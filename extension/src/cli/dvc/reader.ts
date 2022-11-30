@@ -13,7 +13,8 @@ import {
   DataStatusOutput,
   DvcError,
   ExperimentsOutput,
-  PlotsOutput
+  PlotsOutput,
+  PlotsOutputOrError
 } from './contract'
 import { getOptions } from './options'
 import { typeCheckCommands } from '..'
@@ -29,7 +30,8 @@ export const isDvcError = <
   T extends ExperimentsOutput | DataStatusOutput | PlotsOutput
 >(
   dataOrError: T | DvcError
-): dataOrError is DvcError => !!(dataOrError as DvcError).error
+): dataOrError is DvcError =>
+  !!(Object.keys(dataOrError).length === 1 && (dataOrError as DvcError).error)
 
 export const autoRegisteredCommands = {
   DATA_STATUS: 'dataStatus',
@@ -80,7 +82,7 @@ export class DvcReader extends DvcCli {
   public plotsDiff(
     cwd: string,
     ...revisions: string[]
-  ): Promise<PlotsOutput | DvcError> {
+  ): Promise<PlotsOutputOrError> {
     return this.readProcessJson<PlotsOutput>(
       cwd,
       Command.PLOTS,
@@ -127,7 +129,7 @@ export class DvcReader extends DvcCli {
     } catch (error: unknown) {
       const msg =
         (error as MaybeConsoleError).stderr || (error as Error).message
-      Logger.error(`${args} failed with ${msg} retrying...`)
+      Logger.error(`${args} failed with ${msg}`)
       return { error: { msg, type: 'Caught error' } }
     }
   }

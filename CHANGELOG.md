@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.20] - 2022-11-29
+
+### 🐛 Bug Fixes
+
+- Do not process CLI errors thrown by plots diff [#2852](https://github.com/iterative/vscode-dvc/pull/2852) by [@mattseddon](https://github.com/mattseddon)
+- Fix plots file watchers (diff output key is not always a file) [#2854](https://github.com/iterative/vscode-dvc/pull/2854) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.5.19] - 2022-11-29
+
+### 🐛 Bug Fixes
+
+- Fix aspect ratio of multi view plots [#2833](https://github.com/iterative/vscode-dvc/pull/2833) by [@sroy3](https://github.com/sroy3)
+- Fix the number of available revisions for multi view plots [#2836](https://github.com/iterative/vscode-dvc/pull/2836) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Reduce renovate noise [#2826](https://github.com/iterative/vscode-dvc/pull/2826) by [@mattseddon](https://github.com/mattseddon)
+- Delay creation of plots to remove optional logic [#2832](https://github.com/iterative/vscode-dvc/pull/2832) by [@mattseddon](https://github.com/mattseddon)
+- Update multi source test fixture to contain the expected revisions (branch revision not name) [#2837](https://github.com/iterative/vscode-dvc/pull/2837) by [@mattseddon](https://github.com/mattseddon)
+- Remove auto-merge component from renovate config (does not work) [#2838](https://github.com/iterative/vscode-dvc/pull/2838) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.18] - 2022-11-24
 
 ### 🚀 New Features and Enhancements

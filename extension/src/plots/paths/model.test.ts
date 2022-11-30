@@ -257,4 +257,16 @@ describe('PathsModel', () => {
     const noChildren = model.getChildren(logsLoss)
     expect(noChildren).toStrictEqual([])
   })
+
+  it('should not provide error as a path when the CLI throws an error', () => {
+    const model = new PathsModel(mockDvcRoot, buildMockMemento())
+    model.transformAndSet({
+      error: {
+        msg: 'UNEXPECTED ERROR: a strange thing happened',
+        type: 'Caught Error'
+      }
+    })
+
+    expect(model.getTerminalNodes()).toStrictEqual([])
+  })
 })

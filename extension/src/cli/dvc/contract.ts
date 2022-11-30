@@ -93,3 +93,5 @@ export interface ExperimentsOutput {
 export interface PlotsOutput {
   [path: string]: Plot[]
 }
+
+export type PlotsOutputOrError = PlotsOutput | DvcError
