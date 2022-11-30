@@ -140,8 +140,7 @@ export class Plots extends BaseRepository<TPlotsData> {
       this.paths.hasPaths() &&
       definedAndNonEmpty(this.plots.getUnfetchedRevisions())
     ) {
-      this.webviewMessages.sendCheckpointPlotsMessage()
-      return this.data.managedUpdate()
+      this.data.managedUpdate()
     }
 
     return this.webviewMessages.sendWebviewMessage()

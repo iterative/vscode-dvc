@@ -425,12 +425,14 @@ suite('Plots Test Suite', () => {
         messageSpy,
         "should update the webview's comparison revision state"
       ).to.be.calledWithExactly({
-        comparison: comparisonPlotsFixture,
-        selectedRevisions: reorderObjectList(
-          mockComparisonOrder,
-          plotsRevisionsFixture,
-          'revision'
-        )
+        comparison: {
+          ...comparisonPlotsFixture,
+          revisions: reorderObjectList(
+            mockComparisonOrder,
+            comparisonPlotsFixture.revisions,
+            'revision'
+          )
+        }
       })
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
@@ -483,8 +485,7 @@ suite('Plots Test Suite', () => {
             comparisonPlotsFixture.plots,
             'path'
           )
-        },
-        selectedRevisions: plotsRevisionsFixture
+        }
       })
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
