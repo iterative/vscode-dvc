@@ -58,6 +58,10 @@ export const EventName = Object.assign(
     VIEWS_EXPERIMENTS_TABLE_SORT_COLUMN:
       'views.experimentsTable.columnSortAdded',
 
+    VIEWS_GET_STARTED_CLOSE: 'view.GET_STARTED.closed',
+    VIEWS_GET_STARTED_CREATED: 'view.GET_STARTED.created',
+    VIEWS_GET_STARTED_FOCUS_CHANGED: 'views.GET_STARTED.focusChanged',
+
     VIEWS_PLOTS_CLOSED: 'views.plots.closed',
     VIEWS_PLOTS_COMPARISON_ROWS_REORDERED:
       'views.plots.comparisonRowsReordered',
@@ -76,11 +80,7 @@ export const EventName = Object.assign(
 
     VIEWS_TERMINAL_CLOSED: 'views.terminal.closed',
     VIEWS_TERMINAL_CREATED: 'views.terminal.created',
-    VIEWS_TERMINAL_FOCUS_CHANGED: 'views.terminal.focusChanged',
-
-    VIEWS_GET_STARTED_CLOSE: 'view.GET_STARTED.closed',
-    VIEWS_GET_STARTED_CREATED: 'view.GET_STARTED.created',
-    VIEWS_GET_STARTED_FOCUS_CHANGED: 'views.GET_STARTED.focusChanged'
+    VIEWS_TERMINAL_FOCUS_CHANGED: 'views.terminal.focusChanged'
   } as const,
   ViewOpenedEvent,
   RegisteredCliCommands,

@@ -359,6 +359,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
           disposable.track(new EventEmitter()),
           buildMockMemento(),
           {} as ResourceLocator,
+          false,
           { [dvcDemoPath]: experiments },
           disposable.track(new EventEmitter())
         )

@@ -106,6 +106,7 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
       updatesPaused,
       buildMockMemento(),
       resourceLocator,
+      false,
       {
         'other/dvc/root': mockExperiments
       }
@@ -135,7 +136,8 @@ export const buildSingleRepoExperiments = (disposer: Disposer) => {
       internalCommands,
       updatesPaused,
       buildMockMemento(),
-      {} as ResourceLocator
+      {} as ResourceLocator,
+      false
     )
   )
   const [experiments] = workspaceExperiments.create(

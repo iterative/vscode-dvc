@@ -62,6 +62,7 @@ describe('Experiments', () => {
     mockedUpdatesPaused,
     buildMockMemento(),
     {} as ResourceLocator,
+    false,
     {
       '/my/dvc/root': {
         getDvcRoot: () => mockedDvcRoot,
