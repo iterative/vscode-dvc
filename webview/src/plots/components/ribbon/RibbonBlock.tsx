@@ -38,7 +38,9 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
           <div className={styles.subtitle}>{revision.revision}</div>
         )}
       </div>
-      {!revision.fetched && <VSCodeProgressRing />}
+      <div className={styles.fetching}>
+        {!revision.fetched && <VSCodeProgressRing />}
+      </div>
       <Tooltip content="Clear" placement="bottom" delay={500}>
         <button className={styles.clearButton} onClick={onClear}>
           <Icon icon={Close} width={12} height={12} />

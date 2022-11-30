@@ -15,7 +15,6 @@
   display: inline-flex;
   justify-content: space-between;
   align-items: center;
-  gap: 5px;
   font-size: 0.8125rem;
 
   svg {
@@ -26,6 +25,11 @@
   &:hover .copyButton {
     display: inline;
     font-size: 0.8125rem;
+  }
+
+  .fetching {
+    height: 18px;
+    width: 18px;
   }
 }
 
