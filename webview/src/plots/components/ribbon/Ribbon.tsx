@@ -1,8 +1,7 @@
 import cx from 'classnames'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { useSelector } from 'react-redux'
-import { performOrderedUpdate, reorderObjectList } from 'dvc/src/util/array'
 import { useInView } from 'react-intersection-observer'
 import styles from './styles.module.scss'
 import { RibbonBlock } from './RibbonBlock'
@@ -23,12 +22,6 @@ export const Ribbon: React.FC = () => {
   const revisions = useSelector(
     (state: PlotsState) => state.webview.selectedRevisions
   )
-  const [order, setOrder] = useState<string[]>([])
-  const reorderId = 'id'
-
-  useEffect(() => {
-    setOrder(pastOrder => performOrderedUpdate(pastOrder, revisions, reorderId))
-  }, [revisions])
 
   const removeRevision = (revision: string) => {
     sendMessage({
@@ -70,7 +63,7 @@ export const Ribbon: React.FC = () => {
           appearance="secondary"
         />
       </li>
-      {reorderObjectList(order, revisions, reorderId).map(revision => (
+      {revisions.map(revision => (
         <RibbonBlock
           revision={revision}
           key={revision.revision}

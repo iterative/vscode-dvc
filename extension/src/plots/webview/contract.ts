@@ -40,11 +40,13 @@ export type Revision = {
   revision: string
   group?: string
   displayColor: Color
+  fetched: boolean
 }
 
 export interface PlotsComparisonData {
   plots: ComparisonPlots
   size: number
+  revisions: Revision[]
 }
 
 export type CheckpointPlotValues = {

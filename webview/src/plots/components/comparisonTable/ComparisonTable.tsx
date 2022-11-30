@@ -15,10 +15,8 @@ import { PlotsState } from '../../store'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 
 export const ComparisonTable: React.FC = () => {
-  const { plots } = useSelector((state: PlotsState) => state.comparison)
-
-  const { selectedRevisions: revisions } = useSelector(
-    (state: PlotsState) => state.webview
+  const { revisions, plots } = useSelector(
+    (state: PlotsState) => state.comparison
   )
 
   const pinnedColumn = useRef('')

@@ -350,42 +350,49 @@ suite('Experiments Tree Test Suite', () => {
       ).to.deep.equal([
         {
           displayColor: colors[0],
+          fetched: true,
           group: undefined,
           id: 'workspace',
           revision: 'workspace'
         },
         {
+          displayColor: colors[1],
+          fetched: true,
+          group: '[exp-83425]',
+          id: '23250b33e3d6dd0e136262d1d26a2face031cb03',
+          revision: '23250b3'
+        },
+        {
           displayColor: colors[2],
+          fetched: true,
           group: '[exp-e7a67]',
           id: 'exp-e7a67',
           revision: '4fb124a'
         },
         {
           displayColor: colors[3],
+          fetched: true,
           group: '[test-branch]',
           id: 'test-branch',
           revision: '42b8736'
         },
         {
-          displayColor: colors[1],
-          group: '[exp-83425]',
-          id: '23250b33e3d6dd0e136262d1d26a2face031cb03',
-          revision: '23250b3'
-        },
-        {
           displayColor: colors[4],
+          fetched: true,
           group: '[exp-e7a67]',
           id: 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9',
           revision: 'd1343a8'
         },
         {
           displayColor: colors[5],
+          fetched: true,
           group: '[exp-e7a67]',
           id: '1ee5f2ecb0fa4d83cbf614386536344cf894dd53',
           revision: '1ee5f2e'
         },
         {
           displayColor: colors[6],
+          fetched: true,
           group: '[test-branch]',
           id: '217312476f8854dda1865450b737eb6bc7a3ba1b',
           revision: '2173124'
