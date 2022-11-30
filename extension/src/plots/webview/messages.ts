@@ -49,17 +49,17 @@ export class WebviewMessages {
   }
 
   public sendWebviewMessage() {
-    const selectedRevisions = this.plots.getOverrideRevisionDetails()
-    const selectedLabels = selectedRevisions.map(({ revision }) => revision)
+    const { overrideComparison, overrideRevisions } =
+      this.plots.getOverrideRevisionDetails()
 
     this.getWebview()?.show({
       checkpoint: this.getCheckpointPlots(),
-      comparison: this.getComparisonPlots(selectedLabels),
+      comparison: this.getComparisonPlots(overrideComparison),
       hasPlots: !!this.paths?.hasPaths(),
       hasSelectedPlots: definedAndNonEmpty(this.paths.getSelected()),
       sectionCollapsed: this.plots.getSectionCollapsed(),
-      selectedRevisions,
-      template: this.getTemplatePlots(selectedRevisions)
+      selectedRevisions: overrideRevisions,
+      template: this.getTemplatePlots(overrideRevisions)
     })
   }
 
@@ -223,8 +223,7 @@ export class WebviewMessages {
 
   private sendComparisonPlots() {
     this.getWebview()?.show({
-      comparison: this.getComparisonPlots(),
-      selectedRevisions: this.plots.getSelectedRevisionDetails()
+      comparison: this.getComparisonPlots()
     })
   }
 
@@ -248,9 +247,12 @@ export class WebviewMessages {
     }
   }
 
-  private getComparisonPlots(overrideRevs?: string[]) {
+  private getComparisonPlots(overrideRevs?: Revision[]) {
     const paths = this.paths.getComparisonPaths()
-    const comparison = this.plots.getComparisonPlots(paths, overrideRevs)
+    const comparison = this.plots.getComparisonPlots(
+      paths,
+      overrideRevs?.map(({ revision }) => revision)
+    )
     if (!comparison || isEmpty(comparison)) {
       return null
     }
@@ -259,6 +261,7 @@ export class WebviewMessages {
       plots: comparison.map(({ path, revisions }) => {
         return { path, revisions: this.getRevisionsWithCorrectUrls(revisions) }
       }),
+      revisions: overrideRevs || this.plots.getComparisonRevisions(),
       size: this.plots.getPlotSize(Section.COMPARISON_TABLE)
     }
   }
