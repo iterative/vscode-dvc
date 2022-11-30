@@ -6,11 +6,12 @@ import {
   PlotPath,
   TemplateOrder
 } from './collect'
-import { PlotsOutput } from '../../cli/dvc/contract'
 import { PathSelectionModel } from '../../path/selection/model'
 import { PersistenceKey } from '../../persistence/constants'
 import { performSimpleOrderedUpdate } from '../../util/array'
 import { MultiSourceEncoding } from '../multiSource/collect'
+import { isDvcError } from '../../cli/dvc/reader'
+import { PlotsOutputOrError } from '../../cli/dvc/contract'
 
 export class PathsModel extends PathSelectionModel<PlotPath> {
   private templateOrder: TemplateOrder
@@ -26,7 +27,11 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     )
   }
 
-  public transformAndSet(data: PlotsOutput) {
+  public transformAndSet(data: PlotsOutputOrError) {
+    if (isDvcError(data)) {
+      return
+    }
+
     const paths = collectPaths(this.data, data)
 
     this.setNewStatuses(paths)

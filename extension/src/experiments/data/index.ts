@@ -43,10 +43,6 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     this.managedUpdate(QUEUED_EXPERIMENT_PATH)
   }
 
-  public collectFiles(data: ExperimentsOutput) {
-    return collectFiles(data, this.collectedFiles)
-  }
-
   public managedUpdate(path?: string) {
     if (
       path?.includes(QUEUED_EXPERIMENT_PATH) ||
@@ -74,6 +70,10 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
 
   public forceUpdate() {
     return this.processManager.forceRunQueued()
+  }
+
+  protected collectFiles(data: ExperimentsOutput) {
+    return collectFiles(data, this.collectedFiles)
   }
 
   private async watchExpGitRefs(): Promise<void> {

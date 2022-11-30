@@ -1,5 +1,6 @@
 import { EventEmitter } from 'vscode'
-import { PlotsOutput } from '../../cli/dvc/contract'
+import { collectFiles } from './collect'
+import { PlotsOutputOrError } from '../../cli/dvc/contract'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { BaseData } from '../../data'
 import {
@@ -9,7 +10,10 @@ import {
 } from '../../util/array'
 import { PlotsModel } from '../model'
 
-export class PlotsData extends BaseData<{ data: PlotsOutput; revs: string[] }> {
+export class PlotsData extends BaseData<{
+  data: PlotsOutputOrError
+  revs: string[]
+}> {
   private readonly model: PlotsModel
 
   constructor(
@@ -49,25 +53,25 @@ export class PlotsData extends BaseData<{ data: PlotsOutput; revs: string[] }> {
     }
 
     const args = this.getArgs(revs)
-    const data = await this.internalCommands.executeCommand<PlotsOutput>(
+    const data = await this.internalCommands.executeCommand<PlotsOutputOrError>(
       AvailableCommands.PLOTS_DIFF,
       this.dvcRoot,
       ...args
     )
 
+    this.notifyChanged({ data, revs })
+
     const files = this.collectFiles({ data })
 
     this.compareFiles(files)
-
-    return this.notifyChanged({ data, revs })
   }
 
   public managedUpdate() {
     return this.processManager.run('update')
   }
 
-  public collectFiles({ data }: { data: PlotsOutput }) {
-    return Object.keys(data)
+  protected collectFiles({ data }: { data: PlotsOutputOrError }) {
+    return collectFiles(data, this.collectedFiles)
   }
 
   private getArgs(revs: string[]) {

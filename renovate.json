@@ -3,14 +3,6 @@
   "extends": ["config:base"],
   "packageRules": [
     {
-      "description": "Automatically merge non-major updates",
-      "automerge": true,
-      "automergeType": "branch",
-      "excludePackageNames": ["vsce"],
-      "matchDatasources": ["npm"],
-      "matchUpdateTypes": ["minor", "patch", "digest", "pin"]
-    },
-    {
       "internalChecksFilter": "strict",
       "matchDatasources": ["npm"],
       "prConcurrentLimit": 1,
