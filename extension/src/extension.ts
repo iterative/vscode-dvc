@@ -141,7 +141,7 @@ export class Extension extends Disposable implements IExtension {
       ])
     )
 
-    const noDvc = !this.cliAccessible || !this.cliCompatible || !this.hasRoots
+    const noDvc = !this.cliAccessible || !this.hasRoots
 
     this.experiments = this.dispose.track(
       new WorkspaceExperiments(
