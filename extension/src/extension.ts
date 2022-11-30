@@ -141,15 +141,13 @@ export class Extension extends Disposable implements IExtension {
       ])
     )
 
-    const noDvc = !this.cliAccessible || !this.hasRoots
-
     this.experiments = this.dispose.track(
       new WorkspaceExperiments(
         this.internalCommands,
         this.updatesPaused,
         context.workspaceState,
         this.resourceLocator,
-        noDvc
+        () => this.getAvailable()
       )
     )
 
@@ -158,7 +156,7 @@ export class Extension extends Disposable implements IExtension {
         this.internalCommands,
         context.workspaceState,
         this.resourceLocator,
-        noDvc
+        () => this.getAvailable()
       )
     )
 
@@ -440,6 +438,10 @@ export class Extension extends Disposable implements IExtension {
     this.setCommandsAvailability(available)
     this.cliAccessible = available
     return available
+  }
+
+  public getAvailable() {
+    return this.cliAccessible
   }
 
   private setCommandsAvailability(available: boolean) {

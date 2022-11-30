@@ -16,13 +16,13 @@ export abstract class BaseWorkspaceWebviews<
   protected focusedWebviewDvcRoot: string | undefined
 
   private resourceLocator: ResourceLocator
-  private noDvc: boolean
+  private getAvailable: () => boolean
 
   constructor(
     internalCommands: InternalCommands,
     workspaceState: Memento,
     resourceLocator: ResourceLocator,
-    noDvc: boolean,
+    getAvailable: () => boolean,
     repositories?: Record<string, T>
   ) {
     super(internalCommands)
@@ -31,7 +31,7 @@ export abstract class BaseWorkspaceWebviews<
 
     this.resourceLocator = resourceLocator
 
-    this.noDvc = noDvc
+    this.getAvailable = getAvailable
 
     if (repositories) {
       this.repositories = repositories
@@ -39,7 +39,7 @@ export abstract class BaseWorkspaceWebviews<
   }
 
   public async showWebview(overrideRoot: string, viewColumn?: ViewColumn) {
-    if (this.noDvc) {
+    if (!this.getAvailable() || this.getDvcRoots().length === 0) {
       this.showEmptyWebview(viewColumn)
       return
     }
