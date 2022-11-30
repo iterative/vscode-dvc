@@ -76,7 +76,11 @@ export const EventName = Object.assign(
 
     VIEWS_TERMINAL_CLOSED: 'views.terminal.closed',
     VIEWS_TERMINAL_CREATED: 'views.terminal.created',
-    VIEWS_TERMINAL_FOCUS_CHANGED: 'views.terminal.focusChanged'
+    VIEWS_TERMINAL_FOCUS_CHANGED: 'views.terminal.focusChanged',
+
+    VIEWS_GET_STARTED_CLOSE: 'view.GET_STARTED.closed',
+    VIEWS_GET_STARTED_CREATED: 'view.GET_STARTED.created',
+    VIEWS_GET_STARTED_FOCUS_CHANGED: 'views.GET_STARTED.focusChanged'
   } as const,
   ViewOpenedEvent,
   RegisteredCliCommands,
@@ -252,4 +256,8 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_TERMINAL_CREATED]: undefined
 
   [EventName.VIEWS_TRACKED_EXPLORER_TREE_OPENED]: DvcRootCount
+
+  [EventName.VIEWS_GET_STARTED_CLOSE]: undefined
+  [EventName.VIEWS_GET_STARTED_CREATED]: undefined
+  [EventName.VIEWS_GET_STARTED_FOCUS_CHANGED]: undefined
 }

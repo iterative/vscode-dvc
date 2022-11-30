@@ -16,7 +16,8 @@ module.exports = {
       files: [
         'src/experiments/index.tsx',
         'src/plots/index.tsx',
-        'src/shared/components/icons/index.ts'
+        'src/shared/components/icons/index.ts',
+        'src/getStarted/index.tsx'
       ],
       rules: {
         'check-file/no-index': 'off'

@@ -26,7 +26,11 @@ export default {
   entry: {
     experiments: { dependOn: 'react', import: r('src/experiments/index.tsx') },
     plots: { dependOn: 'react', import: r('src/plots/index.tsx') },
-    react: ['react', 'react-dom']
+    react: ['react', 'react-dom'],
+    getStarted: {
+      dependOn: 'react',
+      import: r('src/getStarted/index.tsx')
+    }
   },
   module: {
     rules: [

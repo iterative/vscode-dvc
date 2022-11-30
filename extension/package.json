@@ -1309,7 +1309,7 @@
         {
           "id": "dvc.views.webviews",
           "name": "Views",
-          "when": "dvc.commands.available && dvc.project.available"
+          "when": "true"
         },
         {
           "id": "dvc.views.experimentsColumnsTree",
@@ -1351,7 +1351,7 @@
       {
         "view": "dvc.views.webviews",
         "contents": "[Show Experiments](command:dvc.showExperiments)\n[Show Plots](command:dvc.showPlots)\n[Show Experiments and Plots](command:dvc.showExperimentsAndPlots)",
-        "when": "dvc.commands.available && dvc.project.available"
+        "when": "true"
       },
       {
         "view": "dvc.views.welcome",

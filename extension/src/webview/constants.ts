@@ -1,9 +1,16 @@
-import { distPath, react, experiments, plots } from 'dvc-vscode-webview'
+import {
+  distPath,
+  react,
+  experiments,
+  plots,
+  getStarted
+} from 'dvc-vscode-webview'
 import { EventName, IEventNamePropertyMapping } from '../telemetry/constants'
 
 export enum ViewKey {
   EXPERIMENTS = 'dvc-experiments',
-  PLOTS = 'dvc-plots'
+  PLOTS = 'dvc-plots',
+  GET_STARTED = 'dvc-getStarted'
 }
 
 type Name = keyof IEventNamePropertyMapping
@@ -46,5 +53,17 @@ export const WebviewDetails: {
     scripts: [react, plots],
     title: 'Plots',
     viewKey: ViewKey.PLOTS
+  },
+  [ViewKey.GET_STARTED]: {
+    contextKey: 'dvc.getStarted.webviewActive',
+    distPath,
+    eventNames: {
+      closedEvent: EventName.VIEWS_GET_STARTED_CLOSE,
+      createdEvent: EventName.VIEWS_GET_STARTED_CREATED,
+      focusChangedEvent: EventName.VIEWS_GET_STARTED_FOCUS_CHANGED
+    },
+    scripts: [react, getStarted],
+    title: 'DVC is not initialized',
+    viewKey: ViewKey.GET_STARTED
   }
 } as const

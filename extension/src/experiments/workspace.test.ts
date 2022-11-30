@@ -13,6 +13,7 @@ import { buildMockedEventEmitter } from '../test/util/jest'
 import { OutputChannel } from '../vscode/outputChannel'
 import { Title } from '../vscode/title'
 import { Args } from '../cli/dvc/constants'
+import { ResourceLocator } from '../resourceLocator'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = jest.mocked(Disposable)
@@ -60,6 +61,7 @@ describe('Experiments', () => {
     mockedInternalCommands,
     mockedUpdatesPaused,
     buildMockMemento(),
+    {} as ResourceLocator,
     {
       '/my/dvc/root': {
         getDvcRoot: () => mockedDvcRoot,

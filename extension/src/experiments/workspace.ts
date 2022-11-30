@@ -35,10 +35,12 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     internalCommands: InternalCommands,
     updatesPaused: EventEmitter<boolean>,
     workspaceState: Memento,
+    resourceLocator: ResourceLocator,
+    noDvc: boolean,
     experiments?: Record<string, Experiments>,
     checkpointsChanged?: EventEmitter<void>
   ) {
-    super(internalCommands, workspaceState, experiments)
+    super(internalCommands, workspaceState, resourceLocator, noDvc, experiments)
 
     this.updatesPaused = updatesPaused
 

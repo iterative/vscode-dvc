@@ -19,6 +19,7 @@ import { FileSystemData } from '../../../fileSystem/data'
 import * as Watcher from '../../../fileSystem/watcher'
 import { ExperimentsModel } from '../../../experiments/model'
 import { ColumnsModel } from '../../../experiments/columns/model'
+import { ResourceLocator } from '../../../resourceLocator'
 
 const hasCheckpoints = (data: ExperimentsOutput) => {
   const [experimentsWithBaseline] = Object.values(omit(data, 'workspace'))
@@ -104,6 +105,7 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
       internalCommands,
       updatesPaused,
       buildMockMemento(),
+      resourceLocator,
       {
         'other/dvc/root': mockExperiments
       }
@@ -132,7 +134,8 @@ export const buildSingleRepoExperiments = (disposer: Disposer) => {
     new WorkspaceExperiments(
       internalCommands,
       updatesPaused,
-      buildMockMemento()
+      buildMockMemento(),
+      {} as ResourceLocator
     )
   )
   const [experiments] = workspaceExperiments.create(
