@@ -11,7 +11,8 @@ import {
   ComparisonData,
   RevisionData,
   TemplateAccumulator,
-  collectBranchRevisionDetails
+  collectBranchRevisionDetails,
+  collectOverrideRevisionDetails
 } from './collect'
 import {
   CheckpointPlot,
@@ -40,7 +41,6 @@ import {
   MultiSourceVariations
 } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
-import { isRunning } from '../../experiments/webview/contract'
 import { SelectedExperimentWithColor } from '../../experiments/model'
 
 export class PlotsModel extends ModelWithPersistence {
@@ -64,6 +64,8 @@ export class PlotsModel extends ModelWithPersistence {
   private checkpointPlots?: CheckpointPlot[]
   private selectedMetrics?: string[]
   private metricOrder: string[]
+
+  private unfinishedRunningExperiments: Set<string> = new Set<string>()
 
   constructor(
     dvcRoot: string,
@@ -184,31 +186,28 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public getOverrideRevisionDetails() {
-    const mapping: { [label: string]: string } = {}
+    if (
+      !(
+        this.experiments.hasCheckpoints() &&
+        (this.experiments.hasRunningExperiment() ||
+          this.unfinishedRunningExperiments.size > 0)
+      )
+    ) {
+      return this.getSelectedRevisionDetails()
+    }
 
-    const selectedWithFetchedRunningCheckpointRevs = this.experiments
-      .getSelectedRevisions()
-      .map(exp => {
-        const { label, status, displayColor, id } = exp
-        if (!this.fetchedRevs.has(label) && isRunning(status)) {
-          const mostRecent =
-            this.experiments
-              .getCheckpoints(id)
-              ?.find(({ label }) => this.fetchedRevs.has(label)) || exp
-          mapping[label] = mostRecent.label
-          return {
-            ...mostRecent,
-            displayColor
-          } as SelectedExperimentWithColor
-        }
-        mapping[label] = label
-        return exp
-      })
+    const { overrideOrder, overrideRevisions, unfinishedRunningExperiments } =
+      collectOverrideRevisionDetails(
+        this.comparisonOrder,
+        this.experiments.getSelectedRevisions(),
+        this.fetchedRevs,
+        this.unfinishedRunningExperiments,
+        id => this.experiments.getCheckpoints(id)
+      )
 
-    return this.getSelectedRevisionDetails(
-      this.comparisonOrder.map(label => mapping[label]).filter(Boolean),
-      selectedWithFetchedRunningCheckpointRevs
-    )
+    this.unfinishedRunningExperiments = unfinishedRunningExperiments
+
+    return this.getSelectedRevisionDetails(overrideOrder, overrideRevisions)
   }
 
   public getUnfetchedRevisions() {

@@ -28,7 +28,11 @@ import {
   decodeColumn,
   appendColumnToPath
 } from '../../experiments/columns/paths'
-import { MetricOrParamColumns } from '../../experiments/webview/contract'
+import {
+  Experiment,
+  isRunning,
+  MetricOrParamColumns
+} from '../../experiments/webview/contract'
 import { addToMapArray } from '../../util/map'
 import { TemplateOrder } from '../paths/collect'
 import { extendVegaSpec, isMultiViewPlot } from '../vega/util'
@@ -42,6 +46,7 @@ import {
   unmergeConcatenatedFields
 } from '../multiSource/collect'
 import { StrokeDashEncoding } from '../multiSource/constants'
+import { SelectedExperimentWithColor } from '../../experiments/model'
 
 type CheckpointPlotAccumulator = {
   iterations: Record<string, number>
@@ -710,4 +715,113 @@ export const collectBranchRevisionDetails = (
     }
   }
   return branchRevisions
+}
+
+const getMostRecentFetchedCheckpointRevision = (
+  selectedRevision: SelectedExperimentWithColor,
+  fetchedRevs: Set<string>,
+  checkpoints: Experiment[] | undefined
+): SelectedExperimentWithColor => {
+  const mostRecent =
+    checkpoints?.find(({ label }) => fetchedRevs.has(label)) || selectedRevision
+  return {
+    ...mostRecent,
+    displayColor: selectedRevision.displayColor
+  } as SelectedExperimentWithColor
+}
+
+const overrideRevisionDetail = (
+  orderMapping: { [label: string]: string },
+  selectedWithFetchedRunningCheckpointRevs: SelectedExperimentWithColor[],
+  selectedRevision: SelectedExperimentWithColor,
+  fetchedRevs: Set<string>,
+  unfinishedRunningExperiments: Set<string>,
+  checkpoints: Experiment[] | undefined
+) => {
+  const { id, status, label } = selectedRevision
+
+  if (isRunning(status)) {
+    unfinishedRunningExperiments.add(id)
+  }
+
+  const mostRecent = getMostRecentFetchedCheckpointRevision(
+    selectedRevision,
+    fetchedRevs,
+    checkpoints
+  )
+  orderMapping[label] = mostRecent.label
+  selectedWithFetchedRunningCheckpointRevs.push(mostRecent)
+}
+
+const collectRevisionDetail = (
+  orderMapping: { [label: string]: string },
+  selectedWithFetchedRunningCheckpointRevs: SelectedExperimentWithColor[],
+  selectedRevision: SelectedExperimentWithColor,
+  fetchedRevs: Set<string>,
+  unfinishedRunningExperiments: Set<string>,
+  getCheckpoints: (id: string) => Experiment[] | undefined
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+) => {
+  const { label, status, id, checkpoint_tip, sha } = selectedRevision
+
+  const isCheckpointTip = sha === checkpoint_tip
+  const running = isRunning(status)
+  const preventRevisionsDisappearingAtEnd =
+    isCheckpointTip && unfinishedRunningExperiments.has(id)
+
+  if (
+    !fetchedRevs.has(label) &&
+    (running || preventRevisionsDisappearingAtEnd)
+  ) {
+    return overrideRevisionDetail(
+      orderMapping,
+      selectedWithFetchedRunningCheckpointRevs,
+      selectedRevision,
+      fetchedRevs,
+      unfinishedRunningExperiments,
+      getCheckpoints(id)
+    )
+  }
+
+  if (!running && isCheckpointTip) {
+    unfinishedRunningExperiments.delete(id)
+  }
+
+  orderMapping[label] = label
+  selectedWithFetchedRunningCheckpointRevs.push(selectedRevision)
+}
+
+export const collectOverrideRevisionDetails = (
+  comparisonOrder: string[],
+  selectedRevisions: SelectedExperimentWithColor[],
+  fetchedRevs: Set<string>,
+  unfinishedRunningExperiments: Set<string>,
+  getCheckpoints: (id: string) => Experiment[] | undefined
+): {
+  overrideOrder: string[]
+  overrideRevisions: SelectedExperimentWithColor[]
+  unfinishedRunningExperiments: Set<string>
+} => {
+  const orderMapping: { [label: string]: string } = {}
+  const selectedWithFetchedRunningCheckpointRevs: SelectedExperimentWithColor[] =
+    []
+
+  for (const selectedRevision of selectedRevisions) {
+    collectRevisionDetail(
+      orderMapping,
+      selectedWithFetchedRunningCheckpointRevs,
+      selectedRevision,
+      fetchedRevs,
+      unfinishedRunningExperiments,
+      getCheckpoints
+    )
+  }
+
+  return {
+    overrideOrder: comparisonOrder
+      .map(label => orderMapping[label])
+      .filter(Boolean),
+    overrideRevisions: selectedWithFetchedRunningCheckpointRevs,
+    unfinishedRunningExperiments
+  }
 }
