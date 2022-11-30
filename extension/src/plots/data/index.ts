@@ -59,7 +59,7 @@ export class PlotsData extends BaseData<{
       ...args
     )
 
-    if (args.length < 2) {
+    if (!revs.includes('workspace') && args.length < 2) {
       revs.push('workspace')
     }
 
