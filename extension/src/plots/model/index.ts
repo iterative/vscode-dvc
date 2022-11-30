@@ -41,7 +41,6 @@ import {
   MultiSourceVariations
 } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
-import { SelectedExperimentWithColor } from '../../experiments/model'
 
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
@@ -193,21 +192,27 @@ export class PlotsModel extends ModelWithPersistence {
           this.unfinishedRunningExperiments.size > 0)
       )
     ) {
-      return this.getSelectedRevisionDetails()
+      return {
+        overrideComparison: this.getComparisonRevisions(),
+        overrideRevisions: this.getSelectedRevisionDetails()
+      }
     }
 
-    const { overrideOrder, overrideRevisions, unfinishedRunningExperiments } =
-      collectOverrideRevisionDetails(
-        this.comparisonOrder,
-        this.experiments.getSelectedRevisions(),
-        this.fetchedRevs,
-        this.unfinishedRunningExperiments,
-        id => this.experiments.getCheckpoints(id)
-      )
+    const {
+      overrideComparison,
+      overrideRevisions,
+      unfinishedRunningExperiments
+    } = collectOverrideRevisionDetails(
+      this.comparisonOrder,
+      this.experiments.getSelectedRevisions(),
+      this.fetchedRevs,
+      this.unfinishedRunningExperiments,
+      id => this.experiments.getCheckpoints(id)
+    )
 
     this.unfinishedRunningExperiments = unfinishedRunningExperiments
 
-    return this.getSelectedRevisionDetails(overrideOrder, overrideRevisions)
+    return { overrideComparison, overrideRevisions }
   }
 
   public getUnfetchedRevisions() {
@@ -235,23 +240,16 @@ export class PlotsModel extends ModelWithPersistence {
     return getColorScale(overrideRevs || this.getSelectedRevisionDetails())
   }
 
-  public getSelectedRevisionDetails(
-    overrideOrder?: string[],
-    overrideRevs?: SelectedExperimentWithColor[]
-  ) {
-    return reorderObjectList<Revision>(
-      overrideOrder || this.comparisonOrder,
-      (overrideRevs || this.experiments.getSelectedRevisions()).map(
-        ({ label, displayColor, logicalGroupName, id }) => ({
-          displayColor,
-          fetched: this.fetchedRevs.has(label),
-          group: logicalGroupName,
-          id,
-          revision: label
-        })
-      ),
-      'revision'
-    )
+  public getSelectedRevisionDetails() {
+    return this.experiments
+      .getSelectedRevisions()
+      .map(({ label, displayColor, logicalGroupName, id }) => ({
+        displayColor,
+        fetched: this.fetchedRevs.has(label),
+        group: logicalGroupName,
+        id,
+        revision: label
+      }))
   }
 
   public getTemplatePlots(
@@ -285,6 +283,14 @@ export class PlotsModel extends ModelWithPersistence {
     }
 
     return this.getSelectedComparisonPlots(paths, selectedRevisions)
+  }
+
+  public getComparisonRevisions() {
+    return reorderObjectList<Revision>(
+      this.comparisonOrder,
+      this.getSelectedRevisionDetails(),
+      'revision'
+    )
   }
 
   public setComparisonOrder(revisions: string[] = this.comparisonOrder) {

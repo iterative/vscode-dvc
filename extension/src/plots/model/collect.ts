@@ -11,7 +11,8 @@ import {
   Plot,
   TemplatePlotEntry,
   TemplatePlotSection,
-  PlotsType
+  PlotsType,
+  Revision
 } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
@@ -36,7 +37,11 @@ import {
 import { addToMapArray } from '../../util/map'
 import { TemplateOrder } from '../paths/collect'
 import { extendVegaSpec, isMultiViewPlot } from '../vega/util'
-import { definedAndNonEmpty, splitMatchedOrdered } from '../../util/array'
+import {
+  definedAndNonEmpty,
+  reorderObjectList,
+  splitMatchedOrdered
+} from '../../util/array'
 import { shortenForLabel } from '../../util/string'
 import {
   getDvcDataVersionInfo,
@@ -47,6 +52,7 @@ import {
 } from '../multiSource/collect'
 import { StrokeDashEncoding } from '../multiSource/constants'
 import { SelectedExperimentWithColor } from '../../experiments/model'
+import { Color } from '../../experiments/model/status/colors'
 
 type CheckpointPlotAccumulator = {
   iterations: Record<string, number>
@@ -717,22 +723,31 @@ export const collectBranchRevisionDetails = (
   return branchRevisions
 }
 
+const getRevision = (
+  displayColor: Color,
+  { logicalGroupName, id, label }: Experiment,
+  fetchedRevs: Set<string>
+): Revision => ({
+  displayColor,
+  fetched: fetchedRevs.has(label),
+  group: logicalGroupName,
+  id,
+  revision: label
+})
+
 const getMostRecentFetchedCheckpointRevision = (
   selectedRevision: SelectedExperimentWithColor,
   fetchedRevs: Set<string>,
   checkpoints: Experiment[] | undefined
-): SelectedExperimentWithColor => {
+): Revision => {
   const mostRecent =
     checkpoints?.find(({ label }) => fetchedRevs.has(label)) || selectedRevision
-  return {
-    ...mostRecent,
-    displayColor: selectedRevision.displayColor
-  } as SelectedExperimentWithColor
+  return getRevision(selectedRevision.displayColor, mostRecent, fetchedRevs)
 }
 
 const overrideRevisionDetail = (
   orderMapping: { [label: string]: string },
-  selectedWithFetchedRunningCheckpointRevs: SelectedExperimentWithColor[],
+  selectedWithFetchedRunningCheckpointRevs: Revision[],
   selectedRevision: SelectedExperimentWithColor,
   fetchedRevs: Set<string>,
   unfinishedRunningExperiments: Set<string>,
@@ -749,20 +764,21 @@ const overrideRevisionDetail = (
     fetchedRevs,
     checkpoints
   )
-  orderMapping[label] = mostRecent.label
+  orderMapping[label] = mostRecent.revision
   selectedWithFetchedRunningCheckpointRevs.push(mostRecent)
 }
 
 const collectRevisionDetail = (
   orderMapping: { [label: string]: string },
-  selectedWithFetchedRunningCheckpointRevs: SelectedExperimentWithColor[],
+  selectedWithFetchedRunningCheckpointRevs: Revision[],
   selectedRevision: SelectedExperimentWithColor,
   fetchedRevs: Set<string>,
   unfinishedRunningExperiments: Set<string>,
   getCheckpoints: (id: string) => Experiment[] | undefined
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
-  const { label, status, id, checkpoint_tip, sha } = selectedRevision
+  const { label, status, id, checkpoint_tip, sha, displayColor } =
+    selectedRevision
 
   const isCheckpointTip = sha === checkpoint_tip
   const running = isRunning(status)
@@ -788,7 +804,9 @@ const collectRevisionDetail = (
   }
 
   orderMapping[label] = label
-  selectedWithFetchedRunningCheckpointRevs.push(selectedRevision)
+  selectedWithFetchedRunningCheckpointRevs.push(
+    getRevision(displayColor, selectedRevision, fetchedRevs)
+  )
 }
 
 export const collectOverrideRevisionDetails = (
@@ -798,13 +816,12 @@ export const collectOverrideRevisionDetails = (
   unfinishedRunningExperiments: Set<string>,
   getCheckpoints: (id: string) => Experiment[] | undefined
 ): {
-  overrideOrder: string[]
-  overrideRevisions: SelectedExperimentWithColor[]
+  overrideComparison: Revision[]
+  overrideRevisions: Revision[]
   unfinishedRunningExperiments: Set<string>
 } => {
   const orderMapping: { [label: string]: string } = {}
-  const selectedWithFetchedRunningCheckpointRevs: SelectedExperimentWithColor[] =
-    []
+  const selectedWithFetchedRunningCheckpointRevs: Revision[] = []
 
   for (const selectedRevision of selectedRevisions) {
     collectRevisionDetail(
@@ -818,9 +835,11 @@ export const collectOverrideRevisionDetails = (
   }
 
   return {
-    overrideOrder: comparisonOrder
-      .map(label => orderMapping[label])
-      .filter(Boolean),
+    overrideComparison: reorderObjectList(
+      comparisonOrder.map(revision => orderMapping[revision]),
+      selectedWithFetchedRunningCheckpointRevs,
+      'revision'
+    ),
     overrideRevisions: selectedWithFetchedRunningCheckpointRevs,
     unfinishedRunningExperiments
   }

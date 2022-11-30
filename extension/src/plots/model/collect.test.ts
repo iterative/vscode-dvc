@@ -365,72 +365,236 @@ describe('collectWorkspaceRaceConditionData', () => {
 describe('collectOverrideRevisionDetails', () => {
   it('should override the revision details for running checkpoint tips', () => {
     const runningId = 'b'
+    const runningGroup = `[${runningId}]`
 
-    const { overrideOrder, overrideRevisions, unfinishedRunningExperiments } =
+    const {
+      overrideComparison,
+      overrideRevisions,
+      unfinishedRunningExperiments
+    } = collectOverrideRevisionDetails(
+      ['a', 'b', 'c', 'd'],
+      [
+        {
+          checkpoint_tip: 'b',
+          displayColor: '#4299e1',
+          id: 'a',
+          label: 'a',
+          logicalGroupName: 'a',
+          sha: 'a',
+          status: ExperimentStatus.SUCCESS
+        },
+        {
+          checkpoint_tip: 'b',
+          displayColor: '#13adc7',
+          id: runningId,
+          label: 'b',
+          logicalGroupName: runningGroup,
+          sha: 'b',
+          status: ExperimentStatus.RUNNING
+        },
+        {
+          checkpoint_tip: 'c',
+          displayColor: '#48bb78',
+          id: 'c',
+          label: 'c',
+          logicalGroupName: 'c',
+          sha: 'c',
+          status: ExperimentStatus.SUCCESS
+        },
+        {
+          checkpoint_tip: 'd',
+          displayColor: '#f56565',
+          id: 'd',
+          label: 'd',
+          logicalGroupName: 'd',
+          sha: 'd',
+          status: ExperimentStatus.SUCCESS
+        }
+      ] as SelectedExperimentWithColor[],
+      new Set(['a', 'c', 'd', 'e']),
+      new Set(),
+      (id: string) =>
+        ({
+          [runningId]: [
+            {
+              checkpoint_tip: 'f',
+              id: 'f',
+              label: 'f',
+              logicalGroupName: runningGroup,
+              sha: 'f',
+              status: ExperimentStatus.SUCCESS
+            },
+            {
+              checkpoint_tip: 'e',
+              id: 'e',
+              label: 'e',
+              logicalGroupName: runningGroup,
+              sha: 'e',
+              status: ExperimentStatus.SUCCESS
+            }
+          ] as Experiment[]
+        }[id])
+    )
+    expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
+      'a',
+      'e',
+      'c',
+      'd'
+    ])
+    expect(overrideRevisions).toStrictEqual([
+      {
+        displayColor: '#4299e1',
+        fetched: true,
+        group: 'a',
+        id: 'a',
+        revision: 'a'
+      },
+      {
+        displayColor: '#13adc7',
+        fetched: true,
+        group: runningGroup,
+        id: 'e',
+        revision: 'e'
+      },
+      {
+        displayColor: '#48bb78',
+        fetched: true,
+        group: 'c',
+        id: 'c',
+        revision: 'c'
+      },
+
+      {
+        displayColor: '#f56565',
+        fetched: true,
+        group: 'd',
+        id: 'd',
+        revision: 'd'
+      }
+    ])
+    expect(unfinishedRunningExperiments).toStrictEqual(new Set([runningId]))
+  })
+
+  it('should order the comparison revisions according to the provided', () => {
+    const runningId = 'b'
+    const runningGroup = `[${runningId}]`
+
+    const { overrideComparison, overrideRevisions } =
       collectOverrideRevisionDetails(
-        ['a', 'b', 'c', 'd'],
+        ['a', 'b', 'c', 'd'].reverse(),
         [
-          { label: 'a' },
+          {
+            checkpoint_tip: 'b',
+            displayColor: '#4299e1',
+            id: 'a',
+            label: 'a',
+            logicalGroupName: 'a',
+            sha: 'a',
+            status: ExperimentStatus.SUCCESS
+          },
           {
             checkpoint_tip: 'b',
             displayColor: '#13adc7',
             id: runningId,
             label: 'b',
+            logicalGroupName: runningGroup,
             sha: 'b',
             status: ExperimentStatus.RUNNING
           },
-          { label: 'c' },
-          { label: 'd' }
+          {
+            checkpoint_tip: 'c',
+            displayColor: '#48bb78',
+            id: 'c',
+            label: 'c',
+            logicalGroupName: 'c',
+            sha: 'c',
+            status: ExperimentStatus.SUCCESS
+          },
+          {
+            checkpoint_tip: 'd',
+            displayColor: '#f56565',
+            id: 'd',
+            label: 'd',
+            logicalGroupName: 'd',
+            sha: 'd',
+            status: ExperimentStatus.SUCCESS
+          }
         ] as SelectedExperimentWithColor[],
         new Set(['a', 'c', 'd', 'e']),
         new Set(),
-        (id: string) => ({ [runningId]: [{ label: 'e' }] as Experiment[] }[id])
+        (id: string) =>
+          ({
+            [runningId]: [
+              {
+                checkpoint_tip: 'f',
+                id: 'f',
+                label: 'f',
+                logicalGroupName: runningGroup,
+                sha: 'f',
+                status: ExperimentStatus.SUCCESS
+              },
+              {
+                checkpoint_tip: 'e',
+                id: 'e',
+                label: 'e',
+                logicalGroupName: runningGroup,
+                sha: 'e',
+                status: ExperimentStatus.SUCCESS
+              }
+            ] as Experiment[]
+          }[id])
       )
-    expect(overrideOrder).toStrictEqual(['a', 'e', 'c', 'd'])
-    expect(overrideRevisions).toStrictEqual([
-      { label: 'a' },
-      {
-        displayColor: '#13adc7',
-        label: 'e'
-      },
-      { label: 'c' },
-      { label: 'd' }
+    expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
+      'd',
+      'c',
+      'e',
+      'a'
     ])
-    expect(unfinishedRunningExperiments).toStrictEqual(new Set([runningId]))
+    expect(overrideRevisions.map(({ revision }) => revision)).toStrictEqual([
+      'a',
+      'e',
+      'c',
+      'd'
+    ])
   })
 
   it('should override the revision details for finished but unfetched checkpoint tips', () => {
     const justFinishedRunningId = 'exp-was-running'
-    const { overrideOrder, overrideRevisions, unfinishedRunningExperiments } =
-      collectOverrideRevisionDetails(
-        ['a', 'b', 'c', 'd'],
-        [
-          { label: 'a' },
-          {
-            checkpoint_tip: 'b',
-            displayColor: '#13adc7',
-            id: justFinishedRunningId,
-            label: 'b',
-            sha: 'b',
-            status: ExperimentStatus.SUCCESS
-          },
-          { label: 'c' },
-          { label: 'd' }
-        ] as SelectedExperimentWithColor[],
-        new Set(['a', 'c', 'd', 'e']),
-        new Set([justFinishedRunningId]),
-        (id: string) =>
-          ({ [justFinishedRunningId]: [{ label: 'e' }] as Experiment[] }[id])
-      )
-    expect(overrideOrder).toStrictEqual(['a', 'e', 'c', 'd'])
-    expect(overrideRevisions).toStrictEqual([
-      { label: 'a' },
-      {
-        displayColor: '#13adc7',
-        label: 'e'
-      },
-      { label: 'c' },
-      { label: 'd' }
+    const {
+      overrideComparison,
+      overrideRevisions,
+      unfinishedRunningExperiments
+    } = collectOverrideRevisionDetails(
+      ['a', 'b', 'c', 'd'],
+      [
+        { label: 'a' },
+        {
+          checkpoint_tip: 'b',
+          displayColor: '#13adc7',
+          id: justFinishedRunningId,
+          label: 'b',
+          sha: 'b',
+          status: ExperimentStatus.SUCCESS
+        },
+        { label: 'c' },
+        { label: 'd' }
+      ] as SelectedExperimentWithColor[],
+      new Set(['a', 'c', 'd', 'e']),
+      new Set([justFinishedRunningId]),
+      (id: string) =>
+        ({ [justFinishedRunningId]: [{ label: 'e' }] as Experiment[] }[id])
+    )
+    expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
+      'a',
+      'e',
+      'c',
+      'd'
+    ])
+    expect(overrideRevisions.map(({ revision }) => revision)).toStrictEqual([
+      'a',
+      'e',
+      'c',
+      'd'
     ])
     expect(unfinishedRunningExperiments).toStrictEqual(
       new Set([justFinishedRunningId])
@@ -439,33 +603,74 @@ describe('collectOverrideRevisionDetails', () => {
 
   it('should remove the id from the unfinishedRunningExperiments set once the revision has been fetched', () => {
     const justFinishedRunningId = 'exp-was-running'
-    const { overrideOrder, overrideRevisions, unfinishedRunningExperiments } =
-      collectOverrideRevisionDetails(
-        ['a', 'b', 'c', 'd'],
-        [
-          { label: 'a' },
-          {
-            checkpoint_tip: 'b',
-            displayColor: '#13adc7',
-            id: justFinishedRunningId,
-            label: 'b',
-            sha: 'b',
-            status: ExperimentStatus.SUCCESS
-          },
-          { label: 'c' },
-          { label: 'd' }
-        ] as SelectedExperimentWithColor[],
-        new Set(['a', 'b', 'c', 'd', 'e']),
-        new Set([justFinishedRunningId]),
-        (id: string) =>
-          ({ [justFinishedRunningId]: [{ label: 'e' }] as Experiment[] }[id])
-      )
-    expect(overrideOrder).toStrictEqual(['a', 'b', 'c', 'd'])
-    expect(overrideRevisions).toStrictEqual([
-      { label: 'a' },
-      expect.objectContaining({ label: 'b' }),
-      { label: 'c' },
-      { label: 'd' }
+    const justFinishedRunningGroup = `[${justFinishedRunningId}]`
+    const {
+      overrideComparison,
+      overrideRevisions,
+      unfinishedRunningExperiments
+    } = collectOverrideRevisionDetails(
+      ['a', 'b', 'c', 'd'],
+      [
+        {
+          checkpoint_tip: 'b',
+          displayColor: '#ed8936',
+          id: 'a',
+          label: 'a',
+          logicalGroupName: justFinishedRunningGroup,
+          sha: 'a'
+        },
+        {
+          checkpoint_tip: 'b',
+          displayColor: '#13adc7',
+          id: justFinishedRunningId,
+          label: 'b',
+          logicalGroupName: justFinishedRunningGroup,
+          sha: 'b',
+          status: ExperimentStatus.SUCCESS
+        },
+        {
+          checkpoint_tip: 'q',
+          displayColor: '#48bb78',
+          id: 'c',
+          label: 'c',
+          logicalGroupName: 'c',
+          sha: 'c'
+        },
+        {
+          checkpoint_tip: 'q',
+          displayColor: '#f46837',
+          id: 'd',
+          label: 'd',
+          logicalGroupName: 'c',
+          sha: 'd'
+        }
+      ] as SelectedExperimentWithColor[],
+      new Set(['a', 'b', 'c', 'd', 'e']),
+      new Set([justFinishedRunningId]),
+      (id: string) =>
+        ({
+          [justFinishedRunningId]: [
+            {
+              checkpoint_tip: 'b',
+              id: 'e',
+              label: 'e',
+              logicalGroupName: justFinishedRunningGroup,
+              sha: 'e'
+            }
+          ] as Experiment[]
+        }[id])
+    )
+    expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
+      'a',
+      'b',
+      'c',
+      'd'
+    ])
+    expect(overrideRevisions.map(({ revision }) => revision)).toStrictEqual([
+      'a',
+      'b',
+      'c',
+      'd'
     ])
     expect(unfinishedRunningExperiments).toStrictEqual(new Set([]))
   })

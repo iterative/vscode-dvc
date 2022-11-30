@@ -356,6 +356,13 @@ suite('Experiments Tree Test Suite', () => {
           revision: 'workspace'
         },
         {
+          displayColor: colors[1],
+          fetched: true,
+          group: '[exp-83425]',
+          id: '23250b33e3d6dd0e136262d1d26a2face031cb03',
+          revision: '23250b3'
+        },
+        {
           displayColor: colors[2],
           fetched: true,
           group: '[exp-e7a67]',
@@ -368,13 +375,6 @@ suite('Experiments Tree Test Suite', () => {
           group: '[test-branch]',
           id: 'test-branch',
           revision: '42b8736'
-        },
-        {
-          displayColor: colors[1],
-          fetched: true,
-          group: '[exp-83425]',
-          id: '23250b33e3d6dd0e136262d1d26a2face031cb03',
-          revision: '23250b3'
         },
         {
           displayColor: colors[4],

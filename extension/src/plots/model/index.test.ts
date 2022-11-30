@@ -125,7 +125,7 @@ describe('plotsModel', () => {
     )
 
     expect(
-      model.getSelectedRevisionDetails().map(({ revision }) => revision)
+      model.getComparisonRevisions().map(({ revision }) => revision)
     ).toStrictEqual(newOrder)
   })
 
@@ -137,7 +137,7 @@ describe('plotsModel', () => {
     model.setComparisonOrder(newOrder)
 
     expect(
-      model.getSelectedRevisionDetails().map(({ revision }) => revision)
+      model.getComparisonRevisions().map(({ revision }) => revision)
     ).toStrictEqual([
       ...newOrder,
       ...mockedRevisions
@@ -163,19 +163,19 @@ describe('plotsModel', () => {
     model.setComparisonOrder(initialOrder)
 
     expect(
-      model.getSelectedRevisionDetails().map(({ revision }) => revision)
+      model.getComparisonRevisions().map(({ revision }) => revision)
     ).toStrictEqual(initialOrder)
 
     model.setComparisonOrder()
 
     expect(
-      model.getSelectedRevisionDetails().map(({ revision }) => revision)
+      model.getComparisonRevisions().map(({ revision }) => revision)
     ).toStrictEqual(initialOrder.filter(revision => revision !== 'main'))
 
     model.setComparisonOrder()
 
     expect(
-      model.getSelectedRevisionDetails().map(({ revision }) => revision)
+      model.getComparisonRevisions().map(({ revision }) => revision)
     ).toStrictEqual(['workspace', '71f31cf', 'main'])
   })
 })

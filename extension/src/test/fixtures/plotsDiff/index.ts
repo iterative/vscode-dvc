@@ -10,7 +10,9 @@ import {
   TemplatePlotGroup,
   TemplatePlotsData,
   TemplatePlots,
-  PlotSizeNumber
+  PlotSizeNumber,
+  Revision,
+  PlotsComparisonData
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
@@ -506,7 +508,7 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
   return [singleViewPlots, multiViewPlots]
 }
 
-export const getRevisions = () => {
+export const getRevisions = (): Revision[] => {
   const [workspace, main, _4fb124a, _42b8735, _1ba7bcd] = copyOriginalColors()
   return [
     {
@@ -572,7 +574,7 @@ export const MOCK_IMAGE_MTIME = 946684800000
 export const getComparisonWebviewMessage = (
   baseUrl: string,
   joinFunc?: (...args: string[]) => string
-) => {
+): PlotsComparisonData => {
   const plotAcc = [] as ComparisonPlots
   for (const [path, plots] of Object.entries(getImageData(baseUrl, joinFunc))) {
     const revisionsAcc: ComparisonRevisionData = {}
@@ -588,6 +590,7 @@ export const getComparisonWebviewMessage = (
   }
 
   return {
+    revisions: getRevisions(),
     plots: plotAcc,
     size: PlotSizeNumber.REGULAR
   }

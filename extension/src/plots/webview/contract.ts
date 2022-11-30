@@ -46,6 +46,7 @@ export type Revision = {
 export interface PlotsComparisonData {
   plots: ComparisonPlots
   size: number
+  revisions: Revision[]
 }
 
 export type CheckpointPlotValues = {

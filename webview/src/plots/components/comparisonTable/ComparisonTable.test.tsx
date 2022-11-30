@@ -63,7 +63,6 @@ describe('ComparisonTable', () => {
 
   const renderTable = (
     props = comparisonTableFixture,
-    revisions: Revision[] = plotsRevisionsFixture,
     renderWith: (ui: React.ReactElement) => RenderResult | void = render
   ) => {
     return (
@@ -77,7 +76,6 @@ describe('ComparisonTable', () => {
               },
               webview: {
                 ...webviewInitialState,
-                selectedRevisions: revisions,
                 zoomedInPlot: undefined
               }
             },
@@ -230,7 +228,13 @@ describe('ComparisonTable', () => {
       ({ revision }) => revision !== revisions[3]
     )
 
-    renderTable(comparisonTableFixture, filteredRevisions, rerender)
+    renderTable(
+      {
+        ...comparisonTableFixture,
+        revisions: filteredRevisions
+      },
+      rerender
+    )
 
     headers = getHeaders().map(header => header.textContent)
 
@@ -250,7 +254,10 @@ describe('ComparisonTable', () => {
       { displayColor: '#000000', fetched: true, revision: newRevName }
     ] as Revision[]
 
-    renderTable(comparisonTableFixture, newRevisions, rerender)
+    renderTable(
+      { ...comparisonTableFixture, revisions: newRevisions },
+      rerender
+    )
     const headers = getHeaders().map(header => header.textContent)
 
     expect(headers).toStrictEqual([...namedRevisions, newRevName])
@@ -259,22 +266,20 @@ describe('ComparisonTable', () => {
   it('should display a refresh button for each revision that has a missing image', () => {
     const revisionWithNoData = 'missing-data'
 
-    renderTable(
-      {
-        ...comparisonTableFixture,
-        plots: comparisonTableFixture.plots.map(({ path, revisions }) => ({
-          path,
-          revisions: {
-            ...revisions,
-            [revisionWithNoData]: {
-              revision: revisionWithNoData,
-              url: undefined
-            }
+    renderTable({
+      ...comparisonTableFixture,
+      plots: comparisonTableFixture.plots.map(({ path, revisions }) => ({
+        path,
+        revisions: {
+          ...revisions,
+          [revisionWithNoData]: {
+            revision: revisionWithNoData,
+            url: undefined
           }
-        }))
-      },
-      [
-        ...selectedRevisions,
+        }
+      })),
+      revisions: [
+        ...comparisonTableFixture.revisions,
         {
           displayColor: '#f56565',
           fetched: true,
@@ -283,7 +288,7 @@ describe('ComparisonTable', () => {
           revision: revisionWithNoData
         }
       ]
-    )
+    })
 
     const refreshButtons = screen.getAllByText('Refresh')
 

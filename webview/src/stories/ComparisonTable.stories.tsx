@@ -6,7 +6,6 @@ import { Provider, useDispatch } from 'react-redux'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import {
   ComparisonRevisionData,
-  Revision,
   PlotsComparisonData,
   PlotSizeNumber
 } from 'dvc/src/plots/webview/contract'
@@ -14,28 +13,25 @@ import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import { ComparisonTable } from '../plots/components/comparisonTable/ComparisonTable'
 import { WebviewWrapper } from '../shared/components/webviewWrapper/WebviewWrapper'
 import { update } from '../plots/components/comparisonTable/comparisonTableSlice'
-import { updateSelectedRevisions } from '../plots/components/webviewSlice'
 import { plotsReducers } from '../plots/store'
 
 const MockedState: React.FC<{
   data: PlotsComparisonData
-  selectedRevisions: Revision[]
   children: React.ReactNode
-}> = ({ children, data, selectedRevisions }) => {
+}> = ({ children, data }) => {
   const dispatch = useDispatch()
   dispatch(update(data))
-  dispatch(updateSelectedRevisions(selectedRevisions))
 
   return <>{children}</>
 }
 
 export default {
-  args: { ...comparisonTableFixture, revisions: plotsRevisionsFixture },
+  args: comparisonTableFixture,
   component: ComparisonTable,
   title: 'Comparison Table'
 } as Meta
 
-const Template: Story = ({ plots, revisions }) => {
+const Template: Story = ({ plots }) => {
   const store = configureStore({
     reducer: plotsReducers
   })
@@ -44,9 +40,9 @@ const Template: Story = ({ plots, revisions }) => {
       <MockedState
         data={{
           plots,
+          revisions: plotsRevisionsFixture,
           size: PlotSizeNumber.REGULAR
         }}
-        selectedRevisions={revisions}
       >
         <WebviewWrapper>
           <div
