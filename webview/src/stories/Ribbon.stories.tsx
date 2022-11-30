@@ -59,3 +59,4 @@ WithLoading.args = {
     })
   }
 }
+WithLoading.parameters = { chromatic: { disableSnapshot: true } }

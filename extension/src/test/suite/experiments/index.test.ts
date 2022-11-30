@@ -1015,10 +1015,14 @@ suite('Experiments Test Suite', () => {
 
     it('should be able to handle a message to compare experiments plots', async () => {
       const { experiments, experimentsModel } = buildExperiments(disposable)
-      const mockShowPlots = stub(
-        WorkspacePlots.prototype,
-        'showWebview'
-      ).resolves(undefined)
+      const mockShowPlots = stub(WorkspacePlots.prototype, 'showWebview')
+
+      const dataSent = new Promise(resolve =>
+        mockShowPlots.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      )
 
       await experiments.isReady()
 
@@ -1039,7 +1043,7 @@ suite('Experiments Test Suite', () => {
         type: MessageFromWebviewType.SET_EXPERIMENTS_AND_OPEN_PLOTS
       })
 
-      await tableChangePromise
+      await Promise.all([tableChangePromise, dataSent])
 
       const selectExperimentIds = experimentsModel
         .getSelectedRevisions()
