@@ -9,13 +9,14 @@ import {
   collectTemplates,
   collectMetricOrder,
   collectWorkspaceRunningCheckpoint,
-  collectWorkspaceRaceConditionData
+  collectWorkspaceRaceConditionData,
+  collectOverrideRevisionDetails
 } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import expShowFixture from '../../test/fixtures/expShow/base/output'
 import modifiedFixture from '../../test/fixtures/expShow/modified/output'
 import checkpointPlotsFixture from '../../test/fixtures/expShow/base/checkpointPlots'
-import { ExperimentsOutput } from '../../cli/dvc/contract'
+import { ExperimentsOutput, ExperimentStatus } from '../../cli/dvc/contract'
 import {
   definedAndNonEmpty,
   sameContents,
@@ -23,6 +24,8 @@ import {
 } from '../../util/array'
 import { TemplatePlot } from '../webview/contract'
 import { getCLIBranchId } from '../../test/fixtures/plotsDiff/util'
+import { SelectedExperimentWithColor } from '../../experiments/model'
+import { Experiment } from '../../experiments/webview/contract'
 
 const logsLossPath = join('logs', 'loss.tsv')
 
@@ -356,5 +359,114 @@ describe('collectWorkspaceRaceConditionData', () => {
         values.map(value => omit(value, 'rev'))
       )
     )
+  })
+})
+
+describe('collectOverrideRevisionDetails', () => {
+  it('should override the revision details for running checkpoint tips', () => {
+    const runningId = 'b'
+
+    const { overrideOrder, overrideRevisions, unfinishedRunningExperiments } =
+      collectOverrideRevisionDetails(
+        ['a', 'b', 'c', 'd'],
+        [
+          { label: 'a' },
+          {
+            checkpoint_tip: 'b',
+            displayColor: '#13adc7',
+            id: runningId,
+            label: 'b',
+            sha: 'b',
+            status: ExperimentStatus.RUNNING
+          },
+          { label: 'c' },
+          { label: 'd' }
+        ] as SelectedExperimentWithColor[],
+        new Set(['a', 'c', 'd', 'e']),
+        new Set(),
+        (id: string) => ({ [runningId]: [{ label: 'e' }] as Experiment[] }[id])
+      )
+    expect(overrideOrder).toStrictEqual(['a', 'e', 'c', 'd'])
+    expect(overrideRevisions).toStrictEqual([
+      { label: 'a' },
+      {
+        displayColor: '#13adc7',
+        label: 'e'
+      },
+      { label: 'c' },
+      { label: 'd' }
+    ])
+    expect(unfinishedRunningExperiments).toStrictEqual(new Set([runningId]))
+  })
+
+  it('should override the revision details for finished but unfetched checkpoint tips', () => {
+    const justFinishedRunningId = 'exp-was-running'
+    const { overrideOrder, overrideRevisions, unfinishedRunningExperiments } =
+      collectOverrideRevisionDetails(
+        ['a', 'b', 'c', 'd'],
+        [
+          { label: 'a' },
+          {
+            checkpoint_tip: 'b',
+            displayColor: '#13adc7',
+            id: justFinishedRunningId,
+            label: 'b',
+            sha: 'b',
+            status: ExperimentStatus.SUCCESS
+          },
+          { label: 'c' },
+          { label: 'd' }
+        ] as SelectedExperimentWithColor[],
+        new Set(['a', 'c', 'd', 'e']),
+        new Set([justFinishedRunningId]),
+        (id: string) =>
+          ({ [justFinishedRunningId]: [{ label: 'e' }] as Experiment[] }[id])
+      )
+    expect(overrideOrder).toStrictEqual(['a', 'e', 'c', 'd'])
+    expect(overrideRevisions).toStrictEqual([
+      { label: 'a' },
+      {
+        displayColor: '#13adc7',
+        label: 'e'
+      },
+      { label: 'c' },
+      { label: 'd' }
+    ])
+    expect(unfinishedRunningExperiments).toStrictEqual(
+      new Set([justFinishedRunningId])
+    )
+  })
+
+  it('should remove the id from the unfinishedRunningExperiments set once the revision has been fetched', () => {
+    const justFinishedRunningId = 'exp-was-running'
+    const { overrideOrder, overrideRevisions, unfinishedRunningExperiments } =
+      collectOverrideRevisionDetails(
+        ['a', 'b', 'c', 'd'],
+        [
+          { label: 'a' },
+          {
+            checkpoint_tip: 'b',
+            displayColor: '#13adc7',
+            id: justFinishedRunningId,
+            label: 'b',
+            sha: 'b',
+            status: ExperimentStatus.SUCCESS
+          },
+          { label: 'c' },
+          { label: 'd' }
+        ] as SelectedExperimentWithColor[],
+        new Set(['a', 'b', 'c', 'd', 'e']),
+        new Set([justFinishedRunningId]),
+        (id: string) =>
+          ({ [justFinishedRunningId]: [{ label: 'e' }] as Experiment[] }[id])
+      )
+    expect(overrideOrder).toStrictEqual(['a', 'b', 'c', 'd'])
+    expect(overrideRevisions).toStrictEqual([
+      { label: 'a' },
+      expect.objectContaining({ label: 'b' }),
+      { label: 'c' },
+      { label: 'd' }
+    ])
+    expect(unfinishedRunningExperiments).toStrictEqual(new Set([]))
   })
 })

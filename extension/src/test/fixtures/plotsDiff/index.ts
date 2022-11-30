@@ -513,22 +513,32 @@ export const getRevisions = () => {
       id: 'workspace',
       revision: 'workspace',
       displayColor: workspace,
+      fetched: true,
       group: undefined
     },
-    { id: 'main', revision: 'main', displayColor: main, group: undefined },
     {
+      fetched: true,
+      id: 'main',
+      revision: 'main',
+      displayColor: main,
+      group: undefined
+    },
+    {
+      fetched: true,
       id: 'exp-e7a67',
       revision: '4fb124a',
       displayColor: _4fb124a,
       group: '[exp-e7a67]'
     },
     {
+      fetched: true,
       id: 'test-branch',
       revision: '42b8736',
       displayColor: _42b8735,
       group: '[test-branch]'
     },
     {
+      fetched: true,
       id: 'exp-83425',
       revision: '1ba7bcd',
       displayColor: _1ba7bcd,

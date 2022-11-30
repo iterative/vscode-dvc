@@ -1,5 +1,6 @@
 import { Revision } from 'dvc/src/plots/webview/contract'
 import React from 'react'
+import { VSCodeProgressRing } from '@vscode/webview-ui-toolkit/react'
 import styles from './styles.module.scss'
 import { Icon } from '../../../shared/components/Icon'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
@@ -35,6 +36,11 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
         </div>
         {revision.group && (
           <div className={styles.subtitle}>{revision.revision}</div>
+        )}
+      </div>
+      <div className={styles.iconPlaceholder}>
+        {!revision.fetched && (
+          <VSCodeProgressRing className={styles.fetching} />
         )}
       </div>
       <Tooltip content="Clear" placement="bottom" delay={500}>

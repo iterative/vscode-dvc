@@ -20,8 +20,9 @@ import {
 } from 'vega-lite/build/src/spec/repeat'
 import { TopLevelUnitSpec } from 'vega-lite/build/src/spec/unit'
 import isEqual from 'lodash.isequal'
-import { ColorScale, PlotSizeNumber, Revision } from '../webview/contract'
+import { ColorScale, PlotSizeNumber } from '../webview/contract'
 import { ShapeEncoding, StrokeDashEncoding } from '../multiSource/constants'
+import { Color } from '../../experiments/model/status/colors'
 
 const COMMIT_FIELD = 'rev'
 
@@ -88,7 +89,7 @@ export const isMultiViewByCommitPlot = (
 ): boolean => !template || getFacetField(template) === COMMIT_FIELD
 
 export const getColorScale = (
-  revisions: Revision[]
+  revisions: { displayColor: Color; revision: string }[]
 ): ColorScale | undefined => {
   const acc: ColorScale = { domain: [], range: [] }
 
