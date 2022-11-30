@@ -223,10 +223,9 @@ export class PlotsModel extends ModelWithPersistence {
       ...Object.keys(this.revisionData)
     ])
 
-    return this.experiments
-      .getSelectedRevisions()
-      .filter(({ label }) => !cachedRevisions.has(label))
-      .map(({ label }) => this.getCLIId(label))
+    return this.getSelectedRevisions()
+      .filter(label => !cachedRevisions.has(label))
+      .map(label => this.getCLIId(label))
   }
 
   public getMutableRevisions() {
@@ -414,7 +413,7 @@ export class PlotsModel extends ModelWithPersistence {
   private getCLIIdToLabel() {
     const mapping: { [shortSha: string]: string } = {}
 
-    for (const rev of this.experiments.getRevisions()) {
+    for (const rev of this.getSelectedRevisions()) {
       mapping[this.getCLIId(rev)] = rev
     }
 
