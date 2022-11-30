@@ -1,5 +1,5 @@
 {
-  "ignoreDeps": ["execa", "@types/vscode"],
+  "ignoreDeps": ["execa", "@types/node", "@types/vscode"],
   "extends": ["config:base"],
   "packageRules": [
     {
