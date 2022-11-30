@@ -190,7 +190,7 @@ export class PlotsModel extends ModelWithPersistence {
       .getSelectedRevisions()
       .map(exp => {
         const { label, status, displayColor, id } = exp
-        if (isRunning(status) && !this.fetchedRevs.has(label)) {
+        if (!this.fetchedRevs.has(label) && isRunning(status)) {
           const mostRecent =
             this.experiments
               .getCheckpoints(id)
@@ -413,7 +413,7 @@ export class PlotsModel extends ModelWithPersistence {
   private getCLIIdToLabel() {
     const mapping: { [shortSha: string]: string } = {}
 
-    for (const rev of this.getSelectedRevisions()) {
+    for (const rev of this.experiments.getRevisions()) {
       mapping[this.getCLIId(rev)] = rev
     }
 
