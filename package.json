@@ -73,7 +73,7 @@
     "**/recursive-readdir/minimatch": "5.1.0",
     "fastify": "3.29.4",
     "loader-utils": "2.0.4",
-    "terser": "5.15.1",
+    "terser": "5.16.0",
     "trim-newlines": "3.0.1",
     "trim": "1.0.1",
     "vega-functions": "5.13.0",

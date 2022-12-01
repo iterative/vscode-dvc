@@ -61,6 +61,8 @@ import { collectWorkspaceScale } from './telemetry/collect'
 import { createFileSystemWatcher } from './fileSystem/watcher'
 import { GitExecutor } from './cli/git/executor'
 import { GitReader } from './cli/git/reader'
+import { createWebview } from './webview/factory'
+import { ViewKey } from './webview/constants'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
@@ -248,6 +250,19 @@ export class Extension extends Disposable implements IExtension {
         await this.plots.showWebview(
           getDvcRootFromContext(context),
           ViewColumn.Beside
+        )
+      }
+    )
+
+    this.internalCommands.registerExternalCommand(
+      RegisteredCommands.GET_STARTED_WEBVIEW_SHOW,
+      async () => {
+        await createWebview(
+          ViewKey.GET_STARTED,
+          '',
+          this.resourceLocator.dvcIcon,
+          ViewColumn.Active,
+          true
         )
       }
     )

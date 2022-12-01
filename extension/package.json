@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.5.20",
+  "version": "0.5.21",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -1307,11 +1307,6 @@
       ],
       "dvc-views": [
         {
-          "id": "dvc.views.webviews",
-          "name": "Views",
-          "when": "dvc.commands.available && dvc.project.available"
-        },
-        {
           "id": "dvc.views.experimentsColumnsTree",
           "name": "Columns",
           "when": "dvc.commands.available && dvc.project.available"
@@ -1320,6 +1315,11 @@
           "id": "dvc.views.welcome",
           "name": "Welcome",
           "when": "!dvc.commands.available || dvc.cli.incompatible || !dvc.project.available"
+        },
+        {
+          "id": "dvc.views.webviews",
+          "name": "Views",
+          "when": "true"
         },
         {
           "id": "dvc.views.experimentsTree",
@@ -1352,6 +1352,11 @@
         "view": "dvc.views.webviews",
         "contents": "[Show Experiments](command:dvc.showExperiments)\n[Show Plots](command:dvc.showPlots)\n[Show Experiments and Plots](command:dvc.showExperimentsAndPlots)",
         "when": "dvc.commands.available && dvc.project.available"
+      },
+      {
+        "view": "dvc.views.webviews",
+        "contents": "[Show Experiments](command:dvc.showGetStartedWebview)\n[Show Plots](command:dvc.showGetStartedWebview)\n[Show Experiments and Plots](command:dvc.showGetStartedWebview)",
+        "when": "!dvc.commands.available || !dvc.project.available"
       },
       {
         "view": "dvc.views.welcome",
