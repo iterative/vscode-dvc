@@ -10,9 +10,10 @@ export const isValidDvcRoot = (dvcRoot?: string): dvcRoot is string => !!dvcRoot
 const create = (
   viewKey: ViewKey,
   webviewPanel: WebviewPanel,
-  dvcRoot: string
+  dvcRoot: string,
+  bypassDvcRoot?: boolean
 ) => {
-  if (!isValidDvcRoot(dvcRoot)) {
+  if (!bypassDvcRoot && !isValidDvcRoot(dvcRoot)) {
     throw new Error(`trying to set invalid state into ${viewKey}`)
   }
 
@@ -25,7 +26,8 @@ export const createWebview = async (
   viewKey: ViewKey,
   dvcRoot: string,
   iconPath: Resource,
-  viewColumn?: ViewColumn
+  viewColumn?: ViewColumn,
+  bypassDvcRoot?: boolean
 ) => {
   const { title, distPath } = WebviewDetails[viewKey]
 
@@ -42,7 +44,7 @@ export const createWebview = async (
 
   webviewPanel.iconPath = iconPath
 
-  const view = create(viewKey, webviewPanel, dvcRoot)
+  const view = create(viewKey, webviewPanel, dvcRoot, bypassDvcRoot)
   await view.isReady()
   return view
 }
