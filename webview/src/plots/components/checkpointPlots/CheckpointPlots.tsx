@@ -17,6 +17,7 @@ import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/Virt
 import { shouldUseVirtualizedGrid } from '../util'
 import { PlotsState } from '../../store'
 import { changeOrderWithDraggedInfo } from '../../../util/array'
+import { LoadingSection, sectionIsLoading } from '../LoadingSection'
 
 interface CheckpointPlotsProps {
   plotsIds: string[]
@@ -37,6 +38,10 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
     (state: PlotsState) => state.dragAndDrop.draggedRef
   )
 
+  const selectedRevisions = useSelector(
+    (state: PlotsState) => state.webview.selectedRevisions
+  )
+
   useEffect(() => {
     setOrder(pastOrder => performSimpleOrderedUpdate(pastOrder, plotsIds))
   }, [plotsIds])
@@ -47,6 +52,10 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
       payload: order,
       type: MessageFromWebviewType.REORDER_PLOTS_METRICS
     })
+  }
+
+  if (sectionIsLoading(selectedRevisions)) {
+    return <LoadingSection />
   }
 
   if (!hasData) {

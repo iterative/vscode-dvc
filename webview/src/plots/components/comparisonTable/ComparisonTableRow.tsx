@@ -1,12 +1,10 @@
 import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
-import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React, { useState } from 'react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
 import styles from './styles.module.scss'
+import { ComparisonTableCell } from './ComparisonTableCell'
 import { Icon } from '../../../shared/components/Icon'
-import { RefreshButton } from '../../../shared/components/button/RefreshButton'
-import { sendMessage } from '../../../shared/vscode'
 import { ChevronDown, ChevronRight } from '../../../shared/components/icons'
 import { PlotsState } from '../../store'
 import { CopyButton } from '../../../shared/components/copyButton/CopyButton'
@@ -17,7 +15,7 @@ import Tooltip, {
 
 export interface ComparisonTableRowProps {
   path: string
-  plots: ComparisonPlot[]
+  plots: (ComparisonPlot & { fetched: boolean })[]
   nbColumns: number
   pinnedColumn: string
 }
@@ -64,16 +62,14 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
         {nbColumns > 1 && pinnedColumn && <td colSpan={nbColumns - 1}></td>}
       </tr>
       <tr>
-        {plots.map((plot: ComparisonPlot) => {
+        {plots.map(plot => {
           const isPinned = pinnedColumn === plot.revision
-          const missing = !plot?.url
-
           return (
             <td
               key={path + plot.revision}
               className={cx({
                 [styles.pinnedColumnCell]: isPinned,
-                [styles.missing]: isShown && missing,
+                [styles.noImage]: isShown && !plot?.url,
                 [styles.draggedColumn]: draggedId === plot.revision
               })}
             >
@@ -81,25 +77,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
                 data-testid="row-images"
                 className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
               >
-                {missing ? (
-                  <div>
-                    <p>No Plot to Display.</p>
-                    <RefreshButton
-                      onClick={() =>
-                        sendMessage({
-                          payload: plot.revision,
-                          type: MessageFromWebviewType.REFRESH_REVISION
-                        })
-                      }
-                    />
-                  </div>
-                ) : (
-                  <img
-                    draggable={false}
-                    src={plot.url}
-                    alt={`Plot of ${path} (${plot.revision})`}
-                  />
-                )}
+                <ComparisonTableCell path={path} plot={plot} />
               </div>
             </td>
           )
