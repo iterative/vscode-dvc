@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.21] - 2022-12-01
+
+### 🚀 New Features and Enhancements
+
+- Add progress ring to plots ribbon while data is loading [#2841](https://github.com/iterative/vscode-dvc/pull/2841) by [@mattseddon](https://github.com/mattseddon)
+- Open plots in split view when request sent from table [#2864](https://github.com/iterative/vscode-dvc/pull/2864) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Separate comparison table and plot ribbon revision orders [#2859](https://github.com/iterative/vscode-dvc/pull/2859) by [@mattseddon](https://github.com/mattseddon)
+- Do not snapshot story with progress rings [#2862](https://github.com/iterative/vscode-dvc/pull/2862) by [@mattseddon](https://github.com/mattseddon)
+- Match VS Code version of @types/node [#2863](https://github.com/iterative/vscode-dvc/pull/2863) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.20] - 2022-11-29
 
 ### 🐛 Bug Fixes
