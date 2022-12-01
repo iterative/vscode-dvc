@@ -88,11 +88,16 @@ $gap: 4px;
   transform: rotate(0deg);
 }
 
-.missing {
+.noImage {
   background-color: $bg-color;
   border-style: solid;
   border-width: thin;
   border-color: $watermark-color;
+}
+
+.noImageContent {
+  padding-top: 25%;
+  padding-bottom: 25%;
 }
 
 .rowToggler {

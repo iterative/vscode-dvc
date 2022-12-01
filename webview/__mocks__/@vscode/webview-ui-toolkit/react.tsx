@@ -24,3 +24,7 @@ type MockCheckboxProps = {
 export const VSCodeCheckbox: React.FC<MockCheckboxProps> = ({ onClick }) => {
   return <input type="checkbox" onClick={onClick} />
 }
+
+export const VSCodeProgressRing: React.FC = () => {
+  return <div />
+}

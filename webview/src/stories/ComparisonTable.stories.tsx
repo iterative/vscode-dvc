@@ -3,7 +3,6 @@ import { configureStore } from '@reduxjs/toolkit'
 import { userEvent, within } from '@storybook/testing-library'
 import React, { DetailedHTMLProps, HTMLAttributes } from 'react'
 import { Provider, useDispatch } from 'react-redux'
-import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import {
   ComparisonRevisionData,
   PlotsComparisonData,
@@ -31,7 +30,7 @@ export default {
   title: 'Comparison Table'
 } as Meta
 
-const Template: Story = ({ plots }) => {
+const Template: Story = ({ plots, revisions }) => {
   const store = configureStore({
     reducer: plotsReducers
   })
@@ -40,7 +39,7 @@ const Template: Story = ({ plots }) => {
       <MockedState
         data={{
           plots,
-          revisions: plotsRevisionsFixture,
+          revisions,
           size: PlotSizeNumber.REGULAR
         }}
       >
@@ -71,24 +70,48 @@ WithPinnedColumn.play = async ({ canvasElement }) => {
   userEvent.click(pin)
 }
 
-const removeSingleImage = (
+const removeImages = (
   path: string,
   revisionsData: ComparisonRevisionData
 ): ComparisonRevisionData => {
   const filteredRevisionData: ComparisonRevisionData = {}
   for (const [revision, data] of Object.entries(revisionsData)) {
-    if (path !== comparisonTableFixture.plots[0].path || revision !== 'main') {
-      filteredRevisionData[revision] = data
+    if (
+      (path === comparisonTableFixture.plots[0].path && revision === 'main') ||
+      revision === 'workspace'
+    ) {
+      continue
     }
+    filteredRevisionData[revision] = data
   }
   return filteredRevisionData
 }
 
 export const WithMissingData = Template.bind({})
 WithMissingData.args = {
-  ...comparisonTableFixture,
   plots: comparisonTableFixture.plots.map(({ path, revisions }) => ({
     path,
-    revisions: removeSingleImage(path, revisions)
-  }))
+    revisions: removeImages(path, revisions)
+  })),
+  revisions: comparisonTableFixture.revisions.map(revision => {
+    if (revision.id === 'workspace') {
+      return { ...revision, fetched: false }
+    }
+    return revision
+  })
+}
+
+export const WithOnlyMissingData = Template.bind({})
+WithOnlyMissingData.args = {
+  plots: comparisonTableFixture.plots.map(({ path, revisions }) => ({
+    path,
+    revisions: removeImages(path, revisions)
+  })),
+  revisions: comparisonTableFixture.revisions
+    .map(revision => {
+      if (revision.id === 'workspace') {
+        return { ...revision, fetched: false }
+      }
+    })
+    .filter(Boolean)
 }

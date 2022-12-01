@@ -21,6 +21,7 @@ import { setDraggedOverGroup } from '../../../shared/components/dragDrop/dragDro
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { isSameGroup } from '../../../shared/components/dragDrop/DragDropContainer'
 import { changeOrderWithDraggedInfo } from '../../../util/array'
+import { LoadingSection, sectionIsLoading } from '../LoadingSection'
 
 export enum NewSectionBlock {
   TOP = 'drop-section-top',
@@ -37,6 +38,10 @@ export const TemplatePlots: React.FC = () => {
   const draggedRef = useSelector(
     (state: PlotsState) => state.dragAndDrop.draggedRef
   )
+  const selectedRevisions = useSelector(
+    (state: PlotsState) => state.webview.selectedRevisions
+  )
+
   const [sections, setSections] = useState<TemplatePlotSection[]>([])
   const [hoveredSection, setHoveredSection] = useState('')
   const nbItemsPerRow = size
@@ -61,6 +66,9 @@ export const TemplatePlots: React.FC = () => {
     shouldSendMessage.current = true
   }, [sections])
 
+  if (sectionIsLoading(selectedRevisions)) {
+    return <LoadingSection />
+  }
   if (!sections || sections.length === 0) {
     return <EmptyState isFullScreen={false}>No Plots to Display</EmptyState>
   }
