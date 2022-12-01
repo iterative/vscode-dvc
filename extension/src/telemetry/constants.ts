@@ -260,4 +260,6 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_GET_STARTED_CLOSE]: undefined
   [EventName.VIEWS_GET_STARTED_CREATED]: undefined
   [EventName.VIEWS_GET_STARTED_FOCUS_CHANGED]: undefined
+
+  [EventName.GET_STARTED_WEBVIEW_SHOW]: undefined
 }

@@ -41,7 +41,6 @@ import {
   FilterItem
 } from '../../../../../experiments/model/filterBy/tree'
 import { starredFilter } from '../../../../../experiments/model/filterBy/constants'
-import { ResourceLocator } from '../../../../../resourceLocator'
 
 suite('Experiments Filter By Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -358,8 +357,6 @@ suite('Experiments Filter By Tree Test Suite', () => {
           internalCommands,
           disposable.track(new EventEmitter()),
           buildMockMemento(),
-          {} as ResourceLocator,
-          () => true,
           { [dvcDemoPath]: experiments },
           disposable.track(new EventEmitter())
         )
