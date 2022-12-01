@@ -448,10 +448,6 @@ export class Extension extends Disposable implements IExtension {
     return available
   }
 
-  public getAvailable() {
-    return this.cliAccessible
-  }
-
   private setCommandsAvailability(available: boolean) {
     setContextValue('dvc.commands.available', available)
   }
