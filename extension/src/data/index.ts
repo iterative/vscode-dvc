@@ -1,6 +1,4 @@
-import { join } from 'path'
 import { EventEmitter, Event } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
 import {
   createFileSystemWatcher,
   getRelativePattern
@@ -8,7 +6,7 @@ import {
 import { ProcessManager } from '../processManager'
 import { InternalCommands } from '../commands/internal'
 import { ExperimentsOutput, PlotsOutputOrError } from '../cli/dvc/contract'
-import { definedAndNonEmpty, sameContents, uniqueValues } from '../util/array'
+import { uniqueValues } from '../util/array'
 import { DeferredDisposable } from '../class/deferred'
 
 export abstract class BaseData<
@@ -27,15 +25,6 @@ export abstract class BaseData<
     new EventEmitter()
   )
 
-  private readonly collectedFilesChanged = this.dispose.track(
-    new EventEmitter<void>()
-  )
-
-  private readonly onDidChangeCollectedFiles: Event<void> =
-    this.collectedFilesChanged.event
-
-  private watcher?: Disposable
-
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
@@ -53,16 +42,9 @@ export abstract class BaseData<
     this.onDidUpdate = this.updated.event
     this.staticFiles = staticFiles
 
+    this.watchFiles()
+
     this.waitForInitialData()
-  }
-
-  protected compareFiles(files: string[]) {
-    if (sameContents(this.collectedFiles, files)) {
-      return
-    }
-
-    this.collectedFiles = files
-    this.collectedFilesChanged.fire()
   }
 
   protected notifyChanged(data: T) {
@@ -72,16 +54,6 @@ export abstract class BaseData<
   private waitForInitialData() {
     const waitForInitialData = this.dispose.track(
       this.onDidUpdate(() => {
-        this.watcher = this.watchFiles()
-
-        this.dispose.track(
-          this.onDidChangeCollectedFiles(() => {
-            const watcher = this.watchFiles()
-            this.dispose.untrack(this.watcher)
-            this.watcher?.dispose()
-            this.watcher = watcher
-          })
-        )
         this.dispose.untrack(waitForInitialData)
         waitForInitialData.dispose()
         this.deferred.resolve()
@@ -89,26 +61,25 @@ export abstract class BaseData<
     )
   }
 
-  private watchFiles() {
-    const files = uniqueValues([...this.staticFiles, ...this.collectedFiles])
-    if (!definedAndNonEmpty(files)) {
-      return
-    }
+  private getWatchedFiles() {
+    return uniqueValues([...this.staticFiles, ...this.collectedFiles])
+  }
 
+  private watchFiles() {
     return this.dispose.track(
-      createFileSystemWatcher(
-        getRelativePattern(this.dvcRoot, join('**', `{${files.join(',')}}`)),
-        path => {
-          if (!path) {
-            return
-          }
+      createFileSystemWatcher(getRelativePattern(this.dvcRoot, '**'), path => {
+        if (
+          this.getWatchedFiles().some(watchedRelPath =>
+            path.endsWith(watchedRelPath)
+          )
+        ) {
           this.managedUpdate(path)
         }
-      )
+      })
     )
   }
 
   abstract managedUpdate(path?: string): Promise<unknown>
 
-  protected abstract collectFiles(data: T): string[]
+  protected abstract collectFiles(data: T): void
 }
