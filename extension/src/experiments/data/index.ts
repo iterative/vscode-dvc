@@ -36,7 +36,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
         },
         { name: 'fullUpdate', process: () => this.update() }
       ],
-      ['dvc.lock', 'dvc.yaml', 'params.yaml', '*.dvc']
+      ['dvc.lock', 'dvc.yaml', 'params.yaml', '.dvc']
     )
 
     this.watchExpGitRefs()
@@ -61,9 +61,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
       ...args
     )
 
-    const files = this.collectFiles(data)
-
-    this.compareFiles(files)
+    this.collectFiles(data)
 
     return this.notifyChanged(data)
   }
@@ -73,7 +71,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   }
 
   protected collectFiles(data: ExperimentsOutput) {
-    return collectFiles(data, this.collectedFiles)
+    this.collectedFiles = collectFiles(data, this.collectedFiles)
   }
 
   private async watchExpGitRefs(): Promise<void> {
