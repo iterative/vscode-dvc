@@ -20,10 +20,6 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
   ) {
     super(dvcRoot, webviewIcon)
 
-    if (this.webview) {
-      this.sendInitialWebviewData()
-    }
-
     this.createWebviewMessageHandler()
     this.internalCommands = internalCommands
   }
