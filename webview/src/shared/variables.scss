@@ -18,6 +18,8 @@ $row-fg-selected-color: var(--vscode-list-activeSelectionForeground);
 $row-border-selected-color: var(--vscode-list-focusOutline);
 $header-bg-color: $bg-color;
 $header-border-color: $border-color;
+$header-dnd-outline: var(--contrast-active-border);
+$header-dnd-drop-background: var(--vscode-editorGroup-dropBackground);
 $meta-cell-color: var(--vscode-descriptionForeground);
 $header-resizer-color: var(--vscode-sash-hoverBorder);
 $header-drop-target-color: var(--vscode-focusBorder);

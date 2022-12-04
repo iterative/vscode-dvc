@@ -15,8 +15,8 @@ describe('reorderColumnIds()', () => {
       'id_1'
     ])
     expect(reorderColumnIds(twoColumnIds, ['id_2'], ['id_1'])).toStrictEqual([
-      'id_1',
-      'id_2'
+      'id_2',
+      'id_1'
     ])
 
     const threeColumnIds = [...twoColumnIds, 'id_3']
@@ -41,6 +41,6 @@ describe('reorderColumnIds()', () => {
     ).toStrictEqual(['id_3', 'id_1', 'id_2'])
     expect(
       reorderColumnIds(threeColumnIds, ['id_2', 'id_3'], ['id_1'])
-    ).toStrictEqual(['id_1', 'id_2', 'id_3'])
+    ).toStrictEqual(['id_2', 'id_3', 'id_1'])
   })
 })

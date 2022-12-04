@@ -26,6 +26,8 @@ export const IconMenu: React.FC<IconMenuProps> = ({ items }) => {
     disabled: tooltipDisabled
   })
 
+  const visibleItems = items.filter(({ hidden }) => !hidden)
+
   return (
     <Tooltip
       singleton={tooltipSource}
@@ -46,10 +48,9 @@ export const IconMenu: React.FC<IconMenuProps> = ({ items }) => {
           setTooltipDisabled(false)
         }}
       >
-        <ul className={styles.menu} role="menu">
-          {items
-            .filter(({ hidden }) => !hidden)
-            .map(item => (
+        {visibleItems.length > 0 ? (
+          <ul className={styles.menu} role="menu">
+            {visibleItems.map(item => (
               <IconMenuItem
                 {...item}
                 key={item.tooltip}
@@ -57,7 +58,10 @@ export const IconMenu: React.FC<IconMenuProps> = ({ items }) => {
                 menuTarget={menuTarget}
               />
             ))}
-        </ul>
+          </ul>
+        ) : (
+          <></>
+        )}
       </Tooltip>
     </Tooltip>
   )
