@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.5.21",
+  "version": "0.5.23",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -1577,7 +1577,7 @@
     "vscode-languageclient": "8.0.2"
   },
   "devDependencies": {
-    "@swc/core": "1.3.19",
+    "@swc/core": "1.3.20",
     "@swc/jest": "0.2.23",
     "@types/chai": "4.3.4",
     "@types/chai-as-promised": "7.1.5",
@@ -1610,7 +1610,7 @@
     "fork-ts-checker-webpack-plugin": "7.2.13",
     "jest": "29.3.1",
     "jest-environment-node": "29.3.1",
-    "lint-staged": "13.0.3",
+    "lint-staged": "13.0.4",
     "mocha": "10.0.0",
     "mock-require": "3.0.3",
     "shx": "0.3.4",

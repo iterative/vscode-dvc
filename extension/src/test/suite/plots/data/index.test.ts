@@ -1,14 +1,23 @@
 import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
+import { EventEmitter } from 'vscode'
 import { expect } from 'chai'
-import { restore, stub } from 'sinon'
+import { restore, spy, stub } from 'sinon'
 import { Disposable } from '../../../../extension'
 import { PlotsData } from '../../../../plots/data'
 import { PlotsModel } from '../../../../plots/model'
 import { dvcDemoPath } from '../../../util'
-import { buildDependencies, getFirstArgOfLastCall } from '../../util'
-import { getRelativePattern } from '../../../../fileSystem/watcher'
-import multiSourcePlotsDiffFixture from '../../../fixtures/plotsDiff/output/multiSource'
+import {
+  buildDependencies,
+  bypassProcessManagerDebounce,
+  getMockNow
+} from '../../util'
+import {
+  AvailableCommands,
+  CommandId,
+  InternalCommands
+} from '../../../../commands/internal'
+import { fireWatcher } from '../../../../fileSystem/watcher'
 
 suite('Plots Data Test Suite', () => {
   const disposable = Disposable.fn()
@@ -27,13 +36,8 @@ suite('Plots Data Test Suite', () => {
     missingRevisions: string[] = [],
     mutableRevisions: string[] = []
   ) => {
-    const {
-      internalCommands,
-      updatesPaused,
-      mockPlotsDiff,
-      dvcRunner,
-      mockCreateFileSystemWatcher
-    } = buildDependencies(disposable)
+    const { internalCommands, updatesPaused, mockPlotsDiff, dvcRunner } =
+      buildDependencies(disposable)
 
     stub(dvcRunner, 'isExperimentRunning').returns(experimentIsRunning)
 
@@ -56,11 +60,11 @@ suite('Plots Data Test Suite', () => {
 
     return {
       data,
-      mockCreateFileSystemWatcher,
       mockPlotsDiff
     }
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('PlotsData', () => {
     it('should not call plots diff when there are no revisions to fetch and an experiment running (checkpoints)', async () => {
       const { data, mockPlotsDiff } = buildPlotsData(true)
@@ -134,40 +138,86 @@ suite('Plots Data Test Suite', () => {
       )
     })
 
-    it('should handle watching paths for top level plots', async () => {
-      const { data, mockPlotsDiff, mockCreateFileSystemWatcher } =
-        buildPlotsData(false)
+    it('should collect files and watch them for updates', async () => {
+      const mockNow = getMockNow()
+      const watchedFile = join('training', 'metrics.json')
 
-      const dataUpdatedEvent = new Promise(resolve =>
-        disposable.track(data.onDidUpdate(() => resolve(undefined)))
-      )
+      const mockExecuteCommand = (command: CommandId) => {
+        if (command === AvailableCommands.IS_EXPERIMENT_RUNNING) {
+          return Promise.resolve(false)
+        }
 
-      mockPlotsDiff.resolves(multiSourcePlotsDiffFixture)
+        if (command === AvailableCommands.PLOTS_DIFF) {
+          return Promise.resolve({
+            'dvc.yaml::Accuracy': [
+              {
+                datapoints: {
+                  workspace: [
+                    {
+                      dvc_data_version_info: {
+                        field: join('train', 'acc'),
+                        filename: join(
+                          'training',
+                          'plots',
+                          'metrics',
+                          'train',
+                          'acc.tsv'
+                        ),
+                        revision: 'workspace'
+                      },
+                      dvc_inferred_y_value: '0.2707333333333333',
+                      step: '0',
+                      [join('train', 'acc')]: '0.2707333333333333'
+                    },
+                    {
+                      dvc_data_version_info: {
+                        field: join('test', 'acc'),
+                        filename: watchedFile,
+                        revision: 'workspace'
+                      },
+                      dvc_inferred_y_value: '0.2712',
+                      step: '0',
+                      [join('test', 'acc')]: '0.2712'
+                    }
+                  ]
+                },
+                revisions: ['workspace'],
+                type: 'vega'
+              }
+            ]
+          })
+        }
+      }
 
-      data.update()
-
-      await dataUpdatedEvent
-
-      expect(getFirstArgOfLastCall(mockCreateFileSystemWatcher)).to.deep.equal(
-        getRelativePattern(
+      const data = disposable.track(
+        new PlotsData(
           dvcDemoPath,
-          join(
-            '**',
-            '{' +
-              'dvc.yaml,' +
-              'dvc.lock,' +
-              [
-                join('evaluation', 'test', 'plots', 'confusion_matrix.json'),
-                join('evaluation', 'test', 'plots', 'precision_recall.json'),
-                join('evaluation', 'test', 'plots', 'roc.json'),
-                join('evaluation', 'train', 'plots', 'confusion_matrix.json'),
-                join('evaluation', 'train', 'plots', 'precision_recall.json'),
-                join('evaluation', 'train', 'plots', 'roc.json')
-              ].join(',') +
-              '}'
-          )
+          {
+            dispose: stub(),
+            executeCommand: mockExecuteCommand
+          } as unknown as InternalCommands,
+          {
+            getMissingRevisions: () => [],
+            getMutableRevisions: () => []
+          } as unknown as PlotsModel,
+          disposable.track(new EventEmitter<boolean>())
         )
       )
+
+      data.update()
+      await data.isReady()
+
+      bypassProcessManagerDebounce(mockNow)
+
+      const managedUpdateSpy = spy(data, 'managedUpdate')
+      const dataUpdatedEvent = new Promise(resolve =>
+        data.onDidUpdate(() => resolve(undefined))
+      )
+
+      await fireWatcher(join(dvcDemoPath, watchedFile))
+      await dataUpdatedEvent
+
+      expect(managedUpdateSpy).to.be.called
     })
   })
 })

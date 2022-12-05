@@ -247,6 +247,46 @@ describe('App', () => {
     expect(emptyState).toBeInTheDocument()
   })
 
+  it('should render loading section states when given a single revision which has not been fetched', async () => {
+    renderAppWithOptionalData({
+      checkpoint: null,
+      comparison: {
+        plots: [
+          {
+            path: 'training/plots/images/misclassified.jpg',
+            revisions: { ad2b5ec: { revision: 'ad2b5ec' } }
+          }
+        ],
+        revisions: [
+          {
+            displayColor: '#945dd6',
+            fetched: false,
+            group: '[exp-a270a]',
+            id: 'ad2b5ec854a447d00d9dfa9cdf88211a39a17813',
+            revision: 'ad2b5ec'
+          }
+        ],
+        size: PlotSizeNumber.REGULAR
+      },
+      hasPlots: true,
+      hasSelectedPlots: true,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      selectedRevisions: [
+        {
+          displayColor: '#945dd6',
+          fetched: false,
+          group: '[exp-a270a]',
+          id: 'ad2b5ec854a447d00d9dfa9cdf88211a39a17813',
+          revision: 'ad2b5ec'
+        }
+      ],
+      template: null
+    })
+    const loading = await screen.findAllByText('Loading...')
+
+    expect(loading).toHaveLength(3)
+  })
+
   it('should render the get started buttons when no plots or experiments are selected', async () => {
     renderAppWithOptionalData({
       checkpoint: null,

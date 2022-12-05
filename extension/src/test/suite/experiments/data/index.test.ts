@@ -1,10 +1,8 @@
-import { join, sep } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
-import { EventEmitter, FileSystemWatcher, RelativePattern } from 'vscode'
+import { EventEmitter, RelativePattern } from 'vscode'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
 import { Disposable } from '../../../../extension'
-import expShowFixture from '../../../fixtures/expShow/base/output'
 import {
   bypassProcessManagerDebounce,
   getFirstArgOfCall,
@@ -22,7 +20,7 @@ import {
   CommandId,
   InternalCommands
 } from '../../../../commands/internal'
-import { buildExperimentsData, buildExperimentsDataDependencies } from '../util'
+import { buildExperimentsData } from '../util'
 import { ExperimentFlag } from '../../../../cli/dvc/constants'
 import { EXPERIMENTS_GIT_LOGS_REFS } from '../../../../experiments/data/constants'
 import { gitPath } from '../../../../cli/git/constants'
@@ -65,96 +63,7 @@ suite('Experiments Data Test Suite', () => {
       expect(mockCreateFileSystemWatcher).to.be.calledOnce
 
       expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 0)).to.deep.equal(
-        new RelativePattern(
-          getTestWorkspaceFolder(),
-          join(
-            '**',
-            `{dvc.lock,dvc.yaml,params.yaml,*.dvc,nested${sep}params.yaml,summary.json}`
-          )
-        )
-      )
-    })
-
-    it('should dispose of the current watcher and instantiate a new one if the params files change', async () => {
-      const mockNow = getMockNow()
-
-      const {
-        internalCommands,
-        mockCreateFileSystemWatcher,
-        mockExperimentShow
-      } = buildExperimentsDataDependencies(disposable)
-
-      const mockDispose = stub()
-
-      mockCreateFileSystemWatcher.callsFake(() => {
-        return { dispose: mockDispose } as unknown as FileSystemWatcher
-      })
-
-      const data = disposable.track(
-        new ExperimentsData(
-          dvcDemoPath,
-          internalCommands,
-          disposable.track(new EventEmitter<boolean>())
-        )
-      )
-
-      await data.isReady()
-
-      bypassProcessManagerDebounce(mockNow)
-
-      mockExperimentShow.resolves(
-        Object.assign(
-          { ...expShowFixture },
-          {
-            workspace: {
-              baseline: {
-                data: {
-                  metrics: {
-                    ...expShowFixture.workspace.baseline.data?.metrics,
-                    'new_summary.json': {
-                      data: { auc: 0, loss: 1 }
-                    }
-                  },
-                  params: {
-                    ...expShowFixture.workspace.baseline.data?.params,
-                    'new_params.yml': {
-                      data: { new_seed: 10000, new_weight_decay: 0 }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        )
-      )
-
-      const dataUpdatedEvent = new Promise(resolve =>
-        data.onDidUpdate(data => resolve(data))
-      )
-
-      data.managedUpdate()
-
-      await dataUpdatedEvent
-
-      expect(mockCreateFileSystemWatcher).to.be.calledTwice
-      expect(mockDispose).to.be.calledOnce
-      expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 0)).to.deep.equal(
-        new RelativePattern(
-          getTestWorkspaceFolder(),
-          join(
-            '**',
-            `{dvc.lock,dvc.yaml,params.yaml,*.dvc,nested${sep}params.yaml,summary.json}`
-          )
-        )
-      )
-      expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 1)).to.deep.equal(
-        new RelativePattern(
-          getTestWorkspaceFolder(),
-          join(
-            '**',
-            `{dvc.lock,dvc.yaml,params.yaml,*.dvc,nested${sep}params.yaml,new_params.yml,new_summary.json,summary.json}`
-          )
-        )
+        new RelativePattern(getTestWorkspaceFolder(), '**')
       )
     })
 

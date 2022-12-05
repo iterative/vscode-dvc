@@ -65,9 +65,7 @@ export class PlotsData extends BaseData<{
 
     this.notifyChanged({ data, revs })
 
-    const files = this.collectFiles({ data })
-
-    this.compareFiles(files)
+    this.collectFiles({ data })
   }
 
   public managedUpdate() {
@@ -75,7 +73,7 @@ export class PlotsData extends BaseData<{
   }
 
   protected collectFiles({ data }: { data: PlotsOutputOrError }) {
-    return collectFiles(data, this.collectedFiles)
+    this.collectedFiles = collectFiles(data, this.collectedFiles)
   }
 
   private getArgs(revs: string[]) {

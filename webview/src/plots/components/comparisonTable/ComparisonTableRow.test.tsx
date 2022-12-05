@@ -31,7 +31,7 @@ describe('ComparisonTableRow', () => {
       comparisonPlotsFixture.plots.find(
         ({ path }) => path === join('plots', 'acc.png')
       )?.revisions || {}
-    )
+    ).map(revision => ({ ...revision, fetched: true }))
   }
 
   const renderRow = (props = basicProps) =>
