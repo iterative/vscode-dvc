@@ -445,7 +445,7 @@ describe('Table', () => {
         headers.indexOf('threshold')
       )
 
-      const [, startingNode] = screen.getAllByText('summary.json')
+      const [startingNode] = screen.getAllByText('summary.json')
       dragAndDrop(
         startingNode,
         getDraggableHeaderFromText('test'),
