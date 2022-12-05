@@ -7,6 +7,7 @@ import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { MessageFromWebviewType } from '../../../webview/contract'
 import { AvailableCommands } from '../../../commands/internal'
 import { Disposable } from '../../../extension'
+import { Logger } from '../../../common/logger'
 
 suite('GetStarted Test Suite', () => {
   const disposable = Disposable.fn()
@@ -41,6 +42,26 @@ suite('GetStarted Test Suite', () => {
 
       expect(mockInitializeProject).to.be.calledWithExactly(
         AvailableCommands.INIT
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should log an error message if the message from the webview is anything else than initialize project', async () => {
+      const { messageSpy, getStarted } = await buildGetStarted(disposable)
+
+      const webview = await getStarted.showWebview()
+      await webview.isReady()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const loggerSpy = spy(Logger, 'error')
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.ADD_STARRED_EXPERIMENT_FILTER
+      })
+
+      expect(loggerSpy).to.be.calledOnce
+      expect(loggerSpy).to.be.calledWithExactly(
+        `Unexpected message: {"type":"${MessageFromWebviewType.ADD_STARRED_EXPERIMENT_FILTER}"}`
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
