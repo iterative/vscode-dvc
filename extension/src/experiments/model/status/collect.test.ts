@@ -1,4 +1,7 @@
-import { collectColoredStatus } from './collect'
+import {
+  collectColoredStatus,
+  collectFinishedRunningExperiments
+} from './collect'
 import { copyOriginalColors } from './colors'
 import { Experiment } from '../../webview/contract'
 import { ExperimentStatus } from '../../../cli/dvc/contract'
@@ -20,7 +23,8 @@ describe('collectColoredStatus', () => {
       new Map(),
       new Map(),
       {},
-      copyOriginalColors()
+      copyOriginalColors(),
+      {}
     )
 
   it('should set new experiments to selected if there are less than 7', () => {
@@ -92,7 +96,8 @@ describe('collectColoredStatus', () => {
         exp7: colors[0],
         exp8: 0
       },
-      copyOriginalColors().slice(3)
+      copyOriginalColors().slice(3),
+      {}
     )
 
     expect(coloredStatus).toStrictEqual({ exp1: colors[0] })
@@ -113,7 +118,8 @@ describe('collectColoredStatus', () => {
         exp2: 0,
         exp9: colors[1]
       },
-      copyOriginalColors().slice(2)
+      copyOriginalColors().slice(2),
+      {}
     )
 
     expect(coloredStatus).toStrictEqual({
@@ -140,7 +146,8 @@ describe('collectColoredStatus', () => {
       new Map(),
       new Map(),
       { exp9: colors[0] },
-      copyOriginalColors().slice(1)
+      copyOriginalColors().slice(1),
+      {}
     )
 
     expect(availableColors).toStrictEqual([])
@@ -173,7 +180,8 @@ describe('collectColoredStatus', () => {
         exp8: colors[4],
         exp9: colors[5]
       },
-      copyOriginalColors().slice(6)
+      copyOriginalColors().slice(6),
+      {}
     )
 
     expect(availableColors).toStrictEqual([])
@@ -202,7 +210,8 @@ describe('collectColoredStatus', () => {
       checkpointsByTip,
       new Map(),
       {},
-      copyOriginalColors()
+      copyOriginalColors(),
+      {}
     )
 
     expect(availableColors).toStrictEqual(colors.slice(1))
@@ -244,7 +253,8 @@ describe('collectColoredStatus', () => {
         checkD6: colors[6],
         expD: colors[0]
       },
-      []
+      [],
+      {}
     )
 
     expect(availableColors).toStrictEqual([])
@@ -275,5 +285,81 @@ describe('collectColoredStatus', () => {
       expC: 0,
       expD: colors[0]
     })
+  })
+})
+
+describe('collectFinishedRunningExperiments', () => {
+  it('should return an empty object when an experiment is still running', () => {
+    const mapping = collectFinishedRunningExperiments(
+      {},
+      [{ Created: '2022-12-02T07:48:24', id: 'exp-1234' }] as Experiment[],
+      [{ executor: 'workspace', id: 'exp-1234' }],
+      [{ executor: 'workspace', id: 'exp-1234' }]
+    )
+    expect(mapping).toStrictEqual({})
+  })
+
+  it('should return the most recently created experiment if there is no longer an experiment running in the workspace', () => {
+    const latestCreatedId = 'exp-123'
+    const mapping = collectFinishedRunningExperiments(
+      {},
+      [
+        { Created: '2022-12-02T07:48:24', id: 'exp-456' },
+        { Created: '2022-10-02T07:48:24', id: 'exp-789' },
+        { Created: '2022-12-02T07:48:25', id: latestCreatedId },
+        { Created: null, id: 'exp-null' }
+      ] as Experiment[],
+      [{ executor: 'workspace', id: 'workspace' }],
+      []
+    )
+    expect(mapping).toStrictEqual({ [latestCreatedId]: 'workspace' })
+  })
+
+  it('should return the most recently created experiment if there is no longer a checkpoint experiment running in the workspace', () => {
+    const latestCreatedId = 'exp-123'
+    const mapping = collectFinishedRunningExperiments(
+      {},
+      [
+        { Created: '2022-12-02T07:48:24', id: 'exp-456' },
+        { Created: '2022-10-02T07:48:24', id: 'exp-789' },
+        { Created: '2022-12-02T07:48:25', id: latestCreatedId },
+        { Created: null, id: 'exp-null' }
+      ] as Experiment[],
+      [{ executor: 'workspace', id: latestCreatedId }],
+      []
+    )
+    expect(mapping).toStrictEqual({ [latestCreatedId]: 'workspace' })
+  })
+
+  it('should return the most recently created experiment if there is no longer an experiment running in queue', () => {
+    const latestCreatedId = 'exp-123'
+    const mapping = collectFinishedRunningExperiments(
+      {},
+      [
+        { Created: '2022-12-02T07:48:24', id: 'exp-456' },
+        { Created: '2022-10-02T07:48:24', id: 'exp-789' },
+        { Created: '2022-12-02T07:48:25', id: latestCreatedId },
+        { Created: null, id: 'exp-null' }
+      ] as Experiment[],
+      [{ executor: 'dvc-task', id: latestCreatedId }],
+      []
+    )
+    expect(mapping).toStrictEqual({ [latestCreatedId]: latestCreatedId })
+  })
+
+  it('should remove the id that was run in the workspace if a new one is found', () => {
+    const latestCreatedId = 'exp-123'
+    const mapping = collectFinishedRunningExperiments(
+      { 'exp-previous': 'workspace' },
+      [
+        { Created: '2022-12-02T07:48:24', id: 'exp-456' },
+        { Created: '2022-10-02T07:48:24', id: 'exp-789' },
+        { Created: '2022-12-02T07:48:25', id: latestCreatedId },
+        { Created: null, id: 'exp-null' }
+      ] as Experiment[],
+      [{ executor: 'workspace', id: latestCreatedId }],
+      []
+    )
+    expect(mapping).toStrictEqual({ [latestCreatedId]: 'workspace' })
   })
 })

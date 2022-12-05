@@ -1,14 +1,38 @@
 import { canSelect, ColoredStatus, UNSELECTED } from '.'
 import { Color, copyOriginalColors } from './colors'
 import { hasKey } from '../../../util/object'
-import { Experiment, isQueued } from '../../webview/contract'
+import { Experiment, isQueued, isRunning } from '../../webview/contract'
 import { definedAndNonEmpty, reorderListSubset } from '../../../util/array'
 import { flattenMapValues } from '../../../util/map'
 
 const getStatus = (
   acc: ColoredStatus,
+  { status, executor }: Experiment,
   unassignColors?: Color[]
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Color | typeof UNSELECTED => {
+  // new experiment running outside of the workspace
+  if (
+    canSelect(acc) &&
+    definedAndNonEmpty(unassignColors) &&
+    isRunning(status) &&
+    executor !== 'workspace'
+  ) {
+    return unassignColors.shift() as Color
+  }
+
+  // experiment running in workspace
+  if (
+    canSelect(acc) &&
+    definedAndNonEmpty(unassignColors) &&
+    isRunning(status) &&
+    executor === 'workspace' &&
+    acc.workspace === UNSELECTED
+  ) {
+    acc.workspace = unassignColors.shift() as Color
+    return UNSELECTED
+  }
+
   if (canSelect(acc) && definedAndNonEmpty(unassignColors)) {
     return unassignColors.shift() as Color
   }
@@ -22,11 +46,11 @@ const collectStatus = (
   unassignColors?: Color[]
 ) => {
   const { id, status } = experiment
-  if (!id || isQueued(status) || hasKey(acc, id)) {
+  if (!id || isQueued(status) || (id !== 'workspace' && hasKey(acc, id))) {
     return
   }
 
-  acc[id] = getStatus(acc, unassignColors)
+  acc[id] = getStatus(acc, experiment, unassignColors)
 }
 
 const collectExistingStatuses = (
@@ -76,7 +100,9 @@ export const collectColoredStatus = (
   checkpointsByTip: Map<string, Experiment[]>,
   experimentsByBranch: Map<string, Experiment[]>,
   previousStatus: ColoredStatus,
-  unassignedColors: Color[]
+  unassignedColors: Color[],
+  finishedRunning: { [id: string]: string }
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 ): { coloredStatus: ColoredStatus; availableColors: Color[] } => {
   const flattenExperimentsByBranch = flattenMapValues(experimentsByBranch)
   const availableColors = unassignColors(
@@ -101,6 +127,13 @@ export const collectColoredStatus = (
 
     for (const checkpoint of checkpointsByTip.get(experiment.id) || []) {
       collectStatus(coloredStatus, checkpoint)
+    }
+  }
+
+  for (const [id, previousId] of Object.entries(finishedRunning)) {
+    if (previousId === 'workspace' && coloredStatus.workspace) {
+      coloredStatus[id] = coloredStatus.workspace
+      coloredStatus.workspace = UNSELECTED
     }
   }
 
@@ -168,4 +201,73 @@ export const collectSelected = (
     coloredStatus,
     availableColors
   )
+}
+
+// assumption breaks if experiment does not complete correctly: fix
+// potentially can use experiment status but need to exclude experiments running in workspace from it
+const getMostRecentExperiment = (
+  experiments: Experiment[]
+): Experiment | undefined =>
+  experiments
+    .sort(({ Created: aCreated }, { Created: bCreated }) => {
+      if (!aCreated) {
+        return 1
+      }
+      if (!bCreated) {
+        return -1
+      }
+      return bCreated.localeCompare(aCreated)
+    })
+    .slice(0, 1)[0]
+
+const collectFinishedWorkspaceExperiment = (
+  acc: { [id: string]: string },
+  mostRecentExperiment: Experiment | undefined
+): void => {
+  const newId = mostRecentExperiment?.id
+
+  if (!newId) {
+    return
+  }
+
+  for (const [id, previousId] of Object.entries(acc)) {
+    if (previousId === 'workspace') {
+      delete acc[id]
+    }
+  }
+  acc[newId] = 'workspace'
+}
+
+export const collectFinishedRunningExperiments = (
+  acc: { [id: string]: string },
+  experiments: Experiment[],
+  previouslyRunning: { id: string; executor: string }[],
+  stillRunning: { id: string; executor: string }[]
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+): { [id: string]: string } => {
+  const stillExecutingInWorkspace = stillRunning.some(
+    ({ executor }) => executor === 'workspace'
+  )
+  for (const {
+    id: previouslyRunningId,
+    executor: previouslyRunningExecutor
+  } of previouslyRunning) {
+    if (
+      (stillExecutingInWorkspace &&
+        previouslyRunningExecutor === 'workspace') ||
+      stillRunning.some(({ id }) => id === previouslyRunningId)
+    ) {
+      continue
+    }
+
+    if (previouslyRunningExecutor === 'workspace') {
+      collectFinishedWorkspaceExperiment(
+        acc,
+        getMostRecentExperiment(experiments)
+      )
+      continue
+    }
+    acc[previouslyRunningId] = previouslyRunningId
+  }
+  return acc
 }

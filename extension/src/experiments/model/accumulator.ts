@@ -5,12 +5,15 @@ export class ExperimentsAccumulator {
   public branches: Experiment[] = []
   public checkpointsByTip: Map<string, Experiment[]> = new Map()
   public experimentsByBranch: Map<string, Experiment[]> = new Map()
-  public hasRunning: boolean
+  public hasRunning: { id: string; executor: string }[]
 
   constructor(workspace: Experiment | undefined) {
     if (workspace) {
       this.workspace = workspace
     }
-    this.hasRunning = isRunning(workspace?.status)
+    this.hasRunning = []
+    if (isRunning(workspace?.status)) {
+      this.hasRunning.push({ executor: 'workspace', id: 'workspace' })
+    }
   }
 }

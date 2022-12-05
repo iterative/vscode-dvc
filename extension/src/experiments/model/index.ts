@@ -13,7 +13,11 @@ import {
   ExperimentAugmented,
   ExperimentWithType
 } from './filterBy/collect'
-import { collectColoredStatus, collectSelected } from './status/collect'
+import {
+  collectColoredStatus,
+  collectFinishedRunningExperiments,
+  collectSelected
+} from './status/collect'
 import { Color, copyOriginalColors } from './status/colors'
 import {
   canSelect,
@@ -68,7 +72,8 @@ export class ExperimentsModel extends ModelWithPersistence {
   private useFiltersForSelection = false
 
   private currentSorts: SortDefinition[]
-  private hasRunning = false
+  private running: { id: string; executor: string }[] = []
+  private finishedRunning: { [id: string]: string } = {}
 
   constructor(dvcRoot: string, workspaceState: Memento) {
     super(dvcRoot, workspaceState)
@@ -114,7 +119,8 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.branches = branches
     this.experimentsByBranch = experimentsByBranch
     this.checkpointsByTip = checkpointsByTip
-    this.hasRunning = hasRunning
+
+    this.setRunning(hasRunning)
 
     this.setColoredStatus()
   }
@@ -151,7 +157,17 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public hasRunningExperiment() {
-    return this.hasRunning
+    return this.running.length > 0
+  }
+
+  public setRevisionCollected(revisions: string[]) {
+    this.getFlattenedExperiments()
+      .filter(({ label }) => revisions.includes(label))
+      .map(({ id }) => {
+        if (this.finishedRunning[id]) {
+          delete this.finishedRunning[id]
+        }
+      })
   }
 
   public canSelect() {
@@ -420,6 +436,10 @@ export class ExperimentsModel extends ModelWithPersistence {
     }))
   }
 
+  public getFinishedExperiments() {
+    return this.finishedRunning
+  }
+
   private getSubRows(experiments: Experiment[], filters = this.getFilters()) {
     return experiments
       .map(experiment => {
@@ -510,6 +530,17 @@ export class ExperimentsModel extends ModelWithPersistence {
     )
   }
 
+  private setRunning(stillRunning: { id: string; executor: string }[]) {
+    this.finishedRunning = collectFinishedRunningExperiments(
+      { ...this.finishedRunning },
+      this.getFlattenedExperiments(),
+      this.running,
+      stillRunning
+    )
+
+    this.running = stillRunning
+  }
+
   private setColoredStatus() {
     if (this.useFiltersForSelection) {
       this.setSelectedToFilters()
@@ -520,7 +551,8 @@ export class ExperimentsModel extends ModelWithPersistence {
       this.checkpointsByTip,
       this.experimentsByBranch,
       this.coloredStatus,
-      this.availableColors
+      this.availableColors,
+      this.finishedRunning
     )
 
     this.setColors(coloredStatus, availableColors)

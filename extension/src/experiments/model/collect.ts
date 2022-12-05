@@ -237,8 +237,9 @@ const collectHasRunningExperiment = (
   acc: ExperimentsAccumulator,
   experiment: Experiment
 ) => {
-  if (isRunning(experiment.status)) {
-    acc.hasRunning = true
+  const { executor, id, status } = experiment
+  if (isRunning(status) && executor) {
+    acc.hasRunning.push({ executor, id })
   }
 }
 
