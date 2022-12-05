@@ -46,7 +46,7 @@ const collectStatus = (
   unassignColors?: Color[]
 ) => {
   const { id, status } = experiment
-  if (!id || isQueued(status) || (id !== 'workspace' && hasKey(acc, id))) {
+  if (!id || isQueued(status) || hasKey(acc, id)) {
     return
   }
 
