@@ -69,7 +69,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
   ul[role='menu'] {
     background-color: $header-bg-color;
     padding-left: 2px;
-    margin: 0;
+    margin: 0px 0px 0px 4px;
     border: none;
 
     button {
@@ -86,6 +86,10 @@ $bullet-size: calc(var(--design-unit) * 4px);
 .moveToRight {
   left: auto;
   right: 0;
+
+  ul[role='menu'] {
+    margin: 4px 0px 0px 0px;
+  }
 }
 
 // Concrete selectors
@@ -561,6 +565,14 @@ $bullet-size: calc(var(--design-unit) * 4px);
     &.leafHeader {
       border-bottom: none;
     }
+
+    &.headerCellDropTarget {
+      background: $header-dnd-drop-background;
+      outline-width: 2px;
+      outline-style: dashed;
+      outline-color: $header-dnd-outline;
+      outline-offset: -4px;
+    }
   }
 }
 
@@ -612,22 +624,8 @@ $bullet-size: calc(var(--design-unit) * 4px);
   right: -2px;
 }
 
-.draggingColumn {
-  border: 1px solid $fg-color;
-  font-size: 0.7rem;
-  opacity: 0.7;
-}
-
 .staticColumn {
   transform: translate(0, 0) !important;
-}
-
-.isDroppedColumn {
-  transition-duration: 100;
-}
-
-.dndPlaceholder {
-  display: none;
 }
 
 .columnResizer {

@@ -38,6 +38,7 @@ const calcResizerHeight = (
 
 const getHeaderPropsArgs = (
   column: HeaderGroup<Experiment>,
+  headerDropTargetId: string,
   sortEnabled: boolean,
   sortOrder: SortOrder
 ) => {
@@ -56,7 +57,8 @@ const getHeaderPropsArgs = (
           sortOrder === SortOrder.ASCENDING && !column.parent?.placeholderOf,
         [styles.sortingHeaderCellDesc]:
           sortOrder === SortOrder.DESCENDING && !column.placeholderOf
-      }
+      },
+      headerDropTargetId === column.id && styles.headerCellDropTarget
     ),
     style: {
       position: undefined
@@ -115,7 +117,7 @@ export const TableHeaderCell: React.FC<{
     return getMenuOptions(column, sorts)
   }, [column, sorts])
 
-  const isDraggable = !column.placeholderOf && column.id !== 'id'
+  const isDraggable = !column.placeholderOf && !isExperimentColumn(column.id)
   const isPlaceholder = !!column.placeholderOf
 
   const canResize = column.canResize && !isPlaceholder
@@ -154,7 +156,7 @@ export const TableHeaderCell: React.FC<{
     >
       <div
         {...column.getHeaderProps(
-          getHeaderPropsArgs(column, isSortable, sortOrder)
+          getHeaderPropsArgs(column, headerDropTargetId, isSortable, sortOrder)
         )}
         data-testid={`header-${column.id}`}
         key={column.id}
@@ -171,12 +173,6 @@ export const TableHeaderCell: React.FC<{
         ) : (
           cellContents
         )}
-        <div
-          className={cx(
-            styles.dropTarget,
-            headerDropTargetId === column.id && styles.active
-          )}
-        />
       </div>
     </ContextMenu>
   )

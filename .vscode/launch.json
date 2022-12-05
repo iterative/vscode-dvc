@@ -35,6 +35,20 @@
           "VSC_DEBUG": "true"
         }
       }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Jest Current File (webview)",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": ["${fileBasenameNoExtension}", "--config", "jest.config.js"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true,
+      "windows": {
+        "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+      },
+      "cwd": "${workspaceFolder}/webview"
     }
   ]
 }
