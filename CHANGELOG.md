@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.23] - 2022-12-05
+
+### 🚀 New Features and Enhancements
+
+- Improve table header DnD [#2876](https://github.com/iterative/vscode-dvc/pull/2876) by [@shcheklein](https://github.com/shcheklein)
+
+### 🔨 Maintenance
+
+- Watch workspace and filter results before calling for data updates [#2872](https://github.com/iterative/vscode-dvc/pull/2872) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.22] - 2022-12-01
 
 ### 🚀 New Features and Enhancements
