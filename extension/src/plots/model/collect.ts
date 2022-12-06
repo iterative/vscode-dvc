@@ -734,6 +734,30 @@ const getRevision = (
   revision: label
 })
 
+const overrideWithWorkspace = (
+  orderMapping: { [label: string]: string },
+  selectedWithOverrides: Revision[],
+  displayColor: Color,
+  label: string
+): void => {
+  orderMapping[label] = 'workspace'
+  selectedWithOverrides.push(
+    getRevision(displayColor, {
+      id: 'workspace',
+      label: 'workspace',
+      logicalGroupName: undefined
+    })
+  )
+}
+
+const isExperimentThatWillDisappearAtEnd = (
+  { id, sha, checkpoint_tip }: Experiment,
+  unfinishedRunningExperiments: { [id: string]: string }
+): boolean => {
+  const isCheckpointTip = sha === checkpoint_tip
+  return isCheckpointTip && unfinishedRunningExperiments[id] !== 'workspace'
+}
+
 const getMostRecentFetchedCheckpointRevision = (
   selectedRevision: SelectedExperimentWithColor,
   fetchedRevs: Set<string>,
@@ -769,35 +793,28 @@ const collectRevisionDetail = (
   fetchedRevs: Set<string>,
   unfinishedRunningExperiments: { [id: string]: string },
   getCheckpoints: (id: string) => Experiment[] | undefined
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
-  const { label, status, id, checkpoint_tip, sha, displayColor } =
-    selectedRevision
+  const { label, status, id, displayColor } = selectedRevision
 
   if (
     !fetchedRevs.has(label) &&
     unfinishedRunningExperiments[id] === 'workspace'
   ) {
-    orderMapping[label] = 'workspace'
-    selectedWithOverrides.push(
-      getRevision(displayColor, {
-        id: 'workspace',
-        label: 'workspace',
-        logicalGroupName: undefined
-      })
+    return overrideWithWorkspace(
+      orderMapping,
+      selectedWithOverrides,
+      displayColor,
+      label
     )
-    return
   }
-
-  const isCheckpointTip = sha === checkpoint_tip
-  const running = isRunning(status)
-
-  const preventRevisionsDisappearingAtEnd =
-    isCheckpointTip && unfinishedRunningExperiments[id] !== 'workspace'
 
   if (
     !fetchedRevs.has(label) &&
-    (running || preventRevisionsDisappearingAtEnd)
+    (isRunning(status) ||
+      isExperimentThatWillDisappearAtEnd(
+        selectedRevision,
+        unfinishedRunningExperiments
+      ))
   ) {
     return overrideRevisionDetail(
       orderMapping,

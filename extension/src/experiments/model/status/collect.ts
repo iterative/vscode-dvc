@@ -263,13 +263,21 @@ export const collectStartedRunningExperiments = (
   return acc
 }
 
+const isStillRunning = (
+  stillExecutingInWorkspace: boolean,
+  previouslyRunningId: string,
+  previouslyRunningExecutor: string,
+  stillRunning: { id: string; executor: string }[]
+): boolean =>
+  (stillExecutingInWorkspace && previouslyRunningExecutor === 'workspace') ||
+  stillRunning.some(({ id }) => id === previouslyRunningId)
+
 export const collectFinishedRunningExperiments = (
   acc: { [id: string]: string },
   experiments: Experiment[],
   previouslyRunning: { id: string; executor: string }[],
   stillRunning: { id: string; executor: string }[],
   coloredStatus: ColoredStatus
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 ): { [id: string]: string } => {
   const stillExecutingInWorkspace = stillRunning.some(
     ({ executor }) => executor === 'workspace'
@@ -279,9 +287,12 @@ export const collectFinishedRunningExperiments = (
     executor: previouslyRunningExecutor
   } of previouslyRunning) {
     if (
-      (stillExecutingInWorkspace &&
-        previouslyRunningExecutor === 'workspace') ||
-      stillRunning.some(({ id }) => id === previouslyRunningId)
+      isStillRunning(
+        stillExecutingInWorkspace,
+        previouslyRunningId,
+        previouslyRunningExecutor,
+        stillRunning
+      )
     ) {
       continue
     }
