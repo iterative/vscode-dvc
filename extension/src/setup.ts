@@ -153,6 +153,7 @@ export const setupWorkspace = async (): Promise<boolean> => {
   return pickCliPath()
 }
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export const setup = async (extension: IExtension) => {
   const cwd = getFirstWorkspaceFolder()
   if (!cwd) {
@@ -164,21 +165,25 @@ export const setup = async (extension: IExtension) => {
   const roots = extension.getRoots()
   const dvcRootOrFirstFolder = roots.length > 0 ? roots[0] : cwd
 
-  const { isAvailable, isCompatible } = await extensionCanRunCli(
-    extension,
-    dvcRootOrFirstFolder
-  )
+  const checkAvailable = setInterval(async () => {
+    const { isAvailable, isCompatible } = await extensionCanRunCli(
+      extension,
+      dvcRootOrFirstFolder
+    )
 
-  extension.setCliCompatible(isCompatible)
-  extension.setAvailable(isAvailable)
+    extension.setCliCompatible(isCompatible)
+    extension.setAvailable(isAvailable)
 
-  if (extension.hasRoots() && isAvailable) {
-    return extension.initialize()
-  }
+    if (extension.hasRoots() && isAvailable) {
+      return extension.initialize()
+    }
 
-  extension.resetMembers()
+    extension.resetMembers()
 
-  if (!isAvailable) {
-    extension.setAvailable(false)
-  }
+    if (!isAvailable) {
+      extension.setAvailable(false)
+    } else {
+      clearInterval(checkAvailable)
+    }
+  }, 5000)
 }

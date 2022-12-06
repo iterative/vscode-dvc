@@ -12,26 +12,45 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
   public readonly viewKey = ViewKey.GET_STARTED
 
   private internalCommands: InternalCommands
+  private webviewMessages: WebviewMessages
+  private getCliAccessible: () => boolean
+  private getHasRoots: () => boolean
 
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
-    webviewIcon: Resource
+    webviewIcon: Resource,
+    getCliAccessible: () => boolean,
+    getHasRoots: () => boolean
   ) {
     super(dvcRoot, webviewIcon)
 
-    this.createWebviewMessageHandler()
+    this.webviewMessages = this.createWebviewMessageHandler()
     this.internalCommands = internalCommands
+
+    if (this.webview) {
+      this.sendDataToWebview()
+    }
+    this.getCliAccessible = getCliAccessible
+    this.getHasRoots = getHasRoots
   }
 
   public sendInitialWebviewData() {
-    return undefined
+    return this.sendDataToWebview()
+  }
+
+  public sendDataToWebview() {
+    this.webviewMessages.sendWebviewMessage(
+      this.getCliAccessible(),
+      this.getHasRoots()
+    )
   }
 
   private createWebviewMessageHandler() {
     const webviewMessages = new WebviewMessages(
       () => this.getWebview(),
-      () => this.initializeProject()
+      () => this.initializeProject(),
+      () => this.openExperimentsWebview()
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>
@@ -43,5 +62,9 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
 
   private initializeProject() {
     this.internalCommands.executeCommand(AvailableCommands.INIT)
+  }
+
+  private openExperimentsWebview() {
+    this.internalCommands.executeCommand(AvailableCommands.EXPERIMENT_SHOW)
   }
 }

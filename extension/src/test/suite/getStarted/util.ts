@@ -7,7 +7,13 @@ export const buildGetStarted = (disposer: Disposer) => {
     buildDependencies(disposer)
 
   const getStarted = disposer.track(
-    new GetStarted('', internalCommands, resourceLocator.dvcIcon)
+    new GetStarted(
+      '',
+      internalCommands,
+      resourceLocator.dvcIcon,
+      () => false,
+      () => false
+    )
   )
 
   return {

@@ -156,7 +156,13 @@ export class Extension extends Disposable implements IExtension {
     )
 
     this.getStarted = this.dispose.track(
-      new GetStarted('', this.internalCommands, this.resourceLocator.dvcIcon)
+      new GetStarted(
+        '',
+        this.internalCommands,
+        this.resourceLocator.dvcIcon,
+        () => this.getAvailable(),
+        () => this.hasRoots()
+      )
     )
 
     this.repositories = this.dispose.track(
@@ -389,6 +395,7 @@ export class Extension extends Disposable implements IExtension {
     )
     this.dvcRoots = nestedRoots.flat().sort()
 
+    this.getStarted.sendDataToWebview()
     return this.setProjectAvailability()
   }
 
@@ -443,7 +450,12 @@ export class Extension extends Disposable implements IExtension {
     this.status.setAvailability(available)
     this.setCommandsAvailability(available)
     this.cliAccessible = available
+    this.getStarted.sendDataToWebview()
     return available
+  }
+
+  public getAvailable() {
+    return this.cliAccessible
   }
 
   private setCommandsAvailability(available: boolean) {
