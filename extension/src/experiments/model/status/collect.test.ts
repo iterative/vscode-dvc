@@ -325,19 +325,19 @@ describe('collectColoredStatus', () => {
 
 describe('collectFinishedRunningExperiments', () => {
   it('should return an empty object when an experiment is still running', () => {
-    const mapping = collectFinishedRunningExperiments(
+    const finishedRunning = collectFinishedRunningExperiments(
       {},
       [{ Created: '2022-12-02T07:48:24', id: 'exp-1234' }] as Experiment[],
       [{ executor: 'workspace', id: 'exp-1234' }],
       [{ executor: 'workspace', id: 'exp-1234' }],
       {}
     )
-    expect(mapping).toStrictEqual({})
+    expect(finishedRunning).toStrictEqual({})
   })
 
   it('should return the most recently created and unseen (without a status) experiment if there is no longer an experiment running in the workspace', () => {
     const latestCreatedId = 'exp-123'
-    const mapping = collectFinishedRunningExperiments(
+    const finishedRunning = collectFinishedRunningExperiments(
       {},
       [
         { Created: '2022-12-02T10:48:24', id: 'exp-456' },
@@ -349,12 +349,12 @@ describe('collectFinishedRunningExperiments', () => {
       [],
       { 'exp-456': UNSELECTED }
     )
-    expect(mapping).toStrictEqual({ [latestCreatedId]: 'workspace' })
+    expect(finishedRunning).toStrictEqual({ [latestCreatedId]: 'workspace' })
   })
 
   it('should return the most recently created experiment if there is no longer a checkpoint experiment running in the workspace', () => {
     const latestCreatedId = 'exp-123'
-    const mapping = collectFinishedRunningExperiments(
+    const finishedRunning = collectFinishedRunningExperiments(
       {},
       [
         { Created: '2022-12-02T07:48:24', id: 'exp-456' },
@@ -366,12 +366,26 @@ describe('collectFinishedRunningExperiments', () => {
       [],
       {}
     )
-    expect(mapping).toStrictEqual({ [latestCreatedId]: 'workspace' })
+    expect(finishedRunning).toStrictEqual({ [latestCreatedId]: 'workspace' })
+  })
+
+  it('should not return an experiment if all of the experiments can be found in the status object', () => {
+    const previouslyCreatedId = 'exp-123'
+    const finishedRunning = collectFinishedRunningExperiments(
+      {},
+      [
+        { Created: '2022-12-02T07:48:25', id: previouslyCreatedId }
+      ] as Experiment[],
+      [{ executor: 'workspace', id: previouslyCreatedId }],
+      [],
+      { [previouslyCreatedId]: UNSELECTED }
+    )
+    expect(finishedRunning).toStrictEqual({})
   })
 
   it('should return the most recently created experiment if there is no longer an experiment running in queue', () => {
     const latestCreatedId = 'exp-123'
-    const mapping = collectFinishedRunningExperiments(
+    const finishedRunning = collectFinishedRunningExperiments(
       {},
       [
         { Created: '2022-12-02T07:48:24', id: 'exp-456' },
@@ -383,12 +397,14 @@ describe('collectFinishedRunningExperiments', () => {
       [],
       {}
     )
-    expect(mapping).toStrictEqual({ [latestCreatedId]: latestCreatedId })
+    expect(finishedRunning).toStrictEqual({
+      [latestCreatedId]: latestCreatedId
+    })
   })
 
   it('should remove the id that was run in the workspace if a new one is found', () => {
     const latestCreatedId = 'exp-123'
-    const mapping = collectFinishedRunningExperiments(
+    const finishedRunning = collectFinishedRunningExperiments(
       { 'exp-previous': 'workspace' },
       [
         { Created: '2022-12-02T07:48:24', id: 'exp-456' },
@@ -400,6 +416,6 @@ describe('collectFinishedRunningExperiments', () => {
       [],
       {}
     )
-    expect(mapping).toStrictEqual({ [latestCreatedId]: 'workspace' })
+    expect(finishedRunning).toStrictEqual({ [latestCreatedId]: 'workspace' })
   })
 })

@@ -212,6 +212,22 @@ export const collectSelected = (
   )
 }
 
+export const collectStartedRunningExperiments = (
+  previouslyRunning: { id: string; executor: string }[],
+  nowRunning: { id: string; executor: string }[]
+): Set<string> => {
+  const acc = new Set<string>()
+
+  for (const { id: runningId, executor } of nowRunning) {
+    if (previouslyRunning.some(({ id }) => id === runningId)) {
+      continue
+    }
+    acc.add(executor === 'workspace' ? 'workspace' : runningId)
+  }
+
+  return acc
+}
+
 const getMostRecentExperiment = (
   experiments: Experiment[],
   coloredStatus: ColoredStatus
@@ -245,22 +261,6 @@ const collectFinishedWorkspaceExperiment = (
     }
   }
   acc[newId] = 'workspace'
-}
-
-export const collectStartedRunningExperiments = (
-  previouslyRunning: { id: string; executor: string }[],
-  nowRunning: { id: string; executor: string }[]
-): Set<string> => {
-  const acc = new Set<string>()
-
-  for (const { id: runningId, executor } of nowRunning) {
-    if (previouslyRunning.some(({ id }) => id === runningId)) {
-      continue
-    }
-    acc.add(executor === 'workspace' ? 'workspace' : runningId)
-  }
-
-  return acc
 }
 
 const isStillRunning = (
