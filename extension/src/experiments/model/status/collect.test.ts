@@ -291,6 +291,36 @@ describe('collectColoredStatus', () => {
       expD: colors[0]
     })
   })
+
+  it('should remove the unselected status of experiments running in the workspace (for getMostRecentExperiment)', () => {
+    const colors = copyOriginalColors()
+    const { availableColors, coloredStatus } = collectColoredStatus(
+      [
+        {
+          executor: 'workspace',
+          id: 'exp-1',
+          status: ExperimentStatus.RUNNING
+        },
+        {
+          executor: 'workspace',
+          id: 'exp-2',
+          status: ExperimentStatus.RUNNING
+        }
+      ] as Experiment[],
+      new Map(),
+      new Map(),
+      {
+        'exp-1': UNSELECTED,
+        'exp-2': colors[0]
+      },
+      colors.slice(1),
+      new Set(),
+      {}
+    )
+    expect(coloredStatus['exp-1']).toBeUndefined()
+    expect(coloredStatus['exp-2']).toStrictEqual(colors[0])
+    expect(availableColors).toStrictEqual(colors.slice(1))
+  })
 })
 
 describe('collectFinishedRunningExperiments', () => {

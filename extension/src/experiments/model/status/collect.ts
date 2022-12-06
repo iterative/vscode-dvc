@@ -59,7 +59,7 @@ const collectStartedRunningColors = (
   }
 }
 
-const removeRunningCheckpointExperiment = (
+const removeUnselectedExperimentRunningInWorkspace = (
   coloredStatus: ColoredStatus,
   { status, executor, id }: Experiment
 ): void => {
@@ -141,7 +141,7 @@ export const collectColoredStatus = (
     ...flattenCheckpoints
   ]) {
     collectStatus(coloredStatus, experiment)
-    removeRunningCheckpointExperiment(coloredStatus, experiment)
+    removeUnselectedExperimentRunningInWorkspace(coloredStatus, experiment)
   }
 
   reassignFinishedWorkspaceExperiment(coloredStatus, finishedRunning)
