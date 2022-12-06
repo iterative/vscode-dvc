@@ -5,52 +5,18 @@ import { Experiment, isQueued, isRunning } from '../../webview/contract'
 import { definedAndNonEmpty, reorderListSubset } from '../../../util/array'
 import { flattenMapValues } from '../../../util/map'
 
-const getStatus = (
-  acc: ColoredStatus,
-  { status, executor }: Experiment,
-  unassignColors?: Color[]
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-): Color | typeof UNSELECTED => {
-  // new experiment running outside of the workspace
-  if (
-    canSelect(acc) &&
-    definedAndNonEmpty(unassignColors) &&
-    isRunning(status) &&
-    executor !== 'workspace'
-  ) {
-    return unassignColors.shift() as Color
-  }
+const canAssign = (
+  coloredStatus: ColoredStatus,
+  unassignedColors: Color[]
+): boolean => canSelect(coloredStatus) && definedAndNonEmpty(unassignedColors)
 
-  // experiment running in workspace
-  if (
-    canSelect(acc) &&
-    definedAndNonEmpty(unassignColors) &&
-    isRunning(status) &&
-    executor === 'workspace' &&
-    acc.workspace === UNSELECTED
-  ) {
-    acc.workspace = unassignColors.shift() as Color
-    return UNSELECTED
-  }
-
-  if (canSelect(acc) && definedAndNonEmpty(unassignColors)) {
-    return unassignColors.shift() as Color
-  }
-
-  return UNSELECTED
-}
-
-const collectStatus = (
-  acc: ColoredStatus,
-  experiment: Experiment,
-  unassignColors?: Color[]
-) => {
+const collectStatus = (acc: ColoredStatus, experiment: Experiment): void => {
   const { id, status } = experiment
   if (!id || isQueued(status) || hasKey(acc, id)) {
     return
   }
 
-  acc[id] = getStatus(acc, experiment, unassignColors)
+  acc[id] = UNSELECTED
 }
 
 const collectExistingStatuses = (
@@ -58,7 +24,7 @@ const collectExistingStatuses = (
   checkpointsByTip: Map<string, Experiment[]>,
   experimentsByBranch: Map<string, Experiment[]>,
   previousStatus: ColoredStatus
-) => {
+): ColoredStatus => {
   const existingStatuses: ColoredStatus = {}
   for (const experiment of [
     ...experiments,
@@ -74,6 +40,49 @@ const collectExistingStatuses = (
     existingStatuses[id] = previousStatus[id]
   }
   return existingStatuses
+}
+
+const collectStartedRunningColors = (
+  coloredStatus: ColoredStatus,
+  availableColors: Color[],
+  unassignedColors: Color[],
+  startedRunning: Set<string>
+): void => {
+  for (const id of startedRunning) {
+    if (coloredStatus[id]) {
+      continue
+    }
+
+    if (canAssign(coloredStatus, unassignedColors)) {
+      coloredStatus[id] = availableColors.shift() as Color
+    }
+  }
+}
+
+const removeRunningCheckpointExperiment = (
+  coloredStatus: ColoredStatus,
+  { status, executor, id }: Experiment
+): void => {
+  if (
+    isRunning(status) &&
+    executor === 'workspace' &&
+    id !== 'workspace' &&
+    !coloredStatus[id]
+  ) {
+    delete coloredStatus[id]
+  }
+}
+
+const reassignFinishedWorkspaceExperiment = (
+  coloredStatus: ColoredStatus,
+  finishedRunning: { [id: string]: string }
+): void => {
+  for (const [id, previousId] of Object.entries(finishedRunning)) {
+    if (previousId === 'workspace' && coloredStatus.workspace) {
+      coloredStatus[id] = coloredStatus.workspace
+      coloredStatus.workspace = UNSELECTED
+    }
+  }
 }
 
 export const unassignColors = (
@@ -101,16 +110,13 @@ export const collectColoredStatus = (
   experimentsByBranch: Map<string, Experiment[]>,
   previousStatus: ColoredStatus,
   unassignedColors: Color[],
+  startedRunning: Set<string>,
   finishedRunning: { [id: string]: string }
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 ): { coloredStatus: ColoredStatus; availableColors: Color[] } => {
   const flattenExperimentsByBranch = flattenMapValues(experimentsByBranch)
+  const flattenCheckpoints = flattenMapValues(checkpointsByTip)
   const availableColors = unassignColors(
-    [
-      ...experiments,
-      ...flattenExperimentsByBranch,
-      ...flattenMapValues(checkpointsByTip)
-    ],
+    [...experiments, ...flattenExperimentsByBranch, ...flattenCheckpoints],
     previousStatus,
     unassignedColors
   )
@@ -122,20 +128,23 @@ export const collectColoredStatus = (
     previousStatus
   )
 
-  for (const experiment of [...experiments, ...flattenExperimentsByBranch]) {
-    collectStatus(coloredStatus, experiment, availableColors)
+  collectStartedRunningColors(
+    coloredStatus,
+    availableColors,
+    unassignedColors,
+    startedRunning
+  )
 
-    for (const checkpoint of checkpointsByTip.get(experiment.id) || []) {
-      collectStatus(coloredStatus, checkpoint)
-    }
+  for (const experiment of [
+    ...experiments,
+    ...flattenExperimentsByBranch,
+    ...flattenCheckpoints
+  ]) {
+    collectStatus(coloredStatus, experiment)
+    removeRunningCheckpointExperiment(coloredStatus, experiment)
   }
 
-  for (const [id, previousId] of Object.entries(finishedRunning)) {
-    if (previousId === 'workspace' && coloredStatus.workspace) {
-      coloredStatus[id] = coloredStatus.workspace
-      coloredStatus.workspace = UNSELECTED
-    }
-  }
+  reassignFinishedWorkspaceExperiment(coloredStatus, finishedRunning)
 
   return { availableColors, coloredStatus }
 }
@@ -203,12 +212,12 @@ export const collectSelected = (
   )
 }
 
-// assumption breaks if experiment does not complete correctly: fix
-// potentially can use experiment status but need to exclude experiments running in workspace from it
 const getMostRecentExperiment = (
-  experiments: Experiment[]
+  experiments: Experiment[],
+  coloredStatus: ColoredStatus
 ): Experiment | undefined =>
   experiments
+    .filter(({ id }) => coloredStatus[id] === undefined)
     .sort(({ Created: aCreated }, { Created: bCreated }) => {
       if (!aCreated) {
         return 1
@@ -238,11 +247,28 @@ const collectFinishedWorkspaceExperiment = (
   acc[newId] = 'workspace'
 }
 
+export const collectStartedRunningExperiments = (
+  previouslyRunning: { id: string; executor: string }[],
+  nowRunning: { id: string; executor: string }[]
+): Set<string> => {
+  const acc = new Set<string>()
+
+  for (const { id: runningId, executor } of nowRunning) {
+    if (previouslyRunning.some(({ id }) => id === runningId)) {
+      continue
+    }
+    acc.add(executor === 'workspace' ? 'workspace' : runningId)
+  }
+
+  return acc
+}
+
 export const collectFinishedRunningExperiments = (
   acc: { [id: string]: string },
   experiments: Experiment[],
   previouslyRunning: { id: string; executor: string }[],
-  stillRunning: { id: string; executor: string }[]
+  stillRunning: { id: string; executor: string }[],
+  coloredStatus: ColoredStatus
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ): { [id: string]: string } => {
   const stillExecutingInWorkspace = stillRunning.some(
@@ -263,7 +289,7 @@ export const collectFinishedRunningExperiments = (
     if (previouslyRunningExecutor === 'workspace') {
       collectFinishedWorkspaceExperiment(
         acc,
-        getMostRecentExperiment(experiments)
+        getMostRecentExperiment(experiments, coloredStatus)
       )
       continue
     }

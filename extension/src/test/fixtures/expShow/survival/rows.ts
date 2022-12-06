@@ -269,8 +269,8 @@ const data: Row[] = [
         value: 'ffcea00'
       }
     },
-    displayColor: '#945dd6',
-    selected: true,
+    displayColor: undefined,
+    selected: false,
     starred: false
   },
   {
@@ -543,8 +543,8 @@ const data: Row[] = [
         value: 'ffcea00'
       }
     },
-    displayColor: '#13adc7',
-    selected: true,
+    displayColor: undefined,
+    selected: false,
     starred: false
   },
   {
@@ -816,8 +816,8 @@ const data: Row[] = [
         value: 'ffcea00'
       }
     },
-    displayColor: '#f46837',
-    selected: true,
+    displayColor: undefined,
+    selected: false,
     starred: false
   },
   {
@@ -1089,8 +1089,8 @@ const data: Row[] = [
         value: 'ffcea00'
       }
     },
-    displayColor: '#48bb78',
-    selected: true,
+    displayColor: undefined,
+    selected: false,
     starred: false
   }
 ]

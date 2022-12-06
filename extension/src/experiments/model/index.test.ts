@@ -208,10 +208,11 @@ describe('ExperimentsModel', () => {
         baseline: buildTestExperiment(3)
       }
     })
+    experimentsModel.toggleStatus(runningExperiment)
 
     expect(experimentsModel.getSelectedExperiments()).toStrictEqual([
       expect.objectContaining({
-        displayColor: expColor,
+        displayColor: workspaceColor,
         id: runningExperiment,
         label: 'tip2'
       })

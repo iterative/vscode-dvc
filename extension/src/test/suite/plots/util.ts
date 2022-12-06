@@ -19,6 +19,8 @@ import { PathsModel } from '../../../plots/paths/model'
 import { Color } from '../../../experiments/model/status/colors'
 import { BaseWorkspaceWebviews } from '../../../webview/workspace'
 import { WebviewMessages } from '../../../plots/webview/messages'
+import { ExperimentsModel } from '../../../experiments/model'
+import { Experiment } from '../../../experiments/webview/contract'
 
 export const buildPlots = async (
   disposer: Disposer,
@@ -61,6 +63,17 @@ export const buildPlots = async (
   )
 
   mockHasCheckpoints(expShow)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const experimentsModel: ExperimentsModel = (experiments as any).experiments
+  experimentsModel.setSelected([
+    { id: 'workspace' },
+    { id: 'main' },
+    { id: 'exp-e7a67' },
+    { id: 'test-branch' },
+    { id: 'exp-83425' },
+    { id: 'exp-f13bca' }
+  ] as Experiment[])
+
   experiments.setState(expShow)
 
   await plots.isReady()

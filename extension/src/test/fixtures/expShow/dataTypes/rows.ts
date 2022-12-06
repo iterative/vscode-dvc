@@ -3,7 +3,7 @@ import { Row } from '../../../../experiments/webview/contract'
 
 const data: Row[] = [
   {
-    displayColor: '#945dd6',
+    displayColor: undefined,
     executor: null,
     id: 'workspace',
     label: 'workspace',
@@ -20,17 +20,17 @@ const data: Row[] = [
       }
     },
     status: ExperimentStatus.SUCCESS,
-    selected: true,
+    selected: false,
     starred: false
   },
   {
-    displayColor: '#13adc7',
+    displayColor: undefined,
     executor: null,
     id: 'main',
     label: 'main',
     name: 'main',
     status: ExperimentStatus.SUCCESS,
-    selected: true,
+    selected: false,
     sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     starred: false,
     Created: '2020-11-21T19:58:22'

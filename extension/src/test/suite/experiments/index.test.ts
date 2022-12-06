@@ -1106,52 +1106,50 @@ suite('Experiments Test Suite', () => {
       await experiments.isReady()
       await experiments.showWebview()
 
-      const colors = copyOriginalColors()
-
       expect(messageSpy).to.be.calledWithMatch({
         rows: [
           {
-            displayColor: colors[0],
+            displayColor: undefined,
             id: 'workspace',
             label: 'workspace',
             params: { 'params.yaml': { test: 10 } },
-            selected: true,
+            selected: false,
             starred: false
           },
           {
-            displayColor: colors[1],
+            displayColor: undefined,
             id: 'testBranch',
             label: 'testBranch',
             name: 'testBranch',
             params: { 'params.yaml': { test: 10 } },
-            selected: true,
+            selected: false,
             sha: 'testBranch',
             starred: false,
             subRows: [
               {
-                displayColor: colors[2],
+                displayColor: undefined,
                 id: 'testExp1',
                 label: 'testExp',
                 params: { 'params.yaml': { test: 2 } },
-                selected: true,
+                selected: false,
                 sha: 'testExp1',
                 starred: false
               },
               {
-                displayColor: colors[3],
+                displayColor: undefined,
                 id: 'testExp2',
                 label: 'testExp',
                 params: { 'params.yaml': { test: 1 } },
-                selected: true,
+                selected: false,
                 sha: 'testExp2',
                 starred: false
               },
               {
-                displayColor: colors[4],
+                displayColor: undefined,
                 id: 'testExp3',
                 label: 'testExp',
                 params: { 'params.yaml': { test: 3 } },
-                selected: true,
+                selected: false,
                 sha: 'testExp3',
                 starred: false
               }
@@ -1191,47 +1189,47 @@ suite('Experiments Test Suite', () => {
       expect(messageSpy).to.be.calledWithMatch({
         rows: [
           {
-            displayColor: colors[0],
+            displayColor: undefined,
             id: 'workspace',
             label: 'workspace',
             params: { 'params.yaml': { test: 10 } },
-            selected: true,
+            selected: false,
             starred: false
           },
           {
-            displayColor: colors[1],
+            displayColor: undefined,
             id: 'testBranch',
             label: 'testBranch',
             name: 'testBranch',
             params: { 'params.yaml': { test: 10 } },
-            selected: true,
+            selected: false,
             sha: 'testBranch',
             starred: false,
             subRows: [
               {
-                displayColor: colors[3],
+                displayColor: undefined,
                 id: 'testExp2',
                 label: 'testExp',
                 params: { 'params.yaml': { test: 1 } },
-                selected: true,
+                selected: false,
                 sha: 'testExp2',
                 starred: false
               },
               {
-                displayColor: colors[2],
+                displayColor: undefined,
                 id: 'testExp1',
                 label: 'testExp',
                 params: { 'params.yaml': { test: 2 } },
-                selected: true,
+                selected: false,
                 sha: 'testExp1',
                 starred: false
               },
               {
-                displayColor: colors[4],
+                displayColor: undefined,
                 id: 'testExp3',
                 label: 'testExp',
                 params: { 'params.yaml': { test: 3 } },
-                selected: true,
+                selected: false,
                 sha: 'testExp3',
                 starred: false
               }
@@ -1331,18 +1329,18 @@ suite('Experiments Test Suite', () => {
         '217312476f8854dda1865450b737eb6bc7a3ba1b': 0,
         '22e40e1fa3c916ac567f69b85969e3066a91dda4': 0,
         '23250b33e3d6dd0e136262d1d26a2face031cb03': 0,
-        '489fd8bdaa709f7330aac342e051a9431c625481': colors[5],
+        '489fd8bdaa709f7330aac342e051a9431c625481': 0,
         '55d492c9c633912685351b32df91bfe1f9ecefb9': 0,
         '91116c1eae4b79cb1f5ab0312dfd9b3e43608e15': 0,
         '9523bde67538cf31230efaff2dbc47d38a944ab5': 0,
         c658f8b14ac819ac2a5ea0449da6c15dbe8eb880: 0,
         d1343a87c6ee4a2e82d19525964d2fb2cb6756c9: 0,
         e821416bfafb4bc28b3e0a8ddb322505b0ad2361: 0,
-        'exp-83425': colors[4],
-        'exp-e7a67': colors[2],
-        'exp-f13bca': colors[6],
-        main: colors[1],
-        'test-branch': colors[3],
+        'exp-83425': 0,
+        'exp-e7a67': colors[1],
+        'exp-f13bca': 0,
+        main: 0,
+        'test-branch': 0,
         workspace: colors[0]
       })
 
@@ -1436,18 +1434,18 @@ suite('Experiments Test Suite', () => {
         '217312476f8854dda1865450b737eb6bc7a3ba1b': 0,
         '22e40e1fa3c916ac567f69b85969e3066a91dda4': 0,
         '23250b33e3d6dd0e136262d1d26a2face031cb03': 0,
-        '489fd8bdaa709f7330aac342e051a9431c625481': colors[5],
+        '489fd8bdaa709f7330aac342e051a9431c625481': 0,
         '55d492c9c633912685351b32df91bfe1f9ecefb9': 0,
         '91116c1eae4b79cb1f5ab0312dfd9b3e43608e15': 0,
         '9523bde67538cf31230efaff2dbc47d38a944ab5': 0,
         c658f8b14ac819ac2a5ea0449da6c15dbe8eb880: 0,
         d1343a87c6ee4a2e82d19525964d2fb2cb6756c9: 0,
         e821416bfafb4bc28b3e0a8ddb322505b0ad2361: 0,
-        'exp-83425': colors[4],
+        'exp-83425': 0,
         'exp-e7a67': 0,
-        'exp-f13bca': colors[6],
-        main: colors[1],
-        'test-branch': colors[3],
+        'exp-f13bca': 0,
+        main: 0,
+        'test-branch': 0,
         workspace: colors[0]
       })
     })
@@ -1461,7 +1459,7 @@ suite('Experiments Test Suite', () => {
           '489fd8bdaa709f7330aac342e051a9431c625481': 0,
           '55d492c9c633912685351b32df91bfe1f9ecefb9': 0,
           'exp-83425': colors[0],
-          'exp-e7a67': 0,
+          'exp-e7a67': colors[5],
           'exp-f13bca': 0,
           'test-branch': colors[1]
         }
@@ -1481,6 +1479,7 @@ suite('Experiments Test Suite', () => {
       )
       testRepository.setState(expShowFixture)
       await testRepository.isReady()
+
       expect(mementoSpy).to.be.calledWith('experimentsSortBy:test', [])
       expect(mementoSpy).to.be.calledWith('experimentsFilterBy:test', [])
       expect(mementoSpy).to.be.calledWith('experimentsStatus:test', {})
@@ -1503,6 +1502,10 @@ suite('Experiments Test Suite', () => {
         {
           displayColor: colors[1],
           id: 'test-branch'
+        },
+        {
+          displayColor: colors[5],
+          id: 'exp-e7a67'
         }
       ])
     })

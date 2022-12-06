@@ -16,7 +16,8 @@ import {
 import {
   collectColoredStatus,
   collectFinishedRunningExperiments,
-  collectSelected
+  collectSelected,
+  collectStartedRunningExperiments
 } from './status/collect'
 import { Color, copyOriginalColors } from './status/colors'
 import {
@@ -74,6 +75,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   private currentSorts: SortDefinition[]
   private running: { id: string; executor: string }[] = []
   private finishedRunning: { [id: string]: string } = {}
+  private startedRunning: Set<string> = new Set()
 
   constructor(dvcRoot: string, workspaceState: Memento) {
     super(dvcRoot, workspaceState)
@@ -120,9 +122,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.experimentsByBranch = experimentsByBranch
     this.checkpointsByTip = checkpointsByTip
 
-    this.setRunning(hasRunning)
-
-    this.setColoredStatus()
+    this.setColoredStatus(hasRunning)
   }
 
   public toggleStars(ids: string[]) {
@@ -530,18 +530,9 @@ export class ExperimentsModel extends ModelWithPersistence {
     )
   }
 
-  private setRunning(stillRunning: { id: string; executor: string }[]) {
-    this.finishedRunning = collectFinishedRunningExperiments(
-      { ...this.finishedRunning },
-      this.getFlattenedExperiments(),
-      this.running,
-      stillRunning
-    )
+  private setColoredStatus(hasRunning: { id: string; executor: string }[]) {
+    this.setRunning(hasRunning)
 
-    this.running = stillRunning
-  }
-
-  private setColoredStatus() {
     if (this.useFiltersForSelection) {
       this.setSelectedToFilters()
       return
@@ -552,12 +543,31 @@ export class ExperimentsModel extends ModelWithPersistence {
       this.experimentsByBranch,
       this.coloredStatus,
       this.availableColors,
+      this.startedRunning,
       this.finishedRunning
     )
+    this.startedRunning = new Set()
 
     this.setColors(coloredStatus, availableColors)
 
     this.persistStatus()
+  }
+
+  private setRunning(stillRunning: { id: string; executor: string }[]) {
+    this.startedRunning = collectStartedRunningExperiments(
+      this.running,
+      stillRunning
+    )
+
+    this.finishedRunning = collectFinishedRunningExperiments(
+      { ...this.finishedRunning },
+      this.getFlattenedExperiments(),
+      this.running,
+      stillRunning,
+      this.coloredStatus
+    )
+
+    this.running = stillRunning
   }
 
   private setColors(coloredStatus: ColoredStatus, availableColors: Color[]) {
