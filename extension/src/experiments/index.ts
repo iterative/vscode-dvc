@@ -16,7 +16,8 @@ import {
   pickFilterToAdd,
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
-import { tooManySelected } from './model/status'
+import { Color } from './model/status/colors'
+import { tooManySelected, UNSELECTED } from './model/status'
 import { starredSort } from './model/sortBy/constants'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ColumnsModel } from './columns/model'
@@ -192,7 +193,15 @@ export class Experiments extends BaseRepository<TableData> {
     return this.columns.getTerminalNodeStatuses()
   }
 
-  public toggleExperimentStatus(id: string) {
+  public toggleExperimentStatus(
+    id: string
+  ): Color | typeof UNSELECTED | undefined {
+    if (this.experiments.isRunningInWorkspace(id)) {
+      return this.experiments.isSelected('workspace')
+        ? undefined
+        : this.toggleExperimentStatus('workspace')
+    }
+
     const selected = this.experiments.isSelected(id)
     if (!selected && !this.experiments.canSelect()) {
       return

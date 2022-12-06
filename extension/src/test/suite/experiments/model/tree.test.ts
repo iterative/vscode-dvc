@@ -152,6 +152,60 @@ suite('Experiments Tree Test Suite', () => {
       ).to.be.calledOnceWith(false)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should set the workspace to selected when trying to toggle a checkpoint experiment that is running in the workspace', async () => {
+      const { experiments } = buildExperiments(disposable, {
+        '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77': {
+          '4fb124aebddb2adf1545030907687fa9a4c80e70': {
+            data: {
+              ...expShowFixture['53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'][
+                '4fb124aebddb2adf1545030907687fa9a4c80e70'
+              ].data,
+              executor: 'workspace'
+            }
+          },
+          baseline:
+            expShowFixture['53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'].baseline
+        },
+        workspace: expShowFixture.workspace
+      })
+      const isWorkspaceSelected = (): boolean =>
+        !!experiments.getExperiments().find(({ id }) => id === 'workspace')
+          ?.selected
+
+      await experiments.isReady()
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
+      expect(isWorkspaceSelected()).to.be.true
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TOGGLE, {
+        dvcRoot: dvcDemoPath,
+        id: 'workspace'
+      })
+
+      expect(isWorkspaceSelected()).to.be.false
+
+      const selected = await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_TOGGLE,
+        {
+          dvcRoot: dvcDemoPath,
+          id: 'exp-e7a67'
+        }
+      )
+      expect(!!selected).to.be.true
+
+      expect(isWorkspaceSelected()).to.be.true
+
+      const notReselected = await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_TOGGLE,
+        {
+          dvcRoot: dvcDemoPath,
+          id: 'exp-e7a67'
+        }
+      )
+      expect(notReselected).to.be.undefined
+
+      expect(isWorkspaceSelected()).to.be.true
+    })
+
     it('should not show queued experiments in the dvc.views.experimentsTree.selectExperiments quick pick', async () => {
       await buildPlots(disposable)
 

@@ -165,6 +165,17 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.running.length > 0
   }
 
+  public isRunningInWorkspace(id: string) {
+    if (id === 'workspace') {
+      return false
+    }
+
+    return this.running.some(
+      ({ id: runningId, executor }) =>
+        executor === 'workspace' && runningId === id
+    )
+  }
+
   public setRevisionCollected(revisions: string[]) {
     this.getFlattenedExperiments()
       .filter(({ label }) => revisions.includes(label))
