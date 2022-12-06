@@ -10,7 +10,11 @@ import { Indicators } from '../Indicators'
 import { useColumnOrder } from '../../../hooks/useColumnOrder'
 import { ExperimentsState } from '../../../store'
 import { sendMessage } from '../../../../shared/vscode'
-import { leafColumnIds, reorderColumnIds } from '../../../util/columns'
+import {
+  leafColumnIds,
+  reorderColumnIds,
+  isExperimentColumn
+} from '../../../util/columns'
 import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
 import { getSelectedForPlotsCount } from '../../../util/rows'
 interface TableHeadProps {
@@ -80,8 +84,9 @@ export const TableHead = ({
 
   const onDragUpdate = (e: DragEvent<HTMLElement>) => {
     findDisplacedHeader(e.currentTarget.id, displacedHeader => {
-      const displaced = leafColumnIds(displacedHeader)
-      dispatch(setDropTarget(displaced[displaced.length - 1]))
+      if (!isExperimentColumn(displacedHeader.id)) {
+        dispatch(setDropTarget(displacedHeader.id))
+      }
     })
   }
 
@@ -95,9 +100,13 @@ export const TableHead = ({
     const fullOrder = fullColumnOrder.current
     const displacer = draggingIds.current
     let newOrder: string[] = []
+    const displacedHeader = allHeaders.find(
+      header => header.id === headerDropTargetId
+    )
 
-    if (fullOrder && displacer) {
-      newOrder = reorderColumnIds(fullOrder, displacer, [headerDropTargetId])
+    if (fullOrder && displacer && displacedHeader) {
+      const leafs = leafColumnIds(displacedHeader)
+      newOrder = reorderColumnIds(fullOrder, displacer, leafs)
 
       setColumnOrder(newOrder)
       sendMessage({
