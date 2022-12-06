@@ -61,8 +61,7 @@ import { collectWorkspaceScale } from './telemetry/collect'
 import { createFileSystemWatcher } from './fileSystem/watcher'
 import { GitExecutor } from './cli/git/executor'
 import { GitReader } from './cli/git/reader'
-import { createWebview } from './webview/factory'
-import { ViewKey } from './webview/constants'
+import { GetStarted } from './getStarted'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
@@ -73,6 +72,7 @@ export class Extension extends Disposable implements IExtension {
   private readonly repositories: WorkspaceRepositories
   private readonly experiments: WorkspaceExperiments
   private readonly plots: WorkspacePlots
+  private readonly getStarted: GetStarted
   private readonly repositoriesTree: RepositoriesTree
   private readonly dvcExecutor: DvcExecutor
   private readonly dvcReader: DvcReader
@@ -153,6 +153,10 @@ export class Extension extends Disposable implements IExtension {
 
     this.plots = this.dispose.track(
       new WorkspacePlots(this.internalCommands, context.workspaceState)
+    )
+
+    this.getStarted = this.dispose.track(
+      new GetStarted('', this.internalCommands, this.resourceLocator.dvcIcon)
     )
 
     this.repositories = this.dispose.track(
@@ -257,13 +261,7 @@ export class Extension extends Disposable implements IExtension {
     this.internalCommands.registerExternalCommand(
       RegisteredCommands.GET_STARTED_WEBVIEW_SHOW,
       async () => {
-        await createWebview(
-          ViewKey.GET_STARTED,
-          '',
-          this.resourceLocator.dvcIcon,
-          ViewColumn.Active,
-          true
-        )
+        await this.getStarted.showWebview()
       }
     )
 

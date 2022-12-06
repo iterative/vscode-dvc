@@ -6,8 +6,9 @@ import {
   SectionCollapsed,
   TemplatePlotGroup
 } from '../plots/webview/contract'
+import { GetStartedData } from '../getStarted/webview/contract'
 
-export type WebviewData = TableData | PlotsData
+export type WebviewData = TableData | PlotsData | GetStartedData
 
 export enum MessageFromWebviewType {
   INITIALIZED = 'initialized',
@@ -45,7 +46,8 @@ export enum MessageFromWebviewType {
   MODIFY_EXPERIMENT_PARAMS_AND_QUEUE = 'modify-experiment-params-and-queue',
   MODIFY_EXPERIMENT_PARAMS_AND_RUN = 'modify-experiment-params-and-run',
   MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN = 'modify-experiment-params-reset-and-run',
-  SET_EXPERIMENTS_HEADER_HEIGHT = 'update-experiments-header-height'
+  SET_EXPERIMENTS_HEADER_HEIGHT = 'update-experiments-header-height',
+  INITIALIZE_PROJECT = 'initialize-project'
 }
 
 export type ColumnResizePayload = {
@@ -176,6 +178,7 @@ export type MessageFromWebview =
       payload: string
     }
   | { type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_HEIGHT }
+  | { type: MessageFromWebviewType.INITIALIZE_PROJECT }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA
