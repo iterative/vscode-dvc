@@ -3,11 +3,7 @@ import { collectFiles } from './collect'
 import { PlotsOutputOrError } from '../../cli/dvc/contract'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { BaseData } from '../../data'
-import {
-  definedAndNonEmpty,
-  flattenUnique,
-  sameContents
-} from '../../util/array'
+import { flattenUnique, sameContents } from '../../util/array'
 import { PlotsModel } from '../model'
 
 export class PlotsData extends BaseData<{
@@ -42,15 +38,6 @@ export class PlotsData extends BaseData<{
       this.model.getMissingRevisions(),
       this.model.getMutableRevisions()
     ])
-
-    if (
-      (await this.internalCommands.executeCommand<boolean>(
-        AvailableCommands.IS_EXPERIMENT_RUNNING
-      )) &&
-      !definedAndNonEmpty(revs)
-    ) {
-      return
-    }
 
     const args = this.getArgs(revs)
     const data = await this.internalCommands.executeCommand<PlotsOutputOrError>(

@@ -124,7 +124,11 @@ suite('Plots Test Suite', () => {
       await dataUpdateEvent
 
       expect(mockPlotsDiff).to.be.calledOnce
-      expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath, 'experim')
+      expect(mockPlotsDiff).to.be.calledWithExactly(
+        dvcDemoPath,
+        'experim',
+        'workspace'
+      )
     })
 
     it('should call plots diff with the branch name whenever the current branch commit changes', async () => {
@@ -588,7 +592,11 @@ suite('Plots Test Suite', () => {
         undefined
       )
       expect(mockPlotsDiff).to.be.called
-      expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath, '53c3851')
+      expect(mockPlotsDiff).to.be.calledWithExactly(
+        dvcDemoPath,
+        '53c3851',
+        'workspace'
+      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to manually refresh all visible plots from the webview', async () => {

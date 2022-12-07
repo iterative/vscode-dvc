@@ -68,14 +68,6 @@ suite('Plots Data Test Suite', () => {
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('PlotsData', () => {
-    it('should not call plots diff when there are no revisions to fetch and an experiment running (checkpoints)', async () => {
-      const { data, mockPlotsDiff } = buildPlotsData(true)
-
-      await data.update()
-
-      expect(mockPlotsDiff).not.to.be.called
-    })
-
     it('should call plots diff when there are no revisions to fetch and no experiment is running (workspace updates)', async () => {
       const { data, mockPlotsDiff } = buildPlotsData(false, [], [])
 
@@ -146,10 +138,6 @@ suite('Plots Data Test Suite', () => {
       const watchedFile = join(parentDirectory, 'metrics.json')
 
       const mockExecuteCommand = (command: CommandId) => {
-        if (command === AvailableCommands.IS_EXPERIMENT_RUNNING) {
-          return Promise.resolve(false)
-        }
-
         if (command === AvailableCommands.PLOTS_DIFF) {
           return Promise.resolve({
             'dvc.yaml::Accuracy': [

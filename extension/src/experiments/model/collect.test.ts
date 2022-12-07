@@ -169,20 +169,6 @@ describe('collectMutableRevisions', () => {
     { label: 'workspace', selected: false, status: ExperimentStatus.FAILED }
   ] as Experiment[]
 
-  it('should not return the workspace when there is a selected running checkpoint experiment (race condition)', () => {
-    const experiments = [
-      {
-        label: 'exp-123',
-        selected: true,
-        status: ExperimentStatus.RUNNING
-      },
-      ...baseExperiments
-    ] as Experiment[]
-
-    const mutableRevisions = collectMutableRevisions(experiments, true)
-    expect(mutableRevisions).toStrictEqual([])
-  })
-
   it('should return the workspace when there is an unselected running checkpoint experiment', () => {
     const experiments = [
       {

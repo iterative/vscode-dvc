@@ -5,8 +5,6 @@ import {
   collectCheckpointPlotsData,
   collectData,
   collectMetricOrder,
-  collectWorkspaceRaceConditionData,
-  collectWorkspaceRunningCheckpoint,
   collectSelectedTemplatePlots,
   collectTemplates,
   ComparisonData,
@@ -49,7 +47,6 @@ export class PlotsModel extends ModelWithPersistence {
   private plotSizes: Record<Section, number>
   private sectionCollapsed: SectionCollapsed
   private branchRevisions: Record<string, string> = {}
-  private workspaceRunningCheckpoint: string | undefined
 
   private fetchedRevs = new Set<string>()
 
@@ -89,18 +86,14 @@ export class PlotsModel extends ModelWithPersistence {
     this.metricOrder = this.revive(PersistenceKey.PLOT_METRIC_ORDER, [])
   }
 
-  public async transformAndSetExperiments(data: ExperimentsOutput) {
-    const [checkpointPlots, workspaceRunningCheckpoint] = await Promise.all([
-      collectCheckpointPlotsData(data),
-      collectWorkspaceRunningCheckpoint(data, this.experiments.hasCheckpoints())
-    ])
+  public transformAndSetExperiments(data: ExperimentsOutput) {
+    const checkpointPlots = collectCheckpointPlotsData(data)
 
     if (!this.selectedMetrics && checkpointPlots) {
       this.selectedMetrics = checkpointPlots.map(({ id }) => id)
     }
 
     this.checkpointPlots = checkpointPlots
-    this.workspaceRunningCheckpoint = workspaceRunningCheckpoint
 
     this.setMetricOrder()
 
@@ -121,23 +114,15 @@ export class PlotsModel extends ModelWithPersistence {
         collectMultiSourceVariations(data, this.multiSourceVariations)
       ])
 
-    const { overwriteComparisonData, overwriteRevisionData } =
-      collectWorkspaceRaceConditionData(
-        this.workspaceRunningCheckpoint,
-        { ...this.comparisonData, ...comparisonData },
-        { ...this.revisionData, ...revisionData }
-      )
-
     this.comparisonData = {
       ...this.comparisonData,
-      ...comparisonData,
-      ...overwriteComparisonData
+      ...comparisonData
     }
     this.revisionData = {
       ...this.revisionData,
-      ...revisionData,
-      ...overwriteRevisionData
+      ...revisionData
     }
+
     this.templates = { ...this.templates, ...templates }
     this.multiSourceVariations = multiSourceVariations
     this.multiSourceEncoding = collectMultiSourceEncoding(

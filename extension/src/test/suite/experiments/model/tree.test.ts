@@ -461,7 +461,8 @@ suite('Experiments Tree Test Suite', () => {
         '1ee5f2e',
         '2173124',
         '9523bde',
-        'd1343a8'
+        'd1343a8',
+        'workspace'
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 

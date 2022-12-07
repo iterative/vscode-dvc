@@ -1,4 +1,3 @@
-import cloneDeep from 'lodash.clonedeep'
 import omit from 'lodash.omit'
 import { TopLevelSpec } from 'vega-lite'
 import {
@@ -16,7 +15,6 @@ import {
 } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
-  ExperimentsBranchOutput,
   ExperimentsOutput,
   ExperimentStatus,
   isValueTree,
@@ -241,35 +239,6 @@ export const collectCheckpointPlotsData = (
   return plotsData
 }
 
-const isRunningInWorkspace = (experiment: ExperimentFieldsOrError) =>
-  experiment.data?.executor === 'workspace'
-
-const collectRunningFromBranch = (
-  experimentsObject: ExperimentsBranchOutput
-): string | undefined => {
-  for (const [sha, experiment] of Object.entries(experimentsObject)) {
-    if (isRunningInWorkspace(experiment)) {
-      return shortenForLabel(sha)
-    }
-  }
-}
-
-export const collectWorkspaceRunningCheckpoint = (
-  data: ExperimentsOutput,
-  hasCheckpoints: boolean
-): string | undefined => {
-  if (!hasCheckpoints) {
-    return
-  }
-  for (const experimentsObject of Object.values(omit(data, 'workspace'))) {
-    const checkpointRunningInWorkspace =
-      collectRunningFromBranch(experimentsObject)
-    if (checkpointRunningInWorkspace) {
-      return checkpointRunningInWorkspace
-    }
-  }
-}
-
 type MetricOrderAccumulator = {
   newOrder: string[]
   uncollectedMetrics: string[]
@@ -435,54 +404,6 @@ export const collectData = (
   }
 
   return acc
-}
-
-const collectWorkspaceRevisionData = (
-  overwriteRevisionData: RevisionPathData
-) => {
-  const acc: RevisionPathData = {}
-
-  for (const [path, values] of Object.entries(overwriteRevisionData)) {
-    acc[path] = []
-    for (const value of values) {
-      acc[path].push({ ...value, rev: 'workspace' })
-    }
-  }
-
-  return acc
-}
-
-export const collectWorkspaceRaceConditionData = (
-  runningSelectedCheckpoint: string | undefined,
-  comparisonData: ComparisonData,
-  revisionData: RevisionData
-): {
-  overwriteComparisonData: ComparisonData
-  overwriteRevisionData: RevisionData
-} => {
-  if (!runningSelectedCheckpoint) {
-    return { overwriteComparisonData: {}, overwriteRevisionData: {} }
-  }
-
-  const overwriteComparisonData = cloneDeep(
-    comparisonData[runningSelectedCheckpoint]
-  )
-  const overwriteRevisionData = cloneDeep(
-    revisionData[runningSelectedCheckpoint]
-  )
-
-  if (!overwriteComparisonData && !overwriteRevisionData) {
-    return { overwriteComparisonData: {}, overwriteRevisionData: {} }
-  }
-
-  const workspaceRevisionData = collectWorkspaceRevisionData(
-    overwriteRevisionData
-  )
-
-  return {
-    overwriteComparisonData: { workspace: overwriteComparisonData },
-    overwriteRevisionData: { workspace: workspaceRevisionData }
-  }
 }
 
 export type TemplateAccumulator = { [path: string]: string }
