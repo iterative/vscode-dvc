@@ -18,16 +18,17 @@ export class BaseWebview extends BasePage<
   }
 
   public async focus() {
-    const webviewContainer = await this.outerFrame$
+    await this.outerFrame$.waitForExist()
 
-    await this.outerFrame$.waitForDisplayed()
+    await browser.switchToFrame(await this.outerFrame$)
 
-    await browser.switchToFrame(webviewContainer)
-    await this.innerFrame$.waitForDisplayed()
+    await this.innerFrame$.waitForExist()
+
     const webviewInner = await browser.findElement(
       'css selector',
       this.locators.innerFrame
     )
+
     return browser.switchToFrame(webviewInner)
   }
 
