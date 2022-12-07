@@ -174,16 +174,18 @@ export const setup = async (extension: IExtension) => {
     extension.setCliCompatible(isCompatible)
     extension.setAvailable(isAvailable)
 
-    if (extension.hasRoots() && isAvailable) {
-      return extension.initialize()
+    if (isAvailable) {
+      clearInterval(checkAvailable)
+
+      if (extension.hasRoots()) {
+        return extension.initialize()
+      }
     }
 
     extension.resetMembers()
 
     if (!isAvailable) {
       extension.setAvailable(false)
-    } else {
-      clearInterval(checkAvailable)
     }
   }, 5000)
 }

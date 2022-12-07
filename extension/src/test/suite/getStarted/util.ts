@@ -9,8 +9,9 @@ export const buildGetStarted = (disposer: Disposer) => {
   const getStarted = disposer.track(
     new GetStarted(
       '',
-      internalCommands,
       resourceLocator.dvcIcon,
+      () => {},
+      () => {},
       () => false,
       () => false
     )

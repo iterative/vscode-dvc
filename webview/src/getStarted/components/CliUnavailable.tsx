@@ -9,7 +9,7 @@ export const CliUnavailable: React.FC = () => {
         <p>
           Take a look at the{' '}
           <a href="https://dvc.org/doc/install">documentation</a> to install the
-          DVC cli on your system or inside a vrtual environment.
+          DVC cli on your system or inside a virtual environment.
         </p>
       </div>
     </EmptyState>

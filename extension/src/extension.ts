@@ -158,8 +158,9 @@ export class Extension extends Disposable implements IExtension {
     this.getStarted = this.dispose.track(
       new GetStarted(
         '',
-        this.internalCommands,
         this.resourceLocator.dvcIcon,
+        () => this.initProject(),
+        () => this.showExperiments(this.dvcRoots[0]),
         () => this.getAvailable(),
         () => this.hasRoots()
       )
@@ -253,10 +254,7 @@ export class Extension extends Disposable implements IExtension {
     this.internalCommands.registerExternalCommand(
       RegisteredCommands.EXPERIMENT_AND_PLOTS_SHOW,
       async (context: VsCodeContext) => {
-        await this.experiments.showWebview(
-          getDvcRootFromContext(context),
-          ViewColumn.Active
-        )
+        await this.showExperiments(getDvcRootFromContext(context))
         await this.plots.showWebview(
           getDvcRootFromContext(context),
           ViewColumn.Beside
@@ -307,13 +305,7 @@ export class Extension extends Disposable implements IExtension {
 
     this.internalCommands.registerExternalCliCommand(
       RegisteredCliCommands.INIT,
-      async () => {
-        const root = getFirstWorkspaceFolder()
-        if (root) {
-          await this.dvcExecutor.init(root)
-          this.workspaceChanged.fire()
-        }
-      }
+      this.initProject
     )
 
     registerRepositoryCommands(this.repositories, this.internalCommands)
@@ -456,6 +448,18 @@ export class Extension extends Disposable implements IExtension {
 
   public getAvailable() {
     return this.cliAccessible
+  }
+
+  public async initProject() {
+    const root = getFirstWorkspaceFolder()
+    if (root) {
+      await this.dvcExecutor.init(root)
+      this.workspaceChanged.fire()
+    }
+  }
+
+  private async showExperiments(dvcRoot: string) {
+    return await this.experiments.showWebview(dvcRoot, ViewColumn.Active)
   }
 
   private setCommandsAvailability(available: boolean) {

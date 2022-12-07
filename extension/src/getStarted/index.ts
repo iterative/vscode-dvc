@@ -4,35 +4,37 @@ import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Resource } from '../resourceLocator'
-import { AvailableCommands, InternalCommands } from '../commands/internal'
 
 export type GetStartedWebview = BaseWebview<TGetStartedData>
 
 export class GetStarted extends BaseRepository<TGetStartedData> {
   public readonly viewKey = ViewKey.GET_STARTED
 
-  private internalCommands: InternalCommands
   private webviewMessages: WebviewMessages
+  private initProject: () => void
+  private showExperiments: () => void
   private getCliAccessible: () => boolean
   private getHasRoots: () => boolean
 
   constructor(
     dvcRoot: string,
-    internalCommands: InternalCommands,
     webviewIcon: Resource,
+    initProject: () => void,
+    showExperiments: () => void,
     getCliAccessible: () => boolean,
     getHasRoots: () => boolean
   ) {
     super(dvcRoot, webviewIcon)
 
     this.webviewMessages = this.createWebviewMessageHandler()
-    this.internalCommands = internalCommands
 
     if (this.webview) {
       this.sendDataToWebview()
     }
     this.getCliAccessible = getCliAccessible
     this.getHasRoots = getHasRoots
+    this.initProject = initProject
+    this.showExperiments = showExperiments
   }
 
   public sendInitialWebviewData() {
@@ -49,8 +51,8 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
   private createWebviewMessageHandler() {
     const webviewMessages = new WebviewMessages(
       () => this.getWebview(),
-      () => this.initializeProject(),
-      () => this.openExperimentsWebview()
+      () => this.initProject(),
+      () => this.showExperiments()
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>
@@ -58,13 +60,5 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
       )
     )
     return webviewMessages
-  }
-
-  private initializeProject() {
-    this.internalCommands.executeCommand(AvailableCommands.INIT)
-  }
-
-  private openExperimentsWebview() {
-    this.internalCommands.executeCommand(AvailableCommands.EXPERIMENT_SHOW)
   }
 }

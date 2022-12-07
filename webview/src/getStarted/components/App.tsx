@@ -5,11 +5,11 @@ import {
   MessageToWebview
 } from 'dvc/src/webview/contract'
 import React, { useCallback, useState } from 'react'
+import { CliUnavailable } from './CliUnavailable'
+import { ProjectUninitialized } from './ProjectUninitialized'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 import { sendMessage } from '../../shared/vscode'
-import { CliUnavailable } from './CliUnavailable'
-import { ProjectUninitialized } from './ProjectUninitialized'
 
 export const App: React.FC = () => {
   const [cliAvailable, setCliAvailable] = useState(false)
