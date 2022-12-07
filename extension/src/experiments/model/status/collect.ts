@@ -1,7 +1,12 @@
 import { canSelect, ColoredStatus, UNSELECTED } from '.'
 import { Color, copyOriginalColors } from './colors'
 import { hasKey } from '../../../util/object'
-import { Experiment, isQueued, isRunning } from '../../webview/contract'
+import {
+  Experiment,
+  isQueued,
+  isRunning,
+  RunningExperiment
+} from '../../webview/contract'
 import { definedAndNonEmpty, reorderListSubset } from '../../../util/array'
 import { flattenMapValues } from '../../../util/map'
 
@@ -213,8 +218,8 @@ export const collectSelected = (
 }
 
 export const collectStartedRunningExperiments = (
-  previouslyRunning: { id: string; executor: string }[],
-  nowRunning: { id: string; executor: string }[]
+  previouslyRunning: RunningExperiment[],
+  nowRunning: RunningExperiment[]
 ): Set<string> => {
   const acc = new Set<string>()
 
@@ -267,7 +272,7 @@ const isStillRunning = (
   stillExecutingInWorkspace: boolean,
   previouslyRunningId: string,
   previouslyRunningExecutor: string,
-  stillRunning: { id: string; executor: string }[]
+  stillRunning: RunningExperiment[]
 ): boolean =>
   (stillExecutingInWorkspace && previouslyRunningExecutor === 'workspace') ||
   stillRunning.some(({ id }) => id === previouslyRunningId)
@@ -275,8 +280,8 @@ const isStillRunning = (
 export const collectFinishedRunningExperiments = (
   acc: { [id: string]: string },
   experiments: Experiment[],
-  previouslyRunning: { id: string; executor: string }[],
-  stillRunning: { id: string; executor: string }[],
+  previouslyRunning: RunningExperiment[],
+  stillRunning: RunningExperiment[],
   coloredStatus: ColoredStatus
 ): { [id: string]: string } => {
   const stillExecutingInWorkspace = stillRunning.some(

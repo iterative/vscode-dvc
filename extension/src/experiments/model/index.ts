@@ -28,7 +28,12 @@ import {
   UNSELECTED
 } from './status'
 import { collectFlatExperimentParams } from './modify/collect'
-import { Experiment, isQueued, Row } from '../webview/contract'
+import {
+  Experiment,
+  isQueued,
+  Row,
+  RunningExperiment
+} from '../webview/contract'
 import {
   definedAndNonEmpty,
   reorderListSubset,
@@ -73,7 +78,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   private useFiltersForSelection = false
 
   private currentSorts: SortDefinition[]
-  private running: { id: string; executor: string }[] = []
+  private running: RunningExperiment[] = []
   private finishedRunning: { [id: string]: string } = {}
   private startedRunning: Set<string> = new Set()
 
@@ -530,7 +535,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     )
   }
 
-  private setColoredStatus(hasRunning: { id: string; executor: string }[]) {
+  private setColoredStatus(hasRunning: RunningExperiment[]) {
     this.setRunning(hasRunning)
 
     if (this.useFiltersForSelection) {
@@ -553,7 +558,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.persistStatus()
   }
 
-  private setRunning(stillRunning: { id: string; executor: string }[]) {
+  private setRunning(stillRunning: RunningExperiment[]) {
     this.startedRunning = collectStartedRunningExperiments(
       this.running,
       stillRunning

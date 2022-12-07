@@ -1,11 +1,11 @@
-import { Experiment, isRunning } from '../webview/contract'
+import { Experiment, isRunning, RunningExperiment } from '../webview/contract'
 
 export class ExperimentsAccumulator {
   public workspace = {} as Experiment
   public branches: Experiment[] = []
   public checkpointsByTip: Map<string, Experiment[]> = new Map()
   public experimentsByBranch: Map<string, Experiment[]> = new Map()
-  public hasRunning: { id: string; executor: string }[]
+  public hasRunning: RunningExperiment[]
 
   constructor(workspace: Experiment | undefined) {
     if (workspace) {
