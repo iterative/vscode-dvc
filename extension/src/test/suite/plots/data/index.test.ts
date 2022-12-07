@@ -138,10 +138,6 @@ suite('Plots Data Test Suite', () => {
       const watchedFile = join(parentDirectory, 'metrics.json')
 
       const mockExecuteCommand = (command: CommandId) => {
-        if (command === AvailableCommands.IS_EXPERIMENT_RUNNING) {
-          return Promise.resolve(false)
-        }
-
         if (command === AvailableCommands.PLOTS_DIFF) {
           return Promise.resolve({
             'dvc.yaml::Accuracy': [
