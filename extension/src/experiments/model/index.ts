@@ -39,7 +39,10 @@ import {
   reorderListSubset,
   reorderObjectList
 } from '../../util/array'
-import { ExperimentsOutput } from '../../cli/dvc/contract'
+import {
+  ExperimentsOutput,
+  EXPERIMENT_WORKSPACE_ID
+} from '../../cli/dvc/contract'
 import { setContextValue } from '../../vscode/context'
 import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
@@ -166,13 +169,13 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public isRunningInWorkspace(id: string) {
-    if (id === 'workspace') {
+    if (id === EXPERIMENT_WORKSPACE_ID) {
       return false
     }
 
     return this.running.some(
       ({ id: runningId, executor }) =>
-        executor === 'workspace' && runningId === id
+        executor === EXPERIMENT_WORKSPACE_ID && runningId === id
     )
   }
 

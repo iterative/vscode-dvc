@@ -34,6 +34,7 @@ import {
 } from 'dvc/src/webview/contract'
 import { reorderObjectList } from 'dvc/src/util/array'
 import { act } from 'react-dom/test-utils'
+import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { App } from './App'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
 import { SectionDescription } from './PlotsContainer'
@@ -1854,7 +1855,13 @@ describe('App', () => {
 
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
-        payload: ['workspace', 'main', '4fb124a', '42b8736', '1ba7bcd'],
+        payload: [
+          EXPERIMENT_WORKSPACE_ID,
+          'main',
+          '4fb124a',
+          '42b8736',
+          '1ba7bcd'
+        ],
         type: MessageFromWebviewType.REFRESH_REVISIONS
       })
     })

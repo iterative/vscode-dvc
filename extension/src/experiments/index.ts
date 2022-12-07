@@ -30,7 +30,7 @@ import { DecorationProvider } from './model/decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
 import { ResourceLocator } from '../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { ExperimentsOutput } from '../cli/dvc/contract'
+import { ExperimentsOutput, EXPERIMENT_WORKSPACE_ID } from '../cli/dvc/contract'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { FileSystemData } from '../fileSystem/data'
@@ -197,9 +197,9 @@ export class Experiments extends BaseRepository<TableData> {
     id: string
   ): Color | typeof UNSELECTED | undefined {
     if (this.experiments.isRunningInWorkspace(id)) {
-      return this.experiments.isSelected('workspace')
+      return this.experiments.isSelected(EXPERIMENT_WORKSPACE_ID)
         ? undefined
-        : this.toggleExperimentStatus('workspace')
+        : this.toggleExperimentStatus(EXPERIMENT_WORKSPACE_ID)
     }
 
     const selected = this.experiments.isSelected(id)

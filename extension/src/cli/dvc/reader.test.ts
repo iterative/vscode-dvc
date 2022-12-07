@@ -2,6 +2,7 @@ import { join } from 'path'
 import { EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { UNEXPECTED_ERROR_CODE } from './constants'
+import { EXPERIMENT_WORKSPACE_ID } from './contract'
 import { DvcReader } from './reader'
 import { CliResult, CliStarted } from '..'
 import { MaybeConsoleError } from '../error'
@@ -91,7 +92,7 @@ describe('CliReader', () => {
 
       const cliOutput = await dvcReader.expShow(cwd)
       expect(cliOutput).toStrictEqual({
-        workspace: {
+        [EXPERIMENT_WORKSPACE_ID]: {
           baseline: { error: { msg: unexpectedStderr, type: 'Caught error' } }
         }
       })
@@ -104,7 +105,9 @@ describe('CliReader', () => {
       )
 
       const cliOutput = await dvcReader.expShow(cwd)
-      expect(cliOutput).toStrictEqual({ workspace: { baseline: {} } })
+      expect(cliOutput).toStrictEqual({
+        [EXPERIMENT_WORKSPACE_ID]: { baseline: {} }
+      })
     })
   })
 

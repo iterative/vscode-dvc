@@ -35,7 +35,10 @@ import { MessageFromWebviewType } from '../../../webview/contract'
 import { reorderObjectList } from '../../../util/array'
 import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
-import { ExperimentStatus } from '../../../cli/dvc/contract'
+import {
+  ExperimentStatus,
+  EXPERIMENT_WORKSPACE_ID
+} from '../../../cli/dvc/contract'
 import { SelectedExperimentWithColor } from '../../../experiments/model'
 
 suite('Plots Test Suite', () => {
@@ -67,7 +70,7 @@ suite('Plots Test Suite', () => {
         '42b8736',
         '4fb124a',
         '53c3851',
-        'workspace'
+        EXPERIMENT_WORKSPACE_ID
       )
       mockPlotsDiff.resetHistory()
 
@@ -127,7 +130,7 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
         'experim',
-        'workspace'
+        EXPERIMENT_WORKSPACE_ID
       )
     })
 
@@ -168,7 +171,7 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
         '9235a02',
-        'workspace'
+        EXPERIMENT_WORKSPACE_ID
       )
     })
 
@@ -315,7 +318,7 @@ suite('Plots Test Suite', () => {
       const mockSetComparisonOrder = spy(plotsModel, 'setComparisonOrder')
       const mockComparisonOrder = [
         '1ba7bcd',
-        'workspace',
+        EXPERIMENT_WORKSPACE_ID,
         'main',
         '4fb124a',
         '42b8736'
@@ -595,7 +598,7 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
         '53c3851',
-        'workspace'
+        EXPERIMENT_WORKSPACE_ID
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -616,7 +619,13 @@ suite('Plots Test Suite', () => {
       )
 
       mockMessageReceived.fire({
-        payload: ['1ba7bcd', '42b8736', '4fb124a', 'main', 'workspace'],
+        payload: [
+          '1ba7bcd',
+          '42b8736',
+          '4fb124a',
+          'main',
+          EXPERIMENT_WORKSPACE_ID
+        ],
         type: MessageFromWebviewType.REFRESH_REVISIONS
       })
 
@@ -635,7 +644,7 @@ suite('Plots Test Suite', () => {
         '42b8736',
         '4fb124a',
         '53c3851',
-        'workspace'
+        EXPERIMENT_WORKSPACE_ID
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -683,7 +692,7 @@ suite('Plots Test Suite', () => {
         await buildPlots(disposable, multiSourcePlotsDiffFixture)
 
       stub(experiments, 'getSelectedRevisions').returns([
-        { label: 'workspace' },
+        { label: EXPERIMENT_WORKSPACE_ID },
         { label: 'main' }
       ] as SelectedExperimentWithColor[])
 

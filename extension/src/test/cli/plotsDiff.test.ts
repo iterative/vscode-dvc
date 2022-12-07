@@ -9,13 +9,14 @@ import {
   PlotsType,
   TemplatePlot
 } from '../../plots/webview/contract'
+import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 
 suite('plots diff -o <TEMP_DIR> --split --show-json', () => {
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('Demo Repository', () => {
     it('should return the expected output', async () => {
       await initializeDemoRepo()
-      const revisionsRequiredForSubmodule = ['workspace', 'HEAD']
+      const revisionsRequiredForSubmodule = [EXPERIMENT_WORKSPACE_ID, 'HEAD']
 
       const output = await dvcReader.plotsDiff(
         dvcDemoPath,

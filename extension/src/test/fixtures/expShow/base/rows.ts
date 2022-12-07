@@ -2,7 +2,10 @@ import { join } from '../../../util/path'
 import { Row } from '../../../../experiments/webview/contract'
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
 import { shortenForLabel } from '../../../../util/string'
-import { ExperimentStatus } from '../../../../cli/dvc/contract'
+import {
+  ExperimentStatus,
+  EXPERIMENT_WORKSPACE_ID
+} from '../../../../cli/dvc/contract'
 
 const valueWithNoChanges = (str: string) => ({
   value: shortenForLabel(str),
@@ -38,9 +41,9 @@ const data: Row[] = [
       )
     },
     displayColor: colorsList[0],
-    executor: 'workspace',
-    id: 'workspace',
-    label: 'workspace',
+    executor: EXPERIMENT_WORKSPACE_ID,
+    id: EXPERIMENT_WORKSPACE_ID,
+    label: EXPERIMENT_WORKSPACE_ID,
     metrics: {
       'summary.json': {
         loss: 1.9293040037155151,

@@ -1,3 +1,4 @@
+import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { Experiment, isRunning, RunningExperiment } from '../webview/contract'
 
 export class ExperimentsAccumulator {
@@ -13,7 +14,10 @@ export class ExperimentsAccumulator {
     }
     this.runningExperiments = []
     if (isRunning(workspace?.status)) {
-      this.runningExperiments.push({ executor: 'workspace', id: 'workspace' })
+      this.runningExperiments.push({
+        executor: EXPERIMENT_WORKSPACE_ID,
+        id: EXPERIMENT_WORKSPACE_ID
+      })
     }
   }
 }

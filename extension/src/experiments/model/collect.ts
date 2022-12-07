@@ -13,7 +13,8 @@ import {
   ExperimentFieldsOrError,
   ExperimentFields,
   ExperimentsBranchOutput,
-  ExperimentsOutput
+  ExperimentsOutput,
+  EXPERIMENT_WORKSPACE_ID
 } from '../../cli/dvc/contract'
 import { addToMapArray } from '../../util/map'
 import { uniqueValues } from '../../util/array'
@@ -313,7 +314,7 @@ export const collectExperiments = (
   data: ExperimentsOutput
 ): ExperimentsAccumulator => {
   const { workspace, ...branchesObject } = data
-  const workspaceId = 'workspace'
+  const workspaceId = EXPERIMENT_WORKSPACE_ID
 
   const workspaceBaseline = transformExperimentData(
     workspaceId,
@@ -327,7 +328,7 @@ export const collectExperiments = (
   return acc
 }
 
-const getDefaultMutableRevision = (): string[] => ['workspace']
+const getDefaultMutableRevision = (): string[] => [EXPERIMENT_WORKSPACE_ID]
 
 const collectMutableRevision = (
   acc: string[],

@@ -71,6 +71,7 @@ import { WorkspacePlots } from '../../../plots/workspace'
 import { PlotSizeNumber } from '../../../plots/webview/contract'
 import { RegisteredCommands } from '../../../commands/external'
 import { ConfigKey } from '../../../vscode/config'
+import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -93,7 +94,7 @@ suite('Experiments Test Suite', () => {
       const runs = experiments.getExperiments()
 
       expect(runs.map(experiment => experiment.label)).to.deep.equal([
-        'workspace',
+        EXPERIMENT_WORKSPACE_ID,
         'main'
       ])
     })
@@ -1088,6 +1089,9 @@ suite('Experiments Test Suite', () => {
       )
 
       experiments.setState({
+        [EXPERIMENT_WORKSPACE_ID]: {
+          baseline: { data: buildTestExperiment(10) }
+        },
         testBranch: {
           baseline: {
             data: { name: 'testBranch', ...buildTestExperiment(10) }
@@ -1095,9 +1099,6 @@ suite('Experiments Test Suite', () => {
           testExp1: { data: buildTestExperiment(2) },
           testExp2: { data: buildTestExperiment(1) },
           testExp3: { data: buildTestExperiment(3) }
-        },
-        workspace: {
-          baseline: { data: buildTestExperiment(10) }
         }
       })
 
@@ -1110,8 +1111,8 @@ suite('Experiments Test Suite', () => {
         rows: [
           {
             displayColor: undefined,
-            id: 'workspace',
-            label: 'workspace',
+            id: EXPERIMENT_WORKSPACE_ID,
+            label: EXPERIMENT_WORKSPACE_ID,
             params: { 'params.yaml': { test: 10 } },
             selected: false,
             starred: false
@@ -1190,8 +1191,8 @@ suite('Experiments Test Suite', () => {
         rows: [
           {
             displayColor: undefined,
-            id: 'workspace',
-            label: 'workspace',
+            id: EXPERIMENT_WORKSPACE_ID,
+            label: EXPERIMENT_WORKSPACE_ID,
             params: { 'params.yaml': { test: 10 } },
             selected: false,
             starred: false
@@ -1596,14 +1597,14 @@ suite('Experiments Test Suite', () => {
   describe('Empty repository', () => {
     it('should not show any experiments in the experiments tree when there are no columns', async () => {
       const { experiments } = buildExperiments(disposable, {
-        b9f016df00d499f6d2a73e7dc34d1600c78066eb: {
+        [EXPERIMENT_WORKSPACE_ID]: {
           baseline: {
             data: {
               deps: {}
             }
           }
         },
-        workspace: {
+        b9f016df00d499f6d2a73e7dc34d1600c78066eb: {
           baseline: {
             data: {
               deps: {}
