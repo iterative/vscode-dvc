@@ -39,8 +39,7 @@ const getRowClassNames = (
   isRowFocused: boolean,
   isRowSelected: boolean,
   isWorkspace: boolean,
-  className?: string,
-  changes?: string[]
+  className?: string
 ) => {
   return cx(
     className,
@@ -55,7 +54,6 @@ const getRowClassNames = (
     isWorkspace ? styles.workspaceRow : styles.normalRow,
     styles.row,
     isRowSelected && styles.rowSelected,
-    isWorkspace && changes?.length && styles.workspaceWithChanges,
     isRowFocused && styles.rowFocused
   )
 }
@@ -165,8 +163,7 @@ export const RowContent: React.FC<
             menuActive,
             isRowSelected,
             isWorkspace,
-            className,
-            changes
+            className
           )
         })}
         tabIndex={0}
@@ -176,6 +173,7 @@ export const RowContent: React.FC<
       >
         <FirstCell
           cell={firstCell}
+          changesIfWorkspace={!!changesIfWorkspace?.length}
           bulletColor={displayColor}
           starred={starred}
           isRowSelected={isRowSelected}
