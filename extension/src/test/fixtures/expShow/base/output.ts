@@ -275,7 +275,7 @@ const data: ExperimentsOutput = {
             nfiles: null
           }
         },
-        executor: null,
+        executor: 'dvc-task',
         metrics: {
           'summary.json': {
             data: {
@@ -1536,7 +1536,7 @@ const data: ExperimentsOutput = {
             }
           }
         },
-        status: ExperimentStatus.RUNNING,
+        status: ExperimentStatus.SUCCESS,
         timestamp: '2020-12-29T15:26:36'
       }
     },

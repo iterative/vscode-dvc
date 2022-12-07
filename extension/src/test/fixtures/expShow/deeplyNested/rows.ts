@@ -24,8 +24,8 @@ export const data = [
         outlier: 1
       }
     },
-    displayColor: '#945dd6',
-    selected: true,
+    displayColor: undefined,
+    selected: false,
     status: ExperimentStatus.SUCCESS,
     starred: false
   },
@@ -56,8 +56,8 @@ export const data = [
         outlier: 1
       }
     },
-    displayColor: '#13adc7',
-    selected: true,
+    displayColor: undefined,
+    selected: false,
     starred: false
   }
 ]

@@ -725,15 +725,38 @@ export const collectBranchRevisionDetails = (
 
 const getRevision = (
   displayColor: Color,
-  { logicalGroupName, id, label }: Experiment,
-  fetchedRevs: Set<string>
+  { logicalGroupName, id, label }: Experiment
 ): Revision => ({
   displayColor,
-  fetched: fetchedRevs.has(label),
+  fetched: true,
   group: logicalGroupName,
   id,
   revision: label
 })
+
+const overrideWithWorkspace = (
+  orderMapping: { [label: string]: string },
+  selectedWithOverrides: Revision[],
+  displayColor: Color,
+  label: string
+): void => {
+  orderMapping[label] = 'workspace'
+  selectedWithOverrides.push(
+    getRevision(displayColor, {
+      id: 'workspace',
+      label: 'workspace',
+      logicalGroupName: undefined
+    })
+  )
+}
+
+const isExperimentThatWillDisappearAtEnd = (
+  { id, sha, checkpoint_tip }: Experiment,
+  unfinishedRunningExperiments: { [id: string]: string }
+): boolean => {
+  const isCheckpointTip = sha === checkpoint_tip
+  return isCheckpointTip && unfinishedRunningExperiments[id] !== 'workspace'
+}
 
 const getMostRecentFetchedCheckpointRevision = (
   selectedRevision: SelectedExperimentWithColor,
@@ -742,22 +765,17 @@ const getMostRecentFetchedCheckpointRevision = (
 ): Revision => {
   const mostRecent =
     checkpoints?.find(({ label }) => fetchedRevs.has(label)) || selectedRevision
-  return getRevision(selectedRevision.displayColor, mostRecent, fetchedRevs)
+  return getRevision(selectedRevision.displayColor, mostRecent)
 }
 
 const overrideRevisionDetail = (
   orderMapping: { [label: string]: string },
-  selectedWithFetchedRunningCheckpointRevs: Revision[],
+  selectedWithOverrides: Revision[],
   selectedRevision: SelectedExperimentWithColor,
   fetchedRevs: Set<string>,
-  unfinishedRunningExperiments: Set<string>,
   checkpoints: Experiment[] | undefined
 ) => {
-  const { id, status, label } = selectedRevision
-
-  if (isRunning(status)) {
-    unfinishedRunningExperiments.add(id)
-  }
+  const { label } = selectedRevision
 
   const mostRecent = getMostRecentFetchedCheckpointRevision(
     selectedRevision,
@@ -765,68 +783,69 @@ const overrideRevisionDetail = (
     checkpoints
   )
   orderMapping[label] = mostRecent.revision
-  selectedWithFetchedRunningCheckpointRevs.push(mostRecent)
+  selectedWithOverrides.push(mostRecent)
 }
 
 const collectRevisionDetail = (
   orderMapping: { [label: string]: string },
-  selectedWithFetchedRunningCheckpointRevs: Revision[],
+  selectedWithOverrides: Revision[],
   selectedRevision: SelectedExperimentWithColor,
   fetchedRevs: Set<string>,
-  unfinishedRunningExperiments: Set<string>,
+  unfinishedRunningExperiments: { [id: string]: string },
   getCheckpoints: (id: string) => Experiment[] | undefined
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
-  const { label, status, id, checkpoint_tip, sha, displayColor } =
-    selectedRevision
-
-  const isCheckpointTip = sha === checkpoint_tip
-  const running = isRunning(status)
-  const preventRevisionsDisappearingAtEnd =
-    isCheckpointTip && unfinishedRunningExperiments.has(id)
+  const { label, status, id, displayColor } = selectedRevision
 
   if (
     !fetchedRevs.has(label) &&
-    (running || preventRevisionsDisappearingAtEnd)
+    unfinishedRunningExperiments[id] === 'workspace'
+  ) {
+    return overrideWithWorkspace(
+      orderMapping,
+      selectedWithOverrides,
+      displayColor,
+      label
+    )
+  }
+
+  if (
+    !fetchedRevs.has(label) &&
+    (isRunning(status) ||
+      isExperimentThatWillDisappearAtEnd(
+        selectedRevision,
+        unfinishedRunningExperiments
+      ))
   ) {
     return overrideRevisionDetail(
       orderMapping,
-      selectedWithFetchedRunningCheckpointRevs,
+      selectedWithOverrides,
       selectedRevision,
       fetchedRevs,
-      unfinishedRunningExperiments,
       getCheckpoints(id)
     )
   }
 
-  if (!running && isCheckpointTip) {
-    unfinishedRunningExperiments.delete(id)
-  }
-
   orderMapping[label] = label
-  selectedWithFetchedRunningCheckpointRevs.push(
-    getRevision(displayColor, selectedRevision, fetchedRevs)
-  )
+  selectedWithOverrides.push(getRevision(displayColor, selectedRevision))
 }
 
 export const collectOverrideRevisionDetails = (
   comparisonOrder: string[],
   selectedRevisions: SelectedExperimentWithColor[],
   fetchedRevs: Set<string>,
-  unfinishedRunningExperiments: Set<string>,
+  unfinishedRunningExperiments: { [id: string]: string },
   getCheckpoints: (id: string) => Experiment[] | undefined
 ): {
   overrideComparison: Revision[]
   overrideRevisions: Revision[]
-  unfinishedRunningExperiments: Set<string>
 } => {
   const orderMapping: { [label: string]: string } = {}
-  const selectedWithFetchedRunningCheckpointRevs: Revision[] = []
+  const selectedWithOverrides: Revision[] = []
 
   for (const selectedRevision of selectedRevisions) {
     collectRevisionDetail(
       orderMapping,
-      selectedWithFetchedRunningCheckpointRevs,
+      selectedWithOverrides,
       selectedRevision,
       fetchedRevs,
       unfinishedRunningExperiments,
@@ -837,10 +856,9 @@ export const collectOverrideRevisionDetails = (
   return {
     overrideComparison: reorderObjectList(
       comparisonOrder.map(revision => orderMapping[revision]),
-      selectedWithFetchedRunningCheckpointRevs,
+      selectedWithOverrides,
       'revision'
     ),
-    overrideRevisions: selectedWithFetchedRunningCheckpointRevs,
-    unfinishedRunningExperiments
+    overrideRevisions: selectedWithOverrides
   }
 }

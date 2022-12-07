@@ -1,4 +1,5 @@
 import { Memento } from 'vscode'
+import isEmpty from 'lodash.isempty'
 import isEqual from 'lodash.isequal'
 import {
   collectCheckpointPlotsData,
@@ -63,8 +64,6 @@ export class PlotsModel extends ModelWithPersistence {
   private checkpointPlots?: CheckpointPlot[]
   private selectedMetrics?: string[]
   private metricOrder: string[]
-
-  private unfinishedRunningExperiments: Set<string> = new Set<string>()
 
   constructor(
     dvcRoot: string,
@@ -152,6 +151,8 @@ export class PlotsModel extends ModelWithPersistence {
       ...revs.map(rev => cliIdToLabel[rev])
     ])
 
+    this.experiments.setRevisionCollected(revs)
+
     this.deferred.resolve()
   }
 
@@ -185,34 +186,26 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public getOverrideRevisionDetails() {
+    const finishedExperiments = this.experiments.getFinishedExperiments()
+
     if (
-      !(
-        this.experiments.hasCheckpoints() &&
-        (this.experiments.hasRunningExperiment() ||
-          this.unfinishedRunningExperiments.size > 0)
-      )
+      (this.experiments.hasCheckpoints() &&
+        this.experiments.hasRunningExperiment()) ||
+      !isEmpty(finishedExperiments)
     ) {
-      return {
-        overrideComparison: this.getComparisonRevisions(),
-        overrideRevisions: this.getSelectedRevisionDetails()
-      }
+      return collectOverrideRevisionDetails(
+        this.comparisonOrder,
+        this.experiments.getSelectedRevisions(),
+        this.fetchedRevs,
+        finishedExperiments,
+        id => this.experiments.getCheckpoints(id)
+      )
     }
 
-    const {
-      overrideComparison,
-      overrideRevisions,
-      unfinishedRunningExperiments
-    } = collectOverrideRevisionDetails(
-      this.comparisonOrder,
-      this.experiments.getSelectedRevisions(),
-      this.fetchedRevs,
-      this.unfinishedRunningExperiments,
-      id => this.experiments.getCheckpoints(id)
-    )
-
-    this.unfinishedRunningExperiments = unfinishedRunningExperiments
-
-    return { overrideComparison, overrideRevisions }
+    return {
+      overrideComparison: this.getComparisonRevisions(),
+      overrideRevisions: this.getSelectedRevisionDetails()
+    }
   }
 
   public getUnfetchedRevisions() {

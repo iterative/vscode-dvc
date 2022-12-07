@@ -13,7 +13,12 @@ import {
   ExperimentAugmented,
   ExperimentWithType
 } from './filterBy/collect'
-import { collectColoredStatus, collectSelected } from './status/collect'
+import {
+  collectColoredStatus,
+  collectFinishedRunningExperiments,
+  collectSelected,
+  collectStartedRunningExperiments
+} from './status/collect'
 import { Color, copyOriginalColors } from './status/colors'
 import {
   canSelect,
@@ -23,7 +28,12 @@ import {
   UNSELECTED
 } from './status'
 import { collectFlatExperimentParams } from './modify/collect'
-import { Experiment, isQueued, Row } from '../webview/contract'
+import {
+  Experiment,
+  isQueued,
+  Row,
+  RunningExperiment
+} from '../webview/contract'
 import {
   definedAndNonEmpty,
   reorderListSubset,
@@ -68,7 +78,9 @@ export class ExperimentsModel extends ModelWithPersistence {
   private useFiltersForSelection = false
 
   private currentSorts: SortDefinition[]
-  private hasRunning = false
+  private running: RunningExperiment[] = []
+  private finishedRunning: { [id: string]: string } = {}
+  private startedRunning: Set<string> = new Set()
 
   constructor(dvcRoot: string, workspaceState: Memento) {
     super(dvcRoot, workspaceState)
@@ -107,16 +119,15 @@ export class ExperimentsModel extends ModelWithPersistence {
       branches,
       experimentsByBranch,
       checkpointsByTip,
-      hasRunning
+      runningExperiments
     } = collectExperiments(data)
 
     this.workspace = workspace
     this.branches = branches
     this.experimentsByBranch = experimentsByBranch
     this.checkpointsByTip = checkpointsByTip
-    this.hasRunning = hasRunning
 
-    this.setColoredStatus()
+    this.setColoredStatus(runningExperiments)
   }
 
   public toggleStars(ids: string[]) {
@@ -151,7 +162,17 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public hasRunningExperiment() {
-    return this.hasRunning
+    return this.running.length > 0
+  }
+
+  public setRevisionCollected(revisions: string[]) {
+    this.getFlattenedExperiments()
+      .filter(({ label }) => revisions.includes(label))
+      .map(({ id }) => {
+        if (this.finishedRunning[id]) {
+          delete this.finishedRunning[id]
+        }
+      })
   }
 
   public canSelect() {
@@ -420,6 +441,10 @@ export class ExperimentsModel extends ModelWithPersistence {
     }))
   }
 
+  public getFinishedExperiments() {
+    return this.finishedRunning
+  }
+
   private getSubRows(experiments: Experiment[], filters = this.getFilters()) {
     return experiments
       .map(experiment => {
@@ -510,7 +535,9 @@ export class ExperimentsModel extends ModelWithPersistence {
     )
   }
 
-  private setColoredStatus() {
+  private setColoredStatus(runningExperiments: RunningExperiment[]) {
+    this.setRunning(runningExperiments)
+
     if (this.useFiltersForSelection) {
       this.setSelectedToFilters()
       return
@@ -520,12 +547,32 @@ export class ExperimentsModel extends ModelWithPersistence {
       this.checkpointsByTip,
       this.experimentsByBranch,
       this.coloredStatus,
-      this.availableColors
+      this.availableColors,
+      this.startedRunning,
+      this.finishedRunning
     )
+    this.startedRunning = new Set()
 
     this.setColors(coloredStatus, availableColors)
 
     this.persistStatus()
+  }
+
+  private setRunning(stillRunning: RunningExperiment[]) {
+    this.startedRunning = collectStartedRunningExperiments(
+      this.running,
+      stillRunning
+    )
+
+    this.finishedRunning = collectFinishedRunningExperiments(
+      { ...this.finishedRunning },
+      this.getFlattenedExperiments(),
+      this.running,
+      stillRunning,
+      this.coloredStatus
+    )
+
+    this.running = stillRunning
   }
 
   private setColors(coloredStatus: ColoredStatus, availableColors: Color[]) {
