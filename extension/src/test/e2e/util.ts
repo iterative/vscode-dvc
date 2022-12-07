@@ -85,6 +85,7 @@ export const waitForViewContainerToLoad = async (): Promise<void> => {
   await waitForDvcToFinish()
 
   const workbench = await browser.getWorkbench()
+  await workbench.executeCommand('DVC: Discard Workspace Changes')
   await workbench.executeCommand('DVC: Pull')
 
   await browser.waitUntil(
