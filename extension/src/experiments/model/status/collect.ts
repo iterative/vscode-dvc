@@ -83,10 +83,12 @@ const reassignFinishedWorkspaceExperiment = (
   finishedRunning: { [id: string]: string }
 ): void => {
   for (const [id, previousId] of Object.entries(finishedRunning)) {
-    if (previousId === 'workspace' && coloredStatus.workspace) {
-      coloredStatus[id] = coloredStatus.workspace
-      coloredStatus.workspace = UNSELECTED
+    if (previousId !== 'workspace' || coloredStatus[id]) {
+      continue
     }
+
+    coloredStatus[id] = coloredStatus.workspace
+    coloredStatus.workspace = UNSELECTED
   }
 }
 

@@ -321,6 +321,67 @@ describe('collectColoredStatus', () => {
     expect(coloredStatus['exp-2']).toStrictEqual(colors[0])
     expect(availableColors).toStrictEqual(colors.slice(1))
   })
+
+  it("should reassign the workspace's color when an experiment finishes running in the workspace", () => {
+    const colors = copyOriginalColors()
+    const { availableColors, coloredStatus } = collectColoredStatus(
+      [
+        {
+          executor: null,
+          id: 'exp-1',
+          status: ExperimentStatus.SUCCESS
+        },
+        {
+          id: 'workspace'
+        }
+      ] as Experiment[],
+      new Map(),
+      new Map(),
+      {
+        workspace: colors[0]
+      },
+      colors.slice(1),
+      new Set(),
+      { 'exp-1': 'workspace' }
+    )
+    expect(coloredStatus).toStrictEqual({
+      'exp-1': colors[0],
+      workspace: UNSELECTED
+    })
+
+    expect(availableColors).toStrictEqual(colors.slice(1))
+  })
+
+  it('should not overwrite an experiments color if it has one and finishes running in the workspace', () => {
+    const colors = copyOriginalColors()
+    const { availableColors, coloredStatus } = collectColoredStatus(
+      [
+        {
+          executor: null,
+          id: 'exp-1',
+          status: ExperimentStatus.SUCCESS
+        },
+        {
+          id: 'workspace'
+        }
+      ] as Experiment[],
+      new Map(),
+      new Map(),
+      {
+        'exp-1': colors[2],
+        workspace: colors[0]
+      },
+      colors.slice(1),
+      new Set(),
+      { 'exp-1': 'workspace' }
+    )
+    expect(coloredStatus).toStrictEqual({
+      'exp-1': colors[2],
+      workspace: colors[0]
+    })
+
+    expect(availableColors).toStrictEqual(colors.slice(1))
+  })
 })
 
 describe('collectFinishedRunningExperiments', () => {
