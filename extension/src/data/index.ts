@@ -1,3 +1,4 @@
+import { relative } from 'path'
 import { EventEmitter, Event } from 'vscode'
 import {
   createFileSystemWatcher,
@@ -8,6 +9,7 @@ import { InternalCommands } from '../commands/internal'
 import { ExperimentsOutput, PlotsOutputOrError } from '../cli/dvc/contract'
 import { uniqueValues } from '../util/array'
 import { DeferredDisposable } from '../class/deferred'
+import { isSameOrChild } from '../fileSystem'
 
 export abstract class BaseData<
   T extends { data: PlotsOutputOrError; revs: string[] } | ExperimentsOutput
@@ -68,9 +70,12 @@ export abstract class BaseData<
   private watchFiles() {
     return this.dispose.track(
       createFileSystemWatcher(getRelativePattern(this.dvcRoot, '**'), path => {
+        const relPath = relative(this.dvcRoot, path)
         if (
-          this.getWatchedFiles().some(watchedRelPath =>
-            path.endsWith(watchedRelPath)
+          this.getWatchedFiles().some(
+            watchedRelPath =>
+              path.endsWith(watchedRelPath) ||
+              isSameOrChild(relPath, watchedRelPath)
           )
         ) {
           this.managedUpdate(path)

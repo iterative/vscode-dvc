@@ -18,6 +18,8 @@ import {
   InternalCommands
 } from '../../../../commands/internal'
 import { fireWatcher } from '../../../../fileSystem/watcher'
+import { getProcessPlatform } from '../../../../env'
+import { removeDir } from '../../../../fileSystem'
 
 suite('Plots Data Test Suite', () => {
   const disposable = Disposable.fn()
@@ -140,7 +142,8 @@ suite('Plots Data Test Suite', () => {
 
     it('should collect files and watch them for updates', async () => {
       const mockNow = getMockNow()
-      const watchedFile = join('training', 'metrics.json')
+      const parentDirectory = 'training'
+      const watchedFile = join(parentDirectory, 'metrics.json')
 
       const mockExecuteCommand = (command: CommandId) => {
         if (command === AvailableCommands.IS_EXPERIMENT_RUNNING) {
@@ -211,13 +214,38 @@ suite('Plots Data Test Suite', () => {
 
       const managedUpdateSpy = spy(data, 'managedUpdate')
       const dataUpdatedEvent = new Promise(resolve =>
-        data.onDidUpdate(() => resolve(undefined))
+        disposable.track(data.onDidUpdate(() => resolve(undefined)))
       )
 
       await fireWatcher(join(dvcDemoPath, watchedFile))
       await dataUpdatedEvent
 
-      expect(managedUpdateSpy).to.be.called
+      expect(
+        managedUpdateSpy,
+        'should update data when an event is fired for a watched file'
+      ).to.be.called
+      managedUpdateSpy.resetHistory()
+
+      bypassProcessManagerDebounce(mockNow, 2)
+
+      const secondDataUpdatedEvent = new Promise(resolve =>
+        disposable.track(data.onDidUpdate(() => resolve(undefined)))
+      )
+
+      const absParentDirectory = join(dvcDemoPath, parentDirectory)
+
+      if (getProcessPlatform() === 'win32') {
+        removeDir(absParentDirectory)
+      } else {
+        await fireWatcher(absParentDirectory)
+      }
+
+      await secondDataUpdatedEvent
+
+      expect(
+        managedUpdateSpy,
+        'should update data when an event is fired for a parent directory'
+      ).to.be.called
     })
   })
 })
