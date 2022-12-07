@@ -119,7 +119,7 @@ export class ExperimentsModel extends ModelWithPersistence {
       branches,
       experimentsByBranch,
       checkpointsByTip,
-      hasRunning
+      runningExperiments
     } = collectExperiments(data)
 
     this.workspace = workspace
@@ -127,7 +127,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.experimentsByBranch = experimentsByBranch
     this.checkpointsByTip = checkpointsByTip
 
-    this.setColoredStatus(hasRunning)
+    this.setColoredStatus(runningExperiments)
   }
 
   public toggleStars(ids: string[]) {
@@ -535,8 +535,8 @@ export class ExperimentsModel extends ModelWithPersistence {
     )
   }
 
-  private setColoredStatus(hasRunning: RunningExperiment[]) {
-    this.setRunning(hasRunning)
+  private setColoredStatus(runningExperiments: RunningExperiment[]) {
+    this.setRunning(runningExperiments)
 
     if (this.useFiltersForSelection) {
       this.setSelectedToFilters()

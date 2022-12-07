@@ -193,16 +193,13 @@ export class PlotsModel extends ModelWithPersistence {
         this.experiments.hasRunningExperiment()) ||
       !isEmpty(finishedExperiments)
     ) {
-      const { overrideComparison, overrideRevisions } =
-        collectOverrideRevisionDetails(
-          this.comparisonOrder,
-          this.experiments.getSelectedRevisions(),
-          this.fetchedRevs,
-          finishedExperiments,
-          id => this.experiments.getCheckpoints(id)
-        )
-
-      return { overrideComparison, overrideRevisions }
+      return collectOverrideRevisionDetails(
+        this.comparisonOrder,
+        this.experiments.getSelectedRevisions(),
+        this.fetchedRevs,
+        finishedExperiments,
+        id => this.experiments.getCheckpoints(id)
+      )
     }
 
     return {

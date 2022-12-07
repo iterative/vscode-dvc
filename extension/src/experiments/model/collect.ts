@@ -239,7 +239,7 @@ const collectHasRunningExperiment = (
 ) => {
   const { executor, id, status } = experiment
   if (isRunning(status) && executor) {
-    acc.hasRunning.push({ executor, id })
+    acc.runningExperiments.push({ executor, id })
   }
 }
 

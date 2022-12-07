@@ -383,7 +383,7 @@ describe('collectFinishedRunningExperiments', () => {
     expect(finishedRunning).toStrictEqual({})
   })
 
-  it('should return the most recently created experiment if there is no longer an experiment running in queue', () => {
+  it('should return the most recently created experiment if there is no longer an experiment running in the queue', () => {
     const latestCreatedId = 'exp-123'
     const finishedRunning = collectFinishedRunningExperiments(
       {},
