@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react'
+import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { ColumnType, TableData } from 'dvc/src/experiments/webview/contract'
 
 export const defaultColumn = 'Experiment'
@@ -42,8 +43,8 @@ export const tableData: TableData = {
   hasRunningExperiment: false,
   rows: [
     {
-      id: 'workspace',
-      label: 'workspace'
+      id: EXPERIMENT_WORKSPACE_ID,
+      label: EXPERIMENT_WORKSPACE_ID
     },
     {
       id: 'main',

@@ -16,6 +16,7 @@ import {
   QuickPickOptionsWithTitle
 } from '../../../../vscode/quickPick'
 import { PlotPath } from '../../../../plots/paths/collect'
+import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 
 suite('Plots Paths Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -152,7 +153,7 @@ suite('Plots Paths Tree Test Suite', () => {
         '42b8736',
         '4fb124a',
         '53c3851',
-        'workspace'
+        EXPERIMENT_WORKSPACE_ID
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })

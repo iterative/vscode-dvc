@@ -1,6 +1,9 @@
 import { EventEmitter } from 'vscode'
 import { collectFiles } from './collect'
-import { PlotsOutputOrError } from '../../cli/dvc/contract'
+import {
+  EXPERIMENT_WORKSPACE_ID,
+  PlotsOutputOrError
+} from '../../cli/dvc/contract'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { BaseData } from '../../data'
 import { flattenUnique, sameContents } from '../../util/array'
@@ -46,8 +49,8 @@ export class PlotsData extends BaseData<{
       ...args
     )
 
-    if (!revs.includes('workspace') && args.length < 2) {
-      revs.push('workspace')
+    if (!revs.includes(EXPERIMENT_WORKSPACE_ID) && args.length < 2) {
+      revs.push(EXPERIMENT_WORKSPACE_ID)
     }
 
     this.notifyChanged({ data, revs })
@@ -64,7 +67,7 @@ export class PlotsData extends BaseData<{
   }
 
   private getArgs(revs: string[]) {
-    const cliWillThrowError = sameContents(revs, ['workspace'])
+    const cliWillThrowError = sameContents(revs, [EXPERIMENT_WORKSPACE_ID])
     if (this.model && cliWillThrowError) {
       return []
     }

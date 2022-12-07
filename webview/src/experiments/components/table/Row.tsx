@@ -7,6 +7,7 @@ import {
   isRunning
 } from 'dvc/src/experiments/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
+import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { RowProp } from './interfaces'
 import styles from './styles.module.scss'
 import { FirstCell, CellWrapper } from './Cell'
@@ -87,7 +88,7 @@ export const RowContent: React.FC<
     values: { id }
   } = row
   const { displayColor, error, starred } = original
-  const isWorkspace = id === 'workspace'
+  const isWorkspace = id === EXPERIMENT_WORKSPACE_ID
   const changesIfWorkspace = isWorkspace ? changes : undefined
   const toggleExperiment = () => {
     sendMessage({

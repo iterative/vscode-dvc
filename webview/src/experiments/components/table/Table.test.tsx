@@ -18,6 +18,7 @@ import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React from 'react'
 import { TableInstance } from 'react-table'
 import tableDataFixture from 'dvc/src/test/fixtures/expShow/base/tableData'
+import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { Table } from './Table'
 import styles from './styles.module.scss'
 import { SortOrder } from './header/ContextMenuContent'
@@ -55,7 +56,7 @@ describe('Table', () => {
   const basicCellProps = {
     getCellProps: getProps,
     row: {
-      id: 'workspace',
+      id: EXPERIMENT_WORKSPACE_ID,
       original: {
         status: ExperimentStatus.SUCCESS
       }
@@ -90,7 +91,7 @@ describe('Table', () => {
             column: {
               id: 'experiment'
             },
-            render: () => 'workspace'
+            render: () => EXPERIMENT_WORKSPACE_ID
           },
           {
             ...basicCellProps,
@@ -102,13 +103,13 @@ describe('Table', () => {
           }
         ],
         getRowProps: getProps,
-        id: 'workspace',
-        label: 'workspace',
+        id: EXPERIMENT_WORKSPACE_ID,
+        label: EXPERIMENT_WORKSPACE_ID,
         original: {
           status: ExperimentStatus.SUCCESS
         },
         values: {
-          id: 'workspace'
+          id: EXPERIMENT_WORKSPACE_ID
         }
       } as unknown as Experiment
     ],

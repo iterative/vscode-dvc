@@ -13,6 +13,7 @@ import {
   DataStatusOutput,
   DvcError,
   ExperimentsOutput,
+  EXPERIMENT_WORKSPACE_ID,
   PlotsOutput,
   PlotsOutputOrError
 } from './contract'
@@ -23,7 +24,7 @@ import { Logger } from '../../common/logger'
 import { parseNonStandardJson } from '../../util/json'
 
 const defaultExperimentsOutput: ExperimentsOutput = {
-  workspace: { baseline: {} }
+  [EXPERIMENT_WORKSPACE_ID]: { baseline: {} }
 }
 
 export const isDvcError = <
@@ -74,7 +75,9 @@ export class DvcReader extends DvcCli {
       Flag.JSON
     )
     if (isDvcError(output) || isEmpty(output)) {
-      return { workspace: { baseline: output as DvcError | {} } }
+      return {
+        [EXPERIMENT_WORKSPACE_ID]: { baseline: output as DvcError | {} }
+      }
     }
     return output
   }

@@ -25,7 +25,11 @@ import {
   SectionCollapsed,
   PlotSizeNumber
 } from '../webview/contract'
-import { ExperimentsOutput, PlotsOutputOrError } from '../../cli/dvc/contract'
+import {
+  ExperimentsOutput,
+  EXPERIMENT_WORKSPACE_ID,
+  PlotsOutputOrError
+} from '../../cli/dvc/contract'
 import { Experiments } from '../../experiments'
 import { getColorScale, truncateVerticalTitle } from '../vega/util'
 import { definedAndNonEmpty, reorderObjectList } from '../../util/array'
@@ -382,7 +386,7 @@ export class PlotsModel extends ModelWithPersistence {
       }
     }
     if (!isEqual(this.branchRevisions, currentBranchRevisions)) {
-      this.deleteRevisionData('workspace')
+      this.deleteRevisionData(EXPERIMENT_WORKSPACE_ID)
     }
     this.branchRevisions = currentBranchRevisions
   }

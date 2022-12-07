@@ -17,6 +17,7 @@ import { getMarkdownString } from '../../vscode/markdownString'
 import { DecoratableTreeItemScheme, getDecoratableUri } from '../../tree'
 import { ExperimentStatus } from '../webview/contract'
 import { formatDate } from '../../util/date'
+import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 
 const mockedCommands = jest.mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -106,7 +107,7 @@ describe('ExperimentsTree', () => {
       mockedGetExperiments.mockReturnValueOnce([])
       mockedGetExperiments.mockReturnValueOnce([])
       mockedGetExperiments.mockReturnValueOnce([
-        { label: 'workspace' },
+        { label: EXPERIMENT_WORKSPACE_ID },
         { label: 'main' },
         { label: '90aea7f' }
       ])
@@ -584,7 +585,10 @@ describe('ExperimentsTree', () => {
       ) {
         expect(collapsibleState).toStrictEqual(0)
         expect(resourceUri).toStrictEqual(
-          getDecoratableUri('workspace', DecoratableTreeItemScheme.EXPERIMENTS)
+          getDecoratableUri(
+            EXPERIMENT_WORKSPACE_ID,
+            DecoratableTreeItemScheme.EXPERIMENTS
+          )
         )
         mockedItem = { collapsibleState, resourceUri }
         return mockedItem
@@ -603,8 +607,8 @@ describe('ExperimentsTree', () => {
         description: undefined,
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('loading~spin'),
-        id: 'workspace',
-        label: 'workspace',
+        id: EXPERIMENT_WORKSPACE_ID,
+        label: EXPERIMENT_WORKSPACE_ID,
         tooltip: undefined,
         type: ExperimentType.WORKSPACE
       })

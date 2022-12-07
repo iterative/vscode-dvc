@@ -14,6 +14,7 @@ import {
   Revision
 } from '../webview/contract'
 import {
+  EXPERIMENT_WORKSPACE_ID,
   ExperimentFieldsOrError,
   ExperimentsOutput,
   ExperimentStatus,
@@ -217,7 +218,7 @@ export const collectCheckpointPlotsData = (
   }
 
   for (const { baseline, ...experimentsObject } of Object.values(
-    omit(data, 'workspace')
+    omit(data, EXPERIMENT_WORKSPACE_ID)
   )) {
     const branch = transformExperimentData(baseline)
 
@@ -661,11 +662,11 @@ const overrideWithWorkspace = (
   displayColor: Color,
   label: string
 ): void => {
-  orderMapping[label] = 'workspace'
+  orderMapping[label] = EXPERIMENT_WORKSPACE_ID
   selectedWithOverrides.push(
     getRevision(displayColor, {
-      id: 'workspace',
-      label: 'workspace',
+      id: EXPERIMENT_WORKSPACE_ID,
+      label: EXPERIMENT_WORKSPACE_ID,
       logicalGroupName: undefined
     })
   )
@@ -676,7 +677,10 @@ const isExperimentThatWillDisappearAtEnd = (
   unfinishedRunningExperiments: { [id: string]: string }
 ): boolean => {
   const isCheckpointTip = sha === checkpoint_tip
-  return isCheckpointTip && unfinishedRunningExperiments[id] !== 'workspace'
+  return (
+    isCheckpointTip &&
+    unfinishedRunningExperiments[id] !== EXPERIMENT_WORKSPACE_ID
+  )
 }
 
 const getMostRecentFetchedCheckpointRevision = (
@@ -719,7 +723,7 @@ const collectRevisionDetail = (
 
   if (
     !fetchedRevs.has(label) &&
-    unfinishedRunningExperiments[id] === 'workspace'
+    unfinishedRunningExperiments[id] === EXPERIMENT_WORKSPACE_ID
   ) {
     return overrideWithWorkspace(
       orderMapping,

@@ -11,6 +11,7 @@ import uncommittedDepsFixture from '../../../test/fixtures/expShow/uncommittedDe
 import {
   ExperimentsOutput,
   ExperimentStatus,
+  EXPERIMENT_WORKSPACE_ID,
   ValueTree
 } from '../../../cli/dvc/contract'
 import { getConfigValue } from '../../../vscode/config'
@@ -28,7 +29,7 @@ describe('collectColumns', () => {
 
   it('should output both params and metrics when both are present', () => {
     const columns = collectColumns({
-      workspace: {
+      [EXPERIMENT_WORKSPACE_ID]: {
         baseline: {
           data: {
             metrics: {
@@ -55,7 +56,7 @@ describe('collectColumns', () => {
 
   it('should omit params when none exist in the source data', () => {
     const columns = collectColumns({
-      workspace: {
+      [EXPERIMENT_WORKSPACE_ID]: {
         baseline: {
           data: {
             metrics: {
@@ -75,7 +76,7 @@ describe('collectColumns', () => {
 
   it('should return an empty array if no params and metrics are provided', () => {
     const columns = collectColumns({
-      workspace: {
+      [EXPERIMENT_WORKSPACE_ID]: {
         baseline: {}
       }
     })
@@ -115,7 +116,7 @@ describe('collectColumns', () => {
         }
       }
     },
-    workspace: {
+    [EXPERIMENT_WORKSPACE_ID]: {
       baseline: {
         data: {
           params: {
@@ -192,7 +193,7 @@ describe('collectColumns', () => {
           }
         }
       },
-      workspace: {
+      [EXPERIMENT_WORKSPACE_ID]: {
         baseline: {}
       }
     })
@@ -236,7 +237,7 @@ describe('collectColumns', () => {
         }
       }
     },
-    workspace: {
+    [EXPERIMENT_WORKSPACE_ID]: {
       baseline: {}
     }
   })
@@ -298,7 +299,7 @@ describe('collectColumns', () => {
           }
         }
       },
-      workspace: {
+      [EXPERIMENT_WORKSPACE_ID]: {
         baseline: {
           data: {
             params: {
@@ -327,7 +328,7 @@ describe('collectColumns', () => {
 
   it('should create concatenated columns for nesting deeper than 5', () => {
     const columns = collectColumns({
-      workspace: {
+      [EXPERIMENT_WORKSPACE_ID]: {
         baseline: {
           data: {
             params: {
@@ -380,7 +381,7 @@ describe('collectColumns', () => {
 
   it('should not report types for params and metrics without primitives or children for params and metrics without objects', () => {
     const columns = collectColumns({
-      workspace: {
+      [EXPERIMENT_WORKSPACE_ID]: {
         baseline: {
           data: {
             params: {
@@ -557,7 +558,7 @@ describe('collectChanges', () => {
 
   it('should not fail when the workspace does not have metrics but a previous commit does', () => {
     const data: ExperimentsOutput = {
-      workspace: {
+      [EXPERIMENT_WORKSPACE_ID]: {
         baseline: {
           data: {
             params: mockedExperimentData.baseline.data.params
@@ -660,7 +661,7 @@ describe('collectChanges', () => {
   it('should work for missing nested arrays', () => {
     expect(
       collectChanges({
-        workspace: {
+        [EXPERIMENT_WORKSPACE_ID]: {
           baseline: {
             data: {
               timestamp: null,
@@ -738,7 +739,7 @@ describe('collectChanges', () => {
 
   it('should not fail when there is no commit data', () => {
     const data: ExperimentsOutput = {
-      workspace: {
+      [EXPERIMENT_WORKSPACE_ID]: {
         baseline: {
           data: {
             params: mockedExperimentData.baseline.data.params

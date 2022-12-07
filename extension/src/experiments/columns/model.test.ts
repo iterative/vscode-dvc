@@ -22,6 +22,7 @@ import survivalOutputFixture from '../../test/fixtures/expShow/survival/output'
 import survivalColumnsFixture from '../../test/fixtures/expShow/survival/columns'
 import { getConfigValue } from '../../vscode/config'
 import { buildMockedEventEmitter } from '../../test/util/jest'
+import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 
 jest.mock('../../vscode/config')
 jest.mock('@hediet/std/disposable')
@@ -165,7 +166,7 @@ describe('ColumnsModel', () => {
     )
     const testParamPath = appendColumnToPath(paramsDotYamlPath, 'testparam')
     const exampleData = {
-      workspace: {
+      [EXPERIMENT_WORKSPACE_ID]: {
         baseline: {
           data: {
             params: {

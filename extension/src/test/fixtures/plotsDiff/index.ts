@@ -1,7 +1,7 @@
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
 import { extendVegaSpec, isMultiViewPlot } from '../../../plots/vega/util'
-import { PlotsOutput } from '../../../cli/dvc/contract'
+import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../../cli/dvc/contract'
 import {
   ComparisonPlots,
   ComparisonRevisionData,
@@ -22,7 +22,13 @@ const basicVega = {
   [join('logs', 'loss.tsv')]: [
     {
       type: PlotsType.VEGA,
-      revisions: ['workspace', '53c3851', '42b8736', '1ba7bcd', '4fb124a'],
+      revisions: [
+        EXPERIMENT_WORKSPACE_ID,
+        '53c3851',
+        '42b8736',
+        '1ba7bcd',
+        '4fb124a'
+      ],
       datapoints: {
         workspace: [
           {
@@ -359,7 +365,7 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
   [join('plots', 'acc.png')]: [
     {
       type: PlotsType.IMAGE,
-      revisions: ['workspace'],
+      revisions: [EXPERIMENT_WORKSPACE_ID],
       url: joinFunc(baseUrl, 'workspace_plots_acc.png')
     },
     {
@@ -386,7 +392,7 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
   [join('plots', 'heatmap.png')]: [
     {
       type: PlotsType.IMAGE,
-      revisions: ['workspace'],
+      revisions: [EXPERIMENT_WORKSPACE_ID],
       url: joinFunc(baseUrl, 'workspace_plots_heatmap.png')
     },
     {
@@ -413,7 +419,7 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
   [join('plots', 'loss.png')]: [
     {
       type: PlotsType.IMAGE,
-      revisions: ['workspace'],
+      revisions: [EXPERIMENT_WORKSPACE_ID],
       url: joinFunc(baseUrl, 'workspace_plots_loss.png')
     },
     {
@@ -454,7 +460,13 @@ export const getMultiSourceOutput = (): PlotsOutput => ({
   ...require('./multiSource').default
 })
 
-const expectedRevisions = ['workspace', 'main', '4fb124a', '42b8736', '1ba7bcd']
+const expectedRevisions = [
+  EXPERIMENT_WORKSPACE_ID,
+  'main',
+  '4fb124a',
+  '42b8736',
+  '1ba7bcd'
+]
 
 const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
   const singleViewPlots: TemplatePlotSection = {
@@ -512,8 +524,8 @@ export const getRevisions = (): Revision[] => {
   const [workspace, main, _4fb124a, _42b8735, _1ba7bcd] = copyOriginalColors()
   return [
     {
-      id: 'workspace',
-      revision: 'workspace',
+      id: EXPERIMENT_WORKSPACE_ID,
+      revision: EXPERIMENT_WORKSPACE_ID,
       displayColor: workspace,
       fetched: true,
       group: undefined

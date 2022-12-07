@@ -9,6 +9,7 @@ import {
 } from '../../webview/contract'
 import { definedAndNonEmpty, reorderListSubset } from '../../../util/array'
 import { flattenMapValues } from '../../../util/map'
+import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
 
 const canAssign = (
   coloredStatus: ColoredStatus,
@@ -70,8 +71,8 @@ const removeUnselectedExperimentRunningInWorkspace = (
 ): void => {
   if (
     isRunning(status) &&
-    executor === 'workspace' &&
-    id !== 'workspace' &&
+    executor === EXPERIMENT_WORKSPACE_ID &&
+    id !== EXPERIMENT_WORKSPACE_ID &&
     !coloredStatus[id]
   ) {
     delete coloredStatus[id]
@@ -83,7 +84,7 @@ const reassignFinishedWorkspaceExperiment = (
   finishedRunning: { [id: string]: string }
 ): void => {
   for (const [id, previousId] of Object.entries(finishedRunning)) {
-    if (previousId !== 'workspace' || coloredStatus[id]) {
+    if (previousId !== EXPERIMENT_WORKSPACE_ID || coloredStatus[id]) {
       continue
     }
 
@@ -229,7 +230,9 @@ export const collectStartedRunningExperiments = (
     if (previouslyRunning.some(({ id }) => id === runningId)) {
       continue
     }
-    acc.add(executor === 'workspace' ? 'workspace' : runningId)
+    acc.add(
+      executor === EXPERIMENT_WORKSPACE_ID ? EXPERIMENT_WORKSPACE_ID : runningId
+    )
   }
 
   return acc
@@ -263,11 +266,11 @@ const collectFinishedWorkspaceExperiment = (
   }
 
   for (const [id, previousId] of Object.entries(acc)) {
-    if (previousId === 'workspace') {
+    if (previousId === EXPERIMENT_WORKSPACE_ID) {
       delete acc[id]
     }
   }
-  acc[newId] = 'workspace'
+  acc[newId] = EXPERIMENT_WORKSPACE_ID
 }
 
 const isStillRunning = (
@@ -276,7 +279,8 @@ const isStillRunning = (
   previouslyRunningExecutor: string,
   stillRunning: RunningExperiment[]
 ): boolean =>
-  (stillExecutingInWorkspace && previouslyRunningExecutor === 'workspace') ||
+  (stillExecutingInWorkspace &&
+    previouslyRunningExecutor === EXPERIMENT_WORKSPACE_ID) ||
   stillRunning.some(({ id }) => id === previouslyRunningId)
 
 export const collectFinishedRunningExperiments = (
@@ -287,7 +291,7 @@ export const collectFinishedRunningExperiments = (
   coloredStatus: ColoredStatus
 ): { [id: string]: string } => {
   const stillExecutingInWorkspace = stillRunning.some(
-    ({ executor }) => executor === 'workspace'
+    ({ executor }) => executor === EXPERIMENT_WORKSPACE_ID
   )
   for (const {
     id: previouslyRunningId,
@@ -304,7 +308,7 @@ export const collectFinishedRunningExperiments = (
       continue
     }
 
-    if (previouslyRunningExecutor === 'workspace') {
+    if (previouslyRunningExecutor === EXPERIMENT_WORKSPACE_ID) {
       collectFinishedWorkspaceExperiment(
         acc,
         getMostRecentExperiment(experiments, coloredStatus)

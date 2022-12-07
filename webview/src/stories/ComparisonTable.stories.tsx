@@ -9,6 +9,7 @@ import {
   PlotSizeNumber
 } from 'dvc/src/plots/webview/contract'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
+import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { ComparisonTable } from '../plots/components/comparisonTable/ComparisonTable'
 import { WebviewWrapper } from '../shared/components/webviewWrapper/WebviewWrapper'
 import { update } from '../plots/components/comparisonTable/comparisonTableSlice'
@@ -78,7 +79,7 @@ const removeImages = (
   for (const [revision, data] of Object.entries(revisionsData)) {
     if (
       (path === comparisonTableFixture.plots[0].path && revision === 'main') ||
-      revision === 'workspace'
+      revision === EXPERIMENT_WORKSPACE_ID
     ) {
       continue
     }
@@ -94,7 +95,7 @@ WithMissingData.args = {
     revisions: removeImages(path, revisions)
   })),
   revisions: comparisonTableFixture.revisions.map(revision => {
-    if (revision.id === 'workspace') {
+    if (revision.id === EXPERIMENT_WORKSPACE_ID) {
       return { ...revision, fetched: false }
     }
     return revision
@@ -109,7 +110,7 @@ WithOnlyMissingData.args = {
   })),
   revisions: comparisonTableFixture.revisions
     .map(revision => {
-      if (revision.id === 'workspace') {
+      if (revision.id === EXPERIMENT_WORKSPACE_ID) {
         return { ...revision, fetched: false }
       }
     })

@@ -19,6 +19,7 @@ import smoothTemplate from '../../test/fixtures/plotsDiff/templates/smooth'
 import multiSourceTemplate from '../../test/fixtures/plotsDiff/templates/multiSource'
 import { copyOriginalColors } from '../../experiments/model/status/colors'
 import { PlotSizeNumber } from '../webview/contract'
+import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 
 describe('isMultiViewPlot', () => {
   it('should recognize the confusion matrix template as a multi view plot', () => {
@@ -72,10 +73,10 @@ describe('getColorScale', () => {
     expect(
       getColorScale([
         { displayColor: firstColor, revision: 'main' },
-        { displayColor: secondColor, revision: 'workspace' }
+        { displayColor: secondColor, revision: EXPERIMENT_WORKSPACE_ID }
       ])
     ).toStrictEqual({
-      domain: ['main', 'workspace'],
+      domain: ['main', EXPERIMENT_WORKSPACE_ID],
       range: [firstColor, secondColor]
     })
   })
@@ -89,7 +90,7 @@ describe('extendVegaSpec', () => {
 
   it('should extend the default linear template', () => {
     const colorScale = {
-      domain: ['workspace', 'main'],
+      domain: [EXPERIMENT_WORKSPACE_ID, 'main'],
       range: copyOriginalColors().slice(0, 2)
     }
     const extendedSpec = extendVegaSpec(

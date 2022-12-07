@@ -20,6 +20,7 @@ import {
 import { fireWatcher } from '../../../../fileSystem/watcher'
 import { getProcessPlatform } from '../../../../env'
 import { removeDir } from '../../../../fileSystem'
+import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 
 suite('Plots Data Test Suite', () => {
   const disposable = Disposable.fn()
@@ -78,7 +79,11 @@ suite('Plots Data Test Suite', () => {
     })
 
     it('should call plots diff when an experiment is running in the workspace (live updates)', async () => {
-      const { data, mockPlotsDiff } = buildPlotsData(true, [], ['workspace'])
+      const { data, mockPlotsDiff } = buildPlotsData(
+        true,
+        [],
+        [EXPERIMENT_WORKSPACE_ID]
+      )
 
       await data.update()
 
@@ -154,7 +159,7 @@ suite('Plots Data Test Suite', () => {
                           'train',
                           'acc.tsv'
                         ),
-                        revision: 'workspace'
+                        revision: EXPERIMENT_WORKSPACE_ID
                       },
                       dvc_inferred_y_value: '0.2707333333333333',
                       step: '0',
@@ -164,7 +169,7 @@ suite('Plots Data Test Suite', () => {
                       dvc_data_version_info: {
                         field: join('test', 'acc'),
                         filename: watchedFile,
-                        revision: 'workspace'
+                        revision: EXPERIMENT_WORKSPACE_ID
                       },
                       dvc_inferred_y_value: '0.2712',
                       step: '0',
@@ -172,7 +177,7 @@ suite('Plots Data Test Suite', () => {
                     }
                   ]
                 },
-                revisions: ['workspace'],
+                revisions: [EXPERIMENT_WORKSPACE_ID],
                 type: 'vega'
               }
             ]
