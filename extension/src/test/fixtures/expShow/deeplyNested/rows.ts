@@ -1,9 +1,12 @@
-import { ExperimentStatus } from '../../../../cli/dvc/contract'
+import {
+  ExperimentStatus,
+  EXPERIMENT_WORKSPACE_ID
+} from '../../../../cli/dvc/contract'
 
 export const data = [
   {
-    id: 'workspace',
-    label: 'workspace',
+    id: EXPERIMENT_WORKSPACE_ID,
+    label: EXPERIMENT_WORKSPACE_ID,
     executor: null,
     params: {
       'params.yaml': {

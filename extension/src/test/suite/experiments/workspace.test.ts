@@ -27,6 +27,7 @@ import { Title } from '../../../vscode/title'
 import { join } from '../../util/path'
 import { AvailableCommands } from '../../../commands/internal'
 import { GitExecutor } from '../../../cli/git/executor'
+import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
 
 suite('Workspace Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -158,7 +159,9 @@ suite('Workspace Experiments Test Suite', () => {
       >
       mockShowQuickPick
         .onFirstCall()
-        .resolves({ value: { id: 'workspace' } } as QuickPickItemWithValue<{
+        .resolves({
+          value: { id: EXPERIMENT_WORKSPACE_ID }
+        } as QuickPickItemWithValue<{
           id: string
         }>)
         .onSecondCall()
@@ -213,7 +216,9 @@ suite('Workspace Experiments Test Suite', () => {
       >
       mockShowQuickPick
         .onFirstCall()
-        .resolves({ value: { id: 'workspace' } } as QuickPickItemWithValue<{
+        .resolves({
+          value: { id: EXPERIMENT_WORKSPACE_ID }
+        } as QuickPickItemWithValue<{
           id: string
         }>)
         .onSecondCall()
@@ -271,7 +276,9 @@ suite('Workspace Experiments Test Suite', () => {
       >
       mockShowQuickPick
         .onFirstCall()
-        .resolves({ value: { id: 'workspace' } } as QuickPickItemWithValue<{
+        .resolves({
+          value: { id: EXPERIMENT_WORKSPACE_ID }
+        } as QuickPickItemWithValue<{
           id: string
         }>)
         .onSecondCall()

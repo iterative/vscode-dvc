@@ -1,12 +1,13 @@
 import {
   ExperimentsOutput,
-  ExperimentStatus
+  ExperimentStatus,
+  EXPERIMENT_WORKSPACE_ID
 } from '../../../../cli/dvc/contract'
 import { join } from '../../../util/path'
 
 // https://dagshub.com/kingabzpro/kaggle-titanic-dvc
 const data: ExperimentsOutput = {
-  workspace: {
+  [EXPERIMENT_WORKSPACE_ID]: {
     baseline: {
       data: {
         timestamp: null,

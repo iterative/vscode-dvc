@@ -7,6 +7,7 @@ import {
   isRunning
 } from 'dvc/src/experiments/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
+import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { RowProp } from './interfaces'
 import styles from './styles.module.scss'
 import { FirstCell, CellWrapper } from './Cell'
@@ -38,8 +39,7 @@ const getRowClassNames = (
   isRowFocused: boolean,
   isRowSelected: boolean,
   isWorkspace: boolean,
-  className?: string,
-  changes?: string[]
+  className?: string
 ) => {
   return cx(
     className,
@@ -54,7 +54,6 @@ const getRowClassNames = (
     isWorkspace ? styles.workspaceRow : styles.normalRow,
     styles.row,
     isRowSelected && styles.rowSelected,
-    isWorkspace && changes?.length && styles.workspaceWithChanges,
     isRowFocused && styles.rowFocused
   )
 }
@@ -87,7 +86,7 @@ export const RowContent: React.FC<
     values: { id }
   } = row
   const { displayColor, error, starred } = original
-  const isWorkspace = id === 'workspace'
+  const isWorkspace = id === EXPERIMENT_WORKSPACE_ID
   const changesIfWorkspace = isWorkspace ? changes : undefined
   const toggleExperiment = () => {
     sendMessage({
@@ -164,8 +163,7 @@ export const RowContent: React.FC<
             menuActive,
             isRowSelected,
             isWorkspace,
-            className,
-            changes
+            className
           )
         })}
         tabIndex={0}
@@ -175,6 +173,7 @@ export const RowContent: React.FC<
       >
         <FirstCell
           cell={firstCell}
+          changesIfWorkspace={!!changesIfWorkspace?.length}
           bulletColor={displayColor}
           starred={starred}
           isRowSelected={isRowSelected}

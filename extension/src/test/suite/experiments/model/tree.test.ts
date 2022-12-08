@@ -52,6 +52,7 @@ import { WorkspaceExperiments } from '../../../../experiments/workspace'
 import { ColumnType } from '../../../../experiments/webview/contract'
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
 import { ExperimentItem } from '../../../../experiments/model/collect'
+import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -151,6 +152,61 @@ suite('Experiments Tree Test Suite', () => {
         'selecting any experiment disables auto-apply filters to experiments selection'
       ).to.be.calledOnceWith(false)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should set the workspace to selected when trying to toggle a checkpoint experiment that is running in the workspace', async () => {
+      const { experiments } = buildExperiments(disposable, {
+        '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77': {
+          '4fb124aebddb2adf1545030907687fa9a4c80e70': {
+            data: {
+              ...expShowFixture['53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'][
+                '4fb124aebddb2adf1545030907687fa9a4c80e70'
+              ].data,
+              executor: EXPERIMENT_WORKSPACE_ID
+            }
+          },
+          baseline:
+            expShowFixture['53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'].baseline
+        },
+        workspace: expShowFixture.workspace
+      })
+      const isWorkspaceSelected = (): boolean =>
+        !!experiments
+          .getExperiments()
+          .find(({ id }) => id === EXPERIMENT_WORKSPACE_ID)?.selected
+
+      await experiments.isReady()
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
+      expect(isWorkspaceSelected()).to.be.true
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TOGGLE, {
+        dvcRoot: dvcDemoPath,
+        id: EXPERIMENT_WORKSPACE_ID
+      })
+
+      expect(isWorkspaceSelected()).to.be.false
+
+      const selected = await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_TOGGLE,
+        {
+          dvcRoot: dvcDemoPath,
+          id: 'exp-e7a67'
+        }
+      )
+      expect(!!selected).to.be.true
+
+      expect(isWorkspaceSelected()).to.be.true
+
+      const notReselected = await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_TOGGLE,
+        {
+          dvcRoot: dvcDemoPath,
+          id: 'exp-e7a67'
+        }
+      )
+      expect(notReselected).to.be.undefined
+
+      expect(isWorkspaceSelected()).to.be.true
+    })
 
     it('should not show queued experiments in the dvc.views.experimentsTree.selectExperiments quick pick', async () => {
       await buildPlots(disposable)
@@ -352,8 +408,8 @@ suite('Experiments Tree Test Suite', () => {
           displayColor: colors[0],
           fetched: true,
           group: undefined,
-          id: 'workspace',
-          revision: 'workspace'
+          id: EXPERIMENT_WORKSPACE_ID,
+          revision: EXPERIMENT_WORKSPACE_ID
         },
         {
           displayColor: colors[1],
@@ -407,7 +463,8 @@ suite('Experiments Tree Test Suite', () => {
         '1ee5f2e',
         '2173124',
         '9523bde',
-        'd1343a8'
+        'd1343a8',
+        EXPERIMENT_WORKSPACE_ID
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -702,7 +759,7 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to queue an experiment from an existing one with dvc.views.experiments.queueExperiment', async () => {
-      const baseExperimentId = 'workspace'
+      const baseExperimentId = EXPERIMENT_WORKSPACE_ID
 
       const { dvcExecutor, experiments, experimentsModel } =
         buildExperiments(disposable)
@@ -765,7 +822,7 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to run a new experiment from an existing one with dvc.views.experiments.runExperiment', async () => {
-      const baseExperimentId = 'workspace'
+      const baseExperimentId = EXPERIMENT_WORKSPACE_ID
 
       const { dvcRunner, experiments, experimentsModel } =
         buildExperiments(disposable)
@@ -824,7 +881,7 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to reset and run a new checkpoint experiment from an existing one with dvc.views.experiments.resetAndRunCheckpointExperiment', async () => {
-      const baseExperimentId = 'workspace'
+      const baseExperimentId = EXPERIMENT_WORKSPACE_ID
 
       const { dvcRunner, experiments, experimentsModel } =
         buildExperiments(disposable)

@@ -4,6 +4,7 @@ import {
   ExperimentStatus,
   isQueued
 } from 'dvc/src/experiments/webview/contract'
+import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { RowProp } from './interfaces'
 import { RowSelectionContext } from './RowSelectionContext'
 import { MessagesMenu } from '../../../shared/components/messagesMenu/MessagesMenu'
@@ -254,7 +255,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
   const { selectedRows, clearSelectedRows } =
     React.useContext(RowSelectionContext)
 
-  const isWorkspace = id === 'workspace'
+  const isWorkspace = id === EXPERIMENT_WORKSPACE_ID
 
   const contextMenuOptions = React.useMemo(() => {
     return getContextMenuOptions(

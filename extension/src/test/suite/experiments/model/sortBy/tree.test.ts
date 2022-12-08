@@ -16,12 +16,23 @@ import { experimentsUpdatedEvent } from '../../../util'
 import { dvcDemoPath } from '../../../../util'
 import { buildMetricOrParamPath } from '../../../../../experiments/columns/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
-import { ExperimentsOutput } from '../../../../../cli/dvc/contract'
+import {
+  ExperimentsOutput,
+  EXPERIMENT_WORKSPACE_ID
+} from '../../../../../cli/dvc/contract'
 import { WEBVIEW_TEST_TIMEOUT } from '../../../timeouts'
 import { starredSort } from '../../../../../experiments/model/sortBy/constants'
 
 suite('Experiments Sort By Tree Test Suite', () => {
   const testData = {
+    [EXPERIMENT_WORKSPACE_ID]: {
+      baseline: {
+        data: {
+          executor: EXPERIMENT_WORKSPACE_ID,
+          timestamp: null
+        }
+      }
+    },
     testBranch: {
       baseline: {
         data: {}
@@ -72,14 +83,6 @@ suite('Experiments Sort By Tree Test Suite', () => {
               }
             }
           }
-        }
-      }
-    },
-    workspace: {
-      baseline: {
-        data: {
-          executor: 'workspace',
-          timestamp: null
         }
       }
     }

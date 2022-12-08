@@ -1,6 +1,7 @@
 import React from 'react'
 import cx from 'classnames'
 import { useInView } from 'react-intersection-observer'
+import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import styles from './styles.module.scss'
 import { BatchSelectionProp, RowContent } from './Row'
 import { InstanceProp, RowProp } from './interfaces'
@@ -74,7 +75,7 @@ export const TableBody: React.FC<
         ))}
     </>
   )
-  return row.values.id === 'workspace' ? (
+  return row.values.id === EXPERIMENT_WORKSPACE_ID ? (
     <WorkspaceRowGroupWrapper
       tableHeaderHeight={tableHeaderHeight}
       root={root}

@@ -1,4 +1,3 @@
-import cloneDeep from 'lodash.clonedeep'
 import omit from 'lodash.omit'
 import { TopLevelSpec } from 'vega-lite'
 import {
@@ -15,8 +14,8 @@ import {
   Revision
 } from '../webview/contract'
 import {
+  EXPERIMENT_WORKSPACE_ID,
   ExperimentFieldsOrError,
-  ExperimentsBranchOutput,
   ExperimentsOutput,
   ExperimentStatus,
   isValueTree,
@@ -219,7 +218,7 @@ export const collectCheckpointPlotsData = (
   }
 
   for (const { baseline, ...experimentsObject } of Object.values(
-    omit(data, 'workspace')
+    omit(data, EXPERIMENT_WORKSPACE_ID)
   )) {
     const branch = transformExperimentData(baseline)
 
@@ -239,35 +238,6 @@ export const collectCheckpointPlotsData = (
   }
 
   return plotsData
-}
-
-const isRunningInWorkspace = (experiment: ExperimentFieldsOrError) =>
-  experiment.data?.executor === 'workspace'
-
-const collectRunningFromBranch = (
-  experimentsObject: ExperimentsBranchOutput
-): string | undefined => {
-  for (const [sha, experiment] of Object.entries(experimentsObject)) {
-    if (isRunningInWorkspace(experiment)) {
-      return shortenForLabel(sha)
-    }
-  }
-}
-
-export const collectWorkspaceRunningCheckpoint = (
-  data: ExperimentsOutput,
-  hasCheckpoints: boolean
-): string | undefined => {
-  if (!hasCheckpoints) {
-    return
-  }
-  for (const experimentsObject of Object.values(omit(data, 'workspace'))) {
-    const checkpointRunningInWorkspace =
-      collectRunningFromBranch(experimentsObject)
-    if (checkpointRunningInWorkspace) {
-      return checkpointRunningInWorkspace
-    }
-  }
 }
 
 type MetricOrderAccumulator = {
@@ -435,54 +405,6 @@ export const collectData = (
   }
 
   return acc
-}
-
-const collectWorkspaceRevisionData = (
-  overwriteRevisionData: RevisionPathData
-) => {
-  const acc: RevisionPathData = {}
-
-  for (const [path, values] of Object.entries(overwriteRevisionData)) {
-    acc[path] = []
-    for (const value of values) {
-      acc[path].push({ ...value, rev: 'workspace' })
-    }
-  }
-
-  return acc
-}
-
-export const collectWorkspaceRaceConditionData = (
-  runningSelectedCheckpoint: string | undefined,
-  comparisonData: ComparisonData,
-  revisionData: RevisionData
-): {
-  overwriteComparisonData: ComparisonData
-  overwriteRevisionData: RevisionData
-} => {
-  if (!runningSelectedCheckpoint) {
-    return { overwriteComparisonData: {}, overwriteRevisionData: {} }
-  }
-
-  const overwriteComparisonData = cloneDeep(
-    comparisonData[runningSelectedCheckpoint]
-  )
-  const overwriteRevisionData = cloneDeep(
-    revisionData[runningSelectedCheckpoint]
-  )
-
-  if (!overwriteComparisonData && !overwriteRevisionData) {
-    return { overwriteComparisonData: {}, overwriteRevisionData: {} }
-  }
-
-  const workspaceRevisionData = collectWorkspaceRevisionData(
-    overwriteRevisionData
-  )
-
-  return {
-    overwriteComparisonData: { workspace: overwriteComparisonData },
-    overwriteRevisionData: { workspace: workspaceRevisionData }
-  }
 }
 
 export type TemplateAccumulator = { [path: string]: string }
@@ -740,11 +662,11 @@ const overrideWithWorkspace = (
   displayColor: Color,
   label: string
 ): void => {
-  orderMapping[label] = 'workspace'
+  orderMapping[label] = EXPERIMENT_WORKSPACE_ID
   selectedWithOverrides.push(
     getRevision(displayColor, {
-      id: 'workspace',
-      label: 'workspace',
+      id: EXPERIMENT_WORKSPACE_ID,
+      label: EXPERIMENT_WORKSPACE_ID,
       logicalGroupName: undefined
     })
   )
@@ -755,7 +677,10 @@ const isExperimentThatWillDisappearAtEnd = (
   unfinishedRunningExperiments: { [id: string]: string }
 ): boolean => {
   const isCheckpointTip = sha === checkpoint_tip
-  return isCheckpointTip && unfinishedRunningExperiments[id] !== 'workspace'
+  return (
+    isCheckpointTip &&
+    unfinishedRunningExperiments[id] !== EXPERIMENT_WORKSPACE_ID
+  )
 }
 
 const getMostRecentFetchedCheckpointRevision = (
@@ -798,7 +723,7 @@ const collectRevisionDetail = (
 
   if (
     !fetchedRevs.has(label) &&
-    unfinishedRunningExperiments[id] === 'workspace'
+    unfinishedRunningExperiments[id] === EXPERIMENT_WORKSPACE_ID
   ) {
     return overrideWithWorkspace(
       orderMapping,

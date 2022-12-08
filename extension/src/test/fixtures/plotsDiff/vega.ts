@@ -1,3 +1,4 @@
+import {EXPERIMENT_WORKSPACE_ID} from '../../../cli/dvc/contract'
 import { join } from '../../util/path'
 
 const data = {
@@ -5,7 +6,13 @@ const data = {
     {
       multiView: false,
       type: 'vega',
-      revisions: ['workspace', '53c3851', '42b8736', '1ba7bcd', '4fb124a'],
+      revisions: [
+        EXPERIMENT_WORKSPACE_ID,
+        '53c3851',
+        '42b8736',
+        '1ba7bcd',
+        '4fb124a'
+      ],
       datapoints: {
         workspace: [
           {
@@ -323,7 +330,13 @@ const data = {
     {
       multiView: true,
       type: 'vega',
-      revisions: ['workspace', '53c3851', '42b8736', '1ba7bcd', '4fb124a'],
+      revisions: [
+        EXPERIMENT_WORKSPACE_ID,
+        '53c3851',
+        '42b8736',
+        '1ba7bcd',
+        '4fb124a'
+      ],
       datapoints: {
         workspace: [
           { actual: 7, predicted: 7 },

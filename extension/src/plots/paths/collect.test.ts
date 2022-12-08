@@ -11,6 +11,7 @@ import {
 import { TemplatePlotGroup, PlotsType } from '../webview/contract'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import { Shape, StrokeDash } from '../multiSource/constants'
+import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 
 describe('collectPath', () => {
   it('should return the expected data from the test fixture', () => {
@@ -87,20 +88,20 @@ describe('collectPath', () => {
       [join('logs', 'scalars', 'acc.tsv')]: [
         {
           content: {},
-          revisions: ['workspace'],
+          revisions: [EXPERIMENT_WORKSPACE_ID],
           type: PlotsType.VEGA
         }
       ],
       [join('logs', 'scalars', 'loss.tsv')]: [
         {
           content: {},
-          revisions: ['workspace'],
+          revisions: [EXPERIMENT_WORKSPACE_ID],
           type: PlotsType.VEGA
         }
       ],
       [join('plots', 'heatmap.png')]: [
         {
-          revisions: ['workspace'],
+          revisions: [EXPERIMENT_WORKSPACE_ID],
           type: PlotsType.IMAGE,
           url: join('plots', 'heatmap.png')
         }
@@ -110,7 +111,7 @@ describe('collectPath', () => {
           content: {
             facet: { field: 'rev', type: 'nominal' }
           } as VisualizationSpec,
-          revisions: ['workspace'],
+          revisions: [EXPERIMENT_WORKSPACE_ID],
           type: PlotsType.VEGA
         }
       ]

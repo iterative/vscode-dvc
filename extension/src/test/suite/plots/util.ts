@@ -21,6 +21,7 @@ import { BaseWorkspaceWebviews } from '../../../webview/workspace'
 import { WebviewMessages } from '../../../plots/webview/messages'
 import { ExperimentsModel } from '../../../experiments/model'
 import { Experiment } from '../../../experiments/webview/contract'
+import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
 
 export const buildPlots = async (
   disposer: Disposer,
@@ -66,7 +67,7 @@ export const buildPlots = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const experimentsModel: ExperimentsModel = (experiments as any).experiments
   experimentsModel.setSelected([
-    { id: 'workspace' },
+    { id: EXPERIMENT_WORKSPACE_ID },
     { id: 'main' },
     { id: 'exp-e7a67' },
     { id: 'test-branch' },

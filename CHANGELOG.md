@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.24] - 2022-12-07
+
+### 🚀 New Features and Enhancements
+
+- Stabilise colors of running experiments [#2877](https://github.com/iterative/vscode-dvc/pull/2877) by [@mattseddon](https://github.com/mattseddon)
+- Move workspace changes indicator from bullet onto text [#2890](https://github.com/iterative/vscode-dvc/pull/2890) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Update data when an event is fired for a parent directory (events grouped in Codespaces) [#2892](https://github.com/iterative/vscode-dvc/pull/2892) by [@mattseddon](https://github.com/mattseddon)
+- Prevent toggle selection of checkpoint experiment running in the workspace [#2888](https://github.com/iterative/vscode-dvc/pull/2888) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Make the Get Started webview a class [#2874](https://github.com/iterative/vscode-dvc/pull/2874) by [@sroy3](https://github.com/sroy3)
+- Add resolution for decode-uri-component [#2884](https://github.com/iterative/vscode-dvc/pull/2884) by [@julieg18](https://github.com/julieg18)
+- Update demo project to lastest commit [#2891](https://github.com/iterative/vscode-dvc/pull/2891) by [@mattseddon](https://github.com/mattseddon)
+- Remove running checkpoint experiment workspace race condition code from plots [#2882](https://github.com/iterative/vscode-dvc/pull/2882) by [@mattseddon](https://github.com/mattseddon)
+- Extract workspace constant [#2889](https://github.com/iterative/vscode-dvc/pull/2889) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.23] - 2022-12-05
 
 ### 🚀 New Features and Enhancements

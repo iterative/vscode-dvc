@@ -14,7 +14,7 @@ import {
   ExperimentFields,
   ExperimentsBranchOutput,
   ExperimentsOutput,
-  ExperimentStatus
+  EXPERIMENT_WORKSPACE_ID
 } from '../../cli/dvc/contract'
 import { addToMapArray } from '../../util/map'
 import { uniqueValues } from '../../util/array'
@@ -314,7 +314,7 @@ export const collectExperiments = (
   data: ExperimentsOutput
 ): ExperimentsAccumulator => {
   const { workspace, ...branchesObject } = data
-  const workspaceId = 'workspace'
+  const workspaceId = EXPERIMENT_WORKSPACE_ID
 
   const workspaceBaseline = transformExperimentData(
     workspaceId,
@@ -328,27 +328,13 @@ export const collectExperiments = (
   return acc
 }
 
-const getDefaultMutableRevision = (hasCheckpoints: boolean): string[] => {
-  if (hasCheckpoints) {
-    return []
-  }
-  return ['workspace']
-}
-
-const noWorkspaceVsSelectedRaceCondition = (
-  hasCheckpoints: boolean,
-  status: ExperimentStatus | undefined,
-  selected: boolean | undefined
-): boolean => !!(hasCheckpoints && isRunning(status) && !selected)
+const getDefaultMutableRevision = (): string[] => [EXPERIMENT_WORKSPACE_ID]
 
 const collectMutableRevision = (
   acc: string[],
-  { label, status, selected }: Experiment,
+  { label, status }: Experiment,
   hasCheckpoints: boolean
 ) => {
-  if (noWorkspaceVsSelectedRaceCondition(hasCheckpoints, status, selected)) {
-    acc.push('workspace')
-  }
   if (isRunning(status) && !hasCheckpoints) {
     acc.push(label)
   }
@@ -358,7 +344,7 @@ export const collectMutableRevisions = (
   experiments: Experiment[],
   hasCheckpoints: boolean
 ): string[] => {
-  const acc = getDefaultMutableRevision(hasCheckpoints)
+  const acc = getDefaultMutableRevision()
 
   for (const experiment of experiments) {
     collectMutableRevision(acc, experiment, hasCheckpoints)

@@ -16,7 +16,8 @@ import {
   pickFilterToAdd,
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
-import { tooManySelected } from './model/status'
+import { Color } from './model/status/colors'
+import { tooManySelected, UNSELECTED } from './model/status'
 import { starredSort } from './model/sortBy/constants'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ColumnsModel } from './columns/model'
@@ -29,7 +30,7 @@ import { DecorationProvider } from './model/decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
 import { ResourceLocator } from '../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { ExperimentsOutput } from '../cli/dvc/contract'
+import { ExperimentsOutput, EXPERIMENT_WORKSPACE_ID } from '../cli/dvc/contract'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { FileSystemData } from '../fileSystem/data'
@@ -192,7 +193,15 @@ export class Experiments extends BaseRepository<TableData> {
     return this.columns.getTerminalNodeStatuses()
   }
 
-  public toggleExperimentStatus(id: string) {
+  public toggleExperimentStatus(
+    id: string
+  ): Color | typeof UNSELECTED | undefined {
+    if (this.experiments.isRunningInWorkspace(id)) {
+      return this.experiments.isSelected(EXPERIMENT_WORKSPACE_ID)
+        ? undefined
+        : this.toggleExperimentStatus(EXPERIMENT_WORKSPACE_ID)
+    }
+
     const selected = this.experiments.isSelected(id)
     if (!selected && !this.experiments.canSelect()) {
       return

@@ -1,10 +1,11 @@
 import { join } from '../../../util/path'
 import { ExperimentStatus, Row } from '../../../../experiments/webview/contract'
+import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 
 const data: Row[] = [
   {
-    id: 'workspace',
-    label: 'workspace',
+    id: EXPERIMENT_WORKSPACE_ID,
+    label: EXPERIMENT_WORKSPACE_ID,
     outs: {
       [join('data', 'raw', 'test.csv')]: {
         hash: '029c9cd22461f6dbe8d9ab01def965c6',

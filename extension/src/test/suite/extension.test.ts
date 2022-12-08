@@ -33,6 +33,7 @@ import * as WorkspaceFolders from '../../vscode/workspaceFolders'
 import { DvcExecutor } from '../../cli/dvc/executor'
 import { GitReader } from '../../cli/git/reader'
 import { Config } from '../../config'
+import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 
 suite('Extension Test Suite', () => {
   const dvcPathOption = 'dvc.dvcPath'
@@ -448,7 +449,7 @@ suite('Extension Test Suite', () => {
 
     it('should set the dvc.cli.incompatible context value', async () => {
       stub(DvcReader.prototype, 'expShow').resolves({
-        workspace: { baseline: {} }
+        [EXPERIMENT_WORKSPACE_ID]: { baseline: {} }
       })
       stub(DvcReader.prototype, 'root').resolves('.')
       stub(DvcReader.prototype, 'dataStatus').resolves({})
