@@ -305,7 +305,7 @@ export class Extension extends Disposable implements IExtension {
 
     this.internalCommands.registerExternalCliCommand(
       RegisteredCliCommands.INIT,
-      this.initProject
+      () => this.initProject()
     )
 
     registerRepositoryCommands(this.repositories, this.internalCommands)

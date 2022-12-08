@@ -5,7 +5,6 @@ import { buildGetStarted } from './util'
 import { closeAllEditors, getMessageReceivedEmitter } from '../util'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { MessageFromWebviewType } from '../../../webview/contract'
-import { AvailableCommands } from '../../../commands/internal'
 import { Disposable } from '../../../extension'
 import { Logger } from '../../../common/logger'
 
@@ -24,14 +23,13 @@ suite('GetStarted Test Suite', () => {
 
   describe('Get Started', () => {
     it('should handle a initialize project message from the webview', async () => {
-      const { messageSpy, getStarted, internalCommands } =
-        await buildGetStarted(disposable)
+      const { messageSpy, getStarted, mockInitializeProject } =
+        await buildGetStarted(disposable, true)
 
       const webview = await getStarted.showWebview()
       await webview.isReady()
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
-      const mockInitializeProject = spy(internalCommands, 'executeCommand')
 
       messageSpy.resetHistory()
       mockMessageReceived.fire({
@@ -39,10 +37,6 @@ suite('GetStarted Test Suite', () => {
       })
 
       expect(mockInitializeProject).to.be.calledOnce
-
-      expect(mockInitializeProject).to.be.calledWithExactly(
-        AvailableCommands.INIT
-      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should log an error message if the message from the webview is anything else than initialize project', async () => {
