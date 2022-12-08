@@ -20,6 +20,10 @@ jobs:
           fetch-depth: 0
           submodules: true
 
+      - name: Remove dodgy cache
+        working-directory: ./demo
+        run: git rm -rf --cached . && git add .
+
       - name: Setup Python environment
         uses: actions/setup-python@v4
         with:
@@ -43,26 +47,6 @@ jobs:
             turbo-${{ github.job }}-${{ github.ref_name }}-
 
       - run: yarn run install-frozen-lockfile
-
-      - run: yarn run lint
-
-      - uses: paambaati/codeclimate-action@v3.2.0
-        env:
-          CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
-        with:
-          coverageCommand: xvfb-run -a yarn run cover
-          coverageLocations: ${{github.workspace}}/coverage/lcov.info:lcov
-
-      - run: yarn build-storybook
-
-      - name: Publish to Chromatic
-        uses: chromaui/action@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-          storybookBuildDir: 'webview/storybook-static'
-          exitOnceUploaded: true
-          autoAcceptChanges: 'main'
 
       - name: Test E2E
         uses: GabrielBB/xvfb-action@v1
