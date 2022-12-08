@@ -2,7 +2,10 @@ import { join } from '../../../util/path'
 import { Row } from '../../../../experiments/webview/contract'
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
 import { shortenForLabel } from '../../../../util/string'
-import { ExperimentStatus } from '../../../../cli/dvc/contract'
+import {
+  ExperimentStatus,
+  EXPERIMENT_WORKSPACE_ID
+} from '../../../../cli/dvc/contract'
 
 const valueWithNoChanges = (str: string) => ({
   value: shortenForLabel(str),
@@ -38,9 +41,9 @@ const data: Row[] = [
       )
     },
     displayColor: colorsList[0],
-    executor: 'workspace',
-    id: 'workspace',
-    label: 'workspace',
+    executor: EXPERIMENT_WORKSPACE_ID,
+    id: EXPERIMENT_WORKSPACE_ID,
+    label: EXPERIMENT_WORKSPACE_ID,
     metrics: {
       'summary.json': {
         loss: 1.9293040037155151,
@@ -122,7 +125,7 @@ const data: Row[] = [
         'c3961d777cfbd7727f9fde4851896006'
       )
     },
-    displayColor: colorsList[1],
+    displayColor: undefined,
     executor: null,
     id: 'main',
     label: 'main',
@@ -180,7 +183,7 @@ const data: Row[] = [
       }
     },
     status: ExperimentStatus.SUCCESS,
-    selected: true,
+    selected: false,
     sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     starred: false,
     subRows: [
@@ -211,9 +214,9 @@ const data: Row[] = [
             'c3961d777cfbd7727f9fde4851896006'
           )
         },
-        displayColor: colorsList[2],
+        displayColor: colorsList[1],
         displayNameOrParent: '[exp-e7a67]',
-        executor: null,
+        executor: 'dvc-task',
         id: 'exp-e7a67',
         label: '4fb124a',
         logicalGroupName: '[exp-e7a67]',
@@ -489,7 +492,7 @@ const data: Row[] = [
             'c3961d777cfbd7727f9fde4851896006'
           )
         },
-        displayColor: colorsList[3],
+        displayColor: undefined,
         displayNameOrParent: '[test-branch]',
         executor: null,
         id: 'test-branch',
@@ -549,7 +552,7 @@ const data: Row[] = [
           }
         },
         status: ExperimentStatus.SUCCESS,
-        selected: true,
+        selected: false,
         sha: '42b8736b08170529903cd203a1f40382a4b4a8cd',
         starred: false,
         subRows: [
@@ -767,7 +770,7 @@ const data: Row[] = [
             'c3961d777cfbd7727f9fde4851896006'
           )
         },
-        displayColor: colorsList[4],
+        displayColor: undefined,
         displayNameOrParent: '[exp-83425]',
         id: 'exp-83425',
         executor: null,
@@ -827,7 +830,7 @@ const data: Row[] = [
           }
         },
         status: ExperimentStatus.SUCCESS,
-        selected: true,
+        selected: false,
         sha: '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d',
         starred: false,
         subRows: [
@@ -1285,7 +1288,7 @@ const data: Row[] = [
                 test: true
               }
             },
-            status: ExperimentStatus.RUNNING,
+            status: ExperimentStatus.SUCCESS,
             selected: false,
             sha: '23250b33e3d6dd0e136262d1d26a2face031cb03',
             starred: false,
@@ -1295,12 +1298,12 @@ const data: Row[] = [
         Created: '2020-12-29T15:27:02'
       },
       {
-        displayColor: colorsList[5],
+        displayColor: undefined,
         id: '489fd8bdaa709f7330aac342e051a9431c625481',
         label: '489fd8b',
         error:
           "unable to read: 'params.yaml', YAML file structure is corrupted",
-        selected: true,
+        selected: false,
         starred: false
       },
       {
@@ -1328,7 +1331,7 @@ const data: Row[] = [
             '44e714021a65edf881b1716e791d7f59'
           )
         },
-        displayColor: colorsList[6],
+        displayColor: undefined,
         displayNameOrParent: '[exp-f13bca]',
         executor: null,
         id: 'exp-f13bca',
@@ -1383,7 +1386,7 @@ const data: Row[] = [
           }
         },
         status: ExperimentStatus.SUCCESS,
-        selected: true,
+        selected: false,
         sha: 'f0f918662b4f8c47819ca154a23029bf9b47d4f3',
         starred: false,
         Created: '2020-12-29T15:26:36'

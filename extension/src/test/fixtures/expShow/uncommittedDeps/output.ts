@@ -1,10 +1,11 @@
 import {
   ExperimentsOutput,
-  ExperimentStatus
+  ExperimentStatus,
+  EXPERIMENT_WORKSPACE_ID
 } from '../../../../cli/dvc/contract'
 
 const data: ExperimentsOutput = {
-  workspace: {
+  [EXPERIMENT_WORKSPACE_ID]: {
     baseline: {
       data: {
         timestamp: null,

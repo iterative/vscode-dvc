@@ -1,12 +1,15 @@
 import { collectExperiments, collectMutableRevisions } from './collect'
 import { Experiment } from '../webview/contract'
 import modifiedFixture from '../../test/fixtures/expShow/modified/output'
-import { ExperimentStatus } from '../../cli/dvc/contract'
+import {
+  ExperimentStatus,
+  EXPERIMENT_WORKSPACE_ID
+} from '../../cli/dvc/contract'
 
 describe('collectExperiments', () => {
   it('should return an empty array if no branches are present', () => {
     const { branches } = collectExperiments({
-      workspace: {
+      [EXPERIMENT_WORKSPACE_ID]: {
         baseline: {}
       }
     })
@@ -14,6 +17,9 @@ describe('collectExperiments', () => {
   })
 
   const repoWithTwoBranches = {
+    [EXPERIMENT_WORKSPACE_ID]: {
+      baseline: {}
+    },
     branchA: {
       baseline: { data: { name: 'branchA' } },
       otherExp1: { data: {} },
@@ -26,9 +32,6 @@ describe('collectExperiments', () => {
     },
     branchB: {
       baseline: { data: { name: 'branchB' } }
-    },
-    workspace: {
-      baseline: {}
     }
   }
   const { branches, experimentsByBranch, workspace } =
@@ -57,6 +60,7 @@ describe('collectExperiments', () => {
   })
 
   const repoWithNestedCheckpoints = {
+    [EXPERIMENT_WORKSPACE_ID]: { baseline: {} },
     branchA: {
       baseline: { data: {} },
       tip1: {
@@ -71,8 +75,7 @@ describe('collectExperiments', () => {
       tip1cp3: {
         data: { checkpoint_tip: 'tip1' }
       }
-    },
-    workspace: { baseline: {} }
+    }
   }
   const acc = collectExperiments(repoWithNestedCheckpoints)
 
@@ -134,6 +137,7 @@ describe('collectExperiments', () => {
     const checkpointTipWithoutAName = '3fceabdcef3c7b97c7779f8ae0c69a5542eefaf5'
 
     const repoWithNestedCheckpoints = {
+      [EXPERIMENT_WORKSPACE_ID]: { baseline: {} },
       branchA: {
         baseline: { data: {} },
         [checkpointTipWithoutAName]: {
@@ -148,8 +152,7 @@ describe('collectExperiments', () => {
         tip1cp3: {
           data: { checkpoint_tip: checkpointTipWithoutAName }
         }
-      },
-      workspace: { baseline: {} }
+      }
     }
     const acc = collectExperiments(repoWithNestedCheckpoints)
 
@@ -166,22 +169,12 @@ describe('collectExperiments', () => {
 describe('collectMutableRevisions', () => {
   const baseExperiments = [
     { label: 'branch-A', selected: false, status: ExperimentStatus.SUCCESS },
-    { label: 'workspace', selected: false, status: ExperimentStatus.FAILED }
+    {
+      label: EXPERIMENT_WORKSPACE_ID,
+      selected: false,
+      status: ExperimentStatus.FAILED
+    }
   ] as Experiment[]
-
-  it('should not return the workspace when there is a selected running checkpoint experiment (race condition)', () => {
-    const experiments = [
-      {
-        label: 'exp-123',
-        selected: true,
-        status: ExperimentStatus.RUNNING
-      },
-      ...baseExperiments
-    ] as Experiment[]
-
-    const mutableRevisions = collectMutableRevisions(experiments, true)
-    expect(mutableRevisions).toStrictEqual([])
-  })
 
   it('should return the workspace when there is an unselected running checkpoint experiment', () => {
     const experiments = [
@@ -194,30 +187,38 @@ describe('collectMutableRevisions', () => {
     ] as Experiment[]
 
     const mutableRevisions = collectMutableRevisions(experiments, true)
-    expect(mutableRevisions).toStrictEqual(['workspace'])
+    expect(mutableRevisions).toStrictEqual([EXPERIMENT_WORKSPACE_ID])
   })
 
   it('should return the workspace when there are no checkpoints', () => {
     const experiments = [
       { label: 'branch-A', selected: false, status: ExperimentStatus.SUCCESS },
-      { label: 'workspace', selected: false, status: ExperimentStatus.SUCCESS }
+      {
+        label: EXPERIMENT_WORKSPACE_ID,
+        selected: false,
+        status: ExperimentStatus.SUCCESS
+      }
     ] as Experiment[]
 
     const mutableRevisions = collectMutableRevisions(experiments, false)
-    expect(mutableRevisions).toStrictEqual(['workspace'])
+    expect(mutableRevisions).toStrictEqual([EXPERIMENT_WORKSPACE_ID])
   })
 
   it('should return all running experiments when there are checkpoints', () => {
     const experiments = [
       { label: 'branch-A', selected: false, status: ExperimentStatus.SUCCESS },
-      { label: 'workspace', selected: false, status: ExperimentStatus.SUCCESS },
+      {
+        label: EXPERIMENT_WORKSPACE_ID,
+        selected: false,
+        status: ExperimentStatus.SUCCESS
+      },
       { label: 'running-1', selected: false, status: ExperimentStatus.RUNNING },
       { label: 'running-2', selected: true, status: ExperimentStatus.RUNNING }
     ] as Experiment[]
 
     const mutableRevisions = collectMutableRevisions(experiments, false)
     expect(mutableRevisions).toStrictEqual([
-      'workspace',
+      EXPERIMENT_WORKSPACE_ID,
       'running-1',
       'running-2'
     ])

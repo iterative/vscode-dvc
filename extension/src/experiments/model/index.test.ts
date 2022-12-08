@@ -18,7 +18,10 @@ import dataTypesOutputFixture from '../../test/fixtures/expShow/dataTypes/output
 import survivalOutputFixture from '../../test/fixtures/expShow/survival/output'
 import survivalRowsFixture from '../../test/fixtures/expShow/survival/rows'
 
-import { ExperimentStatus } from '../../cli/dvc/contract'
+import {
+  ExperimentStatus,
+  EXPERIMENT_WORKSPACE_ID
+} from '../../cli/dvc/contract'
 
 jest.mock('vscode')
 
@@ -98,7 +101,7 @@ describe('ExperimentsModel', () => {
 
     const model = new ExperimentsModel('', buildMockMemento())
     model.transformAndSet({
-      workspace: {
+      [EXPERIMENT_WORKSPACE_ID]: {
         baseline: {
           data: {
             executor: null,
@@ -204,14 +207,15 @@ describe('ExperimentsModel', () => {
         test1: buildTestExperiment(1, 'tip2'),
         tip2: buildTestExperiment(2, 'tip2', runningExperiment)
       },
-      workspace: {
+      [EXPERIMENT_WORKSPACE_ID]: {
         baseline: buildTestExperiment(3)
       }
     })
+    experimentsModel.toggleStatus(runningExperiment)
 
     expect(experimentsModel.getSelectedExperiments()).toStrictEqual([
       expect.objectContaining({
-        displayColor: expColor,
+        displayColor: workspaceColor,
         id: runningExperiment,
         label: 'tip2'
       })
@@ -236,7 +240,7 @@ describe('ExperimentsModel', () => {
         test2: buildTestExperiment(2, 'tip3'),
         tip3: unfilteredCheckpoint
       },
-      workspace: {
+      [EXPERIMENT_WORKSPACE_ID]: {
         baseline: buildTestExperiment(3)
       }
     }
@@ -275,7 +279,7 @@ describe('ExperimentsModel', () => {
         baseline,
         tip: buildTestExperiment(2.1, 'tip', runningExperiment)
       },
-      workspace: {
+      [EXPERIMENT_WORKSPACE_ID]: {
         baseline: buildTestExperiment(3)
       }
     })
@@ -286,8 +290,8 @@ describe('ExperimentsModel', () => {
     expect(experimentsModel.getSelectedRevisions()).toStrictEqual([
       expect.objectContaining({
         displayColor: workspaceColor,
-        id: 'workspace',
-        label: 'workspace'
+        id: EXPERIMENT_WORKSPACE_ID,
+        label: EXPERIMENT_WORKSPACE_ID
       }),
       expect.objectContaining({
         displayColor: branchColor,
@@ -330,7 +334,7 @@ describe('ExperimentsModel', () => {
         exp5: buildTestExperiment(0, 'tip'),
         tip: buildTestExperiment(0, 'tip', runningExperiment)
       },
-      workspace: {
+      [EXPERIMENT_WORKSPACE_ID]: {
         baseline: buildTestExperiment(3)
       }
     })
@@ -345,7 +349,7 @@ describe('ExperimentsModel', () => {
       { id: 'exp5' },
       { id: 'testBranch' },
       { id: 'tip' },
-      { id: 'workspace' }
+      { id: EXPERIMENT_WORKSPACE_ID }
     ] as Experiment[])
     expect(experimentsModel.getSelectedRevisions()).toHaveLength(6)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -364,7 +368,7 @@ describe('ExperimentsModel', () => {
     const model = new ExperimentsModel('', buildMockMemento())
     model.transformAndSet(outputFixture)
 
-    const workspaceParams = model.getExperimentParams('workspace')
+    const workspaceParams = model.getExperimentParams(EXPERIMENT_WORKSPACE_ID)
     expect(definedAndNonEmpty(workspaceParams)).toBe(true)
   })
 

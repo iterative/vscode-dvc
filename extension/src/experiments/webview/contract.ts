@@ -21,6 +21,8 @@ export interface DepColumns {
   [path: string]: ValueWithChanges
 }
 
+export type RunningExperiment = { executor: string; id: string }
+
 export interface Experiment extends BaseExperimentFields {
   deps?: DepColumns
   displayColor?: string

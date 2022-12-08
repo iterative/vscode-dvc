@@ -6,6 +6,7 @@ import { quickPickLimitedValues } from '../../vscode/quickPick'
 import { Experiment } from '../webview/contract'
 import { Title } from '../../vscode/title'
 import { formatDate } from '../../util/date'
+import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 
 jest.mock('../../vscode/quickPick')
 
@@ -178,7 +179,7 @@ describe('pickExperiments', () => {
       selected: true
     }
 
-    const mockedWorkspace = { label: 'workspace', selected: false }
+    const mockedWorkspace = { label: EXPERIMENT_WORKSPACE_ID, selected: false }
     const mockedBranch = { label: 'main', selected: false }
 
     const mockedExp1 = {

@@ -20,8 +20,7 @@ import { Disposable } from '../../class/dispose'
 export const autoRegisteredCommands = {
   EXPERIMENT_RESET_AND_RUN: 'runExperimentReset',
   EXPERIMENT_RUN: 'runExperiment',
-  EXPERIMENT_RUN_QUEUED: 'runExperimentQueue',
-  IS_EXPERIMENT_RUNNING: 'isExperimentRunning'
+  EXPERIMENT_RUN_QUEUED: 'runExperimentQueue'
 } as const
 
 export class DvcRunner extends Disposable implements ICli {

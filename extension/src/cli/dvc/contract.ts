@@ -51,6 +51,8 @@ export enum ExperimentStatus {
   SUCCESS = 'Success'
 }
 
+export const EXPERIMENT_WORKSPACE_ID = 'workspace'
+
 export interface BaseExperimentFields {
   name?: string
   timestamp?: string | null
@@ -85,7 +87,7 @@ export interface ExperimentsBranchOutput {
 
 export interface ExperimentsOutput {
   [name: string]: ExperimentsBranchOutput
-  workspace: {
+  [EXPERIMENT_WORKSPACE_ID]: {
     baseline: ExperimentFieldsOrError
   }
 }

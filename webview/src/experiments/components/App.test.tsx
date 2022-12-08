@@ -13,6 +13,7 @@ import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { Column, ColumnType, Row } from 'dvc/src/experiments/webview/contract'
 import { buildMetricOrParamPath } from 'dvc/src/experiments/columns/paths'
 import dataTypesTableFixture from 'dvc/src/test/fixtures/expShow/dataTypes/tableData'
+import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { useIsFullyContained } from './overflowHoverTooltip/useIsFullyContained'
 import styles from './table/styles.module.scss'
 import { vsCodeApi } from '../../shared/api'
@@ -375,7 +376,7 @@ describe('App', () => {
         })
       }
 
-      testClick('workspace')
+      testClick(EXPERIMENT_WORKSPACE_ID)
       testClick('main')
       testClick('[exp-e7a67]', 'exp-e7a67')
       testClick('22e40e1', '22e40e1fa3c916ac567f69b85969e3066a91dda4')
@@ -427,7 +428,7 @@ describe('App', () => {
       renderTable()
       mockPostMessage.mockClear()
 
-      const testRowId = 'workspace'
+      const testRowId = EXPERIMENT_WORKSPACE_ID
 
       createWindowTextSelection(testRowId, 5)
       fireEvent.click(screen.getByText(testRowId))
@@ -453,7 +454,7 @@ describe('App', () => {
       renderTable()
       mockPostMessage.mockClear()
 
-      const selectedTestRowId = 'workspace'
+      const selectedTestRowId = EXPERIMENT_WORKSPACE_ID
       const testRowId = 'main'
 
       createWindowTextSelection(selectedTestRowId, 5)
@@ -533,8 +534,8 @@ describe('App', () => {
       ],
       rows: [
         {
-          id: 'workspace',
-          label: 'workspace',
+          id: EXPERIMENT_WORKSPACE_ID,
+          label: EXPERIMENT_WORKSPACE_ID,
           metrics: {
             'summary.json': {
               loss: testMetricNumberValue
@@ -691,7 +692,7 @@ describe('App', () => {
 
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
-      const radioButton = within(getRow('workspace')).getByTestId(
+      const radioButton = within(getRow(EXPERIMENT_WORKSPACE_ID)).getByTestId(
         'row-action-plot'
       )
       fireEvent.mouseEnter(radioButton)
@@ -1179,7 +1180,7 @@ describe('App', () => {
       })
       const selectedForPlotsIndicator =
         screen.getByLabelText('selected for plots')
-      expect(selectedForPlotsIndicator).toHaveTextContent('7')
+      expect(selectedForPlotsIndicator).toHaveTextContent('2')
 
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
@@ -1188,7 +1189,7 @@ describe('App', () => {
       const tooltip = screen.getByRole('tooltip')
 
       expect(tooltip).toHaveTextContent(
-        '7 Experiments Selected for Plotting (Max 7)'
+        '2 Experiments Selected for Plotting (Max 7)'
       )
 
       setTableData({

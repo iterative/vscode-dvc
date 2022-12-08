@@ -1,4 +1,4 @@
-import { join, resolve } from 'path'
+import { join, relative, resolve } from 'path'
 import { ensureDirSync, remove } from 'fs-extra'
 import * as FileSystem from '.'
 import { dvcDemoPath } from '../test/util'
@@ -107,6 +107,21 @@ describe('isSameOrChild', () => {
     expect(isSameOrChild(mockedRoot, resolve(mockedRoot, '..', '..'))).toBe(
       false
     )
+  })
+
+  it('should work for relative paths', () => {
+    const relPath = relative(
+      '/workspaces/magnetic-tiles-defect',
+      '/workspaces/magnetic-tiles-defect/training/plots'
+    )
+
+    expect(
+      isSameOrChild(relPath, 'training/plots/metrics/train/loss.tsv')
+    ).toBe(true)
+
+    expect(
+      isSameOrChild(relPath, './training/plots/metrics/train/loss.tsv')
+    ).toBe(true)
   })
 })
 

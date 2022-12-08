@@ -1,9 +1,12 @@
-import { ExperimentStatus } from '../../../../cli/dvc/contract'
+import {
+  ExperimentStatus,
+  EXPERIMENT_WORKSPACE_ID
+} from '../../../../cli/dvc/contract'
 
 export const data = [
   {
-    id: 'workspace',
-    label: 'workspace',
+    id: EXPERIMENT_WORKSPACE_ID,
+    label: EXPERIMENT_WORKSPACE_ID,
     executor: null,
     params: {
       'params.yaml': {
@@ -24,8 +27,8 @@ export const data = [
         outlier: 1
       }
     },
-    displayColor: '#945dd6',
-    selected: true,
+    displayColor: undefined,
+    selected: false,
     status: ExperimentStatus.SUCCESS,
     starred: false
   },
@@ -56,8 +59,8 @@ export const data = [
         outlier: 1
       }
     },
-    displayColor: '#13adc7',
-    selected: true,
+    displayColor: undefined,
+    selected: false,
     starred: false
   }
 ]

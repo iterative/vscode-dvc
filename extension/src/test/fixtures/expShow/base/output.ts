@@ -1,7 +1,8 @@
 import { join } from '../../../util/path'
 import {
   ExperimentsOutput,
-  ExperimentStatus
+  ExperimentStatus,
+  EXPERIMENT_WORKSPACE_ID
 } from '../../../../cli/dvc/contract'
 
 export const errorShas = [
@@ -11,7 +12,7 @@ export const errorShas = [
 ]
 
 const data: ExperimentsOutput = {
-  workspace: {
+  [EXPERIMENT_WORKSPACE_ID]: {
     baseline: {
       data: {
         deps: {
@@ -56,7 +57,7 @@ const data: ExperimentsOutput = {
             nfiles: null
           }
         },
-        executor: 'workspace',
+        executor: EXPERIMENT_WORKSPACE_ID,
         metrics: {
           'summary.json': {
             data: {
@@ -275,7 +276,7 @@ const data: ExperimentsOutput = {
             nfiles: null
           }
         },
-        executor: null,
+        executor: 'dvc-task',
         metrics: {
           'summary.json': {
             data: {
@@ -1536,7 +1537,7 @@ const data: ExperimentsOutput = {
             }
           }
         },
-        status: ExperimentStatus.RUNNING,
+        status: ExperimentStatus.SUCCESS,
         timestamp: '2020-12-29T15:26:36'
       }
     },

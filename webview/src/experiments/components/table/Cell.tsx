@@ -31,10 +31,9 @@ const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
     <span className={styles.rowArrowContainer} />
   )
 
-export const FirstCell: React.FC<CellProp & CellRowActionsProps> = ({
-  cell,
-  ...rowActionsProps
-}) => {
+export const FirstCell: React.FC<
+  CellProp & CellRowActionsProps & { changesIfWorkspace: boolean }
+> = ({ cell, changesIfWorkspace, ...rowActionsProps }) => {
   const { row, isPlaceholder } = cell
   const {
     original: { error, status, label, displayNameOrParent = '' }
@@ -53,10 +52,10 @@ export const FirstCell: React.FC<CellProp & CellRowActionsProps> = ({
         {isPlaceholder ? null : (
           <ErrorTooltip error={error}>
             <div
-              className={cx(
-                styles.experimentCellContentsContainer,
-                error && styles.error
-              )}
+              className={cx(styles.experimentCellContentsContainer, {
+                [styles.workspaceChange]: changesIfWorkspace,
+                [styles.error]: error
+              })}
               {...clickAndEnterProps(toggleExperiment, [
                 label,
                 displayNameOrParent

@@ -1,11 +1,10 @@
 import { Memento } from 'vscode'
+import isEmpty from 'lodash.isempty'
 import isEqual from 'lodash.isequal'
 import {
   collectCheckpointPlotsData,
   collectData,
   collectMetricOrder,
-  collectWorkspaceRaceConditionData,
-  collectWorkspaceRunningCheckpoint,
   collectSelectedTemplatePlots,
   collectTemplates,
   ComparisonData,
@@ -26,7 +25,11 @@ import {
   SectionCollapsed,
   PlotSizeNumber
 } from '../webview/contract'
-import { ExperimentsOutput, PlotsOutputOrError } from '../../cli/dvc/contract'
+import {
+  ExperimentsOutput,
+  EXPERIMENT_WORKSPACE_ID,
+  PlotsOutputOrError
+} from '../../cli/dvc/contract'
 import { Experiments } from '../../experiments'
 import { getColorScale, truncateVerticalTitle } from '../vega/util'
 import { definedAndNonEmpty, reorderObjectList } from '../../util/array'
@@ -48,7 +51,6 @@ export class PlotsModel extends ModelWithPersistence {
   private plotSizes: Record<Section, number>
   private sectionCollapsed: SectionCollapsed
   private branchRevisions: Record<string, string> = {}
-  private workspaceRunningCheckpoint: string | undefined
 
   private fetchedRevs = new Set<string>()
 
@@ -63,8 +65,6 @@ export class PlotsModel extends ModelWithPersistence {
   private checkpointPlots?: CheckpointPlot[]
   private selectedMetrics?: string[]
   private metricOrder: string[]
-
-  private unfinishedRunningExperiments: Set<string> = new Set<string>()
 
   constructor(
     dvcRoot: string,
@@ -90,18 +90,14 @@ export class PlotsModel extends ModelWithPersistence {
     this.metricOrder = this.revive(PersistenceKey.PLOT_METRIC_ORDER, [])
   }
 
-  public async transformAndSetExperiments(data: ExperimentsOutput) {
-    const [checkpointPlots, workspaceRunningCheckpoint] = await Promise.all([
-      collectCheckpointPlotsData(data),
-      collectWorkspaceRunningCheckpoint(data, this.experiments.hasCheckpoints())
-    ])
+  public transformAndSetExperiments(data: ExperimentsOutput) {
+    const checkpointPlots = collectCheckpointPlotsData(data)
 
     if (!this.selectedMetrics && checkpointPlots) {
       this.selectedMetrics = checkpointPlots.map(({ id }) => id)
     }
 
     this.checkpointPlots = checkpointPlots
-    this.workspaceRunningCheckpoint = workspaceRunningCheckpoint
 
     this.setMetricOrder()
 
@@ -122,23 +118,15 @@ export class PlotsModel extends ModelWithPersistence {
         collectMultiSourceVariations(data, this.multiSourceVariations)
       ])
 
-    const { overwriteComparisonData, overwriteRevisionData } =
-      collectWorkspaceRaceConditionData(
-        this.workspaceRunningCheckpoint,
-        { ...this.comparisonData, ...comparisonData },
-        { ...this.revisionData, ...revisionData }
-      )
-
     this.comparisonData = {
       ...this.comparisonData,
-      ...comparisonData,
-      ...overwriteComparisonData
+      ...comparisonData
     }
     this.revisionData = {
       ...this.revisionData,
-      ...revisionData,
-      ...overwriteRevisionData
+      ...revisionData
     }
+
     this.templates = { ...this.templates, ...templates }
     this.multiSourceVariations = multiSourceVariations
     this.multiSourceEncoding = collectMultiSourceEncoding(
@@ -151,6 +139,8 @@ export class PlotsModel extends ModelWithPersistence {
       ...this.fetchedRevs,
       ...revs.map(rev => cliIdToLabel[rev])
     ])
+
+    this.experiments.setRevisionCollected(revs)
 
     this.deferred.resolve()
   }
@@ -185,34 +175,26 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public getOverrideRevisionDetails() {
+    const finishedExperiments = this.experiments.getFinishedExperiments()
+
     if (
-      !(
-        this.experiments.hasCheckpoints() &&
-        (this.experiments.hasRunningExperiment() ||
-          this.unfinishedRunningExperiments.size > 0)
-      )
+      (this.experiments.hasCheckpoints() &&
+        this.experiments.hasRunningExperiment()) ||
+      !isEmpty(finishedExperiments)
     ) {
-      return {
-        overrideComparison: this.getComparisonRevisions(),
-        overrideRevisions: this.getSelectedRevisionDetails()
-      }
+      return collectOverrideRevisionDetails(
+        this.comparisonOrder,
+        this.experiments.getSelectedRevisions(),
+        this.fetchedRevs,
+        finishedExperiments,
+        id => this.experiments.getCheckpoints(id)
+      )
     }
 
-    const {
-      overrideComparison,
-      overrideRevisions,
-      unfinishedRunningExperiments
-    } = collectOverrideRevisionDetails(
-      this.comparisonOrder,
-      this.experiments.getSelectedRevisions(),
-      this.fetchedRevs,
-      this.unfinishedRunningExperiments,
-      id => this.experiments.getCheckpoints(id)
-    )
-
-    this.unfinishedRunningExperiments = unfinishedRunningExperiments
-
-    return { overrideComparison, overrideRevisions }
+    return {
+      overrideComparison: this.getComparisonRevisions(),
+      overrideRevisions: this.getSelectedRevisionDetails()
+    }
   }
 
   public getUnfetchedRevisions() {
@@ -404,7 +386,7 @@ export class PlotsModel extends ModelWithPersistence {
       }
     }
     if (!isEqual(this.branchRevisions, currentBranchRevisions)) {
-      this.deleteRevisionData('workspace')
+      this.deleteRevisionData(EXPERIMENT_WORKSPACE_ID)
     }
     this.branchRevisions = currentBranchRevisions
   }

@@ -8,9 +8,10 @@ import {
 import { buildMockMemento } from '../../test/util'
 import { Experiments } from '../../experiments'
 import { PersistenceKey } from '../../persistence/constants'
+import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 
 const mockedRevisions = [
-  { displayColor: 'white', label: 'workspace' },
+  { displayColor: 'white', label: EXPERIMENT_WORKSPACE_ID },
   { displayColor: 'red', label: 'main' },
   { displayColor: 'blue', label: '71f31cf' },
   { displayColor: 'black', label: 'e93c7e6' },
@@ -115,7 +116,13 @@ describe('plotsModel', () => {
     mockedGetSelectedRevisions.mockReturnValue(mockedRevisions)
 
     const mementoUpdateSpy = jest.spyOn(memento, 'update')
-    const newOrder = ['71f31cf', 'e93c7e6', 'ffbe811', 'workspace', 'main']
+    const newOrder = [
+      '71f31cf',
+      'e93c7e6',
+      'ffbe811',
+      EXPERIMENT_WORKSPACE_ID,
+      'main'
+    ]
     model.setComparisonOrder(newOrder)
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
@@ -159,7 +166,7 @@ describe('plotsModel', () => {
       .mockReturnValueOnce(revisionReAdded)
       .mockReturnValueOnce(revisionReAdded)
 
-    const initialOrder = ['workspace', 'main', '71f31cf']
+    const initialOrder = [EXPERIMENT_WORKSPACE_ID, 'main', '71f31cf']
     model.setComparisonOrder(initialOrder)
 
     expect(
@@ -176,6 +183,6 @@ describe('plotsModel', () => {
 
     expect(
       model.getComparisonRevisions().map(({ revision }) => revision)
-    ).toStrictEqual(['workspace', '71f31cf', 'main'])
+    ).toStrictEqual([EXPERIMENT_WORKSPACE_ID, '71f31cf', 'main'])
   })
 })

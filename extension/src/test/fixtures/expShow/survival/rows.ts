@@ -1,10 +1,11 @@
 import { join } from '../../../util/path'
 import { ExperimentStatus, Row } from '../../../../experiments/webview/contract'
+import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 
 const data: Row[] = [
   {
-    id: 'workspace',
-    label: 'workspace',
+    id: EXPERIMENT_WORKSPACE_ID,
+    label: EXPERIMENT_WORKSPACE_ID,
     outs: {
       [join('data', 'raw', 'test.csv')]: {
         hash: '029c9cd22461f6dbe8d9ab01def965c6',
@@ -269,8 +270,8 @@ const data: Row[] = [
         value: 'ffcea00'
       }
     },
-    displayColor: '#945dd6',
-    selected: true,
+    displayColor: undefined,
+    selected: false,
     starred: false
   },
   {
@@ -543,8 +544,8 @@ const data: Row[] = [
         value: 'ffcea00'
       }
     },
-    displayColor: '#13adc7',
-    selected: true,
+    displayColor: undefined,
+    selected: false,
     starred: false
   },
   {
@@ -816,8 +817,8 @@ const data: Row[] = [
         value: 'ffcea00'
       }
     },
-    displayColor: '#f46837',
-    selected: true,
+    displayColor: undefined,
+    selected: false,
     starred: false
   },
   {
@@ -1089,8 +1090,8 @@ const data: Row[] = [
         value: 'ffcea00'
       }
     },
-    displayColor: '#48bb78',
-    selected: true,
+    displayColor: undefined,
+    selected: false,
     starred: false
   }
 ]
