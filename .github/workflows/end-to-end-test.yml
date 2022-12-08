@@ -1,4 +1,4 @@
-name: Continuous Integration
+name: End To End Test
 on:
   push:
     branches:
@@ -6,11 +6,11 @@ on:
   pull_request:
 
 concurrency:
-  group: continuous-integration-${{ github.head_ref }}
+  group: end-to-end-${{ github.head_ref }}
   cancel-in-progress: true
 
 jobs:
-  build:
+  suite:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -19,6 +19,12 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
+
+      - name: Setup Python environment
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
@@ -38,22 +44,15 @@ jobs:
 
       - run: yarn run install-frozen-lockfile
 
-      - run: yarn run lint
-
-      - uses: paambaati/codeclimate-action@v3.2.0
-        env:
-          CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
+      - name: Test E2E
+        uses: GabrielBB/xvfb-action@v1
         with:
-          coverageCommand: xvfb-run -a yarn run cover
-          coverageLocations: ${{github.workspace}}/coverage/lcov.info:lcov
-
-      - run: yarn build-storybook
-
-      - name: Publish to Chromatic
-        uses: chromaui/action@v1
+          run: yarn test:e2e
+          options: '-screen 0 1600x1200x24'
+      - uses: actions/upload-artifact@v3
+        if: failure()
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-          storybookBuildDir: 'webview/storybook-static'
-          exitOnceUploaded: true
-          autoAcceptChanges: 'main'
+          name: screenshots
+          path: |
+            extension/src/test/e2e/screenshots
+            extension/src/test/e2e/logs
