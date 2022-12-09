@@ -16,7 +16,7 @@ suite('data status --granular --unchanged --show-json', () => {
       )) as DataStatusOutput
 
       const demoRepoTrackedData = [
-        join('data', 'MNIST', 'raw') + sep,
+        'data' + sep,
         join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz'),
         join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
         join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz'),
