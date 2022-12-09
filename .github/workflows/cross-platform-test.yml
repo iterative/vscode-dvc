@@ -36,10 +36,10 @@ jobs:
         with:
           path: node_modules/.cache/turbo
           key:
-            turbo-${{ runner.os }}-${{ github.job }}-${{ github.ref_name }}-${{
-            github.sha }}
+            turbo-${{ runner.os }}-cross-platform-${{ github.job }}-${{
+            github.ref_name }}-${{ github.sha }}
           restore-keys: |
-            turbo-${{ runner.os }}-${{ github.job }}-${{ github.ref_name }}-
+            turbo-${{ runner.os }}-cross-platform-${{ github.job }}-${{ github.ref_name }}-
 
       - run: yarn install
 

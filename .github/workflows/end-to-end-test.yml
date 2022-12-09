@@ -38,9 +38,11 @@ jobs:
         uses: actions/cache@v3
         with:
           path: node_modules/.cache/turbo
-          key: turbo-${{ github.job }}-${{ github.ref_name }}-${{ github.sha }}
+          key:
+            turbo-end-to-end-${{ github.job }}-${{ github.ref_name }}-${{
+            github.sha }}
           restore-keys: |
-            turbo-${{ github.job }}-${{ github.ref_name }}-
+            turbo-end-to-end-${{ github.job }}-${{ github.ref_name }}-
 
       - run: yarn run install-frozen-lockfile
 
