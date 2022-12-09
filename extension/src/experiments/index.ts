@@ -1,3 +1,4 @@
+import { join } from 'path'
 import {
   ConfigurationChangeEvent,
   Event,
@@ -40,6 +41,8 @@ import { createTypedAccumulator } from '../util/object'
 import { pickPaths } from '../path/selection/quickPick'
 import { Toast } from '../vscode/toast'
 import { ConfigKey } from '../vscode/config'
+import { exists } from '../fileSystem'
+import { DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
 
 export const ExperimentsScale = {
   ...omit(ColumnType, 'TIMESTAMP'),
@@ -165,9 +168,12 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public async setState(data: ExperimentsOutput) {
+    const dvclive_only = exists(
+      join(this.dvcRoot, DVCLIVE_ONLY_RUNNING_SIGNAL_FILE)
+    )
     await Promise.all([
       this.columns.transformAndSet(data),
-      this.experiments.transformAndSet(data)
+      this.experiments.transformAndSet(data, dvclive_only)
     ])
 
     return this.notifyChanged(data)

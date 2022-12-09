@@ -14,7 +14,8 @@ import {
   ExperimentFields,
   ExperimentsBranchOutput,
   ExperimentsOutput,
-  EXPERIMENT_WORKSPACE_ID
+  EXPERIMENT_WORKSPACE_ID,
+  ExperimentStatus
 } from '../../cli/dvc/contract'
 import { addToMapArray } from '../../util/map'
 import { uniqueValues } from '../../util/array'
@@ -311,16 +312,21 @@ const collectFromBranchesObject = (
 }
 
 export const collectExperiments = (
-  data: ExperimentsOutput
+  data: ExperimentsOutput,
+  dvclive_only = false
 ): ExperimentsAccumulator => {
   const { workspace, ...branchesObject } = data
-  const workspaceId = EXPERIMENT_WORKSPACE_ID
 
   const workspaceBaseline = transformExperimentData(
-    workspaceId,
+    EXPERIMENT_WORKSPACE_ID,
     workspace.baseline,
-    workspaceId
+    EXPERIMENT_WORKSPACE_ID
   )
+
+  if (dvclive_only) {
+    workspaceBaseline.executor = EXPERIMENT_WORKSPACE_ID
+    workspaceBaseline.status = ExperimentStatus.RUNNING
+  }
 
   const acc = new ExperimentsAccumulator(workspaceBaseline)
 
