@@ -39,6 +39,23 @@ suite('GetStarted Test Suite', () => {
       expect(mockInitializeProject).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should handle a open experiments message from the webview', async () => {
+      const { messageSpy, getStarted, mockOpenExperiments } =
+        await buildGetStarted(disposable, true)
+
+      const webview = await getStarted.showWebview()
+      await webview.isReady()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW
+      })
+
+      expect(mockOpenExperiments).to.be.calledOnce
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should log an error message if the message from the webview is anything else than initialize project', async () => {
       const { messageSpy, getStarted } = await buildGetStarted(disposable)
 
