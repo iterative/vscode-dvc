@@ -1314,12 +1314,14 @@
         {
           "id": "dvc.views.welcome",
           "name": "Welcome",
-          "when": "!dvc.commands.available || dvc.cli.incompatible || !dvc.project.available"
+          "when": "!dvc.commands.available || dvc.cli.incompatible || !dvc.project.available",
+          "initialSize": 5
         },
         {
           "id": "dvc.views.webviews",
           "name": "Views",
-          "when": "true"
+          "when": "true",
+          "initialSize": 0
         },
         {
           "id": "dvc.views.experimentsTree",
