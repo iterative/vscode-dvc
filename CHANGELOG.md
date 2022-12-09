@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.25] - 2022-12-09
+
+### 🔨 Maintenance
+
+- Improve stability of e2e tests for new VS Code release [#2897](https://github.com/iterative/vscode-dvc/pull/2897) by [@mattseddon](https://github.com/mattseddon)
+- Move from vsce to @vscode/vsce [#2895](https://github.com/iterative/vscode-dvc/pull/2895) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project [#2899](https://github.com/iterative/vscode-dvc/pull/2899) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (2.37.0) [#2908](https://github.com/iterative/vscode-dvc/pull/2908) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.24] - 2022-12-07
 
 ### 🚀 New Features and Enhancements
