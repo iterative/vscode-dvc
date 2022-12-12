@@ -1375,7 +1375,7 @@
       },
       {
         "view": "dvc.views.welcome",
-        "contents": "The currently open folder does not contain a DVC project. You can initialize a project which will enable features powered by DVC.\n[Initialize Project](command:dvc.init)\nTo learn more about how to use DVC please read [our docs](https://dvc.org/doc).",
+        "contents": "The current workspace does not contain a DVC project. You can initialize a project which will enable features powered by DVC.\n[Initialize Project](command:dvc.init)\nTo learn more about how to use DVC please read [our docs](https://dvc.org/doc).",
         "when": "dvc.commands.available && !dvc.cli.incompatible && !dvc.project.available"
       },
       {
