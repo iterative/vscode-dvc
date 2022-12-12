@@ -17,6 +17,8 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
   private templateOrder: TemplateOrder
   private comparisonPathsOrder: string[]
 
+  private selectedRevisions: string[] = []
+
   constructor(dvcRoot: string, workspaceState: Memento) {
     super(dvcRoot, workspaceState, PersistenceKey.PLOT_PATH_STATUS)
 
@@ -25,6 +27,10 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
       PersistenceKey.PLOT_COMPARISON_PATHS_ORDER,
       []
     )
+  }
+
+  public setSelectedRevisions(selectedRevisions: string[]) {
+    this.selectedRevisions = selectedRevisions
   }
 
   public transformAndSet(data: PlotsOutputOrError) {
@@ -58,15 +64,11 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
 
   public getChildren(
     path: string | undefined,
-    selectedRevisions: string[],
     multiSourceEncoding: MultiSourceEncoding = {}
   ) {
-    return this.filterChildren(path, selectedRevisions).map(element => ({
+    return this.filterChildren(path).map(element => ({
       ...element,
-      descendantStatuses: this.getTerminalNodeStatuses(
-        element.path,
-        selectedRevisions
-      ),
+      descendantStatuses: this.getTerminalNodeStatuses(element.path),
       hasChildren: this.getHasChildren(element, multiSourceEncoding),
       label: element.label,
       status: this.status[element.path]
@@ -110,13 +112,12 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
       .map(({ path }) => path)
   }
 
-  private filterChildren(
-    path: string | undefined,
-    selectedRevisions: string[]
-  ): PlotPath[] {
+  private filterChildren(path: string | undefined): PlotPath[] {
     return this.data.filter(element => {
       if (
-        !selectedRevisions.some(revision => element.revisions.has(revision))
+        !this.selectedRevisions.some(revision =>
+          element.revisions.has(revision)
+        )
       ) {
         return false
       }

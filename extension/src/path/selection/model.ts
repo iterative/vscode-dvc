@@ -49,27 +49,25 @@ export abstract class PathSelectionModel<
       .map(element => ({ ...element, selected: !!this.status[element.path] }))
   }
 
-  public toggleStatus(path: string, ...args: unknown[]) {
+  public toggleStatus(path: string) {
     const status = this.getNextStatus(path)
-    return this.setStatus(path, status, ...args)
+    return this.setStatus(path, status)
   }
 
-  public getTerminalNodeStatuses(
-    parentPath?: string,
-    ...args: unknown[]
-  ): Status[] {
-    return (this.getChildren(parentPath, ...args) || []).flatMap(element => {
+  public unselect(path: string) {
+    return this.setStatus(path, Status.UNSELECTED)
+  }
+
+  public getTerminalNodeStatuses(parentPath?: string): Status[] {
+    return (this.getChildren(parentPath) || []).flatMap(element => {
       const terminalStatuses = element.hasChildren
-        ? this.getTerminalNodeStatuses(element.path, ...args)
+        ? this.getTerminalNodeStatuses(element.path)
         : [this.status[element.path]]
       return [...terminalStatuses]
     })
   }
 
-  public setSelected(
-    elements: (T & { selected: boolean })[],
-    ...args: unknown[]
-  ) {
+  public setSelected(elements: (T & { selected: boolean })[]) {
     const terminalNodes = this.getTerminalNodes()
     for (const { path, selected } of terminalNodes) {
       const selectedElement = elements.find(
@@ -77,7 +75,7 @@ export abstract class PathSelectionModel<
       )
 
       if (!!selectedElement !== !!selected) {
-        this.toggleStatus(path, ...args)
+        this.toggleStatus(path)
       }
     }
   }
@@ -90,22 +88,18 @@ export abstract class PathSelectionModel<
     }
   }
 
-  protected setStatus(path: string, status: Status, ...args: unknown[]) {
+  private setStatus(path: string, status: Status) {
     this.status[path] = status
-    this.setAreChildrenSelected(path, status, ...args)
-    this.setAreParentsSelected(path, ...args)
+    this.setAreChildrenSelected(path, status)
+    this.setAreParentsSelected(path)
     this.persistStatus()
     this.statusChanged?.fire()
 
     return this.status[path]
   }
 
-  private setAreChildrenSelected(
-    path: string,
-    status: Status,
-    ...args: unknown[]
-  ) {
-    return this.getChildren(path, ...args)?.map(element => {
+  private setAreChildrenSelected(path: string, status: Status) {
+    return this.getChildren(path)?.map(element => {
       const path = element.path
       this.status[path] = status
       this.setAreChildrenSelected(path, status)
@@ -116,7 +110,7 @@ export abstract class PathSelectionModel<
     return this.data?.find(element => element.path === path)
   }
 
-  private setAreParentsSelected(path: string, ...args: unknown[]) {
+  private setAreParentsSelected(path: string) {
     const changed = this.getElement(path)
     if (!changed) {
       return
@@ -128,13 +122,13 @@ export abstract class PathSelectionModel<
 
     const parentPath = parent.path
 
-    const status = this.getStatus(parentPath, args)
+    const status = this.getStatus(parentPath)
     this.status[parentPath] = status
-    this.setAreParentsSelected(parentPath, args)
+    this.setAreParentsSelected(parentPath)
   }
 
-  private getStatus(parentPath: string, ...args: unknown[]) {
-    const statuses = this.getTerminalNodeStatuses(parentPath, ...args)
+  private getStatus(parentPath: string) {
+    const statuses = this.getTerminalNodeStatuses(parentPath)
 
     const isAnyChildSelected = statuses.includes(Status.SELECTED)
     const isAnyChildUnselected = statuses.includes(Status.UNSELECTED)

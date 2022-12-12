@@ -4,7 +4,7 @@ import { EXPERIMENT_COLUMN_ID, timestampColumn } from './constants'
 import { Column, ColumnType } from '../webview/contract'
 import { ExperimentsOutput } from '../../cli/dvc/contract'
 import { PersistenceKey } from '../../persistence/constants'
-import { PathSelectionModel, Status } from '../../path/selection/model'
+import { PathSelectionModel } from '../../path/selection/model'
 
 export class ColumnsModel extends PathSelectionModel<Column> {
   private columnOrderState: string[] = []
@@ -89,10 +89,6 @@ export class ColumnsModel extends PathSelectionModel<Column> {
         status: this.status[element.path]
       }
     })
-  }
-
-  public unselect(path: string) {
-    return this.setStatus(path, Status.UNSELECTED)
   }
 
   public hasNonDefaultColumns() {

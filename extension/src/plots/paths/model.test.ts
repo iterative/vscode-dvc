@@ -138,16 +138,17 @@ describe('PathsModel', () => {
   it('should retain the order of template paths when they are unselected', () => {
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
     model.transformAndSet(plotsDiffFixture)
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
 
-    model.toggleStatus(logsAcc, [EXPERIMENT_WORKSPACE_ID])
+    model.toggleStatus(logsAcc)
 
     const newOrder = model.getTemplateOrder()
 
     expect(newOrder).toStrictEqual([logsLossGroup, multiViewGroup])
 
-    model.toggleStatus(logsAcc, [EXPERIMENT_WORKSPACE_ID])
+    model.toggleStatus(logsAcc)
 
     expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
   })
@@ -155,10 +156,11 @@ describe('PathsModel', () => {
   it('should move unselected plots to the end when a reordering occurs', () => {
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
     model.transformAndSet(plotsDiffFixture)
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
 
-    model.toggleStatus(logsAcc, [EXPERIMENT_WORKSPACE_ID])
+    model.toggleStatus(logsAcc)
 
     const newOrder = model.getTemplateOrder()
 
@@ -166,7 +168,7 @@ describe('PathsModel', () => {
 
     model.setTemplateOrder([multiViewGroup, logsLossGroup])
 
-    model.toggleStatus(logsAcc, [EXPERIMENT_WORKSPACE_ID])
+    model.toggleStatus(logsAcc)
 
     expect(model.getTemplateOrder()).toStrictEqual([
       multiViewGroup,
@@ -183,7 +185,7 @@ describe('PathsModel', () => {
 
     model.setTemplateOrder([logsLossGroup, logsAccGroup, multiViewGroup])
 
-    model.toggleStatus('predictions.json', [EXPERIMENT_WORKSPACE_ID])
+    model.toggleStatus('predictions.json')
 
     expect(model.getTemplateOrder()).toStrictEqual([originalSingleViewGroup])
   })
@@ -212,16 +214,13 @@ describe('PathsModel', () => {
   it('should return the expected children from the test fixture', () => {
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
     model.transformAndSet(plotsDiffFixture)
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
-    const rootChildren = model.getChildren(
-      undefined,
-      [EXPERIMENT_WORKSPACE_ID],
-      {
-        'predictions.json': {
-          strokeDash: { field: '', scale: { domain: [], range: [] } }
-        }
+    const rootChildren = model.getChildren(undefined, {
+      'predictions.json': {
+        strokeDash: { field: '', scale: { domain: [], range: [] } }
       }
-    )
+    })
 
     expect(rootChildren).toStrictEqual([
       {
@@ -272,9 +271,7 @@ describe('PathsModel', () => {
       }
     ])
 
-    const directoryChildren = model.getChildren('logs', [
-      EXPERIMENT_WORKSPACE_ID
-    ])
+    const directoryChildren = model.getChildren('logs')
     expect(directoryChildren).toStrictEqual([
       {
         descendantStatuses: [],
@@ -310,18 +307,14 @@ describe('PathsModel', () => {
       }
     ])
 
-    const plotsWithEncoding = model.getChildren(
-      'logs',
-      [EXPERIMENT_WORKSPACE_ID],
-      {
-        [logsAcc]: {
-          strokeDash: { field: '', scale: { domain: [], range: [] } }
-        },
-        [logsLoss]: {
-          strokeDash: { field: '', scale: { domain: [], range: [] } }
-        }
+    const plotsWithEncoding = model.getChildren('logs', {
+      [logsAcc]: {
+        strokeDash: { field: '', scale: { domain: [], range: [] } }
+      },
+      [logsLoss]: {
+        strokeDash: { field: '', scale: { domain: [], range: [] } }
       }
-    )
+    })
     expect(plotsWithEncoding).toStrictEqual([
       {
         descendantStatuses: [],
@@ -357,7 +350,7 @@ describe('PathsModel', () => {
       }
     ])
 
-    const noChildren = model.getChildren(logsLoss, [EXPERIMENT_WORKSPACE_ID])
+    const noChildren = model.getChildren(logsLoss)
     expect(noChildren).toStrictEqual([])
   })
 

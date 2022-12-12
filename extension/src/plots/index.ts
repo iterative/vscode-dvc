@@ -81,12 +81,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   public togglePathStatus(path: string) {
-    const status = this.paths.toggleStatus(
-      path,
-      this.plots
-        .getOverrideRevisionDetails()
-        .overrideRevisions.map(({ revision }) => revision)
-    )
+    const status = this.paths.toggleStatus(path)
     this.paths.setTemplateOrder()
     this.notifyChanged()
     return status
@@ -100,12 +95,7 @@ export class Plots extends BaseRepository<TPlotsData> {
       return
     }
 
-    this.paths.setSelected(
-      selected,
-      this.plots
-        .getOverrideRevisionDetails()
-        .overrideRevisions.map(({ revision }) => revision)
-    )
+    this.paths.setSelected(selected) // check what having paths missing will do here
     this.paths.setTemplateOrder()
     return this.notifyChanged()
   }
@@ -127,20 +117,11 @@ export class Plots extends BaseRepository<TPlotsData> {
       return collectEncodingElements(path, multiSourceEncoding)
     }
 
-    const selectedRevisions = this.plots
-      .getOverrideRevisionDetails()
-      .overrideRevisions.map(({ revision }) => revision)
-
-    return this.paths.getChildren(path, selectedRevisions, multiSourceEncoding)
+    return this.paths.getChildren(path, multiSourceEncoding)
   }
 
   public getPathStatuses() {
-    return this.paths.getTerminalNodeStatuses(
-      undefined,
-      this.plots
-        .getOverrideRevisionDetails()
-        .overrideRevisions.map(({ revision }) => revision)
-    )
+    return this.paths.getTerminalNodeStatuses(undefined)
   }
 
   public getScale() {
@@ -148,6 +129,9 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private notifyChanged() {
+    this.paths.setSelectedRevisions(
+      this.plots.getSelectedRevisionDetails().map(({ revision }) => revision)
+    )
     this.pathsChanged.fire()
     this.fetchMissingOrSendPlots()
   }

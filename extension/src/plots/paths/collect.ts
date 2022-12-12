@@ -99,10 +99,32 @@ const collectPath = (
   acc.push(plotPath)
 }
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
+const collectPathRevisions = (data: PlotsOutput, path: string): Set<string> => {
+  const revisions = new Set<string>()
+  const pathData = data[path]
+  for (const plot of pathData) {
+    if (isImagePlot(plot)) {
+      if (plot.revisions?.[0]) {
+        revisions.add(plot.revisions[0])
+      }
+    } else {
+      for (const [revision, datapoints] of Object.entries(
+        plot?.datapoints || {}
+      )) {
+        if (datapoints.length > 0) {
+          revisions.add(revision)
+        }
+      }
+    }
+  }
+
+  return revisions
+}
+
 export const collectPaths = (
   existingPaths: PlotPath[],
   data: PlotsOutput
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 ): PlotPath[] => {
   const acc: PlotPath[] = [...existingPaths]
 
@@ -110,23 +132,8 @@ export const collectPaths = (
 
   for (const path of paths) {
     // need cliIdToLabel[id]
-    const revisions = new Set<string>()
-    const pathData = data[path]
-    for (const plot of pathData) {
-      if (isImagePlot(plot)) {
-        if (plot.revisions?.[0]) {
-          revisions.add(plot.revisions[0])
-        }
-      } else {
-        for (const [revision, datapoints] of Object.entries(
-          plot?.datapoints || {}
-        )) {
-          if (datapoints.length > 0) {
-            revisions.add(revision)
-          }
-        }
-      }
-    }
+    // need to remove collected revisions as they might change (workspace) => pass in revs and is workspace is present remove the key for each entry.
+    const revisions = collectPathRevisions(data, path)
 
     if (revisions.size === 0) {
       continue
