@@ -1622,7 +1622,7 @@
     "wdio-vscode-service": "4.2.1",
     "webdriverio": "7.27.0",
     "webpack": "5.75.0",
-    "webpack-cli": "5.0.0"
+    "webpack-cli": "5.0.1"
   },
   "peerDependencies": {
     "typescript": "*"
