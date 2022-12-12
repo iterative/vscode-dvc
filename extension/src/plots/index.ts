@@ -81,21 +81,31 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   public togglePathStatus(path: string) {
-    const status = this.paths.toggleStatus(path)
+    const status = this.paths.toggleStatus(
+      path,
+      this.plots
+        .getOverrideRevisionDetails()
+        .overrideRevisions.map(({ revision }) => revision)
+    )
     this.paths.setTemplateOrder()
     this.notifyChanged()
     return status
   }
 
   public async selectPlots() {
-    const paths = this.paths.getTerminalNodes()
+    const paths = this.paths.getTerminalNodes() // need to filter to selected revisions
 
     const selected = await pickPaths('plots', paths)
     if (!selected) {
       return
     }
 
-    this.paths.setSelected(selected)
+    this.paths.setSelected(
+      selected,
+      this.plots
+        .getOverrideRevisionDetails()
+        .overrideRevisions.map(({ revision }) => revision)
+    )
     this.paths.setTemplateOrder()
     return this.notifyChanged()
   }
@@ -117,11 +127,20 @@ export class Plots extends BaseRepository<TPlotsData> {
       return collectEncodingElements(path, multiSourceEncoding)
     }
 
-    return this.paths.getChildren(path, multiSourceEncoding)
+    const selectedRevisions = this.plots
+      .getOverrideRevisionDetails()
+      .overrideRevisions.map(({ revision }) => revision)
+
+    return this.paths.getChildren(path, selectedRevisions, multiSourceEncoding)
   }
 
   public getPathStatuses() {
-    return this.paths.getTerminalNodeStatuses()
+    return this.paths.getTerminalNodeStatuses(
+      undefined,
+      this.plots
+        .getOverrideRevisionDetails()
+        .overrideRevisions.map(({ revision }) => revision)
+    )
   }
 
   public getScale() {
@@ -187,9 +206,7 @@ export class Plots extends BaseRepository<TPlotsData> {
           await this.plots.transformAndSetExperiments(data)
         }
 
-        this.plots.setComparisonOrder()
-
-        this.fetchMissingOrSendPlots()
+        this.notifyChanged()
       })
     )
   }

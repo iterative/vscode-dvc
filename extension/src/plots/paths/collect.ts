@@ -24,22 +24,7 @@ export type PlotPath = {
   type?: Set<PathType>
   parentPath: string | undefined
   hasChildren: boolean
-}
-
-type PathAccumulator = {
-  plotPaths: PlotPath[]
-  included: Set<string>
-}
-
-const createPathAccumulator = (existingPaths: PlotPath[]): PathAccumulator => {
-  const acc: PathAccumulator = { included: new Set<string>(), plotPaths: [] }
-
-  for (const existing of existingPaths) {
-    acc.included.add(existing.path)
-    acc.plotPaths.push(existing)
-  }
-
-  return acc
+  revisions: Set<string>
 }
 
 const collectType = (plots: Plot[]) => {
@@ -77,14 +62,22 @@ const getType = (
 }
 
 const collectPath = (
-  acc: PathAccumulator,
+  acc: PlotPath[],
   data: PlotsOutput,
+  revisions: Set<string>,
   pathArray: string[],
   idx: number
 ) => {
   const path = getPath(pathArray, idx)
 
-  if (acc.included.has(path)) {
+  const existing = acc.find(({ path: existingPath }) => existingPath === path)
+
+  if (existing) {
+    acc = acc.filter(({ path: existingPath }) => existingPath === path)
+    acc.push({
+      ...existing,
+      revisions: new Set([...existing.revisions, ...revisions])
+    })
     return
   }
 
@@ -94,7 +87,8 @@ const collectPath = (
     hasChildren,
     label: pathArray[idx - 1],
     parentPath: getParent(pathArray, idx),
-    path
+    path,
+    revisions
   }
 
   const type = getType(data, hasChildren, path)
@@ -102,27 +96,50 @@ const collectPath = (
     plotPath.type = type
   }
 
-  acc.plotPaths.push(plotPath)
-  acc.included.add(path)
+  acc.push(plotPath)
 }
 
 export const collectPaths = (
   existingPaths: PlotPath[],
   data: PlotsOutput
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 ): PlotPath[] => {
-  const acc = createPathAccumulator(existingPaths)
+  const acc: PlotPath[] = [...existingPaths]
 
   const paths = Object.keys(data)
 
   for (const path of paths) {
+    // need cliIdToLabel[id]
+    const revisions = new Set<string>()
+    const pathData = data[path]
+    for (const plot of pathData) {
+      if (isImagePlot(plot)) {
+        if (plot.revisions?.[0]) {
+          revisions.add(plot.revisions[0])
+        }
+      } else {
+        for (const [revision, datapoints] of Object.entries(
+          plot?.datapoints || {}
+        )) {
+          if (datapoints.length > 0) {
+            revisions.add(revision)
+          }
+        }
+      }
+    }
+
+    if (revisions.size === 0) {
+      continue
+    }
+
     const pathArray = getPathArray(path)
 
     for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
-      collectPath(acc, data, pathArray, reverseIdx)
+      collectPath(acc, data, revisions, pathArray, reverseIdx)
     }
   }
 
-  return acc.plotPaths
+  return acc
 }
 
 export type TemplateOrder = { paths: string[]; group: TemplatePlotGroup }[]

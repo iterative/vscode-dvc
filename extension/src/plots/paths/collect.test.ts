@@ -21,19 +21,40 @@ describe('collectPath', () => {
         label: 'acc.png',
         parentPath: 'plots',
         path: join('plots', 'acc.png'),
+        revisions: new Set([
+          'workspace',
+          '53c3851',
+          '4fb124a',
+          '42b8736',
+          '1ba7bcd'
+        ]),
         type: new Set(['comparison'])
       },
       {
         hasChildren: true,
         label: 'plots',
         parentPath: undefined,
-        path: 'plots'
+        path: 'plots',
+        revisions: new Set([
+          'workspace',
+          '53c3851',
+          '4fb124a',
+          '42b8736',
+          '1ba7bcd'
+        ])
       },
       {
         hasChildren: false,
         label: 'heatmap.png',
         parentPath: 'plots',
         path: join('plots', 'heatmap.png'),
+        revisions: new Set([
+          'workspace',
+          '53c3851',
+          '4fb124a',
+          '42b8736',
+          '1ba7bcd'
+        ]),
         type: new Set(['comparison'])
       },
       {
@@ -41,6 +62,13 @@ describe('collectPath', () => {
         label: 'loss.png',
         parentPath: 'plots',
         path: join('plots', 'loss.png'),
+        revisions: new Set([
+          'workspace',
+          '53c3851',
+          '4fb124a',
+          '42b8736',
+          '1ba7bcd'
+        ]),
         type: new Set(['comparison'])
       },
       {
@@ -48,14 +76,40 @@ describe('collectPath', () => {
         label: 'loss.tsv',
         parentPath: 'logs',
         path: join('logs', 'loss.tsv'),
+        revisions: new Set([
+          'workspace',
+          '53c3851',
+          '4fb124a',
+          '42b8736',
+          '1ba7bcd'
+        ]),
         type: new Set(['template-single'])
       },
-      { hasChildren: true, label: 'logs', parentPath: undefined, path: 'logs' },
+      {
+        hasChildren: true,
+        label: 'logs',
+        parentPath: undefined,
+        path: 'logs',
+        revisions: new Set([
+          'workspace',
+          '53c3851',
+          '4fb124a',
+          '42b8736',
+          '1ba7bcd'
+        ])
+      },
       {
         hasChildren: false,
         label: 'acc.tsv',
         parentPath: 'logs',
         path: join('logs', 'acc.tsv'),
+        revisions: new Set([
+          'workspace',
+          '53c3851',
+          '4fb124a',
+          '42b8736',
+          '1ba7bcd'
+        ]),
         type: new Set(['template-single'])
       },
       {
@@ -63,6 +117,13 @@ describe('collectPath', () => {
         label: 'predictions.json',
         parentPath: undefined,
         path: 'predictions.json',
+        revisions: new Set([
+          'workspace',
+          '53c3851',
+          '4fb124a',
+          '42b8736',
+          '1ba7bcd'
+        ]),
         type: new Set(['template-multi'])
       }
     ])
@@ -75,6 +136,7 @@ describe('collectPath', () => {
       label: mockPath,
       parentPath: undefined,
       path: mockPath,
+      revisions: new Set(['bfc7f64']),
       type: new Set([PathType.TEMPLATE_SINGLE])
     }
 
@@ -88,6 +150,7 @@ describe('collectPath', () => {
       [join('logs', 'scalars', 'acc.tsv')]: [
         {
           content: {},
+          datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
           revisions: [EXPERIMENT_WORKSPACE_ID],
           type: PlotsType.VEGA
         }
@@ -95,6 +158,7 @@ describe('collectPath', () => {
       [join('logs', 'scalars', 'loss.tsv')]: [
         {
           content: {},
+          datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
           revisions: [EXPERIMENT_WORKSPACE_ID],
           type: PlotsType.VEGA
         }
@@ -111,6 +175,7 @@ describe('collectPath', () => {
           content: {
             facet: { field: 'rev', type: 'nominal' }
           } as VisualizationSpec,
+          datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
           revisions: [EXPERIMENT_WORKSPACE_ID],
           type: PlotsType.VEGA
         }
@@ -123,20 +188,29 @@ describe('collectPath', () => {
         label: 'acc.tsv',
         parentPath: join('logs', 'scalars'),
         path: join('logs', 'scalars', 'acc.tsv'),
+        revisions: new Set([EXPERIMENT_WORKSPACE_ID]),
         type: new Set(['template-single'])
       },
       {
         hasChildren: true,
         label: 'scalars',
         parentPath: 'logs',
-        path: join('logs', 'scalars')
+        path: join('logs', 'scalars'),
+        revisions: new Set([EXPERIMENT_WORKSPACE_ID])
       },
-      { hasChildren: true, label: 'logs', parentPath: undefined, path: 'logs' },
+      {
+        hasChildren: true,
+        label: 'logs',
+        parentPath: undefined,
+        path: 'logs',
+        revisions: new Set([EXPERIMENT_WORKSPACE_ID])
+      },
       {
         hasChildren: false,
         label: 'loss.tsv',
         parentPath: join('logs', 'scalars'),
         path: join('logs', 'scalars', 'loss.tsv'),
+        revisions: new Set([EXPERIMENT_WORKSPACE_ID]),
         type: new Set(['template-single'])
       },
       {
@@ -144,19 +218,22 @@ describe('collectPath', () => {
         label: 'heatmap.png',
         parentPath: 'plots',
         path: join('plots', 'heatmap.png'),
+        revisions: new Set([EXPERIMENT_WORKSPACE_ID]),
         type: new Set(['comparison'])
       },
       {
         hasChildren: true,
         label: 'plots',
         parentPath: undefined,
-        path: 'plots'
+        path: 'plots',
+        revisions: new Set([EXPERIMENT_WORKSPACE_ID])
       },
       {
         hasChildren: false,
         label: 'predictions.json',
         parentPath: undefined,
         path: 'predictions.json',
+        revisions: new Set([EXPERIMENT_WORKSPACE_ID]),
         type: new Set(['template-multi'])
       }
     ])

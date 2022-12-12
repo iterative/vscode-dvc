@@ -58,11 +58,15 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
 
   public getChildren(
     path: string | undefined,
+    selectedRevisions: string[],
     multiSourceEncoding: MultiSourceEncoding = {}
   ) {
-    return this.filterChildren(path).map(element => ({
+    return this.filterChildren(path, selectedRevisions).map(element => ({
       ...element,
-      descendantStatuses: this.getTerminalNodeStatuses(element.path),
+      descendantStatuses: this.getTerminalNodeStatuses(
+        element.path,
+        selectedRevisions
+      ),
       hasChildren: this.getHasChildren(element, multiSourceEncoding),
       label: element.label,
       status: this.status[element.path]
@@ -106,8 +110,17 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
       .map(({ path }) => path)
   }
 
-  private filterChildren(path: string | undefined): PlotPath[] {
+  private filterChildren(
+    path: string | undefined,
+    selectedRevisions: string[]
+  ): PlotPath[] {
     return this.data.filter(element => {
+      if (
+        !selectedRevisions.some(revision => element.revisions.has(revision))
+      ) {
+        return false
+      }
+
       if (!path) {
         return !element.parentPath
       }

@@ -4,6 +4,7 @@ import { PathType } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import { buildMockMemento } from '../../test/util'
 import { TemplatePlotGroup } from '../webview/contract'
+import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 
 describe('PathsModel', () => {
   const mockDvcRoot = 'test'
@@ -12,7 +13,7 @@ describe('PathsModel', () => {
   const logsLoss = join('logs', 'loss.tsv')
   const plotsAcc = join('plots', 'acc.png')
 
-  it('should return the expected columns when given the default output fixture', () => {
+  it('should return the expected paths when given the default output fixture', () => {
     const comparisonType = new Set([PathType.COMPARISON])
     const singleType = new Set([PathType.TEMPLATE_SINGLE])
     const multiType = new Set([PathType.TEMPLATE_MULTI])
@@ -25,6 +26,13 @@ describe('PathsModel', () => {
         label: 'acc.png',
         parentPath: 'plots',
         path: plotsAcc,
+        revisions: new Set([
+          'workspace',
+          '53c3851',
+          '4fb124a',
+          '42b8736',
+          '1ba7bcd'
+        ]),
         selected: true,
         type: comparisonType
       },
@@ -33,6 +41,13 @@ describe('PathsModel', () => {
         label: 'heatmap.png',
         parentPath: 'plots',
         path: join('plots', 'heatmap.png'),
+        revisions: new Set([
+          'workspace',
+          '53c3851',
+          '4fb124a',
+          '42b8736',
+          '1ba7bcd'
+        ]),
         selected: true,
         type: comparisonType
       },
@@ -41,6 +56,13 @@ describe('PathsModel', () => {
         label: 'loss.png',
         parentPath: 'plots',
         path: join('plots', 'loss.png'),
+        revisions: new Set([
+          'workspace',
+          '53c3851',
+          '4fb124a',
+          '42b8736',
+          '1ba7bcd'
+        ]),
         selected: true,
         type: comparisonType
       },
@@ -49,6 +71,13 @@ describe('PathsModel', () => {
         label: 'loss.tsv',
         parentPath: 'logs',
         path: logsLoss,
+        revisions: new Set([
+          'workspace',
+          '53c3851',
+          '4fb124a',
+          '42b8736',
+          '1ba7bcd'
+        ]),
         selected: true,
         type: singleType
       },
@@ -57,6 +86,13 @@ describe('PathsModel', () => {
         label: 'acc.tsv',
         parentPath: 'logs',
         path: logsAcc,
+        revisions: new Set([
+          'workspace',
+          '53c3851',
+          '4fb124a',
+          '42b8736',
+          '1ba7bcd'
+        ]),
         selected: true,
         type: singleType
       },
@@ -65,6 +101,13 @@ describe('PathsModel', () => {
         label: 'predictions.json',
         parentPath: undefined,
         path: 'predictions.json',
+        revisions: new Set([
+          'workspace',
+          '53c3851',
+          '4fb124a',
+          '42b8736',
+          '1ba7bcd'
+        ]),
         selected: true,
         type: multiType
       }
@@ -98,13 +141,13 @@ describe('PathsModel', () => {
 
     expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
 
-    model.toggleStatus(logsAcc)
+    model.toggleStatus(logsAcc, [EXPERIMENT_WORKSPACE_ID])
 
     const newOrder = model.getTemplateOrder()
 
     expect(newOrder).toStrictEqual([logsLossGroup, multiViewGroup])
 
-    model.toggleStatus(logsAcc)
+    model.toggleStatus(logsAcc, [EXPERIMENT_WORKSPACE_ID])
 
     expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
   })
@@ -115,7 +158,7 @@ describe('PathsModel', () => {
 
     expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
 
-    model.toggleStatus(logsAcc)
+    model.toggleStatus(logsAcc, [EXPERIMENT_WORKSPACE_ID])
 
     const newOrder = model.getTemplateOrder()
 
@@ -123,7 +166,7 @@ describe('PathsModel', () => {
 
     model.setTemplateOrder([multiViewGroup, logsLossGroup])
 
-    model.toggleStatus(logsAcc)
+    model.toggleStatus(logsAcc, [EXPERIMENT_WORKSPACE_ID])
 
     expect(model.getTemplateOrder()).toStrictEqual([
       multiViewGroup,
@@ -140,7 +183,7 @@ describe('PathsModel', () => {
 
     model.setTemplateOrder([logsLossGroup, logsAccGroup, multiViewGroup])
 
-    model.toggleStatus('predictions.json')
+    model.toggleStatus('predictions.json', [EXPERIMENT_WORKSPACE_ID])
 
     expect(model.getTemplateOrder()).toStrictEqual([originalSingleViewGroup])
   })
@@ -170,11 +213,16 @@ describe('PathsModel', () => {
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
     model.transformAndSet(plotsDiffFixture)
 
-    const rootChildren = model.getChildren(undefined, {
-      'predictions.json': {
-        strokeDash: { field: '', scale: { domain: [], range: [] } }
+    const rootChildren = model.getChildren(
+      undefined,
+      [EXPERIMENT_WORKSPACE_ID],
+      {
+        'predictions.json': {
+          strokeDash: { field: '', scale: { domain: [], range: [] } }
+        }
       }
-    })
+    )
+
     expect(rootChildren).toStrictEqual([
       {
         descendantStatuses: [2, 2, 2],
@@ -182,6 +230,13 @@ describe('PathsModel', () => {
         label: 'plots',
         parentPath: undefined,
         path: 'plots',
+        revisions: new Set([
+          'workspace',
+          '53c3851',
+          '4fb124a',
+          '42b8736',
+          '1ba7bcd'
+        ]),
         status: 2
       },
       {
@@ -190,6 +245,13 @@ describe('PathsModel', () => {
         label: 'logs',
         parentPath: undefined,
         path: 'logs',
+        revisions: new Set([
+          'workspace',
+          '53c3851',
+          '4fb124a',
+          '42b8736',
+          '1ba7bcd'
+        ]),
         status: 2
       },
       {
@@ -198,12 +260,21 @@ describe('PathsModel', () => {
         label: 'predictions.json',
         parentPath: undefined,
         path: 'predictions.json',
+        revisions: new Set([
+          'workspace',
+          '53c3851',
+          '4fb124a',
+          '42b8736',
+          '1ba7bcd'
+        ]),
         status: 2,
         type: new Set([PathType.TEMPLATE_MULTI])
       }
     ])
 
-    const directoryChildren = model.getChildren('logs')
+    const directoryChildren = model.getChildren('logs', [
+      EXPERIMENT_WORKSPACE_ID
+    ])
     expect(directoryChildren).toStrictEqual([
       {
         descendantStatuses: [],
@@ -211,6 +282,13 @@ describe('PathsModel', () => {
         label: 'loss.tsv',
         parentPath: 'logs',
         path: logsLoss,
+        revisions: new Set([
+          'workspace',
+          '53c3851',
+          '4fb124a',
+          '42b8736',
+          '1ba7bcd'
+        ]),
         status: 2,
         type: new Set([PathType.TEMPLATE_SINGLE])
       },
@@ -220,19 +298,30 @@ describe('PathsModel', () => {
         label: 'acc.tsv',
         parentPath: 'logs',
         path: logsAcc,
+        revisions: new Set([
+          'workspace',
+          '53c3851',
+          '4fb124a',
+          '42b8736',
+          '1ba7bcd'
+        ]),
         status: 2,
         type: new Set([PathType.TEMPLATE_SINGLE])
       }
     ])
 
-    const plotsWithEncoding = model.getChildren('logs', {
-      [logsAcc]: {
-        strokeDash: { field: '', scale: { domain: [], range: [] } }
-      },
-      [logsLoss]: {
-        strokeDash: { field: '', scale: { domain: [], range: [] } }
+    const plotsWithEncoding = model.getChildren(
+      'logs',
+      [EXPERIMENT_WORKSPACE_ID],
+      {
+        [logsAcc]: {
+          strokeDash: { field: '', scale: { domain: [], range: [] } }
+        },
+        [logsLoss]: {
+          strokeDash: { field: '', scale: { domain: [], range: [] } }
+        }
       }
-    })
+    )
     expect(plotsWithEncoding).toStrictEqual([
       {
         descendantStatuses: [],
@@ -240,6 +329,13 @@ describe('PathsModel', () => {
         label: 'loss.tsv',
         parentPath: 'logs',
         path: logsLoss,
+        revisions: new Set([
+          'workspace',
+          '53c3851',
+          '4fb124a',
+          '42b8736',
+          '1ba7bcd'
+        ]),
         status: 2,
         type: new Set([PathType.TEMPLATE_SINGLE])
       },
@@ -249,12 +345,19 @@ describe('PathsModel', () => {
         label: 'acc.tsv',
         parentPath: 'logs',
         path: logsAcc,
+        revisions: new Set([
+          'workspace',
+          '53c3851',
+          '4fb124a',
+          '42b8736',
+          '1ba7bcd'
+        ]),
         status: 2,
         type: new Set([PathType.TEMPLATE_SINGLE])
       }
     ])
 
-    const noChildren = model.getChildren(logsLoss)
+    const noChildren = model.getChildren(logsLoss, [EXPERIMENT_WORKSPACE_ID])
     expect(noChildren).toStrictEqual([])
   })
 
