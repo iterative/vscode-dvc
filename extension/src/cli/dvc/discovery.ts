@@ -159,15 +159,17 @@ const processVersionDetails = (
 
 const tryGlobalFallbackVersion = async (
   extension: IExtension,
-  cwd: string
+  cwd: string,
+  recheck: boolean
 ): Promise<CanRunCli> => {
   const tryGlobal = await getVersionDetails(extension, cwd, true)
   const { cliCompatible, isAvailable, isCompatible, version } = tryGlobal
 
-  if (extension.hasRoots() && !isCompatible) {
+  if (!recheck && extension.hasRoots() && !isCompatible) {
     warnUserCLIInaccessibleAnywhere(extension, version)
   }
   if (
+    !recheck &&
     extension.hasRoots() &&
     cliCompatible === CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED
   ) {
@@ -183,7 +185,8 @@ const tryGlobalFallbackVersion = async (
 
 const extensionCanAutoRunCli = async (
   extension: IExtension,
-  cwd: string
+  cwd: string,
+  recheck: boolean
 ): Promise<CanRunCli> => {
   const {
     cliCompatible: pythonCliCompatible,
@@ -193,7 +196,7 @@ const extensionCanAutoRunCli = async (
   } = await getVersionDetails(extension, cwd)
 
   if (pythonCliCompatible === CliCompatible.NO_NOT_FOUND) {
-    return tryGlobalFallbackVersion(extension, cwd)
+    return tryGlobalFallbackVersion(extension, cwd, recheck)
   }
   return processVersionDetails(
     extension,
@@ -206,10 +209,11 @@ const extensionCanAutoRunCli = async (
 
 export const extensionCanRunCli = async (
   extension: IExtension,
-  cwd: string
+  cwd: string,
+  recheck: boolean
 ): Promise<CanRunCli> => {
   if (await extension.isPythonExtensionUsed()) {
-    return extensionCanAutoRunCli(extension, cwd)
+    return extensionCanAutoRunCli(extension, cwd, recheck)
   }
 
   const { cliCompatible, isAvailable, isCompatible, version } =

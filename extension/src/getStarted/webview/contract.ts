@@ -1,1 +1,4 @@
-export type GetStartedData = undefined
+export type GetStartedData = {
+  cliAccessible: boolean
+  projectInitialized: boolean
+}

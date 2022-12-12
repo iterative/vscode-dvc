@@ -4,34 +4,55 @@ import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Resource } from '../resourceLocator'
-import { AvailableCommands, InternalCommands } from '../commands/internal'
 
 export type GetStartedWebview = BaseWebview<TGetStartedData>
 
 export class GetStarted extends BaseRepository<TGetStartedData> {
   public readonly viewKey = ViewKey.GET_STARTED
 
-  private internalCommands: InternalCommands
+  private webviewMessages: WebviewMessages
+  private initProject: () => void
+  private showExperiments: () => void
+  private getCliAccessible: () => boolean
+  private getHasRoots: () => boolean
 
   constructor(
     dvcRoot: string,
-    internalCommands: InternalCommands,
-    webviewIcon: Resource
+    webviewIcon: Resource,
+    initProject: () => void,
+    showExperiments: () => void,
+    getCliAccessible: () => boolean,
+    getHasRoots: () => boolean
   ) {
     super(dvcRoot, webviewIcon)
 
-    this.createWebviewMessageHandler()
-    this.internalCommands = internalCommands
+    this.webviewMessages = this.createWebviewMessageHandler()
+
+    if (this.webview) {
+      this.sendDataToWebview()
+    }
+    this.getCliAccessible = getCliAccessible
+    this.getHasRoots = getHasRoots
+    this.initProject = initProject
+    this.showExperiments = showExperiments
   }
 
   public sendInitialWebviewData() {
-    return undefined
+    return this.sendDataToWebview()
+  }
+
+  public sendDataToWebview() {
+    this.webviewMessages.sendWebviewMessage(
+      this.getCliAccessible(),
+      this.getHasRoots()
+    )
   }
 
   private createWebviewMessageHandler() {
     const webviewMessages = new WebviewMessages(
       () => this.getWebview(),
-      () => this.initializeProject()
+      () => this.initProject(),
+      () => this.showExperiments()
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>
@@ -39,9 +60,5 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
       )
     )
     return webviewMessages
-  }
-
-  private initializeProject() {
-    this.internalCommands.executeCommand(AvailableCommands.INIT)
   }
 }
