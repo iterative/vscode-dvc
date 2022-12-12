@@ -20,6 +20,13 @@ describe('PathsModel', () => {
 
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
     model.transformAndSet(plotsDiffFixture)
+    model.setSelectedRevisions([
+      'workspace',
+      '53c3851',
+      '4fb124a',
+      '42b8736',
+      '1ba7bcd'
+    ])
     expect(model.getTerminalNodes()).toStrictEqual([
       {
         hasChildren: false,

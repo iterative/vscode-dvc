@@ -75,6 +75,12 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     }))
   }
 
+  public getTerminalNodes(): (PlotPath & { selected: boolean })[] {
+    return this.data
+      .filter(element => !element.hasChildren && this.hasRevisions(element))
+      .map(element => ({ ...element, selected: !!this.status[element.path] }))
+  }
+
   public getTemplateOrder(): TemplateOrder {
     return collectTemplateOrder(
       this.getPathsByType(PathType.TEMPLATE_SINGLE),
@@ -114,11 +120,7 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
 
   private filterChildren(path: string | undefined): PlotPath[] {
     return this.data.filter(element => {
-      if (
-        !this.selectedRevisions.some(revision =>
-          element.revisions.has(revision)
-        )
-      ) {
+      if (!this.hasRevisions(element)) {
         return false
       }
 
@@ -143,5 +145,9 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     }
 
     return element.hasChildren
+  }
+
+  private hasRevisions({ revisions }: PlotPath) {
+    return this.selectedRevisions.some(revision => revisions.has(revision))
   }
 }

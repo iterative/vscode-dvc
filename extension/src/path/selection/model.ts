@@ -43,12 +43,6 @@ export abstract class PathSelectionModel<
     )
   }
 
-  public getTerminalNodes(): (T & { selected: boolean })[] {
-    return this.data
-      .filter(element => !element.hasChildren)
-      .map(element => ({ ...element, selected: !!this.status[element.path] }))
-  }
-
   public toggleStatus(path: string) {
     const status = this.getNextStatus(path)
     return this.setStatus(path, status)
@@ -159,4 +153,6 @@ export abstract class PathSelectionModel<
   abstract getChildren(
     ...args: unknown[]
   ): (T & { descendantStatuses: Status[]; label: string; status: Status })[]
+
+  abstract getTerminalNodes(): (T & { selected: boolean })[]
 }

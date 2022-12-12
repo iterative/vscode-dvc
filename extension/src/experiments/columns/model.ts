@@ -91,6 +91,12 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     })
   }
 
+  public getTerminalNodes(): (Column & { selected: boolean })[] {
+    return this.data
+      .filter(element => !element.hasChildren)
+      .map(element => ({ ...element, selected: !!this.status[element.path] }))
+  }
+
   public hasNonDefaultColumns() {
     return this.data.length > 1
   }
