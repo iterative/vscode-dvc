@@ -12,7 +12,7 @@ export const DVCLIVE_ONLY_RUNNING_SIGNAL_FILE = join(
   'tmp',
   'exps',
   'run',
-  'dvclive_only'
+  'DVCLIVE_ONLY'
 )
 
 export const NUM_OF_COMMITS_TO_SHOW = '3'

@@ -313,7 +313,7 @@ const collectFromBranchesObject = (
 
 export const collectExperiments = (
   data: ExperimentsOutput,
-  dvclive_only = false
+  dvcLiveOnly = false
 ): ExperimentsAccumulator => {
   const { workspace, ...branchesObject } = data
 
@@ -323,7 +323,7 @@ export const collectExperiments = (
     EXPERIMENT_WORKSPACE_ID
   )
 
-  if (dvclive_only) {
+  if (dvcLiveOnly) {
     workspaceBaseline.executor = EXPERIMENT_WORKSPACE_ID
     workspaceBaseline.status = ExperimentStatus.RUNNING
   }

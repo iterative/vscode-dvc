@@ -1,4 +1,5 @@
-import { executeProcess } from './processExecution'
+import process from 'process'
+import { executeProcess, processExists } from './processExecution'
 
 describe('executeProcess', () => {
   it('should be able to run a process', async () => {
@@ -18,5 +19,14 @@ describe('executeProcess', () => {
         executable: 'find'
       })
     ).rejects.toBeTruthy()
+  })
+})
+
+describe('processExists', () => {
+  it('should return true if the process exists', async () => {
+    expect(await processExists(process.pid)).toBe(true)
+  })
+  it('should return false if it does not', async () => {
+    expect(await processExists(-123.321)).toBe(false)
   })
 })
