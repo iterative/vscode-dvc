@@ -189,6 +189,7 @@ describe('PathsModel', () => {
   it('should merge template plots groups when a path is unselected', () => {
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
     model.transformAndSet(plotsDiffFixture, {})
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     model.setTemplateOrder([logsLossGroup, logsAccGroup, multiViewGroup])
 
@@ -200,6 +201,7 @@ describe('PathsModel', () => {
   it('should retain the order of the comparison paths when changed', () => {
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
     model.transformAndSet(plotsDiffFixture, {})
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     expect(model.getComparisonPaths()).toStrictEqual([
       join('plots', 'acc.png'),

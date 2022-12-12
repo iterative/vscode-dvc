@@ -35,6 +35,7 @@ export abstract class PathSelectionModel<
     }
   }
 
+  // possibly needs update
   public getSelected() {
     return (
       this.data.filter(

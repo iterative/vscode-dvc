@@ -54,7 +54,7 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
 
   public setTemplateOrder(templateOrder?: TemplateOrder) {
     const filter = (type: PathType, plotPath: PlotPath) =>
-      !!plotPath.type?.has(type)
+      !!plotPath.type?.has(type) && this.hasRevisions(plotPath)
 
     this.templateOrder = collectTemplateOrder(
       this.getPathsByType(PathType.TEMPLATE_SINGLE, filter),
@@ -114,7 +114,11 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
   private getPathsByType(
     type: PathType,
     filter = (type: PathType, plotPath: PlotPath) =>
-      !!(plotPath.type?.has(type) && this.status[plotPath.path])
+      !!(
+        plotPath.type?.has(type) &&
+        this.status[plotPath.path] &&
+        this.hasRevisions(plotPath)
+      )
   ) {
     return this.data
       .filter(plotPath => filter(type, plotPath))
