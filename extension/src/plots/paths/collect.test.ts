@@ -15,7 +15,7 @@ import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 
 describe('collectPath', () => {
   it('should return the expected data from the test fixture', () => {
-    expect(collectPaths([], plotsDiffFixture)).toStrictEqual([
+    expect(collectPaths([], plotsDiffFixture, {})).toStrictEqual([
       {
         hasChildren: false,
         label: 'acc.png',

@@ -211,7 +211,7 @@ export class Plots extends BaseRepository<TPlotsData> {
       this.data.onDidUpdate(async ({ data, revs }) => {
         await Promise.all([
           this.plots.transformAndSetPlots(data, revs),
-          this.paths.transformAndSet(data)
+          this.paths.transformAndSet(data, this.plots.getCLIIdToLabel())
         ])
         this.notifyChanged()
       })

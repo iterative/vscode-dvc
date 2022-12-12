@@ -349,6 +349,16 @@ export class PlotsModel extends ModelWithPersistence {
     return this.multiSourceEncoding
   }
 
+  public getCLIIdToLabel() {
+    const mapping: { [shortSha: string]: string } = {}
+
+    for (const rev of this.experiments.getRevisions()) {
+      mapping[this.getCLIId(rev)] = rev
+    }
+
+    return mapping
+  }
+
   private removeStaleData() {
     return Promise.all([
       this.removeStaleBranches(),
@@ -395,16 +405,6 @@ export class PlotsModel extends ModelWithPersistence {
     delete this.revisionData[id]
     delete this.comparisonData[id]
     this.fetchedRevs.delete(id)
-  }
-
-  private getCLIIdToLabel() {
-    const mapping: { [shortSha: string]: string } = {}
-
-    for (const rev of this.experiments.getRevisions()) {
-      mapping[this.getCLIId(rev)] = rev
-    }
-
-    return mapping
   }
 
   private getCLIId(label: string) {

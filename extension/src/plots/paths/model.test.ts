@@ -19,7 +19,7 @@ describe('PathsModel', () => {
     const multiType = new Set([PathType.TEMPLATE_MULTI])
 
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
-    model.transformAndSet(plotsDiffFixture)
+    model.transformAndSet(plotsDiffFixture, {})
     model.setSelectedRevisions([
       'workspace',
       '53c3851',
@@ -144,7 +144,7 @@ describe('PathsModel', () => {
 
   it('should retain the order of template paths when they are unselected', () => {
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
-    model.transformAndSet(plotsDiffFixture)
+    model.transformAndSet(plotsDiffFixture, {})
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
@@ -162,7 +162,7 @@ describe('PathsModel', () => {
 
   it('should move unselected plots to the end when a reordering occurs', () => {
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
-    model.transformAndSet(plotsDiffFixture)
+    model.transformAndSet(plotsDiffFixture, {})
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
@@ -188,7 +188,7 @@ describe('PathsModel', () => {
 
   it('should merge template plots groups when a path is unselected', () => {
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
-    model.transformAndSet(plotsDiffFixture)
+    model.transformAndSet(plotsDiffFixture, {})
 
     model.setTemplateOrder([logsLossGroup, logsAccGroup, multiViewGroup])
 
@@ -199,7 +199,7 @@ describe('PathsModel', () => {
 
   it('should retain the order of the comparison paths when changed', () => {
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
-    model.transformAndSet(plotsDiffFixture)
+    model.transformAndSet(plotsDiffFixture, {})
 
     expect(model.getComparisonPaths()).toStrictEqual([
       join('plots', 'acc.png'),
@@ -220,7 +220,7 @@ describe('PathsModel', () => {
 
   it('should return the expected children from the test fixture', () => {
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
-    model.transformAndSet(plotsDiffFixture)
+    model.transformAndSet(plotsDiffFixture, {})
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     const rootChildren = model.getChildren(undefined, {
@@ -363,12 +363,15 @@ describe('PathsModel', () => {
 
   it('should not provide error as a path when the CLI throws an error', () => {
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
-    model.transformAndSet({
-      error: {
-        msg: 'UNEXPECTED ERROR: a strange thing happened',
-        type: 'Caught Error'
-      }
-    })
+    model.transformAndSet(
+      {
+        error: {
+          msg: 'UNEXPECTED ERROR: a strange thing happened',
+          type: 'Caught Error'
+        }
+      },
+      {}
+    )
 
     expect(model.getTerminalNodes()).toStrictEqual([])
   })

@@ -61,7 +61,7 @@ const getType = (
   return collectType(plots)
 }
 
-const collectPath = (
+const collectOrderedPath = (
   acc: PlotPath[],
   data: PlotsOutput,
   revisions: Set<string>,
@@ -70,15 +70,15 @@ const collectPath = (
 ) => {
   const path = getPath(pathArray, idx)
 
-  const existing = acc.find(({ path: existingPath }) => existingPath === path)
-
-  if (existing) {
-    acc = acc.filter(({ path: existingPath }) => existingPath === path)
-    acc.push({
-      ...existing,
-      revisions: new Set([...existing.revisions, ...revisions])
-    })
-    return
+  if (acc.some(({ path: existingPath }) => existingPath === path)) {
+    return acc.map(existing =>
+      existing.path === path
+        ? {
+            ...existing,
+            revisions: new Set([...existing.revisions, ...revisions])
+          }
+        : existing
+    )
   }
 
   const hasChildren = idx !== pathArray.length
@@ -97,23 +97,28 @@ const collectPath = (
   }
 
   acc.push(plotPath)
+  return acc
 }
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
-const collectPathRevisions = (data: PlotsOutput, path: string): Set<string> => {
+const collectPathRevisions = (
+  data: PlotsOutput,
+  path: string,
+  cliIdToLabel: { [id: string]: string }
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+): Set<string> => {
   const revisions = new Set<string>()
   const pathData = data[path]
   for (const plot of pathData) {
     if (isImagePlot(plot)) {
       if (plot.revisions?.[0]) {
-        revisions.add(plot.revisions[0])
+        revisions.add(cliIdToLabel[plot.revisions[0]] || plot.revisions[0])
       }
     } else {
       for (const [revision, datapoints] of Object.entries(
         plot?.datapoints || {}
       )) {
         if (datapoints.length > 0) {
-          revisions.add(revision)
+          revisions.add(cliIdToLabel[revision] || revision)
         }
       }
     }
@@ -124,16 +129,16 @@ const collectPathRevisions = (data: PlotsOutput, path: string): Set<string> => {
 
 export const collectPaths = (
   existingPaths: PlotPath[],
-  data: PlotsOutput
+  data: PlotsOutput,
+  cliIdToLabel: { [id: string]: string } = {}
 ): PlotPath[] => {
-  const acc: PlotPath[] = [...existingPaths]
+  let acc: PlotPath[] = [...existingPaths]
 
   const paths = Object.keys(data)
 
   for (const path of paths) {
-    // need cliIdToLabel[id]
     // need to remove collected revisions as they might change (workspace) => pass in revs and is workspace is present remove the key for each entry.
-    const revisions = collectPathRevisions(data, path)
+    const revisions = collectPathRevisions(data, path, cliIdToLabel)
 
     if (revisions.size === 0) {
       continue
@@ -142,7 +147,7 @@ export const collectPaths = (
     const pathArray = getPathArray(path)
 
     for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
-      collectPath(acc, data, revisions, pathArray, reverseIdx)
+      acc = collectOrderedPath(acc, data, revisions, pathArray, reverseIdx)
     }
   }
 
