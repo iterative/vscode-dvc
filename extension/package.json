@@ -1375,7 +1375,7 @@
       },
       {
         "view": "dvc.views.welcome",
-        "contents": "The currently open folder does not contain a DVC project. You can initialize a project which will enable features powered by DVC.\n[Initialize Project](command:dvc.init)\nTo learn more about how to use DVC please read [our docs](https://dvc.org/doc).",
+        "contents": "The current workspace does not contain a DVC project. You can initialize a project which will enable features powered by DVC.\n[Initialize Project](command:dvc.init)\nTo learn more about how to use DVC please read [our docs](https://dvc.org/doc).",
         "when": "dvc.commands.available && !dvc.cli.incompatible && !dvc.project.available"
       },
       {
@@ -1583,7 +1583,7 @@
     "@types/chai-as-promised": "7.1.5",
     "@types/copy-webpack-plugin": "10.1.0",
     "@types/fs-extra": "9.0.13",
-    "@types/jest": "29.2.3",
+    "@types/jest": "29.2.4",
     "@types/js-yaml": "4.0.5",
     "@types/lodash.clonedeep": "4.5.7",
     "@types/lodash.get": "4.4.7",
@@ -1622,7 +1622,7 @@
     "wdio-vscode-service": "4.2.1",
     "webdriverio": "7.27.0",
     "webpack": "5.75.0",
-    "webpack-cli": "5.0.0"
+    "webpack-cli": "5.0.1"
   },
   "peerDependencies": {
     "typescript": "*"

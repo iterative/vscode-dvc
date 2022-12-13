@@ -32,6 +32,7 @@ import { PlotsData } from '../../plots/webview/contract'
 import { TableData } from '../../experiments/webview/contract'
 import { DvcExecutor } from '../../cli/dvc/executor'
 import { GitReader } from '../../cli/git/reader'
+import { GetStartedData } from '../../getStarted/webview/contract'
 
 export const mockDisposable = {
   dispose: stub()
@@ -197,7 +198,7 @@ export const buildDependencies = (
 }
 
 export const getMessageReceivedEmitter = (
-  webview: BaseWebview<PlotsData | TableData>
+  webview: BaseWebview<PlotsData | TableData | GetStartedData>
 ): EventEmitter<MessageFromWebview> => (webview as any).messageReceived
 
 export const getInputBoxEvent = (mockInputValue: string) => {
