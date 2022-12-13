@@ -5,7 +5,7 @@ import {
   TemplatePlot,
   TemplatePlotGroup
 } from '../webview/contract'
-import { PlotsOutput } from '../../cli/dvc/contract'
+import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../cli/dvc/contract'
 import { getParent, getPath, getPathArray } from '../../fileSystem/util'
 import { splitMatchedOrdered, definedAndNonEmpty } from '../../util/array'
 import { isMultiViewPlot } from '../vega/util'
@@ -106,6 +106,21 @@ const collectOrderedPath = (
   return acc
 }
 
+const filterWorkspaceIfFetched = (
+  existingPaths: PlotPath[],
+  fetchedRevs: string[]
+) => {
+  if (!fetchedRevs.includes(EXPERIMENT_WORKSPACE_ID)) {
+    return existingPaths
+  }
+
+  return existingPaths.map(existing => {
+    const revisions = existing.revisions
+    revisions.delete(EXPERIMENT_WORKSPACE_ID)
+    return { ...existing, revisions }
+  })
+}
+
 const collectImageRevision = (
   acc: Set<string>,
   plot: ImagePlot,
@@ -151,14 +166,14 @@ const collectPathRevisions = (
 export const collectPaths = (
   existingPaths: PlotPath[],
   data: PlotsOutput,
-  cliIdToLabel: { [id: string]: string } = {}
+  fetchedRevs: string[],
+  cliIdToLabel: { [id: string]: string }
 ): PlotPath[] => {
-  let acc: PlotPath[] = [...existingPaths]
+  let acc: PlotPath[] = filterWorkspaceIfFetched(existingPaths, fetchedRevs)
 
   const paths = Object.keys(data)
 
   for (const path of paths) {
-    // need to remove collected revisions as they might change (workspace) => pass in revs and is workspace is present remove the key for each entry.
     const revisions = collectPathRevisions(data, path, cliIdToLabel)
 
     if (revisions.size === 0) {
