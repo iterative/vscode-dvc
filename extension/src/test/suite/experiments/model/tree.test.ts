@@ -52,6 +52,7 @@ import { WorkspaceExperiments } from '../../../../experiments/workspace'
 import { ColumnType } from '../../../../experiments/webview/contract'
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
 import { ExperimentItem } from '../../../../experiments/model/collect'
+import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -160,7 +161,7 @@ suite('Experiments Tree Test Suite', () => {
               ...expShowFixture['53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'][
                 '4fb124aebddb2adf1545030907687fa9a4c80e70'
               ].data,
-              executor: 'workspace'
+              executor: EXPERIMENT_WORKSPACE_ID
             }
           },
           baseline:
@@ -169,8 +170,9 @@ suite('Experiments Tree Test Suite', () => {
         workspace: expShowFixture.workspace
       })
       const isWorkspaceSelected = (): boolean =>
-        !!experiments.getExperiments().find(({ id }) => id === 'workspace')
-          ?.selected
+        !!experiments
+          .getExperiments()
+          .find(({ id }) => id === EXPERIMENT_WORKSPACE_ID)?.selected
 
       await experiments.isReady()
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
@@ -178,7 +180,7 @@ suite('Experiments Tree Test Suite', () => {
 
       await commands.executeCommand(RegisteredCommands.EXPERIMENT_TOGGLE, {
         dvcRoot: dvcDemoPath,
-        id: 'workspace'
+        id: EXPERIMENT_WORKSPACE_ID
       })
 
       expect(isWorkspaceSelected()).to.be.false
@@ -420,8 +422,8 @@ suite('Experiments Tree Test Suite', () => {
             }
           ],
           group: undefined,
-          id: 'workspace',
-          revision: 'workspace'
+          id: EXPERIMENT_WORKSPACE_ID,
+          revision: EXPERIMENT_WORKSPACE_ID
         },
         {
           displayColor: colors[1],
@@ -560,7 +562,7 @@ suite('Experiments Tree Test Suite', () => {
         '2173124',
         '9523bde',
         'd1343a8',
-        'workspace'
+        EXPERIMENT_WORKSPACE_ID
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -855,7 +857,7 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to queue an experiment from an existing one with dvc.views.experiments.queueExperiment', async () => {
-      const baseExperimentId = 'workspace'
+      const baseExperimentId = EXPERIMENT_WORKSPACE_ID
 
       const { dvcExecutor, experiments, experimentsModel } =
         buildExperiments(disposable)
@@ -918,7 +920,7 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to run a new experiment from an existing one with dvc.views.experiments.runExperiment', async () => {
-      const baseExperimentId = 'workspace'
+      const baseExperimentId = EXPERIMENT_WORKSPACE_ID
 
       const { dvcRunner, experiments, experimentsModel } =
         buildExperiments(disposable)
@@ -977,7 +979,7 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to reset and run a new checkpoint experiment from an existing one with dvc.views.experiments.resetAndRunCheckpointExperiment', async () => {
-      const baseExperimentId = 'workspace'
+      const baseExperimentId = EXPERIMENT_WORKSPACE_ID
 
       const { dvcRunner, experiments, experimentsModel } =
         buildExperiments(disposable)

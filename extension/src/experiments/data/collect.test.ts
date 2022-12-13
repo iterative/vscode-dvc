@@ -1,6 +1,10 @@
 import { join } from 'path'
 import { collectFiles } from './collect'
-import { ExperimentsOutput, ExperimentStatus } from '../../cli/dvc/contract'
+import {
+  ExperimentsOutput,
+  ExperimentStatus,
+  EXPERIMENT_WORKSPACE_ID
+} from '../../cli/dvc/contract'
 import expShowFixture from '../../test/fixtures/expShow/base/output'
 
 describe('collectFiles', () => {
@@ -14,7 +18,7 @@ describe('collectFiles', () => {
 
   it('should handle an error being returned', () => {
     const workspace = {
-      workspace: {
+      [EXPERIMENT_WORKSPACE_ID]: {
         baseline: {
           error: { msg: 'bad things are happening', type: 'today' }
         }
@@ -26,7 +30,7 @@ describe('collectFiles', () => {
 
   it('should handle a missing params key', () => {
     const workspace = {
-      workspace: {
+      [EXPERIMENT_WORKSPACE_ID]: {
         baseline: {
           data: {
             metrics: {
@@ -42,7 +46,7 @@ describe('collectFiles', () => {
 
   it('should handle a missing metrics key', () => {
     const workspace = {
-      workspace: {
+      [EXPERIMENT_WORKSPACE_ID]: {
         baseline: {
           data: {
             params: {
@@ -58,7 +62,7 @@ describe('collectFiles', () => {
 
   it('should collect all of the available files from a more complex example', () => {
     const workspace = {
-      workspace: {
+      [EXPERIMENT_WORKSPACE_ID]: {
         baseline: {
           data: {
             metrics: {
@@ -88,10 +92,10 @@ describe('collectFiles', () => {
 
   it('should not remove a previously collected file if it is deleted (removal breaks live updates logged by dvclive)', () => {
     const workspace = {
-      workspace: {
+      [EXPERIMENT_WORKSPACE_ID]: {
         baseline: {
           data: {
-            executor: 'workspace',
+            executor: EXPERIMENT_WORKSPACE_ID,
             metrics: {},
             params: {
               'params.yaml': {

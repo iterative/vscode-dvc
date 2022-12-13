@@ -12,7 +12,10 @@ import {
   buildMockData,
   mockDisposable
 } from '../util'
-import { ExperimentsOutput } from '../../../cli/dvc/contract'
+import {
+  ExperimentsOutput,
+  EXPERIMENT_WORKSPACE_ID
+} from '../../../cli/dvc/contract'
 import { ExperimentsData } from '../../../experiments/data'
 import { CheckpointsModel } from '../../../experiments/checkpoints/model'
 import { FileSystemData } from '../../../fileSystem/data'
@@ -21,7 +24,9 @@ import { ExperimentsModel } from '../../../experiments/model'
 import { ColumnsModel } from '../../../experiments/columns/model'
 
 const hasCheckpoints = (data: ExperimentsOutput) => {
-  const [experimentsWithBaseline] = Object.values(omit(data, 'workspace'))
+  const [experimentsWithBaseline] = Object.values(
+    omit(data, EXPERIMENT_WORKSPACE_ID)
+  )
   const [firstExperiment] = Object.values(
     omit(experimentsWithBaseline, 'baseline')
   )

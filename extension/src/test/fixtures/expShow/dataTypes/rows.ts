@@ -1,12 +1,15 @@
-import { ExperimentStatus } from '../../../../cli/dvc/contract'
+import {
+  ExperimentStatus,
+  EXPERIMENT_WORKSPACE_ID
+} from '../../../../cli/dvc/contract'
 import { Row } from '../../../../experiments/webview/contract'
 
 const data: Row[] = [
   {
     displayColor: undefined,
     executor: null,
-    id: 'workspace',
-    label: 'workspace',
+    id: EXPERIMENT_WORKSPACE_ID,
+    label: EXPERIMENT_WORKSPACE_ID,
     params: {
       'params.yaml': {
         array: [true, false, 'string', 2],

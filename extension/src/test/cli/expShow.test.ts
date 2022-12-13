@@ -4,6 +4,7 @@ import { expect } from 'chai'
 import { TEMP_DIR } from './constants'
 import { dvcReader, initializeDemoRepo, initializeEmptyRepo } from './util'
 import { dvcDemoPath } from '../util'
+import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 
 suite('exp show --show-json', () => {
   // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -32,7 +33,7 @@ suite('exp show --show-json', () => {
         ).to.be.an('object')
 
         expect(obj.baseline.data?.timestamp, 'should have a timestamp').to.be.a(
-          key === 'workspace' ? 'null' : 'string'
+          key === EXPERIMENT_WORKSPACE_ID ? 'null' : 'string'
         )
 
         expect(obj.baseline.data?.params, 'should have params').to.be.an(
@@ -81,7 +82,7 @@ suite('exp show --show-json', () => {
       const output = await dvcReader.expShow(TEMP_DIR)
 
       expect(output).to.deep.equal({
-        workspace: { baseline: {} }
+        [EXPERIMENT_WORKSPACE_ID]: { baseline: {} }
       })
     })
   })

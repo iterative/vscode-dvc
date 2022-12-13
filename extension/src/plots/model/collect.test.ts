@@ -12,7 +12,11 @@ import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import expShowFixture from '../../test/fixtures/expShow/base/output'
 import modifiedFixture from '../../test/fixtures/expShow/modified/output'
 import checkpointPlotsFixture from '../../test/fixtures/expShow/base/checkpointPlots'
-import { ExperimentsOutput, ExperimentStatus } from '../../cli/dvc/contract'
+import {
+  ExperimentsOutput,
+  ExperimentStatus,
+  EXPERIMENT_WORKSPACE_ID
+} from '../../cli/dvc/contract'
 import { definedAndNonEmpty, sameContents } from '../../util/array'
 import { TemplatePlot } from '../webview/contract'
 import { getCLIBranchId } from '../../test/fixtures/plotsDiff/util'
@@ -201,13 +205,19 @@ describe('collectData', () => {
       '42b8736': '42b8736',
       '4fb124a': '4fb124a',
       '53c3851': 'main',
-      workspace: 'workspace'
+      workspace: EXPERIMENT_WORKSPACE_ID
     }
     const { revisionData, comparisonData } = collectData(
       plotsDiffFixture,
       mapping
     )
-    const revisions = ['workspace', 'main', '42b8736', '1ba7bcd', '4fb124a']
+    const revisions = [
+      EXPERIMENT_WORKSPACE_ID,
+      'main',
+      '42b8736',
+      '1ba7bcd',
+      '4fb124a'
+    ]
 
     const values =
       (logsLossPlot?.datapoints as {
@@ -425,7 +435,7 @@ describe('collectOverrideRevisionDetails', () => {
           }
         ] as SelectedExperimentWithColor[],
         new Set(['a', 'c', 'd', 'e']),
-        { [runningId]: 'workspace' },
+        { [runningId]: EXPERIMENT_WORKSPACE_ID },
         (id: string) =>
           ({
             [runningId]: [
@@ -451,7 +461,7 @@ describe('collectOverrideRevisionDetails', () => {
       )
     expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
       'a',
-      'workspace',
+      EXPERIMENT_WORKSPACE_ID,
       'c',
       'd'
     ])
@@ -469,8 +479,8 @@ describe('collectOverrideRevisionDetails', () => {
         fetched: true,
         firstThreeColumns: [],
         group: undefined,
-        id: 'workspace',
-        revision: 'workspace'
+        id: EXPERIMENT_WORKSPACE_ID,
+        revision: EXPERIMENT_WORKSPACE_ID
       },
       {
         displayColor: '#48bb78',

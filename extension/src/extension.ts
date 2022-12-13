@@ -156,7 +156,14 @@ export class Extension extends Disposable implements IExtension {
     )
 
     this.getStarted = this.dispose.track(
-      new GetStarted('', this.internalCommands, this.resourceLocator.dvcIcon)
+      new GetStarted(
+        '',
+        this.resourceLocator.dvcIcon,
+        () => this.initProject(),
+        () => this.showExperiments(this.dvcRoots[0]),
+        () => this.getAvailable(),
+        () => this.hasRoots()
+      )
     )
 
     this.repositories = this.dispose.track(
@@ -247,10 +254,7 @@ export class Extension extends Disposable implements IExtension {
     this.internalCommands.registerExternalCommand(
       RegisteredCommands.EXPERIMENT_AND_PLOTS_SHOW,
       async (context: VsCodeContext) => {
-        await this.experiments.showWebview(
-          getDvcRootFromContext(context),
-          ViewColumn.Active
-        )
+        await this.showExperiments(getDvcRootFromContext(context))
         await this.plots.showWebview(
           getDvcRootFromContext(context),
           ViewColumn.Beside
@@ -301,13 +305,7 @@ export class Extension extends Disposable implements IExtension {
 
     this.internalCommands.registerExternalCliCommand(
       RegisteredCliCommands.INIT,
-      async () => {
-        const root = getFirstWorkspaceFolder()
-        if (root) {
-          await this.dvcExecutor.init(root)
-          this.workspaceChanged.fire()
-        }
-      }
+      () => this.initProject()
     )
 
     registerRepositoryCommands(this.repositories, this.internalCommands)
@@ -389,6 +387,7 @@ export class Extension extends Disposable implements IExtension {
     )
     this.dvcRoots = nestedRoots.flat().sort()
 
+    this.getStarted.sendDataToWebview()
     return this.setProjectAvailability()
   }
 
@@ -443,7 +442,24 @@ export class Extension extends Disposable implements IExtension {
     this.status.setAvailability(available)
     this.setCommandsAvailability(available)
     this.cliAccessible = available
+    this.getStarted.sendDataToWebview()
     return available
+  }
+
+  public getAvailable() {
+    return this.cliAccessible
+  }
+
+  public async initProject() {
+    const root = getFirstWorkspaceFolder()
+    if (root) {
+      await this.dvcExecutor.init(root)
+      this.workspaceChanged.fire()
+    }
+  }
+
+  private async showExperiments(dvcRoot: string) {
+    return await this.experiments.showWebview(dvcRoot, ViewColumn.Active)
   }
 
   private setCommandsAvailability(available: boolean) {

@@ -32,6 +32,7 @@ jest.mock('./vscode/quickPick')
 jest.mock('./vscode/toast')
 jest.mock('./vscode/workspaceFolders')
 jest.mock('./processExecution')
+jest.mock('./setupUtil')
 
 const mockedExtensions = jest.mocked(extensions)
 const mockedCommands = jest.mocked(commands)
