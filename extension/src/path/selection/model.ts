@@ -35,15 +35,6 @@ export abstract class PathSelectionModel<
     }
   }
 
-  // possibly needs update
-  public getSelected() {
-    return (
-      this.data.filter(
-        element => this.status[element.path] !== Status.UNSELECTED
-      ) || []
-    )
-  }
-
   public toggleStatus(path: string) {
     const status = this.getNextStatus(path)
     return this.setStatus(path, status)

@@ -88,14 +88,14 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   public async selectPlots() {
-    const paths = this.paths.getTerminalNodes() // need to filter to selected revisions
+    const paths = this.paths.getTerminalNodes()
 
     const selected = await pickPaths('plots', paths)
     if (!selected) {
       return
     }
 
-    this.paths.setSelected(selected) // check what having paths missing will do here
+    this.paths.setSelected(selected)
     this.paths.setTemplateOrder()
     return this.notifyChanged()
   }

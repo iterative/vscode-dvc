@@ -6,7 +6,7 @@ import {
   PlotPath,
   TemplateOrder
 } from './collect'
-import { PathSelectionModel } from '../../path/selection/model'
+import { PathSelectionModel, Status } from '../../path/selection/model'
 import { PersistenceKey } from '../../persistence/constants'
 import { performSimpleOrderedUpdate } from '../../util/array'
 import { MultiSourceEncoding } from '../multiSource/collect'
@@ -82,6 +82,16 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     return this.data
       .filter(element => !element.hasChildren && this.hasRevisions(element))
       .map(element => ({ ...element, selected: !!this.status[element.path] }))
+  }
+
+  public getSelected() {
+    return (
+      this.data.filter(
+        element =>
+          this.status[element.path] !== Status.UNSELECTED &&
+          this.hasRevisions(element)
+      ) || []
+    )
   }
 
   public getTemplateOrder(): TemplateOrder {
