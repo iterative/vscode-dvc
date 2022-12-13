@@ -3,7 +3,7 @@ import { PathsModel } from './model'
 import { PathType } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import { buildMockMemento } from '../../test/util'
-import { TemplatePlotGroup } from '../webview/contract'
+import { PlotsType, TemplatePlotGroup } from '../webview/contract'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 
 describe('PathsModel', () => {
@@ -121,6 +121,34 @@ describe('PathsModel', () => {
     ])
   })
 
+  const revWithDifferentPlot = '4c4318d'
+  const differentPlotPath = join('dvclive', 'plots', 'metrics', 'loss.tsv')
+  const singleRevisionPlotFixture = {
+    [differentPlotPath]: [
+      {
+        content: {},
+        datapoints: {
+          [revWithDifferentPlot]: [
+            {
+              loss: '2.29',
+              step: '0'
+            },
+            {
+              loss: '2.27',
+              step: '1'
+            },
+            {
+              loss: '2.25',
+              step: '2'
+            }
+          ]
+        },
+        revisions: [revWithDifferentPlot],
+        type: PlotsType.VEGA
+      }
+    ]
+  }
+
   const multiViewGroup = {
     group: TemplatePlotGroup.MULTI_VIEW,
     paths: ['predictions.json']
@@ -183,6 +211,113 @@ describe('PathsModel', () => {
         group: TemplatePlotGroup.SINGLE_VIEW,
         paths: [logsLoss, logsAcc]
       }
+    ])
+  })
+
+  it('should not update the order of plots when there are no revisions selected', () => {
+    const model = new PathsModel(mockDvcRoot, buildMockMemento())
+    model.transformAndSet(plotsDiffFixture, {})
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
+
+    expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
+
+    model.setSelectedRevisions([])
+    expect(model.getTemplateOrder()).toStrictEqual([])
+
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
+
+    expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
+
+    const newOrder = [logsAccGroup, multiViewGroup, logsLossGroup]
+
+    model.setTemplateOrder(newOrder)
+
+    expect(model.getTemplateOrder()).toStrictEqual(newOrder)
+
+    model.setSelectedRevisions([])
+    expect(model.getTemplateOrder()).toStrictEqual([])
+
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
+
+    expect(model.getTemplateOrder()).toStrictEqual(newOrder)
+  })
+
+  it('should not move plots which do not have the selected revisions if no reordering occurs', () => {
+    const model = new PathsModel(mockDvcRoot, buildMockMemento())
+
+    model.transformAndSet(
+      { ...plotsDiffFixture, ...singleRevisionPlotFixture },
+      {}
+    )
+
+    const expectedOrderAllRevisions = [
+      {
+        ...originalSingleViewGroup,
+        paths: [...originalSingleViewGroup.paths, differentPlotPath]
+      },
+      multiViewGroup
+    ]
+
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
+
+    expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
+
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID, revWithDifferentPlot])
+
+    expect(model.getTemplateOrder()).toStrictEqual(expectedOrderAllRevisions)
+
+    model.setSelectedRevisions([revWithDifferentPlot])
+
+    expect(model.getTemplateOrder()).toStrictEqual([
+      {
+        group: TemplatePlotGroup.SINGLE_VIEW,
+        paths: [differentPlotPath]
+      }
+    ])
+
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID, revWithDifferentPlot])
+
+    expect(model.getTemplateOrder()).toStrictEqual(expectedOrderAllRevisions)
+  })
+
+  it('should move plots which do not have selected revisions to the end when a reordering occurs', () => {
+    const model = new PathsModel(mockDvcRoot, buildMockMemento())
+    model.transformAndSet(
+      { ...plotsDiffFixture, ...singleRevisionPlotFixture },
+      {}
+    )
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
+
+    expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
+
+    model.setTemplateOrder([logsLossGroup, multiViewGroup, logsAccGroup])
+
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID, revWithDifferentPlot])
+
+    expect(model.getTemplateOrder()).toStrictEqual([
+      logsLossGroup,
+      multiViewGroup,
+      {
+        group: TemplatePlotGroup.SINGLE_VIEW,
+        paths: [logsAcc, differentPlotPath]
+      }
+    ])
+  })
+
+  it('should move newly collected plot paths to the end', () => {
+    const model = new PathsModel(mockDvcRoot, buildMockMemento())
+
+    model.transformAndSet(plotsDiffFixture, {})
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
+
+    expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
+
+    model.transformAndSet(singleRevisionPlotFixture, {})
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID, revWithDifferentPlot])
+
+    expect(model.getTemplateOrder()).toStrictEqual([
+      ...originalTemplateOrder,
+      { group: TemplatePlotGroup.SINGLE_VIEW, paths: [differentPlotPath] }
     ])
   })
 
