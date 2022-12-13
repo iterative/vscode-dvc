@@ -32,7 +32,6 @@ jest.mock('./vscode/quickPick')
 jest.mock('./vscode/toast')
 jest.mock('./vscode/workspaceFolders')
 jest.mock('./processExecution')
-jest.mock('./setupUtil')
 
 const mockedExtensions = jest.mocked(extensions)
 const mockedCommands = jest.mocked(commands)
@@ -63,6 +62,7 @@ const mockedVscodePython = {
 }
 
 const mockedCwd = __dirname
+const mockedGetAvailable = jest.fn()
 const mockedGetCliVersion = jest.fn()
 const mockedGetFirstWorkspaceFolder = jest.mocked(getFirstWorkspaceFolder)
 const mockedHasRoots = jest.fn()
@@ -259,6 +259,7 @@ describe('setupWorkspace', () => {
 
 describe('setup', () => {
   const extension = {
+    getAvailable: mockedGetAvailable,
     getCliVersion: mockedGetCliVersion,
     getRoots: mockedGetRoots,
     hasRoots: mockedHasRoots,

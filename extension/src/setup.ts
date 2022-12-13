@@ -10,7 +10,6 @@ import { getFirstWorkspaceFolder } from './vscode/workspaceFolders'
 import { getSelectTitle, Title } from './vscode/title'
 import { isPythonExtensionInstalled } from './extensions/python'
 import { extensionCanRunCli } from './cli/dvc/discovery'
-import { willRecheck } from './setupUtil'
 
 const setConfigPath = async (
   option: ConfigKey,
@@ -156,13 +155,11 @@ export const setupWorkspace = async (): Promise<boolean> => {
 
 export const checkAvailable = async (
   extension: IExtension,
-  dvcRootOrFirstFolder: string,
-  recheck = false
+  dvcRootOrFirstFolder: string
 ) => {
   const { isAvailable, isCompatible } = await extensionCanRunCli(
     extension,
-    dvcRootOrFirstFolder,
-    recheck
+    dvcRootOrFirstFolder
   )
 
   extension.setCliCompatible(isCompatible)
@@ -176,7 +173,6 @@ export const checkAvailable = async (
 
   if (!isAvailable) {
     extension.setAvailable(false)
-    willRecheck(extension, dvcRootOrFirstFolder)
   }
 }
 

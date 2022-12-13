@@ -17,6 +17,7 @@ import {
   isPythonExtensionInstalled,
   selectPythonInterpreter
 } from '../../extensions/python'
+import { getFirstWorkspaceFolder } from '../../vscode/workspaceFolders'
 
 const getToastOptions = (isPythonExtensionInstalled: boolean): Response[] => {
   return isPythonExtensionInstalled
@@ -116,7 +117,9 @@ type CanRunCli = {
   isCompatible: boolean | undefined
 }
 
-const isCliCompatible = (cliCompatible: CliCompatible): boolean | undefined => {
+export const isCliCompatible = (
+  cliCompatible: CliCompatible
+): boolean | undefined => {
   if (cliCompatible === CliCompatible.NO_NOT_FOUND) {
     return
   }
@@ -159,17 +162,15 @@ const processVersionDetails = (
 
 const tryGlobalFallbackVersion = async (
   extension: IExtension,
-  cwd: string,
-  recheck: boolean
+  cwd: string
 ): Promise<CanRunCli> => {
   const tryGlobal = await getVersionDetails(extension, cwd, true)
   const { cliCompatible, isAvailable, isCompatible, version } = tryGlobal
 
-  if (!recheck && extension.hasRoots() && !isCompatible) {
+  if (extension.hasRoots() && !isCompatible) {
     warnUserCLIInaccessibleAnywhere(extension, version)
   }
   if (
-    !recheck &&
     extension.hasRoots() &&
     cliCompatible === CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED
   ) {
@@ -185,8 +186,7 @@ const tryGlobalFallbackVersion = async (
 
 const extensionCanAutoRunCli = async (
   extension: IExtension,
-  cwd: string,
-  recheck: boolean
+  cwd: string
 ): Promise<CanRunCli> => {
   const {
     cliCompatible: pythonCliCompatible,
@@ -196,7 +196,7 @@ const extensionCanAutoRunCli = async (
   } = await getVersionDetails(extension, cwd)
 
   if (pythonCliCompatible === CliCompatible.NO_NOT_FOUND) {
-    return tryGlobalFallbackVersion(extension, cwd, recheck)
+    return tryGlobalFallbackVersion(extension, cwd)
   }
   return processVersionDetails(
     extension,
@@ -209,11 +209,10 @@ const extensionCanAutoRunCli = async (
 
 export const extensionCanRunCli = async (
   extension: IExtension,
-  cwd: string,
-  recheck: boolean
+  cwd: string
 ): Promise<CanRunCli> => {
   if (await extension.isPythonExtensionUsed()) {
-    return extensionCanAutoRunCli(extension, cwd, recheck)
+    return extensionCanAutoRunCli(extension, cwd)
   }
 
   const { cliCompatible, isAvailable, isCompatible, version } =
@@ -226,4 +225,27 @@ export const extensionCanRunCli = async (
     isAvailable,
     isCompatible
   )
+}
+
+export const recheckGlobal = async (
+  extension: IExtension,
+  setup: () => Promise<void[] | undefined>
+): Promise<void> => {
+  const roots = extension.getRoots()
+  const cwd = roots.length > 0 ? roots[0] : getFirstWorkspaceFolder()
+
+  if (!cwd || extension.getAvailable()) {
+    return
+  }
+
+  const version = await extension.getCliVersion(cwd, true)
+  const cliCompatible = isVersionCompatible(version)
+  const isCompatible = isCliCompatible(cliCompatible)
+
+  if (!isCompatible) {
+    setTimeout(() => recheckGlobal(extension, setup), 5000)
+    return
+  }
+
+  setup()
 }

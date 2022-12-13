@@ -62,6 +62,7 @@ import { createFileSystemWatcher } from './fileSystem/watcher'
 import { GitExecutor } from './cli/git/executor'
 import { GitReader } from './cli/git/reader'
 import { GetStarted } from './getStarted'
+import { recheckGlobal } from './cli/dvc/discovery'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
@@ -205,13 +206,17 @@ export class Extension extends Disposable implements IExtension {
     )
 
     setup(this)
-      .then(async () =>
+      .then(async () => {
         sendTelemetryEvent(
           EventName.EXTENSION_LOAD,
           await this.getEventProperties(),
           { duration: stopWatch.getElapsedTime() }
         )
-      )
+
+        if (!this.cliAccessible) {
+          recheckGlobal(this, () => setup(this))
+        }
+      })
       .catch(async error =>
         sendTelemetryEventAndThrow(
           EventName.EXTENSION_LOAD,

@@ -22,6 +22,7 @@ import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../commands/external'
+import * as Discovery from '../../cli/dvc/discovery'
 import * as Setup from '../../setup'
 import * as Telemetry from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
@@ -55,7 +56,6 @@ suite('Extension Test Suite', () => {
     ])
   })
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('dvc.setupWorkspace', () => {
     it('should set dvc.dvcPath to the default when dvc is installed in a virtual environment', async () => {
       stub(Python, 'isPythonExtensionInstalled').returns(true)
@@ -359,6 +359,7 @@ suite('Extension Test Suite', () => {
 
       const mockErrorMessage = 'NOPE'
       stub(Setup, 'setupWorkspace').rejects(new Error(mockErrorMessage))
+      stub(Discovery, 'recheckGlobal').resolves(undefined)
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
       await expect(
