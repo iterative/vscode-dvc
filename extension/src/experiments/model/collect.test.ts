@@ -8,11 +8,14 @@ import {
 
 describe('collectExperiments', () => {
   it('should return an empty array if no branches are present', () => {
-    const { branches } = collectExperiments({
-      [EXPERIMENT_WORKSPACE_ID]: {
-        baseline: {}
-      }
-    })
+    const { branches } = collectExperiments(
+      {
+        [EXPERIMENT_WORKSPACE_ID]: {
+          baseline: {}
+        }
+      },
+      false
+    )
     expect(branches).toStrictEqual([])
   })
 
@@ -34,8 +37,10 @@ describe('collectExperiments', () => {
       baseline: { data: { name: 'branchB' } }
     }
   }
-  const { branches, experimentsByBranch, workspace } =
-    collectExperiments(repoWithTwoBranches)
+  const { branches, experimentsByBranch, workspace } = collectExperiments(
+    repoWithTwoBranches,
+    false
+  )
 
   it('should define a workspace', () => {
     expect(workspace).toBeDefined()
@@ -77,7 +82,7 @@ describe('collectExperiments', () => {
       }
     }
   }
-  const acc = collectExperiments(repoWithNestedCheckpoints)
+  const acc = collectExperiments(repoWithNestedCheckpoints, false)
 
   it('should only list the tip as a top-level experiment', () => {
     const { experimentsByBranch } = acc
@@ -98,7 +103,7 @@ describe('collectExperiments', () => {
   })
 
   it('should handle the continuation of a modified checkpoint', () => {
-    const { checkpointsByTip } = collectExperiments(modifiedFixture)
+    const { checkpointsByTip } = collectExperiments(modifiedFixture, false)
 
     const modifiedCheckpointTip = checkpointsByTip
       .get('exp-01b3a')
@@ -154,7 +159,7 @@ describe('collectExperiments', () => {
         }
       }
     }
-    const acc = collectExperiments(repoWithNestedCheckpoints)
+    const acc = collectExperiments(repoWithNestedCheckpoints, false)
 
     const { experimentsByBranch, checkpointsByTip } = acc
     const [experiment] = experimentsByBranch.get('branchA') || []

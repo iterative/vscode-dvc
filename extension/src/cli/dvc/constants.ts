@@ -7,6 +7,14 @@ export const MAX_CLI_VERSION = '3'
 export const UNEXPECTED_ERROR_CODE = 255
 
 export const TEMP_PLOTS_DIR = join('.dvc', 'tmp', 'plots')
+export const DVCLIVE_ONLY_RUNNING_SIGNAL_FILE = join(
+  '.dvc',
+  'tmp',
+  'exps',
+  'run',
+  'DVCLIVE_ONLY'
+)
+
 export const NUM_OF_COMMITS_TO_SHOW = '3'
 
 export enum Command {

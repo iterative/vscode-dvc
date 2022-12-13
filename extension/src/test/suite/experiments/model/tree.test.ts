@@ -775,6 +775,8 @@ suite('Experiments Tree Test Suite', () => {
     it('should be able to apply an experiment to the workspace with dvc.views.experiments.applyExperiment', async () => {
       const { experiments } = buildExperiments(disposable)
 
+      await experiments.isReady()
+
       const mockExperiment = 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9'
 
       const mockExperimentApply = stub(
