@@ -313,7 +313,7 @@ const collectFromBranchesObject = (
 
 export const collectExperiments = (
   data: ExperimentsOutput,
-  dvcLiveOnly = false
+  dvcLiveOnly: boolean
 ): ExperimentsAccumulator => {
   const { workspace, ...branchesObject } = data
 

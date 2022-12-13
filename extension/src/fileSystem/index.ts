@@ -157,7 +157,7 @@ export const checkSignalFile = async (path: string): Promise<boolean> => {
   const contents = readFileSync(path).toString()
   const pid = createValidInteger(contents)
 
-  if (!contents || !pid || !(await processExists(pid))) {
+  if (!pid || !(await processExists(pid))) {
     removeSync(path)
     return false
   }
