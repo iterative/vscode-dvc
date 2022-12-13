@@ -26,6 +26,7 @@ import { ExperimentsData } from '../../experiments/data'
 import { ResourceLocator } from '../../resourceLocator'
 import { DEFAULT_DEBOUNCE_WINDOW_MS } from '../../processManager'
 import { FileSystemData } from '../../fileSystem/data'
+import * as FileSystem from '../../fileSystem'
 import * as Watcher from '../../fileSystem/watcher'
 import { MessageFromWebview } from '../../webview/contract'
 import { PlotsData } from '../../plots/webview/contract'
@@ -172,6 +173,10 @@ export const buildDependencies = (
     'createFileSystemWatcher'
   ).returns(mockDisposable)
 
+  const mockCheckSignalFile = stub(FileSystem, 'checkSignalFile').resolves(
+    false
+  )
+
   const mockPlotsDiff = stub(dvcReader, 'plotsDiff').resolves(plotsDiff)
 
   const mockExperimentShow = stub(dvcReader, 'expShow').resolves(expShow)
@@ -189,6 +194,7 @@ export const buildDependencies = (
     gitReader,
     internalCommands,
     messageSpy,
+    mockCheckSignalFile,
     mockCreateFileSystemWatcher,
     mockExperimentShow,
     mockPlotsDiff,

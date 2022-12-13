@@ -14,6 +14,8 @@ import { standardizePath } from './path'
 import { definedAndNonEmpty } from '../util/array'
 import { Logger } from '../common/logger'
 import { gitPath } from '../cli/git/constants'
+import { createValidInteger } from '../util/number'
+import { processExists } from '../processExecution'
 
 export const exists = (path: string): boolean => existsSync(path)
 
@@ -145,4 +147,20 @@ export const writeJson = <T extends Record<string, unknown>>(
 ): void => {
   ensureFileSync(path)
   return writeFileSync(path, JSON.stringify(obj))
+}
+
+export const checkSignalFile = async (path: string): Promise<boolean> => {
+  if (!exists(path)) {
+    return false
+  }
+
+  const contents = readFileSync(path).toString()
+  const pid = createValidInteger(contents)
+
+  if (!pid || !(await processExists(pid))) {
+    removeSync(path)
+    return false
+  }
+
+  return true
 }

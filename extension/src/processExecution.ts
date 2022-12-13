@@ -3,6 +3,7 @@ import { Readable } from 'stream'
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import execa from 'execa'
+import doesProcessExists from 'process-exists'
 
 interface RunningProcess extends ChildProcess {
   all?: Readable
@@ -58,3 +59,6 @@ export const executeProcess = async (
   const { stdout } = await createProcess(options)
   return stdout
 }
+
+export const processExists = (pid: number): Promise<boolean> =>
+  doesProcessExists(pid)
