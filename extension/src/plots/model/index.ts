@@ -13,6 +13,7 @@ import {
   collectBranchRevisionDetails,
   collectOverrideRevisionDetails
 } from './collect'
+import { getRevisionFirstThreeColumns } from './util'
 import {
   CheckpointPlot,
   CheckpointPlotData,
@@ -183,7 +184,8 @@ export class PlotsModel extends ModelWithPersistence {
         this.experiments.getSelectedRevisions(),
         this.fetchedRevs,
         finishedExperiments,
-        id => this.experiments.getCheckpoints(id)
+        id => this.experiments.getCheckpoints(id),
+        this.experiments.getFirstThreeColumnOrder()
       )
     }
 
@@ -219,15 +221,22 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public getSelectedRevisionDetails() {
-    return this.experiments
-      .getSelectedRevisions()
-      .map(({ label, displayColor, logicalGroupName, id }) => ({
+    return this.experiments.getSelectedRevisions().map(exp => {
+      const { label, displayColor, logicalGroupName, id } = exp
+      const firstThreeColumns = getRevisionFirstThreeColumns(
+        this.experiments.getFirstThreeColumnOrder(),
+        exp
+      )
+
+      return {
         displayColor,
         fetched: this.fetchedRevs.has(label),
+        firstThreeColumns,
         group: logicalGroupName,
         id,
         revision: label
-      }))
+      }
+    })
   }
 
   public getTemplatePlots(

@@ -405,6 +405,20 @@ suite('Experiments Tree Test Suite', () => {
         {
           displayColor: colors[0],
           fetched: true,
+          firstThreeColumns: [
+            {
+              path: 'Created',
+              value: '-'
+            },
+            {
+              path: 'summary.json:loss',
+              value: '1.9293'
+            },
+            {
+              path: 'summary.json:accuracy',
+              value: '0.46680'
+            }
+          ],
           group: undefined,
           id: 'workspace',
           revision: 'workspace'
@@ -412,6 +426,20 @@ suite('Experiments Tree Test Suite', () => {
         {
           displayColor: colors[1],
           fetched: true,
+          firstThreeColumns: [
+            {
+              path: 'Created',
+              value: 'Dec 29, 2020'
+            },
+            {
+              path: 'summary.json:loss',
+              value: '2.0205'
+            },
+            {
+              path: 'summary.json:accuracy',
+              value: '0.37242'
+            }
+          ],
           group: '[exp-e7a67]',
           id: 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9',
           revision: 'd1343a8'
@@ -419,6 +447,20 @@ suite('Experiments Tree Test Suite', () => {
         {
           displayColor: colors[2],
           fetched: true,
+          firstThreeColumns: [
+            {
+              path: 'Created',
+              value: 'Dec 29, 2020'
+            },
+            {
+              path: 'summary.json:loss',
+              value: '2.0205'
+            },
+            {
+              path: 'summary.json:accuracy',
+              value: '0.37242'
+            }
+          ],
           group: '[exp-e7a67]',
           id: 'exp-e7a67',
           revision: '4fb124a'
@@ -426,6 +468,20 @@ suite('Experiments Tree Test Suite', () => {
         {
           displayColor: colors[3],
           fetched: true,
+          firstThreeColumns: [
+            {
+              path: 'Created',
+              value: 'Dec 29, 2020'
+            },
+            {
+              path: 'summary.json:loss',
+              value: '1.9293'
+            },
+            {
+              path: 'summary.json:accuracy',
+              value: '0.46680'
+            }
+          ],
           group: '[test-branch]',
           id: 'test-branch',
           revision: '42b8736'
@@ -433,6 +489,20 @@ suite('Experiments Tree Test Suite', () => {
         {
           displayColor: colors[4],
           fetched: true,
+          firstThreeColumns: [
+            {
+              path: 'Created',
+              value: 'Dec 29, 2020'
+            },
+            {
+              path: 'summary.json:loss',
+              value: '2.0204'
+            },
+            {
+              path: 'summary.json:accuracy',
+              value: '0.37232'
+            }
+          ],
           group: '[exp-e7a67]',
           id: '1ee5f2ecb0fa4d83cbf614386536344cf894dd53',
           revision: '1ee5f2e'
@@ -440,6 +510,20 @@ suite('Experiments Tree Test Suite', () => {
         {
           displayColor: colors[5],
           fetched: true,
+          firstThreeColumns: [
+            {
+              path: 'Created',
+              value: 'Dec 29, 2020'
+            },
+            {
+              path: 'summary.json:loss',
+              value: '1.9293'
+            },
+            {
+              path: 'summary.json:accuracy',
+              value: '0.46680'
+            }
+          ],
           group: '[test-branch]',
           id: '217312476f8854dda1865450b737eb6bc7a3ba1b',
           revision: '2173124'
@@ -447,6 +531,20 @@ suite('Experiments Tree Test Suite', () => {
         {
           displayColor: colors[6],
           fetched: true,
+          firstThreeColumns: [
+            {
+              path: 'Created',
+              value: 'Dec 29, 2020'
+            },
+            {
+              path: 'summary.json:loss',
+              value: '1.9883'
+            },
+            {
+              path: 'summary.json:accuracy',
+              value: '0.40838'
+            }
+          ],
           group: '[test-branch]',
           id: '9523bde67538cf31230efaff2dbc47d38a944ab5',
           revision: '9523bde'

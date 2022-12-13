@@ -7,6 +7,16 @@
   top: 3px;
 }
 
+.columnsTable {
+  td:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    direction: rtl;
+    max-width: 180px;
+    text-align: left;
+  }
+}
+
 .block {
   border-left-style: solid;
   border-left-width: 3px;

@@ -1,5 +1,6 @@
 import omit from 'lodash.omit'
 import { TopLevelSpec } from 'vega-lite'
+import { getRevisionFirstThreeColumns } from './util'
 import {
   ColorScale,
   CheckpointPlotValues,
@@ -646,28 +647,41 @@ export const collectBranchRevisionDetails = (
 
 const getRevision = (
   displayColor: Color,
-  { logicalGroupName, id, label }: Experiment
-): Revision => ({
-  displayColor,
-  fetched: true,
-  group: logicalGroupName,
-  id,
-  revision: label
-})
+  experiment: Experiment,
+  firstThreeColumns: string[]
+): Revision => {
+  const { logicalGroupName, id, label } = experiment
+  return {
+    displayColor,
+    fetched: true,
+    firstThreeColumns: getRevisionFirstThreeColumns(
+      firstThreeColumns,
+      experiment
+    ),
+    group: logicalGroupName,
+    id,
+    revision: label
+  }
+}
 
 const overrideWithWorkspace = (
   orderMapping: { [label: string]: string },
   selectedWithOverrides: Revision[],
   displayColor: Color,
-  label: string
+  label: string,
+  firstThreeColumns: string[]
 ): void => {
   orderMapping[label] = 'workspace'
   selectedWithOverrides.push(
-    getRevision(displayColor, {
-      id: 'workspace',
-      label: 'workspace',
-      logicalGroupName: undefined
-    })
+    getRevision(
+      displayColor,
+      {
+        id: 'workspace',
+        label: 'workspace',
+        logicalGroupName: undefined
+      },
+      firstThreeColumns
+    )
   )
 }
 
@@ -682,11 +696,16 @@ const isExperimentThatWillDisappearAtEnd = (
 const getMostRecentFetchedCheckpointRevision = (
   selectedRevision: SelectedExperimentWithColor,
   fetchedRevs: Set<string>,
-  checkpoints: Experiment[] | undefined
+  checkpoints: Experiment[] | undefined,
+  firstThreeColumns: string[]
 ): Revision => {
   const mostRecent =
     checkpoints?.find(({ label }) => fetchedRevs.has(label)) || selectedRevision
-  return getRevision(selectedRevision.displayColor, mostRecent)
+  return getRevision(
+    selectedRevision.displayColor,
+    mostRecent,
+    firstThreeColumns
+  )
 }
 
 const overrideRevisionDetail = (
@@ -694,14 +713,16 @@ const overrideRevisionDetail = (
   selectedWithOverrides: Revision[],
   selectedRevision: SelectedExperimentWithColor,
   fetchedRevs: Set<string>,
-  checkpoints: Experiment[] | undefined
+  checkpoints: Experiment[] | undefined,
+  firstThreeColumns: string[]
 ) => {
   const { label } = selectedRevision
 
   const mostRecent = getMostRecentFetchedCheckpointRevision(
     selectedRevision,
     fetchedRevs,
-    checkpoints
+    checkpoints,
+    firstThreeColumns
   )
   orderMapping[label] = mostRecent.revision
   selectedWithOverrides.push(mostRecent)
@@ -713,7 +734,8 @@ const collectRevisionDetail = (
   selectedRevision: SelectedExperimentWithColor,
   fetchedRevs: Set<string>,
   unfinishedRunningExperiments: { [id: string]: string },
-  getCheckpoints: (id: string) => Experiment[] | undefined
+  getCheckpoints: (id: string) => Experiment[] | undefined,
+  firstThreeColumns: string[]
 ) => {
   const { label, status, id, displayColor } = selectedRevision
 
@@ -725,7 +747,8 @@ const collectRevisionDetail = (
       orderMapping,
       selectedWithOverrides,
       displayColor,
-      label
+      label,
+      firstThreeColumns
     )
   }
 
@@ -742,12 +765,15 @@ const collectRevisionDetail = (
       selectedWithOverrides,
       selectedRevision,
       fetchedRevs,
-      getCheckpoints(id)
+      getCheckpoints(id),
+      firstThreeColumns
     )
   }
 
   orderMapping[label] = label
-  selectedWithOverrides.push(getRevision(displayColor, selectedRevision))
+  selectedWithOverrides.push(
+    getRevision(displayColor, selectedRevision, firstThreeColumns)
+  )
 }
 
 export const collectOverrideRevisionDetails = (
@@ -755,7 +781,8 @@ export const collectOverrideRevisionDetails = (
   selectedRevisions: SelectedExperimentWithColor[],
   fetchedRevs: Set<string>,
   unfinishedRunningExperiments: { [id: string]: string },
-  getCheckpoints: (id: string) => Experiment[] | undefined
+  getCheckpoints: (id: string) => Experiment[] | undefined,
+  firstThreeColumns: string[]
 ): {
   overrideComparison: Revision[]
   overrideRevisions: Revision[]
@@ -770,7 +797,8 @@ export const collectOverrideRevisionDetails = (
       selectedRevision,
       fetchedRevs,
       unfinishedRunningExperiments,
-      getCheckpoints
+      getCheckpoints,
+      firstThreeColumns
     )
   }
 

@@ -261,6 +261,7 @@ describe('App', () => {
           {
             displayColor: '#945dd6',
             fetched: false,
+            firstThreeColumns: [],
             group: '[exp-a270a]',
             id: 'ad2b5ec854a447d00d9dfa9cdf88211a39a17813',
             revision: 'ad2b5ec'
@@ -275,6 +276,7 @@ describe('App', () => {
         {
           displayColor: '#945dd6',
           fetched: false,
+          firstThreeColumns: [],
           group: '[exp-a270a]',
           id: 'ad2b5ec854a447d00d9dfa9cdf88211a39a17813',
           revision: 'ad2b5ec'

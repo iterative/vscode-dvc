@@ -283,6 +283,7 @@ describe('ComparisonTable', () => {
         {
           displayColor: '#f56565',
           fetched: true,
+          firstThreeColumns: [],
           group: undefined,
           id: 'noData',
           revision: revisionWithNoData

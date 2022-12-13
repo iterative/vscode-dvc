@@ -516,10 +516,38 @@ export const getRevisions = (): Revision[] => {
       revision: 'workspace',
       displayColor: workspace,
       fetched: true,
+      firstThreeColumns: [
+        {
+          path: 'Created',
+          value: '-'
+        },
+        {
+          path: 'summary.json:loss',
+          value: '1.9293'
+        },
+        {
+          path: 'summary.json:accuracy',
+          value: '0.46680'
+        }
+      ],
       group: undefined
     },
     {
       fetched: true,
+      firstThreeColumns: [
+        {
+          path: 'Created',
+          value: 'Nov 21, 2020'
+        },
+        {
+          path: 'summary.json:loss',
+          value: '2.0489'
+        },
+        {
+          path: 'summary.json:accuracy',
+          value: '0.34848'
+        }
+      ],
       id: 'main',
       revision: 'main',
       displayColor: main,
@@ -527,6 +555,20 @@ export const getRevisions = (): Revision[] => {
     },
     {
       fetched: true,
+      firstThreeColumns: [
+        {
+          path: 'Created',
+          value: 'Dec 29, 2020'
+        },
+        {
+          path: 'summary.json:loss',
+          value: '2.0205'
+        },
+        {
+          path: 'summary.json:accuracy',
+          value: '0.37242'
+        }
+      ],
       id: 'exp-e7a67',
       revision: '4fb124a',
       displayColor: _4fb124a,
@@ -534,6 +576,20 @@ export const getRevisions = (): Revision[] => {
     },
     {
       fetched: true,
+      firstThreeColumns: [
+        {
+          path: 'Created',
+          value: 'Dec 29, 2020'
+        },
+        {
+          path: 'summary.json:loss',
+          value: '1.9293'
+        },
+        {
+          path: 'summary.json:accuracy',
+          value: '0.46680'
+        }
+      ],
       id: 'test-branch',
       revision: '42b8736',
       displayColor: _42b8735,
@@ -541,6 +597,20 @@ export const getRevisions = (): Revision[] => {
     },
     {
       fetched: true,
+      firstThreeColumns: [
+        {
+          path: 'Created',
+          value: 'Dec 29, 2020'
+        },
+        {
+          path: 'summary.json:loss',
+          value: '1.7750'
+        },
+        {
+          path: 'summary.json:accuracy',
+          value: '0.59265'
+        }
+      ],
       id: 'exp-83425',
       revision: '1ba7bcd',
       displayColor: _1ba7bcd,

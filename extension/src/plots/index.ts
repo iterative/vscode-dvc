@@ -192,6 +192,12 @@ export class Plots extends BaseRepository<TPlotsData> {
         this.fetchMissingOrSendPlots()
       })
     )
+
+    this.dispose.track(
+      experiments.onDidChangeColumnOrderOrStatus(() => {
+        this.notifyChanged()
+      })
+    )
   }
 
   private async initializeData(data: ExperimentsOutput) {
