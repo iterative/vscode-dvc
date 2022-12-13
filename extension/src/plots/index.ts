@@ -129,9 +129,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private notifyChanged() {
-    this.paths.setSelectedRevisions(
-      this.plots.getSelectedRevisionDetails().map(({ revision }) => revision)
-    )
+    this.paths.setSelectedRevisions(this.plots.getSelectedRevisions())
     this.pathsChanged.fire()
     this.fetchMissingOrSendPlots()
   }

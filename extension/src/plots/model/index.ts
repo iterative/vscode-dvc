@@ -291,6 +291,10 @@ export class PlotsModel extends ModelWithPersistence {
     this.persist(PersistenceKey.PLOT_COMPARISON_ORDER, this.comparisonOrder)
   }
 
+  public getSelectedRevisions() {
+    return this.experiments.getSelectedRevisions().map(({ label }) => label)
+  }
+
   public setSelectedMetrics(selectedMetrics: string[]) {
     this.selectedMetrics = selectedMetrics
     this.setMetricOrder()
@@ -409,10 +413,6 @@ export class PlotsModel extends ModelWithPersistence {
 
   private getCLIId(label: string) {
     return this.branchRevisions[label] || label
-  }
-
-  private getSelectedRevisions() {
-    return this.experiments.getSelectedRevisions().map(({ label }) => label)
   }
 
   private getPlots(
