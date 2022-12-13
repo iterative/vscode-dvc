@@ -15,6 +15,7 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
   private showExperiments: () => void
   private getCliAccessible: () => boolean
   private getHasRoots: () => boolean
+  private getHasData: () => boolean
 
   constructor(
     dvcRoot: string,
@@ -22,7 +23,8 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
     initProject: () => void,
     showExperiments: () => void,
     getCliAccessible: () => boolean,
-    getHasRoots: () => boolean
+    getHasRoots: () => boolean,
+    getHasData: () => boolean
   ) {
     super(dvcRoot, webviewIcon)
 
@@ -35,6 +37,7 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
     this.getHasRoots = getHasRoots
     this.initProject = initProject
     this.showExperiments = showExperiments
+    this.getHasData = getHasData
   }
 
   public sendInitialWebviewData() {
@@ -44,7 +47,8 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
   public sendDataToWebview() {
     this.webviewMessages.sendWebviewMessage(
       this.getCliAccessible(),
-      this.getHasRoots()
+      this.getHasRoots(),
+      this.getHasData()
     )
   }
 

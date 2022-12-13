@@ -40,6 +40,7 @@ import { createTypedAccumulator } from '../util/object'
 import { pickPaths } from '../path/selection/quickPick'
 import { Toast } from '../vscode/toast'
 import { ConfigKey } from '../vscode/config'
+import { setContextValue } from '../vscode/context'
 
 export const ExperimentsScale = {
   ...omit(ColumnType, 'TIMESTAMP'),
@@ -493,6 +494,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.columns.getFirstThreeColumnOrder()
   }
 
+  public getHasData() {
+    return this.columns.hasNonDefaultColumns()
+  }
+
   private setupInitialData() {
     const waitForInitialData = this.dispose.track(
       this.onDidChangeExperiments(() => {
@@ -515,6 +520,7 @@ export class Experiments extends BaseRepository<TableData> {
 
   private notifyColumnsChanged() {
     this.columnsChanged.fire()
+    setContextValue('dvc.project.hasData', this.getHasData())
     return this.webviewMessages.sendWebviewMessage()
   }
 

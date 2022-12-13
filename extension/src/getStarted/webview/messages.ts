@@ -23,10 +23,12 @@ export class WebviewMessages {
 
   public sendWebviewMessage(
     cliAccessible: boolean,
-    projectInitialized: boolean
+    projectInitialized: boolean,
+    hasData: boolean
   ) {
     this.getWebview()?.show({
       cliAccessible,
+      hasData,
       projectInitialized
     })
   }

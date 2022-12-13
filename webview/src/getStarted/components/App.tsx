@@ -7,6 +7,7 @@ import {
 import React, { useCallback, useState } from 'react'
 import { CliUnavailable } from './CliUnavailable'
 import { ProjectUninitialized } from './ProjectUninitialized'
+import { NoData } from './NoData'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 import { sendMessage } from '../../shared/vscode'
@@ -14,12 +15,14 @@ import { sendMessage } from '../../shared/vscode'
 export const App: React.FC = () => {
   const [cliAvailable, setCliAvailable] = useState(false)
   const [projectInitialized, setProjectInitialized] = useState(false)
+  const [hasData, setHasData] = useState(false)
 
   useVsCodeMessaging(
     useCallback(
       ({ data }: { data: MessageToWebview<GetStartedData> }) => {
         setCliAvailable(data.data.cliAccessible)
         setProjectInitialized(data.data.projectInitialized)
+        setHasData(data.data.hasData)
       },
       [setCliAvailable, setProjectInitialized]
     )
@@ -43,6 +46,10 @@ export const App: React.FC = () => {
 
   if (!projectInitialized) {
     return <ProjectUninitialized initializeProject={initializeProject} />
+  }
+
+  if (!hasData) {
+    return <NoData />
   }
 
   return (
