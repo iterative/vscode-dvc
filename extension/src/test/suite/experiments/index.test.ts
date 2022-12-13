@@ -732,6 +732,8 @@ suite('Experiments Test Suite', () => {
     it("should be able to handle a message to toggle an experiment's status", async () => {
       const { experiments, experimentsModel } = buildExperiments(disposable)
 
+      await experiments.isReady()
+
       const experimentToToggle = 'exp-e7a67'
       const queuedExperiment = '90aea7f2482117a55dfcadcdb901aaa6610fbbc9'
 
