@@ -12,7 +12,13 @@ describe('PathsModel', () => {
   const logsAcc = join('logs', 'acc.tsv')
   const logsLoss = join('logs', 'loss.tsv')
   const plotsAcc = join('plots', 'acc.png')
-  const revisions = ['workspace', '53c3851', '4fb124a', '42b8736', '1ba7bcd']
+  const revisions = [
+    EXPERIMENT_WORKSPACE_ID,
+    '53c3851',
+    '4fb124a',
+    '42b8736',
+    '1ba7bcd'
+  ]
 
   it('should return the expected paths when given the default output fixture', () => {
     const comparisonType = new Set([PathType.COMPARISON])
@@ -80,14 +86,14 @@ describe('PathsModel', () => {
     ])
   })
 
-  const revWithDifferentPlot = '4c4318d'
-  const differentPlotPath = join('dvclive', 'plots', 'metrics', 'loss.tsv')
-  const singleRevisionPlotFixture = {
-    [differentPlotPath]: [
+  const commitBeforePlots = '4c4318d'
+  const previousPlotPath = join('dvclive', 'plots', 'metrics', 'loss.tsv')
+  const previousPlotFixture = {
+    [previousPlotPath]: [
       {
         content: {},
         datapoints: {
-          [revWithDifferentPlot]: [
+          [commitBeforePlots]: [
             {
               loss: '2.29',
               step: '0'
@@ -102,7 +108,7 @@ describe('PathsModel', () => {
             }
           ]
         },
-        revisions: [revWithDifferentPlot],
+        revisions: [commitBeforePlots],
         type: PlotsType.VEGA
       }
     ]
@@ -205,15 +211,15 @@ describe('PathsModel', () => {
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
 
     model.transformAndSet(
-      { ...plotsDiffFixture, ...singleRevisionPlotFixture },
-      [...revisions, revWithDifferentPlot],
+      { ...plotsDiffFixture, ...previousPlotFixture },
+      [...revisions, commitBeforePlots],
       {}
     )
 
     const expectedOrderAllRevisions = [
       {
         ...originalSingleViewGroup,
-        paths: [...originalSingleViewGroup.paths, differentPlotPath]
+        paths: [...originalSingleViewGroup.paths, previousPlotPath]
       },
       multiViewGroup
     ]
@@ -222,20 +228,20 @@ describe('PathsModel', () => {
 
     expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
 
-    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID, revWithDifferentPlot])
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID, commitBeforePlots])
 
     expect(model.getTemplateOrder()).toStrictEqual(expectedOrderAllRevisions)
 
-    model.setSelectedRevisions([revWithDifferentPlot])
+    model.setSelectedRevisions([commitBeforePlots])
 
     expect(model.getTemplateOrder()).toStrictEqual([
       {
         group: TemplatePlotGroup.SINGLE_VIEW,
-        paths: [differentPlotPath]
+        paths: [previousPlotPath]
       }
     ])
 
-    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID, revWithDifferentPlot])
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID, commitBeforePlots])
 
     expect(model.getTemplateOrder()).toStrictEqual(expectedOrderAllRevisions)
   })
@@ -243,8 +249,8 @@ describe('PathsModel', () => {
   it('should move plots which do not have selected revisions to the end when a reordering occurs', () => {
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
     model.transformAndSet(
-      { ...plotsDiffFixture, ...singleRevisionPlotFixture },
-      [...revisions, revWithDifferentPlot],
+      { ...plotsDiffFixture, ...previousPlotFixture },
+      [...revisions, commitBeforePlots],
       {}
     )
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
@@ -253,14 +259,14 @@ describe('PathsModel', () => {
 
     model.setTemplateOrder([logsLossGroup, multiViewGroup, logsAccGroup])
 
-    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID, revWithDifferentPlot])
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID, commitBeforePlots])
 
     expect(model.getTemplateOrder()).toStrictEqual([
       logsLossGroup,
       multiViewGroup,
       {
         group: TemplatePlotGroup.SINGLE_VIEW,
-        paths: [logsAcc, differentPlotPath]
+        paths: [logsAcc, previousPlotPath]
       }
     ])
   })
@@ -273,12 +279,12 @@ describe('PathsModel', () => {
 
     expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
 
-    model.transformAndSet(singleRevisionPlotFixture, [revWithDifferentPlot], {})
-    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID, revWithDifferentPlot])
+    model.transformAndSet(previousPlotFixture, [commitBeforePlots], {})
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID, commitBeforePlots])
 
     expect(model.getTemplateOrder()).toStrictEqual([
       ...originalTemplateOrder,
-      { group: TemplatePlotGroup.SINGLE_VIEW, paths: [differentPlotPath] }
+      { group: TemplatePlotGroup.SINGLE_VIEW, paths: [previousPlotPath] }
     ])
   })
 
@@ -334,13 +340,7 @@ describe('PathsModel', () => {
         label: 'plots',
         parentPath: undefined,
         path: 'plots',
-        revisions: new Set([
-          'workspace',
-          '53c3851',
-          '4fb124a',
-          '42b8736',
-          '1ba7bcd'
-        ]),
+        revisions: new Set(revisions),
         status: 2
       },
       {
@@ -349,13 +349,7 @@ describe('PathsModel', () => {
         label: 'logs',
         parentPath: undefined,
         path: 'logs',
-        revisions: new Set([
-          'workspace',
-          '53c3851',
-          '4fb124a',
-          '42b8736',
-          '1ba7bcd'
-        ]),
+        revisions: new Set(revisions),
         status: 2
       },
       {
@@ -364,13 +358,7 @@ describe('PathsModel', () => {
         label: 'predictions.json',
         parentPath: undefined,
         path: 'predictions.json',
-        revisions: new Set([
-          'workspace',
-          '53c3851',
-          '4fb124a',
-          '42b8736',
-          '1ba7bcd'
-        ]),
+        revisions: new Set(revisions),
         status: 2,
         type: new Set([PathType.TEMPLATE_MULTI])
       }
@@ -384,13 +372,7 @@ describe('PathsModel', () => {
         label: 'loss.tsv',
         parentPath: 'logs',
         path: logsLoss,
-        revisions: new Set([
-          'workspace',
-          '53c3851',
-          '4fb124a',
-          '42b8736',
-          '1ba7bcd'
-        ]),
+        revisions: new Set(revisions),
         status: 2,
         type: new Set([PathType.TEMPLATE_SINGLE])
       },
@@ -400,13 +382,7 @@ describe('PathsModel', () => {
         label: 'acc.tsv',
         parentPath: 'logs',
         path: logsAcc,
-        revisions: new Set([
-          'workspace',
-          '53c3851',
-          '4fb124a',
-          '42b8736',
-          '1ba7bcd'
-        ]),
+        revisions: new Set(revisions),
         status: 2,
         type: new Set([PathType.TEMPLATE_SINGLE])
       }

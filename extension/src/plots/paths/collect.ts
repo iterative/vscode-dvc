@@ -67,45 +67,6 @@ const getType = (
   return collectType(plots)
 }
 
-const collectOrderedPath = (
-  acc: PlotPath[],
-  data: PlotsOutput,
-  revisions: Set<string>,
-  pathArray: string[],
-  idx: number
-) => {
-  const path = getPath(pathArray, idx)
-
-  if (acc.some(({ path: existingPath }) => existingPath === path)) {
-    return acc.map(existing =>
-      existing.path === path
-        ? {
-            ...existing,
-            revisions: new Set([...existing.revisions, ...revisions])
-          }
-        : existing
-    )
-  }
-
-  const hasChildren = idx !== pathArray.length
-
-  const plotPath: PlotPath = {
-    hasChildren,
-    label: pathArray[idx - 1],
-    parentPath: getParent(pathArray, idx),
-    path,
-    revisions
-  }
-
-  const type = getType(data, hasChildren, path)
-  if (type) {
-    plotPath.type = type
-  }
-
-  acc.push(plotPath)
-  return acc
-}
-
 const filterWorkspaceIfFetched = (
   existingPaths: PlotPath[],
   fetchedRevs: string[]
@@ -161,6 +122,45 @@ const collectPathRevisions = (
   }
 
   return revisions
+}
+
+const collectOrderedPath = (
+  acc: PlotPath[],
+  data: PlotsOutput,
+  revisions: Set<string>,
+  pathArray: string[],
+  idx: number
+): PlotPath[] => {
+  const path = getPath(pathArray, idx)
+
+  if (acc.some(({ path: existingPath }) => existingPath === path)) {
+    return acc.map(existing =>
+      existing.path === path
+        ? {
+            ...existing,
+            revisions: new Set([...existing.revisions, ...revisions])
+          }
+        : existing
+    )
+  }
+
+  const hasChildren = idx !== pathArray.length
+
+  const plotPath: PlotPath = {
+    hasChildren,
+    label: pathArray[idx - 1],
+    parentPath: getParent(pathArray, idx),
+    path,
+    revisions
+  }
+
+  const type = getType(data, hasChildren, path)
+  if (type) {
+    plotPath.type = type
+  }
+
+  acc.push(plotPath)
+  return acc
 }
 
 export const collectPaths = (

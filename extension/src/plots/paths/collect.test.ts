@@ -14,7 +14,13 @@ import { Shape, StrokeDash } from '../multiSource/constants'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 
 describe('collectPath', () => {
-  const revisions = ['workspace', '53c3851', '4fb124a', '42b8736', '1ba7bcd']
+  const revisions = [
+    EXPERIMENT_WORKSPACE_ID,
+    '53c3851',
+    '4fb124a',
+    '42b8736',
+    '1ba7bcd'
+  ]
   it('should return the expected data from the test fixture', () => {
     expect(collectPaths([], plotsDiffFixture, revisions, {})).toStrictEqual([
       {
