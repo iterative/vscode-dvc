@@ -36,39 +36,39 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
     </table>
   )
 
-  return (
-    <Tooltip
-      placement="bottom-start"
-      content={
-        revision.firstThreeColumns.length > 1 ? tooltipContent : undefined
-      }
-      interactive
+  const mainContent = (
+    <li
+      className={styles.block}
+      style={{ borderColor: revision.displayColor }}
+      data-testid={`ribbon-${revision.id}`}
     >
-      <li
-        className={styles.block}
-        style={{ borderColor: revision.displayColor }}
-        data-testid={`ribbon-${revision.id}`}
-      >
-        <div className={styles.label}>
-          <div className={styles.title}>
-            {exp}
-            <CopyButton value={exp} className={styles.copyButton} />
-          </div>
-          {revision.group && (
-            <div className={styles.subtitle}>{revision.revision}</div>
-          )}
+      <div className={styles.label}>
+        <div className={styles.title}>
+          {exp}
+          <CopyButton value={exp} className={styles.copyButton} />
         </div>
-        <div className={styles.iconPlaceholder}>
-          {!revision.fetched && (
-            <VSCodeProgressRing className={styles.fetching} />
-          )}
-        </div>
-        <Tooltip content="Clear" placement="bottom" delay={500}>
-          <button className={styles.clearButton} onClick={onClear}>
-            <Icon icon={Close} width={12} height={12} />
-          </button>
-        </Tooltip>
-      </li>
+        {revision.group && (
+          <div className={styles.subtitle}>{revision.revision}</div>
+        )}
+      </div>
+      <div className={styles.iconPlaceholder}>
+        {!revision.fetched && (
+          <VSCodeProgressRing className={styles.fetching} />
+        )}
+      </div>
+      <Tooltip content="Clear" placement="bottom" delay={500}>
+        <button className={styles.clearButton} onClick={onClear}>
+          <Icon icon={Close} width={12} height={12} />
+        </button>
+      </Tooltip>
+    </li>
+  )
+
+  return revision.firstThreeColumns.length === 0 ? (
+    mainContent
+  ) : (
+    <Tooltip placement="bottom-start" content={tooltipContent} interactive>
+      {mainContent}
     </Tooltip>
   )
 }
