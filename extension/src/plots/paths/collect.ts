@@ -1,4 +1,10 @@
-import { isImagePlot, Plot, TemplatePlotGroup } from '../webview/contract'
+import {
+  ImagePlot,
+  isImagePlot,
+  Plot,
+  TemplatePlot,
+  TemplatePlotGroup
+} from '../webview/contract'
 import { PlotsOutput } from '../../cli/dvc/contract'
 import { getParent, getPath, getPathArray } from '../../fileSystem/util'
 import { splitMatchedOrdered, definedAndNonEmpty } from '../../util/array'
@@ -100,28 +106,43 @@ const collectOrderedPath = (
   return acc
 }
 
+const collectImageRevision = (
+  acc: Set<string>,
+  plot: ImagePlot,
+  cliIdToLabel: { [id: string]: string }
+): void => {
+  const revision = plot.revisions?.[0]
+  if (revision) {
+    acc.add(cliIdToLabel[revision] || revision)
+  }
+}
+
+const collectTemplateRevisions = (
+  acc: Set<string>,
+  plot: TemplatePlot,
+  cliIdToLabel: { [id: string]: string }
+): void => {
+  for (const [revision, datapoints] of Object.entries(plot?.datapoints || {})) {
+    if (datapoints.length > 0) {
+      acc.add(cliIdToLabel[revision] || revision)
+    }
+  }
+}
+
 const collectPathRevisions = (
   data: PlotsOutput,
   path: string,
   cliIdToLabel: { [id: string]: string }
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 ): Set<string> => {
   const revisions = new Set<string>()
-  const pathData = data[path]
-  for (const plot of pathData) {
+
+  for (const plot of data[path] || []) {
     if (isImagePlot(plot)) {
-      if (plot.revisions?.[0]) {
-        revisions.add(cliIdToLabel[plot.revisions[0]] || plot.revisions[0])
-      }
-    } else {
-      for (const [revision, datapoints] of Object.entries(
-        plot?.datapoints || {}
-      )) {
-        if (datapoints.length > 0) {
-          revisions.add(cliIdToLabel[revision] || revision)
-        }
-      }
+      collectImageRevision(revisions, plot, cliIdToLabel)
+      continue
     }
+
+    collectTemplateRevisions(revisions, plot, cliIdToLabel)
   }
 
   return revisions
