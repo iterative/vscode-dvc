@@ -1,16 +1,14 @@
 import { join, relative, resolve } from 'path'
 import { ensureDirSync, remove } from 'fs-extra'
-import * as FileSystem from '.'
-import { dvcDemoPath } from '../test/util'
-
-const {
+import {
   exists,
   findAbsoluteDvcRootPath,
   findDvcRootPaths,
   isDirectory,
   isSameOrChild,
   getModifiedTime
-} = FileSystem
+} from '.'
+import { dvcDemoPath } from '../test/util'
 
 jest.mock('../cli/dvc/reader')
 

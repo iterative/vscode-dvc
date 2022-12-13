@@ -54,6 +54,7 @@ export const buildExperiments = (
     gitReader,
     internalCommands,
     messageSpy,
+    mockCheckSignalFile,
     mockExperimentShow,
     updatesPaused,
     resourceLocator
@@ -87,6 +88,7 @@ export const buildExperiments = (
     gitReader,
     internalCommands,
     messageSpy,
+    mockCheckSignalFile,
     mockExperimentShow,
     resourceLocator,
     updatesPaused
@@ -119,6 +121,7 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
     updatesPaused,
     resourceLocator
   )
+
   experiments.setState(expShowFixture)
   return { experiments, internalCommands, messageSpy, workspaceExperiments }
 }
