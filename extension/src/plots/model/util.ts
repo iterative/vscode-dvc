@@ -6,7 +6,7 @@ export const getRevisionFirstThreeColumns = (
   experiment: Experiment
 ) => {
   const columns: Array<{ path: string; value: string }> = []
-  firstThreeColumns.map(path => {
+  for (const path of firstThreeColumns) {
     const { value, splitUpPath } = getDataFromColumnPath(experiment, path)
     const [type] = splitUpPath
     if (value) {
@@ -15,6 +15,6 @@ export const getRevisionFirstThreeColumns = (
         value
       })
     }
-  })
+  }
   return columns
 }
