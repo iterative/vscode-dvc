@@ -67,7 +67,7 @@ export default {
       checkpoint: checkpointPlotsFixture,
       comparison: comparisonPlotsFixture,
       hasPlots: true,
-      hasSelectedPlots: false,
+      hasUnselectedPlots: false,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       selectedRevisions: plotsRevisionsFixture,
       template: templatePlotsFixture
@@ -144,7 +144,7 @@ export const WithoutPlotsSelected = Template.bind({})
 WithoutPlotsSelected.args = {
   data: {
     hasPlots: true,
-    hasSelectedPlots: false,
+    hasUnselectedPlots: true,
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
     selectedRevisions: plotsRevisionsFixture
   }
@@ -154,19 +154,9 @@ export const WithoutExperimentsSelected = Template.bind({})
 WithoutExperimentsSelected.args = {
   data: {
     hasPlots: true,
-    hasSelectedPlots: true,
+    hasUnselectedPlots: false,
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
     selectedRevisions: []
-  }
-}
-
-export const WithoutAnySelected = Template.bind({})
-WithoutAnySelected.args = {
-  data: {
-    hasPlots: true,
-    hasSelectedPlots: false,
-    sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-    selectedRevisions: undefined
   }
 }
 
