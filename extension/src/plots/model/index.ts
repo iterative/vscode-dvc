@@ -291,6 +291,10 @@ export class PlotsModel extends ModelWithPersistence {
     this.persist(PersistenceKey.PLOT_COMPARISON_ORDER, this.comparisonOrder)
   }
 
+  public getSelectedRevisions() {
+    return this.experiments.getSelectedRevisions().map(({ label }) => label)
+  }
+
   public setSelectedMetrics(selectedMetrics: string[]) {
     this.selectedMetrics = selectedMetrics
     this.setMetricOrder()
@@ -349,6 +353,16 @@ export class PlotsModel extends ModelWithPersistence {
     return this.multiSourceEncoding
   }
 
+  public getCLIIdToLabel() {
+    const mapping: { [shortSha: string]: string } = {}
+
+    for (const rev of this.experiments.getRevisions()) {
+      mapping[this.getCLIId(rev)] = rev
+    }
+
+    return mapping
+  }
+
   private removeStaleData() {
     return Promise.all([
       this.removeStaleBranches(),
@@ -397,22 +411,8 @@ export class PlotsModel extends ModelWithPersistence {
     this.fetchedRevs.delete(id)
   }
 
-  private getCLIIdToLabel() {
-    const mapping: { [shortSha: string]: string } = {}
-
-    for (const rev of this.experiments.getRevisions()) {
-      mapping[this.getCLIId(rev)] = rev
-    }
-
-    return mapping
-  }
-
   private getCLIId(label: string) {
     return this.branchRevisions[label] || label
-  }
-
-  private getSelectedRevisions() {
-    return this.experiments.getSelectedRevisions().map(({ label }) => label)
   }
 
   private getPlots(

@@ -55,7 +55,7 @@ export class WebviewMessages {
     this.getWebview()?.show({
       checkpoint: this.getCheckpointPlots(),
       comparison: this.getComparisonPlots(overrideComparison),
-      hasPlots: !!this.paths?.hasPaths(),
+      hasPlots: !!this.paths.hasPaths(),
       hasSelectedPlots: definedAndNonEmpty(this.paths.getSelected()),
       sectionCollapsed: this.plots.getSectionCollapsed(),
       selectedRevisions: overrideRevisions,

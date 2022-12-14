@@ -4,6 +4,7 @@ import { quickPickManyValues } from '../../vscode/quickPick'
 import { Toast } from '../../vscode/toast'
 import { Title } from '../../vscode/title'
 import { PathType } from '../../plots/paths/collect'
+import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 
 jest.mock('../../vscode/quickPick')
 jest.mock('../../vscode/toast')
@@ -36,6 +37,7 @@ describe('pickPaths', () => {
 
   it('should call the quickPick with the correct items', async () => {
     mockedQuickPickManyValues.mockResolvedValueOnce([])
+    const revisions = new Set([EXPERIMENT_WORKSPACE_ID])
 
     const plotPaths = [
       {
@@ -43,6 +45,7 @@ describe('pickPaths', () => {
         label: 'loss.tsv',
         parentPath: 'logs',
         path: join('logs', 'loss.tsv'),
+        revisions,
         selected: true,
         type: new Set([PathType.TEMPLATE_SINGLE])
       },
@@ -51,6 +54,7 @@ describe('pickPaths', () => {
         label: 'acc.tsv',
         parentPath: 'logs',
         path: join('logs', 'acc.tsv'),
+        revisions,
         selected: true,
         type: new Set([PathType.TEMPLATE_SINGLE])
       },
@@ -59,6 +63,7 @@ describe('pickPaths', () => {
         label: 'fun.tsv',
         parentPath: 'logs',
         path: join('logs', 'fun.tsv'),
+        revisions,
         selected: false,
         type: new Set([PathType.TEMPLATE_SINGLE])
       }

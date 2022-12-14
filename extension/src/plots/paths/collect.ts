@@ -1,5 +1,11 @@
-import { isImagePlot, Plot, TemplatePlotGroup } from '../webview/contract'
-import { PlotsOutput } from '../../cli/dvc/contract'
+import {
+  ImagePlot,
+  isImagePlot,
+  Plot,
+  TemplatePlot,
+  TemplatePlotGroup
+} from '../webview/contract'
+import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../cli/dvc/contract'
 import { getParent, getPath, getPathArray } from '../../fileSystem/util'
 import { splitMatchedOrdered, definedAndNonEmpty } from '../../util/array'
 import { isMultiViewPlot } from '../vega/util'
@@ -24,22 +30,7 @@ export type PlotPath = {
   type?: Set<PathType>
   parentPath: string | undefined
   hasChildren: boolean
-}
-
-type PathAccumulator = {
-  plotPaths: PlotPath[]
-  included: Set<string>
-}
-
-const createPathAccumulator = (existingPaths: PlotPath[]): PathAccumulator => {
-  const acc: PathAccumulator = { included: new Set<string>(), plotPaths: [] }
-
-  for (const existing of existingPaths) {
-    acc.included.add(existing.path)
-    acc.plotPaths.push(existing)
-  }
-
-  return acc
+  revisions: Set<string>
 }
 
 const collectType = (plots: Plot[]) => {
@@ -76,16 +67,81 @@ const getType = (
   return collectType(plots)
 }
 
-const collectPath = (
-  acc: PathAccumulator,
+const filterWorkspaceIfFetched = (
+  existingPaths: PlotPath[],
+  fetchedRevs: string[]
+) => {
+  if (!fetchedRevs.includes(EXPERIMENT_WORKSPACE_ID)) {
+    return existingPaths
+  }
+
+  return existingPaths.map(existing => {
+    const revisions = existing.revisions
+    revisions.delete(EXPERIMENT_WORKSPACE_ID)
+    return { ...existing, revisions }
+  })
+}
+
+const collectImageRevision = (
+  acc: Set<string>,
+  plot: ImagePlot,
+  cliIdToLabel: { [id: string]: string }
+): void => {
+  const revision = plot.revisions?.[0]
+  if (revision) {
+    acc.add(cliIdToLabel[revision] || revision)
+  }
+}
+
+const collectTemplateRevisions = (
+  acc: Set<string>,
+  plot: TemplatePlot,
+  cliIdToLabel: { [id: string]: string }
+): void => {
+  for (const [revision, datapoints] of Object.entries(plot?.datapoints || {})) {
+    if (datapoints.length > 0) {
+      acc.add(cliIdToLabel[revision] || revision)
+    }
+  }
+}
+
+const collectPathRevisions = (
   data: PlotsOutput,
+  path: string,
+  cliIdToLabel: { [id: string]: string }
+): Set<string> => {
+  const revisions = new Set<string>()
+
+  for (const plot of data[path] || []) {
+    if (isImagePlot(plot)) {
+      collectImageRevision(revisions, plot, cliIdToLabel)
+      continue
+    }
+
+    collectTemplateRevisions(revisions, plot, cliIdToLabel)
+  }
+
+  return revisions
+}
+
+const collectOrderedPath = (
+  acc: PlotPath[],
+  data: PlotsOutput,
+  revisions: Set<string>,
   pathArray: string[],
   idx: number
-) => {
+): PlotPath[] => {
   const path = getPath(pathArray, idx)
 
-  if (acc.included.has(path)) {
-    return
+  if (acc.some(({ path: existingPath }) => existingPath === path)) {
+    return acc.map(existing =>
+      existing.path === path
+        ? {
+            ...existing,
+            revisions: new Set([...existing.revisions, ...revisions])
+          }
+        : existing
+    )
   }
 
   const hasChildren = idx !== pathArray.length
@@ -94,7 +150,8 @@ const collectPath = (
     hasChildren,
     label: pathArray[idx - 1],
     parentPath: getParent(pathArray, idx),
-    path
+    path,
+    revisions
   }
 
   const type = getType(data, hasChildren, path)
@@ -102,27 +159,35 @@ const collectPath = (
     plotPath.type = type
   }
 
-  acc.plotPaths.push(plotPath)
-  acc.included.add(path)
+  acc.push(plotPath)
+  return acc
 }
 
 export const collectPaths = (
   existingPaths: PlotPath[],
-  data: PlotsOutput
+  data: PlotsOutput,
+  fetchedRevs: string[],
+  cliIdToLabel: { [id: string]: string }
 ): PlotPath[] => {
-  const acc = createPathAccumulator(existingPaths)
+  let acc: PlotPath[] = filterWorkspaceIfFetched(existingPaths, fetchedRevs)
 
   const paths = Object.keys(data)
 
   for (const path of paths) {
+    const revisions = collectPathRevisions(data, path, cliIdToLabel)
+
+    if (revisions.size === 0) {
+      continue
+    }
+
     const pathArray = getPathArray(path)
 
     for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
-      collectPath(acc, data, pathArray, reverseIdx)
+      acc = collectOrderedPath(acc, data, revisions, pathArray, reverseIdx)
     }
   }
 
-  return acc.plotPaths
+  return acc
 }
 
 export type TemplateOrder = { paths: string[]; group: TemplatePlotGroup }[]
