@@ -2,11 +2,11 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { EventEmitter, RelativePattern } from 'vscode'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
-import { Disposable } from '../../../../extension'
 import {
   bypassProcessManagerDebounce,
   getFirstArgOfCall,
   getMockNow,
+  getSafeWatcherDisposer,
   stubPrivateMemberMethod
 } from '../../util'
 import { dvcDemoPath, getTestWorkspaceFolder } from '../../../util'
@@ -27,14 +27,14 @@ import { gitPath } from '../../../../cli/git/constants'
 import { getGitPath } from '../../../../fileSystem'
 
 suite('Experiments Data Test Suite', () => {
-  const disposable = Disposable.fn()
+  const disposable = getSafeWatcherDisposer()
 
   beforeEach(() => {
     restore()
   })
 
   afterEach(() => {
-    disposable.dispose()
+    return disposable.disposeAndFlush()
   })
 
   describe('ExperimentsData', () => {

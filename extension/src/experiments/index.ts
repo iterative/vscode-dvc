@@ -163,10 +163,6 @@ export class Experiments extends BaseRepository<TableData> {
     return this.cliData.managedUpdate()
   }
 
-  public forceUpdate() {
-    return this.cliData.forceUpdate()
-  }
-
   public async setState(data: ExperimentsOutput) {
     const dvcLiveOnly = await checkSignalFile(
       join(this.dvcRoot, DVCLIVE_ONLY_RUNNING_SIGNAL_FILE)

@@ -66,10 +66,6 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     return this.notifyChanged(data)
   }
 
-  public forceUpdate() {
-    return this.processManager.forceRunQueued()
-  }
-
   protected collectFiles(data: ExperimentsOutput) {
     this.collectedFiles = collectFiles(data, this.collectedFiles)
   }
