@@ -30,7 +30,7 @@ const basicVega = {
         '4fb124a'
       ],
       datapoints: {
-        workspace: [
+        [EXPERIMENT_WORKSPACE_ID]: [
           {
             loss: '2.298783302307129',
             step: '0',

@@ -17,7 +17,7 @@ export const AddPlots: React.FC<AddPlotsProps> = ({
   <div>
     <NoPlotsText />
     <div>
-      {!hasSelectedPlots && (
+      {hasSelectedRevisions && !hasSelectedPlots && (
         <StartButton
           onClick={() =>
             sendMessage({
@@ -29,7 +29,6 @@ export const AddPlots: React.FC<AddPlotsProps> = ({
       )}
       {!hasSelectedRevisions && (
         <StartButton
-          appearance={hasSelectedPlots ? 'primary' : 'secondary'}
           isNested={!hasSelectedPlots}
           onClick={() =>
             sendMessage({

@@ -13,6 +13,7 @@ export interface IExtension {
   resetMembers: () => void
 
   setAvailable: (available: boolean) => void
+  getAvailable: () => boolean
   setCliCompatible: (compatible: boolean | undefined) => void
   setRoots: () => Promise<void>
   unsetPythonBinPath: () => void

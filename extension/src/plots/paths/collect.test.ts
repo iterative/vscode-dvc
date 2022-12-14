@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { join, sep } from 'path'
 import { VisualizationSpec } from 'react-vega'
 import isEqual from 'lodash.isequal'
 import {
@@ -14,26 +14,36 @@ import { Shape, StrokeDash } from '../multiSource/constants'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 
 describe('collectPath', () => {
+  const revisions = [
+    EXPERIMENT_WORKSPACE_ID,
+    '53c3851',
+    '4fb124a',
+    '42b8736',
+    '1ba7bcd'
+  ]
   it('should return the expected data from the test fixture', () => {
-    expect(collectPaths([], plotsDiffFixture)).toStrictEqual([
+    expect(collectPaths([], plotsDiffFixture, revisions, {})).toStrictEqual([
       {
         hasChildren: false,
         label: 'acc.png',
         parentPath: 'plots',
         path: join('plots', 'acc.png'),
+        revisions: new Set(revisions),
         type: new Set(['comparison'])
       },
       {
         hasChildren: true,
         label: 'plots',
         parentPath: undefined,
-        path: 'plots'
+        path: 'plots',
+        revisions: new Set(revisions)
       },
       {
         hasChildren: false,
         label: 'heatmap.png',
         parentPath: 'plots',
         path: join('plots', 'heatmap.png'),
+        revisions: new Set(revisions),
         type: new Set(['comparison'])
       },
       {
@@ -41,6 +51,7 @@ describe('collectPath', () => {
         label: 'loss.png',
         parentPath: 'plots',
         path: join('plots', 'loss.png'),
+        revisions: new Set(revisions),
         type: new Set(['comparison'])
       },
       {
@@ -48,14 +59,22 @@ describe('collectPath', () => {
         label: 'loss.tsv',
         parentPath: 'logs',
         path: join('logs', 'loss.tsv'),
+        revisions: new Set(revisions),
         type: new Set(['template-single'])
       },
-      { hasChildren: true, label: 'logs', parentPath: undefined, path: 'logs' },
+      {
+        hasChildren: true,
+        label: 'logs',
+        parentPath: undefined,
+        path: 'logs',
+        revisions: new Set(revisions)
+      },
       {
         hasChildren: false,
         label: 'acc.tsv',
         parentPath: 'logs',
         path: join('logs', 'acc.tsv'),
+        revisions: new Set(revisions),
         type: new Set(['template-single'])
       },
       {
@@ -63,9 +82,45 @@ describe('collectPath', () => {
         label: 'predictions.json',
         parentPath: undefined,
         path: 'predictions.json',
+        revisions: new Set(revisions),
         type: new Set(['template-multi'])
       }
     ])
+  })
+
+  it('should update the revision details when the workspace is recollected (plots in workspace changed)', () => {
+    const [remainingPath] = Object.keys(plotsDiffFixture)
+    const collectedPaths = collectPaths([], plotsDiffFixture, revisions, {})
+    expect(
+      collectedPaths.filter(path => path.revisions.has(EXPERIMENT_WORKSPACE_ID))
+    ).toHaveLength(collectedPaths.length)
+
+    const updatedPaths = collectPaths(
+      collectedPaths,
+      {
+        [remainingPath]: [
+          {
+            content: {},
+            datapoints: {
+              [EXPERIMENT_WORKSPACE_ID]: [
+                {
+                  loss: '2.43323',
+                  step: '0'
+                }
+              ]
+            },
+            revisions: [EXPERIMENT_WORKSPACE_ID],
+            type: PlotsType.VEGA
+          }
+        ]
+      },
+      [EXPERIMENT_WORKSPACE_ID],
+      {}
+    )
+
+    expect(
+      updatedPaths.filter(path => path.revisions.has(EXPERIMENT_WORKSPACE_ID))
+    ).toHaveLength(remainingPath.split(sep).length)
   })
 
   it('should not drop already collected paths', () => {
@@ -75,33 +130,42 @@ describe('collectPath', () => {
       label: mockPath,
       parentPath: undefined,
       path: mockPath,
+      revisions: new Set(['bfc7f64']),
       type: new Set([PathType.TEMPLATE_SINGLE])
     }
 
-    const paths = collectPaths([mockPlotPath], plotsDiffFixture)
+    const paths = collectPaths(
+      [mockPlotPath],
+      plotsDiffFixture,
+      ['bfc7f64'],
+      {}
+    )
 
     expect(paths.some(plotPath => isEqual(plotPath, mockPlotPath))).toBeTruthy()
   })
 
   it('should handle more complex paths', () => {
+    const revisions = [EXPERIMENT_WORKSPACE_ID]
     const mockPlotsDiff = {
       [join('logs', 'scalars', 'acc.tsv')]: [
         {
           content: {},
-          revisions: [EXPERIMENT_WORKSPACE_ID],
+          datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
+          revisions,
           type: PlotsType.VEGA
         }
       ],
       [join('logs', 'scalars', 'loss.tsv')]: [
         {
           content: {},
-          revisions: [EXPERIMENT_WORKSPACE_ID],
+          datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
+          revisions,
           type: PlotsType.VEGA
         }
       ],
       [join('plots', 'heatmap.png')]: [
         {
-          revisions: [EXPERIMENT_WORKSPACE_ID],
+          revisions,
           type: PlotsType.IMAGE,
           url: join('plots', 'heatmap.png')
         }
@@ -111,32 +175,42 @@ describe('collectPath', () => {
           content: {
             facet: { field: 'rev', type: 'nominal' }
           } as VisualizationSpec,
-          revisions: [EXPERIMENT_WORKSPACE_ID],
+          datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
+          revisions,
           type: PlotsType.VEGA
         }
       ]
     }
 
-    expect(collectPaths([], mockPlotsDiff)).toStrictEqual([
+    expect(collectPaths([], mockPlotsDiff, revisions, {})).toStrictEqual([
       {
         hasChildren: false,
         label: 'acc.tsv',
         parentPath: join('logs', 'scalars'),
         path: join('logs', 'scalars', 'acc.tsv'),
+        revisions: new Set(revisions),
         type: new Set(['template-single'])
       },
       {
         hasChildren: true,
         label: 'scalars',
         parentPath: 'logs',
-        path: join('logs', 'scalars')
+        path: join('logs', 'scalars'),
+        revisions: new Set(revisions)
       },
-      { hasChildren: true, label: 'logs', parentPath: undefined, path: 'logs' },
+      {
+        hasChildren: true,
+        label: 'logs',
+        parentPath: undefined,
+        path: 'logs',
+        revisions: new Set(revisions)
+      },
       {
         hasChildren: false,
         label: 'loss.tsv',
         parentPath: join('logs', 'scalars'),
         path: join('logs', 'scalars', 'loss.tsv'),
+        revisions: new Set(revisions),
         type: new Set(['template-single'])
       },
       {
@@ -144,19 +218,22 @@ describe('collectPath', () => {
         label: 'heatmap.png',
         parentPath: 'plots',
         path: join('plots', 'heatmap.png'),
+        revisions: new Set(revisions),
         type: new Set(['comparison'])
       },
       {
         hasChildren: true,
         label: 'plots',
         parentPath: undefined,
-        path: 'plots'
+        path: 'plots',
+        revisions: new Set(revisions)
       },
       {
         hasChildren: false,
         label: 'predictions.json',
         parentPath: undefined,
         path: 'predictions.json',
+        revisions: new Set(revisions),
         type: new Set(['template-multi'])
       }
     ])
