@@ -21,7 +21,7 @@ import { IExtension } from './interfaces'
 import { registerRepositoryCommands } from './repository/commands/register'
 import { ResourceLocator } from './resourceLocator'
 import { definedAndNonEmpty } from './util/array'
-import { setup, setupWorkspace } from './setup'
+import { setup, setupWithGlobalRecheck, setupWorkspace } from './setup'
 import { Status } from './status'
 import { reRegisterVsCodeCommands } from './vscode/commands'
 import { InternalCommands } from './commands/internal'
@@ -62,7 +62,6 @@ import { createFileSystemWatcher } from './fileSystem/watcher'
 import { GitExecutor } from './cli/git/executor'
 import { GitReader } from './cli/git/reader'
 import { GetStarted } from './getStarted'
-import { recheckGlobal } from './cli/dvc/discovery'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
@@ -205,17 +204,13 @@ export class Extension extends Disposable implements IExtension {
       new RepositoriesTree(this.internalCommands, this.repositories)
     )
 
-    setup(this)
+    setupWithGlobalRecheck(this)
       .then(async () => {
         sendTelemetryEvent(
           EventName.EXTENSION_LOAD,
           await this.getEventProperties(),
           { duration: stopWatch.getElapsedTime() }
         )
-
-        if (!this.cliAccessible) {
-          recheckGlobal(this, () => setup(this))
-        }
       })
       .catch(async error =>
         sendTelemetryEventAndThrow(

@@ -18,6 +18,7 @@ import {
   selectPythonInterpreter
 } from '../../extensions/python'
 import { getFirstWorkspaceFolder } from '../../vscode/workspaceFolders'
+import { delay } from '../../util/time'
 
 const getToastOptions = (isPythonExtensionInstalled: boolean): Response[] => {
   return isPythonExtensionInstalled
@@ -229,8 +230,10 @@ export const extensionCanRunCli = async (
 
 export const recheckGlobal = async (
   extension: IExtension,
-  setup: () => Promise<void[] | undefined>
+  setup: () => Promise<void[] | undefined>,
+  recheckInterval: number
 ): Promise<void> => {
+  await delay(recheckInterval)
   const roots = extension.getRoots()
   const cwd = roots.length > 0 ? roots[0] : getFirstWorkspaceFolder()
 
@@ -243,8 +246,7 @@ export const recheckGlobal = async (
   const isCompatible = isCliCompatible(cliCompatible)
 
   if (!isCompatible) {
-    setTimeout(() => recheckGlobal(extension, setup), 5000)
-    return
+    return recheckGlobal(extension, setup, recheckInterval)
   }
 
   setup()
