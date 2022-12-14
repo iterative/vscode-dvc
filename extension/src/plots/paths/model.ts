@@ -8,7 +8,10 @@ import {
 } from './collect'
 import { PathSelectionModel, Status } from '../../path/selection/model'
 import { PersistenceKey } from '../../persistence/constants'
-import { performSimpleOrderedUpdate } from '../../util/array'
+import {
+  definedAndNonEmpty,
+  performSimpleOrderedUpdate
+} from '../../util/array'
 import { MultiSourceEncoding } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
 import { PlotsOutputOrError } from '../../cli/dvc/contract'
@@ -85,14 +88,21 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
       .map(element => ({ ...element, selected: !!this.status[element.path] }))
   }
 
-  public getSelected() {
-    return (
-      this.data.filter(
-        element =>
-          this.status[element.path] !== Status.UNSELECTED &&
-          this.hasRevisions(element)
-      ) || []
+  public getHasUnselectedPlots() {
+    const revisionPaths = this.data.filter(element =>
+      this.hasRevisions(element)
     )
+
+    if (!definedAndNonEmpty(revisionPaths)) {
+      return false
+    }
+
+    for (const { path } of revisionPaths) {
+      if (this.status[path] === Status.UNSELECTED) {
+        return true
+      }
+    }
+    return false
   }
 
   public getTemplateOrder(): TemplateOrder {

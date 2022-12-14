@@ -21,7 +21,6 @@ import { PlotsModel } from '../model'
 import { PathsModel } from '../paths/model'
 import { BaseWebview } from '../../webview'
 import { getModifiedTime } from '../../fileSystem'
-import { definedAndNonEmpty } from '../../util/array'
 
 export class WebviewMessages {
   private readonly paths: PathsModel
@@ -56,7 +55,7 @@ export class WebviewMessages {
       checkpoint: this.getCheckpointPlots(),
       comparison: this.getComparisonPlots(overrideComparison),
       hasPlots: !!this.paths.hasPaths(),
-      hasSelectedPlots: definedAndNonEmpty(this.paths.getSelected()),
+      hasUnselectedPlots: this.paths.getHasUnselectedPlots(),
       sectionCollapsed: this.plots.getSectionCollapsed(),
       selectedRevisions: overrideRevisions,
       template: this.getTemplatePlots(overrideRevisions)

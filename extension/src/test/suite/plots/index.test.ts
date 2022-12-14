@@ -675,7 +675,7 @@ suite('Plots Test Suite', () => {
         checkpoint: checkpointPlotsFixture,
         comparison: comparisonPlotsFixture,
         hasPlots: true,
-        hasSelectedPlots: true,
+        hasUnselectedPlots: false,
         sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
         selectedRevisions: plotsRevisionsFixture,
         template: templatePlotsFixture

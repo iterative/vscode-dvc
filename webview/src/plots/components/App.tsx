@@ -27,7 +27,7 @@ import {
 import {
   initialize,
   updateHasPlots,
-  updateHasSelectedPlots,
+  updateHasUnselectedPlots,
   updateSelectedRevisions
 } from './webviewSlice'
 import { PlotsDispatch } from '../store'
@@ -71,8 +71,8 @@ export const feedStore = (
         case PlotsDataKeys.HAS_PLOTS:
           dispatch(updateHasPlots(!!data.data[key]))
           continue
-        case PlotsDataKeys.HAS_SELECTED_PLOTS:
-          dispatch(updateHasSelectedPlots(!!data.data[key]))
+        case PlotsDataKeys.HAS_UNSELECTED_PLOTS:
+          dispatch(updateHasUnselectedPlots(!!data.data[key]))
           continue
         case PlotsDataKeys.SELECTED_REVISIONS:
           dispatch(updateSelectedRevisions(data.data[key] as Revision[]))

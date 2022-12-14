@@ -3,22 +3,31 @@ import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { sendMessage } from '../../shared/vscode'
 import { StartButton } from '../../shared/components/button/StartButton'
 
-const NoPlotsText: React.FC = () => <p>No Plots to Display.</p>
-
 export type AddPlotsProps = {
-  hasSelectedPlots: boolean
+  hasUnselectedPlots: boolean
   hasSelectedRevisions: boolean
 }
 
 export const AddPlots: React.FC<AddPlotsProps> = ({
-  hasSelectedPlots,
-  hasSelectedRevisions
+  hasUnselectedPlots
 }: AddPlotsProps) => (
   <div>
-    <NoPlotsText />
+    <p>No Plots to Display.</p>
     <div>
-      {hasSelectedRevisions && !hasSelectedPlots && (
+      {
         <StartButton
+          onClick={() =>
+            sendMessage({
+              type: MessageFromWebviewType.SELECT_EXPERIMENTS
+            })
+          }
+          text="Add Experiments"
+        />
+      }
+      {hasUnselectedPlots && (
+        <StartButton
+          isNested={hasUnselectedPlots}
+          appearance="secondary"
           onClick={() =>
             sendMessage({
               type: MessageFromWebviewType.SELECT_PLOTS
@@ -27,24 +36,21 @@ export const AddPlots: React.FC<AddPlotsProps> = ({
           text="Add Plots"
         />
       )}
-      {!hasSelectedRevisions && (
-        <StartButton
-          isNested={!hasSelectedPlots}
-          onClick={() =>
-            sendMessage({
-              type: MessageFromWebviewType.SELECT_EXPERIMENTS
-            })
-          }
-          text="Add Experiments"
-        />
-      )}
     </div>
   </div>
 )
 
 export const Welcome: React.FC = () => (
   <div>
-    <NoPlotsText />
+    <p>No Plots Detected.</p>
+    <StartButton
+      onClick={() =>
+        sendMessage({
+          type: MessageFromWebviewType.SELECT_EXPERIMENTS
+        })
+      }
+      text="Add Experiments"
+    />
     <p>
       Learn how to{' '}
       <a href="https://dvc.org/doc/studio/user-guide/views/visualize-experiments">
