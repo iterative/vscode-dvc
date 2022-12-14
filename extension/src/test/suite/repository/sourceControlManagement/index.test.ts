@@ -213,6 +213,7 @@ suite('Source Control Management Test Suite', () => {
         GitCli.prototype,
         'getGitRepositoryRoot'
       ).resolves(gitRoot)
+
       const mockExecuteProcess = stubPrivatePrototypeMethod(
         Cli,
         'executeProcess'
@@ -223,8 +224,7 @@ suite('Source Control Management Test Suite', () => {
       })
 
       expect(mockGetGitRepositoryRoot).to.be.calledOnce
-      expect(mockExecuteProcess).to.be.calledOnce
-      expect(mockExecuteProcess).to.be.calledWith({
+      expect(mockExecuteProcess).to.be.calledWithExactly({
         args: ['add', '.'],
         cwd: gitRoot,
         executable: 'git'
@@ -241,8 +241,7 @@ suite('Source Control Management Test Suite', () => {
         rootUri
       })
 
-      expect(mockExecuteProcess).to.be.calledOnce
-      expect(mockExecuteProcess).to.be.calledWith({
+      expect(mockExecuteProcess).to.be.calledWithExactly({
         args: ['reset'],
         cwd: dvcDemoPath,
         executable: 'git'
@@ -251,10 +250,6 @@ suite('Source Control Management Test Suite', () => {
 
     it('should not reset the workspace if the user does not confirm', async () => {
       const mockCheckout = stub(DvcExecutor.prototype, 'checkout').resolves('')
-      const mockExecuteProcess = stubPrivatePrototypeMethod(
-        Cli,
-        'executeProcess'
-      )
 
       stubPrivatePrototypeMethod(WorkspaceRepositories, 'hasChanges').returns(
         true
@@ -274,7 +269,6 @@ suite('Source Control Management Test Suite', () => {
 
       expect(mockShowWarningMessage).to.be.calledOnce
       expect(mockCheckout).not.to.be.called
-      expect(mockExecuteProcess).not.to.be.called
     })
 
     it('should reset the workspace if the user confirms they want to', async () => {
@@ -302,13 +296,12 @@ suite('Source Control Management Test Suite', () => {
 
       expect(mockShowWarningMessage).to.be.calledOnce
       expect(mockCheckout).to.be.calledOnce
-      expect(mockExecuteProcess).to.be.calledTwice
-      expect(mockExecuteProcess).to.be.calledWith({
+      expect(mockExecuteProcess).to.be.calledWithExactly({
         args: ['reset', '--hard', 'HEAD'],
         cwd: dvcDemoPath,
         executable: 'git'
       })
-      expect(mockExecuteProcess).to.be.calledWith({
+      expect(mockExecuteProcess).to.be.calledWithExactly({
         args: ['clean', '-f', '-d', '-q'],
         cwd: dvcDemoPath,
         executable: 'git'
@@ -317,10 +310,6 @@ suite('Source Control Management Test Suite', () => {
 
     it('should not reset the workspace if there is another user initiated command running', async () => {
       const mockCheckout = stub(DvcExecutor.prototype, 'checkout').resolves('')
-      const mockExecuteProcess = stubPrivatePrototypeMethod(
-        Cli,
-        'executeProcess'
-      )
 
       stubPrivatePrototypeMethod(WorkspaceRepositories, 'hasChanges').returns(
         true
@@ -336,7 +325,6 @@ suite('Source Control Management Test Suite', () => {
       )
 
       expect(mockCheckout).not.to.be.called
-      expect(mockExecuteProcess).not.to.be.called
     })
   })
 })
