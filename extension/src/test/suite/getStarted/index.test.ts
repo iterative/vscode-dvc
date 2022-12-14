@@ -23,8 +23,10 @@ suite('GetStarted Test Suite', () => {
 
   describe('Get Started', () => {
     it('should handle a initialize project message from the webview', async () => {
-      const { messageSpy, getStarted, mockInitializeProject } =
-        await buildGetStarted(disposable, true)
+      const { messageSpy, getStarted, mockInitializeProject } = buildGetStarted(
+        disposable,
+        true
+      )
 
       const webview = await getStarted.showWebview()
       await webview.isReady()
@@ -40,8 +42,10 @@ suite('GetStarted Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a open experiments message from the webview', async () => {
-      const { messageSpy, getStarted, mockOpenExperiments } =
-        await buildGetStarted(disposable, true)
+      const { messageSpy, getStarted, mockOpenExperiments } = buildGetStarted(
+        disposable,
+        true
+      )
 
       const webview = await getStarted.showWebview()
       await webview.isReady()
@@ -57,7 +61,7 @@ suite('GetStarted Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should log an error message if the message from the webview is anything else than initialize project', async () => {
-      const { messageSpy, getStarted } = await buildGetStarted(disposable)
+      const { messageSpy, getStarted } = buildGetStarted(disposable)
 
       const webview = await getStarted.showWebview()
       await webview.isReady()

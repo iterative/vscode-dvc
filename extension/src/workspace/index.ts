@@ -38,7 +38,9 @@ export abstract class BaseWorkspace<
   }
 
   public reset(): void {
-    this.repositories = reset<T>(this.repositories, this.dispose)
+    this.repositories = reset<T>(this.repositories, (disposable: T) =>
+      this.dispose.untrack(disposable)
+    )
     this.resetDeferred()
   }
 
