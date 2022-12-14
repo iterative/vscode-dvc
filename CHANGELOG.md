@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.26] - 2022-12-14
+
+### 🚀 New Features and Enhancements
+
+- Dynamic Get Started webview [#2894](https://github.com/iterative/vscode-dvc/pull/2894) by [@sroy3](https://github.com/sroy3)
+- Use DVCLive signal file to indicate that an experiment is running in the workspace [#2923](https://github.com/iterative/vscode-dvc/pull/2923) by [@mattseddon](https://github.com/mattseddon)
+- Only show plots which are available for selected revisions [#2915](https://github.com/iterative/vscode-dvc/pull/2915) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Recheck for global CLI becoming available [#2928](https://github.com/iterative/vscode-dvc/pull/2928) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Split turbo cache between workflows [#2905](https://github.com/iterative/vscode-dvc/pull/2905) by [@mattseddon](https://github.com/mattseddon)
+- Update scheduled cli test [#2906](https://github.com/iterative/vscode-dvc/pull/2906) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.25] - 2022-12-09
 
 ### 🔨 Maintenance
