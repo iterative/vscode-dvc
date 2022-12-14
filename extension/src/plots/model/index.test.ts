@@ -28,11 +28,14 @@ describe('plotsModel', () => {
     [PersistenceKey.PLOT_SIZES + exampleDvcRoot]: DEFAULT_SECTION_SIZES
   })
   const mockedGetSelectedRevisions = jest.fn()
+  const mockedGetFirstThreeColumnOrder = jest.fn()
+  mockedGetFirstThreeColumnOrder.mockReturnValue([])
 
   beforeEach(() => {
     model = new PlotsModel(
       exampleDvcRoot,
       {
+        getFirstThreeColumnOrder: mockedGetFirstThreeColumnOrder,
         getSelectedRevisions: mockedGetSelectedRevisions,
         isReady: () => Promise.resolve(undefined)
       } as unknown as Experiments,
