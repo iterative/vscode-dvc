@@ -1,6 +1,6 @@
 import { resolve } from 'path'
 import { extensions, Extension, commands } from 'vscode'
-import { setup, setupWorkspace } from './setup'
+import { setup, setupWithGlobalRecheck, setupWorkspace } from './setup'
 import { flushPromises } from './test/util/jest'
 import {
   getConfigValue,
@@ -24,6 +24,7 @@ import {
   MIN_CLI_VERSION
 } from './cli/dvc/constants'
 import { extractSemver, ParsedSemver } from './cli/dvc/version'
+import { delay } from './util/time'
 
 jest.mock('vscode')
 jest.mock('./vscode/config')
@@ -32,7 +33,6 @@ jest.mock('./vscode/quickPick')
 jest.mock('./vscode/toast')
 jest.mock('./vscode/workspaceFolders')
 jest.mock('./processExecution')
-jest.mock('./setupUtil')
 
 const mockedExtensions = jest.mocked(extensions)
 const mockedCommands = jest.mocked(commands)
@@ -63,6 +63,7 @@ const mockedVscodePython = {
 }
 
 const mockedCwd = __dirname
+const mockedGetAvailable = jest.fn()
 const mockedGetCliVersion = jest.fn()
 const mockedGetFirstWorkspaceFolder = jest.mocked(getFirstWorkspaceFolder)
 const mockedHasRoots = jest.fn()
@@ -259,6 +260,7 @@ describe('setupWorkspace', () => {
 
 describe('setup', () => {
   const extension = {
+    getAvailable: mockedGetAvailable,
     getCliVersion: mockedGetCliVersion,
     getRoots: mockedGetRoots,
     hasRoots: mockedHasRoots,
@@ -616,5 +618,104 @@ describe('setup', () => {
     await setup(extension)
     expect(mockedResetMembers).toHaveBeenCalledTimes(1)
     expect(mockedInitialize).not.toHaveBeenCalled()
+  })
+})
+
+describe('setupWithGlobalRecheck', () => {
+  const extension = {
+    getAvailable: mockedGetAvailable,
+    getCliVersion: mockedGetCliVersion,
+    getRoots: mockedGetRoots,
+    hasRoots: mockedHasRoots,
+    initialize: mockedInitialize,
+    isPythonExtensionUsed: mockedIsPythonExtensionUsed,
+    resetMembers: mockedResetMembers,
+    setAvailable: mockedSetAvailable,
+    setCliCompatible: mockedSetCliCompatible,
+    setRoots: mockedSetRoots,
+    setupWorkspace: mockedSetupWorkspace,
+    unsetPythonBinPath: mockedUnsetPythonBinPath
+  }
+
+  it('should periodically check to see if the CLI is available globally if the extension fails to initialize', async () => {
+    mockedGetFirstWorkspaceFolder.mockReturnValue(mockedCwd)
+
+    const mockedRecheckInterval = 0
+
+    mockedGetAvailable
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(false)
+
+    mockedGetCliVersion
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(LATEST_TESTED_CLI_VERSION)
+      .mockResolvedValueOnce(LATEST_TESTED_CLI_VERSION)
+
+    await setupWithGlobalRecheck(extension, mockedRecheckInterval)
+
+    expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
+    expect(mockedGetAvailable).toHaveBeenCalledTimes(1)
+
+    await delay(mockedRecheckInterval)
+
+    expect(mockedGetCliVersion).toHaveBeenCalledTimes(2)
+    expect(mockedGetAvailable).toHaveBeenCalledTimes(2)
+
+    await delay(mockedRecheckInterval)
+
+    expect(mockedGetCliVersion).toHaveBeenCalledTimes(4)
+    expect(mockedGetAvailable).toHaveBeenCalledTimes(3)
+
+    await delay(mockedRecheckInterval)
+
+    expect(mockedGetCliVersion).toHaveBeenCalledTimes(4)
+    expect(mockedGetAvailable).toHaveBeenCalledTimes(3)
+  })
+
+  it('should not periodically check to see if the CLI is available globally if the extension initializes', async () => {
+    mockedGetFirstWorkspaceFolder.mockReturnValue(mockedCwd)
+
+    mockedGetAvailable.mockReturnValueOnce(true)
+
+    mockedGetCliVersion.mockResolvedValueOnce(LATEST_TESTED_CLI_VERSION)
+
+    await setupWithGlobalRecheck(extension, 0)
+
+    expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
+    expect(mockedGetAvailable).toHaveBeenCalledTimes(1)
+
+    await delay(0)
+
+    expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
+    expect(mockedGetAvailable).toHaveBeenCalledTimes(1)
+
+    await delay(0)
+
+    expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
+    expect(mockedGetAvailable).toHaveBeenCalledTimes(1)
+  })
+
+  it('should stop checking if the extension is available globally if it initializes', async () => {
+    mockedGetFirstWorkspaceFolder.mockReturnValue(mockedCwd)
+
+    mockedGetAvailable.mockReturnValueOnce(false).mockReturnValueOnce(true)
+    mockedGetCliVersion.mockResolvedValueOnce(undefined)
+
+    await setupWithGlobalRecheck(extension, 0)
+
+    expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
+    expect(mockedGetAvailable).toHaveBeenCalledTimes(1)
+
+    await delay(0)
+
+    expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
+    expect(mockedGetAvailable).toHaveBeenCalledTimes(2)
+
+    await delay(0)
+
+    expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
+    expect(mockedGetAvailable).toHaveBeenCalledTimes(2)
   })
 })

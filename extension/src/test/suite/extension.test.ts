@@ -55,7 +55,6 @@ suite('Extension Test Suite', () => {
     ])
   })
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('dvc.setupWorkspace', () => {
     it('should set dvc.dvcPath to the default when dvc is installed in a virtual environment', async () => {
       stub(Python, 'isPythonExtensionInstalled').returns(true)
