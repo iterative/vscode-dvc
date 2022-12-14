@@ -113,8 +113,9 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
   const dispatch = useDispatch()
 
   const cleanup = useCallback(() => {
+    immediateDragLeave()
+
     if (pickedUp.current) {
-      immediateDragLeave()
       setDraggedOverId('')
       setDraggedId('')
       setDirection(defaultDragEnterDirection)
