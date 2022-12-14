@@ -247,6 +247,10 @@ export const spyOnPrivateMemberMethod = <T>(
   method: string
 ) => spy((classWithPrivateMember as any)[memberName], method)
 
+export type SafeWatcherDisposer = Disposer & {
+  disposeAndFlush: () => Promise<unknown>
+}
+
 export const getSafeWatcherDisposer = (): Disposer & {
   disposeAndFlush: () => Promise<unknown>
 } => {

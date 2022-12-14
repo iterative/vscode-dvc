@@ -12,12 +12,12 @@ import {
   window
 } from 'vscode'
 import { addFilterViaQuickInput } from './filterBy/util'
-import { Disposable } from '../../../../extension'
 import { ExperimentsModel, ExperimentType } from '../../../../experiments/model'
 import { UNSELECTED } from '../../../../experiments/model/status'
 import {
   experimentsUpdatedEvent,
   getFirstArgOfLastCall,
+  getSafeWatcherDisposer,
   spyOnPrivateMethod,
   stubPrivatePrototypeMethod
 } from '../../util'
@@ -55,14 +55,14 @@ import { ExperimentItem } from '../../../../experiments/model/collect'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 
 suite('Experiments Tree Test Suite', () => {
-  const disposable = Disposable.fn()
+  const disposable = getSafeWatcherDisposer()
 
   beforeEach(() => {
     restore()
   })
 
   afterEach(() => {
-    disposable.dispose()
+    return disposable.disposeAndFlush()
   })
 
   // eslint-disable-next-line sonarjs/cognitive-complexity

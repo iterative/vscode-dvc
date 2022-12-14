@@ -5,6 +5,7 @@ import {
   buildInternalCommands,
   FIRST_TRUTHY_TIME,
   mockDisposable,
+  SafeWatcherDisposer,
   spyOnPrivateMemberMethod
 } from '../util'
 import { Disposer } from '../../../extension'
@@ -46,7 +47,7 @@ export const buildDependencies = (disposer: Disposer) => {
   }
 }
 
-export const buildRepositoryData = async (disposer: Disposer) => {
+export const buildRepositoryData = async (disposer: SafeWatcherDisposer) => {
   const {
     internalCommands,
     mockCreateFileSystemWatcher,
