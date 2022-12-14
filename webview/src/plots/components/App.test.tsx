@@ -244,7 +244,7 @@ describe('App', () => {
     renderAppWithOptionalData({
       checkpoint: null
     })
-    const emptyState = await screen.findByText('No Plots to Display.')
+    const emptyState = await screen.findByText('No Plots Detected.')
 
     expect(emptyState).toBeInTheDocument()
   })
@@ -272,7 +272,7 @@ describe('App', () => {
         size: PlotSizeNumber.REGULAR
       },
       hasPlots: true,
-      hasSelectedPlots: true,
+      hasUnselectedPlots: false,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       selectedRevisions: [
         {
@@ -291,18 +291,26 @@ describe('App', () => {
     expect(loading).toHaveLength(3)
   })
 
-  it('should only render the Add Plots get started button when there are experiments but no plots are selected', async () => {
+  it('should render the Add Plots and Add Experiments get started button when there are experiments which have plots that are all unselected', async () => {
     renderAppWithOptionalData({
       checkpoint: null,
       hasPlots: true,
-      hasSelectedPlots: false,
+      hasUnselectedPlots: true,
       selectedRevisions: [{} as Revision]
     })
-    const addExperimentsButton = screen.queryByText('Add Experiments')
+    const addExperimentsButton = await screen.findByText('Add Experiments')
     const addPlotsButton = await screen.findByText('Add Plots')
 
-    expect(addExperimentsButton).not.toBeInTheDocument()
+    expect(addExperimentsButton).toBeInTheDocument()
     expect(addPlotsButton).toBeInTheDocument()
+
+    mockPostMessage.mockReset()
+
+    fireEvent.click(addExperimentsButton)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.SELECT_EXPERIMENTS
+    })
 
     mockPostMessage.mockReset()
 
@@ -314,11 +322,11 @@ describe('App', () => {
     mockPostMessage.mockReset()
   })
 
-  it('should only render the Add Experiments get started button when no plots or experiments are selected', async () => {
+  it('should render only the Add Experiments get started button when no experiments are selected', async () => {
     renderAppWithOptionalData({
       checkpoint: null,
       hasPlots: true,
-      hasSelectedPlots: false,
+      hasUnselectedPlots: false,
       selectedRevisions: undefined
     })
     const addExperimentsButton = await screen.findByText('Add Experiments')

@@ -2,23 +2,26 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { stub, restore } from 'sinon'
 import { expect } from 'chai'
 import { RelativePattern } from 'vscode'
-import { Disposable } from '../../../../extension'
 import { FileSystemData } from '../../../../fileSystem/data'
 import { dvcDemoPath, getTestWorkspaceFolder } from '../../../util'
 import * as FileSystem from '../../../../fileSystem'
 import * as Watcher from '../../../../fileSystem/watcher'
-import { getFirstArgOfCall, mockDisposable } from '../../util'
+import {
+  getFirstArgOfCall,
+  getSafeWatcherDisposer,
+  mockDisposable
+} from '../../util'
 import { join } from '../../../util/path'
 
 suite('File System Data Test Suite', () => {
-  const disposable = Disposable.fn()
+  const disposable = getSafeWatcherDisposer()
 
   beforeEach(() => {
     restore()
   })
 
   afterEach(() => {
-    disposable.dispose()
+    return disposable.disposeAndFlush()
   })
 
   describe('FileSystemData', () => {

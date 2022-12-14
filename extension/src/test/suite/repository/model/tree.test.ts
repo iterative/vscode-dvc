@@ -215,7 +215,7 @@ suite('Repositories Tree Test Suite', () => {
     })
 
     it('should be able to compare two files', async () => {
-      const baseline = Uri.file(join(dvcDemoPath, 'logs.json'))
+      const baseline = Uri.file(join(dvcDemoPath, 'dvc.yaml'))
       const comparison = Uri.file(join(dvcDemoPath, 'requirements.txt'))
       const executeCommandSpy = spy(commands, 'executeCommand')
 
@@ -283,10 +283,11 @@ suite('Repositories Tree Test Suite', () => {
     })
 
     it('should pull the correct target(s) when asked to dvc.pullTarget a non-tracked directory', async () => {
-      const { dvcReader, gitReader, internalCommands, updatesPaused } =
+      const { gitReader, internalCommands, mockDataStatus, updatesPaused } =
         buildDependencies(disposable)
 
-      stub(dvcReader, 'dataStatus').resolves({
+      mockDataStatus.resetBehavior()
+      mockDataStatus.resolves({
         unchanged: [
           join('data', 'data.xml'),
           join('data', 'features'),
