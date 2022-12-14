@@ -22,7 +22,6 @@ import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../commands/external'
-import * as Discovery from '../../cli/dvc/discovery'
 import * as Setup from '../../setup'
 import * as Telemetry from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
@@ -359,7 +358,6 @@ suite('Extension Test Suite', () => {
 
       const mockErrorMessage = 'NOPE'
       stub(Setup, 'setupWorkspace').rejects(new Error(mockErrorMessage))
-      stub(Discovery, 'recheckGlobal').resolves(undefined)
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
       await expect(
