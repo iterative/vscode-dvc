@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.27] - 2022-12-14
+
+### 🚀 New Features and Enhancements
+
+- Update plots empty states to reflect dynamic nature of available plots [#2932](https://github.com/iterative/vscode-dvc/pull/2932) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix cleanup on merging drag and drop groups [#2935](https://github.com/iterative/vscode-dvc/pull/2935) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Prevent unnecessary CLI calls in the integration test suite [#2934](https://github.com/iterative/vscode-dvc/pull/2934) by [@mattseddon](https://github.com/mattseddon)
+- Update renovate config [#2933](https://github.com/iterative/vscode-dvc/pull/2933) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.26] - 2022-12-14
 
 ### 🚀 New Features and Enhancements
