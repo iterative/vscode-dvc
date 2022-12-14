@@ -8,12 +8,12 @@
 }
 
 .columnsTable {
-  td:first-child {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    direction: rtl;
-    max-width: 180px;
-    text-align: left;
+  td {
+    padding: 2px;
+
+    &:first-child {
+      text-align: left;
+    }
   }
 }
 
