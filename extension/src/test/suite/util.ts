@@ -177,6 +177,8 @@ export const buildDependencies = (
     false
   )
 
+  const mockDataStatus = stub(dvcReader, 'dataStatus').resolves({})
+
   const mockPlotsDiff = stub(dvcReader, 'plotsDiff').resolves(plotsDiff)
 
   const mockExperimentShow = stub(dvcReader, 'expShow').resolves(expShow)
@@ -196,6 +198,7 @@ export const buildDependencies = (
     messageSpy,
     mockCheckSignalFile,
     mockCreateFileSystemWatcher,
+    mockDataStatus,
     mockExperimentShow,
     mockPlotsDiff,
     resourceLocator,
@@ -243,3 +246,15 @@ export const spyOnPrivateMemberMethod = <T>(
   memberName: string,
   method: string
 ) => spy((classWithPrivateMember as any)[memberName], method)
+
+export const getSafeWatcherDisposer = (): Disposer & {
+  disposeAndFlush: () => Promise<unknown>
+} => {
+  const disposer = Disposable.fn()
+  return Object.assign(disposer, {
+    disposeAndFlush: () => {
+      disposer.dispose()
+      return Time.delay(500)
+    }
+  })
+}

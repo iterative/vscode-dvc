@@ -153,6 +153,7 @@ export const buildSingleRepoExperiments = (disposer: Disposer) => {
 
   return { messageSpy, workspaceExperiments }
 }
+
 const buildExperimentsDataDependencies = (disposer: Disposer) => {
   const mockCreateFileSystemWatcher = stub(
     Watcher,

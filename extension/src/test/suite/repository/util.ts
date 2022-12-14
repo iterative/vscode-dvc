@@ -13,7 +13,6 @@ import * as Time from '../../../util/time'
 import * as Watcher from '../../../fileSystem/watcher'
 import { Repository } from '../../../repository'
 import { InternalCommands } from '../../../commands/internal'
-import { DataStatusOutput } from '../../../cli/dvc/contract'
 
 export const buildDependencies = (disposer: Disposer) => {
   const { dvcReader, gitReader, internalCommands } =
@@ -57,7 +56,7 @@ export const buildRepositoryData = async (disposer: Disposer) => {
     updatesPaused
   } = buildDependencies(disposer)
 
-  mockDataStatus.resolves({} as DataStatusOutput)
+  mockDataStatus.resolves({})
   mockGetAllUntracked.resolves(new Set())
   mockNow.returns(FIRST_TRUTHY_TIME)
 
