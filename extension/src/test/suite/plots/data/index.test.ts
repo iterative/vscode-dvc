@@ -3,14 +3,14 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { EventEmitter } from 'vscode'
 import { expect } from 'chai'
 import { restore, spy, stub } from 'sinon'
-import { Disposable } from '../../../../extension'
 import { PlotsData } from '../../../../plots/data'
 import { PlotsModel } from '../../../../plots/model'
 import { dvcDemoPath } from '../../../util'
 import {
   buildDependencies,
   bypassProcessManagerDebounce,
-  getMockNow
+  getMockNow,
+  getSafeWatcherDisposer
 } from '../../util'
 import {
   AvailableCommands,
@@ -23,7 +23,7 @@ import { removeDir } from '../../../../fileSystem'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 
 suite('Plots Data Test Suite', () => {
-  const disposable = Disposable.fn()
+  const disposable = getSafeWatcherDisposer()
 
   beforeEach(() => {
     restore()
@@ -31,7 +31,7 @@ suite('Plots Data Test Suite', () => {
 
   afterEach(function () {
     this.timeout(6000)
-    disposable.dispose()
+    return disposable.disposeAndFlush()
   })
 
   const buildPlotsData = (

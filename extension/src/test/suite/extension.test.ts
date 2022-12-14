@@ -6,6 +6,7 @@ import { window, commands, workspace, Uri } from 'vscode'
 import {
   closeAllEditors,
   configurationChangeEvent,
+  mockDisposable,
   mockDuration,
   quickPickInitialized,
   selectQuickPickItem
@@ -23,6 +24,7 @@ import {
   RegisteredCommands
 } from '../../commands/external'
 import * as Setup from '../../setup'
+import * as Watcher from '../../fileSystem/watcher'
 import * as Telemetry from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { OutputChannel } from '../../vscode/outputChannel'
@@ -447,6 +449,7 @@ suite('Extension Test Suite', () => {
     })
 
     it('should set the dvc.cli.incompatible context value', async () => {
+      stub(Watcher, 'createFileSystemWatcher').returns(mockDisposable)
       stub(DvcReader.prototype, 'expShow').resolves({
         [EXPERIMENT_WORKSPACE_ID]: { baseline: {} }
       })
