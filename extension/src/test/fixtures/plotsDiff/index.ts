@@ -19,6 +19,7 @@ import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
 import { getCLIBranchId, replaceBranchCLIId } from './util'
 import { formatDate } from '../../../util/date'
+import { Row } from '../../../experiments/webview/contract'
 
 const basicVega = {
   [join('logs', 'loss.tsv')]: [
@@ -522,11 +523,12 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
   return [singleViewPlots, multiViewPlots]
 }
 
+const getMain = (): Row => rowsFixture.find(({ id }) => id === 'main') as Row
+const getMainExperiments = (): Row[] => getMain().subRows as Row[]
+
 export const findAndFormatCreated = (revisionId: string): string =>
   formatDate(
-    rowsFixture
-      .find(({ id }) => id === 'main')
-      ?.subRows?.find(({ id }) => id === revisionId)?.Created as string
+    getMainExperiments().find(({ id }) => id === revisionId)?.Created as string
   )
 
 export const getRevisions = (): Revision[] => {
@@ -558,9 +560,7 @@ export const getRevisions = (): Revision[] => {
       firstThreeColumns: [
         {
           path: 'Created',
-          value: formatDate(
-            rowsFixture.find(({ id }) => id === 'main')?.Created || ''
-          )
+          value: formatDate(getMain().Created as string)
         },
         {
           path: 'summary.json:loss',
