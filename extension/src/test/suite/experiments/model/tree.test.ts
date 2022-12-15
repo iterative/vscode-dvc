@@ -53,6 +53,7 @@ import { ColumnType } from '../../../../experiments/webview/contract'
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
 import { ExperimentItem } from '../../../../experiments/model/collect'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
+import { findAndFormatCreated } from '../../../fixtures/plotsDiff'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = getSafeWatcherDisposer()
@@ -431,7 +432,7 @@ suite('Experiments Tree Test Suite', () => {
           firstThreeColumns: [
             {
               path: 'Created',
-              value: 'Dec 29, 2020'
+              value: findAndFormatCreated('exp-e7a67')
             },
             {
               path: 'summary.json:loss',
@@ -452,7 +453,7 @@ suite('Experiments Tree Test Suite', () => {
           firstThreeColumns: [
             {
               path: 'Created',
-              value: 'Dec 29, 2020'
+              value: findAndFormatCreated('exp-e7a67')
             },
             {
               path: 'summary.json:loss',
@@ -473,7 +474,7 @@ suite('Experiments Tree Test Suite', () => {
           firstThreeColumns: [
             {
               path: 'Created',
-              value: 'Dec 29, 2020'
+              value: findAndFormatCreated('test-branch')
             },
             {
               path: 'summary.json:loss',
@@ -494,7 +495,7 @@ suite('Experiments Tree Test Suite', () => {
           firstThreeColumns: [
             {
               path: 'Created',
-              value: 'Dec 29, 2020'
+              value: findAndFormatCreated('exp-e7a67')
             },
             {
               path: 'summary.json:loss',
@@ -515,7 +516,7 @@ suite('Experiments Tree Test Suite', () => {
           firstThreeColumns: [
             {
               path: 'Created',
-              value: 'Dec 29, 2020'
+              value: findAndFormatCreated('test-branch')
             },
             {
               path: 'summary.json:loss',
@@ -536,7 +537,7 @@ suite('Experiments Tree Test Suite', () => {
           firstThreeColumns: [
             {
               path: 'Created',
-              value: 'Dec 29, 2020'
+              value: findAndFormatCreated('test-branch')
             },
             {
               path: 'summary.json:loss',
