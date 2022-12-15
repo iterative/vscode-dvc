@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.28] - 2022-12-15
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (2.38.0) [#2942](https://github.com/iterative/vscode-dvc/pull/2942) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.27] - 2022-12-14
 
 ### 🚀 New Features and Enhancements
