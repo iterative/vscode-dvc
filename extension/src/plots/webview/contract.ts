@@ -41,6 +41,7 @@ export type Revision = {
   group?: string
   displayColor: Color
   fetched: boolean
+  firstThreeColumns: Array<{ path: string; value: string }>
 }
 
 export interface PlotsComparisonData {

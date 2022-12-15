@@ -1,6 +1,7 @@
 import { Revision } from 'dvc/src/plots/webview/contract'
 import React from 'react'
 import { VSCodeProgressRing } from '@vscode/webview-ui-toolkit/react'
+import { truncate } from 'vega'
 import styles from './styles.module.scss'
 import { Icon } from '../../../shared/components/Icon'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
@@ -23,7 +24,20 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
 }) => {
   const exp = revision.group?.replace(/[[\]]/g, '') || revision.revision
 
-  return (
+  const tooltipContent = (
+    <table className={styles.columnsTable}>
+      <tbody>
+        {revision.firstThreeColumns.map(({ path, value }) => (
+          <tr key={path}>
+            <td>{truncate(path, 45, 'left')}</td>
+            <td>{value}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )
+
+  const mainContent = (
     <li
       className={styles.block}
       style={{ borderColor: revision.displayColor }}
@@ -49,5 +63,13 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
         </button>
       </Tooltip>
     </li>
+  )
+
+  return revision.firstThreeColumns.length === 0 ? (
+    mainContent
+  ) : (
+    <Tooltip placement="bottom-start" content={tooltipContent} interactive>
+      {mainContent}
+    </Tooltip>
   )
 }
