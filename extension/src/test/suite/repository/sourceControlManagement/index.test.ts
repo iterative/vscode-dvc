@@ -14,6 +14,7 @@ import {
 import { WorkspaceRepositories } from '../../../../repository/workspace'
 import { Cli } from '../../../../cli'
 import { GitCli } from '../../../../cli/git'
+import { GitExecutor } from '../../../../cli/git/executor'
 
 suite('Source Control Management Test Suite', () => {
   const disposable = Disposable.fn()
@@ -250,6 +251,10 @@ suite('Source Control Management Test Suite', () => {
 
     it('should not reset the workspace if the user does not confirm', async () => {
       const mockCheckout = stub(DvcExecutor.prototype, 'checkout').resolves('')
+      const mockResetWorkspace = stub(
+        GitExecutor.prototype,
+        'resetWorkspace'
+      ).resolves(undefined)
 
       stubPrivatePrototypeMethod(WorkspaceRepositories, 'hasChanges').returns(
         true
@@ -269,6 +274,7 @@ suite('Source Control Management Test Suite', () => {
 
       expect(mockShowWarningMessage).to.be.calledOnce
       expect(mockCheckout).not.to.be.called
+      expect(mockResetWorkspace).not.to.be.called
     })
 
     it('should reset the workspace if the user confirms they want to', async () => {
@@ -310,6 +316,10 @@ suite('Source Control Management Test Suite', () => {
 
     it('should not reset the workspace if there is another user initiated command running', async () => {
       const mockCheckout = stub(DvcExecutor.prototype, 'checkout').resolves('')
+      const mockResetWorkspace = stub(
+        GitExecutor.prototype,
+        'resetWorkspace'
+      ).resolves(undefined)
 
       stubPrivatePrototypeMethod(WorkspaceRepositories, 'hasChanges').returns(
         true
@@ -325,6 +335,7 @@ suite('Source Control Management Test Suite', () => {
       )
 
       expect(mockCheckout).not.to.be.called
+      expect(mockResetWorkspace).not.to.be.called
     })
   })
 })
