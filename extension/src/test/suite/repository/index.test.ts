@@ -4,21 +4,24 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore } from 'sinon'
 import { buildDependencies, buildRepository } from './util'
-import { Disposable } from '../../../extension'
 import { dvcDemoPath } from '../../util'
-import { bypassProcessManagerDebounce, FIRST_TRUTHY_TIME } from '../util'
+import {
+  bypassProcessManagerDebounce,
+  FIRST_TRUTHY_TIME,
+  getSafeWatcherDisposer
+} from '../util'
 import { SourceControlDataStatus } from '../../../repository/sourceControlManagement'
 import { makeAbsPathSet } from '../../util/path'
 
 suite('Repository Test Suite', () => {
-  const disposable = Disposable.fn()
+  const disposable = getSafeWatcherDisposer()
 
   beforeEach(() => {
     restore()
   })
 
   afterEach(() => {
-    disposable.dispose()
+    return disposable.disposeAndFlush()
   })
 
   const emptySet = new Set<string>()

@@ -4,7 +4,7 @@ import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
 import {
   bypassProcessManagerDebounce,
-  getFirstArgOfCall,
+  getArgOfCall,
   getMockNow,
   getSafeWatcherDisposer,
   stubPrivateMemberMethod
@@ -62,7 +62,7 @@ suite('Experiments Data Test Suite', () => {
       expect(mockExperimentShow).to.be.calledOnce
       expect(mockCreateFileSystemWatcher).to.be.calledOnce
 
-      expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 0)).to.deep.equal(
+      expect(getArgOfCall(mockCreateFileSystemWatcher, 0, 2)).to.deep.equal(
         new RelativePattern(getTestWorkspaceFolder(), '**')
       )
     })
