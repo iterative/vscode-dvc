@@ -23,7 +23,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^1.8.2",
     "@tippyjs/react": "^4.2.6",
-    "@vscode/webview-ui-toolkit": "^1.0.0",
+    "@vscode/webview-ui-toolkit": "1.0.0",
     "classnames": "^2.2.6",
     "lodash.clonedeep": "^4.5.0",
     "lodash.merge": "^4.6.2",

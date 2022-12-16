@@ -12,7 +12,7 @@ export const NoData: React.FC = () => {
     <EmptyState>
       <div>
         <h1>Your project contains no data</h1>
-        <p>
+        <div>
           Enable DVC experiment tracking using{' '}
           <a href="https://dvc.org/doc/dvclive">DVCLive</a> with{' '}
           <CodeBlock language="python" inline>
@@ -24,7 +24,7 @@ export const NoData: React.FC = () => {
             other frameworks available
           </a>
           )
-        </p>
+        </div>
         <CodeSlider
           codeBlocks={[
             {
