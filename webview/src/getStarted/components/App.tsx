@@ -12,16 +12,28 @@ import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 import { sendMessage } from '../../shared/vscode'
 
 export const App: React.FC = () => {
-  const [cliAvailable, setCliAvailable] = useState(false)
-  const [projectInitialized, setProjectInitialized] = useState(false)
+  const [cliAvailable, setCliAvailable] = useState<boolean>(false)
+  const [projectInitialized, setProjectInitialized] = useState<boolean>(false)
+  const [pythonBinPath, setPythonBinPath] = useState<string | undefined>(
+    undefined
+  )
+  const [isPythonExtensionUsed, setIsPythonExtensionUsed] =
+    useState<boolean>(false)
 
   useVsCodeMessaging(
     useCallback(
       ({ data }: { data: MessageToWebview<GetStartedData> }) => {
         setCliAvailable(data.data.cliAccessible)
+        setIsPythonExtensionUsed(data.data.isPythonExtensionUsed)
         setProjectInitialized(data.data.projectInitialized)
+        setPythonBinPath(data.data.pythonBinPath)
       },
-      [setCliAvailable, setProjectInitialized]
+      [
+        setCliAvailable,
+        setIsPythonExtensionUsed,
+        setProjectInitialized,
+        setPythonBinPath
+      ]
     )
   )
 
@@ -38,7 +50,12 @@ export const App: React.FC = () => {
   }
 
   if (!cliAvailable) {
-    return <CliUnavailable />
+    return (
+      <CliUnavailable
+        isPythonExtensionUsed={isPythonExtensionUsed}
+        pythonBinPath={pythonBinPath}
+      />
+    )
   }
 
   if (!projectInitialized) {

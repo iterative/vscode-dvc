@@ -162,7 +162,9 @@ export class Extension extends Disposable implements IExtension {
         () => this.initProject(),
         () => this.showExperiments(this.dvcRoots[0]),
         () => this.getAvailable(),
-        () => this.hasRoots()
+        () => this.hasRoots(),
+        () => this.config.isPythonExtensionUsed(),
+        () => this.config.getPythonBinPath()
       )
     )
 
@@ -231,6 +233,7 @@ export class Extension extends Disposable implements IExtension {
       this.config.onDidChangeExecutionDetails(async () => {
         const stopWatch = new StopWatch()
         try {
+          this.getStarted.sendDataToWebview()
           await setup(this)
 
           return sendTelemetryEvent(

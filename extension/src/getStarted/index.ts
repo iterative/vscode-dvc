@@ -1,9 +1,13 @@
+import { relative } from 'path'
 import { GetStartedData as TGetStartedData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Resource } from '../resourceLocator'
+import { isSameOrChild } from '../fileSystem'
+import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
+import { findPythonBin } from '../python'
 
 export type GetStartedWebview = BaseWebview<TGetStartedData>
 
@@ -15,6 +19,8 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
   private showExperiments: () => void
   private getCliAccessible: () => boolean
   private getHasRoots: () => boolean
+  private getIsPythonExtensionUsed: () => boolean
+  private getPythonBinPath: () => string | undefined
 
   constructor(
     dvcRoot: string,
@@ -22,7 +28,9 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
     initProject: () => void,
     showExperiments: () => void,
     getCliAccessible: () => boolean,
-    getHasRoots: () => boolean
+    getHasRoots: () => boolean,
+    getIsPythonExtensionUsed: () => boolean,
+    getPythonBinPath: () => string | undefined
   ) {
     super(dvcRoot, webviewIcon)
 
@@ -35,16 +43,22 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
     this.getHasRoots = getHasRoots
     this.initProject = initProject
     this.showExperiments = showExperiments
+    this.getIsPythonExtensionUsed = getIsPythonExtensionUsed
+    this.getPythonBinPath = getPythonBinPath
   }
 
   public sendInitialWebviewData() {
     return this.sendDataToWebview()
   }
 
-  public sendDataToWebview() {
+  public async sendDataToWebview() {
+    const pythonBinPath = await this.getPythonBinPathWithDefault()
+
     this.webviewMessages.sendWebviewMessage(
       this.getCliAccessible(),
-      this.getHasRoots()
+      this.getHasRoots(),
+      this.getIsPythonExtensionUsed(),
+      pythonBinPath
     )
   }
 
@@ -60,5 +74,22 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
       )
     )
     return webviewMessages
+  }
+
+  private async getPythonBinPathWithDefault() {
+    const pythonPath = this.getPythonBinPath()
+
+    if (!pythonPath) {
+      return await findPythonBin()
+    }
+
+    const firstWorkspaceFolder = getFirstWorkspaceFolder()
+    if (!firstWorkspaceFolder) {
+      return pythonPath
+    }
+
+    return isSameOrChild(firstWorkspaceFolder, pythonPath)
+      ? relative(firstWorkspaceFolder, pythonPath)
+      : pythonPath
   }
 }

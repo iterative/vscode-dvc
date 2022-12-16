@@ -1,5 +1,5 @@
 import { commands, Event, Uri } from 'vscode'
-import { executeProcess } from '../processExecution'
+import { findPythonBin } from '../python'
 import { getExtensionAPI, isInstalled } from '../vscode/extensions'
 
 const PYTHON_EXTENSION_ID = 'ms-python.python'
@@ -38,13 +38,7 @@ export const getPythonBinPath = async (): Promise<string | undefined> => {
   const pythonExecutionDetails = await getPythonExecutionDetails()
   const pythonBin = pythonExecutionDetails?.join(' ')
   if (pythonBin) {
-    try {
-      return await executeProcess({
-        args: ['-c', 'import sys; print(sys.executable)'],
-        cwd: process.cwd(),
-        executable: pythonBin
-      })
-    } catch {}
+    return findPythonBin(pythonBin)
   }
 }
 

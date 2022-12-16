@@ -8,21 +8,66 @@ import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 // 2. If Python extension is available / used (remove Select Python Interpreter button)
 // 3. "(Auto)" needs some kind of explanation => maybe a tooltip
 
-export const CliUnavailable: React.FC = () => {
+export type CliUnavailableProps = {
+  isPythonExtensionUsed: boolean
+  pythonBinPath: string | undefined
+}
+
+const PythonExtensionUsed: React.FC<{ pythonBinPath: string }> = ({
+  pythonBinPath
+}) => (
+  <div>
+    <p>
+      {`DVC & DVCLive can be auto-installed as packages with ${pythonBinPath}`}
+    </p>
+    <Button onClick={() => undefined} text="Install" />
+    <p>To update the interpreter and/or locate DVC</p>
+    <Button onClick={() => undefined} text="Select Python Interpreter" />
+    <Button
+      isNested={true}
+      appearance="secondary"
+      onClick={() => undefined}
+      text="Setup The Workspace"
+    />
+  </div>
+)
+
+const PythonBinFound: React.FC<{ pythonBinPath: string }> = ({
+  pythonBinPath
+}) => (
+  <div>
+    <p>
+      {`DVC & DVCLive can be auto-installed as packages with ${pythonBinPath}`}
+    </p>
+    <Button onClick={() => undefined} text="Install" />
+    <p>To update the install location or locate DVC</p>
+    <Button onClick={() => undefined} text="Setup The Workspace" />
+  </div>
+)
+
+const PythonBinNotFound: React.FC = () => (
+  <div>
+    <p>DVC & DVCLive cannot be auto-installed as Python was not located.</p>
+    <p>To locate a Python Interpreter or DVC</p>
+    <Button onClick={() => undefined} text="Setup The Workspace" />
+  </div>
+)
+
+export const CliUnavailable: React.FC<CliUnavailableProps> = ({
+  isPythonExtensionUsed,
+  pythonBinPath
+}) => {
   return (
     <EmptyState>
       <div>
         <h1>DVC is currently unavailable</h1>
-        <p>DVC & DVCLive can be auto-installed at .env (Auto)</p>
-        <Button onClick={() => undefined} text="Install" />
-        <p>To update the install location or locate DVC</p>
-        <Button onClick={() => undefined} text="Setup The Workspace" />
-        <Button
-          isNested={true}
-          appearance="secondary"
-          onClick={() => undefined}
-          text="Select Python Interpreter"
-        />
+        {isPythonExtensionUsed ? (
+          <PythonExtensionUsed pythonBinPath={pythonBinPath as string} />
+        ) : (
+          (pythonBinPath && (
+            <PythonBinFound pythonBinPath={pythonBinPath} />
+          )) || <PythonBinNotFound />
+        )}
       </div>
     </EmptyState>
   )
