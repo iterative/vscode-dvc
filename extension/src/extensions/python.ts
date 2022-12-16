@@ -1,6 +1,9 @@
+import { relative } from 'path'
 import { commands, Event, Uri } from 'vscode'
 import { executeProcess } from '../processExecution'
 import { getExtensionAPI, isInstalled } from '../vscode/extensions'
+import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
+import { isSameOrChild } from '../fileSystem'
 
 const PYTHON_EXTENSION_ID = 'ms-python.python'
 
@@ -46,6 +49,25 @@ export const getPythonBinPath = async (): Promise<string | undefined> => {
       })
     } catch {}
   }
+}
+
+export const getPythonInterpreterStr = async (): Promise<
+  string | undefined
+> => {
+  const pythonBinPath = await getPythonBinPath()
+
+  const firstWorkspaceFolder = getFirstWorkspaceFolder()
+
+  if (
+    !(
+      firstWorkspaceFolder &&
+      pythonBinPath &&
+      isSameOrChild(firstWorkspaceFolder, pythonBinPath)
+    )
+  ) {
+    return pythonBinPath
+  }
+  return relative(firstWorkspaceFolder, pythonBinPath)
 }
 
 export const getOnDidChangePythonExecutionDetails = async () => {

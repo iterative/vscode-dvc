@@ -1,3 +1,4 @@
+import { commands } from 'vscode'
 import { IExtension } from './interfaces'
 import {
   quickPickOneOrInput,
@@ -8,7 +9,10 @@ import { ConfigKey, setConfigValue } from './vscode/config'
 import { pickFile } from './vscode/resourcePicker'
 import { getFirstWorkspaceFolder } from './vscode/workspaceFolders'
 import { getSelectTitle, Title } from './vscode/title'
-import { isPythonExtensionInstalled } from './extensions/python'
+import {
+  getPythonInterpreterStr,
+  isPythonExtensionInstalled
+} from './extensions/python'
 import { extensionCanRunCli, recheckGlobal } from './cli/dvc/discovery'
 
 const setConfigPath = async (
@@ -26,7 +30,7 @@ const enterPathOrFind = (text: string): Promise<string | undefined> =>
   quickPickOneOrInput(
     [
       {
-        detail: `Browse the filesystem for a ${text}.`,
+        detail: `Browse the filesystem for a ${text}`,
         label: 'Find...',
         value: 'pick'
       }
@@ -127,12 +131,47 @@ const quickPickVenvOption = () => {
   })
 }
 
-const quickPickOrUnsetPythonInterpreter = (usesVenv: number) => {
+const quickPickOrUnsetPythonInterpreter = async (usesVenv: number) => {
   if (usesVenv === 1) {
     return enterPathOrPickFile(ConfigKey.PYTHON_PATH, 'Python Interpreter')
   }
 
-  return setConfigPath(ConfigKey.PYTHON_PATH, undefined)
+  const pythonInterpreter = await getPythonInterpreterStr()
+
+  const response = await (pythonInterpreter
+    ? quickPickYesOrNo(
+        `Use ${pythonInterpreter}`,
+        'Select Python Interpreter (Python extension)',
+        {
+          placeHolder: 'Is the current Python interpreter correct?',
+          title: Title.SETUP_WORKSPACE
+        }
+      )
+    : quickPickValue<boolean>(
+        [
+          {
+            description: 'Use the Python extension to pick another',
+            label: 'Select Interpreter',
+            value: false
+          }
+        ],
+        {
+          placeHolder: 'An interpreter could not be located.',
+          title: Title.SETUP_WORKSPACE
+        }
+      ))
+
+  if (response === undefined) {
+    return
+  }
+
+  if (response) {
+    return setConfigPath(ConfigKey.PYTHON_PATH, undefined)
+  }
+
+  if (!response) {
+    commands.executeCommand('python.setInterpreter')
+  }
 }
 
 export const setupWorkspace = async (): Promise<boolean> => {
