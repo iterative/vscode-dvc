@@ -38,6 +38,7 @@ export enum MessageFromWebviewType {
   SELECT_EXPERIMENTS = 'select-experiments',
   SELECT_COLUMNS = 'select-columns',
   SELECT_PLOTS = 'select-plots',
+  SELECT_PYTHON_INTERPRETER = 'select-python-interpreter',
   SET_EXPERIMENTS_FOR_PLOTS = 'set-experiments-for-plots',
   SET_EXPERIMENTS_AND_OPEN_PLOTS = 'set-experiments-and-open-plots',
   SHARE_EXPERIMENT_AS_BRANCH = 'share-experiment-as-branch',
@@ -155,6 +156,7 @@ export type MessageFromWebview =
     }
   | { type: MessageFromWebviewType.INITIALIZED }
   | { type: MessageFromWebviewType.SELECT_EXPERIMENTS }
+  | { type: MessageFromWebviewType.SELECT_PYTHON_INTERPRETER }
   | { type: MessageFromWebviewType.SELECT_PLOTS }
   | { type: MessageFromWebviewType.REFRESH_REVISION; payload: string }
   | { type: MessageFromWebviewType.REFRESH_REVISIONS; payload: string[] }

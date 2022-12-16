@@ -1,6 +1,8 @@
 import React from 'react'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { Button } from '../../shared/components/button/Button'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
+import { sendMessage } from '../../shared/vscode'
 
 // Needs to be aware of
 // 1. Current Python path
@@ -22,7 +24,12 @@ const PythonExtensionUsed: React.FC<{ pythonBinPath: string }> = ({
     </p>
     <Button onClick={() => undefined} text="Install" />
     <p>To update the interpreter and/or locate DVC</p>
-    <Button onClick={() => undefined} text="Select Python Interpreter" />
+    <Button
+      onClick={() =>
+        sendMessage({ type: MessageFromWebviewType.SELECT_PYTHON_INTERPRETER })
+      }
+      text="Select Python Interpreter"
+    />
     <Button
       isNested={true}
       appearance="secondary"

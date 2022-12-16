@@ -60,7 +60,30 @@ suite('GetStarted Test Suite', () => {
       expect(mockOpenExperiments).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should log an error message if the message from the webview is anything else than initialize project', async () => {
+    it('should handle a select python interpreter message from the webview', async () => {
+      const { messageSpy, getStarted, mockExecuteCommand } = buildGetStarted(
+        disposable,
+        true
+      )
+
+      const webview = await getStarted.showWebview()
+      await webview.isReady()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      messageSpy.resetHistory()
+      mockExecuteCommand.resetHistory()
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SELECT_PYTHON_INTERPRETER
+      })
+
+      expect(mockExecuteCommand).to.be.calledOnce
+      expect(mockExecuteCommand).to.be.calledWithExactly(
+        'python.setInterpreter'
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should log an error message if the message from the webview if given an unexpected message', async () => {
       const { messageSpy, getStarted } = buildGetStarted(disposable)
 
       const webview = await getStarted.showWebview()

@@ -58,9 +58,11 @@ export const EventName = Object.assign(
     VIEWS_EXPERIMENTS_TABLE_SORT_COLUMN:
       'views.experimentsTable.columnSortAdded',
 
-    VIEWS_GET_STARTED_CLOSE: 'view.GET_STARTED.closed',
-    VIEWS_GET_STARTED_CREATED: 'view.GET_STARTED.created',
-    VIEWS_GET_STARTED_FOCUS_CHANGED: 'views.GET_STARTED.focusChanged',
+    VIEWS_GET_STARTED_CLOSE: 'views.getStarted.closed',
+    VIEWS_GET_STARTED_CREATED: 'views.getStarted.created',
+    VIEWS_GET_STARTED_FOCUS_CHANGED: 'views.getStarted.focusChanged',
+    VIEWS_GET_STARTED_SELECT_PYTHON_INTERPRETER:
+      'views.getStarted.selectPythonInterpreter',
 
     VIEWS_PLOTS_CLOSED: 'views.plots.closed',
     VIEWS_PLOTS_COMPARISON_ROWS_REORDERED:
@@ -260,6 +262,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_GET_STARTED_CLOSE]: undefined
   [EventName.VIEWS_GET_STARTED_CREATED]: undefined
   [EventName.VIEWS_GET_STARTED_FOCUS_CHANGED]: undefined
+  [EventName.VIEWS_GET_STARTED_SELECT_PYTHON_INTERPRETER]: undefined
 
   [EventName.GET_STARTED_WEBVIEW_SHOW]: undefined
 }
