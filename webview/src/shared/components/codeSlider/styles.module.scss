@@ -1,0 +1,29 @@
+@import '../../variables.scss';
+
+.codeSlider {
+  margin-top: 40px;
+}
+
+.codeBlockButton {
+  background: none;
+  font-size: 1rem;
+  color: $fg-color;
+  border: none;
+  padding: 0 0 2px 0;
+  margin: 0 5px;
+  font-weight: bold;
+}
+
+.codeBlockButtonActive {
+  border-bottom: 2px solid $fg-color;
+}
+
+.codeBlock {
+  display: none;
+  text-align: left;
+  margin-top: 20px;
+}
+
+.codeBlockActive {
+  display: block;
+}
