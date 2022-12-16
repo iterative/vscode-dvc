@@ -91,21 +91,29 @@ describe('ignoredDotDirectories', () => {
 
 describe('createFileSystemWatcher', () => {
   const mockedListener = jest.fn()
+  const mockedTrack = jest.fn()
   it('should call createFileSystemWatcher with the correct parameters', () => {
     const file = '/some/file.csv'
 
-    createFileSystemWatcher(file, mockedListener)
+    createFileSystemWatcher(mockedTrack, file, mockedListener)
 
     expect(mockedCreateFileSystemWatcher).toHaveBeenCalledWith(file)
+    expect(mockedTrack).toHaveBeenCalledTimes(4)
   })
 
   it('should throw an error when given a directory path', () => {
-    expect(() => createFileSystemWatcher(__dirname, mockedListener)).toThrow()
+    expect(() =>
+      createFileSystemWatcher(mockedTrack, __dirname, mockedListener)
+    ).toThrow()
   })
 
   it('should not throw an error when given a directory glob', () => {
     expect(() =>
-      createFileSystemWatcher(join(__dirname, '**'), mockedListener)
+      createFileSystemWatcher(
+        mockedTrack,
+        join(__dirname, '**'),
+        mockedListener
+      )
     ).not.toThrow()
   })
 })

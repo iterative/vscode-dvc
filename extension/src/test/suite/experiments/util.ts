@@ -10,7 +10,6 @@ import {
   buildDependencies,
   buildInternalCommands,
   buildMockData,
-  mockDisposable,
   SafeWatcherDisposer
 } from '../util'
 import {
@@ -159,7 +158,7 @@ const buildExperimentsDataDependencies = (disposer: Disposer) => {
   const mockCreateFileSystemWatcher = stub(
     Watcher,
     'createFileSystemWatcher'
-  ).returns(mockDisposable)
+  ).returns(undefined)
 
   const { dvcReader, internalCommands } = buildInternalCommands(disposer)
   const mockExperimentShow = stub(dvcReader, 'expShow').resolves(expShowFixture)

@@ -6,11 +6,7 @@ import { FileSystemData } from '../../../../fileSystem/data'
 import { dvcDemoPath, getTestWorkspaceFolder } from '../../../util'
 import * as FileSystem from '../../../../fileSystem'
 import * as Watcher from '../../../../fileSystem/watcher'
-import {
-  getFirstArgOfCall,
-  getSafeWatcherDisposer,
-  mockDisposable
-} from '../../util'
+import { getArgOfCall, getSafeWatcherDisposer } from '../../util'
 import { join } from '../../../util/path'
 
 suite('File System Data Test Suite', () => {
@@ -26,7 +22,7 @@ suite('File System Data Test Suite', () => {
 
   describe('FileSystemData', () => {
     it('should read the dvc.yaml from the demo path and send an event containing the path and the yaml', async () => {
-      stub(Watcher, 'createFileSystemWatcher').returns(mockDisposable)
+      stub(Watcher, 'createFileSystemWatcher').returns(undefined)
       const data = disposable.track(new FileSystemData(dvcDemoPath))
 
       disposable.track(
@@ -45,12 +41,12 @@ suite('File System Data Test Suite', () => {
       const mockCreateFileSystemWatcher = stub(
         Watcher,
         'createFileSystemWatcher'
-      ).returns(mockDisposable)
+      ).returns(undefined)
       stub(FileSystem, 'loadYaml').returns(undefined)
       const data = disposable.track(new FileSystemData(dvcDemoPath))
 
       expect(mockCreateFileSystemWatcher).to.be.calledOnce
-      expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 0)).to.deep.equal(
+      expect(getArgOfCall(mockCreateFileSystemWatcher, 0, 2)).to.deep.equal(
         new RelativePattern(getTestWorkspaceFolder(), join('**', 'dvc.yaml'))
       )
 
