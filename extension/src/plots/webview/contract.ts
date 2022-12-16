@@ -41,6 +41,7 @@ export type Revision = {
   group?: string
   displayColor: Color
   fetched: boolean
+  firstThreeColumns: Array<{ path: string; value: string }>
 }
 
 export interface PlotsComparisonData {
@@ -126,8 +127,8 @@ export type ComparisonPlot = {
 export enum PlotsDataKeys {
   COMPARISON = 'comparison',
   CHECKPOINT = 'checkpoint',
+  HAS_UNSELECTED_PLOTS = 'hasUnselectedPlots',
   HAS_PLOTS = 'hasPlots',
-  HAS_SELECTED_PLOTS = 'hasSelectedPlots',
   SELECTED_REVISIONS = 'selectedRevisions',
   TEMPLATE = 'template',
   SECTION_COLLAPSED = 'sectionCollapsed'
@@ -138,7 +139,7 @@ export type PlotsData =
       [PlotsDataKeys.COMPARISON]?: PlotsComparisonData | null
       [PlotsDataKeys.CHECKPOINT]?: CheckpointPlotsData | null
       [PlotsDataKeys.HAS_PLOTS]?: boolean
-      [PlotsDataKeys.HAS_SELECTED_PLOTS]?: boolean
+      [PlotsDataKeys.HAS_UNSELECTED_PLOTS]?: boolean
       [PlotsDataKeys.SELECTED_REVISIONS]?: Revision[]
       [PlotsDataKeys.TEMPLATE]?: TemplatePlotsData | null
       [PlotsDataKeys.SECTION_COLLAPSED]?: SectionCollapsed

@@ -121,7 +121,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   public getPathStatuses() {
-    return this.paths.getTerminalNodeStatuses()
+    return this.paths.getTerminalNodeStatuses(undefined)
   }
 
   public getScale() {
@@ -129,6 +129,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private notifyChanged() {
+    this.paths.setSelectedRevisions(this.plots.getSelectedRevisions())
     this.pathsChanged.fire()
     this.fetchMissingOrSendPlots()
   }
@@ -187,9 +188,13 @@ export class Plots extends BaseRepository<TPlotsData> {
           await this.plots.transformAndSetExperiments(data)
         }
 
-        this.plots.setComparisonOrder()
+        this.notifyChanged()
+      })
+    )
 
-        this.fetchMissingOrSendPlots()
+    this.dispose.track(
+      experiments.onDidChangeColumnOrderOrStatus(() => {
+        this.notifyChanged()
       })
     )
   }
@@ -210,7 +215,7 @@ export class Plots extends BaseRepository<TPlotsData> {
       this.data.onDidUpdate(async ({ data, revs }) => {
         await Promise.all([
           this.plots.transformAndSetPlots(data, revs),
-          this.paths.transformAndSet(data)
+          this.paths.transformAndSet(data, revs, this.plots.getCLIIdToLabel())
         ])
         this.notifyChanged()
       })

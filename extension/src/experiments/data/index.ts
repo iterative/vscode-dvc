@@ -66,10 +66,6 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     return this.notifyChanged(data)
   }
 
-  public forceUpdate() {
-    return this.processManager.forceRunQueued()
-  }
-
   protected collectFiles(data: ExperimentsOutput) {
     this.collectedFiles = collectFiles(data, this.collectedFiles)
   }
@@ -88,23 +84,20 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
       gitPath.HEADS_GIT_REFS
     ]
 
-    this.dispose.track(
-      createFileSystemWatcher(
-        getRelativePattern(dotGitPath, '**'),
-        (path: string) => {
-          if (path.includes(EXPERIMENTS_GIT_REFS_EXEC)) {
-            return
-          }
-
-          if (
-            watchedRelPaths.some(watchedRelPath =>
-              path.includes(watchedRelPath)
-            )
-          ) {
-            return this.managedUpdate(path)
-          }
+    return createFileSystemWatcher(
+      disposable => this.dispose.track(disposable),
+      getRelativePattern(dotGitPath, '**'),
+      (path: string) => {
+        if (path.includes(EXPERIMENTS_GIT_REFS_EXEC)) {
+          return
         }
-      )
+
+        if (
+          watchedRelPaths.some(watchedRelPath => path.includes(watchedRelPath))
+        ) {
+          return this.managedUpdate(path)
+        }
+      }
     )
   }
 }

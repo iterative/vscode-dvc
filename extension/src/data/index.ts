@@ -68,8 +68,10 @@ export abstract class BaseData<
   }
 
   private watchFiles() {
-    return this.dispose.track(
-      createFileSystemWatcher(getRelativePattern(this.dvcRoot, '**'), path => {
+    return createFileSystemWatcher(
+      disposable => this.dispose.track(disposable),
+      getRelativePattern(this.dvcRoot, '**'),
+      path => {
         const relPath = relative(this.dvcRoot, path)
         if (
           this.getWatchedFiles().some(
@@ -80,7 +82,7 @@ export abstract class BaseData<
         ) {
           this.managedUpdate(path)
         }
-      })
+      }
     )
   }
 

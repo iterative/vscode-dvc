@@ -10,7 +10,7 @@ import {
   buildDependencies,
   buildInternalCommands,
   buildMockData,
-  mockDisposable
+  SafeWatcherDisposer
 } from '../util'
 import {
   ExperimentsOutput,
@@ -95,7 +95,7 @@ export const buildExperiments = (
   }
 }
 
-export const buildMultiRepoExperiments = (disposer: Disposer) => {
+export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
   const {
     internalCommands,
     experiments: mockExperiments,
@@ -126,7 +126,7 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
   return { experiments, internalCommands, messageSpy, workspaceExperiments }
 }
 
-export const buildSingleRepoExperiments = (disposer: Disposer) => {
+export const buildSingleRepoExperiments = (disposer: SafeWatcherDisposer) => {
   const {
     internalCommands,
     gitReader,
@@ -153,18 +153,19 @@ export const buildSingleRepoExperiments = (disposer: Disposer) => {
 
   return { messageSpy, workspaceExperiments }
 }
+
 const buildExperimentsDataDependencies = (disposer: Disposer) => {
   const mockCreateFileSystemWatcher = stub(
     Watcher,
     'createFileSystemWatcher'
-  ).returns(mockDisposable)
+  ).returns(undefined)
 
   const { dvcReader, internalCommands } = buildInternalCommands(disposer)
   const mockExperimentShow = stub(dvcReader, 'expShow').resolves(expShowFixture)
   return { internalCommands, mockCreateFileSystemWatcher, mockExperimentShow }
 }
 
-export const buildExperimentsData = (disposer: Disposer) => {
+export const buildExperimentsData = (disposer: SafeWatcherDisposer) => {
   const { internalCommands, mockExperimentShow, mockCreateFileSystemWatcher } =
     buildExperimentsDataDependencies(disposer)
 

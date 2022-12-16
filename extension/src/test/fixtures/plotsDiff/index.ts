@@ -1,5 +1,6 @@
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
+import rowsFixture from '../expShow/base/rows'
 import { extendVegaSpec, isMultiViewPlot } from '../../../plots/vega/util'
 import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../../cli/dvc/contract'
 import {
@@ -17,6 +18,8 @@ import {
 import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
 import { getCLIBranchId, replaceBranchCLIId } from './util'
+import { formatDate } from '../../../util/date'
+import { Row } from '../../../experiments/webview/contract'
 
 const basicVega = {
   [join('logs', 'loss.tsv')]: [
@@ -30,7 +33,7 @@ const basicVega = {
         '4fb124a'
       ],
       datapoints: {
-        workspace: [
+        [EXPERIMENT_WORKSPACE_ID]: [
           {
             loss: '2.298783302307129',
             step: '0',
@@ -520,6 +523,14 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
   return [singleViewPlots, multiViewPlots]
 }
 
+const getMain = (): Row => rowsFixture.find(({ id }) => id === 'main') as Row
+const getMainExperiments = (): Row[] => getMain().subRows as Row[]
+
+export const findAndFormatCreated = (revisionId: string): string =>
+  formatDate(
+    getMainExperiments().find(({ id }) => id === revisionId)?.Created as string
+  )
+
 export const getRevisions = (): Revision[] => {
   const [workspace, main, _4fb124a, _42b8735, _1ba7bcd] = copyOriginalColors()
   return [
@@ -528,10 +539,38 @@ export const getRevisions = (): Revision[] => {
       revision: EXPERIMENT_WORKSPACE_ID,
       displayColor: workspace,
       fetched: true,
+      firstThreeColumns: [
+        {
+          path: 'Created',
+          value: '-'
+        },
+        {
+          path: 'summary.json:loss',
+          value: '1.9293'
+        },
+        {
+          path: 'summary.json:accuracy',
+          value: '0.46680'
+        }
+      ],
       group: undefined
     },
     {
       fetched: true,
+      firstThreeColumns: [
+        {
+          path: 'Created',
+          value: formatDate(getMain().Created as string)
+        },
+        {
+          path: 'summary.json:loss',
+          value: '2.0489'
+        },
+        {
+          path: 'summary.json:accuracy',
+          value: '0.34848'
+        }
+      ],
       id: 'main',
       revision: 'main',
       displayColor: main,
@@ -539,6 +578,20 @@ export const getRevisions = (): Revision[] => {
     },
     {
       fetched: true,
+      firstThreeColumns: [
+        {
+          path: 'Created',
+          value: findAndFormatCreated('exp-e7a67')
+        },
+        {
+          path: 'summary.json:loss',
+          value: '2.0205'
+        },
+        {
+          path: 'summary.json:accuracy',
+          value: '0.37242'
+        }
+      ],
       id: 'exp-e7a67',
       revision: '4fb124a',
       displayColor: _4fb124a,
@@ -546,6 +599,20 @@ export const getRevisions = (): Revision[] => {
     },
     {
       fetched: true,
+      firstThreeColumns: [
+        {
+          path: 'Created',
+          value: findAndFormatCreated('test-branch')
+        },
+        {
+          path: 'summary.json:loss',
+          value: '1.9293'
+        },
+        {
+          path: 'summary.json:accuracy',
+          value: '0.46680'
+        }
+      ],
       id: 'test-branch',
       revision: '42b8736',
       displayColor: _42b8735,
@@ -553,6 +620,20 @@ export const getRevisions = (): Revision[] => {
     },
     {
       fetched: true,
+      firstThreeColumns: [
+        {
+          path: 'Created',
+          value: findAndFormatCreated('exp-83425')
+        },
+        {
+          path: 'summary.json:loss',
+          value: '1.7750'
+        },
+        {
+          path: 'summary.json:accuracy',
+          value: '0.59265'
+        }
+      ],
       id: 'exp-83425',
       revision: '1ba7bcd',
       displayColor: _1ba7bcd,

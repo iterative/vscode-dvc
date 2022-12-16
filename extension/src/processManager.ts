@@ -55,17 +55,6 @@ export class ProcessManager extends Disposable {
     return this.runQueued()
   }
 
-  public async forceRunQueued(): Promise<void> {
-    const next = this.getNextFromQueue()
-    if (!next) {
-      return
-    }
-
-    const { process } = this.processes[next]
-    await Promise.all([process(), this.setLastStarted(next)])
-    return this.forceRunQueued()
-  }
-
   public isOngoingOrQueued(name: string) {
     return this.isOngoing(name) || this.isQueued(name)
   }
@@ -92,7 +81,7 @@ export class ProcessManager extends Disposable {
 
   private runQueued(): Promise<void> {
     const next = this.getNextFromQueue()
-    if (!next) {
+    if (!next || this.dispose.disposed) {
       return Promise.resolve()
     }
 

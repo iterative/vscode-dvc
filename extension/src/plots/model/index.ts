@@ -13,6 +13,7 @@ import {
   collectBranchRevisionDetails,
   collectOverrideRevisionDetails
 } from './collect'
+import { getRevisionFirstThreeColumns } from './util'
 import {
   CheckpointPlot,
   CheckpointPlotData,
@@ -187,7 +188,8 @@ export class PlotsModel extends ModelWithPersistence {
         this.experiments.getSelectedRevisions(),
         this.fetchedRevs,
         finishedExperiments,
-        id => this.experiments.getCheckpoints(id)
+        id => this.experiments.getCheckpoints(id),
+        this.experiments.getFirstThreeColumnOrder()
       )
     }
 
@@ -223,15 +225,22 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public getSelectedRevisionDetails() {
-    return this.experiments
-      .getSelectedRevisions()
-      .map(({ label, displayColor, logicalGroupName, id }) => ({
+    return this.experiments.getSelectedRevisions().map(exp => {
+      const { label, displayColor, logicalGroupName, id } = exp
+      const firstThreeColumns = getRevisionFirstThreeColumns(
+        this.experiments.getFirstThreeColumnOrder(),
+        exp
+      )
+
+      return {
         displayColor,
         fetched: this.fetchedRevs.has(label),
+        firstThreeColumns,
         group: logicalGroupName,
         id,
         revision: label
-      }))
+      }
+    })
   }
 
   public getTemplatePlots(
@@ -289,6 +298,10 @@ export class PlotsModel extends ModelWithPersistence {
     })
 
     this.persist(PersistenceKey.PLOT_COMPARISON_ORDER, this.comparisonOrder)
+  }
+
+  public getSelectedRevisions() {
+    return this.experiments.getSelectedRevisions().map(({ label }) => label)
   }
 
   public setSelectedMetrics(selectedMetrics: string[]) {
@@ -349,6 +362,16 @@ export class PlotsModel extends ModelWithPersistence {
     return this.multiSourceEncoding
   }
 
+  public getCLIIdToLabel() {
+    const mapping: { [shortSha: string]: string } = {}
+
+    for (const rev of this.experiments.getRevisions()) {
+      mapping[this.getCLIId(rev)] = rev
+    }
+
+    return mapping
+  }
+
   private removeStaleData() {
     return Promise.all([
       this.removeStaleBranches(),
@@ -397,22 +420,8 @@ export class PlotsModel extends ModelWithPersistence {
     this.fetchedRevs.delete(id)
   }
 
-  private getCLIIdToLabel() {
-    const mapping: { [shortSha: string]: string } = {}
-
-    for (const rev of this.experiments.getRevisions()) {
-      mapping[this.getCLIId(rev)] = rev
-    }
-
-    return mapping
-  }
-
   private getCLIId(label: string) {
     return this.branchRevisions[label] || label
-  }
-
-  private getSelectedRevisions() {
-    return this.experiments.getSelectedRevisions().map(({ label }) => label)
   }
 
   private getPlots(

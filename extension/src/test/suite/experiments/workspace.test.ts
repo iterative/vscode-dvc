@@ -12,7 +12,12 @@ import { Disposable } from '../../../extension'
 import { Experiments } from '../../../experiments'
 import * as QuickPick from '../../../vscode/quickPick'
 import { DvcExecutor } from '../../../cli/dvc/executor'
-import { closeAllEditors, getInputBoxEvent, mockDuration } from '../util'
+import {
+  closeAllEditors,
+  getInputBoxEvent,
+  getSafeWatcherDisposer,
+  mockDuration
+} from '../util'
 import { dvcDemoPath } from '../../util'
 import { RegisteredCliCommands } from '../../../commands/external'
 import * as Telemetry from '../../../telemetry'
@@ -30,15 +35,14 @@ import { GitExecutor } from '../../../cli/git/executor'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
 
 suite('Workspace Experiments Test Suite', () => {
-  const disposable = Disposable.fn()
+  const disposable = getSafeWatcherDisposer()
 
   beforeEach(() => {
     restore()
   })
 
   afterEach(() => {
-    disposable.dispose()
-    return closeAllEditors()
+    return Promise.all([closeAllEditors(), disposable.disposeAndFlush()])
   })
 
   const onDidChangeIsWebviewFocused = (
