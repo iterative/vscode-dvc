@@ -6,9 +6,12 @@ import {
   PlotPath,
   TemplateOrder
 } from './collect'
-import { PathSelectionModel } from '../../path/selection/model'
+import { PathSelectionModel, Status } from '../../path/selection/model'
 import { PersistenceKey } from '../../persistence/constants'
-import { performSimpleOrderedUpdate } from '../../util/array'
+import {
+  definedAndNonEmpty,
+  performSimpleOrderedUpdate
+} from '../../util/array'
 import { MultiSourceEncoding } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
 import { PlotsOutputOrError } from '../../cli/dvc/contract'
@@ -16,6 +19,8 @@ import { PlotsOutputOrError } from '../../cli/dvc/contract'
 export class PathsModel extends PathSelectionModel<PlotPath> {
   private templateOrder: TemplateOrder
   private comparisonPathsOrder: string[]
+
+  private selectedRevisions: string[] = []
 
   constructor(dvcRoot: string, workspaceState: Memento) {
     super(dvcRoot, workspaceState, PersistenceKey.PLOT_PATH_STATUS)
@@ -27,12 +32,20 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     )
   }
 
-  public transformAndSet(data: PlotsOutputOrError) {
+  public setSelectedRevisions(selectedRevisions: string[]) {
+    this.selectedRevisions = selectedRevisions
+  }
+
+  public transformAndSet(
+    data: PlotsOutputOrError,
+    revs: string[],
+    cliIdToLabel: { [id: string]: string }
+  ) {
     if (isDvcError(data)) {
       return
     }
 
-    const paths = collectPaths(this.data, data)
+    const paths = collectPaths(this.data, data, revs, cliIdToLabel)
 
     this.setNewStatuses(paths)
 
@@ -45,7 +58,7 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
 
   public setTemplateOrder(templateOrder?: TemplateOrder) {
     const filter = (type: PathType, plotPath: PlotPath) =>
-      !!plotPath.type?.has(type)
+      !!plotPath.type?.has(type) && this.hasRevisions(plotPath)
 
     this.templateOrder = collectTemplateOrder(
       this.getPathsByType(PathType.TEMPLATE_SINGLE, filter),
@@ -67,6 +80,29 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
       label: element.label,
       status: this.status[element.path]
     }))
+  }
+
+  public getTerminalNodes(): (PlotPath & { selected: boolean })[] {
+    return this.data
+      .filter(element => !element.hasChildren && this.hasRevisions(element))
+      .map(element => ({ ...element, selected: !!this.status[element.path] }))
+  }
+
+  public getHasUnselectedPlots() {
+    const revisionPaths = this.data.filter(element =>
+      this.hasRevisions(element)
+    )
+
+    if (!definedAndNonEmpty(revisionPaths)) {
+      return false
+    }
+
+    for (const { path } of revisionPaths) {
+      if (this.status[path] === Status.UNSELECTED) {
+        return true
+      }
+    }
+    return false
   }
 
   public getTemplateOrder(): TemplateOrder {
@@ -99,7 +135,11 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
   private getPathsByType(
     type: PathType,
     filter = (type: PathType, plotPath: PlotPath) =>
-      !!(plotPath.type?.has(type) && this.status[plotPath.path])
+      !!(
+        plotPath.type?.has(type) &&
+        this.status[plotPath.path] &&
+        this.hasRevisions(plotPath)
+      )
   ) {
     return this.data
       .filter(plotPath => filter(type, plotPath))
@@ -108,6 +148,10 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
 
   private filterChildren(path: string | undefined): PlotPath[] {
     return this.data.filter(element => {
+      if (!this.hasRevisions(element)) {
+        return false
+      }
+
       if (!path) {
         return !element.parentPath
       }
@@ -129,5 +173,9 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     }
 
     return element.hasChildren
+  }
+
+  private hasRevisions({ revisions }: PlotPath) {
+    return this.selectedRevisions.some(revision => revisions.has(revision))
   }
 }

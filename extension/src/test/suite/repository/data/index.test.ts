@@ -3,7 +3,6 @@ import { expect } from 'chai'
 import { restore, spy, stub } from 'sinon'
 import { EventEmitter } from 'vscode'
 import { buildRepositoryData } from '../util'
-import { Disposable } from '../../../../extension'
 import { dvcDemoPath } from '../../../util'
 import { fireWatcher } from '../../../../fileSystem/watcher'
 import { RepositoryData } from '../../../../repository/data'
@@ -14,16 +13,17 @@ import {
 } from '../../../../commands/internal'
 import { gitPath } from '../../../../cli/git/constants'
 import { getGitPath } from '../../../../fileSystem'
+import { getSafeWatcherDisposer } from '../../util'
 
 suite('Repository Data Test Suite', () => {
-  const disposable = Disposable.fn()
+  const disposable = getSafeWatcherDisposer()
 
   beforeEach(() => {
     restore()
   })
 
   afterEach(() => {
-    disposable.dispose()
+    return disposable.disposeAndFlush()
   })
 
   describe('RepositoryData', () => {

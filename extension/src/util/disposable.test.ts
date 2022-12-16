@@ -25,7 +25,9 @@ describe('reset', () => {
     const aDisposable = disposer.track(Disposable.fn())
     let disposables: Record<string, Disposer> = { aDisposable, bDisposable }
 
-    disposables = reset<Disposer>(disposables, disposer)
+    disposables = reset<Disposer>(disposables, disposable =>
+      disposer.untrack(disposable)
+    )
 
     expect(disposables).toStrictEqual({})
   })
@@ -37,7 +39,7 @@ describe('reset', () => {
     const cDisposable = disposer.track(Disposable.fn())
     const disposables = { aDisposable, bDisposable, cDisposable }
 
-    reset(disposables, disposer)
+    reset(disposables, disposable => disposer.untrack(disposable))
 
     expect(mockedDispose).toHaveBeenCalledTimes(3)
   })
@@ -48,7 +50,7 @@ describe('reset', () => {
     const disposable = disposer.track(Disposable.fn())
     const disposables = { aDisposable: disposable }
 
-    reset(disposables, disposer)
+    reset(disposables, disposable => disposer.untrack(disposable))
 
     expect(mockedUntrack).toHaveBeenCalledWith(disposable)
   })

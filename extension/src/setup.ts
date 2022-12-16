@@ -9,8 +9,7 @@ import { pickFile } from './vscode/resourcePicker'
 import { getFirstWorkspaceFolder } from './vscode/workspaceFolders'
 import { getSelectTitle, Title } from './vscode/title'
 import { isPythonExtensionInstalled } from './extensions/python'
-import { extensionCanRunCli } from './cli/dvc/discovery'
-import { willRecheck } from './setupUtil'
+import { extensionCanRunCli, recheckGlobal } from './cli/dvc/discovery'
 
 const setConfigPath = async (
   option: ConfigKey,
@@ -156,13 +155,11 @@ export const setupWorkspace = async (): Promise<boolean> => {
 
 export const checkAvailable = async (
   extension: IExtension,
-  dvcRootOrFirstFolder: string,
-  recheck = false
+  dvcRootOrFirstFolder: string
 ) => {
   const { isAvailable, isCompatible } = await extensionCanRunCli(
     extension,
-    dvcRootOrFirstFolder,
-    recheck
+    dvcRootOrFirstFolder
   )
 
   extension.setCliCompatible(isCompatible)
@@ -173,11 +170,6 @@ export const checkAvailable = async (
   }
 
   extension.resetMembers()
-
-  if (!isAvailable) {
-    extension.setAvailable(false)
-    willRecheck(extension, dvcRootOrFirstFolder)
-  }
 }
 
 export const setup = async (extension: IExtension) => {
@@ -192,4 +184,15 @@ export const setup = async (extension: IExtension) => {
   const dvcRootOrFirstFolder = roots.length > 0 ? roots[0] : cwd
 
   return checkAvailable(extension, dvcRootOrFirstFolder)
+}
+
+export const setupWithGlobalRecheck = async (
+  extension: IExtension,
+  recheckInterval = 5000
+): Promise<void> => {
+  await setup(extension)
+
+  if (!extension.getAvailable()) {
+    recheckGlobal(extension, () => setup(extension), recheckInterval)
+  }
 }

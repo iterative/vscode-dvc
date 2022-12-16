@@ -4,7 +4,7 @@ import { dvcDemoPath } from '../../util'
 import {
   buildInternalCommands,
   FIRST_TRUTHY_TIME,
-  mockDisposable,
+  SafeWatcherDisposer,
   spyOnPrivateMemberMethod
 } from '../util'
 import { Disposer } from '../../../extension'
@@ -13,7 +13,6 @@ import * as Time from '../../../util/time'
 import * as Watcher from '../../../fileSystem/watcher'
 import { Repository } from '../../../repository'
 import { InternalCommands } from '../../../commands/internal'
-import { DataStatusOutput } from '../../../cli/dvc/contract'
 
 export const buildDependencies = (disposer: Disposer) => {
   const { dvcReader, gitReader, internalCommands } =
@@ -22,7 +21,7 @@ export const buildDependencies = (disposer: Disposer) => {
   const mockCreateFileSystemWatcher = stub(
     Watcher,
     'createFileSystemWatcher'
-  ).returns(mockDisposable)
+  ).returns(undefined)
 
   const mockDataStatus = stub(dvcReader, 'dataStatus')
   const mockGetAllUntracked = stub(gitReader, 'listUntracked')
@@ -47,7 +46,7 @@ export const buildDependencies = (disposer: Disposer) => {
   }
 }
 
-export const buildRepositoryData = async (disposer: Disposer) => {
+export const buildRepositoryData = async (disposer: SafeWatcherDisposer) => {
   const {
     internalCommands,
     mockCreateFileSystemWatcher,
@@ -57,7 +56,7 @@ export const buildRepositoryData = async (disposer: Disposer) => {
     updatesPaused
   } = buildDependencies(disposer)
 
-  mockDataStatus.resolves({} as DataStatusOutput)
+  mockDataStatus.resolves({})
   mockGetAllUntracked.resolves(new Set())
   mockNow.returns(FIRST_TRUTHY_TIME)
 
@@ -77,7 +76,7 @@ export const buildRepositoryData = async (disposer: Disposer) => {
 }
 
 export const buildRepository = async (
-  disposer: Disposer,
+  disposer: SafeWatcherDisposer,
   internalCommands: InternalCommands,
   updatesPaused: EventEmitter<boolean>,
   treeDataChanged: EventEmitter<void>,

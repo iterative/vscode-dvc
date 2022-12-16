@@ -21,7 +21,7 @@ import { IExtension } from './interfaces'
 import { registerRepositoryCommands } from './repository/commands/register'
 import { ResourceLocator } from './resourceLocator'
 import { definedAndNonEmpty } from './util/array'
-import { setup, setupWorkspace } from './setup'
+import { setup, setupWithGlobalRecheck, setupWorkspace } from './setup'
 import { Status } from './status'
 import { reRegisterVsCodeCommands } from './vscode/commands'
 import { InternalCommands } from './commands/internal'
@@ -205,14 +205,14 @@ export class Extension extends Disposable implements IExtension {
       new RepositoriesTree(this.internalCommands, this.repositories)
     )
 
-    setup(this)
-      .then(async () =>
+    setupWithGlobalRecheck(this)
+      .then(async () => {
         sendTelemetryEvent(
           EventName.EXTENSION_LOAD,
           await this.getEventProperties(),
           { duration: stopWatch.getElapsedTime() }
         )
-      )
+      })
       .catch(async error =>
         sendTelemetryEventAndThrow(
           EventName.EXTENSION_LOAD,
@@ -503,12 +503,14 @@ export class Extension extends Disposable implements IExtension {
   }
 
   private watchForVenvChanges() {
-    this.dispose.track(
-      createFileSystemWatcher('**/dvc{,.exe}', path => {
+    return createFileSystemWatcher(
+      disposable => this.dispose.track(disposable),
+      '**/dvc{,.exe}',
+      path => {
         if (path && (!this.cliAccessible || !this.cliCompatible)) {
           setup(this)
         }
-      })
+      }
     )
   }
 }

@@ -19,7 +19,7 @@ const PlotsContent = () => {
   const {
     hasData,
     hasPlots,
-    hasSelectedPlots,
+    hasUnselectedPlots,
     selectedRevisions,
     zoomedInPlot
   } = useSelector((state: PlotsState) => state.webview)
@@ -57,7 +57,7 @@ const PlotsContent = () => {
       <GetStarted
         addItems={
           <AddPlots
-            hasSelectedPlots={!!hasSelectedPlots}
+            hasUnselectedPlots={hasUnselectedPlots}
             hasSelectedRevisions={!!selectedRevisions?.length}
           />
         }

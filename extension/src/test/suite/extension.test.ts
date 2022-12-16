@@ -6,6 +6,7 @@ import { window, commands, workspace, Uri } from 'vscode'
 import {
   closeAllEditors,
   configurationChangeEvent,
+  mockDisposable,
   mockDuration,
   quickPickInitialized,
   selectQuickPickItem
@@ -23,6 +24,7 @@ import {
   RegisteredCommands
 } from '../../commands/external'
 import * as Setup from '../../setup'
+import * as Watcher from '../../fileSystem/watcher'
 import * as Telemetry from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { OutputChannel } from '../../vscode/outputChannel'
@@ -55,7 +57,6 @@ suite('Extension Test Suite', () => {
     ])
   })
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('dvc.setupWorkspace', () => {
     it('should set dvc.dvcPath to the default when dvc is installed in a virtual environment', async () => {
       stub(Python, 'isPythonExtensionInstalled').returns(true)
@@ -195,10 +196,18 @@ suite('Extension Test Suite', () => {
         return setupWorkspaceWizard
       }
 
-      const createFileSystemWatcherSpy = spy(
+      const mockCreateFileSystemWatcher = stub(
         workspace,
         'createFileSystemWatcher'
-      )
+      ).returns({
+        dispose: () => undefined,
+        ignoreChangeEvents: false,
+        ignoreCreateEvents: false,
+        ignoreDeleteEvents: false,
+        onDidChange: () => mockDisposable,
+        onDidCreate: () => mockDisposable,
+        onDidDelete: () => mockDisposable
+      })
 
       const mockCanRunCli = stub(DvcReader.prototype, 'version')
         .onFirstCall()
@@ -351,7 +360,7 @@ suite('Extension Test Suite', () => {
         'should dispose of the current repositories and experiments if the cli can no longer be found'
       ).to.have.been.called
 
-      expect(createFileSystemWatcherSpy).not.to.be.calledWithMatch('{}')
+      expect(mockCreateFileSystemWatcher).not.to.be.calledWithMatch('{}')
     }).timeout(25000)
 
     it('should send an error telemetry event when setupWorkspace fails', async () => {
@@ -448,6 +457,7 @@ suite('Extension Test Suite', () => {
     })
 
     it('should set the dvc.cli.incompatible context value', async () => {
+      stub(Watcher, 'createFileSystemWatcher').returns(undefined)
       stub(DvcReader.prototype, 'expShow').resolves({
         [EXPERIMENT_WORKSPACE_ID]: { baseline: {} }
       })

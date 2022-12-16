@@ -344,7 +344,8 @@ describe('collectOverrideRevisionDetails', () => {
                 status: ExperimentStatus.SUCCESS
               }
             ] as Experiment[]
-          }[id])
+          }[id]),
+        []
       )
     expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
       'a',
@@ -356,6 +357,7 @@ describe('collectOverrideRevisionDetails', () => {
       {
         displayColor: '#4299e1',
         fetched: true,
+        firstThreeColumns: [],
         group: 'a',
         id: 'a',
         revision: 'a'
@@ -363,6 +365,7 @@ describe('collectOverrideRevisionDetails', () => {
       {
         displayColor: '#13adc7',
         fetched: true,
+        firstThreeColumns: [],
         group: runningGroup,
         id: 'e',
         revision: 'e'
@@ -370,14 +373,15 @@ describe('collectOverrideRevisionDetails', () => {
       {
         displayColor: '#48bb78',
         fetched: true,
+        firstThreeColumns: [],
         group: 'c',
         id: 'c',
         revision: 'c'
       },
-
       {
         displayColor: '#f56565',
         fetched: true,
+        firstThreeColumns: [],
         group: 'd',
         id: 'd',
         revision: 'd'
@@ -452,7 +456,8 @@ describe('collectOverrideRevisionDetails', () => {
                 status: ExperimentStatus.SUCCESS
               }
             ] as Experiment[]
-          }[id])
+          }[id]),
+        []
       )
     expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
       'a',
@@ -464,6 +469,7 @@ describe('collectOverrideRevisionDetails', () => {
       {
         displayColor: '#4299e1',
         fetched: true,
+        firstThreeColumns: [],
         group: 'a',
         id: 'a',
         revision: 'a'
@@ -471,6 +477,7 @@ describe('collectOverrideRevisionDetails', () => {
       {
         displayColor: '#13adc7',
         fetched: true,
+        firstThreeColumns: [],
         group: undefined,
         id: EXPERIMENT_WORKSPACE_ID,
         revision: EXPERIMENT_WORKSPACE_ID
@@ -478,14 +485,15 @@ describe('collectOverrideRevisionDetails', () => {
       {
         displayColor: '#48bb78',
         fetched: true,
+        firstThreeColumns: [],
         group: 'c',
         id: 'c',
         revision: 'c'
       },
-
       {
         displayColor: '#f56565',
         fetched: true,
+        firstThreeColumns: [],
         group: 'd',
         id: 'd',
         revision: 'd'
@@ -560,7 +568,8 @@ describe('collectOverrideRevisionDetails', () => {
                 status: ExperimentStatus.SUCCESS
               }
             ] as Experiment[]
-          }[id])
+          }[id]),
+        []
       )
     expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
       'd',
@@ -597,7 +606,8 @@ describe('collectOverrideRevisionDetails', () => {
         new Set(['a', 'c', 'd', 'e']),
         { [justFinishedRunningId]: justFinishedRunningId },
         (id: string) =>
-          ({ [justFinishedRunningId]: [{ label: 'e' }] as Experiment[] }[id])
+          ({ [justFinishedRunningId]: [{ label: 'e' }] as Experiment[] }[id]),
+        []
       )
     expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
       'a',

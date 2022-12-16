@@ -10,7 +10,7 @@ type ZoomedInPlotState = {
 export interface WebviewState {
   hasData: boolean
   hasPlots: boolean
-  hasSelectedPlots: boolean
+  hasUnselectedPlots: boolean
   selectedRevisions: Revision[]
   zoomedInPlot: ZoomedInPlotState | undefined
   maxPlotSize: number
@@ -19,7 +19,7 @@ export interface WebviewState {
 export const webviewInitialState: WebviewState = {
   hasData: false,
   hasPlots: false,
-  hasSelectedPlots: false,
+  hasUnselectedPlots: false,
   maxPlotSize: 375,
   selectedRevisions: [],
   zoomedInPlot: {
@@ -64,11 +64,11 @@ export const webviewSlice = createSlice({
     ) => {
       state.hasPlots = action.payload
     },
-    updateHasSelectedPlots: (
-      state: { hasSelectedPlots: boolean },
+    updateHasUnselectedPlots: (
+      state: { hasUnselectedPlots: boolean },
       action: PayloadAction<boolean>
     ) => {
-      state.hasSelectedPlots = action.payload
+      state.hasUnselectedPlots = action.payload
     },
     updateSelectedRevisions: (
       state: { selectedRevisions: Revision[] },
@@ -82,7 +82,7 @@ export const webviewSlice = createSlice({
 export const {
   initialize,
   updateHasPlots,
-  updateHasSelectedPlots,
+  updateHasUnselectedPlots,
   updateSelectedRevisions,
   setZoomedInPlot,
   setMaxPlotSize

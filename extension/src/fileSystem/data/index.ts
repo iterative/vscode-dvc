@@ -39,19 +39,18 @@ export class FileSystemData extends DeferredDisposable {
   }
 
   private watchDvcYaml() {
-    this.dispose.track(
-      createFileSystemWatcher(
-        getRelativePattern(this.dvcRoot, join('**', 'dvc.yaml')),
-        path => {
-          if (!path) {
-            return
-          }
-          const yaml = loadYaml<PartialDvcYaml>(path)
-          if (yaml) {
-            this.updated.fire({ path, yaml })
-          }
+    return createFileSystemWatcher(
+      disposable => this.dispose.track(disposable),
+      getRelativePattern(this.dvcRoot, join('**', 'dvc.yaml')),
+      path => {
+        if (!path) {
+          return
         }
-      )
+        const yaml = loadYaml<PartialDvcYaml>(path)
+        if (yaml) {
+          this.updated.fire({ path, yaml })
+        }
+      }
     )
   }
 }

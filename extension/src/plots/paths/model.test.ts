@@ -3,7 +3,8 @@ import { PathsModel } from './model'
 import { PathType } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import { buildMockMemento } from '../../test/util'
-import { TemplatePlotGroup } from '../webview/contract'
+import { PlotsType, TemplatePlotGroup } from '../webview/contract'
+import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 
 describe('PathsModel', () => {
   const mockDvcRoot = 'test'
@@ -11,20 +12,29 @@ describe('PathsModel', () => {
   const logsAcc = join('logs', 'acc.tsv')
   const logsLoss = join('logs', 'loss.tsv')
   const plotsAcc = join('plots', 'acc.png')
+  const revisions = [
+    EXPERIMENT_WORKSPACE_ID,
+    '53c3851',
+    '4fb124a',
+    '42b8736',
+    '1ba7bcd'
+  ]
 
-  it('should return the expected columns when given the default output fixture', () => {
+  it('should return the expected paths when given the default output fixture', () => {
     const comparisonType = new Set([PathType.COMPARISON])
     const singleType = new Set([PathType.TEMPLATE_SINGLE])
     const multiType = new Set([PathType.TEMPLATE_MULTI])
 
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
-    model.transformAndSet(plotsDiffFixture)
+    model.transformAndSet(plotsDiffFixture, revisions, {})
+    model.setSelectedRevisions(revisions)
     expect(model.getTerminalNodes()).toStrictEqual([
       {
         hasChildren: false,
         label: 'acc.png',
         parentPath: 'plots',
         path: plotsAcc,
+        revisions: new Set(revisions),
         selected: true,
         type: comparisonType
       },
@@ -33,6 +43,7 @@ describe('PathsModel', () => {
         label: 'heatmap.png',
         parentPath: 'plots',
         path: join('plots', 'heatmap.png'),
+        revisions: new Set(revisions),
         selected: true,
         type: comparisonType
       },
@@ -41,6 +52,7 @@ describe('PathsModel', () => {
         label: 'loss.png',
         parentPath: 'plots',
         path: join('plots', 'loss.png'),
+        revisions: new Set(revisions),
         selected: true,
         type: comparisonType
       },
@@ -49,6 +61,7 @@ describe('PathsModel', () => {
         label: 'loss.tsv',
         parentPath: 'logs',
         path: logsLoss,
+        revisions: new Set(revisions),
         selected: true,
         type: singleType
       },
@@ -57,6 +70,7 @@ describe('PathsModel', () => {
         label: 'acc.tsv',
         parentPath: 'logs',
         path: logsAcc,
+        revisions: new Set(revisions),
         selected: true,
         type: singleType
       },
@@ -65,11 +79,40 @@ describe('PathsModel', () => {
         label: 'predictions.json',
         parentPath: undefined,
         path: 'predictions.json',
+        revisions: new Set(revisions),
         selected: true,
         type: multiType
       }
     ])
   })
+
+  const commitBeforePlots = '4c4318d'
+  const previousPlotPath = join('dvclive', 'plots', 'metrics', 'loss.tsv')
+  const previousPlotFixture = {
+    [previousPlotPath]: [
+      {
+        content: {},
+        datapoints: {
+          [commitBeforePlots]: [
+            {
+              loss: '2.29',
+              step: '0'
+            },
+            {
+              loss: '2.27',
+              step: '1'
+            },
+            {
+              loss: '2.25',
+              step: '2'
+            }
+          ]
+        },
+        revisions: [commitBeforePlots],
+        type: PlotsType.VEGA
+      }
+    ]
+  }
 
   const multiViewGroup = {
     group: TemplatePlotGroup.MULTI_VIEW,
@@ -94,7 +137,8 @@ describe('PathsModel', () => {
 
   it('should retain the order of template paths when they are unselected', () => {
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
-    model.transformAndSet(plotsDiffFixture)
+    model.transformAndSet(plotsDiffFixture, revisions, {})
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
 
@@ -111,7 +155,8 @@ describe('PathsModel', () => {
 
   it('should move unselected plots to the end when a reordering occurs', () => {
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
-    model.transformAndSet(plotsDiffFixture)
+    model.transformAndSet(plotsDiffFixture, revisions, {})
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
 
@@ -134,9 +179,119 @@ describe('PathsModel', () => {
     ])
   })
 
+  it('should not update the order of plots when there are no revisions selected', () => {
+    const model = new PathsModel(mockDvcRoot, buildMockMemento())
+    model.transformAndSet(plotsDiffFixture, revisions, {})
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
+
+    expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
+
+    model.setSelectedRevisions([])
+    expect(model.getTemplateOrder()).toStrictEqual([])
+
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
+
+    expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
+
+    const newOrder = [logsAccGroup, multiViewGroup, logsLossGroup]
+
+    model.setTemplateOrder(newOrder)
+
+    expect(model.getTemplateOrder()).toStrictEqual(newOrder)
+
+    model.setSelectedRevisions([])
+    expect(model.getTemplateOrder()).toStrictEqual([])
+
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
+
+    expect(model.getTemplateOrder()).toStrictEqual(newOrder)
+  })
+
+  it('should not move plots which do not have the selected revisions if no reordering occurs', () => {
+    const model = new PathsModel(mockDvcRoot, buildMockMemento())
+
+    model.transformAndSet(
+      { ...plotsDiffFixture, ...previousPlotFixture },
+      [...revisions, commitBeforePlots],
+      {}
+    )
+
+    const expectedOrderAllRevisions = [
+      {
+        ...originalSingleViewGroup,
+        paths: [...originalSingleViewGroup.paths, previousPlotPath]
+      },
+      multiViewGroup
+    ]
+
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
+
+    expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
+
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID, commitBeforePlots])
+
+    expect(model.getTemplateOrder()).toStrictEqual(expectedOrderAllRevisions)
+
+    model.setSelectedRevisions([commitBeforePlots])
+
+    expect(model.getTemplateOrder()).toStrictEqual([
+      {
+        group: TemplatePlotGroup.SINGLE_VIEW,
+        paths: [previousPlotPath]
+      }
+    ])
+
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID, commitBeforePlots])
+
+    expect(model.getTemplateOrder()).toStrictEqual(expectedOrderAllRevisions)
+  })
+
+  it('should move plots which do not have selected revisions to the end when a reordering occurs', () => {
+    const model = new PathsModel(mockDvcRoot, buildMockMemento())
+    model.transformAndSet(
+      { ...plotsDiffFixture, ...previousPlotFixture },
+      [...revisions, commitBeforePlots],
+      {}
+    )
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
+
+    expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
+
+    model.setTemplateOrder([logsLossGroup, multiViewGroup, logsAccGroup])
+
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID, commitBeforePlots])
+
+    expect(model.getTemplateOrder()).toStrictEqual([
+      logsLossGroup,
+      multiViewGroup,
+      {
+        group: TemplatePlotGroup.SINGLE_VIEW,
+        paths: [logsAcc, previousPlotPath]
+      }
+    ])
+  })
+
+  it('should move newly collected plot paths to the end', () => {
+    const model = new PathsModel(mockDvcRoot, buildMockMemento())
+
+    model.transformAndSet(plotsDiffFixture, revisions, {})
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
+
+    expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
+
+    model.transformAndSet(previousPlotFixture, [commitBeforePlots], {})
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID, commitBeforePlots])
+
+    expect(model.getTemplateOrder()).toStrictEqual([
+      ...originalTemplateOrder,
+      { group: TemplatePlotGroup.SINGLE_VIEW, paths: [previousPlotPath] }
+    ])
+  })
+
   it('should merge template plots groups when a path is unselected', () => {
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
-    model.transformAndSet(plotsDiffFixture)
+    model.transformAndSet(plotsDiffFixture, revisions, {})
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     model.setTemplateOrder([logsLossGroup, logsAccGroup, multiViewGroup])
 
@@ -147,7 +302,8 @@ describe('PathsModel', () => {
 
   it('should retain the order of the comparison paths when changed', () => {
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
-    model.transformAndSet(plotsDiffFixture)
+    model.transformAndSet(plotsDiffFixture, revisions, {})
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     expect(model.getComparisonPaths()).toStrictEqual([
       join('plots', 'acc.png'),
@@ -168,13 +324,15 @@ describe('PathsModel', () => {
 
   it('should return the expected children from the test fixture', () => {
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
-    model.transformAndSet(plotsDiffFixture)
+    model.transformAndSet(plotsDiffFixture, revisions, {})
+    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     const rootChildren = model.getChildren(undefined, {
       'predictions.json': {
         strokeDash: { field: '', scale: { domain: [], range: [] } }
       }
     })
+
     expect(rootChildren).toStrictEqual([
       {
         descendantStatuses: [2, 2, 2],
@@ -182,6 +340,7 @@ describe('PathsModel', () => {
         label: 'plots',
         parentPath: undefined,
         path: 'plots',
+        revisions: new Set(revisions),
         status: 2
       },
       {
@@ -190,6 +349,7 @@ describe('PathsModel', () => {
         label: 'logs',
         parentPath: undefined,
         path: 'logs',
+        revisions: new Set(revisions),
         status: 2
       },
       {
@@ -198,6 +358,7 @@ describe('PathsModel', () => {
         label: 'predictions.json',
         parentPath: undefined,
         path: 'predictions.json',
+        revisions: new Set(revisions),
         status: 2,
         type: new Set([PathType.TEMPLATE_MULTI])
       }
@@ -211,6 +372,7 @@ describe('PathsModel', () => {
         label: 'loss.tsv',
         parentPath: 'logs',
         path: logsLoss,
+        revisions: new Set(revisions),
         status: 2,
         type: new Set([PathType.TEMPLATE_SINGLE])
       },
@@ -220,6 +382,7 @@ describe('PathsModel', () => {
         label: 'acc.tsv',
         parentPath: 'logs',
         path: logsAcc,
+        revisions: new Set(revisions),
         status: 2,
         type: new Set([PathType.TEMPLATE_SINGLE])
       }
@@ -240,6 +403,7 @@ describe('PathsModel', () => {
         label: 'loss.tsv',
         parentPath: 'logs',
         path: logsLoss,
+        revisions: new Set(revisions),
         status: 2,
         type: new Set([PathType.TEMPLATE_SINGLE])
       },
@@ -249,6 +413,7 @@ describe('PathsModel', () => {
         label: 'acc.tsv',
         parentPath: 'logs',
         path: logsAcc,
+        revisions: new Set(revisions),
         status: 2,
         type: new Set([PathType.TEMPLATE_SINGLE])
       }
@@ -260,12 +425,16 @@ describe('PathsModel', () => {
 
   it('should not provide error as a path when the CLI throws an error', () => {
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
-    model.transformAndSet({
-      error: {
-        msg: 'UNEXPECTED ERROR: a strange thing happened',
-        type: 'Caught Error'
-      }
-    })
+    model.transformAndSet(
+      {
+        error: {
+          msg: 'UNEXPECTED ERROR: a strange thing happened',
+          type: 'Caught Error'
+        }
+      },
+      [EXPERIMENT_WORKSPACE_ID],
+      {}
+    )
 
     expect(model.getTerminalNodes()).toStrictEqual([])
   })

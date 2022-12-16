@@ -89,6 +89,9 @@ export const experimentsUpdatedEvent = (experiments: Experiments) =>
 export const getFirstArgOfCall = (spy: SinonSpy, call: number) =>
   spy.getCall(call).firstArg
 
+export const getArgOfCall = (spy: SinonSpy, call: number, arg: number) =>
+  spy.getCall(call).args[arg - 1]
+
 export const getFirstArgOfLastCall = (spy: SinonSpy) =>
   getFirstArgOfCall(spy, -1)
 
@@ -171,11 +174,13 @@ export const buildDependencies = (
   const mockCreateFileSystemWatcher = stub(
     Watcher,
     'createFileSystemWatcher'
-  ).returns(mockDisposable)
+  ).returns(undefined)
 
   const mockCheckSignalFile = stub(FileSystem, 'checkSignalFile').resolves(
     false
   )
+
+  const mockDataStatus = stub(dvcReader, 'dataStatus').resolves({})
 
   const mockPlotsDiff = stub(dvcReader, 'plotsDiff').resolves(plotsDiff)
 
@@ -196,6 +201,7 @@ export const buildDependencies = (
     messageSpy,
     mockCheckSignalFile,
     mockCreateFileSystemWatcher,
+    mockDataStatus,
     mockExperimentShow,
     mockPlotsDiff,
     resourceLocator,
@@ -243,3 +249,19 @@ export const spyOnPrivateMemberMethod = <T>(
   memberName: string,
   method: string
 ) => spy((classWithPrivateMember as any)[memberName], method)
+
+export type SafeWatcherDisposer = Disposer & {
+  disposeAndFlush: () => Promise<unknown>
+}
+
+export const getSafeWatcherDisposer = (): Disposer & {
+  disposeAndFlush: () => Promise<unknown>
+} => {
+  const disposer = Disposable.fn()
+  return Object.assign(disposer, {
+    disposeAndFlush: () => {
+      disposer.dispose()
+      return Time.delay(500)
+    }
+  })
+}

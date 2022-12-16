@@ -23,6 +23,7 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   PlotsData,
   PlotSizeNumber,
+  Revision,
   Section,
   TemplatePlotGroup,
   TemplatePlotsData,
@@ -243,7 +244,7 @@ describe('App', () => {
     renderAppWithOptionalData({
       checkpoint: null
     })
-    const emptyState = await screen.findByText('No Plots to Display.')
+    const emptyState = await screen.findByText('No Plots Detected.')
 
     expect(emptyState).toBeInTheDocument()
   })
@@ -262,6 +263,7 @@ describe('App', () => {
           {
             displayColor: '#945dd6',
             fetched: false,
+            firstThreeColumns: [],
             group: '[exp-a270a]',
             id: 'ad2b5ec854a447d00d9dfa9cdf88211a39a17813',
             revision: 'ad2b5ec'
@@ -270,12 +272,13 @@ describe('App', () => {
         size: PlotSizeNumber.REGULAR
       },
       hasPlots: true,
-      hasSelectedPlots: true,
+      hasUnselectedPlots: false,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       selectedRevisions: [
         {
           displayColor: '#945dd6',
           fetched: false,
+          firstThreeColumns: [],
           group: '[exp-a270a]',
           id: 'ad2b5ec854a447d00d9dfa9cdf88211a39a17813',
           revision: 'ad2b5ec'
@@ -288,18 +291,26 @@ describe('App', () => {
     expect(loading).toHaveLength(3)
   })
 
-  it('should render the get started buttons when no plots or experiments are selected', async () => {
+  it('should render the Add Plots and Add Experiments get started button when there are experiments which have plots that are all unselected', async () => {
     renderAppWithOptionalData({
       checkpoint: null,
       hasPlots: true,
-      hasSelectedPlots: false,
-      selectedRevisions: undefined
+      hasUnselectedPlots: true,
+      selectedRevisions: [{} as Revision]
     })
-    const addPlotsButton = await screen.findByText('Add Plots')
     const addExperimentsButton = await screen.findByText('Add Experiments')
+    const addPlotsButton = await screen.findByText('Add Plots')
 
-    expect(addPlotsButton).toBeInTheDocument()
     expect(addExperimentsButton).toBeInTheDocument()
+    expect(addPlotsButton).toBeInTheDocument()
+
+    mockPostMessage.mockReset()
+
+    fireEvent.click(addExperimentsButton)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.SELECT_EXPERIMENTS
+    })
 
     mockPostMessage.mockReset()
 
@@ -308,6 +319,22 @@ describe('App', () => {
     expect(mockPostMessage).toHaveBeenCalledWith({
       type: MessageFromWebviewType.SELECT_PLOTS
     })
+    mockPostMessage.mockReset()
+  })
+
+  it('should render only the Add Experiments get started button when no experiments are selected', async () => {
+    renderAppWithOptionalData({
+      checkpoint: null,
+      hasPlots: true,
+      hasUnselectedPlots: false,
+      selectedRevisions: undefined
+    })
+    const addExperimentsButton = await screen.findByText('Add Experiments')
+    const addPlotsButton = screen.queryByText('Add Plots')
+
+    expect(addExperimentsButton).toBeInTheDocument()
+    expect(addPlotsButton).not.toBeInTheDocument()
+
     mockPostMessage.mockReset()
 
     fireEvent.click(addExperimentsButton)
