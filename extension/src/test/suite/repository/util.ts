@@ -4,7 +4,6 @@ import { dvcDemoPath } from '../../util'
 import {
   buildInternalCommands,
   FIRST_TRUTHY_TIME,
-  mockDisposable,
   SafeWatcherDisposer,
   spyOnPrivateMemberMethod
 } from '../util'
@@ -22,7 +21,7 @@ export const buildDependencies = (disposer: Disposer) => {
   const mockCreateFileSystemWatcher = stub(
     Watcher,
     'createFileSystemWatcher'
-  ).returns(mockDisposable)
+  ).returns(undefined)
 
   const mockDataStatus = stub(dvcReader, 'dataStatus')
   const mockGetAllUntracked = stub(gitReader, 'listUntracked')
@@ -77,7 +76,7 @@ export const buildRepositoryData = async (disposer: SafeWatcherDisposer) => {
 }
 
 export const buildRepository = async (
-  disposer: Disposer,
+  disposer: SafeWatcherDisposer,
   internalCommands: InternalCommands,
   updatesPaused: EventEmitter<boolean>,
   treeDataChanged: EventEmitter<void>,
