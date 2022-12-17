@@ -75,7 +75,7 @@
     "fastify": "3.29.4",
     "loader-utils": "2.0.4",
     "terser": "5.16.1",
-    "trim-newlines": "3.0.1",
+    "trim-newlines": "4.0.2",
     "trim": "1.0.1",
     "vega-functions": "5.13.0",
     "vega-scale": "7.2.0"
