@@ -30,12 +30,6 @@ const PythonExtensionUsed: React.FC<{ pythonBinPath: string }> = ({
       }
       text="Select Python Interpreter"
     />
-    <Button
-      isNested={true}
-      appearance="secondary"
-      onClick={() => undefined}
-      text="Setup The Workspace"
-    />
   </div>
 )
 
