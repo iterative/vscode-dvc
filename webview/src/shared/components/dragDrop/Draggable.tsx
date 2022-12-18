@@ -1,7 +1,6 @@
 import React, { DragEvent } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { setGroup } from './dragDropSlice'
-import { DropTarget } from './DropTarget'
 import { ExperimentsState } from '../../../experiments/store'
 
 export type DragFunction = (e: DragEvent<HTMLElement>) => void
@@ -11,11 +10,11 @@ export interface DraggableProps {
   group: string
   disabled: boolean
   children: JSX.Element
-  dropTarget: JSX.Element
   onDrop: DragFunction
   onDragStart: DragFunction
   onDragEnter: DragFunction
   onDragEnd: DragFunction
+  onDragLeave: DragFunction
 }
 
 export const Draggable: React.FC<DraggableProps> = ({
@@ -23,17 +22,17 @@ export const Draggable: React.FC<DraggableProps> = ({
   group,
   children,
   disabled,
-  dropTarget,
   onDrop,
   onDragEnter,
   onDragStart,
-  onDragEnd
+  onDragEnd,
+  onDragLeave
 }) => {
   const groupState = useSelector(
     (state: ExperimentsState) => state.dragAndDrop.groups[group] || {}
   )
   const dispatch = useDispatch()
-  const { draggedOverId, draggedId } = groupState
+  const { draggedId } = groupState
 
   const modifyGroup = (id: string) => {
     dispatch(
@@ -60,9 +59,7 @@ export const Draggable: React.FC<DraggableProps> = ({
   const handleDragEnter = (e: DragEvent<HTMLElement>) => {
     if (draggedId) {
       const { id } = e.currentTarget
-
-      if (id !== draggedId && id !== draggedOverId) {
-        modifyGroup(id)
+      if (id !== draggedId) {
         onDragEnter(e)
       }
     }
@@ -77,8 +74,7 @@ export const Draggable: React.FC<DraggableProps> = ({
       setGroup({
         group: {
           ...groupState,
-          draggedId: undefined,
-          draggedOverId: undefined
+          draggedId: undefined
         },
         id: group
       })
@@ -86,24 +82,11 @@ export const Draggable: React.FC<DraggableProps> = ({
     onDragEnd(e)
   }
 
-  if (dropTarget && id === draggedOverId) {
-    return (
-      <DropTarget
-        onDragOver={handleDragOver}
-        onDragEnd={onDragEnd}
-        onDrop={onDrop}
-        id={id}
-        key="drop-target"
-      >
-        {dropTarget}
-      </DropTarget>
-    )
-  }
-
   return (
     <children.type
       {...children.props}
       id={id}
+      onDragLeave={onDragLeave}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDragOver={handleDragOver}

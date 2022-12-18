@@ -30,7 +30,7 @@ import {
   getHeaders,
   tableData as sortingTableDataFixture
 } from '../../../test/sort'
-import { dragAndDrop } from '../../../test/dragDrop'
+import { dragAndDrop, dragEnter, dragLeave } from '../../../test/dragDrop'
 import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
 import { experimentsReducers } from '../../store'
 import { customQueries } from '../../../test/queries'
@@ -462,6 +462,30 @@ describe('Table', () => {
       expect(headers.indexOf('accuracy')).toBeGreaterThan(
         headers.indexOf('test')
       )
+    })
+
+    it('should remove the drop zone when hovering out a target column header', async () => {
+      const { getDraggableHeaderFromText } = renderExperimentsTable({
+        ...tableDataFixture
+      })
+
+      await getHeaders()
+
+      const startingNode = screen.getByText('process')
+      const targetNode = getDraggableHeaderFromText('loss')
+      const header = screen.getByTestId('header-metrics:summary.json:loss')
+
+      dragEnter(startingNode, targetNode.id, DragEnterDirection.AUTO)
+
+      expect(
+        header?.classList.contains(styles.headerCellDropTarget)
+      ).toBeTruthy()
+
+      dragLeave(targetNode)
+
+      expect(
+        header?.classList.contains(styles.headerCellDropTarget)
+      ).toBeFalsy()
     })
   })
 })

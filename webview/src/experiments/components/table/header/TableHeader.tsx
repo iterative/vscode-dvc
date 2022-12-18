@@ -14,6 +14,7 @@ interface TableHeaderProps {
   onDragEnd: DragFunction
   onDragStart: DragFunction
   onDrop: DragFunction
+  onDragLeave: DragFunction
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   root: HTMLElement | null
 }
@@ -26,6 +27,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   onDragEnd,
   onDragStart,
   onDrop,
+  onDragLeave,
   root,
   setExpColumnNeedsShadow
 }) => {
@@ -43,6 +45,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       onDragEnd={onDragEnd}
       onDragStart={onDragStart}
       onDrop={onDrop}
+      onDragLeave={onDragLeave}
       root={root}
       setExpColumnNeedsShadow={setExpColumnNeedsShadow}
     />

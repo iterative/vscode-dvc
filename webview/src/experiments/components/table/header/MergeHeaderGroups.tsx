@@ -10,20 +10,22 @@ export const MergedHeaderGroups: React.FC<{
   headerGroup: HeaderGroup<Experiment>
   columns: HeaderGroup<Experiment>[]
   orderedColumns: Column[]
-  onDragUpdate: DragFunction
+  onDragEnter: DragFunction
   onDragStart: DragFunction
   onDragEnd: DragFunction
   onDrop: DragFunction
+  onDragLeave: DragFunction
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   root: HTMLElement | null
 }> = ({
   headerGroup,
   columns,
   orderedColumns,
-  onDragUpdate,
+  onDragEnter,
   onDragEnd,
   onDragStart,
   onDrop,
+  onDragLeave,
   root,
   setExpColumnNeedsShadow
 }) => {
@@ -40,10 +42,11 @@ export const MergedHeaderGroups: React.FC<{
           orderedColumns={orderedColumns}
           column={column}
           columns={columns}
-          onDragEnter={onDragUpdate}
+          onDragEnter={onDragEnter}
           onDragStart={onDragStart}
           onDragEnd={onDragEnd}
           onDrop={onDrop}
+          onDragLeave={onDragLeave}
           root={root}
         />
       ))}

@@ -349,6 +349,11 @@ $bullet-size: calc(var(--design-unit) * 4px);
       @extend %truncateLeftParent;
       direction: rtl;
       opacity: 0.6;
+
+      span {
+        // to prevent extra dragLeave and dragEnter fired
+        pointer-events: none;
+      }
     }
     .cellContents {
       @extend %truncateLeftChild;
