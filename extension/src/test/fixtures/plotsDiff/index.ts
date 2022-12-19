@@ -548,12 +548,12 @@ export const getRevisions = (): Revision[] => {
         {
           type: ColumnType.METRICS,
           path: 'summary.json:loss',
-          value: '1.9293040037155151'
+          value: 1.9293040037155151
         },
         {
           type: ColumnType.METRICS,
           path: 'summary.json:accuracy',
-          value: '0.4668000042438507'
+          value: 0.4668000042438507
         }
       ],
       group: undefined
@@ -569,12 +569,12 @@ export const getRevisions = (): Revision[] => {
         {
           path: 'summary.json:loss',
           type: ColumnType.METRICS,
-          value: '2.048856019973755'
+          value: 2.048856019973755
         },
         {
           path: 'summary.json:accuracy',
           type: ColumnType.METRICS,
-          value: '0.3484833240509033'
+          value: 0.3484833240509033
         }
       ],
       id: 'main',
@@ -593,12 +593,12 @@ export const getRevisions = (): Revision[] => {
         {
           type: ColumnType.METRICS,
           path: 'summary.json:loss',
-          value: '2.0205044746398926'
+          value: 2.0205044746398926
         },
         {
           type: ColumnType.METRICS,
           path: 'summary.json:accuracy',
-          value: '0.3724166750907898'
+          value: 0.3724166750907898
         }
       ],
       id: 'exp-e7a67',
@@ -617,12 +617,12 @@ export const getRevisions = (): Revision[] => {
         {
           type: ColumnType.METRICS,
           path: 'summary.json:loss',
-          value: '1.9293040037155151'
+          value: 1.9293040037155151
         },
         {
           type: ColumnType.METRICS,
           path: 'summary.json:accuracy',
-          value: '0.4668000042438507'
+          value: 0.4668000042438507
         }
       ],
       id: 'test-branch',
@@ -641,12 +641,12 @@ export const getRevisions = (): Revision[] => {
         {
           type: ColumnType.METRICS,
           path: 'summary.json:loss',
-          value: '1.775016188621521'
+          value: 1.775016188621521
         },
         {
           type: ColumnType.METRICS,
           path: 'summary.json:accuracy',
-          value: '0.5926499962806702'
+          value: 0.5926499962806702
         }
       ],
       id: 'exp-83425',
