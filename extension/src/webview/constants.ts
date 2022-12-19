@@ -63,7 +63,7 @@ export const WebviewDetails: {
       focusChangedEvent: EventName.VIEWS_GET_STARTED_FOCUS_CHANGED
     },
     scripts: [react, getStarted],
-    title: 'DVC is not initialized',
+    title: 'Setup',
     viewKey: ViewKey.GET_STARTED
   }
 } as const

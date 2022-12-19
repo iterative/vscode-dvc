@@ -38,12 +38,15 @@ const getStringifiedValue = (value: Value): string => {
 export const getDataFromColumnPath = (
   experiment: Experiment,
   columnPath: string
-): { splitUpPath: string[]; value: string | null } => {
+): { fullValue: string; splitUpPath: string[]; value: string | null } => {
   const splitUpPath = splitColumnPath(columnPath)
   const collectedVal = get(experiment, splitUpPath)
   const value = collectedVal?.value || collectedVal
 
   return {
+    fullValue: isLongNumber(value)
+      ? value.toString()
+      : getStringifiedValue(value),
     splitUpPath,
     value:
       columnPath === 'Created' && value === 'undefined'

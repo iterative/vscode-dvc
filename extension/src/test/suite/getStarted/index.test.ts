@@ -57,6 +57,8 @@ suite('GetStarted Test Suite', () => {
         type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW
       })
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((webview as any).disposer.disposed).to.be.true
       expect(mockOpenExperiments).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 

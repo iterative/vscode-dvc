@@ -35,6 +35,10 @@ export default {
   module: {
     rules: [
       {
+        test: /\.py$/i,
+        use: 'raw-loader'
+      },
+      {
         test: /\.svg$/,
         type: 'asset/inline'
       },
