@@ -104,28 +104,24 @@ const pickVenvOptions = async () => {
 
 const quickPickVenvOption = () => {
   const options = [
+    isPythonExtensionInstalled()
+      ? {
+          description:
+            '• Use the virtual environment detected automatically by the Python extension',
+          label: 'Auto',
+          value: 2
+        }
+      : {
+          description: '• Let me select the virtual environment manually',
+          label: 'Manual',
+          value: 1
+        },
     {
       description: '• DVC is available globally (e.g. installed as a binary)',
       label: 'Global',
       value: 0
     }
   ]
-  if (!isPythonExtensionInstalled()) {
-    options.unshift({
-      description: '• Let me select the virtual environment manually',
-      label: 'Manual',
-      value: 1
-    })
-  }
-
-  if (isPythonExtensionInstalled()) {
-    options.unshift({
-      description:
-        '• Use the virtual environment detected automatically by the Python extension',
-      label: 'Auto',
-      value: 2
-    })
-  }
 
   return quickPickValue<number>(options, {
     placeHolder: 'Select an environment where DVC is installed',
