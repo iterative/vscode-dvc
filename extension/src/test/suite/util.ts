@@ -89,6 +89,9 @@ export const experimentsUpdatedEvent = (experiments: Experiments) =>
 export const getFirstArgOfCall = (spy: SinonSpy, call: number) =>
   spy.getCall(call).firstArg
 
+export const getArgOfCall = (spy: SinonSpy, call: number, arg: number) =>
+  spy.getCall(call).args[arg - 1]
+
 export const getFirstArgOfLastCall = (spy: SinonSpy) =>
   getFirstArgOfCall(spy, -1)
 
@@ -171,7 +174,7 @@ export const buildDependencies = (
   const mockCreateFileSystemWatcher = stub(
     Watcher,
     'createFileSystemWatcher'
-  ).returns(mockDisposable)
+  ).returns(undefined)
 
   const mockCheckSignalFile = stub(FileSystem, 'checkSignalFile').resolves(
     false

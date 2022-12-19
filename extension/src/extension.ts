@@ -545,12 +545,14 @@ export class Extension extends Disposable implements IExtension {
   }
 
   private watchForVenvChanges() {
-    this.dispose.track(
-      createFileSystemWatcher('**/dvc{,.exe}', path => {
+    return createFileSystemWatcher(
+      disposable => this.dispose.track(disposable),
+      '**/dvc{,.exe}',
+      path => {
         if (path && (!this.cliAccessible || !this.cliCompatible)) {
           setup(this)
         }
-      })
+      }
     )
   }
 }

@@ -114,31 +114,26 @@ export class RepositoryData extends DeferredDisposable {
       this.dvcRoot
     )
 
-    this.dispose.track(
-      createFileSystemWatcher(
-        getRelativePattern(this.dvcRoot, '**'),
-        (path: string) => {
-          if (isExcluded(this.dvcRoot, path)) {
-            return
-          }
-          return this.managedUpdate()
+    createFileSystemWatcher(
+      disposable => this.dispose.track(disposable),
+      getRelativePattern(this.dvcRoot, '**'),
+      (path: string) => {
+        if (isExcluded(this.dvcRoot, path)) {
+          return
         }
-      )
+        return this.managedUpdate()
+      }
     )
 
-    this.dispose.track(
-      createFileSystemWatcher(
-        getRelativePattern(
-          getGitPath(gitRoot, gitPath.DOT_GIT),
-          '{HEAD,index}'
-        ),
-        (path: string) => {
-          if (!path) {
-            return
-          }
-          return this.managedUpdate()
+    createFileSystemWatcher(
+      disposable => this.dispose.track(disposable),
+      getRelativePattern(getGitPath(gitRoot, gitPath.DOT_GIT), '{HEAD,index}'),
+      (path: string) => {
+        if (!path) {
+          return
         }
-      )
+        return this.managedUpdate()
+      }
     )
   }
 }

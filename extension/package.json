@@ -1307,11 +1307,6 @@
       ],
       "dvc-views": [
         {
-          "id": "dvc.views.experimentsColumnsTree",
-          "name": "Columns",
-          "when": "dvc.commands.available && dvc.project.available"
-        },
-        {
           "id": "dvc.views.welcome",
           "name": "Welcome",
           "when": "!dvc.commands.available || dvc.cli.incompatible || !dvc.project.available"
@@ -1320,6 +1315,11 @@
           "id": "dvc.views.webviews",
           "name": "Views",
           "when": "true"
+        },
+        {
+          "id": "dvc.views.experimentsColumnsTree",
+          "name": "Columns",
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "id": "dvc.views.experimentsTree",
@@ -1577,8 +1577,8 @@
     "vscode-languageclient": "8.0.2"
   },
   "devDependencies": {
-    "@swc/core": "1.3.21",
-    "@swc/jest": "0.2.23",
+    "@swc/core": "1.3.22",
+    "@swc/jest": "0.2.24",
     "@types/chai": "4.3.4",
     "@types/chai-as-promised": "7.1.5",
     "@types/copy-webpack-plugin": "10.1.0",
