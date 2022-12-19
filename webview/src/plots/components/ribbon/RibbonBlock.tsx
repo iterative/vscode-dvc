@@ -8,6 +8,7 @@ import { Icon } from '../../../shared/components/Icon'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
 import { CopyButton } from '../../../shared/components/copyButton/CopyButton'
 import { Close } from '../../../shared/components/icons'
+import { formatFloat } from '../../../util/number'
 
 interface RibbonBlockProps {
   revision: Revision
@@ -28,19 +29,25 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
   const tooltipContent = (
     <table className={styles.columnsTable}>
       <tbody>
-        {revision.firstThreeColumns.map(({ path, value, type, fullValue }) => (
-          <tr key={path}>
-            <td className={cn(styles[`${type}Key`])}>
-              {truncate(path, 45, 'left')}
-            </td>
-            <td>
-              {value}
-              {value === '-' || (
-                <CopyButton value={fullValue} className={styles.copyButton} />
-              )}
-            </td>
-          </tr>
-        ))}
+        {revision.firstThreeColumns.map(({ path, value, type }) => {
+          const isFloat = typeof value === 'number' && !Number.isInteger(value)
+          return (
+            <tr key={path}>
+              <td className={cn(styles[`${type}Key`])}>
+                {truncate(path, 45, 'left')}
+              </td>
+              <td>
+                {isFloat ? formatFloat(value) : value}
+                {value === '-' || (
+                  <CopyButton
+                    value={value.toString()}
+                    className={styles.copyButton}
+                  />
+                )}
+              </td>
+            </tr>
+          )
+        })}
       </tbody>
     </table>
   )

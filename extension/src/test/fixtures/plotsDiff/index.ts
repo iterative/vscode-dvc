@@ -542,21 +542,18 @@ export const getRevisions = (): Revision[] => {
       firstThreeColumns: [
         {
           type: 'Created',
-          fullValue: '-',
           path: 'Created',
           value: '-'
         },
         {
           type: ColumnType.METRICS,
-          fullValue: '1.9293040037155151',
           path: 'summary.json:loss',
-          value: '1.9293'
+          value: '1.9293040037155151'
         },
         {
           type: ColumnType.METRICS,
-          fullValue: '0.4668000042438507',
           path: 'summary.json:accuracy',
-          value: '0.46680'
+          value: '0.4668000042438507'
         }
       ],
       group: undefined
@@ -566,21 +563,18 @@ export const getRevisions = (): Revision[] => {
       firstThreeColumns: [
         {
           type: 'Created',
-          fullValue: formatDate(getMain().Created as string),
           path: 'Created',
           value: formatDate(getMain().Created as string)
         },
         {
-          type: ColumnType.METRICS,
-          fullValue: '2.048856019973755',
           path: 'summary.json:loss',
-          value: '2.0489'
+          type: ColumnType.METRICS,
+          value: '2.048856019973755'
         },
         {
-          type: ColumnType.METRICS,
-          fullValue: '0.3484833240509033',
           path: 'summary.json:accuracy',
-          value: '0.34848'
+          type: ColumnType.METRICS,
+          value: '0.3484833240509033'
         }
       ],
       id: 'main',
@@ -593,21 +587,18 @@ export const getRevisions = (): Revision[] => {
       firstThreeColumns: [
         {
           type: 'Created',
-          fullValue: findAndFormatCreated('exp-e7a67'),
           path: 'Created',
           value: findAndFormatCreated('exp-e7a67')
         },
         {
           type: ColumnType.METRICS,
-          fullValue: '2.0205044746398926',
           path: 'summary.json:loss',
-          value: '2.0205'
+          value: '2.0205044746398926'
         },
         {
           type: ColumnType.METRICS,
-          fullValue: '0.3724166750907898',
           path: 'summary.json:accuracy',
-          value: '0.37242'
+          value: '0.3724166750907898'
         }
       ],
       id: 'exp-e7a67',
@@ -619,22 +610,19 @@ export const getRevisions = (): Revision[] => {
       fetched: true,
       firstThreeColumns: [
         {
-          fullValue: findAndFormatCreated('test-branch'),
           type: 'Created',
           path: 'Created',
           value: findAndFormatCreated('test-branch')
         },
         {
-          fullValue: '1.9293040037155151',
           type: ColumnType.METRICS,
           path: 'summary.json:loss',
-          value: '1.9293'
+          value: '1.9293040037155151'
         },
         {
-          fullValue: '0.4668000042438507',
           type: ColumnType.METRICS,
           path: 'summary.json:accuracy',
-          value: '0.46680'
+          value: '0.4668000042438507'
         }
       ],
       id: 'test-branch',
@@ -646,22 +634,19 @@ export const getRevisions = (): Revision[] => {
       fetched: true,
       firstThreeColumns: [
         {
-          fullValue: findAndFormatCreated('exp-83425'),
           type: 'Created',
           path: 'Created',
           value: findAndFormatCreated('exp-83425')
         },
         {
-          fullValue: '1.775016188621521',
           type: ColumnType.METRICS,
           path: 'summary.json:loss',
-          value: '1.7750'
+          value: '1.775016188621521'
         },
         {
-          fullValue: '0.5926499962806702',
           type: ColumnType.METRICS,
           path: 'summary.json:accuracy',
-          value: '0.59265'
+          value: '0.5926499962806702'
         }
       ],
       id: 'exp-83425',
