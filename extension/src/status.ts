@@ -14,7 +14,6 @@ export class Status extends Disposable {
 
   private workers = 0
   private available = false
-  private textSuffix = 'DVC'
 
   constructor(config: Config, ...cliInteractors: ICli[]) {
     super()
@@ -43,26 +42,26 @@ export class Status extends Disposable {
   public async setAvailability(available: boolean) {
     this.available = available
     await this.config.isReady()
-    const { text, tooltip } = this.getEnvDetails()
-
-    this.textSuffix = text ? `DVC ${text}` : 'DVC'
-
-    this.statusBarItem.tooltip = tooltip
     this.setState(!!this.workers)
   }
 
-  private getText(isWorking: boolean) {
+  private getText(isWorking: boolean, envIndicator?: string) {
+    const suffix = envIndicator ? `DVC ${envIndicator}` : 'DVC'
+
     if (!this.available) {
-      return `$(circle-slash) ${this.textSuffix}`
+      return `$(circle-slash) ${suffix}`
     }
     if (isWorking) {
-      return `$(loading~spin) ${this.textSuffix}`
+      return `$(loading~spin) ${suffix}`
     }
-    return `$(circle-large-outline) ${this.textSuffix}`
+    return `$(circle-large-outline) ${suffix}`
   }
 
   private setState(isWorking: boolean) {
-    this.statusBarItem.text = this.getText(isWorking)
+    const { indicator, tooltip } = this.getEnvDetails()
+    this.statusBarItem.text = this.getText(isWorking, indicator)
+    this.statusBarItem.tooltip = tooltip
+
     this.statusBarItem.color = this.getColor()
 
     this.statusBarItem.command = this.getCommand()
@@ -100,18 +99,21 @@ export class Status extends Disposable {
   private getEnvDetails() {
     const dvcPath = this.config.getCliPath()
     if (dvcPath) {
-      return { text: '(Global)', tooltip: dvcPath }
+      return { indicator: '(Global)', tooltip: dvcPath }
     }
 
     if (this.config.isPythonExtensionUsed()) {
-      return { text: '(Auto)', tooltip: 'Interpreter set by Python extension' }
+      return {
+        indicator: '(Auto)',
+        tooltip: 'Interpreter set by Python extension'
+      }
     }
 
     const pythonBinPath = this.config.getPythonBinPath()
     if (pythonBinPath) {
-      return { text: '(Manual)', tooltip: pythonBinPath }
+      return { indicator: '(Manual)', tooltip: pythonBinPath }
     }
 
-    return { text: '(Global)', tooltip: 'dvc' }
+    return { indicator: '(Global)', tooltip: 'dvc' }
   }
 }
