@@ -1,0 +1,13 @@
+.codeBlock {
+  padding: 10px;
+  width: max-content;
+  min-width: 500px;
+  margin: 0 auto;
+}
+
+.codeInline {
+  display: inline-block;
+  background-color: transparent !important;
+  padding: 0;
+  min-width: 0;
+}

@@ -329,6 +329,12 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
   }
 
+  public getHasData() {
+    return Object.values(this.repositories).some(repository =>
+      repository.getHasData()
+    )
+  }
+
   private async pickExpThenRun(
     commandId: CommandId,
     pickFunc: (
