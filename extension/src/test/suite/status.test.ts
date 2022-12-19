@@ -11,10 +11,9 @@ import { DvcCli } from '../../cli/dvc'
 import { Config } from '../../config'
 import { RegisteredCommands } from '../../commands/external'
 import { Title } from '../../vscode/title'
+import { ConfigKey } from '../../vscode/config'
 
 suite('Status Test Suite', () => {
-  const dvcPathOption = 'dvc.dvcPath'
-
   const disposable = Disposable.fn()
 
   beforeEach(() => {
@@ -23,7 +22,9 @@ suite('Status Test Suite', () => {
 
   afterEach(async () => {
     disposable.dispose()
-    await workspace.getConfiguration().update(dvcPathOption, undefined, false)
+    await workspace
+      .getConfiguration()
+      .update(ConfigKey.DVC_PATH, undefined, false)
     return closeAllEditors()
   })
 
