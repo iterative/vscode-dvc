@@ -38,6 +38,7 @@ export class WebviewMessages {
       return this.initializeProject()
     }
     if (message.type === MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW) {
+      this.getWebview()?.dispose()
       return this.openExperiments()
     }
     Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
