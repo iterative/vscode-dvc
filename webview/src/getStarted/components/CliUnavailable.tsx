@@ -4,12 +4,6 @@ import { Button } from '../../shared/components/button/Button'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { sendMessage } from '../../shared/vscode'
 
-// Needs to be aware of
-// 1. Current Python path
-// 2. If global state "DVC & DVCLive can be auto-installed as user Python packages"
-// 2. If Python extension is available / used (remove Select Python Interpreter button)
-// 3. "(Auto)" needs some kind of explanation => maybe a tooltip
-
 export type CliUnavailableProps = {
   isPythonExtensionUsed: boolean
   pythonBinPath: string | undefined
@@ -22,7 +16,10 @@ const PythonExtensionUsed: React.FC<{ pythonBinPath: string }> = ({
     <p>
       {`DVC & DVCLive can be auto-installed as packages with ${pythonBinPath}`}
     </p>
-    <Button onClick={() => undefined} text="Install" />
+    <Button
+      onClick={() => sendMessage({ type: MessageFromWebviewType.INSTALL_DVC })}
+      text="Install"
+    />
     <p>To update the interpreter and/or locate DVC</p>
     <Button
       onClick={() =>
@@ -40,7 +37,10 @@ const PythonBinFound: React.FC<{ pythonBinPath: string }> = ({
     <p>
       {`DVC & DVCLive can be auto-installed as packages with ${pythonBinPath}`}
     </p>
-    <Button onClick={() => undefined} text="Install" />
+    <Button
+      onClick={() => sendMessage({ type: MessageFromWebviewType.INSTALL_DVC })}
+      text="Install"
+    />
     <p>To update the install location or locate DVC</p>
     <Button onClick={() => undefined} text="Setup The Workspace" />
   </div>

@@ -61,9 +61,9 @@ export const EventName = Object.assign(
     VIEWS_GET_STARTED_CLOSE: 'views.getStarted.closed',
     VIEWS_GET_STARTED_CREATED: 'views.getStarted.created',
     VIEWS_GET_STARTED_FOCUS_CHANGED: 'views.getStarted.focusChanged',
+    VIEWS_GET_STARTED_INSTALL_DVC: 'views.getStarted.installDvc',
     VIEWS_GET_STARTED_SELECT_PYTHON_INTERPRETER:
       'views.getStarted.selectPythonInterpreter',
-
     VIEWS_PLOTS_CLOSED: 'views.plots.closed',
     VIEWS_PLOTS_COMPARISON_ROWS_REORDERED:
       'views.plots.comparisonRowsReordered',
@@ -263,6 +263,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_GET_STARTED_CREATED]: undefined
   [EventName.VIEWS_GET_STARTED_FOCUS_CHANGED]: undefined
   [EventName.VIEWS_GET_STARTED_SELECT_PYTHON_INTERPRETER]: undefined
+  [EventName.VIEWS_GET_STARTED_INSTALL_DVC]: undefined
 
   [EventName.GET_STARTED_WEBVIEW_SHOW]: undefined
 }

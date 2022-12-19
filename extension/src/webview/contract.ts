@@ -49,7 +49,8 @@ export enum MessageFromWebviewType {
   MODIFY_EXPERIMENT_PARAMS_AND_RUN = 'modify-experiment-params-and-run',
   MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN = 'modify-experiment-params-reset-and-run',
   SET_EXPERIMENTS_HEADER_HEIGHT = 'update-experiments-header-height',
-  INITIALIZE_PROJECT = 'initialize-project'
+  INITIALIZE_PROJECT = 'initialize-project',
+  INSTALL_DVC = 'install-dvc'
 }
 
 export type ColumnResizePayload = {
@@ -183,6 +184,7 @@ export type MessageFromWebview =
     }
   | { type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_HEIGHT }
   | { type: MessageFromWebviewType.INITIALIZE_PROJECT }
+  | { type: MessageFromWebviewType.INSTALL_DVC }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA

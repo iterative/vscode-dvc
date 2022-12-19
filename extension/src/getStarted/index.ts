@@ -21,6 +21,7 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
   private getHasRoots: () => boolean
   private getIsPythonExtensionUsed: () => boolean
   private getPythonBinPath: () => string | undefined
+  private installDvc: () => void
 
   constructor(
     dvcRoot: string,
@@ -30,7 +31,8 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
     getCliAccessible: () => boolean,
     getHasRoots: () => boolean,
     getIsPythonExtensionUsed: () => boolean,
-    getPythonBinPath: () => string | undefined
+    getPythonBinPath: () => string | undefined,
+    installDvc: () => void
   ) {
     super(dvcRoot, webviewIcon)
 
@@ -45,6 +47,7 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
     this.showExperiments = showExperiments
     this.getIsPythonExtensionUsed = getIsPythonExtensionUsed
     this.getPythonBinPath = getPythonBinPath
+    this.installDvc = installDvc
   }
 
   public sendInitialWebviewData() {
@@ -66,7 +69,8 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
     const webviewMessages = new WebviewMessages(
       () => this.getWebview(),
       () => this.initProject(),
-      () => this.showExperiments()
+      () => this.showExperiments(),
+      () => this.installDvc()
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>

@@ -21,6 +21,7 @@ export const buildGetStarted = (disposer: Disposer, dvInstalled = false) => {
       () => dvInstalled,
       () => false,
       () => false,
+      () => undefined,
       () => undefined
     )
   )
