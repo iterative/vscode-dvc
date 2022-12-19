@@ -107,12 +107,12 @@ const quickPickVenvOption = () => {
     isPythonExtensionInstalled()
       ? {
           description:
-            '• Use the virtual environment detected automatically by the Python extension',
+            '• Use the virtual environment detected by the Python extension',
           label: 'Auto',
           value: 2
         }
       : {
-          description: '• Let me select the virtual environment manually',
+          description: '• Select the virtual environment',
           label: 'Manual',
           value: 1
         },
