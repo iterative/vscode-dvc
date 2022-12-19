@@ -41,7 +41,6 @@ import { createTypedAccumulator } from '../util/object'
 import { pickPaths } from '../path/selection/quickPick'
 import { Toast } from '../vscode/toast'
 import { ConfigKey } from '../vscode/config'
-import { setContextValue } from '../vscode/context'
 import { checkSignalFile } from '../fileSystem'
 import { DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
 
@@ -94,6 +93,8 @@ export class Experiments extends BaseRepository<TableData> {
 
   private readonly internalCommands: InternalCommands
   private readonly webviewMessages: WebviewMessages
+  private test = 1
+  public onHasData: (() => void) | null = null
 
   constructor(
     dvcRoot: string,
@@ -158,6 +159,10 @@ export class Experiments extends BaseRepository<TableData> {
     this.webviewMessages = this.createWebviewMessageHandler()
     this.setupInitialData()
     this.watchActiveEditor()
+    setInterval(() => {
+      this.test++
+      this.notifyColumnsChanged()
+    }, 1000)
   }
 
   public update() {
@@ -497,6 +502,9 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public getHasData() {
+    if (this.test < 10) {
+      return false
+    }
     return this.columns.hasNonDefaultColumns()
   }
 
@@ -522,8 +530,6 @@ export class Experiments extends BaseRepository<TableData> {
 
   private notifyColumnsChanged() {
     this.columnsChanged.fire()
-    const hasData = this.getHasData()
-    setContextValue('dvc.project.hasData', hasData)
     return this.webviewMessages.sendWebviewMessage()
   }
 

@@ -45,18 +45,32 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
   }
 
   public sendDataToWebview() {
+    const cliAccessible = this.getCliAccessible()
+    const projectInitialized = this.getHasRoots()
+    const hasData = this.getHasData()
+
+    if (
+      this.webview?.isVisible &&
+      cliAccessible &&
+      projectInitialized &&
+      hasData
+    ) {
+      this.getWebview()?.dispose()
+      this.showExperiments()
+      return
+    }
+
     this.webviewMessages.sendWebviewMessage(
-      this.getCliAccessible(),
-      this.getHasRoots(),
-      this.getHasData()
+      cliAccessible,
+      projectInitialized,
+      hasData
     )
   }
 
   private createWebviewMessageHandler() {
     const webviewMessages = new WebviewMessages(
       () => this.getWebview(),
-      () => this.initProject(),
-      () => this.showExperiments()
+      () => this.initProject()
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>

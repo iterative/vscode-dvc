@@ -147,7 +147,8 @@ export class Extension extends Disposable implements IExtension {
       new WorkspaceExperiments(
         this.internalCommands,
         this.updatesPaused,
-        context.workspaceState
+        context.workspaceState,
+        () => this.changeGetStartedStep()
       )
     )
 
@@ -388,7 +389,7 @@ export class Extension extends Disposable implements IExtension {
     )
     this.dvcRoots = nestedRoots.flat().sort()
 
-    this.getStarted.sendDataToWebview()
+    this.changeGetStartedStep()
     return this.setProjectAvailability()
   }
 
@@ -443,7 +444,7 @@ export class Extension extends Disposable implements IExtension {
     this.status.setAvailability(available)
     this.setCommandsAvailability(available)
     this.cliAccessible = available
-    this.getStarted.sendDataToWebview()
+    this.changeGetStartedStep()
     return available
   }
 
@@ -512,6 +513,10 @@ export class Extension extends Disposable implements IExtension {
         }
       }
     )
+  }
+
+  private changeGetStartedStep() {
+    this.getStarted.sendDataToWebview()
   }
 }
 

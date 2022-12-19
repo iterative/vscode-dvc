@@ -98,25 +98,4 @@ describe('App', () => {
 
     expect(screen.queryByText('Your project contains no data')).toBeNull()
   })
-
-  it('should show a screen saying that the extension is ready to use if the project is initialized and dvc is installed', () => {
-    render(<App />)
-    setData(true, true, true)
-
-    expect(
-      screen.getByText('You are now ready to use the DVC VS Code extension')
-    ).toBeInTheDocument()
-  })
-
-  it('should send a message to open the experiments when clicking the View Experiments button when the project is initialized and DVC is installed', () => {
-    render(<App />)
-    setData(true, true, true)
-
-    const viewExperimentsButton = screen.getByText('View Experiments')
-    fireEvent.click(viewExperimentsButton)
-
-    expect(mockPostMessage).toHaveBeenCalledWith({
-      type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW
-    })
-  })
 })
