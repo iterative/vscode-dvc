@@ -1,4 +1,3 @@
-import { commands } from 'vscode'
 import { GetStartedData as TGetStartedData } from './contract'
 import { Logger } from '../../common/logger'
 import {
@@ -8,6 +7,7 @@ import {
 import { BaseWebview } from '../../webview'
 import { sendTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
+import { selectPythonInterpreter } from '../../extensions/python'
 
 export class WebviewMessages {
   private readonly getWebview: () => BaseWebview<TGetStartedData> | undefined
@@ -59,6 +59,6 @@ export class WebviewMessages {
       undefined,
       undefined
     )
-    return commands.executeCommand('python.setInterpreter')
+    return selectPythonInterpreter()
   }
 }
