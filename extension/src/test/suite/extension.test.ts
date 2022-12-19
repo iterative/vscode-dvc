@@ -36,11 +36,9 @@ import { DvcExecutor } from '../../cli/dvc/executor'
 import { GitReader } from '../../cli/git/reader'
 import { Config } from '../../config'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
+import { ConfigKey, setConfigValue } from '../../vscode/config'
 
 suite('Extension Test Suite', () => {
-  const dvcPathOption = 'dvc.dvcPath'
-  const pythonPathOption = 'dvc.pythonPath'
-
   const disposable = Disposable.fn()
 
   beforeEach(() => {
@@ -51,48 +49,18 @@ suite('Extension Test Suite', () => {
     this.timeout(6000)
     disposable.dispose()
     return Promise.all([
-      workspace.getConfiguration().update(dvcPathOption, undefined, false),
-      workspace.getConfiguration().update(pythonPathOption, undefined, false),
+      workspace.getConfiguration().update(ConfigKey.DVC_PATH, undefined, false),
+      workspace
+        .getConfiguration()
+        .update(ConfigKey.PYTHON_PATH, undefined, false),
       closeAllEditors()
     ])
   })
 
   describe('dvc.setupWorkspace', () => {
-    it('should set dvc.dvcPath to the default when dvc is installed in a virtual environment', async () => {
-      stub(Python, 'isPythonExtensionInstalled').returns(true)
-      stub(DvcReader.prototype, 'version').rejects('do not run setup')
-
-      const mockShowQuickPick = stub(window, 'showQuickPick')
-
-      const venvQuickPickActive = quickPickInitialized(mockShowQuickPick, 0)
-      const dvcInVenvQuickPickActive = quickPickInitialized(
-        mockShowQuickPick,
-        1
-      )
-
-      const setupWorkspaceWizard = commands.executeCommand(
-        RegisteredCommands.EXTENSION_SETUP_WORKSPACE
-      )
-      await venvQuickPickActive
-
-      const selectVenvAndUseExtension = selectQuickPickItem(1)
-      await selectVenvAndUseExtension
-
-      await dvcInVenvQuickPickActive
-
-      const selectDVCInVenv = selectQuickPickItem(1)
-      await selectDVCInVenv
-
-      await setupWorkspaceWizard
-
-      expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal(
-        null
-      )
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
     it('should set dvc.pythonPath to the picked value when the user selects to pick a Python interpreter', async () => {
-      stub(DvcReader.prototype, 'version').rejects('still do not run setup')
-      stub(Python, 'isPythonExtensionInstalled').returns(true)
+      stub(DvcReader.prototype, 'version').rejects('do not initialize')
+      stub(Python, 'isPythonExtensionInstalled').returns(false)
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockUri = Uri.file(
@@ -101,12 +69,11 @@ suite('Extension Test Suite', () => {
       const mockPath = mockUri.fsPath
       stub(window, 'showOpenDialog').resolves([mockUri])
       const pythonChanged = configurationChangeEvent(
-        pythonPathOption,
+        ConfigKey.PYTHON_PATH,
         disposable
       )
 
       const venvQuickPickActive = quickPickInitialized(mockShowQuickPick, 0)
-      const globalQuickPickActive = quickPickInitialized(mockShowQuickPick, 1)
 
       const quickPick = window.createQuickPick<QuickPickItemWithValue<string>>()
       const mockCreateQuickPick = stub(window, 'createQuickPick').returns(
@@ -122,7 +89,7 @@ suite('Extension Test Suite', () => {
 
       await venvQuickPickActive
 
-      const selectVenvAndInterpreter = selectQuickPickItem(2)
+      const selectVenvAndInterpreter = selectQuickPickItem(1)
       await selectVenvAndInterpreter
 
       await pickOneOrInputActive
@@ -131,67 +98,46 @@ suite('Extension Test Suite', () => {
       const selectToFindInterpreter = selectQuickPickItem(1)
       await selectToFindInterpreter
 
-      await globalQuickPickActive
-
-      const selectDVCInVenv = selectQuickPickItem(1)
-      await selectDVCInVenv
-
       await pythonChanged
 
       await setupWorkspaceWizard
 
-      expect(workspace.getConfiguration().get(pythonPathOption)).to.equal(
+      expect(workspace.getConfiguration().get(ConfigKey.PYTHON_PATH)).to.equal(
         mockPath
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should initialize the extension when the cli is usable', async () => {
       stub(Python, 'isPythonExtensionInstalled').returns(true)
-      const selectDvcPathFromFilePicker = async () => {
-        const quickPick =
-          window.createQuickPick<QuickPickItemWithValue<string>>()
-
+      const selectVirtualEnvWithPython = async (path: string) => {
         const mockShowQuickPick = stub(window, 'showQuickPick')
 
         const venvQuickPickActive = quickPickInitialized(mockShowQuickPick, 0)
-        const globalQuickPickActive = quickPickInitialized(mockShowQuickPick, 1)
-
-        const mockCreateQuickPick = stub(window, 'createQuickPick').returns(
-          quickPick
-        )
-        const pickOneOrInputActive = new Promise(resolve => {
-          disposable.track(
-            quickPick.onDidChangeActive(() => resolve(undefined))
-          )
-        })
 
         const setupWorkspaceWizard = commands.executeCommand(
           RegisteredCommands.EXTENSION_SETUP_WORKSPACE
         )
 
-        await venvQuickPickActive
-
-        const selectNoVenv = selectQuickPickItem(3)
-        await selectNoVenv
-
-        await globalQuickPickActive
-        mockShowQuickPick.restore()
-
-        const selectNotGlobal = selectQuickPickItem(2)
-        await selectNotGlobal
-
-        await pickOneOrInputActive
-        mockCreateQuickPick.restore()
-
-        const dvcPathChanged = configurationChangeEvent(
-          dvcPathOption,
-          disposable
+        const mockSelectPythonInterpreter = stub(
+          Python,
+          'selectPythonInterpreter'
+        )
+        const executeCommandCalled = new Promise(resolve =>
+          mockSelectPythonInterpreter.callsFake(() => {
+            setConfigValue(ConfigKey.PYTHON_PATH, path)
+            resolve(undefined)
+          })
         )
 
-        const selectToFindCLI = selectQuickPickItem(1)
-        await selectToFindCLI
+        await venvQuickPickActive
 
-        await dvcPathChanged
+        await selectQuickPickItem(1)
+
+        await executeCommandCalled
+
+        mockSelectPythonInterpreter.restore()
+
+        mockShowQuickPick.restore()
 
         return setupWorkspaceWizard
       }
@@ -237,15 +183,6 @@ suite('Extension Test Suite', () => {
           }
         })
       )
-
-      const mockUri = Uri.file(resolve('file', 'picked', 'path', 'to', 'dvc'))
-      const mockPath = mockUri.fsPath
-
-      const mockShowOpenDialog = stub(window, 'showOpenDialog')
-        .onFirstCall()
-        .resolves([mockUri])
-        .onSecondCall()
-        .resolves([Uri.file(resolve('path', 'to', 'dvc'))])
 
       mockHasCheckpoints(expShowFixture)
       const mockExpShow = stub(DvcReader.prototype, 'expShow').resolves(
@@ -299,16 +236,16 @@ suite('Extension Test Suite', () => {
         })
       )
 
-      await selectDvcPathFromFilePicker()
+      const mockPath = resolve('path', 'to', 'venv')
 
-      expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal(
-        mockPath
-      )
+      await selectVirtualEnvWithPython(resolve('path', 'to', 'venv'))
 
       await Promise.all([firstDisposal, correctTelemetryEventSent])
 
-      expect(mockShowOpenDialog, 'should show the open dialog').to.have.been
-        .called
+      expect(
+        await workspace.getConfiguration().get(ConfigKey.PYTHON_PATH)
+      ).to.equal(mockPath)
+
       expect(
         mockCanRunCli,
         'should have checked to see if the cli could be run with the given execution details'
@@ -326,7 +263,7 @@ suite('Extension Test Suite', () => {
         {
           cliAccessible: true,
           deps: 8,
-          dvcPathUsed: true,
+          dvcPathUsed: false,
           dvcRootCount: 1,
           hasCheckpoints: 1,
           images: 3,
@@ -335,7 +272,7 @@ suite('Extension Test Suite', () => {
           msPythonUsed: false,
           noCheckpoints: 0,
           params: 9,
-          pythonPathUsed: false,
+          pythonPathUsed: true,
           templates: 3,
           tracked: 13,
           workspaceFolderCount: 1
@@ -351,7 +288,7 @@ suite('Extension Test Suite', () => {
       await workspaceExperimentsAreReady
       const secondDisposal = disposalEvent()
 
-      await selectDvcPathFromFilePicker()
+      await selectVirtualEnvWithPython(resolve('path', 'to', 'virtualenv'))
 
       await secondDisposal
 
