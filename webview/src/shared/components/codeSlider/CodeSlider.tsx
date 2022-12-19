@@ -1,5 +1,9 @@
-import cx from 'classnames'
-import React, { useState } from 'react'
+import {
+  VSCodePanels,
+  VSCodePanelTab,
+  VSCodePanelView
+} from '@vscode/webview-ui-toolkit/react'
+import React from 'react'
 import styles from './styles.module.scss'
 import { CodeBlock, CodeBlockProps } from '../codeBlock/CodeBlock'
 
@@ -12,37 +16,22 @@ interface CodeSliderProps {
 }
 
 export const CodeSlider: React.FC<CodeSliderProps> = ({ codeBlocks }) => {
-  const [active, setActive] = useState(0)
-
   return (
     <div className={styles.codeSlider}>
-      <div>
-        {codeBlocks.map((codeBlock, i) => (
-          <button
-            key={codeBlock.title}
-            onClick={() => setActive(i)}
-            className={cx(styles.codeBlockButton, {
-              [styles.codeBlockButtonActive]: active === i
-            })}
-          >
+      <VSCodePanels>
+        {codeBlocks.map(codeBlock => (
+          <VSCodePanelTab key={`tab-${codeBlock.title}`}>
             {codeBlock.title}
-          </button>
+          </VSCodePanelTab>
         ))}
-      </div>
-      <div>
-        {codeBlocks.map((codeBlock, i) => (
-          <div
-            className={cx(styles.codeBlock, {
-              [styles.codeBlockActive]: active === i
-            })}
-            key={codeBlock.title}
-          >
+        {codeBlocks.map(codeBlock => (
+          <VSCodePanelView key={`view-${codeBlock.title}`}>
             <CodeBlock language={codeBlock.language}>
               {codeBlock.children}
             </CodeBlock>
-          </div>
+          </VSCodePanelView>
         ))}
-      </div>
+      </VSCodePanels>
     </div>
   )
 }

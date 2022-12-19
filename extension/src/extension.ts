@@ -163,7 +163,7 @@ export class Extension extends Disposable implements IExtension {
         () => this.showExperiments(this.dvcRoots[0]),
         () => this.getAvailable(),
         () => this.hasRoots(),
-        () => this.experiments.getHasData(this.dvcRoots)
+        () => this.experiments.getHasData()
       )
     )
 

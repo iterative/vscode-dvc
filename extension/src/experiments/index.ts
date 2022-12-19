@@ -522,7 +522,8 @@ export class Experiments extends BaseRepository<TableData> {
 
   private notifyColumnsChanged() {
     this.columnsChanged.fire()
-    setContextValue('dvc.project.hasData', this.getHasData())
+    const hasData = this.getHasData()
+    setContextValue('dvc.project.hasData', hasData)
     return this.webviewMessages.sendWebviewMessage()
   }
 

@@ -329,13 +329,10 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
   }
 
-  public getHasData(dvcRoots: string[]) {
-    for (const dvcRoot of dvcRoots) {
-      if (this.getRepository(dvcRoot)?.getHasData()) {
-        return true
-      }
-    }
-    return false
+  public getHasData() {
+    return Object.values(this.repositories).some(repository =>
+      repository.getHasData()
+    )
   }
 
   private async pickExpThenRun(

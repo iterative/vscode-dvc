@@ -9,6 +9,7 @@ import { App } from './App'
 import { vsCodeApi } from '../../shared/api'
 
 jest.mock('../../shared/api')
+jest.mock('../../shared/components/codeSlider/CodeSlider')
 
 const { postMessage } = vsCodeApi
 const mockPostMessage = jest.mocked(postMessage)
