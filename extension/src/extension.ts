@@ -480,20 +480,20 @@ export class Extension extends Disposable implements IExtension {
 
         await Toast.runCommandAndIncrementProgress(
           async () => {
-            await installPackages(root, pythonBinPath, 'dvc[all]')
-            return 'DVC Installed'
-          },
-          progress,
-          75
-        )
-
-        await Toast.runCommandAndIncrementProgress(
-          async () => {
             await installPackages(root, pythonBinPath, 'dvclive')
             return 'DVCLive Installed'
           },
           progress,
           25
+        )
+
+        await Toast.runCommandAndIncrementProgress(
+          async () => {
+            await installPackages(root, pythonBinPath, 'dvc')
+            return 'DVC Installed'
+          },
+          progress,
+          75
         )
 
         return Toast.delayProgressClosing()
