@@ -35,13 +35,20 @@ export type ComparisonPlots = {
   revisions: ComparisonRevisionData
 }[]
 
+export type RevisionFirstThreeColumns = Array<{
+  path: string
+  value: string
+  fullValue: string
+  type: string
+}>
+
 export type Revision = {
   id?: string
   revision: string
   group?: string
   displayColor: Color
   fetched: boolean
-  firstThreeColumns: Array<{ path: string; value: string }>
+  firstThreeColumns: RevisionFirstThreeColumns
 }
 
 export interface PlotsComparisonData {

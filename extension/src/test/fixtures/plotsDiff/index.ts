@@ -19,7 +19,7 @@ import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
 import { getCLIBranchId, replaceBranchCLIId } from './util'
 import { formatDate } from '../../../util/date'
-import { Row } from '../../../experiments/webview/contract'
+import { ColumnType, Row } from '../../../experiments/webview/contract'
 
 const basicVega = {
   [join('logs', 'loss.tsv')]: [
@@ -541,14 +541,20 @@ export const getRevisions = (): Revision[] => {
       fetched: true,
       firstThreeColumns: [
         {
+          type: 'Created',
+          fullValue: '-',
           path: 'Created',
           value: '-'
         },
         {
+          type: ColumnType.METRICS,
+          fullValue: '1.9293040037155151',
           path: 'summary.json:loss',
           value: '1.9293'
         },
         {
+          type: ColumnType.METRICS,
+          fullValue: '0.4668000042438507',
           path: 'summary.json:accuracy',
           value: '0.46680'
         }
@@ -559,14 +565,20 @@ export const getRevisions = (): Revision[] => {
       fetched: true,
       firstThreeColumns: [
         {
+          type: 'Created',
+          fullValue: formatDate(getMain().Created as string),
           path: 'Created',
           value: formatDate(getMain().Created as string)
         },
         {
+          type: ColumnType.METRICS,
+          fullValue: '2.048856019973755',
           path: 'summary.json:loss',
           value: '2.0489'
         },
         {
+          type: ColumnType.METRICS,
+          fullValue: '0.3484833240509033',
           path: 'summary.json:accuracy',
           value: '0.34848'
         }
@@ -580,14 +592,20 @@ export const getRevisions = (): Revision[] => {
       fetched: true,
       firstThreeColumns: [
         {
+          type: 'Created',
+          fullValue: findAndFormatCreated('exp-e7a67'),
           path: 'Created',
           value: findAndFormatCreated('exp-e7a67')
         },
         {
+          type: ColumnType.METRICS,
+          fullValue: '2.0205044746398926',
           path: 'summary.json:loss',
           value: '2.0205'
         },
         {
+          type: ColumnType.METRICS,
+          fullValue: '0.3724166750907898',
           path: 'summary.json:accuracy',
           value: '0.37242'
         }
@@ -601,14 +619,20 @@ export const getRevisions = (): Revision[] => {
       fetched: true,
       firstThreeColumns: [
         {
+          fullValue: findAndFormatCreated('test-branch'),
+          type: 'Created',
           path: 'Created',
           value: findAndFormatCreated('test-branch')
         },
         {
+          fullValue: '1.9293040037155151',
+          type: ColumnType.METRICS,
           path: 'summary.json:loss',
           value: '1.9293'
         },
         {
+          fullValue: '0.4668000042438507',
+          type: ColumnType.METRICS,
           path: 'summary.json:accuracy',
           value: '0.46680'
         }
@@ -622,14 +646,20 @@ export const getRevisions = (): Revision[] => {
       fetched: true,
       firstThreeColumns: [
         {
+          fullValue: findAndFormatCreated('exp-83425'),
+          type: 'Created',
           path: 'Created',
           value: findAndFormatCreated('exp-83425')
         },
         {
+          fullValue: '1.775016188621521',
+          type: ColumnType.METRICS,
           path: 'summary.json:loss',
           value: '1.7750'
         },
         {
+          fullValue: '0.5926499962806702',
+          type: ColumnType.METRICS,
           path: 'summary.json:accuracy',
           value: '0.59265'
         }

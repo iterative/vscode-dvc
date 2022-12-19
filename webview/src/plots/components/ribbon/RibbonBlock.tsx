@@ -1,5 +1,6 @@
 import { Revision } from 'dvc/src/plots/webview/contract'
 import React from 'react'
+import cn from 'classnames'
 import { VSCodeProgressRing } from '@vscode/webview-ui-toolkit/react'
 import { truncate } from 'vega'
 import styles from './styles.module.scss'
@@ -27,10 +28,17 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
   const tooltipContent = (
     <table className={styles.columnsTable}>
       <tbody>
-        {revision.firstThreeColumns.map(({ path, value }) => (
+        {revision.firstThreeColumns.map(({ path, value, type, fullValue }) => (
           <tr key={path}>
-            <td>{truncate(path, 45, 'left')}</td>
-            <td>{value}</td>
+            <td className={cn(styles[`${type}Key`])}>
+              {truncate(path, 45, 'left')}
+            </td>
+            <td>
+              {value}
+              {value === '-' || (
+                <CopyButton value={fullValue} className={styles.copyButton} />
+              )}
+            </td>
           </tr>
         ))}
       </tbody>
