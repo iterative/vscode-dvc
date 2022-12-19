@@ -384,30 +384,6 @@ describe('setup', () => {
     expect(mockedInitialize).not.toHaveBeenCalled()
   })
 
-  it('should try to select the python interpreter if the workspace contains a DVC project, the cli cannot be found and the user decides to select the python interpreter', async () => {
-    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
-    mockedHasRoots.mockReturnValueOnce(true)
-    mockedIsPythonExtensionUsed.mockResolvedValueOnce(false)
-    mockedGetCliVersion.mockResolvedValueOnce(undefined)
-    mockedWarnWithOptions.mockResolvedValueOnce(Response.SELECT_INTERPRETER)
-    mockedExecuteProcess.mockImplementation(({ executable }) =>
-      Promise.resolve(executable)
-    )
-    mockedReady.mockResolvedValue(true)
-    mockedGetExtension.mockReturnValue(mockedVscodePython)
-
-    await setup(extension)
-    await flushPromises()
-    expect(mockedSetRoots).toHaveBeenCalledTimes(1)
-    expect(mockedGetConfigValue).toHaveBeenCalledTimes(1)
-    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
-    expect(mockedSetupWorkspace).toHaveBeenCalledTimes(0)
-    expect(mockedExecuteCommand).toHaveBeenCalledTimes(1)
-    expect(mockedSetUserConfigValue).not.toHaveBeenCalled()
-    expect(mockedResetMembers).toHaveBeenCalledTimes(1)
-    expect(mockedInitialize).not.toHaveBeenCalled()
-  })
-
   it('should set a user config option if the workspace contains a DVC project, the cli cannot be found and the user selects never', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
@@ -495,7 +471,6 @@ describe('setup', () => {
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
       `The extension is unable to initialize. The CLI was not located using the interpreter provided by the Python extension. ${belowMinVersion} is installed globally. For auto Python environment activation, ensure the correct interpreter is set. Active Python interpreter: ${mockedPythonPath}.`,
       Response.SETUP_WORKSPACE,
-      Response.SELECT_INTERPRETER,
       Response.NEVER
     )
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(2)
@@ -586,7 +561,6 @@ describe('setup', () => {
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
       `The extension is unable to initialize. The CLI was not located using the interpreter provided by the Python extension. The CLI is also not installed globally. For auto Python environment activation, ensure the correct interpreter is set. Active Python interpreter: ${mockedPythonPath}.`,
       Response.SETUP_WORKSPACE,
-      Response.SELECT_INTERPRETER,
       Response.NEVER
     )
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(2)

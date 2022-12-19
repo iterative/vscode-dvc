@@ -12,19 +12,9 @@ import {
   getConfigValue,
   setUserConfigValue
 } from '../../vscode/config'
-import {
-  getPythonBinPath,
-  isPythonExtensionInstalled,
-  selectPythonInterpreter
-} from '../../extensions/python'
+import { getPythonBinPath } from '../../extensions/python'
 import { getFirstWorkspaceFolder } from '../../vscode/workspaceFolders'
 import { delay } from '../../util/time'
-
-const getToastOptions = (isPythonExtensionInstalled: boolean): Response[] => {
-  return isPythonExtensionInstalled
-    ? [Response.SETUP_WORKSPACE, Response.SELECT_INTERPRETER, Response.NEVER]
-    : [Response.SETUP_WORKSPACE, Response.NEVER]
-}
 
 export const warnUnableToVerifyVersion = () =>
   Toast.warnWithOptions(
@@ -48,7 +38,6 @@ export const warnAheadOfLatestTested = (): void => {
 
 const warnUserCLIInaccessible = async (
   extension: IExtension,
-  isMsPythonInstalled: boolean,
   warningText: string
 ): Promise<void> => {
   if (getConfigValue<boolean>(ConfigKey.DO_NOT_SHOW_CLI_UNAVAILABLE)) {
@@ -57,12 +46,11 @@ const warnUserCLIInaccessible = async (
 
   const response = await Toast.warnWithOptions(
     warningText,
-    ...getToastOptions(isMsPythonInstalled)
+    Response.SETUP_WORKSPACE,
+    Response.NEVER
   )
 
   switch (response) {
-    case Response.SELECT_INTERPRETER:
-      return selectPythonInterpreter()
     case Response.SETUP_WORKSPACE:
       return extension.setupWorkspace()
     case Response.NEVER:
@@ -78,7 +66,6 @@ const warnUserCLIInaccessibleAnywhere = async (
 
   return warnUserCLIInaccessible(
     extension,
-    true,
     `The extension is unable to initialize. The CLI was not located using the interpreter provided by the Python extension. ${
       globalDvcVersion ? globalDvcVersion + ' is' : 'The CLI is also not'
     } installed globally. For auto Python environment activation, ensure the correct interpreter is set. Active Python interpreter: ${binPath}.`
@@ -104,7 +91,6 @@ const warnUser = (
     case CliCompatible.NO_NOT_FOUND:
       warnUserCLIInaccessible(
         extension,
-        isPythonExtensionInstalled(),
         'An error was thrown when trying to access the CLI.'
       )
       return
