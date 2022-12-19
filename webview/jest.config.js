@@ -21,6 +21,7 @@ module.exports = {
   testEnvironment: 'jsdom',
   testTimeout: 20000,
   transform: {
+    '\\.py$': '<rootDir>/rawLoaderTransformer.js',
     '^.+\\.(t|j)sx?$': ['@swc/jest']
   }
 }
