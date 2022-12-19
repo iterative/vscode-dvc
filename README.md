@@ -2,10 +2,10 @@
 
 # DVC Extension for Visual Studio Code
 
-[![Version](https://vsmarketplacebadges.dev/version-short/iterative.dvc.svg)](https://marketplace.visualstudio.com/items?itemName=Iterative.dvc)
+<!-- [![Version](https://vsmarketplacebadges.dev/version-short/iterative.dvc.svg)](https://marketplace.visualstudio.com/items?itemName=Iterative.dvc)
 [![Installs](https://vsmarketplacebadges.dev/installs/iterative.dvc.svg)](https://marketplace.visualstudio.com/items?itemName=Iterative.dvc)
 [![Downloads](https://vsmarketplacebadges.dev/downloads/iterative.dvc.svg)](https://marketplace.visualstudio.com/items?itemName=Iterative.dvc)
-[![Ratings](https://vsmarketplacebadges.dev/rating-short/iterative.dvc.svg)](https://marketplace.visualstudio.com/items?itemName=Iterative.dvc)
+[![Ratings](https://vsmarketplacebadges.dev/rating-short/iterative.dvc.svg)](https://marketplace.visualstudio.com/items?itemName=Iterative.dvc) -->
 
 [![Continuous Integration](https://github.com/iterative/vscode-dvc/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/iterative/vscode-dvc/actions/workflows/continuous-integration.yml)
 [![Maintainability](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/maintainability)](https://codeclimate.com/repos/608b5886f52398018b00264c/maintainability)
