@@ -1,3 +1,4 @@
+import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { fake, restore, stub } from 'sinon'
@@ -27,11 +28,12 @@ suite('Status Test Suite', () => {
   })
 
   describe('Status', () => {
-    const disabledText = '$(circle-slash) DVC'
-    const loadingText = '$(loading~spin) DVC'
-    const waitingText = '$(circle-large-outline) DVC'
+    const preReadyDisabledText = '$(circle-slash) DVC'
+    const disabledText = `${preReadyDisabledText} (Global)`
+    const loadingText = '$(loading~spin) DVC (Global)'
+    const waitingText = '$(circle-large-outline) DVC (Global)'
 
-    it('should show the correct status of the cli', () => {
+    it('should show the correct status of the cli', async () => {
       const cwd = __dirname
       const processCompleted = disposable.track(new EventEmitter<CliResult>())
       const processStarted = disposable.track(new EventEmitter<CliStarted>())
@@ -50,7 +52,17 @@ suite('Status Test Suite', () => {
         'createStatusBarItem'
       ).returns(mockStatusBarItem)
 
-      const status = disposable.track(new Status([cli]))
+      const status = disposable.track(
+        new Status(
+          {
+            getCliPath: () => undefined,
+            getPythonBinPath: () => undefined,
+            isPythonExtensionUsed: () => false,
+            isReady: () => Promise.resolve()
+          } as unknown as Config,
+          cli
+        )
+      )
 
       const firstFinishedCommand = {
         command: 'one is still running',
@@ -64,10 +76,10 @@ suite('Status Test Suite', () => {
       }
 
       expect(mockCreateStatusBarItem).to.be.calledOnce
-      expect(mockStatusBarItem.text).to.equal(disabledText)
+      expect(mockStatusBarItem.text).to.equal(preReadyDisabledText)
       expect(mockStatusBarItem.command).to.equal(undefined)
 
-      status.setAvailability(true)
+      await status.setAvailability(true)
 
       expect(mockStatusBarItem.text).to.equal(waitingText)
       expect(mockStatusBarItem.command).to.equal(undefined)
@@ -102,7 +114,7 @@ suite('Status Test Suite', () => {
       expect(mockStatusBarItem.text).to.equal(waitingText)
       expect(mockStatusBarItem.command).to.equal(undefined)
 
-      status.setAvailability(false)
+      await status.setAvailability(false)
 
       expect(mockStatusBarItem.text).to.equal(disabledText)
       expect(mockStatusBarItem.command).to.deep.equal({
@@ -111,7 +123,7 @@ suite('Status Test Suite', () => {
       })
     })
 
-    it('should floor the number of workers at 0', () => {
+    it('should floor the number of workers at 0', async () => {
       const processCompleted = disposable.track(new EventEmitter<CliResult>())
       const processStarted = disposable.track(new EventEmitter<CliStarted>())
 
@@ -127,7 +139,17 @@ suite('Status Test Suite', () => {
       } as unknown as StatusBarItem
       stub(window, 'createStatusBarItem').returns(mockStatusBarItem)
 
-      const status = disposable.track(new Status([cli]))
+      const status = disposable.track(
+        new Status(
+          {
+            getCliPath: () => undefined,
+            getPythonBinPath: () => undefined,
+            isPythonExtensionUsed: () => false,
+            isReady: () => Promise.resolve()
+          } as unknown as Config,
+          cli
+        )
+      )
 
       const mockCliResult = {
         command: 'there is nothing currently running',
@@ -137,7 +159,7 @@ suite('Status Test Suite', () => {
         pid: 200
       }
 
-      status.setAvailability(true)
+      await status.setAvailability(true)
 
       processCompleted.fire(mockCliResult)
       processCompleted.fire(mockCliResult)
@@ -154,6 +176,91 @@ suite('Status Test Suite', () => {
         pid: 32213423
       })
       expect(mockStatusBarItem.text).to.equal(loadingText)
+    })
+
+    it('should return the correct values dependent on the current settings', async () => {
+      const mockedIsPythonExtensionUsed = stub()
+      const mockGetCliPath = stub()
+      const mockGetPythonBinPath = stub()
+
+      const mockStatusBarItem = {
+        dispose: fake(),
+        show: fake(),
+        text: ''
+      } as unknown as StatusBarItem
+      stub(window, 'createStatusBarItem').returns(mockStatusBarItem)
+
+      const status = disposable.track(
+        new Status({
+          getCliPath: mockGetCliPath,
+          getPythonBinPath: mockGetPythonBinPath,
+          isPythonExtensionUsed: mockedIsPythonExtensionUsed,
+          isReady: () => Promise.resolve()
+        } as unknown as Config)
+      )
+
+      const setupMocks = (
+        isPythonExtensionUsed: boolean,
+        cliPath: string | undefined,
+        pythonBinPath: string | undefined
+      ) => {
+        mockedIsPythonExtensionUsed.resetBehavior()
+        mockGetCliPath.resetBehavior()
+        mockGetPythonBinPath.resetBehavior()
+
+        mockedIsPythonExtensionUsed.returns(isPythonExtensionUsed)
+        mockGetCliPath.returns(cliPath)
+        mockGetPythonBinPath.returns(pythonBinPath)
+      }
+
+      setupMocks(false, undefined, undefined)
+
+      await status.setAvailability(true)
+
+      expect(mockStatusBarItem.text).to.equal(waitingText)
+      expect(mockStatusBarItem.tooltip).to.equal('dvc')
+
+      const mockPythonPath = resolve('a', 'virtual', 'environment')
+
+      setupMocks(true, undefined, mockPythonPath)
+
+      await status.setAvailability(true)
+
+      expect(mockStatusBarItem.text).to.equal(
+        '$(circle-large-outline) DVC (Auto)'
+      )
+      expect(mockStatusBarItem.tooltip).to.equal(
+        'Interpreter set by Python extension'
+      )
+
+      setupMocks(false, undefined, mockPythonPath)
+
+      await status.setAvailability(true)
+
+      expect(mockStatusBarItem.text).to.equal(
+        '$(circle-large-outline) DVC (Manual)'
+      )
+      expect(mockStatusBarItem.tooltip).to.equal(mockPythonPath)
+
+      const mockDvcPath = resolve('path', 'to', 'dvc')
+
+      setupMocks(false, mockDvcPath, mockPythonPath)
+
+      await status.setAvailability(true)
+
+      expect(mockStatusBarItem.text).to.equal(
+        '$(circle-large-outline) DVC (Global)'
+      )
+      expect(mockStatusBarItem.tooltip).to.equal(mockDvcPath)
+
+      setupMocks(false, 'dvc', mockPythonPath)
+
+      await status.setAvailability(true)
+
+      expect(mockStatusBarItem.text).to.equal(
+        '$(circle-large-outline) DVC (Global)'
+      )
+      expect(mockStatusBarItem.tooltip).to.equal('dvc')
     })
   })
 })
