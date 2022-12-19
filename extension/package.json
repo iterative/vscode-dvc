@@ -1351,12 +1351,12 @@
       {
         "view": "dvc.views.webviews",
         "contents": "[Show Experiments](command:dvc.showExperiments)\n[Show Plots](command:dvc.showPlots)\n[Show Experiments and Plots](command:dvc.showExperimentsAndPlots)",
-        "when": "dvc.commands.available && dvc.project.available"
+        "when": "dvc.commands.available && dvc.project.available && dvc.project.hasData"
       },
       {
         "view": "dvc.views.webviews",
         "contents": "[Show Experiments](command:dvc.showGetStartedWebview)\n[Show Plots](command:dvc.showGetStartedWebview)\n[Show Experiments and Plots](command:dvc.showGetStartedWebview)",
-        "when": "!dvc.commands.available || !dvc.project.available"
+        "when": "!dvc.commands.available || !dvc.project.available || !dvc.project.hasData"
       },
       {
         "view": "dvc.views.welcome",
