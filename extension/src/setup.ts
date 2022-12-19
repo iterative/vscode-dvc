@@ -8,7 +8,10 @@ import { ConfigKey, setConfigValue } from './vscode/config'
 import { pickFile } from './vscode/resourcePicker'
 import { getFirstWorkspaceFolder } from './vscode/workspaceFolders'
 import { getSelectTitle, Title } from './vscode/title'
-import { isPythonExtensionInstalled } from './extensions/python'
+import {
+  isPythonExtensionInstalled,
+  selectPythonInterpreter
+} from './extensions/python'
 import { extensionCanRunCli, recheckGlobal } from './cli/dvc/discovery'
 
 const setConfigPath = async (
@@ -102,16 +105,19 @@ const pickVenvOptions = async () => {
 const quickPickVenvOption = () => {
   const options = [
     {
-      description: '• Let me select the virtual environment manually',
-      label: 'Manual',
-      value: 1
-    },
-    {
       description: '• DVC is available globally (e.g. installed as a binary)',
       label: 'Global',
       value: 0
     }
   ]
+  if (!isPythonExtensionInstalled()) {
+    options.unshift({
+      description: '• Let me select the virtual environment manually',
+      label: 'Manual',
+      value: 1
+    })
+  }
+
   if (isPythonExtensionInstalled()) {
     options.unshift({
       description:
@@ -127,12 +133,18 @@ const quickPickVenvOption = () => {
   })
 }
 
-const quickPickOrUnsetPythonInterpreter = (usesVenv: number) => {
+const selectInterpreter = async (usesVenv: number) => {
   if (usesVenv === 1) {
     return enterPathOrPickFile(ConfigKey.PYTHON_PATH, 'Python Interpreter')
   }
 
-  return setConfigPath(ConfigKey.PYTHON_PATH, undefined)
+  await Promise.all([
+    setConfigPath(ConfigKey.PYTHON_PATH, undefined),
+    setConfigPath(ConfigKey.DVC_PATH, undefined)
+  ])
+
+  selectPythonInterpreter()
+  return false
 }
 
 export const setupWorkspace = async (): Promise<boolean> => {
@@ -143,11 +155,7 @@ export const setupWorkspace = async (): Promise<boolean> => {
   }
 
   if (usesVenv) {
-    if (!(await quickPickOrUnsetPythonInterpreter(usesVenv))) {
-      return false
-    }
-
-    return pickVenvOptions()
+    return (await selectInterpreter(usesVenv)) ? pickVenvOptions() : false
   }
 
   return pickCliPath()

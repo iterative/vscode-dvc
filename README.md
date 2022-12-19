@@ -146,15 +146,15 @@ These are the VS Code [settings] available for the Extension:
 
 [settings]: https://code.visualstudio.com/docs/getstarted/settings
 
-| **Option**                             | **Description**                                                                                                                                      |
-| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `dvc.dvcPath`                          | Path or shell command to the DVC binary. Required unless Microsoft's [Python extension] is installed and the `dvc` package found in its environment. |
-| `dvc.pythonPath`                       | Path to the desired Python interpreter to use with DVC. Required when using a virtual environment.                                                   |
-| `dvc.experimentsTableHeadMaxHeight`    | Maximum height of experiment table head rows.                                                                                                        |
-| `dvc.doNotShowWalkthroughAfterInstall` | Do not prompt to show the Get Started page after installing. Useful for pre-configured development environments                                      |
-| `dvc.doNotRecommendRedHatExtension`    | Do not prompt to install the Red Hat YAML extension, which helps with DVC YAML schema validation (`dvc.yaml` and `.dvc` files).                      |
-| `dvc.doNotShowCliUnavailable`          | Do not warn when the workspace contains a DVC project but the DVC binary is unavailable.                                                             |
-| `dvc.doNotShowUnableToFilter`          | Do not warn before disabling auto-apply filters when these would result in too many experiments being selected.                                      |
+| **Option**                             | **Description**                                                                                                                                          |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `dvc.dvcPath`                          | Path or shell command to the DVC binary. Required unless Microsoft's [Python extension] is installed and the `dvc` package found in its environment.     |
+| `dvc.pythonPath`                       | Path to the desired Python interpreter to use with DVC. Should only be utilized when using a virtual environment without Microsoft's [Python extension]. |
+| `dvc.experimentsTableHeadMaxHeight`    | Maximum height of experiment table head rows.                                                                                                            |
+| `dvc.doNotShowWalkthroughAfterInstall` | Do not prompt to show the Get Started page after installing. Useful for pre-configured development environments                                          |
+| `dvc.doNotRecommendRedHatExtension`    | Do not prompt to install the Red Hat YAML extension, which helps with DVC YAML schema validation (`dvc.yaml` and `.dvc` files).                          |
+| `dvc.doNotShowCliUnavailable`          | Do not warn when the workspace contains a DVC project but the DVC binary is unavailable.                                                                 |
+| `dvc.doNotShowUnableToFilter`          | Do not warn before disabling auto-apply filters when these would result in too many experiments being selected.                                          |
 
 > **Note** that the `Setup The Workspace` command helps you set up the basic
 > ones at the [Workspace level] (saved to `.vscode/setting.json`).
