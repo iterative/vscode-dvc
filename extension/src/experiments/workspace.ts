@@ -35,20 +35,17 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     internalCommands: InternalCommands,
     updatesPaused: EventEmitter<boolean>,
     workspaceState: Memento,
-    onHasDataChanged: () => void,
     experiments?: Record<string, Experiments>,
-    eventEmittter?: EventEmitter<void>
+    checkpointsChanged?: EventEmitter<void>
   ) {
     super(internalCommands, workspaceState, experiments)
 
     this.updatesPaused = updatesPaused
 
     this.checkpointsChanged = this.dispose.track(
-      eventEmittter || new EventEmitter()
+      checkpointsChanged || new EventEmitter()
     )
     const onDidChangeCheckpoints = this.checkpointsChanged.event
-
-    const onHasData = eventEmittter?.event || this.columnsChanged.event
 
     this.dispose.track(
       onDidChangeCheckpoints(() => {
@@ -57,14 +54,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
         )
 
         setContextValue('dvc.experiment.checkpoints', workspaceHasCheckpoints)
-      })
-    )
-
-    this.dispose.track(
-      onHasData(() => {
-        const hasData = this.getHasData()
-        onHasDataChanged()
-        setContextValue('dvc.project.hasData', hasData)
       })
     )
   }

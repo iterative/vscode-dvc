@@ -148,9 +148,16 @@ export class Extension extends Disposable implements IExtension {
       new WorkspaceExperiments(
         this.internalCommands,
         this.updatesPaused,
-        context.workspaceState,
-        () => this.changeGetStartedStep()
+        context.workspaceState
       )
+    )
+
+    const onHasData = this.experiments.columnsChanged.event
+    this.dispose.track(
+      onHasData(() => {
+        this.changeGetStartedStep()
+        setContextValue('dvc.project.hasData', this.experiments.getHasData())
+      })
     )
 
     this.plots = this.dispose.track(
