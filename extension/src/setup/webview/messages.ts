@@ -1,4 +1,4 @@
-import { GetStartedData as TGetStartedData } from './contract'
+import { SetupData as TSetupData } from './contract'
 import { Logger } from '../../common/logger'
 import {
   MessageFromWebview,
@@ -7,11 +7,11 @@ import {
 import { BaseWebview } from '../../webview'
 
 export class WebviewMessages {
-  private readonly getWebview: () => BaseWebview<TGetStartedData> | undefined
+  private readonly getWebview: () => BaseWebview<TSetupData> | undefined
   private readonly initializeProject: () => void
 
   constructor(
-    getWebview: () => BaseWebview<TGetStartedData> | undefined,
+    getWebview: () => BaseWebview<TSetupData> | undefined,
     initializeProject: () => void
   ) {
     this.getWebview = getWebview

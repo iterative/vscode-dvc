@@ -1,9 +1,9 @@
 import { Disposer } from '@hediet/std/disposable'
 import { fake } from 'sinon'
-import { GetStarted } from '../../../getStarted'
+import { Setup } from '../../../setup/index'
 import { buildDependencies } from '../util'
 
-export const buildGetStarted = (
+export const buildSetup = (
   disposer: Disposer,
   dvInstalled = false,
   dvcInit = false,
@@ -14,8 +14,8 @@ export const buildGetStarted = (
   const mockInitializeProject = fake()
   const mockOpenExperiments = fake()
 
-  const getStarted = disposer.track(
-    new GetStarted(
+  const setup = disposer.track(
+    new Setup(
       '',
       resourceLocator.dvcIcon,
       mockInitializeProject,
@@ -27,10 +27,10 @@ export const buildGetStarted = (
   )
 
   return {
-    getStarted,
     messageSpy,
     mockInitializeProject,
     mockOpenExperiments,
-    resourceLocator
+    resourceLocator,
+    setup
   }
 }

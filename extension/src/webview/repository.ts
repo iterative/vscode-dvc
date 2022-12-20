@@ -48,7 +48,7 @@ export abstract class BaseRepository<
       this.dvcRoot,
       this.webviewIcon,
       viewColumn,
-      this.viewKey === ViewKey.GET_STARTED
+      this.viewKey === ViewKey.SETUP
     )
 
     this.setWebview(webview)
