@@ -63,7 +63,7 @@
     "@types/react-virtualized": "9.21.21",
     "@types/webpack": "5.28.0",
     "@welldone-software/why-did-you-render": "7.0.1",
-    "chromatic": "6.12.0",
+    "chromatic": "6.13.0",
     "clean-webpack-plugin": "4.0.0",
     "css-loader": "6.7.2",
     "file-loader": "6.2.0",
