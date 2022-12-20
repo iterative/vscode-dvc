@@ -29,7 +29,7 @@ export class WebviewMessages {
     projectInitialized: boolean,
     isPythonExtensionInstalled: boolean,
     pythonBinPath: string | undefined,
-    hasData: boolean
+    hasData: boolean | undefined
   ) {
     this.getWebview()?.show({
       cliAccessible,

@@ -9,6 +9,7 @@ import { ProjectUninitialized } from './ProjectUninitialized'
 import { NoData } from './NoData'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 import { sendMessage } from '../../shared/vscode'
+import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 
 export const App: React.FC = () => {
   const [cliAvailable, setCliAvailable] = useState<boolean>(false)
@@ -18,7 +19,7 @@ export const App: React.FC = () => {
   )
   const [isPythonExtensionInstalled, setIsPythonExtensionInstalled] =
     useState<boolean>(false)
-  const [hasData, setHasData] = useState(false)
+  const [hasData, setHasData] = useState<boolean | undefined>(false)
 
   useVsCodeMessaging(
     useCallback(
@@ -71,6 +72,10 @@ export const App: React.FC = () => {
 
   if (!projectInitialized) {
     return <ProjectUninitialized initializeProject={initializeProject} />
+  }
+
+  if (hasData === undefined) {
+    return <EmptyState>Loading Project...</EmptyState>
   }
 
   if (!hasData) {

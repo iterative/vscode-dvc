@@ -3,5 +3,5 @@ export type GetStartedData = {
   isPythonExtensionInstalled: boolean
   projectInitialized: boolean
   pythonBinPath: string | undefined
-  hasData: boolean
+  hasData: boolean | undefined
 }

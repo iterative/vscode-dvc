@@ -17,7 +17,7 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
   private showExperiments: () => void
 
   private getHasRoots: () => boolean
-  private getHasData: () => boolean
+  private getHasData: () => boolean | undefined
 
   constructor(
     dvcRoot: string,
@@ -26,7 +26,7 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
     showExperiments: () => void,
     getCliAccessible: () => boolean,
     getHasRoots: () => boolean,
-    getHasData: () => boolean
+    getHasData: () => boolean | undefined
   ) {
     super(dvcRoot, webviewIcon)
 
