@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.28] - 2022-12-20
+
+### 🚀 New Features and Enhancements
+
+- Move Views sidebar section to the top [#2954](https://github.com/iterative/vscode-dvc/pull/2954) by [@sroy3](https://github.com/sroy3)
+- Improve plots ribbon block tooltips [#2956](https://github.com/iterative/vscode-dvc/pull/2956) by [@julieg18](https://github.com/julieg18)
+- Show a screen when there is no data in the project [#2927](https://github.com/iterative/vscode-dvc/pull/2927) by [@sroy3](https://github.com/sroy3)
+- Close setup webview when all actions have been completed [#2968](https://github.com/iterative/vscode-dvc/pull/2968) by [@mattseddon](https://github.com/mattseddon)
+- Simplify Setup the Workspace by removing manual option when Python extension is installed [#2967](https://github.com/iterative/vscode-dvc/pull/2967) by [@mattseddon](https://github.com/mattseddon)
+- Add environment selection information to the DVC status bar item [#2969](https://github.com/iterative/vscode-dvc/pull/2969) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (2.38.0) [#2942](https://github.com/iterative/vscode-dvc/pull/2942) by [@mattseddon](https://github.com/mattseddon)
+- Fix integration tests for non en-US timezones [#2945](https://github.com/iterative/vscode-dvc/pull/2945) by [@mattseddon](https://github.com/mattseddon)
+- Do not rely on number of call to execute process stub in integration tests [#2939](https://github.com/iterative/vscode-dvc/pull/2939) by [@mattseddon](https://github.com/mattseddon)
+- Ensure that all watcher's listeners are disposed [#2948](https://github.com/iterative/vscode-dvc/pull/2948) by [@mattseddon](https://github.com/mattseddon)
+- Temporarily remove VS Marketplace badges [#2957](https://github.com/iterative/vscode-dvc/pull/2957) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.27] - 2022-12-14
 
 ### 🚀 New Features and Enhancements
