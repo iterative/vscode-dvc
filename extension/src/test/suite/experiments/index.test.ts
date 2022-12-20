@@ -1583,7 +1583,7 @@ suite('Experiments Test Suite', () => {
       ).to.be.false
     })
 
-    it('should only set the context value for hasData when a non-params file is open and the extension starts', async () => {
+    it('should not set a context value when a non-params file is open and the extension starts', async () => {
       const nonParamsFile = Uri.file(join(dvcDemoPath, '.gitignore'))
       await window.showTextDocument(nonParamsFile)
 
@@ -1592,10 +1592,7 @@ suite('Experiments Test Suite', () => {
       const { experiments } = buildExperiments(disposable)
       await experiments.isReady()
 
-      expect(setContextValueSpy).to.be.calledOnceWith(
-        'dvc.project.hasData',
-        true
-      )
+      expect(setContextValueSpy).not.to.be.called
     })
   })
 
