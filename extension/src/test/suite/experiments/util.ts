@@ -111,6 +111,7 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
       internalCommands,
       updatesPaused,
       buildMockMemento(),
+      () => {},
       {
         'other/dvc/root': mockExperiments
       }
@@ -140,7 +141,8 @@ export const buildSingleRepoExperiments = (disposer: SafeWatcherDisposer) => {
     new WorkspaceExperiments(
       internalCommands,
       updatesPaused,
-      buildMockMemento()
+      buildMockMemento(),
+      () => {}
     )
   )
   const [experiments] = workspaceExperiments.create(

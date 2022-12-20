@@ -9,7 +9,6 @@ import { getInput } from '../vscode/inputBox'
 import { BaseWorkspaceWebviews } from '../webview/workspace'
 import { Title } from '../vscode/title'
 import { setContextValue } from '../vscode/context'
-import { registerRepositoryCommands } from '../repository/commands/register'
 
 export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   Experiments,
@@ -29,7 +28,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   public readonly updatesPaused: EventEmitter<boolean>
 
   private readonly checkpointsChanged: EventEmitter<void>
-  private readonly hasDataChanged: EventEmitter<void>
 
   private focusedParamsDvcRoot: string | undefined
 
@@ -39,19 +37,18 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     workspaceState: Memento,
     onHasDataChanged: () => void,
     experiments?: Record<string, Experiments>,
-    checkpointsChanged?: EventEmitter<void>
+    eventEmittter?: EventEmitter<void>
   ) {
     super(internalCommands, workspaceState, experiments)
 
     this.updatesPaused = updatesPaused
 
     this.checkpointsChanged = this.dispose.track(
-      checkpointsChanged || new EventEmitter()
+      eventEmittter || new EventEmitter()
     )
     const onDidChangeCheckpoints = this.checkpointsChanged.event
 
-    this.hasDataChanged = new EventEmitter()
-    const onHasData = this.hasDataChanged.event
+    const onHasData = eventEmittter?.event || this.columnsChanged.event
 
     this.dispose.track(
       onDidChangeCheckpoints(() => {
@@ -331,12 +328,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       })
     )
 
-    experiments.dispose.track(
-      experiments.onDidChangeColumns(() => {
-        this.hasDataChanged.fire()
-      })
-    )
-
     return experiments
   }
 
@@ -349,10 +340,9 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   }
 
   public getHasData() {
-    return Object.values(this.repositories).some(repository => {
-      repository.onHasData = () => this.onHasDataChanged()
-      return repository.getHasData()
-    })
+    return Object.values(this.repositories).some(repository =>
+      repository.getHasData()
+    )
   }
 
   private async pickExpThenRun(

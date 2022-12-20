@@ -357,6 +357,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
           internalCommands,
           disposable.track(new EventEmitter()),
           buildMockMemento(),
+          () => {},
           { [dvcDemoPath]: experiments },
           disposable.track(new EventEmitter())
         )

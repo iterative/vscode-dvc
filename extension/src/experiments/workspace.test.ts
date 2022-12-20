@@ -60,6 +60,7 @@ describe('Experiments', () => {
     mockedInternalCommands,
     mockedUpdatesPaused,
     buildMockMemento(),
+    () => {},
     {
       '/my/dvc/root': {
         getDvcRoot: () => mockedDvcRoot,

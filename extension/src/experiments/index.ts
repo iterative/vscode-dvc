@@ -93,8 +93,6 @@ export class Experiments extends BaseRepository<TableData> {
 
   private readonly internalCommands: InternalCommands
   private readonly webviewMessages: WebviewMessages
-  private test = 1
-  public onHasData: (() => void) | null = null
 
   constructor(
     dvcRoot: string,
@@ -159,10 +157,6 @@ export class Experiments extends BaseRepository<TableData> {
     this.webviewMessages = this.createWebviewMessageHandler()
     this.setupInitialData()
     this.watchActiveEditor()
-    setInterval(() => {
-      this.test++
-      this.notifyColumnsChanged()
-    }, 1000)
   }
 
   public update() {
@@ -502,7 +496,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public getHasData() {
-    if (this.test < 10) {
+    if (this.deferred.state === 'none') {
       return false
     }
     return this.columns.hasNonDefaultColumns()
