@@ -45,7 +45,7 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
     return this.sendDataToWebview()
   }
 
-  public sendDataToWebview() {
+  public async sendDataToWebview() {
     const cliAccessible = this.getCliAccessible()
     const projectInitialized = this.getHasRoots()
     const hasData = this.getHasData()
