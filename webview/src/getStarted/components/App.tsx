@@ -18,7 +18,7 @@ export const App: React.FC = () => {
   const [pythonBinPath, setPythonBinPath] = useState<string | undefined>(
     undefined
   )
-  const [isPythonExtensionUsed, setIsPythonExtensionUsed] =
+  const [isPythonExtensionInstalled, setIsPythonExtensionInstalled] =
     useState<boolean>(false)
   const [hasData, setHasData] = useState(false)
 
@@ -26,14 +26,14 @@ export const App: React.FC = () => {
     useCallback(
       ({ data }: { data: MessageToWebview<GetStartedData> }) => {
         setCliAvailable(data.data.cliAccessible)
-        setIsPythonExtensionUsed(data.data.isPythonExtensionUsed)
+        setIsPythonExtensionInstalled(data.data.isPythonExtensionInstalled)
         setProjectInitialized(data.data.projectInitialized)
         setPythonBinPath(data.data.pythonBinPath)
         setHasData(data.data.hasData)
       },
       [
         setCliAvailable,
-        setIsPythonExtensionUsed,
+        setIsPythonExtensionInstalled,
         setProjectInitialized,
         setPythonBinPath,
         setHasData
@@ -53,11 +53,26 @@ export const App: React.FC = () => {
     })
   }
 
+  const installDvc = () => {
+    sendMessage({ type: MessageFromWebviewType.INSTALL_DVC })
+  }
+
+  const selectPythonInterpreter = () => {
+    sendMessage({ type: MessageFromWebviewType.SELECT_PYTHON_INTERPRETER })
+  }
+
+  const setupWorkspace = () => {
+    sendMessage({ type: MessageFromWebviewType.SETUP_WORKSPACE })
+  }
+
   if (!cliAvailable) {
     return (
       <CliUnavailable
-        isPythonExtensionUsed={isPythonExtensionUsed}
+        installDvc={installDvc}
+        isPythonExtensionInstalled={isPythonExtensionInstalled}
         pythonBinPath={pythonBinPath}
+        selectPythonInterpreter={selectPythonInterpreter}
+        setupWorkspace={setupWorkspace}
       />
     )
   }

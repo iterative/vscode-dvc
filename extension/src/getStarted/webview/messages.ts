@@ -30,14 +30,14 @@ export class WebviewMessages {
   public sendWebviewMessage(
     cliAccessible: boolean,
     projectInitialized: boolean,
-    isPythonExtensionUsed: boolean,
+    isPythonExtensionInstalled: boolean,
     pythonBinPath: string | undefined,
     hasData: boolean
   ) {
     this.getWebview()?.show({
       cliAccessible,
       hasData,
-      isPythonExtensionUsed,
+      isPythonExtensionInstalled,
       projectInitialized,
       pythonBinPath
     })

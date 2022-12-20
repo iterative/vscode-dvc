@@ -1,6 +1,6 @@
 export type GetStartedData = {
   cliAccessible: boolean
-  isPythonExtensionUsed: boolean
+  isPythonExtensionInstalled: boolean
   projectInitialized: boolean
   pythonBinPath: string | undefined
   hasData: boolean

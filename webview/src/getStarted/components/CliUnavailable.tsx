@@ -1,79 +1,71 @@
 import React from 'react'
-import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { Button } from '../../shared/components/button/Button'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
-import { sendMessage } from '../../shared/vscode'
 
 export type CliUnavailableProps = {
-  isPythonExtensionUsed: boolean
+  installDvc: () => void
+  isPythonExtensionInstalled: boolean
   pythonBinPath: string | undefined
+  selectPythonInterpreter: () => void
+  setupWorkspace: () => void
 }
 
-const InstallButton: React.FC = () => (
-  <Button
-    onClick={() => sendMessage({ type: MessageFromWebviewType.INSTALL_DVC })}
-    text="Install"
-  />
-)
-
-const PythonExtensionUsed: React.FC<{ pythonBinPath: string }> = ({
-  pythonBinPath
-}) => (
+const CanInstall: React.FC<{
+  children: React.ReactNode
+  pythonBinPath: string
+  installDvc: () => void
+}> = ({ installDvc, pythonBinPath, children }) => (
   <div>
     <p>
       {`DVC & DVCLive can be auto-installed as packages with ${pythonBinPath}`}
     </p>
-    <InstallButton />
-    <p>To update the interpreter and/or locate DVC</p>
-    <Button
-      onClick={() =>
-        sendMessage({ type: MessageFromWebviewType.SELECT_PYTHON_INTERPRETER })
-      }
-      text="Select Python Interpreter"
-    />
-  </div>
-)
-
-const PythonBinFound: React.FC<{ pythonBinPath: string }> = ({
-  pythonBinPath
-}) => (
-  <div>
-    <p>
-      {`DVC & DVCLive can be auto-installed as packages with ${pythonBinPath}`}
-    </p>
-    <InstallButton />
-    <p>To update the install location or locate DVC</p>
-    <Button
-      onClick={() =>
-        sendMessage({ type: MessageFromWebviewType.SETUP_WORKSPACE })
-      }
-      text="Setup The Workspace"
-    />
-  </div>
-)
-
-const PythonBinNotFound: React.FC = () => (
-  <div>
-    <p>DVC & DVCLive cannot be auto-installed as Python was not located.</p>
-    <p>To locate a Python Interpreter or DVC</p>
+    <Button onClick={installDvc} text="Install" />
+    {children}
   </div>
 )
 
 export const CliUnavailable: React.FC<CliUnavailableProps> = ({
-  isPythonExtensionUsed,
-  pythonBinPath
+  installDvc,
+  isPythonExtensionInstalled,
+  pythonBinPath,
+  selectPythonInterpreter,
+  setupWorkspace
 }) => {
+  if (!pythonBinPath) {
+    return (
+      <EmptyState>
+        <div>
+          <h1>DVC is currently unavailable</h1>
+          <p>
+            DVC & DVCLive cannot be auto-installed as Python was not located.
+          </p>
+          <p>To locate a Python Interpreter or DVC</p>
+          <Button onClick={setupWorkspace} text="Setup The Workspace" />
+        </div>
+      </EmptyState>
+    )
+  }
+
   return (
     <EmptyState>
       <div>
         <h1>DVC is currently unavailable</h1>
-        {isPythonExtensionUsed ? (
-          <PythonExtensionUsed pythonBinPath={pythonBinPath as string} />
-        ) : (
-          (pythonBinPath && (
-            <PythonBinFound pythonBinPath={pythonBinPath} />
-          )) || <PythonBinNotFound />
-        )}
+        <CanInstall pythonBinPath={pythonBinPath} installDvc={installDvc}>
+          {isPythonExtensionInstalled ? (
+            <div>
+              <p>To update the interpreter and/or locate DVC</p>
+              <Button
+                onClick={selectPythonInterpreter}
+                text="Select Python Interpreter"
+              />
+            </div>
+          ) : (
+            <div>
+              <p>To update the install location or locate DVC</p>
+              <Button onClick={setupWorkspace} text="Setup The Workspace" />
+            </div>
+          )}
+        </CanInstall>
       </div>
     </EmptyState>
   )

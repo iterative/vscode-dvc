@@ -17,31 +17,34 @@ export default {
 } as Meta
 
 const Template: Story<CliUnavailableProps> = ({
-  isPythonExtensionUsed,
+  isPythonExtensionInstalled,
   pythonBinPath
 }) => {
   return (
     <CliUnavailable
-      isPythonExtensionUsed={isPythonExtensionUsed}
+      isPythonExtensionInstalled={isPythonExtensionInstalled}
       pythonBinPath={pythonBinPath}
+      installDvc={() => undefined}
+      setupWorkspace={() => undefined}
+      selectPythonInterpreter={() => undefined}
     />
   )
 }
 
 export const PythonNotFound = Template.bind({})
 PythonNotFound.args = {
-  isPythonExtensionUsed: false,
+  isPythonExtensionInstalled: false,
   pythonBinPath: undefined
 }
 
 export const PythonExtensionUsed = Template.bind({})
 PythonExtensionUsed.args = {
-  isPythonExtensionUsed: true,
+  isPythonExtensionInstalled: true,
   pythonBinPath: '/opt/homebrew/Caskroom/miniforge/base/bin/python'
 }
 
 export const PythonExtensionNotUsed = Template.bind({})
 PythonExtensionNotUsed.args = {
-  isPythonExtensionUsed: false,
+  isPythonExtensionInstalled: false,
   pythonBinPath: '.env/bin/python'
 }
