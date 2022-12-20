@@ -45,7 +45,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     this.checkpointsChanged = this.dispose.track(
       checkpointsChanged || new EventEmitter()
     )
-
     const onDidChangeCheckpoints = this.checkpointsChanged.event
 
     this.dispose.track(

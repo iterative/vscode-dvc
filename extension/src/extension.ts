@@ -152,6 +152,14 @@ export class Extension extends Disposable implements IExtension {
       )
     )
 
+    const onDidChangeHasData = this.experiments.columnsChanged.event
+    this.dispose.track(
+      onDidChangeHasData(() => {
+        this.changeGetStartedStep()
+        setContextValue('dvc.project.hasData', this.experiments.getHasData())
+      })
+    )
+
     this.plots = this.dispose.track(
       new WorkspacePlots(this.internalCommands, context.workspaceState)
     )
@@ -391,7 +399,7 @@ export class Extension extends Disposable implements IExtension {
     )
     this.dvcRoots = nestedRoots.flat().sort()
 
-    this.getStarted.sendDataToWebview()
+    this.changeGetStartedStep()
     return this.setProjectAvailability()
   }
 
@@ -446,7 +454,7 @@ export class Extension extends Disposable implements IExtension {
     this.status.setAvailability(available)
     this.setCommandsAvailability(available)
     this.cliAccessible = available
-    this.getStarted.sendDataToWebview()
+    this.changeGetStartedStep()
     return available
   }
 
@@ -525,6 +533,10 @@ export class Extension extends Disposable implements IExtension {
         }
       }
     )
+  }
+
+  private changeGetStartedStep() {
+    this.getStarted.sendDataToWebview()
   }
 }
 
