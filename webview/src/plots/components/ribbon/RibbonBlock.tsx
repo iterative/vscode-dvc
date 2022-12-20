@@ -29,25 +29,22 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
   const tooltipContent = (
     <table className={styles.columnsTable}>
       <tbody>
-        {revision.firstThreeColumns.map(({ path, value, type }) => {
-          const isFloat = typeof value === 'number' && !Number.isInteger(value)
-          return (
-            <tr key={path}>
-              <td className={cn(styles[`${type}Key`])}>
-                {truncate(path, 45, 'left')}
-              </td>
-              <td>
-                {isFloat ? formatFloat(value) : value}
-                {value === '-' || (
-                  <CopyButton
-                    value={value.toString()}
-                    className={styles.copyButton}
-                  />
-                )}
-              </td>
-            </tr>
-          )
-        })}
+        {revision.firstThreeColumns.map(({ path, value, type }) => (
+          <tr key={path}>
+            <td className={cn(styles[`${type}Key`])}>
+              {truncate(path, 45, 'left')}
+            </td>
+            <td>
+              {typeof value === 'number' ? formatFloat(value) : value}
+              {value === '-' || (
+                <CopyButton
+                  value={value.toString()}
+                  className={styles.copyButton}
+                />
+              )}
+            </td>
+          </tr>
+        ))}
       </tbody>
     </table>
   )

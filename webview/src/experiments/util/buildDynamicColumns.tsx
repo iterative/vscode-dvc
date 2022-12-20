@@ -89,9 +89,7 @@ const Cell: React.FC<Cell<Experiment, CellValue>> = cell => {
   const stringValue = String(rawValue)
 
   const displayValue =
-    typeof rawValue === 'number' && !Number.isInteger(rawValue)
-      ? formatFloat(rawValue as number)
-      : stringValue
+    typeof rawValue === 'number' ? formatFloat(rawValue as number) : stringValue
 
   return (
     <Tooltip
