@@ -3,7 +3,12 @@ import { fake } from 'sinon'
 import { GetStarted } from '../../../getStarted'
 import { buildDependencies } from '../util'
 
-export const buildGetStarted = (disposer: Disposer, dvInstalled = false) => {
+export const buildGetStarted = (
+  disposer: Disposer,
+  dvInstalled = false,
+  dvcInit = false,
+  hasData = false
+) => {
   const { messageSpy, resourceLocator } = buildDependencies(disposer)
 
   const mockInitializeProject = fake()
@@ -16,8 +21,8 @@ export const buildGetStarted = (disposer: Disposer, dvInstalled = false) => {
       mockInitializeProject,
       mockOpenExperiments,
       () => dvInstalled,
-      () => false,
-      () => false
+      () => dvcInit,
+      () => hasData
     )
   )
 
