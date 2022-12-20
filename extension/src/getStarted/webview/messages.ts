@@ -15,16 +15,13 @@ import { RegisteredCommands } from '../../commands/external'
 export class WebviewMessages {
   private readonly getWebview: () => BaseWebview<TGetStartedData> | undefined
   private readonly initializeProject: () => void
-  private readonly openExperiments: () => void
 
   constructor(
     getWebview: () => BaseWebview<TGetStartedData> | undefined,
-    initializeProject: () => void,
-    openExperiments: () => void
+    initializeProject: () => void
   ) {
     this.getWebview = getWebview
     this.initializeProject = initializeProject
-    this.openExperiments = openExperiments
   }
 
   public sendWebviewMessage(
@@ -46,10 +43,6 @@ export class WebviewMessages {
   public handleMessageFromWebview(message: MessageFromWebview) {
     if (message.type === MessageFromWebviewType.INITIALIZE_PROJECT) {
       return this.initializeProject()
-    }
-    if (message.type === MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW) {
-      this.getWebview()?.dispose()
-      return this.openExperiments()
     }
 
     if (message.type === MessageFromWebviewType.SELECT_PYTHON_INTERPRETER) {

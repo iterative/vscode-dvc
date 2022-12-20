@@ -14,6 +14,8 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
 
   private webviewMessages: WebviewMessages
   private getCliAccessible: () => boolean
+  private showExperiments: () => void
+
   private getHasRoots: () => boolean
   private getHasData: () => boolean
 
@@ -28,14 +30,12 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
   ) {
     super(dvcRoot, webviewIcon)
 
-    this.webviewMessages = this.createWebviewMessageHandler(
-      initProject,
-      showExperiments
-    )
+    this.webviewMessages = this.createWebviewMessageHandler(initProject)
 
     if (this.webview) {
       this.sendDataToWebview()
     }
+    this.showExperiments = showExperiments
     this.getCliAccessible = getCliAccessible
     this.getHasRoots = getHasRoots
     this.getHasData = getHasData
@@ -45,26 +45,37 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
     return this.sendDataToWebview()
   }
 
-  public async sendDataToWebview() {
+  public sendDataToWebview() {
+    const cliAccessible = this.getCliAccessible()
+    const projectInitialized = this.getHasRoots()
+    const hasData = this.getHasData()
+
+    if (
+      this.webview?.isVisible &&
+      cliAccessible &&
+      projectInitialized &&
+      hasData
+    ) {
+      this.getWebview()?.dispose()
+      this.showExperiments()
+      return
+    }
+
     const pythonBinPath = await findPythonBinForInstall()
 
     this.webviewMessages.sendWebviewMessage(
-      this.getCliAccessible(),
-      this.getHasRoots(),
+      cliAccessible,
+      projectInitialized,
       isPythonExtensionInstalled(),
       getPythonBinDisplayText(pythonBinPath),
-      this.getHasData()
+      hasData
     )
   }
 
-  private createWebviewMessageHandler(
-    initProject: () => void,
-    showExperiments: () => void
-  ) {
+  private createWebviewMessageHandler(initProject: () => void) {
     const webviewMessages = new WebviewMessages(
       () => this.getWebview(),
-      initProject,
-      showExperiments
+      initProject
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>

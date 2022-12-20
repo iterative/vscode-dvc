@@ -4,7 +4,12 @@ import { fake, stub } from 'sinon'
 import { GetStarted } from '../../../getStarted'
 import { buildDependencies } from '../util'
 
-export const buildGetStarted = (disposer: Disposer, dvcInstalled = false) => {
+export const buildGetStarted = (
+  disposer: Disposer,
+  dvInstalled = false,
+  dvcInit = false,
+  hasData = false
+) => {
   const { messageSpy, resourceLocator } = buildDependencies(disposer)
 
   const mockInitializeProject = fake()
@@ -18,9 +23,9 @@ export const buildGetStarted = (disposer: Disposer, dvcInstalled = false) => {
       resourceLocator.dvcIcon,
       mockInitializeProject,
       mockOpenExperiments,
-      () => dvcInstalled,
-      () => false,
-      () => false
+      () => dvInstalled,
+      () => dvcInit,
+      () => hasData
     )
   )
 

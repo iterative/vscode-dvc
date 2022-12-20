@@ -152,6 +152,14 @@ export class Extension extends Disposable implements IExtension {
       )
     )
 
+    const onDidChangeHasData = this.experiments.columnsChanged.event
+    this.dispose.track(
+      onDidChangeHasData(() => {
+        this.changeGetStartedStep()
+        setContextValue('dvc.project.hasData', this.experiments.getHasData())
+      })
+    )
+
     this.plots = this.dispose.track(
       new WorkspacePlots(this.internalCommands, context.workspaceState)
     )
@@ -339,7 +347,9 @@ export class Extension extends Disposable implements IExtension {
       const previousCliPath = this.config.getCliPath()
       const previousPythonPath = this.config.getPythonBinPath()
 
-      const completed = await setupWorkspace()
+      const completed = await setupWorkspace(() =>
+        this.config.setPythonAndNotifyIfChanged()
+      )
       sendTelemetryEvent(
         RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
         { completed },
@@ -390,7 +400,7 @@ export class Extension extends Disposable implements IExtension {
     )
     this.dvcRoots = nestedRoots.flat().sort()
 
-    this.getStarted.sendDataToWebview()
+    this.changeGetStartedStep()
     return this.setProjectAvailability()
   }
 
@@ -445,7 +455,7 @@ export class Extension extends Disposable implements IExtension {
     this.status.setAvailability(available)
     this.setCommandsAvailability(available)
     this.cliAccessible = available
-    this.getStarted.sendDataToWebview()
+    this.changeGetStartedStep()
     return available
   }
 
@@ -508,12 +518,26 @@ export class Extension extends Disposable implements IExtension {
     return createFileSystemWatcher(
       disposable => this.dispose.track(disposable),
       '**/dvc{,.exe}',
-      path => {
-        if (path && (!this.cliAccessible || !this.cliCompatible)) {
+      async path => {
+        if (!path) {
+          return
+        }
+
+        const previousPythonBinPath = this.config.getPythonBinPath()
+        await this.config.setPythonBinPath()
+
+        const trySetupWithVenv =
+          previousPythonBinPath !== this.config.getPythonBinPath()
+
+        if (!this.cliAccessible || !this.cliCompatible || trySetupWithVenv) {
           setup(this)
         }
       }
     )
+  }
+
+  private changeGetStartedStep() {
+    this.getStarted.sendDataToWebview()
   }
 }
 

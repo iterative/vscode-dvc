@@ -35,22 +35,31 @@ const getStringifiedValue = (value: Value): string => {
   return String(value)
 }
 
-export const getDataFromColumnPath = (
+const getDataFromColumnPath = (
   experiment: Experiment,
   columnPath: string
-): { fullValue: string; splitUpPath: string[]; value: string | null } => {
+): {
+  type: string
+  value: string | number
+  columnPath: string
+  splitUpPath: string[]
+  truncatedValue: string
+} => {
   const splitUpPath = splitColumnPath(columnPath)
   const collectedVal = get(experiment, splitUpPath)
   const value = collectedVal?.value || collectedVal
+  const [type] = splitUpPath
 
   return {
-    fullValue: isLongNumber(value)
-      ? value.toString()
-      : getStringifiedValue(value),
+    columnPath: columnPath.slice(type.length + 1) || columnPath,
     splitUpPath,
-    value:
-      columnPath === 'Created' && value === 'undefined'
-        ? null
-        : getStringifiedValue(value)
+    truncatedValue: getStringifiedValue(value),
+    type,
+    value: isLongNumber(value) ? value : getStringifiedValue(value)
   }
 }
+
+export const getDataFromColumnPaths = (
+  experiment: Experiment,
+  columnPaths: string[]
+) => columnPaths.map(path => getDataFromColumnPath(experiment, path))

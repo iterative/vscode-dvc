@@ -37,8 +37,7 @@ export type ComparisonPlots = {
 
 export type RevisionFirstThreeColumns = Array<{
   path: string
-  value: string
-  fullValue: string
+  value: string | number
   type: string
 }>
 

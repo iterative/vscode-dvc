@@ -129,9 +129,23 @@ const quickPickVenvOption = () => {
   })
 }
 
-const selectInterpreter = async (usesVenv: number) => {
+const manuallySelectInterpreter = async () => {
+  const interpreterSet = await enterPathOrPickFile(
+    ConfigKey.PYTHON_PATH,
+    'Python Interpreter'
+  )
+  if (!interpreterSet) {
+    return false
+  }
+  return pickVenvOptions()
+}
+
+const selectInterpreter = async (
+  usesVenv: number,
+  setConfigToUsePythonExtension: () => Promise<void>
+) => {
   if (usesVenv === 1) {
-    return enterPathOrPickFile(ConfigKey.PYTHON_PATH, 'Python Interpreter')
+    return manuallySelectInterpreter()
   }
 
   await Promise.all([
@@ -139,11 +153,15 @@ const selectInterpreter = async (usesVenv: number) => {
     setConfigPath(ConfigKey.DVC_PATH, undefined)
   ])
 
+  await setConfigToUsePythonExtension()
+
   selectPythonInterpreter()
-  return false
+  return true
 }
 
-export const setupWorkspace = async (): Promise<boolean> => {
+export const setupWorkspace = async (
+  setConfigToUsePythonExtension: () => Promise<void>
+): Promise<boolean> => {
   const usesVenv = await quickPickVenvOption()
 
   if (usesVenv === undefined) {
@@ -151,7 +169,7 @@ export const setupWorkspace = async (): Promise<boolean> => {
   }
 
   if (usesVenv) {
-    return (await selectInterpreter(usesVenv)) ? pickVenvOptions() : false
+    return selectInterpreter(usesVenv, setConfigToUsePythonExtension)
   }
 
   return pickCliPath()
