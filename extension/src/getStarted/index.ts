@@ -1,14 +1,11 @@
 import { GetStartedData as TGetStartedData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
+import { findPythonBinForInstall, getPythonBinDisplayText } from './autoInstall'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Resource } from '../resourceLocator'
 import { isPythonExtensionInstalled } from '../extensions/python'
-import {
-  findPythonBinForInstall,
-  getPythonBinDisplayText
-} from '../cli/dvc/install'
 
 export type GetStartedWebview = BaseWebview<TGetStartedData>
 

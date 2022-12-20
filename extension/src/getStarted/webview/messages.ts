@@ -1,3 +1,4 @@
+import { commands } from 'vscode'
 import { GetStartedData as TGetStartedData } from './contract'
 import { Logger } from '../../common/logger'
 import {
@@ -8,7 +9,8 @@ import { BaseWebview } from '../../webview'
 import { sendTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { selectPythonInterpreter } from '../../extensions/python'
-import { autoInstallDvc } from '../../cli/dvc/install'
+import { autoInstallDvc } from '../autoInstall'
+import { RegisteredCommands } from '../../commands/external'
 
 export class WebviewMessages {
   private readonly getWebview: () => BaseWebview<TGetStartedData> | undefined
@@ -56,6 +58,12 @@ export class WebviewMessages {
 
     if (message.type === MessageFromWebviewType.INSTALL_DVC) {
       return this.installDvc()
+    }
+
+    if (message.type === MessageFromWebviewType.SETUP_WORKSPACE) {
+      return commands.executeCommand(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE
+      )
     }
 
     Logger.error(`Unexpected message: ${JSON.stringify(message)}`)

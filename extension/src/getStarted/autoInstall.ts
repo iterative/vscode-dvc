@@ -1,10 +1,10 @@
 import { join, relative } from 'path'
-import { getPythonExecutionDetails } from '../../extensions/python'
-import { findPythonBin, getDefaultPython, installPackages } from '../../python'
-import { ConfigKey, getConfigValue } from '../../vscode/config'
-import { getFirstWorkspaceFolder } from '../../vscode/workspaceFolders'
-import { isSameOrChild } from '../../fileSystem'
-import { Toast } from '../../vscode/toast'
+import { getPythonExecutionDetails } from '../extensions/python'
+import { findPythonBin, getDefaultPython, installPackages } from '../python'
+import { ConfigKey, getConfigValue } from '../vscode/config'
+import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
+import { isSameOrChild } from '../fileSystem'
+import { Toast } from '../vscode/toast'
 
 export const findPythonBinForInstall = async (): Promise<
   string | undefined

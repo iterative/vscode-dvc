@@ -9,6 +9,13 @@ export type CliUnavailableProps = {
   pythonBinPath: string | undefined
 }
 
+const InstallButton: React.FC = () => (
+  <Button
+    onClick={() => sendMessage({ type: MessageFromWebviewType.INSTALL_DVC })}
+    text="Install"
+  />
+)
+
 const PythonExtensionUsed: React.FC<{ pythonBinPath: string }> = ({
   pythonBinPath
 }) => (
@@ -16,10 +23,7 @@ const PythonExtensionUsed: React.FC<{ pythonBinPath: string }> = ({
     <p>
       {`DVC & DVCLive can be auto-installed as packages with ${pythonBinPath}`}
     </p>
-    <Button
-      onClick={() => sendMessage({ type: MessageFromWebviewType.INSTALL_DVC })}
-      text="Install"
-    />
+    <InstallButton />
     <p>To update the interpreter and/or locate DVC</p>
     <Button
       onClick={() =>
@@ -37,12 +41,14 @@ const PythonBinFound: React.FC<{ pythonBinPath: string }> = ({
     <p>
       {`DVC & DVCLive can be auto-installed as packages with ${pythonBinPath}`}
     </p>
-    <Button
-      onClick={() => sendMessage({ type: MessageFromWebviewType.INSTALL_DVC })}
-      text="Install"
-    />
+    <InstallButton />
     <p>To update the install location or locate DVC</p>
-    <Button onClick={() => undefined} text="Setup The Workspace" />
+    <Button
+      onClick={() =>
+        sendMessage({ type: MessageFromWebviewType.SETUP_WORKSPACE })
+      }
+      text="Setup The Workspace"
+    />
   </div>
 )
 
@@ -50,7 +56,6 @@ const PythonBinNotFound: React.FC = () => (
   <div>
     <p>DVC & DVCLive cannot be auto-installed as Python was not located.</p>
     <p>To locate a Python Interpreter or DVC</p>
-    <Button onClick={() => undefined} text="Setup The Workspace" />
   </div>
 )
 
