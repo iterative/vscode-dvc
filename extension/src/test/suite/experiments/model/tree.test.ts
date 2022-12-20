@@ -410,22 +410,19 @@ suite('Experiments Tree Test Suite', () => {
           fetched: true,
           firstThreeColumns: [
             {
-              fullValue: '-',
               path: 'Created',
               type: 'Created',
               value: '-'
             },
             {
-              fullValue: '1.9293040037155151',
               path: 'summary.json:loss',
               type: ColumnType.METRICS,
-              value: '1.9293'
+              value: 1.9293040037155151
             },
             {
-              fullValue: '0.4668000042438507',
               path: 'summary.json:accuracy',
               type: ColumnType.METRICS,
-              value: '0.46680'
+              value: 0.4668000042438507
             }
           ],
           group: undefined,
@@ -437,22 +434,19 @@ suite('Experiments Tree Test Suite', () => {
           fetched: true,
           firstThreeColumns: [
             {
-              fullValue: findAndFormatCreated('exp-e7a67'),
               path: 'Created',
               type: 'Created',
               value: findAndFormatCreated('exp-e7a67')
             },
             {
-              fullValue: '2.0205044746398926',
               path: 'summary.json:loss',
               type: ColumnType.METRICS,
-              value: '2.0205'
+              value: 2.0205044746398926
             },
             {
-              fullValue: '0.3724166750907898',
               path: 'summary.json:accuracy',
               type: ColumnType.METRICS,
-              value: '0.37242'
+              value: 0.3724166750907898
             }
           ],
           group: '[exp-e7a67]',
@@ -464,22 +458,19 @@ suite('Experiments Tree Test Suite', () => {
           fetched: true,
           firstThreeColumns: [
             {
-              fullValue: findAndFormatCreated('exp-e7a67'),
               path: 'Created',
               type: 'Created',
               value: findAndFormatCreated('exp-e7a67')
             },
             {
-              fullValue: '2.0205044746398926',
               path: 'summary.json:loss',
               type: ColumnType.METRICS,
-              value: '2.0205'
+              value: 2.0205044746398926
             },
             {
-              fullValue: '0.3724166750907898',
               path: 'summary.json:accuracy',
               type: ColumnType.METRICS,
-              value: '0.37242'
+              value: 0.3724166750907898
             }
           ],
           group: '[exp-e7a67]',
@@ -491,22 +482,19 @@ suite('Experiments Tree Test Suite', () => {
           fetched: true,
           firstThreeColumns: [
             {
-              fullValue: findAndFormatCreated('test-branch'),
               path: 'Created',
               type: 'Created',
               value: findAndFormatCreated('test-branch')
             },
             {
-              fullValue: '1.9293040037155151',
               path: 'summary.json:loss',
               type: ColumnType.METRICS,
-              value: '1.9293'
+              value: 1.9293040037155151
             },
             {
-              fullValue: '0.4668000042438507',
               path: 'summary.json:accuracy',
               type: ColumnType.METRICS,
-              value: '0.46680'
+              value: 0.4668000042438507
             }
           ],
           group: '[test-branch]',
@@ -518,22 +506,19 @@ suite('Experiments Tree Test Suite', () => {
           fetched: true,
           firstThreeColumns: [
             {
-              fullValue: findAndFormatCreated('exp-e7a67'),
               path: 'Created',
               type: 'Created',
               value: findAndFormatCreated('exp-e7a67')
             },
             {
-              fullValue: '2.020392894744873',
               path: 'summary.json:loss',
               type: ColumnType.METRICS,
-              value: '2.0204'
+              value: 2.020392894744873
             },
             {
-              fullValue: '0.3723166584968567',
               path: 'summary.json:accuracy',
               type: ColumnType.METRICS,
-              value: '0.37232'
+              value: 0.3723166584968567
             }
           ],
           group: '[exp-e7a67]',
@@ -545,22 +530,19 @@ suite('Experiments Tree Test Suite', () => {
           fetched: true,
           firstThreeColumns: [
             {
-              fullValue: findAndFormatCreated('test-branch'),
               path: 'Created',
               type: 'Created',
               value: findAndFormatCreated('test-branch')
             },
             {
-              fullValue: '1.9293040037155151',
               path: 'summary.json:loss',
               type: ColumnType.METRICS,
-              value: '1.9293'
+              value: 1.9293040037155151
             },
             {
-              fullValue: '0.4668000042438507',
               path: 'summary.json:accuracy',
               type: ColumnType.METRICS,
-              value: '0.46680'
+              value: 0.4668000042438507
             }
           ],
           group: '[test-branch]',
@@ -572,22 +554,19 @@ suite('Experiments Tree Test Suite', () => {
           fetched: true,
           firstThreeColumns: [
             {
-              fullValue: findAndFormatCreated('test-branch'),
               path: 'Created',
               type: 'Created',
               value: findAndFormatCreated('test-branch')
             },
             {
-              fullValue: '1.9882521629333496',
               path: 'summary.json:loss',
               type: ColumnType.METRICS,
-              value: '1.9883'
+              value: 1.9882521629333496
             },
             {
-              fullValue: '0.4083833396434784',
               path: 'summary.json:accuracy',
               type: ColumnType.METRICS,
-              value: '0.40838'
+              value: 0.4083833396434784
             }
           ],
           group: '[test-branch]',
