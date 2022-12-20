@@ -8,10 +8,8 @@ type Value = undefined | null | [] | string | number
 const isDate = (value: Value): boolean =>
   !!(typeof value === 'string' && Date.parse(value))
 
-const isLongFloatNumber = (value: Value): boolean =>
-  typeof value === 'number' &&
-  !Number.isInteger(value as number) &&
-  value.toString().length > 7
+const isLongNumber = (value: Value): boolean =>
+  typeof value === 'number' && value.toString().length > 7
 
 const getStringifiedValue = (value: Value): string => {
   if (Number.isNaN(value)) {
@@ -30,7 +28,7 @@ const getStringifiedValue = (value: Value): string => {
     return '-'
   }
 
-  if (isLongFloatNumber(value)) {
+  if (isLongNumber(value)) {
     return (value as number).toPrecision(5)
   }
 
@@ -57,7 +55,7 @@ const getDataFromColumnPath = (
     splitUpPath,
     truncatedValue: getStringifiedValue(value),
     type,
-    value: isLongFloatNumber(value) ? value : getStringifiedValue(value)
+    value: isLongNumber(value) ? value : getStringifiedValue(value)
   }
 }
 
