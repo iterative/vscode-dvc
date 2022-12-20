@@ -79,6 +79,8 @@ const mockedSetRoots = jest.fn()
 const mockedSetupWorkspace = jest.fn()
 const mockedUnsetPythonBinPath = jest.fn()
 
+const mockedSetConfigToUsePythonExtension = jest.fn()
+
 const mockedQuickPickYesOrNo = jest.mocked(quickPickYesOrNo)
 const mockedQuickPickValue = jest.mocked(quickPickValue)
 const mockedSetConfigValue = jest.mocked(setConfigValue)
@@ -105,7 +107,7 @@ describe('setupWorkspace', () => {
   it('should present two options if the python extension is installed (Auto & Global)', async () => {
     mockedQuickPickValue.mockResolvedValueOnce(undefined)
 
-    await setupWorkspace()
+    await setupWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedQuickPickValue).toHaveBeenCalledWith(
@@ -123,7 +125,7 @@ describe('setupWorkspace', () => {
   it('should present two options if the python extension is NOT installed (Manual & Global)', async () => {
     mockedExtensions.all = []
 
-    await setupWorkspace()
+    await setupWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedQuickPickValue).toHaveBeenCalledWith(
@@ -141,9 +143,10 @@ describe('setupWorkspace', () => {
   it('should set the dvc path and python path options to undefined if the CLI is being auto detected inside a virtual environment', async () => {
     mockedQuickPickValue.mockResolvedValueOnce(2)
 
-    await setupWorkspace()
+    await setupWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
+    expect(mockedSetConfigToUsePythonExtension).toHaveBeenCalledTimes(1)
     expect(mockedSetConfigValue).toHaveBeenCalledWith(
       ConfigKey.DVC_PATH,
       undefined
@@ -158,7 +161,7 @@ describe('setupWorkspace', () => {
     mockedQuickPickValue.mockResolvedValueOnce(1)
     mockedQuickPickOneOrInput.mockResolvedValueOnce(undefined)
 
-    await setupWorkspace()
+    await setupWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedQuickPickOneOrInput).toHaveBeenCalledTimes(1)
@@ -173,8 +176,9 @@ describe('setupWorkspace', () => {
     mockedQuickPickOneOrInput.mockResolvedValueOnce('pick')
     mockedPickFile.mockResolvedValueOnce(mockedPythonPath)
 
-    await setupWorkspace()
+    await setupWorkspace(mockedSetConfigToUsePythonExtension)
 
+    expect(mockedSetConfigToUsePythonExtension).not.toHaveBeenCalled()
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedQuickPickYesOrNo).toHaveBeenCalledTimes(2)
     expect(mockedQuickPickOneOrInput).toHaveBeenCalledTimes(1)
@@ -190,7 +194,7 @@ describe('setupWorkspace', () => {
   it('should return without setting any options if the dialog is cancelled at the virtual environment step', async () => {
     mockedQuickPickValue.mockResolvedValueOnce(undefined)
 
-    await setupWorkspace()
+    await setupWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedSetConfigValue).not.toHaveBeenCalled()
@@ -208,7 +212,7 @@ describe('setupWorkspace', () => {
       .mockResolvedValueOnce(mockedPythonPath)
       .mockResolvedValueOnce(mockedDvcPath)
 
-    await setupWorkspace()
+    await setupWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedQuickPickYesOrNo).toHaveBeenCalledTimes(2)
@@ -229,7 +233,7 @@ describe('setupWorkspace', () => {
     mockedQuickPickValue.mockResolvedValueOnce(1)
     mockedQuickPickOneOrInput.mockResolvedValueOnce(undefined)
 
-    await setupWorkspace()
+    await setupWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedQuickPickYesOrNo).not.toHaveBeenCalled()
@@ -247,7 +251,7 @@ describe('setupWorkspace', () => {
     mockedQuickPickOneOrInput.mockResolvedValueOnce('pick')
     mockedPickFile.mockResolvedValueOnce(mockedDvcPath)
 
-    await setupWorkspace()
+    await setupWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedQuickPickYesOrNo).toHaveBeenCalledTimes(2)
