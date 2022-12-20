@@ -15,13 +15,10 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
   public readonly viewKey = ViewKey.GET_STARTED
 
   private webviewMessages: WebviewMessages
-  private initProject: () => void
-  private showExperiments: () => void
   private getCliAccessible: () => boolean
   private getHasRoots: () => boolean
   private getIsPythonExtensionUsed: () => boolean
   private getPythonBinPath: () => string | undefined
-  private installDvc: () => void
   private getHasData: () => boolean
 
   constructor(
@@ -38,19 +35,20 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
   ) {
     super(dvcRoot, webviewIcon)
 
-    this.webviewMessages = this.createWebviewMessageHandler()
+    this.webviewMessages = this.createWebviewMessageHandler(
+      initProject,
+      showExperiments,
+      installDvc
+    )
 
     if (this.webview) {
       this.sendDataToWebview()
     }
     this.getCliAccessible = getCliAccessible
     this.getHasRoots = getHasRoots
-    this.initProject = initProject
-    this.showExperiments = showExperiments
     this.getHasData = getHasData
     this.getIsPythonExtensionUsed = getIsPythonExtensionUsed
     this.getPythonBinPath = getPythonBinPath
-    this.installDvc = installDvc
   }
 
   public sendInitialWebviewData() {
@@ -69,12 +67,16 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
     )
   }
 
-  private createWebviewMessageHandler() {
+  private createWebviewMessageHandler(
+    initProject: () => void,
+    showExperiments: () => void,
+    installDvc: () => void
+  ) {
     const webviewMessages = new WebviewMessages(
       () => this.getWebview(),
-      () => this.initProject(),
-      () => this.showExperiments(),
-      () => this.installDvc()
+      initProject,
+      showExperiments,
+      installDvc
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>
