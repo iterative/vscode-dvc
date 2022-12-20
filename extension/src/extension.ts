@@ -339,7 +339,7 @@ export class Extension extends Disposable implements IExtension {
       const previousPythonPath = this.config.getPythonBinPath()
 
       const completed = await setupWorkspace(() =>
-        this.config.setPythonBinPath()
+        this.config.setPythonAndNotifyIfChanged()
       )
       sendTelemetryEvent(
         RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
