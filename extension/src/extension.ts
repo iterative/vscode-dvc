@@ -62,8 +62,6 @@ import { createFileSystemWatcher } from './fileSystem/watcher'
 import { GitExecutor } from './cli/git/executor'
 import { GitReader } from './cli/git/reader'
 import { GetStarted } from './getStarted'
-import { Toast } from './vscode/toast'
-import { findPythonBin, installPackages } from './python'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
@@ -166,10 +164,7 @@ export class Extension extends Disposable implements IExtension {
         () => this.showExperiments(this.dvcRoots[0]),
         () => this.getAvailable(),
         () => this.hasRoots(),
-        () => this.experiments.getHasData(),
-        () => this.config.isPythonExtensionUsed(),
-        () => this.config.getPythonBinPath(),
-        () => this.installDvc()
+        () => this.experiments.getHasData()
       )
     )
 
@@ -463,43 +458,6 @@ export class Extension extends Disposable implements IExtension {
     if (root) {
       await this.dvcExecutor.init(root)
       this.workspaceChanged.fire()
-    }
-  }
-
-  public async installDvc() {
-    const root = getFirstWorkspaceFolder()
-    if (root) {
-      const pythonBinPath =
-        this.config.getPythonBinPath() || (await findPythonBin())
-
-      if (!pythonBinPath) {
-        return Toast.showError(
-          'DVC could not be auto-installed because a Python interpreter could not be located'
-        )
-      }
-      return Toast.showProgress('Installing packages', async progress => {
-        progress.report({ increment: 0 })
-
-        await Toast.runCommandAndIncrementProgress(
-          async () => {
-            await installPackages(root, pythonBinPath, 'dvclive')
-            return 'DVCLive Installed'
-          },
-          progress,
-          25
-        )
-
-        await Toast.runCommandAndIncrementProgress(
-          async () => {
-            await installPackages(root, pythonBinPath, 'dvc')
-            return 'DVC Installed'
-          },
-          progress,
-          75
-        )
-
-        return Toast.delayProgressClosing()
-      })
     }
   }
 

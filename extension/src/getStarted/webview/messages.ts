@@ -8,23 +8,21 @@ import { BaseWebview } from '../../webview'
 import { sendTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { selectPythonInterpreter } from '../../extensions/python'
+import { autoInstallDvc } from '../../cli/dvc/install'
 
 export class WebviewMessages {
   private readonly getWebview: () => BaseWebview<TGetStartedData> | undefined
   private readonly initializeProject: () => void
   private readonly openExperiments: () => void
-  private readonly installDvc: () => void
 
   constructor(
     getWebview: () => BaseWebview<TGetStartedData> | undefined,
     initializeProject: () => void,
-    openExperiments: () => void,
-    installDvc: () => void
+    openExperiments: () => void
   ) {
     this.getWebview = getWebview
     this.initializeProject = initializeProject
     this.openExperiments = openExperiments
-    this.installDvc = installDvc
   }
 
   public sendWebviewMessage(
@@ -57,7 +55,7 @@ export class WebviewMessages {
     }
 
     if (message.type === MessageFromWebviewType.INSTALL_DVC) {
-      return this.installDvcAsPackage()
+      return this.installDvc()
     }
 
     Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
@@ -72,13 +70,13 @@ export class WebviewMessages {
     return selectPythonInterpreter()
   }
 
-  private installDvcAsPackage() {
+  private installDvc() {
     sendTelemetryEvent(
       EventName.VIEWS_GET_STARTED_INSTALL_DVC,
       undefined,
       undefined
     )
 
-    return this.installDvc()
+    return autoInstallDvc()
   }
 }

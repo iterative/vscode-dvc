@@ -20,9 +20,6 @@ export const buildGetStarted = (disposer: Disposer, dvcInstalled = false) => {
       mockOpenExperiments,
       () => dvcInstalled,
       () => false,
-      () => false,
-      () => false,
-      () => undefined,
       () => false
     )
   )

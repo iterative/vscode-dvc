@@ -1,13 +1,14 @@
-import { relative } from 'path'
 import { GetStartedData as TGetStartedData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Resource } from '../resourceLocator'
-import { isSameOrChild } from '../fileSystem'
-import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
-import { findPythonBin } from '../python'
+import { isPythonExtensionInstalled } from '../extensions/python'
+import {
+  findPythonBinForInstall,
+  getPythonBinDisplayText
+} from '../cli/dvc/install'
 
 export type GetStartedWebview = BaseWebview<TGetStartedData>
 
@@ -17,8 +18,6 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
   private webviewMessages: WebviewMessages
   private getCliAccessible: () => boolean
   private getHasRoots: () => boolean
-  private getIsPythonExtensionUsed: () => boolean
-  private getPythonBinPath: () => string | undefined
   private getHasData: () => boolean
 
   constructor(
@@ -28,17 +27,13 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
     showExperiments: () => void,
     getCliAccessible: () => boolean,
     getHasRoots: () => boolean,
-    getHasData: () => boolean,
-    getIsPythonExtensionUsed: () => boolean,
-    getPythonBinPath: () => string | undefined,
-    installDvc: () => void
+    getHasData: () => boolean
   ) {
     super(dvcRoot, webviewIcon)
 
     this.webviewMessages = this.createWebviewMessageHandler(
       initProject,
-      showExperiments,
-      installDvc
+      showExperiments
     )
 
     if (this.webview) {
@@ -47,8 +42,6 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
     this.getCliAccessible = getCliAccessible
     this.getHasRoots = getHasRoots
     this.getHasData = getHasData
-    this.getIsPythonExtensionUsed = getIsPythonExtensionUsed
-    this.getPythonBinPath = getPythonBinPath
   }
 
   public sendInitialWebviewData() {
@@ -56,27 +49,25 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
   }
 
   public async sendDataToWebview() {
-    const pythonBinPath = await this.getPythonBinPathWithDefault()
+    const pythonBinPath = await findPythonBinForInstall()
 
     this.webviewMessages.sendWebviewMessage(
       this.getCliAccessible(),
       this.getHasRoots(),
-      this.getIsPythonExtensionUsed(),
-      pythonBinPath,
+      isPythonExtensionInstalled(),
+      getPythonBinDisplayText(pythonBinPath),
       this.getHasData()
     )
   }
 
   private createWebviewMessageHandler(
     initProject: () => void,
-    showExperiments: () => void,
-    installDvc: () => void
+    showExperiments: () => void
   ) {
     const webviewMessages = new WebviewMessages(
       () => this.getWebview(),
       initProject,
-      showExperiments,
-      installDvc
+      showExperiments
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>
@@ -84,22 +75,5 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
       )
     )
     return webviewMessages
-  }
-
-  private async getPythonBinPathWithDefault() {
-    const pythonPath = this.getPythonBinPath()
-
-    if (!pythonPath) {
-      return await findPythonBin()
-    }
-
-    const firstWorkspaceFolder = getFirstWorkspaceFolder()
-    if (!firstWorkspaceFolder) {
-      return pythonPath
-    }
-
-    return isSameOrChild(firstWorkspaceFolder, pythonPath)
-      ? relative(firstWorkspaceFolder, pythonPath)
-      : pythonPath
   }
 }

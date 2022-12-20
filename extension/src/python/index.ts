@@ -3,39 +3,28 @@ import { getVenvBinPath } from './path'
 import { getProcessPlatform } from '../env'
 import { exists } from '../fileSystem'
 import { Logger } from '../common/logger'
-import {
-  createProcess,
-  executeProcess,
-  Process,
-  ProcessOptions
-} from '../processExecution'
+import { createProcess, executeProcess, Process } from '../processExecution'
 
 const sendOutput = (process: Process) =>
   process.all?.on('data', chunk =>
     Logger.log(chunk.toString().replace(/(\r?\n)/g, ''))
   )
 
-export const createProcessWithOutput = (options: ProcessOptions) => {
-  const process = createProcess(options)
-
-  sendOutput(process)
-
-  return process
-}
-
 export const installPackages = (
   cwd: string,
   pythonBin: string,
   ...args: string[]
 ): Process => {
-  return createProcessWithOutput({
+  const options = {
     args: ['-m', 'pip', 'install', '--upgrade', ...args],
     cwd,
     executable: pythonBin
-  })
+  }
+
+  return createProcess(options)
 }
 
-const getDefaultBin = () =>
+export const getDefaultPython = (): string =>
   getProcessPlatform() === 'win32' ? 'python' : 'python3'
 
 export const setupVenv = async (
@@ -44,22 +33,32 @@ export const setupVenv = async (
   ...installArgs: string[]
 ) => {
   if (!exists(join(cwd, envDir))) {
-    await createProcessWithOutput({
+    const initVenv = createProcess({
       args: ['-m', 'venv', envDir],
       cwd,
-      executable: getDefaultBin()
+      executable: getDefaultPython()
     })
+    sendOutput(initVenv)
+    await initVenv
   }
 
   const venvPython = getVenvBinPath(cwd, envDir, 'python')
 
-  await installPackages(cwd, venvPython, 'pip', 'wheel')
+  const venvUpgrade = installPackages(cwd, venvPython, 'pip', 'wheel')
+  sendOutput(venvUpgrade)
+  await venvUpgrade
 
-  return installPackages(cwd, venvPython, ...installArgs)
+  const installRequestedPackages = installPackages(
+    cwd,
+    venvPython,
+    ...installArgs
+  )
+  sendOutput(installRequestedPackages)
+  return installRequestedPackages
 }
 
 export const findPythonBin = async (
-  pythonBin = getDefaultBin()
+  pythonBin: string
 ): Promise<string | undefined> => {
   try {
     return await executeProcess({
