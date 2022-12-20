@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.30] - 2022-12-20
+
+### 🐛 Bug Fixes
+
+- Left align code block text on the no data setup screen [#2977](https://github.com/iterative/vscode-dvc/pull/2977) by [@mattseddon](https://github.com/mattseddon)
+- Enable user to move from Global to Auto without reloading the window [#2974](https://github.com/iterative/vscode-dvc/pull/2974) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Refactor `getDataFromColumnPath` logic  [#2971](https://github.com/iterative/vscode-dvc/pull/2971) by [@julieg18](https://github.com/julieg18)
+
 ## [0.5.29] - 2022-12-20
 
 ### 🚀 New Features and Enhancements

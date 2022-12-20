@@ -152,9 +152,9 @@ export class Extension extends Disposable implements IExtension {
       )
     )
 
-    const onHasData = this.experiments.columnsChanged.event
+    const onDidChangeHasData = this.experiments.columnsChanged.event
     this.dispose.track(
-      onHasData(() => {
+      onDidChangeHasData(() => {
         this.changeSetupStep()
         setContextValue('dvc.project.hasData', this.experiments.getHasData())
       })
