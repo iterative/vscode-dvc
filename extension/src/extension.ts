@@ -136,13 +136,14 @@ export class Extension extends Disposable implements IExtension {
     )
 
     this.status = this.dispose.track(
-      new Status([
+      new Status(
+        this.config,
         this.dvcExecutor,
         this.dvcReader,
         this.dvcRunner,
         this.gitExecutor,
         this.gitReader
-      ])
+      )
     )
 
     this.experiments = this.dispose.track(
@@ -165,6 +166,7 @@ export class Extension extends Disposable implements IExtension {
         () => this.showExperiments(this.dvcRoots[0]),
         () => this.getAvailable(),
         () => this.hasRoots(),
+        () => this.experiments.getHasData(),
         () => this.config.isPythonExtensionUsed(),
         () => this.config.getPythonBinPath(),
         () => this.installDvc()

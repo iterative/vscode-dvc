@@ -22,6 +22,7 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
   private getIsPythonExtensionUsed: () => boolean
   private getPythonBinPath: () => string | undefined
   private installDvc: () => void
+  private getHasData: () => boolean
 
   constructor(
     dvcRoot: string,
@@ -30,6 +31,7 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
     showExperiments: () => void,
     getCliAccessible: () => boolean,
     getHasRoots: () => boolean,
+    getHasData: () => boolean,
     getIsPythonExtensionUsed: () => boolean,
     getPythonBinPath: () => string | undefined,
     installDvc: () => void
@@ -45,6 +47,7 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
     this.getHasRoots = getHasRoots
     this.initProject = initProject
     this.showExperiments = showExperiments
+    this.getHasData = getHasData
     this.getIsPythonExtensionUsed = getIsPythonExtensionUsed
     this.getPythonBinPath = getPythonBinPath
     this.installDvc = installDvc
@@ -61,7 +64,8 @@ export class GetStarted extends BaseRepository<TGetStartedData> {
       this.getCliAccessible(),
       this.getHasRoots(),
       this.getIsPythonExtensionUsed(),
-      pythonBinPath
+      pythonBinPath,
+      this.getHasData()
     )
   }
 

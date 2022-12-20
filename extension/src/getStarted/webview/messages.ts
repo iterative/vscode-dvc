@@ -31,10 +31,12 @@ export class WebviewMessages {
     cliAccessible: boolean,
     projectInitialized: boolean,
     isPythonExtensionUsed: boolean,
-    pythonBinPath: string | undefined
+    pythonBinPath: string | undefined,
+    hasData: boolean
   ) {
     this.getWebview()?.show({
       cliAccessible,
+      hasData,
       isPythonExtensionUsed,
       projectInitialized,
       pythonBinPath
@@ -46,6 +48,7 @@ export class WebviewMessages {
       return this.initializeProject()
     }
     if (message.type === MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW) {
+      this.getWebview()?.dispose()
       return this.openExperiments()
     }
 
