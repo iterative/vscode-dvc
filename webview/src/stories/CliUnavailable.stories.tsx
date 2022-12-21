@@ -13,7 +13,7 @@ export default {
     data: {}
   },
   component: CliUnavailable,
-  title: 'Cli Unavailable'
+  title: 'Setup'
 } as Meta
 
 const Template: Story<CliUnavailableProps> = ({
@@ -31,20 +31,20 @@ const Template: Story<CliUnavailableProps> = ({
   )
 }
 
-export const PythonNotFound = Template.bind({})
-PythonNotFound.args = {
+export const NoCLIPythonNotFound = Template.bind({})
+NoCLIPythonNotFound.args = {
   isPythonExtensionInstalled: false,
   pythonBinPath: undefined
 }
 
-export const PythonExtensionUsed = Template.bind({})
-PythonExtensionUsed.args = {
+export const NoCLIPythonExtensionUsed = Template.bind({})
+NoCLIPythonExtensionUsed.args = {
   isPythonExtensionInstalled: true,
   pythonBinPath: '/opt/homebrew/Caskroom/miniforge/base/bin/python'
 }
 
-export const PythonExtensionNotUsed = Template.bind({})
-PythonExtensionNotUsed.args = {
+export const NoCLIPythonExtensionNotUsed = Template.bind({})
+NoCLIPythonExtensionNotUsed.args = {
   isPythonExtensionInstalled: false,
   pythonBinPath: '.env/bin/python'
 }
