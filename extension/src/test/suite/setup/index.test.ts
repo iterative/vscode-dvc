@@ -8,6 +8,7 @@ import { MessageFromWebviewType } from '../../../webview/contract'
 import { Disposable } from '../../../extension'
 import { Logger } from '../../../common/logger'
 import { BaseWebview } from '../../../webview'
+import { RegisteredCommands } from '../../../commands/external'
 
 suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
@@ -23,7 +24,7 @@ suite('Setup Test Suite', () => {
   })
 
   describe('Setup', () => {
-    it('should handle a initialize project message from the webview', async () => {
+    it('should handle an initialize project message from the webview', async () => {
       const { messageSpy, setup, mockInitializeProject } = buildSetup(
         disposable,
         true
@@ -42,7 +43,58 @@ suite('Setup Test Suite', () => {
       expect(mockInitializeProject).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should log an error message if the message from the webview is anything else than initialize project', async () => {
+    it('should handle an auto install dvc message from the webview', async () => {
+      const { messageSpy, setup, mockAutoInstallDvc } = buildSetup(disposable)
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.INSTALL_DVC
+      })
+
+      expect(mockAutoInstallDvc).to.be.calledOnce
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a select python interpreter message from the webview', async () => {
+      const { messageSpy, setup, mockExecuteCommand } = buildSetup(disposable)
+      const setInterpreterCommand = 'python.setInterpreter'
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SELECT_PYTHON_INTERPRETER
+      })
+
+      expect(mockExecuteCommand).to.be.calledWithExactly(setInterpreterCommand)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a setup the workspace message from the webview', async () => {
+      const { messageSpy, setup, mockExecuteCommand } = buildSetup(disposable)
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SETUP_WORKSPACE
+      })
+
+      expect(mockExecuteCommand).to.be.calledWithExactly(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should log an error message if the message from the webview is unexpected', async () => {
       const { messageSpy, setup } = buildSetup(disposable)
 
       const webview = await setup.showWebview()

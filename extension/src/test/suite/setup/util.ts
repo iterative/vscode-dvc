@@ -3,6 +3,7 @@ import { Disposer } from '@hediet/std/disposable'
 import { fake, stub } from 'sinon'
 import { Setup } from '../../../setup/index'
 import { buildDependencies } from '../util'
+import * as AutoInstall from '../../../setup/autoInstall'
 
 export const buildSetup = (
   disposer: Disposer,
@@ -16,6 +17,8 @@ export const buildSetup = (
   const mockOpenExperiments = fake()
 
   const mockExecuteCommand = stub(commands, 'executeCommand')
+
+  const mockAutoInstallDvc = stub(AutoInstall, 'autoInstallDvc')
 
   const setup = disposer.track(
     new Setup(
@@ -31,6 +34,7 @@ export const buildSetup = (
 
   return {
     messageSpy,
+    mockAutoInstallDvc,
     mockExecuteCommand,
     mockInitializeProject,
     mockOpenExperiments,

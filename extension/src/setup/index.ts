@@ -13,9 +13,8 @@ export class Setup extends BaseRepository<TSetupData> {
   public readonly viewKey = ViewKey.SETUP
 
   private webviewMessages: WebviewMessages
-  private getCliAccessible: () => boolean
   private showExperiments: () => void
-
+  private getCliAccessible: () => boolean
   private getHasRoots: () => boolean
   private getHasData: () => boolean | undefined
 
