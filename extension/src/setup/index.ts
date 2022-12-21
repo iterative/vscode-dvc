@@ -1,14 +1,14 @@
-import { GetStartedData as TGetStartedData } from './webview/contract'
+import { SetupData as TSetupData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Resource } from '../resourceLocator'
 
-export type GetStartedWebview = BaseWebview<TGetStartedData>
+export type SetupWebviewWebview = BaseWebview<TSetupData>
 
-export class GetStarted extends BaseRepository<TGetStartedData> {
-  public readonly viewKey = ViewKey.GET_STARTED
+export class Setup extends BaseRepository<TSetupData> {
+  public readonly viewKey = ViewKey.SETUP
 
   private webviewMessages: WebviewMessages
   private initProject: () => void

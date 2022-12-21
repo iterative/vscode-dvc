@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore, spy } from 'sinon'
-import { buildGetStarted } from './util'
+import { buildSetup } from './util'
 import { closeAllEditors, getMessageReceivedEmitter } from '../util'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { MessageFromWebviewType } from '../../../webview/contract'
@@ -9,7 +9,7 @@ import { Disposable } from '../../../extension'
 import { Logger } from '../../../common/logger'
 import { BaseWebview } from '../../../webview'
 
-suite('GetStarted Test Suite', () => {
+suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
 
   beforeEach(() => {
@@ -22,14 +22,14 @@ suite('GetStarted Test Suite', () => {
     return closeAllEditors()
   })
 
-  describe('Get Started', () => {
+  describe('Setup', () => {
     it('should handle a initialize project message from the webview', async () => {
-      const { messageSpy, getStarted, mockInitializeProject } = buildGetStarted(
+      const { messageSpy, setup, mockInitializeProject } = buildSetup(
         disposable,
         true
       )
 
-      const webview = await getStarted.showWebview()
+      const webview = await setup.showWebview()
       await webview.isReady()
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -43,9 +43,9 @@ suite('GetStarted Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should log an error message if the message from the webview is anything else than initialize project', async () => {
-      const { messageSpy, getStarted } = buildGetStarted(disposable)
+      const { messageSpy, setup } = buildSetup(disposable)
 
-      const webview = await getStarted.showWebview()
+      const webview = await setup.showWebview()
       await webview.isReady()
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -63,7 +63,7 @@ suite('GetStarted Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should close the webview and open the experiments when the setup is done', async () => {
-      const { getStarted, mockOpenExperiments } = buildGetStarted(
+      const { setup, mockOpenExperiments } = buildSetup(
         disposable,
         true,
         true,
@@ -72,7 +72,7 @@ suite('GetStarted Test Suite', () => {
 
       const closeWebviewSpy = spy(BaseWebview.prototype, 'dispose')
 
-      const webview = await getStarted.showWebview()
+      const webview = await setup.showWebview()
       await webview.isReady()
 
       expect(closeWebviewSpy).to.be.calledOnce

@@ -1355,7 +1355,7 @@
       },
       {
         "view": "dvc.views.webviews",
-        "contents": "[Show Experiments](command:dvc.showGetStartedWebview)\n[Show Plots](command:dvc.showGetStartedWebview)\n[Show Experiments and Plots](command:dvc.showGetStartedWebview)",
+        "contents": "[Show Experiments](command:dvc.showSetupWebview)\n[Show Plots](command:dvc.showSetupdWebview)\n[Show Experiments and Plots](command:dvc.showSetupWebview)",
         "when": "!dvc.commands.available || !dvc.project.available || !dvc.project.hasData"
       },
       {
@@ -1577,7 +1577,7 @@
     "vscode-languageclient": "8.0.2"
   },
   "devDependencies": {
-    "@swc/core": "1.3.22",
+    "@swc/core": "1.3.23",
     "@swc/jest": "0.2.24",
     "@types/chai": "4.3.4",
     "@types/chai-as-promised": "7.1.5",
