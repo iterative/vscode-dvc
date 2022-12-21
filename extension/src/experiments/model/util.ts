@@ -1,5 +1,6 @@
 import get from 'lodash.get'
 import { formatDate } from '../../util/date'
+import { formatNumber } from '../../util/number'
 import { splitColumnPath } from '../columns/paths'
 import { Experiment } from '../webview/contract'
 
@@ -7,16 +8,6 @@ type Value = undefined | null | [] | string | number
 
 const isDate = (value: Value): boolean =>
   !!(typeof value === 'string' && Date.parse(value))
-
-export const formatNumber = (value: number): string => {
-  const defaultPrecision = 5 // for when we can't calculate real precision yet
-  const maxLength = Number.isInteger(value) ? 10 : 7
-  const automatic = value.toString()
-  if (automatic.length > maxLength) {
-    return value.toPrecision(defaultPrecision)
-  }
-  return automatic
-}
 
 const getStringifiedValue = (value: Value): string => {
   if (Number.isNaN(value)) {

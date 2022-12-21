@@ -52,7 +52,8 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     isContextMenu = false,
     animation = false,
     followCursor: followCursorVal,
-    offset
+    offset,
+    maxWidth = 350
   },
   ref
 ) => (
@@ -84,6 +85,7 @@ const TooltipRenderFunction: React.ForwardRefRenderFunction<
     followCursor={followCursorVal}
     plugins={[hideOnEsc, followCursor]}
     offset={offset}
+    maxWidth={maxWidth}
   >
     {children}
   </Tippy>

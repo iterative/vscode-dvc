@@ -14,6 +14,7 @@ import {
   ValueWithChanges
 } from 'dvc/src/experiments/webview/contract'
 import { Value } from 'dvc/src/cli/dvc/contract'
+import { formatNumber } from 'dvc/src/util/number'
 import Tooltip, {
   NORMAL_TOOLTIP_DELAY
 } from '../../shared/components/tooltip/Tooltip'
@@ -21,7 +22,6 @@ import styles from '../components/table/styles.module.scss'
 import { CopyButton } from '../../shared/components/copyButton/CopyButton'
 import { OverflowHoverTooltip } from '../components/overflowHoverTooltip/OverflowHoverTooltip'
 import { ErrorTooltip } from '../components/table/Errors'
-import { formatNumber } from '../../util/number'
 
 export type CellValue = Value | ValueWithChanges
 

@@ -3,12 +3,12 @@ import React from 'react'
 import cn from 'classnames'
 import { VSCodeProgressRing } from '@vscode/webview-ui-toolkit/react'
 import { truncate } from 'vega'
+import { formatNumber } from 'dvc/src/util/number'
 import styles from './styles.module.scss'
 import { Icon } from '../../../shared/components/Icon'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
 import { CopyButton } from '../../../shared/components/copyButton/CopyButton'
 import { Close } from '../../../shared/components/icons'
-import { formatNumber } from '../../../util/number'
 
 interface RibbonBlockProps {
   revision: Revision
@@ -80,7 +80,12 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
   return revision.firstThreeColumns.length === 0 ? (
     mainContent
   ) : (
-    <Tooltip placement="bottom-start" content={tooltipContent} interactive>
+    <Tooltip
+      placement="bottom-start"
+      content={tooltipContent}
+      maxWidth="none"
+      interactive
+    >
       {mainContent}
     </Tooltip>
   )
