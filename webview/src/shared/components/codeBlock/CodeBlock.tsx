@@ -9,13 +9,45 @@ export interface CodeBlockProps {
   inline?: boolean
 }
 
+const editorBackground = 'var(--vscode-textCodeBlock-background)'
+const editorForeground = 'var(--vscode-editor-foreground)'
+const tokenHighlight = 'var(--vscode-editorInfo-foreground)'
+
+const approximateTheme = {
+  plain: {
+    backgroundColor: editorBackground,
+    color: editorForeground
+  },
+  styles: [
+    {
+      style: {
+        color: tokenHighlight
+      },
+      types: [
+        'char',
+        'function',
+        'keyword',
+        'operator',
+        'punctuation',
+        'string',
+        'variable'
+      ]
+    }
+  ]
+}
+
 export const CodeBlock: React.FC<CodeBlockProps> = ({
   language,
   children,
   inline
 }) => {
   return (
-    <Highlight {...defaultProps} code={children} language={language}>
+    <Highlight
+      {...defaultProps}
+      code={children}
+      language={language}
+      theme={approximateTheme}
+    >
       {({ className, style, tokens, getLineProps, getTokenProps }) => (
         <pre
           className={cx(className, styles.codeBlock, {
