@@ -61,7 +61,7 @@ export const CliUnavailable: React.FC<CliUnavailableProps> = ({
         <div>
           {Title}
           <p>
-            DVC & DVCLive cannot be auto-installed as Python was not located.
+            DVC & DVCLive cannot be auto-installed as Python was not located
           </p>
           <SetupWorkspace description="To locate a Python Interpreter or DVC" />
         </div>
