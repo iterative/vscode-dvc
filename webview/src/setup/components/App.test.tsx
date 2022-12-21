@@ -54,7 +54,7 @@ describe('App', () => {
     expect(screen.getByText('DVC is currently unavailable')).toBeInTheDocument()
   })
 
-  it('should tell the user cannot auto-install DVC without a Python interpreter', () => {
+  it('should tell the user they cannot install DVC without a Python interpreter', () => {
     render(<App />)
     setData(false, false, false, false, undefined)
 
@@ -103,7 +103,7 @@ describe('App', () => {
     })
   })
 
-  it('should let the user auto install DVC under the right conditions', () => {
+  it('should let the user auto-install DVC under the right conditions', () => {
     render(<App />)
     setData(false, false, true, false, 'python')
 
@@ -115,7 +115,7 @@ describe('App', () => {
     })
   })
 
-  it('should now show a screen saying that DVC is not installed if the cli is available', () => {
+  it('should not show a screen saying that DVC is not installed if the cli is available', () => {
     render(<App />)
     setData(true, false, false, false, undefined)
 

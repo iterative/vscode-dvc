@@ -24,7 +24,7 @@ suite('Auto Install Test Suite', () => {
   describe('autoInstallDvc', () => {
     const defaultPython = getDefaultPython()
 
-    it('should return early if no python binary is found', async () => {
+    it('should return early if no Python interpreter is found', async () => {
       stub(PythonExtension, 'getPythonExecutionDetails').resolves(undefined)
       stub(Python, 'findPythonBin').resolves(undefined)
       const mockInstallPackages = stub(Python, 'installPackages').resolves(
@@ -41,7 +41,7 @@ suite('Auto Install Test Suite', () => {
       expect(mockInstallPackages).not.to.be.called
     })
 
-    it('should return early if no the is no workspace folder open', async () => {
+    it('should return early if there is no workspace folder open', async () => {
       stub(PythonExtension, 'getPythonExecutionDetails').resolves(undefined)
       stub(Python, 'findPythonBin').resolves(defaultPython)
       const mockInstallPackages = stub(Python, 'installPackages').resolves(

@@ -59,7 +59,7 @@ suite('Setup Test Suite', () => {
       expect(mockAutoInstallDvc).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle a select python interpreter message from the webview', async () => {
+    it('should handle a select Python interpreter message from the webview', async () => {
       const { messageSpy, setup, mockExecuteCommand } = buildSetup(disposable)
       const setInterpreterCommand = 'python.setInterpreter'
 
