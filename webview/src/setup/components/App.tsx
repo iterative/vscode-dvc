@@ -1,4 +1,4 @@
-import { GetStartedData } from 'dvc/src/getStarted/webview/contract'
+import { SetupData } from 'dvc/src/setup/webview/contract'
 import {
   MessageFromWebviewType,
   MessageToWebview
@@ -23,7 +23,7 @@ export const App: React.FC = () => {
 
   useVsCodeMessaging(
     useCallback(
-      ({ data }: { data: MessageToWebview<GetStartedData> }) => {
+      ({ data }: { data: MessageToWebview<SetupData> }) => {
         setCliAvailable(data.data.cliAccessible)
         setIsPythonExtensionInstalled(data.data.isPythonExtensionInstalled)
         setProjectInitialized(data.data.projectInitialized)

@@ -1,10 +1,10 @@
 import { commands } from 'vscode'
 import { Disposer } from '@hediet/std/disposable'
 import { fake, stub } from 'sinon'
-import { GetStarted } from '../../../getStarted'
+import { Setup } from '../../../setup/index'
 import { buildDependencies } from '../util'
 
-export const buildGetStarted = (
+export const buildSetup = (
   disposer: Disposer,
   dvInstalled = false,
   dvcInit = false,
@@ -17,8 +17,8 @@ export const buildGetStarted = (
 
   const mockExecuteCommand = stub(commands, 'executeCommand')
 
-  const getStarted = disposer.track(
-    new GetStarted(
+  const setup = disposer.track(
+    new Setup(
       '',
       resourceLocator.dvcIcon,
       mockInitializeProject,
@@ -30,11 +30,11 @@ export const buildGetStarted = (
   )
 
   return {
-    getStarted,
     messageSpy,
     mockExecuteCommand,
     mockInitializeProject,
     mockOpenExperiments,
-    resourceLocator
+    resourceLocator,
+    setup
   }
 }

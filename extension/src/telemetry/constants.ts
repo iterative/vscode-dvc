@@ -58,12 +58,6 @@ export const EventName = Object.assign(
     VIEWS_EXPERIMENTS_TABLE_SORT_COLUMN:
       'views.experimentsTable.columnSortAdded',
 
-    VIEWS_GET_STARTED_CLOSE: 'views.getStarted.closed',
-    VIEWS_GET_STARTED_CREATED: 'views.getStarted.created',
-    VIEWS_GET_STARTED_FOCUS_CHANGED: 'views.getStarted.focusChanged',
-    VIEWS_GET_STARTED_INSTALL_DVC: 'views.getStarted.installDvc',
-    VIEWS_GET_STARTED_SELECT_PYTHON_INTERPRETER:
-      'views.getStarted.selectPythonInterpreter',
     VIEWS_PLOTS_CLOSED: 'views.plots.closed',
     VIEWS_PLOTS_COMPARISON_ROWS_REORDERED:
       'views.plots.comparisonRowsReordered',
@@ -79,6 +73,13 @@ export const EventName = Object.assign(
     VIEWS_PLOTS_SELECT_PLOTS: 'view.plots.selectPlots',
     VIEWS_REORDER_PLOTS_METRICS: 'views.plots.metricsReordered',
     VIEWS_REORDER_PLOTS_TEMPLATES: 'views.plots.templatesReordered',
+
+    VIEWS_SETUP_CLOSE: 'view.setup.closed',
+    VIEWS_SETUP_CREATED: 'view.setup.created',
+    VIEWS_SETUP_FOCUS_CHANGED: 'views.setup.focusChanged',
+    VIEWS_SETUP_INSTALL_DVC: 'views.setup.installDvc',
+    VIEWS_SETUP_SELECT_PYTHON_INTERPRETER:
+      'views.setup.selectPythonInterpreter',
 
     VIEWS_TERMINAL_CLOSED: 'views.terminal.closed',
     VIEWS_TERMINAL_CREATED: 'views.terminal.created',
@@ -259,11 +260,11 @@ export interface IEventNamePropertyMapping {
 
   [EventName.VIEWS_TRACKED_EXPLORER_TREE_OPENED]: DvcRootCount
 
-  [EventName.VIEWS_GET_STARTED_CLOSE]: undefined
-  [EventName.VIEWS_GET_STARTED_CREATED]: undefined
-  [EventName.VIEWS_GET_STARTED_FOCUS_CHANGED]: undefined
-  [EventName.VIEWS_GET_STARTED_SELECT_PYTHON_INTERPRETER]: undefined
-  [EventName.VIEWS_GET_STARTED_INSTALL_DVC]: undefined
+  [EventName.VIEWS_SETUP_CLOSE]: undefined
+  [EventName.VIEWS_SETUP_CREATED]: undefined
+  [EventName.VIEWS_SETUP_FOCUS_CHANGED]: undefined
+  [EventName.VIEWS_SETUP_SELECT_PYTHON_INTERPRETER]: undefined
+  [EventName.VIEWS_SETUP_INSTALL_DVC]: undefined
 
-  [EventName.GET_STARTED_WEBVIEW_SHOW]: undefined
+  [EventName.SETUP_WEBVIEW_SHOW]: undefined
 }

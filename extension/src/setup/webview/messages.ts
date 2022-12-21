@@ -1,5 +1,5 @@
 import { commands } from 'vscode'
-import { GetStartedData as TGetStartedData } from './contract'
+import { SetupData as TSetupData } from './contract'
 import { Logger } from '../../common/logger'
 import {
   MessageFromWebview,
@@ -13,11 +13,11 @@ import { autoInstallDvc } from '../autoInstall'
 import { RegisteredCommands } from '../../commands/external'
 
 export class WebviewMessages {
-  private readonly getWebview: () => BaseWebview<TGetStartedData> | undefined
+  private readonly getWebview: () => BaseWebview<TSetupData> | undefined
   private readonly initializeProject: () => void
 
   constructor(
-    getWebview: () => BaseWebview<TGetStartedData> | undefined,
+    getWebview: () => BaseWebview<TSetupData> | undefined,
     initializeProject: () => void
   ) {
     this.getWebview = getWebview
@@ -64,7 +64,7 @@ export class WebviewMessages {
 
   private selectPythonInterpreter() {
     sendTelemetryEvent(
-      EventName.VIEWS_GET_STARTED_SELECT_PYTHON_INTERPRETER,
+      EventName.VIEWS_SETUP_SELECT_PYTHON_INTERPRETER,
       undefined,
       undefined
     )
@@ -72,11 +72,7 @@ export class WebviewMessages {
   }
 
   private installDvc() {
-    sendTelemetryEvent(
-      EventName.VIEWS_GET_STARTED_INSTALL_DVC,
-      undefined,
-      undefined
-    )
+    sendTelemetryEvent(EventName.VIEWS_SETUP_INSTALL_DVC, undefined, undefined)
 
     return autoInstallDvc()
   }

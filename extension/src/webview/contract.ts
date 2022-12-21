@@ -6,9 +6,9 @@ import {
   SectionCollapsed,
   TemplatePlotGroup
 } from '../plots/webview/contract'
-import { GetStartedData } from '../getStarted/webview/contract'
+import { SetupData } from '../setup/webview/contract'
 
-export type WebviewData = TableData | PlotsData | GetStartedData
+export type WebviewData = TableData | PlotsData | SetupData
 
 export enum MessageFromWebviewType {
   INITIALIZED = 'initialized',

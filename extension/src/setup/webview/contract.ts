@@ -1,4 +1,4 @@
-export type GetStartedData = {
+export type SetupData = {
   cliAccessible: boolean
   isPythonExtensionInstalled: boolean
   projectInitialized: boolean

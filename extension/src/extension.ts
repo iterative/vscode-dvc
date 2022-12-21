@@ -61,7 +61,7 @@ import { collectWorkspaceScale } from './telemetry/collect'
 import { createFileSystemWatcher } from './fileSystem/watcher'
 import { GitExecutor } from './cli/git/executor'
 import { GitReader } from './cli/git/reader'
-import { GetStarted } from './getStarted'
+import { Setup } from './setup/index'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
@@ -72,7 +72,7 @@ export class Extension extends Disposable implements IExtension {
   private readonly repositories: WorkspaceRepositories
   private readonly experiments: WorkspaceExperiments
   private readonly plots: WorkspacePlots
-  private readonly getStarted: GetStarted
+  private readonly setup: Setup
   private readonly repositoriesTree: RepositoriesTree
   private readonly dvcExecutor: DvcExecutor
   private readonly dvcReader: DvcReader
@@ -155,7 +155,7 @@ export class Extension extends Disposable implements IExtension {
     const onDidChangeHasData = this.experiments.columnsChanged.event
     this.dispose.track(
       onDidChangeHasData(() => {
-        this.changeGetStartedStep()
+        this.changeSetupStep()
         setContextValue('dvc.project.hasData', this.experiments.getHasData())
       })
     )
@@ -164,8 +164,8 @@ export class Extension extends Disposable implements IExtension {
       new WorkspacePlots(this.internalCommands, context.workspaceState)
     )
 
-    this.getStarted = this.dispose.track(
-      new GetStarted(
+    this.setup = this.dispose.track(
+      new Setup(
         '',
         this.resourceLocator.dvcIcon,
         () => this.initProject(),
@@ -241,7 +241,7 @@ export class Extension extends Disposable implements IExtension {
       this.config.onDidChangeExecutionDetails(async () => {
         const stopWatch = new StopWatch()
         try {
-          this.getStarted.sendDataToWebview()
+          this.changeSetupStep()
           await setup(this)
 
           return sendTelemetryEvent(
@@ -274,9 +274,9 @@ export class Extension extends Disposable implements IExtension {
     )
 
     this.internalCommands.registerExternalCommand(
-      RegisteredCommands.GET_STARTED_WEBVIEW_SHOW,
+      RegisteredCommands.SETUP_WEBVIEW_SHOW,
       async () => {
-        await this.getStarted.showWebview()
+        await this.setup.showWebview()
       }
     )
 
@@ -400,7 +400,7 @@ export class Extension extends Disposable implements IExtension {
     )
     this.dvcRoots = nestedRoots.flat().sort()
 
-    this.changeGetStartedStep()
+    this.changeSetupStep()
     return this.setProjectAvailability()
   }
 
@@ -455,7 +455,7 @@ export class Extension extends Disposable implements IExtension {
     this.status.setAvailability(available)
     this.setCommandsAvailability(available)
     this.cliAccessible = available
-    this.changeGetStartedStep()
+    this.changeSetupStep()
     return available
   }
 
@@ -536,8 +536,8 @@ export class Extension extends Disposable implements IExtension {
     )
   }
 
-  private changeGetStartedStep() {
-    this.getStarted.sendDataToWebview()
+  private changeSetupStep() {
+    this.setup.sendDataToWebview()
   }
 }
 

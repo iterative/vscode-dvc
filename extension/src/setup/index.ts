@@ -1,4 +1,4 @@
-import { GetStartedData as TGetStartedData } from './webview/contract'
+import { SetupData as TSetupData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { findPythonBinForInstall, getPythonBinDisplayText } from './autoInstall'
 import { BaseWebview } from '../webview'
@@ -7,10 +7,10 @@ import { BaseRepository } from '../webview/repository'
 import { Resource } from '../resourceLocator'
 import { isPythonExtensionInstalled } from '../extensions/python'
 
-export type GetStartedWebview = BaseWebview<TGetStartedData>
+export type SetupWebviewWebview = BaseWebview<TSetupData>
 
-export class GetStarted extends BaseRepository<TGetStartedData> {
-  public readonly viewKey = ViewKey.GET_STARTED
+export class Setup extends BaseRepository<TSetupData> {
+  public readonly viewKey = ViewKey.SETUP
 
   private webviewMessages: WebviewMessages
   private getCliAccessible: () => boolean

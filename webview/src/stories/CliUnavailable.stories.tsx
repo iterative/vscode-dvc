@@ -3,7 +3,7 @@ import React from 'react'
 import {
   CliUnavailable,
   CliUnavailableProps
-} from '../getStarted/components/CliUnavailable'
+} from '../setup/components/CliUnavailable'
 
 import './test-vscode-styles.scss'
 import '../shared/style.scss'

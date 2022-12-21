@@ -1,6 +1,6 @@
 import { Story, Meta } from '@storybook/react/types-6-0'
 import React from 'react'
-import { NoData as SetupNoData } from '../getStarted/components/NoData'
+import { NoData as SetupNoData } from '../setup/components/NoData'
 
 import './test-vscode-styles.scss'
 import '../shared/style.scss'
