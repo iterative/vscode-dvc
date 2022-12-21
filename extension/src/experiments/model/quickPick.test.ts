@@ -155,7 +155,7 @@ describe('pickExperiments', () => {
           description: '[exp-789]',
           detail: `Created:${formatDate(
             mockedExperiments[2].Created as string
-          )}, split:0.00031111, data/data.xml:22a1a29`,
+          )}, split:0.00031111100, data/data.xml:22a1a29`,
           label: '789fsf4',
           value: mockedExperiments[2]
         }
