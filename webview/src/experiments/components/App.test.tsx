@@ -668,7 +668,7 @@ describe('App', () => {
       renderTable(dataTypesTableFixture)
 
       expectTooltipValue({
-        cellLabel: '1.9293',
+        cellLabel: '1.9293040',
         expectedTooltipResult: '1.9293040037155151'
       })
       expectTooltipValue({
