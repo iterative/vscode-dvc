@@ -8,7 +8,7 @@ import { Icon } from '../../../shared/components/Icon'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
 import { CopyButton } from '../../../shared/components/copyButton/CopyButton'
 import { Close } from '../../../shared/components/icons'
-import { formatFloat } from '../../../util/number'
+import { formatNumber } from '../../../util/number'
 
 interface RibbonBlockProps {
   revision: Revision
@@ -35,7 +35,7 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
               {truncate(path, 45, 'left')}
             </td>
             <td>
-              {typeof value === 'number' ? formatFloat(value) : value}
+              {typeof value === 'number' ? formatNumber(value) : value}
               {value === '-' || (
                 <CopyButton
                   value={value.toString()}

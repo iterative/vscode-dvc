@@ -21,7 +21,7 @@ import styles from '../components/table/styles.module.scss'
 import { CopyButton } from '../../shared/components/copyButton/CopyButton'
 import { OverflowHoverTooltip } from '../components/overflowHoverTooltip/OverflowHoverTooltip'
 import { ErrorTooltip } from '../components/table/Errors'
-import { formatFloat } from '../../util/number'
+import { formatNumber } from '../../util/number'
 
 export type CellValue = Value | ValueWithChanges
 
@@ -89,7 +89,9 @@ const Cell: React.FC<Cell<Experiment, CellValue>> = cell => {
   const stringValue = String(rawValue)
 
   const displayValue =
-    typeof rawValue === 'number' ? formatFloat(rawValue as number) : stringValue
+    typeof rawValue === 'number'
+      ? formatNumber(rawValue as number)
+      : stringValue
 
   return (
     <Tooltip
