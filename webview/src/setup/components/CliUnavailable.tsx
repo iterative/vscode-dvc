@@ -10,7 +10,7 @@ export type CliUnavailableProps = {
   setupWorkspace: () => void
 }
 
-const CanInstall: React.FC<{
+const OfferToInstall: React.FC<{
   children: React.ReactNode
   pythonBinPath: string
   installDvc: () => void
@@ -24,6 +24,17 @@ const CanInstall: React.FC<{
   </div>
 )
 
+const UpdateInterpreterOrFind: React.FC<{
+  action: string
+  description: string
+  onClick: () => void
+}> = ({ action, description, onClick }) => (
+  <div>
+    <p>{description}</p>
+    <Button onClick={onClick} text={action} />
+  </div>
+)
+
 export const CliUnavailable: React.FC<CliUnavailableProps> = ({
   installDvc,
   isPythonExtensionInstalled,
@@ -31,16 +42,28 @@ export const CliUnavailable: React.FC<CliUnavailableProps> = ({
   selectPythonInterpreter,
   setupWorkspace
 }) => {
-  if (!pythonBinPath) {
+  const Title = <h1>DVC is currently unavailable</h1>
+  const SetupWorkspace: React.FC<{ description: string }> = ({
+    description
+  }) => (
+    <UpdateInterpreterOrFind
+      description={description}
+      action="Setup The Workspace"
+      onClick={setupWorkspace}
+    />
+  )
+
+  const canInstall = !!pythonBinPath
+
+  if (!canInstall) {
     return (
       <EmptyState>
         <div>
-          <h1>DVC is currently unavailable</h1>
+          {Title}
           <p>
             DVC & DVCLive cannot be auto-installed as Python was not located.
           </p>
-          <p>To locate a Python Interpreter or DVC</p>
-          <Button onClick={setupWorkspace} text="Setup The Workspace" />
+          <SetupWorkspace description="To locate a Python Interpreter or DVC" />
         </div>
       </EmptyState>
     )
@@ -49,23 +72,18 @@ export const CliUnavailable: React.FC<CliUnavailableProps> = ({
   return (
     <EmptyState>
       <div>
-        <h1>DVC is currently unavailable</h1>
-        <CanInstall pythonBinPath={pythonBinPath} installDvc={installDvc}>
+        {Title}
+        <OfferToInstall pythonBinPath={pythonBinPath} installDvc={installDvc}>
           {isPythonExtensionInstalled ? (
-            <div>
-              <p>To update the interpreter and/or locate DVC</p>
-              <Button
-                onClick={selectPythonInterpreter}
-                text="Select Python Interpreter"
-              />
-            </div>
+            <UpdateInterpreterOrFind
+              action="Select Python Interpreter"
+              description="To update the interpreter and/or locate DVC"
+              onClick={selectPythonInterpreter}
+            />
           ) : (
-            <div>
-              <p>To update the install location or locate DVC</p>
-              <Button onClick={setupWorkspace} text="Setup The Workspace" />
-            </div>
+            <SetupWorkspace description="To update the install location or locate DVC" />
           )}
-        </CanInstall>
+        </OfferToInstall>
       </div>
     </EmptyState>
   )
