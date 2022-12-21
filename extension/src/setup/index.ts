@@ -1,11 +1,12 @@
 import { SetupData as TSetupData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
-import { findPythonBinForInstall, getPythonBinDisplayText } from './autoInstall'
+import { findPythonBinForInstall } from './autoInstall'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Resource } from '../resourceLocator'
 import { isPythonExtensionInstalled } from '../extensions/python'
+import { getBinDisplayText } from '../fileSystem'
 
 export type SetupWebviewWebview = BaseWebview<TSetupData>
 
@@ -66,7 +67,7 @@ export class Setup extends BaseRepository<TSetupData> {
       cliAccessible,
       projectInitialized,
       isPythonExtensionInstalled(),
-      getPythonBinDisplayText(pythonBinPath),
+      getBinDisplayText(pythonBinPath),
       hasData
     )
   }

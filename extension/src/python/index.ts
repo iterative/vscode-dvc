@@ -5,10 +5,12 @@ import { exists } from '../fileSystem'
 import { Logger } from '../common/logger'
 import { createProcess, executeProcess, Process } from '../processExecution'
 
-const sendOutput = (process: Process) =>
+const sendOutput = (process: Process) => {
   process.all?.on('data', chunk =>
     Logger.log(chunk.toString().replace(/(\r?\n)/g, ''))
   )
+  return process
+}
 
 export const installPackages = (
   cwd: string,
@@ -38,23 +40,20 @@ export const setupVenv = async (
       cwd,
       executable: getDefaultPython()
     })
-    sendOutput(initVenv)
-    await initVenv
+    await sendOutput(initVenv)
   }
 
   const venvPython = getVenvBinPath(cwd, envDir, 'python')
 
   const venvUpgrade = installPackages(cwd, venvPython, 'pip', 'wheel')
-  sendOutput(venvUpgrade)
-  await venvUpgrade
+  await sendOutput(venvUpgrade)
 
   const installRequestedPackages = installPackages(
     cwd,
     venvPython,
     ...installArgs
   )
-  sendOutput(installRequestedPackages)
-  return installRequestedPackages
+  return sendOutput(installRequestedPackages)
 }
 
 export const findPythonBin = async (
