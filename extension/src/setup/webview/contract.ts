@@ -1,5 +1,7 @@
 export type SetupData = {
   cliAccessible: boolean
+  hasData: boolean | undefined
+  isPythonExtensionInstalled: boolean
   projectInitialized: boolean
-  hasData: boolean
+  pythonBinPath: string | undefined
 }

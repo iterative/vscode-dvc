@@ -241,6 +241,7 @@ export class Extension extends Disposable implements IExtension {
       this.config.onDidChangeExecutionDetails(async () => {
         const stopWatch = new StopWatch()
         try {
+          this.changeSetupStep()
           await setup(this)
 
           return sendTelemetryEvent(

@@ -329,9 +329,19 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   }
 
   public getHasData() {
-    return Object.values(this.repositories).some(repository =>
-      repository.getHasData()
-    )
+    const allLoading = undefined
+
+    const repositories = Object.values(this.repositories)
+
+    if (repositories.some(repository => repository.getHasData())) {
+      return true
+    }
+
+    if (repositories.some(repository => repository.getHasData() === false)) {
+      return false
+    }
+
+    return allLoading
   }
 
   private async pickExpThenRun(
