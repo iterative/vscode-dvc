@@ -23,7 +23,7 @@ import {
   LATEST_TESTED_CLI_VERSION,
   MAX_CLI_VERSION,
   MIN_CLI_VERSION
-} from './cli/dvc/constants'
+} from './cli/dvc/contract'
 import { extractSemver, ParsedSemver } from './cli/dvc/version'
 import { delay } from './util/time'
 import { Title } from './vscode/title'

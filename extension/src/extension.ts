@@ -170,7 +170,7 @@ export class Extension extends Disposable implements IExtension {
         this.resourceLocator.dvcIcon,
         () => this.initProject(),
         () => this.showExperiments(this.dvcRoots[0]),
-        () => this.getAvailable(),
+        () => this.getCliCompatible(),
         () => this.hasRoots(),
         () => this.experiments.getHasData()
       )
@@ -542,6 +542,10 @@ export class Extension extends Disposable implements IExtension {
         }
       }
     )
+  }
+
+  private getCliCompatible() {
+    return this.cliCompatible
   }
 
   private changeSetupStep() {
