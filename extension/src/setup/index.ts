@@ -1,9 +1,12 @@
 import { SetupData as TSetupData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
+import { findPythonBinForInstall } from './autoInstall'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Resource } from '../resourceLocator'
+import { isPythonExtensionInstalled } from '../extensions/python'
+import { getBinDisplayText } from '../fileSystem'
 
 export type SetupWebviewWebview = BaseWebview<TSetupData>
 
@@ -11,47 +14,49 @@ export class Setup extends BaseRepository<TSetupData> {
   public readonly viewKey = ViewKey.SETUP
 
   private webviewMessages: WebviewMessages
-  private initProject: () => void
   private showExperiments: () => void
-  private getCliAccessible: () => boolean
+  private getCliCompatible: () => boolean | undefined
   private getHasRoots: () => boolean
-  private getHasData: () => boolean
+  private getHasData: () => boolean | undefined
 
   constructor(
     dvcRoot: string,
     webviewIcon: Resource,
     initProject: () => void,
     showExperiments: () => void,
-    getCliAccessible: () => boolean,
+    getCliCompatible: () => boolean | undefined,
     getHasRoots: () => boolean,
-    getHasData: () => boolean
+    getHasData: () => boolean | undefined
   ) {
     super(dvcRoot, webviewIcon)
 
-    this.webviewMessages = this.createWebviewMessageHandler()
+    this.webviewMessages = this.createWebviewMessageHandler(initProject)
 
     if (this.webview) {
       this.sendDataToWebview()
     }
-    this.getCliAccessible = getCliAccessible
-    this.getHasRoots = getHasRoots
-    this.initProject = initProject
     this.showExperiments = showExperiments
+    this.getCliCompatible = getCliCompatible
+    this.getHasRoots = getHasRoots
     this.getHasData = getHasData
+  }
+
+  public isFocused() {
+    return !!this.webview?.isActive
   }
 
   public sendInitialWebviewData() {
     return this.sendDataToWebview()
   }
 
-  public sendDataToWebview() {
-    const cliAccessible = this.getCliAccessible()
+  public async sendDataToWebview() {
+    const cliCompatible = this.getCliCompatible()
     const projectInitialized = this.getHasRoots()
     const hasData = this.getHasData()
 
     if (
       this.webview?.isVisible &&
-      cliAccessible &&
+      cliCompatible &&
       projectInitialized &&
       hasData
     ) {
@@ -60,17 +65,21 @@ export class Setup extends BaseRepository<TSetupData> {
       return
     }
 
+    const pythonBinPath = await findPythonBinForInstall()
+
     this.webviewMessages.sendWebviewMessage(
-      cliAccessible,
+      cliCompatible,
       projectInitialized,
+      isPythonExtensionInstalled(),
+      getBinDisplayText(pythonBinPath),
       hasData
     )
   }
 
-  private createWebviewMessageHandler() {
+  private createWebviewMessageHandler(initProject: () => void) {
     const webviewMessages = new WebviewMessages(
       () => this.getWebview(),
-      () => this.initProject()
+      initProject
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>

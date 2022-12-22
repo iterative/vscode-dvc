@@ -170,7 +170,7 @@ export class Extension extends Disposable implements IExtension {
         this.resourceLocator.dvcIcon,
         () => this.initProject(),
         () => this.showExperiments(this.dvcRoots[0]),
-        () => this.getAvailable(),
+        () => this.getCliCompatible(),
         () => this.hasRoots(),
         () => this.experiments.getHasData()
       )
@@ -241,6 +241,7 @@ export class Extension extends Disposable implements IExtension {
       this.config.onDidChangeExecutionDetails(async () => {
         const stopWatch = new StopWatch()
         try {
+          this.changeSetupStep()
           await setup(this)
 
           return sendTelemetryEvent(
@@ -273,7 +274,7 @@ export class Extension extends Disposable implements IExtension {
     )
 
     this.internalCommands.registerExternalCommand(
-      RegisteredCommands.SETUP_WEBVIEW_SHOW,
+      RegisteredCommands.SETUP_SHOW,
       async () => {
         await this.setup.showWebview()
       }
@@ -340,39 +341,12 @@ export class Extension extends Disposable implements IExtension {
     this.watchForVenvChanges()
   }
 
-  public async setupWorkspace() {
-    const stopWatch = new StopWatch()
-    try {
-      const previousCliPath = this.config.getCliPath()
-      const previousPythonPath = this.config.getPythonBinPath()
+  public async showSetup() {
+    return await this.setup.showWebview()
+  }
 
-      const completed = await setupWorkspace(() =>
-        this.config.setPythonAndNotifyIfChanged()
-      )
-      sendTelemetryEvent(
-        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-        { completed },
-        {
-          duration: stopWatch.getElapsedTime()
-        }
-      )
-
-      const executionDetailsUnchanged =
-        this.config.getCliPath() === previousPythonPath &&
-        this.config.getPythonBinPath() === previousCliPath
-
-      if (completed && !this.cliAccessible && executionDetailsUnchanged) {
-        this.workspaceChanged.fire()
-      }
-
-      return completed
-    } catch (error: unknown) {
-      return sendTelemetryEventAndThrow(
-        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-        error as Error,
-        stopWatch.getElapsedTime()
-      )
-    }
+  public shouldWarnUserIfCLIUnavailable() {
+    return this.hasRoots() && !this.setup.isFocused()
   }
 
   public async isPythonExtensionUsed() {
@@ -478,6 +452,41 @@ export class Extension extends Disposable implements IExtension {
     setContextValue('dvc.commands.available', available)
   }
 
+  private async setupWorkspace() {
+    const stopWatch = new StopWatch()
+    try {
+      const previousCliPath = this.config.getCliPath()
+      const previousPythonPath = this.config.getPythonBinPath()
+
+      const completed = await setupWorkspace(() =>
+        this.config.setPythonAndNotifyIfChanged()
+      )
+      sendTelemetryEvent(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+        { completed },
+        {
+          duration: stopWatch.getElapsedTime()
+        }
+      )
+
+      const executionDetailsUnchanged =
+        this.config.getCliPath() === previousPythonPath &&
+        this.config.getPythonBinPath() === previousCliPath
+
+      if (completed && !this.cliAccessible && executionDetailsUnchanged) {
+        this.workspaceChanged.fire()
+      }
+
+      return completed
+    } catch (error: unknown) {
+      return sendTelemetryEventAndThrow(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+        error as Error,
+        stopWatch.getElapsedTime()
+      )
+    }
+  }
+
   private setProjectAvailability() {
     const available = this.hasRoots()
     setContextValue('dvc.project.available', available)
@@ -533,6 +542,10 @@ export class Extension extends Disposable implements IExtension {
         }
       }
     )
+  }
+
+  private getCliCompatible() {
+    return this.cliCompatible
   }
 
   private changeSetupStep() {

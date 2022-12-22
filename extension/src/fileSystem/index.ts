@@ -1,4 +1,4 @@
-import { basename, extname, join, relative, resolve } from 'path'
+import { basename, extname, join, relative, resolve, sep } from 'path'
 import {
   ensureFileSync,
   existsSync,
@@ -16,6 +16,7 @@ import { Logger } from '../common/logger'
 import { gitPath } from '../cli/git/constants'
 import { createValidInteger } from '../util/number'
 import { processExists } from '../processExecution'
+import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 
 export const exists = (path: string): boolean => existsSync(path)
 
@@ -163,4 +164,21 @@ export const checkSignalFile = async (path: string): Promise<boolean> => {
   }
 
   return true
+}
+
+export const getBinDisplayText = (
+  path: string | undefined
+): string | undefined => {
+  if (!path) {
+    return
+  }
+
+  const workspaceRoot = getFirstWorkspaceFolder()
+  if (!workspaceRoot) {
+    return path
+  }
+
+  return isSameOrChild(workspaceRoot, path)
+    ? '.' + sep + relative(workspaceRoot, path)
+    : path
 }

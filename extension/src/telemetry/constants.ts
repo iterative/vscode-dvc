@@ -77,6 +77,9 @@ export const EventName = Object.assign(
     VIEWS_SETUP_CLOSE: 'view.setup.closed',
     VIEWS_SETUP_CREATED: 'view.setup.created',
     VIEWS_SETUP_FOCUS_CHANGED: 'views.setup.focusChanged',
+    VIEWS_SETUP_INSTALL_DVC: 'views.setup.installDvc',
+    VIEWS_SETUP_SELECT_PYTHON_INTERPRETER:
+      'views.setup.selectPythonInterpreter',
 
     VIEWS_TERMINAL_CLOSED: 'views.terminal.closed',
     VIEWS_TERMINAL_CREATED: 'views.terminal.created',
@@ -260,6 +263,8 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_SETUP_CLOSE]: undefined
   [EventName.VIEWS_SETUP_CREATED]: undefined
   [EventName.VIEWS_SETUP_FOCUS_CHANGED]: undefined
+  [EventName.VIEWS_SETUP_SELECT_PYTHON_INTERPRETER]: undefined
+  [EventName.VIEWS_SETUP_INSTALL_DVC]: undefined
 
-  [EventName.SETUP_WEBVIEW_SHOW]: undefined
+  [EventName.SETUP_SHOW]: undefined
 }

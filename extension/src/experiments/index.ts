@@ -497,7 +497,7 @@ export class Experiments extends BaseRepository<TableData> {
 
   public getHasData() {
     if (this.deferred.state === 'none') {
-      return false
+      return
     }
     return this.columns.hasNonDefaultColumns()
   }

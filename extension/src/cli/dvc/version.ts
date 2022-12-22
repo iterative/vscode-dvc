@@ -2,7 +2,7 @@ import {
   MAX_CLI_VERSION,
   LATEST_TESTED_CLI_VERSION,
   MIN_CLI_VERSION
-} from './constants'
+} from './contract'
 
 export enum CliCompatible {
   NO_BEHIND_MIN_VERSION = 'no-behind-min-version',

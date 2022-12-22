@@ -119,8 +119,8 @@ suite('Status Test Suite', () => {
 
       expect(mockStatusBarItem.text).to.equal(disabledText)
       expect(mockStatusBarItem.command).to.deep.equal({
-        command: RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-        title: Title.SETUP_WORKSPACE
+        command: RegisteredCommands.SETUP_SHOW,
+        title: Title.SHOW_SETUP
       })
     })
 

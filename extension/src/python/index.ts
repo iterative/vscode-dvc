@@ -3,28 +3,31 @@ import { getVenvBinPath } from './path'
 import { getProcessPlatform } from '../env'
 import { exists } from '../fileSystem'
 import { Logger } from '../common/logger'
-import { createProcess, Process, ProcessOptions } from '../processExecution'
+import { createProcess, executeProcess, Process } from '../processExecution'
 
-const sendOutput = (process: Process) =>
+const sendOutput = (process: Process) => {
   process.all?.on('data', chunk =>
     Logger.log(chunk.toString().replace(/(\r?\n)/g, ''))
   )
-
-export const createProcessWithOutput = (options: ProcessOptions) => {
-  const process = createProcess(options)
-
-  sendOutput(process)
-
   return process
 }
 
-const installPackages = (cwd: string, pythonBin: string, ...args: string[]) => {
-  return createProcessWithOutput({
+export const installPackages = (
+  cwd: string,
+  pythonBin: string,
+  ...args: string[]
+): Process => {
+  const options = {
     args: ['-m', 'pip', 'install', '--upgrade', ...args],
     cwd,
     executable: pythonBin
-  })
+  }
+
+  return createProcess(options)
 }
+
+export const getDefaultPython = (): string =>
+  getProcessPlatform() === 'win32' ? 'python' : 'python3'
 
 export const setupVenv = async (
   cwd: string,
@@ -32,16 +35,35 @@ export const setupVenv = async (
   ...installArgs: string[]
 ) => {
   if (!exists(join(cwd, envDir))) {
-    await createProcessWithOutput({
+    const initVenv = createProcess({
       args: ['-m', 'venv', envDir],
       cwd,
-      executable: getProcessPlatform() === 'win32' ? 'python' : 'python3'
+      executable: getDefaultPython()
     })
+    await sendOutput(initVenv)
   }
 
   const venvPython = getVenvBinPath(cwd, envDir, 'python')
 
-  await installPackages(cwd, venvPython, 'pip', 'wheel')
+  const venvUpgrade = installPackages(cwd, venvPython, 'pip', 'wheel')
+  await sendOutput(venvUpgrade)
 
-  return installPackages(cwd, venvPython, ...installArgs)
+  const installRequestedPackages = installPackages(
+    cwd,
+    venvPython,
+    ...installArgs
+  )
+  return sendOutput(installRequestedPackages)
+}
+
+export const findPythonBin = async (
+  pythonBin: string
+): Promise<string | undefined> => {
+  try {
+    return await executeProcess({
+      args: ['-c', 'import sys; print(sys.executable)'],
+      cwd: process.cwd(),
+      executable: pythonBin
+    })
+  } catch {}
 }

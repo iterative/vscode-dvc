@@ -1,11 +1,13 @@
+import { commands } from 'vscode'
 import { Disposer } from '@hediet/std/disposable'
-import { fake } from 'sinon'
+import { fake, stub } from 'sinon'
 import { Setup } from '../../../setup/index'
 import { buildDependencies } from '../util'
+import * as AutoInstall from '../../../setup/autoInstall'
 
 export const buildSetup = (
   disposer: Disposer,
-  dvInstalled = false,
+  cliCompatible: boolean | undefined = undefined,
   dvcInit = false,
   hasData = false
 ) => {
@@ -14,13 +16,17 @@ export const buildSetup = (
   const mockInitializeProject = fake()
   const mockOpenExperiments = fake()
 
+  const mockExecuteCommand = stub(commands, 'executeCommand')
+
+  const mockAutoInstallDvc = stub(AutoInstall, 'autoInstallDvc')
+
   const setup = disposer.track(
     new Setup(
       '',
       resourceLocator.dvcIcon,
       mockInitializeProject,
       mockOpenExperiments,
-      () => dvInstalled,
+      () => cliCompatible,
       () => dvcInit,
       () => hasData
     )
@@ -28,6 +34,8 @@ export const buildSetup = (
 
   return {
     messageSpy,
+    mockAutoInstallDvc,
+    mockExecuteCommand,
     mockInitializeProject,
     mockOpenExperiments,
     resourceLocator,

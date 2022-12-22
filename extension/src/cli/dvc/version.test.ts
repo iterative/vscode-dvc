@@ -4,10 +4,10 @@ import {
   ParsedSemver,
   CliCompatible
 } from './version'
-import { MIN_CLI_VERSION, LATEST_TESTED_CLI_VERSION } from './constants'
+import { MIN_CLI_VERSION, LATEST_TESTED_CLI_VERSION } from './contract'
 
-jest.mock('./constants', () => ({
-  ...jest.requireActual('./constants'),
+jest.mock('./contract', () => ({
+  ...jest.requireActual('./contract'),
   LATEST_TESTED_CLI_VERSION: '2.11.1',
   MIN_CLI_VERSION: '2.9.4'
 }))

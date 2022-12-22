@@ -15,18 +15,22 @@ const { postMessage } = vsCodeApi
 const mockPostMessage = jest.mocked(postMessage)
 
 const setData = (
-  cliAccessible: boolean,
+  cliCompatible: boolean | undefined,
+  hasData: boolean | undefined,
+  isPythonExtensionInstalled: boolean,
   projectInitialized: boolean,
-  hasData: boolean
+  pythonBinPath: string | undefined
 ) => {
   fireEvent(
     window,
     new MessageEvent('message', {
       data: {
         data: {
-          cliAccessible,
+          cliCompatible,
           hasData,
-          projectInitialized
+          isPythonExtensionInstalled,
+          projectInitialized,
+          pythonBinPath
         },
         type: MessageToWebviewType.SET_DATA
       }
@@ -43,37 +47,107 @@ describe('App', () => {
     expect(mockPostMessage).toHaveBeenCalledTimes(1)
   })
 
+  it('should show a screen saying that DVC is incompatible if the cli version is unexpected', () => {
+    render(<App />)
+    setData(false, false, false, false, undefined)
+
+    expect(screen.getByText('DVC is incompatible')).toBeInTheDocument()
+  })
+
   it('should show a screen saying that DVC is not installed if the cli is unavailable', () => {
     render(<App />)
-    setData(false, false, false)
+    setData(undefined, false, false, false, undefined)
 
     expect(screen.getByText('DVC is currently unavailable')).toBeInTheDocument()
   })
 
-  it('should now show a screen saying that DVC is not installed if the cli is available', () => {
+  it('should tell the user they cannot install DVC without a Python interpreter', () => {
     render(<App />)
-    setData(true, false, false)
+    setData(undefined, false, false, false, undefined)
 
-    expect(screen.queryByText('DVC is currently unavailable')).toBeNull()
+    expect(
+      screen.getByText(
+        'DVC & DVCLive cannot be auto-installed as Python was not located'
+      )
+    ).toBeInTheDocument()
+    expect(screen.queryByText('Install')).not.toBeInTheDocument()
+  })
+
+  it('should tell the user they can auto-install DVC with a Python interpreter', () => {
+    render(<App />)
+    const defaultInterpreter = 'python'
+    setData(undefined, false, false, false, defaultInterpreter)
+
+    expect(
+      screen.getByText(
+        `DVC & DVCLive can be auto-installed as packages with ${defaultInterpreter}`
+      )
+    ).toBeInTheDocument()
+    expect(screen.getByText('Install')).toBeInTheDocument()
+  })
+
+  it('should let the user find another Python interpreter to install DVC when the Python extension is not installed', () => {
+    render(<App />)
+    setData(undefined, false, false, false, 'python')
+
+    const button = screen.getByText('Setup The Workspace')
+    fireEvent.click(button)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.SETUP_WORKSPACE
+    })
+  })
+
+  it('should let the user find another Python interpreter to install DVC when the Python extension is installed', () => {
+    render(<App />)
+    setData(undefined, false, true, false, 'python')
+
+    const button = screen.getByText('Select Python Interpreter')
+    fireEvent.click(button)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.SELECT_PYTHON_INTERPRETER
+    })
+  })
+
+  it('should let the user auto-install DVC under the right conditions', () => {
+    render(<App />)
+    setData(undefined, false, true, false, 'python')
+
+    const button = screen.getByText('Install')
+    fireEvent.click(button)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.INSTALL_DVC
+    })
+  })
+
+  it('should not show a screen saying that DVC is not installed if the cli is available', () => {
+    render(<App />)
+    setData(true, false, false, false, undefined)
+
+    expect(
+      screen.queryByText('DVC is currently unavailable')
+    ).not.toBeInTheDocument()
   })
 
   it('should show a screen saying that DVC is not initialized if the project is not initialized and dvc is installed', () => {
     render(<App />)
-    setData(true, false, false)
+    setData(true, false, false, false, undefined)
 
     expect(screen.getByText('DVC is not initialized')).toBeInTheDocument()
   })
 
   it('should not show a screen saying that DVC is not initialized if the project is initialized and dvc is installed', () => {
     render(<App />)
-    setData(true, true, false)
+    setData(true, false, false, true, undefined)
 
-    expect(screen.queryByText('DVC is not initialized')).toBeNull()
+    expect(screen.queryByText('DVC is not initialized')).not.toBeInTheDocument()
   })
 
   it('should send a message to initialize the project when clicking the Initialize Project buttons when the project is not initialized', () => {
     render(<App />)
-    setData(true, false, false)
+    setData(true, false, false, false, undefined)
 
     const initializeButton = screen.getByText('Initialize Project')
     fireEvent.click(initializeButton)
@@ -85,7 +159,7 @@ describe('App', () => {
 
   it('should show a screen saying that the project contains no data if dvc is installed, the project is initialized but has no data', () => {
     render(<App />)
-    setData(true, true, false)
+    setData(true, false, false, true, undefined)
 
     expect(
       screen.getByText('Your project contains no data')
@@ -94,8 +168,10 @@ describe('App', () => {
 
   it('should not show a screen saying that the project contains no data if dvc is installed, the project is initialized and has data', () => {
     render(<App />)
-    setData(true, true, true)
+    setData(true, true, false, true, undefined)
 
-    expect(screen.queryByText('Your project contains no data')).toBeNull()
+    expect(
+      screen.queryByText('Your project contains no data')
+    ).not.toBeInTheDocument()
   })
 })

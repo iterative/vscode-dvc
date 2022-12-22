@@ -15,6 +15,10 @@
       text-align: left;
     }
 
+    &:nth-child(2) {
+      padding-right: 0;
+    }
+
     &.depsKey {
       color: $deps-color;
     }

@@ -1355,7 +1355,7 @@
       },
       {
         "view": "dvc.views.webviews",
-        "contents": "[Show Experiments](command:dvc.showSetupWebview)\n[Show Plots](command:dvc.showSetupdWebview)\n[Show Experiments and Plots](command:dvc.showSetupWebview)",
+        "contents": "[Show Experiments](command:dvc.showSetup)\n[Show Plots](command:dvc.showSetup)\n[Show Experiments and Plots](command:dvc.showSetup)",
         "when": "!dvc.commands.available || !dvc.project.available || !dvc.project.hasData"
       },
       {
@@ -1600,10 +1600,10 @@
     "@types/vscode": "1.64.0",
     "@vscode/test-electron": "2.2.1",
     "@vscode/vsce": "2.16.0",
-    "@wdio/cli": "7.27.0",
-    "@wdio/local-runner": "7.27.0",
+    "@wdio/cli": "7.28.0",
+    "@wdio/local-runner": "7.28.0",
     "@wdio/mocha-framework": "7.26.0",
-    "@wdio/spec-reporter": "7.26.0",
+    "@wdio/spec-reporter": "7.28.0",
     "chai": "4.3.7",
     "chai-as-promised": "7.1.1",
     "clean-webpack-plugin": "4.0.0",
@@ -1616,12 +1616,12 @@
     "mock-require": "3.0.3",
     "process-exists": "4.1.0",
     "shx": "0.3.4",
-    "sinon": "15.0.0",
+    "sinon": "15.0.1",
     "sinon-chai": "3.7.0",
     "ts-loader": "9.4.2",
     "vscode-uri": "3.0.7",
     "wdio-vscode-service": "4.2.1",
-    "webdriverio": "7.27.0",
+    "webdriverio": "7.28.0",
     "webpack": "5.75.0",
     "webpack-cli": "5.0.1"
   },
