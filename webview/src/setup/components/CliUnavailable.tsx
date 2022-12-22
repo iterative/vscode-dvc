@@ -16,9 +16,7 @@ const OfferToInstall: React.FC<{
   installDvc: () => void
 }> = ({ installDvc, pythonBinPath, children }) => (
   <div>
-    <p>
-      {`DVC & DVCLive can be auto-installed as packages with ${pythonBinPath}`}
-    </p>
+    <p>DVC & DVCLive can be auto-installed as packages with {pythonBinPath}</p>
     <Button onClick={installDvc} text="Install" />
     {children}
   </div>
