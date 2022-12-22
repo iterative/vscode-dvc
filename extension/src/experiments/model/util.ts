@@ -1,5 +1,6 @@
 import get from 'lodash.get'
 import { formatDate } from '../../util/date'
+import { formatNumber } from '../../util/number'
 import { splitColumnPath } from '../columns/paths'
 import { Experiment } from '../webview/contract'
 
@@ -7,9 +8,6 @@ type Value = undefined | null | [] | string | number
 
 const isDate = (value: Value): boolean =>
   !!(typeof value === 'string' && Date.parse(value))
-
-const isLongNumber = (value: Value): boolean =>
-  typeof value === 'number' && value.toString().length > 7
 
 const getStringifiedValue = (value: Value): string => {
   if (Number.isNaN(value)) {
@@ -28,8 +26,8 @@ const getStringifiedValue = (value: Value): string => {
     return '-'
   }
 
-  if (isLongNumber(value)) {
-    return (value as number).toPrecision(5)
+  if (typeof value === 'number') {
+    return formatNumber(value)
   }
 
   return String(value)
@@ -55,7 +53,7 @@ const getDataFromColumnPath = (
     splitUpPath,
     truncatedValue: getStringifiedValue(value),
     type,
-    value: isLongNumber(value) ? value : getStringifiedValue(value)
+    value: typeof value === 'number' ? value : getStringifiedValue(value)
   }
 }
 
