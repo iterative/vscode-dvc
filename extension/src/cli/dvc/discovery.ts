@@ -46,13 +46,13 @@ const warnUserCLIInaccessible = async (
 
   const response = await Toast.warnWithOptions(
     warningText,
-    Response.SETUP_WORKSPACE,
+    Response.SHOW_SETUP,
     Response.NEVER
   )
 
   switch (response) {
-    case Response.SETUP_WORKSPACE:
-      return extension.setupWorkspace()
+    case Response.SHOW_SETUP:
+      return extension.showSetup()
     case Response.NEVER:
       return setUserConfigValue(ConfigKey.DO_NOT_SHOW_CLI_UNAVAILABLE, true)
   }
@@ -77,7 +77,7 @@ const warnUser = (
   cliCompatible: CliCompatible,
   version: string | undefined
 ): void => {
-  if (!extension.hasRoots()) {
+  if (!extension.shouldWarnUserIfCLIUnavailable()) {
     return
   }
   switch (cliCompatible) {
@@ -154,11 +154,11 @@ const tryGlobalFallbackVersion = async (
   const tryGlobal = await getVersionDetails(extension, cwd, true)
   const { cliCompatible, isAvailable, isCompatible, version } = tryGlobal
 
-  if (extension.hasRoots() && !isCompatible) {
+  if (extension.shouldWarnUserIfCLIUnavailable() && !isCompatible) {
     warnUserCLIInaccessibleAnywhere(extension, version)
   }
   if (
-    extension.hasRoots() &&
+    extension.shouldWarnUserIfCLIUnavailable() &&
     cliCompatible === CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED
   ) {
     warnAheadOfLatestTested()

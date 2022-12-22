@@ -41,6 +41,10 @@ export class Setup extends BaseRepository<TSetupData> {
     this.getHasData = getHasData
   }
 
+  public isFocused() {
+    return !!this.webview?.isActive
+  }
+
   public sendInitialWebviewData() {
     return this.sendDataToWebview()
   }

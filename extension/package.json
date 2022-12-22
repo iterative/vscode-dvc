@@ -1355,7 +1355,7 @@
       },
       {
         "view": "dvc.views.webviews",
-        "contents": "[Show Experiments](command:dvc.showSetupWebview)\n[Show Plots](command:dvc.showSetupdWebview)\n[Show Experiments and Plots](command:dvc.showSetupWebview)",
+        "contents": "[Show Experiments](command:dvc.showSetup)\n[Show Plots](command:dvc.showSetup)\n[Show Experiments and Plots](command:dvc.showSetup)",
         "when": "!dvc.commands.available || !dvc.project.available || !dvc.project.hasData"
       },
       {
