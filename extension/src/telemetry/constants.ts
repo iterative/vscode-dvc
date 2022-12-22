@@ -266,5 +266,5 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_SETUP_SELECT_PYTHON_INTERPRETER]: undefined
   [EventName.VIEWS_SETUP_INSTALL_DVC]: undefined
 
-  [EventName.SETUP_WEBVIEW_SHOW]: undefined
+  [EventName.SETUP_SHOW]: undefined
 }

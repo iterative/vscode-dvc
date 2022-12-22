@@ -91,8 +91,8 @@ export class Status extends Disposable {
       return
     }
     return {
-      command: RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-      title: Title.SETUP_WORKSPACE
+      command: RegisteredCommands.SETUP_SHOW,
+      title: Title.SHOW_SETUP
     }
   }
 
