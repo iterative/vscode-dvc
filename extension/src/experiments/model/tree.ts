@@ -182,7 +182,10 @@ export class ExperimentsTree
   private formatExperiment(experiment: ExperimentAugmented, dvcRoot: string) {
     return {
       collapsibleState: experiment.hasChildren
-        ? this.getCollapsibleState(experiment.displayNameOrParent)
+        ? this.getInitialCollapsibleState(
+            experiment.type,
+            experiment.displayNameOrParent
+          )
         : TreeItemCollapsibleState.None,
       command: {
         arguments: [{ dvcRoot, id: experiment.id }],
@@ -234,8 +237,14 @@ export class ExperimentsTree
     this.expandedExperiments[description] = expanded
   }
 
-  private getCollapsibleState(description?: string) {
-    if (description && this.expandedExperiments[description]) {
+  private getInitialCollapsibleState(
+    type: ExperimentType,
+    description?: string
+  ) {
+    if (
+      (description && this.expandedExperiments[description]) ||
+      type === ExperimentType.BRANCH
+    ) {
       return TreeItemCollapsibleState.Expanded
     }
     return TreeItemCollapsibleState.Collapsed
