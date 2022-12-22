@@ -15,7 +15,7 @@ export class Setup extends BaseRepository<TSetupData> {
 
   private webviewMessages: WebviewMessages
   private showExperiments: () => void
-  private getCliAccessible: () => boolean
+  private getCliCompatible: () => boolean | undefined
   private getHasRoots: () => boolean
   private getHasData: () => boolean | undefined
 
@@ -24,7 +24,7 @@ export class Setup extends BaseRepository<TSetupData> {
     webviewIcon: Resource,
     initProject: () => void,
     showExperiments: () => void,
-    getCliAccessible: () => boolean,
+    getCliCompatible: () => boolean | undefined,
     getHasRoots: () => boolean,
     getHasData: () => boolean | undefined
   ) {
@@ -36,7 +36,7 @@ export class Setup extends BaseRepository<TSetupData> {
       this.sendDataToWebview()
     }
     this.showExperiments = showExperiments
-    this.getCliAccessible = getCliAccessible
+    this.getCliCompatible = getCliCompatible
     this.getHasRoots = getHasRoots
     this.getHasData = getHasData
   }
@@ -50,13 +50,13 @@ export class Setup extends BaseRepository<TSetupData> {
   }
 
   public async sendDataToWebview() {
-    const cliAccessible = this.getCliAccessible()
+    const cliCompatible = this.getCliCompatible()
     const projectInitialized = this.getHasRoots()
     const hasData = this.getHasData()
 
     if (
       this.webview?.isVisible &&
-      cliAccessible &&
+      cliCompatible &&
       projectInitialized &&
       hasData
     ) {
@@ -68,7 +68,7 @@ export class Setup extends BaseRepository<TSetupData> {
     const pythonBinPath = await findPythonBinForInstall()
 
     this.webviewMessages.sendWebviewMessage(
-      cliAccessible,
+      cliCompatible,
       projectInitialized,
       isPythonExtensionInstalled(),
       getBinDisplayText(pythonBinPath),

@@ -2,7 +2,7 @@ import {
   LATEST_TESTED_CLI_VERSION,
   MAX_CLI_VERSION,
   MIN_CLI_VERSION
-} from './constants'
+} from './contract'
 import { CliCompatible, isVersionCompatible } from './version'
 import { IExtension } from '../../interfaces'
 import { Toast } from '../../vscode/toast'

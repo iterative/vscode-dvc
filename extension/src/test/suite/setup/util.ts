@@ -7,7 +7,7 @@ import * as AutoInstall from '../../../setup/autoInstall'
 
 export const buildSetup = (
   disposer: Disposer,
-  dvInstalled = false,
+  cliCompatible: boolean | undefined = undefined,
   dvcInit = false,
   hasData = false
 ) => {
@@ -26,7 +26,7 @@ export const buildSetup = (
       resourceLocator.dvcIcon,
       mockInitializeProject,
       mockOpenExperiments,
-      () => dvInstalled,
+      () => cliCompatible,
       () => dvcInit,
       () => hasData
     )

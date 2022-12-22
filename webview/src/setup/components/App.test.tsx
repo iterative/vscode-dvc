@@ -15,7 +15,7 @@ const { postMessage } = vsCodeApi
 const mockPostMessage = jest.mocked(postMessage)
 
 const setData = (
-  cliAccessible: boolean,
+  cliCompatible: boolean | undefined,
   hasData: boolean | undefined,
   isPythonExtensionInstalled: boolean,
   projectInitialized: boolean,
@@ -26,7 +26,7 @@ const setData = (
     new MessageEvent('message', {
       data: {
         data: {
-          cliAccessible,
+          cliCompatible,
           hasData,
           isPythonExtensionInstalled,
           projectInitialized,
@@ -47,16 +47,23 @@ describe('App', () => {
     expect(mockPostMessage).toHaveBeenCalledTimes(1)
   })
 
-  it('should show a screen saying that DVC is not installed if the cli is unavailable', () => {
+  it('should show a screen saying that DVC is incompatible if the cli version is unexpected', () => {
     render(<App />)
     setData(false, false, false, false, undefined)
+
+    expect(screen.getByText('DVC is incompatible')).toBeInTheDocument()
+  })
+
+  it('should show a screen saying that DVC is not installed if the cli is unavailable', () => {
+    render(<App />)
+    setData(undefined, false, false, false, undefined)
 
     expect(screen.getByText('DVC is currently unavailable')).toBeInTheDocument()
   })
 
   it('should tell the user they cannot install DVC without a Python interpreter', () => {
     render(<App />)
-    setData(false, false, false, false, undefined)
+    setData(undefined, false, false, false, undefined)
 
     expect(
       screen.getByText(
@@ -69,7 +76,7 @@ describe('App', () => {
   it('should tell the user they can auto-install DVC with a Python interpreter', () => {
     render(<App />)
     const defaultInterpreter = 'python'
-    setData(false, false, false, false, defaultInterpreter)
+    setData(undefined, false, false, false, defaultInterpreter)
 
     expect(
       screen.getByText(
@@ -81,7 +88,7 @@ describe('App', () => {
 
   it('should let the user find another Python interpreter to install DVC when the Python extension is not installed', () => {
     render(<App />)
-    setData(false, false, false, false, 'python')
+    setData(undefined, false, false, false, 'python')
 
     const button = screen.getByText('Setup The Workspace')
     fireEvent.click(button)
@@ -93,7 +100,7 @@ describe('App', () => {
 
   it('should let the user find another Python interpreter to install DVC when the Python extension is installed', () => {
     render(<App />)
-    setData(false, false, true, false, 'python')
+    setData(undefined, false, true, false, 'python')
 
     const button = screen.getByText('Select Python Interpreter')
     fireEvent.click(button)
@@ -105,7 +112,7 @@ describe('App', () => {
 
   it('should let the user auto-install DVC under the right conditions', () => {
     render(<App />)
-    setData(false, false, true, false, 'python')
+    setData(undefined, false, true, false, 'python')
 
     const button = screen.getByText('Install')
     fireEvent.click(button)

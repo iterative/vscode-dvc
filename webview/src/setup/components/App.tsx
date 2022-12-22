@@ -4,6 +4,7 @@ import {
   MessageToWebview
 } from 'dvc/src/webview/contract'
 import React, { useCallback, useState } from 'react'
+import { CliIncompatible } from './CliIncompatible'
 import { CliUnavailable } from './CliUnavailable'
 import { ProjectUninitialized } from './ProjectUninitialized'
 import { NoData } from './NoData'
@@ -12,7 +13,9 @@ import { sendMessage } from '../../shared/vscode'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 
 export const App: React.FC = () => {
-  const [cliAvailable, setCliAvailable] = useState<boolean>(false)
+  const [cliCompatible, setCliCompatible] = useState<boolean | undefined>(
+    undefined
+  )
   const [projectInitialized, setProjectInitialized] = useState<boolean>(false)
   const [pythonBinPath, setPythonBinPath] = useState<string | undefined>(
     undefined
@@ -24,14 +27,14 @@ export const App: React.FC = () => {
   useVsCodeMessaging(
     useCallback(
       ({ data }: { data: MessageToWebview<SetupData> }) => {
-        setCliAvailable(data.data.cliAccessible)
+        setCliCompatible(data.data.cliCompatible)
         setIsPythonExtensionInstalled(data.data.isPythonExtensionInstalled)
         setProjectInitialized(data.data.projectInitialized)
         setPythonBinPath(data.data.pythonBinPath)
         setHasData(data.data.hasData)
       },
       [
-        setCliAvailable,
+        setCliCompatible,
         setIsPythonExtensionInstalled,
         setProjectInitialized,
         setPythonBinPath,
@@ -58,7 +61,11 @@ export const App: React.FC = () => {
     sendMessage({ type: MessageFromWebviewType.SETUP_WORKSPACE })
   }
 
-  if (!cliAvailable) {
+  if (cliCompatible === false) {
+    return <CliIncompatible />
+  }
+
+  if (cliCompatible === undefined) {
     return (
       <CliUnavailable
         installDvc={installDvc}
