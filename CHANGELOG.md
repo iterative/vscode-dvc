@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.31] - 2022-12-23
+
+### 🚀 New Features and Enhancements
+
+- Open experiments automatically once setup is done [#2973](https://github.com/iterative/vscode-dvc/pull/2973) by [@sroy3](https://github.com/sroy3)
+- Adjust formatting on table cell long numbers [#2983](https://github.com/iterative/vscode-dvc/pull/2983) by [@julieg18](https://github.com/julieg18)
+- Provide option to auto-install DVC if unavailable [#2944](https://github.com/iterative/vscode-dvc/pull/2944) by [@mattseddon](https://github.com/mattseddon)
+- Direct users to setup webview from warning popups [#2990](https://github.com/iterative/vscode-dvc/pull/2990) by [@mattseddon](https://github.com/mattseddon)
+- Patch CLI incompatible path for onboarding [#2992](https://github.com/iterative/vscode-dvc/pull/2992) by [@mattseddon](https://github.com/mattseddon)
+- Get closer to theme inside of code blocks shown on no experiments data screen [#2988](https://github.com/iterative/vscode-dvc/pull/2988) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Initially expand commit entries in the experiments tree [#2996](https://github.com/iterative/vscode-dvc/pull/2996) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Rename getStarted to setup [#2982](https://github.com/iterative/vscode-dvc/pull/2982) by [@sroy3](https://github.com/sroy3)
+- Reinstate badges (with @vscode/vsce v2.16.0) [#2987](https://github.com/iterative/vscode-dvc/pull/2987) by [@renovate[bot]](https://github.com/renovate%5Bbot%5D)
+- Update demo project and latest tested CLI version (2.38.1) [#2989](https://github.com/iterative/vscode-dvc/pull/2989) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.30] - 2022-12-20
 
 ### 🐛 Bug Fixes
