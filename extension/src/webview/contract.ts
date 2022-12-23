@@ -48,7 +48,8 @@ export enum MessageFromWebviewType {
   MODIFY_EXPERIMENT_PARAMS_AND_RUN = 'modify-experiment-params-and-run',
   MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN = 'modify-experiment-params-reset-and-run',
   SET_EXPERIMENTS_HEADER_HEIGHT = 'update-experiments-header-height',
-  INITIALIZE_PROJECT = 'initialize-project',
+  INITIALIZE_DVC = 'initialize-dvc',
+  INITIALIZE_GIT = 'initialize-git',
   INSTALL_DVC = 'install-dvc',
   SETUP_WORKSPACE = 'setup-workspace'
 }
@@ -182,7 +183,8 @@ export type MessageFromWebview =
       payload: string
     }
   | { type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_HEIGHT }
-  | { type: MessageFromWebviewType.INITIALIZE_PROJECT }
+  | { type: MessageFromWebviewType.INITIALIZE_DVC }
+  | { type: MessageFromWebviewType.INITIALIZE_GIT }
   | { type: MessageFromWebviewType.INSTALL_DVC }
   | { type: MessageFromWebviewType.SETUP_WORKSPACE }
 

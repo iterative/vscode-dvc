@@ -153,7 +153,7 @@ describe('App', () => {
     fireEvent.click(initializeButton)
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      type: MessageFromWebviewType.INITIALIZE_PROJECT
+      type: MessageFromWebviewType.INITIALIZE_DVC
     })
   })
 

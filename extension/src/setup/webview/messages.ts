@@ -14,35 +14,46 @@ import { RegisteredCommands } from '../../commands/external'
 
 export class WebviewMessages {
   private readonly getWebview: () => BaseWebview<TSetupData> | undefined
-  private readonly initializeProject: () => void
+  private readonly initializeDvc: () => void
+  private readonly initializeGit: () => void
 
   constructor(
     getWebview: () => BaseWebview<TSetupData> | undefined,
-    initializeProject: () => void
+    initializeDvc: () => void,
+    initializeGit: () => void
   ) {
     this.getWebview = getWebview
-    this.initializeProject = initializeProject
+    this.initializeDvc = initializeDvc
+    this.initializeGit = initializeGit
   }
 
   public sendWebviewMessage(
     cliCompatible: boolean | undefined,
+    needsGitInitialized: boolean | undefined,
+    canGitInitialize: boolean,
     projectInitialized: boolean,
     isPythonExtensionInstalled: boolean,
     pythonBinPath: string | undefined,
     hasData: boolean | undefined
   ) {
     this.getWebview()?.show({
+      canGitInitialize,
       cliCompatible,
       hasData,
       isPythonExtensionInstalled,
+      needsGitInitialized,
       projectInitialized,
       pythonBinPath
     })
   }
 
   public handleMessageFromWebview(message: MessageFromWebview) {
-    if (message.type === MessageFromWebviewType.INITIALIZE_PROJECT) {
-      return this.initializeProject()
+    if (message.type === MessageFromWebviewType.INITIALIZE_DVC) {
+      return this.initializeDvc()
+    }
+
+    if (message.type === MessageFromWebviewType.INITIALIZE_GIT) {
+      return this.initializeGit()
     }
 
     if (message.type === MessageFromWebviewType.SELECT_PYTHON_INTERPRETER) {

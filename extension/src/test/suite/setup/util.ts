@@ -9,11 +9,14 @@ export const buildSetup = (
   disposer: Disposer,
   cliCompatible: boolean | undefined = undefined,
   dvcInit = false,
-  hasData = false
+  hasData = false,
+  gitInit = Promise.resolve(true),
+  canGitInit = Promise.resolve(false)
 ) => {
   const { messageSpy, resourceLocator } = buildDependencies(disposer)
 
-  const mockInitializeProject = fake()
+  const mockInitializeDvc = fake()
+  const mockInitializeGit = fake()
   const mockOpenExperiments = fake()
 
   const mockExecuteCommand = stub(commands, 'executeCommand')
@@ -24,9 +27,12 @@ export const buildSetup = (
     new Setup(
       '',
       resourceLocator.dvcIcon,
-      mockInitializeProject,
+      mockInitializeDvc,
+      mockInitializeGit,
       mockOpenExperiments,
       () => cliCompatible,
+      () => gitInit,
+      () => canGitInit,
       () => dvcInit,
       () => hasData
     )
@@ -36,7 +42,7 @@ export const buildSetup = (
     messageSpy,
     mockAutoInstallDvc,
     mockExecuteCommand,
-    mockInitializeProject,
+    mockInitializeDvc,
     mockOpenExperiments,
     resourceLocator,
     setup

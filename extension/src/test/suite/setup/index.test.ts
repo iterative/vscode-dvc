@@ -25,7 +25,7 @@ suite('Setup Test Suite', () => {
 
   describe('Setup', () => {
     it('should handle an initialize project message from the webview', async () => {
-      const { messageSpy, setup, mockInitializeProject } = buildSetup(
+      const { messageSpy, setup, mockInitializeDvc } = buildSetup(
         disposable,
         true
       )
@@ -37,10 +37,10 @@ suite('Setup Test Suite', () => {
 
       messageSpy.resetHistory()
       mockMessageReceived.fire({
-        type: MessageFromWebviewType.INITIALIZE_PROJECT
+        type: MessageFromWebviewType.INITIALIZE_DVC
       })
 
-      expect(mockInitializeProject).to.be.calledOnce
+      expect(mockInitializeDvc).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle an auto install dvc message from the webview', async () => {

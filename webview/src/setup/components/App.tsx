@@ -12,11 +12,18 @@ import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 import { sendMessage } from '../../shared/vscode'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export const App: React.FC = () => {
   const [cliCompatible, setCliCompatible] = useState<boolean | undefined>(
     undefined
   )
   const [projectInitialized, setProjectInitialized] = useState<boolean>(false)
+  const [needsGitInitialized, setNeedsGitInitialized] = useState<
+    boolean | undefined
+  >(false)
+  const [canGitInitialize, setCanGitInitialized] = useState<
+    boolean | undefined
+  >(false)
   const [pythonBinPath, setPythonBinPath] = useState<string | undefined>(
     undefined
   )
@@ -27,25 +34,35 @@ export const App: React.FC = () => {
   useVsCodeMessaging(
     useCallback(
       ({ data }: { data: MessageToWebview<SetupData> }) => {
+        setCanGitInitialized(data.data.canGitInitialize)
         setCliCompatible(data.data.cliCompatible)
+        setHasData(data.data.hasData)
         setIsPythonExtensionInstalled(data.data.isPythonExtensionInstalled)
+        setNeedsGitInitialized(data.data.needsGitInitialized)
         setProjectInitialized(data.data.projectInitialized)
         setPythonBinPath(data.data.pythonBinPath)
-        setHasData(data.data.hasData)
       },
       [
+        setCanGitInitialized,
         setCliCompatible,
+        setHasData,
         setIsPythonExtensionInstalled,
+        setNeedsGitInitialized,
         setProjectInitialized,
-        setPythonBinPath,
-        setHasData
+        setPythonBinPath
       ]
     )
   )
 
-  const initializeProject = () => {
+  const initializeGit = () => {
     sendMessage({
-      type: MessageFromWebviewType.INITIALIZE_PROJECT
+      type: MessageFromWebviewType.INITIALIZE_GIT
+    })
+  }
+
+  const initializeDvc = () => {
+    sendMessage({
+      type: MessageFromWebviewType.INITIALIZE_DVC
     })
   }
 
@@ -78,7 +95,14 @@ export const App: React.FC = () => {
   }
 
   if (!projectInitialized) {
-    return <ProjectUninitialized initializeProject={initializeProject} />
+    return (
+      <ProjectUninitialized
+        initializeDvc={initializeDvc}
+        initializeGit={initializeGit}
+        canGitInitialize={canGitInitialize}
+        needsGitInitialized={needsGitInitialized}
+      />
+    )
   }
 
   if (hasData === undefined) {
