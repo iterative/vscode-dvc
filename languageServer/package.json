@@ -33,7 +33,7 @@
     "@types/jest": "29.2.4",
     "clean-webpack-plugin": "4.0.0",
     "copy-webpack-plugin": "11.0.0",
-    "fork-ts-checker-webpack-plugin": "7.2.13",
+    "fork-ts-checker-webpack-plugin": "7.2.14",
     "ts-loader": "9.4.2",
     "lint-staged": "13.1.0",
     "jest": "29.3.1",
