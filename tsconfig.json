@@ -22,5 +22,6 @@
     "downlevelIteration": true,
     "noEmit": true
   },
-  "include": ["*/src/**/*"]
+  "include": ["*/src/**/*"],
+  "exclude": ["extension/src/test/e2e/**"]
 }

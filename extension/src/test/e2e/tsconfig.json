@@ -1,0 +1,18 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "module": "ESNext",
+    "types": [
+      "node",
+      "mocha",
+      "wdio-vscode-service",
+      "@wdio/globals/types",
+      "expect-webdriverio",
+      "@wdio/mocha-framework"
+    ],
+    "target": "es2022"
+  },
+  "include": ["specs", "./wdio.conf.ts"],
+  "exclude": []
+}

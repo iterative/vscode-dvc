@@ -1,6 +1,6 @@
 import { IPageDecorator, PageDecorator } from 'wdio-vscode-service'
-import { BaseWebview } from './baseWebview'
-import { experiments } from './locators'
+import { BaseWebview } from './baseWebview.js'
+import { experiments } from './locators.js'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ExperimentsWebview
