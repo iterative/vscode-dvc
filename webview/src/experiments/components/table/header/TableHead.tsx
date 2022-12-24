@@ -82,7 +82,7 @@ export const TableHead = ({
     displacedHeader && cb(displacedHeader)
   }
 
-  const onDragUpdate = (e: DragEvent<HTMLElement>) => {
+  const onDragEnter = (e: DragEvent<HTMLElement>) => {
     findDisplacedHeader(e.currentTarget.id, displacedHeader => {
       if (!isExperimentColumn(displacedHeader.id)) {
         dispatch(setDropTarget(displacedHeader.id))
@@ -93,6 +93,12 @@ export const TableHead = ({
   const onDragEnd = () => {
     fullColumnOrder.current = undefined
     draggingIds.current = undefined
+    dispatch(setDropTarget(''))
+  }
+
+  const onDragLeave = () => {
+    // note: for this to work it's important to have `pointer-events: none;`
+    // on text children to avoid duplicate dragEnter and dragLeave events fired
     dispatch(setDropTarget(''))
   }
 
@@ -130,9 +136,10 @@ export const TableHead = ({
           headerGroup={headerGroup}
           columns={allHeaders}
           onDragStart={onDragStart}
-          onDragUpdate={onDragUpdate}
+          onDragEnter={onDragEnter}
           onDragEnd={onDragEnd}
           onDrop={onDrop}
+          onDragLeave={onDragLeave}
           root={root}
           setExpColumnNeedsShadow={setExpColumnNeedsShadow}
         />

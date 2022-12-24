@@ -35,9 +35,16 @@ export const ColumnDragHandle: React.FC<{
   onDragStart: DragFunction
   onDrop: DragFunction
   onDragEnd: DragFunction
-}> = ({ disabled, column, onDragEnter, onDragStart, onDragEnd, onDrop }) => {
-  const DropTarget = <span>{column?.name}</span>
-
+  onDragLeave: DragFunction
+}> = ({
+  disabled,
+  column,
+  onDragEnter,
+  onDragStart,
+  onDragEnd,
+  onDrop,
+  onDragLeave
+}) => {
   return (
     <span
       data-testid="rendered-header"
@@ -49,11 +56,11 @@ export const ColumnDragHandle: React.FC<{
         id={column.id}
         disabled={disabled}
         group={'experiment-table'}
-        dropTarget={DropTarget}
         onDragEnter={onDragEnter}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
         onDrop={onDrop}
+        onDragLeave={onDragLeave}
       >
         <span>{column?.render('Header')}</span>
       </Draggable>
@@ -72,6 +79,7 @@ export const TableHeaderCellContents: React.FC<{
   onDragEnd: DragFunction
   onDragStart: DragFunction
   onDrop: DragFunction
+  onDragLeave: DragFunction
   canResize: boolean
   setMenuSuppressed: (menuSuppressed: boolean) => void
   resizerHeight: string
@@ -86,6 +94,7 @@ export const TableHeaderCellContents: React.FC<{
   onDragEnd,
   onDragStart,
   onDrop,
+  onDragLeave,
   canResize,
   setMenuSuppressed,
   resizerHeight
@@ -117,6 +126,7 @@ export const TableHeaderCellContents: React.FC<{
         onDragStart={onDragStart}
         onDrop={onDrop}
         onDragEnd={onDragEnd}
+        onDragLeave={onDragLeave}
       />
       {canResize && (
         <div

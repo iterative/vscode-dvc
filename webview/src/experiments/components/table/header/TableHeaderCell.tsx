@@ -93,6 +93,7 @@ export const TableHeaderCell: React.FC<{
   onDragEnd: DragFunction
   onDragStart: DragFunction
   onDrop: DragFunction
+  onDragLeave: DragFunction
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   root: HTMLElement | null
 }> = ({
@@ -104,6 +105,7 @@ export const TableHeaderCell: React.FC<{
   onDragEnd,
   onDragStart,
   onDrop,
+  onDragLeave,
   root,
   setExpColumnNeedsShadow
 }) => {
@@ -140,6 +142,7 @@ export const TableHeaderCell: React.FC<{
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       onDrop={onDrop}
+      onDragLeave={onDragLeave}
       canResize={canResize}
       setMenuSuppressed={setMenuSuppressed}
       resizerHeight={resizerHeight}
