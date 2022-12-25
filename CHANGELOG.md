@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.32] - 2022-12-25
+
+### 🚀 New Features and Enhancements
+
+- Table DnD cleanup, reset drop zone on leave [#2965](https://github.com/iterative/vscode-dvc/pull/2965) by [@shcheklein](https://github.com/shcheklein)
+
+### 🔨 Maintenance
+
+- Update status bar item [#3001](https://github.com/iterative/vscode-dvc/pull/3001) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.31] - 2022-12-23
 
 ### 🚀 New Features and Enhancements
