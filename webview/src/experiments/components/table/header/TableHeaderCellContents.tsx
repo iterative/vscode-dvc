@@ -55,7 +55,6 @@ export const ColumnDragHandle: React.FC<{
       <Draggable
         id={column.id}
         disabled={disabled}
-        group={'experiment-table'}
         onDragEnter={onDragEnter}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
