@@ -311,10 +311,32 @@ const collectFromBranchesObject = (
   }
 }
 
-export const collectExperiments = (
+const addCommitDataToBranches = async (
+  branches: Experiment[],
+  getCommitData: (sha: string) => Promise<string | undefined>
+): Promise<Experiment[]> =>
+  await Promise.all(
+    branches.map(async (branch, ind) => {
+      if (ind === 0) {
+        return branch
+      }
+      const { sha } = branch
+      if (sha) {
+        const commit = await getCommitData(sha)
+
+        if (commit) {
+          branch.displayLabel = commit
+        }
+      }
+      return branch
+    })
+  )
+
+export const collectExperiments = async (
   data: ExperimentsOutput,
-  dvcLiveOnly: boolean
-): ExperimentsAccumulator => {
+  dvcLiveOnly: boolean,
+  getCommitData: (sha: string) => Promise<string | undefined>
+): Promise<ExperimentsAccumulator> => {
   const { workspace, ...branchesObject } = data
 
   const workspaceBaseline = transformExperimentData(
@@ -331,6 +353,9 @@ export const collectExperiments = (
   const acc = new ExperimentsAccumulator(workspaceBaseline)
 
   collectFromBranchesObject(acc, branchesObject)
+
+  acc.branches = await addCommitDataToBranches(acc.branches, getCommitData)
+
   return acc
 }
 

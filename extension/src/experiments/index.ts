@@ -115,7 +115,7 @@ export class Experiments extends BaseRepository<TableData> {
     this.onDidChangeCheckpoints = this.checkpointsChanged.event
 
     this.experiments = this.dispose.track(
-      new ExperimentsModel(dvcRoot, workspaceState)
+      new ExperimentsModel(dvcRoot, workspaceState, internalCommands)
     )
 
     this.columns = this.dispose.track(

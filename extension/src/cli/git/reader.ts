@@ -7,6 +7,7 @@ import { trimAndSplit } from '../../util/stdout'
 import { isDirectory } from '../../fileSystem'
 
 export const autoRegisteredCommands = {
+  GIT_GET_COMMIT_MESSAGE: 'getCommitMessage',
   GIT_GET_REPOSITORY_ROOT: 'getGitRepositoryRoot',
   GIT_HAS_CHANGES: 'hasChanges',
   GIT_LIST_UNTRACKED: 'listUntracked'
@@ -28,6 +29,20 @@ export class GitReader extends GitCli {
     const output = await this.executeProcess(options)
 
     return !!output
+  }
+
+  public async getCommitMessage(cwd: string, sha: string) {
+    const options = getOptions(
+      cwd,
+      Command.LOG,
+      Flag.PRETTY_FORMAT_COMMIT_MESSAGE,
+      Flag.NUMBER,
+      '1',
+      sha
+    )
+    try {
+      return await this.executeProcess(options)
+    } catch {}
   }
 
   public async listUntracked(cwd: string) {

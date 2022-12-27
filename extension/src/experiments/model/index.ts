@@ -48,6 +48,7 @@ import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
 import { PersistenceKey } from '../../persistence/constants'
 import { sum } from '../../util/math'
+import { AvailableCommands, InternalCommands } from '../../commands/internal'
 
 export type StarredExperiments = Record<string, boolean | undefined>
 
@@ -84,9 +85,16 @@ export class ExperimentsModel extends ModelWithPersistence {
   private running: RunningExperiment[] = []
   private finishedRunning: { [id: string]: string } = {}
   private startedRunning: Set<string> = new Set()
+  private readonly internalCommands: InternalCommands
 
-  constructor(dvcRoot: string, workspaceState: Memento) {
+  constructor(
+    dvcRoot: string,
+    workspaceState: Memento,
+    internalComands: InternalCommands
+  ) {
     super(dvcRoot, workspaceState)
+
+    this.internalCommands = internalComands
 
     this.currentSorts = this.revive<SortDefinition[]>(
       PersistenceKey.EXPERIMENTS_SORT_BY,
@@ -116,14 +124,20 @@ export class ExperimentsModel extends ModelWithPersistence {
     )
   }
 
-  public transformAndSet(data: ExperimentsOutput, dvcLiveOnly: boolean) {
+  public async transformAndSet(data: ExperimentsOutput, dvcLiveOnly: boolean) {
     const {
       workspace,
       branches,
       experimentsByBranch,
       checkpointsByTip,
       runningExperiments
-    } = collectExperiments(data, dvcLiveOnly)
+    } = await collectExperiments(data, dvcLiveOnly, (sha: string) =>
+      this.internalCommands.executeCommand(
+        AvailableCommands.GIT_GET_COMMIT_MESSAGE,
+        this.dvcRoot,
+        sha
+      )
+    )
 
     this.workspace = workspace
     this.branches = branches
