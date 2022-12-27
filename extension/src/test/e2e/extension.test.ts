@@ -26,10 +26,6 @@ after(function () {
   return waitForDvcToFinish()
 })
 
-afterEach(function () {
-  return browser.switchToFrame(null)
-})
-
 describe('Activity Bar', function () {
   it('should show the DVC Icon', async function () {
     const dvcIcon = await getDVCActivityBarIcon()
