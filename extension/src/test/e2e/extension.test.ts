@@ -112,10 +112,6 @@ describe('Experiments Table Webview', function () {
 })
 
 describe('Plots Webview', function () {
-  before(function () {
-    return closeAllEditors()
-  })
-
   it('should load the plots webview with non-empty plots', async function () {
     this.timeout(60000)
     const webview = new PlotsWebview('plots')
