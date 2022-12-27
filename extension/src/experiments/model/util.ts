@@ -1,5 +1,6 @@
 import get from 'lodash.get'
 import { formatDate } from '../../util/date'
+import { formatNumber } from '../../util/number'
 import { splitColumnPath } from '../columns/paths'
 import { Experiment } from '../webview/contract'
 
@@ -7,9 +8,6 @@ type Value = undefined | null | [] | string | number
 
 const isDate = (value: Value): boolean =>
   !!(typeof value === 'string' && Date.parse(value))
-
-const isLongNumber = (value: Value): boolean =>
-  typeof value === 'number' && value.toString().length > 7
 
 const getStringifiedValue = (value: Value): string => {
   if (Number.isNaN(value)) {
@@ -28,29 +26,38 @@ const getStringifiedValue = (value: Value): string => {
     return '-'
   }
 
-  if (isLongNumber(value)) {
-    return (value as number).toPrecision(5)
+  if (typeof value === 'number') {
+    return formatNumber(value)
   }
 
   return String(value)
 }
 
-export const getDataFromColumnPath = (
+const getDataFromColumnPath = (
   experiment: Experiment,
   columnPath: string
-): { fullValue: string; splitUpPath: string[]; value: string | null } => {
+): {
+  type: string
+  value: string | number
+  columnPath: string
+  splitUpPath: string[]
+  truncatedValue: string
+} => {
   const splitUpPath = splitColumnPath(columnPath)
   const collectedVal = get(experiment, splitUpPath)
   const value = collectedVal?.value || collectedVal
+  const [type] = splitUpPath
 
   return {
-    fullValue: isLongNumber(value)
-      ? value.toString()
-      : getStringifiedValue(value),
+    columnPath: columnPath.slice(type.length + 1) || columnPath,
     splitUpPath,
-    value:
-      columnPath === 'Created' && value === 'undefined'
-        ? null
-        : getStringifiedValue(value)
+    truncatedValue: getStringifiedValue(value),
+    type,
+    value: typeof value === 'number' ? value : getStringifiedValue(value)
   }
 }
+
+export const getDataFromColumnPaths = (
+  experiment: Experiment,
+  columnPaths: string[]
+) => columnPaths.map(path => getDataFromColumnPath(experiment, path))

@@ -41,7 +41,6 @@ import { createTypedAccumulator } from '../util/object'
 import { pickPaths } from '../path/selection/quickPick'
 import { Toast } from '../vscode/toast'
 import { ConfigKey } from '../vscode/config'
-import { setContextValue } from '../vscode/context'
 import { checkSignalFile } from '../fileSystem'
 import { DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
 
@@ -497,6 +496,9 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public getHasData() {
+    if (this.deferred.state === 'none') {
+      return
+    }
     return this.columns.hasNonDefaultColumns()
   }
 
@@ -522,8 +524,6 @@ export class Experiments extends BaseRepository<TableData> {
 
   private notifyColumnsChanged() {
     this.columnsChanged.fire()
-    const hasData = this.getHasData()
-    setContextValue('dvc.project.hasData', hasData)
     return this.webviewMessages.sendWebviewMessage()
   }
 

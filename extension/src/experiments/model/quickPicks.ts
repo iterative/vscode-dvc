@@ -2,7 +2,7 @@ import { QuickPickItemKind } from 'vscode'
 import omit from 'lodash.omit'
 import { ExperimentWithCheckpoints } from '.'
 import { MAX_SELECTED_EXPERIMENTS } from './status'
-import { getDataFromColumnPath } from './util'
+import { getDataFromColumnPaths } from './util'
 import { definedAndNonEmpty } from '../../util/array'
 import {
   QuickPickItemWithValue,
@@ -25,17 +25,11 @@ const getSeparator = (experiment: Experiment) => ({
 })
 
 const getItem = (experiment: Experiment, firstThreeColumnOrder: string[]) => ({
-  detail: firstThreeColumnOrder
-    .map(path => {
-      const { splitUpPath, value } = getDataFromColumnPath(experiment, path)
-      const truncatedKey = truncateFromLeft(
-        splitUpPath[splitUpPath.length - 1],
-        15
-      )
-
-      return value === null ? '' : `${truncatedKey}:${value}`
-    })
-    .filter(Boolean)
+  detail: getDataFromColumnPaths(experiment, firstThreeColumnOrder)
+    .map(
+      ({ splitUpPath, truncatedValue: value }) =>
+        `${truncateFromLeft(splitUpPath[splitUpPath.length - 1], 15)}:${value}`
+    )
     .join(', '),
   label: experiment.label,
   value: omit(experiment, 'checkpoints')

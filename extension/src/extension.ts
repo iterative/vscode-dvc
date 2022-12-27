@@ -61,7 +61,7 @@ import { collectWorkspaceScale } from './telemetry/collect'
 import { createFileSystemWatcher } from './fileSystem/watcher'
 import { GitExecutor } from './cli/git/executor'
 import { GitReader } from './cli/git/reader'
-import { GetStarted } from './getStarted'
+import { Setup } from './setup/index'
 
 export class Extension extends Disposable implements IExtension {
   protected readonly internalCommands: InternalCommands
@@ -72,7 +72,7 @@ export class Extension extends Disposable implements IExtension {
   private readonly repositories: WorkspaceRepositories
   private readonly experiments: WorkspaceExperiments
   private readonly plots: WorkspacePlots
-  private readonly getStarted: GetStarted
+  private readonly setup: Setup
   private readonly repositoriesTree: RepositoriesTree
   private readonly dvcExecutor: DvcExecutor
   private readonly dvcReader: DvcReader
@@ -152,17 +152,25 @@ export class Extension extends Disposable implements IExtension {
       )
     )
 
+    const onDidChangeHasData = this.experiments.columnsChanged.event
+    this.dispose.track(
+      onDidChangeHasData(() => {
+        this.changeSetupStep()
+        setContextValue('dvc.project.hasData', this.experiments.getHasData())
+      })
+    )
+
     this.plots = this.dispose.track(
       new WorkspacePlots(this.internalCommands, context.workspaceState)
     )
 
-    this.getStarted = this.dispose.track(
-      new GetStarted(
+    this.setup = this.dispose.track(
+      new Setup(
         '',
         this.resourceLocator.dvcIcon,
         () => this.initProject(),
         () => this.showExperiments(this.dvcRoots[0]),
-        () => this.getAvailable(),
+        () => this.getCliCompatible(),
         () => this.hasRoots(),
         () => this.experiments.getHasData()
       )
@@ -233,6 +241,7 @@ export class Extension extends Disposable implements IExtension {
       this.config.onDidChangeExecutionDetails(async () => {
         const stopWatch = new StopWatch()
         try {
+          this.changeSetupStep()
           await setup(this)
 
           return sendTelemetryEvent(
@@ -265,9 +274,9 @@ export class Extension extends Disposable implements IExtension {
     )
 
     this.internalCommands.registerExternalCommand(
-      RegisteredCommands.GET_STARTED_WEBVIEW_SHOW,
+      RegisteredCommands.SETUP_SHOW,
       async () => {
-        await this.getStarted.showWebview()
+        await this.setup.showWebview()
       }
     )
 
@@ -332,37 +341,12 @@ export class Extension extends Disposable implements IExtension {
     this.watchForVenvChanges()
   }
 
-  public async setupWorkspace() {
-    const stopWatch = new StopWatch()
-    try {
-      const previousCliPath = this.config.getCliPath()
-      const previousPythonPath = this.config.getPythonBinPath()
+  public async showSetup() {
+    return await this.setup.showWebview()
+  }
 
-      const completed = await setupWorkspace()
-      sendTelemetryEvent(
-        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-        { completed },
-        {
-          duration: stopWatch.getElapsedTime()
-        }
-      )
-
-      const executionDetailsUnchanged =
-        this.config.getCliPath() === previousPythonPath &&
-        this.config.getPythonBinPath() === previousCliPath
-
-      if (completed && !this.cliAccessible && executionDetailsUnchanged) {
-        this.workspaceChanged.fire()
-      }
-
-      return completed
-    } catch (error: unknown) {
-      return sendTelemetryEventAndThrow(
-        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-        error as Error,
-        stopWatch.getElapsedTime()
-      )
-    }
+  public shouldWarnUserIfCLIUnavailable() {
+    return this.hasRoots() && !this.setup.isFocused()
   }
 
   public async isPythonExtensionUsed() {
@@ -389,7 +373,7 @@ export class Extension extends Disposable implements IExtension {
     )
     this.dvcRoots = nestedRoots.flat().sort()
 
-    this.getStarted.sendDataToWebview()
+    this.changeSetupStep()
     return this.setProjectAvailability()
   }
 
@@ -444,7 +428,7 @@ export class Extension extends Disposable implements IExtension {
     this.status.setAvailability(available)
     this.setCommandsAvailability(available)
     this.cliAccessible = available
-    this.getStarted.sendDataToWebview()
+    this.changeSetupStep()
     return available
   }
 
@@ -466,6 +450,41 @@ export class Extension extends Disposable implements IExtension {
 
   private setCommandsAvailability(available: boolean) {
     setContextValue('dvc.commands.available', available)
+  }
+
+  private async setupWorkspace() {
+    const stopWatch = new StopWatch()
+    try {
+      const previousCliPath = this.config.getCliPath()
+      const previousPythonPath = this.config.getPythonBinPath()
+
+      const completed = await setupWorkspace(() =>
+        this.config.setPythonAndNotifyIfChanged()
+      )
+      sendTelemetryEvent(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+        { completed },
+        {
+          duration: stopWatch.getElapsedTime()
+        }
+      )
+
+      const executionDetailsUnchanged =
+        this.config.getCliPath() === previousPythonPath &&
+        this.config.getPythonBinPath() === previousCliPath
+
+      if (completed && !this.cliAccessible && executionDetailsUnchanged) {
+        this.workspaceChanged.fire()
+      }
+
+      return completed
+    } catch (error: unknown) {
+      return sendTelemetryEventAndThrow(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+        error as Error,
+        stopWatch.getElapsedTime()
+      )
+    }
   }
 
   private setProjectAvailability() {
@@ -507,12 +526,30 @@ export class Extension extends Disposable implements IExtension {
     return createFileSystemWatcher(
       disposable => this.dispose.track(disposable),
       '**/dvc{,.exe}',
-      path => {
-        if (path && (!this.cliAccessible || !this.cliCompatible)) {
+      async path => {
+        if (!path) {
+          return
+        }
+
+        const previousPythonBinPath = this.config.getPythonBinPath()
+        await this.config.setPythonBinPath()
+
+        const trySetupWithVenv =
+          previousPythonBinPath !== this.config.getPythonBinPath()
+
+        if (!this.cliAccessible || !this.cliCompatible || trySetupWithVenv) {
           setup(this)
         }
       }
     )
+  }
+
+  private getCliCompatible() {
+    return this.cliCompatible
+  }
+
+  private changeSetupStep() {
+    this.setup.sendDataToWebview()
   }
 }
 

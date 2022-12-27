@@ -14,7 +14,7 @@ import {
   ValueWithChanges
 } from 'dvc/src/experiments/webview/contract'
 import { Value } from 'dvc/src/cli/dvc/contract'
-import { formatFloat } from './numberFormatting'
+import { formatNumber } from 'dvc/src/util/number'
 import Tooltip, {
   NORMAL_TOOLTIP_DELAY
 } from '../../shared/components/tooltip/Tooltip'
@@ -89,8 +89,8 @@ const Cell: React.FC<Cell<Experiment, CellValue>> = cell => {
   const stringValue = String(rawValue)
 
   const displayValue =
-    typeof rawValue === 'number' && !Number.isInteger(rawValue)
-      ? formatFloat(rawValue as number)
+    typeof rawValue === 'number'
+      ? formatNumber(rawValue as number)
       : stringValue
 
   return (

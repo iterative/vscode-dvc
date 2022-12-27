@@ -23,7 +23,7 @@ import {
   LATEST_TESTED_CLI_VERSION,
   MAX_CLI_VERSION,
   MIN_CLI_VERSION
-} from './cli/dvc/constants'
+} from './cli/dvc/contract'
 import { extractSemver, ParsedSemver } from './cli/dvc/version'
 import { delay } from './util/time'
 import { Title } from './vscode/title'
@@ -76,8 +76,11 @@ const mockedResetMembers = jest.fn()
 const mockedSetAvailable = jest.fn()
 const mockedSetCliCompatible = jest.fn()
 const mockedSetRoots = jest.fn()
-const mockedSetupWorkspace = jest.fn()
+const mockedShowSetup = jest.fn()
+const mockedShouldWarnUserIfCLIUnavailable = jest.fn()
 const mockedUnsetPythonBinPath = jest.fn()
+
+const mockedSetConfigToUsePythonExtension = jest.fn()
 
 const mockedQuickPickYesOrNo = jest.mocked(quickPickYesOrNo)
 const mockedQuickPickValue = jest.mocked(quickPickValue)
@@ -105,7 +108,7 @@ describe('setupWorkspace', () => {
   it('should present two options if the python extension is installed (Auto & Global)', async () => {
     mockedQuickPickValue.mockResolvedValueOnce(undefined)
 
-    await setupWorkspace()
+    await setupWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedQuickPickValue).toHaveBeenCalledWith(
@@ -123,7 +126,7 @@ describe('setupWorkspace', () => {
   it('should present two options if the python extension is NOT installed (Manual & Global)', async () => {
     mockedExtensions.all = []
 
-    await setupWorkspace()
+    await setupWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedQuickPickValue).toHaveBeenCalledWith(
@@ -141,9 +144,10 @@ describe('setupWorkspace', () => {
   it('should set the dvc path and python path options to undefined if the CLI is being auto detected inside a virtual environment', async () => {
     mockedQuickPickValue.mockResolvedValueOnce(2)
 
-    await setupWorkspace()
+    await setupWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
+    expect(mockedSetConfigToUsePythonExtension).toHaveBeenCalledTimes(1)
     expect(mockedSetConfigValue).toHaveBeenCalledWith(
       ConfigKey.DVC_PATH,
       undefined
@@ -158,7 +162,7 @@ describe('setupWorkspace', () => {
     mockedQuickPickValue.mockResolvedValueOnce(1)
     mockedQuickPickOneOrInput.mockResolvedValueOnce(undefined)
 
-    await setupWorkspace()
+    await setupWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedQuickPickOneOrInput).toHaveBeenCalledTimes(1)
@@ -173,8 +177,9 @@ describe('setupWorkspace', () => {
     mockedQuickPickOneOrInput.mockResolvedValueOnce('pick')
     mockedPickFile.mockResolvedValueOnce(mockedPythonPath)
 
-    await setupWorkspace()
+    await setupWorkspace(mockedSetConfigToUsePythonExtension)
 
+    expect(mockedSetConfigToUsePythonExtension).not.toHaveBeenCalled()
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedQuickPickYesOrNo).toHaveBeenCalledTimes(2)
     expect(mockedQuickPickOneOrInput).toHaveBeenCalledTimes(1)
@@ -190,7 +195,7 @@ describe('setupWorkspace', () => {
   it('should return without setting any options if the dialog is cancelled at the virtual environment step', async () => {
     mockedQuickPickValue.mockResolvedValueOnce(undefined)
 
-    await setupWorkspace()
+    await setupWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedSetConfigValue).not.toHaveBeenCalled()
@@ -208,7 +213,7 @@ describe('setupWorkspace', () => {
       .mockResolvedValueOnce(mockedPythonPath)
       .mockResolvedValueOnce(mockedDvcPath)
 
-    await setupWorkspace()
+    await setupWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedQuickPickYesOrNo).toHaveBeenCalledTimes(2)
@@ -229,7 +234,7 @@ describe('setupWorkspace', () => {
     mockedQuickPickValue.mockResolvedValueOnce(1)
     mockedQuickPickOneOrInput.mockResolvedValueOnce(undefined)
 
-    await setupWorkspace()
+    await setupWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedQuickPickYesOrNo).not.toHaveBeenCalled()
@@ -247,7 +252,7 @@ describe('setupWorkspace', () => {
     mockedQuickPickOneOrInput.mockResolvedValueOnce('pick')
     mockedPickFile.mockResolvedValueOnce(mockedDvcPath)
 
-    await setupWorkspace()
+    await setupWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedQuickPickYesOrNo).toHaveBeenCalledTimes(2)
@@ -277,7 +282,8 @@ describe('setup', () => {
     setAvailable: mockedSetAvailable,
     setCliCompatible: mockedSetCliCompatible,
     setRoots: mockedSetRoots,
-    setupWorkspace: mockedSetupWorkspace,
+    shouldWarnUserIfCLIUnavailable: mockedShouldWarnUserIfCLIUnavailable,
+    showSetup: mockedShowSetup,
     unsetPythonBinPath: mockedUnsetPythonBinPath
   }
 
@@ -310,7 +316,7 @@ describe('setup', () => {
     expect(mockedSetRoots).toHaveBeenCalledTimes(1)
     expect(mockedGetConfigValue).not.toHaveBeenCalled()
     expect(mockedWarnWithOptions).not.toHaveBeenCalled()
-    expect(mockedSetupWorkspace).not.toHaveBeenCalled()
+    expect(mockedShowSetup).not.toHaveBeenCalled()
     expect(mockedSetUserConfigValue).not.toHaveBeenCalled()
     expect(mockedResetMembers).toHaveBeenCalledTimes(1)
     expect(mockedInitialize).not.toHaveBeenCalled()
@@ -318,7 +324,7 @@ describe('setup', () => {
 
   it('should not alert the user if the workspace contains a DVC project, the cli cannot be found and the do not show option is set', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
-    mockedHasRoots.mockReturnValueOnce(true)
+    mockedShouldWarnUserIfCLIUnavailable.mockReturnValueOnce(true)
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
     mockedGetCliVersion
       .mockResolvedValueOnce(undefined)
@@ -329,7 +335,7 @@ describe('setup', () => {
     expect(mockedSetRoots).toHaveBeenCalledTimes(1)
     expect(mockedGetConfigValue).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).not.toHaveBeenCalled()
-    expect(mockedSetupWorkspace).not.toHaveBeenCalled()
+    expect(mockedShowSetup).not.toHaveBeenCalled()
     expect(mockedSetUserConfigValue).not.toHaveBeenCalled()
     expect(mockedResetMembers).toHaveBeenCalledTimes(1)
     expect(mockedInitialize).not.toHaveBeenCalled()
@@ -337,7 +343,7 @@ describe('setup', () => {
 
   it('should alert the user if the workspace contains a DVC project and the cli cannot be found', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
-    mockedHasRoots.mockReturnValueOnce(true)
+    mockedShouldWarnUserIfCLIUnavailable.mockReturnValueOnce(true)
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
     mockedGetCliVersion
       .mockResolvedValueOnce(undefined)
@@ -358,14 +364,14 @@ describe('setup', () => {
     expect(mockedInitialize).not.toHaveBeenCalled()
   })
 
-  it('should try to setup the workspace if the workspace contains a DVC project, the cli cannot be found and the user selects setup the workspace', async () => {
+  it('should show the setup webview if the workspace contains a DVC project, the cli cannot be found and the user selects setup', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
-    mockedHasRoots.mockReturnValueOnce(true)
+    mockedShouldWarnUserIfCLIUnavailable.mockReturnValueOnce(true)
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
     mockedGetCliVersion
       .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce(undefined)
-    mockedWarnWithOptions.mockResolvedValueOnce(Response.SETUP_WORKSPACE)
+    mockedWarnWithOptions.mockResolvedValueOnce(Response.SHOW_SETUP)
     mockedExecuteProcess.mockImplementation(({ executable }) =>
       Promise.resolve(executable)
     )
@@ -377,7 +383,7 @@ describe('setup', () => {
     expect(mockedSetRoots).toHaveBeenCalledTimes(1)
     expect(mockedGetConfigValue).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
-    expect(mockedSetupWorkspace).toHaveBeenCalledTimes(1)
+    expect(mockedShowSetup).toHaveBeenCalledTimes(1)
     expect(mockedExecuteCommand).not.toHaveBeenCalled()
     expect(mockedSetUserConfigValue).not.toHaveBeenCalled()
     expect(mockedResetMembers).toHaveBeenCalledTimes(1)
@@ -386,7 +392,7 @@ describe('setup', () => {
 
   it('should set a user config option if the workspace contains a DVC project, the cli cannot be found and the user selects never', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
-    mockedHasRoots.mockReturnValueOnce(true)
+    mockedShouldWarnUserIfCLIUnavailable.mockReturnValueOnce(true)
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(false)
     mockedGetCliVersion.mockResolvedValueOnce(undefined)
     mockedWarnWithOptions.mockResolvedValueOnce(Response.NEVER)
@@ -401,7 +407,7 @@ describe('setup', () => {
     expect(mockedSetRoots).toHaveBeenCalledTimes(1)
     expect(mockedGetConfigValue).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
-    expect(mockedSetupWorkspace).not.toHaveBeenCalled()
+    expect(mockedShowSetup).not.toHaveBeenCalled()
     expect(mockedExecuteCommand).not.toHaveBeenCalled()
     expect(mockedSetUserConfigValue).toHaveBeenCalledTimes(1)
     expect(mockedResetMembers).toHaveBeenCalledTimes(1)
@@ -410,7 +416,8 @@ describe('setup', () => {
 
   it('should not send telemetry or set the cli as unavailable or run initialization if roots have not been found but the cli can be run', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
-    mockedHasRoots.mockReturnValueOnce(false).mockReturnValueOnce(false)
+    mockedShouldWarnUserIfCLIUnavailable.mockReturnValueOnce(false)
+    mockedHasRoots.mockReturnValueOnce(false)
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(false)
     mockedGetCliVersion.mockResolvedValueOnce(MIN_CLI_VERSION)
 
@@ -423,7 +430,8 @@ describe('setup', () => {
 
   it('should run initialization if roots have been found and the cli can be run', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
-    mockedHasRoots.mockReturnValueOnce(true).mockReturnValueOnce(true)
+    mockedShouldWarnUserIfCLIUnavailable.mockReturnValueOnce(true)
+    mockedHasRoots.mockReturnValueOnce(true)
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
     mockedGetCliVersion.mockResolvedValueOnce(MIN_CLI_VERSION)
 
@@ -434,10 +442,8 @@ describe('setup', () => {
 
   it('should call the cli to see if it is available from path if the Python extension is being used and the first call fails', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
-    mockedHasRoots
-      .mockReturnValueOnce(true)
-      .mockReturnValueOnce(true)
-      .mockReturnValueOnce(true)
+    mockedHasRoots.mockReturnValueOnce(true)
+    mockedShouldWarnUserIfCLIUnavailable.mockReturnValueOnce(true)
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
     mockedGetCliVersion
       .mockResolvedValueOnce(undefined)
@@ -452,10 +458,7 @@ describe('setup', () => {
   it('should send a specific message to the user if the Python extension is being used, the CLI is not available in the virtual environment and the global CLI is not compatible', async () => {
     const belowMinVersion = '2.0.0'
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
-    mockedHasRoots
-      .mockReturnValueOnce(true)
-      .mockReturnValueOnce(true)
-      .mockReturnValueOnce(true)
+    mockedShouldWarnUserIfCLIUnavailable.mockReturnValueOnce(true)
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
     mockedExecuteProcess.mockImplementation(({ executable }) =>
       Promise.resolve(executable)
@@ -470,7 +473,7 @@ describe('setup', () => {
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
       `The extension is unable to initialize. The CLI was not located using the interpreter provided by the Python extension. ${belowMinVersion} is installed globally. For auto Python environment activation, ensure the correct interpreter is set. Active Python interpreter: ${mockedPythonPath}.`,
-      Response.SETUP_WORKSPACE,
+      Response.SHOW_SETUP,
       Response.NEVER
     )
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(2)
@@ -483,8 +486,8 @@ describe('setup', () => {
       LATEST_TESTED_CLI_VERSION
     ) as ParsedSemver
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
-    mockedHasRoots
-      .mockReturnValueOnce(true)
+    mockedHasRoots.mockReturnValueOnce(true)
+    mockedShouldWarnUserIfCLIUnavailable
       .mockReturnValueOnce(true)
       .mockReturnValueOnce(true)
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
@@ -505,7 +508,7 @@ describe('setup', () => {
 
   it('should send a specific message to the user if the Python extension is not being used and the CLI is not available', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
-    mockedHasRoots.mockReturnValueOnce(true)
+    mockedShouldWarnUserIfCLIUnavailable.mockReturnValueOnce(true)
     mockedExtensions.all = []
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(false)
     mockedGetCliVersion.mockResolvedValueOnce(undefined)
@@ -515,7 +518,7 @@ describe('setup', () => {
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
       'An error was thrown when trying to access the CLI.',
-      Response.SETUP_WORKSPACE,
+      Response.SHOW_SETUP,
       Response.NEVER
     )
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
@@ -528,7 +531,7 @@ describe('setup', () => {
       .map(num => Number(num) + 100)
       .join('.')
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
-    mockedHasRoots.mockReturnValueOnce(true)
+    mockedShouldWarnUserIfCLIUnavailable.mockReturnValueOnce(true)
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
     mockedGetCliVersion.mockResolvedValueOnce(MajorAhead)
 
@@ -546,6 +549,8 @@ describe('setup', () => {
   it('should send a specific message to the user if the Python extension is being used, the CLI is not available in the virtual environment and no cli is found globally', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
+    mockedShouldWarnUserIfCLIUnavailable.mockReturnValueOnce(true)
+    mockedShouldWarnUserIfCLIUnavailable.mockReturnValueOnce(true)
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
     mockedExecuteProcess.mockImplementation(({ executable }) =>
       Promise.resolve(executable)
@@ -560,7 +565,7 @@ describe('setup', () => {
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
       `The extension is unable to initialize. The CLI was not located using the interpreter provided by the Python extension. The CLI is also not installed globally. For auto Python environment activation, ensure the correct interpreter is set. Active Python interpreter: ${mockedPythonPath}.`,
-      Response.SETUP_WORKSPACE,
+      Response.SHOW_SETUP,
       Response.NEVER
     )
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(2)
@@ -582,7 +587,7 @@ describe('setup', () => {
     const [major] = MIN_CLI_VERSION.split('.')
     const behind = [major, 0, 0].join('.')
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
-    mockedHasRoots.mockReturnValueOnce(true)
+    mockedShouldWarnUserIfCLIUnavailable.mockReturnValueOnce(true)
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
     mockedGetCliVersion.mockResolvedValueOnce(behind)
 
@@ -593,7 +598,7 @@ describe('setup', () => {
   it('should run reset if the cli cannot be run and there is a workspace folder open', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
-    mockedHasRoots.mockReturnValueOnce(true)
+    mockedShouldWarnUserIfCLIUnavailable.mockReturnValueOnce(true)
     mockedGetCliVersion.mockResolvedValueOnce(false)
 
     await setup(extension)
@@ -614,7 +619,8 @@ describe('setupWithGlobalRecheck', () => {
     setAvailable: mockedSetAvailable,
     setCliCompatible: mockedSetCliCompatible,
     setRoots: mockedSetRoots,
-    setupWorkspace: mockedSetupWorkspace,
+    shouldWarnUserIfCLIUnavailable: mockedShouldWarnUserIfCLIUnavailable,
+    showSetup: mockedShowSetup,
     unsetPythonBinPath: mockedUnsetPythonBinPath
   }
 

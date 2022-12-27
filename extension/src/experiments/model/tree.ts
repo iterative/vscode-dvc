@@ -12,7 +12,7 @@ import { ExperimentType } from '.'
 import { ExperimentAugmented } from './filterBy/collect'
 import { collectDeletable, ExperimentItem } from './collect'
 import { MAX_SELECTED_EXPERIMENTS } from './status'
-import { getDataFromColumnPath } from './util'
+import { getDataFromColumnPaths } from './util'
 import { WorkspaceExperiments } from '../workspace'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
@@ -182,7 +182,10 @@ export class ExperimentsTree
   private formatExperiment(experiment: ExperimentAugmented, dvcRoot: string) {
     return {
       collapsibleState: experiment.hasChildren
-        ? this.getCollapsibleState(experiment.displayNameOrParent)
+        ? this.getInitialCollapsibleState(
+            experiment.type,
+            experiment.displayNameOrParent
+          )
         : TreeItemCollapsibleState.None,
       command: {
         arguments: [{ dvcRoot, id: experiment.id }],
@@ -234,8 +237,14 @@ export class ExperimentsTree
     this.expandedExperiments[description] = expanded
   }
 
-  private getCollapsibleState(description?: string) {
-    if (description && this.expandedExperiments[description]) {
+  private getInitialCollapsibleState(
+    type: ExperimentType,
+    description?: string
+  ) {
+    if (
+      (description && this.expandedExperiments[description]) ||
+      type === ExperimentType.BRANCH
+    ) {
       return TreeItemCollapsibleState.Expanded
     }
     return TreeItemCollapsibleState.Collapsed
@@ -347,18 +356,12 @@ export class ExperimentsTree
   }
 
   private getTooltipTable(experiment: Experiment, firstThreeColumns: string[]) {
-    const data = firstThreeColumns
-      .map(path => {
-        const { value, splitUpPath } = getDataFromColumnPath(experiment, path)
-        const [type] = splitUpPath
-        const truncatedKey = truncateFromLeft(
-          path.slice(type.length + 1) || path,
-          30
-        )
-        return value === null ? '' : `| ${truncatedKey} | ${value} |\n`
-      })
+    const data = getDataFromColumnPaths(experiment, firstThreeColumns)
+      .map(
+        ({ truncatedValue: value, columnPath }) =>
+          `| ${truncateFromLeft(columnPath, 30)} | ${value} |\n`
+      )
       .join('')
-
     return data === '' ? undefined : getMarkdownString(`|||\n|:--|--|\n${data}`)
   }
 

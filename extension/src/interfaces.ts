@@ -7,7 +7,8 @@ export interface IExtension {
   hasRoots: () => boolean
   isPythonExtensionUsed: () => Promise<boolean>
 
-  setupWorkspace: () => void
+  showSetup: () => void
+  shouldWarnUserIfCLIUnavailable: () => boolean
 
   initialize: () => Promise<void[]>
   resetMembers: () => void

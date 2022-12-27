@@ -6,9 +6,9 @@ import {
   SectionCollapsed,
   TemplatePlotGroup
 } from '../plots/webview/contract'
-import { GetStartedData } from '../getStarted/webview/contract'
+import { SetupData } from '../setup/webview/contract'
 
-export type WebviewData = TableData | PlotsData | GetStartedData
+export type WebviewData = TableData | PlotsData | SetupData
 
 export enum MessageFromWebviewType {
   INITIALIZED = 'initialized',
@@ -18,7 +18,6 @@ export enum MessageFromWebviewType {
   FOCUS_FILTERS_TREE = 'focus-filters-tree',
   FOCUS_SORTS_TREE = 'focus-sorts-tree',
   OPEN_PLOTS_WEBVIEW = 'open-plots-webview',
-  OPEN_EXPERIMENTS_WEBVIEW = 'open-experiments-webview',
   OPEN_PARAMS_FILE_TO_THE_SIDE = 'open-params-file-to-the-side',
   REMOVE_COLUMN_SORT = 'remove-column-sort',
   REMOVE_EXPERIMENT = 'remove-experiment',
@@ -38,6 +37,7 @@ export enum MessageFromWebviewType {
   SELECT_EXPERIMENTS = 'select-experiments',
   SELECT_COLUMNS = 'select-columns',
   SELECT_PLOTS = 'select-plots',
+  SELECT_PYTHON_INTERPRETER = 'select-python-interpreter',
   SET_EXPERIMENTS_FOR_PLOTS = 'set-experiments-for-plots',
   SET_EXPERIMENTS_AND_OPEN_PLOTS = 'set-experiments-and-open-plots',
   SHARE_EXPERIMENT_AS_BRANCH = 'share-experiment-as-branch',
@@ -48,7 +48,9 @@ export enum MessageFromWebviewType {
   MODIFY_EXPERIMENT_PARAMS_AND_RUN = 'modify-experiment-params-and-run',
   MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN = 'modify-experiment-params-reset-and-run',
   SET_EXPERIMENTS_HEADER_HEIGHT = 'update-experiments-header-height',
-  INITIALIZE_PROJECT = 'initialize-project'
+  INITIALIZE_PROJECT = 'initialize-project',
+  INSTALL_DVC = 'install-dvc',
+  SETUP_WORKSPACE = 'setup-workspace'
 }
 
 export type ColumnResizePayload = {
@@ -155,13 +157,13 @@ export type MessageFromWebview =
     }
   | { type: MessageFromWebviewType.INITIALIZED }
   | { type: MessageFromWebviewType.SELECT_EXPERIMENTS }
+  | { type: MessageFromWebviewType.SELECT_PYTHON_INTERPRETER }
   | { type: MessageFromWebviewType.SELECT_PLOTS }
   | { type: MessageFromWebviewType.REFRESH_REVISION; payload: string }
   | { type: MessageFromWebviewType.REFRESH_REVISIONS; payload: string[] }
   | { type: MessageFromWebviewType.SELECT_COLUMNS }
   | { type: MessageFromWebviewType.FOCUS_FILTERS_TREE }
   | { type: MessageFromWebviewType.FOCUS_SORTS_TREE }
-  | { type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW }
   | { type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW }
   | {
       type: MessageFromWebviewType.SET_EXPERIMENTS_FOR_PLOTS
@@ -181,6 +183,8 @@ export type MessageFromWebview =
     }
   | { type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_HEIGHT }
   | { type: MessageFromWebviewType.INITIALIZE_PROJECT }
+  | { type: MessageFromWebviewType.INSTALL_DVC }
+  | { type: MessageFromWebviewType.SETUP_WORKSPACE }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA

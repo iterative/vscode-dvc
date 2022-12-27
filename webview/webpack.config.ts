@@ -25,12 +25,12 @@ export default {
   devtool: 'source-map',
   entry: {
     experiments: { dependOn: 'react', import: r('src/experiments/index.tsx') },
-    getStarted: {
-      dependOn: 'react',
-      import: r('src/getStarted/index.tsx')
-    },
     plots: { dependOn: 'react', import: r('src/plots/index.tsx') },
-    react: ['react', 'react-dom']
+    react: ['react', 'react-dom'],
+    setup: {
+      dependOn: 'react',
+      import: r('src/setup/index.tsx')
+    }
   },
   module: {
     rules: [

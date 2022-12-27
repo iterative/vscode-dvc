@@ -30,12 +30,14 @@ import { EventName } from '../../telemetry/constants'
 import { OutputChannel } from '../../vscode/outputChannel'
 import { WorkspaceExperiments } from '../../experiments/workspace'
 import { QuickPickItemWithValue } from '../../vscode/quickPick'
-import { MIN_CLI_VERSION } from '../../cli/dvc/constants'
 import * as WorkspaceFolders from '../../vscode/workspaceFolders'
 import { DvcExecutor } from '../../cli/dvc/executor'
 import { GitReader } from '../../cli/git/reader'
 import { Config } from '../../config'
-import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
+import {
+  EXPERIMENT_WORKSPACE_ID,
+  MIN_CLI_VERSION
+} from '../../cli/dvc/contract'
 import { ConfigKey, setConfigValue } from '../../vscode/config'
 
 suite('Extension Test Suite', () => {

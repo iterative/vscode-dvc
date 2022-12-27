@@ -87,33 +87,43 @@ export class Status extends Disposable {
   }
 
   private getCommand() {
-    if (this.available) {
+    if (this.workers) {
       return
     }
+
+    if (this.available) {
+      return {
+        command: RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+        title: Title.SETUP_WORKSPACE
+      }
+    }
+
     return {
-      command: RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-      title: Title.SETUP_WORKSPACE
+      command: RegisteredCommands.SETUP_SHOW,
+      title: Title.SHOW_SETUP
     }
   }
 
   private getEnvDetails() {
     const dvcPath = this.config.getCliPath()
-    if (dvcPath) {
-      return { indicator: '(Global)', tooltip: dvcPath }
+    const pythonBinPath = this.config.getPythonBinPath()
+    if (dvcPath || !pythonBinPath) {
+      return {
+        indicator: '(Global)',
+        tooltip: `Locate DVC at: ${dvcPath || 'dvc'}`
+      }
     }
 
     if (this.config.isPythonExtensionUsed()) {
       return {
         indicator: '(Auto)',
-        tooltip: 'Interpreter set by Python extension'
+        tooltip: `Locate DVC in the Python environment selected by the Python extension: ${pythonBinPath}`
       }
     }
 
-    const pythonBinPath = this.config.getPythonBinPath()
-    if (pythonBinPath) {
-      return { indicator: '(Manual)', tooltip: pythonBinPath }
+    return {
+      indicator: '(Manual)',
+      tooltip: `Locate DVC in this Python environment: ${pythonBinPath}`
     }
-
-    return { indicator: '(Global)', tooltip: 'dvc' }
   }
 }
