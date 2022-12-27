@@ -83,6 +83,7 @@ describe('Experiments Table Webview', function () {
   })
 
   it('should update with a new row for each checkpoint when an experiment is running', async function () {
+    this.timeout(180000)
     await runModifiedExperiment()
     await webview.focus()
 
@@ -107,7 +108,7 @@ describe('Experiments Table Webview', function () {
     await waitForDvcToFinish()
     const workbench = await browser.getWorkbench()
     return workbench.executeCommand('Terminal: Kill All Terminals')
-  }).timeout(180000)
+  })
 })
 
 describe('Plots Webview', function () {
@@ -116,6 +117,7 @@ describe('Plots Webview', function () {
   })
 
   it('should load the plots webview with non-empty plots', async function () {
+    this.timeout(60000)
     const webview = new PlotsWebview('plots')
     const workbench = await browser.getWorkbench()
     await workbench.openCommandPrompt()
@@ -141,7 +143,7 @@ describe('Plots Webview', function () {
     }
 
     await webview.unfocus()
-  }).timeout(60000)
+  })
 })
 
 describe('Source Control View', function () {
