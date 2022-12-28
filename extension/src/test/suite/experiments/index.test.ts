@@ -1322,7 +1322,7 @@ suite('Experiments Test Suite', () => {
       expect(
         mockMemento.keys(),
         'Memento starts with the status keys'
-      ).to.deep.equal(['experimentsStatus:test', 'columnsColumnOrder:test'])
+      ).to.deep.equal(['columnsColumnOrder:test', 'experimentsStatus:test'])
 
       expect(
         mockMemento.get('experimentsStatus:test'),
