@@ -1,40 +1,40 @@
 import { resolve } from 'path'
 import { extensions, Extension, commands } from 'vscode'
-import { setup, setupWithGlobalRecheck, setupWorkspace } from './setup'
-import { flushPromises } from './test/util/jest'
+import { run, runWithGlobalRecheck, runWorkspace } from './runner'
+import { flushPromises } from '../test/util/jest'
 import {
   ConfigKey,
   getConfigValue,
   setConfigValue,
   setUserConfigValue
-} from './vscode/config'
-import { pickFile } from './vscode/resourcePicker'
+} from '../vscode/config'
+import { pickFile } from '../vscode/resourcePicker'
 import {
   quickPickOneOrInput,
   quickPickValue,
   quickPickYesOrNo
-} from './vscode/quickPick'
-import { getFirstWorkspaceFolder } from './vscode/workspaceFolders'
-import { Toast } from './vscode/toast'
-import { Response } from './vscode/response'
-import { VscodePython } from './extensions/python'
-import { executeProcess } from './processExecution'
+} from '../vscode/quickPick'
+import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
+import { Toast } from '../vscode/toast'
+import { Response } from '../vscode/response'
+import { VscodePython } from '../extensions/python'
+import { executeProcess } from '../processExecution'
 import {
   LATEST_TESTED_CLI_VERSION,
   MAX_CLI_VERSION,
   MIN_CLI_VERSION
-} from './cli/dvc/contract'
-import { extractSemver, ParsedSemver } from './cli/dvc/version'
-import { delay } from './util/time'
-import { Title } from './vscode/title'
+} from '../cli/dvc/contract'
+import { extractSemver, ParsedSemver } from '../cli/dvc/version'
+import { delay } from '../util/time'
+import { Title } from '../vscode/title'
 
 jest.mock('vscode')
-jest.mock('./vscode/config')
-jest.mock('./vscode/resourcePicker')
-jest.mock('./vscode/quickPick')
-jest.mock('./vscode/toast')
-jest.mock('./vscode/workspaceFolders')
-jest.mock('./processExecution')
+jest.mock('../vscode/config')
+jest.mock('../vscode/resourcePicker')
+jest.mock('../vscode/quickPick')
+jest.mock('../vscode/toast')
+jest.mock('../vscode/workspaceFolders')
+jest.mock('../processExecution')
 
 const mockedExtensions = jest.mocked(extensions)
 const mockedCommands = jest.mocked(commands)
@@ -104,11 +104,11 @@ beforeEach(() => {
   } & { [x: number]: jest.MockedObjectDeep<Extension<unknown>> }
 })
 
-describe('setupWorkspace', () => {
+describe('runWorkspace', () => {
   it('should present two options if the python extension is installed (Auto & Global)', async () => {
     mockedQuickPickValue.mockResolvedValueOnce(undefined)
 
-    await setupWorkspace(mockedSetConfigToUsePythonExtension)
+    await runWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedQuickPickValue).toHaveBeenCalledWith(
@@ -126,7 +126,7 @@ describe('setupWorkspace', () => {
   it('should present two options if the python extension is NOT installed (Manual & Global)', async () => {
     mockedExtensions.all = []
 
-    await setupWorkspace(mockedSetConfigToUsePythonExtension)
+    await runWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedQuickPickValue).toHaveBeenCalledWith(
@@ -144,7 +144,7 @@ describe('setupWorkspace', () => {
   it('should set the dvc path and python path options to undefined if the CLI is being auto detected inside a virtual environment', async () => {
     mockedQuickPickValue.mockResolvedValueOnce(2)
 
-    await setupWorkspace(mockedSetConfigToUsePythonExtension)
+    await runWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedSetConfigToUsePythonExtension).toHaveBeenCalledTimes(1)
@@ -162,7 +162,7 @@ describe('setupWorkspace', () => {
     mockedQuickPickValue.mockResolvedValueOnce(1)
     mockedQuickPickOneOrInput.mockResolvedValueOnce(undefined)
 
-    await setupWorkspace(mockedSetConfigToUsePythonExtension)
+    await runWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedQuickPickOneOrInput).toHaveBeenCalledTimes(1)
@@ -177,7 +177,7 @@ describe('setupWorkspace', () => {
     mockedQuickPickOneOrInput.mockResolvedValueOnce('pick')
     mockedPickFile.mockResolvedValueOnce(mockedPythonPath)
 
-    await setupWorkspace(mockedSetConfigToUsePythonExtension)
+    await runWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedSetConfigToUsePythonExtension).not.toHaveBeenCalled()
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
@@ -195,7 +195,7 @@ describe('setupWorkspace', () => {
   it('should return without setting any options if the dialog is cancelled at the virtual environment step', async () => {
     mockedQuickPickValue.mockResolvedValueOnce(undefined)
 
-    await setupWorkspace(mockedSetConfigToUsePythonExtension)
+    await runWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedSetConfigValue).not.toHaveBeenCalled()
@@ -213,7 +213,7 @@ describe('setupWorkspace', () => {
       .mockResolvedValueOnce(mockedPythonPath)
       .mockResolvedValueOnce(mockedDvcPath)
 
-    await setupWorkspace(mockedSetConfigToUsePythonExtension)
+    await runWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedQuickPickYesOrNo).toHaveBeenCalledTimes(2)
@@ -234,7 +234,7 @@ describe('setupWorkspace', () => {
     mockedQuickPickValue.mockResolvedValueOnce(1)
     mockedQuickPickOneOrInput.mockResolvedValueOnce(undefined)
 
-    await setupWorkspace(mockedSetConfigToUsePythonExtension)
+    await runWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedQuickPickYesOrNo).not.toHaveBeenCalled()
@@ -252,7 +252,7 @@ describe('setupWorkspace', () => {
     mockedQuickPickOneOrInput.mockResolvedValueOnce('pick')
     mockedPickFile.mockResolvedValueOnce(mockedDvcPath)
 
-    await setupWorkspace(mockedSetConfigToUsePythonExtension)
+    await runWorkspace(mockedSetConfigToUsePythonExtension)
 
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedQuickPickYesOrNo).toHaveBeenCalledTimes(2)
@@ -270,7 +270,7 @@ describe('setupWorkspace', () => {
   })
 })
 
-describe('setup', () => {
+describe('run', () => {
   const extensionSetup = {
     getAvailable: mockedGetAvailable,
     getCliVersion: mockedGetCliVersion,
@@ -290,7 +290,7 @@ describe('setup', () => {
   it('should do nothing if there is no workspace folder', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(undefined)
 
-    await setup(extensionSetup)
+    await run(extensionSetup)
 
     expect(mockedGetCliVersion).not.toHaveBeenCalled()
     expect(mockedInitialize).not.toHaveBeenCalled()
@@ -301,7 +301,7 @@ describe('setup', () => {
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(false)
     mockedGetCliVersion.mockResolvedValueOnce(false)
 
-    await setup(extensionSetup)
+    await run(extensionSetup)
 
     expect(mockedSetRoots).toHaveBeenCalledTimes(1)
   })
@@ -312,7 +312,7 @@ describe('setup', () => {
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(false)
     mockedGetCliVersion.mockResolvedValueOnce(undefined)
 
-    await setup(extensionSetup)
+    await run(extensionSetup)
     expect(mockedSetRoots).toHaveBeenCalledTimes(1)
     expect(mockedGetConfigValue).not.toHaveBeenCalled()
     expect(mockedWarnWithOptions).not.toHaveBeenCalled()
@@ -331,7 +331,7 @@ describe('setup', () => {
       .mockResolvedValueOnce(undefined)
     mockedGetConfigValue.mockReturnValueOnce(true)
 
-    await setup(extensionSetup)
+    await run(extensionSetup)
     expect(mockedSetRoots).toHaveBeenCalledTimes(1)
     expect(mockedGetConfigValue).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).not.toHaveBeenCalled()
@@ -355,7 +355,7 @@ describe('setup', () => {
     mockedReady.mockResolvedValue(true)
     mockedGetExtension.mockReturnValue(mockedVscodePython)
 
-    await setup(extensionSetup)
+    await run(extensionSetup)
     await flushPromises()
     expect(mockedSetRoots).toHaveBeenCalledTimes(1)
     expect(mockedGetConfigValue).toHaveBeenCalledTimes(1)
@@ -378,7 +378,7 @@ describe('setup', () => {
     mockedReady.mockResolvedValue(true)
     mockedGetExtension.mockReturnValue(mockedVscodePython)
 
-    await setup(extensionSetup)
+    await run(extensionSetup)
     await flushPromises()
     expect(mockedSetRoots).toHaveBeenCalledTimes(1)
     expect(mockedGetConfigValue).toHaveBeenCalledTimes(1)
@@ -402,7 +402,7 @@ describe('setup', () => {
     mockedReady.mockResolvedValue(true)
     mockedGetExtension.mockReturnValue(mockedVscodePython)
 
-    await setup(extensionSetup)
+    await run(extensionSetup)
     await flushPromises()
     expect(mockedSetRoots).toHaveBeenCalledTimes(1)
     expect(mockedGetConfigValue).toHaveBeenCalledTimes(1)
@@ -421,7 +421,7 @@ describe('setup', () => {
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(false)
     mockedGetCliVersion.mockResolvedValueOnce(MIN_CLI_VERSION)
 
-    await setup(extensionSetup)
+    await run(extensionSetup)
     expect(mockedSetRoots).toHaveBeenCalledTimes(1)
     expect(mockedResetMembers).toHaveBeenCalledTimes(1)
     expect(mockedSetAvailable).not.toHaveBeenCalledWith(false)
@@ -435,7 +435,7 @@ describe('setup', () => {
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
     mockedGetCliVersion.mockResolvedValueOnce(MIN_CLI_VERSION)
 
-    await setup(extensionSetup)
+    await run(extensionSetup)
     expect(mockedResetMembers).not.toHaveBeenCalled()
     expect(mockedInitialize).toHaveBeenCalledTimes(1)
   })
@@ -449,7 +449,7 @@ describe('setup', () => {
       .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce(MIN_CLI_VERSION)
 
-    await setup(extensionSetup)
+    await run(extensionSetup)
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(2)
     expect(mockedResetMembers).not.toHaveBeenCalled()
     expect(mockedInitialize).toHaveBeenCalledTimes(1)
@@ -468,7 +468,7 @@ describe('setup', () => {
       .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce(belowMinVersion)
 
-    await setup(extensionSetup)
+    await run(extensionSetup)
     await flushPromises()
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
@@ -495,7 +495,7 @@ describe('setup', () => {
       .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce([major, minor + 1, patch].join('.'))
 
-    await setup(extensionSetup)
+    await run(extensionSetup)
     await flushPromises()
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
@@ -513,7 +513,7 @@ describe('setup', () => {
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(false)
     mockedGetCliVersion.mockResolvedValueOnce(undefined)
 
-    await setup(extensionSetup)
+    await run(extensionSetup)
     await flushPromises()
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
@@ -535,7 +535,7 @@ describe('setup', () => {
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
     mockedGetCliVersion.mockResolvedValueOnce(MajorAhead)
 
-    await setup(extensionSetup)
+    await run(extensionSetup)
     await flushPromises()
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
@@ -560,7 +560,7 @@ describe('setup', () => {
       .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce(undefined)
 
-    await setup(extensionSetup)
+    await run(extensionSetup)
     await flushPromises()
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
@@ -579,7 +579,7 @@ describe('setup', () => {
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(false)
     mockedGetCliVersion.mockResolvedValueOnce(false)
 
-    await setup(extensionSetup)
+    await run(extensionSetup)
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
   })
 
@@ -591,7 +591,7 @@ describe('setup', () => {
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
     mockedGetCliVersion.mockResolvedValueOnce(behind)
 
-    await setup(extensionSetup)
+    await run(extensionSetup)
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
   })
 
@@ -601,13 +601,13 @@ describe('setup', () => {
     mockedShouldWarnUserIfCLIUnavailable.mockReturnValueOnce(true)
     mockedGetCliVersion.mockResolvedValueOnce(false)
 
-    await setup(extensionSetup)
+    await run(extensionSetup)
     expect(mockedResetMembers).toHaveBeenCalledTimes(1)
     expect(mockedInitialize).not.toHaveBeenCalled()
   })
 })
 
-describe('setupWithGlobalRecheck', () => {
+describe('runWithGlobalRecheck', () => {
   const extensionSetup = {
     getAvailable: mockedGetAvailable,
     getCliVersion: mockedGetCliVersion,
@@ -640,7 +640,7 @@ describe('setupWithGlobalRecheck', () => {
       .mockResolvedValueOnce(LATEST_TESTED_CLI_VERSION)
       .mockResolvedValueOnce(LATEST_TESTED_CLI_VERSION)
 
-    await setupWithGlobalRecheck(extensionSetup, mockedRecheckInterval)
+    await runWithGlobalRecheck(extensionSetup, mockedRecheckInterval)
 
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
     expect(mockedGetAvailable).toHaveBeenCalledTimes(1)
@@ -668,7 +668,7 @@ describe('setupWithGlobalRecheck', () => {
 
     mockedGetCliVersion.mockResolvedValueOnce(LATEST_TESTED_CLI_VERSION)
 
-    await setupWithGlobalRecheck(extensionSetup, 0)
+    await runWithGlobalRecheck(extensionSetup, 0)
 
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
     expect(mockedGetAvailable).toHaveBeenCalledTimes(1)
@@ -690,7 +690,7 @@ describe('setupWithGlobalRecheck', () => {
     mockedGetAvailable.mockReturnValueOnce(false).mockReturnValueOnce(true)
     mockedGetCliVersion.mockResolvedValueOnce(undefined)
 
-    await setupWithGlobalRecheck(extensionSetup, 0)
+    await runWithGlobalRecheck(extensionSetup, 0)
 
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
     expect(mockedGetAvailable).toHaveBeenCalledTimes(1)

@@ -23,7 +23,7 @@ import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../commands/external'
-import * as Setup from '../../setup'
+import * as Setup from '../../setup/runner'
 import * as Watcher from '../../fileSystem/watcher'
 import * as Telemetry from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
@@ -306,7 +306,7 @@ suite('Extension Test Suite', () => {
       mockDuration(0)
 
       const mockErrorMessage = 'NOPE'
-      stub(Setup, 'setupWorkspace').rejects(new Error(mockErrorMessage))
+      stub(Setup, 'runWorkspace').rejects(new Error(mockErrorMessage))
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
       await expect(
@@ -346,7 +346,7 @@ suite('Extension Test Suite', () => {
   describe('dvc.init', () => {
     it('should be able to run dvc.init without error', async () => {
       const mockInit = stub(DvcExecutor.prototype, 'init').resolves('')
-      const mockSetup = stub(Setup, 'setup')
+      const mockSetup = stub(Setup, 'run')
       const mockSetupCalled = new Promise(resolve =>
         mockSetup.callsFake(() => {
           resolve(undefined)
@@ -388,7 +388,7 @@ suite('Extension Test Suite', () => {
 
   describe('dvc.checkCLICompatible', () => {
     it('should call setup', async () => {
-      const mockSetup = stub(Setup, 'setup').resolves(undefined)
+      const mockSetup = stub(Setup, 'run').resolves(undefined)
       await commands.executeCommand(
         RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE
       )
