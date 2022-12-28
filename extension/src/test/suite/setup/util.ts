@@ -1,7 +1,9 @@
 import { EventEmitter, commands } from 'vscode'
 import { Disposer } from '@hediet/std/disposable'
 import { fake, stub } from 'sinon'
+import * as FileSystem from '../../../fileSystem'
 import { Setup } from '../../../setup/index'
+import * as RunSetup from '../../../setup'
 import { buildDependencies, mockDisposable } from '../util'
 import * as AutoInstall from '../../../setup/autoInstall'
 import { DvcReader } from '../../../cli/dvc/reader'
@@ -13,21 +15,38 @@ import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { DvcRunner } from '../../../cli/dvc/runner'
 import { StopWatch } from '../../../util/time'
 import { WorkspaceScale } from '../../../telemetry/collect'
+import { dvcDemoPath } from '../../util'
 
-export const buildSetup = (disposer: Disposer, hasData = false) => {
+export const buildSetup = (
+  disposer: Disposer,
+  hasData = false,
+  noDvcRoot = true,
+  noGitRoot = true
+) => {
   const { config, messageSpy, resourceLocator } = buildDependencies(disposer)
+
+  const mockDvcRoot = noDvcRoot ? undefined : dvcDemoPath
+  const mockGitRoot = noGitRoot ? undefined : dvcDemoPath
 
   const mockEmitter = disposer.track(new EventEmitter())
   const mockEvent = mockEmitter.event
 
+  const mockGetGitRepositoryRoot = stub().resolves(mockGitRoot)
   const mockInitializeDvc = fake()
   const mockInitializeGit = fake()
   const mockOpenExperiments = fake()
+  const mockRoot = stub().resolves(mockDvcRoot)
+  stub(FileSystem, 'findDvcRootPaths').resolves(
+    [mockDvcRoot].filter(Boolean) as string[]
+  )
 
   const mockExecuteCommand = stub(commands, 'executeCommand')
 
   const mockAutoInstallDvc = stub(AutoInstall, 'autoInstallDvc')
+  stub(AutoInstall, 'findPythonBinForInstall').resolves(undefined)
   stub(commands, 'registerCommand').returns(mockDisposable)
+  stub(RunSetup, 'setup').resolves(undefined)
+  stub(RunSetup, 'setupWithGlobalRecheck').resolves(undefined)
 
   const setup = disposer.track(
     new Setup(
@@ -40,8 +59,9 @@ export const buildSetup = (disposer: Disposer, hasData = false) => {
       } as unknown as DvcExecutor,
       {
         onDidCompleteProcess: mockEvent,
-        onDidStartProcess: mockEvent
-      } as DvcReader,
+        onDidStartProcess: mockEvent,
+        root: mockRoot
+      } as unknown as DvcReader,
       {
         onDidCompleteProcess: mockEvent,
         onDidStartProcess: mockEvent
@@ -52,9 +72,10 @@ export const buildSetup = (disposer: Disposer, hasData = false) => {
         onDidStartProcess: mockEvent
       } as unknown as GitExecutor,
       {
+        getGitRepositoryRoot: mockGetGitRepositoryRoot,
         onDidCompleteProcess: mockEvent,
         onDidStartProcess: mockEvent
-      } as GitReader,
+      } as unknown as GitReader,
       () => Promise.resolve([undefined]),
       () => Promise.resolve(undefined),
       {
@@ -72,9 +93,11 @@ export const buildSetup = (disposer: Disposer, hasData = false) => {
   )
 
   return {
+    config,
     messageSpy,
     mockAutoInstallDvc,
     mockExecuteCommand,
+    mockGetGitRepositoryRoot,
     mockInitializeDvc,
     mockInitializeGit,
     mockOpenExperiments,

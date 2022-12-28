@@ -182,18 +182,9 @@ export class Extension extends Disposable {
     this.internalCommands.registerExternalCommand(
       RegisteredCommands.EXPERIMENT_AND_PLOTS_SHOW,
       async (context: VsCodeContext) => {
-        await this.showExperiments(getDvcRootFromContext(context))
-        await this.plots.showWebview(
-          getDvcRootFromContext(context),
-          ViewColumn.Beside
-        )
-      }
-    )
-
-    this.internalCommands.registerExternalCommand(
-      RegisteredCommands.SETUP_SHOW,
-      async () => {
-        await this.setup.showWebview()
+        const dvcRoot = getDvcRootFromContext(context)
+        await this.experiments.showWebview(dvcRoot, ViewColumn.Active)
+        await this.plots.showWebview(dvcRoot, ViewColumn.Beside)
       }
     )
 
@@ -239,10 +230,6 @@ export class Extension extends Disposable {
     this.dispose.track(recommendRedHatExtensionOnce())
   }
 
-  public getRoots() {
-    return this.setup.getRoots()
-  }
-
   public async initialize() {
     this.resetMembers()
 
@@ -276,8 +263,8 @@ export class Extension extends Disposable {
     this.plots.reset()
   }
 
-  private async showExperiments(dvcRoot: string) {
-    return await this.experiments.showWebview(dvcRoot, ViewColumn.Active)
+  private getRoots() {
+    return this.setup.getRoots()
   }
 }
 

@@ -122,16 +122,10 @@ export class Setup
       this.sendDataToWebview()
     }
 
-    internalCommands.registerExternalCliCommand(
-      RegisteredCliCommands.INIT,
-      () => this.initializeDvc()
-    )
+    this.showExperiments = () =>
+      experiments.showWebview(this.dvcRoots[0], ViewColumn.Active)
 
-    this.dispose.track(
-      this.onDidChangeWorkspace(() => {
-        setup(this)
-      })
-    )
+    this.registerCommands(internalCommands)
 
     this.getHasData = () => experiments.getHasData()
     const onDidChangeHasData = experiments.columnsChanged.event
@@ -142,62 +136,14 @@ export class Setup
       })
     )
 
-    this.showExperiments = () =>
-      experiments.showWebview(this.dvcRoots[0], ViewColumn.Active)
-
-    internalCommands.registerExternalCommand(
-      RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE,
-      () => setup(this)
-    )
-
     this.dispose.track(
-      commands.registerCommand(
-        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-        () => this.setupWorkspace()
-      )
+      this.onDidChangeWorkspace(() => {
+        setup(this)
+      })
     )
-
     this.watchForVenvChanges()
-
-    this.dispose.track(
-      this.config.onDidChangeExecutionDetails(async () => {
-        const stopWatch = new StopWatch()
-        try {
-          this.sendDataToWebview()
-          await setup(this)
-
-          return sendTelemetryEvent(
-            EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
-            await this.getEventProperties(),
-            { duration: stopWatch.getElapsedTime() }
-          )
-        } catch (error: unknown) {
-          return sendTelemetryEventAndThrow(
-            EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
-            error as Error,
-            stopWatch.getElapsedTime(),
-            await this.getEventProperties()
-          )
-        }
-      })
-    )
-
-    setupWithGlobalRecheck(this)
-      .then(async () => {
-        sendTelemetryEvent(
-          EventName.EXTENSION_LOAD,
-          await this.getEventProperties(),
-          { duration: stopWatch.getElapsedTime() }
-        )
-      })
-      .catch(async error =>
-        sendTelemetryEventAndThrow(
-          EventName.EXTENSION_LOAD,
-          error,
-          stopWatch.getElapsedTime(),
-          await this.getEventProperties()
-        )
-      )
+    this.watchExecutionDetailsForChanges()
+    this.watchPathForChanges(stopWatch)
   }
 
   public getRoots() {
@@ -382,6 +328,32 @@ export class Setup
     }
   }
 
+  private registerCommands(internalCommands: InternalCommands) {
+    internalCommands.registerExternalCliCommand(
+      RegisteredCliCommands.INIT,
+      () => this.initializeDvc()
+    )
+
+    internalCommands.registerExternalCommand(
+      RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE,
+      () => setup(this)
+    )
+
+    this.dispose.track(
+      commands.registerCommand(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+        () => this.setupWorkspace()
+      )
+    )
+
+    internalCommands.registerExternalCommand(
+      RegisteredCommands.SETUP_SHOW,
+      async () => {
+        await this.showSetup()
+      }
+    )
+  }
+
   private async setupWorkspace() {
     const stopWatch = new StopWatch()
     try {
@@ -415,6 +387,50 @@ export class Setup
         stopWatch.getElapsedTime()
       )
     }
+  }
+
+  private watchExecutionDetailsForChanges() {
+    this.dispose.track(
+      this.config.onDidChangeExecutionDetails(async () => {
+        const stopWatch = new StopWatch()
+        try {
+          this.sendDataToWebview()
+          await setup(this)
+
+          return sendTelemetryEvent(
+            EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
+            await this.getEventProperties(),
+            { duration: stopWatch.getElapsedTime() }
+          )
+        } catch (error: unknown) {
+          return sendTelemetryEventAndThrow(
+            EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
+            error as Error,
+            stopWatch.getElapsedTime(),
+            await this.getEventProperties()
+          )
+        }
+      })
+    )
+  }
+
+  private watchPathForChanges(stopWatch: StopWatch) {
+    setupWithGlobalRecheck(this)
+      .then(async () => {
+        sendTelemetryEvent(
+          EventName.EXTENSION_LOAD,
+          await this.getEventProperties(),
+          { duration: stopWatch.getElapsedTime() }
+        )
+      })
+      .catch(async error =>
+        sendTelemetryEventAndThrow(
+          EventName.EXTENSION_LOAD,
+          error,
+          stopWatch.getElapsedTime(),
+          await this.getEventProperties()
+        )
+      )
   }
 
   private watchForVenvChanges() {
