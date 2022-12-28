@@ -1,9 +1,9 @@
 export type SetupData = {
   canGitInitialize: boolean
   cliCompatible: boolean | undefined
-  projectInitialized: boolean
   hasData: boolean | undefined
   isPythonExtensionInstalled: boolean
   needsGitInitialized: boolean | undefined
+  projectInitialized: boolean
   pythonBinPath: string | undefined
 }

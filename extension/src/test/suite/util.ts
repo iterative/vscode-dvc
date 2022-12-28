@@ -154,7 +154,14 @@ export const buildInternalCommands = (disposer: Disposer) => {
     )
   )
 
-  return { dvcExecutor, dvcReader, dvcRunner, gitReader, internalCommands }
+  return {
+    config,
+    dvcExecutor,
+    dvcReader,
+    dvcRunner,
+    gitReader,
+    internalCommands
+  }
 }
 
 export const buildMockData = <T extends ExperimentsData | FileSystemData>() =>
@@ -168,8 +175,14 @@ export const buildDependencies = (
   expShow = expShowFixture,
   plotsDiff = plotsDiffFixture
 ) => {
-  const { dvcExecutor, dvcReader, dvcRunner, gitReader, internalCommands } =
-    buildInternalCommands(disposer)
+  const {
+    config,
+    dvcExecutor,
+    dvcReader,
+    dvcRunner,
+    gitReader,
+    internalCommands
+  } = buildInternalCommands(disposer)
 
   const mockCreateFileSystemWatcher = stub(
     Watcher,
@@ -193,6 +206,7 @@ export const buildDependencies = (
   const messageSpy = spy(BaseWebview.prototype, 'show')
 
   return {
+    config,
     dvcExecutor,
     dvcReader,
     dvcRunner,

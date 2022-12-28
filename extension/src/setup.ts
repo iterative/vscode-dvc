@@ -1,4 +1,4 @@
-import { IExtension } from './interfaces'
+import { IExtensionSetup } from './interfaces'
 import {
   quickPickOneOrInput,
   quickPickValue,
@@ -176,7 +176,7 @@ export const setupWorkspace = async (
 }
 
 export const checkAvailable = async (
-  extension: IExtension,
+  extension: IExtensionSetup,
   dvcRootOrFirstFolder: string
 ) => {
   const { isAvailable, isCompatible } = await extensionCanRunCli(
@@ -194,7 +194,7 @@ export const checkAvailable = async (
   extension.resetMembers()
 }
 
-export const setup = async (extension: IExtension) => {
+export const setup = async (extension: IExtensionSetup) => {
   const cwd = getFirstWorkspaceFolder()
   if (!cwd) {
     return
@@ -209,7 +209,7 @@ export const setup = async (extension: IExtension) => {
 }
 
 export const setupWithGlobalRecheck = async (
-  extension: IExtension,
+  extension: IExtensionSetup,
   recheckInterval = 5000
 ): Promise<void> => {
   await setup(extension)

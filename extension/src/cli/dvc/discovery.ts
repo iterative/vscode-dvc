@@ -4,7 +4,7 @@ import {
   MIN_CLI_VERSION
 } from './contract'
 import { CliCompatible, isVersionCompatible } from './version'
-import { IExtension } from '../../interfaces'
+import { IExtensionSetup } from '../../interfaces'
 import { Toast } from '../../vscode/toast'
 import { Response } from '../../vscode/response'
 import {
@@ -37,7 +37,7 @@ export const warnAheadOfLatestTested = (): void => {
 }
 
 const warnUserCLIInaccessible = async (
-  extension: IExtension,
+  extension: IExtensionSetup,
   warningText: string
 ): Promise<void> => {
   if (getConfigValue<boolean>(ConfigKey.DO_NOT_SHOW_CLI_UNAVAILABLE)) {
@@ -59,7 +59,7 @@ const warnUserCLIInaccessible = async (
 }
 
 const warnUserCLIInaccessibleAnywhere = async (
-  extension: IExtension,
+  extension: IExtensionSetup,
   globalDvcVersion: string | undefined
 ): Promise<void> => {
   const binPath = await getPythonBinPath()
@@ -73,7 +73,7 @@ const warnUserCLIInaccessibleAnywhere = async (
 }
 
 const warnUser = (
-  extension: IExtension,
+  extension: IExtensionSetup,
   cliCompatible: CliCompatible,
   version: string | undefined
 ): void => {
@@ -118,7 +118,7 @@ export const isCliCompatible = (
 }
 
 const getVersionDetails = async (
-  extension: IExtension,
+  extension: IExtensionSetup,
   cwd: string,
   tryGlobalCli?: true
 ): Promise<
@@ -134,7 +134,7 @@ const getVersionDetails = async (
 }
 
 const processVersionDetails = (
-  extension: IExtension,
+  extension: IExtensionSetup,
   cliCompatible: CliCompatible,
   version: string | undefined,
   isAvailable: boolean,
@@ -148,7 +148,7 @@ const processVersionDetails = (
 }
 
 const tryGlobalFallbackVersion = async (
-  extension: IExtension,
+  extension: IExtensionSetup,
   cwd: string
 ): Promise<CanRunCli> => {
   const tryGlobal = await getVersionDetails(extension, cwd, true)
@@ -172,7 +172,7 @@ const tryGlobalFallbackVersion = async (
 }
 
 const extensionCanAutoRunCli = async (
-  extension: IExtension,
+  extension: IExtensionSetup,
   cwd: string
 ): Promise<CanRunCli> => {
   const {
@@ -195,7 +195,7 @@ const extensionCanAutoRunCli = async (
 }
 
 export const extensionCanRunCli = async (
-  extension: IExtension,
+  extension: IExtensionSetup,
   cwd: string
 ): Promise<CanRunCli> => {
   if (await extension.isPythonExtensionUsed()) {
@@ -215,7 +215,7 @@ export const extensionCanRunCli = async (
 }
 
 export const recheckGlobal = async (
-  extension: IExtension,
+  extension: IExtensionSetup,
   setup: () => Promise<void[] | undefined>,
   recheckInterval: number
 ): Promise<void> => {
