@@ -1,5 +1,5 @@
 #!/bin/sh
 . "$(dirname $0)/_/husky.sh"
 
-yarn run tsc -p tsconfig.json --noEmit
+yarn run turbo lint:build
 yarn lint-staged

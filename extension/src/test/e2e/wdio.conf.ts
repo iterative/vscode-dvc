@@ -1,8 +1,14 @@
-import { join, resolve } from 'path'
+import { join, resolve } from 'node:path'
+import url from 'node:url'
 import { mkdirp } from 'fs-extra'
 import { Options } from '@wdio/types'
-import { getVenvBinPath } from '../../python/path'
-import { Logger } from '../../common/logger'
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
+
+const getVenvBinPath = (cwd: string, envDir: string, name: string) =>
+  process.platform === 'win32'
+    ? join(cwd, envDir, 'Scripts', `${name}.exe`)
+    : join(cwd, envDir, 'bin', name)
 
 const screenshotDir = join(__dirname, 'screenshots')
 const logsDir = join(__dirname, 'logs')
@@ -19,11 +25,19 @@ export const config: Options.Testrunner = {
       return
     }
 
-    Logger.log('Capturing screenshot for debugging')
+    // eslint-disable-next-line no-console
+    console.log('Capturing screenshot for debugging')
 
     await browser.saveScreenshot(
       join(screenshotDir, `${test.parent} - ${test.title}.png`)
     )
+  },
+  autoCompileOpts: {
+    autoCompile: true,
+    tsNodeOpts: {
+      project: join(__dirname, 'tsconfig.json'),
+      transpileOnly: true
+    }
   },
   baseUrl: 'http://localhost',
   before: async function () {
@@ -58,6 +72,6 @@ export const config: Options.Testrunner = {
   outputDir: logsDir,
   reporters: ['spec'],
   services: ['vscode'],
-  specs: ['./src/test/e2e/*.test.ts'],
+  specs: ['./*.test.ts'],
   waitforTimeout: 10000
 }
