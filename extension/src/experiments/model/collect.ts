@@ -311,21 +311,23 @@ const collectFromBranchesObject = (
   }
 }
 
+const formatCommitMessage = (commit: string) => {
+  const lines = commit.split('\n').filter(Boolean)
+  return `[${lines[0]}${lines.length > 1 ? ' ...' : ''}]`
+}
+
 const addCommitDataToBranches = async (
   branches: Experiment[],
   getCommitData: (sha: string) => Promise<string | undefined>
 ): Promise<Experiment[]> =>
   await Promise.all(
-    branches.map(async (branch, ind) => {
-      if (ind === 0) {
-        return branch
-      }
+    branches.map(async branch => {
       const { sha } = branch
       if (sha) {
         const commit = await getCommitData(sha)
 
         if (commit) {
-          branch.displayLabel = commit
+          branch.displayNameOrParent = formatCommitMessage(commit)
         }
       }
       return branch

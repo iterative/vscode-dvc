@@ -72,12 +72,12 @@ const getDefaultColumnWithIndicatorsPlaceHolder = () => {
   const experimentColumn = {
     Cell: ({
       row: {
-        original: { displayLabel, label, displayNameOrParent }
+        original: { label, displayNameOrParent }
       }
     }: Cell<Row>) => {
       return (
         <div className={styles.experimentCellContents}>
-          <span>{displayLabel?.split('\n')[0] || label}</span>
+          <span>{label}</span>
           {displayNameOrParent && (
             <span className={styles.experimentCellSecondaryName}>
               {displayNameOrParent}
