@@ -2,8 +2,8 @@ import { EventEmitter, commands } from 'vscode'
 import { Disposer } from '@hediet/std/disposable'
 import { fake, stub } from 'sinon'
 import * as FileSystem from '../../../fileSystem'
-import { Setup } from '../../../setup/index'
-import * as RunSetup from '../../../setup'
+import { Setup } from '../../../setup'
+import * as Runner from '../../../setup/runner'
 import { buildDependencies, mockDisposable } from '../util'
 import * as AutoInstall from '../../../setup/autoInstall'
 import { DvcReader } from '../../../cli/dvc/reader'
@@ -45,8 +45,8 @@ export const buildSetup = (
   const mockAutoInstallDvc = stub(AutoInstall, 'autoInstallDvc')
   stub(AutoInstall, 'findPythonBinForInstall').resolves(undefined)
   stub(commands, 'registerCommand').returns(mockDisposable)
-  stub(RunSetup, 'setup').resolves(undefined)
-  stub(RunSetup, 'setupWithGlobalRecheck').resolves(undefined)
+  stub(Runner, 'run').resolves(undefined)
+  stub(Runner, 'runWithGlobalRecheck').resolves(undefined)
 
   const setup = disposer.track(
     new Setup(

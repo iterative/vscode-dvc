@@ -46,7 +46,7 @@ import { Disposable } from './class/dispose'
 import { collectWorkspaceScale } from './telemetry/collect'
 import { GitExecutor } from './cli/git/executor'
 import { GitReader } from './cli/git/reader'
-import { Setup } from './setup/index'
+import { Setup } from './setup'
 
 export class Extension extends Disposable {
   protected readonly internalCommands: InternalCommands

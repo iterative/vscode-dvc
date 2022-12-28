@@ -3,7 +3,7 @@ import isEmpty from 'lodash.isempty'
 import { SetupData as TSetupData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { findPythonBinForInstall } from './autoInstall'
-import { setup, setupWithGlobalRecheck, setupWorkspace } from '../setup'
+import { run, runWithGlobalRecheck, runWorkspace } from './runner'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -138,7 +138,7 @@ export class Setup
 
     this.dispose.track(
       this.onDidChangeWorkspace(() => {
-        setup(this)
+        run(this)
       })
     )
     this.watchForVenvChanges()
@@ -336,7 +336,7 @@ export class Setup
 
     internalCommands.registerExternalCommand(
       RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE,
-      () => setup(this)
+      () => run(this)
     )
 
     this.dispose.track(
@@ -360,7 +360,7 @@ export class Setup
       const previousCliPath = this.config.getCliPath()
       const previousPythonPath = this.config.getPythonBinPath()
 
-      const completed = await setupWorkspace(() =>
+      const completed = await runWorkspace(() =>
         this.config.setPythonAndNotifyIfChanged()
       )
       sendTelemetryEvent(
@@ -395,7 +395,7 @@ export class Setup
         const stopWatch = new StopWatch()
         try {
           this.sendDataToWebview()
-          await setup(this)
+          await run(this)
 
           return sendTelemetryEvent(
             EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
@@ -415,7 +415,7 @@ export class Setup
   }
 
   private watchPathForChanges(stopWatch: StopWatch) {
-    setupWithGlobalRecheck(this)
+    runWithGlobalRecheck(this)
       .then(async () => {
         sendTelemetryEvent(
           EventName.EXTENSION_LOAD,
@@ -449,7 +449,7 @@ export class Setup
           previousPythonBinPath !== this.config.getPythonBinPath()
 
         if (!this.cliAccessible || !this.cliCompatible || trySetupWithVenv) {
-          setup(this)
+          run(this)
         }
       }
     )
