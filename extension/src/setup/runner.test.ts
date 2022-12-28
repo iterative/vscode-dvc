@@ -271,7 +271,7 @@ describe('runWorkspace', () => {
 })
 
 describe('run', () => {
-  const extensionSetup = {
+  const setup = {
     getAvailable: mockedGetAvailable,
     getCliVersion: mockedGetCliVersion,
     getRoots: mockedGetRoots,
@@ -290,7 +290,7 @@ describe('run', () => {
   it('should do nothing if there is no workspace folder', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(undefined)
 
-    await run(extensionSetup)
+    await run(setup)
 
     expect(mockedGetCliVersion).not.toHaveBeenCalled()
     expect(mockedInitialize).not.toHaveBeenCalled()
@@ -301,7 +301,7 @@ describe('run', () => {
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(false)
     mockedGetCliVersion.mockResolvedValueOnce(false)
 
-    await run(extensionSetup)
+    await run(setup)
 
     expect(mockedSetRoots).toHaveBeenCalledTimes(1)
   })
@@ -312,7 +312,7 @@ describe('run', () => {
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(false)
     mockedGetCliVersion.mockResolvedValueOnce(undefined)
 
-    await run(extensionSetup)
+    await run(setup)
     expect(mockedSetRoots).toHaveBeenCalledTimes(1)
     expect(mockedGetConfigValue).not.toHaveBeenCalled()
     expect(mockedWarnWithOptions).not.toHaveBeenCalled()
@@ -331,7 +331,7 @@ describe('run', () => {
       .mockResolvedValueOnce(undefined)
     mockedGetConfigValue.mockReturnValueOnce(true)
 
-    await run(extensionSetup)
+    await run(setup)
     expect(mockedSetRoots).toHaveBeenCalledTimes(1)
     expect(mockedGetConfigValue).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).not.toHaveBeenCalled()
@@ -355,7 +355,7 @@ describe('run', () => {
     mockedReady.mockResolvedValue(true)
     mockedGetExtension.mockReturnValue(mockedVscodePython)
 
-    await run(extensionSetup)
+    await run(setup)
     await flushPromises()
     expect(mockedSetRoots).toHaveBeenCalledTimes(1)
     expect(mockedGetConfigValue).toHaveBeenCalledTimes(1)
@@ -378,7 +378,7 @@ describe('run', () => {
     mockedReady.mockResolvedValue(true)
     mockedGetExtension.mockReturnValue(mockedVscodePython)
 
-    await run(extensionSetup)
+    await run(setup)
     await flushPromises()
     expect(mockedSetRoots).toHaveBeenCalledTimes(1)
     expect(mockedGetConfigValue).toHaveBeenCalledTimes(1)
@@ -402,7 +402,7 @@ describe('run', () => {
     mockedReady.mockResolvedValue(true)
     mockedGetExtension.mockReturnValue(mockedVscodePython)
 
-    await run(extensionSetup)
+    await run(setup)
     await flushPromises()
     expect(mockedSetRoots).toHaveBeenCalledTimes(1)
     expect(mockedGetConfigValue).toHaveBeenCalledTimes(1)
@@ -421,7 +421,7 @@ describe('run', () => {
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(false)
     mockedGetCliVersion.mockResolvedValueOnce(MIN_CLI_VERSION)
 
-    await run(extensionSetup)
+    await run(setup)
     expect(mockedSetRoots).toHaveBeenCalledTimes(1)
     expect(mockedResetMembers).toHaveBeenCalledTimes(1)
     expect(mockedSetAvailable).not.toHaveBeenCalledWith(false)
@@ -435,7 +435,7 @@ describe('run', () => {
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
     mockedGetCliVersion.mockResolvedValueOnce(MIN_CLI_VERSION)
 
-    await run(extensionSetup)
+    await run(setup)
     expect(mockedResetMembers).not.toHaveBeenCalled()
     expect(mockedInitialize).toHaveBeenCalledTimes(1)
   })
@@ -449,7 +449,7 @@ describe('run', () => {
       .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce(MIN_CLI_VERSION)
 
-    await run(extensionSetup)
+    await run(setup)
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(2)
     expect(mockedResetMembers).not.toHaveBeenCalled()
     expect(mockedInitialize).toHaveBeenCalledTimes(1)
@@ -468,7 +468,7 @@ describe('run', () => {
       .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce(belowMinVersion)
 
-    await run(extensionSetup)
+    await run(setup)
     await flushPromises()
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
@@ -495,7 +495,7 @@ describe('run', () => {
       .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce([major, minor + 1, patch].join('.'))
 
-    await run(extensionSetup)
+    await run(setup)
     await flushPromises()
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
@@ -513,7 +513,7 @@ describe('run', () => {
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(false)
     mockedGetCliVersion.mockResolvedValueOnce(undefined)
 
-    await run(extensionSetup)
+    await run(setup)
     await flushPromises()
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
@@ -535,7 +535,7 @@ describe('run', () => {
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
     mockedGetCliVersion.mockResolvedValueOnce(MajorAhead)
 
-    await run(extensionSetup)
+    await run(setup)
     await flushPromises()
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
@@ -560,7 +560,7 @@ describe('run', () => {
       .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce(undefined)
 
-    await run(extensionSetup)
+    await run(setup)
     await flushPromises()
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
@@ -579,7 +579,7 @@ describe('run', () => {
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(false)
     mockedGetCliVersion.mockResolvedValueOnce(false)
 
-    await run(extensionSetup)
+    await run(setup)
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
   })
 
@@ -591,7 +591,7 @@ describe('run', () => {
     mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
     mockedGetCliVersion.mockResolvedValueOnce(behind)
 
-    await run(extensionSetup)
+    await run(setup)
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
   })
 
@@ -601,14 +601,14 @@ describe('run', () => {
     mockedShouldWarnUserIfCLIUnavailable.mockReturnValueOnce(true)
     mockedGetCliVersion.mockResolvedValueOnce(false)
 
-    await run(extensionSetup)
+    await run(setup)
     expect(mockedResetMembers).toHaveBeenCalledTimes(1)
     expect(mockedInitialize).not.toHaveBeenCalled()
   })
 })
 
 describe('runWithGlobalRecheck', () => {
-  const extensionSetup = {
+  const setup = {
     getAvailable: mockedGetAvailable,
     getCliVersion: mockedGetCliVersion,
     getRoots: mockedGetRoots,
@@ -640,7 +640,7 @@ describe('runWithGlobalRecheck', () => {
       .mockResolvedValueOnce(LATEST_TESTED_CLI_VERSION)
       .mockResolvedValueOnce(LATEST_TESTED_CLI_VERSION)
 
-    await runWithGlobalRecheck(extensionSetup, mockedRecheckInterval)
+    await runWithGlobalRecheck(setup, mockedRecheckInterval)
 
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
     expect(mockedGetAvailable).toHaveBeenCalledTimes(1)
@@ -668,7 +668,7 @@ describe('runWithGlobalRecheck', () => {
 
     mockedGetCliVersion.mockResolvedValueOnce(LATEST_TESTED_CLI_VERSION)
 
-    await runWithGlobalRecheck(extensionSetup, 0)
+    await runWithGlobalRecheck(setup, 0)
 
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
     expect(mockedGetAvailable).toHaveBeenCalledTimes(1)
@@ -690,7 +690,7 @@ describe('runWithGlobalRecheck', () => {
     mockedGetAvailable.mockReturnValueOnce(false).mockReturnValueOnce(true)
     mockedGetCliVersion.mockResolvedValueOnce(undefined)
 
-    await runWithGlobalRecheck(extensionSetup, 0)
+    await runWithGlobalRecheck(setup, 0)
 
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
     expect(mockedGetAvailable).toHaveBeenCalledTimes(1)
