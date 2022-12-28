@@ -6,6 +6,7 @@ import {
   ExtensionContext,
   ViewColumn
 } from 'vscode'
+import isEmpty from 'lodash.isempty'
 import { DvcExecutor } from './cli/dvc/executor'
 import { DvcRunner } from './cli/dvc/runner'
 import { DvcReader } from './cli/dvc/reader'
@@ -15,7 +16,11 @@ import { isPythonExtensionInstalled } from './extensions/python'
 import { WorkspaceExperiments } from './experiments/workspace'
 import { registerExperimentCommands } from './experiments/commands/register'
 import { registerPlotsCommands } from './plots/commands/register'
-import { findAbsoluteDvcRootPath, findDvcRootPaths } from './fileSystem'
+import {
+  findAbsoluteDvcRootPath,
+  findDvcRootPaths,
+  findSubRootPaths
+} from './fileSystem'
 import { RepositoriesTree } from './repository/model/tree'
 import { IExtension } from './interfaces'
 import { registerRepositoryCommands } from './repository/commands/register'
@@ -168,9 +173,12 @@ export class Extension extends Disposable implements IExtension {
       new Setup(
         '',
         this.resourceLocator.dvcIcon,
-        () => this.initProject(),
+        () => this.initializeDvc(),
+        () => this.initializeGit(),
         () => this.showExperiments(this.dvcRoots[0]),
         () => this.getCliCompatible(),
+        () => this.needsGitInit(),
+        needsGitInit => this.canGitInitialize(needsGitInit),
         () => this.hasRoots(),
         () => this.experiments.getHasData()
       )
@@ -316,7 +324,7 @@ export class Extension extends Disposable implements IExtension {
 
     this.internalCommands.registerExternalCliCommand(
       RegisteredCliCommands.INIT,
-      () => this.initProject()
+      () => this.initializeDvc()
     )
 
     registerRepositoryCommands(this.repositories, this.internalCommands)
@@ -436,7 +444,7 @@ export class Extension extends Disposable implements IExtension {
     return this.cliAccessible
   }
 
-  public async initProject() {
+  public async initializeDvc() {
     const root = getFirstWorkspaceFolder()
     if (root) {
       await this.dvcExecutor.init(root)
@@ -492,7 +500,7 @@ export class Extension extends Disposable implements IExtension {
     setContextValue('dvc.project.available', available)
   }
 
-  private findDvcRoots = async (cwd: string): Promise<string[]> => {
+  private async findDvcRoots(cwd: string): Promise<string[]> {
     const dvcRoots = await findDvcRootPaths(cwd)
     if (definedAndNonEmpty(dvcRoots)) {
       return dvcRoots
@@ -546,6 +554,44 @@ export class Extension extends Disposable implements IExtension {
 
   private getCliCompatible() {
     return this.cliCompatible
+  }
+
+  private initializeGit() {
+    const cwd = getFirstWorkspaceFolder()
+    if (cwd) {
+      this.gitExecutor.init(cwd)
+      this.workspaceChanged.fire()
+    }
+  }
+
+  private async canGitInitialize(needsGitInit: boolean) {
+    if (!needsGitInit) {
+      return false
+    }
+    const nestedRoots = await Promise.all(
+      getWorkspaceFolders().map(workspaceFolder =>
+        findSubRootPaths(workspaceFolder, '.git')
+      )
+    )
+
+    return isEmpty(nestedRoots.flat())
+  }
+
+  private async needsGitInit() {
+    if (this.hasRoots()) {
+      return false
+    }
+
+    const cwd = getFirstWorkspaceFolder()
+    if (!cwd) {
+      return undefined
+    }
+
+    try {
+      return !(await this.gitExecutor.getGitRepositoryRoot(cwd))
+    } catch {
+      return true
+    }
   }
 
   private changeSetupStep() {

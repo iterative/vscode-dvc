@@ -13,30 +13,40 @@ export type SetupWebviewWebview = BaseWebview<TSetupData>
 export class Setup extends BaseRepository<TSetupData> {
   public readonly viewKey = ViewKey.SETUP
 
-  private webviewMessages: WebviewMessages
-  private showExperiments: () => void
-  private getCliCompatible: () => boolean | undefined
-  private getHasRoots: () => boolean
-  private getHasData: () => boolean | undefined
+  private readonly webviewMessages: WebviewMessages
+  private readonly showExperiments: () => void
+  private readonly getCliCompatible: () => boolean | undefined
+  private readonly needsGitInit: () => Promise<boolean | undefined>
+  private readonly canGitInitialize: (needsGitInit: boolean) => Promise<boolean>
+  private readonly getHasRoots: () => boolean
+  private readonly getHasData: () => boolean | undefined
 
   constructor(
     dvcRoot: string,
     webviewIcon: Resource,
-    initProject: () => void,
+    initializeDvc: () => void,
+    initializeGit: () => void,
     showExperiments: () => void,
     getCliCompatible: () => boolean | undefined,
+    needsGitInit: () => Promise<boolean | undefined>,
+    canGitInitialize: (needsGitInit: boolean) => Promise<boolean>,
     getHasRoots: () => boolean,
     getHasData: () => boolean | undefined
   ) {
     super(dvcRoot, webviewIcon)
 
-    this.webviewMessages = this.createWebviewMessageHandler(initProject)
+    this.webviewMessages = this.createWebviewMessageHandler(
+      initializeDvc,
+      initializeGit
+    )
 
     if (this.webview) {
       this.sendDataToWebview()
     }
     this.showExperiments = showExperiments
     this.getCliCompatible = getCliCompatible
+    this.needsGitInit = needsGitInit
+    this.canGitInitialize = canGitInitialize
     this.getHasRoots = getHasRoots
     this.getHasData = getHasData
   }
@@ -65,10 +75,17 @@ export class Setup extends BaseRepository<TSetupData> {
       return
     }
 
+    const needsGitInitialized =
+      !projectInitialized && !!(await this.needsGitInit())
+
+    const canGitInitialize = await this.canGitInitialize(needsGitInitialized)
+
     const pythonBinPath = await findPythonBinForInstall()
 
     this.webviewMessages.sendWebviewMessage(
       cliCompatible,
+      needsGitInitialized,
+      canGitInitialize,
       projectInitialized,
       isPythonExtensionInstalled(),
       getBinDisplayText(pythonBinPath),
@@ -76,10 +93,14 @@ export class Setup extends BaseRepository<TSetupData> {
     )
   }
 
-  private createWebviewMessageHandler(initProject: () => void) {
+  private createWebviewMessageHandler(
+    initializeDvc: () => void,
+    initGit: () => void
+  ) {
     const webviewMessages = new WebviewMessages(
       () => this.getWebview(),
-      initProject
+      initializeDvc,
+      initGit
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>

@@ -31,21 +31,25 @@ export const isDirectory = (path: string): boolean => {
 export const getModifiedTime = (path: string): number =>
   lstatSync(path).mtime.getTime()
 
-export const findDvcSubRootPaths = async (
-  cwd: string
+export const findSubRootPaths = async (
+  cwd: string,
+  dotDir: string
 ): Promise<string[] | undefined> => {
-  if (isDirectory(join(cwd, '.dvc'))) {
-    return [cwd]
-  }
   const children = await readdir(cwd)
 
   return children
-    .filter(child => isDirectory(join(cwd, child, '.dvc')))
+    .filter(child => isDirectory(join(cwd, child, dotDir)))
     .map(child => standardizePath(join(cwd, child)))
 }
 
 export const findDvcRootPaths = async (cwd: string): Promise<string[]> => {
-  const subRoots = await findDvcSubRootPaths(cwd)
+  const dotDir = '.dvc'
+
+  if (isDirectory(join(cwd, dotDir))) {
+    return [cwd]
+  }
+
+  const subRoots = await findSubRootPaths(cwd, '.dvc')
 
   if (definedAndNonEmpty(subRoots)) {
     return subRoots
