@@ -1,6 +1,6 @@
 import { BasePage, IPageDecorator, PageDecorator } from 'wdio-vscode-service'
-import { webview as webviewLocators } from './locators'
-import * as locators from './locators'
+import { webview as webviewLocators } from './locators.js'
+import * as locators from './locators.js'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface BaseWebview extends IPageDecorator<typeof webviewLocators> {}

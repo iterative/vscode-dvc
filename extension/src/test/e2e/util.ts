@@ -1,10 +1,10 @@
 import {
   ChainablePromiseArray,
   ChainablePromiseElement,
-  ElementArray
+  ElementArray,
+  Key
 } from 'webdriverio'
 import { ViewControl } from 'wdio-vscode-service'
-import { delay } from '../../util/time'
 
 const findProgressBars = (): ChainablePromiseArray<ElementArray> =>
   $$('.monaco-progress-container')
@@ -137,10 +137,21 @@ export const runModifiedExperiment = async () => {
     'DVC: Modify Experiment Param(s), Reset and Run'
   )
   await browser.waitUntil(() => options.elem.isDisplayed())
-  await browser.keys('Enter')
-  await delay(500)
-  await browser.keys(['ArrowDown', 'Space', 'Enter'])
+  await browser
+    .action('key')
+    .down(Key.Enter)
+    .up(Key.Enter)
+    .pause(500)
+    .down(Key.ArrowDown)
+    .up(Key.ArrowDown)
+    .down(Key.Space)
+    .up(Key.Space)
+    .down(Key.Enter)
+    .up(Key.Enter)
+    .pause(100)
+    .perform()
   await browser.keys([...'0.005', 'Enter'])
+  return workbench.executeCommand('DVC: Show Experiments')
 }
 
 export const closeAllEditors = async (): Promise<void> => {
