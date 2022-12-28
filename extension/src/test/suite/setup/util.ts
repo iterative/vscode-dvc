@@ -43,6 +43,7 @@ export const buildSetup = (
     mockAutoInstallDvc,
     mockExecuteCommand,
     mockInitializeDvc,
+    mockInitializeGit,
     mockOpenExperiments,
     resourceLocator,
     setup

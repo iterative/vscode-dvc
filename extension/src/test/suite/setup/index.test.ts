@@ -24,6 +24,25 @@ suite('Setup Test Suite', () => {
   })
 
   describe('Setup', () => {
+    it('should handle an initialize git message from the webview', async () => {
+      const { messageSpy, setup, mockInitializeGit } = buildSetup(
+        disposable,
+        true
+      )
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.INITIALIZE_GIT
+      })
+
+      expect(mockInitializeGit).to.be.calledOnce
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should handle an initialize project message from the webview', async () => {
       const { messageSpy, setup, mockInitializeDvc } = buildSetup(
         disposable,

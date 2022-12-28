@@ -97,9 +97,9 @@ export const App: React.FC = () => {
   if (!projectInitialized) {
     return (
       <ProjectUninitialized
+        canGitInitialize={canGitInitialize}
         initializeDvc={initializeDvc}
         initializeGit={initializeGit}
-        canGitInitialize={canGitInitialize}
         needsGitInitialized={needsGitInitialized}
       />
     )
