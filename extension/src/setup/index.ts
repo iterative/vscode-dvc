@@ -1,54 +1,265 @@
+import { Event, EventEmitter, ViewColumn, commands } from 'vscode'
+import isEmpty from 'lodash.isempty'
 import { SetupData as TSetupData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { findPythonBinForInstall } from './autoInstall'
+import { setup, setupWithGlobalRecheck, setupWorkspace } from '../setup'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Resource } from '../resourceLocator'
 import { isPythonExtensionInstalled } from '../extensions/python'
-import { getBinDisplayText } from '../fileSystem'
+import {
+  findAbsoluteDvcRootPath,
+  findDvcRootPaths,
+  findSubRootPaths,
+  getBinDisplayText
+} from '../fileSystem'
+import { IExtensionSetup } from '../interfaces'
+import { definedAndNonEmpty } from '../util/array'
+import { Config } from '../config'
+import {
+  getFirstWorkspaceFolder,
+  getWorkspaceFolderCount,
+  getWorkspaceFolders
+} from '../vscode/workspaceFolders'
+import { DvcReader } from '../cli/dvc/reader'
+import { setContextValue } from '../vscode/context'
+import { DvcExecutor } from '../cli/dvc/executor'
+import { GitReader } from '../cli/git/reader'
+import { GitExecutor } from '../cli/git/executor'
+import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
+import { InternalCommands } from '../commands/internal'
+import { Status } from '../status'
+import { WorkspaceExperiments } from '../experiments/workspace'
+import { DvcRunner } from '../cli/dvc/runner'
+import { sendTelemetryEvent, sendTelemetryEventAndThrow } from '../telemetry'
+import { StopWatch } from '../util/time'
+import { createFileSystemWatcher } from '../fileSystem/watcher'
+import { EventName } from '../telemetry/constants'
+import { WorkspaceScale } from '../telemetry/collect'
 
 export type SetupWebviewWebview = BaseWebview<TSetupData>
 
-export class Setup extends BaseRepository<TSetupData> {
+export class Setup
+  extends BaseRepository<TSetupData>
+  implements IExtensionSetup
+{
   public readonly viewKey = ViewKey.SETUP
+
+  public readonly initialize: () => Promise<void[]>
+  public readonly resetMembers: () => void
+
+  private dvcRoots: string[] = []
+
+  private readonly config: Config
+  private readonly dvcReader: DvcReader
+  private readonly dvcExecutor: DvcExecutor
+  private readonly gitReader: GitReader
+  private readonly gitExecutor: GitExecutor
+  private readonly status: Status
 
   private readonly webviewMessages: WebviewMessages
   private readonly showExperiments: () => void
-  private readonly getCliCompatible: () => boolean | undefined
-  private readonly needsGitInit: () => Promise<boolean | undefined>
-  private readonly canGitInitialize: (needsGitInit: boolean) => Promise<boolean>
-  private readonly getHasRoots: () => boolean
   private readonly getHasData: () => boolean | undefined
+  private readonly collectWorkspaceScale: () => Promise<WorkspaceScale>
+
+  private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
+    new EventEmitter()
+  )
+
+  private readonly onDidChangeWorkspace: Event<void> =
+    this.workspaceChanged.event
+
+  private cliAccessible = false
+  private cliCompatible: boolean | undefined
 
   constructor(
-    dvcRoot: string,
+    stopWatch: StopWatch,
+    config: Config,
+    dvcExecutor: DvcExecutor,
+    dvcReader: DvcReader,
+    dvcRunner: DvcRunner,
+    gitExecutor: GitExecutor,
+    gitReader: GitReader,
+    initialize: () => Promise<void[]>,
+    resetMembers: () => void,
+    experiments: WorkspaceExperiments,
+    internalCommands: InternalCommands,
     webviewIcon: Resource,
-    initializeDvc: () => void,
-    initializeGit: () => void,
-    showExperiments: () => void,
-    getCliCompatible: () => boolean | undefined,
-    needsGitInit: () => Promise<boolean | undefined>,
-    canGitInitialize: (needsGitInit: boolean) => Promise<boolean>,
-    getHasRoots: () => boolean,
-    getHasData: () => boolean | undefined
+    collectWorkspaceScale: () => Promise<WorkspaceScale>
   ) {
-    super(dvcRoot, webviewIcon)
+    super('', webviewIcon)
 
-    this.webviewMessages = this.createWebviewMessageHandler(
-      initializeDvc,
-      initializeGit
+    this.config = config
+    this.dvcExecutor = dvcExecutor
+    this.dvcReader = dvcReader
+    this.gitExecutor = gitExecutor
+    this.gitReader = gitReader
+
+    this.status = this.dispose.track(
+      new Status(
+        this.config,
+        this.dvcExecutor,
+        this.dvcReader,
+        dvcRunner,
+        this.gitExecutor,
+        this.gitReader
+      )
     )
+
+    this.initialize = initialize
+    this.resetMembers = resetMembers
+
+    this.collectWorkspaceScale = collectWorkspaceScale
+
+    this.setCommandsAvailability(false)
+    this.setProjectAvailability()
+
+    this.webviewMessages = this.createWebviewMessageHandler()
 
     if (this.webview) {
       this.sendDataToWebview()
     }
-    this.showExperiments = showExperiments
-    this.getCliCompatible = getCliCompatible
-    this.needsGitInit = needsGitInit
-    this.canGitInitialize = canGitInitialize
-    this.getHasRoots = getHasRoots
-    this.getHasData = getHasData
+
+    internalCommands.registerExternalCliCommand(
+      RegisteredCliCommands.INIT,
+      () => this.initializeDvc()
+    )
+
+    this.dispose.track(
+      this.onDidChangeWorkspace(() => {
+        setup(this)
+      })
+    )
+
+    this.getHasData = () => experiments.getHasData()
+    const onDidChangeHasData = experiments.columnsChanged.event
+    this.dispose.track(
+      onDidChangeHasData(() => {
+        this.sendDataToWebview()
+        setContextValue('dvc.project.hasData', this.getHasData())
+      })
+    )
+
+    this.showExperiments = () =>
+      experiments.showWebview(this.dvcRoots[0], ViewColumn.Active)
+
+    internalCommands.registerExternalCommand(
+      RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE,
+      () => setup(this)
+    )
+
+    this.dispose.track(
+      commands.registerCommand(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+        () => this.setupWorkspace()
+      )
+    )
+
+    this.watchForVenvChanges()
+
+    this.dispose.track(
+      this.config.onDidChangeExecutionDetails(async () => {
+        const stopWatch = new StopWatch()
+        try {
+          this.sendDataToWebview()
+          await setup(this)
+
+          return sendTelemetryEvent(
+            EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
+            await this.getEventProperties(),
+            { duration: stopWatch.getElapsedTime() }
+          )
+        } catch (error: unknown) {
+          return sendTelemetryEventAndThrow(
+            EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
+            error as Error,
+            stopWatch.getElapsedTime(),
+            await this.getEventProperties()
+          )
+        }
+      })
+    )
+
+    setupWithGlobalRecheck(this)
+      .then(async () => {
+        sendTelemetryEvent(
+          EventName.EXTENSION_LOAD,
+          await this.getEventProperties(),
+          { duration: stopWatch.getElapsedTime() }
+        )
+      })
+      .catch(async error =>
+        sendTelemetryEventAndThrow(
+          EventName.EXTENSION_LOAD,
+          error,
+          stopWatch.getElapsedTime(),
+          await this.getEventProperties()
+        )
+      )
+  }
+
+  public getRoots() {
+    return this.dvcRoots
+  }
+
+  public async getCliVersion(cwd: string, tryGlobalCli?: true) {
+    await this.config.isReady()
+    try {
+      return await this.dvcReader.version(cwd, tryGlobalCli)
+    } catch {}
+  }
+
+  public hasRoots() {
+    return definedAndNonEmpty(this.getRoots())
+  }
+
+  public async isPythonExtensionUsed() {
+    await this.config.isReady()
+    return !!this.config.isPythonExtensionUsed()
+  }
+
+  public unsetPythonBinPath() {
+    this.config.unsetPythonBinPath()
+  }
+
+  public async showSetup() {
+    return await this.showWebview()
+  }
+
+  public shouldWarnUserIfCLIUnavailable() {
+    return this.hasRoots() && !this.isFocused()
+  }
+
+  public async setRoots() {
+    const nestedRoots = await Promise.all(
+      getWorkspaceFolders().map(workspaceFolder =>
+        this.findDvcRoots(workspaceFolder)
+      )
+    )
+    this.dvcRoots = nestedRoots.flat().sort()
+
+    this.sendDataToWebview()
+    return this.setProjectAvailability()
+  }
+
+  public setAvailable(available: boolean) {
+    this.status.setAvailability(available)
+    this.setCommandsAvailability(available)
+    this.cliAccessible = available
+    this.sendDataToWebview()
+    return available
+  }
+
+  public setCliCompatible(compatible: boolean | undefined) {
+    this.cliCompatible = compatible
+    const incompatible = compatible === undefined ? undefined : !compatible
+    setContextValue('dvc.cli.incompatible', incompatible)
+  }
+
+  public getAvailable() {
+    return this.cliAccessible
   }
 
   public isFocused() {
@@ -60,13 +271,12 @@ export class Setup extends BaseRepository<TSetupData> {
   }
 
   public async sendDataToWebview() {
-    const cliCompatible = this.getCliCompatible()
-    const projectInitialized = this.getHasRoots()
+    const projectInitialized = this.hasRoots()
     const hasData = this.getHasData()
 
     if (
       this.webview?.isVisible &&
-      cliCompatible &&
+      this.cliCompatible &&
       projectInitialized &&
       hasData
     ) {
@@ -83,7 +293,7 @@ export class Setup extends BaseRepository<TSetupData> {
     const pythonBinPath = await findPythonBinForInstall()
 
     this.webviewMessages.sendWebviewMessage(
-      cliCompatible,
+      this.cliCompatible,
       needsGitInitialized,
       canGitInitialize,
       projectInitialized,
@@ -93,14 +303,11 @@ export class Setup extends BaseRepository<TSetupData> {
     )
   }
 
-  private createWebviewMessageHandler(
-    initializeDvc: () => void,
-    initGit: () => void
-  ) {
+  private createWebviewMessageHandler() {
     const webviewMessages = new WebviewMessages(
       () => this.getWebview(),
-      initializeDvc,
-      initGit
+      () => this.initializeDvc(),
+      () => this.initializeGit()
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>
@@ -108,5 +315,140 @@ export class Setup extends BaseRepository<TSetupData> {
       )
     )
     return webviewMessages
+  }
+
+  private async findDvcRoots(cwd: string): Promise<string[]> {
+    const dvcRoots = await findDvcRootPaths(cwd)
+    if (definedAndNonEmpty(dvcRoots)) {
+      return dvcRoots
+    }
+
+    await this.config.isReady()
+    return findAbsoluteDvcRootPath(cwd, this.dvcReader.root(cwd))
+  }
+
+  private setCommandsAvailability(available: boolean) {
+    setContextValue('dvc.commands.available', available)
+  }
+
+  private setProjectAvailability() {
+    const available = this.hasRoots()
+    setContextValue('dvc.project.available', available)
+  }
+
+  private async initializeDvc() {
+    const root = getFirstWorkspaceFolder()
+    if (root) {
+      await this.dvcExecutor.init(root)
+      this.workspaceChanged.fire()
+    }
+  }
+
+  private async canGitInitialize(needsGitInit: boolean) {
+    if (!needsGitInit) {
+      return false
+    }
+    const nestedRoots = await Promise.all(
+      getWorkspaceFolders().map(workspaceFolder =>
+        findSubRootPaths(workspaceFolder, '.git')
+      )
+    )
+
+    return isEmpty(nestedRoots.flat())
+  }
+
+  private async needsGitInit() {
+    if (this.hasRoots()) {
+      return false
+    }
+
+    const cwd = getFirstWorkspaceFolder()
+    if (!cwd) {
+      return undefined
+    }
+
+    try {
+      return !(await this.gitReader.getGitRepositoryRoot(cwd))
+    } catch {
+      return true
+    }
+  }
+
+  private initializeGit() {
+    const cwd = getFirstWorkspaceFolder()
+    if (cwd) {
+      this.gitExecutor.init(cwd)
+      this.workspaceChanged.fire()
+    }
+  }
+
+  private async setupWorkspace() {
+    const stopWatch = new StopWatch()
+    try {
+      const previousCliPath = this.config.getCliPath()
+      const previousPythonPath = this.config.getPythonBinPath()
+
+      const completed = await setupWorkspace(() =>
+        this.config.setPythonAndNotifyIfChanged()
+      )
+      sendTelemetryEvent(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+        { completed },
+        {
+          duration: stopWatch.getElapsedTime()
+        }
+      )
+
+      const executionDetailsUnchanged =
+        this.config.getCliPath() === previousPythonPath &&
+        this.config.getPythonBinPath() === previousCliPath
+
+      if (completed && !this.cliAccessible && executionDetailsUnchanged) {
+        this.workspaceChanged.fire()
+      }
+
+      return completed
+    } catch (error: unknown) {
+      return sendTelemetryEventAndThrow(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+        error as Error,
+        stopWatch.getElapsedTime()
+      )
+    }
+  }
+
+  private watchForVenvChanges() {
+    return createFileSystemWatcher(
+      disposable => this.dispose.track(disposable),
+      '**/dvc{,.exe}',
+      async path => {
+        if (!path) {
+          return
+        }
+
+        const previousPythonBinPath = this.config.getPythonBinPath()
+        await this.config.setPythonBinPath()
+
+        const trySetupWithVenv =
+          previousPythonBinPath !== this.config.getPythonBinPath()
+
+        if (!this.cliAccessible || !this.cliCompatible || trySetupWithVenv) {
+          setup(this)
+        }
+      }
+    )
+  }
+
+  private async getEventProperties() {
+    return {
+      ...(this.cliAccessible ? await this.collectWorkspaceScale() : {}),
+      cliAccessible: this.cliAccessible,
+      dvcPathUsed: !!this.config.getCliPath(),
+      dvcRootCount: this.getRoots().length,
+      msPythonInstalled: isPythonExtensionInstalled(),
+      msPythonUsed: await this.isPythonExtensionUsed(),
+      pythonPathUsed: !!this.config.getPythonBinPath(),
+      workspaceFolderCount: getWorkspaceFolderCount()
+    }
   }
 }
