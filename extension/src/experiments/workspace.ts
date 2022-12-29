@@ -1,7 +1,8 @@
+import { join } from 'path'
 import { EventEmitter, Memento } from 'vscode'
 import { Experiments, ModifiedExperimentAndRunCommandId } from '.'
 import { TableData } from './webview/contract'
-import { Args } from '../cli/dvc/constants'
+import { Args, DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
 import { CommandId, InternalCommands } from '../commands/internal'
 import { ResourceLocator } from '../resourceLocator'
 import { Toast } from '../vscode/toast'
@@ -9,6 +10,7 @@ import { getInput } from '../vscode/inputBox'
 import { BaseWorkspaceWebviews } from '../webview/workspace'
 import { Title } from '../vscode/title'
 import { setContextValue } from '../vscode/context'
+import { getPidFromSignalFile } from '../fileSystem'
 
 export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   Experiments,
@@ -342,6 +344,21 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     }
 
     return allLoading
+  }
+
+  public async getDvcLiveOnlyPids() {
+    const pids: number[] = []
+
+    for (const dvcRoot of this.getDvcRoots()) {
+      const signalFile = join(dvcRoot, DVCLIVE_ONLY_RUNNING_SIGNAL_FILE)
+      const pid = await getPidFromSignalFile(signalFile)
+      if (!pid) {
+        continue
+      }
+      pids.push(pid)
+    }
+
+    return pids
   }
 
   private async pickExpThenRun(

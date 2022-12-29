@@ -47,6 +47,8 @@ import { collectWorkspaceScale } from './telemetry/collect'
 import { GitExecutor } from './cli/git/executor'
 import { GitReader } from './cli/git/reader'
 import { Setup } from './setup'
+import { definedAndNonEmpty } from './util/array'
+import { stopProcesses } from './processExecution'
 
 export class Extension extends Disposable {
   protected readonly internalCommands: InternalCommands
@@ -191,9 +193,17 @@ export class Extension extends Disposable {
     this.dispose.track(
       commands.registerCommand(RegisteredCommands.STOP_EXPERIMENT, async () => {
         const stopWatch = new StopWatch()
-        const wasRunning = this.dvcRunner.isExperimentRunning()
+        const dvcLiveOnlyPids = await this.experiments.getDvcLiveOnlyPids()
+        const wasRunning =
+          this.dvcRunner.isExperimentRunning() ||
+          definedAndNonEmpty(dvcLiveOnlyPids)
         try {
-          const stopped = await this.dvcRunner.stop()
+          const [dvcLiveOnlyStopped, runnerStopped] = await Promise.all([
+            stopProcesses(dvcLiveOnlyPids),
+            this.dvcRunner.stop()
+          ])
+
+          const stopped = dvcLiveOnlyStopped && runnerStopped
           sendTelemetryEvent(
             RegisteredCommands.STOP_EXPERIMENT,
             { stopped, wasRunning },
