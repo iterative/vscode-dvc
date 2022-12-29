@@ -25,13 +25,13 @@ describe('pickExperiments', () => {
 
   it('should return the selected experiment', async () => {
     const selectedExperiment = {
-      displayNameOrParent: '[exp-789]',
+      displayNameOrParent: 'exp-789',
       label: '7c366f6',
       selected: false
     }
     const mockedExperiments = [
-      { displayNameOrParent: '[exp-123]', label: '73de3fe', selected: false },
-      { displayNameOrParent: '[exp-456]', label: '0be657c', selected: true },
+      { displayNameOrParent: 'exp-123', label: '73de3fe', selected: false },
+      { displayNameOrParent: 'exp-456', label: '0be657c', selected: true },
       selectedExperiment
     ] as Experiment[]
 
@@ -43,19 +43,19 @@ describe('pickExperiments', () => {
     expect(mockedQuickPickLimitedValues).toHaveBeenCalledWith(
       [
         {
-          description: '[exp-123]',
+          description: 'exp-123',
           detail: '',
           label: '73de3fe',
           value: mockedExperiments[0]
         },
         {
-          description: '[exp-456]',
+          description: 'exp-456',
           detail: '',
           label: '0be657c',
           value: mockedExperiments[1]
         },
         {
-          description: '[exp-789]',
+          description: 'exp-789',
           detail: '',
           label: '7c366f6',
           value: mockedExperiments[2]
@@ -63,7 +63,7 @@ describe('pickExperiments', () => {
       ],
       [
         {
-          description: '[exp-456]',
+          description: 'exp-456',
           detail: '',
           label: '0be657c',
           value: mockedExperiments[1]
@@ -80,7 +80,7 @@ describe('pickExperiments', () => {
       deps: {
         'data/data.xml': { changes: false, value: '22a1a29' }
       },
-      displayNameOrParent: '[exp-123]',
+      displayNameOrParent: 'exp-123',
       id: 'exp-123',
       label: '123fsf4',
       params: {
@@ -97,7 +97,7 @@ describe('pickExperiments', () => {
         deps: {
           'data/data.xml': { changes: false, value: '22a1a29' }
         },
-        displayNameOrParent: '[exp-456]',
+        displayNameOrParent: 'exp-456',
         id: 'exp-456',
         label: '456fsf4',
         params: {
@@ -112,7 +112,7 @@ describe('pickExperiments', () => {
         deps: {
           'data/data.xml': { changes: false, value: '22a1a29' }
         },
-        displayNameOrParent: '[exp-789]',
+        displayNameOrParent: 'exp-789',
         id: 'exp-789',
         label: '789fsf4',
         params: {
@@ -136,7 +136,7 @@ describe('pickExperiments', () => {
     expect(mockedQuickPickLimitedValues).toHaveBeenCalledWith(
       [
         {
-          description: '[exp-123]',
+          description: 'exp-123',
           detail: `Created:${formatDate(
             mockedExperiments[0].Created as string
           )}, split:0, data/data.xml:22a1a29`,
@@ -144,7 +144,7 @@ describe('pickExperiments', () => {
           value: mockedExperiments[0]
         },
         {
-          description: '[exp-456]',
+          description: 'exp-456',
           detail: `Created:${formatDate(
             mockedExperiments[1].Created as string
           )}, split:2.2000436e+13, data/data.xml:22a1a29`,
@@ -152,7 +152,7 @@ describe('pickExperiments', () => {
           value: mockedExperiments[1]
         },
         {
-          description: '[exp-789]',
+          description: 'exp-789',
           detail: `Created:${formatDate(
             mockedExperiments[2].Created as string
           )}, split:0.00031111100, data/data.xml:22a1a29`,
@@ -168,7 +168,7 @@ describe('pickExperiments', () => {
 
   it('should send separators containing the experiment name to the quick pick when there are checkpoints', async () => {
     const selectedExperiment = {
-      displayNameOrParent: '[exp-2]',
+      displayNameOrParent: 'exp-2',
       id: 'exp-2',
       label: '7c366f6',
       selected: false
@@ -183,7 +183,7 @@ describe('pickExperiments', () => {
     const mockedBranch = { label: 'main', selected: false }
 
     const mockedExp1 = {
-      displayNameOrParent: '[exp-1]',
+      displayNameOrParent: 'exp-1',
       id: 'exp-1',
       label: '73de3fe',
       selected: false

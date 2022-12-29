@@ -378,7 +378,7 @@ describe('App', () => {
 
       testClick(EXPERIMENT_WORKSPACE_ID)
       testClick('main')
-      testClick('[exp-e7a67]', 'exp-e7a67')
+      testClick('exp-e7a67', 'exp-e7a67')
       testClick('22e40e1', '22e40e1fa3c916ac567f69b85969e3066a91dda4')
       testClick('e821416', 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361')
     })
@@ -890,7 +890,7 @@ describe('App', () => {
     it('should present the correct option for an experiment with checkpoints and close on esc', () => {
       renderTableWithoutRunningExperiments()
 
-      const target = screen.getByText('[exp-e7a67]')
+      const target = screen.getByText('exp-e7a67')
       fireEvent.contextMenu(target, { bubbles: true })
 
       advanceTimersByTime(100)
@@ -950,7 +950,7 @@ describe('App', () => {
       advanceTimersByTime(100)
       expect(screen.queryAllByRole('menuitem')).toHaveLength(9)
 
-      fireEvent.contextMenu(within(row).getByText('[exp-e7a67]'), {
+      fireEvent.contextMenu(within(row).getByText('exp-e7a67'), {
         bubbles: true
       })
       advanceTimersByTime(200)
