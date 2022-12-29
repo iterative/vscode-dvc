@@ -880,7 +880,7 @@ describe('App', () => {
       const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toStrictEqual([
-        'Modify, Reset and Run',
+        'Modify and Run',
         'Modify and Resume',
         'Modify and Queue',
         'Star'
@@ -901,7 +901,7 @@ describe('App', () => {
         'Create new Branch',
         'Commit and Share',
         'Share as Branch',
-        'Modify, Reset and Run',
+        'Modify and Run',
         'Modify and Resume',
         'Modify and Queue',
         'Star',
