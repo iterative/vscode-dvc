@@ -80,7 +80,7 @@ export class Setup
   private cliAccessible = false
   private cliCompatible: boolean | undefined
 
-  private dotFolderWatcher?: Disposable
+  private dotFolderWatcher?: Disposer
 
   constructor(
     stopWatch: StopWatch,
@@ -289,6 +289,10 @@ export class Setup
   private setProjectAvailability() {
     const available = this.hasRoots()
     setContextValue('dvc.project.available', available)
+    if (available && this.dotFolderWatcher && !this.dotFolderWatcher.disposed) {
+      this.dispose.untrack(this.dotFolderWatcher)
+      this.dotFolderWatcher.dispose()
+    }
   }
 
   private async initializeDvc() {
