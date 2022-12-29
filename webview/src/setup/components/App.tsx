@@ -54,6 +54,10 @@ export const App: React.FC = () => {
     )
   )
 
+  const checkCompatibility = () => {
+    sendMessage({ type: MessageFromWebviewType.CHECK_CLI_COMPATIBLE })
+  }
+
   const initializeGit = () => {
     sendMessage({
       type: MessageFromWebviewType.INITIALIZE_GIT
@@ -79,7 +83,7 @@ export const App: React.FC = () => {
   }
 
   if (cliCompatible === false) {
-    return <CliIncompatible />
+    return <CliIncompatible checkCompatibility={checkCompatibility} />
   }
 
   if (cliCompatible === undefined) {

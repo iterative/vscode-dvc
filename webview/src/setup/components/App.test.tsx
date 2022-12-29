@@ -72,6 +72,14 @@ describe('App', () => {
     })
 
     expect(screen.getByText('DVC is incompatible')).toBeInTheDocument()
+
+    const button = screen.getByText('Check Compatibility')
+    expect(button).toBeInTheDocument()
+
+    fireEvent.click(button)
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.CHECK_CLI_COMPATIBLE
+    })
   })
 
   it('should show a screen saying that DVC is not installed if the cli is unavailable', () => {
