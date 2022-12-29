@@ -64,6 +64,24 @@ suite('Setup Test Suite', () => {
       expect(mockInitializeDvc).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should handle a check cli compatible message from the webview', async () => {
+      const { messageSpy, setup, mockExecuteCommand } = buildSetup(disposable)
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.CHECK_CLI_COMPATIBLE
+      })
+
+      expect(mockExecuteCommand).to.be.calledWithExactly(
+        RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should handle an auto install dvc message from the webview', async () => {
       const { messageSpy, setup, mockAutoInstallDvc } = buildSetup(disposable)
 

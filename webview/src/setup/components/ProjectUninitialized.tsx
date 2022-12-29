@@ -10,7 +10,7 @@ interface GitUninitializedProps {
 }
 
 const GitIsPrerequisite: React.FC = () => (
-  <p>A Git repository is a prerequisite of project initialization</p>
+  <p>A Git repository is a prerequisite of project initialization.</p>
 )
 
 const GitUninitialized: React.FC<GitUninitializedProps> = ({
@@ -24,11 +24,11 @@ const GitUninitialized: React.FC<GitUninitializedProps> = ({
         <GitIsPrerequisite />
         <p>
           The extension is unable to initialize a Git repository in this
-          workspace
+          workspace.
         </p>
         <p>
           Please open a different folder which contains no Git repositories or a
-          single existing Git repository at the root
+          single existing Git repository at the root.
         </p>
       </EmptyState>
     )
@@ -51,7 +51,7 @@ const DvcUninitialized: React.FC<{ initializeDvc: () => void }> = ({
     <p>
       The current workspace does not contain a DVC project. You can initialize a
       project which will enable features powered by DVC. To learn more about how
-      to use DVC please read <a href="https://dvc.org/doc">our docs</a>
+      to use DVC please read <a href="https://dvc.org/doc">our docs</a>.
     </p>
     <Button onClick={initializeDvc} text="Initialize Project"></Button>
   </EmptyState>
