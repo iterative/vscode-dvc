@@ -134,7 +134,7 @@ export const deleteAllExistingExperiments = async () => {
 export const runModifiedExperiment = async () => {
   const workbench = await browser.getWorkbench()
   const options = await workbench.executeCommand(
-    'DVC: Modify Experiment Param(s), Reset and Run'
+    'DVC: Modify Experiment Param(s) and Run'
   )
   await browser.waitUntil(() => options.elem.isDisplayed())
   await browser
