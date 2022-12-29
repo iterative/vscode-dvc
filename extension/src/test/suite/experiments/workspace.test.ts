@@ -477,7 +477,7 @@ suite('Workspace Experiments Test Suite', () => {
       expect(mockShowQuickPick).to.be.calledWith(
         [
           {
-            description: 'exp-e7a67',
+            description: '[exp-e7a67]',
             label: '4fb124a',
             value: {
               id: 'exp-e7a67',
@@ -485,7 +485,7 @@ suite('Workspace Experiments Test Suite', () => {
             }
           },
           {
-            description: 'test-branch',
+            description: '[test-branch]',
             label: '42b8736',
             value: {
               id: 'test-branch',
@@ -493,7 +493,7 @@ suite('Workspace Experiments Test Suite', () => {
             }
           },
           {
-            description: 'exp-83425',
+            description: '[exp-83425]',
             label: '1ba7bcd',
             value: {
               id: 'exp-83425',
@@ -509,7 +509,7 @@ suite('Workspace Experiments Test Suite', () => {
             }
           },
           {
-            description: 'exp-f13bca',
+            description: '[exp-f13bca]',
             label: 'f0f9186',
             value: { id: 'exp-f13bca', name: 'exp-f13bca' }
           },

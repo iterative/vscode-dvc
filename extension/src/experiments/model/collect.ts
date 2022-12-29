@@ -86,7 +86,7 @@ const getDisplayNameOrParent = (
     return `(${shortenForLabel(checkpointParent)})`
   }
   if (name) {
-    return name
+    return `[${name}]`
   }
 }
 

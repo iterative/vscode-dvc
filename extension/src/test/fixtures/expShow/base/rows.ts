@@ -215,7 +215,7 @@ const data: Row[] = [
           )
         },
         displayColor: colorsList[1],
-        displayNameOrParent: 'exp-e7a67',
+        displayNameOrParent: '[exp-e7a67]',
         executor: 'dvc-task',
         id: 'exp-e7a67',
         label: '4fb124a',
@@ -493,7 +493,7 @@ const data: Row[] = [
           )
         },
         displayColor: undefined,
-        displayNameOrParent: 'test-branch',
+        displayNameOrParent: '[test-branch]',
         executor: null,
         id: 'test-branch',
         label: '42b8736',
@@ -771,7 +771,7 @@ const data: Row[] = [
           )
         },
         displayColor: undefined,
-        displayNameOrParent: 'exp-83425',
+        displayNameOrParent: '[exp-83425]',
         id: 'exp-83425',
         executor: null,
         label: '1ba7bcd',
@@ -1332,7 +1332,7 @@ const data: Row[] = [
           )
         },
         displayColor: undefined,
-        displayNameOrParent: 'exp-f13bca',
+        displayNameOrParent: '[exp-f13bca]',
         executor: null,
         id: 'exp-f13bca',
         error:
