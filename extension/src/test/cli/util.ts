@@ -7,6 +7,7 @@ import { exists } from '../../fileSystem'
 import { getVenvBinPath } from '../../python/path'
 import { dvcDemoPath } from '../util'
 import { GitExecutor } from '../../cli/git/executor'
+import { DOT_DVC } from '../../cli/dvc/constants'
 
 const config = {
   getCliPath: () => '',
@@ -26,7 +27,7 @@ export const initializeDemoRepo = (): Promise<string> => {
 }
 
 export const initializeEmptyRepo = async (): Promise<string> => {
-  if (exists(join(TEMP_DIR, '.dvc'))) {
+  if (exists(join(TEMP_DIR, DOT_DVC))) {
     return ''
   }
 

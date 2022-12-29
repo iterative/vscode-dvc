@@ -13,11 +13,11 @@ import {
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { ExperimentsOutput } from '../../cli/dvc/contract'
 import { BaseData } from '../../data'
-import { ExperimentFlag } from '../../cli/dvc/constants'
+import { DOT_DVC, ExperimentFlag } from '../../cli/dvc/constants'
 import { gitPath } from '../../cli/git/constants'
 import { getGitPath } from '../../fileSystem'
 
-export const QUEUED_EXPERIMENT_PATH = join('.dvc', 'tmp', 'exps')
+export const QUEUED_EXPERIMENT_PATH = join(DOT_DVC, 'tmp', 'exps')
 
 export class ExperimentsData extends BaseData<ExperimentsOutput> {
   constructor(
@@ -36,7 +36,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
         },
         { name: 'fullUpdate', process: () => this.update() }
       ],
-      ['dvc.lock', 'dvc.yaml', 'params.yaml', '.dvc']
+      ['dvc.lock', 'dvc.yaml', 'params.yaml', DOT_DVC]
     )
 
     this.watchExpGitRefs()
