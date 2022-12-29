@@ -343,33 +343,6 @@ suite('Extension Test Suite', () => {
     })
   })
 
-  describe('dvc.init', () => {
-    it('should be able to run dvc.init without error', async () => {
-      const mockInit = stub(DvcExecutor.prototype, 'init').resolves('')
-      const mockSetup = stub(Setup, 'run')
-      const mockSetupCalled = new Promise(resolve =>
-        mockSetup.callsFake(() => {
-          resolve(undefined)
-          return Promise.resolve(undefined)
-        })
-      )
-
-      await commands.executeCommand(RegisteredCliCommands.INIT)
-      await mockSetupCalled
-      expect(mockInit).to.be.calledOnce
-      expect(mockSetup).to.be.calledOnce
-
-      mockInit.resetHistory()
-      mockSetup.resetHistory()
-      stub(WorkspaceFolders, 'getFirstWorkspaceFolder').returns(undefined)
-
-      await commands.executeCommand(RegisteredCliCommands.INIT)
-
-      expect(mockInit).not.to.be.called
-      expect(mockSetup).not.to.be.called
-    })
-  })
-
   describe('dvc.showCommands', () => {
     it('should show all of the dvc commands without error', async () => {
       await expect(
