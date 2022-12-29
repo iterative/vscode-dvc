@@ -460,7 +460,7 @@ export class Setup
           previousPythonBinPath !== this.config.getPythonBinPath()
 
         if (!this.cliAccessible || !this.cliCompatible || trySetupWithVenv) {
-          run(this)
+          this.workspaceChanged.fire()
         }
       }
     )
@@ -469,7 +469,7 @@ export class Setup
   private watchDotFolderForChanges() {
     const cwd = getFirstWorkspaceFolder()
 
-    if (this.dotFolderWatcher || !cwd) {
+    if (!cwd) {
       return
     }
 
