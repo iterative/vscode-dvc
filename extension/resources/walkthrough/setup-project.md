@@ -8,9 +8,11 @@
 [Extension Demo](https://github.com/iterative/vscode-dvc-demo) projects to
 quickly try the extension.
 
-To quickly setup a new DVC project follow the [Setup](command:dvc.showSetup)
-wizard. Initializing a project will generate a config file `dvc.yaml` that
-describes the project, and will look something like this:
+To quickly setup a new DVC project run
+[`dvc exp init -i`](https://dvc.org/doc/command-reference/exp/init#example-interactive-mode)
+in a [Terminal](command:workbench.action.terminal.new). It will generate a
+config file `dvc.yaml` that describes the project, and will look something like
+this:
 
 ```yaml
 train:
