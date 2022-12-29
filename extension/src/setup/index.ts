@@ -486,10 +486,8 @@ export class Setup
 
   private dotFolderListener(disposer: Disposer, path: string) {
     if (
-      !(
-        (path && (path.endsWith(gitPath.DOT_GIT) || path.includes(DOT_DVC))) ||
-        disposer.disposed
-      )
+      !(path && (path.endsWith(gitPath.DOT_GIT) || path.includes(DOT_DVC))) ||
+      disposer.disposed
     ) {
       return
     }
