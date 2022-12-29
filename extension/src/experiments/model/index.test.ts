@@ -33,7 +33,7 @@ mockedCommands.executeCommand = jest.fn()
 const mockedInternalCommands = new InternalCommands({
   show: jest.fn()
 } as unknown as OutputChannel)
-const mockedGetCommit = jest.fn(() => Promise.resolve('commit message'))
+const mockedGetCommit = jest.fn()
 mockedInternalCommands.registerCommand(
   AvailableCommands.GIT_GET_COMMIT_MESSAGE,
   () => mockedGetCommit()
