@@ -1417,7 +1417,7 @@
           {
             "id": "dvc.installDVC",
             "title": "Install DVC",
-            "description": "This extension requires DVC to be installed.\n\n[Install DVC](https://dvc.org/doc/install)\n",
+            "description": "This extension requires DVC to be installed.\n\n[Show Setup](command:dvc.showSetup)\n",
             "media": {
               "markdown": "resources/walkthrough/install-dvc.md"
             },
