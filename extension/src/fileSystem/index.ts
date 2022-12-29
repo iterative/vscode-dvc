@@ -17,6 +17,7 @@ import { gitPath } from '../cli/git/constants'
 import { createValidInteger } from '../util/number'
 import { processExists } from '../processExecution'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
+import { DOT_DVC } from '../cli/dvc/constants'
 
 export const exists = (path: string): boolean => existsSync(path)
 
@@ -43,13 +44,11 @@ export const findSubRootPaths = async (
 }
 
 export const findDvcRootPaths = async (cwd: string): Promise<string[]> => {
-  const dotDir = '.dvc'
-
-  if (isDirectory(join(cwd, dotDir))) {
+  if (isDirectory(join(cwd, DOT_DVC))) {
     return [cwd]
   }
 
-  const subRoots = await findSubRootPaths(cwd, '.dvc')
+  const subRoots = await findSubRootPaths(cwd, DOT_DVC)
 
   if (definedAndNonEmpty(subRoots)) {
     return subRoots
@@ -120,7 +119,7 @@ export type PartialDvcYaml = {
 export const isAnyDvcYaml = (path?: string): boolean =>
   !!(
     path &&
-    (extname(path) === '.dvc' ||
+    (extname(path) === DOT_DVC ||
       basename(path) === 'dvc.lock' ||
       basename(path) === 'dvc.yaml')
   )

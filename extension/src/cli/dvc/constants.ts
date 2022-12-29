@@ -1,10 +1,11 @@
 import { join } from 'path'
 
 export const UNEXPECTED_ERROR_CODE = 255
+export const DOT_DVC = '.dvc'
 
-export const TEMP_PLOTS_DIR = join('.dvc', 'tmp', 'plots')
+export const TEMP_PLOTS_DIR = join(DOT_DVC, 'tmp', 'plots')
 export const DVCLIVE_ONLY_RUNNING_SIGNAL_FILE = join(
-  '.dvc',
+  DOT_DVC,
   'tmp',
   'exps',
   'run',

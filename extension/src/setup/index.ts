@@ -1,4 +1,5 @@
 import { Event, EventEmitter, ViewColumn, commands } from 'vscode'
+import { Disposable, Disposer } from '@hediet/std/disposable'
 import isEmpty from 'lodash.isempty'
 import { SetupData as TSetupData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
@@ -35,9 +36,14 @@ import { WorkspaceExperiments } from '../experiments/workspace'
 import { DvcRunner } from '../cli/dvc/runner'
 import { sendTelemetryEvent, sendTelemetryEventAndThrow } from '../telemetry'
 import { StopWatch } from '../util/time'
-import { createFileSystemWatcher } from '../fileSystem/watcher'
+import {
+  createFileSystemWatcher,
+  getRelativePattern
+} from '../fileSystem/watcher'
 import { EventName } from '../telemetry/constants'
 import { WorkspaceScale } from '../telemetry/collect'
+import { gitPath } from '../cli/git/constants'
+import { DOT_DVC } from '../cli/dvc/constants'
 
 export type SetupWebviewWebview = BaseWebview<TSetupData>
 
@@ -73,6 +79,8 @@ export class Setup
 
   private cliAccessible = false
   private cliCompatible: boolean | undefined
+
+  private dotFolderWatcher?: Disposer
 
   constructor(
     stopWatch: StopWatch,
@@ -143,6 +151,7 @@ export class Setup
     )
     this.watchForVenvChanges()
     this.watchExecutionDetailsForChanges()
+    this.watchDotFolderForChanges()
     this.watchPathForChanges(stopWatch)
   }
 
@@ -280,13 +289,16 @@ export class Setup
   private setProjectAvailability() {
     const available = this.hasRoots()
     setContextValue('dvc.project.available', available)
+    if (available && this.dotFolderWatcher && !this.dotFolderWatcher.disposed) {
+      this.dispose.untrack(this.dotFolderWatcher)
+      this.dotFolderWatcher.dispose()
+    }
   }
 
   private async initializeDvc() {
     const root = getFirstWorkspaceFolder()
     if (root) {
       await this.dvcExecutor.init(root)
-      this.workspaceChanged.fire()
     }
   }
 
@@ -324,7 +336,6 @@ export class Setup
     const cwd = getFirstWorkspaceFolder()
     if (cwd) {
       this.gitExecutor.init(cwd)
-      this.workspaceChanged.fire()
     }
   }
 
@@ -449,10 +460,44 @@ export class Setup
           previousPythonBinPath !== this.config.getPythonBinPath()
 
         if (!this.cliAccessible || !this.cliCompatible || trySetupWithVenv) {
-          run(this)
+          this.workspaceChanged.fire()
         }
       }
     )
+  }
+
+  private watchDotFolderForChanges() {
+    const cwd = getFirstWorkspaceFolder()
+
+    if (!cwd) {
+      return
+    }
+
+    const disposer = Disposable.fn()
+    this.dotFolderWatcher = disposer
+    this.dispose.track(this.dotFolderWatcher)
+
+    return createFileSystemWatcher(
+      disposable => disposer.track(disposable),
+      getRelativePattern(cwd, '**'),
+      path => this.dotFolderListener(disposer, path)
+    )
+  }
+
+  private dotFolderListener(disposer: Disposer, path: string) {
+    if (
+      !(path && (path.endsWith(gitPath.DOT_GIT) || path.includes(DOT_DVC))) ||
+      disposer.disposed
+    ) {
+      return
+    }
+
+    if (path.includes(DOT_DVC)) {
+      this.dispose.untrack(disposer)
+      disposer.dispose()
+    }
+
+    return this.workspaceChanged.fire()
   }
 
   private async getEventProperties() {

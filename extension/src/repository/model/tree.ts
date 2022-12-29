@@ -46,6 +46,7 @@ import {
   getErrorTooltip
 } from '../../tree'
 import { getWorkspaceFolders } from '../../vscode/workspaceFolders'
+import { DOT_DVC } from '../../cli/dvc/constants'
 
 export class RepositoriesTree
   extends Disposable
@@ -174,7 +175,7 @@ export class RepositoriesTree
   }
 
   private getDataPlaceholder({ fsPath }: { fsPath: string }): string {
-    return fsPath.trim() + '.dvc'
+    return fsPath.trim() + DOT_DVC
   }
 
   private getContextValue({ fsPath }: Uri, isDirectory: boolean): string {
