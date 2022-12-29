@@ -8,11 +8,9 @@
 [Extension Demo](https://github.com/iterative/vscode-dvc-demo) projects to
 quickly try the extension.
 
-To quickly setup a new DVC project run
-[`dvc exp init -i`](https://dvc.org/doc/command-reference/exp/init#example-interactive-mode)
-in a [Terminal](command:workbench.action.terminal.new). It will generate a
-config file `dvc.yaml` that describes the project, and will look something like
-this:
+To quickly setup a new DVC project follow the [Setup](command:dvc.showSetup)
+wizard. Initializing a project will generate a config file `dvc.yaml` that
+describes the project, and will look something like this:
 
 ```yaml
 train:
@@ -40,8 +38,9 @@ with open('metrics.json', 'w') as fd:
   json.dump({'avg_prec': avg_prec, 'roc_auc': roc_auc}, fd)
 ```
 
-Alternatively, use the [`DVCLive`](https://dvc.org/doc/dvclive) Python library,
-which can read and write a lot of different common metrics and plots:
+To DVC-ify an existing machine learning project use the
+[`DVCLive`](https://dvc.org/doc/dvclive) Python library, which can read and
+write a lot of different common metrics and plots:
 
 ```python
 from dvclive import Live
@@ -51,3 +50,8 @@ live = Live("evaluation")
 live.log("avg_prec", metrics.average_precision_score(labels, predictions))
 live.log("roc_auc", metrics.roc_auc_score(labels, predictions))
 ```
+
+💡 View
+[Instant Experiment Tracking: Just Add DVC!](https://iterative.ai/blog/exp-tracking-dvc-python)
+for a quick-start guide on migrating an existing project. Use
+[Setup](command:dvc.showSetup) to be guided through the onboarding process.
