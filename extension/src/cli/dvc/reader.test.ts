@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
-import { UNEXPECTED_ERROR_CODE } from './constants'
+import { DOT_DVC, UNEXPECTED_ERROR_CODE } from './constants'
 import { EXPERIMENT_WORKSPACE_ID } from './contract'
 import { DvcReader } from './reader'
 import { CliResult, CliStarted } from '..'
@@ -168,7 +168,7 @@ describe('CliReader', () => {
           'diff',
           'HEAD',
           '-o',
-          join('.dvc', 'tmp', 'plots'),
+          join(DOT_DVC, 'tmp', 'plots'),
           '--split',
           JSON_FLAG
         ],

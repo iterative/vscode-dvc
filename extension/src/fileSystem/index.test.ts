@@ -9,6 +9,7 @@ import {
   getModifiedTime
 } from '.'
 import { dvcDemoPath } from '../test/util'
+import { DOT_DVC } from '../cli/dvc/constants'
 
 jest.mock('../cli/dvc/reader')
 
@@ -26,7 +27,7 @@ describe('findDvcRootPaths', () => {
   it('should find multiple roots if available one directory below the given folder', async () => {
     const parentDir = resolve(dvcDemoPath, '..')
     const mockDvcRoot = join(parentDir, 'mockDvc')
-    ensureDirSync(join(mockDvcRoot, '.dvc'))
+    ensureDirSync(join(mockDvcRoot, DOT_DVC))
 
     const dvcRoots = await findDvcRootPaths(parentDir)
 

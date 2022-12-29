@@ -33,6 +33,7 @@ import { Title } from '../../../../vscode/title'
 import { Repository } from '../../../../repository'
 import { WorkspaceRepositories } from '../../../../repository/workspace'
 import { RepositoriesTree } from '../../../../repository/model/tree'
+import { DOT_DVC } from '../../../../cli/dvc/constants'
 
 suite('Repositories Tree Test Suite', () => {
   const { join } = path
@@ -110,7 +111,7 @@ suite('Repositories Tree Test Suite', () => {
 
       const mockDestinationPath = mockDestination.resourceUri.fsPath
 
-      ensureFileSync(mockDestinationPath + '.dvc')
+      ensureFileSync(mockDestinationPath + DOT_DVC)
 
       const expectedTargets = mockData.map(file => join(dvcDemoPath, file))
       const expectedDestinations = mockData.map(file =>

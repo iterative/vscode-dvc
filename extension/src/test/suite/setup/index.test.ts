@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
+import { ensureFileSync, remove } from 'fs-extra'
 import { expect } from 'chai'
 import { restore, spy, stub } from 'sinon'
-import { buildSetup } from './util'
+import { buildSetup, buildSetupWithWatchers, TEMP_DIR } from './util'
 import { closeAllEditors, getMessageReceivedEmitter } from '../util'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { MessageFromWebviewType } from '../../../webview/contract'
@@ -9,6 +10,10 @@ import { Disposable } from '../../../extension'
 import { Logger } from '../../../common/logger'
 import { BaseWebview } from '../../../webview'
 import { RegisteredCommands } from '../../../commands/external'
+import { isDirectory } from '../../../fileSystem'
+import { gitPath } from '../../../cli/git/constants'
+import { join } from '../../util/path'
+import { DOT_DVC } from '../../../cli/dvc/constants'
 
 suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
@@ -20,6 +25,9 @@ suite('Setup Test Suite', () => {
   afterEach(function () {
     this.timeout(6000)
     disposable.dispose()
+    if (isDirectory(TEMP_DIR)) {
+      remove(TEMP_DIR)
+    }
     return closeAllEditors()
   })
 
@@ -273,5 +281,62 @@ suite('Setup Test Suite', () => {
         pythonBinPath: undefined
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should setup the appropriate watchers', async () => {
+      const { setup, mockRunSetup, onDidChangeWorkspace } =
+        await buildSetupWithWatchers(disposable)
+
+      let workspaceChangedCount = 0
+      disposable.track(
+        onDidChangeWorkspace(() => {
+          workspaceChangedCount = workspaceChangedCount + 1
+        })
+      )
+
+      const resetMockRunSetup = () => {
+        mockRunSetup.resetHistory()
+        mockRunSetup.resetBehavior()
+        return new Promise(resolve =>
+          mockRunSetup.callsFake(() => {
+            resolve(undefined)
+            return Promise.resolve([])
+          })
+        )
+      }
+
+      const setupCalledOnGitInit = resetMockRunSetup()
+
+      ensureFileSync(join(TEMP_DIR, gitPath.DOT_GIT))
+
+      await setupCalledOnGitInit
+
+      expect(mockRunSetup, 'should called setup when Git is initialized').to.be
+        .called
+      expect(workspaceChangedCount).to.equal(1)
+
+      const setupCalledOnDvcInit = resetMockRunSetup()
+
+      ensureFileSync(join(TEMP_DIR, DOT_DVC))
+
+      await setupCalledOnDvcInit
+
+      expect(mockRunSetup, 'should called setup when DVC is initialized').to.be
+        .called
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((setup as any).dotFolderWatcher.disposed).to.be.true
+      expect(workspaceChangedCount).to.equal(2)
+
+      const setupCalledOnDvcInstalled = resetMockRunSetup()
+
+      ensureFileSync(join(TEMP_DIR, 'dvc'))
+
+      await setupCalledOnDvcInstalled
+
+      expect(
+        mockRunSetup,
+        'should called setup when DVC is installed into a virtual environment'
+      ).to.be.called
+      expect(workspaceChangedCount).to.equal(3)
+    })
   })
 })

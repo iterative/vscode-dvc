@@ -23,6 +23,7 @@ import { Disposable } from '../../class/dispose'
 import { sameContents } from '../../util/array'
 import { Data } from '../data'
 import { isDirectory } from '../../fileSystem'
+import { DOT_DVC } from '../../cli/dvc/constants'
 
 export class RepositoryModel extends Disposable {
   private readonly dvcRoot: string
@@ -156,7 +157,7 @@ export class RepositoryModel extends Disposable {
       ),
       untracked: [...untracked]
         .filter(
-          path => extname(path) !== '.dvc' && basename(path) !== '.gitignore'
+          path => extname(path) !== DOT_DVC && basename(path) !== '.gitignore'
         )
         .map(path => ({
           contextValue: SourceControlDataStatus.UNTRACKED,
