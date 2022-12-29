@@ -111,7 +111,7 @@ describe('App', () => {
 
     expect(
       screen.getByText(
-        'DVC & DVCLive cannot be auto-installed as Python was not located'
+        'DVC & DVCLive cannot be auto-installed as Python was not located.'
       )
     ).toBeInTheDocument()
     expect(screen.queryByText('Install')).not.toBeInTheDocument()

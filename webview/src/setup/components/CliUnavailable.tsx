@@ -2,6 +2,8 @@ import React from 'react'
 import { Button } from '../../shared/components/button/Button'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 
+const Title: React.FC = () => <h1>DVC is currently unavailable</h1>
+
 export type CliUnavailableProps = {
   installDvc: () => void
   isPythonExtensionInstalled: boolean
@@ -40,7 +42,6 @@ export const CliUnavailable: React.FC<CliUnavailableProps> = ({
   selectPythonInterpreter,
   setupWorkspace
 }) => {
-  const Title = <h1>DVC is currently unavailable</h1>
   const SetupWorkspace: React.FC<{ description: string }> = ({
     description
   }) => (
@@ -56,33 +57,27 @@ export const CliUnavailable: React.FC<CliUnavailableProps> = ({
   if (!canInstall) {
     return (
       <EmptyState>
-        <div>
-          {Title}
-          <p>
-            DVC & DVCLive cannot be auto-installed as Python was not located
-          </p>
-          <SetupWorkspace description="To locate a Python Interpreter or DVC" />
-        </div>
+        <Title />
+        <p>DVC & DVCLive cannot be auto-installed as Python was not located.</p>
+        <SetupWorkspace description="To locate a Python Interpreter or DVC." />
       </EmptyState>
     )
   }
 
   return (
     <EmptyState>
-      <div>
-        {Title}
-        <OfferToInstall pythonBinPath={pythonBinPath} installDvc={installDvc}>
-          {isPythonExtensionInstalled ? (
-            <UpdateInterpreterOrFind
-              action="Select Python Interpreter"
-              description="To update the interpreter and/or locate DVC"
-              onClick={selectPythonInterpreter}
-            />
-          ) : (
-            <SetupWorkspace description="To update the install location or locate DVC" />
-          )}
-        </OfferToInstall>
-      </div>
+      <Title />
+      <OfferToInstall pythonBinPath={pythonBinPath} installDvc={installDvc}>
+        {isPythonExtensionInstalled ? (
+          <UpdateInterpreterOrFind
+            action="Select Python Interpreter"
+            description="To update the interpreter and/or locate DVC."
+            onClick={selectPythonInterpreter}
+          />
+        ) : (
+          <SetupWorkspace description="To update the install location or locate DVC." />
+        )}
+      </OfferToInstall>
     </EmptyState>
   )
 }
