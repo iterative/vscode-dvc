@@ -14,52 +14,60 @@ import { RegisteredCommands } from '../../commands/external'
 
 export class WebviewMessages {
   private readonly getWebview: () => BaseWebview<TSetupData> | undefined
-  private readonly initializeProject: () => void
+  private readonly initializeDvc: () => void
+  private readonly initializeGit: () => void
 
   constructor(
     getWebview: () => BaseWebview<TSetupData> | undefined,
-    initializeProject: () => void
+    initializeDvc: () => void,
+    initializeGit: () => void
   ) {
     this.getWebview = getWebview
-    this.initializeProject = initializeProject
+    this.initializeDvc = initializeDvc
+    this.initializeGit = initializeGit
   }
 
   public sendWebviewMessage(
     cliCompatible: boolean | undefined,
+    needsGitInitialized: boolean | undefined,
+    canGitInitialize: boolean,
     projectInitialized: boolean,
     isPythonExtensionInstalled: boolean,
     pythonBinPath: string | undefined,
     hasData: boolean | undefined
   ) {
     this.getWebview()?.show({
+      canGitInitialize,
       cliCompatible,
       hasData,
       isPythonExtensionInstalled,
+      needsGitInitialized,
       projectInitialized,
       pythonBinPath
     })
   }
 
   public handleMessageFromWebview(message: MessageFromWebview) {
-    if (message.type === MessageFromWebviewType.INITIALIZE_PROJECT) {
-      return this.initializeProject()
+    switch (message.type) {
+      case MessageFromWebviewType.CHECK_CLI_COMPATIBLE:
+        return commands.executeCommand(
+          RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE
+        )
+      case MessageFromWebviewType.INITIALIZE_DVC:
+        return this.initializeDvc()
+      case MessageFromWebviewType.INITIALIZE_GIT:
+        return this.initializeGit()
+      case MessageFromWebviewType.SELECT_PYTHON_INTERPRETER:
+        return this.selectPythonInterpreter()
+      case MessageFromWebviewType.INSTALL_DVC:
+        return this.installDvc()
+      case MessageFromWebviewType.SETUP_WORKSPACE:
+        return commands.executeCommand(
+          RegisteredCommands.EXTENSION_SETUP_WORKSPACE
+        )
+      default:
+        Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
-
-    if (message.type === MessageFromWebviewType.SELECT_PYTHON_INTERPRETER) {
-      return this.selectPythonInterpreter()
-    }
-
-    if (message.type === MessageFromWebviewType.INSTALL_DVC) {
-      return this.installDvc()
-    }
-
-    if (message.type === MessageFromWebviewType.SETUP_WORKSPACE) {
-      return commands.executeCommand(
-        RegisteredCommands.EXTENSION_SETUP_WORKSPACE
-      )
-    }
-
-    Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
   }
 
   private selectPythonInterpreter() {

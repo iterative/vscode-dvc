@@ -1,18 +1,18 @@
-import { IExtension } from './interfaces'
+import { IExtensionSetup } from '../interfaces'
 import {
   quickPickOneOrInput,
   quickPickValue,
   quickPickYesOrNo
-} from './vscode/quickPick'
-import { ConfigKey, setConfigValue } from './vscode/config'
-import { pickFile } from './vscode/resourcePicker'
-import { getFirstWorkspaceFolder } from './vscode/workspaceFolders'
-import { getSelectTitle, Title } from './vscode/title'
+} from '../vscode/quickPick'
+import { ConfigKey, setConfigValue } from '../vscode/config'
+import { pickFile } from '../vscode/resourcePicker'
+import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
+import { getSelectTitle, Title } from '../vscode/title'
 import {
   isPythonExtensionInstalled,
   selectPythonInterpreter
-} from './extensions/python'
-import { extensionCanRunCli, recheckGlobal } from './cli/dvc/discovery'
+} from '../extensions/python'
+import { extensionCanRunCli, recheckGlobal } from '../cli/dvc/discovery'
 
 const setConfigPath = async (
   option: ConfigKey,
@@ -159,7 +159,7 @@ const selectInterpreter = async (
   return true
 }
 
-export const setupWorkspace = async (
+export const runWorkspace = async (
   setConfigToUsePythonExtension: () => Promise<void>
 ): Promise<boolean> => {
   const usesVenv = await quickPickVenvOption()
@@ -176,45 +176,45 @@ export const setupWorkspace = async (
 }
 
 export const checkAvailable = async (
-  extension: IExtension,
+  setup: IExtensionSetup,
   dvcRootOrFirstFolder: string
 ) => {
   const { isAvailable, isCompatible } = await extensionCanRunCli(
-    extension,
+    setup,
     dvcRootOrFirstFolder
   )
 
-  extension.setCliCompatible(isCompatible)
-  extension.setAvailable(isAvailable)
+  setup.setCliCompatible(isCompatible)
+  setup.setAvailable(isAvailable)
 
-  if (extension.hasRoots() && isAvailable) {
-    return extension.initialize()
+  if (setup.hasRoots() && isAvailable) {
+    return setup.initialize()
   }
 
-  extension.resetMembers()
+  setup.resetMembers()
 }
 
-export const setup = async (extension: IExtension) => {
+export const run = async (setup: IExtensionSetup) => {
   const cwd = getFirstWorkspaceFolder()
   if (!cwd) {
     return
   }
 
-  await extension.setRoots()
+  await setup.setRoots()
 
-  const roots = extension.getRoots()
+  const roots = setup.getRoots()
   const dvcRootOrFirstFolder = roots.length > 0 ? roots[0] : cwd
 
-  return checkAvailable(extension, dvcRootOrFirstFolder)
+  return checkAvailable(setup, dvcRootOrFirstFolder)
 }
 
-export const setupWithGlobalRecheck = async (
-  extension: IExtension,
+export const runWithGlobalRecheck = async (
+  setup: IExtensionSetup,
   recheckInterval = 5000
 ): Promise<void> => {
-  await setup(extension)
+  await run(setup)
 
-  if (!extension.getAvailable()) {
-    recheckGlobal(extension, () => setup(extension), recheckInterval)
+  if (!setup.getAvailable()) {
+    recheckGlobal(setup, () => run(setup), recheckInterval)
   }
 }

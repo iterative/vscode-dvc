@@ -12,11 +12,18 @@ import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 import { sendMessage } from '../../shared/vscode'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 
+// eslint-disable-next-line sonarjs/cognitive-complexity
 export const App: React.FC = () => {
   const [cliCompatible, setCliCompatible] = useState<boolean | undefined>(
     undefined
   )
   const [projectInitialized, setProjectInitialized] = useState<boolean>(false)
+  const [needsGitInitialized, setNeedsGitInitialized] = useState<
+    boolean | undefined
+  >(false)
+  const [canGitInitialize, setCanGitInitialized] = useState<
+    boolean | undefined
+  >(false)
   const [pythonBinPath, setPythonBinPath] = useState<string | undefined>(
     undefined
   )
@@ -27,25 +34,39 @@ export const App: React.FC = () => {
   useVsCodeMessaging(
     useCallback(
       ({ data }: { data: MessageToWebview<SetupData> }) => {
+        setCanGitInitialized(data.data.canGitInitialize)
         setCliCompatible(data.data.cliCompatible)
+        setHasData(data.data.hasData)
         setIsPythonExtensionInstalled(data.data.isPythonExtensionInstalled)
+        setNeedsGitInitialized(data.data.needsGitInitialized)
         setProjectInitialized(data.data.projectInitialized)
         setPythonBinPath(data.data.pythonBinPath)
-        setHasData(data.data.hasData)
       },
       [
+        setCanGitInitialized,
         setCliCompatible,
+        setHasData,
         setIsPythonExtensionInstalled,
+        setNeedsGitInitialized,
         setProjectInitialized,
-        setPythonBinPath,
-        setHasData
+        setPythonBinPath
       ]
     )
   )
 
-  const initializeProject = () => {
+  const checkCompatibility = () => {
+    sendMessage({ type: MessageFromWebviewType.CHECK_CLI_COMPATIBLE })
+  }
+
+  const initializeGit = () => {
     sendMessage({
-      type: MessageFromWebviewType.INITIALIZE_PROJECT
+      type: MessageFromWebviewType.INITIALIZE_GIT
+    })
+  }
+
+  const initializeDvc = () => {
+    sendMessage({
+      type: MessageFromWebviewType.INITIALIZE_DVC
     })
   }
 
@@ -62,7 +83,7 @@ export const App: React.FC = () => {
   }
 
   if (cliCompatible === false) {
-    return <CliIncompatible />
+    return <CliIncompatible checkCompatibility={checkCompatibility} />
   }
 
   if (cliCompatible === undefined) {
@@ -78,7 +99,14 @@ export const App: React.FC = () => {
   }
 
   if (!projectInitialized) {
-    return <ProjectUninitialized initializeProject={initializeProject} />
+    return (
+      <ProjectUninitialized
+        canGitInitialize={canGitInitialize}
+        initializeDvc={initializeDvc}
+        initializeGit={initializeGit}
+        needsGitInitialized={needsGitInitialized}
+      />
+    )
   }
 
   if (hasData === undefined) {

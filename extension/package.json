@@ -1360,23 +1360,8 @@
       },
       {
         "view": "dvc.views.welcome",
-        "contents": "New to the extension?\n[Show Walkthrough](command:dvc.getStarted)\n\n",
+        "contents": "New to the extension?\n[Show Walkthrough](command:dvc.getStarted)\n\nThe extension is currently unable to initialize.\n[Show Setup](command:dvc.showSetup)",
         "when": "true"
-      },
-      {
-        "view": "dvc.views.welcome",
-        "contents": "DVC is currently unavailable, [learn more](https://dvc.org/doc).\n[Setup the Workspace](command:dvc.setupWorkspace)",
-        "when": "!dvc.commands.available && !dvc.cli.incompatible"
-      },
-      {
-        "view": "dvc.views.welcome",
-        "contents": "The located version of DVC is incompatible with the extension.\n[Find Another](command:dvc.setupWorkspace)\nUpgrade DVC then...\n[Check Compatibility](command:dvc.checkCLICompatible)",
-        "when": "dvc.cli.incompatible"
-      },
-      {
-        "view": "dvc.views.welcome",
-        "contents": "The current workspace does not contain a DVC project. You can initialize a project which will enable features powered by DVC.\n[Initialize Project](command:dvc.init)\nTo learn more about how to use DVC please read [our docs](https://dvc.org/doc).",
-        "when": "dvc.commands.available && !dvc.cli.incompatible && !dvc.project.available"
       },
       {
         "view": "dvc.views.trackedExplorerTree",
@@ -1565,7 +1550,7 @@
     "execa": "5.1.1",
     "fs-extra": "11.1.0",
     "js-yaml": "4.1.0",
-    "json5": "^2.2.1",
+    "json5": "2.2.2",
     "lodash.clonedeep": "4.5.0",
     "lodash.get": "4.4.2",
     "lodash.isempty": "4.4.0",
@@ -1577,7 +1562,7 @@
     "vscode-languageclient": "8.0.2"
   },
   "devDependencies": {
-    "@swc/core": "1.3.23",
+    "@swc/core": "1.3.24",
     "@swc/jest": "0.2.24",
     "@types/chai": "4.3.4",
     "@types/chai-as-promised": "7.1.5",
@@ -1591,7 +1576,7 @@
     "@types/lodash.isequal": "4.5.6",
     "@types/lodash.merge": "4.6.7",
     "@types/lodash.omit": "4.5.7",
-    "@types/mocha": "10.0.0",
+    "@types/mocha": "10.0.1",
     "@types/mock-require": "2.0.1",
     "@types/node": "16.x",
     "@types/react-vega": "7.0.0",
@@ -1600,10 +1585,10 @@
     "@types/vscode": "1.64.0",
     "@vscode/test-electron": "2.2.1",
     "@vscode/vsce": "2.16.0",
-    "@wdio/cli": "7.28.0",
-    "@wdio/local-runner": "7.28.0",
-    "@wdio/mocha-framework": "7.26.0",
-    "@wdio/spec-reporter": "7.28.0",
+    "@wdio/cli": "8.0.13",
+    "@wdio/local-runner": "8.0.13",
+    "@wdio/mocha-framework": "8.0.13",
+    "@wdio/spec-reporter": "8.0.13",
     "chai": "4.3.7",
     "chai-as-promised": "7.1.1",
     "clean-webpack-plugin": "4.0.0",
@@ -1612,7 +1597,7 @@
     "jest": "29.3.1",
     "jest-environment-node": "29.3.1",
     "lint-staged": "13.1.0",
-    "mocha": "10.0.0",
+    "mocha": "10.2.0",
     "mock-require": "3.0.3",
     "process-exists": "4.1.0",
     "shx": "0.3.4",
@@ -1620,8 +1605,8 @@
     "sinon-chai": "3.7.0",
     "ts-loader": "9.4.2",
     "vscode-uri": "3.0.7",
-    "wdio-vscode-service": "4.2.1",
-    "webdriverio": "7.28.0",
+    "wdio-vscode-service": "5.0.0",
+    "webdriverio": "8.0.13",
     "webpack": "5.75.0",
     "webpack-cli": "5.0.1"
   },

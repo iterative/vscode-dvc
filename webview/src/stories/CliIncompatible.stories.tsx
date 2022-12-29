@@ -14,7 +14,7 @@ export default {
 } as Meta
 
 const Template: Story = () => {
-  return <CliIncompatible />
+  return <CliIncompatible checkCompatibility={() => undefined} />
 }
 
 export const CliFoundButNotCompatible = Template.bind({})

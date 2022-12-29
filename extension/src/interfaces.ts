@@ -1,4 +1,4 @@
-export interface IExtension {
+export interface IExtensionSetup {
   getCliVersion: (
     cwd: string,
     isCliGlobal?: true

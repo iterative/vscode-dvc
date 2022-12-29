@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { restore, spy } from 'sinon'
+import { restore, spy, stub } from 'sinon'
 import { buildSetup } from './util'
 import { closeAllEditors, getMessageReceivedEmitter } from '../util'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
@@ -24,11 +24,8 @@ suite('Setup Test Suite', () => {
   })
 
   describe('Setup', () => {
-    it('should handle an initialize project message from the webview', async () => {
-      const { messageSpy, setup, mockInitializeProject } = buildSetup(
-        disposable,
-        true
-      )
+    it('should handle an initialize git message from the webview', async () => {
+      const { messageSpy, setup, mockInitializeGit } = buildSetup(disposable)
 
       const webview = await setup.showWebview()
       await webview.isReady()
@@ -37,10 +34,44 @@ suite('Setup Test Suite', () => {
 
       messageSpy.resetHistory()
       mockMessageReceived.fire({
-        type: MessageFromWebviewType.INITIALIZE_PROJECT
+        type: MessageFromWebviewType.INITIALIZE_GIT
       })
 
-      expect(mockInitializeProject).to.be.calledOnce
+      expect(mockInitializeGit).to.be.calledOnce
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle an initialize project message from the webview', async () => {
+      const { messageSpy, setup, mockInitializeDvc } = buildSetup(disposable)
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.INITIALIZE_DVC
+      })
+
+      expect(mockInitializeDvc).to.be.calledOnce
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a check cli compatible message from the webview', async () => {
+      const { messageSpy, setup, mockExecuteCommand } = buildSetup(disposable)
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.CHECK_CLI_COMPATIBLE
+      })
+
+      expect(mockExecuteCommand).to.be.calledWithExactly(
+        RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE
+      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle an auto install dvc message from the webview', async () => {
@@ -115,20 +146,132 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should close the webview and open the experiments when the setup is done', async () => {
-      const { setup, mockOpenExperiments } = buildSetup(
-        disposable,
-        true,
-        true,
-        true
-      )
+      const { setup, mockOpenExperiments } = buildSetup(disposable, true)
 
       const closeWebviewSpy = spy(BaseWebview.prototype, 'dispose')
 
       const webview = await setup.showWebview()
       await webview.isReady()
 
+      stub(setup, 'hasRoots').returns(true)
+      setup.setCliCompatible(true)
+      setup.setAvailable(true)
+
       expect(closeWebviewSpy).to.be.calledOnce
       expect(mockOpenExperiments).to.be.calledOnce
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should send the expected message to the webview when there is no CLI available', async () => {
+      const { config, setup, messageSpy } = buildSetup(disposable)
+
+      await config.isReady()
+
+      setup.setCliCompatible(undefined)
+      setup.setAvailable(false)
+      await setup.setRoots()
+
+      messageSpy.restore()
+      const mockSendMessage = stub(BaseWebview.prototype, 'show')
+
+      const messageSent = new Promise(resolve =>
+        mockSendMessage.callsFake(data => {
+          resolve(undefined)
+          return mockSendMessage.wrappedMethod(data)
+        })
+      )
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      await messageSent
+
+      expect(mockSendMessage).to.be.calledOnce
+      expect(mockSendMessage).to.be.calledWithExactly({
+        canGitInitialize: true,
+        cliCompatible: undefined,
+        hasData: false,
+        isPythonExtensionInstalled: false,
+        needsGitInitialized: true,
+        projectInitialized: false,
+        pythonBinPath: undefined
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should send the expected message to the webview when there is no Git repository in the workspace', async () => {
+      const { config, setup, messageSpy } = buildSetup(disposable)
+
+      await config.isReady()
+
+      setup.setCliCompatible(true)
+      setup.setAvailable(true)
+      await setup.setRoots()
+
+      messageSpy.restore()
+      const mockSendMessage = stub(BaseWebview.prototype, 'show')
+
+      const messageSent = new Promise(resolve =>
+        mockSendMessage.callsFake(data => {
+          resolve(undefined)
+          return mockSendMessage.wrappedMethod(data)
+        })
+      )
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      await messageSent
+
+      expect(mockSendMessage).to.be.calledOnce
+      expect(mockSendMessage).to.be.calledWithExactly({
+        canGitInitialize: true,
+        cliCompatible: true,
+        hasData: false,
+        isPythonExtensionInstalled: false,
+        needsGitInitialized: true,
+        projectInitialized: false,
+        pythonBinPath: undefined
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should send the expected message to the webview when there is no DVC project in the workspace', async () => {
+      const { config, setup, messageSpy } = buildSetup(
+        disposable,
+        false,
+        true,
+        false
+      )
+
+      await config.isReady()
+
+      setup.setCliCompatible(true)
+      setup.setAvailable(true)
+      await setup.setRoots()
+
+      messageSpy.restore()
+      const mockSendMessage = stub(BaseWebview.prototype, 'show')
+
+      const messageSent = new Promise(resolve =>
+        mockSendMessage.callsFake(data => {
+          resolve(undefined)
+          return mockSendMessage.wrappedMethod(data)
+        })
+      )
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      await messageSent
+
+      expect(mockSendMessage).to.be.calledOnce
+      expect(mockSendMessage).to.be.calledWithExactly({
+        canGitInitialize: false,
+        cliCompatible: true,
+        hasData: false,
+        isPythonExtensionInstalled: false,
+        needsGitInitialized: false,
+        projectInitialized: false,
+        pythonBinPath: undefined
+      })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 })
