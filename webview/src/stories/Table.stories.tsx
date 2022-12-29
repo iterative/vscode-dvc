@@ -46,6 +46,8 @@ const tableData: TableDataState = {
   hasRunningExperiment: true,
   rows: rowsFixture.map(row => ({
     ...row,
+    displayNameOrParent:
+      row.id === 'main' ? 'Upgrading dependencies ...' : undefined,
     subRows: row.subRows?.map(experiment => ({
       ...experiment,
       starred: experiment.starred || experiment.label === '42b8736',
