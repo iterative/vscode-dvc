@@ -19,6 +19,7 @@ import {
   findByText,
   getAllByRole
 } from '@storybook/testing-library'
+import { addCommitDataToMainBranch } from './util'
 import Experiments from '../experiments/components/Experiments'
 
 import './test-vscode-styles.scss'
@@ -44,10 +45,8 @@ const tableData: TableDataState = {
   hasColumns: true,
   hasData: true,
   hasRunningExperiment: true,
-  rows: rowsFixture.map(row => ({
+  rows: addCommitDataToMainBranch(rowsFixture).map(row => ({
     ...row,
-    displayNameOrParent:
-      row.id === 'main' ? 'Upgrading dependencies ...' : undefined,
     subRows: row.subRows?.map(experiment => ({
       ...experiment,
       starred: experiment.starred || experiment.label === '42b8736',
@@ -67,7 +66,7 @@ const tableData: TableDataState = {
 const noRunningExperiments = {
   ...tableData,
   hasRunningExperiment: false,
-  rows: rowsFixture.map(row => ({
+  rows: addCommitDataToMainBranch(rowsFixture).map(row => ({
     ...row,
     status: ExperimentStatus.SUCCESS,
     subRows: row.subRows?.map(experiment => ({
@@ -86,7 +85,7 @@ const noRunningExperiments = {
 const noRunningExperimentsNoCheckpoints = {
   ...noRunningExperiments,
   hasCheckpoints: false,
-  rows: rowsFixture.map(row => ({
+  rows: addCommitDataToMainBranch(rowsFixture).map(row => ({
     ...row,
     status: ExperimentStatus.SUCCESS,
     subRows: row.subRows?.map(experiment => ({
@@ -133,7 +132,11 @@ export const WithData = Template.bind({})
 
 export const WithSurvivalData = Template.bind({})
 WithSurvivalData.args = {
-  tableData: { ...survivalTableData, hasData: true }
+  tableData: {
+    ...survivalTableData,
+    hasData: true,
+    rows: addCommitDataToMainBranch(survivalTableData.rows)
+  }
 }
 
 export const WithMiddleStates = Template.bind({})
@@ -195,7 +198,11 @@ WithContextMenuNoCheckpoints.play = contextMenuPlay
 
 export const WithAllDataTypes = Template.bind({})
 WithAllDataTypes.args = {
-  tableData: { ...dataTypesTableFixture, hasData: true }
+  tableData: {
+    ...dataTypesTableFixture,
+    hasData: true,
+    rows: addCommitDataToMainBranch(dataTypesTableFixture.rows)
+  }
 }
 WithAllDataTypes.play = async ({ canvasElement }) => {
   const falseCell = await within(canvasElement).findByText('false')
@@ -207,7 +214,11 @@ WithAllDataTypes.parameters = {
 
 export const WithDeeplyNestedHeaders = Template.bind({})
 WithDeeplyNestedHeaders.args = {
-  tableData: { ...deeplyNestedTableData, hasData: true }
+  tableData: {
+    ...deeplyNestedTableData,
+    hasData: true,
+    rows: addCommitDataToMainBranch(deeplyNestedTableData.rows)
+  }
 }
 
 export const LoadingData = Template.bind({})
