@@ -15,13 +15,8 @@ DVC icon like this in the status bar:
        alt="DVC icon in the status bar" />
 </p>
 
-If you see instead the crossed circle icon, use the
-[Setup Workspace](command:dvc.setupWorkspace) wizard to manually select the
-right environment:
-
-<p align="center">
-  <img src="images/install-dvc-setup-wizard.png" alt="DVC Setup Wizard" />
-</p>
+If you see instead the crossed circle icon, click on the icon or follow the
+[Setup](command:dvc.showSetup) wizard.
 
 > **Note**: The correct Python interpreter must be set for the current workspace
 > when relying on the Python extension for auto environment activation.

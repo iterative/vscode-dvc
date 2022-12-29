@@ -1402,7 +1402,7 @@
           {
             "id": "dvc.installDVC",
             "title": "Install DVC",
-            "description": "This extension requires DVC to be installed.\n\n[Install DVC](https://dvc.org/doc/install)\n",
+            "description": "This extension requires DVC to be installed.\n\n[Show Setup](command:dvc.showSetup)\n",
             "media": {
               "markdown": "resources/walkthrough/install-dvc.md"
             },
@@ -1415,7 +1415,7 @@
           {
             "id": "dvc.setupProject",
             "title": "Setup a DVC Project",
-            "description": "Try an example DVC project or setup a new quickly, and start tracking datasets, models, metrics, and plots\n\n[Example Project](https://github.com/iterative/example-get-started)\n",
+            "description": "Try an example DVC project or set one up quickly, and start tracking datasets, models, metrics, and plots\n\n[Example Project](https://github.com/iterative/example-get-started)\n",
             "media": {
               "markdown": "resources/walkthrough/setup-project.md"
             },
