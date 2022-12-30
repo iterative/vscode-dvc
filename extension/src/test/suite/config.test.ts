@@ -2,7 +2,7 @@ import { join, resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore } from 'sinon'
-import { EventEmitter, workspace } from 'vscode'
+import { EventEmitter, Uri, workspace } from 'vscode'
 import { Disposable } from '../../extension'
 import { Config } from '../../config'
 import * as Extensions from '../../vscode/extensions'
@@ -76,13 +76,15 @@ suite('Config Test Suite', () => {
         setupTriggeredCount = setupTriggeredCount + 1
       })
     )
-    const mockDvcMonoRepo = resolve('mono-repo')
+    const mockDvcMonoRepo = Uri.file(resolve('mono-repo')).fsPath
     const mockGetWorkspaceFolders = stub(
       WorkspaceFolders,
       'getWorkspaceFolders'
     ).returns([mockDvcMonoRepo])
-    const mockDvcSubRoot1 = join(mockDvcMonoRepo, 'subroot1')
-    const mockDvcSubRoot2 = join(mockDvcMonoRepo, 'subroot2', 'deep', 'root')
+    const mockDvcSubRoot1 = Uri.file(join(mockDvcMonoRepo, 'subroot1')).fsPath
+    const mockDvcSubRoot2 = Uri.file(
+      join(mockDvcMonoRepo, 'subroot2', 'deep', 'root')
+    ).fsPath
 
     await setConfigValue(ConfigKey.FOCUSED_PROJECTS, mockDvcSubRoot1)
     await configUpdated

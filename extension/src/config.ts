@@ -143,7 +143,7 @@ export class Config extends DeferredDisposable {
 
     const paths = Array.isArray(focusedProjects)
       ? focusedProjects
-      : ([focusedProjects] as string[])
+      : ([focusedProjects].filter(Boolean) as string[])
     for (const path of paths) {
       this.collectValidFocusedProject(
         validatedFocusedProjects,
