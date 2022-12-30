@@ -150,7 +150,7 @@ export class Setup
       })
     )
     this.watchForVenvChanges()
-    this.watchExecutionDetailsForChanges()
+    this.watchConfigurationDetailsForChanges()
     this.watchDotFolderForChanges()
     this.watchPathForChanges(stopWatch)
   }
@@ -401,7 +401,7 @@ export class Setup
     }
   }
 
-  private watchExecutionDetailsForChanges() {
+  private watchConfigurationDetailsForChanges() {
     this.dispose.track(
       this.config.onDidChangeConfigurationDetails(async () => {
         const stopWatch = new StopWatch()
