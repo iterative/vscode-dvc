@@ -22,22 +22,11 @@ import {
   ExperimentStatus,
   EXPERIMENT_WORKSPACE_ID
 } from '../../cli/dvc/contract'
-import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import { OutputChannel } from '../../vscode/outputChannel'
 
 jest.mock('vscode')
 
 const mockedCommands = jest.mocked(commands)
 mockedCommands.executeCommand = jest.fn()
-
-const mockedInternalCommands = new InternalCommands({
-  show: jest.fn()
-} as unknown as OutputChannel)
-const mockedGetCommit = jest.fn(() => Promise.resolve('commit message'))
-mockedInternalCommands.registerCommand(
-  AvailableCommands.GIT_GET_COMMIT_MESSAGE,
-  () => mockedGetCommit()
-)
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -85,33 +74,20 @@ describe('ExperimentsModel', () => {
     return { data }
   }
 
-  it('should return the expected rows when given the output fixture', async () => {
-    const model = new ExperimentsModel(
-      '',
-      buildMockMemento(),
-      mockedInternalCommands
-    )
-    await model.transformAndSet(outputFixture, false)
+  it('should return the expected rows when given the output fixture', () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+    model.transformAndSet(outputFixture, false, {})
     expect(model.getRowData()).toStrictEqual(rowsFixture)
   })
 
-  it('should return the expected rows when given the survival fixture', async () => {
-    const model = new ExperimentsModel(
-      '',
-      buildMockMemento(),
-      mockedInternalCommands
-    )
-    await model.transformAndSet(survivalOutputFixture, false)
-
+  it('should return the expected rows when given the survival fixture', () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+    model.transformAndSet(survivalOutputFixture, false, {})
     expect(model.getRowData()).toStrictEqual(survivalRowsFixture)
   })
 
-  it('should set the workspace to running if a signal file for a DVCLive only experiment has been found', async () => {
-    const model = new ExperimentsModel(
-      '',
-      buildMockMemento(),
-      mockedInternalCommands
-    )
+  it('should set the workspace to running if a signal file for a DVCLive only experiment has been found', () => {
+    const model = new ExperimentsModel('', buildMockMemento())
     const dvcLiveOnly = {
       [EXPERIMENT_WORKSPACE_ID]: {
         baseline: {
@@ -155,13 +131,13 @@ describe('ExperimentsModel', () => {
       }
     }
 
-    await model.transformAndSet(dvcLiveOnly, true)
+    model.transformAndSet(dvcLiveOnly, true, {})
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const runningWorkspace = (model as any).workspace
     expect(runningWorkspace?.executor).toStrictEqual(EXPERIMENT_WORKSPACE_ID)
     expect(runningWorkspace?.status).toStrictEqual(ExperimentStatus.RUNNING)
 
-    await model.transformAndSet(dvcLiveOnly, false)
+    model.transformAndSet(dvcLiveOnly, false, {})
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const stoppedWorkspace = (model as any).workspace
     expect(stoppedWorkspace?.executor).toBeNull()
@@ -169,7 +145,7 @@ describe('ExperimentsModel', () => {
   })
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
-  it('should handle a new dep file being introduced in the workspace', async () => {
+  it('should handle a new dep file being introduced in the workspace', () => {
     const newDep = join('data', '.ldb_workspace')
     const shaWithChange = '060985f9883e99cad9efbd5e0c0d1797aa54f23a'
     const existingDep = {
@@ -180,12 +156,8 @@ describe('ExperimentsModel', () => {
       }
     }
 
-    const model = new ExperimentsModel(
-      '',
-      buildMockMemento(),
-      mockedInternalCommands
-    )
-    await model.transformAndSet(
+    const model = new ExperimentsModel('', buildMockMemento())
+    model.transformAndSet(
       {
         [EXPERIMENT_WORKSPACE_ID]: {
           baseline: {
@@ -236,7 +208,8 @@ describe('ExperimentsModel', () => {
           }
         }
       },
-      false
+      false,
+      {}
     )
 
     const experiments = model.getAllExperiments()
@@ -254,49 +227,33 @@ describe('ExperimentsModel', () => {
     expect(changed).toStrictEqual([shaWithChange])
   })
 
-  it('should handle deps have all null properties (never been committed)', async () => {
-    const model = new ExperimentsModel(
-      '',
-      buildMockMemento(),
-      mockedInternalCommands
-    )
-    await model.transformAndSet(uncommittedDepsFixture, false)
+  it('should handle deps have all null properties (never been committed)', () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+    model.transformAndSet(uncommittedDepsFixture, false, {})
     const [workspace] = model.getExperiments()
     expect(workspace.deps).toStrictEqual({})
   })
 
-  it('should return the expected rows when given the deeply nested output fixture', async () => {
-    const model = new ExperimentsModel(
-      '',
-      buildMockMemento(),
-      mockedInternalCommands
-    )
-    await model.transformAndSet(deeplyNestedOutputFixture, false)
+  it('should return the expected rows when given the deeply nested output fixture', () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+    model.transformAndSet(deeplyNestedOutputFixture, false, {})
     expect(model.getRowData()).toStrictEqual(deeplyNestedRowsFixture)
   })
 
-  it('should return the expected rows when given the data types output fixture', async () => {
-    const model = new ExperimentsModel(
-      '',
-      buildMockMemento(),
-      mockedInternalCommands
-    )
-    await model.transformAndSet(dataTypesOutputFixture, false)
+  it('should return the expected rows when given the data types output fixture', () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+    model.transformAndSet(dataTypesOutputFixture, false, {})
     expect(model.getRowData()).toStrictEqual(dataTypesRowsFixture)
   })
 
-  it('should continue to apply filters to new data if selection mode is set to use filters', async () => {
+  it('should continue to apply filters to new data if selection mode is set to use filters', () => {
     const testPath = buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
       'test'
     )
 
-    const experimentsModel = new ExperimentsModel(
-      '',
-      buildMockMemento(),
-      mockedInternalCommands
-    )
+    const experimentsModel = new ExperimentsModel('', buildMockMemento())
     experimentsModel.addFilter({
       operator: Operator.GREATER_THAN,
       path: testPath,
@@ -304,7 +261,7 @@ describe('ExperimentsModel', () => {
     })
     const baseline = buildTestExperiment(2, undefined, 'testBranch')
 
-    await experimentsModel.transformAndSet(
+    experimentsModel.transformAndSet(
       {
         testBranch: {
           baseline,
@@ -316,7 +273,8 @@ describe('ExperimentsModel', () => {
           baseline: buildTestExperiment(3)
         }
       },
-      false
+      false,
+      {}
     )
     experimentsModel.toggleStatus(runningExperiment)
 
@@ -352,7 +310,7 @@ describe('ExperimentsModel', () => {
       }
     }
 
-    await experimentsModel.transformAndSet(experimentWithNewCheckpoint, false)
+    experimentsModel.transformAndSet(experimentWithNewCheckpoint, false, {})
     expect(experimentsModel.getSelectedExperiments()).toStrictEqual([
       expect.objectContaining({
         id: runningExperiment,
@@ -361,18 +319,14 @@ describe('ExperimentsModel', () => {
     ])
   })
 
-  it('should apply filters to checkpoints and experiments if selection mode is set to use filters', async () => {
+  it('should apply filters to checkpoints and experiments if selection mode is set to use filters', () => {
     const testPath = buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
       'test'
     )
 
-    const experimentsModel = new ExperimentsModel(
-      '',
-      buildMockMemento(),
-      mockedInternalCommands
-    )
+    const experimentsModel = new ExperimentsModel('', buildMockMemento())
     experimentsModel.addFilter({
       operator: Operator.GREATER_THAN_OR_EQUAL,
       path: testPath,
@@ -380,7 +334,7 @@ describe('ExperimentsModel', () => {
     })
     const baseline = buildTestExperiment(2, undefined, 'testBranch')
 
-    await experimentsModel.transformAndSet(
+    experimentsModel.transformAndSet(
       {
         testBranch: {
           '0notIncluded': buildTestExperiment(0, 'tip'),
@@ -395,7 +349,8 @@ describe('ExperimentsModel', () => {
           baseline: buildTestExperiment(3)
         }
       },
-      false
+      false,
+      {}
     )
 
     experimentsModel.setSelectionMode(true)
@@ -435,14 +390,10 @@ describe('ExperimentsModel', () => {
     ])
   })
 
-  it('should always limit the number of selected experiments to 7', async () => {
-    const experimentsModel = new ExperimentsModel(
-      '',
-      buildMockMemento(),
-      mockedInternalCommands
-    )
+  it('should always limit the number of selected experiments to 7', () => {
+    const experimentsModel = new ExperimentsModel('', buildMockMemento())
 
-    await experimentsModel.transformAndSet(
+    experimentsModel.transformAndSet(
       {
         testBranch: {
           baseline: buildTestExperiment(2, undefined, 'testBranch'),
@@ -457,7 +408,8 @@ describe('ExperimentsModel', () => {
           baseline: buildTestExperiment(3)
         }
       },
-      false
+      false,
+      {}
     )
 
     experimentsModel.setSelectionMode(true)
@@ -477,49 +429,33 @@ describe('ExperimentsModel', () => {
     expect((experimentsModel as any).useFiltersForSelection).toBe(false)
   })
 
-  it('should fetch branch params', async () => {
-    const model = new ExperimentsModel(
-      '',
-      buildMockMemento(),
-      mockedInternalCommands
-    )
-    await model.transformAndSet(outputFixture, false)
+  it('should fetch branch params', () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+    model.transformAndSet(outputFixture, false, {})
 
     const branchParams = model.getExperimentParams('main')
     expect(definedAndNonEmpty(branchParams)).toBe(true)
   })
 
-  it('should fetch workspace params', async () => {
-    const model = new ExperimentsModel(
-      '',
-      buildMockMemento(),
-      mockedInternalCommands
-    )
-    await model.transformAndSet(outputFixture, false)
+  it('should fetch workspace params', () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+    model.transformAndSet(outputFixture, false, {})
 
     const workspaceParams = model.getExperimentParams(EXPERIMENT_WORKSPACE_ID)
     expect(definedAndNonEmpty(workspaceParams)).toBe(true)
   })
 
-  it("should fetch an experiment's params", async () => {
-    const model = new ExperimentsModel(
-      '',
-      buildMockMemento(),
-      mockedInternalCommands
-    )
-    await model.transformAndSet(outputFixture, false)
+  it("should fetch an experiment's params", () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+    model.transformAndSet(outputFixture, false, {})
 
     const experimentParams = model.getExperimentParams('exp-e7a67')
     expect(definedAndNonEmpty(experimentParams)).toBe(true)
   })
 
-  it("should fetch an empty array if the experiment's params cannot be found", async () => {
-    const model = new ExperimentsModel(
-      '',
-      buildMockMemento(),
-      mockedInternalCommands
-    )
-    await model.transformAndSet(outputFixture, false)
+  it("should fetch an empty array if the experiment's params cannot be found", () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+    model.transformAndSet(outputFixture, false, {})
 
     const noParams = model.getExperimentParams('not-an-experiment')
     expect(definedAndNonEmpty(noParams)).toBe(false)
