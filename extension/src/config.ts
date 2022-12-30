@@ -36,6 +36,7 @@ export class Config extends DeferredDisposable {
     this.onDidChangeExtensionsEvent = onDidChangeExtensionsEvent
 
     this.setPythonBinPath()
+    this.setFocusedProjects()
 
     this.onDidChangePythonExecutionDetails()
     this.onDidChangeExtensions()
@@ -118,11 +119,14 @@ export class Config extends DeferredDisposable {
 
   private setFocusedProjectsAndNotifyIfChanged() {
     const oldFocusedProjects = this.focusedProjects
-    this.focusedProjects = this.validateFocusedProjects()
-
+    this.setFocusedProjects()
     if (!isEqual(oldFocusedProjects, this.focusedProjects)) {
       this.configurationDetailsChanged.fire()
     }
+  }
+
+  private setFocusedProjects() {
+    this.focusedProjects = this.validateFocusedProjects()
   }
 
   private validateFocusedProjects() {
