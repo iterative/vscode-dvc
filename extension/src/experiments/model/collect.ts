@@ -318,7 +318,7 @@ const formatCommitMessage = (commit: string) => {
 
 const addCommitDataToBranches = (
   branches: Experiment[],
-  commitMessages: { [sha: string]: string }
+  commitMessages: { [sha: string]: string } = {}
 ): Experiment[] =>
   branches.map(branch => {
     const { sha } = branch

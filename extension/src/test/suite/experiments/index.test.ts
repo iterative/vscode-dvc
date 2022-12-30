@@ -71,6 +71,7 @@ import { PlotSizeNumber } from '../../../plots/webview/contract'
 import { RegisteredCommands } from '../../../commands/external'
 import { ConfigKey } from '../../../vscode/config'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
+import { InternalCommands } from '../../../commands/internal'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -1059,9 +1060,7 @@ suite('Experiments Test Suite', () => {
 
   describe('Sorting', () => {
     it('should be able to sort', async () => {
-      const { internalCommands, gitReader } = buildInternalCommands(disposable)
-      stub(gitReader, 'getLastThreeCommitMessages').resolves({})
-
+      const { internalCommands } = buildInternalCommands(disposable)
       const buildTestExperiment = (testParam: number) => ({
         params: {
           'params.yaml': {
@@ -1289,8 +1288,6 @@ suite('Experiments Test Suite', () => {
     const filterMapEntries = [firstFilterMapEntry, secondFilterMapEntry]
 
     it('should initialize given no persisted state and update persistence given any change', async () => {
-      const { internalCommands, gitReader } = buildInternalCommands(disposable)
-      stub(gitReader, 'getLastThreeCommitMessages').resolves({})
       const colors = copyOriginalColors()
       const mockMemento = buildMockMemento()
       const mementoSpy = spy(mockMemento, 'get')
@@ -1298,7 +1295,7 @@ suite('Experiments Test Suite', () => {
       const testRepository = disposable.track(
         new Experiments(
           'test',
-          internalCommands,
+          {} as InternalCommands,
           {} as EventEmitter<boolean>,
           {} as ResourceLocator,
           mockMemento,
@@ -1456,8 +1453,6 @@ suite('Experiments Test Suite', () => {
     })
 
     it('should initialize with state reflected from the given Memento', async () => {
-      const { internalCommands, gitReader } = buildInternalCommands(disposable)
-      stub(gitReader, 'getLastThreeCommitMessages').resolves({})
       const colors = copyOriginalColors()
       const mockMemento = buildMockMemento({
         'experimentsFilterBy:test': filterMapEntries,
@@ -1476,7 +1471,7 @@ suite('Experiments Test Suite', () => {
       const testRepository = disposable.track(
         new Experiments(
           'test',
-          internalCommands,
+          {} as InternalCommands,
           {} as EventEmitter<boolean>,
           {} as ResourceLocator,
           mockMemento,
