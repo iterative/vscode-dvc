@@ -1288,6 +1288,7 @@ suite('Experiments Test Suite', () => {
     const filterMapEntries = [firstFilterMapEntry, secondFilterMapEntry]
 
     it('should initialize given no persisted state and update persistence given any change', async () => {
+      const { internalCommands } = buildInternalCommands(disposable)
       const colors = copyOriginalColors()
       const mockMemento = buildMockMemento()
       const mementoSpy = spy(mockMemento, 'get')
@@ -1295,7 +1296,7 @@ suite('Experiments Test Suite', () => {
       const testRepository = disposable.track(
         new Experiments(
           'test',
-          {} as InternalCommands,
+          internalCommands,
           {} as EventEmitter<boolean>,
           {} as ResourceLocator,
           mockMemento,
@@ -1453,6 +1454,7 @@ suite('Experiments Test Suite', () => {
     })
 
     it('should initialize with state reflected from the given Memento', async () => {
+      const { internalCommands } = buildInternalCommands(disposable)
       const colors = copyOriginalColors()
       const mockMemento = buildMockMemento({
         'experimentsFilterBy:test': filterMapEntries,
@@ -1471,7 +1473,7 @@ suite('Experiments Test Suite', () => {
       const testRepository = disposable.track(
         new Experiments(
           'test',
-          {} as InternalCommands,
+          internalCommands,
           {} as EventEmitter<boolean>,
           {} as ResourceLocator,
           mockMemento,
