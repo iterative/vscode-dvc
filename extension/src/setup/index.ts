@@ -273,7 +273,8 @@ export class Setup
   }
 
   private async findDvcRoots(cwd: string): Promise<string[]> {
-    const dvcRoots = await findDvcRootPaths(cwd)
+    const dvcRoots =
+      this.config.getFocusedProjects() || (await findDvcRootPaths(cwd))
     if (definedAndNonEmpty(dvcRoots)) {
       return dvcRoots
     }
@@ -402,7 +403,7 @@ export class Setup
 
   private watchExecutionDetailsForChanges() {
     this.dispose.track(
-      this.config.onDidChangeExecutionDetails(async () => {
+      this.config.onDidChangeConfigurationDetails(async () => {
         const stopWatch = new StopWatch()
         try {
           this.sendDataToWebview()

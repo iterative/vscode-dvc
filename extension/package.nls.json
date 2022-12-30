@@ -75,6 +75,8 @@
   "command.views.experimentsTree.selectExperiments": "Select Experiments to Display in Plots",
   "command.views.plotsPathsTree.selectPlots": "Select Plots to Display",
   "command.views.plotsPathsTree.refreshPlots": "Refresh Plots for Selected Experiments",
+  "config.focusedProjects.description": "A path or list of paths from inside the workspace which point to the desired sub-projects to focus. All other DVC projects in the workspace will be ignored. Paths which are not inside the workspace will be excluded.",
+  "config.focusedProjects.title": "Path(s) to DVC sub-projects to be focused.",
   "config.doNotRecommendRedHatExtension.description": "Do not prompt to install the Red Hat YAML extension, which helps with DVC YAML schema validation.",
   "config.doNotRecommendRedHatExtension.title": "Do not recommend the YAML extension.",
   "config.doNotShowCliUnavailable.description": "Do not warn when the workspace contains a DVC project but the DVC binary is unavailable.",
