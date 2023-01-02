@@ -26,8 +26,8 @@ jobs:
       - name: Set Variables
         id: set_variables
         run: |
-          echo "::set-output name=last_release_tag::$(git describe --tags --abbrev=0)"
-          echo "::set-output name=release_date::$(date --rfc-3339=date)"
+          echo "last_release_tag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
+          echo "release_date=$(date --rfc-3339=date)" >> $GITHUB_OUTPUT
 
       - name: Build Changelog
         id: build_changelog
@@ -44,7 +44,7 @@ jobs:
         run: |
           OVERRIDE_VERSION=${{ github.event.inputs.override_version }}
           yarn workspace dvc version --new-version ${OVERRIDE_VERSION:-patch} --no-git-tag-version
-          echo "::set-output name=new_version::$(cat extension/package.json | jq -r .version)"
+          echo "new_version=$(cat extension/package.json | jq -r .version)" >> $GITHUB_OUTPUT
 
       - name: Update Changelog
         uses: stefanzweifel/changelog-updater-action@v1
