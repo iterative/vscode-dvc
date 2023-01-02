@@ -124,7 +124,7 @@ const getRunResumeOptions = (
 
   return [
     withId(
-      'Modify, Reset and Run',
+      'Modify and Run',
       MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN,
       isCheckpoint || !projectHasCheckpoints,
       resetNeedsSeparator
