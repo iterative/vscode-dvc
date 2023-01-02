@@ -313,7 +313,7 @@ const collectFromBranchesObject = (
 
 const formatCommitMessage = (commit: string) => {
   const lines = commit.split('\n').filter(Boolean)
-  return `[${lines[0]}${lines.length > 1 ? ' ...' : ''}]`
+  return `${lines[0]}${lines.length > 1 ? ' ...' : ''}`
 }
 
 const addCommitDataToBranches = async (
