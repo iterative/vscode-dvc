@@ -44,16 +44,18 @@ export const findSubRootPaths = async (
 }
 
 export const findDvcRootPaths = async (cwd: string): Promise<string[]> => {
+  const dvcRoots = []
+
   if (isDirectory(join(cwd, DOT_DVC))) {
-    return [cwd]
+    dvcRoots.push(cwd)
   }
 
   const subRoots = await findSubRootPaths(cwd, DOT_DVC)
 
   if (definedAndNonEmpty(subRoots)) {
-    return subRoots
+    dvcRoots.push(...subRoots)
   }
-  return []
+  return dvcRoots.sort()
 }
 
 export const findAbsoluteDvcRootPath = async (

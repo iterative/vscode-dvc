@@ -150,7 +150,7 @@ export class Setup
       })
     )
     this.watchForVenvChanges()
-    this.watchExecutionDetailsForChanges()
+    this.watchConfigurationDetailsForChanges()
     this.watchDotFolderForChanges()
     this.watchPathForChanges(stopWatch)
   }
@@ -273,7 +273,8 @@ export class Setup
   }
 
   private async findDvcRoots(cwd: string): Promise<string[]> {
-    const dvcRoots = await findDvcRootPaths(cwd)
+    const dvcRoots =
+      this.config.getFocusedProjects() || (await findDvcRootPaths(cwd))
     if (definedAndNonEmpty(dvcRoots)) {
       return dvcRoots
     }
@@ -400,9 +401,9 @@ export class Setup
     }
   }
 
-  private watchExecutionDetailsForChanges() {
+  private watchConfigurationDetailsForChanges() {
     this.dispose.track(
-      this.config.onDidChangeExecutionDetails(async () => {
+      this.config.onDidChangeConfigurationDetails(async () => {
         const stopWatch = new StopWatch()
         try {
           this.sendDataToWebview()
