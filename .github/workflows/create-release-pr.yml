@@ -20,6 +20,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup CML
+        uses: iterative/setup-cml@v1
+
       - name: Set Variables
         id: set_variables
         run: |
@@ -51,16 +54,14 @@ jobs:
           release-date: ${{ steps.set_variables.outputs.release_date }}
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v4
-        with:
-          base: main
-          body: |
-            This PR updates the extension version and CHANGELOG.md.
+        run: |
+          echo "This PR updates the extension version and CHANGELOG.md.\n" >> body.log
+          echo "Please close and reopen this PR to run the required workflows (Required statuses must pass before merging).\n" >> body.log
+          echo "**The \`publish\` workflow will run automatically when this PR is merged.**" >> body.log
 
-            Please close and reopen this PR to run the required workflows (Required statuses must pass before merging).
-
-            **The `publish` workflow will run automatically when this PR is merged.**
-          commit-message: 'Update version and CHANGELOG for release'
-          title: 'Update version and CHANGELOG for release'
-          token: ${{ secrets.GITHUB_TOKEN }}
-          labels: make release go now
+          cml pr create \
+            --token="${{ secrets.GITHUB_TOKEN }}" \
+            --message="Update version and CHANGELOG for release" \
+            --title="Update version and CHANGELOG for release" \
+            --body="$(cat ./body.log)" .
+          
