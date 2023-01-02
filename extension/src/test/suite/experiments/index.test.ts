@@ -71,7 +71,6 @@ import { PlotSizeNumber } from '../../../plots/webview/contract'
 import { RegisteredCommands } from '../../../commands/external'
 import { ConfigKey } from '../../../vscode/config'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
-import { InternalCommands } from '../../../commands/internal'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
