@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.33] - 2023-01-02
+
+### 🚀 New Features and Enhancements
+
+- Offer to Git init when there is no DVC project or Git repository [#3002](https://github.com/iterative/vscode-dvc/pull/3002) by [@mattseddon](https://github.com/mattseddon)
+- Simply welcome view inside view container [#3023](https://github.com/iterative/vscode-dvc/pull/3023) by [@mattseddon](https://github.com/mattseddon)
+- Integrate walkthrough with setup webview [#3026](https://github.com/iterative/vscode-dvc/pull/3026) by [@mattseddon](https://github.com/mattseddon)
+- Enable sub-project selection in monorepos [#3030](https://github.com/iterative/vscode-dvc/pull/3030) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Add DVC and Git initialization watcher [#3025](https://github.com/iterative/vscode-dvc/pull/3025) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Cleanup table dnd code: remove unused slice/group logic [#3007](https://github.com/iterative/vscode-dvc/pull/3007) by [@shcheklein](https://github.com/shcheklein)
+- Upgrade e2e test dependencies and Mocha [#3005](https://github.com/iterative/vscode-dvc/pull/3005) by [@mattseddon](https://github.com/mattseddon)
+- Split setup from extension [#3017](https://github.com/iterative/vscode-dvc/pull/3017) by [@mattseddon](https://github.com/mattseddon)
+- Rename original setup file to runner [#3018](https://github.com/iterative/vscode-dvc/pull/3018) by [@mattseddon](https://github.com/mattseddon)
+- Add periods to setup webview views [#3024](https://github.com/iterative/vscode-dvc/pull/3024) by [@mattseddon](https://github.com/mattseddon)
+- GitHub actions update [#3032](https://github.com/iterative/vscode-dvc/pull/3032) by [@dacbd](https://github.com/dacbd)
+
 ## [0.5.32] - 2022-12-25
 
 ### 🚀 New Features and Enhancements
