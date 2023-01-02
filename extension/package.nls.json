@@ -47,6 +47,7 @@
   "command.startExperimentsQueue": "Start the Experiments Queue",
   "command.resetAndRunCheckpointExperiment": "Run Experiment",
   "command.selectForCompare": "Select for Compare",
+  "command.selectFocusedProjects": "Select Projects to Focus",
   "command.setupWorkspace": "Setup The Workspace",
   "command.shareExperimentAsBranch": "Share Experiment as Branch",
   "command.shareExperimentAsCommit": "Commit and Share Experiment",

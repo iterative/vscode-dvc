@@ -5,6 +5,7 @@ import { SetupData as TSetupData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { findPythonBinForInstall } from './autoInstall'
 import { run, runWithGlobalRecheck, runWorkspace } from './runner'
+import { pickFocusedProjects } from './quickPick'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -44,6 +45,7 @@ import { EventName } from '../telemetry/constants'
 import { WorkspaceScale } from '../telemetry/collect'
 import { gitPath } from '../cli/git/constants'
 import { DOT_DVC } from '../cli/dvc/constants'
+import { ConfigKey, setConfigValue } from '../vscode/config'
 
 export type SetupWebviewWebview = BaseWebview<TSetupData>
 
@@ -188,12 +190,9 @@ export class Setup
   }
 
   public async setRoots() {
-    const nestedRoots = await Promise.all(
-      getWorkspaceFolders().map(workspaceFolder =>
-        this.findDvcRoots(workspaceFolder)
-      )
-    )
-    this.dvcRoots = nestedRoots.flat().sort()
+    const nestedRoots = await this.findDvcRoots()
+    this.dvcRoots =
+      this.config.getFocusedProjects() || nestedRoots.flat().sort()
 
     this.sendDataToWebview()
     return this.setProjectAvailability()
@@ -272,15 +271,30 @@ export class Setup
     return webviewMessages
   }
 
-  private async findDvcRoots(cwd: string): Promise<string[]> {
-    const dvcRoots =
-      this.config.getFocusedProjects() || (await findDvcRootPaths(cwd))
-    if (definedAndNonEmpty(dvcRoots)) {
-      return dvcRoots
+  private async findDvcRoots(): Promise<string[]> {
+    const dvcRoots: string[] = []
+
+    for (const cwd of getWorkspaceFolders()) {
+      const workspaceFolderRoots = await findDvcRootPaths(cwd)
+      if (definedAndNonEmpty(workspaceFolderRoots)) {
+        dvcRoots.push(...workspaceFolderRoots)
+        continue
+      }
+
+      await this.config.isReady()
+      const absoluteRoot = await findAbsoluteDvcRootPath(
+        cwd,
+        this.dvcReader.root(cwd)
+      )
+      if (absoluteRoot) {
+        dvcRoots.push(...absoluteRoot)
+      }
     }
 
-    await this.config.isReady()
-    return findAbsoluteDvcRootPath(cwd, this.dvcReader.root(cwd))
+    const hasMultipleRoots = dvcRoots.length > 1
+    setContextValue('dvc.multiple.projects', hasMultipleRoots)
+
+    return dvcRoots
   }
 
   private setCommandsAvailability(available: boolean) {
@@ -362,6 +376,20 @@ export class Setup
       RegisteredCommands.SETUP_SHOW,
       async () => {
         await this.showSetup()
+      }
+    )
+
+    internalCommands.registerExternalCommand(
+      RegisteredCommands.SELECT_FOCUSED_PROJECTS,
+      async () => {
+        const dvcRoots = await this.findDvcRoots()
+        const focusedProjects = await pickFocusedProjects(
+          dvcRoots,
+          this.dvcRoots
+        )
+        if (focusedProjects) {
+          setConfigValue(ConfigKey.FOCUSED_PROJECTS, focusedProjects)
+        }
       }
     )
   }
