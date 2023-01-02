@@ -61,12 +61,9 @@ jobs:
           echo "Please close and reopen this PR to run the required workflows (Required statuses must pass before merging).\n" >> pr-body.md
           echo "**The \`publish\` workflow will run automatically when this PR is merged.**" >> pr-body.md
 
-          new_pr=$(cml pr create \
+          cml pr create \
             --token="${{ secrets.GITHUB_TOKEN }}" \
             --message="Update version and CHANGELOG for release" \
             --title="Update version and CHANGELOG for release" \
-            --body="$(cat ./pr-body.md)")
+            --body="$(cat ./pr-body.md)"
           
-          gh pr edit $(echo "$new_pr" | awk -F / '{print $NF}') --add-label "make release go now"
-
-          echo "$new_pr"
