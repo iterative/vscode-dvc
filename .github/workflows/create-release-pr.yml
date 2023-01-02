@@ -54,16 +54,14 @@ jobs:
           release-date: ${{ steps.set_variables.outputs.release_date }}
 
       - name: Create Pull Request
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "This PR updates the extension version and CHANGELOG.md.\n" >> pr-body.md
-          echo "Please close and reopen this PR to run the required workflows (Required statuses must pass before merging).\n" >> pr-body.md
-          echo "**The \`publish\` workflow will run automatically when this PR is merged.**" >> pr-body.md
+          echo "This PR updates the extension version and CHANGELOG.md.\n" >> body.log
+          echo "Please close and reopen this PR to run the required workflows (Required statuses must pass before merging).\n" >> body.log
+          echo "**The \`publish\` workflow will run automatically when this PR is merged.**" >> body.log
 
           cml pr create \
             --token="${{ secrets.GITHUB_TOKEN }}" \
             --message="Update version and CHANGELOG for release" \
             --title="Update version and CHANGELOG for release" \
-            --body="$(cat ./pr-body.md)"
+            --body="$(cat ./body.log)" .
           
