@@ -311,9 +311,27 @@ const collectFromBranchesObject = (
   }
 }
 
+const formatCommitMessage = (commit: string) => {
+  const lines = commit.split('\n').filter(Boolean)
+  return `${lines[0]}${lines.length > 1 ? ' ...' : ''}`
+}
+
+const addCommitDataToBranches = (
+  branches: Experiment[],
+  commitMessages: { [sha: string]: string } = {}
+): Experiment[] =>
+  branches.map(branch => {
+    const { sha } = branch
+    if (sha && commitMessages[sha]) {
+      branch.displayNameOrParent = formatCommitMessage(commitMessages[sha])
+    }
+    return branch
+  })
+
 export const collectExperiments = (
   data: ExperimentsOutput,
-  dvcLiveOnly: boolean
+  dvcLiveOnly: boolean,
+  commitMessages: { [sha: string]: string }
 ): ExperimentsAccumulator => {
   const { workspace, ...branchesObject } = data
 
@@ -331,6 +349,9 @@ export const collectExperiments = (
   const acc = new ExperimentsAccumulator(workspaceBaseline)
 
   collectFromBranchesObject(acc, branchesObject)
+
+  acc.branches = addCommitDataToBranches(acc.branches, commitMessages)
+
   return acc
 }
 
