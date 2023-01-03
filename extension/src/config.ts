@@ -1,7 +1,6 @@
 import { EventEmitter, Event, workspace } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import isEqual from 'lodash.isequal'
-import isEmpty from 'lodash.isempty'
 import {
   getOnDidChangePythonExecutionDetails,
   getPythonBinPath
