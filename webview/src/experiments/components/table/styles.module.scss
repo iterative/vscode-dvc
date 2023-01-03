@@ -697,7 +697,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
   cursor: text;
 
   > * {
-    margin: 0 0.25em;
+    margin: 0 0.5em;
     overflow: hidden;
     text-overflow: ellipsis;
   }
@@ -705,7 +705,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
 
 .experimentCellSecondaryName {
   color: $meta-cell-color;
-  font-size: 0.8em;
+  font-size: 0.75em;
 }
 
 .innerCell {

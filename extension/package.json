@@ -353,6 +353,11 @@
         "category": "DVC"
       },
       {
+        "title": "%command.selectFocusedProjects%",
+        "command": "dvc.selectFocusedProjects",
+        "category": "DVC"
+      },
+      {
         "title": "%command.setupWorkspace%",
         "command": "dvc.setupWorkspace",
         "category": "DVC"
@@ -775,6 +780,10 @@
         {
           "command": "dvc.selectForCompare",
           "when": "false"
+        },
+        {
+          "command": "dvc.selectFocusedProjects",
+          "when": "dvc.commands.available && dvc.project.available && dvc.multiple.projects"
         },
         {
           "command": "dvc.showCommands",

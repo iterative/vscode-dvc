@@ -11,6 +11,7 @@ export enum Title {
   SELECT_EXPERIMENT = 'Select an Experiment',
   SELECT_EXPERIMENTS = 'Select up to 7 Experiments to Display in Plots',
   SELECT_FILTERS_TO_REMOVE = 'Select Filter(s) to Remove',
+  SELECT_FOCUSED_PROJECTS = 'Select Project(s) to Focus (set dvc.focusedProjects)',
   SELECT_OPERATOR = 'Select an Operator',
   SELECT_PARAM_OR_METRIC_FILTER = 'Select a Param or Metric to Filter by',
   SELECT_PARAM_OR_METRIC_SORT = 'Select a Param or Metric to Sort by',

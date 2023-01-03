@@ -55,7 +55,6 @@ import { ColumnsModel } from '../../../experiments/columns/model'
 import { MessageFromWebviewType } from '../../../webview/contract'
 import { ExperimentsModel } from '../../../experiments/model'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
-import { InternalCommands } from '../../../commands/internal'
 import { FileSystemData } from '../../../fileSystem/data'
 import { ExperimentsData } from '../../../experiments/data'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
@@ -1061,7 +1060,6 @@ suite('Experiments Test Suite', () => {
   describe('Sorting', () => {
     it('should be able to sort', async () => {
       const { internalCommands } = buildInternalCommands(disposable)
-
       const buildTestExperiment = (testParam: number) => ({
         params: {
           'params.yaml': {
@@ -1289,6 +1287,7 @@ suite('Experiments Test Suite', () => {
     const filterMapEntries = [firstFilterMapEntry, secondFilterMapEntry]
 
     it('should initialize given no persisted state and update persistence given any change', async () => {
+      const { internalCommands } = buildInternalCommands(disposable)
       const colors = copyOriginalColors()
       const mockMemento = buildMockMemento()
       const mementoSpy = spy(mockMemento, 'get')
@@ -1296,7 +1295,7 @@ suite('Experiments Test Suite', () => {
       const testRepository = disposable.track(
         new Experiments(
           'test',
-          {} as InternalCommands,
+          internalCommands,
           {} as EventEmitter<boolean>,
           {} as ResourceLocator,
           mockMemento,
@@ -1454,6 +1453,7 @@ suite('Experiments Test Suite', () => {
     })
 
     it('should initialize with state reflected from the given Memento', async () => {
+      const { internalCommands } = buildInternalCommands(disposable)
       const colors = copyOriginalColors()
       const mockMemento = buildMockMemento({
         'experimentsFilterBy:test': filterMapEntries,
@@ -1472,7 +1472,7 @@ suite('Experiments Test Suite', () => {
       const testRepository = disposable.track(
         new Experiments(
           'test',
-          {} as InternalCommands,
+          internalCommands,
           {} as EventEmitter<boolean>,
           {} as ResourceLocator,
           mockMemento,
