@@ -89,6 +89,7 @@ module.exports = {
     '@typescript-eslint/no-empty-function': 'off',
     '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/no-extra-semi': 'off',
+    '@typescript-eslint/no-unused-vars': 'error',
     '@typescript-eslint/no-use-before-define': 'error',
     '@typescript-eslint/no-var-requires': 'off',
     '@typescript-eslint/prefer-optional-chain': 'error',
