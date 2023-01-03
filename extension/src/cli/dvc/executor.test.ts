@@ -8,7 +8,7 @@ import { createProcess } from '../../processExecution'
 import { getMockedProcess } from '../../test/util/jest'
 import { getProcessEnv } from '../../env'
 import { Config } from '../../config'
-import { setContextValue } from '../../vscode/context'
+import { ContextKey, setContextValue } from '../../vscode/context'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -584,11 +584,11 @@ describe('CliExecutor', () => {
 
       expect(mockedSetContextValue).toHaveBeenCalledTimes(2)
       expect(mockedSetContextValue).toHaveBeenCalledWith(
-        'dvc.scm.command.running',
+        ContextKey.SCM_RUNNING,
         true
       )
       expect(mockedSetContextValue).toHaveBeenLastCalledWith(
-        'dvc.scm.command.running',
+        ContextKey.SCM_RUNNING,
         false
       )
     })

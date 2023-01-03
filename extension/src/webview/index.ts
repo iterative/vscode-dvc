@@ -9,7 +9,7 @@ import {
   WebviewData
 } from './contract'
 import { EventNames } from './constants'
-import { setContextValue } from '../vscode/context'
+import { ContextKey, setContextValue } from '../vscode/context'
 import { sendTelemetryEvent } from '../telemetry'
 
 export class BaseWebview<T extends WebviewData> {
@@ -28,7 +28,7 @@ export class BaseWebview<T extends WebviewData> {
     this.disposer.track(new EventEmitter())
 
   private readonly webviewPanel: WebviewPanel
-  private readonly contextKey: string
+  private readonly contextKey: ContextKey
 
   private readonly messageReceived = this.disposer.track(
     new EventEmitter<MessageFromWebview>()
@@ -37,7 +37,7 @@ export class BaseWebview<T extends WebviewData> {
   constructor(
     webviewPanel: WebviewPanel,
     dvcRoot: string,
-    contextKey: string,
+    contextKey: ContextKey,
     eventsNames: EventNames,
     scripts: readonly string[]
   ) {

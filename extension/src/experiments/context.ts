@@ -1,6 +1,6 @@
 import { Event, EventEmitter, window } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
-import { setContextValue } from '../vscode/context'
+import { ContextKey, setContextValue } from '../vscode/context'
 import { standardizePossiblePath } from '../fileSystem/path'
 
 const setContextOnDidChangeParamsFiles = (
@@ -51,7 +51,7 @@ export const setContextForEditorTitleIcons = (
   onDidChangeColumns: Event<void>
 ): void => {
   const setActiveEditorContext = (paramsFileActive: boolean) => {
-    setContextValue('dvc.params.fileActive', paramsFileActive)
+    setContextValue(ContextKey.PARAMS_FILE_ACTIVE, paramsFileActive)
     const activeDvcRoot = paramsFileActive ? dvcRoot : undefined
     paramsFileFocused.fire(activeDvcRoot)
   }

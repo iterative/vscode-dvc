@@ -2,7 +2,7 @@ import { Disposable } from './class/dispose'
 import { DvcRunner } from './cli/dvc/runner'
 import { Experiments } from './experiments'
 import { WorkspaceExperiments } from './experiments/workspace'
-import { setContextValue } from './vscode/context'
+import { ContextKey, setContextValue } from './vscode/context'
 
 export class Context extends Disposable {
   private readonly experiments: WorkspaceExperiments
@@ -40,13 +40,13 @@ export class Context extends Disposable {
         this.setIsExperimentRunning(repositories)
 
         this.setContextFromRepositories(
-          'dvc.experiments.filtered',
+          ContextKey.EXPERIMENTS_FILTERED,
           repositories,
           (experiments: Experiments) => experiments.getFilters().length > 0
         )
 
         this.setContextFromRepositories(
-          'dvc.experiments.sorted',
+          ContextKey.EXPERIMENTS_SORTED,
           repositories,
           (experiments: Experiments) => experiments.getSorts().length > 0
         )
@@ -55,27 +55,26 @@ export class Context extends Disposable {
   }
 
   private async setIsExperimentRunning(repositories: Experiments[] = []) {
-    const contextKey = 'dvc.experiment.running'
     if (this.dvcRunner.isExperimentRunning()) {
-      setContextValue(contextKey, true)
-      setContextValue('dvc.experiment.stoppable', true)
+      setContextValue(ContextKey.EXPERIMENT_RUNNING, true)
+      setContextValue(ContextKey.EXPERIMENT_STOPPABLE, true)
       return
     }
 
     this.setContextFromRepositories(
-      contextKey,
+      ContextKey.EXPERIMENT_RUNNING,
       repositories,
       (experiments: Experiments) => experiments.hasRunningExperiment()
     )
 
     setContextValue(
-      'dvc.experiment.stoppable',
+      ContextKey.EXPERIMENT_STOPPABLE,
       await this.experiments.hasDvcLiveOnlyExperimentRunning()
     )
   }
 
   private setContextFromRepositories(
-    contextKey: string,
+    contextKey: ContextKey,
     repositories: Experiments[],
     hasRequirement: (experiments: Experiments) => boolean
   ) {

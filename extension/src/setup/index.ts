@@ -26,7 +26,7 @@ import {
   getWorkspaceFolders
 } from '../vscode/workspaceFolders'
 import { DvcReader } from '../cli/dvc/reader'
-import { setContextValue } from '../vscode/context'
+import { ContextKey, setContextValue } from '../vscode/context'
 import { DvcExecutor } from '../cli/dvc/executor'
 import { GitReader } from '../cli/git/reader'
 import { GitExecutor } from '../cli/git/executor'
@@ -141,7 +141,7 @@ export class Setup
     this.dispose.track(
       onDidChangeHasData(() => {
         this.sendDataToWebview()
-        setContextValue('dvc.project.hasData', this.getHasData())
+        setContextValue(ContextKey.PROJECT_HAS_DATA, this.getHasData())
       })
     )
 
@@ -208,7 +208,7 @@ export class Setup
   public setCliCompatible(compatible: boolean | undefined) {
     this.cliCompatible = compatible
     const incompatible = compatible === undefined ? undefined : !compatible
-    setContextValue('dvc.cli.incompatible', incompatible)
+    setContextValue(ContextKey.CLI_INCOMPATIBLE, incompatible)
   }
 
   public getAvailable() {
@@ -291,18 +291,18 @@ export class Setup
     }
 
     const hasMultipleRoots = dvcRoots.length > 1
-    setContextValue('dvc.multiple.projects', hasMultipleRoots)
+    setContextValue(ContextKey.MULTIPLE_PROJECTS, hasMultipleRoots)
 
     return dvcRoots
   }
 
   private setCommandsAvailability(available: boolean) {
-    setContextValue('dvc.commands.available', available)
+    setContextValue(ContextKey.COMMANDS_AVAILABLE, available)
   }
 
   private setProjectAvailability() {
     const available = this.hasRoots()
-    setContextValue('dvc.project.available', available)
+    setContextValue(ContextKey.PROJECT_AVAILABLE, available)
     if (available && this.dotFolderWatcher && !this.dotFolderWatcher.disposed) {
       this.dispose.untrack(this.dotFolderWatcher)
       this.dotFolderWatcher.dispose()
