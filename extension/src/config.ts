@@ -6,7 +6,7 @@ import {
   getOnDidChangePythonExecutionDetails,
   getPythonBinPath
 } from './extensions/python'
-import { ConfigKey, getConfigValue } from './vscode/config'
+import { ConfigKey, getConfigValue, setConfigValue } from './vscode/config'
 import { DeferredDisposable } from './class/deferred'
 import { getOnDidChangeExtensions } from './vscode/extensions'
 import { standardizePath } from './fileSystem/path'
@@ -69,6 +69,10 @@ export class Config extends DeferredDisposable {
 
   public unsetPythonBinPath() {
     this.pythonBinPath = undefined
+  }
+
+  public setFocusedProjectsOption(focusedProjects: string[]) {
+    setConfigValue(ConfigKey.FOCUSED_PROJECTS, focusedProjects)
   }
 
   public isPythonExtensionUsed() {

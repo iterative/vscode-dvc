@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { ensureFileSync, remove } from 'fs-extra'
 import { expect } from 'chai'
-import { restore, spy, stub } from 'sinon'
+import { SinonStub, restore, spy, stub } from 'sinon'
+import { QuickPickItem, commands, window } from 'vscode'
 import { buildSetup, buildSetupWithWatchers, TEMP_DIR } from './util'
 import { closeAllEditors, getMessageReceivedEmitter } from '../util'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
@@ -14,6 +15,12 @@ import { isDirectory } from '../../../fileSystem'
 import { gitPath } from '../../../cli/git/constants'
 import { join } from '../../util/path'
 import { DOT_DVC } from '../../../cli/dvc/constants'
+import * as Config from '../../../vscode/config'
+import { dvcDemoPath } from '../../util'
+import {
+  QuickPickItemWithValue,
+  QuickPickOptionsWithTitle
+} from '../../../vscode/quickPick'
 
 suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
@@ -337,6 +344,27 @@ suite('Setup Test Suite', () => {
         'should called setup when DVC is installed into a virtual environment'
       ).to.be.called
       expect(workspaceChangedCount).to.equal(3)
+    })
+
+    it('should be able to select focused projects', async () => {
+      const mockFocusedProjects = [dvcDemoPath]
+      ;(
+        stub(window, 'showQuickPick') as SinonStub<
+          [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
+          Thenable<QuickPickItemWithValue<string>[] | undefined>
+        >
+      ).resolves([
+        { label: dvcDemoPath, value: dvcDemoPath }
+      ] as QuickPickItemWithValue[])
+      const mockSetConfigValue = stub(Config, 'setConfigValue').resolves(
+        undefined
+      )
+      await commands.executeCommand(RegisteredCommands.SELECT_FOCUSED_PROJECTS)
+      expect(mockSetConfigValue).to.be.calledOnce
+      expect(mockSetConfigValue).to.be.calledWithExactly(
+        Config.ConfigKey.FOCUSED_PROJECTS,
+        mockFocusedProjects
+      )
     })
   })
 })

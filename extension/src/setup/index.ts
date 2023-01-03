@@ -45,7 +45,6 @@ import { EventName } from '../telemetry/constants'
 import { WorkspaceScale } from '../telemetry/collect'
 import { gitPath } from '../cli/git/constants'
 import { DOT_DVC } from '../cli/dvc/constants'
-import { ConfigKey, setConfigValue } from '../vscode/config'
 
 export type SetupWebviewWebview = BaseWebview<TSetupData>
 
@@ -388,7 +387,7 @@ export class Setup
           this.dvcRoots
         )
         if (focusedProjects) {
-          setConfigValue(ConfigKey.FOCUSED_PROJECTS, focusedProjects)
+          this.config.setFocusedProjectsOption(focusedProjects)
         }
       }
     )
