@@ -35,6 +35,25 @@ describe('findDvcRootPaths', () => {
 
     expect([...dvcRoots]).toStrictEqual([dvcDemoPath, mockDvcRoot])
   })
+
+  it('should find a mono-repo root as well as sub-roots if available one directory below the given folder', async () => {
+    const parentDir = dvcDemoPath
+    const mockFirstDvcRoot = join(parentDir, 'mockFirstDvc')
+    const mockSecondDvcRoot = join(parentDir, 'mockSecondDvc')
+    ensureDirSync(join(mockFirstDvcRoot, DOT_DVC))
+    ensureDirSync(join(mockSecondDvcRoot, DOT_DVC))
+
+    const dvcRoots = await findDvcRootPaths(parentDir)
+
+    remove(mockFirstDvcRoot)
+    remove(mockSecondDvcRoot)
+
+    expect([...dvcRoots]).toStrictEqual([
+      dvcDemoPath,
+      mockFirstDvcRoot,
+      mockSecondDvcRoot
+    ])
+  })
 })
 
 describe('findAbsoluteDvcRootPath', () => {
