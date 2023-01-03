@@ -29,7 +29,9 @@ suite('Context Test Suite', () => {
       update: stub()
     })
 
-    const mockdvcRunner = {
+    const mockHasDvcLiveOnlyExperimentRunning = stub()
+
+    const mockDvcRunner = {
       isExperimentRunning: () => runnerRunning,
       onDidCompleteProcess,
       onDidStartProcess
@@ -37,21 +39,23 @@ suite('Context Test Suite', () => {
     const mockExperiments = {
       getDvcRoots: mockGetDvcRoots,
       getRepository: mockGetRepository,
+      hasDvcLiveOnlyExperimentRunning: mockHasDvcLiveOnlyExperimentRunning,
       onDidChangeExperiments
     } as unknown as WorkspaceExperiments
 
     const context = disposable.track(
-      new Context(mockExperiments, mockdvcRunner)
+      new Context(mockExperiments, mockDvcRunner)
     )
 
     return {
       context,
       executeCommandSpy,
       experimentsChanged,
+      mockDvcRunner,
       mockExperiments,
       mockGetDvcRoots,
       mockGetRepository,
-      mockdvcRunner,
+      mockHasDvcLiveOnlyExperimentRunning,
       onDidChangeExperiments,
       onDidCompleteProcess,
       onDidStartProcess,
@@ -82,7 +86,7 @@ suite('Context Test Suite', () => {
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('Context', () => {
-    it('should set the dvc.experiment.running context to true whenever an experiment is running in the runner', async () => {
+    it('should set the dvc.experiment.running and dvc.experiment.stoppable context to true whenever an experiment is running in the runner', async () => {
       const { executeCommandSpy, onDidStartProcess, processStarted } =
         buildContext(true)
 
@@ -96,6 +100,12 @@ suite('Context Test Suite', () => {
       expect(executeCommandSpy).to.be.calledWith(
         'setContext',
         'dvc.experiment.running',
+        true
+      )
+
+      expect(executeCommandSpy).to.be.calledWith(
+        'setContext',
+        'dvc.experiment.stoppable',
         true
       )
     })
@@ -159,6 +169,53 @@ suite('Context Test Suite', () => {
       expect(executeCommandSpy).to.be.calledWith(
         'setContext',
         'dvc.experiment.running',
+        false
+      )
+    })
+
+    it('should set the dvc.experiment.stoppable context to whether or not there is a DVCLive only experiment running if an experiment is not running in the runner', async () => {
+      const {
+        executeCommandSpy,
+        experimentsChanged,
+        mockGetDvcRoots,
+        mockGetRepository,
+        mockHasDvcLiveOnlyExperimentRunning,
+        onDidChangeExperiments
+      } = buildContext(false)
+
+      const dvcLiveOnlyRunningEvent = new Promise(resolve =>
+        disposable.track(onDidChangeExperiments(() => resolve(undefined)))
+      )
+
+      const mockDvcRoot = resolve('first', 'root')
+      mockGetDvcRoots.returns([mockDvcRoot])
+      mockGetRepository.callsFake(() => buildMockExperiments())
+
+      mockHasDvcLiveOnlyExperimentRunning.resolves(true)
+
+      experimentsChanged.fire()
+      await dvcLiveOnlyRunningEvent
+
+      expect(executeCommandSpy).to.be.calledWith(
+        'setContext',
+        'dvc.experiment.stoppable',
+        true
+      )
+      mockHasDvcLiveOnlyExperimentRunning.resetBehavior()
+      executeCommandSpy.resetHistory()
+
+      const dvcLiveOnlyStoppedEvent = new Promise(resolve =>
+        disposable.track(onDidChangeExperiments(() => resolve(undefined)))
+      )
+
+      mockHasDvcLiveOnlyExperimentRunning.resolves(false)
+
+      experimentsChanged.fire()
+      await dvcLiveOnlyStoppedEvent
+
+      expect(executeCommandSpy).to.be.calledWith(
+        'setContext',
+        'dvc.experiment.stoppable',
         false
       )
     })
