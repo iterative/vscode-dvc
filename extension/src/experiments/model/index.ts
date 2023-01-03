@@ -43,7 +43,7 @@ import {
   ExperimentsOutput,
   EXPERIMENT_WORKSPACE_ID
 } from '../../cli/dvc/contract'
-import { setContextValue } from '../../vscode/context'
+import { ContextKey, setContextValue } from '../../vscode/context'
 import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
 import { PersistenceKey } from '../../persistence/constants'
@@ -300,7 +300,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public setSelectionMode(useFilters: boolean) {
-    setContextValue('dvc.experiments.filter.selected', useFilters)
+    setContextValue(ContextKey.EXPERIMENT_FILTERS_SELECTED, useFilters)
     this.useFiltersForSelection = useFilters
   }
 

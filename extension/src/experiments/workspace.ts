@@ -9,7 +9,7 @@ import { Toast } from '../vscode/toast'
 import { getInput } from '../vscode/inputBox'
 import { BaseWorkspaceWebviews } from '../webview/workspace'
 import { Title } from '../vscode/title'
-import { setContextValue } from '../vscode/context'
+import { ContextKey, setContextValue } from '../vscode/context'
 import { getPidFromSignalFile } from '../fileSystem'
 import { definedAndNonEmpty } from '../util/array'
 
@@ -56,7 +56,10 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
           experiments => experiments.hasCheckpoints()
         )
 
-        setContextValue('dvc.experiment.checkpoints', workspaceHasCheckpoints)
+        setContextValue(
+          ContextKey.EXPERIMENT_CHECKPOINTS,
+          workspaceHasCheckpoints
+        )
       })
     )
   }

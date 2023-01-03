@@ -1,5 +1,6 @@
 import { distPath, react, experiments, plots, setup } from 'dvc-vscode-webview'
 import { EventName, IEventNamePropertyMapping } from '../telemetry/constants'
+import { ContextKey } from '../vscode/context'
 
 export enum ViewKey {
   EXPERIMENTS = 'dvc-experiments',
@@ -16,7 +17,7 @@ export type EventNames = {
 
 export const WebviewDetails: {
   [key in ViewKey]: {
-    contextKey: string
+    contextKey: ContextKey
     distPath: string
     eventNames: EventNames
     scripts: readonly string[]
@@ -25,7 +26,7 @@ export const WebviewDetails: {
   }
 } = {
   [ViewKey.EXPERIMENTS]: {
-    contextKey: 'dvc.experiments.webviewActive',
+    contextKey: ContextKey.EXPERIMENTS_WEBVIEW_ACTIVE,
     distPath,
     eventNames: {
       closedEvent: EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED,
@@ -37,7 +38,7 @@ export const WebviewDetails: {
     viewKey: ViewKey.EXPERIMENTS
   },
   [ViewKey.PLOTS]: {
-    contextKey: 'dvc.plots.webviewActive',
+    contextKey: ContextKey.PLOTS_WEBVIEW_ACTIVE,
     distPath,
     eventNames: {
       closedEvent: EventName.VIEWS_PLOTS_CLOSED,
@@ -49,7 +50,7 @@ export const WebviewDetails: {
     viewKey: ViewKey.PLOTS
   },
   [ViewKey.SETUP]: {
-    contextKey: 'dvc.setup.webviewActive',
+    contextKey: ContextKey.SETUP_WEBVIEW_ACTIVE,
     distPath,
     eventNames: {
       closedEvent: EventName.VIEWS_SETUP_CLOSE,

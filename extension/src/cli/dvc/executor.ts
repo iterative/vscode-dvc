@@ -8,7 +8,7 @@ import {
   GcPreserveFlag
 } from './constants'
 import { typeCheckCommands } from '..'
-import { setContextValue } from '../../vscode/context'
+import { ContextKey, setContextValue } from '../../vscode/context'
 
 export const autoRegisteredCommands = {
   ADD: 'add',
@@ -143,6 +143,6 @@ export class DvcExecutor extends DvcCli {
 
   private setRunning(running: boolean) {
     this.scmCommandRunning = running
-    setContextValue('dvc.scm.command.running', running)
+    setContextValue(ContextKey.SCM_RUNNING, running)
   }
 }
