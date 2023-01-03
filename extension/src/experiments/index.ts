@@ -167,9 +167,14 @@ export class Experiments extends BaseRepository<TableData> {
     const dvcLiveOnly = await checkSignalFile(
       join(this.dvcRoot, DVCLIVE_ONLY_RUNNING_SIGNAL_FILE)
     )
+    const commitMessages: { [sha: string]: string } =
+      await this.internalCommands.executeCommand(
+        AvailableCommands.GIT_GET_LAST_THREE_COMMIT_MESSAGES,
+        this.dvcRoot
+      )
     await Promise.all([
       this.columns.transformAndSet(data),
-      this.experiments.transformAndSet(data, dvcLiveOnly)
+      this.experiments.transformAndSet(data, dvcLiveOnly, commitMessages)
     ])
 
     return this.notifyChanged(data)

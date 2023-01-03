@@ -7,14 +7,15 @@ import {
 } from '../../cli/dvc/contract'
 
 describe('collectExperiments', () => {
-  it('should return an empty array if no branches are present', () => {
-    const { branches } = collectExperiments(
+  it('should return an empty array if no branches are present', async () => {
+    const { branches } = await collectExperiments(
       {
         [EXPERIMENT_WORKSPACE_ID]: {
           baseline: {}
         }
       },
-      false
+      false,
+      {}
     )
     expect(branches).toStrictEqual([])
   })
@@ -37,30 +38,54 @@ describe('collectExperiments', () => {
       baseline: { data: { name: 'branchB' } }
     }
   }
-  const { branches, experimentsByBranch, workspace } = collectExperiments(
-    repoWithTwoBranches,
-    false
-  )
 
-  it('should define a workspace', () => {
+  it('should define a workspace', async () => {
+    const { workspace } = await collectExperiments(
+      repoWithTwoBranches,
+      false,
+      {}
+    )
+
     expect(workspace).toBeDefined()
   })
 
-  it('should find two branches from a repo with two branches', () => {
+  it('should find two branches from a repo with two branches', async () => {
+    const { branches } = await collectExperiments(
+      repoWithTwoBranches,
+      false,
+      {}
+    )
+
     expect(branches.length).toStrictEqual(2)
   })
 
-  const [branchA, branchB] = branches
-  it('should list branches in the same order as they are collected', () => {
+  it('should list branches in the same order as they are collected', async () => {
+    const { branches } = await collectExperiments(
+      repoWithTwoBranches,
+      false,
+      {}
+    )
+    const [branchA, branchB] = branches
+
     expect(branchA.id).toStrictEqual('branchA')
     expect(branchB.id).toStrictEqual('branchB')
   })
 
-  it('should find two experiments on branchA', () => {
+  it('should find two experiments on branchA', async () => {
+    const { experimentsByBranch } = await collectExperiments(
+      repoWithTwoBranches,
+      false,
+      {}
+    )
     expect(experimentsByBranch.get('branchA')?.length).toStrictEqual(2)
   })
 
-  it('should find no experiments on branchB', () => {
+  it('should find no experiments on branchB', async () => {
+    const { experimentsByBranch } = await collectExperiments(
+      repoWithTwoBranches,
+      false,
+      {}
+    )
     expect(experimentsByBranch.get('branchB')).toBeUndefined()
   })
 
@@ -82,28 +107,46 @@ describe('collectExperiments', () => {
       }
     }
   }
-  const acc = collectExperiments(repoWithNestedCheckpoints, false)
 
-  it('should only list the tip as a top-level experiment', () => {
-    const { experimentsByBranch } = acc
+  it('should only list the tip as a top-level experiment', async () => {
+    const { experimentsByBranch } = await collectExperiments(
+      repoWithNestedCheckpoints,
+      false,
+      {}
+    )
     expect(experimentsByBranch.size).toStrictEqual(1)
   })
 
-  const checkpoints = acc.checkpointsByTip.get('tip1') as Experiment[]
+  it('should find three checkpoints on the tip', async () => {
+    const { checkpointsByTip } = await collectExperiments(
+      repoWithNestedCheckpoints,
+      false,
+      {}
+    )
+    const checkpoints = checkpointsByTip.get('tip1') as Experiment[]
 
-  it('should find three checkpoints on the tip', () => {
     expect(checkpoints?.length).toStrictEqual(3)
   })
-  const [tip1cp1, tip1cp2, tip1cp3] = checkpoints
 
-  it('should find checkpoints in the correct order', () => {
+  it('should find checkpoints in the correct order', async () => {
+    const { checkpointsByTip } = await collectExperiments(
+      repoWithNestedCheckpoints,
+      false,
+      {}
+    )
+    const checkpoints = checkpointsByTip.get('tip1') as Experiment[]
+    const [tip1cp1, tip1cp2, tip1cp3] = checkpoints
     expect(tip1cp1.id).toStrictEqual('tip1cp1')
     expect(tip1cp2.id).toStrictEqual('tip1cp2')
     expect(tip1cp3.id).toStrictEqual('tip1cp3')
   })
 
-  it('should handle the continuation of a modified checkpoint', () => {
-    const { checkpointsByTip } = collectExperiments(modifiedFixture, false)
+  it('should handle the continuation of a modified checkpoint', async () => {
+    const { checkpointsByTip } = await collectExperiments(
+      modifiedFixture,
+      false,
+      {}
+    )
 
     const modifiedCheckpointTip = checkpointsByTip
       .get('exp-01b3a')
@@ -138,7 +181,7 @@ describe('collectExperiments', () => {
     }
   })
 
-  it('should handle a checkpoint tip not having a name', () => {
+  it('should handle a checkpoint tip not having a name', async () => {
     const checkpointTipWithoutAName = '3fceabdcef3c7b97c7779f8ae0c69a5542eefaf5'
 
     const repoWithNestedCheckpoints = {
@@ -159,7 +202,7 @@ describe('collectExperiments', () => {
         }
       }
     }
-    const acc = collectExperiments(repoWithNestedCheckpoints, false)
+    const acc = await collectExperiments(repoWithNestedCheckpoints, false, {})
 
     const { experimentsByBranch, checkpointsByTip } = acc
     const [experiment] = experimentsByBranch.get('branchA') || []

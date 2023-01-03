@@ -7,6 +7,7 @@ import { trimAndSplit } from '../../util/stdout'
 import { isDirectory } from '../../fileSystem'
 
 export const autoRegisteredCommands = {
+  GIT_GET_LAST_THREE_COMMIT_MESSAGES: 'getLastThreeCommitMessages',
   GIT_GET_REPOSITORY_ROOT: 'getGitRepositoryRoot',
   GIT_HAS_CHANGES: 'hasChanges',
   GIT_LIST_UNTRACKED: 'listUntracked'
@@ -28,6 +29,29 @@ export class GitReader extends GitCli {
     const output = await this.executeProcess(options)
 
     return !!output
+  }
+
+  public async getLastThreeCommitMessages(cwd: string): Promise<{
+    [sha: string]: string
+  }> {
+    const options = getOptions(
+      cwd,
+      Command.LOG,
+      Flag.PRETTY_FORMAT_COMMIT_MESSAGE,
+      Flag.NUMBER,
+      '6',
+      Flag.SEPARATE_WITH_NULL
+    )
+    try {
+      const output = await this.executeProcess(options)
+      const commits = output.split('\u0000').map(commit => {
+        const [sha, ...splitMessage] = commit.split(' ')
+        return [sha, splitMessage.join(' ')]
+      })
+      return Object.fromEntries(commits)
+    } catch {
+      return {}
+    }
   }
 
   public async listUntracked(cwd: string) {
