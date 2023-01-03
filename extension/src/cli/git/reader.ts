@@ -39,7 +39,7 @@ export class GitReader extends GitCli {
       Command.LOG,
       Flag.PRETTY_FORMAT_COMMIT_MESSAGE,
       Flag.NUMBER,
-      '3',
+      '6',
       Flag.SEPARATE_WITH_NULL
     )
     try {
@@ -48,7 +48,6 @@ export class GitReader extends GitCli {
         const [sha, ...splitMessage] = commit.split(' ')
         return [sha, splitMessage.join(' ')]
       })
-
       return Object.fromEntries(commits)
     } catch {
       return {}
