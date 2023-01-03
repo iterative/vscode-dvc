@@ -190,7 +190,7 @@ export class Setup
   }
 
   public async setRoots() {
-    const nestedRoots = await this.findDvcRoots()
+    const nestedRoots = await this.findWorkspaceDvcRoots()
     this.dvcRoots =
       this.config.getFocusedProjects() || nestedRoots.flat().sort()
 
@@ -271,11 +271,11 @@ export class Setup
     return webviewMessages
   }
 
-  private async findDvcRoots(): Promise<string[]> {
+  private async findWorkspaceDvcRoots(): Promise<string[]> {
     const dvcRoots: string[] = []
 
-    for (const cwd of getWorkspaceFolders()) {
-      const workspaceFolderRoots = await findDvcRootPaths(cwd)
+    for (const workspaceFolder of getWorkspaceFolders()) {
+      const workspaceFolderRoots = await findDvcRootPaths(workspaceFolder)
       if (definedAndNonEmpty(workspaceFolderRoots)) {
         dvcRoots.push(...workspaceFolderRoots)
         continue
@@ -283,8 +283,8 @@ export class Setup
 
       await this.config.isReady()
       const absoluteRoot = await findAbsoluteDvcRootPath(
-        cwd,
-        this.dvcReader.root(cwd)
+        workspaceFolder,
+        this.dvcReader.root(workspaceFolder)
       )
       if (absoluteRoot) {
         dvcRoots.push(...absoluteRoot)
@@ -382,7 +382,7 @@ export class Setup
     internalCommands.registerExternalCommand(
       RegisteredCommands.SELECT_FOCUSED_PROJECTS,
       async () => {
-        const dvcRoots = await this.findDvcRoots()
+        const dvcRoots = await this.findWorkspaceDvcRoots()
         const focusedProjects = await pickFocusedProjects(
           dvcRoots,
           this.dvcRoots
