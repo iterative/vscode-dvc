@@ -11,6 +11,7 @@ import { BaseWorkspaceWebviews } from '../webview/workspace'
 import { Title } from '../vscode/title'
 import { setContextValue } from '../vscode/context'
 import { getPidFromSignalFile } from '../fileSystem'
+import { definedAndNonEmpty } from '../util/array'
 
 export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   Experiments,
@@ -344,6 +345,10 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     }
 
     return allLoading
+  }
+
+  public async hasDvcLiveOnlyExperimentRunning() {
+    return definedAndNonEmpty(await this.getDvcLiveOnlyPids())
   }
 
   public async getDvcLiveOnlyPids() {

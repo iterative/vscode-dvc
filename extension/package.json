@@ -802,7 +802,7 @@
         },
         {
           "command": "dvc.stopRunningExperiment",
-          "when": "dvc.commands.available && dvc.project.available && dvc.experiment.running"
+          "when": "dvc.commands.available && dvc.project.available && dvc.experiment.stoppable"
         },
         {
           "command": "dvc.views.experimentsColumnsTree.selectColumns",
@@ -975,7 +975,7 @@
         {
           "command": "dvc.stopRunningExperiment",
           "group": "navigation@0",
-          "when": "dvc.experiment.running && dvc.commands.available"
+          "when": "dvc.experiment.stoppable && dvc.commands.available"
         },
         {
           "command": "dvc.resetAndRunCheckpointExperiment",
@@ -1193,12 +1193,12 @@
         },
         {
           "command": "dvc.stopRunningExperiment",
-          "when": "view == dvc.views.experimentsTree && !dvc.experiments.webviewActive && dvc.experiment.running",
+          "when": "view == dvc.views.experimentsTree && !dvc.experiments.webviewActive && dvc.experiment.stoppable",
           "group": "1_run@1"
         },
         {
           "command": "dvc.stopRunningExperiment",
-          "when": "view == dvc.views.experimentsTree && dvc.experiments.webviewActive && dvc.experiment.running",
+          "when": "view == dvc.views.experimentsTree && dvc.experiments.webviewActive && dvc.experiment.stoppable",
           "group": "navigation@1"
         },
         {
