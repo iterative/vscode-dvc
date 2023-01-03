@@ -54,10 +54,11 @@ export class Context extends Disposable {
     )
   }
 
-  private setIsExperimentRunning(repositories: Experiments[] = []) {
+  private async setIsExperimentRunning(repositories: Experiments[] = []) {
     const contextKey = 'dvc.experiment.running'
     if (this.dvcRunner.isExperimentRunning()) {
       setContextValue(contextKey, true)
+      setContextValue('dvc.experiment.stoppable', true)
       return
     }
 
@@ -65,6 +66,11 @@ export class Context extends Disposable {
       contextKey,
       repositories,
       (experiments: Experiments) => experiments.hasRunningExperiment()
+    )
+
+    setContextValue(
+      'dvc.experiment.stoppable',
+      await this.experiments.hasDvcLiveOnlyExperimentRunning()
     )
   }
 

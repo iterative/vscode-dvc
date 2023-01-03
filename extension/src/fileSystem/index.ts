@@ -155,9 +155,11 @@ export const writeJson = <T extends Record<string, unknown>>(
   return writeFileSync(path, JSON.stringify(obj))
 }
 
-export const checkSignalFile = async (path: string): Promise<boolean> => {
+export const getPidFromSignalFile = async (
+  path: string
+): Promise<number | undefined> => {
   if (!exists(path)) {
-    return false
+    return
   }
 
   const contents = readFileSync(path).toString()
@@ -165,10 +167,13 @@ export const checkSignalFile = async (path: string): Promise<boolean> => {
 
   if (!pid || !(await processExists(pid))) {
     removeSync(path)
-    return false
+    return
   }
+  return pid
+}
 
-  return true
+export const checkSignalFile = async (path: string): Promise<boolean> => {
+  return !!(await getPidFromSignalFile(path))
 }
 
 export const getBinDisplayText = (

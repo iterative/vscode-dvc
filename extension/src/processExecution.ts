@@ -4,6 +4,7 @@ import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import execa from 'execa'
 import doesProcessExists from 'process-exists'
+import kill from 'tree-kill'
 
 interface RunningProcess extends ChildProcess {
   all?: Readable
@@ -46,8 +47,7 @@ export const createProcess = ({
 
   return Object.assign(process, {
     dispose: () => {
-      const kill = require('tree-kill')
-      kill(process.pid, 'SIGINT', () => disposed.fire(true))
+      kill(process.pid as number, 'SIGINT', () => disposed.fire(true))
     },
     onDidDispose: disposed.event
   })
@@ -62,3 +62,15 @@ export const executeProcess = async (
 
 export const processExists = (pid: number): Promise<boolean> =>
   doesProcessExists(pid)
+
+export const stopProcesses = (pids: number[]): boolean => {
+  let allKilled = true
+  for (const pid of pids) {
+    if (!processExists(pid)) {
+      allKilled = false
+      continue
+    }
+    kill(pid)
+  }
+  return allKilled
+}
