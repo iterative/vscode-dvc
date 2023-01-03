@@ -267,4 +267,5 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_SETUP_INSTALL_DVC]: undefined
 
   [EventName.SETUP_SHOW]: undefined
+  [EventName.SELECT_FOCUSED_PROJECTS]: undefined
 }

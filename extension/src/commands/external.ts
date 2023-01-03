@@ -92,5 +92,6 @@ export enum RegisteredCommands {
   TRACKED_EXPLORER_OPEN_TO_THE_SIDE = 'dvc.openToTheSide',
   TRACKED_EXPLORER_SELECT_FOR_COMPARE = 'dvc.selectForCompare',
 
-  SETUP_SHOW = 'dvc.showSetup'
+  SETUP_SHOW = 'dvc.showSetup',
+  SELECT_FOCUSED_PROJECTS = 'dvc.selectFocusedProjects'
 }
