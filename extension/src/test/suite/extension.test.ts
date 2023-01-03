@@ -19,10 +19,7 @@ import { DvcReader } from '../../cli/dvc/reader'
 import expShowFixture from '../fixtures/expShow/base/output'
 import plotsDiffFixture from '../fixtures/plotsDiff/output'
 import * as Disposer from '../../util/disposable'
-import {
-  RegisteredCliCommands,
-  RegisteredCommands
-} from '../../commands/external'
+import { RegisteredCommands } from '../../commands/external'
 import * as Setup from '../../setup/runner'
 import * as Watcher from '../../fileSystem/watcher'
 import * as Telemetry from '../../telemetry'
@@ -30,8 +27,6 @@ import { EventName } from '../../telemetry/constants'
 import { OutputChannel } from '../../vscode/outputChannel'
 import { WorkspaceExperiments } from '../../experiments/workspace'
 import { QuickPickItemWithValue } from '../../vscode/quickPick'
-import * as WorkspaceFolders from '../../vscode/workspaceFolders'
-import { DvcExecutor } from '../../cli/dvc/executor'
 import { GitReader } from '../../cli/git/reader'
 import { Config } from '../../config'
 import {

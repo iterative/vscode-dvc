@@ -316,29 +316,23 @@ const formatCommitMessage = (commit: string) => {
   return `${lines[0]}${lines.length > 1 ? ' ...' : ''}`
 }
 
-const addCommitDataToBranches = async (
+const addCommitDataToBranches = (
   branches: Experiment[],
-  getCommitData: (sha: string) => Promise<string | undefined>
-): Promise<Experiment[]> =>
-  await Promise.all(
-    branches.map(async branch => {
-      const { sha } = branch
-      if (sha) {
-        const commit = await getCommitData(sha)
+  commitMessages: { [sha: string]: string } = {}
+): Experiment[] =>
+  branches.map(branch => {
+    const { sha } = branch
+    if (sha && commitMessages[sha]) {
+      branch.displayNameOrParent = formatCommitMessage(commitMessages[sha])
+    }
+    return branch
+  })
 
-        if (commit) {
-          branch.displayNameOrParent = formatCommitMessage(commit)
-        }
-      }
-      return branch
-    })
-  )
-
-export const collectExperiments = async (
+export const collectExperiments = (
   data: ExperimentsOutput,
   dvcLiveOnly: boolean,
-  getCommitData: (sha: string) => Promise<string | undefined>
-): Promise<ExperimentsAccumulator> => {
+  commitMessages: { [sha: string]: string }
+): ExperimentsAccumulator => {
   const { workspace, ...branchesObject } = data
 
   const workspaceBaseline = transformExperimentData(
@@ -356,7 +350,7 @@ export const collectExperiments = async (
 
   collectFromBranchesObject(acc, branchesObject)
 
-  acc.branches = await addCommitDataToBranches(acc.branches, getCommitData)
+  acc.branches = addCommitDataToBranches(acc.branches, commitMessages)
 
   return acc
 }

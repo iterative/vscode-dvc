@@ -6,8 +6,6 @@ import {
   EXPERIMENT_WORKSPACE_ID
 } from '../../cli/dvc/contract'
 
-const mockedGetCommit = jest.mocked(() => Promise.resolve('commit message'))
-
 describe('collectExperiments', () => {
   it('should return an empty array if no branches are present', async () => {
     const { branches } = await collectExperiments(
@@ -17,7 +15,7 @@ describe('collectExperiments', () => {
         }
       },
       false,
-      mockedGetCommit
+      {}
     )
     expect(branches).toStrictEqual([])
   })
@@ -45,7 +43,7 @@ describe('collectExperiments', () => {
     const { workspace } = await collectExperiments(
       repoWithTwoBranches,
       false,
-      mockedGetCommit
+      {}
     )
 
     expect(workspace).toBeDefined()
@@ -55,7 +53,7 @@ describe('collectExperiments', () => {
     const { branches } = await collectExperiments(
       repoWithTwoBranches,
       false,
-      mockedGetCommit
+      {}
     )
 
     expect(branches.length).toStrictEqual(2)
@@ -65,7 +63,7 @@ describe('collectExperiments', () => {
     const { branches } = await collectExperiments(
       repoWithTwoBranches,
       false,
-      mockedGetCommit
+      {}
     )
     const [branchA, branchB] = branches
 
@@ -77,7 +75,7 @@ describe('collectExperiments', () => {
     const { experimentsByBranch } = await collectExperiments(
       repoWithTwoBranches,
       false,
-      mockedGetCommit
+      {}
     )
     expect(experimentsByBranch.get('branchA')?.length).toStrictEqual(2)
   })
@@ -86,7 +84,7 @@ describe('collectExperiments', () => {
     const { experimentsByBranch } = await collectExperiments(
       repoWithTwoBranches,
       false,
-      mockedGetCommit
+      {}
     )
     expect(experimentsByBranch.get('branchB')).toBeUndefined()
   })
@@ -114,7 +112,7 @@ describe('collectExperiments', () => {
     const { experimentsByBranch } = await collectExperiments(
       repoWithNestedCheckpoints,
       false,
-      mockedGetCommit
+      {}
     )
     expect(experimentsByBranch.size).toStrictEqual(1)
   })
@@ -123,7 +121,7 @@ describe('collectExperiments', () => {
     const { checkpointsByTip } = await collectExperiments(
       repoWithNestedCheckpoints,
       false,
-      mockedGetCommit
+      {}
     )
     const checkpoints = checkpointsByTip.get('tip1') as Experiment[]
 
@@ -134,7 +132,7 @@ describe('collectExperiments', () => {
     const { checkpointsByTip } = await collectExperiments(
       repoWithNestedCheckpoints,
       false,
-      mockedGetCommit
+      {}
     )
     const checkpoints = checkpointsByTip.get('tip1') as Experiment[]
     const [tip1cp1, tip1cp2, tip1cp3] = checkpoints
@@ -147,7 +145,7 @@ describe('collectExperiments', () => {
     const { checkpointsByTip } = await collectExperiments(
       modifiedFixture,
       false,
-      mockedGetCommit
+      {}
     )
 
     const modifiedCheckpointTip = checkpointsByTip
@@ -204,11 +202,7 @@ describe('collectExperiments', () => {
         }
       }
     }
-    const acc = await collectExperiments(
-      repoWithNestedCheckpoints,
-      false,
-      mockedGetCommit
-    )
+    const acc = await collectExperiments(repoWithNestedCheckpoints, false, {})
 
     const { experimentsByBranch, checkpointsByTip } = acc
     const [experiment] = experimentsByBranch.get('branchA') || []

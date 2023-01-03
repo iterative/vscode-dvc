@@ -1060,7 +1060,6 @@ suite('Experiments Test Suite', () => {
   describe('Sorting', () => {
     it('should be able to sort', async () => {
       const { internalCommands } = buildInternalCommands(disposable)
-
       const buildTestExperiment = (testParam: number) => ({
         params: {
           'params.yaml': {
@@ -1322,7 +1321,7 @@ suite('Experiments Test Suite', () => {
       expect(
         mockMemento.keys(),
         'Memento starts with the status keys'
-      ).to.deep.equal(['columnsColumnOrder:test', 'experimentsStatus:test'])
+      ).to.deep.equal(['experimentsStatus:test', 'columnsColumnOrder:test'])
 
       expect(
         mockMemento.get('experimentsStatus:test'),

@@ -33,12 +33,13 @@ export enum Flag {
   NAME_ONLY = '--name-only',
   NO_EMPTY_DIRECTORY = '--no-empty-directory',
   NUMBER = '-n',
+  PRETTY_FORMAT_COMMIT_MESSAGE = '--pretty=format:%H %B',
   OTHERS = '--others',
   QUIET = '-q',
   RAW_WITH_NUL = '-z',
+  SEPARATE_WITH_NULL = '-z',
   SET_UPSTREAM = '--set-upstream',
-  SHOW_TOPLEVEL = '--show-toplevel',
-  PRETTY_FORMAT_COMMIT_MESSAGE = '--pretty=format:%B'
+  SHOW_TOPLEVEL = '--show-toplevel'
 }
 
 export enum Commit {
