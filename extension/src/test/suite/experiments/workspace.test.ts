@@ -439,17 +439,23 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.startExperimentsQueue', () => {
     it('should be able to execute all experiments in the run queue', async () => {
-      const mockRunExperimentQueue = stub(
-        DvcRunner.prototype,
-        'runExperimentQueue'
-      ).resolves(undefined)
+      const mockQueueStart = stub(DvcExecutor.prototype, 'queueStart').resolves(
+        undefined
+      )
+
+      const dDosNumberOfJobs = '10000'
+
+      const mockInputBox = stub(window, 'showInputBox').resolves(
+        dDosNumberOfJobs
+      )
 
       stubWorkspaceExperimentsGetters(dvcDemoPath)
 
-      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_RUN_QUEUED)
+      await commands.executeCommand(RegisteredCliCommands.QUEUE_START)
 
-      expect(mockRunExperimentQueue).to.be.calledOnce
-      expect(mockRunExperimentQueue).to.be.calledWith(dvcDemoPath)
+      expect(mockQueueStart).to.be.calledOnce
+      expect(mockQueueStart).to.be.calledWith(dvcDemoPath, dDosNumberOfJobs)
+      expect(mockInputBox)
     })
   })
 
