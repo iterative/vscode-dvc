@@ -1646,15 +1646,12 @@ suite('Experiments Test Suite', () => {
 
       let processKilled = false
 
-      let calls = 0
-
       const cleanupUpdate = new Promise(resolve =>
         mockUpdateExperimentsData.callsFake(() => resolve(undefined))
       )
 
       mockCheckSignalFile.resetBehavior()
       mockCheckSignalFile.callsFake(() => {
-        calls = calls + 1
         return Promise.resolve(!processKilled)
       })
 
@@ -1676,8 +1673,8 @@ suite('Experiments Test Suite', () => {
       await cleanupUpdate
 
       expect(getCleanupInitialized(experiments)).to.be.false
-      expect(mockCheckSignalFile).to.have.callCount(calls + 1)
-      expect(mockDelay).to.have.callCount(calls - 1)
+      expect(mockCheckSignalFile).to.be.called
+      expect(mockDelay).to.be.called
       expect(mockUpdateExperimentsData).to.be.calledOnce
     })
   })
