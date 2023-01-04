@@ -443,12 +443,19 @@ suite('Workspace Experiments Test Suite', () => {
         undefined
       )
 
+      const dDosNumberOfJobs = '10000'
+
+      const mockInputBox = stub(window, 'showInputBox').resolves(
+        dDosNumberOfJobs
+      )
+
       stubWorkspaceExperimentsGetters(dvcDemoPath)
 
       await commands.executeCommand(RegisteredCliCommands.QUEUE_START)
 
       expect(mockQueueStart).to.be.calledOnce
-      expect(mockQueueStart).to.be.calledWith(dvcDemoPath)
+      expect(mockQueueStart).to.be.calledWith(dvcDemoPath, dDosNumberOfJobs)
+      expect(mockInputBox)
     })
   })
 

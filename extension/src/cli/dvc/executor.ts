@@ -128,13 +128,13 @@ export class DvcExecutor extends DvcCli {
     return this.blockAndExecuteProcess(cwd, Command.PUSH, ...args)
   }
 
-  public queueStart(cwd: string, jobs = 1) {
+  public queueStart(cwd: string, jobs: string) {
     return this.executeDvcProcess(
       cwd,
       Command.QUEUE,
       QueueSubCommand.START,
       Flag.JOBS,
-      jobs.toString()
+      jobs
     )
   }
 

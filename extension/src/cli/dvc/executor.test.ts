@@ -566,7 +566,7 @@ describe('CliExecutor', () => {
   describe('queueStart', () => {
     it("should call createProcess with the correct parameters to start the experiment's queue", async () => {
       const cwd = __dirname
-      const jobs = 91231324
+      const jobs = '91231324'
 
       const stdout = `Started '${jobs}' new experiments task queue workers.`
 
@@ -577,7 +577,7 @@ describe('CliExecutor', () => {
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toHaveBeenCalledWith({
-        args: ['queue', 'start', '-j', String(jobs)],
+        args: ['queue', 'start', '-j', jobs],
         cwd,
         env: mockedEnv,
         executable: 'dvc'

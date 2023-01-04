@@ -18,3 +18,27 @@ export const getValidInput = (
     validateInput,
     value: options?.value
   })
+
+export const getPositiveIntegerInput = async (
+  title: Title,
+  options: { prompt: string; value: string }
+) => {
+  const input = await getValidInput(
+    title,
+    val => {
+      const number = Number(val)
+
+      if (!Number.isInteger(number) || number <= 0) {
+        return 'Input needs to be a positive integer'
+      }
+
+      return ''
+    },
+    options
+  )
+
+  if (!input) {
+    return
+  }
+  return Number.parseInt(input).toString()
+}
