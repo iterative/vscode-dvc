@@ -1,18 +1,22 @@
 import { window } from 'vscode'
 import { Title } from './title'
 import { isValidStringInteger } from '../util/number'
+import { getIsoDate, isFreeTextDate } from '../util/date'
 
-export const getInput = (title: Title, value?: string) =>
+export const getInput = (
+  title: Title,
+  value?: string
+): Thenable<string | undefined> =>
   window.showInputBox({
     title,
     value
   })
 
-export const getValidInput = (
+const getValidInput = (
   title: Title,
   validateInput: (text?: string) => null | string,
   options?: { prompt?: string; value?: string }
-) =>
+): Thenable<string | undefined> =>
   window.showInputBox({
     prompt: options?.prompt,
     title,
@@ -23,7 +27,7 @@ export const getValidInput = (
 const isValid = (
   input: string | undefined,
   includeZero: boolean | undefined
-) => {
+): boolean => {
   if (!isValidStringInteger(input)) {
     return false
   }
@@ -40,7 +44,7 @@ export const getPositiveIntegerInput = async (
   title: Title,
   options: { prompt: string; value: string },
   includeZero?: boolean
-) => {
+): Promise<string | undefined> => {
   const input = await getValidInput(
     title,
     val => {
@@ -48,7 +52,7 @@ export const getPositiveIntegerInput = async (
         return ''
       }
 
-      return `Input needs to be a positive integer${includeZero ? ' or 0' : ''}`
+      return `please enter a positive integer${includeZero ? ' or 0' : ''}`
     },
     options
   )
@@ -58,3 +62,13 @@ export const getPositiveIntegerInput = async (
   }
   return Number.parseInt(input).toString()
 }
+
+export const getValidDateInput = (title: Title): Thenable<string | undefined> =>
+  getValidInput(
+    title,
+    (text?: string): null | string =>
+      isFreeTextDate(text)
+        ? null
+        : 'please enter a valid date of the form yyyy-mm-dd',
+    { value: getIsoDate() }
+  )
