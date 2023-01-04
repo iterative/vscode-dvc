@@ -41,7 +41,7 @@ import { createTypedAccumulator } from '../util/object'
 import { pickPaths } from '../path/selection/quickPick'
 import { Toast } from '../vscode/toast'
 import { ConfigKey } from '../vscode/config'
-import { checkSignalFile } from '../fileSystem'
+import { checkSignalFile, pollSignalFileForProcess } from '../fileSystem'
 import { DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
 
 export const ExperimentsScale = {
@@ -94,6 +94,9 @@ export class Experiments extends BaseRepository<TableData> {
   private readonly internalCommands: InternalCommands
   private readonly webviewMessages: WebviewMessages
 
+  private dvcLiveOnlyCleanupInitialized = false
+  private dvcLiveOnlySignalFile: string
+
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
@@ -104,6 +107,11 @@ export class Experiments extends BaseRepository<TableData> {
     fileSystemData?: FileSystemData
   ) {
     super(dvcRoot, resourceLocator.beaker)
+
+    this.dvcLiveOnlySignalFile = join(
+      this.dvcRoot,
+      DVCLIVE_ONLY_RUNNING_SIGNAL_FILE
+    )
 
     this.internalCommands = internalCommands
 
@@ -164,9 +172,8 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public async setState(data: ExperimentsOutput) {
-    const dvcLiveOnly = await checkSignalFile(
-      join(this.dvcRoot, DVCLIVE_ONLY_RUNNING_SIGNAL_FILE)
-    )
+    const dvcLiveOnly = await this.checkSignalFile()
+
     const commitMessages: { [sha: string]: string } =
       await this.internalCommands.executeCommand(
         AvailableCommands.GIT_GET_LAST_THREE_COMMIT_MESSAGES,
@@ -601,5 +608,20 @@ export class Experiments extends BaseRepository<TableData> {
       this.paramsFileFocused,
       this.onDidChangeColumns
     )
+  }
+
+  private async checkSignalFile() {
+    const dvcLiveOnly = await checkSignalFile(this.dvcLiveOnlySignalFile)
+
+    if (dvcLiveOnly && !this.dvcLiveOnlyCleanupInitialized) {
+      this.dvcLiveOnlyCleanupInitialized = true
+      pollSignalFileForProcess(this.dvcLiveOnlySignalFile, () => {
+        this.dvcLiveOnlyCleanupInitialized = false
+        if (this.hasRunningExperiment()) {
+          this.cliData.update()
+        }
+      })
+    }
+    return dvcLiveOnly
   }
 }
