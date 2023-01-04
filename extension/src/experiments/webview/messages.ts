@@ -18,7 +18,7 @@ import { splitColumnPath } from '../columns/paths'
 import { ExperimentsModel } from '../model'
 import { SortDefinition } from '../model/sortBy'
 import { CheckpointsModel } from '../checkpoints/model'
-import { getValidInput } from '../../vscode/inputBox'
+import { getPositiveIntegerInput } from '../../vscode/inputBox'
 import { Title } from '../../vscode/title'
 import { ConfigKey, setConfigValue } from '../../vscode/config'
 
@@ -174,12 +174,10 @@ export class WebviewMessages {
   }
 
   private async setMaxTableHeadDepth() {
-    const newValue = await getValidInput(
+    const newValue = await getPositiveIntegerInput(
       Title.SET_EXPERIMENTS_HEADER_HEIGHT,
-      val => {
-        return Number.isNaN(Number(val)) ? 'Input needs to be a number' : ''
-      },
-      { prompt: 'Use 0 for infinite height.' }
+      { prompt: 'Use 0 for infinite height.', value: '0' },
+      true
     )
 
     if (!newValue) {
