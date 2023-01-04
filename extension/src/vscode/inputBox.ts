@@ -20,18 +20,35 @@ export const getValidInput = (
     value: options?.value
   })
 
+const isValid = (
+  input: string | undefined,
+  includeZero: boolean | undefined
+) => {
+  if (!isValidStringInteger(input)) {
+    return false
+  }
+
+  const number = Number(input)
+
+  if (!includeZero) {
+    return number > 0
+  }
+  return number >= 0
+}
+
 export const getPositiveIntegerInput = async (
   title: Title,
-  options: { prompt: string; value: string }
+  options: { prompt: string; value: string },
+  includeZero?: boolean
 ) => {
   const input = await getValidInput(
     title,
     val => {
-      if (isValidStringInteger(val) && Number(val) > 0) {
+      if (isValid(val, includeZero)) {
         return ''
       }
 
-      return 'Input needs to be a positive integer'
+      return `Input needs to be a positive integer${includeZero ? ' or 0' : ''}`
     },
     options
   )
