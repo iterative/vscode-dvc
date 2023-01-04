@@ -24,7 +24,7 @@ const getValidInput = (
     value: options?.value
   })
 
-const isValid = (
+const isPositiveInteger = (
   input: string | undefined,
   includeZero: boolean | undefined
 ): boolean => {
@@ -47,8 +47,8 @@ export const getPositiveIntegerInput = async (
 ): Promise<string | undefined> => {
   const input = await getValidInput(
     title,
-    val => {
-      if (isValid(val, includeZero)) {
+    input => {
+      if (isPositiveInteger(input, includeZero)) {
         return ''
       }
 
