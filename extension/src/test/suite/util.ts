@@ -202,6 +202,11 @@ export const buildDependencies = (
 
   const mockExperimentShow = stub(dvcReader, 'expShow').resolves(expShow)
 
+  const mockGetLastThreeCommitMessages = stub(
+    gitReader,
+    'getLastThreeCommitMessages'
+  ).resolves({})
+
   const updatesPaused = disposer.track(new EventEmitter<boolean>())
 
   const resourceLocator = disposer.track(new ResourceLocator(extensionUri))
@@ -220,6 +225,7 @@ export const buildDependencies = (
     mockCreateFileSystemWatcher,
     mockDataStatus,
     mockExperimentShow,
+    mockGetLastThreeCommitMessages,
     mockPlotsDiff,
     resourceLocator,
     updatesPaused

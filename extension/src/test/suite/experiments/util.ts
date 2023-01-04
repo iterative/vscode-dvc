@@ -56,6 +56,7 @@ export const buildExperiments = (
     messageSpy,
     mockCheckSignalFile,
     mockExperimentShow,
+    mockGetLastThreeCommitMessages,
     updatesPaused,
     resourceLocator
   } = buildDependencies(disposer, experimentShowData)
@@ -95,6 +96,7 @@ export const buildExperiments = (
     messageSpy,
     mockCheckSignalFile,
     mockExperimentShow,
+    mockGetLastThreeCommitMessages,
     mockUpdateExperimentsData,
     resourceLocator,
     updatesPaused
