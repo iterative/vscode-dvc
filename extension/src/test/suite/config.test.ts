@@ -9,6 +9,7 @@ import * as Extensions from '../../vscode/extensions'
 import * as Python from '../../extensions/python'
 import * as WorkspaceFolders from '../../vscode/workspaceFolders'
 import { ConfigKey, setConfigValue } from '../../vscode/config'
+import { dvcDemoPath } from '../util'
 
 suite('Config Test Suite', () => {
   const disposable = Disposable.fn()
@@ -76,15 +77,13 @@ suite('Config Test Suite', () => {
         setupTriggeredCount = setupTriggeredCount + 1
       })
     )
-    const mockDvcMonoRepo = Uri.file(resolve('mono-repo')).fsPath
+    const mockDvcMonoRepo = Uri.file(resolve(dvcDemoPath)).fsPath
     const mockGetWorkspaceFolders = stub(
       WorkspaceFolders,
       'getWorkspaceFolders'
     ).returns([mockDvcMonoRepo])
-    const mockDvcSubRoot1 = Uri.file(join(mockDvcMonoRepo, 'subroot1')).fsPath
-    const mockDvcSubRoot2 = Uri.file(
-      join(mockDvcMonoRepo, 'subroot2', 'deep', 'root')
-    ).fsPath
+    const mockDvcSubRoot1 = Uri.file(join(mockDvcMonoRepo, 'data')).fsPath
+    const mockDvcSubRoot2 = Uri.file(join(mockDvcMonoRepo, '.dvc')).fsPath
 
     await setConfigValue(ConfigKey.FOCUSED_PROJECTS, mockDvcSubRoot1)
     await configUpdated
@@ -117,7 +116,7 @@ suite('Config Test Suite', () => {
     expect(
       config.getFocusedProjects(),
       'should be able to focus multiple sub-projects'
-    ).to.deep.equal([mockDvcSubRoot1, mockDvcSubRoot2])
+    ).to.deep.equal([mockDvcSubRoot1, mockDvcSubRoot2].sort())
     expect(setupTriggeredCount).to.equal(2)
 
     await setConfigValue(ConfigKey.FOCUSED_PROJECTS, [
@@ -129,7 +128,7 @@ suite('Config Test Suite', () => {
     expect(
       config.getFocusedProjects(),
       'should not call setup if the value(s) inside of the option have not changed'
-    ).to.deep.equal([mockDvcSubRoot1, mockDvcSubRoot2])
+    ).to.deep.equal([mockDvcSubRoot1, mockDvcSubRoot2].sort())
     expect(setupTriggeredCount).to.equal(2)
 
     await setConfigValue(ConfigKey.FOCUSED_PROJECTS, [
@@ -142,7 +141,7 @@ suite('Config Test Suite', () => {
     expect(
       config.getFocusedProjects(),
       'should be able to focus multiple sub-projects along with the monorepo root'
-    ).to.deep.equal([mockDvcMonoRepo, mockDvcSubRoot1, mockDvcSubRoot2])
+    ).to.deep.equal([mockDvcMonoRepo, mockDvcSubRoot1, mockDvcSubRoot2].sort())
     expect(setupTriggeredCount).to.equal(3)
 
     await setConfigValue(ConfigKey.FOCUSED_PROJECTS, undefined)
@@ -165,11 +164,7 @@ suite('Config Test Suite', () => {
 
     mockGetWorkspaceFolders.restore()
 
-    await setConfigValue(ConfigKey.FOCUSED_PROJECTS, [
-      mockDvcSubRoot2,
-      mockDvcSubRoot1,
-      mockDvcMonoRepo
-    ])
+    await setConfigValue(ConfigKey.FOCUSED_PROJECTS, ['a', 'b', 'c'])
     await configUpdated
 
     expect(
