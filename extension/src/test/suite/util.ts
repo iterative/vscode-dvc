@@ -164,10 +164,13 @@ export const buildInternalCommands = (disposer: Disposer) => {
   }
 }
 
-export const buildMockData = <T extends ExperimentsData | FileSystemData>() =>
+export const buildMockData = <T extends ExperimentsData | FileSystemData>(
+  update = stub()
+) =>
   ({
     dispose: stub(),
-    onDidUpdate: stub()
+    onDidUpdate: stub(),
+    update
   } as unknown as T)
 
 export const buildDependencies = (

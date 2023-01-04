@@ -60,6 +60,11 @@ export const buildExperiments = (
     resourceLocator
   } = buildDependencies(disposer, experimentShowData)
 
+  const mockUpdateExperimentsData = stub()
+  const mockExperimentsData = buildMockData<ExperimentsData>(
+    mockUpdateExperimentsData
+  )
+
   const experiments = disposer.track(
     new Experiments(
       dvcRoot,
@@ -67,7 +72,7 @@ export const buildExperiments = (
       updatesPaused,
       resourceLocator,
       buildMockMemento(),
-      buildMockData<ExperimentsData>(),
+      mockExperimentsData,
       buildMockData<FileSystemData>()
     )
   )
@@ -90,6 +95,7 @@ export const buildExperiments = (
     messageSpy,
     mockCheckSignalFile,
     mockExperimentShow,
+    mockUpdateExperimentsData,
     resourceLocator,
     updatesPaused
   }

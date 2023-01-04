@@ -71,6 +71,7 @@ import { PlotSizeNumber } from '../../../plots/webview/contract'
 import { RegisteredCommands } from '../../../commands/external'
 import { ConfigKey } from '../../../vscode/config'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
+import * as Time from '../../../util/time'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -1624,6 +1625,57 @@ suite('Experiments Test Suite', () => {
         experiments.getSelectedRevisions(),
         'should show 0 selected experiments as selected in the description'
       ).to.deep.equal([])
+    })
+  })
+
+  describe('setState', () => {
+    it('should clean up after a killed DVCLive process that was running an experiment outside of the DVC context', async () => {
+      const defaultExperimentsData = { workspace: { baseline: { data: {} } } }
+
+      const { experiments, mockCheckSignalFile, mockUpdateExperimentsData } =
+        buildExperiments(disposable, defaultExperimentsData)
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const getCleanupInitialized = (experiments: any) =>
+        experiments.dvcLiveOnlyCleanupInitialized
+
+      await experiments.isReady()
+
+      const mockDelay = stub(Time, 'delay')
+      mockDelay.callsFake(() => mockDelay.wrappedMethod(500))
+
+      let processKilled = false
+
+      const cleanupUpdate = new Promise(resolve =>
+        mockUpdateExperimentsData.callsFake(() => resolve(undefined))
+      )
+
+      mockCheckSignalFile.resetBehavior()
+      mockCheckSignalFile.callsFake(() => {
+        return Promise.resolve(!processKilled)
+      })
+
+      const dataUpdated = new Promise(resolve =>
+        disposable.track(
+          experiments.onDidChangeExperiments(() => resolve(undefined))
+        )
+      )
+
+      experiments.setState(defaultExperimentsData)
+      await dataUpdated
+      expect(experiments.hasRunningExperiment()).to.be.true
+      expect(getCleanupInitialized(experiments)).to.be.true
+
+      processKilled = true
+
+      mockUpdateExperimentsData.resetHistory()
+
+      await cleanupUpdate
+
+      expect(getCleanupInitialized(experiments)).to.be.false
+      expect(mockCheckSignalFile).to.be.called
+      expect(mockDelay).to.be.called
+      expect(mockUpdateExperimentsData).to.be.calledOnce
     })
   })
 })
