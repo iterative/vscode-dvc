@@ -563,6 +563,28 @@ describe('CliExecutor', () => {
     })
   })
 
+  describe('queueStart', () => {
+    it("should call createProcess with the correct parameters to start the experiment's queue", async () => {
+      const cwd = __dirname
+      const jobs = 91231324
+
+      const stdout = `Started '${jobs}' new experiments task queue workers.`
+
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
+
+      const output = await dvcExecutor.queueStart(cwd, jobs)
+
+      expect(output).toStrictEqual(stdout)
+
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
+        args: ['queue', 'start', '-j', String(jobs)],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
   describe('remove', () => {
     it('should call createProcess with the correct parameters to remove a .dvc file', async () => {
       const cwd = __dirname

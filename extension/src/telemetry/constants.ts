@@ -137,7 +137,7 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_REMOVE_QUEUED]: undefined
   [EventName.EXPERIMENT_RESUME]: undefined
   [EventName.EXPERIMENT_RUN]: undefined
-  [EventName.EXPERIMENT_RUN_QUEUED]: undefined
+  [EventName.QUEUE_START]: undefined
   [EventName.EXPERIMENT_RESET_AND_RUN]: undefined
   [EventName.EXPERIMENT_SELECT]: undefined
   [EventName.EXPERIMENT_SHARE_AS_BRANCH]: undefined

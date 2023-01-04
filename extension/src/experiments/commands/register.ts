@@ -294,8 +294,8 @@ const registerExperimentRunCommands = (
   )
 
   internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_RUN_QUEUED,
-    () => experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RUN_QUEUED)
+    RegisteredCliCommands.QUEUE_START,
+    () => experiments.getCwdThenRun(AvailableCommands.QUEUE_START) // need to pass a number
   )
 
   internalCommands.registerExternalCommand(
