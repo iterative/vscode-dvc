@@ -191,7 +191,7 @@ suite('Setup Test Suite', () => {
       const messageSent = new Promise(resolve =>
         mockSendMessage.callsFake(data => {
           resolve(undefined)
-          return mockSendMessage.wrappedMethod(data)
+          return Promise.resolve(!!data)
         })
       )
 
@@ -227,7 +227,7 @@ suite('Setup Test Suite', () => {
       const messageSent = new Promise(resolve =>
         mockSendMessage.callsFake(data => {
           resolve(undefined)
-          return mockSendMessage.wrappedMethod(data)
+          return Promise.resolve(!!data)
         })
       )
 
@@ -268,7 +268,7 @@ suite('Setup Test Suite', () => {
       const messageSent = new Promise(resolve =>
         mockSendMessage.callsFake(data => {
           resolve(undefined)
-          return mockSendMessage.wrappedMethod(data)
+          return Promise.resolve(!!data)
         })
       )
 
