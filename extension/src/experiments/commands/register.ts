@@ -294,8 +294,17 @@ const registerExperimentRunCommands = (
   )
 
   internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_RUN_QUEUED,
-    () => experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RUN_QUEUED)
+    RegisteredCliCommands.QUEUE_START,
+    () =>
+      experiments.getCwdIntegerInputAndRun(
+        AvailableCommands.QUEUE_START,
+        Title.ENTER_EXPERIMENT_WORKER_COUNT,
+        {
+          prompt:
+            'Input the maximum number of concurrent queue workers to start.',
+          value: '1'
+        }
+      )
   )
 
   internalCommands.registerExternalCommand(

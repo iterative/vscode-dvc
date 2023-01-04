@@ -5,7 +5,8 @@ import {
   ExperimentFlag,
   ExperimentSubCommand,
   Flag,
-  GcPreserveFlag
+  GcPreserveFlag,
+  QueueSubCommand
 } from './constants'
 import { typeCheckCommands } from '..'
 import { ContextKey, setContextValue } from '../../vscode/context'
@@ -25,6 +26,7 @@ export const autoRegisteredCommands = {
   MOVE: 'move',
   PULL: 'pull',
   PUSH: 'push',
+  QUEUE_START: 'queueStart',
   REMOVE: 'remove'
 } as const
 
@@ -124,6 +126,16 @@ export class DvcExecutor extends DvcCli {
 
   public push(cwd: string, ...args: Args) {
     return this.blockAndExecuteProcess(cwd, Command.PUSH, ...args)
+  }
+
+  public queueStart(cwd: string, jobs: string) {
+    return this.executeDvcProcess(
+      cwd,
+      Command.QUEUE,
+      QueueSubCommand.START,
+      Flag.JOBS,
+      jobs
+    )
   }
 
   public remove(cwd: string, ...args: Args) {

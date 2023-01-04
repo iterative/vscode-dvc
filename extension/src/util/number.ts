@@ -10,18 +10,17 @@ export const formatNumber = (value: number): string => {
   return automatic
 }
 
+export const isValidStringInteger = (
+  input: string | undefined
+): input is string =>
+  !!input && Number.parseInt(input) === Number.parseFloat(input)
+
 export const createValidInteger = (
   input: string | number | undefined
 ): number | undefined => {
-  if (!input) {
-    return
-  }
-
   if (typeof input === 'number') {
     return validateNumericInteger(input)
   }
 
-  return Number.parseInt(input) === Number.parseFloat(input)
-    ? Number.parseInt(input)
-    : undefined
+  return isValidStringInteger(input) ? Number.parseInt(input) : undefined
 }

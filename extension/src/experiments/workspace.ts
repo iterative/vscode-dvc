@@ -6,7 +6,7 @@ import { Args, DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
 import { CommandId, InternalCommands } from '../commands/internal'
 import { ResourceLocator } from '../resourceLocator'
 import { Toast } from '../vscode/toast'
-import { getInput } from '../vscode/inputBox'
+import { getInput, getPositiveIntegerInput } from '../vscode/inputBox'
 import { BaseWorkspaceWebviews } from '../webview/workspace'
 import { Title } from '../vscode/title'
 import { ContextKey, setContextValue } from '../vscode/context'
@@ -262,6 +262,25 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     }
 
     return this.runCommand(commandId, cwd, name)
+  }
+
+  public async getCwdIntegerInputAndRun(
+    commandId: CommandId,
+    title: Title,
+    options: { prompt: string; value: string }
+  ) {
+    const cwd = await this.getFocusedOrOnlyOrPickProject()
+    if (!cwd) {
+      return
+    }
+
+    const integer = await getPositiveIntegerInput(title, options)
+
+    if (!integer) {
+      return
+    }
+
+    return this.runCommand(commandId, cwd, integer)
   }
 
   public runCommand(commandId: CommandId, cwd: string, ...args: Args) {
