@@ -142,7 +142,7 @@ suite('Experiments Test Suite', () => {
         sorts: []
       }
 
-      expect(messageSpy).to.be.calledWith(expectedTableData)
+      expect(messageSpy).to.be.calledWithExactly(expectedTableData)
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
