@@ -1,5 +1,6 @@
 import { window } from 'vscode'
 import { Title } from './title'
+import { isValidStringInteger } from '../util/number'
 
 export const getInput = (title: Title, value?: string) =>
   window.showInputBox({
@@ -18,3 +19,25 @@ export const getValidInput = (
     validateInput,
     value: options?.value
   })
+
+export const getPositiveIntegerInput = async (
+  title: Title,
+  options: { prompt: string; value: string }
+) => {
+  const input = await getValidInput(
+    title,
+    val => {
+      if (isValidStringInteger(val) && Number(val) > 0) {
+        return ''
+      }
+
+      return 'Input needs to be a positive integer'
+    },
+    options
+  )
+
+  if (!input) {
+    return
+  }
+  return Number.parseInt(input).toString()
+}

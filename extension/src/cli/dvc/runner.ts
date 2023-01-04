@@ -19,8 +19,7 @@ import { Disposable } from '../../class/dispose'
 
 export const autoRegisteredCommands = {
   EXPERIMENT_RESET_AND_RUN: 'runExperimentReset',
-  EXPERIMENT_RUN: 'runExperiment',
-  EXPERIMENT_RUN_QUEUED: 'runExperimentQueue'
+  EXPERIMENT_RUN: 'runExperiment'
 } as const
 
 export class DvcRunner extends Disposable implements ICli {
@@ -110,10 +109,6 @@ export class DvcRunner extends Disposable implements ICli {
 
   public runExperimentReset(dvcRoot: string, ...args: Args) {
     return this.runExperiment(dvcRoot, ExperimentFlag.RESET, ...args)
-  }
-
-  public runExperimentQueue(dvcRoot: string) {
-    return this.runExperiment(dvcRoot, ExperimentFlag.RUN_ALL)
   }
 
   public async run(cwd: string, ...args: Args) {
