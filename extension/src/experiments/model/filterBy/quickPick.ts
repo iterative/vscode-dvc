@@ -1,7 +1,6 @@
 import { FilterDefinition, getFilterId, isDateOperator, Operator } from '.'
 import { definedAndNonEmpty } from '../../../util/array'
-import { getIsoDate, isFreeTextDate } from '../../../util/date'
-import { getInput, getValidInput } from '../../../vscode/inputBox'
+import { getInput, getValidDateInput } from '../../../vscode/inputBox'
 import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
 import { Title } from '../../../vscode/title'
 import { Toast } from '../../../vscode/toast'
@@ -92,14 +91,7 @@ export const OPERATORS = [
 
 const getValue = (operator: Operator): Thenable<string | undefined> => {
   if (isDateOperator(operator)) {
-    return getValidInput(
-      Title.ENTER_FILTER_VALUE,
-      (text?: string): null | string =>
-        isFreeTextDate(text)
-          ? null
-          : 'please enter a valid date of the form yyyy-mm-dd',
-      { value: getIsoDate() }
-    )
+    return getValidDateInput(Title.ENTER_FILTER_VALUE)
   }
   return getInput(Title.ENTER_FILTER_VALUE)
 }
