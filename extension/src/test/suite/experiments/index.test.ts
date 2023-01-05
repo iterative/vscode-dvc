@@ -197,7 +197,7 @@ suite('Experiments Test Suite', () => {
         internalCommands,
         'executeCommand'
       ).callsFake(commandId =>
-        commandId === AvailableCommands.GIT_GET_COMMIT_MESSAGES_UP_TO_HASH
+        commandId === AvailableCommands.GIT_GET_COMMIT_MESSAGES
           ? Promise.resolve('')
           : Promise.resolve(undefined)
       )

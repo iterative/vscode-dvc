@@ -7,7 +7,7 @@ import { trimAndSplit } from '../../util/stdout'
 import { isDirectory } from '../../fileSystem'
 
 export const autoRegisteredCommands = {
-  GIT_GET_COMMIT_MESSAGES_UP_TO_HASH: 'getCommitMessagesUpToHash',
+  GIT_GET_COMMIT_MESSAGES: 'getCommitMessages',
   GIT_GET_REPOSITORY_ROOT: 'getGitRepositoryRoot',
   GIT_HAS_CHANGES: 'hasChanges',
   GIT_LIST_UNTRACKED: 'listUntracked'
@@ -31,10 +31,7 @@ export class GitReader extends GitCli {
     return !!output
   }
 
-  public async getCommitMessagesUpToHash(
-    cwd: string,
-    sha: string
-  ): Promise<string> {
+  public async getCommitMessages(cwd: string, sha: string): Promise<string> {
     const options = getOptions(
       cwd,
       Command.LOG,

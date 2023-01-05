@@ -175,7 +175,7 @@ export class Experiments extends BaseRepository<TableData> {
     const dvcLiveOnly = await this.checkSignalFile()
 
     const commitsOutput = await this.internalCommands.executeCommand(
-      AvailableCommands.GIT_GET_COMMIT_MESSAGES_UP_TO_HASH,
+      AvailableCommands.GIT_GET_COMMIT_MESSAGES,
       this.dvcRoot,
       this.getOldestCommitHashFromData(data)
     )
