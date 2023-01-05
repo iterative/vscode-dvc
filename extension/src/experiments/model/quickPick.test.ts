@@ -70,7 +70,8 @@ describe('pickExperiments', () => {
         }
       ],
       MAX_SELECTED_EXPERIMENTS,
-      Title.SELECT_EXPERIMENTS
+      Title.SELECT_EXPERIMENTS,
+      { matchOnDescription: true, matchOnDetail: true }
     )
   })
 
@@ -162,7 +163,8 @@ describe('pickExperiments', () => {
       ],
       [],
       MAX_SELECTED_EXPERIMENTS,
-      Title.SELECT_EXPERIMENTS
+      Title.SELECT_EXPERIMENTS,
+      { matchOnDescription: true, matchOnDetail: true }
     )
   })
 
@@ -250,7 +252,8 @@ describe('pickExperiments', () => {
       ],
       [getExpectedItem(selectedCheckpoint)],
       MAX_SELECTED_EXPERIMENTS,
-      Title.SELECT_EXPERIMENTS
+      Title.SELECT_EXPERIMENTS,
+      { matchOnDescription: true, matchOnDetail: true }
     )
   })
 })
