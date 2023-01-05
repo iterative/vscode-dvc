@@ -173,11 +173,11 @@ export class Experiments extends BaseRepository<TableData> {
 
   public async setState(data: ExperimentsOutput) {
     const dvcLiveOnly = await this.checkSignalFile()
-
+    const dataKeys = Object.keys(data)
     const commitsOutput = await this.internalCommands.executeCommand(
       AvailableCommands.GIT_GET_COMMIT_MESSAGES,
       this.dvcRoot,
-      this.getOldestCommitHashFromData(data)
+      dataKeys[dataKeys.length - 1]
     )
     await Promise.all([
       this.columns.transformAndSet(data),
@@ -598,21 +598,6 @@ export class Experiments extends BaseRepository<TableData> {
     )
 
     return experiment?.id
-  }
-
-  private getOldestCommitHashFromData(data: ExperimentsOutput) {
-    const branches = Object.entries(data)
-    branches.sort((branch1, branch2) => {
-      const [, output1] = branch1
-      const [, output2] = branch2
-      const timestamp1 = output1.baseline.data?.timestamp
-      const timestamp2 = output2.baseline.data?.timestamp
-      if (typeof timestamp1 === 'string' && typeof timestamp2 === 'string') {
-        return new Date(timestamp2).getTime() - new Date(timestamp1).getTime()
-      }
-      return 0
-    })
-    return branches[branches.length - 1][0]
   }
 
   private watchActiveEditor() {
