@@ -22,6 +22,7 @@ import { uniqueValues } from '../../util/array'
 import { RegisteredCommands } from '../../commands/external'
 import { Resource } from '../../resourceLocator'
 import { shortenForLabel } from '../../util/string'
+import { COMMITS_SEPARATOR } from '../../cli/git/constants'
 
 export type ExperimentItem = {
   command?: {
@@ -317,7 +318,7 @@ const formatCommitMessage = (commit: string) => {
 }
 
 const getCommitMessages = (commitsOutput: string) => {
-  const commits = commitsOutput.split('\u0000').map(commit => {
+  const commits = commitsOutput.split(COMMITS_SEPARATOR).map(commit => {
     const [sha, ...splitMessage] = commit.split(' ')
     return [sha, splitMessage.join(' ')]
   })

@@ -5,6 +5,7 @@ import {
   ExperimentStatus,
   EXPERIMENT_WORKSPACE_ID
 } from '../../cli/dvc/contract'
+import { COMMITS_SEPARATOR } from '../../cli/git/constants'
 
 describe('collectExperiments', () => {
   it('should return an empty array if no branches are present', () => {
@@ -91,7 +92,7 @@ describe('collectExperiments', () => {
         }
       },
       false,
-      'a123 add new feature\u0000b123 update various dependencies\n* update dvc\n* update jest'
+      `a123 add new feature${COMMITS_SEPARATOR}b123 update various dependencies\n* update dvc\n* update jest`
     )
     const [branch1, branch2] = branches
     expect(branch1.displayNameOrParent).toStrictEqual('add new feature')
