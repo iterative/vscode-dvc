@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.34] - 2023-01-05
+
+### 🚀 New Features and Enhancements
+
+- Add commit messages to experiment views  [#3016](https://github.com/iterative/vscode-dvc/pull/3016) by [@julieg18](https://github.com/julieg18)
+- Add project selection quick pick [#3040](https://github.com/iterative/vscode-dvc/pull/3040) by [@mattseddon](https://github.com/mattseddon)
+- Enable the user to specify a number of concurrent jobs when starting the experiments queue [#3048](https://github.com/iterative/vscode-dvc/pull/3048) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix stop button [#3027](https://github.com/iterative/vscode-dvc/pull/3027) by [@mattseddon](https://github.com/mattseddon)
+- Use process polling to ensure DVCLive only PIDs are still running [#3045](https://github.com/iterative/vscode-dvc/pull/3045) by [@mattseddon](https://github.com/mattseddon)
+- Fix missing commit messages in experiment branches [#3053](https://github.com/iterative/vscode-dvc/pull/3053) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Use cml to create release PR [#3034](https://github.com/iterative/vscode-dvc/pull/3034) by [@dacbd](https://github.com/dacbd)
+- Reinstate @typescript-eslint/no-unused-vars as error [#3039](https://github.com/iterative/vscode-dvc/pull/3039) by [@mattseddon](https://github.com/mattseddon)
+- Add context key enum [#3041](https://github.com/iterative/vscode-dvc/pull/3041) by [@mattseddon](https://github.com/mattseddon)
+- Suppress integration test warninngs [#3046](https://github.com/iterative/vscode-dvc/pull/3046) by [@mattseddon](https://github.com/mattseddon)
+- Consolidate use of input box validation [#3049](https://github.com/iterative/vscode-dvc/pull/3049) by [@mattseddon](https://github.com/mattseddon)
+- Stub getLastThreeCommitMessages in integration tests [#3052](https://github.com/iterative/vscode-dvc/pull/3052) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.33] - 2023-01-02
 
 ### 🚀 New Features and Enhancements
