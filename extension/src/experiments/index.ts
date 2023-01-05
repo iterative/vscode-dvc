@@ -593,7 +593,7 @@ export class Experiments extends BaseRepository<TableData> {
     }
 
     const experiment = await pickExperiment(
-      this.experiments.getExperiments(),
+      this.experiments.getAllExperiments(),
       Title.SELECT_BASE_EXPERIMENT
     )
 
