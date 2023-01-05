@@ -173,15 +173,15 @@ export class Experiments extends BaseRepository<TableData> {
 
   public async setState(data: ExperimentsOutput) {
     const dvcLiveOnly = await this.checkSignalFile()
-
-    const commitMessages: { [sha: string]: string } =
-      await this.internalCommands.executeCommand(
-        AvailableCommands.GIT_GET_LAST_THREE_COMMIT_MESSAGES,
-        this.dvcRoot
-      )
+    const dataKeys = Object.keys(data)
+    const commitsOutput = await this.internalCommands.executeCommand(
+      AvailableCommands.GIT_GET_COMMIT_MESSAGES,
+      this.dvcRoot,
+      dataKeys[dataKeys.length - 1]
+    )
     await Promise.all([
       this.columns.transformAndSet(data),
-      this.experiments.transformAndSet(data, dvcLiveOnly, commitMessages)
+      this.experiments.transformAndSet(data, dvcLiveOnly, commitsOutput)
     ])
 
     return this.notifyChanged(data)

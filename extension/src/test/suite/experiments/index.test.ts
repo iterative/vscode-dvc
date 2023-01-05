@@ -72,6 +72,7 @@ import { RegisteredCommands } from '../../../commands/external'
 import { ConfigKey } from '../../../vscode/config'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
 import * as Time from '../../../util/time'
+import { AvailableCommands } from '../../../commands/internal'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -195,8 +196,11 @@ suite('Experiments Test Suite', () => {
       const mockExecuteCommand = stub(
         internalCommands,
         'executeCommand'
-      ).resolves(undefined)
-
+      ).callsFake(commandId =>
+        commandId === AvailableCommands.GIT_GET_COMMIT_MESSAGES
+          ? Promise.resolve('')
+          : Promise.resolve(undefined)
+      )
       return {
         columnsModel,
         dvcExecutor,
