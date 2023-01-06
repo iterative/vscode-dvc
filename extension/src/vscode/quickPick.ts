@@ -45,13 +45,21 @@ export const quickPickOne = (
 const createQuickPick = <T>(
   items: readonly QuickPickItemWithValue<T>[],
   selectedItems: readonly QuickPickItemWithValue<T>[] | undefined,
-  options: { canSelectMany: boolean; placeholder?: string; title: Title }
+  options: {
+    canSelectMany: boolean
+    placeholder?: string
+    title: Title
+    matchOnDescription?: boolean
+    matchOnDetail?: boolean
+  }
 ): QuickPick<QuickPickItemWithValue<T>> => {
   const quickPick = window.createQuickPick<QuickPickItemWithValue<T>>()
 
   quickPick.canSelectMany = options.canSelectMany
   quickPick.placeholder = options.placeholder
   quickPick.title = options.title
+  quickPick.matchOnDescription = options.matchOnDescription || false
+  quickPick.matchOnDetail = options.matchOnDetail || false
 
   quickPick.items = items
   if (selectedItems) {
@@ -181,12 +189,14 @@ export const quickPickLimitedValues = <T>(
   items: QuickPickItemWithValue<T>[],
   selectedItems: readonly QuickPickItemWithValue<T>[],
   maxSelectedItems: number,
-  title: Title
+  title: Title,
+  options?: { matchOnDescription?: boolean; matchOnDetail?: boolean }
 ): Promise<Exclude<T, undefined>[] | undefined> =>
   new Promise(resolve => {
     const quickPick = createQuickPick(items, selectedItems, {
       canSelectMany: true,
-      title
+      title,
+      ...options
     })
 
     limitSelected<T>(quickPick, maxSelectedItems)

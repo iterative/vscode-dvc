@@ -135,6 +135,7 @@ export const pickExperiments = (
     items,
     selectedItems,
     MAX_SELECTED_EXPERIMENTS,
-    Title.SELECT_EXPERIMENTS
+    Title.SELECT_EXPERIMENTS,
+    { matchOnDescription: true, matchOnDetail: true }
   )
 }
