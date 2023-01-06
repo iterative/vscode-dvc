@@ -6,11 +6,11 @@ import { FileSystemData } from '../../../../fileSystem/data'
 import { dvcDemoPath, getTestWorkspaceFolder } from '../../../util'
 import * as FileSystem from '../../../../fileSystem'
 import * as Watcher from '../../../../fileSystem/watcher'
-import { getArgOfCall, getSafeWatcherDisposer } from '../../util'
+import { getArgOfCall, getTimeSafeDisposer } from '../../util'
 import { join } from '../../../util/path'
 
 suite('File System Data Test Suite', () => {
-  const disposable = getSafeWatcherDisposer()
+  const disposable = getTimeSafeDisposer()
 
   beforeEach(() => {
     restore()

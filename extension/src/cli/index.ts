@@ -107,12 +107,7 @@ export class Cli extends Disposable implements ICli {
       return new Promise<string>(resolve => {
         const readable = backgroundProcess.all
         readable?.on('data', chunk => {
-          resolve(
-            chunk
-              .toString()
-              .split(/(\r?\n)/g)
-              .join('\r')
-          )
+          resolve(chunk.toString().trim())
           if (backgroundProcess.connected) {
             readable.destroy()
             backgroundProcess.disconnect()

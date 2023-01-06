@@ -17,7 +17,7 @@ import { UNSELECTED } from '../../../../experiments/model/status'
 import {
   experimentsUpdatedEvent,
   getFirstArgOfLastCall,
-  getSafeWatcherDisposer,
+  getTimeSafeDisposer,
   spyOnPrivateMethod,
   stubPrivatePrototypeMethod
 } from '../../util'
@@ -56,7 +56,7 @@ import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 import { findAndFormatCreated } from '../../../fixtures/plotsDiff'
 
 suite('Experiments Tree Test Suite', () => {
-  const disposable = getSafeWatcherDisposer()
+  const disposable = getTimeSafeDisposer()
 
   beforeEach(() => {
     restore()

@@ -5,6 +5,7 @@ import { Disposable } from '@hediet/std/disposable'
 import execa from 'execa'
 import doesProcessExists from 'process-exists'
 import kill from 'tree-kill'
+import { getProcessPlatform } from './env'
 
 interface RunningProcess extends ChildProcess {
   all?: Readable
@@ -30,6 +31,32 @@ export interface ProcessOptions {
   env?: NodeJS.ProcessEnv
 }
 
+const getOptions = (
+  cwd: string,
+  detached?: boolean,
+  env?: NodeJS.ProcessEnv
+) => {
+  const options = {
+    all: true,
+    cwd,
+    env,
+    extendEnv: true,
+    windowsHide: true
+  }
+
+  if (!detached) {
+    return options
+  }
+
+  // a detached/non-shell/windowsHide process will error on Windows:
+  // https://github.com/nodejs/node/issues/21825#issuecomment-503766781
+  // use this workaround: https://github.com/sindresorhus/execa/issues/433
+  const detachedOption =
+    getProcessPlatform() === 'win32' ? { shell: true } : { detached }
+
+  return { ...options, ...detachedOption }
+}
+
 export const createProcess = ({
   executable,
   args,
@@ -37,14 +64,9 @@ export const createProcess = ({
   detached,
   env
 }: ProcessOptions): Process => {
-  const process = execa(executable, args, {
-    all: true,
-    cwd,
-    detached,
-    env,
-    extendEnv: true,
-    windowsHide: true
-  })
+  const options = getOptions(cwd, detached, env)
+
+  const process = execa(executable, args, options)
 
   const disposed = new EventEmitter<boolean>()
 

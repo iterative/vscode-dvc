@@ -3,15 +3,14 @@ import { expect } from 'chai'
 import { restore } from 'sinon'
 import { EventEmitter } from 'vscode'
 import kill from 'tree-kill'
-import { Disposable } from '@hediet/std/disposable'
 import { getOptions } from './util'
+import { getTimeSafeDisposer } from '../util'
 import { createProcess, processExists } from '../../../processExecution'
 import { createValidInteger } from '../../../util/number'
 import { Cli, CliEvent, CliResult } from '../../../cli'
-import { delay } from '../../../util/time'
 
 suite('CLI Suite', () => {
-  const disposable = Disposable.fn()
+  const disposable = getTimeSafeDisposer()
 
   beforeEach(() => {
     restore()
@@ -42,7 +41,11 @@ suite('CLI Suite', () => {
       expect(backgroundExists).to.be.true
 
       child.kill()
-      expect(child.killed).to.be.true
+      await new Promise(resolve => {
+        if (child.killed) {
+          resolve(undefined)
+        }
+      })
 
       const childRunning = await processExists(childPid)
       const backgroundRunning = await processExists(backgroundPid)
@@ -51,8 +54,8 @@ suite('CLI Suite', () => {
       expect(backgroundRunning).to.be.true
 
       const killed = await new Promise(resolve =>
-        kill(backgroundPid as number, async error => {
-          expect(error).to.be.undefined
+        kill(backgroundPid, async error => {
+          expect(!!error).to.be.false
           const backgroundRunning = await processExists(backgroundPid)
           expect(backgroundRunning).to.be.false
           resolve(true)
@@ -65,7 +68,9 @@ suite('CLI Suite', () => {
       const processStarted = disposable.track(new EventEmitter<CliEvent>())
       const processCompleted = disposable.track(new EventEmitter<CliResult>())
 
-      const cli = new Cli({ processCompleted, processStarted })
+      const cli = disposable.track(
+        new Cli({ processCompleted, processStarted })
+      )
 
       const processCreatedEvent = new Promise<CliEvent>(resolve =>
         disposable.track(processStarted.event(event => resolve(event)))
@@ -73,7 +78,7 @@ suite('CLI Suite', () => {
       const options = getOptions('background')
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(cli as any).executeProcess(options)
+      ;(cli as any).executeProcess(options).catch(() => {})
 
       const { pid } = await processCreatedEvent
       const executingPid = createValidInteger(pid) as number
@@ -84,8 +89,7 @@ suite('CLI Suite', () => {
 
       expect(pidIsExecuting).to.be.true
 
-      cli.dispose()
-      await delay(500)
+      await disposable.disposeAndFlush()
 
       const processIsStillExecuting = await processExists(executingPid)
 

@@ -19,7 +19,7 @@ const main = async () => {
 
   Logger.log(pid)
 
-  return delay(500000000)
+  return delay(30000)
 }
 
 main()

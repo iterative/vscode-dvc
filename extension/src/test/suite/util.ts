@@ -276,7 +276,7 @@ export type SafeWatcherDisposer = Disposer & {
   disposeAndFlush: () => Promise<unknown>
 }
 
-export const getSafeWatcherDisposer = (): Disposer & {
+export const getTimeSafeDisposer = (): Disposer & {
   disposeAndFlush: () => Promise<unknown>
 } => {
   const disposer = Disposable.fn()
