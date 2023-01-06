@@ -5,7 +5,7 @@ import { createProcess, ProcessOptions } from '../processExecution'
 import { StopWatch } from '../util/time'
 import { Disposable } from '../class/dispose'
 
-type CliEvent = {
+export type CliEvent = {
   command: string
   cwd: string
   pid: number | undefined
@@ -70,14 +70,9 @@ export class Cli extends Disposable implements ICli {
   }
 
   protected async executeProcess(options: ProcessOptions): Promise<string> {
-    const command = getCommandString(options)
-    const baseEvent: CliEvent = { command, cwd: options.cwd, pid: undefined }
-    const stopWatch = new StopWatch()
+    const { baseEvent, stopWatch } = this.getProcessDetails(options)
     try {
-      const process = this.dispose.track(createProcess(options))
-
-      baseEvent.pid = process.pid
-      this.processStarted.fire(baseEvent)
+      const process = this.dispose.track(this.createProcess(baseEvent, options))
 
       process.on('close', () => {
         this.dispose.untrack(process)
@@ -99,6 +94,60 @@ export class Cli extends Disposable implements ICli {
         stopWatch.getElapsedTime()
       )
     }
+  }
+
+  protected createBackgroundProcess(options: ProcessOptions) {
+    const { baseEvent, stopWatch } = this.getProcessDetails(options)
+    try {
+      const backgroundProcess = this.createProcess(baseEvent, {
+        detached: true,
+        ...options
+      })
+
+      return new Promise<string>(resolve => {
+        const readable = backgroundProcess.all
+        readable?.on('data', chunk => {
+          resolve(
+            chunk
+              .toString()
+              .split(/(\r?\n)/g)
+              .join('\r')
+          )
+          if (backgroundProcess.connected) {
+            readable.destroy()
+            backgroundProcess.disconnect()
+            backgroundProcess.unref()
+            this.processCompleted.fire({
+              ...baseEvent,
+              duration: stopWatch.getElapsedTime(),
+              exitCode: 0
+            })
+          }
+        })
+      })
+    } catch (error: unknown) {
+      throw this.processCliError(
+        error as MaybeConsoleError,
+        options,
+        baseEvent,
+        stopWatch.getElapsedTime()
+      )
+    }
+  }
+
+  private createProcess(baseEvent: CliEvent, options: ProcessOptions) {
+    const createdProcess = createProcess(options)
+    baseEvent.pid = createdProcess.pid
+    this.processStarted.fire(baseEvent)
+
+    return createdProcess
+  }
+
+  private getProcessDetails(options: ProcessOptions) {
+    const command = getCommandString(options)
+    const baseEvent: CliEvent = { command, cwd: options.cwd, pid: undefined }
+    const stopWatch = new StopWatch()
+    return { baseEvent, stopWatch }
   }
 
   private processCliError(

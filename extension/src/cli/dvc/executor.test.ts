@@ -564,7 +564,7 @@ describe('CliExecutor', () => {
   })
 
   describe('queueStart', () => {
-    it("should call createProcess with the correct parameters to start the experiment's queue", async () => {
+    it("should call createProcess with the correct parameters to start the experiment's queue in a detached process", () => {
       const cwd = __dirname
       const jobs = '91231324'
 
@@ -572,13 +572,12 @@ describe('CliExecutor', () => {
 
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await dvcExecutor.queueStart(cwd, jobs)
-
-      expect(output).toStrictEqual(stdout)
+      dvcExecutor.queueStart(cwd, jobs)
 
       expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['queue', 'start', '-j', jobs],
         cwd,
+        detached: true,
         env: mockedEnv,
         executable: 'dvc'
       })

@@ -26,6 +26,7 @@ export interface ProcessOptions {
   executable: string
   args: string[]
   cwd: string
+  detached?: boolean
   env?: NodeJS.ProcessEnv
 }
 
@@ -33,11 +34,13 @@ export const createProcess = ({
   executable,
   args,
   cwd,
+  detached,
   env
 }: ProcessOptions): Process => {
   const process = execa(executable, args, {
     all: true,
     cwd,
+    detached,
     env,
     extendEnv: true,
     windowsHide: true
