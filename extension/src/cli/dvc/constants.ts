@@ -62,7 +62,6 @@ export enum ExperimentSubCommand {
 }
 
 export enum QueueSubCommand {
-  KILL = 'kill',
   START = 'start',
   STOP = 'stop'
 }

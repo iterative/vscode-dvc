@@ -217,11 +217,6 @@
         "category": "DVC"
       },
       {
-        "title": "%command.killExperimentsQueue%",
-        "command": "dvc.killExperimentsQueue",
-        "category": "DVC"
-      },
-      {
         "title": "%command.moveTargets%",
         "command": "dvc.moveTargets",
         "category": "DVC"
@@ -694,10 +689,6 @@
         {
           "command": "dvc.init",
           "when": "dvc.commands.available && !dvc.cli.incompatible && !dvc.project.available && !dvc.scm.command.running"
-        },
-        {
-          "command": "dvc.killExperimentsQueue",
-          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.moveTargets",
@@ -1282,11 +1273,6 @@
           "command": "dvc.stopExperimentsQueue",
           "when": "view == dvc.views.experimentsTree",
           "group": "3_queue@3"
-        },
-        {
-          "command": "dvc.killExperimentsQueue",
-          "when": "view == dvc.views.experimentsTree",
-          "group": "3_queue@4"
         },
         {
           "command": "dvc.addExperimentsTableSort",

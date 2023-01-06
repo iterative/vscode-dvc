@@ -437,21 +437,6 @@ suite('Workspace Experiments Test Suite', () => {
     })
   })
 
-  describe('dvc.killExperimentsQueue', () => {
-    it('should be able to kill the experiments queue', async () => {
-      const mockQueueKill = stub(DvcExecutor.prototype, 'queueKill').resolves(
-        undefined
-      )
-
-      stubWorkspaceExperimentsGetters(dvcDemoPath)
-
-      await commands.executeCommand(RegisteredCliCommands.QUEUE_KILL)
-
-      expect(mockQueueKill).to.be.calledOnce
-      expect(mockQueueKill).to.be.calledWithExactly(dvcDemoPath)
-    })
-  })
-
   describe('dvc.startExperimentsQueue', () => {
     it('should be able to start the experiments queue with the selected number of workers', async () => {
       const mockQueueStart = stub(DvcExecutor.prototype, 'queueStart').resolves(

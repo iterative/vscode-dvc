@@ -28,11 +28,6 @@ const registerExperimentCwdCommands = (
   )
 
   internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.QUEUE_KILL,
-    () => experiments.getCwdThenReport(AvailableCommands.QUEUE_KILL)
-  )
-
-  internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.QUEUE_STOP,
     () => experiments.getCwdThenReport(AvailableCommands.QUEUE_STOP)
   )

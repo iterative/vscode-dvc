@@ -563,27 +563,6 @@ describe('CliExecutor', () => {
     })
   })
 
-  describe('queueKill', () => {
-    it("should call createProcess with the correct parameters to kill the experiment's queue", async () => {
-      const cwd = __dirname
-
-      const stdout = 'Queue workers will stop after running tasks finish.'
-
-      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
-
-      const output = await dvcExecutor.queueKill(cwd)
-
-      expect(output).toStrictEqual(stdout)
-
-      expect(mockedCreateProcess).toHaveBeenCalledWith({
-        args: ['queue', 'kill'],
-        cwd,
-        env: mockedEnv,
-        executable: 'dvc'
-      })
-    })
-  })
-
   describe('queueStart', () => {
     it("should call createProcess with the correct parameters to start the experiment's queue", async () => {
       const cwd = __dirname
