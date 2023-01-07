@@ -1,5 +1,3 @@
-const { off } = require('process')
-
 /* global module */
 module.exports = {
   env: {

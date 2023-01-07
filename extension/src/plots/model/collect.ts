@@ -71,13 +71,16 @@ const collectFromMetricsFile = (
   const pathArray = [...ancestors, key].filter(Boolean) as string[]
 
   if (isValueTree(value)) {
-    for (const [childKey, childValue] of Object.entries(value)) {
+    for (const [childKey, childValue] of Object.entries(value) as [
+      string,
+      Value | ValueTree
+    ][]) {
       collectFromMetricsFile(
         acc,
         name,
         iteration,
         childKey,
-        childValue as Value | ValueTree,
+        childValue,
         pathArray
       )
     }
