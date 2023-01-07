@@ -342,6 +342,11 @@
         "icon": "$(run-all)"
       },
       {
+        "title": "%command.stopExperimentsQueue%",
+        "command": "dvc.stopExperimentsQueue",
+        "category": "DVC"
+      },
+      {
         "title": "%command.resetAndRunCheckpointExperiment%",
         "command": "dvc.resetAndRunCheckpointExperiment",
         "category": "DVC",
@@ -775,7 +780,11 @@
         },
         {
           "command": "dvc.startExperimentsQueue",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.stopExperimentsQueue",
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.selectForCompare",
@@ -1257,8 +1266,13 @@
         },
         {
           "command": "dvc.startExperimentsQueue",
-          "when": "view == dvc.views.experimentsTree && !dvc.experiment.running",
+          "when": "view == dvc.views.experimentsTree",
           "group": "3_queue@2"
+        },
+        {
+          "command": "dvc.stopExperimentsQueue",
+          "when": "view == dvc.views.experimentsTree",
+          "group": "3_queue@3"
         },
         {
           "command": "dvc.addExperimentsTableSort",

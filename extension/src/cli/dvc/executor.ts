@@ -27,6 +27,7 @@ export const autoRegisteredCommands = {
   PULL: 'pull',
   PUSH: 'push',
   QUEUE_START: 'queueStart',
+  QUEUE_STOP: 'queueStop',
   REMOVE: 'remove'
 } as const
 
@@ -136,6 +137,10 @@ export class DvcExecutor extends DvcCli {
       Flag.JOBS,
       jobs
     )
+  }
+
+  public queueStop(cwd: string) {
+    return this.executeDvcProcess(cwd, Command.QUEUE, QueueSubCommand.STOP)
   }
 
   public remove(cwd: string, ...args: Args) {
