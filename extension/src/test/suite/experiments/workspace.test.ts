@@ -548,6 +548,8 @@ suite('Workspace Experiments Test Suite', () => {
         ],
         {
           canPickMany: false,
+          matchOnDescription: true,
+          matchOnDetail: true,
           title: Title.SELECT_EXPERIMENT
         }
       )

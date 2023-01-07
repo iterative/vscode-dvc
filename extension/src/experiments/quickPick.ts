@@ -21,7 +21,7 @@ export const pickExperiment = (
         label,
         value: { id, name: name || label }
       })),
-      { title }
+      { matchOnDescription: true, matchOnDetail: true, title }
     )
   }
 }
