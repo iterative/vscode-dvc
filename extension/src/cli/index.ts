@@ -96,14 +96,14 @@ export class Cli extends Disposable implements ICli {
     }
   }
 
-  protected createBackgroundProcess(options: ProcessOptions) {
+  protected async createBackgroundProcess(options: ProcessOptions) {
     const { baseEvent, stopWatch } = this.getProcessDetails(options)
     try {
       const backgroundProcess = this.createProcess(baseEvent, {
         detached: true,
         ...options
       })
-      return this.getOutputAndDisconnect(
+      return await this.getOutputAndDisconnect(
         baseEvent,
         backgroundProcess,
         stopWatch
