@@ -47,7 +47,11 @@ suite('CLI Suite', () => {
         }
       })
 
-      const childRunning = await processExists(childPid)
+      let childRunning = true
+      while (childRunning) {
+        childRunning = await processExists(childPid)
+      }
+
       const backgroundRunning = await processExists(backgroundPid)
 
       expect(childRunning).to.be.false

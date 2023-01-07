@@ -1,7 +1,7 @@
 import { Event, EventEmitter } from 'vscode'
 import { CliError, MaybeConsoleError } from './error'
 import { getCommandString } from './command'
-import { createProcess, ProcessOptions } from '../processExecution'
+import { createProcess, Process, ProcessOptions } from '../processExecution'
 import { StopWatch } from '../util/time'
 import { Disposable } from '../class/dispose'
 
@@ -103,23 +103,11 @@ export class Cli extends Disposable implements ICli {
         detached: true,
         ...options
       })
-
-      return new Promise<string>(resolve => {
-        const readable = backgroundProcess.all
-        readable?.on('data', chunk => {
-          resolve(chunk.toString().trim())
-          if (backgroundProcess.connected) {
-            readable.destroy()
-            backgroundProcess.disconnect()
-            backgroundProcess.unref()
-            this.processCompleted.fire({
-              ...baseEvent,
-              duration: stopWatch.getElapsedTime(),
-              exitCode: 0
-            })
-          }
-        })
-      })
+      return this.getOutputAndDisconnect(
+        baseEvent,
+        backgroundProcess,
+        stopWatch
+      )
     } catch (error: unknown) {
       throw this.processCliError(
         error as MaybeConsoleError,
@@ -143,6 +131,34 @@ export class Cli extends Disposable implements ICli {
     const baseEvent: CliEvent = { command, cwd: options.cwd, pid: undefined }
     const stopWatch = new StopWatch()
     return { baseEvent, stopWatch }
+  }
+
+  private getOutputAndDisconnect(
+    baseEvent: CliEvent,
+    backgroundProcess: Process,
+    stopWatch: StopWatch
+  ) {
+    let completed = false
+    return new Promise<string>(resolve => {
+      const readable = backgroundProcess.all
+      readable?.on('data', chunk => {
+        if (!completed) {
+          this.processCompleted.fire({
+            ...baseEvent,
+            duration: stopWatch.getElapsedTime(),
+            exitCode: 0
+          })
+          completed = true
+        }
+
+        resolve(chunk.toString().trim())
+        if (backgroundProcess.connected) {
+          readable.destroy()
+          backgroundProcess.disconnect()
+          backgroundProcess.unref()
+        }
+      })
+    })
   }
 
   private processCliError(
