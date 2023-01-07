@@ -48,6 +48,15 @@ module.exports = {
       rules: {
         'check-file/folder-naming-convention': 'off'
       }
+    },
+    {
+      files: ['**/*.tsx'],
+      rules: {
+        // breaks use of styles
+        '@typescript-eslint/no-unsafe-assignment': 'off',
+        '@typescript-eslint/no-unsafe-member-access': 'off',
+        '@typescript-eslint/no-unsafe-argument': 'off'
+      }
     }
   ]
 }

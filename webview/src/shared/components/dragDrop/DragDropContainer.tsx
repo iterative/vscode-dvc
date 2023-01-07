@@ -344,6 +344,7 @@ export const DragDropContainer: React.FC<DragDropContainerProps> = ({
     const id = draggable?.props?.id
     const item = id && buildItem(id, draggable)
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return id === draggedOverId && (hoveringSomething || !parentDraggedOver)
       ? createItemWithDropTarget(id, item)
       : item

@@ -60,7 +60,7 @@ export class TextDocumentWrapper implements ITextDocumentWrapper {
       if (!range) {
         continue
       }
-      acc.push(Location.create(this.uri, range as Range))
+      acc.push(Location.create(this.uri, range))
     }
     return acc
   }
@@ -107,7 +107,7 @@ export class TextDocumentWrapper implements ITextDocumentWrapper {
     node: Scalar,
     [nodeStart, valueEnd, nodeEnd]: [number, number, number]
   ) {
-    const nodeValue = `${node.value}`
+    const nodeValue = `${node.value as string | number}`
 
     let symbolKind: SymbolKind = SymbolKind.String
 

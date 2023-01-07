@@ -89,9 +89,7 @@ const Cell: React.FC<Cell<Experiment, CellValue>> = cell => {
   const stringValue = String(rawValue)
 
   const displayValue =
-    typeof rawValue === 'number'
-      ? formatNumber(rawValue as number)
-      : stringValue
+    typeof rawValue === 'number' ? formatNumber(rawValue) : stringValue
 
   return (
     <Tooltip
@@ -129,7 +127,7 @@ const buildAccessor: (valuePath: string[]) => Accessor<Experiment> =
     const value = get(originalRow, pathArray)
 
     if (!Array.isArray(value)) {
-      return value
+      return value as unknown[]
     }
     return `[${value.join(', ')}]`
   }
@@ -195,7 +193,7 @@ const fixColumnsNesting = (
         if (!column.columns) {
           ;(column as Partial<ColumnInstance<Experiment>>) = {
             Header: '',
-            id: `${column.id}_previous_placeholder`,
+            id: `${column.id as string}_previous_placeholder`,
             parent: parent as ColumnInstance<Experiment>,
             placeholderOf: column as ColumnInstance<{}>
           }
