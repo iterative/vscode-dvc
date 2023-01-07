@@ -1,3 +1,5 @@
+const { off } = require('process')
+
 /* global module */
 module.exports = {
   env: {
@@ -7,6 +9,7 @@ module.exports = {
     'prettier-standard/prettier-file',
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/recommended-requiring-type-checking',
     'plugin:react/recommended',
     'plugin:jest/recommended',
     'plugin:jsx-a11y/recommended',
@@ -15,7 +18,14 @@ module.exports = {
     'plugin:import/typescript',
     'plugin:unicorn/recommended'
   ],
-  ignorePatterns: ['**/coverage/**', '**/dist/**'],
+  ignorePatterns: [
+    '**/coverage/**',
+    '**/dist/**',
+    '**/*.js',
+    '*.d.ts',
+    'tsconfig.json',
+    'webpack.config.ts'
+  ],
   overrides: [
     {
       extends: ['plugin:testing-library/react'],
@@ -23,9 +33,12 @@ module.exports = {
       files: ['**/*.test.*'],
       rules: {
         '@typescript-eslint/no-floating-promises': 'off',
+        '@typescript-eslint/no-unsafe-argument': 'off',
         '@typescript-eslint/no-unsafe-assignment': 'off',
+        '@typescript-eslint/no-unsafe-member-access': 'off',
         '@typescript-eslint/no-unsafe-call': 'off',
         '@typescript-eslint/no-unsafe-return': 'off',
+        '@typescript-eslint/unbound-method': 'off',
         'no-undef': 'off',
         'sonarjs/no-duplicate-string': 'off',
         'testing-library/no-render-in-setup': 'off',
@@ -61,12 +74,6 @@ module.exports = {
       }
     }
   ],
-  parser: '@typescript-eslint/parser',
-  parserOptions: {
-    ecmaFeatures: {
-      jsx: true
-    }
-  },
   plugins: [
     '@typescript-eslint',
     'check-file',
@@ -143,6 +150,7 @@ module.exports = {
     ],
     // https://github.com/typescript-eslint/typescript-eslint/issues/2540#issuecomment-692505191
     'no-use-before-define': 'off',
+    'no-void': ['error', { allowAsStatement: true }],
     quotes: ['error', 'single', { avoidEscape: true }],
     'react-hooks/exhaustive-deps': 'error',
     'react-hooks/rules-of-hooks': 'error',

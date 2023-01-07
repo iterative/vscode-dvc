@@ -1,5 +1,6 @@
 import omit from 'lodash.omit'
 import { TopLevelSpec } from 'vega-lite'
+import { VisualizationSpec } from 'react-vega'
 import { getRevisionFirstThreeColumns } from './util'
 import {
   ColorScale,
@@ -76,7 +77,7 @@ const collectFromMetricsFile = (
         name,
         iteration,
         childKey,
-        childValue,
+        childValue as Value | ValueTree,
         pathArray
       )
     }
@@ -445,7 +446,7 @@ const updateDatapoints = (
     .flatMap(revision => {
       const datapoints = revisionData?.[revision]?.[path] || []
       return datapoints.map(data => {
-        const obj = data as Record<string, unknown>
+        const obj = data
         return {
           ...obj,
           [key]: mergeFields(fields.map(field => obj[field] as string))
@@ -540,7 +541,9 @@ const collectTemplatePlot = (
   revisionColors: ColorScale | undefined,
   multiSourceEncoding: MultiSourceEncoding
 ) => {
-  const isMultiView = isMultiViewPlot(JSON.parse(template))
+  const isMultiView = isMultiViewPlot(
+    JSON.parse(template) as TopLevelSpec | VisualizationSpec
+  )
   const multiSourceEncodingUpdate = multiSourceEncoding[path] || {}
   const { datapoints, revisions } = transformRevisionData(
     path,
@@ -557,7 +560,7 @@ const collectTemplatePlot = (
   const content = extendVegaSpec(fillTemplate(template, datapoints), size, {
     ...multiSourceEncodingUpdate,
     color: revisionColors
-  })
+  }) as VisualizationSpec
 
   acc.push({
     content,

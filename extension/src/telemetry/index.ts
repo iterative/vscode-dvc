@@ -55,7 +55,9 @@ const sanitizeProperty = (
     sanitizedProperties[key] = convertProperty(value)
   } catch (error: unknown) {
     Logger.error(
-      `Failed to serialize ${key} for ${String(eventName)}: ${error}`
+      `Failed to serialize ${key} for ${String(eventName)}: ${JSON.stringify(
+        error
+      )}`
     )
   }
 }

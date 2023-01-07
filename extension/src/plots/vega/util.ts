@@ -1,3 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import cloneDeep from 'lodash.clonedeep'
 import merge from 'lodash.merge'
@@ -31,20 +36,16 @@ const getFacetField = (
 ): string | null => {
   const facetSpec = template as TopLevelFacetSpec
   if (facetSpec.facet) {
-    return (
-      (facetSpec.facet as FacetFieldDef<any, any>).field ||
+    return ((facetSpec.facet as FacetFieldDef<any, any>).field ||
       (facetSpec.facet as FacetMapping<any>).row?.field ||
-      (facetSpec.facet as FacetMapping<any>).column?.field
-    )
+      (facetSpec.facet as FacetMapping<any>).column?.field) as string | null
   }
 
   const unitSpec = template as TopLevelUnitSpec<any>
   if (unitSpec.encoding) {
-    return (
-      unitSpec.encoding.facet?.field ||
+    return (unitSpec.encoding.facet?.field ||
       unitSpec.encoding.row?.field ||
-      unitSpec.encoding.column?.field
-    )
+      unitSpec.encoding.column?.field) as string | null
   }
 
   return null
@@ -125,7 +126,9 @@ type EncodingUpdate = {
 const specHasVerticalLineOnHover = (
   spec: any
 ): spec is { layer: { layer: [{ encoding: Record<string, unknown> }] }[] } =>
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
   spec.layer?.[1]?.layer?.[0]?.encoding?.x &&
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   isEqual(spec.layer[1].layer[0].mark, {
     color: 'gray',
     type: 'rule'
@@ -255,7 +258,7 @@ const truncateTitle = (
 }
 
 export const truncateVerticalTitle = (title: Text | Title, size: number) =>
-  truncateTitle(title, TitleLimit[size as keyof typeof TitleLimit] * 0.75)
+  truncateTitle(title, TitleLimit[size] * 0.75)
 
 const isEndValue = (valueType: string) =>
   ['string', 'number', 'boolean'].includes(valueType)
@@ -283,7 +286,7 @@ export const truncateTitles = (
         const title = value as unknown as Title
         specCopy[key] = vertical
           ? truncateVerticalTitle(title, size)
-          : truncateTitle(title, TitleLimit[size as keyof typeof TitleLimit])
+          : truncateTitle(title, TitleLimit[size])
       } else if (isEndValue(valueType)) {
         specCopy[key] = value
       } else if (Array.isArray(value)) {

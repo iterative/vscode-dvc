@@ -21,19 +21,19 @@ export class FileSystemData extends DeferredDisposable {
     this.onDidUpdate = this.updated.event
 
     this.watchDvcYaml()
-    this.initialize()
+    void this.initialize()
   }
 
   private async initialize() {
     const files = await findFiles(join('**', 'dvc.yaml'))
     const filesInRepo = files.filter(file => isSameOrChild(this.dvcRoot, file))
 
-    filesInRepo.map(path => {
+    for (const path of filesInRepo) {
       const yaml = loadYaml<PartialDvcYaml>(path)
       if (yaml) {
         this.updated.fire({ path, yaml })
       }
-    })
+    }
 
     this.deferred.resolve()
   }

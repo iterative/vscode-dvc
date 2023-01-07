@@ -28,16 +28,16 @@ export class WebviewMessages {
   private readonly experiments: Experiments
 
   private readonly getWebview: () => BaseWebview<TPlotsData> | undefined
-  private readonly selectPlots: () => void
-  private readonly updateData: () => void
+  private readonly selectPlots: () => Promise<void>
+  private readonly updateData: () => Promise<void>
 
   constructor(
     paths: PathsModel,
     plots: PlotsModel,
     experiments: Experiments,
     getWebview: () => BaseWebview<TPlotsData> | undefined,
-    selectPlots: () => void,
-    updateData: () => void
+    selectPlots: () => Promise<void>,
+    updateData: () => Promise<void>
   ) {
     this.paths = paths
     this.plots = plots
@@ -51,7 +51,7 @@ export class WebviewMessages {
     const { overrideComparison, overrideRevisions } =
       this.plots.getOverrideRevisionDetails()
 
-    this.getWebview()?.show({
+    void this.getWebview()?.show({
       checkpoint: this.getCheckpointPlots(),
       comparison: this.getComparisonPlots(overrideComparison),
       hasPlots: !!this.paths.hasPaths(),
@@ -63,7 +63,7 @@ export class WebviewMessages {
   }
 
   public sendCheckpointPlotsMessage() {
-    this.getWebview()?.show({
+    void this.getWebview()?.show({
       checkpoint: this.getCheckpointPlots()
     })
   }
@@ -159,12 +159,12 @@ export class WebviewMessages {
   }
 
   private selectPlotsFromWebview() {
-    this.selectPlots()
+    void this.selectPlots()
     sendTelemetryEvent(EventName.VIEWS_PLOTS_SELECT_PLOTS, undefined, undefined)
   }
 
   private selectExperimentsFromWebview() {
-    this.experiments.selectExperiments()
+    void this.experiments.selectExperiments()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_SELECT_EXPERIMENTS,
       undefined,
@@ -182,9 +182,11 @@ export class WebviewMessages {
   }
 
   private attemptToRefreshRevData(revision: string) {
-    Toast.infoWithOptions(`Attempting to refresh plots data for ${revision}.`)
+    void Toast.infoWithOptions(
+      `Attempting to refresh plots data for ${revision}.`
+    )
     this.plots.setupManualRefresh(revision)
-    this.updateData()
+    void this.updateData()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_MANUAL_REFRESH,
       { revisions: 1 },
@@ -193,11 +195,11 @@ export class WebviewMessages {
   }
 
   private attemptToRefreshSelectedData(revisions: string[]) {
-    Toast.infoWithOptions('Attempting to refresh visible plots data.')
+    void Toast.infoWithOptions('Attempting to refresh visible plots data.')
     for (const revision of revisions) {
       this.plots.setupManualRefresh(revision)
     }
-    this.updateData()
+    void this.updateData()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_MANUAL_REFRESH,
       { revisions: revisions.length },
@@ -215,19 +217,19 @@ export class WebviewMessages {
   }
 
   private sendSectionCollapsed() {
-    this.getWebview()?.show({
+    void this.getWebview()?.show({
       sectionCollapsed: this.plots.getSectionCollapsed()
     })
   }
 
   private sendComparisonPlots() {
-    this.getWebview()?.show({
+    void this.getWebview()?.show({
       comparison: this.getComparisonPlots()
     })
   }
 
   private sendTemplatePlots() {
-    this.getWebview()?.show({
+    void this.getWebview()?.show({
       template: this.getTemplatePlots()
     })
   }

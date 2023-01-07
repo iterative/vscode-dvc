@@ -4,6 +4,14 @@ const config = require('../.eslintrc')
 module.exports = {
   ...config,
   ignorePatterns: [...config.ignorePatterns, 'storybook-static/**'],
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    tsconfigRootDir: __dirname,
+    project: ['./tsconfig.json'],
+    ecmaFeatures: {
+      jsx: true
+    }
+  },
   overrides: [
     ...config.overrides,
     {

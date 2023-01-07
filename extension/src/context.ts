@@ -16,7 +16,7 @@ export class Context extends Disposable {
 
     this.dispose.track(
       this.dvcRunner.onDidStartProcess(() => {
-        this.setIsExperimentRunning()
+        void this.setIsExperimentRunning()
       })
     )
 
@@ -37,7 +37,7 @@ export class Context extends Disposable {
           repositories.push(this.experiments.getRepository(dvcRoot))
         }
 
-        this.setIsExperimentRunning(repositories)
+        void this.setIsExperimentRunning(repositories)
 
         this.setContextFromRepositories(
           ContextKey.EXPERIMENTS_FILTERED,
@@ -56,8 +56,8 @@ export class Context extends Disposable {
 
   private async setIsExperimentRunning(repositories: Experiments[] = []) {
     if (this.dvcRunner.isExperimentRunning()) {
-      setContextValue(ContextKey.EXPERIMENT_RUNNING, true)
-      setContextValue(ContextKey.EXPERIMENT_STOPPABLE, true)
+      void setContextValue(ContextKey.EXPERIMENT_RUNNING, true)
+      void setContextValue(ContextKey.EXPERIMENT_STOPPABLE, true)
       return
     }
 
@@ -67,7 +67,7 @@ export class Context extends Disposable {
       (experiments: Experiments) => experiments.hasRunningExperiment()
     )
 
-    setContextValue(
+    void setContextValue(
       ContextKey.EXPERIMENT_STOPPABLE,
       await this.experiments.hasDvcLiveOnlyExperimentRunning()
     )
@@ -80,10 +80,10 @@ export class Context extends Disposable {
   ) {
     for (const experiments of repositories) {
       if (hasRequirement(experiments)) {
-        setContextValue(contextKey, true)
+        void setContextValue(contextKey, true)
         return
       }
     }
-    setContextValue(contextKey, false)
+    void setContextValue(contextKey, false)
   }
 }

@@ -130,7 +130,7 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
     resourceLocator
   )
 
-  experiments.setState(expShowFixture)
+  experiments.setState(expShowFixture).catch(() => undefined)
   return { experiments, internalCommands, messageSpy, workspaceExperiments }
 }
 

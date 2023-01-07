@@ -16,7 +16,10 @@ const collectFromParamsFile = (
   const pathArray = [...ancestors, key].filter(Boolean) as string[]
 
   if (isValueTree(value)) {
-    for (const [childKey, childValue] of Object.entries(value)) {
+    for (const [childKey, childValue] of Object.entries(value) as [
+      string,
+      Value
+    ][]) {
       collectFromParamsFile(acc, childKey, childValue, pathArray)
     }
     return

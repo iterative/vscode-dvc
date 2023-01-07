@@ -440,10 +440,10 @@ describe('App', () => {
 
     const summaryElement = await screen.findByText('Trends')
     const visiblePlots = await screen.findAllByLabelText('Vega visualization')
-    visiblePlots.map(visiblePlot => {
+    for (const visiblePlot of visiblePlots) {
       expect(visiblePlot).toBeInTheDocument()
       expect(visiblePlot).toBeVisible()
-    })
+    }
 
     fireEvent.click(summaryElement, {
       bubbles: true,

@@ -13,7 +13,7 @@ export const pickExperiment = (
   title: Title = Title.SELECT_EXPERIMENT
 ): Thenable<{ id: string; name: string } | undefined> | undefined => {
   if (experiments.length === 0) {
-    Toast.showError('There are no experiments to select.')
+    void Toast.showError('There are no experiments to select.')
   } else {
     return quickPickValue<{ id: string; name: string }>(
       experiments.map(({ label, displayNameOrParent, id, name }) => ({

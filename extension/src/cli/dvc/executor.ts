@@ -160,6 +160,6 @@ export class DvcExecutor extends DvcCli {
 
   private setRunning(running: boolean) {
     this.scmCommandRunning = running
-    setContextValue(ContextKey.SCM_RUNNING, running)
+    void setContextValue(ContextKey.SCM_RUNNING, running)
   }
 }

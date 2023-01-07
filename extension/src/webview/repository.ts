@@ -60,7 +60,7 @@ export abstract class BaseRepository<
 
   public setWebview(view: BaseWebview<T>) {
     this.webview = this.dispose.track(view)
-    view.isReady().then(() => this.sendInitialWebviewData())
+    void view.isReady().then(() => this.sendInitialWebviewData())
 
     const listener = this.dispose.track(
       view.onDidReceiveMessage(message =>

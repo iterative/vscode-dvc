@@ -79,8 +79,8 @@ export class Cli extends Disposable implements ICli {
       baseEvent.pid = process.pid
       this.processStarted.fire(baseEvent)
 
-      process.on('close', () => {
-        this.dispose.untrack(process)
+      void process.on('close', () => {
+        void this.dispose.untrack(process)
       })
 
       const { stdout, exitCode } = await process
@@ -108,7 +108,7 @@ export class Cli extends Disposable implements ICli {
     duration: number
   ) {
     const cliError = new CliError({
-      baseError: error as MaybeConsoleError,
+      baseError: error,
       options
     })
     this.processCompleted.fire({
