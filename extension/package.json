@@ -342,6 +342,11 @@
         "icon": "$(run-all)"
       },
       {
+        "title": "%command.stopExperimentsQueue%",
+        "command": "dvc.stopExperimentsQueue",
+        "category": "DVC"
+      },
+      {
         "title": "%command.resetAndRunCheckpointExperiment%",
         "command": "dvc.resetAndRunCheckpointExperiment",
         "category": "DVC",
@@ -775,7 +780,11 @@
         },
         {
           "command": "dvc.startExperimentsQueue",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.stopExperimentsQueue",
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.selectForCompare",
@@ -1257,8 +1266,13 @@
         },
         {
           "command": "dvc.startExperimentsQueue",
-          "when": "view == dvc.views.experimentsTree && !dvc.experiment.running",
+          "when": "view == dvc.views.experimentsTree",
           "group": "3_queue@2"
+        },
+        {
+          "command": "dvc.stopExperimentsQueue",
+          "when": "view == dvc.views.experimentsTree",
+          "group": "3_queue@3"
         },
         {
           "command": "dvc.addExperimentsTableSort",
@@ -1569,7 +1583,7 @@
     "execa": "5.1.1",
     "fs-extra": "11.1.0",
     "js-yaml": "4.1.0",
-    "json5": "2.2.2",
+    "json5": "2.2.3",
     "lodash.clonedeep": "4.5.0",
     "lodash.get": "4.4.2",
     "lodash.isempty": "4.4.0",
@@ -1587,7 +1601,7 @@
     "@types/chai-as-promised": "7.1.5",
     "@types/copy-webpack-plugin": "10.1.0",
     "@types/fs-extra": "9.0.13",
-    "@types/jest": "29.2.4",
+    "@types/jest": "29.2.5",
     "@types/js-yaml": "4.0.5",
     "@types/lodash.clonedeep": "4.5.7",
     "@types/lodash.get": "4.4.7",

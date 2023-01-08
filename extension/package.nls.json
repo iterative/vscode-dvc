@@ -45,6 +45,7 @@
   "command.runExperiment": "Run Experiment",
   "command.resumeCheckpointExperiment": "Resume Experiment",
   "command.startExperimentsQueue": "Start the Experiments Queue",
+  "command.stopExperimentsQueue": "Stop the Experiments Queue",
   "command.resetAndRunCheckpointExperiment": "Run Experiment",
   "command.selectForCompare": "Select for Compare",
   "command.selectFocusedProjects": "Select Project(s) to Focus (set dvc.focusedProjects)",
