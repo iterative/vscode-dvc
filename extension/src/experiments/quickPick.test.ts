@@ -94,18 +94,18 @@ describe('pickExperiment', () => {
       name: mockedExp.name
     }
     mockedQuickPickValue.mockResolvedValueOnce(expectedDetails)
-    const experiment = await pickExperiment(mockedExpList)
+    const experiment = await pickExperiment(mockedExpList, [])
     expect(experiment).toStrictEqual(expectedDetails)
   })
 
   it('should return undefined if the user cancels the popup dialog', async () => {
     mockedQuickPickValue.mockResolvedValueOnce(undefined)
-    const undef = await pickExperiment(mockedExpList)
+    const undef = await pickExperiment(mockedExpList, [])
     expect(undef).toBeUndefined()
   })
 
   it('should call showErrorMessage when no experiment names are provided', async () => {
-    await pickExperiment([])
+    await pickExperiment([], [])
     expect(mockedShowError).toHaveBeenCalledTimes(1)
   })
 })
