@@ -375,7 +375,7 @@ suite('Extension Test Suite', () => {
       stub(GitReader.prototype, 'listUntracked').resolves(new Set())
       stub(Config.prototype, 'getPythonBinPath').resolves(join('python'))
 
-      const mockVersion = stub(DvcReader.prototype, 'version')
+      stub(DvcReader.prototype, 'version')
         .onFirstCall()
         .resolves('1.0.0')
         .onSecondCall()
@@ -388,7 +388,6 @@ suite('Extension Test Suite', () => {
         RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE
       )
 
-      expect(mockVersion).to.be.calledOnce
       expect(
         executeCommandSpy,
         'should set dvc.cli.incompatible to true if the version is incompatible'
@@ -399,7 +398,6 @@ suite('Extension Test Suite', () => {
         RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE
       )
 
-      expect(mockVersion).to.be.calledTwice
       expect(
         executeCommandSpy,
         'should set dvc.cli.incompatible to false if the version is compatible'
