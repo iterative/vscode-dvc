@@ -317,12 +317,14 @@ const formatCommitMessage = (commit: string) => {
   return `${lines[0]}${lines.length > 1 ? ' ...' : ''}`
 }
 
-const getCommitMessages = (commitsOutput: string) => {
+const getCommitMessages = (
+  commitsOutput: string
+): { [sha: string]: string } => {
   const commits = commitsOutput.split(COMMITS_SEPARATOR).map(commit => {
     const [sha, ...splitMessage] = commit.split(' ')
     return [sha, splitMessage.join(' ')]
   })
-  return Object.fromEntries(commits)
+  return Object.fromEntries(commits) as { [sha: string]: string }
 }
 
 const addCommitDataToBranches = (

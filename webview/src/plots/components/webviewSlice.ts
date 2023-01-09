@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { Revision } from 'dvc/src/plots/webview/contract'
 import { VegaProps } from 'react-vega/lib/Vega'

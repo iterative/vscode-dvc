@@ -1,5 +1,6 @@
 import omit from 'lodash.omit'
 import { TopLevelSpec } from 'vega-lite'
+import { VisualizationSpec } from 'react-vega'
 import { getRevisionFirstThreeColumns } from './util'
 import {
   ColorScale,
@@ -53,6 +54,7 @@ import {
 import { StrokeDashEncoding } from '../multiSource/constants'
 import { SelectedExperimentWithColor } from '../../experiments/model'
 import { Color } from '../../experiments/model/status/colors'
+import { typedValueTreeEntries } from '../../experiments/columns/collect/metricsAndParams'
 
 type CheckpointPlotAccumulator = {
   iterations: Record<string, number>
@@ -70,7 +72,7 @@ const collectFromMetricsFile = (
   const pathArray = [...ancestors, key].filter(Boolean) as string[]
 
   if (isValueTree(value)) {
-    for (const [childKey, childValue] of Object.entries(value)) {
+    for (const [childKey, childValue] of typedValueTreeEntries(value)) {
       collectFromMetricsFile(
         acc,
         name,
@@ -445,7 +447,7 @@ const updateDatapoints = (
     .flatMap(revision => {
       const datapoints = revisionData?.[revision]?.[path] || []
       return datapoints.map(data => {
-        const obj = data as Record<string, unknown>
+        const obj = data
         return {
           ...obj,
           [key]: mergeFields(fields.map(field => obj[field] as string))
@@ -540,7 +542,9 @@ const collectTemplatePlot = (
   revisionColors: ColorScale | undefined,
   multiSourceEncoding: MultiSourceEncoding
 ) => {
-  const isMultiView = isMultiViewPlot(JSON.parse(template))
+  const isMultiView = isMultiViewPlot(
+    JSON.parse(template) as TopLevelSpec | VisualizationSpec
+  )
   const multiSourceEncodingUpdate = multiSourceEncoding[path] || {}
   const { datapoints, revisions } = transformRevisionData(
     path,
@@ -557,7 +561,7 @@ const collectTemplatePlot = (
   const content = extendVegaSpec(fillTemplate(template, datapoints), size, {
     ...multiSourceEncodingUpdate,
     color: revisionColors
-  })
+  }) as VisualizationSpec
 
   acc.push({
     content,

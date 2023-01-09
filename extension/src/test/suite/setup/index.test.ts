@@ -43,7 +43,7 @@ suite('Setup Test Suite', () => {
     this.timeout(6000)
     disposable.dispose()
     if (isDirectory(TEMP_DIR)) {
-      remove(TEMP_DIR)
+      void remove(TEMP_DIR)
     }
     return Promise.all([
       workspace

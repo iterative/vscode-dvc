@@ -63,7 +63,7 @@ suite('Extension Test Suite', () => {
         )
         const executeCommandCalled = new Promise(resolve =>
           mockSelectPythonInterpreter.callsFake(() => {
-            setConfigValue(ConfigKey.PYTHON_PATH, path)
+            void setConfigValue(ConfigKey.PYTHON_PATH, path)
             resolve(undefined)
           })
         )

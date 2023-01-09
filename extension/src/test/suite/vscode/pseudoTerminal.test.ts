@@ -39,7 +39,7 @@ suite('Pseudo Terminal Test Suite', () => {
         )
       )
 
-      pseudoTerminal.openCurrentInstance()
+      void pseudoTerminal.openCurrentInstance()
 
       const openTerminalEvent = (): Promise<Terminal> => {
         return new Promise(resolve => {

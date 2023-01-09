@@ -139,7 +139,10 @@ export class ExperimentsTree
     commands.registerCommand(
       'dvc.views.experimentsTree.removeExperiment',
       async experimentItem => {
-        const selected = [...this.getSelectedExperimentItems(), experimentItem]
+        const selected = [
+          ...this.getSelectedExperimentItems(),
+          experimentItem
+        ] as (string | ExperimentItem)[]
 
         const deletable = collectDeletable(selected)
 

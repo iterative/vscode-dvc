@@ -60,9 +60,9 @@ export class RepositoryData extends DeferredDisposable {
 
     this.internalCommands = internalCommands
     this.onDidUpdate = this.updated.event
-    this.watchWorkspace()
+    void this.watchWorkspace()
 
-    this.initialize()
+    void this.initialize()
   }
 
   public async managedUpdate() {

@@ -128,11 +128,11 @@ export class DvcReader extends DvcCli {
     try {
       const output =
         (await this.executeDvcProcess(cwd, ...args)) || defaultValue
-      return parseNonStandardJson(output) as T
+      return parseNonStandardJson<T>(output)
     } catch (error: unknown) {
       const msg =
         (error as MaybeConsoleError).stderr || (error as Error).message
-      Logger.error(`${args} failed with ${msg}`)
+      Logger.error(`${args.join(' ')} failed with ${msg}`)
       return { error: { msg, type: 'Caught error' } }
     }
   }

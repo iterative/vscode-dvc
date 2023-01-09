@@ -1093,7 +1093,7 @@ suite('Experiments Test Suite', () => {
         )
       )
 
-      experiments.setState({
+      void experiments.setState({
         [EXPERIMENT_WORKSPACE_ID]: {
           baseline: { data: buildTestExperiment(10) }
         },
@@ -1308,7 +1308,7 @@ suite('Experiments Test Suite', () => {
           buildMockData<FileSystemData>()
         )
       )
-      testRepository.setState(expShowFixture)
+      void testRepository.setState(expShowFixture)
       await testRepository.isReady()
       expect(
         mementoSpy,
@@ -1485,7 +1485,7 @@ suite('Experiments Test Suite', () => {
           buildMockData<FileSystemData>()
         )
       )
-      testRepository.setState(expShowFixture)
+      void testRepository.setState(expShowFixture)
       await testRepository.isReady()
 
       expect(mementoSpy).to.be.calledWith('experimentsSortBy:test', [])
@@ -1665,7 +1665,7 @@ suite('Experiments Test Suite', () => {
         )
       )
 
-      experiments.setState(defaultExperimentsData)
+      void experiments.setState(defaultExperimentsData)
       await dataUpdated
       expect(experiments.hasRunningExperiment()).to.be.true
       expect(getCleanupInitialized(experiments)).to.be.true

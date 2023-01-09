@@ -31,7 +31,7 @@ describe('findDvcRootPaths', () => {
 
     const dvcRoots = await findDvcRootPaths(parentDir)
 
-    remove(mockDvcRoot)
+    void remove(mockDvcRoot)
 
     expect([...dvcRoots]).toStrictEqual([dvcDemoPath, mockDvcRoot])
   })
@@ -45,8 +45,8 @@ describe('findDvcRootPaths', () => {
 
     const dvcRoots = await findDvcRootPaths(parentDir)
 
-    remove(mockFirstDvcRoot)
-    remove(mockSecondDvcRoot)
+    void remove(mockFirstDvcRoot)
+    void remove(mockSecondDvcRoot)
 
     expect([...dvcRoots]).toStrictEqual([
       dvcDemoPath,

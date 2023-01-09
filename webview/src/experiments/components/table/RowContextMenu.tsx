@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import React from 'react'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import {

@@ -122,13 +122,17 @@ export class ExperimentsFilterByTree
   private async removeAllFilters(element: string | undefined) {
     if (!element) {
       const dvcRoots = this.getDvcRoots()
-      dvcRoots.map(dvcRoot => this.removeAllFilters(dvcRoot))
+      for (const dvcRoot of dvcRoots) {
+        void this.removeAllFilters(dvcRoot)
+      }
       return
     }
 
-    this.experiments.getRepository(element).autoApplyFilters(false)
+    void this.experiments.getRepository(element).autoApplyFilters(false)
     const filters = await this.getChildren(element)
-    filters.map(filter => this.removeFilter(filter as FilterItem))
+    for (const filter of filters) {
+      void this.removeFilter(filter as FilterItem)
+    }
   }
 
   private removeFilter(filter: FilterItem) {

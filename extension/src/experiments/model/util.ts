@@ -45,8 +45,8 @@ const getDataFromColumnPath = (
   truncatedValue: string
 } => {
   const splitUpPath = splitColumnPath(columnPath)
-  const collectedVal = get(experiment, splitUpPath)
-  const value = collectedVal?.value || collectedVal
+  const collectedVal = get(experiment, splitUpPath) as { value?: Value }
+  const value = (collectedVal?.value || collectedVal) as Value
   const [type] = splitUpPath
 
   return {

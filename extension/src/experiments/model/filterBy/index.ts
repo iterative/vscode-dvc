@@ -108,9 +108,13 @@ const buildFilter =
   experiment => {
     const firstFailure = filterDefinitions.find(filter => {
       const pathArray = splitColumnPath(filter.path)
-      const value = get(experiment, pathArray)
+      const value = get(experiment, pathArray) as string | number | boolean
 
-      return !evaluate<typeof value>(value, filter.operator, filter.value)
+      return !evaluate<typeof value>(
+        value,
+        filter.operator,
+        filter.value as string | number | boolean
+      )
     })
     return !firstFailure
   }

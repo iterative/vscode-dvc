@@ -33,7 +33,7 @@ const calcResizerHeight = (
   const nbUpperLevels = isPlaceholder
     ? 0
     : countUpperLevels(orderedColumns, column, columns, 0)
-  return 100 + nbUpperLevels * 105 + '%'
+  return `${100 + nbUpperLevels * 105}` + '%'
 }
 
 const getHeaderPropsArgs = (

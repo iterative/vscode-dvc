@@ -43,7 +43,7 @@ export class ExperimentsSortByTree
     internalCommands.registerExternalCommand(
       RegisteredCommands.EXPERIMENT_SORTS_REMOVE_ALL,
       resource => {
-        this.removeAllSorts(resource)
+        void this.removeAllSorts(resource)
       }
     )
 
@@ -109,13 +109,15 @@ export class ExperimentsSortByTree
   private async removeAllSorts(element: string | undefined) {
     if (!element) {
       const dvcRoots = this.experiments.getDvcRoots()
-      dvcRoots.map(dvcRoot => this.removeAllSorts(dvcRoot))
+      for (const dvcRoot of dvcRoots) {
+        void this.removeAllSorts(dvcRoot)
+      }
       return
     }
 
     const sorts = (await this.getChildren(element)) as SortItem[]
-    sorts.map(({ dvcRoot, sort }) =>
+    for (const { dvcRoot, sort } of sorts) {
       this.experiments.getRepository(dvcRoot).removeSort(sort.path)
-    )
+    }
   }
 }

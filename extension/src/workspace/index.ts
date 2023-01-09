@@ -26,8 +26,8 @@ export abstract class BaseWorkspace<
       this.createRepository(dvcRoot, updatesPaused, ...args)
     )
 
-    Promise.all(repositories.map(repository => repository.isReady())).then(() =>
-      this.deferred.resolve()
+    void Promise.all(repositories.map(repository => repository.isReady())).then(
+      () => this.deferred.resolve()
     )
 
     return repositories

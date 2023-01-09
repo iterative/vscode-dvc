@@ -131,7 +131,7 @@ export const buildSetup = (
       mockGitExecutor,
       mockGitReader,
       () => Promise.resolve([undefined]),
-      () => Promise.resolve(undefined),
+      () => undefined,
       {
         columnsChanged: mockEmitter,
         getHasData: () => hasData,
@@ -189,7 +189,7 @@ export const buildSetupWithWatchers = async (disposer: Disposer) => {
       mockGitExecutor,
       mockGitReader,
       () => Promise.resolve([undefined]),
-      () => Promise.resolve(undefined),
+      () => undefined,
       {
         columnsChanged: mockEmitter,
         getHasData: () => false,

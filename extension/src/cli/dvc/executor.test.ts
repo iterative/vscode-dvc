@@ -572,7 +572,7 @@ describe('CliExecutor', () => {
 
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      dvcExecutor.queueStart(cwd, jobs)
+      void dvcExecutor.queueStart(cwd, jobs)
 
       expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['queue', 'start', '-j', jobs],

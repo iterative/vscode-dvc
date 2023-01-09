@@ -166,7 +166,7 @@ export class BaseWebview<T extends WebviewData> {
   }
 
   private setPanelActiveContext(state: boolean) {
-    setContextValue(this.contextKey, state)
+    void setContextValue(this.contextKey, state)
   }
 
   private setupTelemetryEvents(
