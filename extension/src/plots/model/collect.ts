@@ -54,6 +54,7 @@ import {
 import { StrokeDashEncoding } from '../multiSource/constants'
 import { SelectedExperimentWithColor } from '../../experiments/model'
 import { Color } from '../../experiments/model/status/colors'
+import { typedEntries } from '../../experiments/columns/collect/metricsAndParams'
 
 type CheckpointPlotAccumulator = {
   iterations: Record<string, number>
@@ -71,10 +72,7 @@ const collectFromMetricsFile = (
   const pathArray = [...ancestors, key].filter(Boolean) as string[]
 
   if (isValueTree(value)) {
-    for (const [childKey, childValue] of Object.entries(value) as [
-      string,
-      Value | ValueTree
-    ][]) {
+    for (const [childKey, childValue] of typedEntries(value)) {
       collectFromMetricsFile(
         acc,
         name,

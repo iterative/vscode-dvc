@@ -53,7 +53,7 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
     <li
       className={styles.block}
       style={{ borderColor: revision.displayColor }}
-      data-testid={`ribbon-${revision.id as string}`}
+      data-testid={`ribbon-${revision.id || 'no-id'}`}
     >
       <div className={styles.label}>
         <div className={styles.title}>

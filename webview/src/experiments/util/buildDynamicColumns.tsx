@@ -127,7 +127,8 @@ const buildAccessor: (valuePath: string[]) => Accessor<Experiment> =
     const value = get(originalRow, pathArray)
 
     if (!Array.isArray(value)) {
-      return value as unknown[]
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return value
     }
     return `[${value.join(', ')}]`
   }
@@ -169,6 +170,9 @@ const findDeepest = (
   maxDepth: number
 ) => (!depth && columns ? findMaxDepth(columns) : maxDepth)
 
+const getPreviousPlaceholderId = (id: string | undefined): string =>
+  `${id || 'no-id'}_previous_placeholder`
+
 const fixColumnsNesting = (
   columns: TableColumn<Experiment>[],
   parent?: TableColumn<Experiment>,
@@ -193,7 +197,7 @@ const fixColumnsNesting = (
         if (!column.columns) {
           ;(column as Partial<ColumnInstance<Experiment>>) = {
             Header: '',
-            id: `${column.id as string}_previous_placeholder`,
+            id: getPreviousPlaceholderId(column.id),
             parent: parent as ColumnInstance<Experiment>,
             placeholderOf: column as ColumnInstance<{}>
           }

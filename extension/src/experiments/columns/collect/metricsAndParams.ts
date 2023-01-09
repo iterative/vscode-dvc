@@ -21,6 +21,9 @@ import {
   METRIC_PARAM_SEPARATOR
 } from '../paths'
 
+export const typedEntries = (value: NonNullable<ValueTree>) =>
+  Object.entries(value) as [string, Value | ValueTree][]
+
 const collectMetricOrParam = (
   acc: ColumnAccumulator,
   type: ColumnType,
@@ -63,10 +66,7 @@ const walkValueTree = (
   tree: ValueTree,
   ancestors: string[] = []
 ) => {
-  for (const [label, value] of Object.entries(tree) as [
-    string,
-    Value | ValueTree
-  ][]) {
+  for (const [label, value] of typedEntries(tree)) {
     if (isValueTree(value)) {
       walkValueTree(acc, type, value, [...ancestors, label])
     } else {
@@ -111,10 +111,7 @@ const collectChange = (
   ancestors: string[] = []
 ) => {
   if (isValueTree(value)) {
-    for (const [childKey, childValue] of Object.entries(value) as [
-      string,
-      Value | ValueTree
-    ][]) {
+    for (const [childKey, childValue] of typedEntries(value)) {
       collectChange(changes, type, file, childKey, childValue, commitData, [
         ...ancestors,
         key
@@ -142,10 +139,7 @@ const collectFileChanges = (
     return
   }
 
-  for (const [key, value] of Object.entries(data) as [
-    string,
-    Value | ValueTree
-  ][]) {
+  for (const [key, value] of typedEntries(data)) {
     collectChange(changes, type, file, key, value, commitData)
   }
 }

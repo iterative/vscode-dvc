@@ -7,8 +7,7 @@ import { getEnterValueTitle, Title } from '../../../vscode/title'
 import { Value } from '../../../cli/dvc/contract'
 
 const standardizeValue = (value: Value): string =>
-  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-  typeof value === 'object' ? JSON.stringify(value) : `${value}`
+  typeof value === 'object' ? JSON.stringify(value) : String(value)
 
 const pickParamsToModify = (params: Param[]): Thenable<Param[] | undefined> =>
   quickPickManyValues<Param>(

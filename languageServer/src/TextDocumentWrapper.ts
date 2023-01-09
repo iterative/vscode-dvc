@@ -107,7 +107,7 @@ export class TextDocumentWrapper implements ITextDocumentWrapper {
     node: Scalar,
     [nodeStart, valueEnd, nodeEnd]: [number, number, number]
   ) {
-    const nodeValue = `${node.value as string | number}`
+    const nodeValue = String(node.value)
 
     let symbolKind: SymbolKind = SymbolKind.String
 

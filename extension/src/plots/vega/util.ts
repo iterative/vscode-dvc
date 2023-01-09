@@ -36,16 +36,20 @@ const getFacetField = (
 ): string | null => {
   const facetSpec = template as TopLevelFacetSpec
   if (facetSpec.facet) {
-    return ((facetSpec.facet as FacetFieldDef<any, any>).field ||
+    return (
+      (facetSpec.facet as FacetFieldDef<any, any>).field ||
       (facetSpec.facet as FacetMapping<any>).row?.field ||
-      (facetSpec.facet as FacetMapping<any>).column?.field) as string | null
+      (facetSpec.facet as FacetMapping<any>).column?.field
+    )
   }
 
   const unitSpec = template as TopLevelUnitSpec<any>
   if (unitSpec.encoding) {
-    return (unitSpec.encoding.facet?.field ||
+    return (
+      unitSpec.encoding.facet?.field ||
       unitSpec.encoding.row?.field ||
-      unitSpec.encoding.column?.field) as string | null
+      unitSpec.encoding.column?.field
+    )
   }
 
   return null
@@ -126,9 +130,7 @@ type EncodingUpdate = {
 const specHasVerticalLineOnHover = (
   spec: any
 ): spec is { layer: { layer: [{ encoding: Record<string, unknown> }] }[] } =>
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
   spec.layer?.[1]?.layer?.[0]?.encoding?.x &&
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   isEqual(spec.layer[1].layer[0].mark, {
     color: 'gray',
     type: 'rule'
