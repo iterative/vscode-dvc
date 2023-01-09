@@ -13,10 +13,10 @@ import {
 } from '../../../../commands/internal'
 import { gitPath } from '../../../../cli/git/constants'
 import { getGitPath } from '../../../../fileSystem'
-import { getSafeWatcherDisposer } from '../../util'
+import { getTimeSafeDisposer } from '../../util'
 
 suite('Repository Data Test Suite', () => {
-  const disposable = getSafeWatcherDisposer()
+  const disposable = getTimeSafeDisposer()
 
   beforeEach(() => {
     restore()

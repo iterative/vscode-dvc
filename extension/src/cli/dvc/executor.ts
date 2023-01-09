@@ -130,7 +130,7 @@ export class DvcExecutor extends DvcCli {
   }
 
   public queueStart(cwd: string, jobs: string) {
-    return this.executeDvcProcess(
+    return this.createBackgroundDvcProcess(
       cwd,
       Command.QUEUE,
       QueueSubCommand.START,

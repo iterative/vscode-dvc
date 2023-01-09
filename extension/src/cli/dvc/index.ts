@@ -22,12 +22,24 @@ export class DvcCli extends Cli {
   }
 
   public executeDvcProcess(cwd: string, ...args: Args): Promise<string> {
-    const options = getOptions(
+    const options = this.getOptions(cwd, ...args)
+    return this.executeProcess(options)
+  }
+
+  protected createBackgroundDvcProcess(
+    cwd: string,
+    ...args: Args
+  ): Promise<string> {
+    const options = this.getOptions(cwd, ...args)
+    return this.createBackgroundProcess(options)
+  }
+
+  private getOptions(cwd: string, ...args: Args) {
+    return getOptions(
       this.config.getPythonBinPath(),
       this.config.getCliPath(),
       cwd,
       ...args
     )
-    return this.executeProcess(options)
   }
 }

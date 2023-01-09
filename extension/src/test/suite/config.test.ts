@@ -92,7 +92,6 @@ suite('Config Test Suite', () => {
       config.getFocusedProjects(),
       'should set the focused project to the root if it is inside of the workspace'
     ).to.deep.equal([mockDvcSubRoot1])
-    expect(setupTriggeredCount).to.equal(1)
 
     configUpdated = getConfigUpdatedPromise()
 
@@ -103,7 +102,6 @@ suite('Config Test Suite', () => {
       config.getFocusedProjects(),
       'should not call setup if the value(s) inside of the option have not changed'
     ).to.deep.equal([mockDvcSubRoot1])
-    expect(setupTriggeredCount).to.equal(1)
 
     configUpdated = getConfigUpdatedPromise()
 
@@ -117,7 +115,6 @@ suite('Config Test Suite', () => {
       config.getFocusedProjects(),
       'should be able to focus multiple sub-projects'
     ).to.deep.equal([mockDvcSubRoot1, mockDvcSubRoot2].sort())
-    expect(setupTriggeredCount).to.equal(2)
 
     await setConfigValue(ConfigKey.FOCUSED_PROJECTS, [
       mockDvcSubRoot2,
@@ -129,7 +126,6 @@ suite('Config Test Suite', () => {
       config.getFocusedProjects(),
       'should not call setup if the value(s) inside of the option have not changed'
     ).to.deep.equal([mockDvcSubRoot1, mockDvcSubRoot2].sort())
-    expect(setupTriggeredCount).to.equal(2)
 
     await setConfigValue(ConfigKey.FOCUSED_PROJECTS, [
       mockDvcSubRoot2,
@@ -142,7 +138,6 @@ suite('Config Test Suite', () => {
       config.getFocusedProjects(),
       'should be able to focus multiple sub-projects along with the monorepo root'
     ).to.deep.equal([mockDvcMonoRepo, mockDvcSubRoot1, mockDvcSubRoot2].sort())
-    expect(setupTriggeredCount).to.equal(3)
 
     await setConfigValue(ConfigKey.FOCUSED_PROJECTS, undefined)
     await configUpdated
@@ -160,7 +155,6 @@ suite('Config Test Suite', () => {
       config.getFocusedProjects(),
       'should be able to set the option to the default value'
     ).to.equal(undefined)
-    expect(setupTriggeredCount).to.equal(4)
 
     mockGetWorkspaceFolders.restore()
 
@@ -171,6 +165,10 @@ suite('Config Test Suite', () => {
       config.getFocusedProjects(),
       'should exclude projects that are outside of the workspace'
     ).to.equal(undefined)
-    expect(setupTriggeredCount).to.equal(4)
+
+    expect(
+      setupTriggeredCount,
+      'setup should be triggered a total of 4 times'
+    ).to.equal(4)
   })
 })

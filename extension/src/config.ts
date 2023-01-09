@@ -3,7 +3,8 @@ import { Disposable } from '@hediet/std/disposable'
 import isEqual from 'lodash.isequal'
 import {
   getOnDidChangePythonExecutionDetails,
-  getPythonBinPath
+  getPythonBinPath,
+  isPythonExtensionInstalled
 } from './extensions/python'
 import { ConfigKey, getConfigValue, setConfigValue } from './vscode/config'
 import { DeferredDisposable } from './class/deferred'
@@ -76,6 +77,10 @@ export class Config extends DeferredDisposable {
 
   public isPythonExtensionUsed() {
     return !getConfigValue(ConfigKey.PYTHON_PATH) && !!this.pythonBinPath
+  }
+
+  public isPythonExtensionInstalled() {
+    return isPythonExtensionInstalled()
   }
 
   private async getConfigOrExtensionPythonBinPath() {

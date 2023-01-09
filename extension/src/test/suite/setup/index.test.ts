@@ -1,10 +1,16 @@
+import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { ensureFileSync, remove } from 'fs-extra'
 import { expect } from 'chai'
 import { SinonStub, restore, spy, stub } from 'sinon'
-import { QuickPickItem, commands, window } from 'vscode'
+import { QuickPickItem, Uri, commands, window, workspace } from 'vscode'
 import { buildSetup, buildSetupWithWatchers, TEMP_DIR } from './util'
-import { closeAllEditors, getMessageReceivedEmitter } from '../util'
+import {
+  closeAllEditors,
+  getMessageReceivedEmitter,
+  quickPickInitialized,
+  selectQuickPickItem
+} from '../util'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { MessageFromWebviewType } from '../../../webview/contract'
 import { Disposable } from '../../../extension'
@@ -21,6 +27,10 @@ import {
   QuickPickItemWithValue,
   QuickPickOptionsWithTitle
 } from '../../../vscode/quickPick'
+import * as Telemetry from '../../../telemetry'
+import { StopWatch } from '../../../util/time'
+import { MIN_CLI_VERSION } from '../../../cli/dvc/contract'
+import { run } from '../../../setup/runner'
 
 suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
@@ -35,7 +45,12 @@ suite('Setup Test Suite', () => {
     if (isDirectory(TEMP_DIR)) {
       void remove(TEMP_DIR)
     }
-    return closeAllEditors()
+    return Promise.all([
+      workspace
+        .getConfiguration()
+        .update(Config.ConfigKey.PYTHON_PATH, undefined, false),
+      closeAllEditors()
+    ])
   })
 
   describe('Setup', () => {
@@ -365,6 +380,129 @@ suite('Setup Test Suite', () => {
         Config.ConfigKey.FOCUSED_PROJECTS,
         mockFocusedProjects
       )
+    })
+
+    it('should set dvc.pythonPath to the picked value when the user selects to pick a Python interpreter', async () => {
+      const { config, setup, mockExecuteCommand, mockVersion } =
+        buildSetup(disposable)
+
+      mockExecuteCommand.restore()
+
+      stub(config, 'isPythonExtensionInstalled').returns(false)
+
+      mockVersion.rejects('do not initialize')
+
+      const mockShowQuickPick = stub(window, 'showQuickPick')
+      const mockUri = Uri.file(
+        resolve('file', 'picked', 'path', 'to', 'python')
+      )
+      const mockPath = mockUri.fsPath
+      stub(window, 'showOpenDialog').resolves([mockUri])
+
+      const venvQuickPickActive = quickPickInitialized(mockShowQuickPick, 0)
+
+      const quickPick = window.createQuickPick<QuickPickItemWithValue<string>>()
+      const mockCreateQuickPick = stub(window, 'createQuickPick').returns(
+        quickPick
+      )
+      const pickOneOrInputActive = new Promise(resolve => {
+        disposable.track(quickPick.onDidChangeActive(() => resolve(undefined)))
+      })
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const setupWorkspaceWizard = (setup as any).setupWorkspace()
+
+      await venvQuickPickActive
+
+      const selectVenvAndInterpreter = selectQuickPickItem(1)
+
+      await selectVenvAndInterpreter
+
+      await pickOneOrInputActive
+
+      mockCreateQuickPick.restore()
+
+      const selectToFindInterpreter = selectQuickPickItem(1)
+      await selectToFindInterpreter
+
+      await setupWorkspaceWizard
+
+      expect(config.getPythonBinPath()).to.equal(mockPath)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should send an error telemetry event when setupWorkspace fails', async () => {
+      stub(StopWatch.prototype, 'getElapsedTime').returns(0)
+
+      const { setup } = buildSetup(disposable)
+
+      const mockErrorMessage = 'NOPE'
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(setup as any, 'runWorkspace').rejects(new Error(mockErrorMessage))
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+
+      await expect(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (setup as any).setupWorkspace()
+      ).to.be.eventually.rejectedWith(Error)
+
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        `errors.${RegisteredCommands.EXTENSION_SETUP_WORKSPACE}`,
+        { error: mockErrorMessage },
+        { duration: 0 }
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should set the dvc.cli.incompatible context value', async () => {
+      const { config, mockExecuteCommand, mockRunSetup, mockVersion, setup } =
+        buildSetup(disposable, true, false, false)
+      mockRunSetup.restore()
+      stub(config, 'isPythonExtensionUsed').returns(false)
+      stub(config, 'getPythonBinPath').resolves(join('python'))
+
+      mockExecuteCommand.restore()
+      mockVersion.resetBehavior()
+      mockVersion
+        .onFirstCall()
+        .resolves('1.0.0')
+        .onSecondCall()
+        .resolves(MIN_CLI_VERSION)
+        .onThirdCall()
+        .rejects(new Error('NO CLI HERE'))
+
+      const executeCommandSpy = spy(commands, 'executeCommand')
+      await run(setup)
+
+      expect(mockVersion).to.be.calledOnce
+      expect(
+        executeCommandSpy,
+        'should set dvc.cli.incompatible to true if the version is incompatible'
+      ).to.be.calledWithExactly('setContext', 'dvc.cli.incompatible', true)
+      executeCommandSpy.resetHistory()
+
+      await run(setup)
+
+      expect(mockVersion).to.be.calledTwice
+      expect(
+        executeCommandSpy,
+        'should set dvc.cli.incompatible to false if the version is compatible'
+      ).to.be.calledWithExactly('setContext', 'dvc.cli.incompatible', false)
+
+      const mockShowWarningMessage = stub(
+        window,
+        'showWarningMessage'
+      ).resolves(undefined)
+
+      await run(setup)
+
+      expect(mockVersion).to.be.calledThrice
+      expect(
+        executeCommandSpy,
+        'should unset dvc.cli.incompatible if the CLI throws an error'
+      ).to.be.calledWithExactly('setContext', 'dvc.cli.incompatible', undefined)
+      expect(
+        mockShowWarningMessage,
+        'should warn the user if the CLI throws an error'
+      ).to.be.calledOnce
     })
   })
 })

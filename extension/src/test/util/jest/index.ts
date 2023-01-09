@@ -5,6 +5,7 @@ import { Process } from '../../../processExecution'
 
 export const getMockedProcess = (stdout: string): Process =>
   ({
+    all: { on: jest.fn() },
     on: jest.fn(),
     stdout: new Promise(resolve => resolve(stdout))
   } as unknown as Process)

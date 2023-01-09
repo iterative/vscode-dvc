@@ -8,13 +8,13 @@ import { dvcDemoPath } from '../../util'
 import {
   bypassProcessManagerDebounce,
   FIRST_TRUTHY_TIME,
-  getSafeWatcherDisposer
+  getTimeSafeDisposer
 } from '../util'
 import { SourceControlDataStatus } from '../../../repository/sourceControlManagement'
 import { makeAbsPathSet } from '../../util/path'
 
 suite('Repository Test Suite', () => {
-  const disposable = getSafeWatcherDisposer()
+  const disposable = getTimeSafeDisposer()
 
   beforeEach(() => {
     restore()

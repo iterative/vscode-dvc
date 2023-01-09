@@ -383,11 +383,17 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public pickCurrentExperiment() {
-    return pickExperiment(this.experiments.getCurrentExperiments())
+    return pickExperiment(
+      this.experiments.getCurrentExperiments(),
+      this.getFirstThreeColumnOrder()
+    )
   }
 
   public pickQueuedExperiment() {
-    return pickExperiment(this.experiments.getQueuedExperiments())
+    return pickExperiment(
+      this.experiments.getQueuedExperiments(),
+      this.getFirstThreeColumnOrder()
+    )
   }
 
   public async pickAndModifyParams(overrideId?: string) {
@@ -594,6 +600,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     const experiment = await pickExperiment(
       this.experiments.getAllExperiments(),
+      this.getFirstThreeColumnOrder(),
       Title.SELECT_BASE_EXPERIMENT
     )
 

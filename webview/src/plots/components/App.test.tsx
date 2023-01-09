@@ -1913,9 +1913,14 @@ describe('App', () => {
       ]
     }
 
-    const getPanel = (smoothPlot: HTMLElement) =>
+    const getPanel = async (smoothPlot: HTMLElement) => {
+      await waitFor(() =>
+        // eslint-disable-next-line testing-library/no-node-access
+        expect(smoothPlot.querySelector('.vega-bindings')).toBeInTheDocument()
+      )
       // eslint-disable-next-line testing-library/no-node-access
-      smoothPlot.querySelector('.vega-bindings')
+      return smoothPlot.querySelector('.vega-bindings')
+    }
 
     it('should disable a template plot from drag and drop when hovering a vega panel', async () => {
       renderAppWithOptionalData({ template: withVegaPanels })
@@ -1924,8 +1929,7 @@ describe('App', () => {
 
       await waitForVega(smoothPlot)
 
-      const panel = getPanel(smoothPlot)
-      expect(panel).toBeInTheDocument()
+      const panel = await getPanel(smoothPlot)
 
       expect(smoothPlot.draggable).toBe(true)
 
@@ -1941,8 +1945,7 @@ describe('App', () => {
 
       await waitForVega(smoothPlot)
 
-      const panel = getPanel(smoothPlot)
-      expect(panel).toBeInTheDocument()
+      const panel = await getPanel(smoothPlot)
 
       panel && fireEvent.mouseEnter(panel)
       panel && fireEvent.mouseLeave(panel)
@@ -1953,10 +1956,10 @@ describe('App', () => {
       renderAppWithOptionalData({ template: withVegaPanels })
 
       const smoothPlot = screen.getByTestId(`plot_${smoothId}`)
-
       await waitForVega(smoothPlot)
 
-      const panel = getPanel(smoothPlot) || smoothPlot
+      // eslint-disable-next-line testing-library/no-node-access
+      const panel = smoothPlot.querySelector('.vega-bindings') || smoothPlot
       expect(panel).toBeInTheDocument()
 
       const clickEvent = createEvent.click(panel)
