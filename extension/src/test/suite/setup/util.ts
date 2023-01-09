@@ -21,6 +21,7 @@ import { WorkspaceScale } from '../../../telemetry/collect'
 import { dvcDemoPath } from '../../util'
 import { Config } from '../../../config'
 import { Resource } from '../../../resourceLocator'
+import { MIN_CLI_VERSION } from '../../../cli/dvc/contract'
 
 export const TEMP_DIR = join(dvcDemoPath, 'temp-empty-watcher-dir')
 
@@ -33,7 +34,7 @@ const buildSetupDependencies = (
   const mockEvent = mockEmitter.event
 
   const mockRoot = stub().resolves(mockDvcRoot)
-  const mockVersion = stub().resolves(undefined)
+  const mockVersion = stub().resolves(MIN_CLI_VERSION)
   const mockGetGitRepositoryRoot = stub().resolves(mockGitRoot)
 
   const mockInitializeDvc = fake()

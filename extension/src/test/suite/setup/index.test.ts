@@ -460,6 +460,7 @@ suite('Setup Test Suite', () => {
       stub(config, 'getPythonBinPath').resolves(join('python'))
 
       mockExecuteCommand.restore()
+      mockVersion.resetBehavior()
       mockVersion
         .onFirstCall()
         .resolves('1.0.0')
