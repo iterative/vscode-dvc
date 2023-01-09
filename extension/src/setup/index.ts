@@ -399,9 +399,7 @@ export class Setup
       const previousCliPath = this.config.getCliPath()
       const previousPythonPath = this.config.getPythonBinPath()
 
-      const completed = await runWorkspace(() =>
-        this.config.setPythonAndNotifyIfChanged()
-      )
+      const completed = await this.runWorkspace()
       sendTelemetryEvent(
         RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
         { completed },
@@ -426,6 +424,10 @@ export class Setup
         stopWatch.getElapsedTime()
       )
     }
+  }
+
+  private runWorkspace() {
+    return runWorkspace(() => this.config.setPythonAndNotifyIfChanged())
   }
 
   private watchConfigurationDetailsForChanges() {
@@ -534,7 +536,7 @@ export class Setup
       cliAccessible: this.cliAccessible,
       dvcPathUsed: !!this.config.getCliPath(),
       dvcRootCount: this.getRoots().length,
-      msPythonInstalled: isPythonExtensionInstalled(),
+      msPythonInstalled: this.config.isPythonExtensionInstalled(),
       msPythonUsed: await this.isPythonExtensionUsed(),
       pythonPathUsed: !!this.config.getPythonBinPath(),
       workspaceFolderCount: getWorkspaceFolderCount()
