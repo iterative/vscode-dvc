@@ -1,26 +1,38 @@
+import { Experiment } from './webview/contract'
+import { getColumnPathsQuickPickDetail } from './model/util'
 import { GcPreserveFlag } from '../cli/dvc/constants'
 import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
 import { Title } from '../vscode/title'
 import { Toast } from '../vscode/toast'
 
+export type ExperimentWithName = Experiment & {
+  name?: string
+}
+
 export const pickExperiment = (
-  experiments: {
-    label: string
-    displayNameOrParent?: string
-    id: string
-    name?: string
-  }[],
+  experiments: ExperimentWithName[],
+  firstThreeColumnOrder: string[],
   title: Title = Title.SELECT_EXPERIMENT
 ): Thenable<{ id: string; name: string } | undefined> | undefined => {
   if (experiments.length === 0) {
     Toast.showError('There are no experiments to select.')
   } else {
     return quickPickValue<{ id: string; name: string }>(
-      experiments.map(({ label, displayNameOrParent, id, name }) => ({
-        description: displayNameOrParent,
-        label,
-        value: { id, name: name || label }
-      })),
+      experiments.map(experiment => {
+        const { label, id, name, displayNameOrParent } = experiment
+        return {
+          description: displayNameOrParent,
+          detail: getColumnPathsQuickPickDetail(
+            experiment,
+            firstThreeColumnOrder
+          ),
+          label,
+          value: {
+            id,
+            name: name || label
+          }
+        }
+      }),
       { matchOnDescription: true, matchOnDetail: true, title }
     )
   }
