@@ -55,8 +55,10 @@ jobs:
 
       - name: Create Pull Request
         run: |
-          echo "This PR updates the extension version and CHANGELOG.md.\n" >> body.log
-          echo "Please close and reopen this PR to run the required workflows (Required statuses must pass before merging).\n" >> body.log
+          echo "This PR updates the extension version and CHANGELOG.md." >> body.log
+          echo "" >> body.log
+          echo "Please close and reopen this PR to run the required workflows (Required statuses must pass before merging)." >> body.log
+          echo "" >> body.log
           echo "**The \`publish\` workflow will run automatically when this PR is merged.**" >> body.log
 
           cml pr create \
