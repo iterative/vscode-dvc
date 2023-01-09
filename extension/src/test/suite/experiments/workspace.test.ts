@@ -33,6 +33,7 @@ import { join } from '../../util/path'
 import { AvailableCommands } from '../../../commands/internal'
 import { GitExecutor } from '../../../cli/git/executor'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
+import { formatDate } from '../../../util/date'
 
 suite('Workspace Experiments Test Suite', () => {
   const disposable = getSafeWatcherDisposer()
@@ -502,6 +503,9 @@ suite('Workspace Experiments Test Suite', () => {
         [
           {
             description: '[exp-e7a67]',
+            detail: `Created:${formatDate(
+              '2020-12-29T15:31:52'
+            )}, loss:2.0205045, accuracy:0.37241668`,
             label: '4fb124a',
             value: {
               id: 'exp-e7a67',
@@ -510,6 +514,9 @@ suite('Workspace Experiments Test Suite', () => {
           },
           {
             description: '[test-branch]',
+            detail: `Created:${formatDate(
+              '2020-12-29T15:28:59'
+            )}, loss:1.9293040, accuracy:0.46680000`,
             label: '42b8736',
             value: {
               id: 'test-branch',
@@ -518,6 +525,9 @@ suite('Workspace Experiments Test Suite', () => {
           },
           {
             description: '[exp-83425]',
+            detail: `Created:${formatDate(
+              '2020-12-29T15:27:02'
+            )}, loss:1.7750162, accuracy:0.59265000`,
             label: '1ba7bcd',
             value: {
               id: 'exp-83425',
@@ -526,6 +536,7 @@ suite('Workspace Experiments Test Suite', () => {
           },
           {
             description: undefined,
+            detail: 'Created:-, loss:-, accuracy:-',
             label: '489fd8b',
             value: {
               id: '489fd8bdaa709f7330aac342e051a9431c625481',
@@ -534,11 +545,17 @@ suite('Workspace Experiments Test Suite', () => {
           },
           {
             description: '[exp-f13bca]',
+            detail: `Created:${formatDate(
+              '2020-12-29T15:26:36'
+            )}, loss:-, accuracy:-`,
             label: 'f0f9186',
             value: { id: 'exp-f13bca', name: 'exp-f13bca' }
           },
           {
             description: undefined,
+            detail: `Created:${formatDate(
+              '2020-12-29T15:25:27'
+            )}, loss:-, accuracy:-`,
             label: '55d492c',
             value: {
               id: '55d492c9c633912685351b32df91bfe1f9ecefb9',
