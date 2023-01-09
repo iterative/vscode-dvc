@@ -6,6 +6,7 @@ import {
   ExperimentSubCommand,
   Flag,
   GcPreserveFlag,
+  QueueRemoveFlag,
   QueueSubCommand
 } from './constants'
 import { typeCheckCommands } from '..'
@@ -26,6 +27,7 @@ export const autoRegisteredCommands = {
   MOVE: 'move',
   PULL: 'pull',
   PUSH: 'push',
+  QUEUE_REMOVE: 'queueRemove',
   QUEUE_START: 'queueStart',
   QUEUE_STOP: 'queueStop',
   REMOVE: 'remove'
@@ -127,6 +129,15 @@ export class DvcExecutor extends DvcCli {
 
   public push(cwd: string, ...args: Args) {
     return this.blockAndExecuteProcess(cwd, Command.PUSH, ...args)
+  }
+
+  public queueRemove(cwd: string, ...flags: QueueRemoveFlag[]) {
+    return this.executeDvcProcess(
+      cwd,
+      Command.QUEUE,
+      QueueSubCommand.REMOVE,
+      ...flags
+    )
   }
 
   public queueStart(cwd: string, jobs: string) {
