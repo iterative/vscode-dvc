@@ -2,7 +2,7 @@ import { QuickPickItemKind } from 'vscode'
 import omit from 'lodash.omit'
 import { ExperimentWithCheckpoints } from '.'
 import { MAX_SELECTED_EXPERIMENTS } from './status'
-import { getDataFromColumnPaths } from './util'
+import { getColumnPathsQuickPickDetail } from './util'
 import { definedAndNonEmpty } from '../../util/array'
 import {
   QuickPickItemWithValue,
@@ -11,7 +11,6 @@ import {
 import { Toast } from '../../vscode/toast'
 import { Experiment } from '../webview/contract'
 import { Title } from '../../vscode/title'
-import { truncateFromLeft } from '../../util/string'
 
 type QuickPickItemAccumulator = {
   items: QuickPickItemWithValue<Experiment | undefined>[]
@@ -25,12 +24,7 @@ const getSeparator = (experiment: Experiment) => ({
 })
 
 const getItem = (experiment: Experiment, firstThreeColumnOrder: string[]) => ({
-  detail: getDataFromColumnPaths(experiment, firstThreeColumnOrder)
-    .map(
-      ({ splitUpPath, truncatedValue: value }) =>
-        `${truncateFromLeft(splitUpPath[splitUpPath.length - 1], 15)}:${value}`
-    )
-    .join(', '),
+  detail: getColumnPathsQuickPickDetail(experiment, firstThreeColumnOrder),
   label: experiment.label,
   value: omit(experiment, 'checkpoints')
 })
