@@ -2,6 +2,7 @@ import { pickGarbageCollectionFlags, pickExperiment } from './quickPick'
 import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
 import { Toast } from '../vscode/toast'
 import { Title } from '../vscode/title'
+import { formatDate } from '../util/date'
 
 jest.mock('../vscode/quickPick')
 jest.mock('../vscode/toast')
@@ -95,6 +96,86 @@ describe('pickExperiment', () => {
     }
     mockedQuickPickValue.mockResolvedValueOnce(expectedDetails)
     const experiment = await pickExperiment(mockedExpList, [])
+    expect(experiment).toStrictEqual(expectedDetails)
+  })
+
+  it('should add columns detail to quick pick items if columns order has been provided', async () => {
+    const expectedDetails = {
+      id: mockedExp.id,
+      name: mockedExp.name
+    }
+    const mockedExpListWithColumnData = [
+      {
+        ...mockedExpList[0],
+        Created: '2022-12-02T10:48:24',
+        metrics: {
+          'summary.json': {
+            accuracy: 0.3723166584968567,
+            val_loss: 1.9979370832443237
+          }
+        }
+      },
+      {
+        ...mockedExpList[1],
+        Created: '2022-08-19T08:17:22',
+        metrics: {
+          'summary.json': {
+            accuracy: 0.4668000042438507,
+            val_loss: 1.8770883083343506
+          }
+        }
+      },
+      {
+        ...mockedExpList[2],
+        Created: '2020-12-29T15:27:01',
+        metrics: {
+          'summary.json': {
+            accuracy: 0.557449996471405,
+            val_loss: 1.7749212980270386
+          }
+        }
+      }
+    ]
+    mockedQuickPickValue.mockResolvedValueOnce(expectedDetails)
+    const experiment = await pickExperiment(mockedExpListWithColumnData, [
+      'Created',
+      'metrics:summary.json:accuracy',
+      'metrics:summary.json:val_loss'
+    ])
+
+    expect(mockedQuickPickValue).toHaveBeenCalledWith(
+      [
+        {
+          description: '[exp-0580a]',
+          detail: `Created:${formatDate(
+            mockedExpListWithColumnData[0].Created
+          )}, accuracy:0.37231666, val_loss:1.9979371`,
+          label: 'abcdefb',
+          value: { id: 'abcdefb', name: 'exp-0580a' }
+        },
+        {
+          description: '[exp-c54c4]',
+          detail: `Created:${formatDate(
+            mockedExpListWithColumnData[1].Created
+          )}, accuracy:0.46680000, val_loss:1.8770883`,
+          label: 'abcdefa',
+          value: { id: 'abcdefa', name: 'exp-c54c4' }
+        },
+        {
+          description: '[exp-054f1]',
+          detail: `Created:${formatDate(
+            mockedExpListWithColumnData[2].Created
+          )}, accuracy:0.55745000, val_loss:1.7749213`,
+          label: 'abcdef1',
+          value: { id: 'abcdef1', name: 'exp-054f1' }
+        }
+      ],
+      {
+        matchOnDescription: true,
+        matchOnDetail: true,
+        title: 'Select an Experiment'
+      }
+    )
     expect(experiment).toStrictEqual(expectedDetails)
   })
 
