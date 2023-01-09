@@ -33,6 +33,7 @@ const buildSetupDependencies = (
   const mockEvent = mockEmitter.event
 
   const mockRoot = stub().resolves(mockDvcRoot)
+  const mockVersion = stub().resolves(undefined)
   const mockGetGitRepositoryRoot = stub().resolves(mockGitRoot)
 
   const mockInitializeDvc = fake()
@@ -48,7 +49,8 @@ const buildSetupDependencies = (
     mockDvcReader: {
       onDidCompleteProcess: mockEvent,
       onDidStartProcess: mockEvent,
-      root: mockRoot
+      root: mockRoot,
+      version: mockVersion
     } as unknown as DvcReader,
     mockDvcRunner: {
       onDidCompleteProcess: mockEvent,
@@ -78,7 +80,8 @@ const buildSetupDependencies = (
     mockRunSetupWithGlobalRecheck: stub(
       Runner,
       'runWithGlobalRecheck'
-    ).resolves(undefined)
+    ).resolves(undefined),
+    mockVersion
   }
 }
 
@@ -104,7 +107,9 @@ export const buildSetup = (
     mockGetGitRepositoryRoot,
     mockInitializeDvc,
     mockInitializeGit,
-    mockInternalCommands
+    mockInternalCommands,
+    mockRunSetup,
+    mockVersion
   } = buildSetupDependencies(disposer, mockDvcRoot, mockGitRoot)
   stub(FileSystem, 'findDvcRootPaths').resolves(
     [mockDvcRoot].filter(Boolean) as string[]
@@ -146,6 +151,8 @@ export const buildSetup = (
     mockInitializeDvc,
     mockInitializeGit,
     mockOpenExperiments,
+    mockRunSetup,
+    mockVersion,
     resourceLocator,
     setup
   }
