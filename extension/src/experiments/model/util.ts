@@ -66,7 +66,7 @@ export const getDataFromColumnPaths = (
 export const getColumnPathsQuickPickDetail = (
   experiment: Experiment,
   columnPaths: string[]
-) =>
+): string =>
   getDataFromColumnPaths(experiment, columnPaths)
     .map(
       ({ splitUpPath, truncatedValue: value }) =>

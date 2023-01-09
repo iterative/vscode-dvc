@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
-import { Flag, GcPreserveFlag } from './constants'
+import { Flag, GcPreserveFlag, QueueRemoveFlag } from './constants'
 import { DvcExecutor } from './executor'
 import { CliResult, CliStarted } from '..'
 import { createProcess } from '../../processExecution'
@@ -556,6 +556,31 @@ describe('CliExecutor', () => {
 
       expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['push', relPath, '-f'],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
+  describe('queueRemove', () => {
+    it('should call createProcess with the correct parameters to remove tasks associated with the queue', async () => {
+      const cwd = __dirname
+      const stdout =
+        'Removed tasks in queue: meaty-pams, catty-mast, kacha-life'
+
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
+
+      const output = await dvcExecutor.queueRemove(
+        cwd,
+        QueueRemoveFlag.QUEUED,
+        QueueRemoveFlag.SUCCESS
+      )
+
+      expect(output).toStrictEqual(stdout)
+
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
+        args: ['queue', 'remove', '--queued', '--success'],
         cwd,
         env: mockedEnv,
         executable: 'dvc'

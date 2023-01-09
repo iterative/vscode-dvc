@@ -3,7 +3,7 @@ import {
   getShareExperimentAsBranchCommand,
   getShareExperimentAsCommitCommand
 } from '.'
-import { pickGarbageCollectionFlags } from '../quickPick'
+import { pickGarbageCollectionFlags, pickQueueRemoveFlags } from '../quickPick'
 import { WorkspaceExperiments } from '../workspace'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import {
@@ -276,6 +276,15 @@ const registerExperimentQuickPickCommands = (
     RegisteredCommands.EXPERIMENT_COLUMNS_SELECT,
     (context: Context) =>
       experiments.selectColumns(getDvcRootFromContext(context))
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.QUEUE_REMOVE,
+    () =>
+      experiments.getCwdAndQuickPickThenRun(
+        AvailableCommands.QUEUE_REMOVE,
+        pickQueueRemoveFlags
+      )
   )
 }
 
