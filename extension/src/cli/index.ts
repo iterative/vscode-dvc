@@ -151,7 +151,7 @@ export class Cli extends Disposable implements ICli {
           completed = true
         }
 
-        resolve(chunk.toString().trim())
+        resolve((chunk as Buffer).toString().trim())
         if (backgroundProcess.connected) {
           readable.destroy()
           backgroundProcess.disconnect()
