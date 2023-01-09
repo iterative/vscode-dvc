@@ -25,13 +25,13 @@ export const warnVersionIncompatible = (
   version: string,
   update: 'CLI' | 'extension'
 ): void => {
-  Toast.warnWithOptions(
+  void Toast.warnWithOptions(
     `The extension cannot initialize because you are using version ${version} of the DVC CLI. The expected version is ${MIN_CLI_VERSION} <= DVC < ${MAX_CLI_VERSION}. Please upgrade to the most recent version of the ${update} and reload this window.`
   )
 }
 
 export const warnAheadOfLatestTested = (): void => {
-  Toast.warnWithOptions(
+  void Toast.warnWithOptions(
     `The located DVC CLI is at least a minor version ahead of the latest version the extension was tested with (${LATEST_TESTED_CLI_VERSION}). This could lead to unexpected behaviour. Please upgrade to the most recent version of the extension and reload this window.`
   )
 }
@@ -68,7 +68,9 @@ const warnUserCLIInaccessibleAnywhere = async (
     setup,
     `The extension is unable to initialize. The CLI was not located using the interpreter provided by the Python extension. ${
       globalDvcVersion ? globalDvcVersion + ' is' : 'The CLI is also not'
-    } installed globally. For auto Python environment activation, ensure the correct interpreter is set. Active Python interpreter: ${binPath}.`
+    } installed globally. For auto Python environment activation, ensure the correct interpreter is set. Active Python interpreter: ${
+      binPath || 'unset'
+    }.`
   )
 }
 
@@ -84,12 +86,12 @@ const warnUser = (
     case CliCompatible.NO_BEHIND_MIN_VERSION:
       return warnVersionIncompatible(version as string, 'CLI')
     case CliCompatible.NO_CANNOT_VERIFY:
-      warnUnableToVerifyVersion()
+      void warnUnableToVerifyVersion()
       return
     case CliCompatible.NO_MAJOR_VERSION_AHEAD:
       return warnVersionIncompatible(version as string, 'extension')
     case CliCompatible.NO_NOT_FOUND:
-      warnUserCLIInaccessible(
+      void warnUserCLIInaccessible(
         setup,
         'An error was thrown when trying to access the CLI.'
       )
@@ -155,7 +157,7 @@ const tryGlobalFallbackVersion = async (
   const { cliCompatible, isAvailable, isCompatible, version } = tryGlobal
 
   if (setup.shouldWarnUserIfCLIUnavailable() && !isCompatible) {
-    warnUserCLIInaccessibleAnywhere(setup, version)
+    void warnUserCLIInaccessibleAnywhere(setup, version)
   }
   if (
     setup.shouldWarnUserIfCLIUnavailable() &&
@@ -235,5 +237,5 @@ export const recheckGlobal = async (
     return recheckGlobal(setup, run, recheckInterval)
   }
 
-  run()
+  void run()
 }

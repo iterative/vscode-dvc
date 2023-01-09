@@ -74,8 +74,8 @@ export class Cli extends Disposable implements ICli {
     try {
       const process = this.dispose.track(this.createProcess(baseEvent, options))
 
-      process.on('close', () => {
-        this.dispose.untrack(process)
+      void process.on('close', () => {
+        void this.dispose.untrack(process)
       })
 
       const { stdout, exitCode } = await process
@@ -151,7 +151,7 @@ export class Cli extends Disposable implements ICli {
           completed = true
         }
 
-        resolve(chunk.toString().trim())
+        resolve((chunk as Buffer).toString().trim())
         if (backgroundProcess.connected) {
           readable.destroy()
           backgroundProcess.disconnect()
@@ -168,7 +168,7 @@ export class Cli extends Disposable implements ICli {
     duration: number
   ) {
     const cliError = new CliError({
-      baseError: error as MaybeConsoleError,
+      baseError: error,
       options
     })
     this.processCompleted.fire({

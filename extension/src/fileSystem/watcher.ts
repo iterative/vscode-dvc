@@ -36,7 +36,7 @@ export const ignoredDotDirectories = /.*[/\\|]\.(dvc|(v)?env)[/\\|].*/
 export const createFileSystemWatcher = (
   track: (disposable: Disposable) => Disposable,
   glob: GlobPattern,
-  listener: (path: string) => void
+  listener: (path: string) => void | Promise<void>
 ): void => {
   if (typeof glob === 'string' && isDirectory(glob)) {
     throw new Error(

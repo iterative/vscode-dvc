@@ -88,10 +88,10 @@ export const executeProcess = async (
 export const processExists = (pid: number): Promise<boolean> =>
   doesProcessExists(pid)
 
-export const stopProcesses = (pids: number[]): boolean => {
+export const stopProcesses = async (pids: number[]): Promise<boolean> => {
   let allKilled = true
   for (const pid of pids) {
-    if (!processExists(pid)) {
+    if (!(await processExists(pid))) {
       allKilled = false
       continue
     }

@@ -150,7 +150,7 @@ export class DecorationProvider
     const path = uri.fsPath
 
     const decoration = decorationPriority.find(status => {
-      if (this.state[status as ScmDecorationStatus]?.has(path)) {
+      if (this.state[status]?.has(path)) {
         return status
       }
     })

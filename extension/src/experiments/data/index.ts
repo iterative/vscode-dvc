@@ -39,8 +39,8 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
       ['dvc.lock', 'dvc.yaml', 'params.yaml', DOT_DVC]
     )
 
-    this.watchExpGitRefs()
-    this.managedUpdate(QUEUED_EXPERIMENT_PATH)
+    void this.watchExpGitRefs()
+    void this.managedUpdate(QUEUED_EXPERIMENT_PATH)
   }
 
   public managedUpdate(path?: string) {

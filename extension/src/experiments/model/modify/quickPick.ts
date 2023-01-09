@@ -7,7 +7,7 @@ import { getEnterValueTitle, Title } from '../../../vscode/title'
 import { Value } from '../../../cli/dvc/contract'
 
 const standardizeValue = (value: Value): string =>
-  typeof value === 'object' ? JSON.stringify(value) : `${value}`
+  typeof value === 'object' ? JSON.stringify(value) : String(value)
 
 const pickParamsToModify = (params: Param[]): Thenable<Param[] | undefined> =>
   quickPickManyValues<Param>(

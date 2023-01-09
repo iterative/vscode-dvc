@@ -113,14 +113,16 @@ export const deleteAllExistingExperiments = async () => {
   const deleteNonWorkspaceExperiments = await workbench.executeCommand(
     'DVC: Garbage Collect Experiments'
   )
-  browser.waitUntil(() => deleteNonWorkspaceExperiments.elem.isDisplayed())
+  await browser.waitUntil(() =>
+    deleteNonWorkspaceExperiments.elem.isDisplayed()
+  )
   await browser.keys('Enter')
 
   const deleteAllNonTagExperiments = await workbench.executeCommand(
     'DVC: Garbage Collect Experiments'
   )
 
-  browser.waitUntil(() => deleteAllNonTagExperiments.elem.isDisplayed())
+  await browser.waitUntil(() => deleteAllNonTagExperiments.elem.isDisplayed())
 
   const tagOption = 'tags'
   await browser.keys([...tagOption, 'ArrowDown', 'Space', 'ArrowUp'])

@@ -58,10 +58,11 @@ suite('CLI Suite', () => {
       expect(backgroundRunning).to.be.true
 
       const killed = await new Promise(resolve =>
-        kill(backgroundPid, async error => {
+        kill(backgroundPid, error => {
           expect(!!error).to.be.false
-          const backgroundRunning = await processExists(backgroundPid)
-          expect(backgroundRunning).to.be.false
+          void processExists(backgroundPid).then(
+            backgroundRunning => expect(backgroundRunning).to.be.false
+          )
           resolve(true)
         })
       )

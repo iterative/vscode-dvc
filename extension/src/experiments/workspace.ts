@@ -56,7 +56,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
           experiments => experiments.hasCheckpoints()
         )
 
-        setContextValue(
+        void setContextValue(
           ContextKey.EXPERIMENT_CHECKPOINTS,
           workspaceHasCheckpoints
         )
@@ -187,11 +187,13 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     this.updatesPaused.fire(false)
   }
 
-  public getCwdThenReport(commandId: CommandId) {
-    const stdout = this.getCwdThenRun(commandId)
-    if (!stdout) {
+  public async getCwdThenReport(commandId: CommandId) {
+    const cwd = await this.getFocusedOrOnlyOrPickProject()
+    if (!cwd) {
       return
     }
+
+    const stdout = this.internalCommands.executeCommand(commandId, cwd)
     return Toast.showOutput(stdout)
   }
 

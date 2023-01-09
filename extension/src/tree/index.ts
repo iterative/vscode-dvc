@@ -43,10 +43,7 @@ export const createTreeView = <T>(
   })
 
 export const getRootItem = (path: string): TreeItem => {
-  const item = new TreeItem(
-    Uri.file(path),
-    TreeItemCollapsibleState.Expanded
-  ) as TreeItem
+  const item = new TreeItem(Uri.file(path), TreeItemCollapsibleState.Expanded)
   item.id = path
   item.contextValue = 'dvcRoot'
   return item

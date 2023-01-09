@@ -184,13 +184,13 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public setRevisionCollected(revisions: string[]) {
-    this.getFlattenedExperiments()
-      .filter(({ label }) => revisions.includes(label))
-      .map(({ id }) => {
-        if (this.finishedRunning[id]) {
-          delete this.finishedRunning[id]
-        }
-      })
+    for (const { id } of this.getFlattenedExperiments().filter(({ label }) =>
+      revisions.includes(label)
+    )) {
+      if (this.finishedRunning[id]) {
+        delete this.finishedRunning[id]
+      }
+    }
   }
 
   public canSelect() {
@@ -252,7 +252,9 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public removeFilters(filterIds: string[]) {
-    filterIds.map(id => this.removeFilter(id))
+    for (const id of filterIds) {
+      this.removeFilter(id)
+    }
   }
 
   public removeFilter(id: string) {
@@ -300,7 +302,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public setSelectionMode(useFilters: boolean) {
-    setContextValue(ContextKey.EXPERIMENT_FILTERS_SELECTED, useFilters)
+    void setContextValue(ContextKey.EXPERIMENT_FILTERS_SELECTED, useFilters)
     this.useFiltersForSelection = useFilters
   }
 

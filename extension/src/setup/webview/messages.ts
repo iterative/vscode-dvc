@@ -14,12 +14,12 @@ import { RegisteredCommands } from '../../commands/external'
 
 export class WebviewMessages {
   private readonly getWebview: () => BaseWebview<TSetupData> | undefined
-  private readonly initializeDvc: () => void
+  private readonly initializeDvc: () => Promise<void>
   private readonly initializeGit: () => void
 
   constructor(
     getWebview: () => BaseWebview<TSetupData> | undefined,
-    initializeDvc: () => void,
+    initializeDvc: () => Promise<void>,
     initializeGit: () => void
   ) {
     this.getWebview = getWebview
@@ -36,7 +36,7 @@ export class WebviewMessages {
     pythonBinPath: string | undefined,
     hasData: boolean | undefined
   ) {
-    this.getWebview()?.show({
+    void this.getWebview()?.show({
       canGitInitialize,
       cliCompatible,
       hasData,

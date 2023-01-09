@@ -118,7 +118,7 @@ suite('DVC Runner Test Suite', () => {
         })
       )
 
-      dvcRunner.run(cwd, text)
+      void dvcRunner.run(cwd, text)
 
       const [, output] = await Promise.all([started, eventStream])
 
@@ -137,9 +137,9 @@ suite('DVC Runner Test Suite', () => {
       await dvcRunner.run(cwd, '1', '&&', 'then', 'die')
       const process = dvcRunner.getRunningProcess()
 
-      const processCompleted = new Promise(resolve =>
-        process?.on('close', () => resolve(undefined))
-      )
+      const processCompleted = new Promise(resolve => {
+        void process?.on('close', () => resolve(undefined))
+      })
 
       await expect(process).to.eventually.be.rejectedWith(Error)
 

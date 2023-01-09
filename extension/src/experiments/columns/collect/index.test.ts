@@ -243,7 +243,7 @@ describe('collectColumns', () => {
   })
   const param = numericColumns.filter(
     column => column.type === ColumnType.PARAMS
-  ) as Column[]
+  )
   const paramWithNumbers = param.find(p => p.label === 'withNumbers') as Column
   const paramWithoutNumbers = param.find(
     p => p.label === 'withoutNumbers'
@@ -316,7 +316,7 @@ describe('collectColumns', () => {
       column =>
         column.parentPath ===
         buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml')
-    ) as Column[]
+    )
 
     expect(params?.map(({ label }) => label)).toStrictEqual([
       'one',

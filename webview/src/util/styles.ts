@@ -23,7 +23,7 @@ export const alphaToHex = (color: string, alpha: number): string => {
     .slice(-2)}`
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-return
 export const getStyleProperty = (propAsString: string) => propAsString as any
 
 export const hexToRGB = (hex: string) =>

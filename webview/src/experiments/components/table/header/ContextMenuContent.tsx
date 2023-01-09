@@ -79,6 +79,7 @@ export const getSortOptions = (
   const baseColumn = column.placeholderOf || column
   const sort = sorts.find(sort => sort.path === baseColumn.id)
 
+  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
   const sortOrder: SortOrder = possibleOrders[`${sort?.descending}`]
 
   const sortOptions = isSortable

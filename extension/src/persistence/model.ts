@@ -14,7 +14,7 @@ export class ModelWithPersistence extends DeferredDisposable {
   }
 
   protected persist(key: PersistenceKey, value: unknown) {
-    this.workspaceState.update(key + this.dvcRoot, value)
+    void this.workspaceState.update(key + this.dvcRoot, value)
   }
 
   protected revive<T>(key: PersistenceKey, defaultValue: T) {

@@ -215,6 +215,6 @@ export const runWithGlobalRecheck = async (
   await run(setup)
 
   if (!setup.getAvailable()) {
-    recheckGlobal(setup, () => run(setup), recheckInterval)
+    void recheckGlobal(setup, () => run(setup), recheckInterval)
   }
 }

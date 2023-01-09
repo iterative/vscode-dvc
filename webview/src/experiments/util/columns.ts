@@ -110,7 +110,7 @@ export const leafColumnIds: (
   column: HeaderGroup<Experiment>
 ) => string[] = column => {
   if (column.headers) {
-    return (column as HeaderGroup<Experiment>).headers.flatMap(leafColumnIds)
+    return column.headers.flatMap(leafColumnIds)
   }
 
   return [column.id]

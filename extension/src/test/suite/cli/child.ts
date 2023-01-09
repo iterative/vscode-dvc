@@ -22,4 +22,4 @@ const main = async () => {
   return delay(30000)
 }
 
-main()
+void main()

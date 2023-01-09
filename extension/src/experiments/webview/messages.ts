@@ -31,7 +31,7 @@ export class WebviewMessages {
 
   private readonly getWebview: () => BaseWebview<TableData> | undefined
   private readonly notifyChanged: () => void
-  private readonly selectColumns: () => void
+  private readonly selectColumns: () => Promise<void>
 
   constructor(
     dvcRoot: string,
@@ -40,7 +40,7 @@ export class WebviewMessages {
     checkpoints: CheckpointsModel,
     getWebview: () => BaseWebview<TableData> | undefined,
     notifyChanged: () => void,
-    selectColumns: () => void
+    selectColumns: () => Promise<void>
   ) {
     this.dvcRoot = dvcRoot
     this.experiments = experiments
@@ -53,7 +53,7 @@ export class WebviewMessages {
 
   public sendWebviewMessage() {
     const webview = this.getWebview()
-    webview?.show(this.getWebviewData())
+    void webview?.show(this.getWebviewData())
   }
 
   public handleMessageFromWebview(message: MessageFromWebview) {
@@ -184,7 +184,7 @@ export class WebviewMessages {
       return
     }
 
-    setConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT, Number(newValue))
+    void setConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT, Number(newValue))
     sendTelemetryEvent(
       EventName.VIEWS_EXPERIMENTS_TABLE_SET_MAX_HEADER_HEIGHT,
       undefined,
@@ -221,7 +221,7 @@ export class WebviewMessages {
   }
 
   private setColumnsStatus() {
-    this.selectColumns()
+    void this.selectColumns()
     sendTelemetryEvent(
       EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_COLUMNS,
       undefined,

@@ -35,7 +35,7 @@ export const recommendRedHatExtensionOnce = (): Disposable => {
       }
 
       if (isAnyDvcYaml(editor?.document.fileName)) {
-        recommendRedHatExtension()
+        void recommendRedHatExtension()
         return singleUseListener.dispose()
       }
     }
