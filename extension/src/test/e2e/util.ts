@@ -1,23 +1,14 @@
-import {
-  ChainablePromiseArray,
-  ChainablePromiseElement,
-  ElementArray,
-  Key
-} from 'webdriverio'
+import { Key } from 'webdriverio'
 import { ViewControl } from 'wdio-vscode-service'
 
-const findProgressBars = (): ChainablePromiseArray<ElementArray> =>
-  $$('.monaco-progress-container')
+const findProgressBars = () => $$('.monaco-progress-container')
 
-const findCurrentTreeItems = (): ChainablePromiseArray<ElementArray> =>
-  $$('div[role="treeitem"]')
+const findCurrentTreeItems = () => $$('div[role="treeitem"]')
 
 export const getLabel = (element: WebdriverIO.Element): Promise<string> =>
   element.getAttribute('aria-label')
 
-export const findDecorationTooltip = (
-  element: WebdriverIO.Element
-): ChainablePromiseElement<WebdriverIO.Element> =>
+export const findDecorationTooltip = (element: WebdriverIO.Element) =>
   element.$('div[title*="• DVC modified"]')
 
 export const dismissAllNotifications = async (): Promise<void> => {
