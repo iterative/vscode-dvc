@@ -30,7 +30,6 @@ module.exports = {
       // Jest tests rely on a lot of undefined globals
       files: ['**/*.test.*'],
       rules: {
-        '@typescript-eslint/no-floating-promises': 'off',
         '@typescript-eslint/no-unsafe-argument': 'off',
         '@typescript-eslint/no-unsafe-assignment': 'off',
         '@typescript-eslint/no-unsafe-member-access': 'off',

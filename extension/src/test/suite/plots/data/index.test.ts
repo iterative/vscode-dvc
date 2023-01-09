@@ -200,7 +200,7 @@ suite('Plots Data Test Suite', () => {
         )
       )
 
-      data.update()
+      void data.update()
       await data.isReady()
 
       bypassProcessManagerDebounce(mockNow)

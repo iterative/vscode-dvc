@@ -80,7 +80,7 @@ export const buildExperiments = (
 
   mockHasCheckpoints(experimentShowData)
 
-  experiments.setState(experimentShowData)
+  void experiments.setState(experimentShowData)
 
   return {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any,
@@ -157,7 +157,7 @@ export const buildSingleRepoExperiments = (disposer: SafeWatcherDisposer) => {
     resourceLocator
   )
 
-  experiments.setState(expShowFixture)
+  void experiments.setState(expShowFixture)
 
   return { messageSpy, workspaceExperiments }
 }
