@@ -23,6 +23,7 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   PlotsData,
   PlotSizeNumber,
+  PlotsType,
   Revision,
   Section,
   TemplatePlotGroup,
@@ -36,6 +37,7 @@ import {
 import { reorderObjectList } from 'dvc/src/util/array'
 import { act } from 'react-dom/test-utils'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
+import { VisualizationSpec } from 'react-vega'
 import { App } from './App'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
 import { SectionDescription } from './PlotsContainer'
@@ -1901,15 +1903,20 @@ describe('App', () => {
       plots: [
         {
           entries: [
-            ...templatePlotsFixture.plots[0].entries,
             {
-              ...templatePlotsFixture.plots[0].entries[0],
-              content: { ...smoothTemplatePlotContent },
-              id: smoothId
+              content: {
+                ...smoothTemplatePlotContent
+              } as unknown as VisualizationSpec,
+              datapoints: {
+                [EXPERIMENT_WORKSPACE_ID]:
+                  smoothTemplatePlotContent.data.values.slice(0, 10)
+              },
+              id: smoothId,
+              type: PlotsType.VEGA
             }
           ],
           group: TemplatePlotGroup.SINGLE_VIEW
-        } as TemplatePlotSection
+        }
       ]
     }
 
