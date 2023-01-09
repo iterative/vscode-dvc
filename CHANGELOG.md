@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.35] - 2023-01-09
+
+### 🚀 New Features and Enhancements
+
+- Add new stop queue action [#3054](https://github.com/iterative/vscode-dvc/pull/3054) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix filtering and add missing experiments on quick pick experiment selection [#3056](https://github.com/iterative/vscode-dvc/pull/3056) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Actions - fix newlines in PR [#3071](https://github.com/iterative/vscode-dvc/pull/3071) by [@dacbd](https://github.com/dacbd)
+
 ## [0.5.34] - 2023-01-05
 
 ### 🚀 New Features and Enhancements
