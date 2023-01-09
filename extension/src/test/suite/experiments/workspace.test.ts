@@ -15,7 +15,7 @@ import { DvcExecutor } from '../../../cli/dvc/executor'
 import {
   closeAllEditors,
   getInputBoxEvent,
-  getSafeWatcherDisposer,
+  getTimeSafeDisposer,
   mockDuration
 } from '../util'
 import { dvcDemoPath } from '../../util'
@@ -36,7 +36,7 @@ import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
 import { formatDate } from '../../../util/date'
 
 suite('Workspace Experiments Test Suite', () => {
-  const disposable = getSafeWatcherDisposer()
+  const disposable = getTimeSafeDisposer()
 
   beforeEach(() => {
     restore()
