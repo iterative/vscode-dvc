@@ -6,7 +6,8 @@ import { getColumnPathsQuickPickDetail } from './util'
 import { definedAndNonEmpty } from '../../util/array'
 import {
   QuickPickItemWithValue,
-  quickPickLimitedValues
+  quickPickLimitedValues,
+  quickPickValue
 } from '../../vscode/quickPick'
 import { Toast } from '../../vscode/toast'
 import { Experiment } from '../webview/contract'
@@ -132,4 +133,37 @@ export const pickExperiments = (
     Title.SELECT_EXPERIMENTS,
     { matchOnDescription: true, matchOnDetail: true }
   )
+}
+
+export type ExperimentWithName = Experiment & {
+  name?: string
+}
+
+export const pickExperiment = (
+  experiments: ExperimentWithName[],
+  firstThreeColumnOrder: string[],
+  title: Title = Title.SELECT_EXPERIMENT
+): Thenable<{ id: string; name: string } | undefined> | undefined => {
+  if (experiments.length === 0) {
+    void Toast.showError('There are no experiments to select.')
+  } else {
+    return quickPickValue<{ id: string; name: string }>(
+      experiments.map(experiment => {
+        const { label, id, name, displayNameOrParent } = experiment
+        return {
+          description: displayNameOrParent,
+          detail: getColumnPathsQuickPickDetail(
+            experiment,
+            firstThreeColumnOrder
+          ),
+          label,
+          value: {
+            id,
+            name: name || label
+          }
+        }
+      }),
+      { matchOnDescription: true, matchOnDetail: true, title }
+    )
+  }
 }

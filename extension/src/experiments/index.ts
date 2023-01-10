@@ -10,9 +10,8 @@ import omit from 'lodash.omit'
 import { addStarredToColumns } from './columns/like'
 import { setContextForEditorTitleIcons } from './context'
 import { ExperimentsModel } from './model'
-import { pickExperiments } from './model/quickPicks'
+import { pickExperiment, pickExperiments } from './model/quickPick'
 import { pickAndModifyParams } from './model/modify/quickPick'
-import { pickExperiment } from './quickPick'
 import {
   pickFilterToAdd,
   pickFiltersToRemove
