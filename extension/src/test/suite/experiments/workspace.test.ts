@@ -439,6 +439,54 @@ suite('Workspace Experiments Test Suite', () => {
     })
   })
 
+  describe('dvc.killExperimentsQueueTasks', () => {
+    it('should be able to kill running queue tasks', async () => {
+      const mockQueueKill = stub(DvcExecutor.prototype, 'queueKill').resolves(
+        undefined
+      )
+
+      const queueTaskId = 'exp-e7a67'
+
+      const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
+        [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
+        Thenable<QuickPickItemWithValue<{ id: string }>[] | undefined>
+      >
+
+      mockShowQuickPick.resolves([
+        {
+          value: { id: queueTaskId }
+        } as QuickPickItemWithValue<{ id: string }>
+      ])
+
+      const { experiments } = buildExperiments(disposable)
+
+      await experiments.isReady()
+
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
+
+      await commands.executeCommand(RegisteredCliCommands.QUEUE_KILL)
+
+      expect(mockShowQuickPick).to.be.calledWithExactly(
+        [
+          {
+            description: '[exp-e7a67]',
+            detail: 'Created:29 Dec 2020, loss:2.0205045, accuracy:0.37241668',
+            label: '4fb124a',
+            value: { id: queueTaskId, name: 'exp-e7a67' }
+          }
+        ],
+        {
+          canPickMany: true,
+          matchOnDescription: true,
+          matchOnDetail: true,
+          title: Title.SELECT_QUEUE_KILL
+        }
+      )
+      expect(mockQueueKill).to.be.calledOnce
+      expect(mockQueueKill).to.be.calledWithExactly(dvcDemoPath, queueTaskId)
+    })
+  })
+
   describe('dvc.removeFromExperimentsQueue', () => {
     it('should be able to remove groups of tasks from the queue', async () => {
       const mockQueueRemove = stub(
@@ -448,7 +496,7 @@ suite('Workspace Experiments Test Suite', () => {
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
         [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
-        Thenable<QuickPickItem[] | QuickPickItemWithValue<string> | undefined>
+        Thenable<QuickPickItemWithValue<string>[] | undefined>
       >
 
       mockShowQuickPick.resolves([

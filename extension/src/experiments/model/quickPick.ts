@@ -138,15 +138,21 @@ export const pickExperimentsToPlot = (
   )
 }
 
-const getExperimentItems = (
-  experiments: ExperimentWithName[],
-  firstThreeColumnOrder: string[]
-): {
+export type ExperimentWithName = Experiment & {
+  name?: string
+}
+
+type ExperimentItem = {
   description: string | undefined
   detail: string
   label: string
   value: { id: string; name: string }
-}[] =>
+}
+
+const getExperimentItems = (
+  experiments: ExperimentWithName[],
+  firstThreeColumnOrder: string[]
+): ExperimentItem[] =>
   experiments.map(experiment => {
     const { label, id, name, displayNameOrParent } = experiment
     return {
@@ -160,23 +166,30 @@ const getExperimentItems = (
     }
   })
 
-export type ExperimentWithName = Experiment & {
-  name?: string
-}
+const getQuickPickDetails = (
+  experiments: ExperimentWithName[],
+  firstThreeColumnOrder: string[],
+  title: Title
+): [
+  ExperimentItem[],
+  { matchOnDescription: boolean; matchOnDetail: boolean; title: Title }
+] => [
+  getExperimentItems(experiments, firstThreeColumnOrder),
+  { matchOnDescription: true, matchOnDetail: true, title }
+]
 
 export const pickExperiment = (
   experiments: ExperimentWithName[],
   firstThreeColumnOrder: string[],
   title: Title = Title.SELECT_EXPERIMENT
 ): Thenable<{ id: string; name: string } | undefined> | undefined => {
-  if (experiments.length === 0) {
-    void Toast.showError(noExperimentsToSelect)
-  } else {
-    return quickPickValue<{ id: string; name: string }>(
-      getExperimentItems(experiments, firstThreeColumnOrder),
-      { matchOnDescription: true, matchOnDetail: true, title }
-    )
+  if (!definedAndNonEmpty(experiments)) {
+    return Toast.showError(noExperimentsToSelect)
   }
+
+  return quickPickValue<{ id: string; name: string }>(
+    ...getQuickPickDetails(experiments, firstThreeColumnOrder, title)
+  )
 }
 
 export const pickExperiments = (
@@ -184,12 +197,10 @@ export const pickExperiments = (
   firstThreeColumnOrder: string[],
   title: Title = Title.SELECT_EXPERIMENTS
 ): Thenable<{ id: string; name: string }[] | undefined> | undefined => {
-  if (experiments.length === 0) {
-    void Toast.showError(noExperimentsToSelect)
-  } else {
-    return quickPickManyValues<{ id: string; name: string }>(
-      getExperimentItems(experiments, firstThreeColumnOrder),
-      { matchOnDescription: true, matchOnDetail: true, title }
-    )
+  if (!definedAndNonEmpty(experiments)) {
+    return Toast.showError(noExperimentsToSelect)
   }
+  return quickPickManyValues<{ id: string; name: string }>(
+    ...getQuickPickDetails(experiments, firstThreeColumnOrder, title)
+  )
 }
