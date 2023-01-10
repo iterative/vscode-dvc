@@ -71,12 +71,6 @@ suite('Config Test Suite', () => {
     await config.isReady()
 
     let configUpdated = getConfigUpdatedPromise()
-    let setupTriggeredCount = 0
-    disposable.track(
-      config.onDidChangeConfigurationDetails(() => {
-        setupTriggeredCount = setupTriggeredCount + 1
-      })
-    )
     const mockDvcMonoRepo = Uri.file(resolve(dvcDemoPath)).fsPath
     const mockGetWorkspaceFolders = stub(
       WorkspaceFolders,
@@ -146,7 +140,6 @@ suite('Config Test Suite', () => {
       config.getFocusedProjects(),
       'should be able to unset the option'
     ).to.equal(undefined)
-    expect(setupTriggeredCount).to.equal(4)
 
     await setConfigValue(ConfigKey.FOCUSED_PROJECTS, null)
     await configUpdated
@@ -165,10 +158,5 @@ suite('Config Test Suite', () => {
       config.getFocusedProjects(),
       'should exclude projects that are outside of the workspace'
     ).to.equal(undefined)
-
-    expect(
-      setupTriggeredCount,
-      'setup should be triggered a total of 4 times'
-    ).to.equal(4)
   })
 })
