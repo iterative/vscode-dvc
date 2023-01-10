@@ -11,8 +11,7 @@
     "build": "webpack --mode production",
     "test": "jest --collect-coverage",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook",
-    "chromatic": "npx chromatic --project-token fexq6zfy6",
+    "build-storybook": "build-storybook --webpack-stats-json",
     "svgr": "svgr --out-dir src/shared/components/icons --ignore-existing ../node_modules/@vscode/codicons/src/icons && svgr -d src/shared/components/icons icons/"
   },
   "main": "./index.js",
@@ -63,7 +62,6 @@
     "@types/react-virtualized": "9.21.21",
     "@types/webpack": "5.28.0",
     "@welldone-software/why-did-you-render": "7.0.1",
-    "chromatic": "6.14.0",
     "clean-webpack-plugin": "4.0.0",
     "css-loader": "6.7.3",
     "file-loader": "6.2.0",
