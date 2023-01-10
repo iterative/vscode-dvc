@@ -44,7 +44,7 @@ jobs:
           restore-keys: |
             turbo-end-to-end-${{ github.job }}-${{ github.ref_name }}-
 
-      - run: yarn run install-frozen-lockfile
+      - run: yarn install
 
       - name: Test E2E
         uses: GabrielBB/xvfb-action@v1

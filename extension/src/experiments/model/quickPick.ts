@@ -6,11 +6,15 @@ import { getColumnPathsQuickPickDetail } from './util'
 import { definedAndNonEmpty } from '../../util/array'
 import {
   QuickPickItemWithValue,
-  quickPickLimitedValues
+  quickPickLimitedValues,
+  quickPickManyValues,
+  quickPickValue
 } from '../../vscode/quickPick'
 import { Toast } from '../../vscode/toast'
 import { Experiment } from '../webview/contract'
 import { Title } from '../../vscode/title'
+
+const noExperimentsToSelect = 'There are no experiments to select.'
 
 type QuickPickItemAccumulator = {
   items: QuickPickItemWithValue<Experiment | undefined>[]
@@ -110,13 +114,13 @@ const collectItems = (
   return collectExperimentOnlyItems(experiments, firstThreeColumnOrder)
 }
 
-export const pickExperiments = (
+export const pickExperimentsToPlot = (
   experiments: ExperimentWithCheckpoints[],
   hasCheckpoints: boolean,
   firstThreeColumnOrder: string[]
 ): Promise<Experiment[] | undefined> => {
   if (!definedAndNonEmpty(experiments)) {
-    return Toast.showError('There are no experiments to select.')
+    return Toast.showError(noExperimentsToSelect)
   }
 
   const { items, selectedItems } = collectItems(
@@ -129,7 +133,84 @@ export const pickExperiments = (
     items,
     selectedItems,
     MAX_SELECTED_EXPERIMENTS,
-    Title.SELECT_EXPERIMENTS,
+    Title.SELECT_EXPERIMENTS_TO_PLOT,
     { matchOnDescription: true, matchOnDetail: true }
   )
 }
+
+export type ExperimentWithName = Experiment & {
+  name?: string
+}
+
+type ExperimentDetails = { id: string; name: string }
+type ExperimentItem = {
+  description: string | undefined
+  detail: string
+  label: string
+  value: ExperimentDetails
+}
+
+const getExperimentItems = (
+  experiments: ExperimentWithName[],
+  firstThreeColumnOrder: string[]
+): ExperimentItem[] =>
+  experiments.map(experiment => {
+    const { label, id, name, displayNameOrParent } = experiment
+    return {
+      description: displayNameOrParent,
+      detail: getColumnPathsQuickPickDetail(experiment, firstThreeColumnOrder),
+      label,
+      value: {
+        id,
+        name: name || label
+      }
+    }
+  })
+
+type QuickPickExperiment = typeof quickPickValue<ExperimentDetails>
+type QuickPickExperiments = typeof quickPickManyValues<ExperimentDetails>
+
+const pickExperimentOrExperiments = <
+  T extends QuickPickExperiment | QuickPickExperiments
+>(
+  experiments: ExperimentWithName[],
+  firstThreeColumnOrder: string[],
+  title: Title,
+  quickPick: T
+): ReturnType<T> | Promise<undefined> => {
+  if (!definedAndNonEmpty(experiments)) {
+    return Toast.showError(noExperimentsToSelect)
+  }
+
+  const items = getExperimentItems(experiments, firstThreeColumnOrder)
+
+  return quickPick(items, {
+    matchOnDescription: true,
+    matchOnDetail: true,
+    title
+  }) as ReturnType<T>
+}
+
+export const pickExperiment = (
+  experiments: ExperimentWithName[],
+  firstThreeColumnOrder: string[],
+  title: Title = Title.SELECT_EXPERIMENT
+): Thenable<ExperimentDetails | undefined> =>
+  pickExperimentOrExperiments<QuickPickExperiment>(
+    experiments,
+    firstThreeColumnOrder,
+    title,
+    quickPickValue
+  )
+
+export const pickExperiments = (
+  experiments: ExperimentWithName[],
+  firstThreeColumnOrder: string[],
+  title: Title = Title.SELECT_EXPERIMENTS
+): Thenable<ExperimentDetails[] | undefined> =>
+  pickExperimentOrExperiments<QuickPickExperiments>(
+    experiments,
+    firstThreeColumnOrder,
+    title,
+    quickPickManyValues
+  )

@@ -1,9 +1,14 @@
 import { join } from 'path'
 import { EventEmitter, Memento } from 'vscode'
+import isEmpty from 'lodash.isempty'
 import { Experiments, ModifiedExperimentAndRunCommandId } from '.'
 import { TableData } from './webview/contract'
 import { Args, DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
-import { CommandId, InternalCommands } from '../commands/internal'
+import {
+  AvailableCommands,
+  CommandId,
+  InternalCommands
+} from '../commands/internal'
 import { ResourceLocator } from '../resourceLocator'
 import { Toast } from '../vscode/toast'
 import { getInput, getPositiveIntegerInput } from '../vscode/inputBox'
@@ -129,6 +134,24 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.getRepository(dvcRoot).selectColumns()
   }
 
+  public async selectQueueTasksToKill() {
+    const cwd = await this.getFocusedOrOnlyOrPickProject()
+    if (!cwd) {
+      return
+    }
+
+    const tasks = await this.getRepository(cwd).pickQueueTasksToKill()
+
+    if (!tasks || isEmpty(tasks)) {
+      return
+    }
+    return this.runCommand(
+      AvailableCommands.QUEUE_KILL,
+      cwd,
+      ...tasks.map(({ id }) => id)
+    )
+  }
+
   public async autoApplyFilters(enable: boolean, overrideRoot?: string) {
     const dvcRoot = await this.getDvcRoot(overrideRoot)
     if (!dvcRoot) {
@@ -209,10 +232,10 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
   }
 
-  public getCwdAndQuickPickThenRun = async (
+  public async getCwdAndQuickPickThenRun(
     commandId: CommandId,
     quickPick: () => Thenable<string[] | undefined>
-  ) => {
+  ) {
     const cwd = await this.getFocusedOrOnlyOrPickProject()
     if (!cwd) {
       return

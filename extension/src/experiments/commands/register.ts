@@ -286,6 +286,11 @@ const registerExperimentQuickPickCommands = (
         pickQueueRemoveFlags
       )
   )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.QUEUE_KILL,
+    () => experiments.selectQueueTasksToKill()
+  )
 }
 
 const registerExperimentRunCommands = (

@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.36] - 2023-01-10
+
+### 🚀 New Features and Enhancements
+
+- Add first three columns to all experiment quick pick selection [#3067](https://github.com/iterative/vscode-dvc/pull/3067) by [@julieg18](https://github.com/julieg18)
+- Add remove tasks from queue command [#3073](https://github.com/iterative/vscode-dvc/pull/3073) by [@mattseddon](https://github.com/mattseddon)
+- Add kill experiments queue tasks command [#3084](https://github.com/iterative/vscode-dvc/pull/3084) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Create queue workers in background process [#3059](https://github.com/iterative/vscode-dvc/pull/3059) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Fix flaky setup tests [#3070](https://github.com/iterative/vscode-dvc/pull/3070) by [@mattseddon](https://github.com/mattseddon)
+- Fix flaky dvc.focusedProjects test [#3068](https://github.com/iterative/vscode-dvc/pull/3068) by [@mattseddon](https://github.com/mattseddon)
+- Fix flaky smooth plot panel test [#3069](https://github.com/iterative/vscode-dvc/pull/3069) by [@mattseddon](https://github.com/mattseddon)
+- Extend timeout of cross-platform-test to 25 minutes [#3074](https://github.com/iterative/vscode-dvc/pull/3074) by [@mattseddon](https://github.com/mattseddon)
+- Add @typescript-eslint/recommended-requiring-type-checking to eslint ruleset [#3063](https://github.com/iterative/vscode-dvc/pull/3063) by [@mattseddon](https://github.com/mattseddon)
+- Use Chromatic's Turbosnap functionality [#3079](https://github.com/iterative/vscode-dvc/pull/3079) by [@mattseddon](https://github.com/mattseddon)
+- Remove setup triggered count from test altogether [#3081](https://github.com/iterative/vscode-dvc/pull/3081) by [@mattseddon](https://github.com/mattseddon)
+- Only render smooth template for unit tests [#3080](https://github.com/iterative/vscode-dvc/pull/3080) by [@mattseddon](https://github.com/mattseddon)
+- Drop custom script from actions (use yarn install) [#3082](https://github.com/iterative/vscode-dvc/pull/3082) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (2.40.0) [#3085](https://github.com/iterative/vscode-dvc/pull/3085) by [@mattseddon](https://github.com/mattseddon)
+- Move pick experiments quick pick [#3083](https://github.com/iterative/vscode-dvc/pull/3083) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.35] - 2023-01-09
 
 ### 🚀 New Features and Enhancements
