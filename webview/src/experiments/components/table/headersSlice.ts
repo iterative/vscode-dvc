@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
-import { HeaderGroup } from 'react-table'
+import { HeaderGroup } from '@tanstack/react-table'
 
 export const headersSlice = createSlice({
   initialState: [] as HeaderGroup<Experiment>[],

@@ -1,21 +1,29 @@
-import React from 'react'
+import { flexRender } from '@tanstack/react-table'
+import React, { ReactNode } from 'react'
 import cx from 'classnames'
 import { ErrorTooltip } from './Errors'
 import styles from './styles.module.scss'
 import { CellProp, RowProp } from './interfaces'
 import { CellRowActionsProps, CellRowActions } from './CellRowActions'
 import { clickAndEnterProps } from '../../../util/props'
-import { cellHasChanges } from '../../util/buildDynamicColumns'
+import { CellValue } from './content/Cell'
+import { ValueWithChanges } from 'dvc/src/experiments/webview/contract'
+
+const isValueWithChanges = (raw: CellValue): raw is ValueWithChanges =>
+  typeof (raw as ValueWithChanges)?.changes === 'boolean'
+
+const cellHasChanges = (cellValue: CellValue) =>
+  isValueWithChanges(cellValue) ? cellValue.changes : false
 
 const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
-  row.canExpand ? (
+  row.getCanExpand() ? (
     <button
-      title={`${row.isExpanded ? 'Contract' : 'Expand'} Row`}
+      title={`${row.getIsExpanded() ? 'Contract' : 'Expand'} Row`}
       className={styles.rowArrowContainer}
       onClick={e => {
         e.preventDefault()
         e.stopPropagation()
-        row.toggleRowExpanded()
+        row.toggleExpanded()
       }}
       onKeyDown={e => {
         e.stopPropagation()
@@ -23,7 +31,9 @@ const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
     >
       <span
         className={
-          row.isExpanded ? styles.expandedRowArrow : styles.contractedRowArrow
+          row.getIsExpanded()
+            ? styles.expandedRowArrow
+            : styles.contractedRowArrow
         }
       />
     </button>
@@ -34,22 +44,18 @@ const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
 export const FirstCell: React.FC<
   CellProp & CellRowActionsProps & { changesIfWorkspace: boolean }
 > = ({ cell, changesIfWorkspace, ...rowActionsProps }) => {
-  const { row, isPlaceholder } = cell
+  const { row, getIsPlaceholder } = cell
   const {
     original: { error, status, label, displayNameOrParent = '' }
   } = row
   const { toggleExperiment } = rowActionsProps
 
   return (
-    <div
-      {...cell.getCellProps({
-        className: cx(styles.td, styles.experimentCell)
-      })}
-    >
+    <td className={cx(styles.experimentCell)}>
       <div className={styles.innerCell}>
         <CellRowActions status={status} {...rowActionsProps} />
         <RowExpansionButton row={row} />
-        {isPlaceholder ? null : (
+        {getIsPlaceholder() ? null : (
           <ErrorTooltip error={error}>
             <div
               className={cx(styles.experimentCellContentsContainer, {
@@ -61,12 +67,12 @@ export const FirstCell: React.FC<
                 displayNameOrParent
               ])}
             >
-              {cell.render('Cell')}
+              {flexRender(cell.column.columnDef.cell, cell.getContext())}
             </div>
           </ErrorTooltip>
         )}
       </div>
-    </div>
+    </td>
   )
 }
 
@@ -75,20 +81,18 @@ export const CellWrapper: React.FC<
     error?: string
     changes?: string[]
     cellId: string
-    children?: React.ReactNode
+    children?: ReactNode
   }
 > = ({ cell, cellId, changes }) => {
   return (
-    <div
-      {...cell.getCellProps({
-        className: cx(styles.td, {
-          [styles.workspaceChange]: changes?.includes(cell.column.id),
-          [styles.depChange]: cellHasChanges(cell.value)
-        })
+    <td
+      className={cx({
+        [styles.workspaceChange]: changes?.includes(cell.column.id),
+        [styles.depChange]: cellHasChanges(cell.getValue() as CellValue)
       })}
       data-testid={cellId}
     >
-      {cell.render('Cell')}
-    </div>
+      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+    </td>
   )
 }

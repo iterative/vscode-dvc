@@ -16,7 +16,7 @@ import {
 } from 'dvc/src/experiments/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React from 'react'
-import { TableInstance } from 'react-table'
+import { Table as TableInstance } from '@tanstack/react-table'
 import tableDataFixture from 'dvc/src/test/fixtures/expShow/base/tableData'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { Table } from './Table'

@@ -1,42 +1,40 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { Column, Row, ColumnType } from 'dvc/src/experiments/webview/contract'
 import {
-  Row as TableRow,
-  Column as TableColumn,
-  useTable,
-  useExpanded,
-  useFlexLayout,
-  useColumnOrder,
-  useResizeColumns,
+  Column,
+  Row,
+  ColumnType,
+  Experiment
+} from 'dvc/src/experiments/webview/contract'
+import {
+  ColumnDef,
+  CellContext,
+  useReactTable,
   TableState,
-  Cell
-} from 'react-table'
+  Row as TableRow,
+  getCoreRowModel,
+  HeaderContext,
+  getExpandedRowModel
+} from '@tanstack/react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { Table } from './table/Table'
 import styles from './table/styles.module.scss'
 import { AddColumns, Welcome } from './GetStarted'
 import { RowSelectionProvider } from './table/RowSelectionContext'
-import buildDynamicColumns from '../util/buildDynamicColumns'
+import { buildColumns, columnHelper } from '../util/buildColumns'
 import { sendMessage } from '../../shared/vscode'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
 import { GetStarted } from '../../shared/components/getStarted/GetStarted'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { ExperimentsState } from '../store'
 import { EXPERIMENT_COLUMN_ID } from '../util/columns'
+import { Header } from './table/content/Header'
+import { CellValue } from './table/content/Cell'
 
 const DEFAULT_COLUMN_WIDTH = 90
 const MINIMUM_COLUMN_WIDTH = 90
 
-const timeFormatter = new Intl.DateTimeFormat([], {
-  hour: '2-digit',
-  minute: '2-digit'
-})
-const dateFormatter = new Intl.DateTimeFormat([], {
-  dateStyle: 'medium'
-})
-
-const countRowsAndAddIndexes: (
+/*const countRowsAndAddIndexes: (
   rows: TableRow<Row>[],
   index?: number
 ) => number = (rows, index = 0) => {
@@ -48,33 +46,23 @@ const countRowsAndAddIndexes: (
     }
   }
   return index
-}
+}*/
 
-const ExperimentHeader = () => (
-  <div className={styles.experimentHeader}>Experiment</div>
-)
-
-const TimestampHeader = () => (
-  <div className={styles.timestampHeader}>Created</div>
-)
-
-const DateCellContents: React.FC<{ value: string }> = ({ value }) => {
-  const date = new Date(value)
-  return (
-    <span className={styles.cellContents}>
-      <div className={styles.timestampTime}>{timeFormatter.format(date)}</div>
-      <div className={styles.timestampDate}>{dateFormatter.format(date)}</div>
-    </span>
+const ExperimentHeader = (context: HeaderContext<Column, unknown>) =>
+  context.header.isPlaceholder ? (
+    ''
+  ) : (
+    <div className={styles.experimentHeader}>Experiment</div>
   )
-}
 
 const getDefaultColumnWithIndicatorsPlaceHolder = () => {
-  const experimentColumn = {
-    Cell: ({
-      row: {
-        original: { label, displayNameOrParent }
-      }
-    }: Cell<Row>) => {
+  return columnHelper.accessor(() => EXPERIMENT_COLUMN_ID, {
+    cell: (cell: CellContext<Column, CellValue>) => {
+      const {
+        row: {
+          original: { label, displayNameOrParent }
+        }
+      } = cell as unknown as CellContext<Experiment, CellValue>
       return (
         <div className={styles.experimentCellContents}>
           <span>{label}</span>
@@ -86,54 +74,47 @@ const getDefaultColumnWithIndicatorsPlaceHolder = () => {
         </div>
       )
     },
-    Header: ExperimentHeader,
-    accessor: EXPERIMENT_COLUMN_ID,
+    header: ExperimentHeader,
     id: EXPERIMENT_COLUMN_ID,
-    minWidth: 215,
-    width: 215
-  }
-  return {
-    Header: '',
-    columns: [experimentColumn],
-    id: 'id_placeholder',
-    placeholderOf: experimentColumn
-  }
+    minSize: 215,
+    size: 215
+  })
 }
 
-const getColumns = (columns: Column[]): TableColumn<Row>[] => {
+const getColumns = (columns: Column[]) => {
   const includeTimestamp = columns.some(
     ({ type }) => type === ColumnType.TIMESTAMP
   )
 
+  const timestampColumn =
+    (includeTimestamp &&
+      buildColumns(
+        [
+          {
+            path: 'Created',
+            parentPath: ColumnType.TIMESTAMP,
+            hasChildren: false,
+            label: 'Created',
+            type: ColumnType.TIMESTAMP,
+            width: 100
+          }
+        ],
+        ColumnType.TIMESTAMP
+      )) ||
+    []
+
   const builtColumns = [
     getDefaultColumnWithIndicatorsPlaceHolder(),
-    ...buildDynamicColumns(columns, ColumnType.METRICS),
-    ...buildDynamicColumns(columns, ColumnType.PARAMS),
-    ...buildDynamicColumns(columns, ColumnType.DEPS)
-  ] as TableColumn<Row>[]
-
-  if (includeTimestamp) {
-    builtColumns.splice(1, 0, {
-      Cell: ({ value }) => {
-        return (
-          <div className={styles.timestampInnerCell}>
-            {value && <DateCellContents value={value} />}
-          </div>
-        )
-      },
-      Header: TimestampHeader,
-      accessor: 'Created',
-      group: ColumnType.TIMESTAMP,
-      id: 'Created',
-      name: 'Created',
-      width: 100
-    })
-  }
+    ...timestampColumn,
+    ...buildColumns(columns, ColumnType.METRICS),
+    ...buildColumns(columns, ColumnType.PARAMS),
+    ...buildColumns(columns, ColumnType.DEPS)
+  ]
 
   return builtColumns
 }
 
-const reportResizedColumn = (state: TableState<Row>) => {
+/*const reportResizedColumn = (state: TableState<Row>) => {
   const id = state.columnResizing.isResizingColumn
   if (id) {
     const width = state.columnResizing.columnWidths[id]
@@ -142,11 +123,11 @@ const reportResizedColumn = (state: TableState<Row>) => {
       type: MessageFromWebviewType.RESIZE_COLUMN
     })
   }
-}
+}*/
 
-const defaultColumn: Partial<TableColumn<Row>> = {
-  minWidth: MINIMUM_COLUMN_WIDTH,
-  width: DEFAULT_COLUMN_WIDTH
+const defaultColumn: Partial<ColumnDef<Row>> = {
+  minSize: MINIMUM_COLUMN_WIDTH,
+  size: DEFAULT_COLUMN_WIDTH
 }
 
 export const ExperimentsTable: React.FC = () => {
@@ -157,13 +138,17 @@ export const ExperimentsTable: React.FC = () => {
     hasColumns,
     rows: data
   } = useSelector((state: ExperimentsState) => state.tableData)
+
+  const [expanded, setExpanded] = useState({})
+
   const columns = getColumns(columnsData)
   const initialState = {
     columnOrder,
     columnResizing: {
       columnWidths
-    }
-  } as Partial<TableState<Row>>
+    },
+    expanded
+  } as Partial<TableState>
 
   const getRowId = useCallback(
     (experiment: Row, relativeIndex: number, parent?: TableRow<Row>) =>
@@ -171,19 +156,25 @@ export const ExperimentsTable: React.FC = () => {
     []
   )
 
-  const instance = useTable<Row>(
+  const instance = useReactTable<Row>(
     {
-      autoResetExpanded: false,
-      autoResetHiddenColumns: false,
-      autoResetResize: false,
+      autoResetAll: false,
+      columnResizeMode: 'onChange',
       columns,
       data,
       defaultColumn,
-      expandSubRows: false,
+      getCoreRowModel: getCoreRowModel(),
       getRowId,
-      initialState
-    },
-    hooks => {
+      //initialState,
+      onExpandedChange: setExpanded,
+      getSubRows: row => row.subRows,
+      getExpandedRowModel: getExpandedRowModel(),
+      state: {
+        columnOrder,
+        expanded
+      }
+    }
+    /*hooks => {
       hooks.stateReducers.push((state, action) => {
         if (action.type === 'columnStartResizing') {
           document.body.classList.add(styles.isColumnResizing)
@@ -207,7 +198,7 @@ export const ExperimentsTable: React.FC = () => {
           expandedRowCount
         })
       })
-    }
+    }*/
   )
 
   const { toggleAllRowsExpanded } = instance

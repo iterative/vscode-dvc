@@ -1,4 +1,10 @@
-import React, { useRef, useState, CSSProperties } from 'react'
+import React, {
+  useRef,
+  useState,
+  CSSProperties,
+  useContext,
+  useCallback
+} from 'react'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import styles from './styles.module.scss'
@@ -8,9 +14,12 @@ import { RowSelectionContext } from './RowSelectionContext'
 import { TableBody } from './TableBody'
 import { useClickOutside } from '../../../shared/hooks/useClickOutside'
 import { ExperimentsState } from '../../store'
+import { Indicators } from './Indicators'
+import { getSelectedForPlotsCount } from '../../util/rows'
 
 export const Table: React.FC<InstanceProp> = ({ instance }) => {
-  const { getTableProps, rows, flatRows } = instance
+  const { rows, flatRows } = instance.getRowModel()
+
   const hasCheckpoints = useSelector(
     (state: ExperimentsState) => state.tableData.hasCheckpoints
   )
@@ -19,19 +28,19 @@ export const Table: React.FC<InstanceProp> = ({ instance }) => {
   )
 
   const { clearSelectedRows, batchSelection, lastSelectedRow } =
-    React.useContext(RowSelectionContext)
+    useContext(RowSelectionContext)
   const [expColumnNeedsShadow, setExpColumnNeedsShadow] = useState(false)
   const [tableHeadHeight, setTableHeadHeight] = useState(55)
 
-  const tableRef = useRef<HTMLDivElement>(null)
+  const tableRef = useRef<HTMLTableElement>(null)
 
-  const clickOutsideHandler = React.useCallback(() => {
+  const clickOutsideHandler = useCallback(() => {
     clearSelectedRows?.()
   }, [clearSelectedRows])
 
   useClickOutside(tableRef, clickOutsideHandler)
 
-  const batchRowSelection = React.useCallback(
+  const batchRowSelection = useCallback(
     ({ row: { id } }: RowProp) => {
       const lastSelectedRowId = lastSelectedRow?.row.id ?? ''
       const lastIndex =
@@ -42,7 +51,7 @@ export const Table: React.FC<InstanceProp> = ({ instance }) => {
       const rangeEnd = Math.max(lastIndex, selectedIndex)
 
       const collapsedIds = flatRows
-        .filter(flatRow => !flatRow.isExpanded)
+        .filter(flatRow => !flatRow.getIsExpanded())
         .map(flatRow => flatRow.id)
 
       const batch = flatRows
@@ -60,18 +69,15 @@ export const Table: React.FC<InstanceProp> = ({ instance }) => {
     [flatRows, batchSelection, lastSelectedRow]
   )
 
+  const selectedForPlotsCount = getSelectedForPlotsCount(rows)
+
   return (
     <div
       className={styles.tableContainer}
       style={{ '--table-head-height': `${tableHeadHeight}px` } as CSSProperties}
     >
-      <div
-        {...getTableProps({
-          className: cx(
-            styles.table,
-            expColumnNeedsShadow && styles.withExpColumnShadow
-          )
-        })}
+      <table
+        className={cx(expColumnNeedsShadow && styles.withExpColumnShadow)}
         ref={tableRef}
         tabIndex={0}
         role="tree"
@@ -99,7 +105,8 @@ export const Table: React.FC<InstanceProp> = ({ instance }) => {
             batchRowSelection={batchRowSelection}
           />
         ))}
-      </div>
+      </table>
+      <Indicators selectedForPlotsCount={selectedForPlotsCount} />
     </div>
   )
 }

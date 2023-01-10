@@ -2,13 +2,6 @@ import React, { SyntheticEvent } from 'react'
 import cx from 'classnames'
 import get from 'lodash/get'
 import {
-  Column as TableColumn,
-  Accessor,
-  ColumnGroup,
-  ColumnInstance,
-  Cell
-} from 'react-table'
-import {
   Experiment,
   Column,
   ValueWithChanges
@@ -22,8 +15,16 @@ import styles from '../components/table/styles.module.scss'
 import { CopyButton } from '../../shared/components/copyButton/CopyButton'
 import { OverflowHoverTooltip } from '../components/overflowHoverTooltip/OverflowHoverTooltip'
 import { ErrorTooltip } from '../components/table/Errors'
+import {
+  createColumnHelper,
+  AccessorFn,
+  ColumnDef,
+  Column as TableColumn,
+  Cell
+} from '@tanstack/react-table'
+const a = 1
 
-export type CellValue = Value | ValueWithChanges
+/*export type CellValue = Value | ValueWithChanges
 
 export const isValueWithChanges = (raw: CellValue): raw is ValueWithChanges =>
   typeof (raw as ValueWithChanges)?.changes === 'boolean'
@@ -124,7 +125,7 @@ const Header: React.FC<{ column: TableColumn<Experiment> }> = ({
   )
 }
 
-const buildAccessor: (valuePath: string[]) => Accessor<Experiment> =
+const buildAccessor: (valuePath: string[]) => AccessorFn<Column> =
   pathArray => originalRow => {
     const value = get(originalRow, pathArray)
 
@@ -134,16 +135,37 @@ const buildAccessor: (valuePath: string[]) => Accessor<Experiment> =
     return `[${value.join(', ')}]`
   }
 
+const columnHelper = createColumnHelper<Column>()
+
 const buildDynamicColumns = (
   properties: Column[],
   parentPath: string
-): TableColumn<Experiment>[] =>
+): ColumnDef<Column>[] =>
   properties
     .filter(column => column.parentPath === parentPath)
     .map(data => {
+      //return columnHelper.accessor()
       const { path, type, pathArray, label } = data
 
       const childColumns = buildDynamicColumns(properties, path)
+
+      if (childColumns.length > 0) {
+        return columnHelper.group({
+          header: Header,
+          id: path,
+          columns: childColumns
+          //cell: Cell
+        })
+      }
+
+      if (pathArray) {
+        return columnHelper.accessor(buildAccessor(pathArray), {
+          header: Header,
+          id: path
+        })
+      }
+
+      return columnHelper.display({ header: Header, id: path })
 
       return {
         Cell,
@@ -216,4 +238,4 @@ const fixColumnsNesting = (
 const buildColumns = (properties: Column[], parentPath: string) =>
   fixColumnsNesting(buildDynamicColumns(properties, parentPath))
 
-export default buildColumns
+export default buildColumns*/

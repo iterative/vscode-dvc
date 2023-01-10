@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
-import { join } from 'dvc/src/test/util/path'
+/*import { join } from 'dvc/src/test/util/path'
 import { ColumnGroup } from 'react-table'
 import { Experiment, ColumnType } from 'dvc/src/experiments/webview/contract'
 import deeplyNestedColumnsFixture from 'dvc/src/test/fixtures/expShow/deeplyNested/columns'
@@ -634,4 +634,4 @@ describe('buildDynamicColumns', () => {
       }
     ])
   })
-})
+})*/

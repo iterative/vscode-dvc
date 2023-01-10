@@ -1,5 +1,5 @@
 import { Experiment } from 'dvc/src/experiments/webview/contract'
-import { Row } from 'react-table'
+import { Row } from '@tanstack/react-table'
 
 const addToSelected = (
   selectedForPlotsCount: number,

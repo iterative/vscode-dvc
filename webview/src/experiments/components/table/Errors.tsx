@@ -1,11 +1,11 @@
-import React from 'react'
+import React, { ReactElement } from 'react'
 import styles from './styles.module.scss'
 import { Error } from '../../../shared/components/icons'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
 
 export const ErrorTooltip: React.FC<{
   error?: string
-  children: React.ReactElement
+  children: ReactElement
 }> = ({ children, error }) => (
   <Tooltip
     content={

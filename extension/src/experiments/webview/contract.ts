@@ -72,6 +72,7 @@ export interface Column extends ColumnAggregateData {
   pathArray?: string[]
   type: ColumnType
   types?: string[]
+  width?: number
 }
 
 export type TableData = {

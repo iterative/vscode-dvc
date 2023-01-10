@@ -1,4 +1,4 @@
-import React, { MouseEventHandler } from 'react'
+import React, { MouseEventHandler, ReactElement } from 'react'
 import cx from 'classnames'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
 import {
@@ -33,10 +33,10 @@ export type CellRowActionProps = {
   tooltipOffset?: [number, number]
   showSubRowStates: boolean
   subRowsAffected: number
-  children: React.ReactElement
+  children: ReactElement
   hidden?: boolean
   testId?: string
-  tooltipContent: string | React.ReactElement
+  tooltipContent: string | ReactElement
   queued?: boolean
   onClick?: MouseEventHandler
 }

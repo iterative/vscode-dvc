@@ -27,9 +27,7 @@ export const RowSelectionProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const toggleRowSelected = (rowProp: RowProp) => {
     const {
-      row: {
-        values: { id }
-      }
+      row: { id }
     } = rowProp
     setSelectedRows({
       ...selectedRows,
@@ -43,22 +41,14 @@ export const RowSelectionProvider: React.FC<{ children: React.ReactNode }> = ({
 
     for (const rowProp of batch) {
       const {
-        row: {
-          values: { id }
-        }
+        row: { id }
       } = rowProp
       selectedRowsCopy[id] = rowProp
     }
 
     setSelectedRows(selectedRowsCopy)
     setSelectionHistory([
-      ...batch.map(
-        ({
-          row: {
-            values: { id }
-          }
-        }) => id
-      ),
+      ...batch.map(({ row: { id } }) => id),
       ...selectionHistory
     ])
   }

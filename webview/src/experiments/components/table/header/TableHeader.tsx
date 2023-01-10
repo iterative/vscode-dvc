@@ -1,15 +1,13 @@
 import { Experiment, Column } from 'dvc/src/experiments/webview/contract'
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { HeaderGroup } from 'react-table'
+import { Header } from '@tanstack/react-table'
 import { TableHeaderCell } from './TableHeaderCell'
 import { ExperimentsState } from '../../../store'
 import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
 
 interface TableHeaderProps {
-  column: HeaderGroup<Experiment> & { originalId?: string }
-  columns: HeaderGroup<Experiment>[]
-  orderedColumns: Column[]
+  header: Header<Experiment, unknown>
   onDragEnter: DragFunction
   onDragEnd: DragFunction
   onDragStart: DragFunction
@@ -20,9 +18,7 @@ interface TableHeaderProps {
 }
 
 export const TableHeader: React.FC<TableHeaderProps> = ({
-  column,
-  columns,
-  orderedColumns,
+  header,
   onDragEnter,
   onDragEnd,
   onDragStart,
@@ -33,13 +29,11 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
 }) => {
   const { filters } = useSelector((state: ExperimentsState) => state.tableData)
 
-  const hasFilter = !!(column.id && filters.includes(column.id))
+  const hasFilter = !!(header.id && filters.includes(header.id))
 
   return (
     <TableHeaderCell
-      column={column}
-      columns={columns}
-      orderedColumns={orderedColumns}
+      header={header}
       hasFilter={hasFilter}
       onDragEnter={onDragEnter}
       onDragEnd={onDragEnd}

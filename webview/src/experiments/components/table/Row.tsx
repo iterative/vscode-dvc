@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useContext, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import {
@@ -76,15 +76,15 @@ export const RowContent: React.FC<
     (state: ExperimentsState) => state.tableData.changes
   )
   const {
-    getRowProps,
-    cells: [firstCell, ...cells],
+    getVisibleCells,
     original,
-    flatIndex,
-    isExpanded,
+    index,
+    getIsExpanded,
     subRows,
     depth,
-    values: { id }
+    id
   } = row
+  const [firstCell, ...cells] = getVisibleCells()
   const { displayColor, error, starred } = original
   const isWorkspace = id === EXPERIMENT_WORKSPACE_ID
   const changesIfWorkspace = isWorkspace ? changes : undefined
@@ -103,12 +103,11 @@ export const RowContent: React.FC<
       })
   }
 
-  const { toggleRowSelected, selectedRows } =
-    React.useContext(RowSelectionContext)
+  const { toggleRowSelected, selectedRows } = useContext(RowSelectionContext)
 
   const isRowSelected = !!selectedRows[id]
 
-  const toggleRowSelection = React.useCallback<HandlerFunc<HTMLElement>>(
+  const toggleRowSelection = useCallback<HandlerFunc<HTMLElement>>(
     args => {
       if (!isWorkspace) {
         if (args?.mouse?.shiftKey) {
@@ -121,13 +120,13 @@ export const RowContent: React.FC<
     [row, toggleRowSelected, isWorkspace, batchRowSelection]
   )
 
-  const subRowStates = React.useMemo(() => {
+  const subRowStates = useMemo(() => {
     const stars = subRows?.filter(subRow => subRow.original.starred).length ?? 0
     const plotSelections =
       subRows?.filter(subRow => subRow.original.selected).length ?? 0
 
     const selections =
-      subRows?.filter(subRow => selectedRows[subRow.values.id]).length ?? 0
+      subRows?.filter(subRow => selectedRows[subRow.id]).length ?? 0
 
     return {
       plotSelections,
@@ -139,64 +138,64 @@ export const RowContent: React.FC<
   const [menuActive, setMenuActive] = useState<boolean>(false)
 
   return (
-    <ContextMenu
-      disabled={contextMenuDisabled}
-      onShow={() => {
-        setMenuActive(true)
-      }}
-      onHide={() => {
-        setMenuActive(false)
-      }}
-      content={
-        <RowContextMenu
-          row={row}
-          projectHasCheckpoints={projectHasCheckpoints}
-          hasRunningExperiment={hasRunningExperiment}
-        />
-      }
-    >
-      <div
-        {...getRowProps({
-          className: getRowClassNames(
+    <>
+      <ContextMenu
+        disabled={contextMenuDisabled}
+        onShow={() => {
+          setMenuActive(true)
+        }}
+        onHide={() => {
+          setMenuActive(false)
+        }}
+        content={
+          <RowContextMenu
+            row={row}
+            projectHasCheckpoints={projectHasCheckpoints}
+            hasRunningExperiment={hasRunningExperiment}
+          />
+        }
+      >
+        <tr
+          className={getRowClassNames(
             original,
-            flatIndex,
+            index,
             menuActive,
             isRowSelected,
             isWorkspace,
             className
-          )
-        })}
-        tabIndex={0}
-        role="row"
-        aria-selected={isRowSelected}
-        data-testid={isWorkspace && 'workspace-row'}
-      >
-        <FirstCell
-          cell={firstCell}
-          changesIfWorkspace={!!changesIfWorkspace?.length}
-          bulletColor={displayColor}
-          starred={starred}
-          isRowSelected={isRowSelected}
-          isWorkspace={isWorkspace}
-          showSubRowStates={!isExpanded && depth > 0}
-          subRowStates={subRowStates}
-          toggleExperiment={toggleExperiment}
-          toggleRowSelection={toggleRowSelection}
-          toggleStarred={toggleStarred}
-        />
-        {cells.map(cell => {
-          const cellId = `${cell.column.id}___${cell.row.id}`
-          return (
-            <CellWrapper
-              cell={cell}
-              changes={changesIfWorkspace}
-              error={error}
-              key={cellId}
-              cellId={cellId}
-            />
-          )
-        })}
-      </div>
-    </ContextMenu>
+          )}
+          tabIndex={0}
+          role="row"
+          aria-selected={isRowSelected}
+          data-testid={isWorkspace && 'workspace-row'}
+        >
+          <FirstCell
+            cell={firstCell}
+            changesIfWorkspace={!!changesIfWorkspace?.length}
+            bulletColor={displayColor}
+            starred={starred}
+            isRowSelected={isRowSelected}
+            isWorkspace={isWorkspace}
+            showSubRowStates={!getIsExpanded() && depth > 0}
+            subRowStates={subRowStates}
+            toggleExperiment={toggleExperiment}
+            toggleRowSelection={toggleRowSelection}
+            toggleStarred={toggleStarred}
+          />
+          {cells.map(cell => {
+            const cellId = `${cell.column.id}___${cell.row.id}`
+            return (
+              <CellWrapper
+                cell={cell}
+                changes={changesIfWorkspace}
+                error={error}
+                key={cellId}
+                cellId={cellId}
+              />
+            )
+          })}
+        </tr>
+      </ContextMenu>
+    </>
   )
 }

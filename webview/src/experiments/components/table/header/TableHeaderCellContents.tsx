@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
 import { ColumnType, Experiment } from 'dvc/src/experiments/webview/contract'
-import { HeaderGroup } from 'react-table'
+import { flexRender, Header } from '@tanstack/react-table'
 import { SortOrder } from './ContextMenuContent'
 import styles from '../styles.module.scss'
 import {
@@ -30,7 +30,7 @@ const getIconMenuItems = (
 
 export const ColumnDragHandle: React.FC<{
   disabled: boolean
-  column: HeaderGroup<Experiment>
+  header: Header<Experiment, unknown>
   onDragEnter: DragFunction
   onDragStart: DragFunction
   onDrop: DragFunction
@@ -38,7 +38,7 @@ export const ColumnDragHandle: React.FC<{
   onDragLeave: DragFunction
 }> = ({
   disabled,
-  column,
+  header,
   onDragEnter,
   onDragStart,
   onDragEnd,
@@ -53,7 +53,7 @@ export const ColumnDragHandle: React.FC<{
       tabIndex={0}
     >
       <Draggable
-        id={column.id}
+        id={header.id}
         disabled={disabled}
         onDragEnter={onDragEnter}
         onDragStart={onDragStart}
@@ -61,14 +61,16 @@ export const ColumnDragHandle: React.FC<{
         onDrop={onDrop}
         onDragLeave={onDragLeave}
       >
-        <span>{column?.render('Header')}</span>
+        <span>
+          {flexRender(header.column.columnDef.header, header.getContext())}
+        </span>
       </Draggable>
     </span>
   )
 }
 
 export const TableHeaderCellContents: React.FC<{
-  column: HeaderGroup<Experiment>
+  header: Header<Experiment, unknown>
   sortOrder: SortOrder
   sortEnabled: boolean
   hasFilter: boolean
@@ -83,7 +85,7 @@ export const TableHeaderCellContents: React.FC<{
   setMenuSuppressed: (menuSuppressed: boolean) => void
   resizerHeight: string
 }> = ({
-  column,
+  header,
   sortEnabled,
   sortOrder,
   hasFilter,
@@ -99,11 +101,12 @@ export const TableHeaderCellContents: React.FC<{
   resizerHeight
 }) => {
   const [isResizing, setIsResizing] = useState(false)
-  const isTimestamp = column.group === ColumnType.TIMESTAMP
+  const isTimestamp = header.headerGroup.id === ColumnType.TIMESTAMP
+  const columnIsResizing = header.column.getIsResizing()
 
   useEffect(() => {
-    setIsResizing(column.isResizing)
-  }, [column.isResizing])
+    setIsResizing(columnIsResizing)
+  }, [columnIsResizing])
 
   return (
     <>
@@ -112,14 +115,14 @@ export const TableHeaderCellContents: React.FC<{
       >
         <IconMenu
           items={getIconMenuItems(
-            sortEnabled && !column.placeholderOf,
+            sortEnabled && !header.isPlaceholder,
             sortOrder,
             hasFilter
           )}
         />
       </div>
       <ColumnDragHandle
-        column={column}
+        header={header}
         disabled={!isDraggable || menuSuppressed}
         onDragEnter={onDragEnter}
         onDragStart={onDragStart}
@@ -129,7 +132,6 @@ export const TableHeaderCellContents: React.FC<{
       />
       {canResize && (
         <div
-          {...column.getResizerProps()}
           onMouseEnter={() => setMenuSuppressed(true)}
           onMouseLeave={() => setMenuSuppressed(false)}
           className={cx(styles.columnResizer, isResizing && styles.isResizing)}
