@@ -31,6 +31,7 @@ import { collectFlatExperimentParams } from './modify/collect'
 import {
   Experiment,
   isQueued,
+  isRunning,
   Row,
   RunningExperiment
 } from '../webview/contract'
@@ -390,6 +391,12 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public getQueuedExperiments() {
     return this.splitExperimentsByQueued(true)
+  }
+
+  public getRunningQueueTasks() {
+    return this.getFlattenedExperiments().filter(
+      ({ status, executor }) => isRunning(status) && executor === 'dvc-task'
+    )
   }
 
   public getCheckpointsWithType(
