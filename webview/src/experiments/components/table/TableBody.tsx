@@ -86,7 +86,7 @@ export const TableBody: React.FC<
   ) : (
     <>
       {row.index === 2 && (
-        <div className={cx(styles.tr, styles.otherCommitsRow)} role="row">
+        <div className={cx(styles.tr, styles.pastCommitsRow)} role="row">
           <div
             role="columnheader"
             className={styles.th}
