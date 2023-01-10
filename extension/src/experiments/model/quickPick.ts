@@ -142,11 +142,12 @@ export type ExperimentWithName = Experiment & {
   name?: string
 }
 
+type ExperimentDetails = { id: string; name: string }
 type ExperimentItem = {
   description: string | undefined
   detail: string
   label: string
-  value: { id: string; name: string }
+  value: ExperimentDetails
 }
 
 const getExperimentItems = (
@@ -166,41 +167,50 @@ const getExperimentItems = (
     }
   })
 
-const getQuickPickDetails = (
+type QuickPickExperiment = typeof quickPickValue<ExperimentDetails>
+type QuickPickExperiments = typeof quickPickManyValues<ExperimentDetails>
+
+const pickExperimentOrExperiments = <
+  T extends QuickPickExperiment | QuickPickExperiments
+>(
   experiments: ExperimentWithName[],
   firstThreeColumnOrder: string[],
-  title: Title
-): [
-  ExperimentItem[],
-  { matchOnDescription: boolean; matchOnDetail: boolean; title: Title }
-] => [
-  getExperimentItems(experiments, firstThreeColumnOrder),
-  { matchOnDescription: true, matchOnDetail: true, title }
-]
+  title: Title,
+  quickPick: T
+): ReturnType<T> | Promise<undefined> => {
+  if (!definedAndNonEmpty(experiments)) {
+    return Toast.showError(noExperimentsToSelect)
+  }
+
+  const items = getExperimentItems(experiments, firstThreeColumnOrder)
+
+  return quickPick(items, {
+    matchOnDescription: true,
+    matchOnDetail: true,
+    title
+  }) as ReturnType<T>
+}
 
 export const pickExperiment = (
   experiments: ExperimentWithName[],
   firstThreeColumnOrder: string[],
   title: Title = Title.SELECT_EXPERIMENT
-): Thenable<{ id: string; name: string } | undefined> | undefined => {
-  if (!definedAndNonEmpty(experiments)) {
-    return Toast.showError(noExperimentsToSelect)
-  }
-
-  return quickPickValue<{ id: string; name: string }>(
-    ...getQuickPickDetails(experiments, firstThreeColumnOrder, title)
+): Thenable<ExperimentDetails | undefined> =>
+  pickExperimentOrExperiments<QuickPickExperiment>(
+    experiments,
+    firstThreeColumnOrder,
+    title,
+    quickPickValue
   )
-}
 
 export const pickExperiments = (
   experiments: ExperimentWithName[],
   firstThreeColumnOrder: string[],
   title: Title = Title.SELECT_EXPERIMENTS
-): Thenable<{ id: string; name: string }[] | undefined> | undefined => {
-  if (!definedAndNonEmpty(experiments)) {
-    return Toast.showError(noExperimentsToSelect)
-  }
-  return quickPickManyValues<{ id: string; name: string }>(
-    ...getQuickPickDetails(experiments, firstThreeColumnOrder, title)
+): Thenable<ExperimentDetails[] | undefined> =>
+  pickExperimentOrExperiments<QuickPickExperiments>(
+    experiments,
+    firstThreeColumnOrder,
+    title,
+    quickPickManyValues
   )
-}
