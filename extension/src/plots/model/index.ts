@@ -291,11 +291,11 @@ export class PlotsModel extends ModelWithPersistence {
       currentRevisions.includes(revision)
     )
 
-    currentRevisions.map(revision => {
+    for (const revision of currentRevisions) {
       if (!this.comparisonOrder.includes(revision)) {
         this.comparisonOrder.push(revision)
       }
-    })
+    }
 
     this.persist(PersistenceKey.PLOT_COMPARISON_ORDER, this.comparisonOrder)
   }

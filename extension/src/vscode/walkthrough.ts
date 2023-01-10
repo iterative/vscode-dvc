@@ -41,9 +41,12 @@ export const showWalkthroughOnFirstUse = async (
   )
 
   if (response === Response.SHOW) {
-    commands.executeCommand(RegisteredCommands.EXTENSION_GET_STARTED)
+    void commands.executeCommand(RegisteredCommands.EXTENSION_GET_STARTED)
   }
   if (response === Response.NEVER) {
-    setUserConfigValue(ConfigKey.DO_NOT_SHOW_WALKTHROUGH_AFTER_INSTALL, true)
+    void setUserConfigValue(
+      ConfigKey.DO_NOT_SHOW_WALKTHROUGH_AFTER_INSTALL,
+      true
+    )
   }
 }

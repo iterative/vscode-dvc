@@ -14,8 +14,8 @@ const compareExperimentsByPath = (
   a: Experiment,
   b: Experiment
 ): number => {
-  const valueA = get(a, path)
-  const valueB = get(b, path)
+  const valueA = get(a, path) as string | number
+  const valueB = get(b, path) as string | number
   if (valueA === valueB) {
     return 0
   }

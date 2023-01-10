@@ -80,7 +80,7 @@ export abstract class BaseData<
               isSameOrChild(relPath, watchedRelPath)
           )
         ) {
-          this.managedUpdate(path)
+          void this.managedUpdate(path)
         }
       }
     )

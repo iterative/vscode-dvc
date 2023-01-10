@@ -122,7 +122,7 @@ suite('Plots Test Suite', () => {
       )
 
       bypassProcessManagerDebounce(mockNow)
-      experiments.setState(updatedExpShowFixture)
+      void experiments.setState(updatedExpShowFixture)
 
       await dataUpdateEvent
 
@@ -163,7 +163,7 @@ suite('Plots Test Suite', () => {
       )
 
       bypassProcessManagerDebounce(mockNow)
-      experiments.setState(updatedExpShowFixture)
+      void experiments.setState(updatedExpShowFixture)
 
       await dataUpdateEvent
 

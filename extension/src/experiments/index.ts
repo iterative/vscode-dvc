@@ -157,7 +157,7 @@ export class Experiments extends BaseRepository<TableData> {
     this.dispose.track(
       workspace.onDidChangeConfiguration((event: ConfigurationChangeEvent) => {
         if (event.affectsConfiguration(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT)) {
-          this.cliData.update()
+          void this.cliData.update()
         }
       })
     )
@@ -383,11 +383,17 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public pickCurrentExperiment() {
-    return pickExperiment(this.experiments.getCurrentExperiments())
+    return pickExperiment(
+      this.experiments.getCurrentExperiments(),
+      this.getFirstThreeColumnOrder()
+    )
   }
 
   public pickQueuedExperiment() {
-    return pickExperiment(this.experiments.getQueuedExperiments())
+    return pickExperiment(
+      this.experiments.getQueuedExperiments(),
+      this.getFirstThreeColumnOrder()
+    )
   }
 
   public async pickAndModifyParams(overrideId?: string) {
@@ -569,7 +575,7 @@ export class Experiments extends BaseRepository<TableData> {
       Response.TURN_OFF
     )
     if (response !== Response.CANCEL) {
-      this.autoApplyFilters(false)
+      void this.autoApplyFilters(false)
     }
     return response
   }
@@ -594,6 +600,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     const experiment = await pickExperiment(
       this.experiments.getAllExperiments(),
+      this.getFirstThreeColumnOrder(),
       Title.SELECT_BASE_EXPERIMENT
     )
 
@@ -615,10 +622,10 @@ export class Experiments extends BaseRepository<TableData> {
 
     if (dvcLiveOnly && !this.dvcLiveOnlyCleanupInitialized) {
       this.dvcLiveOnlyCleanupInitialized = true
-      pollSignalFileForProcess(this.dvcLiveOnlySignalFile, () => {
+      void pollSignalFileForProcess(this.dvcLiveOnlySignalFile, () => {
         this.dvcLiveOnlyCleanupInitialized = false
         if (this.hasRunningExperiment()) {
-          this.cliData.update()
+          void this.cliData.update()
         }
       })
     }

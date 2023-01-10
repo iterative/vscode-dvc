@@ -128,28 +128,27 @@ export class Setup
     this.webviewMessages = this.createWebviewMessageHandler()
 
     if (this.webview) {
-      this.sendDataToWebview()
+      void this.sendDataToWebview()
     }
 
-    this.showExperiments = () =>
-      experiments.showWebview(this.dvcRoots[0], ViewColumn.Active)
+    this.showExperiments = () => {
+      void experiments.showWebview(this.dvcRoots[0], ViewColumn.Active)
+    }
 
     this.registerCommands(internalCommands)
 
     this.getHasData = () => experiments.getHasData()
     const onDidChangeHasData = experiments.columnsChanged.event
     this.dispose.track(
-      onDidChangeHasData(() => {
-        this.sendDataToWebview()
-        setContextValue(ContextKey.PROJECT_HAS_DATA, this.getHasData())
-      })
+      onDidChangeHasData(() =>
+        Promise.all([
+          this.sendDataToWebview(),
+          setContextValue(ContextKey.PROJECT_HAS_DATA, this.getHasData())
+        ])
+      )
     )
 
-    this.dispose.track(
-      this.onDidChangeWorkspace(() => {
-        run(this)
-      })
-    )
+    this.dispose.track(this.onDidChangeWorkspace(() => run(this)))
     this.watchForVenvChanges()
     this.watchConfigurationDetailsForChanges()
     this.watchDotFolderForChanges()
@@ -193,22 +192,22 @@ export class Setup
     this.dvcRoots =
       this.config.getFocusedProjects() || nestedRoots.flat().sort()
 
-    this.sendDataToWebview()
+    void this.sendDataToWebview()
     return this.setProjectAvailability()
   }
 
   public setAvailable(available: boolean) {
-    this.status.setAvailability(available)
+    void this.status.setAvailability(available)
     this.setCommandsAvailability(available)
     this.cliAccessible = available
-    this.sendDataToWebview()
+    void this.sendDataToWebview()
     return available
   }
 
   public setCliCompatible(compatible: boolean | undefined) {
     this.cliCompatible = compatible
     const incompatible = compatible === undefined ? undefined : !compatible
-    setContextValue(ContextKey.CLI_INCOMPATIBLE, incompatible)
+    void setContextValue(ContextKey.CLI_INCOMPATIBLE, incompatible)
   }
 
   public getAvailable() {
@@ -291,18 +290,18 @@ export class Setup
     }
 
     const hasMultipleRoots = dvcRoots.length > 1
-    setContextValue(ContextKey.MULTIPLE_PROJECTS, hasMultipleRoots)
+    void setContextValue(ContextKey.MULTIPLE_PROJECTS, hasMultipleRoots)
 
     return dvcRoots
   }
 
   private setCommandsAvailability(available: boolean) {
-    setContextValue(ContextKey.COMMANDS_AVAILABLE, available)
+    void setContextValue(ContextKey.COMMANDS_AVAILABLE, available)
   }
 
   private setProjectAvailability() {
     const available = this.hasRoots()
-    setContextValue(ContextKey.PROJECT_AVAILABLE, available)
+    void setContextValue(ContextKey.PROJECT_AVAILABLE, available)
     if (available && this.dotFolderWatcher && !this.dotFolderWatcher.disposed) {
       this.dispose.untrack(this.dotFolderWatcher)
       this.dotFolderWatcher.dispose()
@@ -349,7 +348,7 @@ export class Setup
   private initializeGit() {
     const cwd = getFirstWorkspaceFolder()
     if (cwd) {
-      this.gitExecutor.init(cwd)
+      void this.gitExecutor.init(cwd)
     }
   }
 
@@ -399,9 +398,7 @@ export class Setup
       const previousCliPath = this.config.getCliPath()
       const previousPythonPath = this.config.getPythonBinPath()
 
-      const completed = await runWorkspace(() =>
-        this.config.setPythonAndNotifyIfChanged()
-      )
+      const completed = await this.runWorkspace()
       sendTelemetryEvent(
         RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
         { completed },
@@ -428,12 +425,16 @@ export class Setup
     }
   }
 
+  private runWorkspace() {
+    return runWorkspace(() => this.config.setPythonAndNotifyIfChanged())
+  }
+
   private watchConfigurationDetailsForChanges() {
     this.dispose.track(
       this.config.onDidChangeConfigurationDetails(async () => {
         const stopWatch = new StopWatch()
         try {
-          this.sendDataToWebview()
+          void this.sendDataToWebview()
           await run(this)
 
           return sendTelemetryEvent(
@@ -462,7 +463,7 @@ export class Setup
           { duration: stopWatch.getElapsedTime() }
         )
       })
-      .catch(async error =>
+      .catch(async (error: Error) =>
         sendTelemetryEventAndThrow(
           EventName.EXTENSION_LOAD,
           error,
@@ -534,7 +535,7 @@ export class Setup
       cliAccessible: this.cliAccessible,
       dvcPathUsed: !!this.config.getCliPath(),
       dvcRootCount: this.getRoots().length,
-      msPythonInstalled: isPythonExtensionInstalled(),
+      msPythonInstalled: this.config.isPythonExtensionInstalled(),
       msPythonUsed: await this.isPythonExtensionUsed(),
       pythonPathUsed: !!this.config.getPythonBinPath(),
       workspaceFolderCount: getWorkspaceFolderCount()

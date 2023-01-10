@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
-import { Flag, GcPreserveFlag } from './constants'
+import { Flag, GcPreserveFlag, QueueRemoveFlag } from './constants'
 import { DvcExecutor } from './executor'
 import { CliResult, CliStarted } from '..'
 import { createProcess } from '../../processExecution'
@@ -563,8 +563,33 @@ describe('CliExecutor', () => {
     })
   })
 
+  describe('queueRemove', () => {
+    it('should call createProcess with the correct parameters to remove tasks associated with the queue', async () => {
+      const cwd = __dirname
+      const stdout =
+        'Removed tasks in queue: meaty-pams, catty-mast, kacha-life'
+
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
+
+      const output = await dvcExecutor.queueRemove(
+        cwd,
+        QueueRemoveFlag.QUEUED,
+        QueueRemoveFlag.SUCCESS
+      )
+
+      expect(output).toStrictEqual(stdout)
+
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
+        args: ['queue', 'remove', '--queued', '--success'],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
   describe('queueStart', () => {
-    it("should call createProcess with the correct parameters to start the experiment's queue", async () => {
+    it("should call createProcess with the correct parameters to start the experiment's queue in a detached process", () => {
       const cwd = __dirname
       const jobs = '91231324'
 
@@ -572,13 +597,12 @@ describe('CliExecutor', () => {
 
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await dvcExecutor.queueStart(cwd, jobs)
-
-      expect(output).toStrictEqual(stdout)
+      void dvcExecutor.queueStart(cwd, jobs)
 
       expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['queue', 'start', '-j', jobs],
         cwd,
+        detached: true,
         env: mockedEnv,
         executable: 'dvc'
       })

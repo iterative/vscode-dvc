@@ -75,7 +75,7 @@ export const buildPlots = async (
     { id: 'exp-f13bca' }
   ] as Experiment[])
 
-  experiments.setState(expShow)
+  void experiments.setState(expShow)
 
   await plots.isReady()
 

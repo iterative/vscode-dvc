@@ -22,7 +22,7 @@ export const askToDisableAutoApplyFilters = async (
   }
 
   if (response === Response.NEVER) {
-    setUserConfigValue(ConfigKey.DO_NOT_SHOW_UNABLE_TO_FILTER, true)
+    void setUserConfigValue(ConfigKey.DO_NOT_SHOW_UNABLE_TO_FILTER, true)
   }
 
   return response

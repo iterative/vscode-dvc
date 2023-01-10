@@ -68,7 +68,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.waitForInitialData(experiments)
 
     if (this.webview) {
-      this.sendInitialWebviewData()
+      void this.sendInitialWebviewData()
     }
 
     this.ensureTempDirRemoved()
@@ -101,13 +101,13 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   public refreshPlots() {
-    Toast.infoWithOptions(
+    void Toast.infoWithOptions(
       'Attempting to refresh plots for selected experiments.'
     )
     for (const { revision } of this.plots.getSelectedRevisionDetails()) {
       this.plots.setupManualRefresh(revision)
     }
-    this.data.managedUpdate()
+    void this.data.managedUpdate()
   }
 
   public getChildPaths(path: string | undefined) {
@@ -131,7 +131,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   private notifyChanged() {
     this.paths.setSelectedRevisions(this.plots.getSelectedRevisions())
     this.pathsChanged.fire()
-    this.fetchMissingOrSendPlots()
+    void this.fetchMissingOrSendPlots()
   }
 
   private async fetchMissingOrSendPlots() {
@@ -141,7 +141,7 @@ export class Plots extends BaseRepository<TPlotsData> {
       this.paths.hasPaths() &&
       definedAndNonEmpty(this.plots.getUnfetchedRevisions())
     ) {
-      this.data.managedUpdate()
+      void this.data.managedUpdate()
     }
 
     return this.webviewMessages.sendWebviewMessage()
@@ -175,7 +175,7 @@ export class Plots extends BaseRepository<TPlotsData> {
           this.dispose.untrack(waitForInitialExpData)
           waitForInitialExpData.dispose()
           this.setupExperimentsListener(experiments)
-          this.initializeData(data)
+          void this.initializeData(data)
         }
       })
     )
@@ -201,7 +201,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private async initializeData(data: ExperimentsOutput) {
     await this.plots.transformAndSetExperiments(data)
-    this.data.managedUpdate()
+    void this.data.managedUpdate()
     await Promise.all([
       this.data.isReady(),
       this.plots.isReady(),

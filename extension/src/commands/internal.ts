@@ -16,6 +16,7 @@ import { Disposable } from '../class/dispose'
 
 type Command = (...args: Args) => unknown | Promise<unknown>
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 export const AvailableCommands = Object.assign(
   {} as const,
   CliExecutorCommands,
@@ -23,7 +24,11 @@ export const AvailableCommands = Object.assign(
   dvcRunnerCommands,
   GitExecutorCommands,
   GitReaderCommands
-)
+) as typeof CliExecutorCommands &
+  typeof CliReaderCommands &
+  typeof dvcRunnerCommands &
+  typeof GitExecutorCommands &
+  typeof GitReaderCommands
 export type CommandId = typeof AvailableCommands[keyof typeof AvailableCommands]
 
 export class InternalCommands extends Disposable {
@@ -68,7 +73,7 @@ export class InternalCommands extends Disposable {
         try {
           return await this.runAndSendTelemetry<T>(name, func, arg)
         } catch {
-          this.offerToShowError()
+          void this.offerToShowError()
         }
       })
     )

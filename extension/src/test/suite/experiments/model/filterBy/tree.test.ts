@@ -399,7 +399,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       }
 
       mockQuickInputFilter(filter)
-      experiments.addFilter()
+      void experiments.addFilter()
       await tableFilterAdded
 
       expect(mockTreeView.description).to.equal(
@@ -449,7 +449,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       )
 
       const tableFilterRemoved = getUpdateEvent()
-      experiments.removeFilter(getFilterId(filter))
+      void experiments.removeFilter(getFilterId(filter))
 
       await tableFilterRemoved
 

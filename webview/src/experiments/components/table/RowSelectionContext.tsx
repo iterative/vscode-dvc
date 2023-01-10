@@ -57,6 +57,7 @@ export const RowSelectionProvider: React.FC<{ children: React.ReactNode }> = ({
           row: {
             values: { id }
           }
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         }) => id
       ),
       ...selectionHistory

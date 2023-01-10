@@ -36,7 +36,7 @@ export class LanguageClientWrapper extends Disposable {
     )
 
     // Start the client. This will also launch the server
-    this.start()
+    void this.start()
   }
 
   async start() {
@@ -65,7 +65,7 @@ export class LanguageClientWrapper extends Disposable {
   }
 
   stop() {
-    this.client.stop()
+    void this.client.stop()
   }
 
   private getServerOptions(): ServerOptions {

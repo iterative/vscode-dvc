@@ -10,7 +10,7 @@ import {
   buildDependencies,
   bypassProcessManagerDebounce,
   getMockNow,
-  getSafeWatcherDisposer
+  getTimeSafeDisposer
 } from '../../util'
 import {
   AvailableCommands,
@@ -23,7 +23,7 @@ import { removeDir } from '../../../../fileSystem'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 
 suite('Plots Data Test Suite', () => {
-  const disposable = getSafeWatcherDisposer()
+  const disposable = getTimeSafeDisposer()
 
   beforeEach(() => {
     restore()
@@ -200,7 +200,7 @@ suite('Plots Data Test Suite', () => {
         )
       )
 
-      data.update()
+      void data.update()
       await data.isReady()
 
       bypassProcessManagerDebounce(mockNow)

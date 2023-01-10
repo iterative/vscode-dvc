@@ -6,7 +6,7 @@ import {
   bypassProcessManagerDebounce,
   getArgOfCall,
   getMockNow,
-  getSafeWatcherDisposer,
+  getTimeSafeDisposer,
   stubPrivateMemberMethod
 } from '../../util'
 import { dvcDemoPath, getTestWorkspaceFolder } from '../../../util'
@@ -27,7 +27,7 @@ import { gitPath } from '../../../../cli/git/constants'
 import { getGitPath } from '../../../../fileSystem'
 
 suite('Experiments Data Test Suite', () => {
-  const disposable = getSafeWatcherDisposer()
+  const disposable = getTimeSafeDisposer()
 
   beforeEach(() => {
     restore()

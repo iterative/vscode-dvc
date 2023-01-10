@@ -14,6 +14,7 @@ export const createBubbledEvent = (type: string, props = {}) => {
   Object.assign(event, props)
   Object.assign(event, {
     dataTransfer: {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       getData: (key: string) => testStorage.get(key),
       setData: (key: string, value: Object) => testStorage.set(key, value)
     }

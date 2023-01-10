@@ -53,7 +53,7 @@ export class Repository extends DeferredDisposable {
 
     this.treeDataChanged = treeDataChanged
 
-    this.initialize()
+    void this.initialize()
   }
 
   public getChildren(path: string) {

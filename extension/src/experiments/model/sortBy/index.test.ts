@@ -67,20 +67,15 @@ describe('sortExperiments', () => {
       'sort'
     )
     expect(
-      (
-        sortExperiments(
-          [{ descending: true, path: testSortPath }],
-          testData
-        ) as Experiment[]
-      ).map(getTestParam)
+      sortExperiments([{ descending: true, path: testSortPath }], testData).map(
+        getTestParam
+      )
     ).toStrictEqual([1, 2, 3])
 
     expect(
-      (
-        sortExperiments(
-          [{ descending: false, path: testSortPath }],
-          testData
-        ) as Experiment[]
+      sortExperiments(
+        [{ descending: false, path: testSortPath }],
+        testData
       ).map(getTestParam)
     ).toStrictEqual([1, 2, 3])
   })
@@ -130,23 +125,19 @@ describe('sortExperiments', () => {
       'sort2'
     )
     expect(
-      (
-        sortExperiments(
-          [
-            { descending: false, path: testSortPath },
-            { descending: true, path: testSortPath2 }
-          ],
-          testData
-        ) as Experiment[]
+      sortExperiments(
+        [
+          { descending: false, path: testSortPath },
+          { descending: true, path: testSortPath2 }
+        ],
+        testData
       ).map(getTestParam)
     ).toStrictEqual([1, 2, 3])
 
     expect(
-      (
-        sortExperiments(
-          [{ descending: false, path: testSortPath }],
-          testData
-        ) as Experiment[]
+      sortExperiments(
+        [{ descending: false, path: testSortPath }],
+        testData
       ).map(getTestParam)
     ).toStrictEqual([1, 2, 3])
   })
@@ -181,23 +172,17 @@ describe('sortExperiments', () => {
 
     it('Should sort ascending', () => {
       expect(
-        (
-          sortExperiments(
-            [{ descending: false, path: testPath }],
-            testData
-          ) as Experiment[]
-        ).map(getTestParam)
+        sortExperiments([{ descending: false, path: testPath }], testData).map(
+          getTestParam
+        )
       ).toStrictEqual([1, 2, 3])
     })
 
     it('Should sort descending', () => {
       expect(
-        (
-          sortExperiments(
-            [{ descending: true, path: testPath }],
-            testData
-          ) as Experiment[]
-        ).map(getTestParam)
+        sortExperiments([{ descending: true, path: testPath }], testData).map(
+          getTestParam
+        )
       ).toStrictEqual([3, 2, 1])
     })
   })
@@ -246,7 +231,7 @@ describe('sortExperiments', () => {
           { descending: false, path: testPath }
         ],
         testData
-      ) as Experiment[]
+      )
       expect(result.map(getTestParam)).toStrictEqual([3, 1, 2])
       expect(result.map(item => get(item, otherTestPathArray))).toStrictEqual([
         1, 2, 2
@@ -260,7 +245,7 @@ describe('sortExperiments', () => {
           { descending: true, path: testPath }
         ],
         testData
-      ) as Experiment[]
+      )
       expect(result.map(getTestParam)).toStrictEqual([3, 2, 1])
       expect(result.map(item => get(item, otherTestPathArray))).toStrictEqual([
         1, 2, 2

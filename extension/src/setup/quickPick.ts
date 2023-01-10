@@ -19,7 +19,7 @@ export const pickFocusedProjects = async (
   }
 
   if (values.length === 0) {
-    Toast.showError('Cannot select 0 projects.')
+    void Toast.showError('Cannot select 0 projects.')
     return
   }
   return values.sort()

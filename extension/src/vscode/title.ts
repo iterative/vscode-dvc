@@ -6,6 +6,7 @@ export enum Title {
   ENTER_FILTER_VALUE = 'Enter a Filter Value',
   ENTER_RELATIVE_DESTINATION = 'Enter a Destination Relative to the Root',
   GARBAGE_COLLECT_EXPERIMENTS = 'Garbage Collect Experiments',
+  QUEUE_REMOVE = 'Remove Experiment Queue Tasks',
   SHOW_SETUP = 'Show Setup',
   SELECT_BASE_EXPERIMENT = 'Select an Experiment to Use as a Base',
   SELECT_COLUMNS = 'Select Columns to Display in the Experiments Table',

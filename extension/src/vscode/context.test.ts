@@ -15,7 +15,7 @@ describe('setContextValue', () => {
   it('should pass the correct details to executeCommand', () => {
     const key = 'my important key' as ContextKey
     const value = 'value that if not set everything breaks'
-    setContextValue(key, value)
+    void setContextValue(key, value)
     expect(mockedExecuteCommand).toHaveBeenCalledWith('setContext', key, value)
   })
 })

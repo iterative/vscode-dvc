@@ -152,7 +152,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
     <DragDropContainer
       order={order}
       setOrder={setEntriesOrder}
-      items={items as JSX.Element[]}
+      items={items}
       group={groupId}
       onDrop={onDropInSection}
       dropTarget={<DropTarget />}

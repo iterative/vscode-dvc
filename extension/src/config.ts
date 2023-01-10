@@ -3,7 +3,8 @@ import { Disposable } from '@hediet/std/disposable'
 import isEqual from 'lodash.isequal'
 import {
   getOnDidChangePythonExecutionDetails,
-  getPythonBinPath
+  getPythonBinPath,
+  isPythonExtensionInstalled
 } from './extensions/python'
 import { ConfigKey, getConfigValue, setConfigValue } from './vscode/config'
 import { DeferredDisposable } from './class/deferred'
@@ -34,10 +35,10 @@ export class Config extends DeferredDisposable {
       this.configurationDetailsChanged.event
     this.onDidChangeExtensionsEvent = onDidChangeExtensionsEvent
 
-    this.setPythonBinPath()
+    void this.setPythonBinPath()
     this.setFocusedProjects()
 
-    this.onDidChangePythonExecutionDetails()
+    void this.onDidChangePythonExecutionDetails()
     this.onDidChangeExtensions()
 
     this.onDidConfigurationChange()
@@ -71,11 +72,15 @@ export class Config extends DeferredDisposable {
   }
 
   public setFocusedProjectsOption(focusedProjects: string[]) {
-    setConfigValue(ConfigKey.FOCUSED_PROJECTS, focusedProjects)
+    void setConfigValue(ConfigKey.FOCUSED_PROJECTS, focusedProjects)
   }
 
   public isPythonExtensionUsed() {
     return !getConfigValue(ConfigKey.PYTHON_PATH) && !!this.pythonBinPath
+  }
+
+  public isPythonExtensionInstalled() {
+    return isPythonExtensionInstalled()
   }
 
   private async getConfigOrExtensionPythonBinPath() {
@@ -88,7 +93,7 @@ export class Config extends DeferredDisposable {
       await getOnDidChangePythonExecutionDetails()
     this.pythonExecutionDetailsListener = this.dispose.track(
       onDidChangePythonExecutionDetails?.(() => {
-        this.setPythonAndNotifyIfChanged()
+        void this.setPythonAndNotifyIfChanged()
       })
     )
   }
@@ -96,8 +101,8 @@ export class Config extends DeferredDisposable {
   private onDidChangeExtensions() {
     this.dispose.track(
       this.onDidChangeExtensionsEvent(() => {
-        this.onDidChangePythonExecutionDetails()
-        this.setPythonAndNotifyIfChanged()
+        void this.onDidChangePythonExecutionDetails()
+        void this.setPythonAndNotifyIfChanged()
       })
     )
   }
@@ -111,7 +116,7 @@ export class Config extends DeferredDisposable {
           this.notifyIfChanged(oldPath, this.dvcPath)
         }
         if (e.affectsConfiguration(ConfigKey.PYTHON_PATH)) {
-          this.setPythonAndNotifyIfChanged()
+          void this.setPythonAndNotifyIfChanged()
         }
         if (e.affectsConfiguration(ConfigKey.FOCUSED_PROJECTS)) {
           this.setFocusedProjectsAndNotifyIfChanged()
@@ -146,7 +151,7 @@ export class Config extends DeferredDisposable {
 
     const paths = Array.isArray(focusedProjects)
       ? focusedProjects
-      : ([focusedProjects].filter(Boolean) as string[])
+      : [focusedProjects].filter(Boolean)
     for (const path of paths) {
       this.collectValidFocusedProject(
         validatedFocusedProjects,

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Meta, Story } from '@storybook/react/types-6-0'
 import { configureStore } from '@reduxjs/toolkit'
 import { userEvent, within } from '@storybook/testing-library'

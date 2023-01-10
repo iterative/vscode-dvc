@@ -37,7 +37,7 @@ export const addFilterViaQuickInput = (
 
   const tableFilterAdded = experimentsUpdatedEvent(experiments)
 
-  commands.executeCommand(RegisteredCommands.EXPERIMENT_FILTER_ADD)
+  void commands.executeCommand(RegisteredCommands.EXPERIMENT_FILTER_ADD)
 
   return tableFilterAdded
 }
