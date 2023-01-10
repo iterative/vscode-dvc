@@ -28,7 +28,6 @@
     "postinstall": "husky install && git submodule init && git submodule update",
     "storybook": "yarn workspace dvc-vscode-webview storybook",
     "build-storybook": "yarn turbo run build-storybook --filter=dvc-vscode-webview",
-    "chromatic": "yarn workspace dvc-vscode-webview chromatic",
     "setup:venv": "ts-node ./scripts/virtualenv-install.ts",
     "scheduled:cli:test": "ts-node ./extension/src/test/cli/index.ts",
     "create-svgs": "ts-node ./scripts/create-svgs.ts",
