@@ -470,7 +470,9 @@ suite('Workspace Experiments Test Suite', () => {
         [
           {
             description: '[exp-e7a67]',
-            detail: 'Created:29 Dec 2020, loss:2.0205045, accuracy:0.37241668',
+            detail: `Created:${formatDate(
+              '2020-12-29T15:31:52'
+            )}, loss:2.0205045, accuracy:0.37241668`,
             label: '4fb124a',
             value: { id: queueTaskId, name: 'exp-e7a67' }
           }
