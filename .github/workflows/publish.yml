@@ -28,7 +28,8 @@ jobs:
         with:
           node-version: '16'
           cache: 'yarn'
-      - run: yarn run install-frozen-lockfile
+          
+      - run: yarn install
       - run: yarn build
 
       - name: Upload VSIX
