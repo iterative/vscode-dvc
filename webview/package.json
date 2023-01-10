@@ -11,7 +11,7 @@
     "build": "webpack --mode production",
     "test": "jest --collect-coverage",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook",
+    "build-storybook": "build-storybook --webpack-stats-json",
     "chromatic": "npx chromatic --project-token fexq6zfy6",
     "svgr": "svgr --out-dir src/shared/components/icons --ignore-existing ../node_modules/@vscode/codicons/src/icons && svgr -d src/shared/components/icons icons/"
   },
