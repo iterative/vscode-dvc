@@ -566,6 +566,19 @@ $bullet-size: calc(var(--design-unit) * 4px);
       outline-offset: -4px;
     }
   }
+
+  .otherCommitsRow {
+    border-bottom: $row-border;
+
+    .th {
+      display: flex;
+      align-items: flex-end;
+      font-size: 0.6rem;
+      height: 32px;
+      padding-bottom: 8px;
+      padding-left: 16px;
+    }
+  }
 }
 
 .starSwitch {

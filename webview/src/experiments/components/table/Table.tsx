@@ -74,7 +74,7 @@ export const Table: React.FC<InstanceProp> = ({ instance }) => {
         })}
         ref={tableRef}
         tabIndex={0}
-        role="tree"
+        role="treegrid"
         onKeyUp={e => {
           if (e.key === 'Escape') {
             clearSelectedRows?.()

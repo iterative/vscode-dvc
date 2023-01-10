@@ -37,7 +37,7 @@ describe('Experiments Table Webview', function () {
   const webview = new ExperimentsWebview('experiments')
 
   const epochs = 15
-  const headerRows = 3
+  const headerRows = 4
   const workspaceRow = 1
   const commitRows = 3
   const initialRows = headerRows + workspaceRow + commitRows
