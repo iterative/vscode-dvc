@@ -10,7 +10,11 @@ import omit from 'lodash.omit'
 import { addStarredToColumns } from './columns/like'
 import { setContextForEditorTitleIcons } from './context'
 import { ExperimentsModel } from './model'
-import { pickExperiment, pickExperiments } from './model/quickPick'
+import {
+  pickExperiment,
+  pickExperiments,
+  pickExperimentsToPlot
+} from './model/quickPick'
 import { pickAndModifyParams } from './model/modify/quickPick'
 import {
   pickFilterToAdd,
@@ -339,7 +343,7 @@ export class Experiments extends BaseRepository<TableData> {
   public async selectExperiments() {
     const experiments = this.experiments.getExperimentsWithCheckpoints()
 
-    const selected = await pickExperiments(
+    const selected = await pickExperimentsToPlot(
       experiments,
       this.hasCheckpoints(),
       this.columns.getFirstThreeColumnOrder()
@@ -392,6 +396,14 @@ export class Experiments extends BaseRepository<TableData> {
     return pickExperiment(
       this.experiments.getQueuedExperiments(),
       this.getFirstThreeColumnOrder()
+    )
+  }
+
+  public pickQueueTasksToKill() {
+    return pickExperiments(
+      this.experiments.getRunningQueueTasks(),
+      this.getFirstThreeColumnOrder(),
+      Title.SELECT_QUEUE_KILL
     )
   }
 

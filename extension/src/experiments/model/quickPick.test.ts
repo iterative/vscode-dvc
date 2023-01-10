@@ -1,8 +1,16 @@
 import { QuickPickItemKind } from 'vscode'
 import { ExperimentWithCheckpoints } from '.'
-import { pickExperiment, pickExperiments } from './quickPick'
+import {
+  pickExperiment,
+  pickExperiments,
+  pickExperimentsToPlot
+} from './quickPick'
 import { MAX_SELECTED_EXPERIMENTS } from './status'
-import { quickPickLimitedValues, quickPickValue } from '../../vscode/quickPick'
+import {
+  quickPickLimitedValues,
+  quickPickManyValues,
+  quickPickValue
+} from '../../vscode/quickPick'
 import { Experiment } from '../webview/contract'
 import { Title } from '../../vscode/title'
 import { formatDate } from '../../util/date'
@@ -14,6 +22,7 @@ jest.mock('../../vscode/toast')
 
 const mockedQuickPickLimitedValues = jest.mocked(quickPickLimitedValues)
 const mockedQuickPickValue = jest.mocked(quickPickValue)
+const mockedQuickPickManyValues = jest.mocked(quickPickManyValues)
 
 const mockedToast = jest.mocked(Toast)
 const mockedShowError = jest.fn()
@@ -23,9 +32,9 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-describe('pickExperiments', () => {
+describe('pickExperimentsToPlot', () => {
   it('should return early given no experiments', async () => {
-    const undef = await pickExperiments([], false, [])
+    const undef = await pickExperimentsToPlot([], false, [])
     expect(undef).toBeUndefined()
     expect(mockedQuickPickLimitedValues).not.toHaveBeenCalled()
   })
@@ -43,7 +52,7 @@ describe('pickExperiments', () => {
     ] as Experiment[]
 
     mockedQuickPickLimitedValues.mockResolvedValueOnce([selectedExperiment])
-    const picked = await pickExperiments(mockedExperiments, false, [])
+    const picked = await pickExperimentsToPlot(mockedExperiments, false, [])
 
     expect(picked).toStrictEqual([selectedExperiment])
     expect(mockedQuickPickLimitedValues).toHaveBeenCalledTimes(1)
@@ -77,7 +86,7 @@ describe('pickExperiments', () => {
         }
       ],
       MAX_SELECTED_EXPERIMENTS,
-      Title.SELECT_EXPERIMENTS,
+      Title.SELECT_EXPERIMENTS_TO_PLOT,
       { matchOnDescription: true, matchOnDetail: true }
     )
   })
@@ -133,7 +142,7 @@ describe('pickExperiments', () => {
     ] as Experiment[]
 
     mockedQuickPickLimitedValues.mockResolvedValueOnce([selectedExperiment])
-    const picked = await pickExperiments(mockedExperiments, false, [
+    const picked = await pickExperimentsToPlot(mockedExperiments, false, [
       'Created',
       'params:params.yaml:prepare.split',
       'deps:data/data.xml'
@@ -170,7 +179,7 @@ describe('pickExperiments', () => {
       ],
       [],
       MAX_SELECTED_EXPERIMENTS,
-      Title.SELECT_EXPERIMENTS,
+      Title.SELECT_EXPERIMENTS_TO_PLOT,
       { matchOnDescription: true, matchOnDetail: true }
     )
   })
@@ -209,7 +218,7 @@ describe('pickExperiments', () => {
       selectedCheckpoint
     ])
 
-    const picked = await pickExperiments(
+    const picked = await pickExperimentsToPlot(
       [
         mockedWorkspace,
         mockedBranch,
@@ -259,27 +268,29 @@ describe('pickExperiments', () => {
       ],
       [getExpectedItem(selectedCheckpoint)],
       MAX_SELECTED_EXPERIMENTS,
-      Title.SELECT_EXPERIMENTS,
+      Title.SELECT_EXPERIMENTS_TO_PLOT,
       { matchOnDescription: true, matchOnDetail: true }
     )
   })
 })
 
-const mockedExp = {
+const mockedExp1 = {
   displayNameOrParent: '[exp-0580a]',
   id: 'abcdefb',
   label: 'abcdefb',
   name: 'exp-0580a'
 }
 
+const mockedExp2 = {
+  displayNameOrParent: '[exp-c54c4]',
+  id: 'abcdefa',
+  label: 'abcdefa',
+  name: 'exp-c54c4'
+}
+
 const mockedExpList = [
-  mockedExp,
-  {
-    displayNameOrParent: '[exp-c54c4]',
-    id: 'abcdefa',
-    label: 'abcdefa',
-    name: 'exp-c54c4'
-  },
+  mockedExp1,
+  mockedExp2,
   {
     displayNameOrParent: '[exp-054f1]',
     id: 'abcdef1',
@@ -339,8 +350,8 @@ const mockedExpList = [
 describe('pickExperiment', () => {
   it('should return the details of the chosen experiment if one is selected by the user', async () => {
     const expectedDetails = {
-      id: mockedExp.id,
-      name: mockedExp.name
+      id: mockedExp1.id,
+      name: mockedExp1.name
     }
     mockedQuickPickValue.mockResolvedValueOnce(expectedDetails)
     const experiment = await pickExperiment(mockedExpList, [])
@@ -349,8 +360,8 @@ describe('pickExperiment', () => {
 
   it('should add columns detail to quick pick items if columns order has been provided', async () => {
     const expectedDetails = {
-      id: mockedExp.id,
-      name: mockedExp.name
+      id: mockedExp1.id,
+      name: mockedExp1.name
     }
     const mockedExpListWithColumnData = [
       {
@@ -435,6 +446,117 @@ describe('pickExperiment', () => {
 
   it('should call showErrorMessage when no experiment names are provided', async () => {
     await pickExperiment([], [])
+    expect(mockedShowError).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('pickExperiments', () => {
+  it('should return the details of the chosen experiment if one is selected by the user', async () => {
+    const expectedDetails = [
+      {
+        id: mockedExp1.id,
+        name: mockedExp1.name
+      }
+    ]
+    mockedQuickPickManyValues.mockResolvedValueOnce(expectedDetails)
+    const experiment = await pickExperiments(mockedExpList, [])
+    expect(experiment).toStrictEqual(expectedDetails)
+  })
+
+  it('should add columns detail to quick pick items if columns order has been provided', async () => {
+    const expectedDetails = [
+      {
+        id: mockedExp1.id,
+        name: mockedExp1.name
+      },
+      {
+        id: mockedExp2.id,
+        name: mockedExp2.name
+      }
+    ]
+    const mockedExpListWithColumnData = [
+      {
+        ...mockedExpList[0],
+        Created: '2022-12-02T10:48:24',
+        metrics: {
+          'summary.json': {
+            accuracy: 0.3723166584968567,
+            val_loss: 1.9979370832443237
+          }
+        }
+      },
+      {
+        ...mockedExpList[1],
+        Created: '2022-08-19T08:17:22',
+        metrics: {
+          'summary.json': {
+            accuracy: 0.4668000042438507,
+            val_loss: 1.8770883083343506
+          }
+        }
+      },
+      {
+        ...mockedExpList[2],
+        Created: '2020-12-29T15:27:01',
+        metrics: {
+          'summary.json': {
+            accuracy: 0.557449996471405,
+            val_loss: 1.7749212980270386
+          }
+        }
+      }
+    ]
+    mockedQuickPickManyValues.mockResolvedValueOnce(expectedDetails)
+    const experiment = await pickExperiments(mockedExpListWithColumnData, [
+      'Created',
+      'metrics:summary.json:accuracy',
+      'metrics:summary.json:val_loss'
+    ])
+
+    expect(mockedQuickPickManyValues).toHaveBeenCalledWith(
+      [
+        {
+          description: '[exp-0580a]',
+          detail: `Created:${formatDate(
+            mockedExpListWithColumnData[0].Created
+          )}, accuracy:0.37231666, val_loss:1.9979371`,
+          label: 'abcdefb',
+          value: { id: 'abcdefb', name: 'exp-0580a' }
+        },
+        {
+          description: '[exp-c54c4]',
+          detail: `Created:${formatDate(
+            mockedExpListWithColumnData[1].Created
+          )}, accuracy:0.46680000, val_loss:1.8770883`,
+          label: 'abcdefa',
+          value: { id: 'abcdefa', name: 'exp-c54c4' }
+        },
+        {
+          description: '[exp-054f1]',
+          detail: `Created:${formatDate(
+            mockedExpListWithColumnData[2].Created
+          )}, accuracy:0.55745000, val_loss:1.7749213`,
+          label: 'abcdef1',
+          value: { id: 'abcdef1', name: 'exp-054f1' }
+        }
+      ],
+      {
+        matchOnDescription: true,
+        matchOnDetail: true,
+        title: 'Select Experiments'
+      }
+    )
+    expect(experiment).toStrictEqual(expectedDetails)
+  })
+
+  it('should return undefined if the user cancels the popup dialog', async () => {
+    mockedQuickPickManyValues.mockResolvedValueOnce(undefined)
+    const undef = await pickExperiments(mockedExpList, [])
+    expect(undef).toBeUndefined()
+  })
+
+  it('should call showErrorMessage when no experiment names are provided', async () => {
+    await pickExperiments([], [])
     expect(mockedShowError).toHaveBeenCalledTimes(1)
   })
 })
