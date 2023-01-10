@@ -57,3 +57,5 @@ jobs:
           storybookBuildDir: 'webview/storybook-static'
           exitOnceUploaded: true
           autoAcceptChanges: 'main'
+          onlyChanged: true
+          externals: '**/*.scss'
