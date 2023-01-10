@@ -185,13 +185,6 @@ describe('App', () => {
     return store
   }
 
-  const waitForVega = async (plot: HTMLElement) => {
-    await waitFor(() =>
-      // eslint-disable-next-line testing-library/no-node-access
-      expect(plot.querySelectorAll('.marks')[0]).toBeInTheDocument()
-    )
-  }
-
   beforeAll(() => {
     Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
       configurable: true,
@@ -1919,6 +1912,14 @@ describe('App', () => {
         }
       ]
     }
+
+    const waitForVega = (plot: HTMLElement): Promise<void> =>
+      waitFor(
+        () =>
+          // eslint-disable-next-line testing-library/no-node-access
+          expect(plot.querySelectorAll('.marks')[0]).toBeInTheDocument(),
+        { timeout: 5000 }
+      )
 
     const getPanel = async (smoothPlot: HTMLElement) => {
       await waitFor(() =>
