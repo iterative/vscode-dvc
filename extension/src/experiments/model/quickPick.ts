@@ -7,11 +7,14 @@ import { definedAndNonEmpty } from '../../util/array'
 import {
   QuickPickItemWithValue,
   quickPickLimitedValues,
+  quickPickManyValues,
   quickPickValue
 } from '../../vscode/quickPick'
 import { Toast } from '../../vscode/toast'
 import { Experiment } from '../webview/contract'
 import { Title } from '../../vscode/title'
+
+const noExperimentsToSelect = 'There are no experiments to select.'
 
 type QuickPickItemAccumulator = {
   items: QuickPickItemWithValue<Experiment | undefined>[]
@@ -111,13 +114,13 @@ const collectItems = (
   return collectExperimentOnlyItems(experiments, firstThreeColumnOrder)
 }
 
-export const pickExperiments = (
+export const pickExperimentsToPlot = (
   experiments: ExperimentWithCheckpoints[],
   hasCheckpoints: boolean,
   firstThreeColumnOrder: string[]
 ): Promise<Experiment[] | undefined> => {
   if (!definedAndNonEmpty(experiments)) {
-    return Toast.showError('There are no experiments to select.')
+    return Toast.showError(noExperimentsToSelect)
   }
 
   const { items, selectedItems } = collectItems(
@@ -130,10 +133,32 @@ export const pickExperiments = (
     items,
     selectedItems,
     MAX_SELECTED_EXPERIMENTS,
-    Title.SELECT_EXPERIMENTS,
+    Title.SELECT_EXPERIMENTS_TO_PLOT,
     { matchOnDescription: true, matchOnDetail: true }
   )
 }
+
+const getExperimentItems = (
+  experiments: ExperimentWithName[],
+  firstThreeColumnOrder: string[]
+): {
+  description: string | undefined
+  detail: string
+  label: string
+  value: { id: string; name: string }
+}[] =>
+  experiments.map(experiment => {
+    const { label, id, name, displayNameOrParent } = experiment
+    return {
+      description: displayNameOrParent,
+      detail: getColumnPathsQuickPickDetail(experiment, firstThreeColumnOrder),
+      label,
+      value: {
+        id,
+        name: name || label
+      }
+    }
+  })
 
 export type ExperimentWithName = Experiment & {
   name?: string
@@ -145,24 +170,25 @@ export const pickExperiment = (
   title: Title = Title.SELECT_EXPERIMENT
 ): Thenable<{ id: string; name: string } | undefined> | undefined => {
   if (experiments.length === 0) {
-    void Toast.showError('There are no experiments to select.')
+    void Toast.showError(noExperimentsToSelect)
   } else {
     return quickPickValue<{ id: string; name: string }>(
-      experiments.map(experiment => {
-        const { label, id, name, displayNameOrParent } = experiment
-        return {
-          description: displayNameOrParent,
-          detail: getColumnPathsQuickPickDetail(
-            experiment,
-            firstThreeColumnOrder
-          ),
-          label,
-          value: {
-            id,
-            name: name || label
-          }
-        }
-      }),
+      getExperimentItems(experiments, firstThreeColumnOrder),
+      { matchOnDescription: true, matchOnDetail: true, title }
+    )
+  }
+}
+
+export const pickExperiments = (
+  experiments: ExperimentWithName[],
+  firstThreeColumnOrder: string[],
+  title: Title = Title.SELECT_EXPERIMENTS
+): Thenable<{ id: string; name: string }[] | undefined> | undefined => {
+  if (experiments.length === 0) {
+    void Toast.showError(noExperimentsToSelect)
+  } else {
+    return quickPickManyValues<{ id: string; name: string }>(
+      getExperimentItems(experiments, firstThreeColumnOrder),
       { matchOnDescription: true, matchOnDetail: true, title }
     )
   }
