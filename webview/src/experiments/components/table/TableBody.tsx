@@ -86,13 +86,13 @@ export const TableBody: React.FC<
   ) : (
     <>
       {row.index === 2 && (
-        <div className={cx(styles.tr, styles.pastCommitsRow)} role="row">
+        <div className={cx(styles.tr, styles.previousCommitsRow)} role="row">
           <div
             role="columnheader"
             className={styles.th}
             style={row.cells[0].getCellProps().style}
           >
-            Past Commits
+            Previous Commits
           </div>
         </div>
       )}
