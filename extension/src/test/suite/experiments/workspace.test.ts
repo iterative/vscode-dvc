@@ -812,9 +812,18 @@ suite('Workspace Experiments Test Suite', () => {
 
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
-      stub(window, 'showQuickPick').resolves({
-        value: { id: mockExperiment, name: mockExperiment }
-      } as QuickPickItemWithValue<{ id: string; name: string }>)
+      const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
+        [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
+        Thenable<
+          QuickPickItemWithValue<{ id: string; name: string }>[] | undefined
+        >
+      >
+
+      mockShowQuickPick.resolves([
+        {
+          value: { id: mockExperiment, name: mockExperiment }
+        } as QuickPickItemWithValue<{ id: string; name: string }>
+      ])
       const mockExperimentRemove = stub(
         DvcExecutor.prototype,
         'experimentRemove'

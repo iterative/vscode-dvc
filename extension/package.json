@@ -292,7 +292,7 @@
         }
       },
       {
-        "title": "%command.removeExperiment%",
+        "title": "%command.removeExperiments%",
         "command": "dvc.removeExperiment",
         "category": "DVC"
       },

@@ -152,6 +152,24 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
   }
 
+  public async selectExperimentsToRemove() {
+    const cwd = await this.getFocusedOrOnlyOrPickProject()
+    if (!cwd) {
+      return
+    }
+
+    const experiments = await this.getRepository(cwd).pickExperimentsToRemove()
+    if (!experiments || isEmpty(experiments)) {
+      return
+    }
+
+    return this.runCommand(
+      AvailableCommands.EXPERIMENT_REMOVE,
+      cwd,
+      ...experiments?.map(({ id }) => id)
+    )
+  }
+
   public async autoApplyFilters(enable: boolean, overrideRoot?: string) {
     const dvcRoot = await this.getDvcRoot(overrideRoot)
     if (!dvcRoot) {

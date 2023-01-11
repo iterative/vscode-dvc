@@ -407,6 +407,14 @@ export class Experiments extends BaseRepository<TableData> {
     )
   }
 
+  public pickExperimentsToRemove() {
+    return pickExperiments(
+      this.experiments.getCurrentExperiments(),
+      this.getFirstThreeColumnOrder(),
+      Title.SELECT_EXPERIMENTS_REMOVE
+    )
+  }
+
   public async pickAndModifyParams(overrideId?: string) {
     const id = await this.getExperimentId(overrideId)
     if (!id) {
