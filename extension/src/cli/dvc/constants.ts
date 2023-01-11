@@ -63,15 +63,8 @@ export enum ExperimentSubCommand {
 
 export enum QueueSubCommand {
   KILL = 'kill',
-  REMOVE = 'remove',
   START = 'start',
   STOP = 'stop'
-}
-export enum QueueRemoveFlag {
-  ALL = '--all',
-  FAILED = '--failed',
-  QUEUED = '--queued',
-  SUCCESS = '--success'
 }
 
 export enum ExperimentFlag {

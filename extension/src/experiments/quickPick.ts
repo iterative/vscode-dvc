@@ -1,4 +1,4 @@
-import { GcPreserveFlag, QueueRemoveFlag } from '../cli/dvc/constants'
+import { GcPreserveFlag } from '../cli/dvc/constants'
 import { quickPickManyValues } from '../vscode/quickPick'
 import { Title } from '../vscode/title'
 
@@ -35,32 +35,5 @@ export const pickGarbageCollectionFlags = () =>
     {
       placeHolder: 'Select which experiments to preserve',
       title: Title.GARBAGE_COLLECT_EXPERIMENTS
-    }
-  )
-
-export const pickQueueRemoveFlags = () =>
-  quickPickManyValues<QueueRemoveFlag>(
-    [
-      {
-        label: 'All',
-        picked: true,
-        value: QueueRemoveFlag.ALL
-      },
-      {
-        label: 'Successful',
-        value: QueueRemoveFlag.SUCCESS
-      },
-      {
-        label: 'Failed',
-        value: QueueRemoveFlag.FAILED
-      },
-      {
-        label: 'Queued',
-        value: QueueRemoveFlag.QUEUED
-      }
-    ],
-    {
-      placeHolder: 'Select task type(s) to remove',
-      title: Title.QUEUE_REMOVE
     }
   )

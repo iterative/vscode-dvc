@@ -341,11 +341,6 @@
         "icon": "$(debug-continue-small)"
       },
       {
-        "title": "%command.removeFromExperimentsQueue%",
-        "command": "dvc.removeFromExperimentsQueue",
-        "category": "DVC"
-      },
-      {
         "title": "%command.startExperimentsQueue%",
         "command": "dvc.startExperimentsQueue",
         "category": "DVC",
@@ -791,10 +786,6 @@
         {
           "command": "dvc.resetAndRunCheckpointExperiment",
           "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && dvc.experiment.checkpoints"
-        },
-        {
-          "command": "dvc.removeFromExperimentsQueue",
-          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.startExperimentsQueue",
@@ -1291,11 +1282,6 @@
           "command": "dvc.stopExperimentsQueue",
           "when": "view == dvc.views.experimentsTree",
           "group": "3_queue@3"
-        },
-        {
-          "command": "dvc.removeFromExperimentsQueue",
-          "when": "view == dvc.views.experimentsTree",
-          "group": "3_queue@4"
         },
         {
           "command": "dvc.killExperimentsQueueTasks",
