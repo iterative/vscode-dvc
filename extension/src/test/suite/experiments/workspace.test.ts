@@ -803,8 +803,13 @@ suite('Workspace Experiments Test Suite', () => {
   })
 
   describe('dvc.removeExperiment', () => {
-    it('should ask the user to pick an experiment and then remove that experiment from the workspace', async () => {
-      const mockExperiment = 'exp-to-remove'
+    it('should ask the user to pick experiment(s) and then remove selected experiments from the workspace', async () => {
+      const mockExperiment = 'exp-e7a67'
+      const secondMockExperiment = 'exp-83425'
+      type QuickPickReturnValue = QuickPickItemWithValue<{
+        id: string
+        name: string
+      }>[]
 
       const { experiments } = buildExperiments(disposable)
 
@@ -814,16 +819,25 @@ suite('Workspace Experiments Test Suite', () => {
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
         [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
-        Thenable<
-          QuickPickItemWithValue<{ id: string; name: string }>[] | undefined
-        >
+        Thenable<QuickPickReturnValue | undefined>
       >
 
-      mockShowQuickPick.resolves([
-        {
-          value: { id: mockExperiment, name: mockExperiment }
-        } as QuickPickItemWithValue<{ id: string; name: string }>
-      ])
+      mockShowQuickPick
+        .onFirstCall()
+        .resolves([
+          {
+            value: { id: mockExperiment, name: mockExperiment }
+          }
+        ] as QuickPickReturnValue)
+        .onSecondCall()
+        .resolves([
+          {
+            value: { id: mockExperiment, name: mockExperiment }
+          },
+          {
+            value: { id: secondMockExperiment, name: secondMockExperiment }
+          }
+        ] as QuickPickReturnValue)
       const mockExperimentRemove = stub(
         DvcExecutor.prototype,
         'experimentRemove'
@@ -902,6 +916,14 @@ suite('Workspace Experiments Test Suite', () => {
         }
       )
       expect(mockExperimentRemove).to.be.calledWith(dvcDemoPath, mockExperiment)
+
+      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_REMOVE)
+
+      expect(mockExperimentRemove).to.be.calledWith(
+        dvcDemoPath,
+        mockExperiment,
+        secondMockExperiment
+      )
     })
   })
 
