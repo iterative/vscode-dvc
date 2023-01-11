@@ -84,12 +84,25 @@ export const TableBody: React.FC<
       {content}
     </WorkspaceRowGroupWrapper>
   ) : (
-    <div
-      {...instance.getTableBodyProps({
-        className: cx(styles.rowGroup, styles.tbody, styles.normalRowGroup)
-      })}
-    >
-      {content}
-    </div>
+    <>
+      {row.index === 2 && (
+        <div className={cx(styles.tr, styles.previousCommitsRow)} role="row">
+          <div
+            role="columnheader"
+            className={styles.th}
+            style={row.cells[0].getCellProps().style}
+          >
+            Previous Commits
+          </div>
+        </div>
+      )}
+      <div
+        {...instance.getTableBodyProps({
+          className: cx(styles.rowGroup, styles.tbody, styles.normalRowGroup)
+        })}
+      >
+        {content}
+      </div>
+    </>
   )
 }
