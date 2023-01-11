@@ -24,7 +24,7 @@
   "command.gitStageAll": "Stage All Git Tracked",
   "command.gitUnstageAll": "Unstage All Git Tracked",
   "command.init": "Initialize a DVC Project",
-  "command.killExperimentsQueueTasks": "Kill Experiments Queue Tasks",
+  "command.killExperimentsRunningInQueue": "Kill Experiments Running in the Queue",
   "command.openToTheSide": "Open to the Side",
   "command.moveTargets": "Add Data",
   "command.pull": "Pull",

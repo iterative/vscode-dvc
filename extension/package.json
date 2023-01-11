@@ -217,8 +217,8 @@
         "category": "DVC"
       },
       {
-        "title": "%command.killExperimentsQueueTasks%",
-        "command": "dvc.killExperimentsQueueTasks",
+        "title": "%command.killExperimentsRunningInQueue%",
+        "command": "dvc.killExperimentsRunningInQueue",
         "category": "DVC"
       },
       {
@@ -696,7 +696,7 @@
           "when": "dvc.commands.available && !dvc.cli.incompatible && !dvc.project.available && !dvc.scm.command.running"
         },
         {
-          "command": "dvc.killExperimentsQueueTasks",
+          "command": "dvc.killExperimentsRunningInQueue",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
@@ -1284,7 +1284,7 @@
           "group": "3_queue@3"
         },
         {
-          "command": "dvc.killExperimentsQueueTasks",
+          "command": "dvc.killExperimentsRunningInQueue",
           "when": "view == dvc.views.experimentsTree",
           "group": "3_queue@5"
         },

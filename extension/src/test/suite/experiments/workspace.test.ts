@@ -438,7 +438,7 @@ suite('Workspace Experiments Test Suite', () => {
     })
   })
 
-  describe('dvc.killExperimentsQueueTasks', () => {
+  describe('dvc.killExperimentsRunningInQueue', () => {
     it('should be able to kill running queue tasks', async () => {
       const mockQueueKill = stub(DvcExecutor.prototype, 'queueKill').resolves(
         undefined
