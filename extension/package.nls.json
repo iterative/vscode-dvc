@@ -36,7 +36,7 @@
   "command.modifyExperimentParamsAndResume": "Modify Experiment Param(s) and Resume",
   "command.modifyExperimentParamsResetAndRun": "Modify Experiment Param(s) and Run",
   "command.queueExperiment": "Queue Experiment",
-  "command.removeExperiment": "Remove Experiment",
+  "command.removeExperiments": "Remove Experiments",
   "command.removeExperimentQueue": "Remove All Queued Experiments",
   "command.removeExperimentsTableFilters": "Remove Filter(s) From Experiments Table",
   "command.removeExperimentsTableSorts": "Remove Sort(s) From Experiments Table",
