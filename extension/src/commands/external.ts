@@ -11,8 +11,7 @@ export enum RegisteredCliCommands {
   EXPERIMENT_SHARE_AS_BRANCH = 'dvc.shareExperimentAsBranch',
   EXPERIMENT_SHARE_AS_COMMIT = 'dvc.shareExperimentAsCommit',
   QUEUE_EXPERIMENT = 'dvc.queueExperiment',
-  QUEUE_KILL = 'dvc.killExperimentsQueueTasks',
-  QUEUE_REMOVE = 'dvc.removeFromExperimentsQueue',
+  QUEUE_KILL = 'dvc.killExperimentsRunningInQueue',
   QUEUE_START = 'dvc.startExperimentsQueue',
   QUEUE_STOP = 'dvc.stopExperimentsQueue',
 

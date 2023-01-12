@@ -34,7 +34,6 @@ import { AvailableCommands } from '../../../commands/internal'
 import { GitExecutor } from '../../../cli/git/executor'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
 import { formatDate } from '../../../util/date'
-import { QueueRemoveFlag } from '../../../cli/dvc/constants'
 
 suite('Workspace Experiments Test Suite', () => {
   const disposable = getTimeSafeDisposer()
@@ -439,7 +438,7 @@ suite('Workspace Experiments Test Suite', () => {
     })
   })
 
-  describe('dvc.killExperimentsQueueTasks', () => {
+  describe('dvc.killExperimentsRunningInQueue', () => {
     it('should be able to kill running queue tasks', async () => {
       const mockQueueKill = stub(DvcExecutor.prototype, 'queueKill').resolves(
         undefined
@@ -486,34 +485,6 @@ suite('Workspace Experiments Test Suite', () => {
       )
       expect(mockQueueKill).to.be.calledOnce
       expect(mockQueueKill).to.be.calledWithExactly(dvcDemoPath, queueTaskId)
-    })
-  })
-
-  describe('dvc.removeFromExperimentsQueue', () => {
-    it('should be able to remove groups of tasks from the queue', async () => {
-      const mockQueueRemove = stub(
-        DvcExecutor.prototype,
-        'queueRemove'
-      ).resolves(undefined)
-
-      const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
-        [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
-        Thenable<QuickPickItemWithValue<string>[] | undefined>
-      >
-
-      mockShowQuickPick.resolves([
-        { value: QueueRemoveFlag.ALL } as QuickPickItemWithValue
-      ])
-
-      stubWorkspaceExperimentsGetters(dvcDemoPath)
-
-      await commands.executeCommand(RegisteredCliCommands.QUEUE_REMOVE)
-
-      expect(mockQueueRemove).to.be.calledOnce
-      expect(mockQueueRemove).to.be.calledWithExactly(
-        dvcDemoPath,
-        QueueRemoveFlag.ALL
-      )
     })
   })
 
