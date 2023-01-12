@@ -135,12 +135,6 @@ const registerExperimentNameCommands = (
   )
 
   internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_REMOVE,
-    () =>
-      experiments.getCwdAndExpNameThenRun(AvailableCommands.EXPERIMENT_REMOVE)
-  )
-
-  internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE,
     ({ dvcRoot, ids }: { dvcRoot: string; ids: string[] }) =>
       experiments.runCommand(
@@ -290,6 +284,11 @@ const registerExperimentQuickPickCommands = (
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.QUEUE_KILL,
     () => experiments.selectQueueTasksToKill()
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_REMOVE,
+    () => experiments.selectExperimentsToRemove()
   )
 }
 
