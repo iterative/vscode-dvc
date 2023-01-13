@@ -16,9 +16,8 @@ import { ExperimentsState } from '../../../store'
 import { ContextMenu } from '../../../../shared/components/contextMenu/ContextMenu'
 import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
 
-const calcResizerHeight = (column: Header<Experiment, unknown>) => {
-  return 100 + column.depth * 105 + '%'
-}
+const calcResizerHeight = (header: Header<Experiment, unknown>) =>
+  100 + (header.depth - header.column.depth - 1) * 105 + '%'
 
 const getHeaderPropsArgs = (
   header: Header<Experiment, unknown>,
@@ -143,9 +142,10 @@ export const TableHeaderCell: React.FC<{
         key={header.id}
         role="columnheader"
         tabIndex={0}
-        colSpan={
-          header.getLeafHeaders().filter(h => h.subHeaders.length === 0).length
-        }
+        colSpan={header.colSpan}
+        style={{
+          width: header.getSize()
+        }}
       >
         {isExperimentColumn(header.id) ? (
           <WithExpColumnNeedsShadowUpdates

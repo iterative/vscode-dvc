@@ -260,6 +260,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
   tr {
     position: relative;
     background-color: $row-bg-color;
+    width: fit-content;
 
     &:hover.rowSelected {
       &:after {

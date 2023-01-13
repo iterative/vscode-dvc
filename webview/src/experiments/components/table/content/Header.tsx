@@ -6,14 +6,13 @@ import { Column } from 'dvc/src/experiments/webview/contract'
 
 interface HeaderProps {
   name: string
-  context: HeaderContext<Column, unknown>
 }
 
-export const Header: React.FC<HeaderProps> = ({ name, context }) => {
+export const Header: React.FC<HeaderProps> = ({ name }) => {
   return (
     <OverflowHoverTooltip content={name}>
       <div className={styles.headerCellWrapper}>
-        <span>{context.header.isPlaceholder ? '' : name}</span>
+        <span>{name}</span>
       </div>
     </OverflowHoverTooltip>
   )

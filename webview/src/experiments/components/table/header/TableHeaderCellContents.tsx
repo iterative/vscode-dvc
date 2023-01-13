@@ -62,7 +62,9 @@ export const ColumnDragHandle: React.FC<{
         onDragLeave={onDragLeave}
       >
         <span>
-          {flexRender(header.column.columnDef.header, header.getContext())}
+          {header.isPlaceholder
+            ? null
+            : flexRender(header.column.columnDef.header, header.getContext())}
         </span>
       </Draggable>
     </span>
@@ -132,6 +134,7 @@ export const TableHeaderCellContents: React.FC<{
       />
       {canResize && (
         <div
+          {...{ onMouseDown: header.getResizeHandler() }}
           onMouseEnter={() => setMenuSuppressed(true)}
           onMouseLeave={() => setMenuSuppressed(false)}
           className={cx(styles.columnResizer, isResizing && styles.isResizing)}

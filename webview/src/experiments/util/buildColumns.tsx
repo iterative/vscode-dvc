@@ -3,8 +3,7 @@ import get from 'lodash/get'
 import {
   createColumnHelper,
   AccessorFn,
-  Column as TableColumn,
-  HeaderContext
+  Column as TableColumn
 } from '@tanstack/react-table'
 import {
   Column,
@@ -39,11 +38,11 @@ export const buildColumns = (
       const childColumns = buildColumns(properties, path)
 
       const mainColumnProperties = {
-        header: (context: HeaderContext<Column, unknown>) =>
+        header: () =>
           type === ColumnType.TIMESTAMP ? (
-            <TimestampHeader isPlaceholder={context.header.isPlaceholder} />
+            <TimestampHeader />
           ) : (
-            <Header name={label} context={context} />
+            <Header name={label} />
           ),
         id: path,
         group: type,

@@ -14,8 +14,11 @@ import {
   Row as TableRow,
   getCoreRowModel,
   HeaderContext,
-  getExpandedRowModel
+  getExpandedRowModel,
+  OnChangeFn,
+  ColumnSizingState
 } from '@tanstack/react-table'
+import debounce from 'lodash.debounce'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { Table } from './table/Table'
 import styles from './table/styles.module.scss'
@@ -28,32 +31,14 @@ import { GetStarted } from '../../shared/components/getStarted/GetStarted'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { ExperimentsState } from '../store'
 import { EXPERIMENT_COLUMN_ID } from '../util/columns'
-import { Header } from './table/content/Header'
 import { CellValue } from './table/content/Cell'
 
 const DEFAULT_COLUMN_WIDTH = 90
 const MINIMUM_COLUMN_WIDTH = 90
 
-/*const countRowsAndAddIndexes: (
-  rows: TableRow<Row>[],
-  index?: number
-) => number = (rows, index = 0) => {
-  for (const row of rows) {
-    row.flatIndex = index
-    index += 1
-    if (row.isExpanded) {
-      index = countRowsAndAddIndexes(row.subRows, index)
-    }
-  }
-  return index
-}*/
-
-const ExperimentHeader = (context: HeaderContext<Column, unknown>) =>
-  context.header.isPlaceholder ? (
-    ''
-  ) : (
-    <div className={styles.experimentHeader}>Experiment</div>
-  )
+const ExperimentHeader = () => (
+  <div className={styles.experimentHeader}>Experiment</div>
+)
 
 const getDefaultColumnWithIndicatorsPlaceHolder = () => {
   return columnHelper.accessor(() => EXPERIMENT_COLUMN_ID, {
@@ -114,16 +99,22 @@ const getColumns = (columns: Column[]) => {
   return builtColumns
 }
 
-/*const reportResizedColumn = (state: TableState<Row>) => {
-  const id = state.columnResizing.isResizingColumn
-  if (id) {
-    const width = state.columnResizing.columnWidths[id]
-    sendMessage({
-      payload: { id, width },
-      type: MessageFromWebviewType.RESIZE_COLUMN
-    })
+const reportResizedColumn = (
+  state: ColumnSizingState,
+  columnWidths: ColumnSizingState
+) => {
+  for (const id of Object.keys(state)) {
+    const width = state[id]
+    if (width !== columnWidths[id]) {
+      debounce(() => {
+        sendMessage({
+          payload: { id, width },
+          type: MessageFromWebviewType.RESIZE_COLUMN
+        })
+      }, 1000)()
+    }
   }
-}*/
+}
 
 const defaultColumn: Partial<ColumnDef<Row>> = {
   minSize: MINIMUM_COLUMN_WIDTH,
@@ -141,14 +132,18 @@ export const ExperimentsTable: React.FC = () => {
 
   const [expanded, setExpanded] = useState({})
 
-  const columns = getColumns(columnsData)
-  const initialState = {
-    columnOrder,
-    columnResizing: {
-      columnWidths
-    },
-    expanded
-  } as Partial<TableState>
+  const [columns] = useState(getColumns(columnsData))
+  const [columnSizing, setColumnSizing] =
+    useState<ColumnSizingState>(columnWidths)
+  const [tableState, setTableState] = useState({})
+
+  useEffect(() => {
+    reportResizedColumn(columnSizing, columnWidths)
+  }, [columnSizing])
+
+  useEffect(() => {
+    //console.log(tableState)
+  }, [tableState])
 
   const getRowId = useCallback(
     (experiment: Row, relativeIndex: number, parent?: TableRow<Row>) =>
@@ -165,13 +160,16 @@ export const ExperimentsTable: React.FC = () => {
       defaultColumn,
       getCoreRowModel: getCoreRowModel(),
       getRowId,
-      //initialState,
+      enableColumnResizing: true,
       onExpandedChange: setExpanded,
+      onColumnSizingChange: setColumnSizing,
+      onStateChange: setTableState,
       getSubRows: row => row.subRows,
       getExpandedRowModel: getExpandedRowModel(),
       state: {
         columnOrder,
-        expanded
+        expanded,
+        columnSizing
       }
     }
     /*hooks => {
