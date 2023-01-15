@@ -26,10 +26,10 @@ const ExtendedDataStatus = Object.assign(
 )
 
 export type ExtendedStatus =
-  typeof ExtendedDataStatus[keyof typeof ExtendedDataStatus]
+  (typeof ExtendedDataStatus)[keyof typeof ExtendedDataStatus]
 
 export type Status =
-  typeof AvailableDataStatus[keyof typeof AvailableDataStatus]
+  (typeof AvailableDataStatus)[keyof typeof AvailableDataStatus]
 
 type DataStatusMapping = { [path: string]: ExtendedStatus }
 

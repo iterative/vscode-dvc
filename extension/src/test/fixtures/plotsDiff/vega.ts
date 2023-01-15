@@ -1,4 +1,4 @@
-import {EXPERIMENT_WORKSPACE_ID} from '../../../cli/dvc/contract'
+import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
 import { join } from '../../util/path'
 
 const data = {
