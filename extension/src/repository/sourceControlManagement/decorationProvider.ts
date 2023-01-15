@@ -16,7 +16,7 @@ export const DecorationDataStatus = Object.assign({}, BaseDataStatus, {
 } as const)
 
 type ScmDecorationStatus =
-  typeof DecorationDataStatus[keyof typeof DecorationDataStatus]
+  (typeof DecorationDataStatus)[keyof typeof DecorationDataStatus]
 
 export type ScmDecorationState = Record<ScmDecorationStatus, Set<string>>
 

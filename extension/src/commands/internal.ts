@@ -29,7 +29,8 @@ export const AvailableCommands = Object.assign(
   typeof dvcRunnerCommands &
   typeof GitExecutorCommands &
   typeof GitReaderCommands
-export type CommandId = typeof AvailableCommands[keyof typeof AvailableCommands]
+export type CommandId =
+  (typeof AvailableCommands)[keyof typeof AvailableCommands]
 
 export class InternalCommands extends Disposable {
   private readonly commands = new Map<string, Command>()

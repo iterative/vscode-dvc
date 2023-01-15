@@ -8,6 +8,6 @@ export const colorsList = [
   '#f56565'
 ] as const
 
-export type Color = typeof colorsList[number]
+export type Color = (typeof colorsList)[number]
 
 export const copyOriginalColors = (): Color[] => [...colorsList]
