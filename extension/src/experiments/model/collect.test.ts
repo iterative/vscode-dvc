@@ -78,7 +78,7 @@ describe('collectExperiments', () => {
     expect(experimentsByBranch.get('branchB')).toBeUndefined()
   })
 
-  it('should add git commit messages to branches if git log output is provided', () => {
+  it('should add git commit data to branches if git log output is provided', () => {
     const { branches } = collectExperiments(
       {
         [EXPERIMENT_WORKSPACE_ID]: {
@@ -92,13 +92,23 @@ describe('collectExperiments', () => {
         }
       },
       false,
-      `a123 add new feature${COMMITS_SEPARATOR}b123 update various dependencies\n* update dvc\n* update jest`
+      `a123\nJohn Smith\nrefNames:tag: v.1.1\nmessage:add new feature${COMMITS_SEPARATOR}b123\nrenovate[bot]\nrefNames:\nmessage:update various dependencies\n* update dvc\n* update dvclive`
     )
     const [branch1, branch2] = branches
     expect(branch1.displayNameOrParent).toStrictEqual('add new feature')
     expect(branch2.displayNameOrParent).toStrictEqual(
       'update various dependencies ...'
     )
+    expect(branch1.commit).toStrictEqual({
+      author: 'John Smith',
+      message: 'add new feature',
+      tags: ['v.1.1']
+    })
+    expect(branch2.commit).toStrictEqual({
+      author: 'renovate[bot]',
+      message: 'update various dependencies\n* update dvc\n* update dvclive',
+      tags: []
+    })
   })
 
   const repoWithNestedCheckpoints = {

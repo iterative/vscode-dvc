@@ -33,7 +33,7 @@ export enum Flag {
   NAME_ONLY = '--name-only',
   NO_EMPTY_DIRECTORY = '--no-empty-directory',
   NUMBER = '-n',
-  PRETTY_FORMAT_COMMIT_MESSAGE = '--pretty=format:%H %B',
+  PRETTY_FORMAT_COMMIT_MESSAGE = '--pretty=format:%H%n%an%nrefNames:%D%nmessage:%B',
   OTHERS = '--others',
   QUIET = '-q',
   RAW_WITH_NUL = '-z',

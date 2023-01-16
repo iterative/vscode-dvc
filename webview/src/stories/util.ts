@@ -71,6 +71,11 @@ export const addCommitDataToMainBranch = (rows: Row[]) =>
   rows.map(row => {
     if (row.id === 'main' || row.id === 'master') {
       row.displayNameOrParent = 'Upgrading dependencies ...'
+      row.commit = {
+        author: 'John Smith',
+        message: 'Upgrading dependencies\n* upgrade dvc \n* upgrade dvclive',
+        tags: ['tag-1', 'tag-2']
+      }
     }
     return row
   })

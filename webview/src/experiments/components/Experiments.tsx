@@ -17,6 +17,7 @@ import { Table } from './table/Table'
 import styles from './table/styles.module.scss'
 import { AddColumns, Welcome } from './GetStarted'
 import { RowSelectionProvider } from './table/RowSelectionContext'
+import { CellSecondaryName } from './table/CellSecondaryName'
 import buildDynamicColumns from '../util/buildDynamicColumns'
 import { sendMessage } from '../../shared/vscode'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
@@ -72,16 +73,18 @@ const getDefaultColumnWithIndicatorsPlaceHolder = () => {
   const experimentColumn = {
     Cell: ({
       row: {
-        original: { label, displayNameOrParent }
+        original: { label, displayNameOrParent, commit, sha }
       }
     }: Cell<Row>) => {
       return (
         <div className={styles.experimentCellContents}>
           <span>{label}</span>
           {displayNameOrParent && (
-            <span className={styles.experimentCellSecondaryName}>
-              {displayNameOrParent}
-            </span>
+            <CellSecondaryName
+              sha={sha}
+              displayNameOrParent={displayNameOrParent}
+              commit={commit}
+            />
           )}
         </div>
       )
