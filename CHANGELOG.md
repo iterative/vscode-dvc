@@ -2,19 +2,6 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.5.37] - 2023-01-16
-
-### 🚀 New Features and Enhancements
-
-- Add "Previous Commits" row to experiments table [#3087](https://github.com/iterative/vscode-dvc/pull/3087) by [@julieg18](https://github.com/julieg18)
-- Change "Remove Experiment" command to "Remove Experiments" [#3093](https://github.com/iterative/vscode-dvc/pull/3093) by [@julieg18](https://github.com/julieg18)
-- Update queue commands [#3094](https://github.com/iterative/vscode-dvc/pull/3094) by [@mattseddon](https://github.com/mattseddon)
-
-### 🔨 Maintenance
-
-- Update demo project and latest tested CLI version (2.41.1) [#3092](https://github.com/iterative/vscode-dvc/pull/3092) by [@mattseddon](https://github.com/mattseddon)
-- Increase timeout of smooth plot test (Windows CI) [#3089](https://github.com/iterative/vscode-dvc/pull/3089) by [@mattseddon](https://github.com/mattseddon)
-
 ## [0.5.36] - 2023-01-10
 
 ### 🚀 New Features and Enhancements
