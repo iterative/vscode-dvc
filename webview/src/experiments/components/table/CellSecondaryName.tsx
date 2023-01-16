@@ -18,7 +18,7 @@ export const CellSecondaryName: React.FC<{
     return children
   }
 
-  const { tags, author, message } = commit
+  const { tags, author, message, date } = commit
   const tooltipContent = (
     <div className={styles.experimentCellSecondaryNameTooltip}>
       <div>
@@ -33,7 +33,9 @@ export const CellSecondaryName: React.FC<{
           </>
         )}
       </div>
-      <p>Commit authored by {author}</p>
+      <p>
+        {author}, {date}
+      </p>
       <p className={styles.message}>{message}</p>
     </div>
   )

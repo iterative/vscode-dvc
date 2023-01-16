@@ -92,7 +92,7 @@ describe('collectExperiments', () => {
         }
       },
       false,
-      `a123\nJohn Smith\nrefNames:tag: v.1.1\nmessage:add new feature${COMMITS_SEPARATOR}b123\nrenovate[bot]\nrefNames:\nmessage:update various dependencies\n* update dvc\n* update dvclive`
+      `a123\nJohn Smith\n3 days ago\nrefNames:tag: v.1.1\nmessage:add new feature${COMMITS_SEPARATOR}b123\nrenovate[bot]\n5 weeks ago\nrefNames:\nmessage:update various dependencies\n* update dvc\n* update dvclive`
     )
     const [branch1, branch2] = branches
     expect(branch1.displayNameOrParent).toStrictEqual('add new feature')
@@ -101,11 +101,13 @@ describe('collectExperiments', () => {
     )
     expect(branch1.commit).toStrictEqual({
       author: 'John Smith',
+      date: '3 days ago',
       message: 'add new feature',
       tags: ['v.1.1']
     })
     expect(branch2.commit).toStrictEqual({
       author: 'renovate[bot]',
+      date: '5 weeks ago',
       message: 'update various dependencies\n* update dvc\n* update dvclive',
       tags: []
     })

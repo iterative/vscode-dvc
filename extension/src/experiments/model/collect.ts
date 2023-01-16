@@ -322,13 +322,17 @@ const getCommitDataFromOutput = (
 ): CommitData & { hash: string } => {
   const data: CommitData & { hash: string } = {
     author: '',
+    date: '',
     hash: '',
     message: '',
     tags: []
   }
-  const [hash, author, refNamesWithKey] = output.split('\n').filter(Boolean)
+  const [hash, author, date, refNamesWithKey] = output
+    .split('\n')
+    .filter(Boolean)
   data.hash = hash
   data.author = author
+  data.date = date
 
   const message = output.match(/\nmessage:(.+)/s) || []
   data.message = message[1] || ''

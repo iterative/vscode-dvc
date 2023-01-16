@@ -74,7 +74,8 @@ export const addCommitDataToMainBranch = (rows: Row[]) =>
       row.commit = {
         author: 'John Smith',
         message: 'Upgrading dependencies\n* upgrade dvc \n* upgrade dvclive',
-        tags: ['tag-1', 'tag-2']
+        tags: ['tag-1', 'tag-2'],
+        date: '4 days ago'
       }
     }
     return row
