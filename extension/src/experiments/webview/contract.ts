@@ -27,6 +27,7 @@ export type CommitData = {
   author: string
   tags: string[]
   message: string
+  date: string
 }
 
 export interface Experiment extends BaseExperimentFields {
