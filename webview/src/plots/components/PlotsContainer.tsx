@@ -67,7 +67,7 @@ export const SectionDescription = {
       <a href="https://dvc.org/doc/user-guide/experiment-management/visualizing-plots#plot-templates-data-series-only">
         plot templates
       </a>
-      . Either predefenined (e.g. confusion matrix, linear) or{' '}
+      . Either predefined (e.g. confusion matrix, linear) or{' '}
       <a href="https://dvc.org/doc/command-reference/plots/templates#custom-templates">
         custom Vega-lite templates
       </a>
