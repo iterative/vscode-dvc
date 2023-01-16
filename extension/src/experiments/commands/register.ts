@@ -3,7 +3,7 @@ import {
   getShareExperimentAsBranchCommand,
   getShareExperimentAsCommitCommand
 } from '.'
-import { pickGarbageCollectionFlags, pickQueueRemoveFlags } from '../quickPick'
+import { pickGarbageCollectionFlags } from '../quickPick'
 import { WorkspaceExperiments } from '../workspace'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import {
@@ -132,12 +132,6 @@ const registerExperimentNameCommands = (
         dvcRoot,
         id
       )
-  )
-
-  internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_REMOVE,
-    () =>
-      experiments.getCwdAndExpNameThenRun(AvailableCommands.EXPERIMENT_REMOVE)
   )
 
   internalCommands.registerExternalCliCommand(
@@ -279,17 +273,13 @@ const registerExperimentQuickPickCommands = (
   )
 
   internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.QUEUE_REMOVE,
-    () =>
-      experiments.getCwdAndQuickPickThenRun(
-        AvailableCommands.QUEUE_REMOVE,
-        pickQueueRemoveFlags
-      )
+    RegisteredCliCommands.QUEUE_KILL,
+    () => experiments.selectQueueTasksToKill()
   )
 
   internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.QUEUE_KILL,
-    () => experiments.selectQueueTasksToKill()
+    RegisteredCliCommands.EXPERIMENT_REMOVE,
+    () => experiments.selectExperimentsToRemove()
   )
 }
 

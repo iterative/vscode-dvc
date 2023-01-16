@@ -326,7 +326,7 @@ export const PlotsScale = {
   IMAGES: 'images',
   TEMPLATES: 'templates'
 } as const
-type PlotsScale = typeof PlotsScale[keyof typeof PlotsScale]
+type PlotsScale = (typeof PlotsScale)[keyof typeof PlotsScale]
 type PlotsScaleAccumulator = Record<PlotsScale, number>
 
 const addToScale = (acc: PlotsScaleAccumulator, type?: Set<PathType>) => {

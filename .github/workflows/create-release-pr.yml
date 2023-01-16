@@ -66,4 +66,3 @@ jobs:
             --message="Update version and CHANGELOG for release" \
             --title="Update version and CHANGELOG for release" \
             --body="$(cat ./body.log)" .
-          
