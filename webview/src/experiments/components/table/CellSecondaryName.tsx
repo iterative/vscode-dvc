@@ -43,7 +43,6 @@ export const CellSecondaryName: React.FC<{
   return (
     <Tooltip
       placement="bottom-start"
-      interactive
       appendTo={document.body}
       content={tooltipContent}
     >
