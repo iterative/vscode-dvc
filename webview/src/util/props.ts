@@ -1,4 +1,5 @@
 import React from 'react'
+import { isTooltip } from './helpers'
 import { isSelecting } from './strings'
 
 export type HandlerFunc<T> = (args?: {
@@ -7,18 +8,24 @@ export type HandlerFunc<T> = (args?: {
 
 export const clickAndEnterProps: <T>(
   handler: HandlerFunc<T>,
-  textsForSelection?: string[]
+  textsForSelection?: string[],
+  checkForTooltip?: boolean
 ) => {
   onClick: React.MouseEventHandler<T>
   onKeyDown: React.KeyboardEventHandler<T>
-} = (handler, textsForSelection = []) => ({
+} = (handler, textsForSelection = [], checkForTooltip = false) => ({
   onClick: e => {
     e.preventDefault()
     e.stopPropagation()
 
-    if (!isSelecting(textsForSelection)) {
-      handler({ mouse: e })
+    if (
+      isSelecting(textsForSelection) ||
+      (checkForTooltip && isTooltip(e.target as HTMLElement, ['BODY']))
+    ) {
+      return
     }
+
+    handler({ mouse: e })
   },
   onKeyDown: e => {
     e.preventDefault()
