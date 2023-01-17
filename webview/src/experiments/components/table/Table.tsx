@@ -6,6 +6,7 @@ import React, {
   useCallback
 } from 'react'
 import { useSelector } from 'react-redux'
+import { ColumnOrderState } from '@tanstack/react-table'
 import cx from 'classnames'
 import styles from './styles.module.scss'
 import { TableHead } from './header/TableHead'
@@ -17,7 +18,14 @@ import { ExperimentsState } from '../../store'
 import { Indicators } from './Indicators'
 import { getSelectedForPlotsCount } from '../../util/rows'
 
-export const Table: React.FC<InstanceProp> = ({ instance }) => {
+interface TableProps extends InstanceProp {
+  onColumnOrderChange: (order: ColumnOrderState) => void
+}
+
+export const Table: React.FC<TableProps> = ({
+  instance,
+  onColumnOrderChange
+}) => {
   const { rows, flatRows } = instance.getRowModel()
 
   const hasCheckpoints = useSelector(
@@ -97,6 +105,7 @@ export const Table: React.FC<InstanceProp> = ({ instance }) => {
           root={tableRef.current}
           setExpColumnNeedsShadow={setExpColumnNeedsShadow}
           setTableHeadHeight={setTableHeadHeight}
+          onOrderChange={onColumnOrderChange}
         />
         {rows.map(row => (
           <TableBody

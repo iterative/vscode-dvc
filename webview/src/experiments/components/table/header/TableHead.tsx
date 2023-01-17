@@ -1,12 +1,10 @@
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import React, { DragEvent, useRef, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Table, Header } from '@tanstack/react-table'
+import { Table, Header, ColumnOrderState } from '@tanstack/react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { MergedHeaderGroups } from './MergeHeaderGroups'
 import { setDropTarget } from '../headerDropTargetSlice'
-import styles from '../styles.module.scss'
-import { Indicators } from '../Indicators'
 import { ExperimentsState } from '../../../store'
 import { sendMessage } from '../../../../shared/vscode'
 import {
@@ -15,10 +13,10 @@ import {
   isExperimentColumn
 } from '../../../util/columns'
 import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
-import { getSelectedForPlotsCount } from '../../../util/rows'
 interface TableHeadProps {
   instance: Table<Experiment>
   root: HTMLElement | null
+  onOrderChange: (order: ColumnOrderState) => void
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   setTableHeadHeight: (height: number) => void
 }
@@ -26,14 +24,13 @@ interface TableHeadProps {
 export const TableHead = ({
   instance,
   root,
+  onOrderChange,
   setExpColumnNeedsShadow,
   setTableHeadHeight
 }: TableHeadProps) => {
-  const { setColumnOrder, getRowModel, getHeaderGroups, getAllColumns } =
-    instance
-  const { rows } = getRowModel()
+  const { setColumnOrder, getHeaderGroups, getAllLeafColumns } = instance
   const headerGroups = getHeaderGroups()
-  const allColumns = getAllColumns()
+  const allColumns = getAllLeafColumns()
 
   const headerDropTargetId = useSelector(
     (state: ExperimentsState) => state.headerDropTarget
@@ -105,6 +102,7 @@ export const TableHead = ({
       header => header.id === headerDropTargetId
     )
 
+    console.log(fullOrder, displacer, displacedHeader)
     if (fullOrder && displacer && displacedHeader) {
       const leafs = leafColumnIds(displacedHeader)
       newOrder = reorderColumnIds(fullOrder, displacer, leafs)
@@ -115,6 +113,7 @@ export const TableHead = ({
         type: MessageFromWebviewType.REORDER_COLUMNS
       })
       onDragEnd()
+      onOrderChange(newOrder)
     }
   }
 

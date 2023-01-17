@@ -48,8 +48,11 @@ export const reorderColumnIds = (
   ]
 }
 
-export const leafColumnIds = (header: Header<Experiment, unknown>): string[] =>
-  header.column.getLeafColumns().map(col => col.id)
+export const leafColumnIds = (
+  header: Header<Experiment, unknown>
+): string[] => {
+  return header.column.getLeafColumns().map(col => col.id)
+}
 
 export const EXPERIMENT_COLUMN_ID = 'id'
 

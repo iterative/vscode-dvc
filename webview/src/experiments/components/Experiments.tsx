@@ -124,7 +124,7 @@ const defaultColumn: Partial<ColumnDef<Row>> = {
 export const ExperimentsTable: React.FC = () => {
   const {
     columns: columnsData,
-    columnOrder,
+    columnOrder: initialColumnOrder,
     columnWidths,
     hasColumns,
     rows: data
@@ -136,6 +136,7 @@ export const ExperimentsTable: React.FC = () => {
   const [columnSizing, setColumnSizing] =
     useState<ColumnSizingState>(columnWidths)
   const [tableState, setTableState] = useState({})
+  const [columnOrder, setColumnOrder] = useState(initialColumnOrder)
 
   useEffect(() => {
     reportResizedColumn(columnSizing, columnWidths)
@@ -219,7 +220,7 @@ export const ExperimentsTable: React.FC = () => {
 
   return (
     <RowSelectionProvider>
-      <Table instance={instance} />
+      <Table instance={instance} onColumnOrderChange={setColumnOrder} />
     </RowSelectionProvider>
   )
 }
