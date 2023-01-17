@@ -21,6 +21,7 @@ import {
   Lines
 } from '../../shared/components/icons'
 import { isSelecting } from '../../util/strings'
+import { isTooltip } from '../../util/helpers'
 
 export interface CommonPlotsContainerProps {
   onResize: (size: number) => void
@@ -111,25 +112,11 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     </div>
   )
 
-  const isTooltip = (el: Element) => {
-    let currentNode = el
-    while (!['SUMMARY', 'BODY'].includes(currentNode.nodeName)) {
-      if (
-        !!currentNode.className.toLocaleLowerCase &&
-        currentNode.className.toLocaleLowerCase().includes('tooltip')
-      ) {
-        return true
-      }
-      currentNode = currentNode.parentElement || currentNode
-    }
-    return false
-  }
-
   const toggleSection = (e: MouseEvent) => {
     e.preventDefault()
     if (
       !isSelecting([title, SectionDescription[sectionKey].props.children]) &&
-      !isTooltip(e.target as Element)
+      !isTooltip(e.target as Element, ['SUMMARY', 'BODY'])
     ) {
       sendMessage({
         payload: {

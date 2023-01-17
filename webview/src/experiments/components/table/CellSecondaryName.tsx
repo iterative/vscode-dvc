@@ -45,6 +45,7 @@ export const CellSecondaryName: React.FC<{
       placement="bottom-start"
       appendTo={document.body}
       content={tooltipContent}
+      interactive
     >
       {children}
     </Tooltip>
