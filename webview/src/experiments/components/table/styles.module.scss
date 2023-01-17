@@ -721,6 +721,42 @@ $bullet-size: calc(var(--design-unit) * 4px);
   font-size: 0.75em;
 }
 
+.experimentCellSecondaryNameTooltip {
+  white-space: normal;
+  padding: 5px;
+
+  &,
+  p,
+  div,
+  .tag {
+    font-size: 0.9em;
+  }
+
+  *:first-child {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .sha {
+    margin: 0 auto 0 0;
+    font-size: 1em;
+  }
+
+  .tag {
+    margin-left: 5px;
+
+    &:first-of-type {
+      margin-left: 50px;
+    }
+  }
+
+  .message {
+    white-space: pre-wrap;
+    margin: 0;
+  }
+}
+
 .innerCell {
   @extend %baseInnerCell;
   justify-content: flex-end;

@@ -8,7 +8,12 @@ import omit from 'lodash.omit'
 import { ExperimentType } from '.'
 import { ExperimentsAccumulator } from './accumulator'
 import { extractColumns } from '../columns/extract'
-import { Experiment, ColumnType, isRunning } from '../webview/contract'
+import {
+  Experiment,
+  ColumnType,
+  isRunning,
+  CommitData
+} from '../webview/contract'
 import {
   ExperimentFieldsOrError,
   ExperimentFields,
@@ -312,6 +317,35 @@ const collectFromBranchesObject = (
   }
 }
 
+const getCommitDataFromOutput = (
+  output: string
+): CommitData & { hash: string } => {
+  const data: CommitData & { hash: string } = {
+    author: '',
+    date: '',
+    hash: '',
+    message: '',
+    tags: []
+  }
+  const [hash, author, date, refNamesWithKey] = output
+    .split('\n')
+    .filter(Boolean)
+  data.hash = hash
+  data.author = author
+  data.date = date
+
+  const message = output.match(/\nmessage:(.+)/s) || []
+  data.message = message[1] || ''
+
+  const refNames = refNamesWithKey.slice('refNames:'.length)
+  data.tags = refNames
+    .split(', ')
+    .filter(item => item.startsWith('tag: '))
+    .map(item => item.slice('tag: '.length))
+
+  return data
+}
+
 const formatCommitMessage = (commit: string) => {
   const lines = commit.split('\n').filter(Boolean)
   return `${lines[0]}${lines.length > 1 ? ' ...' : ''}`
@@ -319,12 +353,15 @@ const formatCommitMessage = (commit: string) => {
 
 const getCommitMessages = (
   commitsOutput: string
-): { [sha: string]: string } => {
+): { [sha: string]: CommitData } => {
+  if (!commitsOutput) {
+    return {}
+  }
   const commits = commitsOutput.split(COMMITS_SEPARATOR).map(commit => {
-    const [sha, ...splitMessage] = commit.split(' ')
-    return [sha, splitMessage.join(' ')]
+    const { hash, ...rest } = getCommitDataFromOutput(commit)
+    return [hash, { ...rest }]
   })
-  return Object.fromEntries(commits) as { [sha: string]: string }
+  return Object.fromEntries(commits) as { [sha: string]: CommitData }
 }
 
 const addCommitDataToBranches = (
@@ -335,7 +372,10 @@ const addCommitDataToBranches = (
   return branches.map(branch => {
     const { sha } = branch
     if (sha && commitMessages[sha]) {
-      branch.displayNameOrParent = formatCommitMessage(commitMessages[sha])
+      branch.displayNameOrParent = formatCommitMessage(
+        commitMessages[sha].message
+      )
+      branch.commit = commitMessages[sha]
     }
     return branch
   })

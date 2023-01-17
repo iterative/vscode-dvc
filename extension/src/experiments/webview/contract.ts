@@ -23,6 +23,13 @@ export interface DepColumns {
 
 export type RunningExperiment = { executor: string; id: string }
 
+export type CommitData = {
+  author: string
+  tags: string[]
+  message: string
+  date: string
+}
+
 export interface Experiment extends BaseExperimentFields {
   deps?: DepColumns
   displayColor?: string
@@ -39,6 +46,7 @@ export interface Experiment extends BaseExperimentFields {
   sha?: string
   starred?: boolean
   Created?: string
+  commit?: CommitData
 }
 
 export const isRunning = (status: ExperimentStatus | undefined): boolean =>
