@@ -15,6 +15,7 @@ import { isExperimentColumn, isFirstLevelHeader } from '../../../util/columns'
 import { ExperimentsState } from '../../../store'
 import { ContextMenu } from '../../../../shared/components/contextMenu/ContextMenu'
 import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
+import { ColumnWithGroup } from '../../../util/buildColumns'
 
 const calcResizerHeight = (header: Header<Experiment, unknown>) =>
   100 + (header.depth - header.column.depth - 1) * 105 + '%'
@@ -24,30 +25,31 @@ const getHeaderPropsArgs = (
   headerDropTargetId: string,
   sortEnabled: boolean,
   sortOrder: SortOrder
-) => ({
-  className: cx(
-    header.isPlaceholder ? styles.placeholderHeaderCell : styles.headerCell,
-    {
-      [styles.paramHeaderCell]:
-        header.column.columnDef.group === ColumnType.PARAMS,
-      [styles.metricHeaderCell]:
-        header.column.columnDef.group === ColumnType.METRICS,
-      [styles.depHeaderCell]: header.column.columnDef.group === ColumnType.DEPS,
-      [styles.firstLevelHeader]: isFirstLevelHeader(header.column.id),
-      [styles.leafHeader]: header.subHeaders === undefined,
-      [styles.menuEnabled]: sortEnabled,
-      [styles.sortingHeaderCellAsc]:
-        sortOrder ===
-        SortOrder.ASCENDING /*&& !column.column.parent.isPlaceholder*/,
-      [styles.sortingHeaderCellDesc]:
-        sortOrder === SortOrder.DESCENDING && !header.isPlaceholder
-    },
-    headerDropTargetId === header.id && styles.headerCellDropTarget
-  ),
-  style: {
-    position: undefined
+) => {
+  const columnWithGroup = header.column.columnDef as ColumnWithGroup
+  return {
+    className: cx(
+      header.isPlaceholder ? styles.placeholderHeaderCell : styles.headerCell,
+      {
+        [styles.paramHeaderCell]: columnWithGroup.group === ColumnType.PARAMS,
+        [styles.metricHeaderCell]: columnWithGroup.group === ColumnType.METRICS,
+        [styles.depHeaderCell]: columnWithGroup.group === ColumnType.DEPS,
+        [styles.firstLevelHeader]: isFirstLevelHeader(header.column.id),
+        [styles.leafHeader]: header.subHeaders === undefined,
+        [styles.menuEnabled]: sortEnabled,
+        [styles.sortingHeaderCellAsc]:
+          sortOrder ===
+          SortOrder.ASCENDING /*&& !column.column.parent.isPlaceholder*/,
+        [styles.sortingHeaderCellDesc]:
+          sortOrder === SortOrder.DESCENDING && !header.isPlaceholder
+      },
+      headerDropTargetId === header.id && styles.headerCellDropTarget
+    ),
+    style: {
+      position: undefined
+    }
   }
-})
+}
 
 const WithExpColumnNeedsShadowUpdates: React.FC<{
   children: ReactNode

@@ -135,16 +135,11 @@ export const ExperimentsTable: React.FC = () => {
   const [columns] = useState(getColumns(columnsData))
   const [columnSizing, setColumnSizing] =
     useState<ColumnSizingState>(columnWidths)
-  const [tableState, setTableState] = useState({})
   const [columnOrder, setColumnOrder] = useState(initialColumnOrder)
 
   useEffect(() => {
     reportResizedColumn(columnSizing, columnWidths)
   }, [columnSizing])
-
-  useEffect(() => {
-    //console.log(tableState)
-  }, [tableState])
 
   const getRowId = useCallback(
     (experiment: Row, relativeIndex: number, parent?: TableRow<Row>) =>
@@ -152,53 +147,25 @@ export const ExperimentsTable: React.FC = () => {
     []
   )
 
-  const instance = useReactTable<Row>(
-    {
-      autoResetAll: false,
-      columnResizeMode: 'onChange',
-      columns,
-      data,
-      defaultColumn,
-      getCoreRowModel: getCoreRowModel(),
-      getRowId,
-      enableColumnResizing: true,
-      onExpandedChange: setExpanded,
-      onColumnSizingChange: setColumnSizing,
-      onStateChange: setTableState,
-      getSubRows: row => row.subRows,
-      getExpandedRowModel: getExpandedRowModel(),
-      state: {
-        columnOrder,
-        expanded,
-        columnSizing
-      }
+  const instance = useReactTable<Row>({
+    autoResetAll: false,
+    columnResizeMode: 'onChange',
+    columns: columns as ColumnDef<Row, unknown>[],
+    data,
+    defaultColumn,
+    getCoreRowModel: getCoreRowModel(),
+    getRowId,
+    enableColumnResizing: true,
+    onExpandedChange: setExpanded,
+    onColumnSizingChange: setColumnSizing,
+    getSubRows: row => row.subRows,
+    getExpandedRowModel: getExpandedRowModel(),
+    state: {
+      columnOrder,
+      expanded,
+      columnSizing
     }
-    /*hooks => {
-      hooks.stateReducers.push((state, action) => {
-        if (action.type === 'columnStartResizing') {
-          document.body.classList.add(styles.isColumnResizing)
-        }
-        if (action.type === 'columnDoneResizing') {
-          reportResizedColumn(state)
-          document.body.classList.remove(styles.isColumnResizing)
-        }
-        return state
-      })
-    },
-    useFlexLayout,
-    useColumnOrder,
-    useExpanded,
-    useResizeColumns,
-    hooks => {
-      hooks.useInstance.push(instance => {
-        const { rows } = instance
-        const expandedRowCount = countRowsAndAddIndexes(rows)
-        Object.assign(instance, {
-          expandedRowCount
-        })
-      })
-    }*/
-  )
+  })
 
   const { toggleAllRowsExpanded } = instance
 

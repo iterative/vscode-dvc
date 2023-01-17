@@ -140,7 +140,7 @@ describe('Table', () => {
           reducer: experimentsReducers
         })}
       >
-        <Table instance={tableInstance} />
+        <Table instance={tableInstance} onColumnOrderChange={jest.fn} />
       </Provider>
     )
   }

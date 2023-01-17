@@ -8,6 +8,7 @@ import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import { MessagesMenu } from '../../../../shared/components/messagesMenu/MessagesMenu'
 import { MessagesMenuOptionProps } from '../../../../shared/components/messagesMenu/MessagesMenuOption'
 import { ExperimentsState } from '../../../store'
+import { ColumnWithGroup } from '../../../util/buildColumns'
 
 export enum SortOrder {
   ASCENDING = 'Sort Ascending',
@@ -21,9 +22,8 @@ const possibleOrders = {
   undefined: SortOrder.NONE
 } as const
 
-const isFromExperimentColumn = (column: Header<Experiment, unknown>) => {
-  return column.id === 'id' || column.id.startsWith('id_placeholder')
-}
+const isFromExperimentColumn = (header: Header<Experiment, unknown>) =>
+  header.column.id === 'id' || header.column.id.startsWith('id_placeholder')
 
 export const sortOption = (
   label: SortOrder,
@@ -120,7 +120,7 @@ export const getMenuOptions = (
   header: Header<Experiment, unknown>,
   sorts: SortDefinition[]
 ) => {
-  const leafColumn = getColumnLeaf(header, header.headerGroup.headers)
+  const leafColumn = header.column
   const menuOptions: MessagesMenuOptionProps[] = [
     {
       hidden: isFromExperimentColumn(header),
@@ -132,7 +132,9 @@ export const getMenuOptions = (
       }
     },
     {
-      hidden: header.headerGroup.id !== ColumnType.PARAMS,
+      hidden:
+        (header.column.columnDef as ColumnWithGroup).group !==
+        ColumnType.PARAMS,
       id: 'open-to-the-side',
       label: 'Open to the Side',
       message: {
