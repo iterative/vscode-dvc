@@ -334,7 +334,7 @@ const getCommitDataFromOutput = (
   data.author = author
   data.date = date
 
-  const message = output.match(/\nmessage:(.+)/s) || ['', '']
+  const message = output.match(/\nmessage:(.+)/s) || []
   data.message = message[1] || ''
 
   const refNames = refNamesWithKey.slice('refNames:'.length)
