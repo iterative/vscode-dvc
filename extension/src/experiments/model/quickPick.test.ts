@@ -198,7 +198,11 @@ describe('pickExperimentsToPlot', () => {
     }
 
     const mockedWorkspace = { label: EXPERIMENT_WORKSPACE_ID, selected: false }
-    const mockedBranch = { label: 'main', selected: false }
+    const mockedBranch = {
+      displayNameOrParent: 'Update dvc',
+      label: 'main',
+      selected: false
+    }
 
     const mockedExp1 = {
       displayNameOrParent: '[exp-1]',
@@ -248,7 +252,10 @@ describe('pickExperimentsToPlot', () => {
     expect(mockedQuickPickLimitedValues).toHaveBeenCalledWith(
       [
         getExpectedItem(mockedWorkspace),
-        getExpectedItem(mockedBranch),
+        {
+          ...getExpectedItem(mockedBranch),
+          description: mockedBranch.displayNameOrParent
+        },
         {
           kind: QuickPickItemKind.Separator,
           label: mockedExp1.id,
