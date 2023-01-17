@@ -27,11 +27,25 @@ const getSeparator = (experiment: Experiment) => ({
   value: undefined
 })
 
-const getItem = (experiment: Experiment, firstThreeColumnOrder: string[]) => ({
+const getItem = (
+  experiment: Experiment,
+  firstThreeColumnOrder: string[]
+): QuickPickItemWithValue<Experiment | undefined> => ({
   detail: getColumnPathsQuickPickDetail(experiment, firstThreeColumnOrder),
   label: experiment.label,
   value: omit(experiment, 'checkpoints')
 })
+
+const getItemWithDescription = (
+  experiment: ExperimentWithCheckpoints,
+  firstThreeColumnOrder: string[]
+) => {
+  const item = getItem(experiment, firstThreeColumnOrder)
+  if (!experiment.checkpoints && experiment.displayNameOrParent) {
+    item.description = experiment.displayNameOrParent
+  }
+  return item
+}
 
 const collectItem = (
   acc: QuickPickItemAccumulator,
@@ -56,7 +70,7 @@ const collectFromExperiment = (
     acc.items.push(getSeparator(experiment))
   }
 
-  collectItem(acc, experiment, firstThreeColumnOrder)
+  collectItem(acc, experiment, firstThreeColumnOrder, getItemWithDescription)
 
   for (const checkpoint of experiment.checkpoints || []) {
     collectItem(acc, checkpoint, firstThreeColumnOrder)
@@ -89,15 +103,7 @@ const collectExperimentOnlyItems = (
   }
 
   for (const experiment of experiments) {
-    collectItem(
-      acc,
-      experiment,
-      firstThreeColumnOrder,
-      (experiment: Experiment) => ({
-        ...getItem(experiment, firstThreeColumnOrder),
-        description: experiment.displayNameOrParent
-      })
-    )
+    collectItem(acc, experiment, firstThreeColumnOrder, getItemWithDescription)
   }
 
   return acc
