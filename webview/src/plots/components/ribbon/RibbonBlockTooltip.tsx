@@ -16,7 +16,7 @@ export const RibbonBlockTooltip: React.FC<{
   const { firstThreeColumns, commit } = revision
 
   const tooltipContent = (
-    <div className={styles.blockTooltip}>
+    <div>
       <table className={styles.columnsTable}>
         <tbody>
           {firstThreeColumns.map(({ path, value, type }) => (

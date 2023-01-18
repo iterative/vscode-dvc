@@ -7,61 +7,59 @@
   top: 3px;
 }
 
-.blockTooltip {
-  .columnsTable {
-    td {
-      padding: 4px;
+.columnsTable {
+  td {
+    padding: 4px;
 
-      &:first-child {
-        text-align: left;
-      }
+    &:first-child {
+      text-align: left;
+    }
 
-      &:nth-child(2) {
-        padding-right: 0;
-      }
+    &:nth-child(2) {
+      padding-right: 0;
+    }
 
-      &.depsKey {
-        color: $deps-color;
-      }
+    &.depsKey {
+      color: $deps-color;
+    }
 
-      &.metricsKey {
-        color: $metrics-color;
-      }
+    &.metricsKey {
+      color: $metrics-color;
+    }
 
-      &.paramsKey {
-        color: $params-color;
-      }
+    &.paramsKey {
+      color: $params-color;
+    }
 
-      svg {
-        display: block;
-        min-width: 100%;
-        min-height: 100%;
-      }
+    svg {
+      display: block;
+      min-width: 100%;
+      min-height: 100%;
+    }
 
-      .copyButton {
-        opacity: 0;
-        display: inline;
-        position: static;
-        margin-top: 2px;
-        font-size: 0.8125rem;
-      }
+    .copyButton {
+      opacity: 0;
+      display: inline;
+      position: static;
+      margin-top: 2px;
+      font-size: 0.8125rem;
+    }
 
-      &:hover .copyButton {
-        opacity: 1;
-      }
+    &:hover .copyButton {
+      opacity: 1;
     }
   }
+}
 
-  .commitMessage {
-    display: flex;
-    align-items: center;
-    margin: 0;
+.commitMessage {
+  display: flex;
+  align-items: center;
+  margin: 0;
 
-    &.addBorder {
-      margin: 1em 0;
-      padding-top: 1em;
-      border-top: 1px solid $tooltip-border;
-    }
+  &.addBorder {
+    margin: 1em 0;
+    padding-top: 1em;
+    border-top: 1px solid $tooltip-border;
   }
 }
 
