@@ -13,9 +13,6 @@ export const getSelectedForPlotsCount = (
 
   for (const row of rows) {
     selectedForPlotsCount = addToSelected(selectedForPlotsCount, row)
-
-    selectedForPlotsCount =
-      selectedForPlotsCount + getSelectedForPlotsCount(row.subRows)
   }
 
   return selectedForPlotsCount

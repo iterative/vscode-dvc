@@ -102,12 +102,15 @@ export const TableHeaderCellContents: React.FC<{
   setMenuSuppressed,
   resizerHeight
 }) => {
-  const [isResizing, setIsResizing] = useState(false)
   const isTimestamp = header.headerGroup.id === ColumnType.TIMESTAMP
   const columnIsResizing = header.column.getIsResizing()
 
   useEffect(() => {
-    setIsResizing(columnIsResizing)
+    if (columnIsResizing) {
+      document.body.classList.add(styles.isColumnResizing)
+    } else {
+      document.body.classList.remove(styles.isColumnResizing)
+    }
   }, [columnIsResizing])
 
   return (
@@ -137,8 +140,12 @@ export const TableHeaderCellContents: React.FC<{
           {...{ onMouseDown: header.getResizeHandler() }}
           onMouseEnter={() => setMenuSuppressed(true)}
           onMouseLeave={() => setMenuSuppressed(false)}
-          className={cx(styles.columnResizer, isResizing && styles.isResizing)}
+          className={cx(
+            styles.columnResizer,
+            columnIsResizing && styles.isResizing
+          )}
           style={{ height: resizerHeight }}
+          role="separator"
         />
       )}
     </>
