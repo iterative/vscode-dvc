@@ -10,12 +10,9 @@ import {
   ColumnDef,
   CellContext,
   useReactTable,
-  TableState,
   Row as TableRow,
   getCoreRowModel,
-  HeaderContext,
   getExpandedRowModel,
-  OnChangeFn,
   ColumnSizingState
 } from '@tanstack/react-table'
 import debounce from 'lodash.debounce'
@@ -24,6 +21,7 @@ import { Table } from './table/Table'
 import styles from './table/styles.module.scss'
 import { AddColumns, Welcome } from './GetStarted'
 import { RowSelectionProvider } from './table/RowSelectionContext'
+import { CellValue } from './table/content/Cell'
 import { buildColumns, columnHelper } from '../util/buildColumns'
 import { sendMessage } from '../../shared/vscode'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
@@ -31,7 +29,6 @@ import { GetStarted } from '../../shared/components/getStarted/GetStarted'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { ExperimentsState } from '../store'
 import { EXPERIMENT_COLUMN_ID } from '../util/columns'
-import { CellValue } from './table/content/Cell'
 
 const DEFAULT_COLUMN_WIDTH = 90
 const MINIMUM_COLUMN_WIDTH = 90
@@ -76,10 +73,10 @@ const getColumns = (columns: Column[]) => {
       buildColumns(
         [
           {
-            path: 'Created',
-            parentPath: ColumnType.TIMESTAMP,
             hasChildren: false,
             label: 'Created',
+            parentPath: ColumnType.TIMESTAMP,
+            path: 'Created',
             type: ColumnType.TIMESTAMP,
             width: 100
           }
@@ -88,15 +85,13 @@ const getColumns = (columns: Column[]) => {
       )) ||
     []
 
-  const builtColumns = [
+  return [
     getDefaultColumnWithIndicatorsPlaceHolder(),
     ...timestampColumn,
     ...buildColumns(columns, ColumnType.METRICS),
     ...buildColumns(columns, ColumnType.PARAMS),
     ...buildColumns(columns, ColumnType.DEPS)
   ]
-
-  return builtColumns
 }
 
 const reportResizedColumn = (
@@ -139,7 +134,7 @@ export const ExperimentsTable: React.FC = () => {
 
   useEffect(() => {
     reportResizedColumn(columnSizing, columnWidths)
-  }, [columnSizing])
+  }, [columnSizing, columnWidths])
 
   const getRowId = useCallback(
     (experiment: Row, relativeIndex: number, parent?: TableRow<Row>) =>
@@ -153,17 +148,17 @@ export const ExperimentsTable: React.FC = () => {
     columns: columns as ColumnDef<Row, unknown>[],
     data,
     defaultColumn,
-    getCoreRowModel: getCoreRowModel(),
-    getRowId,
     enableColumnResizing: true,
-    onExpandedChange: setExpanded,
-    onColumnSizingChange: setColumnSizing,
-    getSubRows: row => row.subRows,
+    getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
+    getRowId,
+    getSubRows: row => row.subRows,
+    onColumnSizingChange: setColumnSizing,
+    onExpandedChange: setExpanded,
     state: {
       columnOrder,
-      expanded,
-      columnSizing
+      columnSizing,
+      expanded
     }
   })
 

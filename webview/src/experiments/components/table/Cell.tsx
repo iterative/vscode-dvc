@@ -1,13 +1,13 @@
 import { flexRender } from '@tanstack/react-table'
+import { ValueWithChanges } from 'dvc/src/experiments/webview/contract'
 import React, { ReactNode } from 'react'
 import cx from 'classnames'
 import { ErrorTooltip } from './Errors'
 import styles from './styles.module.scss'
 import { CellProp, RowProp } from './interfaces'
 import { CellRowActionsProps, CellRowActions } from './CellRowActions'
-import { clickAndEnterProps } from '../../../util/props'
 import { CellValue } from './content/Cell'
-import { ValueWithChanges } from 'dvc/src/experiments/webview/contract'
+import { clickAndEnterProps } from '../../../util/props'
 
 const isValueWithChanges = (raw: CellValue): raw is ValueWithChanges =>
   typeof (raw as ValueWithChanges)?.changes === 'boolean'
@@ -44,17 +44,22 @@ const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
 export const FirstCell: React.FC<
   CellProp & CellRowActionsProps & { changesIfWorkspace: boolean }
 > = ({ cell, changesIfWorkspace, ...rowActionsProps }) => {
-  const { row, getIsPlaceholder } = cell
+  const {
+    row,
+    getIsPlaceholder,
+    getContext,
+    column: {
+      getSize,
+      columnDef: { cell: columnCell }
+    }
+  } = cell
   const {
     original: { error, status, label, displayNameOrParent = '' }
   } = row
   const { toggleExperiment } = rowActionsProps
 
   return (
-    <td
-      className={cx(styles.experimentCell)}
-      style={{ width: cell.column.getSize() }}
-    >
+    <td className={cx(styles.experimentCell)} style={{ width: getSize() }}>
       <div className={styles.innerCell}>
         <CellRowActions status={status} {...rowActionsProps} />
         <RowExpansionButton row={row} />
@@ -70,7 +75,7 @@ export const FirstCell: React.FC<
                 displayNameOrParent
               ])}
             >
-              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              {flexRender(columnCell, getContext())}
             </div>
           </ErrorTooltip>
         )}

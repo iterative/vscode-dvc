@@ -18,16 +18,5 @@ export const ExperimentGroup: React.FC<RowProp & BatchSelectionProp> = ({
       hasRunningExperiment={hasRunningExperiment}
       batchRowSelection={batchRowSelection}
     />
-    {row.getIsExpanded() &&
-      row.subRows.map(row => (
-        <NestedRow
-          row={row}
-          key={row.id}
-          contextMenuDisabled={contextMenuDisabled}
-          projectHasCheckpoints={projectHasCheckpoints}
-          hasRunningExperiment={hasRunningExperiment}
-          batchRowSelection={batchRowSelection}
-        />
-      ))}
   </>
 )

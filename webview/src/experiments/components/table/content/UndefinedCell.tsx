@@ -1,9 +1,28 @@
+import { CellContext } from '@tanstack/react-table'
+import { Experiment } from 'dvc/src/experiments/webview/contract'
 import React from 'react'
-import styles from '../styles.module.scss'
 import { CellContents } from './CellContent'
+import { CellValue } from './Cell'
+import styles from '../styles.module.scss'
 
-export const UndefinedCell: React.FC = () => (
-  <div className={styles.innerCell}>
-    <CellContents>-</CellContents>
-  </div>
-)
+interface UndefinedCellProps {
+  cell: CellContext<Experiment, CellValue>
+}
+
+export const UndefinedCell: React.FC<UndefinedCellProps> = ({ cell }) => {
+  const {
+    column: { id: columnId },
+    row: {
+      original: { id: rowId }
+    }
+  } = cell
+  return (
+    <div className={styles.innerCell}>
+      {columnId === 'Created' && rowId === 'workspace' ? (
+        <></>
+      ) : (
+        <CellContents>-</CellContents>
+      )}
+    </div>
+  )
+}

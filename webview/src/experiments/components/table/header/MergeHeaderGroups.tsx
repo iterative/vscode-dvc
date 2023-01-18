@@ -1,5 +1,4 @@
-import React, { ReactNode } from 'react'
-import cx from 'classnames'
+import React from 'react'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import { HeaderGroup, Header } from '@tanstack/react-table'
 import { TableHeader } from './TableHeader'

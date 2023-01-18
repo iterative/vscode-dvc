@@ -1,4 +1,4 @@
-import { Experiment, Column } from 'dvc/src/experiments/webview/contract'
+import { Experiment } from 'dvc/src/experiments/webview/contract'
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { Header } from '@tanstack/react-table'

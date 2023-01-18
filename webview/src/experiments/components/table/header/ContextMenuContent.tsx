@@ -73,12 +73,11 @@ export const getSortOptions = (
   sorts: SortDefinition[]
 ) => {
   const isNotExperiments = !isFromExperimentColumn(header)
-  const isSortable =
-    isNotExperiments &&
-    (!header.column.columns || header.column.columns?.length === 1)
+  const isSortable = isNotExperiments && header.column.columns.length <= 1
   const baseColumn =
-    header.headerGroup.headers.find(h => h.id === header.placeholderId) ||
-    header
+    header.headerGroup.headers.find(
+      h => h.column.id === header.placeholderId
+    ) || header.column
   const sort = sorts.find(sort => sort.path === baseColumn.id)
 
   const sortOrder: SortOrder = possibleOrders[`${sort?.descending}`]
@@ -96,24 +95,6 @@ export const getSortOptions = (
 
 export type HeaderGroupWithOptionalOriginalId = HeaderGroup<Experiment> & {
   originalId?: string
-}
-
-const getColumnLeaf = (
-  header: Header<Experiment, unknown>,
-  headersFromGroup: Header<Experiment, unknown>[]
-) => {
-  let leafColumn: Header<Experiment, unknown> = header
-
-  while (leafColumn?.isPlaceholder) {
-    const newLeafColumn = headersFromGroup.find(
-      h => h.id === leafColumn.placeholderId
-    )
-    if (!newLeafColumn) {
-      break
-    }
-    leafColumn = newLeafColumn
-  }
-  return leafColumn
 }
 
 export const getMenuOptions = (

@@ -37,9 +37,7 @@ const getHeaderPropsArgs = (
         [styles.firstLevelHeader]: isFirstLevelHeader(header.column.id),
         [styles.leafHeader]: header.subHeaders === undefined,
         [styles.menuEnabled]: sortEnabled,
-        [styles.sortingHeaderCellAsc]:
-          sortOrder ===
-          SortOrder.ASCENDING /*&& !column.column.parent.isPlaceholder*/,
+        [styles.sortingHeaderCellAsc]: sortOrder === SortOrder.ASCENDING,
         [styles.sortingHeaderCellDesc]:
           sortOrder === SortOrder.DESCENDING && !header.isPlaceholder
       },
@@ -90,6 +88,12 @@ export const TableHeaderCell: React.FC<{
   root,
   setExpColumnNeedsShadow
 }) => {
+  const {
+    colSpan,
+    column: { getCanResize, id },
+    isPlaceholder,
+    getSize
+  } = header
   const [menuSuppressed, setMenuSuppressed] = useState<boolean>(false)
   const headerDropTargetId = useSelector(
     (state: ExperimentsState) => state.headerDropTarget
@@ -99,11 +103,9 @@ export const TableHeaderCell: React.FC<{
   const { menuEnabled, isSortable, sortOrder } = useMemo(() => {
     return getMenuOptions(header, sorts)
   }, [header, sorts])
+  const isDraggable = !isPlaceholder && !isExperimentColumn(id)
 
-  const isDraggable = !header.isPlaceholder && !isExperimentColumn(header.id)
-  const { isPlaceholder } = header
-
-  const canResize = header.column.getCanResize() && !isPlaceholder
+  const canResize = getCanResize() && !isPlaceholder
   const resizerHeight = calcResizerHeight(header)
 
   const cellContents = (
@@ -140,16 +142,15 @@ export const TableHeaderCell: React.FC<{
           isSortable,
           sortOrder
         )}
-        data-testid={`header-${header.id}`}
-        key={header.id}
-        role="columnheader"
+        data-testid={`header-${id}`}
+        key={id}
         tabIndex={0}
-        colSpan={header.colSpan}
+        colSpan={colSpan}
         style={{
-          width: header.getSize()
+          width: getSize()
         }}
       >
-        {isExperimentColumn(header.id) ? (
+        {isExperimentColumn(id) ? (
           <WithExpColumnNeedsShadowUpdates
             setExpColumnNeedsShadow={setExpColumnNeedsShadow}
             root={root}

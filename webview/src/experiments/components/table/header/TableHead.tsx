@@ -102,7 +102,6 @@ export const TableHead = ({
       header => header.id === headerDropTargetId
     )
 
-    console.log(fullOrder, displacer, displacedHeader)
     if (fullOrder && displacer && displacedHeader) {
       const leafs = leafColumnIds(displacedHeader)
       newOrder = reorderColumnIds(fullOrder, displacer, leafs)
@@ -119,7 +118,7 @@ export const TableHead = ({
 
   return (
     <thead ref={wrapper}>
-      {headerGroups.map((headerGroup, i) => (
+      {headerGroups.map(headerGroup => (
         <MergedHeaderGroups
           key={headerGroup.id}
           headerGroup={headerGroup}

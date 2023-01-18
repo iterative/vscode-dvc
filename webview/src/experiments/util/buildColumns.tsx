@@ -4,7 +4,8 @@ import {
   createColumnHelper,
   AccessorFn,
   Column as TableColumn,
-  ColumnDef
+  ColumnDef,
+  CellContext
 } from '@tanstack/react-table'
 import {
   Column,
@@ -12,7 +13,7 @@ import {
   Experiment
 } from 'dvc/src/experiments/webview/contract'
 import { Header } from '../components/table/content/Header'
-import { Cell } from '../components/table/content/Cell'
+import { Cell, CellValue } from '../components/table/content/Cell'
 import { TimestampHeader } from '../components/table/content/TimestampHeader'
 
 export type ColumnWithGroup = ColumnDef<Experiment, unknown> & { group: string }
@@ -41,13 +42,13 @@ export const buildColumns = (
       const childColumns = buildColumns(properties, path)
 
       const mainColumnProperties = {
+        group: type,
         header: () =>
           type === ColumnType.TIMESTAMP ? (
             <TimestampHeader />
           ) : (
             <Header name={label} />
           ),
-        group: type,
         id: path,
         width
       }
@@ -61,7 +62,7 @@ export const buildColumns = (
 
       return columnHelper.accessor(buildAccessor(pathArray || [path]), {
         ...mainColumnProperties,
-        cell: Cell
+        cell: Cell as unknown as React.FC<CellContext<Column, CellValue>>
       })
     })
     .filter(Boolean) as TableColumn<Experiment>[]

@@ -13,9 +13,9 @@ import { TableHead } from './header/TableHead'
 import { InstanceProp, RowProp } from './interfaces'
 import { RowSelectionContext } from './RowSelectionContext'
 import { TableBody } from './TableBody'
+import { Indicators } from './Indicators'
 import { useClickOutside } from '../../../shared/hooks/useClickOutside'
 import { ExperimentsState } from '../../store'
-import { Indicators } from './Indicators'
 import { getSelectedForPlotsCount } from '../../util/rows'
 
 interface TableProps extends InstanceProp {
@@ -84,11 +84,10 @@ export const Table: React.FC<TableProps> = ({
       className={styles.tableContainer}
       style={{ '--table-head-height': `${tableHeadHeight}px` } as CSSProperties}
     >
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
       <table
         className={cx(expColumnNeedsShadow && styles.withExpColumnShadow)}
         ref={tableRef}
-        tabIndex={0}
-        role="tree"
         onKeyUp={e => {
           if (e.key === 'Escape') {
             clearSelectedRows?.()

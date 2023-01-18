@@ -1,6 +1,5 @@
 import { Value } from 'dvc/src/cli/dvc/contract'
 import {
-  Column,
   Experiment,
   ValueWithChanges
 } from 'dvc/src/experiments/webview/contract'
@@ -9,13 +8,13 @@ import React from 'react'
 import { CellContext } from '@tanstack/react-table'
 import { ErrorCell } from './ErrorCell'
 import { UndefinedCell } from './UndefinedCell'
+import { CellTooltip } from './CellTooltip'
+import { CellContents } from './CellContent'
 import styles from '../styles.module.scss'
 import Tooltip, {
   NORMAL_TOOLTIP_DELAY
 } from '../../../../shared/components/tooltip/Tooltip'
-import { CellContents } from './CellContent'
 import { CopyButton } from '../../../../shared/components/copyButton/CopyButton'
-import { CellTooltip } from './CellTooltip'
 
 export type CellValue = Value | ValueWithChanges
 
@@ -25,7 +24,7 @@ export const isValueWithChanges = (raw: CellValue): raw is ValueWithChanges =>
 export const cellValue = (raw: CellValue) =>
   isValueWithChanges(raw) ? raw.value : raw
 
-export const Cell: React.FC<CellContext<Column, CellValue>> = cell => {
+export const Cell: React.FC<CellContext<Experiment, CellValue>> = cell => {
   const value = cell.getValue()
   const {
     row: {
@@ -38,7 +37,7 @@ export const Cell: React.FC<CellContext<Column, CellValue>> = cell => {
   }
 
   if (value === undefined) {
-    return <UndefinedCell />
+    return <UndefinedCell cell={cell} />
   }
 
   const rawValue = cellValue(value)

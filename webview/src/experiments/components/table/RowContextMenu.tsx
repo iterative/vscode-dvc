@@ -247,9 +247,8 @@ export const RowContextMenu: React.FC<RowProp> = ({
   hasRunningExperiment = false,
   projectHasCheckpoints = false,
   row: {
-    original: { status, starred },
-    depth,
-    id
+    original: { status, starred, id },
+    depth
   }
 }) => {
   const { selectedRows, clearSelectedRows } =
