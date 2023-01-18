@@ -333,7 +333,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
     }
   }
 
-  .table.withExpColumnShadow tr > *:first-child:after {
+  table.withExpColumnShadow tr > *:first-child:after {
     box-shadow: 3px 0px 3px $shadow;
   }
 
