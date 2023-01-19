@@ -42,7 +42,9 @@ const getItemWithDescription = (
 ) => {
   const item = getItem(experiment, firstThreeColumnOrder)
   if (!experiment.checkpoints && experiment.displayNameOrParent) {
-    item.description = experiment.displayNameOrParent
+    item.description = `${experiment.commit ? '$(git-commit)' : ''}${
+      experiment.displayNameOrParent
+    }`
   }
   return item
 }
@@ -161,9 +163,11 @@ const getExperimentItems = (
   firstThreeColumnOrder: string[]
 ): ExperimentItem[] =>
   experiments.map(experiment => {
-    const { label, id, name, displayNameOrParent } = experiment
+    const { label, id, name, displayNameOrParent, commit } = experiment
     return {
-      description: displayNameOrParent,
+      description:
+        displayNameOrParent &&
+        `${commit ? '$(git-commit)' : ''}${displayNameOrParent}`,
       detail: getColumnPathsQuickPickDetail(experiment, firstThreeColumnOrder),
       label,
       value: {
