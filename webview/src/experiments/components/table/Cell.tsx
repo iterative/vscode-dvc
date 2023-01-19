@@ -8,6 +8,7 @@ import { CellProp, RowProp } from './interfaces'
 import { CellRowActionsProps, CellRowActions } from './CellRowActions'
 import { CellValue } from './content/Cell'
 import { clickAndEnterProps } from '../../../util/props'
+import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 
 const isValueWithChanges = (raw: CellValue): raw is ValueWithChanges =>
   typeof (raw as ValueWithChanges)?.changes === 'boolean'
@@ -74,6 +75,7 @@ export const FirstCell: React.FC<
                 label,
                 displayNameOrParent
               ])}
+              data-testid={`id___${cell.row.original.id}`}
             >
               {flexRender(columnCell, getContext())}
             </div>

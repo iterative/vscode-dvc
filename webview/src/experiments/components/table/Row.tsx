@@ -120,7 +120,7 @@ export const RowContent: React.FC<
       subRows?.filter(subRow => subRow.original.selected).length ?? 0
 
     const selections =
-      subRows?.filter(subRow => selectedRows[subRow.id]).length ?? 0
+      subRows?.filter(subRow => selectedRows[subRow.original.id]).length ?? 0
 
     return {
       plotSelections,
@@ -159,7 +159,6 @@ export const RowContent: React.FC<
             className
           )}
           tabIndex={0}
-          role="row"
           aria-selected={isRowSelected}
           data-testid={isWorkspace && 'workspace-row'}
         >
@@ -177,7 +176,7 @@ export const RowContent: React.FC<
             toggleStarred={toggleStarred}
           />
           {cells.map(cell => {
-            const cellId = `${cell.column.id}___${cell.row.id}`
+            const cellId = `${cell.column.id}___${cell.row.original.id}`
             return (
               <CellWrapper
                 cell={cell}

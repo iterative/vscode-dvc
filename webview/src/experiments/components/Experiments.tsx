@@ -127,7 +127,7 @@ export const ExperimentsTable: React.FC = () => {
 
   const [expanded, setExpanded] = useState({})
 
-  const [columns] = useState(getColumns(columnsData))
+  const [columns, setColumns] = useState(getColumns(columnsData))
   const [columnSizing, setColumnSizing] =
     useState<ColumnSizingState>(columnWidths)
   const [columnOrder, setColumnOrder] = useState(initialColumnOrder)
@@ -135,6 +135,10 @@ export const ExperimentsTable: React.FC = () => {
   useEffect(() => {
     reportResizedColumn(columnSizing, columnWidths)
   }, [columnSizing, columnWidths])
+
+  useEffect(() => {
+    setColumns(getColumns(columnsData))
+  }, [columnsData])
 
   const getRowId = useCallback(
     (experiment: Row, relativeIndex: number, parent?: TableRow<Row>) =>

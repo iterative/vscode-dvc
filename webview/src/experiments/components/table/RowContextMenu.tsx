@@ -69,11 +69,11 @@ const getMultiSelectMenuOptions = (
 
   return [
     toggleStarOption(
-      unstarredExperiments.map(value => value.row.id),
+      unstarredExperiments.map(value => value.row.original.id),
       'Star'
     ),
     toggleStarOption(
-      starredExperiments.map(value => value.row.id),
+      starredExperiments.map(value => value.row.original.id),
       'Unstar'
     ),
     experimentMenuOption(

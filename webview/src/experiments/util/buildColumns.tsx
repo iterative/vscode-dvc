@@ -49,7 +49,7 @@ export const buildColumns = (
           ) : (
             <Header name={label} />
           ),
-        id: path,
+        id: type === ColumnType.TIMESTAMP ? ColumnType.TIMESTAMP : path,
         width
       }
 

@@ -142,7 +142,9 @@ export const TableHeaderCell: React.FC<{
           isSortable,
           sortOrder
         )}
-        data-testid={`header-${id}`}
+        data-testid={`header-${id}${
+          header.isPlaceholder ? '_previous_placeholder_' + header.depth : ''
+        }`}
         key={id}
         tabIndex={0}
         colSpan={colSpan}
