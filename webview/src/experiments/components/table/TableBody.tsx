@@ -73,11 +73,10 @@ export const TableBody: React.FC<
     </WorkspaceRowGroupWrapper>
   ) : (
     <>
-      {row.index === 2 && (
+      {row.index === 2 && row.depth === 0 && (
         <tr className={cx(styles.tr, styles.previousCommitsRow)}>
-          <td className={styles.th} colSpan={row.getAllCells().length}>
-            Previous Commits
-          </td>
+          <td className={styles.th}>Previous Commits</td>
+          <td colSpan={row.getAllCells().length - 1}></td>
         </tr>
       )}
       <tbody

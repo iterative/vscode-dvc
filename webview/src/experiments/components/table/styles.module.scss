@@ -545,6 +545,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
 
   .placeholderHeaderCell {
     background-color: $header-bg-color;
+    border-bottom: 1px solid $header-bg-color;
     border-left: 1px solid $header-border-color;
     padding: 0.31rem $cell-padding;
 
@@ -576,11 +577,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
     border-bottom: $row-border;
 
     .th {
-      display: flex;
-      align-items: flex-end;
       font-size: 0.6rem;
-      height: 32px;
-      padding-bottom: 8px;
       padding-left: 16px;
     }
   }
