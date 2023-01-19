@@ -72,6 +72,7 @@
     "@types/react": "18.0.26",
     "**/recursive-readdir/minimatch": "5.1.2",
     "fastify": "3.29.4",
+    "json5": "2.2.3",
     "loader-utils": "2.0.4",
     "terser": "5.16.1",
     "trim-newlines": "3.0.1",
