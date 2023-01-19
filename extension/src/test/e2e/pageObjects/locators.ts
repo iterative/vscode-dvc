@@ -6,8 +6,8 @@ export const webview = {
 export const experiments = {
   ...webview,
   expandRowButton: 'button[title="Expand Row"]',
-  row: '[role=row]',
-  table: '[role=treegrid]'
+  row: 'tr',
+  table: 'table'
 }
 
 export const plots = {
