@@ -3969,13 +3969,6 @@
   dependencies:
     "@types/lodash" "*"
 
-"@types/lodash.flattendeep@^4.4.7":
-  version "4.4.7"
-  resolved "https://registry.yarnpkg.com/@types/lodash.flattendeep/-/lodash.flattendeep-4.4.7.tgz#0ce3dccbe006826d58e9824b27df4b00ed3e90e6"
-  integrity sha512-1h6GW/AeZw/Wej6uxrqgmdTDZX1yFS39lRsXYkg+3kWvOWWrlGCI6H7lXxlUHOzxDT4QeYGmgPpQ3BX9XevzOg==
-  dependencies:
-    "@types/lodash" "*"
-
 "@types/lodash.get@4.4.7":
   version "4.4.7"
   resolved "https://registry.yarnpkg.com/@types/lodash.get/-/lodash.get-4.4.7.tgz#1ea63d8b94709f6bc9e231f252b31440abe312cf"
