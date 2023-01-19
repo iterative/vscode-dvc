@@ -655,8 +655,9 @@ const getRevision = (
   experiment: Experiment,
   firstThreeColumns: string[]
 ): Revision => {
-  const { logicalGroupName, id, label } = experiment
-  return {
+  const { commit, displayNameOrParent, logicalGroupName, id, label } =
+    experiment
+  const revision: Revision = {
     displayColor,
     fetched: true,
     firstThreeColumns: getRevisionFirstThreeColumns(
@@ -667,6 +668,10 @@ const getRevision = (
     id,
     revision: label
   }
+  if (commit) {
+    revision.commit = displayNameOrParent
+  }
+  return revision
 }
 
 const overrideWithWorkspace = (

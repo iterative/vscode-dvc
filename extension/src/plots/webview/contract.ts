@@ -47,6 +47,7 @@ export type Revision = {
   group?: string
   displayColor: Color
   fetched: boolean
+  commit?: string
   firstThreeColumns: RevisionFirstThreeColumns
 }
 
