@@ -23,10 +23,15 @@ const MockedState: React.FC<{ data: PlotsData; children: React.ReactNode }> = ({
   return <>{children}</>
 }
 
+const plotsRevisionsFixtureWithCommit = plotsRevisionsFixture.map(revision => ({
+  ...revision,
+  commit: revision.id === 'main' ? 'Upgrade dependencies' : undefined
+}))
+
 export default {
   args: {
     data: {
-      selectedRevisions: plotsRevisionsFixture
+      selectedRevisions: plotsRevisionsFixtureWithCommit
     }
   },
   component: Ribbon,
@@ -51,7 +56,7 @@ export const WithData = Template.bind({})
 export const WithLoading = Template.bind({})
 WithLoading.args = {
   data: {
-    selectedRevisions: plotsRevisionsFixture.map(item => {
+    selectedRevisions: plotsRevisionsFixtureWithCommit.map(item => {
       if (['main', '42b8736'].includes(item.revision)) {
         return { ...item, fetched: false }
       }

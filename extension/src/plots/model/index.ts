@@ -226,20 +226,30 @@ export class PlotsModel extends ModelWithPersistence {
 
   public getSelectedRevisionDetails() {
     return this.experiments.getSelectedRevisions().map(exp => {
-      const { label, displayColor, logicalGroupName, id } = exp
-      const firstThreeColumns = getRevisionFirstThreeColumns(
-        this.experiments.getFirstThreeColumnOrder(),
-        exp
-      )
-
-      return {
+      const {
+        commit,
+        displayNameOrParent,
+        label,
+        displayColor,
+        logicalGroupName,
+        id
+      } = exp
+      const revision: Revision = {
         displayColor,
         fetched: this.fetchedRevs.has(label),
-        firstThreeColumns,
+        firstThreeColumns: getRevisionFirstThreeColumns(
+          this.experiments.getFirstThreeColumnOrder(),
+          exp
+        ),
         group: logicalGroupName,
         id,
         revision: label
       }
+
+      if (commit) {
+        revision.commit = displayNameOrParent
+      }
+      return revision
     })
   }
 
