@@ -719,6 +719,14 @@ $bullet-size: calc(var(--design-unit) * 4px);
 .experimentCellSecondaryName {
   color: $meta-cell-color;
   font-size: 0.75em;
+  display: flex;
+  align-items: center;
+
+  svg {
+    min-width: 10px;
+    min-height: 10px;
+    margin-right: 2px;
+  }
 }
 
 .experimentCellSecondaryNameTooltip {
@@ -741,6 +749,11 @@ $bullet-size: calc(var(--design-unit) * 4px);
   .sha {
     margin: 0 auto 0 0;
     font-size: 1em;
+
+    svg {
+      min-width: 14px;
+      min-height: 14px;
+    }
   }
 
   .tag {
