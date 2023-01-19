@@ -9,14 +9,9 @@ import {
   screen
 } from '@testing-library/react'
 import { Provider } from 'react-redux'
-import {
-  Experiment,
-  ExperimentStatus,
-  TableData
-} from 'dvc/src/experiments/webview/contract'
+import { TableData } from 'dvc/src/experiments/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React from 'react'
-import { Table as TableInstance } from '@tanstack/react-table'
 import tableDataFixture from 'dvc/src/test/fixtures/expShow/base/tableData'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import styles from './styles.module.scss'
@@ -47,90 +42,6 @@ const { postMessage } = vsCodeApi
 const mockedPostMessage = jest.mocked(postMessage)
 
 describe('Table', () => {
-  const getProps = (props: React.ReactPropTypes) => ({ ...props })
-  const getHeaderGroupProps = (key: string) => () => ({ key })
-  const headerBasicProps = {
-    getHeaderProps: getProps
-  }
-  const basicCellProps = {
-    getCellProps: getProps,
-    row: {
-      id: EXPERIMENT_WORKSPACE_ID,
-      original: {
-        status: ExperimentStatus.SUCCESS
-      }
-    }
-  }
-  const instance = {
-    getTableBodyProps: getProps,
-    getTableProps: getProps,
-    headerGroups: [
-      {
-        getHeaderGroupProps: getHeaderGroupProps('headerGroup_1'),
-        headers: [
-          {
-            ...headerBasicProps,
-            id: 'experiment',
-            render: () => 'Experiment'
-          },
-          {
-            ...headerBasicProps,
-            id: 'timestamp',
-            render: () => 'Created'
-          }
-        ]
-      }
-    ],
-    prepareRow: () => {},
-    rows: [
-      {
-        cells: [
-          {
-            ...basicCellProps,
-            column: {
-              id: 'experiment'
-            },
-            render: () => EXPERIMENT_WORKSPACE_ID
-          },
-          {
-            ...basicCellProps,
-            column: {
-              Header: 'Timestamp',
-              id: 'timestamp'
-            },
-            render: () => new Date('2021-09-09').toString()
-          }
-        ],
-        getRowProps: getProps,
-        id: EXPERIMENT_WORKSPACE_ID,
-        label: EXPERIMENT_WORKSPACE_ID,
-        original: {
-          status: ExperimentStatus.SUCCESS
-        },
-        values: {
-          id: EXPERIMENT_WORKSPACE_ID
-        }
-      } as unknown as Experiment
-    ],
-    setColumnOrder: jest.fn,
-    state: {
-      columnOrder: []
-    }
-  } as unknown as TableInstance<Experiment>
-  const dummyTableData: TableData = {
-    changes: [],
-    columnOrder: [],
-    columnWidths: {},
-    columns: [],
-    filteredCounts: { checkpoints: 0, experiments: 0 },
-    filters: [],
-    hasCheckpoints: false,
-    hasColumns: true,
-    hasRunningExperiment: false,
-    rows: [],
-    sorts: []
-  }
-
   const renderExperimentsTable = (
     partialTableData: Partial<TableData> = {}
   ) => {
@@ -138,23 +49,6 @@ describe('Table', () => {
       ...sortingTableDataFixture,
       ...partialTableData
     }
-    return render(
-      <Provider
-        store={configureStore({
-          preloadedState: { tableData },
-          reducer: experimentsReducers
-        })}
-      >
-        <ExperimentsTable />
-      </Provider>,
-      {
-        queries: { ...queries, ...customQueries }
-      }
-    )
-  }
-
-  const renderTable = (testData = {}) => {
-    const tableData = { ...dummyTableData, ...testData }
     return render(
       <Provider
         store={configureStore({

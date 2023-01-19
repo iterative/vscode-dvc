@@ -92,7 +92,8 @@ export const TableHeaderCell: React.FC<{
     colSpan,
     column: { getCanResize, id },
     isPlaceholder,
-    getSize
+    getSize,
+    depth
   } = header
   const [menuSuppressed, setMenuSuppressed] = useState<boolean>(false)
   const headerDropTargetId = useSelector(
@@ -143,7 +144,7 @@ export const TableHeaderCell: React.FC<{
           sortOrder
         )}
         data-testid={`header-${id}${
-          header.isPlaceholder ? '_previous_placeholder_' + header.depth : ''
+          isPlaceholder ? '_previous_placeholder_' + depth : ''
         }`}
         key={id}
         tabIndex={0}

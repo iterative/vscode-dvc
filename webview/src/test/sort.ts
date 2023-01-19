@@ -1,6 +1,10 @@
 import { screen } from '@testing-library/react'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
-import { ColumnType, TableData } from 'dvc/src/experiments/webview/contract'
+import {
+  Column,
+  ColumnType,
+  TableData
+} from 'dvc/src/experiments/webview/contract'
 
 export const defaultColumn = ['Experiment', 'Created']
 
@@ -39,7 +43,7 @@ export const tableData: TableData = {
   changes: [],
   columnOrder: [],
   columnWidths: {},
-  columns,
+  columns: columns as Column[],
   filteredCounts: { checkpoints: 0, experiments: 0 },
   filters: [],
   hasCheckpoints: false,
