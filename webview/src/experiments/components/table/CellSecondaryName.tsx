@@ -13,7 +13,7 @@ export const CellSecondaryName: React.FC<{
 }> = ({ displayNameOrParent, commit, sha }) => {
   const children = (
     <span className={styles.experimentCellSecondaryName}>
-      {commit && <Icon width={10} height={10} icon={GitCommit} />}{' '}
+      {commit && <Icon width={14} height={14} icon={GitCommit} />}{' '}
       {displayNameOrParent}
     </span>
   )
@@ -26,7 +26,7 @@ export const CellSecondaryName: React.FC<{
     <div className={styles.experimentCellSecondaryNameTooltip}>
       <div>
         <p className={styles.sha}>
-          <Icon width={14} height={14} icon={GitCommit} /> {sha?.slice(0, 7)}
+          <Icon width={16} height={16} icon={GitCommit} /> {sha?.slice(0, 7)}
         </p>
         {tags.length > 0 && (
           <>
