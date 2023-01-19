@@ -31,6 +31,32 @@ const buildAccessor: (valuePath: string[]) => AccessorFn<Column> =
     return `[${value.join(', ')}]`
   }
 
+const getMainColumnProperties = (
+  type: ColumnType,
+  label: string,
+  path: string,
+  width?: number
+) => {
+  const basicProperties = {
+    group: type,
+    width
+  }
+
+  if (type === ColumnType.TIMESTAMP) {
+    return {
+      ...basicProperties,
+      header: () => <TimestampHeader />,
+      id: ColumnType.TIMESTAMP
+    }
+  }
+
+  return {
+    ...basicProperties,
+    header: () => <Header name={label} />,
+    id: path
+  }
+}
+
 export const buildColumns = (
   properties: Column[],
   parentPath: string
@@ -41,18 +67,12 @@ export const buildColumns = (
       const { path, width, pathArray, label, type } = data
 
       const childColumns = buildColumns(properties, path)
-
-      const mainColumnProperties = {
-        group: type,
-        header: () =>
-          type === ColumnType.TIMESTAMP ? (
-            <TimestampHeader />
-          ) : (
-            <Header name={label} />
-          ),
-        id: type === ColumnType.TIMESTAMP ? ColumnType.TIMESTAMP : path,
+      const mainColumnProperties = getMainColumnProperties(
+        type,
+        label,
+        path,
         width
-      }
+      )
 
       if (childColumns.length > 0) {
         return columnHelper.group({

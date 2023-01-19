@@ -1,16 +1,12 @@
 import { flexRender } from '@tanstack/react-table'
-import { ValueWithChanges } from 'dvc/src/experiments/webview/contract'
 import React, { ReactNode } from 'react'
 import cx from 'classnames'
 import { ErrorTooltip } from './Errors'
 import styles from './styles.module.scss'
 import { CellProp, RowProp } from './interfaces'
 import { CellRowActionsProps, CellRowActions } from './CellRowActions'
-import { CellValue } from './content/Cell'
+import { CellValue, isValueWithChanges } from './content/Cell'
 import { clickAndEnterProps } from '../../../util/props'
-
-const isValueWithChanges = (raw: CellValue): raw is ValueWithChanges =>
-  typeof (raw as ValueWithChanges)?.changes === 'boolean'
 
 const cellHasChanges = (cellValue: CellValue) =>
   isValueWithChanges(cellValue) ? cellValue.changes : false

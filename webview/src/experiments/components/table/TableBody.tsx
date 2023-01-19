@@ -43,24 +43,19 @@ export const TableBody: React.FC<
   root,
   tableHeaderHeight
 }) => {
+  const contentProps = {
+    batchRowSelection,
+    contextMenuDisabled,
+    hasRunningExperiment,
+    key: row.id,
+    projectHasCheckpoints,
+    row
+  }
   const content =
     row.depth > 0 ? (
-      <ExperimentGroup
-        row={row}
-        key={row.id}
-        contextMenuDisabled={contextMenuDisabled}
-        projectHasCheckpoints={projectHasCheckpoints}
-        hasRunningExperiment={hasRunningExperiment}
-        batchRowSelection={batchRowSelection}
-      />
+      <ExperimentGroup {...contentProps} />
     ) : (
-      <RowContent
-        row={row}
-        projectHasCheckpoints={projectHasCheckpoints}
-        hasRunningExperiment={hasRunningExperiment}
-        contextMenuDisabled={contextMenuDisabled}
-        batchRowSelection={batchRowSelection}
-      />
+      <RowContent {...contentProps} />
     )
 
   return row.original.id === EXPERIMENT_WORKSPACE_ID ? (
