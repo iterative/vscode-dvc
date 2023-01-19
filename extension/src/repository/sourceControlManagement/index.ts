@@ -15,7 +15,7 @@ export type SCMState = {
 }
 
 export type SourceControlStatus =
-  typeof SourceControlDataStatus[keyof typeof SourceControlDataStatus]
+  (typeof SourceControlDataStatus)[keyof typeof SourceControlDataStatus]
 
 export type SourceControlResource = PathItem & {
   contextValue: SourceControlStatus

@@ -12,7 +12,7 @@ const WorkspaceScale = Object.assign(
   RepositoryScale
 )
 
-type ScaleType = typeof WorkspaceScale[keyof typeof WorkspaceScale]
+type ScaleType = (typeof WorkspaceScale)[keyof typeof WorkspaceScale]
 
 export type WorkspaceScale = Record<ScaleType, number>
 

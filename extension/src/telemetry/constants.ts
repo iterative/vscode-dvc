@@ -19,7 +19,7 @@ const ViewOpenedEvent = {
 } as const
 
 export type ViewOpenedEventName =
-  typeof ViewOpenedEvent[keyof typeof ViewOpenedEvent]
+  (typeof ViewOpenedEvent)[keyof typeof ViewOpenedEvent]
 
 export const EventName = Object.assign(
   {
