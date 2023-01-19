@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import React from 'react'
 import pyTorch from '../snippets/pyTorch.py'
 import huggingFace from '../snippets/huggingFace.py'

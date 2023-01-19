@@ -1,30 +1,6 @@
 import { GcPreserveFlag } from '../cli/dvc/constants'
-import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
+import { quickPickManyValues } from '../vscode/quickPick'
 import { Title } from '../vscode/title'
-import { Toast } from '../vscode/toast'
-
-export const pickExperiment = (
-  experiments: {
-    label: string
-    displayNameOrParent?: string
-    id: string
-    name?: string
-  }[],
-  title: Title = Title.SELECT_EXPERIMENT
-): Thenable<{ id: string; name: string } | undefined> | undefined => {
-  if (experiments.length === 0) {
-    Toast.showError('There are no experiments to select.')
-  } else {
-    return quickPickValue<{ id: string; name: string }>(
-      experiments.map(({ label, displayNameOrParent, id, name }) => ({
-        description: displayNameOrParent,
-        label,
-        value: { id, name: name || label }
-      })),
-      { title }
-    )
-  }
-}
 
 export const pickGarbageCollectionFlags = () =>
   quickPickManyValues<GcPreserveFlag>(

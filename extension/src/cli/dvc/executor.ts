@@ -5,7 +5,8 @@ import {
   ExperimentFlag,
   ExperimentSubCommand,
   Flag,
-  GcPreserveFlag
+  GcPreserveFlag,
+  QueueSubCommand
 } from './constants'
 import { typeCheckCommands } from '..'
 import { ContextKey, setContextValue } from '../../vscode/context'
@@ -25,6 +26,9 @@ export const autoRegisteredCommands = {
   MOVE: 'move',
   PULL: 'pull',
   PUSH: 'push',
+  QUEUE_KILL: 'queueKill',
+  QUEUE_START: 'queueStart',
+  QUEUE_STOP: 'queueStop',
   REMOVE: 'remove'
 } as const
 
@@ -126,6 +130,29 @@ export class DvcExecutor extends DvcCli {
     return this.blockAndExecuteProcess(cwd, Command.PUSH, ...args)
   }
 
+  public queueKill(cwd: string, ...args: Args) {
+    return this.executeDvcProcess(
+      cwd,
+      Command.QUEUE,
+      QueueSubCommand.KILL,
+      ...args
+    )
+  }
+
+  public queueStart(cwd: string, jobs: string) {
+    return this.createBackgroundDvcProcess(
+      cwd,
+      Command.QUEUE,
+      QueueSubCommand.START,
+      Flag.JOBS,
+      jobs
+    )
+  }
+
+  public queueStop(cwd: string) {
+    return this.executeDvcProcess(cwd, Command.QUEUE, QueueSubCommand.STOP)
+  }
+
   public remove(cwd: string, ...args: Args) {
     return this.blockAndExecuteProcess(cwd, Command.REMOVE, ...args)
   }
@@ -143,6 +170,6 @@ export class DvcExecutor extends DvcCli {
 
   private setRunning(running: boolean) {
     this.scmCommandRunning = running
-    setContextValue(ContextKey.SCM_RUNNING, running)
+    void setContextValue(ContextKey.SCM_RUNNING, running)
   }
 }

@@ -19,8 +19,7 @@ import { Disposable } from '../../class/dispose'
 
 export const autoRegisteredCommands = {
   EXPERIMENT_RESET_AND_RUN: 'runExperimentReset',
-  EXPERIMENT_RUN: 'runExperiment',
-  EXPERIMENT_RUN_QUEUED: 'runExperimentQueue'
+  EXPERIMENT_RUN: 'runExperiment'
 } as const
 
 export class DvcRunner extends Disposable implements ICli {
@@ -90,7 +89,7 @@ export class DvcRunner extends Disposable implements ICli {
     this.onDidTerminateProcess = this.processTerminated.event
     this.dispose.track(
       this.onDidTerminateProcess(() => {
-        this.stop()
+        void this.stop()
       })
     )
 
@@ -112,16 +111,12 @@ export class DvcRunner extends Disposable implements ICli {
     return this.runExperiment(dvcRoot, ExperimentFlag.RESET, ...args)
   }
 
-  public runExperimentQueue(dvcRoot: string) {
-    return this.runExperiment(dvcRoot, ExperimentFlag.RUN_ALL)
-  }
-
   public async run(cwd: string, ...args: Args) {
     await this.pseudoTerminal.openCurrentInstance()
     if (!this.pseudoTerminal.isBlocked()) {
       return this.startProcess(cwd, args)
     }
-    Toast.showError(
+    void Toast.showError(
       `Cannot start dvc ${args.join(
         ' '
       )} as the output terminal is already occupied.`
@@ -177,10 +172,13 @@ export class DvcRunner extends Disposable implements ICli {
     this.notifyOutput(process)
 
     let stderr = ''
-    process.stderr?.on('data', chunk => (stderr += chunk.toString()))
+    process.stderr?.on(
+      'data',
+      chunk => (stderr += (chunk as Buffer).toString())
+    )
 
-    process.on('close', exitCode => {
-      this.dispose.untrack(process)
+    void process.on('close', exitCode => {
+      void this.dispose.untrack(process)
       this.notifyCompleted({
         ...baseEvent,
         duration: stopWatch.getElapsedTime(),
@@ -214,7 +212,7 @@ export class DvcRunner extends Disposable implements ICli {
   private notifyOutput(process: Process) {
     process.all?.on('data', chunk =>
       this.processOutput.fire(
-        chunk
+        (chunk as Buffer)
           .toString()
           .split(/(\r?\n)/g)
           .join('\r')

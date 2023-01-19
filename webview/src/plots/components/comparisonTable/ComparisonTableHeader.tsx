@@ -24,7 +24,9 @@ export const ComparisonTableHeader: React.FC<ComparisonTableHeaderProps> = ({
   return (
     <div
       className={styles.header}
-      data-testid={`${children?.toString().split(',')[0]}-header`}
+      data-testid={`${
+        children?.toString().split(',')[0] || 'no-children'
+      }-header`}
     >
       {!isPinned && <GripIcon className={styles.gripIcon} />}
       <button className={pinClasses} onClick={onClicked}>

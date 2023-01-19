@@ -1,12 +1,17 @@
 import { join } from 'path'
 import { EventEmitter, Memento } from 'vscode'
+import isEmpty from 'lodash.isempty'
 import { Experiments, ModifiedExperimentAndRunCommandId } from '.'
 import { TableData } from './webview/contract'
 import { Args, DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
-import { CommandId, InternalCommands } from '../commands/internal'
+import {
+  AvailableCommands,
+  CommandId,
+  InternalCommands
+} from '../commands/internal'
 import { ResourceLocator } from '../resourceLocator'
 import { Toast } from '../vscode/toast'
-import { getInput } from '../vscode/inputBox'
+import { getInput, getPositiveIntegerInput } from '../vscode/inputBox'
 import { BaseWorkspaceWebviews } from '../webview/workspace'
 import { Title } from '../vscode/title'
 import { ContextKey, setContextValue } from '../vscode/context'
@@ -56,7 +61,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
           experiments => experiments.hasCheckpoints()
         )
 
-        setContextValue(
+        void setContextValue(
           ContextKey.EXPERIMENT_CHECKPOINTS,
           workspaceHasCheckpoints
         )
@@ -129,6 +134,42 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.getRepository(dvcRoot).selectColumns()
   }
 
+  public async selectQueueTasksToKill() {
+    const cwd = await this.getFocusedOrOnlyOrPickProject()
+    if (!cwd) {
+      return
+    }
+
+    const tasks = await this.getRepository(cwd).pickQueueTasksToKill()
+
+    if (!tasks || isEmpty(tasks)) {
+      return
+    }
+    return this.runCommand(
+      AvailableCommands.QUEUE_KILL,
+      cwd,
+      ...tasks.map(({ id }) => id)
+    )
+  }
+
+  public async selectExperimentsToRemove() {
+    const cwd = await this.getFocusedOrOnlyOrPickProject()
+    if (!cwd) {
+      return
+    }
+
+    const experiments = await this.getRepository(cwd).pickExperimentsToRemove()
+    if (!experiments || isEmpty(experiments)) {
+      return
+    }
+
+    return this.runCommand(
+      AvailableCommands.EXPERIMENT_REMOVE,
+      cwd,
+      ...experiments?.map(({ id }) => id)
+    )
+  }
+
   public async autoApplyFilters(enable: boolean, overrideRoot?: string) {
     const dvcRoot = await this.getDvcRoot(overrideRoot)
     if (!dvcRoot) {
@@ -187,11 +228,13 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     this.updatesPaused.fire(false)
   }
 
-  public getCwdThenReport(commandId: CommandId) {
-    const stdout = this.getCwdThenRun(commandId)
-    if (!stdout) {
+  public async getCwdThenReport(commandId: CommandId) {
+    const cwd = await this.getFocusedOrOnlyOrPickProject()
+    if (!cwd) {
       return
     }
+
+    const stdout = this.internalCommands.executeCommand(commandId, cwd)
     return Toast.showOutput(stdout)
   }
 
@@ -207,10 +250,10 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
   }
 
-  public getCwdAndQuickPickThenRun = async (
+  public async getCwdAndQuickPickThenRun(
     commandId: CommandId,
     quickPick: () => Thenable<string[] | undefined>
-  ) => {
+  ) {
     const cwd = await this.getFocusedOrOnlyOrPickProject()
     if (!cwd) {
       return
@@ -262,6 +305,25 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     }
 
     return this.runCommand(commandId, cwd, name)
+  }
+
+  public async getCwdIntegerInputAndRun(
+    commandId: CommandId,
+    title: Title,
+    options: { prompt: string; value: string }
+  ) {
+    const cwd = await this.getFocusedOrOnlyOrPickProject()
+    if (!cwd) {
+      return
+    }
+
+    const integer = await getPositiveIntegerInput(title, options)
+
+    if (!integer) {
+      return
+    }
+
+    return this.runCommand(commandId, cwd, integer)
   }
 
   public runCommand(commandId: CommandId, cwd: string, ...args: Args) {

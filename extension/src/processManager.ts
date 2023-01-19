@@ -20,9 +20,9 @@ export class ProcessManager extends Disposable {
   ) {
     super()
 
-    processes.map(({ name, process }) => {
+    for (const { name, process } of processes) {
       this.processes[name] = { process }
-    })
+    }
 
     const onDidPauseProcesses = processesPaused.event
 
@@ -89,7 +89,7 @@ export class ProcessManager extends Disposable {
   }
 
   private getNextFromQueue(): string | undefined {
-    const next = this.queued.values().next().value
+    const next = this.queued.values().next().value as string
     if (!next) {
       return
     }

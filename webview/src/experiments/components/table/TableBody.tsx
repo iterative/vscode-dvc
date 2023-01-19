@@ -72,13 +72,22 @@ export const TableBody: React.FC<
       {content}
     </WorkspaceRowGroupWrapper>
   ) : (
-    <tbody
-      className={cx(styles.rowGroup, styles.tbody, styles.normalRowGroup, {
-        [styles.experimentGroup]: row.depth > 0,
-        [styles.expandedGroup]: row.getIsExpanded() && row.subRows.length > 0
-      })}
-    >
-      {content}
-    </tbody>
+    <>
+      {row.index === 2 && (
+        <tr className={cx(styles.tr, styles.previousCommitsRow)}>
+          <td className={styles.th} colSpan={row.getAllCells().length}>
+            Previous Commits
+          </td>
+        </tr>
+      )}
+      <tbody
+        className={cx(styles.rowGroup, styles.tbody, styles.normalRowGroup, {
+          [styles.experimentGroup]: row.depth > 0,
+          [styles.expandedGroup]: row.getIsExpanded() && row.subRows.length > 0
+        })}
+      >
+        {content}
+      </tbody>
+    </>
   )
 }

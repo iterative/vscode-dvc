@@ -71,6 +71,8 @@ import { PlotSizeNumber } from '../../../plots/webview/contract'
 import { RegisteredCommands } from '../../../commands/external'
 import { ConfigKey } from '../../../vscode/config'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
+import * as Time from '../../../util/time'
+import { AvailableCommands } from '../../../commands/internal'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -141,7 +143,7 @@ suite('Experiments Test Suite', () => {
         sorts: []
       }
 
-      expect(messageSpy).to.be.calledWith(expectedTableData)
+      expect(messageSpy).to.be.calledWithExactly(expectedTableData)
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
@@ -194,8 +196,11 @@ suite('Experiments Test Suite', () => {
       const mockExecuteCommand = stub(
         internalCommands,
         'executeCommand'
-      ).resolves(undefined)
-
+      ).callsFake(commandId =>
+        commandId === AvailableCommands.GIT_GET_COMMIT_MESSAGES
+          ? Promise.resolve('')
+          : Promise.resolve(undefined)
+      )
       return {
         columnsModel,
         dvcExecutor,
@@ -1088,7 +1093,7 @@ suite('Experiments Test Suite', () => {
         )
       )
 
-      experiments.setState({
+      void experiments.setState({
         [EXPERIMENT_WORKSPACE_ID]: {
           baseline: { data: buildTestExperiment(10) }
         },
@@ -1303,7 +1308,7 @@ suite('Experiments Test Suite', () => {
           buildMockData<FileSystemData>()
         )
       )
-      testRepository.setState(expShowFixture)
+      void testRepository.setState(expShowFixture)
       await testRepository.isReady()
       expect(
         mementoSpy,
@@ -1480,7 +1485,7 @@ suite('Experiments Test Suite', () => {
           buildMockData<FileSystemData>()
         )
       )
-      testRepository.setState(expShowFixture)
+      void testRepository.setState(expShowFixture)
       await testRepository.isReady()
 
       expect(mementoSpy).to.be.calledWith('experimentsSortBy:test', [])
@@ -1624,6 +1629,57 @@ suite('Experiments Test Suite', () => {
         experiments.getSelectedRevisions(),
         'should show 0 selected experiments as selected in the description'
       ).to.deep.equal([])
+    })
+  })
+
+  describe('setState', () => {
+    it('should clean up after a killed DVCLive process that was running an experiment outside of the DVC context', async () => {
+      const defaultExperimentsData = { workspace: { baseline: { data: {} } } }
+
+      const { experiments, mockCheckSignalFile, mockUpdateExperimentsData } =
+        buildExperiments(disposable, defaultExperimentsData)
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const getCleanupInitialized = (experiments: any) =>
+        experiments.dvcLiveOnlyCleanupInitialized
+
+      await experiments.isReady()
+
+      const mockDelay = stub(Time, 'delay')
+      mockDelay.callsFake(() => mockDelay.wrappedMethod(500))
+
+      let processKilled = false
+
+      const cleanupUpdate = new Promise(resolve =>
+        mockUpdateExperimentsData.callsFake(() => resolve(undefined))
+      )
+
+      mockCheckSignalFile.resetBehavior()
+      mockCheckSignalFile.callsFake(() => {
+        return Promise.resolve(!processKilled)
+      })
+
+      const dataUpdated = new Promise(resolve =>
+        disposable.track(
+          experiments.onDidChangeExperiments(() => resolve(undefined))
+        )
+      )
+
+      void experiments.setState(defaultExperimentsData)
+      await dataUpdated
+      expect(experiments.hasRunningExperiment()).to.be.true
+      expect(getCleanupInitialized(experiments)).to.be.true
+
+      processKilled = true
+
+      mockUpdateExperimentsData.resetHistory()
+
+      await cleanupUpdate
+
+      expect(getCleanupInitialized(experiments)).to.be.false
+      expect(mockCheckSignalFile).to.be.called
+      expect(mockDelay).to.be.called
+      expect(mockUpdateExperimentsData).to.be.calledOnce
     })
   })
 })

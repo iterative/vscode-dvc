@@ -21,6 +21,9 @@ import {
   METRIC_PARAM_SEPARATOR
 } from '../paths'
 
+export const typedValueTreeEntries = (value: NonNullable<ValueTree>) =>
+  Object.entries(value) as [string, Value | ValueTree][]
+
 const collectMetricOrParam = (
   acc: ColumnAccumulator,
   type: ColumnType,
@@ -63,7 +66,7 @@ const walkValueTree = (
   tree: ValueTree,
   ancestors: string[] = []
 ) => {
-  for (const [label, value] of Object.entries(tree)) {
+  for (const [label, value] of typedValueTreeEntries(tree)) {
     if (isValueTree(value)) {
       walkValueTree(acc, type, value, [...ancestors, label])
     } else {
@@ -108,7 +111,7 @@ const collectChange = (
   ancestors: string[] = []
 ) => {
   if (isValueTree(value)) {
-    for (const [childKey, childValue] of Object.entries(value)) {
+    for (const [childKey, childValue] of typedValueTreeEntries(value)) {
       collectChange(changes, type, file, childKey, childValue, commitData, [
         ...ancestors,
         key
@@ -136,7 +139,7 @@ const collectFileChanges = (
     return
   }
 
-  for (const [key, value] of Object.entries(data)) {
+  for (const [key, value] of typedValueTreeEntries(data)) {
     collectChange(changes, type, file, key, value, commitData)
   }
 }
@@ -147,7 +150,10 @@ export const collectMetricAndParamChanges = (
   commitData: ExperimentFields
 ) => {
   for (const type of [ColumnType.METRICS, ColumnType.PARAMS]) {
-    for (const [file, value] of Object.entries(workspaceData?.[type] || {})) {
+    for (const [file, value] of Object.entries(workspaceData?.[type] || {}) as [
+      string,
+      ValueTreeOrError
+    ][]) {
       collectFileChanges(changes, type, commitData, file, value)
     }
   }

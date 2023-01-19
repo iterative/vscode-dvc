@@ -99,9 +99,9 @@ suite('Experiments Columns Tree Test Suite', () => {
         ...selectedGrandChildren
       ]
 
-      allSelectedChildren.map(column =>
+      for (const column of allSelectedChildren) {
         expect(column.status).to.equal(Status.SELECTED)
-      )
+      }
 
       const isUnselected = await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_METRICS_AND_PARAMS_TOGGLE,
@@ -124,9 +124,9 @@ suite('Experiments Columns Tree Test Suite', () => {
         ...unselectedGrandChildren
       ]
 
-      allUnselectedChildren.map(column =>
+      for (const column of allUnselectedChildren) {
         expect(column.status).to.equal(Status.UNSELECTED)
-      )
+      }
     })
 
     it("should be able to select a child and set all of the ancestors' statuses to indeterminate with dvc.views.experimentsColumnsTree.toggleStatus", async () => {
@@ -160,9 +160,9 @@ suite('Experiments Columns Tree Test Suite', () => {
 
       const allUnselected = [...unselectedChildren, ...unselectedGrandChildren]
 
-      allUnselected.map(column =>
+      for (const column of allUnselected) {
         expect(column?.status).to.equal(Status.UNSELECTED)
-      )
+      }
 
       const [firstGrandChild] = unselectedGrandChildren
 
@@ -193,9 +193,11 @@ suite('Experiments Columns Tree Test Suite', () => {
         )?.status
       ).to.equal(Status.INDETERMINATE)
 
-      unselectedOrIndeterminateParams
-        .filter(column => column.path !== parentPath)
-        .map(column => expect(column.status).to.equal(Status.UNSELECTED))
+      for (const column of unselectedOrIndeterminateParams.filter(
+        column => column.path !== parentPath
+      )) {
+        expect(column.status).to.equal(Status.UNSELECTED)
+      }
     })
 
     it("should be able to unselect the last remaining selected child and set it's ancestors to unselected with dvc.views.experimentsColumnsTree.toggleStatus", async () => {
@@ -227,9 +229,9 @@ suite('Experiments Columns Tree Test Suite', () => {
 
       const [firstGrandChild] = selectedGrandChildren
 
-      selectedGrandChildren.map(column =>
+      for (const column of selectedGrandChildren) {
         expect(column.status).to.equal(Status.SELECTED)
-      )
+      }
 
       await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_METRICS_AND_PARAMS_TOGGLE,
@@ -259,16 +261,16 @@ suite('Experiments Columns Tree Test Suite', () => {
 
       const unselectedChildren = experiments.getChildColumns(parentPath) || []
 
-      unselectedChildren.map(column =>
+      for (const column of unselectedChildren) {
         expect(column.status).to.equal(Status.UNSELECTED)
-      )
+      }
 
       const unselectedParents =
         experiments.getChildColumns(grandParentPath) || []
 
-      unselectedParents.map(column =>
+      for (const column of unselectedParents) {
         expect(column.status).to.equal(Status.UNSELECTED)
-      )
+      }
     })
 
     it("should be able to unselect the last selected child and set it's children and ancestors to unselected with dvc.views.experimentsColumnsTree.toggleStatus", async () => {
@@ -331,12 +333,12 @@ suite('Experiments Columns Tree Test Suite', () => {
 
       const unselectedChildren = experiments.getChildColumns(parentPath) || []
 
-      unselectedChildren.map(column =>
+      for (const column of unselectedChildren) {
         expect(
           column.status,
           "each of it's children are now unselected"
         ).to.equal(Status.UNSELECTED)
-      )
+      }
 
       const unselectedGrandParent = experiments
         .getChildColumns()

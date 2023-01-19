@@ -10,7 +10,4 @@ const MaxItemsBeforeVirtualization = {
 }
 
 export const shouldUseVirtualizedGrid = (nbItems: number, size: number) =>
-  nbItems >
-  MaxItemsBeforeVirtualization[
-    size as keyof typeof MaxItemsBeforeVirtualization
-  ]
+  nbItems > MaxItemsBeforeVirtualization[size]

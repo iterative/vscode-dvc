@@ -98,7 +98,10 @@ export class Extension extends Disposable {
     ]
 
     const outputChannel = this.dispose.track(
-      new OutputChannel(clis, context.extension.packageJSON.version)
+      new OutputChannel(
+        clis,
+        (context.extension.packageJSON as { version: string }).version
+      )
     )
 
     this.internalCommands = this.dispose.track(
@@ -232,11 +235,17 @@ export class Extension extends Disposable {
     reRegisterVsCodeCommands(this.internalCommands)
     registerWalkthroughCommands(
       this.internalCommands,
-      context.extension.packageJSON.id,
-      context.extension.packageJSON.contributes.walkthroughs[0].id
+      (context.extension.packageJSON as { id: string }).id,
+      (
+        context.extension.packageJSON as {
+          contributes: {
+            walkthroughs: { id: string }[]
+          }
+        }
+      ).contributes.walkthroughs[0].id
     )
 
-    showWalkthroughOnFirstUse(env.isNewAppInstall)
+    void showWalkthroughOnFirstUse(env.isNewAppInstall)
     this.dispose.track(recommendRedHatExtensionOnce())
   }
 

@@ -44,9 +44,7 @@ export const Cell: React.FC<CellContext<Experiment, CellValue>> = cell => {
   const stringValue = String(rawValue)
 
   const displayValue =
-    typeof rawValue === 'number'
-      ? formatNumber(rawValue as number)
-      : stringValue
+    typeof rawValue === 'number' ? formatNumber(rawValue) : stringValue
 
   return (
     <Tooltip

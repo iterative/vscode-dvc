@@ -15,7 +15,7 @@ import { DvcExecutor } from '../../../cli/dvc/executor'
 import {
   closeAllEditors,
   getInputBoxEvent,
-  getSafeWatcherDisposer,
+  getTimeSafeDisposer,
   mockDuration
 } from '../util'
 import { dvcDemoPath } from '../../util'
@@ -33,9 +33,10 @@ import { join } from '../../util/path'
 import { AvailableCommands } from '../../../commands/internal'
 import { GitExecutor } from '../../../cli/git/executor'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
+import { formatDate } from '../../../util/date'
 
 suite('Workspace Experiments Test Suite', () => {
-  const disposable = getSafeWatcherDisposer()
+  const disposable = getTimeSafeDisposer()
 
   beforeEach(() => {
     restore()
@@ -437,19 +438,93 @@ suite('Workspace Experiments Test Suite', () => {
     })
   })
 
+  describe('dvc.killExperimentsRunningInQueue', () => {
+    it('should be able to kill running queue tasks', async () => {
+      const mockQueueKill = stub(DvcExecutor.prototype, 'queueKill').resolves(
+        undefined
+      )
+
+      const queueTaskId = 'exp-e7a67'
+
+      const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
+        [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
+        Thenable<QuickPickItemWithValue<{ id: string }>[] | undefined>
+      >
+
+      mockShowQuickPick.resolves([
+        {
+          value: { id: queueTaskId }
+        } as QuickPickItemWithValue<{ id: string }>
+      ])
+
+      const { experiments } = buildExperiments(disposable)
+
+      await experiments.isReady()
+
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
+
+      await commands.executeCommand(RegisteredCliCommands.QUEUE_KILL)
+
+      expect(mockShowQuickPick).to.be.calledWithExactly(
+        [
+          {
+            description: '[exp-e7a67]',
+            detail: `Created:${formatDate(
+              '2020-12-29T15:31:52'
+            )}, loss:2.0205045, accuracy:0.37241668`,
+            label: '4fb124a',
+            value: { id: queueTaskId, name: 'exp-e7a67' }
+          }
+        ],
+        {
+          canPickMany: true,
+          matchOnDescription: true,
+          matchOnDetail: true,
+          title: Title.SELECT_QUEUE_KILL
+        }
+      )
+      expect(mockQueueKill).to.be.calledOnce
+      expect(mockQueueKill).to.be.calledWithExactly(dvcDemoPath, queueTaskId)
+    })
+  })
+
   describe('dvc.startExperimentsQueue', () => {
-    it('should be able to execute all experiments in the run queue', async () => {
-      const mockRunExperimentQueue = stub(
-        DvcRunner.prototype,
-        'runExperimentQueue'
-      ).resolves(undefined)
+    it('should be able to start the experiments queue with the selected number of workers', async () => {
+      const mockQueueStart = stub(DvcExecutor.prototype, 'queueStart').resolves(
+        undefined
+      )
+
+      const dDosNumberOfJobs = '10000'
+
+      const mockInputBox = stub(window, 'showInputBox').resolves(
+        dDosNumberOfJobs
+      )
 
       stubWorkspaceExperimentsGetters(dvcDemoPath)
 
-      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_RUN_QUEUED)
+      await commands.executeCommand(RegisteredCliCommands.QUEUE_START)
 
-      expect(mockRunExperimentQueue).to.be.calledOnce
-      expect(mockRunExperimentQueue).to.be.calledWith(dvcDemoPath)
+      expect(mockQueueStart).to.be.calledOnce
+      expect(mockQueueStart).to.be.calledWithExactly(
+        dvcDemoPath,
+        dDosNumberOfJobs
+      )
+      expect(mockInputBox)
+    })
+  })
+
+  describe('dvc.stopExperimentsQueue', () => {
+    it('should be able to stop the experiments queue', async () => {
+      const mockQueueStop = stub(DvcExecutor.prototype, 'queueStop').resolves(
+        undefined
+      )
+
+      stubWorkspaceExperimentsGetters(dvcDemoPath)
+
+      await commands.executeCommand(RegisteredCliCommands.QUEUE_STOP)
+
+      expect(mockQueueStop).to.be.calledOnce
+      expect(mockQueueStop).to.be.calledWithExactly(dvcDemoPath)
     })
   })
 
@@ -478,6 +553,9 @@ suite('Workspace Experiments Test Suite', () => {
         [
           {
             description: '[exp-e7a67]',
+            detail: `Created:${formatDate(
+              '2020-12-29T15:31:52'
+            )}, loss:2.0205045, accuracy:0.37241668`,
             label: '4fb124a',
             value: {
               id: 'exp-e7a67',
@@ -486,6 +564,9 @@ suite('Workspace Experiments Test Suite', () => {
           },
           {
             description: '[test-branch]',
+            detail: `Created:${formatDate(
+              '2020-12-29T15:28:59'
+            )}, loss:1.9293040, accuracy:0.46680000`,
             label: '42b8736',
             value: {
               id: 'test-branch',
@@ -494,6 +575,9 @@ suite('Workspace Experiments Test Suite', () => {
           },
           {
             description: '[exp-83425]',
+            detail: `Created:${formatDate(
+              '2020-12-29T15:27:02'
+            )}, loss:1.7750162, accuracy:0.59265000`,
             label: '1ba7bcd',
             value: {
               id: 'exp-83425',
@@ -502,6 +586,7 @@ suite('Workspace Experiments Test Suite', () => {
           },
           {
             description: undefined,
+            detail: 'Created:-, loss:-, accuracy:-',
             label: '489fd8b',
             value: {
               id: '489fd8bdaa709f7330aac342e051a9431c625481',
@@ -510,11 +595,17 @@ suite('Workspace Experiments Test Suite', () => {
           },
           {
             description: '[exp-f13bca]',
+            detail: `Created:${formatDate(
+              '2020-12-29T15:26:36'
+            )}, loss:-, accuracy:-`,
             label: 'f0f9186',
             value: { id: 'exp-f13bca', name: 'exp-f13bca' }
           },
           {
             description: undefined,
+            detail: `Created:${formatDate(
+              '2020-12-29T15:25:27'
+            )}, loss:-, accuracy:-`,
             label: '55d492c',
             value: {
               id: '55d492c9c633912685351b32df91bfe1f9ecefb9',
@@ -524,6 +615,8 @@ suite('Workspace Experiments Test Suite', () => {
         ],
         {
           canPickMany: false,
+          matchOnDescription: true,
+          matchOnDetail: true,
           title: Title.SELECT_EXPERIMENT
         }
       )
@@ -681,8 +774,13 @@ suite('Workspace Experiments Test Suite', () => {
   })
 
   describe('dvc.removeExperiment', () => {
-    it('should ask the user to pick an experiment and then remove that experiment from the workspace', async () => {
-      const mockExperiment = 'exp-to-remove'
+    it('should ask the user to pick experiment(s) and then remove selected experiments from the workspace', async () => {
+      const mockExperiment = 'exp-e7a67'
+      const secondMockExperiment = 'exp-83425'
+      type QuickPickReturnValue = QuickPickItemWithValue<{
+        id: string
+        name: string
+      }>[]
 
       const { experiments } = buildExperiments(disposable)
 
@@ -690,17 +788,113 @@ suite('Workspace Experiments Test Suite', () => {
 
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
-      stub(window, 'showQuickPick').resolves({
-        value: { id: mockExperiment, name: mockExperiment }
-      } as QuickPickItemWithValue<{ id: string; name: string }>)
+      const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
+        [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
+        Thenable<QuickPickReturnValue | undefined>
+      >
+
+      mockShowQuickPick
+        .onFirstCall()
+        .resolves([
+          {
+            value: { id: mockExperiment, name: mockExperiment }
+          }
+        ] as QuickPickReturnValue)
+        .onSecondCall()
+        .resolves([
+          {
+            value: { id: mockExperiment, name: mockExperiment }
+          },
+          {
+            value: { id: secondMockExperiment, name: secondMockExperiment }
+          }
+        ] as QuickPickReturnValue)
       const mockExperimentRemove = stub(
         DvcExecutor.prototype,
         'experimentRemove'
       )
 
       await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_REMOVE)
-
+      expect(mockShowQuickPick).calledWithExactly(
+        [
+          {
+            description: '[exp-e7a67]',
+            detail: `Created:${formatDate(
+              '2020-12-29T15:31:52'
+            )}, loss:2.0205045, accuracy:0.37241668`,
+            label: '4fb124a',
+            value: {
+              id: 'exp-e7a67',
+              name: 'exp-e7a67'
+            }
+          },
+          {
+            description: '[test-branch]',
+            detail: `Created:${formatDate(
+              '2020-12-29T15:28:59'
+            )}, loss:1.9293040, accuracy:0.46680000`,
+            label: '42b8736',
+            value: {
+              id: 'test-branch',
+              name: 'test-branch'
+            }
+          },
+          {
+            description: '[exp-83425]',
+            detail: `Created:${formatDate(
+              '2020-12-29T15:27:02'
+            )}, loss:1.7750162, accuracy:0.59265000`,
+            label: '1ba7bcd',
+            value: {
+              id: 'exp-83425',
+              name: 'exp-83425'
+            }
+          },
+          {
+            description: undefined,
+            detail: 'Created:-, loss:-, accuracy:-',
+            label: '489fd8b',
+            value: {
+              id: '489fd8bdaa709f7330aac342e051a9431c625481',
+              name: '489fd8b'
+            }
+          },
+          {
+            description: '[exp-f13bca]',
+            detail: `Created:${formatDate(
+              '2020-12-29T15:26:36'
+            )}, loss:-, accuracy:-`,
+            label: 'f0f9186',
+            value: { id: 'exp-f13bca', name: 'exp-f13bca' }
+          },
+          {
+            description: undefined,
+            detail: `Created:${formatDate(
+              '2020-12-29T15:25:27'
+            )}, loss:-, accuracy:-`,
+            label: '55d492c',
+            value: {
+              id: '55d492c9c633912685351b32df91bfe1f9ecefb9',
+              name: '55d492c'
+            }
+          }
+        ],
+        {
+          canPickMany: true,
+          matchOnDescription: true,
+          matchOnDetail: true,
+          title: 'Select Experiments to Remove'
+        }
+      )
       expect(mockExperimentRemove).to.be.calledWith(dvcDemoPath, mockExperiment)
+
+      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_REMOVE)
+
+      expect(mockExperimentRemove).to.be.calledWith(
+        dvcDemoPath,
+        mockExperiment,
+        secondMockExperiment
+      )
     })
   })
 

@@ -70,10 +70,11 @@ export const FirstCell: React.FC<
                 [styles.workspaceChange]: changesIfWorkspace,
                 [styles.error]: error
               })}
-              {...clickAndEnterProps(toggleExperiment, [
-                label,
-                displayNameOrParent
-              ])}
+              {...clickAndEnterProps(
+                toggleExperiment,
+                [label, displayNameOrParent],
+                true
+              )}
               data-testid={`id___${id}`}
             >
               {flexRender(columnCell, getContext())}

@@ -19,11 +19,11 @@ type ProgressCallback = (
 export class Toast {
   static async showOutput(stdout: Promise<string | undefined>) {
     const output = (await stdout) || 'Operation successful.'
-    Toast.infoWithOptions(output)
+    void Toast.infoWithOptions(output)
   }
 
   static showError(message: string) {
-    Toast.errorWithOptions(message)
+    void Toast.errorWithOptions(message)
     return Promise.resolve(undefined)
   }
 

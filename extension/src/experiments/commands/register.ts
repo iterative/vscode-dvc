@@ -28,6 +28,11 @@ const registerExperimentCwdCommands = (
   )
 
   internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.QUEUE_STOP,
+    () => experiments.getCwdThenReport(AvailableCommands.QUEUE_STOP)
+  )
+
+  internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE,
     () =>
       experiments.pauseUpdatesThenRun(() =>
@@ -127,12 +132,6 @@ const registerExperimentNameCommands = (
         dvcRoot,
         id
       )
-  )
-
-  internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_REMOVE,
-    () =>
-      experiments.getCwdAndExpNameThenRun(AvailableCommands.EXPERIMENT_REMOVE)
   )
 
   internalCommands.registerExternalCliCommand(
@@ -272,6 +271,16 @@ const registerExperimentQuickPickCommands = (
     (context: Context) =>
       experiments.selectColumns(getDvcRootFromContext(context))
   )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.QUEUE_KILL,
+    () => experiments.selectQueueTasksToKill()
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_REMOVE,
+    () => experiments.selectExperimentsToRemove()
+  )
 }
 
 const registerExperimentRunCommands = (
@@ -294,8 +303,17 @@ const registerExperimentRunCommands = (
   )
 
   internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_RUN_QUEUED,
-    () => experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RUN_QUEUED)
+    RegisteredCliCommands.QUEUE_START,
+    () =>
+      experiments.getCwdIntegerInputAndRun(
+        AvailableCommands.QUEUE_START,
+        Title.ENTER_EXPERIMENT_WORKER_COUNT,
+        {
+          prompt:
+            'Input the maximum number of concurrent queue workers to start.',
+          value: '1'
+        }
+      )
   )
 
   internalCommands.registerExternalCommand(

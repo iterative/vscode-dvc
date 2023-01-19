@@ -12,7 +12,7 @@ concurrency:
 jobs:
   suite:
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 20
+    timeout-minutes: 25
     strategy:
       matrix:
         os: [windows-latest]
@@ -41,6 +41,7 @@ jobs:
           restore-keys: |
             turbo-${{ runner.os }}-cross-platform-${{ github.job }}-${{ github.ref_name }}-
 
+      - run: yarn config set network-timeout 300000
       - run: yarn install
 
       - run: yarn run test:jest

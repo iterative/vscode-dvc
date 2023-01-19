@@ -126,7 +126,7 @@ suite('Quick Pick Test Suite', () => {
         { label: 'R', value: 9 }
       ]
 
-      quickPickLimitedValues(
+      void quickPickLimitedValues(
         items,
         items.slice(0, maxSelectedItems - 1),
         maxSelectedItems,

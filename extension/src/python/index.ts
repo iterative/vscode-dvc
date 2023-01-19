@@ -7,7 +7,7 @@ import { createProcess, executeProcess, Process } from '../processExecution'
 
 const sendOutput = (process: Process) => {
   process.all?.on('data', chunk =>
-    Logger.log(chunk.toString().replace(/(\r?\n)/g, ''))
+    Logger.log((chunk as Buffer).toString().replace(/(\r?\n)/g, ''))
   )
   return process
 }

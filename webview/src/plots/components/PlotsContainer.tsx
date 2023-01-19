@@ -21,6 +21,7 @@ import {
   Lines
 } from '../../shared/components/icons'
 import { isSelecting } from '../../util/strings'
+import { isTooltip } from '../../util/helpers'
 
 export interface CommonPlotsContainerProps {
   onResize: (size: number) => void
@@ -67,7 +68,7 @@ export const SectionDescription = {
       <a href="https://dvc.org/doc/user-guide/experiment-management/visualizing-plots#plot-templates-data-series-only">
         plot templates
       </a>
-      . Either predefenined (e.g. confusion matrix, linear) or{' '}
+      . Either predefined (e.g. confusion matrix, linear) or{' '}
       <a href="https://dvc.org/doc/command-reference/plots/templates#custom-templates">
         custom Vega-lite templates
       </a>
@@ -111,25 +112,11 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     </div>
   )
 
-  const isTooltip = (el: Element) => {
-    let currentNode = el
-    while (!['SUMMARY', 'BODY'].includes(currentNode.nodeName)) {
-      if (
-        !!currentNode.className.toLocaleLowerCase &&
-        currentNode.className.toLocaleLowerCase().includes('tooltip')
-      ) {
-        return true
-      }
-      currentNode = currentNode.parentElement || currentNode
-    }
-    return false
-  }
-
   const toggleSection = (e: MouseEvent) => {
     e.preventDefault()
     if (
       !isSelecting([title, SectionDescription[sectionKey].props.children]) &&
-      !isTooltip(e.target as Element)
+      !isTooltip(e.target as Element, ['SUMMARY', 'BODY'])
     ) {
       sendMessage({
         payload: {

@@ -33,7 +33,7 @@ export enum Flag {
   NAME_ONLY = '--name-only',
   NO_EMPTY_DIRECTORY = '--no-empty-directory',
   NUMBER = '-n',
-  PRETTY_FORMAT_COMMIT_MESSAGE = '--pretty=format:%H %B',
+  PRETTY_FORMAT_COMMIT_MESSAGE = '--pretty=format:%H%n%an%n%ar%nrefNames:%D%nmessage:%B',
   OTHERS = '--others',
   QUIET = '-q',
   RAW_WITH_NUL = '-z',
@@ -47,5 +47,7 @@ export enum Commit {
 }
 
 export const DEFAULT_REMOTE = 'origin'
+
+export const COMMITS_SEPARATOR = '\u0000'
 
 export type Args = (Command | Flag | Commit | typeof DEFAULT_REMOTE | string)[]

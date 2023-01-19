@@ -31,6 +31,7 @@ import { collectFlatExperimentParams } from './modify/collect'
 import {
   Experiment,
   isQueued,
+  isRunning,
   Row,
   RunningExperiment
 } from '../webview/contract'
@@ -119,7 +120,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   public transformAndSet(
     data: ExperimentsOutput,
     dvcLiveOnly: boolean,
-    commitMessages: { [sha: string]: string }
+    commitsOutput: string
   ) {
     const {
       workspace,
@@ -127,7 +128,7 @@ export class ExperimentsModel extends ModelWithPersistence {
       experimentsByBranch,
       checkpointsByTip,
       runningExperiments
-    } = collectExperiments(data, dvcLiveOnly, commitMessages)
+    } = collectExperiments(data, dvcLiveOnly, commitsOutput)
 
     this.workspace = workspace
     this.branches = branches
@@ -184,13 +185,13 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public setRevisionCollected(revisions: string[]) {
-    this.getFlattenedExperiments()
-      .filter(({ label }) => revisions.includes(label))
-      .map(({ id }) => {
-        if (this.finishedRunning[id]) {
-          delete this.finishedRunning[id]
-        }
-      })
+    for (const { id } of this.getFlattenedExperiments().filter(({ label }) =>
+      revisions.includes(label)
+    )) {
+      if (this.finishedRunning[id]) {
+        delete this.finishedRunning[id]
+      }
+    }
   }
 
   public canSelect() {
@@ -252,7 +253,9 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public removeFilters(filterIds: string[]) {
-    filterIds.map(id => this.removeFilter(id))
+    for (const id of filterIds) {
+      this.removeFilter(id)
+    }
   }
 
   public removeFilter(id: string) {
@@ -300,7 +303,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public setSelectionMode(useFilters: boolean) {
-    setContextValue(ContextKey.EXPERIMENT_FILTERS_SELECTED, useFilters)
+    void setContextValue(ContextKey.EXPERIMENT_FILTERS_SELECTED, useFilters)
     this.useFiltersForSelection = useFilters
   }
 
@@ -388,6 +391,12 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public getQueuedExperiments() {
     return this.splitExperimentsByQueued(true)
+  }
+
+  public getRunningQueueTasks() {
+    return this.getFlattenedExperiments().filter(
+      ({ status, executor }) => isRunning(status) && executor === 'dvc-task'
+    )
   }
 
   public getCheckpointsWithType(

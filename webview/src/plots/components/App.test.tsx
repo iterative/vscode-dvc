@@ -23,6 +23,7 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   PlotsData,
   PlotSizeNumber,
+  PlotsType,
   Revision,
   Section,
   TemplatePlotGroup,
@@ -36,6 +37,7 @@ import {
 import { reorderObjectList } from 'dvc/src/util/array'
 import { act } from 'react-dom/test-utils'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
+import { VisualizationSpec } from 'react-vega'
 import { App } from './App'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
 import { SectionDescription } from './PlotsContainer'
@@ -181,13 +183,6 @@ describe('App', () => {
     await screen.findAllByTestId('plots-wrapper')
 
     return store
-  }
-
-  const waitForVega = async (plot: HTMLElement) => {
-    await waitFor(() =>
-      // eslint-disable-next-line testing-library/no-node-access
-      expect(plot.querySelectorAll('.marks')[0]).toBeInTheDocument()
-    )
   }
 
   beforeAll(() => {
@@ -440,10 +435,10 @@ describe('App', () => {
 
     const summaryElement = await screen.findByText('Trends')
     const visiblePlots = await screen.findAllByLabelText('Vega visualization')
-    visiblePlots.map(visiblePlot => {
+    for (const visiblePlot of visiblePlots) {
       expect(visiblePlot).toBeInTheDocument()
       expect(visiblePlot).toBeVisible()
-    })
+    }
 
     fireEvent.click(summaryElement, {
       bubbles: true,
@@ -1901,21 +1896,39 @@ describe('App', () => {
       plots: [
         {
           entries: [
-            ...templatePlotsFixture.plots[0].entries,
             {
-              ...templatePlotsFixture.plots[0].entries[0],
-              content: { ...smoothTemplatePlotContent },
-              id: smoothId
+              content: {
+                ...smoothTemplatePlotContent
+              } as unknown as VisualizationSpec,
+              datapoints: {
+                [EXPERIMENT_WORKSPACE_ID]:
+                  smoothTemplatePlotContent.data.values.slice(0, 10)
+              },
+              id: smoothId,
+              type: PlotsType.VEGA
             }
           ],
           group: TemplatePlotGroup.SINGLE_VIEW
-        } as TemplatePlotSection
+        }
       ]
     }
 
-    const getPanel = (smoothPlot: HTMLElement) =>
+    const waitForVega = (plot: HTMLElement): Promise<void> =>
+      waitFor(
+        () =>
+          // eslint-disable-next-line testing-library/no-node-access
+          expect(plot.querySelectorAll('.marks')[0]).toBeInTheDocument(),
+        { timeout: 5000 }
+      )
+
+    const getPanel = async (smoothPlot: HTMLElement) => {
+      await waitFor(() =>
+        // eslint-disable-next-line testing-library/no-node-access
+        expect(smoothPlot.querySelector('.vega-bindings')).toBeInTheDocument()
+      )
       // eslint-disable-next-line testing-library/no-node-access
-      smoothPlot.querySelector('.vega-bindings')
+      return smoothPlot.querySelector('.vega-bindings')
+    }
 
     it('should disable a template plot from drag and drop when hovering a vega panel', async () => {
       renderAppWithOptionalData({ template: withVegaPanels })
@@ -1924,8 +1937,7 @@ describe('App', () => {
 
       await waitForVega(smoothPlot)
 
-      const panel = getPanel(smoothPlot)
-      expect(panel).toBeInTheDocument()
+      const panel = await getPanel(smoothPlot)
 
       expect(smoothPlot.draggable).toBe(true)
 
@@ -1941,8 +1953,7 @@ describe('App', () => {
 
       await waitForVega(smoothPlot)
 
-      const panel = getPanel(smoothPlot)
-      expect(panel).toBeInTheDocument()
+      const panel = await getPanel(smoothPlot)
 
       panel && fireEvent.mouseEnter(panel)
       panel && fireEvent.mouseLeave(panel)
@@ -1953,10 +1964,10 @@ describe('App', () => {
       renderAppWithOptionalData({ template: withVegaPanels })
 
       const smoothPlot = screen.getByTestId(`plot_${smoothId}`)
-
       await waitForVega(smoothPlot)
 
-      const panel = getPanel(smoothPlot) || smoothPlot
+      // eslint-disable-next-line testing-library/no-node-access
+      const panel = smoothPlot.querySelector('.vega-bindings') || smoothPlot
       expect(panel).toBeInTheDocument()
 
       const clickEvent = createEvent.click(panel)

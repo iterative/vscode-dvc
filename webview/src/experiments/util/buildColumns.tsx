@@ -25,6 +25,7 @@ const buildAccessor: (valuePath: string[]) => AccessorFn<Column> =
     const value = get(originalRow, pathArray)
 
     if (!Array.isArray(value)) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return value
     }
     return `[${value.join(', ')}]`

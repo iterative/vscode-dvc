@@ -10,9 +10,12 @@ import omit from 'lodash.omit'
 import { addStarredToColumns } from './columns/like'
 import { setContextForEditorTitleIcons } from './context'
 import { ExperimentsModel } from './model'
-import { pickExperiments } from './model/quickPicks'
+import {
+  pickExperiment,
+  pickExperiments,
+  pickExperimentsToPlot
+} from './model/quickPick'
 import { pickAndModifyParams } from './model/modify/quickPick'
-import { pickExperiment } from './quickPick'
 import {
   pickFilterToAdd,
   pickFiltersToRemove
@@ -41,7 +44,7 @@ import { createTypedAccumulator } from '../util/object'
 import { pickPaths } from '../path/selection/quickPick'
 import { Toast } from '../vscode/toast'
 import { ConfigKey } from '../vscode/config'
-import { checkSignalFile } from '../fileSystem'
+import { checkSignalFile, pollSignalFileForProcess } from '../fileSystem'
 import { DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
 
 export const ExperimentsScale = {
@@ -94,6 +97,9 @@ export class Experiments extends BaseRepository<TableData> {
   private readonly internalCommands: InternalCommands
   private readonly webviewMessages: WebviewMessages
 
+  private dvcLiveOnlyCleanupInitialized = false
+  private dvcLiveOnlySignalFile: string
+
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
@@ -104,6 +110,11 @@ export class Experiments extends BaseRepository<TableData> {
     fileSystemData?: FileSystemData
   ) {
     super(dvcRoot, resourceLocator.beaker)
+
+    this.dvcLiveOnlySignalFile = join(
+      this.dvcRoot,
+      DVCLIVE_ONLY_RUNNING_SIGNAL_FILE
+    )
 
     this.internalCommands = internalCommands
 
@@ -149,7 +160,7 @@ export class Experiments extends BaseRepository<TableData> {
     this.dispose.track(
       workspace.onDidChangeConfiguration((event: ConfigurationChangeEvent) => {
         if (event.affectsConfiguration(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT)) {
-          this.cliData.update()
+          void this.cliData.update()
         }
       })
     )
@@ -164,17 +175,16 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public async setState(data: ExperimentsOutput) {
-    const dvcLiveOnly = await checkSignalFile(
-      join(this.dvcRoot, DVCLIVE_ONLY_RUNNING_SIGNAL_FILE)
+    const dvcLiveOnly = await this.checkSignalFile()
+    const dataKeys = Object.keys(data)
+    const commitsOutput = await this.internalCommands.executeCommand(
+      AvailableCommands.GIT_GET_COMMIT_MESSAGES,
+      this.dvcRoot,
+      dataKeys[dataKeys.length - 1]
     )
-    const commitMessages: { [sha: string]: string } =
-      await this.internalCommands.executeCommand(
-        AvailableCommands.GIT_GET_LAST_THREE_COMMIT_MESSAGES,
-        this.dvcRoot
-      )
     await Promise.all([
       this.columns.transformAndSet(data),
-      this.experiments.transformAndSet(data, dvcLiveOnly, commitMessages)
+      this.experiments.transformAndSet(data, dvcLiveOnly, commitsOutput)
     ])
 
     return this.notifyChanged(data)
@@ -333,7 +343,7 @@ export class Experiments extends BaseRepository<TableData> {
   public async selectExperiments() {
     const experiments = this.experiments.getExperimentsWithCheckpoints()
 
-    const selected = await pickExperiments(
+    const selected = await pickExperimentsToPlot(
       experiments,
       this.hasCheckpoints(),
       this.columns.getFirstThreeColumnOrder()
@@ -376,11 +386,33 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public pickCurrentExperiment() {
-    return pickExperiment(this.experiments.getCurrentExperiments())
+    return pickExperiment(
+      this.experiments.getCurrentExperiments(),
+      this.getFirstThreeColumnOrder()
+    )
   }
 
   public pickQueuedExperiment() {
-    return pickExperiment(this.experiments.getQueuedExperiments())
+    return pickExperiment(
+      this.experiments.getQueuedExperiments(),
+      this.getFirstThreeColumnOrder()
+    )
+  }
+
+  public pickQueueTasksToKill() {
+    return pickExperiments(
+      this.experiments.getRunningQueueTasks(),
+      this.getFirstThreeColumnOrder(),
+      Title.SELECT_QUEUE_KILL
+    )
+  }
+
+  public pickExperimentsToRemove() {
+    return pickExperiments(
+      this.experiments.getCurrentExperiments(),
+      this.getFirstThreeColumnOrder(),
+      Title.SELECT_EXPERIMENTS_REMOVE
+    )
   }
 
   public async pickAndModifyParams(overrideId?: string) {
@@ -562,7 +594,7 @@ export class Experiments extends BaseRepository<TableData> {
       Response.TURN_OFF
     )
     if (response !== Response.CANCEL) {
-      this.autoApplyFilters(false)
+      void this.autoApplyFilters(false)
     }
     return response
   }
@@ -586,7 +618,8 @@ export class Experiments extends BaseRepository<TableData> {
     }
 
     const experiment = await pickExperiment(
-      this.experiments.getExperiments(),
+      this.experiments.getAllExperiments(),
+      this.getFirstThreeColumnOrder(),
       Title.SELECT_BASE_EXPERIMENT
     )
 
@@ -601,5 +634,20 @@ export class Experiments extends BaseRepository<TableData> {
       this.paramsFileFocused,
       this.onDidChangeColumns
     )
+  }
+
+  private async checkSignalFile() {
+    const dvcLiveOnly = await checkSignalFile(this.dvcLiveOnlySignalFile)
+
+    if (dvcLiveOnly && !this.dvcLiveOnlyCleanupInitialized) {
+      this.dvcLiveOnlyCleanupInitialized = true
+      void pollSignalFileForProcess(this.dvcLiveOnlySignalFile, () => {
+        this.dvcLiveOnlyCleanupInitialized = false
+        if (this.hasRunningExperiment()) {
+          void this.cliData.update()
+        }
+      })
+    }
+    return dvcLiveOnly
   }
 }

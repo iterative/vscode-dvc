@@ -33,7 +33,7 @@ export const getExtensionVersion = <T>(id: string): string | undefined => {
     return
   }
 
-  return extension.packageJSON.version
+  return (extension.packageJSON as { version: string }).version
 }
 
 export const isInstalled = (id: string): boolean =>

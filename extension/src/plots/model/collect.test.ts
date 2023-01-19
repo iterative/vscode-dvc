@@ -314,7 +314,14 @@ describe('collectOverrideRevisionDetails', () => {
           },
           {
             checkpoint_tip: 'd',
+            commit: {
+              author: 'John Smith',
+              date: '3 days ago',
+              message: 'Upgrade dependencies\n* upgrade dvc\n* upgrade dvclive',
+              tags: []
+            },
             displayColor: '#f56565',
+            displayNameOrParent: 'Upgrade dependencies ...',
             id: 'd',
             label: 'd',
             logicalGroupName: 'd',
@@ -379,6 +386,7 @@ describe('collectOverrideRevisionDetails', () => {
         revision: 'c'
       },
       {
+        commit: 'Upgrade dependencies ...',
         displayColor: '#f56565',
         fetched: true,
         firstThreeColumns: [],

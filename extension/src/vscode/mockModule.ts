@@ -15,6 +15,7 @@ class MockEventEmitter {
 mock('vscode', {
   EventEmitter: MockEventEmitter,
   Uri: {
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     file: URI.file
   },
   commands: { executeCommand: () => undefined }

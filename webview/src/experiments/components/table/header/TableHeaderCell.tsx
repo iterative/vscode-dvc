@@ -18,7 +18,7 @@ import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
 import { ColumnWithGroup } from '../../../util/buildColumns'
 
 const calcResizerHeight = (header: Header<Experiment, unknown>) =>
-  100 + (header.depth - header.column.depth - 1) * 105 + '%'
+  `${100 + (header.depth - header.column.depth - 1) * 105}%`
 
 const getHeaderPropsArgs = (
   header: Header<Experiment, unknown>,
@@ -129,6 +129,9 @@ export const TableHeaderCell: React.FC<{
   )
 
   const menuContent = <ContextMenuContent header={header} />
+  const previousPlaceholder = isPlaceholder
+    ? `_previous_placeholder_${depth}`
+    : ''
 
   return (
     <ContextMenu
@@ -143,9 +146,7 @@ export const TableHeaderCell: React.FC<{
           isSortable,
           sortOrder
         )}
-        data-testid={`header-${id}${
-          isPlaceholder ? '_previous_placeholder_' + depth : ''
-        }`}
+        data-testid={`header-${id}${previousPlaceholder}`}
         key={id}
         tabIndex={0}
         colSpan={colSpan}

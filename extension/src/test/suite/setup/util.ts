@@ -21,6 +21,7 @@ import { WorkspaceScale } from '../../../telemetry/collect'
 import { dvcDemoPath } from '../../util'
 import { Config } from '../../../config'
 import { Resource } from '../../../resourceLocator'
+import { MIN_CLI_VERSION } from '../../../cli/dvc/contract'
 
 export const TEMP_DIR = join(dvcDemoPath, 'temp-empty-watcher-dir')
 
@@ -33,6 +34,7 @@ const buildSetupDependencies = (
   const mockEvent = mockEmitter.event
 
   const mockRoot = stub().resolves(mockDvcRoot)
+  const mockVersion = stub().resolves(MIN_CLI_VERSION)
   const mockGetGitRepositoryRoot = stub().resolves(mockGitRoot)
 
   const mockInitializeDvc = fake()
@@ -48,7 +50,8 @@ const buildSetupDependencies = (
     mockDvcReader: {
       onDidCompleteProcess: mockEvent,
       onDidStartProcess: mockEvent,
-      root: mockRoot
+      root: mockRoot,
+      version: mockVersion
     } as unknown as DvcReader,
     mockDvcRunner: {
       onDidCompleteProcess: mockEvent,
@@ -78,7 +81,8 @@ const buildSetupDependencies = (
     mockRunSetupWithGlobalRecheck: stub(
       Runner,
       'runWithGlobalRecheck'
-    ).resolves(undefined)
+    ).resolves(undefined),
+    mockVersion
   }
 }
 
@@ -104,7 +108,9 @@ export const buildSetup = (
     mockGetGitRepositoryRoot,
     mockInitializeDvc,
     mockInitializeGit,
-    mockInternalCommands
+    mockInternalCommands,
+    mockRunSetup,
+    mockVersion
   } = buildSetupDependencies(disposer, mockDvcRoot, mockGitRoot)
   stub(FileSystem, 'findDvcRootPaths').resolves(
     [mockDvcRoot].filter(Boolean) as string[]
@@ -125,7 +131,7 @@ export const buildSetup = (
       mockGitExecutor,
       mockGitReader,
       () => Promise.resolve([undefined]),
-      () => Promise.resolve(undefined),
+      () => undefined,
       {
         columnsChanged: mockEmitter,
         getHasData: () => hasData,
@@ -146,6 +152,8 @@ export const buildSetup = (
     mockInitializeDvc,
     mockInitializeGit,
     mockOpenExperiments,
+    mockRunSetup,
+    mockVersion,
     resourceLocator,
     setup
   }
@@ -181,7 +189,7 @@ export const buildSetupWithWatchers = async (disposer: Disposer) => {
       mockGitExecutor,
       mockGitReader,
       () => Promise.resolve([undefined]),
-      () => Promise.resolve(undefined),
+      () => undefined,
       {
         columnsChanged: mockEmitter,
         getHasData: () => false,

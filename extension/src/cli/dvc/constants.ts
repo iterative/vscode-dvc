@@ -25,6 +25,7 @@ export enum Command {
   PLOTS = 'plots',
   PULL = 'pull',
   PUSH = 'push',
+  QUEUE = 'queue',
   REMOVE = 'remove',
   ROOT = 'root',
   PARAMS = 'params',
@@ -41,6 +42,7 @@ export enum Flag {
   ALL_COMMITS = '-A',
   FORCE = '-f',
   GRANULAR = '--granular',
+  JOBS = '-j',
   JSON = '--json',
   NUM_COMMIT = '-n',
   OUTPUT_PATH = '-o',
@@ -59,11 +61,16 @@ export enum ExperimentSubCommand {
   RUN = 'run'
 }
 
+export enum QueueSubCommand {
+  KILL = 'kill',
+  START = 'start',
+  STOP = 'stop'
+}
+
 export enum ExperimentFlag {
   NO_FETCH = '--no-fetch',
   QUEUE = '--queue',
-  RESET = '--reset',
-  RUN_ALL = '--run-all'
+  RESET = '--reset'
 }
 
 export enum GcPreserveFlag {

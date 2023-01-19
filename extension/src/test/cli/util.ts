@@ -20,6 +20,7 @@ const gitExecutor = new GitExecutor()
 
 let demoInitialized: Promise<string>
 export const initializeDemoRepo = (): Promise<string> => {
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   if (!demoInitialized) {
     demoInitialized = dvcExecutor.pull(dvcDemoPath)
   }

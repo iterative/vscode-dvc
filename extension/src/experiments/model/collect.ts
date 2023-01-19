@@ -8,7 +8,12 @@ import omit from 'lodash.omit'
 import { ExperimentType } from '.'
 import { ExperimentsAccumulator } from './accumulator'
 import { extractColumns } from '../columns/extract'
-import { Experiment, ColumnType, isRunning } from '../webview/contract'
+import {
+  Experiment,
+  ColumnType,
+  isRunning,
+  CommitData
+} from '../webview/contract'
 import {
   ExperimentFieldsOrError,
   ExperimentFields,
@@ -22,6 +27,7 @@ import { uniqueValues } from '../../util/array'
 import { RegisteredCommands } from '../../commands/external'
 import { Resource } from '../../resourceLocator'
 import { shortenForLabel } from '../../util/string'
+import { COMMITS_SEPARATOR } from '../../cli/git/constants'
 
 export type ExperimentItem = {
   command?: {
@@ -311,27 +317,74 @@ const collectFromBranchesObject = (
   }
 }
 
+const getCommitDataFromOutput = (
+  output: string
+): CommitData & { hash: string } => {
+  const data: CommitData & { hash: string } = {
+    author: '',
+    date: '',
+    hash: '',
+    message: '',
+    tags: []
+  }
+  const [hash, author, date, refNamesWithKey] = output
+    .split('\n')
+    .filter(Boolean)
+  data.hash = hash
+  data.author = author
+  data.date = date
+
+  const message = output.match(/\nmessage:(.+)/s) || []
+  data.message = message[1] || ''
+
+  const refNames = refNamesWithKey.slice('refNames:'.length)
+  data.tags = refNames
+    .split(', ')
+    .filter(item => item.startsWith('tag: '))
+    .map(item => item.slice('tag: '.length))
+
+  return data
+}
+
 const formatCommitMessage = (commit: string) => {
   const lines = commit.split('\n').filter(Boolean)
   return `${lines[0]}${lines.length > 1 ? ' ...' : ''}`
 }
 
+const getCommitMessages = (
+  commitsOutput: string
+): { [sha: string]: CommitData } => {
+  if (!commitsOutput) {
+    return {}
+  }
+  const commits = commitsOutput.split(COMMITS_SEPARATOR).map(commit => {
+    const { hash, ...rest } = getCommitDataFromOutput(commit)
+    return [hash, { ...rest }]
+  })
+  return Object.fromEntries(commits) as { [sha: string]: CommitData }
+}
+
 const addCommitDataToBranches = (
   branches: Experiment[],
-  commitMessages: { [sha: string]: string } = {}
-): Experiment[] =>
-  branches.map(branch => {
+  commitsOutput: string
+): Experiment[] => {
+  const commitMessages = getCommitMessages(commitsOutput)
+  return branches.map(branch => {
     const { sha } = branch
     if (sha && commitMessages[sha]) {
-      branch.displayNameOrParent = formatCommitMessage(commitMessages[sha])
+      branch.displayNameOrParent = formatCommitMessage(
+        commitMessages[sha].message
+      )
+      branch.commit = commitMessages[sha]
     }
     return branch
   })
+}
 
 export const collectExperiments = (
   data: ExperimentsOutput,
   dvcLiveOnly: boolean,
-  commitMessages: { [sha: string]: string }
+  commitsOutput: string
 ): ExperimentsAccumulator => {
   const { workspace, ...branchesObject } = data
 
@@ -350,7 +403,7 @@ export const collectExperiments = (
 
   collectFromBranchesObject(acc, branchesObject)
 
-  acc.branches = addCommitDataToBranches(acc.branches, commitMessages)
+  acc.branches = addCommitDataToBranches(acc.branches, commitsOutput)
 
   return acc
 }

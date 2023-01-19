@@ -164,10 +164,13 @@ export const buildInternalCommands = (disposer: Disposer) => {
   }
 }
 
-export const buildMockData = <T extends ExperimentsData | FileSystemData>() =>
+export const buildMockData = <T extends ExperimentsData | FileSystemData>(
+  update = stub()
+) =>
   ({
     dispose: stub(),
-    onDidUpdate: stub()
+    onDidUpdate: stub(),
+    update
   } as unknown as T)
 
 export const buildDependencies = (
@@ -199,6 +202,10 @@ export const buildDependencies = (
 
   const mockExperimentShow = stub(dvcReader, 'expShow').resolves(expShow)
 
+  const mockGetCommitMessages = stub(gitReader, 'getCommitMessages').resolves(
+    ''
+  )
+
   const updatesPaused = disposer.track(new EventEmitter<boolean>())
 
   const resourceLocator = disposer.track(new ResourceLocator(extensionUri))
@@ -217,6 +224,7 @@ export const buildDependencies = (
     mockCreateFileSystemWatcher,
     mockDataStatus,
     mockExperimentShow,
+    mockGetCommitMessages,
     mockPlotsDiff,
     resourceLocator,
     updatesPaused
@@ -268,7 +276,7 @@ export type SafeWatcherDisposer = Disposer & {
   disposeAndFlush: () => Promise<unknown>
 }
 
-export const getSafeWatcherDisposer = (): Disposer & {
+export const getTimeSafeDisposer = (): Disposer & {
   disposeAndFlush: () => Promise<unknown>
 } => {
   const disposer = Disposable.fn()

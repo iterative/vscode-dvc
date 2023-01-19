@@ -33,7 +33,7 @@ describe('DeferredDisposable', () => {
     const newDeferred = deferredDisposable.getDeferred()
 
     expect(deferred).not.toBe(newDeferred)
-    expect(newDeferred.promise).toBeInstanceOf(Promise)
+    void expect(newDeferred.promise).toBeInstanceOf(Promise)
     expect(util.inspect(deferred.promise).includes('pending')).toBe(false)
     expect(util.inspect(newDeferred.promise).includes('pending')).toBe(true)
   })

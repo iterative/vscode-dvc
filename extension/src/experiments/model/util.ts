@@ -1,6 +1,7 @@
 import get from 'lodash.get'
 import { formatDate } from '../../util/date'
 import { formatNumber } from '../../util/number'
+import { truncateFromLeft } from '../../util/string'
 import { splitColumnPath } from '../columns/paths'
 import { Experiment } from '../webview/contract'
 
@@ -44,8 +45,8 @@ const getDataFromColumnPath = (
   truncatedValue: string
 } => {
   const splitUpPath = splitColumnPath(columnPath)
-  const collectedVal = get(experiment, splitUpPath)
-  const value = collectedVal?.value || collectedVal
+  const collectedVal = get(experiment, splitUpPath) as { value?: Value }
+  const value = (collectedVal?.value || collectedVal) as Value
   const [type] = splitUpPath
 
   return {
@@ -61,3 +62,14 @@ export const getDataFromColumnPaths = (
   experiment: Experiment,
   columnPaths: string[]
 ) => columnPaths.map(path => getDataFromColumnPath(experiment, path))
+
+export const getColumnPathsQuickPickDetail = (
+  experiment: Experiment,
+  columnPaths: string[]
+): string =>
+  getDataFromColumnPaths(experiment, columnPaths)
+    .map(
+      ({ splitUpPath, truncatedValue: value }) =>
+        `${truncateFromLeft(splitUpPath[splitUpPath.length - 1], 15)}:${value}`
+    )
+    .join(', ')

@@ -56,9 +56,15 @@ export const buildExperiments = (
     messageSpy,
     mockCheckSignalFile,
     mockExperimentShow,
+    mockGetCommitMessages,
     updatesPaused,
     resourceLocator
   } = buildDependencies(disposer, experimentShowData)
+
+  const mockUpdateExperimentsData = stub()
+  const mockExperimentsData = buildMockData<ExperimentsData>(
+    mockUpdateExperimentsData
+  )
 
   const experiments = disposer.track(
     new Experiments(
@@ -67,14 +73,14 @@ export const buildExperiments = (
       updatesPaused,
       resourceLocator,
       buildMockMemento(),
-      buildMockData<ExperimentsData>(),
+      mockExperimentsData,
       buildMockData<FileSystemData>()
     )
   )
 
   mockHasCheckpoints(experimentShowData)
 
-  experiments.setState(experimentShowData)
+  void experiments.setState(experimentShowData)
 
   return {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any,
@@ -90,6 +96,8 @@ export const buildExperiments = (
     messageSpy,
     mockCheckSignalFile,
     mockExperimentShow,
+    mockGetCommitMessages,
+    mockUpdateExperimentsData,
     resourceLocator,
     updatesPaused
   }
@@ -122,7 +130,7 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
     resourceLocator
   )
 
-  experiments.setState(expShowFixture)
+  void experiments.setState(expShowFixture)
   return { experiments, internalCommands, messageSpy, workspaceExperiments }
 }
 
@@ -149,7 +157,7 @@ export const buildSingleRepoExperiments = (disposer: SafeWatcherDisposer) => {
     resourceLocator
   )
 
-  experiments.setState(expShowFixture)
+  void experiments.setState(expShowFixture)
 
   return { messageSpy, workspaceExperiments }
 }

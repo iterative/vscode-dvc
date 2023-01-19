@@ -18,6 +18,7 @@ import { createValidInteger } from '../util/number'
 import { processExists } from '../processExecution'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 import { DOT_DVC } from '../cli/dvc/constants'
+import { delay } from '../util/time'
 
 export const exists = (path: string): boolean => existsSync(path)
 
@@ -174,6 +175,19 @@ export const getPidFromSignalFile = async (
 
 export const checkSignalFile = async (path: string): Promise<boolean> => {
   return !!(await getPidFromSignalFile(path))
+}
+
+export const pollSignalFileForProcess = async (
+  path: string,
+  callback: () => void,
+  ms = 5000
+): Promise<void> => {
+  await delay(ms)
+  const signalIsValid = await checkSignalFile(path)
+  if (signalIsValid) {
+    return pollSignalFileForProcess(path, callback, ms)
+  }
+  return callback()
 }
 
 export const getBinDisplayText = (

@@ -18,7 +18,7 @@ import { splitColumnPath } from '../columns/paths'
 import { ExperimentsModel } from '../model'
 import { SortDefinition } from '../model/sortBy'
 import { CheckpointsModel } from '../checkpoints/model'
-import { getValidInput } from '../../vscode/inputBox'
+import { getPositiveIntegerInput } from '../../vscode/inputBox'
 import { Title } from '../../vscode/title'
 import { ConfigKey, setConfigValue } from '../../vscode/config'
 
@@ -31,7 +31,7 @@ export class WebviewMessages {
 
   private readonly getWebview: () => BaseWebview<TableData> | undefined
   private readonly notifyChanged: () => void
-  private readonly selectColumns: () => void
+  private readonly selectColumns: () => Promise<void>
 
   constructor(
     dvcRoot: string,
@@ -40,7 +40,7 @@ export class WebviewMessages {
     checkpoints: CheckpointsModel,
     getWebview: () => BaseWebview<TableData> | undefined,
     notifyChanged: () => void,
-    selectColumns: () => void
+    selectColumns: () => Promise<void>
   ) {
     this.dvcRoot = dvcRoot
     this.experiments = experiments
@@ -53,7 +53,7 @@ export class WebviewMessages {
 
   public sendWebviewMessage() {
     const webview = this.getWebview()
-    webview?.show(this.getWebviewData())
+    void webview?.show(this.getWebviewData())
   }
 
   public handleMessageFromWebview(message: MessageFromWebview) {
@@ -174,19 +174,17 @@ export class WebviewMessages {
   }
 
   private async setMaxTableHeadDepth() {
-    const newValue = await getValidInput(
+    const newValue = await getPositiveIntegerInput(
       Title.SET_EXPERIMENTS_HEADER_HEIGHT,
-      val => {
-        return Number.isNaN(Number(val)) ? 'Input needs to be a number' : ''
-      },
-      { prompt: 'Use 0 for infinite height.' }
+      { prompt: 'Use 0 for infinite height.', value: '0' },
+      true
     )
 
     if (!newValue) {
       return
     }
 
-    setConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT, Number(newValue))
+    void setConfigValue(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT, Number(newValue))
     sendTelemetryEvent(
       EventName.VIEWS_EXPERIMENTS_TABLE_SET_MAX_HEADER_HEIGHT,
       undefined,
@@ -223,7 +221,7 @@ export class WebviewMessages {
   }
 
   private setColumnsStatus() {
-    this.selectColumns()
+    void this.selectColumns()
     sendTelemetryEvent(
       EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_COLUMNS,
       undefined,

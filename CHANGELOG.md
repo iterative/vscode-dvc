@@ -2,6 +2,87 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.37] - 2023-01-16
+
+### 🚀 New Features and Enhancements
+
+- Add "Previous Commits" row to experiments table [#3087](https://github.com/iterative/vscode-dvc/pull/3087) by [@julieg18](https://github.com/julieg18)
+- Change "Remove Experiment" command to "Remove Experiments" [#3093](https://github.com/iterative/vscode-dvc/pull/3093) by [@julieg18](https://github.com/julieg18)
+- Update queue commands [#3094](https://github.com/iterative/vscode-dvc/pull/3094) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix typo in plots tooltip [#3108](https://github.com/iterative/vscode-dvc/pull/3108) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (2.41.1) [#3092](https://github.com/iterative/vscode-dvc/pull/3092) by [@mattseddon](https://github.com/mattseddon)
+- Increase timeout of smooth plot test (Windows CI) [#3089](https://github.com/iterative/vscode-dvc/pull/3089) by [@mattseddon](https://github.com/mattseddon)
+- Revert "Update version and CHANGELOG for release" [#3107](https://github.com/iterative/vscode-dvc/pull/3107) by [@julieg18](https://github.com/julieg18)
+
+## [0.5.36] - 2023-01-10
+
+### 🚀 New Features and Enhancements
+
+- Add first three columns to all experiment quick pick selection [#3067](https://github.com/iterative/vscode-dvc/pull/3067) by [@julieg18](https://github.com/julieg18)
+- Add remove tasks from queue command [#3073](https://github.com/iterative/vscode-dvc/pull/3073) by [@mattseddon](https://github.com/mattseddon)
+- Add kill experiments queue tasks command [#3084](https://github.com/iterative/vscode-dvc/pull/3084) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Create queue workers in background process [#3059](https://github.com/iterative/vscode-dvc/pull/3059) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Fix flaky setup tests [#3070](https://github.com/iterative/vscode-dvc/pull/3070) by [@mattseddon](https://github.com/mattseddon)
+- Fix flaky dvc.focusedProjects test [#3068](https://github.com/iterative/vscode-dvc/pull/3068) by [@mattseddon](https://github.com/mattseddon)
+- Fix flaky smooth plot panel test [#3069](https://github.com/iterative/vscode-dvc/pull/3069) by [@mattseddon](https://github.com/mattseddon)
+- Extend timeout of cross-platform-test to 25 minutes [#3074](https://github.com/iterative/vscode-dvc/pull/3074) by [@mattseddon](https://github.com/mattseddon)
+- Add @typescript-eslint/recommended-requiring-type-checking to eslint ruleset [#3063](https://github.com/iterative/vscode-dvc/pull/3063) by [@mattseddon](https://github.com/mattseddon)
+- Use Chromatic's Turbosnap functionality [#3079](https://github.com/iterative/vscode-dvc/pull/3079) by [@mattseddon](https://github.com/mattseddon)
+- Remove setup triggered count from test altogether [#3081](https://github.com/iterative/vscode-dvc/pull/3081) by [@mattseddon](https://github.com/mattseddon)
+- Only render smooth template for unit tests [#3080](https://github.com/iterative/vscode-dvc/pull/3080) by [@mattseddon](https://github.com/mattseddon)
+- Drop custom script from actions (use yarn install) [#3082](https://github.com/iterative/vscode-dvc/pull/3082) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (2.40.0) [#3085](https://github.com/iterative/vscode-dvc/pull/3085) by [@mattseddon](https://github.com/mattseddon)
+- Move pick experiments quick pick [#3083](https://github.com/iterative/vscode-dvc/pull/3083) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.5.35] - 2023-01-09
+
+### 🚀 New Features and Enhancements
+
+- Add new stop queue action [#3054](https://github.com/iterative/vscode-dvc/pull/3054) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix filtering and add missing experiments on quick pick experiment selection [#3056](https://github.com/iterative/vscode-dvc/pull/3056) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Actions - fix newlines in PR [#3071](https://github.com/iterative/vscode-dvc/pull/3071) by [@dacbd](https://github.com/dacbd)
+
+## [0.5.34] - 2023-01-05
+
+### 🚀 New Features and Enhancements
+
+- Add commit messages to experiment views  [#3016](https://github.com/iterative/vscode-dvc/pull/3016) by [@julieg18](https://github.com/julieg18)
+- Add project selection quick pick [#3040](https://github.com/iterative/vscode-dvc/pull/3040) by [@mattseddon](https://github.com/mattseddon)
+- Enable the user to specify a number of concurrent jobs when starting the experiments queue [#3048](https://github.com/iterative/vscode-dvc/pull/3048) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix stop button [#3027](https://github.com/iterative/vscode-dvc/pull/3027) by [@mattseddon](https://github.com/mattseddon)
+- Use process polling to ensure DVCLive only PIDs are still running [#3045](https://github.com/iterative/vscode-dvc/pull/3045) by [@mattseddon](https://github.com/mattseddon)
+- Fix missing commit messages in experiment branches [#3053](https://github.com/iterative/vscode-dvc/pull/3053) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Use cml to create release PR [#3034](https://github.com/iterative/vscode-dvc/pull/3034) by [@dacbd](https://github.com/dacbd)
+- Reinstate @typescript-eslint/no-unused-vars as error [#3039](https://github.com/iterative/vscode-dvc/pull/3039) by [@mattseddon](https://github.com/mattseddon)
+- Add context key enum [#3041](https://github.com/iterative/vscode-dvc/pull/3041) by [@mattseddon](https://github.com/mattseddon)
+- Suppress integration test warninngs [#3046](https://github.com/iterative/vscode-dvc/pull/3046) by [@mattseddon](https://github.com/mattseddon)
+- Consolidate use of input box validation [#3049](https://github.com/iterative/vscode-dvc/pull/3049) by [@mattseddon](https://github.com/mattseddon)
+- Stub getLastThreeCommitMessages in integration tests [#3052](https://github.com/iterative/vscode-dvc/pull/3052) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.33] - 2023-01-02
 
 ### 🚀 New Features and Enhancements

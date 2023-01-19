@@ -563,6 +563,68 @@ describe('CliExecutor', () => {
     })
   })
 
+  describe('queueKill', () => {
+    it('should call createProcess with the correct parameters to kill running queue tasks', async () => {
+      const cwd = __dirname
+      const stdout = ''
+
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
+
+      const output = await dvcExecutor.queueKill(cwd, '80609f0', '19d1c56')
+
+      expect(output).toStrictEqual(stdout)
+
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
+        args: ['queue', 'kill', '80609f0', '19d1c56'],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
+  describe('queueStart', () => {
+    it("should call createProcess with the correct parameters to start the experiment's queue in a detached process", () => {
+      const cwd = __dirname
+      const jobs = '91231324'
+
+      const stdout = `Started '${jobs}' new experiments task queue workers.`
+
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
+
+      void dvcExecutor.queueStart(cwd, jobs)
+
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
+        args: ['queue', 'start', '-j', jobs],
+        cwd,
+        detached: true,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
+  describe('queueStop', () => {
+    it("should call createProcess with the correct parameters to stop the experiment's queue", async () => {
+      const cwd = __dirname
+
+      const stdout = 'Queue workers will stop after running tasks finish.'
+
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
+
+      const output = await dvcExecutor.queueStop(cwd)
+
+      expect(output).toStrictEqual(stdout)
+
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
+        args: ['queue', 'stop'],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
   describe('remove', () => {
     it('should call createProcess with the correct parameters to remove a .dvc file', async () => {
       const cwd = __dirname

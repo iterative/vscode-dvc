@@ -4,6 +4,14 @@ const config = require('../.eslintrc')
 module.exports = {
   ...config,
   ignorePatterns: [...config.ignorePatterns, 'storybook-static/**'],
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    tsconfigRootDir: __dirname,
+    project: ['./tsconfig.json'],
+    ecmaFeatures: {
+      jsx: true
+    }
+  },
   overrides: [
     ...config.overrides,
     {
@@ -39,6 +47,15 @@ module.exports = {
       files: ['src/shared/**'],
       rules: {
         'check-file/folder-naming-convention': 'off'
+      }
+    },
+    {
+      files: ['**/*.tsx'],
+      rules: {
+        // breaks use of styles
+        '@typescript-eslint/no-unsafe-assignment': 'off',
+        '@typescript-eslint/no-unsafe-member-access': 'off',
+        '@typescript-eslint/no-unsafe-argument': 'off'
       }
     }
   ]

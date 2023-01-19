@@ -1,10 +1,8 @@
 import { Revision } from 'dvc/src/plots/webview/contract'
 import React from 'react'
-import cn from 'classnames'
 import { VSCodeProgressRing } from '@vscode/webview-ui-toolkit/react'
-import { truncate } from 'vega'
-import { formatNumber } from 'dvc/src/util/number'
 import styles from './styles.module.scss'
+import { RibbonBlockTooltip } from './RibbonBlockTooltip'
 import { Icon } from '../../../shared/components/Icon'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
 import { CopyButton } from '../../../shared/components/copyButton/CopyButton'
@@ -24,50 +22,32 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
   revision,
   onClear
 }) => {
-  const exp = revision.group?.replace(/[[\]]/g, '') || revision.revision
-
-  const tooltipContent = (
-    <table className={styles.columnsTable}>
-      <tbody>
-        {revision.firstThreeColumns.map(({ path, value, type }) => (
-          <tr key={path}>
-            <td className={cn(styles[`${type}Key`])}>
-              {truncate(path, 45, 'left')}
-            </td>
-            <td>
-              {typeof value === 'number' ? formatNumber(value) : value}
-              {value === '-' || (
-                <CopyButton
-                  value={value.toString()}
-                  className={styles.copyButton}
-                />
-              )}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  )
+  const {
+    firstThreeColumns,
+    commit,
+    fetched,
+    group,
+    id,
+    revision: rev,
+    displayColor
+  } = revision
+  const exp = group?.replace(/[[\]]/g, '') || rev
 
   const mainContent = (
     <li
       className={styles.block}
-      style={{ borderColor: revision.displayColor }}
-      data-testid={`ribbon-${revision.id}`}
+      style={{ borderColor: displayColor }}
+      data-testid={`ribbon-${id || 'no-id'}`}
     >
       <div className={styles.label}>
         <div className={styles.title}>
           {exp}
           <CopyButton value={exp} className={styles.copyButton} />
         </div>
-        {revision.group && (
-          <div className={styles.subtitle}>{revision.revision}</div>
-        )}
+        {group && <div className={styles.subtitle}>{rev}</div>}
       </div>
       <div className={styles.iconPlaceholder}>
-        {!revision.fetched && (
-          <VSCodeProgressRing className={styles.fetching} />
-        )}
+        {!fetched && <VSCodeProgressRing className={styles.fetching} />}
       </div>
       <Tooltip content="Clear" placement="bottom" delay={500}>
         <button className={styles.clearButton} onClick={onClear}>
@@ -77,16 +57,9 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
     </li>
   )
 
-  return revision.firstThreeColumns.length === 0 ? (
+  return firstThreeColumns.length === 0 && !commit ? (
     mainContent
   ) : (
-    <Tooltip
-      placement="bottom-start"
-      content={tooltipContent}
-      maxWidth="none"
-      interactive
-    >
-      {mainContent}
-    </Tooltip>
+    <RibbonBlockTooltip revision={revision}>{mainContent}</RibbonBlockTooltip>
   )
 }

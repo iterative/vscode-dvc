@@ -51,7 +51,7 @@ export const setContextForEditorTitleIcons = (
   onDidChangeColumns: Event<void>
 ): void => {
   const setActiveEditorContext = (paramsFileActive: boolean) => {
-    setContextValue(ContextKey.PARAMS_FILE_ACTIVE, paramsFileActive)
+    void setContextValue(ContextKey.PARAMS_FILE_ACTIVE, paramsFileActive)
     const activeDvcRoot = paramsFileActive ? dvcRoot : undefined
     paramsFileFocused.fire(activeDvcRoot)
   }
