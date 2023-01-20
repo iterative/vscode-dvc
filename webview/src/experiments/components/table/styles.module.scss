@@ -275,22 +275,20 @@ $bullet-size: calc(var(--design-unit) * 4px);
         pointer-events: none;
       }
 
-      td:hover,
-      td:hover + td {
-        border-left-color: $row-border-selected-color;
+      td {
+        border-color: $row-hover-background-color;
       }
     }
 
     &:hover:not(.rowSelected),
     &.rowFocused:not(.rowSelected) {
+      td {
+        border-right-color: $border-color;
+      }
+
       td:not(.experimentCell),
       .experimentCell:before {
         background-color: $row-hover-background-color;
-      }
-
-      td:hover,
-      td:hover + td {
-        border-left-color: $border-color;
       }
     }
 
@@ -336,6 +334,8 @@ $bullet-size: calc(var(--design-unit) * 4px);
       td {
         background-color: $row-bg-selected-color;
         color: $row-fg-selected-color;
+        border-color: $row-bg-selected-color;
+        border-bottom-color: $row-border-selected-color;
       }
 
       > *:first-child {
@@ -358,7 +358,9 @@ $bullet-size: calc(var(--design-unit) * 4px);
   }
 
   .bodyRow {
-    border-bottom: $row-border;
+    td {
+      border-bottom: $row-border;
+    }
 
     &:not(.rowSelected) {
       & > *:first-child {
