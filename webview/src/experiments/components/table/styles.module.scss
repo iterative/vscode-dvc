@@ -282,7 +282,8 @@ $bullet-size: calc(var(--design-unit) * 4px);
 
     &:hover:not(.rowSelected),
     &.rowFocused:not(.rowSelected) {
-      td {
+      .innerCell,
+      .timestampInnerCell {
         border-right-color: $border-color;
       }
 
@@ -358,9 +359,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
   }
 
   .bodyRow {
-    td {
-      border-bottom: $row-border;
-    }
+    border-bottom: $row-border;
 
     &:not(.rowSelected) {
       & > *:first-child {
@@ -506,8 +505,12 @@ $bullet-size: calc(var(--design-unit) * 4px);
     font-size: 0.8rem;
     line-height: 2rem;
     align-items: center;
-    border-right: 1px solid transparent;
-    border-left: 1px solid transparent;
+
+    .innerCell,
+    .timestampInnerCell {
+      border-right: 1px solid transparent;
+      border-left: 1px solid transparent;
+    }
 
     &:first-child {
       .innerCell {
