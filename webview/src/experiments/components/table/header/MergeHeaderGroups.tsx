@@ -14,6 +14,7 @@ export const MergedHeaderGroups: React.FC<{
   onDragLeave: DragFunction
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   root: HTMLElement | null
+  onlyOneLine?: boolean
 }> = ({
   headerGroup,
   onDragEnter,
@@ -22,7 +23,8 @@ export const MergedHeaderGroups: React.FC<{
   onDrop,
   onDragLeave,
   root,
-  setExpColumnNeedsShadow
+  setExpColumnNeedsShadow,
+  onlyOneLine
 }) => {
   return (
     <tr className={styles.headRow}>
@@ -37,6 +39,7 @@ export const MergedHeaderGroups: React.FC<{
           onDrop={onDrop}
           onDragLeave={onDragLeave}
           root={root}
+          onlyOneLine={onlyOneLine}
         />
       ))}
     </tr>

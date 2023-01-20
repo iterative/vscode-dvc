@@ -15,6 +15,7 @@ interface TableHeaderProps {
   onDragLeave: DragFunction
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   root: HTMLElement | null
+  onlyOneLine?: boolean
 }
 
 export const TableHeader: React.FC<TableHeaderProps> = ({
@@ -25,7 +26,8 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   onDrop,
   onDragLeave,
   root,
-  setExpColumnNeedsShadow
+  setExpColumnNeedsShadow,
+  onlyOneLine
 }) => {
   const { filters } = useSelector((state: ExperimentsState) => state.tableData)
 
@@ -42,6 +44,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
       onDragLeave={onDragLeave}
       root={root}
       setExpColumnNeedsShadow={setExpColumnNeedsShadow}
+      onlyOneLine={onlyOneLine}
     />
   )
 }

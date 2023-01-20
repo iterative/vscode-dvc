@@ -129,6 +129,7 @@ export const TableHead = ({
           onDragLeave={onDragLeave}
           root={root}
           setExpColumnNeedsShadow={setExpColumnNeedsShadow}
+          onlyOneLine={headerGroups.length === 1}
         />
       ))}
     </thead>

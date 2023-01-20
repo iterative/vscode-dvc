@@ -24,7 +24,8 @@ const getHeaderPropsArgs = (
   header: Header<Experiment, unknown>,
   headerDropTargetId: string,
   sortEnabled: boolean,
-  sortOrder: SortOrder
+  sortOrder: SortOrder,
+  onlyOneLine?: boolean
 ) => {
   const columnWithGroup = header.column.columnDef as ColumnWithGroup
   return {
@@ -39,7 +40,8 @@ const getHeaderPropsArgs = (
         [styles.menuEnabled]: sortEnabled,
         [styles.sortingHeaderCellAsc]: sortOrder === SortOrder.ASCENDING,
         [styles.sortingHeaderCellDesc]:
-          sortOrder === SortOrder.DESCENDING && !header.isPlaceholder
+          sortOrder === SortOrder.DESCENDING && !header.isPlaceholder,
+        [styles.oneRowHeaderCell]: onlyOneLine
       },
       headerDropTargetId === header.id && styles.headerCellDropTarget
     ),
@@ -78,6 +80,7 @@ export const TableHeaderCell: React.FC<{
   onDragLeave: DragFunction
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   root: HTMLElement | null
+  onlyOneLine?: boolean
 }> = ({
   header,
   hasFilter,
@@ -87,7 +90,8 @@ export const TableHeaderCell: React.FC<{
   onDrop,
   onDragLeave,
   root,
-  setExpColumnNeedsShadow
+  setExpColumnNeedsShadow,
+  onlyOneLine
 }) => {
   const {
     colSpan,
@@ -145,7 +149,8 @@ export const TableHeaderCell: React.FC<{
           header,
           headerDropTargetId,
           isSortable,
-          sortOrder
+          sortOrder,
+          onlyOneLine
         )}
         data-testid={`header-${id}${previousPlaceholder}`}
         key={id}
