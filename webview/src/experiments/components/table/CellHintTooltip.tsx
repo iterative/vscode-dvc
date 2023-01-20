@@ -14,15 +14,14 @@ export type CellHintTooltipProps = {
 export const CellHintTooltip: React.FC<CellHintTooltipProps & TippyProps> = ({
   tooltipContent,
   children,
-  delay = NORMAL_TOOLTIP_DELAY,
-  tooltipOffset = [0, -2]
+  delay = NORMAL_TOOLTIP_DELAY
 }) => {
   return (
     <Tooltip
       content={<span className={styles.cellHintTooltip}>{tooltipContent}</span>}
       appendTo={document.body}
       placement="bottom-start"
-      offset={tooltipOffset}
+      offset={[0, -2]}
       delay={delay}
       interactive={true}
     >

@@ -10,13 +10,11 @@ export const ExperimentGroup: React.FC<RowProp & BatchSelectionProp> = ({
   hasRunningExperiment,
   batchRowSelection
 }) => (
-  <>
-    <NestedRow
-      row={row}
-      contextMenuDisabled={contextMenuDisabled}
-      projectHasCheckpoints={projectHasCheckpoints}
-      hasRunningExperiment={hasRunningExperiment}
-      batchRowSelection={batchRowSelection}
-    />
-  </>
+  <NestedRow
+    row={row}
+    contextMenuDisabled={contextMenuDisabled}
+    projectHasCheckpoints={projectHasCheckpoints}
+    hasRunningExperiment={hasRunningExperiment}
+    batchRowSelection={batchRowSelection}
+  />
 )

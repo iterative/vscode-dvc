@@ -133,63 +133,60 @@ export const RowContent: React.FC<
   const [menuActive, setMenuActive] = useState<boolean>(false)
 
   return (
-    <>
-      <ContextMenu
-        disabled={contextMenuDisabled}
-        onShow={() => {
-          setMenuActive(true)
-        }}
-        onHide={() => {
-          setMenuActive(false)
-        }}
-        content={
-          <RowContextMenu
-            row={row}
-            projectHasCheckpoints={projectHasCheckpoints}
-            hasRunningExperiment={hasRunningExperiment}
-          />
-        }
+    <ContextMenu
+      disabled={contextMenuDisabled}
+      onShow={() => {
+        setMenuActive(true)
+      }}
+      onHide={() => {
+        setMenuActive(false)
+      }}
+      content={
+        <RowContextMenu
+          row={row}
+          projectHasCheckpoints={projectHasCheckpoints}
+          hasRunningExperiment={hasRunningExperiment}
+        />
+      }
+    >
+      <tr
+        className={getRowClassNames(
+          original,
+          index,
+          menuActive,
+          isRowSelected,
+          isWorkspace,
+          className
+        )}
+        tabIndex={0}
+        aria-selected={isRowSelected}
+        data-testid={isWorkspace && 'workspace-row'}
       >
-        <tr
-          className={getRowClassNames(
-            original,
-            index,
-            menuActive,
-            isRowSelected,
-            isWorkspace,
-            className
-          )}
-          tabIndex={0}
-          aria-selected={isRowSelected}
-          data-testid={isWorkspace && 'workspace-row'}
-        >
-          <FirstCell
-            cell={firstCell}
-            changesIfWorkspace={!!changesIfWorkspace?.length}
-            bulletColor={displayColor}
-            starred={starred}
-            isRowSelected={isRowSelected}
-            isWorkspace={isWorkspace}
-            showSubRowStates={!getIsExpanded() && depth > 0}
-            subRowStates={subRowStates}
-            toggleExperiment={toggleExperiment}
-            toggleRowSelection={toggleRowSelection}
-            toggleStarred={toggleStarred}
-          />
-          {cells.map(cell => {
-            const cellId = `${cell.column.id}___${cell.row.original.id}`
-            return (
-              <CellWrapper
-                cell={cell}
-                changes={changesIfWorkspace}
-                error={error}
-                key={cellId}
-                cellId={cellId}
-              />
-            )
-          })}
-        </tr>
-      </ContextMenu>
-    </>
+        <FirstCell
+          cell={firstCell}
+          changesIfWorkspace={!!changesIfWorkspace?.length}
+          bulletColor={displayColor}
+          starred={starred}
+          isRowSelected={isRowSelected}
+          showSubRowStates={!getIsExpanded() && depth > 0}
+          subRowStates={subRowStates}
+          toggleExperiment={toggleExperiment}
+          toggleRowSelection={toggleRowSelection}
+          toggleStarred={toggleStarred}
+        />
+        {cells.map(cell => {
+          const cellId = `${cell.column.id}___${cell.row.original.id}`
+          return (
+            <CellWrapper
+              cell={cell}
+              changes={changesIfWorkspace}
+              error={error}
+              key={cellId}
+              cellId={cellId}
+            />
+          )
+        })}
+      </tr>
+    </ContextMenu>
   )
 }

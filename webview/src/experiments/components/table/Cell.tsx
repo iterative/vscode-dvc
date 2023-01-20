@@ -55,7 +55,7 @@ export const FirstCell: React.FC<
   const { toggleExperiment } = rowActionsProps
 
   return (
-    <td className={cx(styles.experimentCell)} style={{ width: getSize() }}>
+    <td className={styles.experimentCell} style={{ width: getSize() }}>
       <div className={styles.innerCell}>
         <CellRowActions status={status} {...rowActionsProps} />
         <RowExpansionButton row={row} />

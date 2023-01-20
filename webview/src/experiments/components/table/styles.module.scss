@@ -463,7 +463,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
     .timestampInnerCell {
       height: 100%;
       width: 100%;
-      background-color: none;
+      background-color: transparent;
     }
   }
 
@@ -707,7 +707,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
   }
 }
 
-.copyButton {
+button.copyButton {
   display: block;
   visibility: hidden;
 }
