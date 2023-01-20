@@ -93,11 +93,6 @@ export const Table: React.FC<TableProps> = ({
             clearSelectedRows?.()
           }
         }}
-        style={{
-          width:
-            instance.getCenterTotalSize() +
-            (instance.getAllLeafColumns().length + 1) * 3
-        }}
       >
         <TableHead
           instance={instance}

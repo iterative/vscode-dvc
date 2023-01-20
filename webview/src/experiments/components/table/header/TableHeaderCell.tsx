@@ -97,7 +97,6 @@ export const TableHeaderCell: React.FC<{
     colSpan,
     column: { getCanResize, id },
     isPlaceholder,
-    getSize,
     depth
   } = header
   const [menuSuppressed, setMenuSuppressed] = useState<boolean>(false)
@@ -156,9 +155,6 @@ export const TableHeaderCell: React.FC<{
         key={id}
         tabIndex={0}
         colSpan={colSpan}
-        style={{
-          width: getSize()
-        }}
       >
         {isExperimentColumn(id) ? (
           <WithExpColumnNeedsShadowUpdates

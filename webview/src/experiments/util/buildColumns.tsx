@@ -36,11 +36,11 @@ const getMainColumnProperties = (
   type: ColumnType,
   label: string,
   path: string,
-  width?: number
+  size?: number
 ) => {
   const basicProperties = {
     group: type,
-    width
+    size
   }
 
   if (type === ColumnType.TIMESTAMP) {

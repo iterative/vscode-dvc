@@ -49,8 +49,9 @@ export const ColumnDragHandle: React.FC<{
     <span
       data-testid="rendered-header"
       className={cx(styles.cellContents)}
-      role={'columnheader'}
-      tabIndex={0}
+      style={{
+        width: header.getSize()
+      }}
     >
       <Draggable
         id={header.id}

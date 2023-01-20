@@ -567,7 +567,9 @@ $bullet-size: calc(var(--design-unit) * 4px);
 
   .placeholderHeaderCell {
     background-color: $header-bg-color;
-    padding: 0.31rem $cell-padding;
+    .cellContents {
+      padding: 0.31rem $cell-padding;
+    }
 
     &::before {
       content: '';
