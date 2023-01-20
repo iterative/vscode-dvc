@@ -15,6 +15,7 @@ import {
 import { Header } from '../components/table/content/Header'
 import { Cell, CellValue } from '../components/table/content/Cell'
 import { TimestampHeader } from '../components/table/content/TimestampHeader'
+import { DateCellContents } from '../components/table/content/DateCellContent'
 
 export type ColumnWithGroup = ColumnDef<Experiment, unknown> & { group: string }
 
@@ -45,6 +46,9 @@ const getMainColumnProperties = (
   if (type === ColumnType.TIMESTAMP) {
     return {
       ...basicProperties,
+      cell: DateCellContents as unknown as React.FC<
+        CellContext<Column, CellValue>
+      >,
       header: () => <TimestampHeader />,
       id: ColumnType.TIMESTAMP
     }
@@ -52,6 +56,7 @@ const getMainColumnProperties = (
 
   return {
     ...basicProperties,
+    cell: Cell as unknown as React.FC<CellContext<Column, CellValue>>,
     header: () => <Header name={label} />,
     id: path
   }
@@ -77,13 +82,13 @@ export const buildColumns = (
       if (childColumns.length > 0) {
         return columnHelper.group({
           ...mainColumnProperties,
+          cell: undefined,
           columns: childColumns
         })
       }
 
       return columnHelper.accessor(buildAccessor(pathArray || [path]), {
-        ...mainColumnProperties,
-        cell: Cell as unknown as React.FC<CellContext<Column, CellValue>>
+        ...mainColumnProperties
       })
     })
     .filter(Boolean) as TableColumn<Experiment>[]

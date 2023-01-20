@@ -586,6 +586,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
     @extend .placeholderHeaderCell;
     color: $header-fg-color;
     text-align: center;
+    font-weight: 400;
 
     &::after {
       content: '';
