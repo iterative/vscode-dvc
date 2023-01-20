@@ -55,6 +55,7 @@ const WithExpColumnNeedsShadowUpdates: React.FC<{
   root: HTMLElement | null
 }> = ({ root, setExpColumnNeedsShadow, children }) => {
   const [ref, needsShadow] = useInView({
+    initialInView: true,
     root,
     rootMargin: '0px 0px 0px -15px',
     threshold: 1
