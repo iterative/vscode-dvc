@@ -308,6 +308,26 @@ $bullet-size: calc(var(--design-unit) * 4px);
         right: 0;
         transition: box-shadow 0.25s;
       }
+
+      &.headerCell {
+        &::after {
+          bottom: auto;
+          left: auto;
+          background-color: transparent;
+        }
+
+        &::before {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 1px;
+          background-color: $header-border-color;
+          display: block;
+          top: auto;
+        }
+      }
     }
 
     &.rowSelected {
@@ -545,12 +565,20 @@ $bullet-size: calc(var(--design-unit) * 4px);
 
   .placeholderHeaderCell {
     background-color: $header-bg-color;
-    border-bottom: 1px solid $header-bg-color;
-    border-left: 1px solid $header-border-color;
     padding: 0.31rem $cell-padding;
 
-    &:first-child {
-      border-left: none;
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 1px;
+      background-color: $header-border-color;
+    }
+
+    &:first-child::before {
+      display: none;
     }
   }
 
@@ -558,10 +586,19 @@ $bullet-size: calc(var(--design-unit) * 4px);
     @extend .placeholderHeaderCell;
     color: $header-fg-color;
     text-align: center;
-    border-bottom: 1px solid $header-border-color;
 
-    &.leafHeader {
-      border-bottom: none;
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background-color: $header-border-color;
+    }
+
+    &.leafHeader::after {
+      display: none;
     }
 
     &.headerCellDropTarget {
@@ -790,7 +827,6 @@ $bullet-size: calc(var(--design-unit) * 4px);
 
 thead {
   background-color: $bg-color;
-  border-bottom: $row-border;
   transition: 0.25s all;
   box-shadow: none;
   position: sticky;

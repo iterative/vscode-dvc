@@ -69,10 +69,12 @@ export const TableBody: React.FC<
   ) : (
     <>
       {row.index === 2 && row.depth === 0 && (
-        <tr className={cx(styles.tr, styles.previousCommitsRow)}>
-          <td className={styles.th}>Previous Commits</td>
-          <td colSpan={row.getAllCells().length - 1}></td>
-        </tr>
+        <tbody>
+          <tr className={cx(styles.tr, styles.previousCommitsRow)}>
+            <td className={styles.th}>Previous Commits</td>
+            <td colSpan={row.getAllCells().length - 1}></td>
+          </tr>
+        </tbody>
       )}
       <tbody
         className={cx(styles.rowGroup, styles.tbody, styles.normalRowGroup, {
