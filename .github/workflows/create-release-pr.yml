@@ -55,14 +55,13 @@ jobs:
 
       - name: Create Pull Request
         run: |
-          echo "This PR updates the extension version and CHANGELOG.md." >> body.log
-          echo "" >> body.log
-          echo "Please close and reopen this PR to run the required workflows (Required statuses must pass before merging)." >> body.log
-          echo "" >> body.log
-          echo "**The \`publish\` workflow will run automatically when this PR is merged.**" >> body.log
-
           cml pr create \
             --token="${{ secrets.GITHUB_TOKEN }}" \
             --message="Update version and CHANGELOG for release" \
             --title="Update version and CHANGELOG for release" \
-            --body="$(cat ./body.log)" .
+            --body='This PR updates the extension version and CHANGELOG.md.
+
+          Please close and reopen this PR to run the required workflows (Required statuses must pass before merging).
+
+          **The `publish` workflow will run automatically when this PR is merged.**
+          ' .
