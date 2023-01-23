@@ -22,7 +22,7 @@ const calcResizerHeight = (header: Header<Experiment, unknown>) => {
   let column = header.column
   while (
     column.parent &&
-    [...column.parent.columns].reverse()[0]?.id === column.id
+    [...column.parent.getLeafColumns()].reverse()[0]?.id === column.id
   ) {
     depth++
     column = column.parent
