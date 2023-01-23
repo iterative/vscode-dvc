@@ -806,6 +806,14 @@ button.copyButton {
 .experimentCellSecondaryName {
   color: $meta-cell-color;
   font-size: 0.75em;
+  display: flex;
+  align-items: center;
+
+  svg {
+    min-width: 14px;
+    min-height: 14px;
+    margin-right: 2px;
+  }
 }
 
 .experimentCellSecondaryNameTooltip {
@@ -828,6 +836,11 @@ button.copyButton {
   .sha {
     margin: 0 auto 0 0;
     font-size: 1em;
+
+    svg {
+      min-width: 14px;
+      min-height: 14px;
+    }
   }
 
   .tag {
