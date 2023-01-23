@@ -199,6 +199,11 @@ describe('pickExperimentsToPlot', () => {
 
     const mockedWorkspace = { label: EXPERIMENT_WORKSPACE_ID, selected: false }
     const mockedBranch = {
+      commit: {
+        author: 'John Smith',
+        date: '3 days ago',
+        message: 'add new feature'
+      },
       displayNameOrParent: 'Update dvc',
       label: 'main',
       selected: false
@@ -254,7 +259,7 @@ describe('pickExperimentsToPlot', () => {
         getExpectedItem(mockedWorkspace),
         {
           ...getExpectedItem(mockedBranch),
-          description: mockedBranch.displayNameOrParent
+          description: `$(git-commit)${mockedBranch.displayNameOrParent}`
         },
         {
           kind: QuickPickItemKind.Separator,
