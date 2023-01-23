@@ -320,6 +320,20 @@ $bullet-size: calc(var(--design-unit) * 4px);
         transition: box-shadow 0.25s;
       }
 
+      &.headerCell,
+      &.placeholderHeaderCell {
+        > div::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          right: -2px;
+          width: 1px;
+          height: 100%;
+          background-color: $header-border-color;
+          display: block;
+        }
+      }
+
       &.headerCell {
         &::after {
           bottom: auto;
@@ -365,8 +379,14 @@ $bullet-size: calc(var(--design-unit) * 4px);
     }
   }
 
-  table.withExpColumnShadow tr > *:first-child:after {
-    box-shadow: 3px 0px 3px $shadow;
+  table.withExpColumnShadow tr > *:first-child {
+    &::after {
+      box-shadow: 3px 0px 3px $shadow;
+    }
+
+    > div::after {
+      display: none;
+    }
   }
 
   .bodyRow {
