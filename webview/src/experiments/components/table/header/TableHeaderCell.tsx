@@ -17,8 +17,18 @@ import { ContextMenu } from '../../../../shared/components/contextMenu/ContextMe
 import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
 import { ColumnWithGroup } from '../../../util/buildColumns'
 
-const calcResizerHeight = (header: Header<Experiment, unknown>) =>
-  `${100 + (header.depth - header.column.depth - 1) * 105}%`
+const calcResizerHeight = (header: Header<Experiment, unknown>) => {
+  let depth = header.depth - header.column.depth - 1
+  let column = header.column
+  while (
+    column.parent &&
+    [...column.parent.columns].reverse()[0]?.id === column.id
+  ) {
+    depth++
+    column = column.parent
+  }
+  return `${100 + depth * 105}%`
+}
 
 const getHeaderPropsArgs = (
   header: Header<Experiment, unknown>,
