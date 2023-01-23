@@ -29,7 +29,8 @@ export const Cell: React.FC<CellContext<Experiment, CellValue>> = cell => {
   const {
     row: {
       original: { error }
-    }
+    },
+    column: { getSize }
   } = cell as unknown as CellContext<Experiment, CellValue>
 
   if (error && value === undefined) {
@@ -53,7 +54,7 @@ export const Cell: React.FC<CellContext<Experiment, CellValue>> = cell => {
       delay={NORMAL_TOOLTIP_DELAY}
       interactive={true}
     >
-      <div className={styles.innerCell}>
+      <div className={styles.innerCell} style={{ width: getSize() }}>
         <CopyButton
           value={stringValue}
           className={styles.copyButton}

@@ -17,11 +17,14 @@ export const DateCellContents: React.FC<
 > = cell => {
   const value = cell.getValue()
   if (!value) {
-    return null
+    return <div className={styles.timestampInnerCell}></div>
   }
   const date = new Date(value as string)
   return (
-    <div className={styles.timestampInnerCell}>
+    <div
+      className={styles.timestampInnerCell}
+      style={{ width: cell.column.getSize() }}
+    >
       <span className={styles.cellContents}>
         <div className={styles.timestampTime}>{timeFormatter.format(date)}</div>
         <div className={styles.timestampDate}>{dateFormatter.format(date)}</div>

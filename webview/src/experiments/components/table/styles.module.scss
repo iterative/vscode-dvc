@@ -300,7 +300,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
       }
 
       td:not(.experimentCell),
-      .experimentCell {
+      .experimentCell::before {
         background-color: $row-hover-background-color;
       }
     }
@@ -348,17 +348,12 @@ $bullet-size: calc(var(--design-unit) * 4px);
         color: $row-fg-selected-color;
         border-bottom-color: $row-border-selected-color;
         background-color: $row-bg-selected-color;
-
-        .innerCell,
-        .timestampInnerCell {
-          border-color: $row-bg-selected-color;
-        }
       }
 
-      > *:first-child {
+      .experimentCell {
         background-color: $row-bg-color;
 
-        &:before {
+        &::before {
           background-color: $row-bg-selected-color;
         }
       }
@@ -480,6 +475,10 @@ $bullet-size: calc(var(--design-unit) * 4px);
       width: 100%;
       background-color: transparent;
     }
+
+    .timestampInnerCell {
+      height: 52px;
+    }
   }
 
   .workspaceChange,
@@ -593,7 +592,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
       content: '';
       position: absolute;
       top: 0;
-      left: 0;
+      left: -2px;
       height: 100%;
       width: 1px;
       background-color: $header-border-color;
