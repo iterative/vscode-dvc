@@ -1,19 +1,5 @@
-import { Experiment, Column } from 'dvc/src/experiments/webview/contract'
+import { Experiment } from 'dvc/src/experiments/webview/contract'
 import { Header } from '@tanstack/react-table'
-import { CellValue } from '../components/table/content/Cell'
-
-export const getPlaceholders = (
-  column: Header<Experiment, CellValue>,
-  columns: Header<Experiment, CellValue>[]
-): Header<Experiment, CellValue>[] =>
-  columns.filter(c => c.placeholderId === column.id)
-
-const cleanPath = (path: string): string => path.split('/').slice(1).join('/')
-
-export const getNodeSiblings = (orderedColumns: Column[], id: string) => {
-  const nodeRep = orderedColumns.find(node => cleanPath(node.path) === id)
-  return orderedColumns.filter(node => node.parentPath === nodeRep?.parentPath)
-}
 
 export const isFirstLevelHeader = (id: string) => id.split(':').length - 1 === 1
 
