@@ -13520,10 +13520,10 @@ minimalistic-crypto-utils@^1.0.1:
   resolved "https://registry.yarnpkg.com/minimalistic-crypto-utils/-/minimalistic-crypto-utils-1.0.1.tgz#f6c00c1c0b082246e5c4d99dfb8c7c083b2b582a"
   integrity sha1-9sAMHAsIIkblxNmd+4x8CDsrWCo=
 
-minimatch@3.0.4, minimatch@6.0.4:
-  version "6.0.4"
-  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-6.0.4.tgz#cbada37326e86dc19434874a04e29df0ba64cb17"
-  integrity sha512-9SQupyyavjdAc1VFjJS/5kdtFtlLAhKSWt7HocG0h/npy626jYrGegSslcM7Xxet5z0U9GOx9YbcpyIjBzn7tA==
+minimatch@3.0.4, minimatch@6.1.4:
+  version "6.1.4"
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-6.1.4.tgz#f34f10bd5f67d7b1aa0032931f2dac64adb51c81"
+  integrity sha512-NsDTCCf9qKxjUUxSfhnF2AbYR9xSpWvJx/HL/4E+KbqhKqdHMXjn81So56Hga/lpyhXL98aLPZLdPmUUEyIrWA==
   dependencies:
     brace-expansion "^2.0.1"
 
