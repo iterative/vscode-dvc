@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { createRef, useEffect, useRef } from 'react'
 import cx from 'classnames'
 import { ColumnType, Experiment } from 'dvc/src/experiments/webview/contract'
 import { flexRender, Header } from '@tanstack/react-table'
@@ -86,7 +86,7 @@ export const TableHeaderCellContents: React.FC<{
   onDragLeave: DragFunction
   canResize: boolean
   setMenuSuppressed: (menuSuppressed: boolean) => void
-  resizerHeight: string
+  resizerHeight: { normal: string; hover: string }
 }> = ({
   header,
   sortEnabled,
@@ -103,6 +103,8 @@ export const TableHeaderCellContents: React.FC<{
   setMenuSuppressed,
   resizerHeight
 }) => {
+  const resizer = createRef<HTMLDivElement>()
+  const hoveringResizer = useRef(false)
   const isTimestamp = header.headerGroup.id === ColumnType.TIMESTAMP
   const columnIsResizing = header.column.getIsResizing()
 
@@ -113,6 +115,21 @@ export const TableHeaderCellContents: React.FC<{
       document.body.classList.remove(styles.isColumnResizing)
     }
   }, [columnIsResizing])
+
+  const resetResizer = () => {
+    if (resizer.current) {
+      if (!columnIsResizing) {
+        resizer.current.style.height = resizerHeight.normal
+        return
+      }
+      if (hoveringResizer.current) {
+        return
+      }
+      setTimeout(() => {
+        resetResizer()
+      }, 300)
+    }
+  }
 
   return (
     <>
@@ -139,13 +156,23 @@ export const TableHeaderCellContents: React.FC<{
       {canResize && (
         <div
           {...{ onMouseDown: header.getResizeHandler() }}
-          onMouseEnter={() => setMenuSuppressed(true)}
-          onMouseLeave={() => setMenuSuppressed(false)}
+          ref={resizer}
+          onMouseEnter={() => {
+            setMenuSuppressed(true)
+            hoveringResizer.current = true
+            if (resizer.current) {
+              resizer.current.style.height = resizerHeight.hover
+            }
+          }}
+          onMouseLeave={() => {
+            setMenuSuppressed(false)
+            resetResizer()
+            hoveringResizer.current = false
+          }}
           className={cx(
             styles.columnResizer,
             columnIsResizing && styles.isResizing
           )}
-          style={{ height: resizerHeight }}
           role="separator"
         />
       )}

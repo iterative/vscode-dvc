@@ -39,13 +39,14 @@ const getMainColumnProperties = (
   size?: number
 ) => {
   const basicProperties = {
-    group: type,
-    size
+    group: type
   }
+  const sizeProperty = size ? { size } : {}
 
   if (type === ColumnType.TIMESTAMP) {
     return {
       ...basicProperties,
+      ...sizeProperty,
       cell: DateCellContents as unknown as React.FC<
         CellContext<Column, CellValue>
       >,
@@ -56,6 +57,7 @@ const getMainColumnProperties = (
 
   return {
     ...basicProperties,
+    ...sizeProperty,
     cell: Cell as unknown as React.FC<CellContext<Column, CellValue>>,
     header: () => <Header name={label} />,
     id: path

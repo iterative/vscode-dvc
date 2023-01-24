@@ -218,9 +218,9 @@ $bullet-size: calc(var(--design-unit) * 4px);
   .experimentGroup {
     .nestedRow {
       .experimentCell {
-        padding-left: $nested-row-padding;
-
         .innerCell {
+          padding-left: calc($nested-row-padding + $edge-padding);
+
           .rowActions {
             left: calc(($cell-padding + $nested-row-padding) * -1);
           }

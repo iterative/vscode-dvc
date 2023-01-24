@@ -17,7 +17,6 @@ import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import styles from './styles.module.scss'
 import { SortOrder } from './header/ContextMenuContent'
 import { ExperimentsTable } from '../Experiments'
-import * as ColumnOrder from '../../hooks/useColumnOrder'
 import { vsCodeApi } from '../../../shared/api'
 import {
   expectHeaders,
@@ -30,13 +29,6 @@ import { experimentsReducers } from '../../store'
 import { customQueries } from '../../../test/queries'
 
 jest.mock('../../../shared/api')
-jest.mock('../../hooks/useColumnOrder', () => {
-  const actualModule = jest.requireActual('../../hooks/useColumnOrder')
-  return {
-    __esModule: true,
-    ...actualModule
-  }
-})
 
 const { postMessage } = vsCodeApi
 const mockedPostMessage = jest.mocked(postMessage)
@@ -63,10 +55,6 @@ describe('Table', () => {
       }
     )
   }
-
-  beforeAll(() => {
-    jest.spyOn(ColumnOrder, 'useColumnOrder').mockImplementation(() => [])
-  })
 
   beforeEach(() => {
     jest.clearAllMocks()
