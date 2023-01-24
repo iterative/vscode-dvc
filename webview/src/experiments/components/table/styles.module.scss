@@ -51,7 +51,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
   height: 100%;
   &:hover {
     & .copyButton {
-      visibility: visible;
+      display: block;
     }
   }
 }
@@ -744,11 +744,6 @@ $bullet-size: calc(var(--design-unit) * 4px);
   &.isResizing::after {
     display: block;
   }
-}
-
-button.copyButton {
-  display: block;
-  visibility: hidden;
 }
 
 .cellContents {
