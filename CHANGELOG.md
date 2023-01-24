@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.38] - 2023-01-24
+
+### 🚀 New Features and Enhancements
+
+- Add experiment row commit tooltips [#3105](https://github.com/iterative/vscode-dvc/pull/3105) by [@julieg18](https://github.com/julieg18)
+- Make experiment row commit tooltips interactive [#3113](https://github.com/iterative/vscode-dvc/pull/3113) by [@julieg18](https://github.com/julieg18)
+- Show commits in "Select Experiments to Display in Plots" quick pick [#3114](https://github.com/iterative/vscode-dvc/pull/3114) by [@julieg18](https://github.com/julieg18)
+- Add commit message to plots ribbon block tooltips [#3122](https://github.com/iterative/vscode-dvc/pull/3122) by [@julieg18](https://github.com/julieg18)
+- Add `git-commit` icon to experiments table and quick pick [#3124](https://github.com/iterative/vscode-dvc/pull/3124) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Add `workflow_dispatch` event to `publish` workflow [#3110](https://github.com/iterative/vscode-dvc/pull/3110) by [@julieg18](https://github.com/julieg18)
+- Update Windows yarn network timeout to 5 minutes (downloading packages on slow disk) [#3129](https://github.com/iterative/vscode-dvc/pull/3129) by [@mattseddon](https://github.com/mattseddon)
+- Add resolution for json5 library (security) [#3128](https://github.com/iterative/vscode-dvc/pull/3128) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.37] - 2023-01-16
 
 ### 🚀 New Features and Enhancements
