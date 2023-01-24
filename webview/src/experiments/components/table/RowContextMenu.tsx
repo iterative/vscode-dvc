@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-import React from 'react'
+import React, { useMemo } from 'react'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import {
   ExperimentStatus,
@@ -51,11 +50,11 @@ const getMultiSelectMenuOptions = (
     }) => starred
   )
 
-  const selectedIds = selectedRowsList.map(value => value.row.values.id)
+  const selectedIds = selectedRowsList.map(value => value.row.id)
 
   const removableRowIds = selectedRowsList
     .filter(value => value.row.depth === 1)
-    .map(value => value.row.values.id)
+    .map(value => value.row.id)
 
   const hideRemoveOption =
     removableRowIds.length !== selectedRowsList.length || hasRunningExperiment
@@ -70,11 +69,11 @@ const getMultiSelectMenuOptions = (
 
   return [
     toggleStarOption(
-      unstarredExperiments.map(value => value.row.values.id),
+      unstarredExperiments.map(value => value.row.original.id),
       'Star'
     ),
     toggleStarOption(
-      starredExperiments.map(value => value.row.values.id),
+      starredExperiments.map(value => value.row.original.id),
       'Unstar'
     ),
     experimentMenuOption(
@@ -248,9 +247,8 @@ export const RowContextMenu: React.FC<RowProp> = ({
   hasRunningExperiment = false,
   projectHasCheckpoints = false,
   row: {
-    original: { status, starred },
-    depth,
-    values: { id }
+    original: { status, starred, id },
+    depth
   }
 }) => {
   const { selectedRows, clearSelectedRows } =
@@ -258,7 +256,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
 
   const isWorkspace = id === EXPERIMENT_WORKSPACE_ID
 
-  const contextMenuOptions = React.useMemo(() => {
+  const contextMenuOptions = useMemo(() => {
     return getContextMenuOptions(
       id,
       isWorkspace,

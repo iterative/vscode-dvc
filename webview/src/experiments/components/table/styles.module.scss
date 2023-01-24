@@ -190,7 +190,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
 }
 
 .rowGroup:last-child {
-  & > .tr:last-child {
+  & > tr:last-child {
     border-color: $row-bg-color;
 
     &.rowSelected {
@@ -199,7 +199,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
   }
 
   .experimentGroup {
-    &:last-child .tr:last-child {
+    &:last-child tr:last-child {
       border-color: $row-bg-color;
 
       &.rowSelected {
@@ -218,9 +218,9 @@ $bullet-size: calc(var(--design-unit) * 4px);
   .experimentGroup {
     .nestedRow {
       .experimentCell {
-        padding-left: $nested-row-padding;
-
         .innerCell {
+          padding-left: calc($nested-row-padding + $edge-padding);
+
           .rowActions {
             left: calc(($cell-padding + $nested-row-padding) * -1);
           }
@@ -228,16 +228,20 @@ $bullet-size: calc(var(--design-unit) * 4px);
       }
     }
   }
+
   ul {
     padding-left: 1rem;
   }
+
   .tableContainer {
     flex: 1;
   }
-  .table {
+
+  table {
     display: inline-block;
     border-collapse: collapse;
   }
+
   summary {
     white-space: nowrap;
     cursor: pointer;
@@ -253,9 +257,10 @@ $bullet-size: calc(var(--design-unit) * 4px);
     width: 1rem;
   }
 
-  .tr {
+  tr {
     position: relative;
     background-color: $row-bg-color;
+    width: fit-content;
 
     &:hover.rowSelected {
       &:after {
@@ -270,22 +275,33 @@ $bullet-size: calc(var(--design-unit) * 4px);
         pointer-events: none;
       }
 
-      .td:hover,
-      .td:hover + .td {
+      td:not(.experimentCell):hover .innerCell,
+      td:hover .timestampInnerCell,
+      td:hover + td .innerCell,
+      td:hover + td .timestampInnerCell {
         border-left-color: $row-border-selected-color;
       }
     }
 
     &:hover:not(.rowSelected),
     &.rowFocused:not(.rowSelected) {
-      .td:not(.experimentCell),
-      .experimentCell:before {
-        background-color: $row-hover-background-color;
+      :not(.experimentCell) {
+        .innerCell,
+        .timestampInnerCell {
+          border-right-color: $border-color;
+        }
       }
 
-      .td:hover,
-      .td:hover + .td {
-        border-left-color: $border-color;
+      .experimentCell + td {
+        .innerCell,
+        .timestampInnerCell {
+          border-left-color: $border-color;
+        }
+      }
+
+      td:not(.experimentCell),
+      .experimentCell::before {
+        background-color: $row-hover-background-color;
       }
     }
 
@@ -303,20 +319,55 @@ $bullet-size: calc(var(--design-unit) * 4px);
         right: 0;
         transition: box-shadow 0.25s;
       }
+
+      &.headerCell,
+      &.placeholderHeaderCell {
+        > div::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          right: -2px;
+          width: 1px;
+          height: 100%;
+          background-color: $header-border-color;
+          display: block;
+        }
+      }
+
+      &.headerCell {
+        &::after {
+          bottom: auto;
+          left: auto;
+          background-color: transparent;
+        }
+
+        &::before {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 1px;
+          background-color: $header-border-color;
+          display: block;
+          top: auto;
+        }
+      }
     }
 
     &.rowSelected {
       border-color: $row-border-selected-color;
 
-      .td {
-        background-color: $row-bg-selected-color;
+      td {
         color: $row-fg-selected-color;
+        border-bottom-color: $row-border-selected-color;
+        background-color: $row-bg-selected-color;
       }
 
-      > *:first-child {
+      .experimentCell {
         background-color: $row-bg-color;
 
-        &:before {
+        &::before {
           background-color: $row-bg-selected-color;
         }
       }
@@ -328,8 +379,14 @@ $bullet-size: calc(var(--design-unit) * 4px);
     }
   }
 
-  .table.withExpColumnShadow .tr > *:first-child:after {
-    box-shadow: 3px 0px 3px $shadow;
+  table.withExpColumnShadow tr > *:first-child {
+    &::after {
+      box-shadow: 3px 0px 3px $shadow;
+    }
+
+    > div::after {
+      display: none;
+    }
   }
 
   .bodyRow {
@@ -419,16 +476,14 @@ $bullet-size: calc(var(--design-unit) * 4px);
     &.withShadow {
       box-shadow: 0 5px 8px -2px $shadow;
 
-      .tr {
+      tr {
         border-bottom: none;
       }
     }
 
-    .td {
-      line-height: 3rem;
-    }
-
     .innerCell {
+      padding: 5px 10px;
+
       .rowActions {
         visibility: hidden;
       }
@@ -438,7 +493,11 @@ $bullet-size: calc(var(--design-unit) * 4px);
     .timestampInnerCell {
       height: 100%;
       width: 100%;
-      background-color: none;
+      background-color: transparent;
+    }
+
+    .timestampInnerCell {
+      height: 42px;
     }
   }
 
@@ -447,14 +506,14 @@ $bullet-size: calc(var(--design-unit) * 4px);
     color: $changed-color;
   }
 
-  .td,
-  .th {
+  td,
+  th {
     white-space: nowrap;
     min-width: 0;
     position: relative;
-    background-color: $row-bg-color;
   }
-  .th {
+
+  th {
     height: auto;
     background-color: $header-bg-color;
 
@@ -474,13 +533,18 @@ $bullet-size: calc(var(--design-unit) * 4px);
       }
     }
   }
-  .td {
+
+  td {
     height: auto;
     font-size: 0.8rem;
     line-height: 2rem;
     align-items: center;
-    border-right: 1px solid transparent;
-    border-left: 1px solid transparent;
+
+    .innerCell,
+    .timestampInnerCell {
+      border-right: 1px solid transparent;
+      border-left: 1px solid transparent;
+    }
 
     &:first-child {
       .innerCell {
@@ -495,12 +559,12 @@ $bullet-size: calc(var(--design-unit) * 4px);
     }
   }
   .experimentCell {
-    display: flex;
-    flex-flow: row nowrap;
     border-right: none;
     border-left: none;
 
     .innerCell {
+      display: flex;
+      flex-flow: row nowrap;
       justify-content: flex-start;
 
       .bullet {
@@ -540,11 +604,22 @@ $bullet-size: calc(var(--design-unit) * 4px);
 
   .placeholderHeaderCell {
     background-color: $header-bg-color;
-    border-left: 1px solid $header-border-color;
-    padding: 0.31rem $cell-padding;
+    .cellContents {
+      padding: 0.31rem $cell-padding;
+    }
 
-    &:first-child {
-      border-left: none;
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -2px;
+      height: 100%;
+      width: 1px;
+      background-color: $header-border-color;
+    }
+
+    &:first-child::before {
+      display: none;
     }
   }
 
@@ -552,10 +627,20 @@ $bullet-size: calc(var(--design-unit) * 4px);
     @extend .placeholderHeaderCell;
     color: $header-fg-color;
     text-align: center;
-    border-bottom: 1px solid $header-border-color;
+    font-weight: 400;
 
-    &.leafHeader {
-      border-bottom: none;
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background-color: $header-border-color;
+    }
+
+    &.leafHeader::after {
+      display: none;
     }
 
     &.headerCellDropTarget {
@@ -567,15 +652,16 @@ $bullet-size: calc(var(--design-unit) * 4px);
     }
   }
 
+  .oneRowHeaderCell {
+    vertical-align: bottom;
+    height: 50px;
+  }
+
   .previousCommitsRow {
     border-bottom: $row-border;
 
     .th {
-      display: flex;
-      align-items: flex-end;
       font-size: 0.6rem;
-      height: 32px;
-      padding-bottom: 8px;
       padding-left: 16px;
     }
   }
@@ -658,10 +744,6 @@ $bullet-size: calc(var(--design-unit) * 4px);
   &.isResizing::after {
     display: block;
   }
-}
-
-.copyButton {
-  display: none;
 }
 
 .cellContents {
@@ -780,6 +862,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
   @extend %truncateLeftParent;
   line-height: normal;
   text-align: left;
+  height: 32px;
 }
 
 .timestampDate {
@@ -798,9 +881,8 @@ $bullet-size: calc(var(--design-unit) * 4px);
   text-align: left;
 }
 
-.thead {
+thead {
   background-color: $bg-color;
-  border-bottom: $row-border;
   transition: 0.25s all;
   box-shadow: none;
   position: sticky;
@@ -812,9 +894,10 @@ $bullet-size: calc(var(--design-unit) * 4px);
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 4;
+  z-index: 5;
   font-size: 0.7rem;
   padding: 0.2rem 0.5rem;
+  text-align: left;
 }
 
 $badge-size: 0.85rem;

@@ -1,8 +1,12 @@
 import { screen } from '@testing-library/react'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
-import { ColumnType, TableData } from 'dvc/src/experiments/webview/contract'
+import {
+  Column,
+  ColumnType,
+  TableData
+} from 'dvc/src/experiments/webview/contract'
 
-export const defaultColumn = 'Experiment'
+export const defaultColumn = ['Experiment', 'Created']
 
 export const commonColumnFields = {
   hasChildren: false,
@@ -11,6 +15,10 @@ export const commonColumnFields = {
 }
 
 export const columns = [
+  {
+    hasChildren: false,
+    type: ColumnType.TIMESTAMP
+  },
   {
     ...commonColumnFields,
     id: 'A',
@@ -35,7 +43,7 @@ export const tableData: TableData = {
   changes: [],
   columnOrder: [],
   columnWidths: {},
-  columns,
+  columns: columns as Column[],
   filteredCounts: { checkpoints: 0, experiments: 0 },
   filters: [],
   hasCheckpoints: false,
@@ -65,7 +73,7 @@ export const getHeaders = async () => {
 
 export const expectHeaders = async (expectedHeaderNames: string[]) => {
   expect(await getHeaders()).toStrictEqual([
-    defaultColumn,
+    ...defaultColumn,
     ...expectedHeaderNames
   ])
 }

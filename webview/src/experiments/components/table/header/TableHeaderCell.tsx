@@ -1,11 +1,7 @@
-import {
-  Experiment,
-  Column,
-  ColumnType
-} from 'dvc/src/experiments/webview/contract'
-import React, { useEffect } from 'react'
+import { Experiment, ColumnType } from 'dvc/src/experiments/webview/contract'
+import React, { ReactNode, useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { HeaderGroup } from 'react-table'
+import { Header } from '@tanstack/react-table'
 import cx from 'classnames'
 import { useInView } from 'react-intersection-observer'
 import { TableHeaderCellContents } from './TableHeaderCellContents'
@@ -15,50 +11,55 @@ import {
   SortOrder
 } from './ContextMenuContent'
 import styles from '../styles.module.scss'
-import {
-  countUpperLevels,
-  isExperimentColumn,
-  isFirstLevelHeader
-} from '../../../util/columns'
+import { isExperimentColumn, isFirstLevelHeader } from '../../../util/columns'
 import { ExperimentsState } from '../../../store'
 import { ContextMenu } from '../../../../shared/components/contextMenu/ContextMenu'
 import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
+import { ColumnWithGroup } from '../../../util/buildColumns'
 
-const calcResizerHeight = (
-  isPlaceholder: boolean,
-  orderedColumns: Column[],
-  column: HeaderGroup<Experiment>,
-  columns: HeaderGroup<Experiment>[]
-) => {
-  const nbUpperLevels = isPlaceholder
-    ? 0
-    : countUpperLevels(orderedColumns, column, columns, 0)
-  return `${100 + nbUpperLevels * 105}` + '%'
+const getPercentResizer = (depth: number) => `${100 + depth * 105}%`
+
+const calcResizerHeight = (header: Header<Experiment, unknown>) => {
+  const originalDepth = header.depth - header.column.depth - 1
+  let depth = originalDepth
+  let column = header.column
+  while (
+    column.parent &&
+    [...column.parent.getLeafColumns()].reverse()[0]?.id === column.id
+  ) {
+    depth++
+    column = column.parent
+  }
+  return {
+    hover: getPercentResizer(depth),
+    normal: getPercentResizer(originalDepth)
+  }
 }
 
 const getHeaderPropsArgs = (
-  column: HeaderGroup<Experiment>,
+  header: Header<Experiment, unknown>,
   headerDropTargetId: string,
   sortEnabled: boolean,
-  sortOrder: SortOrder
+  sortOrder: SortOrder,
+  onlyOneLine?: boolean
 ) => {
+  const columnWithGroup = header.column.columnDef as ColumnWithGroup
   return {
     className: cx(
-      styles.th,
-      column.placeholderOf ? styles.placeholderHeaderCell : styles.headerCell,
+      header.isPlaceholder ? styles.placeholderHeaderCell : styles.headerCell,
       {
-        [styles.paramHeaderCell]: column.group === ColumnType.PARAMS,
-        [styles.metricHeaderCell]: column.group === ColumnType.METRICS,
-        [styles.depHeaderCell]: column.group === ColumnType.DEPS,
-        [styles.firstLevelHeader]: isFirstLevelHeader(column.id),
-        [styles.leafHeader]: column.headers === undefined,
+        [styles.paramHeaderCell]: columnWithGroup.group === ColumnType.PARAMS,
+        [styles.metricHeaderCell]: columnWithGroup.group === ColumnType.METRICS,
+        [styles.depHeaderCell]: columnWithGroup.group === ColumnType.DEPS,
+        [styles.firstLevelHeader]: isFirstLevelHeader(header.column.id),
+        [styles.leafHeader]: header.subHeaders === undefined,
         [styles.menuEnabled]: sortEnabled,
-        [styles.sortingHeaderCellAsc]:
-          sortOrder === SortOrder.ASCENDING && !column.parent?.placeholderOf,
+        [styles.sortingHeaderCellAsc]: sortOrder === SortOrder.ASCENDING,
         [styles.sortingHeaderCellDesc]:
-          sortOrder === SortOrder.DESCENDING && !column.placeholderOf
+          sortOrder === SortOrder.DESCENDING && !header.isPlaceholder,
+        [styles.oneRowHeaderCell]: onlyOneLine
       },
-      headerDropTargetId === column.id && styles.headerCellDropTarget
+      headerDropTargetId === header.id && styles.headerCellDropTarget
     ),
     style: {
       position: undefined
@@ -67,13 +68,14 @@ const getHeaderPropsArgs = (
 }
 
 const WithExpColumnNeedsShadowUpdates: React.FC<{
-  children: React.ReactNode
+  children: ReactNode
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   root: HTMLElement | null
 }> = ({ root, setExpColumnNeedsShadow, children }) => {
   const [ref, needsShadow] = useInView({
+    initialInView: true,
     root,
-    rootMargin: '0px 0px 0px -15px',
+    rootMargin: '0px 0px 0px -2px',
     threshold: 1
   })
 
@@ -85,10 +87,8 @@ const WithExpColumnNeedsShadowUpdates: React.FC<{
 }
 
 export const TableHeaderCell: React.FC<{
-  column: HeaderGroup<Experiment>
-  columns: HeaderGroup<Experiment>[]
+  header: Header<Experiment, unknown>
   hasFilter: boolean
-  orderedColumns: Column[]
   onDragEnter: DragFunction
   onDragEnd: DragFunction
   onDragStart: DragFunction
@@ -96,10 +96,9 @@ export const TableHeaderCell: React.FC<{
   onDragLeave: DragFunction
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   root: HTMLElement | null
+  onlyOneLine?: boolean
 }> = ({
-  column,
-  columns,
-  orderedColumns,
+  header,
   hasFilter,
   onDragEnter,
   onDragEnd,
@@ -107,32 +106,32 @@ export const TableHeaderCell: React.FC<{
   onDrop,
   onDragLeave,
   root,
-  setExpColumnNeedsShadow
+  setExpColumnNeedsShadow,
+  onlyOneLine
 }) => {
-  const [menuSuppressed, setMenuSuppressed] = React.useState<boolean>(false)
+  const {
+    colSpan,
+    column: { getCanResize, id },
+    isPlaceholder,
+    depth
+  } = header
+  const [menuSuppressed, setMenuSuppressed] = useState<boolean>(false)
   const headerDropTargetId = useSelector(
     (state: ExperimentsState) => state.headerDropTarget
   )
   const { sorts } = useSelector((state: ExperimentsState) => state.tableData)
 
-  const { menuEnabled, isSortable, sortOrder } = React.useMemo(() => {
-    return getMenuOptions(column, sorts)
-  }, [column, sorts])
+  const { menuEnabled, isSortable, sortOrder } = useMemo(() => {
+    return getMenuOptions(header, sorts)
+  }, [header, sorts])
+  const isDraggable = !isPlaceholder && !isExperimentColumn(id)
 
-  const isDraggable = !column.placeholderOf && !isExperimentColumn(column.id)
-  const isPlaceholder = !!column.placeholderOf
-
-  const canResize = column.canResize && !isPlaceholder
-  const resizerHeight = calcResizerHeight(
-    isPlaceholder,
-    orderedColumns,
-    column,
-    columns
-  )
+  const canResize = getCanResize() && !isPlaceholder
+  const resizerHeight = calcResizerHeight(header)
 
   const cellContents = (
     <TableHeaderCellContents
-      column={column}
+      header={header}
       sortOrder={sortOrder}
       sortEnabled={isSortable}
       hasFilter={hasFilter}
@@ -149,7 +148,10 @@ export const TableHeaderCell: React.FC<{
     />
   )
 
-  const menuContent = <ContextMenuContent column={column} />
+  const menuContent = <ContextMenuContent header={header} />
+  const previousPlaceholder = isPlaceholder
+    ? `_previous_placeholder_${depth}`
+    : ''
 
   return (
     <ContextMenu
@@ -157,16 +159,20 @@ export const TableHeaderCell: React.FC<{
       disabled={!menuEnabled || menuSuppressed}
       trigger={'contextmenu'}
     >
-      <div
-        {...column.getHeaderProps(
-          getHeaderPropsArgs(column, headerDropTargetId, isSortable, sortOrder)
+      <th
+        {...getHeaderPropsArgs(
+          header,
+          headerDropTargetId,
+          isSortable,
+          sortOrder,
+          onlyOneLine
         )}
-        data-testid={`header-${column.id}`}
-        key={column.id}
-        role="columnheader"
+        data-testid={`header-${id}${previousPlaceholder}`}
+        key={id}
         tabIndex={0}
+        colSpan={colSpan}
       >
-        {isExperimentColumn(column.id) ? (
+        {isExperimentColumn(id) ? (
           <WithExpColumnNeedsShadowUpdates
             setExpColumnNeedsShadow={setExpColumnNeedsShadow}
             root={root}
@@ -176,7 +182,7 @@ export const TableHeaderCell: React.FC<{
         ) : (
           cellContents
         )}
-      </div>
+      </th>
     </ContextMenu>
   )
 }

@@ -1,16 +1,33 @@
-import React, { useRef, useState, CSSProperties } from 'react'
+import React, {
+  useRef,
+  useState,
+  CSSProperties,
+  useContext,
+  useCallback
+} from 'react'
 import { useSelector } from 'react-redux'
+import { ColumnOrderState } from '@tanstack/react-table'
 import cx from 'classnames'
 import styles from './styles.module.scss'
 import { TableHead } from './header/TableHead'
 import { InstanceProp, RowProp } from './interfaces'
 import { RowSelectionContext } from './RowSelectionContext'
 import { TableBody } from './TableBody'
+import { Indicators } from './Indicators'
 import { useClickOutside } from '../../../shared/hooks/useClickOutside'
 import { ExperimentsState } from '../../store'
+import { getSelectedForPlotsCount } from '../../util/rows'
 
-export const Table: React.FC<InstanceProp> = ({ instance }) => {
-  const { getTableProps, rows, flatRows } = instance
+interface TableProps extends InstanceProp {
+  onColumnOrderChange: (order: ColumnOrderState) => void
+}
+
+export const Table: React.FC<TableProps> = ({
+  instance,
+  onColumnOrderChange
+}) => {
+  const { rows, flatRows } = instance.getRowModel()
+
   const hasCheckpoints = useSelector(
     (state: ExperimentsState) => state.tableData.hasCheckpoints
   )
@@ -19,19 +36,19 @@ export const Table: React.FC<InstanceProp> = ({ instance }) => {
   )
 
   const { clearSelectedRows, batchSelection, lastSelectedRow } =
-    React.useContext(RowSelectionContext)
+    useContext(RowSelectionContext)
   const [expColumnNeedsShadow, setExpColumnNeedsShadow] = useState(false)
   const [tableHeadHeight, setTableHeadHeight] = useState(55)
 
-  const tableRef = useRef<HTMLDivElement>(null)
+  const tableRef = useRef<HTMLTableElement>(null)
 
-  const clickOutsideHandler = React.useCallback(() => {
+  const clickOutsideHandler = useCallback(() => {
     clearSelectedRows?.()
   }, [clearSelectedRows])
 
   useClickOutside(tableRef, clickOutsideHandler)
 
-  const batchRowSelection = React.useCallback(
+  const batchRowSelection = useCallback(
     ({ row: { id } }: RowProp) => {
       const lastSelectedRowId = lastSelectedRow?.row.id ?? ''
       const lastIndex =
@@ -42,7 +59,7 @@ export const Table: React.FC<InstanceProp> = ({ instance }) => {
       const rangeEnd = Math.max(lastIndex, selectedIndex)
 
       const collapsedIds = flatRows
-        .filter(flatRow => !flatRow.isExpanded)
+        .filter(flatRow => !flatRow.getIsExpanded())
         .map(flatRow => flatRow.id)
 
       const batch = flatRows
@@ -60,21 +77,17 @@ export const Table: React.FC<InstanceProp> = ({ instance }) => {
     [flatRows, batchSelection, lastSelectedRow]
   )
 
+  const selectedForPlotsCount = getSelectedForPlotsCount(rows)
+
   return (
     <div
       className={styles.tableContainer}
       style={{ '--table-head-height': `${tableHeadHeight}px` } as CSSProperties}
     >
-      <div
-        {...getTableProps({
-          className: cx(
-            styles.table,
-            expColumnNeedsShadow && styles.withExpColumnShadow
-          )
-        })}
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
+      <table
+        className={cx(expColumnNeedsShadow && styles.withExpColumnShadow)}
         ref={tableRef}
-        tabIndex={0}
-        role="treegrid"
         onKeyUp={e => {
           if (e.key === 'Escape') {
             clearSelectedRows?.()
@@ -86,6 +99,7 @@ export const Table: React.FC<InstanceProp> = ({ instance }) => {
           root={tableRef.current}
           setExpColumnNeedsShadow={setExpColumnNeedsShadow}
           setTableHeadHeight={setTableHeadHeight}
+          onOrderChange={onColumnOrderChange}
         />
         {rows.map(row => (
           <TableBody
@@ -99,7 +113,8 @@ export const Table: React.FC<InstanceProp> = ({ instance }) => {
             batchRowSelection={batchRowSelection}
           />
         ))}
-      </div>
+      </table>
+      <Indicators selectedForPlotsCount={selectedForPlotsCount} />
     </div>
   )
 }

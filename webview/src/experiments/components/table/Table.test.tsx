@@ -9,21 +9,14 @@ import {
   screen
 } from '@testing-library/react'
 import { Provider } from 'react-redux'
-import {
-  Experiment,
-  ExperimentStatus,
-  TableData
-} from 'dvc/src/experiments/webview/contract'
+import { TableData } from 'dvc/src/experiments/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React from 'react'
-import { TableInstance } from 'react-table'
 import tableDataFixture from 'dvc/src/test/fixtures/expShow/base/tableData'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
-import { Table } from './Table'
 import styles from './styles.module.scss'
 import { SortOrder } from './header/ContextMenuContent'
 import { ExperimentsTable } from '../Experiments'
-import * as ColumnOrder from '../../hooks/useColumnOrder'
 import { vsCodeApi } from '../../../shared/api'
 import {
   expectHeaders,
@@ -36,117 +29,18 @@ import { experimentsReducers } from '../../store'
 import { customQueries } from '../../../test/queries'
 
 jest.mock('../../../shared/api')
-jest.mock('../../hooks/useColumnOrder', () => {
-  const actualModule = jest.requireActual('../../hooks/useColumnOrder')
-  return {
-    __esModule: true,
-    ...actualModule
-  }
-})
 
 const { postMessage } = vsCodeApi
 const mockedPostMessage = jest.mocked(postMessage)
 
 describe('Table', () => {
-  const getProps = (props: React.ReactPropTypes) => ({ ...props })
-  const getHeaderGroupProps = (key: string) => () => ({ key })
-  const headerBasicProps = {
-    getHeaderProps: getProps
-  }
-  const basicCellProps = {
-    getCellProps: getProps,
-    row: {
-      id: EXPERIMENT_WORKSPACE_ID,
-      original: {
-        status: ExperimentStatus.SUCCESS
-      }
-    }
-  }
-  const instance = {
-    getTableBodyProps: getProps,
-    getTableProps: getProps,
-    headerGroups: [
-      {
-        getHeaderGroupProps: getHeaderGroupProps('headerGroup_1'),
-        headers: [
-          {
-            ...headerBasicProps,
-            id: 'experiment',
-            render: () => 'Experiment'
-          },
-          {
-            ...headerBasicProps,
-            id: 'timestamp',
-            render: () => 'Created'
-          }
-        ]
-      }
-    ],
-    prepareRow: () => {},
-    rows: [
-      {
-        cells: [
-          {
-            ...basicCellProps,
-            column: {
-              id: 'experiment'
-            },
-            render: () => EXPERIMENT_WORKSPACE_ID
-          },
-          {
-            ...basicCellProps,
-            column: {
-              Header: 'Timestamp',
-              id: 'timestamp'
-            },
-            render: () => new Date('2021-09-09').toString()
-          }
-        ],
-        getRowProps: getProps,
-        id: EXPERIMENT_WORKSPACE_ID,
-        label: EXPERIMENT_WORKSPACE_ID,
-        original: {
-          status: ExperimentStatus.SUCCESS
-        },
-        values: {
-          id: EXPERIMENT_WORKSPACE_ID
-        }
-      } as unknown as Experiment
-    ],
-    setColumnOrder: jest.fn,
-    state: {
-      columnOrder: []
-    }
-  } as unknown as TableInstance<Experiment>
-  const dummyTableData: TableData = {
-    changes: [],
-    columnOrder: [],
-    columnWidths: {},
-    columns: [],
-    filteredCounts: { checkpoints: 0, experiments: 0 },
-    filters: [],
-    hasCheckpoints: false,
-    hasColumns: true,
-    hasRunningExperiment: false,
-    rows: [],
-    sorts: []
-  }
-  const renderTable = (testData = {}, tableInstance = instance) => {
-    const tableData = { ...dummyTableData, ...testData }
-    return render(
-      <Provider
-        store={configureStore({
-          preloadedState: { tableData },
-          reducer: experimentsReducers
-        })}
-      >
-        <Table instance={tableInstance} />
-      </Provider>
-    )
-  }
   const renderExperimentsTable = (
-    tableData: TableData = sortingTableDataFixture
+    partialTableData: Partial<TableData> = {}
   ) => {
+    const tableData = {
+      ...sortingTableDataFixture,
+      ...partialTableData
+    }
     return render(
       <Provider
         store={configureStore({
@@ -161,10 +55,6 @@ describe('Table', () => {
       }
     )
   }
-
-  beforeAll(() => {
-    jest.spyOn(ColumnOrder, 'useColumnOrder').mockImplementation(() => [])
-  })
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -280,7 +170,7 @@ describe('Table', () => {
 
   describe('Changes', () => {
     it("should not have the workspaceChange class on the workspace's first cell (text) workspace changes", async () => {
-      renderTable()
+      renderExperimentsTable()
 
       const workspaceCell = await screen.findByText(EXPERIMENT_WORKSPACE_ID)
 
@@ -289,18 +179,18 @@ describe('Table', () => {
       )
     })
 
-    it("should have the workspaceChange class on the workspace's first cell (text) if there are workspace changes", async () => {
-      renderTable({ changes: ['something_changed'] })
+    it("should have the workspaceChange class on the workspace's first cell (text) if there are workspace changes", () => {
+      renderExperimentsTable({ changes: ['something_changed'] })
 
-      const workspaceCell = await screen.findByText(EXPERIMENT_WORKSPACE_ID)
+      const workspaceCell = screen.getByTestId('id___workspace')
 
-      expect(workspaceCell?.className.includes(styles.workspaceChange)).toBe(
+      expect(workspaceCell.className.includes(styles.workspaceChange)).toBe(
         true
       )
     })
 
     it('should not have the workspaceChange class on a cell if there are no changes', async () => {
-      renderTable()
+      renderExperimentsTable()
 
       const row = await screen.findByTestId('timestamp___workspace')
 
@@ -308,7 +198,7 @@ describe('Table', () => {
     })
 
     it('should not have the workspaceChange class on a cell if there are changes to other columns but not this one', async () => {
-      renderTable({ changes: ['a_change'] })
+      renderExperimentsTable({ changes: ['a_change'] })
 
       const row = await screen.findByTestId('timestamp___workspace')
 
@@ -316,7 +206,7 @@ describe('Table', () => {
     })
 
     it('should have the workspaceChange class on a cell if there are changes matching the column id', async () => {
-      renderTable({ changes: ['timestamp'] })
+      renderExperimentsTable({ changes: ['timestamp'] })
 
       const row = await screen.findByTestId('timestamp___workspace')
 
@@ -377,6 +267,7 @@ describe('Table', () => {
     })
 
     it('should resize columns and persist new state when a separator is clicked and dragged', async () => {
+      jest.useFakeTimers()
       const columnWidths = {
         id: 333
       }
@@ -402,26 +293,54 @@ describe('Table', () => {
       fireEvent.mouseDown(experimentColumnResizeHandle, {
         bubbles: true
       })
+      fireEvent.mouseMove(experimentColumnResizeHandle, {
+        clientX: 100
+      })
       fireEvent.mouseUp(experimentColumnResizeHandle)
+      jest.runAllTimers()
 
       expect(mockedPostMessage).toHaveBeenCalledWith({
-        payload: { id: 'id', width: 333 },
+        payload: { id: 'id', width: columnWidths.id + 100 },
         type: MessageFromWebviewType.RESIZE_COLUMN
       })
-      mockedPostMessage.mockReset()
+      jest.useRealTimers()
+    })
+
+    it('should not resize the column and persist new state if the width did not change', async () => {
+      jest.useFakeTimers()
+      const columnWidths = {
+        id: 333
+      }
+
+      const tableDataWithColumnSetting: TableData = {
+        ...sortingTableDataFixture,
+        columnWidths
+      }
+      render(
+        <Provider
+          store={configureStore({
+            preloadedState: { tableData: tableDataWithColumnSetting },
+            reducer: experimentsReducers
+          })}
+        >
+          <ExperimentsTable />
+        </Provider>
+      )
+      const [experimentColumnResizeHandle] = await screen.findAllByRole(
+        'separator'
+      )
 
       fireEvent.mouseDown(experimentColumnResizeHandle, {
         bubbles: true
       })
-
-      columnWidths.id = 353
-
-      fireEvent.mouseUp(experimentColumnResizeHandle)
-
-      expect(mockedPostMessage).toHaveBeenCalledWith({
-        payload: { id: 'id', width: 353 },
-        type: MessageFromWebviewType.RESIZE_COLUMN
+      fireEvent.mouseMove(experimentColumnResizeHandle, {
+        clientX: 0
       })
+      fireEvent.mouseUp(experimentColumnResizeHandle)
+      jest.runAllTimers()
+
+      expect(mockedPostMessage).not.toHaveBeenCalled()
+      jest.useRealTimers()
     })
 
     it('should move all the columns from a group from their current position to their new position', async () => {

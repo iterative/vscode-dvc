@@ -1,13 +1,14 @@
 import { ColumnType, Experiment } from 'dvc/src/experiments/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { VSCodeDivider } from '@vscode/webview-ui-toolkit/react'
-import React from 'react'
-import { HeaderGroup } from 'react-table'
+import React, { useMemo } from 'react'
+import { HeaderGroup, Header } from '@tanstack/react-table'
 import { useSelector } from 'react-redux'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import { MessagesMenu } from '../../../../shared/components/messagesMenu/MessagesMenu'
 import { MessagesMenuOptionProps } from '../../../../shared/components/messagesMenu/MessagesMenuOption'
 import { ExperimentsState } from '../../../store'
+import { ColumnWithGroup } from '../../../util/buildColumns'
 
 export enum SortOrder {
   ASCENDING = 'Sort Ascending',
@@ -21,9 +22,8 @@ const possibleOrders = {
   undefined: SortOrder.NONE
 } as const
 
-const isFromExperimentColumn = (column: HeaderGroup<Experiment>) => {
-  return column.id === 'id' || column.id.startsWith('id_placeholder')
-}
+const isFromExperimentColumn = (header: Header<Experiment, unknown>) =>
+  header.column.id === 'id' || header.column.id.startsWith('id_placeholder')
 
 export const sortOption = (
   label: SortOrder,
@@ -59,7 +59,7 @@ export const sortOption = (
 }
 
 export interface HeaderMenuProps {
-  column: HeaderGroup<Experiment> & { originalId?: string }
+  header: Header<Experiment, unknown>
 }
 
 export interface HeaderMenuDescription {
@@ -69,14 +69,15 @@ export interface HeaderMenuDescription {
 }
 
 export const getSortOptions = (
-  column: HeaderGroup<Experiment> & { originalId?: string },
+  header: Header<Experiment, unknown>,
   sorts: SortDefinition[]
 ) => {
-  const isNotExperiments = !isFromExperimentColumn(column)
-  const isSortable =
-    isNotExperiments && (!column.columns || column.columns?.length === 1)
-
-  const baseColumn = column.placeholderOf || column
+  const isNotExperiments = !isFromExperimentColumn(header)
+  const isSortable = isNotExperiments && header.column.columns.length <= 1
+  const baseColumn =
+    header.headerGroup.headers.find(
+      h => h.column.id === header.placeholderId
+    ) || header.column
   const sort = sorts.find(sort => sort.path === baseColumn.id)
 
   // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
@@ -97,32 +98,25 @@ export type HeaderGroupWithOptionalOriginalId = HeaderGroup<Experiment> & {
   originalId?: string
 }
 
-const getColumnLeaf = (column: HeaderGroupWithOptionalOriginalId) => {
-  let leafColumn: HeaderGroupWithOptionalOriginalId = column
-
-  while (leafColumn?.placeholderOf) {
-    leafColumn = leafColumn.placeholderOf as HeaderGroupWithOptionalOriginalId
-  }
-  return leafColumn
-}
-
 export const getMenuOptions = (
-  column: HeaderGroupWithOptionalOriginalId,
+  header: Header<Experiment, unknown>,
   sorts: SortDefinition[]
 ) => {
-  const leafColumn = getColumnLeaf(column)
+  const leafColumn = header.column
   const menuOptions: MessagesMenuOptionProps[] = [
     {
-      hidden: isFromExperimentColumn(column),
+      hidden: isFromExperimentColumn(header),
       id: 'hide-column',
       label: 'Hide Column',
       message: {
-        payload: leafColumn.originalId || leafColumn.id,
+        payload: leafColumn.id,
         type: MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN
       }
     },
     {
-      hidden: column.group !== ColumnType.PARAMS,
+      hidden:
+        (header.column.columnDef as ColumnWithGroup).group !==
+        ColumnType.PARAMS,
       id: 'open-to-the-side',
       label: 'Open to the Side',
       message: {
@@ -139,19 +133,19 @@ export const getMenuOptions = (
     }
   ]
 
-  const { isSortable, sortOptions, sortOrder } = getSortOptions(column, sorts)
+  const { isSortable, sortOptions, sortOrder } = getSortOptions(header, sorts)
   const visibleOptions = menuOptions.filter(option => !option.hidden).length
   const menuEnabled = isSortable || visibleOptions > 0
 
   return { isSortable, menuEnabled, menuOptions, sortOptions, sortOrder }
 }
 
-export const ContextMenuContent: React.FC<HeaderMenuProps> = ({ column }) => {
+export const ContextMenuContent: React.FC<HeaderMenuProps> = ({ header }) => {
   const { sorts } = useSelector((state: ExperimentsState) => state.tableData)
 
-  const { menuOptions, sortOptions } = React.useMemo(() => {
-    return getMenuOptions(column, sorts)
-  }, [column, sorts])
+  const { menuOptions, sortOptions } = useMemo(() => {
+    return getMenuOptions(header, sorts)
+  }, [header, sorts])
 
   return (
     <div>

@@ -1,13 +1,10 @@
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import React, { DragEvent, useRef, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { HeaderGroup, TableInstance } from 'react-table'
+import { Table, Header, ColumnOrderState } from '@tanstack/react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { MergedHeaderGroups } from './MergeHeaderGroups'
 import { setDropTarget } from '../headerDropTargetSlice'
-import styles from '../styles.module.scss'
-import { Indicators } from '../Indicators'
-import { useColumnOrder } from '../../../hooks/useColumnOrder'
 import { ExperimentsState } from '../../../store'
 import { sendMessage } from '../../../../shared/vscode'
 import {
@@ -16,43 +13,38 @@ import {
   isExperimentColumn
 } from '../../../util/columns'
 import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
-import { getSelectedForPlotsCount } from '../../../util/rows'
 interface TableHeadProps {
-  instance: TableInstance<Experiment>
+  instance: Table<Experiment>
   root: HTMLElement | null
+  onOrderChange: (order: ColumnOrderState) => void
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   setTableHeadHeight: (height: number) => void
 }
 
 export const TableHead = ({
-  instance: {
-    headerGroups,
-    setColumnOrder,
-    state: { columnOrder },
-    allColumns,
-    rows
-  },
+  instance,
   root,
+  onOrderChange,
   setExpColumnNeedsShadow,
   setTableHeadHeight
 }: TableHeadProps) => {
-  const columns = useSelector(
-    (state: ExperimentsState) => state.tableData.columns
-  )
+  const { setColumnOrder, getHeaderGroups, getAllLeafColumns } = instance
+  const headerGroups = getHeaderGroups()
+  const allColumns = getAllLeafColumns()
+
   const headerDropTargetId = useSelector(
     (state: ExperimentsState) => state.headerDropTarget
   )
   const dispatch = useDispatch()
-  const orderedColumns = useColumnOrder(columns, columnOrder)
 
-  const allHeaders: HeaderGroup<Experiment>[] = []
+  const allHeaders: Header<Experiment, unknown>[] = []
   for (const headerGroup of headerGroups) {
     allHeaders.push(...headerGroup.headers)
   }
 
   const fullColumnOrder = useRef<string[]>()
   const draggingIds = useRef<string[]>()
-  const wrapper = useRef<HTMLDivElement>(null)
+  const wrapper = useRef<HTMLTableSectionElement>(null)
 
   useEffect(() => {
     const wrapperHeight = wrapper.current?.getBoundingClientRect().height
@@ -73,7 +65,7 @@ export const TableHead = ({
 
   const findDisplacedHeader = (
     draggedOverId: string,
-    cb: (displacedHeader: HeaderGroup<Experiment>) => void
+    cb: (displacedHeader: Header<Experiment, unknown>) => void
   ) => {
     const displacedHeader = allHeaders.find(
       header => header.id === draggedOverId
@@ -120,21 +112,16 @@ export const TableHead = ({
         type: MessageFromWebviewType.REORDER_COLUMNS
       })
       onDragEnd()
+      onOrderChange(newOrder)
     }
   }
 
-  const selectedForPlotsCount = getSelectedForPlotsCount(rows)
-
   return (
-    <div className={styles.thead} ref={wrapper}>
-      <Indicators selectedForPlotsCount={selectedForPlotsCount} />
+    <thead ref={wrapper}>
       {headerGroups.map(headerGroup => (
-        // eslint-disable-next-line react/jsx-key
         <MergedHeaderGroups
-          {...headerGroup.getHeaderGroupProps()}
-          orderedColumns={orderedColumns}
+          key={headerGroup.id}
           headerGroup={headerGroup}
-          columns={allHeaders}
           onDragStart={onDragStart}
           onDragEnter={onDragEnter}
           onDragEnd={onDragEnd}
@@ -142,8 +129,9 @@ export const TableHead = ({
           onDragLeave={onDragLeave}
           root={root}
           setExpColumnNeedsShadow={setExpColumnNeedsShadow}
+          onlyOneLine={headerGroups.length === 1}
         />
       ))}
-    </div>
+    </thead>
   )
 }
