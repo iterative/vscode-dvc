@@ -482,7 +482,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
     }
 
     .innerCell {
-      padding: 10px;
+      padding: 5px 10px;
 
       .rowActions {
         visibility: hidden;
@@ -497,7 +497,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
     }
 
     .timestampInnerCell {
-      height: 52px;
+      height: 42px;
     }
   }
 
