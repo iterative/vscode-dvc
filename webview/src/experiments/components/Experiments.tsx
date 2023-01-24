@@ -38,8 +38,8 @@ const ExperimentHeader = () => (
   <div className={styles.experimentHeader}>Experiment</div>
 )
 
-const getDefaultColumnWithIndicatorsPlaceHolder = () => {
-  return columnHelper.accessor(() => EXPERIMENT_COLUMN_ID, {
+const getDefaultColumnWithIndicatorsPlaceHolder = () =>
+  columnHelper.accessor(() => EXPERIMENT_COLUMN_ID, {
     cell: (cell: CellContext<Column, CellValue>) => {
       const {
         row: {
@@ -64,7 +64,6 @@ const getDefaultColumnWithIndicatorsPlaceHolder = () => {
     minSize: 215,
     size: 215
   })
-}
 
 const getColumns = (columns: Column[]) => {
   const includeTimestamp = columns.some(
