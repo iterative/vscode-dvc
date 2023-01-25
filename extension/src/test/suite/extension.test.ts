@@ -25,6 +25,10 @@ import { WorkspaceExperiments } from '../../experiments/workspace'
 import { GitReader } from '../../cli/git/reader'
 import { MIN_CLI_VERSION } from '../../cli/dvc/contract'
 import { ConfigKey, setConfigValue } from '../../vscode/config'
+import { DvcExecutor } from '../../cli/dvc/executor'
+import { dvcDemoPath } from '../util'
+import { Setup } from '../../setup'
+import { Flag } from '../../cli/dvc/constants'
 
 suite('Extension Test Suite', () => {
   const disposable = Disposable.fn()
@@ -243,9 +247,15 @@ suite('Extension Test Suite', () => {
   describe('dvc.stopAllRunningExperiments', () => {
     it('should send a telemetry event containing properties relating to the event', async () => {
       const duration = 1234
+      const otherRoot = resolve('other', 'root')
       mockDuration(duration)
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockQueueStop = stub(DvcExecutor.prototype, 'queueStop').resolves(
+        undefined
+      )
+
+      stub(Setup.prototype, 'getRoots').returns([dvcDemoPath, otherRoot])
 
       await commands.executeCommand(RegisteredCommands.STOP_EXPERIMENTS)
 
@@ -259,6 +269,9 @@ suite('Extension Test Suite', () => {
           duration
         }
       )
+
+      expect(mockQueueStop).to.be.calledWith(dvcDemoPath, Flag.KILL)
+      expect(mockQueueStop).to.be.calledWith(otherRoot, Flag.KILL)
     })
   })
 
