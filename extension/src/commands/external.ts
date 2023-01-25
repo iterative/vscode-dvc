@@ -14,6 +14,7 @@ export enum RegisteredCliCommands {
   QUEUE_KILL = 'dvc.stopQueuedExperiments',
   QUEUE_START = 'dvc.startExperimentsQueue',
   QUEUE_STOP = 'dvc.stopExperimentsQueue',
+  QUEUE_STOP_KILL = 'dvc.stopExperimentsQueueAndRunning',
 
   EXPERIMENT_VIEW_APPLY = 'dvc.views.experiments.applyExperiment',
   EXPERIMENT_VIEW_BRANCH = 'dvc.views.experiments.branchExperiment',

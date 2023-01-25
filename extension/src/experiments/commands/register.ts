@@ -12,6 +12,7 @@ import {
 } from '../../commands/external'
 import { Title } from '../../vscode/title'
 import { Context, getDvcRootFromContext } from '../../vscode/context'
+import { Flag } from '../../cli/dvc/constants'
 
 type ExperimentDetails = { dvcRoot: string; id: string }
 
@@ -30,6 +31,11 @@ const registerExperimentCwdCommands = (
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.QUEUE_STOP,
     () => experiments.getCwdThenReport(AvailableCommands.QUEUE_STOP)
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.QUEUE_STOP_KILL,
+    () => experiments.getCwdThenReport(AvailableCommands.QUEUE_STOP, Flag.KILL)
   )
 
   internalCommands.registerExternalCliCommand(

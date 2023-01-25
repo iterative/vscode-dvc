@@ -157,6 +157,7 @@ export interface IEventNamePropertyMapping {
   [EventName.QUEUE_KILL]: undefined
   [EventName.QUEUE_START]: undefined
   [EventName.QUEUE_STOP]: undefined
+  [EventName.QUEUE_STOP_KILL]: undefined
 
   [EventName.EXPERIMENT_VIEW_QUEUE]: undefined
   [EventName.EXPERIMENT_VIEW_RESUME]: undefined

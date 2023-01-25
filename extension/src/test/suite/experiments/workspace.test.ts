@@ -513,7 +513,7 @@ suite('Workspace Experiments Test Suite', () => {
     })
   })
 
-  describe('dvc.stopExperimentsQueue', () => {
+  describe('stop processing queued experiments', () => {
     it('should be able to stop the experiments queue', async () => {
       const mockQueueStop = stub(DvcExecutor.prototype, 'queueStop').resolves(
         undefined
@@ -525,6 +525,16 @@ suite('Workspace Experiments Test Suite', () => {
 
       expect(mockQueueStop).to.be.calledOnce
       expect(mockQueueStop).to.be.calledWithExactly(dvcDemoPath)
+
+      mockQueueStop.resetHistory()
+
+      await commands.executeCommand(RegisteredCliCommands.QUEUE_STOP_KILL)
+
+      expect(mockQueueStop).to.be.calledOnce
+      expect(
+        mockQueueStop,
+        'should be able to stop the experiments queue and kill currently running tasks'
+      ).to.be.calledWithExactly(dvcDemoPath, '--kill')
     })
   })
 

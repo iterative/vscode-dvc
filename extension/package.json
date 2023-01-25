@@ -347,6 +347,11 @@
         "category": "DVC"
       },
       {
+        "title": "%command.stopExperimentsQueueAndRunning%",
+        "command": "dvc.stopExperimentsQueueAndRunning",
+        "category": "DVC"
+      },
+      {
         "title": "%command.stopQueuedExperiments%",
         "command": "dvc.stopQueuedExperiments",
         "category": "DVC"
@@ -789,6 +794,10 @@
         },
         {
           "command": "dvc.stopExperimentsQueue",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.stopExperimentsQueueAndRunning",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
@@ -1282,6 +1291,11 @@
           "command": "dvc.stopExperimentsQueue",
           "when": "view == dvc.views.experimentsTree",
           "group": "3_queue@3"
+        },
+        {
+          "command": "dvc.stopExperimentsQueueAndRunning",
+          "when": "view == dvc.views.experimentsTree",
+          "group": "3_queue@4"
         },
         {
           "command": "dvc.stopQueuedExperiments",

@@ -228,13 +228,13 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     this.updatesPaused.fire(false)
   }
 
-  public async getCwdThenReport(commandId: CommandId) {
+  public async getCwdThenReport(commandId: CommandId, ...args: Args) {
     const cwd = await this.getFocusedOrOnlyOrPickProject()
     if (!cwd) {
       return
     }
 
-    const stdout = this.internalCommands.executeCommand(commandId, cwd)
+    const stdout = this.internalCommands.executeCommand(commandId, cwd, ...args)
     return Toast.showOutput(stdout)
   }
 
