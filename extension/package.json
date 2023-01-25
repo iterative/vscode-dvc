@@ -217,11 +217,6 @@
         "category": "DVC"
       },
       {
-        "title": "%command.killExperimentsRunningInQueue%",
-        "command": "dvc.killExperimentsRunningInQueue",
-        "category": "DVC"
-      },
-      {
         "title": "%command.moveTargets%",
         "command": "dvc.moveTargets",
         "category": "DVC"
@@ -349,6 +344,11 @@
       {
         "title": "%command.stopExperimentsQueue%",
         "command": "dvc.stopExperimentsQueue",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.stopQueuedExperiments%",
+        "command": "dvc.stopQueuedExperiments",
         "category": "DVC"
       },
       {
@@ -696,10 +696,6 @@
           "when": "dvc.commands.available && !dvc.cli.incompatible && !dvc.project.available && !dvc.scm.command.running"
         },
         {
-          "command": "dvc.killExperimentsRunningInQueue",
-          "when": "dvc.commands.available && dvc.project.available"
-        },
-        {
           "command": "dvc.moveTargets",
           "when": "false"
         },
@@ -793,6 +789,10 @@
         },
         {
           "command": "dvc.stopExperimentsQueue",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.stopQueuedExperiments",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
@@ -1284,7 +1284,7 @@
           "group": "3_queue@3"
         },
         {
-          "command": "dvc.killExperimentsRunningInQueue",
+          "command": "dvc.stopQueuedExperiments",
           "when": "view == dvc.views.experimentsTree",
           "group": "3_queue@5"
         },
