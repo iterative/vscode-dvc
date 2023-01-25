@@ -49,6 +49,7 @@ import { GitReader } from './cli/git/reader'
 import { Setup } from './setup'
 import { definedAndNonEmpty } from './util/array'
 import { stopProcesses } from './processExecution'
+import { Flag } from './cli/dvc/constants'
 
 export class Extension extends Disposable {
   protected readonly internalCommands: InternalCommands
@@ -194,35 +195,42 @@ export class Extension extends Disposable {
     )
 
     this.dispose.track(
-      commands.registerCommand(RegisteredCommands.STOP_EXPERIMENT, async () => {
-        const stopWatch = new StopWatch()
-        const dvcLiveOnlyPids = await this.experiments.getDvcLiveOnlyPids()
-        const wasRunning =
-          this.dvcRunner.isExperimentRunning() ||
-          definedAndNonEmpty(dvcLiveOnlyPids)
-        try {
-          const [dvcLiveOnlyStopped, runnerStopped] = await Promise.all([
-            stopProcesses(dvcLiveOnlyPids),
-            this.dvcRunner.stop()
-          ])
+      commands.registerCommand(
+        RegisteredCommands.STOP_EXPERIMENTS,
+        async () => {
+          const stopWatch = new StopWatch()
+          const dvcLiveOnlyPids = await this.experiments.getDvcLiveOnlyPids()
+          const wasRunning =
+            this.dvcRunner.isExperimentRunning() ||
+            definedAndNonEmpty(dvcLiveOnlyPids) ||
+            this.experiments.hasQueuedExperimentsRunning()
+          try {
+            const allStopped = await Promise.all([
+              stopProcesses(dvcLiveOnlyPids),
+              this.dvcRunner.stop(),
+              ...this.getRoots().map(dvcRoot =>
+                this.dvcExecutor.queueStop(dvcRoot, Flag.KILL)
+              )
+            ])
 
-          const stopped = dvcLiveOnlyStopped && runnerStopped
-          sendTelemetryEvent(
-            RegisteredCommands.STOP_EXPERIMENT,
-            { stopped, wasRunning },
-            {
-              duration: stopWatch.getElapsedTime()
-            }
-          )
-          return stopped
-        } catch (error: unknown) {
-          return sendTelemetryEventAndThrow(
-            RegisteredCommands.STOP_EXPERIMENT,
-            error as Error,
-            stopWatch.getElapsedTime()
-          )
+            const stopped = allStopped.every(Boolean)
+            sendTelemetryEvent(
+              RegisteredCommands.STOP_EXPERIMENTS,
+              { stopped, wasRunning },
+              {
+                duration: stopWatch.getElapsedTime()
+              }
+            )
+            return stopped
+          } catch (error: unknown) {
+            return sendTelemetryEventAndThrow(
+              RegisteredCommands.STOP_EXPERIMENTS,
+              error as Error,
+              stopWatch.getElapsedTime()
+            )
+          }
         }
-      })
+      )
     )
 
     this.internalCommands.registerExternalCommand(

@@ -412,8 +412,8 @@
         "category": "DVC"
       },
       {
-        "title": "%command.stopRunningExperiment%",
-        "command": "dvc.stopRunningExperiment",
+        "title": "%command.stopAllRunningExperiments%",
+        "command": "dvc.stopAllRunningExperiments",
         "category": "DVC",
         "icon": "$(debug-stop)"
       },
@@ -828,7 +828,7 @@
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
-          "command": "dvc.stopRunningExperiment",
+          "command": "dvc.stopAllRunningExperiments",
           "when": "dvc.commands.available && dvc.project.available && dvc.experiment.stoppable"
         },
         {
@@ -1000,7 +1000,7 @@
           "when": "dvc.experiments.webview.active && !dvc.experiment.running && dvc.commands.available && !dvc.experiment.checkpoints"
         },
         {
-          "command": "dvc.stopRunningExperiment",
+          "command": "dvc.stopAllRunningExperiments",
           "group": "navigation@0",
           "when": "dvc.experiment.stoppable && dvc.commands.available"
         },
@@ -1219,12 +1219,12 @@
           "group": "navigation@2"
         },
         {
-          "command": "dvc.stopRunningExperiment",
+          "command": "dvc.stopAllRunningExperiments",
           "when": "view == dvc.views.experimentsTree && !dvc.experiments.webview.active && dvc.experiment.stoppable",
           "group": "1_run@1"
         },
         {
-          "command": "dvc.stopRunningExperiment",
+          "command": "dvc.stopAllRunningExperiments",
           "when": "view == dvc.views.experimentsTree && dvc.experiments.webview.active && dvc.experiment.stoppable",
           "group": "navigation@1"
         },

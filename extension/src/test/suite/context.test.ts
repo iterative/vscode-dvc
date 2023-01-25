@@ -67,12 +67,14 @@ suite('Context Test Suite', () => {
   const buildMockExperiments = (
     filters: FilterDefinition[] = [],
     sorts: SortDefinition[] = [],
-    experimentRunning = false
+    experimentRunning = false,
+    queuedExperimentRunning = false
   ) => {
     return {
       getFilters: () => filters,
       getSorts: () => sorts,
-      hasRunningExperiment: () => experimentRunning
+      hasRunningExperiment: () => experimentRunning,
+      hasRunningQueuedExperiment: () => queuedExperimentRunning
     }
   }
 
@@ -173,7 +175,7 @@ suite('Context Test Suite', () => {
       )
     })
 
-    it('should set the dvc.experiment.stoppable context to whether or not there is a DVCLive only experiment running if an experiment is not running in the runner', async () => {
+    it('should set the dvc.experiment.stoppable context to whether or not there is a DVCLive only experiment running if an experiment is not running in the runner or queue', async () => {
       const {
         executeCommandSpy,
         experimentsChanged,
@@ -212,6 +214,53 @@ suite('Context Test Suite', () => {
 
       experimentsChanged.fire()
       await dvcLiveOnlyStoppedEvent
+
+      expect(executeCommandSpy).to.be.calledWith(
+        'setContext',
+        'dvc.experiment.stoppable',
+        false
+      )
+    })
+
+    it('should set the dvc.experiment.stoppable context to true if an experiment is running in the queue', async () => {
+      const {
+        executeCommandSpy,
+        experimentsChanged,
+        mockGetDvcRoots,
+        mockGetRepository,
+        mockHasDvcLiveOnlyExperimentRunning,
+        onDidChangeExperiments
+      } = buildContext(false)
+
+      const queuedExperimentRunningEvent = new Promise(resolve =>
+        disposable.track(onDidChangeExperiments(() => resolve(undefined)))
+      )
+
+      const mockDvcRoot = resolve('first', 'root')
+      mockGetDvcRoots.returns([mockDvcRoot])
+      let hasRunningQueuedExperiment = true
+      mockGetRepository.callsFake(() =>
+        buildMockExperiments([], [], false, hasRunningQueuedExperiment)
+      )
+
+      mockHasDvcLiveOnlyExperimentRunning.resolves(false)
+
+      experimentsChanged.fire()
+      await queuedExperimentRunningEvent
+
+      expect(executeCommandSpy).to.be.calledWith(
+        'setContext',
+        'dvc.experiment.stoppable',
+        true
+      )
+      executeCommandSpy.resetHistory()
+
+      const queuedExperimentStoppedEvent = new Promise(resolve =>
+        disposable.track(onDidChangeExperiments(() => resolve(undefined)))
+      )
+      hasRunningQueuedExperiment = false
+      experimentsChanged.fire()
+      await queuedExperimentStoppedEvent
 
       expect(executeCommandSpy).to.be.calledWith(
         'setContext',
