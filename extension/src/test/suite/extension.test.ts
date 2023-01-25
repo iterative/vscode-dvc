@@ -240,17 +240,17 @@ suite('Extension Test Suite', () => {
     }).timeout(25000)
   })
 
-  describe('dvc.stopRunningExperiment', () => {
+  describe('dvc.stopAllRunningExperiments', () => {
     it('should send a telemetry event containing properties relating to the event', async () => {
       const duration = 1234
       mockDuration(duration)
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
-      await commands.executeCommand(RegisteredCommands.STOP_EXPERIMENT)
+      await commands.executeCommand(RegisteredCommands.STOP_EXPERIMENTS)
 
       expect(mockSendTelemetryEvent).to.be.calledWith(
-        RegisteredCommands.STOP_EXPERIMENT,
+        RegisteredCommands.STOP_EXPERIMENTS,
         {
           stopped: false,
           wasRunning: false

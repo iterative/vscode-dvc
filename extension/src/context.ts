@@ -67,9 +67,15 @@ export class Context extends Disposable {
       (experiments: Experiments) => experiments.hasRunningExperiment()
     )
 
+    const hasRunningQueuedExperiment = this.repositoriesHaveRequirement(
+      repositories,
+      (experiments: Experiments) => experiments.hasRunningQueuedExperiment()
+    )
+
     void setContextValue(
       ContextKey.EXPERIMENT_STOPPABLE,
-      await this.experiments.hasDvcLiveOnlyExperimentRunning()
+      hasRunningQueuedExperiment ||
+        (await this.experiments.hasDvcLiveOnlyExperimentRunning())
     )
   }
 
@@ -78,12 +84,20 @@ export class Context extends Disposable {
     repositories: Experiments[],
     hasRequirement: (experiments: Experiments) => boolean
   ) {
+    const value = this.repositoriesHaveRequirement(repositories, hasRequirement)
+
+    void setContextValue(contextKey, value)
+  }
+
+  private repositoriesHaveRequirement(
+    repositories: Experiments[],
+    hasRequirement: (experiments: Experiments) => boolean
+  ) {
     for (const experiments of repositories) {
       if (hasRequirement(experiments)) {
-        void setContextValue(contextKey, true)
-        return
+        return true
       }
     }
-    void setContextValue(contextKey, false)
+    return false
   }
 }
