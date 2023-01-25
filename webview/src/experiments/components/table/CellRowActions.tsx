@@ -1,4 +1,4 @@
-import React, { MouseEventHandler } from 'react'
+import React, { MouseEventHandler, ReactElement } from 'react'
 import cx from 'classnames'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
 import {
@@ -13,7 +13,6 @@ import { clickAndEnterProps } from '../../../util/props'
 import { Clock, StarFull, StarEmpty } from '../../../shared/components/icons'
 
 export type CellRowActionsProps = {
-  isWorkspace: boolean
   bulletColor?: string
   isRowSelected: boolean
   showSubRowStates: boolean
@@ -30,13 +29,12 @@ export type CellRowActionsProps = {
 }
 
 export type CellRowActionProps = {
-  tooltipOffset?: [number, number]
   showSubRowStates: boolean
   subRowsAffected: number
-  children: React.ReactElement
+  children: ReactElement
   hidden?: boolean
   testId?: string
-  tooltipContent: string | React.ReactElement
+  tooltipContent: string | ReactElement
   queued?: boolean
   onClick?: MouseEventHandler
 }
@@ -48,16 +46,12 @@ export const CellRowAction: React.FC<CellRowActionProps> = ({
   hidden,
   testId,
   tooltipContent,
-  tooltipOffset,
   onClick
 }) => {
   const count = (showSubRowStates && subRowsAffected) || 0
 
   return (
-    <CellHintTooltip
-      tooltipContent={tooltipContent}
-      tooltipOffset={tooltipOffset}
-    >
+    <CellHintTooltip tooltipContent={tooltipContent}>
       <div
         className={cx(styles.rowActions, hidden && styles.hidden)}
         data-testid={testId}
@@ -95,7 +89,6 @@ const ClickableTooltipContent: React.FC<ClickableTooltipContentProps> = ({
 
 export const CellRowActions: React.FC<CellRowActionsProps> = ({
   bulletColor,
-  isWorkspace,
   status,
   toggleExperiment,
   isRowSelected,
@@ -152,7 +145,6 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
           showSubRowStates={showSubRowStates}
           subRowsAffected={plotSelections}
           testId={'row-action-plot'}
-          tooltipOffset={isWorkspace ? [0, -16] : undefined}
           tooltipContent={
             <ClickableTooltipContent
               clickableText={'Open the plots view'}

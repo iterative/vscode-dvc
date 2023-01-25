@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import cx from 'classnames'
 import { ColumnType, Experiment } from 'dvc/src/experiments/webview/contract'
-import { HeaderGroup } from 'react-table'
+import { flexRender, Header } from '@tanstack/react-table'
 import { SortOrder } from './ContextMenuContent'
+import { ColumnResizer, ResizerHeight } from './ColumnResizer'
 import styles from '../styles.module.scss'
 import {
   Draggable,
@@ -30,7 +31,7 @@ const getIconMenuItems = (
 
 export const ColumnDragHandle: React.FC<{
   disabled: boolean
-  column: HeaderGroup<Experiment>
+  header: Header<Experiment, unknown>
   onDragEnter: DragFunction
   onDragStart: DragFunction
   onDrop: DragFunction
@@ -38,7 +39,7 @@ export const ColumnDragHandle: React.FC<{
   onDragLeave: DragFunction
 }> = ({
   disabled,
-  column,
+  header,
   onDragEnter,
   onDragStart,
   onDragEnd,
@@ -49,11 +50,12 @@ export const ColumnDragHandle: React.FC<{
     <span
       data-testid="rendered-header"
       className={cx(styles.cellContents)}
-      role={'columnheader'}
-      tabIndex={0}
+      style={{
+        width: header.getSize()
+      }}
     >
       <Draggable
-        id={column.id}
+        id={header.id}
         disabled={disabled}
         onDragEnter={onDragEnter}
         onDragStart={onDragStart}
@@ -61,14 +63,18 @@ export const ColumnDragHandle: React.FC<{
         onDrop={onDrop}
         onDragLeave={onDragLeave}
       >
-        <span>{column?.render('Header')}</span>
+        <span>
+          {header.isPlaceholder
+            ? null
+            : flexRender(header.column.columnDef.header, header.getContext())}
+        </span>
       </Draggable>
     </span>
   )
 }
 
 export const TableHeaderCellContents: React.FC<{
-  column: HeaderGroup<Experiment>
+  header: Header<Experiment, unknown>
   sortOrder: SortOrder
   sortEnabled: boolean
   hasFilter: boolean
@@ -81,9 +87,9 @@ export const TableHeaderCellContents: React.FC<{
   onDragLeave: DragFunction
   canResize: boolean
   setMenuSuppressed: (menuSuppressed: boolean) => void
-  resizerHeight: string
+  resizerHeight: ResizerHeight
 }> = ({
-  column,
+  header,
   sortEnabled,
   sortOrder,
   hasFilter,
@@ -98,12 +104,16 @@ export const TableHeaderCellContents: React.FC<{
   setMenuSuppressed,
   resizerHeight
 }) => {
-  const [isResizing, setIsResizing] = useState(false)
-  const isTimestamp = column.group === ColumnType.TIMESTAMP
+  const isTimestamp = header.headerGroup.id === ColumnType.TIMESTAMP
+  const columnIsResizing = header.column.getIsResizing()
 
   useEffect(() => {
-    setIsResizing(column.isResizing)
-  }, [column.isResizing])
+    if (columnIsResizing) {
+      document.body.classList.add(styles.isColumnResizing)
+    } else {
+      document.body.classList.remove(styles.isColumnResizing)
+    }
+  }, [columnIsResizing])
 
   return (
     <>
@@ -112,14 +122,14 @@ export const TableHeaderCellContents: React.FC<{
       >
         <IconMenu
           items={getIconMenuItems(
-            sortEnabled && !column.placeholderOf,
+            sortEnabled && !header.isPlaceholder,
             sortOrder,
             hasFilter
           )}
         />
       </div>
       <ColumnDragHandle
-        column={column}
+        header={header}
         disabled={!isDraggable || menuSuppressed}
         onDragEnter={onDragEnter}
         onDragStart={onDragStart}
@@ -128,12 +138,11 @@ export const TableHeaderCellContents: React.FC<{
         onDragLeave={onDragLeave}
       />
       {canResize && (
-        <div
-          {...column.getResizerProps()}
-          onMouseEnter={() => setMenuSuppressed(true)}
-          onMouseLeave={() => setMenuSuppressed(false)}
-          className={cx(styles.columnResizer, isResizing && styles.isResizing)}
-          style={{ height: resizerHeight }}
+        <ColumnResizer
+          setMenuSuppressed={setMenuSuppressed}
+          resizerHeight={resizerHeight}
+          header={header}
+          columnIsResizing={columnIsResizing}
         />
       )}
     </>

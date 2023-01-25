@@ -1,19 +1,15 @@
 import React from 'react'
 import styles from './styles.module.scss'
 import { BatchSelectionProp, RowContent } from './Row'
-import { InstanceProp, RowProp } from './interfaces'
+import { RowProp } from './interfaces'
 
-export const NestedRow: React.FC<
-  RowProp & InstanceProp & BatchSelectionProp
-> = ({
+export const NestedRow: React.FC<RowProp & BatchSelectionProp> = ({
   row,
-  instance,
   contextMenuDisabled,
   projectHasCheckpoints,
   hasRunningExperiment,
   batchRowSelection
 }) => {
-  instance.prepareRow(row)
   return (
     <RowContent
       row={row}

@@ -28,7 +28,7 @@ export const RowSelectionProvider: React.FC<{ children: React.ReactNode }> = ({
   const toggleRowSelected = (rowProp: RowProp) => {
     const {
       row: {
-        values: { id }
+        original: { id }
       }
     } = rowProp
     setSelectedRows({
@@ -44,7 +44,7 @@ export const RowSelectionProvider: React.FC<{ children: React.ReactNode }> = ({
     for (const rowProp of batch) {
       const {
         row: {
-          values: { id }
+          original: { id }
         }
       } = rowProp
       selectedRowsCopy[id] = rowProp
@@ -55,7 +55,7 @@ export const RowSelectionProvider: React.FC<{ children: React.ReactNode }> = ({
       ...batch.map(
         ({
           row: {
-            values: { id }
+            original: { id }
           }
           // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         }) => id

@@ -8,7 +8,6 @@
     "demo/**",
     "extension/src/test/**",
     "languageServer/src/test/**",
-    "webview/src/react-table-config.d.ts",
     "webview/src/shared/components/icons/**"
   ],
   "checks": {

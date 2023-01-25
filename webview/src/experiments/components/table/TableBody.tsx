@@ -13,7 +13,7 @@ const WorkspaceRowGroupWrapper: React.FC<
     root: HTMLElement | null
     tableHeaderHeight: number
   } & InstanceProp
-> = ({ children, instance, root, tableHeaderHeight }) => {
+> = ({ children, root, tableHeaderHeight }) => {
   const [ref, needsShadow] = useInView({
     root,
     rootMargin: `-${tableHeaderHeight + 15}px 0px 0px 0px`,
@@ -21,19 +21,12 @@ const WorkspaceRowGroupWrapper: React.FC<
   })
 
   return (
-    <div
+    <tbody
       ref={ref}
-      {...instance.getTableBodyProps({
-        className: cx(
-          styles.rowGroup,
-          styles.tbody,
-          styles.workspaceRowGroup,
-          needsShadow && styles.withShadow
-        )
-      })}
+      className={cx(styles.workspaceRowGroup, needsShadow && styles.withShadow)}
     >
       {children}
-    </div>
+    </tbody>
   )
 }
 export const TableBody: React.FC<
@@ -50,32 +43,22 @@ export const TableBody: React.FC<
   root,
   tableHeaderHeight
 }) => {
-  instance.prepareRow(row)
+  const contentProps = {
+    batchRowSelection,
+    contextMenuDisabled,
+    hasRunningExperiment,
+    key: row.id,
+    projectHasCheckpoints,
+    row
+  }
+  const content =
+    row.depth > 0 ? (
+      <ExperimentGroup {...contentProps} />
+    ) : (
+      <RowContent {...contentProps} />
+    )
 
-  const content = (
-    <>
-      <RowContent
-        row={row}
-        projectHasCheckpoints={projectHasCheckpoints}
-        hasRunningExperiment={hasRunningExperiment}
-        contextMenuDisabled={contextMenuDisabled}
-        batchRowSelection={batchRowSelection}
-      />
-      {row.isExpanded &&
-        row.subRows.map(subRow => (
-          <ExperimentGroup
-            row={subRow}
-            instance={instance}
-            key={subRow.values.id}
-            contextMenuDisabled={contextMenuDisabled}
-            projectHasCheckpoints={projectHasCheckpoints}
-            hasRunningExperiment={hasRunningExperiment}
-            batchRowSelection={batchRowSelection}
-          />
-        ))}
-    </>
-  )
-  return row.values.id === EXPERIMENT_WORKSPACE_ID ? (
+  return row.original.id === EXPERIMENT_WORKSPACE_ID ? (
     <WorkspaceRowGroupWrapper
       tableHeaderHeight={tableHeaderHeight}
       root={root}
@@ -85,24 +68,22 @@ export const TableBody: React.FC<
     </WorkspaceRowGroupWrapper>
   ) : (
     <>
-      {row.index === 2 && (
-        <div className={cx(styles.tr, styles.previousCommitsRow)} role="row">
-          <div
-            role="columnheader"
-            className={styles.th}
-            style={row.cells[0].getCellProps().style}
-          >
-            Previous Commits
-          </div>
-        </div>
+      {row.index === 2 && row.depth === 0 && (
+        <tbody>
+          <tr className={cx(styles.tr, styles.previousCommitsRow)}>
+            <td className={styles.th}>Previous Commits</td>
+            <td colSpan={row.getAllCells().length - 1}></td>
+          </tr>
+        </tbody>
       )}
-      <div
-        {...instance.getTableBodyProps({
-          className: cx(styles.rowGroup, styles.tbody, styles.normalRowGroup)
+      <tbody
+        className={cx(styles.rowGroup, styles.tbody, styles.normalRowGroup, {
+          [styles.experimentGroup]: row.depth > 0,
+          [styles.expandedGroup]: row.getIsExpanded() && row.subRows.length > 0
         })}
       >
         {content}
-      </div>
+      </tbody>
     </>
   )
 }

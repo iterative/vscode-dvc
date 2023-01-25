@@ -1,8 +1,8 @@
 import { Experiment } from 'dvc/src/experiments/webview/contract'
-import { Cell, Row, TableInstance } from 'react-table'
+import { Cell, Row, Table } from '@tanstack/react-table'
 
 export interface InstanceProp {
-  instance: TableInstance<Experiment>
+  instance: Table<Experiment>
 }
 
 export interface RowProp {
@@ -13,5 +13,5 @@ export interface RowProp {
 }
 
 export interface CellProp {
-  cell: Cell<Experiment>
+  cell: Cell<Experiment, unknown>
 }
