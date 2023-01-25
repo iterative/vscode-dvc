@@ -48,6 +48,7 @@ import {
   setTableData
 } from '../../test/experimentsTable'
 import { clearSelection, createWindowTextSelection } from '../../test/selection'
+import { sendMessage } from '../../shared/vscode'
 
 jest.mock('../../shared/api')
 jest.mock('../../util/styles')
@@ -950,6 +951,19 @@ describe('App', () => {
       const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toContain('Remove Selected Rows')
+
+      const removeOption = menuitems.find(item =>
+        item.textContent?.includes('Remove Selected Rows')
+      )
+
+      expect(removeOption).toBeDefined()
+
+      removeOption && fireEvent.click(removeOption)
+
+      expect(sendMessage).toHaveBeenCalledWith({
+        payload: ['exp-e7a67', 'test-branch'],
+        type: MessageFromWebviewType.REMOVE_EXPERIMENT
+      })
     })
 
     it('should always present the Plots options if multiple rows are selected', () => {
@@ -966,6 +980,19 @@ describe('App', () => {
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toContain('Plot and Show')
       expect(itemLabels).toContain('Plot')
+
+      const plotOption = menuitems.find(item =>
+        item.textContent?.includes('Plot and Show')
+      )
+
+      expect(plotOption).toBeDefined()
+
+      plotOption && fireEvent.click(plotOption)
+
+      expect(sendMessage).toHaveBeenCalledWith({
+        payload: ['exp-e7a67', 'test-branch'],
+        type: MessageFromWebviewType.SET_EXPERIMENTS_AND_OPEN_PLOTS
+      })
     })
 
     it('should allow batch selection of rows by shift-clicking a range of them', () => {
