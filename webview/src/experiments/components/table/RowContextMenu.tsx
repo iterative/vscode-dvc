@@ -50,11 +50,11 @@ const getMultiSelectMenuOptions = (
     }) => starred
   )
 
-  const selectedIds = selectedRowsList.map(value => value.row.id)
+  const selectedIds = selectedRowsList.map(value => value.row.original.id)
 
   const removableRowIds = selectedRowsList
     .filter(value => value.row.depth === 1)
-    .map(value => value.row.id)
+    .map(value => value.row.original.id)
 
   const hideRemoveOption =
     removableRowIds.length !== selectedRowsList.length || hasRunningExperiment
