@@ -270,12 +270,12 @@ export class Setup
   }
 
   private async findWorkspaceDvcRoots(): Promise<string[]> {
-    const dvcRoots: string[] = []
+    let dvcRoots: Set<string> = new Set()
 
     for (const workspaceFolder of getWorkspaceFolders()) {
       const workspaceFolderRoots = await findDvcRootPaths(workspaceFolder)
       if (definedAndNonEmpty(workspaceFolderRoots)) {
-        dvcRoots.push(...workspaceFolderRoots)
+        dvcRoots = new Set([...dvcRoots, ...workspaceFolderRoots])
         continue
       }
 
@@ -285,14 +285,14 @@ export class Setup
         this.dvcReader.root(workspaceFolder)
       )
       if (absoluteRoot) {
-        dvcRoots.push(...absoluteRoot)
+        dvcRoots.add(absoluteRoot)
       }
     }
 
-    const hasMultipleRoots = dvcRoots.length > 1
+    const hasMultipleRoots = dvcRoots.size > 1
     void setContextValue(ContextKey.MULTIPLE_PROJECTS, hasMultipleRoots)
 
-    return dvcRoots
+    return [...dvcRoots]
   }
 
   private setCommandsAvailability(available: boolean) {
