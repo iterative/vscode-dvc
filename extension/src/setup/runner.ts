@@ -12,7 +12,7 @@ import {
   isPythonExtensionInstalled,
   selectPythonInterpreter
 } from '../extensions/python'
-import { extensionCanRunCli, recheckGlobal } from '../cli/dvc/discovery'
+import { extensionCanRunCli, recheck } from '../cli/dvc/discovery'
 
 const setConfigPath = async (
   option: ConfigKey,
@@ -208,13 +208,13 @@ export const run = async (setup: IExtensionSetup) => {
   return checkAvailable(setup, dvcRootOrFirstFolder)
 }
 
-export const runWithGlobalRecheck = async (
+export const runWithRecheck = async (
   setup: IExtensionSetup,
   recheckInterval = 5000
 ): Promise<void> => {
   await run(setup)
 
   if (!setup.getAvailable()) {
-    void recheckGlobal(setup, () => run(setup), recheckInterval)
+    void recheck(setup, () => run(setup), recheckInterval)
   }
 }
