@@ -216,7 +216,17 @@ export const extensionCanRunCli = async (
   )
 }
 
-export const recheckGlobal = async (
+const checkVersion = async (
+  setup: IExtensionSetup,
+  cwd: string,
+  checkGlobal?: true
+) => {
+  const version = await setup.getCliVersion(cwd, checkGlobal)
+  const cliCompatible = isVersionCompatible(version)
+  return isCliCompatible(cliCompatible)
+}
+
+export const recheck = async (
   setup: IExtensionSetup,
   run: () => Promise<void[] | undefined>,
   recheckInterval: number
@@ -229,12 +239,13 @@ export const recheckGlobal = async (
     return
   }
 
-  const version = await setup.getCliVersion(cwd, true)
-  const cliCompatible = isVersionCompatible(version)
-  const isCompatible = isCliCompatible(cliCompatible)
+  let isCompatible = await checkVersion(setup, cwd, undefined)
+  if (!isCompatible) {
+    isCompatible = await checkVersion(setup, cwd, true)
+  }
 
   if (!isCompatible) {
-    return recheckGlobal(setup, run, recheckInterval)
+    return recheck(setup, run, recheckInterval)
   }
 
   void run()
