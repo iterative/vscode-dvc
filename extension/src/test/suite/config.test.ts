@@ -51,112 +51,114 @@ suite('Config Test Suite', () => {
       await executionDetailsUpdated
       expect(config.getPythonBinPath()).to.equal(pythonBinPath)
     })
-  })
 
-  it('should fire an event if dvc.focusedProjects is changed', async () => {
-    const getConfigUpdatedPromise = () =>
-      new Promise(resolve => {
-        const singleUseListener = workspace.onDidChangeConfiguration(e => {
-          if (e.affectsConfiguration(ConfigKey.FOCUSED_PROJECTS)) {
-            resolve(undefined)
-            disposable.untrack(singleUseListener)
-            singleUseListener.dispose()
-          }
+    it('should fire an event if dvc.focusedProjects is changed', async () => {
+      const getConfigUpdatedPromise = () =>
+        new Promise(resolve => {
+          const singleUseListener = workspace.onDidChangeConfiguration(e => {
+            if (e.affectsConfiguration(ConfigKey.FOCUSED_PROJECTS)) {
+              resolve(undefined)
+              disposable.untrack(singleUseListener)
+              singleUseListener.dispose()
+            }
+          })
+          disposable.track(singleUseListener)
         })
-        disposable.track(singleUseListener)
-      })
 
-    const extensionsChanged = disposable.track(new EventEmitter<void>())
-    const config = disposable.track(new Config(extensionsChanged.event))
-    await config.isReady()
+      const extensionsChanged = disposable.track(new EventEmitter<void>())
+      const config = disposable.track(new Config(extensionsChanged.event))
+      await config.isReady()
 
-    let configUpdated = getConfigUpdatedPromise()
-    const mockDvcMonoRepo = Uri.file(resolve(dvcDemoPath)).fsPath
-    const mockGetWorkspaceFolders = stub(
-      WorkspaceFolders,
-      'getWorkspaceFolders'
-    ).returns([mockDvcMonoRepo])
-    const mockDvcSubRoot1 = Uri.file(join(mockDvcMonoRepo, 'data')).fsPath
-    const mockDvcSubRoot2 = Uri.file(join(mockDvcMonoRepo, '.dvc')).fsPath
+      let configUpdated = getConfigUpdatedPromise()
+      const mockDvcMonoRepo = Uri.file(resolve(dvcDemoPath)).fsPath
+      const mockGetWorkspaceFolders = stub(
+        WorkspaceFolders,
+        'getWorkspaceFolders'
+      ).returns([mockDvcMonoRepo])
+      const mockDvcSubRoot1 = Uri.file(join(mockDvcMonoRepo, 'data')).fsPath
+      const mockDvcSubRoot2 = Uri.file(join(mockDvcMonoRepo, '.dvc')).fsPath
 
-    await setConfigValue(ConfigKey.FOCUSED_PROJECTS, mockDvcSubRoot1)
-    await configUpdated
+      await setConfigValue(ConfigKey.FOCUSED_PROJECTS, mockDvcSubRoot1)
+      await configUpdated
 
-    expect(
-      config.getFocusedProjects(),
-      'should set the focused project to the root if it is inside of the workspace'
-    ).to.deep.equal([mockDvcSubRoot1])
+      expect(
+        config.getFocusedProjects(),
+        'should set the focused project to the root if it is inside of the workspace'
+      ).to.deep.equal([mockDvcSubRoot1])
 
-    configUpdated = getConfigUpdatedPromise()
+      configUpdated = getConfigUpdatedPromise()
 
-    await setConfigValue(ConfigKey.FOCUSED_PROJECTS, [mockDvcSubRoot1])
-    await configUpdated
+      await setConfigValue(ConfigKey.FOCUSED_PROJECTS, [mockDvcSubRoot1])
+      await configUpdated
 
-    expect(
-      config.getFocusedProjects(),
-      'should not call setup if the value(s) inside of the option have not changed'
-    ).to.deep.equal([mockDvcSubRoot1])
+      expect(
+        config.getFocusedProjects(),
+        'should not call setup if the value(s) inside of the option have not changed'
+      ).to.deep.equal([mockDvcSubRoot1])
 
-    configUpdated = getConfigUpdatedPromise()
+      configUpdated = getConfigUpdatedPromise()
 
-    await setConfigValue(ConfigKey.FOCUSED_PROJECTS, [
-      mockDvcSubRoot1,
-      mockDvcSubRoot2
-    ])
-    await configUpdated
+      await setConfigValue(ConfigKey.FOCUSED_PROJECTS, [
+        mockDvcSubRoot1,
+        mockDvcSubRoot2
+      ])
+      await configUpdated
 
-    expect(
-      config.getFocusedProjects(),
-      'should be able to focus multiple sub-projects'
-    ).to.deep.equal([mockDvcSubRoot1, mockDvcSubRoot2].sort())
+      expect(
+        config.getFocusedProjects(),
+        'should be able to focus multiple sub-projects'
+      ).to.deep.equal([mockDvcSubRoot1, mockDvcSubRoot2].sort())
 
-    await setConfigValue(ConfigKey.FOCUSED_PROJECTS, [
-      mockDvcSubRoot2,
-      mockDvcSubRoot1
-    ])
-    await configUpdated
+      await setConfigValue(ConfigKey.FOCUSED_PROJECTS, [
+        mockDvcSubRoot2,
+        mockDvcSubRoot1
+      ])
+      await configUpdated
 
-    expect(
-      config.getFocusedProjects(),
-      'should not call setup if the value(s) inside of the option have not changed'
-    ).to.deep.equal([mockDvcSubRoot1, mockDvcSubRoot2].sort())
+      expect(
+        config.getFocusedProjects(),
+        'should not call setup if the value(s) inside of the option have not changed'
+      ).to.deep.equal([mockDvcSubRoot1, mockDvcSubRoot2].sort())
 
-    await setConfigValue(ConfigKey.FOCUSED_PROJECTS, [
-      mockDvcSubRoot2,
-      mockDvcSubRoot1,
-      mockDvcMonoRepo
-    ])
-    await configUpdated
+      await setConfigValue(ConfigKey.FOCUSED_PROJECTS, [
+        mockDvcSubRoot2,
+        mockDvcSubRoot1,
+        mockDvcMonoRepo
+      ])
+      await configUpdated
 
-    expect(
-      config.getFocusedProjects(),
-      'should be able to focus multiple sub-projects along with the monorepo root'
-    ).to.deep.equal([mockDvcMonoRepo, mockDvcSubRoot1, mockDvcSubRoot2].sort())
+      expect(
+        config.getFocusedProjects(),
+        'should be able to focus multiple sub-projects along with the monorepo root'
+      ).to.deep.equal(
+        [mockDvcMonoRepo, mockDvcSubRoot1, mockDvcSubRoot2].sort()
+      )
 
-    await setConfigValue(ConfigKey.FOCUSED_PROJECTS, undefined)
-    await configUpdated
+      await setConfigValue(ConfigKey.FOCUSED_PROJECTS, undefined)
+      await configUpdated
 
-    expect(
-      config.getFocusedProjects(),
-      'should be able to unset the option'
-    ).to.equal(undefined)
+      expect(
+        config.getFocusedProjects(),
+        'should be able to unset the option'
+      ).to.equal(undefined)
 
-    await setConfigValue(ConfigKey.FOCUSED_PROJECTS, null)
-    await configUpdated
+      await setConfigValue(ConfigKey.FOCUSED_PROJECTS, null)
+      await configUpdated
 
-    expect(
-      config.getFocusedProjects(),
-      'should be able to set the option to the default value'
-    ).to.equal(undefined)
+      expect(
+        config.getFocusedProjects(),
+        'should be able to set the option to the default value'
+      ).to.equal(undefined)
 
-    mockGetWorkspaceFolders.restore()
+      mockGetWorkspaceFolders.restore()
 
-    await setConfigValue(ConfigKey.FOCUSED_PROJECTS, ['a', 'b', 'c'])
-    await configUpdated
+      await setConfigValue(ConfigKey.FOCUSED_PROJECTS, ['a', 'b', 'c'])
+      await configUpdated
 
-    expect(
-      config.getFocusedProjects(),
-      'should exclude projects that are outside of the workspace'
-    ).to.equal(undefined)
+      expect(
+        config.getFocusedProjects(),
+        'should exclude projects that are outside of the workspace'
+      ).to.equal(undefined)
+    })
   })
 })

@@ -167,7 +167,7 @@ export interface IEventNamePropertyMapping {
   [EventName.MODIFY_EXPERIMENT_PARAMS_AND_RESUME]: undefined
   [EventName.MODIFY_EXPERIMENT_PARAMS_AND_RUN]: undefined
   [EventName.MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN]: undefined
-  [EventName.STOP_EXPERIMENT]: { stopped: boolean; wasRunning: boolean }
+  [EventName.STOP_EXPERIMENTS]: { stopped: boolean; wasRunning: boolean }
 
   [EventName.PLOTS_PATH_TOGGLE]: undefined
   [EventName.PLOTS_SHOW]: undefined

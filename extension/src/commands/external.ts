@@ -11,7 +11,7 @@ export enum RegisteredCliCommands {
   EXPERIMENT_SHARE_AS_BRANCH = 'dvc.shareExperimentAsBranch',
   EXPERIMENT_SHARE_AS_COMMIT = 'dvc.shareExperimentAsCommit',
   QUEUE_EXPERIMENT = 'dvc.queueExperiment',
-  QUEUE_KILL = 'dvc.killExperimentsRunningInQueue',
+  QUEUE_KILL = 'dvc.stopQueuedExperiments',
   QUEUE_START = 'dvc.startExperimentsQueue',
   QUEUE_STOP = 'dvc.stopExperimentsQueue',
 
@@ -66,7 +66,7 @@ export enum RegisteredCommands {
   EXPERIMENT_SORTS_REMOVE = 'dvc.removeExperimentsTableSorts',
   EXPERIMENT_SORTS_REMOVE_ALL = 'dvc.views.experimentsSortByTree.removeAllSorts',
   EXPERIMENT_TOGGLE = 'dvc.views.experiments.toggleStatus',
-  STOP_EXPERIMENT = 'dvc.stopRunningExperiment',
+  STOP_EXPERIMENTS = 'dvc.stopAllRunningExperiments',
 
   PLOTS_PATH_TOGGLE = 'dvc.views.plotsPathsTree.toggleStatus',
   PLOTS_SHOW = 'dvc.showPlots',
