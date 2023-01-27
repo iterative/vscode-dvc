@@ -39,51 +39,37 @@ export class Context extends Disposable {
 
         void this.setIsExperimentRunning(repositories)
 
-        this.setContextFromRepositories(
+        void setContextValue(
           ContextKey.EXPERIMENTS_FILTERED,
-          repositories,
-          (experiments: Experiments) => experiments.getFilters().length > 0
+          repositories.some(experiments => experiments.getFilters().length > 0)
         )
 
-        this.setContextFromRepositories(
+        void setContextValue(
           ContextKey.EXPERIMENTS_SORTED,
-          repositories,
-          (experiments: Experiments) => experiments.getSorts().length > 0
+          repositories.some(experiments => experiments.getSorts().length > 0)
         )
       })
     )
   }
 
   private async setIsExperimentRunning(repositories: Experiments[] = []) {
-    if (this.dvcRunner.isExperimentRunning()) {
+    if (
+      this.dvcRunner.isExperimentRunning() ||
+      repositories.some(experiments => experiments.hasRunningQueuedExperiment())
+    ) {
       void setContextValue(ContextKey.EXPERIMENT_RUNNING, true)
       void setContextValue(ContextKey.EXPERIMENT_STOPPABLE, true)
       return
     }
 
-    this.setContextFromRepositories(
+    void setContextValue(
       ContextKey.EXPERIMENT_RUNNING,
-      repositories,
-      (experiments: Experiments) => experiments.hasRunningExperiment()
+      repositories.some(experiments => experiments.hasRunningExperiment())
     )
 
     void setContextValue(
       ContextKey.EXPERIMENT_STOPPABLE,
       await this.experiments.hasDvcLiveOnlyExperimentRunning()
     )
-  }
-
-  private setContextFromRepositories(
-    contextKey: ContextKey,
-    repositories: Experiments[],
-    hasRequirement: (experiments: Experiments) => boolean
-  ) {
-    for (const experiments of repositories) {
-      if (hasRequirement(experiments)) {
-        void setContextValue(contextKey, true)
-        return
-      }
-    }
-    void setContextValue(contextKey, false)
   }
 }

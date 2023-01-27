@@ -431,6 +431,12 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return pids
   }
 
+  public hasQueuedExperimentsRunning() {
+    return Object.values(this.repositories).some(experiments =>
+      experiments.hasRunningQueuedExperiment()
+    )
+  }
+
   private async pickExpThenRun(
     commandId: CommandId,
     pickFunc: (
