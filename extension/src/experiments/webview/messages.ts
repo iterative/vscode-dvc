@@ -21,6 +21,7 @@ import { CheckpointsModel } from '../checkpoints/model'
 import { getPositiveIntegerInput } from '../../vscode/inputBox'
 import { Title } from '../../vscode/title'
 import { ConfigKey, setConfigValue } from '../../vscode/config'
+import { Toast } from '../../vscode/toast'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
@@ -32,6 +33,10 @@ export class WebviewMessages {
   private readonly getWebview: () => BaseWebview<TableData> | undefined
   private readonly notifyChanged: () => void
   private readonly selectColumns: () => Promise<void>
+  private readonly stopQueuedExperiments: (
+    dvcRoot: string,
+    ...ids: string[]
+  ) => Promise<string | undefined>
 
   constructor(
     dvcRoot: string,
@@ -40,7 +45,11 @@ export class WebviewMessages {
     checkpoints: CheckpointsModel,
     getWebview: () => BaseWebview<TableData> | undefined,
     notifyChanged: () => void,
-    selectColumns: () => Promise<void>
+    selectColumns: () => Promise<void>,
+    stopQueuedExperiments: (
+      dvcRoot: string,
+      ...ids: string[]
+    ) => Promise<string | undefined>
   ) {
     this.dvcRoot = dvcRoot
     this.experiments = experiments
@@ -49,6 +58,7 @@ export class WebviewMessages {
     this.getWebview = getWebview
     this.notifyChanged = notifyChanged
     this.selectColumns = selectColumns
+    this.stopQueuedExperiments = stopQueuedExperiments
   }
 
   public sendWebviewMessage() {
@@ -148,6 +158,10 @@ export class WebviewMessages {
 
       case MessageFromWebviewType.SET_EXPERIMENTS_HEADER_HEIGHT: {
         return this.setMaxTableHeadDepth()
+      }
+
+      case MessageFromWebviewType.STOP_EXPERIMENT: {
+        return this.stopExperiments([message.payload].flat())
       }
 
       default:
@@ -319,5 +333,10 @@ export class WebviewMessages {
       RegisteredCommands.EXPERIMENT_AND_PLOTS_SHOW,
       this.dvcRoot
     )
+  }
+
+  private stopExperiments(ids: string[]) {
+    void Toast.showOutput(this.stopQueuedExperiments(this.dvcRoot, ...ids))
+    sendTelemetryEvent(EventName.EXPERIMENT_VIEW_STOP, undefined, undefined)
   }
 }

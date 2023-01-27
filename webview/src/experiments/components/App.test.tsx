@@ -874,6 +874,7 @@ describe('App', () => {
         'Modify and Resume',
         'Modify and Queue',
         'Star',
+        'Stop',
         'Remove'
       ])
 
@@ -888,7 +889,7 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(9)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(10)
 
       fireEvent.click(window, { bubbles: true })
       advanceTimersByTime(100)
@@ -902,7 +903,7 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(9)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(10)
 
       const commit = getRow('main')
       fireEvent.click(commit, { bubbles: true })
@@ -917,13 +918,13 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(9)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(10)
 
       fireEvent.contextMenu(within(row).getByText('[exp-e7a67]'), {
         bubbles: true
       })
       advanceTimersByTime(200)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(9)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(10)
     })
 
     it('should present the Remove experiment option for the checkpoint tips', () => {

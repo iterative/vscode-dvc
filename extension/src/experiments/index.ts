@@ -569,7 +569,13 @@ export class Experiments extends BaseRepository<TableData> {
       this.checkpoints,
       () => this.getWebview(),
       () => this.notifyChanged(),
-      () => this.selectColumns()
+      () => this.selectColumns(),
+      (dvcRoot: string, ...ids: string[]) =>
+        this.internalCommands.executeCommand(
+          AvailableCommands.QUEUE_KILL,
+          dvcRoot,
+          ...ids
+        )
     )
 
     this.dispose.track(
