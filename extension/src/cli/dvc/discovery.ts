@@ -239,7 +239,7 @@ export const recheck = async (
     return
   }
 
-  let isCompatible = await checkVersion(setup, cwd, undefined)
+  let isCompatible = await checkVersion(setup, cwd)
   if (!isCompatible) {
     isCompatible = await checkVersion(setup, cwd, true)
   }
