@@ -288,7 +288,7 @@
       },
       {
         "title": "%command.removeExperiments%",
-        "command": "dvc.removeExperiment",
+        "command": "dvc.removeExperiments",
         "category": "DVC"
       },
       {
@@ -306,11 +306,6 @@
         "command": "dvc.removeExperimentsTableSorts",
         "category": "DVC",
         "icon": "$(close-all)"
-      },
-      {
-        "title": "%command.removeQueuedExperiment%",
-        "command": "dvc.removeQueuedExperiment",
-        "category": "DVC"
       },
       {
         "title": "%command.removeTarget%",
@@ -740,7 +735,7 @@
           "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
         },
         {
-          "command": "dvc.removeExperiment",
+          "command": "dvc.removeExperiments",
           "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
         },
         {
@@ -754,10 +749,6 @@
         {
           "command": "dvc.removeExperimentsTableSorts",
           "when": "dvc.commands.available && dvc.project.available"
-        },
-        {
-          "command": "dvc.removeQueuedExperiment",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
         },
         {
           "command": "dvc.removeTarget",

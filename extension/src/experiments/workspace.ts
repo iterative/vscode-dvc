@@ -244,12 +244,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
   }
 
-  public getQueuedExpThenRun(commandId: CommandId) {
-    return this.pickExpThenRun(commandId, cwd =>
-      this.getRepository(cwd).pickQueuedExperiment()
-    )
-  }
-
   public async getCwdAndQuickPickThenRun(
     commandId: CommandId,
     quickPick: () => Thenable<string[] | undefined>

@@ -387,14 +387,7 @@ export class Experiments extends BaseRepository<TableData> {
 
   public pickCurrentExperiment() {
     return pickExperiment(
-      this.experiments.getCurrentExperiments(),
-      this.getFirstThreeColumnOrder()
-    )
-  }
-
-  public pickQueuedExperiment() {
-    return pickExperiment(
-      this.experiments.getQueuedExperiments(),
+      this.experiments.getExperimentsWithoutQueued(),
       this.getFirstThreeColumnOrder()
     )
   }
@@ -409,7 +402,7 @@ export class Experiments extends BaseRepository<TableData> {
 
   public pickExperimentsToRemove() {
     return pickExperiments(
-      this.experiments.getCurrentExperiments(),
+      this.experiments.getExperimentsWithQueued(),
       this.getFirstThreeColumnOrder(),
       Title.SELECT_EXPERIMENTS_REMOVE
     )
