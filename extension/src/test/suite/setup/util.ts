@@ -78,10 +78,7 @@ const buildSetupDependencies = (
     } as unknown as InternalCommands,
     mockRoot,
     mockRunSetup: stub(Runner, 'run').resolves(undefined),
-    mockRunSetupWithGlobalRecheck: stub(
-      Runner,
-      'runWithGlobalRecheck'
-    ).resolves(undefined),
+    mockRunSetupWithRecheck: stub(Runner, 'runWithRecheck').resolves(undefined),
     mockVersion
   }
 }
