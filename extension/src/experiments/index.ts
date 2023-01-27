@@ -385,9 +385,9 @@ export class Experiments extends BaseRepository<TableData> {
     }
   }
 
-  public pickCurrentExperiment() {
+  public pickExperiment() {
     return pickExperiment(
-      this.experiments.getExperimentsWithoutQueued(),
+      this.experiments.getExperiments(),
       this.getFirstThreeColumnOrder()
     )
   }
@@ -402,7 +402,7 @@ export class Experiments extends BaseRepository<TableData> {
 
   public pickExperimentsToRemove() {
     return pickExperiments(
-      this.experiments.getExperimentsWithQueued(),
+      this.experiments.getExperimentsAndQueued(),
       this.getFirstThreeColumnOrder(),
       Title.SELECT_EXPERIMENTS_REMOVE
     )
@@ -423,20 +423,20 @@ export class Experiments extends BaseRepository<TableData> {
     return pickAndModifyParams(params)
   }
 
-  public getExperiments() {
+  public getWorkspaceAndCommits() {
     if (!this.columns.hasNonDefaultColumns()) {
       return []
     }
 
-    return this.experiments.getExperiments()
+    return this.experiments.getWorkspaceAndCommits()
   }
 
   public getCheckpoints(id: string) {
     return this.experiments.getCheckpointsWithType(id)
   }
 
-  public getBranchExperiments(branch: Experiment) {
-    return this.experiments.getExperimentsByBranchForTree(branch)
+  public getCommitExperiments(commit: Experiment) {
+    return this.experiments.getExperimentsByCommitForTree(commit)
   }
 
   public sendInitialWebviewData() {
@@ -455,8 +455,8 @@ export class Experiments extends BaseRepository<TableData> {
     this.experiments.setRevisionCollected(revisions)
   }
 
-  public getBranchRevisions() {
-    return this.experiments.getBranchRevisions()
+  public getCommitRevisions() {
+    return this.experiments.getCommitRevisions()
   }
 
   public getFinishedExperiments() {
@@ -615,7 +615,7 @@ export class Experiments extends BaseRepository<TableData> {
     }
 
     const experiment = await pickExperiment(
-      this.experiments.getAllExperiments(),
+      this.experiments.getRecordsWithoutCheckpoints(),
       this.getFirstThreeColumnOrder(),
       Title.SELECT_BASE_EXPERIMENT
     )

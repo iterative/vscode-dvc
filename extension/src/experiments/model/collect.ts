@@ -17,7 +17,7 @@ import {
 import {
   ExperimentFieldsOrError,
   ExperimentFields,
-  ExperimentsBranchOutput,
+  ExperimentsCommitOutput,
   ExperimentsOutput,
   EXPERIMENT_WORKSPACE_ID,
   ExperimentStatus
@@ -71,7 +71,7 @@ const getExperimentId = (
 
 const getDisplayNameOrParent = (
   sha: string,
-  branchSha: string,
+  commitSha: string,
   experimentsObject: { [sha: string]: ExperimentFieldsOrError }
 ): string | undefined => {
   const experiment = experimentsObject[sha]?.data
@@ -86,7 +86,7 @@ const getDisplayNameOrParent = (
   } = experiment
   if (
     checkpointParent &&
-    branchSha !== checkpointParent &&
+    commitSha !== checkpointParent &&
     experimentsObject[checkpointParent]?.data?.checkpoint_tip !== checkpointTip
   ) {
     return `(${shortenForLabel(checkpointParent)})`
@@ -98,7 +98,7 @@ const getDisplayNameOrParent = (
 
 const getLogicalGroupName = (
   sha: string,
-  branchSha: string,
+  commitSha: string,
   experimentsObject: { [sha: string]: ExperimentFieldsOrError }
 ): string | undefined => {
   const experiment = experimentsObject[sha]?.data
@@ -111,9 +111,9 @@ const getLogicalGroupName = (
   }
 
   return (
-    getDisplayNameOrParent(sha, branchSha, experimentsObject) ||
+    getDisplayNameOrParent(sha, commitSha, experimentsObject) ||
     (checkpointTip && checkpointTip !== sha
-      ? getLogicalGroupName(checkpointTip, branchSha, experimentsObject)
+      ? getLogicalGroupName(checkpointTip, commitSha, experimentsObject)
       : undefined)
   )
 }
@@ -134,11 +134,11 @@ const getCheckpointTipId = (
 const transformColumns = (
   experiment: Experiment,
   experimentFields: ExperimentFields,
-  branch?: Experiment
+  commit?: Experiment
 ) => {
   const { error, metrics, params, deps, Created } = extractColumns(
     experimentFields,
-    branch
+    commit
   )
 
   if (Created) {
@@ -170,7 +170,7 @@ const transformExperimentData = (
   sha?: string,
   displayNameOrParent?: string,
   logicalGroupName?: string,
-  branch?: Experiment
+  commit?: Experiment
 ): Experiment => {
   const data = experimentFieldsOrError.data || {}
 
@@ -198,7 +198,7 @@ const transformExperimentData = (
     experiment.error = error
   }
 
-  transformColumns(experiment, data, branch)
+  transformColumns(experiment, data, commit)
 
   return experiment
 }
@@ -207,8 +207,8 @@ const transformExperimentOrCheckpointData = (
   sha: string,
   experimentData: ExperimentFieldsOrError,
   experimentsObject: ExperimentsObject,
-  branchSha: string,
-  branch: Experiment
+  commitSha: string,
+  commit: Experiment
 ): {
   checkpointTipId?: string
   experiment: Experiment | undefined
@@ -233,9 +233,9 @@ const transformExperimentOrCheckpointData = (
       experimentData,
       shortenForLabel(sha),
       sha,
-      getDisplayNameOrParent(sha, branchSha, experimentsObject),
-      getLogicalGroupName(sha, branchSha, experimentsObject),
-      branch
+      getDisplayNameOrParent(sha, commitSha, experimentsObject),
+      getLogicalGroupName(sha, commitSha, experimentsObject),
+      commit
     )
   }
 }
@@ -253,7 +253,7 @@ const collectHasRunningExperiment = (
 const collectExperimentOrCheckpoint = (
   acc: ExperimentsAccumulator,
   experiment: Experiment,
-  branchName: string,
+  commitName: string,
   checkpointTipId: string | undefined
 ) => {
   const { checkpoint_tip: checkpointTip, sha } = experiment
@@ -264,40 +264,40 @@ const collectExperimentOrCheckpoint = (
     addToMapArray(acc.checkpointsByTip, checkpointTipId, experiment)
     return
   }
-  addToMapArray(acc.experimentsByBranch, branchName, experiment)
+  addToMapArray(acc.experimentsByCommit, commitName, experiment)
 }
 
 const collectFromExperimentsObject = (
   acc: ExperimentsAccumulator,
   experimentsObject: ExperimentsObject,
-  branchSha: string,
-  branch: Experiment
+  commitSha: string,
+  commit: Experiment
 ) => {
-  const branchName = branch.label
+  const commitName = commit.label
 
   for (const [sha, experimentData] of Object.entries(experimentsObject)) {
     const { checkpointTipId, experiment } = transformExperimentOrCheckpointData(
       sha,
       experimentData,
       experimentsObject,
-      branchSha,
-      branch
+      commitSha,
+      commit
     )
     if (!experiment) {
       continue
     }
 
-    collectExperimentOrCheckpoint(acc, experiment, branchName, checkpointTipId)
+    collectExperimentOrCheckpoint(acc, experiment, commitName, checkpointTipId)
     collectHasRunningExperiment(acc, experiment)
   }
 }
 
-const collectFromBranchesObject = (
+const collectFromCommits = (
   acc: ExperimentsAccumulator,
-  branchesObject: { [name: string]: ExperimentsBranchOutput }
+  commitsObject: { [name: string]: ExperimentsCommitOutput }
 ) => {
   for (const [sha, { baseline, ...experimentsObject }] of Object.entries(
-    branchesObject
+    commitsObject
   )) {
     let name = baseline.data?.name
     let label = name
@@ -306,13 +306,13 @@ const collectFromBranchesObject = (
       name = sha
       label = shortenForLabel(name)
     }
-    const branch = transformExperimentData(name, baseline, label, sha)
+    const commit = transformExperimentData(name, baseline, label, sha)
 
-    if (branch) {
-      collectFromExperimentsObject(acc, experimentsObject, sha, branch)
-      collectHasRunningExperiment(acc, branch)
+    if (commit) {
+      collectFromExperimentsObject(acc, experimentsObject, sha, commit)
+      collectHasRunningExperiment(acc, commit)
 
-      acc.branches.push(branch)
+      acc.commits.push(commit)
     }
   }
 }
@@ -364,20 +364,20 @@ const getCommitMessages = (
   return Object.fromEntries(commits) as { [sha: string]: CommitData }
 }
 
-const addCommitDataToBranches = (
-  branches: Experiment[],
+const addDataToCommits = (
+  commits: Experiment[],
   commitsOutput: string
 ): Experiment[] => {
   const commitMessages = getCommitMessages(commitsOutput)
-  return branches.map(branch => {
-    const { sha } = branch
+  return commits.map(commit => {
+    const { sha } = commit
     if (sha && commitMessages[sha]) {
-      branch.displayNameOrParent = formatCommitMessage(
+      commit.displayNameOrParent = formatCommitMessage(
         commitMessages[sha].message
       )
-      branch.commit = commitMessages[sha]
+      commit.commit = commitMessages[sha]
     }
-    return branch
+    return commit
   })
 }
 
@@ -386,7 +386,7 @@ export const collectExperiments = (
   dvcLiveOnly: boolean,
   commitsOutput: string
 ): ExperimentsAccumulator => {
-  const { workspace, ...branchesObject } = data
+  const { workspace, ...commitsObject } = data
 
   const workspaceBaseline = transformExperimentData(
     EXPERIMENT_WORKSPACE_ID,
@@ -401,9 +401,9 @@ export const collectExperiments = (
 
   const acc = new ExperimentsAccumulator(workspaceBaseline)
 
-  collectFromBranchesObject(acc, branchesObject)
+  collectFromCommits(acc, commitsObject)
 
-  acc.branches = addCommitDataToBranches(acc.branches, commitsOutput)
+  acc.commits = addDataToCommits(acc.commits, commitsOutput)
 
   return acc
 }

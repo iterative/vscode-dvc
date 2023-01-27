@@ -28,13 +28,13 @@ const collectStatus = (acc: ColoredStatus, experiment: Experiment): void => {
 const collectExistingStatuses = (
   experiments: Experiment[],
   checkpointsByTip: Map<string, Experiment[]>,
-  experimentsByBranch: Map<string, Experiment[]>,
+  experimentsByCommit: Map<string, Experiment[]>,
   previousStatus: ColoredStatus
 ): ColoredStatus => {
   const existingStatuses: ColoredStatus = {}
   for (const experiment of [
     ...experiments,
-    ...flattenMapValues(experimentsByBranch),
+    ...flattenMapValues(experimentsByCommit),
     ...flattenMapValues(checkpointsByTip)
   ]) {
     const { id } = experiment
@@ -115,16 +115,16 @@ export const unassignColors = (
 export const collectColoredStatus = (
   experiments: Experiment[],
   checkpointsByTip: Map<string, Experiment[]>,
-  experimentsByBranch: Map<string, Experiment[]>,
+  experimentsByCommit: Map<string, Experiment[]>,
   previousStatus: ColoredStatus,
   unassignedColors: Color[],
   startedRunning: Set<string>,
   finishedRunning: { [id: string]: string }
 ): { coloredStatus: ColoredStatus; availableColors: Color[] } => {
-  const flattenExperimentsByBranch = flattenMapValues(experimentsByBranch)
+  const flattenExperimentsByCommit = flattenMapValues(experimentsByCommit)
   const flattenCheckpoints = flattenMapValues(checkpointsByTip)
   const availableColors = unassignColors(
-    [...experiments, ...flattenExperimentsByBranch, ...flattenCheckpoints],
+    [...experiments, ...flattenExperimentsByCommit, ...flattenCheckpoints],
     previousStatus,
     unassignedColors
   )
@@ -132,7 +132,7 @@ export const collectColoredStatus = (
   const coloredStatus = collectExistingStatuses(
     experiments,
     checkpointsByTip,
-    experimentsByBranch,
+    experimentsByCommit,
     previousStatus
   )
 
@@ -145,7 +145,7 @@ export const collectColoredStatus = (
 
   for (const experiment of [
     ...experiments,
-    ...flattenExperimentsByBranch,
+    ...flattenExperimentsByCommit,
     ...flattenCheckpoints
   ]) {
     collectStatus(coloredStatus, experiment)

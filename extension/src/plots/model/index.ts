@@ -10,7 +10,7 @@ import {
   ComparisonData,
   RevisionData,
   TemplateAccumulator,
-  collectBranchRevisionDetails,
+  collectCommitRevisionDetails,
   collectOverrideRevisionDetails
 } from './collect'
 import { getRevisionFirstThreeColumns } from './util'
@@ -51,7 +51,7 @@ export class PlotsModel extends ModelWithPersistence {
 
   private plotSizes: Record<Section, number>
   private sectionCollapsed: SectionCollapsed
-  private branchRevisions: Record<string, string> = {}
+  private commitRevisions: Record<string, string> = {}
 
   private fetchedRevs = new Set<string>()
 
@@ -383,10 +383,7 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   private removeStaleData() {
-    return Promise.all([
-      this.removeStaleBranches(),
-      this.removeStaleRevisions()
-    ])
+    return Promise.all([this.removeStaleCommits(), this.removeStaleRevisions()])
   }
 
   private removeStaleRevisions() {
@@ -409,19 +406,19 @@ export class PlotsModel extends ModelWithPersistence {
     }
   }
 
-  private removeStaleBranches() {
-    const currentBranchRevisions = collectBranchRevisionDetails(
-      this.experiments.getBranchRevisions()
+  private removeStaleCommits() {
+    const currentCommitRevisions = collectCommitRevisionDetails(
+      this.experiments.getCommitRevisions()
     )
-    for (const id of Object.keys(this.branchRevisions)) {
-      if (this.branchRevisions[id] !== currentBranchRevisions[id]) {
+    for (const id of Object.keys(this.commitRevisions)) {
+      if (this.commitRevisions[id] !== currentCommitRevisions[id]) {
         this.deleteRevisionData(id)
       }
     }
-    if (!isEqual(this.branchRevisions, currentBranchRevisions)) {
+    if (!isEqual(this.commitRevisions, currentCommitRevisions)) {
       this.deleteRevisionData(EXPERIMENT_WORKSPACE_ID)
     }
-    this.branchRevisions = currentBranchRevisions
+    this.commitRevisions = currentCommitRevisions
   }
 
   private deleteRevisionData(id: string) {
@@ -431,7 +428,7 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   private getCLIId(label: string) {
-    return this.branchRevisions[label] || label
+    return this.commitRevisions[label] || label
   }
 
   private getPlots(
