@@ -9,7 +9,7 @@ import { Column } from '../../webview/contract'
 import {
   ExperimentFields,
   ExperimentFieldsOrError,
-  ExperimentsBranchOutput,
+  ExperimentsCommitOutput,
   ExperimentsOutput
 } from '../../../cli/dvc/contract'
 import { standardizePath } from '../../../fileSystem/path'
@@ -26,11 +26,11 @@ const collectFromExperiment = (
   }
 }
 
-const collectFromBranch = (
+const collectFromCommit = (
   acc: ColumnAccumulator,
-  branch: ExperimentsBranchOutput
+  commit: ExperimentsCommitOutput
 ) => {
-  const { baseline, ...rest } = branch
+  const { baseline, ...rest } = commit
   collectFromExperiment(acc, baseline)
   for (const experiment of Object.values(rest)) {
     collectFromExperiment(acc, experiment)
@@ -43,9 +43,9 @@ export const collectColumns = (data: ExperimentsOutput): Column[] => {
   acc.timestamp = timestampColumn
 
   const { workspace, ...rest } = data
-  collectFromBranch(acc, workspace)
-  for (const branch of Object.values(rest)) {
-    collectFromBranch(acc, branch)
+  collectFromCommit(acc, workspace)
+  for (const commit of Object.values(rest)) {
+    collectFromCommit(acc, commit)
   }
   return Object.values(acc)
 }

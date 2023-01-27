@@ -134,7 +134,7 @@ suite('Plots Test Suite', () => {
       )
     })
 
-    it('should call plots diff with the branch name whenever the current branch commit changes', async () => {
+    it('should call plots diff with the branch name (if available) whenever the current commit changes', async () => {
       const mockNow = getMockNow()
       const { data, experiments, mockPlotsDiff } = await buildPlots(
         disposable,

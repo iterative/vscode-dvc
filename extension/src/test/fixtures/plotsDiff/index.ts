@@ -17,7 +17,7 @@ import {
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
-import { getCLIBranchId, replaceBranchCLIId } from './util'
+import { getCLICommitId, replaceCommitCLIId } from './util'
 import { formatDate } from '../../../util/date'
 import { ColumnType, Row } from '../../../experiments/webview/contract'
 
@@ -490,7 +490,7 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
             data: {
               values:
                 expectedRevisions.flatMap(revision =>
-                  originalPlot.datapoints?.[getCLIBranchId(revision)].map(
+                  originalPlot.datapoints?.[getCLICommitId(revision)].map(
                     values => ({
                       ...values,
                       rev: revision
@@ -687,7 +687,7 @@ export const getComparisonWebviewMessage = (
   for (const [path, plots] of Object.entries(getImageData(baseUrl, joinFunc))) {
     const revisionsAcc: ComparisonRevisionData = {}
     for (const { url, revisions } of plots) {
-      const revision = replaceBranchCLIId(revisions?.[0])
+      const revision = replaceCommitCLIId(revisions?.[0])
       if (!revision) {
         continue
       }

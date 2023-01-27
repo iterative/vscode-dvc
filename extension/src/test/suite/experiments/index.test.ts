@@ -87,12 +87,12 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('getExperiments', () => {
-    it('should return the workspace and branch (HEAD revision)', async () => {
+    it('should return the workspace and commit (HEAD revision)', async () => {
       const { experiments } = buildExperiments(disposable)
 
       await experiments.isReady()
 
-      const runs = experiments.getExperiments()
+      const runs = experiments.getWorkspaceAndCommits()
 
       expect(runs.map(experiment => experiment.label)).to.deep.equal([
         EXPERIMENT_WORKSPACE_ID,
@@ -742,8 +742,9 @@ suite('Experiments Test Suite', () => {
       const queuedExperiment = '90aea7f2482117a55dfcadcdb901aaa6610fbbc9'
 
       const isExperimentSelected = (expId: string): boolean =>
-        !!experimentsModel.getAllExperiments().find(({ id }) => id === expId)
-          ?.selected
+        !!experimentsModel
+          .getRecordsWithoutCheckpoints()
+          .find(({ id }) => id === expId)?.selected
 
       expect(isExperimentSelected(experimentToToggle), 'experiment is selected')
         .to.be.true
@@ -939,7 +940,9 @@ suite('Experiments Test Suite', () => {
       const areExperimentsStarred = (expIds: string[]): boolean =>
         expIds
           .map(expId =>
-            experimentsModel.getAllExperiments().find(({ id }) => id === expId)
+            experimentsModel
+              .getRecordsWithoutCheckpoints()
+              .find(({ id }) => id === expId)
           )
           .every(exp => exp?.starred)
 
@@ -1622,7 +1625,7 @@ suite('Experiments Test Suite', () => {
       await experiments.isReady()
 
       expect(
-        experiments.getExperiments(),
+        experiments.getWorkspaceAndCommits(),
         'should send no experiments to the tree'
       ).to.deep.equal([])
       expect(

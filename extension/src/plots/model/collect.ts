@@ -223,9 +223,9 @@ export const collectCheckpointPlotsData = (
   for (const { baseline, ...experimentsObject } of Object.values(
     omit(data, EXPERIMENT_WORKSPACE_ID)
   )) {
-    const branch = transformExperimentData(baseline)
+    const commit = transformExperimentData(baseline)
 
-    if (branch) {
+    if (commit) {
       collectFromExperimentsObject(acc, experimentsObject)
     }
   }
@@ -635,19 +635,19 @@ export const collectSelectedTemplatePlots = (
   return acc.length > 0 ? acc : undefined
 }
 
-export const collectBranchRevisionDetails = (
-  branchShas: {
+export const collectCommitRevisionDetails = (
+  shas: {
     id: string
     sha: string | undefined
   }[]
 ) => {
-  const branchRevisions: Record<string, string> = {}
-  for (const { id, sha } of branchShas) {
+  const commitRevisions: Record<string, string> = {}
+  for (const { id, sha } of shas) {
     if (sha) {
-      branchRevisions[id] = shortenForLabel(sha)
+      commitRevisions[id] = shortenForLabel(sha)
     }
   }
-  return branchRevisions
+  return commitRevisions
 }
 
 const getRevision = (

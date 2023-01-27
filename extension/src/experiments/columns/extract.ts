@@ -47,7 +47,7 @@ const extractMetricsOrParams = (
 
 const extractDeps = (
   columns?: Deps,
-  branch?: Experiment
+  commit?: Experiment
 ): DepColumns | undefined => {
   if (!columns) {
     return
@@ -59,7 +59,7 @@ const extractDeps = (
     const value = shortenForLabel<string | null>(hash)
     if (value) {
       acc[path] = {
-        changes: !!branch && branch?.deps?.[path]?.value !== value,
+        changes: !!commit && commit?.deps?.[path]?.value !== value,
         value
       }
     }
@@ -78,7 +78,7 @@ type Columns = {
 
 export const extractColumns = (
   experiment: ExperimentFields,
-  branch?: Experiment
+  commit?: Experiment
 ): Columns => {
   const metricsData = extractMetricsOrParams(experiment.metrics)
   const paramsData = extractMetricsOrParams(experiment.params)
@@ -90,7 +90,7 @@ export const extractColumns = (
 
   const columns: Columns = {
     Created: experiment?.timestamp,
-    deps: extractDeps(experiment.deps, branch),
+    deps: extractDeps(experiment.deps, commit),
     metrics: metricsData?.columns,
     params: paramsData?.columns
   }

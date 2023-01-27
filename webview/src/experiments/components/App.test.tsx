@@ -196,7 +196,7 @@ describe('App', () => {
       expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
     })
 
-    it('should maintain expansion status when the branch changes', () => {
+    it('should maintain expansion status when the commit changes', () => {
       renderTable()
 
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
@@ -209,14 +209,14 @@ describe('App', () => {
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
 
-      const changedBranchName = 'changed-branch'
+      const changedCommitName = 'changed-branch'
 
       const changedRows = [...tableDataFixture.rows]
       changedRows[1] = {
         ...changedRows[1],
-        id: changedBranchName,
-        label: changedBranchName,
-        name: changedBranchName,
+        id: changedCommitName,
+        label: changedCommitName,
+        name: changedCommitName,
         sha: '99999dfb4aa5fb41915610c3a256b418fc095610'
       }
 
@@ -225,7 +225,7 @@ describe('App', () => {
         rows: changedRows
       })
 
-      expect(screen.getByText(changedBranchName)).toBeInTheDocument()
+      expect(screen.getByText(changedCommitName)).toBeInTheDocument()
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
     })
@@ -904,8 +904,8 @@ describe('App', () => {
       advanceTimersByTime(100)
       expect(screen.getAllByRole('menuitem')).toHaveLength(9)
 
-      const branch = getRow('main')
-      fireEvent.click(branch, { bubbles: true })
+      const commit = getRow('main')
+      fireEvent.click(commit, { bubbles: true })
       advanceTimersByTime(100)
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })

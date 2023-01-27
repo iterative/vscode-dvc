@@ -122,12 +122,12 @@ export class ExperimentsTree
     }
 
     if (this.isRoot(element)) {
-      return Promise.resolve(this.getExperiments(element))
+      return Promise.resolve(this.getWorkspaceAndCommits(element))
     }
 
-    if (element.type === ExperimentType.BRANCH) {
+    if (element.type === ExperimentType.COMMIT) {
       return Promise.resolve(
-        this.getExperimentsByBranch(element.dvcRoot, element)
+        this.getExperimentsByCommit(element.dvcRoot, element)
       )
     }
 
@@ -169,7 +169,7 @@ export class ExperimentsTree
     }
 
     const experiments = dvcRoots.flatMap(dvcRoot =>
-      this.experiments.getRepository(dvcRoot).getExperiments()
+      this.experiments.getRepository(dvcRoot).getWorkspaceAndCommits()
     )
     if (definedAndNonEmpty(experiments)) {
       if (dvcRoots.length === 1) {
@@ -209,21 +209,21 @@ export class ExperimentsTree
     }
   }
 
-  private getExperiments(dvcRoot: string): ExperimentItem[] {
+  private getWorkspaceAndCommits(dvcRoot: string): ExperimentItem[] {
     return this.experiments
       .getRepository(dvcRoot)
-      .getExperiments()
+      .getWorkspaceAndCommits()
       .map(experiment => this.formatExperiment(experiment, dvcRoot))
   }
 
-  private getExperimentsByBranch(
+  private getExperimentsByCommit(
     dvcRoot: string,
-    branch: Experiment
+    commit: Experiment
   ): ExperimentItem[] {
     return (
       this.experiments
         .getRepository(dvcRoot)
-        .getBranchExperiments(branch)
+        .getCommitExperiments(commit)
         ?.map(experiment =>
           this.formatExperiment(experiment as ExperimentAugmented, dvcRoot)
         ) || []
@@ -246,7 +246,7 @@ export class ExperimentsTree
   ) {
     if (
       (description && this.expandedExperiments[description]) ||
-      type === ExperimentType.BRANCH
+      type === ExperimentType.COMMIT
     ) {
       return TreeItemCollapsibleState.Expanded
     }
