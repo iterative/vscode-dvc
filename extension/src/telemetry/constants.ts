@@ -134,7 +134,6 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_METRICS_AND_PARAMS_TOGGLE]: undefined
   [EventName.EXPERIMENT_REMOVE]: undefined
   [EventName.EXPERIMENT_REMOVE_QUEUE]: undefined
-  [EventName.EXPERIMENT_REMOVE_QUEUED]: undefined
   [EventName.EXPERIMENT_RESUME]: undefined
   [EventName.EXPERIMENT_RUN]: undefined
   [EventName.EXPERIMENT_RESET_AND_RUN]: undefined

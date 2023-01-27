@@ -148,7 +148,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   public toggleStatus(id: string) {
     if (
       isQueued(
-        this.getFlattenedExperiments().find(
+        this.getExperimentsWithQueued().find(
           ({ id: queuedId }) => queuedId === id
         )?.status
       )
@@ -185,7 +185,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public setRevisionCollected(revisions: string[]) {
-    for (const { id } of this.getFlattenedExperiments().filter(({ label }) =>
+    for (const { id } of this.getExperimentsWithQueued().filter(({ label }) =>
       revisions.includes(label)
     )) {
       if (this.finishedRunning[id]) {
@@ -281,7 +281,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getSelectedExperiments() {
-    return this.getSelectedFromList(() => this.getFlattenedExperiments())
+    return this.getSelectedFromList(() => this.getExperimentsWithQueued())
   }
 
   public setSelected(selectedExperiments: Experiment[]) {
@@ -348,7 +348,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getAllExperiments() {
-    return [...this.getExperiments(), ...this.getFlattenedExperiments()]
+    return [...this.getExperiments(), ...this.getExperimentsWithQueued()]
   }
 
   public getErrors() {
@@ -385,16 +385,20 @@ export class ExperimentsModel extends ModelWithPersistence {
     return collectFlatExperimentParams(params)
   }
 
-  public getCurrentExperiments() {
-    return this.splitExperimentsByQueued()
+  public getExperimentsWithoutQueued() {
+    return this.getExperimentsWithQueued().filter(({ status }) => {
+      return !isQueued(status)
+    })
   }
 
-  public getQueuedExperiments() {
-    return this.splitExperimentsByQueued(true)
+  public getExperimentsWithQueued() {
+    return flattenMapValues(this.experimentsByBranch).map(experiment =>
+      this.addDetails(experiment)
+    )
   }
 
   public getRunningQueueTasks() {
-    return this.getFlattenedExperiments().filter(
+    return this.getExperimentsWithQueued().filter(
       ({ status, executor }) => isRunning(status) && executor === 'dvc-task'
     )
   }
@@ -438,7 +442,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   public getExperimentCount() {
     return sum([
       this.getFlattenedCheckpoints().length,
-      this.getFlattenedExperiments().length,
+      this.getExperimentsWithQueued().length,
       this.branches.length,
       1
     ])
@@ -453,7 +457,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     return [
       this.workspace,
       ...this.branches,
-      ...this.getFlattenedExperiments(),
+      ...this.getExperimentsWithQueued(),
       ...this.getFlattenedCheckpoints()
     ]
   }
@@ -505,7 +509,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   private getFilteredExperiments() {
     const acc: ExperimentWithType[] = []
 
-    for (const experiment of this.getCurrentExperiments()) {
+    for (const experiment of this.getExperimentsWithoutQueued()) {
       const checkpoints = this.getCheckpointsWithType(experiment.id) || []
       collectFiltered(acc, this.getFilters(), experiment, checkpoints)
     }
@@ -539,21 +543,6 @@ export class ExperimentsModel extends ModelWithPersistence {
       return
     }
     return sortExperiments(this.getSorts(), experiments)
-  }
-
-  private getFlattenedExperiments() {
-    return flattenMapValues(this.experimentsByBranch).map(experiment =>
-      this.addDetails(experiment)
-    )
-  }
-
-  private splitExperimentsByQueued(getQueued = false) {
-    return this.getFlattenedExperiments().filter(({ status }) => {
-      if (getQueued) {
-        return isQueued(status)
-      }
-      return !isQueued(status)
-    })
   }
 
   private getFlattenedCheckpoints() {
@@ -593,7 +582,7 @@ export class ExperimentsModel extends ModelWithPersistence {
 
     this.finishedRunning = collectFinishedRunningExperiments(
       { ...this.finishedRunning },
-      this.getFlattenedExperiments(),
+      this.getExperimentsWithQueued(),
       this.running,
       stillRunning,
       this.coloredStatus
