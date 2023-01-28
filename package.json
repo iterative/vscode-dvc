@@ -71,7 +71,7 @@
     "decode-uri-component": "0.2.2",
     "@types/react": "18.0.27",
     "**/recursive-readdir/minimatch": "6.1.5",
-    "fastify": "3.29.4",
+    "fastify": "3.29.5",
     "json5": "2.2.3",
     "loader-utils": "2.0.4",
     "terser": "5.16.1",
