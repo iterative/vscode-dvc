@@ -9,6 +9,7 @@ import {
 import { readFileSync } from 'fs-extra'
 import { documentSelector, serverModule } from 'dvc-vscode-lsp'
 import { Disposable } from '../class/dispose'
+import { isDirectory } from '../fileSystem'
 
 export class LanguageClientWrapper extends Disposable {
   private client: LanguageClient
@@ -35,15 +36,18 @@ export class LanguageClientWrapper extends Disposable {
       )
     )
 
-    this.client.onRequest('isFile', (path: string) => {
-      const uri = Uri.file(path).toString()
-      const languageId = extname(path) === '.py' ? 'python' : 'other'
+    this.client.onRequest('getFileDetails', (uriString: string) => {
+      const uri = Uri.parse(uriString)
+      const languageId = extname(uriString) === '.py' ? 'python' : 'other'
       try {
-        const text = readFileSync(path, 'utf8')
+        if (isDirectory(uri.fsPath)) {
+          return null
+        }
+        const text = readFileSync(uri.fsPath, 'utf8')
         return {
           languageId,
           text,
-          uri,
+          uri: uri.toString(),
           version: 0
         }
       } catch {

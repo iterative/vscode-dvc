@@ -22,7 +22,7 @@ export const setupTestConnections = () => {
 
   server = createConnection(up, down)
   client = createConnection(down, up)
-  client.onRequest('isFile', () => null)
+  client.onRequest('getFileDetails', () => null)
 
   dvcLanguageService.listen(server)
   client.listen()

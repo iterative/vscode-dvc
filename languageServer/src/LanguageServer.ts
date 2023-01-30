@@ -117,24 +117,16 @@ export class LanguageServer {
       locationsAccumulator.push(...fileLocations)
 
       for (const possibleFile of symbolUnderCursor.name.split(' ')) {
-        const possiblePath = join(
-          dirname(document.uri).replace('file:///', ''),
-          possibleFile
-        )
-        const isFile = await connection.sendRequest<{
+        const possiblePath = join(dirname(document.uri), possibleFile)
+        const fileDetails = await connection.sendRequest<{
           languageId: string
           text: string
-          uri: URI
+          uri: string
           version: number
-        } | null>('isFile', possiblePath)
-        if (isFile) {
-          const { languageId, text, version } = isFile
-          const doc = TextDocument.create(
-            possiblePath,
-            languageId,
-            version,
-            text
-          )
+        } | null>('getFileDetails', possiblePath)
+        if (fileDetails) {
+          const { uri, languageId, text, version } = fileDetails
+          const doc = TextDocument.create(uri, languageId, version, text)
           const start = Position.create(0, 0)
           const end = doc.positionAt(doc.getText().length - 1)
           const range = Range.create(start, end)
