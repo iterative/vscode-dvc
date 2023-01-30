@@ -58,12 +58,10 @@ export const isQueued = (status: ExperimentStatus | undefined): boolean =>
 export const isRunningInQueue = ({
   status,
   executor
-}:
-  | Experiment
-  | {
-      status: ExperimentStatus | undefined
-      executor: string | null | undefined
-    }): boolean => isRunning(status) && executor === 'dvc-task'
+}: {
+  status?: ExperimentStatus
+  executor?: string | null
+}): boolean => isRunning(status) && executor === 'dvc-task'
 
 export interface Row extends Experiment {
   subRows?: Row[]

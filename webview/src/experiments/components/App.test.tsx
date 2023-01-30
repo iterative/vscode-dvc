@@ -967,6 +967,33 @@ describe('App', () => {
       })
     })
 
+    it('should present the Stop option if rows that are running in the queue are selected', () => {
+      renderTableWithoutRunningExperiments()
+
+      clickRowCheckbox('4fb124a')
+
+      const target = screen.getByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems.map(item => item.textContent)
+      expect(itemLabels).toContain('Stop')
+
+      const stopOption = menuitems.find(item =>
+        item.textContent?.includes('Stop')
+      )
+
+      expect(stopOption).toBeDefined()
+
+      stopOption && fireEvent.click(stopOption)
+
+      expect(sendMessage).toHaveBeenCalledWith({
+        payload: ['exp-e7a67'],
+        type: MessageFromWebviewType.STOP_EXPERIMENT
+      })
+    })
+
     it('should always present the Plots options if multiple rows are selected', () => {
       renderTableWithoutRunningExperiments()
 
