@@ -1,6 +1,6 @@
 import { resolve } from 'path'
 import { extensions, Extension, commands } from 'vscode'
-import { run, runWithRecheck, runWorkspace } from './runner'
+import { run, runWithGlobalRecheck, runWorkspace } from './runner'
 import { flushPromises } from '../test/util/jest'
 import {
   ConfigKey,
@@ -607,7 +607,7 @@ describe('run', () => {
   })
 })
 
-describe('runWithRecheck', () => {
+describe('runWithGlobalRecheck', () => {
   const setup = {
     getAvailable: mockedGetAvailable,
     getCliVersion: mockedGetCliVersion,
@@ -624,48 +624,7 @@ describe('runWithRecheck', () => {
     unsetPythonBinPath: mockedUnsetPythonBinPath
   }
 
-  it('should periodically check to see if the CLI is available if the extension fails to initialize', async () => {
-    mockedGetFirstWorkspaceFolder.mockReturnValue(mockedCwd)
-
-    const mockedRecheckInterval = 0
-
-    mockedGetAvailable.mockReturnValue(false)
-
-    mockedGetCliVersion
-      .mockResolvedValueOnce(undefined)
-      .mockResolvedValueOnce(undefined)
-      .mockResolvedValueOnce(undefined)
-      .mockResolvedValueOnce(undefined)
-      .mockResolvedValueOnce(undefined)
-      .mockResolvedValueOnce(LATEST_TESTED_CLI_VERSION)
-
-    await runWithRecheck(setup, mockedRecheckInterval)
-
-    expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
-    expect(mockedGetAvailable).toHaveBeenCalledTimes(1)
-
-    await delay(mockedRecheckInterval)
-
-    expect(mockedGetCliVersion).toHaveBeenCalledTimes(3)
-    expect(mockedGetAvailable).toHaveBeenCalledTimes(2)
-
-    await delay(mockedRecheckInterval)
-
-    expect(mockedGetCliVersion).toHaveBeenCalledTimes(5)
-    expect(mockedGetAvailable).toHaveBeenCalledTimes(3)
-
-    await delay(mockedRecheckInterval)
-
-    expect(mockedGetCliVersion).toHaveBeenCalledTimes(7)
-    expect(mockedGetAvailable).toHaveBeenCalledTimes(4)
-
-    await delay(mockedRecheckInterval)
-
-    expect(mockedGetCliVersion).toHaveBeenCalledTimes(7)
-    expect(mockedGetAvailable).toHaveBeenCalledTimes(4)
-  })
-
-  it('should check for globally installed version if the version from the virtual environment is unavailable', async () => {
+  it('should periodically check to see if the CLI is available globally if the extension fails to initialize', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValue(mockedCwd)
 
     const mockedRecheckInterval = 0
@@ -673,57 +632,43 @@ describe('runWithRecheck', () => {
     mockedGetAvailable
       .mockReturnValueOnce(false)
       .mockReturnValueOnce(false)
-      .mockReturnValueOnce(true)
+      .mockReturnValueOnce(false)
 
     mockedGetCliVersion
       .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce(LATEST_TESTED_CLI_VERSION)
+      .mockResolvedValueOnce(LATEST_TESTED_CLI_VERSION)
 
-    await runWithRecheck(setup, mockedRecheckInterval)
+    await runWithGlobalRecheck(setup, mockedRecheckInterval)
 
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
     expect(mockedGetAvailable).toHaveBeenCalledTimes(1)
+
+    await delay(mockedRecheckInterval)
+
+    expect(mockedGetCliVersion).toHaveBeenCalledTimes(2)
+    expect(mockedGetAvailable).toHaveBeenCalledTimes(2)
 
     await delay(mockedRecheckInterval)
 
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(4)
-    expect(mockedGetAvailable).toHaveBeenCalledTimes(2)
-  })
-
-  it('should not check for globally installed version if the version from the virtual environment is available', async () => {
-    mockedGetFirstWorkspaceFolder.mockReturnValue(mockedCwd)
-
-    const mockedRecheckInterval = 0
-
-    mockedGetAvailable
-      .mockReturnValueOnce(false)
-      .mockReturnValueOnce(false)
-      .mockReturnValueOnce(true)
-
-    mockedGetCliVersion
-      .mockResolvedValueOnce(undefined)
-      .mockResolvedValueOnce(LATEST_TESTED_CLI_VERSION)
-
-    await runWithRecheck(setup, mockedRecheckInterval)
-
-    expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
-    expect(mockedGetAvailable).toHaveBeenCalledTimes(1)
+    expect(mockedGetAvailable).toHaveBeenCalledTimes(3)
 
     await delay(mockedRecheckInterval)
 
-    expect(mockedGetCliVersion).toHaveBeenCalledTimes(3)
-    expect(mockedGetAvailable).toHaveBeenCalledTimes(2)
+    expect(mockedGetCliVersion).toHaveBeenCalledTimes(4)
+    expect(mockedGetAvailable).toHaveBeenCalledTimes(3)
   })
 
-  it('should not periodically check to see if the CLI is available if the extension initializes', async () => {
+  it('should not periodically check to see if the CLI is available globally if the extension initializes', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValue(mockedCwd)
 
     mockedGetAvailable.mockReturnValueOnce(true)
 
     mockedGetCliVersion.mockResolvedValueOnce(LATEST_TESTED_CLI_VERSION)
 
-    await runWithRecheck(setup, 0)
+    await runWithGlobalRecheck(setup, 0)
 
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
     expect(mockedGetAvailable).toHaveBeenCalledTimes(1)
@@ -739,13 +684,13 @@ describe('runWithRecheck', () => {
     expect(mockedGetAvailable).toHaveBeenCalledTimes(1)
   })
 
-  it('should stop checking if the extension is available if it initializes', async () => {
+  it('should stop checking if the extension is available globally if it initializes', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValue(mockedCwd)
 
     mockedGetAvailable.mockReturnValueOnce(false).mockReturnValueOnce(true)
     mockedGetCliVersion.mockResolvedValueOnce(undefined)
 
-    await runWithRecheck(setup, 0)
+    await runWithGlobalRecheck(setup, 0)
 
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
     expect(mockedGetAvailable).toHaveBeenCalledTimes(1)

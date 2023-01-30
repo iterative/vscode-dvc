@@ -4,7 +4,7 @@ import isEmpty from 'lodash.isempty'
 import { SetupData as TSetupData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { findPythonBinForInstall } from './autoInstall'
-import { run, runWithRecheck, runWorkspace } from './runner'
+import { run, runWithGlobalRecheck, runWorkspace } from './runner'
 import { pickFocusedProjects } from './quickPick'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
@@ -435,7 +435,7 @@ export class Setup
         const stopWatch = new StopWatch()
         try {
           void this.sendDataToWebview()
-          await runWithRecheck(this)
+          await run(this)
 
           return sendTelemetryEvent(
             EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
@@ -455,7 +455,7 @@ export class Setup
   }
 
   private watchPathForChanges(stopWatch: StopWatch) {
-    runWithRecheck(this)
+    runWithGlobalRecheck(this)
       .then(async () => {
         sendTelemetryEvent(
           EventName.EXTENSION_LOAD,
