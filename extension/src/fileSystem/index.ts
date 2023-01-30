@@ -127,6 +127,10 @@ export const isAnyDvcYaml = (path?: string): boolean =>
       basename(path) === 'dvc.yaml')
   )
 
+export const ensureOrCreateDvcYamlFile = (cwd: string) => {
+  ensureFileSync(`${cwd}/dvc.yaml`)
+}
+
 export const relativeWithUri = (dvcRoot: string, uri: Uri) =>
   relative(dvcRoot, uri.fsPath)
 

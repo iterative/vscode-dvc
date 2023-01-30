@@ -15,7 +15,7 @@ import { getInput, getPositiveIntegerInput } from '../vscode/inputBox'
 import { BaseWorkspaceWebviews } from '../webview/workspace'
 import { Title } from '../vscode/title'
 import { ContextKey, setContextValue } from '../vscode/context'
-import { getPidFromSignalFile } from '../fileSystem'
+import { ensureOrCreateDvcYamlFile, getPidFromSignalFile } from '../fileSystem'
 import { definedAndNonEmpty } from '../util/array'
 
 export class WorkspaceExperiments extends BaseWorkspaceWebviews<
@@ -213,10 +213,17 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return await repository.modifyExperimentParamsAndQueue(overrideId)
   }
 
-  public async getCwdThenRun(commandId: CommandId) {
+  public async getCwdThenRun(
+    commandId: CommandId,
+    ensureDvcYamlFileExists?: boolean
+  ) {
     const cwd = await this.getFocusedOrOnlyOrPickProject()
     if (!cwd) {
       return
+    }
+
+    if (ensureDvcYamlFileExists) {
+      ensureOrCreateDvcYamlFile(cwd)
     }
 
     return this.internalCommands.executeCommand(commandId, cwd)
