@@ -161,7 +161,7 @@ export class WebviewMessages {
       }
 
       case MessageFromWebviewType.STOP_EXPERIMENT: {
-        return this.stopExperiments([message.payload].flat())
+        return this.stopExperiments(message.payload)
       }
 
       default:
