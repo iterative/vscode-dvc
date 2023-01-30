@@ -51,7 +51,7 @@ const getMainColumnProperties = (
         CellContext<Column, CellValue>
       >,
       header: () => <TimestampHeader />,
-      id: ColumnType.TIMESTAMP
+      id: 'Created'
     }
   }
 
