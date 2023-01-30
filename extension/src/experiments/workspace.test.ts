@@ -13,6 +13,7 @@ import { buildMockedEventEmitter } from '../test/util/jest'
 import { OutputChannel } from '../vscode/outputChannel'
 import { Title } from '../vscode/title'
 import { Args } from '../cli/dvc/constants'
+import { ensureOrCreateDvcYamlFile } from '../fileSystem'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = jest.mocked(Disposable)
@@ -28,6 +29,9 @@ jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 jest.mock('../vscode/quickPick')
 jest.mock('../vscode/inputBox')
+jest.mock('../fileSystem', () => ({
+  ensureOrCreateDvcYamlFile: jest.fn()
+}))
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -242,6 +246,43 @@ describe('Experiments', () => {
       expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
       expect(mockedGetInput).toHaveBeenCalledTimes(1)
       expect(mockedExpFunc).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('getCwdThenRun', () => {
+    it('should call the correct function with the correct parameters if a project is picked', async () => {
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
+
+      expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
+      expect(mockedExpFunc).toHaveBeenCalledTimes(1)
+      expect(mockedExpFunc).toHaveBeenCalledWith(mockedDvcRoot)
+    })
+
+    it('should not call the function if a project is not picked', async () => {
+      mockedQuickPickOne.mockResolvedValueOnce(undefined)
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
+
+      expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
+      expect(mockedExpFunc).not.toHaveBeenCalled()
+    })
+
+    it('should ensure that a dvc.yaml file exists if the the registered command needs it', async () => {
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+
+      expect(ensureOrCreateDvcYamlFile).toHaveBeenCalledTimes(1)
+    })
+
+    it('should not ensure that a dvc.yaml file exists if the the registered command needs it', async () => {
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
+
+      expect(ensureOrCreateDvcYamlFile).not.toHaveBeenCalled()
     })
   })
 })
