@@ -149,8 +149,13 @@ export class DvcExecutor extends DvcCli {
     )
   }
 
-  public queueStop(cwd: string) {
-    return this.executeDvcProcess(cwd, Command.QUEUE, QueueSubCommand.STOP)
+  public queueStop(cwd: string, ...args: Args) {
+    return this.executeDvcProcess(
+      cwd,
+      Command.QUEUE,
+      QueueSubCommand.STOP,
+      ...args
+    )
   }
 
   public remove(cwd: string, ...args: Args) {

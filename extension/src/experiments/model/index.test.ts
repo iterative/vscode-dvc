@@ -37,7 +37,7 @@ describe('ExperimentsModel', () => {
 
   const [
     workspaceColor,
-    branchColor,
+    commitColor,
     expColor,
     fourthColor,
     fifthColor,
@@ -212,7 +212,7 @@ describe('ExperimentsModel', () => {
       ''
     )
 
-    const experiments = model.getAllExperiments()
+    const experiments = model.getRecordsWithoutCheckpoints()
 
     const changed: string[] = []
     for (const { deps, sha } of experiments) {
@@ -230,7 +230,7 @@ describe('ExperimentsModel', () => {
   it('should handle deps have all null properties (never been committed)', () => {
     const model = new ExperimentsModel('', buildMockMemento())
     model.transformAndSet(uncommittedDepsFixture, false, '')
-    const [workspace] = model.getExperiments()
+    const [workspace] = model.getWorkspaceAndCommits()
     expect(workspace.deps).toStrictEqual({})
   })
 
@@ -363,7 +363,7 @@ describe('ExperimentsModel', () => {
         label: EXPERIMENT_WORKSPACE_ID
       }),
       expect.objectContaining({
-        displayColor: branchColor,
+        displayColor: commitColor,
         id: 'testBranch',
         label: 'testBranch'
       }),
@@ -429,12 +429,12 @@ describe('ExperimentsModel', () => {
     expect((experimentsModel as any).useFiltersForSelection).toBe(false)
   })
 
-  it('should fetch branch params', () => {
+  it('should fetch commit params', () => {
     const model = new ExperimentsModel('', buildMockMemento())
     model.transformAndSet(outputFixture, false, '')
 
-    const branchParams = model.getExperimentParams('main')
-    expect(definedAndNonEmpty(branchParams)).toBe(true)
+    const commitParams = model.getExperimentParams('main')
+    expect(definedAndNonEmpty(commitParams)).toBe(true)
   })
 
   it('should fetch workspace params', () => {

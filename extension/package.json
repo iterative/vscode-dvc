@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.5.38",
+  "version": "0.5.39",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -217,11 +217,6 @@
         "category": "DVC"
       },
       {
-        "title": "%command.killExperimentsRunningInQueue%",
-        "command": "dvc.killExperimentsRunningInQueue",
-        "category": "DVC"
-      },
-      {
         "title": "%command.moveTargets%",
         "command": "dvc.moveTargets",
         "category": "DVC"
@@ -293,7 +288,7 @@
       },
       {
         "title": "%command.removeExperiments%",
-        "command": "dvc.removeExperiment",
+        "command": "dvc.removeExperiments",
         "category": "DVC"
       },
       {
@@ -311,11 +306,6 @@
         "command": "dvc.removeExperimentsTableSorts",
         "category": "DVC",
         "icon": "$(close-all)"
-      },
-      {
-        "title": "%command.removeQueuedExperiment%",
-        "command": "dvc.removeQueuedExperiment",
-        "category": "DVC"
       },
       {
         "title": "%command.removeTarget%",
@@ -349,6 +339,11 @@
       {
         "title": "%command.stopExperimentsQueue%",
         "command": "dvc.stopExperimentsQueue",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.stopQueuedExperiments%",
+        "command": "dvc.stopQueuedExperiments",
         "category": "DVC"
       },
       {
@@ -412,8 +407,8 @@
         "category": "DVC"
       },
       {
-        "title": "%command.stopRunningExperiment%",
-        "command": "dvc.stopRunningExperiment",
+        "title": "%command.stopAllRunningExperiments%",
+        "command": "dvc.stopAllRunningExperiments",
         "category": "DVC",
         "icon": "$(debug-stop)"
       },
@@ -696,10 +691,6 @@
           "when": "dvc.commands.available && !dvc.cli.incompatible && !dvc.project.available && !dvc.scm.command.running"
         },
         {
-          "command": "dvc.killExperimentsRunningInQueue",
-          "when": "dvc.commands.available && dvc.project.available"
-        },
-        {
           "command": "dvc.moveTargets",
           "when": "false"
         },
@@ -744,7 +735,7 @@
           "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
         },
         {
-          "command": "dvc.removeExperiment",
+          "command": "dvc.removeExperiments",
           "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
         },
         {
@@ -758,10 +749,6 @@
         {
           "command": "dvc.removeExperimentsTableSorts",
           "when": "dvc.commands.available && dvc.project.available"
-        },
-        {
-          "command": "dvc.removeQueuedExperiment",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
         },
         {
           "command": "dvc.removeTarget",
@@ -793,6 +780,10 @@
         },
         {
           "command": "dvc.stopExperimentsQueue",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.stopQueuedExperiments",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
@@ -828,7 +819,7 @@
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
-          "command": "dvc.stopRunningExperiment",
+          "command": "dvc.stopAllRunningExperiments",
           "when": "dvc.commands.available && dvc.project.available && dvc.experiment.stoppable"
         },
         {
@@ -1000,7 +991,7 @@
           "when": "dvc.experiments.webview.active && !dvc.experiment.running && dvc.commands.available && !dvc.experiment.checkpoints"
         },
         {
-          "command": "dvc.stopRunningExperiment",
+          "command": "dvc.stopAllRunningExperiments",
           "group": "navigation@0",
           "when": "dvc.experiment.stoppable && dvc.commands.available"
         },
@@ -1144,22 +1135,22 @@
         {
           "command": "dvc.views.experiments.runExperiment",
           "group": "2_modify@1",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|branch|experiment|queued)$/ && !dvc.experiment.running && !dvc.experiment.checkpoints"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|commit|experiment|queued)$/ && !dvc.experiment.running && !dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.views.experiments.resetAndRunCheckpointExperiment",
           "group": "2_modify@1",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|branch|experiment|queued)$/ && !dvc.experiment.running && dvc.experiment.checkpoints"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|commit|experiment|queued)$/ && !dvc.experiment.running && dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.views.experiments.resumeCheckpointExperiment",
           "group": "2_modify@2",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|branch|experiment|queued)$/ && !dvc.experiment.running && dvc.experiment.checkpoints"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|commit|experiment|queued)$/ && !dvc.experiment.running && dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.views.experiments.queueExperiment",
           "group": "2_modify@3",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|branch|experiment|queued)$/ && !dvc.experiment.running"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|commit|experiment|queued)$/ && !dvc.experiment.running"
         }
       ],
       "view/title": [
@@ -1219,12 +1210,12 @@
           "group": "navigation@2"
         },
         {
-          "command": "dvc.stopRunningExperiment",
+          "command": "dvc.stopAllRunningExperiments",
           "when": "view == dvc.views.experimentsTree && !dvc.experiments.webview.active && dvc.experiment.stoppable",
           "group": "1_run@1"
         },
         {
-          "command": "dvc.stopRunningExperiment",
+          "command": "dvc.stopAllRunningExperiments",
           "when": "view == dvc.views.experimentsTree && dvc.experiments.webview.active && dvc.experiment.stoppable",
           "group": "navigation@1"
         },
@@ -1284,7 +1275,7 @@
           "group": "3_queue@3"
         },
         {
-          "command": "dvc.killExperimentsRunningInQueue",
+          "command": "dvc.stopQueuedExperiments",
           "when": "view == dvc.views.experimentsTree",
           "group": "3_queue@5"
         },
@@ -1615,7 +1606,7 @@
     "@types/chai-as-promised": "7.1.5",
     "@types/copy-webpack-plugin": "10.1.0",
     "@types/fs-extra": "11.0.1",
-    "@types/jest": "29.2.5",
+    "@types/jest": "29.2.6",
     "@types/js-yaml": "4.0.5",
     "@types/lodash.clonedeep": "4.5.7",
     "@types/lodash.get": "4.4.7",
@@ -1632,9 +1623,9 @@
     "@types/vscode": "1.64.0",
     "@vscode/test-electron": "2.2.2",
     "@vscode/vsce": "2.16.0",
-    "@wdio/cli": "8.1.3",
-    "@wdio/local-runner": "8.1.3",
-    "@wdio/mocha-framework": "8.1.2",
+    "@wdio/cli": "8.2.1",
+    "@wdio/local-runner": "8.2.1",
+    "@wdio/mocha-framework": "8.2.1",
     "@wdio/spec-reporter": "8.1.2",
     "chai": "4.3.7",
     "chai-as-promised": "7.1.1",
@@ -1653,7 +1644,7 @@
     "ts-loader": "9.4.2",
     "vscode-uri": "3.0.7",
     "wdio-vscode-service": "5.0.0",
-    "webdriverio": "8.1.3",
+    "webdriverio": "8.2.1",
     "webpack": "5.75.0",
     "webpack-cli": "5.0.1"
   },

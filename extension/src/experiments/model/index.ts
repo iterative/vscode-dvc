@@ -31,7 +31,7 @@ import { collectFlatExperimentParams } from './modify/collect'
 import {
   Experiment,
   isQueued,
-  isRunning,
+  isRunningInQueue,
   Row,
   RunningExperiment
 } from '../webview/contract'
@@ -63,7 +63,7 @@ export type ExperimentWithCheckpoints = Experiment & {
 
 export enum ExperimentType {
   WORKSPACE = 'workspace',
-  BRANCH = 'branch',
+  COMMIT = 'commit',
   EXPERIMENT = 'experiment',
   CHECKPOINT = 'checkpoint',
   QUEUED = 'queued'
@@ -71,8 +71,8 @@ export enum ExperimentType {
 
 export class ExperimentsModel extends ModelWithPersistence {
   private workspace = {} as Experiment
-  private branches: Experiment[] = []
-  private experimentsByBranch: Map<string, Experiment[]> = new Map()
+  private commits: Experiment[] = []
+  private experimentsByCommit: Map<string, Experiment[]> = new Map()
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
   private availableColors: Color[]
   private coloredStatus: ColoredStatus
@@ -124,15 +124,15 @@ export class ExperimentsModel extends ModelWithPersistence {
   ) {
     const {
       workspace,
-      branches,
-      experimentsByBranch,
+      commits,
+      experimentsByCommit,
       checkpointsByTip,
       runningExperiments
     } = collectExperiments(data, dvcLiveOnly, commitsOutput)
 
     this.workspace = workspace
-    this.branches = branches
-    this.experimentsByBranch = experimentsByBranch
+    this.commits = commits
+    this.experimentsByCommit = experimentsByCommit
     this.checkpointsByTip = checkpointsByTip
 
     this.setColoredStatus(runningExperiments)
@@ -148,7 +148,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   public toggleStatus(id: string) {
     if (
       isQueued(
-        this.getFlattenedExperiments().find(
+        this.getExperimentsAndQueued().find(
           ({ id: queuedId }) => queuedId === id
         )?.status
       )
@@ -185,7 +185,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public setRevisionCollected(revisions: string[]) {
-    for (const { id } of this.getFlattenedExperiments().filter(({ label }) =>
+    for (const { id } of this.getExperimentsAndQueued().filter(({ label }) =>
       revisions.includes(label)
     )) {
       if (this.finishedRunning[id]) {
@@ -264,8 +264,8 @@ export class ExperimentsModel extends ModelWithPersistence {
     return result
   }
 
-  public getBranchRevisions() {
-    return this.branches.map(({ id, sha }) => ({ id, sha }))
+  public getCommitRevisions() {
+    return this.commits.map(({ id, sha }) => ({ id, sha }))
   }
 
   public getRevisions() {
@@ -273,7 +273,10 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getMutableRevisions(hasCheckpoints: boolean) {
-    return collectMutableRevisions(this.getAllExperiments(), hasCheckpoints)
+    return collectMutableRevisions(
+      this.getRecordsWithoutCheckpoints(),
+      hasCheckpoints
+    )
   }
 
   public getSelectedRevisions() {
@@ -281,7 +284,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getSelectedExperiments() {
-    return this.getSelectedFromList(() => this.getFlattenedExperiments())
+    return this.getSelectedFromList(() => this.getExperimentsAndQueued())
   }
 
   public setSelected(selectedExperiments: Experiment[]) {
@@ -309,7 +312,7 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public getUnfilteredExperiments(filters = this.getFilters()) {
     const unfilteredExperiments = this.getSubRows(
-      this.getAllExperiments(),
+      this.getRecordsWithoutCheckpoints(),
       filters
     )
 
@@ -330,25 +333,25 @@ export class ExperimentsModel extends ModelWithPersistence {
     )
   }
 
-  public getExperiments(): ExperimentAugmented[] {
+  public getWorkspaceAndCommits(): ExperimentAugmented[] {
     return [
       {
         ...this.addDetails(this.workspace),
         hasChildren: false,
         type: ExperimentType.WORKSPACE
       },
-      ...this.branches.map(branch => {
+      ...this.commits.map(commit => {
         return {
-          ...this.addDetails(branch),
-          hasChildren: !!this.experimentsByBranch.get(branch.label),
-          type: ExperimentType.BRANCH
+          ...this.addDetails(commit),
+          hasChildren: !!this.experimentsByCommit.get(commit.label),
+          type: ExperimentType.COMMIT
         }
       })
     ]
   }
 
-  public getAllExperiments() {
-    return [...this.getExperiments(), ...this.getFlattenedExperiments()]
+  public getRecordsWithoutCheckpoints() {
+    return [...this.getWorkspaceAndCommits(), ...this.getExperimentsAndQueued()]
   }
 
   public getErrors() {
@@ -361,7 +364,7 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public getExperimentsWithCheckpoints(): ExperimentWithCheckpoints[] {
     const experimentsWithCheckpoints: ExperimentWithCheckpoints[] = []
-    for (const experiment of this.getAllExperiments()) {
+    for (const experiment of this.getRecordsWithoutCheckpoints()) {
       const { id, status } = experiment
       if (isQueued(status)) {
         continue
@@ -378,24 +381,28 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getExperimentParams(id: string) {
-    const params = this.getAllExperiments().find(
+    const params = this.getRecordsWithoutCheckpoints().find(
       experiment => experiment.id === id
     )?.params
 
     return collectFlatExperimentParams(params)
   }
 
-  public getCurrentExperiments() {
-    return this.splitExperimentsByQueued()
+  public getExperiments() {
+    return this.getExperimentsAndQueued().filter(({ status }) => {
+      return !isQueued(status)
+    })
   }
 
-  public getQueuedExperiments() {
-    return this.splitExperimentsByQueued(true)
+  public getExperimentsAndQueued() {
+    return flattenMapValues(this.experimentsByCommit).map(experiment =>
+      this.addDetails(experiment)
+    )
   }
 
   public getRunningQueueTasks() {
-    return this.getFlattenedExperiments().filter(
-      ({ status, executor }) => isRunning(status) && executor === 'dvc-task'
+    return this.getExperimentsAndQueued().filter(experiment =>
+      isRunningInQueue(experiment)
     )
   }
 
@@ -411,16 +418,16 @@ export class ExperimentsModel extends ModelWithPersistence {
   public getRowData() {
     return [
       this.addDetails(this.workspace),
-      ...this.branches.map(branch => {
-        const experiments = this.getExperimentsByBranch(branch)
-        const branchWithSelectedAndStarred = this.addDetails(branch)
+      ...this.commits.map(commit => {
+        const experiments = this.getExperimentsByCommit(commit)
+        const commitWithSelectedAndStarred = this.addDetails(commit)
 
         if (!definedAndNonEmpty(experiments)) {
-          return branchWithSelectedAndStarred
+          return commitWithSelectedAndStarred
         }
 
         return {
-          ...branchWithSelectedAndStarred,
+          ...commitWithSelectedAndStarred,
           subRows: this.getSubRows(experiments)
         }
       })
@@ -438,8 +445,8 @@ export class ExperimentsModel extends ModelWithPersistence {
   public getExperimentCount() {
     return sum([
       this.getFlattenedCheckpoints().length,
-      this.getFlattenedExperiments().length,
-      this.branches.length,
+      this.getExperimentsAndQueued().length,
+      this.commits.length,
       1
     ])
   }
@@ -452,14 +459,14 @@ export class ExperimentsModel extends ModelWithPersistence {
   public getCombinedList() {
     return [
       this.workspace,
-      ...this.branches,
-      ...this.getFlattenedExperiments(),
+      ...this.commits,
+      ...this.getExperimentsAndQueued(),
       ...this.getFlattenedCheckpoints()
     ]
   }
 
-  public getExperimentsByBranchForTree(branch: Experiment) {
-    return this.getExperimentsByBranch(branch)?.map(experiment => ({
+  public getExperimentsByCommitForTree(commit: Experiment) {
+    return this.getExperimentsByCommit(commit)?.map(experiment => ({
       ...experiment,
       hasChildren: definedAndNonEmpty(this.checkpointsByTip.get(experiment.id)),
       type: isQueued(experiment.status)
@@ -505,7 +512,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   private getFilteredExperiments() {
     const acc: ExperimentWithType[] = []
 
-    for (const experiment of this.getCurrentExperiments()) {
+    for (const experiment of this.getExperiments()) {
       const checkpoints = this.getCheckpointsWithType(experiment.id) || []
       collectFiltered(acc, this.getFilters(), experiment, checkpoints)
     }
@@ -531,29 +538,14 @@ export class ExperimentsModel extends ModelWithPersistence {
       ?.map(checkpoint => this.addDetails(checkpoint))
   }
 
-  private getExperimentsByBranch(branch: Experiment) {
-    const experiments = this.experimentsByBranch
-      .get(branch.label)
+  private getExperimentsByCommit(commit: Experiment) {
+    const experiments = this.experimentsByCommit
+      .get(commit.label)
       ?.map(experiment => this.addDetails(experiment))
     if (!experiments) {
       return
     }
     return sortExperiments(this.getSorts(), experiments)
-  }
-
-  private getFlattenedExperiments() {
-    return flattenMapValues(this.experimentsByBranch).map(experiment =>
-      this.addDetails(experiment)
-    )
-  }
-
-  private splitExperimentsByQueued(getQueued = false) {
-    return this.getFlattenedExperiments().filter(({ status }) => {
-      if (getQueued) {
-        return isQueued(status)
-      }
-      return !isQueued(status)
-    })
   }
 
   private getFlattenedCheckpoints() {
@@ -570,9 +562,9 @@ export class ExperimentsModel extends ModelWithPersistence {
       return
     }
     const { coloredStatus, availableColors } = collectColoredStatus(
-      this.getExperiments(),
+      this.getWorkspaceAndCommits(),
       this.checkpointsByTip,
-      this.experimentsByBranch,
+      this.experimentsByCommit,
       this.coloredStatus,
       this.availableColors,
       this.startedRunning,
@@ -593,7 +585,7 @@ export class ExperimentsModel extends ModelWithPersistence {
 
     this.finishedRunning = collectFinishedRunningExperiments(
       { ...this.finishedRunning },
-      this.getFlattenedExperiments(),
+      this.getExperimentsAndQueued(),
       this.running,
       stillRunning,
       this.coloredStatus

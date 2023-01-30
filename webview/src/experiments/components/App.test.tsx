@@ -196,7 +196,7 @@ describe('App', () => {
       expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
     })
 
-    it('should maintain expansion status when the branch changes', () => {
+    it('should maintain expansion status when the commit changes', () => {
       renderTable()
 
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
@@ -209,14 +209,14 @@ describe('App', () => {
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
 
-      const changedBranchName = 'changed-branch'
+      const changedCommitName = 'changed-branch'
 
       const changedRows = [...tableDataFixture.rows]
       changedRows[1] = {
         ...changedRows[1],
-        id: changedBranchName,
-        label: changedBranchName,
-        name: changedBranchName,
+        id: changedCommitName,
+        label: changedCommitName,
+        name: changedCommitName,
         sha: '99999dfb4aa5fb41915610c3a256b418fc095610'
       }
 
@@ -225,7 +225,7 @@ describe('App', () => {
         rows: changedRows
       })
 
-      expect(screen.getByText(changedBranchName)).toBeInTheDocument()
+      expect(screen.getByText(changedCommitName)).toBeInTheDocument()
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
       expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
     })
@@ -736,10 +736,8 @@ describe('App', () => {
 
     it('should have the same options in the empty placeholders', () => {
       renderTableWithPlaceholder()
-      const header = screen.getByTestId('header-timestamp')
-      const placeholders = screen.getAllByTestId(
-        /header-timestamp.+placeholder/
-      )
+      const header = screen.getByTestId('header-Created')
+      const placeholders = screen.getAllByTestId(/header-Created.+placeholder/)
       const entireColumn = [header, ...placeholders]
 
       expect(entireColumn).toHaveLength(5)
@@ -787,7 +785,7 @@ describe('App', () => {
       it('should send the column id and not the placeholder id as the message payload', () => {
         renderTableWithPlaceholder()
         const placeholders = screen.getAllByTestId(
-          /header-timestamp.+placeholder/
+          /header-Created.+placeholder/
         )
         const placeholder = placeholders[0]
         fireEvent.contextMenu(placeholder, { bubbles: true })
@@ -801,7 +799,7 @@ describe('App', () => {
 
         expect(mockPostMessage).toHaveBeenCalledTimes(1)
         expect(mockPostMessage).toHaveBeenCalledWith({
-          payload: 'timestamp',
+          payload: 'Created',
           type: MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN
         })
       })
@@ -874,6 +872,7 @@ describe('App', () => {
         'Modify and Resume',
         'Modify and Queue',
         'Star',
+        'Stop',
         'Remove'
       ])
 
@@ -888,7 +887,7 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(9)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(10)
 
       fireEvent.click(window, { bubbles: true })
       advanceTimersByTime(100)
@@ -902,10 +901,10 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(9)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(10)
 
-      const branch = getRow('main')
-      fireEvent.click(branch, { bubbles: true })
+      const commit = getRow('main')
+      fireEvent.click(commit, { bubbles: true })
       advanceTimersByTime(100)
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })
@@ -917,13 +916,13 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(9)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(10)
 
       fireEvent.contextMenu(within(row).getByText('[exp-e7a67]'), {
         bubbles: true
       })
       advanceTimersByTime(200)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(9)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(10)
     })
 
     it('should present the Remove experiment option for the checkpoint tips', () => {
@@ -963,6 +962,33 @@ describe('App', () => {
       expect(sendMessage).toHaveBeenCalledWith({
         payload: ['exp-e7a67', 'test-branch'],
         type: MessageFromWebviewType.REMOVE_EXPERIMENT
+      })
+    })
+
+    it('should present the Stop option if rows that are running in the queue are selected', () => {
+      renderTableWithoutRunningExperiments()
+
+      clickRowCheckbox('4fb124a')
+
+      const target = screen.getByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems.map(item => item.textContent)
+      expect(itemLabels).toContain('Stop')
+
+      const stopOption = menuitems.find(item =>
+        item.textContent?.includes('Stop')
+      )
+
+      expect(stopOption).toBeDefined()
+
+      stopOption && fireEvent.click(stopOption)
+
+      expect(sendMessage).toHaveBeenCalledWith({
+        payload: ['exp-e7a67'],
+        type: MessageFromWebviewType.STOP_EXPERIMENT
       })
     })
 

@@ -172,7 +172,7 @@ suite('Experiments Tree Test Suite', () => {
       })
       const isWorkspaceSelected = (): boolean =>
         !!experiments
-          .getExperiments()
+          .getWorkspaceAndCommits()
           .find(({ id }) => id === EXPERIMENT_WORKSPACE_ID)?.selected
 
       await experiments.isReady()

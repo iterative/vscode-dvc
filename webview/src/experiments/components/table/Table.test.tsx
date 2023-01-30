@@ -192,7 +192,7 @@ describe('Table', () => {
     it('should not have the workspaceChange class on a cell if there are no changes', async () => {
       renderExperimentsTable()
 
-      const row = await screen.findByTestId('timestamp___workspace')
+      const row = await screen.findByTestId('Created___workspace')
 
       expect(row?.className.includes(styles.workspaceChange)).toBe(false)
     })
@@ -200,15 +200,15 @@ describe('Table', () => {
     it('should not have the workspaceChange class on a cell if there are changes to other columns but not this one', async () => {
       renderExperimentsTable({ changes: ['a_change'] })
 
-      const row = await screen.findByTestId('timestamp___workspace')
+      const row = await screen.findByTestId('Created___workspace')
 
       expect(row?.className.includes(styles.workspaceChange)).toBe(false)
     })
 
     it('should have the workspaceChange class on a cell if there are changes matching the column id', async () => {
-      renderExperimentsTable({ changes: ['timestamp'] })
+      renderExperimentsTable({ changes: ['Created'] })
 
-      const row = await screen.findByTestId('timestamp___workspace')
+      const row = await screen.findByTestId('Created___workspace')
 
       expect(row?.className.includes(styles.workspaceChange)).toBe(true)
     })
@@ -250,13 +250,7 @@ describe('Table', () => {
     })
 
     it('should order the columns with the columnOrder from the data', async () => {
-      const columnOrder = [
-        'id',
-        'timestamp',
-        'params:C',
-        'params:B',
-        'params:A'
-      ]
+      const columnOrder = ['id', 'Created', 'params:C', 'params:B', 'params:A']
       const tableDataWithCustomColOrder = {
         ...sortingTableDataFixture,
         columnOrder

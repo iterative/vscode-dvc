@@ -84,13 +84,13 @@ export interface ExperimentFieldsOrError {
   error?: ErrorContents
 }
 
-export interface ExperimentsBranchOutput {
+export interface ExperimentsCommitOutput {
   [sha: string]: ExperimentFieldsOrError
   baseline: ExperimentFieldsOrError
 }
 
 export interface ExperimentsOutput {
-  [name: string]: ExperimentsBranchOutput
+  [name: string]: ExperimentsCommitOutput
   [EXPERIMENT_WORKSPACE_ID]: {
     baseline: ExperimentFieldsOrError
   }

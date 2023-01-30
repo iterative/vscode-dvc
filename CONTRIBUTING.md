@@ -58,8 +58,8 @@ First, ensure that [Visual Studio Code](https://code.visualstudio.com) and
 
 ## The demo project
 
-The [demo project](demo) is provided as a lightweight, convenient testbed to try
-your changes to this extension.
+The [demo project](https://github.com/iterative/vscode-dvc-demo) is provided as
+a lightweight, convenient testbed to try your changes to this extension.
 
 > **Note**: It is not an exhaustive showcase of DVC's features. Testers are
 > encouraged to try other DVC repositories -- especially real-world cases!

@@ -246,15 +246,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   }
 
   public getCwdAndExpNameThenRun(commandId: CommandId) {
-    return this.pickExpThenRun(commandId, cwd =>
-      this.pickCurrentExperiment(cwd)
-    )
-  }
-
-  public getQueuedExpThenRun(commandId: CommandId) {
-    return this.pickExpThenRun(commandId, cwd =>
-      this.getRepository(cwd).pickQueuedExperiment()
-    )
+    return this.pickExpThenRun(commandId, cwd => this.pickExperiment(cwd))
   }
 
   public async getCwdAndQuickPickThenRun(
@@ -281,7 +273,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    const experiment = await this.pickCurrentExperiment(cwd)
+    const experiment = await this.pickExperiment(cwd)
 
     if (!experiment) {
       return
@@ -438,6 +430,12 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return pids
   }
 
+  public hasQueuedExperimentsRunning() {
+    return Object.values(this.repositories).some(experiments =>
+      experiments.hasRunningQueuedExperiment()
+    )
+  }
+
   private async pickExpThenRun(
     commandId: CommandId,
     pickFunc: (
@@ -469,7 +467,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return runCommand(...args, input)
   }
 
-  private pickCurrentExperiment(cwd: string) {
-    return this.getRepository(cwd).pickCurrentExperiment()
+  private pickExperiment(cwd: string) {
+    return this.getRepository(cwd).pickExperiment()
   }
 }

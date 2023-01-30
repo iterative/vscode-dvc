@@ -65,7 +65,7 @@ describe('findAbsoluteDvcRootPath', () => {
       Promise.resolve('..')
     )
 
-    expect(dvcRoots).toStrictEqual([dvcDemoPath])
+    expect(dvcRoots).toStrictEqual(dvcDemoPath)
   })
 
   it('should return an empty array given no dvc root in or above the given directory', async () => {
@@ -73,7 +73,7 @@ describe('findAbsoluteDvcRootPath', () => {
       __dirname,
       Promise.resolve(undefined)
     )
-    expect(dvcRoots).toStrictEqual([])
+    expect(dvcRoots).toBeUndefined()
   })
 })
 

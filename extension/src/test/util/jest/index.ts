@@ -32,13 +32,13 @@ export const buildMockedExperiments = () => {
   const mockedExperimentsChanged = buildMockedEventEmitter()
   const mockedGetChildColumns = jest.fn()
   const mockedGetDvcRoots = jest.fn()
-  const mockedGetExperiments = jest.fn()
+  const mockedGetWorkspaceAndCommits = jest.fn()
   const mockedGetCheckpoints = jest.fn()
   const mockedGetFilters = jest.fn()
   const mockedGetFilter = jest.fn()
   const mockedGetSorts = jest.fn()
   const mockedGetSelectedRevisions = jest.fn()
-  const mockedGetBranchExperiments = jest.fn()
+  const mockedGetCommitExperiments = jest.fn()
   const mockedGetFirstThreeColumnOrder = jest.fn()
   const mockedExperiments = {
     columnsChanged: mockedColumnsChanged,
@@ -46,15 +46,15 @@ export const buildMockedExperiments = () => {
     getDvcRoots: mockedGetDvcRoots,
     getRepository: () =>
       ({
-        getBranchExperiments: mockedGetBranchExperiments,
         getCheckpoints: mockedGetCheckpoints,
         getChildColumns: mockedGetChildColumns,
-        getExperiments: mockedGetExperiments,
+        getCommitExperiments: mockedGetCommitExperiments,
         getFilter: mockedGetFilter,
         getFilters: mockedGetFilters,
         getFirstThreeColumnOrder: mockedGetFirstThreeColumnOrder,
         getSelectedRevisions: mockedGetSelectedRevisions,
-        getSorts: mockedGetSorts
+        getSorts: mockedGetSorts,
+        getWorkspaceAndCommits: mockedGetWorkspaceAndCommits
       } as unknown as Experiments),
     isReady: () => true
   } as unknown as WorkspaceExperiments
@@ -64,16 +64,16 @@ export const buildMockedExperiments = () => {
     mockedColumnsOrderOrStatusChanged,
     mockedExperiments,
     mockedExperimentsChanged,
-    mockedGetBranchExperiments,
     mockedGetCheckpoints,
     mockedGetChildColumns,
+    mockedGetCommitExperiments,
     mockedGetDvcRoots,
-    mockedGetExperiments,
     mockedGetFilter,
     mockedGetFilters,
     mockedGetFirstThreeColumnOrder,
     mockedGetSelectedRevisions,
-    mockedGetSorts
+    mockedGetSorts,
+    mockedGetWorkspaceAndCommits
   }
 }
 

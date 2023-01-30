@@ -134,7 +134,6 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_METRICS_AND_PARAMS_TOGGLE]: undefined
   [EventName.EXPERIMENT_REMOVE]: undefined
   [EventName.EXPERIMENT_REMOVE_QUEUE]: undefined
-  [EventName.EXPERIMENT_REMOVE_QUEUED]: undefined
   [EventName.EXPERIMENT_RESUME]: undefined
   [EventName.EXPERIMENT_RUN]: undefined
   [EventName.EXPERIMENT_RESET_AND_RUN]: undefined
@@ -153,6 +152,7 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_VIEW_REMOVE]: undefined
   [EventName.EXPERIMENT_VIEW_SHARE_AS_BRANCH]: undefined
   [EventName.EXPERIMENT_VIEW_SHARE_AS_COMMIT]: undefined
+  [EventName.EXPERIMENT_VIEW_STOP]: undefined
   [EventName.QUEUE_EXPERIMENT]: undefined
   [EventName.QUEUE_KILL]: undefined
   [EventName.QUEUE_START]: undefined
@@ -167,7 +167,7 @@ export interface IEventNamePropertyMapping {
   [EventName.MODIFY_EXPERIMENT_PARAMS_AND_RESUME]: undefined
   [EventName.MODIFY_EXPERIMENT_PARAMS_AND_RUN]: undefined
   [EventName.MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN]: undefined
-  [EventName.STOP_EXPERIMENT]: { stopped: boolean; wasRunning: boolean }
+  [EventName.STOP_EXPERIMENTS]: { stopped: boolean; wasRunning: boolean }
 
   [EventName.PLOTS_PATH_TOGGLE]: undefined
   [EventName.PLOTS_SHOW]: undefined

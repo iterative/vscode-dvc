@@ -4,7 +4,7 @@ import isEmpty from 'lodash.isempty'
 import { SetupData as TSetupData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { findPythonBinForInstall } from './autoInstall'
-import { run, runWithGlobalRecheck, runWorkspace } from './runner'
+import { run, runWithRecheck, runWorkspace } from './runner'
 import { pickFocusedProjects } from './quickPick'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
@@ -270,12 +270,12 @@ export class Setup
   }
 
   private async findWorkspaceDvcRoots(): Promise<string[]> {
-    const dvcRoots: string[] = []
+    let dvcRoots: Set<string> = new Set()
 
     for (const workspaceFolder of getWorkspaceFolders()) {
       const workspaceFolderRoots = await findDvcRootPaths(workspaceFolder)
       if (definedAndNonEmpty(workspaceFolderRoots)) {
-        dvcRoots.push(...workspaceFolderRoots)
+        dvcRoots = new Set([...dvcRoots, ...workspaceFolderRoots])
         continue
       }
 
@@ -285,14 +285,14 @@ export class Setup
         this.dvcReader.root(workspaceFolder)
       )
       if (absoluteRoot) {
-        dvcRoots.push(...absoluteRoot)
+        dvcRoots.add(absoluteRoot)
       }
     }
 
-    const hasMultipleRoots = dvcRoots.length > 1
+    const hasMultipleRoots = dvcRoots.size > 1
     void setContextValue(ContextKey.MULTIPLE_PROJECTS, hasMultipleRoots)
 
-    return dvcRoots
+    return [...dvcRoots]
   }
 
   private setCommandsAvailability(available: boolean) {
@@ -435,7 +435,7 @@ export class Setup
         const stopWatch = new StopWatch()
         try {
           void this.sendDataToWebview()
-          await run(this)
+          await runWithRecheck(this)
 
           return sendTelemetryEvent(
             EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
@@ -455,7 +455,7 @@ export class Setup
   }
 
   private watchPathForChanges(stopWatch: StopWatch) {
-    runWithGlobalRecheck(this)
+    runWithRecheck(this)
       .then(async () => {
         sendTelemetryEvent(
           EventName.EXTENSION_LOAD,
