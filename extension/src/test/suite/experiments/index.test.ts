@@ -1063,6 +1063,35 @@ suite('Experiments Test Suite', () => {
       expect(mockShowPlots).to.be.calledOnce
       expect(mockShowPlots).to.be.calledWith(dvcDemoPath)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a message to stop experiments running in the queue', async () => {
+      const { experiments, dvcExecutor } = buildExperiments(disposable)
+      const mockQueueKill = stub(dvcExecutor, 'queueKill')
+
+      const experimentsKilled = new Promise(resolve =>
+        mockQueueKill.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve('')
+        })
+      )
+
+      await experiments.isReady()
+
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockExperimentIds = ['exp-e7a67', 'test-branch']
+
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
+
+      mockMessageReceived.fire({
+        payload: mockExperimentIds,
+        type: MessageFromWebviewType.STOP_EXPERIMENT
+      })
+
+      await experimentsKilled
+
+      expect(mockQueueKill).to.be.calledWith(dvcDemoPath, ...mockExperimentIds)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 
   describe('Sorting', () => {
