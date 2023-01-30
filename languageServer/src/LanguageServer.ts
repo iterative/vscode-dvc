@@ -1,3 +1,4 @@
+import { dirname, join } from 'path'
 import {
   TextDocuments,
   InitializeResult,
@@ -11,7 +12,7 @@ import {
   Position,
   Range,
   DocumentSymbol,
-  TextDocumentItem
+  Connection
 } from 'vscode-languageserver/node'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import { URI } from 'vscode-uri'
@@ -19,7 +20,6 @@ import { TextDocumentWrapper } from './TextDocumentWrapper'
 
 export class LanguageServer {
   private documentsKnownToEditor!: TextDocuments<TextDocument>
-  private documentsFromDvcClient: TextDocumentWrapper[] = []
 
   public listen(connection: _Connection) {
     this.documentsKnownToEditor = new TextDocuments(TextDocument)
@@ -31,26 +31,8 @@ export class LanguageServer {
         return null
       }
 
-      return this.onDefinition(params)
+      return this.onDefinition(params, connection)
     })
-
-    connection.onRequest(
-      'initialTextDocuments',
-      (params: { textDocuments: TextDocumentItem[] }) => {
-        this.documentsFromDvcClient = params.textDocuments.map(
-          ({ uri, languageId, version, text: content }) => {
-            const textDocument = TextDocument.create(
-              uri,
-              languageId,
-              version,
-              content
-            )
-
-            return this.wrap(textDocument)
-          }
-        )
-      }
-    )
 
     this.documentsKnownToEditor.listen(connection)
 
@@ -59,32 +41,18 @@ export class LanguageServer {
 
   private getAllDocuments() {
     const openDocuments = this.documentsKnownToEditor.all()
-    const acc: TextDocumentWrapper[] = openDocuments.map(doc => this.wrap(doc))
-
-    for (const textDocument of this.documentsFromDvcClient) {
-      const userAlreadyOpenedIt = this.documentsKnownToEditor.get(
-        textDocument.uri
-      )
-
-      if (!userAlreadyOpenedIt) {
-        acc.push(textDocument)
-      }
-    }
-
-    return acc
+    return openDocuments.map(doc => this.wrap(doc))
   }
 
   private getDvcTextDocument(
     params: TextDocumentPositionParams | CodeActionParams
   ) {
     const uri = params.textDocument.uri
+
     const doc = this.documentsKnownToEditor.get(uri)
 
     if (!doc) {
-      const alternative = this.documentsFromDvcClient.find(
-        txtDoc => txtDoc.uri === uri
-      )
-      return alternative ?? null
+      return null
     }
 
     return this.wrap(doc)
@@ -132,7 +100,8 @@ export class LanguageServer {
     return locationsAccumulator
   }
 
-  private onDefinition(params: DefinitionParams) {
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+  private async onDefinition(params: DefinitionParams, connection: Connection) {
     const document = this.getDvcTextDocument(params)
     const symbolUnderCursor = document?.symbolAt(params.position)
 
@@ -146,6 +115,33 @@ export class LanguageServer {
       )
 
       locationsAccumulator.push(...fileLocations)
+
+      for (const possibleFile of symbolUnderCursor.name.split(' ')) {
+        const possiblePath = join(
+          dirname(document.uri).replace('file:///', ''),
+          possibleFile
+        )
+        const isFile = await connection.sendRequest<{
+          languageId: string
+          text: string
+          uri: URI
+          version: number
+        } | null>('isFile', possiblePath)
+        if (isFile) {
+          const { languageId, text, version } = isFile
+          const doc = TextDocument.create(
+            possiblePath,
+            languageId,
+            version,
+            text
+          )
+          const start = Position.create(0, 0)
+          const end = doc.positionAt(doc.getText().length - 1)
+          const range = Range.create(start, end)
+
+          locationsAccumulator.push(Location.create(possiblePath, range))
+        }
+      }
 
       const locationsFromOtherDocuments = this.getLocationsFromOtherDocuments(
         symbolUnderCursor,

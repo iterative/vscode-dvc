@@ -1,3 +1,4 @@
+import { extname } from 'path'
 import { Uri, workspace } from 'vscode'
 import {
   LanguageClient,
@@ -5,10 +6,9 @@ import {
   ServerOptions,
   TransportKind
 } from 'vscode-languageclient/node'
-import { documentSelector, serverModule } from 'dvc-vscode-lsp'
 import { readFileSync } from 'fs-extra'
+import { documentSelector, serverModule } from 'dvc-vscode-lsp'
 import { Disposable } from '../class/dispose'
-import { findFiles } from '../fileSystem/workspace'
 
 export class LanguageClientWrapper extends Disposable {
   private client: LanguageClient
@@ -35,33 +35,27 @@ export class LanguageClientWrapper extends Disposable {
       )
     )
 
-    // Start the client. This will also launch the server
-    void this.start()
-  }
-
-  async start() {
-    await this.client.start()
-
-    const files = await findFiles('**/*.{yaml,json,py,toml}', '.??*')
-
-    const textDocuments = files.map(filePath => {
-      const uri = Uri.file(filePath).toString()
-      const languageId = filePath.endsWith('yaml') ? 'yaml' : 'json'
-      const text = readFileSync(filePath, 'utf8')
-
-      return {
-        languageId,
-        text,
-        uri,
-        version: 0
+    this.client.onRequest('isFile', (path: string) => {
+      const uri = Uri.file(path).toString()
+      const languageId = extname(path) === '.py' ? 'python' : 'other'
+      try {
+        const text = readFileSync(path, 'utf8')
+        return {
+          languageId,
+          text,
+          uri,
+          version: 0
+        }
+      } catch {
+        return null
       }
     })
 
-    await this.client.sendRequest('initialTextDocuments', {
-      textDocuments
-    })
+    void this.start()
+  }
 
-    return this
+  start() {
+    return this.client.start()
   }
 
   stop() {
