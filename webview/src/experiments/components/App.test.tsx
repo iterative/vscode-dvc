@@ -736,10 +736,8 @@ describe('App', () => {
 
     it('should have the same options in the empty placeholders', () => {
       renderTableWithPlaceholder()
-      const header = screen.getByTestId('header-timestamp')
-      const placeholders = screen.getAllByTestId(
-        /header-timestamp.+placeholder/
-      )
+      const header = screen.getByTestId('header-Created')
+      const placeholders = screen.getAllByTestId(/header-Created.+placeholder/)
       const entireColumn = [header, ...placeholders]
 
       expect(entireColumn).toHaveLength(5)
@@ -787,7 +785,7 @@ describe('App', () => {
       it('should send the column id and not the placeholder id as the message payload', () => {
         renderTableWithPlaceholder()
         const placeholders = screen.getAllByTestId(
-          /header-timestamp.+placeholder/
+          /header-Created.+placeholder/
         )
         const placeholder = placeholders[0]
         fireEvent.contextMenu(placeholder, { bubbles: true })
@@ -801,7 +799,7 @@ describe('App', () => {
 
         expect(mockPostMessage).toHaveBeenCalledTimes(1)
         expect(mockPostMessage).toHaveBeenCalledWith({
-          payload: 'timestamp',
+          payload: 'Created',
           type: MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN
         })
       })
