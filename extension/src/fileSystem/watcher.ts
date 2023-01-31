@@ -1,6 +1,12 @@
-import { join, relative } from 'path'
+import { relative } from 'path'
 import { utimes } from 'fs-extra'
-import { GlobPattern, RelativePattern, Uri, workspace } from 'vscode'
+import {
+  GlobPattern,
+  RelativePattern,
+  Uri,
+  workspace,
+  WorkspaceFolder
+} from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { isDirectory, isSameOrChild } from '.'
 
@@ -9,6 +15,17 @@ const getRelativePatternForOutsideWorkspace = (
   pattern: string
 ): RelativePattern => new RelativePattern(uri, pattern)
 
+const createRelativePattern = (
+  folder: WorkspaceFolder,
+  path: string,
+  pattern: string
+) => {
+  return new RelativePattern(
+    folder,
+    `${path}${path.length > 0 ? '/' : ''}${pattern}`
+  )
+}
+
 export const getRelativePattern = (
   path: string,
   pattern: string
@@ -16,10 +33,8 @@ export const getRelativePattern = (
   for (const workspaceFolder of workspace.workspaceFolders || []) {
     const workspaceFolderPath = workspaceFolder.uri.fsPath
     if (isSameOrChild(workspaceFolderPath, path)) {
-      return new RelativePattern(
-        workspaceFolder,
-        join(relative(workspaceFolderPath, path), pattern)
-      )
+      const relativePath = relative(workspaceFolderPath, path)
+      return createRelativePattern(workspaceFolder, relativePath, pattern)
     }
   }
 
