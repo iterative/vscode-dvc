@@ -9,3 +9,6 @@ export const truncateFromLeft = (str: string, length: number): string => {
 export const truncate = (str: string, length: number): string => {
   return str.length > length ? str.slice(0, length - 1) + '...' : str
 }
+
+export const joinWithForwardSlashes = (strings: string[]) =>
+  strings.filter(Boolean).join('/')
