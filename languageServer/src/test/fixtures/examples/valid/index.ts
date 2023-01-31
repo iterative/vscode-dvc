@@ -167,3 +167,30 @@ stages:
       - output
 
 `
+export const vars_dvc_yaml = `
+vars:
+- custom_params.yaml
+- models:
+      us:
+        threshold: 10
+- desc: 'Reusable description'
+- params.json
+- myvar: 'value'
+- config/myapp.yaml
+- params.json:clean,feats
+stages:
+  test_vars:
+    vars:
+      - params.json:build
+      - model:
+          filename: 'model-us.hdf5'
+    cmd: echo hello world
+  test_foreach_vars:
+    foreach: \${vars}
+    do:
+      vars:
+        - params.json:build
+        - model:
+            filename: 'model-us.hdf5'
+      cmd: echo \${item} \${model.filename}
+ `
