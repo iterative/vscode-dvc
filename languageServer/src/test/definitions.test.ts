@@ -1,7 +1,11 @@
 import { join } from 'path'
 import { Position, Range } from 'vscode-languageserver/node'
 import { URI } from 'vscode-uri'
-import { params_dvc_yaml, train_dvc_yaml } from './fixtures/examples/valid'
+import {
+  params_dvc_yaml,
+  plots_dvc_yaml,
+  train_dvc_yaml
+} from './fixtures/examples/valid'
 import { params } from './fixtures/params'
 import { train } from './fixtures/python'
 import { requestDefinitions } from './utils/requestDefinitions'
@@ -88,5 +92,22 @@ describe('textDocument/definitions', () => {
       range: Range.create(Position.create(0, 0), Position.create(7, 13)),
       uri: trainUri
     })
+  })
+
+  it('should return null if the provided symbol is not in the known documents and cannot be found on the file system', async () => {
+    mockedReadFileContents.mockResolvedValue(null)
+
+    const [dvcYaml] = await openTheseFilesAndNotifyServer([
+      {
+        languageId: 'yaml',
+        mockContents: plots_dvc_yaml,
+        mockPath: join(__dirname, 'dvc.yaml')
+      }
+    ])
+
+    const response = await requestDefinitions(dvcYaml, 'plot5')
+
+    expect(mockedReadFileContents).toHaveBeenCalledTimes(1)
+    expect(response).toBeNull()
   })
 })

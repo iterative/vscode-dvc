@@ -120,7 +120,7 @@ export class LanguageServer {
   }
 
   private getLocation(path: string, contents: string) {
-    const doc = this.wrap(TextDocument.create(path, 'python', 0, contents))
+    const doc = this.wrap(TextDocument.create(path, 'plain/text', 0, contents))
     return doc.getLocation()
   }
 
