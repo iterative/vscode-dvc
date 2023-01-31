@@ -1,3 +1,4 @@
+import { dirname } from 'path'
 import {
   TextDocuments,
   InitializeResult,
@@ -7,11 +8,9 @@ import {
   CodeActionParams,
   DefinitionParams,
   SymbolKind,
-  Location,
-  Position,
-  Range,
   DocumentSymbol,
-  TextDocumentItem
+  Connection,
+  Location
 } from 'vscode-languageserver/node'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import { URI } from 'vscode-uri'
@@ -19,7 +18,6 @@ import { TextDocumentWrapper } from './TextDocumentWrapper'
 
 export class LanguageServer {
   private documentsKnownToEditor!: TextDocuments<TextDocument>
-  private documentsFromDvcClient: TextDocumentWrapper[] = []
 
   public listen(connection: _Connection) {
     this.documentsKnownToEditor = new TextDocuments(TextDocument)
@@ -31,26 +29,8 @@ export class LanguageServer {
         return null
       }
 
-      return this.onDefinition(params)
+      return this.onDefinition(params, connection)
     })
-
-    connection.onRequest(
-      'initialTextDocuments',
-      (params: { textDocuments: TextDocumentItem[] }) => {
-        this.documentsFromDvcClient = params.textDocuments.map(
-          ({ uri, languageId, version, text: content }) => {
-            const textDocument = TextDocument.create(
-              uri,
-              languageId,
-              version,
-              content
-            )
-
-            return this.wrap(textDocument)
-          }
-        )
-      }
-    )
 
     this.documentsKnownToEditor.listen(connection)
 
@@ -59,32 +39,16 @@ export class LanguageServer {
 
   private getAllDocuments() {
     const openDocuments = this.documentsKnownToEditor.all()
-    const acc: TextDocumentWrapper[] = openDocuments.map(doc => this.wrap(doc))
-
-    for (const textDocument of this.documentsFromDvcClient) {
-      const userAlreadyOpenedIt = this.documentsKnownToEditor.get(
-        textDocument.uri
-      )
-
-      if (!userAlreadyOpenedIt) {
-        acc.push(textDocument)
-      }
-    }
-
-    return acc
+    return openDocuments.map(doc => this.wrap(doc))
   }
 
-  private getDvcTextDocument(
-    params: TextDocumentPositionParams | CodeActionParams
-  ) {
+  private getDocument(params: TextDocumentPositionParams | CodeActionParams) {
     const uri = params.textDocument.uri
+
     const doc = this.documentsKnownToEditor.get(uri)
 
     if (!doc) {
-      const alternative = this.documentsFromDvcClient.find(
-        txtDoc => txtDoc.uri === uri
-      )
-      return alternative ?? null
+      return null
     }
 
     return this.wrap(doc)
@@ -94,78 +58,70 @@ export class LanguageServer {
     return new TextDocumentWrapper(doc)
   }
 
-  private getFilePathLocations(
-    symbolUnderCursor: DocumentSymbol,
-    allDocs: TextDocumentWrapper[]
-  ) {
+  private getKnownDocumentLocations(symbolUnderCursor: DocumentSymbol) {
     if (symbolUnderCursor.kind !== SymbolKind.File) {
       return []
     }
 
     const filePath = symbolUnderCursor.name
 
-    const matchingFiles = allDocs.filter(doc =>
-      URI.file(doc.uri).fsPath.endsWith(filePath)
+    const matchingFiles = this.getAllDocuments().filter(doc =>
+      URI.parse(doc.uri).fsPath.endsWith(filePath)
     )
 
-    return matchingFiles.map(doc => {
-      const uri = doc.uri
-      const start = Position.create(0, 0)
-      const end = doc.positionAt(doc.getText().length - 1)
-      const range = Range.create(start, end)
-
-      return Location.create(uri, range)
-    })
+    return matchingFiles.map(doc => doc.getLocation())
   }
 
-  private getLocationsFromOtherDocuments(
-    symbolUnderCursor: DocumentSymbol,
-    allDocs: TextDocumentWrapper[]
-  ) {
-    const locationsAccumulator = []
+  private async onDefinition(params: DefinitionParams, connection: Connection) {
+    const document = this.getDocument(params)
 
-    for (const txtDoc of allDocs) {
-      const locations = txtDoc.findLocationsFor(symbolUnderCursor)
-      locationsAccumulator.push(...locations)
-    }
-
-    return locationsAccumulator
-  }
-
-  private onDefinition(params: DefinitionParams) {
-    const document = this.getDvcTextDocument(params)
     const symbolUnderCursor = document?.symbolAt(params.position)
 
-    if (document && symbolUnderCursor) {
-      const allDocs = this.getAllDocuments()
-      const locationsAccumulator = []
+    if (!(document && symbolUnderCursor)) {
+      return null
+    }
 
-      const fileLocations = this.getFilePathLocations(
+    const fileLocations = this.getKnownDocumentLocations(symbolUnderCursor)
+
+    if (fileLocations.length === 0) {
+      await this.checkIfSymbolsAreFiles(
+        connection,
+        document,
         symbolUnderCursor,
-        allDocs
+        fileLocations
       )
+    }
 
-      locationsAccumulator.push(...fileLocations)
-
-      const locationsFromOtherDocuments = this.getLocationsFromOtherDocuments(
-        symbolUnderCursor,
-        allDocs
-      )
-
-      locationsAccumulator.push(...locationsFromOtherDocuments)
-
-      const externalLocations = locationsAccumulator.filter(
-        location => location.uri !== document.uri
-      )
-
-      if (externalLocations.length > 0) {
-        return this.arrayOrSingleResponse(externalLocations)
-      }
-
-      return this.arrayOrSingleResponse(locationsAccumulator)
+    if (fileLocations.length > 0) {
+      return this.arrayOrSingleResponse(fileLocations)
     }
 
     return null
+  }
+
+  private async checkIfSymbolsAreFiles(
+    connection: _Connection,
+    document: TextDocumentWrapper,
+    symbolUnderCursor: DocumentSymbol,
+    fileLocations: Location[]
+  ) {
+    for (const possibleFile of symbolUnderCursor.name.split(' ')) {
+      const possiblePath = URI.parse(
+        [dirname(document.uri), possibleFile].join('/')
+      ).toString()
+      const file = await connection.sendRequest<{
+        contents: string
+      } | null>('readFileContents', possiblePath)
+      if (file) {
+        const location = this.getLocation(possiblePath, file.contents)
+        fileLocations.push(location)
+      }
+    }
+  }
+
+  private getLocation(path: string, contents: string) {
+    const doc = this.wrap(TextDocument.create(path, 'plain/text', 0, contents))
+    return doc.getLocation()
   }
 
   private arrayOrSingleResponse<T>(elements: T[]) {

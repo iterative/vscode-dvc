@@ -4,7 +4,7 @@ import { URI } from 'vscode-uri'
 import { client } from './setup-test-connections'
 
 export const openTheseFilesAndNotifyServer = async (
-  files: Array<{ mockPath: string; mockContents: string; languageId: string }>
+  files: { mockPath: string; mockContents: string; languageId: string }[]
 ) => {
   const filesToReturn: TextDocument[] = []
 

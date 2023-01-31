@@ -50,6 +50,7 @@ import { Setup } from './setup'
 import { definedAndNonEmpty } from './util/array'
 import { stopProcesses } from './processExecution'
 import { Flag } from './cli/dvc/constants'
+import { LanguageClientWrapper } from './lspClient/languageClient'
 
 export class Extension extends Disposable {
   protected readonly internalCommands: InternalCommands
@@ -255,6 +256,8 @@ export class Extension extends Disposable {
 
     void showWalkthroughOnFirstUse(env.isNewAppInstall)
     this.dispose.track(recommendRedHatExtensionOnce())
+
+    this.dispose.track(new LanguageClientWrapper())
   }
 
   public async initialize() {
