@@ -1,4 +1,4 @@
-import { dirname, join } from 'path'
+import { dirname } from 'path'
 import {
   TextDocuments,
   InitializeResult,
@@ -107,7 +107,7 @@ export class LanguageServer {
   ) {
     for (const possibleFile of symbolUnderCursor.name.split(' ')) {
       const possiblePath = URI.parse(
-        join(dirname(document.uri), possibleFile)
+        [dirname(document.uri), possibleFile].join('/')
       ).toString()
       const file = await connection.sendRequest<{
         contents: string

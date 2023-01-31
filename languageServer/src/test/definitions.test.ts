@@ -1,3 +1,4 @@
+import { join } from 'path'
 import { Position, Range } from 'vscode-languageserver/node'
 import { URI } from 'vscode-uri'
 import { params_dvc_yaml, train_dvc_yaml } from './fixtures/examples/valid'
@@ -59,7 +60,7 @@ describe('textDocument/definitions', () => {
   })
 
   it('should try to read the file system when a python file is unknown', async () => {
-    const trainUri = URI.file('train.py').toString()
+    const trainUri = URI.file(join(__dirname, 'train.py')).toString()
 
     mockedReadFileContents.mockImplementation(path => {
       if (path === trainUri) {
@@ -72,7 +73,7 @@ describe('textDocument/definitions', () => {
       {
         languageId: 'yaml',
         mockContents: train_dvc_yaml,
-        mockPath: 'dvc.yaml'
+        mockPath: join(__dirname, 'dvc.yaml')
       }
     ])
 
