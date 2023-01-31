@@ -86,9 +86,12 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
 
     return createFileSystemWatcher(
       disposable => this.dispose.track(disposable),
-      getRelativePattern(dotGitPath, '**'),
+      getRelativePattern(this.dvcRoot, '**'),
       (path: string) => {
-        if (path.includes(EXPERIMENTS_GIT_REFS_EXEC)) {
+        if (
+          !path.includes(dotGitPath) ||
+          path.includes(EXPERIMENTS_GIT_REFS_EXEC)
+        ) {
           return
         }
 
