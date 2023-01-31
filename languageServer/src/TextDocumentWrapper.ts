@@ -16,7 +16,6 @@ import {
   Pair,
   isPair
 } from 'yaml'
-import { alphadecimalWords, variableTemplates } from './regexes'
 import { ITextDocumentWrapper } from './ITextDocumentWrapper'
 
 export class TextDocumentWrapper implements ITextDocumentWrapper {
@@ -58,40 +57,6 @@ export class TextDocumentWrapper implements ITextDocumentWrapper {
     return this.textDocument.getText()
   }
 
-  private getTemplateExpressionSymbolsInsideScalar(
-    scalarValue: string,
-    nodeOffset: number
-  ) {
-    const templateSymbols: DocumentSymbol[] = []
-
-    const templates = scalarValue.matchAll(variableTemplates)
-    for (const template of templates) {
-      const expression = template[1]
-      const expressionOffset: number = nodeOffset + (template.index ?? 0) + 2 // To account for the '${'
-      const symbols = expression.matchAll(alphadecimalWords) // It works well for now. We can always add more sophistication when needed.
-
-      for (const templateSymbol of symbols) {
-        const symbolStart = (templateSymbol.index ?? 0) + expressionOffset
-        const symbolEnd = symbolStart + templateSymbol[0].length
-        const symbolRange = Range.create(
-          this.positionAt(symbolStart),
-          this.positionAt(symbolEnd)
-        )
-        templateSymbols.push(
-          DocumentSymbol.create(
-            templateSymbol[0],
-            undefined,
-            SymbolKind.Variable,
-            symbolRange,
-            symbolRange
-          )
-        )
-      }
-    }
-
-    return templateSymbols
-  }
-
   private yamlScalarNodeToDocumentSymbols(
     node: Scalar,
     [nodeStart, valueEnd, nodeEnd]: [number, number, number]
@@ -100,22 +65,19 @@ export class TextDocumentWrapper implements ITextDocumentWrapper {
 
     let symbolKind: SymbolKind = SymbolKind.String
 
-    if (/\.[A-Za-z]+$/.test(nodeValue)) {
+    if (/\.[A-Za-z]+$/.test(nodeValue) && !nodeValue.includes(' ')) {
       symbolKind = SymbolKind.File
     }
 
-    const symbolsSoFar: DocumentSymbol[] = [
+    return [
       DocumentSymbol.create(
         nodeValue,
         undefined,
         symbolKind,
         Range.create(this.positionAt(nodeStart), this.positionAt(nodeEnd)),
         Range.create(this.positionAt(nodeStart), this.positionAt(valueEnd))
-      ),
-      ...this.getTemplateExpressionSymbolsInsideScalar(nodeValue, nodeStart)
+      )
     ]
-
-    return symbolsSoFar
   }
 
   private yamlNodeToDocumentSymbols(

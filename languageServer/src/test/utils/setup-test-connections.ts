@@ -15,14 +15,16 @@ class TestStream extends Duplex {
 export let server: Connection
 export let client: Connection
 
-export const setupTestConnections = () => {
+export const setupTestConnections = (
+  mockedReadFileContents: typeof jest.fn
+) => {
   const dvcLanguageService = new LanguageServer()
   const up = new TestStream()
   const down = new TestStream()
 
   server = createConnection(up, down)
   client = createConnection(down, up)
-  client.onRequest('getFileDetails', () => null)
+  client.onRequest('readFileContents', mockedReadFileContents)
 
   dvcLanguageService.listen(server)
   client.listen()

@@ -1,4 +1,3 @@
-import { extname } from 'path'
 import { Uri, workspace } from 'vscode'
 import {
   LanguageClient,
@@ -36,23 +35,14 @@ export class LanguageClientWrapper extends Disposable {
       )
     )
 
-    this.client.onRequest('getFileDetails', (uriString: string) => {
-      const uri = Uri.parse(uriString)
-      const languageId = extname(uriString) === '.py' ? 'python' : 'other'
+    this.client.onRequest('readFileContents', (uriString: string) => {
       try {
-        if (isDirectory(uri.fsPath)) {
-          return null
+        const uri = Uri.parse(uriString)
+        if (!isDirectory(uri.fsPath)) {
+          return { contents: readFileSync(uri.fsPath, 'utf8') }
         }
-        const text = readFileSync(uri.fsPath, 'utf8')
-        return {
-          languageId,
-          text,
-          uri: uri.toString(),
-          version: 0
-        }
-      } catch {
-        return null
-      }
+      } catch {}
+      return null
     })
 
     void this.start()

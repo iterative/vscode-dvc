@@ -117,6 +117,21 @@ stages:
     outs:
       - params2.yaml
 `
+export const train_dvc_yaml = `stages:
+train:
+  cmd: python train.py
+  deps:
+    - data
+    - train.py
+  params:
+    - params.yaml:
+  outs:
+    - model.pt:
+        checkpoint: true
+    - training/plots:
+        persist: true
+    - hist.csv
+`
 export const plots_dvc_yaml = `
 stages:
   stage_one:

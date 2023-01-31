@@ -8,9 +8,6 @@ import {
   CodeActionParams,
   DefinitionParams,
   SymbolKind,
-  Location,
-  Position,
-  Range,
   DocumentSymbol,
   Connection
 } from 'vscode-languageserver/node'
@@ -97,20 +94,12 @@ export class LanguageServer {
       if (locationsAccumulator.length === 0) {
         for (const possibleFile of symbolUnderCursor.name.split(' ')) {
           const possiblePath = join(dirname(document.uri), possibleFile)
-          const fileDetails = await connection.sendRequest<{
-            languageId: string
-            text: string
-            uri: string
-            version: number
-          } | null>('getFileDetails', possiblePath)
-          if (fileDetails) {
-            const { uri, languageId, text, version } = fileDetails
-            const doc = TextDocument.create(uri, languageId, version, text)
-            const start = Position.create(0, 0)
-            const end = doc.positionAt(doc.getText().length - 1)
-            const range = Range.create(start, end)
-
-            locationsAccumulator.push(Location.create(possiblePath, range))
+          const file = await connection.sendRequest<{
+            contents: string
+          } | null>('readFileContents', possiblePath)
+          if (file) {
+            const location = this.getLocation(possiblePath, file.contents)
+            locationsAccumulator.push(location)
           }
         }
       }
@@ -121,6 +110,11 @@ export class LanguageServer {
     }
 
     return null
+  }
+
+  private getLocation(path: string, contents: string) {
+    const doc = this.wrap(TextDocument.create(path, 'python', 0, contents))
+    return doc.getLocation()
   }
 
   private arrayOrSingleResponse<T>(elements: T[]) {
