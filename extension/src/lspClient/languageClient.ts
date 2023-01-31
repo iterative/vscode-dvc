@@ -1,14 +1,13 @@
-import { Uri, workspace } from 'vscode'
+import { workspace } from 'vscode'
 import {
   LanguageClient,
   LanguageClientOptions,
   ServerOptions,
   TransportKind
 } from 'vscode-languageclient/node'
-import { readFileSync } from 'fs-extra'
 import { documentSelector, serverModule } from 'dvc-vscode-lsp'
 import { Disposable } from '../class/dispose'
-import { isDirectory } from '../fileSystem'
+import { readFileContents } from '../fileSystem'
 
 export class LanguageClientWrapper extends Disposable {
   private client: LanguageClient
@@ -20,9 +19,7 @@ export class LanguageClientWrapper extends Disposable {
       documentSelector,
 
       synchronize: {
-        fileEvents: workspace.createFileSystemWatcher(
-          '**/*.{yaml,dvc,dvc.lock,json,toml}'
-        )
+        fileEvents: workspace.createFileSystemWatcher('**/dvc.yaml')
       }
     }
 
@@ -35,25 +32,11 @@ export class LanguageClientWrapper extends Disposable {
       )
     )
 
-    this.client.onRequest('readFileContents', (uriString: string) => {
-      try {
-        const uri = Uri.parse(uriString)
-        if (!isDirectory(uri.fsPath)) {
-          return { contents: readFileSync(uri.fsPath, 'utf8') }
-        }
-      } catch {}
-      return null
-    })
+    this.dispose.track(
+      this.client.onRequest('readFileContents', readFileContents)
+    )
 
-    void this.start()
-  }
-
-  start() {
-    return this.client.start()
-  }
-
-  stop() {
-    void this.client.stop()
+    void this.client.start()
   }
 
   private getServerOptions(): ServerOptions {
