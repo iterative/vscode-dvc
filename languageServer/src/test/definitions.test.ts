@@ -1,4 +1,5 @@
 import { Position, Range } from 'vscode-languageserver/node'
+import { URI } from 'vscode-uri'
 import { params_dvc_yaml, train_dvc_yaml } from './fixtures/examples/valid'
 import { params } from './fixtures/params'
 import { train } from './fixtures/python'
@@ -58,8 +59,10 @@ describe('textDocument/definitions', () => {
   })
 
   it('should try to read the file system when a python file is unknown', async () => {
+    const trainUri = URI.file('train.py').toString()
+
     mockedReadFileContents.mockImplementation(path => {
-      if (path === 'file:/train.py') {
+      if (path === trainUri) {
         return { contents: train }
       }
       return null
@@ -75,14 +78,14 @@ describe('textDocument/definitions', () => {
 
     const response = await requestDefinitions(dvcYaml, 'train.py')
 
-    expect(mockedReadFileContents).toHaveBeenCalledWith('file:/train.py', {
+    expect(mockedReadFileContents).toHaveBeenCalledWith(trainUri, {
       _isCancelled: false
     })
 
     expect(response).toBeTruthy()
     expect(response).toStrictEqual({
       range: Range.create(Position.create(0, 0), Position.create(7, 13)),
-      uri: 'file:/train.py'
+      uri: trainUri
     })
   })
 })

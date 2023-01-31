@@ -93,7 +93,9 @@ export class LanguageServer {
 
       if (locationsAccumulator.length === 0) {
         for (const possibleFile of symbolUnderCursor.name.split(' ')) {
-          const possiblePath = join(dirname(document.uri), possibleFile)
+          const possiblePath = URI.parse(
+            join(dirname(document.uri), possibleFile)
+          ).toString()
           const file = await connection.sendRequest<{
             contents: string
           } | null>('readFileContents', possiblePath)
