@@ -44,9 +44,7 @@ export class LanguageServer {
     return openDocuments.map(doc => this.wrap(doc))
   }
 
-  private getDvcTextDocument(
-    params: TextDocumentPositionParams | CodeActionParams
-  ) {
+  private getDocument(params: TextDocumentPositionParams | CodeActionParams) {
     const uri = params.textDocument.uri
 
     const doc = this.documentsKnownToEditor.get(uri)
@@ -62,7 +60,7 @@ export class LanguageServer {
     return new TextDocumentWrapper(doc)
   }
 
-  private getFilePathLocations(
+  private getKnownDocumentLocations(
     symbolUnderCursor: DocumentSymbol,
     allDocs: TextDocumentWrapper[]
   ) {
@@ -73,84 +71,53 @@ export class LanguageServer {
     const filePath = symbolUnderCursor.name
 
     const matchingFiles = allDocs.filter(doc =>
-      URI.file(doc.uri).fsPath.endsWith(filePath)
+      URI.parse(doc.uri).fsPath.endsWith(filePath)
     )
 
-    return matchingFiles.map(doc => {
-      const uri = doc.uri
-      const start = Position.create(0, 0)
-      const end = doc.positionAt(doc.getText().length - 1)
-      const range = Range.create(start, end)
-
-      return Location.create(uri, range)
-    })
-  }
-
-  private getLocationsFromOtherDocuments(
-    symbolUnderCursor: DocumentSymbol,
-    allDocs: TextDocumentWrapper[]
-  ) {
-    const locationsAccumulator = []
-
-    for (const txtDoc of allDocs) {
-      const locations = txtDoc.findLocationsFor(symbolUnderCursor)
-      locationsAccumulator.push(...locations)
-    }
-
-    return locationsAccumulator
+    return matchingFiles.map(doc => doc.getLocation())
   }
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   private async onDefinition(params: DefinitionParams, connection: Connection) {
-    const document = this.getDvcTextDocument(params)
+    const document = this.getDocument(params)
+
     const symbolUnderCursor = document?.symbolAt(params.position)
 
     if (document && symbolUnderCursor) {
       const allDocs = this.getAllDocuments()
       const locationsAccumulator = []
 
-      const fileLocations = this.getFilePathLocations(
+      const fileLocations = this.getKnownDocumentLocations(
         symbolUnderCursor,
         allDocs
       )
 
       locationsAccumulator.push(...fileLocations)
 
-      for (const possibleFile of symbolUnderCursor.name.split(' ')) {
-        const possiblePath = join(dirname(document.uri), possibleFile)
-        const fileDetails = await connection.sendRequest<{
-          languageId: string
-          text: string
-          uri: string
-          version: number
-        } | null>('getFileDetails', possiblePath)
-        if (fileDetails) {
-          const { uri, languageId, text, version } = fileDetails
-          const doc = TextDocument.create(uri, languageId, version, text)
-          const start = Position.create(0, 0)
-          const end = doc.positionAt(doc.getText().length - 1)
-          const range = Range.create(start, end)
+      if (locationsAccumulator.length === 0) {
+        for (const possibleFile of symbolUnderCursor.name.split(' ')) {
+          const possiblePath = join(dirname(document.uri), possibleFile)
+          const fileDetails = await connection.sendRequest<{
+            languageId: string
+            text: string
+            uri: string
+            version: number
+          } | null>('getFileDetails', possiblePath)
+          if (fileDetails) {
+            const { uri, languageId, text, version } = fileDetails
+            const doc = TextDocument.create(uri, languageId, version, text)
+            const start = Position.create(0, 0)
+            const end = doc.positionAt(doc.getText().length - 1)
+            const range = Range.create(start, end)
 
-          locationsAccumulator.push(Location.create(possiblePath, range))
+            locationsAccumulator.push(Location.create(possiblePath, range))
+          }
         }
       }
 
-      const locationsFromOtherDocuments = this.getLocationsFromOtherDocuments(
-        symbolUnderCursor,
-        allDocs
-      )
-
-      locationsAccumulator.push(...locationsFromOtherDocuments)
-
-      const externalLocations = locationsAccumulator.filter(
-        location => location.uri !== document.uri
-      )
-
-      if (externalLocations.length > 0) {
-        return this.arrayOrSingleResponse(externalLocations)
+      if (locationsAccumulator.length > 0) {
+        return this.arrayOrSingleResponse(locationsAccumulator)
       }
-
-      return this.arrayOrSingleResponse(locationsAccumulator)
     }
 
     return null

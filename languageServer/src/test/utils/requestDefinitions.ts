@@ -4,16 +4,18 @@ import { client } from './setup-test-connections'
 
 export const requestDefinitions = async (
   textDocument: TextDocument,
-  substring: string
+  substring: string,
+  offset = 0
 ) => {
   const text = textDocument.getText()
   const uri = textDocument.uri
 
   const symbolOffset = text.indexOf(substring)
-  const position = textDocument.positionAt(symbolOffset)
+
+  const { character, line } = textDocument.positionAt(symbolOffset)
 
   const params: DefinitionParams = {
-    position,
+    position: { character: character + offset, line },
     textDocument: {
       uri
     }

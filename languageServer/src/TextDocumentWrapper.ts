@@ -29,12 +29,17 @@ export class TextDocumentWrapper implements ITextDocumentWrapper {
     this.uri = this.textDocument.uri
   }
 
-  public offsetAt(position: Position) {
-    return this.textDocument.offsetAt(position)
+  public getLocation() {
+    const uri = this.uri
+    const start = Position.create(0, 0)
+    const end = this.positionAt(this.getText().length - 1)
+    const range = Range.create(start, end)
+
+    return Location.create(uri, range)
   }
 
-  public getText() {
-    return this.textDocument.getText()
+  public offsetAt(position: Position) {
+    return this.textDocument.offsetAt(position)
   }
 
   public positionAt(offset: number) {
@@ -45,28 +50,12 @@ export class TextDocumentWrapper implements ITextDocumentWrapper {
     return parseDocument(this.getText())
   }
 
-  public findLocationsFor(aSymbol: DocumentSymbol) {
-    const parts = aSymbol.name.split(/\s/g)
-    const txt = this.getText()
-
-    const acc: Location[] = []
-    for (const str of parts) {
-      const index = txt.indexOf(str)
-      if (index <= 0) {
-        continue
-      }
-      const pos = this.positionAt(index)
-      const range = this.symbolAt(pos)?.range
-      if (!range) {
-        continue
-      }
-      acc.push(Location.create(this.uri, range))
-    }
-    return acc
-  }
-
   public symbolAt(position: Position): DocumentSymbol | undefined {
     return this.symbolScopeAt(position).pop()
+  }
+
+  private getText() {
+    return this.textDocument.getText()
   }
 
   private getTemplateExpressionSymbolsInsideScalar(

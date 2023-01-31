@@ -97,8 +97,9 @@ stages:
   use-params_stage:
     cmd: cat params.yaml > params2.yaml
     params:
-      - auc
-      - loss
+      - params.yaml:
+        - auc
+        - loss
     outs:
       - params2.yaml
   use-custom-params_file:
