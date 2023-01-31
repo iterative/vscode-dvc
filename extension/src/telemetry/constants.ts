@@ -152,6 +152,7 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_VIEW_REMOVE]: undefined
   [EventName.EXPERIMENT_VIEW_SHARE_AS_BRANCH]: undefined
   [EventName.EXPERIMENT_VIEW_SHARE_AS_COMMIT]: undefined
+  [EventName.EXPERIMENT_VIEW_STOP]: undefined
   [EventName.QUEUE_EXPERIMENT]: undefined
   [EventName.QUEUE_KILL]: undefined
   [EventName.QUEUE_START]: undefined

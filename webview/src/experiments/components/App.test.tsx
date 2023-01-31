@@ -872,6 +872,7 @@ describe('App', () => {
         'Modify and Resume',
         'Modify and Queue',
         'Star',
+        'Stop',
         'Remove'
       ])
 
@@ -886,7 +887,7 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(9)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(10)
 
       fireEvent.click(window, { bubbles: true })
       advanceTimersByTime(100)
@@ -900,7 +901,7 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(9)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(10)
 
       const commit = getRow('main')
       fireEvent.click(commit, { bubbles: true })
@@ -915,13 +916,13 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(9)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(10)
 
       fireEvent.contextMenu(within(row).getByText('[exp-e7a67]'), {
         bubbles: true
       })
       advanceTimersByTime(200)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(9)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(10)
     })
 
     it('should present the Remove experiment option for the checkpoint tips', () => {
@@ -961,6 +962,33 @@ describe('App', () => {
       expect(sendMessage).toHaveBeenCalledWith({
         payload: ['exp-e7a67', 'test-branch'],
         type: MessageFromWebviewType.REMOVE_EXPERIMENT
+      })
+    })
+
+    it('should present the Stop option if rows that are running in the queue are selected', () => {
+      renderTableWithoutRunningExperiments()
+
+      clickRowCheckbox('4fb124a')
+
+      const target = screen.getByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems.map(item => item.textContent)
+      expect(itemLabels).toContain('Stop')
+
+      const stopOption = menuitems.find(item =>
+        item.textContent?.includes('Stop')
+      )
+
+      expect(stopOption).toBeDefined()
+
+      stopOption && fireEvent.click(stopOption)
+
+      expect(sendMessage).toHaveBeenCalledWith({
+        payload: ['exp-e7a67'],
+        type: MessageFromWebviewType.STOP_EXPERIMENT
       })
     })
 

@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.40] - 2023-01-30
+
+### 🚀 New Features and Enhancements
+
+- Combine remove experiments and remove queued experiment quick picks [#3166](https://github.com/iterative/vscode-dvc/pull/3166) by [@mattseddon](https://github.com/mattseddon)
+- Add stop queued experiment running option into table context menu [#3168](https://github.com/iterative/vscode-dvc/pull/3168) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Recheck for global and venv dvc version [#3165](https://github.com/iterative/vscode-dvc/pull/3165) by [@sroy3](https://github.com/sroy3)
+- Fix inital ordering of experiments table [#3174](https://github.com/iterative/vscode-dvc/pull/3174) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Fix test describe statements [#3163](https://github.com/iterative/vscode-dvc/pull/3163) by [@mattseddon](https://github.com/mattseddon)
+- Replace branch terminology with commit for Experiments internals [#3167](https://github.com/iterative/vscode-dvc/pull/3167) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.39] - 2023-01-25
 
 ### 🚀 New Features and Enhancements

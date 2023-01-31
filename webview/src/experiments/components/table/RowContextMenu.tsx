@@ -2,7 +2,8 @@ import React, { useMemo } from 'react'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import {
   ExperimentStatus,
-  isQueued
+  isQueued,
+  isRunningInQueue
 } from 'dvc/src/experiments/webview/contract'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { RowProp } from './interfaces'
@@ -59,6 +60,12 @@ const getMultiSelectMenuOptions = (
   const hideRemoveOption =
     removableRowIds.length !== selectedRowsList.length || hasRunningExperiment
 
+  const stoppableRowIds = selectedRowsList.filter(value =>
+    isRunningInQueue(value.row.original)
+  )
+
+  const hideStopOption = stoppableRowIds.length !== selectedRowsList.length
+
   const toggleStarOption = (ids: string[], label: string) =>
     experimentMenuOption(
       ids,
@@ -89,6 +96,13 @@ const getMultiSelectMenuOptions = (
       MessageFromWebviewType.SET_EXPERIMENTS_AND_OPEN_PLOTS,
       false,
       false
+    ),
+    experimentMenuOption(
+      selectedIds,
+      'Stop',
+      MessageFromWebviewType.STOP_EXPERIMENT,
+      hideStopOption,
+      true
     ),
     experimentMenuOption(
       removableRowIds,
@@ -150,7 +164,8 @@ const getSingleSelectMenuOptions = (
   hasRunningExperiment: boolean,
   depth: number,
   status?: ExperimentStatus,
-  starred?: boolean
+  starred?: boolean,
+  executor?: string | null
 ) => {
   const isNotExperimentOrCheckpoint =
     isQueued(status) || isWorkspace || depth <= 0
@@ -203,6 +218,13 @@ const getSingleSelectMenuOptions = (
       isWorkspace,
       !hasRunningExperiment
     ),
+    experimentMenuOption(
+      [id],
+      'Stop',
+      MessageFromWebviewType.STOP_EXPERIMENT,
+      !isRunningInQueue({ executor, status }),
+      true
+    ),
     withId(
       'Remove',
       MessageFromWebviewType.REMOVE_EXPERIMENT,
@@ -220,7 +242,8 @@ const getContextMenuOptions = (
   depth: number,
   selectedRows: Record<string, RowProp | undefined>,
   status?: ExperimentStatus,
-  starred?: boolean
+  starred?: boolean,
+  executor?: string | null
 ) => {
   const isFromSelection = !!selectedRows[id]
   const selectedRowsList = Object.values(selectedRows).filter(
@@ -238,7 +261,8 @@ const getContextMenuOptions = (
         hasRunningExperiment,
         depth,
         status,
-        starred
+        starred,
+        executor
       )
   )
 }
@@ -247,7 +271,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
   hasRunningExperiment = false,
   projectHasCheckpoints = false,
   row: {
-    original: { status, starred, id },
+    original: { status, starred, id, executor },
     depth
   }
 }) => {
@@ -265,9 +289,11 @@ export const RowContextMenu: React.FC<RowProp> = ({
       depth,
       selectedRows,
       status,
-      starred
+      starred,
+      executor
     )
   }, [
+    executor,
     status,
     starred,
     isWorkspace,

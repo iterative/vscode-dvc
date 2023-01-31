@@ -31,7 +31,7 @@ import { collectFlatExperimentParams } from './modify/collect'
 import {
   Experiment,
   isQueued,
-  isRunning,
+  isRunningInQueue,
   Row,
   RunningExperiment
 } from '../webview/contract'
@@ -401,8 +401,8 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getRunningQueueTasks() {
-    return this.getExperimentsAndQueued().filter(
-      ({ status, executor }) => isRunning(status) && executor === 'dvc-task'
+    return this.getExperimentsAndQueued().filter(experiment =>
+      isRunningInQueue(experiment)
     )
   }
 
