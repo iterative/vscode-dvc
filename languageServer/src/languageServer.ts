@@ -14,7 +14,11 @@ import {
 } from 'vscode-languageserver/node'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import { URI } from 'vscode-uri'
-import { TextDocumentWrapper } from './TextDocumentWrapper'
+import {
+  getTextDocumentLocation,
+  getUriLocation,
+  symbolAt
+} from './textDocument'
 
 export class LanguageServer {
   private documentsKnownToEditor!: TextDocuments<TextDocument>
@@ -37,25 +41,9 @@ export class LanguageServer {
     connection.listen()
   }
 
-  private getAllDocuments() {
-    const openDocuments = this.documentsKnownToEditor.all()
-    return openDocuments.map(doc => this.wrap(doc))
-  }
-
   private getDocument(params: TextDocumentPositionParams | CodeActionParams) {
     const uri = params.textDocument.uri
-
-    const doc = this.documentsKnownToEditor.get(uri)
-
-    if (!doc) {
-      return null
-    }
-
-    return this.wrap(doc)
-  }
-
-  private wrap(doc: TextDocument) {
-    return new TextDocumentWrapper(doc)
+    return this.documentsKnownToEditor.get(uri)
   }
 
   private getKnownDocumentLocations(symbolUnderCursor: DocumentSymbol) {
@@ -65,17 +53,17 @@ export class LanguageServer {
 
     const filePath = symbolUnderCursor.name
 
-    const matchingFiles = this.getAllDocuments().filter(doc =>
-      URI.parse(doc.uri).fsPath.endsWith(filePath)
-    )
+    const matchingFiles = this.documentsKnownToEditor
+      .all()
+      .filter(doc => URI.parse(doc.uri).fsPath.endsWith(filePath))
 
-    return matchingFiles.map(doc => doc.getLocation())
+    return matchingFiles.map(doc => getTextDocumentLocation(doc))
   }
 
   private async onDefinition(params: DefinitionParams, connection: Connection) {
     const document = this.getDocument(params)
 
-    const symbolUnderCursor = document?.symbolAt(params.position)
+    const symbolUnderCursor = symbolAt(document, params.position)
 
     if (!(document && symbolUnderCursor)) {
       return null
@@ -101,7 +89,7 @@ export class LanguageServer {
 
   private async checkIfSymbolsAreFiles(
     connection: _Connection,
-    document: TextDocumentWrapper,
+    document: TextDocument,
     symbolUnderCursor: DocumentSymbol,
     fileLocations: Location[]
   ) {
@@ -113,15 +101,10 @@ export class LanguageServer {
         contents: string
       } | null>('readFileContents', possiblePath)
       if (file) {
-        const location = this.getLocation(possiblePath, file.contents)
+        const location = getUriLocation(possiblePath, file.contents)
         fileLocations.push(location)
       }
     }
-  }
-
-  private getLocation(path: string, contents: string) {
-    const doc = this.wrap(TextDocument.create(path, 'plain/text', 0, contents))
-    return doc.getLocation()
   }
 
   private arrayOrSingleResponse<T>(elements: T[]) {

@@ -1,6 +1,6 @@
 import { Duplex } from 'stream'
 import { Connection, createConnection } from 'vscode-languageserver/node'
-import { LanguageServer } from '../../LanguageServer'
+import { LanguageServer } from '../../languageServer'
 
 class TestStream extends Duplex {
   _write(chunk: string, _encoding: string, done: () => void) {
