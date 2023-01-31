@@ -9,7 +9,8 @@ import {
   DefinitionParams,
   SymbolKind,
   DocumentSymbol,
-  Connection
+  Connection,
+  Location
 } from 'vscode-languageserver/node'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import { URI } from 'vscode-uri'
@@ -57,61 +58,65 @@ export class LanguageServer {
     return new TextDocumentWrapper(doc)
   }
 
-  private getKnownDocumentLocations(
-    symbolUnderCursor: DocumentSymbol,
-    allDocs: TextDocumentWrapper[]
-  ) {
+  private getKnownDocumentLocations(symbolUnderCursor: DocumentSymbol) {
     if (symbolUnderCursor.kind !== SymbolKind.File) {
       return []
     }
 
     const filePath = symbolUnderCursor.name
 
-    const matchingFiles = allDocs.filter(doc =>
+    const matchingFiles = this.getAllDocuments().filter(doc =>
       URI.parse(doc.uri).fsPath.endsWith(filePath)
     )
 
     return matchingFiles.map(doc => doc.getLocation())
   }
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   private async onDefinition(params: DefinitionParams, connection: Connection) {
     const document = this.getDocument(params)
 
     const symbolUnderCursor = document?.symbolAt(params.position)
 
-    if (document && symbolUnderCursor) {
-      const allDocs = this.getAllDocuments()
-      const locationsAccumulator = []
+    if (!(document && symbolUnderCursor)) {
+      return null
+    }
 
-      const fileLocations = this.getKnownDocumentLocations(
+    const fileLocations = this.getKnownDocumentLocations(symbolUnderCursor)
+
+    if (fileLocations.length === 0) {
+      await this.checkIfSymbolsAreFiles(
+        connection,
+        document,
         symbolUnderCursor,
-        allDocs
+        fileLocations
       )
+    }
 
-      locationsAccumulator.push(...fileLocations)
-
-      if (locationsAccumulator.length === 0) {
-        for (const possibleFile of symbolUnderCursor.name.split(' ')) {
-          const possiblePath = URI.parse(
-            join(dirname(document.uri), possibleFile)
-          ).toString()
-          const file = await connection.sendRequest<{
-            contents: string
-          } | null>('readFileContents', possiblePath)
-          if (file) {
-            const location = this.getLocation(possiblePath, file.contents)
-            locationsAccumulator.push(location)
-          }
-        }
-      }
-
-      if (locationsAccumulator.length > 0) {
-        return this.arrayOrSingleResponse(locationsAccumulator)
-      }
+    if (fileLocations.length > 0) {
+      return this.arrayOrSingleResponse(fileLocations)
     }
 
     return null
+  }
+
+  private async checkIfSymbolsAreFiles(
+    connection: _Connection,
+    document: TextDocumentWrapper,
+    symbolUnderCursor: DocumentSymbol,
+    fileLocations: Location[]
+  ) {
+    for (const possibleFile of symbolUnderCursor.name.split(' ')) {
+      const possiblePath = URI.parse(
+        join(dirname(document.uri), possibleFile)
+      ).toString()
+      const file = await connection.sendRequest<{
+        contents: string
+      } | null>('readFileContents', possiblePath)
+      if (file) {
+        const location = this.getLocation(possiblePath, file.contents)
+        fileLocations.push(location)
+      }
+    }
   }
 
   private getLocation(path: string, contents: string) {
