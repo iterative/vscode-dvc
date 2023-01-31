@@ -1,6 +1,6 @@
 import { workspace } from 'vscode'
 import {
-  LanguageClient,
+  LanguageClient as Client,
   LanguageClientOptions,
   ServerOptions,
   TransportKind
@@ -9,8 +9,8 @@ import { documentSelector, serverModule } from 'dvc-vscode-lsp'
 import { Disposable } from '../class/dispose'
 import { readFileContents } from '../fileSystem'
 
-export class LanguageClientWrapper extends Disposable {
-  private client: LanguageClient
+export class LanguageClient extends Disposable {
+  private client: Client
 
   constructor() {
     super()
@@ -24,7 +24,7 @@ export class LanguageClientWrapper extends Disposable {
     }
 
     this.client = this.dispose.track(
-      new LanguageClient(
+      new Client(
         'dvc-vscode-lsp',
         'DVC Language Server',
         this.getServerOptions(),
