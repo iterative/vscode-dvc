@@ -24,7 +24,7 @@ export const setupTestConnections = (
 
   server = createConnection(up, down)
   client = createConnection(down, up)
-  client.onRequest('readFileContents', mockedReadFileContents)
+  client.onRequest('isFile', mockedReadFileContents)
 
   dvcLanguageService.listen(server)
   client.listen()

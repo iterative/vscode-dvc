@@ -1,4 +1,4 @@
-import { workspace } from 'vscode'
+import { Uri, workspace } from 'vscode'
 import {
   LanguageClient as Client,
   LanguageClientOptions,
@@ -7,7 +7,7 @@ import {
 } from 'vscode-languageclient/node'
 import { documentSelector, serverModule } from 'dvc-vscode-lsp'
 import { Disposable } from '../class/dispose'
-import { readFileContents } from '../fileSystem'
+import { isFile } from '../fileSystem'
 
 export class LanguageClient extends Disposable {
   private client: Client
@@ -32,7 +32,14 @@ export class LanguageClient extends Disposable {
     )
 
     this.dispose.track(
-      this.client.onRequest('readFileContents', readFileContents)
+      this.client.onRequest('isFile', (uri: string) => {
+        try {
+          const path = Uri.parse(uri).fsPath
+          return { isFile: isFile(path) }
+        } catch {
+          return null
+        }
+      })
     )
 
     void this.client.start()
