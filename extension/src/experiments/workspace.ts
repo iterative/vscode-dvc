@@ -15,8 +15,10 @@ import { getInput, getPositiveIntegerInput } from '../vscode/inputBox'
 import { BaseWorkspaceWebviews } from '../webview/workspace'
 import { Title } from '../vscode/title'
 import { ContextKey, setContextValue } from '../vscode/context'
-import { ensureOrCreateDvcYamlFile, getPidFromSignalFile } from '../fileSystem'
+import { findOrCreateDvcYamlFile, getPidFromSignalFile } from '../fileSystem'
 import { definedAndNonEmpty } from '../util/array'
+import { quickPickOneOrInput } from '../vscode/quickPick'
+import { pickFile } from '../vscode/resourcePicker'
 
 export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   Experiments,
@@ -215,15 +217,14 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
 
   public async getCwdThenRun(
     commandId: CommandId,
-    ensureDvcYamlFileExists?: boolean
+    ensurePipelineExists?: boolean
   ) {
     const cwd = await this.getFocusedOrOnlyOrPickProject()
     if (!cwd) {
       return
     }
-
-    if (ensureDvcYamlFileExists) {
-      ensureOrCreateDvcYamlFile(cwd)
+    if (ensurePipelineExists) {
+      await this.checkOrAddPipeline(cwd)
     }
 
     return this.internalCommands.executeCommand(commandId, cwd)
@@ -436,6 +437,34 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     }
 
     return pids
+  }
+
+  private async checkOrAddPipeline(cwd: string) {
+    const stages = await this.internalCommands.executeCommand(
+      AvailableCommands.STAGE_LIST,
+      cwd
+    )
+    if (!stages) {
+      const pathOrSelect = await quickPickOneOrInput(
+        [{ label: 'Select from file explorer', value: 'select' }],
+        {
+          defaultValue: '',
+          placeholder: 'Path to script',
+          title:
+            'Enter the path to your training script or select it' as unknown as Title
+        }
+      )
+
+      const trainingScript =
+        pathOrSelect === 'select'
+          ? await pickFile(Title.SELECT_TRAINING_SCRIPT)
+          : pathOrSelect
+
+      if (!trainingScript) {
+        return
+      }
+      findOrCreateDvcYamlFile(cwd, trainingScript)
+    }
   }
 
   private async pickExpThenRun(

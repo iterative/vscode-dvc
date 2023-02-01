@@ -23,6 +23,7 @@ export enum Title {
   SELECT_QUEUE_KILL = 'Select Queue Task(s) to Kill',
   SELECT_SORT_DIRECTION = 'Select Sort Direction',
   SELECT_SORTS_TO_REMOVE = 'Select Sort(s) to Remove',
+  SELECT_TRAINING_SCRIPT = 'Select your training script',
   SETUP_WORKSPACE = 'Setup the Workspace',
   SET_EXPERIMENTS_HEADER_HEIGHT = 'Set Maximum Experiment Table Header Height'
 }

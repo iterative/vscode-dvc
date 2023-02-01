@@ -37,7 +37,8 @@ export const isDvcError = <
 export const autoRegisteredCommands = {
   DATA_STATUS: 'dataStatus',
   EXP_SHOW: 'expShow',
-  PLOTS_DIFF: 'plotsDiff'
+  PLOTS_DIFF: 'plotsDiff',
+  STAGE_LIST: 'listStages'
 } as const
 
 export class DvcReader extends DvcCli {
@@ -112,6 +113,12 @@ export class DvcReader extends DvcCli {
     )
 
     return this.executeProcess(options)
+  }
+
+  public async listStages(cwd: string): Promise<string | undefined> {
+    try {
+      return await this.executeDvcProcess(cwd, Command.STAGE, SubCommand.LIST)
+    } catch {}
   }
 
   private readProcessJson<T extends DataStatusOutput | PlotsOutput>(

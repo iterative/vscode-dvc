@@ -29,11 +29,13 @@ export enum Command {
   REMOVE = 'remove',
   ROOT = 'root',
   PARAMS = 'params',
-  METRICS = 'metrics'
+  METRICS = 'metrics',
+  STAGE = 'stage'
 }
 
 export enum SubCommand {
   DIFF = 'diff',
+  LIST = 'list',
   STATUS = 'status',
   SHOW = 'show'
 }

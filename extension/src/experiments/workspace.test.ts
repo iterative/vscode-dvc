@@ -13,7 +13,7 @@ import { buildMockedEventEmitter } from '../test/util/jest'
 import { OutputChannel } from '../vscode/outputChannel'
 import { Title } from '../vscode/title'
 import { Args } from '../cli/dvc/constants'
-import { ensureOrCreateDvcYamlFile } from '../fileSystem'
+import { findOrCreateDvcYamlFile } from '../fileSystem'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = jest.mocked(Disposable)
@@ -30,7 +30,7 @@ jest.mock('@hediet/std/disposable')
 jest.mock('../vscode/quickPick')
 jest.mock('../vscode/inputBox')
 jest.mock('../fileSystem', () => ({
-  ensureOrCreateDvcYamlFile: jest.fn()
+  findOrCreateDvcYamlFile: jest.fn()
 }))
 
 beforeEach(() => {
@@ -45,7 +45,8 @@ describe('Experiments', () => {
   } as unknown as (() => void) & Disposer)
 
   const mockedInternalCommands = new InternalCommands({
-    show: jest.fn()
+    show: jest.fn(),
+    listStages: jest.fn()
   } as unknown as OutputChannel)
 
   const mockedCommandId = 'mockedExpFunc' as CommandId
@@ -274,7 +275,7 @@ describe('Experiments', () => {
 
       await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
 
-      expect(ensureOrCreateDvcYamlFile).toHaveBeenCalledTimes(1)
+      expect(findOrCreateDvcYamlFile).toHaveBeenCalledTimes(1)
     })
 
     it('should not ensure that a dvc.yaml file exists if the the registered command needs it', async () => {
@@ -282,7 +283,7 @@ describe('Experiments', () => {
 
       await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
-      expect(ensureOrCreateDvcYamlFile).not.toHaveBeenCalled()
+      expect(findOrCreateDvcYamlFile).not.toHaveBeenCalled()
     })
   })
 })
