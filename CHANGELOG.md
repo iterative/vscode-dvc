@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.0] - 2023-02-01
+
+### 🚀 New Features and Enhancements
+
+- Implement simple onDefinition feature in LSP [#3175](https://github.com/iterative/vscode-dvc/pull/3175) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Rename files associated with LSP [#3185](https://github.com/iterative/vscode-dvc/pull/3185) by [@mattseddon](https://github.com/mattseddon)
+- Remove unnecessary dependencies from LSP [#3184](https://github.com/iterative/vscode-dvc/pull/3184) by [@mattseddon](https://github.com/mattseddon)
+- Remove unnecessary interface from LSP [#3181](https://github.com/iterative/vscode-dvc/pull/3181) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.40] - 2023-01-30
 
 ### 🚀 New Features and Enhancements
