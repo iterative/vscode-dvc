@@ -204,3 +204,15 @@ export const getBinDisplayText = (
     ? '.' + sep + relative(workspaceRoot, path)
     : path
 }
+
+export const readFileContents = (
+  uriString: string
+): { contents: string } | null => {
+  try {
+    const uri = Uri.parse(uriString)
+    if (!isDirectory(uri.fsPath)) {
+      return { contents: readFileSync(uri.fsPath, 'utf8') }
+    }
+  } catch {}
+  return null
+}

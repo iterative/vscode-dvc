@@ -1,12 +1,18 @@
 import { join, resolve } from 'path'
 import process from 'process'
+import { Uri } from 'vscode'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { Disposable } from '@hediet/std/disposable'
 import { restore } from 'sinon'
 import { ensureFileSync, removeSync, writeFileSync } from 'fs-extra'
 import { dvcDemoPath } from '../../util'
-import { checkSignalFile, exists, getGitPath } from '../../../fileSystem'
+import {
+  checkSignalFile,
+  exists,
+  getGitPath,
+  readFileContents
+} from '../../../fileSystem'
 import { gitPath } from '../../../cli/git/constants'
 import { GitReader } from '../../../cli/git/reader'
 import { standardizePath } from '../../../fileSystem/path'
@@ -91,6 +97,22 @@ suite('File System Test Suite', () => {
       ).to.be.false
 
       expect(exists(mockSignalFilePath)).to.be.false
+    })
+  })
+
+  describe('readFileContents', () => {
+    it('should read the contents of a file when it exists', () => {
+      const uriString = Uri.file(join(dvcDemoPath, 'train.py')).toString()
+
+      const file = readFileContents(uriString)
+      expect(file?.contents).to.contain('main()')
+    })
+
+    it('should return null when the file cannot be found', () => {
+      const uriString = 'file:///some/fun/file.txt'
+
+      const contents = readFileContents(uriString)
+      expect(contents).to.be.null
     })
   })
 })
