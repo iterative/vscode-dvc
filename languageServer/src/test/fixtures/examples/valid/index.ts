@@ -97,8 +97,9 @@ stages:
   use-params_stage:
     cmd: cat params.yaml > params2.yaml
     params:
-      - auc
-      - loss
+      - params.yaml:
+        - auc
+        - loss
     outs:
       - params2.yaml
   use-custom-params_file:
@@ -115,6 +116,21 @@ stages:
       - my_params.yaml:
     outs:
       - params2.yaml
+`
+export const train_dvc_yaml = `stages:
+train:
+  cmd: python train.py
+  deps:
+    - data
+    - train.py
+  params:
+    - params.yaml:
+  outs:
+    - model.pt:
+        checkpoint: true
+    - training/plots:
+        persist: true
+    - hist.csv
 `
 export const plots_dvc_yaml = `
 stages:
@@ -162,7 +178,6 @@ vars:
 - myvar: 'value'
 - config/myapp.yaml
 - params.json:clean,feats
-
 stages:
   test_vars:
     vars:
@@ -178,5 +193,4 @@ stages:
         - model:
             filename: 'model-us.hdf5'
       cmd: echo \${item} \${model.filename}
-
-`
+ `

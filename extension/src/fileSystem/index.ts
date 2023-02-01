@@ -49,7 +49,7 @@ export const findDvcRootPaths = async (cwd: string): Promise<string[]> => {
   const dvcRoots = []
 
   if (isDirectory(join(cwd, DOT_DVC))) {
-    dvcRoots.push(cwd)
+    dvcRoots.push(standardizePath(cwd))
   }
 
   const subRoots = await findSubRootPaths(cwd, DOT_DVC)
@@ -63,15 +63,13 @@ export const findDvcRootPaths = async (cwd: string): Promise<string[]> => {
 export const findAbsoluteDvcRootPath = async (
   cwd: string,
   relativePathPromise: Promise<string | undefined>
-): Promise<string[]> => {
+): Promise<string | undefined> => {
   const relativePath = await relativePathPromise
   if (!relativePath) {
-    return []
+    return
   }
 
-  const absoluteRoot = standardizePath(resolve(cwd, relativePath))
-
-  return [absoluteRoot]
+  return standardizePath(resolve(cwd, relativePath))
 }
 
 // .git inside a submodule is a file with the following content: `gitdir: ../.git/modules/demo`
@@ -218,4 +216,16 @@ export const getBinDisplayText = (
   return isSameOrChild(workspaceRoot, path)
     ? '.' + sep + relative(workspaceRoot, path)
     : path
+}
+
+export const readFileContents = (
+  uriString: string
+): { contents: string } | null => {
+  try {
+    const uri = Uri.parse(uriString)
+    if (!isDirectory(uri.fsPath)) {
+      return { contents: readFileSync(uri.fsPath, 'utf8') }
+    }
+  } catch {}
+  return null
 }

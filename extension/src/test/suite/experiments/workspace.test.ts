@@ -438,7 +438,7 @@ suite('Workspace Experiments Test Suite', () => {
     })
   })
 
-  describe('dvc.killExperimentsRunningInQueue', () => {
+  describe('dvc.stopQueuedExperiments', () => {
     it('should be able to kill running queue tasks', async () => {
       const mockQueueKill = stub(DvcExecutor.prototype, 'queueKill').resolves(
         undefined
@@ -773,8 +773,8 @@ suite('Workspace Experiments Test Suite', () => {
     })
   })
 
-  describe('dvc.removeExperiment', () => {
-    it('should ask the user to pick experiment(s) and then remove selected experiments from the workspace', async () => {
+  describe('dvc.removeExperiments', () => {
+    it('should ask the user to pick experiment(s) and then remove selected ones from the workspace', async () => {
       const mockExperiment = 'exp-e7a67'
       const secondMockExperiment = 'exp-83425'
       type QuickPickReturnValue = QuickPickItemWithValue<{
@@ -872,6 +872,17 @@ suite('Workspace Experiments Test Suite', () => {
             detail: `Created:${formatDate(
               '2020-12-29T15:25:27'
             )}, loss:-, accuracy:-`,
+            label: '90aea7f',
+            value: {
+              id: '90aea7f2482117a55dfcadcdb901aaa6610fbbc9',
+              name: '90aea7f'
+            }
+          },
+          {
+            description: undefined,
+            detail: `Created:${formatDate(
+              '2020-12-29T15:25:27'
+            )}, loss:-, accuracy:-`,
             label: '55d492c',
             value: {
               id: '55d492c9c633912685351b32df91bfe1f9ecefb9',
@@ -916,32 +927,6 @@ suite('Workspace Experiments Test Suite', () => {
       )
 
       expect(mockExperimentRemove).to.be.calledWith(dvcDemoPath, '--queue')
-    })
-  })
-
-  describe('dvc.removeQueuedExperiment', () => {
-    it('should ask the user to pick a queued experiment and then remove that experiment from the workspace', async () => {
-      const mockExperiment = 'queued-exp-to-remove'
-
-      const { experiments } = buildExperiments(disposable)
-
-      await experiments.isReady()
-
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
-
-      stub(window, 'showQuickPick').resolves({
-        value: { id: mockExperiment, name: mockExperiment }
-      } as QuickPickItemWithValue<{ id: string; name: string }>)
-      const mockExperimentRemove = stub(
-        DvcExecutor.prototype,
-        'experimentRemove'
-      )
-
-      await commands.executeCommand(
-        RegisteredCliCommands.EXPERIMENT_REMOVE_QUEUED
-      )
-
-      expect(mockExperimentRemove).to.be.calledWith(dvcDemoPath, mockExperiment)
     })
   })
 })

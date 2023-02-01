@@ -198,7 +198,7 @@ describe('pickExperimentsToPlot', () => {
     }
 
     const mockedWorkspace = { label: EXPERIMENT_WORKSPACE_ID, selected: false }
-    const mockedBranch = {
+    const mockedCommit = {
       commit: {
         author: 'John Smith',
         date: '3 days ago',
@@ -230,7 +230,7 @@ describe('pickExperimentsToPlot', () => {
     const picked = await pickExperimentsToPlot(
       [
         mockedWorkspace,
-        mockedBranch,
+        mockedCommit,
         {
           ...mockedExp1,
           checkpoints: [mockedExp1Checkpoint1, mockedExp1Checkpoint2]
@@ -258,8 +258,8 @@ describe('pickExperimentsToPlot', () => {
       [
         getExpectedItem(mockedWorkspace),
         {
-          ...getExpectedItem(mockedBranch),
-          description: `$(git-commit)${mockedBranch.displayNameOrParent}`
+          ...getExpectedItem(mockedCommit),
+          description: `$(git-commit)${mockedCommit.displayNameOrParent}`
         },
         {
           kind: QuickPickItemKind.Separator,

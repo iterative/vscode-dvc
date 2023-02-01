@@ -5,11 +5,11 @@ import {
 import expShowFixture, { errorShas } from './output'
 
 const excludeErrors = (): ExperimentsOutput => {
-  const { workspace, ...branchesObject } = expShowFixture
+  const { workspace, ...commitsObject } = expShowFixture
   const expShowFixtureWithoutErrors: ExperimentsOutput = { workspace }
 
   for (const [sha, { baseline, ...experimentsObject }] of Object.entries(
-    branchesObject
+    commitsObject
   )) {
     const experiments: { [sha: string]: ExperimentFieldsOrError } = {}
     for (const [sha, experiment] of Object.entries(experimentsObject)) {

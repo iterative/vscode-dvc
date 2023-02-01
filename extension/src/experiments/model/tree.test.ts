@@ -34,11 +34,11 @@ const mockedGetMarkdownString = jest.mocked(getMarkdownString)
 
 const {
   mockedExperiments,
-  mockedGetDvcRoots,
-  mockedGetExperiments,
-  mockedGetBranchExperiments,
   mockedGetCheckpoints,
-  mockedGetFirstThreeColumnOrder
+  mockedGetCommitExperiments,
+  mockedGetDvcRoots,
+  mockedGetFirstThreeColumnOrder,
+  mockedGetWorkspaceAndCommits
 } = buildMockedExperiments()
 
 const mockedClockResource = {
@@ -76,8 +76,8 @@ describe('ExperimentsTree', () => {
         mockedResourceLocator
       )
       mockedGetDvcRoots.mockReturnValueOnce(['demo', 'second/repo'])
-      mockedGetExperiments.mockReturnValueOnce([])
-      mockedGetExperiments.mockReturnValueOnce([])
+      mockedGetWorkspaceAndCommits.mockReturnValueOnce([])
+      mockedGetWorkspaceAndCommits.mockReturnValueOnce([])
 
       const rootElements = await experimentsTree.getChildren()
 
@@ -90,7 +90,7 @@ describe('ExperimentsTree', () => {
         mockedResourceLocator
       )
       mockedGetDvcRoots.mockReturnValueOnce(['demo'])
-      mockedGetExperiments.mockReturnValueOnce([])
+      mockedGetWorkspaceAndCommits.mockReturnValueOnce([])
 
       const rootElements = await experimentsTree.getChildren()
 
@@ -104,9 +104,9 @@ describe('ExperimentsTree', () => {
         mockedResourceLocator
       )
       mockedGetDvcRoots.mockReturnValueOnce(dvcRoots)
-      mockedGetExperiments.mockReturnValueOnce([])
-      mockedGetExperiments.mockReturnValueOnce([])
-      mockedGetExperiments.mockReturnValueOnce([
+      mockedGetWorkspaceAndCommits.mockReturnValueOnce([])
+      mockedGetWorkspaceAndCommits.mockReturnValueOnce([])
+      mockedGetWorkspaceAndCommits.mockReturnValueOnce([
         { label: EXPERIMENT_WORKSPACE_ID },
         { label: 'main' },
         { label: '90aea7f' }
@@ -178,7 +178,7 @@ describe('ExperimentsTree', () => {
         mockedExperiments,
         mockedResourceLocator
       )
-      mockedGetExperiments
+      mockedGetWorkspaceAndCommits
         .mockReturnValueOnce(experiments)
         .mockReturnValueOnce(experiments)
 
@@ -339,7 +339,7 @@ describe('ExperimentsTree', () => {
       ])
     })
 
-    it('should return the branch experiments when the element is a branch', async () => {
+    it("should return the commit's experiments when the element is a commit", async () => {
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
         mockedResourceLocator
@@ -347,7 +347,7 @@ describe('ExperimentsTree', () => {
       const getMockedUri = (name: string, color: string) =>
         Uri.file(join('path', 'to', 'resources', `${name}-${color}.svg`))
       const dvcRoot = '/dvc-root'
-      const branch = {
+      const commit = {
         collapsibleState: 0,
         description: 'f81f1b5',
         dvcRoot,
@@ -356,10 +356,10 @@ describe('ExperimentsTree', () => {
         id: 'f81f1b5',
         label: 'f81f1b5',
         tooltip: undefined,
-        type: ExperimentType.BRANCH
+        type: ExperimentType.COMMIT
       }
 
-      const experimentsByBranch = [
+      const experimentsByCommit = [
         {
           displayColor: undefined,
           hasChildren: false,
@@ -369,10 +369,10 @@ describe('ExperimentsTree', () => {
           type: ExperimentType.EXPERIMENT
         }
       ]
-      mockedGetBranchExperiments.mockReturnValueOnce(experimentsByBranch)
+      mockedGetCommitExperiments.mockReturnValueOnce(experimentsByCommit)
       mockedGetFirstThreeColumnOrder.mockReturnValue([])
 
-      const children = await experimentsTree.getChildren(branch)
+      const children = await experimentsTree.getChildren(commit)
 
       expect(children).toStrictEqual([
         {
@@ -460,7 +460,7 @@ describe('ExperimentsTree', () => {
         mockedExperiments,
         mockedResourceLocator
       )
-      mockedGetExperiments
+      mockedGetWorkspaceAndCommits
         .mockReturnValueOnce(experiments)
         .mockReturnValueOnce(experiments)
       mockedGetDvcRoots.mockReturnValueOnce(['repo'])
@@ -542,8 +542,8 @@ describe('ExperimentsTree', () => {
         mockedResourceLocator
       )
       mockedGetDvcRoots.mockReturnValueOnce(['demo', 'other'])
-      mockedGetExperiments.mockReturnValueOnce([])
-      mockedGetExperiments.mockReturnValueOnce([])
+      mockedGetWorkspaceAndCommits.mockReturnValueOnce([])
+      mockedGetWorkspaceAndCommits.mockReturnValueOnce([])
 
       await experimentsTree.getChildren()
 

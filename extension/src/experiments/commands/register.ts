@@ -143,11 +143,6 @@ const registerExperimentNameCommands = (
         ...ids
       )
   )
-
-  internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_REMOVE_QUEUED,
-    () => experiments.getQueuedExpThenRun(AvailableCommands.EXPERIMENT_REMOVE)
-  )
 }
 
 const registerExperimentInputCommands = (

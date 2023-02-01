@@ -46,6 +46,7 @@ export enum Flag {
   GRANULAR = '--granular',
   JOBS = '-j',
   JSON = '--json',
+  KILL = '--kill',
   NUM_COMMIT = '-n',
   OUTPUT_PATH = '-o',
   SUBDIRECTORY = '--subdir',

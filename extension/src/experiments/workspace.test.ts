@@ -1,7 +1,7 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { Experiments } from '.'
 import { WorkspaceExperiments } from './workspace'
-import { quickPickOne } from '../vscode/quickPick'
+import { quickPickOne, quickPickOneOrInput } from '../vscode/quickPick'
 import {
   CommandId,
   AvailableCommands,
@@ -20,7 +20,8 @@ const mockedDisposable = jest.mocked(Disposable)
 const mockedDvcRoot = '/my/dvc/root'
 const mockedOtherDvcRoot = '/my/fun/dvc/root'
 const mockedQuickPickOne = jest.mocked(quickPickOne)
-const mockedPickCurrentExperiment = jest.fn()
+const mockedQuickPickOneOrInput = jest.mocked(quickPickOneOrInput)
+const mockedPickExperiment = jest.fn()
 const mockedGetInput = jest.mocked(getInput)
 const mockedRun = jest.fn()
 const mockedExpFunc = jest.fn()
@@ -45,8 +46,7 @@ describe('Experiments', () => {
   } as unknown as (() => void) & Disposer)
 
   const mockedInternalCommands = new InternalCommands({
-    show: jest.fn(),
-    listStages: jest.fn()
+    show: jest.fn()
   } as unknown as OutputChannel)
 
   const mockedCommandId = 'mockedExpFunc' as CommandId
@@ -59,6 +59,10 @@ describe('Experiments', () => {
     (...args) => mockedRun(...args)
   )
 
+  mockedInternalCommands.registerCommand(AvailableCommands.STAGE_LIST, () =>
+    Promise.resolve('')
+  )
+
   const mockedUpdatesPaused = buildMockedEventEmitter<boolean>()
 
   const workspaceExperiments = new WorkspaceExperiments(
@@ -68,12 +72,12 @@ describe('Experiments', () => {
     {
       '/my/dvc/root': {
         getDvcRoot: () => mockedDvcRoot,
-        pickCurrentExperiment: mockedPickCurrentExperiment,
+        pickExperiment: mockedPickExperiment,
         showWebview: mockedShowWebview
       } as unknown as Experiments,
       '/my/fun/dvc/root': {
         getDvcRoot: () => mockedOtherDvcRoot,
-        pickCurrentExperiment: jest.fn(),
+        pickExperiment: jest.fn(),
         showWebview: jest.fn()
       } as unknown as Experiments
     },
@@ -117,7 +121,7 @@ describe('Experiments', () => {
   describe('getExpNameThenRun', () => {
     it('should call the correct function with the correct parameters if a project and experiment are picked', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
-      mockedPickCurrentExperiment.mockResolvedValueOnce({
+      mockedPickExperiment.mockResolvedValueOnce({
         id: 'a123456',
         name: 'exp-123'
       })
@@ -125,7 +129,7 @@ describe('Experiments', () => {
       await workspaceExperiments.getCwdAndExpNameThenRun(mockedCommandId)
 
       expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
-      expect(mockedPickCurrentExperiment).toHaveBeenCalledTimes(1)
+      expect(mockedPickExperiment).toHaveBeenCalledTimes(1)
       expect(mockedExpFunc).toHaveBeenCalledTimes(1)
       expect(mockedExpFunc).toHaveBeenCalledWith(mockedDvcRoot, 'exp-123')
     })
@@ -194,7 +198,7 @@ describe('Experiments', () => {
   describe('getCwdExpNameAndInputThenRun', () => {
     it('should call the correct function with the correct parameters if a project and experiment are picked and an input provided', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
-      mockedPickCurrentExperiment.mockResolvedValueOnce({
+      mockedPickExperiment.mockResolvedValueOnce({
         id: 'a123456',
         name: 'exp-123'
       })
@@ -207,7 +211,7 @@ describe('Experiments', () => {
       )
 
       expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
-      expect(mockedPickCurrentExperiment).toHaveBeenCalledTimes(1)
+      expect(mockedPickExperiment).toHaveBeenCalledTimes(1)
       expect(mockedExpFunc).toHaveBeenCalledTimes(1)
       expect(mockedExpFunc).toHaveBeenCalledWith(
         mockedDvcRoot,
@@ -232,7 +236,7 @@ describe('Experiments', () => {
 
     it('should not call the function if user input is not provided', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
-      mockedPickCurrentExperiment.mockResolvedValueOnce({
+      mockedPickExperiment.mockResolvedValueOnce({
         id: 'b456789',
         name: 'exp-456'
       })
@@ -272,6 +276,9 @@ describe('Experiments', () => {
 
     it('should ensure that a dvc.yaml file exists if the the registered command needs it', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedQuickPickOneOrInput.mockResolvedValueOnce(
+        'path/to/training_script.py'
+      )
 
       await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
 

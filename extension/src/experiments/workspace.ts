@@ -247,15 +247,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   }
 
   public getCwdAndExpNameThenRun(commandId: CommandId) {
-    return this.pickExpThenRun(commandId, cwd =>
-      this.pickCurrentExperiment(cwd)
-    )
-  }
-
-  public getQueuedExpThenRun(commandId: CommandId) {
-    return this.pickExpThenRun(commandId, cwd =>
-      this.getRepository(cwd).pickQueuedExperiment()
-    )
+    return this.pickExpThenRun(commandId, cwd => this.pickExperiment(cwd))
   }
 
   public async getCwdAndQuickPickThenRun(
@@ -282,7 +274,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    const experiment = await this.pickCurrentExperiment(cwd)
+    const experiment = await this.pickExperiment(cwd)
 
     if (!experiment) {
       return
@@ -439,11 +431,18 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return pids
   }
 
+  public hasQueuedExperimentsRunning() {
+    return Object.values(this.repositories).some(experiments =>
+      experiments.hasRunningQueuedExperiment()
+    )
+  }
+
   private async checkOrAddPipeline(cwd: string) {
     const stages = await this.internalCommands.executeCommand(
       AvailableCommands.STAGE_LIST,
       cwd
     )
+
     if (!stages) {
       const pathOrSelect = await quickPickOneOrInput(
         [{ label: 'Select from file explorer', value: 'select' }],
@@ -498,7 +497,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return runCommand(...args, input)
   }
 
-  private pickCurrentExperiment(cwd: string) {
-    return this.getRepository(cwd).pickCurrentExperiment()
+  private pickExperiment(cwd: string) {
+    return this.getRepository(cwd).pickExperiment()
   }
 }

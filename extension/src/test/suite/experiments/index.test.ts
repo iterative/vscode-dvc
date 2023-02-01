@@ -87,12 +87,12 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('getExperiments', () => {
-    it('should return the workspace and branch (HEAD revision)', async () => {
+    it('should return the workspace and commit (HEAD revision)', async () => {
       const { experiments } = buildExperiments(disposable)
 
       await experiments.isReady()
 
-      const runs = experiments.getExperiments()
+      const runs = experiments.getWorkspaceAndCommits()
 
       expect(runs.map(experiment => experiment.label)).to.deep.equal([
         EXPERIMENT_WORKSPACE_ID,
@@ -742,8 +742,9 @@ suite('Experiments Test Suite', () => {
       const queuedExperiment = '90aea7f2482117a55dfcadcdb901aaa6610fbbc9'
 
       const isExperimentSelected = (expId: string): boolean =>
-        !!experimentsModel.getAllExperiments().find(({ id }) => id === expId)
-          ?.selected
+        !!experimentsModel
+          .getRecordsWithoutCheckpoints()
+          .find(({ id }) => id === expId)?.selected
 
       expect(isExperimentSelected(experimentToToggle), 'experiment is selected')
         .to.be.true
@@ -939,7 +940,9 @@ suite('Experiments Test Suite', () => {
       const areExperimentsStarred = (expIds: string[]): boolean =>
         expIds
           .map(expId =>
-            experimentsModel.getAllExperiments().find(({ id }) => id === expId)
+            experimentsModel
+              .getRecordsWithoutCheckpoints()
+              .find(({ id }) => id === expId)
           )
           .every(exp => exp?.starred)
 
@@ -1059,6 +1062,35 @@ suite('Experiments Test Suite', () => {
       expect(selectExperimentIds).to.deep.equal(mockExperimentIds.sort())
       expect(mockShowPlots).to.be.calledOnce
       expect(mockShowPlots).to.be.calledWith(dvcDemoPath)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a message to stop experiments running in the queue', async () => {
+      const { experiments, dvcExecutor } = buildExperiments(disposable)
+      const mockQueueKill = stub(dvcExecutor, 'queueKill')
+
+      const experimentsKilled = new Promise(resolve =>
+        mockQueueKill.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve('')
+        })
+      )
+
+      await experiments.isReady()
+
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockExperimentIds = ['exp-e7a67', 'test-branch']
+
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
+
+      mockMessageReceived.fire({
+        payload: mockExperimentIds,
+        type: MessageFromWebviewType.STOP_EXPERIMENT
+      })
+
+      await experimentsKilled
+
+      expect(mockQueueKill).to.be.calledWith(dvcDemoPath, ...mockExperimentIds)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 
@@ -1622,7 +1654,7 @@ suite('Experiments Test Suite', () => {
       await experiments.isReady()
 
       expect(
-        experiments.getExperiments(),
+        experiments.getWorkspaceAndCommits(),
         'should send no experiments to the tree'
       ).to.deep.equal([])
       expect(

@@ -1,9 +1,7 @@
 import { relative } from 'path'
 import { EventEmitter, Event } from 'vscode'
-import {
-  createFileSystemWatcher,
-  getRelativePattern
-} from '../fileSystem/watcher'
+import { getRelativePattern } from '../fileSystem/relativePattern'
+import { createFileSystemWatcher } from '../fileSystem/watcher'
 import { ProcessManager } from '../processManager'
 import { InternalCommands } from '../commands/internal'
 import { ExperimentsOutput, PlotsOutputOrError } from '../cli/dvc/contract'

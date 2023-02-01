@@ -2,6 +2,57 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.0] - 2023-02-01
+
+### 🚀 New Features and Enhancements
+
+- Implement simple onDefinition feature in LSP [#3175](https://github.com/iterative/vscode-dvc/pull/3175) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Limit language server reach to dvc yaml files [#3194](https://github.com/iterative/vscode-dvc/pull/3194) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Rename files associated with LSP [#3185](https://github.com/iterative/vscode-dvc/pull/3185) by [@mattseddon](https://github.com/mattseddon)
+- Remove unnecessary dependencies from LSP [#3184](https://github.com/iterative/vscode-dvc/pull/3184) by [@mattseddon](https://github.com/mattseddon)
+- Remove unnecessary interface from LSP [#3181](https://github.com/iterative/vscode-dvc/pull/3181) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.5.40] - 2023-01-30
+
+### 🚀 New Features and Enhancements
+
+- Combine remove experiments and remove queued experiment quick picks [#3166](https://github.com/iterative/vscode-dvc/pull/3166) by [@mattseddon](https://github.com/mattseddon)
+- Add stop queued experiment running option into table context menu [#3168](https://github.com/iterative/vscode-dvc/pull/3168) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Recheck for global and venv dvc version [#3165](https://github.com/iterative/vscode-dvc/pull/3165) by [@sroy3](https://github.com/sroy3)
+- Fix inital ordering of experiments table [#3174](https://github.com/iterative/vscode-dvc/pull/3174) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Fix test describe statements [#3163](https://github.com/iterative/vscode-dvc/pull/3163) by [@mattseddon](https://github.com/mattseddon)
+- Replace branch terminology with commit for Experiments internals [#3167](https://github.com/iterative/vscode-dvc/pull/3167) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.5.39] - 2023-01-25
+
+### 🚀 New Features and Enhancements
+
+- Update user facing queue terminology [#3154](https://github.com/iterative/vscode-dvc/pull/3154) by [@mattseddon](https://github.com/mattseddon)
+- Add ability to stop experiments running in the queue into stop experiments command [#3157](https://github.com/iterative/vscode-dvc/pull/3157) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix Experiments table multi-select context menu [#3156](https://github.com/iterative/vscode-dvc/pull/3156) by [@mattseddon](https://github.com/mattseddon)
+- Ensure dvc roots are not duplicated during collection [#3153](https://github.com/iterative/vscode-dvc/pull/3153) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Upgrade react-table [#3095](https://github.com/iterative/vscode-dvc/pull/3095) by [@sroy3](https://github.com/sroy3)
+- Update demo project and latest tested CLI version (2.43.1) [#3151](https://github.com/iterative/vscode-dvc/pull/3151) by [@mattseddon](https://github.com/mattseddon)
+- Refactor and reduce code in context class [#3158](https://github.com/iterative/vscode-dvc/pull/3158) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.5.38] - 2023-01-24
 
 ### 🚀 New Features and Enhancements

@@ -8,8 +8,8 @@ import {
 import { COMMITS_SEPARATOR } from '../../cli/git/constants'
 
 describe('collectExperiments', () => {
-  it('should return an empty array if no branches are present', () => {
-    const { branches } = collectExperiments(
+  it('should return an empty array if no commits are present', () => {
+    const { commits } = collectExperiments(
       {
         [EXPERIMENT_WORKSPACE_ID]: {
           baseline: {}
@@ -18,14 +18,14 @@ describe('collectExperiments', () => {
       false,
       ''
     )
-    expect(branches).toStrictEqual([])
+    expect(commits).toStrictEqual([])
   })
 
-  const repoWithTwoBranches = {
+  const repoWithTwoCommits = {
     [EXPERIMENT_WORKSPACE_ID]: {
       baseline: {}
     },
-    branchA: {
+    commitA: {
       baseline: { data: { name: 'branchA' } },
       otherExp1: { data: {} },
       otherExp2: {
@@ -35,51 +35,51 @@ describe('collectExperiments', () => {
         data: { checkpoint_tip: 'otherExp2' }
       }
     },
-    branchB: {
+    commitB: {
       baseline: { data: { name: 'branchB' } }
     }
   }
 
   it('should define a workspace', () => {
-    const { workspace } = collectExperiments(repoWithTwoBranches, false, '')
+    const { workspace } = collectExperiments(repoWithTwoCommits, false, '')
 
     expect(workspace).toBeDefined()
   })
 
   it('should find two branches from a repo with two branches', () => {
-    const { branches } = collectExperiments(repoWithTwoBranches, false, '')
+    const { commits } = collectExperiments(repoWithTwoCommits, false, '')
 
-    expect(branches.length).toStrictEqual(2)
+    expect(commits.length).toStrictEqual(2)
   })
 
-  it('should list branches in the same order as they are collected', () => {
-    const { branches } = collectExperiments(repoWithTwoBranches, false, '')
-    const [branchA, branchB] = branches
+  it('should list commits in the same order as they are collected', () => {
+    const { commits } = collectExperiments(repoWithTwoCommits, false, '')
+    const [commitA, commitB] = commits
 
-    expect(branchA.id).toStrictEqual('branchA')
-    expect(branchB.id).toStrictEqual('branchB')
+    expect(commitA.id).toStrictEqual('branchA')
+    expect(commitB.id).toStrictEqual('branchB')
   })
 
-  it('should find two experiments on branchA', () => {
-    const { experimentsByBranch } = collectExperiments(
-      repoWithTwoBranches,
+  it('should find two experiments on commitA', () => {
+    const { experimentsByCommit } = collectExperiments(
+      repoWithTwoCommits,
       false,
       ''
     )
-    expect(experimentsByBranch.get('branchA')?.length).toStrictEqual(2)
+    expect(experimentsByCommit.get('branchA')?.length).toStrictEqual(2)
   })
 
   it('should find no experiments on branchB', () => {
-    const { experimentsByBranch } = collectExperiments(
-      repoWithTwoBranches,
+    const { experimentsByCommit } = collectExperiments(
+      repoWithTwoCommits,
       false,
       ''
     )
-    expect(experimentsByBranch.get('branchB')).toBeUndefined()
+    expect(experimentsByCommit.get('branchB')).toBeUndefined()
   })
 
-  it('should add git commit data to branches if git log output is provided', () => {
-    const { branches } = collectExperiments(
+  it('should add data from git to commits if git log output is provided', () => {
+    const { commits } = collectExperiments(
       {
         [EXPERIMENT_WORKSPACE_ID]: {
           baseline: {}
@@ -94,7 +94,7 @@ describe('collectExperiments', () => {
       false,
       `a123\nJohn Smith\n3 days ago\nrefNames:tag: v.1.1\nmessage:add new feature${COMMITS_SEPARATOR}b123\nrenovate[bot]\n5 weeks ago\nrefNames:\nmessage:update various dependencies\n* update dvc\n* update dvclive`
     )
-    const [branch1, branch2] = branches
+    const [branch1, branch2] = commits
     expect(branch1.displayNameOrParent).toStrictEqual('add new feature')
     expect(branch2.displayNameOrParent).toStrictEqual(
       'update various dependencies ...'
@@ -133,12 +133,12 @@ describe('collectExperiments', () => {
   }
 
   it('should only list the tip as a top-level experiment', () => {
-    const { experimentsByBranch } = collectExperiments(
+    const { experimentsByCommit } = collectExperiments(
       repoWithNestedCheckpoints,
       false,
       ''
     )
-    expect(experimentsByBranch.size).toStrictEqual(1)
+    expect(experimentsByCommit.size).toStrictEqual(1)
   })
 
   it('should find three checkpoints on the tip', () => {
@@ -224,8 +224,8 @@ describe('collectExperiments', () => {
     }
     const acc = collectExperiments(repoWithNestedCheckpoints, false, '')
 
-    const { experimentsByBranch, checkpointsByTip } = acc
-    const [experiment] = experimentsByBranch.get('branchA') || []
+    const { experimentsByCommit, checkpointsByTip } = acc
+    const [experiment] = experimentsByCommit.get('branchA') || []
 
     expect(experiment.id).toStrictEqual(checkpointTipWithoutAName)
     expect(

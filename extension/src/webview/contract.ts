@@ -30,6 +30,7 @@ export enum MessageFromWebviewType {
   REFRESH_REVISIONS = 'refresh-revisions',
   RESIZE_COLUMN = 'resize-column',
   RESIZE_PLOTS = 'resize-plots',
+  STOP_EXPERIMENT = 'stop-experiment',
   SORT_COLUMN = 'sort-column',
   TOGGLE_EXPERIMENT = 'toggle-experiment',
   TOGGLE_EXPERIMENT_STAR = 'toggle-experiment-star',
@@ -124,6 +125,10 @@ export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.SORT_COLUMN
       payload: SortDefinition
+    }
+  | {
+      type: MessageFromWebviewType.STOP_EXPERIMENT
+      payload: string[]
     }
   | {
       type: MessageFromWebviewType.REMOVE_COLUMN_SORT

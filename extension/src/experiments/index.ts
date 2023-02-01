@@ -385,16 +385,9 @@ export class Experiments extends BaseRepository<TableData> {
     }
   }
 
-  public pickCurrentExperiment() {
+  public pickExperiment() {
     return pickExperiment(
-      this.experiments.getCurrentExperiments(),
-      this.getFirstThreeColumnOrder()
-    )
-  }
-
-  public pickQueuedExperiment() {
-    return pickExperiment(
-      this.experiments.getQueuedExperiments(),
+      this.experiments.getExperiments(),
       this.getFirstThreeColumnOrder()
     )
   }
@@ -409,7 +402,7 @@ export class Experiments extends BaseRepository<TableData> {
 
   public pickExperimentsToRemove() {
     return pickExperiments(
-      this.experiments.getCurrentExperiments(),
+      this.experiments.getExperimentsAndQueued(),
       this.getFirstThreeColumnOrder(),
       Title.SELECT_EXPERIMENTS_REMOVE
     )
@@ -430,20 +423,20 @@ export class Experiments extends BaseRepository<TableData> {
     return pickAndModifyParams(params)
   }
 
-  public getExperiments() {
+  public getWorkspaceAndCommits() {
     if (!this.columns.hasNonDefaultColumns()) {
       return []
     }
 
-    return this.experiments.getExperiments()
+    return this.experiments.getWorkspaceAndCommits()
   }
 
   public getCheckpoints(id: string) {
     return this.experiments.getCheckpointsWithType(id)
   }
 
-  public getBranchExperiments(branch: Experiment) {
-    return this.experiments.getExperimentsByBranchForTree(branch)
+  public getCommitExperiments(commit: Experiment) {
+    return this.experiments.getExperimentsByCommitForTree(commit)
   }
 
   public sendInitialWebviewData() {
@@ -462,8 +455,8 @@ export class Experiments extends BaseRepository<TableData> {
     this.experiments.setRevisionCollected(revisions)
   }
 
-  public getBranchRevisions() {
-    return this.experiments.getBranchRevisions()
+  public getCommitRevisions() {
+    return this.experiments.getCommitRevisions()
   }
 
   public getFinishedExperiments() {
@@ -528,6 +521,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.hasRunningExperiment()
   }
 
+  public hasRunningQueuedExperiment() {
+    return this.experiments.getRunningQueueTasks().length > 0
+  }
+
   public getFirstThreeColumnOrder() {
     return this.columns.getFirstThreeColumnOrder()
   }
@@ -572,7 +569,13 @@ export class Experiments extends BaseRepository<TableData> {
       this.checkpoints,
       () => this.getWebview(),
       () => this.notifyChanged(),
-      () => this.selectColumns()
+      () => this.selectColumns(),
+      (dvcRoot: string, ...ids: string[]) =>
+        this.internalCommands.executeCommand(
+          AvailableCommands.QUEUE_KILL,
+          dvcRoot,
+          ...ids
+        )
     )
 
     this.dispose.track(
@@ -618,7 +621,7 @@ export class Experiments extends BaseRepository<TableData> {
     }
 
     const experiment = await pickExperiment(
-      this.experiments.getAllExperiments(),
+      this.experiments.getRecordsWithoutCheckpoints(),
       this.getFirstThreeColumnOrder(),
       Title.SELECT_BASE_EXPERIMENT
     )
