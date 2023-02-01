@@ -17,7 +17,6 @@ export class LanguageClient extends Disposable {
 
     const clientOptions: LanguageClientOptions = {
       documentSelector,
-
       synchronize: {
         fileEvents: workspace.createFileSystemWatcher('**/dvc.yaml')
       }

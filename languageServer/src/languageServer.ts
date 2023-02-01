@@ -10,7 +10,8 @@ import {
   SymbolKind,
   DocumentSymbol,
   Connection,
-  Location
+  Location,
+  TextDocumentSyncKind
 } from 'vscode-languageserver/node'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import { URI } from 'vscode-uri'
@@ -117,7 +118,8 @@ export class LanguageServer {
 
   private onInitialize() {
     const serverCapabilities: ServerCapabilities = {
-      definitionProvider: true
+      definitionProvider: true,
+      textDocumentSync: TextDocumentSyncKind.Incremental
     }
 
     const result: InitializeResult = {
