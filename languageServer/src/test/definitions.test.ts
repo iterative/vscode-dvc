@@ -1,21 +1,26 @@
+import { join } from 'path'
 import { Position, Range } from 'vscode-languageserver/node'
+import { URI } from 'vscode-uri'
 import {
-  foreach_dvc_yaml,
   params_dvc_yaml,
-  vars_dvc_yaml
+  plots_dvc_yaml,
+  train_dvc_yaml
 } from './fixtures/examples/valid'
 import { params } from './fixtures/params'
+import { train } from './fixtures/python'
 import { requestDefinitions } from './utils/requestDefinitions'
 import { openTheseFilesAndNotifyServer } from './utils/openTheseFilesAndNotifyServer'
 import {
   disposeTestConnections,
   setupTestConnections
 } from './utils/setup-test-connections'
-import { sendTheseFilesToServer } from './utils/sendTheseFilesToServer'
+
+const mockedReadFileContents = jest.fn()
 
 describe('textDocument/definitions', () => {
   beforeEach(() => {
-    setupTestConnections()
+    jest.resetAllMocks()
+    setupTestConnections(mockedReadFileContents)
   })
 
   afterEach(() => {
@@ -49,51 +54,60 @@ describe('textDocument/definitions', () => {
         mockPath: 'params.yaml'
       }
     ])
-    const response = await requestDefinitions(dvcYaml, 'auc')
+    const response = await requestDefinitions(dvcYaml, '- params.yaml', 2)
 
     expect(response).toBeTruthy()
     expect(response).toStrictEqual({
-      range: Range.create(Position.create(4, 0), Position.create(4, 3)),
+      range: Range.create(Position.create(0, 0), Position.create(5, 9)),
       uri: 'file:///params.yaml'
     })
   })
 
-  it('should be able to read a complicated command from a stage', async () => {
+  it('should try to read the file system when a python file is unknown', async () => {
+    const trainUri = URI.file(join(__dirname, 'train.py')).toString()
+
+    mockedReadFileContents.mockImplementation(path => {
+      if (path === trainUri) {
+        return { contents: train }
+      }
+      return null
+    })
+
     const [dvcYaml] = await openTheseFilesAndNotifyServer([
       {
         languageId: 'yaml',
-        mockContents: foreach_dvc_yaml,
-        mockPath: 'dvc.yaml'
+        mockContents: train_dvc_yaml,
+        mockPath: join(__dirname, 'dvc.yaml')
       }
     ])
-    const response = await requestDefinitions(dvcYaml, '{item.os}')
+
+    const response = await requestDefinitions(dvcYaml, 'train.py')
+
+    expect(mockedReadFileContents).toHaveBeenCalledWith(trainUri, {
+      _isCancelled: false
+    })
 
     expect(response).toBeTruthy()
     expect(response).toStrictEqual({
-      range: Range.create(Position.create(15, 8), Position.create(15, 10)),
-      uri: 'file:///dvc.yaml'
+      range: Range.create(Position.create(0, 0), Position.create(7, 13)),
+      uri: trainUri
     })
   })
 
-  it('should provide a single location that points to the top of the file path symbol', async () => {
-    const [dvcYaml] = await sendTheseFilesToServer([
+  it('should return null if the provided symbol is not in the known documents and cannot be found on the file system', async () => {
+    mockedReadFileContents.mockResolvedValue(null)
+
+    const [dvcYaml] = await openTheseFilesAndNotifyServer([
       {
         languageId: 'yaml',
-        mockContents: vars_dvc_yaml,
-        mockPath: 'dvc.yaml'
-      },
-      {
-        languageId: 'json',
-        mockContents: '',
-        mockPath: 'params.json'
+        mockContents: plots_dvc_yaml,
+        mockPath: join(__dirname, 'dvc.yaml')
       }
     ])
-    const response = await requestDefinitions(dvcYaml, 'params.json')
 
-    expect(response).toBeTruthy()
-    expect(response).toStrictEqual({
-      range: Range.create(Position.create(0, 0), Position.create(0, 0)),
-      uri: 'file:///params.json'
-    })
+    const response = await requestDefinitions(dvcYaml, 'plot5')
+
+    expect(mockedReadFileContents).toHaveBeenCalledTimes(1)
+    expect(response).toBeNull()
   })
 })

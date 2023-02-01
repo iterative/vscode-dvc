@@ -3931,10 +3931,10 @@
     jest-matcher-utils "^27.0.0"
     pretty-format "^27.0.0"
 
-"@types/jest@29.2.6":
-  version "29.2.6"
-  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-29.2.6.tgz#1d43c8e533463d0437edef30b2d45d5aa3d95b0a"
-  integrity sha512-XEUC/Tgw3uMh6Ho8GkUtQ2lPhY5Fmgyp3TdlkTJs1W9VgNxs+Ow/x3Elh8lHQKqCbZL0AubQuqWjHVT033Hhrw==
+"@types/jest@29.4.0":
+  version "29.4.0"
+  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-29.4.0.tgz#a8444ad1704493e84dbf07bb05990b275b3b9206"
+  integrity sha512-VaywcGQ9tPorCX/Jkkni7RWGFfI11whqzs8dvxF41P17Z+z872thvEvlIbznjPJ02kl1HMX3LmLOonsj2n7HeQ==
   dependencies:
     expect "^29.0.0"
     pretty-format "^29.0.0"
@@ -4659,14 +4659,14 @@
     "@microsoft/fast-foundation" "^2.38.0"
     "@microsoft/fast-react-wrapper" "^0.1.18"
 
-"@wdio/cli@8.2.3":
-  version "8.2.3"
-  resolved "https://registry.yarnpkg.com/@wdio/cli/-/cli-8.2.3.tgz#878d333cfbeb234b2266f3885f29facd95151e4b"
-  integrity sha512-nMNda+qs7Wpwe+ca/ihLiljqN5PKDVPCa6J6nWPq8ro1KvS8uT3LipZ7T56IEiLeqGtwjCmPc2RZ6DVMsCPKZg==
+"@wdio/cli@8.2.4":
+  version "8.2.4"
+  resolved "https://registry.yarnpkg.com/@wdio/cli/-/cli-8.2.4.tgz#1cd5e6ebfca9af6de99f9b7ba59e30c3ec81ad41"
+  integrity sha512-0w8if0kuAGxlNymJzJPMrJTeAFyCA3SuznBVDBFCWZfi56bwNXvv/ZZ+LikbNzJFlZ7OsAp3K+Ln072nffEigA==
   dependencies:
     "@types/node" "^18.0.0"
     "@wdio/config" "8.2.3"
-    "@wdio/globals" "8.2.3"
+    "@wdio/globals" "8.2.4"
     "@wdio/logger" "8.1.0"
     "@wdio/protocols" "8.2.0"
     "@wdio/types" "8.1.2"
@@ -4685,7 +4685,7 @@
     mkdirp "^2.0.0"
     read-pkg-up "9.1.0"
     recursive-readdir "^2.2.2"
-    webdriverio "8.2.3"
+    webdriverio "8.2.4"
     yargs "^17.5.1"
     yarn-install "^1.0.0"
 
@@ -4725,23 +4725,23 @@
     expect-webdriverio "^4.0.1"
     webdriverio "8.0.13"
 
-"@wdio/globals@8.2.3":
-  version "8.2.3"
-  resolved "https://registry.yarnpkg.com/@wdio/globals/-/globals-8.2.3.tgz#87355958c00241e89918d85bb23edd2d23befec3"
-  integrity sha512-eXoGvKY7NcTk6PBc1ZmLSjJtOji835XuhkPkfuWp1MyXYS1OnZrlekW21YaOWaHSZMn+Sjqbag/UySNxQw7S/w==
+"@wdio/globals@8.2.4":
+  version "8.2.4"
+  resolved "https://registry.yarnpkg.com/@wdio/globals/-/globals-8.2.4.tgz#a730a72aa9a4e11de2c2f04a6e40c65c86a77a05"
+  integrity sha512-8TjR56PpjdFqn4fBLBT6BH1o44q4GvBxlwjkWZvi99Hfw5nIzmRxo8mYK+LNaF1iDq4uta94e9Z+hWrmQLZQuw==
   optionalDependencies:
     expect-webdriverio "^4.0.1"
-    webdriverio "8.2.3"
+    webdriverio "8.2.4"
 
-"@wdio/local-runner@8.2.3":
-  version "8.2.3"
-  resolved "https://registry.yarnpkg.com/@wdio/local-runner/-/local-runner-8.2.3.tgz#2df680de4d146547c8024166bd165b86fa98bd21"
-  integrity sha512-9jJ1zzjR/3ZWsPc+E5hPfxBylCIYEHgsINSqfYtEIotCuLANuPvggxOTe4WU6LOo6mWsvBQOPZ0zjkxiJddAVQ==
+"@wdio/local-runner@8.2.4":
+  version "8.2.4"
+  resolved "https://registry.yarnpkg.com/@wdio/local-runner/-/local-runner-8.2.4.tgz#0998f403324eada1bae7d954f7ed3ae438722153"
+  integrity sha512-s9nymIYAFdZpYlykSPXxGVfxdTkuMfhPoIIZhCtREzmWDCURLBcSDjL2MA7m+cBXJhf9EqlFS2TIpKoEaS0wYQ==
   dependencies:
     "@types/node" "^18.0.0"
     "@wdio/logger" "8.1.0"
     "@wdio/repl" "8.1.0"
-    "@wdio/runner" "8.2.3"
+    "@wdio/runner" "8.2.4"
     "@wdio/types" "8.1.2"
     async-exit-hook "^2.0.1"
     split2 "^4.1.0"
@@ -4813,14 +4813,14 @@
     object-inspect "^1.12.0"
     supports-color "9.3.1"
 
-"@wdio/runner@8.2.3":
-  version "8.2.3"
-  resolved "https://registry.yarnpkg.com/@wdio/runner/-/runner-8.2.3.tgz#ac92ac68d23b1e3a00e887ed827d27c855dbfa3b"
-  integrity sha512-dXx95VhNcKmiP7qe7FS4AQu31Ccz3QtNZsohgHHQWod9nn1DK877NOF3Kvqh9+aXIjHf9mWRidGbLkhTY/dkfw==
+"@wdio/runner@8.2.4":
+  version "8.2.4"
+  resolved "https://registry.yarnpkg.com/@wdio/runner/-/runner-8.2.4.tgz#65eda8b108fce56666f43027fbf90d3e86830092"
+  integrity sha512-LdrPnb9X7II7FxTqgi9bHP2ItiHG+YSUihAlunE65OREaiuwCceZBw1WRnJE3u2geTQC9jRRcXb1u0LJiA4N7g==
   dependencies:
     "@types/node" "^18.0.0"
     "@wdio/config" "8.2.3"
-    "@wdio/globals" "8.2.3"
+    "@wdio/globals" "8.2.4"
     "@wdio/logger" "8.1.0"
     "@wdio/types" "8.1.2"
     "@wdio/utils" "8.2.3"
@@ -4828,7 +4828,7 @@
     expect-webdriverio "^4.0.1"
     gaze "^1.1.2"
     webdriver "8.2.3"
-    webdriverio "8.2.3"
+    webdriverio "8.2.4"
 
 "@wdio/spec-reporter@8.1.2":
   version "8.1.2"
@@ -12738,7 +12738,7 @@ json5@2.2.3, json5@^1.0.1, json5@^2.1.2, json5@^2.1.3, json5@^2.2.1:
   resolved "https://registry.yarnpkg.com/json5/-/json5-2.2.3.tgz#78cd6f1a19bdc12b73db5ad0c61efd66c1e29283"
   integrity sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==
 
-jsonc-parser@3.2.0, jsonc-parser@^3.2.0:
+jsonc-parser@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/jsonc-parser/-/jsonc-parser-3.2.0.tgz#31ff3f4c2b9793f89c67212627c51c6394f88e76"
   integrity sha512-gfFQZrcTc8CnKXp6Y4/CBT3fTc0OVuDofpre4aEeEpSBPV5X5v4+Vmx+8snU7RLPrNHPKSgLxGo9YuQzz20o+w==
@@ -12758,11 +12758,6 @@ jsonfile@^6.0.1:
     universalify "^2.0.0"
   optionalDependencies:
     graceful-fs "^4.1.6"
-
-jsonpath-plus@7.2.0:
-  version "7.2.0"
-  resolved "https://registry.yarnpkg.com/jsonpath-plus/-/jsonpath-plus-7.2.0.tgz#7ad94e147b3ed42f7939c315d2b9ce490c5a3899"
-  integrity sha512-zBfiUPM5nD0YZSBT/o/fbCUlCcepMIdP0CJZxM1+KgA4f2T206f6VAg9e7mX35+KlMaIc5qXW34f3BnwJ3w+RA==
 
 "jsx-ast-utils@^2.4.1 || ^3.0.0":
   version "3.2.1"
@@ -13160,7 +13155,7 @@ lodash.zip@^4.2.0:
   resolved "https://registry.yarnpkg.com/lodash.zip/-/lodash.zip-4.2.0.tgz#ec6662e4896408ed4ab6c542a3990b72cc080020"
   integrity sha512-C7IOaBBK/0gMORRBd8OETNx3kmOkgIWIPvyDpZSCTwUrpYmgZwJkjZeOD8ww4xbOUOs4/attY+pciKvadNfFbg==
 
-lodash@4.17.21, lodash@^4, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.20, lodash@^4.17.21:
+lodash@^4, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.20, lodash@^4.17.21:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
@@ -19238,10 +19233,10 @@ webdriverio@8.0.13, webdriverio@^8.0.0-alpha.505:
     serialize-error "^8.0.0"
     webdriver "8.0.13"
 
-webdriverio@8.2.3:
-  version "8.2.3"
-  resolved "https://registry.yarnpkg.com/webdriverio/-/webdriverio-8.2.3.tgz#176f22c93a8b1f433fece435e7e982d6830ac9a6"
-  integrity sha512-zBopvntluqIBBP88WZGbabQv4MCw1g4metAU3P5K3VToVE0+nrjQGIJ/pr871uxd83pnMMfM2T713oGN67S35w==
+webdriverio@8.2.4:
+  version "8.2.4"
+  resolved "https://registry.yarnpkg.com/webdriverio/-/webdriverio-8.2.4.tgz#16a2a78dc746d3cdff5136395bf4bb52a6c9d431"
+  integrity sha512-wFm1NZXwpl6TJcvWBRFyFKqYqSL8aUEa+J2CzsRLvXbeys69uVj0eIGRx5jbq+Y6at0M35ADwUCRqxRWNDvMqQ==
   dependencies:
     "@types/node" "^18.0.0"
     "@wdio/config" "8.2.3"

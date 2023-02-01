@@ -37,10 +37,8 @@ import { WorkspaceExperiments } from '../experiments/workspace'
 import { DvcRunner } from '../cli/dvc/runner'
 import { sendTelemetryEvent, sendTelemetryEventAndThrow } from '../telemetry'
 import { StopWatch } from '../util/time'
-import {
-  createFileSystemWatcher,
-  getRelativePattern
-} from '../fileSystem/watcher'
+import { getRelativePattern } from '../fileSystem/relativePattern'
+import { createFileSystemWatcher } from '../fileSystem/watcher'
 import { EventName } from '../telemetry/constants'
 import { WorkspaceScale } from '../telemetry/collect'
 import { gitPath } from '../cli/git/constants'

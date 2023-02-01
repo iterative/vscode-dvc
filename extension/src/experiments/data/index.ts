@@ -6,10 +6,8 @@ import {
   EXPERIMENTS_GIT_REFS,
   EXPERIMENTS_GIT_REFS_EXEC
 } from './constants'
-import {
-  createFileSystemWatcher,
-  getRelativePattern
-} from '../../fileSystem/watcher'
+import { getRelativePattern } from '../../fileSystem/relativePattern'
+import { createFileSystemWatcher } from '../../fileSystem/watcher'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { ExperimentsOutput } from '../../cli/dvc/contract'
 import { BaseData } from '../../data'
