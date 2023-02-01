@@ -56,6 +56,29 @@ $bullet-size: calc(var(--design-unit) * 4px);
   }
 }
 
+%cellBorderLeft {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  height: 100%;
+  top: 0;
+  background-color: transparent;
+}
+
+%headerCellBorderBottom {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  top: auto;
+  left: 1px;
+  width: 100%;
+  height: 1px;
+  display: block;
+  background-color: $header-border-color;
+}
+
 .hidden {
   visibility: hidden;
 }
@@ -275,40 +298,21 @@ $bullet-size: calc(var(--design-unit) * 4px);
         pointer-events: none;
       }
 
-      td:not(.experimentCell):hover .innerCell,
-      td:hover .timestampInnerCell,
-      td:hover + td .innerCell,
-      td:hover + td .timestampInnerCell {
-        border-left-color: $row-border-selected-color;
+      td:not(.experimentCell):hover:before,
+      td:hover + td:before {
+        background-color: $row-border-selected-color;
       }
     }
 
-    &:hover:not(.rowSelected),
-    &.rowFocused:not(.rowSelected) {
-      td:not(.experimentCell):hover {
-        .innerCell,
-        .timestampInnerCell {
-          border-left-color: $border-color;
-        }
-
-        & + td {
-          .innerCell,
-          .timestampInnerCell {
-            border-left-color: $border-color;
-          }
-        }
-      }
-
-      td.experimentCell:hover + td {
-        .innerCell,
-        .timestampInnerCell {
-          border-left-color: $border-color;
-        }
-      }
-
+    &:hover:not(.rowSelected) {
       td:not(.experimentCell),
       .experimentCell::before {
         background-color: $row-hover-background-color;
+      }
+
+      td:not(.experimentCell):hover:before,
+      td:hover + td:before {
+        background-color: $border-color;
       }
     }
 
@@ -335,15 +339,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
         }
 
         &::before {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 1px;
-          width: 100%;
-          height: 1px;
-          background-color: $header-border-color;
-          display: block;
-          top: auto;
+          @extend %headerCellBorderBottom;
         }
       }
     }
@@ -533,10 +529,8 @@ $bullet-size: calc(var(--design-unit) * 4px);
     line-height: 2rem;
     align-items: center;
 
-    .innerCell,
-    .timestampInnerCell {
-      border-right: 1px solid transparent;
-      border-left: 1px solid transparent;
+    &:not(.experimentCell):before {
+      @extend %cellBorderLeft;
     }
 
     &:first-child {
@@ -551,10 +545,8 @@ $bullet-size: calc(var(--design-unit) * 4px);
       }
     }
   }
-  .experimentCell {
-    border-right: none;
-    border-left: none;
 
+  .experimentCell {
     .innerCell {
       display: flex;
       flex-flow: row nowrap;
@@ -602,12 +594,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
     }
 
     &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 1px;
-      height: 100%;
-      width: 1px;
+      @extend %cellBorderLeft;
       background-color: $header-border-color;
     }
 
@@ -642,6 +629,10 @@ $bullet-size: calc(var(--design-unit) * 4px);
       outline-style: dashed;
       outline-color: $header-dnd-outline;
       outline-offset: -4px;
+
+      .iconMenu ul[role='menu'] {
+        background-color: transparent;
+      }
     }
   }
 
@@ -868,9 +859,19 @@ $bullet-size: calc(var(--design-unit) * 4px);
   @extend %truncateLeftChild;
   font-size: 0.7em;
 }
+
 .timestampTime {
   @extend %truncateLeftChild;
   font-size: 0.9em;
+}
+
+.createdHeaderCell .iconMenu {
+  left: auto;
+  right: 0;
+
+  ul[role='menu'] {
+    margin: 0 4px 0 0;
+  }
 }
 
 .timestampHeader {
