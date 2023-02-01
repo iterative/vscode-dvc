@@ -2,7 +2,8 @@ import { join } from 'path'
 import { Event, EventEmitter } from 'vscode'
 import { isSameOrChild, loadYaml, PartialDvcYaml } from '..'
 import { findFiles } from '../workspace'
-import { createFileSystemWatcher, getRelativePattern } from '../watcher'
+import { getRelativePattern } from '../relativePattern'
+import { createFileSystemWatcher } from '../watcher'
 import { DeferredDisposable } from '../../class/deferred'
 
 export class FileSystemData extends DeferredDisposable {

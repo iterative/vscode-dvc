@@ -1,31 +1,7 @@
-import { relative } from 'path'
 import { utimes } from 'fs-extra'
-import { GlobPattern, RelativePattern, Uri, workspace } from 'vscode'
+import { GlobPattern, workspace } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { isDirectory, isSameOrChild } from '.'
-import { joinWithForwardSlashes } from '../util/string'
-
-const getRelativePatternForOutsideWorkspace = (
-  uri: Uri,
-  pattern: string
-): RelativePattern => new RelativePattern(uri, pattern)
-
-export const getRelativePattern = (
-  path: string,
-  pattern: string
-): RelativePattern => {
-  for (const workspaceFolder of workspace.workspaceFolders || []) {
-    const workspaceFolderPath = workspaceFolder.uri.fsPath
-    if (isSameOrChild(workspaceFolderPath, path)) {
-      return new RelativePattern(
-        workspaceFolder,
-        joinWithForwardSlashes([relative(workspaceFolderPath, path), pattern])
-      )
-    }
-  }
-
-  return getRelativePatternForOutsideWorkspace(Uri.file(path), pattern)
-}
+import { isDirectory } from '.'
 
 export const fireWatcher = (path: string): Promise<void> => {
   const now = Date.now() / 1000

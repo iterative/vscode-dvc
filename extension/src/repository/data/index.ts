@@ -1,10 +1,10 @@
 import { Event, EventEmitter } from 'vscode'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { ProcessManager } from '../../processManager'
+import { getRelativePattern } from '../../fileSystem/relativePattern'
 import {
   createFileSystemWatcher,
-  ignoredDotDirectories,
-  getRelativePattern
+  ignoredDotDirectories
 } from '../../fileSystem/watcher'
 import {
   EXPERIMENTS_GIT_LOGS_REFS,

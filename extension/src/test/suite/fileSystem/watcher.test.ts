@@ -4,9 +4,8 @@ import { expect } from 'chai'
 import { Uri } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { restore } from 'sinon'
-import { getRelativePattern } from '../../../fileSystem/watcher'
+import { getRelativePattern } from '../../../fileSystem/relativePattern'
 import { dvcDemoPath, getTestWorkspaceFolder } from '../../util'
-import { joinWithForwardSlashes } from '../../../util/string'
 
 suite('File System Watcher Test Suite', () => {
   const disposable = Disposable.fn()
@@ -28,9 +27,7 @@ suite('File System Watcher Test Suite', () => {
       expect(relativePattern.baseUri).to.deep.equal(
         getTestWorkspaceFolder().uri
       )
-      expect(relativePattern.pattern).equal(
-        joinWithForwardSlashes(['.git', '**'])
-      )
+      expect(relativePattern.pattern).equal('.git/**')
     })
 
     it('should return the expected relative pattern for a path outside of the workspace', () => {
