@@ -51,6 +51,7 @@ const getHeaderPropsArgs = (
         [styles.paramHeaderCell]: columnWithGroup.group === ColumnType.PARAMS,
         [styles.metricHeaderCell]: columnWithGroup.group === ColumnType.METRICS,
         [styles.depHeaderCell]: columnWithGroup.group === ColumnType.DEPS,
+        [styles.createdHeaderCell]: header.id === 'Created',
         [styles.firstLevelHeader]: isFirstLevelHeader(header.column.id),
         [styles.leafHeader]: header.subHeaders === undefined,
         [styles.menuEnabled]: sortEnabled,

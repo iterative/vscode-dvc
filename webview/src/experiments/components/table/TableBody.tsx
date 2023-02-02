@@ -72,7 +72,10 @@ export const TableBody: React.FC<
         <tbody>
           <tr className={cx(styles.tr, styles.previousCommitsRow)}>
             <td className={styles.th}>Previous Commits</td>
-            <td colSpan={row.getAllCells().length - 1}></td>
+            <td
+              className={styles.th}
+              colSpan={row.getAllCells().length - 1}
+            ></td>
           </tr>
         </tbody>
       )}
