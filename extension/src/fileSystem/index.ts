@@ -22,13 +22,18 @@ import { delay } from '../util/time'
 
 export const exists = (path: string): boolean => existsSync(path)
 
-export const isDirectory = (path: string): boolean => {
+const checkStats = (path: string, check: 'isDirectory' | 'isFile'): boolean => {
   try {
-    return lstatSync(path).isDirectory()
+    return lstatSync(path)[check]()
   } catch {
     return false
   }
 }
+
+export const isDirectory = (path: string): boolean =>
+  checkStats(path, 'isDirectory')
+
+export const isFile = (path: string): boolean => checkStats(path, 'isFile')
 
 export const getModifiedTime = (path: string): number =>
   lstatSync(path).mtime.getTime()
@@ -75,7 +80,7 @@ export const findAbsoluteDvcRootPath = async (
 const findDotGitDir = (gitRoot: string) => {
   const dotGitPath = join(gitRoot, gitPath.DOT_GIT)
 
-  const isSubmodule = lstatSync(dotGitPath).isFile()
+  const isSubmodule = isFile(dotGitPath)
   if (isSubmodule) {
     const dotGitAsFileContent = readFileSync(dotGitPath, 'utf8')
     const gitDirPrefix = 'gitdir: '
@@ -203,16 +208,4 @@ export const getBinDisplayText = (
   return isSameOrChild(workspaceRoot, path)
     ? '.' + sep + relative(workspaceRoot, path)
     : path
-}
-
-export const readFileContents = (
-  uriString: string
-): { contents: string } | null => {
-  try {
-    const uri = Uri.parse(uriString)
-    if (!isDirectory(uri.fsPath)) {
-      return { contents: readFileSync(uri.fsPath, 'utf8') }
-    }
-  } catch {}
-  return null
 }
