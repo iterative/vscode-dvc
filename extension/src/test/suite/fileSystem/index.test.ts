@@ -1,6 +1,5 @@
 import { join, resolve } from 'path'
 import process from 'process'
-import { Uri } from 'vscode'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { Disposable } from '@hediet/std/disposable'
@@ -11,7 +10,8 @@ import {
   checkSignalFile,
   exists,
   getGitPath,
-  readFileContents
+  isDirectory,
+  isFile
 } from '../../../fileSystem'
 import { gitPath } from '../../../cli/git/constants'
 import { GitReader } from '../../../cli/git/reader'
@@ -100,19 +100,28 @@ suite('File System Test Suite', () => {
     })
   })
 
-  describe('readFileContents', () => {
-    it('should read the contents of a file when it exists', () => {
-      const uriString = Uri.file(join(dvcDemoPath, 'train.py')).toString()
+  describe('isFile', () => {
+    it('should return true when the path is a file', () => {
+      const path = standardizePath(join(dvcDemoPath, 'train.py'))
 
-      const file = readFileContents(uriString)
-      expect(file?.contents).to.contain('main()')
+      const result = isFile(path)
+      expect(result).to.be.true
     })
 
-    it('should return null when the file cannot be found', () => {
-      const uriString = 'file:///some/fun/file.txt'
+    it('should return false when the file cannot be found', () => {
+      const path = standardizePath(join('some', 'fun', 'file.txt'))
 
-      const contents = readFileContents(uriString)
-      expect(contents).to.be.null
+      const result = isFile(path)
+      expect(result).to.be.false
+    })
+
+    it('should return false for a directory', () => {
+      const path = standardizePath(join(dvcDemoPath, 'training'))
+
+      expect(isDirectory(path)).to.be.true
+
+      const result = isFile(path)
+      expect(result).to.be.false
     })
   })
 })
