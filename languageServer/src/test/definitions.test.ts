@@ -7,7 +7,6 @@ import {
   train_dvc_yaml
 } from './fixtures/examples/valid'
 import { params } from './fixtures/params'
-import { train } from './fixtures/python'
 import { requestDefinitions } from './utils/requestDefinitions'
 import { openTheseFilesAndNotifyServer } from './utils/openTheseFilesAndNotifyServer'
 import {
@@ -58,7 +57,7 @@ describe('textDocument/definitions', () => {
 
     expect(response).toBeTruthy()
     expect(response).toStrictEqual({
-      range: Range.create(Position.create(0, 0), Position.create(5, 9)),
+      range: Range.create(Position.create(0, 0), Position.create(0, 0)),
       uri: 'file:///params.yaml'
     })
   })
@@ -68,7 +67,7 @@ describe('textDocument/definitions', () => {
 
     mockedReadFileContents.mockImplementation(path => {
       if (path === trainUri) {
-        return { contents: train }
+        return { isFile: true }
       }
       return null
     })
@@ -89,7 +88,7 @@ describe('textDocument/definitions', () => {
 
     expect(response).toBeTruthy()
     expect(response).toStrictEqual({
-      range: Range.create(Position.create(0, 0), Position.create(7, 13)),
+      range: Range.create(Position.create(0, 0), Position.create(0, 0)),
       uri: trainUri
     })
   })

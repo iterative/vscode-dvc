@@ -56,6 +56,29 @@ $bullet-size: calc(var(--design-unit) * 4px);
   }
 }
 
+%cellBorderLeft {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  height: 100%;
+  top: 0;
+  background-color: transparent;
+}
+
+%headerCellBorderBottom {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  top: auto;
+  left: 1px;
+  width: 100%;
+  height: 1px;
+  display: block;
+  background-color: $header-border-color;
+}
+
 .hidden {
   visibility: hidden;
 }
@@ -263,7 +286,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
     width: fit-content;
 
     &:hover.rowSelected {
-      &:after {
+      &::after {
         box-shadow: inset 0 0 20px $shadow;
         content: '';
         top: 0;
@@ -275,33 +298,21 @@ $bullet-size: calc(var(--design-unit) * 4px);
         pointer-events: none;
       }
 
-      td:not(.experimentCell):hover .innerCell,
-      td:hover .timestampInnerCell,
-      td:hover + td .innerCell,
-      td:hover + td .timestampInnerCell {
-        border-left-color: $row-border-selected-color;
+      td:not(.experimentCell):hover::before,
+      td:hover + td::before {
+        background-color: $row-border-selected-color;
       }
     }
 
-    &:hover:not(.rowSelected),
-    &.rowFocused:not(.rowSelected) {
-      :not(.experimentCell) {
-        .innerCell,
-        .timestampInnerCell {
-          border-right-color: $border-color;
-        }
-      }
-
-      .experimentCell + td {
-        .innerCell,
-        .timestampInnerCell {
-          border-left-color: $border-color;
-        }
-      }
-
+    &:hover:not(.rowSelected) {
       td:not(.experimentCell),
       .experimentCell::before {
         background-color: $row-hover-background-color;
+      }
+
+      td:not(.experimentCell):hover::before,
+      td:hover + td::before {
+        background-color: $border-color;
       }
     }
 
@@ -310,7 +321,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
       left: 0;
       z-index: 3;
 
-      &:after {
+      &::after {
         content: '';
         height: 100%;
         position: absolute;
@@ -318,20 +329,6 @@ $bullet-size: calc(var(--design-unit) * 4px);
         width: 6px;
         right: 0;
         transition: box-shadow 0.25s;
-      }
-
-      &.headerCell,
-      &.placeholderHeaderCell {
-        > div::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          right: -2px;
-          width: 1px;
-          height: 100%;
-          background-color: $header-border-color;
-          display: block;
-        }
       }
 
       &.headerCell {
@@ -342,15 +339,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
         }
 
         &::before {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 100%;
-          height: 1px;
-          background-color: $header-border-color;
-          display: block;
-          top: auto;
+          @extend %headerCellBorderBottom;
         }
       }
     }
@@ -540,10 +529,8 @@ $bullet-size: calc(var(--design-unit) * 4px);
     line-height: 2rem;
     align-items: center;
 
-    .innerCell,
-    .timestampInnerCell {
-      border-right: 1px solid transparent;
-      border-left: 1px solid transparent;
+    &:not(.experimentCell)::before {
+      @extend %cellBorderLeft;
     }
 
     &:first-child {
@@ -558,10 +545,8 @@ $bullet-size: calc(var(--design-unit) * 4px);
       }
     }
   }
-  .experimentCell {
-    border-right: none;
-    border-left: none;
 
+  .experimentCell {
     .innerCell {
       display: flex;
       flex-flow: row nowrap;
@@ -609,12 +594,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
     }
 
     &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -2px;
-      height: 100%;
-      width: 1px;
+      @extend %cellBorderLeft;
       background-color: $header-border-color;
     }
 
@@ -633,7 +613,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
       content: '';
       position: absolute;
       bottom: 0;
-      left: 0;
+      left: 1px;
       width: 100%;
       height: 1px;
       background-color: $header-border-color;
@@ -649,6 +629,10 @@ $bullet-size: calc(var(--design-unit) * 4px);
       outline-style: dashed;
       outline-color: $header-dnd-outline;
       outline-offset: -4px;
+
+      .iconMenu ul[role='menu'] {
+        background-color: transparent;
+      }
     }
   }
 
@@ -663,6 +647,16 @@ $bullet-size: calc(var(--design-unit) * 4px);
     .th {
       font-size: 0.6rem;
       padding-left: 16px;
+
+      &::before {
+        display: none;
+      }
+    }
+
+    &:hover {
+      .th:not(.experimentCell) {
+        background: $bg-color;
+      }
     }
   }
 }
@@ -869,9 +863,19 @@ $bullet-size: calc(var(--design-unit) * 4px);
   @extend %truncateLeftChild;
   font-size: 0.7em;
 }
+
 .timestampTime {
   @extend %truncateLeftChild;
   font-size: 0.9em;
+}
+
+.createdHeaderCell .iconMenu {
+  left: auto;
+  right: 0;
+
+  ul[role='menu'] {
+    margin: 0 4px 0 0;
+  }
 }
 
 .timestampHeader {
@@ -946,7 +950,7 @@ $badge-size: 0.85rem;
 }
 
 .experimentCell {
-  &:before {
+  &::before {
     content: '';
     top: 0;
     right: 0;

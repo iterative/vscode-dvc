@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.1] - 2023-02-02
+
+### 🐛 Bug Fixes
+
+- Fix table/plots not updating correctly on windows [#3191](https://github.com/iterative/vscode-dvc/pull/3191) by [@julieg18](https://github.com/julieg18)
+- Fix minor table bugs [#3192](https://github.com/iterative/vscode-dvc/pull/3192) by [@julieg18](https://github.com/julieg18)
+
 ## [0.6.0] - 2023-02-01
 
 ### 🚀 New Features and Enhancements
