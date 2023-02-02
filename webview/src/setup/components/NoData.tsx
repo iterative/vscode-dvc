@@ -23,7 +23,8 @@ export const NoData: React.FC = () => {
         <a href="https://dvc.org/doc/dvclive/api-reference/ml-frameworks">
           other frameworks available
         </a>
-        ).
+        ). Once you have successfully, do not forget to run your script to see
+        DVC&apos;s power in action.
       </div>
       <CodeSlider
         codeBlocks={[
