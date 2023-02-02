@@ -25,6 +25,7 @@ const mockedPickExperiment = jest.fn()
 const mockedGetInput = jest.mocked(getInput)
 const mockedRun = jest.fn()
 const mockedExpFunc = jest.fn()
+const mockedListStages = jest.fn()
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -60,7 +61,7 @@ describe('Experiments', () => {
   )
 
   mockedInternalCommands.registerCommand(AvailableCommands.STAGE_LIST, () =>
-    Promise.resolve('')
+    mockedListStages()
   )
 
   const mockedUpdatesPaused = buildMockedEventEmitter<boolean>()
@@ -276,6 +277,7 @@ describe('Experiments', () => {
 
     it('should ensure that a dvc.yaml file exists if the the registered command needs it', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedListStages.mockResolvedValueOnce('')
       mockedQuickPickOneOrInput.mockResolvedValueOnce(
         'path/to/training_script.py'
       )
@@ -291,6 +293,92 @@ describe('Experiments', () => {
       await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
       expect(findOrCreateDvcYamlFile).not.toHaveBeenCalled()
+    })
+
+    it('should check for pipelines when a command needs it and continue with the command if there is a pipeline', async () => {
+      const executeCommandSpy = jest.spyOn(
+        mockedInternalCommands,
+        'executeCommand'
+      )
+
+      mockedListStages.mockResolvedValueOnce('train')
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+
+      expect(executeCommandSpy).toHaveBeenCalledWith(
+        AvailableCommands.STAGE_LIST,
+        mockedDvcRoot
+      )
+      expect(executeCommandSpy).toHaveBeenCalledWith(
+        mockedCommandId,
+        mockedDvcRoot
+      )
+    })
+
+    it('should let the user select a training script or enter its path if there are no pipelines found', async () => {
+      mockedListStages.mockResolvedValueOnce('')
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedQuickPickOneOrInput.mockResolvedValueOnce(
+        'path/to/training_script.py'
+      )
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+
+      expect(mockedQuickPickOneOrInput).toHaveBeenCalledTimes(1)
+    })
+
+    it('should add the train stage to the dvc.yaml file if the path to the training script was given', async () => {
+      const trainingScript = 'path/to/training_script.py'
+
+      mockedListStages.mockResolvedValueOnce('')
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedQuickPickOneOrInput.mockResolvedValueOnce(trainingScript)
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+
+      expect(findOrCreateDvcYamlFile).toHaveBeenCalledWith(
+        mockedDvcRoot,
+        trainingScript
+      )
+    })
+
+    it('should continue with the command if the path to the training script is entered', async () => {
+      const executeCommandSpy = jest.spyOn(
+        mockedInternalCommands,
+        'executeCommand'
+      )
+
+      mockedListStages.mockResolvedValueOnce('')
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedQuickPickOneOrInput.mockResolvedValueOnce(
+        'path/to/training_script.py'
+      )
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+
+      expect(executeCommandSpy).toHaveBeenCalledWith(
+        mockedCommandId,
+        mockedDvcRoot
+      )
+    })
+
+    it('should not run the command if the path to the taining script was not given', async () => {
+      const executeCommandSpy = jest.spyOn(
+        mockedInternalCommands,
+        'executeCommand'
+      )
+
+      mockedListStages.mockResolvedValueOnce('')
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedQuickPickOneOrInput.mockResolvedValueOnce('')
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+
+      expect(executeCommandSpy).not.toHaveBeenCalledWith(
+        mockedCommandId,
+        mockedDvcRoot
+      )
     })
   })
 })
