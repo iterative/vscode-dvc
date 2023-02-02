@@ -17,19 +17,11 @@ import {
   visit
 } from 'yaml'
 
-export const getTextDocumentLocation = (
-  textDocument: TextDocument
-): Location => {
-  const start = Position.create(0, 0)
-  const end = textDocument.positionAt(textDocument.getText().length - 1)
-  const range = Range.create(start, end)
+export const getLocationToOpen = (uri: string): Location => {
+  const position = Position.create(0, 0)
+  const range = Range.create(position, position)
 
-  return Location.create(textDocument.uri, range)
-}
-
-export const getUriLocation = (uri: string, content: string): Location => {
-  const textDocument = TextDocument.create(uri, 'plain/text', 0, content)
-  return getTextDocumentLocation(textDocument)
+  return Location.create(uri, range)
 }
 
 const yamlScalarNodeToDocumentSymbols = (

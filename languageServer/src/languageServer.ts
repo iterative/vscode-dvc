@@ -15,11 +15,7 @@ import {
 } from 'vscode-languageserver/node'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import { URI } from 'vscode-uri'
-import {
-  getTextDocumentLocation,
-  getUriLocation,
-  symbolAt
-} from './textDocument'
+import { getLocationToOpen, symbolAt } from './textDocument'
 
 export class LanguageServer {
   private documentsKnownToEditor!: TextDocuments<TextDocument>
@@ -58,7 +54,7 @@ export class LanguageServer {
       .all()
       .filter(doc => URI.parse(doc.uri).fsPath.endsWith(filePath))
 
-    return matchingFiles.map(doc => getTextDocumentLocation(doc))
+    return matchingFiles.map(doc => getLocationToOpen(doc.uri))
   }
 
   private async onDefinition(params: DefinitionParams, connection: Connection) {
@@ -98,11 +94,11 @@ export class LanguageServer {
       const possiblePath = URI.parse(
         [dirname(document.uri), possibleFile].join('/')
       ).toString()
-      const file = await connection.sendRequest<{
-        contents: string
-      } | null>('readFileContents', possiblePath)
-      if (file) {
-        const location = getUriLocation(possiblePath, file.contents)
+      const result = await connection.sendRequest<{
+        isFile: boolean
+      } | null>('isFile', possiblePath)
+      if (result?.isFile) {
+        const location = getLocationToOpen(possiblePath)
         fileLocations.push(location)
       }
     }
