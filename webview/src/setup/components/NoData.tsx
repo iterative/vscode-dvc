@@ -24,7 +24,7 @@ export const NoData: React.FC = () => {
           other frameworks available
         </a>
         ). Once you have successfully added DVCLive to your project, do not
-        forget to run your script to see DVC&apos;s power in action.
+        forget to run your script to see experiments and plots in action.
       </div>
       <CodeSlider
         codeBlocks={[
