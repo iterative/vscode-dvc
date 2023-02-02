@@ -5,6 +5,7 @@ export enum Title {
   ENTER_EXPERIMENT_WORKER_COUNT = 'Enter the Number of Queue Workers',
   ENTER_FILTER_VALUE = 'Enter a Filter Value',
   ENTER_RELATIVE_DESTINATION = 'Enter a Destination Relative to the Root',
+  ENTER_PATH_OR_CHOOSE_FILE = 'Enter the path to your training script or select it',
   GARBAGE_COLLECT_EXPERIMENTS = 'Garbage Collect Experiments',
   SHOW_SETUP = 'Show Setup',
   SELECT_BASE_EXPERIMENT = 'Select an Experiment to Use as a Base',

@@ -224,7 +224,10 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
     if (ensurePipelineExists) {
-      await this.checkOrAddPipeline(cwd)
+      const shouldContinue = await this.checkOrAddPipeline(cwd)
+      if (!shouldContinue) {
+        return
+      }
     }
 
     return this.internalCommands.executeCommand(commandId, cwd)
@@ -444,26 +447,27 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
 
     if (!stages) {
+      const selectValue = 'select'
       const pathOrSelect = await quickPickOneOrInput(
-        [{ label: 'Select from file explorer', value: 'select' }],
+        [{ label: 'Select from file explorer', value: selectValue }],
         {
           defaultValue: '',
           placeholder: 'Path to script',
-          title:
-            'Enter the path to your training script or select it' as unknown as Title
+          title: Title.ENTER_PATH_OR_CHOOSE_FILE
         }
       )
 
       const trainingScript =
-        pathOrSelect === 'select'
+        pathOrSelect === selectValue
           ? await pickFile(Title.SELECT_TRAINING_SCRIPT)
           : pathOrSelect
 
       if (!trainingScript) {
-        return
+        return false
       }
       findOrCreateDvcYamlFile(cwd, trainingScript)
     }
+    return true
   }
 
   private async pickExpThenRun(
