@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.2] - 2023-02-03
+
+### 🚀 New Features and Enhancements
+
+- Remove beaker (show experiments) and scatter graph (show plots) buttons from sidebar [#3205](https://github.com/iterative/vscode-dvc/pull/3205) by [@sroy3](https://github.com/sroy3)
+- Add a mention to run script after adding dvclive [#3206](https://github.com/iterative/vscode-dvc/pull/3206) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Remove read file contents request sent to extension by language server (use is file check) [#3198](https://github.com/iterative/vscode-dvc/pull/3198) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (2.43.2) [#3207](https://github.com/iterative/vscode-dvc/pull/3207) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.6.1] - 2023-02-02
 
 ### 🐛 Bug Fixes
