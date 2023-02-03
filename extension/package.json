@@ -998,6 +998,11 @@
         {
           "command": "dvc.resetAndRunCheckpointExperiment",
           "group": "navigation@1",
+          "when": "dvc.experiments.webview.active && !dvc.experiment.running && dvc.commands.available && dvc.experiment.checkpoints"
+        },
+        {
+          "command": "dvc.resetAndRunCheckpointExperiment",
+          "group": "navigation@1",
           "when": "dvc.params.file.active && !dvc.experiment.running && dvc.commands.available && dvc.experiment.checkpoints"
         },
         {
