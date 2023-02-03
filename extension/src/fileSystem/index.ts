@@ -140,10 +140,7 @@ export const findOrCreateDvcYamlFile = (
 
   const pipeline = `stages:
   train:
-    cmd: python ${trainingScript}
-    outs:
-      - dvclive:
-          cache: false`
+    cmd: python ${relative(cwd, trainingScript)}`
   return appendFileSync(dvcYamlPath, pipeline)
 }
 
