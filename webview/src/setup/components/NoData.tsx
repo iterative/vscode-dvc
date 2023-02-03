@@ -23,7 +23,8 @@ export const NoData: React.FC = () => {
         <a href="https://dvc.org/doc/dvclive/api-reference/ml-frameworks">
           other frameworks available
         </a>
-        ).
+        ). Once you have successfully added DVCLive to your project, do not
+        forget to run your script to see experiments and plots in action.
       </div>
       <CodeSlider
         codeBlocks={[
