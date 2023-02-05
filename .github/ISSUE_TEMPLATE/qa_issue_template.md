@@ -1,24 +1,32 @@
 ---
-name: Manual QA
-about: Use this template for running manual QA issues.
+name: "\Testing type, Checklist # "
+Example:
+name: "\Manual QA for, Checklist # "
+about: "Purpose of using the document"
+Example:
+about: "Use this template for running manual QA issues."
 title: "[DATE]: [FEATURE NAME]"
+Example:
+title: "[02/04/2023]: [Experiments table]"
 labels: qa, review
 ---
-# Manual QA for # 
 
-### Check list
-- [] columns of experiments table are appropriate sizes 
-- [] order of colomns is correct  
-- []header menu has appropriate options  
-- []shadow of the first column is absent while first opening 
-- [] borders of the table are stable wlile scrolling  
-- [] fonts of different table cells in header are the same  
-- [] column layout is appropriate 
-- [] cell borders are the same on row hover in selected and non-selected state  
-- [] header title stays on the same place while resizing  
-- [] first cell border is present 
-- [] cell border is aligned with header 
-- [] shadow and borders are alignedwhile resizing 
-- [] column sizes are appropriate to the size of the inscription  
-- [] resizer spans the whole column height  
-- [] first column width is static when rows are collapced 
+# Manual QA for  # 
+
+[Checklist]
+### Static checks
+
+-  [ ]   sizes of columns 
+-  [ ]   order of columns 
+-  [ ]   header menu content 
+-  [ ]   shadow of columns
+-  [ ]   borders of the table 
+-  [ ]   fonts of the table   
+-  [ ]   layout of the table
+
+### Dynamic checks
+-  [ ]   table elements while scrolling
+-  [ ]   table elements while zooming
+-  [ ]   table elements while hover and focus
+-  [ ]   changing display of table content while resizing
+-  [ ]   table shadows while resizing
