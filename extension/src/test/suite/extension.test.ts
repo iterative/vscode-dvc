@@ -2,14 +2,8 @@ import { join, resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore, spy, match } from 'sinon'
-import { window, commands, workspace } from 'vscode'
-import {
-  closeAllEditors,
-  mockDisposable,
-  mockDuration,
-  quickPickInitialized,
-  selectQuickPickItem
-} from './util'
+import { commands, workspace } from 'vscode'
+import { closeAllEditors, mockDisposable, mockDuration } from './util'
 import { mockHasCheckpoints } from './experiments/util'
 import { Disposable } from '../../extension'
 import * as Python from '../../extensions/python'
@@ -53,38 +47,6 @@ suite('Extension Test Suite', () => {
   describe('dvc.setupWorkspace', () => {
     it('should initialize the extension when the cli is usable', async () => {
       stub(Python, 'isPythonExtensionInstalled').returns(true)
-      const selectVirtualEnvWithPython = async (path: string) => {
-        const mockShowQuickPick = stub(window, 'showQuickPick')
-
-        const venvQuickPickActive = quickPickInitialized(mockShowQuickPick, 0)
-
-        const setupWorkspaceWizard = commands.executeCommand(
-          RegisteredCommands.EXTENSION_SETUP_WORKSPACE
-        )
-
-        const mockSelectPythonInterpreter = stub(
-          Python,
-          'selectPythonInterpreter'
-        )
-        const executeCommandCalled = new Promise(resolve =>
-          mockSelectPythonInterpreter.callsFake(() => {
-            void setConfigValue(ConfigKey.PYTHON_PATH, path)
-            resolve(undefined)
-          })
-        )
-
-        await venvQuickPickActive
-
-        await selectQuickPickItem(1)
-
-        await executeCommandCalled
-
-        mockSelectPythonInterpreter.restore()
-
-        mockShowQuickPick.restore()
-
-        return setupWorkspaceWizard
-      }
 
       const mockCreateFileSystemWatcher = stub(
         workspace,
@@ -207,7 +169,7 @@ suite('Extension Test Suite', () => {
 
       const mockPath = resolve('path', 'to', 'venv')
 
-      await selectVirtualEnvWithPython(resolve('path', 'to', 'venv'))
+      void (await setConfigValue(ConfigKey.PYTHON_PATH, mockPath))
 
       await Promise.all([
         firstDisposal,
@@ -266,7 +228,10 @@ suite('Extension Test Suite', () => {
       await workspaceExperimentsAreReady
       const secondDisposal = disposalEvent()
 
-      await selectVirtualEnvWithPython(resolve('path', 'to', 'virtualenv'))
+      void (await setConfigValue(
+        ConfigKey.PYTHON_PATH,
+        resolve('path', 'to', 'virtualenv')
+      ))
 
       await secondDisposal
 
