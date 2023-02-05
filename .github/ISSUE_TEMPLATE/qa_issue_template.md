@@ -1,7 +1,7 @@
 ---
-name: "\Testing type, Checklist # "
+name: "Testing type, Checklist # "
 Example:
-name: "\Manual QA for, Checklist # "
+name: "Manual QA for, Checklist # "
 about: "Purpose of using the document"
 Example:
 about: "Use this template for running manual QA issues."
