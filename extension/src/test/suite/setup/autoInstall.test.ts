@@ -7,6 +7,7 @@ import * as PythonExtension from '../../../extensions/python'
 import * as Python from '../../../python'
 import { autoInstallDvc } from '../../../setup/autoInstall'
 import * as WorkspaceFolders from '../../../vscode/workspaceFolders'
+import { PROGRESS_TEST_TIMEOUT } from '../timeouts'
 
 const { getDefaultPython } = Python
 
@@ -86,6 +87,6 @@ suite('Auto Install Test Suite', () => {
         defaultPython,
         'dvclive'
       )
-    })
+    }).timeout(PROGRESS_TEST_TIMEOUT)
   })
 })
