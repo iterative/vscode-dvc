@@ -1,7 +1,7 @@
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
 import rowsFixture from '../expShow/base/rows'
-import { extendVegaSpec, isMultiViewPlot } from '../../../plots/vega/util'
+import { transformVegaSpec, isMultiViewPlot } from '../../../plots/vega/util'
 import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../../cli/dvc/contract'
 import {
   ComparisonPlots,
@@ -484,7 +484,7 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
   for (const [path, plots] of Object.entries(plotsOutput)) {
     for (const originalPlot of plots) {
       const plot = {
-        content: extendVegaSpec(
+        content: transformVegaSpec(
           {
             ...originalPlot.content,
             data: {

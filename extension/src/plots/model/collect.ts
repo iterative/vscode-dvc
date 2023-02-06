@@ -37,7 +37,7 @@ import {
 } from '../../experiments/webview/contract'
 import { addToMapArray } from '../../util/map'
 import { TemplateOrder } from '../paths/collect'
-import { extendVegaSpec, isMultiViewPlot } from '../vega/util'
+import { transformVegaSpec, isMultiViewPlot } from '../vega/util'
 import {
   definedAndNonEmpty,
   reorderObjectList,
@@ -558,7 +558,7 @@ const collectTemplatePlot = (
     return
   }
 
-  const content = extendVegaSpec(fillTemplate(template, datapoints), size, {
+  const content = transformVegaSpec(fillTemplate(template, datapoints), size, {
     ...multiSourceEncodingUpdate,
     color: revisionColors
   }) as VisualizationSpec

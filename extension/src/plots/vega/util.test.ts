@@ -5,7 +5,7 @@ import cloneDeep from 'lodash.clonedeep'
 import {
   isMultiViewPlot,
   isMultiViewByCommitPlot,
-  extendVegaSpec,
+  transformVegaSpec,
   getColorScale,
   Encoding,
   reverseOfLegendSuppressionUpdate
@@ -84,7 +84,10 @@ describe('getColorScale', () => {
 
 describe('extendVegaSpec', () => {
   it('should not add encoding if no color scale is provided', () => {
-    const extendedSpec = extendVegaSpec(linearTemplate, PlotSizeNumber.REGULAR)
+    const extendedSpec = transformVegaSpec(
+      linearTemplate,
+      PlotSizeNumber.REGULAR
+    )
     expect(extendedSpec.encoding).toBeUndefined()
   })
 
@@ -93,7 +96,7 @@ describe('extendVegaSpec', () => {
       domain: [EXPERIMENT_WORKSPACE_ID, 'main'],
       range: copyOriginalColors().slice(0, 2)
     }
-    const extendedSpec = extendVegaSpec(
+    const extendedSpec = transformVegaSpec(
       linearTemplate,
       PlotSizeNumber.REGULAR,
       {
@@ -140,7 +143,7 @@ describe('extendVegaSpec', () => {
 
   it('should truncate all titles from the left to 50 characters for large plots', () => {
     const spec = withLongTemplatePlotTitle()
-    const updatedSpec = extendVegaSpec(spec, PlotSizeNumber.LARGE)
+    const updatedSpec = transformVegaSpec(spec, PlotSizeNumber.LARGE)
 
     const truncatedTitle = '…-many-many-characters-at-least-seventy-characters'
     const truncatedHorizontalTitle =
@@ -166,7 +169,7 @@ describe('extendVegaSpec', () => {
 
   it('should truncate all titles from the left to 50 characters for regular plots', () => {
     const spec = withLongTemplatePlotTitle()
-    const updatedSpec = extendVegaSpec(spec, PlotSizeNumber.REGULAR)
+    const updatedSpec = transformVegaSpec(spec, PlotSizeNumber.REGULAR)
 
     const truncatedTitle = '…-many-many-characters-at-least-seventy-characters'
     const truncatedHorizontalTitle =
@@ -192,7 +195,7 @@ describe('extendVegaSpec', () => {
 
   it('should truncate all titles from the left to 30 characters for small plots', () => {
     const spec = withLongTemplatePlotTitle()
-    const updatedSpec = extendVegaSpec(spec, PlotSizeNumber.SMALL)
+    const updatedSpec = transformVegaSpec(spec, PlotSizeNumber.SMALL)
 
     const truncatedTitle = '…s-at-least-seventy-characters'
     const truncatedHorizontalTitle = '…at-least-seventy-characters-x'
@@ -222,7 +225,7 @@ describe('extendVegaSpec', () => {
       text: repeatedTitle
     })
 
-    const updatedSpec = extendVegaSpec(spec, PlotSizeNumber.SMALL)
+    const updatedSpec = transformVegaSpec(spec, PlotSizeNumber.SMALL)
 
     const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
 
@@ -239,7 +242,7 @@ describe('extendVegaSpec', () => {
     const repeatedTitle = 'abcdefghijklmnopqrstuvwyz1234567890'
     const spec = withLongTemplatePlotTitle([repeatedTitle, repeatedTitle])
 
-    const updatedSpec = extendVegaSpec(spec, PlotSizeNumber.SMALL)
+    const updatedSpec = transformVegaSpec(spec, PlotSizeNumber.SMALL)
 
     const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
 
@@ -259,7 +262,7 @@ describe('extendVegaSpec', () => {
       text: [repeatedTitle, repeatedTitle]
     })
 
-    const updatedSpec = extendVegaSpec(spec, PlotSizeNumber.SMALL)
+    const updatedSpec = transformVegaSpec(spec, PlotSizeNumber.SMALL)
 
     const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
 
@@ -273,7 +276,7 @@ describe('extendVegaSpec', () => {
   })
 
   it('should update the multi-source template to remove erroneous shape encoding from the vertical line displayed on hover', () => {
-    const updatedSpec = extendVegaSpec(
+    const updatedSpec = transformVegaSpec(
       multiSourceTemplate,
       PlotSizeNumber.LARGE,
       {

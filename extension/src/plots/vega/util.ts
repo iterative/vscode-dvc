@@ -303,8 +303,31 @@ export const truncateTitles = (
   }
   return spec
 }
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export const removeLegend = (spec: TopLevelSpec) => {
+  if (spec && typeof spec === 'object') {
+    const specCopy: Record<string, unknown> = {}
 
-export const extendVegaSpec = (
+    for (const [key, value] of Object.entries(spec)) {
+      if (key !== 'legend') {
+        const valueType = typeof value
+        if (isEndValue(valueType)) {
+          specCopy[key] = value
+        } else if (Array.isArray(value)) {
+          specCopy[key] = value.map(val =>
+            isEndValue(typeof val) ? val : removeLegend(val)
+          )
+        } else if (typeof value === 'object') {
+          specCopy[key] = removeLegend(value)
+        }
+      }
+    }
+    return specCopy
+  }
+  return spec
+}
+
+export const transformVegaSpec = (
   spec: TopLevelSpec,
   size: number,
   encoding?: {
@@ -313,7 +336,8 @@ export const extendVegaSpec = (
     shape?: ShapeEncoding
   }
 ) => {
-  const updatedSpec = truncateTitles(spec, size) as unknown as TopLevelSpec
+  let updatedSpec = truncateTitles(spec, size) as unknown as TopLevelSpec
+  updatedSpec = removeLegend(updatedSpec) as unknown as TopLevelSpec
 
   if (isMultiViewByCommitPlot(spec) || !encoding) {
     return updatedSpec
