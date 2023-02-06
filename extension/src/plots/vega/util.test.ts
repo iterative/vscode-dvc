@@ -333,6 +333,6 @@ describe('reverseOfLegendSuppressionUpdate', () => {
       merge({ spec: { encoding: update } }, reverse)
     )
     expect(result).not.toContain('"legend":{"disable":true}')
-    expect(result).toContain('"legend":{"disable":false}')
+    expect(result).toContain('"disable":false')
   })
 })

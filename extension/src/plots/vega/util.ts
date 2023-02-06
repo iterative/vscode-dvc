@@ -329,18 +329,24 @@ export const reverseOfLegendSuppressionUpdate = () => ({
     encoding: {
       color: {
         legend: {
-          disable: false
+          direction: 'vertical',
+          disable: false,
+          orient: 'top'
         }
       },
       shape: {
         legend: {
+          direction: 'vertical',
           disable: false,
+          orient: 'top',
           symbolFillColor: 'grey'
         }
       },
       strokeDash: {
         legend: {
+          direction: 'vertical',
           disable: false,
+          orient: 'top',
           symbolFillColor: 'transparent',
           symbolStrokeColor: 'grey'
         }
