@@ -1,4 +1,5 @@
 import { join } from 'path'
+import isEqual from 'lodash.isequal'
 import { ColumnAccumulator } from './util'
 import { collectDepChanges, collectDeps } from './deps'
 import {
@@ -48,8 +49,9 @@ export const collectColumns = (data: ExperimentsOutput): Column[] => {
     collectFromCommit(acc, commit)
   }
   const columns = Object.values(acc)
+  const hasNoData = isEqual(columns, [timestampColumn])
 
-  return columns.length === 1 ? [] : columns
+  return hasNoData ? [] : columns
 }
 
 const getData = (value?: {
