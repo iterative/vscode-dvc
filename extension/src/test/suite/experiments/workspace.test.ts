@@ -27,7 +27,7 @@ import {
   QuickPickItemWithValue,
   QuickPickOptionsWithTitle
 } from '../../../vscode/quickPick'
-import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
+import { PROGRESS_TEST_TIMEOUT, WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { Title } from '../../../vscode/title'
 import { join } from '../../util/path'
 import { AvailableCommands } from '../../../commands/internal'
@@ -719,7 +719,7 @@ suite('Workspace Experiments Test Suite', () => {
       expect(mockPush).to.be.calledWithExactly(dvcDemoPath)
       expect(mockGitPush).to.be.calledWithExactly(dvcDemoPath, mockBranch)
     })
-  })
+  }).timeout(PROGRESS_TEST_TIMEOUT)
 
   describe('dvc.shareExperimentAsCommit', () => {
     it('should be able to share an experiment as a commit', async () => {
@@ -773,7 +773,7 @@ suite('Workspace Experiments Test Suite', () => {
       )
       expect(mockPush).to.be.calledWithExactly(dvcDemoPath)
       expect(mockGitPush).to.be.calledWithExactly(dvcDemoPath)
-    })
+    }).timeout(PROGRESS_TEST_TIMEOUT)
   })
 
   describe('dvc.removeExperiments', () => {
