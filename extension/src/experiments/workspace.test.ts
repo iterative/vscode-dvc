@@ -275,7 +275,7 @@ describe('Experiments', () => {
       expect(mockedExpFunc).not.toHaveBeenCalled()
     })
 
-    it('should ensure that a dvc.yaml file exists if the the registered command needs it', async () => {
+    it('should ensure that a dvc.yaml file exists if the registered command needs it', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       mockedListStages.mockResolvedValueOnce('')
       mockedQuickPickOneOrInput.mockResolvedValueOnce(
@@ -287,7 +287,7 @@ describe('Experiments', () => {
       expect(findOrCreateDvcYamlFile).toHaveBeenCalledTimes(1)
     })
 
-    it('should not ensure that a dvc.yaml file exists if the the registered command needs it', async () => {
+    it('should not ensure that a dvc.yaml file exists if the registered command does not require it', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
 
       await workspaceExperiments.getCwdThenRun(mockedCommandId)
@@ -363,7 +363,7 @@ describe('Experiments', () => {
       )
     })
 
-    it('should not run the command if the path to the taining script was not given', async () => {
+    it('should not run the command if the path to the training script was not given', async () => {
       const executeCommandSpy = jest.spyOn(
         mockedInternalCommands,
         'executeCommand'
