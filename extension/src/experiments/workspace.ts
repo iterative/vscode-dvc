@@ -15,8 +15,10 @@ import { getInput, getPositiveIntegerInput } from '../vscode/inputBox'
 import { BaseWorkspaceWebviews } from '../webview/workspace'
 import { Title } from '../vscode/title'
 import { ContextKey, setContextValue } from '../vscode/context'
-import { getPidFromSignalFile } from '../fileSystem'
+import { findOrCreateDvcYamlFile, getPidFromSignalFile } from '../fileSystem'
 import { definedAndNonEmpty } from '../util/array'
+import { quickPickOneOrInput } from '../vscode/quickPick'
+import { pickFile } from '../vscode/resourcePicker'
 
 export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   Experiments,
@@ -213,10 +215,19 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return await repository.modifyExperimentParamsAndQueue(overrideId)
   }
 
-  public async getCwdThenRun(commandId: CommandId) {
+  public async getCwdThenRun(
+    commandId: CommandId,
+    ensurePipelineExists?: boolean
+  ) {
     const cwd = await this.getFocusedOrOnlyOrPickProject()
     if (!cwd) {
       return
+    }
+    if (ensurePipelineExists) {
+      const shouldContinue = await this.checkOrAddPipeline(cwd)
+      if (!shouldContinue) {
+        return
+      }
     }
 
     return this.internalCommands.executeCommand(commandId, cwd)
@@ -427,6 +438,36 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return Object.values(this.repositories).some(experiments =>
       experiments.hasRunningQueuedExperiment()
     )
+  }
+
+  private async checkOrAddPipeline(cwd: string) {
+    const stages = await this.internalCommands.executeCommand(
+      AvailableCommands.STAGE_LIST,
+      cwd
+    )
+
+    if (!stages) {
+      const selectValue = 'select'
+      const pathOrSelect = await quickPickOneOrInput(
+        [{ label: 'Select from file explorer', value: selectValue }],
+        {
+          defaultValue: '',
+          placeholder: 'Path to script',
+          title: Title.ENTER_PATH_OR_CHOOSE_FILE
+        }
+      )
+
+      const trainingScript =
+        pathOrSelect === selectValue
+          ? await pickFile(Title.SELECT_TRAINING_SCRIPT)
+          : pathOrSelect
+
+      if (!trainingScript) {
+        return false
+      }
+      findOrCreateDvcYamlFile(cwd, trainingScript)
+    }
+    return true
   }
 
   private async pickExpThenRun(
