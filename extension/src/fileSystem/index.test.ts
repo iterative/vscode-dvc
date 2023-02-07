@@ -189,7 +189,7 @@ describe('findOrCreateDvcYamlFile', () => {
 
     expect(appendFileSync).toHaveBeenCalledWith(
       expect.anything(),
-      expect.stringContaining('src/training/train.py')
+      expect.stringContaining(join('src', 'training', 'train.py'))
     )
 
     findOrCreateDvcYamlFile(
@@ -199,7 +199,7 @@ describe('findOrCreateDvcYamlFile', () => {
 
     expect(appendFileSync).toHaveBeenCalledWith(
       expect.anything(),
-      expect.stringContaining('../my_other_project/train.py')
+      expect.stringContaining(join('..', 'my_other_project', 'train.py'))
     )
   })
 
