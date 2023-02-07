@@ -1,5 +1,6 @@
 import { basename, extname, join, relative, resolve, sep } from 'path'
 import {
+  appendFileSync,
   ensureFileSync,
   existsSync,
   lstatSync,
@@ -129,6 +130,19 @@ export const isAnyDvcYaml = (path?: string): boolean =>
       basename(path) === 'dvc.lock' ||
       basename(path) === 'dvc.yaml')
   )
+
+export const findOrCreateDvcYamlFile = (
+  cwd: string,
+  trainingScript: string
+) => {
+  const dvcYamlPath = `${cwd}/dvc.yaml`
+  ensureFileSync(dvcYamlPath)
+
+  const pipeline = `stages:
+  train:
+    cmd: python ${relative(cwd, trainingScript)}`
+  return appendFileSync(dvcYamlPath, pipeline)
+}
 
 export const relativeWithUri = (dvcRoot: string, uri: Uri) =>
   relative(dvcRoot, uri.fsPath)

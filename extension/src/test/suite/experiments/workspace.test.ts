@@ -34,6 +34,7 @@ import { AvailableCommands } from '../../../commands/internal'
 import { GitExecutor } from '../../../cli/git/executor'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
 import { formatDate } from '../../../util/date'
+import { DvcReader } from '../../../cli/dvc/reader'
 
 suite('Workspace Experiments Test Suite', () => {
   const disposable = getTimeSafeDisposer()
@@ -390,6 +391,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.runExperiment', () => {
     it('should be able to run an experiment', async () => {
+      stub(DvcReader.prototype, 'listStages').resolves('train')
       const mockRunExperiment = stub(
         DvcRunner.prototype,
         'runExperiment'
@@ -422,6 +424,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.resetAndRunCheckpointExperiment', () => {
     it('should be able to reset existing checkpoints and restart the experiment', async () => {
+      stub(DvcReader.prototype, 'listStages').resolves('train')
       const mockRunExperimentReset = stub(
         DvcRunner.prototype,
         'runExperimentReset'
