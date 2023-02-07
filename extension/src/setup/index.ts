@@ -43,6 +43,7 @@ import { EventName } from '../telemetry/constants'
 import { WorkspaceScale } from '../telemetry/collect'
 import { gitPath } from '../cli/git/constants'
 import { DOT_DVC } from '../cli/dvc/constants'
+import { Toast } from '../vscode/toast'
 
 export type SetupWebviewWebview = BaseWebview<TSetupData>
 
@@ -310,6 +311,9 @@ export class Setup
     const root = getFirstWorkspaceFolder()
     if (root) {
       await this.dvcExecutor.init(root)
+      void Toast.infoWithOptions(
+        'Initialized DVC repository. You can now [commit the changes to git](command:workbench.view.scm).'
+      )
     }
   }
 
