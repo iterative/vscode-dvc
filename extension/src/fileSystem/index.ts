@@ -10,7 +10,7 @@ import {
   writeFileSync
 } from 'fs-extra'
 import { load } from 'js-yaml'
-import { Uri } from 'vscode'
+import { Uri, workspace, window } from 'vscode'
 import { standardizePath } from './path'
 import { definedAndNonEmpty } from '../util/array'
 import { Logger } from '../common/logger'
@@ -131,16 +131,20 @@ export const isAnyDvcYaml = (path?: string): boolean =>
       basename(path) === 'dvc.yaml')
   )
 
-export const findOrCreateDvcYamlFile = (
+export const findOrCreateDvcYamlFile = async (
   cwd: string,
   trainingScript: string
 ) => {
   const dvcYamlPath = `${cwd}/dvc.yaml`
   ensureFileSync(dvcYamlPath)
 
-  const pipeline = `stages:
+  const pipeline = `
+stages:
   train:
     cmd: python ${relative(cwd, trainingScript)}`
+
+  const dvcYaml = await workspace.openTextDocument(Uri.file(dvcYamlPath))
+  await window.showTextDocument(dvcYaml)
   return appendFileSync(dvcYamlPath, pipeline)
 }
 
