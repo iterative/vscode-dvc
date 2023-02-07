@@ -8,7 +8,7 @@ import {
 } from '../plots/webview/contract'
 import { SetupData } from '../setup/webview/contract'
 
-export type WebviewData = TableData | PlotsData | SetupData
+export type WebviewData = TableData | PlotsData | SetupData | {}
 
 export enum MessageFromWebviewType {
   INITIALIZED = 'initialized',

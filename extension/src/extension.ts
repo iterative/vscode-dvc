@@ -3,7 +3,8 @@ import {
   env,
   EventEmitter,
   ExtensionContext,
-  ViewColumn
+  ViewColumn,
+  window
 } from 'vscode'
 import { DvcExecutor } from './cli/dvc/executor'
 import { DvcRunner } from './cli/dvc/runner'
@@ -76,6 +77,14 @@ export class Extension extends Disposable {
     super()
 
     const stopWatch = new StopWatch()
+
+    this.dispose.track(
+      commands.registerCommand('dvc.studioConnect', () =>
+        window.showInformationMessage('Not implemented', {
+          modal: true
+        })
+      )
+    )
 
     this.dispose.track(getTelemetryReporter())
 

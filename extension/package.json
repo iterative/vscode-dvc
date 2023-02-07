@@ -89,6 +89,11 @@
     ],
     "commands": [
       {
+        "title": "Connect to Studio",
+        "command": "dvc.studioConnect",
+        "category": "DVC"
+      },
+      {
         "title": "%command.addExperimentsTableFilter%",
         "command": "dvc.addExperimentsTableFilter",
         "category": "DVC",
@@ -1320,6 +1325,11 @@
           "when": "true"
         },
         {
+          "id": "dvc.views.studio",
+          "name": "Studio",
+          "when": "true"
+        },
+        {
           "id": "dvc.views.experimentsColumnsTree",
           "name": "Columns",
           "when": "dvc.commands.available && dvc.project.available"
@@ -1355,6 +1365,11 @@
         "view": "dvc.views.webviews",
         "contents": "[Show Experiments](command:dvc.showExperiments)\n[Show Plots](command:dvc.showPlots)\n[Show Experiments and Plots](command:dvc.showExperimentsAndPlots)",
         "when": "dvc.commands.available && dvc.project.available && dvc.project.hasData"
+      },
+      {
+        "view": "dvc.views.studio",
+        "contents": "[$(plug) Connect and Collaborate](command:dvc.studioConnect)",
+        "when": "true"
       },
       {
         "view": "dvc.views.webviews",
