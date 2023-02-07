@@ -131,6 +131,11 @@ export const isAnyDvcYaml = (path?: string): boolean =>
       basename(path) === 'dvc.yaml')
   )
 
+export const scriptCommand = {
+  JUPYTER: 'jupyter nbconvert --to notebook --inplace --execute',
+  PYTHON: 'python'
+}
+
 export const findOrCreateDvcYamlFile = (
   cwd: string,
   trainingScript: string
@@ -139,9 +144,7 @@ export const findOrCreateDvcYamlFile = (
   ensureFileSync(dvcYamlPath)
 
   const isNotebook = parse(trainingScript).ext === '.ipynb'
-  const command = isNotebook
-    ? 'jupyter nbconvert --to notebook --inplace --execute'
-    : 'python'
+  const command = isNotebook ? scriptCommand.JUPYTER : scriptCommand.PYTHON
 
   const pipeline = `
 stages:

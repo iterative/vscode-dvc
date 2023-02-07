@@ -1,17 +1,28 @@
 import { join, relative, resolve } from 'path'
-import { ensureDirSync, remove } from 'fs-extra'
+import { appendFileSync, ensureDirSync, ensureFileSync, remove } from 'fs-extra'
 import {
   exists,
   findAbsoluteDvcRootPath,
   findDvcRootPaths,
   isDirectory,
   isSameOrChild,
-  getModifiedTime
+  getModifiedTime,
+  findOrCreateDvcYamlFile,
+  scriptCommand
 } from '.'
 import { dvcDemoPath } from '../test/util'
 import { DOT_DVC } from '../cli/dvc/constants'
 
 jest.mock('../cli/dvc/reader')
+jest.mock('fs-extra', () => {
+  const actualModule = jest.requireActual('fs-extra')
+  return {
+    __esModule: true,
+    ...actualModule,
+    appendFileSync: jest.fn(),
+    ensureFileSync: jest.fn()
+  }
+})
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -149,5 +160,72 @@ describe('getModifiedTime', () => {
 
     expect(typeof epoch).toBe('number')
     expect(epoch).toBeGreaterThan(1640995200000)
+  })
+})
+
+describe('findOrCreateDvcYamlFile', () => {
+  it('should make sure a dvc.yaml file exists', () => {
+    const cwd = '/cwd'
+    findOrCreateDvcYamlFile(cwd, '/my/training/script.py')
+
+    expect(ensureFileSync).toHaveBeenCalledWith(`${cwd}/dvc.yaml`)
+  })
+
+  it('should add the training script as a train stage in the dvc.yaml file', () => {
+    const cwd = '/cwd'
+    findOrCreateDvcYamlFile(cwd, '/my/training/script.py')
+
+    expect(appendFileSync).toHaveBeenCalledWith(
+      `${cwd}/dvc.yaml`,
+      expect.stringMatching(/^\s+stages:\s+train:/)
+    )
+  })
+
+  it('should add the training script as a relative path to the cwd', () => {
+    findOrCreateDvcYamlFile(
+      '/dir/my_project/',
+      '/dir/my_project/src/training/train.py'
+    )
+
+    expect(appendFileSync).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.stringContaining('src/training/train.py')
+    )
+
+    findOrCreateDvcYamlFile(
+      '/dir/my_project/',
+      '/dir/my_other_project/train.py'
+    )
+
+    expect(appendFileSync).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.stringContaining('../my_other_project/train.py')
+    )
+  })
+
+  it('should use the jupyter nbconvert command if the training script is a Jupyter notebook', () => {
+    findOrCreateDvcYamlFile('/', '/train.ipynb')
+
+    expect(appendFileSync).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.stringContaining(scriptCommand.JUPYTER)
+    )
+    expect(appendFileSync).not.toHaveBeenCalledWith(
+      expect.anything(),
+      expect.stringContaining(scriptCommand.PYTHON)
+    )
+  })
+
+  it('should use the python command if the training script is not a Jupyter notebook', () => {
+    findOrCreateDvcYamlFile('/', '/train.py')
+
+    expect(appendFileSync).not.toHaveBeenCalledWith(
+      expect.anything(),
+      expect.stringContaining(scriptCommand.JUPYTER)
+    )
+    expect(appendFileSync).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.stringContaining(scriptCommand.PYTHON)
+    )
   })
 })
