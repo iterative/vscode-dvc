@@ -47,7 +47,9 @@ export const collectColumns = (data: ExperimentsOutput): Column[] => {
   for (const commit of Object.values(rest)) {
     collectFromCommit(acc, commit)
   }
-  return Object.values(acc)
+  const columns = Object.values(acc)
+
+  return columns.length === 1 ? [] : columns
 }
 
 const getData = (value?: {
