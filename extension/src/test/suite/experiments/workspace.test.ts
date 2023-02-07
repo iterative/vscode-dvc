@@ -27,13 +27,14 @@ import {
   QuickPickItemWithValue,
   QuickPickOptionsWithTitle
 } from '../../../vscode/quickPick'
-import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
+import { PROGRESS_TEST_TIMEOUT, WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { Title } from '../../../vscode/title'
 import { join } from '../../util/path'
 import { AvailableCommands } from '../../../commands/internal'
 import { GitExecutor } from '../../../cli/git/executor'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
 import { formatDate } from '../../../util/date'
+import { DvcReader } from '../../../cli/dvc/reader'
 
 suite('Workspace Experiments Test Suite', () => {
   const disposable = getTimeSafeDisposer()
@@ -390,6 +391,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.runExperiment', () => {
     it('should be able to run an experiment', async () => {
+      stub(DvcReader.prototype, 'listStages').resolves('train')
       const mockRunExperiment = stub(
         DvcRunner.prototype,
         'runExperiment'
@@ -422,6 +424,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.resetAndRunCheckpointExperiment', () => {
     it('should be able to reset existing checkpoints and restart the experiment', async () => {
+      stub(DvcReader.prototype, 'listStages').resolves('train')
       const mockRunExperimentReset = stub(
         DvcRunner.prototype,
         'runExperimentReset'
@@ -716,7 +719,7 @@ suite('Workspace Experiments Test Suite', () => {
       expect(mockPush).to.be.calledWithExactly(dvcDemoPath)
       expect(mockGitPush).to.be.calledWithExactly(dvcDemoPath, mockBranch)
     })
-  })
+  }).timeout(PROGRESS_TEST_TIMEOUT)
 
   describe('dvc.shareExperimentAsCommit', () => {
     it('should be able to share an experiment as a commit', async () => {
@@ -770,7 +773,7 @@ suite('Workspace Experiments Test Suite', () => {
       )
       expect(mockPush).to.be.calledWithExactly(dvcDemoPath)
       expect(mockGitPush).to.be.calledWithExactly(dvcDemoPath)
-    })
+    }).timeout(PROGRESS_TEST_TIMEOUT)
   })
 
   describe('dvc.removeExperiments', () => {
