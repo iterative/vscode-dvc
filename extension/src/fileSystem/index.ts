@@ -1,4 +1,4 @@
-import { basename, extname, join, relative, resolve, sep } from 'path'
+import { basename, extname, join, parse, relative, resolve, sep } from 'path'
 import {
   appendFileSync,
   ensureFileSync,
@@ -138,9 +138,15 @@ export const findOrCreateDvcYamlFile = (
   const dvcYamlPath = `${cwd}/dvc.yaml`
   ensureFileSync(dvcYamlPath)
 
-  const pipeline = `stages:
+  const isNotebook = parse(trainingScript).ext === '.ipynb'
+  const command = isNotebook
+    ? 'jupyter nbconvert --to notebook --inplace --execute'
+    : 'python'
+
+  const pipeline = `
+stages:
   train:
-    cmd: python ${relative(cwd, trainingScript)}`
+    cmd: ${command} ${relative(cwd, trainingScript)}`
   return appendFileSync(dvcYamlPath, pipeline)
 }
 
