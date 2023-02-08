@@ -7,7 +7,6 @@ export enum ContextKey {
   EXPERIMENT_FILTERS_SELECTED = 'dvc.experiments.filter.selected',
   EXPERIMENTS_WEBVIEW_ACTIVE = 'dvc.experiments.webview.active',
   EXPERIMENT_RUNNING = 'dvc.experiment.running',
-  EXPERIMENT_STOPPABLE = 'dvc.experiment.stoppable',
   EXPERIMENTS_FILTERED = 'dvc.experiments.filtered',
   EXPERIMENTS_SORTED = 'dvc.experiments.sorted',
   MULTIPLE_PROJECTS = 'dvc.multiple.projects',

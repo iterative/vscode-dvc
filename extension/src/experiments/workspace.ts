@@ -1,9 +1,8 @@
-import { join } from 'path'
 import { EventEmitter, Memento } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import { Experiments, ModifiedExperimentAndRunCommandId } from '.'
 import { TableData } from './webview/contract'
-import { Args, DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
+import { Args } from '../cli/dvc/constants'
 import {
   AvailableCommands,
   CommandId,
@@ -19,8 +18,7 @@ import {
 import { BaseWorkspaceWebviews } from '../webview/workspace'
 import { Title } from '../vscode/title'
 import { ContextKey, setContextValue } from '../vscode/context'
-import { findOrCreateDvcYamlFile, getPidFromSignalFile } from '../fileSystem'
-import { definedAndNonEmpty } from '../util/array'
+import { findOrCreateDvcYamlFile } from '../fileSystem'
 import { quickPickOneOrInput } from '../vscode/quickPick'
 import { pickFile } from '../vscode/resourcePicker'
 
@@ -419,28 +417,9 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return allLoading
   }
 
-  public async hasDvcLiveOnlyExperimentRunning() {
-    return definedAndNonEmpty(await this.getDvcLiveOnlyPids())
-  }
-
-  public async getDvcLiveOnlyPids() {
-    const pids: number[] = []
-
-    for (const dvcRoot of this.getDvcRoots()) {
-      const signalFile = join(dvcRoot, DVCLIVE_ONLY_RUNNING_SIGNAL_FILE)
-      const pid = await getPidFromSignalFile(signalFile)
-      if (!pid) {
-        continue
-      }
-      pids.push(pid)
-    }
-
-    return pids
-  }
-
-  public hasQueuedExperimentsRunning() {
+  public hasRunningExperiment() {
     return Object.values(this.repositories).some(experiments =>
-      experiments.hasRunningQueuedExperiment()
+      experiments.hasRunningExperiment()
     )
   }
 
