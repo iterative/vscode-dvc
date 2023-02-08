@@ -11,6 +11,11 @@ describe('createInteger', () => {
     expect(integer).toStrictEqual(1234)
   })
 
+  it('should create an integer from a string with a space at the start', () => {
+    const integer = createValidInteger(' 3538')
+    expect(integer).toStrictEqual(3538)
+  })
+
   it('should return undefined if the string does not represent an integer', () => {
     const integer = createValidInteger('1234.0001')
     expect(integer).toBeUndefined()

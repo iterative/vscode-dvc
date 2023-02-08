@@ -1,4 +1,4 @@
-import { basename, extname, join, relative, resolve, sep } from 'path'
+import { basename, extname, join, parse, relative, resolve, sep } from 'path'
 import {
   appendFileSync,
   ensureFileSync,
@@ -131,6 +131,11 @@ export const isAnyDvcYaml = (path?: string): boolean =>
       basename(path) === 'dvc.yaml')
   )
 
+export const scriptCommand = {
+  JUPYTER: 'jupyter nbconvert --to notebook --inplace --execute',
+  PYTHON: 'python'
+}
+
 export const findOrCreateDvcYamlFile = (
   cwd: string,
   trainingScript: string
@@ -138,9 +143,13 @@ export const findOrCreateDvcYamlFile = (
   const dvcYamlPath = `${cwd}/dvc.yaml`
   ensureFileSync(dvcYamlPath)
 
-  const pipeline = `stages:
+  const isNotebook = parse(trainingScript).ext === '.ipynb'
+  const command = isNotebook ? scriptCommand.JUPYTER : scriptCommand.PYTHON
+
+  const pipeline = `
+stages:
   train:
-    cmd: python ${relative(cwd, trainingScript)}`
+    cmd: ${command} ${relative(cwd, trainingScript)}`
   return appendFileSync(dvcYamlPath, pipeline)
 }
 
@@ -173,7 +182,7 @@ export const writeJson = <T extends Record<string, unknown>>(
   return writeFileSync(path, JSON.stringify(obj))
 }
 
-export const getPidFromSignalFile = async (
+export const getPidFromFile = async (
   path: string
 ): Promise<number | undefined> => {
   if (!exists(path)) {
@@ -191,7 +200,7 @@ export const getPidFromSignalFile = async (
 }
 
 export const checkSignalFile = async (path: string): Promise<boolean> => {
-  return !!(await getPidFromSignalFile(path))
+  return !!(await getPidFromFile(path))
 }
 
 export const pollSignalFileForProcess = async (
