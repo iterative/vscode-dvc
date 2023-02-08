@@ -173,7 +173,7 @@ export const writeJson = <T extends Record<string, unknown>>(
   return writeFileSync(path, JSON.stringify(obj))
 }
 
-export const getPidFromSignalFile = async (
+export const getPidFromFile = async (
   path: string
 ): Promise<number | undefined> => {
   if (!exists(path)) {
@@ -191,7 +191,7 @@ export const getPidFromSignalFile = async (
 }
 
 export const checkSignalFile = async (path: string): Promise<boolean> => {
-  return !!(await getPidFromSignalFile(path))
+  return !!(await getPidFromFile(path))
 }
 
 export const pollSignalFileForProcess = async (

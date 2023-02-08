@@ -4,13 +4,14 @@ export const UNEXPECTED_ERROR_CODE = 255
 export const DOT_DVC = '.dvc'
 
 export const TEMP_PLOTS_DIR = join(DOT_DVC, 'tmp', 'plots')
+
+const TEMP_EXP_DIR = join(DOT_DVC, 'tmp', 'exps')
 export const DVCLIVE_ONLY_RUNNING_SIGNAL_FILE = join(
-  DOT_DVC,
-  'tmp',
-  'exps',
+  TEMP_EXP_DIR,
   'run',
   'DVCLIVE_ONLY'
 )
+export const EXP_RWLOCK_FILE = join(TEMP_EXP_DIR, 'rwlock.lock')
 
 export const NUM_OF_COMMITS_TO_SHOW = '3'
 
