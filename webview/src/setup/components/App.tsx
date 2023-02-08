@@ -8,6 +8,7 @@ import { CliIncompatible } from './CliIncompatible'
 import { CliUnavailable } from './CliUnavailable'
 import { ProjectUninitialized } from './ProjectUninitialized'
 import { NoData } from './NoData'
+import { NeedsGitCommit } from './NeedsGitCommit'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 import { sendMessage } from '../../shared/vscode'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
@@ -24,6 +25,7 @@ export const App: React.FC = () => {
   const [canGitInitialize, setCanGitInitialized] = useState<
     boolean | undefined
   >(false)
+  const [needsGitCommit, setNeedsGitCommit] = useState<boolean>(false)
   const [pythonBinPath, setPythonBinPath] = useState<string | undefined>(
     undefined
   )
@@ -39,6 +41,7 @@ export const App: React.FC = () => {
         setHasData(data.data.hasData)
         setIsPythonExtensionInstalled(data.data.isPythonExtensionInstalled)
         setNeedsGitInitialized(data.data.needsGitInitialized)
+        setNeedsGitCommit(data.data.needsGitCommit)
         setProjectInitialized(data.data.projectInitialized)
         setPythonBinPath(data.data.pythonBinPath)
       },
@@ -48,6 +51,7 @@ export const App: React.FC = () => {
         setHasData,
         setIsPythonExtensionInstalled,
         setNeedsGitInitialized,
+        setNeedsGitCommit,
         setProjectInitialized,
         setPythonBinPath
       ]
@@ -68,6 +72,10 @@ export const App: React.FC = () => {
     sendMessage({
       type: MessageFromWebviewType.INITIALIZE_DVC
     })
+  }
+
+  const showScmPanel = () => {
+    sendMessage({ type: MessageFromWebviewType.SHOW_SCM_PANEL })
   }
 
   const installDvc = () => {
@@ -107,6 +115,10 @@ export const App: React.FC = () => {
         needsGitInitialized={needsGitInitialized}
       />
     )
+  }
+
+  if (needsGitCommit) {
+    return <NeedsGitCommit showScmPanel={showScmPanel} />
   }
 
   if (hasData === undefined) {

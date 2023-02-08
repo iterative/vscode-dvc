@@ -4,6 +4,7 @@ export type SetupData = {
   hasData: boolean | undefined
   isPythonExtensionInstalled: boolean
   needsGitInitialized: boolean | undefined
+  needsGitCommit: boolean
   projectInitialized: boolean
   pythonBinPath: string | undefined
 }

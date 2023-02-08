@@ -137,6 +137,23 @@ suite('Setup Test Suite', () => {
       expect(mockExecuteCommand).to.be.calledWithExactly(setInterpreterCommand)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should handle a show source control panel message from the webview', async () => {
+      const { messageSpy, setup, mockExecuteCommand } = buildSetup(disposable)
+      const showScmPanelCommand = 'workbench.view.scm'
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SHOW_SCM_PANEL
+      })
+
+      expect(mockExecuteCommand).to.be.calledWithExactly(showScmPanelCommand)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should handle a setup the workspace message from the webview', async () => {
       const { messageSpy, setup, mockExecuteCommand } = buildSetup(disposable)
 
@@ -221,6 +238,7 @@ suite('Setup Test Suite', () => {
         cliCompatible: undefined,
         hasData: false,
         isPythonExtensionInstalled: false,
+        needsGitCommit: true,
         needsGitInitialized: true,
         projectInitialized: false,
         pythonBinPath: undefined
@@ -257,6 +275,7 @@ suite('Setup Test Suite', () => {
         cliCompatible: true,
         hasData: false,
         isPythonExtensionInstalled: false,
+        needsGitCommit: true,
         needsGitInitialized: true,
         projectInitialized: false,
         pythonBinPath: undefined
@@ -268,6 +287,7 @@ suite('Setup Test Suite', () => {
         disposable,
         false,
         true,
+        false,
         false
       )
 
@@ -298,8 +318,52 @@ suite('Setup Test Suite', () => {
         cliCompatible: true,
         hasData: false,
         isPythonExtensionInstalled: false,
+        needsGitCommit: false,
         needsGitInitialized: false,
         projectInitialized: false,
+        pythonBinPath: undefined
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should send the expected message to the webview when there is no commits in the git repository', async () => {
+      const { config, setup, messageSpy } = buildSetup(
+        disposable,
+        false,
+        false,
+        false,
+        true
+      )
+
+      await config.isReady()
+
+      setup.setCliCompatible(true)
+      setup.setAvailable(true)
+      await setup.setRoots()
+
+      messageSpy.restore()
+      const mockSendMessage = stub(BaseWebview.prototype, 'show')
+
+      const messageSent = new Promise(resolve =>
+        mockSendMessage.callsFake(data => {
+          resolve(undefined)
+          return Promise.resolve(!!data)
+        })
+      )
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      await messageSent
+
+      expect(mockSendMessage).to.be.calledOnce
+      expect(mockSendMessage).to.be.calledWithExactly({
+        canGitInitialize: false,
+        cliCompatible: true,
+        hasData: false,
+        isPythonExtensionInstalled: false,
+        needsGitCommit: true,
+        needsGitInitialized: false,
+        projectInitialized: true,
         pythonBinPath: undefined
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)

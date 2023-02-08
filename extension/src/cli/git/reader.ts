@@ -31,6 +31,19 @@ export class GitReader extends GitCli {
     return !!output
   }
 
+  public async hasNoCommits(cwd: string) {
+    const options = getOptions(
+      cwd,
+      Command.REV_LIST,
+      Flag.NUMBER,
+      '1',
+      Flag.ALL
+    )
+    const output = await this.executeProcess(options)
+
+    return !output
+  }
+
   public async getCommitMessages(cwd: string, sha: string): Promise<string> {
     const options = getOptions(
       cwd,

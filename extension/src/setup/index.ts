@@ -240,17 +240,21 @@ export class Setup
 
     const canGitInitialize = await this.canGitInitialize(needsGitInitialized)
 
+    const needsGitCommit =
+      needsGitInitialized || (await this.needsGitCommit(needsGitInitialized))
+
     const pythonBinPath = await findPythonBinForInstall()
 
-    this.webviewMessages.sendWebviewMessage(
-      this.cliCompatible,
-      needsGitInitialized,
+    this.webviewMessages.sendWebviewMessage({
       canGitInitialize,
+      cliCompatible: this.cliCompatible,
+      hasData,
+      isPythonExtensionInstalled: isPythonExtensionInstalled(),
+      needsGitCommit,
+      needsGitInitialized,
       projectInitialized,
-      isPythonExtensionInstalled(),
-      getBinDisplayText(pythonBinPath),
-      hasData
-    )
+      pythonBinPath: getBinDisplayText(pythonBinPath)
+    })
   }
 
   private createWebviewMessageHandler() {
@@ -348,6 +352,18 @@ export class Setup
     if (cwd) {
       void this.gitExecutor.init(cwd)
     }
+  }
+
+  private needsGitCommit(needsGitInit: boolean) {
+    if (needsGitInit) {
+      return true
+    }
+
+    const cwd = getFirstWorkspaceFolder()
+    if (!cwd) {
+      return true
+    }
+    return this.gitReader.hasNoCommits(cwd)
   }
 
   private registerCommands(internalCommands: InternalCommands) {
