@@ -48,7 +48,8 @@ $gap: 20px;
   position: absolute;
   bottom: 0;
   width: 100%;
-  background-color: $fg-color;
+  background-color: $plot-block-bg-color;
+  color: $fg-color;
   padding: 10px;
   display: none;
 
