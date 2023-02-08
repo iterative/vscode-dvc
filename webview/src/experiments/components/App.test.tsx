@@ -987,7 +987,7 @@ describe('App', () => {
       stopOption && fireEvent.click(stopOption)
 
       expect(sendMessage).toHaveBeenCalledWith({
-        payload: ['exp-e7a67'],
+        payload: [{ executor: 'dvc-task', id: 'exp-e7a67' }],
         type: MessageFromWebviewType.STOP_EXPERIMENT
       })
     })

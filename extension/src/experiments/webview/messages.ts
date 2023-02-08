@@ -22,6 +22,10 @@ import { getPositiveIntegerInput } from '../../vscode/inputBox'
 import { Title } from '../../vscode/title'
 import { ConfigKey, setConfigValue } from '../../vscode/config'
 import { Toast } from '../../vscode/toast'
+import { definedAndNonEmpty } from '../../util/array'
+import { getPidFromFile } from '../../fileSystem'
+import { EXP_RWLOCK_FILE } from '../../cli/dvc/constants'
+import { stopProcesses, processExists } from '../../processExecution'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
@@ -335,8 +339,36 @@ export class WebviewMessages {
     )
   }
 
-  private stopExperiments(ids: string[]) {
-    void Toast.showOutput(this.stopQueuedExperiments(this.dvcRoot, ...ids))
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+  private async stopExperiments(
+    experiments: { id: string; executor: string }[]
+  ) {
+    const runningInQueueIds = experiments
+      .filter(({ executor }) => executor === 'dvc-task')
+      .map(({ id }) => id)
+
+    const runningInWorkspace = definedAndNonEmpty(
+      experiments.filter(({ executor }) => executor === 'workspace')
+    )
+
+    if (definedAndNonEmpty(runningInQueueIds)) {
+      void Toast.showOutput(
+        this.stopQueuedExperiments(this.dvcRoot, ...runningInQueueIds)
+      )
+    }
+    if (runningInWorkspace) {
+      const pid = await getPidFromFile(join(this.dvcRoot, EXP_RWLOCK_FILE))
+      if (pid && (await processExists(pid))) {
+        void Toast.showOutput(
+          stopProcesses([pid]).then(stopped =>
+            stopped
+              ? 'Experiment running in the workspace was stopped.'
+              : 'Failed to stop the experiment running in the workspace.'
+          )
+        )
+      }
+    }
+
     sendTelemetryEvent(EventName.EXPERIMENT_VIEW_STOP, undefined, undefined)
   }
 }

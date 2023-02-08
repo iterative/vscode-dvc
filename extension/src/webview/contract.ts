@@ -129,7 +129,7 @@ export type MessageFromWebview =
     }
   | {
       type: MessageFromWebviewType.STOP_EXPERIMENT
-      payload: string[]
+      payload: { id: string; executor: string }[]
     }
   | {
       type: MessageFromWebviewType.REMOVE_COLUMN_SORT

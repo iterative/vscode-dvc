@@ -1082,7 +1082,7 @@ suite('Experiments Test Suite', () => {
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       mockMessageReceived.fire({
-        payload: mockExperimentIds,
+        payload: mockExperimentIds.map(id => ({ executor: 'dvc-task', id })),
         type: MessageFromWebviewType.STOP_EXPERIMENT
       })
 
