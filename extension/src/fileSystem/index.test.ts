@@ -24,6 +24,9 @@ jest.mock('fs-extra', () => {
   }
 })
 
+const mockedAppendFileSync = jest.mocked(appendFileSync)
+const mockedEnsureFileSync = jest.mocked(ensureFileSync)
+
 beforeEach(() => {
   jest.resetAllMocks()
 })
@@ -168,14 +171,14 @@ describe('findOrCreateDvcYamlFile', () => {
     const cwd = '/cwd'
     findOrCreateDvcYamlFile(cwd, '/my/training/script.py')
 
-    expect(ensureFileSync).toHaveBeenCalledWith(`${cwd}/dvc.yaml`)
+    expect(mockedEnsureFileSync).toHaveBeenCalledWith(`${cwd}/dvc.yaml`)
   })
 
   it('should add the training script as a train stage in the dvc.yaml file', () => {
     const cwd = '/cwd'
     findOrCreateDvcYamlFile(cwd, '/my/training/script.py')
 
-    expect(appendFileSync).toHaveBeenCalledWith(
+    expect(mockedAppendFileSync).toHaveBeenCalledWith(
       `${cwd}/dvc.yaml`,
       expect.stringMatching(/^\s+stages:\s+train:/)
     )
@@ -187,7 +190,7 @@ describe('findOrCreateDvcYamlFile', () => {
       '/dir/my_project/src/training/train.py'
     )
 
-    expect(appendFileSync).toHaveBeenCalledWith(
+    expect(mockedAppendFileSync).toHaveBeenCalledWith(
       expect.anything(),
       expect.stringContaining(join('src', 'training', 'train.py'))
     )
@@ -197,7 +200,7 @@ describe('findOrCreateDvcYamlFile', () => {
       '/dir/my_other_project/train.py'
     )
 
-    expect(appendFileSync).toHaveBeenCalledWith(
+    expect(mockedAppendFileSync).toHaveBeenCalledWith(
       expect.anything(),
       expect.stringContaining(join('..', 'my_other_project', 'train.py'))
     )
@@ -206,11 +209,11 @@ describe('findOrCreateDvcYamlFile', () => {
   it('should use the jupyter nbconvert command if the training script is a Jupyter notebook', () => {
     findOrCreateDvcYamlFile('/', '/train.ipynb')
 
-    expect(appendFileSync).toHaveBeenCalledWith(
+    expect(mockedAppendFileSync).toHaveBeenCalledWith(
       expect.anything(),
       expect.stringContaining(scriptCommand.JUPYTER)
     )
-    expect(appendFileSync).not.toHaveBeenCalledWith(
+    expect(mockedAppendFileSync).not.toHaveBeenCalledWith(
       expect.anything(),
       expect.stringContaining(scriptCommand.PYTHON)
     )
@@ -219,11 +222,11 @@ describe('findOrCreateDvcYamlFile', () => {
   it('should use the python command if the training script is not a Jupyter notebook', () => {
     findOrCreateDvcYamlFile('/', '/train.py')
 
-    expect(appendFileSync).not.toHaveBeenCalledWith(
+    expect(mockedAppendFileSync).not.toHaveBeenCalledWith(
       expect.anything(),
       expect.stringContaining(scriptCommand.JUPYTER)
     )
-    expect(appendFileSync).toHaveBeenCalledWith(
+    expect(mockedAppendFileSync).toHaveBeenCalledWith(
       expect.anything(),
       expect.stringContaining(scriptCommand.PYTHON)
     )
