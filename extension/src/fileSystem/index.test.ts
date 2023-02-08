@@ -188,7 +188,19 @@ describe('findOrCreateDvcYamlFile', () => {
 
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
       `${cwd}/dvc.yaml`,
-      expect.stringMatching(/^\s+stages:\s+train:/)
+      expect.stringMatching(/stages:\s+train:/)
+    )
+  })
+
+  it('should add a comment to direct the user towards the dvc.yaml stages documentation', () => {
+    const cwd = '/cwd'
+    void findOrCreateDvcYamlFile(cwd, '/my/training/script.py')
+
+    expect(mockedAppendFileSync).toHaveBeenCalledWith(
+      `${cwd}/dvc.yaml`,
+      expect.stringContaining(
+        '# Read about DVC pipeline configuration (https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#stages) to customize your stages even more'
+      )
     )
   })
 

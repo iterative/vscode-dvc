@@ -152,6 +152,7 @@ export const findOrCreateDvcYamlFile = (
   const command = isNotebook ? scriptCommand.JUPYTER : scriptCommand.PYTHON
 
   const pipeline = `
+# Read about DVC pipeline configuration (https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#stages) to customize your stages even more
 stages:
   train:
     cmd: ${command} ${relative(cwd, trainingScript)}`
