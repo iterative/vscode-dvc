@@ -12,7 +12,7 @@ export const getInput = (
     value
   })
 
-const getValidInput = (
+export const getValidInput = (
   title: Title,
   validateInput: (text?: string) => null | string,
   options?: { prompt?: string; value?: string }

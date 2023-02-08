@@ -138,7 +138,8 @@ export const scriptCommand = {
 
 export const findOrCreateDvcYamlFile = (
   cwd: string,
-  trainingScript: string
+  trainingScript: string,
+  stageName: string
 ) => {
   const dvcYamlPath = `${cwd}/dvc.yaml`
   ensureFileSync(dvcYamlPath)
@@ -148,7 +149,7 @@ export const findOrCreateDvcYamlFile = (
 
   const pipeline = `
 stages:
-  train:
+  ${stageName}:
     cmd: ${command} ${relative(cwd, trainingScript)}`
   return appendFileSync(dvcYamlPath, pipeline)
 }
