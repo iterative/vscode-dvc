@@ -521,10 +521,6 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.hasRunningExperiment()
   }
 
-  public hasRunningQueuedExperiment() {
-    return this.experiments.getRunningQueueTasks().length > 0
-  }
-
   public getFirstThreeColumnOrder() {
     return this.columns.getFirstThreeColumnOrder()
   }

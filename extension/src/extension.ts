@@ -51,6 +51,7 @@ import { definedAndNonEmpty } from './util/array'
 import { stopProcesses } from './processExecution'
 import { Flag } from './cli/dvc/constants'
 import { LanguageClient } from './languageClient'
+import { collectRunningExperimentPids } from './experiments/processes/collect'
 
 export class Extension extends Disposable {
   protected readonly internalCommands: InternalCommands
@@ -200,21 +201,21 @@ export class Extension extends Disposable {
         RegisteredCommands.STOP_EXPERIMENTS,
         async () => {
           const stopWatch = new StopWatch()
-          const dvcLiveOnlyPids = await this.experiments.getDvcLiveOnlyPids()
+          const pids = await collectRunningExperimentPids(this.getRoots())
           const wasRunning =
             this.dvcRunner.isExperimentRunning() ||
-            definedAndNonEmpty(dvcLiveOnlyPids) ||
-            this.experiments.hasQueuedExperimentsRunning()
+            definedAndNonEmpty(pids) ||
+            this.experiments.hasRunningExperiment()
           try {
-            const allStopped = await Promise.all([
-              stopProcesses(dvcLiveOnlyPids),
-              this.dvcRunner.stop(),
+            const processesStopped = await Promise.all([
+              stopProcesses(pids),
               ...this.getRoots().map(dvcRoot =>
                 this.dvcExecutor.queueStop(dvcRoot, Flag.KILL)
               )
             ])
+            const runnerStopped = await this.dvcRunner.stop()
 
-            const stopped = allStopped.every(Boolean)
+            const stopped = processesStopped.every(Boolean) || runnerStopped
             sendTelemetryEvent(
               RegisteredCommands.STOP_EXPERIMENTS,
               { stopped, wasRunning },
