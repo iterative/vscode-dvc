@@ -31,6 +31,7 @@ import * as Telemetry from '../../../telemetry'
 import { StopWatch } from '../../../util/time'
 import { MIN_CLI_VERSION } from '../../../cli/dvc/contract'
 import { run } from '../../../setup/runner'
+import * as Python from '../../../extensions/python'
 
 suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
@@ -380,6 +381,37 @@ suite('Setup Test Suite', () => {
         Config.ConfigKey.FOCUSED_PROJECTS,
         mockFocusedProjects
       )
+    })
+
+    it("should prompt show the Python extension's select python interpreter command if the extension is installed and the user chooses to use a virtual environment", async () => {
+      stub(Python, 'isPythonExtensionInstalled').returns(true)
+      const mockShowQuickPick = stub(window, 'showQuickPick')
+
+      const venvQuickPickActive = quickPickInitialized(mockShowQuickPick, 0)
+
+      const setupWorkspaceWizard = commands.executeCommand(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE
+      )
+
+      const mockSelectPythonInterpreter = stub(
+        Python,
+        'selectPythonInterpreter'
+      )
+      const executeCommandCalled = new Promise(resolve =>
+        mockSelectPythonInterpreter.callsFake(() => {
+          resolve(undefined)
+        })
+      )
+
+      await venvQuickPickActive
+
+      await Promise.all([
+        selectQuickPickItem(1),
+        executeCommandCalled,
+        setupWorkspaceWizard
+      ])
+
+      expect(mockSelectPythonInterpreter).to.be.calledOnce
     })
 
     it('should set dvc.pythonPath to the picked value when the user selects to pick a Python interpreter', async () => {

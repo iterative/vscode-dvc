@@ -2,14 +2,8 @@ import { join, resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore, spy, match } from 'sinon'
-import { window, commands, workspace } from 'vscode'
-import {
-  closeAllEditors,
-  mockDisposable,
-  mockDuration,
-  quickPickInitialized,
-  selectQuickPickItem
-} from './util'
+import { commands, workspace } from 'vscode'
+import { closeAllEditors, mockDisposable, mockDuration } from './util'
 import { mockHasCheckpoints } from './experiments/util'
 import { Disposable } from '../../extension'
 import * as Python from '../../extensions/python'
@@ -49,41 +43,10 @@ suite('Extension Test Suite', () => {
     ])
   })
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('dvc.setupWorkspace', () => {
     it('should initialize the extension when the cli is usable', async () => {
       stub(Python, 'isPythonExtensionInstalled').returns(true)
-      const selectVirtualEnvWithPython = async (path: string) => {
-        const mockShowQuickPick = stub(window, 'showQuickPick')
-
-        const venvQuickPickActive = quickPickInitialized(mockShowQuickPick, 0)
-
-        const setupWorkspaceWizard = commands.executeCommand(
-          RegisteredCommands.EXTENSION_SETUP_WORKSPACE
-        )
-
-        const mockSelectPythonInterpreter = stub(
-          Python,
-          'selectPythonInterpreter'
-        )
-        const executeCommandCalled = new Promise(resolve =>
-          mockSelectPythonInterpreter.callsFake(() => {
-            void setConfigValue(ConfigKey.PYTHON_PATH, path)
-            resolve(undefined)
-          })
-        )
-
-        await venvQuickPickActive
-
-        await selectQuickPickItem(1)
-
-        await executeCommandCalled
-
-        mockSelectPythonInterpreter.restore()
-
-        mockShowQuickPick.restore()
-
-        return setupWorkspaceWizard
-      }
 
       const mockCreateFileSystemWatcher = stub(
         workspace,
@@ -98,6 +61,10 @@ suite('Extension Test Suite', () => {
         onDidDelete: () => mockDisposable
       })
 
+      const mockGetDvcRoots = stub(Setup.prototype, 'getRoots').returns([
+        dvcDemoPath
+      ])
+
       const mockCanRunCli = stub(DvcReader.prototype, 'version')
         .onFirstCall()
         .resolves(MIN_CLI_VERSION)
@@ -110,9 +77,13 @@ suite('Extension Test Suite', () => {
         new Promise(resolve => {
           mockDisposer.resetBehavior()
           mockDisposer.resetHistory()
-          mockDisposer.callsFake((...args) => {
+          mockDisposer.callsFake((disposables, untrack) => {
             resolve(undefined)
-            return mockDisposer.wrappedMethod(...args)
+            for (const repository of Object.values(disposables)) {
+              untrack(repository)
+              disposable.track(repository)
+            }
+            return {}
           })
         })
 
@@ -128,41 +99,58 @@ suite('Extension Test Suite', () => {
       )
 
       mockHasCheckpoints(expShowFixture)
-      const mockExpShow = stub(DvcReader.prototype, 'expShow').resolves(
-        expShowFixture
-      )
+      const mockExpShow = stub(DvcReader.prototype, 'expShow')
+      const mockDataStatus = stub(DvcReader.prototype, 'dataStatus')
+      const mockPlotsDiff = stub(DvcReader.prototype, 'plotsDiff')
 
       stub(DvcReader.prototype, 'root').resolves('.')
 
-      const mockDataStatus = stub(DvcReader.prototype, 'dataStatus').resolves({
-        committed: {
-          added: [],
-          deleted: [],
-          modified: [],
-          renamed: []
-        },
-        not_in_cache: [],
-        unchanged: [
-          join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
-          join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz'),
-          join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte'),
-          join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz'),
-          join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte'),
-          join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz'),
-          join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte'),
-          join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz'),
-          join('logs', 'acc.tsv'),
-          join('logs', 'loss.tsv')
-        ],
-        uncommitted: {
-          added: [],
-          deleted: [],
-          modified: ['model.pt', join('data', 'MNIST', 'raw'), 'logs'],
-          renamed: []
-        }
+      const dataStatusCalled = new Promise(resolve => {
+        mockDataStatus.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve({
+            committed: {
+              added: [],
+              deleted: [],
+              modified: [],
+              renamed: []
+            },
+            not_in_cache: [],
+            unchanged: [
+              join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
+              join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz'),
+              join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte'),
+              join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz'),
+              join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte'),
+              join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz'),
+              join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte'),
+              join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz'),
+              join('logs', 'acc.tsv'),
+              join('logs', 'loss.tsv')
+            ],
+            uncommitted: {
+              added: [],
+              deleted: [],
+              modified: ['model.pt', join('data', 'MNIST', 'raw'), 'logs'],
+              renamed: []
+            }
+          })
+        })
       })
 
-      stub(DvcReader.prototype, 'plotsDiff').resolves(plotsDiffFixture)
+      const expShowCalled = new Promise(resolve => {
+        mockExpShow.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(expShowFixture)
+        })
+      })
+
+      const plotsDiffCalled = new Promise(resolve => {
+        mockPlotsDiff.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(plotsDiffFixture)
+        })
+      })
 
       const mockWorkspaceExperimentsReady = stub(
         WorkspaceExperiments.prototype,
@@ -181,9 +169,15 @@ suite('Extension Test Suite', () => {
 
       const mockPath = resolve('path', 'to', 'venv')
 
-      await selectVirtualEnvWithPython(resolve('path', 'to', 'venv'))
+      void (await setConfigValue(ConfigKey.PYTHON_PATH, mockPath))
 
-      await Promise.all([firstDisposal, correctTelemetryEventSent])
+      await Promise.all([
+        firstDisposal,
+        correctTelemetryEventSent,
+        dataStatusCalled,
+        expShowCalled,
+        plotsDiffCalled
+      ])
 
       expect(
         await workspace.getConfiguration().get(ConfigKey.PYTHON_PATH)
@@ -197,6 +191,9 @@ suite('Extension Test Suite', () => {
         .been.called
       expect(mockExpShow, 'should have updated the experiments data').to.have
         .been.called
+      expect(mockPlotsDiff, 'should have updated the plots data').to.have.been
+        .called
+      expect(mockGetDvcRoots).to.have.been.called
 
       expect(
         mockSendTelemetryEvent,
@@ -231,7 +228,10 @@ suite('Extension Test Suite', () => {
       await workspaceExperimentsAreReady
       const secondDisposal = disposalEvent()
 
-      await selectVirtualEnvWithPython(resolve('path', 'to', 'virtualenv'))
+      void (await setConfigValue(
+        ConfigKey.PYTHON_PATH,
+        resolve('path', 'to', 'virtualenv')
+      ))
 
       await secondDisposal
 
