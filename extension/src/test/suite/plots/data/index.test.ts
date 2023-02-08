@@ -35,14 +35,11 @@ suite('Plots Data Test Suite', () => {
   })
 
   const buildPlotsData = (
-    experimentIsRunning: boolean,
     missingRevisions: string[] = [],
     mutableRevisions: string[] = []
   ) => {
-    const { internalCommands, updatesPaused, mockPlotsDiff, dvcRunner } =
+    const { internalCommands, updatesPaused, mockPlotsDiff } =
       buildDependencies(disposable)
-
-    stub(dvcRunner, 'isExperimentRunning').returns(experimentIsRunning)
 
     const mockGetMissingRevisions = stub().returns(missingRevisions)
     const mockGetMutableRevisions = stub().returns(mutableRevisions)
@@ -70,7 +67,7 @@ suite('Plots Data Test Suite', () => {
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('PlotsData', () => {
     it('should call plots diff when there are no revisions to fetch and no experiment is running (workspace updates)', async () => {
-      const { data, mockPlotsDiff } = buildPlotsData(false, [], [])
+      const { data, mockPlotsDiff } = buildPlotsData([], [])
 
       await data.update()
 
@@ -80,7 +77,6 @@ suite('Plots Data Test Suite', () => {
 
     it('should call plots diff when an experiment is running in the workspace (live updates)', async () => {
       const { data, mockPlotsDiff } = buildPlotsData(
-        true,
         [],
         [EXPERIMENT_WORKSPACE_ID]
       )
@@ -91,7 +87,7 @@ suite('Plots Data Test Suite', () => {
     })
 
     it('should call plots diff when an experiment is running in a temporary directory (live updates)', async () => {
-      const { data, mockPlotsDiff } = buildPlotsData(true, [], ['a7739b5'])
+      const { data, mockPlotsDiff } = buildPlotsData([], ['a7739b5'])
 
       await data.update()
 
@@ -101,7 +97,6 @@ suite('Plots Data Test Suite', () => {
 
     it('should call plots diff when an experiment is running and there are missing revisions (checkpoints)', async () => {
       const { data, mockPlotsDiff } = buildPlotsData(
-        true,
         ['53c3851', '4fb124a', '42b8736', '1ba7bcd'],
         []
       )
@@ -120,7 +115,6 @@ suite('Plots Data Test Suite', () => {
 
     it('should call plots diff when an experiment is running and there are missing revisions and one of them is mutable', async () => {
       const { data, mockPlotsDiff } = buildPlotsData(
-        true,
         ['53c3851', '4fb124a', '42b8736', '1ba7bcd'],
         ['1ba7bcd']
       )
