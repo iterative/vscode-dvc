@@ -88,7 +88,7 @@ suite('Context Test Suite', () => {
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('Context', () => {
-    it('should set the dvc.experiment.running and dvc.experiment.stoppable context to true whenever an experiment is running in the runner', async () => {
+    it('should set the dvc.experiment.running context to true whenever an experiment is running in the runner', async () => {
       const { executeCommandSpy, onDidStartProcess, processStarted } =
         buildContext(true)
 
@@ -102,12 +102,6 @@ suite('Context Test Suite', () => {
       expect(executeCommandSpy).to.be.calledWith(
         'setContext',
         'dvc.experiment.running',
-        true
-      )
-
-      expect(executeCommandSpy).to.be.calledWith(
-        'setContext',
-        'dvc.experiment.stoppable',
         true
       )
     })
@@ -171,100 +165,6 @@ suite('Context Test Suite', () => {
       expect(executeCommandSpy).to.be.calledWith(
         'setContext',
         'dvc.experiment.running',
-        false
-      )
-    })
-
-    it('should set the dvc.experiment.stoppable context to whether or not there is a DVCLive only experiment running if an experiment is not running in the runner or queue', async () => {
-      const {
-        executeCommandSpy,
-        experimentsChanged,
-        mockGetDvcRoots,
-        mockGetRepository,
-        mockHasDvcLiveOnlyExperimentRunning,
-        onDidChangeExperiments
-      } = buildContext(false)
-
-      const dvcLiveOnlyRunningEvent = new Promise(resolve =>
-        disposable.track(onDidChangeExperiments(() => resolve(undefined)))
-      )
-
-      const mockDvcRoot = resolve('first', 'root')
-      mockGetDvcRoots.returns([mockDvcRoot])
-      mockGetRepository.callsFake(() => buildMockExperiments())
-
-      mockHasDvcLiveOnlyExperimentRunning.resolves(true)
-
-      experimentsChanged.fire()
-      await dvcLiveOnlyRunningEvent
-
-      expect(executeCommandSpy).to.be.calledWith(
-        'setContext',
-        'dvc.experiment.stoppable',
-        true
-      )
-      mockHasDvcLiveOnlyExperimentRunning.resetBehavior()
-      executeCommandSpy.resetHistory()
-
-      const dvcLiveOnlyStoppedEvent = new Promise(resolve =>
-        disposable.track(onDidChangeExperiments(() => resolve(undefined)))
-      )
-
-      mockHasDvcLiveOnlyExperimentRunning.resolves(false)
-
-      experimentsChanged.fire()
-      await dvcLiveOnlyStoppedEvent
-
-      expect(executeCommandSpy).to.be.calledWith(
-        'setContext',
-        'dvc.experiment.stoppable',
-        false
-      )
-    })
-
-    it('should set the dvc.experiment.stoppable context to true if an experiment is running in the queue', async () => {
-      const {
-        executeCommandSpy,
-        experimentsChanged,
-        mockGetDvcRoots,
-        mockGetRepository,
-        mockHasDvcLiveOnlyExperimentRunning,
-        onDidChangeExperiments
-      } = buildContext(false)
-
-      const queuedExperimentRunningEvent = new Promise(resolve =>
-        disposable.track(onDidChangeExperiments(() => resolve(undefined)))
-      )
-
-      const mockDvcRoot = resolve('first', 'root')
-      mockGetDvcRoots.returns([mockDvcRoot])
-      let hasRunningQueuedExperiment = true
-      mockGetRepository.callsFake(() =>
-        buildMockExperiments([], [], false, hasRunningQueuedExperiment)
-      )
-
-      mockHasDvcLiveOnlyExperimentRunning.resolves(false)
-
-      experimentsChanged.fire()
-      await queuedExperimentRunningEvent
-
-      expect(executeCommandSpy).to.be.calledWith(
-        'setContext',
-        'dvc.experiment.stoppable',
-        true
-      )
-      executeCommandSpy.resetHistory()
-
-      const queuedExperimentStoppedEvent = new Promise(resolve =>
-        disposable.track(onDidChangeExperiments(() => resolve(undefined)))
-      )
-      hasRunningQueuedExperiment = false
-      experimentsChanged.fire()
-      await queuedExperimentStoppedEvent
-
-      expect(executeCommandSpy).to.be.calledWith(
-        'setContext',
-        'dvc.experiment.stoppable',
         false
       )
     })

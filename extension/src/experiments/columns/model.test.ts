@@ -45,6 +45,19 @@ describe('ColumnsModel', () => {
   const exampleDvcRoot = 'test'
   const mockedColumnsOrderOrStatusChanged = buildMockedEventEmitter<void>()
 
+  it('should return no columns when given an output with no data', async () => {
+    const model = new ColumnsModel(
+      '',
+      buildMockMemento(),
+      mockedColumnsOrderOrStatusChanged
+    )
+    await model.transformAndSet({
+      [EXPERIMENT_WORKSPACE_ID]: { baseline: {} }
+    })
+
+    expect(model.getSelected()).toStrictEqual([])
+  })
+
   it('should return the expected columns when given the default output fixture', async () => {
     const model = new ColumnsModel(
       '',

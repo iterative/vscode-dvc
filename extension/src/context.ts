@@ -37,7 +37,7 @@ export class Context extends Disposable {
           repositories.push(this.experiments.getRepository(dvcRoot))
         }
 
-        void this.setIsExperimentRunning(repositories)
+        this.setIsExperimentRunning(repositories)
 
         void setContextValue(
           ContextKey.EXPERIMENTS_FILTERED,
@@ -52,24 +52,11 @@ export class Context extends Disposable {
     )
   }
 
-  private async setIsExperimentRunning(repositories: Experiments[] = []) {
-    if (
-      this.dvcRunner.isExperimentRunning() ||
-      repositories.some(experiments => experiments.hasRunningQueuedExperiment())
-    ) {
-      void setContextValue(ContextKey.EXPERIMENT_RUNNING, true)
-      void setContextValue(ContextKey.EXPERIMENT_STOPPABLE, true)
-      return
-    }
-
+  private setIsExperimentRunning(repositories: Experiments[] = []) {
     void setContextValue(
       ContextKey.EXPERIMENT_RUNNING,
-      repositories.some(experiments => experiments.hasRunningExperiment())
-    )
-
-    void setContextValue(
-      ContextKey.EXPERIMENT_STOPPABLE,
-      await this.experiments.hasDvcLiveOnlyExperimentRunning()
+      this.dvcRunner.isExperimentRunning() ||
+        repositories.some(experiments => experiments.hasRunningExperiment())
     )
   }
 }
