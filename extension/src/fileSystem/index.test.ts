@@ -174,6 +174,17 @@ describe('findOrCreateDvcYamlFile', () => {
     expect(mockedEnsureFileSync).toHaveBeenCalledWith(`${cwd}/dvc.yaml`)
   })
 
+  it('should add the stage name to the dvc.yaml file', () => {
+    const cwd = '/cwd'
+    const uniqueStageName = 'aWesome_STAGE_name48'
+    findOrCreateDvcYamlFile(cwd, '/script.py', uniqueStageName)
+
+    expect(mockedAppendFileSync).toHaveBeenCalledWith(
+      `${cwd}/dvc.yaml`,
+      expect.stringContaining(uniqueStageName)
+    )
+  })
+
   it('should add the training script as a train stage in the dvc.yaml file', () => {
     const cwd = '/cwd'
     findOrCreateDvcYamlFile(cwd, '/my/training/script.py', 'train')
