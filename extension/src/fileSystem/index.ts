@@ -1,4 +1,4 @@
-import { basename, extname, join, relative, resolve, sep } from 'path'
+import { basename, extname, join, parse, relative, resolve, sep } from 'path'
 import {
   appendFileSync,
   ensureFileSync,
@@ -131,20 +131,32 @@ export const isAnyDvcYaml = (path?: string): boolean =>
       basename(path) === 'dvc.yaml')
   )
 
-export const findOrCreateDvcYamlFile = async (
+export const scriptCommand = {
+  JUPYTER: 'jupyter nbconvert --to notebook --inplace --execute',
+  PYTHON: 'python'
+}
+
+export const openDvcYamlFile = async (dvcYamlPath: string) => {
+  const dvcYaml = await workspace.openTextDocument(Uri.file(dvcYamlPath))
+  await window.showTextDocument(dvcYaml)
+}
+
+export const findOrCreateDvcYamlFile = (
   cwd: string,
   trainingScript: string
 ) => {
   const dvcYamlPath = `${cwd}/dvc.yaml`
   ensureFileSync(dvcYamlPath)
 
+  const isNotebook = parse(trainingScript).ext === '.ipynb'
+  const command = isNotebook ? scriptCommand.JUPYTER : scriptCommand.PYTHON
+
   const pipeline = `
 stages:
   train:
-    cmd: python ${relative(cwd, trainingScript)}`
+    cmd: ${command} ${relative(cwd, trainingScript)}`
 
-  const dvcYaml = await workspace.openTextDocument(Uri.file(dvcYamlPath))
-  await window.showTextDocument(dvcYaml)
+  void openDvcYamlFile(dvcYamlPath)
   return appendFileSync(dvcYamlPath, pipeline)
 }
 

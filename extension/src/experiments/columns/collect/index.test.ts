@@ -80,7 +80,7 @@ describe('collectColumns', () => {
         baseline: {}
       }
     })
-    expect(columns).toStrictEqual([timestampColumn])
+    expect(columns).toStrictEqual([])
   })
 
   const exampleBigNumber = 3000000000
