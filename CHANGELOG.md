@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.3] - 2023-02-09
+
+### 🚀 New Features and Enhancements
+
+- Create dvc.yaml file with training script on run experiment [#3197](https://github.com/iterative/vscode-dvc/pull/3197) by [@sroy3](https://github.com/sroy3)
+- Add reminder to commit after `dvc init` [#3239](https://github.com/iterative/vscode-dvc/pull/3239) by [@julieg18](https://github.com/julieg18)
+- Add jupyter notebook script to run in dvc.yaml [#3240](https://github.com/iterative/vscode-dvc/pull/3240) by [@sroy3](https://github.com/sroy3)
+- Improve vega bindings color (smooth template) [#3250](https://github.com/iterative/vscode-dvc/pull/3250) by [@mattseddon](https://github.com/mattseddon)
+- Add ability to stop experiments running in the workspace (outside of the extension) [#3247](https://github.com/iterative/vscode-dvc/pull/3247) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Don't add "Created" column when there is no data [#3241](https://github.com/iterative/vscode-dvc/pull/3241) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Attempt to fix flaky integration test (simplify and split) [#3201](https://github.com/iterative/vscode-dvc/pull/3201) by [@mattseddon](https://github.com/mattseddon)
+- Remove unnecessary dependency from tests [#3248](https://github.com/iterative/vscode-dvc/pull/3248) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.6.2] - 2023-02-07
 
 ### 🚀 New Features and Enhancements
