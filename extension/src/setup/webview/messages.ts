@@ -27,20 +27,31 @@ export class WebviewMessages {
     this.initializeGit = initializeGit
   }
 
-  public sendWebviewMessage(
-    cliCompatible: boolean | undefined,
-    needsGitInitialized: boolean | undefined,
-    canGitInitialize: boolean,
-    projectInitialized: boolean,
-    isPythonExtensionInstalled: boolean,
-    pythonBinPath: string | undefined,
+  public sendWebviewMessage({
+    cliCompatible,
+    needsGitInitialized,
+    canGitInitialize,
+    needsGitCommit,
+    projectInitialized,
+    isPythonExtensionInstalled,
+    pythonBinPath,
+    hasData
+  }: {
+    cliCompatible: boolean | undefined
+    needsGitInitialized: boolean | undefined
+    canGitInitialize: boolean
+    projectInitialized: boolean
+    needsGitCommit: boolean
+    isPythonExtensionInstalled: boolean
+    pythonBinPath: string | undefined
     hasData: boolean | undefined
-  ) {
+  }) {
     void this.getWebview()?.show({
       canGitInitialize,
       cliCompatible,
       hasData,
       isPythonExtensionInstalled,
+      needsGitCommit,
       needsGitInitialized,
       projectInitialized,
       pythonBinPath
@@ -57,6 +68,8 @@ export class WebviewMessages {
         return this.initializeDvc()
       case MessageFromWebviewType.INITIALIZE_GIT:
         return this.initializeGit()
+      case MessageFromWebviewType.SHOW_SCM_PANEL:
+        return commands.executeCommand('workbench.view.scm')
       case MessageFromWebviewType.SELECT_PYTHON_INTERPRETER:
         return this.selectPythonInterpreter()
       case MessageFromWebviewType.INSTALL_DVC:

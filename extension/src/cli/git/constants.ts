@@ -19,10 +19,12 @@ export enum Command {
   LS_FILES = 'ls-files',
   PUSH = 'push',
   RESET = 'reset',
-  REV_PARSE = 'rev-parse'
+  REV_PARSE = 'rev-parse',
+  REV_LIST = 'rev-list'
 }
 
 export enum Flag {
+  ALL = '--all',
   DIRECTORIES = '-d',
   DIRECTORY = '--directory',
   DOT = '.',
