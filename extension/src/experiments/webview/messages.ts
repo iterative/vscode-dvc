@@ -22,10 +22,8 @@ import { getPositiveIntegerInput } from '../../vscode/inputBox'
 import { Title } from '../../vscode/title'
 import { ConfigKey, setConfigValue } from '../../vscode/config'
 import { Toast } from '../../vscode/toast'
-import { definedAndNonEmpty } from '../../util/array'
-import { getPidFromFile } from '../../fileSystem'
-import { EXP_RWLOCK_FILE } from '../../cli/dvc/constants'
-import { stopProcesses, processExists } from '../../processExecution'
+import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
+import { stopWorkspaceExperiment } from '../processes'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
@@ -339,36 +337,37 @@ export class WebviewMessages {
     )
   }
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  private async stopExperiments(
-    experiments: { id: string; executor: string }[]
+  private stopExperiments(
+    runningExperiments: { id: string; executor?: string | null }[]
   ) {
-    const runningInQueueIds = experiments
-      .filter(({ executor }) => executor === 'dvc-task')
-      .map(({ id }) => id)
+    const { runningInQueueIds, runningInWorkspace } =
+      this.groupRunningExperiments(runningExperiments)
 
-    const runningInWorkspace = definedAndNonEmpty(
-      experiments.filter(({ executor }) => executor === 'workspace')
-    )
-
-    if (definedAndNonEmpty(runningInQueueIds)) {
+    if (runningInQueueIds.size > 0) {
       void Toast.showOutput(
         this.stopQueuedExperiments(this.dvcRoot, ...runningInQueueIds)
       )
     }
     if (runningInWorkspace) {
-      const pid = await getPidFromFile(join(this.dvcRoot, EXP_RWLOCK_FILE))
-      if (pid && (await processExists(pid))) {
-        void Toast.showOutput(
-          stopProcesses([pid]).then(stopped =>
-            stopped
-              ? 'Experiment running in the workspace was stopped.'
-              : 'Failed to stop the experiment running in the workspace.'
-          )
-        )
-      }
+      void stopWorkspaceExperiment(this.dvcRoot)
     }
 
     sendTelemetryEvent(EventName.EXPERIMENT_VIEW_STOP, undefined, undefined)
+  }
+
+  private groupRunningExperiments(
+    experiments: { executor?: string | null; id: string }[]
+  ) {
+    let runningInWorkspace = false
+    const runningInQueueIds = new Set<string>()
+    for (const { executor, id } of experiments) {
+      if (executor === EXPERIMENT_WORKSPACE_ID) {
+        runningInWorkspace = true
+      }
+      if (executor === 'dvc-task') {
+        runningInQueueIds.add(id)
+      }
+    }
+    return { runningInQueueIds, runningInWorkspace }
   }
 }
