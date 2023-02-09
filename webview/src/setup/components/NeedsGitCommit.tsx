@@ -9,10 +9,10 @@ export const NeedsGitCommit: React.FC<NeedsGitCommitProps> = ({
 }) => (
   <EmptyState>
     <div>
-      <h1>Your project has no commits in Git</h1>
+      <h1>No Git commits detected</h1>
       <p>
-        DVC requires your project to have atleast one commit to run experiments
-        correctly.{' '}
+        At least one commit is required to enable DVC&apos;s experiments and
+        plots functionality.
       </p>
       <Button text="Create a Commit" onClick={showScmPanel} />
     </div>
