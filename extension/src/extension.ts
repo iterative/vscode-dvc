@@ -185,11 +185,19 @@ export class Extension extends Disposable {
       )
     )
 
-    registerExperimentCommands(this.experiments, this.internalCommands)
-    registerPlotsCommands(this.plots, this.internalCommands)
+    registerExperimentCommands(
+      this.experiments,
+      this.internalCommands,
+      this.setup
+    )
+    registerPlotsCommands(this.plots, this.internalCommands, this.setup)
     this.internalCommands.registerExternalCommand(
       RegisteredCommands.EXPERIMENT_AND_PLOTS_SHOW,
       async (context: VsCodeContext) => {
+        if (this.setup.shouldBeShown()) {
+          await this.setup.showWebview()
+          return
+        }
         const dvcRoot = getDvcRootFromContext(context)
         await this.experiments.showWebview(dvcRoot, ViewColumn.Active)
         await this.plots.showWebview(dvcRoot, ViewColumn.Beside)
