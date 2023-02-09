@@ -199,7 +199,8 @@ describe('findOrCreateDvcYamlFile', () => {
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
       `${cwd}/dvc.yaml`,
       expect.stringContaining(
-        '# Read about DVC pipeline configuration (https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#stages) to customize your stages even more'
+        `# Read about DVC pipeline configuration (https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#stages)
+# to customize your stages even more`
       )
     )
   })

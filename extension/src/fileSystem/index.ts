@@ -136,9 +136,10 @@ export const scriptCommand = {
   PYTHON: 'python'
 }
 
-export const openDvcYamlFile = async (dvcYamlPath: string) => {
-  const dvcYaml = await workspace.openTextDocument(Uri.file(dvcYamlPath))
-  await window.showTextDocument(dvcYaml)
+export const openFileInEditor = async (filePath: string) => {
+  const document = await workspace.openTextDocument(Uri.file(filePath))
+  await window.showTextDocument(document)
+  return document
 }
 
 export const findOrCreateDvcYamlFile = (
@@ -152,12 +153,13 @@ export const findOrCreateDvcYamlFile = (
   const command = isNotebook ? scriptCommand.JUPYTER : scriptCommand.PYTHON
 
   const pipeline = `
-# Read about DVC pipeline configuration (https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#stages) to customize your stages even more
+# Read about DVC pipeline configuration (https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#stages)
+# to customize your stages even more
 stages:
   train:
     cmd: ${command} ${relative(cwd, trainingScript)}`
 
-  void openDvcYamlFile(dvcYamlPath)
+  void openFileInEditor(dvcYamlPath)
   return appendFileSync(dvcYamlPath, pipeline)
 }
 
