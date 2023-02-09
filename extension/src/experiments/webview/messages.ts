@@ -23,7 +23,7 @@ import { Title } from '../../vscode/title'
 import { ConfigKey, setConfigValue } from '../../vscode/config'
 import { Toast } from '../../vscode/toast'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
-import { stopWorkspaceExperiment } from '../processes'
+import { stopWorkspaceExperiment } from '../processExecution'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
