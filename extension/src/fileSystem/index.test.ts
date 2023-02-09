@@ -169,7 +169,12 @@ describe('getModifiedTime', () => {
 describe('findOrCreateDvcYamlFile', () => {
   it('should make sure a dvc.yaml file exists', () => {
     const cwd = '/cwd'
-    findOrCreateDvcYamlFile(cwd, '/my/training/script.py', 'train')
+    findOrCreateDvcYamlFile(
+      cwd,
+      '/my/training/script.py',
+      'train',
+      scriptCommand.PYTHON
+    )
 
     expect(mockedEnsureFileSync).toHaveBeenCalledWith(`${cwd}/dvc.yaml`)
   })
@@ -177,7 +182,12 @@ describe('findOrCreateDvcYamlFile', () => {
   it('should add the stage name to the dvc.yaml file', () => {
     const cwd = '/cwd'
     const uniqueStageName = 'aWesome_STAGE_name48'
-    findOrCreateDvcYamlFile(cwd, '/script.py', uniqueStageName)
+    findOrCreateDvcYamlFile(
+      cwd,
+      '/script.py',
+      uniqueStageName,
+      scriptCommand.PYTHON
+    )
 
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
       `${cwd}/dvc.yaml`,
@@ -187,7 +197,12 @@ describe('findOrCreateDvcYamlFile', () => {
 
   it('should add the training script as a train stage in the dvc.yaml file', () => {
     const cwd = '/cwd'
-    findOrCreateDvcYamlFile(cwd, '/my/training/script.py', 'train')
+    findOrCreateDvcYamlFile(
+      cwd,
+      '/my/training/script.py',
+      'train',
+      scriptCommand.PYTHON
+    )
 
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
       `${cwd}/dvc.yaml`,
@@ -199,7 +214,8 @@ describe('findOrCreateDvcYamlFile', () => {
     findOrCreateDvcYamlFile(
       '/dir/my_project/',
       '/dir/my_project/src/training/train.py',
-      'train'
+      'train',
+      scriptCommand.PYTHON
     )
 
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
@@ -210,7 +226,8 @@ describe('findOrCreateDvcYamlFile', () => {
     findOrCreateDvcYamlFile(
       '/dir/my_project/',
       '/dir/my_other_project/train.py',
-      'train'
+      'train',
+      scriptCommand.PYTHON
     )
 
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
@@ -220,7 +237,7 @@ describe('findOrCreateDvcYamlFile', () => {
   })
 
   it('should use the jupyter nbconvert command if the training script is a Jupyter notebook', () => {
-    findOrCreateDvcYamlFile('/', '/train.ipynb', 'train')
+    findOrCreateDvcYamlFile('/', '/train.ipynb', 'train', scriptCommand.JUPYTER)
 
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
       expect.anything(),
@@ -233,7 +250,7 @@ describe('findOrCreateDvcYamlFile', () => {
   })
 
   it('should use the python command if the training script is not a Jupyter notebook', () => {
-    findOrCreateDvcYamlFile('/', '/train.py', 'train')
+    findOrCreateDvcYamlFile('/', '/train.py', 'train', scriptCommand.PYTHON)
 
     expect(mockedAppendFileSync).not.toHaveBeenCalledWith(
       expect.anything(),
@@ -242,6 +259,16 @@ describe('findOrCreateDvcYamlFile', () => {
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
       expect.anything(),
       expect.stringContaining(scriptCommand.PYTHON)
+    )
+  })
+
+  it('should use the custom command received', () => {
+    const command = 'specialCommand'
+    findOrCreateDvcYamlFile('/', '/train.other', 'train', command)
+
+    expect(mockedAppendFileSync).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.stringContaining(command)
     )
   })
 })

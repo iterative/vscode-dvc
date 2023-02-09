@@ -131,27 +131,37 @@ export const isAnyDvcYaml = (path?: string): boolean =>
       basename(path) === 'dvc.yaml')
   )
 
-export const scriptCommand = {
-  JUPYTER: 'jupyter nbconvert --to notebook --inplace --execute',
-  PYTHON: 'python'
-}
-
 export const findOrCreateDvcYamlFile = (
   cwd: string,
   trainingScript: string,
-  stageName: string
+  stageName: string,
+  command: string
 ) => {
   const dvcYamlPath = `${cwd}/dvc.yaml`
   ensureFileSync(dvcYamlPath)
-
-  const isNotebook = parse(trainingScript).ext === '.ipynb'
-  const command = isNotebook ? scriptCommand.JUPYTER : scriptCommand.PYTHON
 
   const pipeline = `
 stages:
   ${stageName}:
     cmd: ${command} ${relative(cwd, trainingScript)}`
   return appendFileSync(dvcYamlPath, pipeline)
+}
+
+export const scriptCommand = {
+  JUPYTER: 'jupyter nbconvert --to notebook --inplace --execute',
+  PYTHON: 'python'
+}
+
+export const getScriptCommand = (script: string) => {
+  const extension = parse(script).ext
+  switch (extension) {
+    case '.py':
+      return scriptCommand.PYTHON
+    case '.ipynb':
+      return scriptCommand.JUPYTER
+    default:
+      return ''
+  }
 }
 
 export const relativeWithUri = (dvcRoot: string, uri: Uri) =>
