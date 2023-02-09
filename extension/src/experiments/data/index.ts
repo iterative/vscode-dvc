@@ -18,10 +18,13 @@ import { getGitPath } from '../../fileSystem'
 export const QUEUED_EXPERIMENT_PATH = join(DOT_DVC, 'tmp', 'exps')
 
 export class ExperimentsData extends BaseData<ExperimentsOutput> {
+  private dotGitPath: string | undefined
+
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
-    updatesPaused: EventEmitter<boolean>
+    updatesPaused: EventEmitter<boolean>,
+    dotGitPath?: string
   ) {
     super(
       dvcRoot,
@@ -39,6 +42,8 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
 
     void this.watchExpGitRefs()
     void this.managedUpdate(QUEUED_EXPERIMENT_PATH)
+
+    this.dotGitPath = dotGitPath
   }
 
   public managedUpdate(path?: string) {
@@ -74,7 +79,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
       this.dvcRoot
     )
 
-    const dotGitPath = getGitPath(gitRoot, gitPath.DOT_GIT)
+    const dotGitPath = this.dotGitPath || getGitPath(gitRoot, gitPath.DOT_GIT)
     const watchedRelPaths = [
       gitPath.DOT_GIT_HEAD,
       EXPERIMENTS_GIT_REFS,
