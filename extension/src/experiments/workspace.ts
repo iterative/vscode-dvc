@@ -10,7 +10,11 @@ import {
 } from '../commands/internal'
 import { ResourceLocator } from '../resourceLocator'
 import { Toast } from '../vscode/toast'
-import { getInput, getPositiveIntegerInput } from '../vscode/inputBox'
+import {
+  getInput,
+  getPositiveIntegerInput,
+  getValidInput
+} from '../vscode/inputBox'
 import { BaseWorkspaceWebviews } from '../webview/workspace'
 import { Title } from '../vscode/title'
 import { ContextKey, setContextValue } from '../vscode/context'
@@ -426,27 +430,52 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
 
     if (!stages) {
-      const selectValue = 'select'
-      const pathOrSelect = await quickPickOneOrInput(
-        [{ label: 'Select from file explorer', value: selectValue }],
-        {
-          defaultValue: '',
-          placeholder: 'Path to script',
-          title: Title.ENTER_PATH_OR_CHOOSE_FILE
-        }
-      )
+      const stageName = await this.askForStageName()
+      if (!stageName) {
+        return false
+      }
 
-      const trainingScript =
-        pathOrSelect === selectValue
-          ? await pickFile(Title.SELECT_TRAINING_SCRIPT)
-          : pathOrSelect
-
+      const trainingScript = await this.askForTrainingScript()
       if (!trainingScript) {
         return false
       }
-      findOrCreateDvcYamlFile(cwd, trainingScript)
+      void findOrCreateDvcYamlFile(cwd, trainingScript, stageName)
     }
     return true
+  }
+
+  private async askForStageName() {
+    return await getValidInput(
+      Title.ENTER_STAGE_NAME,
+      (stageName?: string) => {
+        if (!stageName) {
+          return 'Stage name must not be empty'
+        }
+        if (!/^[a-z]/i.test(stageName)) {
+          return 'Stage name should start with a letter'
+        }
+        return /^\w+$/.test(stageName)
+          ? null
+          : 'Stage name should only include letters and numbers'
+      },
+      { value: 'train' }
+    )
+  }
+
+  private async askForTrainingScript() {
+    const selectValue = 'select'
+    const pathOrSelect = await quickPickOneOrInput(
+      [{ label: 'Select from file explorer', value: selectValue }],
+      {
+        defaultValue: '',
+        placeholder: 'Path to script',
+        title: Title.ENTER_PATH_OR_CHOOSE_FILE
+      }
+    )
+
+    return pathOrSelect === selectValue
+      ? await pickFile(Title.SELECT_TRAINING_SCRIPT)
+      : pathOrSelect
   }
 
   private async pickExpThenRun(

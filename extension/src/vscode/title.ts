@@ -6,6 +6,7 @@ export enum Title {
   ENTER_FILTER_VALUE = 'Enter a Filter Value',
   ENTER_RELATIVE_DESTINATION = 'Enter a Destination Relative to the Root',
   ENTER_PATH_OR_CHOOSE_FILE = 'Enter the path to your training script or select it',
+  ENTER_STAGE_NAME = 'Enter a name for the main stage of your pipeline',
   GARBAGE_COLLECT_EXPERIMENTS = 'Garbage Collect Experiments',
   SHOW_SETUP = 'Show Setup',
   SELECT_BASE_EXPERIMENT = 'Select an Experiment to Use as a Base',

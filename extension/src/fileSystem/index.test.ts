@@ -1,5 +1,6 @@
 import { join, relative, resolve } from 'path'
 import { appendFileSync, ensureDirSync, ensureFileSync, remove } from 'fs-extra'
+import { TextDocument, window, workspace } from 'vscode'
 import {
   exists,
   findAbsoluteDvcRootPath,
@@ -26,6 +27,13 @@ jest.mock('fs-extra', () => {
 
 const mockedAppendFileSync = jest.mocked(appendFileSync)
 const mockedEnsureFileSync = jest.mocked(ensureFileSync)
+const mockedWorkspace = jest.mocked(workspace)
+const mockedWindow = jest.mocked(window)
+const mockedOpenTextDocument = jest.fn()
+const mockedShowTextDocument = jest.fn()
+
+mockedWorkspace.openTextDocument = mockedOpenTextDocument
+mockedWindow.showTextDocument = mockedShowTextDocument
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -169,25 +177,50 @@ describe('getModifiedTime', () => {
 describe('findOrCreateDvcYamlFile', () => {
   it('should make sure a dvc.yaml file exists', () => {
     const cwd = '/cwd'
-    findOrCreateDvcYamlFile(cwd, '/my/training/script.py')
+    void findOrCreateDvcYamlFile(cwd, '/my/training/script.py', 'train')
 
     expect(mockedEnsureFileSync).toHaveBeenCalledWith(`${cwd}/dvc.yaml`)
   })
 
-  it('should add the training script as a train stage in the dvc.yaml file', () => {
+  it('should add the stage name to the dvc.yaml file', () => {
     const cwd = '/cwd'
-    findOrCreateDvcYamlFile(cwd, '/my/training/script.py')
+    const uniqueStageName = 'aWesome_STAGE_name48'
+    findOrCreateDvcYamlFile(cwd, '/script.py', uniqueStageName)
 
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
       `${cwd}/dvc.yaml`,
-      expect.stringMatching(/^\s+stages:\s+train:/)
+      expect.stringContaining(uniqueStageName)
+    )
+  })
+
+  it('should add the training script as a train stage in the dvc.yaml file', () => {
+    const cwd = '/cwd'
+    void findOrCreateDvcYamlFile(cwd, '/my/training/script.py', 'train')
+
+    expect(mockedAppendFileSync).toHaveBeenCalledWith(
+      `${cwd}/dvc.yaml`,
+      expect.stringMatching(/stages:\s+train:/)
+    )
+  })
+
+  it('should add a comment to direct the user towards the dvc.yaml stages documentation', () => {
+    const cwd = '/cwd'
+    void findOrCreateDvcYamlFile(cwd, '/my/training/script.py', 'train')
+
+    expect(mockedAppendFileSync).toHaveBeenCalledWith(
+      `${cwd}/dvc.yaml`,
+      expect.stringContaining(
+        `# Read about DVC pipeline configuration (https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#stages)
+# to customize your stages even more`
+      )
     )
   })
 
   it('should add the training script as a relative path to the cwd', () => {
-    findOrCreateDvcYamlFile(
+    void findOrCreateDvcYamlFile(
       '/dir/my_project/',
-      '/dir/my_project/src/training/train.py'
+      '/dir/my_project/src/training/train.py',
+      'train'
     )
 
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
@@ -195,9 +228,10 @@ describe('findOrCreateDvcYamlFile', () => {
       expect.stringContaining(join('src', 'training', 'train.py'))
     )
 
-    findOrCreateDvcYamlFile(
+    void findOrCreateDvcYamlFile(
       '/dir/my_project/',
-      '/dir/my_other_project/train.py'
+      '/dir/my_other_project/train.py',
+      'train'
     )
 
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
@@ -207,7 +241,7 @@ describe('findOrCreateDvcYamlFile', () => {
   })
 
   it('should use the jupyter nbconvert command if the training script is a Jupyter notebook', () => {
-    findOrCreateDvcYamlFile('/', '/train.ipynb')
+    void findOrCreateDvcYamlFile('/', '/train.ipynb', 'train')
 
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
       expect.anything(),
@@ -220,7 +254,7 @@ describe('findOrCreateDvcYamlFile', () => {
   })
 
   it('should use the python command if the training script is not a Jupyter notebook', () => {
-    findOrCreateDvcYamlFile('/', '/train.py')
+    void findOrCreateDvcYamlFile('/', '/train.py', 'train')
 
     expect(mockedAppendFileSync).not.toHaveBeenCalledWith(
       expect.anything(),
@@ -229,6 +263,20 @@ describe('findOrCreateDvcYamlFile', () => {
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
       expect.anything(),
       expect.stringContaining(scriptCommand.PYTHON)
+    )
+  })
+
+  it('should open the dvc.yaml file in the editor', () => {
+    mockedOpenTextDocument.mockResolvedValue({} as TextDocument)
+
+    void findOrCreateDvcYamlFile('/', '/train.py', 'train')
+
+    expect(mockedOpenTextDocument).toHaveBeenCalledWith(
+      expect.objectContaining({
+        authority: 'dvc.yaml',
+        path: '/',
+        scheme: 'file'
+      })
     )
   })
 })
