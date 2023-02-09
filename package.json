@@ -79,5 +79,6 @@
     "trim": "1.0.1",
     "vega-functions": "5.13.0",
     "vega-scale": "7.2.0"
-  }
+  },
+  "packageManager": "yarn@1.22.19"
 }
