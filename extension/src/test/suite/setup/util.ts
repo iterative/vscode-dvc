@@ -28,7 +28,8 @@ export const TEMP_DIR = join(dvcDemoPath, 'temp-empty-watcher-dir')
 const buildSetupDependencies = (
   disposer: Disposer,
   mockDvcRoot: string | undefined,
-  mockGitRoot: string | undefined
+  mockGitRoot: string | undefined,
+  noGitCommits = true
 ) => {
   const mockEmitter = disposer.track(new EventEmitter())
   const mockEvent = mockEmitter.event
@@ -36,6 +37,7 @@ const buildSetupDependencies = (
   const mockRoot = stub().resolves(mockDvcRoot)
   const mockVersion = stub().resolves(MIN_CLI_VERSION)
   const mockGetGitRepositoryRoot = stub().resolves(mockGitRoot)
+  const mockHasNoCommits = stub().resolves(noGitCommits)
 
   const mockInitializeDvc = fake()
   const mockInitializeGit = fake()
@@ -67,6 +69,7 @@ const buildSetupDependencies = (
     } as unknown as GitExecutor,
     mockGitReader: {
       getGitRepositoryRoot: mockGetGitRepositoryRoot,
+      hasNoCommits: mockHasNoCommits,
       onDidCompleteProcess: mockEvent,
       onDidStartProcess: mockEvent
     } as unknown as GitReader,
@@ -87,7 +90,8 @@ export const buildSetup = (
   disposer: Disposer,
   hasData = false,
   noDvcRoot = true,
-  noGitRoot = true
+  noGitRoot = true,
+  noGitCommits = true
 ) => {
   const { config, messageSpy, resourceLocator } = buildDependencies(disposer)
 
@@ -108,7 +112,7 @@ export const buildSetup = (
     mockInternalCommands,
     mockRunSetup,
     mockVersion
-  } = buildSetupDependencies(disposer, mockDvcRoot, mockGitRoot)
+  } = buildSetupDependencies(disposer, mockDvcRoot, mockGitRoot, noGitCommits)
   stub(FileSystem, 'findDvcRootPaths').resolves(
     [mockDvcRoot].filter(Boolean) as string[]
   )

@@ -52,6 +52,7 @@ export enum MessageFromWebviewType {
   CHECK_CLI_COMPATIBLE = 'check-cli-compatible',
   INITIALIZE_DVC = 'initialize-dvc',
   INITIALIZE_GIT = 'initialize-git',
+  SHOW_SCM_PANEL = 'show-scm-panel',
   INSTALL_DVC = 'install-dvc',
   SETUP_WORKSPACE = 'setup-workspace'
 }
@@ -192,6 +193,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.CHECK_CLI_COMPATIBLE }
   | { type: MessageFromWebviewType.INITIALIZE_DVC }
   | { type: MessageFromWebviewType.INITIALIZE_GIT }
+  | { type: MessageFromWebviewType.SHOW_SCM_PANEL }
   | { type: MessageFromWebviewType.INSTALL_DVC }
   | { type: MessageFromWebviewType.SETUP_WORKSPACE }
 

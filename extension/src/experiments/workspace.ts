@@ -439,8 +439,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       if (!trainingScript) {
         return false
       }
-
-      findOrCreateDvcYamlFile(cwd, trainingScript, stageName, command)
+      void findOrCreateDvcYamlFile(cwd, trainingScript, stageName, command)
     }
     return true
   }
