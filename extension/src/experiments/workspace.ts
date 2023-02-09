@@ -1,9 +1,8 @@
-import { join } from 'path'
 import { EventEmitter, Memento } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import { Experiments, ModifiedExperimentAndRunCommandId } from '.'
 import { TableData } from './webview/contract'
-import { Args, DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
+import { Args } from '../cli/dvc/constants'
 import {
   AvailableCommands,
   CommandId,
@@ -11,12 +10,15 @@ import {
 } from '../commands/internal'
 import { ResourceLocator } from '../resourceLocator'
 import { Toast } from '../vscode/toast'
-import { getInput, getPositiveIntegerInput } from '../vscode/inputBox'
+import {
+  getInput,
+  getPositiveIntegerInput,
+  getValidInput
+} from '../vscode/inputBox'
 import { BaseWorkspaceWebviews } from '../webview/workspace'
 import { Title } from '../vscode/title'
 import { ContextKey, setContextValue } from '../vscode/context'
-import { findOrCreateDvcYamlFile, getPidFromSignalFile } from '../fileSystem'
-import { definedAndNonEmpty } from '../util/array'
+import { findOrCreateDvcYamlFile } from '../fileSystem'
 import { quickPickOneOrInput } from '../vscode/quickPick'
 import { pickFile } from '../vscode/resourcePicker'
 
@@ -415,28 +417,9 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return allLoading
   }
 
-  public async hasDvcLiveOnlyExperimentRunning() {
-    return definedAndNonEmpty(await this.getDvcLiveOnlyPids())
-  }
-
-  public async getDvcLiveOnlyPids() {
-    const pids: number[] = []
-
-    for (const dvcRoot of this.getDvcRoots()) {
-      const signalFile = join(dvcRoot, DVCLIVE_ONLY_RUNNING_SIGNAL_FILE)
-      const pid = await getPidFromSignalFile(signalFile)
-      if (!pid) {
-        continue
-      }
-      pids.push(pid)
-    }
-
-    return pids
-  }
-
-  public hasQueuedExperimentsRunning() {
+  public hasRunningExperiment() {
     return Object.values(this.repositories).some(experiments =>
-      experiments.hasRunningQueuedExperiment()
+      experiments.hasRunningExperiment()
     )
   }
 
@@ -447,27 +430,52 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
 
     if (!stages) {
-      const selectValue = 'select'
-      const pathOrSelect = await quickPickOneOrInput(
-        [{ label: 'Select from file explorer', value: selectValue }],
-        {
-          defaultValue: '',
-          placeholder: 'Path to script',
-          title: Title.ENTER_PATH_OR_CHOOSE_FILE
-        }
-      )
+      const stageName = await this.askForStageName()
+      if (!stageName) {
+        return false
+      }
 
-      const trainingScript =
-        pathOrSelect === selectValue
-          ? await pickFile(Title.SELECT_TRAINING_SCRIPT)
-          : pathOrSelect
-
+      const trainingScript = await this.askForTrainingScript()
       if (!trainingScript) {
         return false
       }
-      void findOrCreateDvcYamlFile(cwd, trainingScript)
+      void findOrCreateDvcYamlFile(cwd, trainingScript, stageName)
     }
     return true
+  }
+
+  private async askForStageName() {
+    return await getValidInput(
+      Title.ENTER_STAGE_NAME,
+      (stageName?: string) => {
+        if (!stageName) {
+          return 'Stage name must not be empty'
+        }
+        if (!/^[a-z]/i.test(stageName)) {
+          return 'Stage name should start with a letter'
+        }
+        return /^\w+$/.test(stageName)
+          ? null
+          : 'Stage name should only include letters and numbers'
+      },
+      { value: 'train' }
+    )
+  }
+
+  private async askForTrainingScript() {
+    const selectValue = 'select'
+    const pathOrSelect = await quickPickOneOrInput(
+      [{ label: 'Select from file explorer', value: selectValue }],
+      {
+        defaultValue: '',
+        placeholder: 'Path to script',
+        title: Title.ENTER_PATH_OR_CHOOSE_FILE
+      }
+    )
+
+    return pathOrSelect === selectValue
+      ? await pickFile(Title.SELECT_TRAINING_SCRIPT)
+      : pathOrSelect
   }
 
   private async pickExpThenRun(

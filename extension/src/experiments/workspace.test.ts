@@ -7,7 +7,7 @@ import {
   AvailableCommands,
   InternalCommands
 } from '../commands/internal'
-import { getInput } from '../vscode/inputBox'
+import { getInput, getValidInput } from '../vscode/inputBox'
 import { buildMockMemento } from '../test/util'
 import { buildMockedEventEmitter } from '../test/util/jest'
 import { OutputChannel } from '../vscode/outputChannel'
@@ -21,6 +21,7 @@ const mockedDvcRoot = '/my/dvc/root'
 const mockedOtherDvcRoot = '/my/fun/dvc/root'
 const mockedQuickPickOne = jest.mocked(quickPickOne)
 const mockedQuickPickOneOrInput = jest.mocked(quickPickOneOrInput)
+const mockedGetValidInput = jest.mocked(getValidInput)
 const mockedPickExperiment = jest.fn()
 const mockedGetInput = jest.mocked(getInput)
 const mockedRun = jest.fn()
@@ -277,6 +278,7 @@ describe('Experiments', () => {
 
     it('should ensure that a dvc.yaml file exists if the registered command needs it', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedGetValidInput.mockResolvedValueOnce('train')
       mockedListStages.mockResolvedValueOnce('')
       mockedQuickPickOneOrInput.mockResolvedValueOnce(
         'path/to/training_script.py'
@@ -301,6 +303,7 @@ describe('Experiments', () => {
         'executeCommand'
       )
 
+      mockedGetValidInput.mockResolvedValueOnce('train')
       mockedListStages.mockResolvedValueOnce('train')
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
 
@@ -316,7 +319,52 @@ describe('Experiments', () => {
       )
     })
 
+    it('should ask the user for the stage name if there are no pipelines', async () => {
+      mockedListStages.mockResolvedValueOnce('')
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+
+      expect(mockedGetValidInput).toHaveBeenCalledWith(
+        Title.ENTER_STAGE_NAME,
+        expect.anything(),
+        expect.anything()
+      )
+    })
+
+    it('should not ask the user for the stage name if there are pipelines', async () => {
+      mockedListStages.mockResolvedValueOnce('train')
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+
+      expect(mockedGetValidInput).not.toHaveBeenCalledWith(
+        Title.ENTER_STAGE_NAME,
+        expect.anything(),
+        expect.anything()
+      )
+    })
+
+    it('should not run the command if no stage name was given', async () => {
+      const executeCommandSpy = jest.spyOn(
+        mockedInternalCommands,
+        'executeCommand'
+      )
+
+      mockedGetValidInput.mockResolvedValueOnce('')
+      mockedListStages.mockResolvedValueOnce('')
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+
+      expect(executeCommandSpy).not.toHaveBeenCalledWith(
+        mockedCommandId,
+        mockedDvcRoot
+      )
+    })
+
     it('should let the user select a training script or enter its path if there are no pipelines found', async () => {
+      mockedGetValidInput.mockResolvedValueOnce('train')
       mockedListStages.mockResolvedValueOnce('')
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       mockedQuickPickOneOrInput.mockResolvedValueOnce(
@@ -331,6 +379,7 @@ describe('Experiments', () => {
     it('should add the train stage to the dvc.yaml file if the path to the training script was given', async () => {
       const trainingScript = 'path/to/training_script.py'
 
+      mockedGetValidInput.mockResolvedValueOnce('train')
       mockedListStages.mockResolvedValueOnce('')
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       mockedQuickPickOneOrInput.mockResolvedValueOnce(trainingScript)
@@ -339,7 +388,8 @@ describe('Experiments', () => {
 
       expect(findOrCreateDvcYamlFile).toHaveBeenCalledWith(
         mockedDvcRoot,
-        trainingScript
+        trainingScript,
+        'train'
       )
     })
 
@@ -349,6 +399,7 @@ describe('Experiments', () => {
         'executeCommand'
       )
 
+      mockedGetValidInput.mockResolvedValueOnce('train')
       mockedListStages.mockResolvedValueOnce('')
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       mockedQuickPickOneOrInput.mockResolvedValueOnce(
@@ -369,6 +420,7 @@ describe('Experiments', () => {
         'executeCommand'
       )
 
+      mockedGetValidInput.mockResolvedValueOnce('train')
       mockedListStages.mockResolvedValueOnce('')
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       mockedQuickPickOneOrInput.mockResolvedValueOnce('')

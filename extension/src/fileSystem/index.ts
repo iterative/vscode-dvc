@@ -144,7 +144,8 @@ export const openFileInEditor = async (filePath: string) => {
 
 export const findOrCreateDvcYamlFile = (
   cwd: string,
-  trainingScript: string
+  trainingScript: string,
+  stageName: string
 ) => {
   const dvcYamlPath = `${cwd}/dvc.yaml`
   ensureFileSync(dvcYamlPath)
@@ -156,7 +157,7 @@ export const findOrCreateDvcYamlFile = (
 # Read about DVC pipeline configuration (https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#stages)
 # to customize your stages even more
 stages:
-  train:
+  ${stageName}:
     cmd: ${command} ${relative(cwd, trainingScript)}`
 
   void openFileInEditor(dvcYamlPath)
@@ -192,7 +193,7 @@ export const writeJson = <T extends Record<string, unknown>>(
   return writeFileSync(path, JSON.stringify(obj))
 }
 
-export const getPidFromSignalFile = async (
+export const getPidFromFile = async (
   path: string
 ): Promise<number | undefined> => {
   if (!exists(path)) {
@@ -210,7 +211,7 @@ export const getPidFromSignalFile = async (
 }
 
 export const checkSignalFile = async (path: string): Promise<boolean> => {
-  return !!(await getPidFromSignalFile(path))
+  return !!(await getPidFromFile(path))
 }
 
 export const pollSignalFileForProcess = async (
