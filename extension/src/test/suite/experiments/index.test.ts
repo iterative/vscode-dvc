@@ -73,6 +73,7 @@ import { ConfigKey } from '../../../vscode/config'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
 import * as Time from '../../../util/time'
 import { AvailableCommands } from '../../../commands/internal'
+import { openFileInEditor } from '../../../fileSystem'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -153,10 +154,7 @@ suite('Experiments Test Suite', () => {
       const { experiments } = buildExperiments(disposable)
 
       const windowSpy = spy(window, 'createWebviewPanel')
-      const uri = Uri.file(resolve(dvcDemoPath, 'train.py'))
-
-      const document = await workspace.openTextDocument(uri)
-      await window.showTextDocument(document)
+      const document = await openFileInEditor(resolve(dvcDemoPath, 'train.py'))
 
       expect(window.activeTextEditor?.document).to.deep.equal(document)
 
