@@ -8,11 +8,11 @@ import {
   isDirectory,
   isSameOrChild,
   getModifiedTime,
-  findOrCreateDvcYamlFile,
-  scriptCommand
+  findOrCreateDvcYamlFile
 } from '.'
 import { dvcDemoPath } from '../test/util'
 import { DOT_DVC } from '../cli/dvc/constants'
+import { scriptCommand } from '../experiments/workspace'
 
 jest.mock('../cli/dvc/reader')
 jest.mock('fs-extra', () => {
@@ -190,7 +190,7 @@ describe('findOrCreateDvcYamlFile', () => {
   it('should add the stage name to the dvc.yaml file', () => {
     const cwd = '/cwd'
     const uniqueStageName = 'aWesome_STAGE_name48'
-    findOrCreateDvcYamlFile(
+    void findOrCreateDvcYamlFile(
       cwd,
       '/script.py',
       uniqueStageName,
@@ -300,7 +300,7 @@ describe('findOrCreateDvcYamlFile', () => {
 
   it('should use the custom command received', () => {
     const command = 'specialCommand'
-    findOrCreateDvcYamlFile('/', '/train.other', 'train', command)
+    void findOrCreateDvcYamlFile('/', '/train.other', 'train', command)
 
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
       expect.anything(),

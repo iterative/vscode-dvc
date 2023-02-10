@@ -1,6 +1,6 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { Experiments } from '.'
-import { WorkspaceExperiments } from './workspace'
+import { scriptCommand, WorkspaceExperiments } from './workspace'
 import { quickPickOne, quickPickOneOrInput } from '../vscode/quickPick'
 import {
   CommandId,
@@ -13,7 +13,7 @@ import { buildMockedEventEmitter } from '../test/util/jest'
 import { OutputChannel } from '../vscode/outputChannel'
 import { Title } from '../vscode/title'
 import { Args } from '../cli/dvc/constants'
-import { findOrCreateDvcYamlFile, scriptCommand } from '../fileSystem'
+import { findOrCreateDvcYamlFile, getFileExtension } from '../fileSystem'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = jest.mocked(Disposable)
@@ -27,22 +27,14 @@ const mockedGetInput = jest.mocked(getInput)
 const mockedRun = jest.fn()
 const mockedExpFunc = jest.fn()
 const mockedListStages = jest.fn()
+const mockedFindOrCreateDvcYamlFile = jest.mocked(findOrCreateDvcYamlFile)
+const mockedGetFileExtension = jest.mocked(getFileExtension)
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 jest.mock('../vscode/quickPick')
 jest.mock('../vscode/inputBox')
-
-jest.mock('../fileSystem', () => {
-  const actualModule = jest.requireActual('../fileSystem')
-  return {
-    __esModule: true,
-    ...actualModule,
-    findOrCreateDvcYamlFile: jest.fn()
-  }
-})
-
-const mockedFindOrCreateDvcYamlFile = jest.mocked(findOrCreateDvcYamlFile)
+jest.mock('../fileSystem')
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -391,6 +383,7 @@ describe('Experiments', () => {
       mockedListStages.mockResolvedValueOnce('')
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       mockedQuickPickOneOrInput.mockResolvedValueOnce(trainingScript)
+      mockedGetFileExtension.mockReturnValueOnce('.py')
 
       await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
 
@@ -430,6 +423,7 @@ describe('Experiments', () => {
       mockedQuickPickOneOrInput.mockResolvedValueOnce(
         'path/to/training_script.py'
       )
+      mockedGetFileExtension.mockReturnValueOnce('.py')
 
       await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
 
@@ -448,6 +442,7 @@ describe('Experiments', () => {
       mockedQuickPickOneOrInput.mockResolvedValueOnce(
         'path/to/training_script.ipynb'
       )
+      mockedGetFileExtension.mockReturnValueOnce('.ipynb')
 
       await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
 
@@ -466,6 +461,7 @@ describe('Experiments', () => {
       mockedQuickPickOneOrInput.mockResolvedValueOnce(
         'path/to/training_script.ipynb'
       )
+      mockedGetFileExtension.mockReturnValueOnce('.ipynb')
 
       await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
 
@@ -481,6 +477,7 @@ describe('Experiments', () => {
       mockedQuickPickOneOrInput.mockResolvedValueOnce(
         'path/to/training_script.js'
       )
+      mockedGetFileExtension.mockReturnValueOnce('.js')
 
       await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
 
@@ -496,6 +493,7 @@ describe('Experiments', () => {
       mockedQuickPickOneOrInput.mockResolvedValueOnce(
         'path/to/training_script.js'
       )
+      mockedGetFileExtension.mockReturnValueOnce('.js')
       mockedGetInput.mockResolvedValueOnce(customCommand)
 
       await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
@@ -515,6 +513,7 @@ describe('Experiments', () => {
       mockedQuickPickOneOrInput.mockResolvedValueOnce(
         'path/to/training_script.js'
       )
+      mockedGetFileExtension.mockReturnValueOnce('.js')
       mockedGetInput.mockResolvedValueOnce(undefined)
 
       await workspaceExperiments.getCwdThenRun(mockedCommandId, true)

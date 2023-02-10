@@ -157,22 +157,7 @@ stages:
   return appendFileSync(dvcYamlPath, pipeline)
 }
 
-export const scriptCommand = {
-  JUPYTER: 'jupyter nbconvert --to notebook --inplace --execute',
-  PYTHON: 'python'
-}
-
-export const getScriptCommand = (script: string) => {
-  const extension = parse(script).ext
-  switch (extension) {
-    case '.py':
-      return scriptCommand.PYTHON
-    case '.ipynb':
-      return scriptCommand.JUPYTER
-    default:
-      return ''
-  }
-}
+export const getFileExtension = (filePath: string) => parse(filePath).ext
 
 export const relativeWithUri = (dvcRoot: string, uri: Uri) =>
   relative(dvcRoot, uri.fsPath)
