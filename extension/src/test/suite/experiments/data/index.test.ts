@@ -26,7 +26,9 @@ import { buildExperimentsData } from '../util'
 import { ExperimentFlag } from '../../../../cli/dvc/constants'
 import { EXPERIMENTS_GIT_LOGS_REFS } from '../../../../experiments/data/constants'
 import { gitPath } from '../../../../cli/git/constants'
-import { getGitPath } from '../../../../fileSystem'
+import * as FileSystem from '../../../../fileSystem'
+
+const MOCK_WORKSPACE_GIT_FOLDER = join(dvcDemoPath, '.mock-git')
 
 suite('Experiments Data Test Suite', () => {
   const disposable = getTimeSafeDisposer()
@@ -41,6 +43,10 @@ suite('Experiments Data Test Suite', () => {
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('ExperimentsData', () => {
+    afterEach(() => {
+      removeSync(MOCK_WORKSPACE_GIT_FOLDER)
+    })
+
     it('should debounce all calls to update that are made within 200ms', async () => {
       const { data, mockExperimentShow } = buildExperimentsData(disposable)
 
@@ -99,19 +105,23 @@ suite('Experiments Data Test Suite', () => {
         data.onDidUpdate(() => resolve(undefined))
       )
 
-      await Watcher.fireWatcher(getGitPath(gitRoot, gitPath.DOT_GIT_HEAD))
+      await Watcher.fireWatcher(
+        FileSystem.getGitPath(gitRoot, gitPath.DOT_GIT_HEAD)
+      )
       await dataUpdatedEvent
 
       expect(managedUpdateSpy).to.be.called
     })
 
-    it('should watch the .git directory for updates when directory is inside workspace', async () => {
+    it('should watch the .git directory for updates when the directory is inside workspace', async () => {
       const mockNow = getMockNow()
       const mockGitRoot = dvcDemoPath
-      const mockDotGitPath = join(dvcDemoPath, '.mock-git')
-      const mockDotGitFilePath = join(mockDotGitPath, gitPath.DOT_GIT_HEAD)
+      const mockDotGitFilePath = join(
+        MOCK_WORKSPACE_GIT_FOLDER,
+        gitPath.DOT_GIT_HEAD
+      )
       const mockDotGitNestedFilePath = join(
-        mockDotGitPath,
+        MOCK_WORKSPACE_GIT_FOLDER,
         EXPERIMENTS_GIT_LOGS_REFS,
         'index'
       )
@@ -124,6 +134,8 @@ suite('Experiments Data Test Suite', () => {
           return Promise.resolve(mockGitRoot)
         }
       }
+      stub(FileSystem, 'getGitPath').returns(MOCK_WORKSPACE_GIT_FOLDER)
+
       const data = disposable.track(
         new ExperimentsData(
           dvcDemoPath,
@@ -131,8 +143,7 @@ suite('Experiments Data Test Suite', () => {
             dispose: stub(),
             executeCommand: mockExecuteCommand
           } as unknown as InternalCommands,
-          disposable.track(new EventEmitter<boolean>()),
-          mockDotGitPath
+          disposable.track(new EventEmitter<boolean>())
         )
       )
 
@@ -153,8 +164,6 @@ suite('Experiments Data Test Suite', () => {
       await dataUpdatedEvent
 
       expect(managedUpdateSpy).to.be.called
-
-      removeSync(mockDotGitPath)
     })
 
     it('should not use exp show to fetch git refs external to the workspace if the path is not from a temp workspace', async () => {
