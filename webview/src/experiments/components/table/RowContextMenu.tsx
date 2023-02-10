@@ -226,7 +226,7 @@ const getSingleSelectMenuOptions = (
       'Stop',
       MessageFromWebviewType.STOP_EXPERIMENT,
       !isRunning(status),
-      true
+      id !== EXPERIMENT_WORKSPACE_ID
     ),
     withId(
       'Remove',
