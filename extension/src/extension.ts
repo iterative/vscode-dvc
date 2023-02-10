@@ -195,7 +195,7 @@ export class Extension extends Disposable {
       RegisteredCommands.EXPERIMENT_AND_PLOTS_SHOW,
       async (context: VsCodeContext) => {
         if (this.setup.shouldBeShown()) {
-          await commands.executeCommand('dvc.showSetup')
+          await commands.executeCommand(RegisteredCommands.SETUP_SHOW)
           return
         }
         const dvcRoot = getDvcRootFromContext(context)
