@@ -62,7 +62,7 @@ import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
 import * as VscodeContext from '../../../vscode/context'
 import { Title } from '../../../vscode/title'
-import { ExperimentFlag } from '../../../cli/dvc/constants'
+import { EXP_RWLOCK_FILE, ExperimentFlag } from '../../../cli/dvc/constants'
 import { DvcExecutor } from '../../../cli/dvc/executor'
 import { shortenForLabel } from '../../../util/string'
 import { GitExecutor } from '../../../cli/git/executor'
@@ -73,8 +73,11 @@ import { ConfigKey } from '../../../vscode/config'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
 import * as Time from '../../../util/time'
 import { AvailableCommands } from '../../../commands/internal'
-import { openFileInEditor } from '../../../fileSystem'
 import { Setup } from '../../../setup'
+import * as FileSystem from '../../../fileSystem'
+import * as ProcessExecution from '../../../processExecution'
+
+const { openFileInEditor } = FileSystem
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -1065,14 +1068,22 @@ suite('Experiments Test Suite', () => {
       expect(mockShowPlots).to.be.calledWith(dvcDemoPath)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle a message to stop experiments running in the queue', async () => {
+    it('should handle a message to stop experiments running', async () => {
       const { experiments, dvcExecutor } = buildExperiments(disposable)
       const mockQueueKill = stub(dvcExecutor, 'queueKill')
+      const mockStopProcesses = stub(ProcessExecution, 'stopProcesses')
 
       const experimentsKilled = new Promise(resolve =>
         mockQueueKill.callsFake(() => {
           resolve(undefined)
           return Promise.resolve('')
+        })
+      )
+
+      const workspaceStopped = new Promise(resolve =>
+        mockStopProcesses.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(true)
         })
       )
 
@@ -1083,15 +1094,31 @@ suite('Experiments Test Suite', () => {
       const mockExperimentIds = ['exp-e7a67', 'test-branch']
 
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
+      const mockPid = 1234
+      const mockGetPidFromFile = stub(FileSystem, 'getPidFromFile').resolves(
+        mockPid
+      )
+      const mockProcessExists = stub(
+        ProcessExecution,
+        'processExists'
+      ).resolves(true)
 
       mockMessageReceived.fire({
-        payload: mockExperimentIds,
+        payload: [
+          ...mockExperimentIds.map(id => ({ executor: 'dvc-task', id })),
+          { executor: EXPERIMENT_WORKSPACE_ID, id: EXPERIMENT_WORKSPACE_ID }
+        ],
         type: MessageFromWebviewType.STOP_EXPERIMENT
       })
 
-      await experimentsKilled
+      await Promise.all([experimentsKilled, workspaceStopped])
 
       expect(mockQueueKill).to.be.calledWith(dvcDemoPath, ...mockExperimentIds)
+      expect(mockGetPidFromFile).to.be.calledWithExactly(
+        join(dvcDemoPath, EXP_RWLOCK_FILE)
+      )
+      expect(mockProcessExists).to.be.calledWithExactly(mockPid)
+      expect(mockStopProcesses).to.be.calledWithExactly([mockPid])
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 

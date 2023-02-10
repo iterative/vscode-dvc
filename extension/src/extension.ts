@@ -51,7 +51,7 @@ import { definedAndNonEmpty } from './util/array'
 import { stopProcesses } from './processExecution'
 import { Flag } from './cli/dvc/constants'
 import { LanguageClient } from './languageClient'
-import { collectRunningExperimentPids } from './experiments/processes/collect'
+import { collectRunningExperimentPids } from './experiments/processExecution/collect'
 
 export class Extension extends Disposable {
   protected readonly internalCommands: InternalCommands
