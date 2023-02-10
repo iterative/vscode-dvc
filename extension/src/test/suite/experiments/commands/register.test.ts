@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { afterEach, beforeEach, describe, it, suite } from 'mocha'
+import { afterEach, before, beforeEach, describe, it, suite } from 'mocha'
 import { restore, spy, stub } from 'sinon'
 import { commands } from 'vscode'
 import { RegisteredCommands } from '../../../../commands/external'
@@ -11,29 +11,31 @@ import { buildSingleRepoExperiments } from '../util'
 import { buildSetup } from '../../setup/util'
 
 suite('Experiments commands', () => {
-  describe('showExperiments', () => {
-    const disposable = getTimeSafeDisposer()
+  const disposable = getTimeSafeDisposer()
 
-    const {
-      workspaceExperiments,
-      internalCommands,
-      config,
-      messageSpy,
-      resourceLocator
-    } = buildSingleRepoExperiments(disposable)
-    const { setup } = buildSetup(disposable, {
-      config,
-      messageSpy,
-      resourceLocator
+  describe('showExperiments', () => {
+    before(() => {
+      restore()
+      const {
+        workspaceExperiments,
+        internalCommands,
+        config,
+        messageSpy,
+        resourceLocator
+      } = buildSingleRepoExperiments(disposable)
+      const { setup } = buildSetup(disposable, {
+        config,
+        messageSpy,
+        resourceLocator
+      })
+      registerExperimentCommands(workspaceExperiments, internalCommands, setup)
     })
-    registerExperimentCommands(workspaceExperiments, internalCommands, setup)
 
     beforeEach(() => {
       restore()
     })
 
     afterEach(() => {
-      restore()
       disposable.dispose()
       return closeAllEditors()
     })
@@ -43,13 +45,14 @@ suite('Experiments commands', () => {
 
       stub(Setup.prototype, 'shouldBeShown').returns(true)
 
-      await commands.executeCommand('dvc.showExperiments')
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
 
       expect(executeCommandSpy).to.have.been.calledWithMatch('dvc.showSetup')
+      executeCommandSpy.restore()
     })
 
     it('should not show the experiments webview if the setup should be shown', async () => {
-      const showExperimentsWebviewSpy = stub(
+      const showPlotsWebviewSpy = stub(
         WorkspaceExperiments.prototype,
         'showWebview'
       )
@@ -57,12 +60,13 @@ suite('Experiments commands', () => {
 
       await commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
 
-      expect(showExperimentsWebviewSpy).not.to.be.called
+      expect(showPlotsWebviewSpy).not.to.be.called
     })
 
     it('should not show the setup if it should not be shown', async () => {
-      stub(WorkspaceExperiments.prototype, 'showWebview').resolves()
       const executeCommandSpy = spy(commands, 'executeCommand')
+
+      stub(WorkspaceExperiments.prototype, 'showWebview').resolves()
 
       stub(Setup.prototype, 'shouldBeShown').returns(false)
 
@@ -72,7 +76,7 @@ suite('Experiments commands', () => {
     })
 
     it('should show the experiments webview if the setup should not be shown', async () => {
-      const showExperimentsWebviewSpy = stub(
+      const showPlotsWebviewSpy = stub(
         WorkspaceExperiments.prototype,
         'showWebview'
       ).resolves()
@@ -80,7 +84,7 @@ suite('Experiments commands', () => {
 
       await commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
 
-      expect(showExperimentsWebviewSpy).to.be.called
+      expect(showPlotsWebviewSpy).to.be.called
     })
   })
 })

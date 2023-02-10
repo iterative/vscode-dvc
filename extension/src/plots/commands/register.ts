@@ -14,7 +14,7 @@ export const registerPlotsCommands = (
     RegisteredCommands.PLOTS_SHOW,
     (context: Context) =>
       setup.shouldBeShown()
-        ? commands.executeCommand('dvc.showSetup')
+        ? commands.executeCommand(RegisteredCommands.SETUP_SHOW)
         : plots.showWebview(getDvcRootFromContext(context))
   )
 

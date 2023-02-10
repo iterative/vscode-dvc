@@ -322,7 +322,7 @@ const registerExperimentRunCommands = (
     RegisteredCommands.EXPERIMENT_SHOW,
     (context: Context) =>
       setup.shouldBeShown()
-        ? commands.executeCommand('dvc.showSetup')
+        ? commands.executeCommand(RegisteredCommands.SETUP_SHOW)
         : experiments.showWebview(getDvcRootFromContext(context))
   )
 }
