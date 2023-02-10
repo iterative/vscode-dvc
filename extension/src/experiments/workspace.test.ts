@@ -1,6 +1,6 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { Experiments } from '.'
-import { WorkspaceExperiments } from './workspace'
+import { scriptCommand, WorkspaceExperiments } from './workspace'
 import { quickPickOne, quickPickOneOrInput } from '../vscode/quickPick'
 import {
   CommandId,
@@ -13,7 +13,7 @@ import { buildMockedEventEmitter } from '../test/util/jest'
 import { OutputChannel } from '../vscode/outputChannel'
 import { Title } from '../vscode/title'
 import { Args } from '../cli/dvc/constants'
-import { findOrCreateDvcYamlFile } from '../fileSystem'
+import { findOrCreateDvcYamlFile, getFileExtension } from '../fileSystem'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = jest.mocked(Disposable)
@@ -27,14 +27,14 @@ const mockedGetInput = jest.mocked(getInput)
 const mockedRun = jest.fn()
 const mockedExpFunc = jest.fn()
 const mockedListStages = jest.fn()
+const mockedFindOrCreateDvcYamlFile = jest.mocked(findOrCreateDvcYamlFile)
+const mockedGetFileExtension = jest.mocked(getFileExtension)
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 jest.mock('../vscode/quickPick')
 jest.mock('../vscode/inputBox')
-jest.mock('../fileSystem', () => ({
-  findOrCreateDvcYamlFile: jest.fn()
-}))
+jest.mock('../fileSystem')
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -286,7 +286,7 @@ describe('Experiments', () => {
 
       await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
 
-      expect(findOrCreateDvcYamlFile).toHaveBeenCalledTimes(1)
+      expect(mockedFindOrCreateDvcYamlFile).toHaveBeenCalledTimes(1)
     })
 
     it('should not ensure that a dvc.yaml file exists if the registered command does not require it', async () => {
@@ -294,7 +294,7 @@ describe('Experiments', () => {
 
       await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
-      expect(findOrCreateDvcYamlFile).not.toHaveBeenCalled()
+      expect(mockedFindOrCreateDvcYamlFile).not.toHaveBeenCalled()
     })
 
     it('should check for pipelines when a command needs it and continue with the command if there is a pipeline', async () => {
@@ -383,13 +383,15 @@ describe('Experiments', () => {
       mockedListStages.mockResolvedValueOnce('')
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       mockedQuickPickOneOrInput.mockResolvedValueOnce(trainingScript)
+      mockedGetFileExtension.mockReturnValueOnce('.py')
 
       await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
 
-      expect(findOrCreateDvcYamlFile).toHaveBeenCalledWith(
+      expect(mockedFindOrCreateDvcYamlFile).toHaveBeenCalledWith(
         mockedDvcRoot,
         trainingScript,
-        'train'
+        'train',
+        scriptCommand.PYTHON
       )
     })
 
@@ -411,6 +413,116 @@ describe('Experiments', () => {
       expect(executeCommandSpy).toHaveBeenCalledWith(
         mockedCommandId,
         mockedDvcRoot
+      )
+    })
+
+    it('should add python as a command to the dvc.yaml file if the file has the .py extension', async () => {
+      mockedGetValidInput.mockResolvedValueOnce('train')
+      mockedListStages.mockResolvedValueOnce('')
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedQuickPickOneOrInput.mockResolvedValueOnce(
+        'path/to/training_script.py'
+      )
+      mockedGetFileExtension.mockReturnValueOnce('.py')
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+
+      expect(mockedFindOrCreateDvcYamlFile).toHaveBeenCalledWith(
+        mockedDvcRoot,
+        'path/to/training_script.py',
+        'train',
+        scriptCommand.PYTHON
+      )
+    })
+
+    it('should add jupyter nbconvert as a command to the dvc.yaml file if the file has the .ipynb extension', async () => {
+      mockedGetValidInput.mockResolvedValueOnce('train')
+      mockedListStages.mockResolvedValueOnce('')
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedQuickPickOneOrInput.mockResolvedValueOnce(
+        'path/to/training_script.ipynb'
+      )
+      mockedGetFileExtension.mockReturnValueOnce('.ipynb')
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+
+      expect(mockedFindOrCreateDvcYamlFile).toHaveBeenCalledWith(
+        mockedDvcRoot,
+        'path/to/training_script.ipynb',
+        'train',
+        scriptCommand.JUPYTER
+      )
+    })
+
+    it('should not ask to enter a custom command if the file is a python file or Jupyter notebook', async () => {
+      mockedGetValidInput.mockResolvedValueOnce('train')
+      mockedListStages.mockResolvedValueOnce('')
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedQuickPickOneOrInput.mockResolvedValueOnce(
+        'path/to/training_script.ipynb'
+      )
+      mockedGetFileExtension.mockReturnValueOnce('.ipynb')
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+
+      expect(mockedGetInput).not.toHaveBeenCalledWith(
+        Title.ENTER_COMMAND_TO_RUN
+      )
+    })
+
+    it('should ask to enter a custom command if the file is not a python file or Jupyter notebook', async () => {
+      mockedGetValidInput.mockResolvedValueOnce('train')
+      mockedListStages.mockResolvedValueOnce('')
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedQuickPickOneOrInput.mockResolvedValueOnce(
+        'path/to/training_script.js'
+      )
+      mockedGetFileExtension.mockReturnValueOnce('.js')
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+
+      expect(mockedGetInput).toHaveBeenCalledWith(Title.ENTER_COMMAND_TO_RUN)
+    })
+
+    it('should add the custom command to the dvc.yaml file', async () => {
+      const customCommand = 'node'
+
+      mockedGetValidInput.mockResolvedValueOnce('train')
+      mockedListStages.mockResolvedValueOnce('')
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedQuickPickOneOrInput.mockResolvedValueOnce(
+        'path/to/training_script.js'
+      )
+      mockedGetFileExtension.mockReturnValueOnce('.js')
+      mockedGetInput.mockResolvedValueOnce(customCommand)
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+
+      expect(mockedFindOrCreateDvcYamlFile).toHaveBeenCalledWith(
+        mockedDvcRoot,
+        'path/to/training_script.js',
+        'train',
+        customCommand
+      )
+    })
+
+    it('should not add a custom command to the dvc.yaml file if the command was not provided', async () => {
+      mockedGetValidInput.mockResolvedValueOnce('train')
+      mockedListStages.mockResolvedValueOnce('')
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedQuickPickOneOrInput.mockResolvedValueOnce(
+        'path/to/training_script.js'
+      )
+      mockedGetFileExtension.mockReturnValueOnce('.js')
+      mockedGetInput.mockResolvedValueOnce(undefined)
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+
+      expect(mockedFindOrCreateDvcYamlFile).toHaveBeenCalledWith(
+        mockedDvcRoot,
+        'path/to/training_script.js',
+        'train',
+        ''
       )
     })
 

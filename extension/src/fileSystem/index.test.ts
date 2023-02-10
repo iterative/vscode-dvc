@@ -8,11 +8,11 @@ import {
   isDirectory,
   isSameOrChild,
   getModifiedTime,
-  findOrCreateDvcYamlFile,
-  scriptCommand
+  findOrCreateDvcYamlFile
 } from '.'
 import { dvcDemoPath } from '../test/util'
 import { DOT_DVC } from '../cli/dvc/constants'
+import { scriptCommand } from '../experiments/workspace'
 
 jest.mock('../cli/dvc/reader')
 jest.mock('fs-extra', () => {
@@ -177,7 +177,12 @@ describe('getModifiedTime', () => {
 describe('findOrCreateDvcYamlFile', () => {
   it('should make sure a dvc.yaml file exists', () => {
     const cwd = '/cwd'
-    void findOrCreateDvcYamlFile(cwd, '/my/training/script.py', 'train')
+    void findOrCreateDvcYamlFile(
+      cwd,
+      '/my/training/script.py',
+      'train',
+      scriptCommand.PYTHON
+    )
 
     expect(mockedEnsureFileSync).toHaveBeenCalledWith(`${cwd}/dvc.yaml`)
   })
@@ -185,7 +190,12 @@ describe('findOrCreateDvcYamlFile', () => {
   it('should add the stage name to the dvc.yaml file', () => {
     const cwd = '/cwd'
     const uniqueStageName = 'aWesome_STAGE_name48'
-    findOrCreateDvcYamlFile(cwd, '/script.py', uniqueStageName)
+    void findOrCreateDvcYamlFile(
+      cwd,
+      '/script.py',
+      uniqueStageName,
+      scriptCommand.PYTHON
+    )
 
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
       `${cwd}/dvc.yaml`,
@@ -195,7 +205,12 @@ describe('findOrCreateDvcYamlFile', () => {
 
   it('should add the training script as a train stage in the dvc.yaml file', () => {
     const cwd = '/cwd'
-    void findOrCreateDvcYamlFile(cwd, '/my/training/script.py', 'train')
+    void findOrCreateDvcYamlFile(
+      cwd,
+      '/my/training/script.py',
+      'train',
+      scriptCommand.PYTHON
+    )
 
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
       `${cwd}/dvc.yaml`,
@@ -205,7 +220,12 @@ describe('findOrCreateDvcYamlFile', () => {
 
   it('should add a comment to direct the user towards the dvc.yaml stages documentation', () => {
     const cwd = '/cwd'
-    void findOrCreateDvcYamlFile(cwd, '/my/training/script.py', 'train')
+    void findOrCreateDvcYamlFile(
+      cwd,
+      '/my/training/script.py',
+      'train',
+      scriptCommand.PYTHON
+    )
 
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
       `${cwd}/dvc.yaml`,
@@ -220,7 +240,8 @@ describe('findOrCreateDvcYamlFile', () => {
     void findOrCreateDvcYamlFile(
       '/dir/my_project/',
       '/dir/my_project/src/training/train.py',
-      'train'
+      'train',
+      scriptCommand.PYTHON
     )
 
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
@@ -231,7 +252,8 @@ describe('findOrCreateDvcYamlFile', () => {
     void findOrCreateDvcYamlFile(
       '/dir/my_project/',
       '/dir/my_other_project/train.py',
-      'train'
+      'train',
+      scriptCommand.PYTHON
     )
 
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
@@ -241,7 +263,12 @@ describe('findOrCreateDvcYamlFile', () => {
   })
 
   it('should use the jupyter nbconvert command if the training script is a Jupyter notebook', () => {
-    void findOrCreateDvcYamlFile('/', '/train.ipynb', 'train')
+    void findOrCreateDvcYamlFile(
+      '/',
+      '/train.ipynb',
+      'train',
+      scriptCommand.JUPYTER
+    )
 
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
       expect.anything(),
@@ -254,7 +281,12 @@ describe('findOrCreateDvcYamlFile', () => {
   })
 
   it('should use the python command if the training script is not a Jupyter notebook', () => {
-    void findOrCreateDvcYamlFile('/', '/train.py', 'train')
+    void findOrCreateDvcYamlFile(
+      '/',
+      '/train.py',
+      'train',
+      scriptCommand.PYTHON
+    )
 
     expect(mockedAppendFileSync).not.toHaveBeenCalledWith(
       expect.anything(),
@@ -266,10 +298,25 @@ describe('findOrCreateDvcYamlFile', () => {
     )
   })
 
+  it('should use the custom command received', () => {
+    const command = 'specialCommand'
+    void findOrCreateDvcYamlFile('/', '/train.other', 'train', command)
+
+    expect(mockedAppendFileSync).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.stringContaining(command)
+    )
+  })
+
   it('should open the dvc.yaml file in the editor', () => {
     mockedOpenTextDocument.mockResolvedValue({} as TextDocument)
 
-    void findOrCreateDvcYamlFile('/', '/train.py', 'train')
+    void findOrCreateDvcYamlFile(
+      '/',
+      '/train.py',
+      'train',
+      scriptCommand.PYTHON
+    )
 
     expect(mockedOpenTextDocument).toHaveBeenCalledWith(
       expect.objectContaining({

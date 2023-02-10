@@ -131,11 +131,6 @@ export const isAnyDvcYaml = (path?: string): boolean =>
       basename(path) === 'dvc.yaml')
   )
 
-export const scriptCommand = {
-  JUPYTER: 'jupyter nbconvert --to notebook --inplace --execute',
-  PYTHON: 'python'
-}
-
 export const openFileInEditor = async (filePath: string) => {
   const document = await workspace.openTextDocument(Uri.file(filePath))
   await window.showTextDocument(document)
@@ -145,13 +140,12 @@ export const openFileInEditor = async (filePath: string) => {
 export const findOrCreateDvcYamlFile = (
   cwd: string,
   trainingScript: string,
-  stageName: string
+  stageName: string,
+  command: string
 ) => {
   const dvcYamlPath = `${cwd}/dvc.yaml`
   ensureFileSync(dvcYamlPath)
 
-  const isNotebook = parse(trainingScript).ext === '.ipynb'
-  const command = isNotebook ? scriptCommand.JUPYTER : scriptCommand.PYTHON
   const relativeScript = relative(cwd, trainingScript)
 
   const pipeline = `
@@ -166,6 +160,8 @@ stages:
   void openFileInEditor(dvcYamlPath)
   return appendFileSync(dvcYamlPath, pipeline)
 }
+
+export const getFileExtension = (filePath: string) => parse(filePath).ext
 
 export const relativeWithUri = (dvcRoot: string, uri: Uri) =>
   relative(dvcRoot, uri.fsPath)
