@@ -1,3 +1,4 @@
+import { commands } from 'vscode'
 import { RegisteredCommands } from '../../commands/external'
 import { InternalCommands } from '../../commands/internal'
 import { Setup } from '../../setup'
@@ -13,7 +14,7 @@ export const registerPlotsCommands = (
     RegisteredCommands.PLOTS_SHOW,
     (context: Context) =>
       setup.shouldBeShown()
-        ? setup.showWebview()
+        ? commands.executeCommand('dvc.showSetup')
         : plots.showWebview(getDvcRootFromContext(context))
   )
 

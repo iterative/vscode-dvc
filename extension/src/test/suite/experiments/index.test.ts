@@ -1024,7 +1024,7 @@ suite('Experiments Test Suite', () => {
 
     it('should be able to handle a message to compare experiments plots', async () => {
       const mockShouldBeShown = stub(Setup.prototype, 'shouldBeShown')
-      mockShouldBeShown.callsFake(() => false)
+      mockShouldBeShown.returns(false)
       const { experiments, experimentsModel } = buildExperiments(disposable)
       const mockShowPlots = stub(WorkspacePlots.prototype, 'showWebview')
 

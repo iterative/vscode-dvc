@@ -1,3 +1,4 @@
+import { commands } from 'vscode'
 import {
   getBranchExperimentCommand,
   getShareExperimentAsBranchCommand,
@@ -321,7 +322,7 @@ const registerExperimentRunCommands = (
     RegisteredCommands.EXPERIMENT_SHOW,
     (context: Context) =>
       setup.shouldBeShown()
-        ? setup.showWebview()
+        ? commands.executeCommand('dvc.showSetup')
         : experiments.showWebview(getDvcRootFromContext(context))
   )
 }
