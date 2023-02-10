@@ -965,8 +965,8 @@ describe('App', () => {
       })
     })
 
-    it('should present the Stop option if rows that are running in the queue are selected', () => {
-      renderTableWithoutRunningExperiments()
+    it('should present the stop option if only running experiments are selected', () => {
+      renderTable()
 
       clickRowCheckbox('4fb124a')
 
@@ -987,7 +987,34 @@ describe('App', () => {
       stopOption && fireEvent.click(stopOption)
 
       expect(sendMessage).toHaveBeenCalledWith({
-        payload: ['exp-e7a67'],
+        payload: [{ executor: 'dvc-task', id: 'exp-e7a67' }],
+        type: MessageFromWebviewType.STOP_EXPERIMENT
+      })
+    })
+
+    it('should enable the user to stop an experiment running in the workspace', () => {
+      renderTable()
+
+      const target = screen.getByText(EXPERIMENT_WORKSPACE_ID)
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems.map(item => item.textContent)
+      expect(itemLabels).toContain('Stop')
+
+      const stopOption = menuitems.find(item =>
+        item.textContent?.includes('Stop')
+      )
+
+      expect(stopOption).toBeDefined()
+
+      stopOption && fireEvent.click(stopOption)
+
+      expect(sendMessage).toHaveBeenCalledWith({
+        payload: [
+          { executor: EXPERIMENT_WORKSPACE_ID, id: EXPERIMENT_WORKSPACE_ID }
+        ],
         type: MessageFromWebviewType.STOP_EXPERIMENT
       })
     })
