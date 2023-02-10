@@ -152,13 +152,16 @@ export const findOrCreateDvcYamlFile = (
 
   const isNotebook = parse(trainingScript).ext === '.ipynb'
   const command = isNotebook ? scriptCommand.JUPYTER : scriptCommand.PYTHON
+  const relativeScript = relative(cwd, trainingScript)
 
   const pipeline = `
 # Read about DVC pipeline configuration (https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#stages)
 # to customize your stages even more
 stages:
   ${stageName}:
-    cmd: ${command} ${relative(cwd, trainingScript)}`
+    cmd: ${command} ${relativeScript}
+    deps:
+      - ${relativeScript}`
 
   void openFileInEditor(dvcYamlPath)
   return appendFileSync(dvcYamlPath, pipeline)
