@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.4] - 2023-02-10
+
+### 🚀 New Features and Enhancements
+
+- Ask the user for the stage name to add to pipeline [#3252](https://github.com/iterative/vscode-dvc/pull/3252) by [@sroy3](https://github.com/sroy3)
+- Open dvc.yaml automatically after adding a pipeline [#3242](https://github.com/iterative/vscode-dvc/pull/3242) by [@sroy3](https://github.com/sroy3)
+- Show a setup screen when project has no commits [#3253](https://github.com/iterative/vscode-dvc/pull/3253) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Fix package-manager issue [#3244](https://github.com/iterative/vscode-dvc/pull/3244) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (2.44.0) [#3258](https://github.com/iterative/vscode-dvc/pull/3258) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.6.3] - 2023-02-09
 
 ### 🚀 New Features and Enhancements
