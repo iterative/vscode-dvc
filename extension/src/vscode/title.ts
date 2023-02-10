@@ -1,6 +1,7 @@
 export enum Title {
   CHOOSE_RESOURCES = 'Choose Resources to Add to the Dataset',
   ENTER_BRANCH_NAME = 'Enter a Name for the New Branch',
+  ENTER_COMMAND_TO_RUN = 'Enter the command that will run your script (e.g., python, sh, go run...)',
   ENTER_COMMIT_MESSAGE = 'Enter a Commit Message',
   ENTER_EXPERIMENT_WORKER_COUNT = 'Enter the Number of Queue Workers',
   ENTER_FILTER_VALUE = 'Enter a Filter Value',

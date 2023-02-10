@@ -18,9 +18,25 @@ import {
 import { BaseWorkspaceWebviews } from '../webview/workspace'
 import { Title } from '../vscode/title'
 import { ContextKey, setContextValue } from '../vscode/context'
-import { findOrCreateDvcYamlFile } from '../fileSystem'
+import { findOrCreateDvcYamlFile, getFileExtension } from '../fileSystem'
 import { quickPickOneOrInput } from '../vscode/quickPick'
 import { pickFile } from '../vscode/resourcePicker'
+
+export enum scriptCommand {
+  JUPYTER = 'jupyter nbconvert --to notebook --inplace --execute',
+  PYTHON = 'python'
+}
+
+export const getScriptCommand = (script: string) => {
+  switch (getFileExtension(script)) {
+    case '.py':
+      return scriptCommand.PYTHON
+    case '.ipynb':
+      return scriptCommand.JUPYTER
+    default:
+      return ''
+  }
+}
 
 export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   Experiments,
@@ -435,11 +451,11 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
         return false
       }
 
-      const trainingScript = await this.askForTrainingScript()
+      const { trainingScript, command } = await this.askForTrainingScript()
       if (!trainingScript) {
         return false
       }
-      void findOrCreateDvcYamlFile(cwd, trainingScript, stageName)
+      void findOrCreateDvcYamlFile(cwd, trainingScript, stageName, command)
     }
     return true
   }
@@ -473,9 +489,20 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       }
     )
 
-    return pathOrSelect === selectValue
-      ? await pickFile(Title.SELECT_TRAINING_SCRIPT)
-      : pathOrSelect
+    const trainingScript =
+      pathOrSelect === selectValue
+        ? await pickFile(Title.SELECT_TRAINING_SCRIPT)
+        : pathOrSelect
+
+    if (!trainingScript) {
+      return { command: undefined, trainingScript: undefined }
+    }
+
+    const command =
+      getScriptCommand(trainingScript) ||
+      (await getInput(Title.ENTER_COMMAND_TO_RUN)) ||
+      ''
+    return { command, trainingScript }
   }
 
   private async pickExpThenRun(

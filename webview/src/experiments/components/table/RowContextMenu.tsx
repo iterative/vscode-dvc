@@ -3,7 +3,7 @@ import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import {
   ExperimentStatus,
   isQueued,
-  isRunningInQueue
+  isRunning
 } from 'dvc/src/experiments/webview/contract'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { RowProp } from './interfaces'
@@ -13,7 +13,7 @@ import { MessagesMenuOptionProps } from '../../../shared/components/messagesMenu
 import { cond } from '../../../util/helpers'
 
 const experimentMenuOption = (
-  payload: string | string[],
+  payload: string | string[] | { id: string; executor?: string | null }[],
   label: string,
   type: MessageFromWebviewType,
   hidden?: boolean,
@@ -60,11 +60,14 @@ const getMultiSelectMenuOptions = (
   const hideRemoveOption =
     removableRowIds.length !== selectedRowsList.length || hasRunningExperiment
 
-  const stoppableRowIds = selectedRowsList.filter(value =>
-    isRunningInQueue(value.row.original)
-  )
+  const stoppableRows = selectedRowsList
+    .filter(value => isRunning(value.row.original.status))
+    .map(value => ({
+      executor: value.row.original.executor,
+      id: value.row.original.id
+    }))
 
-  const hideStopOption = stoppableRowIds.length !== selectedRowsList.length
+  const hideStopOption = stoppableRows.length !== selectedRowsList.length
 
   const toggleStarOption = (ids: string[], label: string) =>
     experimentMenuOption(
@@ -98,7 +101,7 @@ const getMultiSelectMenuOptions = (
       false
     ),
     experimentMenuOption(
-      selectedIds,
+      stoppableRows,
       'Stop',
       MessageFromWebviewType.STOP_EXPERIMENT,
       hideStopOption,
@@ -219,11 +222,11 @@ const getSingleSelectMenuOptions = (
       !hasRunningExperiment
     ),
     experimentMenuOption(
-      [id],
+      [{ executor, id }],
       'Stop',
       MessageFromWebviewType.STOP_EXPERIMENT,
-      !isRunningInQueue({ executor, status }),
-      true
+      !isRunning(status),
+      id !== EXPERIMENT_WORKSPACE_ID
     ),
     withId(
       'Remove',
