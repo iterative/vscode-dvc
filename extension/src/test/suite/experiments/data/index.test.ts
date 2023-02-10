@@ -80,18 +80,16 @@ suite('Experiments Data Test Suite', () => {
       const mockNow = getMockNow()
       const gitRoot = dvcDemoPath
 
-      const mockExecuteCommand = (command: CommandId) => {
-        if (command === AvailableCommands.GIT_GET_REPOSITORY_ROOT) {
-          return Promise.resolve(gitRoot)
-        }
-      }
-
       const data = disposable.track(
         new ExperimentsData(
           dvcDemoPath,
           {
             dispose: stub(),
-            executeCommand: mockExecuteCommand
+            executeCommand: (command: CommandId) => {
+              if (command === AvailableCommands.GIT_GET_REPOSITORY_ROOT) {
+                return Promise.resolve(gitRoot)
+              }
+            }
           } as unknown as InternalCommands,
           disposable.track(new EventEmitter<boolean>())
         )
@@ -115,7 +113,7 @@ suite('Experiments Data Test Suite', () => {
 
     it('should watch the .git directory for updates when the directory is inside workspace', async () => {
       const mockNow = getMockNow()
-      const mockGitRoot = dvcDemoPath
+      const gitRoot = dvcDemoPath
       const mockDotGitFilePath = join(
         MOCK_WORKSPACE_GIT_FOLDER,
         gitPath.DOT_GIT_HEAD
@@ -129,11 +127,6 @@ suite('Experiments Data Test Suite', () => {
       ensureFileSync(mockDotGitFilePath)
       ensureFileSync(mockDotGitNestedFilePath)
 
-      const mockExecuteCommand = (command: CommandId) => {
-        if (command === AvailableCommands.GIT_GET_REPOSITORY_ROOT) {
-          return Promise.resolve(mockGitRoot)
-        }
-      }
       stub(FileSystem, 'getGitPath').returns(MOCK_WORKSPACE_GIT_FOLDER)
 
       const data = disposable.track(
@@ -141,7 +134,11 @@ suite('Experiments Data Test Suite', () => {
           dvcDemoPath,
           {
             dispose: stub(),
-            executeCommand: mockExecuteCommand
+            executeCommand: (command: CommandId) => {
+              if (command === AvailableCommands.GIT_GET_REPOSITORY_ROOT) {
+                return Promise.resolve(gitRoot)
+              }
+            }
           } as unknown as InternalCommands,
           disposable.track(new EventEmitter<boolean>())
         )
