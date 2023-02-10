@@ -3,8 +3,7 @@ import {
   env,
   EventEmitter,
   ExtensionContext,
-  ViewColumn,
-  window
+  ViewColumn
 } from 'vscode'
 import { DvcExecutor } from './cli/dvc/executor'
 import { DvcRunner } from './cli/dvc/runner'
@@ -53,12 +52,14 @@ import { stopProcesses } from './processExecution'
 import { Flag } from './cli/dvc/constants'
 import { LanguageClient } from './languageClient'
 import { collectRunningExperimentPids } from './experiments/processExecution/collect'
+import { Connect } from './connect'
 
 export class Extension extends Disposable {
   protected readonly internalCommands: InternalCommands
 
   private readonly resourceLocator: ResourceLocator
   private readonly repositories: WorkspaceRepositories
+  private readonly connect: Connect
   private readonly experiments: WorkspaceExperiments
   private readonly plots: WorkspacePlots
   private readonly setup: Setup
@@ -80,9 +81,7 @@ export class Extension extends Disposable {
 
     this.dispose.track(
       commands.registerCommand('dvc.studioConnect', () =>
-        window.showInformationMessage('Not implemented', {
-          modal: true
-        })
+        this.connect.showWebview()
       )
     )
 
@@ -193,6 +192,8 @@ export class Extension extends Disposable {
           )
       )
     )
+
+    this.connect = this.dispose.track(new Connect(this.resourceLocator.dvcIcon))
 
     registerExperimentCommands(this.experiments, this.internalCommands)
     registerPlotsCommands(this.plots, this.internalCommands)
