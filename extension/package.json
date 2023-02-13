@@ -600,6 +600,9 @@
           "title": "%config.studioAccessToken.title%",
           "description": "%config.studioAccessToken.description%",
           "type": "string",
+          "pattern": "^isat_",
+          "minLength": 54,
+          "maxLength": 54,
           "default": null
         }
       }
@@ -1374,7 +1377,7 @@
       },
       {
         "view": "dvc.views.studio",
-        "contents": "[$(plug) Connect and Collaborate](command:dvc.studioConnect)",
+        "contents": "[$(plug) Connect](command:dvc.studioConnect)",
         "when": "true"
       },
       {
