@@ -1,7 +1,9 @@
+import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { EventEmitter, RelativePattern } from 'vscode'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
+import { ensureFileSync, removeSync } from 'fs-extra'
 import {
   bypassProcessManagerDebounce,
   getArgOfCall,
@@ -24,7 +26,9 @@ import { buildExperimentsData } from '../util'
 import { ExperimentFlag } from '../../../../cli/dvc/constants'
 import { EXPERIMENTS_GIT_LOGS_REFS } from '../../../../experiments/data/constants'
 import { gitPath } from '../../../../cli/git/constants'
-import { getGitPath } from '../../../../fileSystem'
+import * as FileSystem from '../../../../fileSystem'
+
+const MOCK_WORKSPACE_GIT_FOLDER = join(dvcDemoPath, '.mock-git')
 
 suite('Experiments Data Test Suite', () => {
   const disposable = getTimeSafeDisposer()
@@ -37,7 +41,12 @@ suite('Experiments Data Test Suite', () => {
     return disposable.disposeAndFlush()
   })
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('ExperimentsData', () => {
+    afterEach(() => {
+      removeSync(MOCK_WORKSPACE_GIT_FOLDER)
+    })
+
     it('should debounce all calls to update that are made within 200ms', async () => {
       const { data, mockExperimentShow } = buildExperimentsData(disposable)
 
@@ -67,22 +76,20 @@ suite('Experiments Data Test Suite', () => {
       )
     })
 
-    it('should watch the .git directory for updates', async () => {
+    it('should watch the .git directory for updates when the directory is outside of the workspace', async () => {
       const mockNow = getMockNow()
       const gitRoot = dvcDemoPath
-
-      const mockExecuteCommand = (command: CommandId) => {
-        if (command === AvailableCommands.GIT_GET_REPOSITORY_ROOT) {
-          return Promise.resolve(gitRoot)
-        }
-      }
 
       const data = disposable.track(
         new ExperimentsData(
           dvcDemoPath,
           {
             dispose: stub(),
-            executeCommand: mockExecuteCommand
+            executeCommand: (command: CommandId) => {
+              if (command === AvailableCommands.GIT_GET_REPOSITORY_ROOT) {
+                return Promise.resolve(gitRoot)
+              }
+            }
           } as unknown as InternalCommands,
           disposable.track(new EventEmitter<boolean>())
         )
@@ -96,7 +103,61 @@ suite('Experiments Data Test Suite', () => {
         data.onDidUpdate(() => resolve(undefined))
       )
 
-      await Watcher.fireWatcher(getGitPath(gitRoot, gitPath.DOT_GIT_HEAD))
+      await Watcher.fireWatcher(
+        FileSystem.getGitPath(gitRoot, gitPath.DOT_GIT_HEAD)
+      )
+      await dataUpdatedEvent
+
+      expect(managedUpdateSpy).to.be.called
+    })
+
+    it('should watch the .git directory for updates when the directory is inside workspace', async () => {
+      const mockNow = getMockNow()
+      const gitRoot = dvcDemoPath
+      const mockDotGitFilePath = join(
+        MOCK_WORKSPACE_GIT_FOLDER,
+        gitPath.DOT_GIT_HEAD
+      )
+      const mockDotGitNestedFilePath = join(
+        MOCK_WORKSPACE_GIT_FOLDER,
+        EXPERIMENTS_GIT_LOGS_REFS,
+        'index'
+      )
+
+      ensureFileSync(mockDotGitFilePath)
+      ensureFileSync(mockDotGitNestedFilePath)
+
+      stub(FileSystem, 'getGitPath').returns(MOCK_WORKSPACE_GIT_FOLDER)
+
+      const data = disposable.track(
+        new ExperimentsData(
+          dvcDemoPath,
+          {
+            dispose: stub(),
+            executeCommand: (command: CommandId) => {
+              if (command === AvailableCommands.GIT_GET_REPOSITORY_ROOT) {
+                return Promise.resolve(gitRoot)
+              }
+            }
+          } as unknown as InternalCommands,
+          disposable.track(new EventEmitter<boolean>())
+        )
+      )
+
+      await data.isReady()
+      bypassProcessManagerDebounce(mockNow)
+
+      const managedUpdateSpy = spy(data, 'managedUpdate')
+      const dataUpdatedEvent = new Promise(resolve =>
+        data.onDidUpdate(() => resolve(undefined))
+      )
+
+      await Watcher.fireWatcher(mockDotGitFilePath)
+      await dataUpdatedEvent
+
+      expect(managedUpdateSpy).to.be.called
+
+      await Watcher.fireWatcher(mockDotGitNestedFilePath)
       await dataUpdatedEvent
 
       expect(managedUpdateSpy).to.be.called
