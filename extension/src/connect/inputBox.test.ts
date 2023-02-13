@@ -1,4 +1,4 @@
-import { validateTokenInput } from './input'
+import { validateTokenInput } from './inputBox'
 
 describe('validateTokenInput', () => {
   const mockedStudioAccessToken =

@@ -1,5 +1,6 @@
-import { ExtensionContext, SecretStorage, commands } from 'vscode'
-import { isStudioAccessToken, validateTokenInput } from './input'
+import { ExtensionContext, SecretStorage } from 'vscode'
+import { validateTokenInput } from './inputBox'
+import { isStudioAccessToken } from './token'
 import { STUDIO_URL } from './webview/contract'
 import { Resource } from '../resourceLocator'
 import { ViewKey } from '../webview/constants'
@@ -10,9 +11,6 @@ import { getInput, getValidInput } from '../vscode/inputBox'
 import { Title } from '../vscode/title'
 import { openUrl } from '../vscode/external'
 import { ContextKey, setContextValue } from '../vscode/context'
-import { RegisteredCommands } from '../commands/external'
-import { sendTelemetryEvent } from '../telemetry'
-import { EventName } from '../telemetry/constants'
 
 const STUDIO_ACCESS_TOKEN = 'dvc.studioAccessToken'
 
@@ -32,27 +30,6 @@ export class Connect extends BaseRepository<undefined> {
       )
     )
 
-    this.dispose.track(
-      commands.registerCommand(RegisteredCommands.CONNECT_SHOW, () => {
-        sendTelemetryEvent(EventName.CONNECT_SHOW, undefined, undefined)
-        return this.showWebview()
-      })
-    )
-
-    this.dispose.track(
-      commands.registerCommand(
-        RegisteredCommands.REMOVE_STUDIO_ACCESS_TOKEN,
-        () => {
-          sendTelemetryEvent(
-            EventName.REMOVE_STUDIO_ACCESS_TOKEN,
-            undefined,
-            undefined
-          )
-          return this.secrets.delete(STUDIO_ACCESS_TOKEN)
-        }
-      )
-    )
-
     void this.setContext()
 
     this.dispose.track(
@@ -66,6 +43,10 @@ export class Connect extends BaseRepository<undefined> {
   }
 
   public sendInitialWebviewData(): void {}
+
+  public removeStudioAccessToken() {
+    return this.secrets.delete(STUDIO_ACCESS_TOKEN)
+  }
 
   private handleMessageFromWebview(message: MessageFromWebview) {
     switch (message.type) {
