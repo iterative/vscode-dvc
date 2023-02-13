@@ -1315,8 +1315,8 @@
           "when": "!dvc.commands.available || dvc.cli.incompatible || !dvc.project.available"
         },
         {
-          "id": "dvc.views.webviews",
-          "name": "Views",
+          "id": "dvc.views.actions",
+          "name": "Actions",
           "when": "true"
         },
         {
@@ -1352,7 +1352,7 @@
     },
     "viewsWelcome": [
       {
-        "view": "dvc.views.webviews",
+        "view": "dvc.views.actions",
         "contents": "[$(beaker) Show Experiments](command:dvc.showExperiments)\n[$(graph-scatter) Show Plots](command:dvc.showPlots)\n[$(play) Run Experiment](command:dvc.runExperiment)"
       },
       {
