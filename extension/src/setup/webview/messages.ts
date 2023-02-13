@@ -67,9 +67,9 @@ export class WebviewMessages {
       case MessageFromWebviewType.INITIALIZE_DVC:
         return this.initializeDvc()
       case MessageFromWebviewType.INITIALIZE_GIT:
-        return this.initializeGit()
+        return this.gitInit()
       case MessageFromWebviewType.SHOW_SCM_PANEL:
-        return commands.executeCommand('workbench.view.scm')
+        return this.showScmForCommit()
       case MessageFromWebviewType.SELECT_PYTHON_INTERPRETER:
         return this.selectPythonInterpreter()
       case MessageFromWebviewType.INSTALL_DVC:
@@ -81,6 +81,20 @@ export class WebviewMessages {
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
+  }
+
+  private gitInit() {
+    sendTelemetryEvent(EventName.VIEWS_SETUP_INIT_GIT, undefined, undefined)
+    return this.initializeGit()
+  }
+
+  private showScmForCommit() {
+    sendTelemetryEvent(
+      EventName.VIEWS_SETUP_SHOW_SCM_FOR_COMMIT,
+      undefined,
+      undefined
+    )
+    return commands.executeCommand('workbench.view.scm')
   }
 
   private selectPythonInterpreter() {
