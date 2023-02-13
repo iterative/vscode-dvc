@@ -1,4 +1,4 @@
-const isStudioAccessToken = (text?: string): boolean => {
+export const isStudioAccessToken = (text?: string): boolean => {
   if (!text) {
     return false
   }

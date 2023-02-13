@@ -1336,7 +1336,7 @@
         {
           "id": "dvc.views.studio",
           "name": "Studio",
-          "when": "true"
+          "when": "!dvc.studio.connected"
         },
         {
           "id": "dvc.views.experimentsColumnsTree",
@@ -1378,7 +1378,7 @@
       {
         "view": "dvc.views.studio",
         "contents": "[$(plug) Connect](command:dvc.studioConnect)",
-        "when": "true"
+        "when": "!dvc.studio.connected"
       },
       {
         "view": "dvc.views.webviews",

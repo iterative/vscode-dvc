@@ -1,5 +1,5 @@
-import { commands } from 'vscode'
-import { validateTokenInput } from './input'
+import { commands, workspace } from 'vscode'
+import { isStudioAccessToken, validateTokenInput } from './input'
 import { STUDIO_URL } from './webview/contract'
 import { Resource } from '../resourceLocator'
 import { ViewKey } from '../webview/constants'
@@ -8,8 +8,9 @@ import { BaseRepository } from '../webview/repository'
 import { Logger } from '../common/logger'
 import { getInput, getValidInput } from '../vscode/inputBox'
 import { Title } from '../vscode/title'
-import { ConfigKey, setUserConfigValue } from '../vscode/config'
+import { ConfigKey, getConfigValue, setUserConfigValue } from '../vscode/config'
 import { openUrl } from '../vscode/external'
+import { ContextKey, setContextValue } from '../vscode/context'
 
 export class Connect extends BaseRepository<undefined> {
   public readonly viewKey = ViewKey.CONNECT
@@ -21,6 +22,17 @@ export class Connect extends BaseRepository<undefined> {
       this.onDidReceivedWebviewMessage(message =>
         this.handleMessageFromWebview(message)
       )
+    )
+
+    void this.setContext()
+
+    this.dispose.track(
+      workspace.onDidChangeConfiguration(e => {
+        if (!e.affectsConfiguration(ConfigKey.STUDIO_ACCESS_TOKEN)) {
+          return
+        }
+        return this.setContext()
+      })
     )
   }
 
@@ -57,10 +69,20 @@ export class Connect extends BaseRepository<undefined> {
     }
 
     await setUserConfigValue(ConfigKey.STUDIO_ACCESS_TOKEN, token)
-    this.webview?.dispose()
     return commands.executeCommand(
       'workbench.action.openSettings',
       'dvc.studioAccessToken'
     )
+  }
+
+  private async setContext() {
+    if (
+      isStudioAccessToken(await getConfigValue(ConfigKey.STUDIO_ACCESS_TOKEN))
+    ) {
+      this.webview?.dispose()
+      return setContextValue(ContextKey.STUDIO_CONNECTED, true)
+    }
+
+    return setContextValue(ContextKey.STUDIO_CONNECTED, false)
   }
 }
