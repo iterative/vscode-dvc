@@ -265,6 +265,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
   table {
     display: inline-block;
     border-collapse: collapse;
+    flex-grow: 1;
   }
 
   summary {
