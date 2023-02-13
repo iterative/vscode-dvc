@@ -1353,7 +1353,7 @@
     "viewsWelcome": [
       {
         "view": "dvc.views.webviews",
-        "contents": "[Show Experiments](command:dvc.showExperiments)\n[Show Plots](command:dvc.showPlots)\n[Show Experiments and Plots](command:dvc.showExperimentsAndPlots)"
+        "contents": "[$(beaker) Show Experiments](command:dvc.showExperiments)\n[$(graph-scatter) Show Plots](command:dvc.showPlots)\n[$(play) Run Experiment](command:dvc.runExperiment)"
       },
       {
         "view": "dvc.views.welcome",
