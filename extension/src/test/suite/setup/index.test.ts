@@ -194,7 +194,11 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should close the webview and open the experiments when the setup is done', async () => {
-      const { setup, mockOpenExperiments } = buildSetup(disposable, true)
+      const { setup, mockOpenExperiments } = buildSetup(
+        disposable,
+        undefined,
+        true
+      )
 
       const closeWebviewSpy = spy(BaseWebview.prototype, 'dispose')
 
@@ -286,6 +290,7 @@ suite('Setup Test Suite', () => {
     it('should send the expected message to the webview when there is no DVC project in the workspace', async () => {
       const { config, setup, messageSpy } = buildSetup(
         disposable,
+        undefined,
         false,
         true,
         false,
@@ -329,6 +334,7 @@ suite('Setup Test Suite', () => {
     it('should send the expected message to the webview when there is no commits in the git repository', async () => {
       const { config, setup, messageSpy } = buildSetup(
         disposable,
+        undefined,
         false,
         false,
         false,
@@ -550,7 +556,7 @@ suite('Setup Test Suite', () => {
 
     it('should set the dvc.cli.incompatible context value', async () => {
       const { config, mockExecuteCommand, mockRunSetup, mockVersion, setup } =
-        buildSetup(disposable, true, false, false)
+        buildSetup(disposable, undefined, true, false, false)
       mockRunSetup.restore()
       stub(config, 'isPythonExtensionUsed').returns(false)
       stub(config, 'getPythonBinPath').resolves(join('python'))

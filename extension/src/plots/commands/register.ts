@@ -1,15 +1,20 @@
 import { RegisteredCommands } from '../../commands/external'
 import { InternalCommands } from '../../commands/internal'
+import { showSetupOrExecuteCommand } from '../../commands/util'
+import { Setup } from '../../setup'
 import { Context, getDvcRootFromContext } from '../../vscode/context'
 import { WorkspacePlots } from '../workspace'
 
 export const registerPlotsCommands = (
   plots: WorkspacePlots,
-  internalCommands: InternalCommands
+  internalCommands: InternalCommands,
+  setup: Setup
 ) => {
   internalCommands.registerExternalCommand(
     RegisteredCommands.PLOTS_SHOW,
-    (context: Context) => plots.showWebview(getDvcRootFromContext(context))
+    showSetupOrExecuteCommand(setup, context =>
+      plots.showWebview(getDvcRootFromContext(context))
+    )
   )
 
   internalCommands.registerExternalCommand(
