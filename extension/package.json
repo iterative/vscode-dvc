@@ -1542,7 +1542,7 @@
   },
   "dependencies": {
     "@hediet/std": "0.6.0",
-    "@vscode/extension-telemetry": "0.6.2",
+    "@vscode/extension-telemetry": "0.7.5",
     "appdirs": "1.1.0",
     "execa": "5.1.1",
     "fs-extra": "11.1.0",
