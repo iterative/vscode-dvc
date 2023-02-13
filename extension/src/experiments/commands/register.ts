@@ -12,6 +12,8 @@ import {
 } from '../../commands/external'
 import { Title } from '../../vscode/title'
 import { Context, getDvcRootFromContext } from '../../vscode/context'
+import { Setup } from '../../setup'
+import { showSetupOrExecuteCommand } from '../../commands/util'
 
 type ExperimentDetails = { dvcRoot: string; id: string }
 
@@ -280,7 +282,8 @@ const registerExperimentQuickPickCommands = (
 
 const registerExperimentRunCommands = (
   experiments: WorkspaceExperiments,
-  internalCommands: InternalCommands
+  internalCommands: InternalCommands,
+  setup: Setup
 ): void => {
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_RUN,
@@ -317,20 +320,22 @@ const registerExperimentRunCommands = (
 
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_SHOW,
-    (context: Context) =>
+    showSetupOrExecuteCommand(setup, context =>
       experiments.showWebview(getDvcRootFromContext(context))
+    )
   )
 }
 
 export const registerExperimentCommands = (
   experiments: WorkspaceExperiments,
-  internalCommands: InternalCommands
+  internalCommands: InternalCommands,
+  setup: Setup
 ) => {
   registerExperimentCwdCommands(experiments, internalCommands)
   registerExperimentNameCommands(experiments, internalCommands)
   registerExperimentInputCommands(experiments, internalCommands)
   registerExperimentQuickPickCommands(experiments, internalCommands)
-  registerExperimentRunCommands(experiments, internalCommands)
+  registerExperimentRunCommands(experiments, internalCommands, setup)
 
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_AUTO_APPLY_FILTERS,
