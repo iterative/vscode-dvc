@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { EventEmitter, commands } from 'vscode'
 import { Disposer } from '@hediet/std/disposable'
-import { fake, stub } from 'sinon'
+import { fake, SinonSpy, stub } from 'sinon'
 import { ensureDirSync } from 'fs-extra'
 import * as FileSystem from '../../../fileSystem'
 import { Setup } from '../../../setup'
@@ -20,7 +20,7 @@ import { StopWatch } from '../../../util/time'
 import { WorkspaceScale } from '../../../telemetry/collect'
 import { dvcDemoPath } from '../../util'
 import { Config } from '../../../config'
-import { Resource } from '../../../resourceLocator'
+import { Resource, ResourceLocator } from '../../../resourceLocator'
 import { MIN_CLI_VERSION } from '../../../cli/dvc/contract'
 
 export const TEMP_DIR = join(dvcDemoPath, 'temp-empty-watcher-dir')
@@ -88,12 +88,18 @@ const buildSetupDependencies = (
 
 export const buildSetup = (
   disposer: Disposer,
+  dependencies?: {
+    config: Config
+    messageSpy: SinonSpy<[data: unknown], Promise<boolean>>
+    resourceLocator: ResourceLocator
+  },
   hasData = false,
   noDvcRoot = true,
   noGitRoot = true,
   noGitCommits = true
 ) => {
-  const { config, messageSpy, resourceLocator } = buildDependencies(disposer)
+  const { config, messageSpy, resourceLocator } =
+    dependencies || buildDependencies(disposer)
 
   const mockDvcRoot = noDvcRoot ? undefined : dvcDemoPath
   const mockGitRoot = noGitRoot ? undefined : dvcDemoPath

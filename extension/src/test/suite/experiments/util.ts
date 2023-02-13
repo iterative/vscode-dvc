@@ -136,6 +136,7 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
 
 export const buildSingleRepoExperiments = (disposer: SafeWatcherDisposer) => {
   const {
+    config,
     internalCommands,
     gitReader,
     messageSpy,
@@ -159,7 +160,13 @@ export const buildSingleRepoExperiments = (disposer: SafeWatcherDisposer) => {
 
   void experiments.setState(expShowFixture)
 
-  return { messageSpy, workspaceExperiments }
+  return {
+    config,
+    internalCommands,
+    messageSpy,
+    resourceLocator,
+    workspaceExperiments
+  }
 }
 
 const buildExperimentsDataDependencies = (disposer: Disposer) => {

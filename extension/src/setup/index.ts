@@ -220,20 +220,19 @@ export class Setup
     return this.sendDataToWebview()
   }
 
-  public async sendDataToWebview() {
-    const projectInitialized = this.hasRoots()
-    const hasData = this.getHasData()
+  public shouldBeShown() {
+    return !this.cliCompatible || !this.hasRoots() || !this.getHasData()
+  }
 
-    if (
-      this.webview?.isVisible &&
-      this.cliCompatible &&
-      projectInitialized &&
-      hasData
-    ) {
+  public async sendDataToWebview() {
+    if (this.webview?.isVisible && !this.shouldBeShown()) {
       this.getWebview()?.dispose()
       this.showExperiments()
       return
     }
+
+    const projectInitialized = this.hasRoots()
+    const hasData = this.getHasData()
 
     const needsGitInitialized =
       !projectInitialized && !!(await this.needsGitInit())

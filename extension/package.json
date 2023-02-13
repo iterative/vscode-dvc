@@ -1353,13 +1353,7 @@
     "viewsWelcome": [
       {
         "view": "dvc.views.webviews",
-        "contents": "[Show Experiments](command:dvc.showExperiments)\n[Show Plots](command:dvc.showPlots)\n[Show Experiments and Plots](command:dvc.showExperimentsAndPlots)",
-        "when": "dvc.commands.available && dvc.project.available && dvc.project.hasData"
-      },
-      {
-        "view": "dvc.views.webviews",
-        "contents": "[Show Experiments](command:dvc.showSetup)\n[Show Plots](command:dvc.showSetup)\n[Show Experiments and Plots](command:dvc.showSetup)",
-        "when": "!dvc.commands.available || !dvc.project.available || !dvc.project.hasData"
+        "contents": "[Show Experiments](command:dvc.showExperiments)\n[Show Plots](command:dvc.showPlots)\n[Show Experiments and Plots](command:dvc.showExperimentsAndPlots)"
       },
       {
         "view": "dvc.views.welcome",
