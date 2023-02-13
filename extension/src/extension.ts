@@ -79,12 +79,6 @@ export class Extension extends Disposable {
 
     const stopWatch = new StopWatch()
 
-    this.dispose.track(
-      commands.registerCommand('dvc.studioConnect', () =>
-        this.connect.showWebview()
-      )
-    )
-
     this.dispose.track(getTelemetryReporter())
 
     this.resourceLocator = this.dispose.track(
@@ -193,7 +187,9 @@ export class Extension extends Disposable {
       )
     )
 
-    this.connect = this.dispose.track(new Connect(this.resourceLocator.dvcIcon))
+    this.connect = this.dispose.track(
+      new Connect(context, this.resourceLocator.dvcIcon)
+    )
 
     registerExperimentCommands(this.experiments, this.internalCommands)
     registerPlotsCommands(this.plots, this.internalCommands)

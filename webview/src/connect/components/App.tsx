@@ -3,7 +3,7 @@ import { Studio } from './Studio'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 
 export const App: React.FC = () => {
-  useVsCodeMessaging(() => undefined)
+  useVsCodeMessaging()
 
   return <Studio />
 }

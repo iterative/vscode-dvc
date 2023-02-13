@@ -89,11 +89,6 @@
     ],
     "commands": [
       {
-        "title": "Connect to Studio",
-        "command": "dvc.studioConnect",
-        "category": "DVC"
-      },
-      {
         "title": "%command.addExperimentsTableFilter%",
         "command": "dvc.addExperimentsTableFilter",
         "category": "DVC",
@@ -313,6 +308,11 @@
         "icon": "$(close-all)"
       },
       {
+        "title": "%command.removeStudioAccessToken%",
+        "command": "dvc.removeStudioAccessToken",
+        "category": "DVC"
+      },
+      {
         "title": "%command.removeTarget%",
         "command": "dvc.removeTarget",
         "category": "DVC",
@@ -387,6 +387,11 @@
       {
         "title": "%command.showCommands",
         "command": "dvc.showCommands",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.showConnect%",
+        "command": "dvc.showConnect",
         "category": "DVC"
       },
       {
@@ -595,15 +600,6 @@
           "description": "%config.pythonPath.description%",
           "type": "string",
           "default": null
-        },
-        "dvc.studioAccessToken": {
-          "title": "%config.studioAccessToken.title%",
-          "description": "%config.studioAccessToken.description%",
-          "type": "string",
-          "pattern": "^isat_",
-          "minLength": 54,
-          "maxLength": 54,
-          "default": null
         }
       }
     },
@@ -765,6 +761,10 @@
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
+          "command": "dvc.removeStudioAccessToken",
+          "when": "dvc.commands.available && dvc.project.available && dvc.studio.connected"
+        },
+        {
           "command": "dvc.removeTarget",
           "when": "false"
         },
@@ -801,7 +801,7 @@
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
-          "command": "dvc.studioConnect",
+          "command": "dvc.showConnect",
           "when": "dvc.commands.available && dvc.project.available && !dvc.studio.connected"
         },
         {
@@ -1381,7 +1381,7 @@
       },
       {
         "view": "dvc.views.studio",
-        "contents": "[$(plug) Connect](command:dvc.studioConnect)",
+        "contents": "[$(plug) Connect](command:dvc.showConnect)",
         "when": "!dvc.studio.connected"
       },
       {

@@ -1,4 +1,4 @@
-import { commands, workspace } from 'vscode'
+import { ExtensionContext, SecretStorage, commands } from 'vscode'
 import { isStudioAccessToken, validateTokenInput } from './input'
 import { STUDIO_URL } from './webview/contract'
 import { Resource } from '../resourceLocator'
@@ -8,15 +8,23 @@ import { BaseRepository } from '../webview/repository'
 import { Logger } from '../common/logger'
 import { getInput, getValidInput } from '../vscode/inputBox'
 import { Title } from '../vscode/title'
-import { ConfigKey, getConfigValue, setUserConfigValue } from '../vscode/config'
 import { openUrl } from '../vscode/external'
 import { ContextKey, setContextValue } from '../vscode/context'
+import { RegisteredCommands } from '../commands/external'
+import { sendTelemetryEvent } from '../telemetry'
+import { EventName } from '../telemetry/constants'
+
+const STUDIO_ACCESS_TOKEN = 'dvc.studioAccessToken'
 
 export class Connect extends BaseRepository<undefined> {
   public readonly viewKey = ViewKey.CONNECT
 
-  constructor(webviewIcon: Resource) {
+  private readonly secrets: SecretStorage
+
+  constructor(context: ExtensionContext, webviewIcon: Resource) {
     super('', webviewIcon)
+
+    this.secrets = context.secrets
 
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>
@@ -24,11 +32,32 @@ export class Connect extends BaseRepository<undefined> {
       )
     )
 
+    this.dispose.track(
+      commands.registerCommand(RegisteredCommands.CONNECT_SHOW, () => {
+        sendTelemetryEvent(EventName.CONNECT_SHOW, undefined, undefined)
+        return this.showWebview()
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand(
+        RegisteredCommands.REMOVE_STUDIO_ACCESS_TOKEN,
+        () => {
+          sendTelemetryEvent(
+            EventName.REMOVE_STUDIO_ACCESS_TOKEN,
+            undefined,
+            undefined
+          )
+          return this.secrets.delete(STUDIO_ACCESS_TOKEN)
+        }
+      )
+    )
+
     void this.setContext()
 
     this.dispose.track(
-      workspace.onDidChangeConfiguration(e => {
-        if (!e.affectsConfiguration(ConfigKey.STUDIO_ACCESS_TOKEN)) {
+      this.secrets.onDidChange(e => {
+        if (e.key !== STUDIO_ACCESS_TOKEN) {
           return
         }
         return this.setContext()
@@ -62,23 +91,19 @@ export class Connect extends BaseRepository<undefined> {
   private async saveStudioToken() {
     const token = await getValidInput(
       Title.ENTER_STUDIO_TOKEN,
-      validateTokenInput
+      validateTokenInput,
+      { password: true }
     )
     if (!token) {
       return
     }
 
-    await setUserConfigValue(ConfigKey.STUDIO_ACCESS_TOKEN, token)
-    return commands.executeCommand(
-      'workbench.action.openSettings',
-      'dvc.studioAccessToken'
-    )
+    return this.secrets.store(STUDIO_ACCESS_TOKEN, token)
   }
 
   private async setContext() {
-    if (
-      isStudioAccessToken(await getConfigValue(ConfigKey.STUDIO_ACCESS_TOKEN))
-    ) {
+    const storedToken = await this.secrets.get(STUDIO_ACCESS_TOKEN)
+    if (isStudioAccessToken(storedToken)) {
       this.webview?.dispose()
       return setContextValue(ContextKey.STUDIO_CONNECTED, true)
     }
