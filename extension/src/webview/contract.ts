@@ -20,7 +20,7 @@ export enum MessageFromWebviewType {
   OPEN_PARAMS_FILE_TO_THE_SIDE = 'open-params-file-to-the-side',
   OPEN_PLOTS_WEBVIEW = 'open-plots-webview',
   OPEN_STUDIO = 'open-studio',
-  OPEN_STUDIO_PROFILE = 'open-studio-in-profile',
+  OPEN_STUDIO_PROFILE = 'open-studio-profile',
   REMOVE_COLUMN_SORT = 'remove-column-sort',
   REMOVE_EXPERIMENT = 'remove-experiment',
   REORDER_COLUMNS = 'reorder-columns',
