@@ -1,3 +1,4 @@
+import { commands } from 'vscode'
 import { validateTokenInput } from './input'
 import { STUDIO_URL } from './webview/contract'
 import { Resource } from '../resourceLocator'
@@ -54,6 +55,12 @@ export class Connect extends BaseRepository<undefined> {
     if (!token) {
       return
     }
-    return setUserConfigValue(ConfigKey.STUDIO_ACCESS_TOKEN, token)
+
+    await setUserConfigValue(ConfigKey.STUDIO_ACCESS_TOKEN, token)
+    this.webview?.dispose()
+    return commands.executeCommand(
+      'workbench.action.openSettings',
+      'dvc.studioAccessToken'
+    )
   }
 }
