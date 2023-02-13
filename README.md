@@ -148,6 +148,7 @@ These are the VS Code [settings] available for the Extension:
 
 | **Option**                             | **Description**                                                                                                                                          |
 | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `dvc.studioAccessToken`                | Token used by DVC to share experiments and plots data to [Iterative Studio](https://studio.iterative.ai).                                                |
 | `dvc.dvcPath`                          | Path or shell command to the DVC binary. Required unless Microsoft's [Python extension] is installed and the `dvc` package found in its environment.     |
 | `dvc.pythonPath`                       | Path to the desired Python interpreter to use with DVC. Should only be utilized when using a virtual environment without Microsoft's [Python extension]. |
 | `dvc.experimentsTableHeadMaxHeight`    | Maximum height of experiment table head rows.                                                                                                            |

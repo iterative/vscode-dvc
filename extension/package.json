@@ -595,6 +595,12 @@
           "description": "%config.pythonPath.description%",
           "type": "string",
           "default": null
+        },
+        "dvc.studioAccessToken": {
+          "title": "%config.studioAccessToken.title%",
+          "description": "%config.studioAccessToken.description%",
+          "type": "string",
+          "default": null
         }
       }
     },

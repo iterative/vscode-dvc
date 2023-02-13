@@ -92,5 +92,7 @@
   "config.experimentsTableHeadMaxHeight.title": "Maximum height of Experiment table head rows",
   "config.experimentsTableHeadMaxHeight.description": "Use 0 for infinite height.",
   "config.pythonPath.description": "Path to the desired Python interpreter to use with DVC. Required when using a virtual environment. Overrides any other extension's settings for this extension's purposes.",
-  "config.pythonPath.title": "Python Interpreter"
+  "config.pythonPath.title": "Python Interpreter",
+  "config.studioAccessToken.description": "Token used by DVC to share experiments and plots data to Iterative Studio.",
+  "config.studioAccessToken.title": "Studio Access Token"
 }

@@ -17,8 +17,10 @@ export enum MessageFromWebviewType {
   CREATE_BRANCH_FROM_EXPERIMENT = 'create-branch-from-experiment',
   FOCUS_FILTERS_TREE = 'focus-filters-tree',
   FOCUS_SORTS_TREE = 'focus-sorts-tree',
-  OPEN_PLOTS_WEBVIEW = 'open-plots-webview',
   OPEN_PARAMS_FILE_TO_THE_SIDE = 'open-params-file-to-the-side',
+  OPEN_PLOTS_WEBVIEW = 'open-plots-webview',
+  OPEN_STUDIO_IN_BROWSER = 'open-studio-in-browser',
+  OPEN_STUDIO_PROFILE = 'open-studio-in-profile',
   REMOVE_COLUMN_SORT = 'remove-column-sort',
   REMOVE_EXPERIMENT = 'remove-experiment',
   REORDER_COLUMNS = 'reorder-columns',
@@ -30,6 +32,7 @@ export enum MessageFromWebviewType {
   REFRESH_REVISIONS = 'refresh-revisions',
   RESIZE_COLUMN = 'resize-column',
   RESIZE_PLOTS = 'resize-plots',
+  SAVE_STUDIO_TOKEN = 'save-studio-token',
   STOP_EXPERIMENT = 'stop-experiment',
   SORT_COLUMN = 'sort-column',
   TOGGLE_EXPERIMENT = 'toggle-experiment',
@@ -196,6 +199,9 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.SHOW_SCM_PANEL }
   | { type: MessageFromWebviewType.INSTALL_DVC }
   | { type: MessageFromWebviewType.SETUP_WORKSPACE }
+  | { type: MessageFromWebviewType.OPEN_STUDIO_IN_BROWSER }
+  | { type: MessageFromWebviewType.OPEN_STUDIO_PROFILE }
+  | { type: MessageFromWebviewType.SAVE_STUDIO_TOKEN }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA

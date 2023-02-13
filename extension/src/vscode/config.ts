@@ -5,10 +5,11 @@ export enum ConfigKey {
   DO_NOT_SHOW_CLI_UNAVAILABLE = 'dvc.doNotShowCliUnavailable',
   DO_NOT_SHOW_WALKTHROUGH_AFTER_INSTALL = 'dvc.doNotShowWalkthroughAfterInstall',
   DO_NOT_SHOW_UNABLE_TO_FILTER = 'dvc.doNotShowUnableToFilter',
+  DVC_PATH = 'dvc.dvcPath',
   EXP_TABLE_HEAD_MAX_HEIGHT = 'dvc.experimentsTableHeadMaxHeight',
   FOCUSED_PROJECTS = 'dvc.focusedProjects',
-  DVC_PATH = 'dvc.dvcPath',
-  PYTHON_PATH = 'dvc.pythonPath'
+  PYTHON_PATH = 'dvc.pythonPath',
+  STUDIO_ACCESS_TOKEN = 'dvc.studioAccessToken'
 }
 
 export const getConfigValue = <T = string, D = string>(
