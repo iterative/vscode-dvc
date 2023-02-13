@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore, SinonStub, match } from 'sinon'
+import { stub, restore, SinonStub, match, spy } from 'sinon'
 import { window, commands, QuickPickItem, Uri } from 'vscode'
 import {
   buildExperiments,
@@ -19,7 +19,10 @@ import {
   mockDuration
 } from '../util'
 import { dvcDemoPath } from '../../util'
-import { RegisteredCliCommands } from '../../../commands/external'
+import {
+  RegisteredCliCommands,
+  RegisteredCommands
+} from '../../../commands/external'
 import * as Telemetry from '../../../telemetry'
 import { DvcRunner } from '../../../cli/dvc/runner'
 import { Param } from '../../../experiments/model/modify/collect'
@@ -35,6 +38,8 @@ import { GitExecutor } from '../../../cli/git/executor'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
 import { formatDate } from '../../../util/date'
 import { DvcReader } from '../../../cli/dvc/reader'
+import { Setup } from '../../../setup'
+import { WorkspaceExperiments } from '../../../experiments/workspace'
 
 suite('Workspace Experiments Test Suite', () => {
   const disposable = getTimeSafeDisposer()
@@ -930,6 +935,54 @@ suite('Workspace Experiments Test Suite', () => {
       )
 
       expect(mockExperimentRemove).to.be.calledWith(dvcDemoPath, '--queue')
+    })
+  })
+
+  describe('dvc.showExperiments', () => {
+    it('should show the setup if it should be shown', async () => {
+      const executeCommandSpy = spy(commands, 'executeCommand')
+
+      stub(Setup.prototype, 'shouldBeShown').returns(true)
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
+
+      expect(executeCommandSpy).to.have.been.calledWithMatch('dvc.showSetup')
+    })
+
+    it('should not show the experiments webview if the setup should be shown', async () => {
+      const showPlotsWebviewSpy = stub(
+        WorkspaceExperiments.prototype,
+        'showWebview'
+      )
+      stub(Setup.prototype, 'shouldBeShown').returns(true)
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
+
+      expect(showPlotsWebviewSpy).not.to.be.called
+    })
+
+    it('should not show the setup if it should not be shown', async () => {
+      const executeCommandSpy = spy(commands, 'executeCommand')
+
+      stub(WorkspaceExperiments.prototype, 'showWebview').resolves()
+
+      stub(Setup.prototype, 'shouldBeShown').returns(false)
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
+
+      expect(executeCommandSpy).not.to.be.calledWith('dvc.showSetup')
+    })
+
+    it('should show the experiments webview if the setup should not be shown', async () => {
+      const showPlotsWebviewSpy = stub(
+        WorkspaceExperiments.prototype,
+        'showWebview'
+      ).resolves()
+      stub(Setup.prototype, 'shouldBeShown').returns(false)
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
+
+      expect(showPlotsWebviewSpy).to.be.called
     })
   })
 })
