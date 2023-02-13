@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.6.4",
+  "version": "0.6.5",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -1333,8 +1333,8 @@
           "when": "!dvc.commands.available || dvc.cli.incompatible || !dvc.project.available"
         },
         {
-          "id": "dvc.views.webviews",
-          "name": "Views",
+          "id": "dvc.views.actions",
+          "name": "Actions",
           "when": "true"
         },
         {
@@ -1375,19 +1375,13 @@
     },
     "viewsWelcome": [
       {
-        "view": "dvc.views.webviews",
-        "contents": "[Show Experiments](command:dvc.showExperiments)\n[Show Plots](command:dvc.showPlots)\n[Show Experiments and Plots](command:dvc.showExperimentsAndPlots)",
-        "when": "dvc.commands.available && dvc.project.available && dvc.project.hasData"
+        "view": "dvc.views.actions",
+        "contents": "[$(beaker) Show Experiments](command:dvc.showExperiments)\n[$(graph-scatter) Show Plots](command:dvc.showPlots)\n[$(play) Run Experiment](command:dvc.runExperiment)"
       },
       {
         "view": "dvc.views.studio",
         "contents": "[$(plug) Connect](command:dvc.showConnect)",
         "when": "!dvc.studio.connected"
-      },
-      {
-        "view": "dvc.views.webviews",
-        "contents": "[Show Experiments](command:dvc.showSetup)\n[Show Plots](command:dvc.showSetup)\n[Show Experiments and Plots](command:dvc.showSetup)",
-        "when": "!dvc.commands.available || !dvc.project.available || !dvc.project.hasData"
       },
       {
         "view": "dvc.views.welcome",

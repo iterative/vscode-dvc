@@ -109,6 +109,23 @@ export const buildPlots = async (
   }
 }
 
+export const buildWorkspacePlots = (disposer: Disposer) => {
+  const { config, internalCommands, messageSpy, resourceLocator } =
+    buildDependencies(disposer)
+
+  const workspacePlots = disposer.track(
+    new WorkspacePlots(internalCommands, buildMockMemento())
+  )
+
+  return {
+    config,
+    internalCommands,
+    messageSpy,
+    resourceLocator,
+    workspacePlots
+  }
+}
+
 export const getExpectedCheckpointPlotsData = (
   domain: string[],
   range: Color[]

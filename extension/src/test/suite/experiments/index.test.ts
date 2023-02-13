@@ -73,6 +73,7 @@ import { ConfigKey } from '../../../vscode/config'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
 import * as Time from '../../../util/time'
 import { AvailableCommands } from '../../../commands/internal'
+import { Setup } from '../../../setup'
 import * as FileSystem from '../../../fileSystem'
 import * as ProcessExecution from '../../../processExecution'
 
@@ -1025,6 +1026,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to compare experiments plots', async () => {
+      const mockShouldBeShown = stub(Setup.prototype, 'shouldBeShown')
+      mockShouldBeShown.returns(false)
       const { experiments, experimentsModel } = buildExperiments(disposable)
       const mockShowPlots = stub(WorkspacePlots.prototype, 'showWebview')
 
