@@ -1,15 +1,25 @@
 import React from 'react'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
+import { STUDIO_URL } from 'dvc/src/connect/webview/contract'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Button } from '../../shared/components/button/Button'
 import { sendMessage } from '../../shared/vscode'
 
 export const Studio: React.FC = () => {
+  const openStudio = () =>
+    sendMessage({ type: MessageFromWebviewType.OPEN_STUDIO })
+
+  const openStudioProfile = () =>
+    sendMessage({ type: MessageFromWebviewType.OPEN_STUDIO_PROFILE })
+
+  const saveStudioToken = () =>
+    sendMessage({ type: MessageFromWebviewType.SAVE_STUDIO_TOKEN })
+
   return (
     <EmptyState>
       <div>
         <h1>
-          Connect to <a href="https://studio.iterative.ai">Studio</a>
+          Connect to <a href={STUDIO_URL}>Studio</a>
         </h1>
         <p>
           To share experiments and plots with collaborators directly from your
@@ -26,30 +36,23 @@ export const Studio: React.FC = () => {
           appearance="primary"
           isNested={false}
           text={'Sign In'}
-          onClick={() =>
-            sendMessage({ type: MessageFromWebviewType.OPEN_STUDIO_IN_BROWSER })
-          }
+          onClick={openStudio}
         />
         <Button
           appearance="secondary"
           isNested={true}
           text={'Get Token'}
-          onClick={() =>
-            sendMessage({ type: MessageFromWebviewType.OPEN_STUDIO_PROFILE })
-          }
+          onClick={openStudioProfile}
         />
         <Button
           appearance="secondary"
           isNested={true}
           text={'Save'}
-          onClick={() =>
-            sendMessage({ type: MessageFromWebviewType.SAVE_STUDIO_TOKEN })
-          }
+          onClick={saveStudioToken}
         />
         <p>
           {"Don't Have an account?\n"}
-
-          <a href="https://studio.iterative.ai">Sign-Up</a>
+          <a href={STUDIO_URL}>Sign-Up</a>
         </p>
       </div>
     </EmptyState>

@@ -19,7 +19,7 @@ export enum MessageFromWebviewType {
   FOCUS_SORTS_TREE = 'focus-sorts-tree',
   OPEN_PARAMS_FILE_TO_THE_SIDE = 'open-params-file-to-the-side',
   OPEN_PLOTS_WEBVIEW = 'open-plots-webview',
-  OPEN_STUDIO_IN_BROWSER = 'open-studio-in-browser',
+  OPEN_STUDIO = 'open-studio',
   OPEN_STUDIO_PROFILE = 'open-studio-in-profile',
   REMOVE_COLUMN_SORT = 'remove-column-sort',
   REMOVE_EXPERIMENT = 'remove-experiment',
@@ -199,7 +199,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.SHOW_SCM_PANEL }
   | { type: MessageFromWebviewType.INSTALL_DVC }
   | { type: MessageFromWebviewType.SETUP_WORKSPACE }
-  | { type: MessageFromWebviewType.OPEN_STUDIO_IN_BROWSER }
+  | { type: MessageFromWebviewType.OPEN_STUDIO }
   | { type: MessageFromWebviewType.OPEN_STUDIO_PROFILE }
   | { type: MessageFromWebviewType.SAVE_STUDIO_TOKEN }
 

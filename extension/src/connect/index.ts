@@ -1,12 +1,14 @@
-import { Uri, env } from 'vscode'
+import { validateTokenInput } from './input'
+import { STUDIO_URL } from './webview/contract'
 import { Resource } from '../resourceLocator'
 import { ViewKey } from '../webview/constants'
 import { MessageFromWebview, MessageFromWebviewType } from '../webview/contract'
 import { BaseRepository } from '../webview/repository'
 import { Logger } from '../common/logger'
-import { getInput } from '../vscode/inputBox'
+import { getInput, getValidInput } from '../vscode/inputBox'
 import { Title } from '../vscode/title'
 import { ConfigKey, setUserConfigValue } from '../vscode/config'
+import { openUrl } from '../vscode/external'
 
 export class Connect extends BaseRepository<undefined> {
   public readonly viewKey = ViewKey.CONNECT
@@ -25,14 +27,14 @@ export class Connect extends BaseRepository<undefined> {
 
   private handleMessageFromWebview(message: MessageFromWebview) {
     switch (message.type) {
-      case MessageFromWebviewType.OPEN_STUDIO_IN_BROWSER:
-        return env.openExternal(Uri.parse('https://studio.iterative.ai'))
+      case MessageFromWebviewType.OPEN_STUDIO:
+        return openUrl(STUDIO_URL)
       case MessageFromWebviewType.OPEN_STUDIO_PROFILE:
         return this.openStudioProfile()
       case MessageFromWebviewType.SAVE_STUDIO_TOKEN:
         return this.saveStudioToken()
       default:
-        Logger.error('method not implemented')
+        Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
   }
 
@@ -41,13 +43,14 @@ export class Connect extends BaseRepository<undefined> {
     if (!username) {
       return
     }
-    return env.openExternal(
-      Uri.parse(`https://studio.iterative.ai/user/${username}/profile`)
-    )
+    return openUrl(`${STUDIO_URL}/user/${username}/profile`)
   }
 
   private async saveStudioToken() {
-    const token = await getInput(Title.ENTER_STUDIO_TOKEN)
+    const token = await getValidInput(
+      Title.ENTER_STUDIO_TOKEN,
+      validateTokenInput
+    )
     if (!token) {
       return
     }
