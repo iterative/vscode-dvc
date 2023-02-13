@@ -24,6 +24,7 @@ import { ConfigKey, setConfigValue } from '../../vscode/config'
 import { Toast } from '../../vscode/toast'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { stopWorkspaceExperiment } from '../processExecution'
+import { AvailableCommands } from '../../commands/internal'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
@@ -39,6 +40,8 @@ export class WebviewMessages {
     dvcRoot: string,
     ...ids: string[]
   ) => Promise<string | undefined>
+  private readonly hasStages: () => Promise<string>
+  private readonly addStage: () => Promise<boolean>
 
   constructor(
     dvcRoot: string,
@@ -51,7 +54,9 @@ export class WebviewMessages {
     stopQueuedExperiments: (
       dvcRoot: string,
       ...ids: string[]
-    ) => Promise<string | undefined>
+    ) => Promise<string | undefined>,
+    hasStages: () => Promise<string>,
+    addStage: () => Promise<boolean>
   ) {
     this.dvcRoot = dvcRoot
     this.experiments = experiments
@@ -61,11 +66,14 @@ export class WebviewMessages {
     this.notifyChanged = notifyChanged
     this.selectColumns = selectColumns
     this.stopQueuedExperiments = stopQueuedExperiments
+    this.hasStages = hasStages
+    this.addStage = addStage
   }
 
-  public sendWebviewMessage() {
+  public async sendWebviewMessage() {
     const webview = this.getWebview()
-    void webview?.show(this.getWebviewData())
+    const hasConfig = !!(await this.hasStages())
+    void webview?.show(this.getWebviewData(hasConfig))
   }
 
   public handleMessageFromWebview(message: MessageFromWebview) {
@@ -166,12 +174,16 @@ export class WebviewMessages {
         return this.stopExperiments(message.payload)
       }
 
+      case MessageFromWebviewType.ADD_CONFIGURATION: {
+        return this.addStage()
+      }
+
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
   }
 
-  private getWebviewData() {
+  private getWebviewData(hasConfig: boolean) {
     return {
       changes: this.columns.getChanges(),
       columnOrder: this.columns.getColumnOrder(),
@@ -183,6 +195,7 @@ export class WebviewMessages {
       filters: this.experiments.getFilterPaths(),
       hasCheckpoints: this.checkpoints.hasCheckpoints(),
       hasColumns: this.columns.hasNonDefaultColumns(),
+      hasConfig: hasConfig,
       hasRunningExperiment: this.experiments.hasRunningExperiment(),
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()

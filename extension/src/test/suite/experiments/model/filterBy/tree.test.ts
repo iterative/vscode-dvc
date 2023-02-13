@@ -124,6 +124,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         filters: [accuracyPath],
         hasCheckpoints: true,
         hasColumns: true,
+        hasConfig: true,
         hasRunningExperiment: true,
         rows: filteredRows,
         sorts: []
@@ -155,6 +156,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         filters: [],
         hasCheckpoints: true,
         hasColumns: true,
+        hasConfig: true,
         hasRunningExperiment: true,
         rows: [workspace, main],
         sorts: []
@@ -485,6 +487,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         filters: ['starred'],
         hasCheckpoints: true,
         hasColumns: true,
+        hasConfig: true,
         hasRunningExperiment: true,
         rows: filteredRows,
         sorts: []

@@ -21,6 +21,7 @@ export const tableDataInitialState: TableDataState = {
   filters: [],
   hasCheckpoints: false,
   hasColumns: false,
+  hasConfig: false,
   hasData: false,
   hasRunningExperiment: false,
   rows: [],
