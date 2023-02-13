@@ -3,18 +3,18 @@ import React from 'react'
 
 import './test-vscode-styles.scss'
 import '../shared/style.scss'
-import { Studio } from '../connect/components/Studio'
+import { App } from '../connect/components/App'
 
 export default {
   args: {
     data: {}
   },
-  component: Studio,
-  title: 'Setup'
+  component: App,
+  title: 'Connect'
 } as Meta
 
 const Template: Story = () => {
-  return <Studio />
+  return <App />
 }
 
-export const ConnectToStudio = Template.bind({})
+export const Studio = Template.bind({})
