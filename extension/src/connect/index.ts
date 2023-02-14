@@ -31,7 +31,7 @@ export class Connect extends BaseRepository<undefined> {
     void this.setContext().then(() => this.deferred.resolve())
 
     this.dispose.track(
-      this.secrets.onDidChange(e => {
+      context.secrets.onDidChange(e => {
         if (e.key !== STUDIO_ACCESS_TOKEN_KEY) {
           return
         }
@@ -96,7 +96,8 @@ export class Connect extends BaseRepository<undefined> {
   }
 
   private storeSecret(key: string, value: string) {
-    return this.secrets.store(key, value)
+    const secrets = this.getSecrets()
+    return secrets.store(key, value)
   }
 
   private removeSecret(key: string) {
