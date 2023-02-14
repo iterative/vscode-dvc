@@ -1,6 +1,6 @@
 import { ExtensionContext, SecretStorage } from 'vscode'
 import { validateTokenInput } from './inputBox'
-import { isStudioAccessToken } from './token'
+import { STUDIO_ACCESS_TOKEN_KEY, isStudioAccessToken } from './token'
 import { STUDIO_URL } from './webview/contract'
 import { Resource } from '../resourceLocator'
 import { ViewKey } from '../webview/constants'
@@ -11,8 +11,6 @@ import { getInput, getValidInput } from '../vscode/inputBox'
 import { Title } from '../vscode/title'
 import { openUrl } from '../vscode/external'
 import { ContextKey, setContextValue } from '../vscode/context'
-
-const STUDIO_ACCESS_TOKEN = 'dvc.studioAccessToken'
 
 export class Connect extends BaseRepository<undefined> {
   public readonly viewKey = ViewKey.CONNECT
@@ -30,11 +28,11 @@ export class Connect extends BaseRepository<undefined> {
       )
     )
 
-    void this.setContext()
+    void this.setContext().then(() => this.deferred.resolve())
 
     this.dispose.track(
       this.secrets.onDidChange(e => {
-        if (e.key !== STUDIO_ACCESS_TOKEN) {
+        if (e.key !== STUDIO_ACCESS_TOKEN_KEY) {
           return
         }
         return this.setContext()
@@ -45,7 +43,7 @@ export class Connect extends BaseRepository<undefined> {
   public sendInitialWebviewData(): void {}
 
   public removeStudioAccessToken() {
-    return this.secrets.delete(STUDIO_ACCESS_TOKEN)
+    return this.removeSecret(STUDIO_ACCESS_TOKEN_KEY)
   }
 
   private handleMessageFromWebview(message: MessageFromWebview) {
@@ -79,16 +77,34 @@ export class Connect extends BaseRepository<undefined> {
       return
     }
 
-    return this.secrets.store(STUDIO_ACCESS_TOKEN, token)
+    return this.storeSecret(STUDIO_ACCESS_TOKEN_KEY, token)
   }
 
   private async setContext() {
-    const storedToken = await this.secrets.get(STUDIO_ACCESS_TOKEN)
+    const storedToken = await this.getSecret(STUDIO_ACCESS_TOKEN_KEY)
     if (isStudioAccessToken(storedToken)) {
       this.webview?.dispose()
       return setContextValue(ContextKey.STUDIO_CONNECTED, true)
     }
 
     return setContextValue(ContextKey.STUDIO_CONNECTED, false)
+  }
+
+  private getSecret(key: string) {
+    const secrets = this.getSecrets()
+    return secrets.get(key)
+  }
+
+  private storeSecret(key: string, value: string) {
+    return this.secrets.store(key, value)
+  }
+
+  private removeSecret(key: string) {
+    const secrets = this.getSecrets()
+    return secrets.delete(key)
+  }
+
+  private getSecrets() {
+    return this.secrets
   }
 }
