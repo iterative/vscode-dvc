@@ -35,12 +35,12 @@ suite('Connect Test Suite', () => {
     return closeAllEditors()
   })
 
-  const buildConnect = async (mockSecrets?: SecretStorage) => {
+  const buildConnect = async (mockSecretStorage?: SecretStorage) => {
     const resourceLocator = buildResourceLocator(disposable)
     const connect = disposable.track(
       new Connect(
         {
-          secrets: mockSecrets || { onDidChange: stub() }
+          secrets: mockSecretStorage || { get: stub(), onDidChange: stub() }
         } as unknown as ExtensionContext,
         resourceLocator.dvcIcon
       )
@@ -109,18 +109,21 @@ suite('Connect Test Suite', () => {
         return Promise.resolve(undefined)
       }
 
-      const secretsChangedEvent = new Promise(resolve =>
-        onDidChange(() => resolve(undefined))
-      )
-
-      const { connect, mockMessageReceived } = await buildConnect({
+      const mockSecretStorage = {
         delete: stub(),
         get: mockGetSecret,
         onDidChange,
         store: mockStoreSecret
-      })
-      await connect.isReady()
+      }
 
+      const secretsChangedEvent = new Promise(resolve =>
+        onDidChange(() => resolve(undefined))
+      )
+
+      const { connect, mockMessageReceived } = await buildConnect(
+        mockSecretStorage
+      )
+      await connect.isReady()
       expect(executeCommandSpy).to.be.calledWithExactly(
         'setContext',
         ContextKey.STUDIO_CONNECTED,
@@ -128,6 +131,9 @@ suite('Connect Test Suite', () => {
       )
 
       const mockInputBox = stub(window, 'showInputBox').resolves(mockToken)
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(Connect.prototype as any, 'getSecrets').returns(mockSecretStorage)
 
       mockMessageReceived.fire({
         type: MessageFromWebviewType.SAVE_STUDIO_TOKEN

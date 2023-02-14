@@ -1,4 +1,4 @@
-import { ExtensionContext, SecretStorage } from 'vscode'
+import { commands, ExtensionContext, SecretStorage } from 'vscode'
 import { validateTokenInput } from './inputBox'
 import { STUDIO_ACCESS_TOKEN_KEY, isStudioAccessToken } from './token'
 import { STUDIO_URL } from './webview/contract'
@@ -11,6 +11,7 @@ import { getInput, getValidInput } from '../vscode/inputBox'
 import { Title } from '../vscode/title'
 import { openUrl } from '../vscode/external'
 import { ContextKey, setContextValue } from '../vscode/context'
+import { RegisteredCommands } from '../commands/external'
 
 export class Connect extends BaseRepository<undefined> {
   public readonly viewKey = ViewKey.CONNECT
@@ -46,28 +47,7 @@ export class Connect extends BaseRepository<undefined> {
     return this.removeSecret(STUDIO_ACCESS_TOKEN_KEY)
   }
 
-  private handleMessageFromWebview(message: MessageFromWebview) {
-    switch (message.type) {
-      case MessageFromWebviewType.OPEN_STUDIO:
-        return openUrl(STUDIO_URL)
-      case MessageFromWebviewType.OPEN_STUDIO_PROFILE:
-        return this.openStudioProfile()
-      case MessageFromWebviewType.SAVE_STUDIO_TOKEN:
-        return this.saveStudioToken()
-      default:
-        Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
-    }
-  }
-
-  private async openStudioProfile() {
-    const username = await getInput(Title.ENTER_STUDIO_USERNAME)
-    if (!username) {
-      return
-    }
-    return openUrl(`${STUDIO_URL}/user/${username}/profile`)
-  }
-
-  private async saveStudioToken() {
+  public async saveStudioAccessToken() {
     const token = await getValidInput(
       Title.ENTER_STUDIO_TOKEN,
       validateTokenInput,
@@ -78,6 +58,33 @@ export class Connect extends BaseRepository<undefined> {
     }
 
     return this.storeSecret(STUDIO_ACCESS_TOKEN_KEY, token)
+  }
+
+  private handleMessageFromWebview(message: MessageFromWebview) {
+    switch (message.type) {
+      case MessageFromWebviewType.OPEN_STUDIO:
+        return this.openStudio()
+      case MessageFromWebviewType.OPEN_STUDIO_PROFILE:
+        return this.openStudioProfile()
+      case MessageFromWebviewType.SAVE_STUDIO_TOKEN:
+        return commands.executeCommand(
+          RegisteredCommands.ADD_STUDIO_ACCESS_TOKEN
+        )
+      default:
+        Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
+    }
+  }
+
+  private openStudio() {
+    return openUrl(STUDIO_URL)
+  }
+
+  private async openStudioProfile() {
+    const username = await getInput(Title.ENTER_STUDIO_USERNAME)
+    if (!username) {
+      return
+    }
+    return openUrl(`${STUDIO_URL}/user/${username}/profile`)
   }
 
   private async setContext() {

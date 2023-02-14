@@ -113,6 +113,11 @@
         "icon": "$(star-full)"
       },
       {
+        "title": "%command.addStudioAccessToken%",
+        "command": "dvc.addStudioAccessToken",
+        "category": "DVC"
+      },
+      {
         "title": "%command.addTarget%",
         "command": "dvc.addTarget",
         "category": "DVC",
@@ -630,6 +635,10 @@
         },
         {
           "command": "dvc.addStarredExperimentsTableSort",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.addStudioAccessToken",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {

@@ -98,5 +98,6 @@ export enum RegisteredCommands {
   SELECT_FOCUSED_PROJECTS = 'dvc.selectFocusedProjects',
 
   CONNECT_SHOW = 'dvc.showConnect',
+  ADD_STUDIO_ACCESS_TOKEN = 'dvc.addStudioAccessToken',
   REMOVE_STUDIO_ACCESS_TOKEN = 'dvc.removeStudioAccessToken'
 }
