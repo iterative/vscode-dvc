@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, {
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState
+} from 'react'
 import { useSelector } from 'react-redux'
 import {
   Column,
@@ -15,7 +21,6 @@ import {
   getExpandedRowModel,
   ColumnSizingState
 } from '@tanstack/react-table'
-import debounce from 'lodash.debounce'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { Table } from './table/Table'
 import styles from './table/styles.module.scss'
@@ -98,17 +103,19 @@ const getColumns = (columns: Column[]) => {
 
 const reportResizedColumn = (
   state: ColumnSizingState,
-  columnWidths: ColumnSizingState
+  columnWidths: ColumnSizingState,
+  debounceTimer: MutableRefObject<number>
 ) => {
   for (const id of Object.keys(state)) {
     const width = state[id]
     if (width !== columnWidths[id]) {
-      debounce(() => {
+      window.clearTimeout(debounceTimer.current)
+      debounceTimer.current = window.setTimeout(() => {
         sendMessage({
           payload: { id, width },
           type: MessageFromWebviewType.RESIZE_COLUMN
         })
-      }, 1000)()
+      }, 500)
     }
   }
 }
@@ -133,9 +140,10 @@ export const ExperimentsTable: React.FC = () => {
   const [columnSizing, setColumnSizing] =
     useState<ColumnSizingState>(columnWidths)
   const [columnOrder, setColumnOrder] = useState(initialColumnOrder)
+  const resizeTimeout = useRef(0)
 
   useEffect(() => {
-    reportResizedColumn(columnSizing, columnWidths)
+    reportResizedColumn(columnSizing, columnWidths, resizeTimeout)
   }, [columnSizing, columnWidths])
 
   useEffect(() => {
