@@ -73,6 +73,7 @@ export const buildExperiments = (
       updatesPaused,
       resourceLocator,
       buildMockMemento(),
+      jest.fn(),
       mockExperimentsData,
       buildMockData<FileSystemData>()
     )

@@ -48,6 +48,7 @@ export const buildPlots = async (
       updatesPaused,
       resourceLocator,
       buildMockMemento(),
+      jest.fn(),
       buildMockData<ExperimentsData>(),
       buildMockData<FileSystemData>()
     )

@@ -1150,6 +1150,7 @@ suite('Experiments Test Suite', () => {
           updatesPaused,
           resourceLocator,
           buildMockMemento(),
+          jest.fn(),
           buildMockData<ExperimentsData>(),
           buildMockData<FileSystemData>()
         )
@@ -1366,6 +1367,7 @@ suite('Experiments Test Suite', () => {
           {} as EventEmitter<boolean>,
           {} as ResourceLocator,
           mockMemento,
+          jest.fn(),
           buildMockData<ExperimentsData>(),
           buildMockData<FileSystemData>()
         )
@@ -1543,6 +1545,7 @@ suite('Experiments Test Suite', () => {
           {} as EventEmitter<boolean>,
           {} as ResourceLocator,
           mockMemento,
+          jest.fn(),
           buildMockData<ExperimentsData>(),
           buildMockData<FileSystemData>()
         )

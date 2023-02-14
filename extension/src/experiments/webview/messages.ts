@@ -24,7 +24,6 @@ import { ConfigKey, setConfigValue } from '../../vscode/config'
 import { Toast } from '../../vscode/toast'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { stopWorkspaceExperiment } from '../processExecution'
-import { AvailableCommands } from '../../commands/internal'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
@@ -40,7 +39,11 @@ export class WebviewMessages {
     dvcRoot: string,
     ...ids: string[]
   ) => Promise<string | undefined>
+
   private readonly hasStages: () => Promise<string>
+
+  private hasConfig = false
+
   private readonly addStage: () => Promise<boolean>
 
   constructor(
@@ -67,13 +70,17 @@ export class WebviewMessages {
     this.selectColumns = selectColumns
     this.stopQueuedExperiments = stopQueuedExperiments
     this.hasStages = hasStages
+    void this.changeHasConfig()
     this.addStage = addStage
   }
 
-  public async sendWebviewMessage() {
+  public async changeHasConfig() {
+    this.hasConfig = !!(await this.hasStages())
+  }
+
+  public sendWebviewMessage() {
     const webview = this.getWebview()
-    const hasConfig = !!(await this.hasStages())
-    void webview?.show(this.getWebviewData(hasConfig))
+    void webview?.show(this.getWebviewData())
   }
 
   public handleMessageFromWebview(message: MessageFromWebview) {
@@ -175,7 +182,7 @@ export class WebviewMessages {
       }
 
       case MessageFromWebviewType.ADD_CONFIGURATION: {
-        return this.addStage()
+        return this.addConfiguration()
       }
 
       default:
@@ -183,7 +190,7 @@ export class WebviewMessages {
     }
   }
 
-  private getWebviewData(hasConfig: boolean) {
+  private getWebviewData() {
     return {
       changes: this.columns.getChanges(),
       columnOrder: this.columns.getColumnOrder(),
@@ -195,11 +202,16 @@ export class WebviewMessages {
       filters: this.experiments.getFilterPaths(),
       hasCheckpoints: this.checkpoints.hasCheckpoints(),
       hasColumns: this.columns.hasNonDefaultColumns(),
-      hasConfig: hasConfig,
+      hasConfig: this.hasConfig,
       hasRunningExperiment: this.experiments.hasRunningExperiment(),
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()
     }
+  }
+
+  private async addConfiguration() {
+    await this.addStage()
+    await this.changeHasConfig()
   }
 
   private async setMaxTableHeadDepth() {
