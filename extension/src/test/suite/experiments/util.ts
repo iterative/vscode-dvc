@@ -65,6 +65,7 @@ export const buildExperiments = (
   const mockExperimentsData = buildMockData<ExperimentsData>(
     mockUpdateExperimentsData
   )
+  const mockCheckOrAddPipeline = stub()
 
   const experiments = disposer.track(
     new Experiments(
@@ -73,7 +74,7 @@ export const buildExperiments = (
       updatesPaused,
       resourceLocator,
       buildMockMemento(),
-      () => Promise.resolve(true),
+      mockCheckOrAddPipeline,
       mockExperimentsData,
       buildMockData<FileSystemData>()
     )
@@ -95,6 +96,7 @@ export const buildExperiments = (
     gitReader,
     internalCommands,
     messageSpy,
+    mockCheckOrAddPipeline,
     mockCheckSignalFile,
     mockExperimentShow,
     mockGetCommitMessages,

@@ -181,6 +181,62 @@ suite('Experiments Test Suite', () => {
 
       expect(windowSpy).not.to.have.been.called
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should set hasConfig to false if there are no stages', async () => {
+      stub(DvcReader.prototype, 'listStages').resolves('')
+
+      const { experiments, messageSpy } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
+
+      await experiments.showWebview()
+
+      const expectedTableData: TableData = {
+        changes: workspaceChangesFixture,
+        columnOrder: columnsOrderFixture,
+        columnWidths: {},
+        columns: columnsFixture,
+        filteredCounts: { checkpoints: 0, experiments: 0 },
+        filters: [],
+        hasCheckpoints: true,
+        hasColumns: true,
+        hasConfig: false,
+        hasRunningExperiment: true,
+        rows: rowsFixture,
+        sorts: []
+      }
+
+      expect(messageSpy).to.be.calledWithExactly(expectedTableData)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should set hasConfig to true if there are stages', async () => {
+      stub(DvcReader.prototype, 'listStages').resolves('train')
+
+      const { experiments, messageSpy } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
+
+      await experiments.showWebview()
+
+      const expectedTableData: TableData = {
+        changes: workspaceChangesFixture,
+        columnOrder: columnsOrderFixture,
+        columnWidths: {},
+        columns: columnsFixture,
+        filteredCounts: { checkpoints: 0, experiments: 0 },
+        filters: [],
+        hasCheckpoints: true,
+        hasColumns: true,
+        hasConfig: true,
+        hasRunningExperiment: true,
+        rows: rowsFixture,
+        sorts: []
+      }
+
+      expect(messageSpy).to.be.calledWithExactly(expectedTableData)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 
   describe('handleMessageFromWebview', () => {
@@ -197,6 +253,7 @@ suite('Experiments Test Suite', () => {
         experimentsModel,
         internalCommands,
         dvcExecutor,
+        mockCheckOrAddPipeline,
         messageSpy
       } = buildExperiments(disposable, expShowFixture)
       const mockExecuteCommand = stub(
@@ -213,6 +270,7 @@ suite('Experiments Test Suite', () => {
         experiments,
         experimentsModel,
         messageSpy,
+        mockCheckOrAddPipeline,
         mockExecuteCommand
       }
     }
@@ -1126,6 +1184,23 @@ suite('Experiments Test Suite', () => {
       )
       expect(mockProcessExists).to.be.calledWithExactly(mockPid)
       expect(mockStopProcesses).to.be.calledWithExactly([mockPid])
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a message to add a configuration', async () => {
+      stub(DvcReader.prototype, 'listStages').resolves('')
+
+      const { experiments, mockCheckOrAddPipeline, messageSpy } =
+        setupExperimentsAndMockCommands()
+
+      const webview = await experiments.showWebview()
+      messageSpy.resetHistory()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.ADD_CONFIGURATION
+      })
+
+      expect(mockCheckOrAddPipeline).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 

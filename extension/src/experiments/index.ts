@@ -120,6 +120,7 @@ export class Experiments extends BaseRepository<TableData> {
     )
 
     this.internalCommands = internalCommands
+    this.addStage = addStage
 
     this.onDidChangeIsParamsFileFocused = this.paramsFileFocused.event
     this.onDidChangeExperiments = this.experimentsChanged.event
@@ -171,7 +172,6 @@ export class Experiments extends BaseRepository<TableData> {
     this.webviewMessages = this.createWebviewMessageHandler()
     this.setupInitialData()
     this.watchActiveEditor()
-    this.addStage = addStage
   }
 
   public update() {
