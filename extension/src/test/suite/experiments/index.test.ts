@@ -76,6 +76,7 @@ import { AvailableCommands } from '../../../commands/internal'
 import { Setup } from '../../../setup'
 import * as FileSystem from '../../../fileSystem'
 import * as ProcessExecution from '../../../processExecution'
+import { DvcReader } from '../../../cli/dvc/reader'
 
 const { openFileInEditor } = FileSystem
 
@@ -127,6 +128,8 @@ suite('Experiments Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the experiment webview visible', async () => {
+      stub(DvcReader.prototype, 'listStages').resolves('train')
+
       const { experiments, messageSpy } = buildExperiments(
         disposable,
         expShowFixture
@@ -789,6 +792,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to select columns', async () => {
+      stub(DvcReader.prototype, 'listStages').resolves('train')
+
       const { columnsModel, experiments, messageSpy } =
         setupExperimentsAndMockCommands()
 
@@ -1150,7 +1155,7 @@ suite('Experiments Test Suite', () => {
           updatesPaused,
           resourceLocator,
           buildMockMemento(),
-          jest.fn(),
+          () => Promise.resolve(true),
           buildMockData<ExperimentsData>(),
           buildMockData<FileSystemData>()
         )
@@ -1367,7 +1372,7 @@ suite('Experiments Test Suite', () => {
           {} as EventEmitter<boolean>,
           {} as ResourceLocator,
           mockMemento,
-          jest.fn(),
+          () => Promise.resolve(true),
           buildMockData<ExperimentsData>(),
           buildMockData<FileSystemData>()
         )
@@ -1545,7 +1550,7 @@ suite('Experiments Test Suite', () => {
           {} as EventEmitter<boolean>,
           {} as ResourceLocator,
           mockMemento,
-          jest.fn(),
+          () => Promise.resolve(true),
           buildMockData<ExperimentsData>(),
           buildMockData<FileSystemData>()
         )

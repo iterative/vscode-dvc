@@ -41,6 +41,7 @@ import {
   FilterItem
 } from '../../../../../experiments/model/filterBy/tree'
 import { starredFilter } from '../../../../../experiments/model/filterBy/constants'
+import { DvcReader } from '../../../../../cli/dvc/reader'
 
 suite('Experiments Filter By Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -62,6 +63,8 @@ suite('Experiments Filter By Tree Test Suite', () => {
     })
 
     it('should be able to update the table data by adding and removing a filter', async () => {
+      stub(DvcReader.prototype, 'listStages').resolves('train')
+
       const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.isReady()
@@ -459,6 +462,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
     })
 
     it('should be able to filter to starred experiments', async () => {
+      stub(DvcReader.prototype, 'listStages').resolves('train')
       const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.isReady()
