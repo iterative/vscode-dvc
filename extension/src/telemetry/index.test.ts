@@ -1,24 +1,13 @@
-import { extensions } from 'vscode'
-// eslint-disable-next-line import/default
 import TelemetryReporter from '@vscode/extension-telemetry'
 import { getTelemetryReporter, sendTelemetryEvent } from '.'
 import {
   APPLICATION_INSIGHTS_KEY,
-  EXTENSION_ID,
   IEventNamePropertyMapping
 } from './constants'
 import { getUserId } from './uuid'
 
 const mockedTelemetryReporter = jest.mocked(TelemetryReporter)
 
-const mockedExtensions = jest.mocked(extensions)
-const mockedGetExtension = jest.fn()
-mockedExtensions.getExtension = mockedGetExtension
-const mockedPackageJSON = {
-  id: EXTENSION_ID,
-  name: 'dvc',
-  version: '0.1.0'
-}
 const mockedSendTelemetryEvent = jest.fn()
 const mockedGetUserId = jest.mocked(getUserId)
 
@@ -46,20 +35,12 @@ describe('getTelemetryReporter', () => {
   let telemetryReporter: TelemetryReporter | undefined
 
   it('should create a reporter on the first call', () => {
-    mockedGetExtension.mockReturnValueOnce({
-      packageJSON: mockedPackageJSON
-    })
     telemetryReporter = getTelemetryReporter()
 
     expect(telemetryReporter).toBeDefined()
-    expect(mockedGetExtension).toHaveBeenCalledTimes(1)
-    expect(mockedGetExtension).toHaveBeenCalledWith('iterative.dvc')
     expect(mockedTelemetryReporter).toHaveBeenCalledTimes(1)
     expect(mockedTelemetryReporter).toHaveBeenCalledWith(
-      EXTENSION_ID,
-      mockedPackageJSON.version,
-      APPLICATION_INSIGHTS_KEY,
-      true
+      APPLICATION_INSIGHTS_KEY
     )
   })
 
@@ -68,7 +49,6 @@ describe('getTelemetryReporter', () => {
 
     expect(telemetryReporter).toStrictEqual(sameTelemetryReporter)
     expect(mockedTelemetryReporter).not.toHaveBeenCalled()
-    expect(mockedGetExtension).not.toHaveBeenCalled()
   })
 })
 

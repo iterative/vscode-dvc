@@ -26,16 +26,6 @@ export const getExtensionAPI = async <T>(
   } catch {}
 }
 
-export const getExtensionVersion = <T>(id: string): string | undefined => {
-  const extension = getExtension<T>(id)
-
-  if (!extension) {
-    return
-  }
-
-  return (extension.packageJSON as { version: string }).version
-}
-
 export const isInstalled = (id: string): boolean =>
   !!extensions.all.some(extension => extension.id === id)
 
