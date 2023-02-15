@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.5] - 2023-02-13
+
+### 🚀 New Features and Enhancements
+
+- Add ability to stop non-queue experiments from the table's context menu [#3249](https://github.com/iterative/vscode-dvc/pull/3249) by [@mattseddon](https://github.com/mattseddon)
+- Add the script as a dependency in dvc.yaml [#3257](https://github.com/iterative/vscode-dvc/pull/3257) by [@sroy3](https://github.com/sroy3)
+- Ask the user for the correct command to their script if it is neither a python file or a Jupyter notebook [#3255](https://github.com/iterative/vscode-dvc/pull/3255) by [@sroy3](https://github.com/sroy3)
+- Show the setup instead of original webview if needed (command palette) [#3256](https://github.com/iterative/vscode-dvc/pull/3256) by [@sroy3](https://github.com/sroy3)
+- Replace Show Experiments and Plots buttonwith a Run Experiment button and added icons to sidebar buttons [#3272](https://github.com/iterative/vscode-dvc/pull/3272) by [@sroy3](https://github.com/sroy3)
+- Rename views tree to actions [#3275](https://github.com/iterative/vscode-dvc/pull/3275) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix checkboxes unchecking when user clicks outside the table [#3271](https://github.com/iterative/vscode-dvc/pull/3271) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Add missing telemetry events to onboarding [#3261](https://github.com/iterative/vscode-dvc/pull/3261) by [@mattseddon](https://github.com/mattseddon)
+- Add regression test for `.git` file watcher [#3259](https://github.com/iterative/vscode-dvc/pull/3259) by [@julieg18](https://github.com/julieg18)
+
 ## [0.6.4] - 2023-02-10
 
 ### 🚀 New Features and Enhancements

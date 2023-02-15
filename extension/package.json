@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.6.4",
+  "version": "0.6.5",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -1315,8 +1315,8 @@
           "when": "!dvc.commands.available || dvc.cli.incompatible || !dvc.project.available"
         },
         {
-          "id": "dvc.views.webviews",
-          "name": "Views",
+          "id": "dvc.views.actions",
+          "name": "Actions",
           "when": "true"
         },
         {
@@ -1352,8 +1352,8 @@
     },
     "viewsWelcome": [
       {
-        "view": "dvc.views.webviews",
-        "contents": "[Show Experiments](command:dvc.showExperiments)\n[Show Plots](command:dvc.showPlots)\n[Show Experiments and Plots](command:dvc.showExperimentsAndPlots)"
+        "view": "dvc.views.actions",
+        "contents": "[$(beaker) Show Experiments](command:dvc.showExperiments)\n[$(graph-scatter) Show Plots](command:dvc.showPlots)\n[$(play) Run Experiment](command:dvc.runExperiment)"
       },
       {
         "view": "dvc.views.welcome",
@@ -1591,9 +1591,9 @@
     "clean-webpack-plugin": "4.0.0",
     "copy-webpack-plugin": "11.0.0",
     "fork-ts-checker-webpack-plugin": "7.3.0",
-    "jest": "29.4.1",
-    "jest-environment-node": "29.4.1",
-    "lint-staged": "13.1.0",
+    "jest": "29.4.2",
+    "jest-environment-node": "29.4.2",
+    "lint-staged": "13.1.1",
     "mocha": "10.2.0",
     "mock-require": "3.0.3",
     "process-exists": "4.1.0",
