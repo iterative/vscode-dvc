@@ -54,6 +54,7 @@ import { stopProcesses } from './processExecution'
 import { Flag } from './cli/dvc/constants'
 import { LanguageClient } from './languageClient'
 import { collectRunningExperimentPids } from './experiments/processExecution/collect'
+import { registerPatchCommand } from './patch'
 export class Extension extends Disposable {
   protected readonly internalCommands: InternalCommands
 
@@ -270,6 +271,8 @@ export class Extension extends Disposable {
         }
       ).contributes.walkthroughs[0].id
     )
+
+    registerPatchCommand(this.internalCommands, this.connect)
 
     void showWalkthroughOnFirstUse(env.isNewAppInstall)
     this.dispose.track(recommendRedHatExtensionOnce())

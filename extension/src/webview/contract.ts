@@ -34,6 +34,7 @@ export enum MessageFromWebviewType {
   RESIZE_COLUMN = 'resize-column',
   RESIZE_PLOTS = 'resize-plots',
   SAVE_STUDIO_TOKEN = 'save-studio-token',
+  SHARE_EXPERIMENT_TO_STUDIO = 'share-experiment-to-studio',
   STOP_EXPERIMENT = 'stop-experiment',
   SORT_COLUMN = 'sort-column',
   TOGGLE_EXPERIMENT = 'toggle-experiment',
@@ -134,6 +135,10 @@ export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.STOP_EXPERIMENT
       payload: { id: string; executor?: string | null }[]
+    }
+  | {
+      type: MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO
+      payload: string
     }
   | {
       type: MessageFromWebviewType.REMOVE_COLUMN_SORT

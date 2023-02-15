@@ -45,6 +45,10 @@ export class WebviewMessages {
   private hasConfig = false
 
   private readonly addStage: () => Promise<boolean>
+  private readonly shareExperimentToStudio: (
+    dvcRoot: string,
+    sha: string
+  ) => Promise<void>
 
   constructor(
     dvcRoot: string,
@@ -58,8 +62,10 @@ export class WebviewMessages {
       dvcRoot: string,
       ...ids: string[]
     ) => Promise<string | undefined>,
+
     hasStages: () => Promise<string>,
-    addStage: () => Promise<boolean>
+    addStage: () => Promise<boolean>,
+    shareExperimentToStudio: (dvcRoot: string, sha: string) => Promise<void>
   ) {
     this.dvcRoot = dvcRoot
     this.experiments = experiments
@@ -69,9 +75,12 @@ export class WebviewMessages {
     this.notifyChanged = notifyChanged
     this.selectColumns = selectColumns
     this.stopQueuedExperiments = stopQueuedExperiments
+
     this.hasStages = hasStages
     void this.changeHasConfig()
     this.addStage = addStage
+    this.shareExperimentToStudio = shareExperimentToStudio
+    this.shareExperimentToStudio = shareExperimentToStudio
   }
 
   public async changeHasConfig() {
@@ -184,6 +193,8 @@ export class WebviewMessages {
       case MessageFromWebviewType.ADD_CONFIGURATION: {
         return this.addConfiguration()
       }
+      case MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO:
+        return this.shareExperimentToStudio(this.dvcRoot, message.payload)
 
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)

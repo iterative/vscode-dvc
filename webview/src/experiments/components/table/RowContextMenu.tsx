@@ -168,7 +168,8 @@ const getSingleSelectMenuOptions = (
   depth: number,
   status?: ExperimentStatus,
   starred?: boolean,
-  executor?: string | null
+  executor?: string | null,
+  sha?: string
 ) => {
   const isNotExperimentOrCheckpoint =
     isQueued(status) || isWorkspace || depth <= 0
@@ -197,6 +198,13 @@ const getSingleSelectMenuOptions = (
       'Create new Branch',
       MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT,
       isNotExperimentOrCheckpoint
+    ),
+    experimentMenuOption(
+      sha as string,
+      'Share to Studio',
+      MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO,
+      depth !== 1,
+      !hasRunningExperiment
     ),
     withId(
       'Commit and Share',
@@ -246,7 +254,8 @@ const getContextMenuOptions = (
   selectedRows: Record<string, RowProp | undefined>,
   status?: ExperimentStatus,
   starred?: boolean,
-  executor?: string | null
+  executor?: string | null,
+  sha?: string
 ) => {
   const isFromSelection = !!selectedRows[id]
   const selectedRowsList = Object.values(selectedRows).filter(
@@ -265,7 +274,8 @@ const getContextMenuOptions = (
         depth,
         status,
         starred,
-        executor
+        executor,
+        sha
       )
   )
 }
@@ -274,7 +284,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
   hasRunningExperiment = false,
   projectHasCheckpoints = false,
   row: {
-    original: { status, starred, id, executor },
+    original: { status, starred, id, executor, sha },
     depth
   }
 }) => {
@@ -293,7 +303,8 @@ export const RowContextMenu: React.FC<RowProp> = ({
       selectedRows,
       status,
       starred,
-      executor
+      executor,
+      sha
     )
   }, [
     executor,
@@ -304,7 +315,8 @@ export const RowContextMenu: React.FC<RowProp> = ({
     id,
     projectHasCheckpoints,
     selectedRows,
-    hasRunningExperiment
+    hasRunningExperiment,
+    sha
   ])
 
   return (

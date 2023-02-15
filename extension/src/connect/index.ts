@@ -61,6 +61,10 @@ export class Connect extends BaseRepository<undefined> {
     return this.storeSecret(STUDIO_ACCESS_TOKEN_KEY, token)
   }
 
+  public getStudioAccessToken() {
+    return this.getSecret(STUDIO_ACCESS_TOKEN_KEY)
+  }
+
   private handleMessageFromWebview(message: MessageFromWebview) {
     switch (message.type) {
       case MessageFromWebviewType.OPEN_STUDIO:
@@ -89,7 +93,7 @@ export class Connect extends BaseRepository<undefined> {
   }
 
   private async setContext() {
-    const storedToken = await this.getSecret(STUDIO_ACCESS_TOKEN_KEY)
+    const storedToken = await this.getStudioAccessToken()
     if (isStudioAccessToken(storedToken)) {
       if (this.deferred.state === 'resolved') {
         void showInformation(

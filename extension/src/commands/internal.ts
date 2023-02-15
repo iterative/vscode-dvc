@@ -18,7 +18,7 @@ type Command = (...args: Args) => unknown | Promise<unknown>
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 export const AvailableCommands = Object.assign(
-  {} as const,
+  { FUN: 'fun' } as const,
   CliExecutorCommands,
   CliReaderCommands,
   dvcRunnerCommands,
@@ -28,7 +28,7 @@ export const AvailableCommands = Object.assign(
   typeof CliReaderCommands &
   typeof dvcRunnerCommands &
   typeof GitExecutorCommands &
-  typeof GitReaderCommands
+  typeof GitReaderCommands & { FUN: 'fun' }
 export type CommandId =
   (typeof AvailableCommands)[keyof typeof AvailableCommands]
 

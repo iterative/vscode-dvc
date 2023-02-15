@@ -8,6 +8,7 @@ import { isDirectory } from '../../fileSystem'
 
 export const autoRegisteredCommands = {
   GIT_GET_COMMIT_MESSAGES: 'getCommitMessages',
+  GIT_GET_REMOTE_URL: 'getRemoteUrl',
   GIT_GET_REPOSITORY_ROOT: 'getGitRepositoryRoot',
   GIT_HAS_CHANGES: 'hasChanges',
   GIT_LIST_UNTRACKED: 'listUntracked'
@@ -52,6 +53,15 @@ export class GitReader extends GitCli {
       Flag.PRETTY_FORMAT_COMMIT_MESSAGE,
       Flag.SEPARATE_WITH_NULL
     )
+    try {
+      return await this.executeProcess(options)
+    } catch {
+      return ''
+    }
+  }
+
+  public async getRemoteUrl(cwd: string): Promise<string> {
+    const options = getOptions(cwd, Command.LS_REMOTE, Flag.GET_URL)
     try {
       return await this.executeProcess(options)
     } catch {
