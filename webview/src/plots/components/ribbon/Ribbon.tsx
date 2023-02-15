@@ -1,6 +1,6 @@
 import cx from 'classnames'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import React, { useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useInView } from 'react-intersection-observer'
 import styles from './styles.module.scss'
@@ -26,11 +26,24 @@ export const Ribbon: React.FC = () => {
     (state: PlotsState) => state.webview.selectedRevisions
   )
 
+  const changeRibbonHeight = useCallback(
+    () =>
+      measurementsRef.current &&
+      dispatch(update(measurementsRef.current.getBoundingClientRect().height)),
+    [dispatch]
+  )
+
   useEffect(() => {
-    if (measurementsRef.current) {
-      dispatch(update(measurementsRef.current.getBoundingClientRect().height))
+    changeRibbonHeight()
+  }, [revisions, changeRibbonHeight])
+
+  useEffect(() => {
+    window.addEventListener('resize', changeRibbonHeight)
+
+    return () => {
+      window.removeEventListener('resize', changeRibbonHeight)
     }
-  }, [revisions, dispatch])
+  }, [changeRibbonHeight])
 
   const removeRevision = (revision: string) => {
     sendMessage({
