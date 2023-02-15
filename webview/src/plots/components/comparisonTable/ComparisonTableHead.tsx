@@ -27,6 +27,7 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
   const draggedId = useSelector(
     (state: PlotsState) => state.dragAndDrop.draggedRef?.itemId
   )
+  const ribbonHeight = useSelector((state: PlotsState) => state.ribbon.height)
 
   const items = columns.map(({ revision, displayColor, group }) => {
     const isPinned = revision === pinnedColumn
@@ -38,6 +39,7 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
           [styles.pinnedColumnHeader]: isPinned,
           [styles.draggedColumn]: draggedId === revision
         })}
+        style={{ top: ribbonHeight - 4 }} // 4 is equal to the gap in the comparison table
       >
         <ComparisonTableHeader
           isPinned={isPinned}
