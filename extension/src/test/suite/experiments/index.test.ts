@@ -548,6 +548,31 @@ suite('Experiments Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should handle a message to share an experiment to Studio', async () => {
+      const { experiments, internalCommands } = buildExperiments(disposable)
+      await experiments.isReady()
+
+      const mockExpId = 'exp-12345'
+      const mockExecuteCommand = stub(
+        internalCommands,
+        'executeCommand'
+      ).resolves(true)
+
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        payload: mockExpId,
+        type: MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO
+      })
+
+      expect(mockExecuteCommand).to.be.calledWithExactly(
+        AvailableCommands.EXP_PUSH,
+        dvcDemoPath,
+        mockExpId
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should handle a message to share an experiment as a new branch', async () => {
       const { experiments } = buildExperiments(disposable)
       await experiments.isReady()

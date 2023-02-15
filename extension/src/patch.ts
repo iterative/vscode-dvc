@@ -12,10 +12,10 @@ import { Connect } from './connect'
 import { Args, ExperimentFlag } from './cli/dvc/constants'
 import { Toast } from './vscode/toast'
 
-const STUDIO_ENDPOINT = 'https://studio.iterative.ai/api/live'
+export const STUDIO_ENDPOINT = 'https://studio.iterative.ai/api/live'
 
 const getExperimentDetails = (
-  shaToShare: string,
+  name: string,
   repoUrl: string,
   expData: ExperimentsOutput
 ):
@@ -28,22 +28,27 @@ const getExperimentDetails = (
       plots: {}
       repo_url: string
     }
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   | undefined => {
   for (const [sha, experimentsObject] of Object.entries(
     omit(expData, EXPERIMENT_WORKSPACE_ID)
   )) {
-    const experiment = experimentsObject[shaToShare]
+    for (const experiment of Object.values(experimentsObject)) {
+      if (experiment.data?.name !== name) {
+        continue
+      }
 
-    if (experiment?.data) {
-      const { metrics, params, name } = experiment?.data
-      return {
-        baseline_sha: sha,
-        client: 'vscode',
-        metrics,
-        name: name as string,
-        params,
-        plots: {},
-        repo_url: repoUrl
+      if (experiment?.data) {
+        const { metrics, params, name } = experiment?.data
+        return {
+          baseline_sha: sha,
+          client: 'vscode',
+          metrics,
+          name,
+          params,
+          plots: {},
+          repo_url: repoUrl
+        }
       }
     }
   }
@@ -54,9 +59,9 @@ export const registerPatchCommand = (
   connect: Connect
 ) =>
   internalCommands.registerCommand(
-    AvailableCommands.FUN,
+    AvailableCommands.EXP_PUSH,
     async (...args: Args) => {
-      const [dvcRoot, sha] = args
+      const [dvcRoot, name] = args
       const studioAccessToken = await connect.getStudioAccessToken()
       if (!studioAccessToken) {
         return commands.executeCommand(RegisteredCommands.CONNECT_SHOW)
@@ -74,11 +79,11 @@ export const registerPatchCommand = (
         )
       ])
 
-      const experimentDetails = getExperimentDetails(sha, repoUrl, expData)
+      const experimentDetails = getExperimentDetails(name, repoUrl, expData)
 
       if (!experimentDetails) {
         return Toast.showError(
-          'Could not share experiment, unable to locate the required data'
+          'Failed to share experiment, unable to locate the required data'
         )
       }
 
@@ -87,17 +92,17 @@ export const registerPatchCommand = (
         'Content-type': 'application/json'
       }
 
-      const { metrics, params, plots, ...rest } = experimentDetails
+      const { metrics, params, plots, ...body } = experimentDetails
 
       await fetch(STUDIO_ENDPOINT, {
-        body: JSON.stringify({ ...rest, type: 'start' }),
+        body: JSON.stringify({ ...body, type: 'start' }),
         headers,
         method: 'POST'
       })
 
       await fetch(STUDIO_ENDPOINT, {
         body: JSON.stringify({
-          ...rest,
+          ...body,
           metrics,
           params,
           plots,
@@ -109,7 +114,7 @@ export const registerPatchCommand = (
       })
 
       await fetch(STUDIO_ENDPOINT, {
-        body: JSON.stringify({ ...rest, type: 'done' }),
+        body: JSON.stringify({ ...body, type: 'done' }),
         headers,
         method: 'POST'
       })

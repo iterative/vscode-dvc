@@ -582,11 +582,11 @@ export class Experiments extends BaseRepository<TableData> {
           this.dvcRoot
         ),
       () => this.addStage(),
-      (dvcRoot: string, sha: string) =>
+      (dvcRoot: string, id: string) =>
         this.internalCommands.executeCommand(
-          AvailableCommands.FUN,
+          AvailableCommands.EXP_PUSH,
           dvcRoot,
-          sha
+          id
         )
     )
 
