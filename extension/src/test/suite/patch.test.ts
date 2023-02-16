@@ -1,3 +1,4 @@
+import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { restore, stub } from 'sinon'
 import { expect } from 'chai'
@@ -51,7 +52,7 @@ suite('Patch Test Suite', () => {
       expect(mockExpShow).to.be.calledOnce
       expect(mockFetch).to.be.calledThrice
 
-      const { metrics, params, name } = expShowFixture[
+      const { metrics, name, params } = expShowFixture[
         '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'
       ]['4fb124aebddb2adf1545030907687fa9a4c80e70'].data as ExperimentFields
 
@@ -77,7 +78,11 @@ suite('Patch Test Suite', () => {
           ...baseBody,
           metrics,
           name,
-          params,
+          params: {
+            'params.yaml': params?.['params.yaml']?.data,
+            [join('nested', 'params.yaml')]:
+              params?.[join('nested', 'params.yaml')]?.data
+          },
           plots: {},
           step: 0,
           type: 'data'

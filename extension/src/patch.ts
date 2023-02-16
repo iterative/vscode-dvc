@@ -2,6 +2,7 @@ import omit from 'lodash.omit'
 import fetch, { Response } from 'node-fetch'
 import {
   EXPERIMENT_WORKSPACE_ID,
+  ExperimentFields,
   ExperimentsCommitOutput,
   ExperimentsOutput,
   ValueTreeRoot
@@ -16,7 +17,7 @@ type ExperimentDetails = {
   baselineSha: string
   metrics: ValueTreeRoot | undefined
   name: string
-  params: ValueTreeRoot | undefined
+  params: ValueTreeRoot
 }
 
 type BaseRequestBody = {
@@ -38,6 +39,20 @@ type DataRequestBody = BaseRequestBody & {
   type: 'data'
 }
 
+const collectExperiment = (data: ExperimentFields) => {
+  const { metrics, params } = data
+
+  const paramsAcc: ValueTreeRoot = {}
+  for (const [file, fileParams] of Object.entries(params || {})) {
+    const data = fileParams?.data
+    if (data) {
+      paramsAcc[file] = data
+    }
+  }
+
+  return { metrics, params: paramsAcc }
+}
+
 const findExperimentByName = (
   name: string,
   sha: string,
@@ -49,7 +64,8 @@ const findExperimentByName = (
     }
 
     if (experiment?.data) {
-      const { metrics, params, name } = experiment?.data
+      const { metrics, params } = collectExperiment(experiment.data)
+
       return {
         baselineSha: sha,
         metrics,
