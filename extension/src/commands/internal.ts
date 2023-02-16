@@ -16,7 +16,6 @@ import { Disposable } from '../class/dispose'
 
 type Command = (...args: Args) => unknown | Promise<unknown>
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 export const AvailableCommands = Object.assign(
   { EXP_PUSH: 'expPush' } as const,
   CliExecutorCommands,
@@ -28,7 +27,7 @@ export const AvailableCommands = Object.assign(
   typeof CliReaderCommands &
   typeof dvcRunnerCommands &
   typeof GitExecutorCommands &
-  typeof GitReaderCommands & { EXP_PUSH: 'fun' }
+  typeof GitReaderCommands & { EXP_PUSH: 'expPush' }
 export type CommandId =
   (typeof AvailableCommands)[keyof typeof AvailableCommands]
 

@@ -47,7 +47,7 @@ export class WebviewMessages {
   private readonly addStage: () => Promise<boolean>
   private readonly shareExperimentToStudio: (
     dvcRoot: string,
-    sha: string
+    id: string
   ) => Promise<void>
 
   constructor(
@@ -62,10 +62,9 @@ export class WebviewMessages {
       dvcRoot: string,
       ...ids: string[]
     ) => Promise<string | undefined>,
-
     hasStages: () => Promise<string>,
     addStage: () => Promise<boolean>,
-    shareExperimentToStudio: (dvcRoot: string, sha: string) => Promise<void>
+    shareExperimentToStudio: (dvcRoot: string, id: string) => Promise<void>
   ) {
     this.dvcRoot = dvcRoot
     this.experiments = experiments

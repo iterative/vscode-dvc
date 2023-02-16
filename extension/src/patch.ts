@@ -38,7 +38,8 @@ type DataRequestBody = BaseRequestBody & {
   params: ValueTreeRoot
   plots: ValueTreeRoot
   step: number
-} & { type: 'data' }
+  type: 'data'
+}
 
 const findExperimentByName = (
   name: string,
@@ -89,7 +90,7 @@ const sendPostRequest = (
     method: 'POST'
   })
 
-const sendWithProgress = (
+const shareWithProgress = (
   experimentDetails: ExperimentDetails,
   repoUrl: string,
   studioAccessToken: string
@@ -127,6 +128,41 @@ const sendWithProgress = (
     return Toast.delayProgressClosing()
   })
 
+const shareExperiment = async (
+  internalCommands: InternalCommands,
+  dvcRoot: string,
+  name: string,
+  studioAccessToken: string
+) => {
+  const [repoUrl, expData] = await Promise.all([
+    internalCommands.executeCommand(
+      AvailableCommands.GIT_GET_REMOTE_URL,
+      dvcRoot
+    ),
+    internalCommands.executeCommand<ExperimentsOutput>(
+      AvailableCommands.EXP_SHOW,
+      dvcRoot,
+      ExperimentFlag.NO_FETCH
+    )
+  ])
+
+  const experimentDetails = collectExperimentDetails(name, expData)
+
+  if (!repoUrl) {
+    return Toast.showError(
+      'Failed to share experiment, unable to generate Git repo URL'
+    )
+  }
+
+  if (!experimentDetails) {
+    return Toast.showError(
+      'Failed to share experiment, unable to locate the required data'
+    )
+  }
+
+  return shareWithProgress(experimentDetails, repoUrl, studioAccessToken)
+}
+
 export const registerPatchCommand = (
   internalCommands: InternalCommands,
   connect: Connect
@@ -140,32 +176,6 @@ export const registerPatchCommand = (
         return commands.executeCommand(RegisteredCommands.CONNECT_SHOW)
       }
 
-      const [repoUrl, expData] = await Promise.all([
-        internalCommands.executeCommand(
-          AvailableCommands.GIT_GET_REMOTE_URL,
-          dvcRoot
-        ),
-        internalCommands.executeCommand<ExperimentsOutput>(
-          AvailableCommands.EXP_SHOW,
-          dvcRoot,
-          ExperimentFlag.NO_FETCH
-        )
-      ])
-
-      const experimentDetails = collectExperimentDetails(name, expData)
-
-      if (!repoUrl) {
-        return Toast.showError(
-          'Failed to share experiment, unable to generate Git repo URL'
-        )
-      }
-
-      if (!experimentDetails) {
-        return Toast.showError(
-          'Failed to share experiment, unable to locate the required data'
-        )
-      }
-
-      return sendWithProgress(experimentDetails, repoUrl, studioAccessToken)
+      return shareExperiment(internalCommands, dvcRoot, name, studioAccessToken)
     }
   )

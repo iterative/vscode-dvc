@@ -55,7 +55,7 @@ suite('Patch Test Suite', () => {
       )
     })
 
-    it('should share an experiment to studio if a Studio access token is present', async () => {
+    it('should share an experiment to Studio if an access token is present', async () => {
       const mockFetch = stub(Fetch, 'default').resolves(undefined)
       const mockStudioAccessToken = 'isat_12123123123123123'
       const mockRepoUrl = 'https://github.com/iterative/vscode-dvc-demo'
