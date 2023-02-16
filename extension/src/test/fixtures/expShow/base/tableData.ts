@@ -8,6 +8,7 @@ const tableDataFixture: TableData = {
   columns: columnsFixture,
   filters: [],
   hasCheckpoints: true,
+  hasConfig: true,
   hasRunningExperiment: true,
   hasColumns: true,
   sorts: [],

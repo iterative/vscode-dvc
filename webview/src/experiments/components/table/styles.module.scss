@@ -256,10 +256,6 @@ $bullet-size: calc(var(--design-unit) * 4px);
     padding-left: 1rem;
   }
 
-  .tableContainer {
-    flex: 1;
-  }
-
   table {
     display: inline-block;
     border-collapse: collapse;
@@ -997,4 +993,8 @@ $badge-size: 0.85rem;
   padding: 0;
   font-size: 0.65rem;
   cursor: pointer;
+}
+
+.addConfigButton {
+  margin: 20px auto;
 }

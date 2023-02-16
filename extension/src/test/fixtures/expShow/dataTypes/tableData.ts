@@ -9,6 +9,7 @@ export const data: TableData = {
   filteredCounts: { experiments: 0, checkpoints: 0 },
   filters: [],
   hasCheckpoints: false,
+  hasConfig: true,
   hasRunningExperiment: false,
   sorts: [],
   columns,
