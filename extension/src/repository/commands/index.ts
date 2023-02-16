@@ -7,7 +7,7 @@ import {
   InternalCommands
 } from '../../commands/internal'
 import { relativeWithUri } from '../../fileSystem'
-import { warnOfConsequences } from '../../vscode/modal'
+import { Modal } from '../../vscode/modal'
 import { Response } from '../../vscode/response'
 import { WorkspaceRepositories } from '../workspace'
 
@@ -135,7 +135,7 @@ export const getResetRootCommand =
       return
     }
 
-    const response = await warnOfConsequences(
+    const response = await Modal.warnOfConsequences(
       'Are you sure you want to discard ALL workspace changes?\n' +
         'This is IRREVERSIBLE!\n' +
         'Your current working set will be FOREVER LOST if you proceed.',
