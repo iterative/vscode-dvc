@@ -1606,7 +1606,7 @@
     "lodash.isequal": "4.5.0",
     "lodash.merge": "4.6.2",
     "lodash.omit": "4.5.0",
-    "node-fetch": "2.6.9",
+    "node-fetch": "3.3.0",
     "tree-kill": "1.2.2",
     "uuid": "9.0.0",
     "vscode-languageclient": "8.0.2"
