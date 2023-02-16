@@ -1425,20 +1425,20 @@ describe('App', () => {
       renderTable()
       setTableData({ ...tableDataFixture, hasConfig: false })
 
-      expect(screen.getByText('Add Configuration')).toBeInTheDocument()
+      expect(screen.getByText('Add a pipeline stage')).toBeInTheDocument()
     })
 
     it('should not show a add config button if the project has pipeline stages', () => {
       renderTable()
 
-      expect(screen.queryByText('Add Configuration')).not.toBeInTheDocument()
+      expect(screen.queryByText('Add a pipeline stage')).not.toBeInTheDocument()
     })
 
     it('should send a message to the extension to add a pipeline stage when clicking on the add config button', () => {
       renderTable()
       setTableData({ ...tableDataFixture, hasConfig: false })
 
-      fireEvent.click(screen.getByText('Add Configuration'))
+      fireEvent.click(screen.getByText('Add a pipeline stage'))
 
       expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.ADD_CONFIGURATION

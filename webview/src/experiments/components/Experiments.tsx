@@ -28,6 +28,7 @@ import { AddColumns, Welcome } from './GetStarted'
 import { RowSelectionProvider } from './table/RowSelectionContext'
 import { CellValue } from './table/content/Cell'
 import { CellSecondaryName } from './table/CellSecondaryName'
+import { AddStage } from './AddStage'
 import { buildColumns, columnHelper } from '../util/buildColumns'
 import { sendMessage } from '../../shared/vscode'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
@@ -35,8 +36,6 @@ import { GetStarted } from '../../shared/components/getStarted/GetStarted'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { ExperimentsState } from '../store'
 import { EXPERIMENT_COLUMN_ID } from '../util/columns'
-import { IconButton } from '../../shared/components/button/IconButton'
-import { Add } from '../../shared/components/icons'
 
 const DEFAULT_COLUMN_WIDTH = 90
 const MINIMUM_COLUMN_WIDTH = 90
@@ -200,17 +199,7 @@ export const ExperimentsTable: React.FC = () => {
   return (
     <RowSelectionProvider>
       <Table instance={instance} onColumnOrderChange={setColumnOrder} />
-      {!hasConfig && (
-        <div className={styles.addConfigButton}>
-          <IconButton
-            icon={Add}
-            onClick={() =>
-              sendMessage({ type: MessageFromWebviewType.ADD_CONFIGURATION })
-            }
-            text="Add Configuration"
-          />
-        </div>
-      )}
+      {!hasConfig && <AddStage />}
     </RowSelectionProvider>
   )
 }
