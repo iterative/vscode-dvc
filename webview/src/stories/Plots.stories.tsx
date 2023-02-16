@@ -244,9 +244,6 @@ SmoothTemplate.args = {
 SmoothTemplate.parameters = chromaticParameters
 
 export const ScrolledHeaders = Template.bind({})
-ScrolledHeaders.parameters = {
-  chromatic: { delay: 2500 }
-}
 ScrolledHeaders.play = async ({ canvasElement }) => {
   await new Promise(resolve => setTimeout(resolve, 1000))
   const comparisonTableHead = await within(canvasElement).findByTestId(
@@ -256,6 +253,9 @@ ScrolledHeaders.play = async ({ canvasElement }) => {
   window.scrollTo({
     top: comparisonTableHead.getBoundingClientRect().top + 30
   })
+}
+ScrolledHeaders.parameters = {
+  chromatic: { delay: 2500 }
 }
 
 export const ScrolledWithManyRevisions = Template.bind({})
@@ -274,9 +274,6 @@ ScrolledWithManyRevisions.args = {
     template: templatePlotsFixture
   }
 }
-ScrolledWithManyRevisions.parameters = {
-  chromatic: { delay: 2500 }
-}
 ScrolledWithManyRevisions.play = async ({ canvasElement }) => {
   await new Promise(resolve => setTimeout(resolve, 1000))
   const comparisonTableHead = await within(canvasElement).findByTestId(
@@ -286,4 +283,7 @@ ScrolledWithManyRevisions.play = async ({ canvasElement }) => {
   window.scrollTo({
     top: comparisonTableHead.getBoundingClientRect().top + 30
   })
+}
+ScrolledWithManyRevisions.parameters = {
+  chromatic: { delay: 2500 }
 }
