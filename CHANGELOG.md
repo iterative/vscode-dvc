@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.6] - 2023-02-14
+
+### 🐛 Bug Fixes
+
+- Correctly debounce resize of table columns [#3280](https://github.com/iterative/vscode-dvc/pull/3280) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (2.45.0) [#3282](https://github.com/iterative/vscode-dvc/pull/3282) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.6.5] - 2023-02-13
 
 ### 🚀 New Features and Enhancements
