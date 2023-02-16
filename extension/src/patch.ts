@@ -1,8 +1,9 @@
 import { commands } from 'vscode'
 import omit from 'lodash.omit'
-import fetch from 'node-fetch'
+import fetch, { Response } from 'node-fetch'
 import {
   EXPERIMENT_WORKSPACE_ID,
+  ExperimentsCommitOutput,
   ExperimentsOutput,
   ValueTreeRoot
 } from './cli/dvc/contract'
@@ -14,45 +15,117 @@ import { Toast } from './vscode/toast'
 
 export const STUDIO_ENDPOINT = 'https://studio.iterative.ai/api/live'
 
-const getExperimentDetails = (
-  name: string,
-  repoUrl: string,
-  expData: ExperimentsOutput
-):
-  | {
-      baseline_sha: string
-      client: string
-      metrics: ValueTreeRoot | undefined
-      name: string
-      params: ValueTreeRoot | undefined
-      plots: {}
-      repo_url: string
-    }
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  | undefined => {
-  for (const [sha, experimentsObject] of Object.entries(
-    omit(expData, EXPERIMENT_WORKSPACE_ID)
-  )) {
-    for (const experiment of Object.values(experimentsObject)) {
-      if (experiment.data?.name !== name) {
-        continue
-      }
+type ExperimentDetails = {
+  baselineSha: string
+  metrics: ValueTreeRoot | undefined
+  name: string
+  params: ValueTreeRoot | undefined
+}
 
-      if (experiment?.data) {
-        const { metrics, params, name } = experiment?.data
-        return {
-          baseline_sha: sha,
-          client: 'vscode',
-          metrics,
-          name,
-          params,
-          plots: {},
-          repo_url: repoUrl
-        }
+type BaseRequestBody = {
+  client: 'vscode'
+  repo_url: string
+  name: string
+  baseline_sha: string
+}
+
+type StartRequestBody = BaseRequestBody & { type: 'start' }
+
+type DoneRequestBody = BaseRequestBody & { type: 'done' }
+
+type DataRequestBody = BaseRequestBody & {
+  metrics: ValueTreeRoot
+  params: ValueTreeRoot
+  plots: ValueTreeRoot
+  step: number
+} & { type: 'data' }
+
+const findExperimentByName = (
+  name: string,
+  sha: string,
+  experimentsObject: ExperimentsCommitOutput
+) => {
+  for (const experiment of Object.values(experimentsObject)) {
+    if (experiment.data?.name !== name) {
+      continue
+    }
+
+    if (experiment?.data) {
+      const { metrics, params, name } = experiment?.data
+      return {
+        baselineSha: sha,
+        metrics,
+        name,
+        params
       }
     }
   }
 }
+
+const collectExperimentDetails = (
+  name: string,
+  expData: ExperimentsOutput
+): ExperimentDetails | undefined => {
+  for (const [sha, experimentsObject] of Object.entries(
+    omit(expData, EXPERIMENT_WORKSPACE_ID)
+  )) {
+    const details = findExperimentByName(name, sha, experimentsObject)
+    if (details) {
+      return details
+    }
+  }
+}
+
+const sendPostRequest = (
+  studioAccessToken: string,
+  body: StartRequestBody | DataRequestBody | DoneRequestBody
+): Promise<Response> =>
+  fetch(STUDIO_ENDPOINT, {
+    body: JSON.stringify(body),
+    headers: {
+      Authorization: `token ${studioAccessToken}`,
+      'Content-type': 'application/json'
+    },
+    method: 'POST'
+  })
+
+const sendWithProgress = (
+  experimentDetails: ExperimentDetails,
+  repoUrl: string,
+  studioAccessToken: string
+): Thenable<unknown> =>
+  Toast.showProgress('Sharing Experiment', async progress => {
+    const { metrics, params, baselineSha, name } = experimentDetails
+    const base: BaseRequestBody = {
+      baseline_sha: baselineSha,
+      client: 'vscode',
+      name,
+      repo_url: repoUrl
+    }
+
+    progress.report({
+      increment: 0,
+      message: 'Initializing experiment...'
+    })
+    await sendPostRequest(studioAccessToken, { ...base, type: 'start' })
+
+    progress.report({ increment: 33, message: 'Sending data...' })
+    await sendPostRequest(studioAccessToken, {
+      ...base,
+      metrics: metrics || {},
+      params: params || {},
+      plots: {},
+      step: 0,
+      type: 'data'
+    })
+
+    progress.report({ increment: 33, message: 'Completing process...' })
+    await sendPostRequest(studioAccessToken, { ...base, type: 'done' })
+
+    progress.report({ increment: 33, message: 'Done' })
+
+    return Toast.delayProgressClosing()
+  })
 
 export const registerPatchCommand = (
   internalCommands: InternalCommands,
@@ -79,7 +152,13 @@ export const registerPatchCommand = (
         )
       ])
 
-      const experimentDetails = getExperimentDetails(name, repoUrl, expData)
+      const experimentDetails = collectExperimentDetails(name, expData)
+
+      if (!repoUrl) {
+        return Toast.showError(
+          'Failed to share experiment, unable to generate Git repo URL'
+        )
+      }
 
       if (!experimentDetails) {
         return Toast.showError(
@@ -87,36 +166,6 @@ export const registerPatchCommand = (
         )
       }
 
-      const headers = {
-        Authorization: `token ${studioAccessToken}`,
-        'Content-type': 'application/json'
-      }
-
-      const { metrics, params, plots, ...body } = experimentDetails
-
-      await fetch(STUDIO_ENDPOINT, {
-        body: JSON.stringify({ ...body, type: 'start' }),
-        headers,
-        method: 'POST'
-      })
-
-      await fetch(STUDIO_ENDPOINT, {
-        body: JSON.stringify({
-          ...body,
-          metrics,
-          params,
-          plots,
-          step: 0,
-          type: 'data'
-        }),
-        headers,
-        method: 'POST'
-      })
-
-      await fetch(STUDIO_ENDPOINT, {
-        body: JSON.stringify({ ...body, type: 'done' }),
-        headers,
-        method: 'POST'
-      })
+      return sendWithProgress(experimentDetails, repoUrl, studioAccessToken)
     }
   )

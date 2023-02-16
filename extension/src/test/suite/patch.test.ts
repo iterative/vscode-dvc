@@ -4,6 +4,7 @@ import { expect } from 'chai'
 import { commands } from 'vscode'
 import * as Fetch from 'node-fetch'
 import { buildInternalCommands, closeAllEditors } from './util'
+import { PROGRESS_TEST_TIMEOUT } from './timeouts'
 import { buildConnect } from './connect/util'
 import { Disposable } from '../../extension'
 import { STUDIO_ENDPOINT, registerPatchCommand } from '../../patch'
@@ -122,7 +123,7 @@ suite('Patch Test Suite', () => {
         headers,
         method: 'POST'
       })
-    })
+    }).timeout(PROGRESS_TEST_TIMEOUT)
 
     it('should show an error message if the experiment cannot be found', async () => {
       const mockShowError = stub(Toast, 'showError').resolves(undefined)
