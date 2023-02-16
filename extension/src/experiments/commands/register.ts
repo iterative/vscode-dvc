@@ -1,8 +1,8 @@
-import { commands } from 'vscode'
 import {
   getBranchExperimentCommand,
   getShareExperimentAsBranchCommand,
-  getShareExperimentAsCommitCommand
+  getShareExperimentAsCommitCommand,
+  getShareExperimentToStudioCommand
 } from '.'
 import { pickGarbageCollectionFlags } from '../quickPick'
 import { WorkspaceExperiments } from '../workspace'
@@ -360,18 +360,6 @@ export const registerExperimentCommands = (
 
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_VIEW_SHARE_TO_STUDIO,
-    async ({ dvcRoot, id }: ExperimentDetails) => {
-      const studioAccessToken = await connect.getStudioAccessToken()
-      if (!studioAccessToken) {
-        return commands.executeCommand(RegisteredCommands.CONNECT_SHOW)
-      }
-
-      return internalCommands.executeCommand(
-        AvailableCommands.EXP_PUSH,
-        studioAccessToken,
-        dvcRoot,
-        id
-      )
-    }
+    getShareExperimentToStudioCommand(internalCommands, connect)
   )
 }

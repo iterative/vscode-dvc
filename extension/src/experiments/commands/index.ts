@@ -1,7 +1,9 @@
-import { Progress } from 'vscode'
+import { Progress, commands } from 'vscode'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { Toast } from '../../vscode/toast'
 import { WorkspaceExperiments } from '../workspace'
+import { Connect } from '../../connect'
+import { RegisteredCommands } from '../../commands/external'
 
 export const getBranchExperimentCommand =
   (experiments: WorkspaceExperiments) =>
@@ -103,4 +105,20 @@ export const getShareExperimentAsCommitCommand =
 
       return Toast.delayProgressClosing()
     })
+  }
+
+export const getShareExperimentToStudioCommand =
+  (internalCommands: InternalCommands, connect: Connect) =>
+  async ({ dvcRoot, id }: { dvcRoot: string; id: string }) => {
+    const studioAccessToken = await connect.getStudioAccessToken()
+    if (!studioAccessToken) {
+      return commands.executeCommand(RegisteredCommands.CONNECT_SHOW)
+    }
+
+    return internalCommands.executeCommand(
+      AvailableCommands.EXP_PUSH,
+      studioAccessToken,
+      dvcRoot,
+      id
+    )
   }
