@@ -1,14 +1,12 @@
 // eslint-disable-next-line import/default
 import TelemetryReporter from '@vscode/extension-telemetry'
 import {
-  EXTENSION_ID,
   APPLICATION_INSIGHTS_KEY,
   IEventNamePropertyMapping,
   ViewOpenedEventName
 } from './constants'
 import { getUserId } from './uuid'
 import { Logger } from '../common/logger'
-import { getExtensionVersion } from '../vscode/extensions'
 
 const isTestExecution = (): boolean =>
   !!process.env.VSC_TEST || process.env.NODE_ENV === 'test'
@@ -20,14 +18,7 @@ export const getTelemetryReporter = (): TelemetryReporter => {
     return telemetryReporter
   }
 
-  const version = getExtensionVersion(EXTENSION_ID) || 'unknown'
-
-  telemetryReporter = new TelemetryReporter(
-    EXTENSION_ID,
-    version,
-    APPLICATION_INSIGHTS_KEY,
-    true
-  )
+  telemetryReporter = new TelemetryReporter(APPLICATION_INSIGHTS_KEY)
   return telemetryReporter
 }
 
