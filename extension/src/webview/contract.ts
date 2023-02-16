@@ -12,6 +12,7 @@ export type WebviewData = TableData | PlotsData | SetupData
 
 export enum MessageFromWebviewType {
   INITIALIZED = 'initialized',
+  ADD_CONFIGURATION = 'add-configuration',
   APPLY_EXPERIMENT_TO_WORKSPACE = 'apply-experiment-to-workspace',
   ADD_STARRED_EXPERIMENT_FILTER = 'add-starred-experiment-filter',
   CREATE_BRANCH_FROM_EXPERIMENT = 'create-branch-from-experiment',
@@ -196,6 +197,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.SHOW_SCM_PANEL }
   | { type: MessageFromWebviewType.INSTALL_DVC }
   | { type: MessageFromWebviewType.SETUP_WORKSPACE }
+  | { type: MessageFromWebviewType.ADD_CONFIGURATION }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA

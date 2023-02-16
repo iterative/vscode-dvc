@@ -48,6 +48,7 @@ export const tableData: TableData = {
   filters: [],
   hasCheckpoints: false,
   hasColumns: true,
+  hasConfig: true,
   hasRunningExperiment: false,
   rows: [
     {

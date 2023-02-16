@@ -100,12 +100,15 @@ export class Experiments extends BaseRepository<TableData> {
   private dvcLiveOnlyCleanupInitialized = false
   private dvcLiveOnlySignalFile: string
 
+  private readonly addStage: () => Promise<boolean>
+
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
     updatesPaused: EventEmitter<boolean>,
     resourceLocator: ResourceLocator,
     workspaceState: Memento,
+    addStage: () => Promise<boolean>,
     cliData?: ExperimentsData,
     fileSystemData?: FileSystemData
   ) {
@@ -117,6 +120,7 @@ export class Experiments extends BaseRepository<TableData> {
     )
 
     this.internalCommands = internalCommands
+    this.addStage = addStage
 
     this.onDidChangeIsParamsFileFocused = this.paramsFileFocused.event
     this.onDidChangeExperiments = this.experimentsChanged.event
@@ -571,7 +575,13 @@ export class Experiments extends BaseRepository<TableData> {
           AvailableCommands.QUEUE_KILL,
           dvcRoot,
           ...ids
-        )
+        ),
+      () =>
+        this.internalCommands.executeCommand(
+          AvailableCommands.STAGE_LIST,
+          this.dvcRoot
+        ),
+      () => this.addStage()
     )
 
     this.dispose.track(

@@ -43,6 +43,7 @@ const tableData: TableDataState = {
   filters: ['params:params.yaml:lr'],
   hasCheckpoints: true,
   hasColumns: true,
+  hasConfig: true,
   hasData: true,
   hasRunningExperiment: true,
   rows: addCommitDataToMainBranch(rowsFixture).map(row => ({
