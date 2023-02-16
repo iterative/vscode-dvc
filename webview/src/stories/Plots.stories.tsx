@@ -245,7 +245,7 @@ SmoothTemplate.parameters = chromaticParameters
 
 export const ScrolledHeaders = Template.bind({})
 ScrolledHeaders.parameters = {
-  chromatic: { delay: 1500 }
+  chromatic: { delay: 2500 }
 }
 ScrolledHeaders.play = async ({ canvasElement }) => {
   await new Promise(resolve => setTimeout(resolve, 1000))
@@ -275,7 +275,7 @@ ScrolledWithManyRevisions.args = {
   }
 }
 ScrolledWithManyRevisions.parameters = {
-  chromatic: { delay: 1500 }
+  chromatic: { delay: 2500 }
 }
 ScrolledWithManyRevisions.play = async ({ canvasElement }) => {
   await new Promise(resolve => setTimeout(resolve, 1000))
