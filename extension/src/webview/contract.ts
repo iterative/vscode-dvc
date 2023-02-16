@@ -218,7 +218,3 @@ export type MessageToWebview<T extends WebviewData> = {
 export enum MessageToWebviewType {
   SET_DATA = 'setData'
 }
-
-export interface WebviewState {
-  dvcRoot: string
-}

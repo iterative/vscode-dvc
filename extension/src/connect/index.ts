@@ -13,6 +13,7 @@ import { openUrl } from '../vscode/external'
 import { ContextKey, setContextValue } from '../vscode/context'
 import { RegisteredCommands } from '../commands/external'
 import { Modal } from '../vscode/modal'
+import { GLOBAL_WEBVIEW_DVCROOT } from '../webview/factory'
 
 export class Connect extends BaseRepository<undefined> {
   public readonly viewKey = ViewKey.CONNECT
@@ -20,7 +21,7 @@ export class Connect extends BaseRepository<undefined> {
   private readonly secrets: SecretStorage
 
   constructor(context: ExtensionContext, webviewIcon: Resource) {
-    super('', webviewIcon)
+    super(GLOBAL_WEBVIEW_DVCROOT, webviewIcon)
 
     this.secrets = context.secrets
 
