@@ -99,5 +99,6 @@ export enum RegisteredCommands {
 
   CONNECT_SHOW = 'dvc.showConnect',
   ADD_STUDIO_ACCESS_TOKEN = 'dvc.addStudioAccessToken',
-  REMOVE_STUDIO_ACCESS_TOKEN = 'dvc.removeStudioAccessToken'
+  REMOVE_STUDIO_ACCESS_TOKEN = 'dvc.removeStudioAccessToken',
+  EXPERIMENT_VIEW_SHARE_TO_STUDIO = 'dvc.views.experiments.shareExperimentToStudio'
 }

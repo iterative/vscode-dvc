@@ -515,6 +515,12 @@
         "icon": "$(repo-push)"
       },
       {
+        "title": "%command.views.experiments.shareExperimentToStudio%",
+        "command": "dvc.views.experiments.shareExperimentToStudio",
+        "category": "DVC",
+        "icon": "$(repo-push)"
+      },
+      {
         "title": "%command.views.experimentsTree.selectExperiments%",
         "command": "dvc.views.experimentsTree.selectExperiments",
         "category": "DVC",
@@ -894,6 +900,10 @@
           "when": "false"
         },
         {
+          "command": "dvc.views.experiments.shareExperimentToStudio",
+          "when": "false"
+        },
+        {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
           "when": "false"
         },
@@ -1148,6 +1158,11 @@
           "command": "dvc.views.experimentsTree.removeExperiment",
           "group": "inline@3",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|queued)$/ && !dvc.experiment.running"
+        },
+        {
+          "command": "dvc.views.experiments.shareExperimentToStudio",
+          "group": "1_share@0",
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ experiment && !dvc.experiment.running"
         },
         {
           "command": "dvc.views.experiments.shareExperimentAsCommit",

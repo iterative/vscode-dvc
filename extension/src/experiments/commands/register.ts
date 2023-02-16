@@ -1,3 +1,4 @@
+import { commands } from 'vscode'
 import {
   getBranchExperimentCommand,
   getShareExperimentAsBranchCommand,
@@ -14,6 +15,7 @@ import { Title } from '../../vscode/title'
 import { Context, getDvcRootFromContext } from '../../vscode/context'
 import { Setup } from '../../setup'
 import { showSetupOrExecuteCommand } from '../../commands/util'
+import { Connect } from '../../connect'
 
 type ExperimentDetails = { dvcRoot: string; id: string }
 
@@ -329,7 +331,8 @@ const registerExperimentRunCommands = (
 export const registerExperimentCommands = (
   experiments: WorkspaceExperiments,
   internalCommands: InternalCommands,
-  setup: Setup
+  setup: Setup,
+  connect: Connect
 ) => {
   registerExperimentCwdCommands(experiments, internalCommands)
   registerExperimentNameCommands(experiments, internalCommands)
@@ -353,5 +356,22 @@ export const registerExperimentCommands = (
     RegisteredCommands.EXPERIMENT_TOGGLE,
     ({ dvcRoot, id }: ExperimentDetails) =>
       experiments.getRepository(dvcRoot).toggleExperimentStatus(id)
+  )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENT_VIEW_SHARE_TO_STUDIO,
+    async ({ dvcRoot, id }: ExperimentDetails) => {
+      const studioAccessToken = await connect.getStudioAccessToken()
+      if (!studioAccessToken) {
+        return commands.executeCommand(RegisteredCommands.CONNECT_SHOW)
+      }
+
+      return internalCommands.executeCommand(
+        AvailableCommands.EXP_PUSH,
+        studioAccessToken,
+        dvcRoot,
+        id
+      )
+    }
   )
 }

@@ -1,18 +1,14 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
-import { restore, spy, stub } from 'sinon'
+import { restore, stub } from 'sinon'
 import { expect } from 'chai'
-import { commands } from 'vscode'
 import * as Fetch from 'node-fetch'
 import { buildInternalCommands, closeAllEditors } from './util'
 import { PROGRESS_TEST_TIMEOUT } from './timeouts'
-import { buildConnect } from './connect/util'
 import { Disposable } from '../../extension'
 import { STUDIO_ENDPOINT, registerPatchCommand } from '../../patch'
 import { AvailableCommands } from '../../commands/internal'
-import { RegisteredCommands } from '../../commands/external'
 import expShowFixture from '../fixtures/expShow/base/output'
 import { dvcDemoPath } from '../util'
-import { STUDIO_ACCESS_TOKEN_KEY } from '../../connect/token'
 import { ExperimentFields } from '../../cli/dvc/contract'
 import { Toast } from '../../vscode/toast'
 
@@ -29,52 +25,24 @@ suite('Patch Test Suite', () => {
   })
 
   describe('exp push patch', () => {
-    const buildMockSecretStorage = (mockStudioAccessToken: string) => ({
-      delete: stub(),
-      get: (key: string) => {
-        if (key === STUDIO_ACCESS_TOKEN_KEY) {
-          return Promise.resolve(mockStudioAccessToken)
-        }
-        return Promise.resolve(undefined)
-      },
-      onDidChange: stub(),
-      store: stub()
-    })
-
-    it('should show the connect webview if a Studio access token is not present in secret storage', async () => {
-      const { internalCommands } = buildInternalCommands(disposable)
-      const { connect } = await buildConnect(disposable)
-
-      registerPatchCommand(internalCommands, connect)
-      const executeCommandSpy = spy(commands, 'executeCommand')
-
-      await internalCommands.executeCommand(AvailableCommands.EXP_PUSH)
-
-      expect(executeCommandSpy).to.be.calledWithExactly(
-        RegisteredCommands.CONNECT_SHOW
-      )
-    })
-
-    it('should share an experiment to Studio if an access token is present', async () => {
+    it('should share an experiment to Studio', async () => {
       const mockFetch = stub(Fetch, 'default').resolves(undefined)
       const mockStudioAccessToken = 'isat_12123123123123123'
       const mockRepoUrl = 'https://github.com/iterative/vscode-dvc-demo'
 
-      const mockSecretStorage = buildMockSecretStorage(mockStudioAccessToken)
-
       const { internalCommands, gitReader, dvcReader } =
         buildInternalCommands(disposable)
-      const { connect } = await buildConnect(disposable, mockSecretStorage)
 
       const mockGetRemoteUrl = stub(gitReader, 'getRemoteUrl').resolves(
         mockRepoUrl
       )
       const mockExpShow = stub(dvcReader, 'expShow').resolves(expShowFixture)
 
-      registerPatchCommand(internalCommands, connect)
+      registerPatchCommand(internalCommands)
 
       await internalCommands.executeCommand(
         AvailableCommands.EXP_PUSH,
+        mockStudioAccessToken,
         dvcDemoPath,
         'exp-e7a67'
       )
@@ -131,27 +99,27 @@ suite('Patch Test Suite', () => {
       const mockStudioAccessToken = 'isat_not-needed'
       const mockRepoUrl = 'https://github.com/iterative/vscode-dvc-demo'
 
-      const mockSecretStorage = buildMockSecretStorage(mockStudioAccessToken)
-
       const { internalCommands, gitReader, dvcReader } =
         buildInternalCommands(disposable)
-      const { connect } = await buildConnect(disposable, mockSecretStorage)
 
       const mockGetRemoteUrl = stub(gitReader, 'getRemoteUrl').resolves(
         mockRepoUrl
       )
       const mockExpShow = stub(dvcReader, 'expShow').resolves(expShowFixture)
 
-      registerPatchCommand(internalCommands, connect)
+      registerPatchCommand(internalCommands)
 
       await internalCommands.executeCommand(
         AvailableCommands.EXP_PUSH,
+        mockStudioAccessToken,
         dvcDemoPath,
         'not-an-experiment'
       )
 
       expect(mockGetRemoteUrl).to.be.calledOnce
+      expect(mockGetRemoteUrl).to.be.calledWith(dvcDemoPath)
       expect(mockExpShow).to.be.calledOnce
+      expect(mockExpShow).to.be.calledWithExactly(dvcDemoPath, '--no-fetch')
       expect(mockShowError).to.be.calledOnce
     })
   })

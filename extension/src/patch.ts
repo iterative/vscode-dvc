@@ -1,4 +1,3 @@
-import { commands } from 'vscode'
 import omit from 'lodash.omit'
 import fetch, { Response } from 'node-fetch'
 import {
@@ -7,9 +6,7 @@ import {
   ExperimentsOutput,
   ValueTreeRoot
 } from './cli/dvc/contract'
-import { RegisteredCommands } from './commands/external'
 import { AvailableCommands, InternalCommands } from './commands/internal'
-import { Connect } from './connect'
 import { Args, ExperimentFlag } from './cli/dvc/constants'
 import { Toast } from './vscode/toast'
 
@@ -128,7 +125,7 @@ const shareWithProgress = (
     return Toast.delayProgressClosing()
   })
 
-const shareExperiment = async (
+const pushExperiment = async (
   internalCommands: InternalCommands,
   dvcRoot: string,
   name: string,
@@ -163,19 +160,12 @@ const shareExperiment = async (
   return shareWithProgress(experimentDetails, repoUrl, studioAccessToken)
 }
 
-export const registerPatchCommand = (
-  internalCommands: InternalCommands,
-  connect: Connect
-) =>
+export const registerPatchCommand = (internalCommands: InternalCommands) =>
   internalCommands.registerCommand(
     AvailableCommands.EXP_PUSH,
-    async (...args: Args) => {
-      const [dvcRoot, name] = args
-      const studioAccessToken = await connect.getStudioAccessToken()
-      if (!studioAccessToken) {
-        return commands.executeCommand(RegisteredCommands.CONNECT_SHOW)
-      }
+    (...args: Args) => {
+      const [studioAccessToken, dvcRoot, name] = args
 
-      return shareExperiment(internalCommands, dvcRoot, name, studioAccessToken)
+      return pushExperiment(internalCommands, dvcRoot, name, studioAccessToken)
     }
   )

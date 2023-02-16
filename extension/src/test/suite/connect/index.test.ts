@@ -1,10 +1,21 @@
 import { afterEach, beforeEach, suite, describe, it } from 'mocha'
 import { expect } from 'chai'
 import { restore, spy, stub } from 'sinon'
-import { EventEmitter, Uri, commands, window } from 'vscode'
-import { buildConnect } from './util'
+import {
+  EventEmitter,
+  ExtensionContext,
+  SecretStorage,
+  Uri,
+  commands,
+  env,
+  window
+} from 'vscode'
 import { Disposable } from '../../../extension'
-import { closeAllEditors } from '../util'
+import {
+  buildResourceLocator,
+  closeAllEditors,
+  getMessageReceivedEmitter
+} from '../util'
 import { Connect } from '../../../connect'
 import { MessageFromWebviewType } from '../../../webview/contract'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
@@ -24,10 +35,36 @@ suite('Connect Test Suite', () => {
     return closeAllEditors()
   })
 
+  const buildConnect = async (mockSecretStorage?: SecretStorage) => {
+    const resourceLocator = buildResourceLocator(disposable)
+    const connect = disposable.track(
+      new Connect(
+        {
+          secrets: mockSecretStorage || { get: stub(), onDidChange: stub() }
+        } as unknown as ExtensionContext,
+        resourceLocator.dvcIcon
+      )
+    )
+
+    const webview = await connect.showWebview()
+
+    const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+    const mockOpenExternal = stub(env, 'openExternal')
+    const urlOpenedEvent = new Promise(resolve =>
+      mockOpenExternal.callsFake(() => {
+        resolve(undefined)
+        return Promise.resolve(true)
+      })
+    )
+
+    return { connect, mockMessageReceived, mockOpenExternal, urlOpenedEvent }
+  }
+
   describe('Connect', () => {
     it('should handle a message from the webview to open Studio', async () => {
       const { mockMessageReceived, mockOpenExternal, urlOpenedEvent } =
-        await buildConnect(disposable)
+        await buildConnect()
 
       mockMessageReceived.fire({
         type: MessageFromWebviewType.OPEN_STUDIO
@@ -42,7 +79,7 @@ suite('Connect Test Suite', () => {
     it("should handle a message from the webview to open the user's Studio profile", async () => {
       const mockUsername = 'username-something-something'
       const { mockMessageReceived, mockOpenExternal, urlOpenedEvent } =
-        await buildConnect(disposable)
+        await buildConnect()
 
       stub(window, 'showInputBox').resolves(mockUsername)
 
@@ -84,7 +121,6 @@ suite('Connect Test Suite', () => {
       )
 
       const { connect, mockMessageReceived } = await buildConnect(
-        disposable,
         mockSecretStorage
       )
       await connect.isReady()

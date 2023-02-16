@@ -194,10 +194,12 @@ export class Extension extends Disposable {
 
     registerConnectCommands(this.connect, this.internalCommands)
 
+    registerPatchCommand(this.internalCommands)
     registerExperimentCommands(
       this.experiments,
       this.internalCommands,
-      this.setup
+      this.setup,
+      this.connect
     )
     registerPlotsCommands(this.plots, this.internalCommands, this.setup)
     this.internalCommands.registerExternalCommand(
@@ -271,8 +273,6 @@ export class Extension extends Disposable {
         }
       ).contributes.walkthroughs[0].id
     )
-
-    registerPatchCommand(this.internalCommands, this.connect)
 
     void showWalkthroughOnFirstUse(env.isNewAppInstall)
     this.dispose.track(recommendRedHatExtensionOnce())
