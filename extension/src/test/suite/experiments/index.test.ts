@@ -77,6 +77,7 @@ import { Setup } from '../../../setup'
 import * as FileSystem from '../../../fileSystem'
 import * as ProcessExecution from '../../../processExecution'
 import { DvcReader } from '../../../cli/dvc/reader'
+import { Connect } from '../../../connect'
 
 const { openFileInEditor } = FileSystem
 
@@ -545,6 +546,41 @@ suite('Experiments Test Suite', () => {
         dvcDemoPath,
         mockExperimentId,
         mockBranch
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a message to share an experiment to Studio', async () => {
+      const { experiments } = buildExperiments(disposable)
+      await experiments.isReady()
+
+      const mockExpId = 'exp-e7a67'
+
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const executeCommandSpy = spy(commands, 'executeCommand')
+
+      const mockGetStudioAccessToken = stub(
+        Connect.prototype,
+        'getStudioAccessToken'
+      )
+
+      const tokenAccessed = new Promise(resolve =>
+        mockGetStudioAccessToken.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      )
+
+      mockMessageReceived.fire({
+        payload: mockExpId,
+        type: MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO
+      })
+
+      await tokenAccessed
+
+      expect(executeCommandSpy).to.be.calledWithExactly(
+        RegisteredCommands.CONNECT_SHOW
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 

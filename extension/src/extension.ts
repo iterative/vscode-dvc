@@ -54,6 +54,7 @@ import { stopProcesses } from './processExecution'
 import { Flag } from './cli/dvc/constants'
 import { LanguageClient } from './languageClient'
 import { collectRunningExperimentPids } from './experiments/processExecution/collect'
+import { registerPatchCommand } from './patch'
 export class Extension extends Disposable {
   protected readonly internalCommands: InternalCommands
 
@@ -193,10 +194,12 @@ export class Extension extends Disposable {
 
     registerConnectCommands(this.connect, this.internalCommands)
 
+    registerPatchCommand(this.internalCommands)
     registerExperimentCommands(
       this.experiments,
       this.internalCommands,
-      this.setup
+      this.setup,
+      this.connect
     )
     registerPlotsCommands(this.plots, this.internalCommands, this.setup)
     this.internalCommands.registerExternalCommand(
