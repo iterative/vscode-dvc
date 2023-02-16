@@ -113,6 +113,11 @@
         "icon": "$(star-full)"
       },
       {
+        "title": "%command.addStudioAccessToken%",
+        "command": "dvc.addStudioAccessToken",
+        "category": "DVC"
+      },
+      {
         "title": "%command.addTarget%",
         "command": "dvc.addTarget",
         "category": "DVC",
@@ -308,6 +313,11 @@
         "icon": "$(close-all)"
       },
       {
+        "title": "%command.removeStudioAccessToken%",
+        "command": "dvc.removeStudioAccessToken",
+        "category": "DVC"
+      },
+      {
         "title": "%command.removeTarget%",
         "command": "dvc.removeTarget",
         "category": "DVC",
@@ -382,6 +392,11 @@
       {
         "title": "%command.showCommands",
         "command": "dvc.showCommands",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.showConnect%",
+        "command": "dvc.showConnect",
         "category": "DVC"
       },
       {
@@ -623,6 +638,10 @@
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
+          "command": "dvc.addStudioAccessToken",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
           "command": "dvc.addTarget",
           "when": "false"
         },
@@ -751,6 +770,10 @@
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
+          "command": "dvc.removeStudioAccessToken",
+          "when": "dvc.commands.available && dvc.project.available && dvc.studio.connected"
+        },
+        {
           "command": "dvc.removeTarget",
           "when": "false"
         },
@@ -785,6 +808,10 @@
         {
           "command": "dvc.stopQueuedExperiments",
           "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.showConnect",
+          "when": "dvc.commands.available && dvc.project.available && !dvc.studio.connected"
         },
         {
           "command": "dvc.selectForCompare",
@@ -1320,6 +1347,11 @@
           "when": "true"
         },
         {
+          "id": "dvc.views.studio",
+          "name": "Studio",
+          "when": "!dvc.studio.connected"
+        },
+        {
           "id": "dvc.views.experimentsColumnsTree",
           "name": "Columns",
           "when": "dvc.commands.available && dvc.project.available"
@@ -1354,6 +1386,11 @@
       {
         "view": "dvc.views.actions",
         "contents": "[$(beaker) Show Experiments](command:dvc.showExperiments)\n[$(graph-scatter) Show Plots](command:dvc.showPlots)\n[$(play) Run Experiment](command:dvc.runExperiment)"
+      },
+      {
+        "view": "dvc.views.studio",
+        "contents": "[$(plug) Connect](command:dvc.showConnect)",
+        "when": "!dvc.studio.connected"
       },
       {
         "view": "dvc.views.welcome",

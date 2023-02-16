@@ -24,6 +24,7 @@
     "featurize",
     "hardlinks",
     "Interactors",
+    "isat",
     "isdir",
     "isempty",
     "isequal",

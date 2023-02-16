@@ -9,6 +9,8 @@ import { DvcExecutor } from './cli/dvc/executor'
 import { DvcRunner } from './cli/dvc/runner'
 import { DvcReader } from './cli/dvc/reader'
 import { Config } from './config'
+import { Connect } from './connect'
+import { registerConnectCommands } from './connect/register'
 import { Context } from './context'
 import { WorkspaceExperiments } from './experiments/workspace'
 import { registerExperimentCommands } from './experiments/commands/register'
@@ -52,12 +54,12 @@ import { stopProcesses } from './processExecution'
 import { Flag } from './cli/dvc/constants'
 import { LanguageClient } from './languageClient'
 import { collectRunningExperimentPids } from './experiments/processExecution/collect'
-
 export class Extension extends Disposable {
   protected readonly internalCommands: InternalCommands
 
   private readonly resourceLocator: ResourceLocator
   private readonly repositories: WorkspaceRepositories
+  private readonly connect: Connect
   private readonly experiments: WorkspaceExperiments
   private readonly plots: WorkspacePlots
   private readonly setup: Setup
@@ -84,6 +86,10 @@ export class Extension extends Disposable {
     )
 
     const config = this.dispose.track(new Config())
+
+    this.connect = this.dispose.track(
+      new Connect(context, this.resourceLocator.dvcIcon)
+    )
 
     this.dvcExecutor = this.dispose.track(new DvcExecutor(config))
     this.dvcReader = this.dispose.track(new DvcReader(config))
@@ -184,6 +190,8 @@ export class Extension extends Disposable {
           )
       )
     )
+
+    registerConnectCommands(this.connect, this.internalCommands)
 
     registerExperimentCommands(
       this.experiments,

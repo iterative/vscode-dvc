@@ -173,6 +173,9 @@ export const buildMockData = <T extends ExperimentsData | FileSystemData>(
     update
   } as unknown as T)
 
+export const buildResourceLocator = (disposer: Disposer): ResourceLocator =>
+  disposer.track(new ResourceLocator(extensionUri))
+
 export const buildDependencies = (
   disposer: Disposer,
   expShow = expShowFixture,
@@ -208,7 +211,7 @@ export const buildDependencies = (
 
   const updatesPaused = disposer.track(new EventEmitter<boolean>())
 
-  const resourceLocator = disposer.track(new ResourceLocator(extensionUri))
+  const resourceLocator = buildResourceLocator(disposer)
 
   const messageSpy = spy(BaseWebview.prototype, 'show')
 
