@@ -54,7 +54,7 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
   })
 
   return (
-    <thead>
+    <thead data-testid="comparison-table-head">
       <tr>
         <DragDropContainer
           order={columns.map(col => col.revision)}
