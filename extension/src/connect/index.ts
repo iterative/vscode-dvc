@@ -12,6 +12,7 @@ import { Title } from '../vscode/title'
 import { openUrl } from '../vscode/external'
 import { ContextKey, setContextValue } from '../vscode/context'
 import { RegisteredCommands } from '../commands/external'
+import { showInformation } from '../vscode/modal'
 
 export class Connect extends BaseRepository<undefined> {
   public readonly viewKey = ViewKey.CONNECT
@@ -90,6 +91,11 @@ export class Connect extends BaseRepository<undefined> {
   private async setContext() {
     const storedToken = await this.getSecret(STUDIO_ACCESS_TOKEN_KEY)
     if (isStudioAccessToken(storedToken)) {
+      if (this.deferred.state === 'resolved') {
+        void showInformation(
+          'Studio is now connected. Use the "Share to Studio" command from an experiment\'s context menu to share experiments.'
+        )
+      }
       this.webview?.dispose()
       return setContextValue(ContextKey.STUDIO_CONNECTED, true)
     }

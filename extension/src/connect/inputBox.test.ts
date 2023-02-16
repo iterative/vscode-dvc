@@ -2,7 +2,7 @@ import { validateTokenInput } from './inputBox'
 
 describe('validateTokenInput', () => {
   const mockedStudioAccessToken =
-    'isat_1Z4T0zVHvq9Cu03XEe9Zjvx2vkBihfGPdY7FfmEMAagOXfQxU'
+    'isat_1Z4T0zVHvq9Cu03XEe9Zjvx2vkBihfGPdY7FfmEMAagOXfQx'
   it('should return the warning if the input is not valid', () => {
     expect(
       validateTokenInput(mockedStudioAccessToken.slice(0, -1))
