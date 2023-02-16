@@ -3,12 +3,14 @@ import checkpointPlotsReducer from './components/checkpointPlots/checkpointPlots
 import comparisonTableReducer from './components/comparisonTable/comparisonTableSlice'
 import templatePlotsReducer from './components/templatePlots/templatePlotsSlice'
 import webviewReducer from './components/webviewSlice'
+import ribbonReducer from './components/ribbon/ribbonSlice'
 import dragAndDropReducer from '../shared/components/dragDrop/dragDropSlice'
 
 export const plotsReducers = {
   checkpoint: checkpointPlotsReducer,
   comparison: comparisonTableReducer,
   dragAndDrop: dragAndDropReducer,
+  ribbon: ribbonReducer,
   template: templatePlotsReducer,
   webview: webviewReducer
 }

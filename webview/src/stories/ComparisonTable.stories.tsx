@@ -14,6 +14,7 @@ import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { ComparisonTable } from '../plots/components/comparisonTable/ComparisonTable'
 import { WebviewWrapper } from '../shared/components/webviewWrapper/WebviewWrapper'
 import { update } from '../plots/components/comparisonTable/comparisonTableSlice'
+import { update as ribbonUpdate } from '../plots/components/ribbon/ribbonSlice'
 import { plotsReducers } from '../plots/store'
 
 const MockedState: React.FC<{
@@ -22,6 +23,7 @@ const MockedState: React.FC<{
 }> = ({ children, data }) => {
   const dispatch = useDispatch()
   dispatch(update(data))
+  dispatch(ribbonUpdate(0))
 
   return <>{children}</>
 }
