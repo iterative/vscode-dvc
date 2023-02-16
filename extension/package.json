@@ -1162,7 +1162,7 @@
         {
           "command": "dvc.views.experiments.shareExperimentToStudio",
           "group": "1_share@0",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ experiment && !dvc.experiment.running"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == experiment && !dvc.experiment.running"
         },
         {
           "command": "dvc.views.experiments.shareExperimentAsCommit",
