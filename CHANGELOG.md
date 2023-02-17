@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.8] - 2023-02-17
+
+### 🐛 Bug Fixes
+
+- Ensure that file exists before trying to read mtime [#3299](https://github.com/iterative/vscode-dvc/pull/3299) by [@mattseddon](https://github.com/mattseddon)
+- Ensure DVC tracked tree is rebuilt when a dvc yaml error has been fixed [#3300](https://github.com/iterative/vscode-dvc/pull/3300) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.6.7] - 2023-02-17
 
 ### 🚀 New Features and Enhancements
