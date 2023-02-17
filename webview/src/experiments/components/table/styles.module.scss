@@ -1004,3 +1004,8 @@ $badge-size: 0.85rem;
     font-family: var(--vscode-font-family);
   }
 }
+
+.tableContainer {
+  width: 98vw;
+  overflow-x: scroll;
+}
