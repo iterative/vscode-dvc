@@ -1,7 +1,7 @@
 import { Args, Flag } from './constants'
 import { Prompt } from './output'
 import { MaybeConsoleError } from '../error'
-import { warnOfConsequences } from '../../vscode/modal'
+import { Modal } from '../../vscode/modal'
 import { CommandId, InternalCommands } from '../../commands/internal'
 import { Response } from '../../vscode/response'
 
@@ -15,7 +15,7 @@ const offerToForce = async (
     Prompt.TRY_FORCE,
     '\n\nWould you like to force this action?'
   )
-  const response = await warnOfConsequences(text, Response.FORCE)
+  const response = await Modal.warnOfConsequences(text, Response.FORCE)
   if (response !== Response.FORCE) {
     return
   }

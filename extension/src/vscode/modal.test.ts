@@ -1,5 +1,5 @@
 import { window } from 'vscode'
-import { warnOfConsequences } from './modal'
+import { Modal } from './modal'
 import { Response } from './response'
 
 const mockedWindow = jest.mocked(window)
@@ -14,28 +14,36 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-describe('warnOfConsequences', () => {
-  it('should return the text of the response provided by the user', async () => {
-    const userSelection = Response.YES
-    const options = [userSelection, Response.NO, Response.NEVER]
+describe('Modal', () => {
+  describe('warnOfConsequences', () => {
+    it('should return the text of the response provided by the user', async () => {
+      const userSelection = Response.YES
+      const options = [userSelection, Response.NO, Response.NEVER]
 
-    mockedShowWarningMessage.mockResolvedValueOnce(Response.YES)
+      mockedShowWarningMessage.mockResolvedValueOnce(Response.YES)
 
-    const response = await warnOfConsequences('WHAT DO I DO?', ...options)
+      const response = await Modal.warnOfConsequences(
+        'WHAT DO I DO?',
+        ...options
+      )
 
-    expect(response).toStrictEqual(userSelection)
-    expect(mockedShowWarningMessage).toHaveBeenCalledTimes(1)
-  })
+      expect(response).toStrictEqual(userSelection)
+      expect(mockedShowWarningMessage).toHaveBeenCalledTimes(1)
+    })
 
-  it('should return undefined if the modal is cancelled', async () => {
-    const modalCancelled = undefined
-    const options = [Response.YES, Response.NO, Response.NEVER]
+    it('should return undefined if the modal is cancelled', async () => {
+      const modalCancelled = undefined
+      const options = [Response.YES, Response.NO, Response.NEVER]
 
-    mockedShowWarningMessage.mockResolvedValueOnce(modalCancelled)
+      mockedShowWarningMessage.mockResolvedValueOnce(modalCancelled)
 
-    const response = await warnOfConsequences('WHAT DO I DO?', ...options)
+      const response = await Modal.warnOfConsequences(
+        'WHAT DO I DO?',
+        ...options
+      )
 
-    expect(response).toStrictEqual(modalCancelled)
-    expect(mockedShowWarningMessage).toHaveBeenCalledTimes(1)
+      expect(response).toStrictEqual(modalCancelled)
+      expect(mockedShowWarningMessage).toHaveBeenCalledTimes(1)
+    })
   })
 })

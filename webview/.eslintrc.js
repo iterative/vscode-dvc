@@ -22,6 +22,7 @@ module.exports = {
     },
     {
       files: [
+        'src/connect/index.tsx',
         'src/experiments/index.tsx',
         'src/plots/index.tsx',
         'src/shared/components/icons/index.ts',

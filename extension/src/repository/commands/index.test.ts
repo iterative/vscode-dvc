@@ -1,13 +1,15 @@
 import { join } from 'path'
 import { Uri } from 'vscode'
 import { getResourceCommand, getRootCommand, getSimpleResourceCommand } from '.'
-import { warnOfConsequences } from '../../vscode/modal'
+import { Modal } from '../../vscode/modal'
 import { CommandId, InternalCommands } from '../../commands/internal'
 import { OutputChannel } from '../../vscode/outputChannel'
 import { WorkspaceRepositories } from '../workspace'
 
 const mockedFunc = jest.fn()
-const mockedGetWarningResponse = jest.mocked(warnOfConsequences)
+const mockedModal = jest.mocked(Modal)
+const mockedGetWarningResponse = jest.fn()
+mockedModal.warnOfConsequences = mockedGetWarningResponse
 const mockedDvcRoot = join('some', 'path')
 const mockedRelPath = join('with', 'a', 'target')
 const mockedTarget = join(mockedDvcRoot, mockedRelPath)
