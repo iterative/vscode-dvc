@@ -87,7 +87,11 @@ export class RepositoryModel extends Disposable {
   }
 
   private collectTree(tracked: Set<string>): void {
-    if (!sameContents([...tracked], [...this.getTracked()])) {
+    const errorNeedsCleared = this.tree.get(this.dvcRoot)?.[0]?.error
+    if (
+      errorNeedsCleared ||
+      !sameContents([...tracked], [...this.getTracked()])
+    ) {
       this.tracked = tracked
       this.tree = collectTree(this.dvcRoot, this.tracked)
     }
