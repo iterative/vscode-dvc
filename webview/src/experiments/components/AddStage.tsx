@@ -7,13 +7,13 @@ import { sendMessage } from '../../shared/vscode'
 
 export const AddStage: React.FC = () => (
   <div className={styles.addConfigButton}>
-    <p>Want to easily and efficiently reproduce your experiments? </p>
+    <p>Easily and efficiently reproduce your experiments </p>
     <IconButton
       icon={Add}
       onClick={() =>
         sendMessage({ type: MessageFromWebviewType.ADD_CONFIGURATION })
       }
-      text="Add a pipeline stage"
+      text="Add a Pipeline Stage"
     />
     <p>
       <a href="https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#stages">
