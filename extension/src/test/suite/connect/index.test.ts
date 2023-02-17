@@ -89,7 +89,9 @@ suite('Connect Test Suite', () => {
 
       await urlOpenedEvent
       expect(mockOpenExternal).to.be.calledWith(
-        Uri.parse(`https://studio.iterative.ai/user/${mockUsername}/profile`)
+        Uri.parse(
+          `https://studio.iterative.ai/user/${mockUsername}/profile#accessToken`
+        )
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 

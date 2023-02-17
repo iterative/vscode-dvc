@@ -90,7 +90,7 @@ export class Connect extends BaseRepository<undefined> {
     if (!username) {
       return
     }
-    return openUrl(`${STUDIO_URL}/user/${username}/profile`)
+    return openUrl(`${STUDIO_URL}/user/${username}/profile#accessToken`)
   }
 
   private async setContext() {
