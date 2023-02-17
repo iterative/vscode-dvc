@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.7] - 2023-02-17
+
+### 🚀 New Features and Enhancements
+
+- Add add configuration button in experiments table [#3281](https://github.com/iterative/vscode-dvc/pull/3281) by [@sroy3](https://github.com/sroy3)
+- Enable saving of Studio access token [#3235](https://github.com/iterative/vscode-dvc/pull/3235) by [@mattseddon](https://github.com/mattseddon)
+- Share experiment to Studio from experiments table [#3289](https://github.com/iterative/vscode-dvc/pull/3289) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Move the comparison table header down from under the ribbon when scrolling [#3291](https://github.com/iterative/vscode-dvc/pull/3291) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Create Modal class (mirror Toast) [#3294](https://github.com/iterative/vscode-dvc/pull/3294) by [@mattseddon](https://github.com/mattseddon)
+- Clean up webview factory [#3277](https://github.com/iterative/vscode-dvc/pull/3277) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.6.6] - 2023-02-14
 
 ### 🐛 Bug Fixes
