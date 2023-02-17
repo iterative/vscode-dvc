@@ -96,8 +96,6 @@ export class Repository extends DeferredDisposable {
     this.treeDataChanged.fire()
     this.sourceControlManagement.setState(sourceControlManagementState)
     this.scmDecorationProvider.setState(scmDecorationState)
-    if (errorDecorationState) {
-      this.errorDecorationProvider.setState(errorDecorationState)
-    }
+    this.errorDecorationProvider.setState(errorDecorationState)
   }
 }
