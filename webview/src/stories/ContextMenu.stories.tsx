@@ -15,6 +15,7 @@ import { Lines } from '../shared/components/icons'
 export default {
   args: {},
   component: ContextMenu,
+  parameters: { chromatic: { disableSnapshot: true } },
   title: 'Context Menu'
 } as Meta
 

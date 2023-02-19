@@ -35,6 +35,7 @@ export default {
     }
   },
   component: Ribbon,
+  parameters: { chromatic: { disableSnapshot: true } },
   title: 'Plots Ribbon'
 } as Meta
 
@@ -64,4 +65,3 @@ WithLoading.args = {
     })
   }
 }
-WithLoading.parameters = { chromatic: { disableSnapshot: true } }

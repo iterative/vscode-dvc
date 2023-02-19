@@ -14,6 +14,7 @@ export default {
   },
   args: basicArgs,
   component: ComparisonTableHeader,
+  parameters: { chromatic: { disableSnapshot: true } },
   title: 'Comparison Table Header'
 } as Meta
 

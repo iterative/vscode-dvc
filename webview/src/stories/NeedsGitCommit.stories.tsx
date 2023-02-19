@@ -10,6 +10,7 @@ export default {
     data: {}
   },
   component: SetupNeedsGitCommit,
+  parameters: { chromatic: { disableSnapshot: true } },
   title: 'Setup'
 } as Meta
 

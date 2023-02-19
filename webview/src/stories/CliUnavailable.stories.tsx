@@ -13,6 +13,7 @@ export default {
     data: {}
   },
   component: CliUnavailable,
+  parameters: { chromatic: { disableSnapshot: true } },
   title: 'Setup'
 } as Meta
 

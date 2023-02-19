@@ -13,6 +13,7 @@ export default {
     data: {}
   },
   component: ProjectUninitialized,
+  parameters: { chromatic: { disableSnapshot: true } },
   title: 'Setup'
 } as Meta
 

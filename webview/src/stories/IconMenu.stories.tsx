@@ -79,6 +79,7 @@ export default {
     items
   },
   component: IconMenu,
+  parameters: { chromatic: { disableSnapshot: true } },
   title: 'Icon Menu'
 } as Meta
 

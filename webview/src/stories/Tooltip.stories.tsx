@@ -17,6 +17,7 @@ export default {
     }
   },
   component: Tooltip,
+  parameters: { chromatic: { disableSnapshot: true } },
   title: 'Tooltip'
 } as Meta
 

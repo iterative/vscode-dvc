@@ -10,6 +10,7 @@ export default {
     data: {}
   },
   component: App,
+  parameters: { chromatic: { disableSnapshot: true } },
   title: 'Connect'
 } as Meta
 

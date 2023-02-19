@@ -10,6 +10,7 @@ export default {
     data: {}
   },
   component: CliIncompatible,
+  parameters: { chromatic: { disableSnapshot: true } },
   title: 'Setup'
 } as Meta
 

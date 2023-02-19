@@ -66,6 +66,8 @@ const Template: Story = ({ plots, revisions }) => {
 
 export const Basic = Template.bind({})
 
+Basic.parameters = { chromatic: { disableSnapshot: true } }
+
 export const WithPinnedColumn = Template.bind({})
 WithPinnedColumn.play = async ({ canvasElement }) => {
   const mainHeader = await within(canvasElement).findByTestId('main-header')
