@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.9] - 2023-02-20
+
+### 🚀 New Features and Enhancements
+
+- Update get Studio access token link [#3303](https://github.com/iterative/vscode-dvc/pull/3303) by [@mattseddon](https://github.com/mattseddon)
+- Update link to get Studio access token (drop need for username) [#3306](https://github.com/iterative/vscode-dvc/pull/3306) by [@mattseddon](https://github.com/mattseddon)
+- Change the add configuration button text and add more information on functionality [#3295](https://github.com/iterative/vscode-dvc/pull/3295) by [@sroy3](https://github.com/sroy3)
+- Redirect user to add new Studio access token on 401 response [#3311](https://github.com/iterative/vscode-dvc/pull/3311) by [@mattseddon](https://github.com/mattseddon)
+- Re-add show experiments and show plots to tree view titles [#3314](https://github.com/iterative/vscode-dvc/pull/3314) by [@mattseddon](https://github.com/mattseddon)
+- Remove auto apply filters to experiment selection for plots [#3315](https://github.com/iterative/vscode-dvc/pull/3315) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- fix: DnD landing breaks on ellipsis [#3309](https://github.com/iterative/vscode-dvc/pull/3309) by [@shcheklein](https://github.com/shcheklein)
+- Add metrics.json to plots list of watched files [#3319](https://github.com/iterative/vscode-dvc/pull/3319) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Disable unnecessary chromatic snapshots [#3310](https://github.com/iterative/vscode-dvc/pull/3310) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (2.45.1) [#3312](https://github.com/iterative/vscode-dvc/pull/3312) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.6.8] - 2023-02-17
 
 ### 🐛 Bug Fixes
