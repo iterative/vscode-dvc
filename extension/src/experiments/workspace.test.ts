@@ -106,6 +106,15 @@ describe('Experiments', () => {
       expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
       expect(mockedExpFunc).not.toHaveBeenCalled()
     })
+
+    it('should check and ask for the creation of a pipeline stage before running the command', async () => {
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedListStages.mockResolvedValueOnce('')
+
+      await workspaceExperiments.getCwdThenReport(mockedCommandId)
+
+      expect(mockedExpFunc).not.toHaveBeenCalled()
+    })
   })
 
   describe('pauseUpdatesThenRun', () => {
@@ -144,6 +153,15 @@ describe('Experiments', () => {
       await workspaceExperiments.getCwdAndExpNameThenRun(mockedCommandId)
 
       expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
+      expect(mockedExpFunc).not.toHaveBeenCalled()
+    })
+
+    it('should check and ask for the creation of a pipeline stage before running the command', async () => {
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedListStages.mockResolvedValueOnce('')
+
+      await workspaceExperiments.getCwdAndExpNameThenRun(mockedCommandId)
+
       expect(mockedExpFunc).not.toHaveBeenCalled()
     })
   })
@@ -197,6 +215,22 @@ describe('Experiments', () => {
 
       expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
       expect(mockedQuickPick).toHaveBeenCalledTimes(1)
+      expect(mockedExpFunc).not.toHaveBeenCalled()
+    })
+
+    it('should check and ask for the creation of a pipeline stage before running the command', async () => {
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedListStages.mockResolvedValueOnce('')
+      const mockedPickedOptions = ['a', 'b', 'c']
+      const mockedQuickPick = jest
+        .fn()
+        .mockResolvedValueOnce(mockedPickedOptions)
+
+      await workspaceExperiments.getCwdAndQuickPickThenRun(
+        mockedCommandId,
+        mockedQuickPick
+      )
+
       expect(mockedExpFunc).not.toHaveBeenCalled()
     })
   })
@@ -258,6 +292,24 @@ describe('Experiments', () => {
 
       expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
       expect(mockedGetInput).toHaveBeenCalledTimes(1)
+      expect(mockedExpFunc).not.toHaveBeenCalled()
+    })
+
+    it('should check and ask for the creation of a pipeline stage before running the command', async () => {
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedListStages.mockResolvedValueOnce('')
+      mockedPickExperiment.mockResolvedValueOnce({
+        id: 'a123456',
+        name: 'exp-123'
+      })
+      mockedGetInput.mockResolvedValueOnce('abc123')
+
+      await workspaceExperiments.getCwdExpNameAndInputThenRun(
+        (cwd: string, ...args: Args) =>
+          workspaceExperiments.runCommand(mockedCommandId, cwd, ...args),
+        'enter your password please' as Title
+      )
+
       expect(mockedExpFunc).not.toHaveBeenCalled()
     })
   })
