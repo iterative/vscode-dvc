@@ -375,31 +375,12 @@ $bullet-size: calc(var(--design-unit) * 4px);
   }
 
   .bodyRow {
+    border-bottom: $row-border;
+
     &:not(.rowSelected) {
       & > *:first-child {
         background-color: $row-bg-color;
       }
-    }
-  }
-
-  .bodyRow,
-  .previousCommitsRow,
-  .headRow {
-    &::after {
-      content: '';
-      height: 1px;
-      width: 98vw;
-      background-color: $border-color;
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      z-index: 3;
-    }
-  }
-
-  .tbody:last-child {
-    .bodyRow:last-child::after {
-      display: none;
     }
   }
 
@@ -657,6 +638,8 @@ $bullet-size: calc(var(--design-unit) * 4px);
   }
 
   .previousCommitsRow {
+    border-bottom: $row-border;
+
     .th {
       font-size: 0.6rem;
       padding-left: 16px;
