@@ -2,6 +2,7 @@ import { Meta, Story } from '@storybook/react/types-6-0'
 import React from 'react'
 import '../shared/style.scss'
 import './test-vscode-styles.scss'
+import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'
 import { SelectMenu } from '../shared/components/selectMenu/SelectMenu'
 
 import { IconMenu } from '../shared/components/iconMenu/IconMenu'
@@ -79,7 +80,7 @@ export default {
     items
   },
   component: IconMenu,
-  parameters: { chromatic: { disableSnapshot: true } },
+  parameters: DISABLE_CHROMATIC_SNAPSHOTS,
   title: 'Icon Menu'
 } as Meta
 

@@ -11,6 +11,7 @@ import {
 } from 'dvc/src/plots/webview/contract'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
+import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'
 import { ComparisonTable } from '../plots/components/comparisonTable/ComparisonTable'
 import { WebviewWrapper } from '../shared/components/webviewWrapper/WebviewWrapper'
 import { update } from '../plots/components/comparisonTable/comparisonTableSlice'
@@ -66,7 +67,7 @@ const Template: Story = ({ plots, revisions }) => {
 
 export const Basic = Template.bind({})
 
-Basic.parameters = { chromatic: { disableSnapshot: true } }
+Basic.parameters = DISABLE_CHROMATIC_SNAPSHOTS
 
 export const WithPinnedColumn = Template.bind({})
 WithPinnedColumn.play = async ({ canvasElement }) => {
