@@ -105,13 +105,11 @@ suite('Workspace Experiments Test Suite', () => {
     })
 
     it('should not prompt to pick a project if a params file is focused', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
-
       const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
         dvcDemoPath
       )
 
-      const { workspaceExperiments, experiments, internalCommands } =
+      const { workspaceExperiments, experiments } =
         buildMultiRepoExperiments(disposable)
 
       await workspaceExperiments.isReady()
@@ -138,18 +136,16 @@ suite('Workspace Experiments Test Suite', () => {
 
       mockQuickPickOne.resetHistory()
 
-      const mockExecuteCommand = stub(
-        internalCommands,
-        'executeCommand'
+      const mockRunExperiment = stub(
+        DvcRunner.prototype,
+        'runExperiment'
       ).resolves(undefined)
 
+      stub(DvcReader.prototype, 'listStages').resolves('train')
       await workspaceExperiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RUN)
 
       expect(mockQuickPickOne).not.to.be.calledOnce
-      expect(mockExecuteCommand).to.be.calledWith(
-        AvailableCommands.EXPERIMENT_RUN,
-        dvcDemoPath
-      )
+      expect(mockRunExperiment).to.be.calledWith(dvcDemoPath)
     })
   }).timeout(WEBVIEW_TEST_TIMEOUT)
 
