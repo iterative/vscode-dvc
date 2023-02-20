@@ -1,5 +1,6 @@
 import { Story, Meta } from '@storybook/react/types-6-0'
 import React from 'react'
+import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'
 import {
   ProjectUninitialized,
   ProjectUninitializedProps
@@ -13,6 +14,7 @@ export default {
     data: {}
   },
   component: ProjectUninitialized,
+  parameters: DISABLE_CHROMATIC_SNAPSHOTS,
   title: 'Setup'
 } as Meta
 
