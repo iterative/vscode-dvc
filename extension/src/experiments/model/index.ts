@@ -286,19 +286,6 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.persistStatus()
   }
 
-  public getUnfilteredExperiments(filters = this.getFilters()) {
-    const unfilteredExperiments = this.getSubRows(
-      this.getRecordsWithoutCheckpoints(),
-      filters
-    )
-
-    const unfilteredCheckpoints = unfilteredExperiments.flatMap(
-      ({ id }) => this.getUnfilteredCheckpointsByTip(id, filters) || []
-    )
-
-    return [...unfilteredExperiments, ...unfilteredCheckpoints]
-  }
-
   public getLabels() {
     return this.getCombinedList().map(({ label }) => label)
   }
