@@ -1,7 +1,7 @@
 ---
 name: "Testing type, Checklist # "
 Example:
-name: "Manual QA for, Checklist # "
+name: "Manual QA for confirmation testing, Checklist # 1"
 about: "Purpose of using the document"
 Example:
 about: "Use this template for running manual QA issues."
@@ -14,6 +14,7 @@ labels: qa, review
 # Manual QA for  # 
 
 [Checklist]
+
 ### Static checks
 
 -  [ ]   sizes of columns 
@@ -25,6 +26,7 @@ labels: qa, review
 -  [ ]   layout of the table
 
 ### Dynamic checks
+
 -  [ ]   table elements while scrolling
 -  [ ]   table elements while zooming
 -  [ ]   table elements while hover and focus
