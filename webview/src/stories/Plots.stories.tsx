@@ -18,7 +18,7 @@ import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import smoothTemplatePlotContent from 'dvc/src/test/fixtures/plotsDiff/template/smoothTemplatePlot'
 import { truncateVerticalTitle } from 'dvc/src/plots/vega/util'
-import { chromaticParameters } from './util'
+import { CHROMATIC_VIEWPORTS, DISABLE_CHROMATIC_SNAPSHOTS } from './util'
 import { Plots } from '../plots/components/Plots'
 
 import './test-vscode-styles.scss'
@@ -91,7 +91,7 @@ const Template: Story<{
 }
 
 export const WithData = Template.bind({})
-WithData.parameters = chromaticParameters
+WithData.parameters = CHROMATIC_VIEWPORTS
 
 export const WithEmptyCheckpoints = Template.bind({})
 WithEmptyCheckpoints.args = {
@@ -103,6 +103,7 @@ WithEmptyCheckpoints.args = {
     template: templatePlotsFixture
   }
 }
+WithEmptyCheckpoints.parameters = DISABLE_CHROMATIC_SNAPSHOTS
 
 export const WithCheckpointOnly = Template.bind({})
 WithCheckpointOnly.args = {
@@ -112,6 +113,7 @@ WithCheckpointOnly.args = {
     selectedRevisions: plotsRevisionsFixture
   }
 }
+WithCheckpointOnly.parameters = DISABLE_CHROMATIC_SNAPSHOTS
 
 export const WithTemplateOnly = Template.bind({})
 WithTemplateOnly.args = {
@@ -121,6 +123,7 @@ WithTemplateOnly.args = {
     template: { ...templatePlotsFixture, size: PlotSizeNumber.REGULAR }
   }
 }
+WithTemplateOnly.parameters = DISABLE_CHROMATIC_SNAPSHOTS
 
 export const WithComparisonOnly = Template.bind({})
 WithComparisonOnly.args = {
@@ -130,6 +133,7 @@ WithComparisonOnly.args = {
     selectedRevisions: plotsRevisionsFixture
   }
 }
+WithComparisonOnly.parameters = DISABLE_CHROMATIC_SNAPSHOTS
 
 export const WithoutPlots = Template.bind({})
 WithoutPlots.args = {
@@ -175,7 +179,7 @@ AllLarge.args = {
     template: { ...templatePlotsFixture, size: PlotSizeNumber.LARGE }
   }
 }
-AllLarge.parameters = chromaticParameters
+AllLarge.parameters = CHROMATIC_VIEWPORTS
 
 export const AllSmall = Template.bind({})
 AllSmall.args = {
@@ -187,7 +191,7 @@ AllSmall.args = {
     template: { ...templatePlotsFixture, size: PlotSizeNumber.SMALL }
   }
 }
-AllSmall.parameters = chromaticParameters
+AllSmall.parameters = CHROMATIC_VIEWPORTS
 
 export const VirtualizedPlots = Template.bind({})
 VirtualizedPlots.args = {
@@ -203,7 +207,7 @@ VirtualizedPlots.args = {
     template: manyTemplatePlots(125)
   }
 }
-VirtualizedPlots.parameters = chromaticParameters
+VirtualizedPlots.parameters = CHROMATIC_VIEWPORTS
 
 export const ZoomedInPlot = Template.bind({})
 ZoomedInPlot.play = async ({ canvasElement }) => {
@@ -241,7 +245,9 @@ SmoothTemplate.args = {
     }
   }
 }
-SmoothTemplate.parameters = chromaticParameters
+SmoothTemplate.parameters = {
+  chromatic: { ...CHROMATIC_VIEWPORTS.chromatic, disableSnapshot: true }
+}
 
 export const ScrolledHeaders = Template.bind({})
 ScrolledHeaders.play = async ({ canvasElement }) => {

@@ -63,8 +63,11 @@ const viewportsWidths = Object.values(viewports)
   })
   .filter(Boolean)
 
-export const chromaticParameters = {
+export const CHROMATIC_VIEWPORTS = {
   chromatic: { viewports: viewportsWidths }
+}
+export const DISABLE_CHROMATIC_SNAPSHOTS = {
+  chromatic: { disableSnapshot: true }
 }
 
 export const addCommitDataToMainBranch = (rows: Row[]) =>

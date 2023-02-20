@@ -1,5 +1,6 @@
+import { commands } from 'vscode'
 import omit from 'lodash.omit'
-import fetch, { Response } from 'node-fetch'
+import fetch, { Response as FetchResponse } from 'node-fetch'
 import {
   EXPERIMENT_WORKSPACE_ID,
   ExperimentFields,
@@ -9,7 +10,10 @@ import {
 } from './cli/dvc/contract'
 import { AvailableCommands, InternalCommands } from './commands/internal'
 import { Args, ExperimentFlag } from './cli/dvc/constants'
+import { Response as UserResponse } from './vscode/response'
 import { Toast } from './vscode/toast'
+import { Modal } from './vscode/modal'
+import { RegisteredCommands } from './commands/external'
 
 export const STUDIO_ENDPOINT = 'https://studio.iterative.ai/api/live'
 
@@ -93,7 +97,7 @@ const collectExperimentDetails = (
 const sendPostRequest = (
   studioAccessToken: string,
   body: StartRequestBody | DataRequestBody | DoneRequestBody
-): Promise<Response> =>
+): Promise<FetchResponse> =>
   fetch(STUDIO_ENDPOINT, {
     body: JSON.stringify(body),
     headers: {
@@ -102,6 +106,16 @@ const sendPostRequest = (
     },
     method: 'POST'
   })
+
+const showUnauthorized = async () => {
+  const response = await Modal.errorWithOptions(
+    'The current Studio access token is invalid. Please add a new token.',
+    UserResponse.SHOW
+  )
+  if (response === UserResponse.SHOW) {
+    return commands.executeCommand(RegisteredCommands.CONNECT_SHOW)
+  }
+}
 
 const shareWithProgress = (
   experimentDetails: ExperimentDetails,
@@ -121,7 +135,16 @@ const shareWithProgress = (
       increment: 0,
       message: 'Initializing experiment...'
     })
-    await sendPostRequest(studioAccessToken, { ...base, type: 'start' })
+    const response = await sendPostRequest(studioAccessToken, {
+      ...base,
+      type: 'start'
+    })
+
+    if (response.status === 401) {
+      progress.report({ increment: 100, message: 'Access unauthorized' })
+      void showUnauthorized()
+      return Toast.delayProgressClosing()
+    }
 
     progress.report({ increment: 33, message: 'Sending data...' })
     await sendPostRequest(studioAccessToken, {

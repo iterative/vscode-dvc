@@ -1646,7 +1646,7 @@
     "fork-ts-checker-webpack-plugin": "7.3.0",
     "jest": "29.4.2",
     "jest-environment-node": "29.4.2",
-    "lint-staged": "13.1.1",
+    "lint-staged": "13.1.2",
     "mocha": "10.2.0",
     "mock-require": "3.0.3",
     "process-exists": "4.1.0",
