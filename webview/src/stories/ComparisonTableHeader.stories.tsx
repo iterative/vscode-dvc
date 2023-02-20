@@ -1,5 +1,6 @@
 import { Meta, Story } from '@storybook/react/types-6-0'
 import React from 'react'
+import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'
 import { ComparisonTableHeader } from '../plots/components/comparisonTable/ComparisonTableHeader'
 import { WebviewWrapper } from '../shared/components/webviewWrapper/WebviewWrapper'
 
@@ -14,6 +15,7 @@ export default {
   },
   args: basicArgs,
   component: ComparisonTableHeader,
+  parameters: DISABLE_CHROMATIC_SNAPSHOTS,
   title: 'Comparison Table Header'
 } as Meta
 
