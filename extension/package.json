@@ -1242,13 +1242,8 @@
           "group": "navigation@3"
         },
         {
-          "command": "dvc.views.experimentsTree.autoApplyFilters",
-          "when": "view == dvc.views.experimentsTree && !dvc.experiments.filter.selected",
-          "group": "navigation@4"
-        },
-        {
-          "command": "dvc.views.experimentsTree.disableAutoApplyFilters",
-          "when": "view == dvc.views.experimentsTree && dvc.experiments.filter.selected",
+          "command": "dvc.showExperiments",
+          "when": "view == dvc.views.experimentsTree",
           "group": "navigation@4"
         },
         {
@@ -1320,6 +1315,11 @@
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
           "when": "view == dvc.views.experimentsFilterByTree && dvc.experiments.filtered",
           "group": "navigation@3"
+        },
+        {
+          "command": "dvc.showPlots",
+          "when": "view == dvc.views.plotsPathsTree",
+          "group": "navigation@1"
         },
         {
           "command": "dvc.views.plotsPathsTree.selectPlots",
