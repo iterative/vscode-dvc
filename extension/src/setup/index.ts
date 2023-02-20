@@ -43,6 +43,7 @@ import { EventName } from '../telemetry/constants'
 import { WorkspaceScale } from '../telemetry/collect'
 import { gitPath } from '../cli/git/constants'
 import { DOT_DVC } from '../cli/dvc/constants'
+import { GLOBAL_WEBVIEW_DVCROOT } from '../webview/factory'
 
 export type SetupWebviewWebview = BaseWebview<TSetupData>
 
@@ -96,7 +97,7 @@ export class Setup
     webviewIcon: Resource,
     collectWorkspaceScale: () => Promise<WorkspaceScale>
   ) {
-    super('', webviewIcon)
+    super(GLOBAL_WEBVIEW_DVCROOT, webviewIcon)
 
     this.config = config
     this.dvcExecutor = dvcExecutor

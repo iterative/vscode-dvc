@@ -35,7 +35,7 @@ import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { getInput } from '../../vscode/inputBox'
 import { pickResources } from '../../vscode/resourcePicker'
-import { warnOfConsequences } from '../../vscode/modal'
+import { Modal } from '../../vscode/modal'
 import { Response } from '../../vscode/response'
 import { Title } from '../../vscode/title'
 import { Disposable } from '../../class/dispose'
@@ -229,7 +229,7 @@ export class RepositoriesTree
       async ({ resourceUri: destination }) => {
         const targets = await pickResources(Title.CHOOSE_RESOURCES)
         if (targets) {
-          const response = await warnOfConsequences(
+          const response = await Modal.warnOfConsequences(
             'Are you sure you want to move the selected data into this dataset?',
             Response.MOVE
           )

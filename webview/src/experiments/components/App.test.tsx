@@ -866,6 +866,7 @@ describe('App', () => {
       expect(itemLabels).toStrictEqual([
         'Apply to Workspace',
         'Create new Branch',
+        'Share to Studio',
         'Commit and Share',
         'Share as Branch',
         'Modify and Run',
@@ -887,7 +888,7 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(10)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(11)
 
       fireEvent.click(window, { bubbles: true })
       advanceTimersByTime(100)
@@ -901,7 +902,7 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(10)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(11)
 
       const commit = getRow('main')
       fireEvent.click(commit, { bubbles: true })
@@ -916,13 +917,13 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(10)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(11)
 
       fireEvent.contextMenu(within(row).getByText('[exp-e7a67]'), {
         bubbles: true
       })
       advanceTimersByTime(200)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(10)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(11)
     })
 
     it('should present the Remove experiment option for the checkpoint tips', () => {
@@ -1017,6 +1018,55 @@ describe('App', () => {
         ],
         type: MessageFromWebviewType.STOP_EXPERIMENT
       })
+    })
+
+    it('should enable the user to share an experiment to Studio', () => {
+      renderTableWithoutRunningExperiments()
+
+      const target = screen.getByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems.map(item => item.textContent)
+      expect(itemLabels).toContain('Share to Studio')
+
+      const shareOption = menuitems.find(item =>
+        item.textContent?.includes('Share to Studio')
+      )
+
+      expect(shareOption).toBeDefined()
+
+      shareOption && fireEvent.click(shareOption)
+
+      expect(sendMessage).toHaveBeenCalledWith({
+        payload: 'exp-e7a67',
+        type: MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO
+      })
+    })
+
+    it('should not enable the user share a checkpoint or commit to Studio', () => {
+      renderTableWithoutRunningExperiments()
+
+      const commitTarget = screen.getByText('main')
+      fireEvent.contextMenu(commitTarget, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const commitMenuitems = screen.getAllByRole('menuitem')
+      const commitItemLabels = commitMenuitems.map(item => item.textContent)
+      expect(commitItemLabels).not.toHaveLength(0)
+      expect(commitItemLabels).not.toContain('Share to Studio')
+
+      const checkpointTarget = screen.getByText('d1343a8')
+      fireEvent.contextMenu(checkpointTarget, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const checkpointMenuitems = screen.getAllByRole('menuitem')
+      const checkpointItemLabels = checkpointMenuitems.map(
+        item => item.textContent
+      )
+      expect(checkpointItemLabels).not.toHaveLength(0)
+      expect(checkpointItemLabels).not.toContain('Share to Studio')
     })
 
     it('should always present the Plots options if multiple rows are selected', () => {
@@ -1418,5 +1468,31 @@ describe('App', () => {
     fireEvent.mouseUp(experimentColumnResizeHandle)
 
     expect(document.body).not.toHaveClass(styles.isColumnResizing)
+  })
+
+  describe('Add configuration button', () => {
+    it('should show a add config button if the project has no pipeline stages', () => {
+      renderTable()
+      setTableData({ ...tableDataFixture, hasConfig: false })
+
+      expect(screen.getByText('Add a Pipeline Stage')).toBeInTheDocument()
+    })
+
+    it('should not show a add config button if the project has pipeline stages', () => {
+      renderTable()
+
+      expect(screen.queryByText('Add a Pipeline Stage')).not.toBeInTheDocument()
+    })
+
+    it('should send a message to the extension to add a pipeline stage when clicking on the add config button', () => {
+      renderTable()
+      setTableData({ ...tableDataFixture, hasConfig: false })
+
+      fireEvent.click(screen.getByText('Add a Pipeline Stage'))
+
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.ADD_CONFIGURATION
+      })
+    })
   })
 })

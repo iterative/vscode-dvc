@@ -231,5 +231,34 @@ describe('RepositoryModel', () => {
         untracked: []
       })
     })
+
+    it('should clear an error when there is no data in the tree and the error is fixed', () => {
+      const emptyRepoData = {
+        dataStatus: {},
+        hasGitChanges: true,
+        untracked: new Set<string>()
+      }
+
+      const msg = "'./dvc.yaml' validation failed.\n\nwith some other text"
+
+      const error = {
+        msg,
+        type: 'caught error'
+      }
+
+      const emptyRepoError = { ...emptyRepoData, dataStatus: { error } }
+      const model = new RepositoryModel(dvcDemoPath)
+
+      model.transformAndSet(emptyRepoData)
+      expect(model.getChildren(dvcDemoPath)).toStrictEqual([])
+
+      model.transformAndSet(emptyRepoError)
+      expect(model.getChildren(dvcDemoPath)).toStrictEqual([
+        { error: { label: './dvc.yaml validation failed.', msg } }
+      ])
+
+      model.transformAndSet(emptyRepoData)
+      expect(model.getChildren(dvcDemoPath)).toStrictEqual([])
+    })
   })
 })

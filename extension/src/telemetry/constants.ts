@@ -5,7 +5,6 @@ import { SortDefinition } from '../experiments/model/sortBy'
 import { Section, SectionCollapsed } from '../plots/webview/contract'
 
 export const APPLICATION_INSIGHTS_KEY = '46e8e554-d50a-471a-a53b-4af2b1cd6594'
-export const EXTENSION_ID = 'iterative.dvc'
 
 const ViewOpenedEvent = {
   VIEWS_EXPERIMENTS_FILTER_BY_TREE_OPENED:
@@ -27,6 +26,10 @@ export const EventName = Object.assign(
 
     EXTENSION_EXECUTION_DETAILS_CHANGED: 'extension.executionDetails.changed',
     EXTENSION_LOAD: 'extension.load',
+
+    VIEWS_CONNECT_CLOSED: 'views.connect.closed',
+    VIEWS_CONNECT_CREATED: 'views.connect.created',
+    VIEWS_CONNECT_FOCUS_CHANGED: 'views.connect.focusChanged',
 
     VIEWS_EXPERIMENTS_TABLE_CLOSED: 'views.experimentsTable.closed',
     VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED:
@@ -154,6 +157,7 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_VIEW_REMOVE]: undefined
   [EventName.EXPERIMENT_VIEW_SHARE_AS_BRANCH]: undefined
   [EventName.EXPERIMENT_VIEW_SHARE_AS_COMMIT]: undefined
+  [EventName.EXPERIMENT_VIEW_SHARE_TO_STUDIO]: undefined
   [EventName.EXPERIMENT_VIEW_STOP]: undefined
   [EventName.QUEUE_EXPERIMENT]: undefined
   [EventName.QUEUE_KILL]: undefined
@@ -208,6 +212,10 @@ export interface IEventNamePropertyMapping {
   [EventName.EXTENSION_SETUP_WORKSPACE]: { completed: boolean }
   [EventName.EXTENSION_SHOW_COMMANDS]: undefined
   [EventName.EXTENSION_SHOW_OUTPUT]: undefined
+
+  [EventName.VIEWS_CONNECT_CLOSED]: undefined
+  [EventName.VIEWS_CONNECT_CREATED]: undefined
+  [EventName.VIEWS_CONNECT_FOCUS_CHANGED]: undefined
 
   [EventName.VIEWS_EXPERIMENTS_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_FILTER_BY_TREE_OPENED]: DvcRootCount
@@ -274,4 +282,8 @@ export interface IEventNamePropertyMapping {
 
   [EventName.SETUP_SHOW]: undefined
   [EventName.SELECT_FOCUSED_PROJECTS]: undefined
+
+  [EventName.CONNECT_SHOW]: undefined
+  [EventName.ADD_STUDIO_ACCESS_TOKEN]: undefined
+  [EventName.REMOVE_STUDIO_ACCESS_TOKEN]: undefined
 }

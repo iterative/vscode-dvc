@@ -1,19 +1,19 @@
 import { Uri, ViewColumn, WebviewPanel, window } from 'vscode'
 import { BaseWebview } from '.'
 import { ViewKey, WebviewDetails } from './constants'
-import { WebviewState, WebviewData } from './contract'
 import { Resource } from '../resourceLocator'
 import { getWorkspaceRootUris } from '../vscode/workspaceFolders'
 
-export const isValidDvcRoot = (dvcRoot?: string): dvcRoot is string => !!dvcRoot
+export const GLOBAL_WEBVIEW_DVCROOT = 'n/a'
+
+const isValidDvcRoot = (dvcRoot?: string): dvcRoot is string => !!dvcRoot
 
 const create = (
   viewKey: ViewKey,
   webviewPanel: WebviewPanel,
-  dvcRoot: string,
-  bypassDvcRoot?: boolean
+  dvcRoot: string
 ) => {
-  if (!bypassDvcRoot && !isValidDvcRoot(dvcRoot)) {
+  if (!isValidDvcRoot(dvcRoot)) {
     throw new Error(`trying to set invalid state into ${viewKey}`)
   }
 
@@ -26,8 +26,7 @@ export const createWebview = async (
   viewKey: ViewKey,
   dvcRoot: string,
   iconPath: Resource,
-  viewColumn?: ViewColumn,
-  bypassDvcRoot?: boolean
+  viewColumn?: ViewColumn
 ) => {
   const { title, distPath } = WebviewDetails[viewKey]
 
@@ -44,21 +43,7 @@ export const createWebview = async (
 
   webviewPanel.iconPath = iconPath
 
-  const view = create(viewKey, webviewPanel, dvcRoot, bypassDvcRoot)
+  const view = create(viewKey, webviewPanel, dvcRoot)
   await view.isReady()
   return view
-}
-
-export const restoreWebview = <T extends WebviewData>(
-  viewKey: ViewKey,
-  webviewPanel: WebviewPanel,
-  state: WebviewState
-): Promise<BaseWebview<T>> => {
-  return new Promise((resolve, reject) => {
-    try {
-      resolve(create(viewKey, webviewPanel, state.dvcRoot))
-    } catch (error: unknown) {
-      reject(error)
-    }
-  })
 }

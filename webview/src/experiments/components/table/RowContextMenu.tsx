@@ -173,6 +173,8 @@ const getSingleSelectMenuOptions = (
   const isNotExperimentOrCheckpoint =
     isQueued(status) || isWorkspace || depth <= 0
 
+  const notExperiment = depth !== 1
+
   const withId = (
     label: string,
     type: MessageFromWebviewType,
@@ -197,6 +199,13 @@ const getSingleSelectMenuOptions = (
       'Create new Branch',
       MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT,
       isNotExperimentOrCheckpoint
+    ),
+    experimentMenuOption(
+      id,
+      'Share to Studio',
+      MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO,
+      notExperiment || hasRunningExperiment,
+      !hasRunningExperiment
     ),
     withId(
       'Commit and Share',

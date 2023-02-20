@@ -40,6 +40,12 @@ export class WebviewMessages {
     ...ids: string[]
   ) => Promise<string | undefined>
 
+  private readonly hasStages: () => Promise<string>
+
+  private hasConfig = false
+
+  private readonly addStage: () => Promise<boolean>
+
   constructor(
     dvcRoot: string,
     experiments: ExperimentsModel,
@@ -51,7 +57,9 @@ export class WebviewMessages {
     stopQueuedExperiments: (
       dvcRoot: string,
       ...ids: string[]
-    ) => Promise<string | undefined>
+    ) => Promise<string | undefined>,
+    hasStages: () => Promise<string>,
+    addStage: () => Promise<boolean>
   ) {
     this.dvcRoot = dvcRoot
     this.experiments = experiments
@@ -61,6 +69,13 @@ export class WebviewMessages {
     this.notifyChanged = notifyChanged
     this.selectColumns = selectColumns
     this.stopQueuedExperiments = stopQueuedExperiments
+    this.hasStages = hasStages
+    void this.changeHasConfig()
+    this.addStage = addStage
+  }
+
+  public async changeHasConfig() {
+    this.hasConfig = !!(await this.hasStages())
   }
 
   public sendWebviewMessage() {
@@ -166,6 +181,15 @@ export class WebviewMessages {
         return this.stopExperiments(message.payload)
       }
 
+      case MessageFromWebviewType.ADD_CONFIGURATION: {
+        return this.addConfiguration()
+      }
+      case MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO:
+        return commands.executeCommand(
+          RegisteredCommands.EXPERIMENT_VIEW_SHARE_TO_STUDIO,
+          { dvcRoot: this.dvcRoot, id: message.payload }
+        )
+
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
@@ -183,10 +207,16 @@ export class WebviewMessages {
       filters: this.experiments.getFilterPaths(),
       hasCheckpoints: this.checkpoints.hasCheckpoints(),
       hasColumns: this.columns.hasNonDefaultColumns(),
+      hasConfig: this.hasConfig,
       hasRunningExperiment: this.experiments.hasRunningExperiment(),
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()
     }
+  }
+
+  private async addConfiguration() {
+    await this.addStage()
+    await this.changeHasConfig()
   }
 
   private async setMaxTableHeadDepth() {
