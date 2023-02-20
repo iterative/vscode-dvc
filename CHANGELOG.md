@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.9] - 2023-02-20
+
+### 🚀 New Features and Enhancements
+
+- Update get Studio access token link [#3303](https://github.com/iterative/vscode-dvc/pull/3303) by [@mattseddon](https://github.com/mattseddon)
+- Update link to get Studio access token (drop need for username) [#3306](https://github.com/iterative/vscode-dvc/pull/3306) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- fix: DnD landing breaks on ellipsis [#3309](https://github.com/iterative/vscode-dvc/pull/3309) by [@shcheklein](https://github.com/shcheklein)
+
 ## [0.6.8] - 2023-02-17
 
 ### 🐛 Bug Fixes
