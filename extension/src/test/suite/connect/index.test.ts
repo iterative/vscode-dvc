@@ -77,11 +77,8 @@ suite('Connect Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should handle a message from the webview to open the user's Studio profile", async () => {
-      const mockUsername = 'username-something-something'
       const { mockMessageReceived, mockOpenExternal, urlOpenedEvent } =
         await buildConnect()
-
-      stub(window, 'showInputBox').resolves(mockUsername)
 
       mockMessageReceived.fire({
         type: MessageFromWebviewType.OPEN_STUDIO_PROFILE
@@ -89,7 +86,9 @@ suite('Connect Test Suite', () => {
 
       await urlOpenedEvent
       expect(mockOpenExternal).to.be.calledWith(
-        Uri.parse(`https://studio.iterative.ai/user/${mockUsername}/profile`)
+        Uri.parse(
+          'https://studio.iterative.ai/user/_/profile?section=accessToken'
+        )
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 

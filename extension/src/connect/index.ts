@@ -7,7 +7,7 @@ import { ViewKey } from '../webview/constants'
 import { MessageFromWebview, MessageFromWebviewType } from '../webview/contract'
 import { BaseRepository } from '../webview/repository'
 import { Logger } from '../common/logger'
-import { getInput, getValidInput } from '../vscode/inputBox'
+import { getValidInput } from '../vscode/inputBox'
 import { Title } from '../vscode/title'
 import { openUrl } from '../vscode/external'
 import { ContextKey, setContextValue } from '../vscode/context'
@@ -85,12 +85,8 @@ export class Connect extends BaseRepository<undefined> {
     return openUrl(STUDIO_URL)
   }
 
-  private async openStudioProfile() {
-    const username = await getInput(Title.ENTER_STUDIO_USERNAME)
-    if (!username) {
-      return
-    }
-    return openUrl(`${STUDIO_URL}/user/${username}/profile`)
+  private openStudioProfile() {
+    return openUrl(`${STUDIO_URL}/user/_/profile?section=accessToken`)
   }
 
   private async setContext() {
