@@ -155,7 +155,6 @@ These are the VS Code [settings] available for the Extension:
 | `dvc.doNotShowWalkthroughAfterInstall` | Do not prompt to show the Get Started page after installing. Useful for pre-configured development environments                                          |
 | `dvc.doNotRecommendRedHatExtension`    | Do not prompt to install the Red Hat YAML extension, which helps with DVC YAML schema validation (`dvc.yaml` and `.dvc` files).                          |
 | `dvc.doNotShowCliUnavailable`          | Do not warn when the workspace contains a DVC project but the DVC binary is unavailable.                                                                 |
-| `dvc.doNotShowUnableToFilter`          | Do not warn before disabling auto-apply filters when these would result in too many experiments being selected.                                          |
 
 > **Note** that the `Setup The Workspace` command helps you set up the basic
 > ones at the [Workspace level] (saved to `.vscode/setting.json`).

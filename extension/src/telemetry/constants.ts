@@ -126,8 +126,6 @@ export interface IEventNamePropertyMapping {
 
   [EventName.EXPERIMENT_AND_PLOTS_SHOW]: undefined
   [EventName.EXPERIMENT_APPLY]: undefined
-  [EventName.EXPERIMENT_AUTO_APPLY_FILTERS]: undefined
-  [EventName.EXPERIMENT_DISABLE_AUTO_APPLY_FILTERS]: undefined
   [EventName.EXPERIMENT_BRANCH]: undefined
   [EventName.EXPERIMENT_COLUMNS_SELECT]: undefined
   [EventName.EXPERIMENT_FILTER_ADD]: undefined
