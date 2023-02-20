@@ -1,10 +1,11 @@
 import cx from 'classnames'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import React from 'react'
-import { useSelector } from 'react-redux'
+import React, { useCallback, useEffect, useRef } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useInView } from 'react-intersection-observer'
 import styles from './styles.module.scss'
 import { RibbonBlock } from './RibbonBlock'
+import { update } from './ribbonSlice'
 import { sendMessage } from '../../../shared/vscode'
 import { IconButton } from '../../../shared/components/button/IconButton'
 import { PlotsState } from '../../store'
@@ -18,10 +19,31 @@ export const Ribbon: React.FC = () => {
     rootMargin: '-5px',
     threshold: 0.95
   })
+  const measurementsRef = useRef<HTMLUListElement>()
+  const dispatch = useDispatch()
 
   const revisions = useSelector(
     (state: PlotsState) => state.webview.selectedRevisions
   )
+
+  const changeRibbonHeight = useCallback(
+    () =>
+      measurementsRef.current &&
+      dispatch(update(measurementsRef.current.getBoundingClientRect().height)),
+    [dispatch]
+  )
+
+  useEffect(() => {
+    changeRibbonHeight()
+  }, [revisions, changeRibbonHeight])
+
+  useEffect(() => {
+    window.addEventListener('resize', changeRibbonHeight)
+
+    return () => {
+      window.removeEventListener('resize', changeRibbonHeight)
+    }
+  }, [changeRibbonHeight])
 
   const removeRevision = (revision: string) => {
     sendMessage({
@@ -44,7 +66,12 @@ export const Ribbon: React.FC = () => {
 
   return (
     <ul
-      ref={ref}
+      ref={node => {
+        if (node) {
+          measurementsRef.current = node
+        }
+        ref(node)
+      }}
       data-testid="ribbon"
       className={cx(styles.list, needsShadow && styles.withShadow)}
     >

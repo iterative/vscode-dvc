@@ -3,7 +3,6 @@
 $gap: 4px;
 .comparisonTableHeader {
   position: sticky;
-  top: -#{$gap};
   z-index: 2;
   background-color: $bg-color;
 }

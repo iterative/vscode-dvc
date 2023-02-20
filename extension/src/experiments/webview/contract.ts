@@ -98,6 +98,7 @@ export type TableData = {
   columnWidths: Record<string, number>
   hasCheckpoints: boolean
   hasColumns: boolean
+  hasConfig: boolean
   hasRunningExperiment: boolean
   rows: Row[]
   sorts: SortDefinition[]

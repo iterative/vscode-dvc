@@ -6,6 +6,7 @@
 const path = require('path')
 
 module.exports.distPath = path.join(__dirname, 'dist')
+module.exports.connect = path.join(__dirname, 'dist/connect.js')
 module.exports.experiments = path.join(__dirname, 'dist/experiments.js')
 module.exports.plots = path.join(__dirname, 'dist/plots.js')
 module.exports.setup = path.join(__dirname, 'dist/setup.js')

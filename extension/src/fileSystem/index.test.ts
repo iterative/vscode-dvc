@@ -172,6 +172,12 @@ describe('getModifiedTime', () => {
     expect(typeof epoch).toBe('number')
     expect(epoch).toBeGreaterThan(1640995200000)
   })
+
+  it('should return -1 for a file that does not exist on the system', () => {
+    const epoch = getModifiedTime('not a path')
+
+    expect(epoch).toStrictEqual(-1)
+  })
 })
 
 describe('findOrCreateDvcYamlFile', () => {

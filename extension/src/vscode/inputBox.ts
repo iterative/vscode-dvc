@@ -15,9 +15,10 @@ export const getInput = (
 export const getValidInput = (
   title: Title,
   validateInput: (text?: string) => null | string,
-  options?: { prompt?: string; value?: string }
+  options?: { prompt?: string; value?: string; password?: boolean }
 ): Thenable<string | undefined> =>
   window.showInputBox({
+    password: options?.password,
     prompt: options?.prompt,
     title,
     validateInput,

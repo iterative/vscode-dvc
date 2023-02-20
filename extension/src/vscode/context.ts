@@ -1,8 +1,9 @@
 import { commands } from 'vscode'
 
 export enum ContextKey {
-  COMMANDS_AVAILABLE = 'dvc.commands.available',
   CLI_INCOMPATIBLE = 'dvc.cli.incompatible',
+  COMMANDS_AVAILABLE = 'dvc.commands.available',
+  CONNECT_WEBVIEW_ACTIVE = 'dvc.connect.webview.active',
   EXPERIMENT_CHECKPOINTS = 'dvc.experiment.checkpoints',
   EXPERIMENT_FILTERS_SELECTED = 'dvc.experiments.filter.selected',
   EXPERIMENTS_WEBVIEW_ACTIVE = 'dvc.experiments.webview.active',
@@ -15,7 +16,8 @@ export enum ContextKey {
   PROJECT_AVAILABLE = 'dvc.project.available',
   PROJECT_HAS_DATA = 'dvc.project.hasData',
   SCM_RUNNING = 'dvc.scm.command.running',
-  SETUP_WEBVIEW_ACTIVE = 'dvc.setup.webview.active'
+  SETUP_WEBVIEW_ACTIVE = 'dvc.setup.webview.active',
+  STUDIO_CONNECTED = 'dvc.studio.connected'
 }
 
 export const setContextValue = (key: ContextKey, value: unknown) =>

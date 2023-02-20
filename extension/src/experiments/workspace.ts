@@ -358,7 +358,8 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
         this.internalCommands,
         updatesPaused,
         resourceLocator,
-        this.workspaceState
+        this.workspaceState,
+        () => this.checkOrAddPipeline(dvcRoot)
       )
     )
 

@@ -36,8 +36,12 @@ export const isDirectory = (path: string): boolean =>
 
 export const isFile = (path: string): boolean => checkStats(path, 'isFile')
 
-export const getModifiedTime = (path: string): number =>
-  lstatSync(path).mtime.getTime()
+export const getModifiedTime = (path: string): number => {
+  if (exists(path)) {
+    return lstatSync(path).mtime.getTime()
+  }
+  return -1
+}
 
 export const findSubRootPaths = async (
   cwd: string,
