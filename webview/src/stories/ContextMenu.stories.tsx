@@ -3,6 +3,7 @@ import React from 'react'
 import '../shared/style.scss'
 import './test-vscode-styles.scss'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
+import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'
 import { WebviewWrapper } from '../shared/components/webviewWrapper/WebviewWrapper'
 import {
   ContextMenu,
@@ -15,6 +16,7 @@ import { Lines } from '../shared/components/icons'
 export default {
   args: {},
   component: ContextMenu,
+  parameters: DISABLE_CHROMATIC_SNAPSHOTS,
   title: 'Context Menu'
 } as Meta
 

@@ -5,6 +5,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
 import { PlotsData } from 'dvc/src/plots/webview/contract'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
+import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'
 import { Ribbon } from '../plots/components/ribbon/Ribbon'
 import './test-vscode-styles.scss'
 import '../shared/style.scss'
@@ -35,6 +36,7 @@ export default {
     }
   },
   component: Ribbon,
+  parameters: DISABLE_CHROMATIC_SNAPSHOTS,
   title: 'Plots Ribbon'
 } as Meta
 
@@ -64,4 +66,3 @@ WithLoading.args = {
     })
   }
 }
-WithLoading.parameters = { chromatic: { disableSnapshot: true } }
