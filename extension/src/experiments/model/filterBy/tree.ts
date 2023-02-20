@@ -128,10 +128,9 @@ export class ExperimentsFilterByTree
       return
     }
 
-    void this.experiments.getRepository(element).autoApplyFilters(false)
     const filters = await this.getChildren(element)
     for (const filter of filters) {
-      void this.removeFilter(filter as FilterItem)
+      this.removeFilter(filter as FilterItem)
     }
   }
 

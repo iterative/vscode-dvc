@@ -341,18 +341,6 @@ export const registerExperimentCommands = (
   registerExperimentRunCommands(experiments, internalCommands, setup)
 
   internalCommands.registerExternalCommand(
-    RegisteredCommands.EXPERIMENT_AUTO_APPLY_FILTERS,
-    (context: Context) =>
-      experiments.autoApplyFilters(true, getDvcRootFromContext(context))
-  )
-
-  internalCommands.registerExternalCommand(
-    RegisteredCommands.EXPERIMENT_DISABLE_AUTO_APPLY_FILTERS,
-    (context: Context) =>
-      experiments.autoApplyFilters(false, getDvcRootFromContext(context))
-  )
-
-  internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_TOGGLE,
     ({ dvcRoot, id }: ExperimentDetails) =>
       experiments.getRepository(dvcRoot).toggleExperimentStatus(id)

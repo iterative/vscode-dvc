@@ -4,18 +4,15 @@ import { stub, restore, spy, SinonStub } from 'sinon'
 import {
   commands,
   EventEmitter,
-  MessageItem,
   QuickPick,
   QuickPickItem,
   TreeView,
   TreeViewExpansionEvent,
   window
 } from 'vscode'
-import { addFilterViaQuickInput } from './filterBy/util'
-import { ExperimentsModel, ExperimentType } from '../../../../experiments/model'
+import { ExperimentType } from '../../../../experiments/model'
 import { UNSELECTED } from '../../../../experiments/model/status'
 import {
-  experimentsUpdatedEvent,
   getFirstArgOfLastCall,
   getTimeSafeDisposer,
   spyOnPrivateMethod,
@@ -28,10 +25,7 @@ import {
 } from '../../../../commands/external'
 import { buildPlots, getExpectedCheckpointPlotsData } from '../../plots/util'
 import checkpointPlotsFixture from '../../../fixtures/expShow/base/checkpointPlots'
-import plotsDiffFixture from '../../../fixtures/plotsDiff/output'
 import expShowFixture from '../../../fixtures/expShow/base/output'
-import { Operator } from '../../../../experiments/model/filterBy'
-import { buildMetricOrParamPath } from '../../../../experiments/columns/paths'
 import { ExperimentsTree } from '../../../../experiments/model/tree'
 import {
   buildExperiments,
@@ -45,15 +39,11 @@ import {
   QuickPickOptionsWithTitle
 } from '../../../../vscode/quickPick'
 import * as QuickPickWrapper from '../../../../vscode/quickPick'
-import { Response } from '../../../../vscode/response'
 import { DvcExecutor } from '../../../../cli/dvc/executor'
 import { Param } from '../../../../experiments/model/modify/collect'
 import { WorkspaceExperiments } from '../../../../experiments/workspace'
-import { ColumnType } from '../../../../experiments/webview/contract'
-import { copyOriginalColors } from '../../../../experiments/model/status/colors'
 import { ExperimentItem } from '../../../../experiments/model/collect'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
-import { findAndFormatCreated } from '../../../fixtures/plotsDiff'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = getTimeSafeDisposer()
@@ -86,11 +76,6 @@ suite('Experiments Tree Test Suite', () => {
       const webview = await plots.showWebview()
       await webview.isReady()
 
-      const setSelectionModeSpy = spy(
-        ExperimentsModel.prototype,
-        'setSelectionMode'
-      )
-
       while (expectedDomain.length > 0) {
         const expectedData = getExpectedCheckpointPlotsData(
           expectedDomain,
@@ -117,11 +102,6 @@ suite('Experiments Tree Test Suite', () => {
         )
 
         expect(unSelected).to.equal(UNSELECTED)
-        expect(
-          setSelectionModeSpy,
-          'de-selecting any experiment disables auto-apply filters to experiments selection'
-        ).to.be.calledOnceWith(false)
-        setSelectionModeSpy.resetHistory()
       }
 
       expect(
@@ -148,10 +128,6 @@ suite('Experiments Tree Test Suite', () => {
       expect(messageSpy, 'we no longer send null').to.be.calledWithMatch(
         getExpectedCheckpointPlotsData(expectedDomain, expectedRange)
       )
-      expect(
-        setSelectionModeSpy,
-        'selecting any experiment disables auto-apply filters to experiments selection'
-      ).to.be.calledOnceWith(false)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set the workspace to selected when trying to toggle a checkpoint experiment that is running in the workspace', async () => {
@@ -271,11 +247,6 @@ suite('Experiments Tree Test Suite', () => {
         })
       )
 
-      const setSelectionModeSpy = spy(
-        ExperimentsModel.prototype,
-        'setSelectionMode'
-      )
-
       const selectExperiments = commands.executeCommand(
         RegisteredCommands.EXPERIMENT_SELECT
       )
@@ -293,356 +264,6 @@ suite('Experiments Tree Test Suite', () => {
       ).to.be.calledWithMatch(
         getExpectedCheckpointPlotsData([selectedDisplayName], [selectedColor])
       )
-      expect(
-        setSelectionModeSpy,
-        'auto-apply filters to experiment selection is disabled'
-      ).to.be.calledOnceWith(false)
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
-    it('should be able to apply filters using dvc.views.experimentsTree.autoApplyFilters', async () => {
-      const { plots, messageSpy } = await buildPlots(disposable)
-
-      const unfilteredCheckpointValue = expShowFixture[
-        '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'
-      ].d1343a87c6ee4a2e82d19525964d2fb2cb6756c9.data?.metrics?.['summary.json']
-        .data?.loss as number
-
-      const selectedDisplayName = domain[0]
-      const selectedColor = range[0]
-
-      await plots.showWebview()
-      messageSpy.resetHistory()
-
-      stub(ExperimentsModel.prototype, 'getFilters').returns([
-        {
-          operator: Operator.EQUAL,
-          path: buildMetricOrParamPath(
-            ColumnType.METRICS,
-            'summary.json',
-            'loss'
-          ),
-          value: unfilteredCheckpointValue
-        }
-      ])
-      const setSelectionModeSpy = spy(
-        ExperimentsModel.prototype,
-        'setSelectionMode'
-      )
-
-      await commands.executeCommand(
-        RegisteredCommands.EXPERIMENT_AUTO_APPLY_FILTERS
-      )
-
-      expect(
-        messageSpy,
-        'the filter is applied and one experiment remains because of a single checkpoint'
-      ).to.be.calledWithMatch(
-        getExpectedCheckpointPlotsData([selectedDisplayName], [selectedColor])
-      )
-      expect(
-        setSelectionModeSpy,
-        'auto-apply filters to experiment selection is enabled'
-      ).to.be.calledOnceWith(true)
-      messageSpy.resetHistory()
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
-    it('should warn the user if enabling dvc.views.experimentsTree.autoApplyFilters would select too many experiments', async () => {
-      const { plots, experiments, plotsModel, messageSpy, mockPlotsDiff } =
-        await buildPlots(disposable, plotsDiffFixture)
-
-      await plots.showWebview()
-      const initiallySelectedRevisions = plotsModel.getSelectedRevisionDetails()
-
-      const setSelectionModeSpy = spy(
-        ExperimentsModel.prototype,
-        'setSelectionMode'
-      )
-
-      stub(window, 'showWarningMessage')
-        .onFirstCall()
-        .resolves(Response.CANCEL as unknown as MessageItem)
-        .onFirstCall()
-        .resolves(Response.SELECT_MOST_RECENT as unknown as MessageItem)
-
-      messageSpy.resetHistory()
-
-      const firstUpdateEvent = experimentsUpdatedEvent(experiments)
-
-      await commands.executeCommand(
-        RegisteredCommands.EXPERIMENT_AUTO_APPLY_FILTERS
-      )
-
-      await firstUpdateEvent
-
-      expect(
-        getFirstArgOfLastCall(setSelectionModeSpy),
-        'auto-apply filters to experiment selection is not enabled when the user selects to cancel'
-      ).to.be.false
-      expect(
-        messageSpy,
-        'the same experiments are still selected'
-      ).to.be.calledWithMatch({
-        selectedRevisions: initiallySelectedRevisions
-      })
-      setSelectionModeSpy.resetHistory()
-      messageSpy.resetHistory()
-
-      const secondUpdateEvent = experimentsUpdatedEvent(experiments)
-
-      await commands.executeCommand(
-        RegisteredCommands.EXPERIMENT_AUTO_APPLY_FILTERS
-      )
-
-      await secondUpdateEvent
-
-      const colors = copyOriginalColors()
-
-      expect(
-        getFirstArgOfLastCall(setSelectionModeSpy),
-        'auto-apply filters to experiment selection is not enabled when the user selects to use the most recent'
-      ).to.be.false
-      expect(
-        plotsModel.getSelectedRevisionDetails(),
-        'all running and the most recent experiments are now selected'
-      ).to.deep.equal([
-        {
-          displayColor: colors[0],
-          fetched: true,
-          firstThreeColumns: [
-            {
-              path: 'Created',
-              type: 'Created',
-              value: '-'
-            },
-            {
-              path: 'summary.json:loss',
-              type: ColumnType.METRICS,
-              value: 1.9293040037155151
-            },
-            {
-              path: 'summary.json:accuracy',
-              type: ColumnType.METRICS,
-              value: 0.4668000042438507
-            }
-          ],
-          group: undefined,
-          id: EXPERIMENT_WORKSPACE_ID,
-          revision: EXPERIMENT_WORKSPACE_ID
-        },
-        {
-          displayColor: colors[1],
-          fetched: true,
-          firstThreeColumns: [
-            {
-              path: 'Created',
-              type: 'Created',
-              value: findAndFormatCreated('exp-e7a67')
-            },
-            {
-              path: 'summary.json:loss',
-              type: ColumnType.METRICS,
-              value: 2.0205044746398926
-            },
-            {
-              path: 'summary.json:accuracy',
-              type: ColumnType.METRICS,
-              value: 0.3724166750907898
-            }
-          ],
-          group: '[exp-e7a67]',
-          id: 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9',
-          revision: 'd1343a8'
-        },
-        {
-          displayColor: colors[2],
-          fetched: true,
-          firstThreeColumns: [
-            {
-              path: 'Created',
-              type: 'Created',
-              value: findAndFormatCreated('exp-e7a67')
-            },
-            {
-              path: 'summary.json:loss',
-              type: ColumnType.METRICS,
-              value: 2.0205044746398926
-            },
-            {
-              path: 'summary.json:accuracy',
-              type: ColumnType.METRICS,
-              value: 0.3724166750907898
-            }
-          ],
-          group: '[exp-e7a67]',
-          id: 'exp-e7a67',
-          revision: '4fb124a'
-        },
-        {
-          displayColor: colors[3],
-          fetched: true,
-          firstThreeColumns: [
-            {
-              path: 'Created',
-              type: 'Created',
-              value: findAndFormatCreated('test-branch')
-            },
-            {
-              path: 'summary.json:loss',
-              type: ColumnType.METRICS,
-              value: 1.9293040037155151
-            },
-            {
-              path: 'summary.json:accuracy',
-              type: ColumnType.METRICS,
-              value: 0.4668000042438507
-            }
-          ],
-          group: '[test-branch]',
-          id: 'test-branch',
-          revision: '42b8736'
-        },
-        {
-          displayColor: colors[4],
-          fetched: true,
-          firstThreeColumns: [
-            {
-              path: 'Created',
-              type: 'Created',
-              value: findAndFormatCreated('exp-e7a67')
-            },
-            {
-              path: 'summary.json:loss',
-              type: ColumnType.METRICS,
-              value: 2.020392894744873
-            },
-            {
-              path: 'summary.json:accuracy',
-              type: ColumnType.METRICS,
-              value: 0.3723166584968567
-            }
-          ],
-          group: '[exp-e7a67]',
-          id: '1ee5f2ecb0fa4d83cbf614386536344cf894dd53',
-          revision: '1ee5f2e'
-        },
-        {
-          displayColor: colors[5],
-          fetched: true,
-          firstThreeColumns: [
-            {
-              path: 'Created',
-              type: 'Created',
-              value: findAndFormatCreated('test-branch')
-            },
-            {
-              path: 'summary.json:loss',
-              type: ColumnType.METRICS,
-              value: 1.9293040037155151
-            },
-            {
-              path: 'summary.json:accuracy',
-              type: ColumnType.METRICS,
-              value: 0.4668000042438507
-            }
-          ],
-          group: '[test-branch]',
-          id: '217312476f8854dda1865450b737eb6bc7a3ba1b',
-          revision: '2173124'
-        },
-        {
-          displayColor: colors[6],
-          fetched: true,
-          firstThreeColumns: [
-            {
-              path: 'Created',
-              type: 'Created',
-              value: findAndFormatCreated('test-branch')
-            },
-            {
-              path: 'summary.json:loss',
-              type: ColumnType.METRICS,
-              value: 1.9882521629333496
-            },
-            {
-              path: 'summary.json:accuracy',
-              type: ColumnType.METRICS,
-              value: 0.4083833396434784
-            }
-          ],
-          group: '[test-branch]',
-          id: '9523bde67538cf31230efaff2dbc47d38a944ab5',
-          revision: '9523bde'
-        }
-      ])
-
-      expect(
-        mockPlotsDiff,
-        'the missing revisions have been requested'
-      ).to.be.calledWithExactly(
-        dvcDemoPath,
-        '1ee5f2e',
-        '2173124',
-        '9523bde',
-        'd1343a8',
-        EXPERIMENT_WORKSPACE_ID
-      )
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
-    it('should automatically apply filters to experiments selection if dvc.experiments.filter.selected has been set via dvc.views.experimentsTree.autoApplyFilters', async () => {
-      const { experiments, plots, messageSpy } = await buildPlots(disposable)
-      const setSelectionModeSpy = spy(
-        ExperimentsModel.prototype,
-        'setSelectionMode'
-      )
-
-      await plots.showWebview()
-
-      messageSpy.resetHistory()
-
-      await addFilterViaQuickInput(experiments, {
-        operator: Operator.EQUAL,
-        path: buildMetricOrParamPath(
-          ColumnType.METRICS,
-          'summary.json',
-          'loss'
-        ),
-        value: '0'
-      })
-
-      await commands.executeCommand(
-        RegisteredCommands.EXPERIMENT_AUTO_APPLY_FILTERS
-      )
-      expect(setSelectionModeSpy).to.be.calledOnceWith(true)
-      setSelectionModeSpy.resetHistory()
-
-      const expectedMessage = {
-        checkpoint: null,
-        comparison: null,
-        template: null
-      }
-
-      expect(
-        messageSpy,
-        'the filter is automatically applied and no experiment remains because every record has a loss'
-      ).to.be.calledWithMatch(expectedMessage)
-      messageSpy.resetHistory()
-
-      const tableFilterRemoved = experimentsUpdatedEvent(experiments)
-
-      await commands.executeCommand(
-        RegisteredCommands.EXPERIMENT_FILTERS_REMOVE_ALL
-      )
-
-      await tableFilterRemoved
-      expect(
-        setSelectionModeSpy,
-        'auto-apply filters is automatically disabled when all filters are removed from the tree'
-      ).to.be.calledOnceWith(false)
-
-      expect(
-        messageSpy,
-        'the old filters are still applied to the message'
-      ).to.be.calledWithMatch(expectedMessage)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should retain the expanded state of experiment tree items', () => {

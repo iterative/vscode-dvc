@@ -533,18 +533,6 @@
         "icon": "$(list-filter)"
       },
       {
-        "title": "%command.views.experimentsTree.autoApplyFilters%",
-        "command": "dvc.views.experimentsTree.autoApplyFilters",
-        "category": "DVC",
-        "icon": "$(filter)"
-      },
-      {
-        "title": "%command.views.experimentsTree.disableAutoApplyFilters%",
-        "command": "dvc.views.experimentsTree.disableAutoApplyFilters",
-        "category": "DVC",
-        "icon": "$(close)"
-      },
-      {
         "title": "%command.views.plotsPathsTree.selectPlots%",
         "command": "dvc.views.plotsPathsTree.selectPlots",
         "category": "DVC",
@@ -585,12 +573,6 @@
         "dvc.doNotShowWalkthroughAfterInstall": {
           "title": "%config.doNotShowWalkthroughAfterInstall.title%",
           "description": "%config.doNotShowWalkthroughAfterInstall.description%",
-          "type": "boolean",
-          "default": null
-        },
-        "dvc.doNotShowUnableToFilter": {
-          "title": "%config.doNotShowUnableToFilter.title%",
-          "description": "%config.doNotShowUnableToFilter.description%",
           "type": "boolean",
           "default": null
         },
@@ -918,14 +900,6 @@
         {
           "command": "dvc.views.experimentsSortByTree.removeSort",
           "when": "false"
-        },
-        {
-          "command": "dvc.views.experimentsTree.autoApplyFilters",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiments.filter.selected"
-        },
-        {
-          "command": "dvc.views.experimentsTree.disableAutoApplyFilters",
-          "when": "dvc.commands.available && dvc.project.available && dvc.experiments.filter.selected"
         },
         {
           "command": "dvc.views.experimentsTree.selectExperiments",

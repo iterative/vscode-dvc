@@ -44,7 +44,6 @@ import {
   ExperimentsOutput,
   EXPERIMENT_WORKSPACE_ID
 } from '../../cli/dvc/contract'
-import { ContextKey, setContextValue } from '../../vscode/context'
 import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
 import { PersistenceKey } from '../../persistence/constants'
@@ -79,7 +78,6 @@ export class ExperimentsModel extends ModelWithPersistence {
   private starredExperiments: StarredExperiments
 
   private filters: Map<string, FilterDefinition> = new Map()
-  private useFiltersForSelection = false
 
   private currentSorts: SortDefinition[]
   private running: RunningExperiment[] = []
@@ -164,7 +162,6 @@ export class ExperimentsModel extends ModelWithPersistence {
       this.coloredStatus[id] = this.availableColors.shift() as Color
     }
 
-    this.setSelectionMode(false)
     this.persistStatus()
     return this.coloredStatus[id]
   }
@@ -232,21 +229,6 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.getFilters().map(({ path }) => path)
   }
 
-  public canAutoApplyFilters(...filterIdsToRemove: string[]): boolean {
-    if (!this.useFiltersForSelection) {
-      return true
-    }
-
-    const filters = new Map(this.filters)
-    for (const id of filterIdsToRemove) {
-      filters.delete(id)
-    }
-    const filteredExperiments = this.getUnfilteredExperiments([
-      ...filters.values()
-    ])
-    return !tooManySelected(filteredExperiments)
-  }
-
   public addFilter(filter: FilterDefinition) {
     this.filters.set(getFilterId(filter), filter)
     this.applyAndPersistFilters()
@@ -290,7 +272,6 @@ export class ExperimentsModel extends ModelWithPersistence {
   public setSelected(selectedExperiments: Experiment[]) {
     if (tooManySelected(selectedExperiments)) {
       selectedExperiments = limitToMaxSelected(selectedExperiments)
-      this.setSelectionMode(false)
     }
 
     const { availableColors, coloredStatus } = collectSelected(
@@ -303,11 +284,6 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.setColors(coloredStatus, availableColors)
 
     this.persistStatus()
-  }
-
-  public setSelectionMode(useFilters: boolean) {
-    void setContextValue(ContextKey.EXPERIMENT_FILTERS_SELECTED, useFilters)
-    this.useFiltersForSelection = useFilters
   }
 
   public getUnfilteredExperiments(filters = this.getFilters()) {
@@ -557,10 +533,6 @@ export class ExperimentsModel extends ModelWithPersistence {
   private setColoredStatus(runningExperiments: RunningExperiment[]) {
     this.setRunning(runningExperiments)
 
-    if (this.useFiltersForSelection) {
-      this.setSelectedToFilters()
-      return
-    }
     const { coloredStatus, availableColors } = collectColoredStatus(
       this.getWorkspaceAndCommits(),
       this.checkpointsByTip,
@@ -607,19 +579,11 @@ export class ExperimentsModel extends ModelWithPersistence {
     )
   }
 
-  private setSelectedToFilters() {
-    const filteredExperiments = this.getUnfilteredExperiments()
-    this.setSelected(filteredExperiments)
-  }
-
   private persistSorts() {
     return this.persist(PersistenceKey.EXPERIMENTS_SORT_BY, this.currentSorts)
   }
 
   private applyAndPersistFilters() {
-    if (this.useFiltersForSelection) {
-      this.setSelectedToFilters()
-    }
     return this.persist(PersistenceKey.EXPERIMENTS_FILTER_BY, [...this.filters])
   }
 

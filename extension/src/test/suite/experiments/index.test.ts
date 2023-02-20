@@ -1570,7 +1570,7 @@ suite('Experiments Test Suite', () => {
         'second filter should be added to memento after addFilter'
       ).to.deep.equal(filterMapEntries)
 
-      await testRepository.removeFilter(firstFilterId)
+      testRepository.removeFilter(firstFilterId)
       expect(
         mockMemento.get('experimentsFilterBy:test'),
         'first filter should be removed from memento after removeFilter'
