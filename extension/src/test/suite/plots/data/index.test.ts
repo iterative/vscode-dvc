@@ -134,7 +134,14 @@ suite('Plots Data Test Suite', () => {
     it('should collect files and watch them for updates', async () => {
       const mockNow = getMockNow()
       const parentDirectory = 'training'
-      const watchedFile = join(parentDirectory, 'metrics.json')
+      const metricsFile = join(parentDirectory, 'metrics.json')
+      const collectedFile = join(
+        'training',
+        'plots',
+        'metrics',
+        'train',
+        'acc.tsv'
+      )
 
       const mockExecuteCommand = (command: CommandId) => {
         if (command === AvailableCommands.PLOTS_DIFF) {
@@ -146,28 +153,12 @@ suite('Plots Data Test Suite', () => {
                     {
                       dvc_data_version_info: {
                         field: join('train', 'acc'),
-                        filename: join(
-                          'training',
-                          'plots',
-                          'metrics',
-                          'train',
-                          'acc.tsv'
-                        ),
+                        filename: collectedFile,
                         revision: EXPERIMENT_WORKSPACE_ID
                       },
                       dvc_inferred_y_value: '0.2707333333333333',
                       step: '0',
                       [join('train', 'acc')]: '0.2707333333333333'
-                    },
-                    {
-                      dvc_data_version_info: {
-                        field: join('test', 'acc'),
-                        filename: watchedFile,
-                        revision: EXPERIMENT_WORKSPACE_ID
-                      },
-                      dvc_inferred_y_value: '0.2712',
-                      step: '0',
-                      [join('test', 'acc')]: '0.2712'
                     }
                   ]
                 },
@@ -196,6 +187,17 @@ suite('Plots Data Test Suite', () => {
 
       void data.update()
       await data.isReady()
+      data.setMetricFiles({
+        workspace: {
+          baseline: { data: { metrics: { [metricsFile]: { data: {} } } } }
+        }
+      })
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((data as any).collectedFiles).to.deep.equal([
+        collectedFile,
+        metricsFile
+      ])
 
       bypassProcessManagerDebounce(mockNow)
 
@@ -204,7 +206,7 @@ suite('Plots Data Test Suite', () => {
         disposable.track(data.onDidUpdate(() => resolve(undefined)))
       )
 
-      await fireWatcher(join(dvcDemoPath, watchedFile))
+      await fireWatcher(join(dvcDemoPath, metricsFile))
       await dataUpdatedEvent
 
       expect(
