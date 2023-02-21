@@ -8,7 +8,7 @@ import styles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
 import { plotDataStore } from '../plotDataStore'
 import { PlotsState } from '../../store'
-import { useResize } from '../../hooks/useResize'
+import { useSnapPoints } from '../../hooks/useSnapPoints'
 
 interface CheckpointPlotProps {
   id: string
@@ -25,10 +25,8 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
   )
   const [plot, setPlot] = useState(plotDataStore.checkpoint[id])
   const currentSize = useSelector((state: PlotsState) => state.checkpoint.size)
-  const { onResize: handleResize, snapPoints } = useResize(
-    Section.CHECKPOINT_PLOTS,
-    changeSize
-  )
+  const snapPoints = useSnapPoints()
+
   const spec = useMemo(() => {
     const title = plot?.title
     if (!title) {
@@ -60,10 +58,10 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
         data={{ values }}
         id={key}
         toggleDrag={toggleDrag}
-        onResize={handleResize}
-        snapPoints={snapPoints}
+        changeSize={changeSize}
         currentSnapPoint={currentSize}
-        size={snapPoints[currentSize - 1]}
+        section={Section.CHECKPOINT_PLOTS}
+        snapPoints={snapPoints}
       />
     </div>
   )

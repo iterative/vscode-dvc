@@ -16,7 +16,7 @@ import { DropTarget } from '../DropTarget'
 import styles from '../styles.module.scss'
 import { ZoomablePlot } from '../ZoomablePlot'
 import { PlotsState } from '../../store'
-import { useResize } from '../../hooks/useResize'
+import { useSnapPoints } from '../../hooks/useSnapPoints'
 
 interface TemplatePlotsGridProps {
   entries: TemplatePlotEntry[]
@@ -48,15 +48,12 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
 }) => {
   const dispatch = useDispatch()
   const [order, setOrder] = useState<string[]>([])
+  const snapPoints = useSnapPoints()
 
   const disabledDragPlotIds = useSelector(
     (state: PlotsState) => state.template.disabledDragPlotIds
   )
   const currentSize = useSelector((state: PlotsState) => state.template.size)
-  const { onResize: handleResize, snapPoints } = useResize(
-    Section.TEMPLATE_PLOTS,
-    changeSize
-  )
 
   const addDisabled = useCallback(
     (e: Event) => {
@@ -139,10 +136,11 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
           spec={{ ...content, ...autoSize } as VisualizationSpec}
           onViewReady={addEventsOnViewReady}
           toggleDrag={toggleDrag}
-          onResize={handleResize}
-          snapPoints={multiView ? [] : snapPoints}
+          changeSize={changeSize}
           currentSnapPoint={currentSize}
-          size={snapPoints[currentSize - 1]}
+          shouldNotResize={multiView}
+          section={Section.TEMPLATE_PLOTS}
+          snapPoints={snapPoints}
         />
       </div>
     )
