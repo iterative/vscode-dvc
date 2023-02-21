@@ -63,7 +63,7 @@ export const collectMetricsFiles = (
 ): string[] =>
   uniqueValues([
     ...Object.keys({
-      ...data?.workspace.baseline?.data?.metrics
+      ...data?.workspace?.baseline?.data?.metrics
     }).filter(Boolean),
     ...existingFiles
   ]).sort()
