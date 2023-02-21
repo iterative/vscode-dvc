@@ -44,6 +44,7 @@ import { Param } from '../../../../experiments/model/modify/collect'
 import { WorkspaceExperiments } from '../../../../experiments/workspace'
 import { ExperimentItem } from '../../../../experiments/model/collect'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
+import { DvcReader } from '../../../../cli/dvc/reader'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = getTimeSafeDisposer()
@@ -503,6 +504,7 @@ suite('Experiments Tree Test Suite', () => {
 
     it('should be able to queue an experiment from an existing one with dvc.views.experiments.queueExperiment', async () => {
       const baseExperimentId = EXPERIMENT_WORKSPACE_ID
+      stub(DvcReader.prototype, 'listStages').resolves('train')
 
       const { dvcExecutor, experiments, experimentsModel } =
         buildExperiments(disposable)
@@ -566,6 +568,7 @@ suite('Experiments Tree Test Suite', () => {
 
     it('should be able to run a new experiment from an existing one with dvc.views.experiments.runExperiment', async () => {
       const baseExperimentId = EXPERIMENT_WORKSPACE_ID
+      stub(DvcReader.prototype, 'listStages').resolves('train')
 
       const { dvcRunner, experiments, experimentsModel } =
         buildExperiments(disposable)
@@ -625,6 +628,7 @@ suite('Experiments Tree Test Suite', () => {
 
     it('should be able to reset and run a new checkpoint experiment from an existing one with dvc.views.experiments.resetAndRunCheckpointExperiment', async () => {
       const baseExperimentId = EXPERIMENT_WORKSPACE_ID
+      stub(DvcReader.prototype, 'listStages').resolves('train')
 
       const { dvcRunner, experiments, experimentsModel } =
         buildExperiments(disposable)
