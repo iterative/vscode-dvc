@@ -290,7 +290,7 @@ const registerExperimentRunCommands = (
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_RUN,
     showSetupOrExecuteCommand(setup, () =>
-      experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RUN, true)
+      experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RUN)
     )
   )
 
@@ -302,10 +302,7 @@ const registerExperimentRunCommands = (
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_RESET_AND_RUN,
     showSetupOrExecuteCommand(setup, () =>
-      experiments.getCwdThenRun(
-        AvailableCommands.EXPERIMENT_RESET_AND_RUN,
-        true
-      )
+      experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RESET_AND_RUN)
     )
   )
 
