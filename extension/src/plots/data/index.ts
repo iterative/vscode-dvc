@@ -68,6 +68,7 @@ export class PlotsData extends BaseData<{
   public setMetricFiles(data: ExperimentsOutput) {
     const metricsFiles = collectMetricsFiles(data, this.metricFiles)
     if (!sameContents(metricsFiles, this.metricFiles)) {
+      this.metricFiles = metricsFiles
       this.collectedFiles = uniqueValues([
         ...this.collectedFiles,
         ...metricsFiles
