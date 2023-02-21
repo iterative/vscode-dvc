@@ -401,6 +401,7 @@ suite('Workspace Experiments Test Suite', () => {
         DvcRunner.prototype,
         'runExperiment'
       ).resolves(undefined)
+      stub(Setup.prototype, 'shouldBeShown').returns(false)
 
       stubWorkspaceExperimentsGetters(dvcDemoPath)
 
@@ -434,6 +435,7 @@ suite('Workspace Experiments Test Suite', () => {
         DvcRunner.prototype,
         'runExperimentReset'
       ).resolves(undefined)
+      stub(Setup.prototype, 'shouldBeShown').returns(false)
 
       stubWorkspaceExperimentsGetters(dvcDemoPath)
 
