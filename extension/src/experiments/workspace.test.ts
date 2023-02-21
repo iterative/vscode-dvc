@@ -89,6 +89,7 @@ describe('Experiments', () => {
   describe('getCwdThenReport', () => {
     it('should call the correct function with the correct parameters if a project is picked', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedListStages.mockResolvedValueOnce('train')
 
       await workspaceExperiments.getCwdThenReport(mockedCommandId)
 
@@ -103,6 +104,15 @@ describe('Experiments', () => {
       await workspaceExperiments.getCwdThenReport(mockedCommandId)
 
       expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
+      expect(mockedExpFunc).not.toHaveBeenCalled()
+    })
+
+    it('should check and ask for the creation of a pipeline stage before running the command', async () => {
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedListStages.mockResolvedValueOnce('')
+
+      await workspaceExperiments.getCwdThenReport(mockedCommandId)
+
       expect(mockedExpFunc).not.toHaveBeenCalled()
     })
   })
@@ -123,6 +133,7 @@ describe('Experiments', () => {
   describe('getExpNameThenRun', () => {
     it('should call the correct function with the correct parameters if a project and experiment are picked', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedListStages.mockResolvedValueOnce('train')
       mockedPickExperiment.mockResolvedValueOnce({
         id: 'a123456',
         name: 'exp-123'
@@ -144,11 +155,21 @@ describe('Experiments', () => {
       expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
       expect(mockedExpFunc).not.toHaveBeenCalled()
     })
+
+    it('should check and ask for the creation of a pipeline stage before running the command', async () => {
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedListStages.mockResolvedValueOnce('')
+
+      await workspaceExperiments.getCwdAndExpNameThenRun(mockedCommandId)
+
+      expect(mockedExpFunc).not.toHaveBeenCalled()
+    })
   })
 
   describe('getCwdAndQuickPickThenRun', () => {
     it('should call the correct function with the correct parameters if a project and experiment are picked and the quick pick returns a list', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedListStages.mockResolvedValueOnce('train')
 
       const mockedPickedOptions = ['a', 'b', 'c']
       const mockedQuickPick = jest
@@ -184,6 +205,7 @@ describe('Experiments', () => {
 
     it('should not call the function if quick picks are not provided', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedListStages.mockResolvedValueOnce('train')
       const mockedQuickPick = jest.fn().mockResolvedValueOnce(undefined)
 
       await workspaceExperiments.getCwdAndQuickPickThenRun(
@@ -195,11 +217,28 @@ describe('Experiments', () => {
       expect(mockedQuickPick).toHaveBeenCalledTimes(1)
       expect(mockedExpFunc).not.toHaveBeenCalled()
     })
+
+    it('should check and ask for the creation of a pipeline stage before running the command', async () => {
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedListStages.mockResolvedValueOnce('')
+      const mockedPickedOptions = ['a', 'b', 'c']
+      const mockedQuickPick = jest
+        .fn()
+        .mockResolvedValueOnce(mockedPickedOptions)
+
+      await workspaceExperiments.getCwdAndQuickPickThenRun(
+        mockedCommandId,
+        mockedQuickPick
+      )
+
+      expect(mockedExpFunc).not.toHaveBeenCalled()
+    })
   })
 
   describe('getCwdExpNameAndInputThenRun', () => {
     it('should call the correct function with the correct parameters if a project and experiment are picked and an input provided', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedListStages.mockResolvedValueOnce('train')
       mockedPickExperiment.mockResolvedValueOnce({
         id: 'a123456',
         name: 'exp-123'
@@ -238,6 +277,7 @@ describe('Experiments', () => {
 
     it('should not call the function if user input is not provided', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedListStages.mockResolvedValueOnce('train')
       mockedPickExperiment.mockResolvedValueOnce({
         id: 'b456789',
         name: 'exp-456'
@@ -254,11 +294,30 @@ describe('Experiments', () => {
       expect(mockedGetInput).toHaveBeenCalledTimes(1)
       expect(mockedExpFunc).not.toHaveBeenCalled()
     })
+
+    it('should check and ask for the creation of a pipeline stage before running the command', async () => {
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedListStages.mockResolvedValueOnce('')
+      mockedPickExperiment.mockResolvedValueOnce({
+        id: 'a123456',
+        name: 'exp-123'
+      })
+      mockedGetInput.mockResolvedValueOnce('abc123')
+
+      await workspaceExperiments.getCwdExpNameAndInputThenRun(
+        (cwd: string, ...args: Args) =>
+          workspaceExperiments.runCommand(mockedCommandId, cwd, ...args),
+        'enter your password please' as Title
+      )
+
+      expect(mockedExpFunc).not.toHaveBeenCalled()
+    })
   })
 
   describe('getCwdThenRun', () => {
     it('should call the correct function with the correct parameters if a project is picked', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedListStages.mockResolvedValueOnce('train')
 
       await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
@@ -276,7 +335,7 @@ describe('Experiments', () => {
       expect(mockedExpFunc).not.toHaveBeenCalled()
     })
 
-    it('should ensure that a dvc.yaml file exists if the registered command needs it', async () => {
+    it('should ensure that a dvc.yaml file exists', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       mockedGetValidInput.mockResolvedValueOnce('train')
       mockedListStages.mockResolvedValueOnce('')
@@ -284,17 +343,9 @@ describe('Experiments', () => {
         'path/to/training_script.py'
       )
 
-      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
-
-      expect(mockedFindOrCreateDvcYamlFile).toHaveBeenCalledTimes(1)
-    })
-
-    it('should not ensure that a dvc.yaml file exists if the registered command does not require it', async () => {
-      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
-
       await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
-      expect(mockedFindOrCreateDvcYamlFile).not.toHaveBeenCalled()
+      expect(mockedFindOrCreateDvcYamlFile).toHaveBeenCalledTimes(1)
     })
 
     it('should check for pipelines when a command needs it and continue with the command if there is a pipeline', async () => {
@@ -307,7 +358,7 @@ describe('Experiments', () => {
       mockedListStages.mockResolvedValueOnce('train')
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
 
-      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
       expect(executeCommandSpy).toHaveBeenCalledWith(
         AvailableCommands.STAGE_LIST,
@@ -323,7 +374,7 @@ describe('Experiments', () => {
       mockedListStages.mockResolvedValueOnce('')
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
 
-      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
       expect(mockedGetValidInput).toHaveBeenCalledWith(
         Title.ENTER_STAGE_NAME,
@@ -336,7 +387,7 @@ describe('Experiments', () => {
       mockedListStages.mockResolvedValueOnce('train')
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
 
-      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
       expect(mockedGetValidInput).not.toHaveBeenCalledWith(
         Title.ENTER_STAGE_NAME,
@@ -355,7 +406,7 @@ describe('Experiments', () => {
       mockedListStages.mockResolvedValueOnce('')
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
 
-      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
       expect(executeCommandSpy).not.toHaveBeenCalledWith(
         mockedCommandId,
@@ -371,7 +422,7 @@ describe('Experiments', () => {
         'path/to/training_script.py'
       )
 
-      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
       expect(mockedQuickPickOneOrInput).toHaveBeenCalledTimes(1)
     })
@@ -385,7 +436,7 @@ describe('Experiments', () => {
       mockedQuickPickOneOrInput.mockResolvedValueOnce(trainingScript)
       mockedGetFileExtension.mockReturnValueOnce('.py')
 
-      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
       expect(mockedFindOrCreateDvcYamlFile).toHaveBeenCalledWith(
         mockedDvcRoot,
@@ -408,7 +459,7 @@ describe('Experiments', () => {
         'path/to/training_script.py'
       )
 
-      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
       expect(executeCommandSpy).toHaveBeenCalledWith(
         mockedCommandId,
@@ -425,7 +476,7 @@ describe('Experiments', () => {
       )
       mockedGetFileExtension.mockReturnValueOnce('.py')
 
-      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
       expect(mockedFindOrCreateDvcYamlFile).toHaveBeenCalledWith(
         mockedDvcRoot,
@@ -444,7 +495,7 @@ describe('Experiments', () => {
       )
       mockedGetFileExtension.mockReturnValueOnce('.ipynb')
 
-      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
       expect(mockedFindOrCreateDvcYamlFile).toHaveBeenCalledWith(
         mockedDvcRoot,
@@ -463,7 +514,7 @@ describe('Experiments', () => {
       )
       mockedGetFileExtension.mockReturnValueOnce('.ipynb')
 
-      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
       expect(mockedGetInput).not.toHaveBeenCalledWith(
         Title.ENTER_COMMAND_TO_RUN
@@ -479,7 +530,7 @@ describe('Experiments', () => {
       )
       mockedGetFileExtension.mockReturnValueOnce('.js')
 
-      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
       expect(mockedGetInput).toHaveBeenCalledWith(Title.ENTER_COMMAND_TO_RUN)
     })
@@ -496,7 +547,7 @@ describe('Experiments', () => {
       mockedGetFileExtension.mockReturnValueOnce('.js')
       mockedGetInput.mockResolvedValueOnce(customCommand)
 
-      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
       expect(mockedFindOrCreateDvcYamlFile).toHaveBeenCalledWith(
         mockedDvcRoot,
@@ -516,7 +567,7 @@ describe('Experiments', () => {
       mockedGetFileExtension.mockReturnValueOnce('.js')
       mockedGetInput.mockResolvedValueOnce(undefined)
 
-      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
       expect(mockedFindOrCreateDvcYamlFile).toHaveBeenCalledWith(
         mockedDvcRoot,
@@ -537,7 +588,7 @@ describe('Experiments', () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       mockedQuickPickOneOrInput.mockResolvedValueOnce('')
 
-      await workspaceExperiments.getCwdThenRun(mockedCommandId, true)
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
       expect(executeCommandSpy).not.toHaveBeenCalledWith(
         mockedCommandId,
