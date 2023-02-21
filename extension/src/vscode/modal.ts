@@ -2,6 +2,7 @@ import { window } from 'vscode'
 import { Response } from './response'
 
 enum Level {
+  ERROR = 'Error',
   INFORMATION = 'Information',
   WARNING = 'Warning'
 }
@@ -13,6 +14,10 @@ export class Modal {
 
   public static warnOfConsequences(text: string, ...items: Response[]) {
     return Modal.show(Level.WARNING, text, ...items)
+  }
+
+  public static errorWithOptions(text: string, ...items: Response[]) {
+    return Modal.show(Level.ERROR, text, ...items)
   }
 
   private static show(

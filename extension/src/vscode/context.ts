@@ -5,7 +5,6 @@ export enum ContextKey {
   COMMANDS_AVAILABLE = 'dvc.commands.available',
   CONNECT_WEBVIEW_ACTIVE = 'dvc.connect.webview.active',
   EXPERIMENT_CHECKPOINTS = 'dvc.experiment.checkpoints',
-  EXPERIMENT_FILTERS_SELECTED = 'dvc.experiments.filter.selected',
   EXPERIMENTS_WEBVIEW_ACTIVE = 'dvc.experiments.webview.active',
   EXPERIMENT_RUNNING = 'dvc.experiment.running',
   EXPERIMENTS_FILTERED = 'dvc.experiments.filtered',

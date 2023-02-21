@@ -66,8 +66,6 @@
   "command.views.experimentsFilterByTree.removeFilter": "Remove Filter From Experiments Table",
   "command.views.experimentsSortByTree.removeAllSorts": "Remove All Sorts From Experiments Table",
   "command.views.experimentsSortByTree.removeSort": "Remove Sort From Experiments Table",
-  "command.views.experimentsTree.autoApplyFilters": "Auto Apply Filters To Experiment Selection",
-  "command.views.experimentsTree.disableAutoApplyFilters": "Disable Auto Apply Filters To Experiment Selection",
   "command.views.experiments.applyExperiment": "Apply to Workspace",
   "command.views.experiments.branchExperiment": "Create new Branch",
   "command.views.experiments.queueExperiment": "Modify Param(s) and Queue",

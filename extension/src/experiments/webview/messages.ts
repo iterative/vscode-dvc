@@ -348,7 +348,6 @@ export class WebviewMessages {
       .getCombinedList()
       .filter(({ id }) => ids.includes(id))
 
-    this.experiments.setSelectionMode(false)
     this.experiments.setSelected(experiments)
 
     this.notifyChanged()

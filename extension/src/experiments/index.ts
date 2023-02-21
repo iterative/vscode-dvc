@@ -21,14 +21,13 @@ import {
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
 import { Color } from './model/status/colors'
-import { tooManySelected, UNSELECTED } from './model/status'
+import { UNSELECTED } from './model/status'
 import { starredSort } from './model/sortBy/constants'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ColumnsModel } from './columns/model'
 import { CheckpointsModel } from './checkpoints/model'
 import { ExperimentsData } from './data'
-import { askToDisableAutoApplyFilters } from './toast'
-import { Experiment, ColumnType, TableData, isQueued } from './webview/contract'
+import { Experiment, ColumnType, TableData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { DecorationProvider } from './model/decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
@@ -38,7 +37,6 @@ import { ExperimentsOutput, EXPERIMENT_WORKSPACE_ID } from '../cli/dvc/contract'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { FileSystemData } from '../fileSystem/data'
-import { Response } from '../vscode/response'
 import { Title } from '../vscode/title'
 import { createTypedAccumulator } from '../util/object'
 import { pickPaths } from '../path/selection/quickPick'
@@ -305,12 +303,7 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
-  public async removeFilter(id: string) {
-    const response = await this.checkAutoApplyFilters(id)
-    if (response === Response.CANCEL) {
-      return
-    }
-
+  public removeFilter(id: string) {
     if (this.experiments.removeFilter(id)) {
       return this.notifyChanged()
     }
@@ -320,11 +313,6 @@ export class Experiments extends BaseRepository<TableData> {
     const filters = this.experiments.getFilters()
     const filterIdsToRemove = await pickFiltersToRemove(filters)
     if (!filterIdsToRemove) {
-      return
-    }
-
-    const response = await this.checkAutoApplyFilters(...filterIdsToRemove)
-    if (response === Response.CANCEL) {
       return
     }
 
@@ -356,7 +344,6 @@ export class Experiments extends BaseRepository<TableData> {
       return
     }
 
-    this.experiments.setSelectionMode(false)
     this.experiments.setSelected(selected)
     return this.notifyChanged()
   }
@@ -371,22 +358,6 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.columns.setSelected(selected)
     return this.notifyChanged()
-  }
-
-  public async autoApplyFilters(useFilters: boolean) {
-    this.experiments.setSelectionMode(useFilters)
-
-    if (useFilters) {
-      const filteredExperiments = this.experiments
-        .getUnfilteredExperiments()
-        .filter(exp => !isQueued(exp.status))
-      if (tooManySelected(filteredExperiments)) {
-        await this.warnAndDoNotAutoApply(filteredExperiments)
-      } else {
-        this.experiments.setSelected(filteredExperiments)
-      }
-      return this.notifyChanged()
-    }
   }
 
   public pickExperiment() {
@@ -591,34 +562,6 @@ export class Experiments extends BaseRepository<TableData> {
     )
 
     return webviewMessages
-  }
-
-  private async checkAutoApplyFilters(...filterIdsToRemove: string[]) {
-    if (this.experiments.canAutoApplyFilters(...filterIdsToRemove)) {
-      return
-    }
-
-    const response = await askToDisableAutoApplyFilters(
-      'Auto apply filters to experiment selection is currently active. Too many experiments would be selected by removing the selected filter(s), how would you like to proceed?',
-      Response.TURN_OFF
-    )
-    if (response !== Response.CANCEL) {
-      void this.autoApplyFilters(false)
-    }
-    return response
-  }
-
-  private async warnAndDoNotAutoApply(filteredExperiments: Experiment[]) {
-    this.experiments.setSelectionMode(false)
-
-    const response = await askToDisableAutoApplyFilters(
-      'Too many experiments would be selected by applying the current filter(s), how would you like to proceed?',
-      Response.SELECT_MOST_RECENT
-    )
-
-    if (response === Response.SELECT_MOST_RECENT) {
-      this.experiments.setSelected(filteredExperiments)
-    }
   }
 
   private async getExperimentId(overrideId?: string) {

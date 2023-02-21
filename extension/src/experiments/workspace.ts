@@ -190,14 +190,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
   }
 
-  public async autoApplyFilters(enable: boolean, overrideRoot?: string) {
-    const dvcRoot = await this.getDvcRoot(overrideRoot)
-    if (!dvcRoot) {
-      return
-    }
-    return this.getRepository(dvcRoot).autoApplyFilters(enable)
-  }
-
   public async modifyExperimentParamsAndRun(
     commandId: ModifiedExperimentAndRunCommandId,
     overrideRoot?: string,

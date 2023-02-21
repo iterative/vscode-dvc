@@ -2,16 +2,13 @@
 import { join } from 'path'
 import { commands } from 'vscode'
 import { ExperimentsModel } from '.'
-import { copyOriginalColors } from './status/colors'
-import { Operator } from './filterBy'
 import outputFixture from '../../test/fixtures/expShow/base/output'
 import rowsFixture from '../../test/fixtures/expShow/base/rows'
 import deeplyNestedRowsFixture from '../../test/fixtures/expShow/deeplyNested/rows'
 import deeplyNestedOutputFixture from '../../test/fixtures/expShow/deeplyNested/output'
 import uncommittedDepsFixture from '../../test/fixtures/expShow/uncommittedDeps/output'
 import { buildMockMemento } from '../../test/util'
-import { buildMetricOrParamPath } from '../columns/paths'
-import { Experiment, ColumnType } from '../webview/contract'
+import { Experiment } from '../webview/contract'
 import { definedAndNonEmpty } from '../../util/array'
 import dataTypesRowsFixture from '../../test/fixtures/expShow/dataTypes/rows'
 import dataTypesOutputFixture from '../../test/fixtures/expShow/dataTypes/output'
@@ -34,15 +31,6 @@ beforeEach(() => {
 
 describe('ExperimentsModel', () => {
   const runningExperiment = 'exp-12345'
-
-  const [
-    workspaceColor,
-    commitColor,
-    expColor,
-    fourthColor,
-    fifthColor,
-    sixthColor
-  ] = copyOriginalColors()
 
   const buildTestExperiment = (
     testParam: number,
@@ -246,150 +234,6 @@ describe('ExperimentsModel', () => {
     expect(model.getRowData()).toStrictEqual(dataTypesRowsFixture)
   })
 
-  it('should continue to apply filters to new data if selection mode is set to use filters', () => {
-    const testPath = buildMetricOrParamPath(
-      ColumnType.PARAMS,
-      'params.yaml',
-      'test'
-    )
-
-    const experimentsModel = new ExperimentsModel('', buildMockMemento())
-    experimentsModel.addFilter({
-      operator: Operator.GREATER_THAN,
-      path: testPath,
-      value: '2'
-    })
-    const baseline = buildTestExperiment(2, undefined, 'testBranch')
-
-    experimentsModel.transformAndSet(
-      {
-        testBranch: {
-          baseline,
-          test0: buildTestExperiment(0, 'tip2'),
-          test1: buildTestExperiment(1, 'tip2'),
-          tip2: buildTestExperiment(2, 'tip2', runningExperiment)
-        },
-        [EXPERIMENT_WORKSPACE_ID]: {
-          baseline: buildTestExperiment(3)
-        }
-      },
-      false,
-      ''
-    )
-    experimentsModel.toggleStatus(runningExperiment)
-
-    expect(experimentsModel.getSelectedExperiments()).toStrictEqual([
-      expect.objectContaining({
-        displayColor: workspaceColor,
-        id: runningExperiment,
-        label: 'tip2'
-      })
-    ])
-
-    experimentsModel.setSelectionMode(true)
-    experimentsModel.setSelected(experimentsModel.getUnfilteredExperiments())
-
-    expect(experimentsModel.getSelectedExperiments()).toStrictEqual([])
-
-    const unfilteredCheckpoint = buildTestExperiment(
-      3,
-      'tip3',
-      runningExperiment
-    )
-
-    const experimentWithNewCheckpoint = {
-      testBranch: {
-        baseline,
-        test0: buildTestExperiment(0, 'tip3'),
-        test1: buildTestExperiment(1, 'tip3'),
-        test2: buildTestExperiment(2, 'tip3'),
-        tip3: unfilteredCheckpoint
-      },
-      [EXPERIMENT_WORKSPACE_ID]: {
-        baseline: buildTestExperiment(3)
-      }
-    }
-
-    experimentsModel.transformAndSet(experimentWithNewCheckpoint, false, '')
-    expect(experimentsModel.getSelectedExperiments()).toStrictEqual([
-      expect.objectContaining({
-        id: runningExperiment,
-        label: 'tip3'
-      })
-    ])
-  })
-
-  it('should apply filters to checkpoints and experiments if selection mode is set to use filters', () => {
-    const testPath = buildMetricOrParamPath(
-      ColumnType.PARAMS,
-      'params.yaml',
-      'test'
-    )
-
-    const experimentsModel = new ExperimentsModel('', buildMockMemento())
-    experimentsModel.addFilter({
-      operator: Operator.GREATER_THAN_OR_EQUAL,
-      path: testPath,
-      value: '2'
-    })
-    const baseline = buildTestExperiment(2, undefined, 'testBranch')
-
-    experimentsModel.transformAndSet(
-      {
-        testBranch: {
-          '0notIncluded': buildTestExperiment(0, 'tip'),
-          '1notIncluded': buildTestExperiment(1, 'tip'),
-          '2included': buildTestExperiment(2, 'tip'),
-          '3included': buildTestExperiment(2.05, 'tip'),
-          '4included': buildTestExperiment(2.05, 'tip'),
-          baseline,
-          tip: buildTestExperiment(2.1, 'tip', runningExperiment)
-        },
-        [EXPERIMENT_WORKSPACE_ID]: {
-          baseline: buildTestExperiment(3)
-        }
-      },
-      false,
-      ''
-    )
-
-    experimentsModel.setSelectionMode(true)
-    experimentsModel.setSelected(experimentsModel.getUnfilteredExperiments())
-
-    expect(experimentsModel.getSelectedRevisions()).toStrictEqual([
-      expect.objectContaining({
-        displayColor: workspaceColor,
-        id: EXPERIMENT_WORKSPACE_ID,
-        label: EXPERIMENT_WORKSPACE_ID
-      }),
-      expect.objectContaining({
-        displayColor: commitColor,
-        id: 'testBranch',
-        label: 'testBranch'
-      }),
-      expect.objectContaining({
-        displayColor: expColor,
-        id: runningExperiment,
-        label: 'tip'
-      }),
-      expect.objectContaining({
-        displayColor: fourthColor,
-        id: '2included',
-        label: '2includ'
-      }),
-      expect.objectContaining({
-        displayColor: fifthColor,
-        id: '3included',
-        label: '3includ'
-      }),
-      expect.objectContaining({
-        displayColor: sixthColor,
-        id: '4included',
-        label: '4includ'
-      })
-    ])
-  })
-
   it('should always limit the number of selected experiments to 7', () => {
     const experimentsModel = new ExperimentsModel('', buildMockMemento())
 
@@ -412,8 +256,6 @@ describe('ExperimentsModel', () => {
       ''
     )
 
-    experimentsModel.setSelectionMode(true)
-
     experimentsModel.setSelected([
       { id: 'exp1' },
       { id: 'exp2' },
@@ -425,8 +267,6 @@ describe('ExperimentsModel', () => {
       { id: EXPERIMENT_WORKSPACE_ID }
     ] as Experiment[])
     expect(experimentsModel.getSelectedRevisions()).toHaveLength(6)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((experimentsModel as any).useFiltersForSelection).toBe(false)
   })
 
   it('should fetch commit params', () => {
