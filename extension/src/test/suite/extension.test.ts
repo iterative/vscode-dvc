@@ -246,6 +246,8 @@ suite('Extension Test Suite', () => {
 
   describe('dvc.stopAllRunningExperiments', () => {
     it('should send a telemetry event containing properties relating to the event', async () => {
+      stub(DvcReader.prototype, 'listStages').resolves('train')
+
       const duration = 1234
       const otherRoot = resolve('other', 'root')
       mockDuration(duration)

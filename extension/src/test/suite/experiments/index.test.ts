@@ -700,6 +700,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to modify an experiment's params and queue an experiment", async () => {
+      stub(DvcReader.prototype, 'listStages').resolves('train')
       const { experiments, dvcExecutor } = buildExperiments(disposable)
 
       const mockModifiedParams = [
@@ -736,6 +737,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to modify an experiment's params and run a new experiment", async () => {
+      stub(DvcReader.prototype, 'listStages').resolves('train')
       const { experiments, dvcRunner } = buildExperiments(disposable)
 
       const mockModifiedParams = [
@@ -773,6 +775,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to modify an experiment's params reset and run a new experiment", async () => {
+      stub(DvcReader.prototype, 'listStages').resolves('train')
       const { experiments, dvcRunner } = buildExperiments(disposable)
 
       const mockModifiedParams = [

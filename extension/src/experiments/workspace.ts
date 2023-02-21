@@ -205,6 +205,11 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
+    const shouldContinue = await this.checkOrAddPipeline(cwd)
+    if (!shouldContinue) {
+      return
+    }
+
     return await repository.modifyExperimentParamsAndRun(commandId, overrideId)
   }
 
@@ -216,7 +221,10 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     if (!cwd) {
       return
     }
-
+    const shouldContinue = await this.checkOrAddPipeline(cwd)
+    if (!shouldContinue) {
+      return
+    }
     const repository = this.getRepository(cwd)
     if (!repository) {
       return
@@ -225,19 +233,11 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return await repository.modifyExperimentParamsAndQueue(overrideId)
   }
 
-  public async getCwdThenRun(
-    commandId: CommandId,
-    ensurePipelineExists?: boolean
-  ) {
-    const cwd = await this.getFocusedOrOnlyOrPickProject()
+  public async getCwdThenRun(commandId: CommandId) {
+    const cwd = await this.shouldRun()
+
     if (!cwd) {
-      return
-    }
-    if (ensurePipelineExists) {
-      const shouldContinue = await this.checkOrAddPipeline(cwd)
-      if (!shouldContinue) {
-        return
-      }
+      return 'Could not run task'
     }
 
     return this.internalCommands.executeCommand(commandId, cwd)
@@ -249,14 +249,8 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     this.updatesPaused.fire(false)
   }
 
-  public async getCwdThenReport(commandId: CommandId) {
-    const cwd = await this.getFocusedOrOnlyOrPickProject()
-    if (!cwd) {
-      return
-    }
-
-    const stdout = this.internalCommands.executeCommand(commandId, cwd)
-    return Toast.showOutput(stdout)
+  public getCwdThenReport(commandId: CommandId) {
+    return Toast.showOutput(this.getCwdThenRun(commandId))
   }
 
   public getCwdAndExpNameThenRun(commandId: CommandId) {
@@ -267,7 +261,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     commandId: CommandId,
     quickPick: () => Thenable<string[] | undefined>
   ) {
-    const cwd = await this.getFocusedOrOnlyOrPickProject()
+    const cwd = await this.shouldRun()
     if (!cwd) {
       return
     }
@@ -282,7 +276,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     runCommand: (cwd: string, ...args: Args) => Promise<void>,
     title: Title
   ) {
-    const cwd = await this.getFocusedOrOnlyOrPickProject()
+    const cwd = await this.shouldRun()
     if (!cwd) {
       return
     }
@@ -325,7 +319,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     title: Title,
     options: { prompt: string; value: string }
   ) {
-    const cwd = await this.getFocusedOrOnlyOrPickProject()
+    const cwd = await this.shouldRun()
     if (!cwd) {
       return
     }
@@ -430,6 +424,18 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return Object.values(this.repositories).some(experiments =>
       experiments.hasRunningExperiment()
     )
+  }
+
+  private async shouldRun() {
+    const cwd = await this.getFocusedOrOnlyOrPickProject()
+    if (!cwd) {
+      return
+    }
+    const shouldContinue = await this.checkOrAddPipeline(cwd)
+    if (!shouldContinue) {
+      return
+    }
+    return cwd
   }
 
   private async checkOrAddPipeline(cwd: string) {
