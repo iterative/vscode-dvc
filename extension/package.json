@@ -1374,7 +1374,13 @@
     "viewsWelcome": [
       {
         "view": "dvc.views.actions",
-        "contents": "[$(beaker) Show Experiments](command:dvc.showExperiments)\n[$(graph-scatter) Show Plots](command:dvc.showPlots)\n[$(play) Run Experiment](command:dvc.runExperiment)"
+        "contents": "[$(beaker) Show Experiments](command:dvc.showExperiments)\n[$(graph-scatter) Show Plots](command:dvc.showPlots)\n[$(play) Run Experiment](command:dvc.runExperiment)",
+        "when": "!dvc.experiment.checkpoints"
+      },
+      {
+        "view": "dvc.views.actions",
+        "contents": "[$(beaker) Show Experiments](command:dvc.showExperiments)\n[$(graph-scatter) Show Plots](command:dvc.showPlots)\n[$(play) Run Experiment](command:dvc.resetAndRunCheckpointExperiment)",
+        "when": "dvc.experiment.checkpoints"
       },
       {
         "view": "dvc.views.studio",
