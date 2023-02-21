@@ -1,22 +1,21 @@
 import cx from 'classnames'
-import { Section, TemplatePlotEntry } from 'dvc/src/plots/webview/contract'
+import { TemplatePlotEntry } from 'dvc/src/plots/webview/contract'
 import { reorderObjectList } from 'dvc/src/util/array'
 import React, { useEffect, useState, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { VisualizationSpec } from 'react-vega'
 import { changeDisabledDragIds, changeSize } from './templatePlotsSlice'
+import { TemplatePlotsGridItem } from './TemplatePlotsGridItem'
 import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/VirtualizedGrid'
 import {
   DragDropContainer,
   OnDrop,
   WrapperProps
 } from '../../../shared/components/dragDrop/DragDropContainer'
-import { withScale } from '../../../util/styles'
 import { DropTarget } from '../DropTarget'
 import styles from '../styles.module.scss'
-import { ZoomablePlot } from '../ZoomablePlot'
 import { PlotsState } from '../../store'
 import { useSnapPoints } from '../../hooks/useSnapPoints'
+import { withScale } from '../../../util/styles'
 
 interface TemplatePlotsGridProps {
   entries: TemplatePlotEntry[]
@@ -28,11 +27,6 @@ interface TemplatePlotsGridProps {
   useVirtualizedGrid?: boolean
   nbItemsPerRow: number
   parentDraggedOver?: boolean
-}
-
-const autoSize = {
-  height: 'container',
-  width: 'container'
 }
 
 export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
@@ -53,7 +47,6 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   const disabledDragPlotIds = useSelector(
     (state: PlotsState) => state.template.disabledDragPlotIds
   )
-  const currentSize = useSelector((state: PlotsState) => state.template.size)
 
   const addDisabled = useCallback(
     (e: Event) => {
@@ -87,14 +80,14 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
     }
   }, [addDisabled, removeDisabled, disableClick])
 
-  const addEventsOnViewReady = () => {
+  const addEventsOnViewReady = useCallback(() => {
     const panels = document.querySelectorAll('.vega-bindings')
     for (const panel of Object.values(panels)) {
       panel.addEventListener('mouseenter', addDisabled)
       panel.addEventListener('mouseleave', removeDisabled)
       panel.addEventListener('click', disableClick)
     }
-  }
+  }, [addDisabled, removeDisabled, disableClick])
 
   const setEntriesOrder = (order: string[]) => {
     setOrder(order)
@@ -116,31 +109,22 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   })
 
   const items = reorderedItems.map((plot: TemplatePlotEntry) => {
-    const { id, content, multiView, revisions } = plot
+    const { id, revisions } = plot
     const nbRevisions = (multiView && revisions?.length) || 1
-
-    const toggleDrag = (enabled: boolean) => {
-      dispatch(changeDisabledDragIds(enabled ? [] : [id]))
-    }
 
     return (
       <div
         key={id}
+        id={id}
         className={plotClassName}
         data-testid={`plot_${id}`}
-        id={id}
         style={withScale(nbRevisions)}
       >
-        <ZoomablePlot
-          id={id}
-          spec={{ ...content, ...autoSize } as VisualizationSpec}
-          onViewReady={addEventsOnViewReady}
-          toggleDrag={toggleDrag}
-          changeSize={changeSize}
-          currentSnapPoint={currentSize}
-          shouldNotResize={multiView}
-          section={Section.TEMPLATE_PLOTS}
+        <TemplatePlotsGridItem
+          plot={plot}
+          addEventsOnViewReady={addEventsOnViewReady}
           snapPoints={snapPoints}
+          changeSize={changeSize}
         />
       </div>
     )
