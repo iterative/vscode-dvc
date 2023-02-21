@@ -76,6 +76,7 @@ import { AvailableCommands } from '../../../commands/internal'
 import { Setup } from '../../../setup'
 import * as FileSystem from '../../../fileSystem'
 import * as ProcessExecution from '../../../processExecution'
+import { DvcReader } from '../../../cli/dvc/reader'
 import { Connect } from '../../../connect'
 
 const { openFileInEditor } = FileSystem
@@ -128,11 +129,12 @@ suite('Experiments Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the experiment webview visible', async () => {
-      const { dvcReader, experiments, messageSpy } = buildExperiments(
+      stub(DvcReader.prototype, 'listStages').resolves('train')
+
+      const { experiments, messageSpy } = buildExperiments(
         disposable,
         expShowFixture
       )
-      stub(dvcReader, 'listStages').resolves('train')
 
       const webview = await experiments.showWebview()
 
@@ -182,11 +184,12 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasConfig to false if there are no stages', async () => {
-      const { dvcReader, experiments, messageSpy } = buildExperiments(
+      stub(DvcReader.prototype, 'listStages').resolves('')
+
+      const { experiments, messageSpy } = buildExperiments(
         disposable,
         expShowFixture
       )
-      stub(dvcReader, 'listStages').resolves('')
 
       await experiments.showWebview()
 
@@ -209,11 +212,12 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasConfig to true if there are stages', async () => {
-      const { dvcReader, experiments, messageSpy } = buildExperiments(
+      stub(DvcReader.prototype, 'listStages').resolves('train')
+
+      const { experiments, messageSpy } = buildExperiments(
         disposable,
         expShowFixture
       )
-      stub(dvcReader, 'listStages').resolves('train')
 
       await experiments.showWebview()
 
@@ -250,7 +254,6 @@ suite('Experiments Test Suite', () => {
         experimentsModel,
         internalCommands,
         dvcExecutor,
-        dvcReader,
         mockCheckOrAddPipeline,
         messageSpy
       } = buildExperiments(disposable, expShowFixture)
@@ -265,7 +268,6 @@ suite('Experiments Test Suite', () => {
       return {
         columnsModel,
         dvcExecutor,
-        dvcReader,
         experiments,
         experimentsModel,
         messageSpy,
@@ -698,9 +700,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to modify an experiment's params and queue an experiment", async () => {
-      const { experiments, dvcExecutor, dvcReader } =
-        buildExperiments(disposable)
-      stub(dvcReader, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'listStages').resolves('train')
+      const { experiments, dvcExecutor } = buildExperiments(disposable)
 
       const mockModifiedParams = [
         '-S',
@@ -736,8 +737,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to modify an experiment's params and run a new experiment", async () => {
-      const { experiments, dvcRunner, dvcReader } = buildExperiments(disposable)
-      stub(dvcReader, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'listStages').resolves('train')
+      const { experiments, dvcRunner } = buildExperiments(disposable)
 
       const mockModifiedParams = [
         '-S',
@@ -774,8 +775,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to modify an experiment's params reset and run a new experiment", async () => {
-      const { experiments, dvcRunner, dvcReader } = buildExperiments(disposable)
-      stub(dvcReader, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'listStages').resolves('train')
+      const { experiments, dvcRunner } = buildExperiments(disposable)
 
       const mockModifiedParams = [
         '-S',
@@ -888,9 +889,10 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to select columns', async () => {
-      const { columnsModel, dvcReader, experiments, messageSpy } =
+      stub(DvcReader.prototype, 'listStages').resolves('train')
+
+      const { columnsModel, experiments, messageSpy } =
         setupExperimentsAndMockCommands()
-      stub(dvcReader, 'listStages').resolves('train')
 
       const webview = await experiments.showWebview()
       messageSpy.resetHistory()
@@ -1224,9 +1226,10 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to add a configuration', async () => {
-      const { dvcReader, experiments, mockCheckOrAddPipeline, messageSpy } =
+      stub(DvcReader.prototype, 'listStages').resolves('')
+
+      const { experiments, mockCheckOrAddPipeline, messageSpy } =
         setupExperimentsAndMockCommands()
-      stub(dvcReader, 'listStages').resolves('')
 
       const webview = await experiments.showWebview()
       messageSpy.resetHistory()
