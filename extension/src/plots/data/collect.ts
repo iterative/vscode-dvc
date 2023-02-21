@@ -1,4 +1,4 @@
-import { PlotsOutputOrError } from '../../cli/dvc/contract'
+import { ExperimentsOutput, PlotsOutputOrError } from '../../cli/dvc/contract'
 import { isDvcError } from '../../cli/dvc/reader'
 import { uniqueValues } from '../../util/array'
 import { isImagePlot, Plot, TemplatePlot } from '../webview/contract'
@@ -56,3 +56,14 @@ export const collectFiles = (
 
   return uniqueValues(acc)
 }
+
+export const collectMetricsFiles = (
+  data: ExperimentsOutput,
+  existingFiles: string[]
+): string[] =>
+  uniqueValues([
+    ...Object.keys({
+      ...data?.workspace.baseline?.data?.metrics
+    }).filter(Boolean),
+    ...existingFiles
+  ]).sort()

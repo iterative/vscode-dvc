@@ -1,12 +1,13 @@
 import { EventEmitter } from 'vscode'
-import { collectFiles } from './collect'
+import { collectMetricsFiles, collectFiles } from './collect'
 import {
   EXPERIMENT_WORKSPACE_ID,
+  ExperimentsOutput,
   PlotsOutputOrError
 } from '../../cli/dvc/contract'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { BaseData } from '../../data'
-import { flattenUnique, sameContents } from '../../util/array'
+import { flattenUnique, sameContents, uniqueValues } from '../../util/array'
 import { PlotsModel } from '../model'
 
 export class PlotsData extends BaseData<{
@@ -14,6 +15,8 @@ export class PlotsData extends BaseData<{
   revs: string[]
 }> {
   private readonly model: PlotsModel
+
+  private metricFiles: string[] = []
 
   constructor(
     dvcRoot: string,
@@ -60,6 +63,16 @@ export class PlotsData extends BaseData<{
 
   public managedUpdate() {
     return this.processManager.run('update')
+  }
+
+  public setMetricFiles(data: ExperimentsOutput) {
+    const metricsFiles = collectMetricsFiles(data, this.metricFiles)
+    if (!sameContents(metricsFiles, this.metricFiles)) {
+      this.collectedFiles = uniqueValues([
+        ...this.collectedFiles,
+        ...metricsFiles
+      ])
+    }
   }
 
   protected collectFiles({ data }: { data: PlotsOutputOrError }) {
