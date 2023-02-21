@@ -13,6 +13,7 @@ import { Resizer } from './Resizer'
 import { config } from './constants'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 import { sendMessage } from '../../shared/vscode'
+import { SnapPoints } from '../hooks/useSnapPoints'
 
 interface ZoomablePlotProps {
   spec: VisualizationSpec
@@ -23,7 +24,7 @@ interface ZoomablePlotProps {
   changeSize: (size: number) => AnyAction
   currentSnapPoint: number
   section: Section
-  snapPoints: [number, number, number, number]
+  snapPoints: SnapPoints
   shouldNotResize?: boolean
 }
 
