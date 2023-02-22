@@ -51,7 +51,7 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
     <div className={styles.plot} data-testid={key} id={id} style={withScale(1)}>
       <ZoomablePlot
         spec={spec}
-        id={key}
+        id={id}
         toggleDrag={toggleDrag}
         changeSize={changeSize}
         currentSnapPoint={currentSize}
