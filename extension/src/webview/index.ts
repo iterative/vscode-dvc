@@ -138,7 +138,6 @@ export class BaseWebview<T extends WebviewData> {
       )
       .join('')
 
-    // TODO make CSP more strict!
     return `
         <html>
           <head>
