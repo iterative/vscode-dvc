@@ -3,14 +3,17 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_SIZES,
   Section,
+  TemplatePlotGroup,
   TemplatePlotsData
 } from 'dvc/src/plots/webview/contract'
-import { plotDataStore } from '../plotDataStore'
+import { addPlotsWithSnapshots, removePlots } from '../plotDataStore'
 
+export type PlotGroup = { group: TemplatePlotGroup; entries: string[] }
 export interface TemplatePlotsState extends Omit<TemplatePlotsData, 'plots'> {
   isCollapsed: boolean
   hasData: boolean
-  plotsSnapshot: string
+  plotSections: PlotGroup[]
+  plotsSnapshots: { [key: string]: string }
   disabledDragPlotIds: string[]
 }
 
@@ -18,7 +21,8 @@ export const templatePlotsInitialState: TemplatePlotsState = {
   disabledDragPlotIds: [],
   hasData: false,
   isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.TEMPLATE_PLOTS],
-  plotsSnapshot: '',
+  plotSections: [],
+  plotsSnapshots: {},
   size: DEFAULT_SECTION_SIZES[Section.TEMPLATE_PLOTS]
 }
 
@@ -36,17 +40,27 @@ export const templatePlotsSlice = createSlice({
       state.isCollapsed = action.payload
     },
     update: (state, action: PayloadAction<TemplatePlotsData>) => {
-      plotDataStore.template = action.payload?.plots
       if (!action.payload) {
         return templatePlotsInitialState
       }
 
+      const plotSections = action.payload.plots?.map(section => ({
+        entries: section.entries.map(entry => entry.id),
+        group: section.group
+      }))
+      const plots = action.payload.plots?.flatMap(section => section.entries)
+      const plotsIds = plots?.map(plot => plot.id) || []
+      const snapShots = addPlotsWithSnapshots(plots, Section.TEMPLATE_PLOTS)
+      removePlots(plotsIds, Section.TEMPLATE_PLOTS)
+
       return {
         ...state,
         hasData: !!action.payload,
-        plotsSnapshot: JSON.stringify(action.payload.plots),
+        plotSections,
+        plotsSnapshots: snapShots,
         size: Math.abs(action.payload.size)
       }
+      // TODO: add sections in here with the entries ids
     }
   }
 })

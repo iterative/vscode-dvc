@@ -1,22 +1,23 @@
-import {
-  TemplatePlotEntry,
-  TemplatePlotGroup,
-  TemplatePlotSection
-} from 'dvc/src/plots/webview/contract'
-import React, { DragEvent, useState, useEffect, useRef } from 'react'
+import { TemplatePlotGroup } from 'dvc/src/plots/webview/contract'
+import React, {
+  DragEvent,
+  useState,
+  useEffect,
+  useRef,
+  useCallback
+} from 'react'
 import cx from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { reorderObjectList } from 'dvc/src/util/array'
 import { AddedSection } from './AddedSection'
 import { TemplatePlotsGrid } from './TemplatePlotsGrid'
+import { PlotGroup } from './templatePlotsSlice'
 import { removeFromPreviousAndAddToNewSection } from './util'
 import { sendMessage } from '../../../shared/vscode'
 import { createIDWithIndex, getIDIndex } from '../../../util/ids'
 import styles from '../styles.module.scss'
 import { shouldUseVirtualizedGrid } from '../util'
 import { PlotsState } from '../../store'
-import { plotDataStore } from '../plotDataStore'
 import { setDraggedOverGroup } from '../../../shared/components/dragDrop/dragDropSlice'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { isSameGroup } from '../../../shared/components/dragDrop/DragDropContainer'
@@ -29,7 +30,7 @@ export enum NewSectionBlock {
 }
 
 export const TemplatePlots: React.FC = () => {
-  const { plotsSnapshot, size } = useSelector(
+  const { plotSections, size } = useSelector(
     (state: PlotsState) => state.template
   )
   const draggedOverGroup = useSelector(
@@ -42,7 +43,7 @@ export const TemplatePlots: React.FC = () => {
     (state: PlotsState) => state.webview.selectedRevisions
   )
 
-  const [sections, setSections] = useState<TemplatePlotSection[]>([])
+  const [sections, setSections] = useState<PlotGroup[]>(plotSections)
   const [hoveredSection, setHoveredSection] = useState('')
   const nbItemsPerRow = size
   const shouldSendMessage = useRef(true)
@@ -50,15 +51,15 @@ export const TemplatePlots: React.FC = () => {
 
   useEffect(() => {
     shouldSendMessage.current = false
-    setSections(plotDataStore.template)
-  }, [plotsSnapshot, setSections])
+    setSections(plotSections)
+  }, [plotSections, setSections])
 
   useEffect(() => {
     if (sections && shouldSendMessage.current) {
       sendMessage({
         payload: sections.map(section => ({
           group: section.group,
-          paths: section.entries.map(({ id }) => id)
+          paths: section.entries
         })),
         type: MessageFromWebviewType.REORDER_PLOTS_TEMPLATES
       })
@@ -66,22 +67,50 @@ export const TemplatePlots: React.FC = () => {
     shouldSendMessage.current = true
   }, [sections])
 
+  const handleDropInSection = useCallback(
+    (
+      draggedId: string,
+      draggedGroup: string,
+      groupId: string,
+      position?: number
+    ) => {
+      if (draggedGroup === groupId) {
+        return
+      }
+      const oldGroupId = getIDIndex(draggedGroup)
+      const newGroupId = getIDIndex(groupId)
+      const updatedSections = removeFromPreviousAndAddToNewSection(
+        sections,
+        oldGroupId,
+        draggedId,
+        newGroupId,
+        position
+      )
+
+      setSections(updatedSections)
+    },
+    [setSections, sections]
+  )
+
+  const setSectionEntries = useCallback(
+    (index: number, entries: string[]) => {
+      setSections(sections => {
+        const updatedSections = [...sections]
+        updatedSections[index] = {
+          ...sections[index],
+          entries
+        }
+        return updatedSections
+      })
+    },
+    [setSections]
+  )
+
   if (sectionIsLoading(selectedRevisions)) {
     return <LoadingSection />
   }
   if (!sections || sections.length === 0) {
     return <EmptyState isFullScreen={false}>No Plots to Display</EmptyState>
-  }
-
-  const setSectionEntries = (index: number, entries: TemplatePlotEntry[]) => {
-    setSections(sections => {
-      const updatedSections = [...sections]
-      updatedSections[index] = {
-        ...sections[index],
-        entries
-      }
-      return updatedSections
-    })
   }
 
   const firstSection = sections[0]
@@ -104,14 +133,11 @@ export const TemplatePlots: React.FC = () => {
       draggedId
     )
 
-    const { group, entries } = sections[draggedSectionId]
+    const { group } = sections[draggedSectionId]
 
     setHoveredSection('')
-    const entry = entries.find(
-      ({ id }) => id === draggedId
-    ) as TemplatePlotEntry
     const newSection = {
-      entries: [entry],
+      entries: [draggedId],
       group
     }
 
@@ -124,32 +150,6 @@ export const TemplatePlots: React.FC = () => {
     if (lastSection.group !== group) {
       setTimeout(() => setSections([...updatedSections, newSection]), 1)
     }
-  }
-
-  const handleDropInSection = (
-    draggedId: string,
-    draggedGroup: string,
-    groupId: string,
-    position?: number
-  ) => {
-    if (draggedGroup === groupId) {
-      return
-    }
-    const oldGroupId = getIDIndex(draggedGroup)
-    const newGroupId = getIDIndex(groupId)
-    const entry = sections[oldGroupId].entries.find(
-      ({ id }) => id === draggedId
-    ) as TemplatePlotEntry
-    const updatedSections = removeFromPreviousAndAddToNewSection(
-      sections,
-      oldGroupId,
-      draggedId,
-      newGroupId,
-      entry,
-      position
-    )
-
-    setSections(updatedSections)
   }
 
   const handleEnteringSection = (groupId: string) => {
@@ -192,17 +192,13 @@ export const TemplatePlots: React.FC = () => {
           }
 
           if (draggedRef.group === groupId) {
-            const order = section.entries.map(s => s.id)
+            const order = section.entries
             const updatedSections = [...sections]
 
             const newOrder = changeOrderWithDraggedInfo(order, draggedRef)
             updatedSections[i] = {
               ...sections[i],
-              entries: reorderObjectList<TemplatePlotEntry>(
-                newOrder,
-                section.entries,
-                'id'
-              )
+              entries: newOrder
             }
             setSections(updatedSections)
           } else if (isSameGroup(draggedRef.group, groupId)) {
@@ -231,7 +227,6 @@ export const TemplatePlots: React.FC = () => {
             onDrop={handleDropAtTheEnd}
           >
             <TemplatePlotsGrid
-              entries={section.entries}
               groupId={groupId}
               groupIndex={i}
               onDropInSection={handleDropInSection}
@@ -240,6 +235,7 @@ export const TemplatePlots: React.FC = () => {
               useVirtualizedGrid={useVirtualizedGrid}
               nbItemsPerRow={nbItemsPerRow}
               parentDraggedOver={draggedOverGroup === groupId}
+              entries={section.entries}
             />
           </div>
         )

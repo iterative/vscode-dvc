@@ -3,43 +3,44 @@ import cx from 'classnames'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { Section } from 'dvc/src/plots/webview/contract'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { PlainObject, VisualizationSpec } from 'react-vega'
+import { useDispatch, useSelector } from 'react-redux'
+import { VisualizationSpec } from 'react-vega'
 import { Renderers } from 'vega'
 import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { setZoomedInPlot } from './webviewSlice'
 import styles from './styles.module.scss'
 import { Resizer } from './Resizer'
 import { config } from './constants'
+import { PlotsState } from '../store'
+import { useGetPlot } from '../hooks/useGetPlot'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 import { sendMessage } from '../../shared/vscode'
-import { SnapPoints } from '../hooks/useSnapPoints'
 
 interface ZoomablePlotProps {
-  spec: VisualizationSpec
-  data?: PlainObject
+  spec?: VisualizationSpec
   id: string
   onViewReady?: () => void
-  toggleDrag: (enabled: boolean) => void
+  toggleDrag: (enabled: boolean, id: string) => void
   changeSize: (size: number) => AnyAction
   currentSnapPoint: number
   section: Section
-  snapPoints: SnapPoints
   shouldNotResize?: boolean
 }
 
 export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
-  spec,
-  data,
+  spec: createdSpec,
   id,
   onViewReady,
   toggleDrag,
   changeSize,
   currentSnapPoint,
   section,
-  snapPoints,
   shouldNotResize
 }) => {
+  const snapPoints = useSelector(
+    (state: PlotsState) => state.webview.snapPoints
+  )
+  const { data, content: spec } = useGetPlot(section, id, createdSpec)
   const dispatch = useDispatch()
   const previousSpecsAndData = useRef(JSON.stringify({ data, spec }))
   const currentPlotProps = useRef<VegaLiteProps>()
@@ -60,6 +61,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   currentPlotProps.current = plotProps
 
   useEffect(() => {
+    // TODO Review this as this should be handled by the useGetPlot
     if (previousSpecsAndData.current !== newSpecsAndData) {
       dispatch(
         setZoomedInPlot({ id, plot: currentPlotProps.current, refresh: true })
@@ -91,16 +93,19 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   const commonResizerProps = {
     onGrab: () => {
       clickDisabled.current = true
-      toggleDrag(false)
+      toggleDrag(false, id)
     },
     onRelease: () => {
-      toggleDrag(true)
+      toggleDrag(true, id)
       enableClickTimeout.current = window.setTimeout(
         () => (clickDisabled.current = false),
         0
       )
     },
     onResize
+  }
+  if (!data && !spec) {
+    return null
   }
   return (
     <button

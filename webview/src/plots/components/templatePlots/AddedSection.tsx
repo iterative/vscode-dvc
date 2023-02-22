@@ -1,10 +1,10 @@
 import React, { DragEvent } from 'react'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
-import { TemplatePlotSection } from 'dvc/src/plots/webview/contract'
+import { PlotGroup } from './templatePlotsSlice'
 import styles from '../styles.module.scss'
-import { getIDWithoutIndex } from '../../../util/ids'
 import { PlotsState } from '../../store'
+import { getIDWithoutIndex } from '../../../util/ids'
 import { Icon } from '../../../shared/components/Icon'
 import { GraphLine } from '../../../shared/components/icons'
 import { useDeferedDragLeave } from '../../../shared/hooks/useDeferedDragLeave'
@@ -14,7 +14,7 @@ interface AddedSectionProps {
   hoveredSection: string
   setHoveredSection: (section: string) => void
   onDrop: (e: DragEvent<HTMLElement>) => void
-  closestSection: TemplatePlotSection
+  closestSection: PlotGroup
   acceptedGroups: string[]
 }
 

@@ -8,7 +8,6 @@ import styles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
 import { plotDataStore } from '../plotDataStore'
 import { PlotsState } from '../../store'
-import { useSnapPoints } from '../../hooks/useSnapPoints'
 
 interface CheckpointPlotProps {
   id: string
@@ -23,9 +22,8 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
   const plotSnapshot = useSelector(
     (state: PlotsState) => state.checkpoint.plotsSnapshots[id]
   )
-  const [plot, setPlot] = useState(plotDataStore.checkpoint[id])
+  const [plot, setPlot] = useState(plotDataStore[Section.CHECKPOINT_PLOTS][id])
   const currentSize = useSelector((state: PlotsState) => state.checkpoint.size)
-  const snapPoints = useSnapPoints()
 
   const spec = useMemo(() => {
     const title = plot?.title
@@ -36,14 +34,12 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
   }, [plot?.title, colors])
 
   useEffect(() => {
-    setPlot(plotDataStore.checkpoint[id])
+    setPlot(plotDataStore[Section.CHECKPOINT_PLOTS][id])
   }, [plotSnapshot, id])
 
   if (!plot) {
     return null
   }
-
-  const { values } = plot
 
   const key = `plot-${id}`
 
@@ -55,13 +51,11 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
     <div className={styles.plot} data-testid={key} id={id} style={withScale(1)}>
       <ZoomablePlot
         spec={spec}
-        data={{ values }}
         id={key}
         toggleDrag={toggleDrag}
         changeSize={changeSize}
         currentSnapPoint={currentSize}
         section={Section.CHECKPOINT_PLOTS}
-        snapPoints={snapPoints}
       />
     </div>
   )

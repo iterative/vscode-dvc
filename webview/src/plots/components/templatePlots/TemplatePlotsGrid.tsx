@@ -1,10 +1,8 @@
 import cx from 'classnames'
-import { TemplatePlotEntry } from 'dvc/src/plots/webview/contract'
-import { reorderObjectList } from 'dvc/src/util/array'
-import React, { useEffect, useState, useCallback } from 'react'
+import { Section } from 'dvc/src/plots/webview/contract'
+import React, { useEffect, useState, useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { changeDisabledDragIds, changeSize } from './templatePlotsSlice'
-import { TemplatePlotsGridItem } from './TemplatePlotsGridItem'
 import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/VirtualizedGrid'
 import {
   DragDropContainer,
@@ -14,23 +12,23 @@ import {
 import { DropTarget } from '../DropTarget'
 import styles from '../styles.module.scss'
 import { PlotsState } from '../../store'
-import { useSnapPoints } from '../../hooks/useSnapPoints'
 import { withScale } from '../../../util/styles'
+import { ZoomablePlot } from '../ZoomablePlot'
+import { plotDataStore } from '../plotDataStore'
 
 interface TemplatePlotsGridProps {
-  entries: TemplatePlotEntry[]
   groupId: string
   groupIndex: number
   onDropInSection: OnDrop
   multiView: boolean
-  setSectionEntries: (groupIndex: number, entries: TemplatePlotEntry[]) => void
+  setSectionEntries: (groupIndex: number, entries: string[]) => void
   useVirtualizedGrid?: boolean
   nbItemsPerRow: number
+  entries: string[]
   parentDraggedOver?: boolean
 }
 
 export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
-  entries,
   groupId,
   groupIndex,
   onDropInSection,
@@ -38,11 +36,12 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   setSectionEntries,
   useVirtualizedGrid,
   nbItemsPerRow,
+  entries,
   parentDraggedOver
 }) => {
   const dispatch = useDispatch()
   const [order, setOrder] = useState<string[]>([])
-  const snapPoints = useSnapPoints()
+  const currentSize = useSelector((state: PlotsState) => state.template.size)
 
   const disabledDragPlotIds = useSelector(
     (state: PlotsState) => state.template.disabledDragPlotIds
@@ -66,7 +65,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   }, [])
 
   useEffect(() => {
-    setOrder(entries.map(({ id }) => id))
+    setOrder(entries)
   }, [entries])
 
   useEffect(() => {
@@ -92,43 +91,57 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   const setEntriesOrder = (order: string[]) => {
     setOrder(order)
 
-    setSectionEntries(
-      groupIndex,
-      reorderObjectList<TemplatePlotEntry>(order, entries, 'id')
-    )
+    setSectionEntries(groupIndex, order)
   }
-
-  const reorderedItems = reorderObjectList<TemplatePlotEntry>(
-    order,
-    entries,
-    'id'
-  )
 
   const plotClassName = cx(styles.plot, {
     [styles.multiViewPlot]: multiView
   })
 
-  const items = reorderedItems.map((plot: TemplatePlotEntry) => {
-    const { id, revisions } = plot
-    const nbRevisions = (multiView && revisions?.length) || 1
+  const toggleDrag = useCallback(
+    (enabled: boolean, id: string) => {
+      dispatch(changeDisabledDragIds(enabled ? [] : [id]))
+    },
+    [dispatch]
+  )
 
-    return (
-      <div
-        key={id}
-        id={id}
-        className={plotClassName}
-        data-testid={`plot_${id}`}
-        style={withScale(nbRevisions)}
-      >
-        <TemplatePlotsGridItem
-          plot={plot}
-          addEventsOnViewReady={addEventsOnViewReady}
-          snapPoints={snapPoints}
-          changeSize={changeSize}
-        />
-      </div>
-    )
-  })
+  const items = useMemo(
+    () =>
+      order.map((plot: string) => {
+        const nbRevisions =
+          (multiView &&
+            plotDataStore[Section.TEMPLATE_PLOTS][plot].revisions?.length) ||
+          1
+
+        return (
+          <div
+            key={plot}
+            id={plot}
+            className={plotClassName}
+            data-testid={`plot_${plot}`}
+            style={withScale(nbRevisions)}
+          >
+            <ZoomablePlot
+              id={plot}
+              onViewReady={addEventsOnViewReady}
+              toggleDrag={toggleDrag}
+              changeSize={changeSize}
+              currentSnapPoint={currentSize}
+              shouldNotResize={multiView}
+              section={Section.TEMPLATE_PLOTS}
+            />
+          </div>
+        )
+      }),
+    [
+      order,
+      plotClassName,
+      addEventsOnViewReady,
+      currentSize,
+      multiView,
+      toggleDrag
+    ]
+  )
 
   return (
     <DragDropContainer
