@@ -28,7 +28,6 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private readonly pathsChanged = this.dispose.track(new EventEmitter<void>())
 
-  private readonly experiments: Experiments
   private readonly plots: PlotsModel
   private readonly paths: PathsModel
   private readonly data: PlotsData
@@ -45,8 +44,6 @@ export class Plots extends BaseRepository<TPlotsData> {
   ) {
     super(dvcRoot, webviewIcon)
 
-    this.experiments = experiments
-
     this.plots = this.dispose.track(
       new PlotsModel(this.dvcRoot, experiments, workspaceState)
     )
@@ -57,7 +54,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.webviewMessages = this.createWebviewMessageHandler(
       this.paths,
       this.plots,
-      this.experiments
+      experiments
     )
 
     this.data = this.dispose.track(
@@ -174,6 +171,7 @@ export class Plots extends BaseRepository<TPlotsData> {
         if (data) {
           this.dispose.untrack(waitForInitialExpData)
           waitForInitialExpData.dispose()
+          this.data.setMetricFiles(data)
           this.setupExperimentsListener(experiments)
           void this.initializeData(data)
         }
@@ -185,7 +183,10 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.dispose.track(
       experiments.onDidChangeExperiments(async data => {
         if (data) {
-          await this.plots.transformAndSetExperiments(data)
+          await Promise.all([
+            this.plots.transformAndSetExperiments(data),
+            this.data.setMetricFiles(data)
+          ])
         }
 
         this.notifyChanged()

@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.10] - 2023-02-22
+
+### 🚀 New Features and Enhancements
+
+- Check stages for all run/queue commands [#3304](https://github.com/iterative/vscode-dvc/pull/3304) by [@sroy3](https://github.com/sroy3)
+
+### 🐛 Bug Fixes
+
+- Watch metric files to update plots [#3321](https://github.com/iterative/vscode-dvc/pull/3321) by [@mattseddon](https://github.com/mattseddon)
+- Direct user to setup when they cannot run an experiment [#3323](https://github.com/iterative/vscode-dvc/pull/3323) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project (plots update) [#3328](https://github.com/iterative/vscode-dvc/pull/3328) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.6.9] - 2023-02-20
 
 ### 🚀 New Features and Enhancements
