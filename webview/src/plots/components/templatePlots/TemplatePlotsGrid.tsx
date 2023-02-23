@@ -40,7 +40,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   const dispatch = useDispatch()
   const currentSize = useSelector((state: PlotsState) => state.template.size)
   const entries = useSelector(
-    (state: PlotsState) => state.template.userSections[groupIndex].entries
+    (state: PlotsState) => state.template.sections[groupIndex].entries
   )
 
   const disabledDragPlotIds = useSelector(

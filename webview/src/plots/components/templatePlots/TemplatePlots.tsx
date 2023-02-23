@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { AddedSection } from './AddedSection'
 import { TemplatePlotsGrid } from './TemplatePlotsGrid'
-import { PlotGroup, updateUserSections } from './templatePlotsSlice'
+import { PlotGroup, updateSections } from './templatePlotsSlice'
 import { removeFromPreviousAndAddToNewSection } from './util'
 import { sendMessage } from '../../../shared/vscode'
 import { createIDWithIndex, getIDIndex } from '../../../util/ids'
@@ -24,9 +24,7 @@ export enum NewSectionBlock {
 }
 
 export const TemplatePlots: React.FC = () => {
-  const { size, userSections } = useSelector(
-    (state: PlotsState) => state.template
-  )
+  const { size, sections } = useSelector((state: PlotsState) => state.template)
   const draggedOverGroup = useSelector(
     (state: PlotsState) => state.dragAndDrop.draggedOverGroup
   )
@@ -56,7 +54,7 @@ export const TemplatePlots: React.FC = () => {
       /* Although the following dispatch duplicates the work the reducer will do when the state returns 
          from the extension, this is necessary to not see any flickering in the order as the returned state 
          sometimes takes a while to come back */
-      dispatch(updateUserSections(sections))
+      dispatch(updateSections(sections))
       sendReorderMessage(sections)
     },
     [dispatch, sendReorderMessage]
@@ -75,7 +73,7 @@ export const TemplatePlots: React.FC = () => {
       const oldGroupId = getIDIndex(draggedGroup)
       const newGroupId = getIDIndex(groupId)
       const updatedSections = removeFromPreviousAndAddToNewSection(
-        userSections,
+        sections,
         oldGroupId,
         draggedId,
         newGroupId,
@@ -84,30 +82,30 @@ export const TemplatePlots: React.FC = () => {
 
       setSections(updatedSections)
     },
-    [setSections, userSections]
+    [setSections, sections]
   )
 
   const setSectionEntries = useCallback(
     (index: number, entries: string[]) => {
-      const updatedSections = [...userSections]
+      const updatedSections = [...sections]
       updatedSections[index] = {
         ...updatedSections[index],
         entries
       }
       setSections(updatedSections)
     },
-    [setSections, userSections]
+    [setSections, sections]
   )
 
   if (sectionIsLoading(selectedRevisions)) {
     return <LoadingSection />
   }
-  if (!userSections || userSections.length === 0) {
+  if (!sections || sections.length === 0) {
     return <EmptyState isFullScreen={false}>No Plots to Display</EmptyState>
   }
 
-  const firstSection = userSections[0]
-  const lastSection = userSections.slice(-1)[0]
+  const firstSection = sections[0]
+  const lastSection = sections.slice(-1)[0]
 
   if (!firstSection || !lastSection) {
     return null
@@ -121,12 +119,12 @@ export const TemplatePlots: React.FC = () => {
     const draggedId = draggedRef.itemId
 
     const updatedSections = removeFromPreviousAndAddToNewSection(
-      userSections,
+      sections,
       draggedSectionId,
       draggedId
     )
 
-    const { group } = userSections[draggedSectionId]
+    const { group } = sections[draggedSectionId]
 
     setHoveredSection('')
     const newSection = {
@@ -163,7 +161,7 @@ export const TemplatePlots: React.FC = () => {
         id={NewSectionBlock.TOP}
         closestSection={firstSection}
       />
-      {userSections.map((section, i) => {
+      {sections.map((section, i) => {
         const groupId = createIDWithIndex(section.group, i)
         const useVirtualizedGrid = shouldUseVirtualizedGrid(
           Object.keys(section.entries).length,
@@ -186,11 +184,11 @@ export const TemplatePlots: React.FC = () => {
 
           if (draggedRef.group === groupId) {
             const order = section.entries
-            const updatedSections = [...userSections]
+            const updatedSections = [...sections]
 
             const newOrder = changeOrderWithDraggedInfo(order, draggedRef)
             updatedSections[i] = {
-              ...userSections[i],
+              ...sections[i],
               entries: newOrder
             }
             setSections(updatedSections)
