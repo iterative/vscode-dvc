@@ -1,17 +1,11 @@
 import { TemplatePlotGroup } from 'dvc/src/plots/webview/contract'
-import React, {
-  DragEvent,
-  useState,
-  useEffect,
-  useRef,
-  useCallback
-} from 'react'
+import React, { DragEvent, useState, useCallback } from 'react'
 import cx from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { AddedSection } from './AddedSection'
 import { TemplatePlotsGrid } from './TemplatePlotsGrid'
-import { PlotGroup } from './templatePlotsSlice'
+import { PlotGroup, updateUserSections } from './templatePlotsSlice'
 import { removeFromPreviousAndAddToNewSection } from './util'
 import { sendMessage } from '../../../shared/vscode'
 import { createIDWithIndex, getIDIndex } from '../../../util/ids'
@@ -30,7 +24,7 @@ export enum NewSectionBlock {
 }
 
 export const TemplatePlots: React.FC = () => {
-  const { plotSections, size } = useSelector(
+  const { size, userSections } = useSelector(
     (state: PlotsState) => state.template
   )
   const draggedOverGroup = useSelector(
@@ -43,29 +37,30 @@ export const TemplatePlots: React.FC = () => {
     (state: PlotsState) => state.webview.selectedRevisions
   )
 
-  const [sections, setSections] = useState<PlotGroup[]>(plotSections)
   const [hoveredSection, setHoveredSection] = useState('')
   const nbItemsPerRow = size
-  const shouldSendMessage = useRef(true)
   const dispatch = useDispatch()
 
-  useEffect(() => {
-    shouldSendMessage.current = false
-    setSections(plotSections)
-  }, [plotSections, setSections])
+  const sendReorderMessage = useCallback((sections: PlotGroup[]) => {
+    sendMessage({
+      payload: sections.map(section => ({
+        group: section.group,
+        paths: section.entries
+      })),
+      type: MessageFromWebviewType.REORDER_PLOTS_TEMPLATES
+    })
+  }, [])
 
-  useEffect(() => {
-    if (sections && shouldSendMessage.current) {
-      sendMessage({
-        payload: sections.map(section => ({
-          group: section.group,
-          paths: section.entries
-        })),
-        type: MessageFromWebviewType.REORDER_PLOTS_TEMPLATES
-      })
-    }
-    shouldSendMessage.current = true
-  }, [sections])
+  const setSections = useCallback(
+    (sections: PlotGroup[]) => {
+      /* Although the following dispatch duplicates the work the reducer will do when the state returns 
+         from the extension, this is necessary to not see any flickering in the order as the returned state 
+         sometimes takes a while to come back */
+      dispatch(updateUserSections(sections))
+      sendReorderMessage(sections)
+    },
+    [dispatch, sendReorderMessage]
+  )
 
   const handleDropInSection = useCallback(
     (
@@ -80,7 +75,7 @@ export const TemplatePlots: React.FC = () => {
       const oldGroupId = getIDIndex(draggedGroup)
       const newGroupId = getIDIndex(groupId)
       const updatedSections = removeFromPreviousAndAddToNewSection(
-        sections,
+        userSections,
         oldGroupId,
         draggedId,
         newGroupId,
@@ -89,32 +84,30 @@ export const TemplatePlots: React.FC = () => {
 
       setSections(updatedSections)
     },
-    [setSections, sections]
+    [setSections, userSections]
   )
 
   const setSectionEntries = useCallback(
     (index: number, entries: string[]) => {
-      setSections(sections => {
-        const updatedSections = [...sections]
-        updatedSections[index] = {
-          ...sections[index],
-          entries
-        }
-        return updatedSections
-      })
+      const updatedSections = [...userSections]
+      updatedSections[index] = {
+        ...updatedSections[index],
+        entries
+      }
+      setSections(updatedSections)
     },
-    [setSections]
+    [setSections, userSections]
   )
 
   if (sectionIsLoading(selectedRevisions)) {
     return <LoadingSection />
   }
-  if (!sections || sections.length === 0) {
+  if (!userSections || userSections.length === 0) {
     return <EmptyState isFullScreen={false}>No Plots to Display</EmptyState>
   }
 
-  const firstSection = sections[0]
-  const lastSection = sections.slice(-1)[0]
+  const firstSection = userSections[0]
+  const lastSection = userSections.slice(-1)[0]
 
   if (!firstSection || !lastSection) {
     return null
@@ -128,12 +121,12 @@ export const TemplatePlots: React.FC = () => {
     const draggedId = draggedRef.itemId
 
     const updatedSections = removeFromPreviousAndAddToNewSection(
-      sections,
+      userSections,
       draggedSectionId,
       draggedId
     )
 
-    const { group } = sections[draggedSectionId]
+    const { group } = userSections[draggedSectionId]
 
     setHoveredSection('')
     const newSection = {
@@ -170,7 +163,7 @@ export const TemplatePlots: React.FC = () => {
         id={NewSectionBlock.TOP}
         closestSection={firstSection}
       />
-      {sections.map((section, i) => {
+      {userSections.map((section, i) => {
         const groupId = createIDWithIndex(section.group, i)
         const useVirtualizedGrid = shouldUseVirtualizedGrid(
           Object.keys(section.entries).length,
@@ -193,11 +186,11 @@ export const TemplatePlots: React.FC = () => {
 
           if (draggedRef.group === groupId) {
             const order = section.entries
-            const updatedSections = [...sections]
+            const updatedSections = [...userSections]
 
             const newOrder = changeOrderWithDraggedInfo(order, draggedRef)
             updatedSections[i] = {
-              ...sections[i],
+              ...userSections[i],
               entries: newOrder
             }
             setSections(updatedSections)
@@ -235,7 +228,6 @@ export const TemplatePlots: React.FC = () => {
               useVirtualizedGrid={useVirtualizedGrid}
               nbItemsPerRow={nbItemsPerRow}
               parentDraggedOver={draggedOverGroup === groupId}
-              entries={section.entries}
             />
           </div>
         )
