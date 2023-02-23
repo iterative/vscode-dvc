@@ -108,7 +108,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   const items = useMemo(
     () =>
       order.map((plot: string) => {
-        const nbRevisions =
+        const colSpan =
           (multiView &&
             plotDataStore[Section.TEMPLATE_PLOTS][plot].revisions?.length) ||
           1
@@ -119,7 +119,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
             id={plot}
             className={plotClassName}
             data-testid={`plot_${plot}`}
-            style={withScale(nbRevisions)}
+            style={withScale(colSpan)}
           >
             <ZoomablePlot
               id={plot}

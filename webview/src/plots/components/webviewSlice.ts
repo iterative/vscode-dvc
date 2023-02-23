@@ -42,6 +42,7 @@ export const webviewSlice = createSlice({
       state: { snapPoints: SnapPoints },
       action: PayloadAction<number>
     ) => {
+      // Action payload here is the max size of the plots webview. When changed, we re-calculate the snap points.
       state.snapPoints = [
         action.payload,
         action.payload / 2,
