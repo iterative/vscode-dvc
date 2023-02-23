@@ -12,7 +12,8 @@ import {
   TemplateAccumulator,
   collectCommitRevisionDetails,
   collectOverrideRevisionDetails,
-  collectAllCustomPlotData
+  collectAllCustomPlotData,
+  getCustomPlotId
 } from './collect'
 import { pickCustomPlots, pickMetricAndParam } from './quickPick'
 import { getRevisionFirstThreeColumns } from './util'
@@ -195,31 +196,39 @@ export class PlotsModel extends ModelWithPersistence {
     }
   }
 
-  public async removeCustomPlots() {
-    const selectedPlots: { metric: string; param: string }[] | undefined =
-      await pickCustomPlots(this.customPlotsOrder, {
-        title: Title.SELECT_CUSTOM_PLOTS_TO_REMOVE
-      })
+  public updateCustomPlotsOrder(
+    newPlotsOrder: { metric: string; param: string }[]
+  ) {
+    this.customPlotsOrder = newPlotsOrder
+  }
 
-    if (!selectedPlots) {
-      return
-    }
-    const selectedPlotsIds = new Set(
-      selectedPlots.map(({ metric, param }) => metric + param) // is this the best way to do this?
-    )
-    this.customPlotsOrder = this.customPlotsOrder.filter(
-      ({ metric, param }) => {
-        return !selectedPlotsIds.has(metric + param)
-      }
-    )
-    // move the update custom plots code to its own function
-    this.persist(PersistenceKey.PLOTS_CUSTOM_ORDER, this.customPlotsOrder)
-
+  public recreateCustomPlots() {
     const customPlots: CustomPlotData[] = collectAllCustomPlotData(
       this.customPlotsOrder,
       this.experiments.getExperiments()
     )
     this.customPlots = customPlots
+  }
+
+  public async removeCustomPlots() {
+    const selectedPlotsIds: string[] | undefined = await pickCustomPlots(
+      this.customPlotsOrder,
+      {
+        title: Title.SELECT_CUSTOM_PLOTS_TO_REMOVE
+      }
+    )
+
+    if (!selectedPlotsIds) {
+      return
+    }
+
+    this.customPlotsOrder = this.customPlotsOrder.filter(
+      ({ metric, param }) => {
+        return !selectedPlotsIds.includes(getCustomPlotId(metric, param))
+      }
+    )
+    this.persist(PersistenceKey.PLOTS_CUSTOM_ORDER, this.customPlotsOrder)
+    this.recreateCustomPlots()
   }
 
   public async addCustomPlot() {
@@ -241,11 +250,7 @@ export class PlotsModel extends ModelWithPersistence {
 
     this.customPlotsOrder.push(metricAndParam)
     this.persist(PersistenceKey.PLOTS_CUSTOM_ORDER, this.customPlotsOrder)
-    const customPlots: CustomPlotData[] = collectAllCustomPlotData(
-      this.customPlotsOrder,
-      this.experiments.getExperiments()
-    )
-    this.customPlots = customPlots
+    this.recreateCustomPlots()
   }
 
   public setupManualRefresh(id: string) {

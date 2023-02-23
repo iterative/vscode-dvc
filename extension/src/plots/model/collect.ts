@@ -247,6 +247,9 @@ export const collectCheckpointPlotsData = (
   return plotsData
 }
 
+export const getCustomPlotId = (metric: string, param: string) =>
+  `custom-${metric}-${param}`
+
 const collectCustomPlotData = (
   metric: string,
   param: string,
@@ -255,7 +258,7 @@ const collectCustomPlotData = (
   const splitUpMetricPath = splitColumnPath(metric)
   const splitUpParamPath = splitColumnPath(param)
   const plotData: CustomPlotData = {
-    id: `custom-${metric}-${param}`,
+    id: getCustomPlotId(metric, param),
     metric: metric.slice(ColumnType.METRICS.length + 1),
     param: param.slice(ColumnType.PARAMS.length + 1),
     values: []
