@@ -6,7 +6,7 @@ import { CheckpointPlotsWrapper } from './checkpointPlots/CheckpointPlotsWrapper
 import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
 import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper'
 import { Ribbon } from './ribbon/Ribbon'
-import { setMaxPlotSize, setZoomedInPlot } from './webviewSlice'
+import { setSnapPoints, setZoomedInPlot } from './webviewSlice'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Modal } from '../../shared/components/modal/Modal'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
@@ -38,7 +38,7 @@ const PlotsContent = () => {
     const onResize = () => {
       wrapperRef.current &&
         dispatch(
-          setMaxPlotSize(wrapperRef.current.getBoundingClientRect().width - 100)
+          setSnapPoints(wrapperRef.current.getBoundingClientRect().width - 100)
         )
     }
     window.addEventListener('resize', onResize)

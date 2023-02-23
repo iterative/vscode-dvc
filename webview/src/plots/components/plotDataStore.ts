@@ -1,30 +1,34 @@
 import {
   CheckpointPlotData,
-  TemplatePlotSection
+  Section,
+  TemplatePlotEntry
 } from 'dvc/src/plots/webview/contract'
 
 export type CheckpointPlotsById = { [key: string]: CheckpointPlotData }
+export type TemplatePlotsById = { [key: string]: TemplatePlotEntry }
 
 export const plotDataStore = {
-  checkpoint: {} as CheckpointPlotsById,
-  template: [] as TemplatePlotSection[]
+  [Section.CHECKPOINT_PLOTS]: {} as CheckpointPlotsById,
+  [Section.TEMPLATE_PLOTS]: {} as TemplatePlotsById,
+  [Section.COMPARISON_TABLE]: {} as CheckpointPlotsById // This category is unused but exists only to make typings easier
 }
 
-export const addCheckpointPlotsWithSnapshots = (
-  plots: CheckpointPlotData[]
+export const addPlotsWithSnapshots = (
+  plots: (CheckpointPlotData | TemplatePlotEntry)[],
+  section: Section
 ) => {
   const snapShots: { [key: string]: string } = {}
   for (const plot of plots || []) {
-    plotDataStore.checkpoint[plot.id] = plot
+    plotDataStore[section][plot.id] = plot
     snapShots[plot.id] = JSON.stringify(plot)
   }
   return snapShots
 }
 
-export const removeCheckpointPlots = (currentIds: string[]) => {
-  for (const plotId of Object.keys(plotDataStore.checkpoint)) {
+export const removePlots = (currentIds: string[], section: Section) => {
+  for (const plotId of Object.keys(plotDataStore[section])) {
     if (!currentIds.includes(plotId)) {
-      delete plotDataStore.checkpoint[plotId]
+      delete plotDataStore[section][plotId]
     }
   }
 }

@@ -148,6 +148,7 @@ module.exports = {
     // https://github.com/typescript-eslint/typescript-eslint/issues/2540#issuecomment-692505191
     'no-use-before-define': 'off',
     'no-void': ['error', { allowAsStatement: true }],
+    'no-warning-comments': 'error',
     quotes: ['error', 'single', { avoidEscape: true }],
     'react-hooks/exhaustive-deps': 'error',
     'react-hooks/rules-of-hooks': 'error',

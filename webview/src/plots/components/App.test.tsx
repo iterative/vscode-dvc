@@ -27,8 +27,7 @@ import {
   Revision,
   Section,
   TemplatePlotGroup,
-  TemplatePlotsData,
-  TemplatePlotSection
+  TemplatePlotsData
 } from 'dvc/src/plots/webview/contract'
 import {
   MessageFromWebviewType,
@@ -41,8 +40,12 @@ import { VisualizationSpec } from 'react-vega'
 import { App } from './App'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
 import { SectionDescription } from './PlotsContainer'
-import { CheckpointPlotsById, plotDataStore } from './plotDataStore'
-import { setMaxPlotSize } from './webviewSlice'
+import {
+  CheckpointPlotsById,
+  plotDataStore,
+  TemplatePlotsById
+} from './plotDataStore'
+import { setSnapPoints } from './webviewSlice'
 import { plotsReducers, plotsStore } from '../store'
 import { vsCodeApi } from '../../shared/api'
 import {
@@ -126,7 +129,7 @@ describe('App', () => {
 
   const setWrapperSize = (store: typeof plotsStore) =>
     act(() => {
-      store.dispatch(setMaxPlotSize(1000))
+      store.dispatch(setSnapPoints(1000))
     })
 
   const templatePlot = templatePlotsFixture.plots[0].entries[0]
@@ -201,8 +204,8 @@ describe('App', () => {
     jest
       .spyOn(HTMLElement.prototype, 'clientHeight', 'get')
       .mockImplementation(() => heightToSuppressVegaError)
-    plotDataStore.checkpoint = {} as CheckpointPlotsById
-    plotDataStore.template = [] as TemplatePlotSection[]
+    plotDataStore[Section.CHECKPOINT_PLOTS] = {} as CheckpointPlotsById
+    plotDataStore[Section.TEMPLATE_PLOTS] = {} as TemplatePlotsById
   })
 
   afterEach(() => {
@@ -1427,7 +1430,7 @@ describe('App', () => {
 
     const resizeScreen = (width: number, store: typeof plotsStore) => {
       act(() => {
-        store.dispatch(setMaxPlotSize(width))
+        store.dispatch(setSnapPoints(width))
       })
       act(() => {
         global.innerWidth = width

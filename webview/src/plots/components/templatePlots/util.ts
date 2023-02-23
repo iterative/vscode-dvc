@@ -1,51 +1,43 @@
-import {
-  TemplatePlotSection,
-  TemplatePlotEntry
-} from 'dvc/src/plots/webview/contract'
+import { PlotGroup } from './templatePlotsSlice'
 
-const remove = (section: TemplatePlotSection, entryId: string) => {
-  const entries = section.entries.filter(({ id }) => id !== entryId)
+const remove = (section: PlotGroup, entryId: string) => {
+  const entries = section.entries.filter(id => id !== entryId)
   return {
     entries,
     group: section.group
   }
 }
 
-const add = (
-  section: TemplatePlotSection,
-  entry: TemplatePlotEntry,
-  position?: number
-) => {
+const add = (section: PlotGroup, entryId: string, position?: number) => {
   const entries = [...section.entries]
   entries.splice(
     position === undefined ? entries.length - 1 : position,
     0,
-    entry
+    entryId
   )
   return { entries, group: section.group }
 }
 
-const cleanup = (section: TemplatePlotSection) =>
+const cleanup = (section: PlotGroup) =>
   section.entries.length > 0 ? section : null
 
 export const removeFromPreviousAndAddToNewSection = (
-  sections: TemplatePlotSection[],
+  sections: PlotGroup[],
   oldSectionIndex: number,
   entryId: string,
   newGroupIndex?: number,
-  entry?: TemplatePlotEntry,
   position?: number
 ) => {
   const newSections = sections.map((section, i) => {
     if (i === oldSectionIndex) {
       return remove(section, entryId)
-    } else if (i === newGroupIndex && entry) {
-      return add(section, entry, position)
+    } else if (i === newGroupIndex) {
+      return add(section, entryId, position)
     }
     return section
   })
 
   return newSections
     .map(section => cleanup(section))
-    .filter(Boolean) as TemplatePlotSection[]
+    .filter(Boolean) as PlotGroup[]
 }
