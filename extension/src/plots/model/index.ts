@@ -11,8 +11,10 @@ import {
   RevisionData,
   TemplateAccumulator,
   collectCommitRevisionDetails,
-  collectOverrideRevisionDetails
+  collectOverrideRevisionDetails,
+  collectAllCustomPlotData
 } from './collect'
+import { pickCustomPlots, pickMetricAndParam } from './quickPick'
 import { getRevisionFirstThreeColumns } from './util'
 import {
   CheckpointPlot,
@@ -24,7 +26,8 @@ import {
   DEFAULT_SECTION_SIZES,
   Section,
   SectionCollapsed,
-  PlotSizeNumber
+  PlotSizeNumber,
+  CustomPlotData
 } from '../webview/contract'
 import {
   ExperimentsOutput,
@@ -45,11 +48,14 @@ import {
   MultiSourceVariations
 } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
+import { Title } from '../../vscode/title'
+import { Toast } from '../../vscode/toast'
 
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
 
   private plotSizes: Record<Section, number>
+  private customPlotsOrder: { metric: string; param: string }[]
   private sectionCollapsed: SectionCollapsed
   private commitRevisions: Record<string, string> = {}
 
@@ -64,6 +70,7 @@ export class PlotsModel extends ModelWithPersistence {
   private multiSourceEncoding: MultiSourceEncoding = {}
 
   private checkpointPlots?: CheckpointPlot[]
+  private customPlots?: CustomPlotData[]
   private selectedMetrics?: string[]
   private metricOrder: string[]
 
@@ -89,6 +96,8 @@ export class PlotsModel extends ModelWithPersistence {
       undefined
     )
     this.metricOrder = this.revive(PersistenceKey.PLOT_METRIC_ORDER, [])
+
+    this.customPlotsOrder = this.revive(PersistenceKey.PLOTS_CUSTOM_ORDER, [])
   }
 
   public transformAndSetExperiments(data: ExperimentsOutput) {
@@ -119,6 +128,11 @@ export class PlotsModel extends ModelWithPersistence {
         collectMultiSourceVariations(data, this.multiSourceVariations)
       ])
 
+    const customPlots: CustomPlotData[] = collectAllCustomPlotData(
+      this.customPlotsOrder,
+      this.experiments.getExperiments()
+    )
+
     this.comparisonData = {
       ...this.comparisonData,
       ...comparisonData
@@ -127,7 +141,7 @@ export class PlotsModel extends ModelWithPersistence {
       ...this.revisionData,
       ...revisionData
     }
-
+    this.customPlots = customPlots
     this.templates = { ...this.templates, ...templates }
     this.multiSourceVariations = multiSourceVariations
     this.multiSourceEncoding = collectMultiSourceEncoding(
@@ -169,6 +183,69 @@ export class PlotsModel extends ModelWithPersistence {
       selectedMetrics: this.getSelectedMetrics(),
       size: this.getPlotSize(Section.CHECKPOINT_PLOTS)
     }
+  }
+
+  public getCustomPlots() {
+    if (!this.customPlots) {
+      return
+    }
+    return {
+      plots: this.customPlots,
+      size: this.getPlotSize(Section.CUSTOM_PLOTS)
+    }
+  }
+
+  public async removeCustomPlots() {
+    const selectedPlots: { metric: string; param: string }[] | undefined =
+      await pickCustomPlots(this.customPlotsOrder, {
+        title: Title.SELECT_CUSTOM_PLOTS_TO_REMOVE
+      })
+
+    if (!selectedPlots) {
+      return
+    }
+    const selectedPlotsIds = new Set(
+      selectedPlots.map(({ metric, param }) => metric + param) // is this the best way to do this?
+    )
+    this.customPlotsOrder = this.customPlotsOrder.filter(
+      ({ metric, param }) => {
+        return !selectedPlotsIds.has(metric + param)
+      }
+    )
+    // move the update custom plots code to its own function
+    this.persist(PersistenceKey.PLOTS_CUSTOM_ORDER, this.customPlotsOrder)
+
+    const customPlots: CustomPlotData[] = collectAllCustomPlotData(
+      this.customPlotsOrder,
+      this.experiments.getExperiments()
+    )
+    this.customPlots = customPlots
+  }
+
+  public async addCustomPlot() {
+    const metricAndParam = await pickMetricAndParam(
+      this.experiments.getColumnTerminalNodes()
+    )
+    if (!metricAndParam) {
+      return
+    }
+
+    const plotAlreadyExists = this.customPlotsOrder.some(
+      ({ param, metric }) =>
+        param === metricAndParam.param && metric === metricAndParam.metric
+    )
+
+    if (plotAlreadyExists) {
+      return Toast.showError('Custom plot already exists.')
+    }
+
+    this.customPlotsOrder.push(metricAndParam)
+    this.persist(PersistenceKey.PLOTS_CUSTOM_ORDER, this.customPlotsOrder)
+    const customPlots: CustomPlotData[] = collectAllCustomPlotData(
+      this.customPlotsOrder,
+      this.experiments.getExperiments()
+    )
+    this.customPlots = customPlots
   }
 
   public setupManualRefresh(id: string) {

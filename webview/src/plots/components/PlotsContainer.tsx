@@ -18,7 +18,9 @@ import {
   ChevronDown,
   ChevronRight,
   Info,
-  Lines
+  Lines,
+  Add,
+  Trash
 } from '../../shared/components/icons'
 import { isSelecting } from '../../util/strings'
 import { isTooltip } from '../../util/helpers'
@@ -32,7 +34,9 @@ export interface PlotsContainerProps extends CommonPlotsContainerProps {
   sectionKey: Section
   title: string
   currentSize: number
-  menu?: PlotsPickerProps
+  selectPlotsMenu?: PlotsPickerProps
+  addPlotsButton?: { onClick: () => void }
+  removePlotsButton?: { onClick: () => void }
   children: React.ReactNode
 }
 
@@ -46,6 +50,13 @@ export const SectionDescription = {
         checkpoints
       </a>{' '}
       are enabled.
+    </span>
+  ),
+  // "Custom"
+  [Section.CUSTOM_PLOTS]: (
+    <span data-testid="tooltip-custom-plots">
+      Generated custom linear plots comparing chose metrics and params in
+      experiments.
     </span>
   ),
   // "Images"
@@ -87,7 +98,9 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   title,
   children,
   currentSize,
-  menu
+  selectPlotsMenu,
+  addPlotsButton,
+  removePlotsButton
 }) => {
   const open = !sectionCollapsed
 
@@ -97,11 +110,27 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
 
   const menuItems: IconMenuItemProps[] = []
 
-  if (menu) {
+  if (selectPlotsMenu) {
     menuItems.unshift({
       icon: Lines,
-      onClickNode: <PlotsPicker {...menu} />,
+      onClickNode: <PlotsPicker {...selectPlotsMenu} />,
       tooltip: 'Select Plots'
+    })
+  }
+
+  if (addPlotsButton) {
+    menuItems.unshift({
+      icon: Add,
+      onClick: addPlotsButton.onClick,
+      tooltip: 'Add Plots'
+    })
+  }
+
+  if (removePlotsButton) {
+    menuItems.unshift({
+      icon: Trash, // trash icon is wrong color
+      onClick: removePlotsButton.onClick,
+      tooltip: 'Remove Plots'
     })
   }
 

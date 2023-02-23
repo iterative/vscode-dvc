@@ -46,7 +46,7 @@ export const CheckpointPlotsWrapper: React.FC = () => {
     <PlotsContainer
       title="Trends"
       sectionKey={Section.CHECKPOINT_PLOTS}
-      menu={menu}
+      selectPlotsMenu={menu}
       currentSize={size}
       sectionCollapsed={isCollapsed}
       onResize={handleResize}

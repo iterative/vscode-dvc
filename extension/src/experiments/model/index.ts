@@ -351,7 +351,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     return collectFlatExperimentParams(params)
   }
 
-  public getExperiments() {
+  public getExperiments(): Experiment[] {
     return this.getExperimentsAndQueued().filter(({ status }) => {
       return !isQueued(status)
     })

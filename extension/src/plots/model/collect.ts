@@ -1,4 +1,5 @@
 import omit from 'lodash.omit'
+import get from 'lodash.get'
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
 import { getRevisionFirstThreeColumns } from './util'
@@ -13,7 +14,8 @@ import {
   TemplatePlotEntry,
   TemplatePlotSection,
   PlotsType,
-  Revision
+  Revision,
+  CustomPlotData
 } from '../webview/contract'
 import {
   EXPERIMENT_WORKSPACE_ID,
@@ -28,9 +30,11 @@ import {
 import { extractColumns } from '../../experiments/columns/extract'
 import {
   decodeColumn,
-  appendColumnToPath
+  appendColumnToPath,
+  splitColumnPath
 } from '../../experiments/columns/paths'
 import {
+  ColumnType,
   Experiment,
   isRunning,
   MetricOrParamColumns
@@ -241,6 +245,45 @@ export const collectCheckpointPlotsData = (
   }
 
   return plotsData
+}
+
+const collectCustomPlotData = (
+  metric: string,
+  param: string,
+  experiments: Experiment[]
+): CustomPlotData => {
+  const splitUpMetricPath = splitColumnPath(metric)
+  const splitUpParamPath = splitColumnPath(param)
+  const plotData: CustomPlotData = {
+    id: `custom-${metric}-${param}`,
+    metric: metric.slice(ColumnType.METRICS.length + 1),
+    param: param.slice(ColumnType.PARAMS.length + 1),
+    values: []
+  }
+
+  for (const experiment of experiments) {
+    const metricValue = get(experiment, splitUpMetricPath) as number | undefined
+    const paramValue = get(experiment, splitUpParamPath) as number | undefined
+
+    if (metricValue !== undefined && paramValue !== undefined) {
+      plotData.values.push({
+        expName: experiment.name || experiment.label,
+        metric: metricValue,
+        param: paramValue
+      })
+    }
+  }
+
+  return plotData
+}
+
+export const collectAllCustomPlotData = (
+  metricsAndParams: { metric: string; param: string }[],
+  experiments: Experiment[]
+): CustomPlotData[] => {
+  return metricsAndParams.map(({ metric, param }) =>
+    collectCustomPlotData(metric, param, experiments)
+  )
 }
 
 type MetricOrderAccumulator = {

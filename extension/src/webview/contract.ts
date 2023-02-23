@@ -15,6 +15,7 @@ export enum MessageFromWebviewType {
   ADD_CONFIGURATION = 'add-configuration',
   APPLY_EXPERIMENT_TO_WORKSPACE = 'apply-experiment-to-workspace',
   ADD_STARRED_EXPERIMENT_FILTER = 'add-starred-experiment-filter',
+  ADD_CUSTOM_PLOT = 'add-custom-plot',
   CREATE_BRANCH_FROM_EXPERIMENT = 'create-branch-from-experiment',
   FOCUS_FILTERS_TREE = 'focus-filters-tree',
   FOCUS_SORTS_TREE = 'focus-sorts-tree',
@@ -50,6 +51,7 @@ export enum MessageFromWebviewType {
   SHARE_EXPERIMENT_AS_COMMIT = 'share-experiment-as-commit',
   TOGGLE_METRIC = 'toggle-metric',
   TOGGLE_PLOTS_SECTION = 'toggle-plots-section',
+  REMOVE_CUSTOM_PLOTS = 'remove-custom-plots',
   MODIFY_EXPERIMENT_PARAMS_AND_QUEUE = 'modify-experiment-params-and-queue',
   MODIFY_EXPERIMENT_PARAMS_AND_RUN = 'modify-experiment-params-and-run',
   MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN = 'modify-experiment-params-reset-and-run',
@@ -77,6 +79,9 @@ export type PlotsTemplatesReordered = {
 }[]
 
 export type MessageFromWebview =
+  | {
+      type: MessageFromWebviewType.ADD_CUSTOM_PLOT
+    }
   | {
       type: MessageFromWebviewType.REORDER_COLUMNS
       payload: string[]
@@ -147,6 +152,9 @@ export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.TOGGLE_METRIC
       payload: string[]
+    }
+  | {
+      type: MessageFromWebviewType.REMOVE_CUSTOM_PLOTS
     }
   | {
       type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON

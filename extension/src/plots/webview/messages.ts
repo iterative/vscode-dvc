@@ -54,6 +54,7 @@ export class WebviewMessages {
     void this.getWebview()?.show({
       checkpoint: this.getCheckpointPlots(),
       comparison: this.getComparisonPlots(overrideComparison),
+      custom: this.getCustomPlots(),
       hasPlots: !!this.paths.hasPaths(),
       hasUnselectedPlots: this.paths.getHasUnselectedPlots(),
       sectionCollapsed: this.plots.getSectionCollapsed(),
@@ -70,6 +71,8 @@ export class WebviewMessages {
 
   public handleMessageFromWebview(message: MessageFromWebview) {
     switch (message.type) {
+      case MessageFromWebviewType.ADD_CUSTOM_PLOT:
+        return this.addCustomPlot()
       case MessageFromWebviewType.TOGGLE_METRIC:
         return this.setSelectedMetrics(message.payload)
       case MessageFromWebviewType.RESIZE_PLOTS:
@@ -88,6 +91,8 @@ export class WebviewMessages {
         return this.selectPlotsFromWebview()
       case MessageFromWebviewType.SELECT_EXPERIMENTS:
         return this.selectExperimentsFromWebview()
+      case MessageFromWebviewType.REMOVE_CUSTOM_PLOTS:
+        return this.removeCustomPlots()
       case MessageFromWebviewType.REFRESH_REVISION:
         return this.attemptToRefreshRevData(message.payload)
       case MessageFromWebviewType.REFRESH_REVISIONS:
@@ -156,6 +161,18 @@ export class WebviewMessages {
   private setMetricOrder(order: string[]) {
     this.plots.setMetricOrder(order)
     this.sendCheckpointPlotsAndEvent(EventName.VIEWS_REORDER_PLOTS_METRICS)
+  }
+
+  private async addCustomPlot() {
+    await this.plots.addCustomPlot()
+    this.sendCustomPlots()
+    // needs a telemetry event
+  }
+
+  private async removeCustomPlots() {
+    await this.plots.removeCustomPlots()
+    this.sendCustomPlots()
+    // needs a telemetry event
   }
 
   private selectPlotsFromWebview() {
@@ -234,6 +251,12 @@ export class WebviewMessages {
     })
   }
 
+  private sendCustomPlots() {
+    void this.getWebview()?.show({
+      custom: this.getCustomPlots()
+    })
+  }
+
   private getTemplatePlots(overrideRevs?: Revision[]) {
     const paths = this.paths.getTemplateOrder()
     const plots = this.plots.getTemplatePlots(paths, overrideRevs)
@@ -294,5 +317,9 @@ export class WebviewMessages {
 
   private getCheckpointPlots() {
     return this.plots.getCheckpointPlots() || null
+  }
+
+  private getCustomPlots() {
+    return this.plots.getCustomPlots() || null
   }
 }
