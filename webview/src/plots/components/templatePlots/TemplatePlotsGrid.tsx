@@ -1,6 +1,6 @@
 import cx from 'classnames'
 import { Section } from 'dvc/src/plots/webview/contract'
-import React, { useEffect, useState, useCallback, useMemo } from 'react'
+import React, { useEffect, useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { changeDisabledDragIds, changeSize } from './templatePlotsSlice'
 import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/VirtualizedGrid'
@@ -24,7 +24,6 @@ interface TemplatePlotsGridProps {
   setSectionEntries: (groupIndex: number, entries: string[]) => void
   useVirtualizedGrid?: boolean
   nbItemsPerRow: number
-  entries: string[]
   parentDraggedOver?: boolean
 }
 
@@ -36,12 +35,13 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   setSectionEntries,
   useVirtualizedGrid,
   nbItemsPerRow,
-  entries,
   parentDraggedOver
 }) => {
   const dispatch = useDispatch()
-  const [order, setOrder] = useState<string[]>([])
   const currentSize = useSelector((state: PlotsState) => state.template.size)
+  const entries = useSelector(
+    (state: PlotsState) => state.template.sections[groupIndex].entries
+  )
 
   const disabledDragPlotIds = useSelector(
     (state: PlotsState) => state.template.disabledDragPlotIds
@@ -65,10 +65,6 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   }, [])
 
   useEffect(() => {
-    setOrder(entries)
-  }, [entries])
-
-  useEffect(() => {
     const panels = document.querySelectorAll('.vega-bindings')
     return () => {
       for (const panel of Object.values(panels)) {
@@ -88,11 +84,8 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
     }
   }, [addDisabled, removeDisabled, disableClick])
 
-  const setEntriesOrder = (order: string[]) => {
-    setOrder(order)
-
+  const setEntriesOrder = (order: string[]) =>
     setSectionEntries(groupIndex, order)
-  }
 
   const plotClassName = cx(styles.plot, {
     [styles.multiViewPlot]: multiView
@@ -107,7 +100,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
 
   const items = useMemo(
     () =>
-      order.map((plot: string) => {
+      entries.map((plot: string) => {
         const colSpan =
           (multiView &&
             plotDataStore[Section.TEMPLATE_PLOTS][plot].revisions?.length) ||
@@ -134,7 +127,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
         )
       }),
     [
-      order,
+      entries,
       plotClassName,
       addEventsOnViewReady,
       currentSize,
@@ -145,7 +138,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
 
   return (
     <DragDropContainer
-      order={order}
+      order={entries}
       setOrder={setEntriesOrder}
       items={items}
       group={groupId}

@@ -12,8 +12,8 @@ export type PlotGroup = { group: TemplatePlotGroup; entries: string[] }
 export interface TemplatePlotsState extends Omit<TemplatePlotsData, 'plots'> {
   isCollapsed: boolean
   hasData: boolean
-  plotSections: PlotGroup[]
   plotsSnapshots: { [key: string]: string }
+  sections: PlotGroup[]
   disabledDragPlotIds: string[]
 }
 
@@ -21,8 +21,8 @@ export const templatePlotsInitialState: TemplatePlotsState = {
   disabledDragPlotIds: [],
   hasData: false,
   isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.TEMPLATE_PLOTS],
-  plotSections: [],
   plotsSnapshots: {},
+  sections: [],
   size: DEFAULT_SECTION_SIZES[Section.TEMPLATE_PLOTS]
 }
 
@@ -48,6 +48,7 @@ export const templatePlotsSlice = createSlice({
         entries: section.entries.map(entry => entry.id),
         group: section.group
       }))
+
       const plots = action.payload.plots?.flatMap(section => section.entries)
       const plotsIds = plots?.map(plot => plot.id) || []
       const snapShots = addPlotsWithSnapshots(plots, Section.TEMPLATE_PLOTS)
@@ -56,15 +57,29 @@ export const templatePlotsSlice = createSlice({
       return {
         ...state,
         hasData: !!action.payload,
-        plotSections,
         plotsSnapshots: snapShots,
+        sections:
+          JSON.stringify(plotSections) === JSON.stringify(state.sections)
+            ? state.sections
+            : plotSections,
         size: Math.abs(action.payload.size)
+      }
+    },
+    updateSections: (state, action: PayloadAction<PlotGroup[]>) => {
+      return {
+        ...state,
+        sections: action.payload
       }
     }
   }
 })
 
-export const { update, setCollapsed, changeSize, changeDisabledDragIds } =
-  templatePlotsSlice.actions
+export const {
+  update,
+  setCollapsed,
+  changeSize,
+  changeDisabledDragIds,
+  updateSections
+} = templatePlotsSlice.actions
 
 export default templatePlotsSlice.reducer

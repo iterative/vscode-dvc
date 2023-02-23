@@ -1,17 +1,11 @@
 import { TemplatePlotGroup } from 'dvc/src/plots/webview/contract'
-import React, {
-  DragEvent,
-  useState,
-  useEffect,
-  useRef,
-  useCallback
-} from 'react'
+import React, { DragEvent, useState, useCallback } from 'react'
 import cx from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { AddedSection } from './AddedSection'
 import { TemplatePlotsGrid } from './TemplatePlotsGrid'
-import { PlotGroup } from './templatePlotsSlice'
+import { PlotGroup, updateSections } from './templatePlotsSlice'
 import { removeFromPreviousAndAddToNewSection } from './util'
 import { sendMessage } from '../../../shared/vscode'
 import { createIDWithIndex, getIDIndex } from '../../../util/ids'
@@ -30,9 +24,7 @@ export enum NewSectionBlock {
 }
 
 export const TemplatePlots: React.FC = () => {
-  const { plotSections, size } = useSelector(
-    (state: PlotsState) => state.template
-  )
+  const { size, sections } = useSelector((state: PlotsState) => state.template)
   const draggedOverGroup = useSelector(
     (state: PlotsState) => state.dragAndDrop.draggedOverGroup
   )
@@ -43,29 +35,30 @@ export const TemplatePlots: React.FC = () => {
     (state: PlotsState) => state.webview.selectedRevisions
   )
 
-  const [sections, setSections] = useState<PlotGroup[]>(plotSections)
   const [hoveredSection, setHoveredSection] = useState('')
   const nbItemsPerRow = size
-  const shouldSendMessage = useRef(true)
   const dispatch = useDispatch()
 
-  useEffect(() => {
-    shouldSendMessage.current = false
-    setSections(plotSections)
-  }, [plotSections, setSections])
+  const sendReorderMessage = useCallback((sections: PlotGroup[]) => {
+    sendMessage({
+      payload: sections.map(section => ({
+        group: section.group,
+        paths: section.entries
+      })),
+      type: MessageFromWebviewType.REORDER_PLOTS_TEMPLATES
+    })
+  }, [])
 
-  useEffect(() => {
-    if (sections && shouldSendMessage.current) {
-      sendMessage({
-        payload: sections.map(section => ({
-          group: section.group,
-          paths: section.entries
-        })),
-        type: MessageFromWebviewType.REORDER_PLOTS_TEMPLATES
-      })
-    }
-    shouldSendMessage.current = true
-  }, [sections])
+  const setSections = useCallback(
+    (sections: PlotGroup[]) => {
+      /* Although the following dispatch duplicates the work the reducer will do when the state returns 
+         from the extension, this is necessary to not see any flickering in the order as the returned state 
+         sometimes takes a while to come back */
+      dispatch(updateSections(sections))
+      sendReorderMessage(sections)
+    },
+    [dispatch, sendReorderMessage]
+  )
 
   const handleDropInSection = useCallback(
     (
@@ -94,16 +87,14 @@ export const TemplatePlots: React.FC = () => {
 
   const setSectionEntries = useCallback(
     (index: number, entries: string[]) => {
-      setSections(sections => {
-        const updatedSections = [...sections]
-        updatedSections[index] = {
-          ...sections[index],
-          entries
-        }
-        return updatedSections
-      })
+      const updatedSections = [...sections]
+      updatedSections[index] = {
+        ...updatedSections[index],
+        entries
+      }
+      setSections(updatedSections)
     },
-    [setSections]
+    [setSections, sections]
   )
 
   if (sectionIsLoading(selectedRevisions)) {
@@ -235,7 +226,6 @@ export const TemplatePlots: React.FC = () => {
               useVirtualizedGrid={useVirtualizedGrid}
               nbItemsPerRow={nbItemsPerRow}
               parentDraggedOver={draggedOverGroup === groupId}
-              entries={section.entries}
             />
           </div>
         )
