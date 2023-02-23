@@ -27,14 +27,16 @@ export const CustomPlot: React.FC<CustomPlotProps> = ({ id }) => {
   )
 
   const spec = useMemo(() => {
-    return createSpec(plot.metric, plot.param)
-  }, [plot.metric, plot.param])
+    if (plot) {
+      return createSpec(plot.metric, plot.param)
+    }
+  }, [plot])
 
   useEffect(() => {
     setPlot(plotDataStore.custom[id])
   }, [plotSnapshot, id])
 
-  if (!plot) {
+  if (!plot || !spec) {
     return null
   }
 
