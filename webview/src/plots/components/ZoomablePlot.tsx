@@ -61,7 +61,6 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   currentPlotProps.current = plotProps
 
   useEffect(() => {
-    // TODO Review this as this should be handled by the useGetPlot
     if (previousSpecsAndData.current !== newSpecsAndData) {
       dispatch(
         setZoomedInPlot({ id, plot: currentPlotProps.current, refresh: true })

@@ -60,7 +60,6 @@ export const templatePlotsSlice = createSlice({
         plotsSnapshots: snapShots,
         size: Math.abs(action.payload.size)
       }
-      // TODO: add sections in here with the entries ids
     }
   }
 })
