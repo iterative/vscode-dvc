@@ -3725,7 +3725,7 @@
   resolved "https://registry.yarnpkg.com/@tanstack/table-core/-/table-core-8.7.4.tgz#e6eb718db7fc45c95e8e64e1c66e08a78fa78bf7"
   integrity sha512-OPhzca7e83KGukxLpZ+4F9OBp9CZXi9b/OGJBH8dlC3wpffcSSDczYGUGJKG7wirXQ6cUVYL+9G6UrrdnblKNQ==
 
-"@testing-library/dom@^8.3.0", "@testing-library/dom@^8.5.0":
+"@testing-library/dom@^8.3.0":
   version "8.14.0"
   resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-8.14.0.tgz#c9830a21006d87b9ef6e1aae306cf49b0283e28e"
   integrity sha512-m8FOdUo77iMTwVRCyzWcqxlEIk+GnopbrRI15a0EaLbpZSCinIVI4kSQzWhkShK83GogvEFJSsHF3Ws0z1vrqA==
@@ -3733,6 +3733,20 @@
     "@babel/code-frame" "^7.10.4"
     "@babel/runtime" "^7.12.5"
     "@types/aria-query" "^4.2.0"
+    aria-query "^5.0.0"
+    chalk "^4.1.0"
+    dom-accessibility-api "^0.5.9"
+    lz-string "^1.4.4"
+    pretty-format "^27.0.2"
+
+"@testing-library/dom@^9.0.0":
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-9.0.0.tgz#cc50e8df2a7dccff95555102beebbae60e95e95e"
+  integrity sha512-+/TLgKNFsYUshOY/zXsQOk+PlFQK+eyJ9T13IDVNJEi+M+Un7xlJK+FZKkbGSnf0+7E1G6PlDhkSYQ/GFiruBQ==
+  dependencies:
+    "@babel/code-frame" "^7.10.4"
+    "@babel/runtime" "^7.12.5"
+    "@types/aria-query" "^5.0.1"
     aria-query "^5.0.0"
     chalk "^4.1.0"
     dom-accessibility-api "^0.5.9"
@@ -3754,13 +3768,13 @@
     lodash "^4.17.15"
     redent "^3.0.0"
 
-"@testing-library/react@13.4.0":
-  version "13.4.0"
-  resolved "https://registry.yarnpkg.com/@testing-library/react/-/react-13.4.0.tgz#6a31e3bf5951615593ad984e96b9e5e2d9380966"
-  integrity sha512-sXOGON+WNTh3MLE9rve97ftaZukN3oNf2KjDy7YTx6hcTO2uuLHuCGynMDhFwGw/jYf4OJ2Qk0i4i79qMNNkyw==
+"@testing-library/react@14.0.0":
+  version "14.0.0"
+  resolved "https://registry.yarnpkg.com/@testing-library/react/-/react-14.0.0.tgz#59030392a6792450b9ab8e67aea5f3cc18d6347c"
+  integrity sha512-S04gSNJbYE30TlIMLTzv6QCTzt9AqIF5y6s6SzVFILNcNvbV/jU96GeiTPillGQo+Ny64M/5PV7klNYYgv5Dfg==
   dependencies:
     "@babel/runtime" "^7.12.5"
-    "@testing-library/dom" "^8.5.0"
+    "@testing-library/dom" "^9.0.0"
     "@types/react-dom" "^18.0.0"
 
 "@testing-library/user-event@^13.2.1":
@@ -3821,6 +3835,11 @@
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/@types/aria-query/-/aria-query-5.0.0.tgz#df2d64b5cc73cca0d75e2a7793d6b5c199c2f7b2"
   integrity sha512-P+dkdFu0n08PDIvw+9nT9ByQnd+Udc8DaWPb9HKfaPwCvWvQpC5XaMRx2xLWECm9x1VKNps6vEAlirjA6+uNrQ==
+
+"@types/aria-query@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@types/aria-query/-/aria-query-5.0.1.tgz#3286741fb8f1e1580ac28784add4c7a1d49bdfbc"
+  integrity sha512-XTIieEY+gvJ39ChLcB4If5zHtPxt3Syj5rgZR+e1ctpmK8NjPf0zFqsz4JpLJT0xla9GFDKjy8Cpu331nrmE1Q==
 
 "@types/babel__core@^7.1.14":
   version "7.1.18"
