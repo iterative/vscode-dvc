@@ -175,7 +175,7 @@ const getSingleSelectMenuOptions = (
 
   const notExperiment = depth !== 1
 
-  const withId = (
+  const notRunningWithId = (
     label: string,
     type: MessageFromWebviewType,
     hidden?: boolean,
@@ -190,35 +190,34 @@ const getSingleSelectMenuOptions = (
     )
 
   return [
-    withId(
+    notRunningWithId(
       'Apply to Workspace',
       MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE,
       isNotExperimentOrCheckpoint
     ),
-    withId(
+    notRunningWithId(
       'Create new Branch',
       MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT,
       isNotExperimentOrCheckpoint
     ),
-    experimentMenuOption(
-      id,
+    notRunningWithId(
       'Share to Studio',
       MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO,
-      notExperiment || hasRunningExperiment,
-      !hasRunningExperiment
+      notExperiment,
+      true
     ),
-    withId(
+    notRunningWithId(
       'Commit and Share',
       MessageFromWebviewType.SHARE_EXPERIMENT_AS_COMMIT,
       isNotExperimentOrCheckpoint
     ),
-    withId(
+    notRunningWithId(
       'Share as Branch',
       MessageFromWebviewType.SHARE_EXPERIMENT_AS_BRANCH,
       isNotExperimentOrCheckpoint
     ),
     ...getRunResumeOptions(
-      withId,
+      notRunningWithId,
       projectHasCheckpoints,
       isNotExperimentOrCheckpoint,
       depth
@@ -237,7 +236,7 @@ const getSingleSelectMenuOptions = (
       !isRunning(status),
       id !== EXPERIMENT_WORKSPACE_ID
     ),
-    withId(
+    notRunningWithId(
       'Remove',
       MessageFromWebviewType.REMOVE_EXPERIMENT,
       depth !== 1,

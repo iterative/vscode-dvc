@@ -5,10 +5,7 @@ import {
   DEFAULT_SECTION_SIZES,
   Section
 } from 'dvc/src/plots/webview/contract'
-import {
-  addCustomPlotsWithSnapshots,
-  removeCustomPlots
-} from '../plotDataStore'
+import { addPlotsWithSnapshots, removePlots } from '../plotDataStore'
 
 export interface CustomPlotsState extends Omit<CustomPlotsData, 'plots'> {
   isCollapsed: boolean
@@ -46,8 +43,8 @@ export const customPlotsSlice = createSlice({
       }
       const { plots, ...statePayload } = action.payload
       const plotsIds = plots?.map(plot => plot.id) || []
-      const snapShots = addCustomPlotsWithSnapshots(plots)
-      removeCustomPlots(plotsIds)
+      const snapShots = addPlotsWithSnapshots(plots, Section.CUSTOM_PLOTS)
+      removePlots(plotsIds, Section.CUSTOM_PLOTS)
       return {
         ...state,
         ...statePayload,

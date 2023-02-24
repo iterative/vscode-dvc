@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.11] - 2023-02-23
+
+### 🔨 Maintenance
+
+- Remove legacy todo [#3339](https://github.com/iterative/vscode-dvc/pull/3339) by [@mattseddon](https://github.com/mattseddon)
+- Optimize plot re-rendering [#3337](https://github.com/iterative/vscode-dvc/pull/3337) by [@sroy3](https://github.com/sroy3)
+- Optimize the plots sections to reduce the number of useless re-renderings [#3341](https://github.com/iterative/vscode-dvc/pull/3341) by [@sroy3](https://github.com/sroy3)
+
 ## [0.6.10] - 2023-02-22
 
 ### 🚀 New Features and Enhancements

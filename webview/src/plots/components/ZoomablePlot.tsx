@@ -1,38 +1,46 @@
+import { AnyAction } from '@reduxjs/toolkit'
 import cx from 'classnames'
-import React, { useEffect, useRef, useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { PlainObject, VisualizationSpec } from 'react-vega'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
+import { Section } from 'dvc/src/plots/webview/contract'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { VisualizationSpec } from 'react-vega'
 import { Renderers } from 'vega'
 import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { setZoomedInPlot } from './webviewSlice'
 import styles from './styles.module.scss'
 import { Resizer } from './Resizer'
 import { config } from './constants'
+import { PlotsState } from '../store'
+import { useGetPlot } from '../hooks/useGetPlot'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
+import { sendMessage } from '../../shared/vscode'
 
 interface ZoomablePlotProps {
-  spec: VisualizationSpec
-  data?: PlainObject
+  spec?: VisualizationSpec
   id: string
   onViewReady?: () => void
-  toggleDrag: (enabled: boolean) => void
-  onResize: (diff: number) => void
-  snapPoints: number[]
+  toggleDrag: (enabled: boolean, id: string) => void
+  changeSize: (size: number) => AnyAction
   currentSnapPoint: number
-  size: number
+  section: Section
+  shouldNotResize?: boolean
 }
 
 export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
-  spec,
-  data,
+  spec: createdSpec,
   id,
   onViewReady,
   toggleDrag,
-  onResize,
-  snapPoints,
+  changeSize,
   currentSnapPoint,
-  size
+  section,
+  shouldNotResize
 }) => {
+  const snapPoints = useSelector(
+    (state: PlotsState) => state.webview.snapPoints
+  )
+  const { data, content: spec } = useGetPlot(section, id, createdSpec)
   const dispatch = useDispatch()
   const previousSpecsAndData = useRef(JSON.stringify({ data, spec }))
   const currentPlotProps = useRef<VegaLiteProps>()
@@ -40,6 +48,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   const enableClickTimeout = useRef(0)
   const [isExpanding, setIsExpanding] = useState(false)
   const newSpecsAndData = JSON.stringify({ data, spec })
+  const size = snapPoints[currentSnapPoint - 1]
 
   const plotProps: VegaLiteProps = {
     actions: false,
@@ -69,19 +78,33 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   const handleOnClick = () =>
     !clickDisabled.current && dispatch(setZoomedInPlot({ id, plot: plotProps }))
 
+  const onResize = useCallback(
+    (newSnapPoint: number) => {
+      dispatch(changeSize(newSnapPoint))
+      sendMessage({
+        payload: { section, size: newSnapPoint },
+        type: MessageFromWebviewType.RESIZE_PLOTS
+      })
+    },
+    [dispatch, changeSize, section]
+  )
+
   const commonResizerProps = {
     onGrab: () => {
       clickDisabled.current = true
-      toggleDrag(false)
+      toggleDrag(false, id)
     },
     onRelease: () => {
-      toggleDrag(true)
+      toggleDrag(true, id)
       enableClickTimeout.current = window.setTimeout(
         () => (clickDisabled.current = false),
         0
       )
     },
     onResize
+  }
+  if (!data && !spec) {
+    return null
   }
   return (
     <button
@@ -94,7 +117,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
       {currentPlotProps.current && (
         <VegaLite {...plotProps} onNewView={onViewReady} />
       )}
-      {snapPoints.length > 0 && (
+      {!shouldNotResize && (
         <Resizer
           className={styles.plotVerticalResizer}
           {...commonResizerProps}

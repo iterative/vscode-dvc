@@ -8,7 +8,6 @@ import styles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
 import { plotDataStore } from '../plotDataStore'
 import { PlotsState } from '../../store'
-import { useResize } from '../../hooks/useResize'
 
 interface CustomPlotProps {
   id: string
@@ -19,12 +18,8 @@ export const CustomPlot: React.FC<CustomPlotProps> = ({ id }) => {
   const plotSnapshot = useSelector(
     (state: PlotsState) => state.custom.plotsSnapshots[id]
   )
-  const [plot, setPlot] = useState(plotDataStore.custom[id])
+  const [plot, setPlot] = useState(plotDataStore[Section.CUSTOM_PLOTS][id])
   const currentSize = useSelector((state: PlotsState) => state.custom.size)
-  const { onResize: handleResize, snapPoints } = useResize(
-    Section.CUSTOM_PLOTS,
-    changeSize
-  )
 
   const spec = useMemo(() => {
     if (plot) {
@@ -33,14 +28,12 @@ export const CustomPlot: React.FC<CustomPlotProps> = ({ id }) => {
   }, [plot])
 
   useEffect(() => {
-    setPlot(plotDataStore.custom[id])
+    setPlot(plotDataStore[Section.CUSTOM_PLOTS][id])
   }, [plotSnapshot, id])
 
   if (!plot || !spec) {
     return null
   }
-
-  const { values } = plot
 
   const key = `plot-${id}`
 
@@ -52,13 +45,11 @@ export const CustomPlot: React.FC<CustomPlotProps> = ({ id }) => {
     <div className={styles.plot} data-testid={key} id={id} style={withScale(1)}>
       <ZoomablePlot
         spec={spec}
-        data={{ values }}
-        id={key}
+        id={id}
         toggleDrag={toggleDrag}
-        onResize={handleResize}
-        snapPoints={snapPoints}
+        changeSize={changeSize}
         currentSnapPoint={currentSize}
-        size={snapPoints[currentSize - 1]}
+        section={Section.CUSTOM_PLOTS}
       />
     </div>
   )

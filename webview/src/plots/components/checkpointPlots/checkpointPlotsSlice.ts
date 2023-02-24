@@ -5,10 +5,8 @@ import {
   DEFAULT_SECTION_SIZES,
   Section
 } from 'dvc/src/plots/webview/contract'
-import {
-  addCheckpointPlotsWithSnapshots,
-  removeCheckpointPlots
-} from '../plotDataStore'
+import { addPlotsWithSnapshots, removePlots } from '../plotDataStore'
+
 export interface CheckpointPlotsState
   extends Omit<CheckpointPlotsData, 'plots'> {
   isCollapsed: boolean
@@ -48,8 +46,8 @@ export const checkpointPlotsSlice = createSlice({
       }
       const { plots, ...statePayload } = action.payload
       const plotsIds = plots?.map(plot => plot.id) || []
-      const snapShots = addCheckpointPlotsWithSnapshots(plots)
-      removeCheckpointPlots(plotsIds)
+      const snapShots = addPlotsWithSnapshots(plots, Section.CHECKPOINT_PLOTS)
+      removePlots(plotsIds, Section.CHECKPOINT_PLOTS)
       return {
         ...state,
         ...statePayload,
