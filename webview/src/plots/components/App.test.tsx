@@ -59,6 +59,12 @@ import { clearSelection, createWindowTextSelection } from '../../test/selection'
 import * as EventCurrentTargetDistances from '../../shared/components/dragDrop/currentTarget'
 import { OVERSCAN_ROW_COUNT } from '../../shared/components/virtualizedGrid/VirtualizedGrid'
 import { pickAndMove } from '../../test/mouseEventsWithCoordinates'
+import {
+  stopTrackingAllComponentsRenders,
+  stopTrackingComponentRenders,
+  trackComponentRenders
+} from '../../util/wdyr'
+import { ZoomablePlot } from './ZoomablePlot'
 
 jest.mock('../../shared/components/dragDrop/currentTarget', () => {
   const actualModule = jest.requireActual(
@@ -149,6 +155,16 @@ describe('App', () => {
       }
     ]
   } as TemplatePlotsData
+
+  const complexData = {
+    template: complexTemplatePlotsFixture,
+    checkpoint: checkpointPlotsFixture,
+    comparison: comparisonTableFixture
+  }
+
+  const renderAppWithComplexData = () => {
+    return renderAppWithOptionalData(complexData)
+  }
 
   const getCheckpointMenuItem = (position: number) =>
     within(
@@ -1977,6 +1993,44 @@ describe('App', () => {
       clickEvent.stopPropagation = jest.fn()
       fireEvent(panel, clickEvent)
       expect(clickEvent.stopPropagation).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('Re-rendering', () => {
+    afterEach(() => {
+      stopTrackingAllComponentsRenders()
+    })
+
+    it('should not cause any unecessary renders on first load of <ZoomablePlot />', () => {
+      let renders = 0
+      trackComponentRenders(ZoomablePlot, () => {
+        renders++
+      })
+
+      renderAppWithComplexData()
+      sendSetDataMessage(complexData)
+
+      expect(renders).toBe(0)
+    })
+
+    xit('should have minimal unecessary renders for <ZoomablePLot /> when re-ordering the plots', () => {
+      let renders = 0
+      trackComponentRenders(ZoomablePlot, () => {
+        renders++
+      })
+      renderAppWithComplexData()
+      const plots = screen.getAllByTestId(/^plot_/)
+
+      expect(plots.map(plot => plot.id)).toStrictEqual([
+        join('logs', 'loss.tsv'),
+        join('other', 'plot.tsv'),
+        join('other', 'multiview.tsv')
+      ])
+
+      mockPostMessage.mockClear()
+      dragAndDrop(plots[1], plots[0])
+
+      expect(renders).toBe(-2323)
     })
   })
 })
