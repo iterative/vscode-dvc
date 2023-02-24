@@ -1,5 +1,5 @@
 import { ColorScale, Section } from 'dvc/src/plots/webview/contract'
-import React, { useMemo, useEffect, useState } from 'react'
+import React, { useMemo, useEffect, useState, useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { createSpec } from './util'
 import { changeDisabledDragIds, changeSize } from './checkpointPlotsSlice'
@@ -37,15 +37,18 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
     setPlot(plotDataStore[Section.CHECKPOINT_PLOTS][id])
   }, [plotSnapshot, id])
 
+  const toggleDrag = useCallback(
+    (enabled: boolean, plotId: string) => {
+      dispatch(changeDisabledDragIds(enabled ? [] : [plotId]))
+    },
+    [dispatch]
+  )
+
   if (!plot) {
     return null
   }
 
   const key = `plot-${id}`
-
-  const toggleDrag = (enabled: boolean) => {
-    dispatch(changeDisabledDragIds(enabled ? [] : [id]))
-  }
 
   return (
     <div className={styles.plot} data-testid={key} id={id} style={withScale(1)}>

@@ -42,12 +42,10 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   )
   const { data, content: spec } = useGetPlot(section, id, createdSpec)
   const dispatch = useDispatch()
-  const previousSpecsAndData = useRef(JSON.stringify({ data, spec }))
   const currentPlotProps = useRef<VegaLiteProps>()
   const clickDisabled = useRef(false)
   const enableClickTimeout = useRef(0)
   const [isExpanding, setIsExpanding] = useState(false)
-  const newSpecsAndData = JSON.stringify({ data, spec })
   const size = snapPoints[currentSnapPoint - 1]
 
   const plotProps: VegaLiteProps = {
@@ -61,13 +59,10 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   currentPlotProps.current = plotProps
 
   useEffect(() => {
-    if (previousSpecsAndData.current !== newSpecsAndData) {
-      dispatch(
-        setZoomedInPlot({ id, plot: currentPlotProps.current, refresh: true })
-      )
-      previousSpecsAndData.current = newSpecsAndData
-    }
-  }, [newSpecsAndData, id, dispatch])
+    dispatch(
+      setZoomedInPlot({ id, plot: currentPlotProps.current, refresh: true })
+    )
+  }, [data, spec, dispatch, id])
 
   useEffect(() => {
     return () => {
