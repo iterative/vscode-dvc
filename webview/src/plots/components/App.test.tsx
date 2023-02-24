@@ -14,6 +14,7 @@ import {
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/base/checkpointPlots'
+import customPlotsFixture from 'dvc/src/test/fixtures/expShow/base/customPlots'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
 import smoothTemplatePlotContent from 'dvc/src/test/fixtures/plotsDiff/template/smoothTemplatePlot'
@@ -98,7 +99,8 @@ describe('App', () => {
   const sectionPosition = {
     [Section.CHECKPOINT_PLOTS]: 2,
     [Section.TEMPLATE_PLOTS]: 0,
-    [Section.COMPARISON_TABLE]: 1
+    [Section.COMPARISON_TABLE]: 1,
+    [Section.CUSTOM_PLOTS]: 3
   }
 
   const sendSetDataMessage = (data: PlotsData) => {
@@ -283,7 +285,7 @@ describe('App', () => {
     })
     const loading = await screen.findAllByText('Loading...')
 
-    expect(loading).toHaveLength(3)
+    expect(loading).toHaveLength(4)
   })
 
   it('should render the Add Plots and Add Experiments get started button when there are experiments which have plots that are all unselected', async () => {
@@ -347,7 +349,9 @@ describe('App', () => {
     expect(screen.getByText('Trends')).toBeInTheDocument()
     expect(screen.getByText('Data Series')).toBeInTheDocument()
     expect(screen.getByText('Images')).toBeInTheDocument()
-    expect(screen.getByText('No Plots to Display')).toBeInTheDocument()
+    const noPlotsToDisplayElements = screen.getAllByText('No Plots to Display')
+    expect(noPlotsToDisplayElements[0]).toBeInTheDocument()
+    expect(noPlotsToDisplayElements[1]).toBeInTheDocument()
     expect(screen.getByText('No Images to Compare')).toBeInTheDocument()
   })
 
@@ -358,7 +362,9 @@ describe('App', () => {
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
     expect(screen.getByText('Trends')).toBeInTheDocument()
-    expect(screen.getByText('No Plots to Display')).toBeInTheDocument()
+    const noPlotsToDisplayElements = screen.getAllByText('No Plots to Display')
+    expect(noPlotsToDisplayElements[0]).toBeInTheDocument()
+    expect(noPlotsToDisplayElements[1]).toBeInTheDocument()
   })
 
   it('should render the comparison table when given a message with comparison plots data', () => {
@@ -394,12 +400,15 @@ describe('App', () => {
     expect(emptyState).toBeInTheDocument()
   })
 
+  // TBD add tests like ones above for custom
+
   it('should remove checkpoint plots given a message showing checkpoint plots as null', async () => {
     const emptyStateText = 'No Plots to Display'
 
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture,
       comparison: comparisonTableFixture,
+      custom: customPlotsFixture,
       template: templatePlotsFixture
     })
 
@@ -642,7 +651,7 @@ describe('App', () => {
       type: MessageFromWebviewType.TOGGLE_METRIC
     })
   })
-
+  // TBD use custom plots in resizing tests?
   it('should send a message to the extension with the selected size when changing the size of plots', () => {
     const store = renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
@@ -710,7 +719,7 @@ describe('App', () => {
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
   })
-
+  // TBD use custom plots in dnd test?
   it('should display the checkpoint plots in the order stored', () => {
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
@@ -1303,7 +1312,7 @@ describe('App', () => {
 
     expect(screen.getByTestId('modal')).toBeInTheDocument()
   })
-
+  // TBD use custom plots is some of these modal tests?
   it('should open a modal with the plot zoomed in when clicking a checkpoint plot', () => {
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
@@ -1384,12 +1393,15 @@ describe('App', () => {
 
     fireEvent.mouseEnter(checkpointInfo, { bubbles: true })
     expect(screen.getByTestId('tooltip-checkpoint-plots')).toBeInTheDocument()
+
+    // TBD add test for custom tooltip
   })
 
   it('should dismiss a tooltip by pressing esc', () => {
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture,
       comparison: comparisonTableFixture,
+      custom: customPlotsFixture,
       template: complexTemplatePlotsFixture
     })
 
@@ -1434,7 +1446,7 @@ describe('App', () => {
         global.dispatchEvent(new Event('resize'))
       })
     }
-
+    // TBD maybe add some tests for sizing using custom plots?
     describe('Large plots', () => {
       it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than ten large plots', async () => {
         await renderAppAndChangeSize(

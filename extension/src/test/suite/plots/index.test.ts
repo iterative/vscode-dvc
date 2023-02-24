@@ -674,6 +674,7 @@ suite('Plots Test Suite', () => {
       const expectedPlotsData: TPlotsData = {
         checkpoint: checkpointPlotsFixture,
         comparison: comparisonPlotsFixture,
+        custom: { plots: [], size: 2 },
         hasPlots: true,
         hasUnselectedPlots: false,
         sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
@@ -768,7 +769,7 @@ suite('Plots Test Suite', () => {
         expect(expectedRevisions).to.include(entry.rev)
       }
     }).timeout(WEBVIEW_TEST_TIMEOUT)
-
+    // TBD add tests for removing/adding custom plots messages
     it('should handle a toggle experiment message from the webview', async () => {
       const { plots, experiments } = await buildPlots(
         disposable,
