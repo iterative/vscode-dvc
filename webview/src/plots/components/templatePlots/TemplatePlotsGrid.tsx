@@ -91,13 +91,6 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
     [styles.multiViewPlot]: multiView
   })
 
-  const toggleDrag = useCallback(
-    (enabled: boolean, id: string) => {
-      dispatch(changeDisabledDragIds(enabled ? [] : [id]))
-    },
-    [dispatch]
-  )
-
   const items = useMemo(
     () =>
       entries.map((plot: string) => {
@@ -117,7 +110,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
             <ZoomablePlot
               id={plot}
               onViewReady={addEventsOnViewReady}
-              toggleDrag={toggleDrag}
+              changeDisabledDragIds={changeDisabledDragIds}
               changeSize={changeSize}
               currentSnapPoint={currentSize}
               shouldNotResize={multiView}
@@ -126,14 +119,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
           </div>
         )
       }),
-    [
-      entries,
-      plotClassName,
-      addEventsOnViewReady,
-      currentSize,
-      multiView,
-      toggleDrag
-    ]
+    [entries, plotClassName, addEventsOnViewReady, currentSize, multiView]
   )
 
   return (

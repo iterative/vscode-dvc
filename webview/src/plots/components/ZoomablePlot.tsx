@@ -20,7 +20,7 @@ interface ZoomablePlotProps {
   spec?: VisualizationSpec
   id: string
   onViewReady?: () => void
-  toggleDrag: (enabled: boolean, id: string) => void
+  changeDisabledDragIds: (ids: string[]) => AnyAction
   changeSize: (size: number) => AnyAction
   currentSnapPoint: number
   section: Section
@@ -31,7 +31,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   spec: createdSpec,
   id,
   onViewReady,
-  toggleDrag,
+  changeDisabledDragIds,
   changeSize,
   currentSnapPoint,
   section,
@@ -87,10 +87,10 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   const commonResizerProps = {
     onGrab: () => {
       clickDisabled.current = true
-      toggleDrag(false, id)
+      dispatch(changeDisabledDragIds([id]))
     },
     onRelease: () => {
-      toggleDrag(true, id)
+      dispatch(changeDisabledDragIds([]))
       enableClickTimeout.current = window.setTimeout(
         () => (clickDisabled.current = false),
         0
