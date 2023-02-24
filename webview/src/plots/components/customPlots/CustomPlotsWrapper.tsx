@@ -38,7 +38,9 @@ export const CustomPlotsWrapper: React.FC = () => {
       sectionCollapsed={isCollapsed}
       onResize={handleResize}
       addPlotsButton={{ onClick: addCustomPlot }}
-      removePlotsButton={{ onClick: removeCustomPlots }}
+      removePlotsButton={
+        plotsIds.length > 0 ? { onClick: removeCustomPlots } : undefined
+      }
     >
       <CustomPlots plotsIds={selectedPlots} />
     </PlotsContainer>

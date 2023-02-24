@@ -10,7 +10,6 @@ import {
 import { Title } from '../../vscode/title'
 import { Toast } from '../../vscode/toast'
 
-// add toast error about missing plots or not show frontend delete button
 export const pickCustomPlots = (
   plots: { metric: string; param: string }[],
   quickPickOptions: QuickPickOptionsWithTitle

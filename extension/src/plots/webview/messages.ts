@@ -166,13 +166,21 @@ export class WebviewMessages {
   private async addCustomPlot() {
     await this.plots.addCustomPlot()
     this.sendCustomPlots()
-    // needs a telemetry event
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED,
+      undefined,
+      undefined
+    )
   }
 
   private async removeCustomPlots() {
     await this.plots.removeCustomPlots()
     this.sendCustomPlots()
-    // needs a telemetry event
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_CUSTOM_PLOT_REMOVED,
+      undefined,
+      undefined
+    )
   }
 
   private selectPlotsFromWebview() {

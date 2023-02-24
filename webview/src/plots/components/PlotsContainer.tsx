@@ -128,7 +128,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
 
   if (removePlotsButton) {
     menuItems.unshift({
-      icon: Trash, // trash icon is wrong color
+      icon: Trash,
       onClick: removePlotsButton.onClick,
       tooltip: 'Remove Plots'
     })
