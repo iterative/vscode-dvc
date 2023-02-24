@@ -3,7 +3,8 @@ import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import {
   ExperimentStatus,
   isQueued,
-  isRunning
+  isRunning,
+  isRunningInQueue
 } from 'dvc/src/experiments/webview/contract'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { RowProp } from './interfaces'
@@ -190,6 +191,12 @@ const getSingleSelectMenuOptions = (
     )
 
   return [
+    experimentMenuOption(
+      id,
+      'Show Logs',
+      MessageFromWebviewType.SHOW_EXPERIMENT_LOGS,
+      !isRunningInQueue({ executor, status })
+    ),
     notRunningWithId(
       'Apply to Workspace',
       MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE,
@@ -227,7 +234,7 @@ const getSingleSelectMenuOptions = (
       starred ? 'Unstar' : 'Star',
       MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR,
       isWorkspace,
-      !hasRunningExperiment
+      true
     ),
     experimentMenuOption(
       [{ executor, id }],

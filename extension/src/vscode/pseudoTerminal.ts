@@ -10,13 +10,13 @@ export class PseudoTerminal extends Disposable {
   private blocked: boolean
 
   private readonly processOutput: EventEmitter<string>
-  private readonly processTerminated: EventEmitter<void>
+  private readonly processTerminated: EventEmitter<string>
 
   private isActive = false
 
   constructor(
     processOutput: EventEmitter<string>,
-    processTerminated: EventEmitter<void>,
+    processTerminated: EventEmitter<string>,
     termName = 'DVC'
   ) {
     super()
@@ -75,7 +75,7 @@ export class PseudoTerminal extends Disposable {
     new Promise<void>(resolve => {
       const pty: Pseudoterminal = {
         close: () => {
-          this.processTerminated.fire()
+          this.processTerminated.fire(this.termName)
           this.setBlocked(false)
         },
         handleInput: data => {

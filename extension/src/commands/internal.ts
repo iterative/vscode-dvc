@@ -2,9 +2,10 @@ import { commands } from 'vscode'
 import { RegisteredCliCommands, RegisteredCommands } from './external'
 import { ICli } from '../cli'
 import { Args } from '../cli/constants'
-import { autoRegisteredCommands as CliExecutorCommands } from '../cli/dvc/executor'
-import { autoRegisteredCommands as CliReaderCommands } from '../cli/dvc/reader'
-import { autoRegisteredCommands as dvcRunnerCommands } from '../cli/dvc/runner'
+import { autoRegisteredCommands as DvcExecutorCommands } from '../cli/dvc/executor'
+import { autoRegisteredCommands as DvcReaderCommands } from '../cli/dvc/reader'
+import { autoRegisteredCommands as DvcRunnerCommands } from '../cli/dvc/runner'
+import { autoRegisteredCommands as DvcLoggerCommands } from '../cli/dvc/viewer'
 import { autoRegisteredCommands as GitExecutorCommands } from '../cli/git/executor'
 import { autoRegisteredCommands as GitReaderCommands } from '../cli/git/reader'
 import { sendTelemetryEvent, sendTelemetryEventAndThrow } from '../telemetry'
@@ -18,14 +19,16 @@ type Command = (...args: Args) => unknown | Promise<unknown>
 
 export const AvailableCommands = Object.assign(
   { EXP_PUSH: 'expPush' } as const,
-  CliExecutorCommands,
-  CliReaderCommands,
-  dvcRunnerCommands,
+  DvcExecutorCommands,
+  DvcReaderCommands,
+  DvcRunnerCommands,
+  DvcLoggerCommands,
   GitExecutorCommands,
   GitReaderCommands
-) as typeof CliExecutorCommands &
-  typeof CliReaderCommands &
-  typeof dvcRunnerCommands &
+) as typeof DvcExecutorCommands &
+  typeof DvcReaderCommands &
+  typeof DvcRunnerCommands &
+  typeof DvcLoggerCommands &
   typeof GitExecutorCommands &
   typeof GitReaderCommands & { EXP_PUSH: 'expPush' }
 export type CommandId =

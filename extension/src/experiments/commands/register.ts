@@ -350,4 +350,10 @@ export const registerExperimentCommands = (
     RegisteredCommands.EXPERIMENT_VIEW_SHARE_TO_STUDIO,
     getShareExperimentToStudioCommand(internalCommands, connect)
   )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_VIEW_SHOW_LOGS,
+    ({ dvcRoot, id }: ExperimentDetails) =>
+      internalCommands.executeCommand(AvailableCommands.QUEUE_LOGS, dvcRoot, id)
+  )
 }

@@ -1,10 +1,5 @@
 import { EventEmitter, Event } from 'vscode'
-import {
-  Args,
-  Command,
-  ExperimentFlag,
-  ExperimentSubCommand
-} from './constants'
+import { Args, Command, QueueSubCommand } from './constants'
 import { getOptions } from './options'
 import { CliResult, CliStarted, ICli, typeCheckCommands } from '..'
 import { getCommandString } from '../command'
@@ -18,11 +13,10 @@ import { Toast } from '../../vscode/toast'
 import { Disposable } from '../../class/dispose'
 
 export const autoRegisteredCommands = {
-  EXPERIMENT_RESET_AND_RUN: 'runExperimentReset',
-  EXPERIMENT_RUN: 'runExperiment'
+  QUEUE_LOGS: 'queueLogs'
 } as const
 
-export class DvcRunner extends Disposable implements ICli {
+export class DvcViewer extends Disposable implements ICli {
   public readonly autoRegisteredCommands = typeCheckCommands(
     autoRegisteredCommands,
     this
@@ -68,9 +62,7 @@ export class DvcRunner extends Disposable implements ICli {
     this.dispose.track(
       this.onDidCompleteProcess(() => {
         this.pseudoTerminal.setBlocked(false)
-        this.processOutput.fire(
-          '\r\nTerminal will be reused by DVC, press any key to close it\r\n\n'
-        )
+        this.processOutput.fire('\r\nPress any key to close\r\n\n')
         this.currentProcess = undefined
       })
     )
@@ -98,20 +90,11 @@ export class DvcRunner extends Disposable implements ICli {
     )
   }
 
-  public runExperiment(dvcRoot: string, ...args: Args) {
-    return this.run(
-      dvcRoot,
-      Command.EXPERIMENT,
-      ExperimentSubCommand.RUN,
-      ...args
-    )
-  }
-
-  public runExperimentReset(dvcRoot: string, ...args: Args) {
-    return this.runExperiment(dvcRoot, ExperimentFlag.RESET, ...args)
-  }
-
   public async run(cwd: string, ...args: Args) {
+    if (this.isProcessRunning()) {
+      await this.stop()
+    }
+
     await this.pseudoTerminal.openCurrentInstance()
     if (!this.pseudoTerminal.isBlocked()) {
       return this.startProcess(cwd, args)
@@ -121,6 +104,10 @@ export class DvcRunner extends Disposable implements ICli {
         ' '
       )} as the output terminal is already occupied.`
     )
+  }
+
+  public queueLogs(cwd: string, expName: string) {
+    return this.run(cwd, Command.QUEUE, QueueSubCommand.LOGS, expName, '-f')
   }
 
   public stop() {
@@ -145,12 +132,8 @@ export class DvcRunner extends Disposable implements ICli {
     return stopped
   }
 
-  public isExperimentRunning() {
+  public isProcessRunning() {
     return !!this.currentProcess
-  }
-
-  public getRunningProcess() {
-    return this.currentProcess
   }
 
   private getOverrideOrCliPath() {

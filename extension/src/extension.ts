@@ -55,6 +55,7 @@ import { Flag } from './cli/dvc/constants'
 import { LanguageClient } from './languageClient'
 import { collectRunningExperimentPids } from './experiments/processExecution/collect'
 import { registerPatchCommand } from './patch'
+import { DvcViewer } from './cli/dvc/viewer'
 export class Extension extends Disposable {
   protected readonly internalCommands: InternalCommands
 
@@ -68,6 +69,7 @@ export class Extension extends Disposable {
   private readonly dvcExecutor: DvcExecutor
   private readonly dvcReader: DvcReader
   private readonly dvcRunner: DvcRunner
+  private readonly dvcLogger: DvcViewer
   private readonly gitExecutor: GitExecutor
   private readonly gitReader: GitReader
 
@@ -95,6 +97,7 @@ export class Extension extends Disposable {
     this.dvcExecutor = this.dispose.track(new DvcExecutor(config))
     this.dvcReader = this.dispose.track(new DvcReader(config))
     this.dvcRunner = this.dispose.track(new DvcRunner(config))
+    this.dvcLogger = this.dispose.track(new DvcViewer(config))
 
     this.gitExecutor = this.dispose.track(new GitExecutor())
     this.gitReader = this.dispose.track(new GitReader())
@@ -103,6 +106,7 @@ export class Extension extends Disposable {
       this.dvcExecutor,
       this.dvcReader,
       this.dvcRunner,
+      this.dvcLogger,
       this.gitExecutor,
       this.gitReader
     ]

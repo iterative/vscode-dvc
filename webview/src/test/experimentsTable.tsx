@@ -58,6 +58,7 @@ export const renderTableWithSortingData = () => {
   return renderTable(sortingTableDataFixture)
 }
 
+// this no longer works, need to rewrite it + tests
 export const renderTableWithoutRunningExperiments = () => {
   renderTable({
     ...tableDataFixture,

@@ -34,7 +34,7 @@ suite('Pseudo Terminal Test Suite', () => {
       const pseudoTerminal = disposable.track(
         new PseudoTerminal(
           disposable.track(new EventEmitter<string>()),
-          disposable.track(new EventEmitter<void>()),
+          disposable.track(new EventEmitter<string>()),
           terminalName
         )
       )
