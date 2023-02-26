@@ -9,13 +9,13 @@ import { getOptions } from './options'
 import { CliResult, CliStarted, ICli, typeCheckCommands } from '..'
 import { getCommandString } from '../command'
 import { Config } from '../../config'
-import { PseudoTerminal } from '../../vscode/pseudoTerminal'
 import { createProcess, Process } from '../../processExecution'
 import { StopWatch } from '../../util/time'
 import { sendErrorTelemetryEvent, sendTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { Toast } from '../../vscode/toast'
 import { Disposable } from '../../class/dispose'
+import { MultiUsePseudoTerminal } from '../../vscode/pseudoTerminal/multiUse'
 
 export const autoRegisteredCommands = {
   EXPERIMENT_RESET_AND_RUN: 'runExperimentReset',
@@ -41,7 +41,7 @@ export class DvcRunner extends Disposable implements ICli {
 
   private readonly executable: string | undefined
 
-  private readonly pseudoTerminal: PseudoTerminal
+  private readonly pseudoTerminal: MultiUsePseudoTerminal
   private currentProcess: Process | undefined
   private readonly config: Config
 
@@ -94,7 +94,7 @@ export class DvcRunner extends Disposable implements ICli {
     )
 
     this.pseudoTerminal = this.dispose.track(
-      new PseudoTerminal(this.processOutput, this.processTerminated)
+      new MultiUsePseudoTerminal(this.processOutput, this.processTerminated)
     )
   }
 

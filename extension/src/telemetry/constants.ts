@@ -27,6 +27,8 @@ export const EventName = Object.assign(
     EXTENSION_EXECUTION_DETAILS_CHANGED: 'extension.executionDetails.changed',
     EXTENSION_LOAD: 'extension.load',
 
+    PROCESS_VIEWER_COMPLETED: 'process.viewer.completed',
+
     VIEWS_CONNECT_CLOSED: 'views.connect.closed',
     VIEWS_CONNECT_CREATED: 'views.connect.created',
     VIEWS_CONNECT_FOCUS_CHANGED: 'views.connect.focusChanged',
@@ -119,6 +121,11 @@ export interface IEventNamePropertyMapping {
   [EventName.EXTENSION_LOAD]: ExtensionProperties
 
   [EventName.EXPERIMENTS_RUNNER_COMPLETED]: {
+    command: string
+    exitCode: number | null
+    wasStopped?: boolean
+  }
+  [EventName.PROCESS_VIEWER_COMPLETED]: {
     command: string
     exitCode: number | null
     wasStopped?: boolean
