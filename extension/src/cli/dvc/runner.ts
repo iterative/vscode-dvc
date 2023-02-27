@@ -12,10 +12,14 @@ import { Config } from '../../config'
 import { PseudoTerminal } from '../../vscode/pseudoTerminal'
 import { createProcess, Process } from '../../process/execution'
 import { StopWatch } from '../../util/time'
-import { sendErrorTelemetryEvent, sendTelemetryEvent } from '../../telemetry'
-import { EventName } from '../../telemetry/constants'
 import { Toast } from '../../vscode/toast'
 import { Disposable } from '../../class/dispose'
+import {
+  captureStdErr,
+  notifyCompleted,
+  notifyOutput,
+  notifyStarted
+} from '../util'
 
 export const autoRegisteredCommands = {
   EXPERIMENT_RESET_AND_RUN: 'runExperimentReset',
@@ -167,25 +171,23 @@ export class DvcRunner extends Disposable implements ICli {
     const process = this.dispose.track(createProcess(options))
     const baseEvent = { command, cwd, pid: process.pid }
 
-    this.processStarted.fire(baseEvent)
+    notifyStarted(baseEvent, this.processStarted)
 
-    this.notifyOutput(process)
+    notifyOutput(process, this.processOutput)
 
-    let stderr = ''
-    process.stderr?.on(
-      'data',
-      chunk => (stderr += (chunk as Buffer).toString())
-    )
+    const stderr = captureStdErr(process)
 
     void process.on('close', exitCode => {
       void this.dispose.untrack(process)
-      this.notifyCompleted({
-        ...baseEvent,
-        duration: stopWatch.getElapsedTime(),
-        exitCode,
-        killed: process.killed,
-        stderr
-      })
+      notifyCompleted(
+        {
+          ...baseEvent,
+          duration: stopWatch.getElapsedTime(),
+          exitCode,
+          stderr
+        },
+        this.processCompleted
+      )
     })
 
     return process
@@ -207,70 +209,5 @@ export class DvcRunner extends Disposable implements ICli {
       args,
       cwd
     })
-  }
-
-  private notifyOutput(process: Process) {
-    process.all?.on('data', chunk =>
-      this.processOutput.fire(
-        (chunk as Buffer)
-          .toString()
-          .split(/(\r?\n)/g)
-          .join('\r')
-      )
-    )
-  }
-
-  private notifyCompleted({
-    command,
-    pid,
-    cwd,
-    duration,
-    exitCode,
-    killed,
-    stderr
-  }: CliResult & {
-    killed: boolean
-  }) {
-    this.processCompleted.fire({
-      command,
-      cwd,
-      duration,
-      exitCode,
-      pid,
-      stderr: stderr?.replace(/\n+/g, '\n')
-    })
-
-    this.sendTelemetryEvent({ command, duration, exitCode, killed, stderr })
-  }
-
-  private sendTelemetryEvent({
-    command,
-    exitCode,
-    stderr,
-    duration,
-    killed
-  }: {
-    command: string
-    exitCode: number | null
-    stderr?: string
-    duration: number
-    killed: boolean
-  }) {
-    const properties = { command, exitCode }
-
-    if (!killed && exitCode && stderr) {
-      return sendErrorTelemetryEvent(
-        EventName.EXPERIMENTS_RUNNER_COMPLETED,
-        new Error(stderr),
-        duration,
-        properties
-      )
-    }
-
-    return sendTelemetryEvent(
-      EventName.EXPERIMENTS_RUNNER_COMPLETED,
-      { ...properties, wasStopped: killed },
-      { duration }
-    )
   }
 }

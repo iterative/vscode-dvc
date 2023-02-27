@@ -22,8 +22,6 @@ export type ViewOpenedEventName =
 
 export const EventName = Object.assign(
   {
-    EXPERIMENTS_RUNNER_COMPLETED: 'experiments.runner.completed',
-
     EXTENSION_EXECUTION_DETAILS_CHANGED: 'extension.executionDetails.changed',
     EXTENSION_LOAD: 'extension.load',
 
@@ -117,12 +115,6 @@ type WebviewFocusChangedProperties = {
 export interface IEventNamePropertyMapping {
   [EventName.EXTENSION_EXECUTION_DETAILS_CHANGED]: ExtensionProperties
   [EventName.EXTENSION_LOAD]: ExtensionProperties
-
-  [EventName.EXPERIMENTS_RUNNER_COMPLETED]: {
-    command: string
-    exitCode: number | null
-    wasStopped?: boolean
-  }
 
   [EventName.EXPERIMENT_AND_PLOTS_SHOW]: undefined
   [EventName.EXPERIMENT_APPLY]: undefined

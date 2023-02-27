@@ -1,13 +1,11 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { restore, spy, stub } from 'sinon'
+import { restore, spy } from 'sinon'
 import { window, Event, EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '../../../../extension'
 import { Config } from '../../../../config'
 import { DvcRunner } from '../../../../cli/dvc/runner'
 import { CliResult, CliStarted } from '../../../../cli'
-import * as Telemetry from '../../../../telemetry'
-import { EventName } from '../../../../telemetry/constants'
 import { WEBVIEW_TEST_TIMEOUT } from '../../timeouts'
 import { spyOnPrivateMemberMethod } from '../../util'
 
@@ -124,39 +122,6 @@ suite('DVC Runner Test Suite', () => {
 
       expect(output.includes(text)).to.be.true
       return completed
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
-    it('should send an error event if the command fails with an exit code and stderr', async () => {
-      const mockSendTelemetryEvent = stub(Telemetry, 'sendErrorTelemetryEvent')
-
-      const mockConfig = { getPythonBinPath: () => undefined } as Config
-      const dvcRunner = disposable.track(new DvcRunner(mockConfig, 'sleep'))
-
-      const cwd = __dirname
-
-      await dvcRunner.run(cwd, '1', '&&', 'then', 'die')
-      const process = dvcRunner.getRunningProcess()
-
-      const processCompleted = new Promise(resolve => {
-        void process?.on('close', () => resolve(undefined))
-      })
-
-      await expect(process).to.eventually.be.rejectedWith(Error)
-
-      await processCompleted
-
-      const [eventName, error, , properties] =
-        mockSendTelemetryEvent.getCall(0).args
-
-      const { command, exitCode } = properties as {
-        command: string
-        exitCode?: number | undefined
-      }
-
-      expect(eventName).to.equal(EventName.EXPERIMENTS_RUNNER_COMPLETED)
-      expect(error.message).to.have.length.greaterThan(0)
-      expect(command).to.equal('sleep 1 && then die')
-      expect(exitCode).to.be.greaterThan(0)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 })

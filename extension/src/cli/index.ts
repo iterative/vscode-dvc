@@ -1,6 +1,7 @@
 import { Event, EventEmitter } from 'vscode'
-import { CliError, MaybeConsoleError } from './error'
 import { getCommandString } from './command'
+import { CliError, MaybeConsoleError } from './error'
+import { notifyCompleted, notifyStarted } from './util'
 import { createProcess, Process, ProcessOptions } from '../process/execution'
 import { StopWatch } from '../util/time'
 import { Disposable } from '../class/dispose'
@@ -80,11 +81,15 @@ export class Cli extends Disposable implements ICli {
 
       const { stdout, exitCode } = await process
 
-      this.processCompleted.fire({
-        ...baseEvent,
-        duration: stopWatch.getElapsedTime(),
-        exitCode
-      })
+      notifyCompleted(
+        {
+          ...baseEvent,
+          duration: stopWatch.getElapsedTime(),
+          exitCode
+        },
+        this.processCompleted
+      )
+
       return stdout
     } catch (error: unknown) {
       throw this.processCliError(
@@ -121,7 +126,7 @@ export class Cli extends Disposable implements ICli {
   private createProcess(baseEvent: CliEvent, options: ProcessOptions) {
     const createdProcess = createProcess(options)
     baseEvent.pid = createdProcess.pid
-    this.processStarted.fire(baseEvent)
+    notifyStarted(baseEvent, this.processStarted)
 
     return createdProcess
   }
@@ -171,12 +176,15 @@ export class Cli extends Disposable implements ICli {
       baseError: error,
       options
     })
-    this.processCompleted.fire({
-      ...baseEvent,
-      duration,
-      exitCode: cliError.exitCode,
-      stderr: cliError.stderr
-    })
+    notifyCompleted(
+      {
+        ...baseEvent,
+        duration,
+        exitCode: cliError.exitCode,
+        stderr: cliError.stderr
+      },
+      this.processCompleted
+    )
     return cliError
   }
 }
