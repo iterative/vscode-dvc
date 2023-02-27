@@ -43,31 +43,16 @@ export class DvcRunner extends Disposable implements ICli {
   private readonly processTerminated: EventEmitter<void>
   private readonly onDidTerminateProcess: Event<void>
 
-  private readonly executable: string | undefined
-
   private readonly pseudoTerminal: PseudoTerminal
   private currentProcess: Process | undefined
   private readonly config: Config
 
-  constructor(
-    config: Config,
-    executable?: string,
-    emitters?: {
-      processCompleted: EventEmitter<CliResult>
-      processOutput: EventEmitter<string>
-      processStarted: EventEmitter<CliStarted>
-      processTerminated?: EventEmitter<void>
-    }
-  ) {
+  constructor(config: Config) {
     super()
 
     this.config = config
 
-    this.executable = executable
-
-    this.processCompleted =
-      emitters?.processCompleted ||
-      this.dispose.track(new EventEmitter<CliResult>())
+    this.processCompleted = this.dispose.track(new EventEmitter<CliResult>())
     this.onDidCompleteProcess = this.processCompleted.event
     this.dispose.track(
       this.onDidCompleteProcess(() => {
@@ -79,17 +64,12 @@ export class DvcRunner extends Disposable implements ICli {
       })
     )
 
-    this.processOutput =
-      emitters?.processOutput || this.dispose.track(new EventEmitter<string>())
+    this.processOutput = this.dispose.track(new EventEmitter<string>())
 
-    this.processStarted =
-      emitters?.processStarted ||
-      this.dispose.track(new EventEmitter<CliStarted>())
+    this.processStarted = this.dispose.track(new EventEmitter<CliStarted>())
     this.onDidStartProcess = this.processStarted.event
 
-    this.processTerminated =
-      emitters?.processTerminated ||
-      this.dispose.track(new EventEmitter<void>())
+    this.processTerminated = this.dispose.track(new EventEmitter<void>())
     this.onDidTerminateProcess = this.processTerminated.event
     this.dispose.track(
       this.onDidTerminateProcess(() => {
@@ -161,13 +141,6 @@ export class DvcRunner extends Disposable implements ICli {
     return this.currentProcess
   }
 
-  private getOverrideOrCliPath() {
-    if (this.executable) {
-      return this.executable
-    }
-    return this.config.getCliPath()
-  }
-
   private createProcess({ cwd, args }: { cwd: string; args: Args }): Process {
     const options = this.getOptions(cwd, args)
     const command = getCommandString(options)
@@ -200,7 +173,7 @@ export class DvcRunner extends Disposable implements ICli {
   private getOptions(cwd: string, args: Args) {
     return getOptions(
       this.config.getPythonBinPath(),
-      this.getOverrideOrCliPath(),
+      this.config.getCliPath(),
       cwd,
       ...args
     )
