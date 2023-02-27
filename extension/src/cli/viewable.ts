@@ -58,15 +58,11 @@ export class ViewableCliProcess extends DeferredDisposable {
     processOutput: EventEmitter<string>,
     processCompleted: EventEmitter<CliResult>
   ) {
-    processOutput.fire(
-      `Running: ${
-        options.executable === 'git' ? 'git' : 'dvc'
-      } ${options.args.join(' ')}\r\n\n`
-    )
     const stopWatch = new StopWatch()
+    const command = getCommandString(options)
+    processOutput.fire(`Running: ${command}\r\n\n`)
     const process = this.dispose.track(createProcess(options))
 
-    const command = getCommandString(options)
     const baseEvent = { command, cwd: options.cwd, pid: process.pid }
 
     notifyStarted(baseEvent, processStarted)
