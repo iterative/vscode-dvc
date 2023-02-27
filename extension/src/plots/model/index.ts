@@ -50,11 +50,13 @@ import {
 import { isDvcError } from '../../cli/dvc/reader'
 import { Toast } from '../../vscode/toast'
 
+export type CustomPlotsOrderValue = { metric: string; param: string }
+
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
 
   private plotSizes: Record<Section, number>
-  private customPlotsOrder: { metric: string; param: string }[]
+  private customPlotsOrder: CustomPlotsOrderValue[]
   private sectionCollapsed: SectionCollapsed
   private commitRevisions: Record<string, string> = {}
 
@@ -202,7 +204,7 @@ export class PlotsModel extends ModelWithPersistence {
     return this.customPlotsOrder
   }
 
-  public setCustomPlotsOrder(plotsOrder: { metric: string; param: string }[]) {
+  public setCustomPlotsOrder(plotsOrder: CustomPlotsOrderValue[]) {
     this.customPlotsOrder = plotsOrder
     this.persist(PersistenceKey.PLOTS_CUSTOM_ORDER, this.customPlotsOrder)
     this.recreateCustomPlots()
@@ -218,7 +220,7 @@ export class PlotsModel extends ModelWithPersistence {
     this.setCustomPlotsOrder(newCustomPlotsOrder)
   }
 
-  public addCustomPlot(metricAndParam: { metric: string; param: string }) {
+  public addCustomPlot(metricAndParam: CustomPlotsOrderValue) {
     const plotAlreadyExists = this.getCustomPlotsOrder().some(
       ({ param, metric }) =>
         param === metricAndParam.param && metric === metricAndParam.metric

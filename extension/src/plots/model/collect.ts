@@ -2,6 +2,7 @@ import omit from 'lodash.omit'
 import get from 'lodash.get'
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
+import { CustomPlotsOrderValue } from '.'
 import { getRevisionFirstThreeColumns } from './util'
 import {
   ColorScale,
@@ -281,7 +282,7 @@ const collectCustomPlotData = (
 }
 
 export const collectCustomPlotsData = (
-  metricsAndParams: { metric: string; param: string }[],
+  metricsAndParams: CustomPlotsOrderValue[],
   experiments: Experiment[]
 ): CustomPlotData[] => {
   return metricsAndParams.map(({ metric, param }) =>

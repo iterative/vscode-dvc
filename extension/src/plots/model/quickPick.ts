@@ -1,3 +1,4 @@
+import { CustomPlotsOrderValue } from '.'
 import { getCustomPlotId } from './collect'
 import { splitColumnPath } from '../../experiments/columns/paths'
 import { pickFromColumnLikes } from '../../experiments/columns/quickPick'
@@ -11,7 +12,7 @@ import { Title } from '../../vscode/title'
 import { Toast } from '../../vscode/toast'
 
 export const pickCustomPlots = (
-  plots: { metric: string; param: string }[],
+  plots: CustomPlotsOrderValue[],
   quickPickOptions: QuickPickOptionsWithTitle
 ): Thenable<string[] | undefined> => {
   if (!definedAndNonEmpty(plots)) {
@@ -33,19 +34,22 @@ export const pickCustomPlots = (
   return quickPickManyValues(plotsItems, quickPickOptions)
 }
 
+const getTypeColumnLikes = (columns: Column[], columnType: ColumnType) =>
+  columns
+    .filter(({ type }) => type === columnType)
+    .map(({ label, path }) => ({ label, path }))
+
 export const pickMetricAndParam = async (columns: Column[]) => {
-  const metricColumnLikes = columns
-    .filter(({ type }) => type === ColumnType.METRICS)
-    .map(({ label, path }) => ({ label, path }))
-  const paramColumnLikes = columns
-    .filter(({ type }) => type === ColumnType.PARAMS)
-    .map(({ label, path }) => ({ label, path }))
+  const metricColumnLikes = getTypeColumnLikes(columns, ColumnType.METRICS)
+  const paramColumnLikes = getTypeColumnLikes(columns, ColumnType.PARAMS)
+
   if (
     !definedAndNonEmpty(metricColumnLikes) ||
     !definedAndNonEmpty(paramColumnLikes)
   ) {
     return Toast.showError('There are no metrics or params to select from.')
   }
+
   const metric = await pickFromColumnLikes(metricColumnLikes, {
     title: Title.SELECT_METRIC_CUSTOM_PLOT
   })
