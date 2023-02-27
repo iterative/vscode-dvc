@@ -113,6 +113,9 @@ export const closeAllEditors = async () => {
   }
 }
 
+export const closeAllTerminals = () =>
+  commands.executeCommand('workbench.action.terminal.killAll')
+
 export const mockDuration = (duration: number) =>
   stub(Time, 'getCurrentEpoch')
     .onFirstCall()
