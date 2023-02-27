@@ -43,6 +43,7 @@ export enum SubCommand {
 
 export enum Flag {
   ALL_COMMITS = '-A',
+  FOLLOW = '-f',
   FORCE = '-f',
   GRANULAR = '--granular',
   JOBS = '-j',
@@ -67,6 +68,7 @@ export enum ExperimentSubCommand {
 
 export enum QueueSubCommand {
   KILL = 'kill',
+  LOGS = 'logs',
   START = 'start',
   STOP = 'stop'
 }
