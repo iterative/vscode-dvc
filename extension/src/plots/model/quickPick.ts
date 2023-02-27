@@ -13,10 +13,11 @@ import { Toast } from '../../vscode/toast'
 
 export const pickCustomPlots = (
   plots: CustomPlotsOrderValue[],
+  noPlotsErrorMessage: string,
   quickPickOptions: QuickPickOptionsWithTitle
 ): Thenable<string[] | undefined> => {
   if (!definedAndNonEmpty(plots)) {
-    return Toast.showError('There are no plots to remove.')
+    return Toast.showError(noPlotsErrorMessage)
   }
 
   const plotsItems = plots.map(({ metric, param }) => {

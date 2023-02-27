@@ -186,6 +186,7 @@ export class WebviewMessages {
   private async removeCustomPlots() {
     const selectedPlotsIds = await pickCustomPlots(
       this.plots.getCustomPlotsOrder(),
+      'There are no plots to remove.',
       {
         title: Title.SELECT_CUSTOM_PLOTS_TO_REMOVE
       }
