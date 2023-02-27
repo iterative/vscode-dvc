@@ -70,7 +70,7 @@
   "resolutions": {
     "decode-uri-component": "0.2.2",
     "@types/react": "18.0.28",
-    "**/recursive-readdir/minimatch": "6.2.0",
+    "**/recursive-readdir/minimatch": "7.0.0",
     "fastify": "3.29.5",
     "json5": "2.2.3",
     "loader-utils": "2.0.4",
