@@ -2,9 +2,9 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore, stub } from 'sinon'
 import { EventEmitter } from 'vscode'
-import { Disposable } from '../../extension'
-import { ProcessManager } from '../../processManager'
-import { delay } from '../../util/time'
+import { Disposable } from '../../../extension'
+import { ProcessManager } from '../../../process/manager'
+import { delay } from '../../../util/time'
 
 suite('Process Manager Test Suite', () => {
   const disposable = Disposable.fn()
