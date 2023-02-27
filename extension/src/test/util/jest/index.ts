@@ -1,7 +1,7 @@
 import { EventEmitter } from 'vscode'
 import { Experiments } from '../../../experiments'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
-import { Process } from '../../../processExecution'
+import { Process } from '../../../process/execution'
 
 export const getMockedProcess = (stdout: string): Process =>
   ({

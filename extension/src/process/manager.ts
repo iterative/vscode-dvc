@@ -1,6 +1,6 @@
 import { EventEmitter } from 'vscode'
-import { getCurrentEpoch } from './util/time'
-import { Disposable } from './class/dispose'
+import { getCurrentEpoch } from '../util/time'
+import { Disposable } from '../class/dispose'
 
 export const DEFAULT_DEBOUNCE_WINDOW_MS = 200
 

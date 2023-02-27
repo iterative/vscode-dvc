@@ -4,10 +4,10 @@ import {
   getOnDidChangePythonExecutionDetails,
   VscodePython
 } from './python'
-import { executeProcess } from '../processExecution'
+import { executeProcess } from '../process/execution'
 
 jest.mock('vscode')
-jest.mock('../processExecution')
+jest.mock('../process/execution')
 
 const mockedExecuteProcess = jest.mocked(executeProcess)
 

@@ -5,7 +5,7 @@ import { EventEmitter } from 'vscode'
 import kill from 'tree-kill'
 import { getOptions } from './util'
 import { getTimeSafeDisposer } from '../util'
-import { createProcess, processExists } from '../../../processExecution'
+import { createProcess, processExists } from '../../../process/execution'
 import { createValidInteger } from '../../../util/number'
 import { Cli, CliEvent, CliResult } from '../../../cli'
 

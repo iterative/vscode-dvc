@@ -1,5 +1,5 @@
 import process from 'process'
-import { executeProcess, processExists } from './processExecution'
+import { executeProcess, processExists } from './execution'
 
 describe('executeProcess', () => {
   it('should be able to run a process', async () => {

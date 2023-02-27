@@ -3,7 +3,7 @@ import { getVenvBinPath } from './path'
 import { getProcessPlatform } from '../env'
 import { exists } from '../fileSystem'
 import { Logger } from '../common/logger'
-import { createProcess, executeProcess, Process } from '../processExecution'
+import { createProcess, executeProcess, Process } from '../process/execution'
 
 const sendOutput = (process: Process) => {
   process.all?.on('data', chunk =>

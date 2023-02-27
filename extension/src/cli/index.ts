@@ -1,7 +1,7 @@
 import { Event, EventEmitter } from 'vscode'
 import { CliError, MaybeConsoleError } from './error'
 import { getCommandString } from './command'
-import { createProcess, Process, ProcessOptions } from '../processExecution'
+import { createProcess, Process, ProcessOptions } from '../process/execution'
 import { StopWatch } from '../util/time'
 import { Disposable } from '../class/dispose'
 
