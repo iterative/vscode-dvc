@@ -21,6 +21,8 @@ import { PlotsModel } from '../model'
 import { PathsModel } from '../paths/model'
 import { BaseWebview } from '../../webview'
 import { getModifiedTime } from '../../fileSystem'
+import { pickCustomPlots, pickMetricAndParam } from '../model/quickPick'
+import { Title } from '../../vscode/title'
 
 export class WebviewMessages {
   private readonly paths: PathsModel
@@ -164,7 +166,15 @@ export class WebviewMessages {
   }
 
   private async addCustomPlot() {
-    await this.plots.addCustomPlot()
+    const metricAndParam = await pickMetricAndParam(
+      this.experiments.getColumnTerminalNodes()
+    )
+
+    if (!metricAndParam) {
+      return
+    }
+
+    void this.plots.addCustomPlot(metricAndParam)
     this.sendCustomPlots()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED,
@@ -174,7 +184,18 @@ export class WebviewMessages {
   }
 
   private async removeCustomPlots() {
-    await this.plots.removeCustomPlots()
+    const selectedPlotsIds = await pickCustomPlots(
+      this.plots.getCustomPlotsOrder(),
+      {
+        title: Title.SELECT_CUSTOM_PLOTS_TO_REMOVE
+      }
+    )
+
+    if (!selectedPlotsIds) {
+      return
+    }
+
+    this.plots.removeCustomPlots(selectedPlotsIds)
     this.sendCustomPlots()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_CUSTOM_PLOT_REMOVED,

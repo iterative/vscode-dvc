@@ -15,7 +15,6 @@ import {
   collectAllCustomPlotData,
   getCustomPlotId
 } from './collect'
-import { pickCustomPlots, pickMetricAndParam } from './quickPick'
 import { getRevisionFirstThreeColumns } from './util'
 import {
   CheckpointPlot,
@@ -49,7 +48,6 @@ import {
   MultiSourceVariations
 } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
-import { Title } from '../../vscode/title'
 import { Toast } from '../../vscode/toast'
 
 export class PlotsModel extends ModelWithPersistence {
@@ -129,10 +127,7 @@ export class PlotsModel extends ModelWithPersistence {
         collectMultiSourceVariations(data, this.multiSourceVariations)
       ])
 
-    const customPlots: CustomPlotData[] = collectAllCustomPlotData(
-      this.customPlotsOrder,
-      this.experiments.getExperiments()
-    )
+    this.recreateCustomPlots()
 
     this.comparisonData = {
       ...this.comparisonData,
@@ -142,7 +137,6 @@ export class PlotsModel extends ModelWithPersistence {
       ...this.revisionData,
       ...revisionData
     }
-    this.customPlots = customPlots
     this.templates = { ...this.templates, ...templates }
     this.multiSourceVariations = multiSourceVariations
     this.multiSourceEncoding = collectMultiSourceEncoding(
@@ -196,50 +190,35 @@ export class PlotsModel extends ModelWithPersistence {
     }
   }
 
-  public updateCustomPlotsOrder(
-    newPlotsOrder: { metric: string; param: string }[]
-  ) {
-    this.customPlotsOrder = newPlotsOrder
-  }
-
   public recreateCustomPlots() {
     const customPlots: CustomPlotData[] = collectAllCustomPlotData(
-      this.customPlotsOrder,
+      this.getCustomPlotsOrder(),
       this.experiments.getExperiments()
     )
     this.customPlots = customPlots
   }
 
-  public async removeCustomPlots() {
-    const selectedPlotsIds: string[] | undefined = await pickCustomPlots(
-      this.customPlotsOrder,
-      {
-        title: Title.SELECT_CUSTOM_PLOTS_TO_REMOVE
-      }
-    )
+  public getCustomPlotsOrder() {
+    return this.customPlotsOrder
+  }
 
-    if (!selectedPlotsIds) {
-      return
-    }
-
-    this.customPlotsOrder = this.customPlotsOrder.filter(
-      ({ metric, param }) => {
-        return !selectedPlotsIds.includes(getCustomPlotId(metric, param))
-      }
-    )
+  public setCustomPlotsOrder(plotsOrder: { metric: string; param: string }[]) {
+    this.customPlotsOrder = plotsOrder
     this.persist(PersistenceKey.PLOTS_CUSTOM_ORDER, this.customPlotsOrder)
     this.recreateCustomPlots()
   }
 
-  public async addCustomPlot() {
-    const metricAndParam = await pickMetricAndParam(
-      this.experiments.getColumnTerminalNodes()
+  public removeCustomPlots(plotIds: string[]) {
+    const newCustomPlotsOrder = this.getCustomPlotsOrder().filter(
+      ({ metric, param }) => {
+        return !plotIds.includes(getCustomPlotId(metric, param))
+      }
     )
-    if (!metricAndParam) {
-      return
-    }
+    this.setCustomPlotsOrder(newCustomPlotsOrder)
+  }
 
-    const plotAlreadyExists = this.customPlotsOrder.some(
+  public addCustomPlot(metricAndParam: { metric: string; param: string }) {
+    const plotAlreadyExists = this.getCustomPlotsOrder().some(
       ({ param, metric }) =>
         param === metricAndParam.param && metric === metricAndParam.metric
     )
@@ -248,9 +227,8 @@ export class PlotsModel extends ModelWithPersistence {
       return Toast.showError('Custom plot already exists.')
     }
 
-    this.customPlotsOrder.push(metricAndParam)
-    this.persist(PersistenceKey.PLOTS_CUSTOM_ORDER, this.customPlotsOrder)
-    this.recreateCustomPlots()
+    const newCustomPlotsOrder = [...this.getCustomPlotsOrder(), metricAndParam]
+    this.setCustomPlotsOrder(newCustomPlotsOrder)
   }
 
   public setupManualRefresh(id: string) {

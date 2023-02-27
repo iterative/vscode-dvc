@@ -40,7 +40,6 @@ export const pickMetricAndParam = async (columns: Column[]) => {
   const paramColumnLikes = columns
     .filter(({ type }) => type === ColumnType.PARAMS)
     .map(({ label, path }) => ({ label, path }))
-
   if (
     !definedAndNonEmpty(metricColumnLikes) ||
     !definedAndNonEmpty(paramColumnLikes)
