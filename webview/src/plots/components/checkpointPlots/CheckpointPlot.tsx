@@ -1,6 +1,6 @@
 import { ColorScale, Section } from 'dvc/src/plots/webview/contract'
 import React, { useMemo, useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { createSpec } from './util'
 import { changeDisabledDragIds, changeSize } from './checkpointPlotsSlice'
 import { ZoomablePlot } from '../ZoomablePlot'
@@ -18,7 +18,6 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
   id,
   colors
 }) => {
-  const dispatch = useDispatch()
   const plotSnapshot = useSelector(
     (state: PlotsState) => state.checkpoint.plotsSnapshots[id]
   )
@@ -43,16 +42,12 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
 
   const key = `plot-${id}`
 
-  const toggleDrag = (enabled: boolean) => {
-    dispatch(changeDisabledDragIds(enabled ? [] : [id]))
-  }
-
   return (
     <div className={styles.plot} data-testid={key} id={id} style={withScale(1)}>
       <ZoomablePlot
         spec={spec}
         id={id}
-        toggleDrag={toggleDrag}
+        changeDisabledDragIds={changeDisabledDragIds}
         changeSize={changeSize}
         currentSnapPoint={currentSize}
         section={Section.CHECKPOINT_PLOTS}
