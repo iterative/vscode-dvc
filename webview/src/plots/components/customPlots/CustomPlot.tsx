@@ -1,6 +1,6 @@
 import { Section } from 'dvc/src/plots/webview/contract'
 import React, { useMemo, useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { createSpec } from './util'
 import { changeDisabledDragIds, changeSize } from './customPlotsSlice'
 import { ZoomablePlot } from '../ZoomablePlot'
@@ -14,7 +14,6 @@ interface CustomPlotProps {
 }
 
 export const CustomPlot: React.FC<CustomPlotProps> = ({ id }) => {
-  const dispatch = useDispatch()
   const plotSnapshot = useSelector(
     (state: PlotsState) => state.custom.plotsSnapshots[id]
   )
@@ -37,17 +36,13 @@ export const CustomPlot: React.FC<CustomPlotProps> = ({ id }) => {
 
   const key = `plot-${id}`
 
-  const toggleDrag = (enabled: boolean) => {
-    dispatch(changeDisabledDragIds(enabled ? [] : [id]))
-  }
-
   return (
     <div className={styles.plot} data-testid={key} id={id} style={withScale(1)}>
       <ZoomablePlot
         spec={spec}
         id={id}
-        toggleDrag={toggleDrag}
         changeSize={changeSize}
+        changeDisabledDragIds={changeDisabledDragIds}
         currentSnapPoint={currentSize}
         section={Section.CUSTOM_PLOTS}
       />
