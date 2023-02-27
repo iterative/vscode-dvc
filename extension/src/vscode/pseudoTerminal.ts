@@ -17,7 +17,7 @@ export class PseudoTerminal extends Disposable {
   constructor(
     processOutput: EventEmitter<string>,
     processTerminated: EventEmitter<void>,
-    termName = 'DVC'
+    termName: string
   ) {
     super()
 

@@ -98,7 +98,11 @@ export class DvcRunner extends Disposable implements ICli {
     )
 
     this.pseudoTerminal = this.dispose.track(
-      new PseudoTerminal(this.processOutput, this.processTerminated)
+      new PseudoTerminal(
+        this.processOutput,
+        this.processTerminated,
+        'DVC: exp run'
+      )
     )
   }
 

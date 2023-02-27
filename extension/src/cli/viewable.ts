@@ -18,7 +18,7 @@ export class ViewableCliProcess extends DeferredDisposable {
   private readonly pseudoTerminal: PseudoTerminal
 
   constructor(
-    termName: string,
+    id: string,
     options: ProcessOptions,
     processStarted: EventEmitter<CliStarted>,
     processCompleted: EventEmitter<CliResult>
@@ -29,7 +29,7 @@ export class ViewableCliProcess extends DeferredDisposable {
     const onDidCloseTerminal = terminalClosed.event
 
     this.pseudoTerminal = this.dispose.track(
-      new PseudoTerminal(processOutput, terminalClosed, termName)
+      new PseudoTerminal(processOutput, terminalClosed, id)
     )
 
     this.pseudoTerminal.setBlocked(true)
