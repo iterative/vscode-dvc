@@ -149,6 +149,7 @@ suite('Experiments Test Suite', () => {
         hasColumns: true,
         hasConfig: true,
         hasRunningExperiment: true,
+        hasValidDvcYaml: true,
         rows: rowsFixture,
         sorts: []
       }
@@ -204,6 +205,7 @@ suite('Experiments Test Suite', () => {
         hasColumns: true,
         hasConfig: false,
         hasRunningExperiment: true,
+        hasValidDvcYaml: true,
         rows: rowsFixture,
         sorts: []
       }
@@ -232,6 +234,7 @@ suite('Experiments Test Suite', () => {
         hasColumns: true,
         hasConfig: true,
         hasRunningExperiment: true,
+        hasValidDvcYaml: true,
         rows: rowsFixture,
         sorts: []
       }
@@ -931,6 +934,7 @@ suite('Experiments Test Suite', () => {
         hasColumns: true,
         hasConfig: true,
         hasRunningExperiment: true,
+        hasValidDvcYaml: true,
         rows: rowsFixture,
         sorts: []
       }

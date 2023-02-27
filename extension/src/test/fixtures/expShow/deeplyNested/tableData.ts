@@ -14,6 +14,7 @@ const data: TableData = {
   hasCheckpoints: false,
   hasConfig: true,
   hasRunningExperiment: false,
+  hasValidDvcYaml: true,
   sorts: [
     {
       path: 'params:params.yaml:nested1.doubled',

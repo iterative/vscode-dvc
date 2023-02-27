@@ -11,6 +11,7 @@ const data: TableData = {
   hasConfig: true,
   hasRunningExperiment: true,
   hasColumns: true,
+  hasValidDvcYaml: true,
   sorts: [],
   changes: [],
   columnOrder: [],
