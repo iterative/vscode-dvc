@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore, spy } from 'sinon'
-import { window, Event, EventEmitter } from 'vscode'
+import { window, Event } from 'vscode'
 import { Disposable, Disposer } from '../../../../extension'
 import { Config } from '../../../../config'
 import { DvcRunner } from '../../../../cli/dvc/runner'
@@ -22,8 +22,11 @@ suite('DVC Runner Test Suite', () => {
 
   describe('DvcRunner', () => {
     it('should only be able to run a single command at a time', async () => {
-      const mockConfig = { getPythonBinPath: () => undefined } as Config
-      const dvcRunner = disposable.track(new DvcRunner(mockConfig, 'sleep'))
+      const mockConfig = {
+        getCliPath: () => 'sleep',
+        getPythonBinPath: () => undefined
+      } as Config
+      const dvcRunner = disposable.track(new DvcRunner(mockConfig))
 
       const windowErrorMessageSpy = spy(window, 'showErrorMessage')
       const cwd = __dirname
@@ -35,8 +38,11 @@ suite('DVC Runner Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to stop a started command', async () => {
-      const mockConfig = { getPythonBinPath: () => undefined } as Config
-      const dvcRunner = disposable.track(new DvcRunner(mockConfig, 'sleep'))
+      const mockConfig = {
+        getCliPath: () => 'sleep',
+        getPythonBinPath: () => undefined
+      } as Config
+      const dvcRunner = disposable.track(new DvcRunner(mockConfig))
       const cwd = __dirname
 
       const onDidCompleteProcess = (): Promise<void> =>
@@ -67,10 +73,6 @@ suite('DVC Runner Test Suite', () => {
     it('should be able to execute a command and provide the correct events in the correct order', async () => {
       const text = ':weeeee:'
 
-      const processCompleted = disposable.track(new EventEmitter<CliResult>())
-      const processOutput = disposable.track(new EventEmitter<string>())
-      const processStarted = disposable.track(new EventEmitter<CliStarted>())
-
       const onDidOutputProcess = (
         text: string,
         event: Event<string>,
@@ -97,23 +99,25 @@ suite('DVC Runner Test Suite', () => {
           })
         })
       }
-      const started = onDidStartOrCompleteProcess(processStarted.event)
-      const completed = onDidStartOrCompleteProcess(processCompleted.event)
-      const eventStream = onDidOutputProcess(
-        text,
-        processOutput.event,
-        disposable
-      )
 
       const cwd = __dirname
 
-      const mockConfig = { getPythonBinPath: () => undefined } as Config
-      const dvcRunner = disposable.track(
-        new DvcRunner(mockConfig, 'echo', {
-          processCompleted,
-          processOutput,
-          processStarted
-        })
+      const mockConfig = {
+        getCliPath: () => 'echo',
+        getPythonBinPath: () => undefined
+      } as Config
+
+      const dvcRunner = disposable.track(new DvcRunner(mockConfig))
+
+      const started = onDidStartOrCompleteProcess(dvcRunner.onDidStartProcess)
+      const completed = onDidStartOrCompleteProcess(
+        dvcRunner.onDidCompleteProcess
+      )
+      const eventStream = onDidOutputProcess(
+        text,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (dvcRunner as any).processOutput.event,
+        disposable
       )
 
       void dvcRunner.run(cwd, text)
