@@ -6,9 +6,9 @@ import {
 const data: CustomPlotsData = {
   plots: [
     {
-      id: 'custom-metrics:summary.json:loss-params:params.yaml:learning_rate',
-      metric: 'metrics:summary.json:loss',
-      param: 'params:params.yaml:dropout',
+      id: 'custom-metrics:summary.json:loss-params:params.yaml:dropout',
+      metric: 'summary.json:loss',
+      param: 'params.yaml:dropout',
       values: [
         {
           expName: 'exp-e7a67',

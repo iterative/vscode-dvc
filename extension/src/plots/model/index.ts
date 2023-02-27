@@ -12,7 +12,7 @@ import {
   TemplateAccumulator,
   collectCommitRevisionDetails,
   collectOverrideRevisionDetails,
-  collectAllCustomPlotData,
+  collectCustomPlotsData,
   getCustomPlotId
 } from './collect'
 import { getRevisionFirstThreeColumns } from './util'
@@ -191,7 +191,7 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public recreateCustomPlots() {
-    const customPlots: CustomPlotData[] = collectAllCustomPlotData(
+    const customPlots: CustomPlotData[] = collectCustomPlotsData(
       this.getCustomPlotsOrder(),
       this.experiments.getExperiments()
     )
@@ -214,6 +214,7 @@ export class PlotsModel extends ModelWithPersistence {
         return !plotIds.includes(getCustomPlotId(metric, param))
       }
     )
+
     this.setCustomPlotsOrder(newCustomPlotsOrder)
   }
 

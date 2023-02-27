@@ -834,8 +834,16 @@ suite('Plots Test Suite', () => {
 
       await quickPickEvent
 
-      expect(mockSetCustomPlotsOrder).to.be.called
-      expect(mockSendTelemetryEvent).to.be.called
+      expect(mockSetCustomPlotsOrder).to.be.calledWith([
+        {
+          metric: 'metrics:summary.json:loss',
+          param: 'params:params.yaml:dropout'
+        }
+      ])
+      expect(mockSendTelemetryEvent).to.be.calledWith(
+        EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED,
+        undefined
+      )
     })
 
     it('should handle a remove custom plot message from the webview', async () => {
@@ -855,7 +863,7 @@ suite('Plots Test Suite', () => {
         mockSelectCustomPlots.callsFake(() => {
           resolve(undefined)
           return Promise.resolve([
-            'metrics:summary.json:lossparams:params.yaml:dropout'
+            'custom-metrics:summary.json:loss-params:params.yaml:dropout'
           ])
         })
       )
@@ -879,8 +887,11 @@ suite('Plots Test Suite', () => {
 
       await quickPickEvent
 
-      expect(mockSetCustomPlotsOrder).to.be.called
-      expect(mockSendTelemetryEvent).to.be.called
+      expect(mockSetCustomPlotsOrder).to.be.calledWith([])
+      expect(mockSendTelemetryEvent).to.be.calledWith(
+        EventName.VIEWS_PLOTS_CUSTOM_PLOT_REMOVED,
+        undefined
+      )
     })
   })
 })

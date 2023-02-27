@@ -280,7 +280,7 @@ const collectCustomPlotData = (
   return plotData
 }
 
-export const collectAllCustomPlotData = (
+export const collectCustomPlotsData = (
   metricsAndParams: { metric: string; param: string }[],
   experiments: Experiment[]
 ): CustomPlotData[] => {
