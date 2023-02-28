@@ -23,11 +23,7 @@ import {
 import { isSelecting } from '../../util/strings'
 import { isTooltip } from '../../util/helpers'
 
-export interface CommonPlotsContainerProps {
-  onResize: (size: number) => void
-}
-
-export interface PlotsContainerProps extends CommonPlotsContainerProps {
+export interface PlotsContainerProps {
   sectionCollapsed: boolean
   sectionKey: Section
   title: string
