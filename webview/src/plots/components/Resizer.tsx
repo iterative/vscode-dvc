@@ -1,4 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, {
+  createRef,
+  CSSProperties,
+  useEffect,
+  useRef,
+  useState
+} from 'react'
 import styles from './styles.module.scss'
 
 interface ResizerProps {
@@ -23,9 +29,13 @@ export const Resizer: React.FC<ResizerProps> = ({
   currentSnapPoint
 }) => {
   const startingPageX = useRef(0)
+  const startingPageY = useRef(0)
   const [lockedX, setLockedX] = useState<number | undefined>(undefined)
+  const [yPos, setyPos] = useState<number | undefined>(0)
   const [isResizing, setIsResizing] = useState(false)
   const lockedSnapPoint = useRef(currentSnapPoint)
+  const wrapperRef = createRef<HTMLDivElement>()
+  const height = useRef(0)
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   useEffect(() => {
@@ -40,6 +50,7 @@ export const Resizer: React.FC<ResizerProps> = ({
     }
     const handleMouseMove = (e: MouseEvent) => {
       const newDiffX = e.clientX - startingPageX.current
+      const newDiffY = e.clientY - startingPageY.current
 
       if (isResizing && newDiffX !== 0) {
         const positionX = newDiffX + sizeBetweenResizers
@@ -62,6 +73,10 @@ export const Resizer: React.FC<ResizerProps> = ({
           }
         }
       }
+
+      if (newDiffY !== 0) {
+        setyPos(newDiffY)
+      }
     }
 
     document.addEventListener('mousemove', handleMouseMove)
@@ -82,6 +97,7 @@ export const Resizer: React.FC<ResizerProps> = ({
       if (e.key === 'Escape') {
         setIsResizing(false)
         setLockedX(undefined)
+        setyPos(undefined)
         setIsExpanding(false)
       }
     }
@@ -91,7 +107,7 @@ export const Resizer: React.FC<ResizerProps> = ({
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [setIsResizing, setLockedX, setIsExpanding])
+  }, [setIsResizing, setLockedX, setyPos, setIsExpanding])
 
   useEffect(() => {
     const handleMouseUp = () => {
@@ -100,6 +116,7 @@ export const Resizer: React.FC<ResizerProps> = ({
         onResize(lockedSnapPoint.current)
         onRelease()
         setLockedX(undefined)
+        setyPos(undefined)
         setIsResizing(false)
       }
     }
@@ -113,16 +130,21 @@ export const Resizer: React.FC<ResizerProps> = ({
 
   const handleMouseDown = (e: React.MouseEvent) => {
     startingPageX.current = e.clientX
+    startingPageY.current = e.clientY
     setIsResizing(true)
     onGrab()
   }
 
-  const lockedStyle = lockedX
+  const lockedStyle: CSSProperties = lockedX
     ? {
         right: Math.min(-lockedX, 0),
         width: Math.abs(lockedX)
       }
     : {}
+  if (yPos) {
+    lockedStyle.bottom = Math.max(yPos, 0)
+    lockedStyle.height = height.current + yPos
+  }
 
   return (
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -130,6 +152,7 @@ export const Resizer: React.FC<ResizerProps> = ({
       className={className}
       onMouseDown={handleMouseDown}
       data-testid="vertical-plot-resizer"
+      ref={node => (height.current = node?.getBoundingClientRect().height || 0)}
     >
       {isResizing && (
         <div className={styles.resizerLocked} style={lockedStyle} />
