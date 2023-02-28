@@ -68,7 +68,10 @@ import { shortenForLabel } from '../../../util/string'
 import { GitExecutor } from '../../../cli/git/executor'
 import { WorkspacePlots } from '../../../plots/workspace'
 import { PlotSizeNumber } from '../../../plots/webview/contract'
-import { RegisteredCommands } from '../../../commands/external'
+import {
+  RegisteredCliCommands,
+  RegisteredCommands
+} from '../../../commands/external'
 import { ConfigKey } from '../../../vscode/config'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
 import * as Time from '../../../util/time'
@@ -78,6 +81,7 @@ import * as FileSystem from '../../../fileSystem'
 import * as ProcessExecution from '../../../process/execution'
 import { DvcReader } from '../../../cli/dvc/reader'
 import { Connect } from '../../../connect'
+import { DvcViewer } from '../../../cli/dvc/viewer'
 
 const { openFileInEditor } = FileSystem
 
@@ -546,6 +550,39 @@ suite('Experiments Test Suite', () => {
         dvcDemoPath,
         mockExperimentId,
         mockBranch
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a message to show the logs of an experiment', async () => {
+      const { experiments } = buildExperiments(disposable)
+      await experiments.isReady()
+
+      const mockExpId = 'exp-e7a67'
+
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const executeCommandSpy = spy(commands, 'executeCommand')
+
+      const mockShowLogs = stub(DvcViewer.prototype, 'queueLogs')
+
+      const logsShown = new Promise(resolve =>
+        mockShowLogs.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      )
+
+      mockMessageReceived.fire({
+        payload: mockExpId,
+        type: MessageFromWebviewType.SHOW_EXPERIMENT_LOGS
+      })
+
+      await logsShown
+
+      expect(executeCommandSpy).to.be.calledWithExactly(
+        RegisteredCliCommands.EXPERIMENT_VIEW_SHOW_LOGS,
+        { dvcRoot: dvcDemoPath, id: mockExpId }
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 

@@ -521,6 +521,11 @@
         "icon": "$(repo-push)"
       },
       {
+        "title": "%command.views.experiments.showLogs%",
+        "command": "dvc.views.experiments.showLogs",
+        "category": "DVC"
+      },
+      {
         "title": "%command.views.experimentsTree.selectExperiments%",
         "command": "dvc.views.experimentsTree.selectExperiments",
         "category": "DVC",
@@ -883,6 +888,10 @@
         },
         {
           "command": "dvc.views.experiments.shareExperimentToStudio",
+          "when": "false"
+        },
+        {
+          "command": "dvc.views.experiments.showLogs",
           "when": "false"
         },
         {
@@ -1615,10 +1624,10 @@
     "@types/vscode": "1.64.0",
     "@vscode/test-electron": "2.2.3",
     "@vscode/vsce": "2.17.0",
-    "@wdio/cli": "8.3.10",
-    "@wdio/local-runner": "8.3.10",
-    "@wdio/mocha-framework": "8.3.0",
-    "@wdio/spec-reporter": "8.3.0",
+    "@wdio/cli": "8.4.0",
+    "@wdio/local-runner": "8.4.0",
+    "@wdio/mocha-framework": "8.4.0",
+    "@wdio/spec-reporter": "8.4.0",
     "chai": "4.3.7",
     "chai-as-promised": "7.1.1",
     "clean-webpack-plugin": "4.0.0",
@@ -1636,7 +1645,7 @@
     "ts-loader": "9.4.2",
     "vscode-uri": "3.0.7",
     "wdio-vscode-service": "5.0.0",
-    "webdriverio": "8.3.10",
+    "webdriverio": "8.4.0",
     "webpack": "5.75.0",
     "webpack-cli": "5.0.1"
   },
