@@ -76,6 +76,7 @@
   "command.views.experiments.shareExperimentAsBranch": "Share as Branch",
   "command.views.experiments.shareExperimentAsCommit": "Commit and Share",
   "command.views.experiments.shareExperimentToStudio": "Share to Studio",
+  "command.views.experiments.showLogs": "Show Logs",
   "command.views.experimentsTree.selectExperiments": "Select Experiments to Display in Plots",
   "command.views.plotsPathsTree.selectPlots": "Select Plots to Display",
   "command.views.plotsPathsTree.refreshPlots": "Refresh Plots for Selected Experiments",
