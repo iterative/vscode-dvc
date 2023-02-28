@@ -14,6 +14,7 @@ import { OutputChannel } from '../vscode/outputChannel'
 import { Title } from '../vscode/title'
 import { Args } from '../cli/dvc/constants'
 import { findOrCreateDvcYamlFile, getFileExtension } from '../fileSystem'
+import { Toast } from '../vscode/toast'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = jest.mocked(Disposable)
@@ -594,6 +595,39 @@ describe('Experiments', () => {
         mockedCommandId,
         mockedDvcRoot
       )
+    })
+
+    it('should show a toast if the dvc.yaml file is invalid', async () => {
+      const showErrorSpy = jest.spyOn(Toast, 'showError')
+
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedListStages.mockResolvedValueOnce(undefined)
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
+
+      expect(showErrorSpy).toHaveBeenCalledWith(
+        'Cannot perform task. Your dvc.yaml file contains invalid yaml'
+      )
+    })
+
+    it('should not ask to create a stage if the dvc.yaml file is invalid', async () => {
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedListStages.mockResolvedValueOnce(undefined)
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
+
+      expect(mockedGetValidInput).not.toHaveBeenCalled()
+    })
+
+    it('should not show a toast if the dvc.yaml file is valid', async () => {
+      const showErrorSpy = jest.spyOn(Toast, 'showError')
+
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedListStages.mockResolvedValueOnce('train')
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
+
+      expect(showErrorSpy).not.toHaveBeenCalled()
     })
   })
 })
