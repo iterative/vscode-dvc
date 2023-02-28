@@ -83,6 +83,16 @@ jest.mock('./checkpointPlots/util', () => ({
     width: 100
   })
 }))
+jest.mock('./customPlots/util', () => ({
+  createSpec: () => ({
+    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+    encoding: {},
+    height: 100,
+    layer: [],
+    transform: [],
+    width: 100
+  })
+}))
 jest.spyOn(console, 'warn').mockImplementation(() => {})
 
 const { postMessage } = vsCodeApi
