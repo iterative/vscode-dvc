@@ -48,7 +48,6 @@ import {
   MultiSourceVariations
 } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
-import { Toast } from '../../vscode/toast'
 
 export type CustomPlotsOrderValue = { metric: string; param: string }
 
@@ -221,15 +220,6 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public addCustomPlot(metricAndParam: CustomPlotsOrderValue) {
-    const plotAlreadyExists = this.getCustomPlotsOrder().some(
-      ({ param, metric }) =>
-        param === metricAndParam.param && metric === metricAndParam.metric
-    )
-
-    if (plotAlreadyExists) {
-      return Toast.showError('Custom plot already exists.')
-    }
-
     const newCustomPlotsOrder = [...this.getCustomPlotsOrder(), metricAndParam]
     this.setCustomPlotsOrder(newCustomPlotsOrder)
   }

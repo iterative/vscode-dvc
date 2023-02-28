@@ -174,7 +174,18 @@ export class WebviewMessages {
       return
     }
 
-    void this.plots.addCustomPlot(metricAndParam)
+    const plotAlreadyExists = this.plots
+      .getCustomPlotsOrder()
+      .some(
+        ({ param, metric }) =>
+          param === metricAndParam.param && metric === metricAndParam.metric
+      )
+
+    if (plotAlreadyExists) {
+      return Toast.showError('Custom plot already exists.')
+    }
+
+    this.plots.addCustomPlot(metricAndParam)
     this.sendCustomPlots()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED,
