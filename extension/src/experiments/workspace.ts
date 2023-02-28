@@ -444,18 +444,30 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       cwd
     )
 
-    if (!stages) {
-      const stageName = await this.askForStageName()
-      if (!stageName) {
-        return false
-      }
-
-      const { trainingScript, command } = await this.askForTrainingScript()
-      if (!trainingScript) {
-        return false
-      }
-      void findOrCreateDvcYamlFile(cwd, trainingScript, stageName, command)
+    if (stages === undefined) {
+      await Toast.showError(
+        'Cannot perform task. Your dvc.yaml file contains invalid yaml'
+      )
+      return false
     }
+
+    if (!stages) {
+      return this.addPipeline(cwd)
+    }
+    return true
+  }
+
+  private async addPipeline(cwd: string) {
+    const stageName = await this.askForStageName()
+    if (!stageName) {
+      return false
+    }
+
+    const { trainingScript, command } = await this.askForTrainingScript()
+    if (!trainingScript) {
+      return false
+    }
+    void findOrCreateDvcYamlFile(cwd, trainingScript, stageName, command)
     return true
   }
 
