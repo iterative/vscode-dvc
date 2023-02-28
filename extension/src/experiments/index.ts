@@ -438,7 +438,7 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getFinishedExperiments()
   }
 
-  public getExperiments(): Experiment[] {
+  public getExperiments() {
     return this.experiments.getExperiments()
   }
 
