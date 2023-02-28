@@ -12,6 +12,7 @@ export const createSpec = (metric: string, param: string) =>
       },
       y: {
         field: 'metric',
+        scale: { zero: false },
         title: metric,
         type: 'quantitative'
       }
