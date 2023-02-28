@@ -23,6 +23,9 @@ import { BaseWebview } from '../../webview'
 import { getModifiedTime } from '../../fileSystem'
 import { pickCustomPlots, pickMetricAndParam } from '../model/quickPick'
 import { Title } from '../../vscode/title'
+import { ColumnType } from '../../experiments/webview/contract'
+import { FILE_SEPARATOR } from '../../experiments/columns/paths'
+import { reorderObjectList } from '../../util/array'
 
 export class WebviewMessages {
   private readonly paths: PathsModel
@@ -89,6 +92,8 @@ export class WebviewMessages {
         return this.setTemplateOrder(message.payload)
       case MessageFromWebviewType.REORDER_PLOTS_METRICS:
         return this.setMetricOrder(message.payload)
+      case MessageFromWebviewType.REORDER_PLOTS_CUSTOM:
+        return this.setCustomPlotsOrder(message.payload)
       case MessageFromWebviewType.SELECT_PLOTS:
         return this.selectPlotsFromWebview()
       case MessageFromWebviewType.SELECT_EXPERIMENTS:
@@ -211,6 +216,29 @@ export class WebviewMessages {
     this.sendCustomPlots()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_CUSTOM_PLOT_REMOVED,
+      undefined,
+      undefined
+    )
+  }
+
+  private setCustomPlotsOrder(plotIds: string[]) {
+    const customPlots = this.plots.getCustomPlots()?.plots
+    if (!customPlots) {
+      return
+    }
+
+    const buildMetricOrParamPath = (type: string, path: string) =>
+      type + FILE_SEPARATOR + path
+    const newOrder = reorderObjectList(plotIds, customPlots, 'id').map(
+      ({ metric, param }) => ({
+        metric: buildMetricOrParamPath(ColumnType.METRICS, metric),
+        param: buildMetricOrParamPath(ColumnType.PARAMS, param)
+      })
+    )
+    this.plots.setCustomPlotsOrder(newOrder)
+    this.sendCustomPlots()
+    sendTelemetryEvent(
+      EventName.VIEWS_REORDER_PLOTS_CUSTOM,
       undefined,
       undefined
     )

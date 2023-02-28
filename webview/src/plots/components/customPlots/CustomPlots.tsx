@@ -1,6 +1,7 @@
 import React, { DragEvent, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { performSimpleOrderedUpdate } from 'dvc/src/util/array'
 import { CustomPlot } from './CustomPlot'
 import styles from '../styles.module.scss'
@@ -13,6 +14,8 @@ import { DropTarget } from '../DropTarget'
 import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/VirtualizedGrid'
 import { shouldUseVirtualizedGrid } from '../util'
 import { PlotsState } from '../../store'
+import { sendMessage } from '../../../shared/vscode'
+import { changeOrderWithDraggedInfo } from '../../../util/array'
 
 interface CustomPlotsProps {
   plotsIds: string[]
@@ -25,10 +28,21 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
   )
   const [onSection, setOnSection] = useState(false)
   const nbItemsPerRow = size
+  const draggedRef = useSelector(
+    (state: PlotsState) => state.dragAndDrop.draggedRef
+  )
 
   useEffect(() => {
     setOrder(pastOrder => performSimpleOrderedUpdate(pastOrder, plotsIds))
   }, [plotsIds])
+
+  const setPlotsIdsOrder = (order: string[]): void => {
+    setOrder(order)
+    sendMessage({
+      payload: order,
+      type: MessageFromWebviewType.REORDER_PLOTS_CUSTOM
+    })
+  }
 
   if (!hasData) {
     return <EmptyState isFullScreen={false}>No Plots to Display</EmptyState>
@@ -47,6 +61,10 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
     setOnSection(true)
   }
 
+  const handleDropAtTheEnd = () => {
+    setPlotsIdsOrder(changeOrderWithDraggedInfo(order, draggedRef))
+  }
+
   return items.length > 0 ? (
     <div
       data-testid="custom-plots"
@@ -57,10 +75,11 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
       onDragEnter={() => setOnSection(true)}
       onDragLeave={() => setOnSection(false)}
       onDragOver={handleDragOver}
+      onDrop={handleDropAtTheEnd}
     >
       <DragDropContainer
         order={order}
-        setOrder={setOrder}
+        setOrder={setPlotsIdsOrder}
         disabledDropIds={disabledDragPlotIds}
         items={items}
         group="custom-plots"

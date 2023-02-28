@@ -8,6 +8,7 @@ import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import expShowFixtureWithoutErrors from '../../fixtures/expShow/base/noErrors'
 import checkpointPlotsFixture from '../../fixtures/expShow/base/checkpointPlots'
+import customPlotsFixture from '../../fixtures/expShow/base/customPlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
 import multiSourcePlotsDiffFixture from '../../fixtures/plotsDiff/multiSource'
 import templatePlotsFixture from '../../fixtures/plotsDiff/template'
@@ -504,6 +505,55 @@ suite('Plots Test Suite', () => {
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_REORDER_PLOTS_METRICS,
+        undefined,
+        undefined
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a custom plots reordered message from the webview', async () => {
+      const { plots, plotsModel, messageSpy } = await buildPlots(
+        disposable,
+        plotsDiffFixture
+      )
+
+      const webview = await plots.showWebview()
+
+      const mockNewCustomPlotsOrder = [
+        'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
+        'custom-metrics:summary.json:loss-params:params.yaml:dropout'
+      ]
+
+      stub(plotsModel, 'getCustomPlots')
+        .onFirstCall()
+        .returns(customPlotsFixture)
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockSetCustomPlotsOrder = stub(plotsModel, 'setCustomPlotsOrder')
+      mockSetCustomPlotsOrder.returns(undefined)
+
+      messageSpy.resetHistory()
+
+      mockMessageReceived.fire({
+        payload: mockNewCustomPlotsOrder,
+        type: MessageFromWebviewType.REORDER_PLOTS_CUSTOM
+      })
+
+      expect(mockSetCustomPlotsOrder).to.be.calledOnce
+      expect(mockSetCustomPlotsOrder).to.be.calledWithExactly([
+        {
+          metric: 'metrics:summary.json:accuracy',
+          param: 'params:params.yaml:epochs'
+        },
+        {
+          metric: 'metrics:summary.json:loss',
+          param: 'params:params.yaml:dropout'
+        }
+      ])
+      expect(messageSpy).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_REORDER_PLOTS_CUSTOM,
         undefined,
         undefined
       )

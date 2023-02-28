@@ -74,6 +74,7 @@ export const EventName = Object.assign(
     VIEWS_PLOTS_SECTION_TOGGLE: 'views.plots.toggleSection',
     VIEWS_PLOTS_SELECT_EXPERIMENTS: 'view.plots.selectExperiments',
     VIEWS_PLOTS_SELECT_PLOTS: 'view.plots.selectPlots',
+    VIEWS_REORDER_PLOTS_CUSTOM: 'views.plots.customReordered',
     VIEWS_REORDER_PLOTS_METRICS: 'views.plots.metricsReordered',
     VIEWS_REORDER_PLOTS_TEMPLATES: 'views.plots.templatesReordered',
 
@@ -256,6 +257,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_SELECT_PLOTS]: undefined
   [EventName.VIEWS_PLOTS_EXPERIMENT_TOGGLE]: undefined
   [EventName.VIEWS_REORDER_PLOTS_METRICS]: undefined
+  [EventName.VIEWS_REORDER_PLOTS_CUSTOM]: undefined
   [EventName.VIEWS_REORDER_PLOTS_TEMPLATES]: undefined
 
   [EventName.VIEWS_PLOTS_PATH_TREE_OPENED]: DvcRootCount
