@@ -75,7 +75,7 @@ import * as Time from '../../../util/time'
 import { AvailableCommands } from '../../../commands/internal'
 import { Setup } from '../../../setup'
 import * as FileSystem from '../../../fileSystem'
-import * as ProcessExecution from '../../../processExecution'
+import * as ProcessExecution from '../../../process/execution'
 import { DvcReader } from '../../../cli/dvc/reader'
 import { Connect } from '../../../connect'
 

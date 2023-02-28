@@ -1,14 +1,14 @@
 import { EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { GitExecutor } from './executor'
-import { createProcess } from '../../processExecution'
+import { createProcess } from '../../process/execution'
 import { CliResult, CliStarted } from '..'
 import { getMockedProcess } from '../../test/util/jest'
 import { standardizePath } from '../../fileSystem/path'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
-jest.mock('../../processExecution')
+jest.mock('../../process/execution')
 
 const mockedDisposable = jest.mocked(Disposable)
 

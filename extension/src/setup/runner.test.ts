@@ -18,7 +18,7 @@ import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 import { Toast } from '../vscode/toast'
 import { Response } from '../vscode/response'
 import { VscodePython } from '../extensions/python'
-import { executeProcess } from '../processExecution'
+import { executeProcess } from '../process/execution'
 import {
   LATEST_TESTED_CLI_VERSION,
   MAX_CLI_VERSION,
@@ -34,7 +34,7 @@ jest.mock('../vscode/resourcePicker')
 jest.mock('../vscode/quickPick')
 jest.mock('../vscode/toast')
 jest.mock('../vscode/workspaceFolders')
-jest.mock('../processExecution')
+jest.mock('../process/execution')
 
 const mockedExtensions = jest.mocked(extensions)
 const mockedCommands = jest.mocked(commands)

@@ -16,17 +16,6 @@ suite('Pseudo Terminal Test Suite', () => {
     disposable.dispose()
   })
 
-  const closeTerminalEvent = (): Promise<Terminal> => {
-    return new Promise(resolve => {
-      const listener: Disposable = window.onDidCloseTerminal(
-        (event: Terminal) => {
-          listener.dispose()
-          return resolve(event)
-        }
-      )
-    })
-  }
-
   describe('PseudoTerminal', () => {
     it('should be able to open a terminal', async () => {
       const terminalName = 'Open Test Terminal'
@@ -39,25 +28,26 @@ suite('Pseudo Terminal Test Suite', () => {
         )
       )
 
+      const openTerminalEvent = new Promise<Terminal>(resolve => {
+        disposable.track(
+          window.onDidOpenTerminal((event: Terminal) => resolve(event))
+        )
+      })
+
+      const closeTerminalEvent = new Promise<Terminal>(resolve => {
+        disposable.track(
+          window.onDidCloseTerminal((event: Terminal) => resolve(event))
+        )
+      })
+
       void pseudoTerminal.openCurrentInstance()
 
-      const openTerminalEvent = (): Promise<Terminal> => {
-        return new Promise(resolve => {
-          const listener: Disposable = window.onDidOpenTerminal(
-            (event: Terminal) => {
-              return resolve(event)
-            }
-          )
-          disposable.track(listener)
-        })
-      }
-
-      const terminal = await openTerminalEvent()
+      const terminal = await openTerminalEvent
       expect(terminal.creationOptions?.name).to.equal(terminalName)
 
       pseudoTerminal.dispose()
 
-      return closeTerminalEvent()
+      return closeTerminalEvent
     })
   })
 })
