@@ -353,9 +353,7 @@ describe('App', () => {
     expect(screen.getByText('Data Series')).toBeInTheDocument()
     expect(screen.getByText('Images')).toBeInTheDocument()
     expect(screen.getByText('Custom')).toBeInTheDocument()
-    const noPlotsToDisplayElements = screen.getAllByText('No Plots to Display')
-    expect(noPlotsToDisplayElements[0]).toBeInTheDocument()
-    expect(noPlotsToDisplayElements[1]).toBeInTheDocument()
+    expect(screen.getAllByText('No Plots to Display')).toHaveLength(2)
     expect(screen.getByText('No Images to Compare')).toBeInTheDocument()
   })
 
@@ -366,9 +364,7 @@ describe('App', () => {
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
     expect(screen.getByText('Trends')).toBeInTheDocument()
-    const noPlotsToDisplayElements = screen.getAllByText('No Plots to Display')
-    expect(noPlotsToDisplayElements[0]).toBeInTheDocument()
-    expect(noPlotsToDisplayElements[1]).toBeInTheDocument()
+    expect(screen.getAllByText('No Plots to Display')).toHaveLength(2)
   })
 
   it('should render other sections given a message with only custom plots data', () => {
@@ -381,9 +377,7 @@ describe('App', () => {
     expect(screen.getByText('Data Series')).toBeInTheDocument()
     expect(screen.getByText('Images')).toBeInTheDocument()
     expect(screen.getByText('Custom')).toBeInTheDocument()
-    const noPlotsToDisplayElements = screen.getAllByText('No Plots to Display')
-    expect(noPlotsToDisplayElements[0]).toBeInTheDocument()
-    expect(noPlotsToDisplayElements[1]).toBeInTheDocument()
+    expect(screen.getAllByText('No Plots to Display')).toHaveLength(2)
     expect(screen.getByText('No Images to Compare')).toBeInTheDocument()
   })
 
@@ -394,10 +388,7 @@ describe('App', () => {
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
     expect(screen.getByText('Custom')).toBeInTheDocument()
-    const noPlotsToDisplayElements = screen.getAllByText('No Plots to Display')
-    expect(noPlotsToDisplayElements[0]).toBeInTheDocument()
-    expect(noPlotsToDisplayElements[1]).toBeInTheDocument()
-    expect(noPlotsToDisplayElements[2]).toBeInTheDocument()
+    expect(screen.getAllByText('No Plots to Display')).toHaveLength(3)
   })
 
   it('should render the comparison table when given a message with comparison plots data', () => {
