@@ -55,8 +55,8 @@ export const SectionDescription = {
   // "Custom"
   [Section.CUSTOM_PLOTS]: (
     <span data-testid="tooltip-custom-plots">
-      Generated custom linear plots comparing chosen metrics and params in
-      experiments.
+      Generated custom linear plots comparing chosen metrics and params in all
+      experiments in the table.
     </span>
   ),
   // "Images"
