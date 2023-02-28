@@ -6,7 +6,7 @@ import { EXPERIMENT_WORKSPACE_ID } from './contract'
 import { DvcReader } from './reader'
 import { CliResult, CliStarted } from '..'
 import { MaybeConsoleError } from '../error'
-import { createProcess } from '../../processExecution'
+import { createProcess } from '../../process/execution'
 import { getFailingMockedProcess, getMockedProcess } from '../../test/util/jest'
 import { getProcessEnv } from '../../env'
 import expShowFixture from '../../test/fixtures/expShow/base/output'
@@ -16,7 +16,7 @@ import { Config } from '../../config'
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 jest.mock('fs')
-jest.mock('../../processExecution')
+jest.mock('../../process/execution')
 jest.mock('../../env')
 jest.mock('../../common/logger')
 

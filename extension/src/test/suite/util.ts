@@ -24,7 +24,7 @@ import plotsDiffFixture from '../fixtures/plotsDiff/output'
 import { BaseWebview } from '../../webview'
 import { ExperimentsData } from '../../experiments/data'
 import { ResourceLocator } from '../../resourceLocator'
-import { DEFAULT_DEBOUNCE_WINDOW_MS } from '../../processManager'
+import { DEFAULT_DEBOUNCE_WINDOW_MS } from '../../process/manager'
 import { FileSystemData } from '../../fileSystem/data'
 import * as FileSystem from '../../fileSystem'
 import * as Watcher from '../../fileSystem/watcher'
@@ -112,6 +112,9 @@ export const closeAllEditors = async () => {
     await commands.executeCommand('workbench.action.closeAllEditors')
   }
 }
+
+export const closeAllTerminals = () =>
+  commands.executeCommand('workbench.action.terminal.killAll')
 
 export const mockDuration = (duration: number) =>
   stub(Time, 'getCurrentEpoch')

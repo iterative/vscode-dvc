@@ -4,7 +4,7 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import { Flag, GcPreserveFlag } from './constants'
 import { DvcExecutor } from './executor'
 import { CliResult, CliStarted } from '..'
-import { createProcess } from '../../processExecution'
+import { createProcess } from '../../process/execution'
 import { getMockedProcess } from '../../test/util/jest'
 import { getProcessEnv } from '../../env'
 import { Config } from '../../config'
@@ -12,7 +12,7 @@ import { ContextKey, setContextValue } from '../../vscode/context'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
-jest.mock('../../processExecution')
+jest.mock('../../process/execution')
 jest.mock('../../env')
 jest.mock('../../vscode/context')
 
