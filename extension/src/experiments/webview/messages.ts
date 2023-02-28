@@ -190,6 +190,15 @@ export class WebviewMessages {
           { dvcRoot: this.dvcRoot, id: message.payload }
         )
 
+      case MessageFromWebviewType.SHOW_EXPERIMENT_LOGS:
+        return commands.executeCommand(
+          RegisteredCliCommands.EXPERIMENT_VIEW_SHOW_LOGS,
+          {
+            dvcRoot: this.dvcRoot,
+            id: message.payload
+          }
+        )
+
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }

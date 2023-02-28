@@ -34,6 +34,7 @@ import { TableData } from '../../experiments/webview/contract'
 import { DvcExecutor } from '../../cli/dvc/executor'
 import { GitReader } from '../../cli/git/reader'
 import { SetupData } from '../../setup/webview/contract'
+import { DvcViewer } from '../../cli/dvc/viewer'
 
 export const mockDisposable = {
   dispose: stub()
@@ -141,6 +142,7 @@ export const buildInternalCommands = (disposer: Disposer) => {
   const dvcReader = disposer.track(new DvcReader(config))
   const dvcRunner = disposer.track(new DvcRunner(config))
   const dvcExecutor = disposer.track(new DvcExecutor(config))
+  const dvcViewer = disposer.track(new DvcViewer(config))
   const gitReader = disposer.track(new GitReader())
 
   const outputChannel = disposer.track(
@@ -153,6 +155,7 @@ export const buildInternalCommands = (disposer: Disposer) => {
       dvcExecutor,
       dvcReader,
       dvcRunner,
+      dvcViewer,
       gitReader
     )
   )
@@ -162,6 +165,7 @@ export const buildInternalCommands = (disposer: Disposer) => {
     dvcExecutor,
     dvcReader,
     dvcRunner,
+    dvcViewer,
     gitReader,
     internalCommands
   }
@@ -189,6 +193,7 @@ export const buildDependencies = (
     dvcExecutor,
     dvcReader,
     dvcRunner,
+    dvcViewer,
     gitReader,
     internalCommands
   } = buildInternalCommands(disposer)
@@ -223,6 +228,7 @@ export const buildDependencies = (
     dvcExecutor,
     dvcReader,
     dvcRunner,
+    dvcViewer,
     gitReader,
     internalCommands,
     messageSpy,
