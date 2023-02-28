@@ -10,11 +10,12 @@ interface AddStageProps {
 }
 
 export const AddStage: React.FC<AddStageProps> = ({ hasValidDvcYaml }) => (
-  <div className={styles.addConfigButton}>
+  <div className={styles.addConfigButton} data-testid="aaa">
     <p>Easily and efficiently reproduce your experiments </p>
     <IconButton
       icon={Add}
       onClick={() =>
+        hasValidDvcYaml &&
         sendMessage({ type: MessageFromWebviewType.ADD_CONFIGURATION })
       }
       text="Add a Pipeline Stage"
