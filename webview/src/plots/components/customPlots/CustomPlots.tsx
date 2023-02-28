@@ -13,7 +13,6 @@ import { DropTarget } from '../DropTarget'
 import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/VirtualizedGrid'
 import { shouldUseVirtualizedGrid } from '../util'
 import { PlotsState } from '../../store'
-import { LoadingSection, sectionIsLoading } from '../LoadingSection'
 
 interface CustomPlotsProps {
   plotsIds: string[]
@@ -27,17 +26,9 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
   const [onSection, setOnSection] = useState(false)
   const nbItemsPerRow = size
 
-  const selectedRevisions = useSelector(
-    (state: PlotsState) => state.webview.selectedRevisions
-  )
-
   useEffect(() => {
     setOrder(pastOrder => performSimpleOrderedUpdate(pastOrder, plotsIds))
   }, [plotsIds])
-
-  if (sectionIsLoading(selectedRevisions)) {
-    return <LoadingSection />
-  }
 
   if (!hasData) {
     return <EmptyState isFullScreen={false}>No Plots to Display</EmptyState>
@@ -86,6 +77,6 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
       />
     </div>
   ) : (
-    <EmptyState isFullScreen={false}>No plots added</EmptyState>
+    <EmptyState isFullScreen={false}>No Plots Added</EmptyState>
   )
 }

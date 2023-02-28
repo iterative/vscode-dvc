@@ -288,7 +288,7 @@ describe('App', () => {
     })
     const loading = await screen.findAllByText('Loading...')
 
-    expect(loading).toHaveLength(4)
+    expect(loading).toHaveLength(3)
   })
 
   it('should render the Add Plots and Add Experiments get started button when there are experiments which have plots that are all unselected', async () => {
