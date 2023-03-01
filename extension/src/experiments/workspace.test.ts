@@ -606,7 +606,7 @@ describe('Experiments', () => {
       await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
       expect(showErrorSpy).toHaveBeenCalledWith(
-        'Cannot perform task. Your dvc.yaml file contains invalid yaml'
+        'Cannot perform task. Your dvc.yaml file is invalid.'
       )
     })
 

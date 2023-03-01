@@ -446,7 +446,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
 
     if (stages === undefined) {
       await Toast.showError(
-        'Cannot perform task. Your dvc.yaml file contains invalid yaml'
+        'Cannot perform task. Your dvc.yaml file is invalid.'
       )
       return false
     }
