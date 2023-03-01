@@ -1,5 +1,6 @@
 import {
   CheckpointPlotData,
+  CustomPlotData,
   Section,
   TemplatePlotEntry
 } from 'dvc/src/plots/webview/contract'
@@ -9,13 +10,25 @@ import { PlainObject, VisualizationSpec } from 'react-vega'
 import { plotDataStore } from '../components/plotDataStore'
 import { PlotsState } from '../store'
 
+const getStoreSection = (section: Section) => {
+  switch (section) {
+    case Section.CHECKPOINT_PLOTS:
+      return 'checkpoint'
+    case Section.TEMPLATE_PLOTS:
+      return 'template'
+    default:
+      return 'custom'
+  }
+}
+
 export const useGetPlot = (
   section: Section,
   id: string,
   spec?: VisualizationSpec
 ) => {
-  const isCheckpointPlot = section === Section.CHECKPOINT_PLOTS
-  const storeSection = isCheckpointPlot ? 'checkpoint' : 'template'
+  const isPlotWithSpec =
+    section === Section.CHECKPOINT_PLOTS || section === Section.CUSTOM_PLOTS
+  const storeSection = getStoreSection(section)
   const snapshot = useSelector(
     (state: PlotsState) => state[storeSection].plotsSnapshots
   )
@@ -28,8 +41,8 @@ export const useGetPlot = (
       return
     }
 
-    if (isCheckpointPlot) {
-      setData({ values: (plot as CheckpointPlotData).values })
+    if (isPlotWithSpec) {
+      setData({ values: (plot as CheckpointPlotData | CustomPlotData).values })
       setContent(spec)
       return
     }
@@ -40,7 +53,7 @@ export const useGetPlot = (
       height: 'container',
       width: 'container'
     } as VisualizationSpec)
-  }, [id, isCheckpointPlot, setData, setContent, section, spec])
+  }, [id, isPlotWithSpec, setData, setContent, section, spec])
 
   useEffect(() => {
     setPlotData()

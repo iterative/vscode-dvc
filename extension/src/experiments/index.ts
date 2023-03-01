@@ -439,6 +439,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getFinishedExperiments()
   }
 
+  public getExperiments() {
+    return this.experiments.getExperiments()
+  }
+
   public getExperimentDisplayName(experimentId: string) {
     const experiment = this.experiments
       .getCombinedList()
@@ -499,6 +503,10 @@ export class Experiments extends BaseRepository<TableData> {
 
   public getFirstThreeColumnOrder() {
     return this.columns.getFirstThreeColumnOrder()
+  }
+
+  public getColumnTerminalNodes() {
+    return this.columns.getTerminalNodes()
   }
 
   public getHasData() {

@@ -2,6 +2,7 @@ import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import {
   CheckpointPlotsData,
+  CustomPlotsData,
   PlotsComparisonData,
   PlotsData,
   PlotsDataKeys,
@@ -16,6 +17,10 @@ import {
   setCollapsed as setCheckpointPlotsCollapsed,
   update as updateCheckpointPlots
 } from './checkpointPlots/checkpointPlotsSlice'
+import {
+  setCollapsed as setCustomPlotsCollapsed,
+  update as updateCustomPlots
+} from './customPlots/customPlotsSlice'
 import {
   setCollapsed as setComparisonTableCollapsed,
   update as updateComparisonTable
@@ -39,6 +44,7 @@ const dispatchCollapsedSections = (
 ) => {
   if (sections) {
     dispatch(setCheckpointPlotsCollapsed(sections[Section.CHECKPOINT_PLOTS]))
+    dispatch(setCustomPlotsCollapsed(sections[Section.CUSTOM_PLOTS]))
     dispatch(setComparisonTableCollapsed(sections[Section.COMPARISON_TABLE]))
     dispatch(setTemplatePlotsCollapsed(sections[Section.TEMPLATE_PLOTS]))
   }
@@ -55,6 +61,9 @@ export const feedStore = (
       switch (key) {
         case PlotsDataKeys.CHECKPOINT:
           dispatch(updateCheckpointPlots(data.data[key] as CheckpointPlotsData))
+          continue
+        case PlotsDataKeys.CUSTOM:
+          dispatch(updateCustomPlots(data.data[key] as CustomPlotsData))
           continue
         case PlotsDataKeys.COMPARISON:
           dispatch(updateComparisonTable(data.data[key] as PlotsComparisonData))

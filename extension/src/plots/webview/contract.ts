@@ -11,19 +11,22 @@ export const PlotSizeNumber = {
 export enum Section {
   CHECKPOINT_PLOTS = 'checkpoint-plots',
   TEMPLATE_PLOTS = 'template-plots',
-  COMPARISON_TABLE = 'comparison-table'
+  COMPARISON_TABLE = 'comparison-table',
+  CUSTOM_PLOTS = 'custom-plots'
 }
 
 export const DEFAULT_SECTION_SIZES = {
   [Section.CHECKPOINT_PLOTS]: PlotSizeNumber.REGULAR,
   [Section.TEMPLATE_PLOTS]: PlotSizeNumber.REGULAR,
-  [Section.COMPARISON_TABLE]: PlotSizeNumber.REGULAR
+  [Section.COMPARISON_TABLE]: PlotSizeNumber.REGULAR,
+  [Section.CUSTOM_PLOTS]: PlotSizeNumber.REGULAR
 }
 
 export const DEFAULT_SECTION_COLLAPSED = {
   [Section.CHECKPOINT_PLOTS]: false,
   [Section.TEMPLATE_PLOTS]: false,
-  [Section.COMPARISON_TABLE]: false
+  [Section.COMPARISON_TABLE]: false,
+  [Section.CUSTOM_PLOTS]: false
 }
 
 export type SectionCollapsed = typeof DEFAULT_SECTION_COLLAPSED
@@ -68,6 +71,24 @@ export type ColorScale = { domain: string[]; range: Color[] }
 export type CheckpointPlot = {
   id: string
   values: CheckpointPlotValues
+}
+
+export type CustomPlotValues = {
+  expName: string
+  metric: number
+  param: number
+}
+
+export type CustomPlotData = {
+  id: string
+  values: CustomPlotValues[]
+  metric: string
+  param: string
+}
+
+export type CustomPlotsData = {
+  plots: CustomPlotData[]
+  size: number
 }
 
 export type CheckpointPlotData = CheckpointPlot & { title: string }
@@ -134,6 +155,7 @@ export type ComparisonPlot = {
 export enum PlotsDataKeys {
   COMPARISON = 'comparison',
   CHECKPOINT = 'checkpoint',
+  CUSTOM = 'custom',
   HAS_UNSELECTED_PLOTS = 'hasUnselectedPlots',
   HAS_PLOTS = 'hasPlots',
   SELECTED_REVISIONS = 'selectedRevisions',
@@ -145,6 +167,7 @@ export type PlotsData =
   | {
       [PlotsDataKeys.COMPARISON]?: PlotsComparisonData | null
       [PlotsDataKeys.CHECKPOINT]?: CheckpointPlotsData | null
+      [PlotsDataKeys.CUSTOM]?: CustomPlotsData | null
       [PlotsDataKeys.HAS_PLOTS]?: boolean
       [PlotsDataKeys.HAS_UNSELECTED_PLOTS]?: boolean
       [PlotsDataKeys.SELECTED_REVISIONS]?: Revision[]

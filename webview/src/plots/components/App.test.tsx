@@ -14,6 +14,7 @@ import {
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/base/checkpointPlots'
+import customPlotsFixture from 'dvc/src/test/fixtures/expShow/base/customPlots'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
 import smoothTemplatePlotContent from 'dvc/src/test/fixtures/plotsDiff/template/smoothTemplatePlot'
@@ -82,6 +83,16 @@ jest.mock('./checkpointPlots/util', () => ({
     width: 100
   })
 }))
+jest.mock('./customPlots/util', () => ({
+  createSpec: () => ({
+    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+    encoding: {},
+    height: 100,
+    layer: [],
+    transform: [],
+    width: 100
+  })
+}))
 jest.spyOn(console, 'warn').mockImplementation(() => {})
 
 const { postMessage } = vsCodeApi
@@ -101,7 +112,8 @@ describe('App', () => {
   const sectionPosition = {
     [Section.CHECKPOINT_PLOTS]: 2,
     [Section.TEMPLATE_PLOTS]: 0,
-    [Section.COMPARISON_TABLE]: 1
+    [Section.COMPARISON_TABLE]: 1,
+    [Section.CUSTOM_PLOTS]: 3
   }
 
   const sendSetDataMessage = (data: PlotsData) => {
@@ -350,7 +362,8 @@ describe('App', () => {
     expect(screen.getByText('Trends')).toBeInTheDocument()
     expect(screen.getByText('Data Series')).toBeInTheDocument()
     expect(screen.getByText('Images')).toBeInTheDocument()
-    expect(screen.getByText('No Plots to Display')).toBeInTheDocument()
+    expect(screen.getByText('Custom')).toBeInTheDocument()
+    expect(screen.getAllByText('No Plots to Display')).toHaveLength(2)
     expect(screen.getByText('No Images to Compare')).toBeInTheDocument()
   })
 
@@ -361,7 +374,31 @@ describe('App', () => {
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
     expect(screen.getByText('Trends')).toBeInTheDocument()
-    expect(screen.getByText('No Plots to Display')).toBeInTheDocument()
+    expect(screen.getAllByText('No Plots to Display')).toHaveLength(2)
+  })
+
+  it('should render other sections given a message with only custom plots data', () => {
+    renderAppWithOptionalData({
+      custom: customPlotsFixture
+    })
+
+    expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
+    expect(screen.getByText('Trends')).toBeInTheDocument()
+    expect(screen.getByText('Data Series')).toBeInTheDocument()
+    expect(screen.getByText('Images')).toBeInTheDocument()
+    expect(screen.getByText('Custom')).toBeInTheDocument()
+    expect(screen.getAllByText('No Plots to Display')).toHaveLength(2)
+    expect(screen.getByText('No Images to Compare')).toBeInTheDocument()
+  })
+
+  it('should render custom even when there is no custom plots data', () => {
+    renderAppWithOptionalData({
+      comparison: comparisonTableFixture
+    })
+
+    expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
+    expect(screen.getByText('Custom')).toBeInTheDocument()
+    expect(screen.getAllByText('No Plots to Display')).toHaveLength(3)
   })
 
   it('should render the comparison table when given a message with comparison plots data', () => {
@@ -403,6 +440,7 @@ describe('App', () => {
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture,
       comparison: comparisonTableFixture,
+      custom: customPlotsFixture,
       template: templatePlotsFixture
     })
 
@@ -793,6 +831,58 @@ describe('App', () => {
       'summary.json:accuracy',
       'summary.json:val_loss',
       'summary.json:val_accuracy'
+    ])
+  })
+
+  it('should add a custom plot if a user creates a custom plot', () => {
+    renderAppWithOptionalData({
+      custom: {
+        ...customPlotsFixture,
+        plots: customPlotsFixture.plots.slice(1)
+      }
+    })
+
+    expect(
+      screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
+    ).toStrictEqual([
+      'custom-metrics:summary.json:accuracy-params:params.yaml:epochs'
+    ])
+
+    sendSetDataMessage({
+      custom: customPlotsFixture
+    })
+
+    expect(
+      screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
+    ).toStrictEqual([
+      'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
+      'custom-metrics:summary.json:loss-params:params.yaml:dropout'
+    ])
+  })
+
+  it('should remove a custom plot if a user deletes a custom plot', () => {
+    renderAppWithOptionalData({
+      custom: customPlotsFixture
+    })
+
+    expect(
+      screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
+    ).toStrictEqual([
+      'custom-metrics:summary.json:loss-params:params.yaml:dropout',
+      'custom-metrics:summary.json:accuracy-params:params.yaml:epochs'
+    ])
+
+    sendSetDataMessage({
+      custom: {
+        ...customPlotsFixture,
+        plots: customPlotsFixture.plots.slice(1)
+      }
+    })
+
+    expect(
+      screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
+    ).toStrictEqual([
+      'custom-metrics:summary.json:accuracy-params:params.yaml:epochs'
     ])
   })
 
@@ -1373,10 +1463,11 @@ describe('App', () => {
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture,
       comparison: comparisonTableFixture,
+      custom: customPlotsFixture,
       template: complexTemplatePlotsFixture
     })
 
-    const [templateInfo, comparisonInfo, checkpointInfo] =
+    const [templateInfo, comparisonInfo, checkpointInfo, customInfo] =
       screen.getAllByTestId('info-tooltip-toggle')
 
     fireEvent.mouseEnter(templateInfo, { bubbles: true })
@@ -1387,12 +1478,16 @@ describe('App', () => {
 
     fireEvent.mouseEnter(checkpointInfo, { bubbles: true })
     expect(screen.getByTestId('tooltip-checkpoint-plots')).toBeInTheDocument()
+
+    fireEvent.mouseEnter(customInfo, { bubbles: true })
+    expect(screen.getByTestId('tooltip-custom-plots')).toBeInTheDocument()
   })
 
   it('should dismiss a tooltip by pressing esc', () => {
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture,
       comparison: comparisonTableFixture,
+      custom: customPlotsFixture,
       template: complexTemplatePlotsFixture
     })
 

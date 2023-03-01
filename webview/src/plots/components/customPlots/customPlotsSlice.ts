@@ -1,14 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
-  CheckpointPlotsData,
+  CustomPlotsData,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_SIZES,
   Section
 } from 'dvc/src/plots/webview/contract'
 import { addPlotsWithSnapshots, removePlots } from '../plotDataStore'
 
-export interface CheckpointPlotsState
-  extends Omit<CheckpointPlotsData, 'plots'> {
+export interface CustomPlotsState extends Omit<CustomPlotsData, 'plots'> {
   isCollapsed: boolean
   hasData: boolean
   plotsIds: string[]
@@ -16,20 +15,18 @@ export interface CheckpointPlotsState
   disabledDragPlotIds: string[]
 }
 
-export const checkpointPlotsInitialState: CheckpointPlotsState = {
-  colors: { domain: [], range: [] },
+export const customPlotsInitialState: CustomPlotsState = {
   disabledDragPlotIds: [],
   hasData: false,
-  isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.CHECKPOINT_PLOTS],
+  isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.CUSTOM_PLOTS],
   plotsIds: [],
   plotsSnapshots: {},
-  selectedMetrics: [],
-  size: DEFAULT_SECTION_SIZES[Section.CHECKPOINT_PLOTS]
+  size: DEFAULT_SECTION_SIZES[Section.CUSTOM_PLOTS]
 }
 
-export const checkpointPlotsSlice = createSlice({
-  initialState: checkpointPlotsInitialState,
-  name: 'checkpoint',
+export const customPlotsSlice = createSlice({
+  initialState: customPlotsInitialState,
+  name: 'custom',
   reducers: {
     changeDisabledDragIds: (state, action: PayloadAction<string[]>) => {
       state.disabledDragPlotIds = action.payload
@@ -40,14 +37,14 @@ export const checkpointPlotsSlice = createSlice({
     setCollapsed: (state, action: PayloadAction<boolean>) => {
       state.isCollapsed = action.payload
     },
-    update: (state, action: PayloadAction<CheckpointPlotsData>) => {
+    update: (state, action: PayloadAction<CustomPlotsData>) => {
       if (!action.payload) {
-        return checkpointPlotsInitialState
+        return customPlotsInitialState
       }
       const { plots, ...statePayload } = action.payload
       const plotsIds = plots?.map(plot => plot.id) || []
-      const snapShots = addPlotsWithSnapshots(plots, Section.CHECKPOINT_PLOTS)
-      removePlots(plotsIds, Section.CHECKPOINT_PLOTS)
+      const snapShots = addPlotsWithSnapshots(plots, Section.CUSTOM_PLOTS)
+      removePlots(plotsIds, Section.CUSTOM_PLOTS)
       return {
         ...state,
         ...statePayload,
@@ -60,6 +57,6 @@ export const checkpointPlotsSlice = createSlice({
 })
 
 export const { update, setCollapsed, changeSize, changeDisabledDragIds } =
-  checkpointPlotsSlice.actions
+  customPlotsSlice.actions
 
-export default checkpointPlotsSlice.reducer
+export default customPlotsSlice.reducer

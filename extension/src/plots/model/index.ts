@@ -11,7 +11,9 @@ import {
   RevisionData,
   TemplateAccumulator,
   collectCommitRevisionDetails,
-  collectOverrideRevisionDetails
+  collectOverrideRevisionDetails,
+  collectCustomPlotsData,
+  getCustomPlotId
 } from './collect'
 import { getRevisionFirstThreeColumns } from './util'
 import {
@@ -24,7 +26,8 @@ import {
   DEFAULT_SECTION_SIZES,
   Section,
   SectionCollapsed,
-  PlotSizeNumber
+  PlotSizeNumber,
+  CustomPlotData
 } from '../webview/contract'
 import {
   ExperimentsOutput,
@@ -46,10 +49,13 @@ import {
 } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
 
+export type CustomPlotsOrderValue = { metric: string; param: string }
+
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
 
   private plotSizes: Record<Section, number>
+  private customPlotsOrder: CustomPlotsOrderValue[]
   private sectionCollapsed: SectionCollapsed
   private commitRevisions: Record<string, string> = {}
 
@@ -64,6 +70,7 @@ export class PlotsModel extends ModelWithPersistence {
   private multiSourceEncoding: MultiSourceEncoding = {}
 
   private checkpointPlots?: CheckpointPlot[]
+  private customPlots?: CustomPlotData[]
   private selectedMetrics?: string[]
   private metricOrder: string[]
 
@@ -89,6 +96,8 @@ export class PlotsModel extends ModelWithPersistence {
       undefined
     )
     this.metricOrder = this.revive(PersistenceKey.PLOT_METRIC_ORDER, [])
+
+    this.customPlotsOrder = this.revive(PersistenceKey.PLOTS_CUSTOM_ORDER, [])
   }
 
   public transformAndSetExperiments(data: ExperimentsOutput) {
@@ -101,6 +110,8 @@ export class PlotsModel extends ModelWithPersistence {
     this.checkpointPlots = checkpointPlots
 
     this.setMetricOrder()
+
+    this.recreateCustomPlots()
 
     return this.removeStaleData()
   }
@@ -119,6 +130,8 @@ export class PlotsModel extends ModelWithPersistence {
         collectMultiSourceVariations(data, this.multiSourceVariations)
       ])
 
+    this.recreateCustomPlots()
+
     this.comparisonData = {
       ...this.comparisonData,
       ...comparisonData
@@ -127,7 +140,6 @@ export class PlotsModel extends ModelWithPersistence {
       ...this.revisionData,
       ...revisionData
     }
-
     this.templates = { ...this.templates, ...templates }
     this.multiSourceVariations = multiSourceVariations
     this.multiSourceEncoding = collectMultiSourceEncoding(
@@ -169,6 +181,49 @@ export class PlotsModel extends ModelWithPersistence {
       selectedMetrics: this.getSelectedMetrics(),
       size: this.getPlotSize(Section.CHECKPOINT_PLOTS)
     }
+  }
+
+  public getCustomPlots() {
+    if (!this.customPlots) {
+      return
+    }
+    return {
+      plots: this.customPlots,
+      size: this.getPlotSize(Section.CUSTOM_PLOTS)
+    }
+  }
+
+  public recreateCustomPlots() {
+    const customPlots: CustomPlotData[] = collectCustomPlotsData(
+      this.getCustomPlotsOrder(),
+      this.experiments.getExperiments()
+    )
+    this.customPlots = customPlots
+  }
+
+  public getCustomPlotsOrder() {
+    return this.customPlotsOrder
+  }
+
+  public setCustomPlotsOrder(plotsOrder: CustomPlotsOrderValue[]) {
+    this.customPlotsOrder = plotsOrder
+    this.persist(PersistenceKey.PLOTS_CUSTOM_ORDER, this.customPlotsOrder)
+    this.recreateCustomPlots()
+  }
+
+  public removeCustomPlots(plotIds: string[]) {
+    const newCustomPlotsOrder = this.getCustomPlotsOrder().filter(
+      ({ metric, param }) => {
+        return !plotIds.includes(getCustomPlotId(metric, param))
+      }
+    )
+
+    this.setCustomPlotsOrder(newCustomPlotsOrder)
+  }
+
+  public addCustomPlot(metricAndParam: CustomPlotsOrderValue) {
+    const newCustomPlotsOrder = [...this.getCustomPlotsOrder(), metricAndParam]
+    this.setCustomPlotsOrder(newCustomPlotsOrder)
   }
 
   public setupManualRefresh(id: string) {

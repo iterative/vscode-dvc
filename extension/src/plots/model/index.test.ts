@@ -103,6 +103,7 @@ describe('plotsModel', () => {
     const expectedSectionCollapsed = {
       [Section.CHECKPOINT_PLOTS]: true,
       [Section.TEMPLATE_PLOTS]: false,
+      [Section.CUSTOM_PLOTS]: false,
       [Section.COMPARISON_TABLE]: false
     }
 

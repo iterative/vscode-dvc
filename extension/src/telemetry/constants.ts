@@ -63,6 +63,8 @@ export const EventName = Object.assign(
     VIEWS_PLOTS_COMPARISON_ROWS_REORDERED:
       'views.plots.comparisonRowsReordered',
     VIEWS_PLOTS_CREATED: 'views.plots.created',
+    VIEWS_PLOTS_CUSTOM_PLOT_ADDED: 'views.plots.addCustomPlot',
+    VIEWS_PLOTS_CUSTOM_PLOT_REMOVED: 'views.plots.removeCustomPlot',
     VIEWS_PLOTS_EXPERIMENT_TOGGLE: 'views.plots.toggleExperimentStatus',
     VIEWS_PLOTS_FOCUS_CHANGED: 'views.plots.focusChanged',
     VIEWS_PLOTS_MANUAL_REFRESH: 'views.plots.manualRefresh',
@@ -72,6 +74,7 @@ export const EventName = Object.assign(
     VIEWS_PLOTS_SECTION_TOGGLE: 'views.plots.toggleSection',
     VIEWS_PLOTS_SELECT_EXPERIMENTS: 'view.plots.selectExperiments',
     VIEWS_PLOTS_SELECT_PLOTS: 'view.plots.selectPlots',
+    VIEWS_REORDER_PLOTS_CUSTOM: 'views.plots.customReordered',
     VIEWS_REORDER_PLOTS_METRICS: 'views.plots.metricsReordered',
     VIEWS_REORDER_PLOTS_TEMPLATES: 'views.plots.templatesReordered',
 
@@ -242,6 +245,8 @@ export interface IEventNamePropertyMapping {
 
   [EventName.VIEWS_PLOTS_CLOSED]: undefined
   [EventName.VIEWS_PLOTS_CREATED]: undefined
+  [EventName.VIEWS_PLOTS_CUSTOM_PLOT_REMOVED]: undefined
+  [EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED]: undefined
   [EventName.VIEWS_PLOTS_FOCUS_CHANGED]: WebviewFocusChangedProperties
   [EventName.VIEWS_PLOTS_MANUAL_REFRESH]: { revisions: number }
   [EventName.VIEWS_PLOTS_METRICS_SELECTED]: undefined
@@ -253,6 +258,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_SELECT_PLOTS]: undefined
   [EventName.VIEWS_PLOTS_EXPERIMENT_TOGGLE]: undefined
   [EventName.VIEWS_REORDER_PLOTS_METRICS]: undefined
+  [EventName.VIEWS_REORDER_PLOTS_CUSTOM]: undefined
   [EventName.VIEWS_REORDER_PLOTS_TEMPLATES]: undefined
 
   [EventName.VIEWS_PLOTS_PATH_TREE_OPENED]: DvcRootCount
