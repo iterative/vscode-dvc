@@ -10,6 +10,7 @@ const tableDataFixture: TableData = {
   hasCheckpoints: true,
   hasConfig: true,
   hasRunningExperiment: true,
+  hasValidDvcYaml: true,
   hasColumns: true,
   sorts: [],
   changes: [],
