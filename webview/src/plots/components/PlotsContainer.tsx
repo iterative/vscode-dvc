@@ -30,7 +30,7 @@ export interface PlotsContainerProps {
   sectionKey: Section
   title: string
   currentSize: number
-  selectPlotsMenu?: PlotsPickerProps
+  menu?: PlotsPickerProps
   addPlotsButton?: { onClick: () => void }
   removePlotsButton?: { onClick: () => void }
   children: React.ReactNode
@@ -94,7 +94,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   title,
   children,
   currentSize,
-  selectPlotsMenu,
+  menu,
   addPlotsButton,
   removePlotsButton
 }) => {
@@ -106,10 +106,10 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
 
   const menuItems: IconMenuItemProps[] = []
 
-  if (selectPlotsMenu) {
+  if (menu) {
     menuItems.unshift({
       icon: Lines,
-      onClickNode: <PlotsPicker {...selectPlotsMenu} />,
+      onClickNode: <PlotsPicker {...menu} />,
       tooltip: 'Select Plots'
     })
   }
