@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.12] - 2023-03-01
+
+### 🚀 New Features and Enhancements
+
+- Add show logs to context menu of experiments running in the queue [#3360](https://github.com/iterative/vscode-dvc/pull/3360) by [@mattseddon](https://github.com/mattseddon)
+- Watch for dvc.yaml changes for manually added stages [#3365](https://github.com/iterative/vscode-dvc/pull/3365) by [@sroy3](https://github.com/sroy3)
+- Do not go into pipeline stage creation mode if dvc.yaml is invalid [#3368](https://github.com/iterative/vscode-dvc/pull/3368) by [@sroy3](https://github.com/sroy3)
+- Add Custom Plots Section [#3342](https://github.com/iterative/vscode-dvc/pull/3342) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Remove hortizontal scrollbar from empty section [#3369](https://github.com/iterative/vscode-dvc/pull/3369) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Improve naming in experiment row context menu component [#3346](https://github.com/iterative/vscode-dvc/pull/3346) by [@mattseddon](https://github.com/mattseddon)
+- Clean up from optimizing rendering of plots [#3348](https://github.com/iterative/vscode-dvc/pull/3348) by [@sroy3](https://github.com/sroy3)
+- Update prototype stub (flaky test) [#3355](https://github.com/iterative/vscode-dvc/pull/3355) by [@mattseddon](https://github.com/mattseddon)
+- Group process execution and manager [#3356](https://github.com/iterative/vscode-dvc/pull/3356) by [@mattseddon](https://github.com/mattseddon)
+- Add viewable cli process class [#3358](https://github.com/iterative/vscode-dvc/pull/3358) by [@mattseddon](https://github.com/mattseddon)
+- Add DvcViewer class [#3359](https://github.com/iterative/vscode-dvc/pull/3359) by [@mattseddon](https://github.com/mattseddon)
+- Remove legacy test code from DvcRunner [#3361](https://github.com/iterative/vscode-dvc/pull/3361) by [@mattseddon](https://github.com/mattseddon)
+- Remove legacy code from PseudoTerminal [#3362](https://github.com/iterative/vscode-dvc/pull/3362) by [@mattseddon](https://github.com/mattseddon)
+- Move e2e tests to stable (wdio chromedriver issue) [#3371](https://github.com/iterative/vscode-dvc/pull/3371) by [@mattseddon](https://github.com/mattseddon)
+- Delete unused code in Plots [#3367](https://github.com/iterative/vscode-dvc/pull/3367) by [@julieg18](https://github.com/julieg18)
+
 ## [0.6.11] - 2023-02-23
 
 ### 🔨 Maintenance
