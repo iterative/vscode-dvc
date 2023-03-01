@@ -111,6 +111,8 @@ export class PlotsModel extends ModelWithPersistence {
 
     this.setMetricOrder()
 
+    this.recreateCustomPlots()
+
     return this.removeStaleData()
   }
 
