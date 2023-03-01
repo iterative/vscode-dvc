@@ -521,6 +521,11 @@
         "icon": "$(repo-push)"
       },
       {
+        "title": "%command.views.experiments.showLogs%",
+        "command": "dvc.views.experiments.showLogs",
+        "category": "DVC"
+      },
+      {
         "title": "%command.views.experimentsTree.selectExperiments%",
         "command": "dvc.views.experimentsTree.selectExperiments",
         "category": "DVC",
@@ -883,6 +888,10 @@
         },
         {
           "command": "dvc.views.experiments.shareExperimentToStudio",
+          "when": "false"
+        },
+        {
+          "command": "dvc.views.experiments.showLogs",
           "when": "false"
         },
         {
@@ -1611,7 +1620,7 @@
     "@types/node": "16.x",
     "@types/react-vega": "7.0.0",
     "@types/sinon-chai": "3.2.9",
-    "@types/uuid": "9.0.0",
+    "@types/uuid": "9.0.1",
     "@types/vscode": "1.64.0",
     "@vscode/test-electron": "2.2.3",
     "@vscode/vsce": "2.17.0",
