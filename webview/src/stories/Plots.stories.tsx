@@ -8,7 +8,7 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   TemplatePlotGroup,
   TemplatePlotSection,
-  PlotWidthNumber
+  PlotNumberOfItemsPerRow
 } from 'dvc/src/plots/webview/contract'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
 import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/base/checkpointPlots'
@@ -30,14 +30,20 @@ import { plotsReducers } from '../plots/store'
 
 const smallCheckpointPlotsFixture = {
   ...checkpointPlotsFixture,
-  nbItemsPerRow: PlotWidthNumber.SMALL,
+  nbItemsPerRow: PlotNumberOfItemsPerRow.SMALL,
   plots: checkpointPlotsFixture.plots.map(plot => ({
     ...plot,
-    title: truncateVerticalTitle(plot.title, PlotWidthNumber.SMALL) as string
+    title: truncateVerticalTitle(
+      plot.title,
+      PlotNumberOfItemsPerRow.SMALL
+    ) as string
   }))
 }
 
-const manyCheckpointPlots = (length: number, size = PlotWidthNumber.REGULAR) =>
+const manyCheckpointPlots = (
+  length: number,
+  size = PlotNumberOfItemsPerRow.REGULAR
+) =>
   Array.from({ length }, () => checkpointPlotsFixture.plots[0]).map(
     (plot, i) => {
       const id = plot.id + i.toString()
@@ -134,7 +140,7 @@ WithTemplateOnly.args = {
     selectedRevisions: plotsRevisionsFixture,
     template: {
       ...templatePlotsFixture,
-      nbItemsPerRow: PlotWidthNumber.REGULAR
+      nbItemsPerRow: PlotNumberOfItemsPerRow.REGULAR
     }
   }
 }
@@ -189,16 +195,22 @@ AllLarge.args = {
   data: {
     checkpoint: {
       ...checkpointPlotsFixture,
-      nbItemsPerRow: PlotWidthNumber.LARGE
+      nbItemsPerRow: PlotNumberOfItemsPerRow.LARGE
     },
     comparison: {
       ...comparisonPlotsFixture,
-      nbItemsPerRow: PlotWidthNumber.LARGE
+      nbItemsPerRow: PlotNumberOfItemsPerRow.LARGE
     },
-    custom: { ...customPlotsFixture, nbItemsPerRow: PlotWidthNumber.LARGE },
+    custom: {
+      ...customPlotsFixture,
+      nbItemsPerRow: PlotNumberOfItemsPerRow.LARGE
+    },
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
     selectedRevisions: plotsRevisionsFixture,
-    template: { ...templatePlotsFixture, nbItemsPerRow: PlotWidthNumber.LARGE }
+    template: {
+      ...templatePlotsFixture,
+      nbItemsPerRow: PlotNumberOfItemsPerRow.LARGE
+    }
   }
 }
 AllLarge.parameters = CHROMATIC_VIEWPORTS
@@ -209,12 +221,18 @@ AllSmall.args = {
     checkpoint: smallCheckpointPlotsFixture,
     comparison: {
       ...comparisonPlotsFixture,
-      nbItemsPerRow: PlotWidthNumber.SMALL
+      nbItemsPerRow: PlotNumberOfItemsPerRow.SMALL
     },
-    custom: { ...customPlotsFixture, nbItemsPerRow: PlotWidthNumber.SMALL },
+    custom: {
+      ...customPlotsFixture,
+      nbItemsPerRow: PlotNumberOfItemsPerRow.SMALL
+    },
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
     selectedRevisions: plotsRevisionsFixture,
-    template: { ...templatePlotsFixture, nbItemsPerRow: PlotWidthNumber.SMALL }
+    template: {
+      ...templatePlotsFixture,
+      nbItemsPerRow: PlotNumberOfItemsPerRow.SMALL
+    }
   }
 }
 AllSmall.parameters = CHROMATIC_VIEWPORTS

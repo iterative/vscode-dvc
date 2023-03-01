@@ -7,7 +7,7 @@ import { Provider, useDispatch } from 'react-redux'
 import {
   ComparisonRevisionData,
   PlotsComparisonData,
-  PlotWidthNumber
+  PlotNumberOfItemsPerRow
 } from 'dvc/src/plots/webview/contract'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
@@ -43,7 +43,7 @@ const Template: Story = ({ plots, revisions }) => {
     <Provider store={store}>
       <MockedState
         data={{
-          nbItemsPerRow: PlotWidthNumber.REGULAR,
+          nbItemsPerRow: PlotNumberOfItemsPerRow.REGULAR,
           plots,
           revisions
         }}

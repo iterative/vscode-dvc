@@ -27,7 +27,7 @@ import {
   Section,
   SectionCollapsed,
   CustomPlotData,
-  PlotWidthNumber
+  PlotNumberOfItemsPerRow
 } from '../webview/contract'
 import {
   ExperimentsOutput,
@@ -400,15 +400,15 @@ export class PlotsModel extends ModelWithPersistence {
     if (
       this.plotSizes[section] &&
       [
-        PlotWidthNumber.LARGE,
-        PlotWidthNumber.REGULAR,
-        PlotWidthNumber.SMALL,
-        PlotWidthNumber.SMALLER
+        PlotNumberOfItemsPerRow.LARGE,
+        PlotNumberOfItemsPerRow.REGULAR,
+        PlotNumberOfItemsPerRow.SMALL,
+        PlotNumberOfItemsPerRow.SMALLER
       ].includes(this.plotSizes[section])
     ) {
       return this.plotSizes[section]
     }
-    return PlotWidthNumber.REGULAR
+    return PlotNumberOfItemsPerRow.REGULAR
   }
 
   public setSectionCollapsed(newState: Partial<SectionCollapsed>) {

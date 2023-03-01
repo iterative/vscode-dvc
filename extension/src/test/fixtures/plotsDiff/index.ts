@@ -11,7 +11,7 @@ import {
   TemplatePlotGroup,
   TemplatePlotsData,
   TemplatePlots,
-  PlotWidthNumber,
+  PlotNumberOfItemsPerRow,
   Revision,
   PlotsComparisonData
 } from '../../../plots/webview/contract'
@@ -499,7 +499,7 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
                 ) || []
             }
           } as TopLevelSpec,
-          PlotWidthNumber.REGULAR,
+          PlotNumberOfItemsPerRow.REGULAR,
           {
             color: {
               domain: expectedRevisions,
@@ -659,13 +659,13 @@ export const getRevisions = (): Revision[] => {
 
 export const getMinimalWebviewMessage = () => ({
   plots: extendedSpecs(basicVega),
-  nbItemsPerRow: PlotWidthNumber.REGULAR,
+  nbItemsPerRow: PlotNumberOfItemsPerRow.REGULAR,
   revisions: getRevisions()
 })
 
 export const getTemplateWebviewMessage = (): TemplatePlotsData => ({
   plots: extendedSpecs({ ...basicVega, ...require('./vega').default }),
-  nbItemsPerRow: PlotWidthNumber.REGULAR
+  nbItemsPerRow: PlotNumberOfItemsPerRow.REGULAR
 })
 
 export const getManyTemplatePlotsWebviewMessage = (
@@ -674,7 +674,7 @@ export const getManyTemplatePlotsWebviewMessage = (
   plots: extendedSpecs({
     ...multipleVega(length)
   }),
-  nbItemsPerRow: PlotWidthNumber.REGULAR
+  nbItemsPerRow: PlotNumberOfItemsPerRow.REGULAR
 })
 
 export const MOCK_IMAGE_MTIME = 946684800000
@@ -700,6 +700,6 @@ export const getComparisonWebviewMessage = (
   return {
     revisions: getRevisions(),
     plots: plotAcc,
-    nbItemsPerRow: PlotWidthNumber.REGULAR
+    nbItemsPerRow: PlotNumberOfItemsPerRow.REGULAR
   }
 }

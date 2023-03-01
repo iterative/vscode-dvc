@@ -1,7 +1,7 @@
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
 import {
   CheckpointPlotsData,
-  PlotWidthNumber
+  PlotNumberOfItemsPerRow
 } from '../../../../plots/webview/contract'
 
 const colors = copyOriginalColors()
@@ -91,7 +91,7 @@ const data: CheckpointPlotsData = {
     'summary.json:val_loss',
     'summary.json:val_accuracy'
   ],
-  nbItemsPerRow: PlotWidthNumber.REGULAR
+  nbItemsPerRow: PlotNumberOfItemsPerRow.REGULAR
 }
 
 export default data

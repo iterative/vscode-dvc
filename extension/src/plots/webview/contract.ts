@@ -1,7 +1,7 @@
 import { VisualizationSpec } from 'react-vega'
 import { Color } from '../../experiments/model/status/colors'
 
-export const PlotWidthNumber = {
+export const PlotNumberOfItemsPerRow = {
   LARGE: 1,
   REGULAR: 2,
   SMALL: 3,
@@ -16,10 +16,10 @@ export enum Section {
 }
 
 export const DEFAULT_SECTION_NB_ITEMS_PER_ROW = {
-  [Section.CHECKPOINT_PLOTS]: PlotWidthNumber.REGULAR,
-  [Section.TEMPLATE_PLOTS]: PlotWidthNumber.REGULAR,
-  [Section.COMPARISON_TABLE]: PlotWidthNumber.REGULAR,
-  [Section.CUSTOM_PLOTS]: PlotWidthNumber.REGULAR
+  [Section.CHECKPOINT_PLOTS]: PlotNumberOfItemsPerRow.REGULAR,
+  [Section.TEMPLATE_PLOTS]: PlotNumberOfItemsPerRow.REGULAR,
+  [Section.COMPARISON_TABLE]: PlotNumberOfItemsPerRow.REGULAR,
+  [Section.CUSTOM_PLOTS]: PlotNumberOfItemsPerRow.REGULAR
 }
 
 export const DEFAULT_SECTION_COLLAPSED = {
