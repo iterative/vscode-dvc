@@ -201,10 +201,10 @@ $resizer-border: 2px dashed $accent-color;
 }
 
 .plotVerticalResizer {
-  width: 10px;
-  height: 10px;
+  width: 3px;
+  height: 100%;
   right: 0;
-  bottom: 0;
+  top: 0;
   cursor: col-resize;
 
   &::after {
