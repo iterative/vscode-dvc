@@ -46,6 +46,7 @@ const tableData: TableDataState = {
   hasConfig: true,
   hasData: true,
   hasRunningExperiment: true,
+  hasValidDvcYaml: true,
   rows: addCommitDataToMainBranch(rowsFixture).map(row => ({
     ...row,
     subRows: row.subRows?.map(experiment => ({

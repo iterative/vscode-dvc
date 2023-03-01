@@ -156,6 +156,7 @@ export class Experiments extends BaseRepository<TableData> {
         if (hadCheckpoints !== this.hasCheckpoints()) {
           this.checkpointsChanged.fire()
         }
+        void this.webviewMessages.changeHasConfig(true)
       })
     )
 

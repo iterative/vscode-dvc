@@ -127,6 +127,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         hasColumns: true,
         hasConfig: true,
         hasRunningExperiment: true,
+        hasValidDvcYaml: true,
         rows: filteredRows,
         sorts: []
       }
@@ -159,6 +160,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         hasColumns: true,
         hasConfig: true,
         hasRunningExperiment: true,
+        hasValidDvcYaml: true,
         rows: [workspace, main],
         sorts: []
       }
@@ -426,6 +428,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         hasColumns: true,
         hasConfig: true,
         hasRunningExperiment: true,
+        hasValidDvcYaml: true,
         rows: filteredRows,
         sorts: []
       }

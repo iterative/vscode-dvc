@@ -1495,5 +1495,27 @@ describe('App', () => {
         type: MessageFromWebviewType.ADD_CONFIGURATION
       })
     })
+
+    it('should disable the button and add an error message if the dvc.yaml file contains invalid yaml', async () => {
+      renderTable()
+      setTableData({
+        ...tableDataFixture,
+        hasConfig: false,
+        hasValidDvcYaml: false
+      })
+      const addPipelineButton = await screen.findByText('Add a Pipeline Stage')
+
+      fireEvent.click(addPipelineButton)
+
+      expect(mockPostMessage).not.toHaveBeenCalledWith({
+        type: MessageFromWebviewType.ADD_CONFIGURATION
+      })
+
+      expect(
+        screen.getByText(
+          'Your dvc.yaml file should contain valid yaml before adding any pipeline stages.'
+        )
+      ).toBeInTheDocument()
+    })
   })
 })
