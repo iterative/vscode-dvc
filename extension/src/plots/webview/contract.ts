@@ -1,12 +1,15 @@
 import { VisualizationSpec } from 'react-vega'
 import { Color } from '../../experiments/model/status/colors'
 
+// It is easier to keep the numerical order than the alphabetical one
+/* eslint-disable sort-keys-fix/sort-keys-fix */
 export const PlotNumberOfItemsPerRow = {
-  LARGE: 1,
-  REGULAR: 2,
-  SMALL: 3,
-  SMALLER: 4
+  ONE: 1,
+  TWO: 2,
+  THREE: 3,
+  FOUR: 4
 }
+/* eslint-enable sort-keys-fix/sort-keys-fix */
 
 export enum Section {
   CHECKPOINT_PLOTS = 'checkpoint-plots',
@@ -16,10 +19,10 @@ export enum Section {
 }
 
 export const DEFAULT_SECTION_NB_ITEMS_PER_ROW = {
-  [Section.CHECKPOINT_PLOTS]: PlotNumberOfItemsPerRow.REGULAR,
-  [Section.TEMPLATE_PLOTS]: PlotNumberOfItemsPerRow.REGULAR,
-  [Section.COMPARISON_TABLE]: PlotNumberOfItemsPerRow.REGULAR,
-  [Section.CUSTOM_PLOTS]: PlotNumberOfItemsPerRow.REGULAR
+  [Section.CHECKPOINT_PLOTS]: PlotNumberOfItemsPerRow.TWO,
+  [Section.TEMPLATE_PLOTS]: PlotNumberOfItemsPerRow.TWO,
+  [Section.COMPARISON_TABLE]: PlotNumberOfItemsPerRow.TWO,
+  [Section.CUSTOM_PLOTS]: PlotNumberOfItemsPerRow.TWO
 }
 
 export const DEFAULT_SECTION_COLLAPSED = {

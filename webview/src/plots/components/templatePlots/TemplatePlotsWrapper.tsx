@@ -14,7 +14,7 @@ export const TemplatePlotsWrapper: React.FC = () => {
     <PlotsContainer
       title="Data Series"
       sectionKey={Section.TEMPLATE_PLOTS}
-      currentSize={nbItemsPerRow}
+      nbItemsPerRow={nbItemsPerRow}
       sectionCollapsed={isCollapsed}
     >
       <TemplatePlots />

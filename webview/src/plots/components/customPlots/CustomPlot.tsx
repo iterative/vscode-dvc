@@ -18,7 +18,7 @@ export const CustomPlot: React.FC<CustomPlotProps> = ({ id }) => {
     (state: PlotsState) => state.custom.plotsSnapshots[id]
   )
   const [plot, setPlot] = useState(plotDataStore[Section.CUSTOM_PLOTS][id])
-  const currentSize = useSelector(
+  const nbItemsPerRow = useSelector(
     (state: PlotsState) => state.custom.nbItemsPerRow
   )
 
@@ -45,7 +45,7 @@ export const CustomPlot: React.FC<CustomPlotProps> = ({ id }) => {
         id={id}
         changeSize={changeSize}
         changeDisabledDragIds={changeDisabledDragIds}
-        currentSnapPoint={currentSize}
+        currentSnapPoint={nbItemsPerRow}
         section={Section.CUSTOM_PLOTS}
       />
     </div>

@@ -25,7 +25,7 @@ describe('plotsModel', () => {
   const memento = buildMockMemento({
     [PersistenceKey.PLOT_SELECTED_METRICS + exampleDvcRoot]:
       persistedSelectedMetrics,
-    [PersistenceKey.PLOT_SIZES + exampleDvcRoot]:
+    [PersistenceKey.PLOT_NB_ITEMS_PER_ROW + exampleDvcRoot]:
       DEFAULT_SECTION_NB_ITEMS_PER_ROW
   })
   const mockedGetSelectedRevisions = jest.fn()
@@ -68,28 +68,34 @@ describe('plotsModel', () => {
   })
 
   it('should change the plotSize when calling setPlotSize', () => {
-    expect(model.getPlotSize(Section.CHECKPOINT_PLOTS)).toStrictEqual(
-      PlotNumberOfItemsPerRow.REGULAR
+    expect(model.getNbItemsPerRow(Section.CHECKPOINT_PLOTS)).toStrictEqual(
+      PlotNumberOfItemsPerRow.TWO
     )
 
-    model.setPlotSize(Section.CHECKPOINT_PLOTS, PlotNumberOfItemsPerRow.LARGE)
+    model.setNbItemsPerRow(
+      Section.CHECKPOINT_PLOTS,
+      PlotNumberOfItemsPerRow.ONE
+    )
 
-    expect(model.getPlotSize(Section.CHECKPOINT_PLOTS)).toStrictEqual(
-      PlotNumberOfItemsPerRow.LARGE
+    expect(model.getNbItemsPerRow(Section.CHECKPOINT_PLOTS)).toStrictEqual(
+      PlotNumberOfItemsPerRow.ONE
     )
   })
 
   it('should update the persisted plot size when calling setPlotSize', () => {
     const mementoUpdateSpy = jest.spyOn(memento, 'update')
 
-    model.setPlotSize(Section.CHECKPOINT_PLOTS, PlotNumberOfItemsPerRow.REGULAR)
+    model.setNbItemsPerRow(
+      Section.CHECKPOINT_PLOTS,
+      PlotNumberOfItemsPerRow.TWO
+    )
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
-      PersistenceKey.PLOT_SIZES + exampleDvcRoot,
+      PersistenceKey.PLOT_NB_ITEMS_PER_ROW + exampleDvcRoot,
       {
         ...DEFAULT_SECTION_NB_ITEMS_PER_ROW,
-        [Section.CHECKPOINT_PLOTS]: PlotNumberOfItemsPerRow.REGULAR
+        [Section.CHECKPOINT_PLOTS]: PlotNumberOfItemsPerRow.TWO
       }
     )
   })

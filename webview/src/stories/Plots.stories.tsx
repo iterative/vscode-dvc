@@ -30,19 +30,19 @@ import { plotsReducers } from '../plots/store'
 
 const smallCheckpointPlotsFixture = {
   ...checkpointPlotsFixture,
-  nbItemsPerRow: PlotNumberOfItemsPerRow.SMALL,
+  nbItemsPerRow: PlotNumberOfItemsPerRow.THREE,
   plots: checkpointPlotsFixture.plots.map(plot => ({
     ...plot,
     title: truncateVerticalTitle(
       plot.title,
-      PlotNumberOfItemsPerRow.SMALL
+      PlotNumberOfItemsPerRow.THREE
     ) as string
   }))
 }
 
 const manyCheckpointPlots = (
   length: number,
-  size = PlotNumberOfItemsPerRow.REGULAR
+  size = PlotNumberOfItemsPerRow.TWO
 ) =>
   Array.from({ length }, () => checkpointPlotsFixture.plots[0]).map(
     (plot, i) => {
@@ -140,7 +140,7 @@ WithTemplateOnly.args = {
     selectedRevisions: plotsRevisionsFixture,
     template: {
       ...templatePlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.REGULAR
+      nbItemsPerRow: PlotNumberOfItemsPerRow.TWO
     }
   }
 }
@@ -195,21 +195,21 @@ AllLarge.args = {
   data: {
     checkpoint: {
       ...checkpointPlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.LARGE
+      nbItemsPerRow: PlotNumberOfItemsPerRow.ONE
     },
     comparison: {
       ...comparisonPlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.LARGE
+      nbItemsPerRow: PlotNumberOfItemsPerRow.ONE
     },
     custom: {
       ...customPlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.LARGE
+      nbItemsPerRow: PlotNumberOfItemsPerRow.ONE
     },
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
     selectedRevisions: plotsRevisionsFixture,
     template: {
       ...templatePlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.LARGE
+      nbItemsPerRow: PlotNumberOfItemsPerRow.ONE
     }
   }
 }
@@ -221,17 +221,17 @@ AllSmall.args = {
     checkpoint: smallCheckpointPlotsFixture,
     comparison: {
       ...comparisonPlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.SMALL
+      nbItemsPerRow: PlotNumberOfItemsPerRow.THREE
     },
     custom: {
       ...customPlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.SMALL
+      nbItemsPerRow: PlotNumberOfItemsPerRow.THREE
     },
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
     selectedRevisions: plotsRevisionsFixture,
     template: {
       ...templatePlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.SMALL
+      nbItemsPerRow: PlotNumberOfItemsPerRow.THREE
     }
   }
 }

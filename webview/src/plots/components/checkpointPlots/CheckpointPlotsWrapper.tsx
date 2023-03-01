@@ -40,7 +40,7 @@ export const CheckpointPlotsWrapper: React.FC = () => {
       title="Trends"
       sectionKey={Section.CHECKPOINT_PLOTS}
       menu={menu}
-      currentSize={nbItemsPerRow}
+      nbItemsPerRow={nbItemsPerRow}
       sectionCollapsed={isCollapsed}
     >
       <CheckpointPlots plotsIds={selectedPlots} colors={colors} />

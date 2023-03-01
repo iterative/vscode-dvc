@@ -54,7 +54,7 @@ export type CustomPlotsOrderValue = { metric: string; param: string }
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
 
-  private plotSizes: Record<Section, number>
+  private nbItemsPerRow: Record<Section, number>
   private customPlotsOrder: CustomPlotsOrderValue[]
   private sectionCollapsed: SectionCollapsed
   private commitRevisions: Record<string, string> = {}
@@ -82,8 +82,8 @@ export class PlotsModel extends ModelWithPersistence {
     super(dvcRoot, workspaceState)
     this.experiments = experiments
 
-    this.plotSizes = this.revive(
-      PersistenceKey.PLOT_SIZES,
+    this.nbItemsPerRow = this.revive(
+      PersistenceKey.PLOT_NB_ITEMS_PER_ROW,
       DEFAULT_SECTION_NB_ITEMS_PER_ROW
     )
     this.sectionCollapsed = this.revive(
@@ -177,7 +177,7 @@ export class PlotsModel extends ModelWithPersistence {
 
     return {
       colors,
-      nbItemsPerRow: this.getPlotSize(Section.CHECKPOINT_PLOTS),
+      nbItemsPerRow: this.getNbItemsPerRow(Section.CHECKPOINT_PLOTS),
       plots: this.getPlots(this.checkpointPlots, selectedExperiments),
       selectedMetrics: this.getSelectedMetrics()
     }
@@ -188,7 +188,7 @@ export class PlotsModel extends ModelWithPersistence {
       return
     }
     return {
-      nbItemsPerRow: this.getPlotSize(Section.CUSTOM_PLOTS),
+      nbItemsPerRow: this.getNbItemsPerRow(Section.CUSTOM_PLOTS),
       plots: this.customPlots
     }
   }
@@ -391,24 +391,24 @@ export class PlotsModel extends ModelWithPersistence {
     this.persist(PersistenceKey.PLOT_METRIC_ORDER, this.metricOrder)
   }
 
-  public setPlotSize(section: Section, nbItemsPerRow: number) {
-    this.plotSizes[section] = nbItemsPerRow
-    this.persist(PersistenceKey.PLOT_SIZES, this.plotSizes)
+  public setNbItemsPerRow(section: Section, nbItemsPerRow: number) {
+    this.nbItemsPerRow[section] = nbItemsPerRow
+    this.persist(PersistenceKey.PLOT_NB_ITEMS_PER_ROW, this.nbItemsPerRow)
   }
 
-  public getPlotSize(section: Section) {
+  public getNbItemsPerRow(section: Section) {
     if (
-      this.plotSizes[section] &&
+      this.nbItemsPerRow[section] &&
       [
-        PlotNumberOfItemsPerRow.LARGE,
-        PlotNumberOfItemsPerRow.REGULAR,
-        PlotNumberOfItemsPerRow.SMALL,
-        PlotNumberOfItemsPerRow.SMALLER
-      ].includes(this.plotSizes[section])
+        PlotNumberOfItemsPerRow.ONE,
+        PlotNumberOfItemsPerRow.TWO,
+        PlotNumberOfItemsPerRow.THREE,
+        PlotNumberOfItemsPerRow.FOUR
+      ].includes(this.nbItemsPerRow[section])
     ) {
-      return this.plotSizes[section]
+      return this.nbItemsPerRow[section]
     }
-    return PlotNumberOfItemsPerRow.REGULAR
+    return PlotNumberOfItemsPerRow.TWO
   }
 
   public setSectionCollapsed(newState: Partial<SectionCollapsed>) {
@@ -498,7 +498,7 @@ export class PlotsModel extends ModelWithPersistence {
           id,
           title: truncateVerticalTitle(
             id,
-            this.getPlotSize(Section.CHECKPOINT_PLOTS)
+            this.getNbItemsPerRow(Section.CHECKPOINT_PLOTS)
           ) as string,
           values: values.filter(value =>
             selectedExperiments.includes(value.group)
@@ -549,7 +549,7 @@ export class PlotsModel extends ModelWithPersistence {
       selectedRevisions.map(({ revision }) => revision),
       this.templates,
       this.revisionData,
-      this.getPlotSize(Section.TEMPLATE_PLOTS),
+      this.getNbItemsPerRow(Section.TEMPLATE_PLOTS),
       this.getRevisionColors(selectedRevisions),
       this.multiSourceEncoding
     )

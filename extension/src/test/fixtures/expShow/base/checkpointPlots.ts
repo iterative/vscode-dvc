@@ -91,7 +91,7 @@ const data: CheckpointPlotsData = {
     'summary.json:val_loss',
     'summary.json:val_accuracy'
   ],
-  nbItemsPerRow: PlotNumberOfItemsPerRow.REGULAR
+  nbItemsPerRow: PlotNumberOfItemsPerRow.TWO
 }
 
 export default data

@@ -120,7 +120,7 @@ export class WebviewMessages {
   }
 
   private setPlotSize(section: Section, nbItemsPerRow: number) {
-    this.plots.setPlotSize(section, nbItemsPerRow)
+    this.plots.setNbItemsPerRow(section, nbItemsPerRow)
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_SECTION_RESIZED,
       { nbItemsPerRow, section },
@@ -338,7 +338,7 @@ export class WebviewMessages {
     }
 
     return {
-      nbItemsPerRow: this.plots.getPlotSize(Section.TEMPLATE_PLOTS),
+      nbItemsPerRow: this.plots.getNbItemsPerRow(Section.TEMPLATE_PLOTS),
       plots
     }
   }
@@ -354,7 +354,7 @@ export class WebviewMessages {
     }
 
     return {
-      nbItemsPerRow: this.plots.getPlotSize(Section.COMPARISON_TABLE),
+      nbItemsPerRow: this.plots.getNbItemsPerRow(Section.COMPARISON_TABLE),
       plots: comparison.map(({ path, revisions }) => {
         return { path, revisions: this.getRevisionsWithCorrectUrls(revisions) }
       }),

@@ -43,7 +43,7 @@ const Template: Story = ({ plots, revisions }) => {
     <Provider store={store}>
       <MockedState
         data={{
-          nbItemsPerRow: PlotNumberOfItemsPerRow.REGULAR,
+          nbItemsPerRow: PlotNumberOfItemsPerRow.TWO,
           plots,
           revisions
         }}
