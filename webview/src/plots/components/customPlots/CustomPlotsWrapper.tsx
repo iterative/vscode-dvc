@@ -27,7 +27,7 @@ export const CustomPlotsWrapper: React.FC = () => {
     <PlotsContainer
       title="Custom"
       sectionKey={Section.CUSTOM_PLOTS}
-      currentSize={nbItemsPerRow}
+      nbItemsPerRow={nbItemsPerRow}
       sectionCollapsed={isCollapsed}
       addPlotsButton={{ onClick: addCustomPlot }}
       removePlotsButton={

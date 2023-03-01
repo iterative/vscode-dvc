@@ -29,7 +29,7 @@ export interface PlotsContainerProps {
   sectionCollapsed: boolean
   sectionKey: Section
   title: string
-  currentSize: number
+  nbItemsPerRow: number
   menu?: PlotsPickerProps
   addPlotsButton?: { onClick: () => void }
   removePlotsButton?: { onClick: () => void }
@@ -93,7 +93,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   sectionKey,
   title,
   children,
-  currentSize,
+  nbItemsPerRow,
   menu,
   addPlotsButton,
   removePlotsButton
@@ -102,7 +102,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
 
   useEffect(() => {
     window.dispatchEvent(new Event('resize'))
-  }, [currentSize])
+  }, [nbItemsPerRow])
 
   const menuItems: IconMenuItemProps[] = []
 
@@ -177,11 +177,11 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
           <div
             className={cx({
               [styles.plotsWrapper]: sectionKey !== Section.COMPARISON_TABLE,
-              [styles.smallPlots]: currentSize === 4
+              [styles.smallPlots]: nbItemsPerRow === 4
             })}
             style={
               {
-                '--nbPerRow': currentSize
+                '--nbPerRow': nbItemsPerRow
               } as DetailedHTMLProps<
                 HTMLAttributes<HTMLDivElement>,
                 HTMLDivElement

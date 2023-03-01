@@ -22,7 +22,7 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
     (state: PlotsState) => state.checkpoint.plotsSnapshots[id]
   )
   const [plot, setPlot] = useState(plotDataStore[Section.CHECKPOINT_PLOTS][id])
-  const currentSize = useSelector(
+  const nbItemsPerRow = useSelector(
     (state: PlotsState) => state.checkpoint.nbItemsPerRow
   )
 
@@ -51,7 +51,7 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
         id={id}
         changeDisabledDragIds={changeDisabledDragIds}
         changeSize={changeSize}
-        currentSnapPoint={currentSize}
+        currentSnapPoint={nbItemsPerRow}
         section={Section.CHECKPOINT_PLOTS}
       />
     </div>
