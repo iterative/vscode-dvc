@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
   CheckpointPlotsData,
   DEFAULT_SECTION_COLLAPSED,
-  DEFAULT_SECTION_SIZES,
+  DEFAULT_SECTION_NB_ITEMS_PER_ROW,
   Section
 } from 'dvc/src/plots/webview/contract'
 import { addPlotsWithSnapshots, removePlots } from '../plotDataStore'
@@ -21,10 +21,10 @@ export const checkpointPlotsInitialState: CheckpointPlotsState = {
   disabledDragPlotIds: [],
   hasData: false,
   isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.CHECKPOINT_PLOTS],
+  nbItemsPerRow: DEFAULT_SECTION_NB_ITEMS_PER_ROW[Section.CHECKPOINT_PLOTS],
   plotsIds: [],
   plotsSnapshots: {},
-  selectedMetrics: [],
-  size: DEFAULT_SECTION_SIZES[Section.CHECKPOINT_PLOTS]
+  selectedMetrics: []
 }
 
 export const checkpointPlotsSlice = createSlice({
@@ -35,7 +35,7 @@ export const checkpointPlotsSlice = createSlice({
       state.disabledDragPlotIds = action.payload
     },
     changeSize: (state, action: PayloadAction<number>) => {
-      state.size = action.payload
+      state.nbItemsPerRow = action.payload
     },
     setCollapsed: (state, action: PayloadAction<boolean>) => {
       state.isCollapsed = action.payload

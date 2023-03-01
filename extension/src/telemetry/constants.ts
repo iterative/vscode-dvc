@@ -252,7 +252,10 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_METRICS_SELECTED]: undefined
   [EventName.VIEWS_PLOTS_REVISIONS_REORDERED]: undefined
   [EventName.VIEWS_PLOTS_COMPARISON_ROWS_REORDERED]: undefined
-  [EventName.VIEWS_PLOTS_SECTION_RESIZED]: { section: Section; size: number }
+  [EventName.VIEWS_PLOTS_SECTION_RESIZED]: {
+    section: Section
+    nbItemsPerRow: number
+  }
   [EventName.VIEWS_PLOTS_SECTION_TOGGLE]: Partial<SectionCollapsed>
   [EventName.VIEWS_PLOTS_SELECT_EXPERIMENTS]: undefined
   [EventName.VIEWS_PLOTS_SELECT_PLOTS]: undefined

@@ -29,11 +29,10 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
   colors
 }) => {
   const [order, setOrder] = useState(plotsIds)
-  const { size, hasData, disabledDragPlotIds } = useSelector(
+  const { nbItemsPerRow, hasData, disabledDragPlotIds } = useSelector(
     (state: PlotsState) => state.checkpoint
   )
   const [onSection, setOnSection] = useState(false)
-  const nbItemsPerRow = size
   const draggedRef = useSelector(
     (state: PlotsState) => state.dragAndDrop.draggedRef
   )
@@ -68,7 +67,10 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
     </div>
   ))
 
-  const useVirtualizedGrid = shouldUseVirtualizedGrid(items.length, size)
+  const useVirtualizedGrid = shouldUseVirtualizedGrid(
+    items.length,
+    nbItemsPerRow
+  )
 
   const handleDropAtTheEnd = () => {
     setMetricOrder(changeOrderWithDraggedInfo(order, draggedRef))

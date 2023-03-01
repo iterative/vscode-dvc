@@ -23,11 +23,10 @@ interface CustomPlotsProps {
 
 export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
   const [order, setOrder] = useState(plotsIds)
-  const { size, hasData, disabledDragPlotIds } = useSelector(
+  const { nbItemsPerRow, hasData, disabledDragPlotIds } = useSelector(
     (state: PlotsState) => state.custom
   )
   const [onSection, setOnSection] = useState(false)
-  const nbItemsPerRow = size
   const draggedRef = useSelector(
     (state: PlotsState) => state.dragAndDrop.draggedRef
   )
@@ -54,7 +53,10 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
     </div>
   ))
 
-  const useVirtualizedGrid = shouldUseVirtualizedGrid(items.length, size)
+  const useVirtualizedGrid = shouldUseVirtualizedGrid(
+    items.length,
+    nbItemsPerRow
+  )
 
   const handleDragOver = (e: DragEvent) => {
     e.preventDefault()

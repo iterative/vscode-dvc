@@ -21,7 +21,7 @@ interface ZoomablePlotProps {
   id: string
   onViewReady?: () => void
   changeDisabledDragIds: (ids: string[]) => AnyAction
-  changeSize: (size: number) => AnyAction
+  changeSize: (nbItemsPerRow: number) => AnyAction
   currentSnapPoint: number
   section: Section
   shouldNotResize?: boolean
@@ -77,7 +77,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
     (newSnapPoint: number) => {
       dispatch(changeSize(newSnapPoint))
       sendMessage({
-        payload: { section, size: newSnapPoint },
+        payload: { nbItemsPerRow: newSnapPoint, section },
         type: MessageFromWebviewType.RESIZE_PLOTS
       })
     },

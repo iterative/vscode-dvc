@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
   CustomPlotsData,
   DEFAULT_SECTION_COLLAPSED,
-  DEFAULT_SECTION_SIZES,
+  DEFAULT_SECTION_NB_ITEMS_PER_ROW,
   Section
 } from 'dvc/src/plots/webview/contract'
 import { addPlotsWithSnapshots, removePlots } from '../plotDataStore'
@@ -19,9 +19,9 @@ export const customPlotsInitialState: CustomPlotsState = {
   disabledDragPlotIds: [],
   hasData: false,
   isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.CUSTOM_PLOTS],
+  nbItemsPerRow: DEFAULT_SECTION_NB_ITEMS_PER_ROW[Section.CUSTOM_PLOTS],
   plotsIds: [],
-  plotsSnapshots: {},
-  size: DEFAULT_SECTION_SIZES[Section.CUSTOM_PLOTS]
+  plotsSnapshots: {}
 }
 
 export const customPlotsSlice = createSlice({
@@ -32,7 +32,7 @@ export const customPlotsSlice = createSlice({
       state.disabledDragPlotIds = action.payload
     },
     changeSize: (state, action: PayloadAction<number>) => {
-      state.size = action.payload
+      state.nbItemsPerRow = action.payload
     },
     setCollapsed: (state, action: PayloadAction<boolean>) => {
       state.isCollapsed = action.payload

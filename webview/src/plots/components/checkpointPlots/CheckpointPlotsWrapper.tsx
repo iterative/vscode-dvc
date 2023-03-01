@@ -8,9 +8,8 @@ import { sendMessage } from '../../../shared/vscode'
 import { PlotsState } from '../../store'
 
 export const CheckpointPlotsWrapper: React.FC = () => {
-  const { plotsIds, size, selectedMetrics, isCollapsed, colors } = useSelector(
-    (state: PlotsState) => state.checkpoint
-  )
+  const { plotsIds, nbItemsPerRow, selectedMetrics, isCollapsed, colors } =
+    useSelector((state: PlotsState) => state.checkpoint)
   const [metrics, setMetrics] = useState<string[]>([])
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
 
@@ -41,7 +40,7 @@ export const CheckpointPlotsWrapper: React.FC = () => {
       title="Trends"
       sectionKey={Section.CHECKPOINT_PLOTS}
       menu={menu}
-      currentSize={size}
+      currentSize={nbItemsPerRow}
       sectionCollapsed={isCollapsed}
     >
       <CheckpointPlots plotsIds={selectedPlots} colors={colors} />

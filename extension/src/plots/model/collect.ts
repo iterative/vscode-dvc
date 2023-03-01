@@ -585,7 +585,7 @@ const collectTemplatePlot = (
   path: string,
   template: string,
   revisionData: RevisionData,
-  size: number,
+  nbItemsPerRow: number,
   revisionColors: ColorScale | undefined,
   multiSourceEncoding: MultiSourceEncoding
 ) => {
@@ -605,10 +605,14 @@ const collectTemplatePlot = (
     return
   }
 
-  const content = extendVegaSpec(fillTemplate(template, datapoints), size, {
-    ...multiSourceEncodingUpdate,
-    color: revisionColors
-  }) as VisualizationSpec
+  const content = extendVegaSpec(
+    fillTemplate(template, datapoints),
+    nbItemsPerRow,
+    {
+      ...multiSourceEncodingUpdate,
+      color: revisionColors
+    }
+  ) as VisualizationSpec
 
   acc.push({
     content,
@@ -624,7 +628,7 @@ const collectTemplateGroup = (
   selectedRevisions: string[],
   templates: TemplateAccumulator,
   revisionData: RevisionData,
-  size: number,
+  nbItemsPerRow: number,
   revisionColors: ColorScale | undefined,
   multiSourceEncoding: MultiSourceEncoding
 ): TemplatePlotEntry[] => {
@@ -642,7 +646,7 @@ const collectTemplateGroup = (
       path,
       template,
       revisionData,
-      size,
+      nbItemsPerRow,
       revisionColors,
       multiSourceEncoding
     )
@@ -655,7 +659,7 @@ export const collectSelectedTemplatePlots = (
   selectedRevisions: string[],
   templates: TemplateAccumulator,
   revisionData: RevisionData,
-  size: number,
+  nbItemsPerRow: number,
   revisionColors: ColorScale | undefined,
   multiSourceEncoding: MultiSourceEncoding
 ): TemplatePlotSection[] | undefined => {
@@ -667,7 +671,7 @@ export const collectSelectedTemplatePlots = (
       selectedRevisions,
       templates,
       revisionData,
-      size,
+      nbItemsPerRow,
       revisionColors,
       multiSourceEncoding
     )

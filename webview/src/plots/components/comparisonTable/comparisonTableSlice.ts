@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
   DEFAULT_SECTION_COLLAPSED,
-  DEFAULT_SECTION_SIZES,
+  DEFAULT_SECTION_NB_ITEMS_PER_ROW,
   PlotsComparisonData,
   Section
 } from 'dvc/src/plots/webview/contract'
@@ -17,10 +17,10 @@ export const DEFAULT_ROW_HEIGHT = 200
 export const comparisonTableInitialState: ComparisonTableState = {
   hasData: false,
   isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.COMPARISON_TABLE],
+  nbItemsPerRow: DEFAULT_SECTION_NB_ITEMS_PER_ROW[Section.COMPARISON_TABLE],
   plots: [],
   revisions: [],
-  rowHeight: DEFAULT_ROW_HEIGHT,
-  size: DEFAULT_SECTION_SIZES[Section.COMPARISON_TABLE]
+  rowHeight: DEFAULT_ROW_HEIGHT
 }
 
 export const comparisonTableSlice = createSlice({
@@ -31,7 +31,7 @@ export const comparisonTableSlice = createSlice({
       state.rowHeight = action.payload
     },
     changeSize: (state, action: PayloadAction<number>) => {
-      state.size = action.payload
+      state.nbItemsPerRow = action.payload
     },
     setCollapsed: (state, action: PayloadAction<boolean>) => {
       state.isCollapsed = action.payload

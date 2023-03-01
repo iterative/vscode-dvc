@@ -24,7 +24,9 @@ export enum NewSectionBlock {
 }
 
 export const TemplatePlots: React.FC = () => {
-  const { size, sections } = useSelector((state: PlotsState) => state.template)
+  const { nbItemsPerRow, sections } = useSelector(
+    (state: PlotsState) => state.template
+  )
   const draggedOverGroup = useSelector(
     (state: PlotsState) => state.dragAndDrop.draggedOverGroup
   )
@@ -36,7 +38,6 @@ export const TemplatePlots: React.FC = () => {
   )
 
   const [hoveredSection, setHoveredSection] = useState('')
-  const nbItemsPerRow = size
   const dispatch = useDispatch()
 
   const sendReorderMessage = useCallback((sections: PlotGroup[]) => {
@@ -165,7 +166,7 @@ export const TemplatePlots: React.FC = () => {
         const groupId = createIDWithIndex(section.group, i)
         const useVirtualizedGrid = shouldUseVirtualizedGrid(
           Object.keys(section.entries).length,
-          size
+          nbItemsPerRow
         )
 
         const isMultiView = section.group === TemplatePlotGroup.MULTI_VIEW
