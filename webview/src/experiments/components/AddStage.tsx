@@ -10,7 +10,7 @@ interface AddStageProps {
 }
 
 export const AddStage: React.FC<AddStageProps> = ({ hasValidDvcYaml }) => (
-  <div className={styles.addConfigButton} data-testid="aaa">
+  <div className={styles.addConfigButton}>
     <p>Easily and efficiently reproduce your experiments </p>
     <IconButton
       icon={Add}
