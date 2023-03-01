@@ -241,11 +241,13 @@ suite('Plots Test Suite', () => {
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
-      const mockSetPlotSize = stub(plotsModel, 'setPlotSize').returns(undefined)
+      const mockSetPlotSize = stub(plotsModel, 'setNbItemsPerRow').returns(
+        undefined
+      )
 
       mockMessageReceived.fire({
         payload: {
-          nbItemsPerRow: PlotNumberOfItemsPerRow.SMALL,
+          nbItemsPerRow: PlotNumberOfItemsPerRow.THREE,
           section: Section.TEMPLATE_PLOTS
         },
         type: MessageFromWebviewType.RESIZE_PLOTS
@@ -254,13 +256,13 @@ suite('Plots Test Suite', () => {
       expect(mockSetPlotSize).to.be.calledOnce
       expect(mockSetPlotSize).to.be.calledWithExactly(
         Section.TEMPLATE_PLOTS,
-        PlotNumberOfItemsPerRow.SMALL
+        PlotNumberOfItemsPerRow.THREE
       )
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_PLOTS_SECTION_RESIZED,
         {
-          nbItemsPerRow: PlotNumberOfItemsPerRow.SMALL,
+          nbItemsPerRow: PlotNumberOfItemsPerRow.THREE,
           section: Section.TEMPLATE_PLOTS
         },
         undefined

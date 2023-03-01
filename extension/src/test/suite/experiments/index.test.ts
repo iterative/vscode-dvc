@@ -339,7 +339,7 @@ suite('Experiments Test Suite', () => {
       ).returns(undefined)
 
       const mockColumnId = 'params:params.yaml:lr'
-      const mockWidth = PlotNumberOfItemsPerRow.REGULAR
+      const mockWidth = PlotNumberOfItemsPerRow.TWO
 
       mockMessageReceived.fire({
         payload: { id: mockColumnId, width: mockWidth },

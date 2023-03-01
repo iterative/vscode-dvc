@@ -50,7 +50,7 @@ const data: CustomPlotsData = {
       ]
     }
   ],
-  nbItemsPerRow: PlotNumberOfItemsPerRow.REGULAR
+  nbItemsPerRow: PlotNumberOfItemsPerRow.TWO
 }
 
 export default data

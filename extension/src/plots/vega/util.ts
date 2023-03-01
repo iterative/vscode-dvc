@@ -220,10 +220,10 @@ const truncateTitleAsArrayOrString = (title: Text, size: number) => {
 }
 
 const TitleLimit = {
-  [PlotNumberOfItemsPerRow.LARGE]: 50,
-  [PlotNumberOfItemsPerRow.REGULAR]: 50,
-  [PlotNumberOfItemsPerRow.SMALL]: 30,
-  [PlotNumberOfItemsPerRow.SMALLER]: 30
+  [PlotNumberOfItemsPerRow.ONE]: 50,
+  [PlotNumberOfItemsPerRow.TWO]: 50,
+  [PlotNumberOfItemsPerRow.THREE]: 30,
+  [PlotNumberOfItemsPerRow.FOUR]: 30
 }
 
 const truncateTitlePart = (

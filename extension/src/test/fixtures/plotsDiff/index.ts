@@ -499,7 +499,7 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
                 ) || []
             }
           } as TopLevelSpec,
-          PlotNumberOfItemsPerRow.REGULAR,
+          PlotNumberOfItemsPerRow.TWO,
           {
             color: {
               domain: expectedRevisions,
@@ -659,13 +659,13 @@ export const getRevisions = (): Revision[] => {
 
 export const getMinimalWebviewMessage = () => ({
   plots: extendedSpecs(basicVega),
-  nbItemsPerRow: PlotNumberOfItemsPerRow.REGULAR,
+  nbItemsPerRow: PlotNumberOfItemsPerRow.TWO,
   revisions: getRevisions()
 })
 
 export const getTemplateWebviewMessage = (): TemplatePlotsData => ({
   plots: extendedSpecs({ ...basicVega, ...require('./vega').default }),
-  nbItemsPerRow: PlotNumberOfItemsPerRow.REGULAR
+  nbItemsPerRow: PlotNumberOfItemsPerRow.TWO
 })
 
 export const getManyTemplatePlotsWebviewMessage = (
@@ -674,7 +674,7 @@ export const getManyTemplatePlotsWebviewMessage = (
   plots: extendedSpecs({
     ...multipleVega(length)
   }),
-  nbItemsPerRow: PlotNumberOfItemsPerRow.REGULAR
+  nbItemsPerRow: PlotNumberOfItemsPerRow.TWO
 })
 
 export const MOCK_IMAGE_MTIME = 946684800000
@@ -700,6 +700,6 @@ export const getComparisonWebviewMessage = (
   return {
     revisions: getRevisions(),
     plots: plotAcc,
-    nbItemsPerRow: PlotNumberOfItemsPerRow.REGULAR
+    nbItemsPerRow: PlotNumberOfItemsPerRow.TWO
   }
 }
