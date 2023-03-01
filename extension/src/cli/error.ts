@@ -1,4 +1,4 @@
-import { ProcessOptions } from '../processExecution'
+import { ProcessOptions } from '../process/execution'
 
 export interface MaybeConsoleError extends Error {
   stderr?: string

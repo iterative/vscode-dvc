@@ -17,7 +17,7 @@ export class PseudoTerminal extends Disposable {
   constructor(
     processOutput: EventEmitter<string>,
     processTerminated: EventEmitter<void>,
-    termName = 'DVC'
+    termName: string
   ) {
     super()
 
@@ -39,7 +39,7 @@ export class PseudoTerminal extends Disposable {
     this.blocked = blocked
   }
 
-  public openCurrentInstance = async (): Promise<Terminal | undefined> => {
+  public async openCurrentInstance() {
     if (!this.instance) {
       await this.createInstance()
     }
@@ -47,14 +47,11 @@ export class PseudoTerminal extends Disposable {
     return this.instance
   }
 
-  public close = (): void => {
-    const currentTerminal = this.instance
-    if (currentTerminal) {
-      currentTerminal.dispose()
-    }
+  public close() {
+    this.instance?.dispose()
   }
 
-  private deleteReferenceOnClose = (): void => {
+  private deleteReferenceOnClose() {
     this.dispose.track(
       window.onDidCloseTerminal(event => {
         if (this.instance && event.name === this.termName) {
@@ -71,8 +68,8 @@ export class PseudoTerminal extends Disposable {
     )
   }
 
-  private createInstance = (): Promise<void> =>
-    new Promise<void>(resolve => {
+  private createInstance() {
+    return new Promise<void>(resolve => {
       const pty: Pseudoterminal = {
         close: () => {
           this.processTerminated.fire()
@@ -104,6 +101,7 @@ export class PseudoTerminal extends Disposable {
         })
       )
     })
+  }
 
   private notifyActiveStatus() {
     this.dispose.track(

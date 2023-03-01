@@ -1,6 +1,6 @@
 import { Event, EventEmitter } from 'vscode'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import { ProcessManager } from '../../processManager'
+import { ProcessManager } from '../../process/manager'
 import { getRelativePattern } from '../../fileSystem/relativePattern'
 import {
   createFileSystemWatcher,

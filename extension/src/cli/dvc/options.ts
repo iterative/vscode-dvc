@@ -3,7 +3,7 @@ import { Args } from './constants'
 import { getCaseSensitiveCwd } from './cwd'
 import { getProcessEnv } from '../../env'
 import { joinEnvPath } from '../../util/env'
-import { ProcessOptions } from '../../processExecution'
+import { ProcessOptions } from '../../process/execution'
 
 type ExecutionOptions = ProcessOptions & {
   env: NodeJS.ProcessEnv

@@ -61,15 +61,9 @@ suite('Extension Test Suite', () => {
         onDidDelete: () => mockDisposable
       })
 
-      const mockGetDvcRoots = stub(Setup.prototype, 'getRoots').returns([
-        dvcDemoPath
-      ])
-
       const mockCanRunCli = stub(DvcReader.prototype, 'version')
-        .onFirstCall()
-        .resolves(MIN_CLI_VERSION)
-        .onSecondCall()
-        .rejects('CLI is gone, dispose of everything')
+
+      mockCanRunCli.resolves(MIN_CLI_VERSION)
 
       const mockDisposer = stub(Disposer, 'reset')
 
@@ -169,7 +163,7 @@ suite('Extension Test Suite', () => {
 
       const mockPath = resolve('path', 'to', 'venv')
 
-      void (await setConfigValue(ConfigKey.PYTHON_PATH, mockPath))
+      await setConfigValue(ConfigKey.PYTHON_PATH, mockPath)
 
       await Promise.all([
         firstDisposal,
@@ -193,7 +187,6 @@ suite('Extension Test Suite', () => {
         .been.called
       expect(mockPlotsDiff, 'should have updated the plots data').to.have.been
         .called
-      expect(mockGetDvcRoots).to.have.been.called
 
       expect(
         mockSendTelemetryEvent,
@@ -228,10 +221,13 @@ suite('Extension Test Suite', () => {
       await workspaceExperimentsAreReady
       const secondDisposal = disposalEvent()
 
-      void (await setConfigValue(
+      mockCanRunCli.resetBehavior()
+      mockCanRunCli.rejects('CLI is gone, dispose of everything')
+
+      await setConfigValue(
         ConfigKey.PYTHON_PATH,
         resolve('path', 'to', 'virtualenv')
-      ))
+      )
 
       await secondDisposal
 

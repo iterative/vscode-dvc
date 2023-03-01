@@ -4,7 +4,7 @@ import { DvcCli } from '.'
 import { Command } from './constants'
 import { CliResult, CliStarted, typeCheckCommands } from '..'
 import { getProcessEnv } from '../../env'
-import { createProcess } from '../../processExecution'
+import { createProcess } from '../../process/execution'
 import { getFailingMockedProcess, getMockedProcess } from '../../test/util/jest'
 import { Config } from '../../config'
 import { joinEnvPath } from '../../util/env'
@@ -12,7 +12,7 @@ import { joinEnvPath } from '../../util/env'
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 jest.mock('../../env')
-jest.mock('../../processExecution')
+jest.mock('../../process/execution')
 
 const mockedDisposable = jest.mocked(Disposable)
 

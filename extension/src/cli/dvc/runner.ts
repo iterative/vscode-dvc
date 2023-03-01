@@ -10,12 +10,16 @@ import { CliResult, CliStarted, ICli, typeCheckCommands } from '..'
 import { getCommandString } from '../command'
 import { Config } from '../../config'
 import { PseudoTerminal } from '../../vscode/pseudoTerminal'
-import { createProcess, Process } from '../../processExecution'
+import { createProcess, Process } from '../../process/execution'
 import { StopWatch } from '../../util/time'
-import { sendErrorTelemetryEvent, sendTelemetryEvent } from '../../telemetry'
-import { EventName } from '../../telemetry/constants'
 import { Toast } from '../../vscode/toast'
 import { Disposable } from '../../class/dispose'
+import {
+  captureStdErr,
+  notifyCompleted,
+  notifyOutput,
+  notifyStarted
+} from '../util'
 
 export const autoRegisteredCommands = {
   EXPERIMENT_RESET_AND_RUN: 'runExperimentReset',
@@ -39,31 +43,16 @@ export class DvcRunner extends Disposable implements ICli {
   private readonly processTerminated: EventEmitter<void>
   private readonly onDidTerminateProcess: Event<void>
 
-  private readonly executable: string | undefined
-
   private readonly pseudoTerminal: PseudoTerminal
   private currentProcess: Process | undefined
   private readonly config: Config
 
-  constructor(
-    config: Config,
-    executable?: string,
-    emitters?: {
-      processCompleted: EventEmitter<CliResult>
-      processOutput: EventEmitter<string>
-      processStarted: EventEmitter<CliStarted>
-      processTerminated?: EventEmitter<void>
-    }
-  ) {
+  constructor(config: Config) {
     super()
 
     this.config = config
 
-    this.executable = executable
-
-    this.processCompleted =
-      emitters?.processCompleted ||
-      this.dispose.track(new EventEmitter<CliResult>())
+    this.processCompleted = this.dispose.track(new EventEmitter<CliResult>())
     this.onDidCompleteProcess = this.processCompleted.event
     this.dispose.track(
       this.onDidCompleteProcess(() => {
@@ -75,17 +64,12 @@ export class DvcRunner extends Disposable implements ICli {
       })
     )
 
-    this.processOutput =
-      emitters?.processOutput || this.dispose.track(new EventEmitter<string>())
+    this.processOutput = this.dispose.track(new EventEmitter<string>())
 
-    this.processStarted =
-      emitters?.processStarted ||
-      this.dispose.track(new EventEmitter<CliStarted>())
+    this.processStarted = this.dispose.track(new EventEmitter<CliStarted>())
     this.onDidStartProcess = this.processStarted.event
 
-    this.processTerminated =
-      emitters?.processTerminated ||
-      this.dispose.track(new EventEmitter<void>())
+    this.processTerminated = this.dispose.track(new EventEmitter<void>())
     this.onDidTerminateProcess = this.processTerminated.event
     this.dispose.track(
       this.onDidTerminateProcess(() => {
@@ -94,7 +78,11 @@ export class DvcRunner extends Disposable implements ICli {
     )
 
     this.pseudoTerminal = this.dispose.track(
-      new PseudoTerminal(this.processOutput, this.processTerminated)
+      new PseudoTerminal(
+        this.processOutput,
+        this.processTerminated,
+        'DVC: exp run'
+      )
     )
   }
 
@@ -153,13 +141,6 @@ export class DvcRunner extends Disposable implements ICli {
     return this.currentProcess
   }
 
-  private getOverrideOrCliPath() {
-    if (this.executable) {
-      return this.executable
-    }
-    return this.config.getCliPath()
-  }
-
   private createProcess({ cwd, args }: { cwd: string; args: Args }): Process {
     const options = this.getOptions(cwd, args)
     const command = getCommandString(options)
@@ -167,25 +148,23 @@ export class DvcRunner extends Disposable implements ICli {
     const process = this.dispose.track(createProcess(options))
     const baseEvent = { command, cwd, pid: process.pid }
 
-    this.processStarted.fire(baseEvent)
+    notifyStarted(baseEvent, this.processStarted)
 
-    this.notifyOutput(process)
+    notifyOutput(process, this.processOutput)
 
-    let stderr = ''
-    process.stderr?.on(
-      'data',
-      chunk => (stderr += (chunk as Buffer).toString())
-    )
+    const stderr = captureStdErr(process)
 
     void process.on('close', exitCode => {
       void this.dispose.untrack(process)
-      this.notifyCompleted({
-        ...baseEvent,
-        duration: stopWatch.getElapsedTime(),
-        exitCode,
-        killed: process.killed,
-        stderr
-      })
+      notifyCompleted(
+        {
+          ...baseEvent,
+          duration: stopWatch.getElapsedTime(),
+          exitCode,
+          stderr
+        },
+        this.processCompleted
+      )
     })
 
     return process
@@ -194,7 +173,7 @@ export class DvcRunner extends Disposable implements ICli {
   private getOptions(cwd: string, args: Args) {
     return getOptions(
       this.config.getPythonBinPath(),
-      this.getOverrideOrCliPath(),
+      this.config.getCliPath(),
       cwd,
       ...args
     )
@@ -207,70 +186,5 @@ export class DvcRunner extends Disposable implements ICli {
       args,
       cwd
     })
-  }
-
-  private notifyOutput(process: Process) {
-    process.all?.on('data', chunk =>
-      this.processOutput.fire(
-        (chunk as Buffer)
-          .toString()
-          .split(/(\r?\n)/g)
-          .join('\r')
-      )
-    )
-  }
-
-  private notifyCompleted({
-    command,
-    pid,
-    cwd,
-    duration,
-    exitCode,
-    killed,
-    stderr
-  }: CliResult & {
-    killed: boolean
-  }) {
-    this.processCompleted.fire({
-      command,
-      cwd,
-      duration,
-      exitCode,
-      pid,
-      stderr: stderr?.replace(/\n+/g, '\n')
-    })
-
-    this.sendTelemetryEvent({ command, duration, exitCode, killed, stderr })
-  }
-
-  private sendTelemetryEvent({
-    command,
-    exitCode,
-    stderr,
-    duration,
-    killed
-  }: {
-    command: string
-    exitCode: number | null
-    stderr?: string
-    duration: number
-    killed: boolean
-  }) {
-    const properties = { command, exitCode }
-
-    if (!killed && exitCode && stderr) {
-      return sendErrorTelemetryEvent(
-        EventName.EXPERIMENTS_RUNNER_COMPLETED,
-        new Error(stderr),
-        duration,
-        properties
-      )
-    }
-
-    return sendTelemetryEvent(
-      EventName.EXPERIMENTS_RUNNER_COMPLETED,
-      { ...properties, wasStopped: killed },
-      { duration }
-    )
   }
 }

@@ -1,10 +1,10 @@
 import { join } from 'path'
 import { setupVenv } from '.'
-import { Process, createProcess } from '../processExecution'
+import { Process, createProcess } from '../process/execution'
 import { getProcessPlatform } from '../env'
 
 jest.mock('../env')
-jest.mock('../processExecution')
+jest.mock('../process/execution')
 
 const mockedGetProcessPlatform = jest.mocked(getProcessPlatform)
 const mockedCreateProcess = jest.mocked(createProcess)

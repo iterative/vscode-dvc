@@ -24,7 +24,7 @@ import plotsDiffFixture from '../fixtures/plotsDiff/output'
 import { BaseWebview } from '../../webview'
 import { ExperimentsData } from '../../experiments/data'
 import { ResourceLocator } from '../../resourceLocator'
-import { DEFAULT_DEBOUNCE_WINDOW_MS } from '../../processManager'
+import { DEFAULT_DEBOUNCE_WINDOW_MS } from '../../process/manager'
 import { FileSystemData } from '../../fileSystem/data'
 import * as FileSystem from '../../fileSystem'
 import * as Watcher from '../../fileSystem/watcher'
@@ -34,6 +34,7 @@ import { TableData } from '../../experiments/webview/contract'
 import { DvcExecutor } from '../../cli/dvc/executor'
 import { GitReader } from '../../cli/git/reader'
 import { SetupData } from '../../setup/webview/contract'
+import { DvcViewer } from '../../cli/dvc/viewer'
 
 export const mockDisposable = {
   dispose: stub()
@@ -113,6 +114,9 @@ export const closeAllEditors = async () => {
   }
 }
 
+export const closeAllTerminals = () =>
+  commands.executeCommand('workbench.action.terminal.killAll')
+
 export const mockDuration = (duration: number) =>
   stub(Time, 'getCurrentEpoch')
     .onFirstCall()
@@ -138,6 +142,7 @@ export const buildInternalCommands = (disposer: Disposer) => {
   const dvcReader = disposer.track(new DvcReader(config))
   const dvcRunner = disposer.track(new DvcRunner(config))
   const dvcExecutor = disposer.track(new DvcExecutor(config))
+  const dvcViewer = disposer.track(new DvcViewer(config))
   const gitReader = disposer.track(new GitReader())
 
   const outputChannel = disposer.track(
@@ -150,6 +155,7 @@ export const buildInternalCommands = (disposer: Disposer) => {
       dvcExecutor,
       dvcReader,
       dvcRunner,
+      dvcViewer,
       gitReader
     )
   )
@@ -159,6 +165,7 @@ export const buildInternalCommands = (disposer: Disposer) => {
     dvcExecutor,
     dvcReader,
     dvcRunner,
+    dvcViewer,
     gitReader,
     internalCommands
   }
@@ -186,6 +193,7 @@ export const buildDependencies = (
     dvcExecutor,
     dvcReader,
     dvcRunner,
+    dvcViewer,
     gitReader,
     internalCommands
   } = buildInternalCommands(disposer)
@@ -220,6 +228,7 @@ export const buildDependencies = (
     dvcExecutor,
     dvcReader,
     dvcRunner,
+    dvcViewer,
     gitReader,
     internalCommands,
     messageSpy,

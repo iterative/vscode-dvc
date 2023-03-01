@@ -62,7 +62,12 @@ const sanitizeProperties = (
     if (value === undefined || value === null) {
       continue
     }
-    sanitizeProperty(eventName as string, sanitizedProperties, key, value)
+    sanitizeProperty(
+      eventName,
+      sanitizedProperties,
+      key,
+      value as string | number | boolean
+    )
   }
   return sanitizedProperties
 }
