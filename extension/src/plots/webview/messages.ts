@@ -81,7 +81,10 @@ export class WebviewMessages {
       case MessageFromWebviewType.TOGGLE_METRIC:
         return this.setSelectedMetrics(message.payload)
       case MessageFromWebviewType.RESIZE_PLOTS:
-        return this.setPlotSize(message.payload.section, message.payload.size)
+        return this.setPlotSize(
+          message.payload.section,
+          message.payload.nbItemsPerRow
+        )
       case MessageFromWebviewType.TOGGLE_PLOTS_SECTION:
         return this.setSectionCollapsed(message.payload)
       case MessageFromWebviewType.REORDER_PLOTS_COMPARISON:
@@ -116,11 +119,11 @@ export class WebviewMessages {
     this.sendCheckpointPlotsAndEvent(EventName.VIEWS_PLOTS_METRICS_SELECTED)
   }
 
-  private setPlotSize(section: Section, size: number) {
-    this.plots.setPlotSize(section, size)
+  private setPlotSize(section: Section, nbItemsPerRow: number) {
+    this.plots.setPlotSize(section, nbItemsPerRow)
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_SECTION_RESIZED,
-      { section, size },
+      { nbItemsPerRow, section },
       undefined
     )
   }
@@ -335,8 +338,8 @@ export class WebviewMessages {
     }
 
     return {
-      plots,
-      size: this.plots.getPlotSize(Section.TEMPLATE_PLOTS)
+      nbItemsPerRow: this.plots.getPlotSize(Section.TEMPLATE_PLOTS),
+      plots
     }
   }
 
@@ -351,11 +354,11 @@ export class WebviewMessages {
     }
 
     return {
+      nbItemsPerRow: this.plots.getPlotSize(Section.COMPARISON_TABLE),
       plots: comparison.map(({ path, revisions }) => {
         return { path, revisions: this.getRevisionsWithCorrectUrls(revisions) }
       }),
-      revisions: overrideRevs || this.plots.getComparisonRevisions(),
-      size: this.plots.getPlotSize(Section.COMPARISON_TABLE)
+      revisions: overrideRevs || this.plots.getComparisonRevisions()
     }
   }
 

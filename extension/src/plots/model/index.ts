@@ -23,11 +23,11 @@ import {
   Revision,
   ComparisonRevisionData,
   DEFAULT_SECTION_COLLAPSED,
-  DEFAULT_SECTION_SIZES,
+  DEFAULT_SECTION_NB_ITEMS_PER_ROW,
   Section,
   SectionCollapsed,
-  PlotSizeNumber,
-  CustomPlotData
+  CustomPlotData,
+  PlotWidthNumber
 } from '../webview/contract'
 import {
   ExperimentsOutput,
@@ -84,7 +84,7 @@ export class PlotsModel extends ModelWithPersistence {
 
     this.plotSizes = this.revive(
       PersistenceKey.PLOT_SIZES,
-      DEFAULT_SECTION_SIZES
+      DEFAULT_SECTION_NB_ITEMS_PER_ROW
     )
     this.sectionCollapsed = this.revive(
       PersistenceKey.PLOT_SECTION_COLLAPSED,
@@ -177,9 +177,9 @@ export class PlotsModel extends ModelWithPersistence {
 
     return {
       colors,
+      nbItemsPerRow: this.getPlotSize(Section.CHECKPOINT_PLOTS),
       plots: this.getPlots(this.checkpointPlots, selectedExperiments),
-      selectedMetrics: this.getSelectedMetrics(),
-      size: this.getPlotSize(Section.CHECKPOINT_PLOTS)
+      selectedMetrics: this.getSelectedMetrics()
     }
   }
 
@@ -188,8 +188,8 @@ export class PlotsModel extends ModelWithPersistence {
       return
     }
     return {
-      plots: this.customPlots,
-      size: this.getPlotSize(Section.CUSTOM_PLOTS)
+      nbItemsPerRow: this.getPlotSize(Section.CUSTOM_PLOTS),
+      plots: this.customPlots
     }
   }
 
@@ -391,8 +391,8 @@ export class PlotsModel extends ModelWithPersistence {
     this.persist(PersistenceKey.PLOT_METRIC_ORDER, this.metricOrder)
   }
 
-  public setPlotSize(section: Section, size: number) {
-    this.plotSizes[section] = size
+  public setPlotSize(section: Section, nbItemsPerRow: number) {
+    this.plotSizes[section] = nbItemsPerRow
     this.persist(PersistenceKey.PLOT_SIZES, this.plotSizes)
   }
 
@@ -400,15 +400,15 @@ export class PlotsModel extends ModelWithPersistence {
     if (
       this.plotSizes[section] &&
       [
-        PlotSizeNumber.LARGE,
-        PlotSizeNumber.REGULAR,
-        PlotSizeNumber.SMALL,
-        PlotSizeNumber.SMALLER
+        PlotWidthNumber.LARGE,
+        PlotWidthNumber.REGULAR,
+        PlotWidthNumber.SMALL,
+        PlotWidthNumber.SMALLER
       ].includes(this.plotSizes[section])
     ) {
       return this.plotSizes[section]
     }
-    return PlotSizeNumber.REGULAR
+    return PlotWidthNumber.REGULAR
   }
 
   public setSectionCollapsed(newState: Partial<SectionCollapsed>) {

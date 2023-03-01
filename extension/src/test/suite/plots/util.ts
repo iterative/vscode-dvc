@@ -131,20 +131,20 @@ export const getExpectedCheckpointPlotsData = (
   domain: string[],
   range: Color[]
 ) => {
-  const { plots, selectedMetrics, size } = checkpointPlotsFixture
+  const { plots, selectedMetrics, nbItemsPerRow } = checkpointPlotsFixture
   return {
     checkpoint: {
       colors: {
         domain,
         range
       },
+      nbItemsPerRow,
       plots: plots.map(plot => ({
         id: plot.id,
         title: plot.title,
         values: plot.values.filter(values => domain.includes(values.group))
       })),
-      selectedMetrics,
-      size
+      selectedMetrics
     }
   }
 }

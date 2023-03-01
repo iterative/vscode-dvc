@@ -6,14 +6,15 @@ import { PlotsContainer } from '../PlotsContainer'
 import { PlotsState } from '../../store'
 
 export const TemplatePlotsWrapper: React.FC = () => {
-  const { size, isCollapsed } = useSelector(
+  const { nbItemsPerRow, isCollapsed } = useSelector(
     (state: PlotsState) => state.template
   )
+
   return (
     <PlotsContainer
       title="Data Series"
       sectionKey={Section.TEMPLATE_PLOTS}
-      currentSize={size}
+      currentSize={nbItemsPerRow}
       sectionCollapsed={isCollapsed}
     >
       <TemplatePlots />

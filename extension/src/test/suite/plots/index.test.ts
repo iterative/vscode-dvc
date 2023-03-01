@@ -25,7 +25,7 @@ import { dvcDemoPath } from '../../util'
 import {
   DEFAULT_SECTION_COLLAPSED,
   PlotsData as TPlotsData,
-  PlotSizeNumber,
+  PlotWidthNumber,
   Section,
   TemplatePlotGroup,
   TemplatePlotsData
@@ -245,8 +245,8 @@ suite('Plots Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: {
-          section: Section.TEMPLATE_PLOTS,
-          size: PlotSizeNumber.SMALL
+          nbItemsPerRow: PlotWidthNumber.SMALL,
+          section: Section.TEMPLATE_PLOTS
         },
         type: MessageFromWebviewType.RESIZE_PLOTS
       })
@@ -254,14 +254,14 @@ suite('Plots Test Suite', () => {
       expect(mockSetPlotSize).to.be.calledOnce
       expect(mockSetPlotSize).to.be.calledWithExactly(
         Section.TEMPLATE_PLOTS,
-        PlotSizeNumber.SMALL
+        PlotWidthNumber.SMALL
       )
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_PLOTS_SECTION_RESIZED,
         {
-          section: Section.TEMPLATE_PLOTS,
-          size: PlotSizeNumber.SMALL
+          nbItemsPerRow: PlotWidthNumber.SMALL,
+          section: Section.TEMPLATE_PLOTS
         },
         undefined
       )
@@ -725,7 +725,7 @@ suite('Plots Test Suite', () => {
       const expectedPlotsData: TPlotsData = {
         checkpoint: checkpointPlotsFixture,
         comparison: comparisonPlotsFixture,
-        custom: { plots: [], size: 2 },
+        custom: { nbItemsPerRow: 2, plots: [] },
         hasPlots: true,
         hasUnselectedPlots: false,
         sectionCollapsed: DEFAULT_SECTION_COLLAPSED,

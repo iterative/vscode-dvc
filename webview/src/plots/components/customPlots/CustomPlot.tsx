@@ -18,7 +18,9 @@ export const CustomPlot: React.FC<CustomPlotProps> = ({ id }) => {
     (state: PlotsState) => state.custom.plotsSnapshots[id]
   )
   const [plot, setPlot] = useState(plotDataStore[Section.CUSTOM_PLOTS][id])
-  const currentSize = useSelector((state: PlotsState) => state.custom.size)
+  const currentSize = useSelector(
+    (state: PlotsState) => state.custom.nbItemsPerRow
+  )
 
   const spec = useMemo(() => {
     if (plot) {

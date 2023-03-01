@@ -23,7 +23,7 @@ import {
   CheckpointPlotsData,
   DEFAULT_SECTION_COLLAPSED,
   PlotsData,
-  PlotSizeNumber,
+  PlotWidthNumber,
   PlotsType,
   Revision,
   Section,
@@ -171,11 +171,11 @@ describe('App', () => {
 
   const renderAppAndChangeSize = async (
     data: PlotsData,
-    size: number,
+    nbItemsPerRow: number,
     section: Section
   ) => {
     const withSize = {
-      size
+      nbItemsPerRow
     }
     const plotsData = {
       ...data,
@@ -263,6 +263,7 @@ describe('App', () => {
     renderAppWithOptionalData({
       checkpoint: null,
       comparison: {
+        nbItemsPerRow: PlotWidthNumber.REGULAR,
         plots: [
           {
             path: 'training/plots/images/misclassified.jpg',
@@ -278,8 +279,7 @@ describe('App', () => {
             id: 'ad2b5ec854a447d00d9dfa9cdf88211a39a17813',
             revision: 'ad2b5ec'
           }
-        ],
-        size: PlotSizeNumber.REGULAR
+        ]
       },
       hasPlots: true,
       hasUnselectedPlots: false,
@@ -695,8 +695,8 @@ describe('App', () => {
     pickAndMove(plotResizer, 10)
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: {
-        section: Section.CHECKPOINT_PLOTS,
-        size: PlotSizeNumber.LARGE
+        nbItemsPerRow: PlotWidthNumber.LARGE,
+        section: Section.CHECKPOINT_PLOTS
       },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
@@ -705,8 +705,8 @@ describe('App', () => {
     pickAndMove(plotResizer, -10)
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: {
-        section: Section.CHECKPOINT_PLOTS,
-        size: PlotSizeNumber.REGULAR
+        nbItemsPerRow: PlotWidthNumber.REGULAR,
+        section: Section.CHECKPOINT_PLOTS
       },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
@@ -717,8 +717,8 @@ describe('App', () => {
 
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: {
-        section: Section.CHECKPOINT_PLOTS,
-        size: PlotSizeNumber.SMALL
+        nbItemsPerRow: PlotWidthNumber.SMALL,
+        section: Section.CHECKPOINT_PLOTS
       },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
@@ -727,8 +727,8 @@ describe('App', () => {
     pickAndMove(plotResizer, -10)
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: {
-        section: Section.CHECKPOINT_PLOTS,
-        size: PlotSizeNumber.SMALLER
+        nbItemsPerRow: PlotWidthNumber.SMALLER,
+        section: Section.CHECKPOINT_PLOTS
       },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
@@ -745,8 +745,8 @@ describe('App', () => {
     pickAndMove(plotResizer, 10, 0, true)
     expect(mockPostMessage).not.toHaveBeenCalledWith({
       payload: {
-        section: Section.CHECKPOINT_PLOTS,
-        size: PlotSizeNumber.LARGE
+        nbItemsPerRow: PlotWidthNumber.LARGE,
+        section: Section.CHECKPOINT_PLOTS
       },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
@@ -1537,7 +1537,7 @@ describe('App', () => {
       it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than ten large plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(11) },
-          PlotSizeNumber.LARGE,
+          PlotWidthNumber.LARGE,
           Section.CHECKPOINT_PLOTS
         )
 
@@ -1555,7 +1555,7 @@ describe('App', () => {
       it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are ten or fewer large plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(10) },
-          PlotSizeNumber.LARGE,
+          PlotWidthNumber.LARGE,
           Section.CHECKPOINT_PLOTS
         )
 
@@ -1573,7 +1573,7 @@ describe('App', () => {
       it('should  wrap the template plots in a big grid (virtualize them) when there are more than ten large plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(11) },
-          PlotSizeNumber.LARGE,
+          PlotWidthNumber.LARGE,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1591,7 +1591,7 @@ describe('App', () => {
       it('should not wrap the template plots in a big grid (virtualize them) when there are ten or fewer large plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(10) },
-          PlotSizeNumber.LARGE,
+          PlotWidthNumber.LARGE,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1613,7 +1613,7 @@ describe('App', () => {
         beforeEach(async () => {
           store = await renderAppAndChangeSize(
             { checkpoint },
-            PlotSizeNumber.LARGE,
+            PlotWidthNumber.LARGE,
             Section.CHECKPOINT_PLOTS
           )
         })
@@ -1666,7 +1666,7 @@ describe('App', () => {
       it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than fifteen regular plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(16) },
-          PlotSizeNumber.REGULAR,
+          PlotWidthNumber.REGULAR,
           Section.CHECKPOINT_PLOTS
         )
 
@@ -1676,7 +1676,7 @@ describe('App', () => {
       it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are eight or fifteen regular plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(15) },
-          PlotSizeNumber.REGULAR,
+          PlotWidthNumber.REGULAR,
           Section.CHECKPOINT_PLOTS
         )
 
@@ -1686,7 +1686,7 @@ describe('App', () => {
       it('should  wrap the template plots in a big grid (virtualize them) when there are more than fifteen regular plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(16) },
-          PlotSizeNumber.REGULAR,
+          PlotWidthNumber.REGULAR,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1696,7 +1696,7 @@ describe('App', () => {
       it('should not wrap the template plots in a big grid (virtualize them) when there are fifteen or fewer regular plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(15) },
-          PlotSizeNumber.REGULAR,
+          PlotWidthNumber.REGULAR,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1710,7 +1710,7 @@ describe('App', () => {
         beforeEach(async () => {
           store = await renderAppAndChangeSize(
             { checkpoint },
-            PlotSizeNumber.REGULAR,
+            PlotWidthNumber.REGULAR,
             Section.CHECKPOINT_PLOTS
           )
         })
@@ -1763,7 +1763,7 @@ describe('App', () => {
       it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than twenty small plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(21) },
-          PlotSizeNumber.SMALLER,
+          PlotWidthNumber.SMALLER,
           Section.CHECKPOINT_PLOTS
         )
 
@@ -1773,7 +1773,7 @@ describe('App', () => {
       it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are twenty or fewer small plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(20) },
-          PlotSizeNumber.SMALLER,
+          PlotWidthNumber.SMALLER,
           Section.CHECKPOINT_PLOTS
         )
 
@@ -1783,7 +1783,7 @@ describe('App', () => {
       it('should  wrap the template plots in a big grid (virtualize them) when there are more than twenty small plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(21) },
-          PlotSizeNumber.SMALLER,
+          PlotWidthNumber.SMALLER,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1793,7 +1793,7 @@ describe('App', () => {
       it('should not wrap the template plots in a big grid (virtualize them) when there are twenty or fewer small plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(20) },
-          PlotSizeNumber.SMALLER,
+          PlotWidthNumber.SMALLER,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1807,7 +1807,7 @@ describe('App', () => {
         beforeEach(async () => {
           store = await renderAppAndChangeSize(
             { checkpoint },
-            PlotSizeNumber.SMALLER,
+            PlotWidthNumber.SMALLER,
             Section.CHECKPOINT_PLOTS
           )
         })

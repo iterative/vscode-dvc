@@ -22,7 +22,9 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
     (state: PlotsState) => state.checkpoint.plotsSnapshots[id]
   )
   const [plot, setPlot] = useState(plotDataStore[Section.CHECKPOINT_PLOTS][id])
-  const currentSize = useSelector((state: PlotsState) => state.checkpoint.size)
+  const currentSize = useSelector(
+    (state: PlotsState) => state.checkpoint.nbItemsPerRow
+  )
 
   const spec = useMemo(() => {
     const title = plot?.title

@@ -1,13 +1,15 @@
-import { PlotSizeNumber } from 'dvc/src/plots/webview/contract'
+import { PlotWidthNumber } from 'dvc/src/plots/webview/contract'
 
-export const DEFAULT_NB_ITEMS_PER_ROW = 2
+export const DEFAULT_NB_ITEMS_PER_ROW = PlotWidthNumber.REGULAR
 
 const MaxItemsBeforeVirtualization = {
-  [PlotSizeNumber.LARGE]: 10,
-  [PlotSizeNumber.REGULAR]: 15,
-  [PlotSizeNumber.SMALL]: 18,
-  [PlotSizeNumber.SMALLER]: 20
+  [PlotWidthNumber.LARGE]: 10,
+  [PlotWidthNumber.REGULAR]: 15,
+  [PlotWidthNumber.SMALL]: 18,
+  [PlotWidthNumber.SMALLER]: 20
 }
 
-export const shouldUseVirtualizedGrid = (nbItems: number, size: number) =>
-  nbItems > MaxItemsBeforeVirtualization[size]
+export const shouldUseVirtualizedGrid = (
+  nbItems: number,
+  nbItemsPerRow: number
+) => nbItems > MaxItemsBeforeVirtualization[nbItemsPerRow]

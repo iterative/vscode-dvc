@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
   DEFAULT_SECTION_COLLAPSED,
-  DEFAULT_SECTION_SIZES,
+  DEFAULT_SECTION_NB_ITEMS_PER_ROW,
   Section,
   TemplatePlotGroup,
   TemplatePlotsData
@@ -21,9 +21,9 @@ export const templatePlotsInitialState: TemplatePlotsState = {
   disabledDragPlotIds: [],
   hasData: false,
   isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.TEMPLATE_PLOTS],
+  nbItemsPerRow: DEFAULT_SECTION_NB_ITEMS_PER_ROW[Section.TEMPLATE_PLOTS],
   plotsSnapshots: {},
-  sections: [],
-  size: DEFAULT_SECTION_SIZES[Section.TEMPLATE_PLOTS]
+  sections: []
 }
 
 export const templatePlotsSlice = createSlice({
@@ -34,7 +34,7 @@ export const templatePlotsSlice = createSlice({
       state.disabledDragPlotIds = action.payload
     },
     changeSize: (state, action: PayloadAction<number>) => {
-      state.size = action.payload
+      state.nbItemsPerRow = action.payload
     },
     setCollapsed: (state, action: PayloadAction<boolean>) => {
       state.isCollapsed = action.payload
@@ -57,12 +57,12 @@ export const templatePlotsSlice = createSlice({
       return {
         ...state,
         hasData: !!action.payload,
+        nbItemsPerRow: action.payload.nbItemsPerRow,
         plotsSnapshots: snapShots,
         sections:
           JSON.stringify(plotSections) === JSON.stringify(state.sections)
             ? state.sections
-            : plotSections,
-        size: Math.abs(action.payload.size)
+            : plotSections
       }
     },
     updateSections: (state, action: PayloadAction<PlotGroup[]>) => {

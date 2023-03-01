@@ -1,6 +1,6 @@
 import {
   CustomPlotsData,
-  PlotSizeNumber
+  PlotWidthNumber
 } from '../../../../plots/webview/contract'
 
 const data: CustomPlotsData = {
@@ -50,7 +50,7 @@ const data: CustomPlotsData = {
       ]
     }
   ],
-  size: PlotSizeNumber.REGULAR
+  nbItemsPerRow: PlotWidthNumber.REGULAR
 }
 
 export default data

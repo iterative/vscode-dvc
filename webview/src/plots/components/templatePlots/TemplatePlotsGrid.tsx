@@ -38,7 +38,9 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   parentDraggedOver
 }) => {
   const dispatch = useDispatch()
-  const currentSize = useSelector((state: PlotsState) => state.template.size)
+  const currentSize = useSelector(
+    (state: PlotsState) => state.template.nbItemsPerRow
+  )
   const entries = useSelector(
     (state: PlotsState) => state.template.sections[groupIndex].entries
   )
