@@ -100,6 +100,7 @@ export type TableData = {
   hasColumns: boolean
   hasConfig: boolean
   hasRunningExperiment: boolean
+  hasValidDvcYaml: boolean
   rows: Row[]
   sorts: SortDefinition[]
   filteredCounts: FilteredCounts

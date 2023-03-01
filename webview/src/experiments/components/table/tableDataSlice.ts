@@ -24,6 +24,7 @@ export const tableDataInitialState: TableDataState = {
   hasConfig: false,
   hasData: false,
   hasRunningExperiment: false,
+  hasValidDvcYaml: true,
   rows: [],
   sorts: []
 }

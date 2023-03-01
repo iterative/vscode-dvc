@@ -11,6 +11,7 @@ export const data: TableData = {
   hasCheckpoints: false,
   hasConfig: true,
   hasRunningExperiment: false,
+  hasValidDvcYaml: true,
   sorts: [],
   columns,
   hasColumns: true,

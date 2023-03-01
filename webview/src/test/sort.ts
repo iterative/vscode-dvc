@@ -50,6 +50,7 @@ export const tableData: TableData = {
   hasColumns: true,
   hasConfig: true,
   hasRunningExperiment: false,
+  hasValidDvcYaml: true,
   rows: [
     {
       id: EXPERIMENT_WORKSPACE_ID,
