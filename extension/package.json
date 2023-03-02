@@ -1386,7 +1386,7 @@
       },
       {
         "view": "dvc.views.actions",
-        "contents": "[$(debug-disconnect) Disconnect Studio](command:dvc.removeStudioAccessToken)",
+        "contents": "[$(settings-gear) Open Studio Settings](command:dvc.showConnect)",
         "when": "dvc.studio.connected"
       },
       {

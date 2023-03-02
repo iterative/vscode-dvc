@@ -1,10 +1,16 @@
 import React from 'react'
-import { STUDIO_URL } from 'dvc/src/connect/webview/contract'
-import { openStudio, openStudioProfile, saveStudioToken } from './messages'
+import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
+import { ConnectData, STUDIO_URL } from 'dvc/src/connect/webview/contract'
+import {
+  openStudio,
+  openStudioProfile,
+  saveStudioToken,
+  removeStudioToken
+} from './messages'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Button } from '../../shared/components/button/Button'
 
-export const Studio: React.FC = () => {
+const Connect: React.FC = () => {
   return (
     <EmptyState>
       <div>
@@ -45,5 +51,62 @@ export const Studio: React.FC = () => {
         </p>
       </div>
     </EmptyState>
+  )
+}
+
+const Settings: React.FC<{
+  shareLiveToStudio: boolean
+  setShareLiveToStudio: (shareLiveToStudio: boolean) => void
+}> = ({ shareLiveToStudio, setShareLiveToStudio }) => {
+  return (
+    <EmptyState>
+      <div>
+        <h1>Studio Settings</h1>
+        <p>
+          Experiment metrics and plots logged with DVCLive <br />
+          can be{' '}
+          <a href="https://dvc.org/doc/studio/user-guide/projects-and-experiments/live-metrics-and-plots#send-and-view-live-metrics-and-plots">
+            automatically shared to Studio
+          </a>
+          .
+        </p>
+        <p>
+          <VSCodeCheckbox
+            onClick={() => {
+              setShareLiveToStudio(!shareLiveToStudio)
+              // send message
+            }}
+            checked={shareLiveToStudio}
+          >
+            Share New Experiments Live
+          </VSCodeCheckbox>
+        </p>
+        <Button
+          appearance="primary"
+          isNested={false}
+          text={'Update Token'}
+          onClick={openStudio}
+        />
+        <Button
+          appearance="secondary"
+          isNested={true}
+          text={'Disconnect'}
+          onClick={removeStudioToken}
+        />
+      </div>
+    </EmptyState>
+  )
+}
+
+export const Studio: React.FC<
+  ConnectData & { setShareLiveToStudio: (shareLiveToStudio: boolean) => void }
+> = ({ isStudioConnected, shareLiveToStudio, setShareLiveToStudio }) => {
+  return isStudioConnected ? (
+    <Settings
+      shareLiveToStudio={shareLiveToStudio}
+      setShareLiveToStudio={setShareLiveToStudio}
+    />
+  ) : (
+    <Connect />
   )
 }

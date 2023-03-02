@@ -9,3 +9,6 @@ export const openStudioProfile = () =>
 
 export const saveStudioToken = () =>
   sendMessage({ type: MessageFromWebviewType.SAVE_STUDIO_TOKEN })
+
+export const removeStudioToken = () =>
+  sendMessage({ type: MessageFromWebviewType.REMOVE_STUDIO_TOKEN })

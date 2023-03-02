@@ -1,7 +1,7 @@
 import { commands, ExtensionContext, SecretStorage } from 'vscode'
 import { validateTokenInput } from './inputBox'
 import { STUDIO_ACCESS_TOKEN_KEY, isStudioAccessToken } from './token'
-import { STUDIO_URL } from './webview/contract'
+import { ConnectData, STUDIO_URL } from './webview/contract'
 import { Resource } from '../resourceLocator'
 import { ViewKey } from '../webview/constants'
 import { MessageFromWebview, MessageFromWebviewType } from '../webview/contract'
@@ -16,11 +16,12 @@ import { Modal } from '../vscode/modal'
 import { GLOBAL_WEBVIEW_DVCROOT } from '../webview/factory'
 import { ConfigKey, getConfigValue } from '../vscode/config'
 
-export class Connect extends BaseRepository<undefined> {
+export class Connect extends BaseRepository<ConnectData> {
   public readonly viewKey = ViewKey.CONNECT
 
   private readonly secrets: SecretStorage
   private studioAccessToken: string | undefined = undefined
+  private studioIsConnected = false
 
   constructor(context: ExtensionContext, webviewIcon: Resource) {
     super(GLOBAL_WEBVIEW_DVCROOT, webviewIcon)
@@ -52,7 +53,9 @@ export class Connect extends BaseRepository<undefined> {
     )
   }
 
-  public sendInitialWebviewData(): void {}
+  public sendInitialWebviewData() {
+    return this.sendWebviewMessage()
+  }
 
   public removeStudioAccessToken() {
     return this.removeSecret(STUDIO_ACCESS_TOKEN_KEY)
@@ -84,6 +87,13 @@ export class Connect extends BaseRepository<undefined> {
     return this.studioAccessToken
   }
 
+  private sendWebviewMessage() {
+    void this.getWebview()?.show({
+      isStudioConnected: this.studioIsConnected,
+      shareLiveToStudio: false
+    })
+  }
+
   private handleMessageFromWebview(message: MessageFromWebview) {
     switch (message.type) {
       case MessageFromWebviewType.OPEN_STUDIO:
@@ -93,6 +103,10 @@ export class Connect extends BaseRepository<undefined> {
       case MessageFromWebviewType.SAVE_STUDIO_TOKEN:
         return commands.executeCommand(
           RegisteredCommands.ADD_STUDIO_ACCESS_TOKEN
+        )
+      case MessageFromWebviewType.REMOVE_STUDIO_TOKEN:
+        return commands.executeCommand(
+          RegisteredCommands.REMOVE_STUDIO_ACCESS_TOKEN
         )
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
@@ -116,9 +130,13 @@ export class Connect extends BaseRepository<undefined> {
         )
       }
       this.webview?.dispose()
+      this.studioIsConnected = true
+      this.sendWebviewMessage()
       return setContextValue(ContextKey.STUDIO_CONNECTED, true)
     }
 
+    this.studioIsConnected = false
+    this.sendWebviewMessage()
     return setContextValue(ContextKey.STUDIO_CONNECTED, false)
   }
 
