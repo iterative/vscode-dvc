@@ -247,6 +247,7 @@ suite('Plots Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: {
+          height: undefined,
           nbItemsPerRow: PlotNumberOfItemsPerRow.THREE,
           section: Section.TEMPLATE_PLOTS
         },
@@ -727,7 +728,7 @@ suite('Plots Test Suite', () => {
       const expectedPlotsData: TPlotsData = {
         checkpoint: checkpointPlotsFixture,
         comparison: comparisonPlotsFixture,
-        custom: { nbItemsPerRow: 2, plots: [] },
+        custom: { height: undefined, nbItemsPerRow: 2, plots: [] },
         hasPlots: true,
         hasUnselectedPlots: false,
         sectionCollapsed: DEFAULT_SECTION_COLLAPSED,

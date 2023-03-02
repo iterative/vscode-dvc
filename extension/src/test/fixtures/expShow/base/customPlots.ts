@@ -50,7 +50,8 @@ const data: CustomPlotsData = {
       ]
     }
   ],
-  nbItemsPerRow: PlotNumberOfItemsPerRow.TWO
+  nbItemsPerRow: PlotNumberOfItemsPerRow.TWO,
+  height: undefined
 }
 
 export default data

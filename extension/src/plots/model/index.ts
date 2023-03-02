@@ -27,7 +27,8 @@ import {
   Section,
   SectionCollapsed,
   CustomPlotData,
-  PlotNumberOfItemsPerRow
+  PlotNumberOfItemsPerRow,
+  DEFAULT_HEIGHT
 } from '../webview/contract'
 import {
   ExperimentsOutput,
@@ -55,6 +56,7 @@ export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
 
   private nbItemsPerRow: Record<Section, number>
+  private height: Record<Section, number | undefined>
   private customPlotsOrder: CustomPlotsOrderValue[]
   private sectionCollapsed: SectionCollapsed
   private commitRevisions: Record<string, string> = {}
@@ -86,6 +88,8 @@ export class PlotsModel extends ModelWithPersistence {
       PersistenceKey.PLOT_NB_ITEMS_PER_ROW,
       DEFAULT_SECTION_NB_ITEMS_PER_ROW
     )
+    this.height = this.revive(PersistenceKey.PLOT_HEIGHT, DEFAULT_HEIGHT)
+
     this.sectionCollapsed = this.revive(
       PersistenceKey.PLOT_SECTION_COLLAPSED,
       DEFAULT_SECTION_COLLAPSED
@@ -177,6 +181,7 @@ export class PlotsModel extends ModelWithPersistence {
 
     return {
       colors,
+      height: this.getHeight(Section.CHECKPOINT_PLOTS),
       nbItemsPerRow: this.getNbItemsPerRow(Section.CHECKPOINT_PLOTS),
       plots: this.getPlots(this.checkpointPlots, selectedExperiments),
       selectedMetrics: this.getSelectedMetrics()
@@ -188,6 +193,7 @@ export class PlotsModel extends ModelWithPersistence {
       return
     }
     return {
+      height: this.getHeight(Section.CUSTOM_PLOTS),
       nbItemsPerRow: this.getNbItemsPerRow(Section.CUSTOM_PLOTS),
       plots: this.customPlots
     }
@@ -409,6 +415,15 @@ export class PlotsModel extends ModelWithPersistence {
       return this.nbItemsPerRow[section]
     }
     return PlotNumberOfItemsPerRow.TWO
+  }
+
+  public setHeight(section: Section, height: number | undefined) {
+    this.height[section] = height
+    this.persist(PersistenceKey.PLOT_HEIGHT, this.height)
+  }
+
+  public getHeight(section: Section) {
+    return this.height[section]
   }
 
   public setSectionCollapsed(newState: Partial<SectionCollapsed>) {

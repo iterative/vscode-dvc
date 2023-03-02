@@ -9,6 +9,7 @@ export enum PersistenceKey {
   PLOT_PATH_STATUS = 'plotPathStatus:',
   PLOT_COMPARISON_ORDER = 'plotComparisonOrder:',
   PLOT_COMPARISON_PATHS_ORDER = 'plotComparisonPathsOrder',
+  PLOT_HEIGHT = 'plotHeigh',
   PLOT_METRIC_ORDER = 'plotMetricOrder:',
   PLOT_NB_ITEMS_PER_ROW = 'plotNbItemsPerRow:',
   PLOTS_CUSTOM_ORDER = 'plotCustomOrder:',

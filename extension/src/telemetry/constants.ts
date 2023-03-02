@@ -255,6 +255,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_SECTION_RESIZED]: {
     section: Section
     nbItemsPerRow: number
+    height: number | undefined
   }
   [EventName.VIEWS_PLOTS_SECTION_TOGGLE]: Partial<SectionCollapsed>
   [EventName.VIEWS_PLOTS_SELECT_EXPERIMENTS]: undefined
