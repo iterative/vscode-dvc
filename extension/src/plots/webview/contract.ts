@@ -1,29 +1,43 @@
 import { VisualizationSpec } from 'react-vega'
 import { Color } from '../../experiments/model/status/colors'
 
-export const PlotSizeNumber = {
-  LARGE: 1,
-  REGULAR: 2,
-  SMALL: 3,
-  SMALLER: 4
+// It is easier to keep the numerical order than the alphabetical one
+/* eslint-disable sort-keys-fix/sort-keys-fix */
+export const PlotNumberOfItemsPerRow = {
+  ONE: 1,
+  TWO: 2,
+  THREE: 3,
+  FOUR: 4
 }
+/* eslint-enable sort-keys-fix/sort-keys-fix */
 
 export enum Section {
   CHECKPOINT_PLOTS = 'checkpoint-plots',
   TEMPLATE_PLOTS = 'template-plots',
-  COMPARISON_TABLE = 'comparison-table'
+  COMPARISON_TABLE = 'comparison-table',
+  CUSTOM_PLOTS = 'custom-plots'
 }
 
-export const DEFAULT_SECTION_SIZES = {
-  [Section.CHECKPOINT_PLOTS]: PlotSizeNumber.REGULAR,
-  [Section.TEMPLATE_PLOTS]: PlotSizeNumber.REGULAR,
-  [Section.COMPARISON_TABLE]: PlotSizeNumber.REGULAR
+export const DEFAULT_SECTION_NB_ITEMS_PER_ROW = {
+  [Section.CHECKPOINT_PLOTS]: PlotNumberOfItemsPerRow.TWO,
+  [Section.TEMPLATE_PLOTS]: PlotNumberOfItemsPerRow.TWO,
+  [Section.COMPARISON_TABLE]: PlotNumberOfItemsPerRow.TWO,
+  [Section.CUSTOM_PLOTS]: PlotNumberOfItemsPerRow.TWO
+}
+
+// Height is undefined by default because it is calculated by ratio of the width it'll fill (calculated by the webview)
+export const DEFAULT_HEIGHT = {
+  [Section.CHECKPOINT_PLOTS]: undefined,
+  [Section.TEMPLATE_PLOTS]: undefined,
+  [Section.COMPARISON_TABLE]: undefined,
+  [Section.CUSTOM_PLOTS]: undefined
 }
 
 export const DEFAULT_SECTION_COLLAPSED = {
   [Section.CHECKPOINT_PLOTS]: false,
   [Section.TEMPLATE_PLOTS]: false,
-  [Section.COMPARISON_TABLE]: false
+  [Section.COMPARISON_TABLE]: false,
+  [Section.CUSTOM_PLOTS]: false
 }
 
 export type SectionCollapsed = typeof DEFAULT_SECTION_COLLAPSED
@@ -53,7 +67,8 @@ export type Revision = {
 
 export interface PlotsComparisonData {
   plots: ComparisonPlots
-  size: number
+  nbItemsPerRow: number
+  height: number | undefined
   revisions: Revision[]
 }
 
@@ -70,12 +85,32 @@ export type CheckpointPlot = {
   values: CheckpointPlotValues
 }
 
+export type CustomPlotValues = {
+  expName: string
+  metric: number
+  param: number
+}
+
+export type CustomPlotData = {
+  id: string
+  values: CustomPlotValues[]
+  metric: string
+  param: string
+}
+
+export type CustomPlotsData = {
+  plots: CustomPlotData[]
+  nbItemsPerRow: number
+  height: number | undefined
+}
+
 export type CheckpointPlotData = CheckpointPlot & { title: string }
 
 export type CheckpointPlotsData = {
   plots: CheckpointPlotData[]
   colors: ColorScale
-  size: number
+  nbItemsPerRow: number
+  height: number | undefined
   selectedMetrics?: string[]
 }
 
@@ -123,7 +158,8 @@ export type TemplatePlotSection = {
 
 export interface TemplatePlotsData {
   plots: TemplatePlotSection[]
-  size: number
+  nbItemsPerRow: number
+  height: number | undefined
 }
 
 export type ComparisonPlot = {
@@ -134,6 +170,7 @@ export type ComparisonPlot = {
 export enum PlotsDataKeys {
   COMPARISON = 'comparison',
   CHECKPOINT = 'checkpoint',
+  CUSTOM = 'custom',
   HAS_UNSELECTED_PLOTS = 'hasUnselectedPlots',
   HAS_PLOTS = 'hasPlots',
   SELECTED_REVISIONS = 'selectedRevisions',
@@ -145,6 +182,7 @@ export type PlotsData =
   | {
       [PlotsDataKeys.COMPARISON]?: PlotsComparisonData | null
       [PlotsDataKeys.CHECKPOINT]?: CheckpointPlotsData | null
+      [PlotsDataKeys.CUSTOM]?: CustomPlotsData | null
       [PlotsDataKeys.HAS_PLOTS]?: boolean
       [PlotsDataKeys.HAS_UNSELECTED_PLOTS]?: boolean
       [PlotsDataKeys.SELECTED_REVISIONS]?: Revision[]

@@ -21,6 +21,11 @@ import { PlotsModel } from '../model'
 import { PathsModel } from '../paths/model'
 import { BaseWebview } from '../../webview'
 import { getModifiedTime } from '../../fileSystem'
+import { pickCustomPlots, pickMetricAndParam } from '../model/quickPick'
+import { Title } from '../../vscode/title'
+import { ColumnType } from '../../experiments/webview/contract'
+import { FILE_SEPARATOR } from '../../experiments/columns/paths'
+import { reorderObjectList } from '../../util/array'
 
 export class WebviewMessages {
   private readonly paths: PathsModel
@@ -54,6 +59,7 @@ export class WebviewMessages {
     void this.getWebview()?.show({
       checkpoint: this.getCheckpointPlots(),
       comparison: this.getComparisonPlots(overrideComparison),
+      custom: this.getCustomPlots(),
       hasPlots: !!this.paths.hasPaths(),
       hasUnselectedPlots: this.paths.getHasUnselectedPlots(),
       sectionCollapsed: this.plots.getSectionCollapsed(),
@@ -70,10 +76,16 @@ export class WebviewMessages {
 
   public handleMessageFromWebview(message: MessageFromWebview) {
     switch (message.type) {
+      case MessageFromWebviewType.ADD_CUSTOM_PLOT:
+        return this.addCustomPlot()
       case MessageFromWebviewType.TOGGLE_METRIC:
         return this.setSelectedMetrics(message.payload)
       case MessageFromWebviewType.RESIZE_PLOTS:
-        return this.setPlotSize(message.payload.section, message.payload.size)
+        return this.setPlotSize(
+          message.payload.section,
+          message.payload.nbItemsPerRow,
+          message.payload.height
+        )
       case MessageFromWebviewType.TOGGLE_PLOTS_SECTION:
         return this.setSectionCollapsed(message.payload)
       case MessageFromWebviewType.REORDER_PLOTS_COMPARISON:
@@ -84,10 +96,14 @@ export class WebviewMessages {
         return this.setTemplateOrder(message.payload)
       case MessageFromWebviewType.REORDER_PLOTS_METRICS:
         return this.setMetricOrder(message.payload)
+      case MessageFromWebviewType.REORDER_PLOTS_CUSTOM:
+        return this.setCustomPlotsOrder(message.payload)
       case MessageFromWebviewType.SELECT_PLOTS:
         return this.selectPlotsFromWebview()
       case MessageFromWebviewType.SELECT_EXPERIMENTS:
         return this.selectExperimentsFromWebview()
+      case MessageFromWebviewType.REMOVE_CUSTOM_PLOTS:
+        return this.removeCustomPlots()
       case MessageFromWebviewType.REFRESH_REVISION:
         return this.attemptToRefreshRevData(message.payload)
       case MessageFromWebviewType.REFRESH_REVISIONS:
@@ -104,11 +120,16 @@ export class WebviewMessages {
     this.sendCheckpointPlotsAndEvent(EventName.VIEWS_PLOTS_METRICS_SELECTED)
   }
 
-  private setPlotSize(section: Section, size: number) {
-    this.plots.setPlotSize(section, size)
+  private setPlotSize(
+    section: Section,
+    nbItemsPerRow: number,
+    height?: number
+  ) {
+    this.plots.setNbItemsPerRow(section, nbItemsPerRow)
+    this.plots.setHeight(section, height)
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_SECTION_RESIZED,
-      { section, size },
+      { height, nbItemsPerRow, section },
       undefined
     )
   }
@@ -156,6 +177,80 @@ export class WebviewMessages {
   private setMetricOrder(order: string[]) {
     this.plots.setMetricOrder(order)
     this.sendCheckpointPlotsAndEvent(EventName.VIEWS_REORDER_PLOTS_METRICS)
+  }
+
+  private async addCustomPlot() {
+    const metricAndParam = await pickMetricAndParam(
+      this.experiments.getColumnTerminalNodes()
+    )
+
+    if (!metricAndParam) {
+      return
+    }
+
+    const plotAlreadyExists = this.plots
+      .getCustomPlotsOrder()
+      .some(
+        ({ param, metric }) =>
+          param === metricAndParam.param && metric === metricAndParam.metric
+      )
+
+    if (plotAlreadyExists) {
+      return Toast.showError('Custom plot already exists.')
+    }
+
+    this.plots.addCustomPlot(metricAndParam)
+    this.sendCustomPlots()
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED,
+      undefined,
+      undefined
+    )
+  }
+
+  private async removeCustomPlots() {
+    const selectedPlotsIds = await pickCustomPlots(
+      this.plots.getCustomPlotsOrder(),
+      'There are no plots to remove.',
+      {
+        title: Title.SELECT_CUSTOM_PLOTS_TO_REMOVE
+      }
+    )
+
+    if (!selectedPlotsIds) {
+      return
+    }
+
+    this.plots.removeCustomPlots(selectedPlotsIds)
+    this.sendCustomPlots()
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_CUSTOM_PLOT_REMOVED,
+      undefined,
+      undefined
+    )
+  }
+
+  private setCustomPlotsOrder(plotIds: string[]) {
+    const customPlots = this.plots.getCustomPlots()?.plots
+    if (!customPlots) {
+      return
+    }
+
+    const buildMetricOrParamPath = (type: string, path: string) =>
+      type + FILE_SEPARATOR + path
+    const newOrder = reorderObjectList(plotIds, customPlots, 'id').map(
+      ({ metric, param }) => ({
+        metric: buildMetricOrParamPath(ColumnType.METRICS, metric),
+        param: buildMetricOrParamPath(ColumnType.PARAMS, param)
+      })
+    )
+    this.plots.setCustomPlotsOrder(newOrder)
+    this.sendCustomPlots()
+    sendTelemetryEvent(
+      EventName.VIEWS_REORDER_PLOTS_CUSTOM,
+      undefined,
+      undefined
+    )
   }
 
   private selectPlotsFromWebview() {
@@ -234,6 +329,12 @@ export class WebviewMessages {
     })
   }
 
+  private sendCustomPlots() {
+    void this.getWebview()?.show({
+      custom: this.getCustomPlots()
+    })
+  }
+
   private getTemplatePlots(overrideRevs?: Revision[]) {
     const paths = this.paths.getTemplateOrder()
     const plots = this.plots.getTemplatePlots(paths, overrideRevs)
@@ -243,8 +344,9 @@ export class WebviewMessages {
     }
 
     return {
-      plots,
-      size: this.plots.getPlotSize(Section.TEMPLATE_PLOTS)
+      height: this.plots.getHeight(Section.TEMPLATE_PLOTS),
+      nbItemsPerRow: this.plots.getNbItemsPerRow(Section.TEMPLATE_PLOTS),
+      plots
     }
   }
 
@@ -259,11 +361,12 @@ export class WebviewMessages {
     }
 
     return {
+      height: this.plots.getHeight(Section.COMPARISON_TABLE),
+      nbItemsPerRow: this.plots.getNbItemsPerRow(Section.COMPARISON_TABLE),
       plots: comparison.map(({ path, revisions }) => {
         return { path, revisions: this.getRevisionsWithCorrectUrls(revisions) }
       }),
-      revisions: overrideRevs || this.plots.getComparisonRevisions(),
-      size: this.plots.getPlotSize(Section.COMPARISON_TABLE)
+      revisions: overrideRevs || this.plots.getComparisonRevisions()
     }
   }
 
@@ -294,5 +397,9 @@ export class WebviewMessages {
 
   private getCheckpointPlots() {
     return this.plots.getCheckpointPlots() || null
+  }
+
+  private getCustomPlots() {
+    return this.plots.getCustomPlots() || null
   }
 }

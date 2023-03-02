@@ -9,7 +9,8 @@ export const IconButton: React.FC<IconButtonProps> = ({
   onClick,
   icon,
   isNested,
-  text
+  text,
+  disabled
 }: IconButtonProps) => {
   return (
     <Button
@@ -17,6 +18,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
       isNested={isNested}
       onClick={onClick}
       text={text}
+      disabled={disabled}
     >
       <span slot="start">
         <Icon icon={icon} width={18} height={18} />

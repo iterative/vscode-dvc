@@ -8,6 +8,7 @@ export type ButtonProps = {
   text: string
   isNested?: boolean
   children?: React.ReactNode
+  disabled?: boolean
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -15,13 +16,15 @@ export const Button: React.FC<ButtonProps> = ({
   children,
   onClick,
   text,
-  isNested
+  isNested,
+  disabled
 }: ButtonProps) => {
   return (
     <VSCodeButton
       appearance={appearance}
       onClick={onClick}
       className={isNested && styles.secondaryButton}
+      disabled={disabled}
     >
       {text}
       {children}

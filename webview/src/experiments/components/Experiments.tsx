@@ -133,6 +133,7 @@ export const ExperimentsTable: React.FC = () => {
     columnWidths,
     hasColumns,
     hasConfig,
+    hasValidDvcYaml,
     rows: data
   } = useSelector((state: ExperimentsState) => state.tableData)
 
@@ -195,11 +196,10 @@ export const ExperimentsTable: React.FC = () => {
       />
     )
   }
-
   return (
     <RowSelectionProvider>
       <Table instance={instance} onColumnOrderChange={setColumnOrder} />
-      {!hasConfig && <AddStage />}
+      {!hasConfig && <AddStage hasValidDvcYaml={hasValidDvcYaml} />}
     </RowSelectionProvider>
   )
 }

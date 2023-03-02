@@ -82,6 +82,7 @@ export class ViewableCliProcess extends DeferredDisposable {
         },
         processCompleted
       )
+      this.pseudoTerminal.setBlocked(false)
       processOutput.fire('\r\nPress any key to close\r\n\n')
     })
   }

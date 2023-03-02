@@ -14,6 +14,7 @@ import {
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/base/checkpointPlots'
+import customPlotsFixture from 'dvc/src/test/fixtures/expShow/base/customPlots'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
 import smoothTemplatePlotContent from 'dvc/src/test/fixtures/plotsDiff/template/smoothTemplatePlot'
@@ -22,7 +23,7 @@ import {
   CheckpointPlotsData,
   DEFAULT_SECTION_COLLAPSED,
   PlotsData,
-  PlotSizeNumber,
+  PlotNumberOfItemsPerRow,
   PlotsType,
   Revision,
   Section,
@@ -82,6 +83,16 @@ jest.mock('./checkpointPlots/util', () => ({
     width: 100
   })
 }))
+jest.mock('./customPlots/util', () => ({
+  createSpec: () => ({
+    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+    encoding: {},
+    height: 100,
+    layer: [],
+    transform: [],
+    width: 100
+  })
+}))
 jest.spyOn(console, 'warn').mockImplementation(() => {})
 
 const { postMessage } = vsCodeApi
@@ -101,7 +112,8 @@ describe('App', () => {
   const sectionPosition = {
     [Section.CHECKPOINT_PLOTS]: 2,
     [Section.TEMPLATE_PLOTS]: 0,
-    [Section.COMPARISON_TABLE]: 1
+    [Section.COMPARISON_TABLE]: 1,
+    [Section.CUSTOM_PLOTS]: 3
   }
 
   const sendSetDataMessage = (data: PlotsData) => {
@@ -159,11 +171,11 @@ describe('App', () => {
 
   const renderAppAndChangeSize = async (
     data: PlotsData,
-    size: number,
+    nbItemsPerRow: number,
     section: Section
   ) => {
     const withSize = {
-      size
+      nbItemsPerRow
     }
     const plotsData = {
       ...data,
@@ -251,6 +263,8 @@ describe('App', () => {
     renderAppWithOptionalData({
       checkpoint: null,
       comparison: {
+        height: undefined,
+        nbItemsPerRow: PlotNumberOfItemsPerRow.TWO,
         plots: [
           {
             path: 'training/plots/images/misclassified.jpg',
@@ -266,8 +280,7 @@ describe('App', () => {
             id: 'ad2b5ec854a447d00d9dfa9cdf88211a39a17813',
             revision: 'ad2b5ec'
           }
-        ],
-        size: PlotSizeNumber.REGULAR
+        ]
       },
       hasPlots: true,
       hasUnselectedPlots: false,
@@ -350,7 +363,8 @@ describe('App', () => {
     expect(screen.getByText('Trends')).toBeInTheDocument()
     expect(screen.getByText('Data Series')).toBeInTheDocument()
     expect(screen.getByText('Images')).toBeInTheDocument()
-    expect(screen.getByText('No Plots to Display')).toBeInTheDocument()
+    expect(screen.getByText('Custom')).toBeInTheDocument()
+    expect(screen.getAllByText('No Plots to Display')).toHaveLength(2)
     expect(screen.getByText('No Images to Compare')).toBeInTheDocument()
   })
 
@@ -361,7 +375,31 @@ describe('App', () => {
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
     expect(screen.getByText('Trends')).toBeInTheDocument()
-    expect(screen.getByText('No Plots to Display')).toBeInTheDocument()
+    expect(screen.getAllByText('No Plots to Display')).toHaveLength(2)
+  })
+
+  it('should render other sections given a message with only custom plots data', () => {
+    renderAppWithOptionalData({
+      custom: customPlotsFixture
+    })
+
+    expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
+    expect(screen.getByText('Trends')).toBeInTheDocument()
+    expect(screen.getByText('Data Series')).toBeInTheDocument()
+    expect(screen.getByText('Images')).toBeInTheDocument()
+    expect(screen.getByText('Custom')).toBeInTheDocument()
+    expect(screen.getAllByText('No Plots to Display')).toHaveLength(2)
+    expect(screen.getByText('No Images to Compare')).toBeInTheDocument()
+  })
+
+  it('should render custom even when there is no custom plots data', () => {
+    renderAppWithOptionalData({
+      comparison: comparisonTableFixture
+    })
+
+    expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
+    expect(screen.getByText('Custom')).toBeInTheDocument()
+    expect(screen.getAllByText('No Plots to Display')).toHaveLength(3)
   })
 
   it('should render the comparison table when given a message with comparison plots data', () => {
@@ -403,6 +441,7 @@ describe('App', () => {
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture,
       comparison: comparisonTableFixture,
+      custom: customPlotsFixture,
       template: templatePlotsFixture
     })
 
@@ -657,8 +696,8 @@ describe('App', () => {
     pickAndMove(plotResizer, 10)
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: {
-        section: Section.CHECKPOINT_PLOTS,
-        size: PlotSizeNumber.LARGE
+        nbItemsPerRow: PlotNumberOfItemsPerRow.ONE,
+        section: Section.CHECKPOINT_PLOTS
       },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
@@ -667,8 +706,8 @@ describe('App', () => {
     pickAndMove(plotResizer, -10)
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: {
-        section: Section.CHECKPOINT_PLOTS,
-        size: PlotSizeNumber.REGULAR
+        nbItemsPerRow: PlotNumberOfItemsPerRow.TWO,
+        section: Section.CHECKPOINT_PLOTS
       },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
@@ -679,8 +718,8 @@ describe('App', () => {
 
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: {
-        section: Section.CHECKPOINT_PLOTS,
-        size: PlotSizeNumber.SMALL
+        nbItemsPerRow: PlotNumberOfItemsPerRow.THREE,
+        section: Section.CHECKPOINT_PLOTS
       },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
@@ -689,8 +728,8 @@ describe('App', () => {
     pickAndMove(plotResizer, -10)
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: {
-        section: Section.CHECKPOINT_PLOTS,
-        size: PlotSizeNumber.SMALLER
+        nbItemsPerRow: PlotNumberOfItemsPerRow.FOUR,
+        section: Section.CHECKPOINT_PLOTS
       },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
@@ -707,8 +746,8 @@ describe('App', () => {
     pickAndMove(plotResizer, 10, 0, true)
     expect(mockPostMessage).not.toHaveBeenCalledWith({
       payload: {
-        section: Section.CHECKPOINT_PLOTS,
-        size: PlotSizeNumber.LARGE
+        nbItemsPerRow: PlotNumberOfItemsPerRow.ONE,
+        section: Section.CHECKPOINT_PLOTS
       },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
@@ -793,6 +832,58 @@ describe('App', () => {
       'summary.json:accuracy',
       'summary.json:val_loss',
       'summary.json:val_accuracy'
+    ])
+  })
+
+  it('should add a custom plot if a user creates a custom plot', () => {
+    renderAppWithOptionalData({
+      custom: {
+        ...customPlotsFixture,
+        plots: customPlotsFixture.plots.slice(1)
+      }
+    })
+
+    expect(
+      screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
+    ).toStrictEqual([
+      'custom-metrics:summary.json:accuracy-params:params.yaml:epochs'
+    ])
+
+    sendSetDataMessage({
+      custom: customPlotsFixture
+    })
+
+    expect(
+      screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
+    ).toStrictEqual([
+      'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
+      'custom-metrics:summary.json:loss-params:params.yaml:dropout'
+    ])
+  })
+
+  it('should remove a custom plot if a user deletes a custom plot', () => {
+    renderAppWithOptionalData({
+      custom: customPlotsFixture
+    })
+
+    expect(
+      screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
+    ).toStrictEqual([
+      'custom-metrics:summary.json:loss-params:params.yaml:dropout',
+      'custom-metrics:summary.json:accuracy-params:params.yaml:epochs'
+    ])
+
+    sendSetDataMessage({
+      custom: {
+        ...customPlotsFixture,
+        plots: customPlotsFixture.plots.slice(1)
+      }
+    })
+
+    expect(
+      screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
+    ).toStrictEqual([
+      'custom-metrics:summary.json:accuracy-params:params.yaml:epochs'
     ])
   })
 
@@ -1373,10 +1464,11 @@ describe('App', () => {
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture,
       comparison: comparisonTableFixture,
+      custom: customPlotsFixture,
       template: complexTemplatePlotsFixture
     })
 
-    const [templateInfo, comparisonInfo, checkpointInfo] =
+    const [templateInfo, comparisonInfo, checkpointInfo, customInfo] =
       screen.getAllByTestId('info-tooltip-toggle')
 
     fireEvent.mouseEnter(templateInfo, { bubbles: true })
@@ -1387,12 +1479,16 @@ describe('App', () => {
 
     fireEvent.mouseEnter(checkpointInfo, { bubbles: true })
     expect(screen.getByTestId('tooltip-checkpoint-plots')).toBeInTheDocument()
+
+    fireEvent.mouseEnter(customInfo, { bubbles: true })
+    expect(screen.getByTestId('tooltip-custom-plots')).toBeInTheDocument()
   })
 
   it('should dismiss a tooltip by pressing esc', () => {
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture,
       comparison: comparisonTableFixture,
+      custom: customPlotsFixture,
       template: complexTemplatePlotsFixture
     })
 
@@ -1442,7 +1538,7 @@ describe('App', () => {
       it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than ten large plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(11) },
-          PlotSizeNumber.LARGE,
+          PlotNumberOfItemsPerRow.ONE,
           Section.CHECKPOINT_PLOTS
         )
 
@@ -1460,7 +1556,7 @@ describe('App', () => {
       it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are ten or fewer large plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(10) },
-          PlotSizeNumber.LARGE,
+          PlotNumberOfItemsPerRow.ONE,
           Section.CHECKPOINT_PLOTS
         )
 
@@ -1478,7 +1574,7 @@ describe('App', () => {
       it('should  wrap the template plots in a big grid (virtualize them) when there are more than ten large plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(11) },
-          PlotSizeNumber.LARGE,
+          PlotNumberOfItemsPerRow.ONE,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1496,7 +1592,7 @@ describe('App', () => {
       it('should not wrap the template plots in a big grid (virtualize them) when there are ten or fewer large plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(10) },
-          PlotSizeNumber.LARGE,
+          PlotNumberOfItemsPerRow.ONE,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1518,7 +1614,7 @@ describe('App', () => {
         beforeEach(async () => {
           store = await renderAppAndChangeSize(
             { checkpoint },
-            PlotSizeNumber.LARGE,
+            PlotNumberOfItemsPerRow.ONE,
             Section.CHECKPOINT_PLOTS
           )
         })
@@ -1571,7 +1667,7 @@ describe('App', () => {
       it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than fifteen regular plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(16) },
-          PlotSizeNumber.REGULAR,
+          PlotNumberOfItemsPerRow.TWO,
           Section.CHECKPOINT_PLOTS
         )
 
@@ -1581,7 +1677,7 @@ describe('App', () => {
       it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are eight or fifteen regular plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(15) },
-          PlotSizeNumber.REGULAR,
+          PlotNumberOfItemsPerRow.TWO,
           Section.CHECKPOINT_PLOTS
         )
 
@@ -1591,7 +1687,7 @@ describe('App', () => {
       it('should  wrap the template plots in a big grid (virtualize them) when there are more than fifteen regular plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(16) },
-          PlotSizeNumber.REGULAR,
+          PlotNumberOfItemsPerRow.TWO,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1601,7 +1697,7 @@ describe('App', () => {
       it('should not wrap the template plots in a big grid (virtualize them) when there are fifteen or fewer regular plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(15) },
-          PlotSizeNumber.REGULAR,
+          PlotNumberOfItemsPerRow.TWO,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1615,7 +1711,7 @@ describe('App', () => {
         beforeEach(async () => {
           store = await renderAppAndChangeSize(
             { checkpoint },
-            PlotSizeNumber.REGULAR,
+            PlotNumberOfItemsPerRow.TWO,
             Section.CHECKPOINT_PLOTS
           )
         })
@@ -1668,7 +1764,7 @@ describe('App', () => {
       it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than twenty small plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(21) },
-          PlotSizeNumber.SMALLER,
+          PlotNumberOfItemsPerRow.FOUR,
           Section.CHECKPOINT_PLOTS
         )
 
@@ -1678,7 +1774,7 @@ describe('App', () => {
       it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are twenty or fewer small plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(20) },
-          PlotSizeNumber.SMALLER,
+          PlotNumberOfItemsPerRow.FOUR,
           Section.CHECKPOINT_PLOTS
         )
 
@@ -1688,7 +1784,7 @@ describe('App', () => {
       it('should  wrap the template plots in a big grid (virtualize them) when there are more than twenty small plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(21) },
-          PlotSizeNumber.SMALLER,
+          PlotNumberOfItemsPerRow.FOUR,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1698,7 +1794,7 @@ describe('App', () => {
       it('should not wrap the template plots in a big grid (virtualize them) when there are twenty or fewer small plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(20) },
-          PlotSizeNumber.SMALLER,
+          PlotNumberOfItemsPerRow.FOUR,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1712,7 +1808,7 @@ describe('App', () => {
         beforeEach(async () => {
           store = await renderAppAndChangeSize(
             { checkpoint },
-            PlotSizeNumber.SMALLER,
+            PlotNumberOfItemsPerRow.FOUR,
             Section.CHECKPOINT_PLOTS
           )
         })

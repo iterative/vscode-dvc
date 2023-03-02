@@ -6,12 +6,14 @@ import {
   collectCheckpointPlotsData,
   collectTemplates,
   collectMetricOrder,
-  collectOverrideRevisionDetails
+  collectOverrideRevisionDetails,
+  collectCustomPlotsData
 } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import expShowFixture from '../../test/fixtures/expShow/base/output'
 import modifiedFixture from '../../test/fixtures/expShow/modified/output'
 import checkpointPlotsFixture from '../../test/fixtures/expShow/base/checkpointPlots'
+import customPlotsFixture from '../../test/fixtures/expShow/base/customPlots'
 import {
   ExperimentsOutput,
   ExperimentStatus,
@@ -26,6 +28,62 @@ import { Experiment } from '../../experiments/webview/contract'
 const logsLossPath = join('logs', 'loss.tsv')
 
 const logsLossPlot = (plotsDiffFixture[logsLossPath][0] || {}) as TemplatePlot
+
+describe('collectCustomPlotsData', () => {
+  it('should return the expected data from the text fixture', () => {
+    const data = collectCustomPlotsData(
+      [
+        {
+          metric: 'metrics:summary.json:loss',
+          param: 'params:params.yaml:dropout'
+        },
+        {
+          metric: 'metrics:summary.json:accuracy',
+          param: 'params:params.yaml:epochs'
+        }
+      ],
+      [
+        {
+          id: '12345',
+          label: '123',
+          metrics: {
+            'summary.json': {
+              accuracy: 0.4668000042438507,
+              loss: 2.0205044746398926
+            }
+          },
+          name: 'exp-e7a67',
+          params: { 'params.yaml': { dropout: 0.15, epochs: 16 } }
+        },
+        {
+          id: '12345',
+          label: '123',
+          metrics: {
+            'summary.json': {
+              accuracy: 0.3484833240509033,
+              loss: 1.9293040037155151
+            }
+          },
+          name: 'exp-83425',
+          params: { 'params.yaml': { dropout: 0.25, epochs: 10 } }
+        },
+        {
+          id: '12345',
+          label: '123',
+          metrics: {
+            'summary.json': {
+              accuracy: 0.6768440509033,
+              loss: 2.298503875732422
+            }
+          },
+          name: 'exp-f13bca',
+          params: { 'params.yaml': { dropout: 0.32, epochs: 20 } }
+        }
+      ]
+    )
+    expect(data).toStrictEqual(customPlotsFixture.plots)
+  })
+})
 
 describe('collectCheckpointPlotsData', () => {
   it('should return the expected data from the test fixture', () => {

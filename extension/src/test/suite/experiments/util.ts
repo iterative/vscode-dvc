@@ -51,6 +51,7 @@ export const buildExperiments = (
     dvcExecutor,
     dvcReader,
     dvcRunner,
+    dvcViewer,
     gitReader,
     internalCommands,
     messageSpy,
@@ -90,6 +91,7 @@ export const buildExperiments = (
     dvcExecutor,
     dvcReader,
     dvcRunner,
+    dvcViewer,
     experiments,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     experimentsModel: (experiments as any).experiments as ExperimentsModel,

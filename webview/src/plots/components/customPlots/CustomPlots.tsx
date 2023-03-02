@@ -1,60 +1,46 @@
 import React, { DragEvent, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
-import { ColorScale } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { performSimpleOrderedUpdate } from 'dvc/src/util/array'
-import { CheckpointPlot } from './CheckpointPlot'
+import { CustomPlot } from './CustomPlot'
 import styles from '../styles.module.scss'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import {
   DragDropContainer,
   WrapperProps
 } from '../../../shared/components/dragDrop/DragDropContainer'
-import { sendMessage } from '../../../shared/vscode'
 import { DropTarget } from '../DropTarget'
 import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/VirtualizedGrid'
 import { shouldUseVirtualizedGrid } from '../util'
 import { PlotsState } from '../../store'
+import { sendMessage } from '../../../shared/vscode'
 import { changeOrderWithDraggedInfo } from '../../../util/array'
-import { LoadingSection, sectionIsLoading } from '../LoadingSection'
 
-interface CheckpointPlotsProps {
+interface CustomPlotsProps {
   plotsIds: string[]
-  colors: ColorScale
 }
 
-export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
-  plotsIds,
-  colors
-}) => {
+export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
   const [order, setOrder] = useState(plotsIds)
   const { nbItemsPerRow, hasData, disabledDragPlotIds } = useSelector(
-    (state: PlotsState) => state.checkpoint
+    (state: PlotsState) => state.custom
   )
   const [onSection, setOnSection] = useState(false)
   const draggedRef = useSelector(
     (state: PlotsState) => state.dragAndDrop.draggedRef
   )
 
-  const selectedRevisions = useSelector(
-    (state: PlotsState) => state.webview.selectedRevisions
-  )
-
   useEffect(() => {
     setOrder(pastOrder => performSimpleOrderedUpdate(pastOrder, plotsIds))
   }, [plotsIds])
 
-  const setMetricOrder = (order: string[]): void => {
+  const setPlotsIdsOrder = (order: string[]): void => {
     setOrder(order)
     sendMessage({
       payload: order,
-      type: MessageFromWebviewType.REORDER_PLOTS_METRICS
+      type: MessageFromWebviewType.REORDER_PLOTS_CUSTOM
     })
-  }
-
-  if (sectionIsLoading(selectedRevisions)) {
-    return <LoadingSection />
   }
 
   if (!hasData) {
@@ -63,7 +49,7 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
 
   const items = order.map(plot => (
     <div key={plot} id={plot}>
-      <CheckpointPlot id={plot} colors={colors} />
+      <CustomPlot id={plot} />
     </div>
   ))
 
@@ -72,19 +58,19 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
     nbItemsPerRow
   )
 
-  const handleDropAtTheEnd = () => {
-    setMetricOrder(changeOrderWithDraggedInfo(order, draggedRef))
-  }
-
   const handleDragOver = (e: DragEvent) => {
     e.preventDefault()
     setOnSection(true)
   }
 
+  const handleDropAtTheEnd = () => {
+    setPlotsIdsOrder(changeOrderWithDraggedInfo(order, draggedRef))
+  }
+
   return items.length > 0 ? (
     <div
-      data-testid="checkpoint-plots"
-      id="checkpoint-plots"
+      data-testid="custom-plots"
+      id="custom-plots"
       className={cx(styles.singleViewPlotsGrid, {
         [styles.noBigGrid]: !useVirtualizedGrid
       })}
@@ -95,10 +81,10 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
     >
       <DragDropContainer
         order={order}
-        setOrder={setMetricOrder}
+        setOrder={setPlotsIdsOrder}
         disabledDropIds={disabledDragPlotIds}
         items={items}
-        group="live-plots"
+        group="custom-plots"
         dropTarget={<DropTarget />}
         wrapperComponent={
           useVirtualizedGrid
@@ -112,6 +98,6 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
       />
     </div>
   ) : (
-    <EmptyState isFullScreen={false}>No Metrics Selected</EmptyState>
+    <EmptyState isFullScreen={false}>No Plots Added</EmptyState>
   )
 }

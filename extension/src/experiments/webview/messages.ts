@@ -43,6 +43,7 @@ export class WebviewMessages {
   private readonly hasStages: () => Promise<string>
 
   private hasConfig = false
+  private hasValidDvcYaml = true
 
   private readonly addStage: () => Promise<boolean>
 
@@ -74,8 +75,11 @@ export class WebviewMessages {
     this.addStage = addStage
   }
 
-  public async changeHasConfig() {
-    this.hasConfig = !!(await this.hasStages())
+  public async changeHasConfig(update?: boolean) {
+    const stages = await this.hasStages()
+    this.hasValidDvcYaml = stages !== undefined
+    this.hasConfig = !!stages
+    update && this.sendWebviewMessage()
   }
 
   public sendWebviewMessage() {
@@ -190,6 +194,15 @@ export class WebviewMessages {
           { dvcRoot: this.dvcRoot, id: message.payload }
         )
 
+      case MessageFromWebviewType.SHOW_EXPERIMENT_LOGS:
+        return commands.executeCommand(
+          RegisteredCliCommands.EXPERIMENT_VIEW_SHOW_LOGS,
+          {
+            dvcRoot: this.dvcRoot,
+            id: message.payload
+          }
+        )
+
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
@@ -209,6 +222,7 @@ export class WebviewMessages {
       hasColumns: this.columns.hasNonDefaultColumns(),
       hasConfig: this.hasConfig,
       hasRunningExperiment: this.experiments.hasRunningExperiment(),
+      hasValidDvcYaml: this.hasValidDvcYaml,
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()
     }
@@ -216,7 +230,6 @@ export class WebviewMessages {
 
   private async addConfiguration() {
     await this.addStage()
-    await this.changeHasConfig()
   }
 
   private async setMaxTableHeadDepth() {

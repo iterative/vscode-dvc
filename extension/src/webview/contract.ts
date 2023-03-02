@@ -15,6 +15,7 @@ export enum MessageFromWebviewType {
   ADD_CONFIGURATION = 'add-configuration',
   APPLY_EXPERIMENT_TO_WORKSPACE = 'apply-experiment-to-workspace',
   ADD_STARRED_EXPERIMENT_FILTER = 'add-starred-experiment-filter',
+  ADD_CUSTOM_PLOT = 'add-custom-plot',
   CREATE_BRANCH_FROM_EXPERIMENT = 'create-branch-from-experiment',
   FOCUS_FILTERS_TREE = 'focus-filters-tree',
   FOCUS_SORTS_TREE = 'focus-sorts-tree',
@@ -28,6 +29,7 @@ export enum MessageFromWebviewType {
   REORDER_PLOTS_COMPARISON = 'reorder-plots-comparison',
   REORDER_PLOTS_COMPARISON_ROWS = 'reorder-plots-comparison-rows',
   REORDER_PLOTS_METRICS = 'reorder-plots-metrics',
+  REORDER_PLOTS_CUSTOM = 'reorder-plots-custom',
   REORDER_PLOTS_TEMPLATES = 'reorder-plots-templates',
   REFRESH_REVISION = 'refresh-revision',
   REFRESH_REVISIONS = 'refresh-revisions',
@@ -35,6 +37,7 @@ export enum MessageFromWebviewType {
   RESIZE_PLOTS = 'resize-plots',
   SAVE_STUDIO_TOKEN = 'save-studio-token',
   SHARE_EXPERIMENT_TO_STUDIO = 'share-experiment-to-studio',
+  SHOW_EXPERIMENT_LOGS = 'show-experiment-logs',
   STOP_EXPERIMENT = 'stop-experiment',
   SORT_COLUMN = 'sort-column',
   TOGGLE_EXPERIMENT = 'toggle-experiment',
@@ -50,6 +53,7 @@ export enum MessageFromWebviewType {
   SHARE_EXPERIMENT_AS_COMMIT = 'share-experiment-as-commit',
   TOGGLE_METRIC = 'toggle-metric',
   TOGGLE_PLOTS_SECTION = 'toggle-plots-section',
+  REMOVE_CUSTOM_PLOTS = 'remove-custom-plots',
   MODIFY_EXPERIMENT_PARAMS_AND_QUEUE = 'modify-experiment-params-and-queue',
   MODIFY_EXPERIMENT_PARAMS_AND_RUN = 'modify-experiment-params-and-run',
   MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN = 'modify-experiment-params-reset-and-run',
@@ -66,7 +70,11 @@ export type ColumnResizePayload = {
   id: string
   width: number
 }
-export type PlotsResizedPayload = { section: Section; size: number }
+export type PlotsResizedPayload = {
+  section: Section
+  nbItemsPerRow: number
+  height: number | undefined
+}
 export type PlotSectionRenamedPayload = {
   section: Section
   name: string
@@ -77,6 +85,9 @@ export type PlotsTemplatesReordered = {
 }[]
 
 export type MessageFromWebview =
+  | {
+      type: MessageFromWebviewType.ADD_CUSTOM_PLOT
+    }
   | {
       type: MessageFromWebviewType.REORDER_COLUMNS
       payload: string[]
@@ -136,6 +147,7 @@ export type MessageFromWebview =
       type: MessageFromWebviewType.STOP_EXPERIMENT
       payload: { id: string; executor?: string | null }[]
     }
+  | { type: MessageFromWebviewType.SHOW_EXPERIMENT_LOGS; payload: string }
   | {
       type: MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO
       payload: string
@@ -149,6 +161,9 @@ export type MessageFromWebview =
       payload: string[]
     }
   | {
+      type: MessageFromWebviewType.REMOVE_CUSTOM_PLOTS
+    }
+  | {
       type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON
       payload: string[]
     }
@@ -158,6 +173,10 @@ export type MessageFromWebview =
     }
   | {
       type: MessageFromWebviewType.REORDER_PLOTS_METRICS
+      payload: string[]
+    }
+  | {
+      type: MessageFromWebviewType.REORDER_PLOTS_CUSTOM
       payload: string[]
     }
   | {

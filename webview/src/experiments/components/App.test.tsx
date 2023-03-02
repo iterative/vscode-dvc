@@ -864,6 +864,7 @@ describe('App', () => {
       const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
       expect(itemLabels).toStrictEqual([
+        'Show Logs',
         'Apply to Workspace',
         'Create new Branch',
         'Share to Studio',
@@ -888,7 +889,7 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(11)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(12)
 
       fireEvent.click(window, { bubbles: true })
       advanceTimersByTime(100)
@@ -902,7 +903,7 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(11)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(12)
 
       const commit = getRow('main')
       fireEvent.click(commit, { bubbles: true })
@@ -917,13 +918,13 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(11)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(12)
 
       fireEvent.contextMenu(within(row).getByText('[exp-e7a67]'), {
         bubbles: true
       })
       advanceTimersByTime(200)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(11)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(12)
     })
 
     it('should present the Remove experiment option for the checkpoint tips', () => {
@@ -1493,6 +1494,28 @@ describe('App', () => {
       expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.ADD_CONFIGURATION
       })
+    })
+
+    it('should disable the button and add an error message if the dvc.yaml file contains invalid yaml', async () => {
+      renderTable()
+      setTableData({
+        ...tableDataFixture,
+        hasConfig: false,
+        hasValidDvcYaml: false
+      })
+      const addPipelineButton = await screen.findByText('Add a Pipeline Stage')
+
+      fireEvent.click(addPipelineButton)
+
+      expect(mockPostMessage).not.toHaveBeenCalledWith({
+        type: MessageFromWebviewType.ADD_CONFIGURATION
+      })
+
+      expect(
+        screen.getByText(
+          'Your dvc.yaml file should contain valid yaml before adding any pipeline stages.'
+        )
+      ).toBeInTheDocument()
     })
   })
 })

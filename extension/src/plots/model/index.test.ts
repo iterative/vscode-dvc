@@ -1,8 +1,8 @@
 import { PlotsModel } from '.'
 import {
   DEFAULT_SECTION_COLLAPSED,
-  DEFAULT_SECTION_SIZES,
-  PlotSizeNumber,
+  DEFAULT_SECTION_NB_ITEMS_PER_ROW,
+  PlotNumberOfItemsPerRow,
   Section
 } from '../webview/contract'
 import { buildMockMemento } from '../../test/util'
@@ -25,7 +25,8 @@ describe('plotsModel', () => {
   const memento = buildMockMemento({
     [PersistenceKey.PLOT_SELECTED_METRICS + exampleDvcRoot]:
       persistedSelectedMetrics,
-    [PersistenceKey.PLOT_SIZES + exampleDvcRoot]: DEFAULT_SECTION_SIZES
+    [PersistenceKey.PLOT_NB_ITEMS_PER_ROW + exampleDvcRoot]:
+      DEFAULT_SECTION_NB_ITEMS_PER_ROW
   })
   const mockedGetSelectedRevisions = jest.fn()
   const mockedGetFirstThreeColumnOrder = jest.fn()
@@ -67,28 +68,34 @@ describe('plotsModel', () => {
   })
 
   it('should change the plotSize when calling setPlotSize', () => {
-    expect(model.getPlotSize(Section.CHECKPOINT_PLOTS)).toStrictEqual(
-      PlotSizeNumber.REGULAR
+    expect(model.getNbItemsPerRow(Section.CHECKPOINT_PLOTS)).toStrictEqual(
+      PlotNumberOfItemsPerRow.TWO
     )
 
-    model.setPlotSize(Section.CHECKPOINT_PLOTS, PlotSizeNumber.LARGE)
+    model.setNbItemsPerRow(
+      Section.CHECKPOINT_PLOTS,
+      PlotNumberOfItemsPerRow.ONE
+    )
 
-    expect(model.getPlotSize(Section.CHECKPOINT_PLOTS)).toStrictEqual(
-      PlotSizeNumber.LARGE
+    expect(model.getNbItemsPerRow(Section.CHECKPOINT_PLOTS)).toStrictEqual(
+      PlotNumberOfItemsPerRow.ONE
     )
   })
 
   it('should update the persisted plot size when calling setPlotSize', () => {
     const mementoUpdateSpy = jest.spyOn(memento, 'update')
 
-    model.setPlotSize(Section.CHECKPOINT_PLOTS, PlotSizeNumber.REGULAR)
+    model.setNbItemsPerRow(
+      Section.CHECKPOINT_PLOTS,
+      PlotNumberOfItemsPerRow.TWO
+    )
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
-      PersistenceKey.PLOT_SIZES + exampleDvcRoot,
+      PersistenceKey.PLOT_NB_ITEMS_PER_ROW + exampleDvcRoot,
       {
-        ...DEFAULT_SECTION_SIZES,
-        [Section.CHECKPOINT_PLOTS]: PlotSizeNumber.REGULAR
+        ...DEFAULT_SECTION_NB_ITEMS_PER_ROW,
+        [Section.CHECKPOINT_PLOTS]: PlotNumberOfItemsPerRow.TWO
       }
     )
   })
@@ -103,6 +110,7 @@ describe('plotsModel', () => {
     const expectedSectionCollapsed = {
       [Section.CHECKPOINT_PLOTS]: true,
       [Section.TEMPLATE_PLOTS]: false,
+      [Section.CUSTOM_PLOTS]: false,
       [Section.COMPARISON_TABLE]: false
     }
 

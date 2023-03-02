@@ -8,6 +8,7 @@ import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import expShowFixtureWithoutErrors from '../../fixtures/expShow/base/noErrors'
 import checkpointPlotsFixture from '../../fixtures/expShow/base/checkpointPlots'
+import customPlotsFixture from '../../fixtures/expShow/base/customPlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
 import multiSourcePlotsDiffFixture from '../../fixtures/plotsDiff/multiSource'
 import templatePlotsFixture from '../../fixtures/plotsDiff/template'
@@ -24,7 +25,7 @@ import { dvcDemoPath } from '../../util'
 import {
   DEFAULT_SECTION_COLLAPSED,
   PlotsData as TPlotsData,
-  PlotSizeNumber,
+  PlotNumberOfItemsPerRow,
   Section,
   TemplatePlotGroup,
   TemplatePlotsData
@@ -40,6 +41,7 @@ import {
   EXPERIMENT_WORKSPACE_ID
 } from '../../../cli/dvc/contract'
 import { SelectedExperimentWithColor } from '../../../experiments/model'
+import * as customPlotQuickPickUtil from '../../../plots/model/quickPick'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -239,12 +241,15 @@ suite('Plots Test Suite', () => {
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
-      const mockSetPlotSize = stub(plotsModel, 'setPlotSize').returns(undefined)
+      const mockSetPlotSize = stub(plotsModel, 'setNbItemsPerRow').returns(
+        undefined
+      )
 
       mockMessageReceived.fire({
         payload: {
-          section: Section.TEMPLATE_PLOTS,
-          size: PlotSizeNumber.SMALL
+          height: undefined,
+          nbItemsPerRow: PlotNumberOfItemsPerRow.THREE,
+          section: Section.TEMPLATE_PLOTS
         },
         type: MessageFromWebviewType.RESIZE_PLOTS
       })
@@ -252,14 +257,14 @@ suite('Plots Test Suite', () => {
       expect(mockSetPlotSize).to.be.calledOnce
       expect(mockSetPlotSize).to.be.calledWithExactly(
         Section.TEMPLATE_PLOTS,
-        PlotSizeNumber.SMALL
+        PlotNumberOfItemsPerRow.THREE
       )
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_PLOTS_SECTION_RESIZED,
         {
-          section: Section.TEMPLATE_PLOTS,
-          size: PlotSizeNumber.SMALL
+          nbItemsPerRow: PlotNumberOfItemsPerRow.THREE,
+          section: Section.TEMPLATE_PLOTS
         },
         undefined
       )
@@ -508,6 +513,55 @@ suite('Plots Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should handle a custom plots reordered message from the webview', async () => {
+      const { plots, plotsModel, messageSpy } = await buildPlots(
+        disposable,
+        plotsDiffFixture
+      )
+
+      const webview = await plots.showWebview()
+
+      const mockNewCustomPlotsOrder = [
+        'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
+        'custom-metrics:summary.json:loss-params:params.yaml:dropout'
+      ]
+
+      stub(plotsModel, 'getCustomPlots')
+        .onFirstCall()
+        .returns(customPlotsFixture)
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockSetCustomPlotsOrder = stub(plotsModel, 'setCustomPlotsOrder')
+      mockSetCustomPlotsOrder.returns(undefined)
+
+      messageSpy.resetHistory()
+
+      mockMessageReceived.fire({
+        payload: mockNewCustomPlotsOrder,
+        type: MessageFromWebviewType.REORDER_PLOTS_CUSTOM
+      })
+
+      expect(mockSetCustomPlotsOrder).to.be.calledOnce
+      expect(mockSetCustomPlotsOrder).to.be.calledWithExactly([
+        {
+          metric: 'metrics:summary.json:accuracy',
+          param: 'params:params.yaml:epochs'
+        },
+        {
+          metric: 'metrics:summary.json:loss',
+          param: 'params:params.yaml:dropout'
+        }
+      ])
+      expect(messageSpy).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_REORDER_PLOTS_CUSTOM,
+        undefined,
+        undefined
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should handle a select experiments message from the webview', async () => {
       const { plots, experiments } = await buildPlots(
         disposable,
@@ -674,6 +728,7 @@ suite('Plots Test Suite', () => {
       const expectedPlotsData: TPlotsData = {
         checkpoint: checkpointPlotsFixture,
         comparison: comparisonPlotsFixture,
+        custom: { height: undefined, nbItemsPerRow: 2, plots: [] },
         hasPlots: true,
         hasUnselectedPlots: false,
         sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
@@ -798,5 +853,98 @@ suite('Plots Test Suite', () => {
         undefined
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a add custom plot message from the webview', async () => {
+      const { plots, plotsModel } = await buildPlots(
+        disposable,
+        plotsDiffFixture
+      )
+
+      const webview = await plots.showWebview()
+
+      const mockGetMetricAndParam = stub(
+        customPlotQuickPickUtil,
+        'pickMetricAndParam'
+      )
+
+      const quickPickEvent = new Promise(resolve =>
+        mockGetMetricAndParam.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve({
+            metric: 'metrics:summary.json:loss',
+            param: 'params:params.yaml:dropout'
+          })
+        })
+      )
+
+      const mockSetCustomPlotsOrder = stub(plotsModel, 'setCustomPlotsOrder')
+      mockSetCustomPlotsOrder.returns(undefined)
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({ type: MessageFromWebviewType.ADD_CUSTOM_PLOT })
+
+      await quickPickEvent
+
+      expect(mockSetCustomPlotsOrder).to.be.calledWith([
+        {
+          metric: 'metrics:summary.json:loss',
+          param: 'params:params.yaml:dropout'
+        }
+      ])
+      expect(mockSendTelemetryEvent).to.be.calledWith(
+        EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED,
+        undefined
+      )
+    })
+
+    it('should handle a remove custom plot message from the webview', async () => {
+      const { plots, plotsModel } = await buildPlots(
+        disposable,
+        plotsDiffFixture
+      )
+
+      const webview = await plots.showWebview()
+
+      const mockSelectCustomPlots = stub(
+        customPlotQuickPickUtil,
+        'pickCustomPlots'
+      )
+
+      const quickPickEvent = new Promise(resolve =>
+        mockSelectCustomPlots.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve([
+            'custom-metrics:summary.json:loss-params:params.yaml:dropout'
+          ])
+        })
+      )
+
+      stub(plotsModel, 'getCustomPlotsOrder').returns([
+        {
+          metric: 'metrics:summary.json:loss',
+          param: 'params:params.yaml:dropout'
+        }
+      ])
+
+      const mockSetCustomPlotsOrder = stub(plotsModel, 'setCustomPlotsOrder')
+      mockSetCustomPlotsOrder.returns(undefined)
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.REMOVE_CUSTOM_PLOTS
+      })
+
+      await quickPickEvent
+
+      expect(mockSetCustomPlotsOrder).to.be.calledWith([])
+      expect(mockSendTelemetryEvent).to.be.calledWith(
+        EventName.VIEWS_PLOTS_CUSTOM_PLOT_REMOVED,
+        undefined
+      )
+    })
   })
 })

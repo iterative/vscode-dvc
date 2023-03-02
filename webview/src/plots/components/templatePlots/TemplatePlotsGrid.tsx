@@ -38,13 +38,12 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
   parentDraggedOver
 }) => {
   const dispatch = useDispatch()
-  const currentSize = useSelector((state: PlotsState) => state.template.size)
   const entries = useSelector(
     (state: PlotsState) => state.template.sections[groupIndex].entries
   )
 
-  const disabledDragPlotIds = useSelector(
-    (state: PlotsState) => state.template.disabledDragPlotIds
+  const { disabledDragPlotIds, height } = useSelector(
+    (state: PlotsState) => state.template
   )
 
   const addDisabled = useCallback(
@@ -112,14 +111,15 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
               onViewReady={addEventsOnViewReady}
               changeDisabledDragIds={changeDisabledDragIds}
               changeSize={changeSize}
-              currentSnapPoint={currentSize}
+              currentSnapPoint={nbItemsPerRow}
               shouldNotResize={multiView}
               section={Section.TEMPLATE_PLOTS}
+              height={height}
             />
           </div>
         )
       }),
-    [entries, plotClassName, addEventsOnViewReady, currentSize, multiView]
+    [entries, plotClassName, addEventsOnViewReady, nbItemsPerRow, multiView]
   )
 
   return (

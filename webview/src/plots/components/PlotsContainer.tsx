@@ -18,21 +18,21 @@ import {
   ChevronDown,
   ChevronRight,
   Info,
-  Lines
+  Lines,
+  Add,
+  Trash
 } from '../../shared/components/icons'
 import { isSelecting } from '../../util/strings'
 import { isTooltip } from '../../util/helpers'
 
-export interface CommonPlotsContainerProps {
-  onResize: (size: number) => void
-}
-
-export interface PlotsContainerProps extends CommonPlotsContainerProps {
+export interface PlotsContainerProps {
   sectionCollapsed: boolean
   sectionKey: Section
   title: string
-  currentSize: number
+  nbItemsPerRow: number
   menu?: PlotsPickerProps
+  addPlotsButton?: { onClick: () => void }
+  removePlotsButton?: { onClick: () => void }
   children: React.ReactNode
 }
 
@@ -46,6 +46,13 @@ export const SectionDescription = {
         checkpoints
       </a>{' '}
       are enabled.
+    </span>
+  ),
+  // "Custom"
+  [Section.CUSTOM_PLOTS]: (
+    <span data-testid="tooltip-custom-plots">
+      Generated custom linear plots comparing chosen metrics and params in all
+      experiments in the table.
     </span>
   ),
   // "Images"
@@ -86,14 +93,16 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   sectionKey,
   title,
   children,
-  currentSize,
-  menu
+  nbItemsPerRow,
+  menu,
+  addPlotsButton,
+  removePlotsButton
 }) => {
   const open = !sectionCollapsed
 
   useEffect(() => {
     window.dispatchEvent(new Event('resize'))
-  }, [currentSize])
+  }, [nbItemsPerRow])
 
   const menuItems: IconMenuItemProps[] = []
 
@@ -102,6 +111,22 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
       icon: Lines,
       onClickNode: <PlotsPicker {...menu} />,
       tooltip: 'Select Plots'
+    })
+  }
+
+  if (addPlotsButton) {
+    menuItems.unshift({
+      icon: Add,
+      onClick: addPlotsButton.onClick,
+      tooltip: 'Add Plots'
+    })
+  }
+
+  if (removePlotsButton) {
+    menuItems.unshift({
+      icon: Trash,
+      onClick: removePlotsButton.onClick,
+      tooltip: 'Remove Plots'
     })
   }
 
@@ -152,11 +177,11 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
           <div
             className={cx({
               [styles.plotsWrapper]: sectionKey !== Section.COMPARISON_TABLE,
-              [styles.smallPlots]: currentSize === 4
+              [styles.smallPlots]: nbItemsPerRow === 4
             })}
             style={
               {
-                '--nbPerRow': currentSize
+                '--nbPerRow': nbItemsPerRow
               } as DetailedHTMLProps<
                 HTMLAttributes<HTMLDivElement>,
                 HTMLDivElement

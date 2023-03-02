@@ -8,10 +8,11 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   TemplatePlotGroup,
   TemplatePlotSection,
-  PlotSizeNumber
+  PlotNumberOfItemsPerRow
 } from 'dvc/src/plots/webview/contract'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
 import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/base/checkpointPlots'
+import customPlotsFixture from 'dvc/src/test/fixtures/expShow/base/customPlots'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template'
 import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtualization'
 import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
@@ -29,14 +30,20 @@ import { plotsReducers } from '../plots/store'
 
 const smallCheckpointPlotsFixture = {
   ...checkpointPlotsFixture,
+  nbItemsPerRow: PlotNumberOfItemsPerRow.THREE,
   plots: checkpointPlotsFixture.plots.map(plot => ({
     ...plot,
-    title: truncateVerticalTitle(plot.title, PlotSizeNumber.SMALL) as string
-  })),
-  size: PlotSizeNumber.SMALL
+    title: truncateVerticalTitle(
+      plot.title,
+      PlotNumberOfItemsPerRow.THREE
+    ) as string
+  }))
 }
 
-const manyCheckpointPlots = (length: number, size = PlotSizeNumber.REGULAR) =>
+const manyCheckpointPlots = (
+  length: number,
+  size = PlotNumberOfItemsPerRow.TWO
+) =>
   Array.from({ length }, () => checkpointPlotsFixture.plots[0]).map(
     (plot, i) => {
       const id = plot.id + i.toString()
@@ -66,6 +73,7 @@ export default {
     data: {
       checkpoint: checkpointPlotsFixture,
       comparison: comparisonPlotsFixture,
+      custom: customPlotsFixture,
       hasPlots: true,
       hasUnselectedPlots: false,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
@@ -115,12 +123,25 @@ WithCheckpointOnly.args = {
 }
 WithCheckpointOnly.parameters = DISABLE_CHROMATIC_SNAPSHOTS
 
+export const WithCustomOnly = Template.bind({})
+WithCustomOnly.args = {
+  data: {
+    custom: customPlotsFixture,
+    sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+    selectedRevisions: plotsRevisionsFixture
+  }
+}
+WithCustomOnly.parameters = DISABLE_CHROMATIC_SNAPSHOTS
+
 export const WithTemplateOnly = Template.bind({})
 WithTemplateOnly.args = {
   data: {
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
     selectedRevisions: plotsRevisionsFixture,
-    template: { ...templatePlotsFixture, size: PlotSizeNumber.REGULAR }
+    template: {
+      ...templatePlotsFixture,
+      nbItemsPerRow: PlotNumberOfItemsPerRow.TWO
+    }
   }
 }
 WithTemplateOnly.parameters = DISABLE_CHROMATIC_SNAPSHOTS
@@ -172,11 +193,24 @@ WithoutData.args = {
 export const AllLarge = Template.bind({})
 AllLarge.args = {
   data: {
-    checkpoint: { ...checkpointPlotsFixture, size: PlotSizeNumber.LARGE },
-    comparison: { ...comparisonPlotsFixture, size: PlotSizeNumber.LARGE },
+    checkpoint: {
+      ...checkpointPlotsFixture,
+      nbItemsPerRow: PlotNumberOfItemsPerRow.ONE
+    },
+    comparison: {
+      ...comparisonPlotsFixture,
+      nbItemsPerRow: PlotNumberOfItemsPerRow.ONE
+    },
+    custom: {
+      ...customPlotsFixture,
+      nbItemsPerRow: PlotNumberOfItemsPerRow.ONE
+    },
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
     selectedRevisions: plotsRevisionsFixture,
-    template: { ...templatePlotsFixture, size: PlotSizeNumber.LARGE }
+    template: {
+      ...templatePlotsFixture,
+      nbItemsPerRow: PlotNumberOfItemsPerRow.ONE
+    }
   }
 }
 AllLarge.parameters = CHROMATIC_VIEWPORTS
@@ -185,10 +219,20 @@ export const AllSmall = Template.bind({})
 AllSmall.args = {
   data: {
     checkpoint: smallCheckpointPlotsFixture,
-    comparison: { ...comparisonPlotsFixture, size: PlotSizeNumber.SMALL },
+    comparison: {
+      ...comparisonPlotsFixture,
+      nbItemsPerRow: PlotNumberOfItemsPerRow.THREE
+    },
+    custom: {
+      ...customPlotsFixture,
+      nbItemsPerRow: PlotNumberOfItemsPerRow.THREE
+    },
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
     selectedRevisions: plotsRevisionsFixture,
-    template: { ...templatePlotsFixture, size: PlotSizeNumber.SMALL }
+    template: {
+      ...templatePlotsFixture,
+      nbItemsPerRow: PlotNumberOfItemsPerRow.THREE
+    }
   }
 }
 AllSmall.parameters = CHROMATIC_VIEWPORTS
@@ -202,6 +246,7 @@ VirtualizedPlots.args = {
       selectedMetrics: manyCheckpointPlotsFixture.map(plot => plot.id)
     },
     comparison: undefined,
+    custom: customPlotsFixture,
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
     selectedRevisions: plotsRevisionsFixture,
     template: manyTemplatePlots(125)
@@ -269,6 +314,7 @@ ScrolledWithManyRevisions.args = {
   data: {
     checkpoint: checkpointPlotsFixture,
     comparison: comparisonPlotsFixture,
+    custom: customPlotsFixture,
     hasPlots: true,
     hasUnselectedPlots: false,
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,

@@ -25,7 +25,7 @@ import {
 } from 'vega-lite/build/src/spec/repeat'
 import { TopLevelUnitSpec } from 'vega-lite/build/src/spec/unit'
 import isEqual from 'lodash.isequal'
-import { ColorScale, PlotSizeNumber } from '../webview/contract'
+import { ColorScale, PlotNumberOfItemsPerRow } from '../webview/contract'
 import { ShapeEncoding, StrokeDashEncoding } from '../multiSource/constants'
 import { Color } from '../../experiments/model/status/colors'
 
@@ -220,10 +220,10 @@ const truncateTitleAsArrayOrString = (title: Text, size: number) => {
 }
 
 const TitleLimit = {
-  [PlotSizeNumber.LARGE]: 50,
-  [PlotSizeNumber.REGULAR]: 50,
-  [PlotSizeNumber.SMALL]: 30,
-  [PlotSizeNumber.SMALLER]: 30
+  [PlotNumberOfItemsPerRow.ONE]: 50,
+  [PlotNumberOfItemsPerRow.TWO]: 50,
+  [PlotNumberOfItemsPerRow.THREE]: 30,
+  [PlotNumberOfItemsPerRow.FOUR]: 30
 }
 
 const truncateTitlePart = (

@@ -21,8 +21,9 @@ interface ZoomablePlotProps {
   id: string
   onViewReady?: () => void
   changeDisabledDragIds: (ids: string[]) => AnyAction
-  changeSize: (size: number) => AnyAction
+  changeSize: (nbItemsPerRow: number) => AnyAction
   currentSnapPoint: number
+  height: number | undefined
   section: Section
   shouldNotResize?: boolean
 }
@@ -35,7 +36,8 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   changeSize,
   currentSnapPoint,
   section,
-  shouldNotResize
+  shouldNotResize,
+  height
 }) => {
   const snapPoints = useSelector(
     (state: PlotsState) => state.webview.snapPoints
@@ -77,7 +79,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
     (newSnapPoint: number) => {
       dispatch(changeSize(newSnapPoint))
       sendMessage({
-        payload: { section, size: newSnapPoint },
+        payload: { height: undefined, nbItemsPerRow: newSnapPoint, section },
         type: MessageFromWebviewType.RESIZE_PLOTS
       })
     },
@@ -107,6 +109,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
         [styles.plotExpanding]: isExpanding
       })}
       onClick={handleOnClick}
+      style={{ height: height || (currentSnapPoint * 5) / 9 }}
     >
       <GripIcon className={styles.plotGripIcon} />
       {currentPlotProps.current && (

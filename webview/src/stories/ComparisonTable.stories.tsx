@@ -2,12 +2,12 @@
 import { Meta, Story } from '@storybook/react/types-6-0'
 import { configureStore } from '@reduxjs/toolkit'
 import { userEvent, within } from '@storybook/testing-library'
-import React, { DetailedHTMLProps, HTMLAttributes } from 'react'
+import React from 'react'
 import { Provider, useDispatch } from 'react-redux'
 import {
   ComparisonRevisionData,
   PlotsComparisonData,
-  PlotSizeNumber
+  PlotNumberOfItemsPerRow
 } from 'dvc/src/plots/webview/contract'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
@@ -43,22 +43,14 @@ const Template: Story = ({ plots, revisions }) => {
     <Provider store={store}>
       <MockedState
         data={{
+          height: undefined,
+          nbItemsPerRow: PlotNumberOfItemsPerRow.TWO,
           plots,
-          revisions,
-          size: PlotSizeNumber.REGULAR
+          revisions
         }}
       >
         <WebviewWrapper>
-          <div
-            style={
-              { '--size': `${PlotSizeNumber.REGULAR}px` } as DetailedHTMLProps<
-                HTMLAttributes<HTMLDivElement>,
-                HTMLDivElement
-              >
-            }
-          >
-            <ComparisonTable />
-          </div>
+          <ComparisonTable />
         </WebviewWrapper>
       </MockedState>
     </Provider>
