@@ -263,6 +263,7 @@ suite('Plots Test Suite', () => {
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_PLOTS_SECTION_RESIZED,
         {
+          height: undefined,
           nbItemsPerRow: PlotNumberOfItemsPerRow.THREE,
           section: Section.TEMPLATE_PLOTS
         },
