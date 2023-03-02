@@ -47,6 +47,10 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
     return <EmptyState isFullScreen={false}>No Plots to Display</EmptyState>
   }
 
+  if (order.length === 0) {
+    return <EmptyState isFullScreen={false}>No Plots Added</EmptyState>
+  }
+
   const items = order.map(plot => (
     <div key={plot} id={plot}>
       <CustomPlot id={plot} />
@@ -66,8 +70,7 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
   const handleDropAtTheEnd = () => {
     setPlotsIdsOrder(changeOrderWithDraggedInfo(order, draggedRef))
   }
-
-  return items.length > 0 ? (
+  return (
     <div
       data-testid="custom-plots"
       id="custom-plots"
@@ -97,7 +100,5 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
         parentDraggedOver={onSection}
       />
     </div>
-  ) : (
-    <EmptyState isFullScreen={false}>No Plots Added</EmptyState>
   )
 }

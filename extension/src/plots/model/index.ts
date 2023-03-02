@@ -194,9 +194,14 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public recreateCustomPlots() {
+    const experiments = this.experiments.getExperiments()
+    if (experiments.length === 0) {
+      this.customPlots = undefined
+      return
+    }
     const customPlots: CustomPlotData[] = collectCustomPlotsData(
       this.getCustomPlotsOrder(),
-      this.experiments.getExperiments()
+      experiments
     )
     this.customPlots = customPlots
   }

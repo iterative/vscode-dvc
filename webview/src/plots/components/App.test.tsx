@@ -377,21 +377,18 @@ describe('App', () => {
     expect(screen.getAllByText('No Plots to Display')).toHaveLength(2)
   })
 
-  it('should render other sections given a message with only custom plots data', () => {
+  it('should render an empty state given a message with only custom plots data', () => {
     renderAppWithOptionalData({
       custom: customPlotsFixture
     })
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
-    expect(screen.getByText('Trends')).toBeInTheDocument()
-    expect(screen.getByText('Data Series')).toBeInTheDocument()
-    expect(screen.getByText('Images')).toBeInTheDocument()
-    expect(screen.getByText('Custom')).toBeInTheDocument()
-    expect(screen.getAllByText('No Plots to Display')).toHaveLength(2)
-    expect(screen.getByText('No Images to Compare')).toBeInTheDocument()
+    const addExperimentsButton = screen.queryByText('Add Experiments')
+
+    expect(addExperimentsButton).toBeInTheDocument()
   })
 
-  it('should render custom even when there is no custom plots data', () => {
+  it('should render custom with "No Plots to Display" message when there is no custom plots data', () => {
     renderAppWithOptionalData({
       comparison: comparisonTableFixture
     })
@@ -399,6 +396,21 @@ describe('App', () => {
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
     expect(screen.getByText('Custom')).toBeInTheDocument()
     expect(screen.getAllByText('No Plots to Display')).toHaveLength(3)
+  })
+
+  it('should render custom with "No Plots Added" message when there are no plots added', () => {
+    renderAppWithOptionalData({
+      comparison: comparisonTableFixture,
+      custom: {
+        ...customPlotsFixture,
+        plots: []
+      }
+    })
+
+    expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
+    expect(screen.getByText('Custom')).toBeInTheDocument()
+    expect(screen.getAllByText('No Plots to Display')).toHaveLength(2)
+    expect(screen.getByText('No Plots Added')).toBeInTheDocument()
   })
 
   it('should render the comparison table when given a message with comparison plots data', () => {
@@ -836,6 +848,7 @@ describe('App', () => {
 
   it('should add a custom plot if a user creates a custom plot', () => {
     renderAppWithOptionalData({
+      comparison: comparisonTableFixture,
       custom: {
         ...customPlotsFixture,
         plots: customPlotsFixture.plots.slice(1)
@@ -862,6 +875,7 @@ describe('App', () => {
 
   it('should remove a custom plot if a user deletes a custom plot', () => {
     renderAppWithOptionalData({
+      comparison: comparisonTableFixture,
       custom: customPlotsFixture
     })
 
