@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
   CustomPlotsData,
+  DEFAULT_HEIGHT,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NB_ITEMS_PER_ROW,
   Section
@@ -18,6 +19,7 @@ export interface CustomPlotsState extends Omit<CustomPlotsData, 'plots'> {
 export const customPlotsInitialState: CustomPlotsState = {
   disabledDragPlotIds: [],
   hasData: false,
+  height: DEFAULT_HEIGHT[Section.CUSTOM_PLOTS],
   isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.CUSTOM_PLOTS],
   nbItemsPerRow: DEFAULT_SECTION_NB_ITEMS_PER_ROW[Section.CUSTOM_PLOTS],
   plotsIds: [],

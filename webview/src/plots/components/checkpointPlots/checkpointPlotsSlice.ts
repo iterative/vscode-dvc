@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
   CheckpointPlotsData,
+  DEFAULT_HEIGHT,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NB_ITEMS_PER_ROW,
   Section
@@ -20,6 +21,7 @@ export const checkpointPlotsInitialState: CheckpointPlotsState = {
   colors: { domain: [], range: [] },
   disabledDragPlotIds: [],
   hasData: false,
+  height: DEFAULT_HEIGHT[Section.CHECKPOINT_PLOTS],
   isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.CHECKPOINT_PLOTS],
   nbItemsPerRow: DEFAULT_SECTION_NB_ITEMS_PER_ROW[Section.CHECKPOINT_PLOTS],
   plotsIds: [],

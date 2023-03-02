@@ -70,7 +70,11 @@ export type ColumnResizePayload = {
   id: string
   width: number
 }
-export type PlotsResizedPayload = { section: Section; nbItemsPerRow: number }
+export type PlotsResizedPayload = {
+  section: Section
+  nbItemsPerRow: number
+  height: number | undefined
+}
 export type PlotSectionRenamedPayload = {
   section: Section
   name: string

@@ -660,12 +660,14 @@ export const getRevisions = (): Revision[] => {
 export const getMinimalWebviewMessage = () => ({
   plots: extendedSpecs(basicVega),
   nbItemsPerRow: PlotNumberOfItemsPerRow.TWO,
+  height: undefined,
   revisions: getRevisions()
 })
 
 export const getTemplateWebviewMessage = (): TemplatePlotsData => ({
   plots: extendedSpecs({ ...basicVega, ...require('./vega').default }),
-  nbItemsPerRow: PlotNumberOfItemsPerRow.TWO
+  nbItemsPerRow: PlotNumberOfItemsPerRow.TWO,
+  height: undefined
 })
 
 export const getManyTemplatePlotsWebviewMessage = (
@@ -674,7 +676,8 @@ export const getManyTemplatePlotsWebviewMessage = (
   plots: extendedSpecs({
     ...multipleVega(length)
   }),
-  nbItemsPerRow: PlotNumberOfItemsPerRow.TWO
+  nbItemsPerRow: PlotNumberOfItemsPerRow.TWO,
+  height: undefined
 })
 
 export const MOCK_IMAGE_MTIME = 946684800000
@@ -700,6 +703,7 @@ export const getComparisonWebviewMessage = (
   return {
     revisions: getRevisions(),
     plots: plotAcc,
-    nbItemsPerRow: PlotNumberOfItemsPerRow.TWO
+    nbItemsPerRow: PlotNumberOfItemsPerRow.TWO,
+    height: undefined
   }
 }
