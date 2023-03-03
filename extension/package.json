@@ -1343,6 +1343,11 @@
           "when": "true"
         },
         {
+          "id": "dvc.views.studio",
+          "name": "Studio",
+          "when": "true"
+        },
+        {
           "id": "dvc.views.experimentsColumnsTree",
           "name": "Columns",
           "when": "dvc.commands.available && dvc.project.available"
@@ -1376,17 +1381,22 @@
     "viewsWelcome": [
       {
         "view": "dvc.views.actions",
-        "contents": "[$(beaker) Show Experiments](command:dvc.showExperiments)\n[$(graph-scatter) Show Plots](command:dvc.showPlots)\n",
-        "when": "true"
+        "contents": "[$(beaker) Show Experiments](command:dvc.showExperiments)\n[$(graph-scatter) Show Plots](command:dvc.showPlots)\n[$(play) Run Experiment](command:dvc.runExperiment)",
+        "when": "!dvc.experiment.checkpoints"
       },
       {
         "view": "dvc.views.actions",
-        "contents": "[$(plug) Connect Studio](command:dvc.showConnect)",
+        "contents": "[$(beaker) Show Experiments](command:dvc.showExperiments)\n[$(graph-scatter) Show Plots](command:dvc.showPlots)\n[$(play) Run Experiment](command:dvc.resetAndRunCheckpointExperiment)",
+        "when": "dvc.experiment.checkpoints"
+      },
+      {
+        "view": "dvc.views.studio",
+        "contents": "[$(plug) Connect](command:dvc.showConnect)",
         "when": "!dvc.studio.connected"
       },
       {
-        "view": "dvc.views.actions",
-        "contents": "[$(settings-gear) Open Studio Settings](command:dvc.showConnect)",
+        "view": "dvc.views.studio",
+        "contents": "[$(settings-gear) Open Settings](command:dvc.showConnect)",
         "when": "dvc.studio.connected"
       },
       {
