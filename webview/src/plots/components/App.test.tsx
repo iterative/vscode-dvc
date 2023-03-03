@@ -690,7 +690,7 @@ describe('App', () => {
       checkpoint: checkpointPlotsFixture
     })
 
-    const plotResizer = screen.getAllByTestId('vertical-plot-resizer')[0]
+    const plotResizer = screen.getAllByTestId('plot-resizer')[0]
 
     setWrapperSize(store)
     pickAndMove(plotResizer, 10)
@@ -740,7 +740,7 @@ describe('App', () => {
       checkpoint: checkpointPlotsFixture
     })
 
-    const plotResizer = screen.getAllByTestId('vertical-plot-resizer')[0]
+    const plotResizer = screen.getAllByTestId('plot-resizer')[0]
 
     setWrapperSize(store)
     pickAndMove(plotResizer, 10, 0, true)

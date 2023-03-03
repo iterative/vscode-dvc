@@ -21,7 +21,10 @@ interface ZoomablePlotProps {
   id: string
   onViewReady?: () => void
   changeDisabledDragIds: (ids: string[]) => AnyAction
-  changeSize: (nbItemsPerRow: number) => AnyAction
+  changeSize: (payload: {
+    nbItemsPerRow: number
+    height: number | undefined
+  }) => AnyAction
   currentSnapPoint: number
   height: number | undefined
   section: Section
@@ -49,6 +52,8 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   const enableClickTimeout = useRef(0)
   const [isExpanding, setIsExpanding] = useState(false)
   const size = snapPoints[currentSnapPoint - 1]
+  const [plotHeight, setPlotHeight] = useState<number | undefined>(height)
+  const [projectedHeight, setProjectedHeight] = useState(plotHeight)
 
   const plotProps: VegaLiteProps = {
     actions: false,
@@ -72,44 +77,57 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
     }
   }, [])
 
+  useEffect(() => {
+    if (height) {
+      setPlotHeight(height)
+    }
+  }, [height])
+
   const handleOnClick = () =>
     !clickDisabled.current && dispatch(setZoomedInPlot({ id, plot: plotProps }))
 
   const onResize = useCallback(
-    (newSnapPoint: number) => {
-      dispatch(changeSize(newSnapPoint))
+    (nbItemsPerRow: number, height: number) => {
+      dispatch(changeSize({ height, nbItemsPerRow }))
       sendMessage({
-        payload: { height: undefined, nbItemsPerRow: newSnapPoint, section },
+        payload: { height, nbItemsPerRow, section },
         type: MessageFromWebviewType.RESIZE_PLOTS
       })
     },
     [dispatch, changeSize, section]
   )
 
-  const commonResizerProps = {
-    onGrab: () => {
-      clickDisabled.current = true
-      dispatch(changeDisabledDragIds([id]))
-    },
-    onRelease: () => {
-      dispatch(changeDisabledDragIds([]))
-      enableClickTimeout.current = window.setTimeout(
-        () => (clickDisabled.current = false),
-        0
-      )
-    },
-    onResize
-  }
+  const startResizing = useCallback(() => {
+    clickDisabled.current = true
+    dispatch(changeDisabledDragIds([id]))
+  }, [dispatch, changeDisabledDragIds, id])
+
+  const resetResizing = useCallback(() => {
+    dispatch(changeDisabledDragIds([]))
+    enableClickTimeout.current = window.setTimeout(
+      () => (clickDisabled.current = false),
+      0
+    )
+  }, [dispatch, changeDisabledDragIds])
+
   if (!data && !spec) {
     return null
   }
+
   return (
     <button
       className={cx(styles.zoomablePlot, {
         [styles.plotExpanding]: isExpanding
       })}
       onClick={handleOnClick}
-      style={{ height: height || (currentSnapPoint * 5) / 9 }}
+      style={{
+        height: shouldNotResize ? undefined : plotHeight
+      }}
+      ref={(node: HTMLButtonElement) =>
+        !height &&
+        node &&
+        setPlotHeight((node.getBoundingClientRect().width * 5) / 9)
+      }
     >
       <GripIcon className={styles.plotGripIcon} />
       {currentPlotProps.current && (
@@ -117,14 +135,21 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
       )}
       {!shouldNotResize && (
         <Resizer
-          className={styles.plotVerticalResizer}
-          {...commonResizerProps}
+          onGrab={startResizing}
+          onRelease={resetResizing}
+          onResize={onResize}
           snapPoints={snapPoints}
           currentSnapPoint={currentSnapPoint}
-          sizeBetweenResizers={size} // 20 is the $gap set in styles.module.scss
+          sizeBetweenResizers={size}
           setIsExpanding={setIsExpanding}
+          height={plotHeight}
+          setProjectedHeight={setProjectedHeight}
         />
       )}
+      <span
+        className={styles.plotExpandingBorders}
+        style={{ height: projectedHeight }}
+      />
     </button>
   )
 }

@@ -119,7 +119,14 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
           </div>
         )
       }),
-    [entries, plotClassName, addEventsOnViewReady, nbItemsPerRow, multiView]
+    [
+      entries,
+      plotClassName,
+      addEventsOnViewReady,
+      nbItemsPerRow,
+      multiView,
+      height
+    ]
   )
 
   return (

@@ -35,8 +35,15 @@ export const templatePlotsSlice = createSlice({
     changeDisabledDragIds: (state, action: PayloadAction<string[]>) => {
       state.disabledDragPlotIds = action.payload
     },
-    changeSize: (state, action: PayloadAction<number>) => {
-      state.nbItemsPerRow = action.payload
+    changeSize: (
+      state,
+      action: PayloadAction<{
+        nbItemsPerRow: number
+        height: number | undefined
+      }>
+    ) => {
+      state.nbItemsPerRow = action.payload.nbItemsPerRow
+      state.height = action.payload.height
     },
     setCollapsed: (state, action: PayloadAction<boolean>) => {
       state.isCollapsed = action.payload
@@ -59,6 +66,7 @@ export const templatePlotsSlice = createSlice({
       return {
         ...state,
         hasData: !!action.payload,
+        height: action.payload.height,
         nbItemsPerRow: action.payload.nbItemsPerRow,
         plotsSnapshots: snapShots,
         sections:

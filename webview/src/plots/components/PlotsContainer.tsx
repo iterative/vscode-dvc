@@ -30,6 +30,7 @@ export interface PlotsContainerProps {
   sectionKey: Section
   title: string
   nbItemsPerRow: number
+  height: number | undefined
   menu?: PlotsPickerProps
   addPlotsButton?: { onClick: () => void }
   removePlotsButton?: { onClick: () => void }
@@ -94,6 +95,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   title,
   children,
   nbItemsPerRow,
+  height,
   menu,
   addPlotsButton,
   removePlotsButton
@@ -102,7 +104,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
 
   useEffect(() => {
     window.dispatchEvent(new Event('resize'))
-  }, [nbItemsPerRow])
+  }, [nbItemsPerRow, height])
 
   const menuItems: IconMenuItemProps[] = []
 

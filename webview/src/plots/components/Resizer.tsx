@@ -1,41 +1,36 @@
-import React, {
-  createRef,
-  CSSProperties,
-  useEffect,
-  useRef,
-  useState
-} from 'react'
+import React, { CSSProperties, useEffect, useRef, useState } from 'react'
 import styles from './styles.module.scss'
 
 interface ResizerProps {
-  className: string
   onGrab: () => void
   onRelease: () => void
-  onResize: (diff: number) => void
+  onResize: (nbItemsPerRow: number, newHeight: number) => void
   snapPoints: number[]
   sizeBetweenResizers: number
   setIsExpanding: (isExpanding: boolean) => void
   currentSnapPoint: number
+  setProjectedHeight: (height: number) => void
+  height: number | undefined
 }
 
 export const Resizer: React.FC<ResizerProps> = ({
-  className,
   onGrab,
   onRelease,
   onResize,
   snapPoints,
   sizeBetweenResizers, // Plot + gap
   setIsExpanding,
-  currentSnapPoint
+  currentSnapPoint,
+  setProjectedHeight,
+  height = 0
 }) => {
   const startingPageX = useRef(0)
   const startingPageY = useRef(0)
   const [lockedX, setLockedX] = useState<number | undefined>(undefined)
   const [yPos, setyPos] = useState<number | undefined>(0)
+  const projectedHeight = useRef(0)
   const [isResizing, setIsResizing] = useState(false)
   const lockedSnapPoint = useRef(currentSnapPoint)
-  const wrapperRef = createRef<HTMLDivElement>()
-  const height = useRef(0)
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   useEffect(() => {
@@ -51,31 +46,34 @@ export const Resizer: React.FC<ResizerProps> = ({
     const handleMouseMove = (e: MouseEvent) => {
       const newDiffX = e.clientX - startingPageX.current
       const newDiffY = e.clientY - startingPageY.current
-
-      if (isResizing && newDiffX !== 0) {
-        const positionX = newDiffX + sizeBetweenResizers
-        const isShrinking = newDiffX < 0
-        if (isShrinking) {
-          for (let i = currentSnapPoint; i < snapPoints.length; i++) {
-            const snapPoint = snapPoints[i]
-            if (Math.abs(positionX) >= snapPoint) {
-              setSnapPoint(snapPoint, true)
-              break
+      if (isResizing) {
+        if (newDiffX !== 0) {
+          const positionX = newDiffX + sizeBetweenResizers
+          const isShrinking = newDiffX < 0
+          if (isShrinking) {
+            for (let i = currentSnapPoint; i < snapPoints.length; i++) {
+              const snapPoint = snapPoints[i]
+              if (Math.abs(positionX) >= snapPoint) {
+                setSnapPoint(snapPoint, true)
+                break
+              }
             }
-          }
-        } else {
-          for (let i = currentSnapPoint - 1; i >= 0; i--) {
-            const snapPoint = snapPoints[i]
-            if (positionX <= snapPoint) {
-              setSnapPoint(snapPoint)
-              break
+          } else {
+            for (let i = currentSnapPoint - 1; i >= 0; i--) {
+              const snapPoint = snapPoints[i]
+              if (positionX <= snapPoint) {
+                setSnapPoint(snapPoint)
+                break
+              }
             }
           }
         }
-      }
 
-      if (newDiffY !== 0) {
-        setyPos(newDiffY)
+        if (newDiffY !== 0) {
+          projectedHeight.current = height + newDiffY
+          setyPos(newDiffY)
+          setProjectedHeight(projectedHeight.current)
+        }
       }
     }
 
@@ -89,7 +87,9 @@ export const Resizer: React.FC<ResizerProps> = ({
     isResizing,
     snapPoints,
     setIsExpanding,
-    sizeBetweenResizers
+    sizeBetweenResizers,
+    height,
+    setProjectedHeight
   ])
 
   useEffect(() => {
@@ -113,7 +113,7 @@ export const Resizer: React.FC<ResizerProps> = ({
     const handleMouseUp = () => {
       if (isResizing) {
         setIsExpanding(false)
-        onResize(lockedSnapPoint.current)
+        onResize(lockedSnapPoint.current, projectedHeight.current)
         onRelease()
         setLockedX(undefined)
         setyPos(undefined)
@@ -142,17 +142,16 @@ export const Resizer: React.FC<ResizerProps> = ({
       }
     : {}
   if (yPos) {
-    lockedStyle.bottom = Math.max(yPos, 0)
-    lockedStyle.height = height.current + yPos
+    lockedStyle.top = -height + 5
+    lockedStyle.height = projectedHeight.current
   }
 
   return (
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div
-      className={className}
+      className={styles.plotResizer}
       onMouseDown={handleMouseDown}
-      data-testid="vertical-plot-resizer"
-      ref={node => (height.current = node?.getBoundingClientRect().height || 0)}
+      data-testid="plot-resizer"
     >
       {isResizing && (
         <div className={styles.resizerLocked} style={lockedStyle} />

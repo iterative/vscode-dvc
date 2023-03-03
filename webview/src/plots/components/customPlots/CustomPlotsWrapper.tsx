@@ -8,7 +8,7 @@ import { PlotsState } from '../../store'
 import { sendMessage } from '../../../shared/vscode'
 
 export const CustomPlotsWrapper: React.FC = () => {
-  const { plotsIds, nbItemsPerRow, isCollapsed } = useSelector(
+  const { plotsIds, nbItemsPerRow, isCollapsed, height } = useSelector(
     (state: PlotsState) => state.custom
   )
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
@@ -28,6 +28,7 @@ export const CustomPlotsWrapper: React.FC = () => {
       title="Custom"
       sectionKey={Section.CUSTOM_PLOTS}
       nbItemsPerRow={nbItemsPerRow}
+      height={height}
       sectionCollapsed={isCollapsed}
       addPlotsButton={{ onClick: addCustomPlot }}
       removePlotsButton={

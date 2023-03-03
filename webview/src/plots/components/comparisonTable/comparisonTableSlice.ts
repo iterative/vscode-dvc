@@ -32,8 +32,15 @@ export const comparisonTableSlice = createSlice({
     changeRowHeight: (state, action: PayloadAction<number>) => {
       state.rowHeight = action.payload
     },
-    changeSize: (state, action: PayloadAction<number>) => {
-      state.nbItemsPerRow = action.payload
+    changeSize: (
+      state,
+      action: PayloadAction<{
+        nbItemsPerRow: number
+        height: number | undefined
+      }>
+    ) => {
+      state.nbItemsPerRow = action.payload.nbItemsPerRow
+      state.height = action.payload.height
     },
     setCollapsed: (state, action: PayloadAction<boolean>) => {
       state.isCollapsed = action.payload

@@ -6,7 +6,7 @@ import { PlotsContainer } from '../PlotsContainer'
 import { PlotsState } from '../../store'
 
 export const ComparisonTableWrapper: React.FC = () => {
-  const { nbItemsPerRow, isCollapsed } = useSelector(
+  const { nbItemsPerRow, isCollapsed, height } = useSelector(
     (state: PlotsState) => state.comparison
   )
 
@@ -15,6 +15,7 @@ export const ComparisonTableWrapper: React.FC = () => {
       title="Images"
       sectionKey={Section.COMPARISON_TABLE}
       nbItemsPerRow={nbItemsPerRow}
+      height={height}
       sectionCollapsed={isCollapsed}
     >
       <ComparisonTable />
