@@ -6,9 +6,11 @@ import {
   ExtensionContext,
   SecretStorage,
   Uri,
+  WorkspaceConfiguration,
   commands,
   env,
-  window
+  window,
+  workspace
 } from 'vscode'
 import { Disposable } from '../../../extension'
 import {
@@ -22,6 +24,7 @@ import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { ContextKey } from '../../../vscode/context'
 import { STUDIO_ACCESS_TOKEN_KEY } from '../../../connect/token'
 import { RegisteredCommands } from '../../../commands/external'
+import { ConfigKey } from '../../../vscode/config'
 
 suite('Connect Test Suite', () => {
   const disposable = Disposable.fn()
@@ -153,6 +156,27 @@ suite('Connect Test Suite', () => {
         true
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a message to set dvc.studio.shareExperimentsLive', async () => {
+      const { connect, mockMessageReceived } = await buildConnect()
+      await connect.isReady()
+
+      const mockUpdate = stub()
+
+      stub(workspace, 'getConfiguration').returns({
+        update: mockUpdate
+      } as unknown as WorkspaceConfiguration)
+
+      mockMessageReceived.fire({
+        payload: false,
+        type: MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE
+      })
+
+      expect(mockUpdate).to.be.calledWithExactly(
+        ConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE,
+        false
+      )
+    })
 
     it('should be able to delete the Studio access token from secrets storage', async () => {
       const mockDelete = stub()

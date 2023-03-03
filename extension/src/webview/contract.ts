@@ -1,3 +1,4 @@
+import { ConnectData } from '../connect/webview/contract'
 import { SortDefinition } from '../experiments/model/sortBy'
 import { TableData } from '../experiments/webview/contract'
 import {
@@ -8,7 +9,7 @@ import {
 } from '../plots/webview/contract'
 import { SetupData } from '../setup/webview/contract'
 
-export type WebviewData = TableData | PlotsData | SetupData | {}
+export type WebviewData = TableData | PlotsData | SetupData | ConnectData
 
 export enum MessageFromWebviewType {
   INITIALIZED = 'initialized',
@@ -49,11 +50,13 @@ export enum MessageFromWebviewType {
   SELECT_PYTHON_INTERPRETER = 'select-python-interpreter',
   SET_EXPERIMENTS_FOR_PLOTS = 'set-experiments-for-plots',
   SET_EXPERIMENTS_AND_OPEN_PLOTS = 'set-experiments-and-open-plots',
+  SET_STUDIO_SHARE_EXPERIMENTS_LIVE = 'set-studio-share-experiments-live',
   SHARE_EXPERIMENT_AS_BRANCH = 'share-experiment-as-branch',
   SHARE_EXPERIMENT_AS_COMMIT = 'share-experiment-as-commit',
   TOGGLE_METRIC = 'toggle-metric',
   TOGGLE_PLOTS_SECTION = 'toggle-plots-section',
   REMOVE_CUSTOM_PLOTS = 'remove-custom-plots',
+  REMOVE_STUDIO_TOKEN = 'remove-studio-token',
   MODIFY_EXPERIMENT_PARAMS_AND_QUEUE = 'modify-experiment-params-and-queue',
   MODIFY_EXPERIMENT_PARAMS_AND_RUN = 'modify-experiment-params-and-run',
   MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN = 'modify-experiment-params-reset-and-run',
@@ -163,6 +166,7 @@ export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.REMOVE_CUSTOM_PLOTS
     }
+  | { type: MessageFromWebviewType.REMOVE_STUDIO_TOKEN }
   | {
       type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON
       payload: string[]
@@ -208,6 +212,10 @@ export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.SET_EXPERIMENTS_AND_OPEN_PLOTS
       payload: string[]
+    }
+  | {
+      type: MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE
+      payload: boolean
     }
   | {
       type: MessageFromWebviewType.SHARE_EXPERIMENT_AS_BRANCH
