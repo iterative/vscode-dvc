@@ -72,10 +72,7 @@ const Settings: React.FC<{
         </p>
         <p>
           <VSCodeCheckbox
-            onClick={() => {
-              setShareLiveToStudio(!shareLiveToStudio)
-              // send message
-            }}
+            onClick={() => setShareLiveToStudio(!shareLiveToStudio)}
             checked={shareLiveToStudio}
           >
             Share New Experiments Live
