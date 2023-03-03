@@ -46,11 +46,11 @@ export class DvcRunner extends Disposable implements ICli {
   private readonly pseudoTerminal: PseudoTerminal
   private currentProcess: Process | undefined
   private readonly config: Config
-  private readonly getStudioAccessToken: () => Promise<string | undefined>
+  private readonly getStudioAccessToken: () => Thenable<string | undefined>
 
   constructor(
     config: Config,
-    getStudioAccessToken: () => Promise<string | undefined>
+    getStudioAccessToken: () => Thenable<string | undefined>
   ) {
     super()
 
@@ -209,13 +209,14 @@ export class DvcRunner extends Disposable implements ICli {
     this.pseudoTerminal.setBlocked(true)
     this.processOutput.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
 
-    const sendLiveToStudio = this.config.sendLiveToStudio()
-    const studioAccessToken = await this.getStudioAccessToken()
+    const studioAccessToken = this.config.sendLiveToStudio()
+      ? await this.getStudioAccessToken()
+      : undefined
 
     this.currentProcess = this.createProcess({
       args,
       cwd,
-      studioAccessToken: sendLiveToStudio ? studioAccessToken : undefined
+      studioAccessToken
     })
   }
 }
