@@ -46,16 +46,15 @@ export class DvcRunner extends Disposable implements ICli {
   private readonly pseudoTerminal: PseudoTerminal
   private currentProcess: Process | undefined
   private readonly config: Config
-  private readonly getStudioAccessToken: () => Thenable<string | undefined>
+  private readonly getStudioLiveShareToken: () => string | undefined
 
   constructor(
     config: Config,
-    getStudioAccessToken: () => Thenable<string | undefined>
+    getStudioLiveShareToken: () => string | undefined
   ) {
     super()
-
     this.config = config
-    this.getStudioAccessToken = getStudioAccessToken
+    this.getStudioLiveShareToken = getStudioLiveShareToken
 
     this.processCompleted = this.dispose.track(new EventEmitter<CliResult>())
     this.onDidCompleteProcess = this.processCompleted.event
@@ -146,16 +145,8 @@ export class DvcRunner extends Disposable implements ICli {
     return this.currentProcess
   }
 
-  private createProcess({
-    cwd,
-    args,
-    studioAccessToken
-  }: {
-    cwd: string
-    args: Args
-    studioAccessToken: string | undefined
-  }): Process {
-    const options = this.getOptions(cwd, args, studioAccessToken)
+  private createProcess({ cwd, args }: { cwd: string; args: Args }): Process {
+    const options = this.getOptions(cwd, args)
     const command = getCommandString(options)
     const stopWatch = new StopWatch()
     const process = this.dispose.track(createProcess(options))
@@ -183,17 +174,15 @@ export class DvcRunner extends Disposable implements ICli {
     return process
   }
 
-  private getOptions(
-    cwd: string,
-    args: Args,
-    studioAccessToken: string | undefined
-  ) {
+  private getOptions(cwd: string, args: Args) {
     const options = getOptions(
       this.config.getPythonBinPath(),
       this.config.getCliPath(),
       cwd,
       ...args
     )
+
+    const studioAccessToken = this.getStudioLiveShareToken()
 
     if (!studioAccessToken) {
       return options
@@ -205,18 +194,13 @@ export class DvcRunner extends Disposable implements ICli {
     }
   }
 
-  private async startProcess(cwd: string, args: Args) {
+  private startProcess(cwd: string, args: Args) {
     this.pseudoTerminal.setBlocked(true)
     this.processOutput.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
 
-    const studioAccessToken = this.config.sendLiveToStudio()
-      ? await this.getStudioAccessToken()
-      : undefined
-
     this.currentProcess = this.createProcess({
       args,
-      cwd,
-      studioAccessToken
+      cwd
     })
   }
 }

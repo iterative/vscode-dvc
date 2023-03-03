@@ -83,13 +83,6 @@ export class Config extends DeferredDisposable {
     return isPythonExtensionInstalled()
   }
 
-  public sendLiveToStudio() {
-    return getConfigValue<boolean>(
-      ConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE,
-      false
-    )
-  }
-
   private async getConfigOrExtensionPythonBinPath() {
     return getConfigValue(ConfigKey.PYTHON_PATH) || (await getPythonBinPath())
   }

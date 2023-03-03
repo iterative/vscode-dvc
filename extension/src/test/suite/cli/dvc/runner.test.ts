@@ -26,13 +26,12 @@ suite('DVC Runner Test Suite', () => {
     it('should only be able to run a single command at a time', async () => {
       const mockConfig = {
         getCliPath: () => 'sleep',
-        getPythonBinPath: () => undefined,
-        sendLiveToStudio: () => false
+        getPythonBinPath: () => undefined
       } as Config
-      const mockGetStudioAccessToken = () => Promise.resolve(undefined)
+      const mockGetStudioLiveShareToken = () => undefined
 
       const dvcRunner = disposable.track(
-        new DvcRunner(mockConfig, mockGetStudioAccessToken)
+        new DvcRunner(mockConfig, mockGetStudioLiveShareToken)
       )
 
       const windowErrorMessageSpy = spy(window, 'showErrorMessage')
@@ -47,13 +46,12 @@ suite('DVC Runner Test Suite', () => {
     it('should be able to stop a started command', async () => {
       const mockConfig = {
         getCliPath: () => 'sleep',
-        getPythonBinPath: () => undefined,
-        sendLiveToStudio: () => false
+        getPythonBinPath: () => undefined
       } as Config
-      const mockGetStudioAccessToken = () => Promise.resolve(undefined)
+      const mockGetStudioLiveShareToken = () => undefined
 
       const dvcRunner = disposable.track(
-        new DvcRunner(mockConfig, mockGetStudioAccessToken)
+        new DvcRunner(mockConfig, mockGetStudioLiveShareToken)
       )
       const cwd = __dirname
 
@@ -116,13 +114,12 @@ suite('DVC Runner Test Suite', () => {
 
       const mockConfig = {
         getCliPath: () => 'echo',
-        getPythonBinPath: () => undefined,
-        sendLiveToStudio: () => false
+        getPythonBinPath: () => undefined
       } as Config
-      const mockGetStudioAccessToken = () => Promise.resolve(undefined)
+      const mockGetStudioLiveShareToken = () => undefined
 
       const dvcRunner = disposable.track(
-        new DvcRunner(mockConfig, mockGetStudioAccessToken)
+        new DvcRunner(mockConfig, mockGetStudioLiveShareToken)
       )
 
       const started = onDidStartOrCompleteProcess(dvcRunner.onDidStartProcess)
@@ -155,17 +152,16 @@ suite('DVC Runner Test Suite', () => {
 
       const mockConfig = {
         getCliPath: () => 'echo',
-        getPythonBinPath: () => undefined,
-        sendLiveToStudio: () => true
+        getPythonBinPath: () => undefined
       } as Config
-      const mockGetStudioAccessToken = stub()
+      const mockGetStudioLiveShareToken = stub()
         .onFirstCall()
-        .resolves(mockStudioAccessToken)
+        .returns(mockStudioAccessToken)
         .onSecondCall()
-        .resolves(undefined)
+        .returns(undefined)
 
       const dvcRunner = disposable.track(
-        new DvcRunner(mockConfig, mockGetStudioAccessToken)
+        new DvcRunner(mockConfig, mockGetStudioLiveShareToken)
       )
 
       await dvcRunner.runExperiment(dvcDemoPath)
