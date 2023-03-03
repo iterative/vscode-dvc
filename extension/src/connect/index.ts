@@ -63,7 +63,7 @@ export class Connect extends BaseRepository<undefined> {
   }
 
   public getStudioAccessToken() {
-    return this.getSecret(STUDIO_ACCESS_TOKEN_KEY)
+    return Promise.resolve(this.getSecret(STUDIO_ACCESS_TOKEN_KEY))
   }
 
   private handleMessageFromWebview(message: MessageFromWebview) {

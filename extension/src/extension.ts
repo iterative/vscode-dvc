@@ -96,7 +96,9 @@ export class Extension extends Disposable {
 
     this.dvcExecutor = this.dispose.track(new DvcExecutor(config))
     this.dvcReader = this.dispose.track(new DvcReader(config))
-    this.dvcRunner = this.dispose.track(new DvcRunner(config))
+    this.dvcRunner = this.dispose.track(
+      new DvcRunner(config, () => this.connect.getStudioAccessToken())
+    )
     this.dvcViewer = this.dispose.track(new DvcViewer(config))
 
     this.gitExecutor = this.dispose.track(new GitExecutor())

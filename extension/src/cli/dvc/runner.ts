@@ -46,11 +46,16 @@ export class DvcRunner extends Disposable implements ICli {
   private readonly pseudoTerminal: PseudoTerminal
   private currentProcess: Process | undefined
   private readonly config: Config
+  private readonly getStudioAccessToken: () => Promise<string | undefined>
 
-  constructor(config: Config) {
+  constructor(
+    config: Config,
+    getStudioAccessToken: () => Promise<string | undefined>
+  ) {
     super()
 
     this.config = config
+    this.getStudioAccessToken = getStudioAccessToken
 
     this.processCompleted = this.dispose.track(new EventEmitter<CliResult>())
     this.onDidCompleteProcess = this.processCompleted.event
@@ -141,8 +146,16 @@ export class DvcRunner extends Disposable implements ICli {
     return this.currentProcess
   }
 
-  private createProcess({ cwd, args }: { cwd: string; args: Args }): Process {
-    const options = this.getOptions(cwd, args)
+  private createProcess({
+    cwd,
+    args,
+    studioAccessToken
+  }: {
+    cwd: string
+    args: Args
+    studioAccessToken: string | undefined
+  }): Process {
+    const options = this.getOptions(cwd, args, studioAccessToken)
     const command = getCommandString(options)
     const stopWatch = new StopWatch()
     const process = this.dispose.track(createProcess(options))
@@ -170,21 +183,39 @@ export class DvcRunner extends Disposable implements ICli {
     return process
   }
 
-  private getOptions(cwd: string, args: Args) {
-    return getOptions(
+  private getOptions(
+    cwd: string,
+    args: Args,
+    studioAccessToken: string | undefined
+  ) {
+    const options = getOptions(
       this.config.getPythonBinPath(),
       this.config.getCliPath(),
       cwd,
       ...args
     )
+
+    if (!studioAccessToken) {
+      return options
+    }
+
+    return {
+      ...options,
+      env: { ...options.env, STUDIO_TOKEN: studioAccessToken }
+    }
   }
 
-  private startProcess(cwd: string, args: Args) {
+  private async startProcess(cwd: string, args: Args) {
     this.pseudoTerminal.setBlocked(true)
     this.processOutput.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
+
+    const sendLiveToStudio = this.config.sendLiveToStudio()
+    const studioAccessToken = await this.getStudioAccessToken()
+
     this.currentProcess = this.createProcess({
       args,
-      cwd
+      cwd,
+      studioAccessToken: sendLiveToStudio ? studioAccessToken : undefined
     })
   }
 }

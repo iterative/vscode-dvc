@@ -7,7 +7,8 @@ export enum ConfigKey {
   EXP_TABLE_HEAD_MAX_HEIGHT = 'dvc.experimentsTableHeadMaxHeight',
   FOCUSED_PROJECTS = 'dvc.focusedProjects',
   DVC_PATH = 'dvc.dvcPath',
-  PYTHON_PATH = 'dvc.pythonPath'
+  PYTHON_PATH = 'dvc.pythonPath',
+  STUDIO_SHARE_EXPERIMENTS_LIVE = 'dvc.studio.shareExperimentsLive'
 }
 
 export const getConfigValue = <T = string, D = string>(

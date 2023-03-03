@@ -598,6 +598,12 @@
           "description": "%config.pythonPath.description%",
           "type": "string",
           "default": null
+        },
+        "dvc.studio.shareExperimentsLive": {
+          "title": "%config.studio.shareExperimentsLive.title%",
+          "description": "%config.studio.shareExperimentsLive.description%",
+          "type": "boolean",
+          "default": false
         }
       }
     },
