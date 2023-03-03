@@ -553,15 +553,6 @@
     "configuration": {
       "title": "DVC",
       "properties": {
-        "dvc.focusedProjects": {
-          "description": "A subset of paths to the workspace's available DVC projects. Using this option will override project auto-discovery. Only absolute paths inside of the workspace will be included. All other DVC projects in the workspace will be ignored.",
-          "type": [
-            "string",
-            "array",
-            "null"
-          ],
-          "default": null
-        },
         "dvc.doNotRecommendRedHatExtension": {
           "description": "Do not prompt to install the Red Hat YAML extension, which helps with DVC YAML schema validation.",
           "type": "boolean",
@@ -586,6 +577,15 @@
           "description": "Maximum height of Experiment table head rows. Use 0 for infinite height.",
           "type": "number",
           "default": 5
+        },
+        "dvc.focusedProjects": {
+          "description": "A subset of paths to the workspace's available DVC projects. Using this option will override project auto-discovery. Only absolute paths inside of the workspace will be included. All other DVC projects in the workspace will be ignored.",
+          "type": [
+            "string",
+            "array",
+            "null"
+          ],
+          "default": null
         },
         "dvc.pythonPath": {
           "description": "Path to the desired Python interpreter to use with DVC. Required when using a virtual environment. Overrides any other extension's settings for this extension's purposes.",
