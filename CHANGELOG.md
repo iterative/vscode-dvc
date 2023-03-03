@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.13] - 2023-03-03
+
+### 🐛 Bug Fixes
+
+- Remove package.nls [#3390](https://github.com/iterative/vscode-dvc/pull/3390) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Rename size to nbItemsPerRow [#3376](https://github.com/iterative/vscode-dvc/pull/3376) by [@sroy3](https://github.com/sroy3)
+- Rename plot sizes pt. 2 [#3377](https://github.com/iterative/vscode-dvc/pull/3377) by [@sroy3](https://github.com/sroy3)
+- Plug in the height inside plots data [#3381](https://github.com/iterative/vscode-dvc/pull/3381) by [@sroy3](https://github.com/sroy3)
+
 ## [0.6.12] - 2023-03-01
 
 ### 🚀 New Features and Enhancements
