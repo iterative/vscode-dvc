@@ -2,8 +2,8 @@
   "name": "dvc",
   "private": true,
   "preview": false,
-  "displayName": "%displayName%",
-  "description": "%description%",
+  "displayName": "DVC",
+  "description": "Machine learning experiment management with tracking, plots, and data versioning.",
   "publisher": "iterative",
   "icon": "docs/dvc.png",
   "extensionDependencies": [
@@ -89,174 +89,174 @@
     ],
     "commands": [
       {
-        "title": "%command.addExperimentsTableFilter%",
+        "title": "Add Filter To Experiments Table",
         "command": "dvc.addExperimentsTableFilter",
         "category": "DVC",
         "icon": "$(add)"
       },
       {
-        "title": "%command.addExperimentsTableSort%",
+        "title": "Add Or Update Sort On Experiments Table",
         "command": "dvc.addExperimentsTableSort",
         "category": "DVC",
         "icon": "$(add)"
       },
       {
-        "title": "%command.addStarredExperimentsTableFilter%",
+        "title": "Filter Experiments Table to Starred",
         "command": "dvc.addStarredExperimentsTableFilter",
         "category": "DVC",
         "icon": "$(star-full)"
       },
       {
-        "title": "%command.addStarredExperimentsTableSort%",
+        "title": "Sort Experiments Table by Starred",
         "command": "dvc.addStarredExperimentsTableSort",
         "category": "DVC",
         "icon": "$(star-full)"
       },
       {
-        "title": "%command.addStudioAccessToken%",
+        "title": "Add Studio Access Token",
         "command": "dvc.addStudioAccessToken",
         "category": "DVC"
       },
       {
-        "title": "%command.addTarget%",
+        "title": "Add",
         "command": "dvc.addTarget",
         "category": "DVC",
         "icon": "$(add)"
       },
       {
-        "title": "%command.applyExperiment%",
+        "title": "Apply Experiment to Workspace",
         "command": "dvc.applyExperiment",
         "category": "DVC"
       },
       {
-        "title": "%command.branchExperiment%",
+        "title": "Create new Branch from Experiment",
         "command": "dvc.branchExperiment",
         "category": "DVC"
       },
       {
-        "title": "%command.checkout%",
+        "title": "Checkout",
         "command": "dvc.checkout",
         "category": "DVC",
         "icon": "$(discard)"
       },
       {
-        "title": "%command.checkCLICompatible%",
+        "title": "Check CLI Compatible",
         "command": "dvc.checkCLICompatible",
         "category": "DVC"
       },
       {
-        "title": "%command.checkoutTarget%",
+        "title": "Checkout",
         "command": "dvc.checkoutTarget",
         "category": "DVC",
         "icon": "$(discard)"
       },
       {
-        "title": "%command.commit%",
+        "title": "Commit",
         "command": "dvc.commit",
         "category": "DVC",
         "icon": "$(check)"
       },
       {
-        "title": "%command.commitTarget%",
+        "title": "Commit",
         "command": "dvc.commitTarget",
         "category": "DVC",
         "icon": "$(check)"
       },
       {
-        "title": "%command.compareSelected%",
+        "title": "Compare with Selected",
         "command": "dvc.compareSelected",
         "category": "DVC"
       },
       {
-        "title": "%command.copyFilePath%",
+        "title": "Copy Path",
         "command": "dvc.copyFilePath",
         "category": "DVC"
       },
       {
-        "title": "%command.copyRelativeFilePath%",
+        "title": "Copy Relative Path",
         "command": "dvc.copyRelativeFilePath",
         "category": "DVC"
       },
       {
-        "title": "%command.deleteTarget%",
+        "title": "Delete",
         "command": "dvc.deleteTarget",
         "category": "DVC",
         "icon": "$(trash)"
       },
       {
-        "title": "%command.discardWorkspaceChanges%",
+        "title": "Discard Workspace Changes",
         "command": "dvc.discardWorkspaceChanges",
         "category": "DVC",
         "icon": "$(discard)"
       },
       {
-        "title": "%command.experimentGarbageCollect%",
+        "title": "Garbage Collect Experiments",
         "command": "dvc.experimentGarbageCollect",
         "category": "DVC"
       },
       {
-        "title": "%command.findInFolder%",
+        "title": "Find in Folder...",
         "command": "dvc.findInFolder",
         "category": "DVC"
       },
       {
-        "title": "%command.getStarted%",
+        "title": "Get Started",
         "command": "dvc.getStarted",
         "category": "DVC"
       },
       {
-        "title": "%command.gitStageAll%",
+        "title": "Stage All Git Tracked",
         "command": "dvc.gitStageAll",
         "category": "DVC",
         "icon": "$(add)"
       },
       {
-        "title": "%command.gitUnstageAll%",
+        "title": "Unstage All Git Tracked",
         "command": "dvc.gitUnstageAll",
         "category": "DVC",
         "icon": "$(remove)"
       },
       {
-        "title": "%command.init%",
+        "title": "Initialize a DVC Project",
         "command": "dvc.init",
         "category": "DVC"
       },
       {
-        "title": "%command.moveTargets%",
+        "title": "Add Data",
         "command": "dvc.moveTargets",
         "category": "DVC"
       },
       {
-        "title": "%command.openToTheSide%",
+        "title": "Open to the Side",
         "command": "dvc.openToTheSide",
         "category": "DVC"
       },
       {
-        "title": "%command.pull%",
+        "title": "Pull",
         "command": "dvc.pull",
         "category": "DVC",
         "icon": "$(cloud-download)"
       },
       {
-        "title": "%command.pullTarget%",
+        "title": "Pull",
         "command": "dvc.pullTarget",
         "category": "DVC",
         "icon": "$(cloud-download)"
       },
       {
-        "title": "%command.push%",
+        "title": "Push",
         "command": "dvc.push",
         "category": "DVC",
         "icon": "$(cloud-upload)"
       },
       {
-        "title": "%command.pushTarget%",
+        "title": "Push",
         "command": "dvc.pushTarget",
         "category": "DVC",
         "icon": "$(cloud-upload)"
       },
       {
-        "title": "%command.modifyExperimentParamsAndQueue%",
+        "title": "Modify Experiment Param(s) and Queue",
         "command": "dvc.modifyExperimentParamsAndQueue",
         "category": "DVC",
         "icon": {
@@ -265,25 +265,25 @@
         }
       },
       {
-        "title": "%command.modifyExperimentParamsAndResume%",
+        "title": "Modify Experiment Param(s) and Resume",
         "command": "dvc.modifyExperimentParamsAndResume",
         "category": "DVC",
         "icon": "$(debug-continue-small)"
       },
       {
-        "title": "%command.modifyExperimentParamsAndRun%",
+        "title": "Modify Experiment Param(s) and Run",
         "command": "dvc.modifyExperimentParamsAndRun",
         "category": "DVC",
         "icon": "$(play)"
       },
       {
-        "title": "%command.modifyExperimentParamsResetAndRun%",
+        "title": "Modify Experiment Param(s) and Run",
         "command": "dvc.modifyExperimentParamsResetAndRun",
         "category": "DVC",
         "icon": "$(play)"
       },
       {
-        "title": "%command.queueExperiment%",
+        "title": "Queue Experiment",
         "command": "dvc.queueExperiment",
         "category": "DVC",
         "icon": {
@@ -292,179 +292,179 @@
         }
       },
       {
-        "title": "%command.removeExperiments%",
+        "title": "Remove Experiment(s)",
         "command": "dvc.removeExperiments",
         "category": "DVC"
       },
       {
-        "title": "%command.removeExperimentQueue%",
+        "title": "Remove All Queued Experiments",
         "command": "dvc.removeExperimentQueue",
         "category": "DVC"
       },
       {
-        "title": "%command.removeExperimentsTableFilters%",
+        "title": "Remove Filter(s) from Experiments Table",
         "command": "dvc.removeExperimentsTableFilters",
         "category": "DVC"
       },
       {
-        "title": "%command.removeExperimentsTableSorts%",
+        "title": "Remove Sort(s) from Experiments Table",
         "command": "dvc.removeExperimentsTableSorts",
         "category": "DVC",
         "icon": "$(close-all)"
       },
       {
-        "title": "%command.removeStudioAccessToken%",
+        "title": "Remove Studio Access Token",
         "command": "dvc.removeStudioAccessToken",
         "category": "DVC"
       },
       {
-        "title": "%command.removeTarget%",
+        "title": "Remove",
         "command": "dvc.removeTarget",
         "category": "DVC",
         "icon": "$(trash)"
       },
       {
-        "title": "%command.renameTarget%",
+        "title": "Rename",
         "command": "dvc.renameTarget",
         "category": "DVC"
       },
       {
-        "title": "%command.runExperiment%",
+        "title": "Run Experiment",
         "command": "dvc.runExperiment",
         "category": "DVC",
         "icon": "$(play)"
       },
       {
-        "title": "%command.resumeCheckpointExperiment%",
+        "title": "Resume Experiment",
         "command": "dvc.resumeCheckpointExperiment",
         "category": "DVC",
         "icon": "$(debug-continue-small)"
       },
       {
-        "title": "%command.startExperimentsQueue%",
+        "title": "Start Processing Queued Experiments",
         "command": "dvc.startExperimentsQueue",
         "category": "DVC",
         "icon": "$(run-all)"
       },
       {
-        "title": "%command.stopExperimentsQueue%",
+        "title": "Stop Processing Queued Experiments Gracefully (Complete Running)",
         "command": "dvc.stopExperimentsQueue",
         "category": "DVC"
       },
       {
-        "title": "%command.stopQueuedExperiments%",
+        "title": "Stop Running Queued Experiment(s)",
         "command": "dvc.stopQueuedExperiments",
         "category": "DVC"
       },
       {
-        "title": "%command.resetAndRunCheckpointExperiment%",
+        "title": "Run Experiment",
         "command": "dvc.resetAndRunCheckpointExperiment",
         "category": "DVC",
         "icon": "$(play)"
       },
       {
-        "title": "%command.selectForCompare%",
+        "title": "Select for Compare",
         "command": "dvc.selectForCompare",
         "category": "DVC"
       },
       {
-        "title": "%command.selectFocusedProjects%",
+        "title": "Select Project(s) to Focus (set dvc.focusedProjects)",
         "command": "dvc.selectFocusedProjects",
         "category": "DVC"
       },
       {
-        "title": "%command.setupWorkspace%",
+        "title": "Setup the Workspace",
         "command": "dvc.setupWorkspace",
         "category": "DVC"
       },
       {
-        "title": "%command.shareExperimentAsBranch%",
+        "title": "Share Experiment as Branch",
         "command": "dvc.shareExperimentAsBranch",
         "category": "DVC",
         "icon": "$(repo-push)"
       },
       {
-        "title": "%command.shareExperimentAsCommit%",
+        "title": "Commit and Share Experiment",
         "command": "dvc.shareExperimentAsCommit",
         "category": "DVC",
         "icon": "$(repo-push)"
       },
       {
-        "title": "%command.showCommands",
+        "title": "Show Commands",
         "command": "dvc.showCommands",
         "category": "DVC"
       },
       {
-        "title": "%command.showConnect%",
+        "title": "Connect to Studio",
         "command": "dvc.showConnect",
         "category": "DVC"
       },
       {
-        "title": "%command.showExperiments%",
+        "title": "Show Experiments",
         "command": "dvc.showExperiments",
         "category": "DVC",
         "icon": "$(beaker)"
       },
       {
-        "title": "%command.showOutput%",
+        "title": "Show DVC Output",
         "command": "dvc.showOutput",
         "category": "DVC"
       },
       {
-        "title": "%command.showPlots%",
+        "title": "Show Plots",
         "command": "dvc.showPlots",
         "category": "DVC",
         "icon": "$(graph-scatter)"
       },
       {
-        "title": "%command.showExperimentsAndPlots%",
+        "title": "Show Experiments and Plots",
         "command": "dvc.showExperimentsAndPlots",
         "category": "DVC"
       },
       {
-        "title": "%command.stopAllRunningExperiments%",
+        "title": "Stop All Running Experiments",
         "command": "dvc.stopAllRunningExperiments",
         "category": "DVC",
         "icon": "$(debug-stop)"
       },
       {
-        "title": "%command.views.experimentsFilterByTree.removeAllFilters%",
+        "title": "Remove All Filters from Experiments Table",
         "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
         "category": "DVC",
         "icon": "$(close-all)"
       },
       {
-        "title": "%command.views.experimentsFilterByTree.removeFilter%",
+        "title": "Remove Filter from Experiments Table",
         "command": "dvc.views.experimentsFilterByTree.removeFilter",
         "category": "DVC",
         "icon": "$(close)"
       },
       {
-        "title": "%command.views.experimentsSortByTree.removeAllSorts%",
+        "title": "Remove All Sorts from Experiments Table",
         "command": "dvc.views.experimentsSortByTree.removeAllSorts",
         "category": "DVC",
         "icon": "$(close-all)"
       },
       {
-        "title": "%command.views.experimentsSortByTree.removeSort%",
+        "title": "Remove Sort from Experiments Table",
         "command": "dvc.views.experimentsSortByTree.removeSort",
         "category": "DVC",
         "icon": "$(close)"
       },
       {
-        "title": "%command.views.experiments.applyExperiment%",
+        "title": "Apply to Workspace",
         "command": "dvc.views.experiments.applyExperiment",
         "category": "DVC",
         "icon": "$(merge)"
       },
       {
-        "title": "%command.views.experiments.branchExperiment%",
+        "title": "Create new Branch",
         "command": "dvc.views.experiments.branchExperiment",
         "category": "DVC",
         "icon": "$(source-control)"
       },
       {
-        "title": "%command.views.experiments.queueExperiment%",
+        "title": "Modify Param(s) and Queue",
         "command": "dvc.views.experiments.queueExperiment",
         "category": "DVC",
         "icon": {
@@ -473,78 +473,78 @@
         }
       },
       {
-        "title": "%command.views.experiments.removeExperiment%",
+        "title": "Remove",
         "command": "dvc.views.experimentsTree.removeExperiment",
         "category": "DVC",
         "icon": "$(trash)"
       },
       {
-        "title": "%command.views.experiments.removeExperiment%",
+        "title": "Remove",
         "command": "dvc.views.experiments.removeExperiment",
         "category": "DVC",
         "icon": "$(trash)"
       },
       {
-        "title": "%command.views.experiments.runExperiment%",
+        "title": "Modify Param(s) and Run",
         "command": "dvc.views.experiments.runExperiment",
         "category": "DVC",
         "icon": "$(play)"
       },
       {
-        "title": "%command.views.experiments.resumeCheckpointExperiment%",
+        "title": "Modify Param(s) and Resume",
         "command": "dvc.views.experiments.resumeCheckpointExperiment",
         "category": "DVC",
         "icon": "$(debug-continue-small)"
       },
       {
-        "title": "%command.views.experiments.resetAndRunCheckpointExperiment%",
+        "title": "Modify Param(s) and Run",
         "command": "dvc.views.experiments.resetAndRunCheckpointExperiment",
         "category": "DVC",
         "icon": "$(play)"
       },
       {
-        "title": "%command.views.experiments.shareExperimentAsBranch%",
+        "title": "Share as Branch",
         "command": "dvc.views.experiments.shareExperimentAsBranch",
         "category": "DVC",
         "icon": "$(repo-push)"
       },
       {
-        "title": "%command.views.experiments.shareExperimentAsCommit%",
+        "title": "Commit and Share",
         "command": "dvc.views.experiments.shareExperimentAsCommit",
         "category": "DVC",
         "icon": "$(repo-push)"
       },
       {
-        "title": "%command.views.experiments.shareExperimentToStudio%",
+        "title": "Share to Studio",
         "command": "dvc.views.experiments.shareExperimentToStudio",
         "category": "DVC",
         "icon": "$(repo-push)"
       },
       {
-        "title": "%command.views.experiments.showLogs%",
+        "title": "Show Logs",
         "command": "dvc.views.experiments.showLogs",
         "category": "DVC"
       },
       {
-        "title": "%command.views.experimentsTree.selectExperiments%",
+        "title": "Select Experiments to Display in Plots",
         "command": "dvc.views.experimentsTree.selectExperiments",
         "category": "DVC",
         "icon": "$(list-filter)"
       },
       {
-        "title": "%command.views.experimentsColumnsTree.selectColumns%",
+        "title": "Select Columns to Display in the Experiments Table",
         "command": "dvc.views.experimentsColumnsTree.selectColumns",
         "category": "DVC",
         "icon": "$(list-filter)"
       },
       {
-        "title": "%command.views.plotsPathsTree.selectPlots%",
+        "title": "Select Plots to Display",
         "command": "dvc.views.plotsPathsTree.selectPlots",
         "category": "DVC",
         "icon": "$(list-filter)"
       },
       {
-        "title": "%command.views.plotsPathsTree.refreshPlots%",
+        "title": "Refresh Plots for Selected Experiments",
         "command": "dvc.views.plotsPathsTree.refreshPlots",
         "category": "DVC",
         "icon": "$(refresh)"
@@ -553,9 +553,33 @@
     "configuration": {
       "title": "DVC",
       "properties": {
+        "dvc.doNotRecommendRedHatExtension": {
+          "description": "Do not prompt to install the Red Hat YAML extension, which helps with DVC YAML schema validation.",
+          "type": "boolean",
+          "default": null
+        },
+        "dvc.doNotShowCliUnavailable": {
+          "description": "Do not warn when the workspace contains a DVC project but the DVC binary is unavailable.",
+          "type": "boolean",
+          "default": null
+        },
+        "dvc.doNotShowWalkthroughAfterInstall": {
+          "description": "Do not prompt to show the Get Started page after installing. Useful for pre-configured development environments.",
+          "type": "boolean",
+          "default": null
+        },
+        "dvc.dvcPath": {
+          "description": "Path or shell command to the DVC binary. Required unless Microsoft's Python extension is installed and the `dvc` package found in its environment.",
+          "type": "string",
+          "default": null
+        },
+        "dvc.experimentsTableHeadMaxHeight": {
+          "description": "Maximum height of Experiment table head rows. Use 0 for infinite height.",
+          "type": "number",
+          "default": 5
+        },
         "dvc.focusedProjects": {
-          "title": "%config.focusedProjects.title%",
-          "description": "%config.focusedProjects.description%",
+          "description": "A subset of paths to the workspace's available DVC projects. Using this option will override project auto-discovery. Only absolute paths inside of the workspace will be included. All other DVC projects in the workspace will be ignored.",
           "type": [
             "string",
             "array",
@@ -563,39 +587,8 @@
           ],
           "default": null
         },
-        "dvc.doNotRecommendRedHatExtension": {
-          "title": "%config.doNotRecommendRedHatExtension.title%",
-          "description": "%config.doNotRecommendRedHatExtension.description%",
-          "type": "boolean",
-          "default": null
-        },
-        "dvc.doNotShowCliUnavailable": {
-          "title": "%config.doNotShowCliUnavailable.title%",
-          "description": "%config.doNotShowCliUnavailable.description%",
-          "type": "boolean",
-          "default": null
-        },
-        "dvc.doNotShowWalkthroughAfterInstall": {
-          "title": "%config.doNotShowWalkthroughAfterInstall.title%",
-          "description": "%config.doNotShowWalkthroughAfterInstall.description%",
-          "type": "boolean",
-          "default": null
-        },
-        "dvc.dvcPath": {
-          "title": "%config.dvcPath.title%",
-          "description": "%config.dvcPath.description%",
-          "type": "string",
-          "default": null
-        },
-        "dvc.experimentsTableHeadMaxHeight": {
-          "title": "%config.experimentsTableHeadMaxHeight.title%",
-          "description": "%config.experimentsTableHeadMaxHeight.description%",
-          "type": "number",
-          "default": 5
-        },
         "dvc.pythonPath": {
-          "title": "%config.pythonPath.title%",
-          "description": "%config.pythonPath.description%",
+          "description": "Path to the desired Python interpreter to use with DVC. Required when using a virtual environment. Overrides any other extension's settings for this extension's purposes.",
           "type": "string",
           "default": null
         }
