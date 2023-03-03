@@ -36,7 +36,7 @@ export class Connect extends BaseRepository<ConnectData> {
     void this.getSecret(STUDIO_ACCESS_TOKEN_KEY).then(
       async studioAccessToken => {
         this.studioAccessToken = studioAccessToken
-        await this.setContext()
+        await this.updateIsStudioConnected()
         this.deferred.resolve()
       }
     )
@@ -46,8 +46,9 @@ export class Connect extends BaseRepository<ConnectData> {
         if (e.key !== STUDIO_ACCESS_TOKEN_KEY) {
           return
         }
+
         this.studioAccessToken = await this.getSecret(STUDIO_ACCESS_TOKEN_KEY)
-        return this.setContext()
+        return this.updateIsStudioConnected()
       })
     )
 
@@ -133,17 +134,16 @@ export class Connect extends BaseRepository<ConnectData> {
     return openUrl(`${STUDIO_URL}/user/_/profile?section=accessToken`)
   }
 
-  private setContext() {
+  private updateIsStudioConnected() {
     const storedToken = this.getStudioAccessToken()
-    if (isStudioAccessToken(storedToken)) {
-      this.studioIsConnected = true
-      this.sendWebviewMessage()
-      return setContextValue(ContextKey.STUDIO_CONNECTED, true)
-    }
+    const isConnected = isStudioAccessToken(storedToken)
+    return this.setStudioIsConnected(isConnected)
+  }
 
-    this.studioIsConnected = false
+  private setStudioIsConnected(isConnected: boolean) {
+    this.studioIsConnected = isConnected
     this.sendWebviewMessage()
-    return setContextValue(ContextKey.STUDIO_CONNECTED, false)
+    return setContextValue(ContextKey.STUDIO_CONNECTED, isConnected)
   }
 
   private getSecret(key: string) {
