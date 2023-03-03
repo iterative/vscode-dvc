@@ -109,8 +109,8 @@ export const getShareExperimentAsCommitCommand =
 
 export const getShareExperimentToStudioCommand =
   (internalCommands: InternalCommands, connect: Connect) =>
-  async ({ dvcRoot, id }: { dvcRoot: string; id: string }) => {
-    const studioAccessToken = await connect.getStudioAccessToken()
+  ({ dvcRoot, id }: { dvcRoot: string; id: string }) => {
+    const studioAccessToken = connect.getStudioAccessToken()
     if (!studioAccessToken) {
       return commands.executeCommand(RegisteredCommands.CONNECT_SHOW)
     }

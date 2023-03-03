@@ -46,11 +46,15 @@ export class DvcRunner extends Disposable implements ICli {
   private readonly pseudoTerminal: PseudoTerminal
   private currentProcess: Process | undefined
   private readonly config: Config
+  private readonly getStudioLiveShareToken: () => string | undefined
 
-  constructor(config: Config) {
+  constructor(
+    config: Config,
+    getStudioLiveShareToken: () => string | undefined
+  ) {
     super()
-
     this.config = config
+    this.getStudioLiveShareToken = getStudioLiveShareToken
 
     this.processCompleted = this.dispose.track(new EventEmitter<CliResult>())
     this.onDidCompleteProcess = this.processCompleted.event
@@ -171,17 +175,29 @@ export class DvcRunner extends Disposable implements ICli {
   }
 
   private getOptions(cwd: string, args: Args) {
-    return getOptions(
+    const options = getOptions(
       this.config.getPythonBinPath(),
       this.config.getCliPath(),
       cwd,
       ...args
     )
+
+    const studioAccessToken = this.getStudioLiveShareToken()
+
+    if (!studioAccessToken) {
+      return options
+    }
+
+    return {
+      ...options,
+      env: { ...options.env, STUDIO_TOKEN: studioAccessToken }
+    }
   }
 
   private startProcess(cwd: string, args: Args) {
     this.pseudoTerminal.setBlocked(true)
     this.processOutput.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
+
     this.currentProcess = this.createProcess({
       args,
       cwd

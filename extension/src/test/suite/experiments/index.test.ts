@@ -608,7 +608,7 @@ suite('Experiments Test Suite', () => {
       const tokenAccessed = new Promise(resolve =>
         mockGetStudioAccessToken.callsFake(() => {
           resolve(undefined)
-          return Promise.resolve(undefined)
+          return undefined
         })
       )
 

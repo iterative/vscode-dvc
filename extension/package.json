@@ -591,6 +591,11 @@
           "description": "Path to the desired Python interpreter to use with DVC. Required when using a virtual environment. Overrides any other extension's settings for this extension's purposes.",
           "type": "string",
           "default": null
+        },
+        "dvc.studio.shareExperimentsLive": {
+          "description": "Automatically share all new experiment metrics and plots logged with DVCLive to Studio. This option will only take effect once Studio is connected.",
+          "type": "boolean",
+          "default": false
         }
       }
     },

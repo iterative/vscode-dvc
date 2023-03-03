@@ -14,11 +14,13 @@ import { ContextKey, setContextValue } from '../vscode/context'
 import { RegisteredCommands } from '../commands/external'
 import { Modal } from '../vscode/modal'
 import { GLOBAL_WEBVIEW_DVCROOT } from '../webview/factory'
+import { ConfigKey, getConfigValue } from '../vscode/config'
 
 export class Connect extends BaseRepository<undefined> {
   public readonly viewKey = ViewKey.CONNECT
 
   private readonly secrets: SecretStorage
+  private studioAccessToken: string | undefined = undefined
 
   constructor(context: ExtensionContext, webviewIcon: Resource) {
     super(GLOBAL_WEBVIEW_DVCROOT, webviewIcon)
@@ -31,13 +33,20 @@ export class Connect extends BaseRepository<undefined> {
       )
     )
 
-    void this.setContext().then(() => this.deferred.resolve())
+    void this.getSecret(STUDIO_ACCESS_TOKEN_KEY).then(
+      async studioAccessToken => {
+        this.studioAccessToken = studioAccessToken
+        await this.setContext()
+        this.deferred.resolve()
+      }
+    )
 
     this.dispose.track(
-      context.secrets.onDidChange(e => {
+      context.secrets.onDidChange(async e => {
         if (e.key !== STUDIO_ACCESS_TOKEN_KEY) {
           return
         }
+        this.studioAccessToken = await this.getSecret(STUDIO_ACCESS_TOKEN_KEY)
         return this.setContext()
       })
     )
@@ -62,8 +71,17 @@ export class Connect extends BaseRepository<undefined> {
     return this.storeSecret(STUDIO_ACCESS_TOKEN_KEY, token)
   }
 
+  public getStudioLiveShareToken() {
+    return getConfigValue<boolean>(
+      ConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE,
+      false
+    )
+      ? this.getStudioAccessToken()
+      : undefined
+  }
+
   public getStudioAccessToken() {
-    return this.getSecret(STUDIO_ACCESS_TOKEN_KEY)
+    return this.studioAccessToken
   }
 
   private handleMessageFromWebview(message: MessageFromWebview) {
@@ -89,8 +107,8 @@ export class Connect extends BaseRepository<undefined> {
     return openUrl(`${STUDIO_URL}/user/_/profile?section=accessToken`)
   }
 
-  private async setContext() {
-    const storedToken = await this.getStudioAccessToken()
+  private setContext() {
+    const storedToken = this.getStudioAccessToken()
     if (isStudioAccessToken(storedToken)) {
       if (this.deferred.state === 'resolved') {
         void Modal.showInformation(

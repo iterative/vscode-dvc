@@ -40,7 +40,10 @@ suite('Connect Test Suite', () => {
     const connect = disposable.track(
       new Connect(
         {
-          secrets: mockSecretStorage || { get: stub(), onDidChange: stub() }
+          secrets: mockSecretStorage || {
+            get: stub().resolves(undefined),
+            onDidChange: stub()
+          }
         } as unknown as ExtensionContext,
         resourceLocator.dvcIcon
       )
