@@ -17,13 +17,9 @@ import { PlotsState } from '../store'
 // eslint-disable-next-line sonarjs/cognitive-complexity
 const PlotsContent = () => {
   const dispatch = useDispatch()
-  const {
-    hasData,
-    hasPlots,
-    hasUnselectedPlots,
-    selectedRevisions,
-    zoomedInPlot
-  } = useSelector((state: PlotsState) => state.webview)
+  const { hasData, hasPlots, hasUnselectedPlots, zoomedInPlot } = useSelector(
+    (state: PlotsState) => state.webview
+  )
   const hasCheckpointData = useSelector(
     (state: PlotsState) => state.checkpoint.hasData
   )
@@ -33,7 +29,6 @@ const PlotsContent = () => {
   const hasTemplateData = useSelector(
     (state: PlotsState) => state.template.hasData
   )
-  const hasCustomData = useSelector((state: PlotsState) => state.custom.hasData)
   const wrapperRef = createRef<HTMLDivElement>()
 
   useLayoutEffect(() => {
@@ -54,20 +49,10 @@ const PlotsContent = () => {
     return <EmptyState>Loading Plots...</EmptyState>
   }
 
-  if (
-    !hasCheckpointData &&
-    !hasComparisonData &&
-    !hasTemplateData &&
-    !hasCustomData
-  ) {
+  if (!hasCheckpointData && !hasComparisonData && !hasTemplateData) {
     return (
       <GetStarted
-        addItems={
-          <AddPlots
-            hasUnselectedPlots={hasUnselectedPlots}
-            hasSelectedRevisions={!!selectedRevisions?.length}
-          />
-        }
+        addItems={<AddPlots hasUnselectedPlots={hasUnselectedPlots} />}
         showEmpty={!hasPlots}
         welcome={<Welcome />}
       />

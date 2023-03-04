@@ -5,7 +5,6 @@ import { StartButton } from '../../shared/components/button/StartButton'
 
 export type AddPlotsProps = {
   hasUnselectedPlots: boolean
-  hasSelectedRevisions: boolean
 }
 
 export const AddPlots: React.FC<AddPlotsProps> = ({
@@ -14,16 +13,14 @@ export const AddPlots: React.FC<AddPlotsProps> = ({
   <div>
     <p>No Plots to Display.</p>
     <div>
-      {
-        <StartButton
-          onClick={() =>
-            sendMessage({
-              type: MessageFromWebviewType.SELECT_EXPERIMENTS
-            })
-          }
-          text="Add Experiments"
-        />
-      }
+      <StartButton
+        onClick={() =>
+          sendMessage({
+            type: MessageFromWebviewType.SELECT_EXPERIMENTS
+          })
+        }
+        text="Add Experiments"
+      />
       {hasUnselectedPlots && (
         <StartButton
           isNested={hasUnselectedPlots}
