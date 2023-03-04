@@ -83,7 +83,8 @@ export class WebviewMessages {
       case MessageFromWebviewType.RESIZE_PLOTS:
         return this.setPlotSize(
           message.payload.section,
-          message.payload.nbItemsPerRow
+          message.payload.nbItemsPerRow,
+          message.payload.height
         )
       case MessageFromWebviewType.TOGGLE_PLOTS_SECTION:
         return this.setSectionCollapsed(message.payload)
@@ -119,11 +120,16 @@ export class WebviewMessages {
     this.sendCheckpointPlotsAndEvent(EventName.VIEWS_PLOTS_METRICS_SELECTED)
   }
 
-  private setPlotSize(section: Section, nbItemsPerRow: number) {
+  private setPlotSize(
+    section: Section,
+    nbItemsPerRow: number,
+    height?: number
+  ) {
     this.plots.setNbItemsPerRow(section, nbItemsPerRow)
+    this.plots.setHeight(section, height)
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_SECTION_RESIZED,
-      { nbItemsPerRow, section },
+      { height, nbItemsPerRow, section },
       undefined
     )
   }
@@ -338,6 +344,7 @@ export class WebviewMessages {
     }
 
     return {
+      height: this.plots.getHeight(Section.TEMPLATE_PLOTS),
       nbItemsPerRow: this.plots.getNbItemsPerRow(Section.TEMPLATE_PLOTS),
       plots
     }
@@ -354,6 +361,7 @@ export class WebviewMessages {
     }
 
     return {
+      height: this.plots.getHeight(Section.COMPARISON_TABLE),
       nbItemsPerRow: this.plots.getNbItemsPerRow(Section.COMPARISON_TABLE),
       plots: comparison.map(({ path, revisions }) => {
         return { path, revisions: this.getRevisionsWithCorrectUrls(revisions) }

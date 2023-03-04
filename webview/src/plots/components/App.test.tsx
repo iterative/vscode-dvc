@@ -263,6 +263,7 @@ describe('App', () => {
     renderAppWithOptionalData({
       checkpoint: null,
       comparison: {
+        height: undefined,
         nbItemsPerRow: PlotNumberOfItemsPerRow.TWO,
         plots: [
           {

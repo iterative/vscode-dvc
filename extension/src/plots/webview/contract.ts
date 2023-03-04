@@ -25,6 +25,14 @@ export const DEFAULT_SECTION_NB_ITEMS_PER_ROW = {
   [Section.CUSTOM_PLOTS]: PlotNumberOfItemsPerRow.TWO
 }
 
+// Height is undefined by default because it is calculated by ratio of the width it'll fill (calculated by the webview)
+export const DEFAULT_HEIGHT = {
+  [Section.CHECKPOINT_PLOTS]: undefined,
+  [Section.TEMPLATE_PLOTS]: undefined,
+  [Section.COMPARISON_TABLE]: undefined,
+  [Section.CUSTOM_PLOTS]: undefined
+}
+
 export const DEFAULT_SECTION_COLLAPSED = {
   [Section.CHECKPOINT_PLOTS]: false,
   [Section.TEMPLATE_PLOTS]: false,
@@ -60,6 +68,7 @@ export type Revision = {
 export interface PlotsComparisonData {
   plots: ComparisonPlots
   nbItemsPerRow: number
+  height: number | undefined
   revisions: Revision[]
 }
 
@@ -92,6 +101,7 @@ export type CustomPlotData = {
 export type CustomPlotsData = {
   plots: CustomPlotData[]
   nbItemsPerRow: number
+  height: number | undefined
 }
 
 export type CheckpointPlotData = CheckpointPlot & { title: string }
@@ -100,6 +110,7 @@ export type CheckpointPlotsData = {
   plots: CheckpointPlotData[]
   colors: ColorScale
   nbItemsPerRow: number
+  height: number | undefined
   selectedMetrics?: string[]
 }
 
@@ -148,6 +159,7 @@ export type TemplatePlotSection = {
 export interface TemplatePlotsData {
   plots: TemplatePlotSection[]
   nbItemsPerRow: number
+  height: number | undefined
 }
 
 export type ComparisonPlot = {

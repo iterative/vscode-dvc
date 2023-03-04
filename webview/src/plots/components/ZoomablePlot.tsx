@@ -77,7 +77,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
     (newSnapPoint: number) => {
       dispatch(changeSize(newSnapPoint))
       sendMessage({
-        payload: { nbItemsPerRow: newSnapPoint, section },
+        payload: { height: undefined, nbItemsPerRow: newSnapPoint, section },
         type: MessageFromWebviewType.RESIZE_PLOTS
       })
     },

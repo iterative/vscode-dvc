@@ -1,7 +1,7 @@
-import { commands, ExtensionContext, SecretStorage } from 'vscode'
+import { commands, ExtensionContext, SecretStorage, workspace } from 'vscode'
 import { validateTokenInput } from './inputBox'
 import { STUDIO_ACCESS_TOKEN_KEY, isStudioAccessToken } from './token'
-import { STUDIO_URL } from './webview/contract'
+import { ConnectData, STUDIO_URL } from './webview/contract'
 import { Resource } from '../resourceLocator'
 import { ViewKey } from '../webview/constants'
 import { MessageFromWebview, MessageFromWebviewType } from '../webview/contract'
@@ -12,13 +12,15 @@ import { Title } from '../vscode/title'
 import { openUrl } from '../vscode/external'
 import { ContextKey, setContextValue } from '../vscode/context'
 import { RegisteredCommands } from '../commands/external'
-import { Modal } from '../vscode/modal'
 import { GLOBAL_WEBVIEW_DVCROOT } from '../webview/factory'
+import { ConfigKey, getConfigValue, setConfigValue } from '../vscode/config'
 
-export class Connect extends BaseRepository<undefined> {
+export class Connect extends BaseRepository<ConnectData> {
   public readonly viewKey = ViewKey.CONNECT
 
   private readonly secrets: SecretStorage
+  private studioAccessToken: string | undefined = undefined
+  private studioIsConnected = false
 
   constructor(context: ExtensionContext, webviewIcon: Resource) {
     super(GLOBAL_WEBVIEW_DVCROOT, webviewIcon)
@@ -31,19 +33,37 @@ export class Connect extends BaseRepository<undefined> {
       )
     )
 
-    void this.setContext().then(() => this.deferred.resolve())
+    void this.getSecret(STUDIO_ACCESS_TOKEN_KEY).then(
+      async studioAccessToken => {
+        this.studioAccessToken = studioAccessToken
+        await this.updateIsStudioConnected()
+        this.deferred.resolve()
+      }
+    )
 
     this.dispose.track(
-      context.secrets.onDidChange(e => {
+      context.secrets.onDidChange(async e => {
         if (e.key !== STUDIO_ACCESS_TOKEN_KEY) {
           return
         }
-        return this.setContext()
+
+        this.studioAccessToken = await this.getSecret(STUDIO_ACCESS_TOKEN_KEY)
+        return this.updateIsStudioConnected()
+      })
+    )
+
+    this.dispose.track(
+      workspace.onDidChangeConfiguration(e => {
+        if (e.affectsConfiguration(ConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE)) {
+          this.sendWebviewMessage()
+        }
       })
     )
   }
 
-  public sendInitialWebviewData(): void {}
+  public sendInitialWebviewData() {
+    return this.sendWebviewMessage()
+  }
 
   public removeStudioAccessToken() {
     return this.removeSecret(STUDIO_ACCESS_TOKEN_KEY)
@@ -62,8 +82,24 @@ export class Connect extends BaseRepository<undefined> {
     return this.storeSecret(STUDIO_ACCESS_TOKEN_KEY, token)
   }
 
+  public getStudioLiveShareToken() {
+    return getConfigValue<boolean>(
+      ConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE,
+      false
+    )
+      ? this.getStudioAccessToken()
+      : undefined
+  }
+
   public getStudioAccessToken() {
-    return this.getSecret(STUDIO_ACCESS_TOKEN_KEY)
+    return this.studioAccessToken
+  }
+
+  private sendWebviewMessage() {
+    void this.getWebview()?.show({
+      isStudioConnected: this.studioIsConnected,
+      shareLiveToStudio: getConfigValue(ConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE)
+    })
   }
 
   private handleMessageFromWebview(message: MessageFromWebview) {
@@ -75,6 +111,15 @@ export class Connect extends BaseRepository<undefined> {
       case MessageFromWebviewType.SAVE_STUDIO_TOKEN:
         return commands.executeCommand(
           RegisteredCommands.ADD_STUDIO_ACCESS_TOKEN
+        )
+      case MessageFromWebviewType.REMOVE_STUDIO_TOKEN:
+        return commands.executeCommand(
+          RegisteredCommands.REMOVE_STUDIO_ACCESS_TOKEN
+        )
+      case MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE:
+        return setConfigValue(
+          ConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE,
+          message.payload
         )
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
@@ -89,19 +134,16 @@ export class Connect extends BaseRepository<undefined> {
     return openUrl(`${STUDIO_URL}/user/_/profile?section=accessToken`)
   }
 
-  private async setContext() {
-    const storedToken = await this.getStudioAccessToken()
-    if (isStudioAccessToken(storedToken)) {
-      if (this.deferred.state === 'resolved') {
-        void Modal.showInformation(
-          'Studio is now connected. Use the "Share to Studio" command from an experiment\'s context menu to share experiments.'
-        )
-      }
-      this.webview?.dispose()
-      return setContextValue(ContextKey.STUDIO_CONNECTED, true)
-    }
+  private updateIsStudioConnected() {
+    const storedToken = this.getStudioAccessToken()
+    const isConnected = isStudioAccessToken(storedToken)
+    return this.setStudioIsConnected(isConnected)
+  }
 
-    return setContextValue(ContextKey.STUDIO_CONNECTED, false)
+  private setStudioIsConnected(isConnected: boolean) {
+    this.studioIsConnected = isConnected
+    this.sendWebviewMessage()
+    return setContextValue(ContextKey.STUDIO_CONNECTED, isConnected)
   }
 
   private getSecret(key: string) {
