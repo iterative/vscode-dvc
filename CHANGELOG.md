@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.14] - 2023-03-05
+
+### 🐛 Bug Fixes
+
+- Revert "fix(deps): update dependency vega to v5.23.0" [#3396](https://github.com/iterative/vscode-dvc/pull/3396) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.6.13] - 2023-03-03
 
 ### 🐛 Bug Fixes
