@@ -42,11 +42,13 @@ export class DvcExecutor extends DvcCli {
   )
 
   private readonly getStudioLiveShareToken: () => string | undefined
+  private readonly getRepoUrl: (cwd: string) => Promise<string>
   private scmCommandRunning = false
 
   constructor(
     config: Config,
     getStudioLiveShareToken: () => string | undefined,
+    getRepoUrl: (cwd: string) => Promise<string>,
     emitters?: {
       processStarted: EventEmitter<CliStarted>
       processCompleted: EventEmitter<CliResult>
@@ -54,6 +56,7 @@ export class DvcExecutor extends DvcCli {
   ) {
     super(config, emitters)
     this.getStudioLiveShareToken = getStudioLiveShareToken
+    this.getRepoUrl = getRepoUrl
   }
 
   public add(cwd: string, target: string) {
@@ -155,7 +158,7 @@ export class DvcExecutor extends DvcCli {
     )
   }
 
-  public queueStart(cwd: string, jobs: string) {
+  public async queueStart(cwd: string, jobs: string) {
     const options = this.getOptions(
       cwd,
       Command.QUEUE,
@@ -164,8 +167,10 @@ export class DvcExecutor extends DvcCli {
       jobs
     )
     const studioAccessToken = this.getStudioLiveShareToken()
+    const repoUrl = studioAccessToken ? await this.getRepoUrl(cwd) : undefined
+
     return this.createBackgroundProcess(
-      addStudioAccessToken(options, studioAccessToken)
+      addStudioAccessToken(options, studioAccessToken, repoUrl)
     )
   }
 
