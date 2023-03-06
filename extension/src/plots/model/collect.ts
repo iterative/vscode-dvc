@@ -60,6 +60,7 @@ import { StrokeDashEncoding } from '../multiSource/constants'
 import { SelectedExperimentWithColor } from '../../experiments/model'
 import { Color } from '../../experiments/model/status/colors'
 import { typedValueTreeEntries } from '../../experiments/columns/collect/metricsAndParams'
+import { coerceStringNumbers } from '../../util/number'
 
 type CheckpointPlotAccumulator = {
   iterations: Record<string, number>
@@ -385,6 +386,16 @@ const collectImageData = (
   acc[label][path] = plot
 }
 
+const convertNumericValues = (
+  data: Record<string, unknown>
+): Record<string, unknown> => {
+  const acc: Record<string, unknown> = {}
+  for (const [key, value] of Object.entries(data)) {
+    acc[key] = coerceStringNumbers(value)
+  }
+  return acc
+}
+
 const collectDatapoints = (
   acc: RevisionData,
   path: string,
@@ -394,7 +405,7 @@ const collectDatapoints = (
   for (const value of values) {
     const dvc_data_version_info = getDvcDataVersionInfo(value)
     const data: { rev: string } = {
-      ...value,
+      ...convertNumericValues(value),
       ...dvc_data_version_info,
       rev
     }

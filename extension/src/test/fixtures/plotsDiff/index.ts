@@ -491,10 +491,20 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
               values:
                 expectedRevisions.flatMap(revision =>
                   originalPlot.datapoints?.[getCLICommitId(revision)].map(
-                    values => ({
-                      ...values,
-                      rev: revision
-                    })
+                    values => {
+                      const acc: Record<string, unknown> = {}
+                      for (const [key, value] of Object.entries(values)) {
+                        acc[key] =
+                          typeof value === 'string' &&
+                          !Number.isNaN(Number.parseFloat(value))
+                            ? Number.parseFloat(value)
+                            : value
+                      }
+                      return {
+                        ...acc,
+                        rev: revision
+                      }
+                    }
                   )
                 ) || []
             }
