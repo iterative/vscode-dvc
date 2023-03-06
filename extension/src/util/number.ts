@@ -24,3 +24,16 @@ export const createValidInteger = (
 
   return isValidStringInteger(input) ? Number.parseInt(input) : undefined
 }
+
+export const coerceStringNumbers = <T>(value: T): number | T => {
+  if (typeof value !== 'string' || Number.isNaN(+value)) {
+    return value
+  }
+
+  const number = Number.parseFloat(value)
+  if (Number.isNaN(number)) {
+    return value
+  }
+
+  return number
+}
