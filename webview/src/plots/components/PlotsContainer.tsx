@@ -3,8 +3,11 @@ import React, {
   MouseEvent,
   useEffect,
   DetailedHTMLProps,
-  HTMLAttributes
+  HTMLAttributes,
+  useCallback
 } from 'react'
+import { AnyAction } from '@reduxjs/toolkit'
+import { useDispatch } from 'react-redux'
 import { Section } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { PlotsPicker, PlotsPickerProps } from './PlotsPicker'
@@ -20,16 +23,19 @@ import {
   Info,
   Lines,
   Add,
-  Trash
+  Trash,
+  ArrowBoth
 } from '../../shared/components/icons'
 import { isSelecting } from '../../util/strings'
 import { isTooltip } from '../../util/helpers'
+import { SingleSelect } from '../../shared/components/selectMenu/SingleSelect'
 
 export interface PlotsContainerProps {
   sectionCollapsed: boolean
   sectionKey: Section
   title: string
   nbItemsPerRow: number
+  changeNbItemsPerRow: (nb: number) => AnyAction
   menu?: PlotsPickerProps
   addPlotsButton?: { onClick: () => void }
   removePlotsButton?: { onClick: () => void }
@@ -96,15 +102,36 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   nbItemsPerRow,
   menu,
   addPlotsButton,
-  removePlotsButton
+  removePlotsButton,
+  changeNbItemsPerRow
 }) => {
   const open = !sectionCollapsed
+  const dispatch = useDispatch()
 
   useEffect(() => {
     window.dispatchEvent(new Event('resize'))
   }, [nbItemsPerRow])
 
-  const menuItems: IconMenuItemProps[] = []
+  const menuItems: IconMenuItemProps[] = [
+    {
+      icon: ArrowBoth,
+      onClickNode: (
+        <SingleSelect
+          items={[1, 2, 3, 4].map(nb => ({
+            id: nb.toString(),
+            isSelected: nbItemsPerRow === nb,
+            label: nb.toString()
+          }))}
+          setSelected={useCallback(
+            (nb: string) =>
+              dispatch(changeNbItemsPerRow(Number.parseInt(nb, 10))),
+            [dispatch, changeNbItemsPerRow]
+          )}
+        />
+      ),
+      tooltip: 'Change the number of plots per row'
+    }
+  ]
 
   if (menu) {
     menuItems.unshift({

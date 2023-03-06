@@ -9,6 +9,7 @@ import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'
 import { Icon } from '../shared/components/Icon'
 import {
   Add,
+  ArrowBoth,
   Check,
   ChevronDown,
   ChevronRight,
@@ -48,6 +49,9 @@ const Template: Story = () => {
     <IconsWrapper>
       <IconWrapper name="Add">
         <Icon icon={Add} />
+      </IconWrapper>
+      <IconWrapper name="ArrowBoth">
+        <Icon icon={ArrowBoth} />
       </IconWrapper>
       <IconWrapper name="Check">
         <Icon icon={Check} />
