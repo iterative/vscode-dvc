@@ -1,0 +1,31 @@
+@import '../../shared/variables.scss';
+
+.iconsWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: 100%;
+}
+
+.iconWrapper {
+  padding: 5px;
+  border: 1px solid $fg-color;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 80px;
+
+  svg {
+    fill: $fg-color;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.iconTitle {
+  font-size: 0.6rem;
+  padding: 3px;
+}
