@@ -1,3 +1,4 @@
+import { EventEmitter } from 'vscode'
 import { DvcCli } from '.'
 import {
   Args,
@@ -8,8 +9,10 @@ import {
   GcPreserveFlag,
   QueueSubCommand
 } from './constants'
-import { typeCheckCommands } from '..'
+import { addStudioAccessToken } from './options'
+import { CliResult, CliStarted, typeCheckCommands } from '..'
 import { ContextKey, setContextValue } from '../../vscode/context'
+import { Config } from '../../config'
 
 export const autoRegisteredCommands = {
   ADD: 'add',
@@ -38,7 +41,23 @@ export class DvcExecutor extends DvcCli {
     this
   )
 
+  private readonly getStudioLiveShareToken: () => string | undefined
+  private readonly getRepoUrl: (cwd: string) => Promise<string>
   private scmCommandRunning = false
+
+  constructor(
+    config: Config,
+    getStudioLiveShareToken: () => string | undefined,
+    getRepoUrl: (cwd: string) => Promise<string>,
+    emitters?: {
+      processStarted: EventEmitter<CliStarted>
+      processCompleted: EventEmitter<CliResult>
+    }
+  ) {
+    super(config, emitters)
+    this.getStudioLiveShareToken = getStudioLiveShareToken
+    this.getRepoUrl = getRepoUrl
+  }
 
   public add(cwd: string, target: string) {
     return this.blockAndExecuteProcess(cwd, Command.ADD, target)
@@ -139,13 +158,19 @@ export class DvcExecutor extends DvcCli {
     )
   }
 
-  public queueStart(cwd: string, jobs: string) {
-    return this.createBackgroundDvcProcess(
+  public async queueStart(cwd: string, jobs: string) {
+    const options = this.getOptions(
       cwd,
       Command.QUEUE,
       QueueSubCommand.START,
       Flag.JOBS,
       jobs
+    )
+    const studioAccessToken = this.getStudioLiveShareToken()
+    const repoUrl = studioAccessToken ? await this.getRepoUrl(cwd) : undefined
+
+    return this.createBackgroundProcess(
+      addStudioAccessToken(options, studioAccessToken, repoUrl)
     )
   }
 

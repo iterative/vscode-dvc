@@ -34,7 +34,7 @@ export class DvcCli extends Cli {
     return this.createBackgroundProcess(options)
   }
 
-  private getOptions(cwd: string, ...args: Args) {
+  protected getOptions(cwd: string, ...args: Args) {
     return getOptions(
       this.config.getPythonBinPath(),
       this.config.getCliPath(),
