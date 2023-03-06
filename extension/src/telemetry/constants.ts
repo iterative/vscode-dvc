@@ -285,6 +285,7 @@ export interface IEventNamePropertyMapping {
   [EventName.SELECT_FOCUSED_PROJECTS]: undefined
 
   [EventName.CONNECT_SHOW]: undefined
+  [EventName.OPEN_STUDIO_SETTINGS]: undefined
   [EventName.ADD_STUDIO_ACCESS_TOKEN]: undefined
   [EventName.REMOVE_STUDIO_ACCESS_TOKEN]: undefined
 }
