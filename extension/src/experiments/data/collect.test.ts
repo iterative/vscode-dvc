@@ -12,7 +12,15 @@ describe('collectFiles', () => {
     expect(collectFiles(expShowFixture, [])).toStrictEqual([
       'params.yaml',
       join('nested', 'params.yaml'),
-      'summary.json'
+      'summary.json',
+      join('data', 'data.xml'),
+      join('src', 'prepare.py'),
+      join('data', 'prepared'),
+      join('src', 'featurization.py'),
+      join('data', 'features'),
+      join('src', 'train.py'),
+      'model.pkl',
+      join('src', 'evaluate.py')
     ])
   })
 
@@ -28,7 +36,7 @@ describe('collectFiles', () => {
     expect(collectFiles(workspace, [])).toStrictEqual([])
   })
 
-  it('should handle a missing params key', () => {
+  it('should handle missing params and deps key', () => {
     const workspace = {
       [EXPERIMENT_WORKSPACE_ID]: {
         baseline: {
@@ -44,7 +52,7 @@ describe('collectFiles', () => {
     expect(collectFiles(workspace, [])).toStrictEqual(['logs.json'])
   })
 
-  it('should handle a missing metrics key', () => {
+  it('should handle missing metrics and deps keys', () => {
     const workspace = {
       [EXPERIMENT_WORKSPACE_ID]: {
         baseline: {
@@ -58,6 +66,38 @@ describe('collectFiles', () => {
     }
 
     expect(collectFiles(workspace, [])).toStrictEqual(['params.yaml'])
+  })
+
+  it('should handle missing metrics and params keys', () => {
+    const workspace = {
+      [EXPERIMENT_WORKSPACE_ID]: {
+        baseline: {
+          data: {
+            deps: {
+              'data.json': {
+                hash: '22a1a2931c8370d3aeedd7183606fd7f',
+                nfiles: null,
+                size: 14445097
+              }
+            }
+          }
+        }
+      }
+    }
+
+    expect(collectFiles(workspace, [])).toStrictEqual(['data.json'])
+  })
+
+  it('should handle none of the expected keys being present', () => {
+    const workspace = {
+      [EXPERIMENT_WORKSPACE_ID]: {
+        baseline: {
+          data: {}
+        }
+      }
+    }
+
+    expect(collectFiles(workspace, [])).toStrictEqual([])
   })
 
   it('should collect all of the available files from a more complex example', () => {
