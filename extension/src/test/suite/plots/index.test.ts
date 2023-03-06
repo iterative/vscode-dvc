@@ -28,7 +28,8 @@ import {
   PlotNumberOfItemsPerRow,
   Section,
   TemplatePlotGroup,
-  TemplatePlotsData
+  TemplatePlotsData,
+  CustomPlotType
 } from '../../../plots/webview/contract'
 import { TEMP_PLOTS_DIR } from '../../../cli/dvc/constants'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
@@ -465,55 +466,6 @@ suite('Plots Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle a metric reordered message from the webview', async () => {
-      const { plots, plotsModel, messageSpy } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
-
-      const webview = await plots.showWebview()
-
-      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
-
-      const mockSetMetricOrder = spy(plotsModel, 'setMetricOrder')
-      const mockMetricOrder = [
-        'summary.json:loss',
-        'summary.json:accuracy',
-        'summary.json:val_loss',
-        'summary.json:val_accuracy'
-      ]
-
-      messageSpy.resetHistory()
-      mockMessageReceived.fire({
-        payload: mockMetricOrder,
-        type: MessageFromWebviewType.REORDER_PLOTS_METRICS
-      })
-
-      expect(mockSetMetricOrder).to.be.calledOnce
-      expect(mockSetMetricOrder).to.be.calledWithExactly(mockMetricOrder)
-      expect(messageSpy).to.be.calledOnce
-      expect(
-        messageSpy,
-        "should update the webview's checkpoint plot order state"
-      ).to.be.calledWithExactly({
-        checkpoint: {
-          ...checkpointPlotsFixture,
-          plots: reorderObjectList(
-            mockMetricOrder,
-            checkpointPlotsFixture.plots,
-            'title'
-          )
-        }
-      })
-      expect(mockSendTelemetryEvent).to.be.calledOnce
-      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_REORDER_PLOTS_METRICS,
-        undefined,
-        undefined
-      )
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
     it('should handle a custom plots reordered message from the webview', async () => {
       const { plots, plotsModel, messageSpy } = await buildPlots(
         disposable,
@@ -729,7 +681,7 @@ suite('Plots Test Suite', () => {
       const expectedPlotsData: TPlotsData = {
         checkpoint: checkpointPlotsFixture,
         comparison: comparisonPlotsFixture,
-        custom: { height: undefined, nbItemsPerRow: 2, plots: [] },
+        custom: customPlotsFixture,
         hasPlots: true,
         hasUnselectedPlots: false,
         sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
@@ -925,7 +877,8 @@ suite('Plots Test Suite', () => {
       stub(plotsModel, 'getCustomPlotsOrder').returns([
         {
           metric: 'metrics:summary.json:loss',
-          param: 'params:params.yaml:dropout'
+          param: 'params:params.yaml:dropout',
+          type: CustomPlotType.METRIC_VS_PARAM
         }
       ])
 

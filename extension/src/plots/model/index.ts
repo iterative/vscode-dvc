@@ -4,7 +4,6 @@ import isEqual from 'lodash.isequal'
 import {
   collectCheckpointPlotsData,
   collectData,
-  collectMetricOrder,
   collectSelectedTemplatePlots,
   collectTemplates,
   ComparisonData,
@@ -118,8 +117,6 @@ export class PlotsModel extends ModelWithPersistence {
     }
 
     this.checkpointPlots = checkpointPlots
-
-    this.setMetricOrder()
 
     this.recreateCustomPlots(data)
 
@@ -401,7 +398,6 @@ export class PlotsModel extends ModelWithPersistence {
 
   public setSelectedMetrics(selectedMetrics: string[]) {
     this.selectedMetrics = selectedMetrics
-    this.setMetricOrder()
     this.persist(
       PersistenceKey.PLOT_SELECTED_METRICS,
       this.getSelectedMetrics()
@@ -410,15 +406,6 @@ export class PlotsModel extends ModelWithPersistence {
 
   public getSelectedMetrics() {
     return this.selectedMetrics
-  }
-
-  public setMetricOrder(metricOrder?: string[]) {
-    this.metricOrder = collectMetricOrder(
-      this.checkpointPlots,
-      metricOrder || this.metricOrder,
-      this.selectedMetrics
-    )
-    this.persist(PersistenceKey.PLOT_METRIC_ORDER, this.metricOrder)
   }
 
   public setNbItemsPerRow(section: Section, nbItemsPerRow: number) {

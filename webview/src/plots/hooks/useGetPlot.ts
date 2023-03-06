@@ -10,16 +10,8 @@ import { PlainObject, VisualizationSpec } from 'react-vega'
 import { plotDataStore } from '../components/plotDataStore'
 import { PlotsState } from '../store'
 
-const getStoreSection = (section: Section) => {
-  switch (section) {
-    case Section.CHECKPOINT_PLOTS:
-      return 'checkpoint'
-    case Section.TEMPLATE_PLOTS:
-      return 'template'
-    default:
-      return 'custom'
-  }
-}
+const getStoreSection = (section: Section) =>
+  section === Section.TEMPLATE_PLOTS ? 'template' : 'custom'
 
 export const useGetPlot = (
   section: Section,

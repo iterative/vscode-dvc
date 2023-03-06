@@ -5,7 +5,6 @@ import {
   collectData,
   collectCheckpointPlotsData,
   collectTemplates,
-  collectMetricOrder,
   collectOverrideRevisionDetails,
   collectCustomPlotsData
 } from './collect'
@@ -20,7 +19,7 @@ import {
   EXPERIMENT_WORKSPACE_ID
 } from '../../cli/dvc/contract'
 import { definedAndNonEmpty, sameContents } from '../../util/array'
-import { TemplatePlot } from '../webview/contract'
+import { CustomPlotType, TemplatePlot } from '../webview/contract'
 import { getCLICommitId } from '../../test/fixtures/plotsDiff/util'
 import { SelectedExperimentWithColor } from '../../experiments/model'
 import { Experiment } from '../../experiments/webview/contract'
@@ -35,13 +34,16 @@ describe('collectCustomPlotsData', () => {
       [
         {
           metric: 'metrics:summary.json:loss',
-          param: 'params:params.yaml:dropout'
+          param: 'params:params.yaml:dropout',
+          type: CustomPlotType.METRIC_VS_PARAM
         },
         {
           metric: 'metrics:summary.json:accuracy',
-          param: 'params:params.yaml:epochs'
+          param: 'params:params.yaml:epochs',
+          type: CustomPlotType.METRIC_VS_PARAM
         }
       ],
+      {},
       [
         {
           id: '12345',
@@ -134,125 +136,6 @@ describe('collectCheckpointPlotsData', () => {
   it('should return undefined given no input', () => {
     const data = collectCheckpointPlotsData({} as ExperimentsOutput)
     expect(data).toBeUndefined()
-  })
-})
-
-describe('collectMetricOrder', () => {
-  it('should return an empty array if there is no checkpoints data', () => {
-    const metricOrder = collectMetricOrder(
-      undefined,
-      ['metric:A', 'metric:B'],
-      []
-    )
-    expect(metricOrder).toStrictEqual([])
-  })
-
-  it('should return an empty array if the checkpoints data is an empty array', () => {
-    const metricOrder = collectMetricOrder([], ['metric:A', 'metric:B'], [])
-    expect(metricOrder).toStrictEqual([])
-  })
-
-  it('should maintain the existing order if all metrics are selected', () => {
-    const expectedOrder = [
-      'metric:F',
-      'metric:A',
-      'metric:B',
-      'metric:E',
-      'metric:D',
-      'metric:C'
-    ]
-
-    const metricOrder = collectMetricOrder(
-      [
-        { id: 'metric:A', values: [] },
-        { id: 'metric:B', values: [] },
-        { id: 'metric:C', values: [] },
-        { id: 'metric:D', values: [] },
-        { id: 'metric:E', values: [] },
-        { id: 'metric:F', values: [] }
-      ],
-      expectedOrder,
-      expectedOrder
-    )
-    expect(metricOrder).toStrictEqual(expectedOrder)
-  })
-
-  it('should push unselected metrics to the end', () => {
-    const existingOrder = [
-      'metric:F',
-      'metric:A',
-      'metric:B',
-      'metric:E',
-      'metric:D',
-      'metric:C'
-    ]
-
-    const metricOrder = collectMetricOrder(
-      [
-        { id: 'metric:A', values: [] },
-        { id: 'metric:B', values: [] },
-        { id: 'metric:C', values: [] },
-        { id: 'metric:D', values: [] },
-        { id: 'metric:E', values: [] },
-        { id: 'metric:F', values: [] }
-      ],
-      existingOrder,
-      existingOrder.filter(metric => !['metric:A', 'metric:B'].includes(metric))
-    )
-    expect(metricOrder).toStrictEqual([
-      'metric:F',
-      'metric:E',
-      'metric:D',
-      'metric:C',
-      'metric:A',
-      'metric:B'
-    ])
-  })
-
-  it('should add new metrics in the given order', () => {
-    const metricOrder = collectMetricOrder(
-      [
-        { id: 'metric:C', values: [] },
-        { id: 'metric:D', values: [] },
-        { id: 'metric:A', values: [] },
-        { id: 'metric:B', values: [] },
-        { id: 'metric:E', values: [] },
-        { id: 'metric:F', values: [] }
-      ],
-      ['metric:B', 'metric:A'],
-      ['metric:B', 'metric:A']
-    )
-    expect(metricOrder).toStrictEqual([
-      'metric:B',
-      'metric:A',
-      'metric:C',
-      'metric:D',
-      'metric:E',
-      'metric:F'
-    ])
-  })
-
-  it('should give selected metrics precedence', () => {
-    const metricOrder = collectMetricOrder(
-      [
-        { id: 'metric:C', values: [] },
-        { id: 'metric:D', values: [] },
-        { id: 'metric:A', values: [] },
-        { id: 'metric:B', values: [] },
-        { id: 'metric:E', values: [] },
-        { id: 'metric:F', values: [] }
-      ],
-      ['metric:B', 'metric:A'],
-      ['metric:B', 'metric:A', 'metric:F']
-    )
-    expect(metricOrder).toStrictEqual([
-      'metric:B',
-      'metric:A',
-      'metric:F',
-      'metric:C',
-      'metric:D',
-      'metric:E'
-    ])
   })
 })
 

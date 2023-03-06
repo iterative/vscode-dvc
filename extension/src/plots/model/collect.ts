@@ -48,11 +48,7 @@ import {
 import { addToMapArray } from '../../util/map'
 import { TemplateOrder } from '../paths/collect'
 import { extendVegaSpec, isMultiViewPlot } from '../vega/util'
-import {
-  definedAndNonEmpty,
-  reorderObjectList,
-  splitMatchedOrdered
-} from '../../util/array'
+import { definedAndNonEmpty, reorderObjectList } from '../../util/array'
 import { shortenForLabel } from '../../util/string'
 import {
   getDvcDataVersionInfo,
@@ -358,63 +354,6 @@ export const collectCustomPlotsData = (
       return collectMetricVsParamPlotData(metric, param, experiments)
     })
     .filter(Boolean)
-}
-
-type MetricOrderAccumulator = {
-  newOrder: string[]
-  uncollectedMetrics: string[]
-  remainingSelectedMetrics: string[]
-}
-
-const collectExistingOrder = (
-  acc: MetricOrderAccumulator,
-  existingMetricOrder: string[]
-) => {
-  for (const metric of existingMetricOrder) {
-    const uncollectedIndex = acc.uncollectedMetrics.indexOf(metric)
-    const remainingIndex = acc.remainingSelectedMetrics.indexOf(metric)
-    if (uncollectedIndex === -1 || remainingIndex === -1) {
-      continue
-    }
-    acc.uncollectedMetrics.splice(uncollectedIndex, 1)
-    acc.remainingSelectedMetrics.splice(remainingIndex, 1)
-    acc.newOrder.push(metric)
-  }
-}
-
-const collectRemainingSelected = (acc: MetricOrderAccumulator) => {
-  const [newOrder, uncollectedMetrics] = splitMatchedOrdered(
-    acc.uncollectedMetrics,
-    acc.remainingSelectedMetrics
-  )
-
-  acc.newOrder.push(...newOrder)
-  acc.uncollectedMetrics = uncollectedMetrics
-}
-
-export const collectMetricOrder = (
-  checkpointPlotData: CheckpointPlot[] | undefined,
-  existingMetricOrder: string[],
-  selectedMetrics: string[] = []
-): string[] => {
-  if (!definedAndNonEmpty(checkpointPlotData)) {
-    return []
-  }
-
-  const acc: MetricOrderAccumulator = {
-    newOrder: [],
-    remainingSelectedMetrics: [...selectedMetrics],
-    uncollectedMetrics: checkpointPlotData.map(({ id }) => id)
-  }
-
-  if (!definedAndNonEmpty(acc.remainingSelectedMetrics)) {
-    return acc.uncollectedMetrics
-  }
-
-  collectExistingOrder(acc, existingMetricOrder)
-  collectRemainingSelected(acc)
-
-  return [...acc.newOrder, ...acc.uncollectedMetrics]
 }
 
 type RevisionPathData = { [path: string]: Record<string, unknown>[] }

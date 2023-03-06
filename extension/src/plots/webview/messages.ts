@@ -105,8 +105,6 @@ export class WebviewMessages {
         return this.setComparisonRowsOrder(message.payload)
       case MessageFromWebviewType.REORDER_PLOTS_TEMPLATES:
         return this.setTemplateOrder(message.payload)
-      case MessageFromWebviewType.REORDER_PLOTS_METRICS:
-        return this.setMetricOrder(message.payload)
       case MessageFromWebviewType.REORDER_PLOTS_CUSTOM:
         return this.setCustomPlotsOrder(message.payload)
       case MessageFromWebviewType.SELECT_PLOTS:
@@ -183,11 +181,6 @@ export class WebviewMessages {
       undefined,
       undefined
     )
-  }
-
-  private setMetricOrder(order: string[]) {
-    this.plots.setMetricOrder(order)
-    this.sendCheckpointPlotsAndEvent(EventName.VIEWS_REORDER_PLOTS_METRICS)
   }
 
   private async getMetricOrParamPlot(): Promise<

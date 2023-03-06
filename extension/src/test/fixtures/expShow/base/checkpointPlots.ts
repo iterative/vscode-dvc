@@ -1,6 +1,7 @@
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
 import {
   CheckpointPlotsData,
+  CustomPlotType,
   PlotNumberOfItemsPerRow
 } from '../../../../plots/webview/contract'
 
@@ -13,8 +14,8 @@ const data: CheckpointPlotsData = {
   },
   plots: [
     {
-      id: 'summary.json:loss',
-      title: 'summary.json:loss',
+      id: 'custom-summary.json:loss',
+      metric: 'summary.json:loss',
       values: [
         { group: 'exp-83425', iteration: 1, y: 1.9896177053451538 },
         { group: 'exp-83425', iteration: 2, y: 1.9329891204833984 },
@@ -28,11 +29,13 @@ const data: CheckpointPlotsData = {
         { group: 'exp-e7a67', iteration: 1, y: 2.020392894744873 },
         { group: 'exp-e7a67', iteration: 2, y: 2.0205044746398926 },
         { group: 'exp-e7a67', iteration: 3, y: 2.0205044746398926 }
-      ]
+      ],
+      type: CustomPlotType.CHECKPOINT,
+      yTitle: 'summary.json:loss'
     },
     {
-      id: 'summary.json:accuracy',
-      title: 'summary.json:accuracy',
+      id: 'custom-summary.json:accuracy',
+      metric: 'summary.json:accuracy',
       values: [
         { group: 'exp-83425', iteration: 1, y: 0.40904998779296875 },
         { group: 'exp-83425', iteration: 2, y: 0.46094998717308044 },
@@ -46,11 +49,13 @@ const data: CheckpointPlotsData = {
         { group: 'exp-e7a67', iteration: 1, y: 0.3723166584968567 },
         { group: 'exp-e7a67', iteration: 2, y: 0.3724166750907898 },
         { group: 'exp-e7a67', iteration: 3, y: 0.3724166750907898 }
-      ]
+      ],
+      type: CustomPlotType.CHECKPOINT,
+      yTitle: 'summary.json:accuracy'
     },
     {
-      id: 'summary.json:val_loss',
-      title: 'summary.json:val_loss',
+      id: 'custom-summary.json:val_loss',
+      metric: 'summary.json:val_loss',
       values: [
         { group: 'exp-83425', iteration: 1, y: 1.9391471147537231 },
         { group: 'exp-83425', iteration: 2, y: 1.8825950622558594 },
@@ -64,11 +69,13 @@ const data: CheckpointPlotsData = {
         { group: 'exp-e7a67', iteration: 1, y: 1.9979370832443237 },
         { group: 'exp-e7a67', iteration: 2, y: 1.9979370832443237 },
         { group: 'exp-e7a67', iteration: 3, y: 1.9979370832443237 }
-      ]
+      ],
+      type: CustomPlotType.CHECKPOINT,
+      yTitle: 'summary.json:val_loss'
     },
     {
-      id: 'summary.json:val_accuracy',
-      title: 'summary.json:val_accuracy',
+      id: 'custom-summary.json:val_accuracy',
+      metric: 'summary.json:val_accuracy',
       values: [
         { group: 'exp-83425', iteration: 1, y: 0.49399998784065247 },
         { group: 'exp-83425', iteration: 2, y: 0.5550000071525574 },
@@ -82,7 +89,9 @@ const data: CheckpointPlotsData = {
         { group: 'exp-e7a67', iteration: 1, y: 0.4277999997138977 },
         { group: 'exp-e7a67', iteration: 2, y: 0.4277999997138977 },
         { group: 'exp-e7a67', iteration: 3, y: 0.4277999997138977 }
-      ]
+      ],
+      type: CustomPlotType.CHECKPOINT,
+      yTitle: 'summary.json:val_accuracy'
     }
   ],
   selectedMetrics: [

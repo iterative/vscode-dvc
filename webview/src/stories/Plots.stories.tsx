@@ -28,18 +28,6 @@ import '../plots/components/styles.module.scss'
 import { feedStore } from '../plots/components/App'
 import { plotsReducers } from '../plots/store'
 
-const smallCheckpointPlotsFixture = {
-  ...checkpointPlotsFixture,
-  nbItemsPerRow: PlotNumberOfItemsPerRow.THREE,
-  plots: checkpointPlotsFixture.plots.map(plot => ({
-    ...plot,
-    title: truncateVerticalTitle(
-      plot.title,
-      PlotNumberOfItemsPerRow.THREE
-    ) as string
-  }))
-}
-
 const manyCheckpointPlots = (
   length: number,
   size = PlotNumberOfItemsPerRow.TWO
@@ -218,7 +206,6 @@ AllLarge.parameters = CHROMATIC_VIEWPORTS
 export const AllSmall = Template.bind({})
 AllSmall.args = {
   data: {
-    checkpoint: smallCheckpointPlotsFixture,
     comparison: {
       ...comparisonPlotsFixture,
       nbItemsPerRow: PlotNumberOfItemsPerRow.THREE

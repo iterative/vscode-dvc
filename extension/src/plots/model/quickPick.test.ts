@@ -1,9 +1,10 @@
-import { CustomPlotsOrderValue } from '.'
+import { CustomPlotsOrderValue } from './custom'
 import { pickCustomPlots, pickMetricAndParam } from './quickPick'
 import { quickPickManyValues, quickPickValue } from '../../vscode/quickPick'
 import { Title } from '../../vscode/title'
 import { Toast } from '../../vscode/toast'
 import { ColumnType } from '../../experiments/webview/contract'
+import { CustomPlotType } from '../webview/contract'
 
 jest.mock('../../vscode/quickPick')
 jest.mock('../../vscode/toast')
@@ -35,15 +36,18 @@ describe('pickCustomPlots', () => {
     const mockedExperiments = [
       {
         metric: 'metrics:summary.json:loss',
-        param: 'params:params.yaml:dropout'
+        param: 'params:params.yaml:dropout',
+        type: CustomPlotType.METRIC_VS_PARAM
       },
       {
         metric: 'metrics:summary.json:accuracy',
-        param: 'params:params.yaml:epochs'
+        param: 'params:params.yaml:epochs',
+        type: CustomPlotType.METRIC_VS_PARAM
       },
       {
         metric: 'metrics:summary.json:learning_rate',
-        param: 'param:summary.json:process.threshold'
+        param: 'param:summary.json:process.threshold',
+        type: CustomPlotType.METRIC_VS_PARAM
       }
     ] as CustomPlotsOrderValue[]
 

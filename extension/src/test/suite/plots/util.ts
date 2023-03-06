@@ -143,7 +143,7 @@ export const getExpectedCheckpointPlotsData = (
       nbItemsPerRow,
       plots: plots.map(plot => ({
         id: plot.id,
-        title: plot.title,
+        title: plot.yTitle,
         values: plot.values.filter(values => domain.includes(values.group))
       })),
       selectedMetrics
