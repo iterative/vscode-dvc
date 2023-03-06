@@ -8,7 +8,10 @@ import React, {
 } from 'react'
 import { AnyAction } from '@reduxjs/toolkit'
 import { useDispatch } from 'react-redux'
-import { Section } from 'dvc/src/plots/webview/contract'
+import {
+  PlotNumberOfItemsPerRow,
+  Section
+} from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { PlotsPicker, PlotsPickerProps } from './PlotsPicker'
 import styles from './styles.module.scss'
@@ -117,7 +120,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
       icon: ArrowBoth,
       onClickNode: (
         <SingleSelect
-          items={[1, 2, 3, 4].map(nb => ({
+          items={Object.values(PlotNumberOfItemsPerRow).map(nb => ({
             id: nb.toString(),
             isSelected: nbItemsPerRow === nb,
             label: nb.toString()
