@@ -308,7 +308,7 @@ export class WebviewMessages {
     ).map(plot =>
       isCheckpointPlot(plot)
         ? {
-            metric: buildMetricOrParamPath(ColumnType.METRICS, plot.title),
+            metric: buildMetricOrParamPath(ColumnType.METRICS, plot.metric),
             type: CustomPlotType.CHECKPOINT
           }
         : {
