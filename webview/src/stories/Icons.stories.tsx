@@ -5,6 +5,7 @@ import './test-vscode-styles.scss'
 import '../shared/style.scss'
 import { IconWrapper } from './components/IconWrapper'
 import { IconsWrapper } from './components/IconsWrapper'
+import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'
 import { Icon } from '../shared/components/Icon'
 import {
   Add,
@@ -38,6 +39,7 @@ export default {
     data: {}
   },
   component: Icon,
+  parameters: DISABLE_CHROMATIC_SNAPSHOTS,
   title: 'Icons'
 } as Meta
 
