@@ -97,6 +97,7 @@ export enum RegisteredCommands {
   SELECT_FOCUSED_PROJECTS = 'dvc.selectFocusedProjects',
 
   CONNECT_SHOW = 'dvc.showConnect',
+  OPEN_STUDIO_SETTINGS = 'dvc.showStudioSettings',
   ADD_STUDIO_ACCESS_TOKEN = 'dvc.addStudioAccessToken',
   REMOVE_STUDIO_ACCESS_TOKEN = 'dvc.removeStudioAccessToken',
   EXPERIMENT_VIEW_SHARE_TO_STUDIO = 'dvc.views.experiments.shareExperimentToStudio'
