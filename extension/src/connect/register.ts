@@ -22,6 +22,11 @@ export const registerConnectCommands = (
   )
 
   internalCommands.registerExternalCommand(
+    RegisteredCommands.UPDATE_STUDIO_ACCESS_TOKEN,
+    () => connect.saveStudioAccessToken()
+  )
+
+  internalCommands.registerExternalCommand(
     RegisteredCommands.REMOVE_STUDIO_ACCESS_TOKEN,
     () => connect.removeStudioAccessToken()
   )

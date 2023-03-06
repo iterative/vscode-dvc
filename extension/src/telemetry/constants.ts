@@ -287,5 +287,6 @@ export interface IEventNamePropertyMapping {
   [EventName.CONNECT_SHOW]: undefined
   [EventName.OPEN_STUDIO_SETTINGS]: undefined
   [EventName.ADD_STUDIO_ACCESS_TOKEN]: undefined
+  [EventName.UPDATE_STUDIO_ACCESS_TOKEN]: undefined
   [EventName.REMOVE_STUDIO_ACCESS_TOKEN]: undefined
 }

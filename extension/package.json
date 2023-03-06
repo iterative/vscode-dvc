@@ -118,6 +118,11 @@
         "category": "DVC"
       },
       {
+        "title": "Update Studio Access Token",
+        "command": "dvc.updateStudioAccessToken",
+        "category": "DVC"
+      },
+      {
         "title": "Add",
         "command": "dvc.addTarget",
         "category": "DVC",
@@ -635,7 +640,11 @@
         },
         {
           "command": "dvc.addStudioAccessToken",
-          "when": "dvc.commands.available && dvc.project.available"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.studio.connected"
+        },
+        {
+          "command": "dvc.updateStudioAccessToken",
+          "when": "dvc.commands.available && dvc.project.available && dvc.studio.connected"
         },
         {
           "command": "dvc.addTarget",

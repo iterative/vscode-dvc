@@ -82,7 +82,7 @@ const Settings: React.FC<{
           appearance="primary"
           isNested={false}
           text={'Update Token'}
-          onClick={openStudio}
+          onClick={saveStudioToken}
         />
         <Button
           appearance="secondary"
