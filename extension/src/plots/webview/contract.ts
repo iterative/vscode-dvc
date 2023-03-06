@@ -72,6 +72,17 @@ export interface PlotsComparisonData {
   revisions: Revision[]
 }
 
+export enum CustomPlotType {
+  CHECKPOINT = 'checkpoint',
+  METRIC_VS_PARAM = 'metricVsParam'
+}
+
+export type MetricVsParamPlotValues = {
+  expName: string
+  metric: number
+  param: number
+}
+
 export type CheckpointPlotValues = {
   group: string
   iteration: number
@@ -82,29 +93,12 @@ export type ColorScale = { domain: string[]; range: Color[] }
 
 export type CheckpointPlot = {
   id: string
-  values: CheckpointPlotValues
-}
-
-export type CustomPlotValues = {
-  expName: string
-  metric: number
-  param: number
-}
-
-export type CustomPlotData = {
-  id: string
-  values: CustomPlotValues[]
   metric: string
-  param: string
+  values: CheckpointPlotValues
+  type: CustomPlotType.CHECKPOINT
 }
 
-export type CustomPlotsData = {
-  plots: CustomPlotData[]
-  nbItemsPerRow: number
-  height: number | undefined
-}
-
-export type CheckpointPlotData = CheckpointPlot & { title: string }
+export type CheckpointPlotData = CheckpointPlot & { yTitle: string }
 
 export type CheckpointPlotsData = {
   plots: CheckpointPlotData[]
@@ -112,6 +106,26 @@ export type CheckpointPlotsData = {
   nbItemsPerRow: number
   height: number | undefined
   selectedMetrics?: string[]
+}
+
+export type MetricVsParamPlot = {
+  id: string
+  values: MetricVsParamPlotValues[]
+  metric: string
+  param: string
+  type: CustomPlotType.METRIC_VS_PARAM
+}
+
+export type MetricVsParamPlotData = MetricVsParamPlot & { yTitle: string }
+
+export type CustomPlot = MetricVsParamPlot | CheckpointPlot
+export type CustomPlotData = MetricVsParamPlotData | CheckpointPlotData
+
+export type CustomPlotsData = {
+  plots: CustomPlotData[]
+  nbItemsPerRow: number
+  height: number | undefined
+  colors: ColorScale | undefined
 }
 
 export enum PlotsType {

@@ -13,9 +13,12 @@ import {
   collectCommitRevisionDetails,
   collectOverrideRevisionDetails,
   collectCustomPlotsData,
-  getCustomPlotId
+  getCustomPlotId,
+  collectCustomCheckpointPlotData,
+  isCheckpointPlot
 } from './collect'
 import { getRevisionFirstThreeColumns } from './util'
+import { CustomPlotsOrderValue } from './custom'
 import {
   CheckpointPlot,
   CheckpointPlotData,
@@ -28,7 +31,9 @@ import {
   SectionCollapsed,
   CustomPlotData,
   PlotNumberOfItemsPerRow,
-  DEFAULT_HEIGHT
+  DEFAULT_HEIGHT,
+  CustomPlotsData,
+  CustomPlot
 } from '../webview/contract'
 import {
   ExperimentsOutput,
@@ -50,8 +55,6 @@ import {
 } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
 
-export type CustomPlotsOrderValue = { metric: string; param: string }
-
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
 
@@ -72,7 +75,10 @@ export class PlotsModel extends ModelWithPersistence {
   private multiSourceEncoding: MultiSourceEncoding = {}
 
   private checkpointPlots?: CheckpointPlot[]
-  private customPlots?: CustomPlotData[]
+  // TBD we need to move this type to a named type if
+  // we plan to keep this
+  private customCheckpointPlots?: { [metric: string]: CheckpointPlot }
+  private customPlots?: CustomPlot[]
   private selectedMetrics?: string[]
   private metricOrder: string[]
 
@@ -115,7 +121,7 @@ export class PlotsModel extends ModelWithPersistence {
 
     this.setMetricOrder()
 
-    this.recreateCustomPlots()
+    this.recreateCustomPlots(data)
 
     return this.removeStaleData()
   }
@@ -188,25 +194,40 @@ export class PlotsModel extends ModelWithPersistence {
     }
   }
 
-  public getCustomPlots() {
+  public getCustomPlots(): CustomPlotsData | undefined {
     if (!this.customPlots) {
       return
     }
+
+    // TBD colors is undefined if there are no selected exps
+    const colors = getColorScale(
+      this.experiments
+        .getSelectedExperiments()
+        .map(({ displayColor, id: revision }) => ({ displayColor, revision }))
+    )
+
     return {
+      colors,
       height: this.getHeight(Section.CUSTOM_PLOTS),
       nbItemsPerRow: this.getNbItemsPerRow(Section.CUSTOM_PLOTS),
-      plots: this.customPlots
+      plots: this.getCustomPlotData(this.customPlots, colors?.domain)
     }
   }
 
-  public recreateCustomPlots() {
+  public recreateCustomPlots(data?: ExperimentsOutput) {
+    if (data) {
+      this.customCheckpointPlots = collectCustomCheckpointPlotData(data)
+    }
     const experiments = this.experiments.getExperiments()
+    // TBD this if check is going to nned to be rethought since checkpoint data
+    // is involved now
     if (experiments.length === 0) {
       this.customPlots = undefined
       return
     }
-    const customPlots: CustomPlotData[] = collectCustomPlotsData(
+    const customPlots: CustomPlot[] = collectCustomPlotsData(
       this.getCustomPlotsOrder(),
+      this.customCheckpointPlots || {},
       experiments
     )
     this.customPlots = customPlots
@@ -224,16 +245,14 @@ export class PlotsModel extends ModelWithPersistence {
 
   public removeCustomPlots(plotIds: string[]) {
     const newCustomPlotsOrder = this.getCustomPlotsOrder().filter(
-      ({ metric, param }) => {
-        return !plotIds.includes(getCustomPlotId(metric, param))
-      }
+      plot => !plotIds.includes(getCustomPlotId(plot))
     )
 
     this.setCustomPlotsOrder(newCustomPlotsOrder)
   }
 
-  public addCustomPlot(metricAndParam: CustomPlotsOrderValue) {
-    const newCustomPlotsOrder = [...this.getCustomPlotsOrder(), metricAndParam]
+  public addCustomPlot(value: CustomPlotsOrderValue) {
+    const newCustomPlotsOrder = [...this.getCustomPlotsOrder(), value]
     this.setCustomPlotsOrder(newCustomPlotsOrder)
   }
 
@@ -513,19 +532,45 @@ export class PlotsModel extends ModelWithPersistence {
     return reorderObjectList<CheckpointPlotData>(
       this.metricOrder,
       checkpointPlots.map(plot => {
-        const { id, values } = plot
+        const { id, values, type } = plot
         return {
           id,
-          title: truncateVerticalTitle(
-            id,
-            this.getNbItemsPerRow(Section.CHECKPOINT_PLOTS)
-          ) as string,
+          metric: id,
+          type,
           values: values.filter(value =>
             selectedExperiments.includes(value.group)
-          )
+          ),
+          yTitle: truncateVerticalTitle(
+            id,
+            this.getNbItemsPerRow(Section.CHECKPOINT_PLOTS)
+          ) as string
         }
       }),
       'id'
+    )
+  }
+
+  private getCustomPlotData(
+    plots: CustomPlot[],
+    selectedExperiments: string[] | undefined
+  ): CustomPlotData[] {
+    if (!selectedExperiments) {
+      return plots.filter(plot => !isCheckpointPlot(plot)) as CustomPlotData[]
+    }
+    return plots.map(
+      plot =>
+        ({
+          ...plot,
+          values: isCheckpointPlot(plot)
+            ? plot.values.filter(value =>
+                selectedExperiments.includes(value.group)
+              )
+            : plot.values,
+          yTitle: truncateVerticalTitle(
+            plot.metric,
+            this.getNbItemsPerRow(Section.CUSTOM_PLOTS)
+          ) as string
+        } as CustomPlotData)
     )
   }
 

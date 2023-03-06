@@ -1,15 +1,46 @@
-import { CustomPlotsOrderValue } from '.'
 import { getCustomPlotId } from './collect'
+import { CustomPlotsOrderValue } from './custom'
 import { splitColumnPath } from '../../experiments/columns/paths'
 import { pickFromColumnLikes } from '../../experiments/columns/quickPick'
 import { Column, ColumnType } from '../../experiments/webview/contract'
 import { definedAndNonEmpty } from '../../util/array'
 import {
   quickPickManyValues,
+  quickPickValue,
   QuickPickOptionsWithTitle
 } from '../../vscode/quickPick'
 import { Title } from '../../vscode/title'
 import { Toast } from '../../vscode/toast'
+import { CustomPlotType } from '../webview/contract'
+
+const getMetricVsParamPlotItem = (metric: string, param: string) => {
+  const splitMetric = splitColumnPath(metric)
+  const splitParam = splitColumnPath(param)
+  return {
+    description: 'Metric Vs Param Plot',
+    detail: `${metric} vs ${param}`,
+    label: `${splitMetric[splitMetric.length - 1]} vs ${
+      splitParam[splitParam.length - 1]
+    }`,
+    value: getCustomPlotId({
+      metric,
+      param,
+      type: CustomPlotType.METRIC_VS_PARAM
+    })
+  }
+}
+const getCheckpointPlotItem = (metric: string) => {
+  const splitMetric = splitColumnPath(metric)
+  return {
+    description: 'Trend Plot',
+    detail: metric,
+    label: splitMetric[splitMetric.length - 1],
+    value: getCustomPlotId({
+      metric,
+      type: CustomPlotType.CHECKPOINT
+    })
+  }
+}
 
 export const pickCustomPlots = (
   plots: CustomPlotsOrderValue[],
@@ -20,19 +51,35 @@ export const pickCustomPlots = (
     return Toast.showError(noPlotsErrorMessage)
   }
 
-  const plotsItems = plots.map(({ metric, param }) => {
-    const splitMetric = splitColumnPath(metric)
-    const splitParam = splitColumnPath(param)
-    return {
-      description: `${metric} vs ${param}`,
-      label: `${splitMetric[splitMetric.length - 1]} vs ${
-        splitParam[splitParam.length - 1]
-      }`,
-      value: getCustomPlotId(metric, param)
-    }
-  })
+  const plotsItems = plots.map(plot =>
+    plot.type === CustomPlotType.CHECKPOINT
+      ? getCheckpointPlotItem(plot.metric)
+      : getMetricVsParamPlotItem(plot.metric, plot.param)
+  )
 
   return quickPickManyValues(plotsItems, quickPickOptions)
+}
+
+export const pickCustomPlotType = (): Thenable<CustomPlotType | undefined> => {
+  return quickPickValue(
+    [
+      {
+        description:
+          'A linear plot that compares a chosen metric and param with current experiments.',
+        label: 'Metric Vs Param',
+        value: CustomPlotType.METRIC_VS_PARAM
+      },
+      {
+        description:
+          'A linear plot that shows how a chosen metric changes over selected experiments.',
+        label: 'Trend',
+        value: CustomPlotType.CHECKPOINT
+      }
+    ],
+    {
+      title: Title.SELECT_PLOT_TYPE_CUSTOM_PLOT
+    }
+  )
 }
 
 const getTypeColumnLikes = (columns: Column[], columnType: ColumnType) =>
@@ -67,4 +114,22 @@ export const pickMetricAndParam = async (columns: Column[]) => {
     return
   }
   return { metric: metric.path, param: param.path }
+}
+
+export const pickMetric = async (columns: Column[]) => {
+  const metricColumnLikes = getTypeColumnLikes(columns, ColumnType.METRICS)
+
+  if (!definedAndNonEmpty(metricColumnLikes)) {
+    return Toast.showError('There are no metrics to select from.')
+  }
+
+  const metric = await pickFromColumnLikes(metricColumnLikes, {
+    title: Title.SELECT_METRIC_CUSTOM_PLOT
+  })
+
+  if (!metric) {
+    return
+  }
+
+  return metric.path
 }

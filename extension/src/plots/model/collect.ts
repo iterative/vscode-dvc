@@ -2,7 +2,10 @@ import omit from 'lodash.omit'
 import get from 'lodash.get'
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
-import { CustomPlotsOrderValue } from '.'
+import {
+  CustomPlotsOrderValue,
+  isCustomPlotOrderCheckpointValue
+} from './custom'
 import { getRevisionFirstThreeColumns } from './util'
 import {
   ColorScale,
@@ -16,7 +19,9 @@ import {
   TemplatePlotSection,
   PlotsType,
   Revision,
-  CustomPlotData
+  CustomPlotType,
+  CustomPlot,
+  MetricVsParamPlot
 } from '../webview/contract'
 import {
   EXPERIMENT_WORKSPACE_ID,
@@ -242,26 +247,81 @@ export const collectCheckpointPlotsData = (
   const plotsData: CheckpointPlot[] = []
 
   for (const [key, value] of acc.plots.entries()) {
-    plotsData.push({ id: decodeColumn(key), values: value })
+    plotsData.push({
+      id: decodeColumn(key),
+      metric: decodeColumn(key),
+      type: CustomPlotType.CHECKPOINT,
+      values: value
+    })
   }
 
   return plotsData
 }
 
-export const getCustomPlotId = (metric: string, param: string) =>
-  `custom-${metric}-${param}`
+export const getCustomPlotId = (plot: CustomPlotsOrderValue) =>
+  plot.type === CustomPlotType.CHECKPOINT
+    ? `custom-${plot.metric}`
+    : `custom-${plot.metric}-${plot.param}`
 
-const collectCustomPlotData = (
+export const collectCustomCheckpointPlotData = (
+  data: ExperimentsOutput
+): { [metric: string]: CheckpointPlot } => {
+  const acc = {
+    iterations: {},
+    plots: new Map<string, CheckpointPlotValues>()
+  }
+
+  for (const { baseline, ...experimentsObject } of Object.values(
+    omit(data, EXPERIMENT_WORKSPACE_ID)
+  )) {
+    const commit = transformExperimentData(baseline)
+
+    if (commit) {
+      collectFromExperimentsObject(acc, experimentsObject)
+    }
+  }
+
+  const plotsData: { [metric: string]: CheckpointPlot } = {}
+  if (acc.plots.size === 0) {
+    return plotsData
+  }
+
+  for (const [key, value] of acc.plots.entries()) {
+    const decodedMetric = decodeColumn(key)
+    plotsData[decodedMetric] = {
+      id: getCustomPlotId({
+        metric: decodedMetric,
+        type: CustomPlotType.CHECKPOINT
+      }),
+      metric: decodedMetric,
+      type: CustomPlotType.CHECKPOINT,
+      values: value
+    }
+  }
+
+  return plotsData
+}
+
+export const isCheckpointPlot = (plot: CustomPlot): plot is CheckpointPlot => {
+  return plot.type === CustomPlotType.CHECKPOINT
+}
+
+const collectMetricVsParamPlotData = (
   metric: string,
   param: string,
   experiments: Experiment[]
-): CustomPlotData => {
+): MetricVsParamPlot => {
   const splitUpMetricPath = splitColumnPath(metric)
   const splitUpParamPath = splitColumnPath(param)
-  const plotData: CustomPlotData = {
-    id: getCustomPlotId(metric, param),
+  const plotData: MetricVsParamPlot = {
+    id: getCustomPlotId({
+      metric,
+      param,
+      type: CustomPlotType.METRIC_VS_PARAM
+    }),
     metric: metric.slice(ColumnType.METRICS.length + 1),
     param: param.slice(ColumnType.PARAMS.length + 1),
+    type: CustomPlotType.METRIC_VS_PARAM,
     values: []
   }
 
@@ -281,13 +341,23 @@ const collectCustomPlotData = (
   return plotData
 }
 
+// TBD it will probably be easier and/or faster to get the data from
+// experiments vs the output...
 export const collectCustomPlotsData = (
-  metricsAndParams: CustomPlotsOrderValue[],
+  plotsOrderValue: CustomPlotsOrderValue[],
+  checkpointPlots: { [metric: string]: CheckpointPlot },
   experiments: Experiment[]
-): CustomPlotData[] => {
-  return metricsAndParams.map(({ metric, param }) =>
-    collectCustomPlotData(metric, param, experiments)
-  )
+): CustomPlot[] => {
+  return plotsOrderValue
+    .map((plotOrderValue): CustomPlot => {
+      if (isCustomPlotOrderCheckpointValue(plotOrderValue)) {
+        const { metric } = plotOrderValue
+        return checkpointPlots[metric.slice(ColumnType.METRICS.length + 1)]
+      }
+      const { metric, param } = plotOrderValue
+      return collectMetricVsParamPlotData(metric, param, experiments)
+    })
+    .filter(Boolean)
 }
 
 type MetricOrderAccumulator = {

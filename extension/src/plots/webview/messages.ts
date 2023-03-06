@@ -2,6 +2,7 @@ import isEmpty from 'lodash.isempty'
 import {
   ComparisonPlot,
   ComparisonRevisionData,
+  CustomPlotType,
   PlotsData as TPlotsData,
   Revision,
   Section,
@@ -21,11 +22,21 @@ import { PlotsModel } from '../model'
 import { PathsModel } from '../paths/model'
 import { BaseWebview } from '../../webview'
 import { getModifiedTime } from '../../fileSystem'
-import { pickCustomPlots, pickMetricAndParam } from '../model/quickPick'
+import {
+  pickCustomPlots,
+  pickCustomPlotType,
+  pickMetric,
+  pickMetricAndParam
+} from '../model/quickPick'
 import { Title } from '../../vscode/title'
 import { ColumnType } from '../../experiments/webview/contract'
 import { FILE_SEPARATOR } from '../../experiments/columns/paths'
 import { reorderObjectList } from '../../util/array'
+import { isCheckpointPlot } from '../model/collect'
+import {
+  CustomPlotsOrderValue,
+  isCustomPlotOrderCheckpointValue
+} from '../model/custom'
 
 export class WebviewMessages {
   private readonly paths: PathsModel
@@ -179,7 +190,9 @@ export class WebviewMessages {
     this.sendCheckpointPlotsAndEvent(EventName.VIEWS_REORDER_PLOTS_METRICS)
   }
 
-  private async addCustomPlot() {
+  private async getMetricOrParamPlot(): Promise<
+    CustomPlotsOrderValue | undefined
+  > {
     const metricAndParam = await pickMetricAndParam(
       this.experiments.getColumnTerminalNodes()
     )
@@ -188,18 +201,68 @@ export class WebviewMessages {
       return
     }
 
-    const plotAlreadyExists = this.plots
-      .getCustomPlotsOrder()
-      .some(
-        ({ param, metric }) =>
-          param === metricAndParam.param && metric === metricAndParam.metric
+    const plotAlreadyExists = this.plots.getCustomPlotsOrder().find(value => {
+      if (isCustomPlotOrderCheckpointValue(value)) {
+        return
+      }
+      return (
+        value.param === metricAndParam.param &&
+        value.metric === metricAndParam.metric
       )
+    })
 
     if (plotAlreadyExists) {
       return Toast.showError('Custom plot already exists.')
     }
 
-    this.plots.addCustomPlot(metricAndParam)
+    return {
+      ...metricAndParam,
+      type: CustomPlotType.METRIC_VS_PARAM
+    }
+  }
+
+  private async getCheckpointPlot(): Promise<
+    CustomPlotsOrderValue | undefined
+  > {
+    const metric = await pickMetric(this.experiments.getColumnTerminalNodes())
+
+    if (!metric) {
+      return
+    }
+
+    const plotAlreadyExists = this.plots.getCustomPlotsOrder().find(value => {
+      if (isCustomPlotOrderCheckpointValue(value)) {
+        return value.metric === metric
+      }
+    })
+
+    if (plotAlreadyExists) {
+      return Toast.showError('Custom plot already exists.')
+    }
+
+    return {
+      metric,
+      type: CustomPlotType.CHECKPOINT
+    }
+  }
+
+  private async addCustomPlot() {
+    const plotType = await pickCustomPlotType()
+
+    if (!plotType) {
+      return
+    }
+
+    const plot = await (plotType === CustomPlotType.CHECKPOINT
+      ? this.getCheckpointPlot()
+      : this.getMetricOrParamPlot())
+
+    if (!plot) {
+      return
+    }
+
+    this.plots.addCustomPlot(plot)
+
     this.sendCustomPlots()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED,
@@ -238,11 +301,21 @@ export class WebviewMessages {
 
     const buildMetricOrParamPath = (type: string, path: string) =>
       type + FILE_SEPARATOR + path
-    const newOrder = reorderObjectList(plotIds, customPlots, 'id').map(
-      ({ metric, param }) => ({
-        metric: buildMetricOrParamPath(ColumnType.METRICS, metric),
-        param: buildMetricOrParamPath(ColumnType.PARAMS, param)
-      })
+    const newOrder: CustomPlotsOrderValue[] = reorderObjectList(
+      plotIds,
+      customPlots,
+      'id'
+    ).map(plot =>
+      isCheckpointPlot(plot)
+        ? {
+            metric: buildMetricOrParamPath(ColumnType.METRICS, plot.title),
+            type: CustomPlotType.CHECKPOINT
+          }
+        : {
+            metric: buildMetricOrParamPath(ColumnType.METRICS, plot.metric),
+            param: buildMetricOrParamPath(ColumnType.PARAMS, plot.param),
+            type: CustomPlotType.METRIC_VS_PARAM
+          }
     )
     this.plots.setCustomPlotsOrder(newOrder)
     this.sendCustomPlots()
