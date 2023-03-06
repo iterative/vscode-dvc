@@ -2,6 +2,7 @@ import isEmpty from 'lodash.isempty'
 import {
   ComparisonPlot,
   ComparisonRevisionData,
+  PlotAspectRatio,
   PlotsData as TPlotsData,
   Revision,
   Section,
@@ -84,7 +85,7 @@ export class WebviewMessages {
         return this.setPlotSize(
           message.payload.section,
           message.payload.nbItemsPerRow,
-          message.payload.height
+          message.payload.aspectRatio
         )
       case MessageFromWebviewType.TOGGLE_PLOTS_SECTION:
         return this.setSectionCollapsed(message.payload)
@@ -123,13 +124,13 @@ export class WebviewMessages {
   private setPlotSize(
     section: Section,
     nbItemsPerRow: number,
-    height?: number
+    aspectRatio: PlotAspectRatio
   ) {
     this.plots.setNbItemsPerRow(section, nbItemsPerRow)
-    this.plots.setHeight(section, height)
+    this.plots.setAspectRatio(section, aspectRatio)
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_SECTION_RESIZED,
-      { height, nbItemsPerRow, section },
+      { aspectRatio, nbItemsPerRow, section },
       undefined
     )
   }
@@ -344,7 +345,7 @@ export class WebviewMessages {
     }
 
     return {
-      height: this.plots.getHeight(Section.TEMPLATE_PLOTS),
+      aspectRatio: this.plots.getASpectRatio(Section.TEMPLATE_PLOTS),
       nbItemsPerRow: this.plots.getNbItemsPerRow(Section.TEMPLATE_PLOTS),
       plots
     }
@@ -361,7 +362,7 @@ export class WebviewMessages {
     }
 
     return {
-      height: this.plots.getHeight(Section.COMPARISON_TABLE),
+      aspectRatio: this.plots.getASpectRatio(Section.COMPARISON_TABLE),
       nbItemsPerRow: this.plots.getNbItemsPerRow(Section.COMPARISON_TABLE),
       plots: comparison.map(({ path, revisions }) => {
         return { path, revisions: this.getRevisionsWithCorrectUrls(revisions) }

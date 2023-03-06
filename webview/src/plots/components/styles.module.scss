@@ -124,7 +124,6 @@ $gap: 20px;
 }
 
 .plot {
-  aspect-ratio: 9 / 5;
   overflow: visible;
   cursor: grab;
   position: relative;
@@ -157,6 +156,26 @@ $gap: 20px;
       opacity: 0.5;
     }
   }
+}
+
+.ratioNormal .plot {
+  aspect-ratio: 9 / 5;
+}
+
+.ratioDouble .plot {
+  aspect-ratio: 2 / 1;
+}
+
+.ratioSquare .plot {
+  aspect-ratio: 1;
+}
+
+.ratioVerticalNormal .plot {
+  aspect-ratio: 2 / 1;
+}
+
+.ratioVerticalDouble .plot {
+  aspect-ratio: 1 / 2;
 }
 
 .plotHorizontalResizer,

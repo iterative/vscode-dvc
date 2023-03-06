@@ -28,7 +28,8 @@ import {
   PlotNumberOfItemsPerRow,
   Section,
   TemplatePlotGroup,
-  TemplatePlotsData
+  TemplatePlotsData,
+  PlotAspectRatio
 } from '../../../plots/webview/contract'
 import { TEMP_PLOTS_DIR } from '../../../cli/dvc/constants'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
@@ -247,7 +248,7 @@ suite('Plots Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: {
-          height: undefined,
+          aspectRatio: PlotAspectRatio.NORMAL,
           nbItemsPerRow: PlotNumberOfItemsPerRow.THREE,
           section: Section.TEMPLATE_PLOTS
         },
@@ -263,7 +264,7 @@ suite('Plots Test Suite', () => {
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_PLOTS_SECTION_RESIZED,
         {
-          height: undefined,
+          aspectRatio: PlotAspectRatio.NORMAL,
           nbItemsPerRow: PlotNumberOfItemsPerRow.THREE,
           section: Section.TEMPLATE_PLOTS
         },
@@ -729,7 +730,11 @@ suite('Plots Test Suite', () => {
       const expectedPlotsData: TPlotsData = {
         checkpoint: checkpointPlotsFixture,
         comparison: comparisonPlotsFixture,
-        custom: { height: undefined, nbItemsPerRow: 2, plots: [] },
+        custom: {
+          aspectRatio: PlotAspectRatio.NORMAL,
+          nbItemsPerRow: 2,
+          plots: []
+        },
         hasPlots: true,
         hasUnselectedPlots: false,
         sectionCollapsed: DEFAULT_SECTION_COLLAPSED,

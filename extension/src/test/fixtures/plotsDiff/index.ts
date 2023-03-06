@@ -13,7 +13,8 @@ import {
   TemplatePlots,
   PlotNumberOfItemsPerRow,
   Revision,
-  PlotsComparisonData
+  PlotsComparisonData,
+  PlotAspectRatio
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
@@ -660,14 +661,14 @@ export const getRevisions = (): Revision[] => {
 export const getMinimalWebviewMessage = () => ({
   plots: extendedSpecs(basicVega),
   nbItemsPerRow: PlotNumberOfItemsPerRow.TWO,
-  height: undefined,
+  aspectRatio: PlotAspectRatio.NORMAL,
   revisions: getRevisions()
 })
 
 export const getTemplateWebviewMessage = (): TemplatePlotsData => ({
   plots: extendedSpecs({ ...basicVega, ...require('./vega').default }),
   nbItemsPerRow: PlotNumberOfItemsPerRow.TWO,
-  height: undefined
+  aspectRatio: PlotAspectRatio.NORMAL
 })
 
 export const getManyTemplatePlotsWebviewMessage = (
@@ -677,7 +678,7 @@ export const getManyTemplatePlotsWebviewMessage = (
     ...multipleVega(length)
   }),
   nbItemsPerRow: PlotNumberOfItemsPerRow.TWO,
-  height: undefined
+  aspectRatio: PlotAspectRatio.NORMAL
 })
 
 export const MOCK_IMAGE_MTIME = 946684800000
@@ -704,6 +705,6 @@ export const getComparisonWebviewMessage = (
     revisions: getRevisions(),
     plots: plotAcc,
     nbItemsPerRow: PlotNumberOfItemsPerRow.TWO,
-    height: undefined
+    aspectRatio: PlotAspectRatio.NORMAL
   }
 }

@@ -7,7 +7,9 @@ import { Provider, useDispatch } from 'react-redux'
 import {
   ComparisonRevisionData,
   PlotsComparisonData,
-  PlotNumberOfItemsPerRow
+  PlotNumberOfItemsPerRow,
+  DEFAULT_ASPECT_RATIO,
+  Section
 } from 'dvc/src/plots/webview/contract'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
@@ -43,7 +45,7 @@ const Template: Story = ({ plots, revisions }) => {
     <Provider store={store}>
       <MockedState
         data={{
-          height: undefined,
+          aspectRatio: DEFAULT_ASPECT_RATIO[Section.COMPARISON_TABLE],
           nbItemsPerRow: PlotNumberOfItemsPerRow.TWO,
           plots,
           revisions

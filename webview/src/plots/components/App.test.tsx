@@ -28,7 +28,8 @@ import {
   Revision,
   Section,
   TemplatePlotGroup,
-  TemplatePlotsData
+  TemplatePlotsData,
+  PlotAspectRatio
 } from 'dvc/src/plots/webview/contract'
 import {
   MessageFromWebviewType,
@@ -263,7 +264,7 @@ describe('App', () => {
     renderAppWithOptionalData({
       checkpoint: null,
       comparison: {
-        height: undefined,
+        aspectRatio: PlotAspectRatio.NORMAL,
         nbItemsPerRow: PlotNumberOfItemsPerRow.TWO,
         plots: [
           {

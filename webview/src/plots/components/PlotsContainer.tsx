@@ -9,6 +9,7 @@ import React, {
 import { AnyAction } from '@reduxjs/toolkit'
 import { useDispatch } from 'react-redux'
 import {
+  PlotAspectRatio,
   PlotNumberOfItemsPerRow,
   Section
 } from 'dvc/src/plots/webview/contract'
@@ -27,7 +28,8 @@ import {
   Lines,
   Add,
   Trash,
-  ArrowBoth
+  ArrowBoth,
+  ArrowBothVertical
 } from '../../shared/components/icons'
 import { isSelecting } from '../../util/strings'
 import { isTooltip } from '../../util/helpers'
@@ -38,7 +40,9 @@ export interface PlotsContainerProps {
   sectionKey: Section
   title: string
   nbItemsPerRow: number
+  aspectRatio: PlotAspectRatio
   changeNbItemsPerRow: (nb: number) => AnyAction
+  changeAspectRatio: (ratio: PlotAspectRatio) => AnyAction
   menu?: PlotsPickerProps
   addPlotsButton?: { onClick: () => void }
   removePlotsButton?: { onClick: () => void }
@@ -103,17 +107,35 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   title,
   children,
   nbItemsPerRow,
+  aspectRatio,
   menu,
   addPlotsButton,
   removePlotsButton,
-  changeNbItemsPerRow
+  changeNbItemsPerRow,
+  changeAspectRatio
 }) => {
   const open = !sectionCollapsed
   const dispatch = useDispatch()
 
   useEffect(() => {
     window.dispatchEvent(new Event('resize'))
-  }, [nbItemsPerRow])
+  }, [nbItemsPerRow, aspectRatio])
+
+  const resize = useCallback(
+    (nbItems: number, ratio: PlotAspectRatio) => {
+      dispatch(changeNbItemsPerRow(nbItems))
+      dispatch(changeAspectRatio(ratio))
+      sendMessage({
+        payload: {
+          aspectRatio: ratio,
+          nbItemsPerRow: nbItems,
+          section: sectionKey
+        },
+        type: MessageFromWebviewType.RESIZE_PLOTS
+      })
+    },
+    [dispatch, changeNbItemsPerRow, changeAspectRatio, sectionKey]
+  )
 
   const menuItems: IconMenuItemProps[] = [
     {
@@ -126,13 +148,29 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
             label: nb.toString()
           }))}
           setSelected={useCallback(
-            (nb: string) =>
-              dispatch(changeNbItemsPerRow(Number.parseInt(nb, 10))),
-            [dispatch, changeNbItemsPerRow]
+            (nb: string) => resize(Number.parseInt(nb, 10), aspectRatio),
+            [resize, aspectRatio]
           )}
         />
       ),
       tooltip: 'Change the number of plots per row'
+    },
+    {
+      icon: ArrowBothVertical,
+      onClickNode: (
+        <SingleSelect
+          items={Object.values(PlotAspectRatio).map(ratio => ({
+            id: ratio,
+            isSelected: false,
+            label: ratio
+          }))}
+          setSelected={useCallback(
+            (ratio: PlotAspectRatio) => resize(nbItemsPerRow, ratio),
+            [resize, nbItemsPerRow]
+          )}
+        />
+      ),
+      tooltip: 'Change the aspect ratio of plots'
     }
   ]
 
@@ -183,7 +221,18 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   }
 
   return (
-    <div className={styles.plotsContainerWrapper} data-testid="plots-container">
+    <div
+      className={cx(styles.plotsContainerWrapper, {
+        [styles.ratioNormal]: aspectRatio === PlotAspectRatio.NORMAL,
+        [styles.ratioDouble]: aspectRatio === PlotAspectRatio.DOUBLE,
+        [styles.ratioSquare]: aspectRatio === PlotAspectRatio.SQUARE,
+        [styles.ratioVerticalNormal]:
+          aspectRatio === PlotAspectRatio.VERTICAL_NORMAL,
+        [styles.ratioVerticalDouble]:
+          aspectRatio === PlotAspectRatio.VERTICAL_DOUBLE
+      })}
+      data-testid="plots-container"
+    >
       <details open={open} className={styles.plotsContainer}>
         <summary onClick={toggleSection}>
           <Icon

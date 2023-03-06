@@ -1,9 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
   CustomPlotsData,
-  DEFAULT_HEIGHT,
+  DEFAULT_ASPECT_RATIO,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NB_ITEMS_PER_ROW,
+  PlotAspectRatio,
   Section
 } from 'dvc/src/plots/webview/contract'
 import { addPlotsWithSnapshots, removePlots } from '../plotDataStore'
@@ -17,9 +18,9 @@ export interface CustomPlotsState extends Omit<CustomPlotsData, 'plots'> {
 }
 
 export const customPlotsInitialState: CustomPlotsState = {
+  aspectRatio: DEFAULT_ASPECT_RATIO[Section.CUSTOM_PLOTS],
   disabledDragPlotIds: [],
   hasData: false,
-  height: DEFAULT_HEIGHT[Section.CUSTOM_PLOTS],
   isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.CUSTOM_PLOTS],
   nbItemsPerRow: DEFAULT_SECTION_NB_ITEMS_PER_ROW[Section.CUSTOM_PLOTS],
   plotsIds: [],
@@ -30,6 +31,9 @@ export const customPlotsSlice = createSlice({
   initialState: customPlotsInitialState,
   name: 'custom',
   reducers: {
+    changeAspectRatio: (state, action: PayloadAction<PlotAspectRatio>) => {
+      state.aspectRatio = action.payload
+    },
     changeDisabledDragIds: (state, action: PayloadAction<string[]>) => {
       state.disabledDragPlotIds = action.payload
     },
@@ -58,7 +62,12 @@ export const customPlotsSlice = createSlice({
   }
 })
 
-export const { update, setCollapsed, changeSize, changeDisabledDragIds } =
-  customPlotsSlice.actions
+export const {
+  update,
+  setCollapsed,
+  changeSize,
+  changeDisabledDragIds,
+  changeAspectRatio
+} = customPlotsSlice.actions
 
 export default customPlotsSlice.reducer

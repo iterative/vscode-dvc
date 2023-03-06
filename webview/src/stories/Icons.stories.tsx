@@ -10,6 +10,7 @@ import { Icon } from '../shared/components/Icon'
 import {
   Add,
   ArrowBoth,
+  ArrowBothVertical,
   Check,
   ChevronDown,
   ChevronRight,
@@ -52,6 +53,9 @@ const Template: Story = () => {
       </IconWrapper>
       <IconWrapper name="ArrowBoth">
         <Icon icon={ArrowBoth} />
+      </IconWrapper>
+      <IconWrapper name="ArrowBothVertical">
+        <Icon icon={ArrowBothVertical} />
       </IconWrapper>
       <IconWrapper name="Check">
         <Icon icon={Check} />

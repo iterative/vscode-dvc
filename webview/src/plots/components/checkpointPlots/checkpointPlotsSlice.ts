@@ -1,9 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
   CheckpointPlotsData,
-  DEFAULT_HEIGHT,
+  DEFAULT_ASPECT_RATIO,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NB_ITEMS_PER_ROW,
+  PlotAspectRatio,
   Section
 } from 'dvc/src/plots/webview/contract'
 import { addPlotsWithSnapshots, removePlots } from '../plotDataStore'
@@ -18,10 +19,10 @@ export interface CheckpointPlotsState
 }
 
 export const checkpointPlotsInitialState: CheckpointPlotsState = {
+  aspectRatio: DEFAULT_ASPECT_RATIO[Section.CHECKPOINT_PLOTS],
   colors: { domain: [], range: [] },
   disabledDragPlotIds: [],
   hasData: false,
-  height: DEFAULT_HEIGHT[Section.CHECKPOINT_PLOTS],
   isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.CHECKPOINT_PLOTS],
   nbItemsPerRow: DEFAULT_SECTION_NB_ITEMS_PER_ROW[Section.CHECKPOINT_PLOTS],
   plotsIds: [],
@@ -33,6 +34,9 @@ export const checkpointPlotsSlice = createSlice({
   initialState: checkpointPlotsInitialState,
   name: 'checkpoint',
   reducers: {
+    changeAspectRatio: (state, action: PayloadAction<PlotAspectRatio>) => {
+      state.aspectRatio = action.payload
+    },
     changeDisabledDragIds: (state, action: PayloadAction<string[]>) => {
       state.disabledDragPlotIds = action.payload
     },
@@ -61,7 +65,12 @@ export const checkpointPlotsSlice = createSlice({
   }
 })
 
-export const { update, setCollapsed, changeSize, changeDisabledDragIds } =
-  checkpointPlotsSlice.actions
+export const {
+  update,
+  setCollapsed,
+  changeSize,
+  changeDisabledDragIds,
+  changeAspectRatio
+} = checkpointPlotsSlice.actions
 
 export default checkpointPlotsSlice.reducer

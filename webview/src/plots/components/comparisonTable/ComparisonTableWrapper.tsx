@@ -1,13 +1,13 @@
 import { Section } from 'dvc/src/plots/webview/contract'
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { changeSize } from './comparisonTableSlice'
+import { changeAspectRatio, changeSize } from './comparisonTableSlice'
 import { ComparisonTable } from './ComparisonTable'
 import { PlotsContainer } from '../PlotsContainer'
 import { PlotsState } from '../../store'
 
 export const ComparisonTableWrapper: React.FC = () => {
-  const { nbItemsPerRow, isCollapsed } = useSelector(
+  const { nbItemsPerRow, isCollapsed, aspectRatio } = useSelector(
     (state: PlotsState) => state.comparison
   )
 
@@ -18,6 +18,8 @@ export const ComparisonTableWrapper: React.FC = () => {
       nbItemsPerRow={nbItemsPerRow}
       sectionCollapsed={isCollapsed}
       changeNbItemsPerRow={changeSize}
+      changeAspectRatio={changeAspectRatio}
+      aspectRatio={aspectRatio}
     >
       <ComparisonTable />
     </PlotsContainer>

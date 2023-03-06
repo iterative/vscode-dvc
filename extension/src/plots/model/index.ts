@@ -28,7 +28,8 @@ import {
   SectionCollapsed,
   CustomPlotData,
   PlotNumberOfItemsPerRow,
-  DEFAULT_HEIGHT
+  PlotAspectRatio,
+  DEFAULT_ASPECT_RATIO
 } from '../webview/contract'
 import {
   ExperimentsOutput,
@@ -56,7 +57,7 @@ export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
 
   private nbItemsPerRow: Record<Section, number>
-  private height: Record<Section, number | undefined>
+  private aspectRatio: Record<Section, PlotAspectRatio>
   private customPlotsOrder: CustomPlotsOrderValue[]
   private sectionCollapsed: SectionCollapsed
   private commitRevisions: Record<string, string> = {}
@@ -88,7 +89,10 @@ export class PlotsModel extends ModelWithPersistence {
       PersistenceKey.PLOT_NB_ITEMS_PER_ROW,
       DEFAULT_SECTION_NB_ITEMS_PER_ROW
     )
-    this.height = this.revive(PersistenceKey.PLOT_HEIGHT, DEFAULT_HEIGHT)
+    this.aspectRatio = this.revive(
+      PersistenceKey.PLOT_ASPECT_RATIO,
+      DEFAULT_ASPECT_RATIO
+    )
 
     this.sectionCollapsed = this.revive(
       PersistenceKey.PLOT_SECTION_COLLAPSED,
@@ -181,7 +185,7 @@ export class PlotsModel extends ModelWithPersistence {
 
     return {
       colors,
-      height: this.getHeight(Section.CHECKPOINT_PLOTS),
+      aspectRatio: this.getASpectRatio(Section.CHECKPOINT_PLOTS),
       nbItemsPerRow: this.getNbItemsPerRow(Section.CHECKPOINT_PLOTS),
       plots: this.getPlots(this.checkpointPlots, selectedExperiments),
       selectedMetrics: this.getSelectedMetrics()
@@ -193,7 +197,7 @@ export class PlotsModel extends ModelWithPersistence {
       return
     }
     return {
-      height: this.getHeight(Section.CUSTOM_PLOTS),
+      aspectRatio: this.getASpectRatio(Section.CUSTOM_PLOTS),
       nbItemsPerRow: this.getNbItemsPerRow(Section.CUSTOM_PLOTS),
       plots: this.customPlots
     }
@@ -422,13 +426,13 @@ export class PlotsModel extends ModelWithPersistence {
     return PlotNumberOfItemsPerRow.TWO
   }
 
-  public setHeight(section: Section, height: number | undefined) {
-    this.height[section] = height
-    this.persist(PersistenceKey.PLOT_HEIGHT, this.height)
+  public setAspectRatio(section: Section, aspectRatio: PlotAspectRatio) {
+    this.aspectRatio[section] = aspectRatio
+    this.persist(PersistenceKey.PLOT_ASPECT_RATIO, this.aspectRatio)
   }
 
-  public getHeight(section: Section) {
-    return this.height[section]
+  public getASpectRatio(section: Section) {
+    return this.aspectRatio[section]
   }
 
   public setSectionCollapsed(newState: Partial<SectionCollapsed>) {

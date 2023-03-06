@@ -1,6 +1,7 @@
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
 import {
   CheckpointPlotsData,
+  PlotAspectRatio,
   PlotNumberOfItemsPerRow
 } from '../../../../plots/webview/contract'
 
@@ -92,7 +93,7 @@ const data: CheckpointPlotsData = {
     'summary.json:val_accuracy'
   ],
   nbItemsPerRow: PlotNumberOfItemsPerRow.TWO,
-  height: undefined
+  aspectRatio: PlotAspectRatio.NORMAL
 }
 
 export default data

@@ -3,13 +3,13 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { CustomPlots } from './CustomPlots'
-import { changeSize } from './customPlotsSlice'
+import { changeAspectRatio, changeSize } from './customPlotsSlice'
 import { PlotsContainer } from '../PlotsContainer'
 import { PlotsState } from '../../store'
 import { sendMessage } from '../../../shared/vscode'
 
 export const CustomPlotsWrapper: React.FC = () => {
-  const { plotsIds, nbItemsPerRow, isCollapsed } = useSelector(
+  const { plotsIds, nbItemsPerRow, isCollapsed, aspectRatio } = useSelector(
     (state: PlotsState) => state.custom
   )
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
@@ -35,6 +35,8 @@ export const CustomPlotsWrapper: React.FC = () => {
         plotsIds.length > 0 ? { onClick: removeCustomPlots } : undefined
       }
       changeNbItemsPerRow={changeSize}
+      changeAspectRatio={changeAspectRatio}
+      aspectRatio={aspectRatio}
     >
       <CustomPlots plotsIds={selectedPlots} />
     </PlotsContainer>

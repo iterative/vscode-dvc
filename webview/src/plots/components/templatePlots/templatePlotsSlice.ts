@@ -1,8 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
-  DEFAULT_HEIGHT,
+  DEFAULT_ASPECT_RATIO,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NB_ITEMS_PER_ROW,
+  PlotAspectRatio,
   Section,
   TemplatePlotGroup,
   TemplatePlotsData
@@ -19,9 +20,9 @@ export interface TemplatePlotsState extends Omit<TemplatePlotsData, 'plots'> {
 }
 
 export const templatePlotsInitialState: TemplatePlotsState = {
+  aspectRatio: DEFAULT_ASPECT_RATIO[Section.TEMPLATE_PLOTS],
   disabledDragPlotIds: [],
   hasData: false,
-  height: DEFAULT_HEIGHT[Section.TEMPLATE_PLOTS],
   isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.TEMPLATE_PLOTS],
   nbItemsPerRow: DEFAULT_SECTION_NB_ITEMS_PER_ROW[Section.TEMPLATE_PLOTS],
   plotsSnapshots: {},
@@ -32,6 +33,9 @@ export const templatePlotsSlice = createSlice({
   initialState: templatePlotsInitialState,
   name: 'template',
   reducers: {
+    changeAspectRatio: (state, action: PayloadAction<PlotAspectRatio>) => {
+      state.aspectRatio = action.payload
+    },
     changeDisabledDragIds: (state, action: PayloadAction<string[]>) => {
       state.disabledDragPlotIds = action.payload
     },
@@ -58,6 +62,7 @@ export const templatePlotsSlice = createSlice({
 
       return {
         ...state,
+        aspectRatio: action.payload.aspectRatio,
         hasData: !!action.payload,
         nbItemsPerRow: action.payload.nbItemsPerRow,
         plotsSnapshots: snapShots,
@@ -79,6 +84,7 @@ export const templatePlotsSlice = createSlice({
 export const {
   update,
   setCollapsed,
+  changeAspectRatio,
   changeSize,
   changeDisabledDragIds,
   updateSections

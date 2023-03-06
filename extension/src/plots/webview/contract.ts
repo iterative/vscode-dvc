@@ -11,6 +11,16 @@ export const PlotNumberOfItemsPerRow = {
 }
 /* eslint-enable sort-keys-fix/sort-keys-fix */
 
+export const PlotAspectRatio = {
+  NORMAL: '9/5',
+  DOUBLE: '2/1',
+  SQUARE: '1',
+  VERTICAL_NORMAL: '5/9',
+  VERTICAL_DOUBLE: '1/2'
+}
+export type PlotAspectRatio =
+  (typeof PlotAspectRatio)[keyof typeof PlotAspectRatio]
+
 export enum Section {
   CHECKPOINT_PLOTS = 'checkpoint-plots',
   TEMPLATE_PLOTS = 'template-plots',
@@ -25,12 +35,11 @@ export const DEFAULT_SECTION_NB_ITEMS_PER_ROW = {
   [Section.CUSTOM_PLOTS]: PlotNumberOfItemsPerRow.TWO
 }
 
-// Height is undefined by default because it is calculated by ratio of the width it'll fill (calculated by the webview)
-export const DEFAULT_HEIGHT = {
-  [Section.CHECKPOINT_PLOTS]: undefined,
-  [Section.TEMPLATE_PLOTS]: undefined,
-  [Section.COMPARISON_TABLE]: undefined,
-  [Section.CUSTOM_PLOTS]: undefined
+export const DEFAULT_ASPECT_RATIO = {
+  [Section.CHECKPOINT_PLOTS]: PlotAspectRatio.NORMAL,
+  [Section.TEMPLATE_PLOTS]: PlotAspectRatio.NORMAL,
+  [Section.COMPARISON_TABLE]: PlotAspectRatio.NORMAL,
+  [Section.CUSTOM_PLOTS]: PlotAspectRatio.NORMAL
 }
 
 export const DEFAULT_SECTION_COLLAPSED = {
@@ -68,7 +77,7 @@ export type Revision = {
 export interface PlotsComparisonData {
   plots: ComparisonPlots
   nbItemsPerRow: number
-  height: number | undefined
+  aspectRatio: PlotAspectRatio
   revisions: Revision[]
 }
 
@@ -101,7 +110,7 @@ export type CustomPlotData = {
 export type CustomPlotsData = {
   plots: CustomPlotData[]
   nbItemsPerRow: number
-  height: number | undefined
+  aspectRatio: PlotAspectRatio
 }
 
 export type CheckpointPlotData = CheckpointPlot & { title: string }
@@ -110,7 +119,7 @@ export type CheckpointPlotsData = {
   plots: CheckpointPlotData[]
   colors: ColorScale
   nbItemsPerRow: number
-  height: number | undefined
+  aspectRatio: PlotAspectRatio
   selectedMetrics?: string[]
 }
 
@@ -159,7 +168,7 @@ export type TemplatePlotSection = {
 export interface TemplatePlotsData {
   plots: TemplatePlotSection[]
   nbItemsPerRow: number
-  height: number | undefined
+  aspectRatio: PlotAspectRatio
 }
 
 export type ComparisonPlot = {

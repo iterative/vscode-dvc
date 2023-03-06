@@ -1,5 +1,6 @@
 import {
   CustomPlotsData,
+  PlotAspectRatio,
   PlotNumberOfItemsPerRow
 } from '../../../../plots/webview/contract'
 
@@ -51,7 +52,7 @@ const data: CustomPlotsData = {
     }
   ],
   nbItemsPerRow: PlotNumberOfItemsPerRow.TWO,
-  height: undefined
+  aspectRatio: PlotAspectRatio.NORMAL
 }
 
 export default data

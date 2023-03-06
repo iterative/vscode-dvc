@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { SelectMenu } from './SelectMenu'
 import { SelectMenuOptionProps } from './SelectMenuOption'
 
@@ -11,9 +11,7 @@ export const SingleSelect: React.FC<{
     setOptions(
       options.map(option => ({ ...option, isSelected: option.id === id }))
     )
+    setSelected(id)
   }
-  useEffect(() => {
-    setSelected(options.find(option => option.isSelected)?.id || '')
-  }, [options, setSelected])
   return <SelectMenu options={options} onClick={onClick} />
 }
