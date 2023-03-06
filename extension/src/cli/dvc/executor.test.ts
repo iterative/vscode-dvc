@@ -28,6 +28,8 @@ const mockedEnv = {
 
 const mockedSetContextValue = jest.mocked(setContextValue)
 
+const mockedGetStudioLiveShareToken = jest.fn()
+
 beforeEach(() => {
   jest.resetAllMocks()
   mockedGetProcessEnv.mockReturnValueOnce(mockedEnv)
@@ -48,6 +50,7 @@ describe('CliExecutor', () => {
       getCliPath: () => undefined,
       getPythonBinPath: () => undefined
     } as unknown as Config,
+    mockedGetStudioLiveShareToken,
     {
       processCompleted: {
         event: jest.fn(),
@@ -599,6 +602,28 @@ describe('CliExecutor', () => {
         cwd,
         detached: true,
         env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+
+    it("should call createProcess with the correct parameters to start the experiment's queue and send live updates to Studio", () => {
+      const cwd = __dirname
+      const jobs = '91231324'
+      const mockedToken = 'isat_notarealtoken'
+
+      mockedGetStudioLiveShareToken.mockReturnValueOnce(mockedToken)
+
+      const stdout = `Started '${jobs}' new experiments task queue workers.`
+
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
+
+      void dvcExecutor.queueStart(cwd, jobs)
+
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
+        args: ['queue', 'start', '-j', jobs],
+        cwd,
+        detached: true,
+        env: { ...mockedEnv, STUDIO_TOKEN: mockedToken },
         executable: 'dvc'
       })
     })

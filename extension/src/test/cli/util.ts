@@ -15,7 +15,7 @@ const config = {
 } as Config
 
 export const dvcReader = new DvcReader(config)
-export const dvcExecutor = new DvcExecutor(config)
+export const dvcExecutor = new DvcExecutor(config, () => undefined)
 const gitExecutor = new GitExecutor()
 
 let demoInitialized: Promise<string>

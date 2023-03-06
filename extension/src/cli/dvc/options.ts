@@ -49,3 +49,17 @@ export const getOptions = (
     executable
   }
 }
+
+export const addStudioAccessToken = (
+  options: ExecutionOptions,
+  studioAccessToken: string | undefined
+): ExecutionOptions => {
+  if (!studioAccessToken) {
+    return options
+  }
+
+  return {
+    ...options,
+    env: { ...options.env, STUDIO_TOKEN: studioAccessToken }
+  }
+}

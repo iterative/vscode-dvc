@@ -142,7 +142,7 @@ export const buildInternalCommands = (disposer: Disposer) => {
   const config = disposer.track(new Config())
   const dvcReader = disposer.track(new DvcReader(config))
   const dvcRunner = disposer.track(new DvcRunner(config, () => undefined))
-  const dvcExecutor = disposer.track(new DvcExecutor(config))
+  const dvcExecutor = disposer.track(new DvcExecutor(config, () => undefined))
   const dvcViewer = disposer.track(new DvcViewer(config))
   const gitReader = disposer.track(new GitReader())
 

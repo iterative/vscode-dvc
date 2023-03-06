@@ -5,7 +5,7 @@ import {
   ExperimentFlag,
   ExperimentSubCommand
 } from './constants'
-import { getOptions } from './options'
+import { addStudioAccessToken, getOptions } from './options'
 import { CliResult, CliStarted, ICli, typeCheckCommands } from '..'
 import { getCommandString } from '../command'
 import { Config } from '../../config'
@@ -183,15 +183,7 @@ export class DvcRunner extends Disposable implements ICli {
     )
 
     const studioAccessToken = this.getStudioLiveShareToken()
-
-    if (!studioAccessToken) {
-      return options
-    }
-
-    return {
-      ...options,
-      env: { ...options.env, STUDIO_TOKEN: studioAccessToken }
-    }
+    return addStudioAccessToken(options, studioAccessToken)
   }
 
   private startProcess(cwd: string, args: Args) {
