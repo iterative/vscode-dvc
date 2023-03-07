@@ -36,6 +36,7 @@ import { GitReader } from '../../cli/git/reader'
 import { SetupData } from '../../setup/webview/contract'
 import { DvcViewer } from '../../cli/dvc/viewer'
 import { ConnectData } from '../../connect/webview/contract'
+import { Toast } from '../../vscode/toast'
 
 export const mockDisposable = {
   dispose: stub()
@@ -306,3 +307,6 @@ export const getTimeSafeDisposer = (): Disposer & {
     }
   })
 }
+
+export const bypassProgressCloseDelay = () =>
+  stub(Toast, 'delayProgressClosing').resolves(undefined)
