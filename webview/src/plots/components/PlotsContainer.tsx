@@ -40,6 +40,7 @@ export interface PlotsContainerProps {
   addPlotsButton?: { onClick: () => void }
   removePlotsButton?: { onClick: () => void }
   children: React.ReactNode
+  hasItems?: boolean
 }
 
 export const SectionDescription = {
@@ -103,7 +104,8 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   menu,
   addPlotsButton,
   removePlotsButton,
-  changeNbItemsPerRow
+  changeNbItemsPerRow,
+  hasItems
 }) => {
   const open = !sectionCollapsed
   const dispatch = useDispatch()
@@ -169,15 +171,15 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
         dispatch(changeNbItemsPerRow(nbItems))
         sendMessage({
           payload: {
-            nbItemsPerRow: nbItems,
             height: undefined,
+            nbItemsPerRow: nbItems,
             section: sectionKey
           },
           type: MessageFromWebviewType.RESIZE_PLOTS
         })
       }
     },
-    [dispatch, changeNbItemsPerRow]
+    [dispatch, changeNbItemsPerRow, sectionKey]
   )
 
   return (
@@ -201,8 +203,11 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
             </div>
           </Tooltip>
         </summary>
-        {changeNbItemsPerRow && (
-          <div className={styles.nbItemsPerRowSlider}>
+        {changeNbItemsPerRow && hasItems && (
+          <div
+            className={styles.nbItemsPerRowSlider}
+            data-testid="nb-items-per-row-slider"
+          >
             <MinMaxSlider
               minimum={1}
               maximum={setMaxNbPlotsPerRow}

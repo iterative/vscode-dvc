@@ -1,4 +1,4 @@
 export const shouldUseVirtualizedGrid = (
   nbItems: number,
   nbItemsPerRow: number
-) => nbItems > (nbItemsPerRow + 1) * 5
+) => nbItems / nbItemsPerRow > 8 - (nbItemsPerRow - 1)

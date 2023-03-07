@@ -10,6 +10,9 @@ export const TemplatePlotsWrapper: React.FC = () => {
   const { nbItemsPerRow, isCollapsed } = useSelector(
     (state: PlotsState) => state.template
   )
+  const hasItems = useSelector(
+    (state: PlotsState) => Object.keys(state.template.plotsSnapshots).length > 0
+  )
 
   return (
     <PlotsContainer
@@ -18,6 +21,7 @@ export const TemplatePlotsWrapper: React.FC = () => {
       nbItemsPerRow={nbItemsPerRow}
       sectionCollapsed={isCollapsed}
       changeNbItemsPerRow={changeSize}
+      hasItems={hasItems}
     >
       <TemplatePlots />
     </PlotsContainer>

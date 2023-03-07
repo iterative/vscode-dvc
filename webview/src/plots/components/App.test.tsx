@@ -59,7 +59,6 @@ import { DragEnterDirection } from '../../shared/components/dragDrop/util'
 import { clearSelection, createWindowTextSelection } from '../../test/selection'
 import * as EventCurrentTargetDistances from '../../shared/components/dragDrop/currentTarget'
 import { OVERSCAN_ROW_COUNT } from '../../shared/components/virtualizedGrid/VirtualizedGrid'
-import { pickAndMove } from '../../test/mouseEventsWithCoordinates'
 
 jest.mock('../../shared/components/dragDrop/currentTarget', () => {
   const actualModule = jest.requireActual(
@@ -697,17 +696,46 @@ describe('App', () => {
     })
   })
 
+  it('should display a slider to pick the number of items per row if there are items and the action is available', () => {
+    renderAppWithOptionalData({
+      checkpoint: checkpointPlotsFixture
+    })
+
+    expect(screen.getByTestId('nb-items-per-row-slider')).toBeInTheDocument()
+  })
+
+  it('should not display a slider to pick the number of items per row if there are no items', () => {
+    renderAppWithOptionalData({})
+
+    expect(
+      screen.queryByTestId('nb-items-per-row-slider')
+    ).not.toBeInTheDocument()
+  })
+
+  it('should not display a slider to pick the number of items per row if the action is unavailable', () => {
+    renderAppWithOptionalData({
+      comparison: comparisonTableFixture
+    })
+
+    expect(
+      screen.queryByTestId('nb-items-per-row-slider')
+    ).not.toBeInTheDocument()
+  })
+
   it('should send a message to the extension with the selected size when changing the size of plots', () => {
     const store = renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
     })
 
-    const plotResizer = screen.getAllByTestId('vertical-plot-resizer')[0]
+    const plotResizer = within(
+      screen.getByTestId('nb-items-per-row-slider')
+    ).getByRole('slider')
 
     setWrapperSize(store)
-    pickAndMove(plotResizer, 10)
+    fireEvent.change(plotResizer, { target: { value: 1 } })
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: {
+        height: undefined,
         nbItemsPerRow: 1,
         section: Section.CHECKPOINT_PLOTS
       },
@@ -715,21 +743,11 @@ describe('App', () => {
     })
 
     setWrapperSize(store)
-    pickAndMove(plotResizer, -10)
-    expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: {
-        nbItemsPerRow: DefaultNumberOfItemsPerRow,
-        section: Section.CHECKPOINT_PLOTS
-      },
-      type: MessageFromWebviewType.RESIZE_PLOTS
-    })
-
-    setWrapperSize(store)
-
-    pickAndMove(plotResizer, -10)
+    fireEvent.change(plotResizer, { target: { value: 3 } })
 
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: {
+        height: undefined,
         nbItemsPerRow: 3,
         section: Section.CHECKPOINT_PLOTS
       },
@@ -737,32 +755,6 @@ describe('App', () => {
     })
 
     setWrapperSize(store)
-    pickAndMove(plotResizer, -10)
-    expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: {
-        nbItemsPerRow: 4,
-        section: Section.CHECKPOINT_PLOTS
-      },
-      type: MessageFromWebviewType.RESIZE_PLOTS
-    })
-  })
-
-  it('should not send a message to the extension with the selected size when changing the size of plots and pressing escape', () => {
-    const store = renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
-    })
-
-    const plotResizer = screen.getAllByTestId('vertical-plot-resizer')[0]
-
-    setWrapperSize(store)
-    pickAndMove(plotResizer, 10, 0, true)
-    expect(mockPostMessage).not.toHaveBeenCalledWith({
-      payload: {
-        nbItemsPerRow: 1,
-        section: Section.CHECKPOINT_PLOTS
-      },
-      type: MessageFromWebviewType.RESIZE_PLOTS
-    })
   })
 
   it('should display the checkpoint plots in the order stored', () => {
@@ -1549,9 +1541,9 @@ describe('App', () => {
     }
 
     describe('Large plots', () => {
-      it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than ten large plots', async () => {
+      it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than eight large plots', async () => {
         await renderAppAndChangeSize(
-          { checkpoint: createCheckpointPlots(11) },
+          { checkpoint: createCheckpointPlots(9) },
           1,
           Section.CHECKPOINT_PLOTS
         )
@@ -1567,9 +1559,9 @@ describe('App', () => {
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
 
-      it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are ten or fewer large plots', async () => {
+      it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are eight or fewer large plots', async () => {
         await renderAppAndChangeSize(
-          { checkpoint: createCheckpointPlots(10) },
+          { checkpoint: createCheckpointPlots(8) },
           1,
           Section.CHECKPOINT_PLOTS
         )
@@ -1585,9 +1577,9 @@ describe('App', () => {
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
       })
 
-      it('should  wrap the template plots in a big grid (virtualize them) when there are more than ten large plots', async () => {
+      it('should  wrap the template plots in a big grid (virtualize them) when there are more than eight large plots', async () => {
         await renderAppAndChangeSize(
-          { template: manyTemplatePlots(11) },
+          { template: manyTemplatePlots(9) },
           1,
           Section.TEMPLATE_PLOTS
         )
@@ -1603,9 +1595,9 @@ describe('App', () => {
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
 
-      it('should not wrap the template plots in a big grid (virtualize them) when there are ten or fewer large plots', async () => {
+      it('should not wrap the template plots in a big grid (virtualize them) when there are eigth or fewer large plots', async () => {
         await renderAppAndChangeSize(
-          { template: manyTemplatePlots(10) },
+          { template: manyTemplatePlots(8) },
           1,
           Section.TEMPLATE_PLOTS
         )
@@ -1678,9 +1670,9 @@ describe('App', () => {
     })
 
     describe('Regular plots', () => {
-      it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than fifteen regular plots', async () => {
+      it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than fourteen regular plots', async () => {
         await renderAppAndChangeSize(
-          { checkpoint: createCheckpointPlots(16) },
+          { checkpoint: createCheckpointPlots(15) },
           DefaultNumberOfItemsPerRow,
           Section.CHECKPOINT_PLOTS
         )
@@ -1688,9 +1680,9 @@ describe('App', () => {
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
 
-      it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are eight or fifteen regular plots', async () => {
+      it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are eight or fourteen regular plots', async () => {
         await renderAppAndChangeSize(
-          { checkpoint: createCheckpointPlots(15) },
+          { checkpoint: createCheckpointPlots(14) },
           DefaultNumberOfItemsPerRow,
           Section.CHECKPOINT_PLOTS
         )
@@ -1698,9 +1690,9 @@ describe('App', () => {
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
       })
 
-      it('should  wrap the template plots in a big grid (virtualize them) when there are more than fifteen regular plots', async () => {
+      it('should  wrap the template plots in a big grid (virtualize them) when there are more than fourteen regular plots', async () => {
         await renderAppAndChangeSize(
-          { template: manyTemplatePlots(16) },
+          { template: manyTemplatePlots(15) },
           DefaultNumberOfItemsPerRow,
           Section.TEMPLATE_PLOTS
         )
@@ -1708,9 +1700,9 @@ describe('App', () => {
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
 
-      it('should not wrap the template plots in a big grid (virtualize them) when there are fifteen or fewer regular plots', async () => {
+      it('should not wrap the template plots in a big grid (virtualize them) when there are fourteen or fewer regular plots', async () => {
         await renderAppAndChangeSize(
-          { template: manyTemplatePlots(15) },
+          { template: manyTemplatePlots(14) },
           DefaultNumberOfItemsPerRow,
           Section.TEMPLATE_PLOTS
         )
