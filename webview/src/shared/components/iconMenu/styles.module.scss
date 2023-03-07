@@ -21,10 +21,6 @@
   background: inherit;
   color: $fg-color;
 
-  svg {
-    fill: $fg-color;
-  }
-
   &:hover {
     background-color: var(--editor-foreground-transparency-1);
   }
