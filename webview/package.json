@@ -31,7 +31,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-intersection-observer": "9.3.5",
-    "react-redux": "8.0.2",
+    "react-redux": "8.0.5",
     "react-vega": "7.6.0",
     "react-virtualized": "9.22.3",
     "vega": "5.22.1",
