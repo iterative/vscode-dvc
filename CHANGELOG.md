@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.15] - 2023-03-07
+
+### 🚀 New Features and Enhancements
+
+- Have queue workers respect dvc.studio.shareExperimentsLive [#3398](https://github.com/iterative/vscode-dvc/pull/3398) by [@mattseddon](https://github.com/mattseddon)
+- Expose Open Studio Settings in the command palette [#3399](https://github.com/iterative/vscode-dvc/pull/3399) by [@mattseddon](https://github.com/mattseddon)
+- Switch add Studio access token to update when Studio is connected [#3400](https://github.com/iterative/vscode-dvc/pull/3400) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Remove vega-functions & vega-scale resolutions [#3395](https://github.com/iterative/vscode-dvc/pull/3395) by [@mattseddon](https://github.com/mattseddon)
+- Added a story to visualize the icons [#3403](https://github.com/iterative/vscode-dvc/pull/3403) by [@sroy3](https://github.com/sroy3)
+
 ## [0.6.14] - 2023-03-05
 
 ### 🐛 Bug Fixes
