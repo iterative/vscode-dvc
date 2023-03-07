@@ -165,7 +165,17 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
 
   const handleResize = useCallback(
     (nbItems: number) => {
-      changeNbItemsPerRow && dispatch(changeNbItemsPerRow(nbItems))
+      if (changeNbItemsPerRow) {
+        dispatch(changeNbItemsPerRow(nbItems))
+        sendMessage({
+          payload: {
+            nbItemsPerRow: nbItems,
+            height: undefined,
+            section: sectionKey
+          },
+          type: MessageFromWebviewType.RESIZE_PLOTS
+        })
+      }
     },
     [dispatch, changeNbItemsPerRow]
   )

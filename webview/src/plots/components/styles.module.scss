@@ -120,10 +120,6 @@ $gap: 20px;
   }
 }
 
-.multiViewPlotsGrid {
-  padding-right: $gap;
-}
-
 .plot {
   aspect-ratio: 9 / 5;
   overflow: visible;
@@ -173,56 +169,6 @@ $gap: 20px;
   }
 }
 
-$resizer-border: 2px dashed $accent-color;
-.resizerLocked {
-  position: absolute;
-  background-color: $accent-color-transparent;
-  border: $resizer-border;
-  border-right: none;
-
-  .plotExpanding & {
-    border-right: $resizer-border;
-    border-left: none;
-  }
-}
-
-.plotExpanding {
-  &::after {
-    content: '';
-    background-color: $accent-color-transparent;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: $resizer-border;
-    border-right: none;
-    box-sizing: border-box;
-  }
-}
-
-.plotVerticalResizer {
-  width: 3px;
-  height: 100%;
-  right: 0;
-  top: 0;
-  cursor: col-resize;
-
-  &::after {
-    width: 1px;
-    height: 50%;
-    top: 25%;
-    right: 1px;
-  }
-
-  .resizerLocked {
-    width: 3px;
-    height: 100%;
-    top: 0;
-    right: 1px;
-  }
-}
-
 .plot img,
 .plot svg {
   max-width: 100%;
@@ -233,8 +179,6 @@ $resizer-border: 2px dashed $accent-color;
 .plot.multiViewPlot {
   aspect-ratio: calc(0.8 * var(--scale) + 0.2);
   grid-column: span var(--scale);
-  width: calc(300px * var(--scale));
-  max-width: max-content;
 }
 
 .comparisonTable {
