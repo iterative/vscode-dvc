@@ -54,30 +54,14 @@ describe('plotsModel', () => {
     expect(model.getSelectedMetrics()).toStrictEqual(newSelectedMetrics)
   })
 
-  it('should update the persisted selected metrics when calling setSelectedMetrics', () => {
-    const mementoUpdateSpy = jest.spyOn(memento, 'update')
-    const newSelectedMetrics = ['one', 'two', 'four', 'hundred']
-
-    model.setSelectedMetrics(newSelectedMetrics)
-
-    expect(mementoUpdateSpy).toHaveBeenCalledTimes(2)
-    expect(mementoUpdateSpy).toHaveBeenCalledWith(
-      PersistenceKey.PLOT_SELECTED_METRICS + exampleDvcRoot,
-      newSelectedMetrics
-    )
-  })
-
   it('should change the plotSize when calling setPlotSize', () => {
-    expect(model.getNbItemsPerRow(Section.CHECKPOINT_PLOTS)).toStrictEqual(
+    expect(model.getNbItemsPerRow(Section.CUSTOM_PLOTS)).toStrictEqual(
       PlotNumberOfItemsPerRow.TWO
     )
 
-    model.setNbItemsPerRow(
-      Section.CHECKPOINT_PLOTS,
-      PlotNumberOfItemsPerRow.ONE
-    )
+    model.setNbItemsPerRow(Section.CUSTOM_PLOTS, PlotNumberOfItemsPerRow.ONE)
 
-    expect(model.getNbItemsPerRow(Section.CHECKPOINT_PLOTS)).toStrictEqual(
+    expect(model.getNbItemsPerRow(Section.CUSTOM_PLOTS)).toStrictEqual(
       PlotNumberOfItemsPerRow.ONE
     )
   })
@@ -85,17 +69,14 @@ describe('plotsModel', () => {
   it('should update the persisted plot size when calling setPlotSize', () => {
     const mementoUpdateSpy = jest.spyOn(memento, 'update')
 
-    model.setNbItemsPerRow(
-      Section.CHECKPOINT_PLOTS,
-      PlotNumberOfItemsPerRow.TWO
-    )
+    model.setNbItemsPerRow(Section.CUSTOM_PLOTS, PlotNumberOfItemsPerRow.TWO)
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
       PersistenceKey.PLOT_NB_ITEMS_PER_ROW + exampleDvcRoot,
       {
         ...DEFAULT_SECTION_NB_ITEMS_PER_ROW,
-        [Section.CHECKPOINT_PLOTS]: PlotNumberOfItemsPerRow.TWO
+        [Section.CUSTOM_PLOTS]: PlotNumberOfItemsPerRow.TWO
       }
     )
   })
@@ -105,12 +86,11 @@ describe('plotsModel', () => {
 
     expect(model.getSectionCollapsed()).toStrictEqual(DEFAULT_SECTION_COLLAPSED)
 
-    model.setSectionCollapsed({ [Section.CHECKPOINT_PLOTS]: true })
+    model.setSectionCollapsed({ [Section.CUSTOM_PLOTS]: true })
 
     const expectedSectionCollapsed = {
-      [Section.CHECKPOINT_PLOTS]: true,
       [Section.TEMPLATE_PLOTS]: false,
-      [Section.CUSTOM_PLOTS]: false,
+      [Section.CUSTOM_PLOTS]: true,
       [Section.COMPARISON_TABLE]: false
     }
 

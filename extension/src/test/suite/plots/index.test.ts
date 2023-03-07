@@ -7,7 +7,6 @@ import { restore, spy, stub } from 'sinon'
 import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import expShowFixtureWithoutErrors from '../../fixtures/expShow/base/noErrors'
-import checkpointPlotsFixture from '../../fixtures/expShow/base/checkpointPlots'
 import customPlotsFixture from '../../fixtures/expShow/base/customPlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
 import multiSourcePlotsDiffFixture from '../../fixtures/plotsDiff/multiSource'
@@ -192,48 +191,6 @@ suite('Plots Test Suite', () => {
       )
     })
 
-    it('should handle a set selected metrics message from the webview', async () => {
-      const { plots, plotsModel, messageSpy } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
-
-      const webview = await plots.showWebview()
-
-      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
-
-      const mockSetSelectedMetrics = spy(plotsModel, 'setSelectedMetrics')
-      const mockSelectedMetrics = ['summary.json:loss']
-
-      messageSpy.resetHistory()
-      mockMessageReceived.fire({
-        payload: mockSelectedMetrics,
-        type: MessageFromWebviewType.TOGGLE_METRIC
-      })
-
-      expect(mockSetSelectedMetrics).to.be.calledOnce
-      expect(mockSetSelectedMetrics).to.be.calledWithExactly(
-        mockSelectedMetrics
-      )
-      expect(messageSpy).to.be.calledOnce
-      expect(
-        messageSpy,
-        "should update the webview's checkpoint plot state"
-      ).to.be.calledWithExactly({
-        checkpoint: {
-          ...checkpointPlotsFixture,
-          selectedMetrics: mockSelectedMetrics
-        }
-      })
-      expect(mockSendTelemetryEvent).to.be.calledOnce
-      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_PLOTS_METRICS_SELECTED,
-        undefined,
-        undefined
-      )
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
     it('should handle a section resized message from the webview', async () => {
       const { plots, plotsModel } = await buildPlots(disposable)
 
@@ -281,7 +238,7 @@ suite('Plots Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockSetSectionCollapsed = spy(plotsModel, 'setSectionCollapsed')
-      const mockSectionCollapsed = { [Section.CHECKPOINT_PLOTS]: true }
+      const mockSectionCollapsed = { [Section.CUSTOM_PLOTS]: true }
 
       messageSpy.resetHistory()
       mockMessageReceived.fire({
@@ -667,19 +624,16 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.called
 
       const {
-        checkpoint: checkpointData,
         comparison: comparisonData,
         sectionCollapsed,
         template: templateData
       } = getFirstArgOfLastCall(messageSpy)
 
-      expect(checkpointData).to.deep.equal(checkpointPlotsFixture)
       expect(comparisonData).to.deep.equal(comparisonPlotsFixture)
       expect(sectionCollapsed).to.deep.equal(DEFAULT_SECTION_COLLAPSED)
       expect(templateData).to.deep.equal(templatePlotsFixture)
 
       const expectedPlotsData: TPlotsData = {
-        checkpoint: checkpointPlotsFixture,
         comparison: comparisonPlotsFixture,
         custom: customPlotsFixture,
         hasPlots: true,

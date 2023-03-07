@@ -11,7 +11,6 @@ import {
   PlotNumberOfItemsPerRow
 } from 'dvc/src/plots/webview/contract'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
-import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/base/checkpointPlots'
 import customPlotsFixture from 'dvc/src/test/fixtures/expShow/base/customPlots'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template'
 import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtualization'
@@ -27,23 +26,18 @@ import '../shared/style.scss'
 import '../plots/components/styles.module.scss'
 import { feedStore } from '../plots/components/App'
 import { plotsReducers } from '../plots/store'
-
-const manyCheckpointPlots = (
-  length: number,
-  size = PlotNumberOfItemsPerRow.TWO
-) =>
-  Array.from({ length }, () => checkpointPlotsFixture.plots[0]).map(
-    (plot, i) => {
-      const id = plot.id + i.toString()
-      return {
-        ...plot,
-        id,
-        title: truncateVerticalTitle(id, size) as string
-      }
+// TBD review storybooks, making sure they all make sense
+const manyCustomPlots = (length: number, size = PlotNumberOfItemsPerRow.TWO) =>
+  Array.from({ length }, () => customPlotsFixture.plots[2]).map((plot, i) => {
+    const id = plot.id + i.toString()
+    return {
+      ...plot,
+      id,
+      yTitle: truncateVerticalTitle(id, size) as string
     }
-  )
+  })
 
-const manyCheckpointPlotsFixture = manyCheckpointPlots(15)
+const manyCustomPlotsFixture = manyCustomPlots(15)
 
 const MockedState: React.FC<{ data: PlotsData; children: React.ReactNode }> = ({
   children,
@@ -59,7 +53,6 @@ const MockedState: React.FC<{ data: PlotsData; children: React.ReactNode }> = ({
 export default {
   args: {
     data: {
-      checkpoint: checkpointPlotsFixture,
       comparison: comparisonPlotsFixture,
       custom: customPlotsFixture,
       hasPlots: true,
@@ -92,8 +85,8 @@ WithData.parameters = CHROMATIC_VIEWPORTS
 export const WithEmptyCheckpoints = Template.bind({})
 WithEmptyCheckpoints.args = {
   data: {
-    checkpoint: { ...checkpointPlotsFixture, selectedMetrics: [] },
     comparison: comparisonPlotsFixture,
+    custom: { ...customPlotsFixture },
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
     selectedRevisions: plotsRevisionsFixture,
     template: templatePlotsFixture
@@ -104,7 +97,7 @@ WithEmptyCheckpoints.parameters = DISABLE_CHROMATIC_SNAPSHOTS
 export const WithCheckpointOnly = Template.bind({})
 WithCheckpointOnly.args = {
   data: {
-    checkpoint: checkpointPlotsFixture,
+    custom: customPlotsFixture,
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
     selectedRevisions: plotsRevisionsFixture
   }
@@ -181,10 +174,6 @@ WithoutData.args = {
 export const AllLarge = Template.bind({})
 AllLarge.args = {
   data: {
-    checkpoint: {
-      ...checkpointPlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.ONE
-    },
     comparison: {
       ...comparisonPlotsFixture,
       nbItemsPerRow: PlotNumberOfItemsPerRow.ONE
@@ -227,13 +216,11 @@ AllSmall.parameters = CHROMATIC_VIEWPORTS
 export const VirtualizedPlots = Template.bind({})
 VirtualizedPlots.args = {
   data: {
-    checkpoint: {
-      ...checkpointPlotsFixture,
-      plots: manyCheckpointPlotsFixture,
-      selectedMetrics: manyCheckpointPlotsFixture.map(plot => plot.id)
-    },
     comparison: undefined,
-    custom: customPlotsFixture,
+    custom: {
+      ...customPlotsFixture,
+      plots: manyCustomPlotsFixture
+    },
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
     selectedRevisions: plotsRevisionsFixture,
     template: manyTemplatePlots(125)
@@ -299,7 +286,6 @@ ScrolledHeaders.parameters = {
 export const ScrolledWithManyRevisions = Template.bind({})
 ScrolledWithManyRevisions.args = {
   data: {
-    checkpoint: checkpointPlotsFixture,
     comparison: comparisonPlotsFixture,
     custom: customPlotsFixture,
     hasPlots: true,

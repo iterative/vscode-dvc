@@ -15,6 +15,8 @@ const data: CustomPlotsData = {
   plots: [
     {
       id: 'custom-metrics:summary.json:loss-params:params.yaml:dropout',
+      // TBD I don't think we actually need metric/param here
+      // since I think only title is used in in the front end
       metric: 'summary.json:loss',
       param: 'params.yaml:dropout',
       type: CustomPlotType.METRIC_VS_PARAM,
@@ -59,6 +61,46 @@ const data: CustomPlotsData = {
           param: 20
         }
       ],
+      yTitle: 'summary.json:accuracy'
+    },
+    {
+      id: 'custom-summary.json:loss',
+      metric: 'summary.json:loss',
+      values: [
+        { group: 'exp-83425', iteration: 1, y: 1.9896177053451538 },
+        { group: 'exp-83425', iteration: 2, y: 1.9329891204833984 },
+        { group: 'exp-83425', iteration: 3, y: 1.8798457384109497 },
+        { group: 'exp-83425', iteration: 4, y: 1.8261293172836304 },
+        { group: 'exp-83425', iteration: 5, y: 1.775016188621521 },
+        { group: 'exp-83425', iteration: 6, y: 1.775016188621521 },
+        { group: 'test-branch', iteration: 1, y: 1.9882521629333496 },
+        { group: 'test-branch', iteration: 2, y: 1.9293040037155151 },
+        { group: 'test-branch', iteration: 3, y: 1.9293040037155151 },
+        { group: 'exp-e7a67', iteration: 1, y: 2.020392894744873 },
+        { group: 'exp-e7a67', iteration: 2, y: 2.0205044746398926 },
+        { group: 'exp-e7a67', iteration: 3, y: 2.0205044746398926 }
+      ],
+      type: CustomPlotType.CHECKPOINT,
+      yTitle: 'summary.json:loss'
+    },
+    {
+      id: 'custom-summary.json:accuracy',
+      metric: 'summary.json:accuracy',
+      values: [
+        { group: 'exp-83425', iteration: 1, y: 0.40904998779296875 },
+        { group: 'exp-83425', iteration: 2, y: 0.46094998717308044 },
+        { group: 'exp-83425', iteration: 3, y: 0.5113166570663452 },
+        { group: 'exp-83425', iteration: 4, y: 0.557449996471405 },
+        { group: 'exp-83425', iteration: 5, y: 0.5926499962806702 },
+        { group: 'exp-83425', iteration: 6, y: 0.5926499962806702 },
+        { group: 'test-branch', iteration: 1, y: 0.4083833396434784 },
+        { group: 'test-branch', iteration: 2, y: 0.4668000042438507 },
+        { group: 'test-branch', iteration: 3, y: 0.4668000042438507 },
+        { group: 'exp-e7a67', iteration: 1, y: 0.3723166584968567 },
+        { group: 'exp-e7a67', iteration: 2, y: 0.3724166750907898 },
+        { group: 'exp-e7a67', iteration: 3, y: 0.3724166750907898 }
+      ],
+      type: CustomPlotType.CHECKPOINT,
       yTitle: 'summary.json:accuracy'
     }
   ],

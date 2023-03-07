@@ -18,8 +18,7 @@ export const useGetPlot = (
   id: string,
   spec?: VisualizationSpec
 ) => {
-  const isPlotWithSpec =
-    section === Section.CHECKPOINT_PLOTS || section === Section.CUSTOM_PLOTS
+  const isPlotWithSpec = section === Section.CUSTOM_PLOTS
   const storeSection = getStoreSection(section)
   const snapshot = useSelector(
     (state: PlotsState) => state[storeSection].plotsSnapshots

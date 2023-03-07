@@ -5,14 +5,12 @@ import {
   TemplatePlotEntry
 } from 'dvc/src/plots/webview/contract'
 
-export type CheckpointPlotsById = { [key: string]: CheckpointPlotData }
 export type CustomPlotsById = { [key: string]: CustomPlotData }
 export type TemplatePlotsById = { [key: string]: TemplatePlotEntry }
 
 export const plotDataStore = {
-  [Section.CHECKPOINT_PLOTS]: {} as CheckpointPlotsById,
   [Section.TEMPLATE_PLOTS]: {} as TemplatePlotsById,
-  [Section.COMPARISON_TABLE]: {} as CheckpointPlotsById, // This category is unused but exists only to make typings easier,
+  [Section.COMPARISON_TABLE]: {} as CustomPlotsById, // This category is unused but exists only to make typings easier,
   [Section.CUSTOM_PLOTS]: {} as CustomPlotsById
 }
 

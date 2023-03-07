@@ -12,14 +12,12 @@ export const PlotNumberOfItemsPerRow = {
 /* eslint-enable sort-keys-fix/sort-keys-fix */
 
 export enum Section {
-  CHECKPOINT_PLOTS = 'checkpoint-plots',
   TEMPLATE_PLOTS = 'template-plots',
   COMPARISON_TABLE = 'comparison-table',
   CUSTOM_PLOTS = 'custom-plots'
 }
 
 export const DEFAULT_SECTION_NB_ITEMS_PER_ROW = {
-  [Section.CHECKPOINT_PLOTS]: PlotNumberOfItemsPerRow.TWO,
   [Section.TEMPLATE_PLOTS]: PlotNumberOfItemsPerRow.TWO,
   [Section.COMPARISON_TABLE]: PlotNumberOfItemsPerRow.TWO,
   [Section.CUSTOM_PLOTS]: PlotNumberOfItemsPerRow.TWO
@@ -27,14 +25,12 @@ export const DEFAULT_SECTION_NB_ITEMS_PER_ROW = {
 
 // Height is undefined by default because it is calculated by ratio of the width it'll fill (calculated by the webview)
 export const DEFAULT_HEIGHT = {
-  [Section.CHECKPOINT_PLOTS]: undefined,
   [Section.TEMPLATE_PLOTS]: undefined,
   [Section.COMPARISON_TABLE]: undefined,
   [Section.CUSTOM_PLOTS]: undefined
 }
 
 export const DEFAULT_SECTION_COLLAPSED = {
-  [Section.CHECKPOINT_PLOTS]: false,
   [Section.TEMPLATE_PLOTS]: false,
   [Section.COMPARISON_TABLE]: false,
   [Section.CUSTOM_PLOTS]: false
@@ -183,7 +179,6 @@ export type ComparisonPlot = {
 
 export enum PlotsDataKeys {
   COMPARISON = 'comparison',
-  CHECKPOINT = 'checkpoint',
   CUSTOM = 'custom',
   HAS_UNSELECTED_PLOTS = 'hasUnselectedPlots',
   HAS_PLOTS = 'hasPlots',
@@ -195,7 +190,6 @@ export enum PlotsDataKeys {
 export type PlotsData =
   | {
       [PlotsDataKeys.COMPARISON]?: PlotsComparisonData | null
-      [PlotsDataKeys.CHECKPOINT]?: CheckpointPlotsData | null
       [PlotsDataKeys.CUSTOM]?: CustomPlotsData | null
       [PlotsDataKeys.HAS_PLOTS]?: boolean
       [PlotsDataKeys.HAS_UNSELECTED_PLOTS]?: boolean

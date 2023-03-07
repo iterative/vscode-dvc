@@ -218,47 +218,12 @@ const collectFromExperimentsObject = (
   }
 }
 
-export const collectCheckpointPlotsData = (
-  data: ExperimentsOutput
-): CheckpointPlot[] | undefined => {
-  const acc = {
-    iterations: {},
-    plots: new Map<string, CheckpointPlotValues>()
-  }
-
-  for (const { baseline, ...experimentsObject } of Object.values(
-    omit(data, EXPERIMENT_WORKSPACE_ID)
-  )) {
-    const commit = transformExperimentData(baseline)
-
-    if (commit) {
-      collectFromExperimentsObject(acc, experimentsObject)
-    }
-  }
-
-  if (acc.plots.size === 0) {
-    return
-  }
-
-  const plotsData: CheckpointPlot[] = []
-
-  for (const [key, value] of acc.plots.entries()) {
-    plotsData.push({
-      id: decodeColumn(key),
-      metric: decodeColumn(key),
-      type: CustomPlotType.CHECKPOINT,
-      values: value
-    })
-  }
-
-  return plotsData
-}
-
 export const getCustomPlotId = (plot: CustomPlotsOrderValue) =>
   plot.type === CustomPlotType.CHECKPOINT
     ? `custom-${plot.metric}`
     : `custom-${plot.metric}-${plot.param}`
 
+// TBD untested...
 export const collectCustomCheckpointPlotData = (
   data: ExperimentsOutput
 ): { [metric: string]: CheckpointPlot } => {
@@ -340,11 +305,11 @@ const collectMetricVsParamPlotData = (
 // TBD it will probably be easier and/or faster to get the data from
 // experiments vs the output...
 export const collectCustomPlotsData = (
-  plotsOrderValue: CustomPlotsOrderValue[],
+  plotsOrderValues: CustomPlotsOrderValue[],
   checkpointPlots: { [metric: string]: CheckpointPlot },
   experiments: Experiment[]
 ): CustomPlot[] => {
-  return plotsOrderValue
+  return plotsOrderValues
     .map((plotOrderValue): CustomPlot => {
       if (isCustomPlotOrderCheckpointValue(plotOrderValue)) {
         const { metric } = plotOrderValue

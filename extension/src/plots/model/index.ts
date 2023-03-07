@@ -2,7 +2,6 @@ import { Memento } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import isEqual from 'lodash.isequal'
 import {
-  collectCheckpointPlotsData,
   collectData,
   collectSelectedTemplatePlots,
   collectTemplates,
@@ -20,7 +19,6 @@ import { getRevisionFirstThreeColumns } from './util'
 import { CustomPlotsOrderValue } from './custom'
 import {
   CheckpointPlot,
-  CheckpointPlotData,
   ComparisonPlots,
   Revision,
   ComparisonRevisionData,
@@ -110,14 +108,6 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public transformAndSetExperiments(data: ExperimentsOutput) {
-    const checkpointPlots = collectCheckpointPlotsData(data)
-
-    if (!this.selectedMetrics && checkpointPlots) {
-      this.selectedMetrics = checkpointPlots.map(({ id }) => id)
-    }
-
-    this.checkpointPlots = checkpointPlots
-
     this.recreateCustomPlots(data)
 
     return this.removeStaleData()
@@ -163,32 +153,6 @@ export class PlotsModel extends ModelWithPersistence {
     this.experiments.setRevisionCollected(revs)
 
     this.deferred.resolve()
-  }
-
-  public getCheckpointPlots() {
-    if (!this.checkpointPlots) {
-      return
-    }
-
-    const colors = getColorScale(
-      this.experiments
-        .getSelectedExperiments()
-        .map(({ displayColor, id: revision }) => ({ displayColor, revision }))
-    )
-
-    if (!colors) {
-      return
-    }
-
-    const { domain: selectedExperiments } = colors
-
-    return {
-      colors,
-      height: this.getHeight(Section.CHECKPOINT_PLOTS),
-      nbItemsPerRow: this.getNbItemsPerRow(Section.CHECKPOINT_PLOTS),
-      plots: this.getPlots(this.checkpointPlots, selectedExperiments),
-      selectedMetrics: this.getSelectedMetrics()
-    }
   }
 
   public getCustomPlots(): CustomPlotsData | undefined {
@@ -510,31 +474,6 @@ export class PlotsModel extends ModelWithPersistence {
 
   private getCLIId(label: string) {
     return this.commitRevisions[label] || label
-  }
-
-  private getPlots(
-    checkpointPlots: CheckpointPlot[],
-    selectedExperiments: string[]
-  ) {
-    return reorderObjectList<CheckpointPlotData>(
-      this.metricOrder,
-      checkpointPlots.map(plot => {
-        const { id, values, type } = plot
-        return {
-          id,
-          metric: id,
-          type,
-          values: values.filter(value =>
-            selectedExperiments.includes(value.group)
-          ),
-          yTitle: truncateVerticalTitle(
-            id,
-            this.getNbItemsPerRow(Section.CHECKPOINT_PLOTS)
-          ) as string
-        }
-      }),
-      'id'
-    )
   }
 
   private getCustomPlotData(

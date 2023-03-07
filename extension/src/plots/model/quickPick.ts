@@ -29,6 +29,7 @@ const getMetricVsParamPlotItem = (metric: string, param: string) => {
     })
   }
 }
+
 const getCheckpointPlotItem = (metric: string) => {
   const splitMetric = splitColumnPath(metric)
   return {

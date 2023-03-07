@@ -68,7 +68,6 @@ export class WebviewMessages {
       this.plots.getOverrideRevisionDetails()
 
     void this.getWebview()?.show({
-      checkpoint: this.getCheckpointPlots(),
       comparison: this.getComparisonPlots(overrideComparison),
       custom: this.getCustomPlots(),
       hasPlots: !!this.paths.hasPaths(),
@@ -79,18 +78,10 @@ export class WebviewMessages {
     })
   }
 
-  public sendCheckpointPlotsMessage() {
-    void this.getWebview()?.show({
-      checkpoint: this.getCheckpointPlots()
-    })
-  }
-
   public handleMessageFromWebview(message: MessageFromWebview) {
     switch (message.type) {
       case MessageFromWebviewType.ADD_CUSTOM_PLOT:
         return this.addCustomPlot()
-      case MessageFromWebviewType.TOGGLE_METRIC:
-        return this.setSelectedMetrics(message.payload)
       case MessageFromWebviewType.RESIZE_PLOTS:
         return this.setPlotSize(
           message.payload.section,
@@ -122,11 +113,6 @@ export class WebviewMessages {
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
-  }
-
-  private setSelectedMetrics(metrics: string[]) {
-    this.plots.setSelectedMetrics(metrics)
-    this.sendCheckpointPlotsAndEvent(EventName.VIEWS_PLOTS_METRICS_SELECTED)
   }
 
   private setPlotSize(
@@ -368,15 +354,6 @@ export class WebviewMessages {
     )
   }
 
-  private sendCheckpointPlotsAndEvent(
-    event:
-      | typeof EventName.VIEWS_REORDER_PLOTS_METRICS
-      | typeof EventName.VIEWS_PLOTS_METRICS_SELECTED
-  ) {
-    this.sendCheckpointPlotsMessage()
-    sendTelemetryEvent(event, undefined, undefined)
-  }
-
   private sendSectionCollapsed() {
     void this.getWebview()?.show({
       sectionCollapsed: this.plots.getSectionCollapsed()
@@ -459,10 +436,6 @@ export class WebviewMessages {
           : undefined
       }
     }
-  }
-
-  private getCheckpointPlots() {
-    return this.plots.getCheckpointPlots() || null
   }
 
   private getCustomPlots() {

@@ -37,17 +37,6 @@ export interface PlotsContainerProps {
 }
 
 export const SectionDescription = {
-  // "Trends"
-  [Section.CHECKPOINT_PLOTS]: (
-    <span data-testid="tooltip-checkpoint-plots">
-      Automatically generated and updated linear plots that show metric value
-      per epoch if{' '}
-      <a href="https://dvc.org/doc/user-guide/experiment-management/checkpoints">
-        checkpoints
-      </a>{' '}
-      are enabled.
-    </span>
-  ),
   // "Custom"
   [Section.CUSTOM_PLOTS]: (
     <span data-testid="tooltip-custom-plots">
