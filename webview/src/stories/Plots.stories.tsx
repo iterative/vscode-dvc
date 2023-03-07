@@ -19,7 +19,10 @@ import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import smoothTemplatePlotContent from 'dvc/src/test/fixtures/plotsDiff/template/smoothTemplatePlot'
 import { truncateVerticalTitle } from 'dvc/src/plots/vega/util'
-import { CHROMATIC_VIEWPORTS, DISABLE_CHROMATIC_SNAPSHOTS } from './util'
+import {
+  CHROMATIC_VIEWPORTS_WITH_DELAY,
+  DISABLE_CHROMATIC_SNAPSHOTS
+} from './util'
 import { Plots } from '../plots/components/Plots'
 
 import './test-vscode-styles.scss'
@@ -96,7 +99,7 @@ const Template: Story<{
 }
 
 export const WithData = Template.bind({})
-WithData.parameters = CHROMATIC_VIEWPORTS
+WithData.parameters = CHROMATIC_VIEWPORTS_WITH_DELAY
 
 export const WithEmptyCheckpoints = Template.bind({})
 WithEmptyCheckpoints.args = {
@@ -210,7 +213,7 @@ AllLarge.args = {
     }
   }
 }
-AllLarge.parameters = CHROMATIC_VIEWPORTS
+AllLarge.parameters = CHROMATIC_VIEWPORTS_WITH_DELAY
 
 export const AllSmall = Template.bind({})
 AllSmall.args = {
@@ -232,7 +235,7 @@ AllSmall.args = {
     }
   }
 }
-AllSmall.parameters = CHROMATIC_VIEWPORTS
+AllSmall.parameters = CHROMATIC_VIEWPORTS_WITH_DELAY
 
 export const VirtualizedPlots = Template.bind({})
 VirtualizedPlots.args = {
@@ -249,7 +252,7 @@ VirtualizedPlots.args = {
     template: manyTemplatePlots(125)
   }
 }
-VirtualizedPlots.parameters = CHROMATIC_VIEWPORTS
+VirtualizedPlots.parameters = CHROMATIC_VIEWPORTS_WITH_DELAY
 
 export const ZoomedInPlot = Template.bind({})
 ZoomedInPlot.play = async ({ canvasElement }) => {
@@ -288,7 +291,10 @@ SmoothTemplate.args = {
   }
 }
 SmoothTemplate.parameters = {
-  chromatic: { ...CHROMATIC_VIEWPORTS.chromatic, disableSnapshot: true }
+  chromatic: {
+    ...CHROMATIC_VIEWPORTS_WITH_DELAY.chromatic,
+    disableSnapshot: true
+  }
 }
 
 export const ScrolledHeaders = Template.bind({})
