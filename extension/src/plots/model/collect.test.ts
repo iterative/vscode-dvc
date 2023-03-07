@@ -283,14 +283,6 @@ describe('collectData', () => {
 
     expect(isEmpty(values)).toBeFalsy()
 
-    // for (const revision of revisions) {
-    //   const expectedValues = values[getCLICommitId(revision)].map(value => ({
-    //     ...value,
-    //     rev: revision
-    //   }))
-    //   expect(revisionData[revision][logsLossPath]).toStrictEqual(expectedValues)
-    // }
-
     expect(Object.keys(revisionData)).toStrictEqual(revisions)
 
     expect(Object.keys(revisionData.main)).toStrictEqual([
