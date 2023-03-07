@@ -96,5 +96,16 @@ describe('App', () => {
         type: MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE
       })
     })
+
+    it('should enable the user to update their studio token', () => {
+      const shareExperimentsLive = false
+      renderApp(true, shareExperimentsLive)
+      mockPostMessage.mockClear()
+      const button = screen.getByText('Update Token')
+      fireEvent.click(button)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SAVE_STUDIO_TOKEN
+      })
+    })
   })
 })

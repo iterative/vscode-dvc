@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.6.14",
+  "version": "0.6.15",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -115,6 +115,11 @@
       {
         "title": "Add Studio Access Token",
         "command": "dvc.addStudioAccessToken",
+        "category": "DVC"
+      },
+      {
+        "title": "Update Studio Access Token",
+        "command": "dvc.updateStudioAccessToken",
         "category": "DVC"
       },
       {
@@ -400,6 +405,11 @@
         "category": "DVC"
       },
       {
+        "title": "Open Studio Settings",
+        "command": "dvc.showStudioSettings",
+        "category": "DVC"
+      },
+      {
         "title": "Show Experiments",
         "command": "dvc.showExperiments",
         "category": "DVC",
@@ -630,7 +640,11 @@
         },
         {
           "command": "dvc.addStudioAccessToken",
-          "when": "dvc.commands.available && dvc.project.available"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.studio.connected"
+        },
+        {
+          "command": "dvc.updateStudioAccessToken",
+          "when": "dvc.commands.available && dvc.project.available && dvc.studio.connected"
         },
         {
           "command": "dvc.addTarget",
@@ -803,6 +817,10 @@
         {
           "command": "dvc.showConnect",
           "when": "dvc.commands.available && dvc.project.available && !dvc.studio.connected"
+        },
+        {
+          "command": "dvc.showStudioSettings",
+          "when": "dvc.commands.available && dvc.project.available && dvc.studio.connected"
         },
         {
           "command": "dvc.selectForCompare",
@@ -1604,7 +1622,7 @@
     "vscode-languageclient": "8.1.0"
   },
   "devDependencies": {
-    "@swc/core": "1.3.36",
+    "@swc/core": "1.3.37",
     "@swc/jest": "0.2.24",
     "@types/chai": "4.3.4",
     "@types/chai-as-promised": "7.1.5",

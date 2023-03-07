@@ -5,7 +5,7 @@ import { Flag, GcPreserveFlag } from './constants'
 import { DvcExecutor } from './executor'
 import { CliResult, CliStarted } from '..'
 import { createProcess } from '../../process/execution'
-import { getMockedProcess } from '../../test/util/jest'
+import { flushPromises, getMockedProcess } from '../../test/util/jest'
 import { getProcessEnv } from '../../env'
 import { Config } from '../../config'
 import { ContextKey, setContextValue } from '../../vscode/context'
@@ -28,6 +28,9 @@ const mockedEnv = {
 
 const mockedSetContextValue = jest.mocked(setContextValue)
 
+const mockedGetStudioLiveShareToken = jest.fn()
+const mockedGetRepoUrl = jest.fn()
+
 beforeEach(() => {
   jest.resetAllMocks()
   mockedGetProcessEnv.mockReturnValueOnce(mockedEnv)
@@ -48,6 +51,8 @@ describe('CliExecutor', () => {
       getCliPath: () => undefined,
       getPythonBinPath: () => undefined
     } as unknown as Config,
+    mockedGetStudioLiveShareToken,
+    mockedGetRepoUrl,
     {
       processCompleted: {
         event: jest.fn(),
@@ -599,6 +604,39 @@ describe('CliExecutor', () => {
         cwd,
         detached: true,
         env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+
+    it("should call createProcess with the correct parameters to start the experiment's queue and send live updates to Studio", async () => {
+      const cwd = __dirname
+      const jobs = '91231324'
+      const mockedToken = 'isat_notarealtoken'
+      const mockedUrl = 'git@github.com:iterative/vscode-dvc-demo.git'
+
+      mockedGetStudioLiveShareToken.mockReturnValueOnce(mockedToken)
+      mockedGetRepoUrl.mockResolvedValueOnce(
+        'git@github.com:iterative/vscode-dvc-demo.git'
+      )
+
+      const stdout = `Started '${jobs}' new experiments task queue workers.`
+
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
+
+      void dvcExecutor.queueStart(cwd, jobs)
+      await flushPromises()
+
+      expect(mockedGetRepoUrl).toHaveBeenCalledWith(cwd)
+
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
+        args: ['queue', 'start', '-j', jobs],
+        cwd,
+        detached: true,
+        env: {
+          ...mockedEnv,
+          STUDIO_REPO_URL: mockedUrl,
+          STUDIO_TOKEN: mockedToken
+        },
         executable: 'dvc'
       })
     })

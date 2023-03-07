@@ -12,7 +12,17 @@ export const registerConnectCommands = (
   )
 
   internalCommands.registerExternalCommand(
+    RegisteredCommands.OPEN_STUDIO_SETTINGS,
+    () => connect.showWebview()
+  )
+
+  internalCommands.registerExternalCommand(
     RegisteredCommands.ADD_STUDIO_ACCESS_TOKEN,
+    () => connect.saveStudioAccessToken()
+  )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.UPDATE_STUDIO_ACCESS_TOKEN,
     () => connect.saveStudioAccessToken()
   )
 
