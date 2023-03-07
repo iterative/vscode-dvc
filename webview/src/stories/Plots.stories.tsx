@@ -8,7 +8,7 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   TemplatePlotGroup,
   TemplatePlotSection,
-  PlotNumberOfItemsPerRow
+  DefaultNumberOfItemsPerRow
 } from 'dvc/src/plots/webview/contract'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
 import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/base/checkpointPlots'
@@ -30,19 +30,16 @@ import { plotsReducers } from '../plots/store'
 
 const smallCheckpointPlotsFixture = {
   ...checkpointPlotsFixture,
-  nbItemsPerRow: PlotNumberOfItemsPerRow.THREE,
+  nbItemsPerRow: 3,
   plots: checkpointPlotsFixture.plots.map(plot => ({
     ...plot,
-    title: truncateVerticalTitle(
-      plot.title,
-      PlotNumberOfItemsPerRow.THREE
-    ) as string
+    title: truncateVerticalTitle(plot.title, 3) as string
   }))
 }
 
 const manyCheckpointPlots = (
   length: number,
-  size = PlotNumberOfItemsPerRow.TWO
+  size = DefaultNumberOfItemsPerRow
 ) =>
   Array.from({ length }, () => checkpointPlotsFixture.plots[0]).map(
     (plot, i) => {
@@ -140,7 +137,7 @@ WithTemplateOnly.args = {
     selectedRevisions: plotsRevisionsFixture,
     template: {
       ...templatePlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.TWO
+      nbItemsPerRow: DefaultNumberOfItemsPerRow
     }
   }
 }
@@ -195,21 +192,21 @@ AllLarge.args = {
   data: {
     checkpoint: {
       ...checkpointPlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.ONE
+      nbItemsPerRow: 1
     },
     comparison: {
       ...comparisonPlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.ONE
+      nbItemsPerRow: 1
     },
     custom: {
       ...customPlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.ONE
+      nbItemsPerRow: 1
     },
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
     selectedRevisions: plotsRevisionsFixture,
     template: {
       ...templatePlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.ONE
+      nbItemsPerRow: 1
     }
   }
 }
@@ -221,17 +218,17 @@ AllSmall.args = {
     checkpoint: smallCheckpointPlotsFixture,
     comparison: {
       ...comparisonPlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.THREE
+      nbItemsPerRow: 3
     },
     custom: {
       ...customPlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.THREE
+      nbItemsPerRow: 3
     },
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
     selectedRevisions: plotsRevisionsFixture,
     template: {
       ...templatePlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.THREE
+      nbItemsPerRow: 3
     }
   }
 }

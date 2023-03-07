@@ -1,0 +1,17 @@
+@import '../../variables.scss';
+
+.wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.label {
+  font-size: 0.6rem;
+  margin-right: 10px;
+  color: $fg-color;
+}
+
+.slider {
+  accent-color: $accent-color;
+  outline: none !important;
+}

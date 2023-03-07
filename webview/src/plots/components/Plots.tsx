@@ -7,7 +7,7 @@ import { CustomPlotsWrapper } from './customPlots/CustomPlotsWrapper'
 import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
 import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper'
 import { Ribbon } from './ribbon/Ribbon'
-import { setSnapPoints, setZoomedInPlot } from './webviewSlice'
+import { setMaxNbPlotsPerRow, setZoomedInPlot } from './webviewSlice'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Modal } from '../../shared/components/modal/Modal'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
@@ -35,7 +35,9 @@ const PlotsContent = () => {
     const onResize = () => {
       wrapperRef.current &&
         dispatch(
-          setSnapPoints(wrapperRef.current.getBoundingClientRect().width - 100)
+          setMaxNbPlotsPerRow(
+            wrapperRef.current.getBoundingClientRect().width - 100
+          )
         )
     }
     window.addEventListener('resize', onResize)

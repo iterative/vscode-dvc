@@ -67,7 +67,6 @@ import { DvcExecutor } from '../../../cli/dvc/executor'
 import { shortenForLabel } from '../../../util/string'
 import { GitExecutor } from '../../../cli/git/executor'
 import { WorkspacePlots } from '../../../plots/workspace'
-import { PlotNumberOfItemsPerRow } from '../../../plots/webview/contract'
 import {
   RegisteredCliCommands,
   RegisteredCommands
@@ -82,6 +81,7 @@ import * as ProcessExecution from '../../../process/execution'
 import { DvcReader } from '../../../cli/dvc/reader'
 import { Connect } from '../../../connect'
 import { DvcViewer } from '../../../cli/dvc/viewer'
+import { DefaultNumberOfItemsPerRow } from '../../../plots/webview/contract'
 
 const { openFileInEditor } = FileSystem
 
@@ -339,7 +339,7 @@ suite('Experiments Test Suite', () => {
       ).returns(undefined)
 
       const mockColumnId = 'params:params.yaml:lr'
-      const mockWidth = PlotNumberOfItemsPerRow.TWO
+      const mockWidth = DefaultNumberOfItemsPerRow
 
       mockMessageReceived.fire({
         payload: { id: mockColumnId, width: mockWidth },

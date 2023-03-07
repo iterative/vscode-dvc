@@ -61,6 +61,7 @@ $gap: 20px;
 
   input {
     accent-color: $accent-color;
+    outline: none;
   }
 }
 
@@ -341,6 +342,12 @@ $resizer-border: 2px dashed $accent-color;
   a {
     text-decoration: none;
   }
+}
+
+.nbItemsPerRowSlider {
+  display: flex;
+  justify-content: end;
+  padding: 0 20px;
 }
 
 :global(.has-actions) {

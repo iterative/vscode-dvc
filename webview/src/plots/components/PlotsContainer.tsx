@@ -7,11 +7,8 @@ import React, {
   useCallback
 } from 'react'
 import { AnyAction } from '@reduxjs/toolkit'
-import { useDispatch } from 'react-redux'
-import {
-  PlotNumberOfItemsPerRow,
-  Section
-} from 'dvc/src/plots/webview/contract'
+import { useDispatch, useSelector } from 'react-redux'
+import { Section } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { PlotsPicker, PlotsPickerProps } from './PlotsPicker'
 import styles from './styles.module.scss'
@@ -26,19 +23,19 @@ import {
   Info,
   Lines,
   Add,
-  Trash,
-  ArrowBoth
+  Trash
 } from '../../shared/components/icons'
 import { isSelecting } from '../../util/strings'
 import { isTooltip } from '../../util/helpers'
-import { SingleSelect } from '../../shared/components/selectMenu/SingleSelect'
+import { MinMaxSlider } from '../../shared/components/slider/MinMaxSlider'
+import { PlotsState } from '../store'
 
 export interface PlotsContainerProps {
   sectionCollapsed: boolean
   sectionKey: Section
   title: string
   nbItemsPerRow: number
-  changeNbItemsPerRow: (nb: number) => AnyAction
+  changeNbItemsPerRow?: (nb: number) => AnyAction
   menu?: PlotsPickerProps
   addPlotsButton?: { onClick: () => void }
   removePlotsButton?: { onClick: () => void }
@@ -110,31 +107,15 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
 }) => {
   const open = !sectionCollapsed
   const dispatch = useDispatch()
+  const setMaxNbPlotsPerRow = useSelector(
+    (state: PlotsState) => state.webview.maxNbPlotsPerRow
+  )
 
   useEffect(() => {
     window.dispatchEvent(new Event('resize'))
   }, [nbItemsPerRow])
 
-  const menuItems: IconMenuItemProps[] = [
-    {
-      icon: ArrowBoth,
-      onClickNode: (
-        <SingleSelect
-          items={Object.values(PlotNumberOfItemsPerRow).map(nb => ({
-            id: nb.toString(),
-            isSelected: nbItemsPerRow === nb,
-            label: nb.toString()
-          }))}
-          setSelected={useCallback(
-            (nb: string) =>
-              dispatch(changeNbItemsPerRow(Number.parseInt(nb, 10))),
-            [dispatch, changeNbItemsPerRow]
-          )}
-        />
-      ),
-      tooltip: 'Change the number of plots per row'
-    }
-  ]
+  const menuItems: IconMenuItemProps[] = []
 
   if (menu) {
     menuItems.unshift({
@@ -182,6 +163,13 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     }
   }
 
+  const handleResize = useCallback(
+    (nbItems: number) => {
+      changeNbItemsPerRow && dispatch(changeNbItemsPerRow(nbItems))
+    },
+    [dispatch, changeNbItemsPerRow]
+  )
+
   return (
     <div className={styles.plotsContainerWrapper} data-testid="plots-container">
       <details open={open} className={styles.plotsContainer}>
@@ -203,11 +191,22 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
             </div>
           </Tooltip>
         </summary>
+        {changeNbItemsPerRow && (
+          <div className={styles.nbItemsPerRowSlider}>
+            <MinMaxSlider
+              minimum={1}
+              maximum={setMaxNbPlotsPerRow}
+              label="Number of plots per row"
+              onChange={handleResize}
+              defaultValue={nbItemsPerRow}
+            />
+          </div>
+        )}
         {open && (
           <div
             className={cx({
               [styles.plotsWrapper]: sectionKey !== Section.COMPARISON_TABLE,
-              [styles.smallPlots]: nbItemsPerRow === 4
+              [styles.smallPlots]: nbItemsPerRow >= 4
             })}
             style={
               {

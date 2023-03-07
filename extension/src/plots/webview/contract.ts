@@ -1,15 +1,7 @@
 import { VisualizationSpec } from 'react-vega'
 import { Color } from '../../experiments/model/status/colors'
 
-// It is easier to keep the numerical order than the alphabetical one
-/* eslint-disable sort-keys-fix/sort-keys-fix */
-export const PlotNumberOfItemsPerRow = {
-  ONE: 1,
-  TWO: 2,
-  THREE: 3,
-  FOUR: 4
-}
-/* eslint-enable sort-keys-fix/sort-keys-fix */
+export const DefaultNumberOfItemsPerRow = 2
 
 export enum Section {
   CHECKPOINT_PLOTS = 'checkpoint-plots',
@@ -19,10 +11,10 @@ export enum Section {
 }
 
 export const DEFAULT_SECTION_NB_ITEMS_PER_ROW = {
-  [Section.CHECKPOINT_PLOTS]: PlotNumberOfItemsPerRow.TWO,
-  [Section.TEMPLATE_PLOTS]: PlotNumberOfItemsPerRow.TWO,
-  [Section.COMPARISON_TABLE]: PlotNumberOfItemsPerRow.TWO,
-  [Section.CUSTOM_PLOTS]: PlotNumberOfItemsPerRow.TWO
+  [Section.CHECKPOINT_PLOTS]: DefaultNumberOfItemsPerRow,
+  [Section.TEMPLATE_PLOTS]: DefaultNumberOfItemsPerRow,
+  [Section.COMPARISON_TABLE]: DefaultNumberOfItemsPerRow,
+  [Section.CUSTOM_PLOTS]: DefaultNumberOfItemsPerRow
 }
 
 // Height is undefined by default because it is calculated by ratio of the width it'll fill (calculated by the webview)
