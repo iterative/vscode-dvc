@@ -4,8 +4,11 @@ import { restore, spy, stub } from 'sinon'
 import { expect } from 'chai'
 import * as Fetch from 'node-fetch'
 import { commands } from 'vscode'
-import { buildInternalCommands, closeAllEditors } from './util'
-import { PROGRESS_TEST_TIMEOUT } from './timeouts'
+import {
+  buildInternalCommands,
+  bypassProgressCloseDelay,
+  closeAllEditors
+} from './util'
 import { Disposable } from '../../extension'
 import { STUDIO_ENDPOINT, registerPatchCommand } from '../../patch'
 import { AvailableCommands } from '../../commands/internal'
@@ -31,6 +34,7 @@ suite('Patch Test Suite', () => {
 
   describe('exp push patch', () => {
     it('should share an experiment to Studio', async () => {
+      bypassProgressCloseDelay()
       const mockFetch = stub(Fetch, 'default').resolves({} as Fetch.Response)
       const mockStudioAccessToken = 'isat_12123123123123123'
       const mockRepoUrl = 'https://github.com/iterative/vscode-dvc-demo'
@@ -100,9 +104,10 @@ suite('Patch Test Suite', () => {
         headers,
         method: 'POST'
       })
-    }).timeout(PROGRESS_TEST_TIMEOUT)
+    })
 
     it('should show an error modal if Studio returns a 401 response', async () => {
+      bypassProgressCloseDelay()
       const mockFetch = stub(Fetch, 'default').resolves({
         status: 401
       } as Fetch.Response)
@@ -160,7 +165,7 @@ suite('Patch Test Suite', () => {
         headers,
         method: 'POST'
       })
-    }).timeout(PROGRESS_TEST_TIMEOUT)
+    })
 
     it('should show an error message if the experiment cannot be found', async () => {
       const mockShowError = stub(Toast, 'showError').resolves(undefined)
