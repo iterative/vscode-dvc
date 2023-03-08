@@ -1,7 +1,7 @@
 import { VisualizationSpec } from 'react-vega'
 import { Color } from '../../experiments/model/status/colors'
 
-export const DEFAULT_NB_ITEMS_PER_REOW = 2
+export const DEFAULT_NB_ITEMS_PER_ROW = 2
 
 export enum PlotHeight {
   SMALLER = 0,
@@ -22,10 +22,10 @@ export enum Section {
 }
 
 export const DEFAULT_SECTION_NB_ITEMS_PER_ROW = {
-  [Section.CHECKPOINT_PLOTS]: DEFAULT_NB_ITEMS_PER_REOW,
-  [Section.TEMPLATE_PLOTS]: DEFAULT_NB_ITEMS_PER_REOW,
-  [Section.COMPARISON_TABLE]: DEFAULT_NB_ITEMS_PER_REOW,
-  [Section.CUSTOM_PLOTS]: DEFAULT_NB_ITEMS_PER_REOW
+  [Section.CHECKPOINT_PLOTS]: DEFAULT_NB_ITEMS_PER_ROW,
+  [Section.TEMPLATE_PLOTS]: DEFAULT_NB_ITEMS_PER_ROW,
+  [Section.COMPARISON_TABLE]: DEFAULT_NB_ITEMS_PER_ROW,
+  [Section.CUSTOM_PLOTS]: DEFAULT_NB_ITEMS_PER_ROW
 }
 
 export const DEFAULT_HEIGHT = {

@@ -6,7 +6,7 @@ import React from 'react'
 import { Provider, useDispatch } from 'react-redux'
 import {
   ComparisonRevisionData,
-  DEFAULT_NB_ITEMS_PER_REOW,
+  DEFAULT_NB_ITEMS_PER_ROW,
   DEFAULT_PLOT_HEIGHT,
   PlotsComparisonData
 } from 'dvc/src/plots/webview/contract'
@@ -45,7 +45,7 @@ const Template: Story = ({ plots, revisions }) => {
       <MockedState
         data={{
           height: DEFAULT_PLOT_HEIGHT,
-          nbItemsPerRow: DEFAULT_NB_ITEMS_PER_REOW,
+          nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
           plots,
           revisions
         }}

@@ -24,23 +24,14 @@ type ExperimentDetails = {
   params: ValueTreeRoot
 }
 
-type BaseRequestBody = {
+type RequestBody = {
   client: 'vscode'
   repo_url: string
   name: string
   baseline_sha: string
-}
-
-type StartRequestBody = BaseRequestBody & { type: 'start' }
-
-type DoneRequestBody = BaseRequestBody & { type: 'done' }
-
-type DataRequestBody = BaseRequestBody & {
   metrics: ValueTreeRoot
   params: ValueTreeRoot
-  plots: ValueTreeRoot
-  step: number
-  type: 'data'
+  type: 'done'
 }
 
 const collectExperiment = (data: ExperimentFields) => {
@@ -96,7 +87,7 @@ const collectExperimentDetails = (
 
 const sendPostRequest = (
   studioAccessToken: string,
-  body: StartRequestBody | DataRequestBody | DoneRequestBody
+  body: RequestBody
 ): Promise<FetchResponse> =>
   fetch(STUDIO_ENDPOINT, {
     body: JSON.stringify(body),
@@ -124,42 +115,32 @@ const shareWithProgress = (
 ): Thenable<unknown> =>
   Toast.showProgress('Sharing Experiment', async progress => {
     const { metrics, params, baselineSha, name } = experimentDetails
-    const base: BaseRequestBody = {
-      baseline_sha: baselineSha,
-      client: 'vscode',
-      name,
-      repo_url: repoUrl
-    }
 
     progress.report({
       increment: 0,
       message: 'Initializing experiment...'
     })
+
+    progress.report({ increment: 50, message: 'Sending data...' })
     const response = await sendPostRequest(studioAccessToken, {
-      ...base,
-      type: 'start'
+      baseline_sha: baselineSha,
+      client: 'vscode',
+      metrics: metrics || {},
+      name,
+      params: params || {},
+      repo_url: repoUrl,
+      type: 'done'
     })
 
+    progress.report({ increment: 25, message: 'Response received...' })
+
     if (response.status === 401) {
-      progress.report({ increment: 100, message: 'Access unauthorized' })
+      progress.report({ increment: 25, message: 'Access unauthorized' })
       void showUnauthorized()
       return Toast.delayProgressClosing()
     }
 
-    progress.report({ increment: 33, message: 'Sending data...' })
-    await sendPostRequest(studioAccessToken, {
-      ...base,
-      metrics: metrics || {},
-      params: params || {},
-      plots: {},
-      step: 0,
-      type: 'data'
-    })
-
-    progress.report({ increment: 33, message: 'Completing process...' })
-    await sendPostRequest(studioAccessToken, { ...base, type: 'done' })
-
-    progress.report({ increment: 33, message: 'Done' })
+    progress.report({ increment: 25, message: 'Done' })
 
     return Toast.delayProgressClosing()
   })

@@ -1,7 +1,7 @@
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
 import {
   CheckpointPlotsData,
-  DEFAULT_NB_ITEMS_PER_REOW,
+  DEFAULT_NB_ITEMS_PER_ROW,
   DEFAULT_PLOT_HEIGHT
 } from '../../../../plots/webview/contract'
 
@@ -92,7 +92,7 @@ const data: CheckpointPlotsData = {
     'summary.json:val_loss',
     'summary.json:val_accuracy'
   ],
-  nbItemsPerRow: DEFAULT_NB_ITEMS_PER_REOW,
+  nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
   height: DEFAULT_PLOT_HEIGHT
 }
 

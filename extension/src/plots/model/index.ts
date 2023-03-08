@@ -28,7 +28,7 @@ import {
   SectionCollapsed,
   CustomPlotData,
   DEFAULT_HEIGHT,
-  DEFAULT_NB_ITEMS_PER_REOW,
+  DEFAULT_NB_ITEMS_PER_ROW,
   PlotHeight
 } from '../webview/contract'
 import {
@@ -412,7 +412,7 @@ export class PlotsModel extends ModelWithPersistence {
     if (this.nbItemsPerRow[section]) {
       return this.nbItemsPerRow[section]
     }
-    return DEFAULT_NB_ITEMS_PER_REOW
+    return DEFAULT_NB_ITEMS_PER_ROW
   }
 
   public setHeight(section: Section, height: PlotHeight) {
