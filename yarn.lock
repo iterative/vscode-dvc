@@ -3718,7 +3718,7 @@
   dependencies:
     defer-to-connect "^2.0.1"
 
-"@tanstack/react-table@^8.7.9":
+"@tanstack/react-table@8.7.9":
   version "8.7.9"
   resolved "https://registry.yarnpkg.com/@tanstack/react-table/-/react-table-8.7.9.tgz#9efcd168fb0080a7e0bc213b5eac8b55513babf4"
   integrity sha512-6MbbQn5AupSOkek1+6IYu+1yZNthAKTRZw9tW92Vi6++iRrD1GbI3lKTjJalf8lEEKOqapPzQPE20nywu0PjCA==
