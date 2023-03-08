@@ -1,10 +1,31 @@
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
+import { CustomPlotsOrderValue } from '../../../../plots/model/custom'
 import {
   CustomPlotsData,
   CustomPlotType,
   PlotNumberOfItemsPerRow
 } from '../../../../plots/webview/contract'
 
+export const customPlotsOrderFixture: CustomPlotsOrderValue[] = [
+  {
+    metric: 'metrics:summary.json:loss',
+    param: 'params:params.yaml:dropout',
+    type: CustomPlotType.METRIC_VS_PARAM
+  },
+  {
+    metric: 'metrics:summary.json:accuracy',
+    param: 'params:params.yaml:epochs',
+    type: CustomPlotType.METRIC_VS_PARAM
+  },
+  {
+    metric: 'metrics:summary.json:loss',
+    type: CustomPlotType.CHECKPOINT
+  },
+  {
+    metric: 'metrics:summary.json:accuracy',
+    type: CustomPlotType.CHECKPOINT
+  }
+]
 const colors = copyOriginalColors()
 
 const data: CustomPlotsData = {
@@ -27,14 +48,14 @@ const data: CustomPlotsData = {
           param: 0.15
         },
         {
-          expName: 'exp-83425',
+          expName: 'test-branch',
           metric: 1.9293040037155151,
-          param: 0.25
+          param: 0.122
         },
         {
-          expName: 'exp-f13bca',
-          metric: 2.298503875732422,
-          param: 0.32
+          expName: 'exp-83425',
+          metric: 1.775016188621521,
+          param: 0.124
         }
       ],
       yTitle: 'summary.json:loss'
@@ -47,18 +68,18 @@ const data: CustomPlotsData = {
       values: [
         {
           expName: 'exp-e7a67',
+          metric: 0.3724166750907898,
+          param: 2
+        },
+        {
+          expName: 'test-branch',
           metric: 0.4668000042438507,
-          param: 16
+          param: 2
         },
         {
           expName: 'exp-83425',
-          metric: 0.3484833240509033,
-          param: 10
-        },
-        {
-          expName: 'exp-f13bca',
-          metric: 0.6768440509033,
-          param: 20
+          metric: 0.5926499962806702,
+          param: 5
         }
       ],
       yTitle: 'summary.json:accuracy'

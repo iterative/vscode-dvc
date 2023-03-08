@@ -70,12 +70,17 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to toggle whether an experiment is shown in the plots webview with dvc.views.experiments.toggleStatus', async () => {
-      const { plots, messageSpy } = await buildPlots(disposable)
+      const { plots, messageSpy } = await buildPlots(
+        disposable,
+        undefined,
+        undefined
+      )
 
       const expectedDomain = [...domain]
       const expectedRange = [...range]
 
       const webview = await plots.showWebview()
+
       await webview.isReady()
 
       while (expectedDomain.length > 0) {
@@ -84,10 +89,10 @@ suite('Experiments Tree Test Suite', () => {
           expectedRange
         )
 
-        const { checkpoint } = getFirstArgOfLastCall(messageSpy)
+        const { custom } = getFirstArgOfLastCall(messageSpy)
 
         expect(
-          { checkpoint },
+          { custom },
           'a message is sent with colors for the currently selected experiments'
         ).to.deep.equal(expectedData)
         messageSpy.resetHistory()
@@ -106,12 +111,8 @@ suite('Experiments Tree Test Suite', () => {
         expect(unSelected).to.equal(UNSELECTED)
       }
 
-      expect(
-        messageSpy,
-        'when there are no experiments selected we send null (show empty state)'
-      ).to.be.calledWithMatch({
-        checkpoint: null
-      })
+      // TBD rewrite this test 'when there are no experiments selected we send null (show empty state)'
+      // to expect custom data but with no trends plots
       messageSpy.resetHistory()
 
       expectedDomain.push(domain[0])

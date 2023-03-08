@@ -7,7 +7,9 @@ import {
   collectCustomPlotsData
 } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
-import customPlotsFixture from '../../test/fixtures/expShow/base/customPlots'
+import customPlotsFixture, {
+  customPlotsOrderFixture
+} from '../../test/fixtures/expShow/base/customPlots'
 import {
   ExperimentStatus,
   EXPERIMENT_WORKSPACE_ID
@@ -48,26 +50,7 @@ describe('collectCustomPlotsData', () => {
             }
     )
     const data = collectCustomPlotsData(
-      [
-        {
-          metric: 'metrics:summary.json:loss',
-          param: 'params:params.yaml:dropout',
-          type: CustomPlotType.METRIC_VS_PARAM
-        },
-        {
-          metric: 'metrics:summary.json:accuracy',
-          param: 'params:params.yaml:epochs',
-          type: CustomPlotType.METRIC_VS_PARAM
-        },
-        {
-          metric: 'metrics:summary.json:loss',
-          type: CustomPlotType.CHECKPOINT
-        },
-        {
-          metric: 'metrics:summary.json:accuracy',
-          type: CustomPlotType.CHECKPOINT
-        }
-      ],
+      customPlotsOrderFixture,
       {
         'summary.json:accuracy': {
           id: 'custom-summary.json:accuracy',
@@ -114,36 +97,36 @@ describe('collectCustomPlotsData', () => {
           label: '123',
           metrics: {
             'summary.json': {
-              accuracy: 0.4668000042438507,
+              accuracy: 0.3724166750907898,
               loss: 2.0205044746398926
             }
           },
           name: 'exp-e7a67',
-          params: { 'params.yaml': { dropout: 0.15, epochs: 16 } }
+          params: { 'params.yaml': { dropout: 0.15, epochs: 2 } }
         },
         {
           id: '12345',
           label: '123',
           metrics: {
             'summary.json': {
-              accuracy: 0.3484833240509033,
+              accuracy: 0.4668000042438507,
               loss: 1.9293040037155151
             }
           },
-          name: 'exp-83425',
-          params: { 'params.yaml': { dropout: 0.25, epochs: 10 } }
+          name: 'test-branch',
+          params: { 'params.yaml': { dropout: 0.122, epochs: 2 } }
         },
         {
           id: '12345',
           label: '123',
           metrics: {
             'summary.json': {
-              accuracy: 0.6768440509033,
-              loss: 2.298503875732422
+              accuracy: 0.5926499962806702,
+              loss: 1.775016188621521
             }
           },
-          name: 'exp-f13bca',
-          params: { 'params.yaml': { dropout: 0.32, epochs: 20 } }
+          name: 'exp-83425',
+          params: { 'params.yaml': { dropout: 0.124, epochs: 5 } }
         }
       ]
     )

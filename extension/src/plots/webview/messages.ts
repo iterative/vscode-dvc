@@ -115,6 +115,37 @@ export class WebviewMessages {
     }
   }
 
+  public async getMetricOrParamPlot(): Promise<
+    CustomPlotsOrderValue | undefined
+  > {
+    const metricAndParam = await pickMetricAndParam(
+      this.experiments.getColumnTerminalNodes()
+    )
+
+    if (!metricAndParam) {
+      return
+    }
+
+    const plotAlreadyExists = this.plots.getCustomPlotsOrder().find(value => {
+      if (isCustomPlotOrderCheckpointValue(value)) {
+        return
+      }
+      return (
+        value.param === metricAndParam.param &&
+        value.metric === metricAndParam.metric
+      )
+    })
+
+    if (plotAlreadyExists) {
+      return Toast.showError('Custom plot already exists.')
+    }
+
+    return {
+      ...metricAndParam,
+      type: CustomPlotType.METRIC_VS_PARAM
+    }
+  }
+
   private setPlotSize(
     section: Section,
     nbItemsPerRow: number,
@@ -167,37 +198,6 @@ export class WebviewMessages {
       undefined,
       undefined
     )
-  }
-
-  private async getMetricOrParamPlot(): Promise<
-    CustomPlotsOrderValue | undefined
-  > {
-    const metricAndParam = await pickMetricAndParam(
-      this.experiments.getColumnTerminalNodes()
-    )
-
-    if (!metricAndParam) {
-      return
-    }
-
-    const plotAlreadyExists = this.plots.getCustomPlotsOrder().find(value => {
-      if (isCustomPlotOrderCheckpointValue(value)) {
-        return
-      }
-      return (
-        value.param === metricAndParam.param &&
-        value.metric === metricAndParam.metric
-      )
-    })
-
-    if (plotAlreadyExists) {
-      return Toast.showError('Custom plot already exists.')
-    }
-
-    return {
-      ...metricAndParam,
-      type: CustomPlotType.METRIC_VS_PARAM
-    }
   }
 
   private async getCheckpointPlot(): Promise<

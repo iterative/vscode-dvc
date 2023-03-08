@@ -2,7 +2,9 @@ import { Disposer } from '@hediet/std/disposable'
 import { stub } from 'sinon'
 import * as FileSystem from '../../../fileSystem'
 import expShowFixtureWithoutErrors from '../../fixtures/expShow/base/noErrors'
-import customPlotsFixture from '../../fixtures/expShow/base/customPlots'
+import customPlotsFixture, {
+  customPlotsOrderFixture
+} from '../../fixtures/expShow/base/customPlots'
 import { Plots } from '../../../plots'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import { WorkspacePlots } from '../../../plots/workspace'
@@ -90,6 +92,7 @@ export const buildPlots = async (
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const plotsModel: PlotsModel = (plots as any).plots
+  plotsModel.updateCustomPlotsOrder(customPlotsOrderFixture)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const pathsModel: PathsModel = (plots as any).paths
@@ -134,7 +137,7 @@ export const getExpectedCustomPlotsData = (
 ) => {
   const { plots, nbItemsPerRow, height } = customPlotsFixture
   return {
-    checkpoint: {
+    custom: {
       colors: {
         domain,
         range
@@ -142,13 +145,11 @@ export const getExpectedCustomPlotsData = (
       height,
       nbItemsPerRow,
       plots: plots.map(plot => ({
-        id: plot.id,
-        type: plot.type,
+        ...plot,
         values:
           plot.type === CustomPlotType.CHECKPOINT
             ? plot.values.filter(value => domain.includes(value.group))
-            : plot.values,
-        yTitle: plot.yTitle
+            : plot.values
       }))
     }
   }

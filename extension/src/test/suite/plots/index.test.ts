@@ -7,7 +7,9 @@ import { restore, spy, stub } from 'sinon'
 import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import expShowFixtureWithoutErrors from '../../fixtures/expShow/base/noErrors'
-import customPlotsFixture from '../../fixtures/expShow/base/customPlots'
+import customPlotsFixture, {
+  customPlotsOrderFixture
+} from '../../fixtures/expShow/base/customPlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
 import multiSourcePlotsDiffFixture from '../../fixtures/plotsDiff/multiSource'
 import templatePlotsFixture from '../../fixtures/plotsDiff/template'
@@ -456,11 +458,13 @@ suite('Plots Test Suite', () => {
       expect(mockSetCustomPlotsOrder).to.be.calledWithExactly([
         {
           metric: 'metrics:summary.json:accuracy',
-          param: 'params:params.yaml:epochs'
+          param: 'params:params.yaml:epochs',
+          type: CustomPlotType.METRIC_VS_PARAM
         },
         {
           metric: 'metrics:summary.json:loss',
-          param: 'params:params.yaml:dropout'
+          param: 'params:params.yaml:dropout',
+          type: CustomPlotType.METRIC_VS_PARAM
         }
       ])
       expect(messageSpy).to.be.calledOnce
@@ -762,25 +766,41 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a add custom plot message from the webview', async () => {
-      const { plots, plotsModel } = await buildPlots(
+      const { plots, plotsModel, webviewMessages } = await buildPlots(
         disposable,
         plotsDiffFixture
       )
 
       const webview = await plots.showWebview()
 
-      const mockGetMetricAndParam = stub(
+      const mockCustomPlotOrderValue = {
+        metric: 'metrics:summary.json:accuracy',
+        param: 'params:params.yaml:dropout',
+        type: CustomPlotType.METRIC_VS_PARAM
+      }
+
+      const mockPickCustomPlotType = stub(
         customPlotQuickPickUtil,
-        'pickMetricAndParam'
+        'pickCustomPlotType'
       )
 
-      const quickPickEvent = new Promise(resolve =>
+      const mockGetMetricAndParam = stub(
+        webviewMessages,
+        'getMetricOrParamPlot'
+      )
+
+      const firstQuickPickEvent = new Promise(resolve =>
+        mockPickCustomPlotType.onFirstCall().callsFake(() => {
+          resolve(undefined)
+
+          return Promise.resolve(CustomPlotType.METRIC_VS_PARAM)
+        })
+      )
+
+      const secondQuickPickEvent = new Promise(resolve =>
         mockGetMetricAndParam.callsFake(() => {
           resolve(undefined)
-          return Promise.resolve({
-            metric: 'metrics:summary.json:loss',
-            param: 'params:params.yaml:dropout'
-          })
+          return Promise.resolve(mockCustomPlotOrderValue)
         })
       )
 
@@ -792,13 +812,12 @@ suite('Plots Test Suite', () => {
 
       mockMessageReceived.fire({ type: MessageFromWebviewType.ADD_CUSTOM_PLOT })
 
-      await quickPickEvent
+      await firstQuickPickEvent
+      await secondQuickPickEvent
 
       expect(mockSetCustomPlotsOrder).to.be.calledWith([
-        {
-          metric: 'metrics:summary.json:loss',
-          param: 'params:params.yaml:dropout'
-        }
+        ...customPlotsOrderFixture,
+        mockCustomPlotOrderValue
       ])
       expect(mockSendTelemetryEvent).to.be.calledWith(
         EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED,

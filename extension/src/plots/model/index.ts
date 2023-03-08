@@ -71,13 +71,11 @@ export class PlotsModel extends ModelWithPersistence {
   private multiSourceVariations: MultiSourceVariations = {}
   private multiSourceEncoding: MultiSourceEncoding = {}
 
-  private checkpointPlots?: CheckpointPlot[]
   // TBD we need to move this type to a named type if
   // we plan to keep this
   private customCheckpointPlots?: { [metric: string]: CheckpointPlot }
   private customPlots?: CustomPlot[]
   private selectedMetrics?: string[]
-  private metricOrder: string[]
 
   constructor(
     dvcRoot: string,
@@ -102,7 +100,6 @@ export class PlotsModel extends ModelWithPersistence {
       PersistenceKey.PLOT_SELECTED_METRICS,
       undefined
     )
-    this.metricOrder = this.revive(PersistenceKey.PLOT_METRIC_ORDER, [])
 
     this.customPlotsOrder = this.revive(PersistenceKey.PLOTS_CUSTOM_ORDER, [])
   }
@@ -126,7 +123,6 @@ export class PlotsModel extends ModelWithPersistence {
         collectTemplates(data),
         collectMultiSourceVariations(data, this.multiSourceVariations)
       ])
-
     this.recreateCustomPlots()
 
     this.comparisonData = {
@@ -179,8 +175,9 @@ export class PlotsModel extends ModelWithPersistence {
     if (data) {
       this.customCheckpointPlots = collectCustomCheckpointPlotData(data)
     }
+
     const experiments = this.experiments.getExperiments()
-    // TBD this if check is going to nned to be rethought since checkpoint data
+    // TBD this if check is going to need to be rethought since checkpoint data
     // is involved now
     if (experiments.length === 0) {
       this.customPlots = undefined
@@ -198,10 +195,14 @@ export class PlotsModel extends ModelWithPersistence {
     return this.customPlotsOrder
   }
 
-  public setCustomPlotsOrder(plotsOrder: CustomPlotsOrderValue[]) {
+  public updateCustomPlotsOrder(plotsOrder: CustomPlotsOrderValue[]) {
     this.customPlotsOrder = plotsOrder
-    this.persist(PersistenceKey.PLOTS_CUSTOM_ORDER, this.customPlotsOrder)
     this.recreateCustomPlots()
+  }
+
+  public setCustomPlotsOrder(plotsOrder: CustomPlotsOrderValue[]) {
+    this.updateCustomPlotsOrder(plotsOrder)
+    this.persist(PersistenceKey.PLOTS_CUSTOM_ORDER, this.customPlotsOrder)
   }
 
   public removeCustomPlots(plotIds: string[]) {
