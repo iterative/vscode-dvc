@@ -1,8 +1,8 @@
 import { PlotsModel } from '.'
 import {
+  DEFAULT_NB_ITEMS_PER_REOW,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NB_ITEMS_PER_ROW,
-  PlotNumberOfItemsPerRow,
   Section
 } from '../webview/contract'
 import { buildMockMemento } from '../../test/util'
@@ -69,33 +69,25 @@ describe('plotsModel', () => {
 
   it('should change the plotSize when calling setPlotSize', () => {
     expect(model.getNbItemsPerRow(Section.CHECKPOINT_PLOTS)).toStrictEqual(
-      PlotNumberOfItemsPerRow.TWO
+      DEFAULT_NB_ITEMS_PER_REOW
     )
 
-    model.setNbItemsPerRow(
-      Section.CHECKPOINT_PLOTS,
-      PlotNumberOfItemsPerRow.ONE
-    )
+    model.setNbItemsPerRow(Section.CHECKPOINT_PLOTS, 1)
 
-    expect(model.getNbItemsPerRow(Section.CHECKPOINT_PLOTS)).toStrictEqual(
-      PlotNumberOfItemsPerRow.ONE
-    )
+    expect(model.getNbItemsPerRow(Section.CHECKPOINT_PLOTS)).toStrictEqual(1)
   })
 
   it('should update the persisted plot size when calling setPlotSize', () => {
     const mementoUpdateSpy = jest.spyOn(memento, 'update')
 
-    model.setNbItemsPerRow(
-      Section.CHECKPOINT_PLOTS,
-      PlotNumberOfItemsPerRow.TWO
-    )
+    model.setNbItemsPerRow(Section.CHECKPOINT_PLOTS, 2)
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
       PersistenceKey.PLOT_NB_ITEMS_PER_ROW + exampleDvcRoot,
       {
         ...DEFAULT_SECTION_NB_ITEMS_PER_ROW,
-        [Section.CHECKPOINT_PLOTS]: PlotNumberOfItemsPerRow.TWO
+        [Section.CHECKPOINT_PLOTS]: 2
       }
     )
   })
