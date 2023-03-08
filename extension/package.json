@@ -1624,6 +1624,7 @@
     "node-fetch": "2.6.9",
     "tree-kill": "1.2.2",
     "uuid": "9.0.0",
+    "vega-util": "1.17.1",
     "vscode-languageclient": "8.1.0"
   },
   "devDependencies": {
@@ -1649,9 +1650,10 @@
     "@types/uuid": "9.0.1",
     "@types/vscode": "1.64.0",
     "@vscode/test-electron": "2.3.0",
+    "@types/vega": "3.2.0",
     "@vscode/vsce": "2.18.0",
-    "@wdio/cli": "8.4.0",
-    "@wdio/local-runner": "8.4.0",
+    "@wdio/cli": "8.5.1",
+    "@wdio/local-runner": "8.5.1",
     "@wdio/mocha-framework": "8.4.0",
     "@wdio/spec-reporter": "8.4.0",
     "chai": "4.3.7",
@@ -1671,7 +1673,7 @@
     "ts-loader": "9.4.2",
     "vscode-uri": "3.0.7",
     "wdio-vscode-service": "5.0.0",
-    "webdriverio": "8.4.0",
+    "webdriverio": "8.5.1",
     "webpack": "5.75.0",
     "webpack-cli": "5.0.1"
   },
