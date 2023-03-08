@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.16] - 2023-03-08
+
+### 🚀 New Features and Enhancements
+
+- Select the number of items per row from slider [#3405](https://github.com/iterative/vscode-dvc/pull/3405) by [@sroy3](https://github.com/sroy3)
+- Change the background color for the smooth slider over plots [#3427](https://github.com/iterative/vscode-dvc/pull/3427) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Remove delay progress notfication closing from integration tests [#3412](https://github.com/iterative/vscode-dvc/pull/3412) by [@mattseddon](https://github.com/mattseddon)
+- Add delay to shore up snapshots [#3415](https://github.com/iterative/vscode-dvc/pull/3415) by [@mattseddon](https://github.com/mattseddon)
+- Pin and upgrade webview dependencies [#3416](https://github.com/iterative/vscode-dvc/pull/3416) by [@mattseddon](https://github.com/mattseddon)
+- Remove unnecessary Vega dependency [#3423](https://github.com/iterative/vscode-dvc/pull/3423) by [@mattseddon](https://github.com/mattseddon)
+- Pin @tanstack/react-table [#3424](https://github.com/iterative/vscode-dvc/pull/3424) by [@mattseddon](https://github.com/mattseddon)
+- Send single event to share experiment to Studio [#3422](https://github.com/iterative/vscode-dvc/pull/3422) by [@mattseddon](https://github.com/mattseddon)
+- Fix typo [#3426](https://github.com/iterative/vscode-dvc/pull/3426) by [@sroy3](https://github.com/sroy3)
+
 ## [0.6.15] - 2023-03-07
 
 ### 🚀 New Features and Enhancements
