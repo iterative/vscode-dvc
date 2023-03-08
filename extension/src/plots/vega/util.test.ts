@@ -1,4 +1,4 @@
-import { Text as VegaText, Title as VegaTitle } from 'vega'
+import type { Text as VegaText, Title as VegaTitle } from 'vega'
 import { TopLevelSpec } from 'vega-lite'
 import merge from 'lodash.merge'
 import cloneDeep from 'lodash.clonedeep'
