@@ -13,7 +13,7 @@ import {
   TemplatePlots,
   Revision,
   PlotsComparisonData,
-  DefaultNumberOfItemsPerRow
+  DEFAULT_NB_ITEMS_PER_REOW
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
@@ -499,7 +499,7 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
                 ) || []
             }
           } as TopLevelSpec,
-          DefaultNumberOfItemsPerRow,
+          DEFAULT_NB_ITEMS_PER_REOW,
           {
             color: {
               domain: expectedRevisions,
@@ -659,14 +659,14 @@ export const getRevisions = (): Revision[] => {
 
 export const getMinimalWebviewMessage = () => ({
   plots: extendedSpecs(basicVega),
-  nbItemsPerRow: DefaultNumberOfItemsPerRow,
+  nbItemsPerRow: DEFAULT_NB_ITEMS_PER_REOW,
   height: undefined,
   revisions: getRevisions()
 })
 
 export const getTemplateWebviewMessage = (): TemplatePlotsData => ({
   plots: extendedSpecs({ ...basicVega, ...require('./vega').default }),
-  nbItemsPerRow: DefaultNumberOfItemsPerRow,
+  nbItemsPerRow: DEFAULT_NB_ITEMS_PER_REOW,
   height: undefined
 })
 
@@ -676,7 +676,7 @@ export const getManyTemplatePlotsWebviewMessage = (
   plots: extendedSpecs({
     ...multipleVega(length)
   }),
-  nbItemsPerRow: DefaultNumberOfItemsPerRow,
+  nbItemsPerRow: DEFAULT_NB_ITEMS_PER_REOW,
   height: undefined
 })
 
@@ -703,7 +703,7 @@ export const getComparisonWebviewMessage = (
   return {
     revisions: getRevisions(),
     plots: plotAcc,
-    nbItemsPerRow: DefaultNumberOfItemsPerRow,
+    nbItemsPerRow: DEFAULT_NB_ITEMS_PER_REOW,
     height: undefined
   }
 }

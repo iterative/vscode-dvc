@@ -109,7 +109,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
 }) => {
   const open = !sectionCollapsed
   const dispatch = useDispatch()
-  const setMaxNbPlotsPerRow = useSelector(
+  const maxNbPlotsPerRow = useSelector(
     (state: PlotsState) => state.webview.maxNbPlotsPerRow
   )
 
@@ -168,11 +168,12 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   const handleResize = useCallback(
     (nbItems: number) => {
       if (changeNbItemsPerRow) {
-        dispatch(changeNbItemsPerRow(nbItems))
+        const positiveNbItems = Math.abs(nbItems)
+        dispatch(changeNbItemsPerRow(positiveNbItems))
         sendMessage({
           payload: {
             height: undefined,
-            nbItemsPerRow: nbItems,
+            nbItemsPerRow: positiveNbItems,
             section: sectionKey
           },
           type: MessageFromWebviewType.RESIZE_PLOTS
@@ -203,17 +204,17 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
             </div>
           </Tooltip>
         </summary>
-        {changeNbItemsPerRow && hasItems && (
+        {changeNbItemsPerRow && hasItems && maxNbPlotsPerRow > 1 && (
           <div
             className={styles.nbItemsPerRowSlider}
             data-testid="nb-items-per-row-slider"
           >
             <MinMaxSlider
-              minimum={1}
-              maximum={setMaxNbPlotsPerRow}
-              label="Number of plots per row"
+              maximum={-1}
+              minimum={-maxNbPlotsPerRow}
+              label="Plot Width"
               onChange={handleResize}
-              defaultValue={nbItemsPerRow}
+              defaultValue={-nbItemsPerRow}
             />
           </div>
         )}

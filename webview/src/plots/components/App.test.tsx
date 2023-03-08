@@ -28,7 +28,7 @@ import {
   Section,
   TemplatePlotGroup,
   TemplatePlotsData,
-  DefaultNumberOfItemsPerRow
+  DEFAULT_NB_ITEMS_PER_REOW
 } from 'dvc/src/plots/webview/contract'
 import {
   MessageFromWebviewType,
@@ -138,9 +138,9 @@ describe('App', () => {
     return store
   }
 
-  const setWrapperSize = (store: typeof plotsStore) =>
+  const setWrapperSize = (store: typeof plotsStore, size = 2000) =>
     act(() => {
-      store.dispatch(setMaxNbPlotsPerRow(1000))
+      store.dispatch(setMaxNbPlotsPerRow(size))
     })
 
   const templatePlot = templatePlotsFixture.plots[0].entries[0]
@@ -263,7 +263,7 @@ describe('App', () => {
       checkpoint: null,
       comparison: {
         height: undefined,
-        nbItemsPerRow: DefaultNumberOfItemsPerRow,
+        nbItemsPerRow: DEFAULT_NB_ITEMS_PER_REOW,
         plots: [
           {
             path: 'training/plots/images/misclassified.jpg',
@@ -697,15 +697,17 @@ describe('App', () => {
   })
 
   it('should display a slider to pick the number of items per row if there are items and the action is available', () => {
-    renderAppWithOptionalData({
+    const store = renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
     })
+    setWrapperSize(store)
 
     expect(screen.getByTestId('nb-items-per-row-slider')).toBeInTheDocument()
   })
 
   it('should not display a slider to pick the number of items per row if there are no items', () => {
-    renderAppWithOptionalData({})
+    const store = renderAppWithOptionalData({})
+    setWrapperSize(store)
 
     expect(
       screen.queryByTestId('nb-items-per-row-slider')
@@ -713,9 +715,21 @@ describe('App', () => {
   })
 
   it('should not display a slider to pick the number of items per row if the action is unavailable', () => {
-    renderAppWithOptionalData({
+    const store = renderAppWithOptionalData({
       comparison: comparisonTableFixture
     })
+    setWrapperSize(store)
+
+    expect(
+      screen.queryByTestId('nb-items-per-row-slider')
+    ).not.toBeInTheDocument()
+  })
+
+  it('should not display a slider to pick the number of items per row if the only width available for one item per row or less', () => {
+    const store = renderAppWithOptionalData({
+      checkpoint: checkpointPlotsFixture
+    })
+    setWrapperSize(store, 400)
 
     expect(
       screen.queryByTestId('nb-items-per-row-slider')
@@ -726,25 +740,13 @@ describe('App', () => {
     const store = renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
     })
+    setWrapperSize(store)
 
     const plotResizer = within(
       screen.getByTestId('nb-items-per-row-slider')
     ).getByRole('slider')
 
-    setWrapperSize(store)
-    fireEvent.change(plotResizer, { target: { value: 1 } })
-    expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: {
-        height: undefined,
-        nbItemsPerRow: 1,
-        section: Section.CHECKPOINT_PLOTS
-      },
-      type: MessageFromWebviewType.RESIZE_PLOTS
-    })
-
-    setWrapperSize(store)
-    fireEvent.change(plotResizer, { target: { value: 3 } })
-
+    fireEvent.change(plotResizer, { target: { value: -3 } })
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: {
         height: undefined,
@@ -753,8 +755,6 @@ describe('App', () => {
       },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
-
-    setWrapperSize(store)
   })
 
   it('should display the checkpoint plots in the order stored', () => {
@@ -1595,7 +1595,7 @@ describe('App', () => {
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
 
-      it('should not wrap the template plots in a big grid (virtualize them) when there are eigth or fewer large plots', async () => {
+      it('should not wrap the template plots in a big grid (virtualize them) when there are eight or fewer large plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(8) },
           1,
@@ -1673,17 +1673,17 @@ describe('App', () => {
       it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than fourteen regular plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(15) },
-          DefaultNumberOfItemsPerRow,
+          DEFAULT_NB_ITEMS_PER_REOW,
           Section.CHECKPOINT_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
 
-      it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are eight or fourteen regular plots', async () => {
+      it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are fourteen regular plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(14) },
-          DefaultNumberOfItemsPerRow,
+          DEFAULT_NB_ITEMS_PER_REOW,
           Section.CHECKPOINT_PLOTS
         )
 
@@ -1693,7 +1693,7 @@ describe('App', () => {
       it('should  wrap the template plots in a big grid (virtualize them) when there are more than fourteen regular plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(15) },
-          DefaultNumberOfItemsPerRow,
+          DEFAULT_NB_ITEMS_PER_REOW,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1703,7 +1703,7 @@ describe('App', () => {
       it('should not wrap the template plots in a big grid (virtualize them) when there are fourteen or fewer regular plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(14) },
-          DefaultNumberOfItemsPerRow,
+          DEFAULT_NB_ITEMS_PER_REOW,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1717,7 +1717,7 @@ describe('App', () => {
         beforeEach(async () => {
           store = await renderAppAndChangeSize(
             { checkpoint },
-            DefaultNumberOfItemsPerRow,
+            DEFAULT_NB_ITEMS_PER_REOW,
             Section.CHECKPOINT_PLOTS
           )
         })

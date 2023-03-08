@@ -8,7 +8,7 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   TemplatePlotGroup,
   TemplatePlotSection,
-  DefaultNumberOfItemsPerRow
+  DEFAULT_NB_ITEMS_PER_REOW
 } from 'dvc/src/plots/webview/contract'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
 import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/base/checkpointPlots'
@@ -42,7 +42,7 @@ const smallCheckpointPlotsFixture = {
 
 const manyCheckpointPlots = (
   length: number,
-  size = DefaultNumberOfItemsPerRow
+  size = DEFAULT_NB_ITEMS_PER_REOW
 ) =>
   Array.from({ length }, () => checkpointPlotsFixture.plots[0]).map(
     (plot, i) => {
@@ -140,7 +140,7 @@ WithTemplateOnly.args = {
     selectedRevisions: plotsRevisionsFixture,
     template: {
       ...templatePlotsFixture,
-      nbItemsPerRow: DefaultNumberOfItemsPerRow
+      nbItemsPerRow: DEFAULT_NB_ITEMS_PER_REOW
     }
   }
 }

@@ -41,7 +41,8 @@ export const webviewSlice = createSlice({
       action: PayloadAction<number>
     ) => {
       // Action payload here is the max width of the plots webview. When changed, we re-calculate the max number of plots per row
-      state.maxNbPlotsPerRow = Math.floor(action.payload / 300)
+      const maxWidth = action.payload
+      state.maxNbPlotsPerRow = Math.floor(maxWidth / 300)
     },
     setZoomedInPlot: (
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,7 +1,7 @@
 import { VisualizationSpec } from 'react-vega'
 import { Color } from '../../experiments/model/status/colors'
 
-export const DefaultNumberOfItemsPerRow = 2
+export const DEFAULT_NB_ITEMS_PER_REOW = 2
 
 export enum Section {
   CHECKPOINT_PLOTS = 'checkpoint-plots',
@@ -11,10 +11,10 @@ export enum Section {
 }
 
 export const DEFAULT_SECTION_NB_ITEMS_PER_ROW = {
-  [Section.CHECKPOINT_PLOTS]: DefaultNumberOfItemsPerRow,
-  [Section.TEMPLATE_PLOTS]: DefaultNumberOfItemsPerRow,
-  [Section.COMPARISON_TABLE]: DefaultNumberOfItemsPerRow,
-  [Section.CUSTOM_PLOTS]: DefaultNumberOfItemsPerRow
+  [Section.CHECKPOINT_PLOTS]: DEFAULT_NB_ITEMS_PER_REOW,
+  [Section.TEMPLATE_PLOTS]: DEFAULT_NB_ITEMS_PER_REOW,
+  [Section.COMPARISON_TABLE]: DEFAULT_NB_ITEMS_PER_REOW,
+  [Section.CUSTOM_PLOTS]: DEFAULT_NB_ITEMS_PER_REOW
 }
 
 // Height is undefined by default because it is calculated by ratio of the width it'll fill (calculated by the webview)

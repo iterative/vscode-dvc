@@ -14,7 +14,6 @@ import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWr
 import { GetStarted } from '../../shared/components/getStarted/GetStarted'
 import { PlotsState } from '../store'
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 const PlotsContent = () => {
   const dispatch = useDispatch()
   const { hasData, hasPlots, hasUnselectedPlots, zoomedInPlot } = useSelector(
@@ -36,7 +35,8 @@ const PlotsContent = () => {
       wrapperRef.current &&
         dispatch(
           setMaxNbPlotsPerRow(
-            wrapperRef.current.getBoundingClientRect().width - 100
+            // Plots grid have a 20px margin around it, we subtract 20 * 2 from the wrapper width to get the max available space
+            wrapperRef.current.getBoundingClientRect().width - 40
           )
         )
     }

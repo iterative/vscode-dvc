@@ -81,7 +81,7 @@ import * as ProcessExecution from '../../../process/execution'
 import { DvcReader } from '../../../cli/dvc/reader'
 import { Connect } from '../../../connect'
 import { DvcViewer } from '../../../cli/dvc/viewer'
-import { DefaultNumberOfItemsPerRow } from '../../../plots/webview/contract'
+import { DEFAULT_NB_ITEMS_PER_REOW } from '../../../plots/webview/contract'
 
 const { openFileInEditor } = FileSystem
 
@@ -339,7 +339,7 @@ suite('Experiments Test Suite', () => {
       ).returns(undefined)
 
       const mockColumnId = 'params:params.yaml:lr'
-      const mockWidth = DefaultNumberOfItemsPerRow
+      const mockWidth = DEFAULT_NB_ITEMS_PER_REOW
 
       mockMessageReceived.fire({
         payload: { id: mockColumnId, width: mockWidth },
