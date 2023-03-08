@@ -13,7 +13,9 @@ import {
   TemplatePlots,
   Revision,
   PlotsComparisonData,
-  DEFAULT_NB_ITEMS_PER_REOW
+  DEFAULT_NB_ITEMS_PER_REOW,
+  PlotHeight,
+  DEFAULT_PLOT_HEIGHT
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
@@ -660,14 +662,14 @@ export const getRevisions = (): Revision[] => {
 export const getMinimalWebviewMessage = () => ({
   plots: extendedSpecs(basicVega),
   nbItemsPerRow: DEFAULT_NB_ITEMS_PER_REOW,
-  height: undefined,
+  height: DEFAULT_PLOT_HEIGHT,
   revisions: getRevisions()
 })
 
 export const getTemplateWebviewMessage = (): TemplatePlotsData => ({
   plots: extendedSpecs({ ...basicVega, ...require('./vega').default }),
   nbItemsPerRow: DEFAULT_NB_ITEMS_PER_REOW,
-  height: undefined
+  height: DEFAULT_PLOT_HEIGHT
 })
 
 export const getManyTemplatePlotsWebviewMessage = (
@@ -677,7 +679,7 @@ export const getManyTemplatePlotsWebviewMessage = (
     ...multipleVega(length)
   }),
   nbItemsPerRow: DEFAULT_NB_ITEMS_PER_REOW,
-  height: undefined
+  height: DEFAULT_PLOT_HEIGHT
 })
 
 export const MOCK_IMAGE_MTIME = 946684800000
@@ -704,6 +706,6 @@ export const getComparisonWebviewMessage = (
     revisions: getRevisions(),
     plots: plotAcc,
     nbItemsPerRow: DEFAULT_NB_ITEMS_PER_REOW,
-    height: undefined
+    height: DEFAULT_PLOT_HEIGHT
   }
 }

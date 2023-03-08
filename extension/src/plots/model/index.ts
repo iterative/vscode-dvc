@@ -28,7 +28,8 @@ import {
   SectionCollapsed,
   CustomPlotData,
   DEFAULT_HEIGHT,
-  DEFAULT_NB_ITEMS_PER_REOW
+  DEFAULT_NB_ITEMS_PER_REOW,
+  PlotHeight
 } from '../webview/contract'
 import {
   ExperimentsOutput,
@@ -56,7 +57,7 @@ export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
 
   private nbItemsPerRow: Record<Section, number>
-  private height: Record<Section, number | undefined>
+  private height: Record<Section, PlotHeight>
   private customPlotsOrder: CustomPlotsOrderValue[]
   private sectionCollapsed: SectionCollapsed
   private commitRevisions: Record<string, string> = {}
@@ -414,7 +415,7 @@ export class PlotsModel extends ModelWithPersistence {
     return DEFAULT_NB_ITEMS_PER_REOW
   }
 
-  public setHeight(section: Section, height: number | undefined) {
+  public setHeight(section: Section, height: PlotHeight) {
     this.height[section] = height
     this.persist(PersistenceKey.PLOT_HEIGHT, this.height)
   }

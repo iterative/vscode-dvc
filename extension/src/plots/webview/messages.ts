@@ -2,6 +2,7 @@ import isEmpty from 'lodash.isempty'
 import {
   ComparisonPlot,
   ComparisonRevisionData,
+  PlotHeight,
   PlotsData as TPlotsData,
   Revision,
   Section,
@@ -123,7 +124,7 @@ export class WebviewMessages {
   private setPlotSize(
     section: Section,
     nbItemsPerRow: number,
-    height?: number
+    height: PlotHeight
   ) {
     this.plots.setNbItemsPerRow(section, nbItemsPerRow)
     this.plots.setHeight(section, height)

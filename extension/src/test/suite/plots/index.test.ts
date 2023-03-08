@@ -23,6 +23,7 @@ import {
 } from '../util'
 import { dvcDemoPath } from '../../util'
 import {
+  DEFAULT_PLOT_HEIGHT,
   DEFAULT_SECTION_COLLAPSED,
   PlotsData as TPlotsData,
   Section,
@@ -246,7 +247,7 @@ suite('Plots Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: {
-          height: undefined,
+          height: DEFAULT_PLOT_HEIGHT,
           nbItemsPerRow: 3,
           section: Section.TEMPLATE_PLOTS
         },
@@ -725,7 +726,7 @@ suite('Plots Test Suite', () => {
       const expectedPlotsData: TPlotsData = {
         checkpoint: checkpointPlotsFixture,
         comparison: comparisonPlotsFixture,
-        custom: { height: undefined, nbItemsPerRow: 2, plots: [] },
+        custom: { height: DEFAULT_PLOT_HEIGHT, nbItemsPerRow: 2, plots: [] },
         hasPlots: true,
         hasUnselectedPlots: false,
         sectionCollapsed: DEFAULT_SECTION_COLLAPSED,

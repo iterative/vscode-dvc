@@ -1,6 +1,7 @@
 import {
   CustomPlotsData,
-  DEFAULT_NB_ITEMS_PER_REOW
+  DEFAULT_NB_ITEMS_PER_REOW,
+  DEFAULT_PLOT_HEIGHT
 } from '../../../../plots/webview/contract'
 
 const data: CustomPlotsData = {
@@ -51,7 +52,7 @@ const data: CustomPlotsData = {
     }
   ],
   nbItemsPerRow: DEFAULT_NB_ITEMS_PER_REOW,
-  height: undefined
+  height: DEFAULT_PLOT_HEIGHT
 }
 
 export default data

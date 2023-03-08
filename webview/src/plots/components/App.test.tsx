@@ -28,7 +28,8 @@ import {
   Section,
   TemplatePlotGroup,
   TemplatePlotsData,
-  DEFAULT_NB_ITEMS_PER_REOW
+  DEFAULT_NB_ITEMS_PER_REOW,
+  DEFAULT_PLOT_HEIGHT
 } from 'dvc/src/plots/webview/contract'
 import {
   MessageFromWebviewType,
@@ -262,7 +263,7 @@ describe('App', () => {
     renderAppWithOptionalData({
       checkpoint: null,
       comparison: {
-        height: undefined,
+        height: DEFAULT_PLOT_HEIGHT,
         nbItemsPerRow: DEFAULT_NB_ITEMS_PER_REOW,
         plots: [
           {
