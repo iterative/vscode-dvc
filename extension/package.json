@@ -1363,7 +1363,7 @@
         {
           "id": "dvc.views.studio",
           "name": "Studio",
-          "when": "true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "id": "dvc.views.experimentsColumnsTree",
