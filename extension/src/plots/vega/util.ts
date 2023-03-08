@@ -8,7 +8,8 @@ import cloneDeep from 'lodash.clonedeep'
 import merge from 'lodash.merge'
 import { VisualizationSpec } from 'react-vega'
 import { TopLevelSpec } from 'vega-lite'
-import { ExprRef, hasOwnProperty, SignalRef, Title, truncate, Text } from 'vega'
+import type { ExprRef, SignalRef, Title, Text } from 'vega'
+import { hasOwnProperty, truncate } from 'vega-util'
 import { TitleParams } from 'vega-lite/build/src/title'
 import {
   GenericHConcatSpec,

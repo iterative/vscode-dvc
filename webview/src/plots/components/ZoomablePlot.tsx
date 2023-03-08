@@ -3,7 +3,6 @@ import { Section } from 'dvc/src/plots/webview/contract'
 import React, { useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { VisualizationSpec } from 'react-vega'
-import { Renderers } from 'vega'
 import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { setZoomedInPlot } from './webviewSlice'
 import styles from './styles.module.scss'
@@ -37,7 +36,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
     config,
     data,
     'data-testid': `${id}-vega`,
-    renderer: 'svg' as unknown as Renderers,
+    renderer: 'svg',
     spec
   } as VegaLiteProps
   currentPlotProps.current = plotProps

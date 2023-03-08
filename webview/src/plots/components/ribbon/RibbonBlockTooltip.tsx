@@ -1,6 +1,6 @@
 import React, { ReactElement } from 'react'
 import cn from 'classnames'
-import { truncate } from 'vega'
+import { truncate } from 'vega-util'
 import { Revision } from 'dvc/src/plots/webview/contract'
 import { formatNumber } from 'dvc/src/util/number'
 import styles from './styles.module.scss'
