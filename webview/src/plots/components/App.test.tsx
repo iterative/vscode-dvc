@@ -28,7 +28,7 @@ import {
   Section,
   TemplatePlotGroup,
   TemplatePlotsData,
-  DEFAULT_NB_ITEMS_PER_REOW
+  DEFAULT_NB_ITEMS_PER_ROW
 } from 'dvc/src/plots/webview/contract'
 import {
   MessageFromWebviewType,
@@ -263,7 +263,7 @@ describe('App', () => {
       checkpoint: null,
       comparison: {
         height: undefined,
-        nbItemsPerRow: DEFAULT_NB_ITEMS_PER_REOW,
+        nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
         plots: [
           {
             path: 'training/plots/images/misclassified.jpg',
@@ -1673,7 +1673,7 @@ describe('App', () => {
       it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than fourteen regular plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(15) },
-          DEFAULT_NB_ITEMS_PER_REOW,
+          DEFAULT_NB_ITEMS_PER_ROW,
           Section.CHECKPOINT_PLOTS
         )
 
@@ -1683,7 +1683,7 @@ describe('App', () => {
       it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are fourteen regular plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(14) },
-          DEFAULT_NB_ITEMS_PER_REOW,
+          DEFAULT_NB_ITEMS_PER_ROW,
           Section.CHECKPOINT_PLOTS
         )
 
@@ -1693,7 +1693,7 @@ describe('App', () => {
       it('should  wrap the template plots in a big grid (virtualize them) when there are more than fourteen regular plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(15) },
-          DEFAULT_NB_ITEMS_PER_REOW,
+          DEFAULT_NB_ITEMS_PER_ROW,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1703,7 +1703,7 @@ describe('App', () => {
       it('should not wrap the template plots in a big grid (virtualize them) when there are fourteen or fewer regular plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(14) },
-          DEFAULT_NB_ITEMS_PER_REOW,
+          DEFAULT_NB_ITEMS_PER_ROW,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1717,7 +1717,7 @@ describe('App', () => {
         beforeEach(async () => {
           store = await renderAppAndChangeSize(
             { checkpoint },
-            DEFAULT_NB_ITEMS_PER_REOW,
+            DEFAULT_NB_ITEMS_PER_ROW,
             Section.CHECKPOINT_PLOTS
           )
         })

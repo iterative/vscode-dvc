@@ -58,32 +58,16 @@ suite('Patch Test Suite', () => {
 
       expect(mockGetRemoteUrl).to.be.calledOnce
       expect(mockExpShow).to.be.calledOnce
-      expect(mockFetch).to.be.calledThrice
+      expect(mockFetch).to.be.calledOnce
 
       const { metrics, name, params } = expShowFixture[
         '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'
       ]['4fb124aebddb2adf1545030907687fa9a4c80e70'].data as ExperimentFields
 
-      const baseBody = {
-        baseline_sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
-        client: 'vscode',
-        name,
-        repo_url: mockRepoUrl
-      }
-      const headers = {
-        Authorization: `token ${mockStudioAccessToken}`,
-        'Content-type': 'application/json'
-      }
-
-      expect(mockFetch).to.be.calledWithExactly(STUDIO_ENDPOINT, {
-        body: JSON.stringify({ ...baseBody, type: 'start' }),
-        headers,
-        method: 'POST'
-      })
-
       expect(mockFetch).to.be.calledWithExactly(STUDIO_ENDPOINT, {
         body: JSON.stringify({
-          ...baseBody,
+          baseline_sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
+          client: 'vscode',
           metrics,
           name,
           params: {
@@ -91,17 +75,13 @@ suite('Patch Test Suite', () => {
             [join('nested', 'params.yaml')]:
               params?.[join('nested', 'params.yaml')]?.data
           },
-          plots: {},
-          step: 0,
-          type: 'data'
+          repo_url: mockRepoUrl,
+          type: 'done'
         }),
-        headers,
-        method: 'POST'
-      })
-
-      expect(mockFetch).to.be.calledWithExactly(STUDIO_ENDPOINT, {
-        body: JSON.stringify({ ...baseBody, type: 'done' }),
-        headers,
+        headers: {
+          Authorization: `token ${mockStudioAccessToken}`,
+          'Content-type': 'application/json'
+        },
         method: 'POST'
       })
     })
@@ -145,24 +125,28 @@ suite('Patch Test Suite', () => {
         RegisteredCommands.CONNECT_SHOW
       )
 
-      const { name } = expShowFixture[
+      const { metrics, params, name } = expShowFixture[
         '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'
       ]['4fb124aebddb2adf1545030907687fa9a4c80e70'].data as ExperimentFields
 
-      const baseBody = {
-        baseline_sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
-        client: 'vscode',
-        name,
-        repo_url: mockRepoUrl
-      }
-      const headers = {
-        Authorization: `token ${mockStudioAccessToken}`,
-        'Content-type': 'application/json'
-      }
-
       expect(mockFetch).to.be.calledWithExactly(STUDIO_ENDPOINT, {
-        body: JSON.stringify({ ...baseBody, type: 'start' }),
-        headers,
+        body: JSON.stringify({
+          baseline_sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
+          client: 'vscode',
+          metrics,
+          name,
+          params: {
+            'params.yaml': params?.['params.yaml']?.data,
+            [join('nested', 'params.yaml')]:
+              params?.[join('nested', 'params.yaml')]?.data
+          },
+          repo_url: mockRepoUrl,
+          type: 'done'
+        }),
+        headers: {
+          Authorization: `token ${mockStudioAccessToken}`,
+          'Content-type': 'application/json'
+        },
         method: 'POST'
       })
     })
