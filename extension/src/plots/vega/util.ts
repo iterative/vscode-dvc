@@ -26,7 +26,7 @@ import {
 } from 'vega-lite/build/src/spec/repeat'
 import { TopLevelUnitSpec } from 'vega-lite/build/src/spec/unit'
 import isEqual from 'lodash.isequal'
-import { ColorScale, DEFAULT_NB_ITEMS_PER_REOW } from '../webview/contract'
+import { ColorScale, DEFAULT_NB_ITEMS_PER_ROW } from '../webview/contract'
 import { ShapeEncoding, StrokeDashEncoding } from '../multiSource/constants'
 import { Color } from '../../experiments/model/status/colors'
 
@@ -282,7 +282,7 @@ export const truncateTitles = (
         const title = value as unknown as Title
         specCopy[key] = vertical
           ? truncateVerticalTitle(title, size)
-          : truncateTitle(title, size > DEFAULT_NB_ITEMS_PER_REOW ? 30 : 50)
+          : truncateTitle(title, size > DEFAULT_NB_ITEMS_PER_ROW ? 30 : 50)
       } else if (isEndValue(valueType)) {
         specCopy[key] = value
       } else if (Array.isArray(value)) {
