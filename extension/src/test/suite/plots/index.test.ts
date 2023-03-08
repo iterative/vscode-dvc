@@ -510,6 +510,26 @@ suite('Plots Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should handle a plot zoomed message from the webview', async () => {
+      const { plots } = await buildPlots(disposable, plotsDiffFixture)
+
+      const webview = await plots.showWebview()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.ZOOM_PLOT
+      })
+
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_ZOOM_PLOT,
+        undefined,
+        undefined
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should handle a custom plots reordered message from the webview', async () => {
       const { plots, plotsModel, messageSpy } = await buildPlots(
         disposable,

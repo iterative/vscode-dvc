@@ -1404,6 +1404,22 @@ describe('App', () => {
     expect(screen.getByTestId('modal')).toBeInTheDocument()
   })
 
+  it('should send a message to the extension when a plot is opened in a modal', () => {
+    renderAppWithOptionalData({
+      template: complexTemplatePlotsFixture
+    })
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
+
+    fireEvent.click(plot)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.ZOOM_PLOT
+    })
+  })
+
   it('should open a modal with the plot zoomed in when clicking a checkpoint plot', () => {
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
