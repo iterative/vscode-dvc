@@ -1,6 +1,6 @@
 import { PlotsModel } from '.'
 import {
-  DEFAULT_NB_ITEMS_PER_REOW,
+  DEFAULT_NB_ITEMS_PER_ROW,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NB_ITEMS_PER_ROW,
   Section
@@ -69,7 +69,7 @@ describe('plotsModel', () => {
 
   it('should change the plotSize when calling setPlotSize', () => {
     expect(model.getNbItemsPerRow(Section.CHECKPOINT_PLOTS)).toStrictEqual(
-      DEFAULT_NB_ITEMS_PER_REOW
+      DEFAULT_NB_ITEMS_PER_ROW
     )
 
     model.setNbItemsPerRow(Section.CHECKPOINT_PLOTS, 1)
