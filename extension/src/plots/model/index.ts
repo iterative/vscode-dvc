@@ -30,7 +30,8 @@ import {
   PlotNumberOfItemsPerRow,
   DEFAULT_HEIGHT,
   CustomPlotsData,
-  CustomPlot
+  CustomPlot,
+  ColorScale
 } from '../webview/contract'
 import {
   ExperimentsOutput,
@@ -156,7 +157,6 @@ export class PlotsModel extends ModelWithPersistence {
       return
     }
 
-    // TBD colors is undefined if there are no selected exps
     const colors = getColorScale(
       this.experiments
         .getSelectedExperiments()
@@ -167,7 +167,7 @@ export class PlotsModel extends ModelWithPersistence {
       colors,
       height: this.getHeight(Section.CUSTOM_PLOTS),
       nbItemsPerRow: this.getNbItemsPerRow(Section.CUSTOM_PLOTS),
-      plots: this.getCustomPlotData(this.customPlots, colors?.domain)
+      plots: this.getCustomPlotData(this.customPlots, colors)
     }
   }
 
@@ -479,19 +479,28 @@ export class PlotsModel extends ModelWithPersistence {
 
   private getCustomPlotData(
     plots: CustomPlot[],
-    selectedExperiments: string[] | undefined
+    colors: ColorScale | undefined
   ): CustomPlotData[] {
-    if (!selectedExperiments) {
-      return plots.filter(plot => !isCheckpointPlot(plot)) as CustomPlotData[]
+    if (!colors) {
+      return plots
+        .filter(plot => !isCheckpointPlot(plot))
+        .map(
+          plot =>
+            ({
+              ...plot,
+              yTitle: truncateVerticalTitle(
+                plot.metric,
+                this.getNbItemsPerRow(Section.CUSTOM_PLOTS)
+              ) as string
+            } as CustomPlotData)
+        )
     }
     return plots.map(
       plot =>
         ({
           ...plot,
           values: isCheckpointPlot(plot)
-            ? plot.values.filter(value =>
-                selectedExperiments.includes(value.group)
-              )
+            ? plot.values.filter(value => colors.domain.includes(value.group))
             : plot.values,
           yTitle: truncateVerticalTitle(
             plot.metric,
