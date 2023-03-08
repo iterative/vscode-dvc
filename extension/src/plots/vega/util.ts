@@ -26,7 +26,7 @@ import {
 } from 'vega-lite/build/src/spec/repeat'
 import { TopLevelUnitSpec } from 'vega-lite/build/src/spec/unit'
 import isEqual from 'lodash.isequal'
-import { ColorScale, PlotNumberOfItemsPerRow } from '../webview/contract'
+import { ColorScale, DEFAULT_NB_ITEMS_PER_REOW } from '../webview/contract'
 import { ShapeEncoding, StrokeDashEncoding } from '../multiSource/constants'
 import { Color } from '../../experiments/model/status/colors'
 
@@ -220,13 +220,6 @@ const truncateTitleAsArrayOrString = (title: Text, size: number) => {
   return truncateTitleString(title as unknown as string, size)
 }
 
-const TitleLimit = {
-  [PlotNumberOfItemsPerRow.ONE]: 50,
-  [PlotNumberOfItemsPerRow.TWO]: 50,
-  [PlotNumberOfItemsPerRow.THREE]: 30,
-  [PlotNumberOfItemsPerRow.FOUR]: 30
-}
-
 const truncateTitlePart = (
   title: Title,
   key: 'text' | 'subtitle',
@@ -261,7 +254,7 @@ const truncateTitle = (
 }
 
 export const truncateVerticalTitle = (title: Text | Title, size: number) =>
-  truncateTitle(title, TitleLimit[size] * 0.75)
+  truncateTitle(title, (size > 2 ? 30 : 50) * 0.75)
 
 const isEndValue = (valueType: string) =>
   ['string', 'number', 'boolean'].includes(valueType)
@@ -289,7 +282,7 @@ export const truncateTitles = (
         const title = value as unknown as Title
         specCopy[key] = vertical
           ? truncateVerticalTitle(title, size)
-          : truncateTitle(title, TitleLimit[size])
+          : truncateTitle(title, size > DEFAULT_NB_ITEMS_PER_REOW ? 30 : 50)
       } else if (isEndValue(valueType)) {
         specCopy[key] = value
       } else if (Array.isArray(value)) {
