@@ -215,7 +215,7 @@ export class Extension extends Disposable {
       this.connect
     )
     registerPlotsCommands(this.plots, this.internalCommands, this.setup)
-    registerSetupCommands(this.setup, this.internalCommands, config)
+    registerSetupCommands(this.setup, this.internalCommands)
     this.internalCommands.registerExternalCommand(
       RegisteredCommands.EXPERIMENT_AND_PLOTS_SHOW,
       async (context: VsCodeContext) => {

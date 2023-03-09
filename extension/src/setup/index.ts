@@ -1,6 +1,7 @@
 import { Event, EventEmitter, ViewColumn } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import isEmpty from 'lodash.isempty'
+import { pickFocusedProjects } from './quickPick'
 import { SetupData as TSetupData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { findPythonBinForInstall } from './autoInstall'
@@ -240,6 +241,14 @@ export class Setup
     })
   }
 
+  public async selectFocusedProjects() {
+    const dvcRoots = await this.findWorkspaceDvcRoots()
+    const focusedProjects = await pickFocusedProjects(dvcRoots, this.getRoots())
+    if (focusedProjects) {
+      this.config.setFocusedProjectsOption(focusedProjects)
+    }
+  }
+
   public async setupWorkspace() {
     const stopWatch = new StopWatch()
     try {
@@ -273,7 +282,20 @@ export class Setup
     }
   }
 
-  public async findWorkspaceDvcRoots(): Promise<string[]> {
+  private createWebviewMessageHandler() {
+    const webviewMessages = new WebviewMessages(
+      () => this.getWebview(),
+      () => this.initializeGit()
+    )
+    this.dispose.track(
+      this.onDidReceivedWebviewMessage(message =>
+        webviewMessages.handleMessageFromWebview(message)
+      )
+    )
+    return webviewMessages
+  }
+
+  private async findWorkspaceDvcRoots() {
     let dvcRoots: Set<string> = new Set()
 
     for (const workspaceFolder of getWorkspaceFolders()) {
@@ -300,19 +322,6 @@ export class Setup
     void setContextValue(ContextKey.MULTIPLE_PROJECTS, hasMultipleRoots)
 
     return [...dvcRoots]
-  }
-
-  private createWebviewMessageHandler() {
-    const webviewMessages = new WebviewMessages(
-      () => this.getWebview(),
-      () => this.initializeGit()
-    )
-    this.dispose.track(
-      this.onDidReceivedWebviewMessage(message =>
-        webviewMessages.handleMessageFromWebview(message)
-      )
-    )
-    return webviewMessages
   }
 
   private setCommandsAvailability(available: boolean) {

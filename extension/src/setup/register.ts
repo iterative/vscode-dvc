@@ -1,9 +1,7 @@
 import { commands } from 'vscode'
 import { Setup } from '.'
 import { run } from './runner'
-import { pickFocusedProjects } from './quickPick'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { Config } from '../config'
 import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 
@@ -25,28 +23,17 @@ const registerRunSetupCommands = (
 
 const registerSetupConfigCommands = (
   setup: Setup,
-  internalCommands: InternalCommands,
-  config: Config
+  internalCommands: InternalCommands
 ): void => {
   internalCommands.registerExternalCommand(
     RegisteredCommands.SELECT_FOCUSED_PROJECTS,
-    async () => {
-      const dvcRoots = await setup.findWorkspaceDvcRoots()
-      const focusedProjects = await pickFocusedProjects(
-        dvcRoots,
-        setup.getRoots()
-      )
-      if (focusedProjects) {
-        config.setFocusedProjectsOption(focusedProjects)
-      }
-    }
+    () => setup.selectFocusedProjects()
   )
 }
 
 export const registerSetupCommands = (
   setup: Setup,
-  internalCommands: InternalCommands,
-  config: Config
+  internalCommands: InternalCommands
 ): void => {
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.INIT,
@@ -66,5 +53,5 @@ export const registerSetupCommands = (
   )
 
   registerRunSetupCommands(setup, internalCommands)
-  registerSetupConfigCommands(setup, internalCommands, config)
+  registerSetupConfigCommands(setup, internalCommands)
 }
