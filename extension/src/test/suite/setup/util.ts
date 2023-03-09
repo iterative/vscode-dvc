@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { EventEmitter, commands } from 'vscode'
+import { EventEmitter } from 'vscode'
 import { Disposer } from '@hediet/std/disposable'
 import { fake, stub } from 'sinon'
 import { ensureDirSync } from 'fs-extra'
@@ -7,84 +7,19 @@ import * as FileSystem from '../../../fileSystem'
 import { Setup } from '../../../setup'
 import * as Runner from '../../../setup/runner'
 import * as WorkspaceFolders from '../../../vscode/workspaceFolders'
-import { buildDependencies, mockDisposable } from '../util'
+import { buildDependencies } from '../util'
 import * as AutoInstall from '../../../setup/autoInstall'
-import { DvcReader } from '../../../cli/dvc/reader'
-import { DvcExecutor } from '../../../cli/dvc/executor'
-import { GitReader } from '../../../cli/git/reader'
-import { GitExecutor } from '../../../cli/git/executor'
 import { InternalCommands } from '../../../commands/internal'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
-import { DvcRunner } from '../../../cli/dvc/runner'
 import { StopWatch } from '../../../util/time'
 import { WorkspaceScale } from '../../../telemetry/collect'
 import { dvcDemoPath } from '../../util'
 import { Config } from '../../../config'
 import { Resource } from '../../../resourceLocator'
 import { MIN_CLI_VERSION } from '../../../cli/dvc/contract'
+import { Status } from '../../../status'
 
 export const TEMP_DIR = join(dvcDemoPath, 'temp-empty-watcher-dir')
-
-const buildSetupDependencies = (
-  disposer: Disposer,
-  mockDvcRoot: string | undefined,
-  mockGitRoot: string | undefined,
-  noGitCommits = true
-) => {
-  const mockEmitter = disposer.track(new EventEmitter())
-  const mockEvent = mockEmitter.event
-
-  const mockRoot = stub().resolves(mockDvcRoot)
-  const mockVersion = stub().resolves(MIN_CLI_VERSION)
-  const mockGetGitRepositoryRoot = stub().resolves(mockGitRoot)
-  const mockHasNoCommits = stub().resolves(noGitCommits)
-
-  const mockInitializeDvc = fake()
-  const mockInitializeGit = fake()
-  stub(commands, 'registerCommand').returns(mockDisposable)
-
-  return {
-    mockDvcExecutor: {
-      init: mockInitializeDvc,
-      onDidCompleteProcess: mockEvent,
-      onDidStartProcess: mockEvent
-    } as unknown as DvcExecutor,
-    mockDvcReader: {
-      onDidCompleteProcess: mockEvent,
-      onDidStartProcess: mockEvent,
-      root: mockRoot,
-      version: mockVersion
-    } as unknown as DvcReader,
-    mockDvcRunner: {
-      onDidCompleteProcess: mockEvent,
-      onDidStartProcess: mockEvent
-    } as DvcRunner,
-    mockEmitter,
-    mockExecuteCommand: stub(commands, 'executeCommand'),
-    mockGetGitRepositoryRoot,
-    mockGitExecutor: {
-      init: mockInitializeGit,
-      onDidCompleteProcess: mockEvent,
-      onDidStartProcess: mockEvent
-    } as unknown as GitExecutor,
-    mockGitReader: {
-      getGitRepositoryRoot: mockGetGitRepositoryRoot,
-      hasNoCommits: mockHasNoCommits,
-      onDidCompleteProcess: mockEvent,
-      onDidStartProcess: mockEvent
-    } as unknown as GitReader,
-    mockInitializeDvc,
-    mockInitializeGit,
-    mockInternalCommands: {
-      registerExternalCliCommand: stub(),
-      registerExternalCommand: stub()
-    } as unknown as InternalCommands,
-    mockRoot,
-    mockRunSetup: stub(Runner, 'run').resolves(undefined),
-    mockRunSetupWithRecheck: stub(Runner, 'runWithRecheck').resolves(undefined),
-    mockVersion
-  }
-}
 
 export const buildSetup = (
   disposer: Disposer,
@@ -98,9 +33,7 @@ export const buildSetup = (
     messageSpy,
     resourceLocator,
     internalCommands,
-    dvcExecutor,
     dvcReader,
-    dvcRunner,
     gitExecutor,
     gitReader
   } = buildDependencies(disposer)
@@ -134,11 +67,7 @@ export const buildSetup = (
     new Setup(
       new StopWatch(),
       config,
-      dvcExecutor,
-      dvcReader,
-      dvcRunner,
-      gitExecutor,
-      gitReader,
+      { setAvailability: stub() } as unknown as Status,
       () => Promise.resolve([undefined]),
       () => undefined,
       {
@@ -168,16 +97,12 @@ export const buildSetup = (
 }
 
 export const buildSetupWithWatchers = async (disposer: Disposer) => {
-  const {
-    mockDvcExecutor,
-    mockDvcReader,
-    mockDvcRunner,
-    mockEmitter,
-    mockGitExecutor,
-    mockGitReader,
-    mockInternalCommands,
-    mockRunSetup
-  } = buildSetupDependencies(disposer, undefined, undefined)
+  const mockEmitter = disposer.track(new EventEmitter())
+  const mockInternalCommands = {
+    registerExternalCliCommand: stub(),
+    registerExternalCommand: stub()
+  } as unknown as InternalCommands
+  const mockRunSetup = stub(Runner, 'run').resolves(undefined)
 
   const config = disposer.track(new Config())
 
@@ -191,11 +116,7 @@ export const buildSetupWithWatchers = async (disposer: Disposer) => {
     new Setup(
       new StopWatch(),
       config,
-      mockDvcExecutor,
-      mockDvcReader,
-      mockDvcRunner,
-      mockGitExecutor,
-      mockGitReader,
+      {} as Status,
       () => Promise.resolve([undefined]),
       () => undefined,
       {

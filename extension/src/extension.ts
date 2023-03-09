@@ -57,6 +57,7 @@ import { collectRunningExperimentPids } from './experiments/processExecution/col
 import { registerPatchCommand } from './patch'
 import { DvcViewer } from './cli/dvc/viewer'
 import { registerSetupCommands } from './setup/register'
+import { Status } from './status'
 export class Extension extends Disposable {
   protected readonly internalCommands: InternalCommands
 
@@ -132,6 +133,8 @@ export class Extension extends Disposable {
       new InternalCommands(outputChannel, ...clis)
     )
 
+    const status = this.dispose.track(new Status(config, ...clis))
+
     this.experiments = this.dispose.track(
       new WorkspaceExperiments(
         this.internalCommands,
@@ -186,11 +189,7 @@ export class Extension extends Disposable {
       new Setup(
         stopWatch,
         config,
-        this.dvcExecutor,
-        this.dvcReader,
-        this.dvcRunner,
-        this.gitExecutor,
-        this.gitReader,
+        status,
         () => this.initialize(),
         () => this.resetMembers(),
         this.experiments,

@@ -24,16 +24,11 @@ import {
   getWorkspaceFolderCount,
   getWorkspaceFolders
 } from '../vscode/workspaceFolders'
-import { DvcReader } from '../cli/dvc/reader'
 import { ContextKey, setContextValue } from '../vscode/context'
-import { DvcExecutor } from '../cli/dvc/executor'
-import { GitReader } from '../cli/git/reader'
-import { GitExecutor } from '../cli/git/executor'
 import { RegisteredCommands } from '../commands/external'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { Status } from '../status'
 import { WorkspaceExperiments } from '../experiments/workspace'
-import { DvcRunner } from '../cli/dvc/runner'
 import { sendTelemetryEvent, sendTelemetryEventAndThrow } from '../telemetry'
 import { StopWatch } from '../util/time'
 import { getRelativePattern } from '../fileSystem/relativePattern'
@@ -81,11 +76,7 @@ export class Setup
   constructor(
     stopWatch: StopWatch,
     config: Config,
-    dvcExecutor: DvcExecutor,
-    dvcReader: DvcReader,
-    dvcRunner: DvcRunner,
-    gitExecutor: GitExecutor,
-    gitReader: GitReader,
+    status: Status,
     initialize: () => Promise<void[]>,
     resetMembers: () => void,
     experiments: WorkspaceExperiments,
@@ -99,16 +90,7 @@ export class Setup
 
     this.internalCommands = internalCommands
 
-    this.status = this.dispose.track(
-      new Status(
-        this.config,
-        dvcExecutor,
-        dvcReader,
-        dvcRunner,
-        gitExecutor,
-        gitReader
-      )
-    )
+    this.status = status
 
     this.initialize = initialize
     this.resetMembers = resetMembers
