@@ -5,7 +5,7 @@ import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 
-const registerRunSetupCommands = (
+const registerSetupConfigCommands = (
   setup: Setup,
   internalCommands: InternalCommands
 ): void => {
@@ -19,12 +19,6 @@ const registerRunSetupCommands = (
       setup.setupWorkspace()
     )
   )
-}
-
-const registerSetupConfigCommands = (
-  setup: Setup,
-  internalCommands: InternalCommands
-): void => {
   internalCommands.registerExternalCommand(
     RegisteredCommands.SELECT_FOCUSED_PROJECTS,
     () => setup.selectFocusedProjects()
@@ -52,6 +46,5 @@ export const registerSetupCommands = (
     }
   )
 
-  registerRunSetupCommands(setup, internalCommands)
   registerSetupConfigCommands(setup, internalCommands)
 }
