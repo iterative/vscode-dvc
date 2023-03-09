@@ -7,7 +7,7 @@ import * as PythonExtension from '../../../extensions/python'
 import * as Python from '../../../python'
 import { autoInstallDvc } from '../../../setup/autoInstall'
 import * as WorkspaceFolders from '../../../vscode/workspaceFolders'
-import { PROGRESS_TEST_TIMEOUT } from '../timeouts'
+import { bypassProgressCloseDelay } from '../util'
 
 const { getDefaultPython } = Python
 
@@ -61,6 +61,7 @@ suite('Auto Install Test Suite', () => {
     })
 
     it('should install DVC and DVCLive if a Python interpreter is found', async () => {
+      bypassProgressCloseDelay()
       const cwd = __dirname
       stub(PythonExtension, 'getPythonExecutionDetails').resolves(undefined)
       stub(Python, 'findPythonBin').resolves(defaultPython)
@@ -87,6 +88,6 @@ suite('Auto Install Test Suite', () => {
         defaultPython,
         'dvclive'
       )
-    }).timeout(PROGRESS_TEST_TIMEOUT)
+    })
   })
 })

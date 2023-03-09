@@ -1,4 +1,4 @@
-import { Text as VegaText, Title as VegaTitle } from 'vega'
+import type { Text as VegaText, Title as VegaTitle } from 'vega'
 import { TopLevelSpec } from 'vega-lite'
 import merge from 'lodash.merge'
 import cloneDeep from 'lodash.clonedeep'
@@ -18,8 +18,8 @@ import scatterTemplate from '../../test/fixtures/plotsDiff/templates/scatter'
 import smoothTemplate from '../../test/fixtures/plotsDiff/templates/smooth'
 import multiSourceTemplate from '../../test/fixtures/plotsDiff/templates/multiSource'
 import { copyOriginalColors } from '../../experiments/model/status/colors'
-import { PlotNumberOfItemsPerRow } from '../webview/contract'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
+import { DEFAULT_NB_ITEMS_PER_ROW } from '../webview/contract'
 
 describe('isMultiViewPlot', () => {
   it('should recognize the confusion matrix template as a multi view plot', () => {
@@ -86,7 +86,7 @@ describe('extendVegaSpec', () => {
   it('should not add encoding if no color scale is provided', () => {
     const extendedSpec = extendVegaSpec(
       linearTemplate,
-      PlotNumberOfItemsPerRow.TWO
+      DEFAULT_NB_ITEMS_PER_ROW
     )
     expect(extendedSpec.encoding).toBeUndefined()
   })
@@ -98,7 +98,7 @@ describe('extendVegaSpec', () => {
     }
     const extendedSpec = extendVegaSpec(
       linearTemplate,
-      PlotNumberOfItemsPerRow.TWO,
+      DEFAULT_NB_ITEMS_PER_ROW,
       {
         color: colorScale
       }
@@ -143,7 +143,7 @@ describe('extendVegaSpec', () => {
 
   it('should truncate all titles from the left to 50 characters for large plots', () => {
     const spec = withLongTemplatePlotTitle()
-    const updatedSpec = extendVegaSpec(spec, PlotNumberOfItemsPerRow.ONE)
+    const updatedSpec = extendVegaSpec(spec, 1)
 
     const truncatedTitle = '…-many-many-characters-at-least-seventy-characters'
     const truncatedHorizontalTitle =
@@ -169,7 +169,7 @@ describe('extendVegaSpec', () => {
 
   it('should truncate all titles from the left to 50 characters for regular plots', () => {
     const spec = withLongTemplatePlotTitle()
-    const updatedSpec = extendVegaSpec(spec, PlotNumberOfItemsPerRow.TWO)
+    const updatedSpec = extendVegaSpec(spec, DEFAULT_NB_ITEMS_PER_ROW)
 
     const truncatedTitle = '…-many-many-characters-at-least-seventy-characters'
     const truncatedHorizontalTitle =
@@ -195,7 +195,7 @@ describe('extendVegaSpec', () => {
 
   it('should truncate all titles from the left to 30 characters for small plots', () => {
     const spec = withLongTemplatePlotTitle()
-    const updatedSpec = extendVegaSpec(spec, PlotNumberOfItemsPerRow.THREE)
+    const updatedSpec = extendVegaSpec(spec, 3)
 
     const truncatedTitle = '…s-at-least-seventy-characters'
     const truncatedHorizontalTitle = '…at-least-seventy-characters-x'
@@ -225,7 +225,7 @@ describe('extendVegaSpec', () => {
       text: repeatedTitle
     })
 
-    const updatedSpec = extendVegaSpec(spec, PlotNumberOfItemsPerRow.THREE)
+    const updatedSpec = extendVegaSpec(spec, 3)
 
     const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
 
@@ -242,7 +242,7 @@ describe('extendVegaSpec', () => {
     const repeatedTitle = 'abcdefghijklmnopqrstuvwyz1234567890'
     const spec = withLongTemplatePlotTitle([repeatedTitle, repeatedTitle])
 
-    const updatedSpec = extendVegaSpec(spec, PlotNumberOfItemsPerRow.THREE)
+    const updatedSpec = extendVegaSpec(spec, 3)
 
     const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
 
@@ -262,7 +262,7 @@ describe('extendVegaSpec', () => {
       text: [repeatedTitle, repeatedTitle]
     })
 
-    const updatedSpec = extendVegaSpec(spec, PlotNumberOfItemsPerRow.THREE)
+    const updatedSpec = extendVegaSpec(spec, 3)
 
     const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
 
@@ -276,17 +276,13 @@ describe('extendVegaSpec', () => {
   })
 
   it('should update the multi-source template to remove erroneous shape encoding from the vertical line displayed on hover', () => {
-    const updatedSpec = extendVegaSpec(
-      multiSourceTemplate,
-      PlotNumberOfItemsPerRow.ONE,
-      {
-        color: { domain: [], range: [] },
-        shape: {
-          field: 'field',
-          scale: { domain: [], range: [] }
-        }
+    const updatedSpec = extendVegaSpec(multiSourceTemplate, 1, {
+      color: { domain: [], range: [] },
+      shape: {
+        field: 'field',
+        scale: { domain: [], range: [] }
       }
-    )
+    })
 
     expect(updatedSpec.encoding).not.toBeUndefined()
     expect(updatedSpec.layer[1].layer[0].encoding.shape).toBeNull()

@@ -3,6 +3,7 @@ import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { CheckpointPlots } from './CheckpointPlots'
+import { changeSize } from './checkpointPlotsSlice'
 import { PlotsContainer } from '../PlotsContainer'
 import { sendMessage } from '../../../shared/vscode'
 import { PlotsState } from '../../store'
@@ -26,14 +27,15 @@ export const CheckpointPlotsWrapper: React.FC = () => {
     })
   }
 
-  const menu =
-    plotsIds.length > 0
-      ? {
-          plots: metrics,
-          selectedPlots,
-          setSelectedPlots: setSelectedMetrics
-        }
-      : undefined
+  const hasItems = plotsIds.length > 0
+
+  const menu = hasItems
+    ? {
+        plots: metrics,
+        selectedPlots,
+        setSelectedPlots: setSelectedMetrics
+      }
+    : undefined
 
   return (
     <PlotsContainer
@@ -42,6 +44,8 @@ export const CheckpointPlotsWrapper: React.FC = () => {
       menu={menu}
       nbItemsPerRow={nbItemsPerRow}
       sectionCollapsed={isCollapsed}
+      changeNbItemsPerRow={changeSize}
+      hasItems={hasItems}
     >
       <CheckpointPlots plotsIds={selectedPlots} colors={colors} />
     </PlotsContainer>

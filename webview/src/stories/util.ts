@@ -63,9 +63,10 @@ const viewportsWidths = Object.values(viewports)
   })
   .filter(Boolean)
 
-export const CHROMATIC_VIEWPORTS = {
-  chromatic: { viewports: viewportsWidths }
+export const CHROMATIC_VIEWPORTS_WITH_DELAY = {
+  chromatic: { delay: 500, viewports: viewportsWidths }
 }
+
 export const DISABLE_CHROMATIC_SNAPSHOTS = {
   chromatic: { disableSnapshot: true }
 }

@@ -25,7 +25,6 @@ import { dvcDemoPath } from '../../util'
 import {
   DEFAULT_SECTION_COLLAPSED,
   PlotsData as TPlotsData,
-  PlotNumberOfItemsPerRow,
   Section,
   TemplatePlotGroup,
   TemplatePlotsData
@@ -248,23 +247,20 @@ suite('Plots Test Suite', () => {
       mockMessageReceived.fire({
         payload: {
           height: undefined,
-          nbItemsPerRow: PlotNumberOfItemsPerRow.THREE,
+          nbItemsPerRow: 3,
           section: Section.TEMPLATE_PLOTS
         },
         type: MessageFromWebviewType.RESIZE_PLOTS
       })
 
       expect(mockSetPlotSize).to.be.calledOnce
-      expect(mockSetPlotSize).to.be.calledWithExactly(
-        Section.TEMPLATE_PLOTS,
-        PlotNumberOfItemsPerRow.THREE
-      )
+      expect(mockSetPlotSize).to.be.calledWithExactly(Section.TEMPLATE_PLOTS, 3)
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_PLOTS_SECTION_RESIZED,
         {
           height: undefined,
-          nbItemsPerRow: PlotNumberOfItemsPerRow.THREE,
+          nbItemsPerRow: 3,
           section: Section.TEMPLATE_PLOTS
         },
         undefined
@@ -509,6 +505,26 @@ suite('Plots Test Suite', () => {
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_REORDER_PLOTS_METRICS,
+        undefined,
+        undefined
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a plot zoomed message from the webview', async () => {
+      const { plots } = await buildPlots(disposable, plotsDiffFixture)
+
+      const webview = await plots.showWebview()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.ZOOM_PLOT
+      })
+
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_ZOOM_PLOT,
         undefined,
         undefined
       )
