@@ -7,21 +7,10 @@ import { Config } from '../config'
 import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 
-export const registerSetupCommands = (
+const registerRunSetupCommands = (
   setup: Setup,
-  internalCommands: InternalCommands,
-  config: Config
-) => {
-  internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.INIT,
-    async () => {
-      const root = getFirstWorkspaceFolder()
-      if (root) {
-        await internalCommands.executeCommand(AvailableCommands.INIT, root)
-      }
-    }
-  )
-
+  internalCommands: InternalCommands
+): void => {
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE,
     () => run(setup)
@@ -32,14 +21,13 @@ export const registerSetupCommands = (
       setup.setupWorkspace()
     )
   )
+}
 
-  internalCommands.registerExternalCommand(
-    RegisteredCommands.SETUP_SHOW,
-    async () => {
-      await setup.showSetup()
-    }
-  )
-
+const registerSetupConfigCommands = (
+  setup: Setup,
+  internalCommands: InternalCommands,
+  config: Config
+): void => {
   internalCommands.registerExternalCommand(
     RegisteredCommands.SELECT_FOCUSED_PROJECTS,
     async () => {
@@ -53,4 +41,30 @@ export const registerSetupCommands = (
       }
     }
   )
+}
+
+export const registerSetupCommands = (
+  setup: Setup,
+  internalCommands: InternalCommands,
+  config: Config
+): void => {
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.INIT,
+    async () => {
+      const root = getFirstWorkspaceFolder()
+      if (root) {
+        await internalCommands.executeCommand(AvailableCommands.INIT, root)
+      }
+    }
+  )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.SETUP_SHOW,
+    async () => {
+      await setup.showSetup()
+    }
+  )
+
+  registerRunSetupCommands(setup, internalCommands)
+  registerSetupConfigCommands(setup, internalCommands, config)
 }
