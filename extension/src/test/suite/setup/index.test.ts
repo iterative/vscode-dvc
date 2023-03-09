@@ -16,7 +16,10 @@ import { MessageFromWebviewType } from '../../../webview/contract'
 import { Disposable } from '../../../extension'
 import { Logger } from '../../../common/logger'
 import { BaseWebview } from '../../../webview'
-import { RegisteredCommands } from '../../../commands/external'
+import {
+  RegisteredCliCommands,
+  RegisteredCommands
+} from '../../../commands/external'
 import { isDirectory } from '../../../fileSystem'
 import { gitPath } from '../../../cli/git/constants'
 import { join } from '../../util/path'
@@ -72,7 +75,11 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle an initialize project message from the webview', async () => {
-      const { messageSpy, setup, mockInitializeDvc } = buildSetup(disposable)
+      const { messageSpy, setup } = buildSetup(disposable)
+
+      const mockExecuteCommand = stub(commands, 'executeCommand').resolves(
+        undefined
+      )
 
       const webview = await setup.showWebview()
       await webview.isReady()
@@ -84,16 +91,20 @@ suite('Setup Test Suite', () => {
         type: MessageFromWebviewType.INITIALIZE_DVC
       })
 
-      expect(mockInitializeDvc).to.be.calledOnce
+      expect(mockExecuteCommand).to.be.calledWithExactly(
+        RegisteredCliCommands.INIT
+      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a check cli compatible message from the webview', async () => {
-      const { messageSpy, setup, mockExecuteCommand } = buildSetup(disposable)
+      const { messageSpy, setup } = buildSetup(disposable)
 
       const webview = await setup.showWebview()
       await webview.isReady()
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const mockExecuteCommand = stub(commands, 'executeCommand').resolves(true)
 
       messageSpy.resetHistory()
       mockMessageReceived.fire({
@@ -122,11 +133,15 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a select Python interpreter message from the webview', async () => {
-      const { messageSpy, setup, mockExecuteCommand } = buildSetup(disposable)
+      const { messageSpy, setup } = buildSetup(disposable)
       const setInterpreterCommand = 'python.setInterpreter'
 
       const webview = await setup.showWebview()
       await webview.isReady()
+
+      const mockExecuteCommand = stub(commands, 'executeCommand').resolves(
+        undefined
+      )
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
@@ -139,11 +154,15 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a show source control panel message from the webview', async () => {
-      const { messageSpy, setup, mockExecuteCommand } = buildSetup(disposable)
+      const { messageSpy, setup } = buildSetup(disposable)
       const showScmPanelCommand = 'workbench.view.scm'
 
       const webview = await setup.showWebview()
       await webview.isReady()
+
+      const mockExecuteCommand = stub(commands, 'executeCommand').resolves(
+        undefined
+      )
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
@@ -156,12 +175,14 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a setup the workspace message from the webview', async () => {
-      const { messageSpy, setup, mockExecuteCommand } = buildSetup(disposable)
+      const { messageSpy, setup } = buildSetup(disposable)
 
       const webview = await setup.showWebview()
       await webview.isReady()
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const mockExecuteCommand = stub(commands, 'executeCommand').resolves(true)
 
       messageSpy.resetHistory()
       mockMessageReceived.fire({
@@ -194,11 +215,7 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should close the webview and open the experiments when the setup is done', async () => {
-      const { setup, mockOpenExperiments } = buildSetup(
-        disposable,
-        undefined,
-        true
-      )
+      const { setup, mockOpenExperiments } = buildSetup(disposable, true)
 
       const closeWebviewSpy = spy(BaseWebview.prototype, 'dispose')
 
@@ -290,7 +307,6 @@ suite('Setup Test Suite', () => {
     it('should send the expected message to the webview when there is no DVC project in the workspace', async () => {
       const { config, setup, messageSpy } = buildSetup(
         disposable,
-        undefined,
         false,
         true,
         false,
@@ -334,7 +350,6 @@ suite('Setup Test Suite', () => {
     it('should send the expected message to the webview when there is no commits in the git repository', async () => {
       const { config, setup, messageSpy } = buildSetup(
         disposable,
-        undefined,
         false,
         false,
         false,
@@ -485,10 +500,7 @@ suite('Setup Test Suite', () => {
     })
 
     it('should set dvc.pythonPath to the picked value when the user selects to pick a Python interpreter', async () => {
-      const { config, setup, mockExecuteCommand, mockVersion } =
-        buildSetup(disposable)
-
-      mockExecuteCommand.restore()
+      const { config, setup, mockVersion } = buildSetup(disposable)
 
       stub(config, 'isPythonExtensionInstalled').returns(false)
 
@@ -555,13 +567,16 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set the dvc.cli.incompatible context value', async () => {
-      const { config, mockExecuteCommand, mockRunSetup, mockVersion, setup } =
-        buildSetup(disposable, undefined, true, false, false)
+      const { config, mockRunSetup, mockVersion, setup } = buildSetup(
+        disposable,
+        true,
+        false,
+        false
+      )
       mockRunSetup.restore()
       stub(config, 'isPythonExtensionUsed').returns(false)
       stub(config, 'getPythonBinPath').resolves(join('python'))
 
-      mockExecuteCommand.restore()
       mockVersion.resetBehavior()
       mockVersion
         .onFirstCall()

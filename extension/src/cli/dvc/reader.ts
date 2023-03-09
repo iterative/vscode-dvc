@@ -38,7 +38,9 @@ export const autoRegisteredCommands = {
   DATA_STATUS: 'dataStatus',
   EXP_SHOW: 'expShow',
   PLOTS_DIFF: 'plotsDiff',
-  STAGE_LIST: 'listStages'
+  ROOT: 'root',
+  STAGE_LIST: 'listStages',
+  VERSION: 'version'
 } as const
 
 export class DvcReader extends DvcCli {

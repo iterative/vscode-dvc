@@ -1,11 +1,10 @@
-import { Event, EventEmitter, ViewColumn, commands } from 'vscode'
+import { Event, EventEmitter, ViewColumn } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import isEmpty from 'lodash.isempty'
 import { SetupData as TSetupData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { findPythonBinForInstall } from './autoInstall'
 import { run, runWithRecheck, runWorkspace } from './runner'
-import { pickFocusedProjects } from './quickPick'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -30,8 +29,8 @@ import { ContextKey, setContextValue } from '../vscode/context'
 import { DvcExecutor } from '../cli/dvc/executor'
 import { GitReader } from '../cli/git/reader'
 import { GitExecutor } from '../cli/git/executor'
-import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
-import { InternalCommands } from '../commands/internal'
+import { RegisteredCommands } from '../commands/external'
+import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { Status } from '../status'
 import { WorkspaceExperiments } from '../experiments/workspace'
 import { DvcRunner } from '../cli/dvc/runner'
@@ -59,11 +58,8 @@ export class Setup
   private dvcRoots: string[] = []
 
   private readonly config: Config
-  private readonly dvcReader: DvcReader
-  private readonly dvcExecutor: DvcExecutor
-  private readonly gitReader: GitReader
-  private readonly gitExecutor: GitExecutor
   private readonly status: Status
+  private readonly internalCommands: InternalCommands
 
   private readonly webviewMessages: WebviewMessages
   private readonly showExperiments: () => void
@@ -100,19 +96,17 @@ export class Setup
     super(GLOBAL_WEBVIEW_DVCROOT, webviewIcon)
 
     this.config = config
-    this.dvcExecutor = dvcExecutor
-    this.dvcReader = dvcReader
-    this.gitExecutor = gitExecutor
-    this.gitReader = gitReader
+
+    this.internalCommands = internalCommands
 
     this.status = this.dispose.track(
       new Status(
         this.config,
-        this.dvcExecutor,
-        this.dvcReader,
+        dvcExecutor,
+        dvcReader,
         dvcRunner,
-        this.gitExecutor,
-        this.gitReader
+        gitExecutor,
+        gitReader
       )
     )
 
@@ -133,8 +127,6 @@ export class Setup
     this.showExperiments = () => {
       void experiments.showWebview(this.dvcRoots[0], ViewColumn.Active)
     }
-
-    this.registerCommands(internalCommands)
 
     this.getHasData = () => experiments.getHasData()
     const onDidChangeHasData = experiments.columnsChanged.event
@@ -161,7 +153,11 @@ export class Setup
   public async getCliVersion(cwd: string, tryGlobalCli?: true) {
     await this.config.isReady()
     try {
-      return await this.dvcReader.version(cwd, tryGlobalCli)
+      return await this.internalCommands.executeCommand(
+        AvailableCommands.VERSION,
+        cwd,
+        tryGlobalCli as unknown as string
+      )
     } catch {}
   }
 
@@ -257,156 +253,7 @@ export class Setup
     })
   }
 
-  private createWebviewMessageHandler() {
-    const webviewMessages = new WebviewMessages(
-      () => this.getWebview(),
-      () => this.initializeDvc(),
-      () => this.initializeGit()
-    )
-    this.dispose.track(
-      this.onDidReceivedWebviewMessage(message =>
-        webviewMessages.handleMessageFromWebview(message)
-      )
-    )
-    return webviewMessages
-  }
-
-  private async findWorkspaceDvcRoots(): Promise<string[]> {
-    let dvcRoots: Set<string> = new Set()
-
-    for (const workspaceFolder of getWorkspaceFolders()) {
-      const workspaceFolderRoots = await findDvcRootPaths(workspaceFolder)
-      if (definedAndNonEmpty(workspaceFolderRoots)) {
-        dvcRoots = new Set([...dvcRoots, ...workspaceFolderRoots])
-        continue
-      }
-
-      await this.config.isReady()
-      const absoluteRoot = await findAbsoluteDvcRootPath(
-        workspaceFolder,
-        this.dvcReader.root(workspaceFolder)
-      )
-      if (absoluteRoot) {
-        dvcRoots.add(absoluteRoot)
-      }
-    }
-
-    const hasMultipleRoots = dvcRoots.size > 1
-    void setContextValue(ContextKey.MULTIPLE_PROJECTS, hasMultipleRoots)
-
-    return [...dvcRoots]
-  }
-
-  private setCommandsAvailability(available: boolean) {
-    void setContextValue(ContextKey.COMMANDS_AVAILABLE, available)
-  }
-
-  private setProjectAvailability() {
-    const available = this.hasRoots()
-    void setContextValue(ContextKey.PROJECT_AVAILABLE, available)
-    if (available && this.dotFolderWatcher && !this.dotFolderWatcher.disposed) {
-      this.dispose.untrack(this.dotFolderWatcher)
-      this.dotFolderWatcher.dispose()
-    }
-  }
-
-  private async initializeDvc() {
-    const root = getFirstWorkspaceFolder()
-    if (root) {
-      await this.dvcExecutor.init(root)
-    }
-  }
-
-  private async canGitInitialize(needsGitInit: boolean) {
-    if (!needsGitInit) {
-      return false
-    }
-    const nestedRoots = await Promise.all(
-      getWorkspaceFolders().map(workspaceFolder =>
-        findSubRootPaths(workspaceFolder, '.git')
-      )
-    )
-
-    return isEmpty(nestedRoots.flat())
-  }
-
-  private async needsGitInit() {
-    if (this.hasRoots()) {
-      return false
-    }
-
-    const cwd = getFirstWorkspaceFolder()
-    if (!cwd) {
-      return undefined
-    }
-
-    try {
-      return !(await this.gitReader.getGitRepositoryRoot(cwd))
-    } catch {
-      return true
-    }
-  }
-
-  private initializeGit() {
-    const cwd = getFirstWorkspaceFolder()
-    if (cwd) {
-      void this.gitExecutor.init(cwd)
-    }
-  }
-
-  private needsGitCommit(needsGitInit: boolean) {
-    if (needsGitInit) {
-      return true
-    }
-
-    const cwd = getFirstWorkspaceFolder()
-    if (!cwd) {
-      return true
-    }
-    return this.gitReader.hasNoCommits(cwd)
-  }
-
-  private registerCommands(internalCommands: InternalCommands) {
-    internalCommands.registerExternalCliCommand(
-      RegisteredCliCommands.INIT,
-      () => this.initializeDvc()
-    )
-
-    internalCommands.registerExternalCommand(
-      RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE,
-      () => run(this)
-    )
-
-    this.dispose.track(
-      commands.registerCommand(
-        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-        () => this.setupWorkspace()
-      )
-    )
-
-    internalCommands.registerExternalCommand(
-      RegisteredCommands.SETUP_SHOW,
-      async () => {
-        await this.showSetup()
-      }
-    )
-
-    internalCommands.registerExternalCommand(
-      RegisteredCommands.SELECT_FOCUSED_PROJECTS,
-      async () => {
-        const dvcRoots = await this.findWorkspaceDvcRoots()
-        const focusedProjects = await pickFocusedProjects(
-          dvcRoots,
-          this.dvcRoots
-        )
-        if (focusedProjects) {
-          this.config.setFocusedProjectsOption(focusedProjects)
-        }
-      }
-    )
-  }
-
-  private async setupWorkspace() {
+  public async setupWorkspace() {
     const stopWatch = new StopWatch()
     try {
       const previousCliPath = this.config.getCliPath()
@@ -437,6 +284,116 @@ export class Setup
         stopWatch.getElapsedTime()
       )
     }
+  }
+
+  public async findWorkspaceDvcRoots(): Promise<string[]> {
+    let dvcRoots: Set<string> = new Set()
+
+    for (const workspaceFolder of getWorkspaceFolders()) {
+      const workspaceFolderRoots = await findDvcRootPaths(workspaceFolder)
+      if (definedAndNonEmpty(workspaceFolderRoots)) {
+        dvcRoots = new Set([...dvcRoots, ...workspaceFolderRoots])
+        continue
+      }
+
+      await this.config.isReady()
+      const absoluteRoot = await findAbsoluteDvcRootPath(
+        workspaceFolder,
+        this.internalCommands.executeCommand(
+          AvailableCommands.ROOT,
+          workspaceFolder
+        )
+      )
+      if (absoluteRoot) {
+        dvcRoots.add(absoluteRoot)
+      }
+    }
+
+    const hasMultipleRoots = dvcRoots.size > 1
+    void setContextValue(ContextKey.MULTIPLE_PROJECTS, hasMultipleRoots)
+
+    return [...dvcRoots]
+  }
+
+  private createWebviewMessageHandler() {
+    const webviewMessages = new WebviewMessages(
+      () => this.getWebview(),
+      () => this.initializeGit()
+    )
+    this.dispose.track(
+      this.onDidReceivedWebviewMessage(message =>
+        webviewMessages.handleMessageFromWebview(message)
+      )
+    )
+    return webviewMessages
+  }
+
+  private setCommandsAvailability(available: boolean) {
+    void setContextValue(ContextKey.COMMANDS_AVAILABLE, available)
+  }
+
+  private setProjectAvailability() {
+    const available = this.hasRoots()
+    void setContextValue(ContextKey.PROJECT_AVAILABLE, available)
+    if (available && this.dotFolderWatcher && !this.dotFolderWatcher.disposed) {
+      this.dispose.untrack(this.dotFolderWatcher)
+      this.dotFolderWatcher.dispose()
+    }
+  }
+
+  private async canGitInitialize(needsGitInit: boolean) {
+    if (!needsGitInit) {
+      return false
+    }
+    const nestedRoots = await Promise.all(
+      getWorkspaceFolders().map(workspaceFolder =>
+        findSubRootPaths(workspaceFolder, '.git')
+      )
+    )
+
+    return isEmpty(nestedRoots.flat())
+  }
+
+  private async needsGitInit() {
+    if (this.hasRoots()) {
+      return false
+    }
+
+    const cwd = getFirstWorkspaceFolder()
+    if (!cwd) {
+      return undefined
+    }
+
+    try {
+      return !(await this.internalCommands.executeCommand(
+        AvailableCommands.GIT_GET_REPOSITORY_ROOT,
+        cwd
+      ))
+    } catch {
+      return true
+    }
+  }
+
+  private initializeGit() {
+    const cwd = getFirstWorkspaceFolder()
+    if (cwd) {
+      void this.internalCommands.executeCommand(AvailableCommands.GIT_INIT, cwd)
+    }
+  }
+
+  private needsGitCommit(needsGitInit: boolean) {
+    if (needsGitInit) {
+      return true
+    }
+
+    const cwd = getFirstWorkspaceFolder()
+    if (!cwd) {
+      return true
+    }
+    return this.internalCommands.executeCommand<boolean>(
+      AvailableCommands.GIT_HAS_NO_COMMITS,
+      cwd
+    )
   }
 
   private runWorkspace() {
