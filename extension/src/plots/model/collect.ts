@@ -2,10 +2,8 @@ import omit from 'lodash.omit'
 import get from 'lodash.get'
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
-import {
-  CustomPlotsOrderValue,
-  isCustomPlotOrderCheckpointValue
-} from './custom'
+import { CustomCheckpointPlots } from '.'
+import { CustomPlotsOrderValue } from './custom'
 import { getRevisionFirstThreeColumns } from './util'
 import {
   ColorScale,
@@ -223,10 +221,9 @@ export const getCustomPlotId = (plot: CustomPlotsOrderValue) =>
     ? `custom-${plot.metric}`
     : `custom-${plot.metric}-${plot.param}`
 
-// TBD untested...
 export const collectCustomCheckpointPlotData = (
   data: ExperimentsOutput
-): { [metric: string]: CheckpointPlot } => {
+): CustomCheckpointPlots => {
   const acc = {
     iterations: {},
     plots: new Map<string, CheckpointPlotValues>()
@@ -242,7 +239,7 @@ export const collectCustomCheckpointPlotData = (
     }
   }
 
-  const plotsData: { [metric: string]: CheckpointPlot } = {}
+  const plotsData: CustomCheckpointPlots = {}
   if (acc.plots.size === 0) {
     return plotsData
   }
@@ -302,16 +299,14 @@ const collectMetricVsParamPlotData = (
   return plotData
 }
 
-// TBD it will probably be easier and/or faster to get the data from
-// experiments vs the output...
 export const collectCustomPlotsData = (
   plotsOrderValues: CustomPlotsOrderValue[],
-  checkpointPlots: { [metric: string]: CheckpointPlot },
+  checkpointPlots: CustomCheckpointPlots,
   experiments: Experiment[]
 ): CustomPlot[] => {
   return plotsOrderValues
     .map((plotOrderValue): CustomPlot => {
-      if (isCustomPlotOrderCheckpointValue(plotOrderValue)) {
+      if (plotOrderValue.type === CustomPlotType.CHECKPOINT) {
         const { metric } = plotOrderValue
         return checkpointPlots[metric.slice(ColumnType.METRICS.length + 1)]
       }

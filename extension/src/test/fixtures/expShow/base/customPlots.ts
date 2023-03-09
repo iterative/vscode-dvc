@@ -36,8 +36,6 @@ const data: CustomPlotsData = {
   plots: [
     {
       id: 'custom-metrics:summary.json:loss-params:params.yaml:dropout',
-      // TBD I don't think we actually need metric/param here
-      // since I think only title is used in in the front end
       metric: 'summary.json:loss',
       param: 'params.yaml:dropout',
       type: CustomPlotType.METRIC_VS_PARAM,

@@ -53,6 +53,8 @@ import {
 } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
 
+export type CustomCheckpointPlots = { [metric: string]: CheckpointPlot }
+
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
 
@@ -72,9 +74,7 @@ export class PlotsModel extends ModelWithPersistence {
   private multiSourceVariations: MultiSourceVariations = {}
   private multiSourceEncoding: MultiSourceEncoding = {}
 
-  // TBD we need to move this type to a named type if
-  // we plan to keep this
-  private customCheckpointPlots?: { [metric: string]: CheckpointPlot }
+  private customCheckpointPlots?: CustomCheckpointPlots
   private customPlots?: CustomPlot[]
   private selectedMetrics?: string[]
 
@@ -177,8 +177,7 @@ export class PlotsModel extends ModelWithPersistence {
     }
 
     const experiments = this.experiments.getExperiments()
-    // TBD this if check is going to need to be rethought since checkpoint data
-    // is involved now
+
     if (experiments.length === 0) {
       this.customPlots = undefined
       return

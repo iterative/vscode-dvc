@@ -33,10 +33,7 @@ import { ColumnType } from '../../experiments/webview/contract'
 import { FILE_SEPARATOR } from '../../experiments/columns/paths'
 import { reorderObjectList } from '../../util/array'
 import { isCheckpointPlot } from '../model/collect'
-import {
-  CustomPlotsOrderValue,
-  isCustomPlotOrderCheckpointValue
-} from '../model/custom'
+import { CustomPlotsOrderValue } from '../model/custom'
 
 export class WebviewMessages {
   private readonly paths: PathsModel
@@ -115,7 +112,7 @@ export class WebviewMessages {
     }
   }
 
-  public async getMetricOrParamPlot(): Promise<
+  public async addMetricVsParamPlot(): Promise<
     CustomPlotsOrderValue | undefined
   > {
     const metricAndParam = await pickMetricAndParam(
@@ -127,7 +124,7 @@ export class WebviewMessages {
     }
 
     const plotAlreadyExists = this.plots.getCustomPlotsOrder().find(value => {
-      if (isCustomPlotOrderCheckpointValue(value)) {
+      if (value.type === CustomPlotType.CHECKPOINT) {
         return
       }
       return (
@@ -140,10 +137,12 @@ export class WebviewMessages {
       return Toast.showError('Custom plot already exists.')
     }
 
-    return {
+    const plot = {
       ...metricAndParam,
       type: CustomPlotType.METRIC_VS_PARAM
     }
+    this.plots.addCustomPlot(plot)
+    this.sendCustomPlotsAndEvent(EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED)
   }
 
   private setPlotSize(
@@ -200,7 +199,7 @@ export class WebviewMessages {
     )
   }
 
-  private async getCheckpointPlot(): Promise<
+  private async addCheckpointPlot(): Promise<
     CustomPlotsOrderValue | undefined
   > {
     const metric = await pickMetric(this.experiments.getColumnTerminalNodes())
@@ -210,7 +209,7 @@ export class WebviewMessages {
     }
 
     const plotAlreadyExists = this.plots.getCustomPlotsOrder().find(value => {
-      if (isCustomPlotOrderCheckpointValue(value)) {
+      if (value.type === CustomPlotType.CHECKPOINT) {
         return value.metric === metric
       }
     })
@@ -219,35 +218,31 @@ export class WebviewMessages {
       return Toast.showError('Custom plot already exists.')
     }
 
-    return {
+    const plot: CustomPlotsOrderValue = {
       metric,
       type: CustomPlotType.CHECKPOINT
     }
+    this.plots.addCustomPlot(plot)
+    this.sendCustomPlotsAndEvent(EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED)
   }
 
   private async addCustomPlot() {
+    if (!this.experiments.hasCheckpoints()) {
+      void this.addMetricVsParamPlot()
+      return
+    }
+
     const plotType = await pickCustomPlotType()
 
     if (!plotType) {
       return
     }
 
-    const plot = await (plotType === CustomPlotType.CHECKPOINT
-      ? this.getCheckpointPlot()
-      : this.getMetricOrParamPlot())
-
-    if (!plot) {
-      return
+    if (plotType === CustomPlotType.CHECKPOINT) {
+      void this.addCheckpointPlot()
+    } else {
+      void this.addMetricVsParamPlot()
     }
-
-    this.plots.addCustomPlot(plot)
-
-    this.sendCustomPlots()
-    sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED,
-      undefined,
-      undefined
-    )
   }
 
   private async removeCustomPlots() {
@@ -264,12 +259,7 @@ export class WebviewMessages {
     }
 
     this.plots.removeCustomPlots(selectedPlotsIds)
-    this.sendCustomPlots()
-    sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_CUSTOM_PLOT_REMOVED,
-      undefined,
-      undefined
-    )
+    this.sendCustomPlotsAndEvent(EventName.VIEWS_PLOTS_CUSTOM_PLOT_REMOVED)
   }
 
   private setCustomPlotsOrder(plotIds: string[]) {
@@ -297,12 +287,17 @@ export class WebviewMessages {
           }
     )
     this.plots.setCustomPlotsOrder(newOrder)
+    this.sendCustomPlotsAndEvent(EventName.VIEWS_REORDER_PLOTS_CUSTOM)
+  }
+
+  private sendCustomPlotsAndEvent(
+    event:
+      | typeof EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED
+      | typeof EventName.VIEWS_PLOTS_CUSTOM_PLOT_REMOVED
+      | typeof EventName.VIEWS_REORDER_PLOTS_CUSTOM
+  ) {
     this.sendCustomPlots()
-    sendTelemetryEvent(
-      EventName.VIEWS_REORDER_PLOTS_CUSTOM,
-      undefined,
-      undefined
-    )
+    sendTelemetryEvent(event, undefined, undefined)
   }
 
   private selectPlotsFromWebview() {

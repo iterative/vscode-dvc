@@ -91,7 +91,7 @@ export const createCheckpointSpec = (
     ],
     width: 'container'
   } as VisualizationSpec)
-// TBD rename to title?
+
 export const createMetricVsParamSpec = (metric: string, param: string) =>
   ({
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',

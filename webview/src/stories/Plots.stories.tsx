@@ -26,7 +26,7 @@ import '../shared/style.scss'
 import '../plots/components/styles.module.scss'
 import { feedStore } from '../plots/components/App'
 import { plotsReducers } from '../plots/store'
-// TBD review storybooks, making sure they all make sense
+
 const manyCustomPlots = (length: number, size = PlotNumberOfItemsPerRow.TWO) =>
   Array.from({ length }, () => customPlotsFixture.plots[2]).map((plot, i) => {
     const id = plot.id + i.toString()

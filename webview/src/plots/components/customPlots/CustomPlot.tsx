@@ -30,8 +30,7 @@ const createCustomPlotSpec = (
   if (!plot) {
     return {}
   }
-  // TBD were forced to use this type of "if or" statement mutliple times throughout the custom code
-  // There's probably a better way to do this
+
   if (isCheckpointPlot(plot)) {
     return colors ? createCheckpointSpec(plot.yTitle, colors) : {}
   }

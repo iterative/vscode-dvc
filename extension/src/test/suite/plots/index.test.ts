@@ -766,7 +766,7 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a add custom plot message from the webview', async () => {
-      const { plots, plotsModel, webviewMessages } = await buildPlots(
+      const { plots, plotsModel } = await buildPlots(
         disposable,
         plotsDiffFixture
       )
@@ -785,8 +785,8 @@ suite('Plots Test Suite', () => {
       )
 
       const mockGetMetricAndParam = stub(
-        webviewMessages,
-        'getMetricOrParamPlot'
+        customPlotQuickPickUtil,
+        'pickMetricAndParam'
       )
 
       const firstQuickPickEvent = new Promise(resolve =>

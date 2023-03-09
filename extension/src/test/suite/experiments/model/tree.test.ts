@@ -26,6 +26,7 @@ import {
 import { buildPlots, getExpectedCustomPlotsData } from '../../plots/util'
 import customPlotsFixture from '../../../fixtures/expShow/base/customPlots'
 import expShowFixture from '../../../fixtures/expShow/base/output'
+import plotsRevisionsFixture from '../../../fixtures/plotsDiff/revisions'
 import { ExperimentsTree } from '../../../../experiments/model/tree'
 import {
   buildExperiments,
@@ -45,7 +46,11 @@ import { WorkspaceExperiments } from '../../../../experiments/workspace'
 import { ExperimentItem } from '../../../../experiments/model/collect'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 import { DvcReader } from '../../../../cli/dvc/reader'
-import { ColorScale } from '../../../../plots/webview/contract'
+import {
+  ColorScale,
+  CustomPlotType,
+  DEFAULT_SECTION_COLLAPSED
+} from '../../../../plots/webview/contract'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = getTimeSafeDisposer()
@@ -70,11 +75,7 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to toggle whether an experiment is shown in the plots webview with dvc.views.experiments.toggleStatus', async () => {
-      const { plots, messageSpy } = await buildPlots(
-        disposable,
-        undefined,
-        undefined
-      )
+      const { plots, messageSpy } = await buildPlots(disposable)
 
       const expectedDomain = [...domain]
       const expectedRange = [...range]
@@ -111,8 +112,24 @@ suite('Experiments Tree Test Suite', () => {
         expect(unSelected).to.equal(UNSELECTED)
       }
 
-      // TBD rewrite this test 'when there are no experiments selected we send null (show empty state)'
-      // to expect custom data but with no trends plots
+      expect(
+        messageSpy,
+        'when there are no experiments selected we dont send trend type plots'
+      ).to.be.calledWithMatch({
+        comparison: null,
+        custom: {
+          ...customPlotsFixture,
+          colors: undefined,
+          plots: customPlotsFixture.plots.filter(
+            plot => plot.type !== CustomPlotType.CHECKPOINT
+          )
+        },
+        hasPlots: false,
+        hasUnselectedPlots: false,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+        selectedRevisions: plotsRevisionsFixture.slice(0, 2),
+        template: null
+      })
       messageSpy.resetHistory()
 
       expectedDomain.push(domain[0])
