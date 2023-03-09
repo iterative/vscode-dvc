@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { CustomPlots } from './CustomPlots'
+import { changeSize } from './customPlotsSlice'
 import { PlotsContainer } from '../PlotsContainer'
 import { PlotsState } from '../../store'
 import { sendMessage } from '../../../shared/vscode'
@@ -23,6 +24,8 @@ export const CustomPlotsWrapper: React.FC = () => {
     sendMessage({ type: MessageFromWebviewType.REMOVE_CUSTOM_PLOTS })
   }
 
+  const hasItems = plotsIds.length > 0
+
   return (
     <PlotsContainer
       title="Custom"
@@ -30,9 +33,9 @@ export const CustomPlotsWrapper: React.FC = () => {
       nbItemsPerRow={nbItemsPerRow}
       sectionCollapsed={isCollapsed}
       addPlotsButton={{ onClick: addCustomPlot }}
-      removePlotsButton={
-        plotsIds.length > 0 ? { onClick: removeCustomPlots } : undefined
-      }
+      removePlotsButton={hasItems ? { onClick: removeCustomPlots } : undefined}
+      changeNbItemsPerRow={changeSize}
+      hasItems={hasItems}
     >
       <CustomPlots plotsIds={selectedPlots} />
     </PlotsContainer>

@@ -6,14 +6,13 @@ import { CustomPlotsWrapper } from './customPlots/CustomPlotsWrapper'
 import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
 import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper'
 import { Ribbon } from './ribbon/Ribbon'
-import { setSnapPoints, setZoomedInPlot } from './webviewSlice'
+import { setMaxNbPlotsPerRow, setZoomedInPlot } from './webviewSlice'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Modal } from '../../shared/components/modal/Modal'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
 import { GetStarted } from '../../shared/components/getStarted/GetStarted'
 import { PlotsState } from '../store'
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 const PlotsContent = () => {
   const dispatch = useDispatch()
   const { hasData, hasPlots, hasUnselectedPlots, zoomedInPlot } = useSelector(
@@ -31,7 +30,10 @@ const PlotsContent = () => {
     const onResize = () => {
       wrapperRef.current &&
         dispatch(
-          setSnapPoints(wrapperRef.current.getBoundingClientRect().width - 100)
+          setMaxNbPlotsPerRow(
+            // Plots grid have a 20px margin around it, we subtract 20 * 2 from the wrapper width to get the max available space
+            wrapperRef.current.getBoundingClientRect().width - 40
+          )
         )
     }
     window.addEventListener('resize', onResize)

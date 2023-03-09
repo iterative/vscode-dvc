@@ -13,6 +13,7 @@ import { Experiments } from '../../../experiments'
 import * as QuickPick from '../../../vscode/quickPick'
 import { DvcExecutor } from '../../../cli/dvc/executor'
 import {
+  bypassProgressCloseDelay,
   closeAllEditors,
   getInputBoxEvent,
   getTimeSafeDisposer,
@@ -30,7 +31,7 @@ import {
   QuickPickItemWithValue,
   QuickPickOptionsWithTitle
 } from '../../../vscode/quickPick'
-import { PROGRESS_TEST_TIMEOUT, WEBVIEW_TEST_TIMEOUT } from '../timeouts'
+import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { Title } from '../../../vscode/title'
 import { join } from '../../util/path'
 import { AvailableCommands } from '../../../commands/internal'
@@ -688,6 +689,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.shareExperimentAsBranch', () => {
     it('should be able to share an experiment as a branch', async () => {
+      bypassProgressCloseDelay()
       stub(DvcReader.prototype, 'listStages').resolves('train')
 
       const { experiments } = buildExperiments(disposable)
@@ -746,10 +748,11 @@ suite('Workspace Experiments Test Suite', () => {
       expect(mockPush).to.be.calledWithExactly(dvcDemoPath)
       expect(mockGitPush).to.be.calledWithExactly(dvcDemoPath, mockBranch)
     })
-  }).timeout(PROGRESS_TEST_TIMEOUT)
+  })
 
   describe('dvc.shareExperimentAsCommit', () => {
     it('should be able to share an experiment as a commit', async () => {
+      bypassProgressCloseDelay()
       stub(DvcReader.prototype, 'listStages').resolves('train')
 
       const { experiments } = buildExperiments(disposable)
@@ -802,7 +805,7 @@ suite('Workspace Experiments Test Suite', () => {
       )
       expect(mockPush).to.be.calledWithExactly(dvcDemoPath)
       expect(mockGitPush).to.be.calledWithExactly(dvcDemoPath)
-    }).timeout(PROGRESS_TEST_TIMEOUT)
+    })
   })
 
   describe('dvc.removeExperiments', () => {

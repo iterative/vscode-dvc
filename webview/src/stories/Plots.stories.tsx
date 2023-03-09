@@ -8,7 +8,7 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   TemplatePlotGroup,
   TemplatePlotSection,
-  PlotNumberOfItemsPerRow
+  DEFAULT_NB_ITEMS_PER_ROW
 } from 'dvc/src/plots/webview/contract'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
 import customPlotsFixture from 'dvc/src/test/fixtures/expShow/base/customPlots'
@@ -18,7 +18,10 @@ import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import smoothTemplatePlotContent from 'dvc/src/test/fixtures/plotsDiff/template/smoothTemplatePlot'
 import { truncateVerticalTitle } from 'dvc/src/plots/vega/util'
-import { CHROMATIC_VIEWPORTS, DISABLE_CHROMATIC_SNAPSHOTS } from './util'
+import {
+  CHROMATIC_VIEWPORTS_WITH_DELAY,
+  DISABLE_CHROMATIC_SNAPSHOTS
+} from './util'
 import { Plots } from '../plots/components/Plots'
 
 import './test-vscode-styles.scss'
@@ -27,7 +30,16 @@ import '../plots/components/styles.module.scss'
 import { feedStore } from '../plots/components/App'
 import { plotsReducers } from '../plots/store'
 
-const manyCustomPlots = (length: number, size = PlotNumberOfItemsPerRow.TWO) =>
+const smallCustomPlotsFixture = {
+  ...customPlotsFixture,
+  nbItemsPerRow: 3,
+  plots: customPlotsFixture.plots.map(plot => ({
+    ...plot,
+    title: truncateVerticalTitle(plot.yTitle, 3) as string
+  }))
+}
+
+const manyCustomPlots = (length: number, size = DEFAULT_NB_ITEMS_PER_ROW) =>
   Array.from({ length }, () => customPlotsFixture.plots[2]).map((plot, i) => {
     const id = plot.id + i.toString()
     return {
@@ -80,29 +92,7 @@ const Template: Story<{
 }
 
 export const WithData = Template.bind({})
-WithData.parameters = CHROMATIC_VIEWPORTS
-
-export const WithEmptyCheckpoints = Template.bind({})
-WithEmptyCheckpoints.args = {
-  data: {
-    comparison: comparisonPlotsFixture,
-    custom: { ...customPlotsFixture },
-    sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-    selectedRevisions: plotsRevisionsFixture,
-    template: templatePlotsFixture
-  }
-}
-WithEmptyCheckpoints.parameters = DISABLE_CHROMATIC_SNAPSHOTS
-
-export const WithCheckpointOnly = Template.bind({})
-WithCheckpointOnly.args = {
-  data: {
-    custom: customPlotsFixture,
-    sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-    selectedRevisions: plotsRevisionsFixture
-  }
-}
-WithCheckpointOnly.parameters = DISABLE_CHROMATIC_SNAPSHOTS
+WithData.parameters = CHROMATIC_VIEWPORTS_WITH_DELAY
 
 export const WithCustomOnly = Template.bind({})
 WithCustomOnly.args = {
@@ -121,7 +111,7 @@ WithTemplateOnly.args = {
     selectedRevisions: plotsRevisionsFixture,
     template: {
       ...templatePlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.TWO
+      nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW
     }
   }
 }
@@ -176,42 +166,39 @@ AllLarge.args = {
   data: {
     comparison: {
       ...comparisonPlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.ONE
+      nbItemsPerRow: 1
     },
     custom: {
       ...customPlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.ONE
+      nbItemsPerRow: 1
     },
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
     selectedRevisions: plotsRevisionsFixture,
     template: {
       ...templatePlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.ONE
+      nbItemsPerRow: 1
     }
   }
 }
-AllLarge.parameters = CHROMATIC_VIEWPORTS
+AllLarge.parameters = CHROMATIC_VIEWPORTS_WITH_DELAY
 
 export const AllSmall = Template.bind({})
 AllSmall.args = {
   data: {
     comparison: {
       ...comparisonPlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.THREE
+      nbItemsPerRow: 3
     },
-    custom: {
-      ...customPlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.THREE
-    },
+    custom: smallCustomPlotsFixture,
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
     selectedRevisions: plotsRevisionsFixture,
     template: {
       ...templatePlotsFixture,
-      nbItemsPerRow: PlotNumberOfItemsPerRow.THREE
+      nbItemsPerRow: 3
     }
   }
 }
-AllSmall.parameters = CHROMATIC_VIEWPORTS
+AllSmall.parameters = CHROMATIC_VIEWPORTS_WITH_DELAY
 
 export const VirtualizedPlots = Template.bind({})
 VirtualizedPlots.args = {
@@ -226,7 +213,7 @@ VirtualizedPlots.args = {
     template: manyTemplatePlots(125)
   }
 }
-VirtualizedPlots.parameters = CHROMATIC_VIEWPORTS
+VirtualizedPlots.parameters = CHROMATIC_VIEWPORTS_WITH_DELAY
 
 export const ZoomedInPlot = Template.bind({})
 ZoomedInPlot.play = async ({ canvasElement }) => {
@@ -265,7 +252,10 @@ SmoothTemplate.args = {
   }
 }
 SmoothTemplate.parameters = {
-  chromatic: { ...CHROMATIC_VIEWPORTS.chromatic, disableSnapshot: true }
+  chromatic: {
+    ...CHROMATIC_VIEWPORTS_WITH_DELAY.chromatic,
+    disableSnapshot: true
+  }
 }
 
 export const ScrolledHeaders = Template.bind({})

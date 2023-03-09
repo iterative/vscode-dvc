@@ -36,6 +36,7 @@ import { GitReader } from '../../cli/git/reader'
 import { SetupData } from '../../setup/webview/contract'
 import { DvcViewer } from '../../cli/dvc/viewer'
 import { ConnectData } from '../../connect/webview/contract'
+import { Toast } from '../../vscode/toast'
 
 export const mockDisposable = {
   dispose: stub()
@@ -142,7 +143,13 @@ export const buildInternalCommands = (disposer: Disposer) => {
   const config = disposer.track(new Config())
   const dvcReader = disposer.track(new DvcReader(config))
   const dvcRunner = disposer.track(new DvcRunner(config, () => undefined))
-  const dvcExecutor = disposer.track(new DvcExecutor(config))
+  const dvcExecutor = disposer.track(
+    new DvcExecutor(
+      config,
+      () => undefined,
+      () => Promise.resolve('')
+    )
+  )
   const dvcViewer = disposer.track(new DvcViewer(config))
   const gitReader = disposer.track(new GitReader())
 
@@ -300,3 +307,6 @@ export const getTimeSafeDisposer = (): Disposer & {
     }
   })
 }
+
+export const bypassProgressCloseDelay = () =>
+  stub(Toast, 'delayProgressClosing').resolves(undefined)

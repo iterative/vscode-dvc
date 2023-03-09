@@ -1,9 +1,9 @@
-import { Config, FontWeight } from 'vega'
+import { Config } from 'vega-lite'
 
 const foregroundColor = 'var(--vscode-editor-foreground)'
 const backgroundColor = 'var(--vscode-editor-foreground-transparency-1)'
 const font = 'var(--vscode-editor-font-family)'
-const fontWeight = 'normal' as FontWeight
+const fontWeight = 'normal' as const
 
 const title = {
   fill: foregroundColor,

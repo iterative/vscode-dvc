@@ -21,14 +21,14 @@ import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtuali
 import {
   DEFAULT_SECTION_COLLAPSED,
   PlotsData,
-  PlotNumberOfItemsPerRow,
   PlotsType,
   Revision,
   Section,
   TemplatePlotGroup,
   TemplatePlotsData,
   CustomPlotType,
-  CustomPlotsData
+  CustomPlotsData,
+  DEFAULT_NB_ITEMS_PER_ROW
 } from 'dvc/src/plots/webview/contract'
 import {
   MessageFromWebviewType,
@@ -45,7 +45,7 @@ import {
   plotDataStore,
   TemplatePlotsById
 } from './plotDataStore'
-import { setSnapPoints } from './webviewSlice'
+import { setMaxNbPlotsPerRow } from './webviewSlice'
 import { plotsReducers, plotsStore } from '../store'
 import { vsCodeApi } from '../../shared/api'
 import {
@@ -58,7 +58,6 @@ import { DragEnterDirection } from '../../shared/components/dragDrop/util'
 import { clearSelection, createWindowTextSelection } from '../../test/selection'
 import * as EventCurrentTargetDistances from '../../shared/components/dragDrop/currentTarget'
 import { OVERSCAN_ROW_COUNT } from '../../shared/components/virtualizedGrid/VirtualizedGrid'
-import { pickAndMove } from '../../test/mouseEventsWithCoordinates'
 
 jest.mock('../../shared/components/dragDrop/currentTarget', () => {
   const actualModule = jest.requireActual(
@@ -129,9 +128,9 @@ describe('App', () => {
     return store
   }
 
-  const setWrapperSize = (store: typeof plotsStore) =>
+  const setWrapperSize = (store: typeof plotsStore, size = 2000) =>
     act(() => {
-      store.dispatch(setSnapPoints(1000))
+      store.dispatch(setMaxNbPlotsPerRow(size))
     })
 
   const templatePlot = templatePlotsFixture.plots[0].entries[0]
@@ -244,7 +243,7 @@ describe('App', () => {
     renderAppWithOptionalData({
       comparison: {
         height: undefined,
-        nbItemsPerRow: PlotNumberOfItemsPerRow.TWO,
+        nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
         plots: [
           {
             path: 'training/plots/images/misclassified.jpg',
@@ -403,7 +402,7 @@ describe('App', () => {
     expect(emptyState).toBeInTheDocument()
   })
 
-  it('should remove checkpoint plots given a message showing custom plots as null', async () => {
+  it('should remove custom plots given a message showing custom plots as null', async () => {
     const emptyStateText = 'No Plots to Display'
 
     renderAppWithOptionalData({
@@ -573,70 +572,64 @@ describe('App', () => {
     })
   })
 
+  it('should display a slider to pick the number of items per row if there are items and the action is available', () => {
+    const store = renderAppWithOptionalData({
+      comparison: comparisonTableFixture,
+      custom: customPlotsFixture
+    })
+    setWrapperSize(store)
+
+    expect(screen.getByTestId('nb-items-per-row-slider')).toBeInTheDocument()
+  })
+
+  it('should not display a slider to pick the number of items per row if there are no items', () => {
+    const store = renderAppWithOptionalData({})
+    setWrapperSize(store)
+
+    expect(
+      screen.queryByTestId('nb-items-per-row-slider')
+    ).not.toBeInTheDocument()
+  })
+
+  it('should not display a slider to pick the number of items per row if the action is unavailable', () => {
+    const store = renderAppWithOptionalData({
+      comparison: comparisonTableFixture
+    })
+    setWrapperSize(store)
+
+    expect(
+      screen.queryByTestId('nb-items-per-row-slider')
+    ).not.toBeInTheDocument()
+  })
+
+  it('should not display a slider to pick the number of items per row if the only width available for one item per row or less', () => {
+    const store = renderAppWithOptionalData({
+      comparison: comparisonTableFixture,
+      custom: customPlotsFixture
+    })
+    setWrapperSize(store, 400)
+
+    expect(
+      screen.queryByTestId('nb-items-per-row-slider')
+    ).not.toBeInTheDocument()
+  })
+
   it('should send a message to the extension with the selected size when changing the size of plots', () => {
     const store = renderAppWithOptionalData({
       comparison: comparisonTableFixture,
       custom: customPlotsFixture
     })
-
-    const plotResizer = screen.getAllByTestId('vertical-plot-resizer')[0]
-
     setWrapperSize(store)
-    pickAndMove(plotResizer, 10)
+
+    const plotResizer = within(
+      screen.getByTestId('nb-items-per-row-slider')
+    ).getByRole('slider')
+
+    fireEvent.change(plotResizer, { target: { value: -3 } })
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: {
-        nbItemsPerRow: PlotNumberOfItemsPerRow.ONE,
-        section: Section.CUSTOM_PLOTS
-      },
-      type: MessageFromWebviewType.RESIZE_PLOTS
-    })
-
-    setWrapperSize(store)
-    pickAndMove(plotResizer, -10)
-    expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: {
-        nbItemsPerRow: PlotNumberOfItemsPerRow.TWO,
-        section: Section.CUSTOM_PLOTS
-      },
-      type: MessageFromWebviewType.RESIZE_PLOTS
-    })
-
-    setWrapperSize(store)
-
-    pickAndMove(plotResizer, -10)
-
-    expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: {
-        nbItemsPerRow: PlotNumberOfItemsPerRow.THREE,
-        section: Section.CUSTOM_PLOTS
-      },
-      type: MessageFromWebviewType.RESIZE_PLOTS
-    })
-
-    setWrapperSize(store)
-    pickAndMove(plotResizer, -10)
-    expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: {
-        nbItemsPerRow: PlotNumberOfItemsPerRow.FOUR,
-        section: Section.CUSTOM_PLOTS
-      },
-      type: MessageFromWebviewType.RESIZE_PLOTS
-    })
-  })
-
-  it('should not send a message to the extension with the selected size when changing the size of plots and pressing escape', () => {
-    const store = renderAppWithOptionalData({
-      comparison: comparisonTableFixture,
-      custom: customPlotsFixture
-    })
-
-    const plotResizer = screen.getAllByTestId('vertical-plot-resizer')[0]
-
-    setWrapperSize(store)
-    pickAndMove(plotResizer, 10, 0, true)
-    expect(mockPostMessage).not.toHaveBeenCalledWith({
-      payload: {
-        nbItemsPerRow: PlotNumberOfItemsPerRow.ONE,
+        height: undefined,
+        nbItemsPerRow: 3,
         section: Section.CUSTOM_PLOTS
       },
       type: MessageFromWebviewType.RESIZE_PLOTS
@@ -1219,7 +1212,23 @@ describe('App', () => {
     expect(screen.getByTestId('modal')).toBeInTheDocument()
   })
 
-  it('should open a modal with the plot zoomed in when clicking a checkpoint plot', () => {
+  it('should send a message to the extension when a plot is opened in a modal', () => {
+    renderAppWithOptionalData({
+      template: complexTemplatePlotsFixture
+    })
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
+
+    fireEvent.click(plot)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.ZOOM_PLOT
+    })
+  })
+
+  it('should open a modal with the plot zoomed in when clicking a custom plot', () => {
     renderAppWithOptionalData({
       comparison: comparisonTableFixture,
       custom: customPlotsFixture
@@ -1346,7 +1355,7 @@ describe('App', () => {
 
     const resizeScreen = (width: number, store: typeof plotsStore) => {
       act(() => {
-        store.dispatch(setSnapPoints(width))
+        store.dispatch(setMaxNbPlotsPerRow(width))
       })
       act(() => {
         global.innerWidth = width
@@ -1355,10 +1364,10 @@ describe('App', () => {
     }
 
     describe('Large plots', () => {
-      it('should  wrap the custom plots in a big grid (virtualize them) when there are more than ten large plots', async () => {
+      it('should  wrap the custom plots in a big grid (virtualize them) when there are more than eight large plots', async () => {
         await renderAppAndChangeSize(
-          { comparison: comparisonTableFixture, custom: createCustomPlots(11) },
-          PlotNumberOfItemsPerRow.ONE,
+          { comparison: comparisonTableFixture, custom: createCustomPlots(9) },
+          1,
           Section.CUSTOM_PLOTS
         )
 
@@ -1373,10 +1382,10 @@ describe('App', () => {
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
 
-      it('should not wrap the custom plots in a big grid (virtualize them) when there are ten or fewer large plots', async () => {
+      it('should not wrap the custom plots in a big grid (virtualize them) when there are eight or fewer large plots', async () => {
         await renderAppAndChangeSize(
-          { comparison: comparisonTableFixture, custom: createCustomPlots(10) },
-          PlotNumberOfItemsPerRow.ONE,
+          { comparison: comparisonTableFixture, custom: createCustomPlots(8) },
+          1,
           Section.CUSTOM_PLOTS
         )
 
@@ -1391,10 +1400,10 @@ describe('App', () => {
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
       })
 
-      it('should  wrap the template plots in a big grid (virtualize them) when there are more than ten large plots', async () => {
+      it('should  wrap the template plots in a big grid (virtualize them) when there are more than eight large plots', async () => {
         await renderAppAndChangeSize(
-          { template: manyTemplatePlots(11) },
-          PlotNumberOfItemsPerRow.ONE,
+          { template: manyTemplatePlots(9) },
+          1,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1409,10 +1418,10 @@ describe('App', () => {
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
 
-      it('should not wrap the template plots in a big grid (virtualize them) when there are ten or fewer large plots', async () => {
+      it('should not wrap the template plots in a big grid (virtualize them) when there are eight or fewer large plots', async () => {
         await renderAppAndChangeSize(
-          { template: manyTemplatePlots(10) },
-          PlotNumberOfItemsPerRow.ONE,
+          { template: manyTemplatePlots(8) },
+          1,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1434,7 +1443,7 @@ describe('App', () => {
         beforeEach(async () => {
           store = await renderAppAndChangeSize(
             { comparison: comparisonTableFixture, custom },
-            PlotNumberOfItemsPerRow.ONE,
+            1,
             Section.CUSTOM_PLOTS
           )
         })
@@ -1482,40 +1491,40 @@ describe('App', () => {
     })
 
     describe('Regular plots', () => {
-      it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than fifteen regular plots', async () => {
+      it('should  wrap the custom plots in a big grid (virtualize them) when there are more than fourteen regular plots', async () => {
         await renderAppAndChangeSize(
-          { comparison: comparisonTableFixture, custom: createCustomPlots(16) },
-          PlotNumberOfItemsPerRow.TWO,
+          { comparison: comparisonTableFixture, custom: createCustomPlots(15) },
+          DEFAULT_NB_ITEMS_PER_ROW,
           Section.CUSTOM_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
 
-      it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are eight or fifteen regular plots', async () => {
+      it('should not wrap the custom plots in a big grid (virtualize them) when there are fourteen regular plots', async () => {
         await renderAppAndChangeSize(
-          { comparison: comparisonTableFixture, custom: createCustomPlots(15) },
-          PlotNumberOfItemsPerRow.TWO,
+          { comparison: comparisonTableFixture, custom: createCustomPlots(14) },
+          DEFAULT_NB_ITEMS_PER_ROW,
           Section.CUSTOM_PLOTS
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
       })
 
-      it('should  wrap the template plots in a big grid (virtualize them) when there are more than fifteen regular plots', async () => {
+      it('should  wrap the template plots in a big grid (virtualize them) when there are more than fourteen regular plots', async () => {
         await renderAppAndChangeSize(
-          { template: manyTemplatePlots(16) },
-          PlotNumberOfItemsPerRow.TWO,
+          { template: manyTemplatePlots(15) },
+          DEFAULT_NB_ITEMS_PER_ROW,
           Section.TEMPLATE_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
 
-      it('should not wrap the template plots in a big grid (virtualize them) when there are fifteen or fewer regular plots', async () => {
+      it('should not wrap the template plots in a big grid (virtualize them) when there are fourteen or fewer regular plots', async () => {
         await renderAppAndChangeSize(
-          { template: manyTemplatePlots(15) },
-          PlotNumberOfItemsPerRow.TWO,
+          { template: manyTemplatePlots(14) },
+          DEFAULT_NB_ITEMS_PER_ROW,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1529,7 +1538,7 @@ describe('App', () => {
         beforeEach(async () => {
           store = await renderAppAndChangeSize(
             { comparison: comparisonTableFixture, custom },
-            PlotNumberOfItemsPerRow.TWO,
+            DEFAULT_NB_ITEMS_PER_ROW,
             Section.CUSTOM_PLOTS
           )
         })
@@ -1579,20 +1588,20 @@ describe('App', () => {
     })
 
     describe('Smaller plots', () => {
-      it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than twenty small plots', async () => {
+      it('should  wrap the custom plots in a big grid (virtualize them) when there are more than twenty small plots', async () => {
         await renderAppAndChangeSize(
           { comparison: comparisonTableFixture, custom: createCustomPlots(21) },
-          PlotNumberOfItemsPerRow.FOUR,
+          4,
           Section.CUSTOM_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
 
-      it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are twenty or fewer small plots', async () => {
+      it('should not wrap the custom plots in a big grid (virtualize them) when there are twenty or fewer small plots', async () => {
         await renderAppAndChangeSize(
           { comparison: comparisonTableFixture, custom: createCustomPlots(20) },
-          PlotNumberOfItemsPerRow.FOUR,
+          4,
           Section.CUSTOM_PLOTS
         )
 
@@ -1602,7 +1611,7 @@ describe('App', () => {
       it('should  wrap the template plots in a big grid (virtualize them) when there are more than twenty small plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(21) },
-          PlotNumberOfItemsPerRow.FOUR,
+          4,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1612,7 +1621,7 @@ describe('App', () => {
       it('should not wrap the template plots in a big grid (virtualize them) when there are twenty or fewer small plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(20) },
-          PlotNumberOfItemsPerRow.FOUR,
+          4,
           Section.TEMPLATE_PLOTS
         )
 
@@ -1626,7 +1635,7 @@ describe('App', () => {
         beforeEach(async () => {
           store = await renderAppAndChangeSize(
             { comparison: comparisonTableFixture, custom },
-            PlotNumberOfItemsPerRow.FOUR,
+            4,
             Section.CUSTOM_PLOTS
           )
         })

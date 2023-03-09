@@ -74,6 +74,7 @@ export const EventName = Object.assign(
     VIEWS_PLOTS_SECTION_TOGGLE: 'views.plots.toggleSection',
     VIEWS_PLOTS_SELECT_EXPERIMENTS: 'view.plots.selectExperiments',
     VIEWS_PLOTS_SELECT_PLOTS: 'view.plots.selectPlots',
+    VIEWS_PLOTS_ZOOM_PLOT: 'views.plots.zoomPlot',
     VIEWS_REORDER_PLOTS_CUSTOM: 'views.plots.customReordered',
     VIEWS_REORDER_PLOTS_METRICS: 'views.plots.metricsReordered',
     VIEWS_REORDER_PLOTS_TEMPLATES: 'views.plots.templatesReordered',
@@ -261,6 +262,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_SELECT_EXPERIMENTS]: undefined
   [EventName.VIEWS_PLOTS_SELECT_PLOTS]: undefined
   [EventName.VIEWS_PLOTS_EXPERIMENT_TOGGLE]: undefined
+  [EventName.VIEWS_PLOTS_ZOOM_PLOT]: undefined
   [EventName.VIEWS_REORDER_PLOTS_METRICS]: undefined
   [EventName.VIEWS_REORDER_PLOTS_CUSTOM]: undefined
   [EventName.VIEWS_REORDER_PLOTS_TEMPLATES]: undefined
@@ -285,6 +287,8 @@ export interface IEventNamePropertyMapping {
   [EventName.SELECT_FOCUSED_PROJECTS]: undefined
 
   [EventName.CONNECT_SHOW]: undefined
+  [EventName.OPEN_STUDIO_SETTINGS]: undefined
   [EventName.ADD_STUDIO_ACCESS_TOKEN]: undefined
+  [EventName.UPDATE_STUDIO_ACCESS_TOKEN]: undefined
   [EventName.REMOVE_STUDIO_ACCESS_TOKEN]: undefined
 }

@@ -3,7 +3,7 @@ import { CustomPlotsOrderValue } from '../../../../plots/model/custom'
 import {
   CustomPlotsData,
   CustomPlotType,
-  PlotNumberOfItemsPerRow
+  DEFAULT_NB_ITEMS_PER_ROW
 } from '../../../../plots/webview/contract'
 
 export const customPlotsOrderFixture: CustomPlotsOrderValue[] = [
@@ -123,7 +123,7 @@ const data: CustomPlotsData = {
       yTitle: 'summary.json:accuracy'
     }
   ],
-  nbItemsPerRow: PlotNumberOfItemsPerRow.TWO,
+  nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
   height: undefined
 }
 

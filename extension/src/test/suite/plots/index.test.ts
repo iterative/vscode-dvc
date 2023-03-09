@@ -26,7 +26,6 @@ import { dvcDemoPath } from '../../util'
 import {
   DEFAULT_SECTION_COLLAPSED,
   PlotsData as TPlotsData,
-  PlotNumberOfItemsPerRow,
   Section,
   TemplatePlotGroup,
   TemplatePlotsData,
@@ -208,23 +207,20 @@ suite('Plots Test Suite', () => {
       mockMessageReceived.fire({
         payload: {
           height: undefined,
-          nbItemsPerRow: PlotNumberOfItemsPerRow.THREE,
+          nbItemsPerRow: 3,
           section: Section.TEMPLATE_PLOTS
         },
         type: MessageFromWebviewType.RESIZE_PLOTS
       })
 
       expect(mockSetPlotSize).to.be.calledOnce
-      expect(mockSetPlotSize).to.be.calledWithExactly(
-        Section.TEMPLATE_PLOTS,
-        PlotNumberOfItemsPerRow.THREE
-      )
+      expect(mockSetPlotSize).to.be.calledWithExactly(Section.TEMPLATE_PLOTS, 3)
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_PLOTS_SECTION_RESIZED,
         {
           height: undefined,
-          nbItemsPerRow: PlotNumberOfItemsPerRow.THREE,
+          nbItemsPerRow: 3,
           section: Section.TEMPLATE_PLOTS
         },
         undefined

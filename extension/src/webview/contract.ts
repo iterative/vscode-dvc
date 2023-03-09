@@ -66,7 +66,8 @@ export enum MessageFromWebviewType {
   INITIALIZE_GIT = 'initialize-git',
   SHOW_SCM_PANEL = 'show-scm-panel',
   INSTALL_DVC = 'install-dvc',
-  SETUP_WORKSPACE = 'setup-workspace'
+  SETUP_WORKSPACE = 'setup-workspace',
+  ZOOM_PLOT = 'zoom-plot'
 }
 
 export type ColumnResizePayload = {
@@ -236,6 +237,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.OPEN_STUDIO_PROFILE }
   | { type: MessageFromWebviewType.SAVE_STUDIO_TOKEN }
   | { type: MessageFromWebviewType.ADD_CONFIGURATION }
+  | { type: MessageFromWebviewType.ZOOM_PLOT }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA
