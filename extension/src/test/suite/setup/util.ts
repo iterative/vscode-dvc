@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { EventEmitter } from 'vscode'
+import { EventEmitter, commands } from 'vscode'
 import { Disposer } from '@hediet/std/disposable'
 import { fake, stub } from 'sinon'
 import { ensureDirSync } from 'fs-extra'
@@ -66,6 +66,10 @@ export const buildSetup = (
 
   const mockRunSetup = stub(Runner, 'run').resolves(undefined)
 
+  const mockExecuteCommand = stub(commands, 'executeCommand').resolves(
+    undefined
+  )
+
   const setup = disposer.track(
     new Setup(
       new StopWatch(),
@@ -89,6 +93,7 @@ export const buildSetup = (
     internalCommands,
     messageSpy,
     mockAutoInstallDvc,
+    mockExecuteCommand,
     mockGetGitRepositoryRoot,
     mockGlobalVersion,
     mockInitializeGit,

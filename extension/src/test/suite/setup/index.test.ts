@@ -75,11 +75,7 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle an initialize project message from the webview', async () => {
-      const { messageSpy, setup } = buildSetup(disposable)
-
-      const mockExecuteCommand = stub(commands, 'executeCommand').resolves(
-        undefined
-      )
+      const { messageSpy, mockExecuteCommand, setup } = buildSetup(disposable)
 
       const webview = await setup.showWebview()
       await webview.isReady()
@@ -97,14 +93,12 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a check cli compatible message from the webview', async () => {
-      const { messageSpy, setup } = buildSetup(disposable)
+      const { messageSpy, mockExecuteCommand, setup } = buildSetup(disposable)
 
       const webview = await setup.showWebview()
       await webview.isReady()
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
-
-      const mockExecuteCommand = stub(commands, 'executeCommand').resolves(true)
 
       messageSpy.resetHistory()
       mockMessageReceived.fire({
@@ -133,15 +127,11 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a select Python interpreter message from the webview', async () => {
-      const { messageSpy, setup } = buildSetup(disposable)
+      const { messageSpy, mockExecuteCommand, setup } = buildSetup(disposable)
       const setInterpreterCommand = 'python.setInterpreter'
 
       const webview = await setup.showWebview()
       await webview.isReady()
-
-      const mockExecuteCommand = stub(commands, 'executeCommand').resolves(
-        undefined
-      )
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
@@ -154,15 +144,11 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a show source control panel message from the webview', async () => {
-      const { messageSpy, setup } = buildSetup(disposable)
+      const { messageSpy, mockExecuteCommand, setup } = buildSetup(disposable)
       const showScmPanelCommand = 'workbench.view.scm'
 
       const webview = await setup.showWebview()
       await webview.isReady()
-
-      const mockExecuteCommand = stub(commands, 'executeCommand').resolves(
-        undefined
-      )
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
@@ -175,14 +161,12 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a setup the workspace message from the webview', async () => {
-      const { messageSpy, setup } = buildSetup(disposable)
+      const { messageSpy, mockExecuteCommand, setup } = buildSetup(disposable)
 
       const webview = await setup.showWebview()
       await webview.isReady()
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
-
-      const mockExecuteCommand = stub(commands, 'executeCommand').resolves(true)
 
       messageSpy.resetHistory()
       mockMessageReceived.fire({
@@ -500,8 +484,10 @@ suite('Setup Test Suite', () => {
     })
 
     it('should set dvc.pythonPath to the picked value when the user selects to pick a Python interpreter', async () => {
-      const { config, setup, mockVersion } = buildSetup(disposable)
+      const { config, mockVersion, mockExecuteCommand, setup } =
+        buildSetup(disposable)
 
+      mockExecuteCommand.restore()
       stub(config, 'isPythonExtensionInstalled').returns(false)
 
       mockVersion.rejects('do not initialize')
@@ -567,12 +553,10 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set the dvc.cli.incompatible context value', async () => {
-      const { config, mockRunSetup, mockVersion, setup } = buildSetup(
-        disposable,
-        true,
-        false,
-        false
-      )
+      const { config, mockExecuteCommand, mockRunSetup, mockVersion, setup } =
+        buildSetup(disposable, true, false, false)
+
+      mockExecuteCommand.restore()
       mockRunSetup.restore()
       stub(config, 'isPythonExtensionUsed').returns(false)
       stub(config, 'getPythonBinPath').resolves(join('python'))
