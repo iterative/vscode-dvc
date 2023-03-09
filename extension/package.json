@@ -1381,18 +1381,20 @@
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
+          "id": "dvc.views.support",
+          "name": "Support"
+        },
+        {
           "id": "dvc.views.experimentsSortByTree",
           "name": "Sort By",
-          "when": "dvc.commands.available && dvc.project.available"
+          "when": "dvc.commands.available && dvc.project.available",
+          "visibility": "collapsed"
         },
         {
           "id": "dvc.views.experimentsFilterByTree",
           "name": "Filter By",
-          "when": "dvc.commands.available && dvc.project.available"
-        },
-        {
-          "id": "dvc.views.support",
-          "name": "Support"
+          "when": "dvc.commands.available && dvc.project.available",
+          "visibility": "collapsed"
         }
       ]
     },
