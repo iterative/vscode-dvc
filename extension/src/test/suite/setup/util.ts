@@ -72,18 +72,18 @@ export const buildSetup = (
 
   const setup = disposer.track(
     new Setup(
-      new StopWatch(),
       config,
-      { setAvailability: stub() } as unknown as Status,
-      () => Promise.resolve([undefined]),
-      () => undefined,
+      internalCommands,
       {
         columnsChanged: mockEmitter,
         getHasData: () => hasData,
         showWebview: mockOpenExperiments
       } as unknown as WorkspaceExperiments,
-      internalCommands,
+      { setAvailability: stub() } as unknown as Status,
       resourceLocator.dvcIcon,
+      new StopWatch(),
+      () => Promise.resolve([undefined]),
+      () => undefined,
       () => Promise.resolve({} as WorkspaceScale)
     )
   )
@@ -123,18 +123,18 @@ export const buildSetupWithWatchers = async (disposer: Disposer) => {
 
   const setup = disposer.track(
     new Setup(
-      new StopWatch(),
       config,
-      {} as Status,
-      () => Promise.resolve([undefined]),
-      () => undefined,
+      mockInternalCommands,
       {
         columnsChanged: mockEmitter,
         getHasData: () => false,
         showWebview: fake()
       } as unknown as WorkspaceExperiments,
-      mockInternalCommands,
+      {} as Status,
       {} as Resource,
+      new StopWatch(),
+      () => Promise.resolve([undefined]),
+      () => undefined,
       () => Promise.resolve({} as WorkspaceScale)
     )
   )

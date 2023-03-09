@@ -187,14 +187,14 @@ export class Extension extends Disposable {
 
     this.setup = this.dispose.track(
       new Setup(
-        stopWatch,
         config,
+        this.internalCommands,
+        this.experiments,
         status,
+        this.resourceLocator.dvcIcon,
+        stopWatch,
         () => this.initialize(),
         () => this.resetMembers(),
-        this.experiments,
-        this.internalCommands,
-        this.resourceLocator.dvcIcon,
         () =>
           collectWorkspaceScale(
             this.getRoots(),

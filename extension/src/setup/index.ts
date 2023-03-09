@@ -75,14 +75,14 @@ export class Setup
   private dotFolderWatcher?: Disposer
 
   constructor(
-    stopWatch: StopWatch,
     config: Config,
+    internalCommands: InternalCommands,
+    experiments: WorkspaceExperiments,
     status: Status,
+    webviewIcon: Resource,
+    stopWatch: StopWatch,
     initialize: () => Promise<void[]>,
     resetMembers: () => void,
-    experiments: WorkspaceExperiments,
-    internalCommands: InternalCommands,
-    webviewIcon: Resource,
     collectWorkspaceScale: () => Promise<WorkspaceScale>
   ) {
     super(GLOBAL_WEBVIEW_DVCROOT, webviewIcon)
