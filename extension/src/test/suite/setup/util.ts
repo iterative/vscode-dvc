@@ -44,6 +44,9 @@ export const buildSetup = (
   const mockEmitter = disposer.track(new EventEmitter())
   stub(dvcReader, 'root').resolves(mockDvcRoot)
   const mockVersion = stub(dvcReader, 'version').resolves(MIN_CLI_VERSION)
+  const mockGlobalVersion = stub(dvcReader, 'globalVersion').resolves(
+    MIN_CLI_VERSION
+  )
   const mockGetGitRepositoryRoot = stub(
     gitReader,
     'getGitRepositoryRoot'
@@ -87,6 +90,7 @@ export const buildSetup = (
     messageSpy,
     mockAutoInstallDvc,
     mockGetGitRepositoryRoot,
+    mockGlobalVersion,
     mockInitializeGit,
     mockOpenExperiments,
     mockRunSetup,

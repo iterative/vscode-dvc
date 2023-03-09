@@ -135,10 +135,15 @@ export class Setup
   public async getCliVersion(cwd: string, tryGlobalCli?: true) {
     await this.config.isReady()
     try {
+      if (tryGlobalCli) {
+        return await this.internalCommands.executeCommand(
+          AvailableCommands.GLOBAL_VERSION,
+          cwd
+        )
+      }
       return await this.internalCommands.executeCommand(
         AvailableCommands.VERSION,
-        cwd,
-        tryGlobalCli as unknown as string
+        cwd
       )
     } catch {}
   }

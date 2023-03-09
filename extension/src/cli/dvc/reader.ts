@@ -37,6 +37,7 @@ export const isDvcError = <
 export const autoRegisteredCommands = {
   DATA_STATUS: 'dataStatus',
   EXP_SHOW: 'expShow',
+  GLOBAL_VERSION: 'globalVersion',
   PLOTS_DIFF: 'plotsDiff',
   ROOT: 'root',
   STAGE_LIST: 'listStages',
@@ -106,9 +107,13 @@ export class DvcReader extends DvcCli {
     } catch {}
   }
 
-  public version(cwd: string, isCliGlobal?: true): Promise<string> {
+  public version(cwd: string): Promise<string> {
+    return this.executeDvcProcess(cwd, Flag.VERSION)
+  }
+
+  public globalVersion(cwd: string): Promise<string> {
     const options = getOptions(
-      isCliGlobal ? undefined : this.config.getPythonBinPath(),
+      undefined,
       this.config.getCliPath(),
       cwd,
       Flag.VERSION
