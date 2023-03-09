@@ -36,7 +36,7 @@ import { MIN_CLI_VERSION } from '../../../cli/dvc/contract'
 import { run } from '../../../setup/runner'
 import * as Python from '../../../extensions/python'
 
-suite.only('Setup Test Suite', () => {
+suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
 
   beforeEach(() => {
