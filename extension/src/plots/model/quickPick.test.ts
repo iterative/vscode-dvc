@@ -132,6 +132,50 @@ describe('pickMetricAndParam', () => {
     expect(mockedShowError).toHaveBeenCalledTimes(1)
   })
 
+  it('should end early if user does not select a param or a metric', async () => {
+    mockedQuickPickValue
+      .mockResolvedValueOnce({
+        hasChildren: false,
+        label: 'dropout',
+        path: 'params:params.yaml:dropout',
+        type: ColumnType.PARAMS
+      })
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValue(undefined)
+
+    const noParamSelected = await pickMetricAndParam([
+      {
+        hasChildren: false,
+        label: 'dropout',
+        path: 'params:params.yaml:dropout',
+        type: ColumnType.PARAMS
+      },
+      {
+        hasChildren: false,
+        label: 'accuracy',
+        path: 'summary.json:accuracy',
+        type: ColumnType.METRICS
+      }
+    ])
+    expect(noParamSelected).toBeUndefined()
+
+    const noMetricSelected = await pickMetricAndParam([
+      {
+        hasChildren: false,
+        label: 'dropout',
+        path: 'params:params.yaml:dropout',
+        type: ColumnType.PARAMS
+      },
+      {
+        hasChildren: false,
+        label: 'accuracy',
+        path: 'summary.json:accuracy',
+        type: ColumnType.METRICS
+      }
+    ])
+    expect(noMetricSelected).toBeUndefined()
+  })
+
   it('should return a metric and a param if both are selected by the user', async () => {
     const expectedMetric = {
       label: 'loss',
@@ -173,6 +217,26 @@ describe('pickMetric', () => {
     const undef = await pickMetric([])
     expect(undef).toBeUndefined()
     expect(mockedShowError).toHaveBeenCalledTimes(1)
+  })
+
+  it('should end early if user does not select a metric', async () => {
+    mockedQuickPickValue.mockResolvedValue(undefined)
+
+    const noMetricSelected = await pickMetricAndParam([
+      {
+        hasChildren: false,
+        label: 'dropout',
+        path: 'params:params.yaml:dropout',
+        type: ColumnType.PARAMS
+      },
+      {
+        hasChildren: false,
+        label: 'accuracy',
+        path: 'summary.json:accuracy',
+        type: ColumnType.METRICS
+      }
+    ])
+    expect(noMetricSelected).toBeUndefined()
   })
 
   it('should return a metric', async () => {
