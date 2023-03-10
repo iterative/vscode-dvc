@@ -75,7 +75,6 @@ export class PlotsModel extends ModelWithPersistence {
 
   private customCheckpointPlots?: CustomCheckpointPlots
   private customPlots?: CustomPlot[]
-  private selectedMetrics?: string[]
 
   constructor(
     dvcRoot: string,
@@ -96,11 +95,6 @@ export class PlotsModel extends ModelWithPersistence {
       DEFAULT_SECTION_COLLAPSED
     )
     this.comparisonOrder = this.revive(PersistenceKey.PLOT_COMPARISON_ORDER, [])
-    this.selectedMetrics = this.revive(
-      PersistenceKey.PLOT_SELECTED_METRICS,
-      undefined
-    )
-
     this.customPlotsOrder = this.revive(PersistenceKey.PLOTS_CUSTOM_ORDER, [])
   }
 
@@ -357,18 +351,6 @@ export class PlotsModel extends ModelWithPersistence {
 
   public getSelectedRevisions() {
     return this.experiments.getSelectedRevisions().map(({ label }) => label)
-  }
-
-  public setSelectedMetrics(selectedMetrics: string[]) {
-    this.selectedMetrics = selectedMetrics
-    this.persist(
-      PersistenceKey.PLOT_SELECTED_METRICS,
-      this.getSelectedMetrics()
-    )
-  }
-
-  public getSelectedMetrics() {
-    return this.selectedMetrics
   }
 
   public setNbItemsPerRow(section: Section, nbItemsPerRow: number) {

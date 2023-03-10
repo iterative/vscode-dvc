@@ -88,14 +88,6 @@ export type CheckpointPlot = {
 
 export type CheckpointPlotData = CheckpointPlot & { yTitle: string }
 
-export type CheckpointPlotsData = {
-  plots: CheckpointPlotData[]
-  colors: ColorScale
-  nbItemsPerRow: number
-  height: number | undefined
-  selectedMetrics?: string[]
-}
-
 export type MetricVsParamPlot = {
   id: string
   values: MetricVsParamPlotValues[]

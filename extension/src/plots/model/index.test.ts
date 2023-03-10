@@ -45,15 +45,6 @@ describe('plotsModel', () => {
     jest.clearAllMocks()
   })
 
-  it('should change the selectedMetrics when calling setSelectedMetrics', () => {
-    expect(model.getSelectedMetrics()).toStrictEqual(persistedSelectedMetrics)
-
-    const newSelectedMetrics = ['one', 'two', 'four', 'hundred']
-    model.setSelectedMetrics(newSelectedMetrics)
-
-    expect(model.getSelectedMetrics()).toStrictEqual(newSelectedMetrics)
-  })
-
   it('should change the plotSize when calling setPlotSize', () => {
     expect(model.getNbItemsPerRow(Section.CUSTOM_PLOTS)).toStrictEqual(
       DEFAULT_NB_ITEMS_PER_ROW
