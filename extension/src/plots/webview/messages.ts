@@ -32,8 +32,7 @@ import { Title } from '../../vscode/title'
 import { ColumnType } from '../../experiments/webview/contract'
 import { FILE_SEPARATOR } from '../../experiments/columns/paths'
 import { reorderObjectList } from '../../util/array'
-import { isCheckpointPlot } from '../model/collect'
-import { CustomPlotsOrderValue } from '../model/custom'
+import { CustomPlotsOrderValue, isCheckpointValue } from '../model/custom'
 
 export class WebviewMessages {
   private readonly paths: PathsModel
@@ -130,7 +129,7 @@ export class WebviewMessages {
     }
 
     const plotAlreadyExists = this.plots.getCustomPlotsOrder().find(value => {
-      if (value.type === CustomPlotType.CHECKPOINT) {
+      if (isCheckpointValue(value)) {
         return
       }
       return (
@@ -215,7 +214,7 @@ export class WebviewMessages {
     }
 
     const plotAlreadyExists = this.plots.getCustomPlotsOrder().find(value => {
-      if (value.type === CustomPlotType.CHECKPOINT) {
+      if (isCheckpointValue(value)) {
         return value.metric === metric
       }
     })
@@ -281,7 +280,7 @@ export class WebviewMessages {
       customPlots,
       'id'
     ).map(plot =>
-      isCheckpointPlot(plot)
+      isCheckpointValue(plot)
         ? {
             metric: buildMetricOrParamPath(ColumnType.METRICS, plot.metric),
             type: CustomPlotType.CHECKPOINT

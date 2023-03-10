@@ -1,4 +1,4 @@
-import { CustomPlotType } from '../webview/contract'
+import { CheckpointPlot, CustomPlot, CustomPlotType } from '../webview/contract'
 
 type CheckpointValue = {
   type: CustomPlotType.CHECKPOINT
@@ -12,3 +12,10 @@ type MetricVsParamValue = {
 }
 
 export type CustomPlotsOrderValue = CheckpointValue | MetricVsParamValue
+
+export const isCheckpointValue = (
+  value: CustomPlotsOrderValue
+): value is CheckpointValue => value.type === CustomPlotType.CHECKPOINT
+
+export const isCheckpointPlot = (plot: CustomPlot): plot is CheckpointPlot =>
+  plot.type === CustomPlotType.CHECKPOINT

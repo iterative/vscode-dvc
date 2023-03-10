@@ -24,7 +24,7 @@ import { WebviewMessages } from '../../../plots/webview/messages'
 import { ExperimentsModel } from '../../../experiments/model'
 import { Experiment } from '../../../experiments/webview/contract'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
-import { CustomPlotType } from '../../../plots/webview/contract'
+import { isCheckpointPlot } from '../../../plots/model/custom'
 
 export const buildPlots = async (
   disposer: Disposer,
@@ -146,10 +146,9 @@ export const getExpectedCustomPlotsData = (
       nbItemsPerRow,
       plots: plots.map(plot => ({
         ...plot,
-        values:
-          plot.type === CustomPlotType.CHECKPOINT
-            ? plot.values.filter(value => domain.includes(value.group))
-            : plot.values
+        values: isCheckpointPlot(plot)
+          ? plot.values.filter(value => domain.includes(value.group))
+          : plot.values
       }))
     }
   }

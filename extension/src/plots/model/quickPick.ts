@@ -1,5 +1,5 @@
 import { getCustomPlotId } from './collect'
-import { CustomPlotsOrderValue } from './custom'
+import { CustomPlotsOrderValue, isCheckpointValue } from './custom'
 import { splitColumnPath } from '../../experiments/columns/paths'
 import { pickFromColumnLikes } from '../../experiments/columns/quickPick'
 import { Column, ColumnType } from '../../experiments/webview/contract'
@@ -53,7 +53,7 @@ export const pickCustomPlots = (
   }
 
   const plotsItems = plots.map(plot =>
-    plot.type === CustomPlotType.CHECKPOINT
+    isCheckpointValue(plot)
       ? getCheckpointPlotItem(plot.metric)
       : getMetricVsParamPlotItem(plot.metric, plot.param)
   )

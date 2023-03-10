@@ -1,10 +1,9 @@
 import {
-  CheckpointPlotData,
   ColorScale,
   CustomPlotData,
-  CustomPlotType,
   Section
 } from 'dvc/src/plots/webview/contract'
+import { isCheckpointPlot } from 'dvc/src/plots/model/custom'
 import React, { useMemo, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { createMetricVsParamSpec, createCheckpointSpec } from './util'
@@ -17,10 +16,6 @@ import { PlotsState } from '../../store'
 
 interface CustomPlotProps {
   id: string
-}
-
-const isCheckpointPlot = (plot: CustomPlotData): plot is CheckpointPlotData => {
-  return plot.type === CustomPlotType.CHECKPOINT
 }
 
 const createCustomPlotSpec = (

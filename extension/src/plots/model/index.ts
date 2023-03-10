@@ -12,11 +12,10 @@ import {
   collectOverrideRevisionDetails,
   collectCustomPlotsData,
   getCustomPlotId,
-  collectCustomCheckpointPlotData,
-  isCheckpointPlot
+  collectCustomCheckpointPlotData
 } from './collect'
 import { getRevisionFirstThreeColumns } from './util'
-import { CustomPlotsOrderValue } from './custom'
+import { CustomPlotsOrderValue, isCheckpointPlot } from './custom'
 import {
   CheckpointPlot,
   ComparisonPlots,

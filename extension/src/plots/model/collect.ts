@@ -3,12 +3,11 @@ import get from 'lodash.get'
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
 import { CustomCheckpointPlots } from '.'
-import { CustomPlotsOrderValue } from './custom'
+import { CustomPlotsOrderValue, isCheckpointValue } from './custom'
 import { getRevisionFirstThreeColumns } from './util'
 import {
   ColorScale,
   CheckpointPlotValues,
-  CheckpointPlot,
   isImagePlot,
   ImagePlot,
   TemplatePlot,
@@ -217,7 +216,7 @@ const collectFromExperimentsObject = (
 }
 
 export const getCustomPlotId = (plot: CustomPlotsOrderValue) =>
-  plot.type === CustomPlotType.CHECKPOINT
+  isCheckpointValue(plot)
     ? `custom-${plot.metric}`
     : `custom-${plot.metric}-${plot.param}`
 
@@ -258,10 +257,6 @@ export const collectCustomCheckpointPlotData = (
   }
 
   return plotsData
-}
-
-export const isCheckpointPlot = (plot: CustomPlot): plot is CheckpointPlot => {
-  return plot.type === CustomPlotType.CHECKPOINT
 }
 
 const collectMetricVsParamPlotData = (
@@ -306,7 +301,7 @@ export const collectCustomPlotsData = (
 ): CustomPlot[] => {
   return plotsOrderValues
     .map((plotOrderValue): CustomPlot => {
-      if (plotOrderValue.type === CustomPlotType.CHECKPOINT) {
+      if (isCheckpointValue(plotOrderValue)) {
         const { metric } = plotOrderValue
         return checkpointPlots[metric.slice(ColumnType.METRICS.length + 1)]
       }
