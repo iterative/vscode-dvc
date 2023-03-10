@@ -56,6 +56,7 @@ import { LanguageClient } from './languageClient'
 import { collectRunningExperimentPids } from './experiments/processExecution/collect'
 import { registerPatchCommand } from './patch'
 import { DvcViewer } from './cli/dvc/viewer'
+import { registerPersistenceCommands } from './persistence/register'
 export class Extension extends Disposable {
   protected readonly internalCommands: InternalCommands
 
@@ -286,6 +287,8 @@ export class Extension extends Disposable {
         }
       ).contributes.walkthroughs[0].id
     )
+
+    registerPersistenceCommands(context.workspaceState, this.internalCommands)
 
     void showWalkthroughOnFirstUse(env.isNewAppInstall)
     this.dispose.track(recommendRedHatExtensionOnce())

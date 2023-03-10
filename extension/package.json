@@ -558,6 +558,11 @@
         "command": "dvc.views.plotsPathsTree.refreshPlots",
         "category": "DVC",
         "icon": "$(refresh)"
+      },
+      {
+        "title": "Reset Persisted State and Reload Window",
+        "command": "dvc.resetState",
+        "category": "DVC"
       }
     ],
     "configuration": {
