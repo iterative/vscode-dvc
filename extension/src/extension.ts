@@ -56,7 +56,7 @@ import { LanguageClient } from './languageClient'
 import { collectRunningExperimentPids } from './experiments/processExecution/collect'
 import { registerPatchCommand } from './patch'
 import { DvcViewer } from './cli/dvc/viewer'
-import { PersistenceKey } from './persistence/constants'
+import { registerPersistenceCommands } from './persistence/register'
 export class Extension extends Disposable {
   protected readonly internalCommands: InternalCommands
 
@@ -73,7 +73,6 @@ export class Extension extends Disposable {
   private readonly dvcViewer: DvcViewer
   private readonly gitExecutor: GitExecutor
   private readonly gitReader: GitReader
-  private readonly context: ExtensionContext
 
   private updatesPaused: EventEmitter<boolean> = this.dispose.track(
     new EventEmitter<boolean>()
@@ -82,7 +81,6 @@ export class Extension extends Disposable {
   constructor(context: ExtensionContext) {
     super()
 
-    this.context = context
     const stopWatch = new StopWatch()
 
     this.dispose.track(getTelemetryReporter())
@@ -290,15 +288,12 @@ export class Extension extends Disposable {
       ).contributes.walkthroughs[0].id
     )
 
+    registerPersistenceCommands(context.workspaceState, this.internalCommands)
+
     void showWalkthroughOnFirstUse(env.isNewAppInstall)
     this.dispose.track(recommendRedHatExtensionOnce())
 
     this.dispose.track(new LanguageClient())
-
-    this.internalCommands.registerExternalCommand(
-      RegisteredCommands.RESET_STATE,
-      () => this.resetState()
-    )
   }
 
   public async initialize() {
@@ -336,21 +331,6 @@ export class Extension extends Disposable {
 
   private getRoots() {
     return this.setup.getRoots()
-  }
-
-  private async resetState() {
-    const dvcRoots = this.getRoots()
-
-    for (const dvcRoot of dvcRoots) {
-      for (const persistenceKey of Object.values(PersistenceKey)) {
-        await this.context.workspaceState.update(
-          persistenceKey + dvcRoot,
-          undefined
-        )
-      }
-    }
-
-    await commands.executeCommand('workbench.action.reloadWindow')
   }
 }
 
