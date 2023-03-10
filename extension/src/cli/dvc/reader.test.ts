@@ -12,6 +12,7 @@ import { getProcessEnv } from '../../env'
 import expShowFixture from '../../test/fixtures/expShow/base/output'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output/minimal'
 import { Config } from '../../config'
+import { joinEnvPath } from '../../util/env'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -273,7 +274,7 @@ describe('CliReader', () => {
         cwd,
         env: {
           ...mockedEnv,
-          PATH: [mockedPythonPath, mockedEnv.PATH].join(':')
+          PATH: joinEnvPath(mockedPythonPath, mockedEnv.PATH)
         },
         executable: mockedPythonBinPath
       })
