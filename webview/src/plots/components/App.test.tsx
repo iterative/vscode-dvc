@@ -500,7 +500,7 @@ describe('App', () => {
 
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: { [Section.CHECKPOINT_PLOTS]: true },
-      type: MessageFromWebviewType.TOGGLE_SECTION
+      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
 
     sendSetDataMessage({
@@ -530,7 +530,7 @@ describe('App', () => {
 
     expect(mockPostMessage).not.toHaveBeenCalledWith({
       payload: { [Section.CHECKPOINT_PLOTS]: true },
-      type: MessageFromWebviewType.TOGGLE_SECTION
+      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
 
     clearSelection()
@@ -541,7 +541,7 @@ describe('App', () => {
 
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: { [Section.CHECKPOINT_PLOTS]: true },
-      type: MessageFromWebviewType.TOGGLE_SECTION
+      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
   })
 
@@ -567,7 +567,7 @@ describe('App', () => {
 
     expect(mockPostMessage).not.toHaveBeenCalledWith({
       payload: { [Section.CHECKPOINT_PLOTS]: true },
-      type: MessageFromWebviewType.TOGGLE_SECTION
+      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
 
     fireEvent.click(checkpointsTooltipToggle, {
@@ -577,7 +577,7 @@ describe('App', () => {
 
     expect(mockPostMessage).not.toHaveBeenCalledWith({
       payload: { [Section.CHECKPOINT_PLOTS]: true },
-      type: MessageFromWebviewType.TOGGLE_SECTION
+      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
   })
 
@@ -599,7 +599,7 @@ describe('App', () => {
 
     expect(mockPostMessage).not.toHaveBeenCalledWith({
       payload: { [Section.CHECKPOINT_PLOTS]: true },
-      type: MessageFromWebviewType.TOGGLE_SECTION
+      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
 
     clearSelection()
@@ -610,7 +610,7 @@ describe('App', () => {
 
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: { [Section.CHECKPOINT_PLOTS]: true },
-      type: MessageFromWebviewType.TOGGLE_SECTION
+      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
   })
 

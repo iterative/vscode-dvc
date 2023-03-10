@@ -1,12 +1,10 @@
 import React, { MouseEvent } from 'react'
 import { Section as PlotsSection } from 'dvc/src/plots/webview/contract'
-import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import styles from './styles.module.scss'
 import { Icon } from '../Icon'
 import { ChevronDown, ChevronRight, Info } from '../icons'
 import { isSelecting } from '../../../util/strings'
 import { isTooltip } from '../../../util/helpers'
-import { sendMessage } from '../../vscode'
 import Tooltip from '../tooltip/Tooltip'
 import { IconMenu } from '../iconMenu/IconMenu'
 import { IconMenuItemProps } from '../iconMenu/IconMenuItem'
@@ -60,11 +58,12 @@ export const SectionDescription = {
 } as const
 
 export interface SectionContainerProps<T extends PlotsSection> {
+  children: React.ReactNode
+  menuItems: IconMenuItemProps[]
+  onToggleSection: () => void
   sectionCollapsed: boolean
   sectionKey: T
   title: string
-  children: React.ReactNode
-  menuItems: IconMenuItemProps[]
 }
 
 const InfoIcon = () => (
@@ -73,7 +72,14 @@ const InfoIcon = () => (
 
 export const SectionContainer: React.FC<
   SectionContainerProps<PlotsSection>
-> = ({ sectionCollapsed, sectionKey, title, children, menuItems }) => {
+> = ({
+  children,
+  menuItems,
+  onToggleSection,
+  sectionCollapsed,
+  sectionKey,
+  title
+}) => {
   const open = !sectionCollapsed
 
   const tooltipContent = (
@@ -89,12 +95,7 @@ export const SectionContainer: React.FC<
       !isSelecting([title, SectionDescription[sectionKey].props.children]) &&
       !isTooltip(e.target as Element, ['SUMMARY', 'BODY'])
     ) {
-      sendMessage({
-        payload: {
-          [sectionKey]: !sectionCollapsed
-        },
-        type: MessageFromWebviewType.TOGGLE_SECTION
-      })
+      onToggleSection()
     }
   }
 

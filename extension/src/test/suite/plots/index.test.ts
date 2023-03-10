@@ -281,7 +281,7 @@ suite('Plots Test Suite', () => {
       messageSpy.resetHistory()
       mockMessageReceived.fire({
         payload: mockSectionCollapsed,
-        type: MessageFromWebviewType.TOGGLE_SECTION
+        type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
       })
 
       expect(mockSetSectionCollapsed).to.be.calledOnce

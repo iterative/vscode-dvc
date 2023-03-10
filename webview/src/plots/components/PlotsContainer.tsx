@@ -97,12 +97,21 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     [dispatch, changeNbItemsPerRow, sectionKey]
   )
 
+  const toggleSection = () =>
+    sendMessage({
+      payload: {
+        [sectionKey]: !sectionCollapsed
+      },
+      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
+    })
+
   return (
     <SectionContainer
       menuItems={menuItems}
       sectionCollapsed={sectionCollapsed}
       sectionKey={sectionKey}
       title={title}
+      onToggleSection={toggleSection}
     >
       {changeNbItemsPerRow && hasItems && maxNbPlotsPerRow > 1 && (
         <div
