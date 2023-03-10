@@ -33,7 +33,7 @@ const getMetricVsParamPlotItem = (metric: string, param: string) => {
 const getCheckpointPlotItem = (metric: string) => {
   const splitMetric = splitColumnPath(metric)
   return {
-    description: 'Trend Plot',
+    description: 'Checkpoint Trend Plot',
     detail: metric,
     label: splitMetric[splitMetric.length - 1],
     value: getCustomPlotId({
@@ -73,7 +73,7 @@ export const pickCustomPlotType = (): Thenable<CustomPlotType | undefined> => {
       {
         description:
           'A linear plot that shows how a chosen metric changes over selected experiments.',
-        label: 'Trend',
+        label: 'Checkpoint Trend',
         value: CustomPlotType.CHECKPOINT
       }
     ],

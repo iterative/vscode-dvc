@@ -67,7 +67,7 @@ describe('pickCustomPlots', () => {
     expect(mockedQuickPickManyValues).toHaveBeenCalledWith(
       [
         {
-          description: 'Trend Plot',
+          description: 'Checkpoint Trend Plot',
           detail: 'metrics:summary.json:loss',
           label: 'loss',
           value: 'custom-metrics:summary.json:loss'
@@ -113,7 +113,7 @@ describe('pickCustomPlotType', () => {
         {
           description:
             'A linear plot that shows how a chosen metric changes over selected experiments.',
-          label: 'Trend',
+          label: 'Checkpoint Trend',
           value: CustomPlotType.CHECKPOINT
         }
       ],

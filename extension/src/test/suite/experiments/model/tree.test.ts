@@ -114,7 +114,7 @@ suite('Experiments Tree Test Suite', () => {
 
       expect(
         messageSpy,
-        'when there are no experiments selected we dont send trend type plots'
+        'when there are no experiments selected we dont send checkpoint type plots'
       ).to.be.calledWithMatch({
         comparison: null,
         custom: {
