@@ -58,6 +58,7 @@ import { registerPatchCommand } from './patch'
 import { DvcViewer } from './cli/dvc/viewer'
 import { registerSetupCommands } from './setup/register'
 import { Status } from './status'
+
 export class Extension extends Disposable {
   protected readonly internalCommands: InternalCommands
 
