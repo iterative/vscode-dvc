@@ -605,5 +605,33 @@ suite('Setup Test Suite', () => {
         'should warn the user if the CLI throws an error'
       ).to.be.calledOnce
     })
+
+    it('should call the CLI to see if there is a global version of DVC available if the Python version fails', async () => {
+      const {
+        config,
+        mockExecuteCommand,
+        mockGlobalVersion,
+        mockRunSetup,
+        mockVersion,
+        setup
+      } = buildSetup(disposable, true, false, false)
+
+      mockExecuteCommand.restore()
+      mockRunSetup.restore()
+      stub(config, 'isPythonExtensionUsed').returns(true)
+
+      mockVersion.resetBehavior()
+      mockVersion.rejects(new Error('no CLI here'))
+
+      const executeCommandSpy = spy(commands, 'executeCommand')
+      await run(setup)
+
+      expect(mockVersion).to.be.calledOnce
+      expect(mockGlobalVersion).to.be.calledOnce
+      expect(
+        executeCommandSpy,
+        'should set dvc.cli.incompatible to false if the version is compatible'
+      ).to.be.calledWithExactly('setContext', 'dvc.cli.incompatible', false)
+    })
   })
 })
