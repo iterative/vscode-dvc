@@ -111,6 +111,12 @@ export class WebviewMessages {
         return this.attemptToRefreshSelectedData(message.payload)
       case MessageFromWebviewType.TOGGLE_EXPERIMENT:
         return this.setExperimentStatus(message.payload)
+      case MessageFromWebviewType.ZOOM_PLOT:
+        return sendTelemetryEvent(
+          EventName.VIEWS_PLOTS_ZOOM_PLOT,
+          undefined,
+          undefined
+        )
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
