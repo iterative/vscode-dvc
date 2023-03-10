@@ -289,9 +289,15 @@ $gap: 20px;
 }
 
 .nbItemsPerRowSlider {
+  position: sticky;
+  right: 0;
+  top: 0;
+  width: 100%;
   display: flex;
   justify-content: end;
-  margin: 20px;
+  padding: 20px;
+  background-color: $bg-color;
+  z-index: 3;
 }
 
 :global(.has-actions) {
