@@ -737,7 +737,7 @@ describe('App', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('should send a message to the extension with the selected size when changing the size of plots', () => {
+  it('should send a message to the extension with the selected size when changing the width of plots', () => {
     const store = renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
     })
@@ -745,13 +745,34 @@ describe('App', () => {
 
     const plotResizer = within(
       screen.getByTestId('nb-items-per-row-slider')
-    ).getByRole('slider')
+    ).getAllByRole('slider')[0]
 
     fireEvent.change(plotResizer, { target: { value: -3 } })
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: {
-        height: undefined,
+        height: 1,
         nbItemsPerRow: 3,
+        section: Section.CHECKPOINT_PLOTS
+      },
+      type: MessageFromWebviewType.RESIZE_PLOTS
+    })
+  })
+
+  it('should send a message to the extension with the selected size when changing the height of plots', () => {
+    const store = renderAppWithOptionalData({
+      checkpoint: checkpointPlotsFixture
+    })
+    setWrapperSize(store)
+
+    const plotResizer = within(
+      screen.getByTestId('nb-items-per-row-slider')
+    ).getAllByRole('slider')[1]
+
+    fireEvent.change(plotResizer, { target: { value: 3 } })
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      payload: {
+        height: 3,
+        nbItemsPerRow: 2,
         section: Section.CHECKPOINT_PLOTS
       },
       type: MessageFromWebviewType.RESIZE_PLOTS
