@@ -86,7 +86,7 @@ export class WebviewMessages {
           message.payload.nbItemsPerRow,
           message.payload.height
         )
-      case MessageFromWebviewType.TOGGLE_PLOTS_SECTION:
+      case MessageFromWebviewType.TOGGLE_SECTION:
         return this.setSectionCollapsed(message.payload)
       case MessageFromWebviewType.REORDER_PLOTS_COMPARISON:
         return this.setComparisonOrder(message.payload)

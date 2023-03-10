@@ -40,7 +40,6 @@ import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { VisualizationSpec } from 'react-vega'
 import { App } from './App'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
-import { SectionDescription } from './PlotsContainer'
 import {
   CheckpointPlotsById,
   plotDataStore,
@@ -55,6 +54,7 @@ import {
   dragEnter,
   dragLeave
 } from '../../test/dragDrop'
+import { SectionDescription } from '../../shared/components/sectionContainer/SectionContainer'
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
 import { clearSelection, createWindowTextSelection } from '../../test/selection'
 import * as EventCurrentTargetDistances from '../../shared/components/dragDrop/currentTarget'
@@ -163,7 +163,7 @@ describe('App', () => {
 
   const getCheckpointMenuItem = (position: number) =>
     within(
-      screen.getAllByTestId('plots-container')[
+      screen.getAllByTestId('section-container')[
         sectionPosition[Section.CHECKPOINT_PLOTS]
       ]
     ).getAllByTestId('icon-menu-item')[position]
@@ -500,7 +500,7 @@ describe('App', () => {
 
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: { [Section.CHECKPOINT_PLOTS]: true },
-      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
+      type: MessageFromWebviewType.TOGGLE_SECTION
     })
 
     sendSetDataMessage({
@@ -530,7 +530,7 @@ describe('App', () => {
 
     expect(mockPostMessage).not.toHaveBeenCalledWith({
       payload: { [Section.CHECKPOINT_PLOTS]: true },
-      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
+      type: MessageFromWebviewType.TOGGLE_SECTION
     })
 
     clearSelection()
@@ -541,7 +541,7 @@ describe('App', () => {
 
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: { [Section.CHECKPOINT_PLOTS]: true },
-      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
+      type: MessageFromWebviewType.TOGGLE_SECTION
     })
   })
 
@@ -567,7 +567,7 @@ describe('App', () => {
 
     expect(mockPostMessage).not.toHaveBeenCalledWith({
       payload: { [Section.CHECKPOINT_PLOTS]: true },
-      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
+      type: MessageFromWebviewType.TOGGLE_SECTION
     })
 
     fireEvent.click(checkpointsTooltipToggle, {
@@ -577,7 +577,7 @@ describe('App', () => {
 
     expect(mockPostMessage).not.toHaveBeenCalledWith({
       payload: { [Section.CHECKPOINT_PLOTS]: true },
-      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
+      type: MessageFromWebviewType.TOGGLE_SECTION
     })
   })
 
@@ -599,7 +599,7 @@ describe('App', () => {
 
     expect(mockPostMessage).not.toHaveBeenCalledWith({
       payload: { [Section.CHECKPOINT_PLOTS]: true },
-      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
+      type: MessageFromWebviewType.TOGGLE_SECTION
     })
 
     clearSelection()
@@ -610,7 +610,7 @@ describe('App', () => {
 
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: { [Section.CHECKPOINT_PLOTS]: true },
-      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
+      type: MessageFromWebviewType.TOGGLE_SECTION
     })
   })
 
@@ -899,7 +899,7 @@ describe('App', () => {
     })
 
     const [pickerButton] = within(
-      screen.getAllByTestId('plots-container')[
+      screen.getAllByTestId('section-container')[
         sectionPosition[Section.CHECKPOINT_PLOTS]
       ]
     ).queryAllByTestId('icon-menu-item')

@@ -54,7 +54,7 @@ export enum MessageFromWebviewType {
   SHARE_EXPERIMENT_AS_BRANCH = 'share-experiment-as-branch',
   SHARE_EXPERIMENT_AS_COMMIT = 'share-experiment-as-commit',
   TOGGLE_METRIC = 'toggle-metric',
-  TOGGLE_PLOTS_SECTION = 'toggle-plots-section',
+  TOGGLE_SECTION = 'toggle-section',
   REMOVE_CUSTOM_PLOTS = 'remove-custom-plots',
   REMOVE_STUDIO_TOKEN = 'remove-studio-token',
   MODIFY_EXPERIMENT_PARAMS_AND_QUEUE = 'modify-experiment-params-and-queue',
@@ -189,7 +189,7 @@ export type MessageFromWebview =
       payload: PlotsResizedPayload
     }
   | {
-      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
+      type: MessageFromWebviewType.TOGGLE_SECTION
       payload: Partial<SectionCollapsed>
     }
   | {
