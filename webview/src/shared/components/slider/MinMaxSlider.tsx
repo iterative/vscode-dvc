@@ -1,4 +1,4 @@
-import React, { FormEvent } from 'react'
+import React from 'react'
 import { Slider } from './Slider'
 
 interface MinMaxSliderProps {
@@ -17,19 +17,13 @@ export const MinMaxSlider: React.FC<MinMaxSliderProps> = ({
   defaultValue,
   label,
   onChange
-}) => {
-  const handleOnChange = (e: FormEvent<HTMLInputElement>) => {
-    onChange(Number.parseFloat(e.currentTarget.value))
-  }
-
-  return (
-    <Slider
-      min={minimum}
-      max={maximum}
-      step={step}
-      defaultValue={defaultValue}
-      onChange={handleOnChange}
-      label={label}
-    />
-  )
-}
+}) => (
+  <Slider
+    min={minimum}
+    max={maximum}
+    step={step}
+    defaultValue={defaultValue}
+    onValueChange={onChange}
+    label={label}
+  />
+)

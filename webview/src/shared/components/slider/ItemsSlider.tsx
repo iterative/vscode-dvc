@@ -1,4 +1,4 @@
-import React, { FormEvent } from 'react'
+import React from 'react'
 import { Slider } from './Slider'
 
 interface ItemSliderProps {
@@ -13,26 +13,20 @@ export const ItemsSlider: React.FC<ItemSliderProps> = ({
   defaultValue,
   label,
   onChange
-}) => {
-  const handleOnChange = (e: FormEvent<HTMLInputElement>) => {
-    onChange(Number.parseFloat(e.currentTarget.value))
-  }
-
-  return (
-    <>
-      <Slider
-        min={items[0]}
-        max={items.reverse()[0]}
-        list="items"
-        defaultValue={defaultValue}
-        onChange={handleOnChange}
-        label={label}
-      />
-      <datalist id="items">
-        {items.map(item => (
-          <option key={item} value={item}></option>
-        ))}
-      </datalist>
-    </>
-  )
-}
+}) => (
+  <>
+    <Slider
+      min={items[0]}
+      max={items.reverse()[0]}
+      list="items"
+      defaultValue={defaultValue}
+      onValueChange={onChange}
+      label={label}
+    />
+    <datalist id="items">
+      {items.map(item => (
+        <option key={item} value={item}></option>
+      ))}
+    </datalist>
+  </>
+)
