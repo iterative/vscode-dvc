@@ -8,3 +8,13 @@ export type SetupData = {
   projectInitialized: boolean
   pythonBinPath: string | undefined
 }
+
+export enum Section {
+  EXPERIMENTS = 'experiments'
+}
+
+export const DEFAULT_SECTION_COLLAPSED = {
+  [Section.EXPERIMENTS]: false
+}
+
+export type SectionCollapsed = typeof DEFAULT_SECTION_COLLAPSED
