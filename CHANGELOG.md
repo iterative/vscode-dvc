@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.17] - 2023-03-10
+
+### 🚀 New Features and Enhancements
+
+- Move filter by and sort by views to the bottom and collapse for new users [#3431](https://github.com/iterative/vscode-dvc/pull/3431) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Hide Studio view during onboarding process/startup [#3432](https://github.com/iterative/vscode-dvc/pull/3432) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Add zoom plot telemetry event [#3433](https://github.com/iterative/vscode-dvc/pull/3433) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (2.47.0) [#3438](https://github.com/iterative/vscode-dvc/pull/3438) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.6.16] - 2023-03-08
 
 ### 🚀 New Features and Enhancements
