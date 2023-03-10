@@ -1,19 +1,14 @@
-import { SetupData } from 'dvc/src/setup/webview/contract'
 import {
-  MessageFromWebviewType,
-  MessageToWebview
-} from 'dvc/src/webview/contract'
+  DEFAULT_SECTION_COLLAPSED,
+  Section,
+  SetupData
+} from 'dvc/src/setup/webview/contract'
+import { MessageToWebview } from 'dvc/src/webview/contract'
 import React, { useCallback, useState } from 'react'
-import { CliIncompatible } from './CliIncompatible'
-import { CliUnavailable } from './CliUnavailable'
-import { ProjectUninitialized } from './ProjectUninitialized'
-import { NoData } from './NoData'
-import { NeedsGitCommit } from './NeedsGitCommit'
+import { SetupExperiments } from './Experiments'
+import { SectionContainer } from '../../shared/components/sectionContainer/SectionContainer'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
-import { sendMessage } from '../../shared/vscode'
-import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 export const App: React.FC = () => {
   const [cliCompatible, setCliCompatible] = useState<boolean | undefined>(
     undefined
@@ -32,6 +27,9 @@ export const App: React.FC = () => {
   const [isPythonExtensionInstalled, setIsPythonExtensionInstalled] =
     useState<boolean>(false)
   const [hasData, setHasData] = useState<boolean | undefined>(false)
+  const [sectionCollapsed, setSectionCollapsed] = useState<
+    typeof DEFAULT_SECTION_COLLAPSED
+  >(DEFAULT_SECTION_COLLAPSED)
 
   useVsCodeMessaging(
     useCallback(
@@ -58,76 +56,28 @@ export const App: React.FC = () => {
     )
   )
 
-  const checkCompatibility = () => {
-    sendMessage({ type: MessageFromWebviewType.CHECK_CLI_COMPATIBLE })
-  }
-
-  const initializeGit = () => {
-    sendMessage({
-      type: MessageFromWebviewType.INITIALIZE_GIT
-    })
-  }
-
-  const initializeDvc = () => {
-    sendMessage({
-      type: MessageFromWebviewType.INITIALIZE_DVC
-    })
-  }
-
-  const showScmPanel = () => {
-    sendMessage({ type: MessageFromWebviewType.SHOW_SCM_PANEL })
-  }
-
-  const installDvc = () => {
-    sendMessage({ type: MessageFromWebviewType.INSTALL_DVC })
-  }
-
-  const selectPythonInterpreter = () => {
-    sendMessage({ type: MessageFromWebviewType.SELECT_PYTHON_INTERPRETER })
-  }
-
-  const setupWorkspace = () => {
-    sendMessage({ type: MessageFromWebviewType.SETUP_WORKSPACE })
-  }
-
-  if (cliCompatible === false) {
-    return <CliIncompatible checkCompatibility={checkCompatibility} />
-  }
-
-  if (cliCompatible === undefined) {
-    return (
-      <CliUnavailable
-        installDvc={installDvc}
-        isPythonExtensionInstalled={isPythonExtensionInstalled}
-        pythonBinPath={pythonBinPath}
-        selectPythonInterpreter={selectPythonInterpreter}
-        setupWorkspace={setupWorkspace}
-      />
-    )
-  }
-
-  if (!projectInitialized) {
-    return (
-      <ProjectUninitialized
+  return (
+    <SectionContainer
+      sectionCollapsed={sectionCollapsed[Section.EXPERIMENTS]}
+      sectionKey={Section.EXPERIMENTS}
+      title={'Experiments'}
+      onToggleSection={() =>
+        setSectionCollapsed({
+          ...sectionCollapsed,
+          [Section.EXPERIMENTS]: !sectionCollapsed[Section.EXPERIMENTS]
+        })
+      }
+    >
+      <SetupExperiments
         canGitInitialize={canGitInitialize}
-        initializeDvc={initializeDvc}
-        initializeGit={initializeGit}
+        cliCompatible={cliCompatible}
+        hasData={hasData}
+        isPythonExtensionInstalled={isPythonExtensionInstalled}
         needsGitInitialized={needsGitInitialized}
+        needsGitCommit={needsGitCommit}
+        projectInitialized={projectInitialized}
+        pythonBinPath={pythonBinPath}
       />
-    )
-  }
-
-  if (needsGitCommit) {
-    return <NeedsGitCommit showScmPanel={showScmPanel} />
-  }
-
-  if (hasData === undefined) {
-    return <EmptyState>Loading Project...</EmptyState>
-  }
-
-  if (!hasData) {
-    return <NoData />
-  }
-
-  return null
+    </SectionContainer>
+  )
 }
