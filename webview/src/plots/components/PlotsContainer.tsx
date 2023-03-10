@@ -3,8 +3,11 @@ import React, {
   MouseEvent,
   useEffect,
   DetailedHTMLProps,
-  HTMLAttributes
+  HTMLAttributes,
+  useCallback
 } from 'react'
+import { AnyAction } from '@reduxjs/toolkit'
+import { useDispatch, useSelector } from 'react-redux'
 import { Section } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { PlotsPicker, PlotsPickerProps } from './PlotsPicker'
@@ -24,16 +27,20 @@ import {
 } from '../../shared/components/icons'
 import { isSelecting } from '../../util/strings'
 import { isTooltip } from '../../util/helpers'
+import { MinMaxSlider } from '../../shared/components/slider/MinMaxSlider'
+import { PlotsState } from '../store'
 
 export interface PlotsContainerProps {
   sectionCollapsed: boolean
   sectionKey: Section
   title: string
   nbItemsPerRow: number
+  changeNbItemsPerRow?: (nb: number) => AnyAction
   menu?: PlotsPickerProps
   addPlotsButton?: { onClick: () => void }
   removePlotsButton?: { onClick: () => void }
   children: React.ReactNode
+  hasItems?: boolean
 }
 
 export const SectionDescription = {
@@ -96,9 +103,15 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   nbItemsPerRow,
   menu,
   addPlotsButton,
-  removePlotsButton
+  removePlotsButton,
+  changeNbItemsPerRow,
+  hasItems
 }) => {
   const open = !sectionCollapsed
+  const dispatch = useDispatch()
+  const maxNbPlotsPerRow = useSelector(
+    (state: PlotsState) => state.webview.maxNbPlotsPerRow
+  )
 
   useEffect(() => {
     window.dispatchEvent(new Event('resize'))
@@ -152,6 +165,24 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     }
   }
 
+  const handleResize = useCallback(
+    (nbItems: number) => {
+      if (changeNbItemsPerRow) {
+        const positiveNbItems = Math.abs(nbItems)
+        dispatch(changeNbItemsPerRow(positiveNbItems))
+        sendMessage({
+          payload: {
+            height: undefined,
+            nbItemsPerRow: positiveNbItems,
+            section: sectionKey
+          },
+          type: MessageFromWebviewType.RESIZE_PLOTS
+        })
+      }
+    },
+    [dispatch, changeNbItemsPerRow, sectionKey]
+  )
+
   return (
     <div className={styles.plotsContainerWrapper} data-testid="plots-container">
       <details open={open} className={styles.plotsContainer}>
@@ -173,11 +204,25 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
             </div>
           </Tooltip>
         </summary>
+        {changeNbItemsPerRow && hasItems && maxNbPlotsPerRow > 1 && (
+          <div
+            className={styles.nbItemsPerRowSlider}
+            data-testid="nb-items-per-row-slider"
+          >
+            <MinMaxSlider
+              maximum={-1}
+              minimum={-maxNbPlotsPerRow}
+              label="Plot Width"
+              onChange={handleResize}
+              defaultValue={-nbItemsPerRow}
+            />
+          </div>
+        )}
         {open && (
           <div
             className={cx({
               [styles.plotsWrapper]: sectionKey !== Section.COMPARISON_TABLE,
-              [styles.smallPlots]: nbItemsPerRow === 4
+              [styles.smallPlots]: nbItemsPerRow >= 4
             })}
             style={
               {

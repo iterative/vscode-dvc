@@ -8,23 +8,21 @@ type ZoomedInPlotState = {
   id: string
   refresh?: boolean
 }
-
-type SnapPoints = [number, number, number, number]
 export interface WebviewState {
   hasData: boolean
   hasPlots: boolean
   hasUnselectedPlots: boolean
   selectedRevisions: Revision[]
   zoomedInPlot: ZoomedInPlotState | undefined
-  snapPoints: SnapPoints
+  maxNbPlotsPerRow: number
 }
 
 export const webviewInitialState: WebviewState = {
   hasData: false,
   hasPlots: false,
   hasUnselectedPlots: false,
+  maxNbPlotsPerRow: 4,
   selectedRevisions: [],
-  snapPoints: [0, 0, 0, 0],
   zoomedInPlot: {
     id: '',
     plot: undefined
@@ -38,17 +36,13 @@ export const webviewSlice = createSlice({
     initialize: (state: { hasData: boolean }) => {
       state.hasData = true
     },
-    setSnapPoints: (
-      state: { snapPoints: SnapPoints },
+    setMaxNbPlotsPerRow: (
+      state: { maxNbPlotsPerRow: number },
       action: PayloadAction<number>
     ) => {
-      // Action payload here is the max width of the plots webview. When changed, we re-calculate the snap points.
-      state.snapPoints = [
-        action.payload,
-        action.payload / 2,
-        action.payload / 3,
-        action.payload / 4
-      ]
+      // Action payload here is the max width of the plots webview. When changed, we re-calculate the max number of plots per row
+      const maxWidth = action.payload
+      state.maxNbPlotsPerRow = Math.floor(maxWidth / 300)
     },
     setZoomedInPlot: (
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -94,7 +88,7 @@ export const {
   updateHasUnselectedPlots,
   updateSelectedRevisions,
   setZoomedInPlot,
-  setSnapPoints
+  setMaxNbPlotsPerRow
 } = webviewSlice.actions
 
 export default webviewSlice.reducer

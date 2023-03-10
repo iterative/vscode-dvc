@@ -27,8 +27,8 @@ import {
   Section,
   SectionCollapsed,
   CustomPlotData,
-  PlotNumberOfItemsPerRow,
-  DEFAULT_HEIGHT
+  DEFAULT_HEIGHT,
+  DEFAULT_NB_ITEMS_PER_ROW
 } from '../webview/contract'
 import {
   ExperimentsOutput,
@@ -408,18 +408,10 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public getNbItemsPerRow(section: Section) {
-    if (
-      this.nbItemsPerRow[section] &&
-      [
-        PlotNumberOfItemsPerRow.ONE,
-        PlotNumberOfItemsPerRow.TWO,
-        PlotNumberOfItemsPerRow.THREE,
-        PlotNumberOfItemsPerRow.FOUR
-      ].includes(this.nbItemsPerRow[section])
-    ) {
+    if (this.nbItemsPerRow[section]) {
       return this.nbItemsPerRow[section]
     }
-    return PlotNumberOfItemsPerRow.TWO
+    return DEFAULT_NB_ITEMS_PER_ROW
   }
 
   public setHeight(section: Section, height: number | undefined) {
