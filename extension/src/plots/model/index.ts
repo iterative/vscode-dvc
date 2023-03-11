@@ -30,7 +30,8 @@ import {
   CustomPlot,
   ColorScale,
   DEFAULT_HEIGHT,
-  DEFAULT_NB_ITEMS_PER_ROW
+  DEFAULT_NB_ITEMS_PER_ROW,
+  CustomPlotType
 } from '../webview/contract'
 import {
   ExperimentsOutput,
@@ -184,7 +185,14 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public getCustomPlotsOrder() {
-    return this.customPlotsOrder
+    return this.customPlotsOrder.map(
+      ({ type, ...rest }) =>
+        ({
+          ...rest,
+          // type is possibly undefined if state holds an older version of custom plots
+          type: type || CustomPlotType.METRIC_VS_PARAM
+        } as CustomPlotsOrderValue)
+    )
   }
 
   public updateCustomPlotsOrder(plotsOrder: CustomPlotsOrderValue[]) {
