@@ -71,7 +71,7 @@ rendered side by side for the selected experiments.
 
 <p align="center">
   <img src="images/plots-custom.png"
-       alt="Plots: Trends" />
+       alt="Plots: Custom" />
 </p>
 
 **Custom** plots are generated linear plots comparing metrics and params. A user
@@ -80,7 +80,7 @@ can choose between two types of plots, "Checkpoint Trend" and "Metric Vs Param".
 [checkpoints] are enabled and "Metric Vs Param" plots compare a chosen metric
 and param across experiments.
 
-[metrics]: https://dvc.org/doc/command-reference/metrics
+[metric]: https://dvc.org/doc/command-reference/metrics
 [checkpoints]: https://dvc.org/doc/user-guide/experiment-management/checkpoints
 
 <p align="center">
