@@ -36,7 +36,7 @@ export const initializeEmptyRepo = async (): Promise<string> => {
     return ''
   }
 
-  await gitExecutor.init(TEMP_DIR)
+  await gitExecutor.gitInit(TEMP_DIR)
 
   return dvcExecutor.init(TEMP_DIR)
 }

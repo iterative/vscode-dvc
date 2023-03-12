@@ -37,6 +37,7 @@ import { SetupData } from '../../setup/webview/contract'
 import { DvcViewer } from '../../cli/dvc/viewer'
 import { ConnectData } from '../../connect/webview/contract'
 import { Toast } from '../../vscode/toast'
+import { GitExecutor } from '../../cli/git/executor'
 
 export const mockDisposable = {
   dispose: stub()
@@ -152,6 +153,7 @@ export const buildInternalCommands = (disposer: Disposer) => {
   )
   const dvcViewer = disposer.track(new DvcViewer(config))
   const gitReader = disposer.track(new GitReader())
+  const gitExecutor = disposer.track(new GitExecutor())
 
   const outputChannel = disposer.track(
     new OutputChannel([dvcReader], '1', 'test output')
@@ -164,6 +166,7 @@ export const buildInternalCommands = (disposer: Disposer) => {
       dvcReader,
       dvcRunner,
       dvcViewer,
+      gitExecutor,
       gitReader
     )
   )
@@ -174,6 +177,7 @@ export const buildInternalCommands = (disposer: Disposer) => {
     dvcReader,
     dvcRunner,
     dvcViewer,
+    gitExecutor,
     gitReader,
     internalCommands
   }
@@ -202,6 +206,7 @@ export const buildDependencies = (
     dvcReader,
     dvcRunner,
     dvcViewer,
+    gitExecutor,
     gitReader,
     internalCommands
   } = buildInternalCommands(disposer)
@@ -237,6 +242,7 @@ export const buildDependencies = (
     dvcReader,
     dvcRunner,
     dvcViewer,
+    gitExecutor,
     gitReader,
     internalCommands,
     messageSpy,

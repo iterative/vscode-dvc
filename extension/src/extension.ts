@@ -56,7 +56,10 @@ import { LanguageClient } from './languageClient'
 import { collectRunningExperimentPids } from './experiments/processExecution/collect'
 import { registerPatchCommand } from './patch'
 import { DvcViewer } from './cli/dvc/viewer'
+import { registerSetupCommands } from './setup/register'
+import { Status } from './status'
 import { registerPersistenceCommands } from './persistence/register'
+
 export class Extension extends Disposable {
   protected readonly internalCommands: InternalCommands
 
@@ -132,6 +135,8 @@ export class Extension extends Disposable {
       new InternalCommands(outputChannel, ...clis)
     )
 
+    const status = this.dispose.track(new Status(config, ...clis))
+
     this.experiments = this.dispose.track(
       new WorkspaceExperiments(
         this.internalCommands,
@@ -184,18 +189,14 @@ export class Extension extends Disposable {
 
     this.setup = this.dispose.track(
       new Setup(
-        stopWatch,
         config,
-        this.dvcExecutor,
-        this.dvcReader,
-        this.dvcRunner,
-        this.gitExecutor,
-        this.gitReader,
+        this.internalCommands,
+        this.experiments,
+        status,
+        this.resourceLocator.dvcIcon,
+        stopWatch,
         () => this.initialize(),
         () => this.resetMembers(),
-        this.experiments,
-        this.internalCommands,
-        this.resourceLocator.dvcIcon,
         () =>
           collectWorkspaceScale(
             this.getRoots(),
@@ -216,6 +217,7 @@ export class Extension extends Disposable {
       this.connect
     )
     registerPlotsCommands(this.plots, this.internalCommands, this.setup)
+    registerSetupCommands(this.setup, this.internalCommands)
     this.internalCommands.registerExternalCommand(
       RegisteredCommands.EXPERIMENT_AND_PLOTS_SHOW,
       async (context: VsCodeContext) => {
