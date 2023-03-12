@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.18] - 2023-03-12
+
+### 🚀 New Features and Enhancements
+
+- Add command to reset state [#3421](https://github.com/iterative/vscode-dvc/pull/3421) by [@sroy3](https://github.com/sroy3)
+- Revert smooth slider background color [#3444](https://github.com/iterative/vscode-dvc/pull/3444) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Clean up setup internals [#3435](https://github.com/iterative/vscode-dvc/pull/3435) by [@mattseddon](https://github.com/mattseddon)
+- Create (shared) section container component [#3440](https://github.com/iterative/vscode-dvc/pull/3440) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.6.17] - 2023-03-10
 
 ### 🚀 New Features and Enhancements
