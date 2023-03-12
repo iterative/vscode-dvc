@@ -11,6 +11,7 @@ export const autoRegisteredCommands = {
   GIT_GET_REMOTE_URL: 'getRemoteUrl',
   GIT_GET_REPOSITORY_ROOT: 'getGitRepositoryRoot',
   GIT_HAS_CHANGES: 'hasChanges',
+  GIT_HAS_NO_COMMITS: 'hasNoCommits',
   GIT_LIST_UNTRACKED: 'listUntracked'
 } as const
 
