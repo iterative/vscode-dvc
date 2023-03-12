@@ -558,6 +558,11 @@
         "command": "dvc.views.plotsPathsTree.refreshPlots",
         "category": "DVC",
         "icon": "$(refresh)"
+      },
+      {
+        "title": "Reset Persisted State and Reload Window",
+        "command": "dvc.resetState",
+        "category": "DVC"
       }
     ],
     "configuration": {
@@ -1649,8 +1654,8 @@
     "@types/vscode": "1.64.0",
     "@vscode/test-electron": "2.3.0",
     "@vscode/vsce": "2.18.0",
-    "@wdio/cli": "8.5.1",
-    "@wdio/local-runner": "8.5.4",
+    "@wdio/cli": "8.5.5",
+    "@wdio/local-runner": "8.5.5",
     "@wdio/mocha-framework": "8.4.0",
     "@wdio/spec-reporter": "8.4.0",
     "chai": "4.3.7",
@@ -1670,7 +1675,7 @@
     "ts-loader": "9.4.2",
     "vscode-uri": "3.0.7",
     "wdio-vscode-service": "5.0.0",
-    "webdriverio": "8.5.1",
+    "webdriverio": "8.5.5",
     "webpack": "5.75.0",
     "webpack-cli": "5.0.1"
   },
