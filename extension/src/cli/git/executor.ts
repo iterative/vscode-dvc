@@ -4,6 +4,7 @@ import { getOptions } from './options'
 import { typeCheckCommands } from '..'
 
 export const autoRegisteredCommands = {
+  GIT_INIT: 'gitInit',
   GIT_PUSH_BRANCH: 'pushBranch',
   GIT_RESET_WORKSPACE: 'resetWorkspace',
   GIT_STAGE_ALL: 'stageAll',
@@ -17,7 +18,7 @@ export class GitExecutor extends GitCli {
     this
   )
 
-  public init(cwd: string) {
+  public gitInit(cwd: string) {
     const options = getOptions(cwd, Command.INITIALIZE)
 
     return this.executeProcess(options)

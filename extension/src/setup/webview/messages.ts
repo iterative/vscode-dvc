@@ -10,20 +10,20 @@ import { sendTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { selectPythonInterpreter } from '../../extensions/python'
 import { autoInstallDvc } from '../autoInstall'
-import { RegisteredCommands } from '../../commands/external'
+import {
+  RegisteredCliCommands,
+  RegisteredCommands
+} from '../../commands/external'
 
 export class WebviewMessages {
   private readonly getWebview: () => BaseWebview<TSetupData> | undefined
-  private readonly initializeDvc: () => Promise<void>
   private readonly initializeGit: () => void
 
   constructor(
     getWebview: () => BaseWebview<TSetupData> | undefined,
-    initializeDvc: () => Promise<void>,
     initializeGit: () => void
   ) {
     this.getWebview = getWebview
-    this.initializeDvc = initializeDvc
     this.initializeGit = initializeGit
   }
 
@@ -65,7 +65,7 @@ export class WebviewMessages {
           RegisteredCommands.EXTENSION_CHECK_CLI_COMPATIBLE
         )
       case MessageFromWebviewType.INITIALIZE_DVC:
-        return this.initializeDvc()
+        return commands.executeCommand(RegisteredCliCommands.INIT)
       case MessageFromWebviewType.INITIALIZE_GIT:
         return this.gitInit()
       case MessageFromWebviewType.SHOW_SCM_PANEL:

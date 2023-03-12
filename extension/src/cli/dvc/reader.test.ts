@@ -12,6 +12,7 @@ import { getProcessEnv } from '../../env'
 import expShowFixture from '../../test/fixtures/expShow/base/output'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output/minimal'
 import { Config } from '../../config'
+import { joinEnvPath } from '../../util/env'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -31,6 +32,8 @@ const mockedEnv = {
 }
 const JSON_FLAG = '--json'
 
+const mockedGetPythonBinPath = jest.fn()
+
 beforeEach(() => {
   jest.resetAllMocks()
   mockedGetProcessEnv.mockReturnValueOnce(mockedEnv)
@@ -49,7 +52,7 @@ describe('CliReader', () => {
   const dvcReader = new DvcReader(
     {
       getCliPath: () => undefined,
-      getPythonBinPath: () => undefined
+      getPythonBinPath: mockedGetPythonBinPath
     } as unknown as Config,
     {
       processCompleted: {
@@ -144,6 +147,33 @@ describe('CliReader', () => {
     })
   })
 
+  describe('globalVersion', () => {
+    it('should call execute process with the correct parameters (does not respect pythonBinPath)', async () => {
+      const cwd = __dirname
+      const stdout = '3.9.11'
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
+      mockedGetPythonBinPath.mockReturnValueOnce('python')
+      const output = await dvcReader.globalVersion(cwd)
+
+      expect(output).toStrictEqual(stdout)
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
+        args: ['--version'],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+
+    it('should not retry if the process fails (cannot find cli - extension should reset)', async () => {
+      const cwd = __dirname
+      mockedCreateProcess.mockImplementationOnce(() => {
+        throw new Error('spawn dvc ENOENT retrying...')
+      })
+
+      await expect(dvcReader.globalVersion(cwd)).rejects.toBeTruthy()
+    })
+  })
+
   describe('plotsDiff', () => {
     it('should handle empty output being returned', async () => {
       const cwd = __dirname
@@ -226,6 +256,27 @@ describe('CliReader', () => {
         cwd,
         env: mockedEnv,
         executable: 'dvc'
+      })
+    })
+
+    it('should respect the pythonBinPath parameters', async () => {
+      const cwd = __dirname
+      const stdout = '2.47.0'
+      const mockedPythonPath = 'some/python/path'
+      const mockedPythonBinPath = [mockedPythonPath, 'python'].join('/')
+      mockedGetPythonBinPath.mockReturnValue(mockedPythonBinPath)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
+      const output = await dvcReader.version(cwd)
+
+      expect(output).toStrictEqual(stdout)
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
+        args: ['-m', 'dvc', '--version'],
+        cwd,
+        env: {
+          ...mockedEnv,
+          PATH: joinEnvPath(mockedPythonPath, mockedEnv.PATH)
+        },
+        executable: mockedPythonBinPath
       })
     })
 
