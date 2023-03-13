@@ -1,0 +1,68 @@
+@import '../../variables.scss';
+@import '../../style.scss';
+
+$gap: 20px;
+
+.sectionContainerWrapper {
+  position: relative;
+}
+
+.sectionContainer {
+  width: 100%;
+
+  summary {
+    list-style-type: none;
+    font-family: var(--vscode-font-family);
+    margin: 14px 10px;
+    font-weight: bold;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    width: max-content;
+    cursor: pointer;
+  }
+}
+
+.iconMenu {
+  position: absolute;
+  right: $gap;
+  top: -15px;
+  z-index: 10;
+}
+
+.detailsIcon {
+  fill: $fg-color;
+  margin-bottom: -4px;
+}
+
+.infoTooltipToggle {
+  display: flex;
+  align-items: center;
+  cursor: initial;
+}
+
+.infoIcon {
+  fill: $accent-color;
+  margin-left: 6px;
+}
+
+.infoTooltip {
+  max-width: 340px;
+  margin-left: 5px;
+  white-space: normal;
+  display: flex;
+  gap: 4px;
+  line-height: 16px;
+  font-size: 13px;
+  font-weight: 400;
+  cursor: auto;
+
+  svg {
+    min-width: 16px;
+    min-height: 16px;
+  }
+
+  a {
+    text-decoration: none;
+  }
+}

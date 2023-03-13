@@ -16,7 +16,10 @@ import { MessageFromWebviewType } from '../../../webview/contract'
 import { Disposable } from '../../../extension'
 import { Logger } from '../../../common/logger'
 import { BaseWebview } from '../../../webview'
-import { RegisteredCommands } from '../../../commands/external'
+import {
+  RegisteredCliCommands,
+  RegisteredCommands
+} from '../../../commands/external'
 import { isDirectory } from '../../../fileSystem'
 import { gitPath } from '../../../cli/git/constants'
 import { join } from '../../util/path'
@@ -72,7 +75,7 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle an initialize project message from the webview', async () => {
-      const { messageSpy, setup, mockInitializeDvc } = buildSetup(disposable)
+      const { messageSpy, mockExecuteCommand, setup } = buildSetup(disposable)
 
       const webview = await setup.showWebview()
       await webview.isReady()
@@ -84,11 +87,13 @@ suite('Setup Test Suite', () => {
         type: MessageFromWebviewType.INITIALIZE_DVC
       })
 
-      expect(mockInitializeDvc).to.be.calledOnce
+      expect(mockExecuteCommand).to.be.calledWithExactly(
+        RegisteredCliCommands.INIT
+      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a check cli compatible message from the webview', async () => {
-      const { messageSpy, setup, mockExecuteCommand } = buildSetup(disposable)
+      const { messageSpy, mockExecuteCommand, setup } = buildSetup(disposable)
 
       const webview = await setup.showWebview()
       await webview.isReady()
@@ -122,7 +127,7 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a select Python interpreter message from the webview', async () => {
-      const { messageSpy, setup, mockExecuteCommand } = buildSetup(disposable)
+      const { messageSpy, mockExecuteCommand, setup } = buildSetup(disposable)
       const setInterpreterCommand = 'python.setInterpreter'
 
       const webview = await setup.showWebview()
@@ -139,7 +144,7 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a show source control panel message from the webview', async () => {
-      const { messageSpy, setup, mockExecuteCommand } = buildSetup(disposable)
+      const { messageSpy, mockExecuteCommand, setup } = buildSetup(disposable)
       const showScmPanelCommand = 'workbench.view.scm'
 
       const webview = await setup.showWebview()
@@ -156,7 +161,7 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a setup the workspace message from the webview', async () => {
-      const { messageSpy, setup, mockExecuteCommand } = buildSetup(disposable)
+      const { messageSpy, mockExecuteCommand, setup } = buildSetup(disposable)
 
       const webview = await setup.showWebview()
       await webview.isReady()
@@ -194,11 +199,7 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should close the webview and open the experiments when the setup is done', async () => {
-      const { setup, mockOpenExperiments } = buildSetup(
-        disposable,
-        undefined,
-        true
-      )
+      const { setup, mockOpenExperiments } = buildSetup(disposable, true)
 
       const closeWebviewSpy = spy(BaseWebview.prototype, 'dispose')
 
@@ -290,7 +291,6 @@ suite('Setup Test Suite', () => {
     it('should send the expected message to the webview when there is no DVC project in the workspace', async () => {
       const { config, setup, messageSpy } = buildSetup(
         disposable,
-        undefined,
         false,
         true,
         false,
@@ -334,7 +334,6 @@ suite('Setup Test Suite', () => {
     it('should send the expected message to the webview when there is no commits in the git repository', async () => {
       const { config, setup, messageSpy } = buildSetup(
         disposable,
-        undefined,
         false,
         false,
         false,
@@ -485,11 +484,10 @@ suite('Setup Test Suite', () => {
     })
 
     it('should set dvc.pythonPath to the picked value when the user selects to pick a Python interpreter', async () => {
-      const { config, setup, mockExecuteCommand, mockVersion } =
+      const { config, mockVersion, mockExecuteCommand, setup } =
         buildSetup(disposable)
 
       mockExecuteCommand.restore()
-
       stub(config, 'isPythonExtensionInstalled').returns(false)
 
       mockVersion.rejects('do not initialize')
@@ -556,12 +554,13 @@ suite('Setup Test Suite', () => {
 
     it('should set the dvc.cli.incompatible context value', async () => {
       const { config, mockExecuteCommand, mockRunSetup, mockVersion, setup } =
-        buildSetup(disposable, undefined, true, false, false)
+        buildSetup(disposable, true, false, false)
+
+      mockExecuteCommand.restore()
       mockRunSetup.restore()
       stub(config, 'isPythonExtensionUsed').returns(false)
       stub(config, 'getPythonBinPath').resolves(join('python'))
 
-      mockExecuteCommand.restore()
       mockVersion.resetBehavior()
       mockVersion
         .onFirstCall()
@@ -605,6 +604,34 @@ suite('Setup Test Suite', () => {
         mockShowWarningMessage,
         'should warn the user if the CLI throws an error'
       ).to.be.calledOnce
+    })
+
+    it('should call the CLI to see if there is a global version of DVC available if the Python version fails', async () => {
+      const {
+        config,
+        mockExecuteCommand,
+        mockGlobalVersion,
+        mockRunSetup,
+        mockVersion,
+        setup
+      } = buildSetup(disposable, true, false, false)
+
+      mockExecuteCommand.restore()
+      mockRunSetup.restore()
+      stub(config, 'isPythonExtensionUsed').returns(true)
+
+      mockVersion.resetBehavior()
+      mockVersion.rejects(new Error('no CLI here'))
+
+      const executeCommandSpy = spy(commands, 'executeCommand')
+      await run(setup)
+
+      expect(mockVersion).to.be.calledOnce
+      expect(mockGlobalVersion).to.be.calledOnce
+      expect(
+        executeCommandSpy,
+        'should set dvc.cli.incompatible to false if the version is compatible'
+      ).to.be.calledWithExactly('setContext', 'dvc.cli.incompatible', false)
     })
   })
 })
