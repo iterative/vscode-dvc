@@ -647,8 +647,8 @@ describe('App', () => {
     expect(plots.map(plot => plot.id)).toStrictEqual([
       'custom-metrics:summary.json:loss-params:params.yaml:dropout',
       'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
-      'custom-summary.json:loss',
-      'custom-summary.json:accuracy'
+      'custom-summary.json:loss-epoch',
+      'custom-summary.json:accuracy-epoch'
     ])
 
     dragAndDrop(plots[1], plots[0])
@@ -658,8 +658,8 @@ describe('App', () => {
     expect(plots.map(plot => plot.id)).toStrictEqual([
       'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
       'custom-metrics:summary.json:loss-params:params.yaml:dropout',
-      'custom-summary.json:loss',
-      'custom-summary.json:accuracy'
+      'custom-summary.json:loss-epoch',
+      'custom-summary.json:accuracy-epoch'
     ])
   })
 
@@ -673,8 +673,8 @@ describe('App', () => {
     expect(plots.map(plot => plot.id)).toStrictEqual([
       'custom-metrics:summary.json:loss-params:params.yaml:dropout',
       'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
-      'custom-summary.json:loss',
-      'custom-summary.json:accuracy'
+      'custom-summary.json:loss-epoch',
+      'custom-summary.json:accuracy-epoch'
     ])
 
     mockPostMessage.mockClear()
@@ -682,10 +682,10 @@ describe('App', () => {
     dragAndDrop(plots[2], plots[0])
 
     const expectedOrder = [
-      'custom-summary.json:loss',
+      'custom-summary.json:loss-epoch',
       'custom-metrics:summary.json:loss-params:params.yaml:dropout',
       'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
-      'custom-summary.json:accuracy'
+      'custom-summary.json:accuracy-epoch'
     ]
 
     expect(mockPostMessage).toHaveBeenCalledTimes(1)
@@ -712,7 +712,7 @@ describe('App', () => {
     ).toStrictEqual([
       'custom-metrics:summary.json:loss-params:params.yaml:dropout',
       'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
-      'custom-summary.json:loss'
+      'custom-summary.json:loss-epoch'
     ])
 
     sendSetDataMessage({
@@ -724,8 +724,8 @@ describe('App', () => {
     ).toStrictEqual([
       'custom-metrics:summary.json:loss-params:params.yaml:dropout',
       'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
-      'custom-summary.json:loss',
-      'custom-summary.json:accuracy'
+      'custom-summary.json:loss-epoch',
+      'custom-summary.json:accuracy-epoch'
     ])
   })
 
@@ -740,8 +740,8 @@ describe('App', () => {
     ).toStrictEqual([
       'custom-metrics:summary.json:loss-params:params.yaml:dropout',
       'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
-      'custom-summary.json:loss',
-      'custom-summary.json:accuracy'
+      'custom-summary.json:loss-epoch',
+      'custom-summary.json:accuracy-epoch'
     ])
 
     sendSetDataMessage({
@@ -755,8 +755,8 @@ describe('App', () => {
       screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
     ).toStrictEqual([
       'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
-      'custom-summary.json:loss',
-      'custom-summary.json:accuracy'
+      'custom-summary.json:loss-epoch',
+      'custom-summary.json:accuracy-epoch'
     ])
   })
 
@@ -998,8 +998,8 @@ describe('App', () => {
 
     const expectedOrder = [
       'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
-      'custom-summary.json:loss',
-      'custom-summary.json:accuracy',
+      'custom-summary.json:loss-epoch',
+      'custom-summary.json:accuracy-epoch',
       'custom-metrics:summary.json:loss-params:params.yaml:dropout'
     ]
 
@@ -1322,6 +1322,7 @@ describe('App', () => {
         plots.push({
           id,
           metric: '',
+          param: '',
           type: CustomPlotType.CHECKPOINT,
           values: [],
           yTitle: id

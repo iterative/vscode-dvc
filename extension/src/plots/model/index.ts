@@ -10,9 +10,9 @@ import {
   TemplateAccumulator,
   collectCommitRevisionDetails,
   collectOverrideRevisionDetails,
-  collectCustomPlotsData,
+  collectCustomPlots,
   getCustomPlotId,
-  collectCustomCheckpointPlotData
+  collectCustomCheckpointPlots
 } from './collect'
 import { getRevisionFirstThreeColumns } from './util'
 import { CustomPlotsOrderValue, isCheckpointPlot } from './custom'
@@ -167,7 +167,7 @@ export class PlotsModel extends ModelWithPersistence {
 
   public recreateCustomPlots(data?: ExperimentsOutput) {
     if (data) {
-      this.customCheckpointPlots = collectCustomCheckpointPlotData(data)
+      this.customCheckpointPlots = collectCustomCheckpointPlots(data)
     }
 
     const experiments = this.experiments.getExperiments()
@@ -176,7 +176,7 @@ export class PlotsModel extends ModelWithPersistence {
       this.customPlots = undefined
       return
     }
-    const customPlots: CustomPlot[] = collectCustomPlotsData(
+    const customPlots: CustomPlot[] = collectCustomPlots(
       this.getCustomPlotsOrder(),
       this.customCheckpointPlots || {},
       experiments
@@ -207,7 +207,7 @@ export class PlotsModel extends ModelWithPersistence {
 
   public removeCustomPlots(plotIds: string[]) {
     const newCustomPlotsOrder = this.getCustomPlotsOrder().filter(
-      plot => !plotIds.includes(getCustomPlotId(plot))
+      ({ metric, param }) => !plotIds.includes(getCustomPlotId(metric, param))
     )
 
     this.setCustomPlotsOrder(newCustomPlotsOrder)

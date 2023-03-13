@@ -35,12 +35,13 @@ describe('pickCustomPlots', () => {
 
   it('should return the selected plots', async () => {
     const selectedPlots = [
-      'custom-metrics:summary.json:loss',
+      'custom-metrics:summary.json:loss-epoch',
       'custom-metrics:summary.json:accuracy-params:params.yaml:epochs'
     ]
     const mockedPlots = [
       {
         metric: 'metrics:summary.json:loss',
+        param: 'epoch',
         type: CustomPlotType.CHECKPOINT
       },
       {
@@ -70,7 +71,7 @@ describe('pickCustomPlots', () => {
           description: 'Checkpoint Trend Plot',
           detail: 'metrics:summary.json:loss',
           label: 'loss',
-          value: 'custom-metrics:summary.json:loss'
+          value: 'custom-metrics:summary.json:loss-epoch'
         },
         {
           description: 'Metric Vs Param Plot',

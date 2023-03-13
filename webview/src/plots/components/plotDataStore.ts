@@ -1,5 +1,4 @@
 import {
-  CheckpointPlotData,
   CustomPlotData,
   Section,
   TemplatePlotEntry
@@ -15,7 +14,7 @@ export const plotDataStore = {
 }
 
 export const addPlotsWithSnapshots = (
-  plots: (CheckpointPlotData | TemplatePlotEntry | CustomPlotData)[],
+  plots: (TemplatePlotEntry | CustomPlotData)[],
   section: Section
 ) => {
   const snapShots: { [key: string]: string } = {}

@@ -1,5 +1,4 @@
 import {
-  CheckpointPlotData,
   CustomPlotData,
   Section,
   TemplatePlotEntry
@@ -33,7 +32,7 @@ export const useGetPlot = (
     }
 
     if (isPlotWithSpec) {
-      setData({ values: (plot as CheckpointPlotData | CustomPlotData).values })
+      setData({ values: (plot as CustomPlotData).values })
       setContent(spec)
       return
     }

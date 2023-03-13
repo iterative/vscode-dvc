@@ -69,7 +69,7 @@ export type MetricVsParamPlotValues = {
   expName: string
   metric: number
   param: number
-}
+}[]
 
 export type CheckpointPlotValues = {
   group: string
@@ -81,25 +81,25 @@ export type ColorScale = { domain: string[]; range: Color[] }
 
 export type CheckpointPlot = {
   id: string
-  metric: string
   values: CheckpointPlotValues
+  metric: string
+  param: string
   type: CustomPlotType.CHECKPOINT
 }
 
-export type CheckpointPlotData = CheckpointPlot & { yTitle: string }
-
 export type MetricVsParamPlot = {
   id: string
-  values: MetricVsParamPlotValues[]
+  values: MetricVsParamPlotValues
   metric: string
   param: string
   type: CustomPlotType.METRIC_VS_PARAM
 }
 
-export type MetricVsParamPlotData = MetricVsParamPlot & { yTitle: string }
-
 export type CustomPlot = MetricVsParamPlot | CheckpointPlot
-export type CustomPlotData = MetricVsParamPlotData | CheckpointPlotData
+
+export type CustomPlotData = CustomPlot & {
+  yTitle: string
+}
 
 export type CustomPlotsData = {
   plots: CustomPlotData[]

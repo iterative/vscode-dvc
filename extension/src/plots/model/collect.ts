@@ -3,7 +3,11 @@ import get from 'lodash.get'
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
 import { CustomCheckpointPlots } from '.'
-import { CustomPlotsOrderValue, isCheckpointValue } from './custom'
+import {
+  CHECKPOINTS_PARAM,
+  CustomPlotsOrderValue,
+  isCheckpointValue
+} from './custom'
 import { getRevisionFirstThreeColumns } from './util'
 import {
   ColorScale,
@@ -215,12 +219,10 @@ const collectFromExperimentsObject = (
   }
 }
 
-export const getCustomPlotId = (plot: CustomPlotsOrderValue) =>
-  isCheckpointValue(plot)
-    ? `custom-${plot.metric}`
-    : `custom-${plot.metric}-${plot.param}`
+export const getCustomPlotId = (metric: string, param = CHECKPOINTS_PARAM) =>
+  `custom-${metric}-${param}`
 
-export const collectCustomCheckpointPlotData = (
+export const collectCustomCheckpointPlots = (
   data: ExperimentsOutput
 ): CustomCheckpointPlots => {
   const acc = {
@@ -246,11 +248,9 @@ export const collectCustomCheckpointPlotData = (
   for (const [key, value] of acc.plots.entries()) {
     const decodedMetric = decodeColumn(key)
     plotsData[decodedMetric] = {
-      id: getCustomPlotId({
-        metric: decodedMetric,
-        type: CustomPlotType.CHECKPOINT
-      }),
+      id: getCustomPlotId(decodedMetric),
       metric: decodedMetric,
+      param: CHECKPOINTS_PARAM,
       type: CustomPlotType.CHECKPOINT,
       values: value
     }
@@ -259,7 +259,7 @@ export const collectCustomCheckpointPlotData = (
   return plotsData
 }
 
-const collectMetricVsParamPlotData = (
+const collectMetricVsParamPlot = (
   metric: string,
   param: string,
   experiments: Experiment[]
@@ -267,11 +267,7 @@ const collectMetricVsParamPlotData = (
   const splitUpMetricPath = splitColumnPath(metric)
   const splitUpParamPath = splitColumnPath(param)
   const plotData: MetricVsParamPlot = {
-    id: getCustomPlotId({
-      metric,
-      param,
-      type: CustomPlotType.METRIC_VS_PARAM
-    }),
+    id: getCustomPlotId(metric, param),
     metric: metric.slice(ColumnType.METRICS.length + 1),
     param: param.slice(ColumnType.PARAMS.length + 1),
     type: CustomPlotType.METRIC_VS_PARAM,
@@ -294,19 +290,19 @@ const collectMetricVsParamPlotData = (
   return plotData
 }
 
-export const collectCustomPlotsData = (
+export const collectCustomPlots = (
   plotsOrderValues: CustomPlotsOrderValue[],
   checkpointPlots: CustomCheckpointPlots,
   experiments: Experiment[]
 ): CustomPlot[] => {
   return plotsOrderValues
     .map((plotOrderValue): CustomPlot => {
-      if (isCheckpointValue(plotOrderValue)) {
+      if (isCheckpointValue(plotOrderValue.type)) {
         const { metric } = plotOrderValue
         return checkpointPlots[metric.slice(ColumnType.METRICS.length + 1)]
       }
       const { metric, param } = plotOrderValue
-      return collectMetricVsParamPlotData(metric, param, experiments)
+      return collectMetricVsParamPlot(metric, param, experiments)
     })
     .filter(Boolean)
 }

@@ -22,11 +22,7 @@ const getMetricVsParamPlotItem = (metric: string, param: string) => {
     label: `${splitMetric[splitMetric.length - 1]} vs ${
       splitParam[splitParam.length - 1]
     }`,
-    value: getCustomPlotId({
-      metric,
-      param,
-      type: CustomPlotType.METRIC_VS_PARAM
-    })
+    value: getCustomPlotId(metric, param)
   }
 }
 
@@ -36,10 +32,7 @@ const getCheckpointPlotItem = (metric: string) => {
     description: 'Checkpoint Trend Plot',
     detail: metric,
     label: splitMetric[splitMetric.length - 1],
-    value: getCustomPlotId({
-      metric,
-      type: CustomPlotType.CHECKPOINT
-    })
+    value: getCustomPlotId(metric)
   }
 }
 
@@ -53,7 +46,7 @@ export const pickCustomPlots = (
   }
 
   const plotsItems = plots.map(plot =>
-    isCheckpointValue(plot)
+    isCheckpointValue(plot.type)
       ? getCheckpointPlotItem(plot.metric)
       : getMetricVsParamPlotItem(plot.metric, plot.param)
   )

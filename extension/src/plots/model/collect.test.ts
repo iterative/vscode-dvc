@@ -5,8 +5,8 @@ import {
   collectData,
   collectTemplates,
   collectOverrideRevisionDetails,
-  collectCustomPlotsData,
-  collectCustomCheckpointPlotData
+  collectCustomPlots,
+  collectCustomCheckpointPlots
 } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import customPlotsFixture, {
@@ -18,13 +18,7 @@ import {
   EXPERIMENT_WORKSPACE_ID
 } from '../../cli/dvc/contract'
 import { sameContents } from '../../util/array'
-import {
-  CustomPlot,
-  CustomPlotData,
-  CustomPlotType,
-  MetricVsParamPlotData,
-  TemplatePlot
-} from '../webview/contract'
+import { CustomPlot, TemplatePlot } from '../webview/contract'
 import { getCLICommitId } from '../../test/fixtures/plotsDiff/util'
 import expShowFixture from '../../test/fixtures/expShow/base/output'
 import modifiedFixture from '../../test/fixtures/expShow/modified/output'
@@ -35,67 +29,21 @@ const logsLossPath = join('logs', 'loss.tsv')
 
 const logsLossPlot = (plotsDiffFixture[logsLossPath][0] || {}) as TemplatePlot
 
-describe('collectCustomPlotsData', () => {
+describe('collectCustomPlots', () => {
   it('should return the expected data from the test fixture', () => {
     const expectedOutput: CustomPlot[] = customPlotsFixture.plots.map(
-      ({ type, metric, id, values, ...plot }: CustomPlotData) =>
-        type === CustomPlotType.CHECKPOINT
-          ? {
-              id,
-              metric,
-              type,
-              values
-            }
-          : {
-              id,
-              metric,
-              param: (plot as MetricVsParamPlotData).param,
-              type,
-              values
-            }
+      ({ type, metric, id, values, param }) =>
+        ({
+          id,
+          metric,
+          param,
+          type,
+          values
+        } as CustomPlot)
     )
-    const data = collectCustomPlotsData(
+    const data = collectCustomPlots(
       customPlotsOrderFixture,
-      {
-        'summary.json:accuracy': {
-          id: 'custom-summary.json:accuracy',
-          metric: 'summary.json:accuracy',
-          type: CustomPlotType.CHECKPOINT,
-          values: [
-            { group: 'exp-83425', iteration: 1, y: 0.40904998779296875 },
-            { group: 'exp-83425', iteration: 2, y: 0.46094998717308044 },
-            { group: 'exp-83425', iteration: 3, y: 0.5113166570663452 },
-            { group: 'exp-83425', iteration: 4, y: 0.557449996471405 },
-            { group: 'exp-83425', iteration: 5, y: 0.5926499962806702 },
-            { group: 'exp-83425', iteration: 6, y: 0.5926499962806702 },
-            { group: 'test-branch', iteration: 1, y: 0.4083833396434784 },
-            { group: 'test-branch', iteration: 2, y: 0.4668000042438507 },
-            { group: 'test-branch', iteration: 3, y: 0.4668000042438507 },
-            { group: 'exp-e7a67', iteration: 1, y: 0.3723166584968567 },
-            { group: 'exp-e7a67', iteration: 2, y: 0.3724166750907898 },
-            { group: 'exp-e7a67', iteration: 3, y: 0.3724166750907898 }
-          ]
-        },
-        'summary.json:loss': {
-          id: 'custom-summary.json:loss',
-          metric: 'summary.json:loss',
-          type: CustomPlotType.CHECKPOINT,
-          values: [
-            { group: 'exp-83425', iteration: 1, y: 1.9896177053451538 },
-            { group: 'exp-83425', iteration: 2, y: 1.9329891204833984 },
-            { group: 'exp-83425', iteration: 3, y: 1.8798457384109497 },
-            { group: 'exp-83425', iteration: 4, y: 1.8261293172836304 },
-            { group: 'exp-83425', iteration: 5, y: 1.775016188621521 },
-            { group: 'exp-83425', iteration: 6, y: 1.775016188621521 },
-            { group: 'test-branch', iteration: 1, y: 1.9882521629333496 },
-            { group: 'test-branch', iteration: 2, y: 1.9293040037155151 },
-            { group: 'test-branch', iteration: 3, y: 1.9293040037155151 },
-            { group: 'exp-e7a67', iteration: 1, y: 2.020392894744873 },
-            { group: 'exp-e7a67', iteration: 2, y: 2.0205044746398926 },
-            { group: 'exp-e7a67', iteration: 3, y: 2.0205044746398926 }
-          ]
-        }
-      },
+      checkpointPlotsFixture,
       [
         {
           id: '12345',
@@ -135,6 +83,7 @@ describe('collectCustomPlotsData', () => {
         }
       ]
     )
+
     expect(data).toStrictEqual(expectedOutput)
   })
 })
@@ -204,13 +153,13 @@ describe('collectData', () => {
 
 describe('collectCustomCheckpointPlotsData', () => {
   it('should return the expected data from the test fixture', () => {
-    const data = collectCustomCheckpointPlotData(expShowFixture)
+    const data = collectCustomCheckpointPlots(expShowFixture)
 
     expect(data).toStrictEqual(checkpointPlotsFixture)
   })
 
   it('should provide a continuous series for a modified experiment', () => {
-    const data = collectCustomCheckpointPlotData(modifiedFixture)
+    const data = collectCustomCheckpointPlots(modifiedFixture)
 
     for (const { values } of Object.values(data)) {
       const initialExperiment = values.filter(

@@ -27,7 +27,7 @@ const createCustomPlotSpec = (
   }
 
   if (isCheckpointPlot(plot)) {
-    return createCheckpointSpec(plot.yTitle, colors)
+    return createCheckpointSpec(plot.yTitle, plot.param, colors)
   }
   return createMetricVsParamSpec(plot.yTitle, plot.param)
 }

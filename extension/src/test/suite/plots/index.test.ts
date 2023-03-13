@@ -43,6 +43,7 @@ import {
 } from '../../../cli/dvc/contract'
 import { SelectedExperimentWithColor } from '../../../experiments/model'
 import * as customPlotQuickPickUtil from '../../../plots/model/quickPick'
+import { CHECKPOINTS_PARAM } from '../../../plots/model/custom'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -825,6 +826,7 @@ suite('Plots Test Suite', () => {
 
       const mockCheckpointsOrderValue = {
         metric: 'metrics:summary.json:val_loss',
+        param: CHECKPOINTS_PARAM,
         type: CustomPlotType.CHECKPOINT
       }
 

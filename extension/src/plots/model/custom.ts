@@ -1,21 +1,25 @@
 import { CheckpointPlot, CustomPlot, CustomPlotType } from '../webview/contract'
 
-type CheckpointValue = {
-  type: CustomPlotType.CHECKPOINT
-  metric: string
-}
+export const CHECKPOINTS_PARAM = 'epoch'
 
-type MetricVsParamValue = {
-  type: CustomPlotType.METRIC_VS_PARAM
+export type CustomPlotsOrderValue = {
+  type: CustomPlotType.METRIC_VS_PARAM | CustomPlotType.CHECKPOINT
   metric: string
   param: string
 }
 
-export type CustomPlotsOrderValue = CheckpointValue | MetricVsParamValue
-
 export const isCheckpointValue = (
-  value: CustomPlotsOrderValue
-): value is CheckpointValue => value.type === CustomPlotType.CHECKPOINT
+  type: CustomPlotType.CHECKPOINT | CustomPlotType.METRIC_VS_PARAM
+) => type === CustomPlotType.CHECKPOINT
 
 export const isCheckpointPlot = (plot: CustomPlot): plot is CheckpointPlot =>
   plot.type === CustomPlotType.CHECKPOINT
+
+export const doesCustomPlotAlreadyExist = (
+  order: CustomPlotsOrderValue[],
+  metric: string,
+  param = CHECKPOINTS_PARAM
+) =>
+  order.some(value => {
+    return value.param === param && value.metric === metric
+  })
