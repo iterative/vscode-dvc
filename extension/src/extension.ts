@@ -9,8 +9,6 @@ import { DvcExecutor } from './cli/dvc/executor'
 import { DvcRunner } from './cli/dvc/runner'
 import { DvcReader } from './cli/dvc/reader'
 import { Config } from './config'
-import { Connect } from './connect'
-import { registerConnectCommands } from './connect/register'
 import { Context } from './context'
 import { WorkspaceExperiments } from './experiments/workspace'
 import { registerExperimentCommands } from './experiments/commands/register'
@@ -65,7 +63,6 @@ export class Extension extends Disposable {
 
   private readonly resourceLocator: ResourceLocator
   private readonly repositories: WorkspaceRepositories
-  private readonly connect: Connect
   private readonly experiments: WorkspaceExperiments
   private readonly plots: WorkspacePlots
   private readonly setup: Setup
@@ -94,14 +91,10 @@ export class Extension extends Disposable {
 
     const config = this.dispose.track(new Config())
 
-    this.connect = this.dispose.track(
-      new Connect(context, this.resourceLocator.dvcIcon)
-    )
-
     this.gitExecutor = this.dispose.track(new GitExecutor())
     this.gitReader = this.dispose.track(new GitReader())
 
-    const getStudioLiveShareToken = () => this.connect.getStudioLiveShareToken()
+    const getStudioLiveShareToken = () => this.setup.getStudioLiveShareToken()
 
     this.dvcExecutor = this.dispose.track(
       new DvcExecutor(config, getStudioLiveShareToken, cwd =>
@@ -189,6 +182,7 @@ export class Extension extends Disposable {
 
     this.setup = this.dispose.track(
       new Setup(
+        context,
         config,
         this.internalCommands,
         this.experiments,
@@ -207,14 +201,11 @@ export class Extension extends Disposable {
       )
     )
 
-    registerConnectCommands(this.connect, this.internalCommands)
-
     registerPatchCommand(this.internalCommands)
     registerExperimentCommands(
       this.experiments,
       this.internalCommands,
-      this.setup,
-      this.connect
+      this.setup
     )
     registerPlotsCommands(this.plots, this.internalCommands, this.setup)
     registerSetupCommands(this.setup, this.internalCommands)

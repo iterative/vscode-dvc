@@ -56,7 +56,7 @@ export const CliUnavailable: React.FC<CliUnavailableProps> = ({
 
   if (!canInstall) {
     return (
-      <EmptyState>
+      <EmptyState isFullScreen={false}>
         <Title />
         <p>DVC & DVCLive cannot be auto-installed as Python was not located.</p>
         <SetupWorkspace description="To locate a Python Interpreter or DVC." />
@@ -65,7 +65,7 @@ export const CliUnavailable: React.FC<CliUnavailableProps> = ({
   }
 
   return (
-    <EmptyState>
+    <EmptyState isFullScreen={false}>
       <Title />
       <OfferToInstall pythonBinPath={pythonBinPath} installDvc={installDvc}>
         {isPythonExtensionInstalled ? (

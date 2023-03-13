@@ -66,6 +66,13 @@ export const SectionDescription = {
       </a>
       .
     </span>
+  ),
+  // Setup Experiments
+  [SetupSection.STUDIO]: (
+    <span data-testid="tooltip-setup-experiments">
+      {"Configure the extension's connection to "}
+      <a href="https://studio.iterative.a">Studio</a>.
+    </span>
   )
 } as const
 

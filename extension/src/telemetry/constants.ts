@@ -29,10 +29,6 @@ export const EventName = Object.assign(
     EXTENSION_EXECUTION_DETAILS_CHANGED: 'extension.executionDetails.changed',
     EXTENSION_LOAD: 'extension.load',
 
-    VIEWS_CONNECT_CLOSED: 'views.connect.closed',
-    VIEWS_CONNECT_CREATED: 'views.connect.created',
-    VIEWS_CONNECT_FOCUS_CHANGED: 'views.connect.focusChanged',
-
     VIEWS_EXPERIMENTS_TABLE_CLOSED: 'views.experimentsTable.closed',
     VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED:
       'views.experimentsTable.columnsReordered',
@@ -212,10 +208,6 @@ export interface IEventNamePropertyMapping {
   [EventName.EXTENSION_SHOW_COMMANDS]: undefined
   [EventName.EXTENSION_SHOW_OUTPUT]: undefined
 
-  [EventName.VIEWS_CONNECT_CLOSED]: undefined
-  [EventName.VIEWS_CONNECT_CREATED]: undefined
-  [EventName.VIEWS_CONNECT_FOCUS_CHANGED]: undefined
-
   [EventName.VIEWS_EXPERIMENTS_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_FILTER_BY_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_METRICS_AND_PARAMS_TREE_OPENED]: DvcRootCount
@@ -290,8 +282,6 @@ export interface IEventNamePropertyMapping {
   [EventName.SETUP_SHOW]: undefined
   [EventName.SELECT_FOCUSED_PROJECTS]: undefined
 
-  [EventName.CONNECT_SHOW]: undefined
-  [EventName.OPEN_STUDIO_SETTINGS]: undefined
   [EventName.ADD_STUDIO_ACCESS_TOKEN]: undefined
   [EventName.UPDATE_STUDIO_ACCESS_TOKEN]: undefined
   [EventName.REMOVE_STUDIO_ACCESS_TOKEN]: undefined
