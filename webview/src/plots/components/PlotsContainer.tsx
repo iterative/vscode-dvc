@@ -1,6 +1,5 @@
 import cx from 'classnames'
 import React, {
-  MouseEvent,
   useEffect,
   DetailedHTMLProps,
   HTMLAttributes,
@@ -12,23 +11,12 @@ import { Section } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { PlotsPicker, PlotsPickerProps } from './PlotsPicker'
 import styles from './styles.module.scss'
-import { Icon } from '../../shared/components/Icon'
-import { IconMenu } from '../../shared/components/iconMenu/IconMenu'
 import { IconMenuItemProps } from '../../shared/components/iconMenu/IconMenuItem'
 import { sendMessage } from '../../shared/vscode'
-import Tooltip from '../../shared/components/tooltip/Tooltip'
-import {
-  ChevronDown,
-  ChevronRight,
-  Info,
-  Lines,
-  Add,
-  Trash
-} from '../../shared/components/icons'
-import { isSelecting } from '../../util/strings'
-import { isTooltip } from '../../util/helpers'
+import { Lines, Add, Trash } from '../../shared/components/icons'
 import { MinMaxSlider } from '../../shared/components/slider/MinMaxSlider'
 import { PlotsState } from '../store'
+import { SectionContainer } from '../../shared/components/sectionContainer/SectionContainer'
 
 export interface PlotsContainerProps {
   sectionCollapsed: boolean
@@ -80,10 +68,6 @@ export const SectionDescription = {
   )
 }
 
-const InfoIcon = () => (
-  <Icon icon={Info} width={16} height={16} className={styles.infoIcon} />
-)
-
 export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   sectionCollapsed,
   sectionKey,
@@ -132,28 +116,6 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     })
   }
 
-  const tooltipContent = (
-    <div className={styles.infoTooltip}>
-      <InfoIcon />
-      {SectionDescription[sectionKey]}
-    </div>
-  )
-
-  const toggleSection = (e: MouseEvent) => {
-    e.preventDefault()
-    if (
-      !isSelecting([title, SectionDescription[sectionKey].props.children]) &&
-      !isTooltip(e.target as Element, ['SUMMARY', 'BODY'])
-    ) {
-      sendMessage({
-        payload: {
-          [sectionKey]: !sectionCollapsed
-        },
-        type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
-      })
-    }
-  }
-
   const handleResize = useCallback(
     (nbItems: number) => {
       if (changeNbItemsPerRow) {
@@ -172,66 +134,55 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
     [dispatch, changeNbItemsPerRow, sectionKey]
   )
 
+  const toggleSection = () =>
+    sendMessage({
+      payload: {
+        [sectionKey]: !sectionCollapsed
+      },
+      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
+    })
+
   return (
-    <div className={styles.plotsContainerWrapper} data-testid="plots-container">
-      <details open={open} className={styles.plotsContainer}>
-        <summary onClick={toggleSection}>
-          <Icon
-            icon={open ? ChevronDown : ChevronRight}
-            data-testid="plots-container-details-chevron"
-            width={20}
-            height={20}
-            className={styles.detailsIcon}
+    <SectionContainer
+      menuItems={menuItems}
+      sectionCollapsed={sectionCollapsed}
+      sectionKey={sectionKey}
+      title={title}
+      onToggleSection={toggleSection}
+    >
+      {changeNbItemsPerRow && hasItems && maxNbPlotsPerRow > 1 && (
+        <div
+          className={styles.nbItemsPerRowSlider}
+          data-testid="nb-items-per-row-slider"
+        >
+          <MinMaxSlider
+            maximum={-1}
+            minimum={-maxNbPlotsPerRow}
+            label="Plot Width"
+            onChange={handleResize}
+            defaultValue={-nbItemsPerRow}
           />
-          {title}
-          <Tooltip content={tooltipContent} placement="bottom-end" interactive>
-            <div
-              className={styles.infoTooltipToggle}
-              data-testid="info-tooltip-toggle"
-            >
-              <InfoIcon />
-            </div>
-          </Tooltip>
-        </summary>
-        {changeNbItemsPerRow && hasItems && maxNbPlotsPerRow > 1 && (
-          <div
-            className={styles.nbItemsPerRowSlider}
-            data-testid="nb-items-per-row-slider"
-          >
-            <MinMaxSlider
-              maximum={-1}
-              minimum={-maxNbPlotsPerRow}
-              label="Plot Width"
-              onChange={handleResize}
-              defaultValue={-nbItemsPerRow}
-            />
-          </div>
-        )}
-        {open && (
-          <div
-            className={cx({
-              [styles.plotsWrapper]: sectionKey !== Section.COMPARISON_TABLE,
-              [styles.smallPlots]: nbItemsPerRow >= 4
-            })}
-            style={
-              {
-                '--nbPerRow': nbItemsPerRow
-              } as DetailedHTMLProps<
-                HTMLAttributes<HTMLDivElement>,
-                HTMLDivElement
-              >
-            }
-            data-testid="plots-wrapper"
-          >
-            {children}
-          </div>
-        )}
-      </details>
-      {menuItems.length > 0 && (
-        <div className={styles.iconMenu}>
-          <IconMenu items={menuItems} />
         </div>
       )}
-    </div>
+      {open && (
+        <div
+          className={cx({
+            [styles.plotsWrapper]: sectionKey !== Section.COMPARISON_TABLE,
+            [styles.smallPlots]: nbItemsPerRow >= 4
+          })}
+          style={
+            {
+              '--nbPerRow': nbItemsPerRow
+            } as DetailedHTMLProps<
+              HTMLAttributes<HTMLDivElement>,
+              HTMLDivElement
+            >
+          }
+          data-testid="plots-wrapper"
+        >
+          {children}
+        </div>
+      )}
+    </SectionContainer>
   )
 }

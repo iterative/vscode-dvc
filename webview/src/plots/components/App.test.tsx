@@ -39,7 +39,6 @@ import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { VisualizationSpec } from 'react-vega'
 import { App } from './App'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
-import { SectionDescription } from './PlotsContainer'
 import {
   CustomPlotsById,
   plotDataStore,
@@ -54,6 +53,7 @@ import {
   dragEnter,
   dragLeave
 } from '../../test/dragDrop'
+import { SectionDescription } from '../../shared/components/sectionContainer/SectionContainer'
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
 import { clearSelection, createWindowTextSelection } from '../../test/selection'
 import * as EventCurrentTargetDistances from '../../shared/components/dragDrop/currentTarget'
@@ -754,25 +754,6 @@ describe('App', () => {
     expect(
       screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
     ).toStrictEqual([
-      'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
-      'custom-summary.json:loss',
-      'custom-summary.json:accuracy'
-    ])
-  })
-
-  it('should not be possible to drag a plot from a section to another', () => {
-    renderAppWithOptionalData({
-      custom: customPlotsFixture,
-      template: templatePlotsFixture
-    })
-
-    const customPlots = screen.getAllByTestId(/summary\.json/)
-    const templatePlots = screen.getAllByTestId(/^plot_/)
-
-    dragAndDrop(templatePlots[0], customPlots[2])
-
-    expect(customPlots.map(plot => plot.id)).toStrictEqual([
-      'custom-metrics:summary.json:loss-params:params.yaml:dropout',
       'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
       'custom-summary.json:loss',
       'custom-summary.json:accuracy'
