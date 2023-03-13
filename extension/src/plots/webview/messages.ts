@@ -283,7 +283,7 @@ export class WebviewMessages {
       param: isCheckpointValue(plot.type)
         ? plot.param
         : buildMetricOrParamPath(ColumnType.PARAMS, plot.param),
-      type: CustomPlotType.METRIC_VS_PARAM
+      type: plot.type
     }))
     this.plots.setCustomPlotsOrder(newOrder)
     this.sendCustomPlotsAndEvent(EventName.VIEWS_REORDER_PLOTS_CUSTOM)
