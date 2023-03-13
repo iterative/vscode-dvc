@@ -463,17 +463,20 @@ export class PlotsModel extends ModelWithPersistence {
     colors: ColorScale | undefined
   ): CustomPlotData[] {
     const selectedExperimentsExist = !!colors
-    let filteredPlots = plots
-    if (!selectedExperimentsExist) {
-      filteredPlots = plots.filter(plot => !isCheckpointPlot(plot))
-    }
-    return filteredPlots.map(plot =>
-      collectCustomPlotData(
-        plot,
-        colors,
-        this.getNbItemsPerRow(Section.CUSTOM_PLOTS)
+    const filteredPlots: CustomPlotData[] = []
+    for (const plot of plots) {
+      if (!selectedExperimentsExist && isCheckpointPlot(plot)) {
+        continue
+      }
+      filteredPlots.push(
+        collectCustomPlotData(
+          plot,
+          colors,
+          this.getNbItemsPerRow(Section.CUSTOM_PLOTS)
+        )
       )
-    )
+    }
+    return filteredPlots
   }
 
   private getSelectedComparisonPlots(
