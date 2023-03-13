@@ -6,7 +6,8 @@ import {
   collectTemplates,
   collectOverrideRevisionDetails,
   collectCustomPlots,
-  collectCustomCheckpointPlots
+  collectCustomCheckpointPlots,
+  collectCustomPlotData
 } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import customPlotsFixture, {
@@ -18,7 +19,12 @@ import {
   EXPERIMENT_WORKSPACE_ID
 } from '../../cli/dvc/contract'
 import { sameContents } from '../../util/array'
-import { CustomPlot, TemplatePlot } from '../webview/contract'
+import {
+  CheckpointPlot,
+  CustomPlot,
+  CustomPlotData,
+  TemplatePlot
+} from '../webview/contract'
 import { getCLICommitId } from '../../test/fixtures/plotsDiff/util'
 import expShowFixture from '../../test/fixtures/expShow/base/output'
 import modifiedFixture from '../../test/fixtures/expShow/modified/output'
@@ -29,17 +35,25 @@ const logsLossPath = join('logs', 'loss.tsv')
 
 const logsLossPlot = (plotsDiffFixture[logsLossPath][0] || {}) as TemplatePlot
 
+const getCustomPlotFromCustomPlotData = ({
+  id,
+  metric,
+  param,
+  type,
+  values
+}: CustomPlotData) =>
+  ({
+    id,
+    metric,
+    param,
+    type,
+    values
+  } as CustomPlot)
+
 describe('collectCustomPlots', () => {
   it('should return the expected data from the test fixture', () => {
     const expectedOutput: CustomPlot[] = customPlotsFixture.plots.map(
-      ({ type, metric, id, values, param }) =>
-        ({
-          id,
-          metric,
-          param,
-          type,
-          values
-        } as CustomPlot)
+      getCustomPlotFromCustomPlotData
     )
     const data = collectCustomPlots(
       customPlotsOrderFixture,
@@ -85,6 +99,54 @@ describe('collectCustomPlots', () => {
     )
 
     expect(data).toStrictEqual(expectedOutput)
+  })
+})
+
+describe('collectCustomPlotData', () => {
+  it('should return the expected data from test fixture', () => {
+    const expectedMetricVsParamPlotData = customPlotsFixture.plots[0]
+    const expectedCheckpointsPlotData = customPlotsFixture.plots[2]
+    const metricVsParamPlot = getCustomPlotFromCustomPlotData(
+      expectedMetricVsParamPlotData
+    )
+    const checkpointsPlot = getCustomPlotFromCustomPlotData(
+      expectedCheckpointsPlotData
+    )
+
+    const metricVsParamData = collectCustomPlotData(
+      metricVsParamPlot,
+      customPlotsFixture.colors,
+      customPlotsFixture.nbItemsPerRow
+    )
+
+    const checkpointsData = collectCustomPlotData(
+      {
+        ...checkpointsPlot,
+        values: [
+          ...checkpointsPlot.values,
+          {
+            group: 'exp-123',
+            iteration: 1,
+            y: 1.4534177053451538
+          },
+          {
+            group: 'exp-123',
+            iteration: 2,
+            y: 1.757687
+          },
+          {
+            group: 'exp-123',
+            iteration: 3,
+            y: 1.989894
+          }
+        ]
+      } as CheckpointPlot,
+      customPlotsFixture.colors,
+      customPlotsFixture.nbItemsPerRow
+    )
+
+    expect(metricVsParamData).toStrictEqual(expectedMetricVsParamPlotData)
+    expect(checkpointsData).toStrictEqual(expectedCheckpointsPlotData)
   })
 })
 

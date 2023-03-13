@@ -12,7 +12,8 @@ import {
   collectOverrideRevisionDetails,
   collectCustomPlots,
   getCustomPlotId,
-  collectCustomCheckpointPlots
+  collectCustomCheckpointPlots,
+  collectCustomPlotData
 } from './collect'
 import { getRevisionFirstThreeColumns } from './util'
 import { CustomPlotsOrderValue, isCheckpointPlot } from './custom'
@@ -39,7 +40,7 @@ import {
   PlotsOutputOrError
 } from '../../cli/dvc/contract'
 import { Experiments } from '../../experiments'
-import { getColorScale, truncateVerticalTitle } from '../vega/util'
+import { getColorScale } from '../vega/util'
 import { definedAndNonEmpty, reorderObjectList } from '../../util/array'
 import { removeMissingKeysFromObject } from '../../util/object'
 import { TemplateOrder } from '../paths/collect'
@@ -161,7 +162,7 @@ export class PlotsModel extends ModelWithPersistence {
       colors,
       height: this.getHeight(Section.CUSTOM_PLOTS),
       nbItemsPerRow: this.getNbItemsPerRow(Section.CUSTOM_PLOTS),
-      plots: this.getCustomPlotData(this.customPlots, colors)
+      plots: this.getCustomPlotsData(this.customPlots, colors)
     }
   }
 
@@ -457,7 +458,7 @@ export class PlotsModel extends ModelWithPersistence {
     return this.commitRevisions[label] || label
   }
 
-  private getCustomPlotData(
+  private getCustomPlotsData(
     plots: CustomPlot[],
     colors: ColorScale | undefined
   ): CustomPlotData[] {
@@ -466,20 +467,12 @@ export class PlotsModel extends ModelWithPersistence {
     if (!selectedExperimentsExist) {
       filteredPlots = plots.filter(plot => !isCheckpointPlot(plot))
     }
-    return filteredPlots.map(
-      plot =>
-        ({
-          ...plot,
-          values: isCheckpointPlot(plot)
-            ? plot.values.filter(value =>
-                (colors as ColorScale).domain.includes(value.group)
-              )
-            : plot.values,
-          yTitle: truncateVerticalTitle(
-            plot.metric,
-            this.getNbItemsPerRow(Section.CUSTOM_PLOTS)
-          ) as string
-        } as CustomPlotData)
+    return filteredPlots.map(plot =>
+      collectCustomPlotData(
+        plot,
+        colors,
+        this.getNbItemsPerRow(Section.CUSTOM_PLOTS)
+      )
     )
   }
 

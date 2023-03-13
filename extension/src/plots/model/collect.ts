@@ -6,6 +6,7 @@ import { CustomCheckpointPlots } from '.'
 import {
   CHECKPOINTS_PARAM,
   CustomPlotsOrderValue,
+  isCheckpointPlot,
   isCheckpointValue
 } from './custom'
 import { getRevisionFirstThreeColumns } from './util'
@@ -22,7 +23,8 @@ import {
   Revision,
   CustomPlotType,
   CustomPlot,
-  MetricVsParamPlot
+  MetricVsParamPlot,
+  CustomPlotData
 } from '../webview/contract'
 import {
   EXPERIMENT_WORKSPACE_ID,
@@ -48,7 +50,11 @@ import {
 } from '../../experiments/webview/contract'
 import { addToMapArray } from '../../util/map'
 import { TemplateOrder } from '../paths/collect'
-import { extendVegaSpec, isMultiViewPlot } from '../vega/util'
+import {
+  extendVegaSpec,
+  isMultiViewPlot,
+  truncateVerticalTitle
+} from '../vega/util'
 import { definedAndNonEmpty, reorderObjectList } from '../../util/array'
 import { shortenForLabel } from '../../util/string'
 import {
@@ -305,6 +311,25 @@ export const collectCustomPlots = (
       return collectMetricVsParamPlot(metric, param, experiments)
     })
     .filter(Boolean)
+}
+
+export const collectCustomPlotData = (
+  plot: CustomPlot,
+  colors: ColorScale | undefined,
+  nbItemsPerRow: number
+): CustomPlotData => {
+  const selectedExperiments = colors?.domain
+  const filteredValues = isCheckpointPlot(plot)
+    ? plot.values.filter(value =>
+        (selectedExperiments as string[]).includes(value.group)
+      )
+    : plot.values
+
+  return {
+    ...plot,
+    values: filteredValues,
+    yTitle: truncateVerticalTitle(plot.metric, nbItemsPerRow) as string
+  } as CustomPlotData
 }
 
 type RevisionPathData = { [path: string]: Record<string, unknown>[] }

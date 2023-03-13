@@ -75,7 +75,7 @@ rendered side by side for the selected experiments.
 </p>
 
 **Custom** plots are generated linear plots comparing metrics and params. A user
-can choose between two types of plots, "Checkpoint Trend" and "Metric Vs Param".
+can add two types of plots, "Checkpoint Trend" and "Metric Vs Param".
 
 "Metric Vs Param" plots compare a chosen metric and param across experiments.
 "Checkpoint Trend" plots can compare a chosen [metric] value per epoch if

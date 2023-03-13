@@ -234,8 +234,7 @@ export class WebviewMessages {
 
   private async addCustomPlot() {
     if (!this.experiments.hasCheckpoints()) {
-      void this.addMetricVsParamPlot()
-      return
+      return this.addMetricVsParamPlot()
     }
 
     const plotType = await pickCustomPlotType()
@@ -244,11 +243,9 @@ export class WebviewMessages {
       return
     }
 
-    if (isCheckpointValue(plotType)) {
-      void this.addCheckpointPlot()
-    } else {
-      void this.addMetricVsParamPlot()
-    }
+    return isCheckpointValue(plotType)
+      ? this.addCheckpointPlot()
+      : this.addMetricVsParamPlot()
   }
 
   private async removeCustomPlots() {

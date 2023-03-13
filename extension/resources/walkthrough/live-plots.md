@@ -33,6 +33,6 @@ for epoch in range(NUM_EPOCHS):
 `DVCLive` is _optional_, and you can just append or modify plot files using any
 language and any tool.
 
-💡 `Custom` section of the plots dashboard is being updated automatically based
-on the data in the table. You don't even have to manage or write any special
-plot files.
+💡 Plots created in the `Custom` section of the plots dashboard is being updated
+automatically based on the data in the table. You don't even have to manage or
+write any special plot files.

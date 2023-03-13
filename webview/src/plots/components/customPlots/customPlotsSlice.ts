@@ -16,8 +16,10 @@ export interface CustomPlotsState extends Omit<CustomPlotsData, 'plots'> {
   disabledDragPlotIds: string[]
 }
 
+const initialColorsState = { domain: [], range: [] }
+
 export const customPlotsInitialState: CustomPlotsState = {
-  colors: { domain: [], range: [] },
+  colors: initialColorsState,
   disabledDragPlotIds: [],
   hasData: false,
   height: DEFAULT_HEIGHT[Section.CUSTOM_PLOTS],
@@ -51,7 +53,7 @@ export const customPlotsSlice = createSlice({
       return {
         ...state,
         ...statePayload,
-        colors: colors || { domain: [], range: [] },
+        colors: colors || initialColorsState,
         hasData: !!action.payload,
         plotsIds: plots?.map(plot => plot.id) || [],
         plotsSnapshots: snapShots

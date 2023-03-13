@@ -9,16 +9,13 @@ import { PlainObject, VisualizationSpec } from 'react-vega'
 import { plotDataStore } from '../components/plotDataStore'
 import { PlotsState } from '../store'
 
-const getStoreSection = (section: Section) =>
-  section === Section.TEMPLATE_PLOTS ? 'template' : 'custom'
-
 export const useGetPlot = (
   section: Section,
   id: string,
   spec?: VisualizationSpec
 ) => {
-  const isPlotWithSpec = section === Section.CUSTOM_PLOTS
-  const storeSection = getStoreSection(section)
+  const isCustomPlot = section === Section.CUSTOM_PLOTS
+  const storeSection = isCustomPlot ? 'custom' : 'template'
   const snapshot = useSelector(
     (state: PlotsState) => state[storeSection].plotsSnapshots
   )
@@ -31,7 +28,7 @@ export const useGetPlot = (
       return
     }
 
-    if (isPlotWithSpec) {
+    if (isCustomPlot) {
       setData({ values: (plot as CustomPlotData).values })
       setContent(spec)
       return
@@ -43,7 +40,7 @@ export const useGetPlot = (
       height: 'container',
       width: 'container'
     } as VisualizationSpec)
-  }, [id, isPlotWithSpec, setData, setContent, section, spec])
+  }, [id, isCustomPlot, setData, setContent, section, spec])
 
   useEffect(() => {
     setPlotData()
