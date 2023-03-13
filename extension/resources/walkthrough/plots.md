@@ -76,9 +76,10 @@ rendered side by side for the selected experiments.
 
 **Custom** plots are generated linear plots comparing metrics and params. A user
 can choose between two types of plots, "Checkpoint Trend" and "Metric Vs Param".
-"Checkpoint Trend" plots compare a chosen [metric] value per epoch if
-[checkpoints] are enabled and "Metric Vs Param" plots compare a chosen metric
-and param across experiments.
+
+"Metric Vs Param" plots compare a chosen metric and param across experiments.
+"Checkpoint Trend" plots can compare a chosen [metric] value per epoch if
+[checkpoints] are enabled.
 
 [metric]: https://dvc.org/doc/command-reference/metrics
 [checkpoints]: https://dvc.org/doc/user-guide/experiment-management/checkpoints
