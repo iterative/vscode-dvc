@@ -85,6 +85,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   const maxNbPlotsPerRow = useSelector(
     (state: PlotsState) => state.webview.maxNbPlotsPerRow
   )
+  const ribbonHeight = useSelector((state: PlotsState) => state.ribbon.height)
 
   useEffect(() => {
     window.dispatchEvent(new Event('resize'))
@@ -153,6 +154,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
       {changeNbItemsPerRow && hasItems && maxNbPlotsPerRow > 1 && (
         <div
           className={styles.nbItemsPerRowSlider}
+          style={{ top: ribbonHeight - 4 }}
           data-testid="nb-items-per-row-slider"
         >
           <MinMaxSlider
@@ -162,6 +164,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
             onChange={handleResize}
             defaultValue={-nbItemsPerRow}
           />
+          main
         </div>
       )}
       {open && (
