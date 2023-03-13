@@ -31,43 +31,6 @@ export interface PlotsContainerProps {
   hasItems?: boolean
 }
 
-export const SectionDescription = {
-  // "Custom"
-  [Section.CUSTOM_PLOTS]: (
-    <span data-testid="tooltip-custom-plots">
-      Generated custom linear plots comparing chosen metrics and params in all
-      experiments in the table.
-    </span>
-  ),
-  // "Images"
-  [Section.COMPARISON_TABLE]: (
-    <span data-testid="tooltip-comparison-plots">
-      Images (e.g. any <code>.jpg</code>, <code>.svg</code>, or
-      <code>.png</code> file) rendered side by side across experiments. They
-      should be registered as{' '}
-      <a href="https://dvc.org/doc/user-guide/experiment-management/visualizing-plots">
-        plots
-      </a>
-      .
-    </span>
-  ),
-  // "Data Series"
-  [Section.TEMPLATE_PLOTS]: (
-    <span data-testid="tooltip-template-plots">
-      Any <code>JSON</code>, <code>YAML</code>, <code>CSV</code>, or{' '}
-      <code>TSV</code> file(s) with data points, visualized using{' '}
-      <a href="https://dvc.org/doc/user-guide/experiment-management/visualizing-plots#plot-templates-data-series-only">
-        plot templates
-      </a>
-      . Either predefined (e.g. confusion matrix, linear) or{' '}
-      <a href="https://dvc.org/doc/command-reference/plots/templates#custom-templates">
-        custom Vega-lite templates
-      </a>
-      .
-    </span>
-  )
-}
-
 export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   sectionCollapsed,
   sectionKey,
