@@ -9,11 +9,10 @@ import { AnyAction } from '@reduxjs/toolkit'
 import { useDispatch, useSelector } from 'react-redux'
 import { Section } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { PlotsPicker, PlotsPickerProps } from './PlotsPicker'
 import styles from './styles.module.scss'
 import { IconMenuItemProps } from '../../shared/components/iconMenu/IconMenuItem'
 import { sendMessage } from '../../shared/vscode'
-import { Lines, Add, Trash } from '../../shared/components/icons'
+import { Add, Trash } from '../../shared/components/icons'
 import { MinMaxSlider } from '../../shared/components/slider/MinMaxSlider'
 import { PlotsState } from '../store'
 import { SectionContainer } from '../../shared/components/sectionContainer/SectionContainer'
@@ -24,48 +23,10 @@ export interface PlotsContainerProps {
   title: string
   nbItemsPerRow: number
   changeNbItemsPerRow?: (nb: number) => AnyAction
-  menu?: PlotsPickerProps
   addPlotsButton?: { onClick: () => void }
   removePlotsButton?: { onClick: () => void }
   children: React.ReactNode
   hasItems?: boolean
-}
-
-export const SectionDescription = {
-  // "Custom"
-  [Section.CUSTOM_PLOTS]: (
-    <span data-testid="tooltip-custom-plots">
-      Generated custom linear plots comparing chosen metrics and params in all
-      experiments in the table.
-    </span>
-  ),
-  // "Images"
-  [Section.COMPARISON_TABLE]: (
-    <span data-testid="tooltip-comparison-plots">
-      Images (e.g. any <code>.jpg</code>, <code>.svg</code>, or
-      <code>.png</code> file) rendered side by side across experiments. They
-      should be registered as{' '}
-      <a href="https://dvc.org/doc/user-guide/experiment-management/visualizing-plots">
-        plots
-      </a>
-      .
-    </span>
-  ),
-  // "Data Series"
-  [Section.TEMPLATE_PLOTS]: (
-    <span data-testid="tooltip-template-plots">
-      Any <code>JSON</code>, <code>YAML</code>, <code>CSV</code>, or{' '}
-      <code>TSV</code> file(s) with data points, visualized using{' '}
-      <a href="https://dvc.org/doc/user-guide/experiment-management/visualizing-plots#plot-templates-data-series-only">
-        plot templates
-      </a>
-      . Either predefined (e.g. confusion matrix, linear) or{' '}
-      <a href="https://dvc.org/doc/command-reference/plots/templates#custom-templates">
-        custom Vega-lite templates
-      </a>
-      .
-    </span>
-  )
 }
 
 export const PlotsContainer: React.FC<PlotsContainerProps> = ({
@@ -74,7 +35,6 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   title,
   children,
   nbItemsPerRow,
-  menu,
   addPlotsButton,
   removePlotsButton,
   changeNbItemsPerRow,
@@ -91,14 +51,6 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   }, [nbItemsPerRow])
 
   const menuItems: IconMenuItemProps[] = []
-
-  if (menu) {
-    menuItems.unshift({
-      icon: Lines,
-      onClickNode: <PlotsPicker {...menu} />,
-      tooltip: 'Select Plots'
-    })
-  }
 
   if (addPlotsButton) {
     menuItems.unshift({
