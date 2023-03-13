@@ -501,6 +501,7 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
             }
           } as TopLevelSpec,
           DEFAULT_NB_ITEMS_PER_ROW,
+          DEFAULT_PLOT_HEIGHT,
           {
             color: {
               domain: expectedRevisions,

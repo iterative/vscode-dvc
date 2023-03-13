@@ -8,7 +8,8 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   TemplatePlotGroup,
   TemplatePlotSection,
-  DEFAULT_NB_ITEMS_PER_ROW
+  DEFAULT_NB_ITEMS_PER_ROW,
+  DEFAULT_PLOT_HEIGHT
 } from 'dvc/src/plots/webview/contract'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
 import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/base/checkpointPlots'
@@ -36,18 +37,26 @@ const smallCheckpointPlotsFixture = {
   nbItemsPerRow: 3,
   plots: checkpointPlotsFixture.plots.map(plot => ({
     ...plot,
-    title: truncateVerticalTitle(plot.title, 3) as string
+    title: truncateVerticalTitle(
+      plot.title,
+      DEFAULT_NB_ITEMS_PER_ROW,
+      DEFAULT_PLOT_HEIGHT
+    ) as string
   }))
 }
 
-const manyCheckpointPlots = (length: number, size = DEFAULT_NB_ITEMS_PER_ROW) =>
+const manyCheckpointPlots = (length: number) =>
   Array.from({ length }, () => checkpointPlotsFixture.plots[0]).map(
     (plot, i) => {
       const id = plot.id + i.toString()
       return {
         ...plot,
         id,
-        title: truncateVerticalTitle(id, size) as string
+        title: truncateVerticalTitle(
+          id,
+          DEFAULT_NB_ITEMS_PER_ROW,
+          DEFAULT_PLOT_HEIGHT
+        ) as string
       }
     }
   )

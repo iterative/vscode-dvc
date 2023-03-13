@@ -139,6 +139,22 @@ export class WebviewMessages {
       { height, nbItemsPerRow, section },
       undefined
     )
+
+    switch (section) {
+      case Section.CHECKPOINT_PLOTS:
+        this.sendCheckpointPlotsMessage()
+        break
+      case Section.COMPARISON_TABLE:
+        this.sendComparisonPlots()
+        break
+      case Section.CUSTOM_PLOTS:
+        this.sendCustomPlots()
+        break
+      case Section.TEMPLATE_PLOTS:
+        this.sendTemplatePlots()
+        break
+      default:
+    }
   }
 
   private setSectionCollapsed(collapsed: Partial<SectionCollapsed>) {

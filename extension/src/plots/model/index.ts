@@ -511,7 +511,8 @@ export class PlotsModel extends ModelWithPersistence {
           id,
           title: truncateVerticalTitle(
             id,
-            this.getNbItemsPerRow(Section.CHECKPOINT_PLOTS)
+            this.getNbItemsPerRow(Section.CHECKPOINT_PLOTS),
+            this.getHeight(Section.CHECKPOINT_PLOTS)
           ) as string,
           values: values.filter(value =>
             selectedExperiments.includes(value.group)
@@ -563,6 +564,7 @@ export class PlotsModel extends ModelWithPersistence {
       this.templates,
       this.revisionData,
       this.getNbItemsPerRow(Section.TEMPLATE_PLOTS),
+      this.getHeight(Section.TEMPLATE_PLOTS),
       this.getRevisionColors(selectedRevisions),
       this.multiSourceEncoding
     )
