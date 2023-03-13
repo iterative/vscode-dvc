@@ -76,6 +76,7 @@ export const EventName = Object.assign(
     VIEWS_PLOTS_SELECT_PLOTS: 'view.plots.selectPlots',
     VIEWS_PLOTS_ZOOM_PLOT: 'views.plots.zoomPlot',
     VIEWS_REORDER_PLOTS_CUSTOM: 'views.plots.customReordered',
+    VIEWS_REORDER_PLOTS_METRICS: 'views.plots.metricsReordered',
     VIEWS_REORDER_PLOTS_TEMPLATES: 'views.plots.templatesReordered',
 
     VIEWS_SETUP_CLOSE: 'view.setup.closed',
@@ -262,6 +263,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_SELECT_PLOTS]: undefined
   [EventName.VIEWS_PLOTS_EXPERIMENT_TOGGLE]: undefined
   [EventName.VIEWS_PLOTS_ZOOM_PLOT]: undefined
+  [EventName.VIEWS_REORDER_PLOTS_METRICS]: undefined
   [EventName.VIEWS_REORDER_PLOTS_CUSTOM]: undefined
   [EventName.VIEWS_REORDER_PLOTS_TEMPLATES]: undefined
 

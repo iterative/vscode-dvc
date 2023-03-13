@@ -29,6 +29,7 @@ export enum MessageFromWebviewType {
   REORDER_COLUMNS = 'reorder-columns',
   REORDER_PLOTS_COMPARISON = 'reorder-plots-comparison',
   REORDER_PLOTS_COMPARISON_ROWS = 'reorder-plots-comparison-rows',
+  REORDER_PLOTS_METRICS = 'reorder-plots-metrics',
   REORDER_PLOTS_CUSTOM = 'reorder-plots-custom',
   REORDER_PLOTS_TEMPLATES = 'reorder-plots-templates',
   REFRESH_REVISION = 'refresh-revision',
@@ -52,6 +53,7 @@ export enum MessageFromWebviewType {
   SET_STUDIO_SHARE_EXPERIMENTS_LIVE = 'set-studio-share-experiments-live',
   SHARE_EXPERIMENT_AS_BRANCH = 'share-experiment-as-branch',
   SHARE_EXPERIMENT_AS_COMMIT = 'share-experiment-as-commit',
+  TOGGLE_METRIC = 'toggle-metric',
   TOGGLE_PLOTS_SECTION = 'toggle-plots-section',
   REMOVE_CUSTOM_PLOTS = 'remove-custom-plots',
   REMOVE_STUDIO_TOKEN = 'remove-studio-token',
@@ -159,6 +161,10 @@ export type MessageFromWebview =
       payload: string
     }
   | {
+      type: MessageFromWebviewType.TOGGLE_METRIC
+      payload: string[]
+    }
+  | {
       type: MessageFromWebviewType.REMOVE_CUSTOM_PLOTS
     }
   | { type: MessageFromWebviewType.REMOVE_STUDIO_TOKEN }
@@ -168,6 +174,10 @@ export type MessageFromWebview =
     }
   | {
       type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON_ROWS
+      payload: string[]
+    }
+  | {
+      type: MessageFromWebviewType.REORDER_PLOTS_METRICS
       payload: string[]
     }
   | {
