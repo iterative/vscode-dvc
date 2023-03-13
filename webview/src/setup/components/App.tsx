@@ -10,7 +10,7 @@ import {
 import React, { useCallback, useState } from 'react'
 import { Experiments } from './Experiments'
 import { Studio } from './Studio'
-import { SectionContainer } from '../../shared/components/sectionContainer/SectionContainer'
+import { SectionContainer } from './SectionContainer'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 import { sendMessage } from '../../shared/vscode'
 
@@ -80,15 +80,10 @@ export const App: React.FC = () => {
   return (
     <>
       <SectionContainer
-        sectionCollapsed={sectionCollapsed[Section.EXPERIMENTS]}
         sectionKey={Section.EXPERIMENTS}
         title={'Experiments'}
-        onToggleSection={() =>
-          setSectionCollapsed({
-            ...sectionCollapsed,
-            [Section.EXPERIMENTS]: !sectionCollapsed[Section.EXPERIMENTS]
-          })
-        }
+        sectionCollapsed={sectionCollapsed}
+        setSectionCollapsed={setSectionCollapsed}
       >
         <Experiments
           canGitInitialize={canGitInitialize}
@@ -102,15 +97,10 @@ export const App: React.FC = () => {
         />
       </SectionContainer>
       <SectionContainer
-        sectionCollapsed={sectionCollapsed[Section.STUDIO]}
         sectionKey={Section.STUDIO}
         title={'Studio'}
-        onToggleSection={() =>
-          setSectionCollapsed({
-            ...sectionCollapsed,
-            [Section.STUDIO]: !sectionCollapsed[Section.STUDIO]
-          })
-        }
+        sectionCollapsed={sectionCollapsed}
+        setSectionCollapsed={setSectionCollapsed}
       >
         <Studio
           isStudioConnected={isStudioConnected}

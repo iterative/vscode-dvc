@@ -71,7 +71,9 @@ export const SectionDescription = {
   [SetupSection.STUDIO]: (
     <span data-testid="tooltip-setup-experiments">
       {"Configure the extension's connection to "}
-      <a href="https://studio.iterative.a">Studio</a>.
+      <a href="https://studio.iterative.a">Studio</a>.<br />
+      Studio provides a collaboration platform for Machine Learning and is free
+      for small teams and individual contributors.
     </span>
   )
 } as const
