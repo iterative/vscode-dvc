@@ -69,7 +69,7 @@ export const SectionDescription = {
   ),
   // Setup Experiments
   [SetupSection.STUDIO]: (
-    <span data-testid="tooltip-setup-experiments">
+    <span data-testid="tooltip-setup-studio">
       {"Configure the extension's connection to "}
       <a href="https://studio.iterative.a">Studio</a>.<br />
       Studio provides a collaboration platform for Machine Learning and is free
