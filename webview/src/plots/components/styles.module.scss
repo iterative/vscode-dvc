@@ -172,7 +172,7 @@ $gap: 20px;
 }
 
 .ratioVerticalNormal .plot {
-  aspect-ratio: 3 /4;
+  aspect-ratio: 3 / 4;
 }
 
 .ratioVerticalLarger .plot {
@@ -300,11 +300,13 @@ $gap: 20px;
 
 .sizeSliders {
   margin: 20px;
+  display: flex;
+  justify-content: end;
+  gap: 10px;
 }
 
 .sizeSlider {
   display: flex;
-  justify-content: end;
 }
 
 :global(.has-actions) {

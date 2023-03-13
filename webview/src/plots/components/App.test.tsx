@@ -703,16 +703,14 @@ describe('App', () => {
     })
     setWrapperSize(store)
 
-    expect(screen.getByTestId('nb-items-per-row-slider')).toBeInTheDocument()
+    expect(screen.getByTestId('size-sliders')).toBeInTheDocument()
   })
 
   it('should not display a slider to pick the number of items per row if there are no items', () => {
     const store = renderAppWithOptionalData({})
     setWrapperSize(store)
 
-    expect(
-      screen.queryByTestId('nb-items-per-row-slider')
-    ).not.toBeInTheDocument()
+    expect(screen.queryByTestId('size-sliders')).not.toBeInTheDocument()
   })
 
   it('should not display a slider to pick the number of items per row if the action is unavailable', () => {
@@ -721,9 +719,7 @@ describe('App', () => {
     })
     setWrapperSize(store)
 
-    expect(
-      screen.queryByTestId('nb-items-per-row-slider')
-    ).not.toBeInTheDocument()
+    expect(screen.queryByTestId('size-sliders')).not.toBeInTheDocument()
   })
 
   it('should not display a slider to pick the number of items per row if the only width available for one item per row or less', () => {
@@ -732,9 +728,7 @@ describe('App', () => {
     })
     setWrapperSize(store, 400)
 
-    expect(
-      screen.queryByTestId('nb-items-per-row-slider')
-    ).not.toBeInTheDocument()
+    expect(screen.queryByTestId('size-sliders')).not.toBeInTheDocument()
   })
 
   it('should send a message to the extension with the selected size when changing the width of plots', () => {
@@ -743,9 +737,9 @@ describe('App', () => {
     })
     setWrapperSize(store)
 
-    const plotResizer = within(
-      screen.getByTestId('nb-items-per-row-slider')
-    ).getAllByRole('slider')[0]
+    const plotResizer = within(screen.getByTestId('size-sliders')).getAllByRole(
+      'slider'
+    )[0]
 
     fireEvent.change(plotResizer, { target: { value: -3 } })
     expect(mockPostMessage).toHaveBeenCalledWith({
@@ -764,9 +758,9 @@ describe('App', () => {
     })
     setWrapperSize(store)
 
-    const plotResizer = within(
-      screen.getByTestId('nb-items-per-row-slider')
-    ).getAllByRole('slider')[1]
+    const plotResizer = within(screen.getByTestId('size-sliders')).getAllByRole(
+      'slider'
+    )[1]
 
     fireEvent.change(plotResizer, { target: { value: 3 } })
     expect(mockPostMessage).toHaveBeenCalledWith({
