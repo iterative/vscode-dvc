@@ -279,7 +279,7 @@ export class Setup
       needsGitInitialized,
       projectInitialized,
       pythonBinPath: getBinDisplayText(pythonBinPath),
-      shareLiveToStudio: false
+      shareLiveToStudio: getConfigValue(ConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE)
     })
   }
 
