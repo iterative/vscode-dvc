@@ -5,7 +5,7 @@ import {
 } from 'dvc/src/webview/contract'
 import '@testing-library/jest-dom/extend-expect'
 import React from 'react'
-import { SetupData } from 'dvc/src/setup/webview/contract'
+import { Section, SetupData } from 'dvc/src/setup/webview/contract'
 import { App } from './App'
 import { vsCodeApi } from '../../shared/api'
 
@@ -24,6 +24,7 @@ const renderApp = ({
   needsGitInitialized,
   projectInitialized,
   pythonBinPath,
+  sectionCollapsed,
   shareLiveToStudio
 }: SetupData) => {
   render(<App />)
@@ -40,6 +41,7 @@ const renderApp = ({
           needsGitInitialized,
           projectInitialized,
           pythonBinPath,
+          sectionCollapsed,
           shareLiveToStudio
         },
         type: MessageToWebviewType.SET_DATA
@@ -537,6 +539,57 @@ describe('App', () => {
       expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.SAVE_STUDIO_TOKEN
       })
+    })
+  })
+
+  describe('focused section', () => {
+    const testData = {
+      canGitInitialize: false,
+      cliCompatible: true,
+      hasData: false,
+      isPythonExtensionInstalled: true,
+      isStudioConnected: true,
+      needsGitCommit: false,
+      needsGitInitialized: false,
+      projectInitialized: true,
+      pythonBinPath: 'python',
+      shareLiveToStudio: false
+    }
+    const experimentsText = 'Your project contains no data'
+    const studioButtonText = 'Update Token'
+
+    it('should render the app with the Studio section collapsed if the Experiments section is focused', () => {
+      renderApp({
+        ...testData,
+        sectionCollapsed: {
+          [Section.EXPERIMENTS]: false,
+          [Section.STUDIO]: true
+        }
+      })
+      mockPostMessage.mockClear()
+      const studio = screen.getByText('Studio')
+      expect(studio).toBeVisible()
+      expect(screen.queryByText(studioButtonText)).not.toBeVisible()
+      const experiments = screen.getByText('Experiments')
+      expect(experiments).toBeVisible()
+      expect(screen.getByText(experimentsText)).toBeVisible()
+    })
+
+    it('should render the app with the Experiments section collapsed if the Studio section is focused', () => {
+      renderApp({
+        ...testData,
+        sectionCollapsed: {
+          [Section.EXPERIMENTS]: true,
+          [Section.STUDIO]: false
+        }
+      })
+      mockPostMessage.mockClear()
+      const studio = screen.getByText('Studio')
+      expect(studio).toBeVisible()
+      expect(screen.queryByText(studioButtonText)).toBeVisible()
+      const experiments = screen.getByText('Experiments')
+      expect(experiments).toBeVisible()
+      expect(screen.getByText(experimentsText)).not.toBeVisible()
     })
   })
 })

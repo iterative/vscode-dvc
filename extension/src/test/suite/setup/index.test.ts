@@ -46,6 +46,7 @@ import * as Python from '../../../extensions/python'
 import { STUDIO_ACCESS_TOKEN_KEY } from '../../../setup/token'
 import { ContextKey } from '../../../vscode/context'
 import { Setup } from '../../../setup'
+import { Section } from '../../../setup/webview/contract'
 
 suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
@@ -788,6 +789,69 @@ suite('Setup Test Suite', () => {
       )
 
       expect(mockDelete).to.be.calledWithExactly(STUDIO_ACCESS_TOKEN_KEY)
+    })
+
+    it('should send the appropriate messages to the webview to focus different sections', async () => {
+      const { setup, messageSpy } = buildSetup(disposable)
+      messageSpy.restore()
+
+      const webview = await setup.showSetup()
+      await webview.isReady()
+
+      const mockShow = stub(webview, 'show')
+
+      const getNewMessageReceived = () => {
+        mockShow.resetHistory()
+        mockShow.resetBehavior()
+        return new Promise(resolve =>
+          mockShow.callsFake(() => {
+            resolve(undefined)
+            return Promise.resolve(true)
+          })
+        )
+      }
+
+      const initialMessage = getNewMessageReceived()
+
+      void setup.showSetup()
+
+      await initialMessage
+
+      expect(mockShow).to.be.calledWithMatch({ sectionCollapsed: undefined })
+
+      const focusExperiments = getNewMessageReceived()
+
+      void setup.showSetup(Section.EXPERIMENTS)
+
+      await focusExperiments
+
+      expect(mockShow).to.be.calledWithMatch({
+        sectionCollapsed: {
+          [Section.EXPERIMENTS]: false,
+          [Section.STUDIO]: true
+        }
+      })
+
+      const focusStudio = getNewMessageReceived()
+
+      void setup.showSetup(Section.STUDIO)
+
+      await focusStudio
+
+      expect(mockShow).to.be.calledWithMatch({
+        sectionCollapsed: {
+          [Section.EXPERIMENTS]: true,
+          [Section.STUDIO]: false
+        }
+      })
+
+      const openUnchanged = getNewMessageReceived()
+
+      void setup.showSetup()
+
+      await openUnchanged
+
+      expect(mockShow).to.be.calledWithMatch({ sectionCollapsed: undefined })
     })
   })
 })
