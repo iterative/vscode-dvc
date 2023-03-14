@@ -84,7 +84,7 @@ export const SectionContainer: React.FC<
   sectionKey,
   title,
   className,
-  stickyHeaderTop,
+  stickyHeaderTop = 0,
   headerChildren
 }) => {
   const open = !sectionCollapsed
@@ -112,10 +112,7 @@ export const SectionContainer: React.FC<
       data-testid="section-container"
     >
       <details open={open} className={styles.sectionContainer}>
-        <summary
-          onClick={toggleSection}
-          style={stickyHeaderTop ? { top: stickyHeaderTop } : undefined}
-        >
+        <summary onClick={toggleSection} style={{ top: stickyHeaderTop }}>
           <div className={styles.summaryTitle}>
             <Icon
               icon={open ? ChevronDown : ChevronRight}
