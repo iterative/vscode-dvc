@@ -39,6 +39,7 @@ export class WebviewMessages {
     needsGitInitialized,
     projectInitialized,
     pythonBinPath,
+    sectionCollapsed,
     shareLiveToStudio
   }: SetupData) {
     void this.getWebview()?.show({
@@ -51,6 +52,7 @@ export class WebviewMessages {
       needsGitInitialized,
       projectInitialized,
       pythonBinPath,
+      sectionCollapsed,
       shareLiveToStudio
     })
   }

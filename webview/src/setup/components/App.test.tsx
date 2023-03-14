@@ -69,6 +69,7 @@ describe('App', () => {
         needsGitInitialized: undefined,
         projectInitialized: false,
         pythonBinPath: undefined,
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
 
@@ -94,6 +95,7 @@ describe('App', () => {
         needsGitInitialized: undefined,
         projectInitialized: false,
         pythonBinPath: undefined,
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
 
@@ -113,6 +115,7 @@ describe('App', () => {
         needsGitInitialized: undefined,
         projectInitialized: false,
         pythonBinPath: undefined,
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
 
@@ -136,6 +139,7 @@ describe('App', () => {
         needsGitInitialized: undefined,
         projectInitialized: false,
         pythonBinPath: defaultInterpreter,
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
 
@@ -158,6 +162,7 @@ describe('App', () => {
         needsGitInitialized: undefined,
         projectInitialized: false,
         pythonBinPath: 'python',
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
 
@@ -180,6 +185,7 @@ describe('App', () => {
         needsGitInitialized: undefined,
         projectInitialized: false,
         pythonBinPath: 'python',
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
 
@@ -202,6 +208,7 @@ describe('App', () => {
         needsGitInitialized: undefined,
         projectInitialized: false,
         pythonBinPath: 'python',
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
 
@@ -224,6 +231,7 @@ describe('App', () => {
         needsGitInitialized: undefined,
         projectInitialized: false,
         pythonBinPath: undefined,
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
 
@@ -243,6 +251,7 @@ describe('App', () => {
         needsGitInitialized: true,
         projectInitialized: false,
         pythonBinPath: undefined,
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
 
@@ -260,6 +269,7 @@ describe('App', () => {
         needsGitInitialized: true,
         projectInitialized: false,
         pythonBinPath: undefined,
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
 
@@ -280,6 +290,7 @@ describe('App', () => {
         needsGitInitialized: true,
         projectInitialized: false,
         pythonBinPath: undefined,
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
 
@@ -297,6 +308,7 @@ describe('App', () => {
         needsGitInitialized: undefined,
         projectInitialized: false,
         pythonBinPath: undefined,
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
 
@@ -314,6 +326,7 @@ describe('App', () => {
         needsGitInitialized: undefined,
         projectInitialized: true,
         pythonBinPath: undefined,
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
 
@@ -333,6 +346,7 @@ describe('App', () => {
         needsGitInitialized: undefined,
         projectInitialized: false,
         pythonBinPath: undefined,
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
 
@@ -355,6 +369,7 @@ describe('App', () => {
         needsGitInitialized: undefined,
         projectInitialized: true,
         pythonBinPath: undefined,
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
 
@@ -374,6 +389,7 @@ describe('App', () => {
         needsGitInitialized: undefined,
         projectInitialized: true,
         pythonBinPath: undefined,
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
 
@@ -395,6 +411,7 @@ describe('App', () => {
         needsGitInitialized: false,
         projectInitialized: true,
         pythonBinPath: 'python',
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
       const buttons = await screen.findAllByRole('button')
@@ -412,6 +429,7 @@ describe('App', () => {
         needsGitInitialized: false,
         projectInitialized: true,
         pythonBinPath: 'python',
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
 
@@ -435,6 +453,7 @@ describe('App', () => {
         needsGitInitialized: false,
         projectInitialized: true,
         pythonBinPath: 'python',
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
 
@@ -458,6 +477,7 @@ describe('App', () => {
         needsGitInitialized: false,
         projectInitialized: true,
         pythonBinPath: 'python',
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
 
@@ -484,6 +504,7 @@ describe('App', () => {
         needsGitInitialized: false,
         projectInitialized: true,
         pythonBinPath: 'python',
+        sectionCollapsed: undefined,
         shareLiveToStudio: shareExperimentsLive
       })
 
@@ -507,6 +528,7 @@ describe('App', () => {
         needsGitInitialized: false,
         projectInitialized: true,
         pythonBinPath: 'python',
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
       mockPostMessage.mockClear()

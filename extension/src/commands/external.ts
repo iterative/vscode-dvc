@@ -94,6 +94,8 @@ export enum RegisteredCommands {
   TRACKED_EXPLORER_SELECT_FOR_COMPARE = 'dvc.selectForCompare',
 
   SETUP_SHOW = 'dvc.showSetup',
+  SETUP_SHOW_EXPERIMENTS = 'dvc.showExperimentsSetup',
+  SETUP_SHOW_STUDIO = 'dvc.showStudioSetup',
   SELECT_FOCUSED_PROJECTS = 'dvc.selectFocusedProjects',
 
   ADD_STUDIO_ACCESS_TOKEN = 'dvc.addStudioAccessToken',

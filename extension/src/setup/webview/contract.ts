@@ -8,6 +8,7 @@ export type SetupData = {
   needsGitInitialized: boolean | undefined
   projectInitialized: boolean
   pythonBinPath: string | undefined
+  sectionCollapsed: typeof DEFAULT_SECTION_COLLAPSED | undefined
   shareLiveToStudio: boolean
 }
 

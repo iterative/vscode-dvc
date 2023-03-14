@@ -244,6 +244,7 @@ suite('Setup Test Suite', () => {
         needsGitInitialized: true,
         projectInitialized: false,
         pythonBinPath: undefined,
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
@@ -283,6 +284,7 @@ suite('Setup Test Suite', () => {
         needsGitInitialized: true,
         projectInitialized: false,
         pythonBinPath: undefined,
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
@@ -328,6 +330,7 @@ suite('Setup Test Suite', () => {
         needsGitInitialized: false,
         projectInitialized: false,
         pythonBinPath: undefined,
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
@@ -373,6 +376,7 @@ suite('Setup Test Suite', () => {
         needsGitInitialized: false,
         projectInitialized: true,
         pythonBinPath: undefined,
+        sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)

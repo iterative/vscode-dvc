@@ -280,6 +280,8 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_SETUP_INSTALL_DVC]: undefined
 
   [EventName.SETUP_SHOW]: undefined
+  [EventName.SETUP_SHOW_EXPERIMENTS]: undefined
+  [EventName.SETUP_SHOW_STUDIO]: undefined
   [EventName.SELECT_FOCUSED_PROJECTS]: undefined
 
   [EventName.ADD_STUDIO_ACCESS_TOKEN]: undefined

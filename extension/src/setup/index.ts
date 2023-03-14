@@ -8,7 +8,8 @@ import {
 } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import isEmpty from 'lodash.isempty'
-import { SetupData as TSetupData } from './webview/contract'
+import { Section, SetupData as TSetupData } from './webview/contract'
+import { collectSectionCollapsed } from './collect'
 import { WebviewMessages } from './webview/messages'
 import { validateTokenInput } from './inputBox'
 import { findPythonBinForInstall } from './autoInstall'
@@ -89,6 +90,8 @@ export class Setup
   private readonly secrets: SecretStorage
   private studioAccessToken: string | undefined = undefined
   private studioIsConnected = false
+
+  private focusedSection: Section | undefined = undefined
 
   constructor(
     context: ExtensionContext,
@@ -208,7 +211,12 @@ export class Setup
     this.config.unsetPythonBinPath()
   }
 
-  public async showSetup() {
+  public async showSetup(focusSection?: Section) {
+    this.focusedSection = focusSection
+    if (this.webview) {
+      void this.sendDataToWebview()
+    }
+
     return await this.showWebview()
   }
 
@@ -253,34 +261,6 @@ export class Setup
 
   public shouldBeShown() {
     return !this.cliCompatible || !this.hasRoots() || !this.getHasData()
-  }
-
-  public async sendDataToWebview() {
-    const projectInitialized = this.hasRoots()
-    const hasData = this.getHasData()
-
-    const needsGitInitialized =
-      !projectInitialized && !!(await this.needsGitInit())
-
-    const canGitInitialize = await this.canGitInitialize(needsGitInitialized)
-
-    const needsGitCommit =
-      needsGitInitialized || (await this.needsGitCommit(needsGitInitialized))
-
-    const pythonBinPath = await findPythonBinForInstall()
-
-    this.webviewMessages.sendWebviewMessage({
-      canGitInitialize,
-      cliCompatible: this.cliCompatible,
-      hasData,
-      isPythonExtensionInstalled: isPythonExtensionInstalled(),
-      isStudioConnected: this.studioIsConnected,
-      needsGitCommit,
-      needsGitInitialized,
-      projectInitialized,
-      pythonBinPath: getBinDisplayText(pythonBinPath),
-      shareLiveToStudio: getConfigValue(ConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE)
-    })
   }
 
   public async selectFocusedProjects() {
@@ -352,6 +332,36 @@ export class Setup
 
   public getStudioAccessToken() {
     return this.studioAccessToken
+  }
+
+  private async sendDataToWebview() {
+    const projectInitialized = this.hasRoots()
+    const hasData = this.getHasData()
+
+    const needsGitInitialized =
+      !projectInitialized && !!(await this.needsGitInit())
+
+    const canGitInitialize = await this.canGitInitialize(needsGitInitialized)
+
+    const needsGitCommit =
+      needsGitInitialized || (await this.needsGitCommit(needsGitInitialized))
+
+    const pythonBinPath = await findPythonBinForInstall()
+
+    this.webviewMessages.sendWebviewMessage({
+      canGitInitialize,
+      cliCompatible: this.cliCompatible,
+      hasData,
+      isPythonExtensionInstalled: isPythonExtensionInstalled(),
+      isStudioConnected: this.studioIsConnected,
+      needsGitCommit,
+      needsGitInitialized,
+      projectInitialized,
+      pythonBinPath: getBinDisplayText(pythonBinPath),
+      sectionCollapsed: collectSectionCollapsed(this.focusedSection),
+      shareLiveToStudio: getConfigValue(ConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE)
+    })
+    this.focusedSection = undefined
   }
 
   private createWebviewMessageHandler() {
