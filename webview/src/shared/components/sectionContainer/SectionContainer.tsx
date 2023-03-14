@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import React, { CSSProperties, MouseEvent, ReactNode } from 'react'
+import React, { MouseEvent, ReactNode } from 'react'
 import { Section as PlotsSection } from 'dvc/src/plots/webview/contract'
 import styles from './styles.module.scss'
 import { Icon } from '../Icon'
@@ -67,7 +67,7 @@ export interface SectionContainerProps<T extends PlotsSection> {
   sectionKey: T
   title: string
   className: string
-  style?: CSSProperties
+  stickyHeaderTop?: number
 }
 
 const InfoIcon = () => (
@@ -84,7 +84,7 @@ export const SectionContainer: React.FC<
   sectionKey,
   title,
   className,
-  style,
+  stickyHeaderTop,
   headerChildren
 }) => {
   const open = !sectionCollapsed
@@ -112,7 +112,10 @@ export const SectionContainer: React.FC<
       data-testid="section-container"
     >
       <details open={open} className={styles.sectionContainer}>
-        <summary onClick={toggleSection} style={style}>
+        <summary
+          onClick={toggleSection}
+          style={stickyHeaderTop ? { top: stickyHeaderTop } : undefined}
+        >
           <div className={styles.summaryTitle}>
             <Icon
               icon={open ? ChevronDown : ChevronRight}

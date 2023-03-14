@@ -129,8 +129,9 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
         [styles.ratioVerticalNormal]: height === PlotHeight.VERTICAL_NORMAL,
         [styles.ratioVerticalLarger]: height === PlotHeight.VERTICAL_LARGER
       })}
-      style={{ top: ribbonHeight - 4 }}
+      stickyHeaderTop={ribbonHeight - 4}
       headerChildren={
+        open &&
         changeSize &&
         hasItems &&
         maxNbPlotsPerRow > 1 && (

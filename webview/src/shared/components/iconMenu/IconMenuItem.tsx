@@ -1,4 +1,4 @@
-import React, { MouseEvent } from 'react'
+import React, { MouseEvent, ReactNode } from 'react'
 import cx from 'classnames'
 import { TippyProps } from '@tippyjs/react'
 import styles from './styles.module.scss'
@@ -8,7 +8,7 @@ import Tooltip from '../tooltip/Tooltip'
 export interface IconMenuItemProps {
   icon: IconValue
   onClick?: () => void
-  onClickNode?: React.ReactNode
+  onClickNode?: ReactNode
   tooltip: string
   hidden?: boolean
 }
