@@ -180,8 +180,7 @@ export class PlotsModel extends ModelWithPersistence {
     }
     const customPlots: CustomPlot[] = collectCustomPlots(
       this.getCustomPlotsOrder(),
-      experimentsWithCheckpoints,
-      this.experiments.getRowData().filter(({ checkpoints }) => !!checkpoints)
+      experimentsWithCheckpoints
     )
     this.customPlots = customPlots
   }
@@ -461,6 +460,9 @@ export class PlotsModel extends ModelWithPersistence {
     const selectedExperimentsExist = !!colors
     const filteredPlots: CustomPlotData[] = []
     for (const plot of plots) {
+      // i wonder if we could filter this when
+      // were doing the collection part now
+      // instead of after...
       if (!selectedExperimentsExist && isCheckpointPlot(plot)) {
         continue
       }

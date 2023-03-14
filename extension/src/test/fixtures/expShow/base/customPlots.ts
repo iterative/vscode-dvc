@@ -1,6 +1,5 @@
 import { ExperimentWithCheckpoints } from '../../../../experiments/model'
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
-import { CustomCheckpointPlots } from '../../../../plots/model'
 import {
   CHECKPOINTS_PARAM,
   CustomPlotsOrderValue
@@ -36,6 +35,82 @@ export const customPlotsOrderFixture: CustomPlotsOrderValue[] = [
 ]
 
 export const experimentsWithCheckpoints: ExperimentWithCheckpoints[] = [
+  {
+    id: '12345',
+    label: '123',
+    metrics: {
+      'summary.json': {
+        accuracy: 0.3724166750907898,
+        loss: 2.0205044746398926
+      }
+    },
+    name: 'exp-e7a67',
+    params: { 'params.yaml': { dropout: 0.15, epochs: 2 } },
+    checkpoints: [
+      {
+        id: '12345',
+        label: '123',
+        metrics: {
+          'summary.json': {
+            accuracy: 0.3724166750907898,
+            loss: 2.0205044746398926
+          }
+        },
+        name: 'exp-e7a67',
+        params: { 'params.yaml': { dropout: 0.15, epochs: 2 } }
+      },
+      {
+        id: '12345',
+        label: '123',
+        metrics: {
+          'summary.json': {
+            accuracy: 0.3723166584968567,
+            loss: 2.020392894744873
+          }
+        },
+        name: 'exp-e7a67',
+        params: { 'params.yaml': { dropout: 0.15, epochs: 2 } }
+      }
+    ]
+  },
+  {
+    id: '12345',
+    label: '123',
+    metrics: {
+      'summary.json': {
+        accuracy: 0.4668000042438507,
+        loss: 1.9293040037155151
+      }
+    },
+    name: 'test-branch',
+    params: { 'params.yaml': { dropout: 0.122, epochs: 2 } },
+    checkpoints: [
+      {
+        id: '12345',
+        label: '123',
+        metrics: {
+          'summary.json': {
+            accuracy: 0.4668000042438507,
+            loss: 1.9293040037155151
+          }
+        },
+        name: 'test-branch',
+        params: { 'params.yaml': { dropout: 0.122, epochs: 2 } }
+      },
+      {
+        id: '12345',
+        label: '123',
+        metrics: {
+          'summary.json': {
+            accuracy: 0.4083833396434784,
+            loss: 1.9882521629333496
+          }
+        },
+        name: 'test-branch',
+        params: { 'params.yaml': { dropout: 0.122, epochs: 2 } }
+      }
+    ]
+  },
   {
     id: '12345',
     label: '123',
@@ -109,82 +184,6 @@ export const experimentsWithCheckpoints: ExperimentWithCheckpoints[] = [
         params: { 'params.yaml': { dropout: 0.124, epochs: 5 } }
       }
     ]
-  },
-  {
-    id: '12345',
-    label: '123',
-    metrics: {
-      'summary.json': {
-        accuracy: 0.4668000042438507,
-        loss: 1.9293040037155151
-      }
-    },
-    name: 'test-branch',
-    params: { 'params.yaml': { dropout: 0.122, epochs: 2 } },
-    checkpoints: [
-      {
-        id: '12345',
-        label: '123',
-        metrics: {
-          'summary.json': {
-            accuracy: 0.4668000042438507,
-            loss: 1.9293040037155151
-          }
-        },
-        name: 'test-branch',
-        params: { 'params.yaml': { dropout: 0.122, epochs: 2 } }
-      },
-      {
-        id: '12345',
-        label: '123',
-        metrics: {
-          'summary.json': {
-            accuracy: 0.4083833396434784,
-            loss: 1.9882521629333496
-          }
-        },
-        name: 'test-branch',
-        params: { 'params.yaml': { dropout: 0.122, epochs: 2 } }
-      }
-    ]
-  },
-  {
-    id: '12345',
-    label: '123',
-    metrics: {
-      'summary.json': {
-        accuracy: 0.3724166750907898,
-        loss: 2.0205044746398926
-      }
-    },
-    name: 'exp-e7a67',
-    params: { 'params.yaml': { dropout: 0.15, epochs: 2 } },
-    checkpoints: [
-      {
-        id: '12345',
-        label: '123',
-        metrics: {
-          'summary.json': {
-            accuracy: 0.3724166750907898,
-            loss: 2.0205044746398926
-          }
-        },
-        name: 'exp-e7a67',
-        params: { 'params.yaml': { dropout: 0.15, epochs: 2 } }
-      },
-      {
-        id: '12345',
-        label: '123',
-        metrics: {
-          'summary.json': {
-            accuracy: 0.3723166584968567,
-            loss: 2.020392894744873
-          }
-        },
-        name: 'exp-e7a67',
-        params: { 'params.yaml': { dropout: 0.15, epochs: 2 } }
-      }
-    ]
   }
 ]
 
@@ -249,18 +248,18 @@ const data: CustomPlotsData = {
       metric: 'summary.json:loss',
       param: CHECKPOINTS_PARAM,
       values: [
-        { group: 'exp-83425', iteration: 1, y: 1.9896177053451538 },
-        { group: 'exp-83425', iteration: 2, y: 1.9329891204833984 },
-        { group: 'exp-83425', iteration: 3, y: 1.8798457384109497 },
-        { group: 'exp-83425', iteration: 4, y: 1.8261293172836304 },
-        { group: 'exp-83425', iteration: 5, y: 1.775016188621521 },
-        { group: 'exp-83425', iteration: 6, y: 1.775016188621521 },
-        { group: 'test-branch', iteration: 1, y: 1.9882521629333496 },
-        { group: 'test-branch', iteration: 2, y: 1.9293040037155151 },
-        { group: 'test-branch', iteration: 3, y: 1.9293040037155151 },
-        { group: 'exp-e7a67', iteration: 1, y: 2.020392894744873 },
+        { group: 'exp-e7a67', iteration: 3, y: 2.0205044746398926 },
         { group: 'exp-e7a67', iteration: 2, y: 2.0205044746398926 },
-        { group: 'exp-e7a67', iteration: 3, y: 2.0205044746398926 }
+        { group: 'exp-e7a67', iteration: 1, y: 2.020392894744873 },
+        { group: 'test-branch', iteration: 3, y: 1.9293040037155151 },
+        { group: 'test-branch', iteration: 2, y: 1.9293040037155151 },
+        { group: 'test-branch', iteration: 1, y: 1.9882521629333496 },
+        { group: 'exp-83425', iteration: 6, y: 1.775016188621521 },
+        { group: 'exp-83425', iteration: 5, y: 1.775016188621521 },
+        { group: 'exp-83425', iteration: 4, y: 1.8261293172836304 },
+        { group: 'exp-83425', iteration: 3, y: 1.8798457384109497 },
+        { group: 'exp-83425', iteration: 2, y: 1.9329891204833984 },
+        { group: 'exp-83425', iteration: 1, y: 1.9896177053451538 }
       ],
       type: CustomPlotType.CHECKPOINT,
       yTitle: 'summary.json:loss'
@@ -270,18 +269,18 @@ const data: CustomPlotsData = {
       metric: 'summary.json:accuracy',
       param: CHECKPOINTS_PARAM,
       values: [
-        { group: 'exp-83425', iteration: 1, y: 0.40904998779296875 },
-        { group: 'exp-83425', iteration: 2, y: 0.46094998717308044 },
-        { group: 'exp-83425', iteration: 3, y: 0.5113166570663452 },
-        { group: 'exp-83425', iteration: 4, y: 0.557449996471405 },
-        { group: 'exp-83425', iteration: 5, y: 0.5926499962806702 },
-        { group: 'exp-83425', iteration: 6, y: 0.5926499962806702 },
-        { group: 'test-branch', iteration: 1, y: 0.4083833396434784 },
-        { group: 'test-branch', iteration: 2, y: 0.4668000042438507 },
-        { group: 'test-branch', iteration: 3, y: 0.4668000042438507 },
-        { group: 'exp-e7a67', iteration: 1, y: 0.3723166584968567 },
+        { group: 'exp-e7a67', iteration: 3, y: 0.3724166750907898 },
         { group: 'exp-e7a67', iteration: 2, y: 0.3724166750907898 },
-        { group: 'exp-e7a67', iteration: 3, y: 0.3724166750907898 }
+        { group: 'exp-e7a67', iteration: 1, y: 0.3723166584968567 },
+        { group: 'test-branch', iteration: 3, y: 0.4668000042438507 },
+        { group: 'test-branch', iteration: 2, y: 0.4668000042438507 },
+        { group: 'test-branch', iteration: 1, y: 0.4083833396434784 },
+        { group: 'exp-83425', iteration: 6, y: 0.5926499962806702 },
+        { group: 'exp-83425', iteration: 5, y: 0.5926499962806702 },
+        { group: 'exp-83425', iteration: 4, y: 0.557449996471405 },
+        { group: 'exp-83425', iteration: 3, y: 0.5113166570663452 },
+        { group: 'exp-83425', iteration: 2, y: 0.46094998717308044 },
+        { group: 'exp-83425', iteration: 1, y: 0.40904998779296875 }
       ],
       type: CustomPlotType.CHECKPOINT,
       yTitle: 'summary.json:accuracy'

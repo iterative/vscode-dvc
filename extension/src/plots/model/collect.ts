@@ -54,7 +54,8 @@ import {
 import { StrokeDashEncoding } from '../multiSource/constants'
 import {
   ExperimentWithCheckpoints,
-  SelectedExperimentWithColor
+  SelectedExperimentWithColor,
+  ExperimentWithDefinedCheckpoints
 } from '../../experiments/model'
 import { Color } from '../../experiments/model/status/colors'
 
@@ -62,49 +63,52 @@ export const getCustomPlotId = (metric: string, param = CHECKPOINTS_PARAM) =>
   `custom-${metric}-${param}`
 
 const getExperimentValues = (
-  allValues: CheckpointPlotValues,
-  exp: ExperimentWithCheckpoints,
+  values: CheckpointPlotValues,
+  exp: ExperimentWithDefinedCheckpoints,
   metric: string
 ) => {
   const splitMetric = splitColumnPath(
     getFullValuePath(ColumnType.METRICS, metric, FILE_SEPARATOR)
   )
-  const values = []
   const group = exp.name || exp.label
-  const expEpochLength = (exp.checkpoints as Experiment[]).length + 1
+  const expEpochLength = exp.checkpoints.length + 1
 
   const y = get(exp, splitMetric) as number | undefined
   if (y !== undefined) {
     values.push({ group, iteration: expEpochLength, y })
   }
 
-  for (const [ind, checkpoint] of (exp.checkpoints as Experiment[]).entries()) {
+  for (const [ind, checkpoint] of exp.checkpoints.entries()) {
     const y = get(checkpoint, splitMetric) as number | undefined
     if (y !== undefined) {
       values.push({ group, iteration: expEpochLength - ind - 1, y })
     }
   }
-  values.reverse()
-  allValues.push(...values)
 }
-
+// I belive we can further combine these
+// leaving the only separate thing being the
+// creation of the values
 const collectCheckpointPlot = (
   metric: string,
   experiments: ExperimentWithCheckpoints[]
 ): CheckpointPlot => {
-  const plotData: CheckpointPlot = {
+  const fullValues: CheckpointPlotValues = []
+  for (const experiment of experiments) {
+    if (experiment.checkpoints) {
+      getExperimentValues(
+        fullValues,
+        experiment as ExperimentWithDefinedCheckpoints,
+        metric
+      )
+    }
+  }
+  return {
     id: getCustomPlotId(metric),
     metric,
     param: CHECKPOINTS_PARAM,
     type: CustomPlotType.CHECKPOINT,
-    values: []
+    values: fullValues
   }
-  const fullValues: CheckpointPlotValues = []
-  for (const experiment of experiments) {
-    getExperimentValues(fullValues, experiment, metric)
-  }
-  plotData.values = fullValues
-  return plotData
 }
 
 const collectMetricVsParamPlot = (
@@ -144,15 +148,14 @@ const collectMetricVsParamPlot = (
 
 export const collectCustomPlots = (
   plotsOrderValues: CustomPlotsOrderValue[],
-  experiments: Experiment[],
-  selectedExperiments: ExperimentWithCheckpoints[]
+  experiments: Experiment[]
 ): CustomPlot[] => {
   return plotsOrderValues
     .map((plotOrderValue): CustomPlot => {
       if (isCheckpointValue(plotOrderValue.type)) {
         const { metric } = plotOrderValue
 
-        return collectCheckpointPlot(metric, selectedExperiments)
+        return collectCheckpointPlot(metric, experiments)
       }
       const { metric, param } = plotOrderValue
       return collectMetricVsParamPlot(metric, param, experiments)

@@ -30,7 +30,7 @@ import { Experiment } from '../../experiments/webview/contract'
 const logsLossPath = join('logs', 'loss.tsv')
 
 const logsLossPlot = (plotsDiffFixture[logsLossPath][0] || {}) as TemplatePlot
-
+// missing tests here (collect function are still a WIP)
 const getCustomPlotFromCustomPlotData = ({
   id,
   metric,
@@ -53,44 +53,6 @@ describe('collectCustomPlots', () => {
     )
     const data = collectCustomPlots(
       customPlotsOrderFixture,
-      [
-        {
-          id: '12345',
-          label: '123',
-          metrics: {
-            'summary.json': {
-              accuracy: 0.3724166750907898,
-              loss: 2.0205044746398926
-            }
-          },
-          name: 'exp-e7a67',
-          params: { 'params.yaml': { dropout: 0.15, epochs: 2 } }
-        },
-        {
-          id: '12345',
-          label: '123',
-          metrics: {
-            'summary.json': {
-              accuracy: 0.4668000042438507,
-              loss: 1.9293040037155151
-            }
-          },
-          name: 'test-branch',
-          params: { 'params.yaml': { dropout: 0.122, epochs: 2 } }
-        },
-        {
-          id: '12345',
-          label: '123',
-          metrics: {
-            'summary.json': {
-              accuracy: 0.5926499962806702,
-              loss: 1.775016188621521
-            }
-          },
-          name: 'exp-83425',
-          params: { 'params.yaml': { dropout: 0.124, epochs: 5 } }
-        }
-      ],
       experimentsWithCheckpoints
     )
     expect(data).toStrictEqual(expectedOutput)
