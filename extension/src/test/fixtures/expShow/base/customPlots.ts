@@ -12,22 +12,22 @@ import {
 
 export const customPlotsOrderFixture: CustomPlotsOrderValue[] = [
   {
-    metric: 'metrics:summary.json:loss',
-    param: 'params:params.yaml:dropout',
+    metric: 'summary.json:loss',
+    param: 'params.yaml:dropout',
     type: CustomPlotType.METRIC_VS_PARAM
   },
   {
-    metric: 'metrics:summary.json:accuracy',
-    param: 'params:params.yaml:epochs',
+    metric: 'summary.json:accuracy',
+    param: 'params.yaml:epochs',
     type: CustomPlotType.METRIC_VS_PARAM
   },
   {
-    metric: 'metrics:summary.json:loss',
+    metric: 'summary.json:loss',
     param: CHECKPOINTS_PARAM,
     type: CustomPlotType.CHECKPOINT
   },
   {
-    metric: 'metrics:summary.json:accuracy',
+    metric: 'summary.json:accuracy',
     param: CHECKPOINTS_PARAM,
     type: CustomPlotType.CHECKPOINT
   }
@@ -125,7 +125,7 @@ const data: CustomPlotsData = {
   },
   plots: [
     {
-      id: 'custom-metrics:summary.json:loss-params:params.yaml:dropout',
+      id: 'custom-summary.json:loss-params.yaml:dropout',
       metric: 'summary.json:loss',
       param: 'params.yaml:dropout',
       type: CustomPlotType.METRIC_VS_PARAM,
@@ -149,7 +149,7 @@ const data: CustomPlotsData = {
       yTitle: 'summary.json:loss'
     },
     {
-      id: 'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
+      id: 'custom-summary.json:accuracy-params.yaml:epochs',
       metric: 'summary.json:accuracy',
       param: 'params.yaml:epochs',
       type: CustomPlotType.METRIC_VS_PARAM,

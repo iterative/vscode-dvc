@@ -16,7 +16,11 @@ import {
   collectCustomPlotData
 } from './collect'
 import { getRevisionFirstThreeColumns } from './util'
-import { CustomPlotsOrderValue, isCheckpointPlot } from './custom'
+import {
+  cleanupOldOrderValue,
+  CustomPlotsOrderValue,
+  isCheckpointPlot
+} from './custom'
 import {
   CheckpointPlot,
   ComparisonPlots,
@@ -31,8 +35,7 @@ import {
   CustomPlot,
   ColorScale,
   DEFAULT_HEIGHT,
-  DEFAULT_NB_ITEMS_PER_ROW,
-  CustomPlotType
+  DEFAULT_NB_ITEMS_PER_ROW
 } from '../webview/contract'
 import {
   ExperimentsOutput,
@@ -186,14 +189,7 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public getCustomPlotsOrder() {
-    return this.customPlotsOrder.map(
-      ({ type, ...rest }) =>
-        ({
-          ...rest,
-          // type is possibly undefined if state holds an older version of custom plots
-          type: type || CustomPlotType.METRIC_VS_PARAM
-        } as CustomPlotsOrderValue)
-    )
+    return this.customPlotsOrder.map(cleanupOldOrderValue)
   }
 
   public updateCustomPlotsOrder(plotsOrder: CustomPlotsOrderValue[]) {

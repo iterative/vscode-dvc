@@ -645,8 +645,8 @@ describe('App', () => {
     let plots = screen.getAllByTestId(/summary\.json/)
 
     expect(plots.map(plot => plot.id)).toStrictEqual([
-      'custom-metrics:summary.json:loss-params:params.yaml:dropout',
-      'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
+      'custom-summary.json:loss-params.yaml:dropout',
+      'custom-summary.json:accuracy-params.yaml:epochs',
       'custom-summary.json:loss-epoch',
       'custom-summary.json:accuracy-epoch'
     ])
@@ -656,8 +656,8 @@ describe('App', () => {
     plots = screen.getAllByTestId(/summary\.json/)
 
     expect(plots.map(plot => plot.id)).toStrictEqual([
-      'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
-      'custom-metrics:summary.json:loss-params:params.yaml:dropout',
+      'custom-summary.json:accuracy-params.yaml:epochs',
+      'custom-summary.json:loss-params.yaml:dropout',
       'custom-summary.json:loss-epoch',
       'custom-summary.json:accuracy-epoch'
     ])
@@ -671,8 +671,8 @@ describe('App', () => {
 
     const plots = screen.getAllByTestId(/summary\.json/)
     expect(plots.map(plot => plot.id)).toStrictEqual([
-      'custom-metrics:summary.json:loss-params:params.yaml:dropout',
-      'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
+      'custom-summary.json:loss-params.yaml:dropout',
+      'custom-summary.json:accuracy-params.yaml:epochs',
       'custom-summary.json:loss-epoch',
       'custom-summary.json:accuracy-epoch'
     ])
@@ -683,8 +683,8 @@ describe('App', () => {
 
     const expectedOrder = [
       'custom-summary.json:loss-epoch',
-      'custom-metrics:summary.json:loss-params:params.yaml:dropout',
-      'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
+      'custom-summary.json:loss-params.yaml:dropout',
+      'custom-summary.json:accuracy-params.yaml:epochs',
       'custom-summary.json:accuracy-epoch'
     ]
 
@@ -710,8 +710,8 @@ describe('App', () => {
     expect(
       screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
     ).toStrictEqual([
-      'custom-metrics:summary.json:loss-params:params.yaml:dropout',
-      'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
+      'custom-summary.json:loss-params.yaml:dropout',
+      'custom-summary.json:accuracy-params.yaml:epochs',
       'custom-summary.json:loss-epoch'
     ])
 
@@ -722,8 +722,8 @@ describe('App', () => {
     expect(
       screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
     ).toStrictEqual([
-      'custom-metrics:summary.json:loss-params:params.yaml:dropout',
-      'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
+      'custom-summary.json:loss-params.yaml:dropout',
+      'custom-summary.json:accuracy-params.yaml:epochs',
       'custom-summary.json:loss-epoch',
       'custom-summary.json:accuracy-epoch'
     ])
@@ -738,8 +738,8 @@ describe('App', () => {
     expect(
       screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
     ).toStrictEqual([
-      'custom-metrics:summary.json:loss-params:params.yaml:dropout',
-      'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
+      'custom-summary.json:loss-params.yaml:dropout',
+      'custom-summary.json:accuracy-params.yaml:epochs',
       'custom-summary.json:loss-epoch',
       'custom-summary.json:accuracy-epoch'
     ])
@@ -754,7 +754,7 @@ describe('App', () => {
     expect(
       screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
     ).toStrictEqual([
-      'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
+      'custom-summary.json:accuracy-params.yaml:epochs',
       'custom-summary.json:loss-epoch',
       'custom-summary.json:accuracy-epoch'
     ])
@@ -997,10 +997,10 @@ describe('App', () => {
     dragAndDrop(plots[0], screen.getByTestId('custom-plots'))
 
     const expectedOrder = [
-      'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
+      'custom-summary.json:accuracy-params.yaml:epochs',
       'custom-summary.json:loss-epoch',
       'custom-summary.json:accuracy-epoch',
-      'custom-metrics:summary.json:loss-params:params.yaml:dropout'
+      'custom-summary.json:loss-params.yaml:dropout'
     ]
 
     expect(

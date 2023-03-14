@@ -40,7 +40,8 @@ import { extractColumns } from '../../experiments/columns/extract'
 import {
   decodeColumn,
   appendColumnToPath,
-  splitColumnPath
+  splitColumnPath,
+  FILE_SEPARATOR
 } from '../../experiments/columns/paths'
 import {
   ColumnType,
@@ -270,18 +271,23 @@ const collectMetricVsParamPlot = (
   param: string,
   experiments: Experiment[]
 ): MetricVsParamPlot => {
-  const splitUpMetricPath = splitColumnPath(metric)
-  const splitUpParamPath = splitColumnPath(param)
+  const splitUpMetricPath = splitColumnPath(
+    ColumnType.METRICS + FILE_SEPARATOR + metric
+  )
+  const splitUpParamPath = splitColumnPath(
+    ColumnType.PARAMS + FILE_SEPARATOR + param
+  )
   const plotData: MetricVsParamPlot = {
     id: getCustomPlotId(metric, param),
-    metric: metric.slice(ColumnType.METRICS.length + 1),
-    param: param.slice(ColumnType.PARAMS.length + 1),
+    metric,
+    param,
     type: CustomPlotType.METRIC_VS_PARAM,
     values: []
   }
 
   for (const experiment of experiments) {
     const metricValue = get(experiment, splitUpMetricPath) as number | undefined
+
     const paramValue = get(experiment, splitUpParamPath) as number | undefined
 
     if (metricValue !== undefined && paramValue !== undefined) {
@@ -305,7 +311,7 @@ export const collectCustomPlots = (
     .map((plotOrderValue): CustomPlot => {
       if (isCheckpointValue(plotOrderValue.type)) {
         const { metric } = plotOrderValue
-        return checkpointPlots[metric.slice(ColumnType.METRICS.length + 1)]
+        return checkpointPlots[metric]
       }
       const { metric, param } = plotOrderValue
       return collectMetricVsParamPlot(metric, param, experiments)

@@ -29,8 +29,6 @@ import {
   pickMetricAndParam
 } from '../model/quickPick'
 import { Title } from '../../vscode/title'
-import { ColumnType } from '../../experiments/webview/contract'
-import { FILE_SEPARATOR } from '../../experiments/columns/paths'
 import { reorderObjectList } from '../../util/array'
 import {
   CHECKPOINTS_PARAM,
@@ -271,19 +269,14 @@ export class WebviewMessages {
       return
     }
 
-    const buildMetricOrParamPath = (type: string, path: string) =>
-      type + FILE_SEPARATOR + path
-
     const newOrder: CustomPlotsOrderValue[] = reorderObjectList(
       plotIds,
       customPlots,
       'id'
-    ).map(plot => ({
-      metric: buildMetricOrParamPath(ColumnType.METRICS, plot.metric),
-      param: isCheckpointValue(plot.type)
-        ? plot.param
-        : buildMetricOrParamPath(ColumnType.PARAMS, plot.param),
-      type: plot.type
+    ).map(({ metric, param, type }) => ({
+      metric,
+      param,
+      type
     }))
     this.plots.setCustomPlotsOrder(newOrder)
     this.sendCustomPlotsAndEvent(EventName.VIEWS_REORDER_PLOTS_CUSTOM)
