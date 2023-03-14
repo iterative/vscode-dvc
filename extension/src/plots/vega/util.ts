@@ -253,15 +253,19 @@ const truncateTitle = (
   return titleCopy
 }
 
-export const truncateVerticalTitle = (title: Text | Title, size: number) =>
-  truncateTitle(title, (size > 2 ? 30 : 50) * 0.75)
+export const truncateVerticalTitle = (
+  title: Text | Title,
+  width: number,
+  height: number
+) => truncateTitle(title, Math.floor((50 - (width - height) * 5) * 0.75))
 
 const isEndValue = (valueType: string) =>
   ['string', 'number', 'boolean'].includes(valueType)
 
 export const truncateTitles = (
   spec: TopLevelSpec,
-  size: number,
+  width: number,
+  height: number,
   vertical?: boolean
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
@@ -281,16 +285,18 @@ export const truncateTitles = (
       if (key === 'title') {
         const title = value as unknown as Title
         specCopy[key] = vertical
-          ? truncateVerticalTitle(title, size)
-          : truncateTitle(title, size > DEFAULT_NB_ITEMS_PER_ROW ? 30 : 50)
+          ? truncateVerticalTitle(title, width, height)
+          : truncateTitle(title, width > DEFAULT_NB_ITEMS_PER_ROW ? 30 : 50)
       } else if (isEndValue(valueType)) {
         specCopy[key] = value
       } else if (Array.isArray(value)) {
         specCopy[key] = value.map(val =>
-          isEndValue(typeof val) ? val : truncateTitles(val, size, vertical)
+          isEndValue(typeof val)
+            ? val
+            : truncateTitles(val, width, height, vertical)
         )
       } else if (typeof value === 'object') {
-        specCopy[key] = truncateTitles(value, size, vertical)
+        specCopy[key] = truncateTitles(value, width, height, vertical)
       }
     }
     return specCopy
@@ -300,14 +306,19 @@ export const truncateTitles = (
 
 export const extendVegaSpec = (
   spec: TopLevelSpec,
-  size: number,
+  width: number,
+  height: number,
   encoding?: {
     color?: ColorScale
     strokeDash?: StrokeDashEncoding
     shape?: ShapeEncoding
   }
 ) => {
-  const updatedSpec = truncateTitles(spec, size) as unknown as TopLevelSpec
+  const updatedSpec = truncateTitles(
+    spec,
+    width,
+    height
+  ) as unknown as TopLevelSpec
 
   if (isMultiViewByCommitPlot(spec) || !encoding) {
     return updatedSpec

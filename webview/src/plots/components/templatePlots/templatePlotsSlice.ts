@@ -3,6 +3,7 @@ import {
   DEFAULT_HEIGHT,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NB_ITEMS_PER_ROW,
+  PlotHeight,
   Section,
   TemplatePlotGroup,
   TemplatePlotsData
@@ -35,8 +36,12 @@ export const templatePlotsSlice = createSlice({
     changeDisabledDragIds: (state, action: PayloadAction<string[]>) => {
       state.disabledDragPlotIds = action.payload
     },
-    changeSize: (state, action: PayloadAction<number>) => {
-      state.nbItemsPerRow = action.payload
+    changeSize: (
+      state,
+      action: PayloadAction<{ nbItemsPerRow: number; height: PlotHeight }>
+    ) => {
+      state.nbItemsPerRow = action.payload.nbItemsPerRow
+      state.height = action.payload.height
     },
     setCollapsed: (state, action: PayloadAction<boolean>) => {
       state.isCollapsed = action.payload

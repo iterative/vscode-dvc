@@ -2,7 +2,7 @@ import { Section } from 'dvc/src/plots/webview/contract'
 import React, { useMemo, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { createSpec } from './util'
-import { changeDisabledDragIds, changeSize } from './customPlotsSlice'
+import { changeDisabledDragIds } from './customPlotsSlice'
 import { ZoomablePlot } from '../ZoomablePlot'
 import styles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
@@ -43,7 +43,6 @@ export const CustomPlot: React.FC<CustomPlotProps> = ({ id }) => {
       <ZoomablePlot
         spec={spec}
         id={id}
-        changeSize={changeSize}
         changeDisabledDragIds={changeDisabledDragIds}
         currentSnapPoint={nbItemsPerRow}
         section={Section.CUSTOM_PLOTS}

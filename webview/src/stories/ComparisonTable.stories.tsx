@@ -7,6 +7,7 @@ import { Provider, useDispatch } from 'react-redux'
 import {
   ComparisonRevisionData,
   DEFAULT_NB_ITEMS_PER_ROW,
+  DEFAULT_PLOT_HEIGHT,
   PlotsComparisonData
 } from 'dvc/src/plots/webview/contract'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
@@ -43,7 +44,7 @@ const Template: Story = ({ plots, revisions }) => {
     <Provider store={store}>
       <MockedState
         data={{
-          height: undefined,
+          height: DEFAULT_PLOT_HEIGHT,
           nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
           plots,
           revisions
