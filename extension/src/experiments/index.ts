@@ -333,6 +333,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getExperimentCount()
   }
 
+  public getRowData() {
+    return this.experiments.getExperimentsWithCheckpoints()
+  }
+
   public async selectExperiments() {
     const experiments = this.experiments.getExperimentsWithCheckpoints()
 

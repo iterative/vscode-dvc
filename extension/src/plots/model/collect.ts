@@ -1,8 +1,6 @@
-import omit from 'lodash.omit'
 import get from 'lodash.get'
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
-import { CustomCheckpointPlots } from '.'
 import {
   getFullValuePath,
   CHECKPOINTS_PARAM,
@@ -25,32 +23,19 @@ import {
   CustomPlotType,
   CustomPlot,
   MetricVsParamPlot,
-  CustomPlotData
+  CustomPlotData,
+  CheckpointPlot
 } from '../webview/contract'
+import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../cli/dvc/contract'
 import {
-  EXPERIMENT_WORKSPACE_ID,
-  ExperimentFieldsOrError,
-  ExperimentsOutput,
-  ExperimentStatus,
-  isValueTree,
-  PlotsOutput,
-  Value,
-  ValueTree
-} from '../../cli/dvc/contract'
-import { extractColumns } from '../../experiments/columns/extract'
-import {
-  decodeColumn,
-  appendColumnToPath,
   splitColumnPath,
   FILE_SEPARATOR
 } from '../../experiments/columns/paths'
 import {
   ColumnType,
   Experiment,
-  isRunning,
-  MetricOrParamColumns
+  isRunning
 } from '../../experiments/webview/contract'
-import { addToMapArray } from '../../util/map'
 import { TemplateOrder } from '../paths/collect'
 import {
   extendVegaSpec,
@@ -67,204 +52,59 @@ import {
   unmergeConcatenatedFields
 } from '../multiSource/collect'
 import { StrokeDashEncoding } from '../multiSource/constants'
-import { SelectedExperimentWithColor } from '../../experiments/model'
+import {
+  ExperimentWithCheckpoints,
+  SelectedExperimentWithColor
+} from '../../experiments/model'
 import { Color } from '../../experiments/model/status/colors'
-import { typedValueTreeEntries } from '../../experiments/columns/collect/metricsAndParams'
-
-type CheckpointPlotAccumulator = {
-  iterations: Record<string, number>
-  plots: Map<string, CheckpointPlotValues>
-}
-
-const collectFromMetricsFile = (
-  acc: CheckpointPlotAccumulator,
-  name: string,
-  iteration: number,
-  key: string | undefined,
-  value: Value | ValueTree,
-  ancestors: string[] = []
-) => {
-  const pathArray = [...ancestors, key].filter(Boolean) as string[]
-
-  if (isValueTree(value)) {
-    for (const [childKey, childValue] of typedValueTreeEntries(value)) {
-      collectFromMetricsFile(
-        acc,
-        name,
-        iteration,
-        childKey,
-        childValue,
-        pathArray
-      )
-    }
-    return
-  }
-
-  const path = appendColumnToPath(...pathArray)
-
-  addToMapArray(acc.plots, path, { group: name, iteration, y: value })
-}
-
-type MetricsAndDetailsOrUndefined =
-  | {
-      checkpoint_parent: string | undefined
-      checkpoint_tip: string | undefined
-      metrics: MetricOrParamColumns | undefined
-      status: ExperimentStatus | undefined
-    }
-  | undefined
-
-const transformExperimentData = (
-  experimentFieldsOrError: ExperimentFieldsOrError
-): MetricsAndDetailsOrUndefined => {
-  const experimentFields = experimentFieldsOrError.data
-  if (!experimentFields) {
-    return
-  }
-
-  const { checkpoint_tip, checkpoint_parent, status } = experimentFields
-  const { metrics } = extractColumns(experimentFields)
-
-  return { checkpoint_parent, checkpoint_tip, metrics, status }
-}
-
-type ValidData = {
-  checkpoint_parent: string
-  checkpoint_tip: string
-  metrics: MetricOrParamColumns
-  status: ExperimentStatus
-}
-
-const isValid = (data: MetricsAndDetailsOrUndefined): data is ValidData =>
-  !!(data?.checkpoint_tip && data?.checkpoint_parent && data?.metrics)
-
-const collectFromMetrics = (
-  acc: CheckpointPlotAccumulator,
-  experimentName: string,
-  iteration: number,
-  metrics: MetricOrParamColumns
-) => {
-  for (const file of Object.keys(metrics)) {
-    collectFromMetricsFile(
-      acc,
-      experimentName,
-      iteration,
-      undefined,
-      metrics[file],
-      [file]
-    )
-  }
-}
-
-const getLastIteration = (
-  acc: CheckpointPlotAccumulator,
-  checkpointParent: string
-): number => acc.iterations[checkpointParent] || 0
-
-const collectIteration = (
-  acc: CheckpointPlotAccumulator,
-  sha: string,
-  checkpointParent: string
-): number => {
-  const iteration = getLastIteration(acc, checkpointParent) + 1
-  acc.iterations[sha] = iteration
-  return iteration
-}
-
-const linkModified = (
-  acc: CheckpointPlotAccumulator,
-  experimentName: string,
-  checkpointTip: string,
-  checkpointParent: string,
-  parent: ExperimentFieldsOrError | undefined
-) => {
-  if (!parent) {
-    return
-  }
-
-  const parentData = transformExperimentData(parent)
-  if (!isValid(parentData) || parentData.checkpoint_tip === checkpointTip) {
-    return
-  }
-
-  const lastIteration = getLastIteration(acc, checkpointParent)
-  collectFromMetrics(acc, experimentName, lastIteration, parentData.metrics)
-}
-
-const collectFromExperimentsObject = (
-  acc: CheckpointPlotAccumulator,
-  experimentsObject: { [sha: string]: ExperimentFieldsOrError }
-) => {
-  for (const [sha, experimentData] of Object.entries(
-    experimentsObject
-  ).reverse()) {
-    const data = transformExperimentData(experimentData)
-
-    if (!isValid(data)) {
-      continue
-    }
-    const {
-      checkpoint_tip: checkpointTip,
-      checkpoint_parent: checkpointParent,
-      metrics
-    } = data
-
-    const experimentName = experimentsObject[checkpointTip].data?.name
-    if (!experimentName) {
-      continue
-    }
-
-    linkModified(
-      acc,
-      experimentName,
-      checkpointTip,
-      checkpointParent,
-      experimentsObject[checkpointParent]
-    )
-
-    const iteration = collectIteration(acc, sha, checkpointParent)
-    collectFromMetrics(acc, experimentName, iteration, metrics)
-  }
-}
 
 export const getCustomPlotId = (metric: string, param = CHECKPOINTS_PARAM) =>
   `custom-${metric}-${param}`
 
-export const collectCustomCheckpointPlots = (
-  data: ExperimentsOutput
-): CustomCheckpointPlots => {
-  const acc = {
-    iterations: {},
-    plots: new Map<string, CheckpointPlotValues>()
+const getExperimentValues = (
+  allValues: CheckpointPlotValues,
+  exp: ExperimentWithCheckpoints,
+  metric: string
+) => {
+  const splitMetric = splitColumnPath(
+    getFullValuePath(ColumnType.METRICS, metric, FILE_SEPARATOR)
+  )
+  const values = []
+  const group = exp.name || exp.label
+  const expEpochLength = (exp.checkpoints as Experiment[]).length + 1
+
+  const y = get(exp, splitMetric) as number | undefined
+  if (y !== undefined) {
+    values.push({ group, iteration: expEpochLength, y })
   }
 
-  for (const { baseline, ...experimentsObject } of Object.values(
-    omit(data, EXPERIMENT_WORKSPACE_ID)
-  )) {
-    const commit = transformExperimentData(baseline)
-
-    if (commit) {
-      collectFromExperimentsObject(acc, experimentsObject)
+  for (const [ind, checkpoint] of (exp.checkpoints as Experiment[]).entries()) {
+    const y = get(checkpoint, splitMetric) as number | undefined
+    if (y !== undefined) {
+      values.push({ group, iteration: expEpochLength - ind - 1, y })
     }
   }
+  values.reverse()
+  allValues.push(...values)
+}
 
-  const plotsData: CustomCheckpointPlots = {}
-  if (acc.plots.size === 0) {
-    return plotsData
+const collectCheckpointPlot = (
+  metric: string,
+  experiments: ExperimentWithCheckpoints[]
+): CheckpointPlot => {
+  const plotData: CheckpointPlot = {
+    id: getCustomPlotId(metric),
+    metric,
+    param: CHECKPOINTS_PARAM,
+    type: CustomPlotType.CHECKPOINT,
+    values: []
   }
-
-  for (const [key, value] of acc.plots.entries()) {
-    const decodedMetric = decodeColumn(key)
-    plotsData[decodedMetric] = {
-      id: getCustomPlotId(decodedMetric),
-      metric: decodedMetric,
-      param: CHECKPOINTS_PARAM,
-      type: CustomPlotType.CHECKPOINT,
-      values: value
-    }
+  const fullValues: CheckpointPlotValues = []
+  for (const experiment of experiments) {
+    getExperimentValues(fullValues, experiment, metric)
   }
-
-  return plotsData
+  plotData.values = fullValues
+  return plotData
 }
 
 const collectMetricVsParamPlot = (
@@ -304,14 +144,15 @@ const collectMetricVsParamPlot = (
 
 export const collectCustomPlots = (
   plotsOrderValues: CustomPlotsOrderValue[],
-  checkpointPlots: CustomCheckpointPlots,
-  experiments: Experiment[]
+  experiments: Experiment[],
+  selectedExperiments: ExperimentWithCheckpoints[]
 ): CustomPlot[] => {
   return plotsOrderValues
     .map((plotOrderValue): CustomPlot => {
       if (isCheckpointValue(plotOrderValue.type)) {
         const { metric } = plotOrderValue
-        return checkpointPlots[metric]
+
+        return collectCheckpointPlot(metric, selectedExperiments)
       }
       const { metric, param } = plotOrderValue
       return collectMetricVsParamPlot(metric, param, experiments)

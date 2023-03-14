@@ -1,18 +1,16 @@
 import { join } from 'path'
-import omit from 'lodash.omit'
 import isEmpty from 'lodash.isempty'
 import {
   collectData,
   collectTemplates,
   collectOverrideRevisionDetails,
   collectCustomPlots,
-  collectCustomCheckpointPlots,
   collectCustomPlotData
 } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import customPlotsFixture, {
   customPlotsOrderFixture,
-  checkpointPlotsFixture
+  experimentsWithCheckpoints
 } from '../../test/fixtures/expShow/base/customPlots'
 import {
   ExperimentStatus,
@@ -26,8 +24,6 @@ import {
   TemplatePlot
 } from '../webview/contract'
 import { getCLICommitId } from '../../test/fixtures/plotsDiff/util'
-import expShowFixture from '../../test/fixtures/expShow/base/output'
-import modifiedFixture from '../../test/fixtures/expShow/modified/output'
 import { SelectedExperimentWithColor } from '../../experiments/model'
 import { Experiment } from '../../experiments/webview/contract'
 
@@ -57,7 +53,6 @@ describe('collectCustomPlots', () => {
     )
     const data = collectCustomPlots(
       customPlotsOrderFixture,
-      checkpointPlotsFixture,
       [
         {
           id: '12345',
@@ -95,9 +90,9 @@ describe('collectCustomPlots', () => {
           name: 'exp-83425',
           params: { 'params.yaml': { dropout: 0.124, epochs: 5 } }
         }
-      ]
+      ],
+      experimentsWithCheckpoints
     )
-
     expect(data).toStrictEqual(expectedOutput)
   })
 })
@@ -212,50 +207,6 @@ describe('collectData', () => {
         sameContents(revisions as string[], ['1ba7bcd'])
       )
     )
-  })
-})
-
-describe('collectCustomCheckpointPlotsData', () => {
-  it('should return the expected data from the test fixture', () => {
-    const data = collectCustomCheckpointPlots(expShowFixture)
-
-    expect(data).toStrictEqual(checkpointPlotsFixture)
-  })
-
-  it('should provide a continuous series for a modified experiment', () => {
-    const data = collectCustomCheckpointPlots(modifiedFixture)
-
-    for (const { values } of Object.values(data)) {
-      const initialExperiment = values.filter(
-        point => point.group === 'exp-908bd'
-      )
-      const modifiedExperiment = values.find(
-        point => point.group === 'exp-01b3a'
-      )
-
-      const lastIterationInitial = initialExperiment?.slice(-1)[0]
-      const firstIterationModified = modifiedExperiment
-
-      expect(lastIterationInitial).not.toStrictEqual(firstIterationModified)
-      expect(omit(lastIterationInitial, 'group')).toStrictEqual(
-        omit(firstIterationModified, 'group')
-      )
-
-      const baseExperiment = values.filter(point => point.group === 'exp-920fc')
-      const restartedExperiment = values.find(
-        point => point.group === 'exp-9bc1b'
-      )
-
-      const iterationRestartedFrom = baseExperiment?.slice(5)[0]
-      const firstIterationAfterRestart = restartedExperiment
-
-      expect(iterationRestartedFrom).not.toStrictEqual(
-        firstIterationAfterRestart
-      )
-      expect(omit(iterationRestartedFrom, 'group')).toStrictEqual(
-        omit(firstIterationAfterRestart, 'group')
-      )
-    }
   })
 })
 

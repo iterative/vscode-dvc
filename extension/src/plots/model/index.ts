@@ -12,7 +12,6 @@ import {
   collectOverrideRevisionDetails,
   collectCustomPlots,
   getCustomPlotId,
-  collectCustomCheckpointPlots,
   collectCustomPlotData
 } from './collect'
 import { getRevisionFirstThreeColumns } from './util'
@@ -39,7 +38,6 @@ import {
   PlotHeight
 } from '../webview/contract'
 import {
-  ExperimentsOutput,
   EXPERIMENT_WORKSPACE_ID,
   PlotsOutputOrError
 } from '../../cli/dvc/contract'
@@ -80,7 +78,6 @@ export class PlotsModel extends ModelWithPersistence {
   private multiSourceVariations: MultiSourceVariations = {}
   private multiSourceEncoding: MultiSourceEncoding = {}
 
-  private customCheckpointPlots?: CustomCheckpointPlots
   private customPlots?: CustomPlot[]
 
   constructor(
@@ -105,8 +102,8 @@ export class PlotsModel extends ModelWithPersistence {
     this.customPlotsOrder = this.revive(PersistenceKey.PLOTS_CUSTOM_ORDER, [])
   }
 
-  public transformAndSetExperiments(data: ExperimentsOutput) {
-    this.recreateCustomPlots(data)
+  public transformAndSetExperiments() {
+    this.recreateCustomPlots()
 
     return this.removeStaleData()
   }
@@ -171,21 +168,20 @@ export class PlotsModel extends ModelWithPersistence {
     }
   }
 
-  public recreateCustomPlots(data?: ExperimentsOutput) {
-    if (data) {
-      this.customCheckpointPlots = collectCustomCheckpointPlots(data)
-    }
+  public recreateCustomPlots() {
+    const allExperiments = this.experiments.getExperiments()
+    const experimentsWithCheckpoints = this.experiments
+      .getRowData()
+      .filter(({ checkpoints }) => !!checkpoints)
 
-    const experiments = this.experiments.getExperiments()
-
-    if (experiments.length === 0) {
+    if (allExperiments.length === 0) {
       this.customPlots = undefined
       return
     }
     const customPlots: CustomPlot[] = collectCustomPlots(
       this.getCustomPlotsOrder(),
-      this.customCheckpointPlots || {},
-      experiments
+      experimentsWithCheckpoints,
+      this.experiments.getRowData().filter(({ checkpoints }) => !!checkpoints)
     )
     this.customPlots = customPlots
   }
