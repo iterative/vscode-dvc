@@ -431,8 +431,8 @@ suite('Plots Test Suite', () => {
       const webview = await plots.showWebview()
 
       const mockNewCustomPlotsOrder = [
-        'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
-        'custom-metrics:summary.json:loss-params:params.yaml:dropout'
+        'custom-summary.json:accuracy-params.yaml:epochs',
+        'custom-summary.json:loss-params.yaml:dropout'
       ]
 
       stub(plotsModel, 'getCustomPlots')
@@ -454,13 +454,13 @@ suite('Plots Test Suite', () => {
       expect(mockSetCustomPlotsOrder).to.be.calledOnce
       expect(mockSetCustomPlotsOrder).to.be.calledWithExactly([
         {
-          metric: 'metrics:summary.json:accuracy',
-          param: 'params:params.yaml:epochs',
+          metric: 'summary.json:accuracy',
+          param: 'params.yaml:epochs',
           type: CustomPlotType.METRIC_VS_PARAM
         },
         {
-          metric: 'metrics:summary.json:loss',
-          param: 'params:params.yaml:dropout',
+          metric: 'summary.json:loss',
+          param: 'params.yaml:dropout',
           type: CustomPlotType.METRIC_VS_PARAM
         }
       ])
@@ -781,8 +781,8 @@ suite('Plots Test Suite', () => {
       const mockGetMetric = stub(customPlotQuickPickUtil, 'pickMetric')
 
       const mockMetricVsParamOrderValue = {
-        metric: 'metrics:summary.json:accuracy',
-        param: 'params:params.yaml:dropout',
+        metric: 'summary.json:accuracy',
+        param: 'params.yaml:dropout',
         type: CustomPlotType.METRIC_VS_PARAM
       }
 
@@ -825,7 +825,7 @@ suite('Plots Test Suite', () => {
       )
 
       const mockCheckpointsOrderValue = {
-        metric: 'metrics:summary.json:val_loss',
+        metric: 'summary.json:val_loss',
         param: CHECKPOINTS_PARAM,
         type: CustomPlotType.CHECKPOINT
       }
@@ -877,15 +877,15 @@ suite('Plots Test Suite', () => {
         mockSelectCustomPlots.callsFake(() => {
           resolve(undefined)
           return Promise.resolve([
-            'custom-metrics:summary.json:loss-params:params.yaml:dropout'
+            'custom-summary.json:loss-params.yaml:dropout'
           ])
         })
       )
 
       stub(plotsModel, 'getCustomPlotsOrder').returns([
         {
-          metric: 'metrics:summary.json:loss',
-          param: 'params:params.yaml:dropout',
+          metric: 'summary.json:loss',
+          param: 'params.yaml:dropout',
           type: CustomPlotType.METRIC_VS_PARAM
         }
       ])

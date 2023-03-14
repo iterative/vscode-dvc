@@ -1,4 +1,3 @@
-import { FILE_SEPARATOR } from '../../experiments/columns/paths'
 import { ColumnType } from '../../experiments/webview/contract'
 import { CheckpointPlot, CustomPlot, CustomPlotType } from '../webview/contract'
 
@@ -26,19 +25,22 @@ export const doesCustomPlotAlreadyExist = (
     return value.param === param && value.metric === metric
   })
 
-const removeColumnTypeFromPath = (columnPath: string, type: string) =>
-  columnPath.startsWith(type + FILE_SEPARATOR)
+const removeColumnTypeFromPath = (
+  columnPath: string,
+  type: string,
+  fileSep: string
+) =>
+  columnPath.startsWith(type + fileSep)
     ? columnPath.slice(type.length + 1)
     : columnPath
 
-export const cleanupOldOrderValue = ({
-  param,
-  metric,
-  type
-}: CustomPlotsOrderValue): CustomPlotsOrderValue => ({
+export const cleanupOldOrderValue = (
+  { param, metric, type }: CustomPlotsOrderValue,
+  fileSep: string
+): CustomPlotsOrderValue => ({
   // previous column paths have the "TYPE:" prefix
-  metric: removeColumnTypeFromPath(metric, ColumnType.METRICS),
-  param: removeColumnTypeFromPath(param, ColumnType.PARAMS),
+  metric: removeColumnTypeFromPath(metric, ColumnType.METRICS, fileSep),
+  param: removeColumnTypeFromPath(param, ColumnType.PARAMS, fileSep),
   // previous values didn't have a type
   type: type || CustomPlotType.METRIC_VS_PARAM
 })
