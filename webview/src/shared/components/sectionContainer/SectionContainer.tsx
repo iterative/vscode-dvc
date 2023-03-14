@@ -1,6 +1,7 @@
 import cx from 'classnames'
 import React, { MouseEvent } from 'react'
 import { Section as PlotsSection } from 'dvc/src/plots/webview/contract'
+import { Section as SetupSection } from 'dvc/src/setup/webview/contract'
 import styles from './styles.module.scss'
 import { Icon } from '../Icon'
 import { ChevronDown, ChevronRight, Info } from '../icons'
@@ -55,12 +56,22 @@ export const SectionDescription = {
       </a>
       .
     </span>
+  ),
+  // Setup Experiments
+  [SetupSection.EXPERIMENTS]: (
+    <span data-testid="tooltip-setup-experiments">
+      Configure the extension to start tracking and visualizing{' '}
+      <a href="https://dvc.org/doc/start/experiment-management/experiments">
+        experiments
+      </a>
+      .
+    </span>
   )
 } as const
 
-export interface SectionContainerProps<T extends PlotsSection> {
+export interface SectionContainerProps<T extends PlotsSection | SetupSection> {
   children: React.ReactNode
-  menuItems: IconMenuItemProps[]
+  menuItems?: IconMenuItemProps[]
   onToggleSection: () => void
   sectionCollapsed: boolean
   sectionKey: T
@@ -73,10 +84,10 @@ const InfoIcon = () => (
 )
 
 export const SectionContainer: React.FC<
-  SectionContainerProps<PlotsSection>
+  SectionContainerProps<PlotsSection | SetupSection>
 > = ({
   children,
-  menuItems,
+  menuItems = [],
   onToggleSection,
   sectionCollapsed,
   sectionKey,
