@@ -399,6 +399,29 @@ describe('App', () => {
         screen.queryByText('Your project contains no data')
       ).not.toBeInTheDocument()
     })
+
+    it('should enable the user to open the experiments webview when they have completed onboarding', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        hasData: true,
+        isPythonExtensionInstalled: true,
+        isStudioConnected: true,
+        needsGitCommit: false,
+        needsGitInitialized: false,
+        projectInitialized: true,
+        pythonBinPath: 'python',
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+      mockPostMessage.mockClear()
+      const button = screen.getByText('Show Experiments')
+      fireEvent.click(button)
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW
+      })
+    })
   })
 
   describe('Studio not connected', () => {

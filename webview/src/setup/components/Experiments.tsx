@@ -18,6 +18,30 @@ import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { IconButton } from '../../shared/components/button/IconButton'
 import { Beaker } from '../../shared/components/icons'
 
+const ProjectSetup: React.FC<{ hasData: boolean | undefined }> = ({
+  hasData
+}) => {
+  if (hasData === undefined) {
+    return <EmptyState isFullScreen={false}>Loading Project...</EmptyState>
+  }
+
+  if (!hasData) {
+    return <NoData />
+  }
+
+  return (
+    <EmptyState isFullScreen={false}>
+      <h1>Setup Complete</h1>
+      <IconButton
+        appearance="primary"
+        icon={Beaker}
+        onClick={showExperiments}
+        text="Show Experiments"
+      />
+    </EmptyState>
+  )
+}
+
 export type ExperimentsProps = {
   canGitInitialize: boolean | undefined
   cliCompatible: boolean | undefined
@@ -38,7 +62,6 @@ export const Experiments: React.FC<ExperimentsProps> = ({
   needsGitCommit,
   projectInitialized,
   pythonBinPath
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
   if (cliCompatible === false) {
     return <CliIncompatible checkCompatibility={checkCompatibility} />
@@ -71,23 +94,5 @@ export const Experiments: React.FC<ExperimentsProps> = ({
     return <NeedsGitCommit showScmPanel={showScmPanel} />
   }
 
-  if (hasData === undefined) {
-    return <EmptyState isFullScreen={false}>Loading Project...</EmptyState>
-  }
-
-  if (!hasData) {
-    return <NoData />
-  }
-
-  return (
-    <EmptyState isFullScreen={false}>
-      <h1>{"You're all setup"}</h1>
-      <IconButton
-        appearance="primary"
-        icon={Beaker}
-        onClick={showExperiments}
-        text="Show Experiments"
-      />
-    </EmptyState>
-  )
+  return <ProjectSetup hasData={hasData} />
 }

@@ -97,7 +97,7 @@ export class WebviewMessages {
           ConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE,
           message.payload
         )
-      case MessageFromWebviewType.SHOW_EXPERIMENTS:
+      case MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW:
         return this.showExperiments()
 
       default:

@@ -34,7 +34,7 @@ export const setupWorkspace = () => {
 }
 
 export const showExperiments = () => {
-  sendMessage({ type: MessageFromWebviewType.SHOW_EXPERIMENTS })
+  sendMessage({ type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW })
 }
 
 export const openStudio = () =>
