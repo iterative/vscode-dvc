@@ -35,7 +35,6 @@ import { DvcExecutor } from '../../cli/dvc/executor'
 import { GitReader } from '../../cli/git/reader'
 import { SetupData } from '../../setup/webview/contract'
 import { DvcViewer } from '../../cli/dvc/viewer'
-import { ConnectData } from '../../connect/webview/contract'
 import { Toast } from '../../vscode/toast'
 import { GitExecutor } from '../../cli/git/executor'
 
@@ -258,7 +257,7 @@ export const buildDependencies = (
 }
 
 export const getMessageReceivedEmitter = (
-  webview: BaseWebview<PlotsData | TableData | SetupData | ConnectData>
+  webview: BaseWebview<PlotsData | TableData | SetupData>
 ): EventEmitter<MessageFromWebview> => (webview as any).messageReceived
 
 export const getInputBoxEvent = (mockInputValue: string) => {

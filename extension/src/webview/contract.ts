@@ -1,4 +1,3 @@
-import { ConnectData } from '../connect/webview/contract'
 import { SortDefinition } from '../experiments/model/sortBy'
 import { TableData } from '../experiments/webview/contract'
 import {
@@ -10,7 +9,7 @@ import {
 } from '../plots/webview/contract'
 import { SetupData } from '../setup/webview/contract'
 
-export type WebviewData = TableData | PlotsData | SetupData | ConnectData
+export type WebviewData = TableData | PlotsData | SetupData
 
 export enum MessageFromWebviewType {
   INITIALIZED = 'initialized',

@@ -15,7 +15,7 @@ import { NeedsGitCommit } from './NeedsGitCommit'
 import { NoData } from './NoData'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 
-export type SetupExperimentsProps = {
+export type ExperimentsProps = {
   canGitInitialize: boolean | undefined
   cliCompatible: boolean | undefined
   hasData: boolean | undefined
@@ -26,7 +26,7 @@ export type SetupExperimentsProps = {
   pythonBinPath: string | undefined
 }
 
-export const SetupExperiments: React.FC<SetupExperimentsProps> = ({
+export const Experiments: React.FC<ExperimentsProps> = ({
   canGitInitialize,
   cliCompatible,
   hasData,
@@ -69,12 +69,16 @@ export const SetupExperiments: React.FC<SetupExperimentsProps> = ({
   }
 
   if (hasData === undefined) {
-    return <EmptyState>Loading Project...</EmptyState>
+    return <EmptyState isFullScreen={false}>Loading Project...</EmptyState>
   }
 
   if (!hasData) {
     return <NoData />
   }
 
-  return <EmptyState>{"You're all setup"}</EmptyState>
+  return (
+    <EmptyState isFullScreen={false}>
+      <h1>{"You're all setup"}</h1>
+    </EmptyState>
+  )
 }

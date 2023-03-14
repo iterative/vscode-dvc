@@ -3,7 +3,6 @@ import { commands } from 'vscode'
 export enum ContextKey {
   CLI_INCOMPATIBLE = 'dvc.cli.incompatible',
   COMMANDS_AVAILABLE = 'dvc.commands.available',
-  CONNECT_WEBVIEW_ACTIVE = 'dvc.connect.webview.active',
   EXPERIMENT_CHECKPOINTS = 'dvc.experiment.checkpoints',
   EXPERIMENTS_WEBVIEW_ACTIVE = 'dvc.experiments.webview.active',
   EXPERIMENT_RUNNING = 'dvc.experiment.running',

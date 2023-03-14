@@ -3,11 +3,16 @@ import {
   Section,
   SetupData
 } from 'dvc/src/setup/webview/contract'
-import { MessageToWebview } from 'dvc/src/webview/contract'
+import {
+  MessageFromWebviewType,
+  MessageToWebview
+} from 'dvc/src/webview/contract'
 import React, { useCallback, useState } from 'react'
-import { SetupExperiments } from './Experiments'
-import { SectionContainer } from '../../shared/components/sectionContainer/SectionContainer'
+import { Experiments } from './Experiments'
+import { Studio } from './Studio'
+import { SetupContainer } from './SetupContainer'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
+import { sendMessage } from '../../shared/vscode'
 
 export const App: React.FC = () => {
   const [cliCompatible, setCliCompatible] = useState<boolean | undefined>(
@@ -31,6 +36,10 @@ export const App: React.FC = () => {
     typeof DEFAULT_SECTION_COLLAPSED
   >(DEFAULT_SECTION_COLLAPSED)
 
+  const [isStudioConnected, setIsStudioConnected] = useState<boolean>(false)
+  const [shareLiveToStudio, setShareLiveToStudioValue] =
+    useState<boolean>(false)
+
   useVsCodeMessaging(
     useCallback(
       ({ data }: { data: MessageToWebview<SetupData> }) => {
@@ -42,6 +51,8 @@ export const App: React.FC = () => {
         setNeedsGitCommit(data.data.needsGitCommit)
         setProjectInitialized(data.data.projectInitialized)
         setPythonBinPath(data.data.pythonBinPath)
+        setIsStudioConnected(data.data.isStudioConnected)
+        setShareLiveToStudioValue(data.data.shareLiveToStudio)
       },
       [
         setCanGitInitialized,
@@ -51,33 +62,52 @@ export const App: React.FC = () => {
         setNeedsGitInitialized,
         setNeedsGitCommit,
         setProjectInitialized,
-        setPythonBinPath
+        setPythonBinPath,
+        setIsStudioConnected,
+        setShareLiveToStudioValue
       ]
     )
   )
 
+  const setShareLiveToStudio = (shouldShareLive: boolean) => {
+    setShareLiveToStudioValue(shouldShareLive)
+    sendMessage({
+      payload: shouldShareLive,
+      type: MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE
+    })
+  }
+
   return (
-    <SectionContainer
-      sectionCollapsed={sectionCollapsed[Section.EXPERIMENTS]}
-      sectionKey={Section.EXPERIMENTS}
-      title={'Experiments'}
-      onToggleSection={() =>
-        setSectionCollapsed({
-          ...sectionCollapsed,
-          [Section.EXPERIMENTS]: !sectionCollapsed[Section.EXPERIMENTS]
-        })
-      }
-    >
-      <SetupExperiments
-        canGitInitialize={canGitInitialize}
-        cliCompatible={cliCompatible}
-        hasData={hasData}
-        isPythonExtensionInstalled={isPythonExtensionInstalled}
-        needsGitInitialized={needsGitInitialized}
-        needsGitCommit={needsGitCommit}
-        projectInitialized={projectInitialized}
-        pythonBinPath={pythonBinPath}
-      />
-    </SectionContainer>
+    <>
+      <SetupContainer
+        sectionKey={Section.EXPERIMENTS}
+        title={'Experiments'}
+        sectionCollapsed={sectionCollapsed}
+        setSectionCollapsed={setSectionCollapsed}
+      >
+        <Experiments
+          canGitInitialize={canGitInitialize}
+          cliCompatible={cliCompatible}
+          hasData={hasData}
+          isPythonExtensionInstalled={isPythonExtensionInstalled}
+          needsGitInitialized={needsGitInitialized}
+          needsGitCommit={needsGitCommit}
+          projectInitialized={projectInitialized}
+          pythonBinPath={pythonBinPath}
+        />
+      </SetupContainer>
+      <SetupContainer
+        sectionKey={Section.STUDIO}
+        title={'Studio'}
+        sectionCollapsed={sectionCollapsed}
+        setSectionCollapsed={setSectionCollapsed}
+      >
+        <Studio
+          isStudioConnected={isStudioConnected}
+          shareLiveToStudio={shareLiveToStudio}
+          setShareLiveToStudio={setShareLiveToStudio}
+        />
+      </SetupContainer>
+    </>
   )
 }

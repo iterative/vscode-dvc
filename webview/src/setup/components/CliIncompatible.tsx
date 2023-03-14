@@ -8,7 +8,7 @@ type CliIncompatibleProps = { checkCompatibility: () => void }
 export const CliIncompatible: React.FC<CliIncompatibleProps> = ({
   checkCompatibility
 }) => (
-  <EmptyState>
+  <EmptyState isFullScreen={false}>
     <div>
       <h1>DVC is incompatible</h1>
       <p>The located CLI is incompatible with the extension.</p>

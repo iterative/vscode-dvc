@@ -400,16 +400,6 @@
         "category": "DVC"
       },
       {
-        "title": "Connect to Studio",
-        "command": "dvc.showConnect",
-        "category": "DVC"
-      },
-      {
-        "title": "Open Studio Settings",
-        "command": "dvc.showStudioSettings",
-        "category": "DVC"
-      },
-      {
         "title": "Show Experiments",
         "command": "dvc.showExperiments",
         "category": "DVC",
@@ -818,14 +808,6 @@
         {
           "command": "dvc.stopQueuedExperiments",
           "when": "dvc.commands.available && dvc.project.available"
-        },
-        {
-          "command": "dvc.showConnect",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.studio.connected"
-        },
-        {
-          "command": "dvc.showStudioSettings",
-          "when": "dvc.commands.available && dvc.project.available && dvc.studio.connected"
         },
         {
           "command": "dvc.selectForCompare",
@@ -1416,12 +1398,12 @@
       },
       {
         "view": "dvc.views.studio",
-        "contents": "[$(plug) Connect](command:dvc.showConnect)",
+        "contents": "[$(plug) Connect](command:dvc.showSetup)",
         "when": "!dvc.studio.connected"
       },
       {
         "view": "dvc.views.studio",
-        "contents": "[$(settings-gear) Open Settings](command:dvc.showConnect)",
+        "contents": "[$(settings-gear) Open Settings](command:dvc.showSetup)",
         "when": "dvc.studio.connected"
       },
       {

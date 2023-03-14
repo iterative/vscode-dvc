@@ -5,6 +5,26 @@ import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 
+const registerSetupStudioCommands = (
+  setup: Setup,
+  internalCommands: InternalCommands
+): void => {
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.ADD_STUDIO_ACCESS_TOKEN,
+    () => setup.saveStudioAccessToken()
+  )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.UPDATE_STUDIO_ACCESS_TOKEN,
+    () => setup.saveStudioAccessToken()
+  )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.REMOVE_STUDIO_ACCESS_TOKEN,
+    () => setup.removeStudioAccessToken()
+  )
+}
+
 const registerSetupConfigCommands = (
   setup: Setup,
   internalCommands: InternalCommands
@@ -47,4 +67,5 @@ export const registerSetupCommands = (
   )
 
   registerSetupConfigCommands(setup, internalCommands)
+  registerSetupStudioCommands(setup, internalCommands)
 }

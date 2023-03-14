@@ -32,3 +32,15 @@ export const selectPythonInterpreter = () => {
 export const setupWorkspace = () => {
   sendMessage({ type: MessageFromWebviewType.SETUP_WORKSPACE })
 }
+
+export const openStudio = () =>
+  sendMessage({ type: MessageFromWebviewType.OPEN_STUDIO })
+
+export const openStudioProfile = () =>
+  sendMessage({ type: MessageFromWebviewType.OPEN_STUDIO_PROFILE })
+
+export const saveStudioToken = () =>
+  sendMessage({ type: MessageFromWebviewType.SAVE_STUDIO_TOKEN })
+
+export const removeStudioToken = () =>
+  sendMessage({ type: MessageFromWebviewType.REMOVE_STUDIO_TOKEN })

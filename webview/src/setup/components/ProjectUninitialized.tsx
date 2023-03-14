@@ -19,7 +19,7 @@ const GitUninitialized: React.FC<GitUninitializedProps> = ({
 }) => {
   if (!canGitInitialize) {
     return (
-      <EmptyState>
+      <EmptyState isFullScreen={false}>
         <Header />
         <GitIsPrerequisite />
         <p>
@@ -35,7 +35,7 @@ const GitUninitialized: React.FC<GitUninitializedProps> = ({
   }
 
   return (
-    <EmptyState>
+    <EmptyState isFullScreen={false}>
       <Header />
       <GitIsPrerequisite />
       <Button onClick={initializeGit} text="Initialize Git" />
@@ -46,7 +46,7 @@ const GitUninitialized: React.FC<GitUninitializedProps> = ({
 const DvcUninitialized: React.FC<{ initializeDvc: () => void }> = ({
   initializeDvc
 }) => (
-  <EmptyState>
+  <EmptyState isFullScreen={false}>
     <Header />
     <p>
       The current workspace does not contain a DVC project. You can initialize a
