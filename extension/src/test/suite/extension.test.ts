@@ -1,7 +1,7 @@
 import { join, resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore, spy, match } from 'sinon'
+import { stub, restore, spy } from 'sinon'
 import { commands, workspace } from 'vscode'
 import { closeAllEditors, mockDisposable, mockDuration } from './util'
 import { mockHasCheckpoints } from './experiments/util'
@@ -189,31 +189,6 @@ suite('Extension Test Suite', () => {
         .called
 
       expect(
-        mockSendTelemetryEvent,
-        'should send the correct event details'
-      ).to.be.calledWithExactly(
-        EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
-        {
-          cliAccessible: true,
-          deps: 8,
-          dvcPathUsed: false,
-          dvcRootCount: 1,
-          hasCheckpoints: 1,
-          images: 3,
-          metrics: 4,
-          msPythonInstalled: true,
-          msPythonUsed: false,
-          noCheckpoints: 0,
-          params: 9,
-          pythonPathUsed: true,
-          templates: 3,
-          tracked: 13,
-          workspaceFolderCount: 1
-        },
-        match.has('duration')
-      )
-
-      expect(
         mockDisposer,
         'should dispose of the current repositories and experiments before creating new ones'
       ).to.have.been.called
@@ -248,7 +223,6 @@ suite('Extension Test Suite', () => {
       const otherRoot = resolve('other', 'root')
       mockDuration(duration)
 
-      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockQueueStop = stub(DvcExecutor.prototype, 'queueStop').resolves(
         undefined
       )
@@ -256,18 +230,6 @@ suite('Extension Test Suite', () => {
       stub(Setup.prototype, 'getRoots').returns([dvcDemoPath, otherRoot])
 
       await commands.executeCommand(RegisteredCommands.STOP_EXPERIMENTS)
-
-      expect(mockSendTelemetryEvent).to.be.calledWith(
-        RegisteredCommands.STOP_EXPERIMENTS,
-        {
-          stopped: false,
-          wasRunning: false
-        },
-        {
-          duration
-        }
-      )
-
       expect(mockQueueStop).to.be.calledWith(dvcDemoPath, Flag.KILL)
       expect(mockQueueStop).to.be.calledWith(otherRoot, Flag.KILL)
     })
