@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { MouseEvent } from 'react'
 import cx from 'classnames'
 import { TippyProps } from '@tippyjs/react'
 import styles from './styles.module.scss'
@@ -26,12 +26,16 @@ export const IconMenuItem: React.FC<IconMenuItemAllProps> = ({
   tooltipTarget,
   menuTarget
 }) => {
+  const handleOnClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation()
+    onClick?.()
+  }
   let button = (
     <Tooltip content={tooltip} singleton={tooltipTarget}>
       <button
         aria-label={tooltip}
         className={cx(styles.item, { [styles.clickable]: !!onClick })}
-        onClick={onClick}
+        onClick={handleOnClick}
         data-testid="icon-menu-item"
       >
         <Icon icon={icon} data-testid="icon-menu-item-icon" width={15} />

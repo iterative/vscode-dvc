@@ -129,34 +129,38 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
         [styles.ratioVerticalNormal]: height === PlotHeight.VERTICAL_NORMAL,
         [styles.ratioVerticalLarger]: height === PlotHeight.VERTICAL_LARGER
       })}
+      style={{ top: ribbonHeight - 4 }}
+      headerChildren={
+        changeSize &&
+        hasItems &&
+        maxNbPlotsPerRow > 1 && (
+          <div className={styles.sizeSliders} data-testid="size-sliders">
+            <div className={styles.sizeSlider}>
+              <MinMaxSlider
+                maximum={-1}
+                minimum={-maxNbPlotsPerRow}
+                label="Plot Width"
+                onChange={nbItems => handleResize(nbItems, height)}
+                defaultValue={-nbItemsPerRow}
+              />
+            </div>
+            <div className={styles.sizeSlider}>
+              <ItemsSlider
+                items={Object.values(PlotHeight) as number[]}
+                label="Plot Height"
+                onChange={newHeight =>
+                  handleResize(
+                    nbItemsPerRow,
+                    newHeight as unknown as PlotHeight
+                  )
+                }
+                defaultValue={height}
+              />
+            </div>
+          </div>
+        )
+      }
     >
-      {changeSize && hasItems && maxNbPlotsPerRow > 1 && (
-        <div
-          className={styles.sizeSliders}
-          style={{ top: ribbonHeight - 4 }}
-          data-testid="size-sliders"
-        >
-          <div className={styles.sizeSlider}>
-            <MinMaxSlider
-              maximum={-1}
-              minimum={-maxNbPlotsPerRow}
-              label="Plot Width"
-              onChange={nbItems => handleResize(nbItems, height)}
-              defaultValue={-nbItemsPerRow}
-            />
-          </div>
-          <div className={styles.sizeSlider}>
-            <ItemsSlider
-              items={Object.values(PlotHeight) as number[]}
-              label="Plot Height"
-              onChange={newHeight =>
-                handleResize(nbItemsPerRow, newHeight as unknown as PlotHeight)
-              }
-              defaultValue={height}
-            />
-          </div>
-        </div>
-      )}
       {open && (
         <div
           className={cx({

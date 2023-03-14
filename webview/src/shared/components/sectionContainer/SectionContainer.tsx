@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import React, { MouseEvent } from 'react'
+import React, { CSSProperties, MouseEvent, ReactNode } from 'react'
 import { Section as PlotsSection } from 'dvc/src/plots/webview/contract'
 import styles from './styles.module.scss'
 import { Icon } from '../Icon'
@@ -61,11 +61,13 @@ export const SectionDescription = {
 export interface SectionContainerProps<T extends PlotsSection> {
   children: React.ReactNode
   menuItems: IconMenuItemProps[]
+  headerChildren?: ReactNode
   onToggleSection: () => void
   sectionCollapsed: boolean
   sectionKey: T
   title: string
   className: string
+  style?: CSSProperties
 }
 
 const InfoIcon = () => (
@@ -81,7 +83,9 @@ export const SectionContainer: React.FC<
   sectionCollapsed,
   sectionKey,
   title,
-  className
+  className,
+  style,
+  headerChildren
 }) => {
   const open = !sectionCollapsed
 
@@ -108,31 +112,40 @@ export const SectionContainer: React.FC<
       data-testid="section-container"
     >
       <details open={open} className={styles.sectionContainer}>
-        <summary onClick={toggleSection}>
-          <Icon
-            icon={open ? ChevronDown : ChevronRight}
-            data-testid="section-container-details-chevron"
-            width={20}
-            height={20}
-            className={styles.detailsIcon}
-          />
-          {title}
-          <Tooltip content={tooltipContent} placement="bottom-end" interactive>
-            <div
-              className={styles.infoTooltipToggle}
-              data-testid="info-tooltip-toggle"
+        <summary onClick={toggleSection} style={style}>
+          <div className={styles.summaryTitle}>
+            <Icon
+              icon={open ? ChevronDown : ChevronRight}
+              data-testid="section-container-details-chevron"
+              width={20}
+              height={20}
+              className={styles.detailsIcon}
+            />
+            {title}
+            <Tooltip
+              content={tooltipContent}
+              placement="bottom-end"
+              interactive
             >
-              <InfoIcon />
+              <div
+                className={styles.infoTooltipToggle}
+                data-testid="info-tooltip-toggle"
+              >
+                <InfoIcon />
+              </div>
+            </Tooltip>
+          </div>
+
+          {headerChildren}
+
+          {menuItems.length > 0 && (
+            <div className={styles.iconMenu}>
+              <IconMenu items={menuItems} />
             </div>
-          </Tooltip>
+          )}
         </summary>
         {children}
       </details>
-      {menuItems.length > 0 && (
-        <div className={styles.iconMenu}>
-          <IconMenu items={menuItems} />
-        </div>
-      )}
     </div>
   )
 }
