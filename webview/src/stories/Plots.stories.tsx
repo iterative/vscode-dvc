@@ -8,7 +8,8 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   TemplatePlotGroup,
   TemplatePlotSection,
-  DEFAULT_NB_ITEMS_PER_ROW
+  DEFAULT_NB_ITEMS_PER_ROW,
+  DEFAULT_PLOT_HEIGHT
 } from 'dvc/src/plots/webview/contract'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
 import customPlotsFixture from 'dvc/src/test/fixtures/expShow/base/customPlots'
@@ -35,17 +36,25 @@ const smallCustomPlotsFixture = {
   nbItemsPerRow: 3,
   plots: customPlotsFixture.plots.map(plot => ({
     ...plot,
-    title: truncateVerticalTitle(plot.yTitle, 3) as string
+    yTitle: truncateVerticalTitle(
+      plot.yTitle,
+      DEFAULT_NB_ITEMS_PER_ROW,
+      DEFAULT_PLOT_HEIGHT
+    ) as string
   }))
 }
 
-const manyCustomPlots = (length: number, size = DEFAULT_NB_ITEMS_PER_ROW) =>
+const manyCustomPlots = (length: number) =>
   Array.from({ length }, () => customPlotsFixture.plots[2]).map((plot, i) => {
     const id = plot.id + i.toString()
     return {
       ...plot,
       id,
-      yTitle: truncateVerticalTitle(id, size) as string
+      yTitle: truncateVerticalTitle(
+        id,
+        DEFAULT_NB_ITEMS_PER_ROW,
+        DEFAULT_PLOT_HEIGHT
+      ) as string
     }
   })
 

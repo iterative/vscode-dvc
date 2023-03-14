@@ -116,7 +116,8 @@ describe('collectCustomPlotData', () => {
     const metricVsParamData = collectCustomPlotData(
       metricVsParamPlot,
       customPlotsFixture.colors,
-      customPlotsFixture.nbItemsPerRow
+      customPlotsFixture.nbItemsPerRow,
+      customPlotsFixture.height
     )
 
     const checkpointsData = collectCustomPlotData(
@@ -142,7 +143,8 @@ describe('collectCustomPlotData', () => {
         ]
       } as CheckpointPlot,
       customPlotsFixture.colors,
-      customPlotsFixture.nbItemsPerRow
+      customPlotsFixture.nbItemsPerRow,
+      customPlotsFixture.height
     )
 
     expect(metricVsParamData).toStrictEqual(expectedMetricVsParamPlotData)

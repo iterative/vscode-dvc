@@ -1,5 +1,5 @@
-import React, { FormEvent } from 'react'
-import styles from './styles.module.scss'
+import React from 'react'
+import { Slider } from './Slider'
 
 interface MinMaxSliderProps {
   minimum?: number
@@ -17,26 +17,13 @@ export const MinMaxSlider: React.FC<MinMaxSliderProps> = ({
   defaultValue,
   label,
   onChange
-}) => {
-  const handleOnChange = (e: FormEvent<HTMLInputElement>) => {
-    onChange(Number.parseFloat(e.currentTarget.value))
-  }
-
-  return (
-    <div className={styles.wrapper}>
-      <label htmlFor={label} className={styles.label}>
-        {label}
-      </label>
-      <input
-        type="range"
-        min={minimum}
-        max={maximum}
-        step={step}
-        defaultValue={defaultValue}
-        id={label}
-        onChange={handleOnChange}
-        className={styles.slider}
-      />
-    </div>
-  )
-}
+}) => (
+  <Slider
+    min={minimum}
+    max={maximum}
+    step={step}
+    defaultValue={defaultValue}
+    onValueChange={onChange}
+    label={label}
+  />
+)

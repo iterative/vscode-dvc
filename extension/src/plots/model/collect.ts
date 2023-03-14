@@ -322,7 +322,8 @@ export const collectCustomPlots = (
 export const collectCustomPlotData = (
   plot: CustomPlot,
   colors: ColorScale | undefined,
-  nbItemsPerRow: number
+  nbItemsPerRow: number,
+  height: number
 ): CustomPlotData => {
   const selectedExperiments = colors?.domain
   const filteredValues = isCheckpointPlot(plot)
@@ -334,7 +335,7 @@ export const collectCustomPlotData = (
   return {
     ...plot,
     values: filteredValues,
-    yTitle: truncateVerticalTitle(plot.metric, nbItemsPerRow) as string
+    yTitle: truncateVerticalTitle(plot.metric, nbItemsPerRow, height) as string
   } as CustomPlotData
 }
 
@@ -577,6 +578,7 @@ const collectTemplatePlot = (
   template: string,
   revisionData: RevisionData,
   nbItemsPerRow: number,
+  height: number,
   revisionColors: ColorScale | undefined,
   multiSourceEncoding: MultiSourceEncoding
 ) => {
@@ -599,6 +601,7 @@ const collectTemplatePlot = (
   const content = extendVegaSpec(
     fillTemplate(template, datapoints),
     nbItemsPerRow,
+    height,
     {
       ...multiSourceEncodingUpdate,
       color: revisionColors
@@ -620,6 +623,7 @@ const collectTemplateGroup = (
   templates: TemplateAccumulator,
   revisionData: RevisionData,
   nbItemsPerRow: number,
+  height: number,
   revisionColors: ColorScale | undefined,
   multiSourceEncoding: MultiSourceEncoding
 ): TemplatePlotEntry[] => {
@@ -638,6 +642,7 @@ const collectTemplateGroup = (
       template,
       revisionData,
       nbItemsPerRow,
+      height,
       revisionColors,
       multiSourceEncoding
     )
@@ -651,6 +656,7 @@ export const collectSelectedTemplatePlots = (
   templates: TemplateAccumulator,
   revisionData: RevisionData,
   nbItemsPerRow: number,
+  height: number,
   revisionColors: ColorScale | undefined,
   multiSourceEncoding: MultiSourceEncoding
 ): TemplatePlotSection[] | undefined => {
@@ -663,6 +669,7 @@ export const collectSelectedTemplatePlots = (
       templates,
       revisionData,
       nbItemsPerRow,
+      height,
       revisionColors,
       multiSourceEncoding
     )

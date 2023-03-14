@@ -7,7 +7,8 @@ import {
 import {
   CustomPlotsData,
   CustomPlotType,
-  DEFAULT_NB_ITEMS_PER_ROW
+  DEFAULT_NB_ITEMS_PER_ROW,
+  DEFAULT_PLOT_HEIGHT
 } from '../../../../plots/webview/contract'
 
 export const customPlotsOrderFixture: CustomPlotsOrderValue[] = [
@@ -216,7 +217,7 @@ const data: CustomPlotsData = {
     }
   ],
   nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
-  height: undefined
+  height: DEFAULT_PLOT_HEIGHT
 }
 
 export default data

@@ -35,7 +35,8 @@ import {
   CustomPlot,
   ColorScale,
   DEFAULT_HEIGHT,
-  DEFAULT_NB_ITEMS_PER_ROW
+  DEFAULT_NB_ITEMS_PER_ROW,
+  PlotHeight
 } from '../webview/contract'
 import {
   ExperimentsOutput,
@@ -64,7 +65,7 @@ export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
 
   private nbItemsPerRow: Record<Section, number>
-  private height: Record<Section, number | undefined>
+  private height: Record<Section, PlotHeight>
   private customPlotsOrder: CustomPlotsOrderValue[]
   private sectionCollapsed: SectionCollapsed
   private commitRevisions: Record<string, string> = {}
@@ -373,7 +374,7 @@ export class PlotsModel extends ModelWithPersistence {
     return DEFAULT_NB_ITEMS_PER_ROW
   }
 
-  public setHeight(section: Section, height: number | undefined) {
+  public setHeight(section: Section, height: PlotHeight) {
     this.height[section] = height
     this.persist(PersistenceKey.PLOT_HEIGHT, this.height)
   }
@@ -471,7 +472,8 @@ export class PlotsModel extends ModelWithPersistence {
         collectCustomPlotData(
           plot,
           colors,
-          this.getNbItemsPerRow(Section.CUSTOM_PLOTS)
+          this.getNbItemsPerRow(Section.CUSTOM_PLOTS),
+          this.getHeight(Section.CUSTOM_PLOTS)
         )
       )
     }
@@ -519,6 +521,7 @@ export class PlotsModel extends ModelWithPersistence {
       this.templates,
       this.revisionData,
       this.getNbItemsPerRow(Section.TEMPLATE_PLOTS),
+      this.getHeight(Section.TEMPLATE_PLOTS),
       this.getRevisionColors(selectedRevisions),
       this.multiSourceEncoding
     )

@@ -7,7 +7,7 @@ import { PlotsContainer } from '../PlotsContainer'
 import { PlotsState } from '../../store'
 
 export const TemplatePlotsWrapper: React.FC = () => {
-  const { nbItemsPerRow, isCollapsed } = useSelector(
+  const { nbItemsPerRow, isCollapsed, height } = useSelector(
     (state: PlotsState) => state.template
   )
   const hasItems = useSelector(
@@ -20,8 +20,9 @@ export const TemplatePlotsWrapper: React.FC = () => {
       sectionKey={Section.TEMPLATE_PLOTS}
       nbItemsPerRow={nbItemsPerRow}
       sectionCollapsed={isCollapsed}
-      changeNbItemsPerRow={changeSize}
+      changeSize={changeSize}
       hasItems={hasItems}
+      height={height}
     >
       <TemplatePlots />
     </PlotsContainer>

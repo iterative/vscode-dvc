@@ -2,7 +2,11 @@ import { ViewColumn } from 'vscode'
 import { WorkspaceScale } from './collect'
 import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { SortDefinition } from '../experiments/model/sortBy'
-import { Section, SectionCollapsed } from '../plots/webview/contract'
+import {
+  PlotHeight,
+  Section,
+  SectionCollapsed
+} from '../plots/webview/contract'
 
 export const APPLICATION_INSIGHTS_KEY = '46e8e554-d50a-471a-a53b-4af2b1cd6594'
 
@@ -255,7 +259,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_SECTION_RESIZED]: {
     section: Section
     nbItemsPerRow: number
-    height: number | undefined
+    height: PlotHeight
   }
   [EventName.VIEWS_PLOTS_SECTION_TOGGLE]: Partial<SectionCollapsed>
   [EventName.VIEWS_PLOTS_SELECT_EXPERIMENTS]: undefined

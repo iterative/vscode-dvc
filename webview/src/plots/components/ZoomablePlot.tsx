@@ -16,7 +16,6 @@ interface ZoomablePlotProps {
   id: string
   onViewReady?: () => void
   changeDisabledDragIds: (ids: string[]) => AnyAction
-  changeSize: (nbItemsPerRow: number) => AnyAction
   currentSnapPoint: number
   section: Section
   shouldNotResize?: boolean

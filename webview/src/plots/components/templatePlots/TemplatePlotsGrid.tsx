@@ -2,7 +2,7 @@ import cx from 'classnames'
 import { Section } from 'dvc/src/plots/webview/contract'
 import React, { useEffect, useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { changeDisabledDragIds, changeSize } from './templatePlotsSlice'
+import { changeDisabledDragIds } from './templatePlotsSlice'
 import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/VirtualizedGrid'
 import {
   DragDropContainer,
@@ -110,7 +110,6 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
               id={plot}
               onViewReady={addEventsOnViewReady}
               changeDisabledDragIds={changeDisabledDragIds}
-              changeSize={changeSize}
               currentSnapPoint={nbItemsPerRow}
               shouldNotResize={multiView}
               section={Section.TEMPLATE_PLOTS}

@@ -2,6 +2,7 @@ import { ConnectData } from '../connect/webview/contract'
 import { SortDefinition } from '../experiments/model/sortBy'
 import { TableData } from '../experiments/webview/contract'
 import {
+  PlotHeight,
   PlotsData,
   Section,
   SectionCollapsed,
@@ -75,7 +76,7 @@ export type ColumnResizePayload = {
 export type PlotsResizedPayload = {
   section: Section
   nbItemsPerRow: number
-  height: number | undefined
+  height: PlotHeight
 }
 export type PlotSectionRenamedPayload = {
   section: Section

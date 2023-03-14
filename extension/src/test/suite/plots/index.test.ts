@@ -24,6 +24,7 @@ import {
 } from '../util'
 import { dvcDemoPath } from '../../util'
 import {
+  DEFAULT_PLOT_HEIGHT,
   DEFAULT_SECTION_COLLAPSED,
   PlotsData as TPlotsData,
   Section,
@@ -207,7 +208,7 @@ suite('Plots Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: {
-          height: undefined,
+          height: DEFAULT_PLOT_HEIGHT,
           nbItemsPerRow: 3,
           section: Section.TEMPLATE_PLOTS
         },
@@ -220,7 +221,7 @@ suite('Plots Test Suite', () => {
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_PLOTS_SECTION_RESIZED,
         {
-          height: undefined,
+          height: DEFAULT_PLOT_HEIGHT,
           nbItemsPerRow: 3,
           section: Section.TEMPLATE_PLOTS
         },
