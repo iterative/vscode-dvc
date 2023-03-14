@@ -91,5 +91,5 @@ export abstract class BaseRepository<
     this.webview = undefined
   }
 
-  abstract sendInitialWebviewData(): void
+  protected abstract sendInitialWebviewData(): void
 }

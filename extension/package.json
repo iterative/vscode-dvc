@@ -1398,17 +1398,17 @@
       },
       {
         "view": "dvc.views.studio",
-        "contents": "[$(plug) Connect](command:dvc.showSetup)",
+        "contents": "[$(plug) Connect](command:dvc.showStudioSetup)",
         "when": "!dvc.studio.connected"
       },
       {
         "view": "dvc.views.studio",
-        "contents": "[$(settings-gear) Open Settings](command:dvc.showSetup)",
+        "contents": "[$(settings-gear) Open Settings](command:dvc.showStudioSetup)",
         "when": "dvc.studio.connected"
       },
       {
         "view": "dvc.views.welcome",
-        "contents": "New to the extension?\n[Show Walkthrough](command:dvc.getStarted)\n\nThe extension is currently unable to initialize.\n[Show Setup](command:dvc.showSetup)",
+        "contents": "New to the extension?\n[Show Walkthrough](command:dvc.getStarted)\n\nThe extension is currently unable to initialize.\n[Show Setup](command:dvc.showExperimentsSetup)",
         "when": "true"
       },
       {
@@ -1450,7 +1450,7 @@
           {
             "id": "dvc.installDVC",
             "title": "Install DVC",
-            "description": "This extension requires DVC to be installed.\n\n[Show Setup](command:dvc.showSetup)\n",
+            "description": "This extension requires DVC to be installed.\n\n[Show Setup](command:dvc.showExperimentsSetup)\n",
             "media": {
               "markdown": "resources/walkthrough/install-dvc.md"
             },

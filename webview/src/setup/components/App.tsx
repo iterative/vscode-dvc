@@ -32,9 +32,9 @@ export const App: React.FC = () => {
   const [isPythonExtensionInstalled, setIsPythonExtensionInstalled] =
     useState<boolean>(false)
   const [hasData, setHasData] = useState<boolean | undefined>(false)
-  const [sectionCollapsed, setSectionCollapsed] = useState<
-    typeof DEFAULT_SECTION_COLLAPSED
-  >(DEFAULT_SECTION_COLLAPSED)
+  const [sectionCollapsed, setSectionCollapsed] = useState(
+    DEFAULT_SECTION_COLLAPSED
+  )
 
   const [isStudioConnected, setIsStudioConnected] = useState<boolean>(false)
   const [shareLiveToStudio, setShareLiveToStudioValue] =
@@ -52,6 +52,9 @@ export const App: React.FC = () => {
         setProjectInitialized(data.data.projectInitialized)
         setPythonBinPath(data.data.pythonBinPath)
         setIsStudioConnected(data.data.isStudioConnected)
+        if (data.data.sectionCollapsed) {
+          setSectionCollapsed(data.data.sectionCollapsed)
+        }
         setShareLiveToStudioValue(data.data.shareLiveToStudio)
       },
       [
@@ -64,6 +67,7 @@ export const App: React.FC = () => {
         setProjectInitialized,
         setPythonBinPath,
         setIsStudioConnected,
+        setSectionCollapsed,
         setShareLiveToStudioValue
       ]
     )
