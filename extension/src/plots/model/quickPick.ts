@@ -37,18 +37,18 @@ const getCheckpointPlotItem = (metric: string) => {
 }
 
 export const pickCustomPlots = (
-  plots: CustomPlotsOrderValue[],
+  plotsOrderValues: CustomPlotsOrderValue[],
   noPlotsErrorMessage: string,
   quickPickOptions: QuickPickOptionsWithTitle
 ): Thenable<string[] | undefined> => {
-  if (!definedAndNonEmpty(plots)) {
+  if (!definedAndNonEmpty(plotsOrderValues)) {
     return Toast.showError(noPlotsErrorMessage)
   }
 
-  const plotsItems = plots.map(plot =>
-    isCheckpointValue(plot.type)
-      ? getCheckpointPlotItem(plot.metric)
-      : getMetricVsParamPlotItem(plot.metric, plot.param)
+  const plotsItems = plotsOrderValues.map(value =>
+    isCheckpointValue(value.type)
+      ? getCheckpointPlotItem(value.metric)
+      : getMetricVsParamPlotItem(value.metric, value.param)
   )
 
   return quickPickManyValues(plotsItems, quickPickOptions)
