@@ -166,6 +166,7 @@ export interface TemplatePlotsData {
 
 export type ComparisonPlot = {
   url?: string
+  resourceUrl?: string
   revision: string
 }
 

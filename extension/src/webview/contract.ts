@@ -238,7 +238,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.OPEN_STUDIO_PROFILE }
   | { type: MessageFromWebviewType.SAVE_STUDIO_TOKEN }
   | { type: MessageFromWebviewType.ADD_CONFIGURATION }
-  | { type: MessageFromWebviewType.ZOOM_PLOT }
+  | { type: MessageFromWebviewType.ZOOM_PLOT; payload?: string }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA
