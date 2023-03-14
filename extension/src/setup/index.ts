@@ -255,10 +255,6 @@ export class Setup
     return !!this.webview?.isActive
   }
 
-  public sendInitialWebviewData() {
-    return this.sendDataToWebview()
-  }
-
   public shouldBeShown() {
     return !this.cliCompatible || !this.hasRoots() || !this.getHasData()
   }
@@ -332,6 +328,10 @@ export class Setup
 
   public getStudioAccessToken() {
     return this.studioAccessToken
+  }
+
+  public sendInitialWebviewData() {
+    return this.sendDataToWebview()
   }
 
   private async sendDataToWebview() {
