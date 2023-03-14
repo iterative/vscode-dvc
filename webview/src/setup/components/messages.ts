@@ -33,6 +33,10 @@ export const setupWorkspace = () => {
   sendMessage({ type: MessageFromWebviewType.SETUP_WORKSPACE })
 }
 
+export const showExperiments = () => {
+  sendMessage({ type: MessageFromWebviewType.SHOW_EXPERIMENTS })
+}
+
 export const openStudio = () =>
   sendMessage({ type: MessageFromWebviewType.OPEN_STUDIO })
 

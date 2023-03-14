@@ -9,11 +9,14 @@ import {
   installDvc,
   selectPythonInterpreter,
   setupWorkspace,
+  showExperiments,
   showScmPanel
 } from './messages'
 import { NeedsGitCommit } from './NeedsGitCommit'
 import { NoData } from './NoData'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
+import { IconButton } from '../../shared/components/button/IconButton'
+import { Beaker } from '../../shared/components/icons'
 
 export type ExperimentsProps = {
   canGitInitialize: boolean | undefined
@@ -79,6 +82,12 @@ export const Experiments: React.FC<ExperimentsProps> = ({
   return (
     <EmptyState isFullScreen={false}>
       <h1>{"You're all setup"}</h1>
+      <IconButton
+        appearance="primary"
+        icon={Beaker}
+        onClick={showExperiments}
+        text="Show Experiments"
+      />
     </EmptyState>
   )
 }

@@ -20,13 +20,16 @@ import { openUrl } from '../../vscode/external'
 export class WebviewMessages {
   private readonly getWebview: () => BaseWebview<TSetupData> | undefined
   private readonly initializeGit: () => void
+  private readonly showExperiments: () => void
 
   constructor(
     getWebview: () => BaseWebview<TSetupData> | undefined,
-    initializeGit: () => void
+    initializeGit: () => void,
+    showExperiments: () => void
   ) {
     this.getWebview = getWebview
     this.initializeGit = initializeGit
+    this.showExperiments = showExperiments
   }
 
   public sendWebviewMessage({
@@ -94,6 +97,8 @@ export class WebviewMessages {
           ConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE,
           message.payload
         )
+      case MessageFromWebviewType.SHOW_EXPERIMENTS:
+        return this.showExperiments()
 
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)

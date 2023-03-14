@@ -53,6 +53,7 @@ export enum MessageFromWebviewType {
   SET_STUDIO_SHARE_EXPERIMENTS_LIVE = 'set-studio-share-experiments-live',
   SHARE_EXPERIMENT_AS_BRANCH = 'share-experiment-as-branch',
   SHARE_EXPERIMENT_AS_COMMIT = 'share-experiment-as-commit',
+  SHOW_EXPERIMENTS = 'show-experiments',
   TOGGLE_METRIC = 'toggle-metric',
   TOGGLE_PLOTS_SECTION = 'toggle-plots-section',
   REMOVE_CUSTOM_PLOTS = 'remove-custom-plots',
@@ -238,6 +239,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.SAVE_STUDIO_TOKEN }
   | { type: MessageFromWebviewType.ADD_CONFIGURATION }
   | { type: MessageFromWebviewType.ZOOM_PLOT }
+  | { type: MessageFromWebviewType.SHOW_EXPERIMENTS }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA

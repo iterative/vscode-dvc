@@ -367,7 +367,8 @@ export class Setup
   private createWebviewMessageHandler() {
     const webviewMessages = new WebviewMessages(
       () => this.getWebview(),
-      () => this.initializeGit()
+      () => this.initializeGit(),
+      () => this.showExperiments()
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>
