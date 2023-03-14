@@ -3,6 +3,7 @@ import { ColorScale } from 'dvc/src/plots/webview/contract'
 
 export const createCheckpointSpec = (
   title: string,
+  fullTitle: string,
   param: string,
   scale?: ColorScale
 ): VisualizationSpec =>
@@ -52,7 +53,7 @@ export const createCheckpointSpec = (
             { field: 'group', title: 'name' },
             {
               field: 'y',
-              title: title.slice(Math.max(0, title.indexOf(':') + 1)),
+              title: fullTitle.slice(Math.max(0, fullTitle.indexOf(':') + 1)),
               type: 'quantitative'
             }
           ]
