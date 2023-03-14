@@ -400,11 +400,6 @@
         "category": "DVC"
       },
       {
-        "title": "Open Studio Settings",
-        "command": "dvc.showStudioSettings",
-        "category": "DVC"
-      },
-      {
         "title": "Show Experiments",
         "command": "dvc.showExperiments",
         "category": "DVC",
@@ -813,10 +808,6 @@
         {
           "command": "dvc.stopQueuedExperiments",
           "when": "dvc.commands.available && dvc.project.available"
-        },
-        {
-          "command": "dvc.showStudioSettings",
-          "when": "dvc.commands.available && dvc.project.available && dvc.studio.connected"
         },
         {
           "command": "dvc.selectForCompare",

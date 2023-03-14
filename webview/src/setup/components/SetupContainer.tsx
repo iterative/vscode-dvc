@@ -3,9 +3,9 @@ import {
   Section
 } from 'dvc/src/setup/webview/contract'
 import React from 'react'
-import { SectionContainer as SharedSectionContainer } from '../../shared/components/sectionContainer/SectionContainer'
+import { SectionContainer } from '../../shared/components/sectionContainer/SectionContainer'
 
-export const SectionContainer: React.FC<{
+export const SetupContainer: React.FC<{
   children: React.ReactNode
   sectionCollapsed: typeof DEFAULT_SECTION_COLLAPSED
   sectionKey: Section
@@ -18,7 +18,7 @@ export const SectionContainer: React.FC<{
   setSectionCollapsed,
   title
 }) => (
-  <SharedSectionContainer
+  <SectionContainer
     sectionCollapsed={sectionCollapsed[sectionKey]}
     sectionKey={sectionKey}
     title={title}
@@ -30,5 +30,5 @@ export const SectionContainer: React.FC<{
     }
   >
     {children}
-  </SharedSectionContainer>
+  </SectionContainer>
 )

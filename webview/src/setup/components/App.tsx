@@ -10,7 +10,7 @@ import {
 import React, { useCallback, useState } from 'react'
 import { Experiments } from './Experiments'
 import { Studio } from './Studio'
-import { SectionContainer } from './SectionContainer'
+import { SetupContainer } from './SetupContainer'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 import { sendMessage } from '../../shared/vscode'
 
@@ -79,7 +79,7 @@ export const App: React.FC = () => {
 
   return (
     <>
-      <SectionContainer
+      <SetupContainer
         sectionKey={Section.EXPERIMENTS}
         title={'Experiments'}
         sectionCollapsed={sectionCollapsed}
@@ -95,8 +95,8 @@ export const App: React.FC = () => {
           projectInitialized={projectInitialized}
           pythonBinPath={pythonBinPath}
         />
-      </SectionContainer>
-      <SectionContainer
+      </SetupContainer>
+      <SetupContainer
         sectionKey={Section.STUDIO}
         title={'Studio'}
         sectionCollapsed={sectionCollapsed}
@@ -107,7 +107,7 @@ export const App: React.FC = () => {
           shareLiveToStudio={shareLiveToStudio}
           setShareLiveToStudio={setShareLiveToStudio}
         />
-      </SectionContainer>
+      </SetupContainer>
     </>
   )
 }

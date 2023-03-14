@@ -66,6 +66,6 @@ export const registerSetupCommands = (
     }
   )
 
-  registerSetupStudioCommands(setup, internalCommands)
   registerSetupConfigCommands(setup, internalCommands)
+  registerSetupStudioCommands(setup, internalCommands)
 }
