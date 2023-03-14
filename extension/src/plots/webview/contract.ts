@@ -3,6 +3,17 @@ import { Color } from '../../experiments/model/status/colors'
 
 export const DEFAULT_NB_ITEMS_PER_ROW = 2
 
+export enum PlotHeight {
+  SMALLER = 0,
+  SMALL = 1,
+  REGULAR = 2,
+  SQUARE = 3,
+  VERTICAL_NORMAL = 4,
+  VERTICAL_LARGER = 5
+}
+
+export const DEFAULT_PLOT_HEIGHT = PlotHeight.SMALL
+
 export enum Section {
   CHECKPOINT_PLOTS = 'checkpoint-plots',
   TEMPLATE_PLOTS = 'template-plots',
@@ -17,12 +28,11 @@ export const DEFAULT_SECTION_NB_ITEMS_PER_ROW = {
   [Section.CUSTOM_PLOTS]: DEFAULT_NB_ITEMS_PER_ROW
 }
 
-// Height is undefined by default because it is calculated by ratio of the width it'll fill (calculated by the webview)
 export const DEFAULT_HEIGHT = {
-  [Section.CHECKPOINT_PLOTS]: undefined,
-  [Section.TEMPLATE_PLOTS]: undefined,
-  [Section.COMPARISON_TABLE]: undefined,
-  [Section.CUSTOM_PLOTS]: undefined
+  [Section.CHECKPOINT_PLOTS]: DEFAULT_PLOT_HEIGHT,
+  [Section.TEMPLATE_PLOTS]: DEFAULT_PLOT_HEIGHT,
+  [Section.COMPARISON_TABLE]: DEFAULT_PLOT_HEIGHT,
+  [Section.CUSTOM_PLOTS]: DEFAULT_PLOT_HEIGHT
 }
 
 export const DEFAULT_SECTION_COLLAPSED = {
@@ -60,7 +70,7 @@ export type Revision = {
 export interface PlotsComparisonData {
   plots: ComparisonPlots
   nbItemsPerRow: number
-  height: number | undefined
+  height: PlotHeight
   revisions: Revision[]
 }
 
@@ -93,7 +103,7 @@ export type CustomPlotData = {
 export type CustomPlotsData = {
   plots: CustomPlotData[]
   nbItemsPerRow: number
-  height: number | undefined
+  height: PlotHeight
 }
 
 export type CheckpointPlotData = CheckpointPlot & { title: string }
@@ -102,7 +112,7 @@ export type CheckpointPlotsData = {
   plots: CheckpointPlotData[]
   colors: ColorScale
   nbItemsPerRow: number
-  height: number | undefined
+  height: PlotHeight
   selectedMetrics?: string[]
 }
 
@@ -151,7 +161,7 @@ export type TemplatePlotSection = {
 export interface TemplatePlotsData {
   plots: TemplatePlotSection[]
   nbItemsPerRow: number
-  height: number | undefined
+  height: PlotHeight
 }
 
 export type ComparisonPlot = {

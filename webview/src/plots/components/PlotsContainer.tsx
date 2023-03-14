@@ -7,7 +7,7 @@ import React, {
 } from 'react'
 import { AnyAction } from '@reduxjs/toolkit'
 import { useDispatch, useSelector } from 'react-redux'
-import { Section } from 'dvc/src/plots/webview/contract'
+import { PlotHeight, Section } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { PlotsPicker, PlotsPickerProps } from './PlotsPicker'
 import styles from './styles.module.scss'
@@ -16,6 +16,7 @@ import { sendMessage } from '../../shared/vscode'
 import { Lines, Add, Trash } from '../../shared/components/icons'
 import { MinMaxSlider } from '../../shared/components/slider/MinMaxSlider'
 import { PlotsState } from '../store'
+import { ItemsSlider } from '../../shared/components/slider/ItemsSlider'
 import { SectionContainer } from '../../shared/components/sectionContainer/SectionContainer'
 
 export interface PlotsContainerProps {
@@ -23,7 +24,11 @@ export interface PlotsContainerProps {
   sectionKey: Section
   title: string
   nbItemsPerRow: number
-  changeNbItemsPerRow?: (nb: number) => AnyAction
+  height: PlotHeight
+  changeSize?: (payload: {
+    nbItemsPerRow: number
+    height: PlotHeight
+  }) => AnyAction
   menu?: PlotsPickerProps
   addPlotsButton?: { onClick: () => void }
   removePlotsButton?: { onClick: () => void }
@@ -37,10 +42,11 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   title,
   children,
   nbItemsPerRow,
+  height,
   menu,
   addPlotsButton,
   removePlotsButton,
-  changeNbItemsPerRow,
+  changeSize,
   hasItems
 }) => {
   const open = !sectionCollapsed
@@ -52,7 +58,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
 
   useEffect(() => {
     window.dispatchEvent(new Event('resize'))
-  }, [nbItemsPerRow])
+  }, [nbItemsPerRow, height])
 
   const menuItems: IconMenuItemProps[] = []
 
@@ -81,13 +87,15 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   }
 
   const handleResize = useCallback(
-    (nbItems: number) => {
-      if (changeNbItemsPerRow) {
+    (nbItems: number, newHeight: PlotHeight) => {
+      if (changeSize) {
         const positiveNbItems = Math.abs(nbItems)
-        dispatch(changeNbItemsPerRow(positiveNbItems))
+        dispatch(
+          changeSize({ height: newHeight, nbItemsPerRow: positiveNbItems })
+        )
         sendMessage({
           payload: {
-            height: undefined,
+            height: newHeight,
             nbItemsPerRow: positiveNbItems,
             section: sectionKey
           },
@@ -95,7 +103,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
         })
       }
     },
-    [dispatch, changeNbItemsPerRow, sectionKey]
+    [dispatch, changeSize, sectionKey]
   )
 
   const toggleSection = () =>
@@ -113,21 +121,40 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
       sectionKey={sectionKey}
       title={title}
       onToggleSection={toggleSection}
+      className={cx({
+        [styles.ratioSmaller]: height === PlotHeight.SMALLER,
+        [styles.ratioSmall]: height === PlotHeight.SMALL,
+        [styles.ratioRegular]: height === PlotHeight.REGULAR,
+        [styles.ratioSquare]: height === PlotHeight.SQUARE,
+        [styles.ratioVerticalNormal]: height === PlotHeight.VERTICAL_NORMAL,
+        [styles.ratioVerticalLarger]: height === PlotHeight.VERTICAL_LARGER
+      })}
     >
-      {changeNbItemsPerRow && hasItems && maxNbPlotsPerRow > 1 && (
+      {changeSize && hasItems && maxNbPlotsPerRow > 1 && (
         <div
-          className={styles.nbItemsPerRowSlider}
+          className={styles.sizeSliders}
           style={{ top: ribbonHeight - 4 }}
-          data-testid="nb-items-per-row-slider"
+          data-testid="size-sliders"
         >
-          <MinMaxSlider
-            maximum={-1}
-            minimum={-maxNbPlotsPerRow}
-            label="Plot Width"
-            onChange={handleResize}
-            defaultValue={-nbItemsPerRow}
-          />
-          main
+          <div className={styles.sizeSlider}>
+            <MinMaxSlider
+              maximum={-1}
+              minimum={-maxNbPlotsPerRow}
+              label="Plot Width"
+              onChange={nbItems => handleResize(nbItems, height)}
+              defaultValue={-nbItemsPerRow}
+            />
+          </div>
+          <div className={styles.sizeSlider}>
+            <ItemsSlider
+              items={Object.values(PlotHeight) as number[]}
+              label="Plot Height"
+              onChange={newHeight =>
+                handleResize(nbItemsPerRow, newHeight as unknown as PlotHeight)
+              }
+              defaultValue={height}
+            />
+          </div>
         </div>
       )}
       {open && (

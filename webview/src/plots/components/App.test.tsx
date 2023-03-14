@@ -28,7 +28,8 @@ import {
   Section,
   TemplatePlotGroup,
   TemplatePlotsData,
-  DEFAULT_NB_ITEMS_PER_ROW
+  DEFAULT_NB_ITEMS_PER_ROW,
+  DEFAULT_PLOT_HEIGHT
 } from 'dvc/src/plots/webview/contract'
 import {
   MessageFromWebviewType,
@@ -262,7 +263,7 @@ describe('App', () => {
     renderAppWithOptionalData({
       checkpoint: null,
       comparison: {
-        height: undefined,
+        height: DEFAULT_PLOT_HEIGHT,
         nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
         plots: [
           {
@@ -702,16 +703,14 @@ describe('App', () => {
     })
     setWrapperSize(store)
 
-    expect(screen.getByTestId('nb-items-per-row-slider')).toBeInTheDocument()
+    expect(screen.getByTestId('size-sliders')).toBeInTheDocument()
   })
 
   it('should not display a slider to pick the number of items per row if there are no items', () => {
     const store = renderAppWithOptionalData({})
     setWrapperSize(store)
 
-    expect(
-      screen.queryByTestId('nb-items-per-row-slider')
-    ).not.toBeInTheDocument()
+    expect(screen.queryByTestId('size-sliders')).not.toBeInTheDocument()
   })
 
   it('should not display a slider to pick the number of items per row if the action is unavailable', () => {
@@ -720,9 +719,7 @@ describe('App', () => {
     })
     setWrapperSize(store)
 
-    expect(
-      screen.queryByTestId('nb-items-per-row-slider')
-    ).not.toBeInTheDocument()
+    expect(screen.queryByTestId('size-sliders')).not.toBeInTheDocument()
   })
 
   it('should not display a slider to pick the number of items per row if the only width available for one item per row or less', () => {
@@ -731,26 +728,45 @@ describe('App', () => {
     })
     setWrapperSize(store, 400)
 
-    expect(
-      screen.queryByTestId('nb-items-per-row-slider')
-    ).not.toBeInTheDocument()
+    expect(screen.queryByTestId('size-sliders')).not.toBeInTheDocument()
   })
 
-  it('should send a message to the extension with the selected size when changing the size of plots', () => {
+  it('should send a message to the extension with the selected size when changing the width of plots', () => {
     const store = renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
     })
     setWrapperSize(store)
 
-    const plotResizer = within(
-      screen.getByTestId('nb-items-per-row-slider')
-    ).getByRole('slider')
+    const plotResizer = within(screen.getByTestId('size-sliders')).getAllByRole(
+      'slider'
+    )[0]
 
     fireEvent.change(plotResizer, { target: { value: -3 } })
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: {
-        height: undefined,
+        height: 1,
         nbItemsPerRow: 3,
+        section: Section.CHECKPOINT_PLOTS
+      },
+      type: MessageFromWebviewType.RESIZE_PLOTS
+    })
+  })
+
+  it('should send a message to the extension with the selected size when changing the height of plots', () => {
+    const store = renderAppWithOptionalData({
+      checkpoint: checkpointPlotsFixture
+    })
+    setWrapperSize(store)
+
+    const plotResizer = within(screen.getByTestId('size-sliders')).getAllByRole(
+      'slider'
+    )[1]
+
+    fireEvent.change(plotResizer, { target: { value: 3 } })
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      payload: {
+        height: 3,
+        nbItemsPerRow: 2,
         section: Section.CHECKPOINT_PLOTS
       },
       type: MessageFromWebviewType.RESIZE_PLOTS

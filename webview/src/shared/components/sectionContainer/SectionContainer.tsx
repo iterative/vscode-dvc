@@ -1,3 +1,4 @@
+import cx from 'classnames'
 import React, { MouseEvent } from 'react'
 import { Section as PlotsSection } from 'dvc/src/plots/webview/contract'
 import styles from './styles.module.scss'
@@ -64,6 +65,7 @@ export interface SectionContainerProps<T extends PlotsSection> {
   sectionCollapsed: boolean
   sectionKey: T
   title: string
+  className: string
 }
 
 const InfoIcon = () => (
@@ -78,7 +80,8 @@ export const SectionContainer: React.FC<
   onToggleSection,
   sectionCollapsed,
   sectionKey,
-  title
+  title,
+  className
 }) => {
   const open = !sectionCollapsed
 
@@ -101,7 +104,7 @@ export const SectionContainer: React.FC<
 
   return (
     <div
-      className={styles.sectionContainerWrapper}
+      className={cx(styles.sectionContainerWrapper, className)}
       data-testid="section-container"
     >
       <details open={open} className={styles.sectionContainer}>

@@ -2,6 +2,7 @@ import isEmpty from 'lodash.isempty'
 import {
   ComparisonPlot,
   ComparisonRevisionData,
+  PlotHeight,
   PlotsData as TPlotsData,
   Revision,
   Section,
@@ -129,7 +130,7 @@ export class WebviewMessages {
   private setPlotSize(
     section: Section,
     nbItemsPerRow: number,
-    height?: number
+    height: PlotHeight
   ) {
     this.plots.setNbItemsPerRow(section, nbItemsPerRow)
     this.plots.setHeight(section, height)
@@ -138,6 +139,22 @@ export class WebviewMessages {
       { height, nbItemsPerRow, section },
       undefined
     )
+
+    switch (section) {
+      case Section.CHECKPOINT_PLOTS:
+        this.sendCheckpointPlotsMessage()
+        break
+      case Section.COMPARISON_TABLE:
+        this.sendComparisonPlots()
+        break
+      case Section.CUSTOM_PLOTS:
+        this.sendCustomPlots()
+        break
+      case Section.TEMPLATE_PLOTS:
+        this.sendTemplatePlots()
+        break
+      default:
+    }
   }
 
   private setSectionCollapsed(collapsed: Partial<SectionCollapsed>) {

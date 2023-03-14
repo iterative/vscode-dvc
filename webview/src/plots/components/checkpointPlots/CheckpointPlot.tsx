@@ -2,7 +2,7 @@ import { ColorScale, Section } from 'dvc/src/plots/webview/contract'
 import React, { useMemo, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { createSpec } from './util'
-import { changeDisabledDragIds, changeSize } from './checkpointPlotsSlice'
+import { changeDisabledDragIds } from './checkpointPlotsSlice'
 import { ZoomablePlot } from '../ZoomablePlot'
 import styles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
@@ -50,7 +50,6 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
         spec={spec}
         id={id}
         changeDisabledDragIds={changeDisabledDragIds}
-        changeSize={changeSize}
         currentSnapPoint={nbItemsPerRow}
         section={Section.CHECKPOINT_PLOTS}
       />

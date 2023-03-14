@@ -19,7 +19,10 @@ import smoothTemplate from '../../test/fixtures/plotsDiff/templates/smooth'
 import multiSourceTemplate from '../../test/fixtures/plotsDiff/templates/multiSource'
 import { copyOriginalColors } from '../../experiments/model/status/colors'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
-import { DEFAULT_NB_ITEMS_PER_ROW } from '../webview/contract'
+import {
+  DEFAULT_NB_ITEMS_PER_ROW,
+  DEFAULT_PLOT_HEIGHT
+} from '../webview/contract'
 
 describe('isMultiViewPlot', () => {
   it('should recognize the confusion matrix template as a multi view plot', () => {
@@ -86,7 +89,8 @@ describe('extendVegaSpec', () => {
   it('should not add encoding if no color scale is provided', () => {
     const extendedSpec = extendVegaSpec(
       linearTemplate,
-      DEFAULT_NB_ITEMS_PER_ROW
+      DEFAULT_NB_ITEMS_PER_ROW,
+      DEFAULT_PLOT_HEIGHT
     )
     expect(extendedSpec.encoding).toBeUndefined()
   })
@@ -99,6 +103,7 @@ describe('extendVegaSpec', () => {
     const extendedSpec = extendVegaSpec(
       linearTemplate,
       DEFAULT_NB_ITEMS_PER_ROW,
+      DEFAULT_PLOT_HEIGHT,
       {
         color: colorScale
       }
@@ -143,12 +148,12 @@ describe('extendVegaSpec', () => {
 
   it('should truncate all titles from the left to 50 characters for large plots', () => {
     const spec = withLongTemplatePlotTitle()
-    const updatedSpec = extendVegaSpec(spec, 1)
+    const updatedSpec = extendVegaSpec(spec, 1, DEFAULT_PLOT_HEIGHT)
 
     const truncatedTitle = '…-many-many-characters-at-least-seventy-characters'
     const truncatedHorizontalTitle =
       '…any-many-characters-at-least-seventy-characters-x'
-    const truncatedVerticalTitle = '…racters-at-least-seventy-characters-y'
+    const truncatedVerticalTitle = '…acters-at-least-seventy-characters-y'
 
     const specString = JSON.stringify(spec)
     expect(specString).not.toContain(truncatedTitle)
@@ -169,12 +174,16 @@ describe('extendVegaSpec', () => {
 
   it('should truncate all titles from the left to 50 characters for regular plots', () => {
     const spec = withLongTemplatePlotTitle()
-    const updatedSpec = extendVegaSpec(spec, DEFAULT_NB_ITEMS_PER_ROW)
+    const updatedSpec = extendVegaSpec(
+      spec,
+      DEFAULT_NB_ITEMS_PER_ROW,
+      DEFAULT_PLOT_HEIGHT
+    )
 
     const truncatedTitle = '…-many-many-characters-at-least-seventy-characters'
     const truncatedHorizontalTitle =
       '…any-many-characters-at-least-seventy-characters-x'
-    const truncatedVerticalTitle = '…racters-at-least-seventy-characters-y'
+    const truncatedVerticalTitle = '…rs-at-least-seventy-characters-y'
 
     const specString = JSON.stringify(spec)
     expect(specString).not.toContain(truncatedTitle)
@@ -195,11 +204,11 @@ describe('extendVegaSpec', () => {
 
   it('should truncate all titles from the left to 30 characters for small plots', () => {
     const spec = withLongTemplatePlotTitle()
-    const updatedSpec = extendVegaSpec(spec, 3)
+    const updatedSpec = extendVegaSpec(spec, 3, DEFAULT_PLOT_HEIGHT)
 
     const truncatedTitle = '…s-at-least-seventy-characters'
     const truncatedHorizontalTitle = '…at-least-seventy-characters-x'
-    const truncatedVerticalTitle = '…t-seventy-characters-y'
+    const truncatedVerticalTitle = '…at-least-seventy-characters-y'
 
     const specString = JSON.stringify(spec)
     expect(specString).not.toContain(truncatedTitle)
@@ -225,7 +234,7 @@ describe('extendVegaSpec', () => {
       text: repeatedTitle
     })
 
-    const updatedSpec = extendVegaSpec(spec, 3)
+    const updatedSpec = extendVegaSpec(spec, 3, DEFAULT_PLOT_HEIGHT)
 
     const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
 
@@ -242,7 +251,7 @@ describe('extendVegaSpec', () => {
     const repeatedTitle = 'abcdefghijklmnopqrstuvwyz1234567890'
     const spec = withLongTemplatePlotTitle([repeatedTitle, repeatedTitle])
 
-    const updatedSpec = extendVegaSpec(spec, 3)
+    const updatedSpec = extendVegaSpec(spec, 3, DEFAULT_PLOT_HEIGHT)
 
     const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
 
@@ -262,7 +271,7 @@ describe('extendVegaSpec', () => {
       text: [repeatedTitle, repeatedTitle]
     })
 
-    const updatedSpec = extendVegaSpec(spec, 3)
+    const updatedSpec = extendVegaSpec(spec, 3, DEFAULT_PLOT_HEIGHT)
 
     const truncatedTitle = '…ghijklmnopqrstuvwyz1234567890'
 
@@ -276,13 +285,18 @@ describe('extendVegaSpec', () => {
   })
 
   it('should update the multi-source template to remove erroneous shape encoding from the vertical line displayed on hover', () => {
-    const updatedSpec = extendVegaSpec(multiSourceTemplate, 1, {
-      color: { domain: [], range: [] },
-      shape: {
-        field: 'field',
-        scale: { domain: [], range: [] }
+    const updatedSpec = extendVegaSpec(
+      multiSourceTemplate,
+      1,
+      DEFAULT_PLOT_HEIGHT,
+      {
+        color: { domain: [], range: [] },
+        shape: {
+          field: 'field',
+          scale: { domain: [], range: [] }
+        }
       }
-    })
+    )
 
     expect(updatedSpec.encoding).not.toBeUndefined()
     expect(updatedSpec.layer[1].layer[0].encoding.shape).toBeNull()
