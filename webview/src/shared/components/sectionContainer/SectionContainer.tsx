@@ -1,7 +1,10 @@
 import cx from 'classnames'
 import React, { MouseEvent } from 'react'
 import { Section as PlotsSection } from 'dvc/src/plots/webview/contract'
-import { Section as SetupSection } from 'dvc/src/setup/webview/contract'
+import {
+  STUDIO_URL,
+  Section as SetupSection
+} from 'dvc/src/setup/webview/contract'
 import styles from './styles.module.scss'
 import { Icon } from '../Icon'
 import { ChevronDown, ChevronRight, Info } from '../icons'
@@ -71,7 +74,7 @@ export const SectionDescription = {
   [SetupSection.STUDIO]: (
     <span data-testid="tooltip-setup-studio">
       {"Configure the extension's connection to "}
-      <a href="https://studio.iterative.a">Studio</a>.<br />
+      <a href={STUDIO_URL}>Studio</a>.<br />
       Studio provides a collaboration platform for Machine Learning and is free
       for small teams and individual contributors.
     </span>
