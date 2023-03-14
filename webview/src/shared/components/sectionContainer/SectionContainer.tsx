@@ -65,7 +65,7 @@ export interface SectionContainerProps<T extends PlotsSection> {
   sectionCollapsed: boolean
   sectionKey: T
   title: string
-  className: string
+  className?: string
 }
 
 const InfoIcon = () => (
