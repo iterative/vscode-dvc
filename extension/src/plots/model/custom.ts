@@ -34,6 +34,12 @@ const removeColumnTypeFromPath = (
     ? columnPath.slice(type.length + 1)
     : columnPath
 
+export const getFullValuePath = (
+  type: string,
+  columnPath: string,
+  fileSep: string
+) => type + fileSep + columnPath
+
 export const cleanupOldOrderValue = (
   { param, metric, type }: CustomPlotsOrderValue,
   fileSep: string

@@ -1,6 +1,13 @@
 import { getCustomPlotId } from './collect'
-import { CustomPlotsOrderValue, isCheckpointValue } from './custom'
-import { splitColumnPath } from '../../experiments/columns/paths'
+import {
+  getFullValuePath,
+  CustomPlotsOrderValue,
+  isCheckpointValue
+} from './custom'
+import {
+  FILE_SEPARATOR,
+  splitColumnPath
+} from '../../experiments/columns/paths'
 import { pickFromColumnLikes } from '../../experiments/columns/quickPick'
 import { Column, ColumnType } from '../../experiments/webview/contract'
 import { definedAndNonEmpty } from '../../util/array'
@@ -14,11 +21,18 @@ import { Toast } from '../../vscode/toast'
 import { CustomPlotType } from '../webview/contract'
 
 const getMetricVsParamPlotItem = (metric: string, param: string) => {
-  const splitMetric = splitColumnPath(metric)
-  const splitParam = splitColumnPath(param)
+  const fullMetric = getFullValuePath(
+    ColumnType.METRICS,
+    metric,
+    FILE_SEPARATOR
+  )
+  const fullParam = getFullValuePath(ColumnType.PARAMS, param, FILE_SEPARATOR)
+  const splitMetric = splitColumnPath(fullMetric)
+  const splitParam = splitColumnPath(fullParam)
+
   return {
     description: 'Metric Vs Param Plot',
-    detail: `${metric} vs ${param}`,
+    detail: `${fullMetric} vs ${fullParam}`,
     label: `${splitMetric[splitMetric.length - 1]} vs ${
       splitParam[splitParam.length - 1]
     }`,
@@ -27,10 +41,15 @@ const getMetricVsParamPlotItem = (metric: string, param: string) => {
 }
 
 const getCheckpointPlotItem = (metric: string) => {
-  const splitMetric = splitColumnPath(metric)
+  const fullMetric = getFullValuePath(
+    ColumnType.METRICS,
+    metric,
+    FILE_SEPARATOR
+  )
+  const splitMetric = splitColumnPath(fullMetric)
   return {
     description: 'Checkpoint Trend Plot',
-    detail: metric,
+    detail: fullMetric,
     label: splitMetric[splitMetric.length - 1],
     value: getCustomPlotId(metric)
   }

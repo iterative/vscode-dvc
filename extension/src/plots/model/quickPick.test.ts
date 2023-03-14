@@ -35,23 +35,23 @@ describe('pickCustomPlots', () => {
 
   it('should return the selected plots', async () => {
     const selectedPlots = [
-      'custom-metrics:summary.json:loss-epoch',
-      'custom-metrics:summary.json:accuracy-params:params.yaml:epochs'
+      'custom-summary.json:loss-epoch',
+      'custom-summary.json:accuracy-params.yaml:epochs'
     ]
     const mockedPlots = [
       {
-        metric: 'metrics:summary.json:loss',
+        metric: 'summary.json:loss',
         param: 'epoch',
         type: CustomPlotType.CHECKPOINT
       },
       {
-        metric: 'metrics:summary.json:accuracy',
-        param: 'params:params.yaml:epochs',
+        metric: 'summary.json:accuracy',
+        param: 'params.yaml:epochs',
         type: CustomPlotType.METRIC_VS_PARAM
       },
       {
-        metric: 'metrics:summary.json:learning_rate',
-        param: 'param:summary.json:process.threshold',
+        metric: 'summary.json:learning_rate',
+        param: 'summary.json:process.threshold',
         type: CustomPlotType.METRIC_VS_PARAM
       }
     ] as CustomPlotsOrderValue[]
@@ -71,22 +71,21 @@ describe('pickCustomPlots', () => {
           description: 'Checkpoint Trend Plot',
           detail: 'metrics:summary.json:loss',
           label: 'loss',
-          value: 'custom-metrics:summary.json:loss-epoch'
+          value: 'custom-summary.json:loss-epoch'
         },
         {
           description: 'Metric Vs Param Plot',
           detail: 'metrics:summary.json:accuracy vs params:params.yaml:epochs',
           label: 'accuracy vs epochs',
-          value:
-            'custom-metrics:summary.json:accuracy-params:params.yaml:epochs'
+          value: 'custom-summary.json:accuracy-params.yaml:epochs'
         },
         {
           description: 'Metric Vs Param Plot',
           detail:
-            'metrics:summary.json:learning_rate vs param:summary.json:process.threshold',
+            'metrics:summary.json:learning_rate vs params:summary.json:process.threshold',
           label: 'learning_rate vs threshold',
           value:
-            'custom-metrics:summary.json:learning_rate-param:summary.json:process.threshold'
+            'custom-summary.json:learning_rate-summary.json:process.threshold'
         }
       ],
       { title: Title.SELECT_CUSTOM_PLOTS_TO_REMOVE }
@@ -184,7 +183,7 @@ describe('pickMetricAndParam', () => {
     }
     const expectedParam = {
       label: 'epochs',
-      path: 'summary.json:loss-params:params.yaml:epochs'
+      path: 'summary.json:loss-params.yaml:epochs'
     }
     mockedQuickPickValue
       .mockResolvedValueOnce(expectedMetric)

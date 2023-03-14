@@ -4,6 +4,7 @@ import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
 import { CustomCheckpointPlots } from '.'
 import {
+  getFullValuePath,
   CHECKPOINTS_PARAM,
   CustomPlotsOrderValue,
   isCheckpointPlot,
@@ -272,10 +273,10 @@ const collectMetricVsParamPlot = (
   experiments: Experiment[]
 ): MetricVsParamPlot => {
   const splitUpMetricPath = splitColumnPath(
-    ColumnType.METRICS + FILE_SEPARATOR + metric
+    getFullValuePath(ColumnType.METRICS, metric, FILE_SEPARATOR)
   )
   const splitUpParamPath = splitColumnPath(
-    ColumnType.PARAMS + FILE_SEPARATOR + param
+    getFullValuePath(ColumnType.PARAMS, param, FILE_SEPARATOR)
   )
   const plotData: MetricVsParamPlot = {
     id: getCustomPlotId(metric, param),
@@ -287,7 +288,6 @@ const collectMetricVsParamPlot = (
 
   for (const experiment of experiments) {
     const metricValue = get(experiment, splitUpMetricPath) as number | undefined
-
     const paramValue = get(experiment, splitUpParamPath) as number | undefined
 
     if (metricValue !== undefined && paramValue !== undefined) {
