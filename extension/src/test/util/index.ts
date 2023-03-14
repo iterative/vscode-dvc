@@ -16,8 +16,8 @@ export const buildMockMemento = (
   ({
     get: (key: string, defaultValue: unknown) => values[key] || defaultValue,
     keys: () => Object.keys(values),
-    update: (key: string, value: unknown) =>
-      new Promise(() => {
-        values[key] = value
-      })
+    update: (key: string, value: unknown) => {
+      values[key] = value
+      void Promise.resolve()
+    }
   } as unknown as Memento)

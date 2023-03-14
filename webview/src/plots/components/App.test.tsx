@@ -41,7 +41,6 @@ import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { VisualizationSpec } from 'react-vega'
 import { App } from './App'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
-import { SectionDescription } from './PlotsContainer'
 import {
   CheckpointPlotsById,
   plotDataStore,
@@ -56,6 +55,7 @@ import {
   dragEnter,
   dragLeave
 } from '../../test/dragDrop'
+import { SectionDescription } from '../../shared/components/sectionContainer/SectionContainer'
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
 import { clearSelection, createWindowTextSelection } from '../../test/selection'
 import * as EventCurrentTargetDistances from '../../shared/components/dragDrop/currentTarget'
@@ -164,7 +164,7 @@ describe('App', () => {
 
   const getCheckpointMenuItem = (position: number) =>
     within(
-      screen.getAllByTestId('plots-container')[
+      screen.getAllByTestId('section-container')[
         sectionPosition[Section.CHECKPOINT_PLOTS]
       ]
     ).getAllByTestId('icon-menu-item')[position]
@@ -915,7 +915,7 @@ describe('App', () => {
     })
 
     const [pickerButton] = within(
-      screen.getAllByTestId('plots-container')[
+      screen.getAllByTestId('section-container')[
         sectionPosition[Section.CHECKPOINT_PLOTS]
       ]
     ).queryAllByTestId('icon-menu-item')
