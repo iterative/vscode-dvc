@@ -89,21 +89,21 @@ export type CheckpointPlotValues = {
 
 export type ColorScale = { domain: string[]; range: Color[] }
 
-export type CheckpointPlot = {
+type CustomPlotBase = {
   id: string
-  values: CheckpointPlotValues
   metric: string
   param: string
-  type: CustomPlotType.CHECKPOINT
 }
 
+export type CheckpointPlot = {
+  values: CheckpointPlotValues
+  type: CustomPlotType.CHECKPOINT
+} & CustomPlotBase
+
 export type MetricVsParamPlot = {
-  id: string
   values: MetricVsParamPlotValues
-  metric: string
-  param: string
   type: CustomPlotType.METRIC_VS_PARAM
-}
+} & CustomPlotBase
 
 export type CustomPlot = MetricVsParamPlot | CheckpointPlot
 
