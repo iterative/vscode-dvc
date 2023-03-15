@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.20] - 2023-03-15
+
+### 🚀 New Features and Enhancements
+
+- Make section headers sticky [#3465](https://github.com/iterative/vscode-dvc/pull/3465) by [@sroy3](https://github.com/sroy3)
+- Add show setup commands [#3474](https://github.com/iterative/vscode-dvc/pull/3474) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (2.50.0) [#3473](https://github.com/iterative/vscode-dvc/pull/3473) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.6.19] - 2023-03-15
 
 ### 🚀 New Features and Enhancements
