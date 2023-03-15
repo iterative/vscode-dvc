@@ -371,31 +371,31 @@ const getImageData = (baseUrl: string, basePath: string, joinFunc = join) => ({
       type: PlotsType.IMAGE,
       revisions: [EXPERIMENT_WORKSPACE_ID],
       url: joinFunc(baseUrl, 'workspace_plots_acc.png'),
-      resourceUrl: joinFunc(basePath, 'workspace_plots_acc.png')
+      resourceUrl: join(basePath, 'workspace_plots_acc.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['53c3851'],
       url: joinFunc(baseUrl, '53c3851_plots_acc.png'),
-      resourceUrl: joinFunc(basePath, '53c3851_plots_acc.png')
+      resourceUrl: join(basePath, '53c3851_plots_acc.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['4fb124a'],
       url: joinFunc(baseUrl, '4fb124a_plots_acc.png'),
-      resourceUrl: joinFunc(basePath, '4fb124a_plots_acc.png')
+      resourceUrl: join(basePath, '4fb124a_plots_acc.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['42b8736'],
       url: joinFunc(baseUrl, '42b8736_plots_acc.png'),
-      resourceUrl: joinFunc(basePath, '42b8736_plots_acc.png')
+      resourceUrl: join(basePath, '42b8736_plots_acc.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['1ba7bcd'],
       url: joinFunc(baseUrl, '1ba7bcd_plots_acc.png'),
-      resourceUrl: joinFunc(basePath, '1ba7bcd_plots_acc.png')
+      resourceUrl: join(basePath, '1ba7bcd_plots_acc.png')
     }
   ],
   [join('plots', 'heatmap.png')]: [
@@ -403,31 +403,31 @@ const getImageData = (baseUrl: string, basePath: string, joinFunc = join) => ({
       type: PlotsType.IMAGE,
       revisions: [EXPERIMENT_WORKSPACE_ID],
       url: joinFunc(baseUrl, 'workspace_plots_heatmap.png'),
-      resourceUrl: joinFunc(basePath, 'workspace_plots_heatmap.png')
+      resourceUrl: join(basePath, 'workspace_plots_heatmap.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['53c3851'],
       url: joinFunc(baseUrl, '53c3851_plots_heatmap.png'),
-      resourceUrl: joinFunc(basePath, '53c3851_plots_heatmap.png')
+      resourceUrl: join(basePath, '53c3851_plots_heatmap.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['4fb124a'],
       url: joinFunc(baseUrl, '4fb124a_plots_heatmap.png'),
-      resourceUrl: joinFunc(basePath, '4fb124a_plots_heatmap.png')
+      resourceUrl: join(basePath, '4fb124a_plots_heatmap.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['42b8736'],
       url: joinFunc(baseUrl, '42b8736_plots_heatmap.png'),
-      resourceUrl: joinFunc(basePath, '42b8736_plots_heatmap.png')
+      resourceUrl: join(basePath, '42b8736_plots_heatmap.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['1ba7bcd'],
       url: joinFunc(baseUrl, '1ba7bcd_plots_heatmap.png'),
-      resourceUrl: joinFunc(basePath, '1ba7bcd_plots_heatmap.png')
+      resourceUrl: join(basePath, '1ba7bcd_plots_heatmap.png')
     }
   ],
   [join('plots', 'loss.png')]: [
@@ -435,41 +435,37 @@ const getImageData = (baseUrl: string, basePath: string, joinFunc = join) => ({
       type: PlotsType.IMAGE,
       revisions: [EXPERIMENT_WORKSPACE_ID],
       url: joinFunc(baseUrl, 'workspace_plots_loss.png'),
-      resourceUrl: joinFunc(basePath, 'workspace_plots_loss.png')
+      resourceUrl: join(basePath, 'workspace_plots_loss.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['53c3851'],
       url: joinFunc(baseUrl, '53c3851_plots_loss.png'),
-      resourceUrl: joinFunc(basePath, '53c3851_plots_loss.png')
+      resourceUrl: join(basePath, '53c3851_plots_loss.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['4fb124a'],
       url: joinFunc(baseUrl, '4fb124a_plots_loss.png'),
-      resourceUrl: joinFunc(basePath, '4fb124a_plots_loss.png')
+      resourceUrl: join(basePath, '4fb124a_plots_loss.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['42b8736'],
       url: joinFunc(baseUrl, '42b8736_plots_loss.png'),
-      resourceUrl: joinFunc(basePath, '42b8736_plots_loss.png')
+      resourceUrl: join(basePath, '42b8736_plots_loss.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['1ba7bcd'],
       url: joinFunc(baseUrl, '1ba7bcd_plots_loss.png'),
-      resourceUrl: joinFunc(basePath, '1ba7bcd_plots_loss.png')
+      resourceUrl: join(basePath, '1ba7bcd_plots_loss.png')
     }
   ]
 })
 
-export const getOutput = (
-  baseUrl: string,
-  basePath: string,
-  joinFunc?: (...args: string[]) => string
-): PlotsOutput => ({
-  ...getImageData(baseUrl, basePath, joinFunc),
+export const getOutput = (baseUrl: string, basePath: string): PlotsOutput => ({
+  ...getImageData(baseUrl, basePath),
   ...basicVega,
   ...require('./vega').default
 })
