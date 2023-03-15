@@ -56,4 +56,5 @@ live.log("roc_auc", metrics.roc_auc_score(labels, predictions))
 💡 View
 [Instant Experiment Tracking: Just Add DVC!](https://iterative.ai/blog/exp-tracking-dvc-python)
 for a quick-start guide on migrating an existing project. Use
-[Setup](command:dvc.showSetup) to be guided through the onboarding process.
+[Setup](command:dvc.showExperimentsSetup) to be guided through the onboarding
+process.

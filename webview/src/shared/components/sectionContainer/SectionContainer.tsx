@@ -1,6 +1,10 @@
 import cx from 'classnames'
 import React, { MouseEvent, ReactNode } from 'react'
 import { Section as PlotsSection } from 'dvc/src/plots/webview/contract'
+import {
+  STUDIO_URL,
+  Section as SetupSection
+} from 'dvc/src/setup/webview/contract'
 import styles from './styles.module.scss'
 import { Icon } from '../Icon'
 import { ChevronDown, ChevronRight, Info } from '../icons'
@@ -55,18 +59,37 @@ export const SectionDescription = {
       </a>
       .
     </span>
+  ),
+  // Setup Experiments
+  [SetupSection.EXPERIMENTS]: (
+    <span data-testid="tooltip-setup-experiments">
+      Configure the extension to start tracking and visualizing{' '}
+      <a href="https://dvc.org/doc/start/experiment-management/experiments">
+        experiments
+      </a>
+      .
+    </span>
+  ),
+  // Setup Experiments
+  [SetupSection.STUDIO]: (
+    <span data-testid="tooltip-setup-studio">
+      {"Configure the extension's connection to "}
+      <a href={STUDIO_URL}>Studio</a>.<br />
+      Studio provides a collaboration platform for Machine Learning and is free
+      for small teams and individual contributors.
+    </span>
   )
 } as const
 
-export interface SectionContainerProps<T extends PlotsSection> {
+export interface SectionContainerProps<T extends PlotsSection | SetupSection> {
   children: React.ReactNode
-  menuItems: IconMenuItemProps[]
+  menuItems?: IconMenuItemProps[]
   headerChildren?: ReactNode
   onToggleSection: () => void
   sectionCollapsed: boolean
   sectionKey: T
   title: string
-  className: string
+  className?: string
   stickyHeaderTop?: number
 }
 
@@ -75,10 +98,10 @@ const InfoIcon = () => (
 )
 
 export const SectionContainer: React.FC<
-  SectionContainerProps<PlotsSection>
+  SectionContainerProps<PlotsSection | SetupSection>
 > = ({
   children,
-  menuItems,
+  menuItems = [],
   onToggleSection,
   sectionCollapsed,
   sectionKey,

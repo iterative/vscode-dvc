@@ -79,7 +79,6 @@ import { Setup } from '../../../setup'
 import * as FileSystem from '../../../fileSystem'
 import * as ProcessExecution from '../../../process/execution'
 import { DvcReader } from '../../../cli/dvc/reader'
-import { Connect } from '../../../connect'
 import { DvcViewer } from '../../../cli/dvc/viewer'
 import { DEFAULT_NB_ITEMS_PER_ROW } from '../../../plots/webview/contract'
 
@@ -601,7 +600,7 @@ suite('Experiments Test Suite', () => {
       const executeCommandSpy = spy(commands, 'executeCommand')
 
       const mockGetStudioAccessToken = stub(
-        Connect.prototype,
+        Setup.prototype,
         'getStudioAccessToken'
       )
 
@@ -620,7 +619,7 @@ suite('Experiments Test Suite', () => {
       await tokenAccessed
 
       expect(executeCommandSpy).to.be.calledWithExactly(
-        RegisteredCommands.CONNECT_SHOW
+        RegisteredCommands.SETUP_SHOW
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 

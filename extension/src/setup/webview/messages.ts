@@ -1,5 +1,5 @@
 import { commands } from 'vscode'
-import { SetupData as TSetupData } from './contract'
+import { STUDIO_URL, SetupData, SetupData as TSetupData } from './contract'
 import { Logger } from '../../common/logger'
 import {
   MessageFromWebview,
@@ -14,47 +14,49 @@ import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../commands/external'
+import { ConfigKey, setConfigValue } from '../../vscode/config'
+import { openUrl } from '../../vscode/external'
 
 export class WebviewMessages {
   private readonly getWebview: () => BaseWebview<TSetupData> | undefined
   private readonly initializeGit: () => void
+  private readonly showExperiments: () => void
 
   constructor(
     getWebview: () => BaseWebview<TSetupData> | undefined,
-    initializeGit: () => void
+    initializeGit: () => void,
+    showExperiments: () => void
   ) {
     this.getWebview = getWebview
     this.initializeGit = initializeGit
+    this.showExperiments = showExperiments
   }
 
   public sendWebviewMessage({
-    cliCompatible,
-    needsGitInitialized,
     canGitInitialize,
-    needsGitCommit,
-    projectInitialized,
+    cliCompatible,
+    hasData,
     isPythonExtensionInstalled,
+    isStudioConnected,
+    needsGitCommit,
+    needsGitInitialized,
+    projectInitialized,
     pythonBinPath,
-    hasData
-  }: {
-    cliCompatible: boolean | undefined
-    needsGitInitialized: boolean | undefined
-    canGitInitialize: boolean
-    projectInitialized: boolean
-    needsGitCommit: boolean
-    isPythonExtensionInstalled: boolean
-    pythonBinPath: string | undefined
-    hasData: boolean | undefined
-  }) {
+    sectionCollapsed,
+    shareLiveToStudio
+  }: SetupData) {
     void this.getWebview()?.show({
       canGitInitialize,
       cliCompatible,
       hasData,
       isPythonExtensionInstalled,
+      isStudioConnected,
       needsGitCommit,
       needsGitInitialized,
       projectInitialized,
-      pythonBinPath
+      pythonBinPath,
+      sectionCollapsed,
+      shareLiveToStudio
     })
   }
 
@@ -78,6 +80,26 @@ export class WebviewMessages {
         return commands.executeCommand(
           RegisteredCommands.EXTENSION_SETUP_WORKSPACE
         )
+      case MessageFromWebviewType.OPEN_STUDIO:
+        return this.openStudio()
+      case MessageFromWebviewType.OPEN_STUDIO_PROFILE:
+        return this.openStudioProfile()
+      case MessageFromWebviewType.SAVE_STUDIO_TOKEN:
+        return commands.executeCommand(
+          RegisteredCommands.ADD_STUDIO_ACCESS_TOKEN
+        )
+      case MessageFromWebviewType.REMOVE_STUDIO_TOKEN:
+        return commands.executeCommand(
+          RegisteredCommands.REMOVE_STUDIO_ACCESS_TOKEN
+        )
+      case MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE:
+        return setConfigValue(
+          ConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE,
+          message.payload
+        )
+      case MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW:
+        return this.showExperiments()
+
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
@@ -110,5 +132,13 @@ export class WebviewMessages {
     sendTelemetryEvent(EventName.VIEWS_SETUP_INSTALL_DVC, undefined, undefined)
 
     return autoInstallDvc()
+  }
+
+  private openStudio() {
+    return openUrl(STUDIO_URL)
+  }
+
+  private openStudioProfile() {
+    return openUrl(`${STUDIO_URL}/user/_/profile?section=accessToken`)
   }
 }

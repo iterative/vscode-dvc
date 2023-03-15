@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.6.18",
+  "version": "0.6.19",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -397,16 +397,6 @@
       {
         "title": "Show Commands",
         "command": "dvc.showCommands",
-        "category": "DVC"
-      },
-      {
-        "title": "Connect to Studio",
-        "command": "dvc.showConnect",
-        "category": "DVC"
-      },
-      {
-        "title": "Open Studio Settings",
-        "command": "dvc.showStudioSettings",
         "category": "DVC"
       },
       {
@@ -818,14 +808,6 @@
         {
           "command": "dvc.stopQueuedExperiments",
           "when": "dvc.commands.available && dvc.project.available"
-        },
-        {
-          "command": "dvc.showConnect",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.studio.connected"
-        },
-        {
-          "command": "dvc.showStudioSettings",
-          "when": "dvc.commands.available && dvc.project.available && dvc.studio.connected"
         },
         {
           "command": "dvc.selectForCompare",
@@ -1416,17 +1398,17 @@
       },
       {
         "view": "dvc.views.studio",
-        "contents": "[$(plug) Connect](command:dvc.showConnect)",
+        "contents": "[$(plug) Connect](command:dvc.showStudioSetup)",
         "when": "!dvc.studio.connected"
       },
       {
         "view": "dvc.views.studio",
-        "contents": "[$(settings-gear) Open Settings](command:dvc.showConnect)",
+        "contents": "[$(settings-gear) Open Settings](command:dvc.showStudioSetup)",
         "when": "dvc.studio.connected"
       },
       {
         "view": "dvc.views.welcome",
-        "contents": "New to the extension?\n[Show Walkthrough](command:dvc.getStarted)\n\nThe extension is currently unable to initialize.\n[Show Setup](command:dvc.showSetup)",
+        "contents": "New to the extension?\n[Show Walkthrough](command:dvc.getStarted)\n\nThe extension is currently unable to initialize.\n[Show Setup](command:dvc.showExperimentsSetup)",
         "when": "true"
       },
       {
@@ -1468,7 +1450,7 @@
           {
             "id": "dvc.installDVC",
             "title": "Install DVC",
-            "description": "This extension requires DVC to be installed.\n\n[Show Setup](command:dvc.showSetup)\n",
+            "description": "This extension requires DVC to be installed.\n\n[Show Setup](command:dvc.showExperimentsSetup)\n",
             "media": {
               "markdown": "resources/walkthrough/install-dvc.md"
             },
@@ -1654,8 +1636,8 @@
     "@types/vscode": "1.64.0",
     "@vscode/test-electron": "2.3.0",
     "@vscode/vsce": "2.18.0",
-    "@wdio/cli": "8.5.6",
-    "@wdio/local-runner": "8.5.6",
+    "@wdio/cli": "8.5.7",
+    "@wdio/local-runner": "8.5.7",
     "@wdio/mocha-framework": "8.5.6",
     "@wdio/spec-reporter": "8.4.0",
     "chai": "4.3.7",
@@ -1675,8 +1657,8 @@
     "ts-loader": "9.4.2",
     "vscode-uri": "3.0.7",
     "wdio-vscode-service": "5.0.0",
-    "webdriverio": "8.5.6",
-    "webpack": "5.75.0",
+    "webdriverio": "8.5.7",
+    "webpack": "5.76.0",
     "webpack-cli": "5.0.1"
   },
   "peerDependencies": {
