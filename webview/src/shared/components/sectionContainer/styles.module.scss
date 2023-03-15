@@ -13,21 +13,24 @@ $gap: 20px;
   summary {
     list-style-type: none;
     font-family: var(--vscode-font-family);
-    margin: 14px 10px;
+    padding: 14px 10px;
     font-weight: bold;
     font-size: 1.25rem;
     display: flex;
     align-items: center;
-    width: max-content;
+    width: 100%;
     cursor: pointer;
+    position: sticky;
+    background-color: $bg-color;
+    z-index: 3;
+    gap: $gap;
   }
 }
 
-.iconMenu {
-  position: absolute;
-  right: $gap;
-  top: -15px;
-  z-index: 10;
+.summaryTitle {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
 }
 
 .detailsIcon {

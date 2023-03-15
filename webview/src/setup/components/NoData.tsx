@@ -10,7 +10,7 @@ import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 
 export const NoData: React.FC = () => {
   return (
-    <EmptyState>
+    <EmptyState isFullScreen={false}>
       <h1>Your project contains no data</h1>
       <div>
         Enable DVC experiment tracking using{' '}

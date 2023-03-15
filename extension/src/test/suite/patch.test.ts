@@ -122,7 +122,7 @@ suite('Patch Test Suite', () => {
       expect(mockFetch).to.be.calledOnce
       expect(mockErrorWithOptions).to.be.calledOnce
       expect(executeCommandSpy).to.be.calledWithExactly(
-        RegisteredCommands.CONNECT_SHOW
+        RegisteredCommands.SETUP_SHOW
       )
 
       const { metrics, params, name } = expShowFixture[

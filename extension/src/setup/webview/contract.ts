@@ -3,8 +3,25 @@ export type SetupData = {
   cliCompatible: boolean | undefined
   hasData: boolean | undefined
   isPythonExtensionInstalled: boolean
-  needsGitInitialized: boolean | undefined
+  isStudioConnected: boolean
   needsGitCommit: boolean
+  needsGitInitialized: boolean | undefined
   projectInitialized: boolean
   pythonBinPath: string | undefined
+  sectionCollapsed: typeof DEFAULT_SECTION_COLLAPSED | undefined
+  shareLiveToStudio: boolean
 }
+
+export enum Section {
+  EXPERIMENTS = 'experiments',
+  STUDIO = 'studio'
+}
+
+export const DEFAULT_SECTION_COLLAPSED = {
+  [Section.EXPERIMENTS]: false,
+  [Section.STUDIO]: false
+}
+
+export type SectionCollapsed = typeof DEFAULT_SECTION_COLLAPSED
+
+export const STUDIO_URL = 'https://studio.iterative.ai'

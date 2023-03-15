@@ -1,19 +1,19 @@
-import { SetupData } from 'dvc/src/setup/webview/contract'
+import {
+  DEFAULT_SECTION_COLLAPSED,
+  Section,
+  SetupData
+} from 'dvc/src/setup/webview/contract'
 import {
   MessageFromWebviewType,
   MessageToWebview
 } from 'dvc/src/webview/contract'
 import React, { useCallback, useState } from 'react'
-import { CliIncompatible } from './CliIncompatible'
-import { CliUnavailable } from './CliUnavailable'
-import { ProjectUninitialized } from './ProjectUninitialized'
-import { NoData } from './NoData'
-import { NeedsGitCommit } from './NeedsGitCommit'
+import { Experiments } from './Experiments'
+import { Studio } from './Studio'
+import { SetupContainer } from './SetupContainer'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 import { sendMessage } from '../../shared/vscode'
-import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 export const App: React.FC = () => {
   const [cliCompatible, setCliCompatible] = useState<boolean | undefined>(
     undefined
@@ -32,6 +32,13 @@ export const App: React.FC = () => {
   const [isPythonExtensionInstalled, setIsPythonExtensionInstalled] =
     useState<boolean>(false)
   const [hasData, setHasData] = useState<boolean | undefined>(false)
+  const [sectionCollapsed, setSectionCollapsed] = useState(
+    DEFAULT_SECTION_COLLAPSED
+  )
+
+  const [isStudioConnected, setIsStudioConnected] = useState<boolean>(false)
+  const [shareLiveToStudio, setShareLiveToStudioValue] =
+    useState<boolean>(false)
 
   useVsCodeMessaging(
     useCallback(
@@ -44,6 +51,11 @@ export const App: React.FC = () => {
         setNeedsGitCommit(data.data.needsGitCommit)
         setProjectInitialized(data.data.projectInitialized)
         setPythonBinPath(data.data.pythonBinPath)
+        setIsStudioConnected(data.data.isStudioConnected)
+        if (data.data.sectionCollapsed) {
+          setSectionCollapsed(data.data.sectionCollapsed)
+        }
+        setShareLiveToStudioValue(data.data.shareLiveToStudio)
       },
       [
         setCanGitInitialized,
@@ -53,81 +65,53 @@ export const App: React.FC = () => {
         setNeedsGitInitialized,
         setNeedsGitCommit,
         setProjectInitialized,
-        setPythonBinPath
+        setPythonBinPath,
+        setIsStudioConnected,
+        setSectionCollapsed,
+        setShareLiveToStudioValue
       ]
     )
   )
 
-  const checkCompatibility = () => {
-    sendMessage({ type: MessageFromWebviewType.CHECK_CLI_COMPATIBLE })
-  }
-
-  const initializeGit = () => {
+  const setShareLiveToStudio = (shouldShareLive: boolean) => {
+    setShareLiveToStudioValue(shouldShareLive)
     sendMessage({
-      type: MessageFromWebviewType.INITIALIZE_GIT
+      payload: shouldShareLive,
+      type: MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE
     })
   }
 
-  const initializeDvc = () => {
-    sendMessage({
-      type: MessageFromWebviewType.INITIALIZE_DVC
-    })
-  }
-
-  const showScmPanel = () => {
-    sendMessage({ type: MessageFromWebviewType.SHOW_SCM_PANEL })
-  }
-
-  const installDvc = () => {
-    sendMessage({ type: MessageFromWebviewType.INSTALL_DVC })
-  }
-
-  const selectPythonInterpreter = () => {
-    sendMessage({ type: MessageFromWebviewType.SELECT_PYTHON_INTERPRETER })
-  }
-
-  const setupWorkspace = () => {
-    sendMessage({ type: MessageFromWebviewType.SETUP_WORKSPACE })
-  }
-
-  if (cliCompatible === false) {
-    return <CliIncompatible checkCompatibility={checkCompatibility} />
-  }
-
-  if (cliCompatible === undefined) {
-    return (
-      <CliUnavailable
-        installDvc={installDvc}
-        isPythonExtensionInstalled={isPythonExtensionInstalled}
-        pythonBinPath={pythonBinPath}
-        selectPythonInterpreter={selectPythonInterpreter}
-        setupWorkspace={setupWorkspace}
-      />
-    )
-  }
-
-  if (!projectInitialized) {
-    return (
-      <ProjectUninitialized
-        canGitInitialize={canGitInitialize}
-        initializeDvc={initializeDvc}
-        initializeGit={initializeGit}
-        needsGitInitialized={needsGitInitialized}
-      />
-    )
-  }
-
-  if (needsGitCommit) {
-    return <NeedsGitCommit showScmPanel={showScmPanel} />
-  }
-
-  if (hasData === undefined) {
-    return <EmptyState>Loading Project...</EmptyState>
-  }
-
-  if (!hasData) {
-    return <NoData />
-  }
-
-  return null
+  return (
+    <>
+      <SetupContainer
+        sectionKey={Section.EXPERIMENTS}
+        title={'Experiments'}
+        sectionCollapsed={sectionCollapsed}
+        setSectionCollapsed={setSectionCollapsed}
+      >
+        <Experiments
+          canGitInitialize={canGitInitialize}
+          cliCompatible={cliCompatible}
+          hasData={hasData}
+          isPythonExtensionInstalled={isPythonExtensionInstalled}
+          needsGitInitialized={needsGitInitialized}
+          needsGitCommit={needsGitCommit}
+          projectInitialized={projectInitialized}
+          pythonBinPath={pythonBinPath}
+        />
+      </SetupContainer>
+      <SetupContainer
+        sectionKey={Section.STUDIO}
+        title={'Studio'}
+        sectionCollapsed={sectionCollapsed}
+        setSectionCollapsed={setSectionCollapsed}
+      >
+        <Studio
+          isStudioConnected={isStudioConnected}
+          shareLiveToStudio={shareLiveToStudio}
+          setShareLiveToStudio={setShareLiveToStudio}
+        />
+      </SetupContainer>
+    </>
+  )
 }
