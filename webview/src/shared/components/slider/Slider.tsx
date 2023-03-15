@@ -1,18 +1,25 @@
-import React, { FormEvent, InputHTMLAttributes } from 'react'
+import React, { FormEvent, MouseEvent } from 'react'
 import styles from './styles.module.scss'
 
-interface SliderProps extends InputHTMLAttributes<HTMLInputElement> {
+interface SliderProps {
+  minimum?: number
+  maximum: number
+  step?: number
+  defaultValue: number
   label: string
-  onValueChange: (newValue: number) => void
+  onChange: (newValue: number) => void
 }
 
 export const Slider: React.FC<SliderProps> = ({
+  minimum,
+  maximum,
+  step,
+  defaultValue,
   label,
-  onValueChange,
-  ...props
+  onChange
 }) => {
   const handleOnChange = (e: FormEvent<HTMLInputElement>) => {
-    onValueChange(Number.parseFloat(e.currentTarget.value))
+    onChange(Number.parseFloat(e.currentTarget.value))
   }
   return (
     <div className={styles.wrapper}>
@@ -24,7 +31,11 @@ export const Slider: React.FC<SliderProps> = ({
         id={label}
         className={styles.slider}
         onChange={handleOnChange}
-        {...props}
+        onClick={(e: MouseEvent<HTMLInputElement>) => e.stopPropagation()}
+        min={minimum}
+        max={maximum}
+        step={step}
+        defaultValue={defaultValue}
       />
     </div>
   )

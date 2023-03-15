@@ -14,9 +14,8 @@ import styles from './styles.module.scss'
 import { IconMenuItemProps } from '../../shared/components/iconMenu/IconMenuItem'
 import { sendMessage } from '../../shared/vscode'
 import { Lines, Add, Trash } from '../../shared/components/icons'
-import { MinMaxSlider } from '../../shared/components/slider/MinMaxSlider'
+import { Slider } from '../../shared/components/slider/Slider'
 import { PlotsState } from '../store'
-import { ItemsSlider } from '../../shared/components/slider/ItemsSlider'
 import { SectionContainer } from '../../shared/components/sectionContainer/SectionContainer'
 
 export interface PlotsContainerProps {
@@ -114,6 +113,10 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
 
+  const plotHeights = Object.values(PlotHeight).filter(
+    value => typeof value !== 'string'
+  ) as number[]
+
   return (
     <SectionContainer
       menuItems={menuItems}
@@ -137,7 +140,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
         maxNbPlotsPerRow > 1 && (
           <div className={styles.sizeSliders} data-testid="size-sliders">
             <div className={styles.sizeSlider}>
-              <MinMaxSlider
+              <Slider
                 maximum={-1}
                 minimum={-maxNbPlotsPerRow}
                 label="Plot Width"
@@ -146,8 +149,9 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
               />
             </div>
             <div className={styles.sizeSlider}>
-              <ItemsSlider
-                items={Object.values(PlotHeight) as number[]}
+              <Slider
+                minimum={Math.min(...plotHeights)}
+                maximum={Math.max(...plotHeights)}
                 label="Plot Height"
                 onChange={newHeight =>
                   handleResize(
