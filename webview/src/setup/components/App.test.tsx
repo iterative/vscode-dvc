@@ -5,7 +5,7 @@ import {
 } from 'dvc/src/webview/contract'
 import '@testing-library/jest-dom/extend-expect'
 import React from 'react'
-import { Section, SetupData } from 'dvc/src/setup/webview/contract'
+import { SetupSection, SetupData } from 'dvc/src/setup/webview/contract'
 import { App } from './App'
 import { vsCodeApi } from '../../shared/api'
 
@@ -585,8 +585,8 @@ describe('App', () => {
       renderApp({
         ...testData,
         sectionCollapsed: {
-          [Section.EXPERIMENTS]: false,
-          [Section.STUDIO]: true
+          [SetupSection.EXPERIMENTS]: false,
+          [SetupSection.STUDIO]: true
         }
       })
       mockPostMessage.mockClear()
@@ -602,8 +602,8 @@ describe('App', () => {
       renderApp({
         ...testData,
         sectionCollapsed: {
-          [Section.EXPERIMENTS]: true,
-          [Section.STUDIO]: false
+          [SetupSection.EXPERIMENTS]: true,
+          [SetupSection.STUDIO]: false
         }
       })
       mockPostMessage.mockClear()

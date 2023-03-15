@@ -1,6 +1,6 @@
 import {
   DEFAULT_SECTION_COLLAPSED,
-  Section
+  SetupSection
 } from 'dvc/src/setup/webview/contract'
 import React from 'react'
 import { SectionContainer } from '../../shared/components/sectionContainer/SectionContainer'
@@ -8,7 +8,7 @@ import { SectionContainer } from '../../shared/components/sectionContainer/Secti
 export const SetupContainer: React.FC<{
   children: React.ReactNode
   sectionCollapsed: typeof DEFAULT_SECTION_COLLAPSED
-  sectionKey: Section
+  sectionKey: SetupSection
   setSectionCollapsed: (value: typeof DEFAULT_SECTION_COLLAPSED) => void
   title: string
 }> = ({

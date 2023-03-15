@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.6.18",
+  "version": "0.6.20",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -419,6 +419,21 @@
       {
         "title": "Show Experiments and Plots",
         "command": "dvc.showExperimentsAndPlots",
+        "category": "DVC"
+      },
+      {
+        "title": "Connect to Studio",
+        "command": "dvc.showStudioConnect",
+        "category": "DVC"
+      },
+      {
+        "title": "Show Studio Settings",
+        "command": "dvc.showStudioSettings",
+        "category": "DVC"
+      },
+      {
+        "title": "Show Setup",
+        "command": "dvc.showSetup",
         "category": "DVC"
       },
       {
@@ -840,6 +855,14 @@
         {
           "command": "dvc.showExperimentsAndPlots",
           "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.showStudioConnect",
+          "when": "dvc.commands.available && dvc.project.available && !dvc.studio.connected"
+        },
+        {
+          "command": "dvc.showStudioSettings",
+          "when": "dvc.commands.available && dvc.project.available && dvc.studio.connected"
         },
         {
           "command": "dvc.stopAllRunningExperiments",
@@ -1398,12 +1421,12 @@
       },
       {
         "view": "dvc.views.studio",
-        "contents": "[$(plug) Connect](command:dvc.showStudioSetup)",
+        "contents": "[$(plug) Connect](command:dvc.showStudioConnect)",
         "when": "!dvc.studio.connected"
       },
       {
         "view": "dvc.views.studio",
-        "contents": "[$(settings-gear) Open Settings](command:dvc.showStudioSetup)",
+        "contents": "[$(settings-gear) Open Settings](command:dvc.showStudioSettings)",
         "when": "dvc.studio.connected"
       },
       {
@@ -1636,8 +1659,8 @@
     "@types/vscode": "1.64.0",
     "@vscode/test-electron": "2.3.0",
     "@vscode/vsce": "2.18.0",
-    "@wdio/cli": "8.5.6",
-    "@wdio/local-runner": "8.5.6",
+    "@wdio/cli": "8.5.7",
+    "@wdio/local-runner": "8.5.7",
     "@wdio/mocha-framework": "8.5.6",
     "@wdio/spec-reporter": "8.4.0",
     "chai": "4.3.7",
@@ -1657,7 +1680,7 @@
     "ts-loader": "9.4.2",
     "vscode-uri": "3.0.7",
     "wdio-vscode-service": "5.0.0",
-    "webdriverio": "8.5.6",
+    "webdriverio": "8.5.7",
     "webpack": "5.76.0",
     "webpack-cli": "5.0.1"
   },

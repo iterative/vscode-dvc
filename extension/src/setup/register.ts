@@ -1,7 +1,7 @@
 import { commands } from 'vscode'
 import { Setup } from '.'
 import { run } from './runner'
-import { Section } from './webview/contract'
+import { SetupSection } from './webview/contract'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
@@ -40,14 +40,21 @@ const registerSetupShowCommands = (
   internalCommands.registerExternalCommand(
     RegisteredCommands.SETUP_SHOW_EXPERIMENTS,
     async () => {
-      await setup.showSetup(Section.EXPERIMENTS)
+      await setup.showSetup(SetupSection.EXPERIMENTS)
     }
   )
 
   internalCommands.registerExternalCommand(
-    RegisteredCommands.SETUP_SHOW_STUDIO,
+    RegisteredCommands.SETUP_SHOW_STUDIO_CONNECT,
     async () => {
-      await setup.showSetup(Section.STUDIO)
+      await setup.showSetup(SetupSection.STUDIO)
+    }
+  )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.SETUP_SHOW_STUDIO_SETTINGS,
+    async () => {
+      await setup.showSetup(SetupSection.STUDIO)
     }
   )
 }

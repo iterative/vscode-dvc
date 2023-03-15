@@ -8,7 +8,7 @@ import {
 } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import isEmpty from 'lodash.isempty'
-import { Section, SetupData as TSetupData } from './webview/contract'
+import { SetupSection, SetupData as TSetupData } from './webview/contract'
 import { collectSectionCollapsed } from './collect'
 import { WebviewMessages } from './webview/messages'
 import { validateTokenInput } from './inputBox'
@@ -91,7 +91,7 @@ export class Setup
   private studioAccessToken: string | undefined = undefined
   private studioIsConnected = false
 
-  private focusedSection: Section | undefined = undefined
+  private focusedSection: SetupSection | undefined = undefined
 
   constructor(
     context: ExtensionContext,
@@ -211,7 +211,7 @@ export class Setup
     this.config.unsetPythonBinPath()
   }
 
-  public async showSetup(focusSection?: Section) {
+  public async showSetup(focusSection?: SetupSection) {
     this.focusedSection = focusSection
     if (this.webview) {
       void this.sendDataToWebview()

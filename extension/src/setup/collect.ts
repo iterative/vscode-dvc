@@ -1,7 +1,7 @@
-import { DEFAULT_SECTION_COLLAPSED, Section } from './webview/contract'
+import { DEFAULT_SECTION_COLLAPSED, SetupSection } from './webview/contract'
 
 export const collectSectionCollapsed = (
-  focusedSection?: Section
+  focusedSection?: SetupSection
 ): typeof DEFAULT_SECTION_COLLAPSED | undefined => {
   if (!focusedSection) {
     return undefined
@@ -10,7 +10,7 @@ export const collectSectionCollapsed = (
   const acc = { ...DEFAULT_SECTION_COLLAPSED }
   for (const section of Object.keys(acc)) {
     if (section !== focusedSection) {
-      acc[section as Section] = true
+      acc[section as SetupSection] = true
     }
   }
 
