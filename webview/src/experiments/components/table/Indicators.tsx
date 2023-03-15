@@ -22,7 +22,7 @@ export const CounterBadge: React.FC<CounterBadgeProps> = ({ count }) => {
   return count ? (
     <span
       className={styles.indicatorCount}
-      role={'marquee'}
+      role="marquee"
       aria-label={`${count}`}
     >
       {count}

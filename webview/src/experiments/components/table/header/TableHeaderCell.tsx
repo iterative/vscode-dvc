@@ -158,7 +158,7 @@ export const TableHeaderCell: React.FC<{
     <ContextMenu
       content={menuContent}
       disabled={!menuEnabled || menuSuppressed}
-      trigger={'contextmenu'}
+      trigger="contextmenu"
     >
       <th
         {...getHeaderPropsArgs(

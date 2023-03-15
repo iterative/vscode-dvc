@@ -85,7 +85,7 @@ export const App: React.FC = () => {
     <>
       <SetupContainer
         sectionKey={SetupSection.EXPERIMENTS}
-        title={'Experiments'}
+        title="Experiments"
         sectionCollapsed={sectionCollapsed}
         setSectionCollapsed={setSectionCollapsed}
       >
@@ -102,7 +102,7 @@ export const App: React.FC = () => {
       </SetupContainer>
       <SetupContainer
         sectionKey={SetupSection.STUDIO}
-        title={'Studio'}
+        title="Studio"
         sectionCollapsed={sectionCollapsed}
         setSectionCollapsed={setSectionCollapsed}
       >

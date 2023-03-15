@@ -14,7 +14,7 @@ export const ErrorTooltip: React.FC<{
         {error}
       </div>
     }
-    placement={'bottom'}
+    placement="bottom"
     disabled={!error}
   >
     {children}
