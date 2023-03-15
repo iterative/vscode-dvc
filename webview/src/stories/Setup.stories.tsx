@@ -1,7 +1,7 @@
 import { Story, Meta } from '@storybook/react/types-6-0'
 import React from 'react'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
-import { Section, SetupData } from 'dvc/src/setup/webview/contract'
+import { SetupData, SetupSection } from 'dvc/src/setup/webview/contract'
 import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'
 import { App } from '../setup/components/App'
 
@@ -18,7 +18,10 @@ const DEFAULT_DATA: SetupData = {
   needsGitInitialized: false,
   projectInitialized: true,
   pythonBinPath: 'python',
-  sectionCollapsed: { [Section.EXPERIMENTS]: false, [Section.STUDIO]: true },
+  sectionCollapsed: {
+    [SetupSection.EXPERIMENTS]: false,
+    [SetupSection.STUDIO]: true
+  },
   shareLiveToStudio: false
 }
 

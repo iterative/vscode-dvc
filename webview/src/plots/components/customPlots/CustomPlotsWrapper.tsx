@@ -1,4 +1,4 @@
-import { Section } from 'dvc/src/plots/webview/contract'
+import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
@@ -29,7 +29,7 @@ export const CustomPlotsWrapper: React.FC = () => {
   return (
     <PlotsContainer
       title="Custom"
-      sectionKey={Section.CUSTOM_PLOTS}
+      sectionKey={PlotsSection.CUSTOM_PLOTS}
       nbItemsPerRow={nbItemsPerRow}
       sectionCollapsed={isCollapsed}
       addPlotsButton={{ onClick: addCustomPlot }}

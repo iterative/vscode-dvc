@@ -46,7 +46,7 @@ import * as Python from '../../../extensions/python'
 import { STUDIO_ACCESS_TOKEN_KEY } from '../../../setup/token'
 import { ContextKey } from '../../../vscode/context'
 import { Setup } from '../../../setup'
-import { Section } from '../../../setup/webview/contract'
+import { SetupSection } from '../../../setup/webview/contract'
 
 suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
@@ -837,27 +837,27 @@ suite('Setup Test Suite', () => {
 
       const focusExperiments = getNewMessageReceived()
 
-      void setup.showSetup(Section.EXPERIMENTS)
+      void setup.showSetup(SetupSection.EXPERIMENTS)
 
       await focusExperiments
 
       expect(mockShow).to.be.calledWithMatch({
         sectionCollapsed: {
-          [Section.EXPERIMENTS]: false,
-          [Section.STUDIO]: true
+          [SetupSection.EXPERIMENTS]: false,
+          [SetupSection.STUDIO]: true
         }
       })
 
       const focusStudio = getNewMessageReceived()
 
-      void setup.showSetup(Section.STUDIO)
+      void setup.showSetup(SetupSection.STUDIO)
 
       await focusStudio
 
       expect(mockShow).to.be.calledWithMatch({
         sectionCollapsed: {
-          [Section.EXPERIMENTS]: true,
-          [Section.STUDIO]: false
+          [SetupSection.EXPERIMENTS]: true,
+          [SetupSection.STUDIO]: false
         }
       })
 
@@ -878,12 +878,12 @@ suite('Setup Test Suite', () => {
 
     await commands.executeCommand(RegisteredCommands.SETUP_SHOW_STUDIO_CONNECT)
 
-    expect(mockShowWebview).to.be.calledWithExactly(Section.STUDIO)
+    expect(mockShowWebview).to.be.calledWithExactly(SetupSection.STUDIO)
 
     mockShowWebview.resetHistory()
 
     await commands.executeCommand(RegisteredCommands.SETUP_SHOW_STUDIO_SETTINGS)
 
-    expect(mockShowWebview).to.be.calledWithExactly(Section.STUDIO)
+    expect(mockShowWebview).to.be.calledWithExactly(SetupSection.STUDIO)
   })
 })

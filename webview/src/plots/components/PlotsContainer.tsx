@@ -7,7 +7,7 @@ import React, {
 } from 'react'
 import { AnyAction } from '@reduxjs/toolkit'
 import { useDispatch, useSelector } from 'react-redux'
-import { PlotHeight, Section } from 'dvc/src/plots/webview/contract'
+import { PlotHeight, PlotsSection } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { PlotsPicker, PlotsPickerProps } from './PlotsPicker'
 import styles from './styles.module.scss'
@@ -20,7 +20,7 @@ import { SectionContainer } from '../../shared/components/sectionContainer/Secti
 
 export interface PlotsContainerProps {
   sectionCollapsed: boolean
-  sectionKey: Section
+  sectionKey: PlotsSection
   title: string
   nbItemsPerRow: number
   height: PlotHeight
@@ -169,7 +169,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
       {open && (
         <div
           className={cx({
-            [styles.plotsWrapper]: sectionKey !== Section.COMPARISON_TABLE,
+            [styles.plotsWrapper]: sectionKey !== PlotsSection.COMPARISON_TABLE,
             [styles.smallPlots]: nbItemsPerRow >= 4
           })}
           style={

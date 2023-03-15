@@ -5,7 +5,7 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NB_ITEMS_PER_ROW,
   PlotHeight,
-  Section
+  PlotsSection
 } from 'dvc/src/plots/webview/contract'
 import { addPlotsWithSnapshots, removePlots } from '../plotDataStore'
 
@@ -20,9 +20,9 @@ export interface CustomPlotsState extends Omit<CustomPlotsData, 'plots'> {
 export const customPlotsInitialState: CustomPlotsState = {
   disabledDragPlotIds: [],
   hasData: false,
-  height: DEFAULT_HEIGHT[Section.CUSTOM_PLOTS],
-  isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.CUSTOM_PLOTS],
-  nbItemsPerRow: DEFAULT_SECTION_NB_ITEMS_PER_ROW[Section.CUSTOM_PLOTS],
+  height: DEFAULT_HEIGHT[PlotsSection.CUSTOM_PLOTS],
+  isCollapsed: DEFAULT_SECTION_COLLAPSED[PlotsSection.CUSTOM_PLOTS],
+  nbItemsPerRow: DEFAULT_SECTION_NB_ITEMS_PER_ROW[PlotsSection.CUSTOM_PLOTS],
   plotsIds: [],
   plotsSnapshots: {}
 }
@@ -50,8 +50,8 @@ export const customPlotsSlice = createSlice({
       }
       const { plots, ...statePayload } = action.payload
       const plotsIds = plots?.map(plot => plot.id) || []
-      const snapShots = addPlotsWithSnapshots(plots, Section.CUSTOM_PLOTS)
-      removePlots(plotsIds, Section.CUSTOM_PLOTS)
+      const snapShots = addPlotsWithSnapshots(plots, PlotsSection.CUSTOM_PLOTS)
+      removePlots(plotsIds, PlotsSection.CUSTOM_PLOTS)
       return {
         ...state,
         ...statePayload,

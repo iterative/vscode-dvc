@@ -12,14 +12,14 @@ export type SetupData = {
   shareLiveToStudio: boolean
 }
 
-export enum Section {
+export enum SetupSection {
   EXPERIMENTS = 'experiments',
   STUDIO = 'studio'
 }
 
 export const DEFAULT_SECTION_COLLAPSED = {
-  [Section.EXPERIMENTS]: false,
-  [Section.STUDIO]: false
+  [SetupSection.EXPERIMENTS]: false,
+  [SetupSection.STUDIO]: false
 }
 
 export type SectionCollapsed = typeof DEFAULT_SECTION_COLLAPSED

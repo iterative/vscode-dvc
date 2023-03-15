@@ -4,7 +4,7 @@ import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { SortDefinition } from '../experiments/model/sortBy'
 import {
   PlotHeight,
-  Section,
+  PlotsSection,
   SectionCollapsed
 } from '../plots/webview/contract'
 
@@ -250,7 +250,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_REVISIONS_REORDERED]: undefined
   [EventName.VIEWS_PLOTS_COMPARISON_ROWS_REORDERED]: undefined
   [EventName.VIEWS_PLOTS_SECTION_RESIZED]: {
-    section: Section
+    section: PlotsSection
     nbItemsPerRow: number
     height: PlotHeight
   }
