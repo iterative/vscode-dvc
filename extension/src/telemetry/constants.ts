@@ -281,8 +281,9 @@ export interface IEventNamePropertyMapping {
 
   [EventName.SETUP_SHOW]: undefined
   [EventName.SETUP_SHOW_EXPERIMENTS]: undefined
-  [EventName.SETUP_SHOW_STUDIO]: undefined
   [EventName.SELECT_FOCUSED_PROJECTS]: undefined
+  [EventName.SETUP_SHOW_STUDIO_SETTINGS]: undefined
+  [EventName.SETUP_SHOW_STUDIO_CONNECT]: undefined
 
   [EventName.ADD_STUDIO_ACCESS_TOKEN]: undefined
   [EventName.UPDATE_STUDIO_ACCESS_TOKEN]: undefined
