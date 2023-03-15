@@ -3,7 +3,7 @@ import {
   DEFAULT_NB_ITEMS_PER_ROW,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NB_ITEMS_PER_ROW,
-  Section
+  PlotsSection
 } from '../webview/contract'
 import { buildMockMemento } from '../../test/util'
 import { Experiments } from '../../experiments'
@@ -68,26 +68,28 @@ describe('plotsModel', () => {
   })
 
   it('should change the plotSize when calling setPlotSize', () => {
-    expect(model.getNbItemsPerRow(Section.CHECKPOINT_PLOTS)).toStrictEqual(
+    expect(model.getNbItemsPerRow(PlotsSection.CHECKPOINT_PLOTS)).toStrictEqual(
       DEFAULT_NB_ITEMS_PER_ROW
     )
 
-    model.setNbItemsPerRow(Section.CHECKPOINT_PLOTS, 1)
+    model.setNbItemsPerRow(PlotsSection.CHECKPOINT_PLOTS, 1)
 
-    expect(model.getNbItemsPerRow(Section.CHECKPOINT_PLOTS)).toStrictEqual(1)
+    expect(model.getNbItemsPerRow(PlotsSection.CHECKPOINT_PLOTS)).toStrictEqual(
+      1
+    )
   })
 
   it('should update the persisted plot size when calling setPlotSize', () => {
     const mementoUpdateSpy = jest.spyOn(memento, 'update')
 
-    model.setNbItemsPerRow(Section.CHECKPOINT_PLOTS, 2)
+    model.setNbItemsPerRow(PlotsSection.CHECKPOINT_PLOTS, 2)
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
       PersistenceKey.PLOT_NB_ITEMS_PER_ROW + exampleDvcRoot,
       {
         ...DEFAULT_SECTION_NB_ITEMS_PER_ROW,
-        [Section.CHECKPOINT_PLOTS]: 2
+        [PlotsSection.CHECKPOINT_PLOTS]: 2
       }
     )
   })
@@ -97,13 +99,13 @@ describe('plotsModel', () => {
 
     expect(model.getSectionCollapsed()).toStrictEqual(DEFAULT_SECTION_COLLAPSED)
 
-    model.setSectionCollapsed({ [Section.CHECKPOINT_PLOTS]: true })
+    model.setSectionCollapsed({ [PlotsSection.CHECKPOINT_PLOTS]: true })
 
     const expectedSectionCollapsed = {
-      [Section.CHECKPOINT_PLOTS]: true,
-      [Section.TEMPLATE_PLOTS]: false,
-      [Section.CUSTOM_PLOTS]: false,
-      [Section.COMPARISON_TABLE]: false
+      [PlotsSection.CHECKPOINT_PLOTS]: true,
+      [PlotsSection.TEMPLATE_PLOTS]: false,
+      [PlotsSection.CUSTOM_PLOTS]: false,
+      [PlotsSection.COMPARISON_TABLE]: false
     }
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)

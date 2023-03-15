@@ -1,10 +1,7 @@
 import cx from 'classnames'
 import React, { MouseEvent } from 'react'
-import { Section as PlotsSection } from 'dvc/src/plots/webview/contract'
-import {
-  STUDIO_URL,
-  Section as SetupSection
-} from 'dvc/src/setup/webview/contract'
+import { PlotsSection } from 'dvc/src/plots/webview/contract'
+import { STUDIO_URL, SetupSection } from 'dvc/src/setup/webview/contract'
 import styles from './styles.module.scss'
 import { Icon } from '../Icon'
 import { ChevronDown, ChevronRight, Info } from '../icons'

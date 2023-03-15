@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import { Section } from 'dvc/src/plots/webview/contract'
+import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import React, { useEffect, useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { changeDisabledDragIds } from './templatePlotsSlice'
@@ -95,7 +95,8 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
       entries.map((plot: string) => {
         const colSpan =
           (multiView &&
-            plotDataStore[Section.TEMPLATE_PLOTS][plot].revisions?.length) ||
+            plotDataStore[PlotsSection.TEMPLATE_PLOTS][plot].revisions
+              ?.length) ||
           1
 
         return (
@@ -112,7 +113,7 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
               changeDisabledDragIds={changeDisabledDragIds}
               currentSnapPoint={nbItemsPerRow}
               shouldNotResize={multiView}
-              section={Section.TEMPLATE_PLOTS}
+              section={PlotsSection.TEMPLATE_PLOTS}
             />
           </div>
         )

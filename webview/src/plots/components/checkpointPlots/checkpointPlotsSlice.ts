@@ -5,7 +5,7 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NB_ITEMS_PER_ROW,
   PlotHeight,
-  Section
+  PlotsSection
 } from 'dvc/src/plots/webview/contract'
 import { addPlotsWithSnapshots, removePlots } from '../plotDataStore'
 
@@ -22,9 +22,10 @@ export const checkpointPlotsInitialState: CheckpointPlotsState = {
   colors: { domain: [], range: [] },
   disabledDragPlotIds: [],
   hasData: false,
-  height: DEFAULT_HEIGHT[Section.CHECKPOINT_PLOTS],
-  isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.CHECKPOINT_PLOTS],
-  nbItemsPerRow: DEFAULT_SECTION_NB_ITEMS_PER_ROW[Section.CHECKPOINT_PLOTS],
+  height: DEFAULT_HEIGHT[PlotsSection.CHECKPOINT_PLOTS],
+  isCollapsed: DEFAULT_SECTION_COLLAPSED[PlotsSection.CHECKPOINT_PLOTS],
+  nbItemsPerRow:
+    DEFAULT_SECTION_NB_ITEMS_PER_ROW[PlotsSection.CHECKPOINT_PLOTS],
   plotsIds: [],
   plotsSnapshots: {},
   selectedMetrics: []
@@ -53,8 +54,11 @@ export const checkpointPlotsSlice = createSlice({
       }
       const { plots, ...statePayload } = action.payload
       const plotsIds = plots?.map(plot => plot.id) || []
-      const snapShots = addPlotsWithSnapshots(plots, Section.CHECKPOINT_PLOTS)
-      removePlots(plotsIds, Section.CHECKPOINT_PLOTS)
+      const snapShots = addPlotsWithSnapshots(
+        plots,
+        PlotsSection.CHECKPOINT_PLOTS
+      )
+      removePlots(plotsIds, PlotsSection.CHECKPOINT_PLOTS)
       return {
         ...state,
         ...statePayload,
