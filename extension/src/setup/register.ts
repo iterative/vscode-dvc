@@ -45,7 +45,14 @@ const registerSetupShowCommands = (
   )
 
   internalCommands.registerExternalCommand(
-    RegisteredCommands.SETUP_SHOW_STUDIO,
+    RegisteredCommands.SETUP_SHOW_STUDIO_CONNECT,
+    async () => {
+      await setup.showSetup(Section.STUDIO)
+    }
+  )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.SETUP_SHOW_STUDIO_SETTINGS,
     async () => {
       await setup.showSetup(Section.STUDIO)
     }
