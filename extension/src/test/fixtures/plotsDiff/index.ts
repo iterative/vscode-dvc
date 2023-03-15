@@ -365,95 +365,111 @@ const multipleVega = (length: number) => {
   return plots
 }
 
-const getImageData = (baseUrl: string, joinFunc = join) => ({
+const getImageData = (baseUrl: string, basePath: string, joinFunc = join) => ({
   [join('plots', 'acc.png')]: [
     {
       type: PlotsType.IMAGE,
       revisions: [EXPERIMENT_WORKSPACE_ID],
-      url: joinFunc(baseUrl, 'workspace_plots_acc.png')
+      url: joinFunc(baseUrl, 'workspace_plots_acc.png'),
+      resourceUrl: joinFunc(basePath, 'workspace_plots_acc.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['53c3851'],
-      url: joinFunc(baseUrl, '53c3851_plots_acc.png')
+      url: joinFunc(baseUrl, '53c3851_plots_acc.png'),
+      resourceUrl: joinFunc(basePath, '53c3851_plots_acc.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['4fb124a'],
-      url: joinFunc(baseUrl, '4fb124a_plots_acc.png')
+      url: joinFunc(baseUrl, '4fb124a_plots_acc.png'),
+      resourceUrl: joinFunc(basePath, '4fb124a_plots_acc.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['42b8736'],
-      url: joinFunc(baseUrl, '42b8736_plots_acc.png')
+      url: joinFunc(baseUrl, '42b8736_plots_acc.png'),
+      resourceUrl: joinFunc(basePath, '42b8736_plots_acc.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['1ba7bcd'],
-      url: joinFunc(baseUrl, '1ba7bcd_plots_acc.png')
+      url: joinFunc(baseUrl, '1ba7bcd_plots_acc.png'),
+      resourceUrl: joinFunc(basePath, '1ba7bcd_plots_acc.png')
     }
   ],
   [join('plots', 'heatmap.png')]: [
     {
       type: PlotsType.IMAGE,
       revisions: [EXPERIMENT_WORKSPACE_ID],
-      url: joinFunc(baseUrl, 'workspace_plots_heatmap.png')
+      url: joinFunc(baseUrl, 'workspace_plots_heatmap.png'),
+      resourceUrl: joinFunc(basePath, 'workspace_plots_heatmap.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['53c3851'],
-      url: joinFunc(baseUrl, '53c3851_plots_heatmap.png')
+      url: joinFunc(baseUrl, '53c3851_plots_heatmap.png'),
+      resourceUrl: joinFunc(basePath, '53c3851_plots_heatmap.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['4fb124a'],
-      url: joinFunc(baseUrl, '4fb124a_plots_heatmap.png')
+      url: joinFunc(baseUrl, '4fb124a_plots_heatmap.png'),
+      resourceUrl: joinFunc(basePath, '4fb124a_plots_heatmap.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['42b8736'],
-      url: joinFunc(baseUrl, '42b8736_plots_heatmap.png')
+      url: joinFunc(baseUrl, '42b8736_plots_heatmap.png'),
+      resourceUrl: joinFunc(basePath, '42b8736_plots_heatmap.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['1ba7bcd'],
-      url: joinFunc(baseUrl, '1ba7bcd_plots_heatmap.png')
+      url: joinFunc(baseUrl, '1ba7bcd_plots_heatmap.png'),
+      resourceUrl: joinFunc(basePath, '1ba7bcd_plots_heatmap.png')
     }
   ],
   [join('plots', 'loss.png')]: [
     {
       type: PlotsType.IMAGE,
       revisions: [EXPERIMENT_WORKSPACE_ID],
-      url: joinFunc(baseUrl, 'workspace_plots_loss.png')
+      url: joinFunc(baseUrl, 'workspace_plots_loss.png'),
+      resourceUrl: joinFunc(basePath, 'workspace_plots_loss.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['53c3851'],
-      url: joinFunc(baseUrl, '53c3851_plots_loss.png')
+      url: joinFunc(baseUrl, '53c3851_plots_loss.png'),
+      resourceUrl: joinFunc(basePath, '53c3851_plots_loss.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['4fb124a'],
-      url: joinFunc(baseUrl, '4fb124a_plots_loss.png')
+      url: joinFunc(baseUrl, '4fb124a_plots_loss.png'),
+      resourceUrl: joinFunc(basePath, '4fb124a_plots_loss.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['42b8736'],
-      url: joinFunc(baseUrl, '42b8736_plots_loss.png')
+      url: joinFunc(baseUrl, '42b8736_plots_loss.png'),
+      resourceUrl: joinFunc(basePath, '42b8736_plots_loss.png')
     },
     {
       type: PlotsType.IMAGE,
       revisions: ['1ba7bcd'],
-      url: joinFunc(baseUrl, '1ba7bcd_plots_loss.png')
+      url: joinFunc(baseUrl, '1ba7bcd_plots_loss.png'),
+      resourceUrl: joinFunc(basePath, '1ba7bcd_plots_loss.png')
     }
   ]
 })
 
 export const getOutput = (
   baseUrl: string,
+  basePath: string,
   joinFunc?: (...args: string[]) => string
 ): PlotsOutput => ({
-  ...getImageData(baseUrl, joinFunc),
+  ...getImageData(baseUrl, basePath, joinFunc),
   ...basicVega,
   ...require('./vega').default
 })
@@ -686,17 +702,25 @@ export const MOCK_IMAGE_MTIME = 946684800000
 
 export const getComparisonWebviewMessage = (
   baseUrl: string,
+  basePath: string,
   joinFunc?: (...args: string[]) => string
 ): PlotsComparisonData => {
   const plotAcc = [] as ComparisonPlots
-  for (const [path, plots] of Object.entries(getImageData(baseUrl, joinFunc))) {
+
+  for (const [path, plots] of Object.entries(
+    getImageData(baseUrl, basePath, joinFunc)
+  )) {
     const revisionsAcc: ComparisonRevisionData = {}
-    for (const { url, revisions } of plots) {
+    for (const { url, resourceUrl, revisions } of plots) {
       const revision = replaceCommitCLIId(revisions?.[0])
       if (!revision) {
         continue
       }
-      revisionsAcc[revision] = { url: `${url}?${MOCK_IMAGE_MTIME}`, revision }
+      revisionsAcc[revision] = {
+        url: `${url}?${MOCK_IMAGE_MTIME}`,
+        resourceUrl,
+        revision
+      }
     }
 
     plotAcc.push({ path, revisions: revisionsAcc })

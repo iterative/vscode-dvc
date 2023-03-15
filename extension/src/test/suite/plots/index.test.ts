@@ -4,6 +4,7 @@ import cloneDeep from 'lodash.clonedeep'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore, spy, stub } from 'sinon'
+import { commands, Uri } from 'vscode'
 import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import expShowFixtureWithoutErrors from '../../fixtures/expShow/base/noErrors'
@@ -528,6 +529,27 @@ suite('Plots Test Suite', () => {
         EventName.VIEWS_PLOTS_ZOOM_PLOT,
         undefined,
         undefined
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should open an image when receiving a plot zoomed message from the webview with a payload', async () => {
+      const { plots } = await buildPlots(disposable, plotsDiffFixture)
+
+      const webview = await plots.showWebview()
+      const imagePath = 'some/path/image.jpg'
+
+      stub(Telemetry, 'sendTelemetryEvent')
+      const mockExecuteCommands = stub(commands, 'executeCommand')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        payload: imagePath,
+        type: MessageFromWebviewType.ZOOM_PLOT
+      })
+
+      expect(mockExecuteCommands).to.be.calledWith(
+        'vscode.open',
+        Uri.file(imagePath)
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 

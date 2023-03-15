@@ -1,5 +1,5 @@
 import { getComparisonWebviewMessage } from '..'
 
-const data = getComparisonWebviewMessage('.')
+const data = getComparisonWebviewMessage('.', '.')
 
 export default data

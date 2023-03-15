@@ -1,7 +1,7 @@
 import { getComparisonWebviewMessage } from '..'
 import { Uri, ViewColumn, window } from 'vscode'
 import { ViewKey } from '../../../../webview/constants'
-import { basePlotsUrl } from '../../../util'
+import { basePlotsPath, basePlotsUrl } from '../../../util'
 
 const webviewPanel = window.createWebviewPanel(
   ViewKey.PLOTS,
@@ -20,6 +20,6 @@ webviewPanel.dispose()
 
 const uriJoin = (...segments: string[]) => segments.join('/')
 
-const data = getComparisonWebviewMessage(baseUrl, uriJoin)
+const data = getComparisonWebviewMessage(baseUrl, basePlotsPath, uriJoin)
 
 export default data
