@@ -20,11 +20,9 @@ import {
   TemplatePlotSection,
   PlotsType,
   Revision,
-  CustomPlotType,
   CustomPlot,
-  MetricVsParamPlot,
   CustomPlotData,
-  CheckpointPlot
+  MetricVsParamPlotValues
 } from '../webview/contract'
 import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../cli/dvc/contract'
 import {
@@ -65,77 +63,54 @@ export const getCustomPlotId = (metric: string, param = CHECKPOINTS_PARAM) =>
 const getExperimentValues = (
   values: CheckpointPlotValues,
   exp: ExperimentWithDefinedCheckpoints,
-  metric: string
+  splitUpMetricPath: string[]
 ) => {
-  const splitMetric = splitColumnPath(
-    getFullValuePath(ColumnType.METRICS, metric, FILE_SEPARATOR)
-  )
   const group = exp.name || exp.label
   const expEpochLength = exp.checkpoints.length + 1
 
-  const y = get(exp, splitMetric) as number | undefined
+  const y = get(exp, splitUpMetricPath) as number | undefined
   if (y !== undefined) {
     values.push({ group, iteration: expEpochLength, y })
   }
 
   for (const [ind, checkpoint] of exp.checkpoints.entries()) {
-    const y = get(checkpoint, splitMetric) as number | undefined
+    const y = get(checkpoint, splitUpMetricPath) as number | undefined
     if (y !== undefined) {
       values.push({ group, iteration: expEpochLength - ind - 1, y })
     }
   }
 }
-// I belive we can further combine these
-// leaving the only separate thing being the
-// creation of the values
-const collectCheckpointPlot = (
-  metric: string,
-  experiments: ExperimentWithCheckpoints[]
-): CheckpointPlot => {
+
+const collectCheckpointValues = (
+  experiments: ExperimentWithCheckpoints[],
+  splitUpMetricPath: string[]
+): CheckpointPlotValues => {
   const fullValues: CheckpointPlotValues = []
   for (const experiment of experiments) {
     if (experiment.checkpoints) {
       getExperimentValues(
         fullValues,
         experiment as ExperimentWithDefinedCheckpoints,
-        metric
+        splitUpMetricPath
       )
     }
   }
-  return {
-    id: getCustomPlotId(metric),
-    metric,
-    param: CHECKPOINTS_PARAM,
-    type: CustomPlotType.CHECKPOINT,
-    values: fullValues
-  }
+  return fullValues
 }
 
-const collectMetricVsParamPlot = (
-  metric: string,
-  param: string,
-  experiments: Experiment[]
-): MetricVsParamPlot => {
-  const splitUpMetricPath = splitColumnPath(
-    getFullValuePath(ColumnType.METRICS, metric, FILE_SEPARATOR)
-  )
-  const splitUpParamPath = splitColumnPath(
-    getFullValuePath(ColumnType.PARAMS, param, FILE_SEPARATOR)
-  )
-  const plotData: MetricVsParamPlot = {
-    id: getCustomPlotId(metric, param),
-    metric,
-    param,
-    type: CustomPlotType.METRIC_VS_PARAM,
-    values: []
-  }
+const collectMetricVsParamValues = (
+  experiments: ExperimentWithCheckpoints[],
+  splitUpMetricPath: string[],
+  splitUpParamPath: string[]
+): MetricVsParamPlotValues => {
+  const fullValues: MetricVsParamPlotValues = []
 
   for (const experiment of experiments) {
     const metricValue = get(experiment, splitUpMetricPath) as number | undefined
     const paramValue = get(experiment, splitUpParamPath) as number | undefined
 
     if (metricValue !== undefined && paramValue !== undefined) {
-      plotData.values.push({
+      fullValues.push({
         expName: experiment.name || experiment.label,
         metric: metricValue,
         param: paramValue
@@ -143,24 +118,47 @@ const collectMetricVsParamPlot = (
     }
   }
 
-  return plotData
+  return fullValues
+}
+
+const collectCustomPlot = (
+  orderValue: CustomPlotsOrderValue,
+  experiments: ExperimentWithCheckpoints[]
+): CustomPlot => {
+  const { metric, param, type } = orderValue
+  const splitUpMetricPath = splitColumnPath(
+    getFullValuePath(ColumnType.METRICS, metric, FILE_SEPARATOR)
+  )
+  const splitUpParamPath = splitColumnPath(
+    getFullValuePath(ColumnType.PARAMS, param, FILE_SEPARATOR)
+  )
+  // were looping over the experiments each time with each plot
+  // I wonder if we could loop over them once and update an object of custom plots
+  // all at once vs creating each plot one at a time
+  const values = isCheckpointValue(type)
+    ? collectCheckpointValues(experiments, splitUpMetricPath)
+    : collectMetricVsParamValues(
+        experiments,
+        splitUpMetricPath,
+        splitUpParamPath
+      )
+
+  return {
+    id: getCustomPlotId(metric, param),
+    metric,
+    param,
+    type,
+    values
+  } as CustomPlot
 }
 
 export const collectCustomPlots = (
   plotsOrderValues: CustomPlotsOrderValue[],
-  experiments: Experiment[]
+  experiments: ExperimentWithCheckpoints[]
 ): CustomPlot[] => {
-  return plotsOrderValues
-    .map((plotOrderValue): CustomPlot => {
-      if (isCheckpointValue(plotOrderValue.type)) {
-        const { metric } = plotOrderValue
-
-        return collectCheckpointPlot(metric, experiments)
-      }
-      const { metric, param } = plotOrderValue
-      return collectMetricVsParamPlot(metric, param, experiments)
-    })
-    .filter(Boolean)
+  return plotsOrderValues.map(plotOrderValue =>
+    collectCustomPlot(plotOrderValue, experiments)
+  )
 }
 
 export const collectCustomPlotData = (

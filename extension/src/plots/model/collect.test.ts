@@ -30,7 +30,8 @@ import { Experiment } from '../../experiments/webview/contract'
 const logsLossPath = join('logs', 'loss.tsv')
 
 const logsLossPlot = (plotsDiffFixture[logsLossPath][0] || {}) as TemplatePlot
-// missing tests here (collect function are still a WIP)
+// missing function tests here collection function are still a WIP)
+
 const getCustomPlotFromCustomPlotData = ({
   id,
   metric,
