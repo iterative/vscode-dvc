@@ -4,12 +4,12 @@ import { Color } from '../../experiments/model/status/colors'
 export const DEFAULT_NB_ITEMS_PER_ROW = 2
 
 export enum PlotHeight {
-  SMALLER = 0,
-  SMALL = 1,
-  REGULAR = 2,
-  SQUARE = 3,
-  VERTICAL_NORMAL = 4,
-  VERTICAL_LARGER = 5
+  SMALLER,
+  SMALL,
+  REGULAR,
+  SQUARE,
+  VERTICAL_NORMAL,
+  VERTICAL_LARGER
 }
 
 export const DEFAULT_PLOT_HEIGHT = PlotHeight.SMALL
