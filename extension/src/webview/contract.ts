@@ -20,6 +20,7 @@ export enum MessageFromWebviewType {
   CREATE_BRANCH_FROM_EXPERIMENT = 'create-branch-from-experiment',
   FOCUS_FILTERS_TREE = 'focus-filters-tree',
   FOCUS_SORTS_TREE = 'focus-sorts-tree',
+  OPEN_EXPERIMENTS_WEBVIEW = 'open-experiments-webview',
   OPEN_PARAMS_FILE_TO_THE_SIDE = 'open-params-file-to-the-side',
   OPEN_PLOTS_WEBVIEW = 'open-plots-webview',
   OPEN_STUDIO = 'open-studio',
@@ -238,6 +239,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.SAVE_STUDIO_TOKEN }
   | { type: MessageFromWebviewType.ADD_CONFIGURATION }
   | { type: MessageFromWebviewType.ZOOM_PLOT }
+  | { type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA

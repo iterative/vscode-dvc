@@ -791,6 +791,22 @@ suite('Setup Test Suite', () => {
       expect(mockDelete).to.be.calledWithExactly(STUDIO_ACCESS_TOKEN_KEY)
     })
 
+    it('should handle a message to open the experiments webview', async () => {
+      const { messageSpy, setup, mockOpenExperiments } = buildSetup(disposable)
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW
+      })
+
+      expect(mockOpenExperiments).to.be.calledOnce
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should send the appropriate messages to the webview to focus different sections', async () => {
       const { setup, messageSpy } = buildSetup(disposable)
       messageSpy.restore()
