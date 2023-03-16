@@ -722,6 +722,59 @@ describe('App', () => {
     expect(screen.queryByTestId('size-sliders')).not.toBeInTheDocument()
   })
 
+  it('should display both size sliders for checkpoint plots', () => {
+    const store = renderAppWithOptionalData({
+      checkpoint: checkpointPlotsFixture
+    })
+    setWrapperSize(store)
+
+    const plotResizers = within(
+      screen.getByTestId('size-sliders')
+    ).getAllByRole('slider')
+
+    expect(plotResizers.length).toBe(2)
+  })
+
+  it('should display both size sliders for template plots', () => {
+    const store = renderAppWithOptionalData({
+      template: templatePlotsFixture
+    })
+    setWrapperSize(store)
+
+    const plotResizers = within(
+      screen.getByTestId('size-sliders')
+    ).getAllByRole('slider')
+
+    expect(plotResizers.length).toBe(2)
+  })
+
+  it('should display both size sliders for custom plots', () => {
+    const store = renderAppWithOptionalData({
+      custom: customPlotsFixture,
+      template: templatePlotsFixture
+    })
+    setWrapperSize(store)
+
+    const plotResizers = within(
+      screen.getAllByTestId('size-sliders')[1]
+    ).getAllByRole('slider')
+
+    expect(plotResizers.length).toBe(2)
+  })
+
+  it('should not display the height slider for the comparison table', () => {
+    const store = renderAppWithOptionalData({
+      comparison: comparisonTableFixture
+    })
+    setWrapperSize(store)
+
+    const plotResizers = within(
+      screen.getByTestId('size-sliders')
+    ).getAllByRole('slider')
+
+    expect(plotResizers.length).toBe(1)
+  })
+
   it('should send a message to the extension with the selected size when changing the width of plots', () => {
     const store = renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
