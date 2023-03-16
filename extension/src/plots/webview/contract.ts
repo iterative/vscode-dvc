@@ -14,6 +14,8 @@ export enum PlotHeight {
 
 export const DEFAULT_PLOT_HEIGHT = PlotHeight.SMALL
 
+export const DEFAULT_PLOT_WIDTH = 2
+
 export enum PlotsSection {
   CHECKPOINT_PLOTS = 'checkpoint-plots',
   TEMPLATE_PLOTS = 'template-plots',
@@ -21,10 +23,10 @@ export enum PlotsSection {
   CUSTOM_PLOTS = 'custom-plots'
 }
 
-export const DEFAULT_SECTION_NB_ITEMS_PER_ROW = {
+export const DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH = {
   [PlotsSection.CHECKPOINT_PLOTS]: DEFAULT_NB_ITEMS_PER_ROW,
   [PlotsSection.TEMPLATE_PLOTS]: DEFAULT_NB_ITEMS_PER_ROW,
-  [PlotsSection.COMPARISON_TABLE]: DEFAULT_NB_ITEMS_PER_ROW,
+  [PlotsSection.COMPARISON_TABLE]: DEFAULT_PLOT_WIDTH,
   [PlotsSection.CUSTOM_PLOTS]: DEFAULT_NB_ITEMS_PER_ROW
 }
 
@@ -69,7 +71,7 @@ export type Revision = {
 
 export interface PlotsComparisonData {
   plots: ComparisonPlots
-  nbItemsPerRow: number
+  width: number
   height: PlotHeight
   revisions: Revision[]
 }

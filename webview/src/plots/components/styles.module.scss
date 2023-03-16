@@ -161,7 +161,7 @@ $gap: 20px;
 
 .comparisonTable {
   table-layout: fixed;
-  width: calc(400px * var(--scale));
+  width: calc((10 - var(--variant)) * 50px * var(--scale));
   position: relative;
   padding: 0 20px;
   padding-right: $gap;

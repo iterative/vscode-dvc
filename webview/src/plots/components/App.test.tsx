@@ -28,8 +28,8 @@ import {
   PlotsSection,
   TemplatePlotGroup,
   TemplatePlotsData,
-  DEFAULT_NB_ITEMS_PER_ROW,
-  DEFAULT_PLOT_HEIGHT
+  DEFAULT_PLOT_HEIGHT,
+  DEFAULT_NB_ITEMS_PER_ROW
 } from 'dvc/src/plots/webview/contract'
 import {
   MessageFromWebviewType,
@@ -264,7 +264,6 @@ describe('App', () => {
       checkpoint: null,
       comparison: {
         height: DEFAULT_PLOT_HEIGHT,
-        nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
         plots: [
           {
             path: 'training/plots/images/misclassified.jpg',
@@ -280,7 +279,8 @@ describe('App', () => {
             id: 'ad2b5ec854a447d00d9dfa9cdf88211a39a17813',
             revision: 'ad2b5ec'
           }
-        ]
+        ],
+        width: DEFAULT_NB_ITEMS_PER_ROW
       },
       hasPlots: true,
       hasUnselectedPlots: false,
@@ -708,15 +708,6 @@ describe('App', () => {
 
   it('should not display a slider to pick the number of items per row if there are no items', () => {
     const store = renderAppWithOptionalData({})
-    setWrapperSize(store)
-
-    expect(screen.queryByTestId('size-sliders')).not.toBeInTheDocument()
-  })
-
-  it('should not display a slider to pick the number of items per row if the action is unavailable', () => {
-    const store = renderAppWithOptionalData({
-      comparison: comparisonTableFixture
-    })
     setWrapperSize(store)
 
     expect(screen.queryByTestId('size-sliders')).not.toBeInTheDocument()

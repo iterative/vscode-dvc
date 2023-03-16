@@ -30,7 +30,7 @@ export const CustomPlotsWrapper: React.FC = () => {
     <PlotsContainer
       title="Custom"
       sectionKey={PlotsSection.CUSTOM_PLOTS}
-      nbItemsPerRow={nbItemsPerRow}
+      nbItemsPerRowOrWidth={nbItemsPerRow}
       sectionCollapsed={isCollapsed}
       addPlotsButton={{ onClick: addCustomPlot }}
       removePlotsButton={hasItems ? { onClick: removeCustomPlots } : undefined}
