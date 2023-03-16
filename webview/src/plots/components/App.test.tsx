@@ -1446,7 +1446,7 @@ describe('App', () => {
     fireEvent.click(plot)
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: comparisonTableFixture.plots[0].revisions.workspace.resourceUrl,
+      payload: comparisonTableFixture.plots[0].revisions.workspace.url,
       type: MessageFromWebviewType.ZOOM_PLOT
     })
   })

@@ -273,7 +273,6 @@ describe('ComparisonTable', () => {
         revisions: {
           ...revisions,
           [revisionWithNoData]: {
-            resourceUrl: '',
             revision: revisionWithNoData,
             url: undefined
           }

@@ -113,11 +113,12 @@ export class WebviewMessages {
         return this.setExperimentStatus(message.payload)
       case MessageFromWebviewType.ZOOM_PLOT:
         if (message.payload) {
-          void openImageFileInEditor(message.payload)
+          const imagePath = this.revertCorrectUrl(message.payload)
+          void openImageFileInEditor(imagePath)
         }
         return sendTelemetryEvent(
           EventName.VIEWS_PLOTS_ZOOM_PLOT,
-          undefined,
+          { isImage: !!message.payload },
           undefined
         )
       default:
@@ -414,12 +415,20 @@ export class WebviewMessages {
     if (webview) {
       return {
         ...plot,
-        resourceUrl: plot.url,
         url: plot.url
           ? `${webview.getWebviewUri(plot.url)}?${getModifiedTime(plot.url)}`
           : undefined
       }
     }
+  }
+
+  private revertCorrectUrl(url: string) {
+    const webview = this.getWebview()
+    if (webview) {
+      const toRemove = webview.getWebviewUri('')
+      return url.replace(toRemove, '').split('?')[0]
+    }
+    return url
   }
 
   private getCheckpointPlots() {
