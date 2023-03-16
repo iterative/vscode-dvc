@@ -4860,14 +4860,14 @@
     "@microsoft/fast-foundation" "^2.38.0"
     "@microsoft/fast-react-wrapper" "^0.1.18"
 
-"@wdio/cli@8.5.7":
-  version "8.5.7"
-  resolved "https://registry.yarnpkg.com/@wdio/cli/-/cli-8.5.7.tgz#192fabfdb32a911c4a61a173d7d7583dc02bef8f"
-  integrity sha512-i/NV96f8ihyoaERmsmsJE07m7GgasfqTdqYb19o9Spa6O+oAchLb2zUDDNgVIbNkgEPLtpHKLymeAZ/mlTsddg==
+"@wdio/cli@8.5.8":
+  version "8.5.8"
+  resolved "https://registry.yarnpkg.com/@wdio/cli/-/cli-8.5.8.tgz#cca8aa0fc81d4bd8dd39d3acb1423ff9bd7e2ce8"
+  integrity sha512-I7B6f+ZcXzftXT3QLkMTKZdqmiZ3CEkmduNFgErchJdXzbQ7/1CU2GyskiNlPW9vBo/fSHUnFca8th5FRgDVFw==
   dependencies:
     "@types/node" "^18.0.0"
     "@wdio/config" "8.5.6"
-    "@wdio/globals" "8.5.7"
+    "@wdio/globals" "8.5.8"
     "@wdio/logger" "8.1.0"
     "@wdio/protocols" "8.5.7"
     "@wdio/types" "8.4.0"
@@ -4886,7 +4886,7 @@
     mkdirp "^2.0.0"
     read-pkg-up "9.1.0"
     recursive-readdir "^2.2.2"
-    webdriverio "8.5.7"
+    webdriverio "8.5.8"
     yargs "^17.5.1"
     yarn-install "^1.0.0"
 
@@ -4926,23 +4926,23 @@
     expect-webdriverio "^4.0.1"
     webdriverio "8.0.13"
 
-"@wdio/globals@8.5.7":
-  version "8.5.7"
-  resolved "https://registry.yarnpkg.com/@wdio/globals/-/globals-8.5.7.tgz#7139852e91a2cd38381f0bfa14d21eb1ed23540a"
-  integrity sha512-N2H8AW5jN17SzgR+9qvxScHX7Mc1BoLXTsbnOghTzTibgn7jEcuyLVOFU5INZYQ3YHO26BYVjvPV7ZXzeaDjHQ==
+"@wdio/globals@8.5.8":
+  version "8.5.8"
+  resolved "https://registry.yarnpkg.com/@wdio/globals/-/globals-8.5.8.tgz#7d1049202704099e4a02ccbaefc59e77884ecec3"
+  integrity sha512-a1DzJprcWOtAHCEEZ6tTFR/S7hplbKejZi97BCOjqhhKt6M8ThGUOjTsuYE9FvnaQATlakszTjD09KF26BSRFQ==
   optionalDependencies:
     expect-webdriverio "^4.0.1"
-    webdriverio "8.5.7"
+    webdriverio "8.5.8"
 
-"@wdio/local-runner@8.5.7":
-  version "8.5.7"
-  resolved "https://registry.yarnpkg.com/@wdio/local-runner/-/local-runner-8.5.7.tgz#f962d824b0fb5c87bf32e1fadc1ad257f7ddeb87"
-  integrity sha512-dM4fwvUhwDGEyle+ImrGf/WT2FnBbyjC6eBIBthOgoo8taiVYlc1V3RaaJrPk5BuVYGguNY6ftrLJxoBI97rTg==
+"@wdio/local-runner@8.5.8":
+  version "8.5.8"
+  resolved "https://registry.yarnpkg.com/@wdio/local-runner/-/local-runner-8.5.8.tgz#9f221f7e3c9c57bd92a17e3aafdec2f0c3a31792"
+  integrity sha512-SqSwwwlM1/VPg4J74hSj0aMb52RQj+JPlyDeDiexnXRnXopKabXlckFHzMF6xJ19GqfnJaR/S9223mdYzN3CYg==
   dependencies:
     "@types/node" "^18.0.0"
     "@wdio/logger" "8.1.0"
     "@wdio/repl" "8.1.0"
-    "@wdio/runner" "8.5.7"
+    "@wdio/runner" "8.5.8"
     "@wdio/types" "8.4.0"
     async-exit-hook "^2.0.1"
     split2 "^4.1.0"
@@ -5014,14 +5014,14 @@
     object-inspect "^1.12.0"
     supports-color "9.3.1"
 
-"@wdio/runner@8.5.7":
-  version "8.5.7"
-  resolved "https://registry.yarnpkg.com/@wdio/runner/-/runner-8.5.7.tgz#08b57ecc40e36310698c9c43c055f0ee8c531ac2"
-  integrity sha512-n49cLKoI9kxhrxzb2fZEe5+apJRXA7q0ezoz9nIBSoPcx4YBLu3LKzP4DnT5+3aScD9OZO82V2nJIEu/ohpgZg==
+"@wdio/runner@8.5.8":
+  version "8.5.8"
+  resolved "https://registry.yarnpkg.com/@wdio/runner/-/runner-8.5.8.tgz#837708c8cf6aa13e1197f97841549191dca95db0"
+  integrity sha512-THg6u5edC5jzygQ5tT4ayKnVfduhxyNzcEvSBkVf9DgiCRAyur07ow3dBkTzmWNGta2JbPfx1Fu2j2yMzalcfw==
   dependencies:
     "@types/node" "^18.0.0"
     "@wdio/config" "8.5.6"
-    "@wdio/globals" "8.5.7"
+    "@wdio/globals" "8.5.8"
     "@wdio/logger" "8.1.0"
     "@wdio/types" "8.4.0"
     "@wdio/utils" "8.5.6"
@@ -5029,7 +5029,7 @@
     expect-webdriverio "^4.0.1"
     gaze "^1.1.2"
     webdriver "8.5.7"
-    webdriverio "8.5.7"
+    webdriverio "8.5.8"
 
 "@wdio/spec-reporter@8.4.0":
   version "8.4.0"
@@ -19348,10 +19348,10 @@ webdriverio@8.0.13, webdriverio@^8.0.0-alpha.505:
     serialize-error "^8.0.0"
     webdriver "8.0.13"
 
-webdriverio@8.5.7:
-  version "8.5.7"
-  resolved "https://registry.yarnpkg.com/webdriverio/-/webdriverio-8.5.7.tgz#8c0d41dab611b146e16efc44219d3c6d83acd9b4"
-  integrity sha512-gFXozyOCPhxkzNiBnvHbJHJVA8fozCqR/TlsOgbwEyc7ww12ZxhoXT8fqdObVd/MYdm0BKdCIUU3AW06hqakRw==
+webdriverio@8.5.8:
+  version "8.5.8"
+  resolved "https://registry.yarnpkg.com/webdriverio/-/webdriverio-8.5.8.tgz#40bad020857ec6f694f2affb3daa6e77a1c719cf"
+  integrity sha512-ViysVL2FhbMSLYhYV6WoikrfzLRzJpoE+bYW2Dj4FITELL4vlPFUAsN+7kiAVWhRXYjpG57IGO6K5xVemT/kbQ==
   dependencies:
     "@types/node" "^18.0.0"
     "@wdio/config" "8.5.6"
