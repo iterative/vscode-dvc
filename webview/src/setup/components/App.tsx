@@ -1,6 +1,6 @@
 import {
   DEFAULT_SECTION_COLLAPSED,
-  Section,
+  SetupSection,
   SetupData
 } from 'dvc/src/setup/webview/contract'
 import {
@@ -84,8 +84,8 @@ export const App: React.FC = () => {
   return (
     <>
       <SetupContainer
-        sectionKey={Section.EXPERIMENTS}
-        title={'Experiments'}
+        sectionKey={SetupSection.EXPERIMENTS}
+        title="Experiments"
         sectionCollapsed={sectionCollapsed}
         setSectionCollapsed={setSectionCollapsed}
       >
@@ -101,8 +101,8 @@ export const App: React.FC = () => {
         />
       </SetupContainer>
       <SetupContainer
-        sectionKey={Section.STUDIO}
-        title={'Studio'}
+        sectionKey={SetupSection.STUDIO}
+        title="Studio"
         sectionCollapsed={sectionCollapsed}
         setSectionCollapsed={setSectionCollapsed}
       >

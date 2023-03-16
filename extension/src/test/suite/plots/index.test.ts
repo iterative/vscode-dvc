@@ -27,7 +27,7 @@ import {
   DEFAULT_PLOT_HEIGHT,
   DEFAULT_SECTION_COLLAPSED,
   PlotsData as TPlotsData,
-  Section,
+  PlotsSection,
   TemplatePlotGroup,
   TemplatePlotsData
 } from '../../../plots/webview/contract'
@@ -250,20 +250,23 @@ suite('Plots Test Suite', () => {
         payload: {
           height: DEFAULT_PLOT_HEIGHT,
           nbItemsPerRow: 3,
-          section: Section.TEMPLATE_PLOTS
+          section: PlotsSection.TEMPLATE_PLOTS
         },
         type: MessageFromWebviewType.RESIZE_PLOTS
       })
 
       expect(mockSetPlotSize).to.be.calledOnce
-      expect(mockSetPlotSize).to.be.calledWithExactly(Section.TEMPLATE_PLOTS, 3)
+      expect(mockSetPlotSize).to.be.calledWithExactly(
+        PlotsSection.TEMPLATE_PLOTS,
+        3
+      )
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_PLOTS_SECTION_RESIZED,
         {
           height: DEFAULT_PLOT_HEIGHT,
           nbItemsPerRow: 3,
-          section: Section.TEMPLATE_PLOTS
+          section: PlotsSection.TEMPLATE_PLOTS
         },
         undefined
       )
@@ -278,7 +281,7 @@ suite('Plots Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockSetSectionCollapsed = spy(plotsModel, 'setSectionCollapsed')
-      const mockSectionCollapsed = { [Section.CHECKPOINT_PLOTS]: true }
+      const mockSectionCollapsed = { [PlotsSection.CHECKPOINT_PLOTS]: true }
 
       messageSpy.resetHistory()
       mockMessageReceived.fire({

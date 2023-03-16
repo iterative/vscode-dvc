@@ -150,6 +150,10 @@ module.exports = {
     'no-void': ['error', { allowAsStatement: true }],
     'no-warning-comments': 'error',
     quotes: ['error', 'single', { avoidEscape: true }],
+    'react/jsx-curly-brace-presence': [
+      'error',
+      { props: 'never', children: 'never' }
+    ],
     'react-hooks/exhaustive-deps': 'error',
     'react-hooks/rules-of-hooks': 'error',
     // This project doesn't use prop types

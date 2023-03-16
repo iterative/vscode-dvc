@@ -1,4 +1,4 @@
-import { ColorScale, Section } from 'dvc/src/plots/webview/contract'
+import { ColorScale, PlotsSection } from 'dvc/src/plots/webview/contract'
 import React, { useMemo, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { createSpec } from './util'
@@ -21,7 +21,9 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
   const plotSnapshot = useSelector(
     (state: PlotsState) => state.checkpoint.plotsSnapshots[id]
   )
-  const [plot, setPlot] = useState(plotDataStore[Section.CHECKPOINT_PLOTS][id])
+  const [plot, setPlot] = useState(
+    plotDataStore[PlotsSection.CHECKPOINT_PLOTS][id]
+  )
   const nbItemsPerRow = useSelector(
     (state: PlotsState) => state.checkpoint.nbItemsPerRow
   )
@@ -35,7 +37,7 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
   }, [plot?.title, colors])
 
   useEffect(() => {
-    setPlot(plotDataStore[Section.CHECKPOINT_PLOTS][id])
+    setPlot(plotDataStore[PlotsSection.CHECKPOINT_PLOTS][id])
   }, [plotSnapshot, id])
 
   if (!plot) {
@@ -51,7 +53,7 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
         id={id}
         changeDisabledDragIds={changeDisabledDragIds}
         currentSnapPoint={nbItemsPerRow}
-        section={Section.CHECKPOINT_PLOTS}
+        section={PlotsSection.CHECKPOINT_PLOTS}
       />
     </div>
   )

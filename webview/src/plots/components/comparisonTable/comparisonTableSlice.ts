@@ -4,7 +4,7 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NB_ITEMS_PER_ROW,
   PlotsComparisonData,
-  Section
+  PlotsSection
 } from 'dvc/src/plots/webview/contract'
 
 export interface ComparisonTableState extends PlotsComparisonData {
@@ -17,9 +17,10 @@ export const DEFAULT_ROW_HEIGHT = 200
 
 export const comparisonTableInitialState: ComparisonTableState = {
   hasData: false,
-  height: DEFAULT_HEIGHT[Section.COMPARISON_TABLE],
-  isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.COMPARISON_TABLE],
-  nbItemsPerRow: DEFAULT_SECTION_NB_ITEMS_PER_ROW[Section.COMPARISON_TABLE],
+  height: DEFAULT_HEIGHT[PlotsSection.COMPARISON_TABLE],
+  isCollapsed: DEFAULT_SECTION_COLLAPSED[PlotsSection.COMPARISON_TABLE],
+  nbItemsPerRow:
+    DEFAULT_SECTION_NB_ITEMS_PER_ROW[PlotsSection.COMPARISON_TABLE],
   plots: [],
   revisions: [],
   rowHeight: DEFAULT_ROW_HEIGHT

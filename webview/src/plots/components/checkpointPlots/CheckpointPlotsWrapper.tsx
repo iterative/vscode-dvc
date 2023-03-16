@@ -1,4 +1,4 @@
-import { Section } from 'dvc/src/plots/webview/contract'
+import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -46,7 +46,7 @@ export const CheckpointPlotsWrapper: React.FC = () => {
   return (
     <PlotsContainer
       title="Trends"
-      sectionKey={Section.CHECKPOINT_PLOTS}
+      sectionKey={PlotsSection.CHECKPOINT_PLOTS}
       menu={menu}
       nbItemsPerRow={nbItemsPerRow}
       sectionCollapsed={isCollapsed}

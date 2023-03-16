@@ -1,4 +1,4 @@
-import { Section } from 'dvc/src/plots/webview/contract'
+import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { ComparisonTable } from './ComparisonTable'
@@ -13,7 +13,7 @@ export const ComparisonTableWrapper: React.FC = () => {
   return (
     <PlotsContainer
       title="Images"
-      sectionKey={Section.COMPARISON_TABLE}
+      sectionKey={PlotsSection.COMPARISON_TABLE}
       nbItemsPerRow={nbItemsPerRow}
       sectionCollapsed={isCollapsed}
       height={height}

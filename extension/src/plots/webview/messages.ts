@@ -5,7 +5,7 @@ import {
   PlotHeight,
   PlotsData as TPlotsData,
   Revision,
-  Section,
+  PlotsSection,
   SectionCollapsed
 } from './contract'
 import { Logger } from '../../common/logger'
@@ -132,7 +132,7 @@ export class WebviewMessages {
   }
 
   private setPlotSize(
-    section: Section,
+    section: PlotsSection,
     nbItemsPerRow: number,
     height: PlotHeight
   ) {
@@ -145,16 +145,16 @@ export class WebviewMessages {
     )
 
     switch (section) {
-      case Section.CHECKPOINT_PLOTS:
+      case PlotsSection.CHECKPOINT_PLOTS:
         this.sendCheckpointPlotsMessage()
         break
-      case Section.COMPARISON_TABLE:
+      case PlotsSection.COMPARISON_TABLE:
         this.sendComparisonPlots()
         break
-      case Section.CUSTOM_PLOTS:
+      case PlotsSection.CUSTOM_PLOTS:
         this.sendCustomPlots()
         break
-      case Section.TEMPLATE_PLOTS:
+      case PlotsSection.TEMPLATE_PLOTS:
         this.sendTemplatePlots()
         break
       default:
@@ -371,8 +371,8 @@ export class WebviewMessages {
     }
 
     return {
-      height: this.plots.getHeight(Section.TEMPLATE_PLOTS),
-      nbItemsPerRow: this.plots.getNbItemsPerRow(Section.TEMPLATE_PLOTS),
+      height: this.plots.getHeight(PlotsSection.TEMPLATE_PLOTS),
+      nbItemsPerRow: this.plots.getNbItemsPerRow(PlotsSection.TEMPLATE_PLOTS),
       plots
     }
   }
@@ -388,8 +388,8 @@ export class WebviewMessages {
     }
 
     return {
-      height: this.plots.getHeight(Section.COMPARISON_TABLE),
-      nbItemsPerRow: this.plots.getNbItemsPerRow(Section.COMPARISON_TABLE),
+      height: this.plots.getHeight(PlotsSection.COMPARISON_TABLE),
+      nbItemsPerRow: this.plots.getNbItemsPerRow(PlotsSection.COMPARISON_TABLE),
       plots: comparison.map(({ path, revisions }) => {
         return { path, revisions: this.getRevisionsWithCorrectUrls(revisions) }
       }),

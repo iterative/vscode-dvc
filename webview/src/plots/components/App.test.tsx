@@ -25,7 +25,7 @@ import {
   PlotsData,
   PlotsType,
   Revision,
-  Section,
+  PlotsSection,
   TemplatePlotGroup,
   TemplatePlotsData,
   DEFAULT_NB_ITEMS_PER_ROW,
@@ -110,10 +110,10 @@ const originalOffsetWidth = Object.getOwnPropertyDescriptor(
 
 describe('App', () => {
   const sectionPosition = {
-    [Section.CHECKPOINT_PLOTS]: 2,
-    [Section.TEMPLATE_PLOTS]: 0,
-    [Section.COMPARISON_TABLE]: 1,
-    [Section.CUSTOM_PLOTS]: 3
+    [PlotsSection.CHECKPOINT_PLOTS]: 2,
+    [PlotsSection.TEMPLATE_PLOTS]: 0,
+    [PlotsSection.COMPARISON_TABLE]: 1,
+    [PlotsSection.CUSTOM_PLOTS]: 3
   }
 
   const sendSetDataMessage = (data: PlotsData) => {
@@ -165,14 +165,14 @@ describe('App', () => {
   const getCheckpointMenuItem = (position: number) =>
     within(
       screen.getAllByTestId('section-container')[
-        sectionPosition[Section.CHECKPOINT_PLOTS]
+        sectionPosition[PlotsSection.CHECKPOINT_PLOTS]
       ]
     ).getAllByTestId('icon-menu-item')[position]
 
   const renderAppAndChangeSize = async (
     data: PlotsData,
     nbItemsPerRow: number,
-    section: Section
+    section: PlotsSection
   ) => {
     const withSize = {
       nbItemsPerRow
@@ -181,13 +181,13 @@ describe('App', () => {
       ...data,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     }
-    if (section === Section.CHECKPOINT_PLOTS) {
+    if (section === PlotsSection.CHECKPOINT_PLOTS) {
       plotsData.checkpoint = {
         ...data?.checkpoint,
         ...withSize
       } as CheckpointPlotsData
     }
-    if (section === Section.TEMPLATE_PLOTS) {
+    if (section === PlotsSection.TEMPLATE_PLOTS) {
       plotsData.template = {
         ...data?.template,
         ...withSize
@@ -216,8 +216,8 @@ describe('App', () => {
     jest
       .spyOn(HTMLElement.prototype, 'clientHeight', 'get')
       .mockImplementation(() => heightToSuppressVegaError)
-    plotDataStore[Section.CHECKPOINT_PLOTS] = {} as CheckpointPlotsById
-    plotDataStore[Section.TEMPLATE_PLOTS] = {} as TemplatePlotsById
+    plotDataStore[PlotsSection.CHECKPOINT_PLOTS] = {} as CheckpointPlotsById
+    plotDataStore[PlotsSection.TEMPLATE_PLOTS] = {} as TemplatePlotsById
   })
 
   afterEach(() => {
@@ -500,14 +500,14 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: { [Section.CHECKPOINT_PLOTS]: true },
+      payload: { [PlotsSection.CHECKPOINT_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
 
     sendSetDataMessage({
       sectionCollapsed: {
         ...DEFAULT_SECTION_COLLAPSED,
-        [Section.CHECKPOINT_PLOTS]: true
+        [PlotsSection.CHECKPOINT_PLOTS]: true
       }
     })
 
@@ -530,7 +530,7 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).not.toHaveBeenCalledWith({
-      payload: { [Section.CHECKPOINT_PLOTS]: true },
+      payload: { [PlotsSection.CHECKPOINT_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
 
@@ -541,7 +541,7 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: { [Section.CHECKPOINT_PLOTS]: true },
+      payload: { [PlotsSection.CHECKPOINT_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
   })
@@ -567,7 +567,7 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).not.toHaveBeenCalledWith({
-      payload: { [Section.CHECKPOINT_PLOTS]: true },
+      payload: { [PlotsSection.CHECKPOINT_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
 
@@ -577,7 +577,7 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).not.toHaveBeenCalledWith({
-      payload: { [Section.CHECKPOINT_PLOTS]: true },
+      payload: { [PlotsSection.CHECKPOINT_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
   })
@@ -599,7 +599,7 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).not.toHaveBeenCalledWith({
-      payload: { [Section.CHECKPOINT_PLOTS]: true },
+      payload: { [PlotsSection.CHECKPOINT_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
 
@@ -610,7 +610,7 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: { [Section.CHECKPOINT_PLOTS]: true },
+      payload: { [PlotsSection.CHECKPOINT_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
   })
@@ -746,7 +746,7 @@ describe('App', () => {
       payload: {
         height: 1,
         nbItemsPerRow: 3,
-        section: Section.CHECKPOINT_PLOTS
+        section: PlotsSection.CHECKPOINT_PLOTS
       },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
@@ -767,7 +767,7 @@ describe('App', () => {
       payload: {
         height: 3,
         nbItemsPerRow: 2,
-        section: Section.CHECKPOINT_PLOTS
+        section: PlotsSection.CHECKPOINT_PLOTS
       },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
@@ -916,7 +916,7 @@ describe('App', () => {
 
     const [pickerButton] = within(
       screen.getAllByTestId('section-container')[
-        sectionPosition[Section.CHECKPOINT_PLOTS]
+        sectionPosition[PlotsSection.CHECKPOINT_PLOTS]
       ]
     ).queryAllByTestId('icon-menu-item')
 
@@ -1592,7 +1592,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(9) },
           1,
-          Section.CHECKPOINT_PLOTS
+          PlotsSection.CHECKPOINT_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1610,7 +1610,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(8) },
           1,
-          Section.CHECKPOINT_PLOTS
+          PlotsSection.CHECKPOINT_PLOTS
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1628,7 +1628,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(9) },
           1,
-          Section.TEMPLATE_PLOTS
+          PlotsSection.TEMPLATE_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1646,7 +1646,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(8) },
           1,
-          Section.TEMPLATE_PLOTS
+          PlotsSection.TEMPLATE_PLOTS
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1668,7 +1668,7 @@ describe('App', () => {
           store = await renderAppAndChangeSize(
             { checkpoint },
             1,
-            Section.CHECKPOINT_PLOTS
+            PlotsSection.CHECKPOINT_PLOTS
           )
         })
 
@@ -1721,7 +1721,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(15) },
           DEFAULT_NB_ITEMS_PER_ROW,
-          Section.CHECKPOINT_PLOTS
+          PlotsSection.CHECKPOINT_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1731,7 +1731,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(14) },
           DEFAULT_NB_ITEMS_PER_ROW,
-          Section.CHECKPOINT_PLOTS
+          PlotsSection.CHECKPOINT_PLOTS
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1741,7 +1741,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(15) },
           DEFAULT_NB_ITEMS_PER_ROW,
-          Section.TEMPLATE_PLOTS
+          PlotsSection.TEMPLATE_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1751,7 +1751,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(14) },
           DEFAULT_NB_ITEMS_PER_ROW,
-          Section.TEMPLATE_PLOTS
+          PlotsSection.TEMPLATE_PLOTS
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1765,7 +1765,7 @@ describe('App', () => {
           store = await renderAppAndChangeSize(
             { checkpoint },
             DEFAULT_NB_ITEMS_PER_ROW,
-            Section.CHECKPOINT_PLOTS
+            PlotsSection.CHECKPOINT_PLOTS
           )
         })
 
@@ -1818,7 +1818,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(21) },
           4,
-          Section.CHECKPOINT_PLOTS
+          PlotsSection.CHECKPOINT_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1828,7 +1828,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(20) },
           4,
-          Section.CHECKPOINT_PLOTS
+          PlotsSection.CHECKPOINT_PLOTS
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1838,7 +1838,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(21) },
           4,
-          Section.TEMPLATE_PLOTS
+          PlotsSection.TEMPLATE_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1848,7 +1848,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(20) },
           4,
-          Section.TEMPLATE_PLOTS
+          PlotsSection.TEMPLATE_PLOTS
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1862,7 +1862,7 @@ describe('App', () => {
           store = await renderAppAndChangeSize(
             { checkpoint },
             4,
-            Section.CHECKPOINT_PLOTS
+            PlotsSection.CHECKPOINT_PLOTS
           )
         })
 

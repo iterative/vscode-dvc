@@ -3,7 +3,7 @@ import { TableData } from '../experiments/webview/contract'
 import {
   PlotHeight,
   PlotsData,
-  Section,
+  PlotsSection,
   SectionCollapsed,
   TemplatePlotGroup
 } from '../plots/webview/contract'
@@ -76,12 +76,12 @@ export type ColumnResizePayload = {
   width: number
 }
 export type PlotsResizedPayload = {
-  section: Section
+  section: PlotsSection
   nbItemsPerRow: number
   height: PlotHeight
 }
 export type PlotSectionRenamedPayload = {
-  section: Section
+  section: PlotsSection
   name: string
 }
 export type PlotsTemplatesReordered = {

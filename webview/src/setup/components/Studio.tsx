@@ -30,19 +30,19 @@ const Connect: React.FC = () => {
         <Button
           appearance="primary"
           isNested={false}
-          text={'Sign In'}
+          text="Sign In"
           onClick={openStudio}
         />
         <Button
           appearance="secondary"
           isNested={true}
-          text={'Get Token'}
+          text="Get Token"
           onClick={openStudioProfile}
         />
         <Button
           appearance="secondary"
           isNested={true}
-          text={'Save'}
+          text="Save"
           onClick={saveStudioToken}
         />
         <p>
@@ -81,13 +81,13 @@ const Settings: React.FC<{
         <Button
           appearance="primary"
           isNested={false}
-          text={'Update Token'}
+          text="Update Token"
           onClick={saveStudioToken}
         />
         <Button
           appearance="secondary"
           isNested={true}
-          text={'Disconnect'}
+          text="Disconnect"
           onClick={removeStudioToken}
         />
       </div>
