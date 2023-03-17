@@ -333,7 +333,7 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getExperimentCount()
   }
 
-  public getRowData() {
+  public getExperimentsWithCheckpoints() {
     return this.experiments.getExperimentsWithCheckpoints()
   }
 

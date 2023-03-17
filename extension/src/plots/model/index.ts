@@ -170,7 +170,9 @@ export class PlotsModel extends ModelWithPersistence {
 
   public recreateCustomPlots() {
     const experiments = this.experiments.hasCheckpoints()
-      ? this.experiments.getRowData().filter(({ checkpoints }) => !!checkpoints)
+      ? this.experiments
+          .getExperimentsWithCheckpoints()
+          .filter(({ checkpoints }) => !!checkpoints)
       : this.experiments.getExperiments()
 
     if (experiments.length === 0) {
