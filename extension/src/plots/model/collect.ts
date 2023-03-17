@@ -5,7 +5,6 @@ import {
   getFullValuePath,
   CHECKPOINTS_PARAM,
   CustomPlotsOrderValue,
-  isCheckpointPlot,
   isCheckpointValue
 } from './custom'
 import { getRevisionFirstThreeColumns } from './util'
@@ -20,7 +19,6 @@ import {
   TemplatePlotSection,
   PlotsType,
   Revision,
-  CustomPlot,
   CustomPlotData,
   MetricVsParamPlotValues
 } from '../webview/contract'
@@ -126,10 +124,13 @@ const getMetricVsParamValues = (
   return values
 }
 
-const getCustomPlot = (
+const getCustomPlotData = (
   orderValue: CustomPlotsOrderValue,
-  experiments: ExperimentWithCheckpoints[]
-): CustomPlot => {
+  experiments: ExperimentWithCheckpoints[],
+  selectedRevisions: string[] | undefined = [],
+  height: number,
+  nbItemsPerRow: number
+): CustomPlotData => {
   const { metric, param, type } = orderValue
   const metricPath = getFullValuePath(
     ColumnType.METRICS,
@@ -139,8 +140,12 @@ const getCustomPlot = (
 
   const paramPath = getFullValuePath(ColumnType.PARAMS, param, FILE_SEPARATOR)
 
+  const selectedExperiments = experiments.filter(({ name, label }) =>
+    selectedRevisions.includes(name || label)
+  )
+
   const values = isCheckpointValue(type)
-    ? getCheckpointValues(experiments, metricPath)
+    ? getCheckpointValues(selectedExperiments, metricPath)
     : getMetricVsParamValues(experiments, metricPath, paramPath)
 
   return {
@@ -148,37 +153,46 @@ const getCustomPlot = (
     metric,
     param,
     type,
-    values
-  } as CustomPlot
-}
-
-export const collectCustomPlots = (
-  plotsOrderValues: CustomPlotsOrderValue[],
-  experiments: ExperimentWithCheckpoints[]
-): CustomPlot[] => {
-  return plotsOrderValues.map(plotOrderValue =>
-    getCustomPlot(plotOrderValue, experiments)
-  )
-}
-
-export const collectCustomPlotData = (
-  plot: CustomPlot,
-  colors: ColorScale | undefined,
-  nbItemsPerRow: number,
-  height: number
-): CustomPlotData => {
-  const selectedExperiments = colors?.domain
-  const filteredValues = isCheckpointPlot(plot)
-    ? plot.values.filter(value =>
-        (selectedExperiments as string[]).includes(value.group)
-      )
-    : plot.values
-
-  return {
-    ...plot,
-    values: filteredValues,
-    yTitle: truncateVerticalTitle(plot.metric, nbItemsPerRow, height) as string
+    values,
+    yTitle: truncateVerticalTitle(metric, nbItemsPerRow, height) as string
   } as CustomPlotData
+}
+
+export const collectCustomPlots = ({
+  plotsOrderValues,
+  experiments,
+  hasCheckpoints,
+  selectedRevisions,
+  height,
+  nbItemsPerRow
+}: {
+  plotsOrderValues: CustomPlotsOrderValue[]
+  experiments: ExperimentWithCheckpoints[]
+  hasCheckpoints: boolean
+  selectedRevisions: string[] | undefined
+  height: number
+  nbItemsPerRow: number
+}): CustomPlotData[] => {
+  const plots = []
+  const shouldSkipCheckpointPlots = !hasCheckpoints || !selectedRevisions
+
+  for (const value of plotsOrderValues) {
+    if (shouldSkipCheckpointPlots && isCheckpointValue(value.type)) {
+      continue
+    }
+
+    plots.push(
+      getCustomPlotData(
+        value,
+        experiments,
+        selectedRevisions,
+        height,
+        nbItemsPerRow
+      )
+    )
+  }
+
+  return plots
 }
 
 type RevisionPathData = { [path: string]: Record<string, unknown>[] }

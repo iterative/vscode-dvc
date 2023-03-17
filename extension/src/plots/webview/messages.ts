@@ -37,6 +37,7 @@ import {
   doesCustomPlotAlreadyExist,
   isCheckpointValue
 } from '../model/custom'
+import { getCustomPlotId } from '../model/collect'
 
 export class WebviewMessages {
   private readonly paths: PathsModel
@@ -278,20 +279,23 @@ export class WebviewMessages {
   }
 
   private setCustomPlotsOrder(plotIds: string[]) {
-    const customPlots = this.plots.getCustomPlots()?.plots
-    if (!customPlots) {
-      return
-    }
+    const customPlotsOrderWithId = this.plots
+      .getCustomPlotsOrder()
+      .map(value => ({
+        ...value,
+        id: getCustomPlotId(value.metric, value.param)
+      }))
 
     const newOrder: CustomPlotsOrderValue[] = reorderObjectList(
       plotIds,
-      customPlots,
+      customPlotsOrderWithId,
       'id'
     ).map(({ metric, param, type }) => ({
       metric,
       param,
       type
     }))
+
     this.plots.setCustomPlotsOrder(newOrder)
     this.sendCustomPlotsAndEvent(EventName.VIEWS_REORDER_PLOTS_CUSTOM)
   }
