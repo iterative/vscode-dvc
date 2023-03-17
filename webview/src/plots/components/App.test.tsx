@@ -1436,6 +1436,21 @@ describe('App', () => {
     })
   })
 
+  it('should send a message with the plot path when a comparison table plot is zoomed', () => {
+    renderAppWithOptionalData({
+      comparison: comparisonTableFixture
+    })
+
+    const plot = screen.getAllByTestId('image-plot-button')[0]
+
+    fireEvent.click(plot)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      payload: comparisonTableFixture.plots[0].revisions.workspace.url,
+      type: MessageFromWebviewType.ZOOM_PLOT
+    })
+  })
+
   it('should open a modal with the plot zoomed in when clicking a checkpoint plot', () => {
     renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture

@@ -21,7 +21,7 @@ import {
 import { PlotsModel } from '../model'
 import { PathsModel } from '../paths/model'
 import { BaseWebview } from '../../webview'
-import { getModifiedTime } from '../../fileSystem'
+import { getModifiedTime, openImageFileInEditor } from '../../fileSystem'
 import { pickCustomPlots, pickMetricAndParam } from '../model/quickPick'
 import { Title } from '../../vscode/title'
 import { ColumnType } from '../../experiments/webview/contract'
@@ -112,9 +112,13 @@ export class WebviewMessages {
       case MessageFromWebviewType.TOGGLE_EXPERIMENT:
         return this.setExperimentStatus(message.payload)
       case MessageFromWebviewType.ZOOM_PLOT:
+        if (message.payload) {
+          const imagePath = this.revertCorrectUrl(message.payload)
+          void openImageFileInEditor(imagePath)
+        }
         return sendTelemetryEvent(
           EventName.VIEWS_PLOTS_ZOOM_PLOT,
-          undefined,
+          { isImage: !!message.payload },
           undefined
         )
       default:
@@ -416,6 +420,15 @@ export class WebviewMessages {
           : undefined
       }
     }
+  }
+
+  private revertCorrectUrl(url: string) {
+    const webview = this.getWebview()
+    if (webview) {
+      const toRemove = webview.getWebviewUri('')
+      return url.replace(toRemove, '').split('?')[0]
+    }
+    return url
   }
 
   private getCheckpointPlots() {

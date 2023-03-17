@@ -4,6 +4,7 @@ import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
 import styles from './styles.module.scss'
 import { RefreshButton } from '../../../shared/components/button/RefreshButton'
 import { sendMessage } from '../../../shared/vscode'
+import { zoomPlot } from '../messages'
 
 type ComparisonTableCellProps = {
   path: string
@@ -41,10 +42,12 @@ export const ComparisonTableCell: React.FC<ComparisonTableCellProps> = ({
   }
 
   return (
-    <img
-      draggable={false}
-      src={plot.url}
-      alt={`Plot of ${path} (${plot.revision})`}
-    />
+    <button onClick={() => zoomPlot(plot.url)} data-testid="image-plot-button">
+      <img
+        draggable={false}
+        src={plot.url}
+        alt={`Plot of ${path} (${plot.revision})`}
+      />
+    </button>
   )
 }

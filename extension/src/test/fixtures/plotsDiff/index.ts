@@ -449,11 +449,8 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
   ]
 })
 
-export const getOutput = (
-  baseUrl: string,
-  joinFunc?: (...args: string[]) => string
-): PlotsOutput => ({
-  ...getImageData(baseUrl, joinFunc),
+export const getOutput = (baseUrl: string): PlotsOutput => ({
+  ...getImageData(baseUrl),
   ...basicVega,
   ...require('./vega').default
 })
@@ -689,6 +686,7 @@ export const getComparisonWebviewMessage = (
   joinFunc?: (...args: string[]) => string
 ): PlotsComparisonData => {
   const plotAcc = [] as ComparisonPlots
+
   for (const [path, plots] of Object.entries(getImageData(baseUrl, joinFunc))) {
     const revisionsAcc: ComparisonRevisionData = {}
     for (const { url, revisions } of plots) {
@@ -696,7 +694,10 @@ export const getComparisonWebviewMessage = (
       if (!revision) {
         continue
       }
-      revisionsAcc[revision] = { url: `${url}?${MOCK_IMAGE_MTIME}`, revision }
+      revisionsAcc[revision] = {
+        url: `${url}?${MOCK_IMAGE_MTIME}`,
+        revision
+      }
     }
 
     plotAcc.push({ path, revisions: revisionsAcc })
