@@ -242,9 +242,10 @@ suite('Plots Test Suite', () => {
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
-      const mockSetPlotSize = stub(plotsModel, 'setNbItemsPerRow').returns(
-        undefined
-      )
+      const mockSetPlotSize = stub(
+        plotsModel,
+        'setNbItemsPerRowOrWidth'
+      ).returns(undefined)
 
       mockMessageReceived.fire({
         payload: {

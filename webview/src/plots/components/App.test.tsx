@@ -28,8 +28,8 @@ import {
   PlotsSection,
   TemplatePlotGroup,
   TemplatePlotsData,
-  DEFAULT_NB_ITEMS_PER_ROW,
-  DEFAULT_PLOT_HEIGHT
+  DEFAULT_PLOT_HEIGHT,
+  DEFAULT_NB_ITEMS_PER_ROW
 } from 'dvc/src/plots/webview/contract'
 import {
   MessageFromWebviewType,
@@ -264,7 +264,6 @@ describe('App', () => {
       checkpoint: null,
       comparison: {
         height: DEFAULT_PLOT_HEIGHT,
-        nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
         plots: [
           {
             path: 'training/plots/images/misclassified.jpg',
@@ -280,7 +279,8 @@ describe('App', () => {
             id: 'ad2b5ec854a447d00d9dfa9cdf88211a39a17813',
             revision: 'ad2b5ec'
           }
-        ]
+        ],
+        width: DEFAULT_NB_ITEMS_PER_ROW
       },
       hasPlots: true,
       hasUnselectedPlots: false,
@@ -713,15 +713,6 @@ describe('App', () => {
     expect(screen.queryByTestId('size-sliders')).not.toBeInTheDocument()
   })
 
-  it('should not display a slider to pick the number of items per row if the action is unavailable', () => {
-    const store = renderAppWithOptionalData({
-      comparison: comparisonTableFixture
-    })
-    setWrapperSize(store)
-
-    expect(screen.queryByTestId('size-sliders')).not.toBeInTheDocument()
-  })
-
   it('should not display a slider to pick the number of items per row if the only width available for one item per row or less', () => {
     const store = renderAppWithOptionalData({
       checkpoint: checkpointPlotsFixture
@@ -729,6 +720,59 @@ describe('App', () => {
     setWrapperSize(store, 400)
 
     expect(screen.queryByTestId('size-sliders')).not.toBeInTheDocument()
+  })
+
+  it('should display both size sliders for checkpoint plots', () => {
+    const store = renderAppWithOptionalData({
+      checkpoint: checkpointPlotsFixture
+    })
+    setWrapperSize(store)
+
+    const plotResizers = within(
+      screen.getByTestId('size-sliders')
+    ).getAllByRole('slider')
+
+    expect(plotResizers.length).toBe(2)
+  })
+
+  it('should display both size sliders for template plots', () => {
+    const store = renderAppWithOptionalData({
+      template: templatePlotsFixture
+    })
+    setWrapperSize(store)
+
+    const plotResizers = within(
+      screen.getByTestId('size-sliders')
+    ).getAllByRole('slider')
+
+    expect(plotResizers.length).toBe(2)
+  })
+
+  it('should display both size sliders for custom plots', () => {
+    const store = renderAppWithOptionalData({
+      custom: customPlotsFixture,
+      template: templatePlotsFixture
+    })
+    setWrapperSize(store)
+
+    const plotResizers = within(
+      screen.getAllByTestId('size-sliders')[1]
+    ).getAllByRole('slider')
+
+    expect(plotResizers.length).toBe(2)
+  })
+
+  it('should not display the height slider for the comparison table', () => {
+    const store = renderAppWithOptionalData({
+      comparison: comparisonTableFixture
+    })
+    setWrapperSize(store)
+
+    const plotResizers = within(
+      screen.getByTestId('size-sliders')
+    ).getAllByRole('slider')
+
+    expect(plotResizers.length).toBe(1)
   })
 
   it('should send a message to the extension with the selected size when changing the width of plots', () => {

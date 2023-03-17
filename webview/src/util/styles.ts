@@ -6,6 +6,12 @@ export const withScale = (scale: number) =>
     HTMLDivElement
   >)
 
+export const withVariant = (variant: number) =>
+  ({ '--variant': variant } as DetailedHTMLProps<
+    HTMLAttributes<HTMLDivElement>,
+    HTMLDivElement
+  >)
+
 export enum ThemeProperty {
   BACKGROUND_COLOR = '--vscode-editor-background',
   FOREGROUND_COLOR = '--vscode-editor-foreground',

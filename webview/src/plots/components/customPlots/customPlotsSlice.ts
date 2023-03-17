@@ -3,7 +3,7 @@ import {
   CustomPlotsData,
   DEFAULT_HEIGHT,
   DEFAULT_SECTION_COLLAPSED,
-  DEFAULT_SECTION_NB_ITEMS_PER_ROW,
+  DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH,
   PlotHeight,
   PlotsSection
 } from 'dvc/src/plots/webview/contract'
@@ -22,7 +22,8 @@ export const customPlotsInitialState: CustomPlotsState = {
   hasData: false,
   height: DEFAULT_HEIGHT[PlotsSection.CUSTOM_PLOTS],
   isCollapsed: DEFAULT_SECTION_COLLAPSED[PlotsSection.CUSTOM_PLOTS],
-  nbItemsPerRow: DEFAULT_SECTION_NB_ITEMS_PER_ROW[PlotsSection.CUSTOM_PLOTS],
+  nbItemsPerRow:
+    DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH[PlotsSection.CUSTOM_PLOTS],
   plotsIds: [],
   plotsSnapshots: {}
 }
@@ -36,9 +37,12 @@ export const customPlotsSlice = createSlice({
     },
     changeSize: (
       state,
-      action: PayloadAction<{ nbItemsPerRow: number; height: PlotHeight }>
+      action: PayloadAction<{
+        nbItemsPerRowOrWidth: number
+        height: PlotHeight
+      }>
     ) => {
-      state.nbItemsPerRow = action.payload.nbItemsPerRow
+      state.nbItemsPerRow = action.payload.nbItemsPerRowOrWidth
       state.height = action.payload.height
     },
     setCollapsed: (state, action: PayloadAction<boolean>) => {

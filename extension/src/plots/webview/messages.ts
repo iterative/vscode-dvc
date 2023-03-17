@@ -136,7 +136,7 @@ export class WebviewMessages {
     nbItemsPerRow: number,
     height: PlotHeight
   ) {
-    this.plots.setNbItemsPerRow(section, nbItemsPerRow)
+    this.plots.setNbItemsPerRowOrWidth(section, nbItemsPerRow)
     this.plots.setHeight(section, height)
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_SECTION_RESIZED,
@@ -372,7 +372,9 @@ export class WebviewMessages {
 
     return {
       height: this.plots.getHeight(PlotsSection.TEMPLATE_PLOTS),
-      nbItemsPerRow: this.plots.getNbItemsPerRow(PlotsSection.TEMPLATE_PLOTS),
+      nbItemsPerRow: this.plots.getNbItemsPerRowOrWidth(
+        PlotsSection.TEMPLATE_PLOTS
+      ),
       plots
     }
   }
@@ -389,11 +391,11 @@ export class WebviewMessages {
 
     return {
       height: this.plots.getHeight(PlotsSection.COMPARISON_TABLE),
-      nbItemsPerRow: this.plots.getNbItemsPerRow(PlotsSection.COMPARISON_TABLE),
       plots: comparison.map(({ path, revisions }) => {
         return { path, revisions: this.getRevisionsWithCorrectUrls(revisions) }
       }),
-      revisions: overrideRevs || this.plots.getComparisonRevisions()
+      revisions: overrideRevs || this.plots.getComparisonRevisions(),
+      width: this.plots.getNbItemsPerRowOrWidth(PlotsSection.COMPARISON_TABLE)
     }
   }
 

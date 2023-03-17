@@ -2,7 +2,7 @@ import { PlotsModel } from '.'
 import {
   DEFAULT_NB_ITEMS_PER_ROW,
   DEFAULT_SECTION_COLLAPSED,
-  DEFAULT_SECTION_NB_ITEMS_PER_ROW,
+  DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH,
   PlotsSection
 } from '../webview/contract'
 import { buildMockMemento } from '../../test/util'
@@ -25,8 +25,8 @@ describe('plotsModel', () => {
   const memento = buildMockMemento({
     [PersistenceKey.PLOT_SELECTED_METRICS + exampleDvcRoot]:
       persistedSelectedMetrics,
-    [PersistenceKey.PLOT_NB_ITEMS_PER_ROW + exampleDvcRoot]:
-      DEFAULT_SECTION_NB_ITEMS_PER_ROW
+    [PersistenceKey.PLOT_NB_ITEMS_PER_ROW_OR_WIDTH + exampleDvcRoot]:
+      DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH
   })
   const mockedGetSelectedRevisions = jest.fn()
   const mockedGetFirstThreeColumnOrder = jest.fn()
@@ -68,27 +68,27 @@ describe('plotsModel', () => {
   })
 
   it('should change the plotSize when calling setPlotSize', () => {
-    expect(model.getNbItemsPerRow(PlotsSection.CHECKPOINT_PLOTS)).toStrictEqual(
-      DEFAULT_NB_ITEMS_PER_ROW
-    )
+    expect(
+      model.getNbItemsPerRowOrWidth(PlotsSection.CHECKPOINT_PLOTS)
+    ).toStrictEqual(DEFAULT_NB_ITEMS_PER_ROW)
 
-    model.setNbItemsPerRow(PlotsSection.CHECKPOINT_PLOTS, 1)
+    model.setNbItemsPerRowOrWidth(PlotsSection.CHECKPOINT_PLOTS, 1)
 
-    expect(model.getNbItemsPerRow(PlotsSection.CHECKPOINT_PLOTS)).toStrictEqual(
-      1
-    )
+    expect(
+      model.getNbItemsPerRowOrWidth(PlotsSection.CHECKPOINT_PLOTS)
+    ).toStrictEqual(1)
   })
 
   it('should update the persisted plot size when calling setPlotSize', () => {
     const mementoUpdateSpy = jest.spyOn(memento, 'update')
 
-    model.setNbItemsPerRow(PlotsSection.CHECKPOINT_PLOTS, 2)
+    model.setNbItemsPerRowOrWidth(PlotsSection.CHECKPOINT_PLOTS, 2)
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
-      PersistenceKey.PLOT_NB_ITEMS_PER_ROW + exampleDvcRoot,
+      PersistenceKey.PLOT_NB_ITEMS_PER_ROW_OR_WIDTH + exampleDvcRoot,
       {
-        ...DEFAULT_SECTION_NB_ITEMS_PER_ROW,
+        ...DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH,
         [PlotsSection.CHECKPOINT_PLOTS]: 2
       }
     )
