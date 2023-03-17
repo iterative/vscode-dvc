@@ -7,7 +7,7 @@ type NeedsGitCommitProps = { showScmPanel: () => void }
 export const NeedsGitCommit: React.FC<NeedsGitCommitProps> = ({
   showScmPanel
 }) => (
-  <EmptyState>
+  <EmptyState isFullScreen={false}>
     <div>
       <h1>No Git commits detected</h1>
       <p>

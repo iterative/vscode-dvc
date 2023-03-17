@@ -103,7 +103,7 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
       <CellRowAction
         showSubRowStates={showSubRowStates}
         subRowsAffected={selections}
-        testId={'row-action-checkbox'}
+        testId="row-action-checkbox"
         tooltipContent={getTooltipContent(isRowSelected, 'select the row')}
       >
         <VSCodeCheckbox
@@ -114,10 +114,10 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
       <CellRowAction
         showSubRowStates={showSubRowStates}
         subRowsAffected={stars}
-        testId={'row-action-star'}
+        testId="row-action-star"
         tooltipContent={
           <ClickableTooltipContent
-            clickableText={'Filter experiments by starred'}
+            clickableText="Filter experiments by starred"
             onClick={addStarredFilter}
             helperText={getTooltipContent(!!starred, 'star')}
           />
@@ -144,10 +144,10 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
         <CellRowAction
           showSubRowStates={showSubRowStates}
           subRowsAffected={plotSelections}
-          testId={'row-action-plot'}
+          testId="row-action-plot"
           tooltipContent={
             <ClickableTooltipContent
-              clickableText={'Open the plots view'}
+              clickableText="Open the plots view"
               helperText={getTooltipContent(!!bulletColor, 'plot')}
               onClick={openPlotsWebview}
             />

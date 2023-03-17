@@ -4,7 +4,7 @@ import { resetPersistedState } from './util'
 import { buildMockMemento } from '../test/util'
 import {
   DEFAULT_HEIGHT,
-  DEFAULT_SECTION_NB_ITEMS_PER_ROW
+  DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH
 } from '../plots/webview/contract'
 
 jest.mock('vscode')
@@ -31,8 +31,8 @@ describe('Persistence util', () => {
     it('should reset all values from all dvc roots', async () => {
       const persistedState = {
         [PersistenceKey.PLOT_HEIGHT + 'root1']: DEFAULT_HEIGHT,
-        [PersistenceKey.PLOT_NB_ITEMS_PER_ROW + 'root2']:
-          DEFAULT_SECTION_NB_ITEMS_PER_ROW
+        [PersistenceKey.PLOT_NB_ITEMS_PER_ROW_OR_WIDTH + 'root2']:
+          DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH
       }
       const workspaceState = buildMockMemento(persistedState)
 
@@ -42,7 +42,9 @@ describe('Persistence util', () => {
         workspaceState.get(PersistenceKey.PLOT_HEIGHT + 'root1')
       ).toBeUndefined()
       expect(
-        workspaceState.get(PersistenceKey.PLOT_NB_ITEMS_PER_ROW + 'root2')
+        workspaceState.get(
+          PersistenceKey.PLOT_NB_ITEMS_PER_ROW_OR_WIDTH + 'root2'
+        )
       ).toBeUndefined()
     })
   })

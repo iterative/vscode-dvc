@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.20] - 2023-03-15
+
+### 🚀 New Features and Enhancements
+
+- Make section headers sticky [#3465](https://github.com/iterative/vscode-dvc/pull/3465) by [@sroy3](https://github.com/sroy3)
+- Add show setup commands [#3474](https://github.com/iterative/vscode-dvc/pull/3474) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (2.50.0) [#3473](https://github.com/iterative/vscode-dvc/pull/3473) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.6.19] - 2023-03-15
+
+### 🚀 New Features and Enhancements
+
+- Make the plot sizing sliders sticky [#3443](https://github.com/iterative/vscode-dvc/pull/3443) by [@sroy3](https://github.com/sroy3)
+- Add a slider to resize plots vertically [#3428](https://github.com/iterative/vscode-dvc/pull/3428) by [@sroy3](https://github.com/sroy3)
+- Move Connect to Studio into Setup webview [#3452](https://github.com/iterative/vscode-dvc/pull/3452) by [@mattseddon](https://github.com/mattseddon)
+- Provide option to open and focus relevant Setup section through UI [#3462](https://github.com/iterative/vscode-dvc/pull/3462) by [@mattseddon](https://github.com/mattseddon)
+- Add show experiments button to final experiments screen [#3463](https://github.com/iterative/vscode-dvc/pull/3463) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Make className optional in SectionContainer [#3464](https://github.com/iterative/vscode-dvc/pull/3464) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (2.47.2) [#3451](https://github.com/iterative/vscode-dvc/pull/3451) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (2.48.0) [#3457](https://github.com/iterative/vscode-dvc/pull/3457) by [@mattseddon](https://github.com/mattseddon)
+- Fix flaky integration tests [#3461](https://github.com/iterative/vscode-dvc/pull/3461) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.6.18] - 2023-03-12
 
 ### 🚀 New Features and Enhancements

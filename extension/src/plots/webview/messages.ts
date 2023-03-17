@@ -6,7 +6,7 @@ import {
   PlotHeight,
   PlotsData as TPlotsData,
   Revision,
-  Section,
+  PlotsSection,
   SectionCollapsed
 } from './contract'
 import { Logger } from '../../common/logger'
@@ -22,13 +22,13 @@ import {
 import { PlotsModel } from '../model'
 import { PathsModel } from '../paths/model'
 import { BaseWebview } from '../../webview'
-import { getModifiedTime } from '../../fileSystem'
 import {
   pickCustomPlots,
   pickCustomPlotType,
   pickMetric,
   pickMetricAndParam
 } from '../model/quickPick'
+import { getModifiedTime, openImageFileInEditor } from '../../fileSystem'
 import { Title } from '../../vscode/title'
 import { reorderObjectList } from '../../util/array'
 import {
@@ -111,9 +111,13 @@ export class WebviewMessages {
       case MessageFromWebviewType.TOGGLE_EXPERIMENT:
         return this.setExperimentStatus(message.payload)
       case MessageFromWebviewType.ZOOM_PLOT:
+        if (message.payload) {
+          const imagePath = this.revertCorrectUrl(message.payload)
+          void openImageFileInEditor(imagePath)
+        }
         return sendTelemetryEvent(
           EventName.VIEWS_PLOTS_ZOOM_PLOT,
-          undefined,
+          { isImage: !!message.payload },
           undefined
         )
       default:
@@ -122,11 +126,11 @@ export class WebviewMessages {
   }
 
   private setPlotSize(
-    section: Section,
+    section: PlotsSection,
     nbItemsPerRow: number,
     height: PlotHeight
   ) {
-    this.plots.setNbItemsPerRow(section, nbItemsPerRow)
+    this.plots.setNbItemsPerRowOrWidth(section, nbItemsPerRow)
     this.plots.setHeight(section, height)
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_SECTION_RESIZED,
@@ -135,13 +139,13 @@ export class WebviewMessages {
     )
 
     switch (section) {
-      case Section.COMPARISON_TABLE:
+      case PlotsSection.COMPARISON_TABLE:
         this.sendComparisonPlots()
         break
-      case Section.CUSTOM_PLOTS:
+      case PlotsSection.CUSTOM_PLOTS:
         this.sendCustomPlots()
         break
-      case Section.TEMPLATE_PLOTS:
+      case PlotsSection.TEMPLATE_PLOTS:
         this.sendTemplatePlots()
         break
       default:
@@ -388,8 +392,10 @@ export class WebviewMessages {
     }
 
     return {
-      height: this.plots.getHeight(Section.TEMPLATE_PLOTS),
-      nbItemsPerRow: this.plots.getNbItemsPerRow(Section.TEMPLATE_PLOTS),
+      height: this.plots.getHeight(PlotsSection.TEMPLATE_PLOTS),
+      nbItemsPerRow: this.plots.getNbItemsPerRowOrWidth(
+        PlotsSection.TEMPLATE_PLOTS
+      ),
       plots
     }
   }
@@ -405,12 +411,12 @@ export class WebviewMessages {
     }
 
     return {
-      height: this.plots.getHeight(Section.COMPARISON_TABLE),
-      nbItemsPerRow: this.plots.getNbItemsPerRow(Section.COMPARISON_TABLE),
+      height: this.plots.getHeight(PlotsSection.COMPARISON_TABLE),
       plots: comparison.map(({ path, revisions }) => {
         return { path, revisions: this.getRevisionsWithCorrectUrls(revisions) }
       }),
-      revisions: overrideRevs || this.plots.getComparisonRevisions()
+      revisions: overrideRevs || this.plots.getComparisonRevisions(),
+      width: this.plots.getNbItemsPerRowOrWidth(PlotsSection.COMPARISON_TABLE)
     }
   }
 
@@ -437,6 +443,15 @@ export class WebviewMessages {
           : undefined
       }
     }
+  }
+
+  private revertCorrectUrl(url: string) {
+    const webview = this.getWebview()
+    if (webview) {
+      const toRemove = webview.getWebviewUri('')
+      return url.replace(toRemove, '').split('?')[0]
+    }
+    return url
   }
 
   private getCustomPlots() {

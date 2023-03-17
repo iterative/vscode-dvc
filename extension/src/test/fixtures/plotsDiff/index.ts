@@ -13,8 +13,9 @@ import {
   TemplatePlots,
   Revision,
   PlotsComparisonData,
+  DEFAULT_PLOT_HEIGHT,
   DEFAULT_NB_ITEMS_PER_ROW,
-  DEFAULT_PLOT_HEIGHT
+  DEFAULT_PLOT_WIDTH
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
@@ -449,11 +450,8 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
   ]
 })
 
-export const getOutput = (
-  baseUrl: string,
-  joinFunc?: (...args: string[]) => string
-): PlotsOutput => ({
-  ...getImageData(baseUrl, joinFunc),
+export const getOutput = (baseUrl: string): PlotsOutput => ({
+  ...getImageData(baseUrl),
   ...basicVega,
   ...require('./vega').default
 })
@@ -689,6 +687,7 @@ export const getComparisonWebviewMessage = (
   joinFunc?: (...args: string[]) => string
 ): PlotsComparisonData => {
   const plotAcc = [] as ComparisonPlots
+
   for (const [path, plots] of Object.entries(getImageData(baseUrl, joinFunc))) {
     const revisionsAcc: ComparisonRevisionData = {}
     for (const { url, revisions } of plots) {
@@ -696,7 +695,10 @@ export const getComparisonWebviewMessage = (
       if (!revision) {
         continue
       }
-      revisionsAcc[revision] = { url: `${url}?${MOCK_IMAGE_MTIME}`, revision }
+      revisionsAcc[revision] = {
+        url: `${url}?${MOCK_IMAGE_MTIME}`,
+        revision
+      }
     }
 
     plotAcc.push({ path, revisions: revisionsAcc })
@@ -705,7 +707,7 @@ export const getComparisonWebviewMessage = (
   return {
     revisions: getRevisions(),
     plots: plotAcc,
-    nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
+    width: DEFAULT_PLOT_WIDTH,
     height: DEFAULT_PLOT_HEIGHT
   }
 }

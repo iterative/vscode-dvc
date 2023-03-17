@@ -9,13 +9,13 @@ import {
 } from './ComparisonTableHead'
 import { ComparisionTableRows } from './ComparisonTableRows'
 import plotsStyles from '../styles.module.scss'
-import { withScale } from '../../../util/styles'
+import { withScale, withVariant } from '../../../util/styles'
 import { sendMessage } from '../../../shared/vscode'
 import { PlotsState } from '../../store'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 
 export const ComparisonTable: React.FC = () => {
-  const { revisions, plots } = useSelector(
+  const { revisions, plots, width } = useSelector(
     (state: PlotsState) => state.comparison
   )
 
@@ -84,7 +84,7 @@ export const ComparisonTable: React.FC = () => {
   return (
     <table
       className={plotsStyles.comparisonTable}
-      style={withScale(columns.length)}
+      style={{ ...withScale(columns.length), ...withVariant(width) }}
     >
       <ComparisonTableHead
         columns={columns}

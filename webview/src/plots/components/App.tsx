@@ -6,7 +6,7 @@ import {
   PlotsData,
   PlotsDataKeys,
   Revision,
-  Section,
+  PlotsSection,
   SectionCollapsed,
   TemplatePlotsData
 } from 'dvc/src/plots/webview/contract'
@@ -38,9 +38,11 @@ const dispatchCollapsedSections = (
   dispatch: PlotsDispatch
 ) => {
   if (sections) {
-    dispatch(setCustomPlotsCollapsed(sections[Section.CUSTOM_PLOTS]))
-    dispatch(setComparisonTableCollapsed(sections[Section.COMPARISON_TABLE]))
-    dispatch(setTemplatePlotsCollapsed(sections[Section.TEMPLATE_PLOTS]))
+    dispatch(setCustomPlotsCollapsed(sections[PlotsSection.CUSTOM_PLOTS]))
+    dispatch(
+      setComparisonTableCollapsed(sections[PlotsSection.COMPARISON_TABLE])
+    )
+    dispatch(setTemplatePlotsCollapsed(sections[PlotsSection.TEMPLATE_PLOTS]))
   }
 }
 
