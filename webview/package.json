@@ -76,7 +76,7 @@
     "storybook-addon-themes": "6.1.0",
     "style-loader": "3.3.1",
     "ts-loader": "9.4.2",
-    "webpack": "5.76.0",
+    "webpack": "5.76.1",
     "webpack-cli": "5.0.1",
     "webpack-dev-server": "4.11.1"
   },
