@@ -39,7 +39,7 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
           [styles.pinnedColumnHeader]: isPinned,
           [styles.draggedColumn]: draggedId === revision
         })}
-        style={{ top: ribbonHeight - 4 + 51 }} // 4 is equal to the gap in the comparison table and 52 is the height of the section header
+        style={{ top: ribbonHeight - 4 + 51 }} // 4 is equal to the gap in the comparison table and 51 is the height of the section header
       >
         <ComparisonTableHeader
           isPinned={isPinned}
