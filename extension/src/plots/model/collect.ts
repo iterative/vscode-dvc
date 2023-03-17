@@ -60,21 +60,26 @@ import { Color } from '../../experiments/model/status/colors'
 export const getCustomPlotId = (metric: string, param = CHECKPOINTS_PARAM) =>
   `custom-${metric}-${param}`
 
+export const getValueFromColumn = (
+  path: string,
+  experiment: ExperimentWithCheckpoints
+) => get(experiment, splitColumnPath(path)) as number | undefined
+
 const collectCheckpointValuesFromExperiment = (
   values: CheckpointPlotValues,
   exp: ExperimentWithDefinedCheckpoints,
-  splitUpMetricPath: string[]
+  metricPath: string
 ) => {
   const group = exp.name || exp.label
   const maxEpoch = exp.checkpoints.length + 1
 
-  const metricValue = get(exp, splitUpMetricPath) as number | undefined
+  const metricValue = getValueFromColumn(metricPath, exp)
   if (metricValue !== undefined) {
     values.push({ group, iteration: maxEpoch, y: metricValue })
   }
 
   for (const [ind, checkpoint] of exp.checkpoints.entries()) {
-    const metricValue = get(checkpoint, splitUpMetricPath) as number | undefined
+    const metricValue = getValueFromColumn(metricPath, checkpoint)
     if (metricValue !== undefined) {
       values.push({ group, iteration: maxEpoch - ind - 1, y: metricValue })
     }
@@ -83,7 +88,7 @@ const collectCheckpointValuesFromExperiment = (
 
 const getCheckpointValues = (
   experiments: ExperimentWithCheckpoints[],
-  splitUpMetricPath: string[]
+  metricPath: string
 ): CheckpointPlotValues => {
   const fullValues: CheckpointPlotValues = []
   for (const experiment of experiments) {
@@ -91,7 +96,7 @@ const getCheckpointValues = (
       collectCheckpointValuesFromExperiment(
         fullValues,
         experiment as ExperimentWithDefinedCheckpoints,
-        splitUpMetricPath
+        metricPath
       )
     }
   }
@@ -100,14 +105,14 @@ const getCheckpointValues = (
 
 const getMetricVsParamValues = (
   experiments: ExperimentWithCheckpoints[],
-  splitUpMetricPath: string[],
-  splitUpParamPath: string[]
+  metricPath: string,
+  paramPath: string
 ): MetricVsParamPlotValues => {
   const fullValues: MetricVsParamPlotValues = []
 
   for (const experiment of experiments) {
-    const metricValue = get(experiment, splitUpMetricPath) as number | undefined
-    const paramValue = get(experiment, splitUpParamPath) as number | undefined
+    const metricValue = getValueFromColumn(metricPath, experiment)
+    const paramValue = getValueFromColumn(paramPath, experiment)
 
     if (metricValue !== undefined && paramValue !== undefined) {
       fullValues.push({
@@ -126,16 +131,17 @@ const getCustomPlot = (
   experiments: ExperimentWithCheckpoints[]
 ): CustomPlot => {
   const { metric, param, type } = orderValue
-  const splitUpMetricPath = splitColumnPath(
-    getFullValuePath(ColumnType.METRICS, metric, FILE_SEPARATOR)
-  )
-  const splitUpParamPath = splitColumnPath(
-    getFullValuePath(ColumnType.PARAMS, param, FILE_SEPARATOR)
+  const metricPath = getFullValuePath(
+    ColumnType.METRICS,
+    metric,
+    FILE_SEPARATOR
   )
 
+  const paramPath = getFullValuePath(ColumnType.PARAMS, param, FILE_SEPARATOR)
+
   const values = isCheckpointValue(type)
-    ? getCheckpointValues(experiments, splitUpMetricPath)
-    : getMetricVsParamValues(experiments, splitUpMetricPath, splitUpParamPath)
+    ? getCheckpointValues(experiments, metricPath)
+    : getMetricVsParamValues(experiments, metricPath, paramPath)
 
   return {
     id: getCustomPlotId(metric, param),
