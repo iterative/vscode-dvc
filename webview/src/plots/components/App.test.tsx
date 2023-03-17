@@ -684,7 +684,7 @@ describe('App', () => {
     })
   })
 
-  it('should display the checkpoint plots in the order stored', () => {
+  it('should display the custom plots in the order stored', () => {
     renderAppWithOptionalData({
       comparison: comparisonTableFixture,
       custom: customPlotsFixture
@@ -814,12 +814,12 @@ describe('App', () => {
       template: templatePlotsFixture
     })
 
-    const checkpointPlots = screen.getAllByTestId(/summary\.json/)
+    const customPlots = screen.getAllByTestId(/summary\.json/)
     const templatePlots = screen.getAllByTestId(/^plot_/)
 
-    dragAndDrop(templatePlots[0], checkpointPlots[2])
+    dragAndDrop(templatePlots[0], customPlots[2])
 
-    expect(checkpointPlots.map(plot => plot.id)).toStrictEqual([
+    expect(customPlots.map(plot => plot.id)).toStrictEqual([
       'custom-summary.json:loss-params.yaml:dropout',
       'custom-summary.json:accuracy-params.yaml:epochs',
       'custom-summary.json:loss-epoch',
@@ -1291,7 +1291,7 @@ describe('App', () => {
     })
   })
 
-  it('should open a modal with the plot zoomed in when clicking a checkpoint plot', () => {
+  it('should open a modal with the plot zoomed in when clicking a custom plot', () => {
     renderAppWithOptionalData({
       comparison: comparisonTableFixture,
       custom: customPlotsFixture
