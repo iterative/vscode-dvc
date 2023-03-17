@@ -13,8 +13,9 @@ import {
   TemplatePlots,
   Revision,
   PlotsComparisonData,
+  DEFAULT_PLOT_HEIGHT,
   DEFAULT_NB_ITEMS_PER_ROW,
-  DEFAULT_PLOT_HEIGHT
+  DEFAULT_PLOT_WIDTH
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
@@ -706,7 +707,7 @@ export const getComparisonWebviewMessage = (
   return {
     revisions: getRevisions(),
     plots: plotAcc,
-    nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
+    width: DEFAULT_PLOT_WIDTH,
     height: DEFAULT_PLOT_HEIGHT
   }
 }

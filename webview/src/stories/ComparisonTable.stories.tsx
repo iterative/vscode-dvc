@@ -45,9 +45,9 @@ const Template: Story = ({ plots, revisions }) => {
       <MockedState
         data={{
           height: DEFAULT_PLOT_HEIGHT,
-          nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
           plots,
-          revisions
+          revisions,
+          width: DEFAULT_NB_ITEMS_PER_ROW
         }}
       >
         <WebviewWrapper>

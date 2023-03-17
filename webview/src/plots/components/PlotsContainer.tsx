@@ -22,10 +22,10 @@ export interface PlotsContainerProps {
   sectionCollapsed: boolean
   sectionKey: PlotsSection
   title: string
-  nbItemsPerRow: number
+  nbItemsPerRowOrWidth: number
   height: PlotHeight
-  changeSize?: (payload: {
-    nbItemsPerRow: number
+  changeSize: (payload: {
+    nbItemsPerRowOrWidth: number
     height: PlotHeight
   }) => AnyAction
   menu?: PlotsPickerProps
@@ -33,6 +33,7 @@ export interface PlotsContainerProps {
   removePlotsButton?: { onClick: () => void }
   children: React.ReactNode
   hasItems?: boolean
+  noHeight?: boolean
 }
 
 export const PlotsContainer: React.FC<PlotsContainerProps> = ({
@@ -40,13 +41,14 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
   sectionKey,
   title,
   children,
-  nbItemsPerRow,
+  nbItemsPerRowOrWidth,
   height,
   menu,
   addPlotsButton,
   removePlotsButton,
   changeSize,
-  hasItems
+  hasItems,
+  noHeight
 }) => {
   const open = !sectionCollapsed
   const dispatch = useDispatch()
@@ -57,7 +59,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
 
   useEffect(() => {
     window.dispatchEvent(new Event('resize'))
-  }, [nbItemsPerRow, height])
+  }, [nbItemsPerRowOrWidth, height])
 
   const menuItems: IconMenuItemProps[] = []
 
@@ -87,20 +89,21 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
 
   const handleResize = useCallback(
     (nbItems: number, newHeight: PlotHeight) => {
-      if (changeSize) {
-        const positiveNbItems = Math.abs(nbItems)
-        dispatch(
-          changeSize({ height: newHeight, nbItemsPerRow: positiveNbItems })
-        )
-        sendMessage({
-          payload: {
-            height: newHeight,
-            nbItemsPerRow: positiveNbItems,
-            section: sectionKey
-          },
-          type: MessageFromWebviewType.RESIZE_PLOTS
+      const positiveNbItems = Math.abs(nbItems)
+      dispatch(
+        changeSize({
+          height: newHeight,
+          nbItemsPerRowOrWidth: positiveNbItems
         })
-      }
+      )
+      sendMessage({
+        payload: {
+          height: newHeight,
+          nbItemsPerRow: positiveNbItems,
+          section: sectionKey
+        },
+        type: MessageFromWebviewType.RESIZE_PLOTS
+      })
     },
     [dispatch, changeSize, sectionKey]
   )
@@ -135,7 +138,6 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
       stickyHeaderTop={ribbonHeight - 4}
       headerChildren={
         open &&
-        changeSize &&
         hasItems &&
         maxNbPlotsPerRow > 1 && (
           <div className={styles.sizeSliders} data-testid="size-sliders">
@@ -145,23 +147,25 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
                 minimum={-maxNbPlotsPerRow}
                 label="Plot Width"
                 onChange={nbItems => handleResize(nbItems, height)}
-                defaultValue={-nbItemsPerRow}
+                defaultValue={-nbItemsPerRowOrWidth}
               />
             </div>
-            <div className={styles.sizeSlider}>
-              <Slider
-                minimum={Math.min(...plotHeights)}
-                maximum={Math.max(...plotHeights)}
-                label="Plot Height"
-                onChange={newHeight =>
-                  handleResize(
-                    nbItemsPerRow,
-                    newHeight as unknown as PlotHeight
-                  )
-                }
-                defaultValue={height}
-              />
-            </div>
+            {!noHeight && (
+              <div className={styles.sizeSlider}>
+                <Slider
+                  minimum={Math.min(...plotHeights)}
+                  maximum={Math.max(...plotHeights)}
+                  label="Plot Height"
+                  onChange={newHeight =>
+                    handleResize(
+                      nbItemsPerRowOrWidth,
+                      newHeight as unknown as PlotHeight
+                    )
+                  }
+                  defaultValue={height}
+                />
+              </div>
+            )}
           </div>
         )
       }
@@ -170,11 +174,11 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
         <div
           className={cx({
             [styles.plotsWrapper]: sectionKey !== PlotsSection.COMPARISON_TABLE,
-            [styles.smallPlots]: nbItemsPerRow >= 4
+            [styles.smallPlots]: nbItemsPerRowOrWidth >= 4
           })}
           style={
             {
-              '--nbPerRow': nbItemsPerRow
+              '--nbPerRow': nbItemsPerRowOrWidth
             } as DetailedHTMLProps<
               HTMLAttributes<HTMLDivElement>,
               HTMLDivElement
