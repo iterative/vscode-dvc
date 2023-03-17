@@ -3,7 +3,7 @@ import {
   CheckpointPlotsData,
   DEFAULT_HEIGHT,
   DEFAULT_SECTION_COLLAPSED,
-  DEFAULT_SECTION_NB_ITEMS_PER_ROW,
+  DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH,
   PlotHeight,
   PlotsSection
 } from 'dvc/src/plots/webview/contract'
@@ -25,7 +25,7 @@ export const checkpointPlotsInitialState: CheckpointPlotsState = {
   height: DEFAULT_HEIGHT[PlotsSection.CHECKPOINT_PLOTS],
   isCollapsed: DEFAULT_SECTION_COLLAPSED[PlotsSection.CHECKPOINT_PLOTS],
   nbItemsPerRow:
-    DEFAULT_SECTION_NB_ITEMS_PER_ROW[PlotsSection.CHECKPOINT_PLOTS],
+    DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH[PlotsSection.CHECKPOINT_PLOTS],
   plotsIds: [],
   plotsSnapshots: {},
   selectedMetrics: []
@@ -40,9 +40,12 @@ export const checkpointPlotsSlice = createSlice({
     },
     changeSize: (
       state,
-      action: PayloadAction<{ nbItemsPerRow: number; height: PlotHeight }>
+      action: PayloadAction<{
+        nbItemsPerRowOrWidth: number
+        height: PlotHeight
+      }>
     ) => {
-      state.nbItemsPerRow = action.payload.nbItemsPerRow
+      state.nbItemsPerRow = action.payload.nbItemsPerRowOrWidth
       state.height = action.payload.height
     },
     setCollapsed: (state, action: PayloadAction<boolean>) => {

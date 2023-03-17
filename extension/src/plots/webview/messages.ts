@@ -21,7 +21,7 @@ import {
 import { PlotsModel } from '../model'
 import { PathsModel } from '../paths/model'
 import { BaseWebview } from '../../webview'
-import { getModifiedTime } from '../../fileSystem'
+import { getModifiedTime, openImageFileInEditor } from '../../fileSystem'
 import { pickCustomPlots, pickMetricAndParam } from '../model/quickPick'
 import { Title } from '../../vscode/title'
 import { ColumnType } from '../../experiments/webview/contract'
@@ -112,9 +112,13 @@ export class WebviewMessages {
       case MessageFromWebviewType.TOGGLE_EXPERIMENT:
         return this.setExperimentStatus(message.payload)
       case MessageFromWebviewType.ZOOM_PLOT:
+        if (message.payload) {
+          const imagePath = this.revertCorrectUrl(message.payload)
+          void openImageFileInEditor(imagePath)
+        }
         return sendTelemetryEvent(
           EventName.VIEWS_PLOTS_ZOOM_PLOT,
-          undefined,
+          { isImage: !!message.payload },
           undefined
         )
       default:
@@ -132,7 +136,7 @@ export class WebviewMessages {
     nbItemsPerRow: number,
     height: PlotHeight
   ) {
-    this.plots.setNbItemsPerRow(section, nbItemsPerRow)
+    this.plots.setNbItemsPerRowOrWidth(section, nbItemsPerRow)
     this.plots.setHeight(section, height)
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_SECTION_RESIZED,
@@ -368,7 +372,9 @@ export class WebviewMessages {
 
     return {
       height: this.plots.getHeight(PlotsSection.TEMPLATE_PLOTS),
-      nbItemsPerRow: this.plots.getNbItemsPerRow(PlotsSection.TEMPLATE_PLOTS),
+      nbItemsPerRow: this.plots.getNbItemsPerRowOrWidth(
+        PlotsSection.TEMPLATE_PLOTS
+      ),
       plots
     }
   }
@@ -385,11 +391,11 @@ export class WebviewMessages {
 
     return {
       height: this.plots.getHeight(PlotsSection.COMPARISON_TABLE),
-      nbItemsPerRow: this.plots.getNbItemsPerRow(PlotsSection.COMPARISON_TABLE),
       plots: comparison.map(({ path, revisions }) => {
         return { path, revisions: this.getRevisionsWithCorrectUrls(revisions) }
       }),
-      revisions: overrideRevs || this.plots.getComparisonRevisions()
+      revisions: overrideRevs || this.plots.getComparisonRevisions(),
+      width: this.plots.getNbItemsPerRowOrWidth(PlotsSection.COMPARISON_TABLE)
     }
   }
 
@@ -416,6 +422,15 @@ export class WebviewMessages {
           : undefined
       }
     }
+  }
+
+  private revertCorrectUrl(url: string) {
+    const webview = this.getWebview()
+    if (webview) {
+      const toRemove = webview.getWebviewUri('')
+      return url.replace(toRemove, '').split('?')[0]
+    }
+    return url
   }
 
   private getCheckpointPlots() {
