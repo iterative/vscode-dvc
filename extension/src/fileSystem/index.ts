@@ -10,7 +10,7 @@ import {
   writeFileSync
 } from 'fs-extra'
 import { load } from 'js-yaml'
-import { Uri, workspace, window } from 'vscode'
+import { Uri, workspace, window, commands, ViewColumn } from 'vscode'
 import { standardizePath } from './path'
 import { definedAndNonEmpty } from '../util/array'
 import { Logger } from '../common/logger'
@@ -140,6 +140,11 @@ export const openFileInEditor = async (filePath: string) => {
   await window.showTextDocument(document)
   return document
 }
+
+export const openImageFileInEditor = async (imagePath: string) =>
+  await commands.executeCommand('vscode.open', Uri.file(imagePath), {
+    viewColumn: ViewColumn.Beside
+  })
 
 export const findOrCreateDvcYamlFile = (
   cwd: string,
