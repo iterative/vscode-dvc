@@ -168,18 +168,20 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public recreateCustomPlots() {
-    const experiments = this.experiments
-      .getExperimentsWithCheckpoints()
-      .filter(({ commit, id }) => !commit && id !== EXPERIMENT_WORKSPACE_ID)
+    const experimentsWithNoCommitData = this.experiments.hasCheckpoints()
+      ? this.experiments
+          .getExperimentsWithCheckpoints()
+          .filter(({ checkpoints }) => !!checkpoints)
+      : this.experiments.getExperiments()
 
-    if (experiments.length === 0) {
+    if (experimentsWithNoCommitData.length === 0) {
       this.customPlots = undefined
       return
     }
 
     const customPlots: CustomPlot[] = collectCustomPlots(
       this.getCustomPlotsOrder(),
-      experiments
+      experimentsWithNoCommitData
     )
     this.customPlots = customPlots
   }
