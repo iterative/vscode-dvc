@@ -15,7 +15,7 @@ export const ComparisonTableWrapper: React.FC = () => {
     <PlotsContainer
       title="Images"
       sectionKey={PlotsSection.COMPARISON_TABLE}
-      nbItemsPerRowOrWidth={width}
+      nbItemsPerRowOrWidth={width || 2}
       changeSize={changeSize}
       sectionCollapsed={isCollapsed}
       height={height}

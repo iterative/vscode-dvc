@@ -16,7 +16,10 @@ import React from 'react'
 import { Revision } from 'dvc/src/plots/webview/contract'
 import { act } from 'react-dom/test-utils'
 import { ComparisonTable } from './ComparisonTable'
-import { comparisonTableInitialState } from './comparisonTableSlice'
+import {
+  comparisonTableInitialState,
+  ComparisonTableState
+} from './comparisonTableSlice'
 import {
   createBubbledEvent,
   dragAndDrop,
@@ -73,7 +76,7 @@ describe('ComparisonTable', () => {
               comparison: {
                 ...comparisonTableInitialState,
                 ...props
-              },
+              } as ComparisonTableState,
               webview: {
                 ...webviewInitialState,
                 zoomedInPlot: undefined

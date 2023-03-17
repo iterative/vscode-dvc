@@ -17,6 +17,7 @@ import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { isSameGroup } from '../../../shared/components/dragDrop/DragDropContainer'
 import { changeOrderWithDraggedInfo } from '../../../util/array'
 import { LoadingSection, sectionIsLoading } from '../LoadingSection'
+import { useNbOfItemsPerRow } from '../../hooks/useNumberOfItemsPerRowOrWidth'
 
 export enum NewSectionBlock {
   TOP = 'drop-section-top',
@@ -27,6 +28,7 @@ export const TemplatePlots: React.FC = () => {
   const { nbItemsPerRow, sections } = useSelector(
     (state: PlotsState) => state.template
   )
+  const nbItemsPerRowOrDefault = useNbOfItemsPerRow(nbItemsPerRow)
   const draggedOverGroup = useSelector(
     (state: PlotsState) => state.dragAndDrop.draggedOverGroup
   )
@@ -166,7 +168,7 @@ export const TemplatePlots: React.FC = () => {
         const groupId = createIDWithIndex(section.group, i)
         const useVirtualizedGrid = shouldUseVirtualizedGrid(
           Object.keys(section.entries).length,
-          nbItemsPerRow
+          nbItemsPerRowOrDefault
         )
 
         const isMultiView = section.group === TemplatePlotGroup.MULTI_VIEW
@@ -225,7 +227,7 @@ export const TemplatePlots: React.FC = () => {
               multiView={isMultiView}
               setSectionEntries={setSectionEntries}
               useVirtualizedGrid={useVirtualizedGrid}
-              nbItemsPerRow={nbItemsPerRow}
+              nbItemsPerRow={nbItemsPerRowOrDefault}
               parentDraggedOver={draggedOverGroup === groupId}
             />
           </div>

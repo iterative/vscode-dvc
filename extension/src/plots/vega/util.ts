@@ -26,7 +26,7 @@ import {
 } from 'vega-lite/build/src/spec/repeat'
 import { TopLevelUnitSpec } from 'vega-lite/build/src/spec/unit'
 import isEqual from 'lodash.isequal'
-import { ColorScale, DEFAULT_NB_ITEMS_PER_ROW } from '../webview/contract'
+import { ColorScale } from '../webview/contract'
 import { ShapeEncoding, StrokeDashEncoding } from '../multiSource/constants'
 import { Color } from '../../experiments/model/status/colors'
 
@@ -255,8 +255,8 @@ const truncateTitle = (
 
 export const truncateVerticalTitle = (
   title: Text | Title,
-  width: number,
-  height: number
+  width = 2,
+  height = 2
 ) => truncateTitle(title, Math.floor((50 - (width - height) * 5) * 0.75))
 
 const isEndValue = (valueType: string) =>
@@ -264,7 +264,7 @@ const isEndValue = (valueType: string) =>
 
 export const truncateTitles = (
   spec: TopLevelSpec,
-  width: number,
+  width = 2,
   height: number,
   vertical?: boolean
   // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -286,7 +286,7 @@ export const truncateTitles = (
         const title = value as unknown as Title
         specCopy[key] = vertical
           ? truncateVerticalTitle(title, width, height)
-          : truncateTitle(title, width > DEFAULT_NB_ITEMS_PER_ROW ? 30 : 50)
+          : truncateTitle(title, width > 2 ? 30 : 50)
       } else if (isEndValue(valueType)) {
         specCopy[key] = value
       } else if (Array.isArray(value)) {
@@ -306,7 +306,7 @@ export const truncateTitles = (
 
 export const extendVegaSpec = (
   spec: TopLevelSpec,
-  width: number,
+  width: number | undefined,
   height: number,
   encoding?: {
     color?: ColorScale

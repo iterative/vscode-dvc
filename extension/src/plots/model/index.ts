@@ -56,7 +56,7 @@ export type CustomPlotsOrderValue = { metric: string; param: string }
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
 
-  private nbItemsPerRowOrWidth: Record<PlotsSection, number>
+  private nbItemsPerRowOrWidth: Record<PlotsSection, number | undefined>
   private height: Record<PlotsSection, PlotHeight>
   private customPlotsOrder: CustomPlotsOrderValue[]
   private sectionCollapsed: SectionCollapsed

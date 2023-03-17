@@ -1,7 +1,7 @@
 import { VisualizationSpec } from 'react-vega'
 import { Color } from '../../experiments/model/status/colors'
 
-export const DEFAULT_NB_ITEMS_PER_ROW = 2
+export const DEFAULT_NB_ITEMS_PER_ROW = undefined
 
 export enum PlotHeight {
   SMALLER,
@@ -71,7 +71,7 @@ export type Revision = {
 
 export interface PlotsComparisonData {
   plots: ComparisonPlots
-  width: number
+  width: number | undefined
   height: PlotHeight
   revisions: Revision[]
 }
@@ -104,7 +104,7 @@ export type CustomPlotData = {
 
 export type CustomPlotsData = {
   plots: CustomPlotData[]
-  nbItemsPerRow: number
+  nbItemsPerRow: number | undefined
   height: PlotHeight
 }
 
@@ -113,7 +113,7 @@ export type CheckpointPlotData = CheckpointPlot & { title: string }
 export type CheckpointPlotsData = {
   plots: CheckpointPlotData[]
   colors: ColorScale
-  nbItemsPerRow: number
+  nbItemsPerRow: number | undefined
   height: PlotHeight
   selectedMetrics?: string[]
 }
@@ -162,7 +162,7 @@ export type TemplatePlotSection = {
 
 export interface TemplatePlotsData {
   plots: TemplatePlotSection[]
-  nbItemsPerRow: number
+  nbItemsPerRow: number | undefined
   height: PlotHeight
 }
 

@@ -18,6 +18,7 @@ import { shouldUseVirtualizedGrid } from '../util'
 import { PlotsState } from '../../store'
 import { changeOrderWithDraggedInfo } from '../../../util/array'
 import { LoadingSection, sectionIsLoading } from '../LoadingSection'
+import { useNbOfItemsPerRow } from '../../hooks/useNumberOfItemsPerRowOrWidth'
 
 interface CheckpointPlotsProps {
   plotsIds: string[]
@@ -32,6 +33,7 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
   const { nbItemsPerRow, hasData, disabledDragPlotIds } = useSelector(
     (state: PlotsState) => state.checkpoint
   )
+  const nbItemsPerRowOrDefault = useNbOfItemsPerRow(nbItemsPerRow)
   const [onSection, setOnSection] = useState(false)
   const draggedRef = useSelector(
     (state: PlotsState) => state.dragAndDrop.draggedRef
@@ -69,7 +71,7 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
 
   const useVirtualizedGrid = shouldUseVirtualizedGrid(
     items.length,
-    nbItemsPerRow
+    nbItemsPerRowOrDefault
   )
 
   const handleDropAtTheEnd = () => {
@@ -104,7 +106,7 @@ export const CheckpointPlots: React.FC<CheckpointPlotsProps> = ({
           useVirtualizedGrid
             ? {
                 component: VirtualizedGrid as React.FC<WrapperProps>,
-                props: { nbItemsPerRow }
+                props: { nbItemsPerRow: nbItemsPerRowOrDefault }
               }
             : undefined
         }

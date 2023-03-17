@@ -37,11 +37,7 @@ const smallCheckpointPlotsFixture = {
   nbItemsPerRow: 3,
   plots: checkpointPlotsFixture.plots.map(plot => ({
     ...plot,
-    title: truncateVerticalTitle(
-      plot.title,
-      DEFAULT_NB_ITEMS_PER_ROW,
-      DEFAULT_PLOT_HEIGHT
-    ) as string
+    title: truncateVerticalTitle(plot.title, 2, DEFAULT_PLOT_HEIGHT) as string
   }))
 }
 
@@ -52,11 +48,7 @@ const manyCheckpointPlots = (length: number) =>
       return {
         ...plot,
         id,
-        title: truncateVerticalTitle(
-          id,
-          DEFAULT_NB_ITEMS_PER_ROW,
-          DEFAULT_PLOT_HEIGHT
-        ) as string
+        title: truncateVerticalTitle(id, 2, DEFAULT_PLOT_HEIGHT) as string
       }
     }
   )

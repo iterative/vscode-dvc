@@ -19,10 +19,7 @@ import smoothTemplate from '../../test/fixtures/plotsDiff/templates/smooth'
 import multiSourceTemplate from '../../test/fixtures/plotsDiff/templates/multiSource'
 import { copyOriginalColors } from '../../experiments/model/status/colors'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
-import {
-  DEFAULT_NB_ITEMS_PER_ROW,
-  DEFAULT_PLOT_HEIGHT
-} from '../webview/contract'
+import { DEFAULT_PLOT_HEIGHT } from '../webview/contract'
 
 describe('isMultiViewPlot', () => {
   it('should recognize the confusion matrix template as a multi view plot', () => {
@@ -87,11 +84,7 @@ describe('getColorScale', () => {
 
 describe('extendVegaSpec', () => {
   it('should not add encoding if no color scale is provided', () => {
-    const extendedSpec = extendVegaSpec(
-      linearTemplate,
-      DEFAULT_NB_ITEMS_PER_ROW,
-      DEFAULT_PLOT_HEIGHT
-    )
+    const extendedSpec = extendVegaSpec(linearTemplate, 2, DEFAULT_PLOT_HEIGHT)
     expect(extendedSpec.encoding).toBeUndefined()
   })
 
@@ -102,7 +95,7 @@ describe('extendVegaSpec', () => {
     }
     const extendedSpec = extendVegaSpec(
       linearTemplate,
-      DEFAULT_NB_ITEMS_PER_ROW,
+      2,
       DEFAULT_PLOT_HEIGHT,
       {
         color: colorScale
@@ -174,11 +167,7 @@ describe('extendVegaSpec', () => {
 
   it('should truncate all titles from the left to 50 characters for regular plots', () => {
     const spec = withLongTemplatePlotTitle()
-    const updatedSpec = extendVegaSpec(
-      spec,
-      DEFAULT_NB_ITEMS_PER_ROW,
-      DEFAULT_PLOT_HEIGHT
-    )
+    const updatedSpec = extendVegaSpec(spec, 2, DEFAULT_PLOT_HEIGHT)
 
     const truncatedTitle = '…-many-many-characters-at-least-seventy-characters'
     const truncatedHorizontalTitle =

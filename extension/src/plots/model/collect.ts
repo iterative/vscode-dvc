@@ -585,7 +585,7 @@ const collectTemplatePlot = (
   path: string,
   template: string,
   revisionData: RevisionData,
-  nbItemsPerRow: number,
+  nbItemsPerRow: number | undefined,
   height: number,
   revisionColors: ColorScale | undefined,
   multiSourceEncoding: MultiSourceEncoding
@@ -630,7 +630,7 @@ const collectTemplateGroup = (
   selectedRevisions: string[],
   templates: TemplateAccumulator,
   revisionData: RevisionData,
-  nbItemsPerRow: number,
+  nbItemsPerRow: number | undefined,
   height: number,
   revisionColors: ColorScale | undefined,
   multiSourceEncoding: MultiSourceEncoding
@@ -663,7 +663,7 @@ export const collectSelectedTemplatePlots = (
   selectedRevisions: string[],
   templates: TemplateAccumulator,
   revisionData: RevisionData,
-  nbItemsPerRow: number,
+  nbItemsPerRow: number | undefined,
   height: number,
   revisionColors: ColorScale | undefined,
   multiSourceEncoding: MultiSourceEncoding

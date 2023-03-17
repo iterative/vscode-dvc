@@ -7,12 +7,15 @@ import { changeSize } from './customPlotsSlice'
 import { PlotsContainer } from '../PlotsContainer'
 import { PlotsState } from '../../store'
 import { sendMessage } from '../../../shared/vscode'
+import { useNbOfItemsPerRow } from '../../hooks/useNumberOfItemsPerRowOrWidth'
 
 export const CustomPlotsWrapper: React.FC = () => {
   const { plotsIds, nbItemsPerRow, isCollapsed, height } = useSelector(
     (state: PlotsState) => state.custom
   )
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
+  const nbItemsPerRowOrDefault = useNbOfItemsPerRow(nbItemsPerRow)
+
   useEffect(() => {
     setSelectedPlots(plotsIds)
   }, [plotsIds, setSelectedPlots])
@@ -30,7 +33,7 @@ export const CustomPlotsWrapper: React.FC = () => {
     <PlotsContainer
       title="Custom"
       sectionKey={PlotsSection.CUSTOM_PLOTS}
-      nbItemsPerRowOrWidth={nbItemsPerRow}
+      nbItemsPerRowOrWidth={nbItemsPerRowOrDefault}
       sectionCollapsed={isCollapsed}
       addPlotsButton={{ onClick: addCustomPlot }}
       removePlotsButton={hasItems ? { onClick: removeCustomPlots } : undefined}

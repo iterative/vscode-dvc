@@ -8,6 +8,7 @@ import styles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
 import { plotDataStore } from '../plotDataStore'
 import { PlotsState } from '../../store'
+import { useNbOfItemsPerRow } from '../../hooks/useNumberOfItemsPerRowOrWidth'
 
 interface CustomPlotProps {
   id: string
@@ -21,6 +22,7 @@ export const CustomPlot: React.FC<CustomPlotProps> = ({ id }) => {
   const nbItemsPerRow = useSelector(
     (state: PlotsState) => state.custom.nbItemsPerRow
   )
+  const nbItemsPerRowOrDefault = useNbOfItemsPerRow(nbItemsPerRow)
 
   const spec = useMemo(() => {
     if (plot) {
@@ -44,7 +46,7 @@ export const CustomPlot: React.FC<CustomPlotProps> = ({ id }) => {
         spec={spec}
         id={id}
         changeDisabledDragIds={changeDisabledDragIds}
-        currentSnapPoint={nbItemsPerRow}
+        currentSnapPoint={nbItemsPerRowOrDefault}
         section={PlotsSection.CUSTOM_PLOTS}
       />
     </div>

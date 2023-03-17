@@ -1764,7 +1764,7 @@ describe('App', () => {
       it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than fourteen regular plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(15) },
-          DEFAULT_NB_ITEMS_PER_ROW,
+          2,
           PlotsSection.CHECKPOINT_PLOTS
         )
 
@@ -1774,7 +1774,7 @@ describe('App', () => {
       it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are fourteen regular plots', async () => {
         await renderAppAndChangeSize(
           { checkpoint: createCheckpointPlots(14) },
-          DEFAULT_NB_ITEMS_PER_ROW,
+          2,
           PlotsSection.CHECKPOINT_PLOTS
         )
 
@@ -1784,7 +1784,7 @@ describe('App', () => {
       it('should  wrap the template plots in a big grid (virtualize them) when there are more than fourteen regular plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(15) },
-          DEFAULT_NB_ITEMS_PER_ROW,
+          2,
           PlotsSection.TEMPLATE_PLOTS
         )
 
@@ -1794,7 +1794,7 @@ describe('App', () => {
       it('should not wrap the template plots in a big grid (virtualize them) when there are fourteen or fewer regular plots', async () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(14) },
-          DEFAULT_NB_ITEMS_PER_ROW,
+          2,
           PlotsSection.TEMPLATE_PLOTS
         )
 
@@ -1808,7 +1808,7 @@ describe('App', () => {
         beforeEach(async () => {
           store = await renderAppAndChangeSize(
             { checkpoint },
-            DEFAULT_NB_ITEMS_PER_ROW,
+            2,
             PlotsSection.CHECKPOINT_PLOTS
           )
         })

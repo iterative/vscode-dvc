@@ -1,4 +1,4 @@
-import React, { FormEvent, MouseEvent } from 'react'
+import React, { createRef, FormEvent, MouseEvent, useEffect } from 'react'
 import styles from './styles.module.scss'
 
 interface SliderProps {
@@ -18,6 +18,16 @@ export const Slider: React.FC<SliderProps> = ({
   label,
   onChange
 }) => {
+  const sliderRef = createRef<HTMLInputElement>()
+
+  useEffect(() => {
+    if (
+      sliderRef.current &&
+      defaultValue !== Number.parseFloat(sliderRef.current.value)
+    ) {
+      sliderRef.current.value = defaultValue.toString()
+    }
+  }, [defaultValue, sliderRef])
   const handleOnChange = (e: FormEvent<HTMLInputElement>) => {
     onChange(Number.parseFloat(e.currentTarget.value))
   }
@@ -27,6 +37,7 @@ export const Slider: React.FC<SliderProps> = ({
         {label}
       </label>
       <input
+        ref={sliderRef}
         type="range"
         id={label}
         className={styles.slider}

@@ -1,4 +1,3 @@
-import { DEFAULT_NB_ITEMS_PER_ROW } from 'dvc/src/plots/webview/contract'
 import React, { useRef } from 'react'
 import {
   AutoSizer,
@@ -18,7 +17,7 @@ export const OVERSCAN_ROW_COUNT = 15
 
 export const VirtualizedGrid: React.FC<VirtualizedGridProps> = ({
   items,
-  nbItemsPerRow = DEFAULT_NB_ITEMS_PER_ROW
+  nbItemsPerRow
 }) => {
   const cache = useRef(
     new CellMeasurerCache({

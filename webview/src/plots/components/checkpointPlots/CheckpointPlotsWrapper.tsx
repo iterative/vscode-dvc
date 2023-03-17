@@ -7,6 +7,7 @@ import { changeSize } from './checkpointPlotsSlice'
 import { PlotsContainer } from '../PlotsContainer'
 import { sendMessage } from '../../../shared/vscode'
 import { PlotsState } from '../../store'
+import { useNbOfItemsPerRow } from '../../hooks/useNumberOfItemsPerRowOrWidth'
 
 export const CheckpointPlotsWrapper: React.FC = () => {
   const {
@@ -19,6 +20,7 @@ export const CheckpointPlotsWrapper: React.FC = () => {
   } = useSelector((state: PlotsState) => state.checkpoint)
   const [metrics, setMetrics] = useState<string[]>([])
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
+  const nbItemsPerRowOrDefault = useNbOfItemsPerRow(nbItemsPerRow)
 
   useEffect(() => {
     setMetrics([...plotsIds].sort())
@@ -48,7 +50,7 @@ export const CheckpointPlotsWrapper: React.FC = () => {
       title="Trends"
       sectionKey={PlotsSection.CHECKPOINT_PLOTS}
       menu={menu}
-      nbItemsPerRowOrWidth={nbItemsPerRow}
+      nbItemsPerRowOrWidth={nbItemsPerRowOrDefault}
       sectionCollapsed={isCollapsed}
       changeSize={changeSize}
       hasItems={hasItems}

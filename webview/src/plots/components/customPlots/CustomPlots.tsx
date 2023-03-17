@@ -16,6 +16,7 @@ import { shouldUseVirtualizedGrid } from '../util'
 import { PlotsState } from '../../store'
 import { sendMessage } from '../../../shared/vscode'
 import { changeOrderWithDraggedInfo } from '../../../util/array'
+import { useNbOfItemsPerRow } from '../../hooks/useNumberOfItemsPerRowOrWidth'
 
 interface CustomPlotsProps {
   plotsIds: string[]
@@ -26,6 +27,7 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
   const { nbItemsPerRow, hasData, disabledDragPlotIds } = useSelector(
     (state: PlotsState) => state.custom
   )
+  const nbItemsPerRowOrDefault = useNbOfItemsPerRow(nbItemsPerRow)
   const [onSection, setOnSection] = useState(false)
   const draggedRef = useSelector(
     (state: PlotsState) => state.dragAndDrop.draggedRef
@@ -59,7 +61,7 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
 
   const useVirtualizedGrid = shouldUseVirtualizedGrid(
     items.length,
-    nbItemsPerRow
+    nbItemsPerRowOrDefault
   )
 
   const handleDragOver = (e: DragEvent) => {
@@ -93,7 +95,7 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
           useVirtualizedGrid
             ? {
                 component: VirtualizedGrid as React.FC<WrapperProps>,
-                props: { nbItemsPerRow }
+                props: { nbItemsPerRow: nbItemsPerRowOrDefault }
               }
             : undefined
         }

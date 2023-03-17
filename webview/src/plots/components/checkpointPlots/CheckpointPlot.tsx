@@ -8,6 +8,7 @@ import styles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
 import { plotDataStore } from '../plotDataStore'
 import { PlotsState } from '../../store'
+import { useNbOfItemsPerRow } from '../../hooks/useNumberOfItemsPerRowOrWidth'
 
 interface CheckpointPlotProps {
   id: string
@@ -27,6 +28,7 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
   const nbItemsPerRow = useSelector(
     (state: PlotsState) => state.checkpoint.nbItemsPerRow
   )
+  const nbItemsPerRowOrDefault = useNbOfItemsPerRow(nbItemsPerRow)
 
   const spec = useMemo(() => {
     const title = plot?.title
@@ -52,7 +54,7 @@ export const CheckpointPlot: React.FC<CheckpointPlotProps> = ({
         spec={spec}
         id={id}
         changeDisabledDragIds={changeDisabledDragIds}
-        currentSnapPoint={nbItemsPerRow}
+        currentSnapPoint={nbItemsPerRowOrDefault}
         section={PlotsSection.CHECKPOINT_PLOTS}
       />
     </div>
