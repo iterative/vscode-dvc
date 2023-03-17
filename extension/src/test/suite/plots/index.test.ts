@@ -544,7 +544,7 @@ suite('Plots Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
-        payload: 'a/path.jpg',
+        payload: webview.getWebviewUri('a/path.jpg'),
         type: MessageFromWebviewType.ZOOM_PLOT
       })
 
@@ -567,7 +567,7 @@ suite('Plots Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
-        payload: imagePath,
+        payload: webview.getWebviewUri(imagePath),
         type: MessageFromWebviewType.ZOOM_PLOT
       })
 
