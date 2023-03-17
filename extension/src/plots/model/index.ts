@@ -121,7 +121,6 @@ export class PlotsModel extends ModelWithPersistence {
         collectTemplates(data),
         collectMultiSourceVariations(data, this.multiSourceVariations)
       ])
-    this.recreateCustomPlots()
 
     this.comparisonData = {
       ...this.comparisonData,
@@ -169,11 +168,9 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public recreateCustomPlots() {
-    const experiments = this.experiments.hasCheckpoints()
-      ? this.experiments
-          .getExperimentsWithCheckpoints()
-          .filter(({ checkpoints }) => !!checkpoints)
-      : this.experiments.getExperiments()
+    const experiments = this.experiments
+      .getExperimentsWithCheckpoints()
+      .filter(({ commit, id }) => !commit && id !== EXPERIMENT_WORKSPACE_ID)
 
     if (experiments.length === 0) {
       this.customPlots = undefined
