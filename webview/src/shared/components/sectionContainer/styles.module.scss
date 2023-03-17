@@ -27,6 +27,11 @@ $gap: 20px;
   }
 }
 
+.insideSection {
+  width: 100%;
+  overflow-x: scroll;
+}
+
 .summaryTitle {
   display: flex;
   align-items: center;
