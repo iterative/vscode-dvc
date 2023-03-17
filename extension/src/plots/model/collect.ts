@@ -52,18 +52,22 @@ import {
 import { StrokeDashEncoding } from '../multiSource/constants'
 import {
   ExperimentWithCheckpoints,
-  SelectedExperimentWithColor,
-  ExperimentWithDefinedCheckpoints
+  ExperimentWithDefinedCheckpoints,
+  SelectedExperimentWithColor
 } from '../../experiments/model'
 import { Color } from '../../experiments/model/status/colors'
 
 export const getCustomPlotId = (metric: string, param = CHECKPOINTS_PARAM) =>
   `custom-${metric}-${param}`
 
-export const getValueFromColumn = (
+const getValueFromColumn = (
   path: string,
   experiment: ExperimentWithCheckpoints
 ) => get(experiment, splitColumnPath(path)) as number | undefined
+
+const isExperimentWithDefinedCheckpoints = (
+  experiment: ExperimentWithCheckpoints
+): experiment is ExperimentWithDefinedCheckpoints => !!experiment.checkpoints
 
 const collectCheckpointValuesFromExperiment = (
   values: CheckpointPlotValues,
@@ -90,17 +94,13 @@ const getCheckpointValues = (
   experiments: ExperimentWithCheckpoints[],
   metricPath: string
 ): CheckpointPlotValues => {
-  const fullValues: CheckpointPlotValues = []
+  const values: CheckpointPlotValues = []
   for (const experiment of experiments) {
-    if (experiment.checkpoints) {
-      collectCheckpointValuesFromExperiment(
-        fullValues,
-        experiment as ExperimentWithDefinedCheckpoints,
-        metricPath
-      )
+    if (isExperimentWithDefinedCheckpoints(experiment)) {
+      collectCheckpointValuesFromExperiment(values, experiment, metricPath)
     }
   }
-  return fullValues
+  return values
 }
 
 const getMetricVsParamValues = (
@@ -108,14 +108,14 @@ const getMetricVsParamValues = (
   metricPath: string,
   paramPath: string
 ): MetricVsParamPlotValues => {
-  const fullValues: MetricVsParamPlotValues = []
+  const values: MetricVsParamPlotValues = []
 
   for (const experiment of experiments) {
     const metricValue = getValueFromColumn(metricPath, experiment)
     const paramValue = getValueFromColumn(paramPath, experiment)
 
     if (metricValue !== undefined && paramValue !== undefined) {
-      fullValues.push({
+      values.push({
         expName: experiment.name || experiment.label,
         metric: metricValue,
         param: paramValue
@@ -123,7 +123,7 @@ const getMetricVsParamValues = (
     }
   }
 
-  return fullValues
+  return values
 }
 
 const getCustomPlot = (
