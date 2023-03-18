@@ -4860,14 +4860,14 @@
     "@microsoft/fast-foundation" "^2.38.0"
     "@microsoft/fast-react-wrapper" "^0.1.18"
 
-"@wdio/cli@8.5.8":
-  version "8.5.8"
-  resolved "https://registry.yarnpkg.com/@wdio/cli/-/cli-8.5.8.tgz#cca8aa0fc81d4bd8dd39d3acb1423ff9bd7e2ce8"
-  integrity sha512-I7B6f+ZcXzftXT3QLkMTKZdqmiZ3CEkmduNFgErchJdXzbQ7/1CU2GyskiNlPW9vBo/fSHUnFca8th5FRgDVFw==
+"@wdio/cli@8.5.9":
+  version "8.5.9"
+  resolved "https://registry.yarnpkg.com/@wdio/cli/-/cli-8.5.9.tgz#15c4225296f111a63b2a4b7ff2e42b721d98ce29"
+  integrity sha512-wZndxvrwOlYKJqZA5Ju0n34NY3hsHwbqBwLVRoKUKlZC2BR/KwWtWE2+RJA/j8/KlkPkxaJzFTq46h8Yv1mSKA==
   dependencies:
     "@types/node" "^18.0.0"
     "@wdio/config" "8.5.6"
-    "@wdio/globals" "8.5.8"
+    "@wdio/globals" "8.5.9"
     "@wdio/logger" "8.1.0"
     "@wdio/protocols" "8.5.7"
     "@wdio/types" "8.4.0"
@@ -4886,7 +4886,7 @@
     mkdirp "^2.0.0"
     read-pkg-up "9.1.0"
     recursive-readdir "^2.2.2"
-    webdriverio "8.5.8"
+    webdriverio "8.5.9"
     yargs "^17.5.1"
     yarn-install "^1.0.0"
 
@@ -4926,23 +4926,23 @@
     expect-webdriverio "^4.0.1"
     webdriverio "8.0.13"
 
-"@wdio/globals@8.5.8":
-  version "8.5.8"
-  resolved "https://registry.yarnpkg.com/@wdio/globals/-/globals-8.5.8.tgz#7d1049202704099e4a02ccbaefc59e77884ecec3"
-  integrity sha512-a1DzJprcWOtAHCEEZ6tTFR/S7hplbKejZi97BCOjqhhKt6M8ThGUOjTsuYE9FvnaQATlakszTjD09KF26BSRFQ==
+"@wdio/globals@8.5.9":
+  version "8.5.9"
+  resolved "https://registry.yarnpkg.com/@wdio/globals/-/globals-8.5.9.tgz#e3f9b18da20d4f1c22f795996756733590453206"
+  integrity sha512-WdBBUvDiyK+7jgjwTcElF+8keF7a0GiV4tg9IYYMWBwApEgrIIQNmG99pl8DZ93ojUQUQ5eCKW52fJySv1GGwg==
   optionalDependencies:
     expect-webdriverio "^4.0.1"
-    webdriverio "8.5.8"
+    webdriverio "8.5.9"
 
-"@wdio/local-runner@8.5.8":
-  version "8.5.8"
-  resolved "https://registry.yarnpkg.com/@wdio/local-runner/-/local-runner-8.5.8.tgz#9f221f7e3c9c57bd92a17e3aafdec2f0c3a31792"
-  integrity sha512-SqSwwwlM1/VPg4J74hSj0aMb52RQj+JPlyDeDiexnXRnXopKabXlckFHzMF6xJ19GqfnJaR/S9223mdYzN3CYg==
+"@wdio/local-runner@8.5.9":
+  version "8.5.9"
+  resolved "https://registry.yarnpkg.com/@wdio/local-runner/-/local-runner-8.5.9.tgz#5f3993165139c15f49a9a1f2902a2352e4597253"
+  integrity sha512-u16wubIh2S7bF90s0xf6PGvmS2F5dT6rpAyxoX4bKG/ab5bjBSLLNHNiJ8/fS8wNllrT6O+b5BvKuolmdvWsHw==
   dependencies:
     "@types/node" "^18.0.0"
     "@wdio/logger" "8.1.0"
     "@wdio/repl" "8.1.0"
-    "@wdio/runner" "8.5.8"
+    "@wdio/runner" "8.5.9"
     "@wdio/types" "8.4.0"
     async-exit-hook "^2.0.1"
     split2 "^4.1.0"
@@ -5014,14 +5014,14 @@
     object-inspect "^1.12.0"
     supports-color "9.3.1"
 
-"@wdio/runner@8.5.8":
-  version "8.5.8"
-  resolved "https://registry.yarnpkg.com/@wdio/runner/-/runner-8.5.8.tgz#837708c8cf6aa13e1197f97841549191dca95db0"
-  integrity sha512-THg6u5edC5jzygQ5tT4ayKnVfduhxyNzcEvSBkVf9DgiCRAyur07ow3dBkTzmWNGta2JbPfx1Fu2j2yMzalcfw==
+"@wdio/runner@8.5.9":
+  version "8.5.9"
+  resolved "https://registry.yarnpkg.com/@wdio/runner/-/runner-8.5.9.tgz#a732dc7baaa2feafe0f6b87dec015846e092602e"
+  integrity sha512-T7fDSuCFgY5nAitE6f2Knj2sCPlA//JaJqLKXWuRC2aEc7g/y5vHzpAJftQ0KLgVl7bKlHeAxkd0VGTIY03jfA==
   dependencies:
     "@types/node" "^18.0.0"
     "@wdio/config" "8.5.6"
-    "@wdio/globals" "8.5.8"
+    "@wdio/globals" "8.5.9"
     "@wdio/logger" "8.1.0"
     "@wdio/types" "8.4.0"
     "@wdio/utils" "8.5.6"
@@ -5029,7 +5029,7 @@
     expect-webdriverio "^4.0.1"
     gaze "^1.1.2"
     webdriver "8.5.7"
-    webdriverio "8.5.8"
+    webdriverio "8.5.9"
 
 "@wdio/spec-reporter@8.4.0":
   version "8.4.0"
@@ -8452,10 +8452,10 @@ devtools@8.0.13:
     uuid "^9.0.0"
     which "^3.0.0"
 
-devtools@8.5.7:
-  version "8.5.7"
-  resolved "https://registry.yarnpkg.com/devtools/-/devtools-8.5.7.tgz#79c5f91e6fd585e0d72c6a9eff9eb771daa485b1"
-  integrity sha512-ikZQFHtyh77Bis0oiAODM8L5MHyzuzjTO1R5s6Z9DA3axefMgXJFzFebA8ku/MCXnl1+GmPdKp2aHC+4YXPYuQ==
+devtools@8.5.9:
+  version "8.5.9"
+  resolved "https://registry.yarnpkg.com/devtools/-/devtools-8.5.9.tgz#ad671503c7bbacad5ae5008b3452bbe32880ef62"
+  integrity sha512-zhEHZjqsWnnOnDozSkKBXEBsfV1qtdk5gbHQQnu2B22Az7f3nZnLfznNVmqxcaYC3lmplsnnMlsRk6WgouAagw==
   dependencies:
     "@types/node" "^18.0.0"
     "@wdio/config" "8.5.6"
@@ -19347,10 +19347,10 @@ webdriverio@8.0.13, webdriverio@^8.0.0-alpha.505:
     serialize-error "^8.0.0"
     webdriver "8.0.13"
 
-webdriverio@8.5.8:
-  version "8.5.8"
-  resolved "https://registry.yarnpkg.com/webdriverio/-/webdriverio-8.5.8.tgz#40bad020857ec6f694f2affb3daa6e77a1c719cf"
-  integrity sha512-ViysVL2FhbMSLYhYV6WoikrfzLRzJpoE+bYW2Dj4FITELL4vlPFUAsN+7kiAVWhRXYjpG57IGO6K5xVemT/kbQ==
+webdriverio@8.5.9:
+  version "8.5.9"
+  resolved "https://registry.yarnpkg.com/webdriverio/-/webdriverio-8.5.9.tgz#9a202cca9959aa7a097ef5ed6178a8a8a39d7f73"
+  integrity sha512-nKjrp6lmPdyg5nnst6BVcV+8r+3Yx/hOhgO2G+0kfCpQp2uATwn2Y4fk6u7ba09e8gsAyxI+1bYv34ra8zKCdQ==
   dependencies:
     "@types/node" "^18.0.0"
     "@wdio/config" "8.5.6"
@@ -19363,7 +19363,7 @@ webdriverio@8.5.8:
     aria-query "^5.0.0"
     css-shorthand-properties "^1.1.1"
     css-value "^0.0.1"
-    devtools "8.5.7"
+    devtools "8.5.9"
     devtools-protocol "^0.0.1109433"
     grapheme-splitter "^1.0.2"
     import-meta-resolve "^2.1.0"
