@@ -70,7 +70,7 @@
     "jest-environment-jsdom": "29.5.0",
     "lint-staged": "13.2.0",
     "raw-loader": "4.0.2",
-    "sass": "1.58.3",
+    "sass": "1.59.1",
     "sass-loader": "13.2.0",
     "storybook-addon-designs": "6.3.1",
     "storybook-addon-themes": "6.1.0",
