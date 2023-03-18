@@ -19,6 +19,7 @@ export const STUDIO_ENDPOINT = 'https://studio.iterative.ai/api/live'
 
 type ExperimentDetails = {
   baselineSha: string
+  sha: string
   metrics: ValueTreeRoot | undefined
   name: string
   params: ValueTreeRoot
@@ -29,6 +30,7 @@ type RequestBody = {
   repo_url: string
   name: string
   baseline_sha: string
+  experiment_rev: string
   metrics: ValueTreeRoot
   params: ValueTreeRoot
   type: 'done'
@@ -50,22 +52,23 @@ const collectExperiment = (data: ExperimentFields) => {
 
 const findExperimentByName = (
   name: string,
-  sha: string,
+  baselineSha: string,
   experimentsObject: ExperimentsCommitOutput
 ) => {
-  for (const experiment of Object.values(experimentsObject)) {
-    if (experiment.data?.name !== name) {
+  for (const [sha, { data }] of Object.entries(experimentsObject)) {
+    if (data?.name !== name) {
       continue
     }
 
-    if (experiment?.data) {
-      const { metrics, params } = collectExperiment(experiment.data)
+    if (data) {
+      const { metrics, params } = collectExperiment(data)
 
       return {
-        baselineSha: sha,
+        baselineSha,
         metrics,
         name,
-        params
+        params,
+        sha
       }
     }
   }
@@ -114,7 +117,7 @@ const shareWithProgress = (
   studioAccessToken: string
 ): Thenable<unknown> =>
   Toast.showProgress('Sharing Experiment', async progress => {
-    const { metrics, params, baselineSha, name } = experimentDetails
+    const { metrics, params, baselineSha, sha, name } = experimentDetails
 
     progress.report({
       increment: 0,
@@ -125,6 +128,7 @@ const shareWithProgress = (
     const response = await sendPostRequest(studioAccessToken, {
       baseline_sha: baselineSha,
       client: 'vscode',
+      experiment_rev: sha,
       metrics: metrics || {},
       name,
       params: params || {},
