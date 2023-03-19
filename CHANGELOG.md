@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.22] - 2023-03-19
+
+### 🐛 Bug Fixes
+
+- Add experiment_rev into payload for share experiment to Studio [#3499](https://github.com/iterative/vscode-dvc/pull/3499) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.6.21] - 2023-03-17
 
 ### 🚀 New Features and Enhancements
