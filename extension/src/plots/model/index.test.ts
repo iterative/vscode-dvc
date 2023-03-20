@@ -1,5 +1,6 @@
 import { PlotsModel } from '.'
 import {
+  CustomPlotType,
   DEFAULT_NB_ITEMS_PER_ROW,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH,
@@ -22,7 +23,7 @@ const mockedRevisions = [
 describe('plotsModel', () => {
   let model: PlotsModel
   const exampleDvcRoot = 'test'
-  const memento = buildMockMemento({
+  let memento = buildMockMemento({
     [PersistenceKey.PLOTS_CUSTOM_ORDER + exampleDvcRoot]:
       customPlotsOrderFixture,
     [PersistenceKey.PLOT_NB_ITEMS_PER_ROW_OR_WIDTH + exampleDvcRoot]:
@@ -43,6 +44,33 @@ describe('plotsModel', () => {
       memento
     )
     jest.clearAllMocks()
+  })
+
+  it('should update outdated custom state', () => {
+    memento = buildMockMemento({
+      [PersistenceKey.PLOTS_CUSTOM_ORDER + exampleDvcRoot]: [
+        {
+          metric: 'metrics:summary.json:loss',
+          param: 'params:params.yaml:dropout'
+        }
+      ]
+    })
+    model = new PlotsModel(
+      exampleDvcRoot,
+      {
+        getFirstThreeColumnOrder: mockedGetFirstThreeColumnOrder,
+        getSelectedRevisions: mockedGetSelectedRevisions,
+        isReady: () => Promise.resolve(undefined)
+      } as unknown as Experiments,
+      memento
+    )
+    expect(model.getCustomPlotsOrder()).toStrictEqual([
+      {
+        metric: 'summary.json:loss',
+        param: 'params.yaml:dropout',
+        type: CustomPlotType.METRIC_VS_PARAM
+      }
+    ])
   })
 
   it('should change the plotSize when calling setPlotSize', () => {
