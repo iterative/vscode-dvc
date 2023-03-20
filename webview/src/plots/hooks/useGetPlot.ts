@@ -1,5 +1,4 @@
 import {
-  CheckpointPlotData,
   CustomPlotData,
   PlotsSection,
   TemplatePlotEntry
@@ -10,26 +9,13 @@ import { PlainObject, VisualizationSpec } from 'react-vega'
 import { plotDataStore } from '../components/plotDataStore'
 import { PlotsState } from '../store'
 
-const getStoreSection = (section: PlotsSection) => {
-  switch (section) {
-    case PlotsSection.CHECKPOINT_PLOTS:
-      return 'checkpoint'
-    case PlotsSection.TEMPLATE_PLOTS:
-      return 'template'
-    default:
-      return 'custom'
-  }
-}
-
 export const useGetPlot = (
   section: PlotsSection,
   id: string,
   spec?: VisualizationSpec
 ) => {
-  const isPlotWithSpec =
-    section === PlotsSection.CHECKPOINT_PLOTS ||
-    section === PlotsSection.CUSTOM_PLOTS
-  const storeSection = getStoreSection(section)
+  const isCustomPlot = section === PlotsSection.CUSTOM_PLOTS
+  const storeSection = isCustomPlot ? 'custom' : 'template'
   const snapshot = useSelector(
     (state: PlotsState) => state[storeSection].plotsSnapshots
   )
@@ -42,8 +28,8 @@ export const useGetPlot = (
       return
     }
 
-    if (isPlotWithSpec) {
-      setData({ values: (plot as CheckpointPlotData | CustomPlotData).values })
+    if (isCustomPlot) {
+      setData({ values: (plot as CustomPlotData).values })
       setContent(spec)
       return
     }
@@ -54,7 +40,7 @@ export const useGetPlot = (
       height: 'container',
       width: 'container'
     } as VisualizationSpec)
-  }, [id, isPlotWithSpec, setData, setContent, section, spec])
+  }, [id, isCustomPlot, setData, setContent, section, spec])
 
   useEffect(() => {
     setPlotData()

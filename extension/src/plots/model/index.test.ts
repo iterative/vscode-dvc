@@ -9,6 +9,7 @@ import { buildMockMemento } from '../../test/util'
 import { Experiments } from '../../experiments'
 import { PersistenceKey } from '../../persistence/constants'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
+import { customPlotsOrderFixture } from '../../test/fixtures/expShow/base/customPlots'
 
 const mockedRevisions = [
   { displayColor: 'white', label: EXPERIMENT_WORKSPACE_ID },
@@ -21,10 +22,9 @@ const mockedRevisions = [
 describe('plotsModel', () => {
   let model: PlotsModel
   const exampleDvcRoot = 'test'
-  const persistedSelectedMetrics = ['loss', 'accuracy']
   const memento = buildMockMemento({
-    [PersistenceKey.PLOT_SELECTED_METRICS + exampleDvcRoot]:
-      persistedSelectedMetrics,
+    [PersistenceKey.PLOTS_CUSTOM_ORDER + exampleDvcRoot]:
+      customPlotsOrderFixture,
     [PersistenceKey.PLOT_NB_ITEMS_PER_ROW_OR_WIDTH + exampleDvcRoot]:
       DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH
   })
@@ -45,51 +45,29 @@ describe('plotsModel', () => {
     jest.clearAllMocks()
   })
 
-  it('should change the selectedMetrics when calling setSelectedMetrics', () => {
-    expect(model.getSelectedMetrics()).toStrictEqual(persistedSelectedMetrics)
-
-    const newSelectedMetrics = ['one', 'two', 'four', 'hundred']
-    model.setSelectedMetrics(newSelectedMetrics)
-
-    expect(model.getSelectedMetrics()).toStrictEqual(newSelectedMetrics)
-  })
-
-  it('should update the persisted selected metrics when calling setSelectedMetrics', () => {
-    const mementoUpdateSpy = jest.spyOn(memento, 'update')
-    const newSelectedMetrics = ['one', 'two', 'four', 'hundred']
-
-    model.setSelectedMetrics(newSelectedMetrics)
-
-    expect(mementoUpdateSpy).toHaveBeenCalledTimes(2)
-    expect(mementoUpdateSpy).toHaveBeenCalledWith(
-      PersistenceKey.PLOT_SELECTED_METRICS + exampleDvcRoot,
-      newSelectedMetrics
-    )
-  })
-
   it('should change the plotSize when calling setPlotSize', () => {
     expect(
-      model.getNbItemsPerRowOrWidth(PlotsSection.CHECKPOINT_PLOTS)
+      model.getNbItemsPerRowOrWidth(PlotsSection.CUSTOM_PLOTS)
     ).toStrictEqual(DEFAULT_NB_ITEMS_PER_ROW)
 
-    model.setNbItemsPerRowOrWidth(PlotsSection.CHECKPOINT_PLOTS, 1)
+    model.setNbItemsPerRowOrWidth(PlotsSection.CUSTOM_PLOTS, 1)
 
     expect(
-      model.getNbItemsPerRowOrWidth(PlotsSection.CHECKPOINT_PLOTS)
+      model.getNbItemsPerRowOrWidth(PlotsSection.CUSTOM_PLOTS)
     ).toStrictEqual(1)
   })
 
   it('should update the persisted plot size when calling setPlotSize', () => {
     const mementoUpdateSpy = jest.spyOn(memento, 'update')
 
-    model.setNbItemsPerRowOrWidth(PlotsSection.CHECKPOINT_PLOTS, 2)
+    model.setNbItemsPerRowOrWidth(PlotsSection.CUSTOM_PLOTS, 2)
 
     expect(mementoUpdateSpy).toHaveBeenCalledTimes(1)
     expect(mementoUpdateSpy).toHaveBeenCalledWith(
       PersistenceKey.PLOT_NB_ITEMS_PER_ROW_OR_WIDTH + exampleDvcRoot,
       {
         ...DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH,
-        [PlotsSection.CHECKPOINT_PLOTS]: 2
+        [PlotsSection.CUSTOM_PLOTS]: 2
       }
     )
   })
@@ -99,12 +77,11 @@ describe('plotsModel', () => {
 
     expect(model.getSectionCollapsed()).toStrictEqual(DEFAULT_SECTION_COLLAPSED)
 
-    model.setSectionCollapsed({ [PlotsSection.CHECKPOINT_PLOTS]: true })
+    model.setSectionCollapsed({ [PlotsSection.CUSTOM_PLOTS]: true })
 
     const expectedSectionCollapsed = {
-      [PlotsSection.CHECKPOINT_PLOTS]: true,
       [PlotsSection.TEMPLATE_PLOTS]: false,
-      [PlotsSection.CUSTOM_PLOTS]: false,
+      [PlotsSection.CUSTOM_PLOTS]: true,
       [PlotsSection.COMPARISON_TABLE]: false
     }
 
