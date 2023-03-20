@@ -74,7 +74,7 @@ export const App: React.FC<Record<string, unknown>> = () => {
                 dispatch(updateRows(data.data.rows))
                 continue
               case 'sorts':
-                updateSorts(data.data.sorts)
+                dispatch(updateSorts(data.data.sorts))
                 continue
               default:
                 continue
