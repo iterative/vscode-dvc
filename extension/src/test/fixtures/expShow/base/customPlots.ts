@@ -37,26 +37,24 @@ export const customPlotsOrderFixture: CustomPlotsOrderValue[] = [
 export const experimentsWithCheckpoints: ExperimentWithCheckpoints[] = [
   {
     id: '12345',
-    label: '123',
     metrics: {
       'summary.json': {
         accuracy: 0.3724166750907898,
         loss: 2.0205044746398926
       }
     },
-    name: 'exp-e7a67',
+    label: 'exp-e7a67',
     params: { 'params.yaml': { dropout: 0.15, epochs: 2 } },
     checkpoints: [
       {
         id: '12345',
-        label: '123',
         metrics: {
           'summary.json': {
             accuracy: 0.3724166750907898,
             loss: 2.0205044746398926
           }
         },
-        name: 'exp-e7a67',
+        label: 'exp-e7a67',
         params: { 'params.yaml': { dropout: 0.15, epochs: 2 } }
       },
       {
