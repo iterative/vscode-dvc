@@ -479,6 +479,15 @@ describe('ComparisonTable', () => {
     it('should add and remove the style for the ghost header being dragged', () => {
       jest.useFakeTimers()
 
+      document.documentElement.style.setProperty(
+        ThemeProperty.ACCENT_COLOR,
+        '#ffffff'
+      )
+      document.documentElement.style.setProperty(
+        ThemeProperty.BACKGROUND_COLOR,
+        '#ffffff'
+      )
+
       renderTable()
 
       const [header] = getHeaders()
