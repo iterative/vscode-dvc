@@ -928,6 +928,92 @@ suite('Plots Test Suite', () => {
       )
     })
 
+    it('should handle a add custom plot message when user ends early', async () => {
+      const { plots, plotsModel } = await buildPlots(
+        disposable,
+        plotsDiffFixture
+      )
+
+      const webview = await plots.showWebview()
+
+      const mockPickCustomPlotType = stub(
+        customPlotQuickPickUtil,
+        'pickCustomPlotType'
+      )
+
+      const mockGetMetricAndParam = stub(
+        customPlotQuickPickUtil,
+        'pickMetricAndParam'
+      )
+      const mockGetMetric = stub(customPlotQuickPickUtil, 'pickMetric')
+
+      const pickUndefinedType = new Promise(resolve =>
+        mockPickCustomPlotType.onFirstCall().callsFake(() => {
+          resolve(undefined)
+
+          return Promise.resolve(undefined)
+        })
+      )
+
+      const mockSetCustomPlotsOrder = stub(plotsModel, 'setCustomPlotsOrder')
+      mockSetCustomPlotsOrder.returns(undefined)
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({ type: MessageFromWebviewType.ADD_CUSTOM_PLOT })
+
+      await pickUndefinedType
+
+      expect(mockSetCustomPlotsOrder).to.not.be.called
+      expect(mockSendTelemetryEvent).to.not.be.called
+
+      const pickMetricVsParamType = new Promise(resolve =>
+        mockPickCustomPlotType.onSecondCall().callsFake(() => {
+          resolve(undefined)
+
+          return Promise.resolve(CustomPlotType.METRIC_VS_PARAM)
+        })
+      )
+
+      const pickMetricVsParamUndefOptions = new Promise(resolve =>
+        mockGetMetricAndParam.onFirstCall().callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      )
+
+      mockMessageReceived.fire({ type: MessageFromWebviewType.ADD_CUSTOM_PLOT })
+
+      await pickMetricVsParamType
+      await pickMetricVsParamUndefOptions
+
+      expect(mockSetCustomPlotsOrder).to.not.be.called
+      expect(mockSendTelemetryEvent).to.not.be.called
+
+      const pickCheckpointType = new Promise(resolve =>
+        mockPickCustomPlotType.onThirdCall().callsFake(() => {
+          resolve(undefined)
+
+          return Promise.resolve(CustomPlotType.CHECKPOINT)
+        })
+      )
+      const pickCheckpointUndefOptions = new Promise(resolve =>
+        mockGetMetric.onFirstCall().callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      )
+
+      mockMessageReceived.fire({ type: MessageFromWebviewType.ADD_CUSTOM_PLOT })
+
+      await pickCheckpointType
+      await pickCheckpointUndefOptions
+
+      expect(mockSetCustomPlotsOrder).to.not.be.called
+      expect(mockSendTelemetryEvent).to.not.be.called
+    })
+
     it('should handle a remove custom plot message from the webview', async () => {
       const { plots, plotsModel } = await buildPlots(
         disposable,
@@ -975,6 +1061,50 @@ suite('Plots Test Suite', () => {
         EventName.VIEWS_PLOTS_CUSTOM_PLOT_REMOVED,
         undefined
       )
+    })
+
+    it('should handle a remove custom plot message from the webview when user ends early', async () => {
+      const { plots, plotsModel } = await buildPlots(
+        disposable,
+        plotsDiffFixture
+      )
+
+      const webview = await plots.showWebview()
+
+      const mockSelectCustomPlots = stub(
+        customPlotQuickPickUtil,
+        'pickCustomPlots'
+      )
+
+      const quickPickEvent = new Promise(resolve =>
+        mockSelectCustomPlots.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      )
+
+      stub(plotsModel, 'getCustomPlotsOrder').returns([
+        {
+          metric: 'summary.json:loss',
+          param: 'params.yaml:dropout',
+          type: CustomPlotType.METRIC_VS_PARAM
+        }
+      ])
+
+      const mockSetCustomPlotsOrder = stub(plotsModel, 'setCustomPlotsOrder')
+      mockSetCustomPlotsOrder.returns(undefined)
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.REMOVE_CUSTOM_PLOTS
+      })
+
+      await quickPickEvent
+
+      expect(mockSetCustomPlotsOrder).to.not.be.called
+      expect(mockSendTelemetryEvent).to.not.be.called
     })
   })
 })
