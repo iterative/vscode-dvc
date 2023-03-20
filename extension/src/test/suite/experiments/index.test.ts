@@ -187,6 +187,96 @@ suite('Experiments Test Suite', () => {
       expect(windowSpy).not.to.have.been.called
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should set hasValidDvcYaml to false if there is an error getting stages and there is a dvc.yaml file', async () => {
+      stub(DvcReader.prototype, 'listStages').resolves(undefined)
+      stub(FileSystem, 'hasDvcYamlFile').resolves(true)
+
+      const { experiments, messageSpy } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
+
+      await experiments.showWebview()
+
+      const expectedTableData: TableData = {
+        changes: workspaceChangesFixture,
+        columnOrder: columnsOrderFixture,
+        columnWidths: {},
+        columns: columnsFixture,
+        filteredCounts: { checkpoints: 0, experiments: 0 },
+        filters: [],
+        hasCheckpoints: true,
+        hasColumns: true,
+        hasConfig: false,
+        hasRunningExperiment: true,
+        hasValidDvcYaml: false,
+        rows: rowsFixture,
+        sorts: []
+      }
+
+      expect(messageSpy).to.be.calledWithExactly(expectedTableData)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should set hasValidDvcYaml to true if there is an error getting stages and there is no dvc.yaml file', async () => {
+      stub(DvcReader.prototype, 'listStages').resolves(undefined)
+      stub(FileSystem, 'hasDvcYamlFile').resolves(false)
+
+      const { experiments, messageSpy } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
+
+      await experiments.showWebview()
+
+      const expectedTableData: TableData = {
+        changes: workspaceChangesFixture,
+        columnOrder: columnsOrderFixture,
+        columnWidths: {},
+        columns: columnsFixture,
+        filteredCounts: { checkpoints: 0, experiments: 0 },
+        filters: [],
+        hasCheckpoints: true,
+        hasColumns: true,
+        hasConfig: false,
+        hasRunningExperiment: true,
+        hasValidDvcYaml: true,
+        rows: rowsFixture,
+        sorts: []
+      }
+
+      expect(messageSpy).to.be.calledWithExactly(expectedTableData)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should set hasValidDvcYaml to true if there are no errors getting stages', async () => {
+      stub(DvcReader.prototype, 'listStages').resolves('')
+      stub(FileSystem, 'hasDvcYamlFile').resolves(false)
+
+      const { experiments, messageSpy } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
+
+      await experiments.showWebview()
+
+      const expectedTableData: TableData = {
+        changes: workspaceChangesFixture,
+        columnOrder: columnsOrderFixture,
+        columnWidths: {},
+        columns: columnsFixture,
+        filteredCounts: { checkpoints: 0, experiments: 0 },
+        filters: [],
+        hasCheckpoints: true,
+        hasColumns: true,
+        hasConfig: false,
+        hasRunningExperiment: true,
+        hasValidDvcYaml: true,
+        rows: rowsFixture,
+        sorts: []
+      }
+
+      expect(messageSpy).to.be.calledWithExactly(expectedTableData)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should set hasConfig to false if there are no stages', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('')
 
