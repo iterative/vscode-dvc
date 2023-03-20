@@ -1,6 +1,6 @@
 import React from 'react'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
-import { ConnectData, STUDIO_URL } from 'dvc/src/connect/webview/contract'
+import { STUDIO_URL } from 'dvc/src/setup/webview/contract'
 import {
   openStudio,
   openStudioProfile,
@@ -12,7 +12,7 @@ import { Button } from '../../shared/components/button/Button'
 
 const Connect: React.FC = () => {
   return (
-    <EmptyState>
+    <EmptyState isFullScreen={false}>
       <div>
         <h1>
           Connect to <a href={STUDIO_URL}>Studio</a>
@@ -30,19 +30,19 @@ const Connect: React.FC = () => {
         <Button
           appearance="primary"
           isNested={false}
-          text={'Sign In'}
+          text="Sign In"
           onClick={openStudio}
         />
         <Button
           appearance="secondary"
           isNested={true}
-          text={'Get Token'}
+          text="Get Token"
           onClick={openStudioProfile}
         />
         <Button
           appearance="secondary"
           isNested={true}
-          text={'Save'}
+          text="Save"
           onClick={saveStudioToken}
         />
         <p>
@@ -59,7 +59,7 @@ const Settings: React.FC<{
   setShareLiveToStudio: (shareLiveToStudio: boolean) => void
 }> = ({ shareLiveToStudio, setShareLiveToStudio }) => {
   return (
-    <EmptyState>
+    <EmptyState isFullScreen={false}>
       <div>
         <h1>Studio Settings</h1>
         <p>
@@ -81,13 +81,13 @@ const Settings: React.FC<{
         <Button
           appearance="primary"
           isNested={false}
-          text={'Update Token'}
+          text="Update Token"
           onClick={saveStudioToken}
         />
         <Button
           appearance="secondary"
           isNested={true}
-          text={'Disconnect'}
+          text="Disconnect"
           onClick={removeStudioToken}
         />
       </div>
@@ -95,9 +95,11 @@ const Settings: React.FC<{
   )
 }
 
-export const Studio: React.FC<
-  ConnectData & { setShareLiveToStudio: (shareLiveToStudio: boolean) => void }
-> = ({ isStudioConnected, shareLiveToStudio, setShareLiveToStudio }) => {
+export const Studio: React.FC<{
+  isStudioConnected: boolean
+  shareLiveToStudio: boolean
+  setShareLiveToStudio: (shareLiveToStudio: boolean) => void
+}> = ({ isStudioConnected, shareLiveToStudio, setShareLiveToStudio }) => {
   return isStudioConnected ? (
     <Settings
       shareLiveToStudio={shareLiveToStudio}

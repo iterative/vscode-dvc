@@ -72,10 +72,6 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.onDidChangePaths = this.pathsChanged.event
   }
 
-  public sendInitialWebviewData() {
-    return this.fetchMissingOrSendPlots()
-  }
-
   public togglePathStatus(path: string) {
     const status = this.paths.toggleStatus(path)
     this.paths.setTemplateOrder()
@@ -122,6 +118,10 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   public getScale() {
     return collectScale(this.paths.getTerminalNodes())
+  }
+
+  protected sendInitialWebviewData() {
+    return this.fetchMissingOrSendPlots()
   }
 
   private notifyChanged() {

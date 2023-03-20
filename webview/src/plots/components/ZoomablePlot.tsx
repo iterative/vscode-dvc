@@ -1,5 +1,5 @@
 import { AnyAction } from '@reduxjs/toolkit'
-import { Section } from 'dvc/src/plots/webview/contract'
+import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import React, { useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { VisualizationSpec } from 'react-vega'
@@ -17,7 +17,7 @@ interface ZoomablePlotProps {
   onViewReady?: () => void
   changeDisabledDragIds: (ids: string[]) => AnyAction
   currentSnapPoint: number
-  section: Section
+  section: PlotsSection
   shouldNotResize?: boolean
 }
 

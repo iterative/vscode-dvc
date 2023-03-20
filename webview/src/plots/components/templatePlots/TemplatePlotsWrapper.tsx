@@ -1,4 +1,4 @@
-import { Section } from 'dvc/src/plots/webview/contract'
+import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { TemplatePlots } from './TemplatePlots'
@@ -17,8 +17,8 @@ export const TemplatePlotsWrapper: React.FC = () => {
   return (
     <PlotsContainer
       title="Data Series"
-      sectionKey={Section.TEMPLATE_PLOTS}
-      nbItemsPerRow={nbItemsPerRow}
+      sectionKey={PlotsSection.TEMPLATE_PLOTS}
+      nbItemsPerRowOrWidth={nbItemsPerRow}
       sectionCollapsed={isCollapsed}
       changeSize={changeSize}
       hasItems={hasItems}

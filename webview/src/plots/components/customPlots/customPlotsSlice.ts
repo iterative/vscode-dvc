@@ -3,9 +3,9 @@ import {
   CustomPlotsData,
   DEFAULT_HEIGHT,
   DEFAULT_SECTION_COLLAPSED,
-  DEFAULT_SECTION_NB_ITEMS_PER_ROW,
+  DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH,
   PlotHeight,
-  Section
+  PlotsSection
 } from 'dvc/src/plots/webview/contract'
 import { addPlotsWithSnapshots, removePlots } from '../plotDataStore'
 
@@ -23,9 +23,10 @@ export const customPlotsInitialState: CustomPlotsState = {
   colors: initialColorsState,
   disabledDragPlotIds: [],
   hasData: false,
-  height: DEFAULT_HEIGHT[Section.CUSTOM_PLOTS],
-  isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.CUSTOM_PLOTS],
-  nbItemsPerRow: DEFAULT_SECTION_NB_ITEMS_PER_ROW[Section.CUSTOM_PLOTS],
+  height: DEFAULT_HEIGHT[PlotsSection.CUSTOM_PLOTS],
+  isCollapsed: DEFAULT_SECTION_COLLAPSED[PlotsSection.CUSTOM_PLOTS],
+  nbItemsPerRow:
+    DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH[PlotsSection.CUSTOM_PLOTS],
   plotsIds: [],
   plotsSnapshots: {}
 }
@@ -39,9 +40,12 @@ export const customPlotsSlice = createSlice({
     },
     changeSize: (
       state,
-      action: PayloadAction<{ nbItemsPerRow: number; height: PlotHeight }>
+      action: PayloadAction<{
+        nbItemsPerRowOrWidth: number
+        height: PlotHeight
+      }>
     ) => {
-      state.nbItemsPerRow = action.payload.nbItemsPerRow
+      state.nbItemsPerRow = action.payload.nbItemsPerRowOrWidth
       state.height = action.payload.height
     },
     setCollapsed: (state, action: PayloadAction<boolean>) => {
@@ -53,8 +57,8 @@ export const customPlotsSlice = createSlice({
       }
       const { plots, colors, ...statePayload } = action.payload
       const plotsIds = plots?.map(plot => plot.id) || []
-      const snapShots = addPlotsWithSnapshots(plots, Section.CUSTOM_PLOTS)
-      removePlots(plotsIds, Section.CUSTOM_PLOTS)
+      const snapShots = addPlotsWithSnapshots(plots, PlotsSection.CUSTOM_PLOTS)
+      removePlots(plotsIds, PlotsSection.CUSTOM_PLOTS)
       return {
         ...state,
         ...statePayload,

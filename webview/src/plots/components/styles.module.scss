@@ -161,7 +161,7 @@ $gap: 20px;
 
 .comparisonTable {
   table-layout: fixed;
-  width: calc(400px * var(--scale));
+  width: calc((10 - var(--variant)) * 50px * var(--scale));
   position: relative;
   padding: 0 20px;
   padding-right: $gap;
@@ -235,19 +235,16 @@ $gap: 20px;
 }
 
 .sizeSliders {
-  margin: 20px;
   display: flex;
   justify-content: end;
   gap: 10px;
-  position: sticky;
   right: 0;
   top: 0;
-  width: 100%;
   display: flex;
   justify-content: end;
-  padding: 20px;
   background-color: $bg-color;
   z-index: 3;
+  justify-self: flex-end;
 }
 
 .sizeSlider {

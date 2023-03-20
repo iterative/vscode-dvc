@@ -1,6 +1,7 @@
 import cx from 'classnames'
-import React, { MouseEvent } from 'react'
-import { Section as PlotsSection } from 'dvc/src/plots/webview/contract'
+import React, { MouseEvent, ReactNode } from 'react'
+import { PlotsSection } from 'dvc/src/plots/webview/contract'
+import { STUDIO_URL, SetupSection } from 'dvc/src/setup/webview/contract'
 import styles from './styles.module.scss'
 import { Icon } from '../Icon'
 import { ChevronDown, ChevronRight, Info } from '../icons'
@@ -44,17 +45,38 @@ export const SectionDescription = {
       </a>
       .
     </span>
+  ),
+  // Setup Experiments
+  [SetupSection.EXPERIMENTS]: (
+    <span data-testid="tooltip-setup-experiments">
+      Configure the extension to start tracking and visualizing{' '}
+      <a href="https://dvc.org/doc/start/experiment-management/experiments">
+        experiments
+      </a>
+      .
+    </span>
+  ),
+  // Setup Experiments
+  [SetupSection.STUDIO]: (
+    <span data-testid="tooltip-setup-studio">
+      {"Configure the extension's connection to "}
+      <a href={STUDIO_URL}>Studio</a>.<br />
+      Studio provides a collaboration platform for Machine Learning and is free
+      for small teams and individual contributors.
+    </span>
   )
 } as const
 
-export interface SectionContainerProps<T extends PlotsSection> {
-  children: React.ReactNode
-  menuItems: IconMenuItemProps[]
+export interface SectionContainerProps<T extends PlotsSection | SetupSection> {
+  children: ReactNode
+  menuItems?: IconMenuItemProps[]
+  headerChildren?: ReactNode
   onToggleSection: () => void
   sectionCollapsed: boolean
   sectionKey: T
   title: string
-  className: string
+  className?: string
+  stickyHeaderTop?: number
 }
 
 const InfoIcon = () => (
@@ -62,15 +84,17 @@ const InfoIcon = () => (
 )
 
 export const SectionContainer: React.FC<
-  SectionContainerProps<PlotsSection>
+  SectionContainerProps<PlotsSection | SetupSection>
 > = ({
   children,
-  menuItems,
+  menuItems = [],
   onToggleSection,
   sectionCollapsed,
   sectionKey,
   title,
-  className
+  className,
+  stickyHeaderTop = 0,
+  headerChildren
 }) => {
   const open = !sectionCollapsed
 
@@ -97,31 +121,40 @@ export const SectionContainer: React.FC<
       data-testid="section-container"
     >
       <details open={open} className={styles.sectionContainer}>
-        <summary onClick={toggleSection}>
-          <Icon
-            icon={open ? ChevronDown : ChevronRight}
-            data-testid="section-container-details-chevron"
-            width={20}
-            height={20}
-            className={styles.detailsIcon}
-          />
-          {title}
-          <Tooltip content={tooltipContent} placement="bottom-end" interactive>
-            <div
-              className={styles.infoTooltipToggle}
-              data-testid="info-tooltip-toggle"
+        <summary onClick={toggleSection} style={{ top: stickyHeaderTop }}>
+          <div className={styles.summaryTitle}>
+            <Icon
+              icon={open ? ChevronDown : ChevronRight}
+              data-testid="section-container-details-chevron"
+              width={20}
+              height={20}
+              className={styles.detailsIcon}
+            />
+            {title}
+            <Tooltip
+              content={tooltipContent}
+              placement="bottom-end"
+              interactive
             >
-              <InfoIcon />
+              <div
+                className={styles.infoTooltipToggle}
+                data-testid="info-tooltip-toggle"
+              >
+                <InfoIcon />
+              </div>
+            </Tooltip>
+          </div>
+
+          {headerChildren}
+
+          {menuItems.length > 0 && (
+            <div className={styles.iconMenu}>
+              <IconMenu items={menuItems} />
             </div>
-          </Tooltip>
+          )}
         </summary>
         {children}
       </details>
-      {menuItems.length > 0 && (
-        <div className={styles.iconMenu}>
-          <IconMenu items={menuItems} />
-        </div>
-      )}
     </div>
   )
 }

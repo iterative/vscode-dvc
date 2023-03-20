@@ -104,7 +104,7 @@ const showUnauthorized = async () => {
     UserResponse.SHOW
   )
   if (response === UserResponse.SHOW) {
-    return commands.executeCommand(RegisteredCommands.CONNECT_SHOW)
+    return commands.executeCommand(RegisteredCommands.SETUP_SHOW)
   }
 }
 

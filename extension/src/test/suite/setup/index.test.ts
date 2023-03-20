@@ -3,7 +3,15 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { ensureFileSync, remove } from 'fs-extra'
 import { expect } from 'chai'
 import { SinonStub, restore, spy, stub } from 'sinon'
-import { QuickPickItem, Uri, commands, window, workspace } from 'vscode'
+import {
+  EventEmitter,
+  QuickPickItem,
+  Uri,
+  WorkspaceConfiguration,
+  commands,
+  window,
+  workspace
+} from 'vscode'
 import { buildSetup, buildSetupWithWatchers, TEMP_DIR } from './util'
 import {
   closeAllEditors,
@@ -35,6 +43,10 @@ import { StopWatch } from '../../../util/time'
 import { MIN_CLI_VERSION } from '../../../cli/dvc/contract'
 import { run } from '../../../setup/runner'
 import * as Python from '../../../extensions/python'
+import { STUDIO_ACCESS_TOKEN_KEY } from '../../../setup/token'
+import { ContextKey } from '../../../vscode/context'
+import { Setup } from '../../../setup'
+import { SetupSection } from '../../../setup/webview/contract'
 
 suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
@@ -198,22 +210,6 @@ suite('Setup Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should close the webview and open the experiments when the setup is done', async () => {
-      const { setup, mockOpenExperiments } = buildSetup(disposable, true)
-
-      const closeWebviewSpy = spy(BaseWebview.prototype, 'dispose')
-
-      const webview = await setup.showWebview()
-      await webview.isReady()
-
-      stub(setup, 'hasRoots').returns(true)
-      setup.setCliCompatible(true)
-      setup.setAvailable(true)
-
-      expect(closeWebviewSpy).to.be.calledOnce
-      expect(mockOpenExperiments).to.be.calledOnce
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
     it('should send the expected message to the webview when there is no CLI available', async () => {
       const { config, setup, messageSpy } = buildSetup(disposable)
 
@@ -244,10 +240,13 @@ suite('Setup Test Suite', () => {
         cliCompatible: undefined,
         hasData: false,
         isPythonExtensionInstalled: false,
+        isStudioConnected: false,
         needsGitCommit: true,
         needsGitInitialized: true,
         projectInitialized: false,
-        pythonBinPath: undefined
+        pythonBinPath: undefined,
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -281,10 +280,13 @@ suite('Setup Test Suite', () => {
         cliCompatible: true,
         hasData: false,
         isPythonExtensionInstalled: false,
+        isStudioConnected: false,
         needsGitCommit: true,
         needsGitInitialized: true,
         projectInitialized: false,
-        pythonBinPath: undefined
+        pythonBinPath: undefined,
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -324,10 +326,13 @@ suite('Setup Test Suite', () => {
         cliCompatible: true,
         hasData: false,
         isPythonExtensionInstalled: false,
+        isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: false,
         projectInitialized: false,
-        pythonBinPath: undefined
+        pythonBinPath: undefined,
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -367,10 +372,13 @@ suite('Setup Test Suite', () => {
         cliCompatible: true,
         hasData: false,
         isPythonExtensionInstalled: false,
+        isStudioConnected: false,
         needsGitCommit: true,
         needsGitInitialized: false,
         projectInitialized: true,
-        pythonBinPath: undefined
+        pythonBinPath: undefined,
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -633,5 +641,249 @@ suite('Setup Test Suite', () => {
         'should set dvc.cli.incompatible to false if the version is compatible'
       ).to.be.calledWithExactly('setContext', 'dvc.cli.incompatible', false)
     })
+
+    it('should handle a message from the webview to open Studio', async () => {
+      const { mockOpenExternal, setup, urlOpenedEvent } = buildSetup(disposable)
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.OPEN_STUDIO
+      })
+
+      await urlOpenedEvent
+      expect(mockOpenExternal).to.be.calledWith(
+        Uri.parse('https://studio.iterative.ai')
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it("should handle a message from the webview to open the user's Studio profile", async () => {
+      const { setup, mockOpenExternal, urlOpenedEvent } = buildSetup(disposable)
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.OPEN_STUDIO_PROFILE
+      })
+
+      await urlOpenedEvent
+      expect(mockOpenExternal).to.be.calledWith(
+        Uri.parse(
+          'https://studio.iterative.ai/user/_/profile?section=accessToken'
+        )
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it("should handle a message from the webview to save the user's Studio access token", async () => {
+      const secretsChanged = disposable.track(
+        new EventEmitter<{ key: string }>()
+      )
+      const mockToken = 'isat_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+
+      const mockSecrets: { [key: string]: string } = {}
+
+      const onDidChange = secretsChanged.event
+      const mockGetSecret = (key: string): Promise<string | undefined> =>
+        Promise.resolve(mockSecrets[key])
+      const mockStoreSecret = (key: string, value: string) => {
+        mockSecrets[key] = value
+        secretsChanged.fire({ key })
+        return Promise.resolve(undefined)
+      }
+
+      const mockSecretStorage = {
+        delete: stub(),
+        get: mockGetSecret,
+        onDidChange,
+        store: mockStoreSecret
+      }
+
+      const secretsChangedEvent = new Promise(resolve =>
+        onDidChange(() => resolve(undefined))
+      )
+
+      const { setup, mockExecuteCommand } = buildSetup(
+        disposable,
+        false,
+        false,
+        false,
+        false,
+        mockSecretStorage
+      )
+      mockExecuteCommand.restore()
+
+      const executeCommandSpy = spy(commands, 'executeCommand')
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      expect(executeCommandSpy).to.be.calledWithExactly(
+        'setContext',
+        ContextKey.STUDIO_CONNECTED,
+        false
+      )
+
+      const mockInputBox = stub(window, 'showInputBox').resolves(mockToken)
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(Setup.prototype as any, 'getSecrets').returns(mockSecretStorage)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SAVE_STUDIO_TOKEN
+      })
+
+      await secretsChangedEvent
+
+      expect(mockInputBox).to.be.called
+
+      expect(await mockGetSecret(STUDIO_ACCESS_TOKEN_KEY)).to.equal(mockToken)
+
+      expect(executeCommandSpy).to.be.calledWithExactly(
+        'setContext',
+        ContextKey.STUDIO_CONNECTED,
+        true
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a message to set dvc.studio.shareExperimentsLive', async () => {
+      const { setup } = buildSetup(disposable)
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const mockUpdate = stub()
+
+      stub(workspace, 'getConfiguration').returns({
+        update: mockUpdate
+      } as unknown as WorkspaceConfiguration)
+
+      mockMessageReceived.fire({
+        payload: false,
+        type: MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE
+      })
+
+      expect(mockUpdate).to.be.calledWithExactly(
+        Config.ConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE,
+        false
+      )
+    })
+
+    it('should be able to delete the Studio access token from secrets storage', async () => {
+      const mockDelete = stub()
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        Setup.prototype as any,
+        'getSecrets'
+      ).returns({ delete: mockDelete })
+
+      await commands.executeCommand(
+        RegisteredCommands.REMOVE_STUDIO_ACCESS_TOKEN
+      )
+
+      expect(mockDelete).to.be.calledWithExactly(STUDIO_ACCESS_TOKEN_KEY)
+    })
+
+    it('should handle a message to open the experiments webview', async () => {
+      const { messageSpy, setup, mockOpenExperiments } = buildSetup(disposable)
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW
+      })
+
+      expect(mockOpenExperiments).to.be.calledOnce
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should send the appropriate messages to the webview to focus different sections', async () => {
+      const { setup, messageSpy } = buildSetup(disposable)
+      messageSpy.restore()
+
+      const webview = await setup.showSetup()
+      await webview.isReady()
+
+      const mockShow = stub(webview, 'show')
+
+      const getNewMessageReceived = () => {
+        mockShow.resetHistory()
+        mockShow.resetBehavior()
+        return new Promise(resolve =>
+          mockShow.callsFake(() => {
+            resolve(undefined)
+            return Promise.resolve(true)
+          })
+        )
+      }
+
+      const initialMessage = getNewMessageReceived()
+
+      void setup.showSetup()
+
+      await initialMessage
+
+      expect(mockShow).to.be.calledWithMatch({ sectionCollapsed: undefined })
+
+      const focusExperiments = getNewMessageReceived()
+
+      void setup.showSetup(SetupSection.EXPERIMENTS)
+
+      await focusExperiments
+
+      expect(mockShow).to.be.calledWithMatch({
+        sectionCollapsed: {
+          [SetupSection.EXPERIMENTS]: false,
+          [SetupSection.STUDIO]: true
+        }
+      })
+
+      const focusStudio = getNewMessageReceived()
+
+      void setup.showSetup(SetupSection.STUDIO)
+
+      await focusStudio
+
+      expect(mockShow).to.be.calledWithMatch({
+        sectionCollapsed: {
+          [SetupSection.EXPERIMENTS]: true,
+          [SetupSection.STUDIO]: false
+        }
+      })
+
+      const openUnchanged = getNewMessageReceived()
+
+      void setup.showSetup()
+
+      await openUnchanged
+
+      expect(mockShow).to.be.calledWithMatch({ sectionCollapsed: undefined })
+    })
+  })
+
+  it('should open the webview with the Studio section focus for dvc.showStudioSettings and dvc.showStudioConnect', async () => {
+    const mockShowWebview = stub(Setup.prototype, 'showSetup').resolves(
+      undefined
+    )
+
+    await commands.executeCommand(RegisteredCommands.SETUP_SHOW_STUDIO_CONNECT)
+
+    expect(mockShowWebview).to.be.calledWithExactly(SetupSection.STUDIO)
+
+    mockShowWebview.resetHistory()
+
+    await commands.executeCommand(RegisteredCommands.SETUP_SHOW_STUDIO_SETTINGS)
+
+    expect(mockShowWebview).to.be.calledWithExactly(SetupSection.STUDIO)
   })
 })

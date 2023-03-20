@@ -4,7 +4,7 @@ import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { SortDefinition } from '../experiments/model/sortBy'
 import {
   PlotHeight,
-  Section,
+  PlotsSection,
   SectionCollapsed
 } from '../plots/webview/contract'
 
@@ -28,10 +28,6 @@ export const EventName = Object.assign(
   {
     EXTENSION_EXECUTION_DETAILS_CHANGED: 'extension.executionDetails.changed',
     EXTENSION_LOAD: 'extension.load',
-
-    VIEWS_CONNECT_CLOSED: 'views.connect.closed',
-    VIEWS_CONNECT_CREATED: 'views.connect.created',
-    VIEWS_CONNECT_FOCUS_CHANGED: 'views.connect.focusChanged',
 
     VIEWS_EXPERIMENTS_TABLE_CLOSED: 'views.experimentsTable.closed',
     VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED:
@@ -72,7 +68,6 @@ export const EventName = Object.assign(
     VIEWS_PLOTS_EXPERIMENT_TOGGLE: 'views.plots.toggleExperimentStatus',
     VIEWS_PLOTS_FOCUS_CHANGED: 'views.plots.focusChanged',
     VIEWS_PLOTS_MANUAL_REFRESH: 'views.plots.manualRefresh',
-    VIEWS_PLOTS_METRICS_SELECTED: 'views.plots.metricsSelected',
     VIEWS_PLOTS_REVISIONS_REORDERED: 'views.plots.revisionsReordered',
     VIEWS_PLOTS_SECTION_RESIZED: 'views.plots.sectionResized',
     VIEWS_PLOTS_SECTION_TOGGLE: 'views.plots.toggleSection',
@@ -211,10 +206,6 @@ export interface IEventNamePropertyMapping {
   [EventName.EXTENSION_SHOW_COMMANDS]: undefined
   [EventName.EXTENSION_SHOW_OUTPUT]: undefined
 
-  [EventName.VIEWS_CONNECT_CLOSED]: undefined
-  [EventName.VIEWS_CONNECT_CREATED]: undefined
-  [EventName.VIEWS_CONNECT_FOCUS_CHANGED]: undefined
-
   [EventName.VIEWS_EXPERIMENTS_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_FILTER_BY_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_METRICS_AND_PARAMS_TREE_OPENED]: DvcRootCount
@@ -253,11 +244,10 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED]: undefined
   [EventName.VIEWS_PLOTS_FOCUS_CHANGED]: WebviewFocusChangedProperties
   [EventName.VIEWS_PLOTS_MANUAL_REFRESH]: { revisions: number }
-  [EventName.VIEWS_PLOTS_METRICS_SELECTED]: undefined
   [EventName.VIEWS_PLOTS_REVISIONS_REORDERED]: undefined
   [EventName.VIEWS_PLOTS_COMPARISON_ROWS_REORDERED]: undefined
   [EventName.VIEWS_PLOTS_SECTION_RESIZED]: {
-    section: Section
+    section: PlotsSection
     nbItemsPerRow: number
     height: PlotHeight
   }
@@ -265,7 +255,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_SELECT_EXPERIMENTS]: undefined
   [EventName.VIEWS_PLOTS_SELECT_PLOTS]: undefined
   [EventName.VIEWS_PLOTS_EXPERIMENT_TOGGLE]: undefined
-  [EventName.VIEWS_PLOTS_ZOOM_PLOT]: undefined
+  [EventName.VIEWS_PLOTS_ZOOM_PLOT]: { isImage: boolean }
   [EventName.VIEWS_REORDER_PLOTS_CUSTOM]: undefined
   [EventName.VIEWS_REORDER_PLOTS_TEMPLATES]: undefined
 
@@ -286,10 +276,11 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_SETUP_INSTALL_DVC]: undefined
 
   [EventName.SETUP_SHOW]: undefined
+  [EventName.SETUP_SHOW_EXPERIMENTS]: undefined
   [EventName.SELECT_FOCUSED_PROJECTS]: undefined
+  [EventName.SETUP_SHOW_STUDIO_SETTINGS]: undefined
+  [EventName.SETUP_SHOW_STUDIO_CONNECT]: undefined
 
-  [EventName.CONNECT_SHOW]: undefined
-  [EventName.OPEN_STUDIO_SETTINGS]: undefined
   [EventName.ADD_STUDIO_ACCESS_TOKEN]: undefined
   [EventName.UPDATE_STUDIO_ACCESS_TOKEN]: undefined
   [EventName.REMOVE_STUDIO_ACCESS_TOKEN]: undefined

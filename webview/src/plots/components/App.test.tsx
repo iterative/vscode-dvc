@@ -23,13 +23,13 @@ import {
   PlotsData,
   PlotsType,
   Revision,
-  Section,
+  PlotsSection,
   TemplatePlotGroup,
   TemplatePlotsData,
   CustomPlotType,
   CustomPlotsData,
-  DEFAULT_NB_ITEMS_PER_ROW,
-  DEFAULT_PLOT_HEIGHT
+  DEFAULT_PLOT_HEIGHT,
+  DEFAULT_NB_ITEMS_PER_ROW
 } from 'dvc/src/plots/webview/contract'
 import {
   MessageFromWebviewType,
@@ -155,7 +155,7 @@ describe('App', () => {
   const renderAppAndChangeSize = async (
     data: PlotsData,
     nbItemsPerRow: number,
-    section: Section
+    section: PlotsSection
   ) => {
     const withSize = {
       nbItemsPerRow
@@ -164,13 +164,13 @@ describe('App', () => {
       ...data,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     }
-    if (section === Section.CUSTOM_PLOTS) {
+    if (section === PlotsSection.CUSTOM_PLOTS) {
       plotsData.custom = {
         ...data?.custom,
         ...withSize
       } as CustomPlotsData
     }
-    if (section === Section.TEMPLATE_PLOTS) {
+    if (section === PlotsSection.TEMPLATE_PLOTS) {
       plotsData.template = {
         ...data?.template,
         ...withSize
@@ -199,8 +199,8 @@ describe('App', () => {
     jest
       .spyOn(HTMLElement.prototype, 'clientHeight', 'get')
       .mockImplementation(() => heightToSuppressVegaError)
-    plotDataStore[Section.CUSTOM_PLOTS] = {} as CustomPlotsById
-    plotDataStore[Section.TEMPLATE_PLOTS] = {} as TemplatePlotsById
+    plotDataStore[PlotsSection.CUSTOM_PLOTS] = {} as CustomPlotsById
+    plotDataStore[PlotsSection.TEMPLATE_PLOTS] = {} as TemplatePlotsById
   })
 
   afterEach(() => {
@@ -244,7 +244,6 @@ describe('App', () => {
     renderAppWithOptionalData({
       comparison: {
         height: DEFAULT_PLOT_HEIGHT,
-        nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
         plots: [
           {
             path: 'training/plots/images/misclassified.jpg',
@@ -260,7 +259,8 @@ describe('App', () => {
             id: 'ad2b5ec854a447d00d9dfa9cdf88211a39a17813',
             revision: 'ad2b5ec'
           }
-        ]
+        ],
+        width: DEFAULT_NB_ITEMS_PER_ROW
       },
       hasPlots: true,
       hasUnselectedPlots: false,
@@ -456,14 +456,14 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: { [Section.CUSTOM_PLOTS]: true },
+      payload: { [PlotsSection.CUSTOM_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
 
     sendSetDataMessage({
       sectionCollapsed: {
         ...DEFAULT_SECTION_COLLAPSED,
-        [Section.CUSTOM_PLOTS]: true
+        [PlotsSection.CUSTOM_PLOTS]: true
       }
     })
 
@@ -487,7 +487,7 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).not.toHaveBeenCalledWith({
-      payload: { [Section.CUSTOM_PLOTS]: true },
+      payload: { [PlotsSection.CUSTOM_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
 
@@ -498,7 +498,7 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: { [Section.CUSTOM_PLOTS]: true },
+      payload: { [PlotsSection.CUSTOM_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
   })
@@ -524,7 +524,7 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).not.toHaveBeenCalledWith({
-      payload: { [Section.CUSTOM_PLOTS]: true },
+      payload: { [PlotsSection.CUSTOM_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
 
@@ -534,7 +534,7 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).not.toHaveBeenCalledWith({
-      payload: { [Section.CUSTOM_PLOTS]: true },
+      payload: { [PlotsSection.CUSTOM_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
   })
@@ -557,7 +557,7 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).not.toHaveBeenCalledWith({
-      payload: { [Section.CUSTOM_PLOTS]: true },
+      payload: { [PlotsSection.CUSTOM_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
 
@@ -568,7 +568,7 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: { [Section.CUSTOM_PLOTS]: true },
+      payload: { [PlotsSection.CUSTOM_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
   })
@@ -580,20 +580,11 @@ describe('App', () => {
     })
     setWrapperSize(store)
 
-    expect(screen.getByTestId('size-sliders')).toBeInTheDocument()
+    expect(screen.getAllByTestId('size-sliders')[1]).toBeInTheDocument()
   })
 
   it('should not display a slider to pick the number of items per row if there are no items', () => {
     const store = renderAppWithOptionalData({})
-    setWrapperSize(store)
-
-    expect(screen.queryByTestId('size-sliders')).not.toBeInTheDocument()
-  })
-
-  it('should not display a slider to pick the number of items per row if the action is unavailable', () => {
-    const store = renderAppWithOptionalData({
-      comparison: comparisonTableFixture
-    })
     setWrapperSize(store)
 
     expect(screen.queryByTestId('size-sliders')).not.toBeInTheDocument()
@@ -609,6 +600,46 @@ describe('App', () => {
     expect(screen.queryByTestId('size-sliders')).not.toBeInTheDocument()
   })
 
+  it('should display both size sliders for template plots', () => {
+    const store = renderAppWithOptionalData({
+      template: templatePlotsFixture
+    })
+    setWrapperSize(store)
+
+    const plotResizers = within(
+      screen.getByTestId('size-sliders')
+    ).getAllByRole('slider')
+
+    expect(plotResizers.length).toBe(2)
+  })
+
+  it('should display both size sliders for custom plots', () => {
+    const store = renderAppWithOptionalData({
+      custom: customPlotsFixture,
+      template: templatePlotsFixture
+    })
+    setWrapperSize(store)
+
+    const plotResizers = within(
+      screen.getAllByTestId('size-sliders')[1]
+    ).getAllByRole('slider')
+
+    expect(plotResizers.length).toBe(2)
+  })
+
+  it('should not display the height slider for the comparison table', () => {
+    const store = renderAppWithOptionalData({
+      comparison: comparisonTableFixture
+    })
+    setWrapperSize(store)
+
+    const plotResizers = within(
+      screen.getByTestId('size-sliders')
+    ).getAllByRole('slider')
+
+    expect(plotResizers.length).toBe(1)
+  })
+
   it('should send a message to the extension with the selected size when changing the width of plots', () => {
     const store = renderAppWithOptionalData({
       comparison: comparisonTableFixture,
@@ -616,16 +647,16 @@ describe('App', () => {
     })
     setWrapperSize(store)
 
-    const plotResizer = within(screen.getByTestId('size-sliders')).getAllByRole(
-      'slider'
-    )[0]
+    const plotResizer = within(
+      screen.getAllByTestId('size-sliders')[1]
+    ).getAllByRole('slider')[0]
 
     fireEvent.change(plotResizer, { target: { value: -3 } })
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: {
         height: 1,
         nbItemsPerRow: 3,
-        section: Section.CUSTOM_PLOTS
+        section: PlotsSection.CUSTOM_PLOTS
       },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
@@ -638,22 +669,22 @@ describe('App', () => {
     })
     setWrapperSize(store)
 
-    const plotResizer = within(screen.getByTestId('size-sliders')).getAllByRole(
-      'slider'
-    )[1]
+    const plotResizer = within(
+      screen.getAllByTestId('size-sliders')[1]
+    ).getAllByRole('slider')[1]
 
     fireEvent.change(plotResizer, { target: { value: 3 } })
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: {
         height: 3,
         nbItemsPerRow: 2,
-        section: Section.CUSTOM_PLOTS
+        section: PlotsSection.CUSTOM_PLOTS
       },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
   })
 
-  it('should display the checkpoint plots in the order stored', () => {
+  it('should display the custom plots in the order stored', () => {
     renderAppWithOptionalData({
       comparison: comparisonTableFixture,
       custom: customPlotsFixture
@@ -771,6 +802,25 @@ describe('App', () => {
     expect(
       screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
     ).toStrictEqual([
+      'custom-summary.json:accuracy-params.yaml:epochs',
+      'custom-summary.json:loss-epoch',
+      'custom-summary.json:accuracy-epoch'
+    ])
+  })
+
+  it('should not be possible to drag a plot from a section to another', () => {
+    renderAppWithOptionalData({
+      custom: customPlotsFixture,
+      template: templatePlotsFixture
+    })
+
+    const customPlots = screen.getAllByTestId(/summary\.json/)
+    const templatePlots = screen.getAllByTestId(/^plot_/)
+
+    dragAndDrop(templatePlots[0], customPlots[2])
+
+    expect(customPlots.map(plot => plot.id)).toStrictEqual([
+      'custom-summary.json:loss-params.yaml:dropout',
       'custom-summary.json:accuracy-params.yaml:epochs',
       'custom-summary.json:loss-epoch',
       'custom-summary.json:accuracy-epoch'
@@ -1226,6 +1276,21 @@ describe('App', () => {
     })
   })
 
+  it('should send a message with the plot path when a comparison table plot is zoomed', () => {
+    renderAppWithOptionalData({
+      comparison: comparisonTableFixture
+    })
+
+    const plot = screen.getAllByTestId('image-plot-button')[0]
+
+    fireEvent.click(plot)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      payload: comparisonTableFixture.plots[0].revisions.workspace.url,
+      type: MessageFromWebviewType.ZOOM_PLOT
+    })
+  })
+
   it('should open a modal with the plot zoomed in when clicking a custom plot', () => {
     renderAppWithOptionalData({
       comparison: comparisonTableFixture,
@@ -1367,7 +1432,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { comparison: comparisonTableFixture, custom: createCustomPlots(9) },
           1,
-          Section.CUSTOM_PLOTS
+          PlotsSection.CUSTOM_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1385,7 +1450,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { comparison: comparisonTableFixture, custom: createCustomPlots(8) },
           1,
-          Section.CUSTOM_PLOTS
+          PlotsSection.CUSTOM_PLOTS
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1403,7 +1468,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(9) },
           1,
-          Section.TEMPLATE_PLOTS
+          PlotsSection.TEMPLATE_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1421,7 +1486,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(8) },
           1,
-          Section.TEMPLATE_PLOTS
+          PlotsSection.TEMPLATE_PLOTS
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1443,7 +1508,7 @@ describe('App', () => {
           store = await renderAppAndChangeSize(
             { comparison: comparisonTableFixture, custom },
             1,
-            Section.CUSTOM_PLOTS
+            PlotsSection.CUSTOM_PLOTS
           )
         })
 
@@ -1494,7 +1559,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { comparison: comparisonTableFixture, custom: createCustomPlots(15) },
           DEFAULT_NB_ITEMS_PER_ROW,
-          Section.CUSTOM_PLOTS
+          PlotsSection.CUSTOM_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1504,7 +1569,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { comparison: comparisonTableFixture, custom: createCustomPlots(14) },
           DEFAULT_NB_ITEMS_PER_ROW,
-          Section.CUSTOM_PLOTS
+          PlotsSection.CUSTOM_PLOTS
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1514,7 +1579,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(15) },
           DEFAULT_NB_ITEMS_PER_ROW,
-          Section.TEMPLATE_PLOTS
+          PlotsSection.TEMPLATE_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1524,7 +1589,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(14) },
           DEFAULT_NB_ITEMS_PER_ROW,
-          Section.TEMPLATE_PLOTS
+          PlotsSection.TEMPLATE_PLOTS
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1538,7 +1603,7 @@ describe('App', () => {
           store = await renderAppAndChangeSize(
             { comparison: comparisonTableFixture, custom },
             DEFAULT_NB_ITEMS_PER_ROW,
-            Section.CUSTOM_PLOTS
+            PlotsSection.CUSTOM_PLOTS
           )
         })
 
@@ -1591,7 +1656,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { comparison: comparisonTableFixture, custom: createCustomPlots(21) },
           4,
-          Section.CUSTOM_PLOTS
+          PlotsSection.CUSTOM_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1601,7 +1666,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { comparison: comparisonTableFixture, custom: createCustomPlots(20) },
           4,
-          Section.CUSTOM_PLOTS
+          PlotsSection.CUSTOM_PLOTS
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1611,7 +1676,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(21) },
           4,
-          Section.TEMPLATE_PLOTS
+          PlotsSection.TEMPLATE_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
@@ -1621,7 +1686,7 @@ describe('App', () => {
         await renderAppAndChangeSize(
           { template: manyTemplatePlots(20) },
           4,
-          Section.TEMPLATE_PLOTS
+          PlotsSection.TEMPLATE_PLOTS
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1635,7 +1700,7 @@ describe('App', () => {
           store = await renderAppAndChangeSize(
             { comparison: comparisonTableFixture, custom },
             4,
-            Section.CUSTOM_PLOTS
+            PlotsSection.CUSTOM_PLOTS
           )
         })
 

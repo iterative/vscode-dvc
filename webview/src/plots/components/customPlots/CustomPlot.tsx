@@ -1,7 +1,7 @@
 import {
   ColorScale,
   CustomPlotData,
-  Section
+  PlotsSection
 } from 'dvc/src/plots/webview/contract'
 import { isCheckpointPlot } from 'dvc/src/plots/model/custom'
 import React, { useMemo, useEffect, useState } from 'react'
@@ -37,7 +37,7 @@ export const CustomPlot: React.FC<CustomPlotProps> = ({ id }) => {
     (state: PlotsState) => state.custom.plotsSnapshots[id]
   )
 
-  const [plot, setPlot] = useState(plotDataStore[Section.CUSTOM_PLOTS][id])
+  const [plot, setPlot] = useState(plotDataStore[PlotsSection.CUSTOM_PLOTS][id])
   const { nbItemsPerRow, colors } = useSelector(
     (state: PlotsState) => state.custom
   )
@@ -46,7 +46,7 @@ export const CustomPlot: React.FC<CustomPlotProps> = ({ id }) => {
   }, [plot, colors])
 
   useEffect(() => {
-    setPlot(plotDataStore[Section.CUSTOM_PLOTS][id])
+    setPlot(plotDataStore[PlotsSection.CUSTOM_PLOTS][id])
   }, [plotSnapshot, id])
 
   if (!plot) {
@@ -62,7 +62,7 @@ export const CustomPlot: React.FC<CustomPlotProps> = ({ id }) => {
         id={id}
         changeDisabledDragIds={changeDisabledDragIds}
         currentSnapPoint={nbItemsPerRow}
-        section={Section.CUSTOM_PLOTS}
+        section={PlotsSection.CUSTOM_PLOTS}
       />
     </div>
   )

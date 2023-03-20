@@ -7,5 +7,5 @@ export const showSetupOrExecuteCommand =
   <T>(setup: Setup, callback: (context: Context) => Promise<T | undefined>) =>
   (context: Context) =>
     setup.shouldBeShown()
-      ? commands.executeCommand(RegisteredCommands.SETUP_SHOW)
+      ? commands.executeCommand(RegisteredCommands.SETUP_SHOW_EXPERIMENTS)
       : callback(context)

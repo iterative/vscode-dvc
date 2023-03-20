@@ -15,6 +15,7 @@ import {
 import { getPythonBinPath } from '../../extensions/python'
 import { getFirstWorkspaceFolder } from '../../vscode/workspaceFolders'
 import { delay } from '../../util/time'
+import { SetupSection } from '../../setup/webview/contract'
 
 export const warnUnableToVerifyVersion = () =>
   Toast.warnWithOptions(
@@ -52,7 +53,7 @@ const warnUserCLIInaccessible = async (
 
   switch (response) {
     case Response.SHOW_SETUP:
-      return setup.showSetup()
+      return setup.showSetup(SetupSection.EXPERIMENTS)
     case Response.NEVER:
       return setUserConfigValue(ConfigKey.DO_NOT_SHOW_CLI_UNAVAILABLE, true)
   }

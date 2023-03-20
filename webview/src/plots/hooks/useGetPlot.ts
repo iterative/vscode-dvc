@@ -1,6 +1,6 @@
 import {
   CustomPlotData,
-  Section,
+  PlotsSection,
   TemplatePlotEntry
 } from 'dvc/src/plots/webview/contract'
 import { useCallback, useEffect, useState } from 'react'
@@ -10,11 +10,11 @@ import { plotDataStore } from '../components/plotDataStore'
 import { PlotsState } from '../store'
 
 export const useGetPlot = (
-  section: Section,
+  section: PlotsSection,
   id: string,
   spec?: VisualizationSpec
 ) => {
-  const isCustomPlot = section === Section.CUSTOM_PLOTS
+  const isCustomPlot = section === PlotsSection.CUSTOM_PLOTS
   const storeSection = isCustomPlot ? 'custom' : 'template'
   const snapshot = useSelector(
     (state: PlotsState) => state[storeSection].plotsSnapshots

@@ -2,9 +2,9 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
   DEFAULT_HEIGHT,
   DEFAULT_SECTION_COLLAPSED,
-  DEFAULT_SECTION_NB_ITEMS_PER_ROW,
+  DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH,
   PlotHeight,
-  Section,
+  PlotsSection,
   TemplatePlotGroup,
   TemplatePlotsData
 } from 'dvc/src/plots/webview/contract'
@@ -22,9 +22,10 @@ export interface TemplatePlotsState extends Omit<TemplatePlotsData, 'plots'> {
 export const templatePlotsInitialState: TemplatePlotsState = {
   disabledDragPlotIds: [],
   hasData: false,
-  height: DEFAULT_HEIGHT[Section.TEMPLATE_PLOTS],
-  isCollapsed: DEFAULT_SECTION_COLLAPSED[Section.TEMPLATE_PLOTS],
-  nbItemsPerRow: DEFAULT_SECTION_NB_ITEMS_PER_ROW[Section.TEMPLATE_PLOTS],
+  height: DEFAULT_HEIGHT[PlotsSection.TEMPLATE_PLOTS],
+  isCollapsed: DEFAULT_SECTION_COLLAPSED[PlotsSection.TEMPLATE_PLOTS],
+  nbItemsPerRow:
+    DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH[PlotsSection.TEMPLATE_PLOTS],
   plotsSnapshots: {},
   sections: []
 }
@@ -38,9 +39,12 @@ export const templatePlotsSlice = createSlice({
     },
     changeSize: (
       state,
-      action: PayloadAction<{ nbItemsPerRow: number; height: PlotHeight }>
+      action: PayloadAction<{
+        nbItemsPerRowOrWidth: number
+        height: PlotHeight
+      }>
     ) => {
-      state.nbItemsPerRow = action.payload.nbItemsPerRow
+      state.nbItemsPerRow = action.payload.nbItemsPerRowOrWidth
       state.height = action.payload.height
     },
     setCollapsed: (state, action: PayloadAction<boolean>) => {
@@ -58,8 +62,11 @@ export const templatePlotsSlice = createSlice({
 
       const plots = action.payload.plots?.flatMap(section => section.entries)
       const plotsIds = plots?.map(plot => plot.id) || []
-      const snapShots = addPlotsWithSnapshots(plots, Section.TEMPLATE_PLOTS)
-      removePlots(plotsIds, Section.TEMPLATE_PLOTS)
+      const snapShots = addPlotsWithSnapshots(
+        plots,
+        PlotsSection.TEMPLATE_PLOTS
+      )
+      removePlots(plotsIds, PlotsSection.TEMPLATE_PLOTS)
 
       return {
         ...state,

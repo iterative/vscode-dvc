@@ -94,14 +94,15 @@ export enum RegisteredCommands {
   TRACKED_EXPLORER_SELECT_FOR_COMPARE = 'dvc.selectForCompare',
 
   SETUP_SHOW = 'dvc.showSetup',
+  SETUP_SHOW_EXPERIMENTS = 'dvc.showExperimentsSetup',
   SELECT_FOCUSED_PROJECTS = 'dvc.selectFocusedProjects',
 
-  CONNECT_SHOW = 'dvc.showConnect',
-  OPEN_STUDIO_SETTINGS = 'dvc.showStudioSettings',
   ADD_STUDIO_ACCESS_TOKEN = 'dvc.addStudioAccessToken',
   UPDATE_STUDIO_ACCESS_TOKEN = 'dvc.updateStudioAccessToken',
   REMOVE_STUDIO_ACCESS_TOKEN = 'dvc.removeStudioAccessToken',
   EXPERIMENT_VIEW_SHARE_TO_STUDIO = 'dvc.views.experiments.shareExperimentToStudio',
+  SETUP_SHOW_STUDIO_CONNECT = 'dvc.showStudioConnect',
+  SETUP_SHOW_STUDIO_SETTINGS = 'dvc.showStudioSettings',
 
   RESET_STATE = 'dvc.resetState'
 }

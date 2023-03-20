@@ -1,3 +1,5 @@
+import { SetupSection } from './setup/webview/contract'
+
 export interface IExtensionSetup {
   getCliVersion: (
     cwd: string,
@@ -7,7 +9,7 @@ export interface IExtensionSetup {
   hasRoots: () => boolean
   isPythonExtensionUsed: () => Promise<boolean>
 
-  showSetup: () => void
+  showSetup: (focusedSection?: SetupSection) => void
   shouldWarnUserIfCLIUnavailable: () => boolean
 
   initialize: () => Promise<void[]>

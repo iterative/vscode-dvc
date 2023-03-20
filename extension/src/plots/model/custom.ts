@@ -25,7 +25,7 @@ export const doesCustomPlotAlreadyExist = (
     return value.param === param && value.metric === metric
   })
 
-const removeColumnTypeFromPath = (
+export const removeColumnTypeFromPath = (
   columnPath: string,
   type: string,
   fileSep: string

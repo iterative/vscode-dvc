@@ -1,10 +1,20 @@
-import { Event, EventEmitter, ViewColumn } from 'vscode'
+import {
+  Event,
+  EventEmitter,
+  ExtensionContext,
+  SecretStorage,
+  ViewColumn,
+  workspace
+} from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import isEmpty from 'lodash.isempty'
-import { SetupData as TSetupData } from './webview/contract'
+import { SetupSection, SetupData as TSetupData } from './webview/contract'
+import { collectSectionCollapsed } from './collect'
 import { WebviewMessages } from './webview/messages'
+import { validateTokenInput } from './inputBox'
 import { findPythonBinForInstall } from './autoInstall'
 import { run, runWithRecheck, runWorkspace } from './runner'
+import { STUDIO_ACCESS_TOKEN_KEY, isStudioAccessToken } from './token'
 import { pickFocusedProjects } from './quickPick'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
@@ -39,6 +49,9 @@ import { WorkspaceScale } from '../telemetry/collect'
 import { gitPath } from '../cli/git/constants'
 import { DOT_DVC } from '../cli/dvc/constants'
 import { GLOBAL_WEBVIEW_DVCROOT } from '../webview/factory'
+import { ConfigKey, getConfigValue } from '../vscode/config'
+import { getValidInput } from '../vscode/inputBox'
+import { Title } from '../vscode/title'
 
 export type SetupWebviewWebview = BaseWebview<TSetupData>
 
@@ -74,7 +87,14 @@ export class Setup
 
   private dotFolderWatcher?: Disposer
 
+  private readonly secrets: SecretStorage
+  private studioAccessToken: string | undefined = undefined
+  private studioIsConnected = false
+
+  private focusedSection: SetupSection | undefined = undefined
+
   constructor(
+    context: ExtensionContext,
     config: Config,
     internalCommands: InternalCommands,
     experiments: WorkspaceExperiments,
@@ -127,6 +147,35 @@ export class Setup
     this.watchConfigurationDetailsForChanges()
     this.watchDotFolderForChanges()
     this.watchPathForChanges(stopWatch)
+
+    this.secrets = context.secrets
+
+    void this.getSecret(STUDIO_ACCESS_TOKEN_KEY).then(
+      async studioAccessToken => {
+        this.studioAccessToken = studioAccessToken
+        await this.updateIsStudioConnected()
+        this.deferred.resolve()
+      }
+    )
+
+    this.dispose.track(
+      context.secrets.onDidChange(async e => {
+        if (e.key !== STUDIO_ACCESS_TOKEN_KEY) {
+          return
+        }
+
+        this.studioAccessToken = await this.getSecret(STUDIO_ACCESS_TOKEN_KEY)
+        return this.updateIsStudioConnected()
+      })
+    )
+
+    this.dispose.track(
+      workspace.onDidChangeConfiguration(e => {
+        if (e.affectsConfiguration(ConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE)) {
+          return this.sendDataToWebview()
+        }
+      })
+    )
   }
 
   public getRoots() {
@@ -162,7 +211,12 @@ export class Setup
     this.config.unsetPythonBinPath()
   }
 
-  public async showSetup() {
+  public async showSetup(focusSection?: SetupSection) {
+    this.focusedSection = focusSection
+    if (this.webview) {
+      void this.sendDataToWebview()
+    }
+
     return await this.showWebview()
   }
 
@@ -201,44 +255,8 @@ export class Setup
     return !!this.webview?.isActive
   }
 
-  public sendInitialWebviewData() {
-    return this.sendDataToWebview()
-  }
-
   public shouldBeShown() {
     return !this.cliCompatible || !this.hasRoots() || !this.getHasData()
-  }
-
-  public async sendDataToWebview() {
-    if (this.webview?.isVisible && !this.shouldBeShown()) {
-      this.getWebview()?.dispose()
-      this.showExperiments()
-      return
-    }
-
-    const projectInitialized = this.hasRoots()
-    const hasData = this.getHasData()
-
-    const needsGitInitialized =
-      !projectInitialized && !!(await this.needsGitInit())
-
-    const canGitInitialize = await this.canGitInitialize(needsGitInitialized)
-
-    const needsGitCommit =
-      needsGitInitialized || (await this.needsGitCommit(needsGitInitialized))
-
-    const pythonBinPath = await findPythonBinForInstall()
-
-    this.webviewMessages.sendWebviewMessage({
-      canGitInitialize,
-      cliCompatible: this.cliCompatible,
-      hasData,
-      isPythonExtensionInstalled: isPythonExtensionInstalled(),
-      needsGitCommit,
-      needsGitInitialized,
-      projectInitialized,
-      pythonBinPath: getBinDisplayText(pythonBinPath)
-    })
   }
 
   public async selectFocusedProjects() {
@@ -282,10 +300,75 @@ export class Setup
     }
   }
 
+  public removeStudioAccessToken() {
+    return this.removeSecret(STUDIO_ACCESS_TOKEN_KEY)
+  }
+
+  public async saveStudioAccessToken() {
+    const token = await getValidInput(
+      Title.ENTER_STUDIO_TOKEN,
+      validateTokenInput,
+      { password: true }
+    )
+    if (!token) {
+      return
+    }
+
+    return this.storeSecret(STUDIO_ACCESS_TOKEN_KEY, token)
+  }
+
+  public getStudioLiveShareToken() {
+    return getConfigValue<boolean>(
+      ConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE,
+      false
+    )
+      ? this.getStudioAccessToken()
+      : undefined
+  }
+
+  public getStudioAccessToken() {
+    return this.studioAccessToken
+  }
+
+  public sendInitialWebviewData() {
+    return this.sendDataToWebview()
+  }
+
+  private async sendDataToWebview() {
+    const projectInitialized = this.hasRoots()
+    const hasData = this.getHasData()
+
+    const needsGitInitialized =
+      !projectInitialized && !!(await this.needsGitInit())
+
+    const canGitInitialize = await this.canGitInitialize(needsGitInitialized)
+
+    const needsGitCommit =
+      needsGitInitialized || (await this.needsGitCommit(needsGitInitialized))
+
+    const pythonBinPath = await findPythonBinForInstall()
+
+    this.webviewMessages.sendWebviewMessage({
+      canGitInitialize,
+      cliCompatible: this.cliCompatible,
+      hasData,
+      isPythonExtensionInstalled: isPythonExtensionInstalled(),
+      isStudioConnected: this.studioIsConnected,
+      needsGitCommit,
+      needsGitInitialized,
+      projectInitialized,
+      pythonBinPath: getBinDisplayText(pythonBinPath),
+      sectionCollapsed: collectSectionCollapsed(this.focusedSection),
+      shareLiveToStudio: getConfigValue(ConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE)
+    })
+    this.focusedSection = undefined
+  }
+
   private createWebviewMessageHandler() {
     const webviewMessages = new WebviewMessages(
       () => this.getWebview(),
-      () => this.initializeGit()
+      () => this.initializeGit(),
+      () => this.showExperiments()
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>
@@ -507,5 +590,36 @@ export class Setup
       pythonPathUsed: !!this.config.getPythonBinPath(),
       workspaceFolderCount: getWorkspaceFolderCount()
     }
+  }
+
+  private updateIsStudioConnected() {
+    const storedToken = this.getStudioAccessToken()
+    const isConnected = isStudioAccessToken(storedToken)
+    return this.setStudioIsConnected(isConnected)
+  }
+
+  private setStudioIsConnected(isConnected: boolean) {
+    this.studioIsConnected = isConnected
+    void this.sendDataToWebview()
+    return setContextValue(ContextKey.STUDIO_CONNECTED, isConnected)
+  }
+
+  private getSecret(key: string) {
+    const secrets = this.getSecrets()
+    return secrets.get(key)
+  }
+
+  private storeSecret(key: string, value: string) {
+    const secrets = this.getSecrets()
+    return secrets.store(key, value)
+  }
+
+  private removeSecret(key: string) {
+    const secrets = this.getSecrets()
+    return secrets.delete(key)
+  }
+
+  private getSecrets() {
+    return this.secrets
   }
 }

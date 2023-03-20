@@ -4,38 +4,40 @@ import { Color } from '../../experiments/model/status/colors'
 export const DEFAULT_NB_ITEMS_PER_ROW = 2
 
 export enum PlotHeight {
-  SMALLER = 0,
-  SMALL = 1,
-  REGULAR = 2,
-  SQUARE = 3,
-  VERTICAL_NORMAL = 4,
-  VERTICAL_LARGER = 5
+  SMALLER,
+  SMALL,
+  REGULAR,
+  SQUARE,
+  VERTICAL_NORMAL,
+  VERTICAL_LARGER
 }
 
 export const DEFAULT_PLOT_HEIGHT = PlotHeight.SMALL
 
-export enum Section {
+export const DEFAULT_PLOT_WIDTH = 2
+
+export enum PlotsSection {
   TEMPLATE_PLOTS = 'template-plots',
   COMPARISON_TABLE = 'comparison-table',
   CUSTOM_PLOTS = 'custom-plots'
 }
 
-export const DEFAULT_SECTION_NB_ITEMS_PER_ROW = {
-  [Section.TEMPLATE_PLOTS]: DEFAULT_NB_ITEMS_PER_ROW,
-  [Section.COMPARISON_TABLE]: DEFAULT_NB_ITEMS_PER_ROW,
-  [Section.CUSTOM_PLOTS]: DEFAULT_NB_ITEMS_PER_ROW
+export const DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH = {
+  [PlotsSection.TEMPLATE_PLOTS]: DEFAULT_NB_ITEMS_PER_ROW,
+  [PlotsSection.COMPARISON_TABLE]: DEFAULT_PLOT_WIDTH,
+  [PlotsSection.CUSTOM_PLOTS]: DEFAULT_NB_ITEMS_PER_ROW
 }
 
 export const DEFAULT_HEIGHT = {
-  [Section.TEMPLATE_PLOTS]: DEFAULT_PLOT_HEIGHT,
-  [Section.COMPARISON_TABLE]: DEFAULT_PLOT_HEIGHT,
-  [Section.CUSTOM_PLOTS]: DEFAULT_PLOT_HEIGHT
+  [PlotsSection.TEMPLATE_PLOTS]: DEFAULT_PLOT_HEIGHT,
+  [PlotsSection.COMPARISON_TABLE]: DEFAULT_PLOT_HEIGHT,
+  [PlotsSection.CUSTOM_PLOTS]: DEFAULT_PLOT_HEIGHT
 }
 
 export const DEFAULT_SECTION_COLLAPSED = {
-  [Section.TEMPLATE_PLOTS]: false,
-  [Section.COMPARISON_TABLE]: false,
-  [Section.CUSTOM_PLOTS]: false
+  [PlotsSection.TEMPLATE_PLOTS]: false,
+  [PlotsSection.COMPARISON_TABLE]: false,
+  [PlotsSection.CUSTOM_PLOTS]: false
 }
 
 export type SectionCollapsed = typeof DEFAULT_SECTION_COLLAPSED
@@ -65,7 +67,7 @@ export type Revision = {
 
 export interface PlotsComparisonData {
   plots: ComparisonPlots
-  nbItemsPerRow: number
+  width: number
   height: PlotHeight
   revisions: Revision[]
 }

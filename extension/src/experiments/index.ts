@@ -419,10 +419,6 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getExperimentsByCommitForTree(commit)
   }
 
-  public sendInitialWebviewData() {
-    return this.webviewMessages.sendWebviewMessage()
-  }
-
   public getSelectedRevisions() {
     if (!this.columns.hasNonDefaultColumns()) {
       return []
@@ -518,6 +514,10 @@ export class Experiments extends BaseRepository<TableData> {
       return
     }
     return this.columns.hasNonDefaultColumns()
+  }
+
+  protected sendInitialWebviewData() {
+    return this.webviewMessages.sendWebviewMessage()
   }
 
   private setupInitialData() {

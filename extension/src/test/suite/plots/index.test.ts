@@ -4,6 +4,7 @@ import cloneDeep from 'lodash.clonedeep'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore, spy, stub } from 'sinon'
+import { commands, Uri } from 'vscode'
 import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import expShowFixtureWithoutErrors from '../../fixtures/expShow/base/noErrors'
@@ -27,7 +28,7 @@ import {
   DEFAULT_PLOT_HEIGHT,
   DEFAULT_SECTION_COLLAPSED,
   PlotsData as TPlotsData,
-  Section,
+  PlotsSection,
   TemplatePlotGroup,
   TemplatePlotsData,
   CustomPlotType
@@ -202,28 +203,32 @@ suite('Plots Test Suite', () => {
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
-      const mockSetPlotSize = stub(plotsModel, 'setNbItemsPerRow').returns(
-        undefined
-      )
+      const mockSetPlotSize = stub(
+        plotsModel,
+        'setNbItemsPerRowOrWidth'
+      ).returns(undefined)
 
       mockMessageReceived.fire({
         payload: {
           height: DEFAULT_PLOT_HEIGHT,
           nbItemsPerRow: 3,
-          section: Section.TEMPLATE_PLOTS
+          section: PlotsSection.TEMPLATE_PLOTS
         },
         type: MessageFromWebviewType.RESIZE_PLOTS
       })
 
       expect(mockSetPlotSize).to.be.calledOnce
-      expect(mockSetPlotSize).to.be.calledWithExactly(Section.TEMPLATE_PLOTS, 3)
+      expect(mockSetPlotSize).to.be.calledWithExactly(
+        PlotsSection.TEMPLATE_PLOTS,
+        3
+      )
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_PLOTS_SECTION_RESIZED,
         {
           height: DEFAULT_PLOT_HEIGHT,
           nbItemsPerRow: 3,
-          section: Section.TEMPLATE_PLOTS
+          section: PlotsSection.TEMPLATE_PLOTS
         },
         undefined
       )
@@ -238,7 +243,7 @@ suite('Plots Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockSetSectionCollapsed = spy(plotsModel, 'setSectionCollapsed')
-      const mockSectionCollapsed = { [Section.CUSTOM_PLOTS]: true }
+      const mockSectionCollapsed = { [PlotsSection.CUSTOM_PLOTS]: true }
 
       messageSpy.resetHistory()
       mockMessageReceived.fire({
@@ -420,6 +425,68 @@ suite('Plots Test Suite', () => {
         EventName.VIEWS_REORDER_PLOTS_TEMPLATES,
         undefined,
         undefined
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a plot zoomed message from the webview', async () => {
+      const { plots } = await buildPlots(disposable, plotsDiffFixture)
+
+      const webview = await plots.showWebview()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.ZOOM_PLOT
+      })
+
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_ZOOM_PLOT,
+        { isImage: false },
+        undefined
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a plot zoomed message from the webview for an image', async () => {
+      const { plots } = await buildPlots(disposable, plotsDiffFixture)
+
+      const webview = await plots.showWebview()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        payload: webview.getWebviewUri('a/path.jpg'),
+        type: MessageFromWebviewType.ZOOM_PLOT
+      })
+
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_ZOOM_PLOT,
+        { isImage: true },
+        undefined
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should open an image when receiving a plot zoomed message from the webview with a payload', async () => {
+      const { plots } = await buildPlots(disposable, plotsDiffFixture)
+
+      const webview = await plots.showWebview()
+      const imagePath = 'some/path/image.jpg'
+
+      stub(Telemetry, 'sendTelemetryEvent')
+      const mockExecuteCommands = stub(commands, 'executeCommand')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        payload: webview.getWebviewUri(imagePath),
+        type: MessageFromWebviewType.ZOOM_PLOT
+      })
+
+      expect(mockExecuteCommands).to.be.calledWith(
+        'vscode.open',
+        Uri.file(imagePath)
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 

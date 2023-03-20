@@ -16,7 +16,7 @@ export const RefreshButton: React.FC<RefreshButtonProps> = ({
       isNested={isNested}
       icon={Refresh}
       onClick={onClick}
-      text={'Refresh'}
+      text="Refresh"
     />
   )
 }

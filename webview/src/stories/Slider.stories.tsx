@@ -3,7 +3,7 @@ import React from 'react'
 import '../shared/style.scss'
 import './test-vscode-styles.scss'
 import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'
-import { MinMaxSlider } from '../shared/components/slider/MinMaxSlider'
+import { Slider } from '../shared/components/slider/Slider'
 
 export default {
   args: {
@@ -11,7 +11,7 @@ export default {
     label: 'Slider with a max',
     maximum: 10
   },
-  component: MinMaxSlider,
+  component: Slider,
   parameters: DISABLE_CHROMATIC_SNAPSHOTS,
   title: 'Slider'
 } as Meta
@@ -21,7 +21,7 @@ const Template: Story<{
   defaultValue: number
   label: string
 }> = ({ maximum, defaultValue, label }) => (
-  <MinMaxSlider
+  <Slider
     maximum={maximum}
     defaultValue={defaultValue}
     label={label}

@@ -15,7 +15,6 @@ import { Title } from '../../vscode/title'
 import { Context, getDvcRootFromContext } from '../../vscode/context'
 import { Setup } from '../../setup'
 import { showSetupOrExecuteCommand } from '../../commands/util'
-import { Connect } from '../../connect'
 
 type ExperimentDetails = { dvcRoot: string; id: string }
 
@@ -331,8 +330,7 @@ const registerExperimentRunCommands = (
 export const registerExperimentCommands = (
   experiments: WorkspaceExperiments,
   internalCommands: InternalCommands,
-  setup: Setup,
-  connect: Connect
+  setup: Setup
 ) => {
   registerExperimentCwdCommands(experiments, internalCommands)
   registerExperimentNameCommands(experiments, internalCommands)
@@ -348,7 +346,7 @@ export const registerExperimentCommands = (
 
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_VIEW_SHARE_TO_STUDIO,
-    getShareExperimentToStudioCommand(internalCommands, connect)
+    getShareExperimentToStudioCommand(internalCommands, setup)
   )
 
   internalCommands.registerExternalCliCommand(

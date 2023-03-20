@@ -15,9 +15,8 @@ export const Icon: React.FC<IconProps> = ({
   ...other
 }) => {
   const I = icon
-  const fill = 'magenta' // This color is used to make sure we change it in CSS
   const w = width || 20
   const h = height || 20
 
-  return <I fill={fill} width={w} height={h} {...other} />
+  return <I width={w} height={h} {...other} />
 }

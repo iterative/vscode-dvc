@@ -8,8 +8,8 @@ import {
   DEFAULT_SECTION_COLLAPSED,
   TemplatePlotGroup,
   TemplatePlotSection,
-  DEFAULT_NB_ITEMS_PER_ROW,
-  DEFAULT_PLOT_HEIGHT
+  DEFAULT_PLOT_HEIGHT,
+  DEFAULT_NB_ITEMS_PER_ROW
 } from 'dvc/src/plots/webview/contract'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
 import customPlotsFixture from 'dvc/src/test/fixtures/expShow/base/customPlots'
@@ -175,7 +175,7 @@ AllLarge.args = {
   data: {
     comparison: {
       ...comparisonPlotsFixture,
-      nbItemsPerRow: 1
+      width: 1
     },
     custom: {
       ...customPlotsFixture,
@@ -196,7 +196,7 @@ AllSmall.args = {
   data: {
     comparison: {
       ...comparisonPlotsFixture,
-      nbItemsPerRow: 3
+      width: 3
     },
     custom: smallCustomPlotsFixture,
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,

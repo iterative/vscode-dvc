@@ -1,5 +1,11 @@
 import { join } from 'path'
-import { EventEmitter, commands } from 'vscode'
+import {
+  EventEmitter,
+  ExtensionContext,
+  SecretStorage,
+  commands,
+  env
+} from 'vscode'
 import { Disposer } from '@hediet/std/disposable'
 import { fake, stub } from 'sinon'
 import { ensureDirSync } from 'fs-extra'
@@ -26,7 +32,8 @@ export const buildSetup = (
   hasData = false,
   noDvcRoot = true,
   noGitRoot = true,
-  noGitCommits = true
+  noGitCommits = true,
+  mockSecretStorage: SecretStorage | undefined = undefined
 ) => {
   const {
     config,
@@ -70,8 +77,22 @@ export const buildSetup = (
     undefined
   )
 
+  const mockOpenExternal = stub(env, 'openExternal')
+  const urlOpenedEvent = new Promise(resolve =>
+    mockOpenExternal.callsFake(() => {
+      resolve(undefined)
+      return Promise.resolve(true)
+    })
+  )
+
   const setup = disposer.track(
     new Setup(
+      {
+        secrets: mockSecretStorage || {
+          get: stub().resolves(undefined),
+          onDidChange: stub()
+        }
+      } as unknown as ExtensionContext,
       config,
       internalCommands,
       {
@@ -98,10 +119,12 @@ export const buildSetup = (
     mockGlobalVersion,
     mockInitializeGit,
     mockOpenExperiments,
+    mockOpenExternal,
     mockRunSetup,
     mockVersion,
     resourceLocator,
-    setup
+    setup,
+    urlOpenedEvent
   }
 }
 
@@ -123,6 +146,12 @@ export const buildSetupWithWatchers = async (disposer: Disposer) => {
 
   const setup = disposer.track(
     new Setup(
+      {
+        secrets: {
+          get: stub().resolves(undefined),
+          onDidChange: stub()
+        }
+      } as unknown as ExtensionContext,
       config,
       mockInternalCommands,
       {
