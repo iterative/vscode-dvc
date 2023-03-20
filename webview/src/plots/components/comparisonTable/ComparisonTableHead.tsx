@@ -1,4 +1,4 @@
-import React, { createRef, useEffect, useState } from 'react'
+import React, { createRef, useEffect } from 'react'
 import { Revision } from 'dvc/src/plots/webview/contract'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
@@ -11,6 +11,13 @@ import { getThemeValue, ThemeProperty } from '../../../util/styles'
 
 export type ComparisonTableColumn = Revision
 
+const POSITION_ADJUSTMENTS = 51 - 4 // 4 is equal to the gap in the comparison table and 51 is the height of the section header
+
+const setHeaderTop = (head: HTMLTableSectionElement, top: number) => {
+  for (const header of head.firstChild?.childNodes || []) {
+    ;(header as HTMLTableCellElement).style.top = `${top}px`
+  }
+}
 interface ComparisonTableHeadProps {
   columns: ComparisonTableColumn[]
   pinnedColumn: string
@@ -28,18 +35,19 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
     (state: PlotsState) => state.dragAndDrop.draggedRef?.itemId
   )
   const ribbonHeight = useSelector((state: PlotsState) => state.ribbon.height)
-  const [top, setTop] = useState(0)
   const headRef = createRef<HTMLTableSectionElement>()
 
   useEffect(() => {
+    const adjustedRibbonHeight = ribbonHeight + POSITION_ADJUSTMENTS
     const calculateTop = () => {
-      const headerPosition = headRef.current?.getBoundingClientRect().top || 0
-      const positionAdjustments = 51 - 4 // 4 is equal to the gap in the comparison table and 51 is the height of the section header
-      setTop(
-        headerPosition - positionAdjustments - 40 < 0
-          ? ribbonHeight - headerPosition + positionAdjustments
-          : 0
-      )
+      if (headRef.current) {
+        const headerPosition = headRef.current.getBoundingClientRect().top
+        const top =
+          headerPosition - POSITION_ADJUSTMENTS < 0
+            ? adjustedRibbonHeight - headerPosition
+            : 0
+        setHeaderTop(headRef.current, top)
+      }
     }
 
     window.addEventListener('scroll', calculateTop)
@@ -59,7 +67,6 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
           [styles.pinnedColumnHeader]: isPinned,
           [styles.draggedColumn]: draggedId === revision
         })}
-        style={{ top }}
       >
         <ComparisonTableHeader
           isPinned={isPinned}
