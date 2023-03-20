@@ -222,7 +222,7 @@ describe('pickMetric', () => {
   it('should end early if user does not select a metric', async () => {
     mockedQuickPickValue.mockResolvedValue(undefined)
 
-    const noMetricSelected = await pickMetricAndParam([
+    const noMetricSelected = await pickMetric([
       {
         hasChildren: false,
         label: 'dropout',
