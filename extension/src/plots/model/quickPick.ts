@@ -2,7 +2,8 @@ import { getCustomPlotId } from './collect'
 import {
   getFullValuePath,
   CustomPlotsOrderValue,
-  isCheckpointValue
+  isCheckpointValue,
+  removeColumnTypeFromPath
 } from './custom'
 import {
   FILE_SEPARATOR,
@@ -126,7 +127,19 @@ export const pickMetricAndParam = async (columns: Column[]) => {
   if (!param) {
     return
   }
-  return { metric: metric.path, param: param.path }
+
+  return {
+    metric: removeColumnTypeFromPath(
+      metric.path,
+      ColumnType.METRICS,
+      FILE_SEPARATOR
+    ),
+    param: removeColumnTypeFromPath(
+      param.path,
+      ColumnType.PARAMS,
+      FILE_SEPARATOR
+    )
+  }
 }
 
 export const pickMetric = async (columns: Column[]) => {
@@ -144,5 +157,9 @@ export const pickMetric = async (columns: Column[]) => {
     return
   }
 
-  return metric.path
+  return removeColumnTypeFromPath(
+    metric.path,
+    ColumnType.METRICS,
+    FILE_SEPARATOR
+  )
 }

@@ -153,7 +153,7 @@ describe('pickMetricAndParam', () => {
       {
         hasChildren: false,
         label: 'accuracy',
-        path: 'summary.json:accuracy',
+        path: 'metrics:summary.json:accuracy',
         type: ColumnType.METRICS
       }
     ])
@@ -169,7 +169,7 @@ describe('pickMetricAndParam', () => {
       {
         hasChildren: false,
         label: 'accuracy',
-        path: 'summary.json:accuracy',
+        path: 'metrics:summary.json:accuracy',
         type: ColumnType.METRICS
       }
     ])
@@ -183,7 +183,7 @@ describe('pickMetricAndParam', () => {
     }
     const expectedParam = {
       label: 'epochs',
-      path: 'summary.json:loss-params.yaml:epochs'
+      path: 'params:params.yaml:epochs'
     }
     mockedQuickPickValue
       .mockResolvedValueOnce(expectedMetric)
@@ -200,13 +200,13 @@ describe('pickMetricAndParam', () => {
       {
         hasChildren: false,
         label: 'accuracy',
-        path: 'summary.json:accuracy',
+        path: 'metrics:summary.json:accuracy',
         type: ColumnType.METRICS
       }
     ])
     expect(metricAndParam).toStrictEqual({
-      metric: expectedMetric.path,
-      param: expectedParam.path
+      metric: 'summary.json:loss',
+      param: 'params.yaml:epochs'
     })
   })
 })
@@ -232,7 +232,7 @@ describe('pickMetric', () => {
       {
         hasChildren: false,
         label: 'accuracy',
-        path: 'summary.json:accuracy',
+        path: 'metrics:summary.json:accuracy',
         type: ColumnType.METRICS
       }
     ])
@@ -250,12 +250,12 @@ describe('pickMetric', () => {
       {
         hasChildren: false,
         label: 'accuracy',
-        path: 'summary.json:accuracy',
+        path: 'metrics:summary.json:accuracy',
         type: ColumnType.METRICS
       }
     ])
 
-    expect(metric).toStrictEqual(expectedMetric.path)
+    expect(metric).toStrictEqual('summary.json:loss')
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
     expect(mockedQuickPickValue).toHaveBeenCalledWith(
       [
@@ -265,9 +265,9 @@ describe('pickMetric', () => {
           value: { label: 'loss', path: 'metrics:summary.json:loss' }
         },
         {
-          description: 'summary.json:accuracy',
+          description: 'metrics:summary.json:accuracy',
           label: 'accuracy',
-          value: { label: 'accuracy', path: 'summary.json:accuracy' }
+          value: { label: 'accuracy', path: 'metrics:summary.json:accuracy' }
         }
       ],
       { title: Title.SELECT_METRIC_CUSTOM_PLOT }
