@@ -13,7 +13,6 @@ import { Experiments } from '../experiments'
 import { Resource } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
 import { definedAndNonEmpty } from '../util/array'
-import { ExperimentsOutput } from '../cli/dvc/contract'
 import { TEMP_PLOTS_DIR } from '../cli/dvc/constants'
 import { removeDir } from '../fileSystem'
 import { Toast } from '../vscode/toast'
@@ -173,7 +172,7 @@ export class Plots extends BaseRepository<TPlotsData> {
           waitForInitialExpData.dispose()
           this.data.setMetricFiles(data)
           this.setupExperimentsListener(experiments)
-          void this.initializeData(data)
+          void this.initializeData()
         }
       })
     )
@@ -184,7 +183,7 @@ export class Plots extends BaseRepository<TPlotsData> {
       experiments.onDidChangeExperiments(async data => {
         if (data) {
           await Promise.all([
-            this.plots.transformAndSetExperiments(data),
+            this.plots.transformAndSetExperiments(),
             this.data.setMetricFiles(data)
           ])
         }
@@ -200,8 +199,8 @@ export class Plots extends BaseRepository<TPlotsData> {
     )
   }
 
-  private async initializeData(data: ExperimentsOutput) {
-    await this.plots.transformAndSetExperiments(data)
+  private async initializeData() {
+    await this.plots.transformAndSetExperiments()
     void this.data.managedUpdate()
     await Promise.all([
       this.data.isReady(),
