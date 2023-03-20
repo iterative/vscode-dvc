@@ -33,8 +33,6 @@ for epoch in range(NUM_EPOCHS):
 `DVCLive` is _optional_, and you can just append or modify plot files using any
 language and any tool.
 
-💡 `Trends` section of the plots dashboard is being updated automatically based
-on the data in the table. You don't even have to manage or write any special
-plot files, but you need to enable
-[checkpoints](https://dvc.org/doc/user-guide/experiment-management/checkpoints)
-in the project.
+💡 Plots created in the `Custom` section of the plots dashboard are being
+updated automatically based on the data in the table. You don't even have to
+manage or write any special plot files.

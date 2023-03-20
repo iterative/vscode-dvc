@@ -17,28 +17,24 @@ export const DEFAULT_PLOT_HEIGHT = PlotHeight.SMALL
 export const DEFAULT_PLOT_WIDTH = 2
 
 export enum PlotsSection {
-  CHECKPOINT_PLOTS = 'checkpoint-plots',
   TEMPLATE_PLOTS = 'template-plots',
   COMPARISON_TABLE = 'comparison-table',
   CUSTOM_PLOTS = 'custom-plots'
 }
 
 export const DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH = {
-  [PlotsSection.CHECKPOINT_PLOTS]: DEFAULT_NB_ITEMS_PER_ROW,
   [PlotsSection.TEMPLATE_PLOTS]: DEFAULT_NB_ITEMS_PER_ROW,
   [PlotsSection.COMPARISON_TABLE]: DEFAULT_PLOT_WIDTH,
   [PlotsSection.CUSTOM_PLOTS]: DEFAULT_NB_ITEMS_PER_ROW
 }
 
 export const DEFAULT_HEIGHT = {
-  [PlotsSection.CHECKPOINT_PLOTS]: DEFAULT_PLOT_HEIGHT,
   [PlotsSection.TEMPLATE_PLOTS]: DEFAULT_PLOT_HEIGHT,
   [PlotsSection.COMPARISON_TABLE]: DEFAULT_PLOT_HEIGHT,
   [PlotsSection.CUSTOM_PLOTS]: DEFAULT_PLOT_HEIGHT
 }
 
 export const DEFAULT_SECTION_COLLAPSED = {
-  [PlotsSection.CHECKPOINT_PLOTS]: false,
   [PlotsSection.TEMPLATE_PLOTS]: false,
   [PlotsSection.COMPARISON_TABLE]: false,
   [PlotsSection.CUSTOM_PLOTS]: false
@@ -76,6 +72,17 @@ export interface PlotsComparisonData {
   revisions: Revision[]
 }
 
+export enum CustomPlotType {
+  CHECKPOINT = 'checkpoint',
+  METRIC_VS_PARAM = 'metricVsParam'
+}
+
+export type MetricVsParamPlotValues = {
+  expName: string
+  metric: number
+  param: number
+}[]
+
 export type CheckpointPlotValues = {
   group: string
   iteration: number
@@ -84,38 +91,33 @@ export type CheckpointPlotValues = {
 
 export type ColorScale = { domain: string[]; range: Color[] }
 
-export type CheckpointPlot = {
+type CustomPlotBase = {
   id: string
-  values: CheckpointPlotValues
-}
-
-export type CustomPlotValues = {
-  expName: string
-  metric: number
-  param: number
-}
-
-export type CustomPlotData = {
-  id: string
-  values: CustomPlotValues[]
   metric: string
   param: string
+}
+
+export type CheckpointPlot = {
+  values: CheckpointPlotValues
+  type: CustomPlotType.CHECKPOINT
+} & CustomPlotBase
+
+export type MetricVsParamPlot = {
+  values: MetricVsParamPlotValues
+  type: CustomPlotType.METRIC_VS_PARAM
+} & CustomPlotBase
+
+export type CustomPlot = MetricVsParamPlot | CheckpointPlot
+
+export type CustomPlotData = CustomPlot & {
+  yTitle: string
 }
 
 export type CustomPlotsData = {
   plots: CustomPlotData[]
   nbItemsPerRow: number
+  colors: ColorScale | undefined
   height: PlotHeight
-}
-
-export type CheckpointPlotData = CheckpointPlot & { title: string }
-
-export type CheckpointPlotsData = {
-  plots: CheckpointPlotData[]
-  colors: ColorScale
-  nbItemsPerRow: number
-  height: PlotHeight
-  selectedMetrics?: string[]
 }
 
 export enum PlotsType {
@@ -173,7 +175,6 @@ export type ComparisonPlot = {
 
 export enum PlotsDataKeys {
   COMPARISON = 'comparison',
-  CHECKPOINT = 'checkpoint',
   CUSTOM = 'custom',
   HAS_UNSELECTED_PLOTS = 'hasUnselectedPlots',
   HAS_PLOTS = 'hasPlots',
@@ -185,7 +186,6 @@ export enum PlotsDataKeys {
 export type PlotsData =
   | {
       [PlotsDataKeys.COMPARISON]?: PlotsComparisonData | null
-      [PlotsDataKeys.CHECKPOINT]?: CheckpointPlotsData | null
       [PlotsDataKeys.CUSTOM]?: CustomPlotsData | null
       [PlotsDataKeys.HAS_PLOTS]?: boolean
       [PlotsDataKeys.HAS_UNSELECTED_PLOTS]?: boolean

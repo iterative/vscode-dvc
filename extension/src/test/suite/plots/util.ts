@@ -2,7 +2,9 @@ import { Disposer } from '@hediet/std/disposable'
 import { stub } from 'sinon'
 import * as FileSystem from '../../../fileSystem'
 import expShowFixtureWithoutErrors from '../../fixtures/expShow/base/noErrors'
-import checkpointPlotsFixture from '../../fixtures/expShow/base/checkpointPlots'
+import customPlotsFixture, {
+  customPlotsOrderFixture
+} from '../../fixtures/expShow/base/customPlots'
 import { Plots } from '../../../plots'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import { WorkspacePlots } from '../../../plots/workspace'
@@ -22,6 +24,7 @@ import { WebviewMessages } from '../../../plots/webview/messages'
 import { ExperimentsModel } from '../../../experiments/model'
 import { Experiment } from '../../../experiments/webview/contract'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
+import { isCheckpointPlot } from '../../../plots/model/custom'
 
 export const buildPlots = async (
   disposer: Disposer,
@@ -89,6 +92,7 @@ export const buildPlots = async (
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const plotsModel: PlotsModel = (plots as any).plots
+  plotsModel.updateCustomPlotsOrder(customPlotsOrderFixture)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const pathsModel: PathsModel = (plots as any).paths
@@ -127,14 +131,13 @@ export const buildWorkspacePlots = (disposer: Disposer) => {
   }
 }
 
-export const getExpectedCheckpointPlotsData = (
+export const getExpectedCustomPlotsData = (
   domain: string[],
   range: Color[]
 ) => {
-  const { plots, selectedMetrics, nbItemsPerRow, height } =
-    checkpointPlotsFixture
+  const { plots, nbItemsPerRow, height } = customPlotsFixture
   return {
-    checkpoint: {
+    custom: {
       colors: {
         domain,
         range
@@ -142,11 +145,11 @@ export const getExpectedCheckpointPlotsData = (
       height,
       nbItemsPerRow,
       plots: plots.map(plot => ({
-        id: plot.id,
-        title: plot.title,
-        values: plot.values.filter(values => domain.includes(values.group))
-      })),
-      selectedMetrics
+        ...plot,
+        values: isCheckpointPlot(plot)
+          ? plot.values.filter(value => domain.includes(value.group))
+          : plot.values
+      }))
     }
   }
 }

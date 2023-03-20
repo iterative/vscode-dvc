@@ -12,17 +12,6 @@ import { IconMenu } from '../iconMenu/IconMenu'
 import { IconMenuItemProps } from '../iconMenu/IconMenuItem'
 
 export const SectionDescription = {
-  // "Trends"
-  [PlotsSection.CHECKPOINT_PLOTS]: (
-    <span data-testid="tooltip-checkpoint-plots">
-      Automatically generated and updated linear plots that show metric value
-      per epoch if{' '}
-      <a href="https://dvc.org/doc/user-guide/experiment-management/checkpoints">
-        checkpoints
-      </a>{' '}
-      are enabled.
-    </span>
-  ),
   // "Custom"
   [PlotsSection.CUSTOM_PLOTS]: (
     <span data-testid="tooltip-custom-plots">

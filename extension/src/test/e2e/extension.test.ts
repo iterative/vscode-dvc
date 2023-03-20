@@ -125,7 +125,7 @@ describe('Plots Webview', function () {
 
     await browser.waitUntil(
       async () => {
-        return (await webview.vegaVisualization$$.length) === 10
+        return (await webview.vegaVisualization$$.length) === 5
       },
       { timeout: 30000 }
     )
