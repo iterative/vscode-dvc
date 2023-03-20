@@ -27,6 +27,12 @@ $gap: 20px;
   }
 }
 
+.insideSection {
+  width: 100%;
+  overflow-x: scroll;
+  padding-bottom: 10px;
+}
+
 .summaryTitle {
   display: flex;
   align-items: center;

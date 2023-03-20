@@ -153,7 +153,7 @@ export const SectionContainer: React.FC<
             </div>
           )}
         </summary>
-        {children}
+        <div className={styles.insideSection}>{children}</div>
       </details>
     </div>
   )
