@@ -68,7 +68,6 @@ export const EventName = Object.assign(
     VIEWS_PLOTS_EXPERIMENT_TOGGLE: 'views.plots.toggleExperimentStatus',
     VIEWS_PLOTS_FOCUS_CHANGED: 'views.plots.focusChanged',
     VIEWS_PLOTS_MANUAL_REFRESH: 'views.plots.manualRefresh',
-    VIEWS_PLOTS_METRICS_SELECTED: 'views.plots.metricsSelected',
     VIEWS_PLOTS_REVISIONS_REORDERED: 'views.plots.revisionsReordered',
     VIEWS_PLOTS_SECTION_RESIZED: 'views.plots.sectionResized',
     VIEWS_PLOTS_SECTION_TOGGLE: 'views.plots.toggleSection',
@@ -76,7 +75,6 @@ export const EventName = Object.assign(
     VIEWS_PLOTS_SELECT_PLOTS: 'view.plots.selectPlots',
     VIEWS_PLOTS_ZOOM_PLOT: 'views.plots.zoomPlot',
     VIEWS_REORDER_PLOTS_CUSTOM: 'views.plots.customReordered',
-    VIEWS_REORDER_PLOTS_METRICS: 'views.plots.metricsReordered',
     VIEWS_REORDER_PLOTS_TEMPLATES: 'views.plots.templatesReordered',
 
     VIEWS_SETUP_CLOSE: 'view.setup.closed',
@@ -246,7 +244,6 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED]: undefined
   [EventName.VIEWS_PLOTS_FOCUS_CHANGED]: WebviewFocusChangedProperties
   [EventName.VIEWS_PLOTS_MANUAL_REFRESH]: { revisions: number }
-  [EventName.VIEWS_PLOTS_METRICS_SELECTED]: undefined
   [EventName.VIEWS_PLOTS_REVISIONS_REORDERED]: undefined
   [EventName.VIEWS_PLOTS_COMPARISON_ROWS_REORDERED]: undefined
   [EventName.VIEWS_PLOTS_SECTION_RESIZED]: {
@@ -259,7 +256,6 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_SELECT_PLOTS]: undefined
   [EventName.VIEWS_PLOTS_EXPERIMENT_TOGGLE]: undefined
   [EventName.VIEWS_PLOTS_ZOOM_PLOT]: { isImage: boolean }
-  [EventName.VIEWS_REORDER_PLOTS_METRICS]: undefined
   [EventName.VIEWS_REORDER_PLOTS_CUSTOM]: undefined
   [EventName.VIEWS_REORDER_PLOTS_TEMPLATES]: undefined
 

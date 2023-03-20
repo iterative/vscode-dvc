@@ -2,6 +2,7 @@ import isEmpty from 'lodash.isempty'
 import {
   ComparisonPlot,
   ComparisonRevisionData,
+  CustomPlotType,
   PlotHeight,
   PlotsData as TPlotsData,
   Revision,
@@ -21,12 +22,22 @@ import {
 import { PlotsModel } from '../model'
 import { PathsModel } from '../paths/model'
 import { BaseWebview } from '../../webview'
+import {
+  pickCustomPlots,
+  pickCustomPlotType,
+  pickMetric,
+  pickMetricAndParam
+} from '../model/quickPick'
 import { getModifiedTime, openImageFileInEditor } from '../../fileSystem'
-import { pickCustomPlots, pickMetricAndParam } from '../model/quickPick'
 import { Title } from '../../vscode/title'
-import { ColumnType } from '../../experiments/webview/contract'
-import { FILE_SEPARATOR } from '../../experiments/columns/paths'
 import { reorderObjectList } from '../../util/array'
+import {
+  CHECKPOINTS_PARAM,
+  CustomPlotsOrderValue,
+  doesCustomPlotAlreadyExist,
+  isCheckpointValue
+} from '../model/custom'
+import { getCustomPlotId } from '../model/collect'
 
 export class WebviewMessages {
   private readonly paths: PathsModel
@@ -58,7 +69,6 @@ export class WebviewMessages {
       this.plots.getOverrideRevisionDetails()
 
     void this.getWebview()?.show({
-      checkpoint: this.getCheckpointPlots(),
       comparison: this.getComparisonPlots(overrideComparison),
       custom: this.getCustomPlots(),
       hasPlots: !!this.paths.hasPaths(),
@@ -69,18 +79,10 @@ export class WebviewMessages {
     })
   }
 
-  public sendCheckpointPlotsMessage() {
-    void this.getWebview()?.show({
-      checkpoint: this.getCheckpointPlots()
-    })
-  }
-
   public handleMessageFromWebview(message: MessageFromWebview) {
     switch (message.type) {
       case MessageFromWebviewType.ADD_CUSTOM_PLOT:
         return this.addCustomPlot()
-      case MessageFromWebviewType.TOGGLE_METRIC:
-        return this.setSelectedMetrics(message.payload)
       case MessageFromWebviewType.RESIZE_PLOTS:
         return this.setPlotSize(
           message.payload.section,
@@ -95,8 +97,6 @@ export class WebviewMessages {
         return this.setComparisonRowsOrder(message.payload)
       case MessageFromWebviewType.REORDER_PLOTS_TEMPLATES:
         return this.setTemplateOrder(message.payload)
-      case MessageFromWebviewType.REORDER_PLOTS_METRICS:
-        return this.setMetricOrder(message.payload)
       case MessageFromWebviewType.REORDER_PLOTS_CUSTOM:
         return this.setCustomPlotsOrder(message.payload)
       case MessageFromWebviewType.SELECT_PLOTS:
@@ -126,11 +126,6 @@ export class WebviewMessages {
     }
   }
 
-  private setSelectedMetrics(metrics: string[]) {
-    this.plots.setSelectedMetrics(metrics)
-    this.sendCheckpointPlotsAndEvent(EventName.VIEWS_PLOTS_METRICS_SELECTED)
-  }
-
   private setPlotSize(
     section: PlotsSection,
     nbItemsPerRow: number,
@@ -145,9 +140,6 @@ export class WebviewMessages {
     )
 
     switch (section) {
-      case PlotsSection.CHECKPOINT_PLOTS:
-        this.sendCheckpointPlotsMessage()
-        break
       case PlotsSection.COMPARISON_TABLE:
         this.sendComparisonPlots()
         break
@@ -201,12 +193,9 @@ export class WebviewMessages {
     )
   }
 
-  private setMetricOrder(order: string[]) {
-    this.plots.setMetricOrder(order)
-    this.sendCheckpointPlotsAndEvent(EventName.VIEWS_REORDER_PLOTS_METRICS)
-  }
-
-  private async addCustomPlot() {
+  private async addMetricVsParamPlot(): Promise<
+    CustomPlotsOrderValue | undefined
+  > {
     const metricAndParam = await pickMetricAndParam(
       this.experiments.getColumnTerminalNodes()
     )
@@ -215,24 +204,65 @@ export class WebviewMessages {
       return
     }
 
-    const plotAlreadyExists = this.plots
-      .getCustomPlotsOrder()
-      .some(
-        ({ param, metric }) =>
-          param === metricAndParam.param && metric === metricAndParam.metric
-      )
+    const plotAlreadyExists = doesCustomPlotAlreadyExist(
+      this.plots.getCustomPlotsOrder(),
+      metricAndParam.metric,
+      metricAndParam.param
+    )
 
     if (plotAlreadyExists) {
       return Toast.showError('Custom plot already exists.')
     }
 
-    this.plots.addCustomPlot(metricAndParam)
-    this.sendCustomPlots()
-    sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED,
-      undefined,
-      undefined
+    const plot = {
+      ...metricAndParam,
+      type: CustomPlotType.METRIC_VS_PARAM
+    }
+    this.plots.addCustomPlot(plot)
+    this.sendCustomPlotsAndEvent(EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED)
+  }
+
+  private async addCheckpointPlot(): Promise<
+    CustomPlotsOrderValue | undefined
+  > {
+    const metric = await pickMetric(this.experiments.getColumnTerminalNodes())
+
+    if (!metric) {
+      return
+    }
+
+    const plotAlreadyExists = doesCustomPlotAlreadyExist(
+      this.plots.getCustomPlotsOrder(),
+      metric
     )
+
+    if (plotAlreadyExists) {
+      return Toast.showError('Custom plot already exists.')
+    }
+
+    const plot: CustomPlotsOrderValue = {
+      metric,
+      param: CHECKPOINTS_PARAM,
+      type: CustomPlotType.CHECKPOINT
+    }
+    this.plots.addCustomPlot(plot)
+    this.sendCustomPlotsAndEvent(EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED)
+  }
+
+  private async addCustomPlot() {
+    if (!this.experiments.hasCheckpoints()) {
+      return this.addMetricVsParamPlot()
+    }
+
+    const plotType = await pickCustomPlotType()
+
+    if (!plotType) {
+      return
+    }
+
+    return isCheckpointValue(plotType)
+      ? this.addCheckpointPlot()
+      : this.addMetricVsParamPlot()
   }
 
   private async removeCustomPlots() {
@@ -249,35 +279,39 @@ export class WebviewMessages {
     }
 
     this.plots.removeCustomPlots(selectedPlotsIds)
-    this.sendCustomPlots()
-    sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_CUSTOM_PLOT_REMOVED,
-      undefined,
-      undefined
-    )
+    this.sendCustomPlotsAndEvent(EventName.VIEWS_PLOTS_CUSTOM_PLOT_REMOVED)
   }
 
   private setCustomPlotsOrder(plotIds: string[]) {
-    const customPlots = this.plots.getCustomPlots()?.plots
-    if (!customPlots) {
-      return
-    }
+    const customPlotsOrderWithId = this.plots
+      .getCustomPlotsOrder()
+      .map(value => ({
+        ...value,
+        id: getCustomPlotId(value.metric, value.param)
+      }))
 
-    const buildMetricOrParamPath = (type: string, path: string) =>
-      type + FILE_SEPARATOR + path
-    const newOrder = reorderObjectList(plotIds, customPlots, 'id').map(
-      ({ metric, param }) => ({
-        metric: buildMetricOrParamPath(ColumnType.METRICS, metric),
-        param: buildMetricOrParamPath(ColumnType.PARAMS, param)
-      })
-    )
+    const newOrder: CustomPlotsOrderValue[] = reorderObjectList(
+      plotIds,
+      customPlotsOrderWithId,
+      'id'
+    ).map(({ metric, param, type }) => ({
+      metric,
+      param,
+      type
+    }))
+
     this.plots.setCustomPlotsOrder(newOrder)
+    this.sendCustomPlotsAndEvent(EventName.VIEWS_REORDER_PLOTS_CUSTOM)
+  }
+
+  private sendCustomPlotsAndEvent(
+    event:
+      | typeof EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED
+      | typeof EventName.VIEWS_PLOTS_CUSTOM_PLOT_REMOVED
+      | typeof EventName.VIEWS_REORDER_PLOTS_CUSTOM
+  ) {
     this.sendCustomPlots()
-    sendTelemetryEvent(
-      EventName.VIEWS_REORDER_PLOTS_CUSTOM,
-      undefined,
-      undefined
-    )
+    sendTelemetryEvent(event, undefined, undefined)
   }
 
   private selectPlotsFromWebview() {
@@ -327,15 +361,6 @@ export class WebviewMessages {
       { revisions: revisions.length },
       undefined
     )
-  }
-
-  private sendCheckpointPlotsAndEvent(
-    event:
-      | typeof EventName.VIEWS_REORDER_PLOTS_METRICS
-      | typeof EventName.VIEWS_PLOTS_METRICS_SELECTED
-  ) {
-    this.sendCheckpointPlotsMessage()
-    sendTelemetryEvent(event, undefined, undefined)
   }
 
   private sendSectionCollapsed() {
@@ -431,10 +456,6 @@ export class WebviewMessages {
       return url.replace(toRemove, '').split('?')[0]
     }
     return url
-  }
-
-  private getCheckpointPlots() {
-    return this.plots.getCheckpointPlots() || null
   }
 
   private getCustomPlots() {

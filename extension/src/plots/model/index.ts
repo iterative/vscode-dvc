@@ -2,9 +2,7 @@ import { Memento } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import isEqual from 'lodash.isequal'
 import {
-  collectCheckpointPlotsData,
   collectData,
-  collectMetricOrder,
   collectSelectedTemplatePlots,
   collectTemplates,
   ComparisonData,
@@ -12,13 +10,13 @@ import {
   TemplateAccumulator,
   collectCommitRevisionDetails,
   collectOverrideRevisionDetails,
-  collectCustomPlotsData,
+  collectCustomPlots,
   getCustomPlotId
 } from './collect'
 import { getRevisionFirstThreeColumns } from './util'
+import { cleanupOldOrderValue, CustomPlotsOrderValue } from './custom'
 import {
   CheckpointPlot,
-  CheckpointPlotData,
   ComparisonPlots,
   Revision,
   ComparisonRevisionData,
@@ -27,17 +25,17 @@ import {
   PlotsSection,
   SectionCollapsed,
   CustomPlotData,
+  CustomPlotsData,
   DEFAULT_HEIGHT,
   DEFAULT_NB_ITEMS_PER_ROW,
   PlotHeight
 } from '../webview/contract'
 import {
-  ExperimentsOutput,
   EXPERIMENT_WORKSPACE_ID,
   PlotsOutputOrError
 } from '../../cli/dvc/contract'
 import { Experiments } from '../../experiments'
-import { getColorScale, truncateVerticalTitle } from '../vega/util'
+import { getColorScale } from '../vega/util'
 import { definedAndNonEmpty, reorderObjectList } from '../../util/array'
 import { removeMissingKeysFromObject } from '../../util/object'
 import { TemplateOrder } from '../paths/collect'
@@ -50,8 +48,9 @@ import {
   MultiSourceVariations
 } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
+import { FILE_SEPARATOR } from '../../experiments/columns/paths'
 
-export type CustomPlotsOrderValue = { metric: string; param: string }
+export type CustomCheckpointPlots = { [metric: string]: CheckpointPlot }
 
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
@@ -72,11 +71,6 @@ export class PlotsModel extends ModelWithPersistence {
   private multiSourceVariations: MultiSourceVariations = {}
   private multiSourceEncoding: MultiSourceEncoding = {}
 
-  private checkpointPlots?: CheckpointPlot[]
-  private customPlots?: CustomPlotData[]
-  private selectedMetrics?: string[]
-  private metricOrder: string[]
-
   constructor(
     dvcRoot: string,
     experiments: Experiments,
@@ -96,28 +90,10 @@ export class PlotsModel extends ModelWithPersistence {
       DEFAULT_SECTION_COLLAPSED
     )
     this.comparisonOrder = this.revive(PersistenceKey.PLOT_COMPARISON_ORDER, [])
-    this.selectedMetrics = this.revive(
-      PersistenceKey.PLOT_SELECTED_METRICS,
-      undefined
-    )
-    this.metricOrder = this.revive(PersistenceKey.PLOT_METRIC_ORDER, [])
-
     this.customPlotsOrder = this.revive(PersistenceKey.PLOTS_CUSTOM_ORDER, [])
   }
 
-  public transformAndSetExperiments(data: ExperimentsOutput) {
-    const checkpointPlots = collectCheckpointPlotsData(data)
-
-    if (!this.selectedMetrics && checkpointPlots) {
-      this.selectedMetrics = checkpointPlots.map(({ id }) => id)
-    }
-
-    this.checkpointPlots = checkpointPlots
-
-    this.setMetricOrder()
-
-    this.recreateCustomPlots()
-
+  public transformAndSetExperiments() {
     return this.removeStaleData()
   }
 
@@ -134,8 +110,6 @@ export class PlotsModel extends ModelWithPersistence {
         collectTemplates(data),
         collectMultiSourceVariations(data, this.multiSourceVariations)
       ])
-
-    this.recreateCustomPlots()
 
     this.comparisonData = {
       ...this.comparisonData,
@@ -163,8 +137,14 @@ export class PlotsModel extends ModelWithPersistence {
     this.deferred.resolve()
   }
 
-  public getCheckpointPlots() {
-    if (!this.checkpointPlots) {
+  public getCustomPlots(): CustomPlotsData | undefined {
+    const experimentsWithNoCommitData = this.experiments.hasCheckpoints()
+      ? this.experiments
+          .getExperimentsWithCheckpoints()
+          .filter(({ checkpoints }) => !!checkpoints)
+      : this.experiments.getExperiments()
+
+    if (experimentsWithNoCommitData.length === 0) {
       return
     }
 
@@ -173,70 +153,58 @@ export class PlotsModel extends ModelWithPersistence {
         .getSelectedExperiments()
         .map(({ displayColor, id: revision }) => ({ displayColor, revision }))
     )
+    const height = this.getHeight(PlotsSection.CUSTOM_PLOTS)
+    const nbItemsPerRow = this.getNbItemsPerRowOrWidth(
+      PlotsSection.CUSTOM_PLOTS
+    )
+    const plotsOrderValues = this.getCustomPlotsOrder()
 
-    if (!colors) {
+    const plots: CustomPlotData[] = collectCustomPlots({
+      experiments: experimentsWithNoCommitData,
+      hasCheckpoints: this.experiments.hasCheckpoints(),
+      height,
+      nbItemsPerRow,
+      plotsOrderValues,
+      selectedRevisions: colors?.domain
+    })
+
+    if (plots.length === 0 && plotsOrderValues.length > 0) {
       return
     }
-
-    const { domain: selectedExperiments } = colors
 
     return {
       colors,
-      height: this.getHeight(PlotsSection.CHECKPOINT_PLOTS),
-      nbItemsPerRow: this.getNbItemsPerRowOrWidth(
-        PlotsSection.CHECKPOINT_PLOTS
-      ),
-      plots: this.getPlots(this.checkpointPlots, selectedExperiments),
-      selectedMetrics: this.getSelectedMetrics()
+      height,
+      nbItemsPerRow,
+      plots
     }
-  }
-
-  public getCustomPlots() {
-    if (!this.customPlots) {
-      return
-    }
-    return {
-      height: this.getHeight(PlotsSection.CUSTOM_PLOTS),
-      nbItemsPerRow: this.getNbItemsPerRowOrWidth(PlotsSection.CUSTOM_PLOTS),
-      plots: this.customPlots
-    }
-  }
-
-  public recreateCustomPlots() {
-    const experiments = this.experiments.getExperiments()
-    if (experiments.length === 0) {
-      this.customPlots = undefined
-      return
-    }
-    const customPlots: CustomPlotData[] = collectCustomPlotsData(
-      this.getCustomPlotsOrder(),
-      experiments
-    )
-    this.customPlots = customPlots
   }
 
   public getCustomPlotsOrder() {
-    return this.customPlotsOrder
+    return this.customPlotsOrder.map(value =>
+      cleanupOldOrderValue(value, FILE_SEPARATOR)
+    )
+  }
+
+  public updateCustomPlotsOrder(plotsOrder: CustomPlotsOrderValue[]) {
+    this.customPlotsOrder = plotsOrder
   }
 
   public setCustomPlotsOrder(plotsOrder: CustomPlotsOrderValue[]) {
-    this.customPlotsOrder = plotsOrder
+    this.updateCustomPlotsOrder(plotsOrder)
     this.persist(PersistenceKey.PLOTS_CUSTOM_ORDER, this.customPlotsOrder)
-    this.recreateCustomPlots()
   }
 
   public removeCustomPlots(plotIds: string[]) {
     const newCustomPlotsOrder = this.getCustomPlotsOrder().filter(
-      ({ metric, param }) => {
-        return !plotIds.includes(getCustomPlotId(metric, param))
-      }
+      ({ metric, param }) => !plotIds.includes(getCustomPlotId(metric, param))
     )
 
     this.setCustomPlotsOrder(newCustomPlotsOrder)
   }
 
-  public addCustomPlot(metricAndParam: CustomPlotsOrderValue) {
-    const newCustomPlotsOrder = [...this.getCustomPlotsOrder(), metricAndParam]
+  public addCustomPlot(value: CustomPlotsOrderValue) {
+    const newCustomPlotsOrder = [...this.getCustomPlotsOrder(), value]
     this.setCustomPlotsOrder(newCustomPlotsOrder)
   }
 
@@ -383,28 +351,6 @@ export class PlotsModel extends ModelWithPersistence {
     return this.experiments.getSelectedRevisions().map(({ label }) => label)
   }
 
-  public setSelectedMetrics(selectedMetrics: string[]) {
-    this.selectedMetrics = selectedMetrics
-    this.setMetricOrder()
-    this.persist(
-      PersistenceKey.PLOT_SELECTED_METRICS,
-      this.getSelectedMetrics()
-    )
-  }
-
-  public getSelectedMetrics() {
-    return this.selectedMetrics
-  }
-
-  public setMetricOrder(metricOrder?: string[]) {
-    this.metricOrder = collectMetricOrder(
-      this.checkpointPlots,
-      metricOrder || this.metricOrder,
-      this.selectedMetrics
-    )
-    this.persist(PersistenceKey.PLOT_METRIC_ORDER, this.metricOrder)
-  }
-
   public setNbItemsPerRowOrWidth(section: PlotsSection, nbItemsPerRow: number) {
     this.nbItemsPerRowOrWidth[section] = nbItemsPerRow
     this.persist(
@@ -502,30 +448,6 @@ export class PlotsModel extends ModelWithPersistence {
 
   private getCLIId(label: string) {
     return this.commitRevisions[label] || label
-  }
-
-  private getPlots(
-    checkpointPlots: CheckpointPlot[],
-    selectedExperiments: string[]
-  ) {
-    return reorderObjectList<CheckpointPlotData>(
-      this.metricOrder,
-      checkpointPlots.map(plot => {
-        const { id, values } = plot
-        return {
-          id,
-          title: truncateVerticalTitle(
-            id,
-            this.getNbItemsPerRowOrWidth(PlotsSection.CHECKPOINT_PLOTS),
-            this.getHeight(PlotsSection.CHECKPOINT_PLOTS)
-          ) as string,
-          values: values.filter(value =>
-            selectedExperiments.includes(value.group)
-          )
-        }
-      }),
-      'id'
-    )
   }
 
   private getSelectedComparisonPlots(

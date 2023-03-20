@@ -23,9 +23,10 @@ import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../../../commands/external'
-import { buildPlots, getExpectedCheckpointPlotsData } from '../../plots/util'
-import checkpointPlotsFixture from '../../../fixtures/expShow/base/checkpointPlots'
+import { buildPlots, getExpectedCustomPlotsData } from '../../plots/util'
+import customPlotsFixture from '../../../fixtures/expShow/base/customPlots'
 import expShowFixture from '../../../fixtures/expShow/base/output'
+import plotsRevisionsFixture from '../../../fixtures/plotsDiff/revisions'
 import { ExperimentsTree } from '../../../../experiments/model/tree'
 import {
   buildExperiments,
@@ -45,6 +46,11 @@ import { WorkspaceExperiments } from '../../../../experiments/workspace'
 import { ExperimentItem } from '../../../../experiments/model/collect'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 import { DvcReader } from '../../../../cli/dvc/reader'
+import {
+  ColorScale,
+  CustomPlotType,
+  DEFAULT_SECTION_COLLAPSED
+} from '../../../../plots/webview/contract'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = getTimeSafeDisposer()
@@ -59,8 +65,8 @@ suite('Experiments Tree Test Suite', () => {
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('ExperimentsTree', () => {
-    const { colors } = checkpointPlotsFixture
-    const { domain, range } = colors
+    const { colors } = customPlotsFixture
+    const { domain, range } = colors as ColorScale
 
     it('should appear in the UI', async () => {
       await expect(
@@ -75,18 +81,19 @@ suite('Experiments Tree Test Suite', () => {
       const expectedRange = [...range]
 
       const webview = await plots.showWebview()
+
       await webview.isReady()
 
       while (expectedDomain.length > 0) {
-        const expectedData = getExpectedCheckpointPlotsData(
+        const expectedData = getExpectedCustomPlotsData(
           expectedDomain,
           expectedRange
         )
 
-        const { checkpoint } = getFirstArgOfLastCall(messageSpy)
+        const { custom } = getFirstArgOfLastCall(messageSpy)
 
         expect(
-          { checkpoint },
+          { custom },
           'a message is sent with colors for the currently selected experiments'
         ).to.deep.equal(expectedData)
         messageSpy.resetHistory()
@@ -107,9 +114,21 @@ suite('Experiments Tree Test Suite', () => {
 
       expect(
         messageSpy,
-        'when there are no experiments selected we send null (show empty state)'
+        'when there are no experiments selected we dont send checkpoint type plots'
       ).to.be.calledWithMatch({
-        checkpoint: null
+        comparison: null,
+        custom: {
+          ...customPlotsFixture,
+          colors: undefined,
+          plots: customPlotsFixture.plots.filter(
+            plot => plot.type !== CustomPlotType.CHECKPOINT
+          )
+        },
+        hasPlots: false,
+        hasUnselectedPlots: false,
+        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+        selectedRevisions: plotsRevisionsFixture.slice(0, 2),
+        template: null
       })
       messageSpy.resetHistory()
 
@@ -127,7 +146,7 @@ suite('Experiments Tree Test Suite', () => {
       expect(selected, 'the experiment is now selected').to.equal(range[0])
 
       expect(messageSpy, 'we no longer send null').to.be.calledWithMatch(
-        getExpectedCheckpointPlotsData(expectedDomain, expectedRange)
+        getExpectedCustomPlotsData(expectedDomain, expectedRange)
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -263,7 +282,7 @@ suite('Experiments Tree Test Suite', () => {
         messageSpy,
         'a message is sent with colors for the currently selected experiments'
       ).to.be.calledWithMatch(
-        getExpectedCheckpointPlotsData([selectedDisplayName], [selectedColor])
+        getExpectedCustomPlotsData([selectedDisplayName], [selectedColor])
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 

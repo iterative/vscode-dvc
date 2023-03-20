@@ -19,7 +19,7 @@ export const joinTruthyItems = (array: (string | undefined)[], sep = ' ') =>
 export const sameContents = (
   array: (null | string | number | undefined)[],
   otherArray: (null | string | number | undefined)[]
-) => isEqual(array.sort(), otherArray.sort())
+) => isEqual([...array].sort(), [...otherArray].sort())
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const reorderObjectList = <T extends { [key: string]: any }>(

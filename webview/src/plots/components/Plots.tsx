@@ -2,7 +2,6 @@ import React, { createRef, useLayoutEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { AddPlots, Welcome } from './GetStarted'
 import { ZoomedInPlot } from './ZoomedInPlot'
-import { CheckpointPlotsWrapper } from './checkpointPlots/CheckpointPlotsWrapper'
 import { CustomPlotsWrapper } from './customPlots/CustomPlotsWrapper'
 import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
 import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper'
@@ -18,9 +17,6 @@ const PlotsContent = () => {
   const dispatch = useDispatch()
   const { hasData, hasPlots, hasUnselectedPlots, zoomedInPlot } = useSelector(
     (state: PlotsState) => state.webview
-  )
-  const hasCheckpointData = useSelector(
-    (state: PlotsState) => state.checkpoint.hasData
   )
   const hasComparisonData = useSelector(
     (state: PlotsState) => state.comparison.hasData
@@ -51,7 +47,7 @@ const PlotsContent = () => {
     return <EmptyState>Loading Plots...</EmptyState>
   }
 
-  if (!hasCheckpointData && !hasComparisonData && !hasTemplateData) {
+  if (!hasComparisonData && !hasTemplateData) {
     return (
       <GetStarted
         addItems={<AddPlots hasUnselectedPlots={hasUnselectedPlots} />}
@@ -66,7 +62,6 @@ const PlotsContent = () => {
       <Ribbon />
       <TemplatePlotsWrapper />
       <ComparisonTableWrapper />
-      <CheckpointPlotsWrapper />
       <CustomPlotsWrapper />
 
       {zoomedInPlot?.plot && (

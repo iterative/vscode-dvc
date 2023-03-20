@@ -2,7 +2,7 @@
 
 $gap: 4px;
 .comparisonTableHeader {
-  position: sticky;
+  position: relative;
   z-index: 2;
   background-color: $bg-color;
 }

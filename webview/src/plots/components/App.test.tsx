@@ -13,14 +13,12 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
-import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/base/checkpointPlots'
 import customPlotsFixture from 'dvc/src/test/fixtures/expShow/base/customPlots'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
 import smoothTemplatePlotContent from 'dvc/src/test/fixtures/plotsDiff/template/smoothTemplatePlot'
 import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtualization'
 import {
-  CheckpointPlotsData,
   DEFAULT_SECTION_COLLAPSED,
   PlotsData,
   PlotsType,
@@ -28,6 +26,8 @@ import {
   PlotsSection,
   TemplatePlotGroup,
   TemplatePlotsData,
+  CustomPlotType,
+  CustomPlotsData,
   DEFAULT_PLOT_HEIGHT,
   DEFAULT_NB_ITEMS_PER_ROW
 } from 'dvc/src/plots/webview/contract'
@@ -35,14 +35,13 @@ import {
   MessageFromWebviewType,
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
-import { reorderObjectList } from 'dvc/src/util/array'
 import { act } from 'react-dom/test-utils'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { VisualizationSpec } from 'react-vega'
 import { App } from './App'
 import { NewSectionBlock } from './templatePlots/TemplatePlots'
 import {
-  CheckpointPlotsById,
+  CustomPlotsById,
   plotDataStore,
   TemplatePlotsById
 } from './plotDataStore'
@@ -73,18 +72,16 @@ jest.mock('../../shared/components/dragDrop/currentTarget', () => {
 
 jest.mock('../../shared/api')
 
-jest.mock('./checkpointPlots/util', () => ({
-  createSpec: () => ({
+jest.mock('./customPlots/util', () => ({
+  createCheckpointSpec: () => ({
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     encoding: {},
     height: 100,
     layer: [],
     transform: [],
     width: 100
-  })
-}))
-jest.mock('./customPlots/util', () => ({
-  createSpec: () => ({
+  }),
+  createMetricVsParamSpec: () => ({
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     encoding: {},
     height: 100,
@@ -109,13 +106,6 @@ const originalOffsetWidth = Object.getOwnPropertyDescriptor(
 )?.value
 
 describe('App', () => {
-  const sectionPosition = {
-    [PlotsSection.CHECKPOINT_PLOTS]: 2,
-    [PlotsSection.TEMPLATE_PLOTS]: 0,
-    [PlotsSection.COMPARISON_TABLE]: 1,
-    [PlotsSection.CUSTOM_PLOTS]: 3
-  }
-
   const sendSetDataMessage = (data: PlotsData) => {
     const message = new MessageEvent('message', {
       data: {
@@ -162,13 +152,6 @@ describe('App', () => {
     ]
   } as TemplatePlotsData
 
-  const getCheckpointMenuItem = (position: number) =>
-    within(
-      screen.getAllByTestId('section-container')[
-        sectionPosition[PlotsSection.CHECKPOINT_PLOTS]
-      ]
-    ).getAllByTestId('icon-menu-item')[position]
-
   const renderAppAndChangeSize = async (
     data: PlotsData,
     nbItemsPerRow: number,
@@ -181,11 +164,11 @@ describe('App', () => {
       ...data,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED
     }
-    if (section === PlotsSection.CHECKPOINT_PLOTS) {
-      plotsData.checkpoint = {
-        ...data?.checkpoint,
+    if (section === PlotsSection.CUSTOM_PLOTS) {
+      plotsData.custom = {
+        ...data?.custom,
         ...withSize
-      } as CheckpointPlotsData
+      } as CustomPlotsData
     }
     if (section === PlotsSection.TEMPLATE_PLOTS) {
       plotsData.template = {
@@ -216,7 +199,7 @@ describe('App', () => {
     jest
       .spyOn(HTMLElement.prototype, 'clientHeight', 'get')
       .mockImplementation(() => heightToSuppressVegaError)
-    plotDataStore[PlotsSection.CHECKPOINT_PLOTS] = {} as CheckpointPlotsById
+    plotDataStore[PlotsSection.CUSTOM_PLOTS] = {} as CustomPlotsById
     plotDataStore[PlotsSection.TEMPLATE_PLOTS] = {} as TemplatePlotsById
   })
 
@@ -251,9 +234,7 @@ describe('App', () => {
   })
 
   it('should render the empty state when given data with no plots', async () => {
-    renderAppWithOptionalData({
-      checkpoint: null
-    })
+    renderAppWithOptionalData({ custom: null })
     const emptyState = await screen.findByText('No Plots Detected.')
 
     expect(emptyState).toBeInTheDocument()
@@ -261,7 +242,6 @@ describe('App', () => {
 
   it('should render loading section states when given a single revision which has not been fetched', async () => {
     renderAppWithOptionalData({
-      checkpoint: null,
       comparison: {
         height: DEFAULT_PLOT_HEIGHT,
         plots: [
@@ -299,12 +279,11 @@ describe('App', () => {
     })
     const loading = await screen.findAllByText('Loading...')
 
-    expect(loading).toHaveLength(3)
+    expect(loading).toHaveLength(2)
   })
 
   it('should render the Add Plots and Add Experiments get started button when there are experiments which have plots that are all unselected', async () => {
     renderAppWithOptionalData({
-      checkpoint: null,
       hasPlots: true,
       hasUnselectedPlots: true,
       selectedRevisions: [{} as Revision]
@@ -335,7 +314,7 @@ describe('App', () => {
 
   it('should render only the Add Experiments get started button when no experiments are selected', async () => {
     renderAppWithOptionalData({
-      checkpoint: null,
+      custom: null,
       hasPlots: true,
       hasUnselectedPlots: false,
       selectedRevisions: undefined
@@ -354,30 +333,6 @@ describe('App', () => {
     })
   })
 
-  it('should render other sections given a message with only checkpoint plots data', () => {
-    renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
-    })
-
-    expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
-    expect(screen.getByText('Trends')).toBeInTheDocument()
-    expect(screen.getByText('Data Series')).toBeInTheDocument()
-    expect(screen.getByText('Images')).toBeInTheDocument()
-    expect(screen.getByText('Custom')).toBeInTheDocument()
-    expect(screen.getAllByText('No Plots to Display')).toHaveLength(2)
-    expect(screen.getByText('No Images to Compare')).toBeInTheDocument()
-  })
-
-  it('should render checkpoint even when there is no checkpoint plots data', () => {
-    renderAppWithOptionalData({
-      template: templatePlotsFixture
-    })
-
-    expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
-    expect(screen.getByText('Trends')).toBeInTheDocument()
-    expect(screen.getAllByText('No Plots to Display')).toHaveLength(2)
-  })
-
   it('should render an empty state given a message with only custom plots data', () => {
     renderAppWithOptionalData({
       custom: customPlotsFixture
@@ -391,12 +346,13 @@ describe('App', () => {
 
   it('should render custom with "No Plots to Display" message when there is no custom plots data', () => {
     renderAppWithOptionalData({
-      comparison: comparisonTableFixture
+      comparison: comparisonTableFixture,
+      template: templatePlotsFixture
     })
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
     expect(screen.getByText('Custom')).toBeInTheDocument()
-    expect(screen.getAllByText('No Plots to Display')).toHaveLength(3)
+    expect(screen.getByText('No Plots to Display')).toBeInTheDocument()
   })
 
   it('should render custom with "No Plots Added" message when there are no plots added', () => {
@@ -410,7 +366,7 @@ describe('App', () => {
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
     expect(screen.getByText('Custom')).toBeInTheDocument()
-    expect(screen.getAllByText('No Plots to Display')).toHaveLength(2)
+    expect(screen.getByText('No Plots to Display')).toBeInTheDocument()
     expect(screen.getByText('No Plots Added')).toBeInTheDocument()
   })
 
@@ -418,7 +374,7 @@ describe('App', () => {
     const expectedSectionName = 'Images'
 
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
+      custom: customPlotsFixture
     })
 
     sendSetDataMessage({
@@ -432,8 +388,8 @@ describe('App', () => {
     const emptyStateText = 'No Images to Compare'
 
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture,
-      comparison: comparisonTableFixture
+      comparison: comparisonTableFixture,
+      template: templatePlotsFixture
     })
 
     expect(screen.queryByText(emptyStateText)).not.toBeInTheDocument()
@@ -447,11 +403,10 @@ describe('App', () => {
     expect(emptyState).toBeInTheDocument()
   })
 
-  it('should remove checkpoint plots given a message showing checkpoint plots as null', async () => {
+  it('should remove custom plots given a message showing custom plots as null', async () => {
     const emptyStateText = 'No Plots to Display'
 
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture,
       comparison: comparisonTableFixture,
       custom: customPlotsFixture,
       template: templatePlotsFixture
@@ -460,7 +415,7 @@ describe('App', () => {
     expect(screen.queryByText(emptyStateText)).not.toBeInTheDocument()
 
     sendSetDataMessage({
-      checkpoint: null
+      custom: null
     })
 
     const emptyState = await screen.findByText(emptyStateText)
@@ -470,24 +425,25 @@ describe('App', () => {
 
   it('should remove all sections from the document if there is no data provided', () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
+      comparison: comparisonTableFixture
     })
 
-    expect(screen.getByText('Trends')).toBeInTheDocument()
+    expect(screen.getByText('Images')).toBeInTheDocument()
 
     sendSetDataMessage({
-      checkpoint: null
+      comparison: null
     })
 
-    expect(screen.queryByText('Trends')).not.toBeInTheDocument()
+    expect(screen.queryByText('Images')).not.toBeInTheDocument()
   })
 
-  it('should toggle the checkpoint plots section in state when its header is clicked', async () => {
+  it('should toggle the custom plots section in state when its header is clicked', async () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
+      comparison: comparisonTableFixture,
+      custom: customPlotsFixture
     })
 
-    const summaryElement = await screen.findByText('Trends')
+    const summaryElement = await screen.findByText('Custom')
     const visiblePlots = await screen.findAllByLabelText('Vega visualization')
     for (const visiblePlot of visiblePlots) {
       expect(visiblePlot).toBeInTheDocument()
@@ -500,14 +456,14 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: { [PlotsSection.CHECKPOINT_PLOTS]: true },
+      payload: { [PlotsSection.CUSTOM_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
 
     sendSetDataMessage({
       sectionCollapsed: {
         ...DEFAULT_SECTION_COLLAPSED,
-        [PlotsSection.CHECKPOINT_PLOTS]: true
+        [PlotsSection.CUSTOM_PLOTS]: true
       }
     })
 
@@ -516,21 +472,22 @@ describe('App', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('should not toggle the checkpoint plots section when its header is clicked and its title is selected', async () => {
+  it('should not toggle the custom plots section when its header is clicked and its title is selected', async () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
+      comparison: comparisonTableFixture,
+      custom: customPlotsFixture
     })
 
-    const summaryElement = await screen.findByText('Trends')
+    const summaryElement = await screen.findByText('Custom')
 
-    createWindowTextSelection('Trends', 2)
+    createWindowTextSelection('Custom', 2)
     fireEvent.click(summaryElement, {
       bubbles: true,
       cancelable: true
     })
 
     expect(mockPostMessage).not.toHaveBeenCalledWith({
-      payload: { [PlotsSection.CHECKPOINT_PLOTS]: true },
+      payload: { [PlotsSection.CUSTOM_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
 
@@ -541,25 +498,25 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: { [PlotsSection.CHECKPOINT_PLOTS]: true },
+      payload: { [PlotsSection.CUSTOM_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
   })
 
-  it('should not toggle the checkpoint plots section if the tooltip is clicked', () => {
+  it('should not toggle the comparison plots section if the tooltip is clicked', () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
+      comparison: comparisonTableFixture
     })
 
-    const checkpointsTooltipToggle = screen.getAllByTestId(
+    const comparisonTooltipToggle = screen.getAllByTestId(
       'info-tooltip-toggle'
-    )[2]
-    fireEvent.mouseEnter(checkpointsTooltipToggle, {
+    )[1]
+    fireEvent.mouseEnter(comparisonTooltipToggle, {
       bubbles: true,
       cancelable: true
     })
 
-    const tooltip = screen.getByTestId('tooltip-checkpoint-plots')
+    const tooltip = screen.getByTestId('tooltip-comparison-plots')
     const tooltipLink = within(tooltip).getByRole('link')
     fireEvent.click(tooltipLink, {
       bubbles: true,
@@ -567,30 +524,31 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).not.toHaveBeenCalledWith({
-      payload: { [PlotsSection.CHECKPOINT_PLOTS]: true },
+      payload: { [PlotsSection.CUSTOM_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
 
-    fireEvent.click(checkpointsTooltipToggle, {
+    fireEvent.click(comparisonTooltipToggle, {
       bubbles: true,
       cancelable: true
     })
 
     expect(mockPostMessage).not.toHaveBeenCalledWith({
-      payload: { [PlotsSection.CHECKPOINT_PLOTS]: true },
+      payload: { [PlotsSection.CUSTOM_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
   })
 
-  it('should not toggle the checkpoint plots section when its header is clicked and the content of its tooltip is selected', async () => {
+  it('should not toggle the custom plots section when its header is clicked and the content of its tooltip is selected', async () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
+      comparison: comparisonTableFixture,
+      custom: customPlotsFixture
     })
 
-    const summaryElement = await screen.findByText('Trends')
+    const summaryElement = await screen.findByText('Custom')
     createWindowTextSelection(
       // eslint-disable-next-line testing-library/no-node-access
-      SectionDescription['checkpoint-plots'].props.children,
+      SectionDescription['custom-plots'].props.children,
       2
     )
     fireEvent.click(summaryElement, {
@@ -599,7 +557,7 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).not.toHaveBeenCalledWith({
-      payload: { [PlotsSection.CHECKPOINT_PLOTS]: true },
+      payload: { [PlotsSection.CUSTOM_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
     })
 
@@ -610,100 +568,19 @@ describe('App', () => {
     })
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: { [PlotsSection.CHECKPOINT_PLOTS]: true },
+      payload: { [PlotsSection.CUSTOM_PLOTS]: true },
       type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
-    })
-  })
-
-  it('should toggle the visibility of plots when clicking the metrics in the metrics picker', async () => {
-    renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
-    })
-
-    const summaryElement = await screen.findByText('Trends')
-    fireEvent.click(summaryElement, {
-      bubbles: true,
-      cancelable: true
-    })
-
-    expect(screen.getByTestId('plot-summary.json:loss')).toBeInTheDocument()
-
-    const pickerButton = getCheckpointMenuItem(0)
-    fireEvent.mouseEnter(pickerButton)
-    fireEvent.click(pickerButton)
-
-    const lossItem = await screen.findByText('summary.json:loss', {
-      ignore: 'text'
-    })
-
-    fireEvent.click(lossItem, {
-      bubbles: true,
-      cancelable: true
-    })
-
-    expect(
-      screen.queryByTestId('plot-summary.json:loss')
-    ).not.toBeInTheDocument()
-
-    fireEvent.mouseEnter(pickerButton)
-    fireEvent.click(pickerButton)
-
-    fireEvent.click(lossItem, {
-      bubbles: true,
-      cancelable: true
-    })
-
-    expect(screen.getByTestId('plot-summary.json:loss')).toBeInTheDocument()
-  })
-
-  it('should send a message to the extension with the selected metrics when toggling the visibility of a plot', async () => {
-    renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
-    })
-
-    const pickerButton = getCheckpointMenuItem(0)
-    fireEvent.mouseEnter(pickerButton)
-    fireEvent.click(pickerButton)
-
-    const lossItem = await screen.findByText('summary.json:loss')
-
-    fireEvent.click(lossItem, {
-      bubbles: true,
-      cancelable: true
-    })
-
-    expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: [
-        'summary.json:accuracy',
-        'summary.json:val_accuracy',
-        'summary.json:val_loss'
-      ],
-      type: MessageFromWebviewType.TOGGLE_METRIC
-    })
-
-    fireEvent.click(lossItem, {
-      bubbles: true,
-      cancelable: true
-    })
-
-    expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: [
-        'summary.json:accuracy',
-        'summary.json:loss',
-        'summary.json:val_accuracy',
-        'summary.json:val_loss'
-      ],
-      type: MessageFromWebviewType.TOGGLE_METRIC
     })
   })
 
   it('should display a slider to pick the number of items per row if there are items and the action is available', () => {
     const store = renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
+      comparison: comparisonTableFixture,
+      custom: customPlotsFixture
     })
     setWrapperSize(store)
 
-    expect(screen.getByTestId('size-sliders')).toBeInTheDocument()
+    expect(screen.getAllByTestId('size-sliders')[1]).toBeInTheDocument()
   })
 
   it('should not display a slider to pick the number of items per row if there are no items', () => {
@@ -715,24 +592,12 @@ describe('App', () => {
 
   it('should not display a slider to pick the number of items per row if the only width available for one item per row or less', () => {
     const store = renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
+      comparison: comparisonTableFixture,
+      custom: customPlotsFixture
     })
     setWrapperSize(store, 400)
 
     expect(screen.queryByTestId('size-sliders')).not.toBeInTheDocument()
-  })
-
-  it('should display both size sliders for checkpoint plots', () => {
-    const store = renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
-    })
-    setWrapperSize(store)
-
-    const plotResizers = within(
-      screen.getByTestId('size-sliders')
-    ).getAllByRole('slider')
-
-    expect(plotResizers.length).toBe(2)
   })
 
   it('should display both size sliders for template plots', () => {
@@ -777,20 +642,21 @@ describe('App', () => {
 
   it('should send a message to the extension with the selected size when changing the width of plots', () => {
     const store = renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
+      comparison: comparisonTableFixture,
+      custom: customPlotsFixture
     })
     setWrapperSize(store)
 
-    const plotResizer = within(screen.getByTestId('size-sliders')).getAllByRole(
-      'slider'
-    )[0]
+    const plotResizer = within(
+      screen.getAllByTestId('size-sliders')[1]
+    ).getAllByRole('slider')[0]
 
     fireEvent.change(plotResizer, { target: { value: -3 } })
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: {
         height: 1,
         nbItemsPerRow: 3,
-        section: PlotsSection.CHECKPOINT_PLOTS
+        section: PlotsSection.CUSTOM_PLOTS
       },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
@@ -798,37 +664,39 @@ describe('App', () => {
 
   it('should send a message to the extension with the selected size when changing the height of plots', () => {
     const store = renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
+      comparison: comparisonTableFixture,
+      custom: customPlotsFixture
     })
     setWrapperSize(store)
 
-    const plotResizer = within(screen.getByTestId('size-sliders')).getAllByRole(
-      'slider'
-    )[1]
+    const plotResizer = within(
+      screen.getAllByTestId('size-sliders')[1]
+    ).getAllByRole('slider')[1]
 
     fireEvent.change(plotResizer, { target: { value: 3 } })
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: {
         height: 3,
         nbItemsPerRow: 2,
-        section: PlotsSection.CHECKPOINT_PLOTS
+        section: PlotsSection.CUSTOM_PLOTS
       },
       type: MessageFromWebviewType.RESIZE_PLOTS
     })
   })
 
-  it('should display the checkpoint plots in the order stored', () => {
+  it('should display the custom plots in the order stored', () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
+      comparison: comparisonTableFixture,
+      custom: customPlotsFixture
     })
 
     let plots = screen.getAllByTestId(/summary\.json/)
 
     expect(plots.map(plot => plot.id)).toStrictEqual([
-      'summary.json:loss',
-      'summary.json:accuracy',
-      'summary.json:val_loss',
-      'summary.json:val_accuracy'
+      'custom-summary.json:loss-params.yaml:dropout',
+      'custom-summary.json:accuracy-params.yaml:epochs',
+      'custom-summary.json:loss-epoch',
+      'custom-summary.json:accuracy-epoch'
     ])
 
     dragAndDrop(plots[1], plots[0])
@@ -836,24 +704,25 @@ describe('App', () => {
     plots = screen.getAllByTestId(/summary\.json/)
 
     expect(plots.map(plot => plot.id)).toStrictEqual([
-      'summary.json:accuracy',
-      'summary.json:loss',
-      'summary.json:val_loss',
-      'summary.json:val_accuracy'
+      'custom-summary.json:accuracy-params.yaml:epochs',
+      'custom-summary.json:loss-params.yaml:dropout',
+      'custom-summary.json:loss-epoch',
+      'custom-summary.json:accuracy-epoch'
     ])
   })
 
-  it('should send a message to the extension when the checkpoint plots are reordered', () => {
+  it('should send a message to the extension when the custom plots are reordered', () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
+      comparison: comparisonTableFixture,
+      custom: customPlotsFixture
     })
 
     const plots = screen.getAllByTestId(/summary\.json/)
     expect(plots.map(plot => plot.id)).toStrictEqual([
-      'summary.json:loss',
-      'summary.json:accuracy',
-      'summary.json:val_loss',
-      'summary.json:val_accuracy'
+      'custom-summary.json:loss-params.yaml:dropout',
+      'custom-summary.json:accuracy-params.yaml:epochs',
+      'custom-summary.json:loss-epoch',
+      'custom-summary.json:accuracy-epoch'
     ])
 
     mockPostMessage.mockClear()
@@ -861,42 +730,20 @@ describe('App', () => {
     dragAndDrop(plots[2], plots[0])
 
     const expectedOrder = [
-      'summary.json:val_loss',
-      'summary.json:loss',
-      'summary.json:accuracy',
-      'summary.json:val_accuracy'
+      'custom-summary.json:loss-epoch',
+      'custom-summary.json:loss-params.yaml:dropout',
+      'custom-summary.json:accuracy-params.yaml:epochs',
+      'custom-summary.json:accuracy-epoch'
     ]
 
     expect(mockPostMessage).toHaveBeenCalledTimes(1)
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: expectedOrder,
-      type: MessageFromWebviewType.REORDER_PLOTS_METRICS
+      type: MessageFromWebviewType.REORDER_PLOTS_CUSTOM
     })
     expect(
       screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
     ).toStrictEqual(expectedOrder)
-  })
-
-  it('should remove the checkpoint plot from the order if it is removed from the plots', () => {
-    renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
-    })
-
-    let plots = screen.getAllByTestId(/summary\.json/)
-    dragAndDrop(plots[1], plots[0])
-
-    sendSetDataMessage({
-      checkpoint: {
-        ...checkpointPlotsFixture,
-        plots: checkpointPlotsFixture.plots.slice(1)
-      }
-    })
-    plots = screen.getAllByTestId(/summary\.json/)
-    expect(plots.map(plot => plot.id)).toStrictEqual([
-      'summary.json:accuracy',
-      'summary.json:val_loss',
-      'summary.json:val_accuracy'
-    ])
   })
 
   it('should add a custom plot if a user creates a custom plot', () => {
@@ -904,14 +751,16 @@ describe('App', () => {
       comparison: comparisonTableFixture,
       custom: {
         ...customPlotsFixture,
-        plots: customPlotsFixture.plots.slice(1)
+        plots: customPlotsFixture.plots.slice(0, 3)
       }
     })
 
     expect(
       screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
     ).toStrictEqual([
-      'custom-metrics:summary.json:accuracy-params:params.yaml:epochs'
+      'custom-summary.json:loss-params.yaml:dropout',
+      'custom-summary.json:accuracy-params.yaml:epochs',
+      'custom-summary.json:loss-epoch'
     ])
 
     sendSetDataMessage({
@@ -921,8 +770,10 @@ describe('App', () => {
     expect(
       screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
     ).toStrictEqual([
-      'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
-      'custom-metrics:summary.json:loss-params:params.yaml:dropout'
+      'custom-summary.json:loss-params.yaml:dropout',
+      'custom-summary.json:accuracy-params.yaml:epochs',
+      'custom-summary.json:loss-epoch',
+      'custom-summary.json:accuracy-epoch'
     ])
   })
 
@@ -935,8 +786,10 @@ describe('App', () => {
     expect(
       screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
     ).toStrictEqual([
-      'custom-metrics:summary.json:loss-params:params.yaml:dropout',
-      'custom-metrics:summary.json:accuracy-params:params.yaml:epochs'
+      'custom-summary.json:loss-params.yaml:dropout',
+      'custom-summary.json:accuracy-params.yaml:epochs',
+      'custom-summary.json:loss-epoch',
+      'custom-summary.json:accuracy-epoch'
     ])
 
     sendSetDataMessage({
@@ -949,87 +802,28 @@ describe('App', () => {
     expect(
       screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
     ).toStrictEqual([
-      'custom-metrics:summary.json:accuracy-params:params.yaml:epochs'
+      'custom-summary.json:accuracy-params.yaml:epochs',
+      'custom-summary.json:loss-epoch',
+      'custom-summary.json:accuracy-epoch'
     ])
-  })
-
-  it('should not change the metric order in the hover menu by reordering the plots', () => {
-    renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
-    })
-
-    const [pickerButton] = within(
-      screen.getAllByTestId('section-container')[
-        sectionPosition[PlotsSection.CHECKPOINT_PLOTS]
-      ]
-    ).queryAllByTestId('icon-menu-item')
-
-    fireEvent.mouseEnter(pickerButton)
-    fireEvent.click(pickerButton)
-
-    let options = screen.getAllByTestId('select-menu-option-label')
-    const optionsOrder = [
-      'summary.json:accuracy',
-      'summary.json:loss',
-      'summary.json:val_accuracy',
-      'summary.json:val_loss'
-    ]
-    expect(options.map(({ textContent }) => textContent)).toStrictEqual(
-      optionsOrder
-    )
-
-    fireEvent.click(pickerButton)
-
-    let plots = screen.getAllByTestId(/summary\.json/)
-    const newPlotOrder = [
-      'summary.json:val_accuracy',
-      'summary.json:loss',
-      'summary.json:accuracy',
-      'summary.json:val_loss'
-    ]
-    expect(plots.map(plot => plot.id)).not.toStrictEqual(newPlotOrder)
-
-    dragAndDrop(plots[3], plots[0])
-    sendSetDataMessage({
-      checkpoint: {
-        ...checkpointPlotsFixture,
-        plots: reorderObjectList(
-          newPlotOrder,
-          checkpointPlotsFixture.plots,
-          'title'
-        )
-      }
-    })
-
-    plots = screen.getAllByTestId(/summary\.json/)
-
-    expect(plots.map(plot => plot.id)).toStrictEqual(newPlotOrder)
-
-    fireEvent.mouseEnter(pickerButton)
-    fireEvent.click(pickerButton)
-
-    options = screen.getAllByTestId('select-menu-option-label')
-    expect(options.map(({ textContent }) => textContent)).toStrictEqual(
-      optionsOrder
-    )
   })
 
   it('should not be possible to drag a plot from a section to another', () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture,
+      custom: customPlotsFixture,
       template: templatePlotsFixture
     })
 
-    const checkpointPlots = screen.getAllByTestId(/summary\.json/)
+    const customPlots = screen.getAllByTestId(/summary\.json/)
     const templatePlots = screen.getAllByTestId(/^plot_/)
 
-    dragAndDrop(templatePlots[0], checkpointPlots[2])
+    dragAndDrop(templatePlots[0], customPlots[2])
 
-    expect(checkpointPlots.map(plot => plot.id)).toStrictEqual([
-      'summary.json:loss',
-      'summary.json:accuracy',
-      'summary.json:val_loss',
-      'summary.json:val_accuracy'
+    expect(customPlots.map(plot => plot.id)).toStrictEqual([
+      'custom-summary.json:loss-params.yaml:dropout',
+      'custom-summary.json:accuracy-params.yaml:epochs',
+      'custom-summary.json:loss-epoch',
+      'custom-summary.json:accuracy-epoch'
     ])
   })
 
@@ -1246,32 +1040,34 @@ describe('App', () => {
     ])
   })
 
-  it('should show a drop target at the end of the checkpoint plots when moving a plot inside the section but not over any other plot', () => {
+  it('should show a drop target at the end of the custom plots when moving a plot inside the section but not over any other plot', () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
+      custom: customPlotsFixture,
+      template: templatePlotsFixture
     })
 
     const plots = screen.getAllByTestId(/summary\.json/)
 
-    dragEnter(plots[0], 'checkpoint-plots', DragEnterDirection.LEFT)
+    dragEnter(plots[0], 'custom-plots', DragEnterDirection.LEFT)
 
     expect(screen.getByTestId('plot_drop-target')).toBeInTheDocument()
   })
 
-  it('should show a drop a plot at the end of the checkpoint plots when moving a plot inside the section but not over any other plot', () => {
+  it('should show a drop a plot at the end of the custom plots when moving a plot inside the section but not over any other plot', () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
+      custom: customPlotsFixture,
+      template: templatePlotsFixture
     })
 
     const plots = screen.getAllByTestId(/summary\.json/)
 
-    dragAndDrop(plots[0], screen.getByTestId('checkpoint-plots'))
+    dragAndDrop(plots[0], screen.getByTestId('custom-plots'))
 
     const expectedOrder = [
-      'summary.json:accuracy',
-      'summary.json:val_loss',
-      'summary.json:val_accuracy',
-      'summary.json:loss'
+      'custom-summary.json:accuracy-params.yaml:epochs',
+      'custom-summary.json:loss-epoch',
+      'custom-summary.json:accuracy-epoch',
+      'custom-summary.json:loss-params.yaml:dropout'
     ]
 
     expect(
@@ -1495,9 +1291,10 @@ describe('App', () => {
     })
   })
 
-  it('should open a modal with the plot zoomed in when clicking a checkpoint plot', () => {
+  it('should open a modal with the plot zoomed in when clicking a custom plot', () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture
+      comparison: comparisonTableFixture,
+      custom: customPlotsFixture
     })
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
@@ -1559,14 +1356,14 @@ describe('App', () => {
 
   it('should show a tooltip with the meaning of each plot section', () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture,
       comparison: comparisonTableFixture,
       custom: customPlotsFixture,
       template: complexTemplatePlotsFixture
     })
 
-    const [templateInfo, comparisonInfo, checkpointInfo, customInfo] =
-      screen.getAllByTestId('info-tooltip-toggle')
+    const [templateInfo, comparisonInfo, customInfo] = screen.getAllByTestId(
+      'info-tooltip-toggle'
+    )
 
     fireEvent.mouseEnter(templateInfo, { bubbles: true })
     expect(screen.getByTestId('tooltip-template-plots')).toBeInTheDocument()
@@ -1574,16 +1371,12 @@ describe('App', () => {
     fireEvent.mouseEnter(comparisonInfo, { bubbles: true })
     expect(screen.getByTestId('tooltip-comparison-plots')).toBeInTheDocument()
 
-    fireEvent.mouseEnter(checkpointInfo, { bubbles: true })
-    expect(screen.getByTestId('tooltip-checkpoint-plots')).toBeInTheDocument()
-
     fireEvent.mouseEnter(customInfo, { bubbles: true })
     expect(screen.getByTestId('tooltip-custom-plots')).toBeInTheDocument()
   })
 
   it('should dismiss a tooltip by pressing esc', () => {
     renderAppWithOptionalData({
-      checkpoint: checkpointPlotsFixture,
       comparison: comparisonTableFixture,
       custom: customPlotsFixture,
       template: complexTemplatePlotsFixture
@@ -1604,21 +1397,24 @@ describe('App', () => {
   })
 
   describe('Virtualization', () => {
-    const createCheckpointPlots = (nbOfPlots: number) => {
+    const createCustomPlots = (nbOfPlots: number): CustomPlotsData => {
       const plots = []
       for (let i = 0; i < nbOfPlots; i++) {
         const id = `plot-${i}`
         plots.push({
           id,
-          title: id,
-          values: []
+          metric: '',
+          param: '',
+          type: CustomPlotType.CHECKPOINT,
+          values: [],
+          yTitle: id
         })
       }
       return {
-        ...checkpointPlotsFixture,
+        ...customPlotsFixture,
         plots,
         selectedMetrics: plots.map(plot => plot.id)
-      }
+      } as CustomPlotsData
     }
 
     const resizeScreen = (width: number, store: typeof plotsStore) => {
@@ -1632,17 +1428,17 @@ describe('App', () => {
     }
 
     describe('Large plots', () => {
-      it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than eight large plots', async () => {
+      it('should  wrap the custom plots in a big grid (virtualize them) when there are more than eight large plots', async () => {
         await renderAppAndChangeSize(
-          { checkpoint: createCheckpointPlots(9) },
+          { comparison: comparisonTableFixture, custom: createCustomPlots(9) },
           1,
-          PlotsSection.CHECKPOINT_PLOTS
+          PlotsSection.CUSTOM_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
 
         sendSetDataMessage({
-          checkpoint: createCheckpointPlots(50)
+          custom: createCustomPlots(50)
         })
 
         await screen.findAllByTestId('plots-wrapper')
@@ -1650,17 +1446,17 @@ describe('App', () => {
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
 
-      it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are eight or fewer large plots', async () => {
+      it('should not wrap the custom plots in a big grid (virtualize them) when there are eight or fewer large plots', async () => {
         await renderAppAndChangeSize(
-          { checkpoint: createCheckpointPlots(8) },
+          { comparison: comparisonTableFixture, custom: createCustomPlots(8) },
           1,
-          PlotsSection.CHECKPOINT_PLOTS
+          PlotsSection.CUSTOM_PLOTS
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
 
         sendSetDataMessage({
-          checkpoint: createCheckpointPlots(1)
+          custom: createCustomPlots(1)
         })
 
         await screen.findAllByTestId('plots-wrapper')
@@ -1705,30 +1501,28 @@ describe('App', () => {
       })
 
       describe('Sizing', () => {
-        const checkpoint = createCheckpointPlots(25)
+        const custom = createCustomPlots(25)
         let store: typeof plotsStore
 
         beforeEach(async () => {
           store = await renderAppAndChangeSize(
-            { checkpoint },
+            { comparison: comparisonTableFixture, custom },
             1,
-            PlotsSection.CHECKPOINT_PLOTS
+            PlotsSection.CUSTOM_PLOTS
           )
         })
 
         it('should render the plots correctly when the screen is larger than 2000px', () => {
-          resizeScreen(3000, store)
-
           let plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[4].id).toBe(checkpoint.plots[4].title)
+          expect(plots[4].id).toBe(custom.plots[4].yTitle)
           expect(plots.length).toBe(OVERSCAN_ROW_COUNT + 1)
 
           resizeScreen(5453, store)
 
           plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[3].id).toBe(checkpoint.plots[3].title)
+          expect(plots[3].id).toBe(custom.plots[3].yTitle)
           expect(plots.length).toBe(OVERSCAN_ROW_COUNT + 1)
         })
 
@@ -1737,7 +1531,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[12].id).toBe(checkpoint.plots[12].title)
+          expect(plots[12].id).toBe(custom.plots[12].yTitle)
           expect(plots.length).toBe(OVERSCAN_ROW_COUNT + 1)
         })
 
@@ -1746,7 +1540,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[14].id).toBe(checkpoint.plots[14].title)
+          expect(plots[14].id).toBe(custom.plots[14].yTitle)
           expect(plots.length).toBe(1 + OVERSCAN_ROW_COUNT) // Only the first and the next lines defined by the overscan row count will be rendered
         })
 
@@ -1755,27 +1549,27 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[4].id).toBe(checkpoint.plots[4].title)
+          expect(plots[4].id).toBe(custom.plots[4].yTitle)
         })
       })
     })
 
     describe('Regular plots', () => {
-      it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than fourteen regular plots', async () => {
+      it('should  wrap the custom plots in a big grid (virtualize them) when there are more than fourteen regular plots', async () => {
         await renderAppAndChangeSize(
-          { checkpoint: createCheckpointPlots(15) },
+          { comparison: comparisonTableFixture, custom: createCustomPlots(15) },
           DEFAULT_NB_ITEMS_PER_ROW,
-          PlotsSection.CHECKPOINT_PLOTS
+          PlotsSection.CUSTOM_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
 
-      it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are fourteen regular plots', async () => {
+      it('should not wrap the custom plots in a big grid (virtualize them) when there are fourteen regular plots', async () => {
         await renderAppAndChangeSize(
-          { checkpoint: createCheckpointPlots(14) },
+          { comparison: comparisonTableFixture, custom: createCustomPlots(14) },
           DEFAULT_NB_ITEMS_PER_ROW,
-          PlotsSection.CHECKPOINT_PLOTS
+          PlotsSection.CUSTOM_PLOTS
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1802,14 +1596,14 @@ describe('App', () => {
       })
 
       describe('Sizing', () => {
-        const checkpoint = createCheckpointPlots(25)
+        const custom = createCustomPlots(25)
         let store: typeof plotsStore
 
         beforeEach(async () => {
           store = await renderAppAndChangeSize(
-            { checkpoint },
+            { comparison: comparisonTableFixture, custom },
             DEFAULT_NB_ITEMS_PER_ROW,
-            PlotsSection.CHECKPOINT_PLOTS
+            PlotsSection.CUSTOM_PLOTS
           )
         })
 
@@ -1818,15 +1612,15 @@ describe('App', () => {
 
           let plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[20].id).toBe(checkpoint.plots[20].title)
-          expect(plots.length).toBe(checkpoint.plots.length)
+          expect(plots[20].id).toBe(custom.plots[20].yTitle)
+          expect(plots.length).toBe(custom.plots.length)
 
           resizeScreen(6453, store)
 
           plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[19].id).toBe(checkpoint.plots[19].title)
-          expect(plots.length).toBe(checkpoint.plots.length)
+          expect(plots[19].id).toBe(custom.plots[19].yTitle)
+          expect(plots.length).toBe(custom.plots.length)
         })
 
         it('should render the plots correctly when the screen is larger than 1600px (but less than 2000px)', () => {
@@ -1834,8 +1628,8 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[7].id).toBe(checkpoint.plots[7].title)
-          expect(plots.length).toBe(checkpoint.plots.length)
+          expect(plots[7].id).toBe(custom.plots[7].yTitle)
+          expect(plots.length).toBe(custom.plots.length)
         })
 
         it('should render the plots correctly when the screen is larger than 800px (but less than 1600px)', () => {
@@ -1843,8 +1637,8 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[7].id).toBe(checkpoint.plots[7].title)
-          expect(plots.length).toBe(checkpoint.plots.length)
+          expect(plots[7].id).toBe(custom.plots[7].yTitle)
+          expect(plots.length).toBe(custom.plots.length)
         })
 
         it('should render the plots correctly when the screen is smaller than 800px', () => {
@@ -1852,27 +1646,27 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[4].id).toBe(checkpoint.plots[4].title)
+          expect(plots[4].id).toBe(custom.plots[4].yTitle)
         })
       })
     })
 
     describe('Smaller plots', () => {
-      it('should  wrap the checkpoint plots in a big grid (virtualize them) when there are more than twenty small plots', async () => {
+      it('should  wrap the custom plots in a big grid (virtualize them) when there are more than twenty small plots', async () => {
         await renderAppAndChangeSize(
-          { checkpoint: createCheckpointPlots(21) },
+          { comparison: comparisonTableFixture, custom: createCustomPlots(21) },
           4,
-          PlotsSection.CHECKPOINT_PLOTS
+          PlotsSection.CUSTOM_PLOTS
         )
 
         expect(screen.getByRole('grid')).toBeInTheDocument()
       })
 
-      it('should not wrap the checkpoint plots in a big grid (virtualize them) when there are twenty or fewer small plots', async () => {
+      it('should not wrap the custom plots in a big grid (virtualize them) when there are twenty or fewer small plots', async () => {
         await renderAppAndChangeSize(
-          { checkpoint: createCheckpointPlots(20) },
+          { comparison: comparisonTableFixture, custom: createCustomPlots(20) },
           4,
-          PlotsSection.CHECKPOINT_PLOTS
+          PlotsSection.CUSTOM_PLOTS
         )
 
         expect(screen.queryByRole('grid')).not.toBeInTheDocument()
@@ -1899,14 +1693,14 @@ describe('App', () => {
       })
 
       describe('Sizing', () => {
-        const checkpoint = createCheckpointPlots(25)
+        const custom = createCustomPlots(25)
         let store: typeof plotsStore
 
         beforeEach(async () => {
           store = await renderAppAndChangeSize(
-            { checkpoint },
+            { comparison: comparisonTableFixture, custom },
             4,
-            PlotsSection.CHECKPOINT_PLOTS
+            PlotsSection.CUSTOM_PLOTS
           )
         })
 
@@ -1915,15 +1709,15 @@ describe('App', () => {
 
           let plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[7].id).toBe(checkpoint.plots[7].title)
-          expect(plots.length).toBe(checkpoint.plots.length)
+          expect(plots[7].id).toBe(custom.plots[7].yTitle)
+          expect(plots.length).toBe(custom.plots.length)
 
           resizeScreen(5473, store)
 
           plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[9].id).toBe(checkpoint.plots[9].title)
-          expect(plots.length).toBe(checkpoint.plots.length)
+          expect(plots[9].id).toBe(custom.plots[9].yTitle)
+          expect(plots.length).toBe(custom.plots.length)
         })
 
         it('should render the plots correctly when the screen is larger than 1600px (but less than 2000px)', () => {
@@ -1931,8 +1725,8 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[24].id).toBe(checkpoint.plots[24].title)
-          expect(plots.length).toBe(checkpoint.plots.length)
+          expect(plots[24].id).toBe(custom.plots[24].yTitle)
+          expect(plots.length).toBe(custom.plots.length)
         })
 
         it('should render the plots correctly when the screen is larger than 800px (but less than 1600px)', () => {
@@ -1940,8 +1734,8 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[9].id).toBe(checkpoint.plots[9].title)
-          expect(plots.length).toBe(checkpoint.plots.length)
+          expect(plots[9].id).toBe(custom.plots[9].yTitle)
+          expect(plots.length).toBe(custom.plots.length)
         })
 
         it('should render the plots correctly when the screen is smaller than 800px but larger than 600px', () => {
@@ -1949,8 +1743,8 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[9].id).toBe(checkpoint.plots[9].title)
-          expect(plots.length).toBe(checkpoint.plots.length)
+          expect(plots[9].id).toBe(custom.plots[9].yTitle)
+          expect(plots.length).toBe(custom.plots.length)
         })
 
         it('should render the plots correctly when the screen is smaller than 600px', () => {
@@ -1958,30 +1752,9 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[4].id).toBe(checkpoint.plots[4].title)
+          expect(plots[4].id).toBe(custom.plots[4].yTitle)
         })
       })
-    })
-  })
-
-  describe('Context Menu Suppression', () => {
-    it('Suppresses the context menu with no plots data', () => {
-      renderAppWithOptionalData()
-      const target = screen.getByText('Loading Plots...')
-      const contextMenuEvent = createEvent.contextMenu(target)
-      fireEvent(target, contextMenuEvent)
-      expect(contextMenuEvent.defaultPrevented).toBe(true)
-    })
-
-    it('Suppresses the context menu with plots data', () => {
-      renderAppWithOptionalData({
-        checkpoint: checkpointPlotsFixture,
-        sectionCollapsed: DEFAULT_SECTION_COLLAPSED
-      })
-      const target = screen.getByText('Trends')
-      const contextMenuEvent = createEvent.contextMenu(target)
-      fireEvent(target, contextMenuEvent)
-      expect(contextMenuEvent.defaultPrevented).toBe(true)
     })
   })
 

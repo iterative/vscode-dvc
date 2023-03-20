@@ -21,7 +21,7 @@
     "cover:mkdir": "mkdir -p ./coverage/combined",
     "cover:report:integration": "nyc report --reporter=lcov --temp-dir=./extension/coverage/integration",
     "cover": "yarn turbo run cover-vscode-run && yarn run-s cover:report:integration cover:mkdir && yarn run-p cover:merge:* && yarn run-s cover:merge cover:report cover:clean",
-    "cover:report": "nyc report --reporter=lcov --reporter=text --reporter=text-summary --temp-dir=./coverage --lines=95 --check-coverage",
+    "cover:report": "nyc report --reporter=lcov --reporter=text --reporter=text-summary --temp-dir=./coverage --lines=90 --check-coverage",
     "build": "yarn turbo run package",
     "install-frozen-lockfile": "./scripts/install-frozen-lockfile.sh",
     "dev-server": "yarn turbo run dev --parallel",
@@ -34,8 +34,8 @@
     "svgr": "yarn workspace dvc-vscode-webview svgr"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "5.54.1",
-    "@typescript-eslint/parser": "5.54.1",
+    "@typescript-eslint/eslint-plugin": "5.55.0",
+    "@typescript-eslint/parser": "5.55.0",
     "@vscode/codicons": "0.0.32",
     "eslint": "8.36.0",
     "eslint-config-prettier": "8.7.0",

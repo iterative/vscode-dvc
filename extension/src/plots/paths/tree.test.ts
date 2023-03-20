@@ -56,7 +56,11 @@ describe('PlotsPathsTree', () => {
       }
     ])
 
-    const children = plotsPathTree.getRepositoryChildren(__dirname, undefined)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const children = (plotsPathTree as any).getRepositoryChildren(
+      __dirname,
+      undefined
+    )
     expect(children).toStrictEqual([
       {
         collapsibleState: 0,

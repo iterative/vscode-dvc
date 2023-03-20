@@ -1,26 +1,29 @@
 import { join } from 'path'
-import omit from 'lodash.omit'
 import isEmpty from 'lodash.isempty'
 import {
   collectData,
-  collectCheckpointPlotsData,
   collectTemplates,
-  collectMetricOrder,
   collectOverrideRevisionDetails,
-  collectCustomPlotsData
+  collectCustomPlots
 } from './collect'
+import { isCheckpointPlot } from './custom'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
-import expShowFixture from '../../test/fixtures/expShow/base/output'
-import modifiedFixture from '../../test/fixtures/expShow/modified/output'
-import checkpointPlotsFixture from '../../test/fixtures/expShow/base/checkpointPlots'
-import customPlotsFixture from '../../test/fixtures/expShow/base/customPlots'
+import customPlotsFixture, {
+  customPlotsOrderFixture,
+  experimentsWithCheckpoints
+} from '../../test/fixtures/expShow/base/customPlots'
 import {
-  ExperimentsOutput,
   ExperimentStatus,
   EXPERIMENT_WORKSPACE_ID
 } from '../../cli/dvc/contract'
-import { definedAndNonEmpty, sameContents } from '../../util/array'
-import { TemplatePlot } from '../webview/contract'
+import { sameContents } from '../../util/array'
+import {
+  CustomPlotData,
+  CustomPlotType,
+  DEFAULT_NB_ITEMS_PER_ROW,
+  DEFAULT_PLOT_HEIGHT,
+  TemplatePlot
+} from '../webview/contract'
 import { getCLICommitId } from '../../test/fixtures/plotsDiff/util'
 import { SelectedExperimentWithColor } from '../../experiments/model'
 import { Experiment } from '../../experiments/webview/contract'
@@ -29,230 +32,62 @@ const logsLossPath = join('logs', 'loss.tsv')
 
 const logsLossPlot = (plotsDiffFixture[logsLossPath][0] || {}) as TemplatePlot
 
-describe('collectCustomPlotsData', () => {
-  it('should return the expected data from the text fixture', () => {
-    const data = collectCustomPlotsData(
-      [
-        {
-          metric: 'metrics:summary.json:loss',
-          param: 'params:params.yaml:dropout'
-        },
-        {
-          metric: 'metrics:summary.json:accuracy',
-          param: 'params:params.yaml:epochs'
-        }
-      ],
-      [
-        {
-          id: '12345',
-          label: '123',
-          metrics: {
-            'summary.json': {
-              accuracy: 0.4668000042438507,
-              loss: 2.0205044746398926
-            }
-          },
-          name: 'exp-e7a67',
-          params: { 'params.yaml': { dropout: 0.15, epochs: 16 } }
-        },
-        {
-          id: '12345',
-          label: '123',
-          metrics: {
-            'summary.json': {
-              accuracy: 0.3484833240509033,
-              loss: 1.9293040037155151
-            }
-          },
-          name: 'exp-83425',
-          params: { 'params.yaml': { dropout: 0.25, epochs: 10 } }
-        },
-        {
-          id: '12345',
-          label: '123',
-          metrics: {
-            'summary.json': {
-              accuracy: 0.6768440509033,
-              loss: 2.298503875732422
-            }
-          },
-          name: 'exp-f13bca',
-          params: { 'params.yaml': { dropout: 0.32, epochs: 20 } }
-        }
-      ]
-    )
-    expect(data).toStrictEqual(customPlotsFixture.plots)
-  })
-})
+describe('collectCustomPlots', () => {
+  const defaultFuncArgs = {
+    experiments: experimentsWithCheckpoints,
+    hasCheckpoints: true,
+    height: DEFAULT_PLOT_HEIGHT,
+    nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
+    plotsOrderValues: customPlotsOrderFixture,
+    selectedRevisions: customPlotsFixture.colors?.domain
+  }
 
-describe('collectCheckpointPlotsData', () => {
   it('should return the expected data from the test fixture', () => {
-    const data = collectCheckpointPlotsData(expShowFixture)
-    expect(data).toStrictEqual(
-      checkpointPlotsFixture.plots.map(({ id, values }) => ({ id, values }))
+    const expectedOutput: CustomPlotData[] = customPlotsFixture.plots
+    const data = collectCustomPlots(defaultFuncArgs)
+    expect(data).toStrictEqual(expectedOutput)
+  })
+
+  it('should return only custom plots if there no selected revisions', () => {
+    const expectedOutput: CustomPlotData[] = customPlotsFixture.plots.filter(
+      plot => plot.type !== CustomPlotType.CHECKPOINT
     )
+    const data = collectCustomPlots({
+      ...defaultFuncArgs,
+      selectedRevisions: undefined
+    })
+
+    expect(data).toStrictEqual(expectedOutput)
   })
 
-  it('should provide a continuous series for a modified experiment', () => {
-    const data = collectCheckpointPlotsData(modifiedFixture)
-
-    expect(definedAndNonEmpty(data)).toBeTruthy()
-
-    for (const { values } of data || []) {
-      const initialExperiment = values.filter(
-        point => point.group === 'exp-908bd'
-      )
-      const modifiedExperiment = values.find(
-        point => point.group === 'exp-01b3a'
-      )
-
-      const lastIterationInitial = initialExperiment?.slice(-1)[0]
-      const firstIterationModified = modifiedExperiment
-
-      expect(lastIterationInitial).not.toStrictEqual(firstIterationModified)
-      expect(omit(lastIterationInitial, 'group')).toStrictEqual(
-        omit(firstIterationModified, 'group')
-      )
-
-      const baseExperiment = values.filter(point => point.group === 'exp-920fc')
-      const restartedExperiment = values.find(
-        point => point.group === 'exp-9bc1b'
-      )
-
-      const iterationRestartedFrom = baseExperiment?.slice(5)[0]
-      const firstIterationAfterRestart = restartedExperiment
-
-      expect(iterationRestartedFrom).not.toStrictEqual(
-        firstIterationAfterRestart
-      )
-      expect(omit(iterationRestartedFrom, 'group')).toStrictEqual(
-        omit(firstIterationAfterRestart, 'group')
-      )
-    }
-  })
-
-  it('should return undefined given no input', () => {
-    const data = collectCheckpointPlotsData({} as ExperimentsOutput)
-    expect(data).toBeUndefined()
-  })
-})
-
-describe('collectMetricOrder', () => {
-  it('should return an empty array if there is no checkpoints data', () => {
-    const metricOrder = collectMetricOrder(
-      undefined,
-      ['metric:A', 'metric:B'],
-      []
+  it('should return only custom plots if checkpoints are not enabled', () => {
+    const expectedOutput: CustomPlotData[] = customPlotsFixture.plots.filter(
+      plot => plot.type !== CustomPlotType.CHECKPOINT
     )
-    expect(metricOrder).toStrictEqual([])
+    const data = collectCustomPlots({
+      ...defaultFuncArgs,
+      hasCheckpoints: false
+    })
+
+    expect(data).toStrictEqual(expectedOutput)
   })
 
-  it('should return an empty array if the checkpoints data is an empty array', () => {
-    const metricOrder = collectMetricOrder([], ['metric:A', 'metric:B'], [])
-    expect(metricOrder).toStrictEqual([])
-  })
+  it('should return checkpoint plots with values only containing selected experiments data', () => {
+    const domain = customPlotsFixture.colors?.domain.slice(1) as string[]
 
-  it('should maintain the existing order if all metrics are selected', () => {
-    const expectedOrder = [
-      'metric:F',
-      'metric:A',
-      'metric:B',
-      'metric:E',
-      'metric:D',
-      'metric:C'
-    ]
+    const expectedOutput = customPlotsFixture.plots.map(plot => ({
+      ...plot,
+      values: isCheckpointPlot(plot)
+        ? plot.values.filter(value => domain.includes(value.group))
+        : plot.values
+    }))
 
-    const metricOrder = collectMetricOrder(
-      [
-        { id: 'metric:A', values: [] },
-        { id: 'metric:B', values: [] },
-        { id: 'metric:C', values: [] },
-        { id: 'metric:D', values: [] },
-        { id: 'metric:E', values: [] },
-        { id: 'metric:F', values: [] }
-      ],
-      expectedOrder,
-      expectedOrder
-    )
-    expect(metricOrder).toStrictEqual(expectedOrder)
-  })
+    const data = collectCustomPlots({
+      ...defaultFuncArgs,
+      selectedRevisions: domain
+    })
 
-  it('should push unselected metrics to the end', () => {
-    const existingOrder = [
-      'metric:F',
-      'metric:A',
-      'metric:B',
-      'metric:E',
-      'metric:D',
-      'metric:C'
-    ]
-
-    const metricOrder = collectMetricOrder(
-      [
-        { id: 'metric:A', values: [] },
-        { id: 'metric:B', values: [] },
-        { id: 'metric:C', values: [] },
-        { id: 'metric:D', values: [] },
-        { id: 'metric:E', values: [] },
-        { id: 'metric:F', values: [] }
-      ],
-      existingOrder,
-      existingOrder.filter(metric => !['metric:A', 'metric:B'].includes(metric))
-    )
-    expect(metricOrder).toStrictEqual([
-      'metric:F',
-      'metric:E',
-      'metric:D',
-      'metric:C',
-      'metric:A',
-      'metric:B'
-    ])
-  })
-
-  it('should add new metrics in the given order', () => {
-    const metricOrder = collectMetricOrder(
-      [
-        { id: 'metric:C', values: [] },
-        { id: 'metric:D', values: [] },
-        { id: 'metric:A', values: [] },
-        { id: 'metric:B', values: [] },
-        { id: 'metric:E', values: [] },
-        { id: 'metric:F', values: [] }
-      ],
-      ['metric:B', 'metric:A'],
-      ['metric:B', 'metric:A']
-    )
-    expect(metricOrder).toStrictEqual([
-      'metric:B',
-      'metric:A',
-      'metric:C',
-      'metric:D',
-      'metric:E',
-      'metric:F'
-    ])
-  })
-
-  it('should give selected metrics precedence', () => {
-    const metricOrder = collectMetricOrder(
-      [
-        { id: 'metric:C', values: [] },
-        { id: 'metric:D', values: [] },
-        { id: 'metric:A', values: [] },
-        { id: 'metric:B', values: [] },
-        { id: 'metric:E', values: [] },
-        { id: 'metric:F', values: [] }
-      ],
-      ['metric:B', 'metric:A'],
-      ['metric:B', 'metric:A', 'metric:F']
-    )
-    expect(metricOrder).toStrictEqual([
-      'metric:B',
-      'metric:A',
-      'metric:F',
-      'metric:C',
-      'metric:D',
-      'metric:E'
-    ])
+    expect(data).toStrictEqual(expectedOutput)
   })
 })
 

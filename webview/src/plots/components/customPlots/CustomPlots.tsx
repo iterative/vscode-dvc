@@ -2,7 +2,6 @@ import React, { DragEvent, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { performSimpleOrderedUpdate } from 'dvc/src/util/array'
 import { CustomPlot } from './CustomPlot'
 import styles from '../styles.module.scss'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
@@ -32,7 +31,7 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
   )
 
   useEffect(() => {
-    setOrder(pastOrder => performSimpleOrderedUpdate(pastOrder, plotsIds))
+    setOrder(plotsIds)
   }, [plotsIds])
 
   const setPlotsIdsOrder = (order: string[]): void => {

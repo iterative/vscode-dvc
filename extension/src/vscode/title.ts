@@ -25,6 +25,7 @@ export enum Title {
   SELECT_PARAM_OR_METRIC_SORT = 'Select a Param or Metric to Sort by',
   SELECT_METRIC_CUSTOM_PLOT = 'Select a Metric to Create a Custom Plot',
   SELECT_PARAM_CUSTOM_PLOT = 'Select a Param to Create a Custom Plot',
+  SELECT_PLOT_TYPE_CUSTOM_PLOT = 'Select a Custom Plot Type',
   SELECT_CUSTOM_PLOTS_TO_REMOVE = 'Select Custom Plot(s) to Remove',
   SELECT_PARAM_TO_MODIFY = 'Select Param(s) to Modify',
   SELECT_PLOTS = 'Select Plots to Display',
