@@ -41,12 +41,12 @@ export const getFullValuePath = (
 ) => type + fileSep + columnPath
 
 export const cleanupOldOrderValue = (
-  { param, metric, type }: CustomPlotsOrderValue,
+  value: { metric: string; param: string } | CustomPlotsOrderValue,
   fileSep: string
 ): CustomPlotsOrderValue => ({
   // previous column paths have the "TYPE:" prefix
-  metric: removeColumnTypeFromPath(metric, ColumnType.METRICS, fileSep),
-  param: removeColumnTypeFromPath(param, ColumnType.PARAMS, fileSep),
+  metric: removeColumnTypeFromPath(value.metric, ColumnType.METRICS, fileSep),
+  param: removeColumnTypeFromPath(value.param, ColumnType.PARAMS, fileSep),
   // previous values didn't have a type
-  type: type || CustomPlotType.METRIC_VS_PARAM
+  type: (value as CustomPlotsOrderValue).type || CustomPlotType.METRIC_VS_PARAM
 })

@@ -231,6 +231,18 @@ describe('pickMetric', () => {
       },
       {
         hasChildren: false,
+        label: 'dropout',
+        path: 'params:params.yaml:epochs',
+        type: ColumnType.PARAMS
+      },
+      {
+        hasChildren: false,
+        label: 'accuracy',
+        path: 'metrics:summary.json:loss',
+        type: ColumnType.METRICS
+      },
+      {
+        hasChildren: false,
         label: 'accuracy',
         path: 'metrics:summary.json:accuracy',
         type: ColumnType.METRICS
