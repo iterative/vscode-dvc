@@ -1,4 +1,5 @@
-import { TreeItemCollapsibleState } from 'vscode'
+import { join } from 'path'
+import { TreeItem, TreeItemCollapsibleState } from 'vscode'
 import { EncodingType, isEncodingElement } from './collect'
 import {
   BasePathSelectionTree,
@@ -9,6 +10,7 @@ import { ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
 import { EventName } from '../../telemetry/constants'
 import { InternalCommands } from '../../commands/internal'
+import { DecoratableTreeItemScheme, getDecoratableUri } from '../../tree'
 
 export class PlotsPathsTree extends BasePathSelectionTree<WorkspacePlots> {
   constructor(
@@ -32,7 +34,19 @@ export class PlotsPathsTree extends BasePathSelectionTree<WorkspacePlots> {
     )
   }
 
-  public getRepositoryChildren(dvcRoot: string, path: string | undefined) {
+  protected getBaseTreeItem({
+    dvcRoot,
+    path,
+    collapsibleState
+  }: PathSelectionItem) {
+    const resourceUri = getDecoratableUri(
+      join(dvcRoot, path),
+      DecoratableTreeItemScheme.PLOTS
+    )
+    return new TreeItem(resourceUri, collapsibleState)
+  }
+
+  protected getRepositoryChildren(dvcRoot: string, path: string | undefined) {
     return this.workspace
       .getRepository(dvcRoot)
       .getChildPaths(path)
@@ -56,7 +70,7 @@ export class PlotsPathsTree extends BasePathSelectionTree<WorkspacePlots> {
       })
   }
 
-  public getRepositoryStatuses(dvcRoot: string) {
+  protected getRepositoryStatuses(dvcRoot: string) {
     return this.workspace.getRepository(dvcRoot).getPathStatuses()
   }
 }

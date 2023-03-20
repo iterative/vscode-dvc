@@ -21,7 +21,7 @@ export type PathSelectionItem = {
   description: string | undefined
   dvcRoot: string
   collapsibleState: TreeItemCollapsibleState
-  label: string
+  label: string | undefined
   path: string
   iconPath: Resource | Uri
 }
@@ -76,10 +76,9 @@ export abstract class BasePathSelectionTree<
       return new TreeItem(resourceUri, TreeItemCollapsibleState.Collapsed)
     }
 
-    const { dvcRoot, path, label, collapsibleState, description, iconPath } =
-      element
+    const { dvcRoot, path, description, iconPath } = element
 
-    const treeItem = new TreeItem(label, collapsibleState)
+    const treeItem = this.getBaseTreeItem(element)
 
     treeItem.command = {
       arguments: [{ dvcRoot, path }],
@@ -132,7 +131,7 @@ export abstract class BasePathSelectionTree<
     hasChildren: boolean
     path: string
     status: Status
-    label: string
+    label?: string
   }) {
     const { dvcRoot, descendantStatuses, hasChildren, path, status, label } =
       element
@@ -203,10 +202,12 @@ export abstract class BasePathSelectionTree<
     return typeof element === 'string'
   }
 
-  abstract getRepositoryStatuses(dvcRoot: string): Status[]
+  protected abstract getBaseTreeItem(element: PathSelectionItem): TreeItem
 
-  abstract getRepositoryChildren(
+  protected abstract getRepositoryChildren(
     dvcRoot: string,
     path: string | undefined
   ): PathSelectionItem[]
+
+  protected abstract getRepositoryStatuses(dvcRoot: string): Status[]
 }

@@ -144,7 +144,7 @@ export abstract class PathSelectionModel<
 
   abstract getChildren(
     ...args: unknown[]
-  ): (T & { descendantStatuses: Status[]; label: string; status: Status })[]
+  ): (T & { descendantStatuses: Status[]; status: Status })[]
 
   abstract getTerminalNodes(): (T & { selected: boolean })[]
 }
