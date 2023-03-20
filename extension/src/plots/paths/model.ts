@@ -77,7 +77,6 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
       ...element,
       descendantStatuses: this.getTerminalNodeStatuses(element.path),
       hasChildren: this.getHasChildren(element, multiSourceEncoding),
-      label: element.label,
       status: this.status[element.path]
     }))
   }
