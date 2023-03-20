@@ -4,9 +4,9 @@ import {
   collectData,
   collectTemplates,
   collectOverrideRevisionDetails,
-  collectCustomPlots,
-  collectCustomPlotData
+  collectCustomPlots
 } from './collect'
+import { isCheckpointPlot } from './custom'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import customPlotsFixture, {
   customPlotsOrderFixture,
@@ -18,9 +18,10 @@ import {
 } from '../../cli/dvc/contract'
 import { sameContents } from '../../util/array'
 import {
-  CheckpointPlot,
-  CustomPlot,
   CustomPlotData,
+  CustomPlotType,
+  DEFAULT_NB_ITEMS_PER_ROW,
+  DEFAULT_PLOT_HEIGHT,
   TemplatePlot
 } from '../webview/contract'
 import { getCLICommitId } from '../../test/fixtures/plotsDiff/util'
@@ -31,81 +32,62 @@ const logsLossPath = join('logs', 'loss.tsv')
 
 const logsLossPlot = (plotsDiffFixture[logsLossPath][0] || {}) as TemplatePlot
 
-const getCustomPlotFromCustomPlotData = ({
-  id,
-  metric,
-  param,
-  type,
-  values
-}: CustomPlotData) =>
-  ({
-    id,
-    metric,
-    param,
-    type,
-    values
-  } as CustomPlot)
-
 describe('collectCustomPlots', () => {
+  const defaultFuncArgs = {
+    experiments: experimentsWithCheckpoints,
+    hasCheckpoints: true,
+    height: DEFAULT_PLOT_HEIGHT,
+    nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
+    plotsOrderValues: customPlotsOrderFixture,
+    selectedRevisions: customPlotsFixture.colors?.domain
+  }
+
   it('should return the expected data from the test fixture', () => {
-    const expectedOutput: CustomPlot[] = customPlotsFixture.plots.map(
-      getCustomPlotFromCustomPlotData
-    )
-    const data = collectCustomPlots(
-      customPlotsOrderFixture,
-      experimentsWithCheckpoints
-    )
+    const expectedOutput: CustomPlotData[] = customPlotsFixture.plots
+    const data = collectCustomPlots(defaultFuncArgs)
     expect(data).toStrictEqual(expectedOutput)
   })
-})
 
-describe('collectCustomPlotData', () => {
-  it('should return the expected data from test fixture', () => {
-    const expectedMetricVsParamPlotData = customPlotsFixture.plots[0]
-    const expectedCheckpointsPlotData = customPlotsFixture.plots[2]
-    const metricVsParamPlot = getCustomPlotFromCustomPlotData(
-      expectedMetricVsParamPlotData
+  it('should return only custom plots if there no selected revisions', () => {
+    const expectedOutput: CustomPlotData[] = customPlotsFixture.plots.filter(
+      plot => plot.type !== CustomPlotType.CHECKPOINT
     )
-    const checkpointsPlot = getCustomPlotFromCustomPlotData(
-      expectedCheckpointsPlotData
-    )
+    const data = collectCustomPlots({
+      ...defaultFuncArgs,
+      selectedRevisions: undefined
+    })
 
-    const metricVsParamData = collectCustomPlotData(
-      metricVsParamPlot,
-      customPlotsFixture.colors,
-      customPlotsFixture.nbItemsPerRow,
-      customPlotsFixture.height
-    )
+    expect(data).toStrictEqual(expectedOutput)
+  })
 
-    const checkpointsData = collectCustomPlotData(
-      {
-        ...checkpointsPlot,
-        values: [
-          ...checkpointsPlot.values,
-          {
-            group: 'exp-123',
-            iteration: 1,
-            y: 1.4534177053451538
-          },
-          {
-            group: 'exp-123',
-            iteration: 2,
-            y: 1.757687
-          },
-          {
-            group: 'exp-123',
-            iteration: 3,
-            y: 1.989894
-          }
-        ]
-      } as CheckpointPlot,
-      customPlotsFixture.colors,
-      customPlotsFixture.nbItemsPerRow,
-      customPlotsFixture.height
+  it('should return only custom plots if checkpoints are not enabled', () => {
+    const expectedOutput: CustomPlotData[] = customPlotsFixture.plots.filter(
+      plot => plot.type !== CustomPlotType.CHECKPOINT
     )
+    const data = collectCustomPlots({
+      ...defaultFuncArgs,
+      hasCheckpoints: false
+    })
 
-    expect(metricVsParamData).toStrictEqual(expectedMetricVsParamPlotData)
-    expect(checkpointsData).toStrictEqual(expectedCheckpointsPlotData)
+    expect(data).toStrictEqual(expectedOutput)
+  })
+
+  it('should return checkpoint plots with values only containing selected experiments data', () => {
+    const domain = customPlotsFixture.colors?.domain.slice(1) as string[]
+
+    const expectedOutput = customPlotsFixture.plots.map(plot => ({
+      ...plot,
+      values: isCheckpointPlot(plot)
+        ? plot.values.filter(value => domain.includes(value.group))
+        : plot.values
+    }))
+
+    const data = collectCustomPlots({
+      ...defaultFuncArgs,
+      selectedRevisions: domain
+    })
+
+    expect(data).toStrictEqual(expectedOutput)
   })
 })
 
