@@ -75,6 +75,19 @@ suite('Plots Data Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath)
     })
 
+    it('should always call plots diff with workspace as the first argument to get the correct template (caching)', async () => {
+      const { data, mockPlotsDiff } = buildPlotsData([], ['53c3851', '4fb124a'])
+
+      await data.update()
+
+      expect(mockPlotsDiff).to.be.calledWithExactly(
+        dvcDemoPath,
+        EXPERIMENT_WORKSPACE_ID,
+        '4fb124a',
+        '53c3851'
+      )
+    })
+
     it('should call plots diff when an experiment is running in the workspace (live updates)', async () => {
       const { data, mockPlotsDiff } = buildPlotsData(
         [],
@@ -92,7 +105,11 @@ suite('Plots Data Test Suite', () => {
       await data.update()
 
       expect(mockPlotsDiff).to.be.calledOnce
-      expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath, 'a7739b5')
+      expect(mockPlotsDiff).to.be.calledWithExactly(
+        dvcDemoPath,
+        EXPERIMENT_WORKSPACE_ID,
+        'a7739b5'
+      )
     })
 
     it('should call plots diff when an experiment is running and there are missing revisions (checkpoints)', async () => {
@@ -106,6 +123,7 @@ suite('Plots Data Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
+        EXPERIMENT_WORKSPACE_ID,
         '1ba7bcd',
         '42b8736',
         '4fb124a',
@@ -124,6 +142,7 @@ suite('Plots Data Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
+        EXPERIMENT_WORKSPACE_ID,
         '1ba7bcd',
         '42b8736',
         '4fb124a',

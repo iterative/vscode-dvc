@@ -69,11 +69,11 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
+        EXPERIMENT_WORKSPACE_ID,
         '1ba7bcd',
         '42b8736',
         '4fb124a',
-        '53c3851',
-        EXPERIMENT_WORKSPACE_ID
+        '53c3851'
       )
       mockPlotsDiff.resetHistory()
 
@@ -132,8 +132,8 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
-        'experim',
-        EXPERIMENT_WORKSPACE_ID
+        EXPERIMENT_WORKSPACE_ID,
+        'experim'
       )
     })
 
@@ -173,8 +173,8 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
-        '9235a02',
-        EXPERIMENT_WORKSPACE_ID
+        EXPERIMENT_WORKSPACE_ID,
+        '9235a02'
       )
     })
 
@@ -716,8 +716,8 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.called
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
-        '53c3851',
-        EXPERIMENT_WORKSPACE_ID
+        EXPERIMENT_WORKSPACE_ID,
+        '53c3851'
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -759,11 +759,11 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.called
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
+        EXPERIMENT_WORKSPACE_ID,
         '1ba7bcd',
         '42b8736',
         '4fb124a',
-        '53c3851',
-        EXPERIMENT_WORKSPACE_ID
+        '53c3851'
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
