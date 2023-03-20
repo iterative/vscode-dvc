@@ -68,6 +68,7 @@ suite('Patch Test Suite', () => {
         body: JSON.stringify({
           baseline_sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
           client: 'vscode',
+          experiment_rev: '4fb124aebddb2adf1545030907687fa9a4c80e70',
           metrics,
           name,
           params: {
@@ -133,6 +134,7 @@ suite('Patch Test Suite', () => {
         body: JSON.stringify({
           baseline_sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
           client: 'vscode',
+          experiment_rev: '4fb124aebddb2adf1545030907687fa9a4c80e70',
           metrics,
           name,
           params: {

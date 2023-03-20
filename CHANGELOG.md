@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.22] - 2023-03-19
+
+### 🐛 Bug Fixes
+
+- Add experiment_rev into payload for share experiment to Studio [#3499](https://github.com/iterative/vscode-dvc/pull/3499) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.6.21] - 2023-03-17
+
+### 🚀 New Features and Enhancements
+
+- Open comparison table images when clicking on them [#3467](https://github.com/iterative/vscode-dvc/pull/3467) by [@sroy3](https://github.com/sroy3)
+- Resize comparison table with slider [#3480](https://github.com/iterative/vscode-dvc/pull/3480) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Consolidate and fix Setup stories [#3469](https://github.com/iterative/vscode-dvc/pull/3469) by [@mattseddon](https://github.com/mattseddon)
+- Rename section enums to differentiate types [#3470](https://github.com/iterative/vscode-dvc/pull/3470) by [@mattseddon](https://github.com/mattseddon)
+- Add react/jsx-curly-brace-presence eslint rule [#3471](https://github.com/iterative/vscode-dvc/pull/3471) by [@mattseddon](https://github.com/mattseddon)
+- Move e2e tests to insiders [#3481](https://github.com/iterative/vscode-dvc/pull/3481) by [@sroy3](https://github.com/sroy3)
+- Update dvclive (2.4.0) [#3488](https://github.com/iterative/vscode-dvc/pull/3488) by [@sroy3](https://github.com/sroy3)
+
 ## [0.6.20] - 2023-03-15
 
 ### 🚀 New Features and Enhancements
