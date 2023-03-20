@@ -306,6 +306,17 @@ describe('ComparisonTable', () => {
     }
   })
 
+  it('should calculate the headers top property on scroll', () => {
+    renderTable()
+
+    const aHeader = screen.getAllByRole('columnheader')[0]
+    expect(aHeader.style.top).toBe('')
+
+    fireEvent.scroll(window)
+
+    expect(aHeader.style.top).not.toBe('')
+  })
+
   describe('Columns drag and drop', () => {
     const pinSecondColumn = () => {
       const secondColumn = getPin(screen.getByText(revisions[1]))
