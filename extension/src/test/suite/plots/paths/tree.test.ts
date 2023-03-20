@@ -149,11 +149,11 @@ suite('Plots Paths Tree Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
+        EXPERIMENT_WORKSPACE_ID,
         '1ba7bcd',
         '42b8736',
         '4fb124a',
-        '53c3851',
-        EXPERIMENT_WORKSPACE_ID
+        '53c3851'
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })

@@ -12,7 +12,6 @@ import {
   DEFAULT_NB_ITEMS_PER_ROW
 } from 'dvc/src/plots/webview/contract'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
-import checkpointPlotsFixture from 'dvc/src/test/fixtures/expShow/base/checkpointPlots'
 import customPlotsFixture from 'dvc/src/test/fixtures/expShow/base/customPlots'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template'
 import manyTemplatePlots from 'dvc/src/test/fixtures/plotsDiff/template/virtualization'
@@ -32,36 +31,34 @@ import '../plots/components/styles.module.scss'
 import { feedStore } from '../plots/components/App'
 import { plotsReducers } from '../plots/store'
 
-const smallCheckpointPlotsFixture = {
-  ...checkpointPlotsFixture,
+const smallCustomPlotsFixture = {
+  ...customPlotsFixture,
   nbItemsPerRow: 3,
-  plots: checkpointPlotsFixture.plots.map(plot => ({
+  plots: customPlotsFixture.plots.map(plot => ({
     ...plot,
-    title: truncateVerticalTitle(
-      plot.title,
+    yTitle: truncateVerticalTitle(
+      plot.yTitle,
       DEFAULT_NB_ITEMS_PER_ROW,
       DEFAULT_PLOT_HEIGHT
     ) as string
   }))
 }
 
-const manyCheckpointPlots = (length: number) =>
-  Array.from({ length }, () => checkpointPlotsFixture.plots[0]).map(
-    (plot, i) => {
-      const id = plot.id + i.toString()
-      return {
-        ...plot,
+const manyCustomPlots = (length: number) =>
+  Array.from({ length }, () => customPlotsFixture.plots[2]).map((plot, i) => {
+    const id = plot.id + i.toString()
+    return {
+      ...plot,
+      id,
+      yTitle: truncateVerticalTitle(
         id,
-        title: truncateVerticalTitle(
-          id,
-          DEFAULT_NB_ITEMS_PER_ROW,
-          DEFAULT_PLOT_HEIGHT
-        ) as string
-      }
+        DEFAULT_NB_ITEMS_PER_ROW,
+        DEFAULT_PLOT_HEIGHT
+      ) as string
     }
-  )
+  })
 
-const manyCheckpointPlotsFixture = manyCheckpointPlots(15)
+const manyCustomPlotsFixture = manyCustomPlots(15)
 
 const MockedState: React.FC<{ data: PlotsData; children: React.ReactNode }> = ({
   children,
@@ -77,7 +74,6 @@ const MockedState: React.FC<{ data: PlotsData; children: React.ReactNode }> = ({
 export default {
   args: {
     data: {
-      checkpoint: checkpointPlotsFixture,
       comparison: comparisonPlotsFixture,
       custom: customPlotsFixture,
       hasPlots: true,
@@ -106,28 +102,6 @@ const Template: Story<{
 
 export const WithData = Template.bind({})
 WithData.parameters = CHROMATIC_VIEWPORTS_WITH_DELAY
-
-export const WithEmptyCheckpoints = Template.bind({})
-WithEmptyCheckpoints.args = {
-  data: {
-    checkpoint: { ...checkpointPlotsFixture, selectedMetrics: [] },
-    comparison: comparisonPlotsFixture,
-    sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-    selectedRevisions: plotsRevisionsFixture,
-    template: templatePlotsFixture
-  }
-}
-WithEmptyCheckpoints.parameters = DISABLE_CHROMATIC_SNAPSHOTS
-
-export const WithCheckpointOnly = Template.bind({})
-WithCheckpointOnly.args = {
-  data: {
-    checkpoint: checkpointPlotsFixture,
-    sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-    selectedRevisions: plotsRevisionsFixture
-  }
-}
-WithCheckpointOnly.parameters = DISABLE_CHROMATIC_SNAPSHOTS
 
 export const WithCustomOnly = Template.bind({})
 WithCustomOnly.args = {
@@ -199,10 +173,6 @@ WithoutData.args = {
 export const AllLarge = Template.bind({})
 AllLarge.args = {
   data: {
-    checkpoint: {
-      ...checkpointPlotsFixture,
-      nbItemsPerRow: 1
-    },
     comparison: {
       ...comparisonPlotsFixture,
       width: 1
@@ -224,15 +194,11 @@ AllLarge.parameters = CHROMATIC_VIEWPORTS_WITH_DELAY
 export const AllSmall = Template.bind({})
 AllSmall.args = {
   data: {
-    checkpoint: smallCheckpointPlotsFixture,
     comparison: {
       ...comparisonPlotsFixture,
       width: 3
     },
-    custom: {
-      ...customPlotsFixture,
-      nbItemsPerRow: 3
-    },
+    custom: smallCustomPlotsFixture,
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
     selectedRevisions: plotsRevisionsFixture,
     template: {
@@ -246,13 +212,11 @@ AllSmall.parameters = CHROMATIC_VIEWPORTS_WITH_DELAY
 export const VirtualizedPlots = Template.bind({})
 VirtualizedPlots.args = {
   data: {
-    checkpoint: {
-      ...checkpointPlotsFixture,
-      plots: manyCheckpointPlotsFixture,
-      selectedMetrics: manyCheckpointPlotsFixture.map(plot => plot.id)
-    },
     comparison: undefined,
-    custom: customPlotsFixture,
+    custom: {
+      ...customPlotsFixture,
+      plots: manyCustomPlotsFixture
+    },
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
     selectedRevisions: plotsRevisionsFixture,
     template: manyTemplatePlots(125)
@@ -321,7 +285,6 @@ ScrolledHeaders.parameters = {
 export const ScrolledWithManyRevisions = Template.bind({})
 ScrolledWithManyRevisions.args = {
   data: {
-    checkpoint: checkpointPlotsFixture,
     comparison: comparisonPlotsFixture,
     custom: customPlotsFixture,
     hasPlots: true,

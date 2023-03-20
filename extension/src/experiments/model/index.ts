@@ -60,6 +60,10 @@ export type ExperimentWithCheckpoints = Experiment & {
   checkpoints?: Experiment[]
 }
 
+export type ExperimentWithDefinedCheckpoints = Experiment & {
+  checkpoints: Experiment[]
+}
+
 export enum ExperimentType {
   WORKSPACE = 'workspace',
   COMMIT = 'commit',
