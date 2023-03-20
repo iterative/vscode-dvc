@@ -26,7 +26,7 @@ describe('array', () => {
       )
     })
 
-    it('should return the order with the dragged item id moved to the dragged index', () => {
+    it('should return the order with the dragged item id moved to the end', () => {
       const currentOrder = ['1', '2', '3', '4']
 
       expect(
