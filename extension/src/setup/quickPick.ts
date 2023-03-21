@@ -1,3 +1,4 @@
+import { sortCollectedArray } from '../util/array'
 import { quickPickManyValues } from '../vscode/quickPick'
 import { Title } from '../vscode/title'
 import { Toast } from '../vscode/toast'
@@ -22,5 +23,6 @@ export const pickFocusedProjects = async (
     void Toast.showError('Cannot select 0 projects.')
     return
   }
-  return values.sort()
+
+  return sortCollectedArray(values)
 }

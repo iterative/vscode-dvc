@@ -793,7 +793,9 @@ suite('Plots Test Suite', () => {
       expect(confusionMatrixDatapoints.length).to.be.greaterThan(0)
 
       expect(confusionMatrix.revisions?.length).to.equal(4)
-      expect(confusionMatrix.revisions?.sort()).to.deep.equal(expectedRevisions)
+      expect([...(confusionMatrix.revisions || [])].sort()).to.deep.equal(
+        expectedRevisions
+      )
 
       for (const entry of confusionMatrixDatapoints) {
         expect(expectedRevisions).to.include(entry.rev)
