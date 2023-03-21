@@ -3,7 +3,8 @@ import {
   getFullValuePath,
   CustomPlotsOrderValue,
   isCheckpointValue,
-  removeColumnTypeFromPath
+  removeColumnTypeFromPath,
+  CHECKPOINTS_PARAM
 } from './custom'
 import {
   FILE_SEPARATOR,
@@ -99,9 +100,54 @@ export const pickCustomPlotType = (): Thenable<CustomPlotType | undefined> => {
 const getTypeColumnLikes = (columns: Column[], columnType: ColumnType) =>
   columns
     .filter(({ type }) => type === columnType)
-    .map(({ label, path }) => ({ label, path }))
+    .map(({ path, label }) => ({ label, path }))
 
-export const pickMetricAndParam = async (columns: Column[]) => {
+const getCustomPlotIds = (
+  customPlotVals: CustomPlotsOrderValue[],
+  customPlotType: CustomPlotType
+) => {
+  const plotIds = new Set()
+
+  for (const { type, metric, param } of customPlotVals) {
+    if (type === customPlotType) {
+      plotIds.add(getCustomPlotId(metric, param))
+    }
+  }
+
+  return plotIds
+}
+
+const filterColumnsBasedOffCustomPlotValues = (
+  columns: Column[],
+  customPlotVals: CustomPlotsOrderValue[],
+  customPlotType: CustomPlotType,
+  knownPlotMetric: string | undefined,
+  knownPlotParam?: string
+) => {
+  const typeToSortColumnsBy = isCheckpointValue(customPlotType)
+    ? ColumnType.METRICS
+    : ColumnType.PARAMS
+  const typeColumnLikes = getTypeColumnLikes(columns, typeToSortColumnsBy)
+  const plotIds = getCustomPlotIds(customPlotVals, customPlotType)
+
+  return plotIds.size > 0
+    ? typeColumnLikes.filter(({ path }) => {
+        const metric =
+          knownPlotMetric ||
+          removeColumnTypeFromPath(path, ColumnType.METRICS, FILE_SEPARATOR)
+        const param =
+          knownPlotParam ||
+          removeColumnTypeFromPath(path, ColumnType.PARAMS, FILE_SEPARATOR)
+
+        return !plotIds.has(getCustomPlotId(metric, param))
+      })
+    : typeColumnLikes
+}
+
+export const pickMetricAndParam = async (
+  columns: Column[],
+  customPlotOrderVals: CustomPlotsOrderValue[]
+) => {
   const metricColumnLikes = getTypeColumnLikes(columns, ColumnType.METRICS)
   const paramColumnLikes = getTypeColumnLikes(columns, ColumnType.PARAMS)
 
@@ -120,7 +166,17 @@ export const pickMetricAndParam = async (columns: Column[]) => {
     return
   }
 
-  const param = await pickFromColumnLikes(paramColumnLikes, {
+  const filteredParamColumnLikes = filterColumnsBasedOffCustomPlotValues(
+    columns,
+    customPlotOrderVals,
+    CustomPlotType.METRIC_VS_PARAM,
+    removeColumnTypeFromPath(metric.path, ColumnType.METRICS, FILE_SEPARATOR)
+  )
+  if (!definedAndNonEmpty(filteredParamColumnLikes)) {
+    return Toast.showError('There are no params to select from.')
+  }
+
+  const param = await pickFromColumnLikes(filteredParamColumnLikes, {
     title: Title.SELECT_PARAM_CUSTOM_PLOT
   })
 
@@ -142,8 +198,17 @@ export const pickMetricAndParam = async (columns: Column[]) => {
   }
 }
 
-export const pickMetric = async (columns: Column[]) => {
-  const metricColumnLikes = getTypeColumnLikes(columns, ColumnType.METRICS)
+export const pickMetric = async (
+  columns: Column[],
+  customPlotOrder: CustomPlotsOrderValue[]
+) => {
+  const metricColumnLikes = filterColumnsBasedOffCustomPlotValues(
+    columns,
+    customPlotOrder,
+    CustomPlotType.CHECKPOINT,
+    undefined,
+    CHECKPOINTS_PARAM
+  )
 
   if (!definedAndNonEmpty(metricColumnLikes)) {
     return Toast.showError('There are no metrics to select from.')
