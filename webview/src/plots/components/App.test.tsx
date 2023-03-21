@@ -262,6 +262,7 @@ describe('App', () => {
         ],
         width: DEFAULT_NB_ITEMS_PER_ROW
       },
+      custom: null,
       hasPlots: true,
       hasUnselectedPlots: false,
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
@@ -279,7 +280,7 @@ describe('App', () => {
     })
     const loading = await screen.findAllByText('Loading...')
 
-    expect(loading).toHaveLength(2)
+    expect(loading).toHaveLength(3)
   })
 
   it('should render the Add Plots and Add Experiments get started button when there are experiments which have plots that are all unselected', async () => {
