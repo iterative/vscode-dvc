@@ -1,5 +1,5 @@
 import { EventEmitter } from 'vscode'
-import { collectMetricsFiles, collectFiles } from './collect'
+import { collectMetricsFiles, collectFiles, collectRevs } from './collect'
 import {
   EXPERIMENT_WORKSPACE_ID,
   ExperimentsOutput,
@@ -7,7 +7,7 @@ import {
 } from '../../cli/dvc/contract'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { BaseData } from '../../data'
-import { flattenUnique, sameContents, uniqueValues } from '../../util/array'
+import { sameContents, uniqueValues } from '../../util/array'
 import { PlotsModel } from '../model'
 
 export class PlotsData extends BaseData<{
@@ -40,10 +40,10 @@ export class PlotsData extends BaseData<{
   }
 
   public async update(): Promise<void> {
-    const revs = flattenUnique([
+    const revs = collectRevs(
       this.model.getMissingRevisions(),
       this.model.getMutableRevisions()
-    ])
+    )
 
     const args = this.getArgs(revs)
     const data = await this.internalCommands.executeCommand<PlotsOutputOrError>(
@@ -51,10 +51,6 @@ export class PlotsData extends BaseData<{
       this.dvcRoot,
       ...args
     )
-
-    if (!revs.includes(EXPERIMENT_WORKSPACE_ID) && args.length < 2) {
-      revs.push(EXPERIMENT_WORKSPACE_ID)
-    }
 
     this.notifyChanged({ data, revs })
 

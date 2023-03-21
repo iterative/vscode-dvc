@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.23] - 2023-03-21
+
+### 🚀 New Features and Enhancements
+
+- Make plots vertical scrollbars local to sections [#3489](https://github.com/iterative/vscode-dvc/pull/3489) by [@sroy3](https://github.com/sroy3)
+- Move trends plots inside of "Custom" section [#3404](https://github.com/iterative/vscode-dvc/pull/3404) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Always call plots diff with workspace as the first revision (get correct templates) [#3503](https://github.com/iterative/vscode-dvc/pull/3503) by [@mattseddon](https://github.com/mattseddon)
+- Fix the comparison table images width [#3507](https://github.com/iterative/vscode-dvc/pull/3507) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Update demo project with dvclive (v2.5.0) [#3506](https://github.com/iterative/vscode-dvc/pull/3506) by [@sroy3](https://github.com/sroy3)
+- Update demo project and latest tested CLI version (2.51.0) [#3510](https://github.com/iterative/vscode-dvc/pull/3510) by [@sroy3](https://github.com/sroy3)
+- Create multiple Redux actions for the table data [#3508](https://github.com/iterative/vscode-dvc/pull/3508) by [@sroy3](https://github.com/sroy3)
+- Increase coverage [#3513](https://github.com/iterative/vscode-dvc/pull/3513) by [@sroy3](https://github.com/sroy3)
+- Drop overall test coverage requirement (unblock) [#3515](https://github.com/iterative/vscode-dvc/pull/3515) by [@mattseddon](https://github.com/mattseddon)
+- Make plots tree items decoratable [#3504](https://github.com/iterative/vscode-dvc/pull/3504) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.6.22] - 2023-03-19
 
 ### 🐛 Bug Fixes

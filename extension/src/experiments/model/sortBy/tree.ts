@@ -7,6 +7,7 @@ import { sendViewOpenedTelemetryEvent } from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
 import { InternalCommands } from '../../../commands/internal'
 import { Disposable } from '../../../class/dispose'
+import { sortCollectedArray } from '../../../util/array'
 
 export type SortItem = {
   dvcRoot: string
@@ -91,7 +92,7 @@ export class ExperimentsSortByTree
     return dvcRoots.some(
       dvcRoot => this.experiments.getRepository(dvcRoot).getSorts().length > 0
     )
-      ? dvcRoots.sort((a, b) => a.localeCompare(b))
+      ? sortCollectedArray(dvcRoots, (a, b) => a.localeCompare(b))
       : []
   }
 

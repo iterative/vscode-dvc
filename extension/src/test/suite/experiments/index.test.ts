@@ -1165,7 +1165,7 @@ suite('Experiments Test Suite', () => {
         .getSelectedRevisions()
         .map(({ id }) => id)
         .sort()
-      expect(selectExperimentIds).to.deep.equal(mockExperimentIds.sort())
+      mockExperimentIds.sort()
       expect(selectExperimentIds).to.deep.equal(mockExperimentIds)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -1207,7 +1207,7 @@ suite('Experiments Test Suite', () => {
         .getSelectedRevisions()
         .map(({ id }) => id)
         .sort()
-      expect(selectExperimentIds).to.deep.equal(mockExperimentIds.sort())
+      expect(selectExperimentIds).to.deep.equal([...mockExperimentIds].sort())
       expect(mockShowPlots).to.be.calledOnce
       expect(mockShowPlots).to.be.calledWith(dvcDemoPath)
     }).timeout(WEBVIEW_TEST_TIMEOUT)

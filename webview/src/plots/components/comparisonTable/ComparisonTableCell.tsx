@@ -42,7 +42,11 @@ export const ComparisonTableCell: React.FC<ComparisonTableCellProps> = ({
   }
 
   return (
-    <button onClick={() => zoomPlot(plot.url)} data-testid="image-plot-button">
+    <button
+      className={styles.imageWrapper}
+      onClick={() => zoomPlot(plot.url)}
+      data-testid="image-plot-button"
+    >
       <img
         draggable={false}
         src={plot.url}

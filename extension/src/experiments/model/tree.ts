@@ -16,7 +16,7 @@ import { getDataFromColumnPaths } from './util'
 import { WorkspaceExperiments } from '../workspace'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
-import { definedAndNonEmpty } from '../../util/array'
+import { definedAndNonEmpty, sortCollectedArray } from '../../util/array'
 import {
   createTreeView,
   DecoratableTreeItemScheme,
@@ -176,7 +176,8 @@ export class ExperimentsTree
         const [onlyRepo] = dvcRoots
         return this.getChildren(onlyRepo)
       }
-      return dvcRoots.sort((a, b) => a.localeCompare(b))
+
+      return sortCollectedArray(dvcRoots, (a, b) => a.localeCompare(b))
     }
 
     return []

@@ -25,7 +25,6 @@ describe('collectPath', () => {
     expect(collectPaths([], plotsDiffFixture, revisions, {})).toStrictEqual([
       {
         hasChildren: false,
-        label: 'acc.png',
         parentPath: 'plots',
         path: join('plots', 'acc.png'),
         revisions: new Set(revisions),
@@ -33,14 +32,12 @@ describe('collectPath', () => {
       },
       {
         hasChildren: true,
-        label: 'plots',
         parentPath: undefined,
         path: 'plots',
         revisions: new Set(revisions)
       },
       {
         hasChildren: false,
-        label: 'heatmap.png',
         parentPath: 'plots',
         path: join('plots', 'heatmap.png'),
         revisions: new Set(revisions),
@@ -48,7 +45,6 @@ describe('collectPath', () => {
       },
       {
         hasChildren: false,
-        label: 'loss.png',
         parentPath: 'plots',
         path: join('plots', 'loss.png'),
         revisions: new Set(revisions),
@@ -56,7 +52,6 @@ describe('collectPath', () => {
       },
       {
         hasChildren: false,
-        label: 'loss.tsv',
         parentPath: 'logs',
         path: join('logs', 'loss.tsv'),
         revisions: new Set(revisions),
@@ -64,14 +59,12 @@ describe('collectPath', () => {
       },
       {
         hasChildren: true,
-        label: 'logs',
         parentPath: undefined,
         path: 'logs',
         revisions: new Set(revisions)
       },
       {
         hasChildren: false,
-        label: 'acc.tsv',
         parentPath: 'logs',
         path: join('logs', 'acc.tsv'),
         revisions: new Set(revisions),
@@ -79,7 +72,6 @@ describe('collectPath', () => {
       },
       {
         hasChildren: false,
-        label: 'predictions.json',
         parentPath: undefined,
         path: 'predictions.json',
         revisions: new Set(revisions),
@@ -127,7 +119,6 @@ describe('collectPath', () => {
     const mockPath = 'completely:madeup:path'
     const mockPlotPath = {
       hasChildren: false,
-      label: mockPath,
       parentPath: undefined,
       path: mockPath,
       revisions: new Set(['bfc7f64']),
@@ -185,7 +176,6 @@ describe('collectPath', () => {
     expect(collectPaths([], mockPlotsDiff, revisions, {})).toStrictEqual([
       {
         hasChildren: false,
-        label: 'acc.tsv',
         parentPath: join('logs', 'scalars'),
         path: join('logs', 'scalars', 'acc.tsv'),
         revisions: new Set(revisions),
@@ -193,21 +183,18 @@ describe('collectPath', () => {
       },
       {
         hasChildren: true,
-        label: 'scalars',
         parentPath: 'logs',
         path: join('logs', 'scalars'),
         revisions: new Set(revisions)
       },
       {
         hasChildren: true,
-        label: 'logs',
         parentPath: undefined,
         path: 'logs',
         revisions: new Set(revisions)
       },
       {
         hasChildren: false,
-        label: 'loss.tsv',
         parentPath: join('logs', 'scalars'),
         path: join('logs', 'scalars', 'loss.tsv'),
         revisions: new Set(revisions),
@@ -215,7 +202,6 @@ describe('collectPath', () => {
       },
       {
         hasChildren: false,
-        label: 'heatmap.png',
         parentPath: 'plots',
         path: join('plots', 'heatmap.png'),
         revisions: new Set(revisions),
@@ -223,14 +209,12 @@ describe('collectPath', () => {
       },
       {
         hasChildren: true,
-        label: 'plots',
         parentPath: undefined,
         path: 'plots',
         revisions: new Set(revisions)
       },
       {
         hasChildren: false,
-        label: 'predictions.json',
         parentPath: undefined,
         path: 'predictions.json',
         revisions: new Set(revisions),
