@@ -86,9 +86,10 @@ const collectPathMultiSourceVariations = (
 }
 
 export const collectMultiSourceVariations = (
-  data: PlotsOutput,
+  output: PlotsOutput,
   acc: Record<string, Record<string, unknown>[]>
 ) => {
+  const { data } = output
   for (const [path, plots] of Object.entries(data)) {
     collectPathMultiSourceVariations(acc, path, plots)
   }

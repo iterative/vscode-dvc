@@ -451,12 +451,14 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
 })
 
 export const getOutput = (baseUrl: string): PlotsOutput => ({
-  ...getImageData(baseUrl),
-  ...basicVega,
-  ...require('./vega').default
+  data: {
+    ...getImageData(baseUrl),
+    ...basicVega,
+    ...require('./vega').default
+  }
 })
 
-export const getMinimalOutput = (): PlotsOutput => ({ ...basicVega })
+export const getMinimalOutput = (): PlotsOutput => ({ data: { ...basicVega } })
 
 export const getMultiSourceOutput = (): PlotsOutput => ({
   ...require('./multiSource').default

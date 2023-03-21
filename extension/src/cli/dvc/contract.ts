@@ -96,8 +96,19 @@ export interface ExperimentsOutput {
   }
 }
 
-export interface PlotsOutput {
+export interface PlotsData {
   [path: string]: Plot[]
+}
+
+type PlotError = {
+  name: string
+  rev: string
+  source?: string
+} & ErrorContents
+
+export interface PlotsOutput {
+  data: { [path: string]: Plot[] }
+  errors?: PlotError[]
 }
 
 export type PlotsOutputOrError = PlotsOutput | DvcError

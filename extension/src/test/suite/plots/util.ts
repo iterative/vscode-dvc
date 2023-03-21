@@ -23,12 +23,12 @@ import { BaseWorkspaceWebviews } from '../../../webview/workspace'
 import { WebviewMessages } from '../../../plots/webview/messages'
 import { ExperimentsModel } from '../../../experiments/model'
 import { Experiment } from '../../../experiments/webview/contract'
-import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
+import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../../cli/dvc/contract'
 import { isCheckpointPlot } from '../../../plots/model/custom'
 
 export const buildPlots = async (
   disposer: Disposer,
-  plotsDiff = {},
+  plotsDiff: PlotsOutput | undefined = undefined,
   expShow = expShowFixtureWithoutErrors
 ) => {
   const {

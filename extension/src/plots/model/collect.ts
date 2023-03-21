@@ -290,9 +290,10 @@ const collectPathData = (
 }
 
 export const collectData = (
-  data: PlotsOutput,
+  output: PlotsOutput,
   cliIdToLabel: CLIRevisionIdToLabel
 ): DataAccumulator => {
+  const { data } = output
   const acc = {
     comparisonData: {},
     revisionData: {}
@@ -319,7 +320,8 @@ const collectTemplate = (
   acc[path] = template
 }
 
-export const collectTemplates = (data: PlotsOutput): TemplateAccumulator => {
+export const collectTemplates = (output: PlotsOutput): TemplateAccumulator => {
+  const { data } = output
   const acc: TemplateAccumulator = {}
 
   for (const [path, plots] of Object.entries(data)) {

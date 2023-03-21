@@ -30,7 +30,8 @@ import { Experiment } from '../../experiments/webview/contract'
 
 const logsLossPath = join('logs', 'loss.tsv')
 
-const logsLossPlot = (plotsDiffFixture[logsLossPath][0] || {}) as TemplatePlot
+const logsLossPlot = (plotsDiffFixture.data[logsLossPath][0] ||
+  {}) as TemplatePlot
 
 describe('collectCustomPlots', () => {
   const defaultFuncArgs = {
@@ -147,7 +148,7 @@ describe('collectData', () => {
 
     expect(_1ba7bcd_heatmap).toBeDefined()
     expect(_1ba7bcd_heatmap).toStrictEqual(
-      plotsDiffFixture[heatmapPlot].find(({ revisions }) =>
+      plotsDiffFixture.data[heatmapPlot].find(({ revisions }) =>
         sameContents(revisions as string[], ['1ba7bcd'])
       )
     )

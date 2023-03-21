@@ -37,7 +37,7 @@ suite('Plots Paths Tree Test Suite', () => {
     })
 
     it('should be able to toggle whether a plot is selected with dvc.views.plotsPathsTree.toggleStatus', async () => {
-      const [path] = Object.keys(plotsDiffFixture)
+      const [path] = Object.keys(plotsDiffFixture.data)
       const { plots, messageSpy } = await buildPlots(
         disposable,
         plotsDiffFixture
