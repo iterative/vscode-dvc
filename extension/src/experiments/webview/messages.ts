@@ -41,7 +41,7 @@ export class WebviewMessages {
     ...ids: string[]
   ) => Promise<string | undefined>
 
-  private readonly hasStages: () => Promise<string>
+  private readonly hasStages: () => Promise<string | undefined>
 
   private hasConfig = false
   private hasValidDvcYaml = true
