@@ -203,26 +203,23 @@ suite('Experiments Test Suite', () => {
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it.only(
-      'should set hasValidDvcYaml to true if there is an error getting stages and there is no dvc.yaml file',
-      async () => {
-        stub(DvcReader.prototype, 'listStages').resolves(undefined)
-        stub(FileSystem, 'hasDvcYamlFile').returns(false)
+    it('should set hasValidDvcYaml to true if there is an error getting stages and there is no dvc.yaml file', async () => {
+      stub(DvcReader.prototype, 'listStages').resolves(undefined)
+      stub(FileSystem, 'hasDvcYamlFile').returns(false)
 
-        const { experiments, messageSpy } = buildExperiments(
-          disposable,
-          expShowFixture
-        )
+      const { experiments, messageSpy } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
 
-        await experiments.showWebview()
+      await experiments.showWebview()
 
-        const expectedTableData = {
-          hasValidDvcYaml: true
-        }
-
-        expect(messageSpy).to.be.calledWithMatch(expectedTableData)
+      const expectedTableData = {
+        hasValidDvcYaml: true
       }
-    ).timeout(WEBVIEW_TEST_TIMEOUT)
+
+      expect(messageSpy).to.be.calledWithMatch(expectedTableData)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasValidDvcYaml to true if there are no errors getting stages', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('')
