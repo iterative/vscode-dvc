@@ -102,6 +102,7 @@ module.exports = {
     camelcase: 'off',
     curly: ['error', 'all'],
     'etc/no-commented-out-code': 'error',
+    'etc/no-assign-mutated-array': 'error',
     'import/no-unresolved': 'off',
     'import/order': [
       'error',

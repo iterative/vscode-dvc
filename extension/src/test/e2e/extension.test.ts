@@ -190,6 +190,8 @@ describe('Source Control View', function () {
       }
     )
 
-    expect(expectedScmItemLabels.sort()).toStrictEqual(dvcTreeItemLabels.sort())
+    expectedScmItemLabels.sort()
+    dvcTreeItemLabels.sort()
+    expect(expectedScmItemLabels).toStrictEqual(dvcTreeItemLabels)
   })
 })

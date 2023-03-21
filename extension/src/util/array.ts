@@ -59,3 +59,11 @@ export const performSimpleOrderedUpdate = (
   ])
   return [...newOrder]
 }
+
+export const sortCollectedArray = <T>(
+  acc: T[],
+  callback?: (a: T, b: T) => number
+): T[] => {
+  acc.sort(callback)
+  return acc
+}

@@ -1,4 +1,4 @@
-import { copyOriginalColors } from 'dvc/src/experiments/model/status/colors'
+import { copyReverseOriginalColors } from 'dvc/src/experiments/model/status/colors'
 import {
   ExperimentStatus,
   Row,
@@ -60,10 +60,10 @@ export const setExperimentsAsSelected = (
   fixture: TableData,
   labelOrIds: string[]
 ) => {
-  let colors = copyOriginalColors().reverse()
+  let colors = copyReverseOriginalColors()
   const nextColor = () => {
     if (colors.length === 0) {
-      colors = copyOriginalColors().reverse()
+      colors = copyReverseOriginalColors()
     }
     return colors.pop()
   }

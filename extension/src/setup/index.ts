@@ -226,8 +226,8 @@ export class Setup
 
   public async setRoots() {
     const nestedRoots = await this.findWorkspaceDvcRoots()
-    this.dvcRoots =
-      this.config.getFocusedProjects() || nestedRoots.flat().sort()
+    this.dvcRoots = this.config.getFocusedProjects() || nestedRoots.flat()
+    this.dvcRoots.sort()
 
     void this.sendDataToWebview()
     return this.setProjectAvailability()
