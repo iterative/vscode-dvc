@@ -416,8 +416,8 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   private cleanupOutdatedTrendsState() {
-    this.revive(PersistenceKey.PLOT_METRIC_ORDER, undefined)
-    this.revive(PersistenceKey.PLOT_SELECTED_METRICS, undefined)
+    this.persist(PersistenceKey.PLOT_METRIC_ORDER, undefined)
+    this.persist(PersistenceKey.PLOT_SELECTED_METRICS, undefined)
   }
 
   private removeStaleData() {
