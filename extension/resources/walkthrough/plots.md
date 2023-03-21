@@ -66,24 +66,28 @@ templates], which may be predefined (e.g. confusion matrix, linear) or custom
        alt="Plots: Images" />
 </p>
 
-<p align="center">
-  <img src="images/plots-trends.png"
-       alt="Plots: Trends" />
-</p>
-
 **Images** (e.g. `.jpg` or `.svg` files) can be visualized as well. They will be
 rendered side by side for the selected experiments.
+
+<p align="center">
+  <img src="images/plots-custom.png"
+       alt="Plots: Custom" />
+</p>
+
+**Custom** plots are generated linear plots comparing metrics and params. A user
+can add two types of plots, "Checkpoint Trend" and "Metric Vs Param".
+
+"Metric Vs Param" plots compare a chosen metric and param across experiments.
+"Checkpoint Trend" plots can compare a chosen [metric] value per epoch if
+[checkpoints] are enabled.
+
+[metric]: https://dvc.org/doc/command-reference/metrics
+[checkpoints]: https://dvc.org/doc/user-guide/experiment-management/checkpoints
 
 <p align="center">
   <img src="images/plots-view-icon.png"
        alt="Plots View Icon" />
 </p>
-
-Automatically generated and updated **Trends** that show scalar [metrics] value
-per epoch if [checkpoints] are enabled.
-
-[metrics]: https://dvc.org/doc/command-reference/metrics
-[checkpoints]: https://dvc.org/doc/user-guide/experiment-management/checkpoints
 
 The **Plots Dashboard** can be configured and accessed from the _Plots_ and
 _Experiments_ side panels in the [**DVC View**](command:views.dvc-views).

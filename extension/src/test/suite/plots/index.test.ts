@@ -8,8 +8,9 @@ import { commands, Uri } from 'vscode'
 import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import expShowFixtureWithoutErrors from '../../fixtures/expShow/base/noErrors'
-import checkpointPlotsFixture from '../../fixtures/expShow/base/checkpointPlots'
-import customPlotsFixture from '../../fixtures/expShow/base/customPlots'
+import customPlotsFixture, {
+  customPlotsOrderFixture
+} from '../../fixtures/expShow/base/customPlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
 import multiSourcePlotsDiffFixture from '../../fixtures/plotsDiff/multiSource'
 import templatePlotsFixture from '../../fixtures/plotsDiff/template'
@@ -29,7 +30,8 @@ import {
   PlotsData as TPlotsData,
   PlotsSection,
   TemplatePlotGroup,
-  TemplatePlotsData
+  TemplatePlotsData,
+  CustomPlotType
 } from '../../../plots/webview/contract'
 import { TEMP_PLOTS_DIR } from '../../../cli/dvc/constants'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
@@ -43,6 +45,7 @@ import {
 } from '../../../cli/dvc/contract'
 import { SelectedExperimentWithColor } from '../../../experiments/model'
 import * as customPlotQuickPickUtil from '../../../plots/model/quickPick'
+import { CHECKPOINTS_PARAM } from '../../../plots/model/custom'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -69,11 +72,11 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
+        EXPERIMENT_WORKSPACE_ID,
         '1ba7bcd',
         '42b8736',
         '4fb124a',
-        '53c3851',
-        EXPERIMENT_WORKSPACE_ID
+        '53c3851'
       )
       mockPlotsDiff.resetHistory()
 
@@ -132,8 +135,8 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
-        'experim',
-        EXPERIMENT_WORKSPACE_ID
+        EXPERIMENT_WORKSPACE_ID,
+        'experim'
       )
     })
 
@@ -173,8 +176,8 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
-        '9235a02',
-        EXPERIMENT_WORKSPACE_ID
+        EXPERIMENT_WORKSPACE_ID,
+        '9235a02'
       )
     })
 
@@ -191,48 +194,6 @@ suite('Plots Test Suite', () => {
         join(dvcDemoPath, TEMP_PLOTS_DIR)
       )
     })
-
-    it('should handle a set selected metrics message from the webview', async () => {
-      const { plots, plotsModel, messageSpy } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
-
-      const webview = await plots.showWebview()
-
-      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
-
-      const mockSetSelectedMetrics = spy(plotsModel, 'setSelectedMetrics')
-      const mockSelectedMetrics = ['summary.json:loss']
-
-      messageSpy.resetHistory()
-      mockMessageReceived.fire({
-        payload: mockSelectedMetrics,
-        type: MessageFromWebviewType.TOGGLE_METRIC
-      })
-
-      expect(mockSetSelectedMetrics).to.be.calledOnce
-      expect(mockSetSelectedMetrics).to.be.calledWithExactly(
-        mockSelectedMetrics
-      )
-      expect(messageSpy).to.be.calledOnce
-      expect(
-        messageSpy,
-        "should update the webview's checkpoint plot state"
-      ).to.be.calledWithExactly({
-        checkpoint: {
-          ...checkpointPlotsFixture,
-          selectedMetrics: mockSelectedMetrics
-        }
-      })
-      expect(mockSendTelemetryEvent).to.be.calledOnce
-      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_PLOTS_METRICS_SELECTED,
-        undefined,
-        undefined
-      )
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a section resized message from the webview', async () => {
       const { plots, plotsModel } = await buildPlots(disposable)
@@ -282,7 +243,7 @@ suite('Plots Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockSetSectionCollapsed = spy(plotsModel, 'setSectionCollapsed')
-      const mockSectionCollapsed = { [PlotsSection.CHECKPOINT_PLOTS]: true }
+      const mockSectionCollapsed = { [PlotsSection.CUSTOM_PLOTS]: true }
 
       messageSpy.resetHistory()
       mockMessageReceived.fire({
@@ -467,55 +428,6 @@ suite('Plots Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle a metric reordered message from the webview', async () => {
-      const { plots, plotsModel, messageSpy } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
-
-      const webview = await plots.showWebview()
-
-      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
-
-      const mockSetMetricOrder = spy(plotsModel, 'setMetricOrder')
-      const mockMetricOrder = [
-        'summary.json:loss',
-        'summary.json:accuracy',
-        'summary.json:val_loss',
-        'summary.json:val_accuracy'
-      ]
-
-      messageSpy.resetHistory()
-      mockMessageReceived.fire({
-        payload: mockMetricOrder,
-        type: MessageFromWebviewType.REORDER_PLOTS_METRICS
-      })
-
-      expect(mockSetMetricOrder).to.be.calledOnce
-      expect(mockSetMetricOrder).to.be.calledWithExactly(mockMetricOrder)
-      expect(messageSpy).to.be.calledOnce
-      expect(
-        messageSpy,
-        "should update the webview's checkpoint plot order state"
-      ).to.be.calledWithExactly({
-        checkpoint: {
-          ...checkpointPlotsFixture,
-          plots: reorderObjectList(
-            mockMetricOrder,
-            checkpointPlotsFixture.plots,
-            'title'
-          )
-        }
-      })
-      expect(mockSendTelemetryEvent).to.be.calledOnce
-      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_REORDER_PLOTS_METRICS,
-        undefined,
-        undefined
-      )
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
     it('should handle a plot zoomed message from the webview', async () => {
       const { plots } = await buildPlots(disposable, plotsDiffFixture)
 
@@ -587,8 +499,8 @@ suite('Plots Test Suite', () => {
       const webview = await plots.showWebview()
 
       const mockNewCustomPlotsOrder = [
-        'custom-metrics:summary.json:accuracy-params:params.yaml:epochs',
-        'custom-metrics:summary.json:loss-params:params.yaml:dropout'
+        'custom-summary.json:accuracy-params.yaml:epochs',
+        'custom-summary.json:loss-params.yaml:dropout'
       ]
 
       stub(plotsModel, 'getCustomPlots')
@@ -610,12 +522,14 @@ suite('Plots Test Suite', () => {
       expect(mockSetCustomPlotsOrder).to.be.calledOnce
       expect(mockSetCustomPlotsOrder).to.be.calledWithExactly([
         {
-          metric: 'metrics:summary.json:accuracy',
-          param: 'params:params.yaml:epochs'
+          metric: 'summary.json:accuracy',
+          param: 'params.yaml:epochs',
+          type: CustomPlotType.METRIC_VS_PARAM
         },
         {
-          metric: 'metrics:summary.json:loss',
-          param: 'params:params.yaml:dropout'
+          metric: 'summary.json:loss',
+          param: 'params.yaml:dropout',
+          type: CustomPlotType.METRIC_VS_PARAM
         }
       ])
       expect(messageSpy).to.be.calledOnce
@@ -716,8 +630,8 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.called
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
-        '53c3851',
-        EXPERIMENT_WORKSPACE_ID
+        EXPERIMENT_WORKSPACE_ID,
+        '53c3851'
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -759,11 +673,11 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.called
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
+        EXPERIMENT_WORKSPACE_ID,
         '1ba7bcd',
         '42b8736',
         '4fb124a',
-        '53c3851',
-        EXPERIMENT_WORKSPACE_ID
+        '53c3851'
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -779,21 +693,18 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.called
 
       const {
-        checkpoint: checkpointData,
         comparison: comparisonData,
         sectionCollapsed,
         template: templateData
       } = getFirstArgOfLastCall(messageSpy)
 
-      expect(checkpointData).to.deep.equal(checkpointPlotsFixture)
       expect(comparisonData).to.deep.equal(comparisonPlotsFixture)
       expect(sectionCollapsed).to.deep.equal(DEFAULT_SECTION_COLLAPSED)
       expect(templateData).to.deep.equal(templatePlotsFixture)
 
       const expectedPlotsData: TPlotsData = {
-        checkpoint: checkpointPlotsFixture,
         comparison: comparisonPlotsFixture,
-        custom: { height: DEFAULT_PLOT_HEIGHT, nbItemsPerRow: 2, plots: [] },
+        custom: customPlotsFixture,
         hasPlots: true,
         hasUnselectedPlots: false,
         sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
@@ -882,7 +793,9 @@ suite('Plots Test Suite', () => {
       expect(confusionMatrixDatapoints.length).to.be.greaterThan(0)
 
       expect(confusionMatrix.revisions?.length).to.equal(4)
-      expect(confusionMatrix.revisions?.sort()).to.deep.equal(expectedRevisions)
+      expect([...(confusionMatrix.revisions || [])].sort()).to.deep.equal(
+        expectedRevisions
+      )
 
       for (const entry of confusionMatrixDatapoints) {
         expect(expectedRevisions).to.include(entry.rev)
@@ -927,17 +840,36 @@ suite('Plots Test Suite', () => {
 
       const webview = await plots.showWebview()
 
+      const mockPickCustomPlotType = stub(
+        customPlotQuickPickUtil,
+        'pickCustomPlotType'
+      )
       const mockGetMetricAndParam = stub(
         customPlotQuickPickUtil,
         'pickMetricAndParam'
       )
+      const mockGetMetric = stub(customPlotQuickPickUtil, 'pickMetric')
 
-      const quickPickEvent = new Promise(resolve =>
-        mockGetMetricAndParam.callsFake(() => {
+      const mockMetricVsParamOrderValue = {
+        metric: 'summary.json:accuracy',
+        param: 'params.yaml:dropout',
+        type: CustomPlotType.METRIC_VS_PARAM
+      }
+
+      const pickMetricVsParamType = new Promise(resolve =>
+        mockPickCustomPlotType.onFirstCall().callsFake(() => {
+          resolve(undefined)
+
+          return Promise.resolve(CustomPlotType.METRIC_VS_PARAM)
+        })
+      )
+
+      const pickMetricVsParamOptions = new Promise(resolve =>
+        mockGetMetricAndParam.onFirstCall().callsFake(() => {
           resolve(undefined)
           return Promise.resolve({
-            metric: 'metrics:summary.json:loss',
-            param: 'params:params.yaml:dropout'
+            metric: mockMetricVsParamOrderValue.metric,
+            param: mockMetricVsParamOrderValue.param
           })
         })
       )
@@ -950,18 +882,138 @@ suite('Plots Test Suite', () => {
 
       mockMessageReceived.fire({ type: MessageFromWebviewType.ADD_CUSTOM_PLOT })
 
-      await quickPickEvent
+      await pickMetricVsParamType
+      await pickMetricVsParamOptions
 
       expect(mockSetCustomPlotsOrder).to.be.calledWith([
-        {
-          metric: 'metrics:summary.json:loss',
-          param: 'params:params.yaml:dropout'
-        }
+        ...customPlotsOrderFixture,
+        mockMetricVsParamOrderValue
       ])
       expect(mockSendTelemetryEvent).to.be.calledWith(
         EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED,
         undefined
       )
+
+      const mockCheckpointsOrderValue = {
+        metric: 'summary.json:val_loss',
+        param: CHECKPOINTS_PARAM,
+        type: CustomPlotType.CHECKPOINT
+      }
+
+      const pickCheckpointsType = new Promise(resolve =>
+        mockPickCustomPlotType.onSecondCall().callsFake(() => {
+          resolve(undefined)
+
+          return Promise.resolve(CustomPlotType.CHECKPOINT)
+        })
+      )
+
+      const pickCheckpointOption = new Promise(resolve =>
+        mockGetMetric.onFirstCall().callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(mockCheckpointsOrderValue.metric)
+        })
+      )
+
+      mockMessageReceived.fire({ type: MessageFromWebviewType.ADD_CUSTOM_PLOT })
+
+      await pickCheckpointsType
+      await pickCheckpointOption
+
+      expect(mockSetCustomPlotsOrder).to.be.calledWith([
+        ...customPlotsOrderFixture,
+        mockCheckpointsOrderValue
+      ])
+      expect(mockSendTelemetryEvent).to.be.calledWith(
+        EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED,
+        undefined
+      )
+    })
+
+    it('should handle a add custom plot message when user ends early', async () => {
+      const { plots, plotsModel } = await buildPlots(
+        disposable,
+        plotsDiffFixture
+      )
+
+      const webview = await plots.showWebview()
+
+      const mockPickCustomPlotType = stub(
+        customPlotQuickPickUtil,
+        'pickCustomPlotType'
+      )
+
+      const mockGetMetricAndParam = stub(
+        customPlotQuickPickUtil,
+        'pickMetricAndParam'
+      )
+      const mockGetMetric = stub(customPlotQuickPickUtil, 'pickMetric')
+
+      const pickUndefinedType = new Promise(resolve =>
+        mockPickCustomPlotType.onFirstCall().callsFake(() => {
+          resolve(undefined)
+
+          return Promise.resolve(undefined)
+        })
+      )
+
+      const mockSetCustomPlotsOrder = stub(plotsModel, 'setCustomPlotsOrder')
+      mockSetCustomPlotsOrder.returns(undefined)
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({ type: MessageFromWebviewType.ADD_CUSTOM_PLOT })
+
+      await pickUndefinedType
+
+      expect(mockSetCustomPlotsOrder).to.not.be.called
+      expect(mockSendTelemetryEvent).to.not.be.called
+
+      const pickMetricVsParamType = new Promise(resolve =>
+        mockPickCustomPlotType.onSecondCall().callsFake(() => {
+          resolve(undefined)
+
+          return Promise.resolve(CustomPlotType.METRIC_VS_PARAM)
+        })
+      )
+
+      const pickMetricVsParamUndefOptions = new Promise(resolve =>
+        mockGetMetricAndParam.onFirstCall().callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      )
+
+      mockMessageReceived.fire({ type: MessageFromWebviewType.ADD_CUSTOM_PLOT })
+
+      await pickMetricVsParamType
+      await pickMetricVsParamUndefOptions
+
+      expect(mockSetCustomPlotsOrder).to.not.be.called
+      expect(mockSendTelemetryEvent).to.not.be.called
+
+      const pickCheckpointType = new Promise(resolve =>
+        mockPickCustomPlotType.onThirdCall().callsFake(() => {
+          resolve(undefined)
+
+          return Promise.resolve(CustomPlotType.CHECKPOINT)
+        })
+      )
+      const pickCheckpointUndefOptions = new Promise(resolve =>
+        mockGetMetric.onFirstCall().callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      )
+
+      mockMessageReceived.fire({ type: MessageFromWebviewType.ADD_CUSTOM_PLOT })
+
+      await pickCheckpointType
+      await pickCheckpointUndefOptions
+
+      expect(mockSetCustomPlotsOrder).to.not.be.called
+      expect(mockSendTelemetryEvent).to.not.be.called
     })
 
     it('should handle a remove custom plot message from the webview', async () => {
@@ -981,15 +1033,16 @@ suite('Plots Test Suite', () => {
         mockSelectCustomPlots.callsFake(() => {
           resolve(undefined)
           return Promise.resolve([
-            'custom-metrics:summary.json:loss-params:params.yaml:dropout'
+            'custom-summary.json:loss-params.yaml:dropout'
           ])
         })
       )
 
       stub(plotsModel, 'getCustomPlotsOrder').returns([
         {
-          metric: 'metrics:summary.json:loss',
-          param: 'params:params.yaml:dropout'
+          metric: 'summary.json:loss',
+          param: 'params.yaml:dropout',
+          type: CustomPlotType.METRIC_VS_PARAM
         }
       ])
 
@@ -1010,6 +1063,50 @@ suite('Plots Test Suite', () => {
         EventName.VIEWS_PLOTS_CUSTOM_PLOT_REMOVED,
         undefined
       )
+    })
+
+    it('should handle a remove custom plot message from the webview when user ends early', async () => {
+      const { plots, plotsModel } = await buildPlots(
+        disposable,
+        plotsDiffFixture
+      )
+
+      const webview = await plots.showWebview()
+
+      const mockSelectCustomPlots = stub(
+        customPlotQuickPickUtil,
+        'pickCustomPlots'
+      )
+
+      const quickPickEvent = new Promise(resolve =>
+        mockSelectCustomPlots.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      )
+
+      stub(plotsModel, 'getCustomPlotsOrder').returns([
+        {
+          metric: 'summary.json:loss',
+          param: 'params.yaml:dropout',
+          type: CustomPlotType.METRIC_VS_PARAM
+        }
+      ])
+
+      const mockSetCustomPlotsOrder = stub(plotsModel, 'setCustomPlotsOrder')
+      mockSetCustomPlotsOrder.returns(undefined)
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.REMOVE_CUSTOM_PLOTS
+      })
+
+      await quickPickEvent
+
+      expect(mockSetCustomPlotsOrder).to.not.be.called
+      expect(mockSendTelemetryEvent).to.not.be.called
     })
   })
 })

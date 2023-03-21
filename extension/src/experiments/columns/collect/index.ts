@@ -15,6 +15,7 @@ import {
 } from '../../../cli/dvc/contract'
 import { standardizePath } from '../../../fileSystem/path'
 import { timestampColumn } from '../constants'
+import { sortCollectedArray } from '../../../util/array'
 
 const collectFromExperiment = (
   acc: ColumnAccumulator,
@@ -72,7 +73,7 @@ export const collectChanges = (data: ExperimentsOutput): string[] => {
   collectMetricAndParamChanges(changes, workspace, currentCommit)
   collectDepChanges(changes, workspace, currentCommit)
 
-  return changes.sort()
+  return sortCollectedArray(changes)
 }
 
 export const collectParamsFiles = (

@@ -10,8 +10,9 @@ import {
 import { getMarkdownString } from '../vscode/markdownString'
 
 export enum DecoratableTreeItemScheme {
-  TRACKED = 'dvc.tracked',
-  EXPERIMENTS = 'dvc.experiments'
+  EXPERIMENTS = 'dvc.experiments',
+  PLOTS = 'dvc.plots',
+  TRACKED = 'dvc.tracked'
 }
 
 export const getDecoratableUri = (

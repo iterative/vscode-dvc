@@ -99,18 +99,16 @@ const symbolScopeAt = (
       }
     }
   })
-  const symbolStack = (symbolsFound.filter(Boolean) as DocumentSymbol[]).sort(
-    (a, b) => {
-      const offA =
-        textDocument.offsetAt(a.range.end) -
-        textDocument.offsetAt(a.range.start)
-      const offB =
-        textDocument.offsetAt(b.range.end) -
-        textDocument.offsetAt(b.range.start)
+  const symbolStack = [
+    ...(symbolsFound.filter(Boolean) as DocumentSymbol[])
+  ].sort((a, b) => {
+    const offA =
+      textDocument.offsetAt(a.range.end) - textDocument.offsetAt(a.range.start)
+    const offB =
+      textDocument.offsetAt(b.range.end) - textDocument.offsetAt(b.range.start)
 
-      return offB - offA // We want the tighter fits for last, so we can just pop them
-    }
-  )
+    return offB - offA // We want the tighter fits for last, so we can just pop them
+  })
 
   return [...symbolStack]
 }

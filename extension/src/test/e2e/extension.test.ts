@@ -125,7 +125,7 @@ describe('Plots Webview', function () {
 
     await browser.waitUntil(
       async () => {
-        return (await webview.vegaVisualization$$.length) === 10
+        return (await webview.vegaVisualization$$.length) === 5
       },
       { timeout: 30000 }
     )
@@ -190,6 +190,8 @@ describe('Source Control View', function () {
       }
     )
 
-    expect(expectedScmItemLabels.sort()).toStrictEqual(dvcTreeItemLabels.sort())
+    expectedScmItemLabels.sort()
+    dvcTreeItemLabels.sort()
+    expect(expectedScmItemLabels).toStrictEqual(dvcTreeItemLabels)
   })
 })

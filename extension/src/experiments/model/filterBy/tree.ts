@@ -13,7 +13,11 @@ import { RegisteredCommands } from '../../../commands/external'
 import { InternalCommands } from '../../../commands/internal'
 import { sendViewOpenedTelemetryEvent } from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
-import { definedAndNonEmpty, joinTruthyItems } from '../../../util/array'
+import {
+  definedAndNonEmpty,
+  joinTruthyItems,
+  sortCollectedArray
+} from '../../../util/array'
 import { createTreeView, getRootItem } from '../../../tree'
 import { Disposable } from '../../../class/dispose'
 
@@ -113,7 +117,7 @@ export class ExperimentsFilterByTree
         return this.getChildren(onlyRepo)
       }
 
-      return dvcRoots.sort((a, b) => a.localeCompare(b))
+      return sortCollectedArray(dvcRoots, (a, b) => a.localeCompare(b))
     }
 
     return []

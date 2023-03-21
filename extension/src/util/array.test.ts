@@ -127,4 +127,13 @@ describe('sameContents', () => {
     const otherArray = [1, 2, undefined]
     expect(sameContents(array, otherArray)).toBe(false)
   })
+
+  it('should not sort the contents of the original arrays', () => {
+    const array = [1, 2, 3, 4, 5, 6, 7, 8]
+    const otherArray = [8, 7, 6, 5, 4, 3, 2, 1]
+    const otherArrayCopy = [...otherArray]
+    sameContents(array, otherArray)
+
+    expect(otherArray).toStrictEqual(otherArrayCopy)
+  })
 })

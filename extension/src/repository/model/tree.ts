@@ -209,7 +209,7 @@ export class RepositoriesTree
   }
 
   private sortDirectory(contents: PathItem[]) {
-    return contents.sort((a, b) => {
+    return [...contents].sort((a, b) => {
       const aIsDirectory = a.isDirectory
       if (aIsDirectory === b.isDirectory) {
         return a.resourceUri.fsPath.localeCompare(b.resourceUri.fsPath)
@@ -302,7 +302,10 @@ export class RepositoriesTree
           )
         }
 
-        const args = [dvcRoot, ...uniqueValues(tracked).sort()]
+        const uniqueTracked = uniqueValues(tracked)
+        uniqueTracked.sort()
+
+        const args = [dvcRoot, ...uniqueTracked]
 
         await tryThenMaybeForce(this.internalCommands, commandId, ...args)
       }

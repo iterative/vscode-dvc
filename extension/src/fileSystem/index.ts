@@ -12,7 +12,7 @@ import {
 import { load } from 'js-yaml'
 import { Uri, workspace, window, commands, ViewColumn } from 'vscode'
 import { standardizePath } from './path'
-import { definedAndNonEmpty } from '../util/array'
+import { definedAndNonEmpty, sortCollectedArray } from '../util/array'
 import { Logger } from '../common/logger'
 import { gitPath } from '../cli/git/constants'
 import { createValidInteger } from '../util/number'
@@ -66,7 +66,8 @@ export const findDvcRootPaths = async (cwd: string): Promise<string[]> => {
   if (definedAndNonEmpty(subRoots)) {
     dvcRoots.push(...subRoots)
   }
-  return dvcRoots.sort()
+
+  return sortCollectedArray(dvcRoots)
 }
 
 export const findAbsoluteDvcRootPath = async (

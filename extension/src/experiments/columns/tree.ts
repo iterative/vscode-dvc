@@ -1,3 +1,4 @@
+import { TreeItem } from 'vscode'
 import {
   BasePathSelectionTree,
   PathSelectionItem
@@ -30,14 +31,21 @@ export class ExperimentsColumnsTree extends BasePathSelectionTree<WorkspaceExper
     )
   }
 
-  public getRepositoryChildren(dvcRoot: string, path: string) {
+  protected getBaseTreeItem({
+    label,
+    collapsibleState
+  }: PathSelectionItem & { label: string }) {
+    return new TreeItem(label, collapsibleState)
+  }
+
+  protected getRepositoryChildren(dvcRoot: string, path: string) {
     return this.workspace
       .getRepository(dvcRoot)
       .getChildColumns(path)
       .map(element => this.transformElement({ ...element, dvcRoot }))
   }
 
-  public getRepositoryStatuses(dvcRoot: string) {
+  protected getRepositoryStatuses(dvcRoot: string) {
     return this.workspace.getRepository(dvcRoot).getColumnsStatuses()
   }
 }
