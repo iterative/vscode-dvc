@@ -46,14 +46,16 @@ describe('plotsModel', () => {
     jest.clearAllMocks()
   })
 
-  it('should update outdated custom state', () => {
+  it('should update outdated custom and trends state', () => {
     memento = buildMockMemento({
       [PersistenceKey.PLOTS_CUSTOM_ORDER + exampleDvcRoot]: [
         {
           metric: 'metrics:summary.json:loss',
           param: 'params:params.yaml:dropout'
         }
-      ]
+      ],
+      [PersistenceKey.PLOT_SELECTED_METRICS + exampleDvcRoot]: ['string'],
+      [PersistenceKey.PLOT_METRIC_ORDER + exampleDvcRoot]: ['string']
     })
     model = new PlotsModel(
       exampleDvcRoot,
@@ -71,6 +73,12 @@ describe('plotsModel', () => {
         type: CustomPlotType.METRIC_VS_PARAM
       }
     ])
+    expect(
+      memento.get(PersistenceKey.PLOT_SELECTED_METRICS + exampleDvcRoot)
+    ).toStrictEqual(undefined)
+    expect(
+      memento.get(PersistenceKey.PLOT_METRIC_ORDER + exampleDvcRoot)
+    ).toStrictEqual(undefined)
   })
 
   it('should change the plotSize when calling setPlotSize', () => {
