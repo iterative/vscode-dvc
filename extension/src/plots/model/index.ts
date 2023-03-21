@@ -403,12 +403,13 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   private cleanupOutdatedCustomPlotsState() {
+    const order = this.getCustomPlotsOrder()
     const workspaceHoldsUpToDateState =
-      this.customPlotsOrder[0].type !== undefined
+      order.length === 0 || order[0].type !== undefined
     if (workspaceHoldsUpToDateState) {
       return
     }
-    const newOrder = this.customPlotsOrder.map(value =>
+    const newOrder = order.map(value =>
       cleanupOldOrderValue(value, FILE_SEPARATOR)
     )
     this.setCustomPlotsOrder(newOrder)
