@@ -11,7 +11,7 @@ export const AddPlots: React.FC<AddPlotsProps> = ({
   hasUnselectedPlots
 }: AddPlotsProps) => (
   <div>
-    <p>No Plots to Display.</p>
+    <p>There are no selected plots or experiments.</p>
     <div>
       <StartButton
         onClick={() =>

@@ -333,14 +333,14 @@ describe('App', () => {
     })
   })
 
-  it('should render an empty state given a message with only custom plots data', () => {
+  it('should render get started along with custom plots given a message with only custom plots data', () => {
     renderAppWithOptionalData({
       custom: customPlotsFixture
     })
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
     const addExperimentsButton = screen.queryByText('Add Experiments')
-
+    expect(screen.getByText('Custom')).toBeInTheDocument()
     expect(addExperimentsButton).toBeInTheDocument()
   })
 
@@ -357,7 +357,6 @@ describe('App', () => {
 
   it('should render custom with "No Plots Added" message when there are no plots added', () => {
     renderAppWithOptionalData({
-      comparison: comparisonTableFixture,
       custom: {
         ...customPlotsFixture,
         plots: []
@@ -365,8 +364,8 @@ describe('App', () => {
     })
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
+    expect(screen.queryByText('No Plots to Display')).not.toBeInTheDocument()
     expect(screen.getByText('Custom')).toBeInTheDocument()
-    expect(screen.getByText('No Plots to Display')).toBeInTheDocument()
     expect(screen.getByText('No Plots Added')).toBeInTheDocument()
   })
 
@@ -403,24 +402,18 @@ describe('App', () => {
     expect(emptyState).toBeInTheDocument()
   })
 
-  it('should remove custom plots given a message showing custom plots as null', async () => {
-    const emptyStateText = 'No Plots to Display'
-
+  it('should remove custom plots given a message showing custom plots as null', () => {
     renderAppWithOptionalData({
-      comparison: comparisonTableFixture,
-      custom: customPlotsFixture,
-      template: templatePlotsFixture
+      custom: customPlotsFixture
     })
 
-    expect(screen.queryByText(emptyStateText)).not.toBeInTheDocument()
+    expect(screen.getByText('Custom')).toBeInTheDocument()
 
     sendSetDataMessage({
       custom: null
     })
 
-    const emptyState = await screen.findByText(emptyStateText)
-
-    expect(emptyState).toBeInTheDocument()
+    expect(screen.queryByText('Custom')).not.toBeInTheDocument()
   })
 
   it('should remove all sections from the document if there is no data provided', () => {
@@ -439,7 +432,6 @@ describe('App', () => {
 
   it('should toggle the custom plots section in state when its header is clicked', async () => {
     renderAppWithOptionalData({
-      comparison: comparisonTableFixture,
       custom: customPlotsFixture
     })
 
@@ -474,7 +466,6 @@ describe('App', () => {
 
   it('should not toggle the custom plots section when its header is clicked and its title is selected', async () => {
     renderAppWithOptionalData({
-      comparison: comparisonTableFixture,
       custom: customPlotsFixture
     })
 
@@ -541,7 +532,6 @@ describe('App', () => {
 
   it('should not toggle the custom plots section when its header is clicked and the content of its tooltip is selected', async () => {
     renderAppWithOptionalData({
-      comparison: comparisonTableFixture,
       custom: customPlotsFixture
     })
 
@@ -575,12 +565,11 @@ describe('App', () => {
 
   it('should display a slider to pick the number of items per row if there are items and the action is available', () => {
     const store = renderAppWithOptionalData({
-      comparison: comparisonTableFixture,
       custom: customPlotsFixture
     })
     setWrapperSize(store)
 
-    expect(screen.getAllByTestId('size-sliders')[1]).toBeInTheDocument()
+    expect(screen.getByTestId('size-sliders')).toBeInTheDocument()
   })
 
   it('should not display a slider to pick the number of items per row if there are no items', () => {
@@ -592,7 +581,6 @@ describe('App', () => {
 
   it('should not display a slider to pick the number of items per row if the only width available for one item per row or less', () => {
     const store = renderAppWithOptionalData({
-      comparison: comparisonTableFixture,
       custom: customPlotsFixture
     })
     setWrapperSize(store, 400)
@@ -615,13 +603,12 @@ describe('App', () => {
 
   it('should display both size sliders for custom plots', () => {
     const store = renderAppWithOptionalData({
-      custom: customPlotsFixture,
-      template: templatePlotsFixture
+      custom: customPlotsFixture
     })
     setWrapperSize(store)
 
     const plotResizers = within(
-      screen.getAllByTestId('size-sliders')[1]
+      screen.getByTestId('size-sliders')
     ).getAllByRole('slider')
 
     expect(plotResizers.length).toBe(2)
@@ -642,14 +629,13 @@ describe('App', () => {
 
   it('should send a message to the extension with the selected size when changing the width of plots', () => {
     const store = renderAppWithOptionalData({
-      comparison: comparisonTableFixture,
       custom: customPlotsFixture
     })
     setWrapperSize(store)
 
-    const plotResizer = within(
-      screen.getAllByTestId('size-sliders')[1]
-    ).getAllByRole('slider')[0]
+    const plotResizer = within(screen.getByTestId('size-sliders')).getAllByRole(
+      'slider'
+    )[0]
 
     fireEvent.change(plotResizer, { target: { value: -3 } })
     expect(mockPostMessage).toHaveBeenCalledWith({
@@ -664,14 +650,13 @@ describe('App', () => {
 
   it('should send a message to the extension with the selected size when changing the height of plots', () => {
     const store = renderAppWithOptionalData({
-      comparison: comparisonTableFixture,
       custom: customPlotsFixture
     })
     setWrapperSize(store)
 
-    const plotResizer = within(
-      screen.getAllByTestId('size-sliders')[1]
-    ).getAllByRole('slider')[1]
+    const plotResizer = within(screen.getByTestId('size-sliders')).getAllByRole(
+      'slider'
+    )[1]
 
     fireEvent.change(plotResizer, { target: { value: 3 } })
     expect(mockPostMessage).toHaveBeenCalledWith({
@@ -713,7 +698,6 @@ describe('App', () => {
 
   it('should send a message to the extension when the custom plots are reordered', () => {
     renderAppWithOptionalData({
-      comparison: comparisonTableFixture,
       custom: customPlotsFixture
     })
 
@@ -748,7 +732,6 @@ describe('App', () => {
 
   it('should add a custom plot if a user creates a custom plot', () => {
     renderAppWithOptionalData({
-      comparison: comparisonTableFixture,
       custom: {
         ...customPlotsFixture,
         plots: customPlotsFixture.plots.slice(0, 3)
@@ -779,7 +762,6 @@ describe('App', () => {
 
   it('should remove a custom plot if a user deletes a custom plot', () => {
     renderAppWithOptionalData({
-      comparison: comparisonTableFixture,
       custom: customPlotsFixture
     })
 
@@ -1293,7 +1275,6 @@ describe('App', () => {
 
   it('should open a modal with the plot zoomed in when clicking a custom plot', () => {
     renderAppWithOptionalData({
-      comparison: comparisonTableFixture,
       custom: customPlotsFixture
     })
 
@@ -1430,7 +1411,7 @@ describe('App', () => {
     describe('Large plots', () => {
       it('should  wrap the custom plots in a big grid (virtualize them) when there are more than eight large plots', async () => {
         await renderAppAndChangeSize(
-          { comparison: comparisonTableFixture, custom: createCustomPlots(9) },
+          { custom: createCustomPlots(9) },
           1,
           PlotsSection.CUSTOM_PLOTS
         )
@@ -1448,7 +1429,7 @@ describe('App', () => {
 
       it('should not wrap the custom plots in a big grid (virtualize them) when there are eight or fewer large plots', async () => {
         await renderAppAndChangeSize(
-          { comparison: comparisonTableFixture, custom: createCustomPlots(8) },
+          { custom: createCustomPlots(8) },
           1,
           PlotsSection.CUSTOM_PLOTS
         )
@@ -1557,7 +1538,7 @@ describe('App', () => {
     describe('Regular plots', () => {
       it('should  wrap the custom plots in a big grid (virtualize them) when there are more than fourteen regular plots', async () => {
         await renderAppAndChangeSize(
-          { comparison: comparisonTableFixture, custom: createCustomPlots(15) },
+          { custom: createCustomPlots(15) },
           DEFAULT_NB_ITEMS_PER_ROW,
           PlotsSection.CUSTOM_PLOTS
         )
@@ -1567,7 +1548,7 @@ describe('App', () => {
 
       it('should not wrap the custom plots in a big grid (virtualize them) when there are fourteen regular plots', async () => {
         await renderAppAndChangeSize(
-          { comparison: comparisonTableFixture, custom: createCustomPlots(14) },
+          { custom: createCustomPlots(14) },
           DEFAULT_NB_ITEMS_PER_ROW,
           PlotsSection.CUSTOM_PLOTS
         )
@@ -1654,7 +1635,7 @@ describe('App', () => {
     describe('Smaller plots', () => {
       it('should  wrap the custom plots in a big grid (virtualize them) when there are more than twenty small plots', async () => {
         await renderAppAndChangeSize(
-          { comparison: comparisonTableFixture, custom: createCustomPlots(21) },
+          { custom: createCustomPlots(21) },
           4,
           PlotsSection.CUSTOM_PLOTS
         )
@@ -1664,7 +1645,7 @@ describe('App', () => {
 
       it('should not wrap the custom plots in a big grid (virtualize them) when there are twenty or fewer small plots', async () => {
         await renderAppAndChangeSize(
-          { comparison: comparisonTableFixture, custom: createCustomPlots(20) },
+          { custom: createCustomPlots(20) },
           4,
           PlotsSection.CUSTOM_PLOTS
         )

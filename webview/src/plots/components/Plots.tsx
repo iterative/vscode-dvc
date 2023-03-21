@@ -7,6 +7,7 @@ import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
 import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper'
 import { Ribbon } from './ribbon/Ribbon'
 import { setMaxNbPlotsPerRow, setZoomedInPlot } from './webviewSlice'
+import styles from './styles.module.scss'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Modal } from '../../shared/components/modal/Modal'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
@@ -24,6 +25,7 @@ const PlotsContent = () => {
   const hasTemplateData = useSelector(
     (state: PlotsState) => state.template.hasData
   )
+  const hasCustomData = useSelector((state: PlotsState) => state.custom.hasData)
   const wrapperRef = createRef<HTMLDivElement>()
 
   useLayoutEffect(() => {
@@ -49,11 +51,15 @@ const PlotsContent = () => {
 
   if (!hasComparisonData && !hasTemplateData) {
     return (
-      <GetStarted
-        addItems={<AddPlots hasUnselectedPlots={hasUnselectedPlots} />}
-        showEmpty={!hasPlots}
-        welcome={<Welcome />}
-      />
+      <div className={styles.getStartedWrapper}>
+        <GetStarted
+          addItems={<AddPlots hasUnselectedPlots={hasUnselectedPlots} />}
+          showEmpty={!hasPlots}
+          welcome={<Welcome />}
+          isFullScreen={!hasCustomData}
+        />
+        {hasCustomData && <CustomPlotsWrapper />}
+      </div>
     )
   }
 
