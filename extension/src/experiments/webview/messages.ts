@@ -24,6 +24,7 @@ import { ConfigKey, setConfigValue } from '../../vscode/config'
 import { Toast } from '../../vscode/toast'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { stopWorkspaceExperiment } from '../processExecution'
+import { hasDvcYamlFile } from '../../fileSystem'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
@@ -40,7 +41,7 @@ export class WebviewMessages {
     ...ids: string[]
   ) => Promise<string | undefined>
 
-  private readonly hasStages: () => Promise<string>
+  private readonly hasStages: () => Promise<string | undefined>
 
   private hasConfig = false
   private hasValidDvcYaml = true
@@ -77,7 +78,7 @@ export class WebviewMessages {
 
   public async changeHasConfig(update?: boolean) {
     const stages = await this.hasStages()
-    this.hasValidDvcYaml = stages !== undefined
+    this.hasValidDvcYaml = !hasDvcYamlFile(this.dvcRoot) || stages !== undefined
     this.hasConfig = !!stages
     update && this.sendWebviewMessage()
   }

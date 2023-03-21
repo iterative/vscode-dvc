@@ -147,6 +147,8 @@ export const openImageFileInEditor = async (imagePath: string) =>
     viewColumn: ViewColumn.Beside
   })
 
+export const hasDvcYamlFile = (cwd: string) => existsSync(`${cwd}/dvc.yaml`)
+
 export const findOrCreateDvcYamlFile = (
   cwd: string,
   trainingScript: string,
