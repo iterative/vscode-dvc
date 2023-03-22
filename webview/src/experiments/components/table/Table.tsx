@@ -14,6 +14,7 @@ import { InstanceProp, RowProp } from './interfaces'
 import { RowSelectionContext } from './RowSelectionContext'
 import { TableBody } from './TableBody'
 import { Indicators } from './Indicators'
+import { ShowMoreCommitsRow } from './ShowMoreCommitsRow'
 import { ExperimentsState } from '../../store'
 import { getSelectedForPlotsCount } from '../../util/rows'
 
@@ -104,10 +105,10 @@ export const Table: React.FC<TableProps> = ({
             hasRunningExperiment={hasRunningExperiment}
             projectHasCheckpoints={hasCheckpoints}
             batchRowSelection={batchRowSelection}
-            numRows={rows.length}
           />
         ))}
       </table>
+      <ShowMoreCommitsRow />
       <Indicators selectedForPlotsCount={selectedForPlotsCount} />
     </div>
   )
