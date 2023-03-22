@@ -17,6 +17,7 @@ import {
   updateHasCheckpoints,
   updateHasColumns,
   updateHasConfig,
+  updateHasMoreCommits,
   updateHasRunningExperiment,
   updateHasValidDvcYaml,
   updateRows,
@@ -61,6 +62,9 @@ export const App: React.FC<Record<string, unknown>> = () => {
                 continue
               case 'hasConfig':
                 dispatch(updateHasConfig(data.data.hasConfig))
+                continue
+              case 'hasMoreCommits':
+                dispatch(updateHasMoreCommits(data.data.hasMoreCommits))
                 continue
               case 'hasRunningExperiment':
                 dispatch(

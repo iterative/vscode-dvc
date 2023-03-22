@@ -104,6 +104,7 @@ export const Table: React.FC<TableProps> = ({
             hasRunningExperiment={hasRunningExperiment}
             projectHasCheckpoints={hasCheckpoints}
             batchRowSelection={batchRowSelection}
+            numRows={rows.length}
           />
         ))}
       </table>

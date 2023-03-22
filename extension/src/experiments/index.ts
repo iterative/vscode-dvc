@@ -43,7 +43,11 @@ import { pickPaths } from '../path/selection/quickPick'
 import { Toast } from '../vscode/toast'
 import { ConfigKey } from '../vscode/config'
 import { checkSignalFile, pollSignalFileForProcess } from '../fileSystem'
-import { DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
+import {
+  DVCLIVE_ONLY_RUNNING_SIGNAL_FILE,
+  ExperimentFlag,
+  NUM_OF_COMMITS_TO_SHOW
+} from '../cli/dvc/constants'
 
 export const ExperimentsScale = {
   ...omit(ColumnType, 'TIMESTAMP'),
@@ -99,6 +103,8 @@ export class Experiments extends BaseRepository<TableData> {
   private dvcLiveOnlySignalFile: string
 
   private readonly addStage: () => Promise<boolean>
+
+  private numberOfCommitsToShow = Number.parseInt(NUM_OF_COMMITS_TO_SHOW, 10)
 
   constructor(
     dvcRoot: string,
@@ -175,6 +181,14 @@ export class Experiments extends BaseRepository<TableData> {
 
   public update() {
     return this.cliData.managedUpdate()
+  }
+
+  public getMoreCommits() {
+    this.numberOfCommitsToShow = this.numberOfCommitsToShow + 2
+    return this.cliData.update(
+      ExperimentFlag.NUM_COMMIT,
+      this.numberOfCommitsToShow.toString()
+    )
   }
 
   public async setState(data: ExperimentsOutput) {
@@ -565,7 +579,13 @@ export class Experiments extends BaseRepository<TableData> {
           AvailableCommands.STAGE_LIST,
           this.dvcRoot
         ),
-      () => this.addStage()
+      () => this.addStage(),
+      () =>
+        this.internalCommands.executeCommand<number>(
+          AvailableCommands.GIT_GET_NUM_COMMITS,
+          this.dvcRoot
+        ),
+      () => this.getMoreCommits()
     )
 
     this.dispose.track(

@@ -6,6 +6,7 @@ import styles from './styles.module.scss'
 import { BatchSelectionProp, RowContent } from './Row'
 import { InstanceProp, RowProp } from './interfaces'
 import { ExperimentGroup } from './ExperimentGroup'
+import { ShowMoreCommitsRow } from './ShowMoreCommitsRow'
 
 const WorkspaceRowGroupWrapper: React.FC<
   {
@@ -32,7 +33,11 @@ const WorkspaceRowGroupWrapper: React.FC<
 export const TableBody: React.FC<
   RowProp &
     InstanceProp &
-    BatchSelectionProp & { root: HTMLElement | null; tableHeaderHeight: number }
+    BatchSelectionProp & {
+      root: HTMLElement | null
+      tableHeaderHeight: number
+      numRows: number
+    }
 > = ({
   row,
   instance,
@@ -41,7 +46,8 @@ export const TableBody: React.FC<
   hasRunningExperiment,
   batchRowSelection,
   root,
-  tableHeaderHeight
+  tableHeaderHeight,
+  numRows
 }) => {
   const contentProps = {
     batchRowSelection,
@@ -58,6 +64,8 @@ export const TableBody: React.FC<
       <RowContent {...contentProps} />
     )
 
+  const colSpan = row.getAllCells().length - 1
+
   return row.original.id === EXPERIMENT_WORKSPACE_ID ? (
     <WorkspaceRowGroupWrapper
       tableHeaderHeight={tableHeaderHeight}
@@ -72,10 +80,7 @@ export const TableBody: React.FC<
         <tbody>
           <tr className={cx(styles.tr, styles.previousCommitsRow)}>
             <td className={styles.th}>Previous Commits</td>
-            <td
-              className={styles.th}
-              colSpan={row.getAllCells().length - 1}
-            ></td>
+            <td className={styles.th} colSpan={colSpan}></td>
           </tr>
         </tbody>
       )}
@@ -87,6 +92,7 @@ export const TableBody: React.FC<
       >
         {content}
       </tbody>
+      {row.index === numRows - 1 && <ShowMoreCommitsRow colSpan={colSpan} />}
     </>
   )
 }

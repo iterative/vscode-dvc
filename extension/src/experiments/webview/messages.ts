@@ -25,6 +25,7 @@ import { Toast } from '../../vscode/toast'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { stopWorkspaceExperiment } from '../processExecution'
 import { hasDvcYamlFile } from '../../fileSystem'
+import { NUM_OF_COMMITS_TO_SHOW } from '../../cli/dvc/constants'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
@@ -45,8 +46,11 @@ export class WebviewMessages {
 
   private hasConfig = false
   private hasValidDvcYaml = true
+  private hasMoreCommits = false
 
   private readonly addStage: () => Promise<boolean>
+  private readonly getNumCommits: () => Promise<number>
+  private readonly getMoreCommits: () => Promise<void>
 
   constructor(
     dvcRoot: string,
@@ -61,7 +65,9 @@ export class WebviewMessages {
       ...ids: string[]
     ) => Promise<string | undefined>,
     hasStages: () => Promise<string>,
-    addStage: () => Promise<boolean>
+    addStage: () => Promise<boolean>,
+    getNumCommits: () => Promise<number>,
+    getMoreCommits: () => Promise<void>
   ) {
     this.dvcRoot = dvcRoot
     this.experiments = experiments
@@ -72,8 +78,12 @@ export class WebviewMessages {
     this.selectColumns = selectColumns
     this.stopQueuedExperiments = stopQueuedExperiments
     this.hasStages = hasStages
-    void this.changeHasConfig()
     this.addStage = addStage
+    this.getNumCommits = getNumCommits
+    this.getMoreCommits = getMoreCommits
+
+    void this.changeHasConfig()
+    void this.changeHasMoreCommits()
   }
 
   public async changeHasConfig(update?: boolean) {
@@ -81,6 +91,11 @@ export class WebviewMessages {
     this.hasValidDvcYaml = !hasDvcYamlFile(this.dvcRoot) || stages !== undefined
     this.hasConfig = !!stages
     update && this.sendWebviewMessage()
+  }
+
+  public async changeHasMoreCommits() {
+    this.hasMoreCommits =
+      (await this.getNumCommits()) > Number.parseInt(NUM_OF_COMMITS_TO_SHOW, 10)
   }
 
   public sendWebviewMessage() {
@@ -204,6 +219,9 @@ export class WebviewMessages {
           }
         )
 
+      case MessageFromWebviewType.SHOW_MORE_COMMITS:
+        return this.getMoreCommits()
+
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
@@ -222,6 +240,7 @@ export class WebviewMessages {
       hasCheckpoints: this.checkpoints.hasCheckpoints(),
       hasColumns: this.columns.hasNonDefaultColumns(),
       hasConfig: this.hasConfig,
+      hasMoreCommits: this.hasMoreCommits,
       hasRunningExperiment: this.experiments.hasRunningExperiment(),
       hasValidDvcYaml: this.hasValidDvcYaml,
       rows: this.experiments.getRowData(),
