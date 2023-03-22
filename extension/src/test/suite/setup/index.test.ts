@@ -869,21 +869,25 @@ suite('Setup Test Suite', () => {
 
       expect(mockShow).to.be.calledWithMatch({ sectionCollapsed: undefined })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
-  })
 
-  it('should open the webview with the Studio section focus for dvc.showStudioSettings and dvc.showStudioConnect', async () => {
-    const mockShowWebview = stub(Setup.prototype, 'showSetup').resolves(
-      undefined
-    )
+    it('should open the webview with the Studio section focus for dvc.showStudioSettings and dvc.showStudioConnect', async () => {
+      const mockShowWebview = stub(Setup.prototype, 'showSetup').resolves(
+        undefined
+      )
 
-    await commands.executeCommand(RegisteredCommands.SETUP_SHOW_STUDIO_CONNECT)
+      await commands.executeCommand(
+        RegisteredCommands.SETUP_SHOW_STUDIO_CONNECT
+      )
 
-    expect(mockShowWebview).to.be.calledWithExactly(SetupSection.STUDIO)
+      expect(mockShowWebview).to.be.calledWithExactly(SetupSection.STUDIO)
 
-    mockShowWebview.resetHistory()
+      mockShowWebview.resetHistory()
 
-    await commands.executeCommand(RegisteredCommands.SETUP_SHOW_STUDIO_SETTINGS)
+      await commands.executeCommand(
+        RegisteredCommands.SETUP_SHOW_STUDIO_SETTINGS
+      )
 
-    expect(mockShowWebview).to.be.calledWithExactly(SetupSection.STUDIO)
+      expect(mockShowWebview).to.be.calledWithExactly(SetupSection.STUDIO)
+    })
   })
 })
