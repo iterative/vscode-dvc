@@ -2196,7 +2196,7 @@
   resolved "https://registry.yarnpkg.com/@mdx-js/util/-/util-1.6.22.tgz#219dfd89ae5b97a8801f015323ffa4b62f45718b"
   integrity sha512-H1rQc1ZOHANWBvPcW+JpGwr+juXSxM8Q8YCkm3GhZd8REu1fHR3z99CErO1p9pkcfcxZnMdIZdIsXkOHY0NilA==
 
-"@microsoft/1ds-core-js@3.2.9", "@microsoft/1ds-core-js@^3.2.8":
+"@microsoft/1ds-core-js@3.2.9", "@microsoft/1ds-core-js@^3.2.9":
   version "3.2.9"
   resolved "https://registry.yarnpkg.com/@microsoft/1ds-core-js/-/1ds-core-js-3.2.9.tgz#8a26935966e4871d1f1e40d992828bdd52bba84e"
   integrity sha512-3pCfM2TzHn3gU9pxHztduKcVRdb/nzruvPFfHPZD0IM0mb0h6TGo2isELF3CTMahTx50RAC51ojNIw2/7VRkOg==
@@ -2205,7 +2205,7 @@
     "@microsoft/applicationinsights-shims" "^2.0.2"
     "@microsoft/dynamicproto-js" "^1.1.7"
 
-"@microsoft/1ds-post-js@^3.2.8":
+"@microsoft/1ds-post-js@^3.2.9":
   version "3.2.9"
   resolved "https://registry.yarnpkg.com/@microsoft/1ds-post-js/-/1ds-post-js-3.2.9.tgz#07030f7455cb4ac8993e9b0bfa6c78ebfe25b499"
   integrity sha512-D/RtqkQ2Nr4cuoGqmhi5QTmi3cBlxehIThJ1u3BaH9H/YkLNTKEcHZRWTXy14bXheCefNHciLuadg37G2Kekcg==
@@ -2214,22 +2214,22 @@
     "@microsoft/applicationinsights-shims" "^2.0.2"
     "@microsoft/dynamicproto-js" "^1.1.7"
 
-"@microsoft/applicationinsights-channel-js@2.8.10":
-  version "2.8.10"
-  resolved "https://registry.yarnpkg.com/@microsoft/applicationinsights-channel-js/-/applicationinsights-channel-js-2.8.10.tgz#9d7077d7daa74d02d15bc26cc5440b4b5802cf5d"
-  integrity sha512-jXEUw3+U6WABygDOjEIlCLsniUpPqH5d/1Rfj1MVWMW6FFZo1vvYZoziOqb+dWWn41Dn5GF4EgXnvsfdkpz29w==
+"@microsoft/applicationinsights-channel-js@2.8.11":
+  version "2.8.11"
+  resolved "https://registry.yarnpkg.com/@microsoft/applicationinsights-channel-js/-/applicationinsights-channel-js-2.8.11.tgz#c41fc2b7d047940ed6d662d1cc7c6a444d74aae8"
+  integrity sha512-DGDNzT4DMlSvUzWjA4y3tDg47+QYOPV+W07vlfdPwGgLwrl4n6Q4crrW8Y/IOpthHAKDU8rolSAUvP3NqxPi4Q==
   dependencies:
-    "@microsoft/applicationinsights-common" "2.8.10"
-    "@microsoft/applicationinsights-core-js" "2.8.10"
+    "@microsoft/applicationinsights-common" "2.8.11"
+    "@microsoft/applicationinsights-core-js" "2.8.11"
     "@microsoft/applicationinsights-shims" "2.0.2"
     "@microsoft/dynamicproto-js" "^1.1.7"
 
-"@microsoft/applicationinsights-common@2.8.10":
-  version "2.8.10"
-  resolved "https://registry.yarnpkg.com/@microsoft/applicationinsights-common/-/applicationinsights-common-2.8.10.tgz#927227db35e4448692726f68deb0f6af576b483c"
-  integrity sha512-wXji97I1eANL5PG8RxZ/st+HCwKgAB1uySSxEvVNj3VcOiUyTYTtBYYEK2xhjBGR49+A2/fIJQHvu1ygco2b3Q==
+"@microsoft/applicationinsights-common@2.8.11":
+  version "2.8.11"
+  resolved "https://registry.yarnpkg.com/@microsoft/applicationinsights-common/-/applicationinsights-common-2.8.11.tgz#e8c27e2371c316cea89c376aca2cce6a838c2531"
+  integrity sha512-Cxu4gRajkYv9buEtrcLGHK97AqGK62feN9jH9/JSjUSiSFhbnWtYvEg1EMqMI/P4pneu53yLJloITB+TKwmK7A==
   dependencies:
-    "@microsoft/applicationinsights-core-js" "2.8.10"
+    "@microsoft/applicationinsights-core-js" "2.8.11"
     "@microsoft/applicationinsights-shims" "2.0.2"
     "@microsoft/dynamicproto-js" "^1.1.7"
 
@@ -2241,19 +2241,27 @@
     "@microsoft/applicationinsights-shims" "2.0.2"
     "@microsoft/dynamicproto-js" "^1.1.7"
 
+"@microsoft/applicationinsights-core-js@2.8.11":
+  version "2.8.11"
+  resolved "https://registry.yarnpkg.com/@microsoft/applicationinsights-core-js/-/applicationinsights-core-js-2.8.11.tgz#43b9a4cccd99dda851d53dd8e7909b2a73deff1d"
+  integrity sha512-6ScXplyb9Zb0K6TQRfqStm20j5lIe/Dslf65ozows6ibDcKkWl2ZdqzFhymVJZz1WRNpSyD4aA8qnqmslIER6g==
+  dependencies:
+    "@microsoft/applicationinsights-shims" "2.0.2"
+    "@microsoft/dynamicproto-js" "^1.1.7"
+
 "@microsoft/applicationinsights-shims@2.0.2", "@microsoft/applicationinsights-shims@^2.0.2":
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/@microsoft/applicationinsights-shims/-/applicationinsights-shims-2.0.2.tgz#92b36a09375e2d9cb2b4203383b05772be837085"
   integrity sha512-PoHEgsnmcqruLNHZ/amACqdJ6YYQpED0KSRe6J7gIJTtpZC1FfFU9b1fmDKDKtFoUSrPzEh1qzO3kmRZP0betg==
 
-"@microsoft/applicationinsights-web-basic@^2.8.9":
-  version "2.8.10"
-  resolved "https://registry.yarnpkg.com/@microsoft/applicationinsights-web-basic/-/applicationinsights-web-basic-2.8.10.tgz#3bc52c2252a6dc41fa14679d941f7da0658d3676"
-  integrity sha512-Iay9y4eYxcX5vIrqbAuOx51hCqABopiQljGQjdxKO/aEET1nHrOxXxcrTUYGUJF/aYoR3+RxaiFcqcuujLPiOg==
+"@microsoft/applicationinsights-web-basic@^2.8.11":
+  version "2.8.11"
+  resolved "https://registry.yarnpkg.com/@microsoft/applicationinsights-web-basic/-/applicationinsights-web-basic-2.8.11.tgz#30327852c07a5be2f63d25996f61b9ba03619cfc"
+  integrity sha512-11T7bbP4ifIBg95E9mYZv1g/vcWvw/KaWKRcGMREP3+vBTLBwMB8r2e9Zd583bOVx+9/gRvfIg+Z/lInQqAfbA==
   dependencies:
-    "@microsoft/applicationinsights-channel-js" "2.8.10"
-    "@microsoft/applicationinsights-common" "2.8.10"
-    "@microsoft/applicationinsights-core-js" "2.8.10"
+    "@microsoft/applicationinsights-channel-js" "2.8.11"
+    "@microsoft/applicationinsights-common" "2.8.11"
+    "@microsoft/applicationinsights-core-js" "2.8.11"
     "@microsoft/applicationinsights-shims" "2.0.2"
     "@microsoft/dynamicproto-js" "^1.1.7"
 
@@ -4092,10 +4100,10 @@
     jest-matcher-utils "^27.0.0"
     pretty-format "^27.0.0"
 
-"@types/jest@29.4.1":
-  version "29.4.1"
-  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-29.4.1.tgz#d76cbd07e5a24c0f4e86c2c0f9ed9e4ed33af3c8"
-  integrity sha512-zDQSWXG+ZkEvs2zFFMszePhx4euKz+Yt3Gg1P+RHjfJBinTTr6L2DEyovO4V/WrKXuF0Dgn56GWGZPDa6TW9eQ==
+"@types/jest@29.4.4":
+  version "29.4.4"
+  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-29.4.4.tgz#ba257bd7b1876dec9e0b4fb82fa60eec5505e5f1"
+  integrity sha512-qezb65VIH7X1wobSnd6Lvdve7PXSyQRa3dljTkhTtDhi603RvHQCshSlJcuyMLHJpeHgY3NKwvDJWxMOOHxGDQ==
   dependencies:
     expect "^29.0.0"
     pretty-format "^29.0.0"
@@ -4805,15 +4813,15 @@
   resolved "https://registry.yarnpkg.com/@vscode/codicons/-/codicons-0.0.32.tgz#9e27de90d509c69762b073719ba3bf46c3cd2530"
   integrity sha512-3lgSTWhAzzWN/EPURoY4ZDBEA80OPmnaknNujA3qnI4Iu7AONWd9xF3iE4L+4prIe8E3TUnLQ4pxoaFTEEZNwg==
 
-"@vscode/extension-telemetry@0.7.5":
-  version "0.7.5"
-  resolved "https://registry.yarnpkg.com/@vscode/extension-telemetry/-/extension-telemetry-0.7.5.tgz#bf965731816e08c3f146f96d901ec67954fc913b"
-  integrity sha512-fJ5y3TcpqqkFYHneabYaoB4XAhDdVflVm+TDKshw9VOs77jkgNS4UA7LNXrWeO0eDne3Sh3JgURf+xzc1rk69w==
+"@vscode/extension-telemetry@0.7.7":
+  version "0.7.7"
+  resolved "https://registry.yarnpkg.com/@vscode/extension-telemetry/-/extension-telemetry-0.7.7.tgz#8213bfbdb1afa216befb146d6563ec5d200d7608"
+  integrity sha512-uW508BPjkWDBOKvvvSym3ZmGb7kHIiWaAfB/1PHzLz2x9TrC33CfjmFEI+CywIL/jBv4bqZxxjN4tfefB61F+g==
   dependencies:
-    "@microsoft/1ds-core-js" "^3.2.8"
-    "@microsoft/1ds-post-js" "^3.2.8"
-    "@microsoft/applicationinsights-web-basic" "^2.8.9"
-    applicationinsights "2.4.1"
+    "@microsoft/1ds-core-js" "^3.2.9"
+    "@microsoft/1ds-post-js" "^3.2.9"
+    "@microsoft/applicationinsights-web-basic" "^2.8.11"
+    applicationinsights "2.5.0"
 
 "@vscode/test-electron@2.3.0":
   version "2.3.0"
@@ -4872,18 +4880,18 @@
     "@microsoft/fast-foundation" "^2.38.0"
     "@microsoft/fast-react-wrapper" "^0.1.18"
 
-"@wdio/cli@8.6.0":
-  version "8.6.0"
-  resolved "https://registry.yarnpkg.com/@wdio/cli/-/cli-8.6.0.tgz#fdc916fbff77e0254fdac4778bc56a7e67e8501f"
-  integrity sha512-A+zilHcVVS8HOjUyLzRcP+L2U7Kx7ZrXEFiKZG5ONzHTd8rlYEzBpynL1WhYdACVpLMVVoIrsFsesm6fXtu2KQ==
+"@wdio/cli@8.6.1":
+  version "8.6.1"
+  resolved "https://registry.yarnpkg.com/@wdio/cli/-/cli-8.6.1.tgz#fa46268b8807f404550bf9a77cbc6edefc97f187"
+  integrity sha512-N/ygNJ73u/7T44MHFctrOLhoPmQa7AFYyeaeOKB5yDsWEkIWc/7HErVPcNEHeeC1s/Kuppr/IFti1BHQywE3FQ==
   dependencies:
     "@types/node" "^18.0.0"
-    "@wdio/config" "8.6.0"
-    "@wdio/globals" "8.6.0"
+    "@wdio/config" "8.6.1"
+    "@wdio/globals" "8.6.1"
     "@wdio/logger" "8.1.0"
     "@wdio/protocols" "8.5.7"
     "@wdio/types" "8.4.0"
-    "@wdio/utils" "8.5.6"
+    "@wdio/utils" "8.6.1"
     async-exit-hook "^2.0.1"
     chalk "^5.0.1"
     chokidar "^3.5.3"
@@ -4898,7 +4906,7 @@
     mkdirp "^2.0.0"
     read-pkg-up "9.1.0"
     recursive-readdir "^2.2.2"
-    webdriverio "8.6.0"
+    webdriverio "8.6.1"
     yargs "^17.5.1"
     yarn-install "^1.0.0"
 
@@ -4916,14 +4924,14 @@
     import-meta-resolve "^2.1.0"
     read-pkg-up "^9.1.0"
 
-"@wdio/config@8.6.0":
-  version "8.6.0"
-  resolved "https://registry.yarnpkg.com/@wdio/config/-/config-8.6.0.tgz#271a9a6b4c42588aa8f350c65a9c0dee0e8605ee"
-  integrity sha512-kiq+e1A3tnIVvqW4MQk1r+v316dzGEx40BSsuwCecj0IIHOUP8vzsmLkGQkUEuN03Y1jDTC9+skimnreOKx4Fw==
+"@wdio/config@8.6.1":
+  version "8.6.1"
+  resolved "https://registry.yarnpkg.com/@wdio/config/-/config-8.6.1.tgz#2bb1177cc4f724f6ab22184d855f92b9ed0ff1a8"
+  integrity sha512-/7WEEQ2rXRNMFd9K+jyrCOvTtUDwiIRadoFD0JD5tFsQ6I7r1NsggvNYGht1pSzGOH++hzLzhnktIY4xuYp1IA==
   dependencies:
     "@wdio/logger" "8.1.0"
     "@wdio/types" "8.4.0"
-    "@wdio/utils" "8.5.6"
+    "@wdio/utils" "8.6.1"
     decamelize "^6.0.0"
     deepmerge-ts "^4.2.2"
     glob "^8.0.3"
@@ -4938,23 +4946,23 @@
     expect-webdriverio "^4.0.1"
     webdriverio "8.0.13"
 
-"@wdio/globals@8.6.0":
-  version "8.6.0"
-  resolved "https://registry.yarnpkg.com/@wdio/globals/-/globals-8.6.0.tgz#64e24d0d14c3939523d07d4c18c6aa4f7ecd02f3"
-  integrity sha512-RCZE8XURSfjZDbeu7PT/bQgvwTGYTnimY0l/ONmkAwmrzkVH8kAEykfaaZBq7BTESk9DRQJGW0sKpgdJMKi8aA==
+"@wdio/globals@8.6.1":
+  version "8.6.1"
+  resolved "https://registry.yarnpkg.com/@wdio/globals/-/globals-8.6.1.tgz#6d02ce42b16a65b34ae8c19b8459bccb8689faab"
+  integrity sha512-uxlBsauOfoBTNBQvWdM5y7bvNmx1j7RZx8JL4vvJMGHcpU2FPfY+9u4RTjBMLZZLzXPbJDs2YqlK1GJNht2GGw==
   optionalDependencies:
     expect-webdriverio "^4.0.1"
-    webdriverio "8.6.0"
+    webdriverio "8.6.1"
 
-"@wdio/local-runner@8.6.0":
-  version "8.6.0"
-  resolved "https://registry.yarnpkg.com/@wdio/local-runner/-/local-runner-8.6.0.tgz#28caf6af4ac89e2a4f893c21dbfe29369226583a"
-  integrity sha512-zOJdFEUUzXZ1uyiX8fdno557dkk9WpsgSNprg8HAWC+4oXZFP9ASnTxqWNZnb2qvwSBEk++o7jgyTcJR9nysuA==
+"@wdio/local-runner@8.6.1":
+  version "8.6.1"
+  resolved "https://registry.yarnpkg.com/@wdio/local-runner/-/local-runner-8.6.1.tgz#3c755643439592564b190dc10c1237635449f19e"
+  integrity sha512-SafnY/iqSkLqnUnVu0Aqq6L6AuD8kCAoDoJUpQKacciCMjZf5/hM5lcQfyFF6z/ig52NrZmFusJxVWROcY6OBQ==
   dependencies:
     "@types/node" "^18.0.0"
     "@wdio/logger" "8.1.0"
     "@wdio/repl" "8.1.0"
-    "@wdio/runner" "8.6.0"
+    "@wdio/runner" "8.6.1"
     "@wdio/types" "8.4.0"
     async-exit-hook "^2.0.1"
     split2 "^4.1.0"
@@ -4980,16 +4988,16 @@
     loglevel-plugin-prefix "^0.8.4"
     strip-ansi "^6.0.0"
 
-"@wdio/mocha-framework@8.5.6":
-  version "8.5.6"
-  resolved "https://registry.yarnpkg.com/@wdio/mocha-framework/-/mocha-framework-8.5.6.tgz#c754636664cbf63ff5631e5e65bf24a03caefc9a"
-  integrity sha512-w7q//meZbbjOYutDz3aXNtaLKmQDmvCrxn1yrfDlIqROmjqWn0s0CZWyvMCwsnfiz6ri1dtj5RJggBD2ZY9Daw==
+"@wdio/mocha-framework@8.6.1":
+  version "8.6.1"
+  resolved "https://registry.yarnpkg.com/@wdio/mocha-framework/-/mocha-framework-8.6.1.tgz#f8e42ccec443341aa18cbc03f6e3178dce30c968"
+  integrity sha512-mRKGTd7VZ2eZxbJcOlY3wbvM55lwN86RtSVqToOgN/BKMGApcAFtPkpj8rZ5I5Kx113a62Z40k6RPqOfAHEbHw==
   dependencies:
     "@types/mocha" "^10.0.0"
     "@types/node" "^18.0.0"
     "@wdio/logger" "8.1.0"
     "@wdio/types" "8.4.0"
-    "@wdio/utils" "8.5.6"
+    "@wdio/utils" "8.6.1"
     mocha "^10.0.0"
 
 "@wdio/protocols@8.0.0":
@@ -5026,22 +5034,22 @@
     object-inspect "^1.12.0"
     supports-color "9.3.1"
 
-"@wdio/runner@8.6.0":
-  version "8.6.0"
-  resolved "https://registry.yarnpkg.com/@wdio/runner/-/runner-8.6.0.tgz#0a2d4c58915e537ee77f3a0c500c9fb92691fd56"
-  integrity sha512-twLOLeawGzE8CJb/oevAO0hd9ei4R4PPt+2keqf9e5tY8//j8hV/tL+FL3X752J5L8K7hy7HsLAsKEMn48JJfg==
+"@wdio/runner@8.6.1":
+  version "8.6.1"
+  resolved "https://registry.yarnpkg.com/@wdio/runner/-/runner-8.6.1.tgz#fd2c1a00102efc54b501df2a706c956d0da84fa6"
+  integrity sha512-nv6DdpzEHluF739VwAmw3TulE7VlXHLxOPJFFQ3scW9kdPeZ/wDW6atG8KqVJxHcIbf1QUo4K50hoNNn3IOvkw==
   dependencies:
     "@types/node" "^18.0.0"
-    "@wdio/config" "8.6.0"
-    "@wdio/globals" "8.6.0"
+    "@wdio/config" "8.6.1"
+    "@wdio/globals" "8.6.1"
     "@wdio/logger" "8.1.0"
     "@wdio/types" "8.4.0"
-    "@wdio/utils" "8.5.6"
+    "@wdio/utils" "8.6.1"
     deepmerge-ts "^4.2.2"
     expect-webdriverio "^4.0.1"
     gaze "^1.1.2"
-    webdriver "8.6.0"
-    webdriverio "8.6.0"
+    webdriver "8.6.1"
+    webdriverio "8.6.1"
 
 "@wdio/spec-reporter@8.4.0":
   version "8.4.0"
@@ -5078,10 +5086,10 @@
     import-meta-resolve "^2.2.0"
     p-iteration "^1.1.8"
 
-"@wdio/utils@8.5.6":
-  version "8.5.6"
-  resolved "https://registry.yarnpkg.com/@wdio/utils/-/utils-8.5.6.tgz#45a8ee243d7753d00bfee1788db2242cc3f47f07"
-  integrity sha512-Al1NWSnA4H/7Sp+DuNisGPqN4x3xcEEGTGyGPQycWbF5ZPPuAT8lQ1v6+SkcpYiuJ5x3MlfaedJsYL10Dbz5PA==
+"@wdio/utils@8.6.1":
+  version "8.6.1"
+  resolved "https://registry.yarnpkg.com/@wdio/utils/-/utils-8.6.1.tgz#98b6909cf04d72337cf0c8f2f33e03de18b2b952"
+  integrity sha512-F/ITsHOG6Q1RxZaQuGcuti/noqxWmgkYQmRM8XdqZe0gSy4VdflGfc6TKCnfcn2oV3VPAX2HiORdTZnEGvzH2g==
   dependencies:
     "@wdio/logger" "8.1.0"
     "@wdio/types" "8.4.0"
@@ -5666,10 +5674,10 @@ append-transform@^2.0.0:
   dependencies:
     default-require-extensions "^3.0.0"
 
-applicationinsights@2.4.1:
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/applicationinsights/-/applicationinsights-2.4.1.tgz#4de4c4dd3c7c4a44445cfbf3d15808fc0dcc423d"
-  integrity sha512-0n0Ikd0gzSm460xm+M0UTWIwXrhrH/0bqfZatcJjYObWyefxfAxapGEyNnSGd1Tg90neHz+Yhf+Ff/zgvPiQYA==
+applicationinsights@2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/applicationinsights/-/applicationinsights-2.5.0.tgz#f008580b2f68267a5d233cce4e1f50b587bdf3c4"
+  integrity sha512-6kIFmpANRok+6FhCOmO7ZZ/mh7fdNKn17BaT13cg/RV5roLPJlA6q8srWexayHd3MPcwMb9072e8Zp0P47s/pw==
   dependencies:
     "@azure/core-auth" "^1.4.0"
     "@azure/core-rest-pipeline" "^1.10.0"
@@ -8464,17 +8472,17 @@ devtools@8.0.13:
     uuid "^9.0.0"
     which "^3.0.0"
 
-devtools@8.6.0:
-  version "8.6.0"
-  resolved "https://registry.yarnpkg.com/devtools/-/devtools-8.6.0.tgz#46ace916dacf9d16cb25239ca798e57e557df820"
-  integrity sha512-zg9zM5KqnL0xol/1s6E4oxDCkmEHORTZhO0Z9lTKB8J4hZfjVFP+skuVzoLaTgta3Tqe3HACB3fh0xm0XWe6NA==
+devtools@8.6.1:
+  version "8.6.1"
+  resolved "https://registry.yarnpkg.com/devtools/-/devtools-8.6.1.tgz#bc70fdc1ca09c21f2871d6ced2558bd22b609350"
+  integrity sha512-a/VnBVmuDMGUVWMoNf24r1zDxpZckD+bh767sR5POEPd96CBh8cc2esxrJxRr1rwuEtQFQ7cTc/Y2aPCHcGvGA==
   dependencies:
     "@types/node" "^18.0.0"
-    "@wdio/config" "8.6.0"
+    "@wdio/config" "8.6.1"
     "@wdio/logger" "8.1.0"
     "@wdio/protocols" "8.5.7"
     "@wdio/types" "8.4.0"
-    "@wdio/utils" "8.5.6"
+    "@wdio/utils" "8.6.1"
     chrome-launcher "^0.15.0"
     edge-paths "^3.0.5"
     import-meta-resolve "^2.1.0"
@@ -16686,10 +16694,10 @@ sass-loader@13.2.0:
     klona "^2.0.4"
     neo-async "^2.6.2"
 
-sass@1.59.2:
-  version "1.59.2"
-  resolved "https://registry.yarnpkg.com/sass/-/sass-1.59.2.tgz#537f6d11614d4f20f97696f23ad358ee398b1937"
-  integrity sha512-jJyO6SmbzkJexF8MUorHx5tAilcgabioYxT/BHbY4+OvoqmbHxsYlrjZ8Adhqcgl6Zqwie0TgMXLCAmPFxXOuw==
+sass@1.59.3:
+  version "1.59.3"
+  resolved "https://registry.yarnpkg.com/sass/-/sass-1.59.3.tgz#a1ddf855d75c70c26b4555df4403e1bbf8e4403f"
+  integrity sha512-QCq98N3hX1jfTCoUAsF3eyGuXLsY7BCnCEg9qAact94Yc21npG2/mVOqoDvE0fCbWDqiM4WlcJQla0gWG2YlxQ==
   dependencies:
     chokidar ">=3.0.0 <4.0.0"
     immutable "^4.0.0"
@@ -19369,18 +19377,18 @@ webdriver@8.0.13:
     ky "^0.32.1"
     ws "^8.8.0"
 
-webdriver@8.6.0:
-  version "8.6.0"
-  resolved "https://registry.yarnpkg.com/webdriver/-/webdriver-8.6.0.tgz#fe384a22f3613cf3e7f18514c7abcc36e2e6cbba"
-  integrity sha512-FBCoxffnJ+E1rv3yIyovyUnxuSebw0rNnWXDd56YoNJ8mHsr7KyUpT2vCS3E3G0l11mT8LG5PgS9pzpwJ7jkPw==
+webdriver@8.6.1:
+  version "8.6.1"
+  resolved "https://registry.yarnpkg.com/webdriver/-/webdriver-8.6.1.tgz#f7c652f1eafed4439a403fbbeafbecf65fcdd0de"
+  integrity sha512-gIxQIMAftTCRrsH+XZR9O4j/DMnBSS5652N9wKP647C13sg5agTTIUZ+wH5ZOoUD2nEjGmahGjUGKIj1m1R0FA==
   dependencies:
     "@types/node" "^18.0.0"
     "@types/ws" "^8.5.3"
-    "@wdio/config" "8.6.0"
+    "@wdio/config" "8.6.1"
     "@wdio/logger" "8.1.0"
     "@wdio/protocols" "8.5.7"
     "@wdio/types" "8.4.0"
-    "@wdio/utils" "8.5.6"
+    "@wdio/utils" "8.6.1"
     deepmerge-ts "^4.2.2"
     got "^12.1.0"
     ky "^0.33.0"
@@ -19419,23 +19427,23 @@ webdriverio@8.0.13, webdriverio@^8.0.0-alpha.505:
     serialize-error "^8.0.0"
     webdriver "8.0.13"
 
-webdriverio@8.6.0:
-  version "8.6.0"
-  resolved "https://registry.yarnpkg.com/webdriverio/-/webdriverio-8.6.0.tgz#0900078223f6ecba83f6c09d45570a68d2f348a3"
-  integrity sha512-tzReBNq4FUBQWm/cKNAK+chO8mzGlEzyRs3IuW+E9+oQjl3BMGA7CM2ls8g5t2HdIvs5gy71cpe/MrVz3KxjfQ==
+webdriverio@8.6.1:
+  version "8.6.1"
+  resolved "https://registry.yarnpkg.com/webdriverio/-/webdriverio-8.6.1.tgz#25c8e35df01ea44fb734a90baf49b9c8b24041b0"
+  integrity sha512-mZVYIrYHaVdDiaE+jh/vPh/cm3jmoA0vOiI2TAv4cEPjkvaJn2h58bmkPHdAhboxWPFJ6EFxqNFe//ta5FsbvA==
   dependencies:
     "@types/node" "^18.0.0"
-    "@wdio/config" "8.6.0"
+    "@wdio/config" "8.6.1"
     "@wdio/logger" "8.1.0"
     "@wdio/protocols" "8.5.7"
     "@wdio/repl" "8.1.0"
     "@wdio/types" "8.4.0"
-    "@wdio/utils" "8.5.6"
+    "@wdio/utils" "8.6.1"
     archiver "^5.0.0"
     aria-query "^5.0.0"
     css-shorthand-properties "^1.1.1"
     css-value "^0.0.1"
-    devtools "8.6.0"
+    devtools "8.6.1"
     devtools-protocol "^0.0.1115542"
     grapheme-splitter "^1.0.2"
     import-meta-resolve "^2.1.0"
@@ -19448,7 +19456,7 @@ webdriverio@8.6.0:
     resq "^1.9.1"
     rgb2hex "0.2.5"
     serialize-error "^8.0.0"
-    webdriver "8.6.0"
+    webdriver "8.6.1"
 
 webidl-conversions@^3.0.0:
   version "3.0.1"

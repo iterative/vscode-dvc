@@ -15,6 +15,7 @@ import { shouldUseVirtualizedGrid } from '../util'
 import { PlotsState } from '../../store'
 import { sendMessage } from '../../../shared/vscode'
 import { changeOrderWithDraggedInfo } from '../../../util/array'
+import { LoadingSection, sectionIsLoading } from '../LoadingSection'
 
 interface CustomPlotsProps {
   plotsIds: string[]
@@ -29,6 +30,9 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
   const draggedRef = useSelector(
     (state: PlotsState) => state.dragAndDrop.draggedRef
   )
+  const selectedRevisions = useSelector(
+    (state: PlotsState) => state.webview.selectedRevisions
+  )
 
   useEffect(() => {
     setOrder(plotsIds)
@@ -40,6 +44,10 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
       payload: order,
       type: MessageFromWebviewType.REORDER_PLOTS_CUSTOM
     })
+  }
+
+  if (sectionIsLoading(selectedRevisions)) {
+    return <LoadingSection />
   }
 
   if (!hasData) {
