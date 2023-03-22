@@ -250,11 +250,58 @@ describe('pickMetricAndParam', () => {
           label: 'accuracy',
           path: 'metrics:summary.json:accuracy',
           type: ColumnType.METRICS
+        },
+        {
+          hasChildren: false,
+          label: 'accuracy',
+          path: 'metrics:summary.json:val_accuracy',
+          type: ColumnType.METRICS
+        },
+        {
+          hasChildren: false,
+          label: 'val_loss',
+          path: 'metrics:summary.json:val_loss',
+          type: ColumnType.METRICS
         }
       ],
-      customPlotsOrderFixture
+      [
+        ...customPlotsOrderFixture,
+        {
+          metric: 'summary.json:val_accuracy',
+          param: 'params.yaml:dropout',
+          type: CustomPlotType.METRIC_VS_PARAM
+        },
+        {
+          metric: 'summary.json:val_accuracy',
+          param: 'params.yaml:epochs',
+          type: CustomPlotType.METRIC_VS_PARAM
+        }
+      ]
     )
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(2)
+    expect(mockedQuickPickValue).toHaveBeenNthCalledWith(
+      1,
+      [
+        {
+          description: 'metrics:summary.json:loss',
+          label: 'loss',
+          value: { label: 'loss', path: 'metrics:summary.json:loss' }
+        },
+        {
+          description: 'metrics:summary.json:accuracy',
+          label: 'accuracy',
+          value: { label: 'accuracy', path: 'metrics:summary.json:accuracy' }
+        },
+        {
+          description: 'metrics:summary.json:val_loss',
+          label: 'val_loss',
+          value: { label: 'val_loss', path: 'metrics:summary.json:val_loss' }
+        }
+      ],
+      {
+        title: Title.SELECT_METRIC_CUSTOM_PLOT
+      }
+    )
     expect(mockedQuickPickValue).toHaveBeenNthCalledWith(
       2,
       [
