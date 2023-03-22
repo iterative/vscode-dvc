@@ -51,7 +51,7 @@
     "@swc/jest": "0.2.24",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "14.0.0",
-    "@types/jest": "29.4.1",
+    "@types/jest": "29.4.2",
     "@types/jsdom": "21.1.0",
     "@types/node": "16.x",
     "@types/react": "18.0.28",
@@ -70,7 +70,7 @@
     "jest-environment-jsdom": "29.5.0",
     "lint-staged": "13.2.0",
     "raw-loader": "4.0.2",
-    "sass": "1.59.2",
+    "sass": "1.59.3",
     "sass-loader": "13.2.0",
     "storybook-addon-designs": "6.3.1",
     "storybook-addon-themes": "6.1.0",
@@ -78,7 +78,7 @@
     "ts-loader": "9.4.2",
     "webpack": "5.76.1",
     "webpack-cli": "5.0.1",
-    "webpack-dev-server": "4.11.1"
+    "webpack-dev-server": "4.12.0"
   },
   "svgr": {
     "typescript": true,

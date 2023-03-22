@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.24] - 2023-03-21
+
+### 🐛 Bug Fixes
+
+- Remove error for invalid dvc.yaml if no dvc.yaml file [#3514](https://github.com/iterative/vscode-dvc/pull/3514) by [@sroy3](https://github.com/sroy3)
+- Add missing loading screen to Custom section [#3524](https://github.com/iterative/vscode-dvc/pull/3524) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Add etc/no-assign-mutated-array rule [#3521](https://github.com/iterative/vscode-dvc/pull/3521) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.6.23] - 2023-03-21
 
 ### 🚀 New Features and Enhancements

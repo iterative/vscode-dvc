@@ -18,7 +18,11 @@ import {
 import { BaseWorkspaceWebviews } from '../webview/workspace'
 import { Title } from '../vscode/title'
 import { ContextKey, setContextValue } from '../vscode/context'
-import { findOrCreateDvcYamlFile, getFileExtension } from '../fileSystem'
+import {
+  findOrCreateDvcYamlFile,
+  getFileExtension,
+  hasDvcYamlFile
+} from '../fileSystem'
 import { quickPickOneOrInput } from '../vscode/quickPick'
 import { pickFile } from '../vscode/resourcePicker'
 
@@ -444,7 +448,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       cwd
     )
 
-    if (stages === undefined) {
+    if (hasDvcYamlFile(cwd) && stages === undefined) {
       await Toast.showError(
         'Cannot perform task. Your dvc.yaml file is invalid.'
       )
