@@ -1,5 +1,6 @@
 import {
   Event,
+  MarkdownString,
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
@@ -24,6 +25,7 @@ export type PathSelectionItem = {
   label: string | undefined
   path: string
   iconPath: Resource | Uri
+  tooltip: MarkdownString | undefined
 }
 
 export abstract class BasePathSelectionTree<
@@ -76,7 +78,7 @@ export abstract class BasePathSelectionTree<
       return new TreeItem(resourceUri, TreeItemCollapsibleState.Collapsed)
     }
 
-    const { dvcRoot, path, description, iconPath } = element
+    const { dvcRoot, path, description, iconPath, tooltip } = element
 
     const treeItem = this.getBaseTreeItem(element)
 
@@ -89,6 +91,9 @@ export abstract class BasePathSelectionTree<
     treeItem.iconPath = iconPath
     if (description) {
       treeItem.description = description
+    }
+    if (tooltip) {
+      treeItem.tooltip = tooltip
     }
 
     return treeItem
@@ -132,9 +137,17 @@ export abstract class BasePathSelectionTree<
     path: string
     status: Status
     label?: string
+    tooltip?: MarkdownString
   }) {
-    const { dvcRoot, descendantStatuses, hasChildren, path, status, label } =
-      element
+    const {
+      dvcRoot,
+      descendantStatuses,
+      hasChildren,
+      path,
+      status,
+      label,
+      tooltip
+    } = element
 
     const description = this.getDescription(descendantStatuses, '/')
     const iconPath = this.getIconPath(status)
@@ -148,8 +161,9 @@ export abstract class BasePathSelectionTree<
       dvcRoot,
       iconPath,
       label,
-      path
-    } as PathSelectionItem
+      path,
+      tooltip
+    }
   }
 
   private updateDescriptionOnChange() {

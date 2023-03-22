@@ -1,5 +1,9 @@
 import { join } from 'path'
-import { collectErrors, collectImageErrors } from './collect'
+import {
+  collectErrors,
+  collectImageErrors,
+  collectPathErrorsTable
+} from './collect'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 
 describe('collectErrors', () => {
@@ -132,6 +136,157 @@ describe('collectImageErrors', () => {
     const error = collectImageErrors(path, EXPERIMENT_WORKSPACE_ID, errors)
     expect(error).toStrictEqual(
       `FileNotFoundError: ${path} not found.\nSomeError: catastrophic error\nUNEXPECTEDERRRRROR`
+    )
+  })
+})
+
+describe('collectPathErrorsTable', () => {
+  it('should return undefined if the errors do not relate to selected revisions', () => {
+    const rev = 'main'
+    const path = 'wat'
+    const markdownTable = collectPathErrorsTable(
+      path,
+      [EXPERIMENT_WORKSPACE_ID],
+      [
+        {
+          msg: '',
+          name: path,
+          rev,
+          source: path,
+          type: 'FileNotFoundError'
+        },
+        {
+          msg: 'catastrophic error',
+          name: path,
+          rev,
+          source: path,
+          type: 'SomeError'
+        },
+        {
+          msg: '',
+          name: path,
+          rev,
+          source: path,
+          type: 'UNEXPECTEDERRRRROR'
+        }
+      ]
+    )
+    expect(markdownTable).toBeUndefined()
+  })
+
+  it('should return undefined if the errors do not relate to the path', () => {
+    const rev = 'main'
+    const path = 'wat'
+    const markdownTable = collectPathErrorsTable(
+      join('other', 'path'),
+      [rev],
+      [
+        {
+          msg: '',
+          name: path,
+          rev,
+          source: path,
+          type: 'FileNotFoundError'
+        },
+        {
+          msg: 'catastrophic error',
+          name: path,
+          rev,
+          source: path,
+          type: 'SomeError'
+        },
+        {
+          msg: '',
+          name: path,
+          rev,
+          source: path,
+          type: 'UNEXPECTEDERRRRROR'
+        }
+      ]
+    )
+    expect(markdownTable).toBeUndefined()
+  })
+
+  it('should construct a markdown table with the error if they relate to the select revision and provided path', () => {
+    const rev = 'a-really-long-branch-name'
+    const path = 'wat'
+    const markdownTable = collectPathErrorsTable(
+      path,
+      [EXPERIMENT_WORKSPACE_ID, rev],
+      [
+        {
+          msg: '',
+          name: path,
+          rev: EXPERIMENT_WORKSPACE_ID,
+          source: path,
+          type: 'FileNotFoundError'
+        },
+        {
+          msg: 'catastrophic error',
+          name: path,
+          rev,
+          source: path,
+          type: 'SomeError'
+        },
+        {
+          msg: '',
+          name: path,
+          rev,
+          source: path,
+          type: 'UNEXPECTEDERRRRROR'
+        }
+      ]
+    )
+    expect(markdownTable).toStrictEqual(
+      'Errors\n' +
+        '|||\n' +
+        '|--|--|\n' +
+        '| a-really... | SomeError: catastrophic error |\n' +
+        '| a-really... | UNEXPECTEDERRRRROR |\n' +
+        '| workspace | FileNotFoundError: wat not found. |'
+    )
+  })
+
+  it('should not duplicate entries in the table', () => {
+    const name = 'dvc.yaml::Accuracy'
+    const msg =
+      "Could not find provided field ('acc_') in data fields ('step, acc')."
+    const type = 'FieldNotFoundError'
+    const duplicateEntry = {
+      msg,
+      name,
+      rev: 'aa1401b',
+      type
+    }
+
+    const markdownTable = collectPathErrorsTable(
+      'dvc.yaml::Accuracy',
+      [EXPERIMENT_WORKSPACE_ID, 'main', 'test-plots-diff', 'aa1401b'],
+      [
+        {
+          msg,
+          name,
+          rev: 'workspace',
+          type
+        },
+        {
+          msg,
+          name,
+          rev: 'test-plots-diff',
+          type
+        },
+        duplicateEntry,
+        duplicateEntry
+      ]
+    )
+
+    expect(markdownTable).toStrictEqual(
+      'Errors\n' +
+        '|||\n' +
+        '|--|--|\n' +
+        "| aa1401b | FieldNotFoundError: Could not find provided field ('acc_') in data fields ('step, acc'). |\n" +
+        "| test-plo... | FieldNotFoundError: Could not find provided field ('acc_') in data fields ('step, acc'). |\n" +
+        "| workspace | FieldNotFoundError: Could not find provided field ('acc_') in data fields ('step, acc'). |"
     )
   })
 })

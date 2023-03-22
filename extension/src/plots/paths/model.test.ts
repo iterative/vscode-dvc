@@ -5,6 +5,7 @@ import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import { buildMockMemento } from '../../test/util'
 import { PlotsType, TemplatePlotGroup } from '../webview/contract'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
+import { ErrorsModel } from '../errors/model'
 
 describe('PathsModel', () => {
   const mockDvcRoot = 'test'
@@ -20,12 +21,19 @@ describe('PathsModel', () => {
     '1ba7bcd'
   ]
 
+  const buildMockErrorsModel = () =>
+    ({ getPathErrors: () => undefined } as unknown as ErrorsModel)
+
   it('should return the expected paths when given the default output fixture', () => {
     const comparisonType = new Set([PathType.COMPARISON])
     const singleType = new Set([PathType.TEMPLATE_SINGLE])
     const multiType = new Set([PathType.TEMPLATE_MULTI])
 
-    const model = new PathsModel(mockDvcRoot, buildMockMemento())
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
     model.transformAndSet(plotsDiffFixture, revisions, {})
     model.setSelectedRevisions(revisions)
     expect(model.getTerminalNodes()).toStrictEqual([
@@ -132,7 +140,11 @@ describe('PathsModel', () => {
   const originalTemplateOrder = [originalSingleViewGroup, multiViewGroup]
 
   it('should retain the order of template paths when they are unselected', () => {
-    const model = new PathsModel(mockDvcRoot, buildMockMemento())
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
     model.transformAndSet(plotsDiffFixture, revisions, {})
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
@@ -150,7 +162,11 @@ describe('PathsModel', () => {
   })
 
   it('should move unselected plots to the end when a reordering occurs', () => {
-    const model = new PathsModel(mockDvcRoot, buildMockMemento())
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
     model.transformAndSet(plotsDiffFixture, revisions, {})
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
@@ -176,7 +192,11 @@ describe('PathsModel', () => {
   })
 
   it('should not update the order of plots when there are no revisions selected', () => {
-    const model = new PathsModel(mockDvcRoot, buildMockMemento())
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
     model.transformAndSet(plotsDiffFixture, revisions, {})
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
@@ -204,7 +224,11 @@ describe('PathsModel', () => {
   })
 
   it('should not move plots which do not have the selected revisions if no reordering occurs', () => {
-    const model = new PathsModel(mockDvcRoot, buildMockMemento())
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
 
     model.transformAndSet(
       { data: { ...plotsDiffFixture.data, ...previousPlotFixture.data } },
@@ -243,7 +267,11 @@ describe('PathsModel', () => {
   })
 
   it('should move plots which do not have selected revisions to the end when a reordering occurs', () => {
-    const model = new PathsModel(mockDvcRoot, buildMockMemento())
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
     model.transformAndSet(
       { data: { ...plotsDiffFixture.data, ...previousPlotFixture.data } },
       [...revisions, commitBeforePlots],
@@ -268,7 +296,11 @@ describe('PathsModel', () => {
   })
 
   it('should move newly collected plot paths to the end', () => {
-    const model = new PathsModel(mockDvcRoot, buildMockMemento())
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
 
     model.transformAndSet(plotsDiffFixture, revisions, {})
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
@@ -285,7 +317,11 @@ describe('PathsModel', () => {
   })
 
   it('should merge template plots groups when a path is unselected', () => {
-    const model = new PathsModel(mockDvcRoot, buildMockMemento())
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
     model.transformAndSet(plotsDiffFixture, revisions, {})
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
@@ -297,7 +333,11 @@ describe('PathsModel', () => {
   })
 
   it('should retain the order of the comparison paths when changed', () => {
-    const model = new PathsModel(mockDvcRoot, buildMockMemento())
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
     model.transformAndSet(plotsDiffFixture, revisions, {})
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
@@ -319,7 +359,11 @@ describe('PathsModel', () => {
   })
 
   it('should return the expected children from the test fixture', () => {
-    const model = new PathsModel(mockDvcRoot, buildMockMemento())
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
     model.transformAndSet(plotsDiffFixture, revisions, {})
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
@@ -336,7 +380,8 @@ describe('PathsModel', () => {
         parentPath: undefined,
         path: 'plots',
         revisions: new Set(revisions),
-        status: 2
+        status: 2,
+        tooltip: undefined
       },
       {
         descendantStatuses: [2, 2],
@@ -344,7 +389,8 @@ describe('PathsModel', () => {
         parentPath: undefined,
         path: 'logs',
         revisions: new Set(revisions),
-        status: 2
+        status: 2,
+        tooltip: undefined
       },
       {
         descendantStatuses: [],
@@ -353,6 +399,7 @@ describe('PathsModel', () => {
         path: 'predictions.json',
         revisions: new Set(revisions),
         status: 2,
+        tooltip: undefined,
         type: new Set([PathType.TEMPLATE_MULTI])
       }
     ])
@@ -366,6 +413,7 @@ describe('PathsModel', () => {
         path: logsLoss,
         revisions: new Set(revisions),
         status: 2,
+        tooltip: undefined,
         type: new Set([PathType.TEMPLATE_SINGLE])
       },
       {
@@ -375,6 +423,7 @@ describe('PathsModel', () => {
         path: logsAcc,
         revisions: new Set(revisions),
         status: 2,
+        tooltip: undefined,
         type: new Set([PathType.TEMPLATE_SINGLE])
       }
     ])
@@ -395,6 +444,7 @@ describe('PathsModel', () => {
         path: logsLoss,
         revisions: new Set(revisions),
         status: 2,
+        tooltip: undefined,
         type: new Set([PathType.TEMPLATE_SINGLE])
       },
       {
@@ -404,6 +454,7 @@ describe('PathsModel', () => {
         path: logsAcc,
         revisions: new Set(revisions),
         status: 2,
+        tooltip: undefined,
         type: new Set([PathType.TEMPLATE_SINGLE])
       }
     ])
@@ -413,7 +464,11 @@ describe('PathsModel', () => {
   })
 
   it('should not provide error as a path when the CLI throws an error', () => {
-    const model = new PathsModel(mockDvcRoot, buildMockMemento())
+    const model = new PathsModel(
+      mockDvcRoot,
+      buildMockErrorsModel(),
+      buildMockMemento()
+    )
     model.transformAndSet(
       {
         error: {

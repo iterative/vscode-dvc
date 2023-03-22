@@ -15,15 +15,21 @@ import {
 import { MultiSourceEncoding } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
 import { PlotsOutputOrError } from '../../cli/dvc/contract'
+import { getErrorTooltip } from '../../tree'
+import { ErrorsModel } from '../errors/model'
 
 export class PathsModel extends PathSelectionModel<PlotPath> {
+  private readonly errors: ErrorsModel
+
   private templateOrder: TemplateOrder
   private comparisonPathsOrder: string[]
 
   private selectedRevisions: string[] = []
 
-  constructor(dvcRoot: string, workspaceState: Memento) {
+  constructor(dvcRoot: string, errors: ErrorsModel, workspaceState: Memento) {
     super(dvcRoot, workspaceState, PersistenceKey.PLOT_PATH_STATUS)
+
+    this.errors = errors
 
     this.templateOrder = this.revive(PersistenceKey.PLOT_TEMPLATE_ORDER, [])
     this.comparisonPathsOrder = this.revive(
@@ -77,7 +83,8 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
       ...element,
       descendantStatuses: this.getTerminalNodeStatuses(element.path),
       hasChildren: this.getHasChildren(element, multiSourceEncoding),
-      status: this.status[element.path]
+      status: this.status[element.path],
+      tooltip: this.getTooltip(element.path)
     }))
   }
 
@@ -176,5 +183,10 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
 
   private hasRevisions({ revisions }: PlotPath) {
     return this.selectedRevisions.some(revision => revisions.has(revision))
+  }
+
+  private getTooltip(path: string) {
+    const error = this.errors.getPathErrors(path, this.selectedRevisions)
+    return error ? getErrorTooltip(error) : undefined
   }
 }

@@ -62,7 +62,8 @@ export class PlotsPathsTree extends BasePathSelectionTree<WorkspacePlots> {
                 ? this.resourceLocator.getPlotsStrokeDashResource(value)
                 : this.resourceLocator.getPlotsShapeResource(value),
             label,
-            path: label
+            path: label,
+            tooltip: undefined
           }
         }
 

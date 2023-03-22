@@ -1,4 +1,9 @@
-import { collectErrors, collectImageErrors } from './collect'
+import { join } from 'path'
+import {
+  collectErrors,
+  collectImageErrors,
+  collectPathErrorsTable
+} from './collect'
 import { Disposable } from '../../class/dispose'
 import { PlotError, PlotsOutputOrError } from '../../cli/dvc/contract'
 import { isDvcError } from '../../cli/dvc/reader'
@@ -27,5 +32,19 @@ export class ErrorsModel extends Disposable {
 
   public getImageErrors(path: string, revision: string) {
     return collectImageErrors(path, revision, this.errors)
+  }
+
+  public getPathErrors(path: string, selectedRevisions: string[]) {
+    return collectPathErrorsTable(path, selectedRevisions, this.errors)
+  }
+
+  public getErrorPaths(selectedRevisions: string[]) {
+    const acc = new Set<string>()
+    for (const { name, rev } of this.errors) {
+      if (selectedRevisions.includes(rev)) {
+        acc.add(join(this.dvcRoot, name))
+      }
+    }
+    return acc
   }
 }
