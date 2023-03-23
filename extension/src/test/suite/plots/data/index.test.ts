@@ -41,12 +41,13 @@ suite('Plots Data Test Suite', () => {
     const { internalCommands, updatesPaused, mockPlotsDiff } =
       buildDependencies(disposable)
 
-    const mockGetMissingRevisions = stub().returns(missingRevisions)
-    const mockGetMutableRevisions = stub().returns(mutableRevisions)
+    const mockGetSelectedOrderedCliIds = stub().returns([
+      ...missingRevisions,
+      ...mutableRevisions
+    ])
 
     const mockPlotsModel = {
-      getMissingRevisions: mockGetMissingRevisions,
-      getMutableRevisions: mockGetMutableRevisions
+      getSelectedOrderedCliIds: mockGetSelectedOrderedCliIds
     } as unknown as PlotsModel
 
     const data = disposable.track(
@@ -74,19 +75,6 @@ suite('Plots Data Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath)
     })
 
-    it('should always call plots diff with workspace as the first argument to get the correct template (caching)', async () => {
-      const { data, mockPlotsDiff } = buildPlotsData([], ['53c3851', '4fb124a'])
-
-      await data.update()
-
-      expect(mockPlotsDiff).to.be.calledWithExactly(
-        dvcDemoPath,
-        EXPERIMENT_WORKSPACE_ID,
-        '4fb124a',
-        '53c3851'
-      )
-    })
-
     it('should call plots diff when an experiment is running in the workspace (live updates)', async () => {
       const { data, mockPlotsDiff } = buildPlotsData(
         [],
@@ -104,11 +92,7 @@ suite('Plots Data Test Suite', () => {
       await data.update()
 
       expect(mockPlotsDiff).to.be.calledOnce
-      expect(mockPlotsDiff).to.be.calledWithExactly(
-        dvcDemoPath,
-        EXPERIMENT_WORKSPACE_ID,
-        'a7739b5'
-      )
+      expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath, 'a7739b5')
     })
 
     it('should call plots diff when an experiment is running and there are missing revisions (checkpoints)', async () => {
@@ -122,30 +106,10 @@ suite('Plots Data Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
-        EXPERIMENT_WORKSPACE_ID,
-        '1ba7bcd',
-        '42b8736',
+        '53c3851',
         '4fb124a',
-        '53c3851'
-      )
-    })
-
-    it('should call plots diff when an experiment is running and there are missing revisions and one of them is mutable', async () => {
-      const { data, mockPlotsDiff } = buildPlotsData(
-        ['53c3851', '4fb124a', '42b8736', '1ba7bcd'],
-        ['1ba7bcd']
-      )
-
-      await data.update()
-
-      expect(mockPlotsDiff).to.be.calledOnce
-      expect(mockPlotsDiff).to.be.calledWithExactly(
-        dvcDemoPath,
-        EXPERIMENT_WORKSPACE_ID,
-        '1ba7bcd',
         '42b8736',
-        '4fb124a',
-        '53c3851'
+        '1ba7bcd'
       )
     })
 
@@ -198,8 +162,7 @@ suite('Plots Data Test Suite', () => {
             executeCommand: mockExecuteCommand
           } as unknown as InternalCommands,
           {
-            getMissingRevisions: () => [],
-            getMutableRevisions: () => []
+            getSelectedOrderedCliIds: () => []
           } as unknown as PlotsModel,
           disposable.track(new EventEmitter<boolean>())
         )

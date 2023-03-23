@@ -14,6 +14,7 @@ export type PlotGroup = { group: TemplatePlotGroup; entries: string[] }
 export interface TemplatePlotsState extends Omit<TemplatePlotsData, 'plots'> {
   isCollapsed: boolean
   hasData: boolean
+  hasItems: boolean
   plotsSnapshots: { [key: string]: string }
   sections: PlotGroup[]
   disabledDragPlotIds: string[]
@@ -22,6 +23,7 @@ export interface TemplatePlotsState extends Omit<TemplatePlotsData, 'plots'> {
 export const templatePlotsInitialState: TemplatePlotsState = {
   disabledDragPlotIds: [],
   hasData: false,
+  hasItems: false,
   height: DEFAULT_HEIGHT[PlotsSection.TEMPLATE_PLOTS],
   isCollapsed: DEFAULT_SECTION_COLLAPSED[PlotsSection.TEMPLATE_PLOTS],
   nbItemsPerRow:
@@ -62,7 +64,7 @@ export const templatePlotsSlice = createSlice({
 
       const plots = action.payload.plots?.flatMap(section => section.entries)
       const plotsIds = plots?.map(plot => plot.id) || []
-      const snapShots = addPlotsWithSnapshots(
+      const plotsSnapshots = addPlotsWithSnapshots(
         plots,
         PlotsSection.TEMPLATE_PLOTS
       )
@@ -71,8 +73,9 @@ export const templatePlotsSlice = createSlice({
       return {
         ...state,
         hasData: !!action.payload,
+        hasItems: Object.keys(plotsSnapshots).length > 0,
         nbItemsPerRow: action.payload.nbItemsPerRow,
-        plotsSnapshots: snapShots,
+        plotsSnapshots,
         sections:
           JSON.stringify(plotSections) === JSON.stringify(state.sections)
             ? state.sections

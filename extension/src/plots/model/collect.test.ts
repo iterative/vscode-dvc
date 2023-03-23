@@ -4,7 +4,8 @@ import {
   collectData,
   collectTemplates,
   collectOverrideRevisionDetails,
-  collectCustomPlots
+  collectCustomPlots,
+  collectOrderedRevisions
 } from './collect'
 import { isCheckpointPlot } from './custom'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
@@ -523,5 +524,58 @@ describe('collectOverrideRevisionDetails', () => {
       'c',
       'd'
     ])
+  })
+})
+
+describe('collectOrderedRevisions', () => {
+  it('should return the expected value from the test fixture', () => {
+    const main = { Created: '2020-11-21T19:58:22', id: 'main', label: 'main' }
+    const workspace = {
+      id: EXPERIMENT_WORKSPACE_ID,
+      label: EXPERIMENT_WORKSPACE_ID
+    }
+    const _4fb124a = {
+      Created: '2020-12-29T15:31:52',
+      id: 'exp-e7a67',
+      label: '4fb124a'
+    }
+    const _42b8736 = {
+      Created: '2020-12-29T15:28:59',
+      id: 'test-branch',
+      label: '42b8736'
+    }
+    const _1ba7bcd = {
+      Created: '2020-12-29T15:27:02',
+      id: 'exp-83425',
+      label: '1ba7bcd'
+    }
+    const orderedRevisions = collectOrderedRevisions([
+      _1ba7bcd,
+      _42b8736,
+      _4fb124a,
+      main,
+      workspace
+    ])
+    expect(orderedRevisions).toStrictEqual([
+      workspace,
+      _4fb124a,
+      _42b8736,
+      _1ba7bcd,
+      main
+    ])
+  })
+
+  it('should order the provided revisions by workspace and then Created', () => {
+    const a = { Created: '2023-03-23T16:27:20', id: 'a', label: 'a' }
+    const b = { Created: '2023-03-23T15:27:20', id: 'b', label: 'b' }
+    const c = { Created: '2023-03-23T12:10:13', id: 'c', label: 'c' }
+    const d = { Created: '2020-11-21T19:58:22', id: 'd', label: 'd' }
+    const workspace = {
+      id: EXPERIMENT_WORKSPACE_ID,
+      label: EXPERIMENT_WORKSPACE_ID
+    }
+    const orderedRevisions = collectOrderedRevisions([b, c, workspace, d, a])
+
+    expect(orderedRevisions).toStrictEqual([workspace, a, b, c, d])
   })
 })

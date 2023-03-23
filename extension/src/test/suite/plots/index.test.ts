@@ -74,9 +74,9 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
         EXPERIMENT_WORKSPACE_ID,
-        '1ba7bcd',
-        '42b8736',
         '4fb124a',
+        '42b8736',
+        '1ba7bcd',
         '53c3851'
       )
       mockPlotsDiff.resetHistory()
@@ -117,7 +117,8 @@ suite('Plots Test Suite', () => {
                 checkpoint_tip: 'experiment',
                 executor: 'dvc-task',
                 name: 'exp-e1new',
-                status: ExperimentStatus.RUNNING
+                status: ExperimentStatus.RUNNING,
+                timestamp: '2023-03-23T09:02:20'
               }
             }
           }
@@ -137,7 +138,11 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
         EXPERIMENT_WORKSPACE_ID,
-        'experim'
+        'experim',
+        '4fb124a',
+        '42b8736',
+        '1ba7bcd',
+        '53c3851'
       )
     })
 
@@ -597,12 +602,10 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to manually refresh a revision from the webview', async () => {
-      const { data, plots, plotsModel, mockPlotsDiff } = await buildPlots(
+      const { data, plots, mockPlotsDiff } = await buildPlots(
         disposable,
         plotsDiffFixture
       )
-
-      const removeDataSpy = spy(plotsModel, 'setupManualRefresh')
 
       const webview = await plots.showWebview()
       mockPlotsDiff.resetHistory()
@@ -621,7 +624,6 @@ suite('Plots Test Suite', () => {
 
       await dataUpdateEvent
 
-      expect(removeDataSpy).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_PLOTS_MANUAL_REFRESH,
@@ -632,6 +634,9 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
         EXPERIMENT_WORKSPACE_ID,
+        '4fb124a',
+        '42b8736',
+        '1ba7bcd',
         '53c3851'
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
@@ -675,9 +680,9 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
         EXPERIMENT_WORKSPACE_ID,
-        '1ba7bcd',
-        '42b8736',
         '4fb124a',
+        '42b8736',
+        '1ba7bcd',
         '53c3851'
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)

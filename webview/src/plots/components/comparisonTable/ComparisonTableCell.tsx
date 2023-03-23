@@ -16,11 +16,14 @@ type ComparisonTableCellProps = {
 export const ComparisonTableCell: React.FC<ComparisonTableCellProps> = ({
   path,
   plot
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
   const error = plot?.error
-  const missing = plot?.fetched && !plot?.url
+  const fetched = plot?.fetched
+  const loading = !fetched && !plot?.url
+  const missing = fetched && !plot?.url
 
-  if (!plot?.fetched) {
+  if (loading) {
     return (
       <div className={styles.noImageContent}>
         <p>Loading...</p>

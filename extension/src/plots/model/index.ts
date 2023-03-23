@@ -11,7 +11,8 @@ import {
   collectCommitRevisionDetails,
   collectOverrideRevisionDetails,
   collectCustomPlots,
-  getCustomPlotId
+  getCustomPlotId,
+  collectOrderedRevisions
 } from './collect'
 import { getRevisionFirstThreeColumns } from './util'
 import {
@@ -217,10 +218,6 @@ export class PlotsModel extends ModelWithPersistence {
     this.setCustomPlotsOrder(newCustomPlotsOrder)
   }
 
-  public setupManualRefresh(id: string) {
-    this.deleteRevisionData(id)
-  }
-
   public getOverrideRevisionDetails() {
     const finishedExperiments = this.experiments.getFinishedExperiments()
 
@@ -243,27 +240,6 @@ export class PlotsModel extends ModelWithPersistence {
       overrideComparison: this.getComparisonRevisions(),
       overrideRevisions: this.getSelectedRevisionDetails()
     }
-  }
-
-  public getUnfetchedRevisions() {
-    return this.getSelectedRevisions().filter(
-      revision => !this.fetchedRevs.has(revision)
-    )
-  }
-
-  public getMissingRevisions() {
-    const cachedRevisions = new Set([
-      ...Object.keys(this.comparisonData),
-      ...Object.keys(this.revisionData)
-    ])
-
-    return this.getSelectedRevisions()
-      .filter(label => !cachedRevisions.has(label))
-      .map(label => this.getCLIId(label))
-  }
-
-  public getMutableRevisions() {
-    return this.experiments.getMutableRevisions()
   }
 
   public getRevisionColors(overrideRevs?: Revision[]) {
@@ -360,6 +336,12 @@ export class PlotsModel extends ModelWithPersistence {
     return this.experiments.getSelectedRevisions().map(({ label }) => label)
   }
 
+  public getSelectedOrderedCliIds() {
+    return collectOrderedRevisions(this.experiments.getSelectedRevisions()).map(
+      ({ label }) => this.getCLIId(label)
+    )
+  }
+
   public setNbItemsPerRowOrWidth(section: PlotsSection, nbItemsPerRow: number) {
     this.nbItemsPerRowOrWidth[section] = nbItemsPerRow
     this.persist(
@@ -378,6 +360,10 @@ export class PlotsModel extends ModelWithPersistence {
   public setHeight(section: PlotsSection, height: PlotHeight) {
     this.height[section] = height
     this.persist(PersistenceKey.PLOT_HEIGHT, this.height)
+  }
+
+  public resetFetched() {
+    this.fetchedRevs = new Set()
   }
 
   public getHeight(section: PlotsSection) {
@@ -442,12 +428,6 @@ export class PlotsModel extends ModelWithPersistence {
       revisions,
       this.revisionData
     )
-
-    for (const fetchedRev of this.fetchedRevs) {
-      if (!revisions.includes(fetchedRev)) {
-        this.fetchedRevs.delete(fetchedRev)
-      }
-    }
   }
 
   private removeStaleCommits() {

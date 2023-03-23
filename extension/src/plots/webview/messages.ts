@@ -67,8 +67,10 @@ export class WebviewMessages {
     const { overrideComparison, overrideRevisions } =
       this.plots.getOverrideRevisionDetails()
 
+    const comparison = this.getComparisonPlots(overrideComparison)
+
     void this.getWebview()?.show({
-      comparison: this.getComparisonPlots(overrideComparison),
+      comparison,
       custom: this.getCustomPlots(),
       hasPlots: !!this.paths.hasPaths(),
       hasUnselectedPlots: this.paths.getHasUnselectedPlots(),
@@ -328,7 +330,6 @@ export class WebviewMessages {
     void Toast.infoWithOptions(
       `Attempting to refresh plots data for ${revision}.`
     )
-    this.plots.setupManualRefresh(revision)
     void this.updateData()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_MANUAL_REFRESH,
@@ -339,9 +340,6 @@ export class WebviewMessages {
 
   private attemptToRefreshSelectedData(revisions: string[]) {
     void Toast.infoWithOptions('Attempting to refresh visible plots data.')
-    for (const revision of revisions) {
-      this.plots.setupManualRefresh(revision)
-    }
     void this.updateData()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_MANUAL_REFRESH,

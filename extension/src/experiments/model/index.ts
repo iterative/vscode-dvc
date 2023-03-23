@@ -6,7 +6,7 @@ import {
   splitExperimentsByFilters,
   getFilterId
 } from './filterBy'
-import { collectExperiments, collectMutableRevisions } from './collect'
+import { collectExperiments } from './collect'
 import {
   collectFiltered,
   collectFilteredCounts,
@@ -262,13 +262,6 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public getRevisions() {
     return this.getCombinedList().map(({ label }) => label)
-  }
-
-  public getMutableRevisions(hasCheckpoints: boolean) {
-    return collectMutableRevisions(
-      this.getRecordsWithoutCheckpoints(),
-      hasCheckpoints
-    )
   }
 
   public getSelectedRevisions() {
