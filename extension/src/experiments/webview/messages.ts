@@ -93,9 +93,10 @@ export class WebviewMessages {
     update && this.sendWebviewMessage()
   }
 
-  public async changeHasMoreCommits() {
-    this.hasMoreCommits =
-      (await this.getNumCommits()) > Number.parseInt(NUM_OF_COMMITS_TO_SHOW, 10)
+  public async changeHasMoreCommits(
+    nbCommits = Number.parseInt(NUM_OF_COMMITS_TO_SHOW, 10)
+  ) {
+    this.hasMoreCommits = (await this.getNumCommits()) > nbCommits
   }
 
   public sendWebviewMessage() {

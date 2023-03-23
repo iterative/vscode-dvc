@@ -81,6 +81,7 @@ import * as ProcessExecution from '../../../process/execution'
 import { DvcReader } from '../../../cli/dvc/reader'
 import { DvcViewer } from '../../../cli/dvc/viewer'
 import { DEFAULT_NB_ITEMS_PER_ROW } from '../../../plots/webview/contract'
+import { GitReader } from '../../../cli/git/reader'
 
 const { openFileInEditor } = FileSystem
 
@@ -127,6 +128,27 @@ suite('Experiments Test Suite', () => {
         'd1343a8',
         '1ee5f2e'
       ])
+    })
+  })
+
+  describe('getMoreCommits', () => {
+    it('should increase the number of commits to show by 2', async () => {
+      const { experiments, mockUpdateExperimentsData } =
+        buildExperiments(disposable)
+
+      await experiments.getMoreCommits()
+
+      expect(mockUpdateExperimentsData).to.be.calledWithExactly(
+        ExperimentFlag.NUM_COMMIT,
+        '5'
+      )
+
+      await experiments.getMoreCommits()
+
+      expect(mockUpdateExperimentsData).to.be.calledWithExactly(
+        ExperimentFlag.NUM_COMMIT,
+        '7'
+      )
     })
   })
 
@@ -296,6 +318,34 @@ suite('Experiments Test Suite', () => {
       }
 
       expect(messageSpy).to.be.calledWithExactly(expectedTableData)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should set hasMoreCommits to true if there are more commits to show', async () => {
+      stub(GitReader.prototype, 'getNumCommits').resolves(5)
+      const { experiments, messageSpy } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
+
+      await experiments.showWebview()
+
+      expect(messageSpy).to.be.calledWithMatch({
+        hasMoreCommits: true
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should set hasMoreCommits to false if there are more commits to show', async () => {
+      stub(GitReader.prototype, 'getNumCommits').resolves(1)
+      const { experiments, messageSpy } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
+
+      await experiments.showWebview()
+
+      expect(messageSpy).to.be.calledWithMatch({
+        hasMoreCommits: false
+      })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 
@@ -1334,6 +1384,22 @@ suite('Experiments Test Suite', () => {
       })
 
       expect(mockCheckOrAddPipeline).to.be.calledOnce
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a message to show more commits', async () => {
+      const { experiments, messageSpy } = setupExperimentsAndMockCommands()
+
+      const getMoreCommitsSpy = spy(experiments, 'getMoreCommits')
+
+      const webview = await experiments.showWebview()
+      messageSpy.resetHistory()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SHOW_MORE_COMMITS
+      })
+
+      expect(getMoreCommitsSpy).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 

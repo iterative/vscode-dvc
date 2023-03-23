@@ -185,6 +185,7 @@ export class Experiments extends BaseRepository<TableData> {
 
   public getMoreCommits() {
     this.numberOfCommitsToShow = this.numberOfCommitsToShow + 2
+    void this.webviewMessages.changeHasMoreCommits(this.numberOfCommitsToShow)
     return this.cliData.update(
       ExperimentFlag.NUM_COMMIT,
       this.numberOfCommitsToShow.toString()
