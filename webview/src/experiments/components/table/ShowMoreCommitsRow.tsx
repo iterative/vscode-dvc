@@ -12,7 +12,7 @@ export const ShowMoreCommitsRow: React.FC = () => {
   )
 
   return hasMoreCommits ? (
-    <div className={styles.showMoreCommits}>
+    <div className={styles.showMoreCommits} data-testid="show-more-commits">
       <IconButton
         icon={Refresh}
         text="Show More Commits"
