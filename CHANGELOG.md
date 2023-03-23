@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.25] - 2023-03-23
+
+### 🚀 New Features and Enhancements
+
+- Filter custom plot creation options [#3526](https://github.com/iterative/vscode-dvc/pull/3526) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Cleanup plots workspace state [#3518](https://github.com/iterative/vscode-dvc/pull/3518) by [@julieg18](https://github.com/julieg18)
+- Update timeout for webview test [#3529](https://github.com/iterative/vscode-dvc/pull/3529) by [@mattseddon](https://github.com/mattseddon)
+- Fix nesting of Setup test [#3533](https://github.com/iterative/vscode-dvc/pull/3533) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.6.24] - 2023-03-21
 
 ### 🐛 Bug Fixes
