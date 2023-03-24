@@ -34,7 +34,6 @@ import { reorderObjectList } from '../../util/array'
 import {
   CHECKPOINTS_PARAM,
   CustomPlotsOrderValue,
-  doesCustomPlotAlreadyExist,
   isCheckpointValue
 } from '../model/custom'
 import { getCustomPlotId } from '../model/collect'
@@ -197,21 +196,12 @@ export class WebviewMessages {
     CustomPlotsOrderValue | undefined
   > {
     const metricAndParam = await pickMetricAndParam(
-      this.experiments.getColumnTerminalNodes()
+      this.experiments.getColumnTerminalNodes(),
+      this.plots.getCustomPlotsOrder()
     )
 
     if (!metricAndParam) {
       return
-    }
-
-    const plotAlreadyExists = doesCustomPlotAlreadyExist(
-      this.plots.getCustomPlotsOrder(),
-      metricAndParam.metric,
-      metricAndParam.param
-    )
-
-    if (plotAlreadyExists) {
-      return Toast.showError('Custom plot already exists.')
     }
 
     const plot = {
@@ -225,19 +215,13 @@ export class WebviewMessages {
   private async addCheckpointPlot(): Promise<
     CustomPlotsOrderValue | undefined
   > {
-    const metric = await pickMetric(this.experiments.getColumnTerminalNodes())
+    const metric = await pickMetric(
+      this.experiments.getColumnTerminalNodes(),
+      this.plots.getCustomPlotsOrder()
+    )
 
     if (!metric) {
       return
-    }
-
-    const plotAlreadyExists = doesCustomPlotAlreadyExist(
-      this.plots.getCustomPlotsOrder(),
-      metric
-    )
-
-    if (plotAlreadyExists) {
-      return Toast.showError('Custom plot already exists.')
     }
 
     const plot: CustomPlotsOrderValue = {
