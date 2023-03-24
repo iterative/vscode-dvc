@@ -16,15 +16,6 @@ export const isCheckpointValue = (
 export const isCheckpointPlot = (plot: CustomPlot): plot is CheckpointPlot =>
   plot.type === CustomPlotType.CHECKPOINT
 
-export const doesCustomPlotAlreadyExist = (
-  order: CustomPlotsOrderValue[],
-  metric: string,
-  param = CHECKPOINTS_PARAM
-) =>
-  order.some(value => {
-    return value.param === param && value.metric === metric
-  })
-
 export const removeColumnTypeFromPath = (
   columnPath: string,
   type: string,

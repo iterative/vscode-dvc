@@ -789,7 +789,7 @@ suite('Setup Test Suite', () => {
       )
 
       expect(mockDelete).to.be.calledWithExactly(STUDIO_ACCESS_TOKEN_KEY)
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to open the experiments webview', async () => {
       const { messageSpy, setup, mockOpenExperiments } = buildSetup(disposable)
@@ -868,22 +868,26 @@ suite('Setup Test Suite', () => {
       await openUnchanged
 
       expect(mockShow).to.be.calledWithMatch({ sectionCollapsed: undefined })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should open the webview with the Studio section focus for dvc.showStudioSettings and dvc.showStudioConnect', async () => {
+      const mockShowWebview = stub(Setup.prototype, 'showSetup').resolves(
+        undefined
+      )
+
+      await commands.executeCommand(
+        RegisteredCommands.SETUP_SHOW_STUDIO_CONNECT
+      )
+
+      expect(mockShowWebview).to.be.calledWithExactly(SetupSection.STUDIO)
+
+      mockShowWebview.resetHistory()
+
+      await commands.executeCommand(
+        RegisteredCommands.SETUP_SHOW_STUDIO_SETTINGS
+      )
+
+      expect(mockShowWebview).to.be.calledWithExactly(SetupSection.STUDIO)
     })
-  })
-
-  it('should open the webview with the Studio section focus for dvc.showStudioSettings and dvc.showStudioConnect', async () => {
-    const mockShowWebview = stub(Setup.prototype, 'showSetup').resolves(
-      undefined
-    )
-
-    await commands.executeCommand(RegisteredCommands.SETUP_SHOW_STUDIO_CONNECT)
-
-    expect(mockShowWebview).to.be.calledWithExactly(SetupSection.STUDIO)
-
-    mockShowWebview.resetHistory()
-
-    await commands.executeCommand(RegisteredCommands.SETUP_SHOW_STUDIO_SETTINGS)
-
-    expect(mockShowWebview).to.be.calledWithExactly(SetupSection.STUDIO)
   })
 })

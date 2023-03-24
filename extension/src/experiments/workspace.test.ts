@@ -13,7 +13,11 @@ import { buildMockedEventEmitter } from '../test/util/jest'
 import { OutputChannel } from '../vscode/outputChannel'
 import { Title } from '../vscode/title'
 import { Args } from '../cli/dvc/constants'
-import { findOrCreateDvcYamlFile, getFileExtension } from '../fileSystem'
+import {
+  findOrCreateDvcYamlFile,
+  getFileExtension,
+  hasDvcYamlFile
+} from '../fileSystem'
 import { Toast } from '../vscode/toast'
 
 const mockedShowWebview = jest.fn()
@@ -30,6 +34,7 @@ const mockedExpFunc = jest.fn()
 const mockedListStages = jest.fn()
 const mockedFindOrCreateDvcYamlFile = jest.mocked(findOrCreateDvcYamlFile)
 const mockedGetFileExtension = jest.mocked(getFileExtension)
+const mockedHasDvcYamlFile = jest.mocked(hasDvcYamlFile)
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -597,11 +602,26 @@ describe('Experiments', () => {
       )
     })
 
+    it('should not show a toast if there is no dvc.yaml file', async () => {
+      const showErrorSpy = jest.spyOn(Toast, 'showError')
+
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedListStages.mockResolvedValueOnce(undefined)
+      mockedHasDvcYamlFile.mockReturnValueOnce(false)
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
+
+      expect(showErrorSpy).not.toHaveBeenCalledWith(
+        'Cannot perform task. Your dvc.yaml file is invalid.'
+      )
+    })
+
     it('should show a toast if the dvc.yaml file is invalid', async () => {
       const showErrorSpy = jest.spyOn(Toast, 'showError')
 
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       mockedListStages.mockResolvedValueOnce(undefined)
+      mockedHasDvcYamlFile.mockReturnValueOnce(true)
 
       await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
@@ -610,9 +630,20 @@ describe('Experiments', () => {
       )
     })
 
+    it('should ask to create a stage if there is no dvc.yaml file', async () => {
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedListStages.mockResolvedValueOnce(undefined)
+      mockedHasDvcYamlFile.mockReturnValueOnce(false)
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
+
+      expect(mockedGetValidInput).toHaveBeenCalled()
+    })
+
     it('should not ask to create a stage if the dvc.yaml file is invalid', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       mockedListStages.mockResolvedValueOnce(undefined)
+      mockedHasDvcYamlFile.mockReturnValueOnce(true)
 
       await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
