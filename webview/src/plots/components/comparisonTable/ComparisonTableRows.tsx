@@ -46,7 +46,6 @@ export const ComparisionTableRows: React.FC<ComparisonTableRowsProps> = ({
           path={path}
           plots={columns.map(column => ({
             ...revs[column.revision],
-            fetched: column.fetched,
             revision: column.revision
           }))}
           nbColumns={columns.length}

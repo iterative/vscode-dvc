@@ -274,6 +274,7 @@ describe('ComparisonTable', () => {
           ...revisions,
           [revisionWithNoData]: {
             error: undefined,
+            loading: false,
             revision: revisionWithNoData,
             url: undefined
           }
@@ -306,6 +307,7 @@ describe('ComparisonTable', () => {
           ...revisions,
           [revisionWithNoData]: {
             error: 'this is an error',
+            loading: false,
             revision: revisionWithNoData,
             url: undefined
           }
