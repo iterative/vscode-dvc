@@ -656,8 +656,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
 }
 
 .showMoreCommits {
-  text-align: center;
-  padding: 20px 0;
+  padding: 20px 16px;
   position: fixed;
   left: 0;
   width: 100%;
@@ -668,6 +667,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
   border: none;
   color: $accent-color;
   text-decoration: underline;
+  font-size: 0.6rem;
 
   &:hover {
     text-decoration: none;
