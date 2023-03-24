@@ -95,6 +95,9 @@ export class PlotsModel extends ModelWithPersistence {
     )
     this.comparisonOrder = this.revive(PersistenceKey.PLOT_COMPARISON_ORDER, [])
     this.customPlotsOrder = this.revive(PersistenceKey.PLOTS_CUSTOM_ORDER, [])
+
+    this.cleanupOutdatedCustomPlotsState()
+    this.cleanupOutdatedTrendsState()
   }
 
   public transformAndSetExperiments() {
@@ -189,9 +192,7 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public getCustomPlotsOrder() {
-    return this.customPlotsOrder.map(value =>
-      cleanupOldOrderValue(value, FILE_SEPARATOR)
-    )
+    return this.customPlotsOrder
   }
 
   public updateCustomPlotsOrder(plotsOrder: CustomPlotsOrderValue[]) {
@@ -407,6 +408,24 @@ export class PlotsModel extends ModelWithPersistence {
     }
 
     return mapping
+  }
+
+  private cleanupOutdatedCustomPlotsState() {
+    const order = this.getCustomPlotsOrder()
+    const workspaceHoldsUpToDateState =
+      order.length === 0 || order[0].type !== undefined
+    if (workspaceHoldsUpToDateState) {
+      return
+    }
+    const newOrder = order.map(value =>
+      cleanupOldOrderValue(value, FILE_SEPARATOR)
+    )
+    this.setCustomPlotsOrder(newOrder)
+  }
+
+  private cleanupOutdatedTrendsState() {
+    this.persist(PersistenceKey.PLOT_METRIC_ORDER, undefined)
+    this.persist(PersistenceKey.PLOT_SELECTED_METRICS, undefined)
   }
 
   private removeStaleData() {
