@@ -41,7 +41,11 @@ import {
 } from '../../cli/dvc/contract'
 import { Experiments } from '../../experiments'
 import { getColorScale } from '../vega/util'
-import { definedAndNonEmpty, reorderObjectList } from '../../util/array'
+import {
+  definedAndNonEmpty,
+  reorderObjectList,
+  sameContents
+} from '../../util/array'
 import { removeMissingKeysFromObject } from '../../util/object'
 import { TemplateOrder } from '../paths/collect'
 import { PersistenceKey } from '../../persistence/constants'
@@ -138,10 +142,7 @@ export class PlotsModel extends ModelWithPersistence {
 
     this.setComparisonOrder()
 
-    this.fetchedRevs = new Set([
-      ...this.fetchedRevs,
-      ...revs.map(rev => cliIdToLabel[rev])
-    ])
+    this.fetchedRevs = new Set(revs.map(rev => cliIdToLabel[rev]))
 
     this.experiments.setRevisionCollected(revs)
 
@@ -306,6 +307,10 @@ export class PlotsModel extends ModelWithPersistence {
     }
 
     return this.getSelectedComparisonPlots(paths, selectedRevisions)
+  }
+
+  public requiresUpdate() {
+    return !sameContents([...this.fetchedRevs], this.getSelectedRevisions())
   }
 
   public getComparisonRevisions() {

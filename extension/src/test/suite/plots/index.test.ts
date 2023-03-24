@@ -146,7 +146,7 @@ suite('Plots Test Suite', () => {
       )
     })
 
-    it('should call plots diff with the branch name (if available) whenever the current commit changes', async () => {
+    it('should call plots diff with the commit whenever the current commit changes', async () => {
       const mockNow = getMockNow()
       const { data, experiments, mockPlotsDiff } = await buildPlots(
         disposable,
@@ -642,13 +642,16 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to manually refresh all visible plots from the webview', async () => {
-      const { data, plots, mockPlotsDiff } = await buildPlots(
+      const { data, plots, mockPlotsDiff, messageSpy } = await buildPlots(
         disposable,
         plotsDiffFixture
       )
 
+      messageSpy.restore()
+
       const webview = await plots.showWebview()
       mockPlotsDiff.resetHistory()
+      const instanceMessageSpy = spy(webview, 'show')
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -685,6 +688,10 @@ suite('Plots Test Suite', () => {
         '1ba7bcd',
         '53c3851'
       )
+      expect(
+        instanceMessageSpy,
+        'should call the plots webview with cached data before refreshing with data from the CLI'
+      ).to.be.calledTwice
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to make the plots webview visible', async () => {

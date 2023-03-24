@@ -1,5 +1,4 @@
 import { join } from 'path'
-import isEqual from 'lodash.isequal'
 import { Event, EventEmitter, Memento } from 'vscode'
 import { PlotsData as TPlotsData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
@@ -39,8 +38,6 @@ export class Plots extends BaseRepository<TPlotsData> {
   )
 
   private webviewMessages: WebviewMessages
-
-  private selectedRevisions: string[] = [] // should be in the plots model?
 
   constructor(
     dvcRoot: string,
@@ -141,8 +138,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     )
     this.pathsChanged.fire()
 
-    if (!isEqual(this.selectedRevisions, selectedRevisions)) {
-      this.selectedRevisions = selectedRevisions
+    if (this.plots.requiresUpdate()) {
       this.triggerDataUpdate()
       return
     }
