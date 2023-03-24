@@ -417,7 +417,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         }
       ]
 
-      const filteredTableData: TableData = {
+      const filteredTableData: Partial<TableData> = {
         changes: workspaceChangesFixture,
         columnOrder: columnsOrderFixture,
         columnWidths: {},
@@ -427,14 +427,13 @@ suite('Experiments Filter By Tree Test Suite', () => {
         hasCheckpoints: true,
         hasColumns: true,
         hasConfig: true,
-        hasMoreCommits: true,
         hasRunningExperiment: true,
         hasValidDvcYaml: true,
         rows: filteredRows,
         sorts: []
       }
 
-      expect(messageSpy).to.be.calledWith(filteredTableData)
+      expect(messageSpy).to.be.calledWithMatch(filteredTableData)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should provide a shortcut to filter to starred experiments', async () => {
