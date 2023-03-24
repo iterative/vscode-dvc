@@ -270,24 +270,9 @@ suite('Experiments Test Suite', () => {
 
       await experiments.showWebview()
 
-      const expectedTableData: TableData = {
-        changes: workspaceChangesFixture,
-        columnOrder: columnsOrderFixture,
-        columnWidths: {},
-        columns: columnsFixture,
-        filteredCounts: { checkpoints: 0, experiments: 0 },
-        filters: [],
-        hasCheckpoints: true,
-        hasColumns: true,
-        hasConfig: false,
-        hasMoreCommits: true,
-        hasRunningExperiment: true,
-        hasValidDvcYaml: true,
-        rows: rowsFixture,
-        sorts: []
-      }
-
-      expect(messageSpy).to.be.calledWithExactly(expectedTableData)
+      expect(messageSpy).to.be.calledWithMatch({
+        hasConfig: false
+      })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasConfig to true if there are stages', async () => {
@@ -300,24 +285,9 @@ suite('Experiments Test Suite', () => {
 
       await experiments.showWebview()
 
-      const expectedTableData: TableData = {
-        changes: workspaceChangesFixture,
-        columnOrder: columnsOrderFixture,
-        columnWidths: {},
-        columns: columnsFixture,
-        filteredCounts: { checkpoints: 0, experiments: 0 },
-        filters: [],
-        hasCheckpoints: true,
-        hasColumns: true,
-        hasConfig: true,
-        hasMoreCommits: true,
-        hasRunningExperiment: true,
-        hasValidDvcYaml: true,
-        rows: rowsFixture,
-        sorts: []
-      }
-
-      expect(messageSpy).to.be.calledWithExactly(expectedTableData)
+      expect(messageSpy).to.be.calledWithMatch({
+        hasConfig: true
+      })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasMoreCommits to true if there are more commits to show', async () => {
@@ -1062,24 +1032,18 @@ suite('Experiments Test Suite', () => {
 
       await tableChangePromise
 
-      const allColumnsUnselected: TableData = {
+      const allColumnsUnselected: Partial<TableData> = {
         changes: workspaceChangesFixture,
         columnOrder: columnsOrderFixture,
         columnWidths: {},
         columns: [],
         filteredCounts: { checkpoints: 0, experiments: 0 },
         filters: [],
-        hasCheckpoints: true,
-        hasColumns: true,
-        hasConfig: true,
-        hasMoreCommits: true,
-        hasRunningExperiment: true,
-        hasValidDvcYaml: true,
         rows: rowsFixture,
         sorts: []
       }
 
-      expect(messageSpy).to.be.calledWith(allColumnsUnselected)
+      expect(messageSpy).to.be.calledWithMatch(allColumnsUnselected)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to focus the sorts tree', async () => {

@@ -663,6 +663,17 @@ $bullet-size: calc(var(--design-unit) * 4px);
   width: 100%;
 }
 
+.showMoreCommitsButton {
+  background: transparent;
+  border: none;
+  color: $accent-color;
+  text-decoration: underline;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
 .starSwitch {
   display: inline-flex;
   align-items: center;
