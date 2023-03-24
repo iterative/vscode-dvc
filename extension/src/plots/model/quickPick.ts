@@ -9,10 +9,7 @@ import {
   checkForMetricVsParamPlotOptions,
   checkForCheckpointPlotOptions
 } from './custom'
-import {
-  FILE_SEPARATOR,
-  splitColumnPath
-} from '../../experiments/columns/paths'
+import { splitColumnPath } from '../../experiments/columns/paths'
 import { pickFromColumnLikes } from '../../experiments/columns/quickPick'
 import { Column, ColumnType } from '../../experiments/webview/contract'
 import { definedAndNonEmpty } from '../../util/array'
@@ -27,12 +24,8 @@ import { CustomPlotType } from '../webview/contract'
 import { ColumnLike } from '../../experiments/columns/like'
 
 const getMetricVsParamPlotItem = (metric: string, param: string) => {
-  const fullMetric = getFullValuePath(
-    ColumnType.METRICS,
-    metric,
-    FILE_SEPARATOR
-  )
-  const fullParam = getFullValuePath(ColumnType.PARAMS, param, FILE_SEPARATOR)
+  const fullMetric = getFullValuePath(ColumnType.METRICS, metric)
+  const fullParam = getFullValuePath(ColumnType.PARAMS, param)
   const splitMetric = splitColumnPath(fullMetric)
   const splitParam = splitColumnPath(fullParam)
 
@@ -47,11 +40,7 @@ const getMetricVsParamPlotItem = (metric: string, param: string) => {
 }
 
 const getCheckpointPlotItem = (metric: string) => {
-  const fullMetric = getFullValuePath(
-    ColumnType.METRICS,
-    metric,
-    FILE_SEPARATOR
-  )
+  const fullMetric = getFullValuePath(ColumnType.METRICS, metric)
   const splitMetric = splitColumnPath(fullMetric)
   return {
     description: 'Checkpoint Trend Plot',
@@ -162,7 +151,7 @@ const getAvailableMetricVsParamPlots = (
 const getMetricColumnLikes = (availablePlots: AvailableMetricVsParamPlots) => {
   const metrics = new Set(
     availablePlots.map(({ metric }) =>
-      getFullValuePath(ColumnType.METRICS, metric, FILE_SEPARATOR)
+      getFullValuePath(ColumnType.METRICS, metric)
     )
   )
   return [...metrics].map(getColumnLike)
@@ -176,11 +165,7 @@ const getParamColumnLikes = (
 
   for (const { param, metric } of availablePlots) {
     if (metric === chosenMetric) {
-      const fullPath = getFullValuePath(
-        ColumnType.PARAMS,
-        param,
-        FILE_SEPARATOR
-      )
+      const fullPath = getFullValuePath(ColumnType.PARAMS, param)
       paramColumnLikes.push(getColumnLike(fullPath))
     }
   }
@@ -212,8 +197,7 @@ export const pickMetricAndParam = async (
 
   const metric = removeColumnTypeFromPath(
     metricColumnLike.path,
-    ColumnType.METRICS,
-    FILE_SEPARATOR
+    ColumnType.METRICS
   )
 
   const paramColumnLikes = getParamColumnLikes(availablePlots, metric)
@@ -228,8 +212,7 @@ export const pickMetricAndParam = async (
 
   const param = removeColumnTypeFromPath(
     paramColumnLike.path,
-    ColumnType.PARAMS,
-    FILE_SEPARATOR
+    ColumnType.PARAMS
   )
 
   return { metric, param }
@@ -248,11 +231,7 @@ const getAvailableCheckpointPlotColumnLikes = (
 
   for (const metric of metrics) {
     if (!customPlotIds.has(getCustomPlotId(metric))) {
-      const fullMetric = getFullValuePath(
-        ColumnType.METRICS,
-        metric,
-        FILE_SEPARATOR
-      )
+      const fullMetric = getFullValuePath(ColumnType.METRICS, metric)
       columnLikes.push(getColumnLike(fullMetric))
     }
   }
@@ -281,9 +260,5 @@ export const pickMetric = async (
     return
   }
 
-  return removeColumnTypeFromPath(
-    metric.path,
-    ColumnType.METRICS,
-    FILE_SEPARATOR
-  )
+  return removeColumnTypeFromPath(metric.path, ColumnType.METRICS)
 }

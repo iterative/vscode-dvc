@@ -52,7 +52,6 @@ import {
   MultiSourceVariations
 } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
-import { FILE_SEPARATOR } from '../../experiments/columns/paths'
 
 export type CustomCheckpointPlots = { [metric: string]: CheckpointPlot }
 
@@ -417,9 +416,7 @@ export class PlotsModel extends ModelWithPersistence {
     if (workspaceHoldsUpToDateState) {
       return
     }
-    const newOrder = order.map(value =>
-      cleanupOldOrderValue(value, FILE_SEPARATOR)
-    )
+    const newOrder = order.map(value => cleanupOldOrderValue(value))
     this.setCustomPlotsOrder(newOrder)
   }
 
