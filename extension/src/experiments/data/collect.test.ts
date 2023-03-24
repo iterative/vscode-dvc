@@ -80,7 +80,10 @@ describe('collectFiles', () => {
       }
     } as ExperimentsOutput
 
-    expect(collectFiles(workspace, []).sort()).toStrictEqual([
+    const files = collectFiles(workspace, [])
+    files.sort()
+
+    expect(files).toStrictEqual([
       'further/nested/params.yaml',
       'logs.json',
       'metrics.json',

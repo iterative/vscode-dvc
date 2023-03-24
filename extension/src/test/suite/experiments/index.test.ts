@@ -187,6 +187,56 @@ suite('Experiments Test Suite', () => {
       expect(windowSpy).not.to.have.been.called
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should set hasValidDvcYaml to false if there is an error getting stages and there is a dvc.yaml file', async () => {
+      stub(DvcReader.prototype, 'listStages').resolves(undefined)
+      stub(FileSystem, 'hasDvcYamlFile').returns(true)
+
+      const { experiments, messageSpy } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
+
+      await experiments.showWebview()
+
+      expect(messageSpy).to.be.calledWithMatch({
+        hasValidDvcYaml: false
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should set hasValidDvcYaml to true if there is an error getting stages and there is no dvc.yaml file', async () => {
+      stub(DvcReader.prototype, 'listStages').resolves(undefined)
+      stub(FileSystem, 'hasDvcYamlFile').returns(false)
+
+      const { experiments, messageSpy } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
+
+      await experiments.showWebview()
+
+      const expectedTableData = {
+        hasValidDvcYaml: true
+      }
+
+      expect(messageSpy).to.be.calledWithMatch(expectedTableData)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should set hasValidDvcYaml to true if there are no errors getting stages', async () => {
+      stub(DvcReader.prototype, 'listStages').resolves('')
+      stub(FileSystem, 'hasDvcYamlFile').returns(false)
+
+      const { experiments, messageSpy } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
+
+      await experiments.showWebview()
+
+      expect(messageSpy).to.be.calledWithMatch({
+        hasValidDvcYaml: true
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should set hasConfig to false if there are no stages', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('')
 
@@ -1165,7 +1215,7 @@ suite('Experiments Test Suite', () => {
         .getSelectedRevisions()
         .map(({ id }) => id)
         .sort()
-      expect(selectExperimentIds).to.deep.equal(mockExperimentIds.sort())
+      mockExperimentIds.sort()
       expect(selectExperimentIds).to.deep.equal(mockExperimentIds)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -1207,7 +1257,7 @@ suite('Experiments Test Suite', () => {
         .getSelectedRevisions()
         .map(({ id }) => id)
         .sort()
-      expect(selectExperimentIds).to.deep.equal(mockExperimentIds.sort())
+      expect(selectExperimentIds).to.deep.equal([...mockExperimentIds].sort())
       expect(mockShowPlots).to.be.calledOnce
       expect(mockShowPlots).to.be.calledWith(dvcDemoPath)
     }).timeout(WEBVIEW_TEST_TIMEOUT)

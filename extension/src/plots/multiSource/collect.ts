@@ -10,6 +10,7 @@ import {
 } from './constants'
 import { isImagePlot, Plot, TemplatePlot } from '../webview/contract'
 import { PlotsOutput } from '../../cli/dvc/contract'
+import { sortCollectedArray } from '../../util/array'
 
 const FIELD_SEPARATOR = '::'
 
@@ -164,7 +165,8 @@ const groupVariations = (
       lessValuesThanVariations,
       expectedOrder
     ),
-    valuesMatchVariations: valuesMatchVariations.sort(
+    valuesMatchVariations: sortCollectedArray(
+      valuesMatchVariations,
       (a, b) => expectedOrder.indexOf(a) - expectedOrder.indexOf(b)
     )
   }

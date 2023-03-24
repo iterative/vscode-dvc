@@ -12,7 +12,7 @@ import { WorkspacePlots } from '../../plots/workspace'
 import { Resource, ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
 import { createTreeView } from '../../tree'
-import { definedAndNonEmpty } from '../../util/array'
+import { definedAndNonEmpty, sortCollectedArray } from '../../util/array'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { ViewOpenedEventName } from '../../telemetry/constants'
 import { Disposable } from '../../class/dispose'
@@ -179,7 +179,7 @@ export abstract class BasePathSelectionTree<
       return this.getChildren(onlyRepo)
     }
 
-    return dvcRoots.sort((a, b) => a.localeCompare(b))
+    return sortCollectedArray(dvcRoots, (a, b) => a.localeCompare(b))
   }
 
   private getChildElements(
