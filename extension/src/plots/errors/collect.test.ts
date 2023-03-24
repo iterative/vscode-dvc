@@ -26,6 +26,66 @@ describe('collectErrors', () => {
     expect(errors).toStrictEqual([])
   })
 
+  it('should correctly handle the cliIdToLabel mapping for removing existing errors', () => {
+    const errors = collectErrors(
+      { data: {} },
+      [EXPERIMENT_WORKSPACE_ID, 'ff2489c'],
+      [
+        {
+          msg: 'unexpected error',
+          name: 'fun::plot',
+          rev: EXPERIMENT_WORKSPACE_ID,
+          source: 'metrics.json',
+          type: 'unexpected'
+        },
+        {
+          msg: 'unexpected error',
+          name: 'fun::plot',
+          rev: 'main',
+          source: 'metrics.json',
+          type: 'unexpected'
+        }
+      ],
+      { [EXPERIMENT_WORKSPACE_ID]: EXPERIMENT_WORKSPACE_ID, ff2489c: 'main' }
+    )
+
+    expect(errors).toStrictEqual([])
+  })
+
+  it('should correctly handle the cliIdToLabel mapping for replacing errors', () => {
+    const newError = {
+      msg: 'new error',
+      name: 'fun::plot',
+      rev: 'ff2489c',
+      source: 'metrics.json',
+      type: 'unexpected'
+    }
+
+    const errors = collectErrors(
+      { data: {}, errors: [newError] },
+      [EXPERIMENT_WORKSPACE_ID, 'ff2489c'],
+      [
+        {
+          msg: 'unexpected error',
+          name: 'fun::plot',
+          rev: EXPERIMENT_WORKSPACE_ID,
+          source: 'metrics.json',
+          type: 'unexpected'
+        },
+        {
+          msg: 'unexpected error',
+          name: 'fun::plot',
+          rev: 'main',
+          source: 'metrics.json',
+          type: 'unexpected'
+        }
+      ],
+      { [EXPERIMENT_WORKSPACE_ID]: EXPERIMENT_WORKSPACE_ID, ff2489c: 'main' }
+    )
+
+    expect(errors).toStrictEqual([{ ...newError, rev: 'main' }])
+  })
+
   it('should collect new errors', () => {
     const newError = {
       msg: 'Blue screen of death',

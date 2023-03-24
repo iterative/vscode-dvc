@@ -11,9 +11,11 @@ export const collectErrors = (
   errors: PlotError[],
   cliIdToLabel: { [id: string]: string }
 ) => {
-  const existingErrors = errors.filter(
-    ({ rev }) => !revs.includes(cliIdToLabel[rev] || rev)
+  const fetchedRevs = new Set(
+    revs.map((rev: string) => cliIdToLabel[rev] || rev)
   )
+
+  const existingErrors = errors.filter(({ rev }) => !fetchedRevs.has(rev))
   const newErrors = data?.errors || []
 
   return [
