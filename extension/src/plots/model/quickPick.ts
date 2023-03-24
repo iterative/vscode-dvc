@@ -4,7 +4,6 @@ import {
   CustomPlotsOrderValue,
   isCheckpointValue,
   removeColumnTypeFromPath,
-  AvailableMetricVsParamPlots,
   getCustomPlotPathsFromColumns,
   getCustomPlotIds,
   checkForMetricVsParamPlotOptions,
@@ -124,6 +123,8 @@ const getColumnLike = (path: string) => {
     path
   }
 }
+
+type AvailableMetricVsParamPlots = { metric: string; param: string }[]
 
 const collectMetricVsParamPlot = (
   availablePlots: AvailableMetricVsParamPlots,

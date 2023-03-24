@@ -44,8 +44,6 @@ export const cleanupOldOrderValue = (
   type: (value as CustomPlotsOrderValue).type || CustomPlotType.METRIC_VS_PARAM
 })
 
-export type AvailableMetricVsParamPlots = { metric: string; param: string }[]
-
 export const getCustomPlotIds = (
   customPlotVals: CustomPlotsOrderValue[],
   customPlotType: CustomPlotType
