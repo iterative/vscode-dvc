@@ -573,6 +573,27 @@ describe('App', () => {
     })
   })
 
+  it('should hide the custom plots add button if there are no more plots to create', () => {
+    renderAppWithOptionalData({
+      comparison: comparisonTableFixture,
+      custom: customPlotsFixture
+    })
+
+    const customSection = screen.getAllByTestId('section-container')[2]
+
+    expect(
+      within(customSection).getByLabelText('Add Plots')
+    ).toBeInTheDocument()
+
+    sendSetDataMessage({
+      custom: { ...customPlotsFixture, enablePlotCreation: false }
+    })
+
+    expect(
+      within(customSection).queryByLabelText('Add Plots')
+    ).not.toBeInTheDocument()
+  })
+
   it('should display a slider to pick the number of items per row if there are items and the action is available', () => {
     const store = renderAppWithOptionalData({
       comparison: comparisonTableFixture,

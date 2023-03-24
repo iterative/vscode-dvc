@@ -14,7 +14,11 @@ import {
   getCustomPlotId
 } from './collect'
 import { getRevisionFirstThreeColumns } from './util'
-import { cleanupOldOrderValue, CustomPlotsOrderValue } from './custom'
+import {
+  checkForCustomPlotOptions,
+  cleanupOldOrderValue,
+  CustomPlotsOrderValue
+} from './custom'
 import {
   CheckpointPlot,
   ComparisonPlots,
@@ -174,6 +178,10 @@ export class PlotsModel extends ModelWithPersistence {
 
     return {
       colors,
+      enablePlotCreation: checkForCustomPlotOptions(
+        this.experiments.getColumnTerminalNodes(),
+        plotsOrderValues
+      ),
       height,
       nbItemsPerRow,
       plots

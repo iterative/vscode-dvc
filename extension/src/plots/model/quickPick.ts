@@ -3,7 +3,12 @@ import {
   getFullValuePath,
   CustomPlotsOrderValue,
   isCheckpointValue,
-  removeColumnTypeFromPath
+  removeColumnTypeFromPath,
+  AvailableMetricVsParamPlots,
+  getCustomPlotPathsFromColumns,
+  getCustomPlotIds,
+  checkForMetricVsParamPlotOptions,
+  checkForCheckpointPlotOptions
 } from './custom'
 import {
   FILE_SEPARATOR,
@@ -75,61 +80,41 @@ export const pickCustomPlots = (
   return quickPickManyValues(plotsItems, quickPickOptions)
 }
 
-export const pickCustomPlotType = (): Thenable<CustomPlotType | undefined> => {
-  return quickPickValue(
-    [
-      {
-        description:
-          'A linear plot that compares a chosen metric and param with current experiments.',
-        label: 'Metric Vs Param',
-        value: CustomPlotType.METRIC_VS_PARAM
-      },
-      {
-        description:
-          'A linear plot that shows how a chosen metric changes over selected experiments.',
-        label: 'Checkpoint Trend',
-        value: CustomPlotType.CHECKPOINT
-      }
-    ],
-    {
-      title: Title.SELECT_PLOT_TYPE_CUSTOM_PLOT
-    }
+export const pickCustomPlotType = (
+  columns: Column[],
+  customPlotOrder: CustomPlotsOrderValue[]
+): Thenable<CustomPlotType | undefined> => {
+  const items = []
+  const isMetricVsParamAvailable = checkForMetricVsParamPlotOptions(
+    columns,
+    customPlotOrder
   )
-}
+  const isCheckpointAvailable = checkForCheckpointPlotOptions(
+    columns,
+    customPlotOrder
+  )
 
-const getCustomPlotIds = (
-  customPlotVals: CustomPlotsOrderValue[],
-  customPlotType: CustomPlotType
-): Set<string> => {
-  const plotIds: Set<string> = new Set()
-
-  for (const { type, metric, param } of customPlotVals) {
-    if (type === customPlotType) {
-      plotIds.add(getCustomPlotId(metric, param))
-    }
+  if (isMetricVsParamAvailable) {
+    items.push({
+      description:
+        'A linear plot that compares a chosen metric and param with current experiments.',
+      label: 'Metric Vs Param',
+      value: CustomPlotType.METRIC_VS_PARAM
+    })
   }
 
-  return plotIds
-}
-
-const getCustomPlotPathsFromColumns = (
-  columns: Column[]
-): { metrics: string[]; params: string[] } => {
-  const metrics = []
-  const params = []
-
-  for (const { path, type } of columns) {
-    if (type === ColumnType.METRICS) {
-      metrics.push(
-        removeColumnTypeFromPath(path, ColumnType.METRICS, FILE_SEPARATOR)
-      )
-    } else if (type === ColumnType.PARAMS) {
-      params.push(
-        removeColumnTypeFromPath(path, ColumnType.PARAMS, FILE_SEPARATOR)
-      )
-    }
+  if (isCheckpointAvailable) {
+    items.push({
+      description:
+        'A linear plot that shows how a chosen metric changes over selected experiments.',
+      label: 'Checkpoint Trend',
+      value: CustomPlotType.CHECKPOINT
+    })
   }
-  return { metrics, params }
+
+  return quickPickValue(items, {
+    title: Title.SELECT_PLOT_TYPE_CUSTOM_PLOT
+  })
 }
 
 const getColumnLike = (path: string) => {
@@ -139,8 +124,6 @@ const getColumnLike = (path: string) => {
     path
   }
 }
-
-type AvailableMetricVsParamPlots = { metric: string; param: string }[]
 
 const collectMetricVsParamPlot = (
   availablePlots: AvailableMetricVsParamPlots,

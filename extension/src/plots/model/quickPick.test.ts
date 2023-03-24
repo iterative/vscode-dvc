@@ -99,7 +99,23 @@ describe('pickCustomPlotType', () => {
     const expectedType = CustomPlotType.CHECKPOINT
     mockedQuickPickValue.mockResolvedValueOnce(expectedType)
 
-    const picked = await pickCustomPlotType()
+    const picked = await pickCustomPlotType(
+      [
+        {
+          hasChildren: false,
+          label: 'dropout',
+          path: 'params:params.yaml:dropout',
+          type: ColumnType.PARAMS
+        },
+        {
+          hasChildren: false,
+          label: 'accuracy',
+          path: 'metrics:summary.json:accuracy',
+          type: ColumnType.METRICS
+        }
+      ],
+      []
+    )
 
     expect(picked).toStrictEqual(expectedType)
     expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
@@ -116,6 +132,118 @@ describe('pickCustomPlotType', () => {
             'A linear plot that shows how a chosen metric changes over selected experiments.',
           label: 'Checkpoint Trend',
           value: CustomPlotType.CHECKPOINT
+        }
+      ],
+      {
+        title: Title.SELECT_PLOT_TYPE_CUSTOM_PLOT
+      }
+    )
+  })
+  it('should show checkpoint type if available', async () => {
+    const expectedType = CustomPlotType.CHECKPOINT
+    mockedQuickPickValue.mockResolvedValueOnce(expectedType)
+
+    const picked = await pickCustomPlotType(
+      [
+        {
+          hasChildren: false,
+          label: 'epochs',
+          path: 'params:params.yaml:epochs',
+          type: ColumnType.PARAMS
+        },
+        {
+          hasChildren: false,
+          label: 'dropout',
+          path: 'params:params.yaml:dropout',
+          type: ColumnType.PARAMS
+        },
+        {
+          hasChildren: false,
+          label: 'accuracy',
+          path: 'metrics:summary.json:accuracy',
+          type: ColumnType.METRICS
+        },
+        {
+          hasChildren: false,
+          label: 'loss',
+          path: 'metrics:summary.json:loss',
+          type: ColumnType.METRICS
+        }
+      ],
+      [
+        ...customPlotsOrderFixture.slice(0, 2),
+        {
+          metric: 'summary.json:accuracy',
+          param: 'params.yaml:dropout',
+          type: CustomPlotType.METRIC_VS_PARAM
+        },
+        {
+          metric: 'summary.json:loss',
+          param: 'params.yaml:epochs',
+          type: CustomPlotType.METRIC_VS_PARAM
+        }
+      ]
+    )
+
+    expect(picked).toStrictEqual(expectedType)
+    expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
+    expect(mockedQuickPickValue).toHaveBeenCalledWith(
+      [
+        {
+          description:
+            'A linear plot that shows how a chosen metric changes over selected experiments.',
+          label: 'Checkpoint Trend',
+          value: CustomPlotType.CHECKPOINT
+        }
+      ],
+      {
+        title: Title.SELECT_PLOT_TYPE_CUSTOM_PLOT
+      }
+    )
+  })
+  it('should show metric vs param type if available', async () => {
+    const expectedType = CustomPlotType.CHECKPOINT
+    mockedQuickPickValue.mockResolvedValueOnce(expectedType)
+
+    const picked = await pickCustomPlotType(
+      [
+        {
+          hasChildren: false,
+          label: 'epochs',
+          path: 'params.yaml:epochs',
+          type: ColumnType.PARAMS
+        },
+        {
+          hasChildren: false,
+          label: 'dropout',
+          path: 'params:params.yaml:dropout',
+          type: ColumnType.PARAMS
+        },
+        {
+          hasChildren: false,
+          label: 'accuracy',
+          path: 'metrics:summary.json:accuracy',
+          type: ColumnType.METRICS
+        },
+        {
+          hasChildren: false,
+          label: 'loss',
+          path: 'summary.json:loss',
+          type: ColumnType.METRICS
+        }
+      ],
+      customPlotsOrderFixture
+    )
+
+    expect(picked).toStrictEqual(expectedType)
+    expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
+    expect(mockedQuickPickValue).toHaveBeenCalledWith(
+      [
+        {
+          description:
+            'A linear plot that compares a chosen metric and param with current experiments.',
+          label: 'Metric Vs Param',
+          value: CustomPlotType.METRIC_VS_PARAM
         }
       ],
       {
