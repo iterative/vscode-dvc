@@ -13,12 +13,34 @@ type ComparisonTableCellProps = {
   plot?: ComparisonPlot & { fetched: boolean }
 }
 
+const MissingPlotTableCell: React.FC<{ plot: ComparisonPlot }> = ({ plot }) => (
+  <div className={styles.noImageContent}>
+    {plot.error ? (
+      <>
+        <ErrorTooltip error={plot.error}>
+          <div>
+            <Error height={48} width={48} className={styles.errorIcon} />
+          </div>
+        </ErrorTooltip>
+        <RefreshButton
+          onClick={() =>
+            sendMessage({
+              payload: plot.revision,
+              type: MessageFromWebviewType.REFRESH_REVISION
+            })
+          }
+        />
+      </>
+    ) : (
+      <p className={styles.emptyIcon}>-</p>
+    )}
+  </div>
+)
+
 export const ComparisonTableCell: React.FC<ComparisonTableCellProps> = ({
   path,
   plot
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 }) => {
-  const error = plot?.error
   const fetched = plot?.fetched
   const loading = !fetched && !plot?.url
   const missing = fetched && !plot?.url
@@ -32,29 +54,7 @@ export const ComparisonTableCell: React.FC<ComparisonTableCellProps> = ({
   }
 
   if (missing) {
-    return (
-      <div className={styles.noImageContent}>
-        {error ? (
-          <>
-            <ErrorTooltip error={error}>
-              <div>
-                <Error height={48} width={48} className={styles.errorIcon} />
-              </div>
-            </ErrorTooltip>
-            <RefreshButton
-              onClick={() =>
-                sendMessage({
-                  payload: plot.revision,
-                  type: MessageFromWebviewType.REFRESH_REVISION
-                })
-              }
-            />
-          </>
-        ) : (
-          <p className={styles.emptyIcon}>-</p>
-        )}
-      </div>
-    )
+    return <MissingPlotTableCell plot={plot} />
   }
 
   return (

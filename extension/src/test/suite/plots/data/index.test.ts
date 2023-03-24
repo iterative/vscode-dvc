@@ -34,17 +34,11 @@ suite('Plots Data Test Suite', () => {
     return disposable.disposeAndFlush()
   })
 
-  const buildPlotsData = (
-    missingRevisions: string[] = [],
-    mutableRevisions: string[] = []
-  ) => {
+  const buildPlotsData = (selectedRevisions: string[] = []) => {
     const { internalCommands, updatesPaused, mockPlotsDiff } =
       buildDependencies(disposable)
 
-    const mockGetSelectedOrderedCliIds = stub().returns([
-      ...missingRevisions,
-      ...mutableRevisions
-    ])
+    const mockGetSelectedOrderedCliIds = stub().returns(selectedRevisions)
 
     const mockPlotsModel = {
       getSelectedOrderedCliIds: mockGetSelectedOrderedCliIds
@@ -67,7 +61,7 @@ suite('Plots Data Test Suite', () => {
 
   describe('PlotsData', () => {
     it('should call plots diff when there are no revisions to fetch and no experiment is running (workspace updates)', async () => {
-      const { data, mockPlotsDiff } = buildPlotsData([], [])
+      const { data, mockPlotsDiff } = buildPlotsData([])
 
       await data.update()
 
@@ -76,10 +70,7 @@ suite('Plots Data Test Suite', () => {
     })
 
     it('should call plots diff when an experiment is running in the workspace (live updates)', async () => {
-      const { data, mockPlotsDiff } = buildPlotsData(
-        [],
-        [EXPERIMENT_WORKSPACE_ID]
-      )
+      const { data, mockPlotsDiff } = buildPlotsData([EXPERIMENT_WORKSPACE_ID])
 
       await data.update()
 
@@ -87,7 +78,7 @@ suite('Plots Data Test Suite', () => {
     })
 
     it('should call plots diff when an experiment is running in a temporary directory (live updates)', async () => {
-      const { data, mockPlotsDiff } = buildPlotsData([], ['a7739b5'])
+      const { data, mockPlotsDiff } = buildPlotsData(['a7739b5'])
 
       await data.update()
 
@@ -96,10 +87,12 @@ suite('Plots Data Test Suite', () => {
     })
 
     it('should call plots diff when an experiment is running and there are missing revisions (checkpoints)', async () => {
-      const { data, mockPlotsDiff } = buildPlotsData(
-        ['53c3851', '4fb124a', '42b8736', '1ba7bcd'],
-        []
-      )
+      const { data, mockPlotsDiff } = buildPlotsData([
+        '53c3851',
+        '4fb124a',
+        '42b8736',
+        '1ba7bcd'
+      ])
 
       await data.update()
 
