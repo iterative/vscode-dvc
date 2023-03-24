@@ -1,5 +1,4 @@
 import { EventEmitter } from 'vscode'
-import { DecorationProvider as ErrorDecorationProvider } from './model/decorationProvider'
 import {
   DecorationProvider as ScmDecorationProvider,
   ScmDecorationState
@@ -9,6 +8,8 @@ import { RepositoryModel } from './model'
 import { SourceControlManagement, SCMState } from './sourceControlManagement'
 import { InternalCommands } from '../commands/internal'
 import { DeferredDisposable } from '../class/deferred'
+import { ErrorDecorationProvider } from '../tree/decorationProvider/error'
+import { DecoratableTreeItemScheme } from '../tree'
 
 export const RepositoryScale = {
   TRACKED: 'tracked'
@@ -39,7 +40,7 @@ export class Repository extends DeferredDisposable {
     )
 
     this.errorDecorationProvider = this.dispose.track(
-      new ErrorDecorationProvider()
+      new ErrorDecorationProvider(DecoratableTreeItemScheme.TRACKED)
     )
     this.scmDecorationProvider = this.dispose.track(new ScmDecorationProvider())
     this.sourceControlManagement = this.dispose.track(

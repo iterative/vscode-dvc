@@ -1,18 +1,14 @@
-import { EventEmitter, FileDecoration, Uri } from 'vscode'
-import { DecoratableTreeItemScheme, getDecoratableUri } from '../../tree'
-import { ErrorDecorationProvider } from '../../tree/errorDecorationProvider'
+import { FileDecoration, Uri } from 'vscode'
+import { BaseDecorationProvider } from '.'
+import { getDecoratableUri } from '..'
 import { uniqueValues } from '../../util/array'
 
-export class DecorationProvider extends ErrorDecorationProvider {
+export class ErrorDecorationProvider extends BaseDecorationProvider {
   private errors = new Set<string>()
-
-  constructor(decorationsChanged?: EventEmitter<Uri[]>) {
-    super(DecoratableTreeItemScheme.TRACKED, decorationsChanged)
-  }
 
   public provideFileDecoration(uri: Uri): FileDecoration | undefined {
     if (this.errors.has(uri.fsPath)) {
-      return DecorationProvider.DecorationError
+      return ErrorDecorationProvider.DecorationError
     }
   }
 

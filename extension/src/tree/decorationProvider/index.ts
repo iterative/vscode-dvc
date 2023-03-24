@@ -9,14 +9,15 @@ import {
   Uri,
   window
 } from 'vscode'
-import { DecoratableTreeItemScheme } from '.'
-import { Disposable } from '../class/dispose'
+import { DecoratableTreeItemScheme } from '..'
+import { Disposable } from '../../class/dispose'
 
-export abstract class ErrorDecorationProvider
+export abstract class BaseDecorationProvider
   extends Disposable
   implements FileDecorationProvider
 {
   protected static DecorationError: FileDecoration = {
+    badge: '!',
     color: new ThemeColor('errorForeground')
   }
 
