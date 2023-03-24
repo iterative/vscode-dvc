@@ -106,9 +106,13 @@ export type PlotError = {
   source?: string
 } & ErrorContents
 
-export interface PlotsOutput {
-  data: { [path: string]: Plot[] }
+export type RawPlotsOutput = {
+  data?: { [path: string]: Plot[] }
   errors?: PlotError[]
+}
+
+export type PlotsOutput = RawPlotsOutput & {
+  data: { [path: string]: Plot[] }
 }
 
 export type PlotsOutputOrError = PlotsOutput | DvcError
