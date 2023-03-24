@@ -1,7 +1,7 @@
 import React, { ReactElement } from 'react'
 import styles from './styles.module.scss'
+import Tooltip from './Tooltip'
 import { Error } from '../icons'
-import Tooltip from '../tooltip/Tooltip'
 
 export const ErrorTooltip: React.FC<{
   error?: string

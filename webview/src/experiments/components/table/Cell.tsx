@@ -6,7 +6,7 @@ import { CellProp, RowProp } from './interfaces'
 import { CellRowActionsProps, CellRowActions } from './CellRowActions'
 import { CellValue, isValueWithChanges } from './content/Cell'
 import { clickAndEnterProps } from '../../../util/props'
-import { ErrorTooltip } from '../../../shared/components/errorTooltip/ErrorTooltip'
+import { ErrorTooltip } from '../../../shared/components/tooltip/ErrorTooltip'
 
 const cellHasChanges = (cellValue: CellValue) =>
   isValueWithChanges(cellValue) ? cellValue.changes : false

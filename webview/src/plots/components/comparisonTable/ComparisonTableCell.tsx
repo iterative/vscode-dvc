@@ -6,7 +6,7 @@ import { RefreshButton } from '../../../shared/components/button/RefreshButton'
 import { sendMessage } from '../../../shared/vscode'
 import { zoomPlot } from '../messages'
 import { Error } from '../../../shared/components/icons'
-import { ErrorTooltip } from '../../../shared/components/errorTooltip/ErrorTooltip'
+import { ErrorTooltip } from '../../../shared/components/tooltip/ErrorTooltip'
 
 type ComparisonTableCellProps = {
   path: string
