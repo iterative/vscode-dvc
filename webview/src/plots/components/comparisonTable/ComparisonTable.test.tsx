@@ -263,7 +263,7 @@ describe('ComparisonTable', () => {
     expect(headers).toStrictEqual([...namedRevisions, newRevName])
   })
 
-  it('should display a refresh button for each revision that has a missing image', () => {
+  it('should not display a refresh button for a revision that does not contain an image', () => {
     const revisionWithNoData = 'missing-data'
 
     renderTable({
@@ -273,6 +273,39 @@ describe('ComparisonTable', () => {
         revisions: {
           ...revisions,
           [revisionWithNoData]: {
+            error: undefined,
+            revision: revisionWithNoData,
+            url: undefined
+          }
+        }
+      })),
+      revisions: [
+        ...comparisonTableFixture.revisions,
+        {
+          displayColor: '#f56565',
+          fetched: true,
+          firstThreeColumns: [],
+          group: undefined,
+          id: 'noData',
+          revision: revisionWithNoData
+        }
+      ]
+    })
+
+    expect(screen.queryByText('Refresh')).not.toBeInTheDocument()
+  })
+
+  it('should display a refresh button for each revision that has an image with an error', () => {
+    const revisionWithNoData = 'missing-data'
+
+    renderTable({
+      ...comparisonTableFixture,
+      plots: comparisonTableFixture.plots.map(({ path, revisions }) => ({
+        path,
+        revisions: {
+          ...revisions,
+          [revisionWithNoData]: {
+            error: 'this is an error',
             revision: revisionWithNoData,
             url: undefined
           }

@@ -1,7 +1,7 @@
 import cx from 'classnames'
 import React from 'react'
 import { CellContents } from './CellContent'
-import { ErrorTooltip } from '../Errors'
+import { ErrorTooltip } from '../../../../shared/components/errorTooltip/ErrorTooltip'
 import styles from '../styles.module.scss'
 
 interface ErrorCellProps {

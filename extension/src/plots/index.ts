@@ -3,6 +3,7 @@ import { Event, EventEmitter, Memento } from 'vscode'
 import { PlotsData as TPlotsData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { PlotsData } from './data'
+import { ErrorsModel } from './errors/model'
 import { PlotsModel } from './model'
 import { collectEncodingElements, collectScale } from './paths/collect'
 import { PathsModel } from './paths/model'
@@ -31,6 +32,8 @@ export class Plots extends BaseRepository<TPlotsData> {
   private readonly paths: PathsModel
   private readonly data: PlotsData
 
+  private readonly errors: ErrorsModel
+
   private webviewMessages: WebviewMessages
 
   constructor(
@@ -43,8 +46,10 @@ export class Plots extends BaseRepository<TPlotsData> {
   ) {
     super(dvcRoot, webviewIcon)
 
+    this.errors = this.dispose.track(new ErrorsModel(this.dvcRoot))
+
     this.plots = this.dispose.track(
-      new PlotsModel(this.dvcRoot, experiments, workspaceState)
+      new PlotsModel(this.dvcRoot, experiments, this.errors, workspaceState)
     )
     this.paths = this.dispose.track(
       new PathsModel(this.dvcRoot, workspaceState)
@@ -213,9 +218,11 @@ export class Plots extends BaseRepository<TPlotsData> {
   private onDidUpdateData() {
     this.dispose.track(
       this.data.onDidUpdate(async ({ data, revs }) => {
+        const cliIdToLabel = this.plots.getCLIIdToLabel()
         await Promise.all([
           this.plots.transformAndSetPlots(data, revs),
-          this.paths.transformAndSet(data, revs, this.plots.getCLIIdToLabel())
+          this.paths.transformAndSet(data, revs, cliIdToLabel),
+          this.errors.transformAndSet(data, revs, cliIdToLabel)
         ])
         this.notifyChanged()
       })

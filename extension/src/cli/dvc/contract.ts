@@ -100,7 +100,7 @@ export interface PlotsData {
   [path: string]: Plot[]
 }
 
-type PlotError = {
+export type PlotError = {
   name: string
   rev: string
   source?: string

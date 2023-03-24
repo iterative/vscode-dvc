@@ -699,7 +699,8 @@ export const getComparisonWebviewMessage = (
       }
       revisionsAcc[revision] = {
         url: `${url}?${MOCK_IMAGE_MTIME}`,
-        revision
+        revision,
+        error: undefined
       }
     }
 

@@ -13,7 +13,7 @@ import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import { Shape, StrokeDash } from '../multiSource/constants'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 
-describe('collectPath', () => {
+describe('collectPaths', () => {
   const revisions = [
     EXPERIMENT_WORKSPACE_ID,
     '53c3851',
@@ -223,6 +223,56 @@ describe('collectPath', () => {
         path: 'predictions.json',
         revisions: new Set(revisions),
         type: new Set(['template-multi'])
+      }
+    ])
+  })
+
+  it('should correctly collect error paths', () => {
+    const misspeltJpg = join('training', 'plots', 'images', 'mip.jpg')
+    const revisions = new Set([EXPERIMENT_WORKSPACE_ID])
+
+    const paths = collectPaths(
+      [],
+      {
+        data: {},
+        errors: [
+          {
+            msg: '',
+            name: misspeltJpg,
+            rev: EXPERIMENT_WORKSPACE_ID,
+            source: misspeltJpg,
+            type: 'FileNotFoundError'
+          }
+        ]
+      },
+      [],
+      {}
+    )
+    expect(paths).toHaveLength(4)
+    expect(paths).toStrictEqual([
+      {
+        hasChildren: false,
+        parentPath: join('training', 'plots', 'images'),
+        path: misspeltJpg,
+        revisions
+      },
+      {
+        hasChildren: true,
+        parentPath: join('training', 'plots'),
+        path: join('training', 'plots', 'images'),
+        revisions
+      },
+      {
+        hasChildren: true,
+        parentPath: 'training',
+        path: join('training', 'plots'),
+        revisions
+      },
+      {
+        hasChildren: true,
+        parentPath: undefined,
+        path: 'training',
+        revisions
       }
     ])
   })
