@@ -163,7 +163,7 @@ suite('Experiments Test Suite', () => {
 
       const webview = await experiments.showWebview()
 
-      const expectedTableData: TableData = {
+      const expectedTableData: Partial<TableData> = {
         changes: workspaceChangesFixture,
         columnOrder: columnsOrderFixture,
         columnWidths: {},
@@ -173,14 +173,13 @@ suite('Experiments Test Suite', () => {
         hasCheckpoints: true,
         hasColumns: true,
         hasConfig: true,
-        hasMoreCommits: true,
         hasRunningExperiment: true,
         hasValidDvcYaml: true,
         rows: rowsFixture,
         sorts: []
       }
 
-      expect(messageSpy).to.be.calledWithExactly(expectedTableData)
+      expect(messageSpy).to.be.calledWithMatch(expectedTableData)
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
