@@ -1,6 +1,7 @@
 import {
   ColorScale,
   CustomPlotData,
+  CustomPlotType,
   PlotsSection
 } from 'dvc/src/plots/webview/contract'
 import { isCheckpointPlot } from 'dvc/src/plots/model/custom'
@@ -13,6 +14,7 @@ import styles from '../styles.module.scss'
 import { withScale } from '../../../util/styles'
 import { plotDataStore } from '../plotDataStore'
 import { PlotsState } from '../../store'
+import { GripIcon } from '../../../shared/components/dragDrop/GripIcon'
 
 interface CustomPlotProps {
   id: string
@@ -57,13 +59,20 @@ export const CustomPlot: React.FC<CustomPlotProps> = ({ id }) => {
 
   return (
     <div className={styles.plot} data-testid={key} id={id} style={withScale(1)}>
-      <ZoomablePlot
-        spec={spec}
-        id={id}
-        changeDisabledDragIds={changeDisabledDragIds}
-        currentSnapPoint={nbItemsPerRow}
-        section={PlotsSection.CUSTOM_PLOTS}
-      />
+      {plot.type === CustomPlotType.CHECKPOINT && plot.values.length === 0 ? (
+        <div className={styles.noCustomPlotContent}>
+          <GripIcon className={styles.plotGripIcon} />
+          There are no selected experiments.
+        </div>
+      ) : (
+        <ZoomablePlot
+          spec={spec}
+          id={id}
+          changeDisabledDragIds={changeDisabledDragIds}
+          currentSnapPoint={nbItemsPerRow}
+          section={PlotsSection.CUSTOM_PLOTS}
+        />
+      )}
     </div>
   )
 }

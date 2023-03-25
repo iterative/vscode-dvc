@@ -114,14 +114,16 @@ suite('Experiments Tree Test Suite', () => {
 
       expect(
         messageSpy,
-        'when there are no experiments selected we dont send checkpoint type plots'
+        'when there are no experiments selected we send checkpoint plots with empty values'
       ).to.be.calledWithMatch({
         comparison: null,
         custom: {
           ...customPlotsFixture,
           colors: undefined,
-          plots: customPlotsFixture.plots.filter(
-            plot => plot.type !== CustomPlotType.CHECKPOINT
+          plots: customPlotsFixture.plots.map(plot =>
+            plot.type === CustomPlotType.CHECKPOINT
+              ? { ...plot, values: [] }
+              : plot
           )
         },
         hasPlots: false,

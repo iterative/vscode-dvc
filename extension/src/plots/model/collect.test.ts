@@ -48,9 +48,10 @@ describe('collectCustomPlots', () => {
     expect(data).toStrictEqual(expectedOutput)
   })
 
-  it('should return only custom plots if there no selected revisions', () => {
-    const expectedOutput: CustomPlotData[] = customPlotsFixture.plots.filter(
-      plot => plot.type !== CustomPlotType.CHECKPOINT
+  it('should return checkpoint plots with empty if there no selected revisions', () => {
+    const expectedOutput: CustomPlotData[] = customPlotsFixture.plots.map(
+      plot =>
+        plot.type === CustomPlotType.CHECKPOINT ? { ...plot, values: [] } : plot
     )
     const data = collectCustomPlots({
       ...defaultFuncArgs,

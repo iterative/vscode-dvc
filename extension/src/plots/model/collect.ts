@@ -174,7 +174,7 @@ export const collectCustomPlots = ({
   nbItemsPerRow: number
 }): CustomPlotData[] => {
   const plots = []
-  const shouldSkipCheckpointPlots = !hasCheckpoints || !selectedRevisions
+  const shouldSkipCheckpointPlots = !hasCheckpoints
 
   for (const value of plotsOrderValues) {
     if (shouldSkipCheckpointPlots && isCheckpointValue(value.type)) {

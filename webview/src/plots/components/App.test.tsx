@@ -1274,7 +1274,19 @@ describe('App', () => {
     })
   })
 
-  // custom modal test should be here
+  it('should open a modal with the plot zoomed in when clicking a custom plot', () => {
+    renderAppWithOptionalData({
+      custom: customPlotsFixture
+    })
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+
+    const plot = within(screen.getAllByTestId(/^plot-/)[0]).getByRole('button')
+
+    fireEvent.click(plot)
+
+    expect(screen.getByTestId('modal')).toBeInTheDocument()
+  })
 
   it('should not open a modal with the plot zoomed in when clicking a comparison table plot', () => {
     renderAppWithOptionalData({
