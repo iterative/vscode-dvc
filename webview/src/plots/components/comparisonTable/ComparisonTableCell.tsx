@@ -1,10 +1,8 @@
 import React from 'react'
-import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
 import styles from './styles.module.scss'
 import { RefreshButton } from '../../../shared/components/button/RefreshButton'
-import { sendMessage } from '../../../shared/vscode'
-import { zoomPlot } from '../messages'
+import { refreshRevisions, zoomPlot } from '../messages'
 import { Error } from '../../../shared/components/icons'
 import { ErrorTooltip } from '../../../shared/components/tooltip/ErrorTooltip'
 
@@ -22,14 +20,7 @@ const MissingPlotTableCell: React.FC<{ plot: ComparisonPlot }> = ({ plot }) => (
             <Error height={48} width={48} className={styles.errorIcon} />
           </div>
         </ErrorTooltip>
-        <RefreshButton
-          onClick={() =>
-            sendMessage({
-              payload: plot.revision,
-              type: MessageFromWebviewType.REFRESH_REVISION
-            })
-          }
-        />
+        <RefreshButton onClick={refreshRevisions} />
       </>
     ) : (
       <p className={styles.emptyIcon}>-</p>

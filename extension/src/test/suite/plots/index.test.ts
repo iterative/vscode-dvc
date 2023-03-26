@@ -601,47 +601,7 @@ suite('Plots Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle a message to manually refresh a revision from the webview', async () => {
-      const { data, plots, mockPlotsDiff } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
-
-      const webview = await plots.showWebview()
-      mockPlotsDiff.resetHistory()
-
-      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
-
-      const dataUpdateEvent = new Promise(resolve =>
-        data.onDidUpdate(() => resolve(undefined))
-      )
-
-      mockMessageReceived.fire({
-        payload: 'main',
-        type: MessageFromWebviewType.REFRESH_REVISION
-      })
-
-      await dataUpdateEvent
-
-      expect(mockSendTelemetryEvent).to.be.calledOnce
-      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_PLOTS_MANUAL_REFRESH,
-        { revisions: 1 },
-        undefined
-      )
-      expect(mockPlotsDiff).to.be.called
-      expect(mockPlotsDiff).to.be.calledWithExactly(
-        dvcDemoPath,
-        EXPERIMENT_WORKSPACE_ID,
-        '4fb124a',
-        '42b8736',
-        '1ba7bcd',
-        '53c3851'
-      )
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
-    it('should handle a message to manually refresh all visible plots from the webview', async () => {
+    it('should handle a message to manually refresh plot revisions from the webview', async () => {
       const { data, plots, mockPlotsDiff, messageSpy } = await buildPlots(
         disposable,
         plotsDiffFixture
@@ -661,13 +621,6 @@ suite('Plots Test Suite', () => {
       )
 
       mockMessageReceived.fire({
-        payload: [
-          '1ba7bcd',
-          '42b8736',
-          '4fb124a',
-          'main',
-          EXPERIMENT_WORKSPACE_ID
-        ],
         type: MessageFromWebviewType.REFRESH_REVISIONS
       })
 
@@ -676,7 +629,7 @@ suite('Plots Test Suite', () => {
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_PLOTS_MANUAL_REFRESH,
-        { revisions: 5 },
+        undefined,
         undefined
       )
       expect(mockPlotsDiff).to.be.called
