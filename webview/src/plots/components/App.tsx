@@ -49,7 +49,6 @@ const dispatchCollapsedSections = (
 export const feedStore = (
   data: MessageToWebview<PlotsData>,
   dispatch: PlotsDispatch
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   if (data.data) {
     dispatch(initialize())

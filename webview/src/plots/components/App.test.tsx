@@ -1759,7 +1759,6 @@ describe('App', () => {
     })
   })
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('Ribbon', () => {
     const getDisplayedRevisionOrder = () => {
       const ribbon = screen.getByTestId('ribbon')
