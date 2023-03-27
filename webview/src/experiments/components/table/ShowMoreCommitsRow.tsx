@@ -10,21 +10,24 @@ export const ShowMoreCommitsRow: React.FC = () => {
   )
 
   return (
-    <div className={styles.showMoreCommits} data-testid="show-more-commits">
-      <button
-        className={styles.showMoreCommitsButton}
-        onClick={showMoreCommits}
-        disabled={!hasMoreCommits}
-      >
-        Show More Commits
-      </button>
-      <button
-        className={styles.showMoreCommitsButton}
-        onClick={showLessCommits}
-        disabled={!isShowingMoreCommits}
-      >
-        Show Less Commits
-      </button>
+    <div className={styles.showMoreCommits}>
+      {hasMoreCommits && (
+        <button
+          className={styles.showMoreCommitsButton}
+          onClick={showMoreCommits}
+          data-testid="show-more-commits"
+        >
+          Show More Commits
+        </button>
+      )}
+      {isShowingMoreCommits && (
+        <button
+          className={styles.showMoreCommitsButton}
+          onClick={showLessCommits}
+        >
+          Show Less Commits
+        </button>
+      )}
     </div>
   )
 }

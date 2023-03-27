@@ -1537,7 +1537,7 @@ describe('App', () => {
 
       fireEvent.click(screen.getByTestId('show-more-commits'))
 
-      expect(mockPostMessage).not.toHaveBeenCalledWith({
+      expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.SHOW_MORE_COMMITS
       })
     })

@@ -79,6 +79,7 @@ export const App: React.FC<Record<string, unknown>> = () => {
                 dispatch(
                   updateIsShowingMoreCommits(data.data.isShowingMoreCommits)
                 )
+                continue
               case 'rows':
                 dispatch(updateRows(data.data.rows))
                 continue
