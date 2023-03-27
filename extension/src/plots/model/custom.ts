@@ -70,7 +70,6 @@ export const getCustomPlotPathsFromColumns = (
 export const checkForMetricVsParamPlotOptions = (
   columns: Column[],
   customPlotOrder: CustomPlotsOrderValue[]
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 ): boolean => {
   const { metrics, params } = getCustomPlotPathsFromColumns(columns)
   const plotIds = getCustomPlotIds(
