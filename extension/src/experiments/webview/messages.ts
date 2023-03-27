@@ -47,10 +47,11 @@ export class WebviewMessages {
   private hasConfig = false
   private hasValidDvcYaml = true
   private hasMoreCommits = false
+  private isShowingMoreCommits = true
 
   private readonly addStage: () => Promise<boolean>
   private readonly getNumCommits: () => Promise<number>
-  private readonly getMoreCommits: () => Promise<void>
+  private readonly changeNbOfCommits: (change: number) => Promise<void>
 
   constructor(
     dvcRoot: string,
@@ -67,7 +68,7 @@ export class WebviewMessages {
     hasStages: () => Promise<string>,
     addStage: () => Promise<boolean>,
     getNumCommits: () => Promise<number>,
-    getMoreCommits: () => Promise<void>
+    changeNbOfCommits: (change: number) => Promise<void>
   ) {
     this.dvcRoot = dvcRoot
     this.experiments = experiments
@@ -80,10 +81,10 @@ export class WebviewMessages {
     this.hasStages = hasStages
     this.addStage = addStage
     this.getNumCommits = getNumCommits
-    this.getMoreCommits = getMoreCommits
+    this.changeNbOfCommits = changeNbOfCommits
 
     void this.changeHasConfig()
-    void this.changeHasMoreCommits()
+    void this.changeHasMoreOrLessCommits()
   }
 
   public async changeHasConfig(update?: boolean) {
@@ -93,10 +94,11 @@ export class WebviewMessages {
     update && this.sendWebviewMessage()
   }
 
-  public async changeHasMoreCommits(
+  public async changeHasMoreOrLessCommits(
     nbCommits = Number.parseInt(NUM_OF_COMMITS_TO_SHOW, 10)
   ) {
     this.hasMoreCommits = (await this.getNumCommits()) > nbCommits
+    this.isShowingMoreCommits = nbCommits > 1
   }
 
   public sendWebviewMessage() {
@@ -221,7 +223,10 @@ export class WebviewMessages {
         )
 
       case MessageFromWebviewType.SHOW_MORE_COMMITS:
-        return this.getMoreCommits()
+        return this.changeNbOfCommits(1)
+
+      case MessageFromWebviewType.SHOW_LESS_COMMITS:
+        return this.changeNbOfCommits(-1)
 
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
@@ -244,6 +249,7 @@ export class WebviewMessages {
       hasMoreCommits: this.hasMoreCommits,
       hasRunningExperiment: this.experiments.hasRunningExperiment(),
       hasValidDvcYaml: this.hasValidDvcYaml,
+      isShowingMoreCommits: this.isShowingMoreCommits,
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()
     }

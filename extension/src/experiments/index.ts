@@ -183,9 +183,11 @@ export class Experiments extends BaseRepository<TableData> {
     return this.cliData.managedUpdate()
   }
 
-  public getMoreCommits() {
-    this.numberOfCommitsToShow = this.numberOfCommitsToShow + 2
-    void this.webviewMessages.changeHasMoreCommits(this.numberOfCommitsToShow)
+  public changeNbOfCommits(change: number) {
+    this.numberOfCommitsToShow = this.numberOfCommitsToShow + 2 * change
+    void this.webviewMessages.changeHasMoreOrLessCommits(
+      this.numberOfCommitsToShow
+    )
     return this.cliData.update(
       ExperimentFlag.NUM_COMMIT,
       this.numberOfCommitsToShow.toString()
@@ -586,7 +588,7 @@ export class Experiments extends BaseRepository<TableData> {
           AvailableCommands.GIT_GET_NUM_COMMITS,
           this.dvcRoot
         ),
-      () => this.getMoreCommits()
+      (change: number) => this.changeNbOfCommits(change)
     )
 
     this.dispose.track(

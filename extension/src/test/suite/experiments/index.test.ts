@@ -136,14 +136,14 @@ suite('Experiments Test Suite', () => {
       const { experiments, mockUpdateExperimentsData } =
         buildExperiments(disposable)
 
-      await experiments.getMoreCommits()
+      await experiments.changeNbOfCommits(1)
 
       expect(mockUpdateExperimentsData).to.be.calledWithExactly(
         ExperimentFlag.NUM_COMMIT,
         '5'
       )
 
-      await experiments.getMoreCommits()
+      await experiments.changeNbOfCommits(1)
 
       expect(mockUpdateExperimentsData).to.be.calledWithExactly(
         ExperimentFlag.NUM_COMMIT,
@@ -1352,7 +1352,7 @@ suite('Experiments Test Suite', () => {
     it('should handle a message to show more commits', async () => {
       const { experiments, messageSpy } = setupExperimentsAndMockCommands()
 
-      const getMoreCommitsSpy = spy(experiments, 'getMoreCommits')
+      const getMoreCommitsSpy = spy(experiments, 'changeNbOfCommits')
 
       const webview = await experiments.showWebview()
       messageSpy.resetHistory()

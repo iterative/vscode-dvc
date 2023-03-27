@@ -67,7 +67,8 @@ export enum MessageFromWebviewType {
   INSTALL_DVC = 'install-dvc',
   SETUP_WORKSPACE = 'setup-workspace',
   ZOOM_PLOT = 'zoom-plot',
-  SHOW_MORE_COMMITS = 'show-more-commits'
+  SHOW_MORE_COMMITS = 'show-more-commits',
+  SHOW_LESS_COMMITS = 'show-less-commits'
 }
 
 export type ColumnResizePayload = {
@@ -232,6 +233,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.ZOOM_PLOT; payload?: string }
   | { type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW }
   | { type: MessageFromWebviewType.SHOW_MORE_COMMITS }
+  | { type: MessageFromWebviewType.SHOW_LESS_COMMITS }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA

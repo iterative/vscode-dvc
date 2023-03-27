@@ -26,6 +26,7 @@ export const tableDataInitialState: TableDataState = {
   hasMoreCommits: false,
   hasRunningExperiment: false,
   hasValidDvcYaml: true,
+  isShowingMoreCommits: true,
   rows: [],
   sorts: []
 }
@@ -88,6 +89,9 @@ export const tableDataSlice = createSlice({
     updateHasValidDvcYaml: (state, action: PayloadAction<boolean>) => {
       state.hasValidDvcYaml = action.payload
     },
+    updateIsShowingMoreCommits: (state, action: PayloadAction<boolean>) => {
+      state.isShowingMoreCommits = action.payload
+    },
     updateRows: (state, action: PayloadAction<Row[]>) => {
       state.rows = keepEqualOldReferencesInArray(
         state.rows,
@@ -117,6 +121,7 @@ export const {
   updateHasMoreCommits,
   updateHasRunningExperiment,
   updateHasValidDvcYaml,
+  updateIsShowingMoreCommits,
   updateRows,
   updateSorts
 } = tableDataSlice.actions
