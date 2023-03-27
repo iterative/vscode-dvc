@@ -100,6 +100,10 @@ export const pickCustomPlotType = (
     })
   }
 
+  if (items.length === 0) {
+    return Toast.showError('There are no plots to create.')
+  }
+
   return quickPickValue(items, {
     title: Title.SELECT_PLOT_TYPE_CUSTOM_PLOT
   })

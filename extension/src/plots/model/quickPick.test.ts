@@ -95,6 +95,13 @@ describe('pickCustomPlots', () => {
 })
 
 describe('pickCustomPlotType', () => {
+  it('should end early if there are no custom plots available', async () => {
+    mockedQuickPickValue.mockResolvedValueOnce(undefined)
+    const undef = await pickCustomPlotType([], [])
+    expect(undef).toBeUndefined()
+    expect(mockedShowError).toHaveBeenCalledTimes(1)
+  })
+
   it('should return a chosen custom plot type', async () => {
     const expectedType = CustomPlotType.CHECKPOINT
     mockedQuickPickValue.mockResolvedValueOnce(expectedType)
@@ -139,7 +146,7 @@ describe('pickCustomPlotType', () => {
       }
     )
   })
-  it('should show checkpoint type if available', async () => {
+  it('should show the checkpoint type if available', async () => {
     const expectedType = CustomPlotType.CHECKPOINT
     mockedQuickPickValue.mockResolvedValueOnce(expectedType)
 
@@ -201,7 +208,8 @@ describe('pickCustomPlotType', () => {
       }
     )
   })
-  it('should show metric vs param type if available', async () => {
+
+  it('should show the metric vs param type if available', async () => {
     const expectedType = CustomPlotType.CHECKPOINT
     mockedQuickPickValue.mockResolvedValueOnce(expectedType)
 
