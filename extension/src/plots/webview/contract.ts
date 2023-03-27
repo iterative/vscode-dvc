@@ -117,6 +117,7 @@ export type CustomPlotsData = {
   plots: CustomPlotData[]
   nbItemsPerRow: number
   colors: ColorScale | undefined
+  enablePlotCreation: boolean
   height: PlotHeight
 }
 

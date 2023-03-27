@@ -4,7 +4,6 @@ import {
   CustomPlotType,
   PlotsSection
 } from 'dvc/src/plots/webview/contract'
-import { isCheckpointPlot } from 'dvc/src/plots/model/custom'
 import React, { useMemo, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { createMetricVsParamSpec, createCheckpointSpec } from './util'
@@ -28,7 +27,7 @@ const createCustomPlotSpec = (
     return {}
   }
 
-  if (isCheckpointPlot(plot)) {
+  if (plot.type === CustomPlotType.CHECKPOINT) {
     return createCheckpointSpec(plot.yTitle, plot.metric, plot.param, colors)
   }
   return createMetricVsParamSpec(plot.yTitle, plot.param)

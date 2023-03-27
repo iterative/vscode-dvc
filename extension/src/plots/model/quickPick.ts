@@ -3,12 +3,13 @@ import {
   getFullValuePath,
   CustomPlotsOrderValue,
   isCheckpointValue,
-  removeColumnTypeFromPath
+  removeColumnTypeFromPath,
+  getCustomPlotPathsFromColumns,
+  getCustomPlotIds,
+  checkForMetricVsParamPlotOptions,
+  checkForCheckpointPlotOptions
 } from './custom'
-import {
-  FILE_SEPARATOR,
-  splitColumnPath
-} from '../../experiments/columns/paths'
+import { splitColumnPath } from '../../experiments/columns/paths'
 import { pickFromColumnLikes } from '../../experiments/columns/quickPick'
 import { Column, ColumnType } from '../../experiments/webview/contract'
 import { definedAndNonEmpty } from '../../util/array'
@@ -23,12 +24,8 @@ import { CustomPlotType } from '../webview/contract'
 import { ColumnLike } from '../../experiments/columns/like'
 
 const getMetricVsParamPlotItem = (metric: string, param: string) => {
-  const fullMetric = getFullValuePath(
-    ColumnType.METRICS,
-    metric,
-    FILE_SEPARATOR
-  )
-  const fullParam = getFullValuePath(ColumnType.PARAMS, param, FILE_SEPARATOR)
+  const fullMetric = getFullValuePath(ColumnType.METRICS, metric)
+  const fullParam = getFullValuePath(ColumnType.PARAMS, param)
   const splitMetric = splitColumnPath(fullMetric)
   const splitParam = splitColumnPath(fullParam)
 
@@ -43,11 +40,7 @@ const getMetricVsParamPlotItem = (metric: string, param: string) => {
 }
 
 const getCheckpointPlotItem = (metric: string) => {
-  const fullMetric = getFullValuePath(
-    ColumnType.METRICS,
-    metric,
-    FILE_SEPARATOR
-  )
+  const fullMetric = getFullValuePath(ColumnType.METRICS, metric)
   const splitMetric = splitColumnPath(fullMetric)
   return {
     description: 'Checkpoint Trend Plot',
@@ -75,61 +68,45 @@ export const pickCustomPlots = (
   return quickPickManyValues(plotsItems, quickPickOptions)
 }
 
-export const pickCustomPlotType = (): Thenable<CustomPlotType | undefined> => {
-  return quickPickValue(
-    [
-      {
-        description:
-          'A linear plot that compares a chosen metric and param with current experiments.',
-        label: 'Metric Vs Param',
-        value: CustomPlotType.METRIC_VS_PARAM
-      },
-      {
-        description:
-          'A linear plot that shows how a chosen metric changes over selected experiments.',
-        label: 'Checkpoint Trend',
-        value: CustomPlotType.CHECKPOINT
-      }
-    ],
-    {
-      title: Title.SELECT_PLOT_TYPE_CUSTOM_PLOT
-    }
+export const pickCustomPlotType = (
+  columns: Column[],
+  customPlotOrder: CustomPlotsOrderValue[]
+): Thenable<CustomPlotType | undefined> => {
+  const items = []
+  const isMetricVsParamAvailable = checkForMetricVsParamPlotOptions(
+    columns,
+    customPlotOrder
   )
-}
+  const isCheckpointAvailable = checkForCheckpointPlotOptions(
+    columns,
+    customPlotOrder
+  )
 
-const getCustomPlotIds = (
-  customPlotVals: CustomPlotsOrderValue[],
-  customPlotType: CustomPlotType
-): Set<string> => {
-  const plotIds: Set<string> = new Set()
-
-  for (const { type, metric, param } of customPlotVals) {
-    if (type === customPlotType) {
-      plotIds.add(getCustomPlotId(metric, param))
-    }
+  if (isMetricVsParamAvailable) {
+    items.push({
+      description:
+        'A linear plot that compares a chosen metric and param with current experiments.',
+      label: 'Metric Vs Param',
+      value: CustomPlotType.METRIC_VS_PARAM
+    })
   }
 
-  return plotIds
-}
-
-const getCustomPlotPathsFromColumns = (
-  columns: Column[]
-): { metrics: string[]; params: string[] } => {
-  const metrics = []
-  const params = []
-
-  for (const { path, type } of columns) {
-    if (type === ColumnType.METRICS) {
-      metrics.push(
-        removeColumnTypeFromPath(path, ColumnType.METRICS, FILE_SEPARATOR)
-      )
-    } else if (type === ColumnType.PARAMS) {
-      params.push(
-        removeColumnTypeFromPath(path, ColumnType.PARAMS, FILE_SEPARATOR)
-      )
-    }
+  if (isCheckpointAvailable) {
+    items.push({
+      description:
+        'A linear plot that shows how a chosen metric changes over selected experiments.',
+      label: 'Checkpoint Trend',
+      value: CustomPlotType.CHECKPOINT
+    })
   }
-  return { metrics, params }
+
+  if (items.length === 0) {
+    return Toast.showError('There are no plots to create.')
+  }
+
+  return quickPickValue(items, {
+    title: Title.SELECT_PLOT_TYPE_CUSTOM_PLOT
+  })
 }
 
 const getColumnLike = (path: string) => {
@@ -178,7 +155,7 @@ const getAvailableMetricVsParamPlots = (
 const getMetricColumnLikes = (availablePlots: AvailableMetricVsParamPlots) => {
   const metrics = new Set(
     availablePlots.map(({ metric }) =>
-      getFullValuePath(ColumnType.METRICS, metric, FILE_SEPARATOR)
+      getFullValuePath(ColumnType.METRICS, metric)
     )
   )
   return [...metrics].map(getColumnLike)
@@ -192,11 +169,7 @@ const getParamColumnLikes = (
 
   for (const { param, metric } of availablePlots) {
     if (metric === chosenMetric) {
-      const fullPath = getFullValuePath(
-        ColumnType.PARAMS,
-        param,
-        FILE_SEPARATOR
-      )
+      const fullPath = getFullValuePath(ColumnType.PARAMS, param)
       paramColumnLikes.push(getColumnLike(fullPath))
     }
   }
@@ -228,8 +201,7 @@ export const pickMetricAndParam = async (
 
   const metric = removeColumnTypeFromPath(
     metricColumnLike.path,
-    ColumnType.METRICS,
-    FILE_SEPARATOR
+    ColumnType.METRICS
   )
 
   const paramColumnLikes = getParamColumnLikes(availablePlots, metric)
@@ -244,8 +216,7 @@ export const pickMetricAndParam = async (
 
   const param = removeColumnTypeFromPath(
     paramColumnLike.path,
-    ColumnType.PARAMS,
-    FILE_SEPARATOR
+    ColumnType.PARAMS
   )
 
   return { metric, param }
@@ -264,11 +235,7 @@ const getAvailableCheckpointPlotColumnLikes = (
 
   for (const metric of metrics) {
     if (!customPlotIds.has(getCustomPlotId(metric))) {
-      const fullMetric = getFullValuePath(
-        ColumnType.METRICS,
-        metric,
-        FILE_SEPARATOR
-      )
+      const fullMetric = getFullValuePath(ColumnType.METRICS, metric)
       columnLikes.push(getColumnLike(fullMetric))
     }
   }
@@ -297,9 +264,5 @@ export const pickMetric = async (
     return
   }
 
-  return removeColumnTypeFromPath(
-    metric.path,
-    ColumnType.METRICS,
-    FILE_SEPARATOR
-  )
+  return removeColumnTypeFromPath(metric.path, ColumnType.METRICS)
 }

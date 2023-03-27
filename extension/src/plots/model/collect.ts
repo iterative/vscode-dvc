@@ -23,10 +23,7 @@ import {
   MetricVsParamPlotValues
 } from '../webview/contract'
 import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../cli/dvc/contract'
-import {
-  splitColumnPath,
-  FILE_SEPARATOR
-} from '../../experiments/columns/paths'
+import { splitColumnPath } from '../../experiments/columns/paths'
 import {
   ColumnType,
   Experiment,
@@ -132,13 +129,9 @@ const getCustomPlotData = (
   nbItemsPerRow: number
 ): CustomPlotData => {
   const { metric, param, type } = orderValue
-  const metricPath = getFullValuePath(
-    ColumnType.METRICS,
-    metric,
-    FILE_SEPARATOR
-  )
+  const metricPath = getFullValuePath(ColumnType.METRICS, metric)
 
-  const paramPath = getFullValuePath(ColumnType.PARAMS, param, FILE_SEPARATOR)
+  const paramPath = getFullValuePath(ColumnType.PARAMS, param)
 
   const selectedExperiments = experiments.filter(({ name, label }) =>
     selectedRevisions.includes(name || label)
