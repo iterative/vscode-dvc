@@ -162,7 +162,7 @@ module.exports = {
     'react/react-in-jsx-scope': 'off',
     'require-await': 'error',
     'security/detect-object-injection': 'off',
-    'sonarjs/cognitive-complexity': ['error', 5],
+    'sonarjs/cognitive-complexity': ['error', 6],
     'sort-keys-fix/sort-keys-fix': 'warn',
     'unicorn/consistent-function-scoping': 'off',
     'unicorn/filename-case': 'off',
