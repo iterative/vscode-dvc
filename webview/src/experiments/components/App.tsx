@@ -29,7 +29,6 @@ export const App: React.FC<Record<string, unknown>> = () => {
 
   useVsCodeMessaging(
     useCallback(
-      // eslint-disable-next-line sonarjs/cognitive-complexity
       ({ data }: { data: MessageToWebview<TableData> }) => {
         if (data.type === MessageToWebviewType.SET_DATA) {
           dispatch(update(!!data.data))
