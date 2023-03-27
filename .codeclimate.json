@@ -19,6 +19,9 @@
       "config": {
         "threshold": 40
       }
+    },
+    "method-complexity": {
+      "config": { "threshold": 6 }
     }
   }
 }

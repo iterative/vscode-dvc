@@ -71,14 +71,14 @@
     "lint-staged": "13.2.0",
     "raw-loader": "4.0.2",
     "sass": "1.59.3",
-    "sass-loader": "13.2.0",
+    "sass-loader": "13.2.1",
     "storybook-addon-designs": "6.3.1",
     "storybook-addon-themes": "6.1.0",
     "style-loader": "3.3.2",
     "ts-loader": "9.4.2",
     "webpack": "5.76.2",
     "webpack-cli": "5.0.1",
-    "webpack-dev-server": "4.12.0"
+    "webpack-dev-server": "4.13.1"
   },
   "svgr": {
     "typescript": true,

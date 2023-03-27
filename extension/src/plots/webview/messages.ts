@@ -238,7 +238,10 @@ export class WebviewMessages {
       return this.addMetricVsParamPlot()
     }
 
-    const plotType = await pickCustomPlotType()
+    const plotType = await pickCustomPlotType(
+      this.experiments.getColumnTerminalNodes(),
+      this.plots.getCustomPlotsOrder()
+    )
 
     if (!plotType) {
       return
