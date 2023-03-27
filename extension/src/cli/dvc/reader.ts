@@ -66,16 +66,16 @@ export class DvcReader extends DvcCli {
 
   public async expShow(
     cwd: string,
-    ...flags: ExperimentFlag[]
+    ...flags: (ExperimentFlag | string)[]
   ): Promise<ExperimentsOutput> {
     const output = await this.readProcess<ExperimentsOutput>(
       cwd,
       JSON.stringify(defaultExperimentsOutput),
       Command.EXPERIMENT,
       SubCommand.SHOW,
-      ...flags,
       Flag.NUM_COMMIT,
       NUM_OF_COMMITS_TO_SHOW,
+      ...flags,
       Flag.JSON
     )
     if (isDvcError(output) || isEmpty(output)) {

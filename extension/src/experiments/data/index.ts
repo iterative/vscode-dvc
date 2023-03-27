@@ -52,7 +52,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     return this.processManager.run('partialUpdate')
   }
 
-  public async update(...args: ExperimentFlag[]): Promise<void> {
+  public async update(...args: (ExperimentFlag | string)[]): Promise<void> {
     const data = await this.internalCommands.executeCommand<ExperimentsOutput>(
       AvailableCommands.EXP_SHOW,
       this.dvcRoot,

@@ -49,6 +49,7 @@ export const tableData: TableData = {
   hasCheckpoints: false,
   hasColumns: true,
   hasConfig: true,
+  hasMoreCommits: true,
   hasRunningExperiment: false,
   hasValidDvcYaml: true,
   rows: [
