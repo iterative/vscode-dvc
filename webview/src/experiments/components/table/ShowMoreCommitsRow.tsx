@@ -24,6 +24,7 @@ export const ShowMoreCommitsRow: React.FC = () => {
         <button
           className={styles.showMoreCommitsButton}
           onClick={showLessCommits}
+          data-testid="show-less-commits"
         >
           Show Less Commits
         </button>

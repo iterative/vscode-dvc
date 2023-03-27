@@ -316,6 +316,35 @@ suite('Experiments Test Suite', () => {
         hasMoreCommits: false
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should set isShowingMoreCommits to true if it is showing more than the current commit', async () => {
+      const { experiments, messageSpy } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
+
+      await experiments.changeNbOfCommits(1)
+      await experiments.showWebview()
+
+      expect(messageSpy).to.be.calledWithMatch({
+        isShowingMoreCommits: true
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should set isShowingMoreCommits to false it is showing only the current commit', async () => {
+      stub(GitReader.prototype, 'getNumCommits').resolves(1)
+      const { experiments, messageSpy } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
+
+      await experiments.changeNbOfCommits(-1)
+      await experiments.showWebview()
+
+      expect(messageSpy).to.be.calledWithMatch({
+        isShowingMoreCommits: false
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 
   describe('handleMessageFromWebview', () => {
@@ -1363,6 +1392,24 @@ suite('Experiments Test Suite', () => {
       })
 
       expect(getMoreCommitsSpy).to.be.calledOnce
+      expect(getMoreCommitsSpy).to.be.calledWith(1)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a message to show less commits', async () => {
+      const { experiments, messageSpy } = setupExperimentsAndMockCommands()
+
+      const getLessCommitsSpy = spy(experiments, 'changeNbOfCommits')
+
+      const webview = await experiments.showWebview()
+      messageSpy.resetHistory()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SHOW_LESS_COMMITS
+      })
+
+      expect(getLessCommitsSpy).to.be.calledOnce
+      expect(getLessCommitsSpy).to.be.calledWith(-1)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 
