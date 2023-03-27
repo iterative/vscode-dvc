@@ -22,6 +22,7 @@ const initialColorsState = { domain: [], range: [] }
 export const customPlotsInitialState: CustomPlotsState = {
   colors: initialColorsState,
   disabledDragPlotIds: [],
+  enablePlotCreation: true,
   hasData: false,
   height: DEFAULT_HEIGHT[PlotsSection.CUSTOM_PLOTS],
   isCollapsed: DEFAULT_SECTION_COLLAPSED[PlotsSection.CUSTOM_PLOTS],

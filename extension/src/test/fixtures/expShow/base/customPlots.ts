@@ -192,6 +192,7 @@ const data: CustomPlotsData = {
     domain: ['exp-e7a67', 'test-branch', 'exp-83425'],
     range: [colors[2], colors[3], colors[4]]
   },
+  enablePlotCreation: true,
   plots: [
     {
       id: 'custom-summary.json:loss-params.yaml:dropout',
