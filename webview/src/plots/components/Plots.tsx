@@ -49,6 +49,16 @@ const PlotsContent = () => {
     return <EmptyState>Loading Plots...</EmptyState>
   }
 
+  const modal = zoomedInPlot?.plot && (
+    <Modal
+      onClose={() => {
+        dispatch(setZoomedInPlot(undefined))
+      }}
+    >
+      <ZoomedInPlot props={zoomedInPlot.plot} />
+    </Modal>
+  )
+
   if (!hasComparisonData && !hasTemplateData) {
     return (
       <div className={styles.getStartedWrapper}>
@@ -61,15 +71,7 @@ const PlotsContent = () => {
         {hasCustomData && (
           <>
             <CustomPlotsWrapper />
-            {zoomedInPlot?.plot && (
-              <Modal
-                onClose={() => {
-                  dispatch(setZoomedInPlot(undefined))
-                }}
-              >
-                <ZoomedInPlot props={zoomedInPlot.plot} />
-              </Modal>
-            )}
+            {modal}
           </>
         )}
       </div>
@@ -83,15 +85,7 @@ const PlotsContent = () => {
       <ComparisonTableWrapper />
       <CustomPlotsWrapper />
 
-      {zoomedInPlot?.plot && (
-        <Modal
-          onClose={() => {
-            dispatch(setZoomedInPlot(undefined))
-          }}
-        >
-          <ZoomedInPlot props={zoomedInPlot.plot} />
-        </Modal>
-      )}
+      {modal}
     </div>
   )
 }

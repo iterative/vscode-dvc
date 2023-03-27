@@ -23,7 +23,7 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
   onClear
 }) => {
   const {
-    firstThreeColumns = [],
+    firstThreeColumns,
     commit,
     fetched,
     group,

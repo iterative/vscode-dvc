@@ -370,6 +370,28 @@ describe('App', () => {
     expect(screen.getByText('No Plots Added')).toBeInTheDocument()
   })
 
+  it('should render custom with checkpoint plot placeholders when there are no selected experiments', () => {
+    const checkpointPlot = customPlotsFixture.plots[2]
+    renderAppWithOptionalData({
+      custom: {
+        ...customPlotsFixture,
+        plots: [
+          {
+            ...checkpointPlot,
+            values: []
+          }
+        ]
+      }
+    })
+
+    expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
+    expect(screen.queryByText('No Plots to Display')).not.toBeInTheDocument()
+    expect(screen.getByText('Custom')).toBeInTheDocument()
+    expect(
+      screen.getByText('There are no selected experiments.')
+    ).toBeInTheDocument()
+  })
+
   it('should render the comparison table when given a message with comparison plots data', () => {
     const expectedSectionName = 'Images'
 
