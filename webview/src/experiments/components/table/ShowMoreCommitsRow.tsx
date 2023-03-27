@@ -10,10 +10,11 @@ export const ShowMoreCommitsRow: React.FC = () => {
   )
 
   return hasMoreCommits ? (
-    <div className={styles.showMoreCommits} data-testid="show-more-commits">
+    <div className={styles.showMoreCommits}>
       <button
         className={styles.showMoreCommitsButton}
         onClick={showMoreCommits}
+        data-testid="show-more-commits"
       >
         Show More Commits
       </button>
