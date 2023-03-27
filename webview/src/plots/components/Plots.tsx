@@ -16,13 +16,9 @@ import { PlotsState } from '../store'
 
 const PlotsContent = () => {
   const dispatch = useDispatch()
-  const {
-    hasData,
-    hasPlots,
-    hasUnselectedPlots,
-    zoomedInPlot,
-    selectedRevisions
-  } = useSelector((state: PlotsState) => state.webview)
+  const { hasData, hasPlots, hasUnselectedPlots, zoomedInPlot } = useSelector(
+    (state: PlotsState) => state.webview
+  )
   const hasComparisonData = useSelector(
     (state: PlotsState) => state.comparison.hasData
   )
@@ -56,7 +52,6 @@ const PlotsContent = () => {
   if (!hasComparisonData && !hasTemplateData) {
     return (
       <div className={styles.getStartedWrapper}>
-        {selectedRevisions.length > 0 && <Ribbon />}
         <GetStarted
           addItems={<AddPlots hasUnselectedPlots={hasUnselectedPlots} />}
           showEmpty={!hasPlots}
