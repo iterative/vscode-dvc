@@ -132,18 +132,18 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('getMoreCommits', () => {
-    it('should increase the number of commits to show by 2', async () => {
+    it('should update the data with the number of commits', async () => {
       const { experiments, mockUpdateExperimentsData } =
         buildExperiments(disposable)
 
-      await experiments.getMoreCommits()
+      await experiments.getMoreCommits(5)
 
       expect(mockUpdateExperimentsData).to.be.calledWithExactly(
         ExperimentFlag.NUM_COMMIT,
         '5'
       )
 
-      await experiments.getMoreCommits()
+      await experiments.getMoreCommits(7)
 
       expect(mockUpdateExperimentsData).to.be.calledWithExactly(
         ExperimentFlag.NUM_COMMIT,

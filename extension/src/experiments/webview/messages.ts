@@ -47,10 +47,11 @@ export class WebviewMessages {
   private hasConfig = false
   private hasValidDvcYaml = true
   private hasMoreCommits = false
+  private numberOfCommitsToShow = Number.parseInt(NUM_OF_COMMITS_TO_SHOW, 10)
 
   private readonly addStage: () => Promise<boolean>
   private readonly getNumCommits: () => Promise<number>
-  private readonly getMoreCommits: () => Promise<void>
+  private readonly getMoreCommits: (nbOfCommits: number) => Promise<void>
 
   constructor(
     dvcRoot: string,
@@ -67,7 +68,7 @@ export class WebviewMessages {
     hasStages: () => Promise<string>,
     addStage: () => Promise<boolean>,
     getNumCommits: () => Promise<number>,
-    getMoreCommits: () => Promise<void>
+    getMoreCommits: (nbOfCommits: number) => Promise<void>
   ) {
     this.dvcRoot = dvcRoot
     this.experiments = experiments
@@ -91,12 +92,6 @@ export class WebviewMessages {
     this.hasValidDvcYaml = !hasDvcYamlFile(this.dvcRoot) || stages !== undefined
     this.hasConfig = !!stages
     update && this.sendWebviewMessage()
-  }
-
-  public async changeHasMoreCommits(
-    nbCommits = Number.parseInt(NUM_OF_COMMITS_TO_SHOW, 10)
-  ) {
-    this.hasMoreCommits = (await this.getNumCommits()) > nbCommits
   }
 
   public sendWebviewMessage() {
@@ -221,11 +216,22 @@ export class WebviewMessages {
         )
 
       case MessageFromWebviewType.SHOW_MORE_COMMITS:
-        return this.getMoreCommits()
+        return this.changeNumberOfCommits()
 
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
+  }
+
+  private async changeHasMoreCommits() {
+    this.hasMoreCommits =
+      (await this.getNumCommits()) > this.numberOfCommitsToShow
+  }
+
+  private async changeNumberOfCommits() {
+    this.numberOfCommitsToShow = this.numberOfCommitsToShow + 2
+    await this.getMoreCommits(this.numberOfCommitsToShow)
+    await this.changeHasMoreCommits()
   }
 
   private getWebviewData() {

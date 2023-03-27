@@ -45,8 +45,7 @@ import { ConfigKey } from '../vscode/config'
 import { checkSignalFile, pollSignalFileForProcess } from '../fileSystem'
 import {
   DVCLIVE_ONLY_RUNNING_SIGNAL_FILE,
-  ExperimentFlag,
-  NUM_OF_COMMITS_TO_SHOW
+  ExperimentFlag
 } from '../cli/dvc/constants'
 
 export const ExperimentsScale = {
@@ -103,8 +102,6 @@ export class Experiments extends BaseRepository<TableData> {
   private dvcLiveOnlySignalFile: string
 
   private readonly addStage: () => Promise<boolean>
-
-  private numberOfCommitsToShow = Number.parseInt(NUM_OF_COMMITS_TO_SHOW, 10)
 
   constructor(
     dvcRoot: string,
@@ -183,12 +180,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.cliData.managedUpdate()
   }
 
-  public getMoreCommits() {
-    this.numberOfCommitsToShow = this.numberOfCommitsToShow + 2
-    void this.webviewMessages.changeHasMoreCommits(this.numberOfCommitsToShow)
+  public getMoreCommits(numberOfCommitsToShow: number) {
     return this.cliData.update(
       ExperimentFlag.NUM_COMMIT,
-      this.numberOfCommitsToShow.toString()
+      numberOfCommitsToShow.toString()
     )
   }
 
@@ -586,7 +581,7 @@ export class Experiments extends BaseRepository<TableData> {
           AvailableCommands.GIT_GET_NUM_COMMITS,
           this.dvcRoot
         ),
-      () => this.getMoreCommits()
+      (nbOfCommits: number) => this.getMoreCommits(nbOfCommits)
     )
 
     this.dispose.track(
