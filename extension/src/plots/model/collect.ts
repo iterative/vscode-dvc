@@ -551,16 +551,17 @@ export const collectCommitRevisionDetails = (
   return commitRevisions
 }
 
-const getRevision = (
+const getOverrideRevision = (
   displayColor: Color,
   experiment: Experiment,
-  firstThreeColumns: string[]
+  firstThreeColumns: string[],
+  fetchedRevs: Set<string>
 ): Revision => {
   const { commit, displayNameOrParent, logicalGroupName, id, label } =
     experiment
   const revision: Revision = {
     displayColor,
-    fetched: true,
+    fetched: fetchedRevs.has(label),
     firstThreeColumns: getRevisionFirstThreeColumns(
       firstThreeColumns,
       experiment
@@ -580,18 +581,20 @@ const overrideWithWorkspace = (
   selectedWithOverrides: Revision[],
   displayColor: Color,
   label: string,
-  firstThreeColumns: string[]
+  firstThreeColumns: string[],
+  fetchedRevs: Set<string>
 ): void => {
   orderMapping[label] = EXPERIMENT_WORKSPACE_ID
   selectedWithOverrides.push(
-    getRevision(
+    getOverrideRevision(
       displayColor,
       {
         id: EXPERIMENT_WORKSPACE_ID,
         label: EXPERIMENT_WORKSPACE_ID,
         logicalGroupName: undefined
       },
-      firstThreeColumns
+      firstThreeColumns,
+      fetchedRevs
     )
   )
 }
@@ -610,15 +613,18 @@ const isExperimentThatWillDisappearAtEnd = (
 const getMostRecentFetchedCheckpointRevision = (
   selectedRevision: SelectedExperimentWithColor,
   fetchedRevs: Set<string>,
+  revisionsWithData: Set<string>,
   checkpoints: Experiment[] | undefined,
   firstThreeColumns: string[]
 ): Revision => {
   const mostRecent =
-    checkpoints?.find(({ label }) => fetchedRevs.has(label)) || selectedRevision
-  return getRevision(
+    checkpoints?.find(({ label }) => revisionsWithData.has(label)) ||
+    selectedRevision
+  return getOverrideRevision(
     selectedRevision.displayColor,
     mostRecent,
-    firstThreeColumns
+    firstThreeColumns,
+    fetchedRevs
   )
 }
 
@@ -627,6 +633,7 @@ const overrideRevisionDetail = (
   selectedWithOverrides: Revision[],
   selectedRevision: SelectedExperimentWithColor,
   fetchedRevs: Set<string>,
+  revisionsWithData: Set<string>,
   checkpoints: Experiment[] | undefined,
   firstThreeColumns: string[]
 ) => {
@@ -635,6 +642,7 @@ const overrideRevisionDetail = (
   const mostRecent = getMostRecentFetchedCheckpointRevision(
     selectedRevision,
     fetchedRevs,
+    revisionsWithData,
     checkpoints,
     firstThreeColumns
   )
@@ -647,6 +655,7 @@ const collectRevisionDetail = (
   selectedWithOverrides: Revision[],
   selectedRevision: SelectedExperimentWithColor,
   fetchedRevs: Set<string>,
+  revisionsWithData: Set<string>,
   unfinishedRunningExperiments: { [id: string]: string },
   getCheckpoints: (id: string) => Experiment[] | undefined,
   firstThreeColumns: string[]
@@ -662,7 +671,8 @@ const collectRevisionDetail = (
       selectedWithOverrides,
       displayColor,
       label,
-      firstThreeColumns
+      firstThreeColumns,
+      fetchedRevs
     )
   }
 
@@ -679,6 +689,7 @@ const collectRevisionDetail = (
       selectedWithOverrides,
       selectedRevision,
       fetchedRevs,
+      revisionsWithData,
       getCheckpoints(id),
       firstThreeColumns
     )
@@ -686,7 +697,12 @@ const collectRevisionDetail = (
 
   orderMapping[label] = label
   selectedWithOverrides.push(
-    getRevision(displayColor, selectedRevision, firstThreeColumns)
+    getOverrideRevision(
+      displayColor,
+      selectedRevision,
+      firstThreeColumns,
+      fetchedRevs
+    )
   )
 }
 
@@ -694,6 +710,7 @@ export const collectOverrideRevisionDetails = (
   comparisonOrder: string[],
   selectedRevisions: SelectedExperimentWithColor[],
   fetchedRevs: Set<string>,
+  revisionsWithData: Set<string>,
   unfinishedRunningExperiments: { [id: string]: string },
   getCheckpoints: (id: string) => Experiment[] | undefined,
   firstThreeColumns: string[]
@@ -710,6 +727,7 @@ export const collectOverrideRevisionDetails = (
       selectedWithOverrides,
       selectedRevision,
       fetchedRevs,
+      revisionsWithData,
       unfinishedRunningExperiments,
       getCheckpoints,
       firstThreeColumns

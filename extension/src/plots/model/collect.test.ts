@@ -236,6 +236,7 @@ describe('collectOverrideRevisionDetails', () => {
           }
         ] as SelectedExperimentWithColor[],
         new Set(['a', 'c', 'd', 'e']),
+        new Set(['a', 'c', 'd', 'e']),
         {},
         (id: string) =>
           ({
@@ -348,6 +349,7 @@ describe('collectOverrideRevisionDetails', () => {
             status: ExperimentStatus.SUCCESS
           }
         ] as SelectedExperimentWithColor[],
+        new Set([]),
         new Set(['a', 'c', 'd', 'e']),
         { [runningId]: EXPERIMENT_WORKSPACE_ID },
         (id: string) =>
@@ -382,7 +384,7 @@ describe('collectOverrideRevisionDetails', () => {
     expect(overrideRevisions).toStrictEqual([
       {
         displayColor: '#4299e1',
-        fetched: true,
+        fetched: false,
         firstThreeColumns: [],
         group: 'a',
         id: 'a',
@@ -390,7 +392,7 @@ describe('collectOverrideRevisionDetails', () => {
       },
       {
         displayColor: '#13adc7',
-        fetched: true,
+        fetched: false,
         firstThreeColumns: [],
         group: undefined,
         id: EXPERIMENT_WORKSPACE_ID,
@@ -398,7 +400,7 @@ describe('collectOverrideRevisionDetails', () => {
       },
       {
         displayColor: '#48bb78',
-        fetched: true,
+        fetched: false,
         firstThreeColumns: [],
         group: 'c',
         id: 'c',
@@ -406,7 +408,7 @@ describe('collectOverrideRevisionDetails', () => {
       },
       {
         displayColor: '#f56565',
-        fetched: true,
+        fetched: false,
         firstThreeColumns: [],
         group: 'd',
         id: 'd',
@@ -460,6 +462,7 @@ describe('collectOverrideRevisionDetails', () => {
             status: ExperimentStatus.SUCCESS
           }
         ] as SelectedExperimentWithColor[],
+        new Set([]),
         new Set(['a', 'c', 'd', 'e']),
         {},
         (id: string) =>
@@ -499,7 +502,7 @@ describe('collectOverrideRevisionDetails', () => {
     ])
   })
 
-  it('should override the revision details for finished but unfetched checkpoint tips', () => {
+  it('should override the revision details for finished but unfetched checkpoint tips (based on available data)', () => {
     const justFinishedRunningId = 'exp-was-running'
     const { overrideComparison, overrideRevisions } =
       collectOverrideRevisionDetails(
@@ -517,6 +520,7 @@ describe('collectOverrideRevisionDetails', () => {
           { label: 'c' },
           { label: 'd' }
         ] as SelectedExperimentWithColor[],
+        new Set([]),
         new Set(['a', 'c', 'd', 'e']),
         { [justFinishedRunningId]: justFinishedRunningId },
         (id: string) =>
