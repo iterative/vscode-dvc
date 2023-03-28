@@ -144,13 +144,11 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public getCustomPlots(): CustomPlotsData | undefined {
-    const experimentsWithNoCommitData = this.experiments.hasCheckpoints()
-      ? this.experiments
-          .getExperimentsWithCheckpoints()
-          .filter(({ checkpoints }) => !!checkpoints)
-      : this.experiments.getExperiments()
+    const experiments = this.experiments
+      .getExperimentsWithCheckpoints()
+      .filter(({ id }) => id !== EXPERIMENT_WORKSPACE_ID)
 
-    if (experimentsWithNoCommitData.length === 0) {
+    if (experiments.length === 0) {
       return
     }
 
@@ -164,9 +162,8 @@ export class PlotsModel extends ModelWithPersistence {
       PlotsSection.CUSTOM_PLOTS
     )
     const plotsOrderValues = this.getCustomPlotsOrder()
-
     const plots: CustomPlotData[] = collectCustomPlots({
-      experiments: experimentsWithNoCommitData,
+      experiments,
       hasCheckpoints: this.experiments.hasCheckpoints(),
       height,
       nbItemsPerRow,
