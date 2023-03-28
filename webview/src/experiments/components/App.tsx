@@ -20,6 +20,7 @@ import {
   updateHasMoreCommits,
   updateHasRunningExperiment,
   updateHasValidDvcYaml,
+  updateIsShowingMoreCommits,
   updateRows,
   updateSorts
 } from './table/tableDataSlice'
@@ -72,6 +73,11 @@ export const App: React.FC<Record<string, unknown>> = () => {
                 continue
               case 'hasValidDvcYaml':
                 dispatch(updateHasValidDvcYaml(data.data.hasValidDvcYaml))
+                continue
+              case 'isShowingMoreCommits':
+                dispatch(
+                  updateIsShowingMoreCommits(data.data.isShowingMoreCommits)
+                )
                 continue
               case 'rows':
                 dispatch(updateRows(data.data.rows))

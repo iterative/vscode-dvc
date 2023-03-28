@@ -47,11 +47,13 @@ export class WebviewMessages {
   private hasConfig = false
   private hasValidDvcYaml = true
   private hasMoreCommits = false
+  private isShowingMoreCommits = true
+
   private numberOfCommitsToShow = Number.parseInt(NUM_OF_COMMITS_TO_SHOW, 10)
 
   private readonly addStage: () => Promise<boolean>
   private readonly getNumCommits: () => Promise<number>
-  private readonly getMoreCommits: (nbOfCommits: number) => Promise<void>
+  private readonly changeNbOfCommits: (nbOfCommits: number) => Promise<void>
 
   constructor(
     dvcRoot: string,
@@ -68,7 +70,7 @@ export class WebviewMessages {
     hasStages: () => Promise<string>,
     addStage: () => Promise<boolean>,
     getNumCommits: () => Promise<number>,
-    getMoreCommits: (nbOfCommits: number) => Promise<void>
+    changeNbOfCommits: (nbOfCommits: number) => Promise<void>
   ) {
     this.dvcRoot = dvcRoot
     this.experiments = experiments
@@ -81,10 +83,10 @@ export class WebviewMessages {
     this.hasStages = hasStages
     this.addStage = addStage
     this.getNumCommits = getNumCommits
-    this.getMoreCommits = getMoreCommits
+    this.changeNbOfCommits = changeNbOfCommits
 
     void this.changeHasConfig()
-    void this.changeHasMoreCommits()
+    void this.changeHasMoreOrLessCommits()
   }
 
   public async changeHasConfig(update?: boolean) {
@@ -216,22 +218,27 @@ export class WebviewMessages {
         )
 
       case MessageFromWebviewType.SHOW_MORE_COMMITS:
-        return this.changeNumberOfCommits()
+        return this.changeCommitsToShow(1)
+
+      case MessageFromWebviewType.SHOW_LESS_COMMITS:
+        return this.changeCommitsToShow(-1)
 
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
   }
 
-  private async changeHasMoreCommits() {
-    this.hasMoreCommits =
-      (await this.getNumCommits()) > this.numberOfCommitsToShow
+  private async changeHasMoreOrLessCommits() {
+    const availableNbCommits = await this.getNumCommits()
+    this.hasMoreCommits = availableNbCommits > this.numberOfCommitsToShow
+    this.isShowingMoreCommits =
+      Math.min(this.numberOfCommitsToShow, availableNbCommits) > 1
   }
 
-  private async changeNumberOfCommits() {
-    this.numberOfCommitsToShow = this.numberOfCommitsToShow + 2
-    await this.getMoreCommits(this.numberOfCommitsToShow)
-    await this.changeHasMoreCommits()
+  private async changeCommitsToShow(change: number) {
+    this.numberOfCommitsToShow = this.numberOfCommitsToShow + 2 * change
+    await this.changeNbOfCommits(this.numberOfCommitsToShow)
+    await this.changeHasMoreOrLessCommits()
   }
 
   private getWebviewData() {
@@ -250,6 +257,7 @@ export class WebviewMessages {
       hasMoreCommits: this.hasMoreCommits,
       hasRunningExperiment: this.experiments.hasRunningExperiment(),
       hasValidDvcYaml: this.hasValidDvcYaml,
+      isShowingMoreCommits: this.isShowingMoreCommits,
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()
     }
