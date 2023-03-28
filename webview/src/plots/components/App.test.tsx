@@ -370,24 +370,6 @@ describe('App', () => {
     expect(screen.getByText('No Plots Added')).toBeInTheDocument()
   })
 
-  it('should render custom with a message when there are no selected experiments', () => {
-    renderAppWithOptionalData({
-      custom: {
-        ...customPlotsFixture,
-        hasMissingCheckpointData: true
-      }
-    })
-
-    expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
-    expect(screen.queryByText('No Plots to Display')).not.toBeInTheDocument()
-    expect(screen.getByText('Custom')).toBeInTheDocument()
-    expect(
-      screen.getByText(
-        'Select a checkpoint experiment to display checkpoint trend plots.'
-      )
-    ).toBeInTheDocument()
-  })
-
   it('should render the comparison table when given a message with comparison plots data', () => {
     const expectedSectionName = 'Images'
 

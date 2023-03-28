@@ -118,7 +118,6 @@ export type CustomPlotsData = {
   nbItemsPerRow: number
   colors: ColorScale | undefined
   enablePlotCreation: boolean
-  hasMissingCheckpointData: boolean
   height: PlotHeight
 }
 

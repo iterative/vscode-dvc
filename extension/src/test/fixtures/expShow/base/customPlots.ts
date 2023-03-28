@@ -205,7 +205,6 @@ const data: CustomPlotsData = {
     range: [colors[2], colors[3], colors[4]]
   },
   enablePlotCreation: true,
-  hasMissingCheckpointData: false,
   plots: [
     {
       id: 'custom-summary.json:loss-params.yaml:dropout',

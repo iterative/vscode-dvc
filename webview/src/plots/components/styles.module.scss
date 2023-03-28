@@ -23,18 +23,6 @@ $gap: 20px;
   width: 100%;
 }
 
-.plotsSectionMessage {
-  margin: 0 20px 20px;
-  display: flex;
-  align-items: center;
-  border-top: 1px solid $border-color;
-  border-bottom: 1px solid $border-color;
-
-  svg {
-    margin-right: 5px;
-  }
-}
-
 :global(.vega-bindings):not(:empty) {
   position: absolute;
   bottom: 0;

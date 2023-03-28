@@ -120,7 +120,6 @@ suite('Experiments Tree Test Suite', () => {
         custom: {
           ...customPlotsFixture,
           colors: undefined,
-          hasMissingCheckpointData: true,
           plots: customPlotsFixture.plots.filter(
             plot => plot.type !== CustomPlotType.CHECKPOINT
           )

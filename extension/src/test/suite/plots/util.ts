@@ -144,7 +144,6 @@ export const getExpectedCustomPlotsData = (
         range
       },
       enablePlotCreation,
-      hasMissingCheckpointData: false,
       height,
       nbItemsPerRow,
       plots: plots.map(plot => ({

@@ -24,7 +24,6 @@ export const customPlotsInitialState: CustomPlotsState = {
   disabledDragPlotIds: [],
   enablePlotCreation: true,
   hasData: false,
-  hasMissingCheckpointData: false,
   height: DEFAULT_HEIGHT[PlotsSection.CUSTOM_PLOTS],
   isCollapsed: DEFAULT_SECTION_COLLAPSED[PlotsSection.CUSTOM_PLOTS],
   nbItemsPerRow:
