@@ -160,3 +160,12 @@
 .buttonWrapper {
   list-style: none;
 }
+
+.tooltipPathWrapper {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: rtl;
+  display: block;
+  white-space: nowrap;
+}

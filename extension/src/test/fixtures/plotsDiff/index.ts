@@ -572,7 +572,7 @@ export const getRevisions = (): Revision[] => {
           value: 2.048856019973755
         },
         {
-          path: 'summary.json:accuracy',
+          path: 'summary.json:accuracy:something:something_more:way--way-way-longer',
           type: ColumnType.METRICS,
           value: 0.3484833240509033
         }
