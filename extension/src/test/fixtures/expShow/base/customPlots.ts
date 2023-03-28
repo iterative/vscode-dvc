@@ -34,7 +34,7 @@ export const customPlotsOrderFixture: CustomPlotsOrderValue[] = [
   }
 ]
 
-export const experimentsWithCheckpoints: ExperimentWithCheckpoints[] = [
+export const experimentsWithCommits: ExperimentWithCheckpoints[] = [
   {
     id: 'main',
     label: 'label',
