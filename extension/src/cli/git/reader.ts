@@ -8,6 +8,7 @@ import { isDirectory } from '../../fileSystem'
 
 export const autoRegisteredCommands = {
   GIT_GET_COMMIT_MESSAGES: 'getCommitMessages',
+  GIT_GET_NUM_COMMITS: 'getNumCommits',
   GIT_GET_REMOTE_URL: 'getRemoteUrl',
   GIT_GET_REPOSITORY_ROOT: 'getGitRepositoryRoot',
   GIT_HAS_CHANGES: 'hasChanges',
@@ -76,6 +77,21 @@ export class GitReader extends GitCli {
       this.getUntrackedDirectories(cwd)
     ])
     return new Set([...files, ...dirs])
+  }
+
+  public async getNumCommits(cwd: string) {
+    const options = getOptions(
+      cwd,
+      Command.REV_LIST,
+      Flag.FULL_HISTORY,
+      Flag.ALL
+    )
+    try {
+      const revisions = await this.executeProcess(options)
+      return revisions.split('\n').length
+    } catch {
+      return ''
+    }
   }
 
   private async getUntrackedDirectories(cwd: string): Promise<string[]> {

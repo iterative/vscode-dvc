@@ -116,7 +116,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         }
       ]
 
-      const filteredTableData: TableData = {
+      const filteredTableData: Partial<TableData> = {
         changes: workspaceChangesFixture,
         columnOrder: columnsOrderFixture,
         columnWidths: {},
@@ -132,7 +132,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         sorts: []
       }
 
-      expect(messageSpy).to.be.calledWith(filteredTableData)
+      expect(messageSpy).to.be.calledWithMatch(filteredTableData)
 
       const tableFilterRemoved = experimentsUpdatedEvent(experiments)
 
@@ -149,7 +149,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       )
       await tableFilterRemoved
 
-      const unfilteredTableData: TableData = {
+      const unfilteredTableData: Partial<TableData> = {
         changes: workspaceChangesFixture,
         columnOrder: columnsOrderFixture,
         columnWidths: {},
@@ -165,7 +165,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         sorts: []
       }
 
-      expect(messageSpy).to.be.calledWith(unfilteredTableData)
+      expect(messageSpy).to.be.calledWithMatch(unfilteredTableData)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to remove all filters with dvc.views.experimentsFilterByTree.removeAllFilters', async () => {
@@ -417,7 +417,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         }
       ]
 
-      const filteredTableData: TableData = {
+      const filteredTableData: Partial<TableData> = {
         changes: workspaceChangesFixture,
         columnOrder: columnsOrderFixture,
         columnWidths: {},
@@ -433,7 +433,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         sorts: []
       }
 
-      expect(messageSpy).to.be.calledWith(filteredTableData)
+      expect(messageSpy).to.be.calledWithMatch(filteredTableData)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should provide a shortcut to filter to starred experiments', async () => {

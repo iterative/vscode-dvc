@@ -76,7 +76,8 @@ export enum QueueSubCommand {
 export enum ExperimentFlag {
   NO_FETCH = '--no-fetch',
   QUEUE = '--queue',
-  RESET = '--reset'
+  RESET = '--reset',
+  NUM_COMMIT = '-n'
 }
 
 export enum GcPreserveFlag {

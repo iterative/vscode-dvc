@@ -31,6 +31,7 @@ export enum Flag {
   DOT = '.',
   EXCLUDE_STANDARD = '--exclude-standard',
   FORCE = '-f',
+  FULL_HISTORY = '--full-history',
   GET_URL = '--get-url',
   HARD = '--hard',
   MESSAGE = '-m',

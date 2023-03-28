@@ -32,7 +32,10 @@ const WorkspaceRowGroupWrapper: React.FC<
 export const TableBody: React.FC<
   RowProp &
     InstanceProp &
-    BatchSelectionProp & { root: HTMLElement | null; tableHeaderHeight: number }
+    BatchSelectionProp & {
+      root: HTMLElement | null
+      tableHeaderHeight: number
+    }
 > = ({
   row,
   instance,

@@ -9,6 +9,7 @@ const tableDataFixture: TableData = {
   filters: [],
   hasCheckpoints: true,
   hasConfig: true,
+  hasMoreCommits: true,
   hasRunningExperiment: true,
   hasValidDvcYaml: true,
   hasColumns: true,

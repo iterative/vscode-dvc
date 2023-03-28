@@ -99,6 +99,7 @@ export type TableData = {
   hasCheckpoints: boolean
   hasColumns: boolean
   hasConfig: boolean
+  hasMoreCommits: boolean
   hasRunningExperiment: boolean
   hasValidDvcYaml: boolean
   rows: Row[]
