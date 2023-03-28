@@ -17,7 +17,8 @@ import { getRevisionFirstThreeColumns } from './util'
 import {
   checkForCustomPlotOptions,
   cleanupOldOrderValue,
-  CustomPlotsOrderValue
+  CustomPlotsOrderValue,
+  isCheckpointValue
 } from './custom'
 import {
   CheckpointPlot,
@@ -175,12 +176,21 @@ export class PlotsModel extends ModelWithPersistence {
       return
     }
 
+    const orderHasCheckpointPlots = plotsOrderValues.some(({ type }) =>
+      isCheckpointValue(type)
+    )
+    const plotsHaveCheckpointPlots = plots.some(({ type }) =>
+      isCheckpointValue(type)
+    )
+
     return {
       colors,
       enablePlotCreation: checkForCustomPlotOptions(
         this.experiments.getColumnTerminalNodes(),
         plotsOrderValues
       ),
+      hasMissingCheckpointData:
+        orderHasCheckpointPlots && !plotsHaveCheckpointPlots,
       height,
       nbItemsPerRow,
       plots

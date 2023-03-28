@@ -7,10 +7,19 @@ import { changeSize } from './customPlotsSlice'
 import { PlotsContainer } from '../PlotsContainer'
 import { PlotsState } from '../../store'
 import { sendMessage } from '../../../shared/vscode'
+import { Icon } from '../../../shared/components/Icon'
+import { Info } from '../../../shared/components/icons'
+import styles from '../styles.module.scss'
 
 export const CustomPlotsWrapper: React.FC = () => {
-  const { plotsIds, nbItemsPerRow, isCollapsed, height, enablePlotCreation } =
-    useSelector((state: PlotsState) => state.custom)
+  const {
+    plotsIds,
+    nbItemsPerRow,
+    isCollapsed,
+    height,
+    enablePlotCreation,
+    hasMissingCheckpointData
+  } = useSelector((state: PlotsState) => state.custom)
   const [selectedPlots, setSelectedPlots] = useState<string[]>([])
   useEffect(() => {
     setSelectedPlots(plotsIds)
@@ -39,6 +48,14 @@ export const CustomPlotsWrapper: React.FC = () => {
       hasItems={hasItems}
       height={height}
     >
+      {hasMissingCheckpointData && (
+        <div className={styles.plotsSectionMessage}>
+          <Icon width={16} height={16} icon={Info} />
+          <p>
+            Select a checkpoint experiment to display checkpoint trend plots.
+          </p>
+        </div>
+      )}
       <CustomPlots plotsIds={selectedPlots} />
     </PlotsContainer>
   )

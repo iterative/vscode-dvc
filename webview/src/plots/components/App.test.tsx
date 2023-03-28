@@ -370,17 +370,11 @@ describe('App', () => {
     expect(screen.getByText('No Plots Added')).toBeInTheDocument()
   })
 
-  it('should render custom with checkpoint plot placeholders when there are no selected experiments', () => {
-    const checkpointPlot = customPlotsFixture.plots[2]
+  it('should render custom with a message when there are no selected experiments', () => {
     renderAppWithOptionalData({
       custom: {
         ...customPlotsFixture,
-        plots: [
-          {
-            ...checkpointPlot,
-            values: []
-          }
-        ]
+        hasMissingCheckpointData: true
       }
     })
 
@@ -388,7 +382,9 @@ describe('App', () => {
     expect(screen.queryByText('No Plots to Display')).not.toBeInTheDocument()
     expect(screen.getByText('Custom')).toBeInTheDocument()
     expect(
-      screen.getByText('There are no selected experiments.')
+      screen.getByText(
+        'Select a checkpoint experiment to display checkpoint trend plots.'
+      )
     ).toBeInTheDocument()
   })
 
