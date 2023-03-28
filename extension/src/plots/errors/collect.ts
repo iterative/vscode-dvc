@@ -30,13 +30,17 @@ export const collectErrors = (
   ]
 }
 
-const getMessage = (error: PlotError): string => {
+export const getMessage = (error: PlotError): string => {
   const { msg, type, source } = error
 
-  if (type === 'FileNotFoundError' && source && !msg) {
-    return `${type}: ${source} not found.`
+  if (msg) {
+    return msg
   }
-  return [type, msg].filter(Boolean).join(': ')
+
+  if (type === 'FileNotFoundError' && source && !msg) {
+    return `${source} not found.`
+  }
+  return type
 }
 
 export const collectImageErrors = (

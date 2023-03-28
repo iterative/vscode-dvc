@@ -1877,6 +1877,40 @@ describe('App', () => {
         type: MessageFromWebviewType.REFRESH_REVISIONS
       })
     })
+
+    it('should show an error indicator for each revision with an error', () => {
+      renderAppWithOptionalData({
+        comparison: comparisonTableFixture,
+        selectedRevisions: plotsRevisionsFixture.map(rev => {
+          if (rev.revision === 'main') {
+            return {
+              ...rev,
+              errors: ['error']
+            }
+          }
+          return rev
+        })
+      })
+      const errorIndicators = screen.getAllByText('!')
+      expect(errorIndicators).toHaveLength(1)
+    })
+
+    it('should not show an error indicator for a loading revision', () => {
+      renderAppWithOptionalData({
+        comparison: comparisonTableFixture,
+        selectedRevisions: plotsRevisionsFixture.map(rev => {
+          if (rev.revision === 'main') {
+            return {
+              ...rev,
+              errors: ['error'],
+              fetched: false
+            }
+          }
+          return rev
+        })
+      })
+      expect(screen.queryByText('!')).not.toBeInTheDocument()
+    })
   })
 
   describe('Vega panels', () => {

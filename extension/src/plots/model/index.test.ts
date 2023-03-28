@@ -42,7 +42,10 @@ describe('plotsModel', () => {
         getSelectedRevisions: mockedGetSelectedRevisions,
         isReady: () => Promise.resolve(undefined)
       } as unknown as Experiments,
-      { getImageErrors: () => undefined } as unknown as ErrorsModel,
+      {
+        getImageErrors: () => undefined,
+        getRevisionErrors: () => undefined
+      } as unknown as ErrorsModel,
       memento
     )
     jest.clearAllMocks()
