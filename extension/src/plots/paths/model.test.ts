@@ -22,7 +22,11 @@ describe('PathsModel', () => {
   ]
 
   const buildMockErrorsModel = () =>
-    ({ getPathErrors: () => undefined } as unknown as ErrorsModel)
+    ({
+      getCliError: () => undefined,
+      getPathErrors: () => undefined,
+      hasCliError: () => undefined
+    } as unknown as ErrorsModel)
 
   it('should return the expected paths when given the default output fixture', () => {
     const comparisonType = new Set([PathType.COMPARISON])

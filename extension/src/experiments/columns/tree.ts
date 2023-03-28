@@ -8,6 +8,7 @@ import { ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
 import { EventName } from '../../telemetry/constants'
 import { InternalCommands } from '../../commands/internal'
+import { getRootItem, isRoot } from '../../tree'
 
 export class ExperimentsColumnsTree extends BasePathSelectionTree<WorkspaceExperiments> {
   constructor(
@@ -31,11 +32,16 @@ export class ExperimentsColumnsTree extends BasePathSelectionTree<WorkspaceExper
     )
   }
 
-  protected getBaseTreeItem({
-    label,
-    collapsibleState
-  }: PathSelectionItem & { label: string }) {
-    return new TreeItem(label, collapsibleState)
+  public getTreeItem(element: string | PathSelectionItem): TreeItem {
+    if (isRoot(element)) {
+      return getRootItem(element)
+    }
+
+    const { label, collapsibleState } = element
+
+    const treeItem = new TreeItem(label as string, collapsibleState)
+
+    return this.addTreeItemDetails(element, treeItem)
   }
 
   protected getRepositoryChildren(dvcRoot: string, path: string) {

@@ -43,21 +43,19 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
   }
 
   public transformAndSet(
-    data: PlotsOutputOrError,
+    output: PlotsOutputOrError,
     revs: string[],
     cliIdToLabel: { [id: string]: string }
   ) {
-    if (isDvcError(data)) {
-      return
+    if (isDvcError(output)) {
+      this.handleCliError()
+    } else {
+      const paths = collectPaths(this.data, output, revs, cliIdToLabel)
+
+      this.setNewStatuses(paths)
+      this.data = paths
+      this.setTemplateOrder()
     }
-
-    const paths = collectPaths(this.data, data, revs, cliIdToLabel)
-
-    this.setNewStatuses(paths)
-
-    this.data = paths
-
-    this.setTemplateOrder()
 
     this.deferred.resolve()
   }
@@ -79,6 +77,15 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     path: string | undefined,
     multiSourceEncoding: MultiSourceEncoding = {}
   ) {
+    if (this.errors.hasCliError()) {
+      return [
+        this.errors.getCliError() as {
+          error: string
+          path: string
+        }
+      ]
+    }
+
     return this.filterChildren(path)
       .map(element => ({
         ...element,
@@ -138,6 +145,10 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
 
   public hasPaths() {
     return this.data.length > 0
+  }
+
+  private handleCliError() {
+    this.data = []
   }
 
   private getPathsByType(

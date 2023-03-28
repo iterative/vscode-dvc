@@ -3,6 +3,7 @@ import { TreeItem, TreeItemCollapsibleState } from 'vscode'
 import { EncodingType, isEncodingElement } from './collect'
 import {
   BasePathSelectionTree,
+  ErrorItem,
   PathSelectionItem
 } from '../../path/selection/tree'
 import { WorkspacePlots } from '../workspace'
@@ -10,7 +11,14 @@ import { ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
 import { EventName } from '../../telemetry/constants'
 import { InternalCommands } from '../../commands/internal'
-import { DecoratableTreeItemScheme, getDecoratableUri } from '../../tree'
+import {
+  DecoratableTreeItemScheme,
+  getDecoratableUri,
+  getCliErrorTreeItem,
+  getRootItem,
+  isRoot,
+  isErrorItem
+} from '../../tree'
 
 export class PlotsPathsTree extends BasePathSelectionTree<WorkspacePlots> {
   constructor(
@@ -34,16 +42,27 @@ export class PlotsPathsTree extends BasePathSelectionTree<WorkspacePlots> {
     )
   }
 
-  protected getBaseTreeItem({
-    dvcRoot,
-    path,
-    collapsibleState
-  }: PathSelectionItem) {
+  public getTreeItem(
+    element: string | PathSelectionItem | ErrorItem
+  ): TreeItem {
+    if (isRoot(element)) {
+      return getRootItem(element)
+    }
+
+    if (isErrorItem(element)) {
+      const { path, error } = element
+      return getCliErrorTreeItem(path, error, DecoratableTreeItemScheme.PLOTS)
+    }
+
+    const { collapsibleState, dvcRoot, path } = element
+
     const resourceUri = getDecoratableUri(
       join(dvcRoot, path),
       DecoratableTreeItemScheme.PLOTS
     )
-    return new TreeItem(resourceUri, collapsibleState)
+    const treeItem = new TreeItem(resourceUri, collapsibleState)
+
+    return this.addTreeItemDetails(element, treeItem)
   }
 
   protected getRepositoryChildren(dvcRoot: string, path: string | undefined) {
@@ -51,6 +70,10 @@ export class PlotsPathsTree extends BasePathSelectionTree<WorkspacePlots> {
       .getRepository(dvcRoot)
       .getChildPaths(path)
       .map(element => {
+        if (isErrorItem(element)) {
+          return element
+        }
+
         if (isEncodingElement(element)) {
           const { label, type, value } = element
           return {

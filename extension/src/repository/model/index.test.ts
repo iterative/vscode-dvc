@@ -253,9 +253,7 @@ describe('RepositoryModel', () => {
       expect(model.getChildren(dvcDemoPath)).toStrictEqual([])
 
       model.transformAndSet(emptyRepoError)
-      expect(model.getChildren(dvcDemoPath)).toStrictEqual([
-        { error: { label: './dvc.yaml validation failed.', msg } }
-      ])
+      expect(model.getChildren(dvcDemoPath)).toStrictEqual([{ error: msg }])
 
       model.transformAndSet(emptyRepoData)
       expect(model.getChildren(dvcDemoPath)).toStrictEqual([])

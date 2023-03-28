@@ -46,6 +46,8 @@ import {
 import { SelectedExperimentWithColor } from '../../../experiments/model'
 import * as customPlotQuickPickUtil from '../../../plots/model/quickPick'
 import { CHECKPOINTS_PARAM } from '../../../plots/model/custom'
+import { ErrorItem } from '../../../path/selection/tree'
+import { isErrorItem } from '../../../tree'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -1073,6 +1075,60 @@ suite('Plots Test Suite', () => {
 
       expect(mockSetCustomPlotsOrder).to.not.be.called
       expect(mockSendTelemetryEvent).to.not.be.called
+    })
+
+    it('should handle the CLI throwing an error', async () => {
+      const { data, errorsModel, mockPlotsDiff, plots, plotsModel } =
+        await buildPlots(disposable, plotsDiffFixture)
+
+      const mockErrorMsg = `'./dvc.yaml' is invalid.\n
+    While parsing a flow sequence, in line 5, column 9
+      5 │   │   [training/plots/metrics/train/acc.tsv: acc\n
+    Did not find expected ',' or ']', in line 6, column 44
+      6 │   │   training/plots/metrics/test/acc.tsv: acc]`
+
+      await plots.isReady()
+
+      mockPlotsDiff.resetBehavior()
+      mockPlotsDiff.resolves({
+        error: { msg: mockErrorMsg, type: 'caught error' }
+      })
+
+      await data.update()
+
+      const errorItems = plots.getChildPaths(undefined) as ErrorItem[]
+
+      expect(
+        errorItems,
+        'should return a single error item for the plots path tree'
+      ).to.deep.equal([
+        {
+          error: mockErrorMsg,
+          path: join(dvcDemoPath, './dvc.yaml is invalid.')
+        }
+      ])
+
+      expect(
+        errorsModel.getErrorPaths(plotsModel.getSelectedRevisions()),
+        'should return the correct path to give the item a DecorationError'
+      ).to.deep.equal(new Set([errorItems[0].path]))
+
+      mockPlotsDiff.resetBehavior()
+      mockPlotsDiff.resolves(plotsDiffFixture)
+
+      await data.update()
+
+      const selectionItems = plots.getChildPaths(undefined) as unknown[]
+
+      expect(
+        selectionItems.filter(item => isErrorItem(item)),
+        'should not return any error items after the error is resolved'
+      ).to.deep.equal([])
+
+      expect(
+        errorsModel.getErrorPaths(plotsModel.getSelectedRevisions()),
+        'should no long provide decorations to the plots paths tree'
+      ).to.deep.equal(new Set([]))
     })
   })
 })

@@ -13,7 +13,8 @@ import {
   collectCustomPlots,
   getCustomPlotId,
   collectOrderedRevisions,
-  collectImageUrl
+  collectImageUrl,
+  CLIRevisionIdToLabel
 } from './collect'
 import { getRevisionFirstThreeColumns } from './util'
 import {
@@ -38,6 +39,7 @@ import {
 } from '../webview/contract'
 import {
   EXPERIMENT_WORKSPACE_ID,
+  PlotsOutput,
   PlotsOutputOrError
 } from '../../cli/dvc/contract'
 import { Experiments } from '../../experiments'
@@ -113,34 +115,17 @@ export class PlotsModel extends ModelWithPersistence {
     return this.removeStaleData()
   }
 
-  public async transformAndSetPlots(data: PlotsOutputOrError, revs: string[]) {
-    if (isDvcError(data)) {
-      return
-    }
-
+  public async transformAndSetPlots(
+    output: PlotsOutputOrError,
+    revs: string[]
+  ) {
     const cliIdToLabel = this.getCLIIdToLabel()
 
-    const [{ comparisonData, revisionData }, templates, multiSourceVariations] =
-      await Promise.all([
-        collectData(data, cliIdToLabel),
-        collectTemplates(data),
-        collectMultiSourceVariations(data, this.multiSourceVariations)
-      ])
-
-    this.comparisonData = {
-      ...this.comparisonData,
-      ...comparisonData
+    if (isDvcError(output)) {
+      this.handleCliError()
+    } else {
+      await this.processOutput(output, cliIdToLabel)
     }
-    this.revisionData = {
-      ...this.revisionData,
-      ...revisionData
-    }
-    this.templates = { ...this.templates, ...templates }
-    this.multiSourceVariations = multiSourceVariations
-    this.multiSourceEncoding = collectMultiSourceEncoding(
-      this.multiSourceVariations
-    )
-
     this.setComparisonOrder()
 
     this.fetchedRevs = new Set(revs.map(rev => cliIdToLabel[rev]))
@@ -404,6 +389,40 @@ export class PlotsModel extends ModelWithPersistence {
     }
 
     return mapping
+  }
+
+  private handleCliError() {
+    this.comparisonData = {}
+    this.revisionData = {}
+    this.templates = {}
+    this.multiSourceVariations = {}
+    this.multiSourceEncoding = {}
+  }
+
+  private async processOutput(
+    output: PlotsOutput,
+    cliIdToLabel: CLIRevisionIdToLabel
+  ) {
+    const [{ comparisonData, revisionData }, templates, multiSourceVariations] =
+      await Promise.all([
+        collectData(output, cliIdToLabel),
+        collectTemplates(output),
+        collectMultiSourceVariations(output, this.multiSourceVariations)
+      ])
+
+    this.comparisonData = {
+      ...this.comparisonData,
+      ...comparisonData
+    }
+    this.revisionData = {
+      ...this.revisionData,
+      ...revisionData
+    }
+    this.templates = { ...this.templates, ...templates }
+    this.multiSourceVariations = multiSourceVariations
+    this.multiSourceEncoding = collectMultiSourceEncoding(
+      this.multiSourceVariations
+    )
   }
 
   private cleanupOutdatedCustomPlotsState() {
