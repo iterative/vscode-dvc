@@ -10,6 +10,7 @@ export const data: TableData = {
   filters: [],
   hasCheckpoints: false,
   hasConfig: true,
+  hasMoreCommits: true,
   hasRunningExperiment: false,
   hasValidDvcYaml: true,
   sorts: [],

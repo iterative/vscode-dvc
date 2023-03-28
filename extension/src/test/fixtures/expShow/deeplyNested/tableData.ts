@@ -13,6 +13,7 @@ const data: TableData = {
   ],
   hasCheckpoints: false,
   hasConfig: true,
+  hasMoreCommits: true,
   hasRunningExperiment: false,
   hasValidDvcYaml: true,
   sorts: [

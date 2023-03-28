@@ -14,3 +14,8 @@ export const addStarredFilter = () =>
   sendMessage({
     type: MessageFromWebviewType.ADD_STARRED_EXPERIMENT_FILTER
   })
+
+export const showMoreCommits = () =>
+  sendMessage({
+    type: MessageFromWebviewType.SHOW_MORE_COMMITS
+  })

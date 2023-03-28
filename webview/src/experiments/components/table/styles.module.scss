@@ -634,24 +634,42 @@ $bullet-size: calc(var(--design-unit) * 4px);
     vertical-align: bottom;
     height: 50px;
   }
+}
 
-  .previousCommitsRow {
-    border-bottom: $row-border;
+.previousCommitsRow {
+  border-bottom: $row-border;
 
-    .th {
-      font-size: 0.6rem;
-      padding-left: 16px;
+  .th {
+    font-size: 0.6rem;
+    padding-left: 16px;
 
-      &::before {
-        display: none;
-      }
+    &::before {
+      display: none;
     }
+  }
 
-    &:hover {
-      .th:not(.experimentCell) {
-        background: $bg-color;
-      }
+  &:hover {
+    .th:not(.experimentCell) {
+      background: $bg-color;
     }
+  }
+}
+
+.showMoreCommits {
+  padding: 20px 16px;
+  left: 0;
+  width: 100%;
+}
+
+.showMoreCommitsButton {
+  background: transparent;
+  border: none;
+  color: $accent-color;
+  text-decoration: underline;
+  font-size: 0.6rem;
+
+  &:hover {
+    text-decoration: none;
   }
 }
 
