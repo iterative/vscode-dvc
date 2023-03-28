@@ -110,7 +110,7 @@ export type MetricVsParamPlot = {
 export type CustomPlot = MetricVsParamPlot | CheckpointPlot
 
 export type CustomPlotData = CustomPlot & {
-  yTitle: string
+  spec: VisualizationSpec
 }
 
 export type CustomPlotsData = {
