@@ -323,7 +323,6 @@ suite('Experiments Test Suite', () => {
         expShowFixture
       )
 
-      await experiments.changeNbOfCommits(1)
       await experiments.showWebview()
 
       expect(messageSpy).to.be.calledWithMatch({
