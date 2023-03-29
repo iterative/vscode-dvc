@@ -13,9 +13,9 @@ type ComparisonTableCellProps = {
 
 const MissingPlotTableCell: React.FC<{ plot: ComparisonPlot }> = ({ plot }) => (
   <div className={styles.noImageContent}>
-    {plot.error ? (
+    {plot.errors?.length ? (
       <>
-        <ErrorTooltip error={plot.error}>
+        <ErrorTooltip error={plot.errors.join('\n')}>
           <div>
             <Error height={48} width={48} className={styles.errorIcon} />
           </div>

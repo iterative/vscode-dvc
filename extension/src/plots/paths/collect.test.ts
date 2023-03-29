@@ -3,6 +3,7 @@ import { VisualizationSpec } from 'react-vega'
 import isEqual from 'lodash.isequal'
 import {
   collectEncodingElements,
+  collectPathErrorsTable,
   collectPaths,
   collectTemplateOrder,
   EncodingType,
@@ -592,5 +593,34 @@ describe('collectEncodingElements', () => {
         value: Shape[1]
       }
     ])
+  })
+})
+
+describe('collectPathErrorsTable', () => {
+  it('should construct a markdown table with the error if they relate to the select revision and provided path', () => {
+    const rev = 'a-really-long-branch-name'
+    const path = 'wat'
+    const markdownTable = collectPathErrorsTable([
+      {
+        msg: `${path} not found.`,
+        rev: EXPERIMENT_WORKSPACE_ID
+      },
+      {
+        msg: 'catastrophic error',
+        rev
+      },
+      {
+        msg: 'UNEXPECTEDERRRRROR',
+        rev
+      }
+    ])
+    expect(markdownTable).toStrictEqual(
+      'Errors\n' +
+        '|||\n' +
+        '|--|--|\n' +
+        '| a-really... | UNEXPECTEDERRRRROR |\n' +
+        '| a-really... | catastrophic error |\n' +
+        '| workspace | wat not found. |'
+    )
   })
 })

@@ -83,9 +83,9 @@ const removeImages = (
       revision === EXPERIMENT_WORKSPACE_ID
     ) {
       filteredRevisionData[revision] = {
-        error:
+        errors:
           revision === 'main'
-            ? `FileNotFoundError: ${path} not found.`
+            ? [`FileNotFoundError: ${path} not found.`]
             : undefined,
         loading: false,
         revision,

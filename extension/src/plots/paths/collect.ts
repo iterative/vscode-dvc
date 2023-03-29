@@ -5,7 +5,12 @@ import {
   TemplatePlot,
   TemplatePlotGroup
 } from '../webview/contract'
-import { PlotError, PlotsData, PlotsOutput } from '../../cli/dvc/contract'
+import {
+  EXPERIMENT_WORKSPACE_ID,
+  PlotError,
+  PlotsData,
+  PlotsOutput
+} from '../../cli/dvc/contract'
 import { getParent, getPath, getPathArray } from '../../fileSystem/util'
 import { splitMatchedOrdered, definedAndNonEmpty } from '../../util/array'
 import { isMultiViewPlot } from '../vega/util'
@@ -18,6 +23,7 @@ import {
 } from '../multiSource/constants'
 import { MultiSourceEncoding } from '../multiSource/collect'
 import { CLIRevisionIdToLabel } from '../model/collect'
+import { truncate } from '../../util/string'
 
 export enum PathType {
   COMPARISON = 'comparison',
@@ -464,4 +470,29 @@ export const collectEncodingElements = (
   }
 
   return acc
+}
+
+const formatError = (acc: string[]): string | undefined => {
+  if (acc.length === 0) {
+    return
+  }
+
+  acc.sort()
+  acc.unshift('Errors\n|||\n|--|--|')
+
+  return acc.join('\n')
+}
+
+export const collectPathErrorsTable = (
+  errors: { rev: string; msg: string }[]
+): string | undefined => {
+  const acc = new Set<string>()
+  for (const error of errors) {
+    const { msg, rev } = error
+
+    const row = `| ${truncate(rev, EXPERIMENT_WORKSPACE_ID.length)} | ${msg} |`
+
+    acc.add(row)
+  }
+  return formatError([...acc])
 }
