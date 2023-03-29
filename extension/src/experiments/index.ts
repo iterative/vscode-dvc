@@ -169,7 +169,7 @@ export class Experiments extends BaseRepository<TableData> {
     this.dispose.track(
       workspace.onDidChangeConfiguration((event: ConfigurationChangeEvent) => {
         if (event.affectsConfiguration(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT)) {
-          void this.update()
+          void this.cliData.update()
         }
       })
     )
@@ -180,7 +180,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public update() {
-    return this.cliData.managedUpdate(undefined)
+    return this.cliData.managedUpdate()
   }
 
   public async setState(data: ExperimentsOutput) {
@@ -621,7 +621,7 @@ export class Experiments extends BaseRepository<TableData> {
       void pollSignalFileForProcess(this.dvcLiveOnlySignalFile, () => {
         this.dvcLiveOnlyCleanupInitialized = false
         if (this.hasRunningExperiment()) {
-          void this.update()
+          void this.cliData.update()
         }
       })
     }
