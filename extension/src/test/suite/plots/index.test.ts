@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore, spy, stub } from 'sinon'
 import { commands, Uri } from 'vscode'
+import isEqual from 'lodash.isequal'
 import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import expShowFixtureWithoutErrors from '../../fixtures/expShow/base/noErrors'
@@ -31,12 +32,14 @@ import {
   PlotsSection,
   TemplatePlotGroup,
   TemplatePlotsData,
-  CustomPlotType
+  CustomPlotType,
+  TemplatePlot,
+  ImagePlot
 } from '../../../plots/webview/contract'
 import { TEMP_PLOTS_DIR } from '../../../cli/dvc/constants'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { MessageFromWebviewType } from '../../../webview/contract'
-import { reorderObjectList } from '../../../util/array'
+import { reorderObjectList, uniqueValues } from '../../../util/array'
 import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
 import {
@@ -685,6 +688,73 @@ suite('Plots Test Suite', () => {
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it("should remove a revision's data if the revision is re-fetched and now contains an error", async () => {
+      const accPngPath = join('plots', 'acc.png')
+      const accPng = [
+        ...plotsDiffFixture.data[join('plots', 'acc.png')]
+      ] as ImagePlot[]
+      const lossTsvPath = join('logs', 'loss.tsv')
+      const lossTsv = [...plotsDiffFixture.data[lossTsvPath]] as TemplatePlot[]
+
+      const plotsDiffOutput = {
+        data: {
+          [accPngPath]: accPng,
+          [lossTsvPath]: lossTsv
+        }
+      }
+
+      const brokenRev = '4fb124a'
+
+      const reFetchedOutput = {
+        data: {
+          [accPngPath]: accPng.filter(
+            ({ revisions }) => !isEqual(revisions, [brokenRev])
+          ),
+          [lossTsvPath]: lossTsv.map((plot, i) => {
+            const datapoints = { ...lossTsv[i].datapoints }
+            delete datapoints[brokenRev]
+
+            return {
+              ...plot,
+              datapoints,
+              revisions: lossTsv[i].revisions?.filter(rev => rev !== brokenRev)
+            }
+          })
+        }
+      }
+
+      const { mockPlotsDiff, plots, data, plotsModel } = await buildPlots(
+        disposable,
+        plotsDiffOutput
+      )
+
+      await plots.isReady()
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const getExistingRevisions = (plotsModel: any) =>
+        uniqueValues([
+          ...Object.keys(plotsModel.revisionData),
+          ...Object.keys(plotsModel.comparisonData)
+        ])
+
+      expect(getExistingRevisions(plotsModel)).to.contain(brokenRev)
+
+      mockPlotsDiff.resetBehavior()
+      mockPlotsDiff.resolves(reFetchedOutput)
+
+      const dataUpdated = new Promise(resolve =>
+        data.onDidUpdate(() => resolve(undefined))
+      )
+
+      await data.update()
+      await dataUpdated
+
+      expect(
+        getExistingRevisions(plotsModel),
+        'the revision should not exist in the underlying data'
+      ).not.to.contain(brokenRev)
+    })
 
     it('should send the correct data to the webview for flexible plots', async () => {
       const { experiments, plots, messageSpy, mockPlotsDiff } =

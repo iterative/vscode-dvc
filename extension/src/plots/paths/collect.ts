@@ -5,12 +5,7 @@ import {
   TemplatePlot,
   TemplatePlotGroup
 } from '../webview/contract'
-import {
-  EXPERIMENT_WORKSPACE_ID,
-  PlotError,
-  PlotsData,
-  PlotsOutput
-} from '../../cli/dvc/contract'
+import { PlotError, PlotsData, PlotsOutput } from '../../cli/dvc/contract'
 import { getParent, getPath, getPathArray } from '../../fileSystem/util'
 import { splitMatchedOrdered, definedAndNonEmpty } from '../../util/array'
 import { isMultiViewPlot } from '../vega/util'
@@ -22,6 +17,7 @@ import {
   StrokeDashValue
 } from '../multiSource/constants'
 import { MultiSourceEncoding } from '../multiSource/collect'
+import { CLIRevisionIdToLabel } from '../model/collect'
 
 export enum PathType {
   COMPARISON = 'comparison',
@@ -71,17 +67,17 @@ const getType = (
   return collectType(plots)
 }
 
-const filterWorkspaceIfFetched = (
+const filterRevisionIfFetched = (
   existingPaths: PlotPath[],
-  fetchedRevs: string[]
+  fetchedRevs: string[],
+  cliIdToLabel: CLIRevisionIdToLabel
 ) => {
-  if (!fetchedRevs.includes(EXPERIMENT_WORKSPACE_ID)) {
-    return existingPaths
-  }
-
   return existingPaths.map(existing => {
     const revisions = existing.revisions
-    revisions.delete(EXPERIMENT_WORKSPACE_ID)
+    for (const rev of fetchedRevs) {
+      const id = cliIdToLabel[rev] || rev
+      revisions.delete(id)
+    }
     return { ...existing, revisions }
   })
 }
@@ -233,7 +229,11 @@ export const collectPaths = (
   fetchedRevs: string[],
   cliIdToLabel: { [id: string]: string }
 ): PlotPath[] => {
-  let acc: PlotPath[] = filterWorkspaceIfFetched(existingPaths, fetchedRevs)
+  let acc: PlotPath[] = filterRevisionIfFetched(
+    existingPaths,
+    fetchedRevs,
+    cliIdToLabel
+  )
 
   const { data, errors } = output
 
