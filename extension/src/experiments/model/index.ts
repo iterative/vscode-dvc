@@ -1,18 +1,8 @@
 import { Memento } from 'vscode'
 import { SortDefinition, sortExperiments } from './sortBy'
-import {
-  FilterDefinition,
-  filterExperiment,
-  splitExperimentsByFilters,
-  getFilterId
-} from './filterBy'
-import { collectExperiments, collectMutableRevisions } from './collect'
-import {
-  collectFiltered,
-  collectFilteredCounts,
-  ExperimentAugmented,
-  ExperimentWithType
-} from './filterBy/collect'
+import { FilterDefinition, filterExperiment, getFilterId } from './filterBy'
+import { collectExperiments } from './collect'
+import { collectFiltered } from './filterBy/collect'
 import {
   collectColoredStatus,
   collectFinishedRunningExperiments,
@@ -32,7 +22,6 @@ import {
   Experiment,
   isQueued,
   isRunningInQueue,
-  Row,
   RunningExperiment
 } from '../webview/contract'
 import {
@@ -124,18 +113,12 @@ export class ExperimentsModel extends ModelWithPersistence {
     dvcLiveOnly: boolean,
     commitsOutput: string
   ) {
-    const {
-      workspace,
-      commits,
-      experimentsByCommit,
-      checkpointsByTip,
-      runningExperiments
-    } = collectExperiments(data, dvcLiveOnly, commitsOutput)
+    const { workspace, commits, experimentsByCommit, runningExperiments } =
+      collectExperiments(data, dvcLiveOnly, commitsOutput)
 
     this.workspace = workspace
     this.commits = commits
     this.experimentsByCommit = experimentsByCommit
-    this.checkpointsByTip = checkpointsByTip
 
     this.setColoredStatus(runningExperiments)
   }
@@ -258,11 +241,8 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.getCombinedList().map(({ label }) => label)
   }
 
-  public getMutableRevisions(hasCheckpoints: boolean) {
-    return collectMutableRevisions(
-      this.getRecordsWithoutCheckpoints(),
-      hasCheckpoints
-    )
+  public getMutableRevisions() {
+    return []
   }
 
   public getSelectedRevisions() {
@@ -300,7 +280,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     )
   }
 
-  public getWorkspaceAndCommits(): ExperimentAugmented[] {
+  public getWorkspaceAndCommits() {
     return [
       {
         ...this.addDetails(this.workspace),
@@ -395,7 +375,9 @@ export class ExperimentsModel extends ModelWithPersistence {
 
         return {
           ...commitWithSelectedAndStarred,
-          subRows: this.getSubRows(experiments)
+          subRows: experiments.filter(
+            experiment => !!filterExperiment(this.getFilters(), experiment)
+          )
         }
       })
     ]
@@ -410,32 +392,22 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getExperimentCount() {
-    return sum([
-      this.getFlattenedCheckpoints().length,
-      this.getExperimentsAndQueued().length,
-      this.commits.length,
-      1
-    ])
+    return sum([this.getExperimentsAndQueued().length, this.commits.length, 1])
   }
 
-  public getFilteredCounts(hasCheckpoints: boolean) {
+  public getFilteredCount() {
     const filtered = this.getFilteredExperiments()
-    return collectFilteredCounts(filtered, hasCheckpoints)
+    return filtered.length
   }
 
   public getCombinedList() {
-    return [
-      this.workspace,
-      ...this.commits,
-      ...this.getExperimentsAndQueued(),
-      ...this.getFlattenedCheckpoints()
-    ]
+    return [this.workspace, ...this.commits, ...this.getExperimentsAndQueued()]
   }
 
   public getExperimentsByCommitForTree(commit: Experiment) {
     return this.getExperimentsByCommit(commit)?.map(experiment => ({
       ...experiment,
-      hasChildren: definedAndNonEmpty(this.checkpointsByTip.get(experiment.id)),
+      hasChildren: false,
       type: isQueued(experiment.status)
         ? ExperimentType.QUEUED
         : ExperimentType.EXPERIMENT
@@ -446,63 +418,18 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.finishedRunning
   }
 
-  private getSubRows(experiments: Experiment[], filters = this.getFilters()) {
-    return experiments
-      .map(experiment => {
-        const checkpoints = this.getUnfilteredCheckpointsByTip(
-          experiment.id,
-          filters
-        )
-        if (!checkpoints) {
-          return experiment
-        }
-        return {
-          ...experiment,
-          subRows: checkpoints
-        }
-      })
-      .filter((row: Row) => this.filterTableRow(row, filters))
-  }
-
   private findIndexByPath(pathToRemove: string) {
     return this.currentSorts.findIndex(({ path }) => path === pathToRemove)
   }
 
-  private filterTableRow(row: Row, filters: FilterDefinition[]): boolean {
-    const hasUnfilteredCheckpoints = definedAndNonEmpty(row.subRows)
-    if (hasUnfilteredCheckpoints) {
-      return true
-    }
-    return !!filterExperiment(filters, row)
-  }
-
   private getFilteredExperiments() {
-    const acc: ExperimentWithType[] = []
+    const acc: Experiment[] = []
 
     for (const experiment of this.getExperiments()) {
-      const checkpoints = this.getCheckpointsWithType(experiment.id) || []
-      collectFiltered(acc, this.getFilters(), experiment, checkpoints)
+      collectFiltered(acc, this.getFilters(), experiment)
     }
 
     return acc
-  }
-
-  private getUnfilteredCheckpointsByTip(
-    sha: string,
-    filters: FilterDefinition[]
-  ) {
-    const checkpoints = this.getCheckpoints(sha)
-    if (!checkpoints) {
-      return
-    }
-    const { unfiltered } = splitExperimentsByFilters(filters, checkpoints)
-    return unfiltered
-  }
-
-  private getCheckpoints(id: string) {
-    return this.checkpointsByTip
-      .get(id)
-      ?.map(checkpoint => this.addDetails(checkpoint))
   }
 
   private getExperimentsByCommit(commit: Experiment) {
@@ -515,18 +442,11 @@ export class ExperimentsModel extends ModelWithPersistence {
     return sortExperiments(this.getSorts(), experiments)
   }
 
-  private getFlattenedCheckpoints() {
-    return flattenMapValues(this.checkpointsByTip).map(checkpoint =>
-      this.addDetails(checkpoint)
-    )
-  }
-
   private setColoredStatus(runningExperiments: RunningExperiment[]) {
     this.setRunning(runningExperiments)
 
     const { coloredStatus, availableColors } = collectColoredStatus(
       this.getWorkspaceAndCommits(),
-      this.checkpointsByTip,
       this.experimentsByCommit,
       this.coloredStatus,
       this.availableColors,

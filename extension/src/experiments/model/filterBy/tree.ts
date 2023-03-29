@@ -7,19 +7,15 @@ import {
   TreeView
 } from 'vscode'
 import { getFilterId } from '.'
-import { collectCombinedFilteredCounts } from './collect'
 import { WorkspaceExperiments } from '../../workspace'
 import { RegisteredCommands } from '../../../commands/external'
 import { InternalCommands } from '../../../commands/internal'
 import { sendViewOpenedTelemetryEvent } from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
-import {
-  definedAndNonEmpty,
-  joinTruthyItems,
-  sortCollectedArray
-} from '../../../util/array'
+import { definedAndNonEmpty, sortCollectedArray } from '../../../util/array'
 import { createTreeView, getRootItem } from '../../../tree'
 import { Disposable } from '../../../class/dispose'
+import { sum } from '../../../util/math'
 
 export type FilterItem = {
   description: string
@@ -171,36 +167,26 @@ export class ExperimentsFilterByTree
     }
 
     const filteredCounts = dvcRoots.flatMap(dvcRoot =>
-      this.experiments.getRepository(dvcRoot).getFilteredCounts()
+      this.experiments.getRepository(dvcRoot).getFilteredCount()
     )
 
-    const { experiments, checkpoints } =
-      collectCombinedFilteredCounts(filteredCounts)
+    const totalFiltered = sum(filteredCounts)
 
-    const combinedText = joinTruthyItems(
-      [
-        this.getDescriptionText('Experiment', experiments),
-        this.getDescriptionText('Checkpoint', checkpoints)
-      ],
-      ', '
-    )
+    const text = this.getDescriptionText(totalFiltered)
 
-    if (!combinedText) {
+    if (!text) {
       return
     }
 
-    return `${combinedText} Filtered`
+    return `${text} Filtered`
   }
 
-  private getDescriptionText(
-    type: 'Experiment' | 'Checkpoint',
-    filteredCount: number | undefined
-  ) {
+  private getDescriptionText(filteredCount: number | undefined) {
     if (filteredCount === undefined) {
       return
     }
 
-    const text = `${filteredCount} ${type}`
+    const text = `${filteredCount} Experiment`
 
     if (filteredCount === 1) {
       return text

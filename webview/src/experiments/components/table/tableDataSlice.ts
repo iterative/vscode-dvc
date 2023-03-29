@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { FilteredCounts } from 'dvc/src/experiments/model/filterBy/collect'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import { Column, Row, TableData } from 'dvc/src/experiments/webview/contract'
 import { keepEqualOldReferencesInArray } from '../../../util/array'
@@ -14,10 +13,7 @@ export const tableDataInitialState: TableDataState = {
   columnOrder: [],
   columnWidths: {},
   columns: [],
-  filteredCounts: {
-    checkpoints: 0,
-    experiments: 0
-  },
+  filteredCount: 0,
   filters: [],
   hasCheckpoints: false,
   hasColumns: false,
@@ -62,11 +58,8 @@ export const tableDataSlice = createSlice({
         action.payload
       ) as Column[]
     },
-    updateFilteredCounts: (state, action: PayloadAction<FilteredCounts>) => {
-      state.filteredCounts = keepReferenceIfEqual(
-        state.filteredCounts,
-        action.payload
-      ) as FilteredCounts
+    updateFilteredCount: (state, action: PayloadAction<number>) => {
+      state.filteredCount = action.payload
     },
     updateFilters: (state, action: PayloadAction<string[]>) => {
       state.filters = action.payload
@@ -113,7 +106,7 @@ export const {
   updateColumnOrder,
   updateColumnWidths,
   updateColumns,
-  updateFilteredCounts,
+  updateFilteredCount,
   updateFilters,
   updateHasCheckpoints,
   updateHasColumns,

@@ -6,7 +6,7 @@ export const data: TableData = {
   changes: [],
   columnOrder: [],
   columnWidths: {},
-  filteredCounts: { experiments: 0, checkpoints: 0 },
+  filteredCount: 0,
   filters: [],
   hasCheckpoints: false,
   hasConfig: true,

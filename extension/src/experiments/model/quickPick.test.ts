@@ -1,5 +1,3 @@
-import { QuickPickItemKind } from 'vscode'
-import { ExperimentWithCheckpoints } from '.'
 import {
   pickExperiment,
   pickExperiments,
@@ -14,7 +12,6 @@ import {
 import { Experiment } from '../webview/contract'
 import { Title } from '../../vscode/title'
 import { formatDate } from '../../util/date'
-import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { Toast } from '../../vscode/toast'
 
 jest.mock('../../vscode/quickPick')
@@ -34,7 +31,7 @@ beforeEach(() => {
 
 describe('pickExperimentsToPlot', () => {
   it('should return early given no experiments', async () => {
-    const undef = await pickExperimentsToPlot([], false, [])
+    const undef = await pickExperimentsToPlot([], [])
     expect(undef).toBeUndefined()
     expect(mockedQuickPickLimitedValues).not.toHaveBeenCalled()
   })
@@ -52,7 +49,7 @@ describe('pickExperimentsToPlot', () => {
     ] as Experiment[]
 
     mockedQuickPickLimitedValues.mockResolvedValueOnce([selectedExperiment])
-    const picked = await pickExperimentsToPlot(mockedExperiments, false, [])
+    const picked = await pickExperimentsToPlot(mockedExperiments, [])
 
     expect(picked).toStrictEqual([selectedExperiment])
     expect(mockedQuickPickLimitedValues).toHaveBeenCalledTimes(1)
@@ -142,7 +139,7 @@ describe('pickExperimentsToPlot', () => {
     ] as Experiment[]
 
     mockedQuickPickLimitedValues.mockResolvedValueOnce([selectedExperiment])
-    const picked = await pickExperimentsToPlot(mockedExperiments, false, [
+    const picked = await pickExperimentsToPlot(mockedExperiments, [
       'Created',
       'params:params.yaml:prepare.split',
       'deps:data/data.xml'
@@ -178,107 +175,6 @@ describe('pickExperimentsToPlot', () => {
         }
       ],
       [],
-      MAX_SELECTED_EXPERIMENTS,
-      Title.SELECT_EXPERIMENTS_TO_PLOT,
-      { matchOnDescription: true, matchOnDetail: true }
-    )
-  })
-
-  it('should send separators containing the experiment name to the quick pick when there are checkpoints', async () => {
-    const selectedExperiment = {
-      displayNameOrParent: '[exp-2]',
-      id: 'exp-2',
-      label: '7c366f6',
-      selected: false
-    }
-
-    const selectedCheckpoint = {
-      label: '6c366f6',
-      selected: true
-    }
-
-    const mockedWorkspace = { label: EXPERIMENT_WORKSPACE_ID, selected: false }
-    const mockedCommit = {
-      commit: {
-        author: 'John Smith',
-        date: '3 days ago',
-        message: 'add new feature'
-      },
-      displayNameOrParent: 'Update dvc',
-      label: 'main',
-      selected: false
-    }
-
-    const mockedExp1 = {
-      displayNameOrParent: '[exp-1]',
-      id: 'exp-1',
-      label: '73de3fe',
-      selected: false
-    }
-    const mockedExp1Checkpoint1 = { label: '63de3fe' }
-    const mockedExp1Checkpoint2 = { label: '53de3fe' }
-
-    const mockedExp2 = selectedExperiment
-    const mockedExp2Checkpoint1 = selectedCheckpoint
-    const mockedExp2Checkpoint2 = { label: '5be657c' }
-
-    mockedQuickPickLimitedValues.mockResolvedValueOnce([
-      selectedExperiment,
-      selectedCheckpoint
-    ])
-
-    const picked = await pickExperimentsToPlot(
-      [
-        mockedWorkspace,
-        mockedCommit,
-        {
-          ...mockedExp1,
-          checkpoints: [mockedExp1Checkpoint1, mockedExp1Checkpoint2]
-        },
-        {
-          ...mockedExp2,
-          checkpoints: [mockedExp2Checkpoint1, mockedExp2Checkpoint2]
-        }
-      ] as ExperimentWithCheckpoints[],
-      true,
-      []
-    )
-
-    const getExpectedItem = <T extends { label: string }>(
-      item: T
-    ): { label: string; value: T; detail: string } => ({
-      detail: '',
-      label: item.label,
-      value: item
-    })
-
-    expect(picked).toStrictEqual([selectedExperiment, selectedCheckpoint])
-    expect(mockedQuickPickLimitedValues).toHaveBeenCalledTimes(1)
-    expect(mockedQuickPickLimitedValues).toHaveBeenCalledWith(
-      [
-        getExpectedItem(mockedWorkspace),
-        {
-          ...getExpectedItem(mockedCommit),
-          description: `$(git-commit)${mockedCommit.displayNameOrParent}`
-        },
-        {
-          kind: QuickPickItemKind.Separator,
-          label: mockedExp1.id,
-          value: undefined
-        },
-        getExpectedItem(mockedExp1),
-        getExpectedItem(mockedExp1Checkpoint1),
-        getExpectedItem(mockedExp1Checkpoint2),
-        {
-          kind: QuickPickItemKind.Separator,
-          label: mockedExp2.id,
-          value: undefined
-        },
-        getExpectedItem(mockedExp2),
-        getExpectedItem(mockedExp2Checkpoint1),
-        getExpectedItem(mockedExp2Checkpoint2)
-      ],
-      [getExpectedItem(selectedCheckpoint)],
       MAX_SELECTED_EXPERIMENTS,
       Title.SELECT_EXPERIMENTS_TO_PLOT,
       { matchOnDescription: true, matchOnDetail: true }

@@ -3,7 +3,7 @@ import rowsFixture from './rows'
 import columnsFixture from './columns'
 
 const data: TableData = {
-  filteredCounts: { experiments: 0, checkpoints: 0 },
+  filteredCount: 0,
   rows: rowsFixture,
   columns: columnsFixture,
   filters: [],

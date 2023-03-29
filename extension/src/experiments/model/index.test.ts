@@ -241,12 +241,12 @@ describe('ExperimentsModel', () => {
       {
         testBranch: {
           baseline: buildTestExperiment(2, undefined, 'testBranch'),
-          exp1: buildTestExperiment(0, 'tip'),
-          exp2: buildTestExperiment(0, 'tip'),
-          exp3: buildTestExperiment(0, 'tip'),
-          exp4: buildTestExperiment(0, 'tip'),
-          exp5: buildTestExperiment(0, 'tip'),
-          tip: buildTestExperiment(0, 'tip', runningExperiment)
+          exp1: buildTestExperiment(0),
+          exp2: buildTestExperiment(0),
+          exp3: buildTestExperiment(0),
+          exp4: buildTestExperiment(0),
+          exp5: buildTestExperiment(0),
+          tip: buildTestExperiment(0, undefined, runningExperiment)
         },
         [EXPERIMENT_WORKSPACE_ID]: {
           baseline: buildTestExperiment(3)

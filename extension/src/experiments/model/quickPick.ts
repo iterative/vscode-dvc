@@ -1,4 +1,3 @@
-import { QuickPickItemKind } from 'vscode'
 import omit from 'lodash.omit'
 import { ExperimentWithCheckpoints } from '.'
 import { MAX_SELECTED_EXPERIMENTS } from './status'
@@ -20,12 +19,6 @@ type QuickPickItemAccumulator = {
   items: QuickPickItemWithValue<Experiment | undefined>[]
   selectedItems: QuickPickItemWithValue<Experiment | undefined>[]
 }
-
-const getSeparator = (experiment: Experiment) => ({
-  kind: QuickPickItemKind.Separator,
-  label: experiment.id,
-  value: undefined
-})
 
 const getItem = (
   experiment: Experiment,
@@ -63,39 +56,7 @@ const collectItem = (
   return acc
 }
 
-const collectFromExperiment = (
-  acc: QuickPickItemAccumulator,
-  experiment: ExperimentWithCheckpoints,
-  firstThreeColumnOrder: string[]
-): void => {
-  if (experiment.checkpoints) {
-    acc.items.push(getSeparator(experiment))
-  }
-
-  collectItem(acc, experiment, firstThreeColumnOrder, getItemWithDescription)
-
-  for (const checkpoint of experiment.checkpoints || []) {
-    collectItem(acc, checkpoint, firstThreeColumnOrder)
-  }
-}
-
-const collectCheckpointItems = (
-  experiments: ExperimentWithCheckpoints[],
-  firstThreeColumnOrder: string[]
-) => {
-  const acc: QuickPickItemAccumulator = {
-    items: [],
-    selectedItems: []
-  }
-
-  for (const experiment of experiments) {
-    collectFromExperiment(acc, experiment, firstThreeColumnOrder)
-  }
-
-  return acc
-}
-
-const collectExperimentOnlyItems = (
+const collectItems = (
   experiments: Experiment[],
   firstThreeColumnOrder: string[]
 ) => {
@@ -111,20 +72,8 @@ const collectExperimentOnlyItems = (
   return acc
 }
 
-const collectItems = (
-  experiments: ExperimentWithCheckpoints[],
-  hasCheckpoints: boolean,
-  firstThreeColumnOrder: string[]
-): QuickPickItemAccumulator => {
-  if (hasCheckpoints) {
-    return collectCheckpointItems(experiments, firstThreeColumnOrder)
-  }
-  return collectExperimentOnlyItems(experiments, firstThreeColumnOrder)
-}
-
 export const pickExperimentsToPlot = (
   experiments: ExperimentWithCheckpoints[],
-  hasCheckpoints: boolean,
   firstThreeColumnOrder: string[]
 ): Promise<Experiment[] | undefined> => {
   if (!definedAndNonEmpty(experiments)) {
@@ -133,7 +82,6 @@ export const pickExperimentsToPlot = (
 
   const { items, selectedItems } = collectItems(
     experiments,
-    hasCheckpoints,
     firstThreeColumnOrder
   )
 
