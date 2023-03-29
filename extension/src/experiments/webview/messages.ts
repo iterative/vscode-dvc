@@ -25,10 +25,7 @@ import { Toast } from '../../vscode/toast'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { stopWorkspaceExperiment } from '../processExecution'
 import { hasDvcYamlFile } from '../../fileSystem'
-import {
-  NUM_OF_COMMITS_TO_INCREASE,
-  NUM_OF_COMMITS_TO_SHOW
-} from '../../cli/dvc/constants'
+import { NUM_OF_COMMITS_TO_INCREASE } from '../../cli/dvc/constants'
 
 export class WebviewMessages {
   private readonly dvcRoot: string

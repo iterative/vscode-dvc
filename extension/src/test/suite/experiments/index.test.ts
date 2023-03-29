@@ -131,27 +131,6 @@ suite('Experiments Test Suite', () => {
     })
   })
 
-  describe('getMoreCommits', () => {
-    it('should update the data with the number of commits', async () => {
-      const { experiments, mockUpdateExperimentsData } =
-        buildExperiments(disposable)
-
-      await experiments.changeNbOfCommits(5)
-
-      expect(mockUpdateExperimentsData).to.be.calledWithExactly(
-        ExperimentFlag.NUM_COMMIT,
-        '5'
-      )
-
-      await experiments.changeNbOfCommits(7)
-
-      expect(mockUpdateExperimentsData).to.be.calledWithExactly(
-        ExperimentFlag.NUM_COMMIT,
-        '7'
-      )
-    })
-  })
-
   describe('showWebview', () => {
     it('should be able to make the experiment webview visible', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('train')
@@ -360,7 +339,8 @@ suite('Experiments Test Suite', () => {
         internalCommands,
         dvcExecutor,
         mockCheckOrAddPipeline,
-        messageSpy
+        messageSpy,
+        mockUpdateExperimentsData
       } = buildExperiments(disposable, expShowFixture)
       const mockExecuteCommand = stub(
         internalCommands,
@@ -377,7 +357,8 @@ suite('Experiments Test Suite', () => {
         experimentsModel,
         messageSpy,
         mockCheckOrAddPipeline,
-        mockExecuteCommand
+        mockExecuteCommand,
+        mockUpdateExperimentsData
       }
     }
 
@@ -1377,9 +1358,17 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to show more commits', async () => {
-      const { experiments, messageSpy } = setupExperimentsAndMockCommands()
+      const {
+        experiments,
+        experimentsModel,
+        messageSpy,
+        mockUpdateExperimentsData
+      } = setupExperimentsAndMockCommands()
 
-      const getMoreCommitsSpy = spy(experiments, 'changeNbOfCommits')
+      const setNbfCommitsToShowSpy = spy(
+        experimentsModel,
+        'setNbfCommitsToShow'
+      )
 
       const webview = await experiments.showWebview()
       messageSpy.resetHistory()
@@ -1389,14 +1378,22 @@ suite('Experiments Test Suite', () => {
         type: MessageFromWebviewType.SHOW_MORE_COMMITS
       })
 
-      expect(getMoreCommitsSpy).to.be.calledOnce
-      expect(getMoreCommitsSpy).to.be.calledWith(5)
+      expect(mockUpdateExperimentsData).to.be.calledOnce
+      expect(setNbfCommitsToShowSpy).to.be.calledWith(5)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to show less commits', async () => {
-      const { experiments, messageSpy } = setupExperimentsAndMockCommands()
+      const {
+        experiments,
+        experimentsModel,
+        messageSpy,
+        mockUpdateExperimentsData
+      } = setupExperimentsAndMockCommands()
 
-      const getLessCommitsSpy = spy(experiments, 'changeNbOfCommits')
+      const setNbfCommitsToShowSpy = spy(
+        experimentsModel,
+        'setNbfCommitsToShow'
+      )
 
       const webview = await experiments.showWebview()
       messageSpy.resetHistory()
@@ -1406,8 +1403,8 @@ suite('Experiments Test Suite', () => {
         type: MessageFromWebviewType.SHOW_LESS_COMMITS
       })
 
-      expect(getLessCommitsSpy).to.be.calledOnce
-      expect(getLessCommitsSpy).to.be.calledWith(1)
+      expect(mockUpdateExperimentsData).to.be.calledOnce
+      expect(setNbfCommitsToShowSpy).to.be.calledWith(1)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 

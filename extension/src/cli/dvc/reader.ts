@@ -5,7 +5,6 @@ import {
   Command,
   ExperimentFlag,
   Flag,
-  NUM_OF_COMMITS_TO_SHOW,
   SubCommand,
   TEMP_PLOTS_DIR
 } from './constants'
