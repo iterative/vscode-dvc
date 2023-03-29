@@ -193,7 +193,8 @@ export const buildExperimentsData = (disposer: SafeWatcherDisposer) => {
     new ExperimentsData(
       dvcDemoPath,
       internalCommands,
-      disposer.track(new EventEmitter<boolean>())
+      disposer.track(new EventEmitter<boolean>()),
+      () => 2
     )
   )
 

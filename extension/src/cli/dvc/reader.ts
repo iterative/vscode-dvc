@@ -73,8 +73,6 @@ export class DvcReader extends DvcCli {
       JSON.stringify(defaultExperimentsOutput),
       Command.EXPERIMENT,
       SubCommand.SHOW,
-      Flag.NUM_COMMIT,
-      NUM_OF_COMMITS_TO_SHOW,
       ...flags,
       Flag.JSON
     )

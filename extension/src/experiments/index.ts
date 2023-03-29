@@ -144,7 +144,10 @@ export class Experiments extends BaseRepository<TableData> {
     this.checkpoints = this.dispose.track(new CheckpointsModel())
 
     this.cliData = this.dispose.track(
-      cliData || new ExperimentsData(dvcRoot, internalCommands, updatesPaused)
+      cliData ||
+        new ExperimentsData(dvcRoot, internalCommands, updatesPaused, () =>
+          this.experiments.getNbOfCommitsToShow()
+        )
     )
 
     this.fileSystemData = this.dispose.track(
@@ -166,7 +169,7 @@ export class Experiments extends BaseRepository<TableData> {
     this.dispose.track(
       workspace.onDidChangeConfiguration((event: ConfigurationChangeEvent) => {
         if (event.affectsConfiguration(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT)) {
-          void this.cliData.update()
+          void this.update()
         }
       })
     )
@@ -177,14 +180,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public update() {
-    return this.cliData.managedUpdate()
-  }
-
-  public changeNbOfCommits(numberOfCommitsToShow: number) {
-    return this.cliData.update(
-      ExperimentFlag.NUM_COMMIT,
-      numberOfCommitsToShow.toString()
-    )
+    return this.cliData.managedUpdate(undefined)
   }
 
   public async setState(data: ExperimentsOutput) {
@@ -581,7 +577,7 @@ export class Experiments extends BaseRepository<TableData> {
           AvailableCommands.GIT_GET_NUM_COMMITS,
           this.dvcRoot
         ),
-      (nbOfCommits: number) => this.changeNbOfCommits(nbOfCommits)
+      () => this.update()
     )
 
     this.dispose.track(
@@ -625,7 +621,7 @@ export class Experiments extends BaseRepository<TableData> {
       void pollSignalFileForProcess(this.dvcLiveOnlySignalFile, () => {
         this.dvcLiveOnlyCleanupInitialized = false
         if (this.hasRunningExperiment()) {
-          void this.cliData.update()
+          void this.update()
         }
       })
     }
