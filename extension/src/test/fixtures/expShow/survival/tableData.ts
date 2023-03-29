@@ -13,6 +13,7 @@ const data: TableData = {
   hasColumns: true,
   hasMoreCommits: true,
   hasValidDvcYaml: true,
+  isShowingMoreCommits: true,
   sorts: [],
   changes: [],
   columnOrder: [],

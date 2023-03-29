@@ -13,6 +13,7 @@ export const data: TableData = {
   hasMoreCommits: true,
   hasRunningExperiment: false,
   hasValidDvcYaml: true,
+  isShowingMoreCommits: true,
   sorts: [],
   columns,
   hasColumns: true,

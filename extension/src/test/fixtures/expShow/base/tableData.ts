@@ -13,6 +13,7 @@ const tableDataFixture: TableData = {
   hasRunningExperiment: true,
   hasValidDvcYaml: true,
   hasColumns: true,
+  isShowingMoreCommits: true,
   sorts: [],
   changes: [],
   columnOrder: [],

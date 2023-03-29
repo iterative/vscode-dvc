@@ -52,6 +52,7 @@ export const tableData: TableData = {
   hasMoreCommits: true,
   hasRunningExperiment: false,
   hasValidDvcYaml: true,
+  isShowingMoreCommits: true,
   rows: [
     {
       id: EXPERIMENT_WORKSPACE_ID,
