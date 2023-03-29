@@ -16,6 +16,7 @@ const data: TableData = {
   hasMoreCommits: true,
   hasRunningExperiment: false,
   hasValidDvcYaml: true,
+  isShowingMoreCommits: true,
   sorts: [
     {
       path: 'params:params.yaml:nested1.doubled',
