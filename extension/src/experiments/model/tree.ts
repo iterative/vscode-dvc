@@ -9,7 +9,6 @@ import {
   Uri
 } from 'vscode'
 import { ExperimentType } from '.'
-import { ExperimentAugmented } from './filterBy/collect'
 import { collectDeletable, ExperimentItem } from './collect'
 import { MAX_SELECTED_EXPERIMENTS } from './status'
 import { getDataFromColumnPaths } from './util'
@@ -34,6 +33,13 @@ import { Disposable } from '../../class/dispose'
 import { Experiment, ExperimentStatus, isRunning } from '../webview/contract'
 import { getMarkdownString } from '../../vscode/markdownString'
 import { truncateFromLeft } from '../../util/string'
+
+export type ExperimentAugmented = Experiment & {
+  hasChildren: boolean
+  selected?: boolean
+  starred: boolean
+  type: ExperimentType
+}
 
 export class ExperimentsTree
   extends Disposable
