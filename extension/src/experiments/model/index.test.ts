@@ -19,6 +19,7 @@ import {
   ExperimentStatus,
   EXPERIMENT_WORKSPACE_ID
 } from '../../cli/dvc/contract'
+import { PersistenceKey } from '../../persistence/constants'
 
 jest.mock('vscode')
 
@@ -299,5 +300,22 @@ describe('ExperimentsModel', () => {
 
     const noParams = model.getExperimentParams('not-an-experiment')
     expect(definedAndNonEmpty(noParams)).toBe(false)
+  })
+
+  it('should set the number of commits to show correctly', () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+
+    model.setNbfCommitsToShow(42)
+
+    expect(model.getNbOfCommitsToShow()).toBe(42)
+  })
+
+  it('should persist the number of commits to show when changing it', () => {
+    const memento = buildMockMemento()
+    const model = new ExperimentsModel('', memento)
+
+    model.setNbfCommitsToShow(42)
+
+    expect(memento.get(PersistenceKey.NUMBER_OF_COMMITS_TO_SHOW)).toBe(42)
   })
 })
