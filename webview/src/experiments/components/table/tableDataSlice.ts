@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { FilteredCounts } from 'dvc/src/experiments/model/filterBy/collect'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
-import { Column, Row, TableData } from 'dvc/src/experiments/webview/contract'
+import { Column, Commit, TableData } from 'dvc/src/experiments/webview/contract'
 import { keepEqualOldReferencesInArray } from '../../../util/array'
 import { keepReferenceIfEqual } from '../../../util/objects'
 
@@ -92,11 +92,11 @@ export const tableDataSlice = createSlice({
     updateIsShowingMoreCommits: (state, action: PayloadAction<boolean>) => {
       state.isShowingMoreCommits = action.payload
     },
-    updateRows: (state, action: PayloadAction<Row[]>) => {
+    updateRows: (state, action: PayloadAction<Commit[]>) => {
       state.rows = keepEqualOldReferencesInArray(
         state.rows,
         action.payload
-      ) as Row[]
+      ) as Commit[]
     },
     updateSorts: (state, action: PayloadAction<SortDefinition[]>) => {
       state.sorts = keepEqualOldReferencesInArray(

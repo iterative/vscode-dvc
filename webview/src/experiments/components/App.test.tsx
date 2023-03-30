@@ -10,7 +10,12 @@ import {
 import '@testing-library/jest-dom/extend-expect'
 import tableDataFixture from 'dvc/src/test/fixtures/expShow/base/tableData'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { Column, ColumnType, Row } from 'dvc/src/experiments/webview/contract'
+import {
+  Column,
+  ColumnType,
+  Commit,
+  Experiment
+} from 'dvc/src/experiments/webview/contract'
 import { buildMetricOrParamPath } from 'dvc/src/experiments/columns/paths'
 import dataTypesTableFixture from 'dvc/src/test/fixtures/expShow/dataTypes/tableData'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
@@ -29,15 +34,11 @@ import {
 import { getRow } from '../../test/queries'
 import { dragAndDrop } from '../../test/dragDrop'
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
-import { setExperimentsAsStarred } from '../../test/tableDataFixture'
 import {
   advanceTimersByTime,
   clickRowCheckbox,
   contractRow,
   expandRow,
-  getCheckboxCountIndicator,
-  getCountIndicatorById,
-  getCountIndicators,
   renderTable,
   renderTableWithNoColumns,
   renderTableWithoutRunningExperiments,
@@ -166,20 +167,11 @@ describe('App', () => {
 
   describe('Row expansion', () => {
     const experimentLabel = '1ba7bcd'
-    const checkpointLabel = '22e40e1'
 
     it('should maintain expansion status when rows are reordered', () => {
       renderTable()
 
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
-      expect(screen.getByText(checkpointLabel)).toBeInTheDocument()
-
-      const testRow = getRow(experimentLabel)
-      const expandButton = within(testRow).getByTitle('Contract Row')
-      fireEvent.click(expandButton)
-
-      expect(screen.getByText(experimentLabel)).toBeInTheDocument()
-      expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
 
       setTableData({
         ...tableDataFixture,
@@ -187,27 +179,33 @@ describe('App', () => {
           tableDataFixture.rows[0],
           {
             ...tableDataFixture.rows[1],
-            subRows: [...(tableDataFixture.rows[1].subRows as Row[])].reverse()
+            subRows: [
+              ...(tableDataFixture.rows[1].subRows as Experiment[])
+            ].reverse()
           }
         ]
       })
 
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
-      expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
+
+      contractRow('main')
+
+      expect(screen.queryByText(experimentLabel)).not.toBeInTheDocument()
+
+      setTableData(tableDataFixture)
+
+      expect(screen.queryByText(experimentLabel)).not.toBeInTheDocument()
     })
 
     it('should maintain expansion status when the commit changes', () => {
       renderTable()
 
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
-      expect(screen.getByText(checkpointLabel)).toBeInTheDocument()
-
-      const testRow = getRow(experimentLabel)
-      const expandButton = within(testRow).getByTitle('Contract Row')
-      fireEvent.click(expandButton)
 
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
-      expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
+
+      contractRow('main')
+      expect(screen.queryByText(experimentLabel)).not.toBeInTheDocument()
 
       const changedCommitName = 'changed-branch'
 
@@ -226,19 +224,20 @@ describe('App', () => {
       })
 
       expect(screen.getByText(changedCommitName)).toBeInTheDocument()
-      expect(screen.getByText(experimentLabel)).toBeInTheDocument()
-      expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
+      expect(screen.queryByText(experimentLabel)).not.toBeInTheDocument()
     })
 
-    it('should not toggle an experiment when using the row expansion button', () => {
+    it('should not toggle a commit when using the row expansion button', () => {
       renderTable()
-      const testRow = getRow(experimentLabel)
+      const testRow = getRow('main')
       const expandButton = within(testRow).getByTitle('Contract Row')
 
       mockPostMessage.mockClear()
 
       fireEvent.click(expandButton)
       expect(mockPostMessage).not.toHaveBeenCalled()
+
+      expandRow('main')
 
       fireEvent.keyDown(expandButton, {
         bubbles: true,
@@ -247,83 +246,6 @@ describe('App', () => {
         keyCode: 13
       })
       expect(mockPostMessage).not.toHaveBeenCalled()
-    })
-  })
-
-  describe('Sub-rows middle states indicators', () => {
-    const testRowLabel = '4fb124a'
-
-    const getMiddleStatesTestRow = () => {
-      return getRow(testRowLabel)
-    }
-
-    const selectSomeSubRows = () => {
-      clickRowCheckbox('d1343a8')
-      clickRowCheckbox('1ee5f2e')
-
-      return 2
-    }
-
-    const starSomeSubRows = () => {
-      const starredFixture = setExperimentsAsStarred(tableDataFixture, [
-        'd1343a8',
-        '1ee5f2e'
-      ])
-
-      setTableData(starredFixture)
-
-      return 2
-    }
-
-    it('should be hidden when the parent row is expanded', () => {
-      renderTable()
-      const row = getMiddleStatesTestRow()
-      const indicators = getCountIndicators(row)
-      expect(indicators).toHaveLength(0)
-    })
-
-    describe('Checkbox selection counter', () => {
-      it('should not be visible if no sub-row was checked', () => {
-        renderTable()
-        const row = getMiddleStatesTestRow()
-        const indicator = getCheckboxCountIndicator(row)
-        expect(indicator).not.toBeInTheDocument()
-      })
-
-      it('should display the correct number of checked sub-rows when the parent is collapsed', () => {
-        renderTable()
-        const row = getMiddleStatesTestRow()
-        const numberOfSubrowsSelected = selectSomeSubRows()
-        expect(getCheckboxCountIndicator(row)).not.toBeInTheDocument()
-        contractRow(testRowLabel)
-        const collapsed = getMiddleStatesTestRow()
-        expect(getCheckboxCountIndicator(collapsed)).toHaveTextContent(
-          `${numberOfSubrowsSelected}`
-        )
-      })
-    })
-
-    describe('Stars counter', () => {
-      it('should not be visible if no sub-row was starred', () => {
-        renderTable()
-        const row = getMiddleStatesTestRow()
-        const indicator = getCountIndicatorById(row, 'row-action-star')
-        expect(indicator).not.toBeInTheDocument()
-      })
-
-      it('should display the correct number of starred sub-rows when the parent is collapsed', () => {
-        renderTable()
-        const row = getMiddleStatesTestRow()
-        const numberOfSubrowsStarred = starSomeSubRows()
-        expect(
-          getCountIndicatorById(row, 'row-action-star')
-        ).not.toBeInTheDocument()
-        contractRow(testRowLabel)
-        const collapsed = getMiddleStatesTestRow()
-        expect(
-          getCountIndicatorById(collapsed, 'row-action-star')
-        ).toHaveTextContent(`${numberOfSubrowsStarred}`)
-      })
     })
   })
 
@@ -346,8 +268,7 @@ describe('App', () => {
       testClick(EXPERIMENT_WORKSPACE_ID)
       testClick('main')
       testClick('[exp-e7a67]', 'exp-e7a67')
-      testClick('22e40e1', '22e40e1fa3c916ac567f69b85969e3066a91dda4')
-      testClick('e821416', 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361')
+      testClick('1ba7bcd', 'exp-83425')
     })
 
     it('should send a message to the extension to toggle an experiment when Enter or Space is pressed on the row', () => {
@@ -1046,30 +967,6 @@ describe('App', () => {
       })
     })
 
-    it('should not enable the user share a checkpoint or commit to Studio', () => {
-      renderTableWithoutRunningExperiments()
-
-      const commitTarget = screen.getByText('main')
-      fireEvent.contextMenu(commitTarget, { bubbles: true })
-
-      advanceTimersByTime(100)
-      const commitMenuitems = screen.getAllByRole('menuitem')
-      const commitItemLabels = commitMenuitems.map(item => item.textContent)
-      expect(commitItemLabels).not.toHaveLength(0)
-      expect(commitItemLabels).not.toContain('Share to Studio')
-
-      const checkpointTarget = screen.getByText('d1343a8')
-      fireEvent.contextMenu(checkpointTarget, { bubbles: true })
-
-      advanceTimersByTime(100)
-      const checkpointMenuitems = screen.getAllByRole('menuitem')
-      const checkpointItemLabels = checkpointMenuitems.map(
-        item => item.textContent
-      )
-      expect(checkpointItemLabels).not.toHaveLength(0)
-      expect(checkpointItemLabels).not.toContain('Share to Studio')
-    })
-
     it('should always present the Plots options if multiple rows are selected', () => {
       renderTableWithoutRunningExperiments()
 
@@ -1103,9 +1000,9 @@ describe('App', () => {
       renderTableWithoutRunningExperiments()
 
       clickRowCheckbox('4fb124a')
-      clickRowCheckbox('42b8736', true)
+      clickRowCheckbox('1ba7bcd', true)
 
-      expect(selectedRows().length).toBe(4)
+      expect(selectedRows().length).toBe(3)
 
       const target = screen.getByText('4fb124a')
       fireEvent.contextMenu(target, { bubbles: true })
@@ -1119,38 +1016,19 @@ describe('App', () => {
     it('should allow batch selection from the bottom up too', () => {
       renderTableWithoutRunningExperiments()
 
-      clickRowCheckbox('42b8736')
+      clickRowCheckbox('1ba7bcd')
       clickRowCheckbox('4fb124a', true)
 
-      expect(selectedRows()).toHaveLength(4)
-
-      clickRowCheckbox('2173124', true)
-      expect(selectedRows()).toHaveLength(5)
-    })
-
-    it('should not include collapsed experiments in the bulk selection', () => {
-      renderTableWithoutRunningExperiments()
-
-      contractRow('42b8736')
-
-      advanceTimersByTime(100)
-      clickRowCheckbox('4fb124a')
-      clickRowCheckbox('22e40e1', true)
-      expandRow('42b8736')
-
-      advanceTimersByTime(100)
-      expect(getRow('42b8736')).toHaveAttribute('aria-selected', 'true')
-      expect(getRow('2173124')).not.toHaveAttribute('aria-selected', 'true')
-      expect(getRow('9523bde')).not.toHaveAttribute('aria-selected', 'true')
+      expect(selectedRows()).toHaveLength(3)
     })
 
     it('should present the Clear selected rows option when multiple rows are selected', () => {
       renderTableWithoutRunningExperiments()
 
       clickRowCheckbox('4fb124a')
-      clickRowCheckbox('42b8736', true)
+      clickRowCheckbox('1ba7bcd', true)
 
-      expect(selectedRows().length).toBe(4)
+      expect(selectedRows().length).toBe(3)
 
       const target = screen.getByText('4fb124a')
       fireEvent.contextMenu(target, { bubbles: true })
@@ -1167,9 +1045,9 @@ describe('App', () => {
       renderTable()
 
       clickRowCheckbox('4fb124a')
-      clickRowCheckbox('42b8736', true)
+      clickRowCheckbox('1ba7bcd', true)
 
-      expect(selectedRows().length).toBe(4)
+      expect(selectedRows().length).toBe(3)
 
       fireEvent.keyUp(getRow('42b8736'), { bubbles: true, key: 'Escape' })
 
@@ -1313,14 +1191,8 @@ describe('App', () => {
             selected: false,
             subRows: [
               {
-                ...(tableDataFixture.rows[1]?.subRows?.[0] as Row),
-                selected: false,
-                subRows: [
-                  {
-                    ...(tableDataFixture.rows[1]?.subRows?.[1] as Row),
-                    selected: true
-                  }
-                ]
+                ...(tableDataFixture.rows[1]?.subRows?.[0] as Commit),
+                selected: true
               }
             ]
           }

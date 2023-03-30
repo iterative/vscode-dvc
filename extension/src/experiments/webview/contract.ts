@@ -63,8 +63,8 @@ export const isRunningInQueue = ({
   executor?: string | null
 }): boolean => isRunning(status) && executor === 'dvc-task'
 
-export interface Row extends Experiment {
-  subRows?: Row[]
+export interface Commit extends Experiment {
+  subRows?: Experiment[]
 }
 
 export interface ColumnAggregateData {
@@ -103,7 +103,7 @@ export type TableData = {
   hasRunningExperiment: boolean
   hasValidDvcYaml: boolean
   isShowingMoreCommits: boolean
-  rows: Row[]
+  rows: Commit[]
   sorts: SortDefinition[]
   filteredCounts: FilteredCounts
   filters: string[]

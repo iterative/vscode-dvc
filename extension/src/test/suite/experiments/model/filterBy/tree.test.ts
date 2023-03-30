@@ -26,7 +26,6 @@ import { buildExperiments, stubWorkspaceExperimentsGetters } from '../../util'
 import {
   ColumnType,
   Experiment,
-  isQueued,
   TableData
 } from '../../../../../experiments/webview/contract'
 import { WEBVIEW_TEST_TIMEOUT } from '../../../timeouts'
@@ -96,23 +95,10 @@ suite('Experiments Filter By Tree Test Suite', () => {
         workspace,
         {
           ...main,
-          subRows: main.subRows
-            ?.filter(experiment => {
-              const accuracy = experiment.metrics?.['summary.json']?.accuracy
-              return !!(accuracy === undefined || gte45(accuracy))
-            })
-            .map(experiment =>
-              isQueued(experiment.status) || experiment.error
-                ? experiment
-                : {
-                    ...experiment,
-                    subRows: experiment.subRows?.filter(checkpoint => {
-                      const accuracy =
-                        checkpoint.metrics?.['summary.json']?.accuracy
-                      return !!(accuracy === undefined || gte45(accuracy))
-                    })
-                  }
-            )
+          subRows: main.subRows?.filter(experiment => {
+            const accuracy = experiment.metrics?.['summary.json']?.accuracy
+            return !!(accuracy === undefined || gte45(accuracy))
+          })
         }
       ]
 

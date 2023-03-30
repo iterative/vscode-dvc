@@ -1,11 +1,6 @@
 import { Memento } from 'vscode'
 import { SortDefinition, sortExperiments } from './sortBy'
-import {
-  FilterDefinition,
-  filterExperiment,
-  splitExperimentsByFilters,
-  getFilterId
-} from './filterBy'
+import { FilterDefinition, filterExperiment, getFilterId } from './filterBy'
 import { collectExperiments, collectMutableRevisions } from './collect'
 import {
   collectFiltered,
@@ -32,7 +27,6 @@ import {
   Experiment,
   isQueued,
   isRunningInQueue,
-  Row,
   RunningExperiment
 } from '../webview/contract'
 import {
@@ -395,7 +389,10 @@ export class ExperimentsModel extends ModelWithPersistence {
 
         return {
           ...commitWithSelectedAndStarred,
-          subRows: this.getSubRows(experiments)
+          subRows: experiments.filter(
+            (experiment: Experiment) =>
+              !!filterExperiment(this.getFilters(), experiment)
+          )
         }
       })
     ]
@@ -446,34 +443,8 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.finishedRunning
   }
 
-  private getSubRows(experiments: Experiment[], filters = this.getFilters()) {
-    return experiments
-      .map(experiment => {
-        const checkpoints = this.getUnfilteredCheckpointsByTip(
-          experiment.id,
-          filters
-        )
-        if (!checkpoints) {
-          return experiment
-        }
-        return {
-          ...experiment,
-          subRows: checkpoints
-        }
-      })
-      .filter((row: Row) => this.filterTableRow(row, filters))
-  }
-
   private findIndexByPath(pathToRemove: string) {
     return this.currentSorts.findIndex(({ path }) => path === pathToRemove)
-  }
-
-  private filterTableRow(row: Row, filters: FilterDefinition[]): boolean {
-    const hasUnfilteredCheckpoints = definedAndNonEmpty(row.subRows)
-    if (hasUnfilteredCheckpoints) {
-      return true
-    }
-    return !!filterExperiment(filters, row)
   }
 
   private getFilteredExperiments() {
@@ -485,24 +456,6 @@ export class ExperimentsModel extends ModelWithPersistence {
     }
 
     return acc
-  }
-
-  private getUnfilteredCheckpointsByTip(
-    sha: string,
-    filters: FilterDefinition[]
-  ) {
-    const checkpoints = this.getCheckpoints(sha)
-    if (!checkpoints) {
-      return
-    }
-    const { unfiltered } = splitExperimentsByFilters(filters, checkpoints)
-    return unfiltered
-  }
-
-  private getCheckpoints(id: string) {
-    return this.checkpointsByTip
-      .get(id)
-      ?.map(checkpoint => this.addDetails(checkpoint))
   }
 
   private getExperimentsByCommit(commit: Experiment) {

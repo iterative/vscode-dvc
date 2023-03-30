@@ -8,7 +8,7 @@ import React, {
 import { useSelector } from 'react-redux'
 import {
   Column,
-  Row,
+  Commit,
   ColumnType,
   Experiment
 } from 'dvc/src/experiments/webview/contract'
@@ -121,7 +121,7 @@ const reportResizedColumn = (
   }
 }
 
-const defaultColumn: Partial<ColumnDef<Row>> = {
+const defaultColumn: Partial<ColumnDef<Commit>> = {
   minSize: MINIMUM_COLUMN_WIDTH,
   size: DEFAULT_COLUMN_WIDTH
 }
@@ -154,15 +154,15 @@ export const ExperimentsTable: React.FC = () => {
   }, [columnsData])
 
   const getRowId = useCallback(
-    (experiment: Row, relativeIndex: number, parent?: TableRow<Row>) =>
+    (experiment: Commit, relativeIndex: number, parent?: TableRow<Commit>) =>
       parent ? [parent.id, experiment.id].join('.') : String(relativeIndex),
     []
   )
 
-  const instance = useReactTable<Row>({
+  const instance = useReactTable<Commit>({
     autoResetAll: false,
     columnResizeMode: 'onChange',
-    columns: columns as ColumnDef<Row, unknown>[],
+    columns: columns as ColumnDef<Commit, unknown>[],
     data,
     defaultColumn,
     enableColumnResizing: true,

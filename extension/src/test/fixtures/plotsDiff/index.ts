@@ -21,7 +21,7 @@ import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
 import { getCLICommitId, replaceCommitCLIId } from './util'
 import { formatDate } from '../../../util/date'
-import { ColumnType, Row } from '../../../experiments/webview/contract'
+import { ColumnType, Commit } from '../../../experiments/webview/contract'
 
 const basicVega = {
   [join('logs', 'loss.tsv')]: [
@@ -523,8 +523,9 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
   return [singleViewPlots, multiViewPlots]
 }
 
-const getMain = (): Row => rowsFixture.find(({ id }) => id === 'main') as Row
-const getMainExperiments = (): Row[] => getMain().subRows as Row[]
+const getMain = (): Commit =>
+  rowsFixture.find(({ id }) => id === 'main') as Commit
+const getMainExperiments = (): Commit[] => getMain().subRows as Commit[]
 
 export const findAndFormatCreated = (revisionId: string): string =>
   formatDate(
