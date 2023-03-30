@@ -25,7 +25,7 @@ import {
 import { buildExperimentsData } from '../util'
 import {
   ExperimentFlag,
-  NUM_OF_COMMITS_TO_SHOW
+  DEFAULT_NUM_OF_COMMITS_TO_SHOW
 } from '../../../../cli/dvc/constants'
 import { EXPERIMENTS_GIT_LOGS_REFS } from '../../../../experiments/data/constants'
 import { gitPath } from '../../../../cli/git/constants'
@@ -95,7 +95,7 @@ suite('Experiments Data Test Suite', () => {
             }
           } as unknown as InternalCommands,
           disposable.track(new EventEmitter<boolean>()),
-          () => NUM_OF_COMMITS_TO_SHOW
+          () => DEFAULT_NUM_OF_COMMITS_TO_SHOW
         )
       )
 
@@ -145,7 +145,7 @@ suite('Experiments Data Test Suite', () => {
             }
           } as unknown as InternalCommands,
           disposable.track(new EventEmitter<boolean>()),
-          () => NUM_OF_COMMITS_TO_SHOW
+          () => DEFAULT_NUM_OF_COMMITS_TO_SHOW
         )
       )
 
@@ -189,7 +189,7 @@ suite('Experiments Data Test Suite', () => {
       expect(mockExperimentShow).to.be.calledWithExactly(
         dvcDemoPath,
         ExperimentFlag.NUM_COMMIT,
-        NUM_OF_COMMITS_TO_SHOW.toString(),
+        DEFAULT_NUM_OF_COMMITS_TO_SHOW.toString(),
         ExperimentFlag.NO_FETCH
       )
 
@@ -202,7 +202,7 @@ suite('Experiments Data Test Suite', () => {
       expect(mockExperimentShow).to.be.calledWithExactly(
         dvcDemoPath,
         ExperimentFlag.NUM_COMMIT,
-        NUM_OF_COMMITS_TO_SHOW.toString(),
+        DEFAULT_NUM_OF_COMMITS_TO_SHOW.toString(),
         ExperimentFlag.NO_FETCH
       )
     })
@@ -221,7 +221,7 @@ suite('Experiments Data Test Suite', () => {
       expect(mockExperimentShow).to.be.calledWithExactly(
         dvcDemoPath,
         ExperimentFlag.NUM_COMMIT,
-        NUM_OF_COMMITS_TO_SHOW.toString()
+        DEFAULT_NUM_OF_COMMITS_TO_SHOW.toString()
       )
     })
   })

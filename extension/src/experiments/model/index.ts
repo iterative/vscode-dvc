@@ -48,7 +48,7 @@ import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
 import { PersistenceKey } from '../../persistence/constants'
 import { sum } from '../../util/math'
-import { NUM_OF_COMMITS_TO_SHOW } from '../../cli/dvc/constants'
+import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../cli/dvc/constants'
 
 export type StarredExperiments = Record<string, boolean | undefined>
 
@@ -114,7 +114,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     )
     this.numberOfCommitsToShow = this.revive<number>(
       PersistenceKey.NUMBER_OF_COMMITS_TO_SHOW,
-      NUM_OF_COMMITS_TO_SHOW
+      DEFAULT_NUM_OF_COMMITS_TO_SHOW
     )
 
     const assignedColors = new Set(

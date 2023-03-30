@@ -22,7 +22,7 @@ import { FileSystemData } from '../../../fileSystem/data'
 import * as Watcher from '../../../fileSystem/watcher'
 import { ExperimentsModel } from '../../../experiments/model'
 import { ColumnsModel } from '../../../experiments/columns/model'
-import { NUM_OF_COMMITS_TO_SHOW } from '../../../cli/dvc/constants'
+import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../../cli/dvc/constants'
 
 const hasCheckpoints = (data: ExperimentsOutput) => {
   const [experimentsWithBaseline] = Object.values(
@@ -196,7 +196,7 @@ export const buildExperimentsData = (disposer: SafeWatcherDisposer) => {
       dvcDemoPath,
       internalCommands,
       disposer.track(new EventEmitter<boolean>()),
-      () => NUM_OF_COMMITS_TO_SHOW
+      () => DEFAULT_NUM_OF_COMMITS_TO_SHOW
     )
   )
 
