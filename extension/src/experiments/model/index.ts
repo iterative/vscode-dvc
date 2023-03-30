@@ -469,7 +469,6 @@ export class ExperimentsModel extends ModelWithPersistence {
 
     const { coloredStatus, availableColors } = collectColoredStatus(
       this.getWorkspaceAndCommits(),
-      this.checkpointsByTip,
       this.experimentsByCommit,
       this.coloredStatus,
       this.availableColors,
