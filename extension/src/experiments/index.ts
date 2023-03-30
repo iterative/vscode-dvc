@@ -348,11 +348,13 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public async selectExperiments() {
-    const experiments = this.experiments.getExperimentsWithCheckpoints()
+    const experiments = [
+      ...this.experiments.getWorkspaceAndCommits(),
+      ...this.experiments.getExperiments()
+    ]
 
     const selected = await pickExperimentsToPlot(
       experiments,
-      this.hasCheckpoints(),
       this.columns.getFirstThreeColumnOrder()
     )
     if (!selected) {

@@ -1,6 +1,3 @@
-import { QuickPickItemKind } from 'vscode'
-import omit from 'lodash.omit'
-import { ExperimentWithCheckpoints } from '.'
 import { MAX_SELECTED_EXPERIMENTS } from './status'
 import { getColumnPathsQuickPickDetail } from './util'
 import { definedAndNonEmpty } from '../../util/array'
@@ -21,27 +18,21 @@ type QuickPickItemAccumulator = {
   selectedItems: QuickPickItemWithValue<Experiment | undefined>[]
 }
 
-const getSeparator = (experiment: Experiment) => ({
-  kind: QuickPickItemKind.Separator,
-  label: experiment.id,
-  value: undefined
-})
-
 const getItem = (
   experiment: Experiment,
   firstThreeColumnOrder: string[]
 ): QuickPickItemWithValue<Experiment | undefined> => ({
   detail: getColumnPathsQuickPickDetail(experiment, firstThreeColumnOrder),
   label: experiment.label,
-  value: omit(experiment, 'checkpoints')
+  value: experiment
 })
 
 const getItemWithDescription = (
-  experiment: ExperimentWithCheckpoints,
+  experiment: Experiment,
   firstThreeColumnOrder: string[]
 ) => {
   const item = getItem(experiment, firstThreeColumnOrder)
-  if (!experiment.checkpoints && experiment.displayNameOrParent) {
+  if (experiment.displayNameOrParent) {
     item.description = `${experiment.commit ? '$(git-commit)' : ''}${
       experiment.displayNameOrParent
     }`
@@ -63,39 +54,7 @@ const collectItem = (
   return acc
 }
 
-const collectFromExperiment = (
-  acc: QuickPickItemAccumulator,
-  experiment: ExperimentWithCheckpoints,
-  firstThreeColumnOrder: string[]
-): void => {
-  if (experiment.checkpoints) {
-    acc.items.push(getSeparator(experiment))
-  }
-
-  collectItem(acc, experiment, firstThreeColumnOrder, getItemWithDescription)
-
-  for (const checkpoint of experiment.checkpoints || []) {
-    collectItem(acc, checkpoint, firstThreeColumnOrder)
-  }
-}
-
-const collectCheckpointItems = (
-  experiments: ExperimentWithCheckpoints[],
-  firstThreeColumnOrder: string[]
-) => {
-  const acc: QuickPickItemAccumulator = {
-    items: [],
-    selectedItems: []
-  }
-
-  for (const experiment of experiments) {
-    collectFromExperiment(acc, experiment, firstThreeColumnOrder)
-  }
-
-  return acc
-}
-
-const collectExperimentOnlyItems = (
+const collectItems = (
   experiments: Experiment[],
   firstThreeColumnOrder: string[]
 ) => {
@@ -111,20 +70,8 @@ const collectExperimentOnlyItems = (
   return acc
 }
 
-const collectItems = (
-  experiments: ExperimentWithCheckpoints[],
-  hasCheckpoints: boolean,
-  firstThreeColumnOrder: string[]
-): QuickPickItemAccumulator => {
-  if (hasCheckpoints) {
-    return collectCheckpointItems(experiments, firstThreeColumnOrder)
-  }
-  return collectExperimentOnlyItems(experiments, firstThreeColumnOrder)
-}
-
 export const pickExperimentsToPlot = (
-  experiments: ExperimentWithCheckpoints[],
-  hasCheckpoints: boolean,
+  experiments: Experiment[],
   firstThreeColumnOrder: string[]
 ): Promise<Experiment[] | undefined> => {
   if (!definedAndNonEmpty(experiments)) {
@@ -133,7 +80,6 @@ export const pickExperimentsToPlot = (
 
   const { items, selectedItems } = collectItems(
     experiments,
-    hasCheckpoints,
     firstThreeColumnOrder
   )
 
@@ -146,10 +92,6 @@ export const pickExperimentsToPlot = (
   )
 }
 
-export type ExperimentWithName = Experiment & {
-  name?: string
-}
-
 type ExperimentDetails = { id: string; name: string }
 type ExperimentItem = {
   description: string | undefined
@@ -159,7 +101,7 @@ type ExperimentItem = {
 }
 
 const getExperimentItems = (
-  experiments: ExperimentWithName[],
+  experiments: Experiment[],
   firstThreeColumnOrder: string[]
 ): ExperimentItem[] =>
   experiments.map(experiment => {
@@ -183,7 +125,7 @@ type QuickPickExperiments = typeof quickPickManyValues<ExperimentDetails>
 const pickExperimentOrExperiments = <
   T extends QuickPickExperiment | QuickPickExperiments
 >(
-  experiments: ExperimentWithName[],
+  experiments: Experiment[],
   firstThreeColumnOrder: string[],
   title: Title,
   quickPick: T
@@ -202,7 +144,7 @@ const pickExperimentOrExperiments = <
 }
 
 export const pickExperiment = (
-  experiments: ExperimentWithName[],
+  experiments: Experiment[],
   firstThreeColumnOrder: string[],
   title: Title = Title.SELECT_EXPERIMENT
 ): Thenable<ExperimentDetails | undefined> =>
@@ -214,7 +156,7 @@ export const pickExperiment = (
   )
 
 export const pickExperiments = (
-  experiments: ExperimentWithName[],
+  experiments: Experiment[],
   firstThreeColumnOrder: string[],
   title: Title = Title.SELECT_EXPERIMENTS
 ): Thenable<ExperimentDetails[] | undefined> =>
