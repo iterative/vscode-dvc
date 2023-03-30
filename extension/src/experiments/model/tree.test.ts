@@ -34,7 +34,6 @@ const mockedGetMarkdownString = jest.mocked(getMarkdownString)
 
 const {
   mockedExperiments,
-  mockedGetCheckpoints,
   mockedGetCommitExperiments,
   mockedGetDvcRoots,
   mockedGetFirstThreeColumnOrder,
@@ -133,7 +132,7 @@ describe('ExperimentsTree', () => {
       const experiments = [
         {
           displayColor: '#b180d7',
-          hasChildren: true,
+          hasChildren: false,
           id: 'exp-12345',
           label: '90aea7f',
           selected: true,
@@ -189,7 +188,7 @@ describe('ExperimentsTree', () => {
 
       expect(children).toStrictEqual([
         {
-          collapsibleState: 1,
+          collapsibleState: 0,
           command: {
             arguments: [{ dvcRoot: 'repo', id: 'exp-12345' }],
             command: RegisteredCommands.EXPERIMENT_TOGGLE,
@@ -267,78 +266,6 @@ describe('ExperimentsTree', () => {
       ])
     })
 
-    it('should return an array of checkpoint items when a non root element is provided', async () => {
-      mockedThemeIcon.mockImplementation(function (id) {
-        return { id }
-      })
-
-      const experimentsTree = new ExperimentsTree(
-        mockedExperiments,
-        mockedResourceLocator
-      )
-
-      const checkpoints = [
-        {
-          id: 'aaaaaaaaaaaaaaaaa',
-          label: 'aaaaaaa',
-          tooltip: undefined,
-          type: ExperimentType.CHECKPOINT
-        },
-        {
-          id: 'bbbbbbbbbbbbbbbbb',
-          label: 'bbbbbbb',
-          tooltip: undefined,
-          type: ExperimentType.CHECKPOINT
-        }
-      ]
-      mockedGetCheckpoints.mockReturnValueOnce(checkpoints)
-      mockedGetFirstThreeColumnOrder.mockReturnValue([])
-
-      const children = await experimentsTree.getChildren({
-        collapsibleState: 1,
-        description: undefined,
-        dvcRoot: 'repo',
-        iconPath: new ThemeIcon('loading~spin'),
-        id: 'ebbd66f',
-        label: 'ebbd66f',
-        tooltip: undefined,
-        type: ExperimentType.EXPERIMENT
-      })
-
-      expect(children).toStrictEqual([
-        {
-          collapsibleState: 0,
-          command: {
-            arguments: [{ dvcRoot: 'repo', id: 'aaaaaaaaaaaaaaaaa' }],
-            command: 'dvc.views.experiments.toggleStatus',
-            title: 'toggle'
-          },
-          description: undefined,
-          dvcRoot: 'repo',
-          iconPath: new ThemeIcon('circle-filled'),
-          id: 'aaaaaaaaaaaaaaaaa',
-          label: 'aaaaaaa',
-          tooltip: undefined,
-          type: ExperimentType.CHECKPOINT
-        },
-        {
-          collapsibleState: 0,
-          command: {
-            arguments: [{ dvcRoot: 'repo', id: 'bbbbbbbbbbbbbbbbb' }],
-            command: 'dvc.views.experiments.toggleStatus',
-            title: 'toggle'
-          },
-          description: undefined,
-          dvcRoot: 'repo',
-          iconPath: new ThemeIcon('circle-filled'),
-          id: 'bbbbbbbbbbbbbbbbb',
-          label: 'bbbbbbb',
-          tooltip: undefined,
-          type: ExperimentType.CHECKPOINT
-        }
-      ])
-    })
-
     it("should return the commit's experiments when the element is a commit", async () => {
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
@@ -404,7 +331,7 @@ describe('ExperimentsTree', () => {
             'data/data.xml': { changes: false, value: '22a1a29' }
           },
           displayColor: undefined,
-          hasChildren: true,
+          hasChildren: false,
           id: 'exp-123',
           label: 'a123',
           params: {
@@ -474,7 +401,7 @@ describe('ExperimentsTree', () => {
 
       expect(children).toStrictEqual([
         {
-          collapsibleState: 1,
+          collapsibleState: 0,
           command: {
             arguments: [{ dvcRoot: 'repo', id: 'exp-123' }],
             command: RegisteredCommands.EXPERIMENT_TOGGLE,
@@ -649,38 +576,6 @@ describe('ExperimentsTree', () => {
       expect(treeItem).toStrictEqual({
         ...mockedItem,
         iconPath: { id: 'loading~spin' }
-      })
-    })
-
-    it("should return a tree item for an experiment's checkpoint", () => {
-      let mockedItem = {}
-      mockedTreeItem.mockImplementationOnce(function (label, collapsibleState) {
-        expect(collapsibleState).toStrictEqual(0)
-        mockedItem = { collapsibleState, label }
-        return mockedItem
-      })
-      mockedThemeIcon.mockImplementationOnce(function (id) {
-        return { id }
-      })
-
-      const experimentsTree = new ExperimentsTree(
-        mockedExperiments,
-        mockedResourceLocator
-      )
-
-      const treeItem = experimentsTree.getTreeItem({
-        collapsibleState: 0,
-        description: undefined,
-        dvcRoot: 'demo',
-        iconPath: new ThemeIcon('circle-filled'),
-        id: 'f0778b3',
-        label: 'f0778b3',
-        tooltip: undefined,
-        type: ExperimentType.EXPERIMENT
-      })
-      expect(treeItem).toStrictEqual({
-        ...mockedItem,
-        iconPath: { id: 'circle-filled' }
       })
     })
 

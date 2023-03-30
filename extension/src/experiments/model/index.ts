@@ -407,12 +407,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getExperimentCount() {
-    return sum([
-      this.getFlattenedCheckpoints().length,
-      this.getExperimentsAndQueued().length,
-      this.commits.length,
-      1
-    ])
+    return sum([this.getExperimentsAndQueued().length, this.commits.length, 1])
   }
 
   public getFilteredCounts(hasCheckpoints: boolean) {
@@ -432,7 +427,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   public getExperimentsByCommitForTree(commit: Experiment) {
     return this.getExperimentsByCommit(commit)?.map(experiment => ({
       ...experiment,
-      hasChildren: definedAndNonEmpty(this.checkpointsByTip.get(experiment.id)),
+      hasChildren: false,
       type: isQueued(experiment.status)
         ? ExperimentType.QUEUED
         : ExperimentType.EXPERIMENT
