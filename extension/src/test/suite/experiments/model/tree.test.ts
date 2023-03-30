@@ -6,8 +6,6 @@ import {
   EventEmitter,
   QuickPick,
   QuickPickItem,
-  TreeView,
-  TreeViewExpansionEvent,
   window
 } from 'vscode'
 import { ExperimentType } from '../../../../experiments/model'
@@ -15,7 +13,6 @@ import { UNSELECTED } from '../../../../experiments/model/status'
 import {
   getFirstArgOfLastCall,
   getTimeSafeDisposer,
-  spyOnPrivateMethod,
   stubPrivatePrototypeMethod
 } from '../../util'
 import { dvcDemoPath } from '../../../util'
@@ -28,12 +25,7 @@ import customPlotsFixture from '../../../fixtures/expShow/base/customPlots'
 import expShowFixture from '../../../fixtures/expShow/base/output'
 import plotsRevisionsFixture from '../../../fixtures/plotsDiff/revisions'
 import { ExperimentsTree } from '../../../../experiments/model/tree'
-import {
-  buildExperiments,
-  buildSingleRepoExperiments,
-  stubWorkspaceExperimentsGetters
-} from '../util'
-import { ResourceLocator } from '../../../../resourceLocator'
+import { buildExperiments, stubWorkspaceExperimentsGetters } from '../util'
 import { WEBVIEW_TEST_TIMEOUT } from '../../timeouts'
 import {
   QuickPickItemWithValue,
@@ -43,7 +35,6 @@ import * as QuickPickWrapper from '../../../../vscode/quickPick'
 import { DvcExecutor } from '../../../../cli/dvc/executor'
 import { Param } from '../../../../experiments/model/modify/collect'
 import { WorkspaceExperiments } from '../../../../experiments/workspace'
-import { ExperimentItem } from '../../../../experiments/model/collect'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 import { DvcReader } from '../../../../cli/dvc/reader'
 import {
@@ -286,51 +277,6 @@ suite('Experiments Tree Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should retain the expanded state of experiment tree items', () => {
-      const { workspaceExperiments } = buildSingleRepoExperiments(disposable)
-
-      const elementCollapsed = disposable.track(
-        new EventEmitter<TreeViewExpansionEvent<ExperimentItem>>()
-      )
-      const elementExpanded = disposable.track(
-        new EventEmitter<TreeViewExpansionEvent<ExperimentItem>>()
-      )
-
-      stub(window, 'createTreeView').returns({
-        dispose: stub(),
-        onDidCollapseElement: elementCollapsed.event,
-        onDidExpandElement: elementExpanded.event
-      } as unknown as TreeView<string | ExperimentItem>)
-      stub(commands, 'registerCommand')
-
-      const experimentsTree = disposable.track(
-        new ExperimentsTree(workspaceExperiments, {} as ResourceLocator)
-      )
-
-      const description = '[exp-1234]'
-
-      const setExpandedSpy = spyOnPrivateMethod(
-        experimentsTree,
-        'setExperimentExpanded'
-      )
-
-      elementExpanded.fire({ element: { description } as ExperimentItem })
-
-      expect(
-        setExpandedSpy,
-        'the experiment should be set to expanded'
-      ).to.be.calledOnceWith(description, true)
-
-      setExpandedSpy.resetHistory()
-
-      elementCollapsed.fire({ element: { description } as ExperimentItem })
-
-      expect(
-        setExpandedSpy,
-        'the experiment should be set to collapsed'
-      ).to.be.calledOnceWith(description, false)
-    })
-
     it('should be able to remove an experiment with dvc.views.experimentsTree.removeExperiment', async () => {
       const mockExperimentId = 'exp-to-remove'
       const mockExperiment = {
@@ -491,14 +437,14 @@ suite('Experiments Tree Test Suite', () => {
       const { experiments } = buildExperiments(disposable)
       await experiments.isReady()
 
-      const mockCheckpoint = 'e821416'
+      const mockExperiment = 'e821416'
       const mockBranch = 'it-is-a-branch'
 
       const mockExperimentBranch = stub(
         DvcExecutor.prototype,
         'experimentBranch'
       ).resolves(
-        `Git branch '${mockBranch}' has been created from experiment '${mockCheckpoint}'.        
+        `Git branch '${mockBranch}' has been created from experiment '${mockExperiment}'.        
        To switch to the new branch run:
              git checkout ${mockBranch}`
       )
@@ -516,7 +462,7 @@ suite('Experiments Tree Test Suite', () => {
       expect(mockShowInputBox).to.be.calledOnce
       expect(mockExperimentBranch).to.be.calledWithExactly(
         dvcDemoPath,
-        mockCheckpoint,
+        mockExperiment,
         mockBranch
       )
     })
