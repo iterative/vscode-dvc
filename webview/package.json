@@ -52,7 +52,7 @@
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "14.0.0",
     "@types/jest": "29.5.0",
-    "@types/jsdom": "21.1.0",
+    "@types/jsdom": "21.1.1",
     "@types/node": "16.x",
     "@types/react": "18.0.28",
     "@types/react-dom": "18.0.11",
@@ -76,7 +76,7 @@
     "storybook-addon-themes": "6.1.0",
     "style-loader": "3.3.2",
     "ts-loader": "9.4.2",
-    "webpack": "5.76.2",
+    "webpack": "5.76.3",
     "webpack-cli": "5.0.1",
     "webpack-dev-server": "4.13.1"
   },
