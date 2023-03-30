@@ -21,16 +21,12 @@ describe('collectColoredStatus', () => {
     return mockExperiments
   }
 
-  it('should set unseen checkpoints and experiments to unselected', () => {
+  it('should set unseen experiments to unselected', () => {
     const experiments = [{ id: 'exp1' }] as Experiment[]
-    const checkpointsByTip = new Map<string, Experiment[]>([
-      ['exp1', buildMockExperiments(5, 'check')]
-    ])
     const colors = copyOriginalColors()
 
     const { availableColors, coloredStatus } = collectColoredStatus(
       experiments,
-      checkpointsByTip,
       new Map(),
       {},
       copyOriginalColors(),
@@ -40,11 +36,6 @@ describe('collectColoredStatus', () => {
 
     expect(availableColors).toStrictEqual(colors)
     expect(coloredStatus).toStrictEqual({
-      check1: UNSELECTED,
-      check2: UNSELECTED,
-      check3: UNSELECTED,
-      check4: UNSELECTED,
-      check5: UNSELECTED,
       exp1: UNSELECTED
     })
   })
@@ -58,7 +49,6 @@ describe('collectColoredStatus', () => {
 
     const { availableColors, coloredStatus } = collectColoredStatus(
       experiments,
-      new Map(),
       new Map(),
       {},
       copyOriginalColors(),
@@ -78,7 +68,6 @@ describe('collectColoredStatus', () => {
 
     const { availableColors, coloredStatus } = collectColoredStatus(
       experiments,
-      new Map(),
       new Map(),
       {
         exp1: colors[0],
@@ -114,7 +103,6 @@ describe('collectColoredStatus', () => {
     const { availableColors, coloredStatus } = collectColoredStatus(
       experiments,
       new Map(),
-      new Map(),
       {
         exp2: UNSELECTED,
         exp3: colors[2],
@@ -140,7 +128,6 @@ describe('collectColoredStatus', () => {
 
     const { availableColors, coloredStatus } = collectColoredStatus(
       experiments,
-      new Map(),
       new Map(),
       {
         exp1: UNSELECTED,
@@ -176,7 +163,6 @@ describe('collectColoredStatus', () => {
     const { availableColors, coloredStatus } = collectColoredStatus(
       experiments,
       new Map(),
-      new Map(),
       { exp9: colors[0] },
       unassignColors,
       new Set(),
@@ -203,7 +189,6 @@ describe('collectColoredStatus', () => {
 
     const { availableColors, coloredStatus } = collectColoredStatus(
       experiments,
-      new Map(),
       new Map(),
       {
         exp4: colors[0],
@@ -232,69 +217,6 @@ describe('collectColoredStatus', () => {
     })
   })
 
-  it('should respect existing checkpoint statuses', () => {
-    const experiments = [
-      { id: 'expA' },
-      { id: 'expB' },
-      { id: 'expC' },
-      { id: 'expD' }
-    ] as Experiment[]
-    const checkpointsByTip = new Map<string, Experiment[]>([
-      ['expA', buildMockExperiments(5, 'checkA')],
-      ['expB', buildMockExperiments(5, 'checkB')],
-      ['expC', buildMockExperiments(5, 'checkC')],
-      ['expD', buildMockExperiments(6, 'checkD')]
-    ])
-    const colors = copyOriginalColors()
-
-    const { availableColors, coloredStatus } = collectColoredStatus(
-      experiments,
-      checkpointsByTip,
-      new Map(),
-      {
-        checkC1: colors[1],
-        checkD2: colors[2],
-        checkD3: colors[3],
-        checkD4: colors[4],
-        checkD5: colors[5],
-        checkD6: colors[6],
-        expD: colors[0]
-      },
-      [],
-      new Set(),
-      {}
-    )
-
-    expect(availableColors).toStrictEqual([])
-    expect(coloredStatus).toStrictEqual({
-      checkA1: UNSELECTED,
-      checkA2: UNSELECTED,
-      checkA3: UNSELECTED,
-      checkA4: UNSELECTED,
-      checkA5: UNSELECTED,
-      checkB1: UNSELECTED,
-      checkB2: UNSELECTED,
-      checkB3: UNSELECTED,
-      checkB4: UNSELECTED,
-      checkB5: UNSELECTED,
-      checkC1: colors[1],
-      checkC2: UNSELECTED,
-      checkC3: UNSELECTED,
-      checkC4: UNSELECTED,
-      checkC5: UNSELECTED,
-      checkD1: UNSELECTED,
-      checkD2: colors[2],
-      checkD3: colors[3],
-      checkD4: colors[4],
-      checkD5: colors[5],
-      checkD6: colors[6],
-      expA: UNSELECTED,
-      expB: UNSELECTED,
-      expC: UNSELECTED,
-      expD: colors[0]
-    })
-  })
-
   it('should remove the unselected status of experiments running in the workspace (for getMostRecentExperiment)', () => {
     const colors = copyOriginalColors()
     const { availableColors, coloredStatus } = collectColoredStatus(
@@ -310,7 +232,6 @@ describe('collectColoredStatus', () => {
           status: ExperimentStatus.RUNNING
         }
       ] as Experiment[],
-      new Map(),
       new Map(),
       {
         'exp-1': UNSELECTED,
@@ -338,7 +259,6 @@ describe('collectColoredStatus', () => {
           id: EXPERIMENT_WORKSPACE_ID
         }
       ] as Experiment[],
-      new Map(),
       new Map(),
       {
         workspace: colors[0]
@@ -368,7 +288,6 @@ describe('collectColoredStatus', () => {
           id: EXPERIMENT_WORKSPACE_ID
         }
       ] as Experiment[],
-      new Map(),
       new Map(),
       {
         'exp-1': colors[2],
