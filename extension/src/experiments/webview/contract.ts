@@ -3,7 +3,6 @@ import {
   ExperimentStatus,
   ValueTree
 } from '../../cli/dvc/contract'
-import { FilteredCounts } from '../model/filterBy/collect'
 import { SortDefinition } from '../model/sortBy'
 
 export { ExperimentStatus } from '../../cli/dvc/contract'
@@ -105,7 +104,7 @@ export type TableData = {
   isShowingMoreCommits: boolean
   rows: Commit[]
   sorts: SortDefinition[]
-  filteredCounts: FilteredCounts
+  filteredCount: number
   filters: string[]
 }
 

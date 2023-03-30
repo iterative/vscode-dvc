@@ -1267,42 +1267,32 @@ describe('App', () => {
     })
     expect(filterIndicator).toHaveTextContent('1')
     expect(tooltip).toHaveTextContent('1 Filter Applied')
-    expect(tooltip).toHaveTextContent('0 Experiments, 0 Checkpoints Filtered')
+    expect(tooltip).toHaveTextContent('No Experiments Filtered')
 
     setTableData({
       ...tableDataFixture,
-      filteredCounts: {
-        checkpoints: 2,
-        experiments: 1
-      },
+      filteredCount: 1,
       filters: [firstFilterPath, secondFilterPath]
     })
     expect(filterIndicator).toHaveTextContent('2')
     expect(tooltip).toHaveTextContent('2 Filters Applied')
-    expect(tooltip).toHaveTextContent('1 Experiment, 2 Checkpoints Filtered')
+    expect(tooltip).toHaveTextContent('1 Experiment Filtered')
 
     setTableData({
       ...tableDataFixture,
-      filteredCounts: {
-        experiments: 10000
-      },
+      filteredCount: 10000,
       filters: [firstFilterPath, secondFilterPath]
     })
     expect(filterIndicator).toHaveTextContent('2')
-    expect(tooltip).toHaveTextContent('Experiment')
-    expect(tooltip).not.toHaveTextContent('Checkpoint')
+    expect(tooltip).toHaveTextContent('10000 Experiments Filtered')
 
     setTableData({
       ...tableDataFixture,
-      filteredCounts: {
-        checkpoints: 10000,
-        experiments: 10000
-      },
+      filteredCount: 10000,
       filters: []
     })
     expect(filterIndicator).toHaveTextContent('')
     expect(tooltip).not.toHaveTextContent('Experiment')
-    expect(tooltip).not.toHaveTextContent('Checkpoint')
   })
 
   it('should send a message to focus the relevant tree when clicked', () => {

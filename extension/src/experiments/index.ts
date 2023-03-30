@@ -331,8 +331,8 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
-  public getFilteredCounts() {
-    return this.experiments.getFilteredCounts(this.hasCheckpoints())
+  public getFilteredCount() {
+    return this.experiments.getFilteredCount()
   }
 
   public getExperimentCount() {

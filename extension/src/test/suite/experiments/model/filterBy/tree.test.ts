@@ -25,11 +25,9 @@ import { RegisteredCommands } from '../../../../../commands/external'
 import { buildExperiments, stubWorkspaceExperimentsGetters } from '../../util'
 import {
   ColumnType,
-  Experiment,
   TableData
 } from '../../../../../experiments/webview/contract'
 import { WEBVIEW_TEST_TIMEOUT } from '../../../timeouts'
-import { ExperimentType } from '../../../../../experiments/model'
 import { Title } from '../../../../../vscode/title'
 import {
   ExperimentsFilterByTree,
@@ -107,7 +105,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         columnOrder: columnsOrderFixture,
         columnWidths: {},
         columns: columnsFixture,
-        filteredCounts: { checkpoints: 4, experiments: 1 },
+        filteredCount: 1,
         filters: [accuracyPath],
         hasCheckpoints: true,
         hasColumns: true,
@@ -140,7 +138,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         columnOrder: columnsOrderFixture,
         columnWidths: {},
         columns: columnsFixture,
-        filteredCounts: { checkpoints: 0, experiments: 0 },
+        filteredCount: 0,
         filters: [],
         hasCheckpoints: true,
         hasColumns: true,
@@ -328,51 +326,27 @@ suite('Experiments Filter By Tree Test Suite', () => {
       void experiments.addFilter()
       await tableFilterAdded
 
-      expect(mockTreeView.description).to.equal(
-        '3 Experiments, 9 Checkpoints Filtered'
-      )
+      expect(mockTreeView.description).to.equal('3 Experiments Filtered')
 
       stubPrivateMethod(experimentsModel, 'getFilteredExperiments')
         .onFirstCall()
-        .returns([
-          { id: '0ef13xs', type: ExperimentType.CHECKPOINT } as Experiment & {
-            type: ExperimentType
-          }
-        ])
+        .returns([{ id: '0ef13xs' }])
         .onSecondCall()
-        .returns([
-          { id: 'exp-1', type: ExperimentType.EXPERIMENT } as Experiment & {
-            type: ExperimentType
-          }
-        ])
+        .returns([{ id: 'exp-1' }, { id: 'exp-2' }, { id: 'exp-3' }])
         .onThirdCall()
-        .returns([
-          { id: 'exp-1', type: ExperimentType.EXPERIMENT } as Experiment & {
-            type: ExperimentType
-          },
-          { id: 'exp-2', type: ExperimentType.EXPERIMENT } as Experiment & {
-            type: ExperimentType
-          },
-          { id: 'exp-3', type: ExperimentType.EXPERIMENT } as Experiment & {
-            type: ExperimentType
-          }
-        ])
-
-      const allButOneCheckpointFilteredEvent = getUpdateEvent()
-      workspaceExperiments.experimentsChanged.fire()
-      await allButOneCheckpointFilteredEvent
-
-      expect(mockTreeView.description).to.equal(
-        '0 Experiments, 1 Checkpoint Filtered'
-      )
+        .returns([])
 
       const allButOneExperimentFilteredEvent = getUpdateEvent()
       workspaceExperiments.experimentsChanged.fire()
       await allButOneExperimentFilteredEvent
 
-      expect(mockTreeView.description).to.equal(
-        '1 Experiment, 0 Checkpoints Filtered'
-      )
+      expect(mockTreeView.description).to.equal('1 Experiment Filtered')
+
+      const threeExperimentsFilteredEvent = getUpdateEvent()
+      workspaceExperiments.experimentsChanged.fire()
+      await threeExperimentsFilteredEvent
+
+      expect(mockTreeView.description).to.equal('3 Experiments Filtered')
 
       const tableFilterRemoved = getUpdateEvent()
       experiments.removeFilter(getFilterId(filter))
@@ -408,7 +382,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         columnOrder: columnsOrderFixture,
         columnWidths: {},
         columns: columnsFixture,
-        filteredCounts: { checkpoints: 9, experiments: 6 },
+        filteredCount: 6,
         filters: ['starred'],
         hasCheckpoints: true,
         hasColumns: true,

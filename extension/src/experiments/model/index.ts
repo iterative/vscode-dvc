@@ -3,12 +3,6 @@ import { SortDefinition, sortExperiments } from './sortBy'
 import { FilterDefinition, filterExperiment, getFilterId } from './filterBy'
 import { collectExperiments, collectMutableRevisions } from './collect'
 import {
-  collectFiltered,
-  collectFilteredCounts,
-  ExperimentAugmented,
-  ExperimentWithType
-} from './filterBy/collect'
-import {
   collectColoredStatus,
   collectFinishedRunningExperiments,
   collectSelected,
@@ -294,7 +288,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     )
   }
 
-  public getWorkspaceAndCommits(): ExperimentAugmented[] {
+  public getWorkspaceAndCommits() {
     return [
       {
         ...this.addDetails(this.workspace),
@@ -410,9 +404,9 @@ export class ExperimentsModel extends ModelWithPersistence {
     return sum([this.getExperimentsAndQueued().length, this.commits.length, 1])
   }
 
-  public getFilteredCounts(hasCheckpoints: boolean) {
+  public getFilteredCount() {
     const filtered = this.getFilteredExperiments()
-    return collectFilteredCounts(filtered, hasCheckpoints)
+    return filtered.length
   }
 
   public getCombinedList() {
@@ -443,11 +437,12 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   private getFilteredExperiments() {
-    const acc: ExperimentWithType[] = []
+    const acc: Experiment[] = []
 
     for (const experiment of this.getExperiments()) {
-      const checkpoints = this.getCheckpointsWithType(experiment.id) || []
-      collectFiltered(acc, this.getFilters(), experiment, checkpoints)
+      if (!filterExperiment(this.getFilters(), experiment)) {
+        acc.push(experiment)
+      }
     }
 
     return acc

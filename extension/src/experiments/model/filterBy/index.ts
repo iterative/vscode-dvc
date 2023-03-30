@@ -122,36 +122,6 @@ const buildFilter =
 export const getFilterId = (filter: FilterDefinition): string =>
   [filter.path, filter.operator, filter.value].join('')
 
-interface FilteredExperimentsAccumulator<T extends Experiment> {
-  filtered: T[]
-  unfiltered: T[]
-}
-
-export const splitExperimentsByFilters = <T extends Experiment>(
-  filterDefinitions: FilterDefinition[],
-  unfilteredExperiments: T[]
-): FilteredExperimentsAccumulator<T> => {
-  if (!definedAndNonEmpty(filterDefinitions)) {
-    return { filtered: [], unfiltered: unfilteredExperiments }
-  }
-  const filterFunction = buildFilter(filterDefinitions)
-
-  const acc: FilteredExperimentsAccumulator<T> = {
-    filtered: [],
-    unfiltered: []
-  }
-
-  for (const experiment of unfilteredExperiments) {
-    if (filterFunction(experiment)) {
-      acc.unfiltered.push(experiment)
-      continue
-    }
-    acc.filtered.push(experiment)
-  }
-
-  return acc
-}
-
 export const filterExperiment = (
   filterDefinitions: FilterDefinition[],
   experiment: Experiment

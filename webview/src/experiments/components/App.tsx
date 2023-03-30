@@ -12,7 +12,7 @@ import {
   updateColumnOrder,
   updateColumns,
   updateColumnWidths,
-  updateFilteredCounts,
+  updateFilteredCount,
   updateFilters,
   updateHasCheckpoints,
   updateHasColumns,
@@ -48,8 +48,8 @@ export const App: React.FC<Record<string, unknown>> = () => {
               case 'columnsWidths':
                 dispatch(updateColumnWidths(data.data.columnWidths))
                 continue
-              case 'filteredCounts':
-                dispatch(updateFilteredCounts(data.data.filteredCounts))
+              case 'filteredCount':
+                dispatch(updateFilteredCount(data.data.filteredCount))
                 continue
               case 'filters':
                 dispatch(updateFilters(data.data.filters))

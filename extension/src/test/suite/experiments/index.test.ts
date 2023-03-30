@@ -112,25 +112,6 @@ suite('Experiments Test Suite', () => {
     })
   })
 
-  describe('getCheckpoints', () => {
-    it("should return the correct checkpoints for an experiment's id", async () => {
-      const { experiments } = buildExperiments(disposable)
-
-      await experiments.isReady()
-
-      const notAnExperimentId = ':cartwheel:'
-      const notCheckpoints = experiments.getCheckpoints(notAnExperimentId)
-      expect(notCheckpoints).to.be.undefined
-
-      const checkpoints = experiments.getCheckpoints('exp-e7a67')
-
-      expect(checkpoints?.map(checkpoint => checkpoint.label)).to.deep.equal([
-        'd1343a8',
-        '1ee5f2e'
-      ])
-    })
-  })
-
   describe('getMoreCommits', () => {
     it('should update the data with the number of commits', async () => {
       const { experiments, mockUpdateExperimentsData } =
@@ -168,7 +149,7 @@ suite('Experiments Test Suite', () => {
         columnOrder: columnsOrderFixture,
         columnWidths: {},
         columns: columnsFixture,
-        filteredCounts: { checkpoints: 0, experiments: 0 },
+        filteredCount: 0,
         filters: [],
         hasCheckpoints: true,
         hasColumns: true,
@@ -1063,7 +1044,7 @@ suite('Experiments Test Suite', () => {
         columnOrder: columnsOrderFixture,
         columnWidths: {},
         columns: [],
-        filteredCounts: { checkpoints: 0, experiments: 0 },
+        filteredCount: 0,
         filters: [],
         rows: rowsFixture,
         sorts: []
