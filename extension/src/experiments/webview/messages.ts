@@ -231,7 +231,7 @@ export class WebviewMessages {
     const nbOfCommitsToShow = this.experiments.getNbOfCommitsToShow()
     this.hasMoreCommits = availableNbCommits > nbOfCommitsToShow
     this.isShowingMoreCommits =
-      Math.min(numberOfCommitsToShow, availableNbCommits) > 1
+      Math.min(nbOfCommitsToShow, availableNbCommits) > 1
     update && this.sendWebviewMessage()
   }
 
