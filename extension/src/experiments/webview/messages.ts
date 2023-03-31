@@ -241,7 +241,7 @@ export class WebviewMessages {
         NUM_OF_COMMITS_TO_INCREASE * change
     )
     await this.changeNbOfCommits()
-    await this.changeHasMoreOrLessCommits()
+    await this.changeHasMoreOrLessCommits(true)
   }
 
   private getWebviewData() {
