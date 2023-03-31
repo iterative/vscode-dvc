@@ -25,7 +25,9 @@ const PlotsContent = () => {
   const hasTemplateData = useSelector(
     (state: PlotsState) => state.template.hasData
   )
-  const hasCustomData = useSelector((state: PlotsState) => state.custom.hasData)
+  const customPlotIds = useSelector(
+    (state: PlotsState) => state.custom.plotsIds
+  )
   const wrapperRef = createRef<HTMLDivElement>()
 
   useLayoutEffect(() => {
@@ -59,16 +61,23 @@ const PlotsContent = () => {
     </Modal>
   )
 
+  const hasNoCustomPlots = customPlotIds.length === 0
+
   if (!hasComparisonData && !hasTemplateData) {
     return (
       <div className={styles.getStartedWrapper}>
         <GetStarted
-          addItems={<AddPlots hasUnselectedPlots={hasUnselectedPlots} />}
+          addItems={
+            <AddPlots
+              hasUnselectedPlots={hasUnselectedPlots}
+              hasNoCustomPlots={hasNoCustomPlots}
+            />
+          }
           showEmpty={!hasPlots}
           welcome={<Welcome />}
-          isFullScreen={!hasCustomData}
+          isFullScreen={hasNoCustomPlots}
         />
-        {hasCustomData && (
+        {!hasNoCustomPlots && (
           <>
             <CustomPlotsWrapper />
             {modal}
