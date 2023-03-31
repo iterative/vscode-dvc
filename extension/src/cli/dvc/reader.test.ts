@@ -76,7 +76,7 @@ describe('CliReader', () => {
       const cliOutput = await dvcReader.expShow(cwd)
       expect(cliOutput).toStrictEqual(expShowFixture)
       expect(mockedCreateProcess).toHaveBeenCalledWith({
-        args: ['exp', 'show', '-n', '3', JSON_FLAG],
+        args: ['exp', 'show', JSON_FLAG],
         cwd,
         env: mockedEnv,
         executable: 'dvc'

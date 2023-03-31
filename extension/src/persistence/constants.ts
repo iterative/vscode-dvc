@@ -6,6 +6,7 @@ export enum PersistenceKey {
   METRICS_AND_PARAMS_COLUMN_ORDER = 'columnsColumnOrder:',
   METRICS_AND_PARAMS_COLUMN_WIDTHS = 'columnsColumnWidths:',
   METRICS_AND_PARAMS_STATUS = 'columnsStatus:',
+  NUMBER_OF_COMMITS_TO_SHOW = 'numberOfCommitisToShow:',
   PLOT_PATH_STATUS = 'plotPathStatus:',
   PLOT_COMPARISON_ORDER = 'plotComparisonOrder:',
   PLOT_COMPARISON_PATHS_ORDER = 'plotComparisonPathsOrder',

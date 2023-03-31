@@ -13,7 +13,8 @@ export const DVCLIVE_ONLY_RUNNING_SIGNAL_FILE = join(
 )
 export const EXP_RWLOCK_FILE = join(TEMP_EXP_DIR, 'rwlock.lock')
 
-export const NUM_OF_COMMITS_TO_SHOW = '3'
+export const DEFAULT_NUM_OF_COMMITS_TO_SHOW = 3
+export const NUM_OF_COMMITS_TO_INCREASE = 2
 
 export enum Command {
   ADD = 'add',

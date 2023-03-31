@@ -18,10 +18,13 @@ import { getGitPath } from '../../fileSystem'
 export const QUEUED_EXPERIMENT_PATH = join(DOT_DVC, 'tmp', 'exps')
 
 export class ExperimentsData extends BaseData<ExperimentsOutput> {
+  private readonly getNbOfCommitsToShow: () => number
+
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
-    updatesPaused: EventEmitter<boolean>
+    updatesPaused: EventEmitter<boolean>,
+    getNbOfCommitsToShow: () => number
   ) {
     super(
       dvcRoot,
@@ -36,6 +39,8 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
       ],
       ['dvc.lock', 'dvc.yaml', 'params.yaml', DOT_DVC]
     )
+
+    this.getNbOfCommitsToShow = getNbOfCommitsToShow
 
     void this.watchExpGitRefs()
     void this.managedUpdate(QUEUED_EXPERIMENT_PATH)
@@ -56,6 +61,8 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     const data = await this.internalCommands.executeCommand<ExperimentsOutput>(
       AvailableCommands.EXP_SHOW,
       this.dvcRoot,
+      ExperimentFlag.NUM_COMMIT,
+      this.getNbOfCommitsToShow().toString(),
       ...args
     )
 
