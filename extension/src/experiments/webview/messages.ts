@@ -228,17 +228,18 @@ export class WebviewMessages {
     }
   }
 
-  private async changeHasMoreOrLessCommits() {
+  private async changeHasMoreOrLessCommits(update?: boolean) {
     const availableNbCommits = await this.getNumCommits()
     this.hasMoreCommits = availableNbCommits > this.numberOfCommitsToShow
     this.isShowingMoreCommits =
       Math.min(this.numberOfCommitsToShow, availableNbCommits) > 1
+    update && this.sendWebviewMessage()
   }
 
   private async changeCommitsToShow(change: number) {
     this.numberOfCommitsToShow = this.numberOfCommitsToShow + 2 * change
     await this.changeNbOfCommits(this.numberOfCommitsToShow)
-    await this.changeHasMoreOrLessCommits()
+    await this.changeHasMoreOrLessCommits(true)
   }
 
   private getWebviewData() {
