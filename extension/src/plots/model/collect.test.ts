@@ -8,7 +8,6 @@ import {
 } from './collect'
 import {
   createCheckpointSpec,
-  createMetricVsParamSpec,
   isCheckpointPlot,
   isCheckpointValue
 } from './custom'
@@ -85,12 +84,11 @@ describe('collectCustomPlots', () => {
     const expectedOutput = customPlotsFixture.plots.map(plot => ({
       ...plot,
       spec: isCheckpointValue(plot.type)
-        ? // split plot up?
-          createCheckpointSpec(plot.metric, plot.metric, plot.param, {
+        ? createCheckpointSpec(plot.metric, plot.metric, plot.param, {
             domain,
             range
           })
-        : createMetricVsParamSpec(plot.metric, plot.metric, plot.param),
+        : plot.spec,
       values: isCheckpointPlot(plot)
         ? plot.values.filter(value => domain.includes(value.group))
         : plot.values

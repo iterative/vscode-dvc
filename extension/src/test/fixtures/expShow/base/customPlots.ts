@@ -265,7 +265,7 @@ const data: CustomPlotsData = {
         ],
         transform: [{ as: 'y', calculate: "format(datum['y'],'.5f')" }],
         width: 'container'
-      } as VisualizationSpec,
+      },
       values: [
         {
           expName: 'main',
@@ -426,7 +426,6 @@ const data: CustomPlotsData = {
         encoding: {
           color: {
             field: 'group',
-            // why am i getting this in customPlots only?
             legend: { disable: true },
             scale: {
               domain: ['exp-e7a67', 'test-branch', 'exp-83425'],
@@ -515,7 +514,7 @@ const data: CustomPlotsData = {
           }
         ],
         width: 'container'
-      }
+      } as VisualizationSpec
     },
     {
       id: 'custom-summary.json:accuracy-epoch',
@@ -630,7 +629,7 @@ const data: CustomPlotsData = {
           }
         ],
         width: 'container'
-      }
+      } as VisualizationSpec
     }
   ],
   nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
