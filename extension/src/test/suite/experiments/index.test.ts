@@ -1219,11 +1219,9 @@ suite('Experiments Test Suite', () => {
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
-      const mockExperimentIds = [
-        'exp-e7a67',
-        'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9',
-        'test-branch'
-      ]
+      const queuedId = '90aea7f2482117a55dfcadcdb901aaa6610fbbc9'
+      const expectedIds = ['exp-e7a67', 'test-branch']
+      const mockExperimentIds = [...expectedIds, queuedId]
 
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
@@ -1241,7 +1239,10 @@ suite('Experiments Test Suite', () => {
         .map(({ id }) => id)
         .sort()
       mockExperimentIds.sort()
-      expect(selectExperimentIds).to.deep.equal(mockExperimentIds)
+      expect(
+        selectExperimentIds,
+        'should exclude queued experiments from selection'
+      ).to.deep.equal(expectedIds)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to compare experiments plots', async () => {

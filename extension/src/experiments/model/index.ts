@@ -267,7 +267,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     }
 
     const { availableColors, coloredStatus } = collectSelected(
-      selectedExperiments,
+      selectedExperiments.filter(({ status }) => !isQueued(status)),
       this.getCombinedList(),
       this.coloredStatus,
       this.availableColors
