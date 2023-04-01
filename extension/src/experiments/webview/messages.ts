@@ -25,7 +25,7 @@ import { Toast } from '../../vscode/toast'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { stopWorkspaceExperiment } from '../processExecution'
 import { hasDvcYamlFile } from '../../fileSystem'
-import { NUM_OF_COMMITS_TO_SHOW } from '../../cli/dvc/constants'
+import { NUM_OF_COMMITS_TO_INCREASE } from '../../cli/dvc/constants'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
@@ -49,11 +49,9 @@ export class WebviewMessages {
   private hasMoreCommits = false
   private isShowingMoreCommits = true
 
-  private numberOfCommitsToShow = Number.parseInt(NUM_OF_COMMITS_TO_SHOW, 10)
-
   private readonly addStage: () => Promise<boolean>
   private readonly getNumCommits: () => Promise<number>
-  private readonly changeNbOfCommits: (nbOfCommits: number) => Promise<void>
+  private readonly changeNbOfCommits: () => Promise<void>
 
   constructor(
     dvcRoot: string,
@@ -70,7 +68,7 @@ export class WebviewMessages {
     hasStages: () => Promise<string>,
     addStage: () => Promise<boolean>,
     getNumCommits: () => Promise<number>,
-    changeNbOfCommits: (nbOfCommits: number) => Promise<void>
+    changeNbOfCommits: () => Promise<void>
   ) {
     this.dvcRoot = dvcRoot
     this.experiments = experiments
@@ -228,17 +226,22 @@ export class WebviewMessages {
     }
   }
 
-  private async changeHasMoreOrLessCommits() {
+  private async changeHasMoreOrLessCommits(update?: boolean) {
     const availableNbCommits = await this.getNumCommits()
-    this.hasMoreCommits = availableNbCommits > this.numberOfCommitsToShow
+    const nbOfCommitsToShow = this.experiments.getNbOfCommitsToShow()
+    this.hasMoreCommits = availableNbCommits > nbOfCommitsToShow
     this.isShowingMoreCommits =
-      Math.min(this.numberOfCommitsToShow, availableNbCommits) > 1
+      Math.min(nbOfCommitsToShow, availableNbCommits) > 1
+    update && this.sendWebviewMessage()
   }
 
-  private async changeCommitsToShow(change: number) {
-    this.numberOfCommitsToShow = this.numberOfCommitsToShow + 2 * change
-    await this.changeNbOfCommits(this.numberOfCommitsToShow)
-    await this.changeHasMoreOrLessCommits()
+  private async changeCommitsToShow(change: 1 | -1) {
+    this.experiments.setNbfCommitsToShow(
+      this.experiments.getNbOfCommitsToShow() +
+        NUM_OF_COMMITS_TO_INCREASE * change
+    )
+    await this.changeNbOfCommits()
+    await this.changeHasMoreOrLessCommits(true)
   }
 
   private getWebviewData() {

@@ -43,10 +43,7 @@ import { pickPaths } from '../path/selection/quickPick'
 import { Toast } from '../vscode/toast'
 import { ConfigKey } from '../vscode/config'
 import { checkSignalFile, pollSignalFileForProcess } from '../fileSystem'
-import {
-  DVCLIVE_ONLY_RUNNING_SIGNAL_FILE,
-  ExperimentFlag
-} from '../cli/dvc/constants'
+import { DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
 
 export const ExperimentsScale = {
   ...omit(ColumnType, 'TIMESTAMP'),
@@ -144,7 +141,10 @@ export class Experiments extends BaseRepository<TableData> {
     this.checkpoints = this.dispose.track(new CheckpointsModel())
 
     this.cliData = this.dispose.track(
-      cliData || new ExperimentsData(dvcRoot, internalCommands, updatesPaused)
+      cliData ||
+        new ExperimentsData(dvcRoot, internalCommands, updatesPaused, () =>
+          this.experiments.getNbOfCommitsToShow()
+        )
     )
 
     this.fileSystemData = this.dispose.track(
@@ -178,13 +178,6 @@ export class Experiments extends BaseRepository<TableData> {
 
   public update() {
     return this.cliData.managedUpdate()
-  }
-
-  public changeNbOfCommits(numberOfCommitsToShow: number) {
-    return this.cliData.update(
-      ExperimentFlag.NUM_COMMIT,
-      numberOfCommitsToShow.toString()
-    )
   }
 
   public async setState(data: ExperimentsOutput) {
@@ -583,7 +576,7 @@ export class Experiments extends BaseRepository<TableData> {
           AvailableCommands.GIT_GET_NUM_COMMITS,
           this.dvcRoot
         ),
-      (nbOfCommits: number) => this.changeNbOfCommits(nbOfCommits)
+      () => this.cliData.update()
     )
 
     this.dispose.track(
