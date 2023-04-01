@@ -257,6 +257,7 @@ export class WebviewMessages {
       hasValidDvcYaml: this.hasValidDvcYaml,
       isShowingMoreCommits: this.isShowingMoreCommits,
       rows: this.experiments.getRowData(),
+      selectedForPlotsCount: this.experiments.getSelectedRevisions().length,
       sorts: this.experiments.getSorts()
     }
   }

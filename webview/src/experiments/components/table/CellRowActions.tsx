@@ -1,5 +1,4 @@
 import React, { MouseEventHandler, ReactElement } from 'react'
-import cx from 'classnames'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
 import {
   ExperimentStatus,
@@ -32,10 +31,8 @@ export type CellRowActionProps = {
   showSubRowStates: boolean
   subRowsAffected: number
   children: ReactElement
-  hidden?: boolean
-  testId?: string
+  testId: string
   tooltipContent: string | ReactElement
-  queued?: boolean
   onClick?: MouseEventHandler
 }
 
@@ -43,7 +40,6 @@ export const CellRowAction: React.FC<CellRowActionProps> = ({
   showSubRowStates,
   subRowsAffected,
   children,
-  hidden,
   testId,
   tooltipContent,
   onClick
@@ -52,10 +48,7 @@ export const CellRowAction: React.FC<CellRowActionProps> = ({
 
   return (
     <CellHintTooltip tooltipContent={tooltipContent}>
-      <div
-        className={cx(styles.rowActions, hidden && styles.hidden)}
-        data-testid={testId}
-      >
+      <div className={styles.rowActions} data-testid={testId}>
         <Indicator onClick={onClick} count={count}>
           {children}
         </Indicator>

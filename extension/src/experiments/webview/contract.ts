@@ -95,6 +95,8 @@ export type TableData = {
   columnOrder: string[]
   columns: Column[]
   columnWidths: Record<string, number>
+  filteredCount: number
+  filters: string[]
   hasCheckpoints: boolean
   hasColumns: boolean
   hasConfig: boolean
@@ -103,9 +105,8 @@ export type TableData = {
   hasValidDvcYaml: boolean
   isShowingMoreCommits: boolean
   rows: Commit[]
+  selectedForPlotsCount: number
   sorts: SortDefinition[]
-  filteredCount: number
-  filters: string[]
 }
 
 export type InitiallyUndefinedTableData = TableData | undefined

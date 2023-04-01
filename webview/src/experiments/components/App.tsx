@@ -22,6 +22,7 @@ import {
   updateHasValidDvcYaml,
   updateIsShowingMoreCommits,
   updateRows,
+  updateSelectedForPlotsCount,
   updateSorts
 } from './table/tableDataSlice'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
@@ -81,6 +82,11 @@ export const App: React.FC<Record<string, unknown>> = () => {
                 continue
               case 'rows':
                 dispatch(updateRows(data.data.rows))
+                continue
+              case 'selectedForPlotsCount':
+                dispatch(
+                  updateSelectedForPlotsCount(data.data.selectedForPlotsCount)
+                )
                 continue
               case 'sorts':
                 dispatch(updateSorts(data.data.sorts))
