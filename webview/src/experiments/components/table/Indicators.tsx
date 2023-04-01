@@ -1,6 +1,5 @@
 import React, { MouseEventHandler, ReactElement, ReactNode } from 'react'
 import { useSelector } from 'react-redux'
-import cx from 'classnames'
 import styles from './styles.module.scss'
 import { CellHintTooltip } from './CellHintTooltip'
 import { focusFiltersTree, focusSortsTree, openPlotsWebview } from './messages'
@@ -43,7 +42,7 @@ export const Indicator = ({
 }) => {
   const content = (
     <button
-      className={cx(styles.indicatorIcon, count && styles.indicatorWithCount)}
+      className={styles.indicatorIcon}
       aria-label={ariaLabel}
       onClick={onClick}
     >
@@ -67,17 +66,16 @@ const formatCountMessage = (
   descriptor = 'Applied'
 ) => `${count || 'No'} ${pluralize(item, count)} ${descriptor}`
 
-export const Indicators = ({
-  selectedForPlotsCount
-}: {
-  selectedForPlotsCount: number
-}) => {
+export const Indicators = () => {
   const filters = useSelector(
     (state: ExperimentsState) => state.tableData.filters
   )
   const sorts = useSelector((state: ExperimentsState) => state.tableData.sorts)
   const filteredCount = useSelector(
     (state: ExperimentsState) => state.tableData.filteredCount
+  )
+  const selectedForPlotsCount = useSelector(
+    (state: ExperimentsState) => state.tableData.selectedForPlotsCount
   )
 
   const sortsCount = sorts?.length

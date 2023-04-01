@@ -16,7 +16,6 @@ import { TableBody } from './TableBody'
 import { Indicators } from './Indicators'
 import { ShowMoreCommitsRow } from './ShowMoreCommitsRow'
 import { ExperimentsState } from '../../store'
-import { getSelectedForPlotsCount } from '../../util/rows'
 
 interface TableProps extends InstanceProp {
   onColumnOrderChange: (order: ColumnOrderState) => void
@@ -71,8 +70,6 @@ export const Table: React.FC<TableProps> = ({
     [flatRows, batchSelection, lastSelectedRow]
   )
 
-  const selectedForPlotsCount = getSelectedForPlotsCount(rows)
-
   return (
     <div
       className={styles.tableContainer}
@@ -109,7 +106,7 @@ export const Table: React.FC<TableProps> = ({
         ))}
       </table>
       <ShowMoreCommitsRow />
-      <Indicators selectedForPlotsCount={selectedForPlotsCount} />
+      <Indicators />
     </div>
   )
 }

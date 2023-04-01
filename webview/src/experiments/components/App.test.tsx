@@ -39,6 +39,9 @@ import {
   clickRowCheckbox,
   contractRow,
   expandRow,
+  getCheckboxCountIndicator,
+  getCountIndicatorById,
+  getCountIndicators,
   renderTable,
   renderTableWithNoColumns,
   renderTableWithoutRunningExperiments,
@@ -50,6 +53,7 @@ import {
 } from '../../test/experimentsTable'
 import { clearSelection, createWindowTextSelection } from '../../test/selection'
 import { sendMessage } from '../../shared/vscode'
+import { setExperimentsAsStarred } from '../../test/tableDataFixture'
 
 jest.mock('../../shared/api')
 jest.mock('../../util/styles')
@@ -246,6 +250,83 @@ describe('App', () => {
         keyCode: 13
       })
       expect(mockPostMessage).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('Sub-rows middle states indicators', () => {
+    const testRowLabel = 'main'
+
+    const getMiddleStatesTestRow = () => {
+      return getRow(testRowLabel)
+    }
+
+    const selectSomeSubRows = () => {
+      clickRowCheckbox('1ba7bcd')
+      clickRowCheckbox('4fb124a')
+
+      return 2
+    }
+
+    const starSomeSubRows = () => {
+      const starredFixture = setExperimentsAsStarred(tableDataFixture, [
+        '1ba7bcd',
+        '4fb124a'
+      ])
+
+      setTableData(starredFixture)
+
+      return 2
+    }
+
+    it('should be hidden when the parent row is expanded', () => {
+      renderTable()
+      const row = getMiddleStatesTestRow()
+      const indicators = getCountIndicators(row)
+      expect(indicators).toHaveLength(0)
+    })
+
+    describe('Checkbox selection counter', () => {
+      it('should not be visible if no sub-row was checked', () => {
+        renderTable()
+        const row = getMiddleStatesTestRow()
+        const indicator = getCheckboxCountIndicator(row)
+        expect(indicator).not.toBeInTheDocument()
+      })
+
+      it('should display the correct number of checked sub-rows when the parent is collapsed', () => {
+        renderTable()
+        const row = getMiddleStatesTestRow()
+        const numberOfSubRowsSelected = selectSomeSubRows()
+        expect(getCheckboxCountIndicator(row)).not.toBeInTheDocument()
+        contractRow(testRowLabel)
+        const collapsed = getMiddleStatesTestRow()
+        expect(getCheckboxCountIndicator(collapsed)).toHaveTextContent(
+          `${numberOfSubRowsSelected}`
+        )
+      })
+    })
+
+    describe('Stars counter', () => {
+      it('should not be visible if no sub-row was starred', () => {
+        renderTable()
+        const row = getMiddleStatesTestRow()
+        const indicator = getCountIndicatorById(row, 'row-action-star')
+        expect(indicator).not.toBeInTheDocument()
+      })
+
+      it('should display the correct number of starred sub-rows when the parent is collapsed', () => {
+        renderTable()
+        const row = getMiddleStatesTestRow()
+        const numberOfSubRowsStarred = starSomeSubRows()
+        expect(
+          getCountIndicatorById(row, 'row-action-star')
+        ).not.toBeInTheDocument()
+        contractRow(testRowLabel)
+        const collapsed = getMiddleStatesTestRow()
+        expect(
+          getCountIndicatorById(collapsed, 'row-action-star')
+        ).toHaveTextContent(`${numberOfSubRowsStarred}`)
+      })
     })
   })
 
@@ -1174,7 +1255,8 @@ describe('App', () => {
         rows: [
           { ...tableDataFixture.rows[0], selected: false },
           { ...tableDataFixture.rows[1], selected: false, subRows: [] }
-        ]
+        ],
+        selectedForPlotsCount: 0
       })
 
       expect(selectedForPlotsIndicator).toHaveTextContent('')
@@ -1196,12 +1278,50 @@ describe('App', () => {
               }
             ]
           }
-        ]
+        ],
+        selectedForPlotsCount: 1
       })
 
       expect(selectedForPlotsIndicator).toHaveTextContent('1')
       expect(tooltip).toHaveTextContent(
         '1 Experiment Selected for Plotting (Max 7)'
+      )
+    })
+
+    it('should show not change the plotted indicator when plotted experiments are hidden', () => {
+      const plottedExperiment = '4fb124a'
+
+      renderTable({
+        ...tableDataFixture
+      })
+
+      expect(screen.getByText(plottedExperiment)).toBeInTheDocument()
+
+      const selectedForPlotsIndicator =
+        screen.getByLabelText('selected for plots')
+      expect(selectedForPlotsIndicator).toHaveTextContent('2')
+
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+      fireEvent.mouseEnter(selectedForPlotsIndicator)
+
+      const expandedTooltip = screen.getByRole('tooltip')
+
+      expect(expandedTooltip).toHaveTextContent(
+        '2 Experiments Selected for Plotting (Max 7)'
+      )
+
+      fireEvent.mouseLeave(selectedForPlotsIndicator)
+
+      contractRow('main')
+
+      expect(screen.queryByText(plottedExperiment)).not.toBeInTheDocument()
+      fireEvent.mouseEnter(selectedForPlotsIndicator)
+
+      const contractedTooltip = screen.getByRole('tooltip')
+
+      expect(contractedTooltip).toHaveTextContent(
+        '2 Experiments Selected for Plotting (Max 7)'
       )
     })
 

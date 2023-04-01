@@ -5,6 +5,7 @@ import { TableData } from '../../../../experiments/webview/contract'
 const data: TableData = {
   changes: [],
   columnOrder: [],
+  columns,
   columnWidths: {},
   filteredCount: 0,
   filters: [
@@ -12,11 +13,14 @@ const data: TableData = {
     'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b.doubled'
   ],
   hasCheckpoints: false,
+  hasColumns: true,
   hasConfig: true,
   hasMoreCommits: true,
   hasRunningExperiment: false,
   hasValidDvcYaml: true,
   isShowingMoreCommits: true,
+  rows,
+  selectedForPlotsCount: 0,
   sorts: [
     {
       path: 'params:params.yaml:nested1.doubled',
@@ -34,10 +38,7 @@ const data: TableData = {
       path: 'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b.doubled',
       descending: true
     }
-  ],
-  columns,
-  hasColumns: true,
-  rows
+  ]
 }
 
 export default data

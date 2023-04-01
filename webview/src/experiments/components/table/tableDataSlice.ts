@@ -28,6 +28,7 @@ export const tableDataInitialState: TableDataState = {
   hasValidDvcYaml: true,
   isShowingMoreCommits: true,
   rows: [],
+  selectedForPlotsCount: 0,
   sorts: []
 }
 
@@ -95,6 +96,9 @@ export const tableDataSlice = createSlice({
         action.payload
       ) as Experiment[]
     },
+    updateSelectedForPlotsCount: (state, action: PayloadAction<number>) => {
+      state.selectedForPlotsCount = action.payload
+    },
     updateSorts: (state, action: PayloadAction<SortDefinition[]>) => {
       state.sorts = keepEqualOldReferencesInArray(
         state.sorts,
@@ -120,6 +124,7 @@ export const {
   updateHasValidDvcYaml,
   updateIsShowingMoreCommits,
   updateRows,
+  updateSelectedForPlotsCount,
   updateSorts
 } = tableDataSlice.actions
 

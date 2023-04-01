@@ -63,6 +63,7 @@ export const tableData: TableData = {
       label: 'main'
     }
   ],
+  selectedForPlotsCount: 0,
   sorts: []
 }
 

@@ -9,6 +9,7 @@ import deeplyNestedTableData from 'dvc/src/test/fixtures/expShow/deeplyNested/ta
 import dataTypesTableFixture from 'dvc/src/test/fixtures/expShow/dataTypes/tableData'
 import survivalTableData from 'dvc/src/test/fixtures/expShow/survival/tableData'
 import { timestampColumn } from 'dvc/src/experiments/columns/constants'
+import { delay } from 'dvc/src/util/time'
 import {
   ExperimentStatus,
   isRunning
@@ -27,6 +28,10 @@ import '../shared/style.scss'
 import { experimentsReducers } from '../experiments/store'
 import { TableDataState } from '../experiments/components/table/tableDataSlice'
 import { NORMAL_TOOLTIP_DELAY } from '../shared/components/tooltip/Tooltip'
+import {
+  setExperimentsAsSelected,
+  setExperimentsAsStarred
+} from '../test/tableDataFixture'
 
 const tableData: TableDataState = {
   changes: workspaceChangesFixture,
@@ -52,6 +57,7 @@ const tableData: TableDataState = {
       starred: experiment.starred || experiment.label === '42b8736'
     }))
   })),
+  selectedForPlotsCount: 2,
   sorts: [
     { descending: true, path: 'params:params.yaml:epochs' },
     { descending: false, path: 'params:params.yaml:log_file' }
@@ -129,6 +135,28 @@ WithSurvivalData.args = {
     rows: addCommitDataToMainBranch(survivalTableData.rows)
   }
 }
+
+export const WithMiddleStates = Template.bind({})
+const tableDataWithSomeSelectedExperiments = setExperimentsAsSelected(
+  tableData,
+  ['4fb124a', '42b8736', '1ba7bcd']
+)
+WithMiddleStates.args = {
+  tableData: setExperimentsAsStarred(tableDataWithSomeSelectedExperiments, [
+    '1ba7bcd'
+  ])
+}
+WithMiddleStates.play = async ({ canvasElement }) => {
+  await within(canvasElement).findByText('4fb124a')
+  const checkboxes = await within(canvasElement).findAllByRole('checkbox')
+  userEvent.click(checkboxes[1], { bubbles: true })
+  await delay(0)
+  userEvent.click(checkboxes[7], { bubbles: true, shiftKey: true })
+
+  const collapseButton = within(canvasElement).getByTitle('Contract Row')
+  userEvent.click(collapseButton)
+}
+WithMiddleStates.parameters = { chromatic: { delay: 2000 } }
 
 export const WithNoRunningExperiments = Template.bind({})
 WithNoRunningExperiments.args = {
