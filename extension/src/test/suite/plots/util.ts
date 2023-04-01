@@ -135,13 +135,15 @@ export const getExpectedCustomPlotsData = (
   domain: string[],
   range: Color[]
 ) => {
-  const { plots, nbItemsPerRow, height } = customPlotsFixture
+  const { plots, nbItemsPerRow, height, enablePlotCreation } =
+    customPlotsFixture
   return {
     custom: {
       colors: {
         domain,
         range
       },
+      enablePlotCreation,
       height,
       nbItemsPerRow,
       plots: plots.map(plot => ({

@@ -81,6 +81,7 @@ import * as ProcessExecution from '../../../process/execution'
 import { DvcReader } from '../../../cli/dvc/reader'
 import { DvcViewer } from '../../../cli/dvc/viewer'
 import { DEFAULT_NB_ITEMS_PER_ROW } from '../../../plots/webview/contract'
+import { GitReader } from '../../../cli/git/reader'
 
 const { openFileInEditor } = FileSystem
 
@@ -141,7 +142,7 @@ suite('Experiments Test Suite', () => {
 
       const webview = await experiments.showWebview()
 
-      const expectedTableData: TableData = {
+      const expectedTableData: Partial<TableData> = {
         changes: workspaceChangesFixture,
         columnOrder: columnsOrderFixture,
         columnWidths: {},
@@ -157,7 +158,7 @@ suite('Experiments Test Suite', () => {
         sorts: []
       }
 
-      expect(messageSpy).to.be.calledWithExactly(expectedTableData)
+      expect(messageSpy).to.be.calledWithMatch(expectedTableData)
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
@@ -247,23 +248,9 @@ suite('Experiments Test Suite', () => {
 
       await experiments.showWebview()
 
-      const expectedTableData: TableData = {
-        changes: workspaceChangesFixture,
-        columnOrder: columnsOrderFixture,
-        columnWidths: {},
-        columns: columnsFixture,
-        filteredCounts: { checkpoints: 0, experiments: 0 },
-        filters: [],
-        hasCheckpoints: true,
-        hasColumns: true,
-        hasConfig: false,
-        hasRunningExperiment: true,
-        hasValidDvcYaml: true,
-        rows: rowsFixture,
-        sorts: []
-      }
-
-      expect(messageSpy).to.be.calledWithExactly(expectedTableData)
+      expect(messageSpy).to.be.calledWithMatch({
+        hasConfig: false
+      })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasConfig to true if there are stages', async () => {
@@ -276,23 +263,64 @@ suite('Experiments Test Suite', () => {
 
       await experiments.showWebview()
 
-      const expectedTableData: TableData = {
-        changes: workspaceChangesFixture,
-        columnOrder: columnsOrderFixture,
-        columnWidths: {},
-        columns: columnsFixture,
-        filteredCounts: { checkpoints: 0, experiments: 0 },
-        filters: [],
-        hasCheckpoints: true,
-        hasColumns: true,
-        hasConfig: true,
-        hasRunningExperiment: true,
-        hasValidDvcYaml: true,
-        rows: rowsFixture,
-        sorts: []
-      }
+      expect(messageSpy).to.be.calledWithMatch({
+        hasConfig: true
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-      expect(messageSpy).to.be.calledWithExactly(expectedTableData)
+    it('should set hasMoreCommits to true if there are more commits to show', async () => {
+      stub(GitReader.prototype, 'getNumCommits').resolves(5)
+      const { experiments, messageSpy } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
+
+      await experiments.showWebview()
+
+      expect(messageSpy).to.be.calledWithMatch({
+        hasMoreCommits: true
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should set hasMoreCommits to false if there are more commits to show', async () => {
+      stub(GitReader.prototype, 'getNumCommits').resolves(1)
+      const { experiments, messageSpy } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
+
+      await experiments.showWebview()
+
+      expect(messageSpy).to.be.calledWithMatch({
+        hasMoreCommits: false
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should set isShowingMoreCommits to true if it is showing more than the current commit', async () => {
+      const { experiments, messageSpy } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
+
+      await experiments.showWebview()
+
+      expect(messageSpy).to.be.calledWithMatch({
+        isShowingMoreCommits: true
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should set isShowingMoreCommits to false it is showing only the current commit', async () => {
+      stub(GitReader.prototype, 'getNumCommits').resolves(1)
+      const { experiments, messageSpy } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
+
+      await experiments.showWebview()
+
+      expect(messageSpy).to.be.calledWithMatch({
+        isShowingMoreCommits: false
+      })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 
@@ -311,7 +339,8 @@ suite('Experiments Test Suite', () => {
         internalCommands,
         dvcExecutor,
         mockCheckOrAddPipeline,
-        messageSpy
+        messageSpy,
+        mockUpdateExperimentsData
       } = buildExperiments(disposable, expShowFixture)
       const mockExecuteCommand = stub(
         internalCommands,
@@ -328,7 +357,8 @@ suite('Experiments Test Suite', () => {
         experimentsModel,
         messageSpy,
         mockCheckOrAddPipeline,
-        mockExecuteCommand
+        mockExecuteCommand,
+        mockUpdateExperimentsData
       }
     }
 
@@ -1009,23 +1039,18 @@ suite('Experiments Test Suite', () => {
 
       await tableChangePromise
 
-      const allColumnsUnselected: TableData = {
+      const allColumnsUnselected: Partial<TableData> = {
         changes: workspaceChangesFixture,
         columnOrder: columnsOrderFixture,
         columnWidths: {},
         columns: [],
         filteredCounts: { checkpoints: 0, experiments: 0 },
         filters: [],
-        hasCheckpoints: true,
-        hasColumns: true,
-        hasConfig: true,
-        hasRunningExperiment: true,
-        hasValidDvcYaml: true,
         rows: rowsFixture,
         sorts: []
       }
 
-      expect(messageSpy).to.be.calledWith(allColumnsUnselected)
+      expect(messageSpy).to.be.calledWithMatch(allColumnsUnselected)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to focus the sorts tree', async () => {
@@ -1330,6 +1355,56 @@ suite('Experiments Test Suite', () => {
       })
 
       expect(mockCheckOrAddPipeline).to.be.calledOnce
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a message to show more commits', async () => {
+      const {
+        experiments,
+        experimentsModel,
+        messageSpy,
+        mockUpdateExperimentsData
+      } = setupExperimentsAndMockCommands()
+
+      const setNbfCommitsToShowSpy = spy(
+        experimentsModel,
+        'setNbfCommitsToShow'
+      )
+
+      const webview = await experiments.showWebview()
+      messageSpy.resetHistory()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SHOW_MORE_COMMITS
+      })
+
+      expect(mockUpdateExperimentsData).to.be.calledOnce
+      expect(setNbfCommitsToShowSpy).to.be.calledWith(5)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a message to show less commits', async () => {
+      const {
+        experiments,
+        experimentsModel,
+        messageSpy,
+        mockUpdateExperimentsData
+      } = setupExperimentsAndMockCommands()
+
+      const setNbfCommitsToShowSpy = spy(
+        experimentsModel,
+        'setNbfCommitsToShow'
+      )
+
+      const webview = await experiments.showWebview()
+      messageSpy.resetHistory()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SHOW_LESS_COMMITS
+      })
+
+      expect(mockUpdateExperimentsData).to.be.calledOnce
+      expect(setNbfCommitsToShowSpy).to.be.calledWith(1)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 

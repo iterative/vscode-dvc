@@ -141,7 +141,10 @@ export class Experiments extends BaseRepository<TableData> {
     this.checkpoints = this.dispose.track(new CheckpointsModel())
 
     this.cliData = this.dispose.track(
-      cliData || new ExperimentsData(dvcRoot, internalCommands, updatesPaused)
+      cliData ||
+        new ExperimentsData(dvcRoot, internalCommands, updatesPaused, () =>
+          this.experiments.getNbOfCommitsToShow()
+        )
     )
 
     this.fileSystemData = this.dispose.track(
@@ -565,7 +568,13 @@ export class Experiments extends BaseRepository<TableData> {
           AvailableCommands.STAGE_LIST,
           this.dvcRoot
         ),
-      () => this.addStage()
+      () => this.addStage(),
+      () =>
+        this.internalCommands.executeCommand<number>(
+          AvailableCommands.GIT_GET_NUM_COMMITS,
+          this.dvcRoot
+        ),
+      () => this.cliData.update()
     )
 
     this.dispose.track(

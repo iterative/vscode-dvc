@@ -1,6 +1,5 @@
 import React, { ReactElement } from 'react'
 import cn from 'classnames'
-import { truncate } from 'vega-util'
 import { Revision } from 'dvc/src/plots/webview/contract'
 import { formatNumber } from 'dvc/src/util/number'
 import styles from './styles.module.scss'
@@ -22,7 +21,7 @@ export const RibbonBlockTooltip: React.FC<{
           {firstThreeColumns.map(({ path, value, type }) => (
             <tr key={path}>
               <td className={cn(styles[`${type}Key`])}>
-                {truncate(path, 45, 'left')}
+                <span className={styles.tooltipPathWrapper}>{path}</span>
               </td>
               <td>
                 {typeof value === 'number' ? formatNumber(value) : value}

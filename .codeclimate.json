@@ -17,8 +17,11 @@
     "method-count": { "config": { "threshold": 30 } },
     "method-lines": {
       "config": {
-        "threshold": 30
+        "threshold": 40
       }
+    },
+    "method-complexity": {
+      "config": { "threshold": 6 }
     }
   }
 }

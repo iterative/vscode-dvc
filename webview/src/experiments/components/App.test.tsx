@@ -1518,4 +1518,50 @@ describe('App', () => {
       ).toBeInTheDocument()
     })
   })
+
+  describe('Show more commits', () => {
+    it('should display a show more commits button if the table data hasMoreCommits is set to true', () => {
+      renderTable({ ...tableDataFixture, hasMoreCommits: true })
+
+      expect(screen.getByTestId('show-more-commits')).toBeInTheDocument()
+    })
+
+    it('should not display a show more commits button if the table data hasMoreCommits is set to false', () => {
+      renderTable({ ...tableDataFixture, hasMoreCommits: false })
+
+      expect(screen.queryByTestId('show-more-commits')).not.toBeInTheDocument()
+    })
+
+    it('should send a message to show more commits when the show more commits button is clicked', () => {
+      renderTable({ ...tableDataFixture, hasMoreCommits: true })
+
+      fireEvent.click(screen.getByTestId('show-more-commits'))
+
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SHOW_MORE_COMMITS
+      })
+    })
+
+    it('should display a show less commits button if the table data isShowingMoreCommits is set to true', () => {
+      renderTable({ ...tableDataFixture, isShowingMoreCommits: true })
+
+      expect(screen.getByTestId('show-less-commits')).toBeInTheDocument()
+    })
+
+    it('should not display a show less commits button if the table data isShowingMoreCommits is set to false', () => {
+      renderTable({ ...tableDataFixture, isShowingMoreCommits: false })
+
+      expect(screen.queryByTestId('show-less-commits')).not.toBeInTheDocument()
+    })
+
+    it('should send a message to show less commits when the show less commits button is clicked', () => {
+      renderTable({ ...tableDataFixture, isShowingMoreCommits: true })
+
+      fireEvent.click(screen.getByTestId('show-less-commits'))
+
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SHOW_LESS_COMMITS
+      })
+    })
+  })
 })

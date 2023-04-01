@@ -14,7 +14,11 @@ import {
   getCustomPlotId
 } from './collect'
 import { getRevisionFirstThreeColumns } from './util'
-import { cleanupOldOrderValue, CustomPlotsOrderValue } from './custom'
+import {
+  checkForCustomPlotOptions,
+  cleanupOldOrderValue,
+  CustomPlotsOrderValue
+} from './custom'
 import {
   CheckpointPlot,
   ComparisonPlots,
@@ -48,7 +52,6 @@ import {
   MultiSourceVariations
 } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
-import { FILE_SEPARATOR } from '../../experiments/columns/paths'
 
 export type CustomCheckpointPlots = { [metric: string]: CheckpointPlot }
 
@@ -141,13 +144,11 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public getCustomPlots(): CustomPlotsData | undefined {
-    const experimentsWithNoCommitData = this.experiments.hasCheckpoints()
-      ? this.experiments
-          .getExperimentsWithCheckpoints()
-          .filter(({ checkpoints }) => !!checkpoints)
-      : this.experiments.getExperiments()
+    const experiments = this.experiments
+      .getExperimentsWithCheckpoints()
+      .filter(({ id }) => id !== EXPERIMENT_WORKSPACE_ID)
 
-    if (experimentsWithNoCommitData.length === 0) {
+    if (experiments.length === 0) {
       return
     }
 
@@ -161,9 +162,8 @@ export class PlotsModel extends ModelWithPersistence {
       PlotsSection.CUSTOM_PLOTS
     )
     const plotsOrderValues = this.getCustomPlotsOrder()
-
     const plots: CustomPlotData[] = collectCustomPlots({
-      experiments: experimentsWithNoCommitData,
+      experiments,
       hasCheckpoints: this.experiments.hasCheckpoints(),
       height,
       nbItemsPerRow,
@@ -177,6 +177,10 @@ export class PlotsModel extends ModelWithPersistence {
 
     return {
       colors,
+      enablePlotCreation: checkForCustomPlotOptions(
+        this.experiments.getColumnTerminalNodes(),
+        plotsOrderValues
+      ),
       height,
       nbItemsPerRow,
       plots
@@ -409,9 +413,7 @@ export class PlotsModel extends ModelWithPersistence {
     if (workspaceHoldsUpToDateState) {
       return
     }
-    const newOrder = order.map(value =>
-      cleanupOldOrderValue(value, FILE_SEPARATOR)
-    )
+    const newOrder = order.map(value => cleanupOldOrderValue(value))
     this.setCustomPlotsOrder(newOrder)
   }
 

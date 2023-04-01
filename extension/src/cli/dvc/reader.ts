@@ -5,7 +5,6 @@ import {
   Command,
   ExperimentFlag,
   Flag,
-  NUM_OF_COMMITS_TO_SHOW,
   SubCommand,
   TEMP_PLOTS_DIR
 } from './constants'
@@ -66,7 +65,7 @@ export class DvcReader extends DvcCli {
 
   public async expShow(
     cwd: string,
-    ...flags: ExperimentFlag[]
+    ...flags: (ExperimentFlag | string)[]
   ): Promise<ExperimentsOutput> {
     const output = await this.readProcess<ExperimentsOutput>(
       cwd,
@@ -74,8 +73,6 @@ export class DvcReader extends DvcCli {
       Command.EXPERIMENT,
       SubCommand.SHOW,
       ...flags,
-      Flag.NUM_COMMIT,
-      NUM_OF_COMMITS_TO_SHOW,
       Flag.JSON
     )
     if (isDvcError(output) || isEmpty(output)) {

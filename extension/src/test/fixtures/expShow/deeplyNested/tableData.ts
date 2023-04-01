@@ -13,8 +13,10 @@ const data: TableData = {
   ],
   hasCheckpoints: false,
   hasConfig: true,
+  hasMoreCommits: true,
   hasRunningExperiment: false,
   hasValidDvcYaml: true,
+  isShowingMoreCommits: true,
   sorts: [
     {
       path: 'params:params.yaml:nested1.doubled',

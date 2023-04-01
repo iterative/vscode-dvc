@@ -99,8 +99,10 @@ export type TableData = {
   hasCheckpoints: boolean
   hasColumns: boolean
   hasConfig: boolean
+  hasMoreCommits: boolean
   hasRunningExperiment: boolean
   hasValidDvcYaml: boolean
+  isShowingMoreCommits: boolean
   rows: Row[]
   sorts: SortDefinition[]
   filteredCounts: FilteredCounts

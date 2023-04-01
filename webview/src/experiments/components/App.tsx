@@ -17,8 +17,10 @@ import {
   updateHasCheckpoints,
   updateHasColumns,
   updateHasConfig,
+  updateHasMoreCommits,
   updateHasRunningExperiment,
   updateHasValidDvcYaml,
+  updateIsShowingMoreCommits,
   updateRows,
   updateSorts
 } from './table/tableDataSlice'
@@ -29,7 +31,6 @@ export const App: React.FC<Record<string, unknown>> = () => {
 
   useVsCodeMessaging(
     useCallback(
-      // eslint-disable-next-line sonarjs/cognitive-complexity
       ({ data }: { data: MessageToWebview<TableData> }) => {
         if (data.type === MessageToWebviewType.SET_DATA) {
           dispatch(update(!!data.data))
@@ -62,6 +63,9 @@ export const App: React.FC<Record<string, unknown>> = () => {
               case 'hasConfig':
                 dispatch(updateHasConfig(data.data.hasConfig))
                 continue
+              case 'hasMoreCommits':
+                dispatch(updateHasMoreCommits(data.data.hasMoreCommits))
+                continue
               case 'hasRunningExperiment':
                 dispatch(
                   updateHasRunningExperiment(data.data.hasRunningExperiment)
@@ -69,6 +73,11 @@ export const App: React.FC<Record<string, unknown>> = () => {
                 continue
               case 'hasValidDvcYaml':
                 dispatch(updateHasValidDvcYaml(data.data.hasValidDvcYaml))
+                continue
+              case 'isShowingMoreCommits':
+                dispatch(
+                  updateIsShowingMoreCommits(data.data.isShowingMoreCommits)
+                )
                 continue
               case 'rows':
                 dispatch(updateRows(data.data.rows))

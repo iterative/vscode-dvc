@@ -10,7 +10,7 @@ import { isCheckpointPlot } from './custom'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import customPlotsFixture, {
   customPlotsOrderFixture,
-  experimentsWithCheckpoints
+  experimentsWithCommits
 } from '../../test/fixtures/expShow/base/customPlots'
 import {
   ExperimentStatus,
@@ -35,7 +35,7 @@ const logsLossPlot = (plotsDiffFixture.data[logsLossPath][0] ||
 
 describe('collectCustomPlots', () => {
   const defaultFuncArgs = {
-    experiments: experimentsWithCheckpoints,
+    experiments: experimentsWithCommits,
     hasCheckpoints: true,
     height: DEFAULT_PLOT_HEIGHT,
     nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,

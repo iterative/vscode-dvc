@@ -64,7 +64,6 @@ suite('Plots Data Test Suite', () => {
     }
   }
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('PlotsData', () => {
     it('should call plots diff when there are no revisions to fetch and no experiment is running (workspace updates)', async () => {
       const { data, mockPlotsDiff } = buildPlotsData([], [])
