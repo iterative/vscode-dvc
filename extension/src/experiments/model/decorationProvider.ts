@@ -1,8 +1,8 @@
 import { EventEmitter, FileDecoration, ThemeColor, Uri } from 'vscode'
 import { DecoratableTreeItemScheme, getDecoratableUri } from '../../tree'
-import { ErrorDecorationProvider } from '../../tree/errorDecorationProvider'
+import { BaseDecorationProvider } from '../../tree/decorationProvider'
 
-export class DecorationProvider extends ErrorDecorationProvider {
+export class DecorationProvider extends BaseDecorationProvider {
   private static DecorationFiltered: FileDecoration = {
     color: new ThemeColor('gitDecoration.ignoredResourceForeground'),
     tooltip: 'Filtered'

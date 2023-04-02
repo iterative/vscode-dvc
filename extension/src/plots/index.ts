@@ -4,7 +4,6 @@ import { PlotsData as TPlotsData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { PlotsData } from './data'
 import { ErrorsModel } from './errors/model'
-import { DecorationProvider } from './errors/decorationProvider'
 import { PlotsModel } from './model'
 import { collectEncodingElements, collectScale } from './paths/collect'
 import { PathsModel } from './paths/model'
@@ -18,6 +17,8 @@ import { TEMP_PLOTS_DIR } from '../cli/dvc/constants'
 import { removeDir } from '../fileSystem'
 import { Toast } from '../vscode/toast'
 import { pickPaths } from '../path/selection/quickPick'
+import { ErrorDecorationProvider } from '../tree/decorationProvider/error'
+import { DecoratableTreeItemScheme } from '../tree'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
 
@@ -33,9 +34,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   private readonly data: PlotsData
 
   private readonly errors: ErrorsModel
-  private readonly decorationProvider = this.dispose.track(
-    new DecorationProvider()
-  )
+  private readonly decorationProvider: ErrorDecorationProvider
 
   private webviewMessages: WebviewMessages
 
@@ -66,6 +65,10 @@ export class Plots extends BaseRepository<TPlotsData> {
 
     this.data = this.dispose.track(
       new PlotsData(dvcRoot, internalCommands, this.plots, updatesPaused)
+    )
+
+    this.decorationProvider = new ErrorDecorationProvider(
+      DecoratableTreeItemScheme.PLOTS
     )
 
     this.onDidTriggerDataUpdate()
