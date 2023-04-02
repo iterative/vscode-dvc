@@ -164,26 +164,28 @@ suite('Plots Data Test Suite', () => {
       const mockExecuteCommand = (command: CommandId) => {
         if (command === AvailableCommands.PLOTS_DIFF) {
           return Promise.resolve({
-            'dvc.yaml::Accuracy': [
-              {
-                datapoints: {
-                  workspace: [
-                    {
-                      dvc_data_version_info: {
-                        field: join('train', 'acc'),
-                        filename: collectedFile,
-                        revision: EXPERIMENT_WORKSPACE_ID
-                      },
-                      dvc_inferred_y_value: '0.2707333333333333',
-                      step: '0',
-                      [join('train', 'acc')]: '0.2707333333333333'
-                    }
-                  ]
-                },
-                revisions: [EXPERIMENT_WORKSPACE_ID],
-                type: 'vega'
-              }
-            ]
+            data: {
+              'dvc.yaml::Accuracy': [
+                {
+                  datapoints: {
+                    workspace: [
+                      {
+                        dvc_data_version_info: {
+                          field: join('train', 'acc'),
+                          filename: collectedFile,
+                          revision: EXPERIMENT_WORKSPACE_ID
+                        },
+                        dvc_inferred_y_value: '0.2707333333333333',
+                        step: '0',
+                        [join('train', 'acc')]: '0.2707333333333333'
+                      }
+                    ]
+                  },
+                  revisions: [EXPERIMENT_WORKSPACE_ID],
+                  type: 'vega'
+                }
+              ]
+            }
           })
         }
       }

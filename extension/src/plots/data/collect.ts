@@ -46,13 +46,15 @@ const collectKeyData = (acc: string[], key: string, plots: Plot[]): void => {
 }
 
 export const collectFiles = (
-  data: PlotsOutputOrError,
+  output: PlotsOutputOrError,
   collectedFiles: string[]
 ): string[] => {
   const acc = [...collectedFiles]
-  if (isDvcError(data)) {
+  if (isDvcError(output)) {
     return acc
   }
+
+  const { data } = output
 
   for (const [key, plots] of Object.entries(data)) {
     collectKeyData(acc, key, plots)

@@ -90,21 +90,23 @@ describe('collectPath', () => {
     const updatedPaths = collectPaths(
       collectedPaths,
       {
-        [remainingPath]: [
-          {
-            content: {},
-            datapoints: {
-              [EXPERIMENT_WORKSPACE_ID]: [
-                {
-                  loss: '2.43323',
-                  step: '0'
-                }
-              ]
-            },
-            revisions: [EXPERIMENT_WORKSPACE_ID],
-            type: PlotsType.VEGA
-          }
-        ]
+        data: {
+          [remainingPath]: [
+            {
+              content: {},
+              datapoints: {
+                [EXPERIMENT_WORKSPACE_ID]: [
+                  {
+                    loss: '2.43323',
+                    step: '0'
+                  }
+                ]
+              },
+              revisions: [EXPERIMENT_WORKSPACE_ID],
+              type: PlotsType.VEGA
+            }
+          ]
+        }
       },
       [EXPERIMENT_WORKSPACE_ID],
       {}
@@ -138,39 +140,41 @@ describe('collectPath', () => {
   it('should handle more complex paths', () => {
     const revisions = [EXPERIMENT_WORKSPACE_ID]
     const mockPlotsDiff = {
-      [join('logs', 'scalars', 'acc.tsv')]: [
-        {
-          content: {},
-          datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
-          revisions,
-          type: PlotsType.VEGA
-        }
-      ],
-      [join('logs', 'scalars', 'loss.tsv')]: [
-        {
-          content: {},
-          datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
-          revisions,
-          type: PlotsType.VEGA
-        }
-      ],
-      [join('plots', 'heatmap.png')]: [
-        {
-          revisions,
-          type: PlotsType.IMAGE,
-          url: join('plots', 'heatmap.png')
-        }
-      ],
-      'predictions.json': [
-        {
-          content: {
-            facet: { field: 'rev', type: 'nominal' }
-          } as VisualizationSpec,
-          datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
-          revisions,
-          type: PlotsType.VEGA
-        }
-      ]
+      data: {
+        [join('logs', 'scalars', 'acc.tsv')]: [
+          {
+            content: {},
+            datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
+            revisions,
+            type: PlotsType.VEGA
+          }
+        ],
+        [join('logs', 'scalars', 'loss.tsv')]: [
+          {
+            content: {},
+            datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
+            revisions,
+            type: PlotsType.VEGA
+          }
+        ],
+        [join('plots', 'heatmap.png')]: [
+          {
+            revisions,
+            type: PlotsType.IMAGE,
+            url: join('plots', 'heatmap.png')
+          }
+        ],
+        'predictions.json': [
+          {
+            content: {
+              facet: { field: 'rev', type: 'nominal' }
+            } as VisualizationSpec,
+            datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
+            revisions,
+            type: PlotsType.VEGA
+          }
+        ]
+      }
     }
 
     expect(collectPaths([], mockPlotsDiff, revisions, {})).toStrictEqual([

@@ -5,7 +5,11 @@ import {
   TemplatePlot,
   TemplatePlotGroup
 } from '../webview/contract'
-import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../cli/dvc/contract'
+import {
+  EXPERIMENT_WORKSPACE_ID,
+  PlotsData,
+  PlotsOutput
+} from '../../cli/dvc/contract'
 import { getParent, getPath, getPathArray } from '../../fileSystem/util'
 import { splitMatchedOrdered, definedAndNonEmpty } from '../../util/array'
 import { isMultiViewPlot } from '../vega/util'
@@ -50,7 +54,7 @@ const collectType = (plots: Plot[]) => {
 }
 
 const getType = (
-  data: PlotsOutput,
+  data: PlotsData,
   hasChildren: boolean,
   path: string
 ): Set<PathType> | undefined => {
@@ -105,7 +109,7 @@ const collectTemplateRevisions = (
 }
 
 const collectPathRevisions = (
-  data: PlotsOutput,
+  data: PlotsData,
   path: string,
   cliIdToLabel: { [id: string]: string }
 ): Set<string> => {
@@ -125,7 +129,7 @@ const collectPathRevisions = (
 
 const collectOrderedPath = (
   acc: PlotPath[],
-  data: PlotsOutput,
+  data: PlotsData,
   revisions: Set<string>,
   pathArray: string[],
   idx: number
@@ -163,11 +167,13 @@ const collectOrderedPath = (
 
 export const collectPaths = (
   existingPaths: PlotPath[],
-  data: PlotsOutput,
+  output: PlotsOutput,
   fetchedRevs: string[],
   cliIdToLabel: { [id: string]: string }
 ): PlotPath[] => {
   let acc: PlotPath[] = filterWorkspaceIfFetched(existingPaths, fetchedRevs)
+
+  const { data } = output
 
   const paths = Object.keys(data)
 

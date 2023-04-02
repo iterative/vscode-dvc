@@ -1,7 +1,7 @@
 import { Plot } from '../../plots/webview/contract'
 
-export const MIN_CLI_VERSION = '2.30.0'
-export const LATEST_TESTED_CLI_VERSION = '2.51.0'
+export const MIN_CLI_VERSION = '2.52.0'
+export const LATEST_TESTED_CLI_VERSION = '2.52.0'
 export const MAX_CLI_VERSION = '3'
 
 type ErrorContents = { type: string; msg: string }
@@ -96,8 +96,19 @@ export interface ExperimentsOutput {
   }
 }
 
-export interface PlotsOutput {
+export interface PlotsData {
   [path: string]: Plot[]
+}
+
+type PlotError = {
+  name: string
+  rev: string
+  source?: string
+} & ErrorContents
+
+export interface PlotsOutput {
+  data: { [path: string]: Plot[] }
+  errors?: PlotError[]
 }
 
 export type PlotsOutputOrError = PlotsOutput | DvcError

@@ -83,29 +83,31 @@ describe('PathsModel', () => {
   const commitBeforePlots = '4c4318d'
   const previousPlotPath = join('dvclive', 'plots', 'metrics', 'loss.tsv')
   const previousPlotFixture = {
-    [previousPlotPath]: [
-      {
-        content: {},
-        datapoints: {
-          [commitBeforePlots]: [
-            {
-              loss: '2.29',
-              step: '0'
-            },
-            {
-              loss: '2.27',
-              step: '1'
-            },
-            {
-              loss: '2.25',
-              step: '2'
-            }
-          ]
-        },
-        revisions: [commitBeforePlots],
-        type: PlotsType.VEGA
-      }
-    ]
+    data: {
+      [previousPlotPath]: [
+        {
+          content: {},
+          datapoints: {
+            [commitBeforePlots]: [
+              {
+                loss: '2.29',
+                step: '0'
+              },
+              {
+                loss: '2.27',
+                step: '1'
+              },
+              {
+                loss: '2.25',
+                step: '2'
+              }
+            ]
+          },
+          revisions: [commitBeforePlots],
+          type: PlotsType.VEGA
+        }
+      ]
+    }
   }
 
   const multiViewGroup = {
@@ -205,7 +207,7 @@ describe('PathsModel', () => {
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
 
     model.transformAndSet(
-      { ...plotsDiffFixture, ...previousPlotFixture },
+      { data: { ...plotsDiffFixture.data, ...previousPlotFixture.data } },
       [...revisions, commitBeforePlots],
       {}
     )
@@ -243,7 +245,7 @@ describe('PathsModel', () => {
   it('should move plots which do not have selected revisions to the end when a reordering occurs', () => {
     const model = new PathsModel(mockDvcRoot, buildMockMemento())
     model.transformAndSet(
-      { ...plotsDiffFixture, ...previousPlotFixture },
+      { data: { ...plotsDiffFixture.data, ...previousPlotFixture.data } },
       [...revisions, commitBeforePlots],
       {}
     )
