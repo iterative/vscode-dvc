@@ -124,7 +124,7 @@ export class PlotsModel extends ModelWithPersistence {
     if (isDvcError(output)) {
       this.handleCliError()
     } else {
-      await this.processOutput(output, cliIdToLabel)
+      await this.processOutput(output, revs, cliIdToLabel)
     }
     this.setComparisonOrder()
 
@@ -403,8 +403,13 @@ export class PlotsModel extends ModelWithPersistence {
 
   private async processOutput(
     output: PlotsOutput,
+    revs: string[],
     cliIdToLabel: CLIRevisionIdToLabel
   ) {
+    for (const rev of revs) {
+      this.deleteRevisionData(cliIdToLabel[rev] || rev)
+    }
+
     const [{ comparisonData, revisionData }, templates, multiSourceVariations] =
       await Promise.all([
         collectData(output, cliIdToLabel),
@@ -420,7 +425,7 @@ export class PlotsModel extends ModelWithPersistence {
       ...this.revisionData,
       ...revisionData
     }
-    this.templates = { ...this.templates, ...templates }
+    this.templates = templates
     this.multiSourceVariations = multiSourceVariations
     this.multiSourceEncoding = collectMultiSourceEncoding(
       this.multiSourceVariations
@@ -468,10 +473,12 @@ export class PlotsModel extends ModelWithPersistence {
     for (const id of Object.keys(this.commitRevisions)) {
       if (this.commitRevisions[id] !== currentCommitRevisions[id]) {
         this.deleteRevisionData(id)
+        this.fetchedRevs.delete(id)
       }
     }
     if (!isEqual(this.commitRevisions, currentCommitRevisions)) {
       this.deleteRevisionData(EXPERIMENT_WORKSPACE_ID)
+      this.fetchedRevs.delete(EXPERIMENT_WORKSPACE_ID)
     }
     this.commitRevisions = currentCommitRevisions
   }
@@ -479,7 +486,6 @@ export class PlotsModel extends ModelWithPersistence {
   private deleteRevisionData(id: string) {
     delete this.revisionData[id]
     delete this.comparisonData[id]
-    this.fetchedRevs.delete(id)
   }
 
   private getCLIId(label: string) {

@@ -12,6 +12,7 @@ import { TemplatePlotGroup, PlotsType } from '../webview/contract'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import { Shape, StrokeDash } from '../multiSource/constants'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
+import { CLIRevisionIdToLabel } from '../model/collect'
 
 describe('collectPaths', () => {
   const revisions = [
@@ -80,12 +81,20 @@ describe('collectPaths', () => {
     ])
   })
 
-  it('should update the revision details when the workspace is recollected (plots in workspace changed)', () => {
+  it('should update the revision details when any revision is recollected', () => {
     const [remainingPath] = Object.keys(plotsDiffFixture)
     const collectedPaths = collectPaths([], plotsDiffFixture, revisions, {})
     expect(
       collectedPaths.filter(path => path.revisions.has(EXPERIMENT_WORKSPACE_ID))
     ).toHaveLength(collectedPaths.length)
+
+    const fetchedRevs = revisions.slice(0, 3)
+    const cliIdToLabel: CLIRevisionIdToLabel = {}
+    for (const rev of fetchedRevs) {
+      cliIdToLabel[rev] = rev
+    }
+
+    cliIdToLabel[fetchedRevs[2]] = 'some-branch'
 
     const updatedPaths = collectPaths(
       collectedPaths,
@@ -95,26 +104,40 @@ describe('collectPaths', () => {
             {
               content: {},
               datapoints: {
-                [EXPERIMENT_WORKSPACE_ID]: [
+                [fetchedRevs[0]]: [
+                  {
+                    loss: '2.43323',
+                    step: '0'
+                  }
+                ],
+                [fetchedRevs[1]]: [
+                  {
+                    loss: '2.43323',
+                    step: '0'
+                  }
+                ],
+                [fetchedRevs[2]]: [
                   {
                     loss: '2.43323',
                     step: '0'
                   }
                 ]
               },
-              revisions: [EXPERIMENT_WORKSPACE_ID],
+              revisions: fetchedRevs,
               type: PlotsType.VEGA
             }
           ]
         }
       },
-      [EXPERIMENT_WORKSPACE_ID],
-      {}
+      fetchedRevs,
+      cliIdToLabel
     )
 
-    expect(
-      updatedPaths.filter(path => path.revisions.has(EXPERIMENT_WORKSPACE_ID))
-    ).toHaveLength(remainingPath.split(sep).length)
+    for (const rev of Object.values(cliIdToLabel)) {
+      expect(updatedPaths.filter(path => path.revisions.has(rev))).toHaveLength(
+        remainingPath.split(sep).length
+      )
+    }
   })
 
   it('should not drop already collected paths', () => {
