@@ -439,7 +439,7 @@ describe('ExperimentsColumnsTree', () => {
     it('should return the correct tree item for a repository root', () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
-        expect(collapsibleState).toStrictEqual(1)
+        expect(collapsibleState).toStrictEqual(2)
         mockedItem = { collapsibleState, uri }
         return mockedItem
       })
@@ -498,6 +498,7 @@ describe('ExperimentsColumnsTree', () => {
       },
       description: '3/4',
       iconPath: mockedSelectedCheckbox,
+      tooltip: undefined,
       uri: filename
     })
   })
@@ -538,6 +539,7 @@ describe('ExperimentsColumnsTree', () => {
         title: 'toggle'
       },
       iconPath: mockedEmptyCheckbox,
+      tooltip: undefined,
       uri: filename
     })
   })

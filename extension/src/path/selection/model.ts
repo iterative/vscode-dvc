@@ -46,7 +46,7 @@ export abstract class PathSelectionModel<
 
   public getTerminalNodeStatuses(parentPath?: string): Status[] {
     return (this.getChildren(parentPath) || []).flatMap(element => {
-      const terminalStatuses = element.hasChildren
+      const terminalStatuses = (element as T).hasChildren
         ? this.getTerminalNodeStatuses(element.path)
         : [this.status[element.path]]
       return [...terminalStatuses]
@@ -144,7 +144,9 @@ export abstract class PathSelectionModel<
 
   abstract getChildren(
     ...args: unknown[]
-  ): (T & { descendantStatuses: Status[]; status: Status })[]
+  ):
+    | (T & { descendantStatuses: Status[]; status: Status })[]
+    | { error: string; path: string }[]
 
   abstract getTerminalNodes(): (T & { selected: boolean })[]
 }

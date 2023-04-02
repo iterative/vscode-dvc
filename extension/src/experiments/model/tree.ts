@@ -22,7 +22,8 @@ import {
   DecoratableTreeItemScheme,
   getDecoratableTreeItem,
   getErrorTooltip,
-  getRootItem
+  getRootItem,
+  isRoot
 } from '../../tree'
 import { IconName, Resource, ResourceLocator } from '../../resourceLocator'
 import {
@@ -82,7 +83,7 @@ export class ExperimentsTree
   }
 
   public getTreeItem(element: string | ExperimentItem): TreeItem {
-    if (this.isRoot(element)) {
+    if (isRoot(element)) {
       return getRootItem(element)
     }
 
@@ -121,7 +122,7 @@ export class ExperimentsTree
       return this.getRootElements()
     }
 
-    if (this.isRoot(element)) {
+    if (isRoot(element)) {
       return Promise.resolve(this.getWorkspaceAndCommits(element))
     }
 
@@ -232,7 +233,7 @@ export class ExperimentsTree
   }
 
   private setExpanded(element: string | ExperimentItem, expanded: boolean) {
-    if (!this.isRoot(element) && element.description) {
+    if (!isRoot(element) && element.description) {
       this.setExperimentExpanded(element.description, expanded)
     }
   }
@@ -349,10 +350,6 @@ export class ExperimentsTree
       (dvcRoots.length > 1 ? ' per project' : '') +
       ')'
     )
-  }
-
-  private isRoot(element: string | ExperimentItem): element is string {
-    return typeof element === 'string'
   }
 
   private getSelectedExperimentItems() {

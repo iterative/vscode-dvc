@@ -122,6 +122,9 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   public getPathStatuses() {
+    if (this.errors.hasCliError()) {
+      return []
+    }
     return this.paths.getTerminalNodeStatuses(undefined)
   }
 
