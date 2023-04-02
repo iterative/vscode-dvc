@@ -232,6 +232,10 @@ export class PlotsModel extends ModelWithPersistence {
         this.comparisonOrder,
         this.experiments.getSelectedRevisions(),
         this.fetchedRevs,
+        new Set([
+          ...Object.keys(this.comparisonData),
+          ...Object.keys(this.revisionData)
+        ]),
         finishedExperiments,
         id => this.experiments.getCheckpoints(id),
         this.experiments.getFirstThreeColumnOrder()
