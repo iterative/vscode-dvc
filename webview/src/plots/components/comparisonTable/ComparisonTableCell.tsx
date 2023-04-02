@@ -10,7 +10,7 @@ import { ErrorTooltip } from '../../../shared/components/errorTooltip/ErrorToolt
 
 type ComparisonTableCellProps = {
   path: string
-  plot?: ComparisonPlot & { fetched: boolean }
+  plot: ComparisonPlot
 }
 
 const MissingPlotTableCell: React.FC<{ plot: ComparisonPlot }> = ({ plot }) => (
@@ -41,9 +41,8 @@ export const ComparisonTableCell: React.FC<ComparisonTableCellProps> = ({
   path,
   plot
 }) => {
-  const fetched = plot?.fetched
-  const loading = !fetched && !plot?.url
-  const missing = fetched && !plot?.url
+  const loading = plot.loading
+  const missing = !loading && !plot.url
 
   if (loading) {
     return (

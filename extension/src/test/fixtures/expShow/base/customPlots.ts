@@ -1,9 +1,6 @@
-import { ExperimentWithCheckpoints } from '../../../../experiments/model'
+import type { ExperimentWithCheckpoints } from '../../../../experiments/model'
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
-import {
-  CHECKPOINTS_PARAM,
-  CustomPlotsOrderValue
-} from '../../../../plots/model/custom'
+import type { CustomPlotsOrderValue } from '../../../../plots/model/custom'
 import {
   CustomPlotsData,
   CustomPlotType,
@@ -24,12 +21,12 @@ export const customPlotsOrderFixture: CustomPlotsOrderValue[] = [
   },
   {
     metric: 'summary.json:loss',
-    param: CHECKPOINTS_PARAM,
+    param: 'epoch',
     type: CustomPlotType.CHECKPOINT
   },
   {
     metric: 'summary.json:accuracy',
-    param: CHECKPOINTS_PARAM,
+    param: 'epoch',
     type: CustomPlotType.CHECKPOINT
   }
 ]
@@ -267,7 +264,7 @@ const data: CustomPlotsData = {
     {
       id: 'custom-summary.json:loss-epoch',
       metric: 'summary.json:loss',
-      param: CHECKPOINTS_PARAM,
+      param: 'epoch',
       values: [
         { group: 'exp-e7a67', iteration: 3, y: 2.0205044746398926 },
         { group: 'exp-e7a67', iteration: 2, y: 2.0205044746398926 },
@@ -288,7 +285,7 @@ const data: CustomPlotsData = {
     {
       id: 'custom-summary.json:accuracy-epoch',
       metric: 'summary.json:accuracy',
-      param: CHECKPOINTS_PARAM,
+      param: 'epoch',
       values: [
         { group: 'exp-e7a67', iteration: 3, y: 0.3724166750907898 },
         { group: 'exp-e7a67', iteration: 2, y: 0.3724166750907898 },

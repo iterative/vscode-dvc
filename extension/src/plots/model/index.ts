@@ -12,7 +12,8 @@ import {
   collectOverrideRevisionDetails,
   collectCustomPlots,
   getCustomPlotId,
-  collectOrderedRevisions
+  collectOrderedRevisions,
+  collectImageUrl
 } from './collect'
 import { getRevisionFirstThreeColumns } from './util'
 import {
@@ -484,10 +485,14 @@ export class PlotsModel extends ModelWithPersistence {
     for (const revision of selectedRevisions) {
       const image = this.comparisonData?.[revision]?.[path]
       const error = this.errors.getImageErrors(path, revision)
+      const fetched = this.fetchedRevs.has(revision)
+      const url = collectImageUrl(image, fetched)
+      const loading = !fetched && !url
       pathRevisions.revisions[revision] = {
         error,
+        loading,
         revision,
-        url: image?.url
+        url
       }
     }
     acc.push(pathRevisions)

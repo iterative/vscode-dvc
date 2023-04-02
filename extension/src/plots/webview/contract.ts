@@ -173,6 +173,7 @@ export type ComparisonPlot = {
   url: string | undefined
   revision: string
   error: string | undefined
+  loading: boolean
 }
 
 export enum PlotsDataKeys {

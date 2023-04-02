@@ -51,6 +51,7 @@ import {
   SelectedExperimentWithColor
 } from '../../experiments/model'
 import { Color } from '../../experiments/model/status/colors'
+import { exists } from '../../fileSystem'
 
 export const getCustomPlotId = (metric: string, param = CHECKPOINTS_PARAM) =>
   `custom-${metric}-${param}`
@@ -741,4 +742,20 @@ export const collectOrderedRevisions = (
     }
     return (b.Created || '').localeCompare(a.Created || '')
   })
+}
+
+export const collectImageUrl = (
+  image: ImagePlot | undefined,
+  fetched: boolean
+): string | undefined => {
+  const url = image?.url
+  if (!url) {
+    return
+  }
+
+  if (!fetched && !exists(url)) {
+    return undefined
+  }
+
+  return url
 }

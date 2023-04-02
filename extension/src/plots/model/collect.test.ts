@@ -5,7 +5,8 @@ import {
   collectTemplates,
   collectOverrideRevisionDetails,
   collectCustomPlots,
-  collectOrderedRevisions
+  collectOrderedRevisions,
+  collectImageUrl
 } from './collect'
 import { isCheckpointPlot } from './custom'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
@@ -23,11 +24,21 @@ import {
   CustomPlotType,
   DEFAULT_NB_ITEMS_PER_ROW,
   DEFAULT_PLOT_HEIGHT,
+  ImagePlot,
   TemplatePlot
 } from '../webview/contract'
 import { getCLICommitId } from '../../test/fixtures/plotsDiff/util'
 import { SelectedExperimentWithColor } from '../../experiments/model'
 import { Experiment } from '../../experiments/webview/contract'
+import { exists } from '../../fileSystem'
+
+const mockedExists = jest.mocked(exists)
+
+jest.mock('../../fileSystem')
+
+beforeEach(() => {
+  jest.resetAllMocks()
+})
 
 const logsLossPath = join('logs', 'loss.tsv')
 
@@ -577,5 +588,31 @@ describe('collectOrderedRevisions', () => {
     const orderedRevisions = collectOrderedRevisions([b, c, workspace, d, a])
 
     expect(orderedRevisions).toStrictEqual([workspace, a, b, c, d])
+  })
+})
+
+describe('collectImageUrl', () => {
+  it('should return undefined if the image is missing', () => {
+    const url = collectImageUrl(undefined, false)
+    expect(url).toBeUndefined()
+  })
+
+  it("should return undefined if the image's url is missing", () => {
+    const url = collectImageUrl({} as ImagePlot, false)
+    expect(url).toBeUndefined()
+  })
+
+  it('should return the url if the plot is fetched', () => {
+    mockedExists.mockReturnValueOnce(false)
+    const imageUrl = join('some', 'path', 'to', 'image')
+    const url = collectImageUrl({ url: imageUrl } as ImagePlot, true)
+    expect(url).toStrictEqual(imageUrl)
+  })
+
+  it('should omit the url if the plot is not fetched and does not exist', () => {
+    mockedExists.mockReturnValueOnce(false)
+    const imageUrl = join('some', 'path', 'to', 'missing', 'image')
+    const url = collectImageUrl({ url: imageUrl } as ImagePlot, false)
+    expect(url).toStrictEqual(undefined)
   })
 })

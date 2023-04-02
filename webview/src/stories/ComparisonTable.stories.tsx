@@ -87,6 +87,7 @@ const removeImages = (
           revision === 'main'
             ? `FileNotFoundError: ${path} not found.`
             : undefined,
+        loading: false,
         revision,
         url: undefined
       }
