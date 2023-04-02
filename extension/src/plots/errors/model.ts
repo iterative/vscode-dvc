@@ -2,18 +2,18 @@ import { join } from 'path'
 import {
   collectErrors,
   collectImageErrors,
-  collectPathErrorsTable,
-  getMessage
+  collectPathErrors,
+  Error
 } from './collect'
 import { Disposable } from '../../class/dispose'
-import { DvcError, PlotError, PlotsOutputOrError } from '../../cli/dvc/contract'
+import { DvcError, PlotsOutputOrError } from '../../cli/dvc/contract'
 import { isDvcError } from '../../cli/dvc/reader'
 import { getCliErrorLabel } from '../../tree'
 
 export class ErrorsModel extends Disposable {
   private readonly dvcRoot: string
 
-  private errors: PlotError[] = []
+  private errors: Error[] = []
   private cliError: { error: string; path: string } | undefined
 
   constructor(dvcRoot: string) {
@@ -39,7 +39,7 @@ export class ErrorsModel extends Disposable {
   }
 
   public getPathErrors(path: string, selectedRevisions: string[]) {
-    return collectPathErrorsTable(path, selectedRevisions, this.errors)
+    return collectPathErrors(path, selectedRevisions, this.errors)
   }
 
   public getErrorPaths(selectedRevisions: string[]) {
@@ -48,22 +48,26 @@ export class ErrorsModel extends Disposable {
     }
 
     const acc = new Set<string>()
-    for (const { name, rev } of this.errors) {
+    for (const { path, rev } of this.errors) {
       if (selectedRevisions.includes(rev)) {
-        acc.add(join(this.dvcRoot, name))
+        acc.add(join(this.dvcRoot, path))
       }
     }
     return acc
   }
 
   public getRevisionErrors(rev: string) {
-    const errors: string[] = []
+    const acc = new Set<string>()
     for (const error of this.errors) {
       if (error.rev === rev) {
-        errors.push(getMessage(error))
+        acc.add(error.msg)
       }
     }
-    return errors.length > 0 ? errors : undefined
+    if (acc.size === 0) {
+      return undefined
+    }
+
+    return [...acc]
   }
 
   public hasCliError() {

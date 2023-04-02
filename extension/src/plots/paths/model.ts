@@ -1,5 +1,6 @@
 import { Memento } from 'vscode'
 import {
+  collectPathErrorsTable,
   collectPaths,
   collectTemplateOrder,
   PathType,
@@ -199,7 +200,13 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
   }
 
   private getTooltip(path: string) {
-    const error = this.errors.getPathErrors(path, this.selectedRevisions)
+    const errors = this.errors.getPathErrors(path, this.selectedRevisions)
+
+    if (!errors?.length) {
+      return
+    }
+
+    const error = collectPathErrorsTable(errors)
     return error ? getErrorTooltip(error) : undefined
   }
 }

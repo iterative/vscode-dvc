@@ -173,7 +173,7 @@ export interface TemplatePlotsData {
 export type ComparisonPlot = {
   url: string | undefined
   revision: string
-  error: string | undefined
+  errors: string[] | undefined
   loading: boolean
 }
 

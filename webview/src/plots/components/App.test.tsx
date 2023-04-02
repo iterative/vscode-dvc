@@ -249,7 +249,7 @@ describe('App', () => {
             path: 'training/plots/images/misclassified.jpg',
             revisions: {
               ad2b5ec: {
-                error: undefined,
+                errors: undefined,
                 loading: true,
                 revision: 'ad2b5ec',
                 url: undefined

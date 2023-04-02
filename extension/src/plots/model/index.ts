@@ -515,12 +515,12 @@ export class PlotsModel extends ModelWithPersistence {
 
     for (const revision of selectedRevisions) {
       const image = this.comparisonData?.[revision]?.[path]
-      const error = this.errors.getImageErrors(path, revision)
+      const errors = this.errors.getImageErrors(path, revision)
       const fetched = this.fetchedRevs.has(revision)
       const url = collectImageUrl(image, fetched)
       const loading = !fetched && !url
       pathRevisions.revisions[revision] = {
-        error,
+        errors,
         loading,
         revision,
         url

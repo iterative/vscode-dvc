@@ -1,36 +1,8 @@
-import {
-  EXPERIMENT_WORKSPACE_ID,
-  PlotError,
-  PlotsOutput
-} from '../../cli/dvc/contract'
-import { truncate } from '../../util/string'
+import { PlotError, PlotsOutput } from '../../cli/dvc/contract'
 
-export const collectErrors = (
-  data: PlotsOutput,
-  revs: string[],
-  errors: PlotError[],
-  cliIdToLabel: { [id: string]: string }
-) => {
-  const fetchedRevs = new Set(
-    revs.map((rev: string) => cliIdToLabel[rev] || rev)
-  )
+export type Error = { path: string; rev: string; msg: string }
 
-  const existingErrors = errors.filter(({ rev }) => !fetchedRevs.has(rev))
-  const newErrors = data?.errors || []
-
-  return [
-    ...existingErrors,
-    ...newErrors.map(error => {
-      const { rev } = error
-      return {
-        ...error,
-        rev: cliIdToLabel[rev] || rev
-      }
-    })
-  ]
-}
-
-export const getMessage = (error: PlotError): string => {
+const getMessage = (error: PlotError): string => {
   const { msg, type, source } = error
 
   if (msg) {
@@ -43,55 +15,83 @@ export const getMessage = (error: PlotError): string => {
   return type
 }
 
+export const collectErrors = (
+  data: PlotsOutput,
+  revs: string[],
+  errors: Error[],
+  cliIdToLabel: { [id: string]: string }
+): Error[] => {
+  const fetchedRevs = new Set(
+    revs.map((rev: string) => cliIdToLabel[rev] || rev)
+  )
+
+  const existingErrors = errors.filter(({ rev }) => !fetchedRevs.has(rev))
+  const newErrors = data?.errors || []
+
+  return [
+    ...existingErrors,
+    ...newErrors.map(error => {
+      const { rev, name } = error
+      return {
+        msg: getMessage(error),
+        path: name,
+        rev: cliIdToLabel[rev] || rev
+      }
+    })
+  ]
+}
+
 export const collectImageErrors = (
   path: string,
   revision: string,
-  errors: PlotError[]
-): string | undefined => {
-  const msgs: string[] = []
+  errors: Error[]
+): string[] | undefined => {
+  const acc: string[] = []
   for (const error of errors) {
-    if (error.rev === revision && error.name === path) {
-      const msg = getMessage(error)
-      msgs.push(msg)
+    if (error.rev === revision && error.path === path) {
+      acc.push(error.msg)
     }
   }
 
-  if (msgs.length === 0) {
+  if (acc.length === 0) {
     return undefined
   }
 
-  return msgs.join('\n')
+  return acc
 }
 
-const formatError = (acc: string[]): string | undefined => {
-  if (acc.length === 0) {
-    return
-  }
+const isDuplicateError = (
+  acc: { rev: string; msg: string }[],
+  rev: string,
+  msg: string
+) =>
+  acc.some(
+    ({ rev: existingRev, msg: existingMsg }) =>
+      rev === existingRev && msg === existingMsg
+  )
 
-  acc.sort()
-  acc.unshift('Errors\n|||\n|--|--|')
-
-  return acc.join('\n')
-}
-
-export const collectPathErrorsTable = (
+export const collectPathErrors = (
   path: string,
   selectedRevisions: string[],
-  errors: PlotError[]
-): string | undefined => {
-  const acc = new Set<string>()
+  errors: Error[]
+): { rev: string; msg: string }[] | undefined => {
+  const acc: { rev: string; msg: string }[] = []
   for (const error of errors) {
-    const { name, rev } = error
-    if (name !== path || !selectedRevisions.includes(rev)) {
+    const { msg, rev } = error
+    if (
+      error.path !== path ||
+      !selectedRevisions.includes(rev) ||
+      isDuplicateError(acc, rev, msg)
+    ) {
       continue
     }
 
-    const row = `| ${truncate(
-      rev,
-      EXPERIMENT_WORKSPACE_ID.length
-    )} | ${getMessage(error)} |`
-
-    acc.add(row)
+    acc.push({ msg, rev })
   }
-  return formatError([...acc])
+
+  if (acc.length === 0) {
+    return undefined
+  }
+
+  return acc
 }

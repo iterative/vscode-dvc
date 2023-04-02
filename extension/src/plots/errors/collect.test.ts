@@ -1,9 +1,5 @@
 import { join } from 'path'
-import {
-  collectErrors,
-  collectImageErrors,
-  collectPathErrorsTable
-} from './collect'
+import { collectErrors, collectImageErrors, collectPathErrors } from './collect'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 
 describe('collectErrors', () => {
@@ -14,10 +10,8 @@ describe('collectErrors', () => {
       [
         {
           msg: 'unexpected error',
-          name: 'fun::plot',
-          rev: EXPERIMENT_WORKSPACE_ID,
-          source: 'metrics.json',
-          type: 'unexpected'
+          path: 'fun::plot',
+          rev: EXPERIMENT_WORKSPACE_ID
         }
       ],
       {}
@@ -33,17 +27,13 @@ describe('collectErrors', () => {
       [
         {
           msg: 'unexpected error',
-          name: 'fun::plot',
-          rev: EXPERIMENT_WORKSPACE_ID,
-          source: 'metrics.json',
-          type: 'unexpected'
+          path: 'fun::plot',
+          rev: EXPERIMENT_WORKSPACE_ID
         },
         {
           msg: 'unexpected error',
-          name: 'fun::plot',
-          rev: 'main',
-          source: 'metrics.json',
-          type: 'unexpected'
+          path: 'fun::plot',
+          rev: 'main'
         }
       ],
       { [EXPERIMENT_WORKSPACE_ID]: EXPERIMENT_WORKSPACE_ID, ff2489c: 'main' }
@@ -67,23 +57,21 @@ describe('collectErrors', () => {
       [
         {
           msg: 'unexpected error',
-          name: 'fun::plot',
-          rev: EXPERIMENT_WORKSPACE_ID,
-          source: 'metrics.json',
-          type: 'unexpected'
+          path: 'fun::plot',
+          rev: EXPERIMENT_WORKSPACE_ID
         },
         {
           msg: 'unexpected error',
-          name: 'fun::plot',
-          rev: 'main',
-          source: 'metrics.json',
-          type: 'unexpected'
+          path: 'fun::plot',
+          rev: 'main'
         }
       ],
       { [EXPERIMENT_WORKSPACE_ID]: EXPERIMENT_WORKSPACE_ID, ff2489c: 'main' }
     )
 
-    expect(errors).toStrictEqual([{ ...newError, rev: 'main' }])
+    expect(errors).toStrictEqual([
+      { msg: 'new error', path: 'fun::plot', rev: 'main' }
+    ])
   })
 
   it('should collect new errors', () => {
@@ -104,16 +92,16 @@ describe('collectErrors', () => {
       [
         {
           msg: 'unexpected error',
-          name: 'fun::plot',
-          rev: EXPERIMENT_WORKSPACE_ID,
-          source: 'metrics.json',
-          type: 'unexpected'
+          path: 'fun::plot',
+          rev: EXPERIMENT_WORKSPACE_ID
         }
       ],
       { d7ad114: 'main' }
     )
 
-    expect(errors).toStrictEqual([{ ...newError, rev: 'main' }])
+    expect(errors).toStrictEqual([
+      { msg: 'Blue screen of death', path: 'fun::plot', rev: 'main' }
+    ])
   })
 })
 
@@ -134,69 +122,57 @@ describe('collectImageErrors', () => {
     const errors = [
       {
         msg: `${otherPath} - file type error\nOnly JSON, YAML, CSV and TSV formats are supported.`,
-        name: otherPath,
-        rev: EXPERIMENT_WORKSPACE_ID,
-        source: otherPath,
-        type: 'PlotMetricTypeError'
+        path: otherPath,
+        rev: EXPERIMENT_WORKSPACE_ID
       },
       {
         msg: "Could not find provided field ('ste') in data fields ('step, test/acc').",
-        name: otherPath,
-        rev: EXPERIMENT_WORKSPACE_ID,
-        source: otherPath,
-        type: 'FieldNotFoundError'
+        path: otherPath,
+        rev: EXPERIMENT_WORKSPACE_ID
       },
       {
-        msg: '',
-        name: path,
-        rev: EXPERIMENT_WORKSPACE_ID,
-        source: path,
-        type: 'FileNotFoundError'
+        msg: `${path} not found.`,
+        path,
+        rev: EXPERIMENT_WORKSPACE_ID
       },
       {
-        msg: '',
-        name: path,
-        rev: 'main',
-        source: path,
-        type: 'FileNotFoundError'
+        msg: `${path} not found.`,
+        path,
+        rev: 'main'
       }
     ]
 
     const error = collectImageErrors(path, EXPERIMENT_WORKSPACE_ID, errors)
-    expect(error).toStrictEqual(`${path} not found.`)
+    expect(error).toStrictEqual([`${path} not found.`])
   })
 
-  it('should concatenate errors together to give a single string', () => {
+  it('should return an array of errors', () => {
     const path = join('training', 'plots', 'images', 'mispredicted.jpg')
 
     const errors = [
       {
-        msg: '',
-        name: path,
-        rev: EXPERIMENT_WORKSPACE_ID,
-        source: path,
-        type: 'FileNotFoundError'
+        msg: `${path} not found.`,
+        path,
+        rev: EXPERIMENT_WORKSPACE_ID
       },
       {
         msg: 'catastrophic error',
-        name: path,
-        rev: EXPERIMENT_WORKSPACE_ID,
-        source: path,
-        type: 'SomeError'
+        path,
+        rev: EXPERIMENT_WORKSPACE_ID
       },
       {
-        msg: '',
-        name: path,
-        rev: EXPERIMENT_WORKSPACE_ID,
-        source: path,
-        type: 'UNEXPECTEDERRRRROR'
+        msg: 'UNEXPECTEDERRRRROR',
+        path,
+        rev: EXPERIMENT_WORKSPACE_ID
       }
     ]
 
     const error = collectImageErrors(path, EXPERIMENT_WORKSPACE_ID, errors)
-    expect(error).toStrictEqual(
-      `${path} not found.\ncatastrophic error\nUNEXPECTEDERRRRROR`
-    )
+    expect(error).toStrictEqual([
+      `${path} not found.`,
+      'catastrophic error',
+      'UNEXPECTEDERRRRROR'
+    ])
   })
 })
 
@@ -204,30 +180,24 @@ describe('collectPathErrorsTable', () => {
   it('should return undefined if the errors do not relate to selected revisions', () => {
     const rev = 'main'
     const path = 'wat'
-    const markdownTable = collectPathErrorsTable(
+    const markdownTable = collectPathErrors(
       path,
       [EXPERIMENT_WORKSPACE_ID],
       [
         {
-          msg: '',
-          name: path,
-          rev,
-          source: path,
-          type: 'FileNotFoundError'
+          msg: `${path} not found.`,
+          path,
+          rev
         },
         {
           msg: 'catastrophic error',
-          name: path,
-          rev,
-          source: path,
-          type: 'SomeError'
+          path,
+          rev
         },
         {
-          msg: '',
-          name: path,
-          rev,
-          source: path,
-          type: 'UNEXPECTEDERRRRROR'
+          msg: 'UNEXPECTEDERRRRROR',
+          path,
+          rev
         }
       ]
     )
@@ -237,101 +207,91 @@ describe('collectPathErrorsTable', () => {
   it('should return undefined if the errors do not relate to the path', () => {
     const rev = 'main'
     const path = 'wat'
-    const markdownTable = collectPathErrorsTable(
+    const markdownTable = collectPathErrors(
       join('other', 'path'),
       [rev],
       [
         {
-          msg: '',
-          name: path,
-          rev,
-          source: path,
-          type: 'FileNotFoundError'
+          msg: `${path} not found.`,
+          path,
+          rev
         },
         {
           msg: 'catastrophic error',
-          name: path,
-          rev,
-          source: path,
-          type: 'SomeError'
+          path,
+          rev
         },
         {
-          msg: '',
-          name: path,
-          rev,
-          source: path,
-          type: 'UNEXPECTEDERRRRROR'
+          msg: 'UNEXPECTEDERRRRROR',
+          path,
+          rev
         }
       ]
     )
     expect(markdownTable).toBeUndefined()
   })
 
-  it('should construct a markdown table with the error if they relate to the select revision and provided path', () => {
+  it('should return an array of objects containing error messages that relate to the select revision and provided path', () => {
     const rev = 'a-really-long-branch-name'
     const path = 'wat'
-    const markdownTable = collectPathErrorsTable(
+    const markdownTable = collectPathErrors(
       path,
       [EXPERIMENT_WORKSPACE_ID, rev],
       [
         {
-          msg: '',
-          name: path,
-          rev: EXPERIMENT_WORKSPACE_ID,
-          source: path,
-          type: 'FileNotFoundError'
+          msg: `${path} not found.`,
+          path,
+          rev: EXPERIMENT_WORKSPACE_ID
         },
         {
           msg: 'catastrophic error',
-          name: path,
-          rev,
-          source: path,
-          type: 'SomeError'
+          path,
+          rev
         },
         {
-          msg: '',
-          name: path,
-          rev,
-          source: path,
-          type: 'UNEXPECTEDERRRRROR'
+          msg: 'UNEXPECTEDERRRRROR',
+          path,
+          rev
+        },
+        {
+          msg: 'other path not found.',
+          path: 'other path',
+          rev: EXPERIMENT_WORKSPACE_ID
         }
       ]
     )
-    expect(markdownTable).toStrictEqual(
-      'Errors\n' +
-        '|||\n' +
-        '|--|--|\n' +
-        '| a-really... | UNEXPECTEDERRRRROR |\n' +
-        '| a-really... | catastrophic error |\n' +
-        '| workspace | wat not found. |'
-    )
+    expect(markdownTable).toStrictEqual([
+      { msg: 'wat not found.', rev: EXPERIMENT_WORKSPACE_ID },
+      { msg: 'catastrophic error', rev },
+      { msg: 'UNEXPECTEDERRRRROR', rev }
+    ])
   })
 
   it('should not duplicate entries in the table', () => {
-    const name = 'dvc.yaml::Accuracy'
+    const path = 'dvc.yaml::Accuracy'
     const msg =
       "Could not find provided field ('acc_') in data fields ('step, acc')."
     const type = 'FieldNotFoundError'
     const duplicateEntry = {
       msg,
-      name,
+      path,
       rev: 'aa1401b',
       type
     }
 
-    const markdownTable = collectPathErrorsTable(
+    const markdownTable = collectPathErrors(
       'dvc.yaml::Accuracy',
       [EXPERIMENT_WORKSPACE_ID, 'main', 'test-plots-diff', 'aa1401b'],
       [
         {
           msg,
-          name,
+          path,
           rev: 'workspace',
           type
         },
         {
           msg,
-          name,
+          path,
           rev: 'test-plots-diff',
           type
         },
@@ -340,13 +300,16 @@ describe('collectPathErrorsTable', () => {
       ]
     )
 
-    expect(markdownTable).toStrictEqual(
-      'Errors\n' +
-        '|||\n' +
-        '|--|--|\n' +
-        "| aa1401b | Could not find provided field ('acc_') in data fields ('step, acc'). |\n" +
-        "| test-plo... | Could not find provided field ('acc_') in data fields ('step, acc'). |\n" +
-        "| workspace | Could not find provided field ('acc_') in data fields ('step, acc'). |"
-    )
+    expect(markdownTable).toStrictEqual([
+      {
+        msg,
+        rev: EXPERIMENT_WORKSPACE_ID
+      },
+      {
+        msg,
+        rev: 'test-plots-diff'
+      },
+      { msg, rev: 'aa1401b' }
+    ])
   })
 })
