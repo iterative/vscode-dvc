@@ -540,6 +540,7 @@ export const getRevisions = (): Revision[] => {
       id: EXPERIMENT_WORKSPACE_ID,
       revision: EXPERIMENT_WORKSPACE_ID,
       displayColor: workspace,
+      errors: undefined,
       fetched: true,
       firstThreeColumns: [
         {
@@ -561,6 +562,7 @@ export const getRevisions = (): Revision[] => {
       group: undefined
     },
     {
+      errors: undefined,
       fetched: true,
       firstThreeColumns: [
         {
@@ -585,6 +587,7 @@ export const getRevisions = (): Revision[] => {
       group: undefined
     },
     {
+      errors: undefined,
       fetched: true,
       firstThreeColumns: [
         {
@@ -609,6 +612,7 @@ export const getRevisions = (): Revision[] => {
       group: '[exp-e7a67]'
     },
     {
+      errors: undefined,
       fetched: true,
       firstThreeColumns: [
         {
@@ -633,6 +637,7 @@ export const getRevisions = (): Revision[] => {
       group: '[test-branch]'
     },
     {
+      errors: undefined,
       fetched: true,
       firstThreeColumns: [
         {

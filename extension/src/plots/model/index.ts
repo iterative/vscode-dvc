@@ -223,6 +223,7 @@ export class PlotsModel extends ModelWithPersistence {
         ]),
         finishedExperiments,
         id => this.experiments.getCheckpoints(id),
+        label => this.errors.getRevisionErrors(label),
         this.experiments.getFirstThreeColumnOrder()
       )
     }
@@ -249,6 +250,7 @@ export class PlotsModel extends ModelWithPersistence {
       } = exp
       const revision: Revision = {
         displayColor,
+        errors: this.errors.getRevisionErrors(label),
         fetched: this.fetchedRevs.has(label),
         firstThreeColumns: getRevisionFirstThreeColumns(
           this.experiments.getFirstThreeColumnOrder(),

@@ -555,12 +555,14 @@ const getOverrideRevision = (
   displayColor: Color,
   experiment: Experiment,
   firstThreeColumns: string[],
-  fetchedRevs: Set<string>
+  fetchedRevs: Set<string>,
+  errors: string[] | undefined
 ): Revision => {
   const { commit, displayNameOrParent, logicalGroupName, id, label } =
     experiment
   const revision: Revision = {
     displayColor,
+    errors,
     fetched: fetchedRevs.has(label),
     firstThreeColumns: getRevisionFirstThreeColumns(
       firstThreeColumns,
@@ -582,7 +584,8 @@ const overrideWithWorkspace = (
   displayColor: Color,
   label: string,
   firstThreeColumns: string[],
-  fetchedRevs: Set<string>
+  fetchedRevs: Set<string>,
+  errors: string[] | undefined
 ): void => {
   orderMapping[label] = EXPERIMENT_WORKSPACE_ID
   selectedWithOverrides.push(
@@ -594,7 +597,8 @@ const overrideWithWorkspace = (
         logicalGroupName: undefined
       },
       firstThreeColumns,
-      fetchedRevs
+      fetchedRevs,
+      errors
     )
   )
 }
@@ -615,7 +619,8 @@ const getMostRecentFetchedCheckpointRevision = (
   fetchedRevs: Set<string>,
   revisionsWithData: Set<string>,
   checkpoints: Experiment[] | undefined,
-  firstThreeColumns: string[]
+  firstThreeColumns: string[],
+  errors: string[] | undefined
 ): Revision => {
   const mostRecent =
     checkpoints?.find(({ label }) => revisionsWithData.has(label)) ||
@@ -624,7 +629,8 @@ const getMostRecentFetchedCheckpointRevision = (
     selectedRevision.displayColor,
     mostRecent,
     firstThreeColumns,
-    fetchedRevs
+    fetchedRevs,
+    errors
   )
 }
 
@@ -635,7 +641,8 @@ const overrideRevisionDetail = (
   fetchedRevs: Set<string>,
   revisionsWithData: Set<string>,
   checkpoints: Experiment[] | undefined,
-  firstThreeColumns: string[]
+  firstThreeColumns: string[],
+  errors: string[] | undefined
 ) => {
   const { label } = selectedRevision
 
@@ -644,7 +651,8 @@ const overrideRevisionDetail = (
     fetchedRevs,
     revisionsWithData,
     checkpoints,
-    firstThreeColumns
+    firstThreeColumns,
+    errors
   )
   orderMapping[label] = mostRecent.revision
   selectedWithOverrides.push(mostRecent)
@@ -658,9 +666,11 @@ const collectRevisionDetail = (
   revisionsWithData: Set<string>,
   unfinishedRunningExperiments: { [id: string]: string },
   getCheckpoints: (id: string) => Experiment[] | undefined,
+  getErrors: (label: string) => string[] | undefined,
   firstThreeColumns: string[]
 ) => {
   const { label, status, id, displayColor } = selectedRevision
+  const errors = getErrors(label)
 
   if (
     !fetchedRevs.has(label) &&
@@ -672,7 +682,8 @@ const collectRevisionDetail = (
       displayColor,
       label,
       firstThreeColumns,
-      fetchedRevs
+      fetchedRevs,
+      errors
     )
   }
 
@@ -691,7 +702,8 @@ const collectRevisionDetail = (
       fetchedRevs,
       revisionsWithData,
       getCheckpoints(id),
-      firstThreeColumns
+      firstThreeColumns,
+      errors
     )
   }
 
@@ -701,7 +713,8 @@ const collectRevisionDetail = (
       displayColor,
       selectedRevision,
       firstThreeColumns,
-      fetchedRevs
+      fetchedRevs,
+      errors
     )
   )
 }
@@ -713,6 +726,7 @@ export const collectOverrideRevisionDetails = (
   revisionsWithData: Set<string>,
   unfinishedRunningExperiments: { [id: string]: string },
   getCheckpoints: (id: string) => Experiment[] | undefined,
+  getErrors: (label: string) => string[] | undefined,
   firstThreeColumns: string[]
 ): {
   overrideComparison: Revision[]
@@ -730,6 +744,7 @@ export const collectOverrideRevisionDetails = (
       revisionsWithData,
       unfinishedRunningExperiments,
       getCheckpoints,
+      getErrors,
       firstThreeColumns
     )
   }

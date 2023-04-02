@@ -259,6 +259,7 @@ describe('collectOverrideRevisionDetails', () => {
               }
             ] as Experiment[]
           }[id]),
+        () => undefined,
         []
       )
     expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
@@ -270,6 +271,7 @@ describe('collectOverrideRevisionDetails', () => {
     expect(overrideRevisions).toStrictEqual([
       {
         displayColor: '#4299e1',
+        errors: undefined,
         fetched: true,
         firstThreeColumns: [],
         group: 'a',
@@ -278,6 +280,7 @@ describe('collectOverrideRevisionDetails', () => {
       },
       {
         displayColor: '#13adc7',
+        errors: undefined,
         fetched: true,
         firstThreeColumns: [],
         group: runningGroup,
@@ -286,6 +289,7 @@ describe('collectOverrideRevisionDetails', () => {
       },
       {
         displayColor: '#48bb78',
+        errors: undefined,
         fetched: true,
         firstThreeColumns: [],
         group: 'c',
@@ -295,6 +299,7 @@ describe('collectOverrideRevisionDetails', () => {
       {
         commit: 'Upgrade dependencies ...',
         displayColor: '#f56565',
+        errors: undefined,
         fetched: true,
         firstThreeColumns: [],
         group: 'd',
@@ -373,6 +378,7 @@ describe('collectOverrideRevisionDetails', () => {
               }
             ] as Experiment[]
           }[id]),
+        () => undefined,
         []
       )
     expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
@@ -384,6 +390,7 @@ describe('collectOverrideRevisionDetails', () => {
     expect(overrideRevisions).toStrictEqual([
       {
         displayColor: '#4299e1',
+        errors: undefined,
         fetched: false,
         firstThreeColumns: [],
         group: 'a',
@@ -392,6 +399,7 @@ describe('collectOverrideRevisionDetails', () => {
       },
       {
         displayColor: '#13adc7',
+        errors: undefined,
         fetched: false,
         firstThreeColumns: [],
         group: undefined,
@@ -400,6 +408,7 @@ describe('collectOverrideRevisionDetails', () => {
       },
       {
         displayColor: '#48bb78',
+        errors: undefined,
         fetched: false,
         firstThreeColumns: [],
         group: 'c',
@@ -408,6 +417,7 @@ describe('collectOverrideRevisionDetails', () => {
       },
       {
         displayColor: '#f56565',
+        errors: undefined,
         fetched: false,
         firstThreeColumns: [],
         group: 'd',
@@ -486,6 +496,7 @@ describe('collectOverrideRevisionDetails', () => {
               }
             ] as Experiment[]
           }[id]),
+        () => undefined,
         []
       )
     expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
@@ -525,6 +536,7 @@ describe('collectOverrideRevisionDetails', () => {
         { [justFinishedRunningId]: justFinishedRunningId },
         (id: string) =>
           ({ [justFinishedRunningId]: [{ label: 'e' }] as Experiment[] }[id]),
+        () => undefined,
         []
       )
     expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
@@ -538,6 +550,53 @@ describe('collectOverrideRevisionDetails', () => {
       'e',
       'c',
       'd'
+    ])
+  })
+
+  it('should override the revision errors for finished but unfetched checkpoint tips (based on available data)', () => {
+    const justFinishedRunningId = 'exp-was-running'
+    const errors = ["b's error"]
+    const { overrideComparison, overrideRevisions } =
+      collectOverrideRevisionDetails(
+        ['a', 'b', 'c', 'd'],
+        [
+          { label: 'a' },
+          {
+            checkpoint_tip: 'b',
+            displayColor: '#13adc7',
+            id: justFinishedRunningId,
+            label: 'b',
+            sha: 'b',
+            status: ExperimentStatus.SUCCESS
+          },
+          { label: 'c' },
+          { label: 'd' }
+        ] as SelectedExperimentWithColor[],
+        new Set([]),
+        new Set(['a', 'c', 'd', 'e']),
+        { [justFinishedRunningId]: justFinishedRunningId },
+        (id: string) =>
+          ({ [justFinishedRunningId]: [{ label: 'e' }] as Experiment[] }[id]),
+        (label: string) => {
+          if (label === 'b') {
+            return errors
+          }
+        },
+        []
+      )
+    expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
+      'a',
+      'e',
+      'c',
+      'd'
+    ])
+    expect(
+      overrideRevisions.map(({ revision, errors }) => ({ errors, revision }))
+    ).toStrictEqual([
+      { errors: undefined, revision: 'a' },
+      { errors, revision: 'e' },
+      { errors: undefined, revision: 'c' },
+      { errors: undefined, revision: 'd' }
     ])
   })
 })

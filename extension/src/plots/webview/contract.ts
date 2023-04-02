@@ -56,13 +56,14 @@ export type RevisionFirstThreeColumns = Array<{
 }>
 
 export type Revision = {
+  commit?: string
+  displayColor: Color
+  errors?: string[]
+  fetched: boolean
+  firstThreeColumns: RevisionFirstThreeColumns
+  group?: string
   id?: string
   revision: string
-  group?: string
-  displayColor: Color
-  fetched: boolean
-  commit?: string
-  firstThreeColumns: RevisionFirstThreeColumns
 }
 
 export interface PlotsComparisonData {

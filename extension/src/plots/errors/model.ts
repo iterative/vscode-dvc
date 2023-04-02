@@ -2,7 +2,8 @@ import { join } from 'path'
 import {
   collectErrors,
   collectImageErrors,
-  collectPathErrorsTable
+  collectPathErrorsTable,
+  getMessage
 } from './collect'
 import { Disposable } from '../../class/dispose'
 import { DvcError, PlotError, PlotsOutputOrError } from '../../cli/dvc/contract'
@@ -53,6 +54,16 @@ export class ErrorsModel extends Disposable {
       }
     }
     return acc
+  }
+
+  public getRevisionErrors(rev: string) {
+    const errors: string[] = []
+    for (const error of this.errors) {
+      if (error.rev === rev) {
+        errors.push(getMessage(error))
+      }
+    }
+    return errors.length > 0 ? errors : undefined
   }
 
   public hasCliError() {

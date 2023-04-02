@@ -163,7 +163,7 @@ describe('collectImageErrors', () => {
     ]
 
     const error = collectImageErrors(path, EXPERIMENT_WORKSPACE_ID, errors)
-    expect(error).toStrictEqual(`FileNotFoundError: ${path} not found.`)
+    expect(error).toStrictEqual(`${path} not found.`)
   })
 
   it('should concatenate errors together to give a single string', () => {
@@ -195,7 +195,7 @@ describe('collectImageErrors', () => {
 
     const error = collectImageErrors(path, EXPERIMENT_WORKSPACE_ID, errors)
     expect(error).toStrictEqual(
-      `FileNotFoundError: ${path} not found.\nSomeError: catastrophic error\nUNEXPECTEDERRRRROR`
+      `${path} not found.\ncatastrophic error\nUNEXPECTEDERRRRROR`
     )
   })
 })
@@ -301,9 +301,9 @@ describe('collectPathErrorsTable', () => {
       'Errors\n' +
         '|||\n' +
         '|--|--|\n' +
-        '| a-really... | SomeError: catastrophic error |\n' +
         '| a-really... | UNEXPECTEDERRRRROR |\n' +
-        '| workspace | FileNotFoundError: wat not found. |'
+        '| a-really... | catastrophic error |\n' +
+        '| workspace | wat not found. |'
     )
   })
 
@@ -344,9 +344,9 @@ describe('collectPathErrorsTable', () => {
       'Errors\n' +
         '|||\n' +
         '|--|--|\n' +
-        "| aa1401b | FieldNotFoundError: Could not find provided field ('acc_') in data fields ('step, acc'). |\n" +
-        "| test-plo... | FieldNotFoundError: Could not find provided field ('acc_') in data fields ('step, acc'). |\n" +
-        "| workspace | FieldNotFoundError: Could not find provided field ('acc_') in data fields ('step, acc'). |"
+        "| aa1401b | Could not find provided field ('acc_') in data fields ('step, acc'). |\n" +
+        "| test-plo... | Could not find provided field ('acc_') in data fields ('step, acc'). |\n" +
+        "| workspace | Could not find provided field ('acc_') in data fields ('step, acc'). |"
     )
   })
 })
