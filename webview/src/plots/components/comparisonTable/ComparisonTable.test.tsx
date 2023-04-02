@@ -334,8 +334,7 @@ describe('ComparisonTable', () => {
       fireEvent.click(button)
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
-        payload: revisionWithNoData,
-        type: MessageFromWebviewType.REFRESH_REVISION
+        type: MessageFromWebviewType.REFRESH_REVISIONS
       })
       mockPostMessage.mockReset()
     }

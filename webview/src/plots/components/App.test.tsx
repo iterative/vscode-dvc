@@ -1874,13 +1874,6 @@ describe('App', () => {
 
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
-        payload: [
-          EXPERIMENT_WORKSPACE_ID,
-          'main',
-          '4fb124a',
-          '42b8736',
-          '1ba7bcd'
-        ],
         type: MessageFromWebviewType.REFRESH_REVISIONS
       })
     })
