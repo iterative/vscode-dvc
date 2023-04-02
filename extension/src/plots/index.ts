@@ -4,6 +4,7 @@ import { PlotsData as TPlotsData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { PlotsData } from './data'
 import { ErrorsModel } from './errors/model'
+import { DecorationProvider } from './errors/decorationProvider'
 import { PlotsModel } from './model'
 import { collectEncodingElements, collectScale } from './paths/collect'
 import { PathsModel } from './paths/model'
@@ -33,6 +34,9 @@ export class Plots extends BaseRepository<TPlotsData> {
   private readonly data: PlotsData
 
   private readonly errors: ErrorsModel
+  private readonly decorationProvider = this.dispose.track(
+    new DecorationProvider()
+  )
 
   private webviewMessages: WebviewMessages
 
@@ -52,7 +56,7 @@ export class Plots extends BaseRepository<TPlotsData> {
       new PlotsModel(this.dvcRoot, experiments, this.errors, workspaceState)
     )
     this.paths = this.dispose.track(
-      new PathsModel(this.dvcRoot, workspaceState)
+      new PathsModel(this.dvcRoot, this.errors, workspaceState)
     )
 
     this.webviewMessages = this.createWebviewMessageHandler(
@@ -130,7 +134,11 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private notifyChanged() {
-    this.paths.setSelectedRevisions(this.plots.getSelectedRevisions())
+    const selectedRevisions = this.plots.getSelectedRevisions()
+    this.paths.setSelectedRevisions(selectedRevisions)
+    this.decorationProvider.setState(
+      this.errors.getErrorPaths(selectedRevisions)
+    )
     this.pathsChanged.fire()
     void this.fetchMissingOrSendPlots()
   }
