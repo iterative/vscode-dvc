@@ -14,7 +14,6 @@ import { BaseRepository } from '../webview/repository'
 import { Experiments } from '../experiments'
 import { Resource } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
-import { definedAndNonEmpty } from '../util/array'
 import { TEMP_PLOTS_DIR } from '../cli/dvc/constants'
 import { removeDir } from '../fileSystem'
 import { Toast } from '../vscode/toast'
@@ -69,6 +68,7 @@ export class Plots extends BaseRepository<TPlotsData> {
       new PlotsData(dvcRoot, internalCommands, this.plots, updatesPaused)
     )
 
+    this.onDidTriggerDataUpdate()
     this.onDidUpdateData()
     this.waitForInitialData(experiments)
 
@@ -105,10 +105,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     void Toast.infoWithOptions(
       'Attempting to refresh plots for selected experiments.'
     )
-    for (const { revision } of this.plots.getSelectedRevisionDetails()) {
-      this.plots.setupManualRefresh(revision)
-    }
-    void this.data.managedUpdate()
+    this.triggerDataUpdate()
   }
 
   public getChildPaths(path: string | undefined) {
@@ -130,7 +127,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   protected sendInitialWebviewData() {
-    return this.fetchMissingOrSendPlots()
+    return this.sendPlots()
   }
 
   private notifyChanged() {
@@ -140,18 +137,17 @@ export class Plots extends BaseRepository<TPlotsData> {
       this.errors.getErrorPaths(selectedRevisions)
     )
     this.pathsChanged.fire()
-    void this.fetchMissingOrSendPlots()
+
+    if (this.plots.requiresUpdate()) {
+      this.triggerDataUpdate()
+      return
+    }
+
+    void this.sendPlots()
   }
 
-  private async fetchMissingOrSendPlots() {
+  private async sendPlots() {
     await this.isReady()
-
-    if (
-      this.paths.hasPaths() &&
-      definedAndNonEmpty(this.plots.getUnfetchedRevisions())
-    ) {
-      void this.data.managedUpdate()
-    }
 
     return this.webviewMessages.sendWebviewMessage()
   }
@@ -214,13 +210,26 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private async initializeData() {
     await this.plots.transformAndSetExperiments()
-    void this.data.managedUpdate()
+    this.triggerDataUpdate()
     await Promise.all([
       this.data.isReady(),
       this.plots.isReady(),
       this.paths.isReady()
     ])
     this.deferred.resolve()
+  }
+
+  private triggerDataUpdate() {
+    void this.data.managedUpdate()
+  }
+
+  private onDidTriggerDataUpdate() {
+    const sendCachedDataToWebview = () => {
+      this.plots.resetFetched()
+      this.plots.setComparisonOrder()
+      return this.sendPlots()
+    }
+    this.dispose.track(this.data.onDidTrigger(() => sendCachedDataToWebview()))
   }
 
   private onDidUpdateData() {

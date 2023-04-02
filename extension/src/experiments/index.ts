@@ -453,12 +453,6 @@ export class Experiments extends BaseRepository<TableData> {
     return experiment?.name || experiment?.label
   }
 
-  public getMutableRevisions() {
-    return this.experiments.getMutableRevisions(
-      this.checkpoints.hasCheckpoints()
-    )
-  }
-
   public getRevisions() {
     return this.experiments.getRevisions()
   }

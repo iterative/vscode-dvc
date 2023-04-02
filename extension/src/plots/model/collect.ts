@@ -724,3 +724,21 @@ export const collectOverrideRevisionDetails = (
     overrideRevisions: selectedWithOverrides
   }
 }
+
+export const collectOrderedRevisions = (
+  revisions: {
+    id: string
+    label: string
+    Created?: string | null
+  }[]
+): { id: string; label: string; Created?: string | null }[] => {
+  return [...revisions].sort((a, b) => {
+    if (a.id === 'workspace') {
+      return -1
+    }
+    if (b.id === 'workspace') {
+      return 1
+    }
+    return (b.Created || '').localeCompare(a.Created || '')
+  })
+}

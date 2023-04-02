@@ -79,13 +79,15 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     path: string | undefined,
     multiSourceEncoding: MultiSourceEncoding = {}
   ) {
-    return this.filterChildren(path).map(element => ({
-      ...element,
-      descendantStatuses: this.getTerminalNodeStatuses(element.path),
-      hasChildren: this.getHasChildren(element, multiSourceEncoding),
-      status: this.status[element.path],
-      tooltip: this.getTooltip(element.path)
-    }))
+    return this.filterChildren(path)
+      .map(element => ({
+        ...element,
+        descendantStatuses: this.getTerminalNodeStatuses(element.path),
+        hasChildren: this.getHasChildren(element, multiSourceEncoding),
+        status: this.status[element.path],
+        tooltip: this.getTooltip(element.path)
+      }))
+      .sort(({ path: aPath }, { path: bPath }) => aPath.localeCompare(bPath))
   }
 
   public getTerminalNodes(): (PlotPath & { selected: boolean })[] {

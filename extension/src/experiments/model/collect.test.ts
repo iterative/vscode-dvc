@@ -1,10 +1,7 @@
-import { collectExperiments, collectMutableRevisions } from './collect'
+import { collectExperiments } from './collect'
 import { Experiment } from '../webview/contract'
 import modifiedFixture from '../../test/fixtures/expShow/modified/output'
-import {
-  ExperimentStatus,
-  EXPERIMENT_WORKSPACE_ID
-} from '../../cli/dvc/contract'
+import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { COMMITS_SEPARATOR } from '../../cli/git/constants'
 
 describe('collectExperiments', () => {
@@ -231,64 +228,5 @@ describe('collectExperiments', () => {
     expect(
       checkpointsByTip.get(checkpointTipWithoutAName)?.length
     ).toStrictEqual(3)
-  })
-})
-
-describe('collectMutableRevisions', () => {
-  const baseExperiments = [
-    { label: 'branch-A', selected: false, status: ExperimentStatus.SUCCESS },
-    {
-      label: EXPERIMENT_WORKSPACE_ID,
-      selected: false,
-      status: ExperimentStatus.FAILED
-    }
-  ] as Experiment[]
-
-  it('should return the workspace when there is an unselected running checkpoint experiment', () => {
-    const experiments = [
-      {
-        label: 'exp-123',
-        selected: false,
-        status: ExperimentStatus.RUNNING
-      },
-      ...baseExperiments
-    ] as Experiment[]
-
-    const mutableRevisions = collectMutableRevisions(experiments, true)
-    expect(mutableRevisions).toStrictEqual([EXPERIMENT_WORKSPACE_ID])
-  })
-
-  it('should return the workspace when there are no checkpoints', () => {
-    const experiments = [
-      { label: 'branch-A', selected: false, status: ExperimentStatus.SUCCESS },
-      {
-        label: EXPERIMENT_WORKSPACE_ID,
-        selected: false,
-        status: ExperimentStatus.SUCCESS
-      }
-    ] as Experiment[]
-
-    const mutableRevisions = collectMutableRevisions(experiments, false)
-    expect(mutableRevisions).toStrictEqual([EXPERIMENT_WORKSPACE_ID])
-  })
-
-  it('should return all running experiments when there are checkpoints', () => {
-    const experiments = [
-      { label: 'branch-A', selected: false, status: ExperimentStatus.SUCCESS },
-      {
-        label: EXPERIMENT_WORKSPACE_ID,
-        selected: false,
-        status: ExperimentStatus.SUCCESS
-      },
-      { label: 'running-1', selected: false, status: ExperimentStatus.RUNNING },
-      { label: 'running-2', selected: true, status: ExperimentStatus.RUNNING }
-    ] as Experiment[]
-
-    const mutableRevisions = collectMutableRevisions(experiments, false)
-    expect(mutableRevisions).toStrictEqual([
-      EXPERIMENT_WORKSPACE_ID,
-      'running-1',
-      'running-2'
-    ])
   })
 })

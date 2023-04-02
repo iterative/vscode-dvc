@@ -13,7 +13,9 @@ import {
 import { ExperimentType } from '../../../../experiments/model'
 import { UNSELECTED } from '../../../../experiments/model/status'
 import {
+  bypassProcessManagerDebounce,
   getFirstArgOfLastCall,
+  getMockNow,
   getTimeSafeDisposer,
   spyOnPrivateMethod,
   stubPrivatePrototypeMethod
@@ -70,6 +72,8 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to toggle whether an experiment is shown in the plots webview with dvc.views.experiments.toggleStatus', async () => {
+      const mockNow = getMockNow()
+
       const { plots, messageSpy } = await buildPlots(disposable)
 
       const expectedDomain = [...domain]
@@ -79,6 +83,7 @@ suite('Experiments Tree Test Suite', () => {
 
       await webview.isReady()
 
+      let updateCall = 1
       while (expectedDomain.length > 0) {
         const expectedData = getExpectedCustomPlotsData(
           expectedDomain,
@@ -96,6 +101,7 @@ suite('Experiments Tree Test Suite', () => {
         const id = expectedDomain.pop()
         expectedRange.pop()
 
+        bypassProcessManagerDebounce(mockNow, updateCall)
         const unSelected = await commands.executeCommand(
           RegisteredCommands.EXPERIMENT_TOGGLE,
           {
@@ -103,6 +109,7 @@ suite('Experiments Tree Test Suite', () => {
             id
           }
         )
+        updateCall = updateCall + 1
 
         expect(unSelected).to.equal(UNSELECTED)
       }
@@ -124,6 +131,7 @@ suite('Experiments Tree Test Suite', () => {
       expectedDomain.push(domain[0])
       expectedRange.push(range[0])
 
+      bypassProcessManagerDebounce(mockNow, updateCall)
       const selected = await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_TOGGLE,
         {
