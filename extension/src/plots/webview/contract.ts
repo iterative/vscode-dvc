@@ -170,8 +170,9 @@ export interface TemplatePlotsData {
 }
 
 export type ComparisonPlot = {
-  url?: string
+  url: string | undefined
   revision: string
+  error: string | undefined
 }
 
 export enum PlotsDataKeys {

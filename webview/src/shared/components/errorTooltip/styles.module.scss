@@ -1,0 +1,15 @@
+.errorIcon {
+  margin-left: 6px;
+  margin-top: 3px;
+}
+
+.errorTooltip {
+  white-space: pre-wrap;
+  display: flex;
+  gap: 4px;
+
+  svg {
+    min-width: 16px;
+    min-height: 16px;
+  }
+}

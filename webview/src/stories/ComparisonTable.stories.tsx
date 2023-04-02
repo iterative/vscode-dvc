@@ -73,13 +73,23 @@ WithPinnedColumn.play = async ({ canvasElement }) => {
 const removeImages = (
   path: string,
   revisionsData: ComparisonRevisionData
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 ): ComparisonRevisionData => {
   const filteredRevisionData: ComparisonRevisionData = {}
   for (const [revision, data] of Object.entries(revisionsData)) {
     if (
-      (path === comparisonTableFixture.plots[0].path && revision === 'main') ||
+      (path === comparisonTableFixture.plots[0].path &&
+        ['main', '4fb124a'].includes(revision)) ||
       revision === EXPERIMENT_WORKSPACE_ID
     ) {
+      filteredRevisionData[revision] = {
+        error:
+          revision === 'main'
+            ? `FileNotFoundError: ${path} not found.`
+            : undefined,
+        revision,
+        url: undefined
+      }
       continue
     }
     filteredRevisionData[revision] = data

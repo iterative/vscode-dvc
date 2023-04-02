@@ -5,6 +5,8 @@ import styles from './styles.module.scss'
 import { RefreshButton } from '../../../shared/components/button/RefreshButton'
 import { sendMessage } from '../../../shared/vscode'
 import { zoomPlot } from '../messages'
+import { Error } from '../../../shared/components/icons'
+import { ErrorTooltip } from '../../../shared/components/errorTooltip/ErrorTooltip'
 
 type ComparisonTableCellProps = {
   path: string
@@ -15,6 +17,7 @@ export const ComparisonTableCell: React.FC<ComparisonTableCellProps> = ({
   path,
   plot
 }) => {
+  const error = plot?.error
   const missing = plot?.fetched && !plot?.url
 
   if (!plot?.fetched) {
@@ -28,15 +31,25 @@ export const ComparisonTableCell: React.FC<ComparisonTableCellProps> = ({
   if (missing) {
     return (
       <div className={styles.noImageContent}>
-        <p>No Plot to Display.</p>
-        <RefreshButton
-          onClick={() =>
-            sendMessage({
-              payload: plot.revision,
-              type: MessageFromWebviewType.REFRESH_REVISION
-            })
-          }
-        />
+        {error ? (
+          <>
+            <ErrorTooltip error={error}>
+              <div>
+                <Error height={48} width={48} className={styles.errorIcon} />
+              </div>
+            </ErrorTooltip>
+            <RefreshButton
+              onClick={() =>
+                sendMessage({
+                  payload: plot.revision,
+                  type: MessageFromWebviewType.REFRESH_REVISION
+                })
+              }
+            />
+          </>
+        ) : (
+          <p className={styles.emptyIcon}>-</p>
+        )}
       </div>
     )
   }

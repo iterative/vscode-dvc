@@ -7,6 +7,7 @@ import {
 } from '../webview/contract'
 import {
   EXPERIMENT_WORKSPACE_ID,
+  PlotError,
   PlotsData,
   PlotsOutput
 } from '../../cli/dvc/contract'
@@ -165,6 +166,67 @@ const collectOrderedPath = (
   return acc
 }
 
+const addRevisionsToPath = (
+  acc: PlotPath[],
+  data: PlotsData,
+  path: string,
+  revisions: Set<string>
+): PlotPath[] => {
+  if (revisions.size === 0) {
+    return acc
+  }
+
+  const pathArray = getPathArray(path)
+
+  for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
+    acc = collectOrderedPath(acc, data, revisions, pathArray, reverseIdx)
+  }
+  return acc
+}
+
+const collectDataPaths = (
+  acc: PlotPath[],
+  data: PlotsData,
+  cliIdToLabel: { [id: string]: string }
+) => {
+  const paths = Object.keys(data)
+
+  for (const path of paths) {
+    const revisions = collectPathRevisions(data, path, cliIdToLabel)
+    acc = addRevisionsToPath(acc, data, path, revisions)
+  }
+  return acc
+}
+
+const collectErrorRevisions = (
+  path: string,
+  errors: PlotError[],
+  cliIdToLabel: { [id: string]: string }
+): Set<string> => {
+  const acc = new Set<string>()
+  for (const error of errors) {
+    const { name, rev } = error
+    if (name === path) {
+      acc.add(cliIdToLabel[rev] || rev)
+    }
+  }
+  return acc
+}
+
+const collectErrorPaths = (
+  acc: PlotPath[],
+  data: PlotsData,
+  errors: PlotError[],
+  cliIdToLabel: { [id: string]: string }
+) => {
+  const paths = errors.map(({ name }) => name)
+  for (const path of paths) {
+    const revisions = collectErrorRevisions(path, errors, cliIdToLabel)
+    acc = addRevisionsToPath(acc, data, path, revisions)
+  }
+  return acc
+}
+
 export const collectPaths = (
   existingPaths: PlotPath[],
   output: PlotsOutput,
@@ -173,22 +235,12 @@ export const collectPaths = (
 ): PlotPath[] => {
   let acc: PlotPath[] = filterWorkspaceIfFetched(existingPaths, fetchedRevs)
 
-  const { data } = output
+  const { data, errors } = output
 
-  const paths = Object.keys(data)
+  acc = collectDataPaths(acc, data, cliIdToLabel)
 
-  for (const path of paths) {
-    const revisions = collectPathRevisions(data, path, cliIdToLabel)
-
-    if (revisions.size === 0) {
-      continue
-    }
-
-    const pathArray = getPathArray(path)
-
-    for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
-      acc = collectOrderedPath(acc, data, revisions, pathArray, reverseIdx)
-    }
+  if (errors?.length) {
+    acc = collectErrorPaths(acc, data, errors, cliIdToLabel)
   }
 
   return acc

@@ -52,11 +52,13 @@ import {
   MultiSourceVariations
 } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
+import { ErrorsModel } from '../errors/model'
 
 export type CustomCheckpointPlots = { [metric: string]: CheckpointPlot }
 
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
+  private readonly errors: ErrorsModel
 
   private nbItemsPerRowOrWidth: Record<PlotsSection, number>
   private height: Record<PlotsSection, PlotHeight>
@@ -77,10 +79,12 @@ export class PlotsModel extends ModelWithPersistence {
   constructor(
     dvcRoot: string,
     experiments: Experiments,
+    errors: ErrorsModel,
     workspaceState: Memento
   ) {
     super(dvcRoot, workspaceState)
     this.experiments = experiments
+    this.errors = errors
 
     this.nbItemsPerRowOrWidth = this.revive(
       PersistenceKey.PLOT_NB_ITEMS_PER_ROW_OR_WIDTH,
@@ -494,7 +498,9 @@ export class PlotsModel extends ModelWithPersistence {
 
     for (const revision of selectedRevisions) {
       const image = this.comparisonData?.[revision]?.[path]
+      const error = this.errors.getImageErrors(path, revision)
       pathRevisions.revisions[revision] = {
+        error,
         revision,
         url: image?.url
       }

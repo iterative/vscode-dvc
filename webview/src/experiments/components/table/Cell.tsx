@@ -1,12 +1,12 @@
 import { flexRender } from '@tanstack/react-table'
 import React, { ReactNode } from 'react'
 import cx from 'classnames'
-import { ErrorTooltip } from './Errors'
 import styles from './styles.module.scss'
 import { CellProp, RowProp } from './interfaces'
 import { CellRowActionsProps, CellRowActions } from './CellRowActions'
 import { CellValue, isValueWithChanges } from './content/Cell'
 import { clickAndEnterProps } from '../../../util/props'
+import { ErrorTooltip } from '../../../shared/components/errorTooltip/ErrorTooltip'
 
 const cellHasChanges = (cellValue: CellValue) =>
   isValueWithChanges(cellValue) ? cellValue.changes : false
