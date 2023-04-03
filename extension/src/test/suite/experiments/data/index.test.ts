@@ -23,7 +23,10 @@ import {
   InternalCommands
 } from '../../../../commands/internal'
 import { buildExperimentsData } from '../util'
-import { ExperimentFlag } from '../../../../cli/dvc/constants'
+import {
+  ExperimentFlag,
+  DEFAULT_NUM_OF_COMMITS_TO_SHOW
+} from '../../../../cli/dvc/constants'
 import { EXPERIMENTS_GIT_LOGS_REFS } from '../../../../experiments/data/constants'
 import { gitPath } from '../../../../cli/git/constants'
 import * as FileSystem from '../../../../fileSystem'
@@ -91,7 +94,8 @@ suite('Experiments Data Test Suite', () => {
               }
             }
           } as unknown as InternalCommands,
-          disposable.track(new EventEmitter<boolean>())
+          disposable.track(new EventEmitter<boolean>()),
+          () => DEFAULT_NUM_OF_COMMITS_TO_SHOW
         )
       )
 
@@ -140,7 +144,8 @@ suite('Experiments Data Test Suite', () => {
               }
             }
           } as unknown as InternalCommands,
-          disposable.track(new EventEmitter<boolean>())
+          disposable.track(new EventEmitter<boolean>()),
+          () => DEFAULT_NUM_OF_COMMITS_TO_SHOW
         )
       )
 
@@ -183,6 +188,8 @@ suite('Experiments Data Test Suite', () => {
       expect(mockExperimentShow).to.be.calledOnce
       expect(mockExperimentShow).to.be.calledWithExactly(
         dvcDemoPath,
+        ExperimentFlag.NUM_COMMIT,
+        DEFAULT_NUM_OF_COMMITS_TO_SHOW.toString(),
         ExperimentFlag.NO_FETCH
       )
 
@@ -194,6 +201,8 @@ suite('Experiments Data Test Suite', () => {
       expect(mockExperimentShow).to.be.calledOnce
       expect(mockExperimentShow).to.be.calledWithExactly(
         dvcDemoPath,
+        ExperimentFlag.NUM_COMMIT,
+        DEFAULT_NUM_OF_COMMITS_TO_SHOW.toString(),
         ExperimentFlag.NO_FETCH
       )
     })
@@ -209,7 +218,11 @@ suite('Experiments Data Test Suite', () => {
       await data.managedUpdate(QUEUED_EXPERIMENT_PATH)
 
       expect(mockExperimentShow).to.be.calledOnce
-      expect(mockExperimentShow).to.be.calledWithExactly(dvcDemoPath)
+      expect(mockExperimentShow).to.be.calledWithExactly(
+        dvcDemoPath,
+        ExperimentFlag.NUM_COMMIT,
+        DEFAULT_NUM_OF_COMMITS_TO_SHOW.toString()
+      )
     })
   })
 })

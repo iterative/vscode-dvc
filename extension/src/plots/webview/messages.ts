@@ -67,8 +67,10 @@ export class WebviewMessages {
     const { overrideComparison, overrideRevisions } =
       this.plots.getOverrideRevisionDetails()
 
+    const comparison = this.getComparisonPlots(overrideComparison)
+
     void this.getWebview()?.show({
-      comparison: this.getComparisonPlots(overrideComparison),
+      comparison,
       custom: this.getCustomPlots(),
       hasPlots: !!this.paths.hasPaths(),
       hasUnselectedPlots: this.paths.getHasUnselectedPlots(),
@@ -104,10 +106,8 @@ export class WebviewMessages {
         return this.selectExperimentsFromWebview()
       case MessageFromWebviewType.REMOVE_CUSTOM_PLOTS:
         return this.removeCustomPlots()
-      case MessageFromWebviewType.REFRESH_REVISION:
-        return this.attemptToRefreshRevData(message.payload)
       case MessageFromWebviewType.REFRESH_REVISIONS:
-        return this.attemptToRefreshSelectedData(message.payload)
+        return this.refreshData()
       case MessageFromWebviewType.TOGGLE_EXPERIMENT:
         return this.setExperimentStatus(message.payload)
       case MessageFromWebviewType.ZOOM_PLOT:
@@ -324,28 +324,12 @@ export class WebviewMessages {
     )
   }
 
-  private attemptToRefreshRevData(revision: string) {
-    void Toast.infoWithOptions(
-      `Attempting to refresh plots data for ${revision}.`
-    )
-    this.plots.setupManualRefresh(revision)
-    void this.updateData()
-    sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_MANUAL_REFRESH,
-      { revisions: 1 },
-      undefined
-    )
-  }
-
-  private attemptToRefreshSelectedData(revisions: string[]) {
+  private refreshData() {
     void Toast.infoWithOptions('Attempting to refresh visible plots data.')
-    for (const revision of revisions) {
-      this.plots.setupManualRefresh(revision)
-    }
     void this.updateData()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_MANUAL_REFRESH,
-      { revisions: revisions.length },
+      undefined,
       undefined
     )
   }

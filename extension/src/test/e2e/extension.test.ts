@@ -37,7 +37,6 @@ describe('Experiments Table Webview', function () {
   const webview = new ExperimentsWebview('experiments')
 
   const epochs = 15
-  const finalExperimentRow = 1
   const headerRows = 3
   const workspaceRow = 1
   const commitRows = 3
@@ -89,7 +88,7 @@ describe('Experiments Table Webview', function () {
       async () => {
         await webview.expandAllRows()
         const currentRows = await webview.row$$
-        return currentRows.length >= initialRows + epochs + finalExperimentRow
+        return currentRows.length >= initialRows + epochs
       },
       { interval: 5000, timeout: 180000 }
     )
@@ -100,9 +99,7 @@ describe('Experiments Table Webview', function () {
 
     const finalRows = await webview.row$$
 
-    expect(finalRows.length).toStrictEqual(
-      initialRows + epochs + finalExperimentRow
-    )
+    expect(finalRows.length).toStrictEqual(initialRows + epochs)
     await webview.unfocus()
     await closeAllEditors()
     await waitForDvcToFinish()

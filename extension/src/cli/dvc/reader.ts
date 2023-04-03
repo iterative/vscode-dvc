@@ -5,7 +5,6 @@ import {
   Command,
   ExperimentFlag,
   Flag,
-  NUM_OF_COMMITS_TO_SHOW,
   SubCommand,
   TEMP_PLOTS_DIR
 } from './constants'
@@ -15,20 +14,22 @@ import {
   ExperimentsOutput,
   EXPERIMENT_WORKSPACE_ID,
   PlotsOutput,
-  PlotsOutputOrError
+  PlotsOutputOrError,
+  RawPlotsOutput
 } from './contract'
 import { getOptions } from './options'
 import { typeCheckCommands } from '..'
 import { MaybeConsoleError } from '../error'
 import { Logger } from '../../common/logger'
 import { parseNonStandardJson } from '../../util/json'
+import { definedAndNonEmpty } from '../../util/array'
 
 const defaultExperimentsOutput: ExperimentsOutput = {
   [EXPERIMENT_WORKSPACE_ID]: { baseline: {} }
 }
 
 export const isDvcError = <
-  T extends ExperimentsOutput | DataStatusOutput | PlotsOutput
+  T extends ExperimentsOutput | DataStatusOutput | RawPlotsOutput
 >(
   dataOrError: T | DvcError
 ): dataOrError is DvcError =>
@@ -73,8 +74,6 @@ export class DvcReader extends DvcCli {
       JSON.stringify(defaultExperimentsOutput),
       Command.EXPERIMENT,
       SubCommand.SHOW,
-      Flag.NUM_COMMIT,
-      NUM_OF_COMMITS_TO_SHOW,
       ...flags,
       Flag.JSON
     )
@@ -86,11 +85,11 @@ export class DvcReader extends DvcCli {
     return output
   }
 
-  public plotsDiff(
+  public async plotsDiff(
     cwd: string,
     ...revisions: string[]
   ): Promise<PlotsOutputOrError> {
-    return this.readProcessJson<PlotsOutput>(
+    const output = await this.readProcessJson<RawPlotsOutput>(
       cwd,
       Command.PLOTS,
       SubCommand.DIFF,
@@ -99,6 +98,20 @@ export class DvcReader extends DvcCli {
       TEMP_PLOTS_DIR,
       Flag.SPLIT
     )
+    if (isDvcError(output)) {
+      return output
+    }
+
+    const { data, errors } = output
+    const expectedOutput: PlotsOutput = {
+      data: data || {}
+    }
+
+    if (definedAndNonEmpty(errors)) {
+      expectedOutput.errors = errors
+    }
+
+    return expectedOutput
   }
 
   public async root(cwd: string): Promise<string | undefined> {
@@ -128,7 +141,7 @@ export class DvcReader extends DvcCli {
     } catch {}
   }
 
-  private readProcessJson<T extends DataStatusOutput | PlotsOutput>(
+  private readProcessJson<T extends DataStatusOutput | RawPlotsOutput>(
     cwd: string,
     command: Command,
     ...args: Args
@@ -137,7 +150,7 @@ export class DvcReader extends DvcCli {
   }
 
   private async readProcess<
-    T extends DataStatusOutput | ExperimentsOutput | PlotsOutput
+    T extends DataStatusOutput | ExperimentsOutput | RawPlotsOutput
   >(cwd: string, defaultValue: string, ...args: Args): Promise<T | DvcError> {
     try {
       const output =

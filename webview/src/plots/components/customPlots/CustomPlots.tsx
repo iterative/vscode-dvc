@@ -23,7 +23,7 @@ interface CustomPlotsProps {
 
 export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
   const [order, setOrder] = useState(plotsIds)
-  const { nbItemsPerRow, hasData, disabledDragPlotIds } = useSelector(
+  const { nbItemsPerRow, hasData, hasItems, disabledDragPlotIds } = useSelector(
     (state: PlotsState) => state.custom
   )
   const [onSection, setOnSection] = useState(false)
@@ -46,7 +46,7 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
     })
   }
 
-  if (sectionIsLoading(selectedRevisions)) {
+  if (sectionIsLoading(selectedRevisions, hasItems)) {
     return <LoadingSection />
   }
 

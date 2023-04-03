@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.26] - 2023-03-29
+
+### 🚀 New Features and Enhancements
+
+- Improve Custom Plot Creation [#3550](https://github.com/iterative/vscode-dvc/pull/3550) by [@julieg18](https://github.com/julieg18)
+- Add a button to show more commits [#3535](https://github.com/iterative/vscode-dvc/pull/3535) by [@sroy3](https://github.com/sroy3)
+- Use commit rows in metric vs param plots [#3567](https://github.com/iterative/vscode-dvc/pull/3567) by [@julieg18](https://github.com/julieg18)
+- Add button to show less commits [#3562](https://github.com/iterative/vscode-dvc/pull/3562) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Increase CodeClimate method line count threshold to 40 [#3543](https://github.com/iterative/vscode-dvc/pull/3543) by [@mattseddon](https://github.com/mattseddon)
+- Move function complexity threshold to 6 (+1) [#3556](https://github.com/iterative/vscode-dvc/pull/3556) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.6.25] - 2023-03-23
 
 ### 🚀 New Features and Enhancements

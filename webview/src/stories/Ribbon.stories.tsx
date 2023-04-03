@@ -66,3 +66,24 @@ WithLoading.args = {
     })
   }
 }
+
+export const WithErrors = Template.bind({})
+WithErrors.args = {
+  data: {
+    selectedRevisions: plotsRevisionsFixtureWithCommit.map(item => {
+      if (['main', '42b8736'].includes(item.revision)) {
+        return {
+          ...item,
+          errors: [
+            "'./dvc.yaml' is invalid.\n" +
+              'While parsing a flow sequence, in line 5, column 9\n' +
+              '  5 │   │   [training/plots/metrics/train/acc.tsv: acc\n\n' +
+              "Did not find expected ',' or ']', in line 6, column 44\n" +
+              '6 │   │   training/plots/metrics/test/acc.tsv: acc]'
+          ]
+        }
+      }
+      return item
+    })
+  }
+}

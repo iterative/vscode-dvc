@@ -34,19 +34,14 @@ suite('Plots Data Test Suite', () => {
     return disposable.disposeAndFlush()
   })
 
-  const buildPlotsData = (
-    missingRevisions: string[] = [],
-    mutableRevisions: string[] = []
-  ) => {
+  const buildPlotsData = (selectedRevisions: string[] = []) => {
     const { internalCommands, updatesPaused, mockPlotsDiff } =
       buildDependencies(disposable)
 
-    const mockGetMissingRevisions = stub().returns(missingRevisions)
-    const mockGetMutableRevisions = stub().returns(mutableRevisions)
+    const mockGetSelectedOrderedCliIds = stub().returns(selectedRevisions)
 
     const mockPlotsModel = {
-      getMissingRevisions: mockGetMissingRevisions,
-      getMutableRevisions: mockGetMutableRevisions
+      getSelectedOrderedCliIds: mockGetSelectedOrderedCliIds
     } as unknown as PlotsModel
 
     const data = disposable.track(
@@ -66,7 +61,7 @@ suite('Plots Data Test Suite', () => {
 
   describe('PlotsData', () => {
     it('should call plots diff when there are no revisions to fetch and no experiment is running (workspace updates)', async () => {
-      const { data, mockPlotsDiff } = buildPlotsData([], [])
+      const { data, mockPlotsDiff } = buildPlotsData([])
 
       await data.update()
 
@@ -74,24 +69,8 @@ suite('Plots Data Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath)
     })
 
-    it('should always call plots diff with workspace as the first argument to get the correct template (caching)', async () => {
-      const { data, mockPlotsDiff } = buildPlotsData([], ['53c3851', '4fb124a'])
-
-      await data.update()
-
-      expect(mockPlotsDiff).to.be.calledWithExactly(
-        dvcDemoPath,
-        EXPERIMENT_WORKSPACE_ID,
-        '4fb124a',
-        '53c3851'
-      )
-    })
-
     it('should call plots diff when an experiment is running in the workspace (live updates)', async () => {
-      const { data, mockPlotsDiff } = buildPlotsData(
-        [],
-        [EXPERIMENT_WORKSPACE_ID]
-      )
+      const { data, mockPlotsDiff } = buildPlotsData([EXPERIMENT_WORKSPACE_ID])
 
       await data.update()
 
@@ -99,53 +78,31 @@ suite('Plots Data Test Suite', () => {
     })
 
     it('should call plots diff when an experiment is running in a temporary directory (live updates)', async () => {
-      const { data, mockPlotsDiff } = buildPlotsData([], ['a7739b5'])
+      const { data, mockPlotsDiff } = buildPlotsData(['a7739b5'])
 
       await data.update()
 
       expect(mockPlotsDiff).to.be.calledOnce
-      expect(mockPlotsDiff).to.be.calledWithExactly(
-        dvcDemoPath,
-        EXPERIMENT_WORKSPACE_ID,
-        'a7739b5'
-      )
+      expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath, 'a7739b5')
     })
 
     it('should call plots diff when an experiment is running and there are missing revisions (checkpoints)', async () => {
-      const { data, mockPlotsDiff } = buildPlotsData(
-        ['53c3851', '4fb124a', '42b8736', '1ba7bcd'],
-        []
-      )
+      const { data, mockPlotsDiff } = buildPlotsData([
+        '53c3851',
+        '4fb124a',
+        '42b8736',
+        '1ba7bcd'
+      ])
 
       await data.update()
 
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
-        EXPERIMENT_WORKSPACE_ID,
-        '1ba7bcd',
-        '42b8736',
+        '53c3851',
         '4fb124a',
-        '53c3851'
-      )
-    })
-
-    it('should call plots diff when an experiment is running and there are missing revisions and one of them is mutable', async () => {
-      const { data, mockPlotsDiff } = buildPlotsData(
-        ['53c3851', '4fb124a', '42b8736', '1ba7bcd'],
-        ['1ba7bcd']
-      )
-
-      await data.update()
-
-      expect(mockPlotsDiff).to.be.calledOnce
-      expect(mockPlotsDiff).to.be.calledWithExactly(
-        dvcDemoPath,
-        EXPERIMENT_WORKSPACE_ID,
-        '1ba7bcd',
         '42b8736',
-        '4fb124a',
-        '53c3851'
+        '1ba7bcd'
       )
     })
 
@@ -164,26 +121,28 @@ suite('Plots Data Test Suite', () => {
       const mockExecuteCommand = (command: CommandId) => {
         if (command === AvailableCommands.PLOTS_DIFF) {
           return Promise.resolve({
-            'dvc.yaml::Accuracy': [
-              {
-                datapoints: {
-                  workspace: [
-                    {
-                      dvc_data_version_info: {
-                        field: join('train', 'acc'),
-                        filename: collectedFile,
-                        revision: EXPERIMENT_WORKSPACE_ID
-                      },
-                      dvc_inferred_y_value: '0.2707333333333333',
-                      step: '0',
-                      [join('train', 'acc')]: '0.2707333333333333'
-                    }
-                  ]
-                },
-                revisions: [EXPERIMENT_WORKSPACE_ID],
-                type: 'vega'
-              }
-            ]
+            data: {
+              'dvc.yaml::Accuracy': [
+                {
+                  datapoints: {
+                    workspace: [
+                      {
+                        dvc_data_version_info: {
+                          field: join('train', 'acc'),
+                          filename: collectedFile,
+                          revision: EXPERIMENT_WORKSPACE_ID
+                        },
+                        dvc_inferred_y_value: '0.2707333333333333',
+                        step: '0',
+                        [join('train', 'acc')]: '0.2707333333333333'
+                      }
+                    ]
+                  },
+                  revisions: [EXPERIMENT_WORKSPACE_ID],
+                  type: 'vega'
+                }
+              ]
+            }
           })
         }
       }
@@ -196,8 +155,7 @@ suite('Plots Data Test Suite', () => {
             executeCommand: mockExecuteCommand
           } as unknown as InternalCommands,
           {
-            getMissingRevisions: () => [],
-            getMutableRevisions: () => []
+            getSelectedOrderedCliIds: () => []
           } as unknown as PlotsModel,
           disposable.track(new EventEmitter<boolean>())
         )

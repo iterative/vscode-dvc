@@ -406,10 +406,7 @@ suite('Repository Test Suite', () => {
 
       expect(repository.getChildren(dvcDemoPath)).to.deep.equal([
         {
-          error: {
-            label: './dvc.yaml validation failed.',
-            msg
-          }
+          error: msg
         }
       ])
     })

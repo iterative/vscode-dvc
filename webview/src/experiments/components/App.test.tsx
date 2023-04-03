@@ -1541,5 +1541,27 @@ describe('App', () => {
         type: MessageFromWebviewType.SHOW_MORE_COMMITS
       })
     })
+
+    it('should display a show less commits button if the table data isShowingMoreCommits is set to true', () => {
+      renderTable({ ...tableDataFixture, isShowingMoreCommits: true })
+
+      expect(screen.getByTestId('show-less-commits')).toBeInTheDocument()
+    })
+
+    it('should not display a show less commits button if the table data isShowingMoreCommits is set to false', () => {
+      renderTable({ ...tableDataFixture, isShowingMoreCommits: false })
+
+      expect(screen.queryByTestId('show-less-commits')).not.toBeInTheDocument()
+    })
+
+    it('should send a message to show less commits when the show less commits button is clicked', () => {
+      renderTable({ ...tableDataFixture, isShowingMoreCommits: true })
+
+      fireEvent.click(screen.getByTestId('show-less-commits'))
+
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SHOW_LESS_COMMITS
+      })
+    })
   })
 })

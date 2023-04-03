@@ -18,6 +18,16 @@ export enum CopyTooltip {
   COPIED = 'Copied'
 }
 
+const RevisionIcon: React.FC<{ fetched: boolean; errors?: string[] }> = ({
+  fetched,
+  errors
+}) => (
+  <div className={styles.iconPlaceholder}>
+    {fetched && errors && '!'}
+    {!fetched && <VSCodeProgressRing className={styles.fetching} />}
+  </div>
+)
+
 export const RibbonBlock: React.FC<RibbonBlockProps> = ({
   revision,
   onClear
@@ -25,6 +35,7 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
   const {
     firstThreeColumns,
     commit,
+    errors,
     fetched,
     group,
     id,
@@ -47,7 +58,7 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
         {group && <div className={styles.subtitle}>{rev}</div>}
       </div>
       <div className={styles.iconPlaceholder}>
-        {!fetched && <VSCodeProgressRing className={styles.fetching} />}
+        <RevisionIcon errors={errors} fetched={fetched} />
       </div>
       <Tooltip content="Clear" placement="bottom" delay={500}>
         <button className={styles.clearButton} onClick={onClear}>

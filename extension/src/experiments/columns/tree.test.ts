@@ -124,7 +124,8 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: timestampColumn.label,
-          path: timestampColumn.path
+          path: timestampColumn.path,
+          tooltip: undefined
         },
         {
           collapsibleState: 1,
@@ -132,7 +133,8 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'summary.json',
-          path: buildMetricOrParamPath(ColumnType.METRICS, 'summary.json')
+          path: buildMetricOrParamPath(ColumnType.METRICS, 'summary.json'),
+          tooltip: undefined
         },
         {
           collapsibleState: 1,
@@ -140,7 +142,8 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'params.yaml',
-          path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml')
+          path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
+          tooltip: undefined
         },
         {
           collapsibleState: 1,
@@ -151,7 +154,8 @@ describe('ExperimentsColumnsTree', () => {
           path: buildMetricOrParamPath(
             ColumnType.PARAMS,
             join('nested', 'params.yaml')
-          )
+          ),
+          tooltip: undefined
         },
         {
           collapsibleState: 1,
@@ -159,7 +163,8 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'data',
-          path: buildDepPath('data')
+          path: buildDepPath('data'),
+          tooltip: undefined
         },
         {
           collapsibleState: 1,
@@ -167,7 +172,8 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'src',
-          path: buildDepPath('src')
+          path: buildDepPath('src'),
+          tooltip: undefined
         },
         {
           collapsibleState: 0,
@@ -175,7 +181,8 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'model.pkl',
-          path: buildDepPath('model.pkl')
+          path: buildDepPath('model.pkl'),
+          tooltip: undefined
         }
       ])
     })
@@ -211,7 +218,8 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: timestampColumn.label,
-          path: timestampColumn.path
+          path: timestampColumn.path,
+          tooltip: undefined
         },
         {
           collapsibleState: 1,
@@ -219,7 +227,8 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'summary.json',
-          path: buildMetricOrParamPath(ColumnType.METRICS, 'summary.json')
+          path: buildMetricOrParamPath(ColumnType.METRICS, 'summary.json'),
+          tooltip: undefined
         },
         {
           collapsibleState: 1,
@@ -227,7 +236,8 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'params.yaml',
-          path: paramsPath
+          path: paramsPath,
+          tooltip: undefined
         },
         {
           collapsibleState: 1,
@@ -238,7 +248,8 @@ describe('ExperimentsColumnsTree', () => {
           path: buildMetricOrParamPath(
             ColumnType.PARAMS,
             join('nested', 'params.yaml')
-          )
+          ),
+          tooltip: undefined
         },
         {
           collapsibleState: 1,
@@ -246,7 +257,8 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'data',
-          path: buildDepPath('data')
+          path: buildDepPath('data'),
+          tooltip: undefined
         },
         {
           collapsibleState: 1,
@@ -254,7 +266,8 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'src',
-          path: buildDepPath('src')
+          path: buildDepPath('src'),
+          tooltip: undefined
         },
         {
           collapsibleState: 0,
@@ -262,7 +275,8 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'model.pkl',
-          path: buildDepPath('model.pkl')
+          path: buildDepPath('model.pkl'),
+          tooltip: undefined
         }
       ])
 
@@ -276,7 +290,8 @@ describe('ExperimentsColumnsTree', () => {
                 descendantStatuses: [Status.UNSELECTED, Status.SELECTED],
                 hasChildren: true,
                 label: getLabel(param.path),
-                status: Status.INDETERMINATE
+                status: Status.INDETERMINATE,
+                tooltip: undefined
               }
             }
             return {
@@ -284,7 +299,8 @@ describe('ExperimentsColumnsTree', () => {
               descendantStatuses: undefined,
               hasChildren: false,
               label: getLabel(param.path),
-              status: Status.SELECTED
+              status: Status.SELECTED,
+              tooltip: undefined
             }
           })
       )
@@ -295,7 +311,8 @@ describe('ExperimentsColumnsTree', () => {
         dvcRoot: mockedDvcRoot,
         iconPath: mockedSelectedCheckbox,
         label: 'params.yaml',
-        path: paramsPath
+        path: paramsPath,
+        tooltip: undefined
       })
       expect(grandChildren).toStrictEqual([
         {
@@ -304,7 +321,8 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'code_names',
-          path: appendColumnToPath(paramsPath, 'code_names')
+          path: appendColumnToPath(paramsPath, 'code_names'),
+          tooltip: undefined
         },
         {
           collapsibleState: 0,
@@ -312,7 +330,8 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'epochs',
-          path: appendColumnToPath(paramsPath, 'epochs')
+          path: appendColumnToPath(paramsPath, 'epochs'),
+          tooltip: undefined
         },
         {
           collapsibleState: 0,
@@ -320,7 +339,8 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'learning_rate',
-          path: appendColumnToPath(paramsPath, 'learning_rate')
+          path: appendColumnToPath(paramsPath, 'learning_rate'),
+          tooltip: undefined
         },
         {
           collapsibleState: 0,
@@ -328,7 +348,8 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'dvc_logs_dir',
-          path: appendColumnToPath(paramsPath, 'dvc_logs_dir')
+          path: appendColumnToPath(paramsPath, 'dvc_logs_dir'),
+          tooltip: undefined
         },
         {
           collapsibleState: 0,
@@ -336,7 +357,8 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'log_file',
-          path: appendColumnToPath(paramsPath, 'log_file')
+          path: appendColumnToPath(paramsPath, 'log_file'),
+          tooltip: undefined
         },
         {
           collapsibleState: 0,
@@ -344,7 +366,8 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
           label: 'dropout',
-          path: appendColumnToPath(paramsPath, 'dropout')
+          path: appendColumnToPath(paramsPath, 'dropout'),
+          tooltip: undefined
         },
         {
           collapsibleState: 1,
@@ -352,7 +375,8 @@ describe('ExperimentsColumnsTree', () => {
           dvcRoot: mockedDvcRoot,
           iconPath: mockedIndeterminateCheckbox,
           label: 'process',
-          path: processPath
+          path: processPath,
+          tooltip: undefined
         }
       ])
 
@@ -364,7 +388,8 @@ describe('ExperimentsColumnsTree', () => {
             descendantStatuses: undefined,
             hasChildren: false,
             label: getLabel(param.path),
-            status: Status.SELECTED
+            status: Status.SELECTED,
+            tooltip: undefined
           }))
       )
       const greatGrandChildren = await experimentsColumnsTree.getChildren({
@@ -373,7 +398,8 @@ describe('ExperimentsColumnsTree', () => {
         dvcRoot: mockedDvcRoot,
         iconPath: mockedIndeterminateCheckbox,
         label: 'process',
-        path: processPath
+        path: processPath,
+        tooltip: undefined
       })
 
       expect(greatGrandChildren).toStrictEqual([
@@ -388,7 +414,8 @@ describe('ExperimentsColumnsTree', () => {
             'params.yaml',
             'process',
             'threshold'
-          )
+          ),
+          tooltip: undefined
         },
         {
           collapsibleState: 0,
@@ -401,7 +428,8 @@ describe('ExperimentsColumnsTree', () => {
             'params.yaml',
             'process',
             'test_arg'
-          )
+          ),
+          tooltip: undefined
         }
       ])
     })
@@ -411,7 +439,7 @@ describe('ExperimentsColumnsTree', () => {
     it('should return the correct tree item for a repository root', () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
-        expect(collapsibleState).toStrictEqual(1)
+        expect(collapsibleState).toStrictEqual(2)
         mockedItem = { collapsibleState, uri }
         return mockedItem
       })
@@ -454,7 +482,8 @@ describe('ExperimentsColumnsTree', () => {
       dvcRoot: mockedDvcRoot,
       iconPath: mockedSelectedCheckbox,
       label: filename,
-      path: relParamsPath
+      path: relParamsPath,
+      tooltip: undefined
     }
 
     const treeItem = experimentsColumnsTree.getTreeItem(columnsItem)
@@ -469,6 +498,7 @@ describe('ExperimentsColumnsTree', () => {
       },
       description: '3/4',
       iconPath: mockedSelectedCheckbox,
+      tooltip: undefined,
       uri: filename
     })
   })
@@ -494,7 +524,8 @@ describe('ExperimentsColumnsTree', () => {
       dvcRoot: mockedDvcRoot,
       iconPath: mockedEmptyCheckbox,
       label: filename,
-      path: relParamsPath
+      path: relParamsPath,
+      tooltip: undefined
     }
 
     const treeItem = experimentsColumnsTree.getTreeItem(columnsItem)
@@ -508,6 +539,7 @@ describe('ExperimentsColumnsTree', () => {
         title: 'toggle'
       },
       iconPath: mockedEmptyCheckbox,
+      tooltip: undefined,
       uri: filename
     })
   })

@@ -243,7 +243,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_CUSTOM_PLOT_REMOVED]: undefined
   [EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED]: undefined
   [EventName.VIEWS_PLOTS_FOCUS_CHANGED]: WebviewFocusChangedProperties
-  [EventName.VIEWS_PLOTS_MANUAL_REFRESH]: { revisions: number }
+  [EventName.VIEWS_PLOTS_MANUAL_REFRESH]: undefined
   [EventName.VIEWS_PLOTS_REVISIONS_REORDERED]: undefined
   [EventName.VIEWS_PLOTS_COMPARISON_ROWS_REORDERED]: undefined
   [EventName.VIEWS_PLOTS_SECTION_RESIZED]: {

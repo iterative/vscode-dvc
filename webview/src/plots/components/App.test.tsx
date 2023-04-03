@@ -247,7 +247,14 @@ describe('App', () => {
         plots: [
           {
             path: 'training/plots/images/misclassified.jpg',
-            revisions: { ad2b5ec: { revision: 'ad2b5ec' } }
+            revisions: {
+              ad2b5ec: {
+                errors: undefined,
+                loading: true,
+                revision: 'ad2b5ec',
+                url: undefined
+              }
+            }
           }
         ],
         revisions: [
@@ -1843,6 +1850,7 @@ describe('App', () => {
     })
   })
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('Ribbon', () => {
     const getDisplayedRevisionOrder = () => {
       const ribbon = screen.getByTestId('ribbon')
@@ -1930,15 +1938,42 @@ describe('App', () => {
 
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
-        payload: [
-          EXPERIMENT_WORKSPACE_ID,
-          'main',
-          '4fb124a',
-          '42b8736',
-          '1ba7bcd'
-        ],
         type: MessageFromWebviewType.REFRESH_REVISIONS
       })
+    })
+
+    it('should show an error indicator for each revision with an error', () => {
+      renderAppWithOptionalData({
+        comparison: comparisonTableFixture,
+        selectedRevisions: plotsRevisionsFixture.map(rev => {
+          if (rev.revision === 'main') {
+            return {
+              ...rev,
+              errors: ['error']
+            }
+          }
+          return rev
+        })
+      })
+      const errorIndicators = screen.getAllByText('!')
+      expect(errorIndicators).toHaveLength(1)
+    })
+
+    it('should not show an error indicator for a loading revision', () => {
+      renderAppWithOptionalData({
+        comparison: comparisonTableFixture,
+        selectedRevisions: plotsRevisionsFixture.map(rev => {
+          if (rev.revision === 'main') {
+            return {
+              ...rev,
+              errors: ['error'],
+              fetched: false
+            }
+          }
+          return rev
+        })
+      })
+      expect(screen.queryByText('!')).not.toBeInTheDocument()
     })
   })
 

@@ -76,7 +76,7 @@ describe('CliReader', () => {
       const cliOutput = await dvcReader.expShow(cwd)
       expect(cliOutput).toStrictEqual(expShowFixture)
       expect(mockedCreateProcess).toHaveBeenCalledWith({
-        args: ['exp', 'show', '-n', '3', JSON_FLAG],
+        args: ['exp', 'show', JSON_FLAG],
         cwd,
         env: mockedEnv,
         executable: 'dvc'
@@ -180,7 +180,30 @@ describe('CliReader', () => {
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(''))
 
       const plots = await dvcReader.plotsDiff(cwd, 'HEAD')
-      expect(plots).toStrictEqual({})
+      expect(plots).toStrictEqual({ data: {} })
+    })
+
+    it('should remove an empty errors array from the output', async () => {
+      const cwd = __dirname
+
+      mockedCreateProcess.mockReturnValueOnce(
+        getMockedProcess(JSON.stringify({ errors: [] }))
+      )
+
+      const plots = await dvcReader.plotsDiff(cwd, 'main')
+      expect(plots).toStrictEqual({ data: {} })
+    })
+
+    it('should not remove an errors array with entries from the output', async () => {
+      const cwd = __dirname
+      const errors = [{ msg: 'something went wrong' }]
+
+      mockedCreateProcess.mockReturnValueOnce(
+        getMockedProcess(JSON.stringify({ errors }))
+      )
+
+      const plots = await dvcReader.plotsDiff(cwd, 'main')
+      expect(plots).toStrictEqual({ data: {}, errors })
     })
 
     it('should match the expected output', async () => {

@@ -15,7 +15,7 @@ import Tooltip, {
 
 export interface ComparisonTableRowProps {
   path: string
-  plots: (ComparisonPlot & { fetched: boolean })[]
+  plots: ComparisonPlot[]
   nbColumns: number
   pinnedColumn: string
 }

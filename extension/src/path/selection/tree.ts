@@ -1,5 +1,6 @@
 import {
   Event,
+  MarkdownString,
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
@@ -11,33 +12,38 @@ import { WorkspaceExperiments } from '../../experiments/workspace'
 import { WorkspacePlots } from '../../plots/workspace'
 import { Resource, ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
-import { createTreeView } from '../../tree'
+import { createTreeView, isRoot } from '../../tree'
 import { definedAndNonEmpty, sortCollectedArray } from '../../util/array'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { ViewOpenedEventName } from '../../telemetry/constants'
 import { Disposable } from '../../class/dispose'
 
+export type ErrorItem = { error: string; path: string }
+
 export type PathSelectionItem = {
+  collapsibleState: TreeItemCollapsibleState
   description: string | undefined
   dvcRoot: string
-  collapsibleState: TreeItemCollapsibleState
+  iconPath: Resource | Uri
   label: string | undefined
   path: string
-  iconPath: Resource | Uri
+  tooltip: MarkdownString | undefined
 }
+
+type Item = ErrorItem | PathSelectionItem
 
 export abstract class BasePathSelectionTree<
     T extends WorkspaceExperiments | WorkspacePlots
   >
   extends Disposable
-  implements TreeDataProvider<string | PathSelectionItem>
+  implements TreeDataProvider<string | Item>
 {
   public readonly onDidChangeTreeData: Event<PathSelectionItem | void>
 
   protected readonly workspace: T
   protected readonly resourceLocator: ResourceLocator
 
-  private readonly view: TreeView<string | PathSelectionItem>
+  private readonly view: TreeView<string | Item>
 
   private viewed = false
   private readonly openEventName: ViewOpenedEventName
@@ -59,9 +65,7 @@ export abstract class BasePathSelectionTree<
 
     this.onDidChangeTreeData = changeEvent
 
-    this.view = this.dispose.track(
-      createTreeView<PathSelectionItem>(name, this)
-    )
+    this.view = this.dispose.track(createTreeView<Item>(name, this))
 
     this.toggleCommand = toggleCommand
 
@@ -70,33 +74,9 @@ export abstract class BasePathSelectionTree<
     this.updateDescriptionOnChange()
   }
 
-  public getTreeItem(element: string | PathSelectionItem): TreeItem {
-    if (this.isRoot(element)) {
-      const resourceUri = Uri.file(element)
-      return new TreeItem(resourceUri, TreeItemCollapsibleState.Collapsed)
-    }
-
-    const { dvcRoot, path, description, iconPath } = element
-
-    const treeItem = this.getBaseTreeItem(element)
-
-    treeItem.command = {
-      arguments: [{ dvcRoot, path }],
-      command: this.toggleCommand,
-      title: 'toggle'
-    }
-
-    treeItem.iconPath = iconPath
-    if (description) {
-      treeItem.description = description
-    }
-
-    return treeItem
-  }
-
   public getChildren(
     element?: string | PathSelectionItem
-  ): Promise<PathSelectionItem[] | string[]> {
+  ): Promise<Item[] | string[]> {
     if (element) {
       return Promise.resolve(this.getChildElements(element))
     }
@@ -104,7 +84,7 @@ export abstract class BasePathSelectionTree<
     return this.getRootElements()
   }
 
-  protected getIconPath(status?: Status) {
+  protected getIconPath(status: Status) {
     if (status === Status.SELECTED) {
       return this.resourceLocator.checkedCheckbox
     }
@@ -132,9 +112,17 @@ export abstract class BasePathSelectionTree<
     path: string
     status: Status
     label?: string
+    tooltip?: MarkdownString
   }) {
-    const { dvcRoot, descendantStatuses, hasChildren, path, status, label } =
-      element
+    const {
+      dvcRoot,
+      descendantStatuses,
+      hasChildren,
+      path,
+      status,
+      label,
+      tooltip
+    } = element
 
     const description = this.getDescription(descendantStatuses, '/')
     const iconPath = this.getIconPath(status)
@@ -142,14 +130,36 @@ export abstract class BasePathSelectionTree<
       ? TreeItemCollapsibleState.Collapsed
       : TreeItemCollapsibleState.None
 
-    return {
+    const pathSelectionItem: PathSelectionItem = {
       collapsibleState,
       description,
       dvcRoot,
       iconPath,
       label,
-      path
-    } as PathSelectionItem
+      path,
+      tooltip
+    }
+
+    return pathSelectionItem
+  }
+
+  protected addTreeItemDetails(element: PathSelectionItem, treeItem: TreeItem) {
+    const { dvcRoot, path, description, iconPath, tooltip } = element
+
+    treeItem.command = {
+      arguments: [{ dvcRoot, path }],
+      command: this.toggleCommand,
+      title: 'toggle'
+    }
+
+    treeItem.iconPath = iconPath
+    if (description) {
+      treeItem.description = description
+    }
+
+    treeItem.tooltip = tooltip
+
+    return treeItem
   }
 
   private updateDescriptionOnChange() {
@@ -182,14 +192,12 @@ export abstract class BasePathSelectionTree<
     return sortCollectedArray(dvcRoots, (a, b) => a.localeCompare(b))
   }
 
-  private getChildElements(
-    element: string | PathSelectionItem
-  ): PathSelectionItem[] {
+  private getChildElements(element: string | PathSelectionItem): Item[] {
     if (!element) {
       return []
     }
 
-    if (this.isRoot(element)) {
+    if (isRoot(element)) {
       return this.getRepositoryChildren(element, undefined)
     }
 
@@ -198,16 +206,12 @@ export abstract class BasePathSelectionTree<
     return this.getRepositoryChildren(dvcRoot, path)
   }
 
-  private isRoot(element: string | PathSelectionItem): element is string {
-    return typeof element === 'string'
-  }
-
-  protected abstract getBaseTreeItem(element: PathSelectionItem): TreeItem
+  abstract getTreeItem(element: string | Item): TreeItem
 
   protected abstract getRepositoryChildren(
     dvcRoot: string,
     path: string | undefined
-  ): PathSelectionItem[]
+  ): Item[]
 
   protected abstract getRepositoryStatuses(dvcRoot: string): Status[]
 }

@@ -1,8 +1,4 @@
-import {
-  EXPERIMENT_WORKSPACE_ID,
-  ExperimentsOutput,
-  PlotsOutputOrError
-} from '../../cli/dvc/contract'
+import { ExperimentsOutput, PlotsOutputOrError } from '../../cli/dvc/contract'
 import { isDvcError } from '../../cli/dvc/reader'
 import { sortCollectedArray, uniqueValues } from '../../util/array'
 import { isImagePlot, Plot, TemplatePlot } from '../webview/contract'
@@ -46,13 +42,15 @@ const collectKeyData = (acc: string[], key: string, plots: Plot[]): void => {
 }
 
 export const collectFiles = (
-  data: PlotsOutputOrError,
+  output: PlotsOutputOrError,
   collectedFiles: string[]
 ): string[] => {
   const acc = [...collectedFiles]
-  if (isDvcError(data)) {
+  if (isDvcError(output)) {
     return acc
   }
+
+  const { data } = output
 
   for (const [key, plots] of Object.entries(data)) {
     collectKeyData(acc, key, plots)
@@ -73,27 +71,4 @@ export const collectMetricsFiles = (
   ])
 
   return sortCollectedArray(metricsFiles)
-}
-
-const collectRev = (acc: string[], rev: string): void => {
-  if (rev !== EXPERIMENT_WORKSPACE_ID && !acc.includes(rev)) {
-    acc.push(rev)
-  }
-}
-
-export const collectRevs = (
-  missingRevisions: string[],
-  mutableRevisions: string[]
-): string[] => {
-  const acc: string[] = []
-
-  for (const missingRevision of missingRevisions) {
-    collectRev(acc, missingRevision)
-  }
-
-  for (const mutableRevision of mutableRevisions) {
-    collectRev(acc, mutableRevision)
-  }
-
-  return [EXPERIMENT_WORKSPACE_ID, ...sortCollectedArray(acc)]
 }
