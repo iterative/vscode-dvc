@@ -32,9 +32,18 @@ export const Ribbon: React.FC = () => {
     [dispatch]
   )
 
+  const setInitialRibbonHeight = useCallback(
+    () => dispatch(update(0)),
+    [dispatch]
+  )
+
   useEffect(() => {
     changeRibbonHeight()
-  }, [revisions, changeRibbonHeight])
+
+    return () => {
+      setInitialRibbonHeight()
+    }
+  }, [revisions, changeRibbonHeight, setInitialRibbonHeight])
 
   useEffect(() => {
     window.addEventListener('resize', changeRibbonHeight)

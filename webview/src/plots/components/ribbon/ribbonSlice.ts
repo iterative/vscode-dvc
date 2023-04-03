@@ -5,7 +5,7 @@ export interface RibbonState {
 }
 
 export const ribbonInitialState: RibbonState = {
-  height: 50
+  height: 0
 }
 
 export const ribbonSlice = createSlice({
