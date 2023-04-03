@@ -1,12 +1,6 @@
-import {
-  ColorScale,
-  CustomPlotData,
-  CustomPlotType,
-  PlotsSection
-} from 'dvc/src/plots/webview/contract'
-import React, { useMemo, useEffect, useState } from 'react'
+import { PlotsSection } from 'dvc/src/plots/webview/contract'
+import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { createMetricVsParamSpec, createCheckpointSpec } from './util'
 import { changeDisabledDragIds } from './customPlotsSlice'
 import { ZoomablePlot } from '../ZoomablePlot'
 import styles from '../styles.module.scss'
@@ -17,33 +11,13 @@ import { PlotsState } from '../../store'
 interface CustomPlotProps {
   id: string
 }
-
-const createCustomPlotSpec = (
-  plot: CustomPlotData | undefined,
-  colors: ColorScale | undefined
-) => {
-  if (!plot) {
-    return {}
-  }
-
-  if (plot.type === CustomPlotType.CHECKPOINT) {
-    return createCheckpointSpec(plot.yTitle, plot.metric, plot.param, colors)
-  }
-  return createMetricVsParamSpec(plot.yTitle, plot.param)
-}
-
 export const CustomPlot: React.FC<CustomPlotProps> = ({ id }) => {
   const plotSnapshot = useSelector(
     (state: PlotsState) => state.custom.plotsSnapshots[id]
   )
 
   const [plot, setPlot] = useState(plotDataStore[PlotsSection.CUSTOM_PLOTS][id])
-  const { nbItemsPerRow, colors } = useSelector(
-    (state: PlotsState) => state.custom
-  )
-  const spec = useMemo(() => {
-    return createCustomPlotSpec(plot, colors)
-  }, [plot, colors])
+  const { nbItemsPerRow } = useSelector((state: PlotsState) => state.custom)
 
   useEffect(() => {
     setPlot(plotDataStore[PlotsSection.CUSTOM_PLOTS][id])
@@ -58,7 +32,7 @@ export const CustomPlot: React.FC<CustomPlotProps> = ({ id }) => {
   return (
     <div className={styles.plot} data-testid={key} id={id} style={withScale(1)}>
       <ZoomablePlot
-        spec={spec}
+        spec={plot.spec}
         id={id}
         changeDisabledDragIds={changeDisabledDragIds}
         currentSnapPoint={nbItemsPerRow}

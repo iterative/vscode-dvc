@@ -5,7 +5,9 @@ import {
   getFullValuePath,
   CHECKPOINTS_PARAM,
   CustomPlotsOrderValue,
-  isCheckpointValue
+  isCheckpointValue,
+  createCheckpointSpec,
+  createMetricVsParamSpec
 } from './custom'
 import { getRevisionFirstThreeColumns } from './util'
 import {
@@ -125,14 +127,14 @@ const getMetricVsParamValues = (
 const getCustomPlotData = (
   orderValue: CustomPlotsOrderValue,
   experiments: ExperimentWithCheckpoints[],
-  selectedRevisions: string[] | undefined = [],
+  scale: ColorScale | undefined,
   height: number,
   nbItemsPerRow: number
 ): CustomPlotData => {
   const { metric, param, type } = orderValue
   const metricPath = getFullValuePath(ColumnType.METRICS, metric)
-
   const paramPath = getFullValuePath(ColumnType.PARAMS, param)
+  const selectedRevisions = scale?.domain || []
 
   const selectedExperiments = experiments.filter(({ name, label }) =>
     selectedRevisions.includes(name || label)
@@ -142,13 +144,19 @@ const getCustomPlotData = (
     ? getCheckpointValues(selectedExperiments, metricPath)
     : getMetricVsParamValues(experiments, metricPath, paramPath)
 
+  const yTitle = truncateVerticalTitle(metric, nbItemsPerRow, height) as string
+
+  const spec = isCheckpointValue(type)
+    ? createCheckpointSpec(yTitle, metric, param, scale)
+    : createMetricVsParamSpec(yTitle, metric, param)
+
   return {
     id: getCustomPlotId(metric, param),
     metric,
     param,
+    spec,
     type,
-    values,
-    yTitle: truncateVerticalTitle(metric, nbItemsPerRow, height) as string
+    values
   } as CustomPlotData
 }
 
@@ -156,19 +164,19 @@ export const collectCustomPlots = ({
   plotsOrderValues,
   experiments,
   hasCheckpoints,
-  selectedRevisions,
+  scale,
   height,
   nbItemsPerRow
 }: {
   plotsOrderValues: CustomPlotsOrderValue[]
   experiments: ExperimentWithCheckpoints[]
   hasCheckpoints: boolean
-  selectedRevisions: string[] | undefined
+  scale: ColorScale | undefined
   height: number
   nbItemsPerRow: number
 }): CustomPlotData[] => {
   const plots = []
-  const shouldSkipCheckpointPlots = !hasCheckpoints || !selectedRevisions
+  const shouldSkipCheckpointPlots = !hasCheckpoints || !scale?.domain
 
   for (const value of plotsOrderValues) {
     if (shouldSkipCheckpointPlots && isCheckpointValue(value.type)) {
@@ -176,13 +184,7 @@ export const collectCustomPlots = ({
     }
 
     plots.push(
-      getCustomPlotData(
-        value,
-        experiments,
-        selectedRevisions,
-        height,
-        nbItemsPerRow
-      )
+      getCustomPlotData(value, experiments, scale, height, nbItemsPerRow)
     )
   }
 
