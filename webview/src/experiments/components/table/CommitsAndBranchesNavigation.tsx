@@ -20,7 +20,6 @@ export const CommitsAndBranchesNavigation: React.FC = () => {
         <button
           className={styles.commitsAndBranchesNavButton}
           onClick={showMoreCommits}
-          data-testid="show-more-commits"
           disabled={isBranchesView}
         >
           Show More Commits
@@ -30,7 +29,6 @@ export const CommitsAndBranchesNavigation: React.FC = () => {
         <button
           className={styles.commitsAndBranchesNavButton}
           onClick={showLessCommits}
-          data-testid="show-less-commits"
           disabled={isBranchesView}
         >
           Show Less Commits
