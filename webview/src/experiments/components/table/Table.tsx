@@ -14,7 +14,7 @@ import { InstanceProp, RowProp } from './interfaces'
 import { RowSelectionContext } from './RowSelectionContext'
 import { TableBody } from './TableBody'
 import { Indicators } from './Indicators'
-import { ShowMoreCommitsRow } from './ShowMoreCommitsRow'
+import { CommitsAndBranchesNavigation } from './CommitsAndBranchesNavigation'
 import { ExperimentsState } from '../../store'
 import { getSelectedForPlotsCount } from '../../util/rows'
 
@@ -108,7 +108,7 @@ export const Table: React.FC<TableProps> = ({
           />
         ))}
       </table>
-      <ShowMoreCommitsRow />
+      <CommitsAndBranchesNavigation />
       <Indicators selectedForPlotsCount={selectedForPlotsCount} />
     </div>
   )

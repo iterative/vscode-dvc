@@ -9,16 +9,16 @@ import {
 import styles from './styles.module.scss'
 import { ExperimentsState } from '../../store'
 
-export const ShowMoreCommitsRow: React.FC = () => {
+export const CommitsAndBranchesNavigation: React.FC = () => {
   const { hasMoreCommits, isBranchesView, isShowingMoreCommits } = useSelector(
     (state: ExperimentsState) => state.tableData
   )
 
   return (
-    <div className={styles.showMoreCommits}>
+    <div className={styles.commitsAndBranchesNav}>
       {hasMoreCommits && (
         <button
-          className={styles.showMoreCommitsButton}
+          className={styles.commitsAndBranchesNavButton}
           onClick={showMoreCommits}
           data-testid="show-more-commits"
           disabled={isBranchesView}
@@ -28,7 +28,7 @@ export const ShowMoreCommitsRow: React.FC = () => {
       )}
       {isShowingMoreCommits && (
         <button
-          className={styles.showMoreCommitsButton}
+          className={styles.commitsAndBranchesNavButton}
           onClick={showLessCommits}
           data-testid="show-less-commits"
           disabled={isBranchesView}
@@ -39,7 +39,7 @@ export const ShowMoreCommitsRow: React.FC = () => {
       <span className={styles.separator} />
 
       <button
-        className={styles.showMoreCommitsButton}
+        className={styles.commitsAndBranchesNavButton}
         onClick={isBranchesView ? switchToCommitsView : switchToBranchesView}
       >
         {isBranchesView ? 'Switch to Commits View' : 'Switch to Branches View'}
