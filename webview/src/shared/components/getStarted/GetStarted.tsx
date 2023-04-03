@@ -5,16 +5,18 @@ export type GetStartedProps = {
   addItems: React.ReactNode
   showEmpty: boolean
   welcome: React.ReactNode
+  isFullScreen?: boolean
 }
 
 export const GetStarted: React.FC<GetStartedProps> = ({
   addItems,
   welcome,
-  showEmpty
+  showEmpty,
+  isFullScreen
 }: GetStartedProps) => {
   if (!showEmpty) {
-    return <EmptyState>{addItems}</EmptyState>
+    return <EmptyState isFullScreen={isFullScreen}>{addItems}</EmptyState>
   }
 
-  return <EmptyState>{welcome}</EmptyState>
+  return <EmptyState isFullScreen={isFullScreen}>{welcome}</EmptyState>
 }
