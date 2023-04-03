@@ -22,8 +22,7 @@ import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../../../commands/external'
-import { buildPlots, getExpectedCustomPlotsData } from '../../plots/util'
-import customPlotsFixture from '../../../fixtures/expShow/base/customPlots'
+import { buildPlots } from '../../plots/util'
 import expShowFixture from '../../../fixtures/expShow/base/output'
 import { ExperimentsTree } from '../../../../experiments/model/tree'
 import { buildExperiments, stubWorkspaceExperimentsGetters } from '../util'
@@ -38,7 +37,8 @@ import { Param } from '../../../../experiments/model/modify/collect'
 import { WorkspaceExperiments } from '../../../../experiments/workspace'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 import { DvcReader } from '../../../../cli/dvc/reader'
-import { ColorScale, CustomPlotType } from '../../../../plots/webview/contract'
+import { copyOriginalColors } from '../../../../experiments/model/status/colors'
+import { Revision } from '../../../../plots/webview/contract'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = getTimeSafeDisposer()
@@ -53,9 +53,6 @@ suite('Experiments Tree Test Suite', () => {
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('ExperimentsTree', () => {
-    const { colors } = customPlotsFixture
-    const { domain, range } = colors as ColorScale
-
     it('should appear in the UI', async () => {
       await expect(
         commands.executeCommand('dvc.views.experimentsTree.focus')
@@ -65,32 +62,37 @@ suite('Experiments Tree Test Suite', () => {
     it('should be able to toggle whether an experiment is shown in the plots webview with dvc.views.experiments.toggleStatus', async () => {
       const mockNow = getMockNow()
 
-      const { plots, messageSpy } = await buildPlots(disposable)
+      const { plots, messageSpy, plotsModel } = await buildPlots(disposable)
 
-      const expectedDomain = [...domain]
-      const expectedRange = [...range]
+      const expectedRevisions: { displayColor: string; id: string }[] = []
+
+      const [{ id }] = plotsModel.getSelectedRevisionDetails()
+
+      for (const {
+        id,
+        displayColor
+      } of plotsModel.getSelectedRevisionDetails()) {
+        expectedRevisions.push({ displayColor, id: id as string })
+      }
 
       const webview = await plots.showWebview()
 
       await webview.isReady()
 
       let updateCall = 1
-      while (expectedDomain.length > 0) {
-        const expectedData = getExpectedCustomPlotsData(
-          expectedDomain,
-          expectedRange
-        )
-
-        const { custom } = getFirstArgOfLastCall(messageSpy)
+      while (expectedRevisions.length > 0) {
+        const { selectedRevisions } = getFirstArgOfLastCall(messageSpy)
 
         expect(
-          { custom },
+          (selectedRevisions as Revision[]).map(({ displayColor, id }) => ({
+            displayColor,
+            id
+          })),
           'a message is sent with colors for the currently selected experiments'
-        ).to.deep.equal(expectedData)
+        ).to.deep.equal(expectedRevisions)
         messageSpy.resetHistory()
 
-        const id = expectedDomain.pop()
-        expectedRange.pop()
+        const { id } = expectedRevisions.pop() as { id: string }
 
         bypassProcessManagerDebounce(mockNow, updateCall)
         const unSelected = await commands.executeCommand(
@@ -107,35 +109,28 @@ suite('Experiments Tree Test Suite', () => {
 
       expect(
         messageSpy,
-        "when there are no experiments selected we don't send checkpoint trend plots"
+        "when there are no experiments selected we don't send any template plots"
       ).to.be.calledWithMatch({
-        custom: {
-          ...customPlotsFixture,
-          colors: undefined,
-          plots: customPlotsFixture.plots.filter(
-            plot => plot.type !== CustomPlotType.CHECKPOINT
-          )
-        }
+        template: null
       })
       messageSpy.resetHistory()
-
-      expectedDomain.push(domain[0])
-      expectedRange.push(range[0])
 
       bypassProcessManagerDebounce(mockNow, updateCall)
       const selected = await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_TOGGLE,
         {
           dvcRoot: dvcDemoPath,
-          id: domain[0]
+          id
         }
       )
 
-      expect(selected, 'the experiment is now selected').to.equal(range[0])
-
-      expect(messageSpy, 'we no longer send null').to.be.calledWithMatch(
-        getExpectedCustomPlotsData(expectedDomain, expectedRange)
+      expect(selected, 'the experiment is now selected').to.equal(
+        copyOriginalColors()[0]
       )
+
+      expect(messageSpy, 'we no longer send null').not.to.be.calledWithMatch({
+        template: null
+      })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set the workspace to selected when trying to toggle a checkpoint experiment that is running in the workspace', async () => {
@@ -222,10 +217,11 @@ suite('Experiments Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to select / de-select experiments using dvc.views.experimentsTree.selectExperiments', async () => {
-      const { plots, messageSpy } = await buildPlots(disposable)
+      const { plots, plotsModel, messageSpy } = await buildPlots(disposable)
 
-      const selectedDisplayName = domain[0]
-      const selectedColor = range[0]
+      const [{ revision: selectedDisplayName, displayColor }] =
+        plotsModel.getSelectedRevisionDetails()
+
       const selectedItem = {
         description: selectedDisplayName,
         label: '',
@@ -266,12 +262,15 @@ suite('Experiments Tree Test Suite', () => {
 
       expect(mockCreateQuickPick).to.be.calledOnce
 
+      const { selectedRevisions } = getFirstArgOfLastCall(messageSpy)
+
       expect(
-        messageSpy,
+        (selectedRevisions as Revision[]).map(({ displayColor, revision }) => ({
+          displayColor,
+          revision
+        })),
         'a message is sent with colors for the currently selected experiments'
-      ).to.be.calledWithMatch(
-        getExpectedCustomPlotsData([selectedDisplayName], [selectedColor])
-      )
+      ).to.deep.equal([{ displayColor, revision: selectedDisplayName }])
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to remove an experiment with dvc.views.experimentsTree.removeExperiment', async () => {

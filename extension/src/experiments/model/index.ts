@@ -45,14 +45,6 @@ export type SelectedExperimentWithColor = Experiment & {
   selected: true
 }
 
-export type ExperimentWithCheckpoints = Experiment & {
-  checkpoints?: Experiment[]
-}
-
-export type ExperimentWithDefinedCheckpoints = Experiment & {
-  checkpoints: Experiment[]
-}
-
 export enum ExperimentType {
   WORKSPACE = 'workspace',
   COMMIT = 'commit',
@@ -304,8 +296,12 @@ export class ExperimentsModel extends ModelWithPersistence {
     ]
   }
 
-  public getRecordsWithoutCheckpoints() {
+  public getAllRecords() {
     return [...this.getWorkspaceAndCommits(), ...this.getExperimentsAndQueued()]
+  }
+
+  public getWorkspaceCommitsAndExperiments() {
+    return [...this.getWorkspaceAndCommits(), ...this.getExperiments()]
   }
 
   public getErrors() {
@@ -316,26 +312,8 @@ export class ExperimentsModel extends ModelWithPersistence {
     )
   }
 
-  public getExperimentsWithCheckpoints(): ExperimentWithCheckpoints[] {
-    const experimentsWithCheckpoints: ExperimentWithCheckpoints[] = []
-    for (const experiment of this.getRecordsWithoutCheckpoints()) {
-      const { id, status } = experiment
-      if (isQueued(status)) {
-        continue
-      }
-
-      const checkpoints = this.getCheckpointsWithType(id)
-      if (!definedAndNonEmpty(checkpoints)) {
-        experimentsWithCheckpoints.push(experiment)
-        continue
-      }
-      experimentsWithCheckpoints.push({ ...experiment, checkpoints })
-    }
-    return experimentsWithCheckpoints
-  }
-
   public getExperimentParams(id: string) {
-    const params = this.getRecordsWithoutCheckpoints().find(
+    const params = this.getAllRecords().find(
       experiment => experiment.id === id
     )?.params
 

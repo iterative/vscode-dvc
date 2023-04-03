@@ -1,15 +1,9 @@
 import { CustomPlotsOrderValue } from './custom'
-import {
-  pickCustomPlots,
-  pickCustomPlotType,
-  pickMetric,
-  pickMetricAndParam
-} from './quickPick'
+import { pickCustomPlots, pickMetricAndParam } from './quickPick'
 import { quickPickManyValues, quickPickValue } from '../../vscode/quickPick'
 import { Title } from '../../vscode/title'
 import { Toast } from '../../vscode/toast'
 import { ColumnType } from '../../experiments/webview/contract'
-import { CustomPlotType } from '../webview/contract'
 import { customPlotsOrderFixture } from '../../test/fixtures/expShow/base/customPlots'
 
 jest.mock('../../vscode/quickPick')
@@ -41,19 +35,12 @@ describe('pickCustomPlots', () => {
     ]
     const mockedPlots = [
       {
-        metric: 'summary.json:loss',
-        param: 'epoch',
-        type: CustomPlotType.CHECKPOINT
-      },
-      {
         metric: 'summary.json:accuracy',
-        param: 'params.yaml:epochs',
-        type: CustomPlotType.METRIC_VS_PARAM
+        param: 'params.yaml:epochs'
       },
       {
         metric: 'summary.json:learning_rate',
-        param: 'summary.json:process.threshold',
-        type: CustomPlotType.METRIC_VS_PARAM
+        param: 'summary.json:process.threshold'
       }
     ] as CustomPlotsOrderValue[]
 
@@ -68,12 +55,6 @@ describe('pickCustomPlots', () => {
     expect(mockedQuickPickManyValues).toHaveBeenCalledTimes(1)
     expect(mockedQuickPickManyValues).toHaveBeenCalledWith(
       [
-        {
-          description: 'Checkpoint Trend Plot',
-          detail: 'metrics:summary.json:loss',
-          label: 'loss',
-          value: 'custom-summary.json:loss-epoch'
-        },
         {
           description: 'Metric Vs Param Plot',
           detail: 'metrics:summary.json:accuracy vs params:params.yaml:epochs',
@@ -90,173 +71,6 @@ describe('pickCustomPlots', () => {
         }
       ],
       { title: Title.SELECT_CUSTOM_PLOTS_TO_REMOVE }
-    )
-  })
-})
-
-describe('pickCustomPlotType', () => {
-  it('should end early if there are no custom plots available', async () => {
-    mockedQuickPickValue.mockResolvedValueOnce(undefined)
-    const undef = await pickCustomPlotType([], [])
-    expect(undef).toBeUndefined()
-    expect(mockedShowError).toHaveBeenCalledTimes(1)
-  })
-
-  it('should return a chosen custom plot type', async () => {
-    const expectedType = CustomPlotType.CHECKPOINT
-    mockedQuickPickValue.mockResolvedValueOnce(expectedType)
-
-    const picked = await pickCustomPlotType(
-      [
-        {
-          hasChildren: false,
-          label: 'dropout',
-          path: 'params:params.yaml:dropout',
-          type: ColumnType.PARAMS
-        },
-        {
-          hasChildren: false,
-          label: 'accuracy',
-          path: 'metrics:summary.json:accuracy',
-          type: ColumnType.METRICS
-        }
-      ],
-      []
-    )
-
-    expect(picked).toStrictEqual(expectedType)
-    expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
-    expect(mockedQuickPickValue).toHaveBeenCalledWith(
-      [
-        {
-          description:
-            'A linear plot that compares a chosen metric and param with current experiments.',
-          label: 'Metric Vs Param',
-          value: CustomPlotType.METRIC_VS_PARAM
-        },
-        {
-          description:
-            'A linear plot that shows how a chosen metric changes over selected experiments.',
-          label: 'Checkpoint Trend',
-          value: CustomPlotType.CHECKPOINT
-        }
-      ],
-      {
-        title: Title.SELECT_PLOT_TYPE_CUSTOM_PLOT
-      }
-    )
-  })
-  it('should show the checkpoint type if available', async () => {
-    const expectedType = CustomPlotType.CHECKPOINT
-    mockedQuickPickValue.mockResolvedValueOnce(expectedType)
-
-    const picked = await pickCustomPlotType(
-      [
-        {
-          hasChildren: false,
-          label: 'epochs',
-          path: 'params:params.yaml:epochs',
-          type: ColumnType.PARAMS
-        },
-        {
-          hasChildren: false,
-          label: 'dropout',
-          path: 'params:params.yaml:dropout',
-          type: ColumnType.PARAMS
-        },
-        {
-          hasChildren: false,
-          label: 'accuracy',
-          path: 'metrics:summary.json:accuracy',
-          type: ColumnType.METRICS
-        },
-        {
-          hasChildren: false,
-          label: 'loss',
-          path: 'metrics:summary.json:loss',
-          type: ColumnType.METRICS
-        }
-      ],
-      [
-        ...customPlotsOrderFixture.slice(0, 2),
-        {
-          metric: 'summary.json:accuracy',
-          param: 'params.yaml:dropout',
-          type: CustomPlotType.METRIC_VS_PARAM
-        },
-        {
-          metric: 'summary.json:loss',
-          param: 'params.yaml:epochs',
-          type: CustomPlotType.METRIC_VS_PARAM
-        }
-      ]
-    )
-
-    expect(picked).toStrictEqual(expectedType)
-    expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
-    expect(mockedQuickPickValue).toHaveBeenCalledWith(
-      [
-        {
-          description:
-            'A linear plot that shows how a chosen metric changes over selected experiments.',
-          label: 'Checkpoint Trend',
-          value: CustomPlotType.CHECKPOINT
-        }
-      ],
-      {
-        title: Title.SELECT_PLOT_TYPE_CUSTOM_PLOT
-      }
-    )
-  })
-
-  it('should show the metric vs param type if available', async () => {
-    const expectedType = CustomPlotType.CHECKPOINT
-    mockedQuickPickValue.mockResolvedValueOnce(expectedType)
-
-    const picked = await pickCustomPlotType(
-      [
-        {
-          hasChildren: false,
-          label: 'epochs',
-          path: 'params.yaml:epochs',
-          type: ColumnType.PARAMS
-        },
-        {
-          hasChildren: false,
-          label: 'dropout',
-          path: 'params:params.yaml:dropout',
-          type: ColumnType.PARAMS
-        },
-        {
-          hasChildren: false,
-          label: 'accuracy',
-          path: 'metrics:summary.json:accuracy',
-          type: ColumnType.METRICS
-        },
-        {
-          hasChildren: false,
-          label: 'loss',
-          path: 'summary.json:loss',
-          type: ColumnType.METRICS
-        }
-      ],
-      customPlotsOrderFixture
-    )
-
-    expect(picked).toStrictEqual(expectedType)
-    expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
-    expect(mockedQuickPickValue).toHaveBeenCalledWith(
-      [
-        {
-          description:
-            'A linear plot that compares a chosen metric and param with current experiments.',
-          label: 'Metric Vs Param',
-          value: CustomPlotType.METRIC_VS_PARAM
-        }
-      ],
-      {
-        title: Title.SELECT_PLOT_TYPE_CUSTOM_PLOT
-      }
     )
   })
 })
@@ -404,13 +218,11 @@ describe('pickMetricAndParam', () => {
         ...customPlotsOrderFixture,
         {
           metric: 'summary.json:val_accuracy',
-          param: 'params.yaml:dropout',
-          type: CustomPlotType.METRIC_VS_PARAM
+          param: 'params.yaml:dropout'
         },
         {
           metric: 'summary.json:val_accuracy',
-          param: 'params.yaml:epochs',
-          type: CustomPlotType.METRIC_VS_PARAM
+          param: 'params.yaml:epochs'
         }
       ]
     )
@@ -450,136 +262,6 @@ describe('pickMetricAndParam', () => {
       {
         title: Title.SELECT_PARAM_CUSTOM_PLOT
       }
-    )
-  })
-})
-
-describe('pickMetric', () => {
-  it('should end early if there are no metrics or params available', async () => {
-    mockedQuickPickValue.mockResolvedValueOnce(undefined)
-    const undef = await pickMetric([], [])
-    expect(undef).toBeUndefined()
-    expect(mockedShowError).toHaveBeenCalledTimes(1)
-  })
-
-  it('should end early if user does not select a metric', async () => {
-    mockedQuickPickValue.mockResolvedValue(undefined)
-
-    const noMetricSelected = await pickMetric(
-      [
-        {
-          hasChildren: false,
-          label: 'dropout',
-          path: 'params:params.yaml:dropout',
-          type: ColumnType.PARAMS
-        },
-        {
-          hasChildren: false,
-          label: 'dropout',
-          path: 'params:params.yaml:epochs',
-          type: ColumnType.PARAMS
-        },
-        {
-          hasChildren: false,
-          label: 'accuracy',
-          path: 'metrics:summary.json:loss',
-          type: ColumnType.METRICS
-        },
-        {
-          hasChildren: false,
-          label: 'accuracy',
-          path: 'metrics:summary.json:accuracy',
-          type: ColumnType.METRICS
-        }
-      ],
-      customPlotsOrderFixture
-    )
-    expect(noMetricSelected).toBeUndefined()
-  })
-
-  it('should return a metric', async () => {
-    const expectedMetric = {
-      label: 'val_loss',
-      path: 'metrics:summary.json:val_loss'
-    }
-    mockedQuickPickValue.mockResolvedValueOnce(expectedMetric)
-    const metric = await pickMetric(
-      [
-        { ...expectedMetric, hasChildren: false, type: ColumnType.METRICS },
-        {
-          hasChildren: false,
-          label: 'val_accuracy',
-          path: 'metrics:summary.json:val_accuracy',
-          type: ColumnType.METRICS
-        }
-      ],
-      customPlotsOrderFixture
-    )
-
-    expect(metric).toStrictEqual('summary.json:val_loss')
-    expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
-    expect(mockedQuickPickValue).toHaveBeenCalledWith(
-      [
-        {
-          description: 'metrics:summary.json:val_loss',
-          label: 'val_loss',
-          value: { label: 'val_loss', path: 'metrics:summary.json:val_loss' }
-        },
-        {
-          description: 'metrics:summary.json:val_accuracy',
-          label: 'val_accuracy',
-          value: {
-            label: 'val_accuracy',
-            path: 'metrics:summary.json:val_accuracy'
-          }
-        }
-      ],
-      { title: Title.SELECT_METRIC_CUSTOM_PLOT }
-    )
-  })
-  it('should filter out metrics when plots are already created', async () => {
-    mockedQuickPickValue.mockResolvedValueOnce(undefined)
-    await pickMetric(
-      [
-        {
-          hasChildren: false,
-          label: 'loss',
-          path: 'metrics:summary.json:loss',
-          type: ColumnType.METRICS
-        },
-        {
-          hasChildren: false,
-          label: 'val_loss',
-          path: 'metrics:summary.json:val_loss',
-          type: ColumnType.METRICS
-        },
-        {
-          hasChildren: false,
-          label: 'val_accuracy',
-          path: 'metrics:summary.json:val_accuracy',
-          type: ColumnType.METRICS
-        }
-      ],
-      customPlotsOrderFixture
-    )
-    expect(mockedQuickPickValue).toHaveBeenCalledTimes(1)
-    expect(mockedQuickPickValue).toHaveBeenCalledWith(
-      [
-        {
-          description: 'metrics:summary.json:val_loss',
-          label: 'val_loss',
-          value: { label: 'val_loss', path: 'metrics:summary.json:val_loss' }
-        },
-        {
-          description: 'metrics:summary.json:val_accuracy',
-          label: 'val_accuracy',
-          value: {
-            label: 'val_accuracy',
-            path: 'metrics:summary.json:val_accuracy'
-          }
-        }
-      ],
-      { title: Title.SELECT_METRIC_CUSTOM_PLOT }
     )
   })
 })
