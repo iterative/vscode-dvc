@@ -1615,15 +1615,27 @@ describe('App', () => {
     it('should disable the show more and show less commits buttons when isBranchView is set to true', () => {
       renderTable({ ...tableDataFixture, isBranchesView: true })
 
-      expect(screen.getByText('Show More Commits').disabled).toBe(true)
-      expect(screen.getByText('Show Less Commits').disabled).toBe(true)
+      expect(screen.getByText('Show More Commits')).toHaveProperty(
+        'disabled',
+        true
+      )
+      expect(screen.getByText('Show Less Commits')).toHaveProperty(
+        'disabled',
+        true
+      )
     })
 
     it('should not disable the show more and show less commits buttons when isBranchView is set to false', () => {
       renderTable({ ...tableDataFixture, isBranchesView: false })
 
-      expect(screen.getByText('Show More Commits').disabled).toBe(false)
-      expect(screen.getByText('Show Less Commits').disabled).toBe(false)
+      expect(screen.getByText('Show More Commits')).toHaveProperty(
+        'disabled',
+        false
+      )
+      expect(screen.getByText('Show Less Commits')).toHaveProperty(
+        'disabled',
+        false
+      )
     })
   })
 })

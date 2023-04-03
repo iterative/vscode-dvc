@@ -82,6 +82,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   private coloredStatus: ColoredStatus
   private starredExperiments: StarredExperiments
   private numberOfCommitsToShow: number
+  private isBranchesView: boolean
 
   private filters: Map<string, FilterDefinition> = new Map()
 
@@ -123,6 +124,8 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.availableColors = copyOriginalColors().filter(
       color => !assignedColors.has(color)
     )
+
+    this.isBranchesView = false
   }
 
   public transformAndSet(
@@ -459,6 +462,14 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public getNbOfCommitsToShow() {
     return this.numberOfCommitsToShow
+  }
+
+  public setIsBranchesView(isBranchesView: boolean) {
+    this.isBranchesView = isBranchesView
+  }
+
+  public getIsBranchesView() {
+    return this.isBranchesView
   }
 
   private getSubRows(experiments: Experiment[], filters = this.getFilters()) {

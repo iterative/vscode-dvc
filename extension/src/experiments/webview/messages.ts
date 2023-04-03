@@ -51,7 +51,6 @@ export class WebviewMessages {
   private hasValidDvcYaml = true
   private hasMoreCommits = false
   private isShowingMoreCommits = true
-  private isBranchesView = false
 
   private readonly addStage: () => Promise<boolean>
   private readonly getNumCommits: () => Promise<number>
@@ -240,12 +239,12 @@ export class WebviewMessages {
   }
 
   private async switchToBranchesView() {
-    this.isBranchesView = true
+    this.experiments.setIsBranchesView(true)
     await this.changeNbOfCommits(ExperimentFlag.ALL_BRANCHES)
   }
 
   private async switchCommitsView() {
-    this.isBranchesView = false
+    this.experiments.setIsBranchesView(false)
     await this.changeNbOfCommits()
   }
 
@@ -283,7 +282,7 @@ export class WebviewMessages {
       hasMoreCommits: this.hasMoreCommits,
       hasRunningExperiment: this.experiments.hasRunningExperiment(),
       hasValidDvcYaml: this.hasValidDvcYaml,
-      isBranchesView: this.isBranchesView,
+      isBranchesView: this.experiments.getIsBranchesView(),
       isShowingMoreCommits: this.isShowingMoreCommits,
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()
