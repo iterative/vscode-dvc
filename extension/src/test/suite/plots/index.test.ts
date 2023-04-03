@@ -32,7 +32,6 @@ import {
   PlotsSection,
   TemplatePlotGroup,
   TemplatePlotsData,
-  CustomPlotType,
   TemplatePlot,
   ImagePlot
 } from '../../../plots/webview/contract'
@@ -48,7 +47,6 @@ import {
 } from '../../../cli/dvc/contract'
 import { SelectedExperimentWithColor } from '../../../experiments/model'
 import * as customPlotQuickPickUtil from '../../../plots/model/quickPick'
-import { CHECKPOINTS_PARAM } from '../../../plots/model/custom'
 import { ErrorItem } from '../../../path/selection/tree'
 import { isErrorItem } from '../../../tree'
 
@@ -534,13 +532,11 @@ suite('Plots Test Suite', () => {
       expect(mockSetCustomPlotsOrder).to.be.calledWithExactly([
         {
           metric: 'summary.json:accuracy',
-          param: 'params.yaml:epochs',
-          type: CustomPlotType.METRIC_VS_PARAM
+          param: 'params.yaml:epochs'
         },
         {
           metric: 'summary.json:loss',
-          param: 'params.yaml:dropout',
-          type: CustomPlotType.METRIC_VS_PARAM
+          param: 'params.yaml:dropout'
         }
       ])
       expect(messageSpy).to.be.calledOnce
@@ -878,29 +874,15 @@ suite('Plots Test Suite', () => {
 
       const webview = await plots.showWebview()
 
-      const mockPickCustomPlotType = stub(
-        customPlotQuickPickUtil,
-        'pickCustomPlotType'
-      )
       const mockGetMetricAndParam = stub(
         customPlotQuickPickUtil,
         'pickMetricAndParam'
       )
-      const mockGetMetric = stub(customPlotQuickPickUtil, 'pickMetric')
 
       const mockMetricVsParamOrderValue = {
         metric: 'summary.json:accuracy',
-        param: 'params.yaml:dropout',
-        type: CustomPlotType.METRIC_VS_PARAM
+        param: 'params.yaml:dropout'
       }
-
-      const pickMetricVsParamType = new Promise(resolve =>
-        mockPickCustomPlotType.onFirstCall().callsFake(() => {
-          resolve(undefined)
-
-          return Promise.resolve(CustomPlotType.METRIC_VS_PARAM)
-        })
-      )
 
       const pickMetricVsParamOptions = new Promise(resolve =>
         mockGetMetricAndParam.onFirstCall().callsFake(() => {
@@ -920,47 +902,11 @@ suite('Plots Test Suite', () => {
 
       mockMessageReceived.fire({ type: MessageFromWebviewType.ADD_CUSTOM_PLOT })
 
-      await pickMetricVsParamType
       await pickMetricVsParamOptions
 
       expect(mockSetCustomPlotsOrder).to.be.calledWith([
         ...customPlotsOrderFixture,
         mockMetricVsParamOrderValue
-      ])
-      expect(mockSendTelemetryEvent).to.be.calledWith(
-        EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED,
-        undefined
-      )
-
-      const mockCheckpointsOrderValue = {
-        metric: 'summary.json:val_loss',
-        param: CHECKPOINTS_PARAM,
-        type: CustomPlotType.CHECKPOINT
-      }
-
-      const pickCheckpointsType = new Promise(resolve =>
-        mockPickCustomPlotType.onSecondCall().callsFake(() => {
-          resolve(undefined)
-
-          return Promise.resolve(CustomPlotType.CHECKPOINT)
-        })
-      )
-
-      const pickCheckpointOption = new Promise(resolve =>
-        mockGetMetric.onFirstCall().callsFake(() => {
-          resolve(undefined)
-          return Promise.resolve(mockCheckpointsOrderValue.metric)
-        })
-      )
-
-      mockMessageReceived.fire({ type: MessageFromWebviewType.ADD_CUSTOM_PLOT })
-
-      await pickCheckpointsType
-      await pickCheckpointOption
-
-      expect(mockSetCustomPlotsOrder).to.be.calledWith([
-        ...customPlotsOrderFixture,
-        mockCheckpointsOrderValue
       ])
       expect(mockSendTelemetryEvent).to.be.calledWith(
         EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED,
@@ -976,19 +922,13 @@ suite('Plots Test Suite', () => {
 
       const webview = await plots.showWebview()
 
-      const mockPickCustomPlotType = stub(
-        customPlotQuickPickUtil,
-        'pickCustomPlotType'
-      )
-
       const mockGetMetricAndParam = stub(
         customPlotQuickPickUtil,
         'pickMetricAndParam'
       )
-      const mockGetMetric = stub(customPlotQuickPickUtil, 'pickMetric')
 
       const pickUndefinedType = new Promise(resolve =>
-        mockPickCustomPlotType.onFirstCall().callsFake(() => {
+        mockGetMetricAndParam.onFirstCall().callsFake(() => {
           resolve(undefined)
 
           return Promise.resolve(undefined)
@@ -1004,51 +944,6 @@ suite('Plots Test Suite', () => {
       mockMessageReceived.fire({ type: MessageFromWebviewType.ADD_CUSTOM_PLOT })
 
       await pickUndefinedType
-
-      expect(mockSetCustomPlotsOrder).to.not.be.called
-      expect(mockSendTelemetryEvent).to.not.be.called
-
-      const pickMetricVsParamType = new Promise(resolve =>
-        mockPickCustomPlotType.onSecondCall().callsFake(() => {
-          resolve(undefined)
-
-          return Promise.resolve(CustomPlotType.METRIC_VS_PARAM)
-        })
-      )
-
-      const pickMetricVsParamUndefOptions = new Promise(resolve =>
-        mockGetMetricAndParam.onFirstCall().callsFake(() => {
-          resolve(undefined)
-          return Promise.resolve(undefined)
-        })
-      )
-
-      mockMessageReceived.fire({ type: MessageFromWebviewType.ADD_CUSTOM_PLOT })
-
-      await pickMetricVsParamType
-      await pickMetricVsParamUndefOptions
-
-      expect(mockSetCustomPlotsOrder).to.not.be.called
-      expect(mockSendTelemetryEvent).to.not.be.called
-
-      const pickCheckpointType = new Promise(resolve =>
-        mockPickCustomPlotType.onThirdCall().callsFake(() => {
-          resolve(undefined)
-
-          return Promise.resolve(CustomPlotType.CHECKPOINT)
-        })
-      )
-      const pickCheckpointUndefOptions = new Promise(resolve =>
-        mockGetMetric.onFirstCall().callsFake(() => {
-          resolve(undefined)
-          return Promise.resolve(undefined)
-        })
-      )
-
-      mockMessageReceived.fire({ type: MessageFromWebviewType.ADD_CUSTOM_PLOT })
-
-      await pickCheckpointType
-      await pickCheckpointUndefOptions
 
       expect(mockSetCustomPlotsOrder).to.not.be.called
       expect(mockSendTelemetryEvent).to.not.be.called
@@ -1079,8 +974,7 @@ suite('Plots Test Suite', () => {
       stub(plotsModel, 'getCustomPlotsOrder').returns([
         {
           metric: 'summary.json:loss',
-          param: 'params.yaml:dropout',
-          type: CustomPlotType.METRIC_VS_PARAM
+          param: 'params.yaml:dropout'
         }
       ])
 
@@ -1126,8 +1020,7 @@ suite('Plots Test Suite', () => {
       stub(plotsModel, 'getCustomPlotsOrder').returns([
         {
           metric: 'summary.json:loss',
-          param: 'params.yaml:dropout',
-          type: CustomPlotType.METRIC_VS_PARAM
+          param: 'params.yaml:dropout'
         }
       ])
 

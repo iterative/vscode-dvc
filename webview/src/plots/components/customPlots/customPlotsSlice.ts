@@ -18,10 +18,7 @@ export interface CustomPlotsState extends Omit<CustomPlotsData, 'plots'> {
   disabledDragPlotIds: string[]
 }
 
-const initialColorsState = { domain: [], range: [] }
-
 export const customPlotsInitialState: CustomPlotsState = {
-  colors: initialColorsState,
   disabledDragPlotIds: [],
   enablePlotCreation: true,
   hasData: false,
@@ -58,7 +55,7 @@ export const customPlotsSlice = createSlice({
       if (!action.payload) {
         return customPlotsInitialState
       }
-      const { plots, colors, ...statePayload } = action.payload
+      const { plots, ...statePayload } = action.payload
       const plotsIds = plots?.map(plot => plot.id) || []
       const plotsSnapshots = addPlotsWithSnapshots(
         plots,
@@ -68,7 +65,6 @@ export const customPlotsSlice = createSlice({
       return {
         ...state,
         ...statePayload,
-        colors: colors || initialColorsState,
         hasData: !!action.payload,
         hasItems: Object.keys(plotsSnapshots).length > 0,
         plotsIds: plots?.map(plot => plot.id) || [],

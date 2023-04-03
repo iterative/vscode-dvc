@@ -9,6 +9,7 @@ import deeplyNestedTableData from 'dvc/src/test/fixtures/expShow/deeplyNested/ta
 import dataTypesTableFixture from 'dvc/src/test/fixtures/expShow/dataTypes/tableData'
 import survivalTableData from 'dvc/src/test/fixtures/expShow/survival/tableData'
 import { timestampColumn } from 'dvc/src/experiments/columns/constants'
+import { delay } from 'dvc/src/util/time'
 import {
   ExperimentStatus,
   isRunning
@@ -24,13 +25,13 @@ import Experiments from '../experiments/components/Experiments'
 
 import './test-vscode-styles.scss'
 import '../shared/style.scss'
+import { experimentsReducers } from '../experiments/store'
+import { TableDataState } from '../experiments/components/table/tableDataSlice'
+import { NORMAL_TOOLTIP_DELAY } from '../shared/components/tooltip/Tooltip'
 import {
   setExperimentsAsSelected,
   setExperimentsAsStarred
 } from '../test/tableDataFixture'
-import { experimentsReducers } from '../experiments/store'
-import { TableDataState } from '../experiments/components/table/tableDataSlice'
-import { NORMAL_TOOLTIP_DELAY } from '../shared/components/tooltip/Tooltip'
 
 const tableData: TableDataState = {
   changes: workspaceChangesFixture,
@@ -39,7 +40,7 @@ const tableData: TableDataState = {
     'params:params.yaml:dvc_logs_dir': 300
   },
   columns: columnsFixture,
-  filteredCounts: { checkpoints: 0, experiments: 0 },
+  filteredCount: 0,
   filters: ['params:params.yaml:lr'],
   hasCheckpoints: true,
   hasColumns: true,
@@ -53,14 +54,10 @@ const tableData: TableDataState = {
     ...row,
     subRows: row.subRows?.map(experiment => ({
       ...experiment,
-      starred: experiment.starred || experiment.label === '42b8736',
-      subRows: experiment.subRows?.map(checkpoint => ({
-        ...checkpoint,
-        running: isRunning(checkpoint.status) || checkpoint.label === '23250b3',
-        starred: checkpoint.starred || checkpoint.label === '22e40e1'
-      }))
+      starred: experiment.starred || experiment.label === '42b8736'
     }))
   })),
+  selectedForPlotsCount: 2,
   sorts: [
     { descending: true, path: 'params:params.yaml:epochs' },
     { descending: false, path: 'params:params.yaml:log_file' }
@@ -77,11 +74,7 @@ const noRunningExperiments = {
       ...experiment,
       status: isRunning(experiment.status)
         ? ExperimentStatus.SUCCESS
-        : experiment.status,
-      subRows: experiment.subRows?.map(checkpoint => ({
-        ...checkpoint,
-        status: ExperimentStatus.SUCCESS
-      }))
+        : experiment.status
     }))
   }))
 }
@@ -146,27 +139,24 @@ WithSurvivalData.args = {
 export const WithMiddleStates = Template.bind({})
 const tableDataWithSomeSelectedExperiments = setExperimentsAsSelected(
   tableData,
-  ['d1343a8', '91116c1', 'e821416']
+  ['4fb124a', '42b8736', '1ba7bcd']
 )
 WithMiddleStates.args = {
   tableData: setExperimentsAsStarred(tableDataWithSomeSelectedExperiments, [
-    'd1343a8',
-    '9523bde',
-    'e821416'
+    '1ba7bcd'
   ])
 }
 WithMiddleStates.play = async ({ canvasElement }) => {
-  await within(canvasElement).findByText('1ba7bcd')
-  let checkboxes = await within(canvasElement).findAllByRole('checkbox')
-  userEvent.click(checkboxes[10], { bubbles: true })
-  checkboxes = await within(canvasElement).findAllByRole('checkbox')
-  userEvent.click(checkboxes[11], { bubbles: true })
-  const collapseButtons = () =>
-    within(canvasElement).getAllByTitle('Contract Row')
-  userEvent.click(collapseButtons()[1])
-  userEvent.click(collapseButtons()[2])
-  userEvent.click(collapseButtons()[3])
+  await within(canvasElement).findByText('4fb124a')
+  const checkboxes = await within(canvasElement).findAllByRole('checkbox')
+  userEvent.click(checkboxes[1], { bubbles: true })
+  await delay(0)
+  userEvent.click(checkboxes[7], { bubbles: true, shiftKey: true })
+
+  const collapseButton = within(canvasElement).getByTitle('Contract Row')
+  userEvent.click(collapseButton)
 }
+WithMiddleStates.parameters = { chromatic: { delay: 2000 } }
 
 export const WithNoRunningExperiments = Template.bind({})
 WithNoRunningExperiments.args = {

@@ -1,8 +1,11 @@
 import { join } from '../../../util/path'
-import { ExperimentStatus, Row } from '../../../../experiments/webview/contract'
+import {
+  ExperimentStatus,
+  Commit
+} from '../../../../experiments/webview/contract'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 
-const data: Row[] = [
+const data: Commit[] = [
   {
     id: EXPERIMENT_WORKSPACE_ID,
     label: EXPERIMENT_WORKSPACE_ID,

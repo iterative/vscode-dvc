@@ -2,7 +2,6 @@ import isEmpty from 'lodash.isempty'
 import {
   ComparisonPlot,
   ComparisonRevisionData,
-  CustomPlotType,
   PlotHeight,
   PlotsData as TPlotsData,
   Revision,
@@ -22,20 +21,11 @@ import {
 import { PlotsModel } from '../model'
 import { PathsModel } from '../paths/model'
 import { BaseWebview } from '../../webview'
-import {
-  pickCustomPlots,
-  pickCustomPlotType,
-  pickMetric,
-  pickMetricAndParam
-} from '../model/quickPick'
+import { pickCustomPlots, pickMetricAndParam } from '../model/quickPick'
 import { getModifiedTime, openImageFileInEditor } from '../../fileSystem'
 import { Title } from '../../vscode/title'
 import { reorderObjectList } from '../../util/array'
-import {
-  CHECKPOINTS_PARAM,
-  CustomPlotsOrderValue,
-  isCheckpointValue
-} from '../model/custom'
+import { CustomPlotsOrderValue } from '../model/custom'
 import { getCustomPlotId } from '../model/collect'
 
 export class WebviewMessages {
@@ -192,9 +182,7 @@ export class WebviewMessages {
     )
   }
 
-  private async addMetricVsParamPlot(): Promise<
-    CustomPlotsOrderValue | undefined
-  > {
+  private async addCustomPlot() {
     const metricAndParam = await pickMetricAndParam(
       this.experiments.getColumnTerminalNodes(),
       this.plots.getCustomPlotsOrder()
@@ -204,52 +192,8 @@ export class WebviewMessages {
       return
     }
 
-    const plot = {
-      ...metricAndParam,
-      type: CustomPlotType.METRIC_VS_PARAM
-    }
-    this.plots.addCustomPlot(plot)
+    this.plots.addCustomPlot(metricAndParam)
     this.sendCustomPlotsAndEvent(EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED)
-  }
-
-  private async addCheckpointPlot(): Promise<
-    CustomPlotsOrderValue | undefined
-  > {
-    const metric = await pickMetric(
-      this.experiments.getColumnTerminalNodes(),
-      this.plots.getCustomPlotsOrder()
-    )
-
-    if (!metric) {
-      return
-    }
-
-    const plot: CustomPlotsOrderValue = {
-      metric,
-      param: CHECKPOINTS_PARAM,
-      type: CustomPlotType.CHECKPOINT
-    }
-    this.plots.addCustomPlot(plot)
-    this.sendCustomPlotsAndEvent(EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED)
-  }
-
-  private async addCustomPlot() {
-    if (!this.experiments.hasCheckpoints()) {
-      return this.addMetricVsParamPlot()
-    }
-
-    const plotType = await pickCustomPlotType(
-      this.experiments.getColumnTerminalNodes(),
-      this.plots.getCustomPlotsOrder()
-    )
-
-    if (!plotType) {
-      return
-    }
-
-    return isCheckpointValue(plotType)
-      ? this.addCheckpointPlot()
-      : this.addMetricVsParamPlot()
   }
 
   private async removeCustomPlots() {
@@ -281,10 +225,9 @@ export class WebviewMessages {
       plotIds,
       customPlotsOrderWithId,
       'id'
-    ).map(({ metric, param, type }) => ({
+    ).map(({ metric, param }) => ({
       metric,
-      param,
-      type
+      param
     }))
 
     this.plots.setCustomPlotsOrder(newOrder)

@@ -1,15 +1,15 @@
 import { copyReverseOriginalColors } from 'dvc/src/experiments/model/status/colors'
 import {
   ExperimentStatus,
-  Row,
+  Commit,
   TableData
 } from 'dvc/src/experiments/webview/contract'
 
 const matchAndTransform = (
-  rows: Row[],
+  rows: Commit[],
   labelOrIds: string[],
-  transform: (source: Row) => Row
-): Row[] => {
+  transform: (source: Commit) => Commit
+): Commit[] => {
   return rows.map(parent => {
     let newParent = parent
 
@@ -27,7 +27,7 @@ const matchAndTransform = (
 export const transformRows = (
   fixture: TableData,
   labelOrIds: string[],
-  transform: (source: Row) => Row
+  transform: (source: Commit) => Commit
 ) => {
   const [workspace, main] = fixture.rows
 
@@ -46,7 +46,7 @@ export const transformRows = (
 }
 
 const setRowProperty =
-  (prop: keyof Row, value: unknown) =>
+  (prop: keyof Commit, value: unknown) =>
   (fixture: TableData, labelOrIds: string[]) => {
     return transformRows(fixture, labelOrIds, row => ({
       ...row,

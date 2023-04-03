@@ -1,5 +1,4 @@
 import { checkForCustomPlotOptions, cleanupOldOrderValue } from './custom'
-import { CustomPlotType } from '../webview/contract'
 import { customPlotsOrderFixture } from '../../test/fixtures/expShow/base/customPlots'
 import { ColumnType } from '../../experiments/webview/contract'
 
@@ -11,16 +10,14 @@ describe('cleanupOlderValue', () => {
     })
     expect(output).toStrictEqual({
       metric: 'summary.json:loss',
-      param: 'params.yaml:dropout',
-      type: CustomPlotType.METRIC_VS_PARAM
+      param: 'params.yaml:dropout'
     })
   })
 
   it('should not update value if contents are not outdated', () => {
     const value = {
       metric: 'summary.json:loss',
-      param: 'params.yaml:dropout',
-      type: CustomPlotType.METRIC_VS_PARAM
+      param: 'params.yaml:dropout'
     }
     const output = cleanupOldOrderValue(value)
     expect(output).toStrictEqual(value)
@@ -93,13 +90,11 @@ describe('checkForCustomPlotOptions', () => {
         ...customPlotsOrderFixture,
         {
           metric: 'summary.json:accuracy',
-          param: 'params.yaml:dropout',
-          type: CustomPlotType.METRIC_VS_PARAM
+          param: 'params.yaml:dropout'
         },
         {
           metric: 'summary.json:loss',
-          param: 'params.yaml:epochs',
-          type: CustomPlotType.METRIC_VS_PARAM
+          param: 'params.yaml:epochs'
         }
       ]
     )

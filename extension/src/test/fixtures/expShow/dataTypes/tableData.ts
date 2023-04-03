@@ -5,19 +5,20 @@ import { TableData } from '../../../../experiments/webview/contract'
 export const data: TableData = {
   changes: [],
   columnOrder: [],
+  columns,
   columnWidths: {},
-  filteredCounts: { experiments: 0, checkpoints: 0 },
+  filteredCount: 0,
   filters: [],
   hasCheckpoints: false,
+  hasColumns: true,
   hasConfig: true,
   hasMoreCommits: true,
   hasRunningExperiment: false,
   hasValidDvcYaml: true,
   isShowingMoreCommits: true,
-  sorts: [],
-  columns,
-  hasColumns: true,
-  rows
+  rows,
+  selectedForPlotsCount: 0,
+  sorts: []
 }
 
 export default data

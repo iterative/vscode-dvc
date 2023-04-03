@@ -1,7 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { FilteredCounts } from 'dvc/src/experiments/model/filterBy/collect'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
-import { Column, Row, TableData } from 'dvc/src/experiments/webview/contract'
+import {
+  Column,
+  Experiment,
+  TableData
+} from 'dvc/src/experiments/webview/contract'
 import { keepEqualOldReferencesInArray } from '../../../util/array'
 import { keepReferenceIfEqual } from '../../../util/objects'
 
@@ -14,10 +17,7 @@ export const tableDataInitialState: TableDataState = {
   columnOrder: [],
   columnWidths: {},
   columns: [],
-  filteredCounts: {
-    checkpoints: 0,
-    experiments: 0
-  },
+  filteredCount: 0,
   filters: [],
   hasCheckpoints: false,
   hasColumns: false,
@@ -28,6 +28,7 @@ export const tableDataInitialState: TableDataState = {
   hasValidDvcYaml: true,
   isShowingMoreCommits: true,
   rows: [],
+  selectedForPlotsCount: 0,
   sorts: []
 }
 
@@ -62,11 +63,8 @@ export const tableDataSlice = createSlice({
         action.payload
       ) as Column[]
     },
-    updateFilteredCounts: (state, action: PayloadAction<FilteredCounts>) => {
-      state.filteredCounts = keepReferenceIfEqual(
-        state.filteredCounts,
-        action.payload
-      ) as FilteredCounts
+    updateFilteredCount: (state, action: PayloadAction<number>) => {
+      state.filteredCount = action.payload
     },
     updateFilters: (state, action: PayloadAction<string[]>) => {
       state.filters = action.payload
@@ -92,11 +90,14 @@ export const tableDataSlice = createSlice({
     updateIsShowingMoreCommits: (state, action: PayloadAction<boolean>) => {
       state.isShowingMoreCommits = action.payload
     },
-    updateRows: (state, action: PayloadAction<Row[]>) => {
+    updateRows: (state, action: PayloadAction<Experiment[]>) => {
       state.rows = keepEqualOldReferencesInArray(
         state.rows,
         action.payload
-      ) as Row[]
+      ) as Experiment[]
+    },
+    updateSelectedForPlotsCount: (state, action: PayloadAction<number>) => {
+      state.selectedForPlotsCount = action.payload
     },
     updateSorts: (state, action: PayloadAction<SortDefinition[]>) => {
       state.sorts = keepEqualOldReferencesInArray(
@@ -113,7 +114,7 @@ export const {
   updateColumnOrder,
   updateColumnWidths,
   updateColumns,
-  updateFilteredCounts,
+  updateFilteredCount,
   updateFilters,
   updateHasCheckpoints,
   updateHasColumns,
@@ -123,6 +124,7 @@ export const {
   updateHasValidDvcYaml,
   updateIsShowingMoreCommits,
   updateRows,
+  updateSelectedForPlotsCount,
   updateSorts
 } = tableDataSlice.actions
 

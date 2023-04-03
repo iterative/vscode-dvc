@@ -23,34 +23,19 @@ project available in the workspace:
 > [GitHub](https://github.com/iterative/vscode-dvc/issues). We are happy to
 > help.
 
-If DVC and the extension are initialized, side bar will exposes multiple views:
+If DVC and the extension are initialized, side bar will expose multiple views:
 
-<p float="left">
-  <img src="images/view-container-show.png"
-       alt="Show DVC Container View" width="49%" />
-  <img src="images/view-container-columns.png"
-       alt="Columns View" width="49%" />
-</p>
-<p float="left">
-  <img src="images/view-container-experiments.png"
-       alt="Experiments View" width="49%" />
-  <img src="images/view-container-sort.png"
-       alt="Sort By View" width="49%" />
-</p>
-<p float="left">
-  <img src="images/view-container-filter.png"
-       alt="Filter By View" width="49%" />
-  <img src="images/view-container-plots.png"
-       alt="Plots View" width="49%" />
+<p align="center">
+<img src="images/view-container.png"
+       alt="View Container" width="49%">
 </p>
 
+- `EXPERIMENTS`. Exposes the list of experiments and common actions.
 - `COLUMNS`. Used to fine-tune the experiments table to focus on the most
   important metrics, parameters, and data signals and to view all available
   columns.
-- `EXPERIMENTS`. Exposes the list of experiments, their checkpoints and common
-  actions.
-- `SORT BY`. Used to display and configure how the experiments table is sorted.
-- `FILTER BY`. Used to view, add, or remove metrics and parameters filters.
-  These will hide specific experiments in the table.
 - `PLOTS`. Used to fine-tune the plots dashboard, e.g. by toggling plots
   visibility.
+- `FILTER BY`. Used to view, add, or remove metrics and parameters filters.
+- `SORT BY`. Used to display and configure how the experiments table is sorted.
+  These will hide specific experiments in the table.

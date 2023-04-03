@@ -125,38 +125,34 @@ const getMultiSelectMenuOptions = (
 }
 
 const getRunResumeOptions = (
-  withId: (
+  hideIfRunning: (
     label: string,
     type: MessageFromWebviewType,
     hidden?: boolean,
     divider?: boolean
   ) => MessagesMenuOptionProps,
   projectHasCheckpoints: boolean,
-  hideVaryAndRun: boolean,
-  depth: number
+  hideVaryAndRun: boolean
 ) => {
-  const isCheckpoint = depth > 1
-
   const resetNeedsSeparator = !hideVaryAndRun && projectHasCheckpoints
   const runNeedsSeparator = !hideVaryAndRun && !projectHasCheckpoints
 
   return [
-    withId(
+    hideIfRunning(
       'Modify and Run',
       MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN,
-      isCheckpoint || !projectHasCheckpoints,
+      !projectHasCheckpoints,
       resetNeedsSeparator
     ),
-    withId(
+    hideIfRunning(
       projectHasCheckpoints ? 'Modify and Resume' : 'Modify and Run',
       MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_AND_RUN,
-      isCheckpoint,
+      false,
       runNeedsSeparator
     ),
-    withId(
+    hideIfRunning(
       'Modify and Queue',
-      MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE,
-      isCheckpoint
+      MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE
     )
   ]
 }
@@ -171,12 +167,9 @@ const getSingleSelectMenuOptions = (
   starred?: boolean,
   executor?: string | null
 ) => {
-  const isNotExperimentOrCheckpoint =
-    isQueued(status) || isWorkspace || depth <= 0
+  const isNotExperiment = isQueued(status) || isWorkspace || depth <= 0
 
-  const notExperiment = depth !== 1
-
-  const notRunningWithId = (
+  const hideIfRunning = (
     label: string,
     type: MessageFromWebviewType,
     hidden?: boolean,
@@ -190,6 +183,12 @@ const getSingleSelectMenuOptions = (
       divider
     )
 
+  const hideIfRunningOrNotExperiment = (
+    label: string,
+    type: MessageFromWebviewType,
+    divider?: boolean
+  ) => hideIfRunning(label, type, isNotExperiment, divider)
+
   return [
     experimentMenuOption(
       id,
@@ -197,37 +196,31 @@ const getSingleSelectMenuOptions = (
       MessageFromWebviewType.SHOW_EXPERIMENT_LOGS,
       !isRunningInQueue({ executor, status })
     ),
-    notRunningWithId(
+    hideIfRunningOrNotExperiment(
       'Apply to Workspace',
-      MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE,
-      isNotExperimentOrCheckpoint
+      MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE
     ),
-    notRunningWithId(
+    hideIfRunningOrNotExperiment(
       'Create new Branch',
-      MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT,
-      isNotExperimentOrCheckpoint
+      MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
     ),
-    notRunningWithId(
+    hideIfRunningOrNotExperiment(
       'Share to Studio',
       MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO,
-      notExperiment,
       true
     ),
-    notRunningWithId(
+    hideIfRunningOrNotExperiment(
       'Commit and Share',
-      MessageFromWebviewType.SHARE_EXPERIMENT_AS_COMMIT,
-      isNotExperimentOrCheckpoint
+      MessageFromWebviewType.SHARE_EXPERIMENT_AS_COMMIT
     ),
-    notRunningWithId(
+    hideIfRunningOrNotExperiment(
       'Share as Branch',
-      MessageFromWebviewType.SHARE_EXPERIMENT_AS_BRANCH,
-      isNotExperimentOrCheckpoint
+      MessageFromWebviewType.SHARE_EXPERIMENT_AS_BRANCH
     ),
     ...getRunResumeOptions(
-      notRunningWithId,
+      hideIfRunning,
       projectHasCheckpoints,
-      isNotExperimentOrCheckpoint,
-      depth
+      isNotExperiment
     ),
     experimentMenuOption(
       [id],
@@ -243,7 +236,7 @@ const getSingleSelectMenuOptions = (
       !isRunning(status),
       id !== EXPERIMENT_WORKSPACE_ID
     ),
-    notRunningWithId(
+    hideIfRunning(
       'Remove',
       MessageFromWebviewType.REMOVE_EXPERIMENT,
       depth !== 1,

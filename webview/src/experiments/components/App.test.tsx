@@ -10,7 +10,12 @@ import {
 import '@testing-library/jest-dom/extend-expect'
 import tableDataFixture from 'dvc/src/test/fixtures/expShow/base/tableData'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { Column, ColumnType, Row } from 'dvc/src/experiments/webview/contract'
+import {
+  Column,
+  ColumnType,
+  Commit,
+  Experiment
+} from 'dvc/src/experiments/webview/contract'
 import { buildMetricOrParamPath } from 'dvc/src/experiments/columns/paths'
 import dataTypesTableFixture from 'dvc/src/test/fixtures/expShow/dataTypes/tableData'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
@@ -29,7 +34,6 @@ import {
 import { getRow } from '../../test/queries'
 import { dragAndDrop } from '../../test/dragDrop'
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
-import { setExperimentsAsStarred } from '../../test/tableDataFixture'
 import {
   advanceTimersByTime,
   clickRowCheckbox,
@@ -49,6 +53,7 @@ import {
 } from '../../test/experimentsTable'
 import { clearSelection, createWindowTextSelection } from '../../test/selection'
 import { sendMessage } from '../../shared/vscode'
+import { setExperimentsAsStarred } from '../../test/tableDataFixture'
 
 jest.mock('../../shared/api')
 jest.mock('../../util/styles')
@@ -166,20 +171,11 @@ describe('App', () => {
 
   describe('Row expansion', () => {
     const experimentLabel = '1ba7bcd'
-    const checkpointLabel = '22e40e1'
 
     it('should maintain expansion status when rows are reordered', () => {
       renderTable()
 
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
-      expect(screen.getByText(checkpointLabel)).toBeInTheDocument()
-
-      const testRow = getRow(experimentLabel)
-      const expandButton = within(testRow).getByTitle('Contract Row')
-      fireEvent.click(expandButton)
-
-      expect(screen.getByText(experimentLabel)).toBeInTheDocument()
-      expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
 
       setTableData({
         ...tableDataFixture,
@@ -187,27 +183,33 @@ describe('App', () => {
           tableDataFixture.rows[0],
           {
             ...tableDataFixture.rows[1],
-            subRows: [...(tableDataFixture.rows[1].subRows as Row[])].reverse()
+            subRows: [
+              ...(tableDataFixture.rows[1].subRows as Experiment[])
+            ].reverse()
           }
         ]
       })
 
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
-      expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
+
+      contractRow('main')
+
+      expect(screen.queryByText(experimentLabel)).not.toBeInTheDocument()
+
+      setTableData(tableDataFixture)
+
+      expect(screen.queryByText(experimentLabel)).not.toBeInTheDocument()
     })
 
     it('should maintain expansion status when the commit changes', () => {
       renderTable()
 
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
-      expect(screen.getByText(checkpointLabel)).toBeInTheDocument()
-
-      const testRow = getRow(experimentLabel)
-      const expandButton = within(testRow).getByTitle('Contract Row')
-      fireEvent.click(expandButton)
 
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
-      expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
+
+      contractRow('main')
+      expect(screen.queryByText(experimentLabel)).not.toBeInTheDocument()
 
       const changedCommitName = 'changed-branch'
 
@@ -226,19 +228,20 @@ describe('App', () => {
       })
 
       expect(screen.getByText(changedCommitName)).toBeInTheDocument()
-      expect(screen.getByText(experimentLabel)).toBeInTheDocument()
-      expect(screen.queryByText(checkpointLabel)).not.toBeInTheDocument()
+      expect(screen.queryByText(experimentLabel)).not.toBeInTheDocument()
     })
 
-    it('should not toggle an experiment when using the row expansion button', () => {
+    it('should not toggle a commit when using the row expansion button', () => {
       renderTable()
-      const testRow = getRow(experimentLabel)
+      const testRow = getRow('main')
       const expandButton = within(testRow).getByTitle('Contract Row')
 
       mockPostMessage.mockClear()
 
       fireEvent.click(expandButton)
       expect(mockPostMessage).not.toHaveBeenCalled()
+
+      expandRow('main')
 
       fireEvent.keyDown(expandButton, {
         bubbles: true,
@@ -251,23 +254,23 @@ describe('App', () => {
   })
 
   describe('Sub-rows middle states indicators', () => {
-    const testRowLabel = '4fb124a'
+    const testRowLabel = 'main'
 
     const getMiddleStatesTestRow = () => {
       return getRow(testRowLabel)
     }
 
     const selectSomeSubRows = () => {
-      clickRowCheckbox('d1343a8')
-      clickRowCheckbox('1ee5f2e')
+      clickRowCheckbox('1ba7bcd')
+      clickRowCheckbox('4fb124a')
 
       return 2
     }
 
     const starSomeSubRows = () => {
       const starredFixture = setExperimentsAsStarred(tableDataFixture, [
-        'd1343a8',
-        '1ee5f2e'
+        '1ba7bcd',
+        '4fb124a'
       ])
 
       setTableData(starredFixture)
@@ -293,12 +296,12 @@ describe('App', () => {
       it('should display the correct number of checked sub-rows when the parent is collapsed', () => {
         renderTable()
         const row = getMiddleStatesTestRow()
-        const numberOfSubrowsSelected = selectSomeSubRows()
+        const numberOfSubRowsSelected = selectSomeSubRows()
         expect(getCheckboxCountIndicator(row)).not.toBeInTheDocument()
         contractRow(testRowLabel)
         const collapsed = getMiddleStatesTestRow()
         expect(getCheckboxCountIndicator(collapsed)).toHaveTextContent(
-          `${numberOfSubrowsSelected}`
+          `${numberOfSubRowsSelected}`
         )
       })
     })
@@ -314,7 +317,7 @@ describe('App', () => {
       it('should display the correct number of starred sub-rows when the parent is collapsed', () => {
         renderTable()
         const row = getMiddleStatesTestRow()
-        const numberOfSubrowsStarred = starSomeSubRows()
+        const numberOfSubRowsStarred = starSomeSubRows()
         expect(
           getCountIndicatorById(row, 'row-action-star')
         ).not.toBeInTheDocument()
@@ -322,7 +325,7 @@ describe('App', () => {
         const collapsed = getMiddleStatesTestRow()
         expect(
           getCountIndicatorById(collapsed, 'row-action-star')
-        ).toHaveTextContent(`${numberOfSubrowsStarred}`)
+        ).toHaveTextContent(`${numberOfSubRowsStarred}`)
       })
     })
   })
@@ -346,8 +349,7 @@ describe('App', () => {
       testClick(EXPERIMENT_WORKSPACE_ID)
       testClick('main')
       testClick('[exp-e7a67]', 'exp-e7a67')
-      testClick('22e40e1', '22e40e1fa3c916ac567f69b85969e3066a91dda4')
-      testClick('e821416', 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361')
+      testClick('1ba7bcd', 'exp-83425')
     })
 
     it('should send a message to the extension to toggle an experiment when Enter or Space is pressed on the row', () => {
@@ -1046,30 +1048,6 @@ describe('App', () => {
       })
     })
 
-    it('should not enable the user share a checkpoint or commit to Studio', () => {
-      renderTableWithoutRunningExperiments()
-
-      const commitTarget = screen.getByText('main')
-      fireEvent.contextMenu(commitTarget, { bubbles: true })
-
-      advanceTimersByTime(100)
-      const commitMenuitems = screen.getAllByRole('menuitem')
-      const commitItemLabels = commitMenuitems.map(item => item.textContent)
-      expect(commitItemLabels).not.toHaveLength(0)
-      expect(commitItemLabels).not.toContain('Share to Studio')
-
-      const checkpointTarget = screen.getByText('d1343a8')
-      fireEvent.contextMenu(checkpointTarget, { bubbles: true })
-
-      advanceTimersByTime(100)
-      const checkpointMenuitems = screen.getAllByRole('menuitem')
-      const checkpointItemLabels = checkpointMenuitems.map(
-        item => item.textContent
-      )
-      expect(checkpointItemLabels).not.toHaveLength(0)
-      expect(checkpointItemLabels).not.toContain('Share to Studio')
-    })
-
     it('should always present the Plots options if multiple rows are selected', () => {
       renderTableWithoutRunningExperiments()
 
@@ -1103,9 +1081,9 @@ describe('App', () => {
       renderTableWithoutRunningExperiments()
 
       clickRowCheckbox('4fb124a')
-      clickRowCheckbox('42b8736', true)
+      clickRowCheckbox('1ba7bcd', true)
 
-      expect(selectedRows().length).toBe(4)
+      expect(selectedRows().length).toBe(3)
 
       const target = screen.getByText('4fb124a')
       fireEvent.contextMenu(target, { bubbles: true })
@@ -1119,38 +1097,19 @@ describe('App', () => {
     it('should allow batch selection from the bottom up too', () => {
       renderTableWithoutRunningExperiments()
 
-      clickRowCheckbox('42b8736')
+      clickRowCheckbox('1ba7bcd')
       clickRowCheckbox('4fb124a', true)
 
-      expect(selectedRows()).toHaveLength(4)
-
-      clickRowCheckbox('2173124', true)
-      expect(selectedRows()).toHaveLength(5)
-    })
-
-    it('should not include collapsed experiments in the bulk selection', () => {
-      renderTableWithoutRunningExperiments()
-
-      contractRow('42b8736')
-
-      advanceTimersByTime(100)
-      clickRowCheckbox('4fb124a')
-      clickRowCheckbox('22e40e1', true)
-      expandRow('42b8736')
-
-      advanceTimersByTime(100)
-      expect(getRow('42b8736')).toHaveAttribute('aria-selected', 'true')
-      expect(getRow('2173124')).not.toHaveAttribute('aria-selected', 'true')
-      expect(getRow('9523bde')).not.toHaveAttribute('aria-selected', 'true')
+      expect(selectedRows()).toHaveLength(3)
     })
 
     it('should present the Clear selected rows option when multiple rows are selected', () => {
       renderTableWithoutRunningExperiments()
 
       clickRowCheckbox('4fb124a')
-      clickRowCheckbox('42b8736', true)
+      clickRowCheckbox('1ba7bcd', true)
 
-      expect(selectedRows().length).toBe(4)
+      expect(selectedRows().length).toBe(3)
 
       const target = screen.getByText('4fb124a')
       fireEvent.contextMenu(target, { bubbles: true })
@@ -1167,9 +1126,9 @@ describe('App', () => {
       renderTable()
 
       clickRowCheckbox('4fb124a')
-      clickRowCheckbox('42b8736', true)
+      clickRowCheckbox('1ba7bcd', true)
 
-      expect(selectedRows().length).toBe(4)
+      expect(selectedRows().length).toBe(3)
 
       fireEvent.keyUp(getRow('42b8736'), { bubbles: true, key: 'Escape' })
 
@@ -1296,7 +1255,8 @@ describe('App', () => {
         rows: [
           { ...tableDataFixture.rows[0], selected: false },
           { ...tableDataFixture.rows[1], selected: false, subRows: [] }
-        ]
+        ],
+        selectedForPlotsCount: 0
       })
 
       expect(selectedForPlotsIndicator).toHaveTextContent('')
@@ -1313,23 +1273,55 @@ describe('App', () => {
             selected: false,
             subRows: [
               {
-                ...(tableDataFixture.rows[1]?.subRows?.[0] as Row),
-                selected: false,
-                subRows: [
-                  {
-                    ...(tableDataFixture.rows[1]?.subRows?.[1] as Row),
-                    selected: true
-                  }
-                ]
+                ...(tableDataFixture.rows[1]?.subRows?.[0] as Commit),
+                selected: true
               }
             ]
           }
-        ]
+        ],
+        selectedForPlotsCount: 1
       })
 
       expect(selectedForPlotsIndicator).toHaveTextContent('1')
       expect(tooltip).toHaveTextContent(
         '1 Experiment Selected for Plotting (Max 7)'
+      )
+    })
+
+    it('should show not change the plotted indicator when plotted experiments are hidden', () => {
+      const plottedExperiment = '4fb124a'
+
+      renderTable({
+        ...tableDataFixture
+      })
+
+      expect(screen.getByText(plottedExperiment)).toBeInTheDocument()
+
+      const selectedForPlotsIndicator =
+        screen.getByLabelText('selected for plots')
+      expect(selectedForPlotsIndicator).toHaveTextContent('2')
+
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+      fireEvent.mouseEnter(selectedForPlotsIndicator)
+
+      const expandedTooltip = screen.getByRole('tooltip')
+
+      expect(expandedTooltip).toHaveTextContent(
+        '2 Experiments Selected for Plotting (Max 7)'
+      )
+
+      fireEvent.mouseLeave(selectedForPlotsIndicator)
+
+      contractRow('main')
+
+      expect(screen.queryByText(plottedExperiment)).not.toBeInTheDocument()
+      fireEvent.mouseEnter(selectedForPlotsIndicator)
+
+      const contractedTooltip = screen.getByRole('tooltip')
+
+      expect(contractedTooltip).toHaveTextContent(
+        '2 Experiments Selected for Plotting (Max 7)'
       )
     })
 
@@ -1395,42 +1387,32 @@ describe('App', () => {
     })
     expect(filterIndicator).toHaveTextContent('1')
     expect(tooltip).toHaveTextContent('1 Filter Applied')
-    expect(tooltip).toHaveTextContent('0 Experiments, 0 Checkpoints Filtered')
+    expect(tooltip).toHaveTextContent('No Experiments Filtered')
 
     setTableData({
       ...tableDataFixture,
-      filteredCounts: {
-        checkpoints: 2,
-        experiments: 1
-      },
+      filteredCount: 1,
       filters: [firstFilterPath, secondFilterPath]
     })
     expect(filterIndicator).toHaveTextContent('2')
     expect(tooltip).toHaveTextContent('2 Filters Applied')
-    expect(tooltip).toHaveTextContent('1 Experiment, 2 Checkpoints Filtered')
+    expect(tooltip).toHaveTextContent('1 Experiment Filtered')
 
     setTableData({
       ...tableDataFixture,
-      filteredCounts: {
-        experiments: 10000
-      },
+      filteredCount: 10000,
       filters: [firstFilterPath, secondFilterPath]
     })
     expect(filterIndicator).toHaveTextContent('2')
-    expect(tooltip).toHaveTextContent('Experiment')
-    expect(tooltip).not.toHaveTextContent('Checkpoint')
+    expect(tooltip).toHaveTextContent('10000 Experiments Filtered')
 
     setTableData({
       ...tableDataFixture,
-      filteredCounts: {
-        checkpoints: 10000,
-        experiments: 10000
-      },
+      filteredCount: 10000,
       filters: []
     })
     expect(filterIndicator).toHaveTextContent('')
     expect(tooltip).not.toHaveTextContent('Experiment')
-    expect(tooltip).not.toHaveTextContent('Checkpoint')
   })
 
   it('should send a message to focus the relevant tree when clicked', () => {

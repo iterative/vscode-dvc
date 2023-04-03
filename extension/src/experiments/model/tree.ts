@@ -9,7 +9,6 @@ import {
   Uri
 } from 'vscode'
 import { ExperimentType } from '.'
-import { ExperimentAugmented } from './filterBy/collect'
 import { collectDeletable, ExperimentItem } from './collect'
 import { MAX_SELECTED_EXPERIMENTS } from './status'
 import { getDataFromColumnPaths } from './util'
@@ -36,6 +35,13 @@ import { Experiment, ExperimentStatus, isRunning } from '../webview/contract'
 import { getMarkdownString } from '../../vscode/markdownString'
 import { truncateFromLeft } from '../../util/string'
 
+export type ExperimentAugmented = Experiment & {
+  hasChildren: boolean
+  selected?: boolean
+  starred: boolean
+  type: ExperimentType
+}
+
 export class ExperimentsTree
   extends Disposable
   implements TreeDataProvider<string | ExperimentItem>
@@ -48,8 +54,6 @@ export class ExperimentsTree
   private readonly view: TreeView<string | ExperimentItem>
   private viewed = false
 
-  private expandedExperiments: Record<string, boolean | undefined> = {}
-
   constructor(
     experiments: WorkspaceExperiments,
     resourceLocator: ResourceLocator
@@ -60,18 +64,6 @@ export class ExperimentsTree
 
     this.view = this.dispose.track(
       createTreeView<ExperimentItem>('dvc.views.experimentsTree', this, true)
-    )
-
-    this.dispose.track(
-      this.view.onDidCollapseElement(({ element }) => {
-        this.setExpanded(element, false)
-      })
-    )
-
-    this.dispose.track(
-      this.view.onDidExpandElement(({ element }) => {
-        this.setExpanded(element, true)
-      })
     )
 
     this.experiments = experiments
@@ -126,14 +118,9 @@ export class ExperimentsTree
       return Promise.resolve(this.getWorkspaceAndCommits(element))
     }
 
-    if (element.type === ExperimentType.COMMIT) {
-      return Promise.resolve(
-        this.getExperimentsByCommit(element.dvcRoot, element)
-      )
-    }
-
-    const { dvcRoot, id } = element
-    return Promise.resolve(this.getCheckpoints(dvcRoot, id))
+    return Promise.resolve(
+      this.getExperimentsByCommit(element.dvcRoot, element)
+    )
   }
 
   private registerWorkaroundCommand() {
@@ -187,10 +174,7 @@ export class ExperimentsTree
   private formatExperiment(experiment: ExperimentAugmented, dvcRoot: string) {
     return {
       collapsibleState: experiment.hasChildren
-        ? this.getInitialCollapsibleState(
-            experiment.type,
-            experiment.displayNameOrParent
-          )
+        ? TreeItemCollapsibleState.Expanded
         : TreeItemCollapsibleState.None,
       command: {
         arguments: [{ dvcRoot, id: experiment.id }],
@@ -232,29 +216,6 @@ export class ExperimentsTree
     )
   }
 
-  private setExpanded(element: string | ExperimentItem, expanded: boolean) {
-    if (!isRoot(element) && element.description) {
-      this.setExperimentExpanded(element.description, expanded)
-    }
-  }
-
-  private setExperimentExpanded(description: string, expanded: boolean) {
-    this.expandedExperiments[description] = expanded
-  }
-
-  private getInitialCollapsibleState(
-    type: ExperimentType,
-    description?: string
-  ) {
-    if (
-      (description && this.expandedExperiments[description]) ||
-      type === ExperimentType.COMMIT
-    ) {
-      return TreeItemCollapsibleState.Expanded
-    }
-    return TreeItemCollapsibleState.Collapsed
-  }
-
   private getExperimentIcon({
     displayColor,
     status,
@@ -277,33 +238,6 @@ export class ExperimentsTree
     const iconName = this.getIconName(selected)
 
     return this.getUriOrIcon(displayColor, iconName)
-  }
-
-  private getCheckpoints(dvcRoot: string, id: string): ExperimentItem[] {
-    return (
-      this.experiments.getRepository(dvcRoot).getCheckpoints(id) || []
-    ).map(checkpoint => ({
-      collapsibleState: TreeItemCollapsibleState.None,
-      command: {
-        arguments: [{ dvcRoot, id: checkpoint.id }],
-        command: RegisteredCommands.EXPERIMENT_TOGGLE,
-        title: 'toggle'
-      },
-      description: checkpoint.displayNameOrParent,
-      dvcRoot,
-      iconPath: this.getUriOrIcon(
-        checkpoint.displayColor,
-        this.getIconName(checkpoint.selected)
-      ),
-      id: checkpoint.id,
-      label: checkpoint.label,
-      tooltip: this.getTooltip(
-        checkpoint.error,
-        checkpoint,
-        this.experiments.getRepository(dvcRoot).getFirstThreeColumnOrder()
-      ),
-      type: checkpoint.type
-    }))
   }
 
   private getUriOrIcon(displayColor: string | undefined, iconName: IconName) {
