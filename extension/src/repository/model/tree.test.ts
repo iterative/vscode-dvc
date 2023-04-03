@@ -401,10 +401,7 @@ describe('RepositoriesTree', () => {
       )
 
       const treeItem = trackedTreeView.getTreeItem({
-        error: {
-          label,
-          msg
-        }
+        error: msg
       } as PathItem)
 
       expect(mockedTreeItem).toHaveBeenCalledTimes(1)

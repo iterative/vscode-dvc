@@ -53,6 +53,7 @@ import {
   SelectedExperimentWithColor
 } from '../../experiments/model'
 import { Color } from '../../experiments/model/status/colors'
+import { exists } from '../../fileSystem'
 
 export const getCustomPlotId = (metric: string, param = CHECKPOINTS_PARAM) =>
   `custom-${metric}-${param}`
@@ -285,9 +286,10 @@ const collectPathData = (
 }
 
 export const collectData = (
-  data: PlotsOutput,
+  output: PlotsOutput,
   cliIdToLabel: CLIRevisionIdToLabel
 ): DataAccumulator => {
+  const { data } = output
   const acc = {
     comparisonData: {},
     revisionData: {}
@@ -314,7 +316,8 @@ const collectTemplate = (
   acc[path] = template
 }
 
-export const collectTemplates = (data: PlotsOutput): TemplateAccumulator => {
+export const collectTemplates = (output: PlotsOutput): TemplateAccumulator => {
+  const { data } = output
   const acc: TemplateAccumulator = {}
 
   for (const [path, plots] of Object.entries(data)) {
@@ -550,16 +553,19 @@ export const collectCommitRevisionDetails = (
   return commitRevisions
 }
 
-const getRevision = (
+const getOverrideRevision = (
   displayColor: Color,
   experiment: Experiment,
-  firstThreeColumns: string[]
+  firstThreeColumns: string[],
+  fetchedRevs: Set<string>,
+  errors: string[] | undefined
 ): Revision => {
   const { commit, displayNameOrParent, logicalGroupName, id, label } =
     experiment
   const revision: Revision = {
     displayColor,
-    fetched: true,
+    errors,
+    fetched: fetchedRevs.has(label),
     firstThreeColumns: getRevisionFirstThreeColumns(
       firstThreeColumns,
       experiment
@@ -579,18 +585,22 @@ const overrideWithWorkspace = (
   selectedWithOverrides: Revision[],
   displayColor: Color,
   label: string,
-  firstThreeColumns: string[]
+  firstThreeColumns: string[],
+  fetchedRevs: Set<string>,
+  errors: string[] | undefined
 ): void => {
   orderMapping[label] = EXPERIMENT_WORKSPACE_ID
   selectedWithOverrides.push(
-    getRevision(
+    getOverrideRevision(
       displayColor,
       {
         id: EXPERIMENT_WORKSPACE_ID,
         label: EXPERIMENT_WORKSPACE_ID,
         logicalGroupName: undefined
       },
-      firstThreeColumns
+      firstThreeColumns,
+      fetchedRevs,
+      errors
     )
   )
 }
@@ -609,15 +619,20 @@ const isExperimentThatWillDisappearAtEnd = (
 const getMostRecentFetchedCheckpointRevision = (
   selectedRevision: SelectedExperimentWithColor,
   fetchedRevs: Set<string>,
+  revisionsWithData: Set<string>,
   checkpoints: Experiment[] | undefined,
-  firstThreeColumns: string[]
+  firstThreeColumns: string[],
+  errors: string[] | undefined
 ): Revision => {
   const mostRecent =
-    checkpoints?.find(({ label }) => fetchedRevs.has(label)) || selectedRevision
-  return getRevision(
+    checkpoints?.find(({ label }) => revisionsWithData.has(label)) ||
+    selectedRevision
+  return getOverrideRevision(
     selectedRevision.displayColor,
     mostRecent,
-    firstThreeColumns
+    firstThreeColumns,
+    fetchedRevs,
+    errors
   )
 }
 
@@ -626,16 +641,20 @@ const overrideRevisionDetail = (
   selectedWithOverrides: Revision[],
   selectedRevision: SelectedExperimentWithColor,
   fetchedRevs: Set<string>,
+  revisionsWithData: Set<string>,
   checkpoints: Experiment[] | undefined,
-  firstThreeColumns: string[]
+  firstThreeColumns: string[],
+  errors: string[] | undefined
 ) => {
   const { label } = selectedRevision
 
   const mostRecent = getMostRecentFetchedCheckpointRevision(
     selectedRevision,
     fetchedRevs,
+    revisionsWithData,
     checkpoints,
-    firstThreeColumns
+    firstThreeColumns,
+    errors
   )
   orderMapping[label] = mostRecent.revision
   selectedWithOverrides.push(mostRecent)
@@ -646,11 +665,14 @@ const collectRevisionDetail = (
   selectedWithOverrides: Revision[],
   selectedRevision: SelectedExperimentWithColor,
   fetchedRevs: Set<string>,
+  revisionsWithData: Set<string>,
   unfinishedRunningExperiments: { [id: string]: string },
   getCheckpoints: (id: string) => Experiment[] | undefined,
+  getErrors: (label: string) => string[] | undefined,
   firstThreeColumns: string[]
 ) => {
   const { label, status, id, displayColor } = selectedRevision
+  const errors = getErrors(label)
 
   if (
     !fetchedRevs.has(label) &&
@@ -661,7 +683,9 @@ const collectRevisionDetail = (
       selectedWithOverrides,
       displayColor,
       label,
-      firstThreeColumns
+      firstThreeColumns,
+      fetchedRevs,
+      errors
     )
   }
 
@@ -678,14 +702,22 @@ const collectRevisionDetail = (
       selectedWithOverrides,
       selectedRevision,
       fetchedRevs,
+      revisionsWithData,
       getCheckpoints(id),
-      firstThreeColumns
+      firstThreeColumns,
+      errors
     )
   }
 
   orderMapping[label] = label
   selectedWithOverrides.push(
-    getRevision(displayColor, selectedRevision, firstThreeColumns)
+    getOverrideRevision(
+      displayColor,
+      selectedRevision,
+      firstThreeColumns,
+      fetchedRevs,
+      errors
+    )
   )
 }
 
@@ -693,8 +725,10 @@ export const collectOverrideRevisionDetails = (
   comparisonOrder: string[],
   selectedRevisions: SelectedExperimentWithColor[],
   fetchedRevs: Set<string>,
+  revisionsWithData: Set<string>,
   unfinishedRunningExperiments: { [id: string]: string },
   getCheckpoints: (id: string) => Experiment[] | undefined,
+  getErrors: (label: string) => string[] | undefined,
   firstThreeColumns: string[]
 ): {
   overrideComparison: Revision[]
@@ -709,8 +743,10 @@ export const collectOverrideRevisionDetails = (
       selectedWithOverrides,
       selectedRevision,
       fetchedRevs,
+      revisionsWithData,
       unfinishedRunningExperiments,
       getCheckpoints,
+      getErrors,
       firstThreeColumns
     )
   }
@@ -723,4 +759,38 @@ export const collectOverrideRevisionDetails = (
     ),
     overrideRevisions: selectedWithOverrides
   }
+}
+
+export const collectOrderedRevisions = (
+  revisions: {
+    id: string
+    label: string
+    Created?: string | null
+  }[]
+): { id: string; label: string; Created?: string | null }[] => {
+  return [...revisions].sort((a, b) => {
+    if (a.id === 'workspace') {
+      return -1
+    }
+    if (b.id === 'workspace') {
+      return 1
+    }
+    return (b.Created || '').localeCompare(a.Created || '')
+  })
+}
+
+export const collectImageUrl = (
+  image: ImagePlot | undefined,
+  fetched: boolean
+): string | undefined => {
+  const url = image?.url
+  if (!url) {
+    return
+  }
+
+  if (!fetched && !exists(url)) {
+    return undefined
+  }
+
+  return url
 }

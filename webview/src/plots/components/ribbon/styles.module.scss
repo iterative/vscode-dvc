@@ -56,11 +56,16 @@
   align-items: center;
   margin: 0;
 
-  &.addBorder {
+  &.addTopBorder {
     margin: 1em 0;
     padding-top: 1em;
     border-top: 1px solid $tooltip-border;
   }
+}
+
+.addBottomBorder {
+  padding-bottom: 1em;
+  border-bottom: 1px solid $tooltip-border;
 }
 
 .block {
@@ -87,6 +92,8 @@
     margin-left: -4px;
     height: 18px;
     width: 18px;
+    color: $error-color;
+    text-align: center;
   }
 
   .fetching {
@@ -159,4 +166,13 @@
 
 .buttonWrapper {
   list-style: none;
+}
+
+.tooltipPathWrapper {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: rtl;
+  display: block;
+  white-space: nowrap;
 }

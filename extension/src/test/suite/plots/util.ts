@@ -23,15 +23,16 @@ import { BaseWorkspaceWebviews } from '../../../webview/workspace'
 import { WebviewMessages } from '../../../plots/webview/messages'
 import { ExperimentsModel } from '../../../experiments/model'
 import { Experiment } from '../../../experiments/webview/contract'
-import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
+import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../../cli/dvc/contract'
 import {
   createCheckpointSpec,
   isCheckpointPlot
 } from '../../../plots/model/custom'
+import { ErrorsModel } from '../../../plots/errors/model'
 
 export const buildPlots = async (
   disposer: Disposer,
-  plotsDiff = {},
+  plotsDiff: PlotsOutput | undefined = undefined,
   expShow = expShowFixtureWithoutErrors
 ) => {
   const {
@@ -101,10 +102,14 @@ export const buildPlots = async (
   const pathsModel: PathsModel = (plots as any).paths
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const errorsModel: ErrorsModel = (plots as any).errors
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const webviewMessages: WebviewMessages = (plots as any).webviewMessages
 
   return {
     data,
+    errorsModel,
     experiments,
     messageSpy,
     mockGetModifiedTime,

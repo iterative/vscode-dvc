@@ -70,7 +70,8 @@ describe('PlotsPathsTree', () => {
           join(__filename, 'resources', 'plots', 'stroke-dash-1-0.svg')
         ),
         label: 'A',
-        path: 'A'
+        path: 'A',
+        tooltip: undefined
       },
       {
         collapsibleState: 0,
@@ -80,7 +81,8 @@ describe('PlotsPathsTree', () => {
           join(__filename, 'resources', 'plots', 'circle.svg')
         ),
         label: 'Y',
-        path: 'Y'
+        path: 'Y',
+        tooltip: undefined
       }
     ])
   })

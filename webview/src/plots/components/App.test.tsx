@@ -13,7 +13,7 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
-import customPlotsFixture from 'dvc/src/test/fixtures/expShow/base/customPlots'
+import originalCustomPlotsFixture from 'dvc/src/test/fixtures/expShow/base/customPlots'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
 import smoothTemplatePlotContent from 'dvc/src/test/fixtures/plotsDiff/template/smoothTemplatePlot'
@@ -59,6 +59,52 @@ import { DragEnterDirection } from '../../shared/components/dragDrop/util'
 import { clearSelection, createWindowTextSelection } from '../../test/selection'
 import * as EventCurrentTargetDistances from '../../shared/components/dragDrop/currentTarget'
 import { OVERSCAN_ROW_COUNT } from '../../shared/components/virtualizedGrid/VirtualizedGrid'
+
+const customPlotsFixture = {
+  ...originalCustomPlotsFixture,
+  plots: originalCustomPlotsFixture.plots.map(plot => {
+    return {
+      ...plot,
+      spec: {
+        ...plot.spec,
+        layer: [
+          {
+            layer: [
+              { mark: { type: 'line' } },
+              {
+                mark: { type: 'point' },
+                transform: [{ filter: { param: 'hover' } }]
+              }
+            ]
+          },
+          {
+            encoding: {
+              opacity: { value: 0 },
+              tooltip: [
+                { field: 'expName', title: 'name' },
+                { field: 'metric', title: 'summary.json:loss' },
+                { field: 'param', title: 'params.yaml:dropout' }
+              ]
+            },
+            mark: { type: 'rule' },
+            params: [
+              {
+                name: 'hover',
+                select: {
+                  clear: 'mouseout',
+                  fields: ['param', 'metric'],
+                  nearest: false, // true causes errors to be logged for tests
+                  on: 'mouseover',
+                  type: 'point'
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  })
+} as CustomPlotsData
 
 jest.mock('../../shared/components/dragDrop/currentTarget', () => {
   const actualModule = jest.requireActual(
@@ -229,7 +275,14 @@ describe('App', () => {
         plots: [
           {
             path: 'training/plots/images/misclassified.jpg',
-            revisions: { ad2b5ec: { revision: 'ad2b5ec' } }
+            revisions: {
+              ad2b5ec: {
+                errors: undefined,
+                loading: true,
+                revision: 'ad2b5ec',
+                url: undefined
+              }
+            }
           }
         ],
         revisions: [
@@ -1409,8 +1462,14 @@ describe('App', () => {
           id,
           metric: '',
           param: '',
-          // may need more than just an object
-          spec: {},
+          spec: {
+            $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+            encoding: {},
+            height: 100,
+            layer: [],
+            transform: [],
+            width: 100
+          },
           type: CustomPlotType.CHECKPOINT,
           values: []
         })
@@ -1763,6 +1822,7 @@ describe('App', () => {
     })
   })
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('Ribbon', () => {
     const getDisplayedRevisionOrder = () => {
       const ribbon = screen.getByTestId('ribbon')
@@ -1850,15 +1910,42 @@ describe('App', () => {
 
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
-        payload: [
-          EXPERIMENT_WORKSPACE_ID,
-          'main',
-          '4fb124a',
-          '42b8736',
-          '1ba7bcd'
-        ],
         type: MessageFromWebviewType.REFRESH_REVISIONS
       })
+    })
+
+    it('should show an error indicator for each revision with an error', () => {
+      renderAppWithOptionalData({
+        comparison: comparisonTableFixture,
+        selectedRevisions: plotsRevisionsFixture.map(rev => {
+          if (rev.revision === 'main') {
+            return {
+              ...rev,
+              errors: ['error']
+            }
+          }
+          return rev
+        })
+      })
+      const errorIndicators = screen.getAllByText('!')
+      expect(errorIndicators).toHaveLength(1)
+    })
+
+    it('should not show an error indicator for a loading revision', () => {
+      renderAppWithOptionalData({
+        comparison: comparisonTableFixture,
+        selectedRevisions: plotsRevisionsFixture.map(rev => {
+          if (rev.revision === 'main') {
+            return {
+              ...rev,
+              errors: ['error'],
+              fetched: false
+            }
+          }
+          return rev
+        })
+      })
+      expect(screen.queryByText('!')).not.toBeInTheDocument()
     })
   })
 

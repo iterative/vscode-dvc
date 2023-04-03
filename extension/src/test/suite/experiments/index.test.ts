@@ -131,27 +131,6 @@ suite('Experiments Test Suite', () => {
     })
   })
 
-  describe('getMoreCommits', () => {
-    it('should update the data with the number of commits', async () => {
-      const { experiments, mockUpdateExperimentsData } =
-        buildExperiments(disposable)
-
-      await experiments.getMoreCommits(5)
-
-      expect(mockUpdateExperimentsData).to.be.calledWithExactly(
-        ExperimentFlag.NUM_COMMIT,
-        '5'
-      )
-
-      await experiments.getMoreCommits(7)
-
-      expect(mockUpdateExperimentsData).to.be.calledWithExactly(
-        ExperimentFlag.NUM_COMMIT,
-        '7'
-      )
-    })
-  })
-
   describe('showWebview', () => {
     it('should be able to make the experiment webview visible', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('train')
@@ -316,6 +295,33 @@ suite('Experiments Test Suite', () => {
         hasMoreCommits: false
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should set isShowingMoreCommits to true if it is showing more than the current commit', async () => {
+      const { experiments, messageSpy } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
+
+      await experiments.showWebview()
+
+      expect(messageSpy).to.be.calledWithMatch({
+        isShowingMoreCommits: true
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should set isShowingMoreCommits to false it is showing only the current commit', async () => {
+      stub(GitReader.prototype, 'getNumCommits').resolves(1)
+      const { experiments, messageSpy } = buildExperiments(
+        disposable,
+        expShowFixture
+      )
+
+      await experiments.showWebview()
+
+      expect(messageSpy).to.be.calledWithMatch({
+        isShowingMoreCommits: false
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 
   describe('handleMessageFromWebview', () => {
@@ -333,7 +339,8 @@ suite('Experiments Test Suite', () => {
         internalCommands,
         dvcExecutor,
         mockCheckOrAddPipeline,
-        messageSpy
+        messageSpy,
+        mockUpdateExperimentsData
       } = buildExperiments(disposable, expShowFixture)
       const mockExecuteCommand = stub(
         internalCommands,
@@ -350,7 +357,8 @@ suite('Experiments Test Suite', () => {
         experimentsModel,
         messageSpy,
         mockCheckOrAddPipeline,
-        mockExecuteCommand
+        mockExecuteCommand,
+        mockUpdateExperimentsData
       }
     }
 
@@ -1350,9 +1358,17 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to show more commits', async () => {
-      const { experiments, messageSpy } = setupExperimentsAndMockCommands()
+      const {
+        experiments,
+        experimentsModel,
+        messageSpy,
+        mockUpdateExperimentsData
+      } = setupExperimentsAndMockCommands()
 
-      const getMoreCommitsSpy = spy(experiments, 'getMoreCommits')
+      const setNbfCommitsToShowSpy = spy(
+        experimentsModel,
+        'setNbfCommitsToShow'
+      )
 
       const webview = await experiments.showWebview()
       messageSpy.resetHistory()
@@ -1362,7 +1378,33 @@ suite('Experiments Test Suite', () => {
         type: MessageFromWebviewType.SHOW_MORE_COMMITS
       })
 
-      expect(getMoreCommitsSpy).to.be.calledOnce
+      expect(mockUpdateExperimentsData).to.be.calledOnce
+      expect(setNbfCommitsToShowSpy).to.be.calledWith(5)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a message to show less commits', async () => {
+      const {
+        experiments,
+        experimentsModel,
+        messageSpy,
+        mockUpdateExperimentsData
+      } = setupExperimentsAndMockCommands()
+
+      const setNbfCommitsToShowSpy = spy(
+        experimentsModel,
+        'setNbfCommitsToShow'
+      )
+
+      const webview = await experiments.showWebview()
+      messageSpy.resetHistory()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SHOW_LESS_COMMITS
+      })
+
+      expect(mockUpdateExperimentsData).to.be.calledOnce
+      expect(setNbfCommitsToShowSpy).to.be.calledWith(1)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 

@@ -8,7 +8,7 @@ import {
   DataStatusAccumulator,
   PathItem
 } from './collect'
-import { createTreeFromError, getLabel } from './error'
+import { createTreeFromError } from './error'
 import { UndecoratedDataStatus } from '../constants'
 import {
   SourceControlDataStatus,
@@ -24,6 +24,7 @@ import { sameContents } from '../../util/array'
 import { Data } from '../data'
 import { isDirectory } from '../../fileSystem'
 import { DOT_DVC } from '../../cli/dvc/constants'
+import { getCliErrorLabel } from '../../tree'
 
 export class RepositoryModel extends Disposable {
   private readonly dvcRoot: string
@@ -50,7 +51,7 @@ export class RepositoryModel extends Disposable {
 
   public transformAndSet({ dataStatus, hasGitChanges, untracked }: Data) {
     if (isDvcError(dataStatus)) {
-      return this.handleError(dataStatus)
+      return this.handleCliError(dataStatus)
     }
 
     const data = this.collectDataStatus({
@@ -70,16 +71,15 @@ export class RepositoryModel extends Disposable {
     return this.hasChanges
   }
 
-  private handleError({ error: { msg } }: DvcError) {
+  private handleCliError({ error: { msg } }: DvcError) {
     const emptyState = createDataStatusAccumulator()
     this.hasChanges = true
 
     this.tracked = new Set()
-    const label = getLabel(msg)
-    this.tree = createTreeFromError(this.dvcRoot, msg, label)
+    this.tree = createTreeFromError(this.dvcRoot, msg)
 
     return {
-      errorDecorationState: new Set([label]),
+      errorDecorationState: new Set([getCliErrorLabel(msg)]),
       scmDecorationState: this.getScmDecorationState(emptyState),
       sourceControlManagementState:
         this.getSourceControlManagementState(emptyState)

@@ -1,5 +1,6 @@
 import {
   MarkdownString,
+  ThemeIcon,
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
@@ -8,6 +9,8 @@ import {
   window
 } from 'vscode'
 import { getMarkdownString } from '../vscode/markdownString'
+import { RegisteredCommands } from '../commands/external'
+import { hasKey } from '../util/object'
 
 export enum DecoratableTreeItemScheme {
   EXPERIMENTS = 'dvc.experiments',
@@ -29,8 +32,38 @@ export const getDecoratableTreeItem = (
   return new TreeItem(decoratableUri, collapsibleState)
 }
 
+export type ErrorItem = { error: string }
+
+export const isErrorItem = (
+  maybeErrorItem: unknown
+): maybeErrorItem is ErrorItem => hasKey(maybeErrorItem, 'error')
+
 export const getErrorTooltip = (msg: string): MarkdownString =>
   getMarkdownString(`$(error) ${msg}`)
+
+export const getCliErrorLabel = (msg: string): string =>
+  msg.split('\n')[0].replace(/'|"/g, '')
+
+export const getCliErrorTreeItem = (
+  path: string,
+  msg: string,
+  decoratableTreeItemScheme: DecoratableTreeItemScheme
+) => {
+  const treeItem = getDecoratableTreeItem(path, decoratableTreeItemScheme)
+
+  treeItem.tooltip = getErrorTooltip(msg)
+
+  treeItem.iconPath = new ThemeIcon('blank')
+
+  treeItem.command = {
+    command: RegisteredCommands.EXTENSION_SHOW_OUTPUT,
+    title: 'Show DVC Output'
+  }
+  return treeItem
+}
+
+export const isRoot = (element: unknown): element is string =>
+  typeof element === 'string'
 
 export const createTreeView = <T>(
   name: string,

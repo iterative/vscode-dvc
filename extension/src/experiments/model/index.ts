@@ -6,7 +6,7 @@ import {
   splitExperimentsByFilters,
   getFilterId
 } from './filterBy'
-import { collectExperiments, collectMutableRevisions } from './collect'
+import { collectExperiments } from './collect'
 import {
   collectFiltered,
   collectFilteredCounts,
@@ -48,6 +48,7 @@ import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
 import { PersistenceKey } from '../../persistence/constants'
 import { sum } from '../../util/math'
+import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../cli/dvc/constants'
 
 export type StarredExperiments = Record<string, boolean | undefined>
 
@@ -80,6 +81,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   private availableColors: Color[]
   private coloredStatus: ColoredStatus
   private starredExperiments: StarredExperiments
+  private numberOfCommitsToShow: number
 
   private filters: Map<string, FilterDefinition> = new Map()
 
@@ -109,6 +111,10 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.starredExperiments = this.revive<StarredExperiments>(
       PersistenceKey.EXPERIMENTS_STARS,
       {}
+    )
+    this.numberOfCommitsToShow = this.revive<number>(
+      PersistenceKey.NUMBER_OF_COMMITS_TO_SHOW,
+      DEFAULT_NUM_OF_COMMITS_TO_SHOW
     )
 
     const assignedColors = new Set(
@@ -256,13 +262,6 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public getRevisions() {
     return this.getCombinedList().map(({ label }) => label)
-  }
-
-  public getMutableRevisions(hasCheckpoints: boolean) {
-    return collectMutableRevisions(
-      this.getRecordsWithoutCheckpoints(),
-      hasCheckpoints
-    )
   }
 
   public getSelectedRevisions() {
@@ -446,6 +445,15 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.finishedRunning
   }
 
+  public setNbfCommitsToShow(numberOfCommitsToShow: number) {
+    this.numberOfCommitsToShow = numberOfCommitsToShow
+    this.persistNbOfCommitsToShow()
+  }
+
+  public getNbOfCommitsToShow() {
+    return this.numberOfCommitsToShow
+  }
+
   private getSubRows(experiments: Experiment[], filters = this.getFilters()) {
     return experiments
       .map(experiment => {
@@ -587,6 +595,13 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   private persistStatus() {
     return this.persist(PersistenceKey.EXPERIMENTS_STATUS, this.coloredStatus)
+  }
+
+  private persistNbOfCommitsToShow() {
+    return this.persist(
+      PersistenceKey.NUMBER_OF_COMMITS_TO_SHOW,
+      this.numberOfCommitsToShow
+    )
   }
 
   private addDetails(experiment: Experiment) {

@@ -18,7 +18,7 @@ import {
   joinTruthyItems,
   sortCollectedArray
 } from '../../../util/array'
-import { createTreeView, getRootItem } from '../../../tree'
+import { createTreeView, getRootItem, isRoot } from '../../../tree'
 import { Disposable } from '../../../class/dispose'
 
 export type FilterItem = {
@@ -66,7 +66,7 @@ export class ExperimentsFilterByTree
   }
 
   public getTreeItem(element: string | FilterItem): TreeItem {
-    if (this.isRoot(element)) {
+    if (isRoot(element)) {
       return getRootItem(element)
     }
 
@@ -142,10 +142,6 @@ export class ExperimentsFilterByTree
     return this.experiments
       .getRepository(filter.dvcRoot)
       .removeFilter(filter.id)
-  }
-
-  private isRoot(element: string | FilterItem): element is string {
-    return typeof element === 'string'
   }
 
   private getDvcRoots() {
