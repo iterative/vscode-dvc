@@ -68,7 +68,9 @@ export enum MessageFromWebviewType {
   SETUP_WORKSPACE = 'setup-workspace',
   ZOOM_PLOT = 'zoom-plot',
   SHOW_MORE_COMMITS = 'show-more-commits',
-  SHOW_LESS_COMMITS = 'show-less-commits'
+  SHOW_LESS_COMMITS = 'show-less-commits',
+  SWITCH_BRANCHES_VIEW = 'show-all-branches',
+  SWITCH_COMMITS_VIEW = 'show-commits'
 }
 
 export type ColumnResizePayload = {
@@ -234,6 +236,8 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW }
   | { type: MessageFromWebviewType.SHOW_MORE_COMMITS }
   | { type: MessageFromWebviewType.SHOW_LESS_COMMITS }
+  | { type: MessageFromWebviewType.SWITCH_BRANCHES_VIEW }
+  | { type: MessageFromWebviewType.SWITCH_COMMITS_VIEW }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA

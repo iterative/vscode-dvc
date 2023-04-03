@@ -103,6 +103,7 @@ export type TableData = {
   hasRunningExperiment: boolean
   hasValidDvcYaml: boolean
   isShowingMoreCommits: boolean
+  isBranchesView: boolean
   rows: Row[]
   sorts: SortDefinition[]
   filteredCounts: FilteredCounts

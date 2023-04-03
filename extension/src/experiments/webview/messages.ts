@@ -25,7 +25,10 @@ import { Toast } from '../../vscode/toast'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { stopWorkspaceExperiment } from '../processExecution'
 import { hasDvcYamlFile } from '../../fileSystem'
-import { NUM_OF_COMMITS_TO_INCREASE } from '../../cli/dvc/constants'
+import {
+  ExperimentFlag,
+  NUM_OF_COMMITS_TO_INCREASE
+} from '../../cli/dvc/constants'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
@@ -48,10 +51,13 @@ export class WebviewMessages {
   private hasValidDvcYaml = true
   private hasMoreCommits = false
   private isShowingMoreCommits = true
+  private isBranchesView = false
 
   private readonly addStage: () => Promise<boolean>
   private readonly getNumCommits: () => Promise<number>
-  private readonly changeNbOfCommits: () => Promise<void>
+  private readonly changeNbOfCommits: (
+    ...args: (ExperimentFlag | string)[]
+  ) => Promise<void>
 
   constructor(
     dvcRoot: string,
@@ -68,7 +74,7 @@ export class WebviewMessages {
     hasStages: () => Promise<string>,
     addStage: () => Promise<boolean>,
     getNumCommits: () => Promise<number>,
-    changeNbOfCommits: () => Promise<void>
+    changeNbOfCommits: (...args: (ExperimentFlag | string)[]) => Promise<void>
   ) {
     this.dvcRoot = dvcRoot
     this.experiments = experiments
@@ -100,6 +106,7 @@ export class WebviewMessages {
   }
 
   public handleMessageFromWebview(message: MessageFromWebview) {
+    // eslint-disable-next-line sonarjs/max-switch-cases
     switch (message.type) {
       case MessageFromWebviewType.REORDER_COLUMNS:
         return this.setColumnOrder(message.payload)
@@ -221,9 +228,25 @@ export class WebviewMessages {
       case MessageFromWebviewType.SHOW_LESS_COMMITS:
         return this.changeCommitsToShow(-1)
 
+      case MessageFromWebviewType.SWITCH_BRANCHES_VIEW:
+        return this.switchToBranchesView()
+
+      case MessageFromWebviewType.SWITCH_COMMITS_VIEW:
+        return this.switchCommitsView()
+
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
+  }
+
+  private async switchToBranchesView() {
+    this.isBranchesView = true
+    await this.changeNbOfCommits(ExperimentFlag.ALL_BRANCHES)
+  }
+
+  private async switchCommitsView() {
+    this.isBranchesView = false
+    await this.changeNbOfCommits()
   }
 
   private async changeHasMoreOrLessCommits(update?: boolean) {
@@ -260,6 +283,7 @@ export class WebviewMessages {
       hasMoreCommits: this.hasMoreCommits,
       hasRunningExperiment: this.experiments.hasRunningExperiment(),
       hasValidDvcYaml: this.hasValidDvcYaml,
+      isBranchesView: this.isBranchesView,
       isShowingMoreCommits: this.isShowingMoreCommits,
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()

@@ -43,7 +43,10 @@ import { pickPaths } from '../path/selection/quickPick'
 import { Toast } from '../vscode/toast'
 import { ConfigKey } from '../vscode/config'
 import { checkSignalFile, pollSignalFileForProcess } from '../fileSystem'
-import { DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
+import {
+  DVCLIVE_ONLY_RUNNING_SIGNAL_FILE,
+  ExperimentFlag
+} from '../cli/dvc/constants'
 
 export const ExperimentsScale = {
   ...omit(ColumnType, 'TIMESTAMP'),
@@ -574,7 +577,7 @@ export class Experiments extends BaseRepository<TableData> {
           AvailableCommands.GIT_GET_NUM_COMMITS,
           this.dvcRoot
         ),
-      () => this.cliData.update()
+      (...args: (ExperimentFlag | string)[]) => this.cliData.update(...args)
     )
 
     this.dispose.track(

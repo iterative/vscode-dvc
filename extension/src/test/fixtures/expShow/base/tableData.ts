@@ -14,6 +14,7 @@ const tableDataFixture: TableData = {
   hasValidDvcYaml: true,
   hasColumns: true,
   isShowingMoreCommits: true,
+  isBranchesView: false,
   sorts: [],
   changes: [],
   columnOrder: [],
