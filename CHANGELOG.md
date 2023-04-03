@@ -2,6 +2,41 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.0] - 2023-04-03
+
+### 🚀 New Features and Enhancements
+
+- Add persistence to the number of commits to show [#3583](https://github.com/iterative/vscode-dvc/pull/3583) by [@sroy3](https://github.com/sroy3)
+- Show plots errors in plots tree [#3522](https://github.com/iterative/vscode-dvc/pull/3522) by [@mattseddon](https://github.com/mattseddon)
+- Display error thrown by Plots Diff in Plots tree [#3569](https://github.com/iterative/vscode-dvc/pull/3569) by [@mattseddon](https://github.com/mattseddon)
+- Show errors in plots ribbon [#3570](https://github.com/iterative/vscode-dvc/pull/3570) by [@mattseddon](https://github.com/mattseddon)
+- Show "Custom" section in "Get Started" screen [#3523](https://github.com/iterative/vscode-dvc/pull/3523) by [@julieg18](https://github.com/julieg18)
+- Show revision level plot errors [#3608](https://github.com/iterative/vscode-dvc/pull/3608) by [@mattseddon](https://github.com/mattseddon)
+- Remove experiment checkpoints from extension UI [#3585](https://github.com/iterative/vscode-dvc/pull/3585) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Send back change in commits to show [#3601](https://github.com/iterative/vscode-dvc/pull/3601) by [@sroy3](https://github.com/sroy3)
+- Use plot errors to display correct messages for missing plots [#3520](https://github.com/iterative/vscode-dvc/pull/3520) by [@mattseddon](https://github.com/mattseddon)
+- Refresh cached plots data on every update [#3532](https://github.com/iterative/vscode-dvc/pull/3532) by [@mattseddon](https://github.com/mattseddon)
+- Ensure unfetched image plots are on disk before providing URL to webview [#3544](https://github.com/iterative/vscode-dvc/pull/3544) by [@mattseddon](https://github.com/mattseddon)
+- Fix removal of existing commit errors [#3545](https://github.com/iterative/vscode-dvc/pull/3545) by [@mattseddon](https://github.com/mattseddon)
+- Account for data key being optional in plots diff output [#3547](https://github.com/iterative/vscode-dvc/pull/3547) by [@mattseddon](https://github.com/mattseddon)
+- Ensure the correct fetched status is applied when overriding plot revisions [#3557](https://github.com/iterative/vscode-dvc/pull/3557) by [@mattseddon](https://github.com/mattseddon)
+- Ensure that data for broken revisions is dropped [#3576](https://github.com/iterative/vscode-dvc/pull/3576) by [@mattseddon](https://github.com/mattseddon)
+- Fix scheduled CLI output test by updating expected demo project output (plots diff breaking change) [#3558](https://github.com/iterative/vscode-dvc/pull/3558) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Remove vega-util truncation for ribbon tooltip [#3573](https://github.com/iterative/vscode-dvc/pull/3573) by [@sroy3](https://github.com/sroy3)
+- Bump min DVC version to 2.52.0 (plots errors) [#3477](https://github.com/iterative/vscode-dvc/pull/3477) by [@mattseddon](https://github.com/mattseddon)
+- Group shared ErrorTooltip with Tooltip [#3546](https://github.com/iterative/vscode-dvc/pull/3546) by [@mattseddon](https://github.com/mattseddon)
+- Consolidate tree view error decoration providers [#3548](https://github.com/iterative/vscode-dvc/pull/3548) by [@mattseddon](https://github.com/mattseddon)
+- Remove code that refreshes a single plot revision (no longer possible) [#3555](https://github.com/iterative/vscode-dvc/pull/3555) by [@mattseddon](https://github.com/mattseddon)
+- Move error formatting logic out to clients [#3578](https://github.com/iterative/vscode-dvc/pull/3578) by [@mattseddon](https://github.com/mattseddon)
+- Move custom plot spec creation to backend [#3575](https://github.com/iterative/vscode-dvc/pull/3575) by [@julieg18](https://github.com/julieg18)
+- Move e2e tests to stable [#3613](https://github.com/iterative/vscode-dvc/pull/3613) by [@julieg18](https://github.com/julieg18)
+
 ## [0.6.26] - 2023-03-29
 
 ### 🚀 New Features and Enhancements
