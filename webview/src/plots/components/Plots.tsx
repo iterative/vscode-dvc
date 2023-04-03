@@ -7,6 +7,7 @@ import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
 import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper'
 import { Ribbon } from './ribbon/Ribbon'
 import { setMaxNbPlotsPerRow, setZoomedInPlot } from './webviewSlice'
+import styles from './styles.module.scss'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Modal } from '../../shared/components/modal/Modal'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
@@ -23,6 +24,9 @@ const PlotsContent = () => {
   )
   const hasTemplateData = useSelector(
     (state: PlotsState) => state.template.hasData
+  )
+  const customPlotIds = useSelector(
+    (state: PlotsState) => state.custom.plotsIds
   )
   const wrapperRef = createRef<HTMLDivElement>()
 
@@ -47,13 +51,39 @@ const PlotsContent = () => {
     return <EmptyState>Loading Plots...</EmptyState>
   }
 
+  const modal = zoomedInPlot?.plot && (
+    <Modal
+      onClose={() => {
+        dispatch(setZoomedInPlot(undefined))
+      }}
+    >
+      <ZoomedInPlot props={zoomedInPlot.plot} />
+    </Modal>
+  )
+
+  const hasNoCustomPlots = customPlotIds.length === 0
+
   if (!hasComparisonData && !hasTemplateData) {
     return (
-      <GetStarted
-        addItems={<AddPlots hasUnselectedPlots={hasUnselectedPlots} />}
-        showEmpty={!hasPlots}
-        welcome={<Welcome />}
-      />
+      <div className={styles.getStartedWrapper}>
+        <GetStarted
+          addItems={
+            <AddPlots
+              hasUnselectedPlots={hasUnselectedPlots}
+              hasNoCustomPlots={hasNoCustomPlots}
+            />
+          }
+          showEmpty={!hasPlots}
+          welcome={<Welcome />}
+          isFullScreen={hasNoCustomPlots}
+        />
+        {!hasNoCustomPlots && (
+          <>
+            <CustomPlotsWrapper />
+            {modal}
+          </>
+        )}
+      </div>
     )
   }
 
@@ -64,15 +94,7 @@ const PlotsContent = () => {
       <ComparisonTableWrapper />
       <CustomPlotsWrapper />
 
-      {zoomedInPlot?.plot && (
-        <Modal
-          onClose={() => {
-            dispatch(setZoomedInPlot(undefined))
-          }}
-        >
-          <ZoomedInPlot props={zoomedInPlot.plot} />
-        </Modal>
-      )}
+      {modal}
     </div>
   )
 }

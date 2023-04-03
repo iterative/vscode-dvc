@@ -223,6 +223,9 @@ const collectErrorPaths = (
 ) => {
   const paths = errors.map(({ name }) => name)
   for (const path of paths) {
+    if (!path) {
+      continue
+    }
     const revisions = collectErrorRevisions(path, errors, cliIdToLabel)
     acc = addRevisionsToPath(acc, data, path, revisions)
   }
