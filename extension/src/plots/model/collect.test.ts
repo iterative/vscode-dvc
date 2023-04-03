@@ -8,7 +8,11 @@ import {
   collectOrderedRevisions,
   collectImageUrl
 } from './collect'
-import { isCheckpointPlot } from './custom'
+import {
+  createCheckpointSpec,
+  isCheckpointPlot,
+  isCheckpointValue
+} from './custom'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import customPlotsFixture, {
   customPlotsOrderFixture,
@@ -30,6 +34,7 @@ import {
 import { getCLICommitId } from '../../test/fixtures/plotsDiff/util'
 import { SelectedExperimentWithColor } from '../../experiments/model'
 import { Experiment } from '../../experiments/webview/contract'
+import { Color } from '../../experiments/model/status/colors'
 import { exists } from '../../fileSystem'
 
 const mockedExists = jest.mocked(exists)
@@ -52,7 +57,7 @@ describe('collectCustomPlots', () => {
     height: DEFAULT_PLOT_HEIGHT,
     nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
     plotsOrderValues: customPlotsOrderFixture,
-    selectedRevisions: customPlotsFixture.colors?.domain
+    scale: customPlotsFixture.colors
   }
 
   it('should return the expected data from the test fixture', () => {
@@ -67,7 +72,7 @@ describe('collectCustomPlots', () => {
     )
     const data = collectCustomPlots({
       ...defaultFuncArgs,
-      selectedRevisions: undefined
+      scale: undefined
     })
 
     expect(data).toStrictEqual(expectedOutput)
@@ -87,9 +92,16 @@ describe('collectCustomPlots', () => {
 
   it('should return checkpoint plots with values only containing selected experiments data', () => {
     const domain = customPlotsFixture.colors?.domain.slice(1) as string[]
+    const range = customPlotsFixture.colors?.range.slice(1) as Color[]
 
     const expectedOutput = customPlotsFixture.plots.map(plot => ({
       ...plot,
+      spec: isCheckpointValue(plot.type)
+        ? createCheckpointSpec(plot.metric, plot.metric, plot.param, {
+            domain,
+            range
+          })
+        : plot.spec,
       values: isCheckpointPlot(plot)
         ? plot.values.filter(value => domain.includes(value.group))
         : plot.values
@@ -97,7 +109,7 @@ describe('collectCustomPlots', () => {
 
     const data = collectCustomPlots({
       ...defaultFuncArgs,
-      selectedRevisions: domain
+      scale: { domain, range }
     })
 
     expect(data).toStrictEqual(expectedOutput)

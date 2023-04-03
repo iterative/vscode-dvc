@@ -24,7 +24,10 @@ import { WebviewMessages } from '../../../plots/webview/messages'
 import { ExperimentsModel } from '../../../experiments/model'
 import { Experiment } from '../../../experiments/webview/contract'
 import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../../cli/dvc/contract'
-import { isCheckpointPlot } from '../../../plots/model/custom'
+import {
+  createCheckpointSpec,
+  isCheckpointPlot
+} from '../../../plots/model/custom'
 import { ErrorsModel } from '../../../plots/errors/model'
 
 export const buildPlots = async (
@@ -153,6 +156,12 @@ export const getExpectedCustomPlotsData = (
       nbItemsPerRow,
       plots: plots.map(plot => ({
         ...plot,
+        spec: isCheckpointPlot(plot)
+          ? createCheckpointSpec(plot.metric, plot.metric, plot.param, {
+              domain,
+              range
+            })
+          : plot.spec,
         values: isCheckpointPlot(plot)
           ? plot.values.filter(value => domain.includes(value.group))
           : plot.values

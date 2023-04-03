@@ -160,7 +160,7 @@ export class PlotsModel extends ModelWithPersistence {
       height,
       nbItemsPerRow,
       plotsOrderValues,
-      selectedRevisions: colors?.domain
+      scale: colors
     })
 
     if (plots.length === 0 && plotsOrderValues.length > 0) {
