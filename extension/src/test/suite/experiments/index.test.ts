@@ -945,9 +945,8 @@ suite('Experiments Test Suite', () => {
       const queuedExperiment = '90aea7f2482117a55dfcadcdb901aaa6610fbbc9'
 
       const isExperimentSelected = (expId: string): boolean =>
-        !!experimentsModel
-          .getRecordsWithoutCheckpoints()
-          .find(({ id }) => id === expId)?.selected
+        !!experimentsModel.getAllRecords().find(({ id }) => id === expId)
+          ?.selected
 
       expect(isExperimentSelected(experimentToToggle), 'experiment is selected')
         .to.be.true
@@ -1142,9 +1141,7 @@ suite('Experiments Test Suite', () => {
       const areExperimentsStarred = (expIds: string[]): boolean =>
         expIds
           .map(expId =>
-            experimentsModel
-              .getRecordsWithoutCheckpoints()
-              .find(({ id }) => id === expId)
+            experimentsModel.getAllRecords().find(({ id }) => id === expId)
           )
           .every(exp => exp?.starred)
 

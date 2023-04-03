@@ -336,15 +336,12 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getExperimentCount()
   }
 
-  public getExperimentsWithCheckpoints() {
-    return this.experiments.getExperimentsWithCheckpoints()
+  public getWorkspaceCommitsAndExperiments() {
+    return this.experiments.getWorkspaceCommitsAndExperiments()
   }
 
   public async selectExperiments() {
-    const experiments = [
-      ...this.experiments.getWorkspaceAndCommits(),
-      ...this.experiments.getExperiments()
-    ]
+    const experiments = this.experiments.getWorkspaceCommitsAndExperiments()
 
     const selected = await pickExperimentsToPlot(
       experiments,
@@ -588,7 +585,7 @@ export class Experiments extends BaseRepository<TableData> {
     }
 
     const experiment = await pickExperiment(
-      this.experiments.getRecordsWithoutCheckpoints(),
+      this.experiments.getAllRecords(),
       this.getFirstThreeColumnOrder(),
       Title.SELECT_BASE_EXPERIMENT
     )

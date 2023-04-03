@@ -23,7 +23,6 @@ import {
   CustomPlotsOrderValue
 } from './custom'
 import {
-  CheckpointPlot,
   ComparisonPlots,
   Revision,
   ComparisonRevisionData,
@@ -61,8 +60,6 @@ import {
 } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
 import { ErrorsModel } from '../errors/model'
-
-export type CustomCheckpointPlots = { [metric: string]: CheckpointPlot }
 
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
@@ -137,18 +134,13 @@ export class PlotsModel extends ModelWithPersistence {
 
   public getCustomPlots(): CustomPlotsData | undefined {
     const experiments = this.experiments
-      .getExperimentsWithCheckpoints()
+      .getWorkspaceCommitsAndExperiments()
       .filter(({ id }) => id !== EXPERIMENT_WORKSPACE_ID)
 
     if (experiments.length === 0) {
       return
     }
 
-    const colors = getColorScale(
-      this.experiments
-        .getSelectedExperiments()
-        .map(({ displayColor, id: revision }) => ({ displayColor, revision }))
-    )
     const height = this.getHeight(PlotsSection.CUSTOM_PLOTS)
     const nbItemsPerRow = this.getNbItemsPerRowOrWidth(
       PlotsSection.CUSTOM_PLOTS
@@ -156,11 +148,9 @@ export class PlotsModel extends ModelWithPersistence {
     const plotsOrderValues = this.getCustomPlotsOrder()
     const plots: CustomPlotData[] = collectCustomPlots({
       experiments,
-      hasCheckpoints: this.experiments.hasCheckpoints(),
       height,
       nbItemsPerRow,
-      plotsOrderValues,
-      scale: colors
+      plotsOrderValues
     })
 
     if (plots.length === 0 && plotsOrderValues.length > 0) {
@@ -168,7 +158,6 @@ export class PlotsModel extends ModelWithPersistence {
     }
 
     return {
-      colors,
       enablePlotCreation: checkForCustomPlotOptions(
         this.experiments.getColumnTerminalNodes(),
         plotsOrderValues
@@ -434,12 +423,9 @@ export class PlotsModel extends ModelWithPersistence {
 
   private cleanupOutdatedCustomPlotsState() {
     const order = this.getCustomPlotsOrder()
-    const workspaceHoldsUpToDateState =
-      order.length === 0 || order[0].type !== undefined
-    if (workspaceHoldsUpToDateState) {
-      return
-    }
-    const newOrder = order.map(value => cleanupOldOrderValue(value))
+    const newOrder = order
+      .filter(plot => (plot as { type?: 'checkpoint' }).type !== 'checkpoint')
+      .map(value => cleanupOldOrderValue(value))
     this.setCustomPlotsOrder(newOrder)
   }
 

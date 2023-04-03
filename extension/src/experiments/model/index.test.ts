@@ -201,7 +201,7 @@ describe('ExperimentsModel', () => {
       ''
     )
 
-    const experiments = model.getRecordsWithoutCheckpoints()
+    const experiments = model.getAllRecords()
 
     const changed: string[] = []
     for (const { deps, sha } of experiments) {

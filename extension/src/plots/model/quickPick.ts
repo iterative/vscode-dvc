@@ -2,12 +2,9 @@ import { getCustomPlotId } from './collect'
 import {
   getFullValuePath,
   CustomPlotsOrderValue,
-  isCheckpointValue,
   removeColumnTypeFromPath,
   getCustomPlotPathsFromColumns,
-  getCustomPlotIds,
-  checkForMetricVsParamPlotOptions,
-  checkForCheckpointPlotOptions
+  getCustomPlotIds
 } from './custom'
 import { splitColumnPath } from '../../experiments/columns/paths'
 import { pickFromColumnLikes } from '../../experiments/columns/quickPick'
@@ -15,13 +12,10 @@ import { Column, ColumnType } from '../../experiments/webview/contract'
 import { definedAndNonEmpty } from '../../util/array'
 import {
   quickPickManyValues,
-  quickPickValue,
   QuickPickOptionsWithTitle
 } from '../../vscode/quickPick'
 import { Title } from '../../vscode/title'
 import { Toast } from '../../vscode/toast'
-import { CustomPlotType } from '../webview/contract'
-import { ColumnLike } from '../../experiments/columns/like'
 
 const getMetricVsParamPlotItem = (metric: string, param: string) => {
   const fullMetric = getFullValuePath(ColumnType.METRICS, metric)
@@ -39,17 +33,6 @@ const getMetricVsParamPlotItem = (metric: string, param: string) => {
   }
 }
 
-const getCheckpointPlotItem = (metric: string) => {
-  const fullMetric = getFullValuePath(ColumnType.METRICS, metric)
-  const splitMetric = splitColumnPath(fullMetric)
-  return {
-    description: 'Checkpoint Trend Plot',
-    detail: fullMetric,
-    label: splitMetric[splitMetric.length - 1],
-    value: getCustomPlotId(metric)
-  }
-}
-
 export const pickCustomPlots = (
   plotsOrderValues: CustomPlotsOrderValue[],
   noPlotsErrorMessage: string,
@@ -60,53 +43,10 @@ export const pickCustomPlots = (
   }
 
   const plotsItems = plotsOrderValues.map(value =>
-    isCheckpointValue(value.type)
-      ? getCheckpointPlotItem(value.metric)
-      : getMetricVsParamPlotItem(value.metric, value.param)
+    getMetricVsParamPlotItem(value.metric, value.param)
   )
 
   return quickPickManyValues(plotsItems, quickPickOptions)
-}
-
-export const pickCustomPlotType = (
-  columns: Column[],
-  customPlotOrder: CustomPlotsOrderValue[]
-): Thenable<CustomPlotType | undefined> => {
-  const items = []
-  const isMetricVsParamAvailable = checkForMetricVsParamPlotOptions(
-    columns,
-    customPlotOrder
-  )
-  const isCheckpointAvailable = checkForCheckpointPlotOptions(
-    columns,
-    customPlotOrder
-  )
-
-  if (isMetricVsParamAvailable) {
-    items.push({
-      description:
-        'A linear plot that compares a chosen metric and param with current experiments.',
-      label: 'Metric Vs Param',
-      value: CustomPlotType.METRIC_VS_PARAM
-    })
-  }
-
-  if (isCheckpointAvailable) {
-    items.push({
-      description:
-        'A linear plot that shows how a chosen metric changes over selected experiments.',
-      label: 'Checkpoint Trend',
-      value: CustomPlotType.CHECKPOINT
-    })
-  }
-
-  if (items.length === 0) {
-    return Toast.showError('There are no plots to create.')
-  }
-
-  return quickPickValue(items, {
-    title: Title.SELECT_PLOT_TYPE_CUSTOM_PLOT
-  })
 }
 
 const getColumnLike = (path: string) => {
@@ -136,10 +76,7 @@ const getAvailableMetricVsParamPlots = (
   customPlotOrder: CustomPlotsOrderValue[]
 ): AvailableMetricVsParamPlots => {
   const { metrics, params } = getCustomPlotPathsFromColumns(columns)
-  const plotIds = getCustomPlotIds(
-    customPlotOrder,
-    CustomPlotType.METRIC_VS_PARAM
-  )
+  const plotIds = getCustomPlotIds(customPlotOrder)
 
   const acc: AvailableMetricVsParamPlots = []
 
@@ -220,49 +157,4 @@ export const pickMetricAndParam = async (
   )
 
   return { metric, param }
-}
-
-const getAvailableCheckpointPlotColumnLikes = (
-  columns: Column[],
-  customPlotOrder: CustomPlotsOrderValue[]
-): ColumnLike[] => {
-  const { metrics } = getCustomPlotPathsFromColumns(columns)
-  const customPlotIds = getCustomPlotIds(
-    customPlotOrder,
-    CustomPlotType.CHECKPOINT
-  )
-  const columnLikes = []
-
-  for (const metric of metrics) {
-    if (!customPlotIds.has(getCustomPlotId(metric))) {
-      const fullMetric = getFullValuePath(ColumnType.METRICS, metric)
-      columnLikes.push(getColumnLike(fullMetric))
-    }
-  }
-
-  return columnLikes
-}
-
-export const pickMetric = async (
-  columns: Column[],
-  customPlotOrder: CustomPlotsOrderValue[]
-) => {
-  const availableMetrics = getAvailableCheckpointPlotColumnLikes(
-    columns,
-    customPlotOrder
-  )
-
-  if (!definedAndNonEmpty(availableMetrics)) {
-    return Toast.showError('There are no metrics to select from.')
-  }
-
-  const metric = await pickFromColumnLikes(availableMetrics, {
-    title: Title.SELECT_METRIC_CUSTOM_PLOT
-  })
-
-  if (!metric) {
-    return
-  }
-
-  return removeColumnTypeFromPath(metric.path, ColumnType.METRICS)
 }

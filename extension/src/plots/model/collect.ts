@@ -1,18 +1,10 @@
 import get from 'lodash.get'
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
-import {
-  getFullValuePath,
-  CHECKPOINTS_PARAM,
-  CustomPlotsOrderValue,
-  isCheckpointValue,
-  createCheckpointSpec,
-  createMetricVsParamSpec
-} from './custom'
+import { createSpec, CustomPlotsOrderValue, getFullValuePath } from './custom'
 import { getRevisionFirstThreeColumns } from './util'
 import {
   ColorScale,
-  CheckpointPlotValues,
   isImagePlot,
   ImagePlot,
   TemplatePlot,
@@ -22,7 +14,7 @@ import {
   PlotsType,
   Revision,
   CustomPlotData,
-  MetricVsParamPlotValues
+  CustomPlotValues
 } from '../webview/contract'
 import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../cli/dvc/contract'
 import { splitColumnPath } from '../../experiments/columns/paths'
@@ -47,66 +39,22 @@ import {
   unmergeConcatenatedFields
 } from '../multiSource/collect'
 import { StrokeDashEncoding } from '../multiSource/constants'
-import {
-  ExperimentWithCheckpoints,
-  ExperimentWithDefinedCheckpoints,
-  SelectedExperimentWithColor
-} from '../../experiments/model'
+import { SelectedExperimentWithColor } from '../../experiments/model'
 import { Color } from '../../experiments/model/status/colors'
 import { exists } from '../../fileSystem'
 
-export const getCustomPlotId = (metric: string, param = CHECKPOINTS_PARAM) =>
+export const getCustomPlotId = (metric: string, param: string) =>
   `custom-${metric}-${param}`
 
-const getValueFromColumn = (
-  path: string,
-  experiment: ExperimentWithCheckpoints
-) => get(experiment, splitColumnPath(path)) as number | undefined
+const getValueFromColumn = (path: string, experiment: Experiment) =>
+  get(experiment, splitColumnPath(path)) as number | undefined
 
-const isExperimentWithDefinedCheckpoints = (
-  experiment: ExperimentWithCheckpoints
-): experiment is ExperimentWithDefinedCheckpoints => !!experiment.checkpoints
-
-const collectCheckpointValuesFromExperiment = (
-  values: CheckpointPlotValues,
-  exp: ExperimentWithDefinedCheckpoints,
-  metricPath: string
-) => {
-  const group = exp.name || exp.label
-  const maxEpoch = exp.checkpoints.length + 1
-
-  const metricValue = getValueFromColumn(metricPath, exp)
-  if (metricValue !== undefined) {
-    values.push({ group, iteration: maxEpoch, y: metricValue })
-  }
-
-  for (const [ind, checkpoint] of exp.checkpoints.entries()) {
-    const metricValue = getValueFromColumn(metricPath, checkpoint)
-    if (metricValue !== undefined) {
-      values.push({ group, iteration: maxEpoch - ind - 1, y: metricValue })
-    }
-  }
-}
-
-const getCheckpointValues = (
-  experiments: ExperimentWithCheckpoints[],
-  metricPath: string
-): CheckpointPlotValues => {
-  const values: CheckpointPlotValues = []
-  for (const experiment of experiments) {
-    if (isExperimentWithDefinedCheckpoints(experiment)) {
-      collectCheckpointValuesFromExperiment(values, experiment, metricPath)
-    }
-  }
-  return values
-}
-
-const getMetricVsParamValues = (
-  experiments: ExperimentWithCheckpoints[],
+const getValues = (
+  experiments: Experiment[],
   metricPath: string,
   paramPath: string
-): MetricVsParamPlotValues => {
-  const values: MetricVsParamPlotValues = []
+): CustomPlotValues => {
+  const values: CustomPlotValues = []
 
   for (const experiment of experiments) {
     const metricValue = getValueFromColumn(metricPath, experiment)
@@ -126,36 +74,25 @@ const getMetricVsParamValues = (
 
 const getCustomPlotData = (
   orderValue: CustomPlotsOrderValue,
-  experiments: ExperimentWithCheckpoints[],
-  scale: ColorScale | undefined,
+  experiments: Experiment[],
   height: number,
   nbItemsPerRow: number
 ): CustomPlotData => {
-  const { metric, param, type } = orderValue
+  const { metric, param } = orderValue
   const metricPath = getFullValuePath(ColumnType.METRICS, metric)
   const paramPath = getFullValuePath(ColumnType.PARAMS, param)
-  const selectedRevisions = scale?.domain || []
 
-  const selectedExperiments = experiments.filter(({ name, label }) =>
-    selectedRevisions.includes(name || label)
-  )
-
-  const values = isCheckpointValue(type)
-    ? getCheckpointValues(selectedExperiments, metricPath)
-    : getMetricVsParamValues(experiments, metricPath, paramPath)
+  const values = getValues(experiments, metricPath, paramPath)
 
   const yTitle = truncateVerticalTitle(metric, nbItemsPerRow, height) as string
 
-  const spec = isCheckpointValue(type)
-    ? createCheckpointSpec(yTitle, metric, param, scale)
-    : createMetricVsParamSpec(yTitle, metric, param)
+  const spec = createSpec(yTitle, metric, param)
 
   return {
     id: getCustomPlotId(metric, param),
     metric,
     param,
     spec,
-    type,
     values
   } as CustomPlotData
 }
@@ -163,29 +100,18 @@ const getCustomPlotData = (
 export const collectCustomPlots = ({
   plotsOrderValues,
   experiments,
-  hasCheckpoints,
-  scale,
   height,
   nbItemsPerRow
 }: {
   plotsOrderValues: CustomPlotsOrderValue[]
-  experiments: ExperimentWithCheckpoints[]
-  hasCheckpoints: boolean
-  scale: ColorScale | undefined
+  experiments: Experiment[]
   height: number
   nbItemsPerRow: number
 }): CustomPlotData[] => {
   const plots = []
-  const shouldSkipCheckpointPlots = !hasCheckpoints || !scale?.domain
 
   for (const value of plotsOrderValues) {
-    if (shouldSkipCheckpointPlots && isCheckpointValue(value.type)) {
-      continue
-    }
-
-    plots.push(
-      getCustomPlotData(value, experiments, scale, height, nbItemsPerRow)
-    )
+    plots.push(getCustomPlotData(value, experiments, height, nbItemsPerRow))
   }
 
   return plots
