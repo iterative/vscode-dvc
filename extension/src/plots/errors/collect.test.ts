@@ -1,5 +1,10 @@
 import { join } from 'path'
-import { collectErrors, collectImageErrors, collectPathErrors } from './collect'
+import {
+  collectErrorPaths,
+  collectErrors,
+  collectImageErrors,
+  collectPathErrors
+} from './collect'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 
 describe('collectErrors', () => {
@@ -180,7 +185,7 @@ describe('collectPathErrorsTable', () => {
   it('should return undefined if the errors do not relate to selected revisions', () => {
     const rev = 'main'
     const path = 'wat'
-    const markdownTable = collectPathErrors(
+    const errors = collectPathErrors(
       path,
       [EXPERIMENT_WORKSPACE_ID],
       [
@@ -201,13 +206,13 @@ describe('collectPathErrorsTable', () => {
         }
       ]
     )
-    expect(markdownTable).toBeUndefined()
+    expect(errors).toBeUndefined()
   })
 
   it('should return undefined if the errors do not relate to the path', () => {
     const rev = 'main'
     const path = 'wat'
-    const markdownTable = collectPathErrors(
+    const errors = collectPathErrors(
       join('other', 'path'),
       [rev],
       [
@@ -228,13 +233,13 @@ describe('collectPathErrorsTable', () => {
         }
       ]
     )
-    expect(markdownTable).toBeUndefined()
+    expect(errors).toBeUndefined()
   })
 
   it('should return an array of objects containing error messages that relate to the select revision and provided path', () => {
     const rev = 'a-really-long-branch-name'
     const path = 'wat'
-    const markdownTable = collectPathErrors(
+    const errors = collectPathErrors(
       path,
       [EXPERIMENT_WORKSPACE_ID, rev],
       [
@@ -260,14 +265,14 @@ describe('collectPathErrorsTable', () => {
         }
       ]
     )
-    expect(markdownTable).toStrictEqual([
+    expect(errors).toStrictEqual([
       { msg: 'wat not found.', rev: EXPERIMENT_WORKSPACE_ID },
       { msg: 'catastrophic error', rev },
       { msg: 'UNEXPECTEDERRRRROR', rev }
     ])
   })
 
-  it('should not duplicate entries in the table', () => {
+  it('should not duplicate entries', () => {
     const path = 'dvc.yaml::Accuracy'
     const msg =
       "Could not find provided field ('acc_') in data fields ('step, acc')."
@@ -279,7 +284,7 @@ describe('collectPathErrorsTable', () => {
       type
     }
 
-    const markdownTable = collectPathErrors(
+    const errors = collectPathErrors(
       'dvc.yaml::Accuracy',
       [EXPERIMENT_WORKSPACE_ID, 'main', 'test-plots-diff', 'aa1401b'],
       [
@@ -300,7 +305,7 @@ describe('collectPathErrorsTable', () => {
       ]
     )
 
-    expect(markdownTable).toStrictEqual([
+    expect(errors).toStrictEqual([
       {
         msg,
         rev: EXPERIMENT_WORKSPACE_ID
@@ -311,5 +316,146 @@ describe('collectPathErrorsTable', () => {
       },
       { msg, rev: 'aa1401b' }
     ])
+  })
+
+  it('should provide an entry for the path if there is a revision level error', () => {
+    const rev = 'main'
+    const path = 'wat'
+    const errors = collectPathErrors(
+      path,
+      [EXPERIMENT_WORKSPACE_ID, rev],
+      [
+        {
+          msg: `${path} not found.`,
+          path,
+          rev: EXPERIMENT_WORKSPACE_ID
+        },
+        {
+          msg: 'UNEXPECTEDERRRRROR',
+          path: undefined,
+          rev: EXPERIMENT_WORKSPACE_ID
+        },
+        {
+          msg: 'catastrophic error',
+          path,
+          rev
+        }
+      ]
+    )
+    expect(errors).toStrictEqual([
+      { msg: 'wat not found.', rev: EXPERIMENT_WORKSPACE_ID },
+      { msg: 'UNEXPECTEDERRRRROR', rev: EXPERIMENT_WORKSPACE_ID },
+      { msg: 'catastrophic error', rev }
+    ])
+  })
+})
+
+describe('collectErrorPaths', () => {
+  it('should apply a revision level error to all available paths if the revision is selected', () => {
+    const mockedDvcRoot = join('root', 'a')
+    const selectedRevisions = ['main', 'test-plots-diff', 'aa1401b']
+    const paths = ['dvc.yaml::Accuracy', 'dvc.yaml::Loss']
+    const errors = [
+      {
+        msg: "'./dvc.yaml' validation failed",
+        path: undefined,
+        rev: 'main',
+        type: 'YAMLValidationError'
+      }
+    ]
+
+    const errorPaths = collectErrorPaths(
+      mockedDvcRoot,
+      selectedRevisions,
+      paths,
+      errors
+    )
+
+    expect(errorPaths).toStrictEqual(
+      new Set(paths.map(path => join(mockedDvcRoot, path)))
+    )
+  })
+
+  it('should ignore revision level errors if the revision is not selected', () => {
+    const mockedDvcRoot = join('root', 'a')
+    const selectedRevisions = ['test-plots-diff', 'aa1401b']
+    const paths = ['dvc.yaml::Accuracy', 'dvc.yaml::Loss']
+    const errors = [
+      {
+        msg: "'./dvc.yaml' validation failed",
+        path: undefined,
+        rev: 'main',
+        type: 'YAMLValidationError'
+      }
+    ]
+
+    const errorPaths = collectErrorPaths(
+      mockedDvcRoot,
+      selectedRevisions,
+      paths,
+      errors
+    )
+
+    expect(errorPaths).toStrictEqual(new Set([]))
+  })
+
+  it('should collect appropriate errors and ignore revision level errors if the revision is not selected', () => {
+    const mockedDvcRoot = join('root', 'a')
+    const selectedRevisions = ['test-plots-diff', 'aa1401b']
+    const paths = ['dvc.yaml::Accuracy', 'dvc.yaml::Loss']
+    const errors = [
+      {
+        msg: "'./dvc.yaml' validation failed",
+        path: undefined,
+        rev: 'main',
+        type: 'YAMLValidationError'
+      },
+      {
+        msg: 'it broke',
+        path: paths[0],
+        rev: 'test-plots-diff',
+        type: 'UnexpectedError'
+      }
+    ]
+
+    const errorPaths = collectErrorPaths(
+      mockedDvcRoot,
+      selectedRevisions,
+      paths,
+      errors
+    )
+
+    expect(errorPaths).toStrictEqual(new Set([join(mockedDvcRoot, paths[0])]))
+  })
+
+  it('should collect revision level and individual errors together', () => {
+    const mockedDvcRoot = join('root', 'a')
+    const selectedRevisions = ['test-plots-diff', 'main']
+    const paths = ['dvc.yaml::Accuracy', 'dvc.yaml::Loss']
+    const errors = [
+      {
+        msg: "'./dvc.yaml' validation failed",
+        path: undefined,
+        rev: 'main',
+        type: 'YAMLValidationError'
+      },
+      {
+        msg: 'it broke',
+        path: paths[0],
+        rev: 'test-plots-diff',
+        type: 'UnexpectedError'
+      }
+    ]
+
+    const errorPaths = collectErrorPaths(
+      mockedDvcRoot,
+      selectedRevisions,
+      paths,
+      errors
+    )
+
+    expect(errorPaths).toStrictEqual(
+      new Set(paths.map(path => join(mockedDvcRoot, path)))
+    )
   })
 })
