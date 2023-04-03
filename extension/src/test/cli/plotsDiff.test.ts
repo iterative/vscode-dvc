@@ -9,7 +9,8 @@ import {
   PlotsType,
   TemplatePlot
 } from '../../plots/webview/contract'
-import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
+import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../cli/dvc/contract'
+import { isDvcError } from '../../cli/dvc/reader'
 
 suite('plots diff -o <TEMP_DIR> --split --show-json', () => {
   // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -24,14 +25,15 @@ suite('plots diff -o <TEMP_DIR> --split --show-json', () => {
       )
 
       expect(output, 'should be an object').to.be.an('object')
+      expect(isDvcError(output), 'should not be an error object').to.be.false
+      const data = (output as PlotsOutput)?.data
 
-      expect(
-        Object.keys(output),
-        'should have six plot paths'
-      ).to.have.lengthOf(6)
+      expect(Object.keys(data), 'should have six plot paths').to.have.lengthOf(
+        6
+      )
 
       // each set of plots under a path
-      for (const plots of Object.values(output)) {
+      for (const plots of Object.values(data)) {
         expect(plots, 'should have plots under each path').to.be.an('array')
         expect(
           plots,
@@ -95,7 +97,7 @@ suite('plots diff -o <TEMP_DIR> --split --show-json', () => {
       await initializeEmptyRepo()
       const output = await dvcReader.plotsDiff(TEMP_DIR)
 
-      expect(output).deep.equal({})
+      expect(output).deep.equal({ data: {} })
     })
   })
 })

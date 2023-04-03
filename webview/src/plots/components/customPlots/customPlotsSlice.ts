@@ -12,6 +12,7 @@ import { addPlotsWithSnapshots, removePlots } from '../plotDataStore'
 export interface CustomPlotsState extends Omit<CustomPlotsData, 'plots'> {
   isCollapsed: boolean
   hasData: boolean
+  hasItems: boolean
   plotsIds: string[]
   plotsSnapshots: { [key: string]: string }
   disabledDragPlotIds: string[]
@@ -24,6 +25,7 @@ export const customPlotsInitialState: CustomPlotsState = {
   disabledDragPlotIds: [],
   enablePlotCreation: true,
   hasData: false,
+  hasItems: false,
   height: DEFAULT_HEIGHT[PlotsSection.CUSTOM_PLOTS],
   isCollapsed: DEFAULT_SECTION_COLLAPSED[PlotsSection.CUSTOM_PLOTS],
   nbItemsPerRow:
@@ -58,15 +60,19 @@ export const customPlotsSlice = createSlice({
       }
       const { plots, colors, ...statePayload } = action.payload
       const plotsIds = plots?.map(plot => plot.id) || []
-      const snapShots = addPlotsWithSnapshots(plots, PlotsSection.CUSTOM_PLOTS)
+      const plotsSnapshots = addPlotsWithSnapshots(
+        plots,
+        PlotsSection.CUSTOM_PLOTS
+      )
       removePlots(plotsIds, PlotsSection.CUSTOM_PLOTS)
       return {
         ...state,
         ...statePayload,
         colors: colors || initialColorsState,
         hasData: !!action.payload,
+        hasItems: Object.keys(plotsSnapshots).length > 0,
         plotsIds: plots?.map(plot => plot.id) || [],
-        plotsSnapshots: snapShots
+        plotsSnapshots
       }
     }
   }

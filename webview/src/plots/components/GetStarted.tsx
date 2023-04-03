@@ -5,13 +5,15 @@ import { StartButton } from '../../shared/components/button/StartButton'
 
 export type AddPlotsProps = {
   hasUnselectedPlots: boolean
+  hasNoCustomPlots: boolean
 }
 
 export const AddPlots: React.FC<AddPlotsProps> = ({
-  hasUnselectedPlots
+  hasUnselectedPlots,
+  hasNoCustomPlots
 }: AddPlotsProps) => (
   <div>
-    <p>No Plots to Display.</p>
+    <p>No Plots to Display</p>
     <div>
       <StartButton
         onClick={() =>
@@ -31,6 +33,18 @@ export const AddPlots: React.FC<AddPlotsProps> = ({
             })
           }
           text="Add Plots"
+        />
+      )}
+      {hasNoCustomPlots && (
+        <StartButton
+          isNested={hasNoCustomPlots}
+          appearance="secondary"
+          onClick={() =>
+            sendMessage({
+              type: MessageFromWebviewType.ADD_CUSTOM_PLOT
+            })
+          }
+          text="Add Custom Plot"
         />
       )}
     </div>

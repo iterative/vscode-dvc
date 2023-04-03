@@ -11,7 +11,10 @@ import {
   collectCommitRevisionDetails,
   collectOverrideRevisionDetails,
   collectCustomPlots,
-  getCustomPlotId
+  getCustomPlotId,
+  collectOrderedRevisions,
+  collectImageUrl,
+  CLIRevisionIdToLabel
 } from './collect'
 import { getRevisionFirstThreeColumns } from './util'
 import {
@@ -36,11 +39,16 @@ import {
 } from '../webview/contract'
 import {
   EXPERIMENT_WORKSPACE_ID,
+  PlotsOutput,
   PlotsOutputOrError
 } from '../../cli/dvc/contract'
 import { Experiments } from '../../experiments'
 import { getColorScale } from '../vega/util'
-import { definedAndNonEmpty, reorderObjectList } from '../../util/array'
+import {
+  definedAndNonEmpty,
+  reorderObjectList,
+  sameContents
+} from '../../util/array'
 import { removeMissingKeysFromObject } from '../../util/object'
 import { TemplateOrder } from '../paths/collect'
 import { PersistenceKey } from '../../persistence/constants'
@@ -52,11 +60,13 @@ import {
   MultiSourceVariations
 } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
+import { ErrorsModel } from '../errors/model'
 
 export type CustomCheckpointPlots = { [metric: string]: CheckpointPlot }
 
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
+  private readonly errors: ErrorsModel
 
   private nbItemsPerRowOrWidth: Record<PlotsSection, number>
   private height: Record<PlotsSection, PlotHeight>
@@ -77,10 +87,12 @@ export class PlotsModel extends ModelWithPersistence {
   constructor(
     dvcRoot: string,
     experiments: Experiments,
+    errors: ErrorsModel,
     workspaceState: Memento
   ) {
     super(dvcRoot, workspaceState)
     this.experiments = experiments
+    this.errors = errors
 
     this.nbItemsPerRowOrWidth = this.revive(
       PersistenceKey.PLOT_NB_ITEMS_PER_ROW_OR_WIDTH,
@@ -103,40 +115,20 @@ export class PlotsModel extends ModelWithPersistence {
     return this.removeStaleData()
   }
 
-  public async transformAndSetPlots(data: PlotsOutputOrError, revs: string[]) {
-    if (isDvcError(data)) {
-      return
-    }
-
+  public async transformAndSetPlots(
+    output: PlotsOutputOrError,
+    revs: string[]
+  ) {
     const cliIdToLabel = this.getCLIIdToLabel()
 
-    const [{ comparisonData, revisionData }, templates, multiSourceVariations] =
-      await Promise.all([
-        collectData(data, cliIdToLabel),
-        collectTemplates(data),
-        collectMultiSourceVariations(data, this.multiSourceVariations)
-      ])
-
-    this.comparisonData = {
-      ...this.comparisonData,
-      ...comparisonData
+    if (isDvcError(output)) {
+      this.handleCliError()
+    } else {
+      await this.processOutput(output, revs, cliIdToLabel)
     }
-    this.revisionData = {
-      ...this.revisionData,
-      ...revisionData
-    }
-    this.templates = { ...this.templates, ...templates }
-    this.multiSourceVariations = multiSourceVariations
-    this.multiSourceEncoding = collectMultiSourceEncoding(
-      this.multiSourceVariations
-    )
-
     this.setComparisonOrder()
 
-    this.fetchedRevs = new Set([
-      ...this.fetchedRevs,
-      ...revs.map(rev => cliIdToLabel[rev])
-    ])
+    this.fetchedRevs = new Set(revs.map(rev => cliIdToLabel[rev]))
 
     this.experiments.setRevisionCollected(revs)
 
@@ -168,7 +160,7 @@ export class PlotsModel extends ModelWithPersistence {
       height,
       nbItemsPerRow,
       plotsOrderValues,
-      selectedRevisions: colors?.domain
+      scale: colors
     })
 
     if (plots.length === 0 && plotsOrderValues.length > 0) {
@@ -213,10 +205,6 @@ export class PlotsModel extends ModelWithPersistence {
     this.setCustomPlotsOrder(newCustomPlotsOrder)
   }
 
-  public setupManualRefresh(id: string) {
-    this.deleteRevisionData(id)
-  }
-
   public getOverrideRevisionDetails() {
     const finishedExperiments = this.experiments.getFinishedExperiments()
 
@@ -229,8 +217,13 @@ export class PlotsModel extends ModelWithPersistence {
         this.comparisonOrder,
         this.experiments.getSelectedRevisions(),
         this.fetchedRevs,
+        new Set([
+          ...Object.keys(this.comparisonData),
+          ...Object.keys(this.revisionData)
+        ]),
         finishedExperiments,
         id => this.experiments.getCheckpoints(id),
+        label => this.errors.getRevisionErrors(label),
         this.experiments.getFirstThreeColumnOrder()
       )
     }
@@ -239,27 +232,6 @@ export class PlotsModel extends ModelWithPersistence {
       overrideComparison: this.getComparisonRevisions(),
       overrideRevisions: this.getSelectedRevisionDetails()
     }
-  }
-
-  public getUnfetchedRevisions() {
-    return this.getSelectedRevisions().filter(
-      revision => !this.fetchedRevs.has(revision)
-    )
-  }
-
-  public getMissingRevisions() {
-    const cachedRevisions = new Set([
-      ...Object.keys(this.comparisonData),
-      ...Object.keys(this.revisionData)
-    ])
-
-    return this.getSelectedRevisions()
-      .filter(label => !cachedRevisions.has(label))
-      .map(label => this.getCLIId(label))
-  }
-
-  public getMutableRevisions() {
-    return this.experiments.getMutableRevisions()
   }
 
   public getRevisionColors(overrideRevs?: Revision[]) {
@@ -278,6 +250,7 @@ export class PlotsModel extends ModelWithPersistence {
       } = exp
       const revision: Revision = {
         displayColor,
+        errors: this.errors.getRevisionErrors(label),
         fetched: this.fetchedRevs.has(label),
         firstThreeColumns: getRevisionFirstThreeColumns(
           this.experiments.getFirstThreeColumnOrder(),
@@ -328,6 +301,10 @@ export class PlotsModel extends ModelWithPersistence {
     return this.getSelectedComparisonPlots(paths, selectedRevisions)
   }
 
+  public requiresUpdate() {
+    return !sameContents([...this.fetchedRevs], this.getSelectedRevisions())
+  }
+
   public getComparisonRevisions() {
     return reorderObjectList<Revision>(
       this.comparisonOrder,
@@ -356,6 +333,12 @@ export class PlotsModel extends ModelWithPersistence {
     return this.experiments.getSelectedRevisions().map(({ label }) => label)
   }
 
+  public getSelectedOrderedCliIds() {
+    return collectOrderedRevisions(this.experiments.getSelectedRevisions()).map(
+      ({ label }) => this.getCLIId(label)
+    )
+  }
+
   public setNbItemsPerRowOrWidth(section: PlotsSection, nbItemsPerRow: number) {
     this.nbItemsPerRowOrWidth[section] = nbItemsPerRow
     this.persist(
@@ -374,6 +357,10 @@ export class PlotsModel extends ModelWithPersistence {
   public setHeight(section: PlotsSection, height: PlotHeight) {
     this.height[section] = height
     this.persist(PersistenceKey.PLOT_HEIGHT, this.height)
+  }
+
+  public resetFetched() {
+    this.fetchedRevs = new Set()
   }
 
   public getHeight(section: PlotsSection) {
@@ -404,6 +391,45 @@ export class PlotsModel extends ModelWithPersistence {
     }
 
     return mapping
+  }
+
+  private handleCliError() {
+    this.comparisonData = {}
+    this.revisionData = {}
+    this.templates = {}
+    this.multiSourceVariations = {}
+    this.multiSourceEncoding = {}
+  }
+
+  private async processOutput(
+    output: PlotsOutput,
+    revs: string[],
+    cliIdToLabel: CLIRevisionIdToLabel
+  ) {
+    for (const rev of revs) {
+      this.deleteRevisionData(cliIdToLabel[rev] || rev)
+    }
+
+    const [{ comparisonData, revisionData }, templates, multiSourceVariations] =
+      await Promise.all([
+        collectData(output, cliIdToLabel),
+        collectTemplates(output),
+        collectMultiSourceVariations(output, this.multiSourceVariations)
+      ])
+
+    this.comparisonData = {
+      ...this.comparisonData,
+      ...comparisonData
+    }
+    this.revisionData = {
+      ...this.revisionData,
+      ...revisionData
+    }
+    this.templates = templates
+    this.multiSourceVariations = multiSourceVariations
+    this.multiSourceEncoding = collectMultiSourceEncoding(
+      this.multiSourceVariations
+    )
   }
 
   private cleanupOutdatedCustomPlotsState() {
@@ -438,12 +464,6 @@ export class PlotsModel extends ModelWithPersistence {
       revisions,
       this.revisionData
     )
-
-    for (const fetchedRev of this.fetchedRevs) {
-      if (!revisions.includes(fetchedRev)) {
-        this.fetchedRevs.delete(fetchedRev)
-      }
-    }
   }
 
   private removeStaleCommits() {
@@ -453,10 +473,12 @@ export class PlotsModel extends ModelWithPersistence {
     for (const id of Object.keys(this.commitRevisions)) {
       if (this.commitRevisions[id] !== currentCommitRevisions[id]) {
         this.deleteRevisionData(id)
+        this.fetchedRevs.delete(id)
       }
     }
     if (!isEqual(this.commitRevisions, currentCommitRevisions)) {
       this.deleteRevisionData(EXPERIMENT_WORKSPACE_ID)
+      this.fetchedRevs.delete(EXPERIMENT_WORKSPACE_ID)
     }
     this.commitRevisions = currentCommitRevisions
   }
@@ -464,7 +486,6 @@ export class PlotsModel extends ModelWithPersistence {
   private deleteRevisionData(id: string) {
     delete this.revisionData[id]
     delete this.comparisonData[id]
-    this.fetchedRevs.delete(id)
   }
 
   private getCLIId(label: string) {
@@ -494,9 +515,15 @@ export class PlotsModel extends ModelWithPersistence {
 
     for (const revision of selectedRevisions) {
       const image = this.comparisonData?.[revision]?.[path]
+      const errors = this.errors.getImageErrors(path, revision)
+      const fetched = this.fetchedRevs.has(revision)
+      const url = collectImageUrl(image, fetched)
+      const loading = !fetched && !url
       pathRevisions.revisions[revision] = {
+        errors,
+        loading,
         revision,
-        url: image?.url
+        url
       }
     }
     acc.push(pathRevisions)

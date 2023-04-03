@@ -1,5 +1,5 @@
-import { EventEmitter } from 'vscode'
-import { collectMetricsFiles, collectFiles, collectRevs } from './collect'
+import { Event, EventEmitter } from 'vscode'
+import { collectMetricsFiles, collectFiles } from './collect'
 import {
   EXPERIMENT_WORKSPACE_ID,
   ExperimentsOutput,
@@ -14,9 +14,15 @@ export class PlotsData extends BaseData<{
   data: PlotsOutputOrError
   revs: string[]
 }> {
+  public readonly onDidTrigger: Event<void>
+
   private readonly model: PlotsModel
 
   private metricFiles: string[] = []
+
+  private readonly triggered: EventEmitter<void> = this.dispose.track(
+    new EventEmitter()
+  )
 
   constructor(
     dvcRoot: string,
@@ -37,13 +43,12 @@ export class PlotsData extends BaseData<{
       ['dvc.yaml', 'dvc.lock']
     )
     this.model = model
+    this.onDidTrigger = this.triggered.event
   }
 
   public async update(): Promise<void> {
-    const revs = collectRevs(
-      this.model.getMissingRevisions(),
-      this.model.getMutableRevisions()
-    )
+    this.notifyTriggered()
+    const revs = this.model.getSelectedOrderedCliIds()
 
     const args = this.getArgs(revs)
     const data = await this.internalCommands.executeCommand<PlotsOutputOrError>(
@@ -74,6 +79,10 @@ export class PlotsData extends BaseData<{
 
   protected collectFiles({ data }: { data: PlotsOutputOrError }) {
     this.collectedFiles = collectFiles(data, this.collectedFiles)
+  }
+
+  private notifyTriggered() {
+    this.triggered.fire()
   }
 
   private getArgs(revs: string[]) {

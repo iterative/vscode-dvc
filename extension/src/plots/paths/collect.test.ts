@@ -3,6 +3,7 @@ import { VisualizationSpec } from 'react-vega'
 import isEqual from 'lodash.isequal'
 import {
   collectEncodingElements,
+  collectPathErrorsTable,
   collectPaths,
   collectTemplateOrder,
   EncodingType,
@@ -12,8 +13,9 @@ import { TemplatePlotGroup, PlotsType } from '../webview/contract'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import { Shape, StrokeDash } from '../multiSource/constants'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
+import { CLIRevisionIdToLabel } from '../model/collect'
 
-describe('collectPath', () => {
+describe('collectPaths', () => {
   const revisions = [
     EXPERIMENT_WORKSPACE_ID,
     '53c3851',
@@ -80,39 +82,63 @@ describe('collectPath', () => {
     ])
   })
 
-  it('should update the revision details when the workspace is recollected (plots in workspace changed)', () => {
+  it('should update the revision details when any revision is recollected', () => {
     const [remainingPath] = Object.keys(plotsDiffFixture)
     const collectedPaths = collectPaths([], plotsDiffFixture, revisions, {})
     expect(
       collectedPaths.filter(path => path.revisions.has(EXPERIMENT_WORKSPACE_ID))
     ).toHaveLength(collectedPaths.length)
 
+    const fetchedRevs = revisions.slice(0, 3)
+    const cliIdToLabel: CLIRevisionIdToLabel = {}
+    for (const rev of fetchedRevs) {
+      cliIdToLabel[rev] = rev
+    }
+
+    cliIdToLabel[fetchedRevs[2]] = 'some-branch'
+
     const updatedPaths = collectPaths(
       collectedPaths,
       {
-        [remainingPath]: [
-          {
-            content: {},
-            datapoints: {
-              [EXPERIMENT_WORKSPACE_ID]: [
-                {
-                  loss: '2.43323',
-                  step: '0'
-                }
-              ]
-            },
-            revisions: [EXPERIMENT_WORKSPACE_ID],
-            type: PlotsType.VEGA
-          }
-        ]
+        data: {
+          [remainingPath]: [
+            {
+              content: {},
+              datapoints: {
+                [fetchedRevs[0]]: [
+                  {
+                    loss: '2.43323',
+                    step: '0'
+                  }
+                ],
+                [fetchedRevs[1]]: [
+                  {
+                    loss: '2.43323',
+                    step: '0'
+                  }
+                ],
+                [fetchedRevs[2]]: [
+                  {
+                    loss: '2.43323',
+                    step: '0'
+                  }
+                ]
+              },
+              revisions: fetchedRevs,
+              type: PlotsType.VEGA
+            }
+          ]
+        }
       },
-      [EXPERIMENT_WORKSPACE_ID],
-      {}
+      fetchedRevs,
+      cliIdToLabel
     )
 
-    expect(
-      updatedPaths.filter(path => path.revisions.has(EXPERIMENT_WORKSPACE_ID))
-    ).toHaveLength(remainingPath.split(sep).length)
+    for (const rev of Object.values(cliIdToLabel)) {
+      expect(updatedPaths.filter(path => path.revisions.has(rev))).toHaveLength(
+        remainingPath.split(sep).length
+      )
+    }
   })
 
   it('should not drop already collected paths', () => {
@@ -138,39 +164,41 @@ describe('collectPath', () => {
   it('should handle more complex paths', () => {
     const revisions = [EXPERIMENT_WORKSPACE_ID]
     const mockPlotsDiff = {
-      [join('logs', 'scalars', 'acc.tsv')]: [
-        {
-          content: {},
-          datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
-          revisions,
-          type: PlotsType.VEGA
-        }
-      ],
-      [join('logs', 'scalars', 'loss.tsv')]: [
-        {
-          content: {},
-          datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
-          revisions,
-          type: PlotsType.VEGA
-        }
-      ],
-      [join('plots', 'heatmap.png')]: [
-        {
-          revisions,
-          type: PlotsType.IMAGE,
-          url: join('plots', 'heatmap.png')
-        }
-      ],
-      'predictions.json': [
-        {
-          content: {
-            facet: { field: 'rev', type: 'nominal' }
-          } as VisualizationSpec,
-          datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
-          revisions,
-          type: PlotsType.VEGA
-        }
-      ]
+      data: {
+        [join('logs', 'scalars', 'acc.tsv')]: [
+          {
+            content: {},
+            datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
+            revisions,
+            type: PlotsType.VEGA
+          }
+        ],
+        [join('logs', 'scalars', 'loss.tsv')]: [
+          {
+            content: {},
+            datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
+            revisions,
+            type: PlotsType.VEGA
+          }
+        ],
+        [join('plots', 'heatmap.png')]: [
+          {
+            revisions,
+            type: PlotsType.IMAGE,
+            url: join('plots', 'heatmap.png')
+          }
+        ],
+        'predictions.json': [
+          {
+            content: {
+              facet: { field: 'rev', type: 'nominal' }
+            } as VisualizationSpec,
+            datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
+            revisions,
+            type: PlotsType.VEGA
+          }
+        ]
+      }
     }
 
     expect(collectPaths([], mockPlotsDiff, revisions, {})).toStrictEqual([
@@ -219,6 +247,56 @@ describe('collectPath', () => {
         path: 'predictions.json',
         revisions: new Set(revisions),
         type: new Set(['template-multi'])
+      }
+    ])
+  })
+
+  it('should correctly collect error paths', () => {
+    const misspeltJpg = join('training', 'plots', 'images', 'mip.jpg')
+    const revisions = new Set([EXPERIMENT_WORKSPACE_ID])
+
+    const paths = collectPaths(
+      [],
+      {
+        data: {},
+        errors: [
+          {
+            msg: '',
+            name: misspeltJpg,
+            rev: EXPERIMENT_WORKSPACE_ID,
+            source: misspeltJpg,
+            type: 'FileNotFoundError'
+          }
+        ]
+      },
+      [],
+      {}
+    )
+    expect(paths).toHaveLength(4)
+    expect(paths).toStrictEqual([
+      {
+        hasChildren: false,
+        parentPath: join('training', 'plots', 'images'),
+        path: misspeltJpg,
+        revisions
+      },
+      {
+        hasChildren: true,
+        parentPath: join('training', 'plots'),
+        path: join('training', 'plots', 'images'),
+        revisions
+      },
+      {
+        hasChildren: true,
+        parentPath: 'training',
+        path: join('training', 'plots'),
+        revisions
+      },
+      {
+        hasChildren: true,
+        parentPath: undefined,
+        path: 'training',
+        revisions
       }
     ])
   })
@@ -515,5 +593,34 @@ describe('collectEncodingElements', () => {
         value: Shape[1]
       }
     ])
+  })
+})
+
+describe('collectPathErrorsTable', () => {
+  it('should construct a markdown table with the error if they relate to the select revision and provided path', () => {
+    const rev = 'a-really-long-branch-name'
+    const path = 'wat'
+    const markdownTable = collectPathErrorsTable([
+      {
+        msg: `${path} not found.`,
+        rev: EXPERIMENT_WORKSPACE_ID
+      },
+      {
+        msg: 'catastrophic error',
+        rev
+      },
+      {
+        msg: 'UNEXPECTEDERRRRROR',
+        rev
+      }
+    ])
+    expect(markdownTable).toStrictEqual(
+      'Errors\n' +
+        '|||\n' +
+        '|--|--|\n' +
+        '| a-really... | UNEXPECTEDERRRRROR |\n' +
+        '| a-really... | catastrophic error |\n' +
+        '| workspace | wat not found. |'
+    )
   })
 })

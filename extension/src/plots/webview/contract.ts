@@ -56,13 +56,14 @@ export type RevisionFirstThreeColumns = Array<{
 }>
 
 export type Revision = {
+  commit?: string
+  displayColor: Color
+  errors?: string[]
+  fetched: boolean
+  firstThreeColumns: RevisionFirstThreeColumns
+  group?: string
   id?: string
   revision: string
-  group?: string
-  displayColor: Color
-  fetched: boolean
-  commit?: string
-  firstThreeColumns: RevisionFirstThreeColumns
 }
 
 export interface PlotsComparisonData {
@@ -110,7 +111,7 @@ export type MetricVsParamPlot = {
 export type CustomPlot = MetricVsParamPlot | CheckpointPlot
 
 export type CustomPlotData = CustomPlot & {
-  yTitle: string
+  spec: VisualizationSpec
 }
 
 export type CustomPlotsData = {
@@ -170,8 +171,10 @@ export interface TemplatePlotsData {
 }
 
 export type ComparisonPlot = {
-  url?: string
+  url: string | undefined
   revision: string
+  errors: string[] | undefined
+  loading: boolean
 }
 
 export enum PlotsDataKeys {

@@ -5,7 +5,12 @@ import {
   TemplatePlot,
   TemplatePlotGroup
 } from '../webview/contract'
-import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../cli/dvc/contract'
+import {
+  EXPERIMENT_WORKSPACE_ID,
+  PlotError,
+  PlotsData,
+  PlotsOutput
+} from '../../cli/dvc/contract'
 import { getParent, getPath, getPathArray } from '../../fileSystem/util'
 import { splitMatchedOrdered, definedAndNonEmpty } from '../../util/array'
 import { isMultiViewPlot } from '../vega/util'
@@ -17,6 +22,8 @@ import {
   StrokeDashValue
 } from '../multiSource/constants'
 import { MultiSourceEncoding } from '../multiSource/collect'
+import { CLIRevisionIdToLabel } from '../model/collect'
+import { truncate } from '../../util/string'
 
 export enum PathType {
   COMPARISON = 'comparison',
@@ -50,7 +57,7 @@ const collectType = (plots: Plot[]) => {
 }
 
 const getType = (
-  data: PlotsOutput,
+  data: PlotsData,
   hasChildren: boolean,
   path: string
 ): Set<PathType> | undefined => {
@@ -66,17 +73,17 @@ const getType = (
   return collectType(plots)
 }
 
-const filterWorkspaceIfFetched = (
+const filterRevisionIfFetched = (
   existingPaths: PlotPath[],
-  fetchedRevs: string[]
+  fetchedRevs: string[],
+  cliIdToLabel: CLIRevisionIdToLabel
 ) => {
-  if (!fetchedRevs.includes(EXPERIMENT_WORKSPACE_ID)) {
-    return existingPaths
-  }
-
   return existingPaths.map(existing => {
     const revisions = existing.revisions
-    revisions.delete(EXPERIMENT_WORKSPACE_ID)
+    for (const rev of fetchedRevs) {
+      const id = cliIdToLabel[rev] || rev
+      revisions.delete(id)
+    }
     return { ...existing, revisions }
   })
 }
@@ -105,7 +112,7 @@ const collectTemplateRevisions = (
 }
 
 const collectPathRevisions = (
-  data: PlotsOutput,
+  data: PlotsData,
   path: string,
   cliIdToLabel: { [id: string]: string }
 ): Set<string> => {
@@ -125,7 +132,7 @@ const collectPathRevisions = (
 
 const collectOrderedPath = (
   acc: PlotPath[],
-  data: PlotsOutput,
+  data: PlotsData,
   revisions: Set<string>,
   pathArray: string[],
   idx: number
@@ -161,28 +168,85 @@ const collectOrderedPath = (
   return acc
 }
 
-export const collectPaths = (
-  existingPaths: PlotPath[],
-  data: PlotsOutput,
-  fetchedRevs: string[],
-  cliIdToLabel: { [id: string]: string }
+const addRevisionsToPath = (
+  acc: PlotPath[],
+  data: PlotsData,
+  path: string,
+  revisions: Set<string>
 ): PlotPath[] => {
-  let acc: PlotPath[] = filterWorkspaceIfFetched(existingPaths, fetchedRevs)
+  if (revisions.size === 0) {
+    return acc
+  }
 
+  const pathArray = getPathArray(path)
+
+  for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
+    acc = collectOrderedPath(acc, data, revisions, pathArray, reverseIdx)
+  }
+  return acc
+}
+
+const collectDataPaths = (
+  acc: PlotPath[],
+  data: PlotsData,
+  cliIdToLabel: { [id: string]: string }
+) => {
   const paths = Object.keys(data)
 
   for (const path of paths) {
     const revisions = collectPathRevisions(data, path, cliIdToLabel)
+    acc = addRevisionsToPath(acc, data, path, revisions)
+  }
+  return acc
+}
 
-    if (revisions.size === 0) {
-      continue
+const collectErrorRevisions = (
+  path: string,
+  errors: PlotError[],
+  cliIdToLabel: { [id: string]: string }
+): Set<string> => {
+  const acc = new Set<string>()
+  for (const error of errors) {
+    const { name, rev } = error
+    if (name === path) {
+      acc.add(cliIdToLabel[rev] || rev)
     }
+  }
+  return acc
+}
 
-    const pathArray = getPathArray(path)
+const collectErrorPaths = (
+  acc: PlotPath[],
+  data: PlotsData,
+  errors: PlotError[],
+  cliIdToLabel: { [id: string]: string }
+) => {
+  const paths = errors.map(({ name }) => name)
+  for (const path of paths) {
+    const revisions = collectErrorRevisions(path, errors, cliIdToLabel)
+    acc = addRevisionsToPath(acc, data, path, revisions)
+  }
+  return acc
+}
 
-    for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
-      acc = collectOrderedPath(acc, data, revisions, pathArray, reverseIdx)
-    }
+export const collectPaths = (
+  existingPaths: PlotPath[],
+  output: PlotsOutput,
+  fetchedRevs: string[],
+  cliIdToLabel: { [id: string]: string }
+): PlotPath[] => {
+  let acc: PlotPath[] = filterRevisionIfFetched(
+    existingPaths,
+    fetchedRevs,
+    cliIdToLabel
+  )
+
+  const { data, errors } = output
+
+  acc = collectDataPaths(acc, data, cliIdToLabel)
+
+  if (errors?.length) {
+    acc = collectErrorPaths(acc, data, errors, cliIdToLabel)
   }
 
   return acc
@@ -406,4 +470,29 @@ export const collectEncodingElements = (
   }
 
   return acc
+}
+
+const formatError = (acc: string[]): string | undefined => {
+  if (acc.length === 0) {
+    return
+  }
+
+  acc.sort()
+  acc.unshift('Errors\n|||\n|--|--|')
+
+  return acc.join('\n')
+}
+
+export const collectPathErrorsTable = (
+  errors: { rev: string; msg: string }[]
+): string | undefined => {
+  const acc = new Set<string>()
+  for (const error of errors) {
+    const { msg, rev } = error
+
+    const row = `| ${truncate(rev, EXPERIMENT_WORKSPACE_ID.length)} | ${msg} |`
+
+    acc.add(row)
+  }
+  return formatError([...acc])
 }

@@ -451,12 +451,14 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
 })
 
 export const getOutput = (baseUrl: string): PlotsOutput => ({
-  ...getImageData(baseUrl),
-  ...basicVega,
-  ...require('./vega').default
+  data: {
+    ...getImageData(baseUrl),
+    ...basicVega,
+    ...require('./vega').default
+  }
 })
 
-export const getMinimalOutput = (): PlotsOutput => ({ ...basicVega })
+export const getMinimalOutput = (): PlotsOutput => ({ data: { ...basicVega } })
 
 export const getMultiSourceOutput = (): PlotsOutput => ({
   ...require('./multiSource').default
@@ -538,6 +540,7 @@ export const getRevisions = (): Revision[] => {
       id: EXPERIMENT_WORKSPACE_ID,
       revision: EXPERIMENT_WORKSPACE_ID,
       displayColor: workspace,
+      errors: undefined,
       fetched: true,
       firstThreeColumns: [
         {
@@ -559,6 +562,7 @@ export const getRevisions = (): Revision[] => {
       group: undefined
     },
     {
+      errors: undefined,
       fetched: true,
       firstThreeColumns: [
         {
@@ -583,6 +587,7 @@ export const getRevisions = (): Revision[] => {
       group: undefined
     },
     {
+      errors: undefined,
       fetched: true,
       firstThreeColumns: [
         {
@@ -607,6 +612,7 @@ export const getRevisions = (): Revision[] => {
       group: '[exp-e7a67]'
     },
     {
+      errors: undefined,
       fetched: true,
       firstThreeColumns: [
         {
@@ -631,6 +637,7 @@ export const getRevisions = (): Revision[] => {
       group: '[test-branch]'
     },
     {
+      errors: undefined,
       fetched: true,
       firstThreeColumns: [
         {
@@ -697,7 +704,9 @@ export const getComparisonWebviewMessage = (
       }
       revisionsAcc[revision] = {
         url: `${url}?${MOCK_IMAGE_MTIME}`,
-        revision
+        revision,
+        errors: undefined,
+        loading: false
       }
     }
 

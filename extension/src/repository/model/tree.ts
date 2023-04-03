@@ -9,7 +9,6 @@ import {
   Uri
 } from 'vscode'
 import { collectSelected, collectTrackedPaths, PathItem } from './collect'
-import { ErrorItem, pathItemHasError } from './error'
 import { Resource } from '../commands'
 import { WorkspaceRepositories } from '../workspace'
 import { exists, relativeWithUri } from '../../fileSystem'
@@ -42,8 +41,9 @@ import { Disposable } from '../../class/dispose'
 import {
   createTreeView,
   DecoratableTreeItemScheme,
-  getDecoratableTreeItem,
-  getErrorTooltip
+  getCliErrorLabel,
+  getCliErrorTreeItem,
+  isErrorItem
 } from '../../tree'
 import { getWorkspaceFolders } from '../../vscode/workspaceFolders'
 import { DOT_DVC } from '../../cli/dvc/constants'
@@ -100,8 +100,14 @@ export class RepositoriesTree
   }
 
   public getTreeItem(item: PathItem): TreeItem {
-    if (pathItemHasError(item)) {
-      return this.getErrorTreeItem(item)
+    if (isErrorItem(item)) {
+      const { error } = item
+
+      return getCliErrorTreeItem(
+        getCliErrorLabel(error),
+        error,
+        DecoratableTreeItemScheme.TRACKED
+      )
     }
     const { resourceUri, isDirectory } = item
 
@@ -122,23 +128,6 @@ export class RepositoriesTree
       }
     }
 
-    return treeItem
-  }
-
-  private getErrorTreeItem({ error: { msg, label } }: ErrorItem) {
-    const treeItem = getDecoratableTreeItem(
-      label,
-      DecoratableTreeItemScheme.TRACKED
-    )
-
-    treeItem.tooltip = getErrorTooltip(msg)
-
-    treeItem.iconPath = new ThemeIcon('blank')
-
-    treeItem.command = {
-      command: RegisteredCommands.EXTENSION_SHOW_OUTPUT,
-      title: 'Show DVC Output'
-    }
     return treeItem
   }
 

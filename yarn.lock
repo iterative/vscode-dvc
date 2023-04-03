@@ -2539,10 +2539,10 @@
     array-from "^2.1.1"
     lodash "^4.17.15"
 
-"@sinonjs/samsam@^7.0.1":
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/@sinonjs/samsam/-/samsam-7.0.1.tgz#5b5fa31c554636f78308439d220986b9523fc51f"
-  integrity sha512-zsAk2Jkiq89mhZovB2LLOdTCxJF4hqqTToGP0ASWlhp4I1hqOjcfmZGafXntCN7MDC6yySH0mFHrYtHceOeLmw==
+"@sinonjs/samsam@^8.0.0":
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/@sinonjs/samsam/-/samsam-8.0.0.tgz#0d488c91efb3fa1442e26abea81759dfc8b5ac60"
+  integrity sha512-Bp8KUVlLp8ibJZrnvq2foVhP0IVX2CIprMJPK0vqGqgrDa0OHVKeZyBykqskkrdxV6yKBPmGasO8LVjAKR3Gew==
   dependencies:
     "@sinonjs/commons" "^2.0.0"
     lodash.get "^4.4.2"
@@ -3785,17 +3785,17 @@
   dependencies:
     defer-to-connect "^2.0.1"
 
-"@tanstack/react-table@8.8.0":
-  version "8.8.0"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-table/-/react-table-8.8.0.tgz#f20e1d5b2615bf785adfb727b89dcf55e72cdab8"
-  integrity sha512-K55peZ4VNRA+Jk/rSI8+0Tj/T9q8SyysmnK08wO/5kgIX3MhGL7wl0858eEcvd/2eq+CPPmhQx9wYoWOWtFEhg==
+"@tanstack/react-table@8.8.4":
+  version "8.8.4"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-table/-/react-table-8.8.4.tgz#814acc520f8d7356d007b441a784c5a30154f516"
+  integrity sha512-5w2AoBnDBJYuUa80sLOqelcG/eJdGwIPFBRnEiU3RCAEeZ1QIhYse/0vzhTY8VAcTXa2sjWhXNDWci4VlktNmg==
   dependencies:
-    "@tanstack/table-core" "8.8.0"
+    "@tanstack/table-core" "8.8.4"
 
-"@tanstack/table-core@8.8.0":
-  version "8.8.0"
-  resolved "https://registry.yarnpkg.com/@tanstack/table-core/-/table-core-8.8.0.tgz#7b6db72ea82175495528313513d825e312cbe58b"
-  integrity sha512-P8Vk9yngfai1GLEfyqtT0b+Dty8subPR8yl5r1z/z4Z8NtaCIL1n+OmMV1QBU8WojeSSsWgr+o1CTxnaaOBoyQ==
+"@tanstack/table-core@8.8.4":
+  version "8.8.4"
+  resolved "https://registry.yarnpkg.com/@tanstack/table-core/-/table-core-8.8.4.tgz#4b6938c0531011afc0746a50ff9b3f772199be36"
+  integrity sha512-4gq0A/Qz/JFuclxPd1UnNi5P57vbVF10mPK743Iuv2ORLLgF/O/XkaYjYDGw5SHMof8CgiT/nfdJdlgHsOfRIg==
 
 "@testing-library/dom@^8.3.0":
   version "8.14.0"
@@ -4392,10 +4392,10 @@
     "@types/prop-types" "*"
     "@types/react" "^17"
 
-"@types/react@*", "@types/react@18.0.28", "@types/react@^16.9.19", "@types/react@^17":
-  version "18.0.28"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.0.28.tgz#accaeb8b86f4908057ad629a26635fe641480065"
-  integrity sha512-RD0ivG1kEztNBdoAK7lekI9M+azSnitIn85h4iOiaLjaTrMjzslhaqCGaI4IyCJ1RljWiLCEu4jyrLLgqxBTew==
+"@types/react@*", "@types/react@18.0.29", "@types/react@^16.9.19", "@types/react@^17":
+  version "18.0.29"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.0.29.tgz#4cead505172c0020c5b51940199e31fc6ff2f63a"
+  integrity sha512-wXHktgUABxplw1+UnljseDq4+uztQyp2tlWZRIxHlpchsCFqiYkvaDS8JR7eKOQm8wziTH/el5qL7D6gYNkYcw==
   dependencies:
     "@types/prop-types" "*"
     "@types/scheduler" "*"
@@ -9241,10 +9241,10 @@ eslint-module-utils@^2.7.4:
   dependencies:
     debug "^3.2.7"
 
-eslint-plugin-check-file@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-check-file/-/eslint-plugin-check-file-2.0.0.tgz#b0c9da47c0ce9d7ccf12ce101fa722dd63eb85af"
-  integrity sha512-FBbhFXZErDw3AQar4kjw/4Pe0GqBXdXuHmCVedrMND6Ujc08XsjzuYmJ1/bcUI7I0Zf1hm5PXHlv0ClEgl55oA==
+eslint-plugin-check-file@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-check-file/-/eslint-plugin-check-file-2.1.0.tgz#10e81d074cbd918110a2a776b259f4c0cfe0c18b"
+  integrity sha512-OK7GiMsV78DTV9eErBNC4p1lE4+izD9FQYDmeSCULa+ZLNsrPBpMTp+HxQ7r5GtHcK3JUI4dE/q6ikoHXvqEmg==
   dependencies:
     is-glob "^4.0.3"
     micromatch "^4.0.4"
@@ -17222,14 +17222,14 @@ sinon-chai@3.7.0:
   resolved "https://registry.yarnpkg.com/sinon-chai/-/sinon-chai-3.7.0.tgz#cfb7dec1c50990ed18c153f1840721cf13139783"
   integrity sha512-mf5NURdUaSdnatJx3uhoBOrY9dtL19fiOtAdT1Azxg3+lNJFiuN0uzaU3xX1LeAfL17kHQhTAJgpsfhbMJMY2g==
 
-sinon@15.0.2:
-  version "15.0.2"
-  resolved "https://registry.yarnpkg.com/sinon/-/sinon-15.0.2.tgz#f3e3aacb990bbaa8a7bb976e86118c5dc0154e66"
-  integrity sha512-PCVP63XZkg0/LOqQH5rEU4LILuvTFMb5tNxTHfs6VUMNnZz2XrnGSTZbAGITjzwQWbl/Bl/8hi4G3zZWjyBwHg==
+sinon@15.0.3:
+  version "15.0.3"
+  resolved "https://registry.yarnpkg.com/sinon/-/sinon-15.0.3.tgz#38005fcd80827177b6aa0245f82401d9ec88994b"
+  integrity sha512-si3geiRkeovP7Iel2O+qGL4NrO9vbMf3KsrJEi0ghP1l5aBkB5UxARea5j0FUsSqH3HLBh0dQPAyQ8fObRUqHw==
   dependencies:
     "@sinonjs/commons" "^3.0.0"
     "@sinonjs/fake-timers" "^10.0.2"
-    "@sinonjs/samsam" "^7.0.1"
+    "@sinonjs/samsam" "^8.0.0"
     diff "^5.1.0"
     nise "^5.1.4"
     supports-color "^7.2.0"
@@ -18114,10 +18114,10 @@ terser-webpack-plugin@^5.0.3, terser-webpack-plugin@^5.1.3:
     source-map "^0.6.1"
     terser "^5.7.2"
 
-terser@5.16.6, terser@^4.1.2, terser@^4.6.3, terser@^5.10.0, terser@^5.3.4, terser@^5.7.2:
-  version "5.16.6"
-  resolved "https://registry.yarnpkg.com/terser/-/terser-5.16.6.tgz#f6c7a14a378ee0630fbe3ac8d1f41b4681109533"
-  integrity sha512-IBZ+ZQIA9sMaXmRZCUMDjNH0D5AQQfdn4WUjHL0+1lF4TP1IHRJbrhb6fNaXWikrYQTSkb7SLxkeXAiy1p7mbg==
+terser@5.16.8, terser@^4.1.2, terser@^4.6.3, terser@^5.10.0, terser@^5.3.4, terser@^5.7.2:
+  version "5.16.8"
+  resolved "https://registry.yarnpkg.com/terser/-/terser-5.16.8.tgz#ccde583dabe71df3f4ed02b65eb6532e0fae15d5"
+  integrity sha512-QI5g1E/ef7d+PsDifb+a6nnVgC4F22Bg6T0xrBrz6iloVB4PUkkunp6V8nzoOOZJIzjWVdAGqCdlKlhLq/TbIA==
   dependencies:
     "@jridgewell/source-map" "^0.3.2"
     acorn "^8.5.0"

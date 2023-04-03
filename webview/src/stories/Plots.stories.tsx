@@ -33,15 +33,7 @@ import { plotsReducers } from '../plots/store'
 
 const smallCustomPlotsFixture = {
   ...customPlotsFixture,
-  nbItemsPerRow: 3,
-  plots: customPlotsFixture.plots.map(plot => ({
-    ...plot,
-    yTitle: truncateVerticalTitle(
-      plot.yTitle,
-      DEFAULT_NB_ITEMS_PER_ROW,
-      DEFAULT_PLOT_HEIGHT
-    ) as string
-  }))
+  nbItemsPerRow: 3
 }
 
 const manyCustomPlots = (length: number) =>

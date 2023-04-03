@@ -24,9 +24,10 @@ export enum NewSectionBlock {
 }
 
 export const TemplatePlots: React.FC = () => {
-  const { nbItemsPerRow, sections } = useSelector(
+  const { nbItemsPerRow, sections, hasItems } = useSelector(
     (state: PlotsState) => state.template
   )
+
   const draggedOverGroup = useSelector(
     (state: PlotsState) => state.dragAndDrop.draggedOverGroup
   )
@@ -98,7 +99,7 @@ export const TemplatePlots: React.FC = () => {
     [setSections, sections]
   )
 
-  if (sectionIsLoading(selectedRevisions)) {
+  if (sectionIsLoading(selectedRevisions, hasItems)) {
     return <LoadingSection />
   }
   if (!sections || sections.length === 0) {
