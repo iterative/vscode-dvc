@@ -299,13 +299,11 @@ describe('App', () => {
     const addExperimentsButton = await screen.findByText('Add Experiments')
     const addPlotsButton = await screen.findByText('Add Plots')
     const addCustomPlotsButton = await screen.findByText('Add Custom Plot')
-    const getStartedText = await screen.findByText('No Plots to Display')
 
     expect(addExperimentsButton).toBeInTheDocument()
     expect(addPlotsButton).toBeInTheDocument()
     expect(addCustomPlotsButton).toBeInTheDocument()
     expect(screen.queryByTestId('section-container')).not.toBeInTheDocument()
-    expect(getStartedText).toBeInTheDocument()
 
     mockPostMessage.mockReset()
 
@@ -343,15 +341,11 @@ describe('App', () => {
     const addPlotsButton = await screen.findByText('Add Plots')
     const addCustomPlotsButton = screen.queryByText('Add Custom Plot')
     const customSection = await screen.findByTestId('section-container')
-    const getStartedText = await screen.findByText(
-      'No Selected Plots or Experiments'
-    )
 
     expect(addExperimentsButton).toBeInTheDocument()
     expect(addPlotsButton).toBeInTheDocument()
     expect(addCustomPlotsButton).not.toBeInTheDocument()
     expect(customSection).toBeInTheDocument()
-    expect(getStartedText).toBeInTheDocument()
 
     mockPostMessage.mockReset()
 
@@ -382,13 +376,11 @@ describe('App', () => {
     const addPlotsButton = screen.queryByText('Add Plots')
     const addCustomPlotsButton = await screen.findByText('Add Custom Plot')
     const customSection = screen.queryByTestId('section-container')
-    const getStartedText = await screen.findByText('No Plots to Display')
 
     expect(addExperimentsButton).toBeInTheDocument()
     expect(addCustomPlotsButton).toBeInTheDocument()
     expect(addPlotsButton).not.toBeInTheDocument()
     expect(customSection).not.toBeInTheDocument()
-    expect(getStartedText).toBeInTheDocument()
 
     mockPostMessage.mockReset()
 
@@ -416,15 +408,11 @@ describe('App', () => {
     const addPlotsButton = screen.queryByText('Add Plots')
     const addCustomPlotsButton = screen.queryByText('Add Custom Plot')
     const customSection = await screen.findByTestId('section-container')
-    const getStartedText = await screen.findByText(
-      'No Selected Plots or Experiments'
-    )
 
     expect(addExperimentsButton).toBeInTheDocument()
     expect(addCustomPlotsButton).not.toBeInTheDocument()
     expect(addPlotsButton).not.toBeInTheDocument()
     expect(customSection).toBeInTheDocument()
-    expect(getStartedText).toBeInTheDocument()
 
     mockPostMessage.mockReset()
 
