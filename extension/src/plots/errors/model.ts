@@ -1,5 +1,6 @@
 import { join } from 'path'
 import {
+  collectErrorPaths,
   collectErrors,
   collectImageErrors,
   collectPathErrors,
@@ -42,18 +43,17 @@ export class ErrorsModel extends Disposable {
     return collectPathErrors(path, selectedRevisions, this.errors)
   }
 
-  public getErrorPaths(selectedRevisions: string[]) {
+  public getErrorPaths(selectedRevisions: string[], paths: string[]) {
     if (this.cliError) {
       return new Set([this.cliError.path])
     }
 
-    const acc = new Set<string>()
-    for (const { path, rev } of this.errors) {
-      if (selectedRevisions.includes(rev)) {
-        acc.add(join(this.dvcRoot, path))
-      }
-    }
-    return acc
+    return collectErrorPaths(
+      this.dvcRoot,
+      selectedRevisions,
+      paths,
+      this.errors
+    )
   }
 
   public getRevisionErrors(rev: string) {

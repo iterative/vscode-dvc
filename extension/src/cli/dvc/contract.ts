@@ -101,7 +101,7 @@ export interface PlotsData {
 }
 
 export type PlotError = {
-  name: string
+  name?: string
   rev: string
   source?: string
 } & ErrorContents

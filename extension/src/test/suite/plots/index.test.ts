@@ -1179,7 +1179,7 @@ suite('Plots Test Suite', () => {
       ])
 
       expect(
-        errorsModel.getErrorPaths(plotsModel.getSelectedRevisions()),
+        errorsModel.getErrorPaths(plotsModel.getSelectedRevisions(), []),
         'should return the correct path to give the item a DecorationError'
       ).to.deep.equal(new Set([errorItems[0].path]))
 
@@ -1196,7 +1196,7 @@ suite('Plots Test Suite', () => {
       ).to.deep.equal([])
 
       expect(
-        errorsModel.getErrorPaths(plotsModel.getSelectedRevisions()),
+        errorsModel.getErrorPaths(plotsModel.getSelectedRevisions(), []),
         'should no long provide decorations to the plots paths tree'
       ).to.deep.equal(new Set([]))
     })
