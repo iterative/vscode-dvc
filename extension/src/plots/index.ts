@@ -3,6 +3,7 @@ import { Event, EventEmitter, Memento } from 'vscode'
 import { PlotsData as TPlotsData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { PlotsData } from './data'
+import { ErrorsModel } from './errors/model'
 import { PlotsModel } from './model'
 import { collectEncodingElements, collectScale } from './paths/collect'
 import { PathsModel } from './paths/model'
@@ -12,11 +13,12 @@ import { BaseRepository } from '../webview/repository'
 import { Experiments } from '../experiments'
 import { Resource } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
-import { definedAndNonEmpty } from '../util/array'
 import { TEMP_PLOTS_DIR } from '../cli/dvc/constants'
 import { removeDir } from '../fileSystem'
 import { Toast } from '../vscode/toast'
 import { pickPaths } from '../path/selection/quickPick'
+import { ErrorDecorationProvider } from '../tree/decorationProvider/error'
+import { DecoratableTreeItemScheme } from '../tree'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
 
@@ -31,6 +33,9 @@ export class Plots extends BaseRepository<TPlotsData> {
   private readonly paths: PathsModel
   private readonly data: PlotsData
 
+  private readonly errors: ErrorsModel
+  private readonly decorationProvider: ErrorDecorationProvider
+
   private webviewMessages: WebviewMessages
 
   constructor(
@@ -43,11 +48,13 @@ export class Plots extends BaseRepository<TPlotsData> {
   ) {
     super(dvcRoot, webviewIcon)
 
+    this.errors = this.dispose.track(new ErrorsModel(this.dvcRoot))
+
     this.plots = this.dispose.track(
-      new PlotsModel(this.dvcRoot, experiments, workspaceState)
+      new PlotsModel(this.dvcRoot, experiments, this.errors, workspaceState)
     )
     this.paths = this.dispose.track(
-      new PathsModel(this.dvcRoot, workspaceState)
+      new PathsModel(this.dvcRoot, this.errors, workspaceState)
     )
 
     this.webviewMessages = this.createWebviewMessageHandler(
@@ -60,6 +67,11 @@ export class Plots extends BaseRepository<TPlotsData> {
       new PlotsData(dvcRoot, internalCommands, this.plots, updatesPaused)
     )
 
+    this.decorationProvider = new ErrorDecorationProvider(
+      DecoratableTreeItemScheme.PLOTS
+    )
+
+    this.onDidTriggerDataUpdate()
     this.onDidUpdateData()
     this.waitForInitialData(experiments)
 
@@ -96,10 +108,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     void Toast.infoWithOptions(
       'Attempting to refresh plots for selected experiments.'
     )
-    for (const { revision } of this.plots.getSelectedRevisionDetails()) {
-      this.plots.setupManualRefresh(revision)
-    }
-    void this.data.managedUpdate()
+    this.triggerDataUpdate()
   }
 
   public getChildPaths(path: string | undefined) {
@@ -113,6 +122,9 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   public getPathStatuses() {
+    if (this.errors.hasCliError()) {
+      return []
+    }
     return this.paths.getTerminalNodeStatuses(undefined)
   }
 
@@ -121,24 +133,27 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   protected sendInitialWebviewData() {
-    return this.fetchMissingOrSendPlots()
+    return this.sendPlots()
   }
 
   private notifyChanged() {
-    this.paths.setSelectedRevisions(this.plots.getSelectedRevisions())
+    const selectedRevisions = this.plots.getSelectedRevisions()
+    this.paths.setSelectedRevisions(selectedRevisions)
+    this.decorationProvider.setState(
+      this.errors.getErrorPaths(selectedRevisions)
+    )
     this.pathsChanged.fire()
-    void this.fetchMissingOrSendPlots()
+
+    if (this.plots.requiresUpdate()) {
+      this.triggerDataUpdate()
+      return
+    }
+
+    void this.sendPlots()
   }
 
-  private async fetchMissingOrSendPlots() {
+  private async sendPlots() {
     await this.isReady()
-
-    if (
-      this.paths.hasPaths() &&
-      definedAndNonEmpty(this.plots.getUnfetchedRevisions())
-    ) {
-      void this.data.managedUpdate()
-    }
 
     return this.webviewMessages.sendWebviewMessage()
   }
@@ -201,7 +216,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private async initializeData() {
     await this.plots.transformAndSetExperiments()
-    void this.data.managedUpdate()
+    this.triggerDataUpdate()
     await Promise.all([
       this.data.isReady(),
       this.plots.isReady(),
@@ -210,12 +225,27 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.deferred.resolve()
   }
 
+  private triggerDataUpdate() {
+    void this.data.managedUpdate()
+  }
+
+  private onDidTriggerDataUpdate() {
+    const sendCachedDataToWebview = () => {
+      this.plots.resetFetched()
+      this.plots.setComparisonOrder()
+      return this.sendPlots()
+    }
+    this.dispose.track(this.data.onDidTrigger(() => sendCachedDataToWebview()))
+  }
+
   private onDidUpdateData() {
     this.dispose.track(
       this.data.onDidUpdate(async ({ data, revs }) => {
+        const cliIdToLabel = this.plots.getCLIIdToLabel()
         await Promise.all([
           this.plots.transformAndSetPlots(data, revs),
-          this.paths.transformAndSet(data, revs, this.plots.getCLIIdToLabel())
+          this.paths.transformAndSet(data, revs, cliIdToLabel),
+          this.errors.transformAndSet(data, revs, cliIdToLabel)
         ])
         this.notifyChanged()
       })

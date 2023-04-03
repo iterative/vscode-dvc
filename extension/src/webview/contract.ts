@@ -193,8 +193,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.SELECT_EXPERIMENTS }
   | { type: MessageFromWebviewType.SELECT_PYTHON_INTERPRETER }
   | { type: MessageFromWebviewType.SELECT_PLOTS }
-  | { type: MessageFromWebviewType.REFRESH_REVISION; payload: string }
-  | { type: MessageFromWebviewType.REFRESH_REVISIONS; payload: string[] }
+  | { type: MessageFromWebviewType.REFRESH_REVISIONS }
   | { type: MessageFromWebviewType.SELECT_COLUMNS }
   | { type: MessageFromWebviewType.FOCUS_FILTERS_TREE }
   | { type: MessageFromWebviewType.FOCUS_SORTS_TREE }

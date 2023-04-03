@@ -1,5 +1,6 @@
 import { Memento } from 'vscode'
 import {
+  collectPathErrorsTable,
   collectPaths,
   collectTemplateOrder,
   PathType,
@@ -15,15 +16,21 @@ import {
 import { MultiSourceEncoding } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
 import { PlotsOutputOrError } from '../../cli/dvc/contract'
+import { getErrorTooltip } from '../../tree'
+import { ErrorsModel } from '../errors/model'
 
 export class PathsModel extends PathSelectionModel<PlotPath> {
+  private readonly errors: ErrorsModel
+
   private templateOrder: TemplateOrder
   private comparisonPathsOrder: string[]
 
   private selectedRevisions: string[] = []
 
-  constructor(dvcRoot: string, workspaceState: Memento) {
+  constructor(dvcRoot: string, errors: ErrorsModel, workspaceState: Memento) {
     super(dvcRoot, workspaceState, PersistenceKey.PLOT_PATH_STATUS)
+
+    this.errors = errors
 
     this.templateOrder = this.revive(PersistenceKey.PLOT_TEMPLATE_ORDER, [])
     this.comparisonPathsOrder = this.revive(
@@ -37,21 +44,19 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
   }
 
   public transformAndSet(
-    data: PlotsOutputOrError,
+    output: PlotsOutputOrError,
     revs: string[],
     cliIdToLabel: { [id: string]: string }
   ) {
-    if (isDvcError(data)) {
-      return
+    if (isDvcError(output)) {
+      this.handleCliError()
+    } else {
+      const paths = collectPaths(this.data, output, revs, cliIdToLabel)
+
+      this.setNewStatuses(paths)
+      this.data = paths
+      this.setTemplateOrder()
     }
-
-    const paths = collectPaths(this.data, data, revs, cliIdToLabel)
-
-    this.setNewStatuses(paths)
-
-    this.data = paths
-
-    this.setTemplateOrder()
 
     this.deferred.resolve()
   }
@@ -73,12 +78,24 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     path: string | undefined,
     multiSourceEncoding: MultiSourceEncoding = {}
   ) {
-    return this.filterChildren(path).map(element => ({
-      ...element,
-      descendantStatuses: this.getTerminalNodeStatuses(element.path),
-      hasChildren: this.getHasChildren(element, multiSourceEncoding),
-      status: this.status[element.path]
-    }))
+    if (this.errors.hasCliError()) {
+      return [
+        this.errors.getCliError() as {
+          error: string
+          path: string
+        }
+      ]
+    }
+
+    return this.filterChildren(path)
+      .map(element => ({
+        ...element,
+        descendantStatuses: this.getTerminalNodeStatuses(element.path),
+        hasChildren: this.getHasChildren(element, multiSourceEncoding),
+        status: this.status[element.path],
+        tooltip: this.getTooltip(element.path)
+      }))
+      .sort(({ path: aPath }, { path: bPath }) => aPath.localeCompare(bPath))
   }
 
   public getTerminalNodes(): (PlotPath & { selected: boolean })[] {
@@ -131,6 +148,10 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     return this.data.length > 0
   }
 
+  private handleCliError() {
+    this.data = []
+  }
+
   private getPathsByType(
     type: PathType,
     filter = (type: PathType, plotPath: PlotPath) =>
@@ -176,5 +197,16 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
 
   private hasRevisions({ revisions }: PlotPath) {
     return this.selectedRevisions.some(revision => revisions.has(revision))
+  }
+
+  private getTooltip(path: string) {
+    const errors = this.errors.getPathErrors(path, this.selectedRevisions)
+
+    if (!errors?.length) {
+      return
+    }
+
+    const error = collectPathErrorsTable(errors)
+    return error ? getErrorTooltip(error) : undefined
   }
 }

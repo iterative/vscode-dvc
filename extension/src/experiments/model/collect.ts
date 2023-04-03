@@ -23,7 +23,6 @@ import {
   ExperimentStatus
 } from '../../cli/dvc/contract'
 import { addToMapArray } from '../../util/map'
-import { uniqueValues } from '../../util/array'
 import { RegisteredCommands } from '../../commands/external'
 import { Resource } from '../../resourceLocator'
 import { shortenForLabel } from '../../util/string'
@@ -406,31 +405,6 @@ export const collectExperiments = (
   acc.commits = addDataToCommits(acc.commits, commitsOutput)
 
   return acc
-}
-
-const getDefaultMutableRevision = (): string[] => [EXPERIMENT_WORKSPACE_ID]
-
-const collectMutableRevision = (
-  acc: string[],
-  { label, status }: Experiment,
-  hasCheckpoints: boolean
-) => {
-  if (isRunning(status) && !hasCheckpoints) {
-    acc.push(label)
-  }
-}
-
-export const collectMutableRevisions = (
-  experiments: Experiment[],
-  hasCheckpoints: boolean
-): string[] => {
-  const acc = getDefaultMutableRevision()
-
-  for (const experiment of experiments) {
-    collectMutableRevision(acc, experiment, hasCheckpoints)
-  }
-
-  return uniqueValues(acc)
 }
 
 type DeletableExperimentAccumulator = { [dvcRoot: string]: Set<string> }

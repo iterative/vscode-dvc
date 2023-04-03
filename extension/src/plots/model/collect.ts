@@ -5,7 +5,9 @@ import {
   getFullValuePath,
   CHECKPOINTS_PARAM,
   CustomPlotsOrderValue,
-  isCheckpointValue
+  isCheckpointValue,
+  createCheckpointSpec,
+  createMetricVsParamSpec
 } from './custom'
 import { getRevisionFirstThreeColumns } from './util'
 import {
@@ -51,6 +53,7 @@ import {
   SelectedExperimentWithColor
 } from '../../experiments/model'
 import { Color } from '../../experiments/model/status/colors'
+import { exists } from '../../fileSystem'
 
 export const getCustomPlotId = (metric: string, param = CHECKPOINTS_PARAM) =>
   `custom-${metric}-${param}`
@@ -124,14 +127,14 @@ const getMetricVsParamValues = (
 const getCustomPlotData = (
   orderValue: CustomPlotsOrderValue,
   experiments: ExperimentWithCheckpoints[],
-  selectedRevisions: string[] | undefined = [],
+  scale: ColorScale | undefined,
   height: number,
   nbItemsPerRow: number
 ): CustomPlotData => {
   const { metric, param, type } = orderValue
   const metricPath = getFullValuePath(ColumnType.METRICS, metric)
-
   const paramPath = getFullValuePath(ColumnType.PARAMS, param)
+  const selectedRevisions = scale?.domain || []
 
   const selectedExperiments = experiments.filter(({ name, label }) =>
     selectedRevisions.includes(name || label)
@@ -141,13 +144,19 @@ const getCustomPlotData = (
     ? getCheckpointValues(selectedExperiments, metricPath)
     : getMetricVsParamValues(experiments, metricPath, paramPath)
 
+  const yTitle = truncateVerticalTitle(metric, nbItemsPerRow, height) as string
+
+  const spec = isCheckpointValue(type)
+    ? createCheckpointSpec(yTitle, metric, param, scale)
+    : createMetricVsParamSpec(yTitle, metric, param)
+
   return {
     id: getCustomPlotId(metric, param),
     metric,
     param,
+    spec,
     type,
-    values,
-    yTitle: truncateVerticalTitle(metric, nbItemsPerRow, height) as string
+    values
   } as CustomPlotData
 }
 
@@ -155,19 +164,19 @@ export const collectCustomPlots = ({
   plotsOrderValues,
   experiments,
   hasCheckpoints,
-  selectedRevisions,
+  scale,
   height,
   nbItemsPerRow
 }: {
   plotsOrderValues: CustomPlotsOrderValue[]
   experiments: ExperimentWithCheckpoints[]
   hasCheckpoints: boolean
-  selectedRevisions: string[] | undefined
+  scale: ColorScale | undefined
   height: number
   nbItemsPerRow: number
 }): CustomPlotData[] => {
   const plots = []
-  const shouldSkipCheckpointPlots = !hasCheckpoints || !selectedRevisions
+  const shouldSkipCheckpointPlots = !hasCheckpoints || !scale?.domain
 
   for (const value of plotsOrderValues) {
     if (shouldSkipCheckpointPlots && isCheckpointValue(value.type)) {
@@ -175,13 +184,7 @@ export const collectCustomPlots = ({
     }
 
     plots.push(
-      getCustomPlotData(
-        value,
-        experiments,
-        selectedRevisions,
-        height,
-        nbItemsPerRow
-      )
+      getCustomPlotData(value, experiments, scale, height, nbItemsPerRow)
     )
   }
 
@@ -283,9 +286,10 @@ const collectPathData = (
 }
 
 export const collectData = (
-  data: PlotsOutput,
+  output: PlotsOutput,
   cliIdToLabel: CLIRevisionIdToLabel
 ): DataAccumulator => {
+  const { data } = output
   const acc = {
     comparisonData: {},
     revisionData: {}
@@ -312,7 +316,8 @@ const collectTemplate = (
   acc[path] = template
 }
 
-export const collectTemplates = (data: PlotsOutput): TemplateAccumulator => {
+export const collectTemplates = (output: PlotsOutput): TemplateAccumulator => {
+  const { data } = output
   const acc: TemplateAccumulator = {}
 
   for (const [path, plots] of Object.entries(data)) {
@@ -548,16 +553,19 @@ export const collectCommitRevisionDetails = (
   return commitRevisions
 }
 
-const getRevision = (
+const getOverrideRevision = (
   displayColor: Color,
   experiment: Experiment,
-  firstThreeColumns: string[]
+  firstThreeColumns: string[],
+  fetchedRevs: Set<string>,
+  errors: string[] | undefined
 ): Revision => {
   const { commit, displayNameOrParent, logicalGroupName, id, label } =
     experiment
   const revision: Revision = {
     displayColor,
-    fetched: true,
+    errors,
+    fetched: fetchedRevs.has(label),
     firstThreeColumns: getRevisionFirstThreeColumns(
       firstThreeColumns,
       experiment
@@ -577,18 +585,22 @@ const overrideWithWorkspace = (
   selectedWithOverrides: Revision[],
   displayColor: Color,
   label: string,
-  firstThreeColumns: string[]
+  firstThreeColumns: string[],
+  fetchedRevs: Set<string>,
+  errors: string[] | undefined
 ): void => {
   orderMapping[label] = EXPERIMENT_WORKSPACE_ID
   selectedWithOverrides.push(
-    getRevision(
+    getOverrideRevision(
       displayColor,
       {
         id: EXPERIMENT_WORKSPACE_ID,
         label: EXPERIMENT_WORKSPACE_ID,
         logicalGroupName: undefined
       },
-      firstThreeColumns
+      firstThreeColumns,
+      fetchedRevs,
+      errors
     )
   )
 }
@@ -607,15 +619,20 @@ const isExperimentThatWillDisappearAtEnd = (
 const getMostRecentFetchedCheckpointRevision = (
   selectedRevision: SelectedExperimentWithColor,
   fetchedRevs: Set<string>,
+  revisionsWithData: Set<string>,
   checkpoints: Experiment[] | undefined,
-  firstThreeColumns: string[]
+  firstThreeColumns: string[],
+  errors: string[] | undefined
 ): Revision => {
   const mostRecent =
-    checkpoints?.find(({ label }) => fetchedRevs.has(label)) || selectedRevision
-  return getRevision(
+    checkpoints?.find(({ label }) => revisionsWithData.has(label)) ||
+    selectedRevision
+  return getOverrideRevision(
     selectedRevision.displayColor,
     mostRecent,
-    firstThreeColumns
+    firstThreeColumns,
+    fetchedRevs,
+    errors
   )
 }
 
@@ -624,16 +641,20 @@ const overrideRevisionDetail = (
   selectedWithOverrides: Revision[],
   selectedRevision: SelectedExperimentWithColor,
   fetchedRevs: Set<string>,
+  revisionsWithData: Set<string>,
   checkpoints: Experiment[] | undefined,
-  firstThreeColumns: string[]
+  firstThreeColumns: string[],
+  errors: string[] | undefined
 ) => {
   const { label } = selectedRevision
 
   const mostRecent = getMostRecentFetchedCheckpointRevision(
     selectedRevision,
     fetchedRevs,
+    revisionsWithData,
     checkpoints,
-    firstThreeColumns
+    firstThreeColumns,
+    errors
   )
   orderMapping[label] = mostRecent.revision
   selectedWithOverrides.push(mostRecent)
@@ -644,11 +665,14 @@ const collectRevisionDetail = (
   selectedWithOverrides: Revision[],
   selectedRevision: SelectedExperimentWithColor,
   fetchedRevs: Set<string>,
+  revisionsWithData: Set<string>,
   unfinishedRunningExperiments: { [id: string]: string },
   getCheckpoints: (id: string) => Experiment[] | undefined,
+  getErrors: (label: string) => string[] | undefined,
   firstThreeColumns: string[]
 ) => {
   const { label, status, id, displayColor } = selectedRevision
+  const errors = getErrors(label)
 
   if (
     !fetchedRevs.has(label) &&
@@ -659,7 +683,9 @@ const collectRevisionDetail = (
       selectedWithOverrides,
       displayColor,
       label,
-      firstThreeColumns
+      firstThreeColumns,
+      fetchedRevs,
+      errors
     )
   }
 
@@ -676,14 +702,22 @@ const collectRevisionDetail = (
       selectedWithOverrides,
       selectedRevision,
       fetchedRevs,
+      revisionsWithData,
       getCheckpoints(id),
-      firstThreeColumns
+      firstThreeColumns,
+      errors
     )
   }
 
   orderMapping[label] = label
   selectedWithOverrides.push(
-    getRevision(displayColor, selectedRevision, firstThreeColumns)
+    getOverrideRevision(
+      displayColor,
+      selectedRevision,
+      firstThreeColumns,
+      fetchedRevs,
+      errors
+    )
   )
 }
 
@@ -691,8 +725,10 @@ export const collectOverrideRevisionDetails = (
   comparisonOrder: string[],
   selectedRevisions: SelectedExperimentWithColor[],
   fetchedRevs: Set<string>,
+  revisionsWithData: Set<string>,
   unfinishedRunningExperiments: { [id: string]: string },
   getCheckpoints: (id: string) => Experiment[] | undefined,
+  getErrors: (label: string) => string[] | undefined,
   firstThreeColumns: string[]
 ): {
   overrideComparison: Revision[]
@@ -707,8 +743,10 @@ export const collectOverrideRevisionDetails = (
       selectedWithOverrides,
       selectedRevision,
       fetchedRevs,
+      revisionsWithData,
       unfinishedRunningExperiments,
       getCheckpoints,
+      getErrors,
       firstThreeColumns
     )
   }
@@ -721,4 +759,38 @@ export const collectOverrideRevisionDetails = (
     ),
     overrideRevisions: selectedWithOverrides
   }
+}
+
+export const collectOrderedRevisions = (
+  revisions: {
+    id: string
+    label: string
+    Created?: string | null
+  }[]
+): { id: string; label: string; Created?: string | null }[] => {
+  return [...revisions].sort((a, b) => {
+    if (a.id === 'workspace') {
+      return -1
+    }
+    if (b.id === 'workspace') {
+      return 1
+    }
+    return (b.Created || '').localeCompare(a.Created || '')
+  })
+}
+
+export const collectImageUrl = (
+  image: ImagePlot | undefined,
+  fetched: boolean
+): string | undefined => {
+  const url = image?.url
+  if (!url) {
+    return
+  }
+
+  if (!fetched && !exists(url)) {
+    return undefined
+  }
+
+  return url
 }

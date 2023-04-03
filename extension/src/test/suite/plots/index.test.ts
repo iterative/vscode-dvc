@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore, spy, stub } from 'sinon'
 import { commands, Uri } from 'vscode'
+import isEqual from 'lodash.isequal'
 import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import expShowFixtureWithoutErrors from '../../fixtures/expShow/base/noErrors'
@@ -31,12 +32,14 @@ import {
   PlotsSection,
   TemplatePlotGroup,
   TemplatePlotsData,
-  CustomPlotType
+  CustomPlotType,
+  TemplatePlot,
+  ImagePlot
 } from '../../../plots/webview/contract'
 import { TEMP_PLOTS_DIR } from '../../../cli/dvc/constants'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { MessageFromWebviewType } from '../../../webview/contract'
-import { reorderObjectList } from '../../../util/array'
+import { reorderObjectList, uniqueValues } from '../../../util/array'
 import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
 import {
@@ -46,6 +49,8 @@ import {
 import { SelectedExperimentWithColor } from '../../../experiments/model'
 import * as customPlotQuickPickUtil from '../../../plots/model/quickPick'
 import { CHECKPOINTS_PARAM } from '../../../plots/model/custom'
+import { ErrorItem } from '../../../path/selection/tree'
+import { isErrorItem } from '../../../tree'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -64,7 +69,8 @@ suite('Plots Test Suite', () => {
   describe('Plots', () => {
     it('should call plots diff once on instantiation with missing revisions if there are no plots', async () => {
       const { mockPlotsDiff, messageSpy, plots, data } = await buildPlots(
-        disposable
+        disposable,
+        { data: {} }
       )
 
       const managedUpdateSpy = spy(data, 'managedUpdate')
@@ -73,9 +79,9 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
         EXPERIMENT_WORKSPACE_ID,
-        '1ba7bcd',
-        '42b8736',
         '4fb124a',
+        '42b8736',
+        '1ba7bcd',
         '53c3851'
       )
       mockPlotsDiff.resetHistory()
@@ -116,7 +122,8 @@ suite('Plots Test Suite', () => {
                 checkpoint_tip: 'experiment',
                 executor: 'dvc-task',
                 name: 'exp-e1new',
-                status: ExperimentStatus.RUNNING
+                status: ExperimentStatus.RUNNING,
+                timestamp: '2023-03-23T09:02:20'
               }
             }
           }
@@ -136,11 +143,15 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
         EXPERIMENT_WORKSPACE_ID,
-        'experim'
+        'experim',
+        '4fb124a',
+        '42b8736',
+        '1ba7bcd',
+        '53c3851'
       )
     })
 
-    it('should call plots diff with the branch name (if available) whenever the current commit changes', async () => {
+    it('should call plots diff with the commit whenever the current commit changes', async () => {
       const mockNow = getMockNow()
       const { data, experiments, mockPlotsDiff } = await buildPlots(
         disposable,
@@ -595,16 +606,17 @@ suite('Plots Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle a message to manually refresh a revision from the webview', async () => {
-      const { data, plots, plotsModel, mockPlotsDiff } = await buildPlots(
+    it('should handle a message to manually refresh plot revisions from the webview', async () => {
+      const { data, plots, mockPlotsDiff, messageSpy } = await buildPlots(
         disposable,
         plotsDiffFixture
       )
 
-      const removeDataSpy = spy(plotsModel, 'setupManualRefresh')
+      messageSpy.restore()
 
       const webview = await plots.showWebview()
       mockPlotsDiff.resetHistory()
+      const instanceMessageSpy = spy(webview, 'show')
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -614,51 +626,6 @@ suite('Plots Test Suite', () => {
       )
 
       mockMessageReceived.fire({
-        payload: 'main',
-        type: MessageFromWebviewType.REFRESH_REVISION
-      })
-
-      await dataUpdateEvent
-
-      expect(removeDataSpy).to.be.calledOnce
-      expect(mockSendTelemetryEvent).to.be.calledOnce
-      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_PLOTS_MANUAL_REFRESH,
-        { revisions: 1 },
-        undefined
-      )
-      expect(mockPlotsDiff).to.be.called
-      expect(mockPlotsDiff).to.be.calledWithExactly(
-        dvcDemoPath,
-        EXPERIMENT_WORKSPACE_ID,
-        '53c3851'
-      )
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
-    it('should handle a message to manually refresh all visible plots from the webview', async () => {
-      const { data, plots, mockPlotsDiff } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
-
-      const webview = await plots.showWebview()
-      mockPlotsDiff.resetHistory()
-
-      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
-
-      const dataUpdateEvent = new Promise(resolve =>
-        data.onDidUpdate(() => resolve(undefined))
-      )
-
-      mockMessageReceived.fire({
-        payload: [
-          '1ba7bcd',
-          '42b8736',
-          '4fb124a',
-          'main',
-          EXPERIMENT_WORKSPACE_ID
-        ],
         type: MessageFromWebviewType.REFRESH_REVISIONS
       })
 
@@ -667,18 +634,22 @@ suite('Plots Test Suite', () => {
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
         EventName.VIEWS_PLOTS_MANUAL_REFRESH,
-        { revisions: 5 },
+        undefined,
         undefined
       )
       expect(mockPlotsDiff).to.be.called
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
         EXPERIMENT_WORKSPACE_ID,
-        '1ba7bcd',
-        '42b8736',
         '4fb124a',
+        '42b8736',
+        '1ba7bcd',
         '53c3851'
       )
+      expect(
+        instanceMessageSpy,
+        'should call the plots webview with cached data before refreshing with data from the CLI'
+      ).to.be.calledTwice
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to make the plots webview visible', async () => {
@@ -717,6 +688,73 @@ suite('Plots Test Suite', () => {
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it("should remove a revision's data if the revision is re-fetched and now contains an error", async () => {
+      const accPngPath = join('plots', 'acc.png')
+      const accPng = [
+        ...plotsDiffFixture.data[join('plots', 'acc.png')]
+      ] as ImagePlot[]
+      const lossTsvPath = join('logs', 'loss.tsv')
+      const lossTsv = [...plotsDiffFixture.data[lossTsvPath]] as TemplatePlot[]
+
+      const plotsDiffOutput = {
+        data: {
+          [accPngPath]: accPng,
+          [lossTsvPath]: lossTsv
+        }
+      }
+
+      const brokenRev = '4fb124a'
+
+      const reFetchedOutput = {
+        data: {
+          [accPngPath]: accPng.filter(
+            ({ revisions }) => !isEqual(revisions, [brokenRev])
+          ),
+          [lossTsvPath]: lossTsv.map((plot, i) => {
+            const datapoints = { ...lossTsv[i].datapoints }
+            delete datapoints[brokenRev]
+
+            return {
+              ...plot,
+              datapoints,
+              revisions: lossTsv[i].revisions?.filter(rev => rev !== brokenRev)
+            }
+          })
+        }
+      }
+
+      const { mockPlotsDiff, plots, data, plotsModel } = await buildPlots(
+        disposable,
+        plotsDiffOutput
+      )
+
+      await plots.isReady()
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const getExistingRevisions = (plotsModel: any) =>
+        uniqueValues([
+          ...Object.keys(plotsModel.revisionData),
+          ...Object.keys(plotsModel.comparisonData)
+        ])
+
+      expect(getExistingRevisions(plotsModel)).to.contain(brokenRev)
+
+      mockPlotsDiff.resetBehavior()
+      mockPlotsDiff.resolves(reFetchedOutput)
+
+      const dataUpdated = new Promise(resolve =>
+        data.onDidUpdate(() => resolve(undefined))
+      )
+
+      await data.update()
+      await dataUpdated
+
+      expect(
+        getExistingRevisions(plotsModel),
+        'the revision should not exist in the underlying data'
+      ).not.to.contain(brokenRev)
+    })
 
     it('should send the correct data to the webview for flexible plots', async () => {
       const { experiments, plots, messageSpy, mockPlotsDiff } =
@@ -1107,6 +1145,60 @@ suite('Plots Test Suite', () => {
 
       expect(mockSetCustomPlotsOrder).to.not.be.called
       expect(mockSendTelemetryEvent).to.not.be.called
+    })
+
+    it('should handle the CLI throwing an error', async () => {
+      const { data, errorsModel, mockPlotsDiff, plots, plotsModel } =
+        await buildPlots(disposable, plotsDiffFixture)
+
+      const mockErrorMsg = `'./dvc.yaml' is invalid.\n
+    While parsing a flow sequence, in line 5, column 9
+      5 │   │   [training/plots/metrics/train/acc.tsv: acc\n
+    Did not find expected ',' or ']', in line 6, column 44
+      6 │   │   training/plots/metrics/test/acc.tsv: acc]`
+
+      await plots.isReady()
+
+      mockPlotsDiff.resetBehavior()
+      mockPlotsDiff.resolves({
+        error: { msg: mockErrorMsg, type: 'caught error' }
+      })
+
+      await data.update()
+
+      const errorItems = plots.getChildPaths(undefined) as ErrorItem[]
+
+      expect(
+        errorItems,
+        'should return a single error item for the plots path tree'
+      ).to.deep.equal([
+        {
+          error: mockErrorMsg,
+          path: join(dvcDemoPath, './dvc.yaml is invalid.')
+        }
+      ])
+
+      expect(
+        errorsModel.getErrorPaths(plotsModel.getSelectedRevisions()),
+        'should return the correct path to give the item a DecorationError'
+      ).to.deep.equal(new Set([errorItems[0].path]))
+
+      mockPlotsDiff.resetBehavior()
+      mockPlotsDiff.resolves(plotsDiffFixture)
+
+      await data.update()
+
+      const selectionItems = plots.getChildPaths(undefined) as unknown[]
+
+      expect(
+        selectionItems.filter(item => isErrorItem(item)),
+        'should not return any error items after the error is resolved'
+      ).to.deep.equal([])
+
+      expect(
+        errorsModel.getErrorPaths(plotsModel.getSelectedRevisions()),
+        'should no long provide decorations to the plots paths tree'
+      ).to.deep.equal(new Set([]))
     })
   })
 })

@@ -4,9 +4,15 @@ import {
   collectData,
   collectTemplates,
   collectOverrideRevisionDetails,
-  collectCustomPlots
+  collectCustomPlots,
+  collectOrderedRevisions,
+  collectImageUrl
 } from './collect'
-import { isCheckpointPlot } from './custom'
+import {
+  createCheckpointSpec,
+  isCheckpointPlot,
+  isCheckpointValue
+} from './custom'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import customPlotsFixture, {
   customPlotsOrderFixture,
@@ -22,15 +28,27 @@ import {
   CustomPlotType,
   DEFAULT_NB_ITEMS_PER_ROW,
   DEFAULT_PLOT_HEIGHT,
+  ImagePlot,
   TemplatePlot
 } from '../webview/contract'
 import { getCLICommitId } from '../../test/fixtures/plotsDiff/util'
 import { SelectedExperimentWithColor } from '../../experiments/model'
 import { Experiment } from '../../experiments/webview/contract'
+import { Color } from '../../experiments/model/status/colors'
+import { exists } from '../../fileSystem'
+
+const mockedExists = jest.mocked(exists)
+
+jest.mock('../../fileSystem')
+
+beforeEach(() => {
+  jest.resetAllMocks()
+})
 
 const logsLossPath = join('logs', 'loss.tsv')
 
-const logsLossPlot = (plotsDiffFixture[logsLossPath][0] || {}) as TemplatePlot
+const logsLossPlot = (plotsDiffFixture.data[logsLossPath][0] ||
+  {}) as TemplatePlot
 
 describe('collectCustomPlots', () => {
   const defaultFuncArgs = {
@@ -39,7 +57,7 @@ describe('collectCustomPlots', () => {
     height: DEFAULT_PLOT_HEIGHT,
     nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
     plotsOrderValues: customPlotsOrderFixture,
-    selectedRevisions: customPlotsFixture.colors?.domain
+    scale: customPlotsFixture.colors
   }
 
   it('should return the expected data from the test fixture', () => {
@@ -54,7 +72,7 @@ describe('collectCustomPlots', () => {
     )
     const data = collectCustomPlots({
       ...defaultFuncArgs,
-      selectedRevisions: undefined
+      scale: undefined
     })
 
     expect(data).toStrictEqual(expectedOutput)
@@ -74,9 +92,16 @@ describe('collectCustomPlots', () => {
 
   it('should return checkpoint plots with values only containing selected experiments data', () => {
     const domain = customPlotsFixture.colors?.domain.slice(1) as string[]
+    const range = customPlotsFixture.colors?.range.slice(1) as Color[]
 
     const expectedOutput = customPlotsFixture.plots.map(plot => ({
       ...plot,
+      spec: isCheckpointValue(plot.type)
+        ? createCheckpointSpec(plot.metric, plot.metric, plot.param, {
+            domain,
+            range
+          })
+        : plot.spec,
       values: isCheckpointPlot(plot)
         ? plot.values.filter(value => domain.includes(value.group))
         : plot.values
@@ -84,7 +109,7 @@ describe('collectCustomPlots', () => {
 
     const data = collectCustomPlots({
       ...defaultFuncArgs,
-      selectedRevisions: domain
+      scale: { domain, range }
     })
 
     expect(data).toStrictEqual(expectedOutput)
@@ -147,7 +172,7 @@ describe('collectData', () => {
 
     expect(_1ba7bcd_heatmap).toBeDefined()
     expect(_1ba7bcd_heatmap).toStrictEqual(
-      plotsDiffFixture[heatmapPlot].find(({ revisions }) =>
+      plotsDiffFixture.data[heatmapPlot].find(({ revisions }) =>
         sameContents(revisions as string[], ['1ba7bcd'])
       )
     )
@@ -223,6 +248,7 @@ describe('collectOverrideRevisionDetails', () => {
           }
         ] as SelectedExperimentWithColor[],
         new Set(['a', 'c', 'd', 'e']),
+        new Set(['a', 'c', 'd', 'e']),
         {},
         (id: string) =>
           ({
@@ -245,6 +271,7 @@ describe('collectOverrideRevisionDetails', () => {
               }
             ] as Experiment[]
           }[id]),
+        () => undefined,
         []
       )
     expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
@@ -256,6 +283,7 @@ describe('collectOverrideRevisionDetails', () => {
     expect(overrideRevisions).toStrictEqual([
       {
         displayColor: '#4299e1',
+        errors: undefined,
         fetched: true,
         firstThreeColumns: [],
         group: 'a',
@@ -264,6 +292,7 @@ describe('collectOverrideRevisionDetails', () => {
       },
       {
         displayColor: '#13adc7',
+        errors: undefined,
         fetched: true,
         firstThreeColumns: [],
         group: runningGroup,
@@ -272,6 +301,7 @@ describe('collectOverrideRevisionDetails', () => {
       },
       {
         displayColor: '#48bb78',
+        errors: undefined,
         fetched: true,
         firstThreeColumns: [],
         group: 'c',
@@ -281,6 +311,7 @@ describe('collectOverrideRevisionDetails', () => {
       {
         commit: 'Upgrade dependencies ...',
         displayColor: '#f56565',
+        errors: undefined,
         fetched: true,
         firstThreeColumns: [],
         group: 'd',
@@ -335,6 +366,7 @@ describe('collectOverrideRevisionDetails', () => {
             status: ExperimentStatus.SUCCESS
           }
         ] as SelectedExperimentWithColor[],
+        new Set([]),
         new Set(['a', 'c', 'd', 'e']),
         { [runningId]: EXPERIMENT_WORKSPACE_ID },
         (id: string) =>
@@ -358,6 +390,7 @@ describe('collectOverrideRevisionDetails', () => {
               }
             ] as Experiment[]
           }[id]),
+        () => undefined,
         []
       )
     expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
@@ -369,7 +402,8 @@ describe('collectOverrideRevisionDetails', () => {
     expect(overrideRevisions).toStrictEqual([
       {
         displayColor: '#4299e1',
-        fetched: true,
+        errors: undefined,
+        fetched: false,
         firstThreeColumns: [],
         group: 'a',
         id: 'a',
@@ -377,7 +411,8 @@ describe('collectOverrideRevisionDetails', () => {
       },
       {
         displayColor: '#13adc7',
-        fetched: true,
+        errors: undefined,
+        fetched: false,
         firstThreeColumns: [],
         group: undefined,
         id: EXPERIMENT_WORKSPACE_ID,
@@ -385,7 +420,8 @@ describe('collectOverrideRevisionDetails', () => {
       },
       {
         displayColor: '#48bb78',
-        fetched: true,
+        errors: undefined,
+        fetched: false,
         firstThreeColumns: [],
         group: 'c',
         id: 'c',
@@ -393,7 +429,8 @@ describe('collectOverrideRevisionDetails', () => {
       },
       {
         displayColor: '#f56565',
-        fetched: true,
+        errors: undefined,
+        fetched: false,
         firstThreeColumns: [],
         group: 'd',
         id: 'd',
@@ -447,6 +484,7 @@ describe('collectOverrideRevisionDetails', () => {
             status: ExperimentStatus.SUCCESS
           }
         ] as SelectedExperimentWithColor[],
+        new Set([]),
         new Set(['a', 'c', 'd', 'e']),
         {},
         (id: string) =>
@@ -470,6 +508,7 @@ describe('collectOverrideRevisionDetails', () => {
               }
             ] as Experiment[]
           }[id]),
+        () => undefined,
         []
       )
     expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
@@ -486,7 +525,7 @@ describe('collectOverrideRevisionDetails', () => {
     ])
   })
 
-  it('should override the revision details for finished but unfetched checkpoint tips', () => {
+  it('should override the revision details for finished but unfetched checkpoint tips (based on available data)', () => {
     const justFinishedRunningId = 'exp-was-running'
     const { overrideComparison, overrideRevisions } =
       collectOverrideRevisionDetails(
@@ -504,10 +543,12 @@ describe('collectOverrideRevisionDetails', () => {
           { label: 'c' },
           { label: 'd' }
         ] as SelectedExperimentWithColor[],
+        new Set([]),
         new Set(['a', 'c', 'd', 'e']),
         { [justFinishedRunningId]: justFinishedRunningId },
         (id: string) =>
           ({ [justFinishedRunningId]: [{ label: 'e' }] as Experiment[] }[id]),
+        () => undefined,
         []
       )
     expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
@@ -522,5 +563,131 @@ describe('collectOverrideRevisionDetails', () => {
       'c',
       'd'
     ])
+  })
+
+  it('should override the revision errors for finished but unfetched checkpoint tips (based on available data)', () => {
+    const justFinishedRunningId = 'exp-was-running'
+    const errors = ["b's error"]
+    const { overrideComparison, overrideRevisions } =
+      collectOverrideRevisionDetails(
+        ['a', 'b', 'c', 'd'],
+        [
+          { label: 'a' },
+          {
+            checkpoint_tip: 'b',
+            displayColor: '#13adc7',
+            id: justFinishedRunningId,
+            label: 'b',
+            sha: 'b',
+            status: ExperimentStatus.SUCCESS
+          },
+          { label: 'c' },
+          { label: 'd' }
+        ] as SelectedExperimentWithColor[],
+        new Set([]),
+        new Set(['a', 'c', 'd', 'e']),
+        { [justFinishedRunningId]: justFinishedRunningId },
+        (id: string) =>
+          ({ [justFinishedRunningId]: [{ label: 'e' }] as Experiment[] }[id]),
+        (label: string) => {
+          if (label === 'b') {
+            return errors
+          }
+        },
+        []
+      )
+    expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
+      'a',
+      'e',
+      'c',
+      'd'
+    ])
+    expect(
+      overrideRevisions.map(({ revision, errors }) => ({ errors, revision }))
+    ).toStrictEqual([
+      { errors: undefined, revision: 'a' },
+      { errors, revision: 'e' },
+      { errors: undefined, revision: 'c' },
+      { errors: undefined, revision: 'd' }
+    ])
+  })
+})
+
+describe('collectOrderedRevisions', () => {
+  it('should return the expected value from the test fixture', () => {
+    const main = { Created: '2020-11-21T19:58:22', id: 'main', label: 'main' }
+    const workspace = {
+      id: EXPERIMENT_WORKSPACE_ID,
+      label: EXPERIMENT_WORKSPACE_ID
+    }
+    const _4fb124a = {
+      Created: '2020-12-29T15:31:52',
+      id: 'exp-e7a67',
+      label: '4fb124a'
+    }
+    const _42b8736 = {
+      Created: '2020-12-29T15:28:59',
+      id: 'test-branch',
+      label: '42b8736'
+    }
+    const _1ba7bcd = {
+      Created: '2020-12-29T15:27:02',
+      id: 'exp-83425',
+      label: '1ba7bcd'
+    }
+    const orderedRevisions = collectOrderedRevisions([
+      _1ba7bcd,
+      _42b8736,
+      _4fb124a,
+      main,
+      workspace
+    ])
+    expect(orderedRevisions).toStrictEqual([
+      workspace,
+      _4fb124a,
+      _42b8736,
+      _1ba7bcd,
+      main
+    ])
+  })
+
+  it('should order the provided revisions by workspace and then Created', () => {
+    const a = { Created: '2023-03-23T16:27:20', id: 'a', label: 'a' }
+    const b = { Created: '2023-03-23T15:27:20', id: 'b', label: 'b' }
+    const c = { Created: '2023-03-23T12:10:13', id: 'c', label: 'c' }
+    const d = { Created: '2020-11-21T19:58:22', id: 'd', label: 'd' }
+    const workspace = {
+      id: EXPERIMENT_WORKSPACE_ID,
+      label: EXPERIMENT_WORKSPACE_ID
+    }
+    const orderedRevisions = collectOrderedRevisions([b, c, workspace, d, a])
+
+    expect(orderedRevisions).toStrictEqual([workspace, a, b, c, d])
+  })
+})
+
+describe('collectImageUrl', () => {
+  it('should return undefined if the image is missing', () => {
+    const url = collectImageUrl(undefined, false)
+    expect(url).toBeUndefined()
+  })
+
+  it("should return undefined if the image's url is missing", () => {
+    const url = collectImageUrl({} as ImagePlot, false)
+    expect(url).toBeUndefined()
+  })
+
+  it('should return the url if the plot is fetched', () => {
+    mockedExists.mockReturnValueOnce(false)
+    const imageUrl = join('some', 'path', 'to', 'image')
+    const url = collectImageUrl({ url: imageUrl } as ImagePlot, true)
+    expect(url).toStrictEqual(imageUrl)
+  })
+
+  it('should omit the url if the plot is not fetched and does not exist', () => {
+    mockedExists.mockReturnValueOnce(false)
+    const imageUrl = join('some', 'path', 'to', 'missing', 'image')
+    const url = collectImageUrl({ url: imageUrl } as ImagePlot, false)
+    expect(url).toStrictEqual(undefined)
   })
 })

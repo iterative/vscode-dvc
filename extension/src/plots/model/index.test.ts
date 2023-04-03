@@ -11,6 +11,7 @@ import { Experiments } from '../../experiments'
 import { PersistenceKey } from '../../persistence/constants'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { customPlotsOrderFixture } from '../../test/fixtures/expShow/base/customPlots'
+import { ErrorsModel } from '../errors/model'
 
 const mockedRevisions = [
   { displayColor: 'white', label: EXPERIMENT_WORKSPACE_ID },
@@ -41,6 +42,10 @@ describe('plotsModel', () => {
         getSelectedRevisions: mockedGetSelectedRevisions,
         isReady: () => Promise.resolve(undefined)
       } as unknown as Experiments,
+      {
+        getImageErrors: () => undefined,
+        getRevisionErrors: () => undefined
+      } as unknown as ErrorsModel,
       memento
     )
     jest.clearAllMocks()
@@ -64,6 +69,7 @@ describe('plotsModel', () => {
         getSelectedRevisions: mockedGetSelectedRevisions,
         isReady: () => Promise.resolve(undefined)
       } as unknown as Experiments,
+      { getImageErrors: () => undefined } as unknown as ErrorsModel,
       memento
     )
     expect(model.getCustomPlotsOrder()).toStrictEqual([

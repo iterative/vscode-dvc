@@ -1,9 +1,7 @@
-import { ExperimentWithCheckpoints } from '../../../../experiments/model'
+import { VisualizationSpec } from 'react-vega'
+import type { ExperimentWithCheckpoints } from '../../../../experiments/model'
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
-import {
-  CHECKPOINTS_PARAM,
-  CustomPlotsOrderValue
-} from '../../../../plots/model/custom'
+import type { CustomPlotsOrderValue } from '../../../../plots/model/custom'
 import {
   CustomPlotsData,
   CustomPlotType,
@@ -24,12 +22,12 @@ export const customPlotsOrderFixture: CustomPlotsOrderValue[] = [
   },
   {
     metric: 'summary.json:loss',
-    param: CHECKPOINTS_PARAM,
+    param: 'epoch',
     type: CustomPlotType.CHECKPOINT
   },
   {
     metric: 'summary.json:accuracy',
-    param: CHECKPOINTS_PARAM,
+    param: 'epoch',
     type: CustomPlotType.CHECKPOINT
   }
 ]
@@ -211,6 +209,60 @@ const data: CustomPlotsData = {
       metric: 'summary.json:loss',
       param: 'params.yaml:dropout',
       type: CustomPlotType.METRIC_VS_PARAM,
+      spec: {
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+        data: { name: 'values' },
+        encoding: {
+          x: {
+            field: 'param',
+            title: 'params.yaml:dropout',
+            type: 'quantitative'
+          },
+          y: {
+            field: 'metric',
+            scale: { zero: false },
+            title: 'summary.json:loss',
+            type: 'quantitative'
+          }
+        },
+        height: 'container',
+        layer: [
+          {
+            layer: [
+              { mark: { type: 'line' } },
+              {
+                mark: { type: 'point' },
+                transform: [{ filter: { param: 'hover' } }]
+              }
+            ]
+          },
+          {
+            encoding: {
+              opacity: { value: 0 },
+              tooltip: [
+                { field: 'expName', title: 'name' },
+                { field: 'metric', title: 'summary.json:loss' },
+                { field: 'param', title: 'params.yaml:dropout' }
+              ]
+            },
+            mark: { type: 'rule' },
+            params: [
+              {
+                name: 'hover',
+                select: {
+                  clear: 'mouseout',
+                  fields: ['param', 'metric'],
+                  nearest: true,
+                  on: 'mouseover',
+                  type: 'point'
+                }
+              }
+            ]
+          }
+        ],
+        transform: [{ as: 'y', calculate: "format(datum['y'],'.5f')" }],
+        width: 'container'
+      },
       values: [
         {
           expName: 'main',
@@ -232,8 +284,7 @@ const data: CustomPlotsData = {
           metric: 1.775016188621521,
           param: 0.124
         }
-      ],
-      yTitle: 'summary.json:loss'
+      ]
     },
     {
       id: 'custom-summary.json:accuracy-params.yaml:epochs',
@@ -262,12 +313,95 @@ const data: CustomPlotsData = {
           param: 5
         }
       ],
-      yTitle: 'summary.json:accuracy'
+      spec: {
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+        data: { name: 'values' },
+        encoding: {
+          x: {
+            field: 'param',
+            title: 'params.yaml:epochs',
+            type: 'quantitative'
+          },
+          y: {
+            field: 'metric',
+            scale: { zero: false },
+            title: 'summary.json:accuracy',
+            type: 'quantitative'
+          }
+        },
+        height: 'container',
+        layer: [
+          {
+            layer: [
+              {
+                mark: {
+                  type: 'line'
+                }
+              },
+              {
+                mark: {
+                  type: 'point'
+                },
+                transform: [
+                  {
+                    filter: {
+                      param: 'hover'
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            encoding: {
+              opacity: {
+                value: 0
+              },
+              tooltip: [
+                {
+                  field: 'expName',
+                  title: 'name'
+                },
+                {
+                  field: 'metric',
+                  title: 'summary.json:accuracy'
+                },
+                {
+                  field: 'param',
+                  title: 'params.yaml:epochs'
+                }
+              ]
+            },
+            mark: {
+              type: 'rule'
+            },
+            params: [
+              {
+                name: 'hover',
+                select: {
+                  clear: 'mouseout',
+                  fields: ['param', 'metric'],
+                  nearest: true,
+                  on: 'mouseover',
+                  type: 'point'
+                }
+              }
+            ]
+          }
+        ],
+        transform: [
+          {
+            as: 'y',
+            calculate: "format(datum['y'],'.5f')"
+          }
+        ],
+        width: 'container'
+      }
     },
     {
       id: 'custom-summary.json:loss-epoch',
       metric: 'summary.json:loss',
-      param: CHECKPOINTS_PARAM,
+      param: 'epoch',
       values: [
         { group: 'exp-e7a67', iteration: 3, y: 2.0205044746398926 },
         { group: 'exp-e7a67', iteration: 2, y: 2.0205044746398926 },
@@ -283,12 +417,106 @@ const data: CustomPlotsData = {
         { group: 'exp-83425', iteration: 1, y: 1.9896177053451538 }
       ],
       type: CustomPlotType.CHECKPOINT,
-      yTitle: 'summary.json:loss'
+      spec: {
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+        data: { name: 'values' },
+        encoding: {
+          color: {
+            field: 'group',
+            legend: { disable: true },
+            scale: {
+              domain: ['exp-e7a67', 'test-branch', 'exp-83425'],
+              range: [colors[2], colors[3], colors[4]]
+            },
+            title: 'rev',
+            type: 'nominal'
+          },
+          x: {
+            axis: { format: '0d', tickMinStep: 1 },
+            field: 'iteration',
+            title: 'epoch',
+            type: 'quantitative'
+          },
+          y: {
+            field: 'y',
+            scale: { zero: false },
+            title: 'summary.json:loss',
+            type: 'quantitative'
+          }
+        },
+        height: 'container',
+        layer: [
+          {
+            layer: [
+              { mark: { type: 'line' } },
+              {
+                mark: { type: 'point' },
+                transform: [
+                  {
+                    filter: { empty: false, param: 'hover' }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            encoding: {
+              opacity: { value: 0 },
+              tooltip: [
+                { field: 'group', title: 'name' },
+                {
+                  field: 'y',
+                  title: 'loss',
+                  type: 'quantitative'
+                }
+              ]
+            },
+            mark: { type: 'rule' },
+            params: [
+              {
+                name: 'hover',
+                select: {
+                  clear: 'mouseout',
+                  fields: ['iteration', 'y'],
+                  nearest: true,
+                  on: 'mouseover',
+                  type: 'point'
+                }
+              }
+            ]
+          },
+          {
+            encoding: {
+              color: {
+                field: 'group',
+                scale: {
+                  domain: ['exp-e7a67', 'test-branch', 'exp-83425'],
+                  range: [colors[2], colors[3], colors[4]]
+                }
+              },
+              x: { aggregate: 'max', field: 'iteration', type: 'quantitative' },
+              y: {
+                aggregate: { argmax: 'iteration' },
+                field: 'y',
+                type: 'quantitative'
+              }
+            },
+            mark: { stroke: null, type: 'circle' }
+          }
+        ],
+        transform: [
+          {
+            as: 'y',
+            calculate: "format(datum['y'],'.5f')"
+          }
+        ],
+        width: 'container'
+      } as VisualizationSpec
     },
     {
       id: 'custom-summary.json:accuracy-epoch',
       metric: 'summary.json:accuracy',
-      param: CHECKPOINTS_PARAM,
+      param: 'epoch',
       values: [
         { group: 'exp-e7a67', iteration: 3, y: 0.3724166750907898 },
         { group: 'exp-e7a67', iteration: 2, y: 0.3724166750907898 },
@@ -304,7 +532,101 @@ const data: CustomPlotsData = {
         { group: 'exp-83425', iteration: 1, y: 0.40904998779296875 }
       ],
       type: CustomPlotType.CHECKPOINT,
-      yTitle: 'summary.json:accuracy'
+      spec: {
+        $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+        data: { name: 'values' },
+        encoding: {
+          color: {
+            field: 'group',
+            legend: { disable: true },
+            scale: {
+              domain: ['exp-e7a67', 'test-branch', 'exp-83425'],
+              range: [colors[2], colors[3], colors[4]]
+            },
+            title: 'rev',
+            type: 'nominal'
+          },
+          x: {
+            axis: { format: '0d', tickMinStep: 1 },
+            field: 'iteration',
+            title: 'epoch',
+            type: 'quantitative'
+          },
+          y: {
+            field: 'y',
+            scale: { zero: false },
+            title: 'summary.json:accuracy',
+            type: 'quantitative'
+          }
+        },
+        height: 'container',
+        layer: [
+          {
+            layer: [
+              { mark: { type: 'line' } },
+              {
+                mark: { type: 'point' },
+                transform: [
+                  {
+                    filter: { empty: false, param: 'hover' }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            encoding: {
+              opacity: { value: 0 },
+              tooltip: [
+                { field: 'group', title: 'name' },
+                {
+                  field: 'y',
+                  title: 'accuracy',
+                  type: 'quantitative'
+                }
+              ]
+            },
+            mark: { type: 'rule' },
+            params: [
+              {
+                name: 'hover',
+                select: {
+                  clear: 'mouseout',
+                  fields: ['iteration', 'y'],
+                  nearest: true,
+                  on: 'mouseover',
+                  type: 'point'
+                }
+              }
+            ]
+          },
+          {
+            encoding: {
+              color: {
+                field: 'group',
+                scale: {
+                  domain: ['exp-e7a67', 'test-branch', 'exp-83425'],
+                  range: [colors[2], colors[3], colors[4]]
+                }
+              },
+              x: { aggregate: 'max', field: 'iteration', type: 'quantitative' },
+              y: {
+                aggregate: { argmax: 'iteration' },
+                field: 'y',
+                type: 'quantitative'
+              }
+            },
+            mark: { stroke: null, type: 'circle' }
+          }
+        ],
+        transform: [
+          {
+            as: 'y',
+            calculate: "format(datum['y'],'.5f')"
+          }
+        ],
+        width: 'container'
+      } as VisualizationSpec
     }
   ],
   nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,

@@ -13,7 +13,7 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
-import customPlotsFixture from 'dvc/src/test/fixtures/expShow/base/customPlots'
+import originalCustomPlotsFixture from 'dvc/src/test/fixtures/expShow/base/customPlots'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
 import smoothTemplatePlotContent from 'dvc/src/test/fixtures/plotsDiff/template/smoothTemplatePlot'
@@ -60,6 +60,52 @@ import { clearSelection, createWindowTextSelection } from '../../test/selection'
 import * as EventCurrentTargetDistances from '../../shared/components/dragDrop/currentTarget'
 import { OVERSCAN_ROW_COUNT } from '../../shared/components/virtualizedGrid/VirtualizedGrid'
 
+const customPlotsFixture = {
+  ...originalCustomPlotsFixture,
+  plots: originalCustomPlotsFixture.plots.map(plot => {
+    return {
+      ...plot,
+      spec: {
+        ...plot.spec,
+        layer: [
+          {
+            layer: [
+              { mark: { type: 'line' } },
+              {
+                mark: { type: 'point' },
+                transform: [{ filter: { param: 'hover' } }]
+              }
+            ]
+          },
+          {
+            encoding: {
+              opacity: { value: 0 },
+              tooltip: [
+                { field: 'expName', title: 'name' },
+                { field: 'metric', title: 'summary.json:loss' },
+                { field: 'param', title: 'params.yaml:dropout' }
+              ]
+            },
+            mark: { type: 'rule' },
+            params: [
+              {
+                name: 'hover',
+                select: {
+                  clear: 'mouseout',
+                  fields: ['param', 'metric'],
+                  nearest: false, // true causes errors to be logged for tests
+                  on: 'mouseover',
+                  type: 'point'
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  })
+} as CustomPlotsData
+
 jest.mock('../../shared/components/dragDrop/currentTarget', () => {
   const actualModule = jest.requireActual(
     '../../shared/components/dragDrop/currentTarget'
@@ -72,24 +118,6 @@ jest.mock('../../shared/components/dragDrop/currentTarget', () => {
 
 jest.mock('../../shared/api')
 
-jest.mock('./customPlots/util', () => ({
-  createCheckpointSpec: () => ({
-    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-    encoding: {},
-    height: 100,
-    layer: [],
-    transform: [],
-    width: 100
-  }),
-  createMetricVsParamSpec: () => ({
-    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-    encoding: {},
-    height: 100,
-    layer: [],
-    transform: [],
-    width: 100
-  })
-}))
 jest.spyOn(console, 'warn').mockImplementation(() => {})
 
 const { postMessage } = vsCodeApi
@@ -247,7 +275,14 @@ describe('App', () => {
         plots: [
           {
             path: 'training/plots/images/misclassified.jpg',
-            revisions: { ad2b5ec: { revision: 'ad2b5ec' } }
+            revisions: {
+              ad2b5ec: {
+                errors: undefined,
+                loading: true,
+                revision: 'ad2b5ec',
+                url: undefined
+              }
+            }
           }
         ],
         revisions: [
@@ -1427,9 +1462,16 @@ describe('App', () => {
           id,
           metric: '',
           param: '',
+          spec: {
+            $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+            encoding: {},
+            height: 100,
+            layer: [],
+            transform: [],
+            width: 100
+          },
           type: CustomPlotType.CHECKPOINT,
-          values: [],
-          yTitle: id
+          values: []
         })
       }
       return {
@@ -1537,14 +1579,14 @@ describe('App', () => {
         it('should render the plots correctly when the screen is larger than 2000px', () => {
           let plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[4].id).toBe(custom.plots[4].yTitle)
+          expect(plots[4].id).toBe('plot-4')
           expect(plots.length).toBe(OVERSCAN_ROW_COUNT + 1)
 
           resizeScreen(5453, store)
 
           plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[3].id).toBe(custom.plots[3].yTitle)
+          expect(plots[3].id).toBe('plot-3')
           expect(plots.length).toBe(OVERSCAN_ROW_COUNT + 1)
         })
 
@@ -1553,7 +1595,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[12].id).toBe(custom.plots[12].yTitle)
+          expect(plots[12].id).toBe('plot-12')
           expect(plots.length).toBe(OVERSCAN_ROW_COUNT + 1)
         })
 
@@ -1562,7 +1604,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[14].id).toBe(custom.plots[14].yTitle)
+          expect(plots[14].id).toBe('plot-14')
           expect(plots.length).toBe(1 + OVERSCAN_ROW_COUNT) // Only the first and the next lines defined by the overscan row count will be rendered
         })
 
@@ -1571,7 +1613,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[4].id).toBe(custom.plots[4].yTitle)
+          expect(plots[4].id).toBe('plot-4')
         })
       })
     })
@@ -1634,14 +1676,14 @@ describe('App', () => {
 
           let plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[20].id).toBe(custom.plots[20].yTitle)
+          expect(plots[20].id).toBe('plot-20')
           expect(plots.length).toBe(custom.plots.length)
 
           resizeScreen(6453, store)
 
           plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[19].id).toBe(custom.plots[19].yTitle)
+          expect(plots[19].id).toBe('plot-19')
           expect(plots.length).toBe(custom.plots.length)
         })
 
@@ -1650,7 +1692,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[7].id).toBe(custom.plots[7].yTitle)
+          expect(plots[7].id).toBe('plot-7')
           expect(plots.length).toBe(custom.plots.length)
         })
 
@@ -1659,7 +1701,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[7].id).toBe(custom.plots[7].yTitle)
+          expect(plots[7].id).toBe('plot-7')
           expect(plots.length).toBe(custom.plots.length)
         })
 
@@ -1668,7 +1710,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[4].id).toBe(custom.plots[4].yTitle)
+          expect(plots[4].id).toBe('plot-4')
         })
       })
     })
@@ -1731,14 +1773,14 @@ describe('App', () => {
 
           let plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[7].id).toBe(custom.plots[7].yTitle)
+          expect(plots[7].id).toBe('plot-7')
           expect(plots.length).toBe(custom.plots.length)
 
           resizeScreen(5473, store)
 
           plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[9].id).toBe(custom.plots[9].yTitle)
+          expect(plots[9].id).toBe('plot-9')
           expect(plots.length).toBe(custom.plots.length)
         })
 
@@ -1747,7 +1789,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[24].id).toBe(custom.plots[24].yTitle)
+          expect(plots[24].id).toBe('plot-24')
           expect(plots.length).toBe(custom.plots.length)
         })
 
@@ -1756,7 +1798,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[9].id).toBe(custom.plots[9].yTitle)
+          expect(plots[9].id).toBe('plot-9')
           expect(plots.length).toBe(custom.plots.length)
         })
 
@@ -1765,7 +1807,7 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[9].id).toBe(custom.plots[9].yTitle)
+          expect(plots[9].id).toBe('plot-9')
           expect(plots.length).toBe(custom.plots.length)
         })
 
@@ -1774,12 +1816,13 @@ describe('App', () => {
 
           const plots = screen.getAllByTestId(/^plot-/)
 
-          expect(plots[4].id).toBe(custom.plots[4].yTitle)
+          expect(plots[4].id).toBe('plot-4')
         })
       })
     })
   })
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('Ribbon', () => {
     const getDisplayedRevisionOrder = () => {
       const ribbon = screen.getByTestId('ribbon')
@@ -1867,15 +1910,42 @@ describe('App', () => {
 
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
-        payload: [
-          EXPERIMENT_WORKSPACE_ID,
-          'main',
-          '4fb124a',
-          '42b8736',
-          '1ba7bcd'
-        ],
         type: MessageFromWebviewType.REFRESH_REVISIONS
       })
+    })
+
+    it('should show an error indicator for each revision with an error', () => {
+      renderAppWithOptionalData({
+        comparison: comparisonTableFixture,
+        selectedRevisions: plotsRevisionsFixture.map(rev => {
+          if (rev.revision === 'main') {
+            return {
+              ...rev,
+              errors: ['error']
+            }
+          }
+          return rev
+        })
+      })
+      const errorIndicators = screen.getAllByText('!')
+      expect(errorIndicators).toHaveLength(1)
+    })
+
+    it('should not show an error indicator for a loading revision', () => {
+      renderAppWithOptionalData({
+        comparison: comparisonTableFixture,
+        selectedRevisions: plotsRevisionsFixture.map(rev => {
+          if (rev.revision === 'main') {
+            return {
+              ...rev,
+              errors: ['error'],
+              fetched: false
+            }
+          }
+          return rev
+        })
+      })
+      expect(screen.queryByText('!')).not.toBeInTheDocument()
     })
   })
 

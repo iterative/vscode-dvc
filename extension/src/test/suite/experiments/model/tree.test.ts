@@ -11,7 +11,9 @@ import {
 import { ExperimentType } from '../../../../experiments/model'
 import { UNSELECTED } from '../../../../experiments/model/status'
 import {
+  bypassProcessManagerDebounce,
   getFirstArgOfLastCall,
+  getMockNow,
   getTimeSafeDisposer,
   stubPrivatePrototypeMethod
 } from '../../util'
@@ -23,7 +25,6 @@ import {
 import { buildPlots, getExpectedCustomPlotsData } from '../../plots/util'
 import customPlotsFixture from '../../../fixtures/expShow/base/customPlots'
 import expShowFixture from '../../../fixtures/expShow/base/output'
-import plotsRevisionsFixture from '../../../fixtures/plotsDiff/revisions'
 import { ExperimentsTree } from '../../../../experiments/model/tree'
 import { buildExperiments, stubWorkspaceExperimentsGetters } from '../util'
 import { WEBVIEW_TEST_TIMEOUT } from '../../timeouts'
@@ -37,11 +38,7 @@ import { Param } from '../../../../experiments/model/modify/collect'
 import { WorkspaceExperiments } from '../../../../experiments/workspace'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 import { DvcReader } from '../../../../cli/dvc/reader'
-import {
-  ColorScale,
-  CustomPlotType,
-  DEFAULT_SECTION_COLLAPSED
-} from '../../../../plots/webview/contract'
+import { ColorScale, CustomPlotType } from '../../../../plots/webview/contract'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = getTimeSafeDisposer()
@@ -66,6 +63,8 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to toggle whether an experiment is shown in the plots webview with dvc.views.experiments.toggleStatus', async () => {
+      const mockNow = getMockNow()
+
       const { plots, messageSpy } = await buildPlots(disposable)
 
       const expectedDomain = [...domain]
@@ -75,6 +74,7 @@ suite('Experiments Tree Test Suite', () => {
 
       await webview.isReady()
 
+      let updateCall = 1
       while (expectedDomain.length > 0) {
         const expectedData = getExpectedCustomPlotsData(
           expectedDomain,
@@ -92,6 +92,7 @@ suite('Experiments Tree Test Suite', () => {
         const id = expectedDomain.pop()
         expectedRange.pop()
 
+        bypassProcessManagerDebounce(mockNow, updateCall)
         const unSelected = await commands.executeCommand(
           RegisteredCommands.EXPERIMENT_TOGGLE,
           {
@@ -99,33 +100,29 @@ suite('Experiments Tree Test Suite', () => {
             id
           }
         )
+        updateCall = updateCall + 1
 
         expect(unSelected).to.equal(UNSELECTED)
       }
 
       expect(
         messageSpy,
-        'when there are no experiments selected we dont send checkpoint type plots'
+        "when there are no experiments selected we don't send checkpoint trend plots"
       ).to.be.calledWithMatch({
-        comparison: null,
         custom: {
           ...customPlotsFixture,
           colors: undefined,
           plots: customPlotsFixture.plots.filter(
             plot => plot.type !== CustomPlotType.CHECKPOINT
           )
-        },
-        hasPlots: false,
-        hasUnselectedPlots: false,
-        sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-        selectedRevisions: plotsRevisionsFixture.slice(0, 2),
-        template: null
+        }
       })
       messageSpy.resetHistory()
 
       expectedDomain.push(domain[0])
       expectedRange.push(range[0])
 
+      bypassProcessManagerDebounce(mockNow, updateCall)
       const selected = await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_TOGGLE,
         {
