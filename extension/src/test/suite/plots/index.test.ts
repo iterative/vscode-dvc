@@ -668,6 +668,7 @@ suite('Plots Test Suite', () => {
       expect(templateData).to.deep.equal(templatePlotsFixture)
 
       const expectedPlotsData: TPlotsData = {
+        cliError: null,
         comparison: comparisonPlotsFixture,
         custom: customPlotsFixture,
         hasPlots: true,

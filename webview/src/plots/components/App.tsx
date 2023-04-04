@@ -26,6 +26,7 @@ import {
 } from './templatePlots/templatePlotsSlice'
 import {
   initialize,
+  updateCliError,
   updateHasPlots,
   updateHasUnselectedPlots,
   updateSelectedRevisions
@@ -54,6 +55,9 @@ export const feedStore = (
     dispatch(initialize())
     for (const key of Object.keys(data.data)) {
       switch (key) {
+        case PlotsDataKeys.CLI_ERROR:
+          dispatch(updateCliError(data.data[key]))
+          continue
         case PlotsDataKeys.CUSTOM:
           dispatch(updateCustomPlots(data.data[key] as CustomPlotsData))
           continue

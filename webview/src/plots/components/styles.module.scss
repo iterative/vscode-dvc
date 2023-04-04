@@ -220,6 +220,10 @@ $gap: 20px;
   }
 }
 
+.errorIcon {
+  color: $error-color;
+}
+
 .zoomablePlot {
   display: block;
   width: 100%;
