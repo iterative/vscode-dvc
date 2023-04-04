@@ -37,6 +37,7 @@ describe('Experiments Table Webview', function () {
   const webview = new ExperimentsWebview('experiments')
 
   const epochs = 15
+  const experimentRow = 1
   const headerRows = 3
   const workspaceRow = 1
   const commitRows = 3
@@ -79,7 +80,7 @@ describe('Experiments Table Webview', function () {
     return closeAllEditors()
   })
 
-  it('should update with a new row for each checkpoint when an experiment is running', async function () {
+  it('should update with new data for each DVCLive step when an experiment is running', async function () {
     this.timeout(180000)
     await runModifiedExperiment()
     await webview.focus()
@@ -88,7 +89,27 @@ describe('Experiments Table Webview', function () {
       async () => {
         await webview.expandAllRows()
         const currentRows = await webview.row$$
-        return currentRows.length >= initialRows + epochs
+
+        return currentRows.length >= initialRows + experimentRow
+      },
+      { interval: 5000, timeout: 180000 }
+    )
+
+    const currentRows = await webview.row$$
+
+    const newRow = currentRows[headerRows + workspaceRow + 1]
+
+    const experimentName = (await webview.getExperimentName(newRow)) as string
+
+    expect(typeof experimentName).toStrictEqual('string')
+
+    await browser.waitUntil(
+      async () => {
+        await webview.expandAllRows()
+
+        const step = await webview.getExperimentStep(newRow, experimentName)
+
+        return step === epochs - 1
       },
       { interval: 5000, timeout: 180000 }
     )
@@ -99,7 +120,7 @@ describe('Experiments Table Webview', function () {
 
     const finalRows = await webview.row$$
 
-    expect(finalRows.length).toStrictEqual(initialRows + epochs)
+    expect(finalRows.length).toStrictEqual(initialRows + experimentRow)
     await webview.unfocus()
     await closeAllEditors()
     await waitForDvcToFinish()

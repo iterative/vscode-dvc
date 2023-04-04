@@ -76,8 +76,7 @@ export const RowContent: React.FC<
   const changes = useSelector(
     (state: ExperimentsState) => state.tableData.changes
   )
-  const { getVisibleCells, original, index, getIsExpanded, subRows, depth } =
-    row
+  const { getVisibleCells, original, index, getIsExpanded, subRows } = row
   const { id } = original
   const [firstCell, ...cells] = getVisibleCells()
   const { displayColor, error, starred } = original
@@ -168,7 +167,7 @@ export const RowContent: React.FC<
           bulletColor={displayColor}
           starred={starred}
           isRowSelected={isRowSelected}
-          showSubRowStates={!getIsExpanded() && depth > 0}
+          showSubRowStates={!getIsExpanded() && !isWorkspace}
           subRowStates={subRowStates}
           toggleExperiment={toggleExperiment}
           toggleRowSelection={toggleRowSelection}

@@ -27,15 +27,13 @@ const collectStatus = (acc: ColoredStatus, experiment: Experiment): void => {
 
 const collectExistingStatuses = (
   experiments: Experiment[],
-  checkpointsByTip: Map<string, Experiment[]>,
   experimentsByCommit: Map<string, Experiment[]>,
   previousStatus: ColoredStatus
 ): ColoredStatus => {
   const existingStatuses: ColoredStatus = {}
   for (const experiment of [
     ...experiments,
-    ...flattenMapValues(experimentsByCommit),
-    ...flattenMapValues(checkpointsByTip)
+    ...flattenMapValues(experimentsByCommit)
   ]) {
     const { id } = experiment
 
@@ -114,24 +112,21 @@ export const unassignColors = (
 
 export const collectColoredStatus = (
   experiments: Experiment[],
-  checkpointsByTip: Map<string, Experiment[]>,
   experimentsByCommit: Map<string, Experiment[]>,
   previousStatus: ColoredStatus,
   unassignedColors: Color[],
   startedRunning: Set<string>,
   finishedRunning: { [id: string]: string }
 ): { coloredStatus: ColoredStatus; availableColors: Color[] } => {
-  const flattenExperimentsByCommit = flattenMapValues(experimentsByCommit)
-  const flattenCheckpoints = flattenMapValues(checkpointsByTip)
+  const flatExperimentsByCommit = flattenMapValues(experimentsByCommit)
   const availableColors = unassignColors(
-    [...experiments, ...flattenExperimentsByCommit, ...flattenCheckpoints],
+    [...experiments, ...flatExperimentsByCommit],
     previousStatus,
     unassignedColors
   )
 
   const coloredStatus = collectExistingStatuses(
     experiments,
-    checkpointsByTip,
     experimentsByCommit,
     previousStatus
   )
@@ -143,11 +138,7 @@ export const collectColoredStatus = (
     startedRunning
   )
 
-  for (const experiment of [
-    ...experiments,
-    ...flattenExperimentsByCommit,
-    ...flattenCheckpoints
-  ]) {
+  for (const experiment of [...experiments, ...flatExperimentsByCommit]) {
     collectStatus(coloredStatus, experiment)
     removeUnselectedExperimentRunningInWorkspace(coloredStatus, experiment)
   }

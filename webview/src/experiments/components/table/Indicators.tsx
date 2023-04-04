@@ -1,7 +1,5 @@
 import React, { MouseEventHandler, ReactElement, ReactNode } from 'react'
 import { useSelector } from 'react-redux'
-import cx from 'classnames'
-import { FilteredCounts } from 'dvc/src/experiments/model/filterBy/collect'
 import styles from './styles.module.scss'
 import { CellHintTooltip } from './CellHintTooltip'
 import { focusFiltersTree, focusSortsTree, openPlotsWebview } from './messages'
@@ -44,7 +42,7 @@ export const Indicator = ({
 }) => {
   const content = (
     <button
-      className={cx(styles.indicatorIcon, count && styles.indicatorWithCount)}
+      className={styles.indicatorIcon}
       aria-label={ariaLabel}
       onClick={onClick}
     >
@@ -68,36 +66,18 @@ const formatCountMessage = (
   descriptor = 'Applied'
 ) => `${count || 'No'} ${pluralize(item, count)} ${descriptor}`
 
-const formatFilteredCount = (
-  item: 'Experiment' | 'Checkpoint',
-  filteredCount: number | undefined
-) => {
-  if (filteredCount === undefined) {
-    return
-  }
-  return `${filteredCount} ${pluralize(item, filteredCount)}`
-}
-
-const formatFilteredCountMessage = (filteredCounts: FilteredCounts): string =>
-  `${[
-    formatFilteredCount('Experiment', filteredCounts.experiments),
-    formatFilteredCount('Checkpoint', filteredCounts.checkpoints)
-  ]
-    .filter(Boolean)
-    .join(', ')} Filtered`
-
-export const Indicators = ({
-  selectedForPlotsCount
-}: {
-  selectedForPlotsCount: number
-}) => {
+export const Indicators = () => {
   const filters = useSelector(
     (state: ExperimentsState) => state.tableData.filters
   )
   const sorts = useSelector((state: ExperimentsState) => state.tableData.sorts)
-  const filteredCounts = useSelector(
-    (state: ExperimentsState) => state.tableData.filteredCounts
+  const filteredCount = useSelector(
+    (state: ExperimentsState) => state.tableData.filteredCount
   )
+  const selectedForPlotsCount = useSelector(
+    (state: ExperimentsState) => state.tableData.selectedForPlotsCount
+  )
+
   const sortsCount = sorts?.length
   const filtersCount = filters?.length
 
@@ -131,7 +111,9 @@ export const Indicators = ({
           <>
             <div>{formatCountMessage('Filter', filtersCount)}</div>
             {filtersCount ? (
-              <div>{formatFilteredCountMessage(filteredCounts)}</div>
+              <div>
+                {formatCountMessage('Experiment', filteredCount, 'Filtered')}
+              </div>
             ) : null}
           </>
         }

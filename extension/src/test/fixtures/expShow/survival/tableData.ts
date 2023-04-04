@@ -3,22 +3,23 @@ import rowsFixture from './rows'
 import columnsFixture from './columns'
 
 const data: TableData = {
-  filteredCounts: { experiments: 0, checkpoints: 0 },
-  rows: rowsFixture,
+  changes: [],
+  columnOrder: [],
   columns: columnsFixture,
+  columnWidths: {},
+  filteredCount: 0,
   filters: [],
   hasCheckpoints: true,
-  hasConfig: true,
-  hasRunningExperiment: true,
   hasColumns: true,
+  hasConfig: true,
   hasMoreCommits: true,
+  hasRunningExperiment: true,
   hasValidDvcYaml: true,
   isBranchesView: false,
   isShowingMoreCommits: true,
-  sorts: [],
-  changes: [],
-  columnOrder: [],
-  columnWidths: {}
+  rows: rowsFixture,
+  selectedForPlotsCount: 0,
+  sorts: []
 }
 
 export default data

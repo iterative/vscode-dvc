@@ -3,7 +3,6 @@ import {
   ExperimentStatus,
   ValueTree
 } from '../../cli/dvc/contract'
-import { FilteredCounts } from '../model/filterBy/collect'
 import { SortDefinition } from '../model/sortBy'
 
 export { ExperimentStatus } from '../../cli/dvc/contract'
@@ -63,8 +62,8 @@ export const isRunningInQueue = ({
   executor?: string | null
 }): boolean => isRunning(status) && executor === 'dvc-task'
 
-export interface Row extends Experiment {
-  subRows?: Row[]
+export interface Commit extends Experiment {
+  subRows?: Experiment[]
 }
 
 export interface ColumnAggregateData {
@@ -96,6 +95,8 @@ export type TableData = {
   columnOrder: string[]
   columns: Column[]
   columnWidths: Record<string, number>
+  filteredCount: number
+  filters: string[]
   hasCheckpoints: boolean
   hasColumns: boolean
   hasConfig: boolean
@@ -104,10 +105,9 @@ export type TableData = {
   hasValidDvcYaml: boolean
   isShowingMoreCommits: boolean
   isBranchesView: boolean
-  rows: Row[]
+  rows: Commit[]
+  selectedForPlotsCount: number
   sorts: SortDefinition[]
-  filteredCounts: FilteredCounts
-  filters: string[]
 }
 
 export type InitiallyUndefinedTableData = TableData | undefined

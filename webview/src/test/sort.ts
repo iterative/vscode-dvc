@@ -44,7 +44,7 @@ export const tableData: TableData = {
   columnOrder: [],
   columnWidths: {},
   columns: columns as Column[],
-  filteredCounts: { checkpoints: 0, experiments: 0 },
+  filteredCount: 0,
   filters: [],
   hasCheckpoints: false,
   hasColumns: true,
@@ -64,6 +64,7 @@ export const tableData: TableData = {
       label: 'main'
     }
   ],
+  selectedForPlotsCount: 0,
   sorts: []
 }
 

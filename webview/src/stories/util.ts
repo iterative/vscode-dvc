@@ -1,6 +1,6 @@
 // Sorting by size instead of alphabetical makes more sense here
 
-import { Row } from 'dvc/src/experiments/webview/contract'
+import { Commit } from 'dvc/src/experiments/webview/contract'
 
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 export const viewports = {
@@ -71,7 +71,7 @@ export const DISABLE_CHROMATIC_SNAPSHOTS = {
   chromatic: { disableSnapshot: true }
 }
 
-export const addCommitDataToMainBranch = (rows: Row[]) =>
+export const addCommitDataToMainBranch = (rows: Commit[]) =>
   rows.map(row => {
     if (row.id === 'main' || row.id === 'master') {
       row.displayNameOrParent = 'Upgrading dependencies ...'

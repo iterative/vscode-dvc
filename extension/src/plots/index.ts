@@ -139,8 +139,9 @@ export class Plots extends BaseRepository<TPlotsData> {
   private notifyChanged() {
     const selectedRevisions = this.plots.getSelectedRevisions()
     this.paths.setSelectedRevisions(selectedRevisions)
+    const paths = this.paths.getTerminalNodes().map(({ path }) => path)
     this.decorationProvider.setState(
-      this.errors.getErrorPaths(selectedRevisions)
+      this.errors.getErrorPaths(selectedRevisions, paths)
     )
     this.pathsChanged.fire()
 

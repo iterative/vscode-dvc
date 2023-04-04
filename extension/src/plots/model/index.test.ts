@@ -1,6 +1,5 @@
 import { PlotsModel } from '.'
 import {
-  CustomPlotType,
   DEFAULT_NB_ITEMS_PER_ROW,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH,
@@ -75,8 +74,7 @@ describe('plotsModel', () => {
     expect(model.getCustomPlotsOrder()).toStrictEqual([
       {
         metric: 'summary.json:loss',
-        param: 'params.yaml:dropout',
-        type: CustomPlotType.METRIC_VS_PARAM
+        param: 'params.yaml:dropout'
       }
     ])
     expect(

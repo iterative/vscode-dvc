@@ -12,7 +12,7 @@ import {
   updateColumnOrder,
   updateColumns,
   updateColumnWidths,
-  updateFilteredCounts,
+  updateFilteredCount,
   updateFilters,
   updateHasCheckpoints,
   updateHasColumns,
@@ -23,6 +23,7 @@ import {
   updateIsBranchesView,
   updateIsShowingMoreCommits,
   updateRows,
+  updateSelectedForPlotsCount,
   updateSorts
 } from './table/tableDataSlice'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
@@ -49,8 +50,8 @@ export const App: React.FC<Record<string, unknown>> = () => {
               case 'columnsWidths':
                 dispatch(updateColumnWidths(data.data.columnWidths))
                 continue
-              case 'filteredCounts':
-                dispatch(updateFilteredCounts(data.data.filteredCounts))
+              case 'filteredCount':
+                dispatch(updateFilteredCount(data.data.filteredCount))
                 continue
               case 'filters':
                 dispatch(updateFilters(data.data.filters))
@@ -85,6 +86,11 @@ export const App: React.FC<Record<string, unknown>> = () => {
                 continue
               case 'rows':
                 dispatch(updateRows(data.data.rows))
+                continue
+              case 'selectedForPlotsCount':
+                dispatch(
+                  updateSelectedForPlotsCount(data.data.selectedForPlotsCount)
+                )
                 continue
               case 'sorts':
                 dispatch(updateSorts(data.data.sorts))

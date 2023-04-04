@@ -2,9 +2,7 @@ import { Disposer } from '@hediet/std/disposable'
 import { stub } from 'sinon'
 import * as FileSystem from '../../../fileSystem'
 import expShowFixtureWithoutErrors from '../../fixtures/expShow/base/noErrors'
-import customPlotsFixture, {
-  customPlotsOrderFixture
-} from '../../fixtures/expShow/base/customPlots'
+import { customPlotsOrderFixture } from '../../fixtures/expShow/base/customPlots'
 import { Plots } from '../../../plots'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import { WorkspacePlots } from '../../../plots/workspace'
@@ -18,16 +16,11 @@ import { ExperimentsData } from '../../../experiments/data'
 import { mockHasCheckpoints } from '../experiments/util'
 import { MOCK_IMAGE_MTIME } from '../../fixtures/plotsDiff'
 import { PathsModel } from '../../../plots/paths/model'
-import { Color } from '../../../experiments/model/status/colors'
 import { BaseWorkspaceWebviews } from '../../../webview/workspace'
 import { WebviewMessages } from '../../../plots/webview/messages'
 import { ExperimentsModel } from '../../../experiments/model'
 import { Experiment } from '../../../experiments/webview/contract'
 import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../../cli/dvc/contract'
-import {
-  createCheckpointSpec,
-  isCheckpointPlot
-} from '../../../plots/model/custom'
 import { ErrorsModel } from '../../../plots/errors/model'
 
 export const buildPlots = async (
@@ -136,36 +129,5 @@ export const buildWorkspacePlots = (disposer: Disposer) => {
     messageSpy,
     resourceLocator,
     workspacePlots
-  }
-}
-
-export const getExpectedCustomPlotsData = (
-  domain: string[],
-  range: Color[]
-) => {
-  const { plots, nbItemsPerRow, height, enablePlotCreation } =
-    customPlotsFixture
-  return {
-    custom: {
-      colors: {
-        domain,
-        range
-      },
-      enablePlotCreation,
-      height,
-      nbItemsPerRow,
-      plots: plots.map(plot => ({
-        ...plot,
-        spec: isCheckpointPlot(plot)
-          ? createCheckpointSpec(plot.metric, plot.metric, plot.param, {
-              domain,
-              range
-            })
-          : plot.spec,
-        values: isCheckpointPlot(plot)
-          ? plot.values.filter(value => domain.includes(value.group))
-          : plot.values
-      }))
-    }
   }
 }

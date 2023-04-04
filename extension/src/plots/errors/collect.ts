@@ -1,6 +1,7 @@
+import { join } from 'path'
 import { PlotError, PlotsOutput } from '../../cli/dvc/contract'
 
-export type Error = { path: string; rev: string; msg: string }
+export type Error = { path: string | undefined; rev: string; msg: string }
 
 const getMessage = (error: PlotError): string => {
   const { msg, type, source } = error
@@ -70,6 +71,8 @@ const isDuplicateError = (
       rev === existingRev && msg === existingMsg
   )
 
+const isRevisionError = (path: string | undefined): path is undefined => !path
+
 export const collectPathErrors = (
   path: string,
   selectedRevisions: string[],
@@ -79,7 +82,7 @@ export const collectPathErrors = (
   for (const error of errors) {
     const { msg, rev } = error
     if (
-      error.path !== path ||
+      (!isRevisionError(error.path) && error.path !== path) ||
       !selectedRevisions.includes(rev) ||
       isDuplicateError(acc, rev, msg)
     ) {
@@ -93,5 +96,37 @@ export const collectPathErrors = (
     return undefined
   }
 
+  return acc
+}
+
+const addErrorToEveryPath = (
+  acc: Set<string>,
+  dvcRoot: string,
+  paths: string[]
+) => {
+  for (const path of paths) {
+    acc.add(join(dvcRoot, path))
+  }
+}
+
+export const collectErrorPaths = (
+  dvcRoot: string,
+  selectedRevisions: string[],
+  paths: string[],
+  errors: Error[]
+): Set<string> => {
+  const acc = new Set<string>()
+  for (const { path, rev } of errors) {
+    if (!selectedRevisions.includes(rev)) {
+      continue
+    }
+
+    if (isRevisionError(path)) {
+      addErrorToEveryPath(acc, dvcRoot, paths)
+      continue
+    }
+
+    acc.add(join(dvcRoot, path))
+  }
   return acc
 }

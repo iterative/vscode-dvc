@@ -26,7 +26,6 @@ import {
   PlotsSection,
   TemplatePlotGroup,
   TemplatePlotsData,
-  CustomPlotType,
   CustomPlotsData,
   DEFAULT_PLOT_HEIGHT,
   DEFAULT_NB_ITEMS_PER_ROW
@@ -806,9 +805,7 @@ describe('App', () => {
 
     expect(plots.map(plot => plot.id)).toStrictEqual([
       'custom-summary.json:loss-params.yaml:dropout',
-      'custom-summary.json:accuracy-params.yaml:epochs',
-      'custom-summary.json:loss-epoch',
-      'custom-summary.json:accuracy-epoch'
+      'custom-summary.json:accuracy-params.yaml:epochs'
     ])
 
     dragAndDrop(plots[1], plots[0])
@@ -817,9 +814,7 @@ describe('App', () => {
 
     expect(plots.map(plot => plot.id)).toStrictEqual([
       'custom-summary.json:accuracy-params.yaml:epochs',
-      'custom-summary.json:loss-params.yaml:dropout',
-      'custom-summary.json:loss-epoch',
-      'custom-summary.json:accuracy-epoch'
+      'custom-summary.json:loss-params.yaml:dropout'
     ])
   })
 
@@ -831,20 +826,16 @@ describe('App', () => {
     const plots = screen.getAllByTestId(/summary\.json/)
     expect(plots.map(plot => plot.id)).toStrictEqual([
       'custom-summary.json:loss-params.yaml:dropout',
-      'custom-summary.json:accuracy-params.yaml:epochs',
-      'custom-summary.json:loss-epoch',
-      'custom-summary.json:accuracy-epoch'
+      'custom-summary.json:accuracy-params.yaml:epochs'
     ])
 
     mockPostMessage.mockClear()
 
-    dragAndDrop(plots[2], plots[0])
+    dragAndDrop(plots[1], plots[0])
 
     const expectedOrder = [
-      'custom-summary.json:loss-epoch',
-      'custom-summary.json:loss-params.yaml:dropout',
       'custom-summary.json:accuracy-params.yaml:epochs',
-      'custom-summary.json:accuracy-epoch'
+      'custom-summary.json:loss-params.yaml:dropout'
     ]
 
     expect(mockPostMessage).toHaveBeenCalledTimes(1)
@@ -861,17 +852,13 @@ describe('App', () => {
     renderAppWithOptionalData({
       custom: {
         ...customPlotsFixture,
-        plots: customPlotsFixture.plots.slice(0, 3)
+        plots: customPlotsFixture.plots.slice(0, 1)
       }
     })
 
     expect(
       screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
-    ).toStrictEqual([
-      'custom-summary.json:loss-params.yaml:dropout',
-      'custom-summary.json:accuracy-params.yaml:epochs',
-      'custom-summary.json:loss-epoch'
-    ])
+    ).toStrictEqual(['custom-summary.json:loss-params.yaml:dropout'])
 
     sendSetDataMessage({
       custom: customPlotsFixture
@@ -881,9 +868,7 @@ describe('App', () => {
       screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
     ).toStrictEqual([
       'custom-summary.json:loss-params.yaml:dropout',
-      'custom-summary.json:accuracy-params.yaml:epochs',
-      'custom-summary.json:loss-epoch',
-      'custom-summary.json:accuracy-epoch'
+      'custom-summary.json:accuracy-params.yaml:epochs'
     ])
   })
 
@@ -896,9 +881,7 @@ describe('App', () => {
       screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
     ).toStrictEqual([
       'custom-summary.json:loss-params.yaml:dropout',
-      'custom-summary.json:accuracy-params.yaml:epochs',
-      'custom-summary.json:loss-epoch',
-      'custom-summary.json:accuracy-epoch'
+      'custom-summary.json:accuracy-params.yaml:epochs'
     ])
 
     sendSetDataMessage({
@@ -910,11 +893,7 @@ describe('App', () => {
 
     expect(
       screen.getAllByTestId(/summary\.json/).map(plot => plot.id)
-    ).toStrictEqual([
-      'custom-summary.json:accuracy-params.yaml:epochs',
-      'custom-summary.json:loss-epoch',
-      'custom-summary.json:accuracy-epoch'
-    ])
+    ).toStrictEqual(['custom-summary.json:accuracy-params.yaml:epochs'])
   })
 
   it('should not be possible to drag a plot from a section to another', () => {
@@ -926,13 +905,11 @@ describe('App', () => {
     const customPlots = screen.getAllByTestId(/summary\.json/)
     const templatePlots = screen.getAllByTestId(/^plot_/)
 
-    dragAndDrop(templatePlots[0], customPlots[2])
+    dragAndDrop(templatePlots[0], customPlots[1])
 
     expect(customPlots.map(plot => plot.id)).toStrictEqual([
       'custom-summary.json:loss-params.yaml:dropout',
-      'custom-summary.json:accuracy-params.yaml:epochs',
-      'custom-summary.json:loss-epoch',
-      'custom-summary.json:accuracy-epoch'
+      'custom-summary.json:accuracy-params.yaml:epochs'
     ])
   })
 
@@ -1174,8 +1151,6 @@ describe('App', () => {
 
     const expectedOrder = [
       'custom-summary.json:accuracy-params.yaml:epochs',
-      'custom-summary.json:loss-epoch',
-      'custom-summary.json:accuracy-epoch',
       'custom-summary.json:loss-params.yaml:dropout'
     ]
 
@@ -1521,7 +1496,6 @@ describe('App', () => {
             transform: [],
             width: 100
           },
-          type: CustomPlotType.CHECKPOINT,
           values: []
         })
       }

@@ -267,9 +267,7 @@ export class WebviewMessages {
       columnOrder: this.columns.getColumnOrder(),
       columnWidths: this.columns.getColumnWidths(),
       columns: this.columns.getSelected(),
-      filteredCounts: this.experiments.getFilteredCounts(
-        this.checkpoints.hasCheckpoints()
-      ),
+      filteredCount: this.experiments.getFilteredCount(),
       filters: this.experiments.getFilterPaths(),
       hasCheckpoints: this.checkpoints.hasCheckpoints(),
       hasColumns: this.columns.hasNonDefaultColumns(),
@@ -280,6 +278,7 @@ export class WebviewMessages {
       isBranchesView: this.experiments.getIsBranchesView(),
       isShowingMoreCommits: this.isShowingMoreCommits,
       rows: this.experiments.getRowData(),
+      selectedForPlotsCount: this.experiments.getSelectedRevisions().length,
       sorts: this.experiments.getSorts()
     }
   }

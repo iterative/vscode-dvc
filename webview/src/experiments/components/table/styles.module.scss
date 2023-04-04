@@ -554,6 +554,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
         display: inline-flex;
         align-items: center;
         position: relative;
+
         left: -$cell-padding;
         height: 100%;
 
@@ -566,7 +567,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
           align-items: center;
           justify-content: center;
           width: 1.3rem;
-          height: 100%;
+          height: 2rem;
           padding: 0;
           margin: 0;
         }
@@ -962,15 +963,10 @@ $badge-size: 0.85rem;
 
   .innerCell {
     .indicatorCount {
-      display: none;
       .experimentGroup & {
-        display: block;
         &[aria-label='0'] {
           display: none;
         }
-      }
-      .experimentGroup.expandedGroup & {
-        display: none;
       }
     }
   }
