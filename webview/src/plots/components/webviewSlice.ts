@@ -9,6 +9,7 @@ type ZoomedInPlotState = {
   refresh?: boolean
 }
 export interface WebviewState {
+  cliError: string | undefined
   hasData: boolean
   hasPlots: boolean
   hasUnselectedPlots: boolean
@@ -18,6 +19,7 @@ export interface WebviewState {
 }
 
 export const webviewInitialState: WebviewState = {
+  cliError: undefined,
   hasData: false,
   hasPlots: false,
   hasUnselectedPlots: false,
@@ -61,6 +63,19 @@ export const webviewSlice = createSlice({
         Object.assign(state.zoomedInPlot, action.payload)
       }
     },
+    updateCliError: (
+      state: { cliError: string | undefined },
+      action: PayloadAction<string | undefined | null>
+    ) => {
+      if (action.payload === undefined) {
+        return
+      }
+      if (action.payload === null) {
+        state.cliError = undefined
+        return
+      }
+      state.cliError = action.payload
+    },
     updateHasPlots: (
       state: { hasPlots: boolean },
       action: PayloadAction<boolean>
@@ -84,6 +99,7 @@ export const webviewSlice = createSlice({
 
 export const {
   initialize,
+  updateCliError,
   updateHasPlots,
   updateHasUnselectedPlots,
   updateSelectedRevisions,

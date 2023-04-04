@@ -60,6 +60,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.webviewMessages = this.createWebviewMessageHandler(
       this.paths,
       this.plots,
+      this.errors,
       experiments
     )
 
@@ -162,11 +163,13 @@ export class Plots extends BaseRepository<TPlotsData> {
   private createWebviewMessageHandler(
     paths: PathsModel,
     plots: PlotsModel,
+    errors: ErrorsModel,
     experiments: Experiments
   ) {
     const webviewMessages = new WebviewMessages(
       paths,
       plots,
+      errors,
       experiments,
       () => this.getWebview(),
       () => this.selectPlots(),
