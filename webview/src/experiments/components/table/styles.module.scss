@@ -667,6 +667,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
   color: $accent-color;
   text-decoration: underline;
   font-size: 0.6rem;
+  cursor: pointer;
 
   &:hover:not(:disabled) {
     text-decoration: none;
