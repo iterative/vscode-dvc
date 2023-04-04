@@ -27,10 +27,12 @@ import { Title } from '../../vscode/title'
 import { reorderObjectList } from '../../util/array'
 import { CustomPlotsOrderValue } from '../model/custom'
 import { getCustomPlotId } from '../model/collect'
+import { ErrorsModel } from '../errors/model'
 
 export class WebviewMessages {
   private readonly paths: PathsModel
   private readonly plots: PlotsModel
+  private readonly errors: ErrorsModel
   private readonly experiments: Experiments
 
   private readonly getWebview: () => BaseWebview<TPlotsData> | undefined
@@ -40,6 +42,7 @@ export class WebviewMessages {
   constructor(
     paths: PathsModel,
     plots: PlotsModel,
+    errors: ErrorsModel,
     experiments: Experiments,
     getWebview: () => BaseWebview<TPlotsData> | undefined,
     selectPlots: () => Promise<void>,
@@ -47,6 +50,7 @@ export class WebviewMessages {
   ) {
     this.paths = paths
     this.plots = plots
+    this.errors = errors
     this.experiments = experiments
     this.getWebview = getWebview
     this.selectPlots = selectPlots
@@ -60,6 +64,7 @@ export class WebviewMessages {
     const comparison = this.getComparisonPlots(overrideComparison)
 
     void this.getWebview()?.show({
+      cliError: this.errors.getCliError()?.error || null,
       comparison,
       custom: this.getCustomPlots(),
       hasPlots: !!this.paths.hasPaths(),
