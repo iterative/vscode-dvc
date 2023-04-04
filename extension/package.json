@@ -566,12 +566,12 @@
       },
       {
         "title": "Add Custom Plot",
-        "command": "dvc.addCustomPlot",
+        "command": "dvc.views.plots.addCustomPlot",
         "category": "DVC"
       },
       {
         "title": "Remove Custom Plot(s)",
-        "command": "dvc.removeCustomPlots",
+        "command": "dvc.views.plots.removeCustomPlots",
         "category": "DVC"
       },
       {
@@ -959,11 +959,11 @@
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
-          "command": "dvc.addCustomPlot",
+          "command": "dvc.views.plots.addCustomPlot",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
-          "command": "dvc.removeCustomPlots",
+          "command": "dvc.views.plots.removeCustomPlots",
           "when": "dvc.commands.available && dvc.project.available"
         }
       ],

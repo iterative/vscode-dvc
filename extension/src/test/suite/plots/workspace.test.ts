@@ -23,7 +23,7 @@ suite('Workspace Plots Test Suite', () => {
     return closeAllEditors()
   })
 
-  describe('dvc.addCustomPlot', () => {
+  describe('dvc.views.plots.addCustomPlot', () => {
     it('should be able to add a custom plot', async () => {
       const { plotsModel } = await buildPlots(disposable, plotsDiffFixture)
 
@@ -68,7 +68,7 @@ suite('Workspace Plots Test Suite', () => {
     })
   })
 
-  describe('dvc.removeCustomPlots', () => {
+  describe('dvc.views.plots.removeCustomPlots', () => {
     it('should be able to remove a custom plot', async () => {
       const { plotsModel } = await buildPlots(disposable, plotsDiffFixture)
 

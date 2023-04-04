@@ -71,8 +71,8 @@ export enum RegisteredCommands {
   PLOTS_SHOW = 'dvc.showPlots',
   PLOTS_SELECT = 'dvc.views.plotsPathsTree.selectPlots',
   PLOTS_REFRESH = 'dvc.views.plotsPathsTree.refreshPlots',
-  PLOTS_CUSTOM_ADD = 'dvc.addCustomPlot',
-  PLOTS_CUSTOM_REMOVE = 'dvc.removeCustomPlots',
+  PLOTS_CUSTOM_ADD = 'dvc.views.plots.addCustomPlot',
+  PLOTS_CUSTOM_REMOVE = 'dvc.views.plots.removeCustomPlots',
 
   EXPERIMENT_AND_PLOTS_SHOW = 'dvc.showExperimentsAndPlots',
 
