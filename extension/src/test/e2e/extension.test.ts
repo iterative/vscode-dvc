@@ -151,7 +151,6 @@ describe('Plots Webview', function () {
     const plots = await webview.vegaVisualization$$
 
     for (const plot of plots) {
-      await plot.scrollIntoView()
       const plotNotEmpty = await webview.plotNotEmpty(plot)
       expect(plotNotEmpty).toBe(true)
     }

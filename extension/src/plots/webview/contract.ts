@@ -156,6 +156,7 @@ export type ComparisonPlot = {
 
 export enum PlotsDataKeys {
   COMPARISON = 'comparison',
+  CLI_ERROR = 'cliError',
   CUSTOM = 'custom',
   HAS_UNSELECTED_PLOTS = 'hasUnselectedPlots',
   HAS_PLOTS = 'hasPlots',
@@ -168,6 +169,7 @@ export type PlotsData =
   | {
       [PlotsDataKeys.COMPARISON]?: PlotsComparisonData | null
       [PlotsDataKeys.CUSTOM]?: CustomPlotsData | null
+      [PlotsDataKeys.CLI_ERROR]?: string | null
       [PlotsDataKeys.HAS_PLOTS]?: boolean
       [PlotsDataKeys.HAS_UNSELECTED_PLOTS]?: boolean
       [PlotsDataKeys.SELECTED_REVISIONS]?: Revision[]

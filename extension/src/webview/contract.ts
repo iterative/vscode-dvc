@@ -32,7 +32,6 @@ export enum MessageFromWebviewType {
   REORDER_PLOTS_COMPARISON_ROWS = 'reorder-plots-comparison-rows',
   REORDER_PLOTS_CUSTOM = 'reorder-plots-custom',
   REORDER_PLOTS_TEMPLATES = 'reorder-plots-templates',
-  REFRESH_REVISION = 'refresh-revision',
   REFRESH_REVISIONS = 'refresh-revisions',
   RESIZE_COLUMN = 'resize-column',
   RESIZE_PLOTS = 'resize-plots',
