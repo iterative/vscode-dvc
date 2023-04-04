@@ -145,8 +145,11 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.cliData = this.dispose.track(
       cliData ||
-        new ExperimentsData(dvcRoot, internalCommands, updatesPaused, () =>
-          this.experiments.getNbOfCommitsToShow()
+        new ExperimentsData(
+          dvcRoot,
+          internalCommands,
+          updatesPaused,
+          this.experiments
         )
     )
 

@@ -25,10 +25,7 @@ import { Toast } from '../../vscode/toast'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { stopWorkspaceExperiment } from '../processExecution'
 import { hasDvcYamlFile } from '../../fileSystem'
-import {
-  ExperimentFlag,
-  NUM_OF_COMMITS_TO_INCREASE
-} from '../../cli/dvc/constants'
+import { NUM_OF_COMMITS_TO_INCREASE } from '../../cli/dvc/constants'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
@@ -54,9 +51,7 @@ export class WebviewMessages {
 
   private readonly addStage: () => Promise<boolean>
   private readonly getNumCommits: () => Promise<number>
-  private readonly changeNbOfCommits: (
-    ...args: (ExperimentFlag | string)[]
-  ) => Promise<void>
+  private readonly update: () => Promise<void>
 
   constructor(
     dvcRoot: string,
@@ -73,7 +68,7 @@ export class WebviewMessages {
     hasStages: () => Promise<string>,
     addStage: () => Promise<boolean>,
     getNumCommits: () => Promise<number>,
-    changeNbOfCommits: (...args: (ExperimentFlag | string)[]) => Promise<void>
+    update: () => Promise<void>
   ) {
     this.dvcRoot = dvcRoot
     this.experiments = experiments
@@ -86,7 +81,7 @@ export class WebviewMessages {
     this.hasStages = hasStages
     this.addStage = addStage
     this.getNumCommits = getNumCommits
-    this.changeNbOfCommits = changeNbOfCommits
+    this.update = update
 
     void this.changeHasConfig()
     void this.changeHasMoreOrLessCommits()
@@ -240,12 +235,12 @@ export class WebviewMessages {
 
   private async switchToBranchesView() {
     this.experiments.setIsBranchesView(true)
-    await this.changeNbOfCommits(ExperimentFlag.ALL_BRANCHES)
+    await this.update()
   }
 
   private async switchCommitsView() {
     this.experiments.setIsBranchesView(false)
-    await this.changeNbOfCommits()
+    await this.update()
   }
 
   private async changeHasMoreOrLessCommits(update?: boolean) {
@@ -262,7 +257,7 @@ export class WebviewMessages {
       this.experiments.getNbOfCommitsToShow() +
         NUM_OF_COMMITS_TO_INCREASE * change
     )
-    await this.changeNbOfCommits()
+    await this.update()
     await this.changeHasMoreOrLessCommits(true)
   }
 
