@@ -1,18 +1,24 @@
 import React from 'react'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
+import { ErrorIcon } from './ErrorIcon'
+import { refreshRevisions } from './messages'
 import { sendMessage } from '../../shared/vscode'
 import { StartButton } from '../../shared/components/button/StartButton'
+import { RefreshButton } from '../../shared/components/button/RefreshButton'
 
 export type AddPlotsProps = {
   hasUnselectedPlots: boolean
   hasNoCustomPlots: boolean
+  cliError: string | undefined
 }
 
 export const AddPlots: React.FC<AddPlotsProps> = ({
+  cliError,
   hasUnselectedPlots,
   hasNoCustomPlots
 }: AddPlotsProps) => (
   <div>
+    {cliError && <ErrorIcon error={cliError} size={96} />}
     <p>No Plots to Display</p>
     <div>
       <StartButton
@@ -23,7 +29,7 @@ export const AddPlots: React.FC<AddPlotsProps> = ({
         }
         text="Add Experiments"
       />
-      {hasUnselectedPlots && (
+      {hasUnselectedPlots && !cliError && (
         <StartButton
           isNested={hasUnselectedPlots}
           appearance="secondary"
@@ -45,6 +51,13 @@ export const AddPlots: React.FC<AddPlotsProps> = ({
             })
           }
           text="Add Custom Plot"
+        />
+      )}
+      {cliError && (
+        <RefreshButton
+          onClick={refreshRevisions}
+          isNested={true}
+          appearance="secondary"
         />
       )}
     </div>

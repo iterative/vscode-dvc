@@ -16,9 +16,8 @@ import { PlotsState } from '../store'
 
 const PlotsContent = () => {
   const dispatch = useDispatch()
-  const { hasData, hasPlots, hasUnselectedPlots, zoomedInPlot } = useSelector(
-    (state: PlotsState) => state.webview
-  )
+  const { hasData, hasPlots, hasUnselectedPlots, zoomedInPlot, cliError } =
+    useSelector((state: PlotsState) => state.webview)
   const hasComparisonData = useSelector(
     (state: PlotsState) => state.comparison.hasData
   )
@@ -71,9 +70,10 @@ const PlotsContent = () => {
             <AddPlots
               hasUnselectedPlots={hasUnselectedPlots}
               hasNoCustomPlots={hasNoCustomPlots}
+              cliError={cliError}
             />
           }
-          showEmpty={!hasPlots}
+          showEmpty={!hasPlots && !cliError}
           welcome={<Welcome />}
           isFullScreen={hasNoCustomPlots}
         />

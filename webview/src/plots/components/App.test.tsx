@@ -357,6 +357,57 @@ describe('App', () => {
     mockPostMessage.mockReset()
   })
 
+  it('should render only get started (buttons: add experiments, add custom plots) when there is a cli error', async () => {
+    const cliError = 'this is an error thrown by DVC'
+
+    renderAppWithOptionalData({
+      cliError,
+      hasPlots: false,
+      hasUnselectedPlots: false,
+      selectedRevisions: [{} as Revision]
+    })
+    const addExperimentsButton = await screen.findByText('Add Experiments')
+    const addCustomPlotsButton = await screen.findByText('Add Custom Plot')
+    const errorIcon = await screen.findByTestId('error-icon')
+    const refreshButton = await screen.findByText('Refresh')
+
+    expect(addExperimentsButton).toBeInTheDocument()
+    expect(screen.queryByText('Add Plots')).not.toBeInTheDocument()
+    expect(addCustomPlotsButton).toBeInTheDocument()
+    expect(errorIcon).toBeInTheDocument()
+    expect(screen.queryByTestId('section-container')).not.toBeInTheDocument()
+
+    mockPostMessage.mockReset()
+
+    fireEvent.click(addExperimentsButton)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.SELECT_EXPERIMENTS
+    })
+
+    mockPostMessage.mockReset()
+
+    fireEvent.mouseEnter(errorIcon, { bubbles: true, cancelable: true })
+
+    const error = await screen.findByText(cliError)
+
+    expect(error).toBeInTheDocument()
+
+    fireEvent.click(addCustomPlotsButton)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.ADD_CUSTOM_PLOT
+    })
+    mockPostMessage.mockReset()
+
+    fireEvent.click(refreshButton)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.REFRESH_REVISIONS
+    })
+    mockPostMessage.mockReset()
+  })
+
   it('should render get started (buttons: add plots, add experiments) and custom section when there are some selected exps, all unselected plots, and added custom plots', async () => {
     renderAppWithOptionalData({
       custom: customPlotsFixture,
