@@ -1,3 +1,4 @@
+import { commands } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import {
   ComparisonPlot,
@@ -21,12 +22,11 @@ import {
 import { PlotsModel } from '../model'
 import { PathsModel } from '../paths/model'
 import { BaseWebview } from '../../webview'
-import { pickCustomPlots, pickMetricAndParam } from '../model/quickPick'
 import { getModifiedTime, openImageFileInEditor } from '../../fileSystem'
-import { Title } from '../../vscode/title'
 import { reorderObjectList } from '../../util/array'
 import { CustomPlotsOrderValue } from '../model/custom'
 import { getCustomPlotId } from '../model/collect'
+import { RegisteredCommands } from '../../commands/external'
 
 export class WebviewMessages {
   private readonly paths: PathsModel
@@ -73,7 +73,7 @@ export class WebviewMessages {
   public handleMessageFromWebview(message: MessageFromWebview) {
     switch (message.type) {
       case MessageFromWebviewType.ADD_CUSTOM_PLOT:
-        return this.addCustomPlot()
+        return commands.executeCommand(RegisteredCommands.PLOTS_CUSTOM_ADD)
       case MessageFromWebviewType.RESIZE_PLOTS:
         return this.setPlotSize(
           message.payload.section,
@@ -95,7 +95,7 @@ export class WebviewMessages {
       case MessageFromWebviewType.SELECT_EXPERIMENTS:
         return this.selectExperimentsFromWebview()
       case MessageFromWebviewType.REMOVE_CUSTOM_PLOTS:
-        return this.removeCustomPlots()
+        return commands.executeCommand(RegisteredCommands.PLOTS_CUSTOM_REMOVE)
       case MessageFromWebviewType.REFRESH_REVISIONS:
         return this.refreshData()
       case MessageFromWebviewType.TOGGLE_EXPERIMENT:
@@ -182,37 +182,6 @@ export class WebviewMessages {
     )
   }
 
-  private async addCustomPlot() {
-    const metricAndParam = await pickMetricAndParam(
-      this.experiments.getColumnTerminalNodes(),
-      this.plots.getCustomPlotsOrder()
-    )
-
-    if (!metricAndParam) {
-      return
-    }
-
-    this.plots.addCustomPlot(metricAndParam)
-    this.sendCustomPlotsAndEvent(EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED)
-  }
-
-  private async removeCustomPlots() {
-    const selectedPlotsIds = await pickCustomPlots(
-      this.plots.getCustomPlotsOrder(),
-      'There are no plots to remove.',
-      {
-        title: Title.SELECT_CUSTOM_PLOTS_TO_REMOVE
-      }
-    )
-
-    if (!selectedPlotsIds) {
-      return
-    }
-
-    this.plots.removeCustomPlots(selectedPlotsIds)
-    this.sendCustomPlotsAndEvent(EventName.VIEWS_PLOTS_CUSTOM_PLOT_REMOVED)
-  }
-
   private setCustomPlotsOrder(plotIds: string[]) {
     const customPlotsOrderWithId = this.plots
       .getCustomPlotsOrder()
@@ -231,17 +200,7 @@ export class WebviewMessages {
     }))
 
     this.plots.setCustomPlotsOrder(newOrder)
-    this.sendCustomPlotsAndEvent(EventName.VIEWS_REORDER_PLOTS_CUSTOM)
-  }
-
-  private sendCustomPlotsAndEvent(
-    event:
-      | typeof EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED
-      | typeof EventName.VIEWS_PLOTS_CUSTOM_PLOT_REMOVED
-      | typeof EventName.VIEWS_REORDER_PLOTS_CUSTOM
-  ) {
     this.sendCustomPlots()
-    sendTelemetryEvent(event, undefined, undefined)
   }
 
   private selectPlotsFromWebview() {

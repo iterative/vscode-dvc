@@ -63,8 +63,6 @@ export const EventName = Object.assign(
     VIEWS_PLOTS_COMPARISON_ROWS_REORDERED:
       'views.plots.comparisonRowsReordered',
     VIEWS_PLOTS_CREATED: 'views.plots.created',
-    VIEWS_PLOTS_CUSTOM_PLOT_ADDED: 'views.plots.addCustomPlot',
-    VIEWS_PLOTS_CUSTOM_PLOT_REMOVED: 'views.plots.removeCustomPlot',
     VIEWS_PLOTS_EXPERIMENT_TOGGLE: 'views.plots.toggleExperimentStatus',
     VIEWS_PLOTS_FOCUS_CHANGED: 'views.plots.focusChanged',
     VIEWS_PLOTS_MANUAL_REFRESH: 'views.plots.manualRefresh',
@@ -172,6 +170,8 @@ export interface IEventNamePropertyMapping {
   [EventName.PLOTS_SHOW]: undefined
   [EventName.PLOTS_SELECT]: undefined
   [EventName.PLOTS_REFRESH]: undefined
+  [EventName.PLOTS_CUSTOM_ADD]: undefined
+  [EventName.PLOTS_CUSTOM_REMOVE]: undefined
 
   [EventName.ADD_TARGET]: undefined
   [EventName.CHECKOUT_TARGET]: undefined
@@ -240,8 +240,6 @@ export interface IEventNamePropertyMapping {
 
   [EventName.VIEWS_PLOTS_CLOSED]: undefined
   [EventName.VIEWS_PLOTS_CREATED]: undefined
-  [EventName.VIEWS_PLOTS_CUSTOM_PLOT_REMOVED]: undefined
-  [EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED]: undefined
   [EventName.VIEWS_PLOTS_FOCUS_CHANGED]: WebviewFocusChangedProperties
   [EventName.VIEWS_PLOTS_MANUAL_REFRESH]: undefined
   [EventName.VIEWS_PLOTS_REVISIONS_REORDERED]: undefined

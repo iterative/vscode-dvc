@@ -565,6 +565,16 @@
         "icon": "$(refresh)"
       },
       {
+        "title": "Add Custom Plot",
+        "command": "dvc.addCustomPlot",
+        "category": "DVC"
+      },
+      {
+        "title": "Remove Custom Plot(s)",
+        "command": "dvc.removeCustomPlots",
+        "category": "DVC"
+      },
+      {
         "title": "Reset Persisted State and Reload Window",
         "command": "dvc.resetState",
         "category": "DVC"
@@ -946,6 +956,14 @@
         },
         {
           "command": "dvc.views.plotsPathsTree.refreshPlots",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.addCustomPlot",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.removeCustomPlots",
           "when": "dvc.commands.available && dvc.project.available"
         }
       ],

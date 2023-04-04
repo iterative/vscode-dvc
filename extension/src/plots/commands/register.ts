@@ -26,4 +26,15 @@ export const registerPlotsCommands = (
     RegisteredCommands.PLOTS_REFRESH,
     (context: Context) => plots.refresh(getDvcRootFromContext(context))
   )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.PLOTS_CUSTOM_ADD,
+    (context: Context) => plots.addCustomPlot(getDvcRootFromContext(context))
+  )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.PLOTS_CUSTOM_REMOVE,
+    (context: Context) =>
+      plots.removeCustomPlots(getDvcRootFromContext(context))
+  )
 }

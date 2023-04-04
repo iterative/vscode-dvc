@@ -7,6 +7,7 @@ import { ErrorsModel } from './errors/model'
 import { PlotsModel } from './model'
 import { collectEncodingElements, collectScale } from './paths/collect'
 import { PathsModel } from './paths/model'
+import { pickCustomPlots, pickMetricAndParam } from './model/quickPick'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -19,6 +20,7 @@ import { Toast } from '../vscode/toast'
 import { pickPaths } from '../path/selection/quickPick'
 import { ErrorDecorationProvider } from '../tree/decorationProvider/error'
 import { DecoratableTreeItemScheme } from '../tree'
+import { Title } from '../vscode/title'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
 
@@ -29,6 +31,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private readonly pathsChanged = this.dispose.track(new EventEmitter<void>())
 
+  private readonly experiments: Experiments
   private readonly plots: PlotsModel
   private readonly paths: PathsModel
   private readonly data: PlotsData
@@ -56,6 +59,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.paths = this.dispose.track(
       new PathsModel(this.dvcRoot, this.errors, workspaceState)
     )
+    this.experiments = experiments
 
     this.webviewMessages = this.createWebviewMessageHandler(
       this.paths,
@@ -109,6 +113,37 @@ export class Plots extends BaseRepository<TPlotsData> {
       'Attempting to refresh plots for selected experiments.'
     )
     this.triggerDataUpdate()
+  }
+
+  public async addCustomPlot() {
+    const metricAndParam = await pickMetricAndParam(
+      this.experiments.getColumnTerminalNodes(),
+      this.plots.getCustomPlotsOrder()
+    )
+
+    if (!metricAndParam) {
+      return
+    }
+
+    this.plots.addCustomPlot(metricAndParam)
+    void this.sendPlots()
+  }
+
+  public async removeCustomPlot() {
+    const selectedPlotsIds = await pickCustomPlots(
+      this.plots.getCustomPlotsOrder(),
+      'There are no plots to remove.',
+      {
+        title: Title.SELECT_CUSTOM_PLOTS_TO_REMOVE
+      }
+    )
+
+    if (!selectedPlotsIds) {
+      return
+    }
+
+    this.plots.removeCustomPlots(selectedPlotsIds)
+    void this.sendPlots()
   }
 
   public getChildPaths(path: string | undefined) {

@@ -58,6 +58,22 @@ export class WorkspacePlots extends BaseWorkspaceWebviews<Plots, PlotsData> {
     return this.getRepository(dvcRoot).selectPlots()
   }
 
+  public async addCustomPlot(overrideRoot?: string) {
+    const dvcRoot = await this.getDvcRoot(overrideRoot)
+    if (!dvcRoot) {
+      return
+    }
+    return this.getRepository(dvcRoot).addCustomPlot()
+  }
+
+  public async removeCustomPlots(overrideRoot?: string) {
+    const dvcRoot = await this.getDvcRoot(overrideRoot)
+    if (!dvcRoot) {
+      return
+    }
+    return this.getRepository(dvcRoot).removeCustomPlot()
+  }
+
   public getFocusedOrOnlyOrPickProject() {
     return this.focusedWebviewDvcRoot || this.getOnlyOrPickProject()
   }
