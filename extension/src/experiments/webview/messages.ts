@@ -51,7 +51,7 @@ export class WebviewMessages {
 
   private readonly addStage: () => Promise<boolean>
   private readonly getNumCommits: () => Promise<number>
-  private readonly changeNbOfCommits: () => Promise<void>
+  private readonly update: () => Promise<void>
 
   constructor(
     dvcRoot: string,
@@ -68,7 +68,7 @@ export class WebviewMessages {
     hasStages: () => Promise<string>,
     addStage: () => Promise<boolean>,
     getNumCommits: () => Promise<number>,
-    changeNbOfCommits: () => Promise<void>
+    update: () => Promise<void>
   ) {
     this.dvcRoot = dvcRoot
     this.experiments = experiments
@@ -81,7 +81,7 @@ export class WebviewMessages {
     this.hasStages = hasStages
     this.addStage = addStage
     this.getNumCommits = getNumCommits
-    this.changeNbOfCommits = changeNbOfCommits
+    this.update = update
 
     void this.changeHasConfig()
     void this.changeHasMoreOrLessCommits()
@@ -100,6 +100,7 @@ export class WebviewMessages {
   }
 
   public handleMessageFromWebview(message: MessageFromWebview) {
+    // eslint-disable-next-line sonarjs/max-switch-cases
     switch (message.type) {
       case MessageFromWebviewType.REORDER_COLUMNS:
         return this.setColumnOrder(message.payload)
@@ -221,9 +222,25 @@ export class WebviewMessages {
       case MessageFromWebviewType.SHOW_LESS_COMMITS:
         return this.changeCommitsToShow(-1)
 
+      case MessageFromWebviewType.SWITCH_BRANCHES_VIEW:
+        return this.switchToBranchesView()
+
+      case MessageFromWebviewType.SWITCH_COMMITS_VIEW:
+        return this.switchCommitsView()
+
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
+  }
+
+  private async switchToBranchesView() {
+    this.experiments.setIsBranchesView(true)
+    await this.update()
+  }
+
+  private async switchCommitsView() {
+    this.experiments.setIsBranchesView(false)
+    await this.update()
   }
 
   private async changeHasMoreOrLessCommits(update?: boolean) {
@@ -240,7 +257,7 @@ export class WebviewMessages {
       this.experiments.getNbOfCommitsToShow() +
         NUM_OF_COMMITS_TO_INCREASE * change
     )
-    await this.changeNbOfCommits()
+    await this.update()
     await this.changeHasMoreOrLessCommits(true)
   }
 
@@ -258,6 +275,7 @@ export class WebviewMessages {
       hasMoreCommits: this.hasMoreCommits,
       hasRunningExperiment: this.experiments.hasRunningExperiment(),
       hasValidDvcYaml: this.hasValidDvcYaml,
+      isBranchesView: this.experiments.getIsBranchesView(),
       isShowingMoreCommits: this.isShowingMoreCommits,
       rows: this.experiments.getRowData(),
       selectedForPlotsCount: this.experiments.getSelectedRevisions().length,

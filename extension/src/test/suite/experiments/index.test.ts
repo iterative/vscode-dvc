@@ -1385,6 +1385,46 @@ suite('Experiments Test Suite', () => {
       expect(mockUpdateExperimentsData).to.be.calledOnce
       expect(setNbfCommitsToShowSpy).to.be.calledWith(1)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a message to switch to branches view', async () => {
+      const {
+        experiments,
+        experimentsModel,
+        messageSpy,
+        mockUpdateExperimentsData
+      } = setupExperimentsAndMockCommands()
+
+      const webview = await experiments.showWebview()
+      messageSpy.resetHistory()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SWITCH_BRANCHES_VIEW
+      })
+
+      expect(mockUpdateExperimentsData).to.be.calledOnce
+      expect(experimentsModel.getIsBranchesView()).to.be.true
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a message to switch to commits view', async () => {
+      const {
+        experiments,
+        experimentsModel,
+        messageSpy,
+        mockUpdateExperimentsData
+      } = setupExperimentsAndMockCommands()
+
+      const webview = await experiments.showWebview()
+      messageSpy.resetHistory()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SWITCH_COMMITS_VIEW
+      })
+
+      expect(mockUpdateExperimentsData).to.be.calledOnce
+      expect(experimentsModel.getIsBranchesView()).to.be.false
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 
   describe('Sorting', () => {

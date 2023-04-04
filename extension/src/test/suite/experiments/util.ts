@@ -196,7 +196,10 @@ export const buildExperimentsData = (disposer: SafeWatcherDisposer) => {
       dvcDemoPath,
       internalCommands,
       disposer.track(new EventEmitter<boolean>()),
-      () => DEFAULT_NUM_OF_COMMITS_TO_SHOW
+      {
+        getIsBranchesView: () => false,
+        getNbOfCommitsToShow: () => DEFAULT_NUM_OF_COMMITS_TO_SHOW
+      } as ExperimentsModel
     )
   )
 

@@ -16,6 +16,7 @@ const tableDataFixture: TableData = {
   hasRunningExperiment: true,
   hasValidDvcYaml: true,
   isShowingMoreCommits: true,
+  isBranchesView: false,
   rows: rowsFixture,
   selectedForPlotsCount: 2,
   sorts: []
