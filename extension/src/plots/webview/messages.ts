@@ -201,6 +201,11 @@ export class WebviewMessages {
 
     this.plots.setCustomPlotsOrder(newOrder)
     this.sendCustomPlots()
+    sendTelemetryEvent(
+      EventName.VIEWS_REORDER_PLOTS_CUSTOM,
+      undefined,
+      undefined
+    )
   }
 
   private selectPlotsFromWebview() {

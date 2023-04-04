@@ -514,6 +514,7 @@ suite('Plots Test Suite', () => {
         .onFirstCall()
         .returns(customPlotsFixture)
 
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockSetCustomPlotsOrder = stub(plotsModel, 'setCustomPlotsOrder')
       mockSetCustomPlotsOrder.returns(undefined)
@@ -537,6 +538,12 @@ suite('Plots Test Suite', () => {
         }
       ])
       expect(messageSpy).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_REORDER_PLOTS_CUSTOM,
+        undefined,
+        undefined
+      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a select experiments message from the webview', async () => {
