@@ -30,9 +30,9 @@ const basicVega = {
       revisions: [
         EXPERIMENT_WORKSPACE_ID,
         '53c3851',
-        '42b8736',
-        '1ba7bcd',
-        '4fb124a'
+        'test-branch',
+        'exp-83425',
+        'exp-e7a67'
       ],
       datapoints: {
         [EXPERIMENT_WORKSPACE_ID]: [
@@ -129,7 +129,7 @@ const basicVega = {
             timestamp: '1641966351758'
           }
         ],
-        '42b8736': [
+        'test-branch': [
           {
             loss: '1.6454246044158936',
             step: '0',
@@ -176,7 +176,7 @@ const basicVega = {
             timestamp: '1642041912764'
           }
         ],
-        '1ba7bcd': [
+        'exp-83425': [
           {
             loss: '2.273470401763916',
             step: '0',
@@ -224,7 +224,7 @@ const basicVega = {
             timestamp: '1642041648829'
           }
         ],
-        '4fb124a': [
+        'exp-e7a67': [
           {
             loss: '2.0380799770355225',
             step: '0',
@@ -380,17 +380,17 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['4fb124a'],
+      revisions: ['exp-e7a67'],
       url: joinFunc(baseUrl, '4fb124a_plots_acc.png')
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['42b8736'],
+      revisions: ['test-branch'],
       url: joinFunc(baseUrl, '42b8736_plots_acc.png')
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['1ba7bcd'],
+      revisions: ['exp-83425'],
       url: joinFunc(baseUrl, '1ba7bcd_plots_acc.png')
     }
   ],
@@ -407,17 +407,17 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['4fb124a'],
+      revisions: ['exp-e7a67'],
       url: joinFunc(baseUrl, '4fb124a_plots_heatmap.png')
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['42b8736'],
+      revisions: ['test-branch'],
       url: joinFunc(baseUrl, '42b8736_plots_heatmap.png')
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['1ba7bcd'],
+      revisions: ['exp-83425'],
       url: joinFunc(baseUrl, '1ba7bcd_plots_heatmap.png')
     }
   ],
@@ -434,17 +434,17 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['4fb124a'],
+      revisions: ['exp-e7a67'],
       url: joinFunc(baseUrl, '4fb124a_plots_loss.png')
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['42b8736'],
+      revisions: ['test-branch'],
       url: joinFunc(baseUrl, '42b8736_plots_loss.png')
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['1ba7bcd'],
+      revisions: ['exp-83425'],
       url: joinFunc(baseUrl, '1ba7bcd_plots_loss.png')
     }
   ]
@@ -464,7 +464,7 @@ export const getMultiSourceOutput = (): PlotsOutput => ({
   ...require('./multiSource').default
 })
 
-const expectedRevisions = [
+export const REVISIONS = [
   EXPERIMENT_WORKSPACE_ID,
   'main',
   '4fb124a',
@@ -490,7 +490,7 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
             ...originalPlot.content,
             data: {
               values:
-                expectedRevisions.flatMap(revision =>
+                REVISIONS.flatMap(revision =>
                   originalPlot.datapoints?.[getCLICommitId(revision)].map(
                     values => ({
                       ...values,
@@ -504,14 +504,14 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
           DEFAULT_PLOT_HEIGHT,
           {
             color: {
-              domain: expectedRevisions,
+              domain: REVISIONS,
               range: copyOriginalColors().slice(0, 5)
             }
           }
         ) as VisualizationSpec,
         id: path,
         multiView: isMultiViewPlot(originalPlot.content as TopLevelSpec),
-        revisions: expectedRevisions,
+        revisions: REVISIONS,
         type: PlotsType.VEGA
       }
       if (plot.multiView) {
@@ -535,7 +535,7 @@ export const findAndFormatCreated = (revisionId: string): string =>
   )
 
 export const getRevisions = (): Revision[] => {
-  const [workspace, main, _4fb124a, _42b8735, _1ba7bcd] = copyOriginalColors()
+  const [workspace, main, _4fb124a, _42b8736, _1ba7bcd] = copyOriginalColors()
   return [
     {
       id: EXPERIMENT_WORKSPACE_ID,
@@ -634,7 +634,7 @@ export const getRevisions = (): Revision[] => {
       ],
       id: 'test-branch',
       revision: '42b8736',
-      displayColor: _42b8735,
+      displayColor: _42b8736,
       group: '[test-branch]'
     },
     {

@@ -9,9 +9,9 @@ const data = {
       revisions: [
         EXPERIMENT_WORKSPACE_ID,
         '53c3851',
-        '42b8736',
-        '1ba7bcd',
-        '4fb124a'
+        'test-branch',
+        'exp-83425',
+        'exp-e7a67'
       ],
       datapoints: {
         workspace: [
@@ -108,7 +108,7 @@ const data = {
             timestamp: '1641966351759'
           }
         ],
-        '42b8736': [
+        'test-branch': [
           {
             acc: '0.5613',
             step: '0',
@@ -155,7 +155,7 @@ const data = {
             timestamp: '1642041912765'
           }
         ],
-        '1ba7bcd': [
+        'exp-83425': [
           {
             acc: '0.1694',
             step: '0',
@@ -202,7 +202,7 @@ const data = {
             timestamp: '1642041648863'
           }
         ],
-        '4fb124a': [
+        'exp-e7a67': [
           {
             acc: '0.5394',
             step: '0',
@@ -333,9 +333,9 @@ const data = {
       revisions: [
         EXPERIMENT_WORKSPACE_ID,
         '53c3851',
-        '42b8736',
-        '1ba7bcd',
-        '4fb124a'
+        'test-branch',
+        'exp-83425',
+        'exp-e7a67'
       ],
       datapoints: {
         workspace: [
@@ -20342,7 +20342,7 @@ const data = {
           { actual: 5, predicted: 0 },
           { actual: 6, predicted: 0 }
         ],
-        '42b8736': [
+        'test-branch': [
           { actual: 7, predicted: 7 },
           { actual: 2, predicted: 2 },
           { actual: 1, predicted: 1 },
@@ -30344,7 +30344,7 @@ const data = {
           { actual: 5, predicted: 8 },
           { actual: 6, predicted: 6 }
         ],
-        '1ba7bcd': [
+        'exp-83425': [
           { actual: 7, predicted: 7 },
           { actual: 2, predicted: 2 },
           { actual: 1, predicted: 1 },
@@ -40346,7 +40346,7 @@ const data = {
           { actual: 5, predicted: 5 },
           { actual: 6, predicted: 6 }
         ],
-        '4fb124a': [
+        'exp-e7a67': [
           { actual: 7, predicted: 7 },
           { actual: 2, predicted: 2 },
           { actual: 1, predicted: 1 },

@@ -64,7 +64,6 @@ import * as VscodeContext from '../../../vscode/context'
 import { Title } from '../../../vscode/title'
 import { EXP_RWLOCK_FILE, ExperimentFlag } from '../../../cli/dvc/constants'
 import { DvcExecutor } from '../../../cli/dvc/executor'
-import { shortenForLabel } from '../../../util/string'
 import { GitExecutor } from '../../../cli/git/executor'
 import { WorkspacePlots } from '../../../plots/workspace'
 import {
@@ -688,8 +687,7 @@ suite('Experiments Test Suite', () => {
       const { experiments } = buildExperiments(disposable)
       await experiments.isReady()
 
-      const testCheckpointId = 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9'
-      const testCheckpointLabel = shortenForLabel(testCheckpointId)
+      const mockExperiment = 'exp-e7a67'
       const mockBranch = 'it-is-a-branch-shared-to-the-remote'
       const inputEvent = getInputBoxEvent(mockBranch)
 
@@ -697,7 +695,7 @@ suite('Experiments Test Suite', () => {
         DvcExecutor.prototype,
         'experimentBranch'
       ).resolves(
-        `Git branch '${mockBranch}' has been created from experiment '${testCheckpointId}'.        
+        `Git branch '${mockBranch}' has been created from experiment '${mockExperiment}'.        
        To switch to the new branch run:
              git checkout ${mockBranch}`
       )
@@ -705,7 +703,7 @@ suite('Experiments Test Suite', () => {
         DvcExecutor.prototype,
         'experimentApply'
       ).resolves(
-        `Changes for experiment '${testCheckpointId}' have been applied to your current workspace.`
+        `Changes for experiment '${mockExperiment}' have been applied to your current workspace.`
       )
       const mockPush = stub(DvcExecutor.prototype, 'push').resolves(
         '10 files updated.'
@@ -724,7 +722,7 @@ suite('Experiments Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
-        payload: testCheckpointId,
+        payload: mockExperiment,
         type: MessageFromWebviewType.SHARE_EXPERIMENT_AS_BRANCH
       })
 
@@ -732,12 +730,12 @@ suite('Experiments Test Suite', () => {
       await branchPushedToRemote
       expect(mockExperimentBranch).to.be.calledWithExactly(
         dvcDemoPath,
-        testCheckpointLabel,
+        mockExperiment,
         mockBranch
       )
       expect(mockExperimentApply).to.be.calledWithExactly(
         dvcDemoPath,
-        testCheckpointLabel
+        mockExperiment
       )
       expect(mockPush).to.be.calledWithExactly(dvcDemoPath)
       expect(mockGitPush).to.be.calledWithExactly(dvcDemoPath, mockBranch)
@@ -747,8 +745,7 @@ suite('Experiments Test Suite', () => {
       const { experiments } = buildExperiments(disposable)
       await experiments.isReady()
 
-      const testCheckpointId = 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9'
-      const testCheckpointLabel = shortenForLabel(testCheckpointId)
+      const mockExperiment = 'exp-e7a67'
       const mockCommitMessage =
         'this is the very best version that I could come up with'
       const inputEvent = getInputBoxEvent(mockCommitMessage)
@@ -757,7 +754,7 @@ suite('Experiments Test Suite', () => {
         DvcExecutor.prototype,
         'experimentApply'
       ).resolves(
-        `Changes for experiment '${testCheckpointId}' have been applied to your current workspace.`
+        `Changes for experiment '${mockExperiment}' have been applied to your current workspace.`
       )
       const mockStageAndCommit = stub(
         GitExecutor.prototype,
@@ -781,7 +778,7 @@ suite('Experiments Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
-        payload: testCheckpointId,
+        payload: mockExperiment,
         type: MessageFromWebviewType.SHARE_EXPERIMENT_AS_COMMIT
       })
 
@@ -793,7 +790,7 @@ suite('Experiments Test Suite', () => {
       )
       expect(mockExperimentApply).to.be.calledWithExactly(
         dvcDemoPath,
-        testCheckpointLabel
+        mockExperiment
       )
       expect(mockPush).to.be.calledWithExactly(dvcDemoPath)
       expect(mockGitPush).to.be.calledWithExactly(dvcDemoPath)
@@ -945,7 +942,7 @@ suite('Experiments Test Suite', () => {
       const queuedExperiment = '90aea7f2482117a55dfcadcdb901aaa6610fbbc9'
 
       const isExperimentSelected = (expId: string): boolean =>
-        !!experimentsModel.getAllRecords().find(({ id }) => id === expId)
+        !!experimentsModel.getCombinedList().find(({ id }) => id === expId)
           ?.selected
 
       expect(isExperimentSelected(experimentToToggle), 'experiment is selected')
@@ -1141,7 +1138,7 @@ suite('Experiments Test Suite', () => {
       const areExperimentsStarred = (expIds: string[]): boolean =>
         expIds
           .map(expId =>
-            experimentsModel.getAllRecords().find(({ id }) => id === expId)
+            experimentsModel.getCombinedList().find(({ id }) => id === expId)
           )
           .every(exp => exp?.starred)
 
@@ -1240,11 +1237,7 @@ suite('Experiments Test Suite', () => {
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
-      const mockExperimentIds = [
-        'exp-e7a67',
-        'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9',
-        'test-branch'
-      ]
+      const mockExperimentIds = ['exp-e7a67', 'test-branch']
 
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 

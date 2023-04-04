@@ -4,9 +4,9 @@ import {
   ComparisonRevisionData,
   PlotHeight,
   PlotsData as TPlotsData,
-  Revision,
   PlotsSection,
-  SectionCollapsed
+  SectionCollapsed,
+  Revision
 } from './contract'
 import { Logger } from '../../common/logger'
 import { Experiments } from '../../experiments'
@@ -58,20 +58,16 @@ export class WebviewMessages {
   }
 
   public sendWebviewMessage() {
-    const { overrideComparison, overrideRevisions } =
-      this.plots.getOverrideRevisionDetails()
-
-    const comparison = this.getComparisonPlots(overrideComparison)
-
+    const selectedRevisions = this.plots.getSelectedRevisionDetails()
     void this.getWebview()?.show({
       cliError: this.errors.getCliError()?.error || null,
-      comparison,
+      comparison: this.getComparisonPlots(),
       custom: this.getCustomPlots(),
       hasPlots: !!this.paths.hasPaths(),
       hasUnselectedPlots: this.paths.getHasUnselectedPlots(),
       sectionCollapsed: this.plots.getSectionCollapsed(),
-      selectedRevisions: overrideRevisions,
-      template: this.getTemplatePlots(overrideRevisions)
+      selectedRevisions,
+      template: this.getTemplatePlots(selectedRevisions)
     })
   }
 
@@ -295,8 +291,9 @@ export class WebviewMessages {
   }
 
   private sendTemplatePlots() {
+    const selectedRevisions = this.plots.getSelectedRevisionDetails()
     void this.getWebview()?.show({
-      template: this.getTemplatePlots()
+      template: this.getTemplatePlots(selectedRevisions)
     })
   }
 
@@ -306,9 +303,9 @@ export class WebviewMessages {
     })
   }
 
-  private getTemplatePlots(overrideRevs?: Revision[]) {
+  private getTemplatePlots(selectedRevisions: Revision[]) {
     const paths = this.paths.getTemplateOrder()
-    const plots = this.plots.getTemplatePlots(paths, overrideRevs)
+    const plots = this.plots.getTemplatePlots(paths, selectedRevisions)
 
     if (!plots || isEmpty(plots)) {
       return null
@@ -323,12 +320,9 @@ export class WebviewMessages {
     }
   }
 
-  private getComparisonPlots(overrideRevs?: Revision[]) {
+  private getComparisonPlots() {
     const paths = this.paths.getComparisonPaths()
-    const comparison = this.plots.getComparisonPlots(
-      paths,
-      overrideRevs?.map(({ revision }) => revision)
-    )
+    const comparison = this.plots.getComparisonPlots(paths)
     if (!comparison || isEmpty(comparison)) {
       return null
     }
@@ -338,7 +332,7 @@ export class WebviewMessages {
       plots: comparison.map(({ path, revisions }) => {
         return { path, revisions: this.getRevisionsWithCorrectUrls(revisions) }
       }),
-      revisions: overrideRevs || this.plots.getComparisonRevisions(),
+      revisions: this.plots.getComparisonRevisions(),
       width: this.plots.getNbItemsPerRowOrWidth(PlotsSection.COMPARISON_TABLE)
     }
   }
