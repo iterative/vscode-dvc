@@ -80,12 +80,17 @@ const data: CustomPlotsData = {
         encoding: {
           x: {
             field: 'param',
+            scale: {
+              zero: false
+            },
             title: 'params.yaml:dropout',
             type: 'quantitative'
           },
           y: {
             field: 'metric',
-            scale: { zero: false },
+            scale: {
+              zero: false
+            },
             title: 'summary.json:loss',
             type: 'quantitative'
           }
@@ -93,39 +98,29 @@ const data: CustomPlotsData = {
         height: 'container',
         layer: [
           {
-            layer: [
-              { mark: { type: 'line' } },
-              {
-                mark: { type: 'point' },
-                transform: [{ filter: { param: 'hover' } }]
-              }
-            ]
-          },
-          {
             encoding: {
-              opacity: { value: 0 },
               tooltip: [
-                { field: 'expName', title: 'name' },
-                { field: 'metric', title: 'summary.json:loss' },
-                { field: 'param', title: 'params.yaml:dropout' }
+                {
+                  field: 'expName',
+                  title: 'name'
+                },
+                {
+                  field: 'metric',
+                  title: 'summary.json:loss'
+                },
+                {
+                  field: 'param',
+                  title: 'params.yaml:dropout'
+                }
               ]
             },
-            mark: { type: 'rule' },
-            params: [
-              {
-                name: 'hover',
-                select: {
-                  clear: 'mouseout',
-                  fields: ['param', 'metric'],
-                  nearest: true,
-                  on: 'mouseover',
-                  type: 'point'
-                }
-              }
-            ]
+            mark: {
+              filled: true,
+              size: 60,
+              type: 'point'
+            }
           }
         ],
-        transform: [{ as: 'y', calculate: "format(datum['y'],'.5f')" }],
         width: 'container'
       },
       values: [
@@ -183,12 +178,17 @@ const data: CustomPlotsData = {
         encoding: {
           x: {
             field: 'param',
+            scale: {
+              zero: false
+            },
             title: 'params.yaml:epochs',
             type: 'quantitative'
           },
           y: {
             field: 'metric',
-            scale: { zero: false },
+            scale: {
+              zero: false
+            },
             title: 'summary.json:accuracy',
             type: 'quantitative'
           }
@@ -196,31 +196,7 @@ const data: CustomPlotsData = {
         height: 'container',
         layer: [
           {
-            layer: [
-              {
-                mark: {
-                  type: 'line'
-                }
-              },
-              {
-                mark: {
-                  type: 'point'
-                },
-                transform: [
-                  {
-                    filter: {
-                      param: 'hover'
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
             encoding: {
-              opacity: {
-                value: 0
-              },
               tooltip: [
                 {
                   field: 'expName',
@@ -237,26 +213,10 @@ const data: CustomPlotsData = {
               ]
             },
             mark: {
-              type: 'rule'
-            },
-            params: [
-              {
-                name: 'hover',
-                select: {
-                  clear: 'mouseout',
-                  fields: ['param', 'metric'],
-                  nearest: true,
-                  on: 'mouseover',
-                  type: 'point'
-                }
-              }
-            ]
-          }
-        ],
-        transform: [
-          {
-            as: 'y',
-            calculate: "format(datum['y'],'.5f')"
+              filled: true,
+              size: 60,
+              type: 'point'
+            }
           }
         ],
         width: 'container'
