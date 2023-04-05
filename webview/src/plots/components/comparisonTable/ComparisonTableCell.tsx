@@ -3,8 +3,7 @@ import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
 import styles from './styles.module.scss'
 import { RefreshButton } from '../../../shared/components/button/RefreshButton'
 import { refreshRevisions, zoomPlot } from '../messages'
-import { Error } from '../../../shared/components/icons'
-import { ErrorTooltip } from '../../../shared/components/tooltip/ErrorTooltip'
+import { ErrorIcon } from '../ErrorIcon'
 
 type ComparisonTableCellProps = {
   path: string
@@ -15,11 +14,9 @@ const MissingPlotTableCell: React.FC<{ plot: ComparisonPlot }> = ({ plot }) => (
   <div className={styles.noImageContent}>
     {plot.errors?.length ? (
       <>
-        <ErrorTooltip error={plot.errors.join('\n')}>
-          <div>
-            <Error height={48} width={48} className={styles.errorIcon} />
-          </div>
-        </ErrorTooltip>
+        <div className={styles.errorIcon}>
+          <ErrorIcon error={plot.errors.join('\n')} size={48} />
+        </div>
         <RefreshButton onClick={refreshRevisions} />
       </>
     ) : (

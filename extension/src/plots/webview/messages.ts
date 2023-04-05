@@ -1,12 +1,13 @@
+import { commands } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import {
   ComparisonPlot,
   ComparisonRevisionData,
   PlotHeight,
   PlotsData as TPlotsData,
-  Revision,
   PlotsSection,
-  SectionCollapsed
+  SectionCollapsed,
+  Revision
 } from './contract'
 import { Logger } from '../../common/logger'
 import { Experiments } from '../../experiments'
@@ -21,16 +22,17 @@ import {
 import { PlotsModel } from '../model'
 import { PathsModel } from '../paths/model'
 import { BaseWebview } from '../../webview'
-import { pickCustomPlots, pickMetricAndParam } from '../model/quickPick'
 import { getModifiedTime, openImageFileInEditor } from '../../fileSystem'
-import { Title } from '../../vscode/title'
 import { reorderObjectList } from '../../util/array'
 import { CustomPlotsOrderValue } from '../model/custom'
 import { getCustomPlotId } from '../model/collect'
+import { RegisteredCommands } from '../../commands/external'
+import { ErrorsModel } from '../errors/model'
 
 export class WebviewMessages {
   private readonly paths: PathsModel
   private readonly plots: PlotsModel
+  private readonly errors: ErrorsModel
   private readonly experiments: Experiments
 
   private readonly getWebview: () => BaseWebview<TPlotsData> | undefined
@@ -40,6 +42,7 @@ export class WebviewMessages {
   constructor(
     paths: PathsModel,
     plots: PlotsModel,
+    errors: ErrorsModel,
     experiments: Experiments,
     getWebview: () => BaseWebview<TPlotsData> | undefined,
     selectPlots: () => Promise<void>,
@@ -47,6 +50,7 @@ export class WebviewMessages {
   ) {
     this.paths = paths
     this.plots = plots
+    this.errors = errors
     this.experiments = experiments
     this.getWebview = getWebview
     this.selectPlots = selectPlots
@@ -54,26 +58,23 @@ export class WebviewMessages {
   }
 
   public sendWebviewMessage() {
-    const { overrideComparison, overrideRevisions } =
-      this.plots.getOverrideRevisionDetails()
-
-    const comparison = this.getComparisonPlots(overrideComparison)
-
+    const selectedRevisions = this.plots.getSelectedRevisionDetails()
     void this.getWebview()?.show({
-      comparison,
+      cliError: this.errors.getCliError()?.error || null,
+      comparison: this.getComparisonPlots(),
       custom: this.getCustomPlots(),
       hasPlots: !!this.paths.hasPaths(),
       hasUnselectedPlots: this.paths.getHasUnselectedPlots(),
       sectionCollapsed: this.plots.getSectionCollapsed(),
-      selectedRevisions: overrideRevisions,
-      template: this.getTemplatePlots(overrideRevisions)
+      selectedRevisions,
+      template: this.getTemplatePlots(selectedRevisions)
     })
   }
 
   public handleMessageFromWebview(message: MessageFromWebview) {
     switch (message.type) {
       case MessageFromWebviewType.ADD_CUSTOM_PLOT:
-        return this.addCustomPlot()
+        return commands.executeCommand(RegisteredCommands.PLOTS_CUSTOM_ADD)
       case MessageFromWebviewType.RESIZE_PLOTS:
         return this.setPlotSize(
           message.payload.section,
@@ -95,7 +96,7 @@ export class WebviewMessages {
       case MessageFromWebviewType.SELECT_EXPERIMENTS:
         return this.selectExperimentsFromWebview()
       case MessageFromWebviewType.REMOVE_CUSTOM_PLOTS:
-        return this.removeCustomPlots()
+        return commands.executeCommand(RegisteredCommands.PLOTS_CUSTOM_REMOVE)
       case MessageFromWebviewType.REFRESH_REVISIONS:
         return this.refreshData()
       case MessageFromWebviewType.TOGGLE_EXPERIMENT:
@@ -182,37 +183,6 @@ export class WebviewMessages {
     )
   }
 
-  private async addCustomPlot() {
-    const metricAndParam = await pickMetricAndParam(
-      this.experiments.getColumnTerminalNodes(),
-      this.plots.getCustomPlotsOrder()
-    )
-
-    if (!metricAndParam) {
-      return
-    }
-
-    this.plots.addCustomPlot(metricAndParam)
-    this.sendCustomPlotsAndEvent(EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED)
-  }
-
-  private async removeCustomPlots() {
-    const selectedPlotsIds = await pickCustomPlots(
-      this.plots.getCustomPlotsOrder(),
-      'There are no plots to remove.',
-      {
-        title: Title.SELECT_CUSTOM_PLOTS_TO_REMOVE
-      }
-    )
-
-    if (!selectedPlotsIds) {
-      return
-    }
-
-    this.plots.removeCustomPlots(selectedPlotsIds)
-    this.sendCustomPlotsAndEvent(EventName.VIEWS_PLOTS_CUSTOM_PLOT_REMOVED)
-  }
-
   private setCustomPlotsOrder(plotIds: string[]) {
     const customPlotsOrderWithId = this.plots
       .getCustomPlotsOrder()
@@ -231,17 +201,12 @@ export class WebviewMessages {
     }))
 
     this.plots.setCustomPlotsOrder(newOrder)
-    this.sendCustomPlotsAndEvent(EventName.VIEWS_REORDER_PLOTS_CUSTOM)
-  }
-
-  private sendCustomPlotsAndEvent(
-    event:
-      | typeof EventName.VIEWS_PLOTS_CUSTOM_PLOT_ADDED
-      | typeof EventName.VIEWS_PLOTS_CUSTOM_PLOT_REMOVED
-      | typeof EventName.VIEWS_REORDER_PLOTS_CUSTOM
-  ) {
     this.sendCustomPlots()
-    sendTelemetryEvent(event, undefined, undefined)
+    sendTelemetryEvent(
+      EventName.VIEWS_REORDER_PLOTS_CUSTOM,
+      undefined,
+      undefined
+    )
   }
 
   private selectPlotsFromWebview() {
@@ -290,8 +255,9 @@ export class WebviewMessages {
   }
 
   private sendTemplatePlots() {
+    const selectedRevisions = this.plots.getSelectedRevisionDetails()
     void this.getWebview()?.show({
-      template: this.getTemplatePlots()
+      template: this.getTemplatePlots(selectedRevisions)
     })
   }
 
@@ -301,9 +267,9 @@ export class WebviewMessages {
     })
   }
 
-  private getTemplatePlots(overrideRevs?: Revision[]) {
+  private getTemplatePlots(selectedRevisions: Revision[]) {
     const paths = this.paths.getTemplateOrder()
-    const plots = this.plots.getTemplatePlots(paths, overrideRevs)
+    const plots = this.plots.getTemplatePlots(paths, selectedRevisions)
 
     if (!plots || isEmpty(plots)) {
       return null
@@ -318,12 +284,9 @@ export class WebviewMessages {
     }
   }
 
-  private getComparisonPlots(overrideRevs?: Revision[]) {
+  private getComparisonPlots() {
     const paths = this.paths.getComparisonPaths()
-    const comparison = this.plots.getComparisonPlots(
-      paths,
-      overrideRevs?.map(({ revision }) => revision)
-    )
+    const comparison = this.plots.getComparisonPlots(paths)
     if (!comparison || isEmpty(comparison)) {
       return null
     }
@@ -333,7 +296,7 @@ export class WebviewMessages {
       plots: comparison.map(({ path, revisions }) => {
         return { path, revisions: this.getRevisionsWithCorrectUrls(revisions) }
       }),
-      revisions: overrideRevs || this.plots.getComparisonRevisions(),
+      revisions: this.plots.getComparisonRevisions(),
       width: this.plots.getNbItemsPerRowOrWidth(PlotsSection.COMPARISON_TABLE)
     }
   }

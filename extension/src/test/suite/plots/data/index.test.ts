@@ -86,26 +86,6 @@ suite('Plots Data Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath, 'a7739b5')
     })
 
-    it('should call plots diff when an experiment is running and there are missing revisions (checkpoints)', async () => {
-      const { data, mockPlotsDiff } = buildPlotsData([
-        '53c3851',
-        '4fb124a',
-        '42b8736',
-        '1ba7bcd'
-      ])
-
-      await data.update()
-
-      expect(mockPlotsDiff).to.be.calledOnce
-      expect(mockPlotsDiff).to.be.calledWithExactly(
-        dvcDemoPath,
-        '53c3851',
-        '4fb124a',
-        '42b8736',
-        '1ba7bcd'
-      )
-    })
-
     it('should collect files and watch them for updates', async () => {
       const mockNow = getMockNow()
       const parentDirectory = 'training'

@@ -43,7 +43,10 @@ import { pickPaths } from '../path/selection/quickPick'
 import { Toast } from '../vscode/toast'
 import { ConfigKey } from '../vscode/config'
 import { checkSignalFile, pollSignalFileForProcess } from '../fileSystem'
-import { DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
+import {
+  DVCLIVE_ONLY_RUNNING_SIGNAL_FILE,
+  ExperimentFlag
+} from '../cli/dvc/constants'
 
 export const ExperimentsScale = {
   ...omit(ColumnType, 'TIMESTAMP'),
@@ -142,8 +145,11 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.cliData = this.dispose.track(
       cliData ||
-        new ExperimentsData(dvcRoot, internalCommands, updatesPaused, () =>
-          this.experiments.getNbOfCommitsToShow()
+        new ExperimentsData(
+          dvcRoot,
+          internalCommands,
+          updatesPaused,
+          this.experiments
         )
     )
 
@@ -413,10 +419,6 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getWorkspaceAndCommits()
   }
 
-  public getCheckpoints(id: string) {
-    return this.experiments.getCheckpointsWithType(id)
-  }
-
   public getCommitExperiments(commit: Experiment) {
     return this.experiments.getExperimentsByCommitForTree(commit)
   }
@@ -435,6 +437,10 @@ export class Experiments extends BaseRepository<TableData> {
 
   public getCommitRevisions() {
     return this.experiments.getCommitRevisions()
+  }
+
+  public getExperimentRevisions() {
+    return this.experiments.getExperimentRevisions()
   }
 
   public getFinishedExperiments() {
@@ -567,7 +573,7 @@ export class Experiments extends BaseRepository<TableData> {
           AvailableCommands.GIT_GET_NUM_COMMITS,
           this.dvcRoot
         ),
-      () => this.cliData.update()
+      (...args: (ExperimentFlag | string)[]) => this.cliData.update(...args)
     )
 
     this.dispose.track(
@@ -585,7 +591,7 @@ export class Experiments extends BaseRepository<TableData> {
     }
 
     const experiment = await pickExperiment(
-      this.experiments.getAllRecords(),
+      this.experiments.getCombinedList(),
       this.getFirstThreeColumnOrder(),
       Title.SELECT_BASE_EXPERIMENT
     )

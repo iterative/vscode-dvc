@@ -1505,19 +1505,19 @@ describe('App', () => {
     it('should display a show more commits button if the table data hasMoreCommits is set to true', () => {
       renderTable({ ...tableDataFixture, hasMoreCommits: true })
 
-      expect(screen.getByTestId('show-more-commits')).toBeInTheDocument()
+      expect(screen.getByText('Show More Commits')).toBeInTheDocument()
     })
 
     it('should not display a show more commits button if the table data hasMoreCommits is set to false', () => {
       renderTable({ ...tableDataFixture, hasMoreCommits: false })
 
-      expect(screen.queryByTestId('show-more-commits')).not.toBeInTheDocument()
+      expect(screen.queryByText('Show More Commits')).not.toBeInTheDocument()
     })
 
     it('should send a message to show more commits when the show more commits button is clicked', () => {
       renderTable({ ...tableDataFixture, hasMoreCommits: true })
 
-      fireEvent.click(screen.getByTestId('show-more-commits'))
+      fireEvent.click(screen.getByText('Show More Commits'))
 
       expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.SHOW_MORE_COMMITS
@@ -1527,23 +1527,97 @@ describe('App', () => {
     it('should display a show less commits button if the table data isShowingMoreCommits is set to true', () => {
       renderTable({ ...tableDataFixture, isShowingMoreCommits: true })
 
-      expect(screen.getByTestId('show-less-commits')).toBeInTheDocument()
+      expect(screen.getByText('Show Less Commits')).toBeInTheDocument()
     })
 
     it('should not display a show less commits button if the table data isShowingMoreCommits is set to false', () => {
       renderTable({ ...tableDataFixture, isShowingMoreCommits: false })
 
-      expect(screen.queryByTestId('show-less-commits')).not.toBeInTheDocument()
+      expect(screen.queryByText('Show Less Commits')).not.toBeInTheDocument()
     })
 
     it('should send a message to show less commits when the show less commits button is clicked', () => {
       renderTable({ ...tableDataFixture, isShowingMoreCommits: true })
 
-      fireEvent.click(screen.getByTestId('show-less-commits'))
+      fireEvent.click(screen.getByText('Show Less Commits'))
 
       expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.SHOW_LESS_COMMITS
       })
+    })
+
+    it('should show a button to switch to branches view if isBranchesView is set to false', () => {
+      renderTable({ ...tableDataFixture, isBranchesView: false })
+
+      expect(screen.getByText('Switch to Branches View')).toBeInTheDocument()
+    })
+
+    it('should not show a button to switch to branches view if isBranchesView is set to true', () => {
+      renderTable({ ...tableDataFixture, isBranchesView: true })
+
+      expect(
+        screen.queryByText('Switch to Branches View')
+      ).not.toBeInTheDocument()
+    })
+
+    it('should send a message to switch to branches view when clicking the switch to branches view button', () => {
+      renderTable({ ...tableDataFixture, isBranchesView: false })
+
+      fireEvent.click(screen.getByText('Switch to Branches View'))
+
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SWITCH_BRANCHES_VIEW
+      })
+    })
+
+    it('should show a button to switch to commits view if isBranchesView is set to true', () => {
+      renderTable({ ...tableDataFixture, isBranchesView: true })
+
+      expect(screen.getByText('Switch to Commits View')).toBeInTheDocument()
+    })
+
+    it('should not show a button to switch to commits view if isBranchesView is set to false', () => {
+      renderTable({ ...tableDataFixture, isBranchesView: false })
+
+      expect(
+        screen.queryByText('Switch to Commits View')
+      ).not.toBeInTheDocument()
+    })
+
+    it('should send a message to switch to commits view when clicking the switch to commits view button', () => {
+      renderTable({ ...tableDataFixture, isBranchesView: true })
+
+      fireEvent.click(screen.getByText('Switch to Commits View'))
+
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SWITCH_COMMITS_VIEW
+      })
+    })
+
+    it('should disable the show more and show less commits buttons when isBranchView is set to true', () => {
+      renderTable({ ...tableDataFixture, isBranchesView: true })
+
+      expect(screen.getByText('Show More Commits')).toHaveProperty(
+        'disabled',
+        true
+      )
+      expect(screen.getByText('Show Less Commits')).toHaveProperty(
+        'disabled',
+        true
+      )
+    })
+
+    it('should not disable the show more and show less commits buttons when isBranchView is set to false', () => {
+      renderTable({ ...tableDataFixture, isBranchesView: false })
+
+      expect(screen.getByText('Show More Commits')).toHaveProperty(
+        'disabled',
+        false
+      )
+      expect(screen.getByText('Show Less Commits')).toHaveProperty(
+        'disabled',
+        false
+      )
     })
   })
 })

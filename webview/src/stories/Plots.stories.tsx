@@ -37,7 +37,7 @@ const smallCustomPlotsFixture = {
 }
 
 const manyCustomPlots = (length: number) =>
-  Array.from({ length }, () => customPlotsFixture.plots[2]).map((plot, i) => {
+  Array.from({ length }, () => customPlotsFixture.plots[1]).map((plot, i) => {
     const id = plot.id + i.toString()
     return {
       ...plot,
@@ -66,6 +66,7 @@ const MockedState: React.FC<{ data: PlotsData; children: React.ReactNode }> = ({
 export default {
   args: {
     data: {
+      cliError: null,
       comparison: comparisonPlotsFixture,
       custom: customPlotsFixture,
       hasPlots: true,
@@ -140,6 +141,17 @@ WithoutPlots.args = {
 export const WithoutPlotsSelected = Template.bind({})
 WithoutPlotsSelected.args = {
   data: {
+    hasPlots: true,
+    hasUnselectedPlots: true,
+    sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+    selectedRevisions: plotsRevisionsFixture
+  }
+}
+
+export const WithCliError = Template.bind({})
+WithCliError.args = {
+  data: {
+    cliError: 'some big bad error',
     hasPlots: true,
     hasUnselectedPlots: true,
     sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
