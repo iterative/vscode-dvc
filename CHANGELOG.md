@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.2] - 2023-04-05
+
+### 🚀 New Features and Enhancements
+
+- Add custom plot commands to the command pallete [#3629](https://github.com/iterative/vscode-dvc/pull/3629) by [@julieg18](https://github.com/julieg18)
+- Update custom plot spec [#3634](https://github.com/iterative/vscode-dvc/pull/3634) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Remove checkpoints from plots [#3624](https://github.com/iterative/vscode-dvc/pull/3624) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.7.1] - 2023-04-05
 
 ### 🚀 New Features and Enhancements
