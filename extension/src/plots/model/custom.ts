@@ -76,12 +76,17 @@ export const createSpec = (title: string, metric: string, param: string) =>
     encoding: {
       x: {
         field: 'param',
+        scale: {
+          zero: false
+        },
         title: param,
         type: 'quantitative'
       },
       y: {
         field: 'metric',
-        scale: { zero: false },
+        scale: {
+          zero: false
+        },
         title,
         type: 'quantitative'
       }
@@ -89,31 +94,7 @@ export const createSpec = (title: string, metric: string, param: string) =>
     height: 'container',
     layer: [
       {
-        layer: [
-          {
-            mark: {
-              type: 'line'
-            }
-          },
-          {
-            mark: {
-              type: 'point'
-            },
-            transform: [
-              {
-                filter: {
-                  param: 'hover'
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
         encoding: {
-          opacity: {
-            value: 0
-          },
           tooltip: [
             {
               field: 'expName',
@@ -130,26 +111,10 @@ export const createSpec = (title: string, metric: string, param: string) =>
           ]
         },
         mark: {
-          type: 'rule'
-        },
-        params: [
-          {
-            name: 'hover',
-            select: {
-              clear: 'mouseout',
-              fields: ['param', 'metric'],
-              nearest: true,
-              on: 'mouseover',
-              type: 'point'
-            }
-          }
-        ]
-      }
-    ],
-    transform: [
-      {
-        as: 'y',
-        calculate: "format(datum['y'],'.5f')"
+          filled: true,
+          size: 60,
+          type: 'point'
+        }
       }
     ],
     width: 'container'
