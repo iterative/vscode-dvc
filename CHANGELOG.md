@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.3] - 2023-04-05
+
+### 🐛 Bug Fixes
+
+- Make sure changing the number of revisions will trigger an update for the scale of the multiview plot [#3642](https://github.com/iterative/vscode-dvc/pull/3642) by [@sroy3](https://github.com/sroy3)
+- Show duplicate revisions when experiment finishes running in the workspace [#3641](https://github.com/iterative/vscode-dvc/pull/3641) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project dvclive (2.6.2) [#3645](https://github.com/iterative/vscode-dvc/pull/3645) by [@sroy3](https://github.com/sroy3)
+- Remove checkpoints from experiment collection [#3639](https://github.com/iterative/vscode-dvc/pull/3639) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.7.2] - 2023-04-05
 
 ### 🚀 New Features and Enhancements
