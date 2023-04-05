@@ -865,7 +865,7 @@ suite('Plots Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle a add custom plot message from the webview', async () => {
+    it('should handle an add custom plot message from the webview', async () => {
       const { plots } = await buildPlots(disposable, plotsDiffFixture)
 
       const webview = await plots.showWebview()
