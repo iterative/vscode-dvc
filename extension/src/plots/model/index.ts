@@ -196,16 +196,17 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public getSelectedRevisionDetails() {
-    return this.experiments.getSelectedRevisions().map(exp => {
+    const selectedRevisions: Revision[] = []
+    for (const experiment of this.experiments.getSelectedRevisions()) {
       const { commit, displayName, label, displayColor, logicalGroupName, id } =
-        exp
+        experiment
       const revision: Revision = {
         displayColor,
         errors: this.errors.getRevisionErrors(label),
         fetched: this.fetchedRevs.has(label),
         firstThreeColumns: getRevisionFirstThreeColumns(
           this.experiments.getFirstThreeColumnOrder(),
-          exp
+          experiment
         ),
         group: logicalGroupName,
         id,
@@ -215,8 +216,10 @@ export class PlotsModel extends ModelWithPersistence {
       if (commit) {
         revision.commit = displayName
       }
-      return revision
-    })
+      selectedRevisions.push(revision)
+    }
+
+    return selectedRevisions
   }
 
   public getTemplatePlots(
