@@ -77,7 +77,7 @@ const removeUnselectedExperimentRunningInWorkspace = (
   }
 }
 
-const reassignFinishedWorkspaceExperiment = (
+const duplicateFinishedWorkspaceExperiment = (
   coloredStatus: ColoredStatus,
   finishedRunning: { [id: string]: string }
 ): void => {
@@ -87,7 +87,6 @@ const reassignFinishedWorkspaceExperiment = (
     }
 
     coloredStatus[id] = coloredStatus.workspace
-    coloredStatus.workspace = UNSELECTED
   }
 }
 
@@ -143,7 +142,7 @@ export const collectColoredStatus = (
     removeUnselectedExperimentRunningInWorkspace(coloredStatus, experiment)
   }
 
-  reassignFinishedWorkspaceExperiment(coloredStatus, finishedRunning)
+  duplicateFinishedWorkspaceExperiment(coloredStatus, finishedRunning)
 
   return { availableColors, coloredStatus }
 }
@@ -309,4 +308,29 @@ export const collectFinishedRunningExperiments = (
     acc[previouslyRunningId] = previouslyRunningId
   }
   return acc
+}
+
+export type FetchedExperiment = { id?: string; displayColor: Color }
+
+export const hasFinishedWorkspaceExperiment = (
+  fetchedExperiments: FetchedExperiment[]
+): boolean => {
+  let workspace: FetchedExperiment | undefined
+  const nonWorkspace: FetchedExperiment[] = []
+
+  for (const revision of fetchedExperiments) {
+    if (revision.id === EXPERIMENT_WORKSPACE_ID) {
+      workspace = revision
+      continue
+    }
+    nonWorkspace.push(revision)
+  }
+
+  if (!workspace) {
+    return false
+  }
+
+  return nonWorkspace.some(
+    ({ displayColor }) => displayColor === workspace?.displayColor
+  )
 }
