@@ -39,13 +39,13 @@ describe('pickExperimentsToPlot', () => {
 
   it('should return the selected experiment', async () => {
     const selectedExperiment = {
-      displayNameOrParent: '[exp-789]',
+      displayName: '[exp-789]',
       label: '7c366f6',
       selected: false
     }
     const mockedExperiments = [
-      { displayNameOrParent: '[exp-123]', label: '73de3fe', selected: false },
-      { displayNameOrParent: '[exp-456]', label: '0be657c', selected: true },
+      { displayName: '[exp-123]', label: '73de3fe', selected: false },
+      { displayName: '[exp-456]', label: '0be657c', selected: true },
       selectedExperiment
     ] as Experiment[]
 
@@ -95,7 +95,7 @@ describe('pickExperimentsToPlot', () => {
       deps: {
         'data/data.xml': { changes: false, value: '22a1a29' }
       },
-      displayNameOrParent: '[exp-123]',
+      displayName: '[exp-123]',
       id: 'exp-123',
       label: '123fsf4',
       params: {
@@ -112,7 +112,7 @@ describe('pickExperimentsToPlot', () => {
         deps: {
           'data/data.xml': { changes: false, value: '22a1a29' }
         },
-        displayNameOrParent: '[exp-456]',
+        displayName: '[exp-456]',
         id: 'exp-456',
         label: '456fsf4',
         params: {
@@ -127,7 +127,7 @@ describe('pickExperimentsToPlot', () => {
         deps: {
           'data/data.xml': { changes: false, value: '22a1a29' }
         },
-        displayNameOrParent: '[exp-789]',
+        displayName: '[exp-789]',
         id: 'exp-789',
         label: '789fsf4',
         params: {
@@ -184,14 +184,14 @@ describe('pickExperimentsToPlot', () => {
 })
 
 const mockedExp1 = {
-  displayNameOrParent: '[exp-0580a]',
+  displayName: '[exp-0580a]',
   id: 'abcdefb',
   label: 'abcdefb',
   name: 'exp-0580a'
 }
 
 const mockedExp2 = {
-  displayNameOrParent: '[exp-c54c4]',
+  displayName: '[exp-c54c4]',
   id: 'abcdefa',
   label: 'abcdefa',
   name: 'exp-c54c4'
@@ -201,55 +201,55 @@ const mockedExpList = [
   mockedExp1,
   mockedExp2,
   {
-    displayNameOrParent: '[exp-054f1]',
+    displayName: '[exp-054f1]',
     id: 'abcdef1',
     label: 'abcdef1',
     name: 'exp-054f1'
   },
   {
-    displayNameOrParent: '[exp-ae4fa]',
+    displayName: '[exp-ae4fa]',
     id: 'abcdef2',
     label: 'abcdef2',
     name: 'exp-ae4fa'
   },
   {
-    displayNameOrParent: '[exp-1324e]',
+    displayName: '[exp-1324e]',
     id: 'abcdef3',
     label: 'abcdef3',
     name: 'exp-1324e'
   },
   {
-    displayNameOrParent: '[exp-3bd24]',
+    displayName: '[exp-3bd24]',
     id: 'abcdef4',
     label: 'abcdef4',
     name: 'exp-3bd24'
   },
   {
-    displayNameOrParent: '[exp-5d170]',
+    displayName: '[exp-5d170]',
     id: 'abcdef5',
     label: 'abcdef5',
     name: 'exp-5d170'
   },
   {
-    displayNameOrParent: '[exp-9fe22]',
+    displayName: '[exp-9fe22]',
     id: 'abcdef6',
     label: 'abcdef6',
     name: 'exp-9fe22'
   },
   {
-    displayNameOrParent: '[exp-b707b]',
+    displayName: '[exp-b707b]',
     id: 'abcdef7',
     label: 'abcdef7',
     name: 'exp-b707b'
   },
   {
-    displayNameOrParent: '[exp-47694]',
+    displayName: '[exp-47694]',
     id: 'abcdef8',
     label: 'abcdef8',
     name: 'exp-47694'
   },
   {
-    displayNameOrParent: '[exp-59807]',
+    displayName: '[exp-59807]',
     id: 'abcdef9',
     label: 'abcdef9',
     name: 'exp-59807'

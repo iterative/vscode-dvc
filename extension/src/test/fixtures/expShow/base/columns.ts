@@ -58,7 +58,7 @@ const data: Column[] = [
   {
     type: ColumnType.METRICS,
     hasChildren: false,
-    maxStringLength: 19,
+    maxStringLength: 18,
     label: 'accuracy',
     parentPath: buildMetricOrParamPath(ColumnType.METRICS, 'summary.json'),
     path: buildMetricOrParamPath(
@@ -90,7 +90,7 @@ const data: Column[] = [
   {
     type: ColumnType.METRICS,
     hasChildren: false,
-    maxStringLength: 19,
+    maxStringLength: 18,
     label: 'val_accuracy',
     parentPath: buildMetricOrParamPath(ColumnType.METRICS, 'summary.json'),
     path: buildMetricOrParamPath(

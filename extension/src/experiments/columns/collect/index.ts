@@ -16,6 +16,7 @@ import {
 import { standardizePath } from '../../../fileSystem/path'
 import { timestampColumn } from '../constants'
 import { sortCollectedArray } from '../../../util/array'
+import { isCheckpoint } from '../../model/collect'
 
 const collectFromExperiment = (
   acc: ColumnAccumulator,
@@ -34,7 +35,10 @@ const collectFromCommit = (
 ) => {
   const { baseline, ...rest } = commit
   collectFromExperiment(acc, baseline)
-  for (const experiment of Object.values(rest)) {
+  for (const [sha, experiment] of Object.entries(rest)) {
+    if (isCheckpoint(experiment.data?.checkpoint_tip, sha)) {
+      continue
+    }
     collectFromExperiment(acc, experiment)
   }
 }
