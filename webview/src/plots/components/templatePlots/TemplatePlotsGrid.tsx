@@ -118,17 +118,6 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
     )
   }, [entries, addEventsOnViewReady, nbItemsPerRow, multiView, revisionsLength])
 
-  useEffect(() => {
-    const panels = document.querySelectorAll('.vega-bindings')
-    return () => {
-      for (const panel of Object.values(panels)) {
-        panel.removeEventListener('mouseenter', addDisabled)
-        panel.removeEventListener('mouseleave', removeDisabled)
-        panel.removeEventListener('click', disableClick)
-      }
-    }
-  }, [addDisabled, removeDisabled, disableClick])
-
   const setEntriesOrder = (order: string[]) =>
     setSectionEntries(groupIndex, order)
 
