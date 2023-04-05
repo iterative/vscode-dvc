@@ -1,6 +1,7 @@
 import { join } from 'path'
 import {
   closeAllEditors,
+  createCustomPlot,
   deleteAllExistingExperiments,
   dismissAllNotifications,
   findDecorationTooltip,
@@ -133,6 +134,7 @@ describe('Plots Webview', function () {
   it('should load the plots webview with non-empty plots', async function () {
     this.timeout(60000)
     const webview = new PlotsWebview('plots')
+    await createCustomPlot()
     const workbench = await browser.getWorkbench()
     await workbench.openCommandPrompt()
     await browser.keys([...'DVC: Show Plots', 'ArrowDown', 'Enter'])
@@ -143,7 +145,7 @@ describe('Plots Webview', function () {
 
     await browser.waitUntil(
       async () => {
-        return (await webview.vegaVisualization$$.length) === 5
+        return (await webview.vegaVisualization$$.length) === 6
       },
       { timeout: 30000 }
     )

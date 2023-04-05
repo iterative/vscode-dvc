@@ -153,6 +153,15 @@ export const closeAllEditors = async (): Promise<void> => {
   return editorView.closeAllEditors()
 }
 
+export const createCustomPlot = async (): Promise<void> => {
+  const workbench = await browser.getWorkbench()
+  const addCustomPlot = await workbench.executeCommand('DVC: Add Custom Plot')
+  await browser.waitUntil(() => addCustomPlot.elem.isDisplayed())
+  await browser.keys('Enter')
+  await browser.waitUntil(() => addCustomPlot.elem.isDisplayed())
+  return browser.keys('Enter')
+}
+
 export const findScmTreeItems = async () => {
   const workspace = await browser.getWorkbench()
   const activityBar = workspace.getActivityBar()
