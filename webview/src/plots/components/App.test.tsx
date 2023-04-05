@@ -13,7 +13,7 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
-import originalCustomPlotsFixture from 'dvc/src/test/fixtures/expShow/base/customPlots'
+import customPlotsFixture from 'dvc/src/test/fixtures/expShow/base/customPlots'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
 import smoothTemplatePlotContent from 'dvc/src/test/fixtures/plotsDiff/template/smoothTemplatePlot'
@@ -58,52 +58,6 @@ import { DragEnterDirection } from '../../shared/components/dragDrop/util'
 import { clearSelection, createWindowTextSelection } from '../../test/selection'
 import * as EventCurrentTargetDistances from '../../shared/components/dragDrop/currentTarget'
 import { OVERSCAN_ROW_COUNT } from '../../shared/components/virtualizedGrid/VirtualizedGrid'
-
-const customPlotsFixture = {
-  ...originalCustomPlotsFixture,
-  plots: originalCustomPlotsFixture.plots.map(plot => {
-    return {
-      ...plot,
-      spec: {
-        ...plot.spec,
-        layer: [
-          {
-            layer: [
-              { mark: { type: 'line' } },
-              {
-                mark: { type: 'point' },
-                transform: [{ filter: { param: 'hover' } }]
-              }
-            ]
-          },
-          {
-            encoding: {
-              opacity: { value: 0 },
-              tooltip: [
-                { field: 'expName', title: 'name' },
-                { field: 'metric', title: 'summary.json:loss' },
-                { field: 'param', title: 'params.yaml:dropout' }
-              ]
-            },
-            mark: { type: 'rule' },
-            params: [
-              {
-                name: 'hover',
-                select: {
-                  clear: 'mouseout',
-                  fields: ['param', 'metric'],
-                  nearest: false, // true causes errors to be logged for tests
-                  on: 'mouseover',
-                  type: 'point'
-                }
-              }
-            ]
-          }
-        ]
-      }
-    }
-  })
-} as CustomPlotsData
 
 jest.mock('../../shared/components/dragDrop/currentTarget', () => {
   const actualModule = jest.requireActual(
