@@ -6,6 +6,8 @@ import { buildMockMemento } from '../../test/util'
 import { PlotsType, TemplatePlotGroup } from '../webview/contract'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { ErrorsModel } from '../errors/model'
+import { getCLIIdToLabel } from '../../test/fixtures/plotsDiff/util'
+import { REVISIONS } from '../../test/fixtures/plotsDiff'
 
 describe('PathsModel', () => {
   const mockDvcRoot = 'test'
@@ -13,13 +15,6 @@ describe('PathsModel', () => {
   const logsAcc = join('logs', 'acc.tsv')
   const logsLoss = join('logs', 'loss.tsv')
   const plotsAcc = join('plots', 'acc.png')
-  const revisions = [
-    EXPERIMENT_WORKSPACE_ID,
-    '53c3851',
-    '4fb124a',
-    '42b8736',
-    '1ba7bcd'
-  ]
 
   const buildMockErrorsModel = () =>
     ({
@@ -38,14 +33,14 @@ describe('PathsModel', () => {
       buildMockErrorsModel(),
       buildMockMemento()
     )
-    model.transformAndSet(plotsDiffFixture, revisions, {})
-    model.setSelectedRevisions(revisions)
+    model.transformAndSet(plotsDiffFixture, REVISIONS, getCLIIdToLabel())
+    model.setSelectedRevisions(REVISIONS)
     expect(model.getTerminalNodes()).toStrictEqual([
       {
         hasChildren: false,
         parentPath: 'plots',
         path: plotsAcc,
-        revisions: new Set(revisions),
+        revisions: new Set(REVISIONS),
         selected: true,
         type: comparisonType
       },
@@ -53,7 +48,7 @@ describe('PathsModel', () => {
         hasChildren: false,
         parentPath: 'plots',
         path: join('plots', 'heatmap.png'),
-        revisions: new Set(revisions),
+        revisions: new Set(REVISIONS),
         selected: true,
         type: comparisonType
       },
@@ -61,7 +56,7 @@ describe('PathsModel', () => {
         hasChildren: false,
         parentPath: 'plots',
         path: join('plots', 'loss.png'),
-        revisions: new Set(revisions),
+        revisions: new Set(REVISIONS),
         selected: true,
         type: comparisonType
       },
@@ -69,7 +64,7 @@ describe('PathsModel', () => {
         hasChildren: false,
         parentPath: 'logs',
         path: logsLoss,
-        revisions: new Set(revisions),
+        revisions: new Set(REVISIONS),
         selected: true,
         type: singleType
       },
@@ -77,7 +72,7 @@ describe('PathsModel', () => {
         hasChildren: false,
         parentPath: 'logs',
         path: logsAcc,
-        revisions: new Set(revisions),
+        revisions: new Set(REVISIONS),
         selected: true,
         type: singleType
       },
@@ -85,7 +80,7 @@ describe('PathsModel', () => {
         hasChildren: false,
         parentPath: undefined,
         path: 'predictions.json',
-        revisions: new Set(revisions),
+        revisions: new Set(REVISIONS),
         selected: true,
         type: multiType
       }
@@ -149,7 +144,7 @@ describe('PathsModel', () => {
       buildMockErrorsModel(),
       buildMockMemento()
     )
-    model.transformAndSet(plotsDiffFixture, revisions, {})
+    model.transformAndSet(plotsDiffFixture, REVISIONS, {})
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
@@ -171,7 +166,7 @@ describe('PathsModel', () => {
       buildMockErrorsModel(),
       buildMockMemento()
     )
-    model.transformAndSet(plotsDiffFixture, revisions, {})
+    model.transformAndSet(plotsDiffFixture, REVISIONS, {})
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
@@ -201,7 +196,7 @@ describe('PathsModel', () => {
       buildMockErrorsModel(),
       buildMockMemento()
     )
-    model.transformAndSet(plotsDiffFixture, revisions, {})
+    model.transformAndSet(plotsDiffFixture, REVISIONS, {})
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
@@ -236,7 +231,7 @@ describe('PathsModel', () => {
 
     model.transformAndSet(
       { data: { ...plotsDiffFixture.data, ...previousPlotFixture.data } },
-      [...revisions, commitBeforePlots],
+      [...REVISIONS, commitBeforePlots],
       {}
     )
 
@@ -278,7 +273,7 @@ describe('PathsModel', () => {
     )
     model.transformAndSet(
       { data: { ...plotsDiffFixture.data, ...previousPlotFixture.data } },
-      [...revisions, commitBeforePlots],
+      [...REVISIONS, commitBeforePlots],
       {}
     )
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
@@ -306,7 +301,7 @@ describe('PathsModel', () => {
       buildMockMemento()
     )
 
-    model.transformAndSet(plotsDiffFixture, revisions, {})
+    model.transformAndSet(plotsDiffFixture, REVISIONS, {})
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
@@ -326,7 +321,7 @@ describe('PathsModel', () => {
       buildMockErrorsModel(),
       buildMockMemento()
     )
-    model.transformAndSet(plotsDiffFixture, revisions, {})
+    model.transformAndSet(plotsDiffFixture, REVISIONS, {})
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     model.setTemplateOrder([logsLossGroup, logsAccGroup, multiViewGroup])
@@ -342,7 +337,7 @@ describe('PathsModel', () => {
       buildMockErrorsModel(),
       buildMockMemento()
     )
-    model.transformAndSet(plotsDiffFixture, revisions, {})
+    model.transformAndSet(plotsDiffFixture, REVISIONS, {})
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     expect(model.getComparisonPaths()).toStrictEqual([
@@ -368,7 +363,7 @@ describe('PathsModel', () => {
       buildMockErrorsModel(),
       buildMockMemento()
     )
-    model.transformAndSet(plotsDiffFixture, revisions, {})
+    model.transformAndSet(plotsDiffFixture, REVISIONS, getCLIIdToLabel())
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     const rootChildren = model.getChildren(undefined, {
@@ -383,7 +378,7 @@ describe('PathsModel', () => {
         hasChildren: true,
         parentPath: undefined,
         path: 'logs',
-        revisions: new Set(revisions),
+        revisions: new Set(REVISIONS),
         status: 2,
         tooltip: undefined
       },
@@ -392,7 +387,7 @@ describe('PathsModel', () => {
         hasChildren: true,
         parentPath: undefined,
         path: 'plots',
-        revisions: new Set(revisions),
+        revisions: new Set(REVISIONS),
         status: 2,
         tooltip: undefined
       },
@@ -401,7 +396,7 @@ describe('PathsModel', () => {
         hasChildren: false,
         parentPath: undefined,
         path: 'predictions.json',
-        revisions: new Set(revisions),
+        revisions: new Set(REVISIONS),
         status: 2,
         tooltip: undefined,
         type: new Set([PathType.TEMPLATE_MULTI])
@@ -415,7 +410,7 @@ describe('PathsModel', () => {
         hasChildren: false,
         parentPath: 'logs',
         path: logsAcc,
-        revisions: new Set(revisions),
+        revisions: new Set(REVISIONS),
         status: 2,
         tooltip: undefined,
         type: new Set([PathType.TEMPLATE_SINGLE])
@@ -425,7 +420,7 @@ describe('PathsModel', () => {
         hasChildren: false,
         parentPath: 'logs',
         path: logsLoss,
-        revisions: new Set(revisions),
+        revisions: new Set(REVISIONS),
         status: 2,
         tooltip: undefined,
         type: new Set([PathType.TEMPLATE_SINGLE])
@@ -446,7 +441,7 @@ describe('PathsModel', () => {
         hasChildren: true,
         parentPath: 'logs',
         path: logsAcc,
-        revisions: new Set(revisions),
+        revisions: new Set(REVISIONS),
         status: 2,
         tooltip: undefined,
         type: new Set([PathType.TEMPLATE_SINGLE])
@@ -456,7 +451,7 @@ describe('PathsModel', () => {
         hasChildren: true,
         parentPath: 'logs',
         path: logsLoss,
-        revisions: new Set(revisions),
+        revisions: new Set(REVISIONS),
         status: 2,
         tooltip: undefined,
         type: new Set([PathType.TEMPLATE_SINGLE])

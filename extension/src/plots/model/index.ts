@@ -1,6 +1,4 @@
 import { Memento } from 'vscode'
-import isEmpty from 'lodash.isempty'
-import isEqual from 'lodash.isequal'
 import {
   collectData,
   collectSelectedTemplatePlots,
@@ -8,8 +6,7 @@ import {
   ComparisonData,
   RevisionData,
   TemplateAccumulator,
-  collectCommitRevisionDetails,
-  collectOverrideRevisionDetails,
+  collectIdMappingDetails,
   collectCustomPlots,
   getCustomPlotId,
   collectOrderedRevisions,
@@ -69,7 +66,7 @@ export class PlotsModel extends ModelWithPersistence {
   private height: Record<PlotsSection, PlotHeight>
   private customPlotsOrder: CustomPlotsOrderValue[]
   private sectionCollapsed: SectionCollapsed
-  private commitRevisions: Record<string, string> = {}
+  private cliIdToLabel: Record<string, string> = {}
 
   private fetchedRevs = new Set<string>()
 
@@ -194,37 +191,8 @@ export class PlotsModel extends ModelWithPersistence {
     this.setCustomPlotsOrder(newCustomPlotsOrder)
   }
 
-  public getOverrideRevisionDetails() {
-    const finishedExperiments = this.experiments.getFinishedExperiments()
-
-    if (
-      (this.experiments.hasCheckpoints() &&
-        this.experiments.hasRunningExperiment()) ||
-      !isEmpty(finishedExperiments)
-    ) {
-      return collectOverrideRevisionDetails(
-        this.comparisonOrder,
-        this.experiments.getSelectedRevisions(),
-        this.fetchedRevs,
-        new Set([
-          ...Object.keys(this.comparisonData),
-          ...Object.keys(this.revisionData)
-        ]),
-        finishedExperiments,
-        id => this.experiments.getCheckpoints(id),
-        label => this.errors.getRevisionErrors(label),
-        this.experiments.getFirstThreeColumnOrder()
-      )
-    }
-
-    return {
-      overrideComparison: this.getComparisonRevisions(),
-      overrideRevisions: this.getSelectedRevisionDetails()
-    }
-  }
-
-  public getRevisionColors(overrideRevs?: Revision[]) {
-    return getColorScale(overrideRevs || this.getSelectedRevisionDetails())
+  public getRevisionColors() {
+    return getColorScale(this.getSelectedRevisionDetails())
   }
 
   public getSelectedRevisionDetails() {
@@ -259,13 +227,11 @@ export class PlotsModel extends ModelWithPersistence {
 
   public getTemplatePlots(
     order: TemplateOrder | undefined,
-    overrideRevs?: Revision[]
+    selectedRevisions: Revision[]
   ) {
     if (!definedAndNonEmpty(order)) {
       return
     }
-
-    const selectedRevisions = overrideRevs || this.getSelectedRevisionDetails()
 
     if (!definedAndNonEmpty(selectedRevisions)) {
       return
@@ -274,15 +240,12 @@ export class PlotsModel extends ModelWithPersistence {
     return this.getSelectedTemplatePlots(order, selectedRevisions)
   }
 
-  public getComparisonPlots(
-    paths: string[] | undefined,
-    overrideRevs?: string[]
-  ) {
+  public getComparisonPlots(paths: string[] | undefined) {
     if (!paths) {
       return
     }
 
-    const selectedRevisions = overrideRevs || this.getSelectedRevisions()
+    const selectedRevisions = this.getSelectedRevisions()
     if (!definedAndNonEmpty(selectedRevisions)) {
       return
     }
@@ -434,8 +397,18 @@ export class PlotsModel extends ModelWithPersistence {
     this.persist(PersistenceKey.PLOT_SELECTED_METRICS, undefined)
   }
 
-  private removeStaleData() {
-    return Promise.all([this.removeStaleCommits(), this.removeStaleRevisions()])
+  private async removeStaleData() {
+    const currentMapping = collectIdMappingDetails(
+      this.experiments.getCommitRevisions(),
+      this.experiments.getExperimentRevisions()
+    )
+
+    await Promise.all([
+      this.removeStaleCommits(currentMapping),
+      this.removeStaleRevisions()
+    ])
+
+    this.cliIdToLabel = currentMapping
   }
 
   private removeStaleRevisions() {
@@ -452,21 +425,15 @@ export class PlotsModel extends ModelWithPersistence {
     )
   }
 
-  private removeStaleCommits() {
-    const currentCommitRevisions = collectCommitRevisionDetails(
-      this.experiments.getCommitRevisions()
-    )
-    for (const id of Object.keys(this.commitRevisions)) {
-      if (this.commitRevisions[id] !== currentCommitRevisions[id]) {
+  private removeStaleCommits(currentMapping: CLIRevisionIdToLabel) {
+    for (const id of Object.keys(this.cliIdToLabel)) {
+      if (this.cliIdToLabel[id] !== currentMapping[id]) {
         this.deleteRevisionData(id)
         this.fetchedRevs.delete(id)
+        this.deleteRevisionData(EXPERIMENT_WORKSPACE_ID)
+        this.fetchedRevs.delete(EXPERIMENT_WORKSPACE_ID)
       }
     }
-    if (!isEqual(this.commitRevisions, currentCommitRevisions)) {
-      this.deleteRevisionData(EXPERIMENT_WORKSPACE_ID)
-      this.fetchedRevs.delete(EXPERIMENT_WORKSPACE_ID)
-    }
-    this.commitRevisions = currentCommitRevisions
   }
 
   private deleteRevisionData(id: string) {
@@ -475,7 +442,7 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   private getCLIId(label: string) {
-    return this.commitRevisions[label] || label
+    return this.cliIdToLabel[label] || label
   }
 
   private getSelectedComparisonPlots(
@@ -526,7 +493,7 @@ export class PlotsModel extends ModelWithPersistence {
       this.revisionData,
       this.getNbItemsPerRowOrWidth(PlotsSection.TEMPLATE_PLOTS),
       this.getHeight(PlotsSection.TEMPLATE_PLOTS),
-      this.getRevisionColors(selectedRevisions),
+      this.getRevisionColors(),
       this.multiSourceEncoding
     )
   }

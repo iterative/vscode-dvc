@@ -14,17 +14,21 @@ import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import { Shape, StrokeDash } from '../multiSource/constants'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { CLIRevisionIdToLabel } from '../model/collect'
+import { getCLIIdToLabel } from '../../test/fixtures/plotsDiff/util'
+import { REVISIONS } from '../../test/fixtures/plotsDiff'
 
 describe('collectPaths', () => {
   const revisions = [
     EXPERIMENT_WORKSPACE_ID,
-    '53c3851',
+    'main',
     '4fb124a',
     '42b8736',
     '1ba7bcd'
   ]
   it('should return the expected data from the test fixture', () => {
-    expect(collectPaths([], plotsDiffFixture, revisions, {})).toStrictEqual([
+    expect(
+      collectPaths([], plotsDiffFixture, REVISIONS, getCLIIdToLabel())
+    ).toStrictEqual([
       {
         hasChildren: false,
         parentPath: 'plots',

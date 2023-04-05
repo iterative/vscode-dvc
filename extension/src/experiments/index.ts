@@ -419,10 +419,6 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getWorkspaceAndCommits()
   }
 
-  public getCheckpoints(id: string) {
-    return this.experiments.getCheckpointsWithType(id)
-  }
-
   public getCommitExperiments(commit: Experiment) {
     return this.experiments.getExperimentsByCommitForTree(commit)
   }
@@ -441,6 +437,10 @@ export class Experiments extends BaseRepository<TableData> {
 
   public getCommitRevisions() {
     return this.experiments.getCommitRevisions()
+  }
+
+  public getExperimentRevisions() {
+    return this.experiments.getExperimentRevisions()
   }
 
   public getFinishedExperiments() {
@@ -591,7 +591,7 @@ export class Experiments extends BaseRepository<TableData> {
     }
 
     const experiment = await pickExperiment(
-      this.experiments.getAllRecords(),
+      this.experiments.getCombinedList(),
       this.getFirstThreeColumnOrder(),
       Title.SELECT_BASE_EXPERIMENT
     )

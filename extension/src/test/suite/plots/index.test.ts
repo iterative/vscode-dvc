@@ -77,9 +77,9 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
         EXPERIMENT_WORKSPACE_ID,
-        '4fb124a',
-        '42b8736',
-        '1ba7bcd',
+        'exp-e7a67',
+        'test-branch',
+        'exp-83425',
         '53c3851'
       )
       mockPlotsDiff.resetHistory()
@@ -141,10 +141,10 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
         EXPERIMENT_WORKSPACE_ID,
-        'experim',
-        '4fb124a',
-        '42b8736',
-        '1ba7bcd',
+        'exp-e1new',
+        'exp-e7a67',
+        'test-branch',
+        'exp-83425',
         '53c3851'
       )
     })
@@ -637,9 +637,9 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
         EXPERIMENT_WORKSPACE_ID,
-        '4fb124a',
-        '42b8736',
-        '1ba7bcd',
+        'exp-e7a67',
+        'test-branch',
+        'exp-83425',
         '53c3851'
       )
       expect(
@@ -701,21 +701,22 @@ suite('Plots Test Suite', () => {
         }
       }
 
+      const brokenExp = 'exp-e7a67'
       const brokenRev = '4fb124a'
 
       const reFetchedOutput = {
         data: {
           [accPngPath]: accPng.filter(
-            ({ revisions }) => !isEqual(revisions, [brokenRev])
+            ({ revisions }) => !isEqual(revisions, [brokenExp])
           ),
           [lossTsvPath]: lossTsv.map((plot, i) => {
             const datapoints = { ...lossTsv[i].datapoints }
-            delete datapoints[brokenRev]
+            delete datapoints[brokenExp]
 
             return {
               ...plot,
               datapoints,
-              revisions: lossTsv[i].revisions?.filter(rev => rev !== brokenRev)
+              revisions: lossTsv[i].revisions?.filter(rev => rev !== brokenExp)
             }
           })
         }

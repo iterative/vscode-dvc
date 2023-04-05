@@ -351,11 +351,6 @@ suite('Experiments Tree Test Suite', () => {
         },
         {
           dvcRoot: dvcDemoPath,
-          id: 'checkpoint-excluded',
-          type: ExperimentType.CHECKPOINT
-        },
-        {
-          dvcRoot: dvcDemoPath,
           id: 'workspace-excluded',
           type: ExperimentType.WORKSPACE
         }
@@ -382,7 +377,7 @@ suite('Experiments Tree Test Suite', () => {
 
       await experiments.isReady()
 
-      const mockExperiment = 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9'
+      const mockExperiment = 'exp-e7a67'
 
       const mockExperimentApply = stub(
         DvcExecutor.prototype,
@@ -402,7 +397,7 @@ suite('Experiments Tree Test Suite', () => {
 
       expect(mockExperimentApply).to.be.calledWithExactly(
         dvcDemoPath,
-        mockExperiment.slice(0, 7)
+        mockExperiment
       )
     })
 
@@ -421,7 +416,7 @@ suite('Experiments Tree Test Suite', () => {
         RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
         {
           dvcRoot: dvcDemoPath,
-          id: 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9'
+          id: 'exp-e7a67'
         }
       )
 
@@ -433,7 +428,7 @@ suite('Experiments Tree Test Suite', () => {
       const { experiments } = buildExperiments(disposable)
       await experiments.isReady()
 
-      const mockExperiment = 'e821416'
+      const mockExperiment = 'exp-e7a67'
       const mockBranch = 'it-is-a-branch'
 
       const mockExperimentBranch = stub(
@@ -451,7 +446,7 @@ suite('Experiments Tree Test Suite', () => {
         RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
         {
           dvcRoot: dvcDemoPath,
-          id: 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361'
+          id: mockExperiment
         }
       )
 

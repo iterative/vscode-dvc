@@ -49,7 +49,6 @@ export enum ExperimentType {
   WORKSPACE = 'workspace',
   COMMIT = 'commit',
   EXPERIMENT = 'experiment',
-  CHECKPOINT = 'checkpoint',
   QUEUED = 'queued'
 }
 
@@ -57,7 +56,6 @@ export class ExperimentsModel extends ModelWithPersistence {
   private workspace = {} as Experiment
   private commits: Experiment[] = []
   private experimentsByCommit: Map<string, Experiment[]> = new Map()
-  private checkpointsByTip: Map<string, Experiment[]> = new Map()
   private availableColors: Color[]
   private coloredStatus: ColoredStatus
   private starredExperiments: StarredExperiments
@@ -113,18 +111,12 @@ export class ExperimentsModel extends ModelWithPersistence {
     dvcLiveOnly: boolean,
     commitsOutput: string
   ) {
-    const {
-      workspace,
-      commits,
-      experimentsByCommit,
-      checkpointsByTip,
-      runningExperiments
-    } = collectExperiments(data, dvcLiveOnly, commitsOutput)
+    const { workspace, commits, experimentsByCommit, runningExperiments } =
+      collectExperiments(data, dvcLiveOnly, commitsOutput)
 
     this.workspace = workspace
     this.commits = commits
     this.experimentsByCommit = experimentsByCommit
-    this.checkpointsByTip = checkpointsByTip
 
     this.setColoredStatus(runningExperiments)
   }
@@ -243,6 +235,10 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.commits.map(({ id, sha }) => ({ id, sha }))
   }
 
+  public getExperimentRevisions() {
+    return this.getExperiments().map(({ id, label }) => ({ id, label }))
+  }
+
   public getRevisions() {
     return this.getCombinedList().map(({ label }) => label)
   }
@@ -262,7 +258,7 @@ export class ExperimentsModel extends ModelWithPersistence {
 
     const { availableColors, coloredStatus } = collectSelected(
       selectedExperiments.filter(({ status }) => !isQueued(status)),
-      this.getCombinedList(),
+      this.getWorkspaceCommitsAndExperiments(),
       this.coloredStatus,
       this.availableColors
     )
@@ -299,10 +295,6 @@ export class ExperimentsModel extends ModelWithPersistence {
     ]
   }
 
-  public getAllRecords() {
-    return [...this.getWorkspaceAndCommits(), ...this.getExperimentsAndQueued()]
-  }
-
   public getWorkspaceCommitsAndExperiments() {
     return [...this.getWorkspaceAndCommits(), ...this.getExperiments()]
   }
@@ -316,7 +308,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getExperimentParams(id: string) {
-    const params = this.getAllRecords().find(
+    const params = this.getCombinedList().find(
       experiment => experiment.id === id
     )?.params
 
@@ -339,15 +331,6 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.getExperimentsAndQueued().filter(experiment =>
       isRunningInQueue(experiment)
     )
-  }
-
-  public getCheckpointsWithType(
-    id: string
-  ): (Experiment & { type: ExperimentType })[] | undefined {
-    return this.checkpointsByTip.get(id)?.map(checkpoint => ({
-      ...this.addDetails(checkpoint),
-      type: ExperimentType.CHECKPOINT
-    }))
   }
 
   public getRowData() {
@@ -390,12 +373,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getCombinedList() {
-    return [
-      this.workspace,
-      ...this.commits,
-      ...this.getExperimentsAndQueued(),
-      ...this.getFlattenedCheckpoints()
-    ]
+    return [this.workspace, ...this.commits, ...this.getExperimentsAndQueued()]
   }
 
   public getExperimentsByCommitForTree(commit: Experiment) {
@@ -453,12 +431,6 @@ export class ExperimentsModel extends ModelWithPersistence {
       return
     }
     return sortExperiments(this.getSorts(), experiments)
-  }
-
-  private getFlattenedCheckpoints() {
-    return flattenMapValues(this.checkpointsByTip).map(checkpoint =>
-      this.addDetails(checkpoint)
-    )
   }
 
   private setColoredStatus(runningExperiments: RunningExperiment[]) {
