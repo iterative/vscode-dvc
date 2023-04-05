@@ -54,7 +54,7 @@
     "@types/jest": "29.5.0",
     "@types/jsdom": "21.1.1",
     "@types/node": "16.x",
-    "@types/react": "18.0.30",
+    "@types/react": "18.0.31",
     "@types/react-dom": "18.0.11",
     "@types/react-measure": "2.0.8",
     "@types/react-virtualized": "9.21.21",
