@@ -111,6 +111,8 @@ export const createSpec = (title: string, metric: string, param: string) =>
           ]
         },
         mark: {
+          filled: true,
+          size: 60,
           type: 'point'
         }
       }

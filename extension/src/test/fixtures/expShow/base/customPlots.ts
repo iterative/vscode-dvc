@@ -115,6 +115,8 @@ const data: CustomPlotsData = {
               ]
             },
             mark: {
+              filled: true,
+              size: 60,
               type: 'point'
             }
           }
@@ -211,6 +213,8 @@ const data: CustomPlotsData = {
               ]
             },
             mark: {
+              filled: true,
+              size: 60,
               type: 'point'
             }
           }
