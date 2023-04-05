@@ -197,14 +197,8 @@ export class PlotsModel extends ModelWithPersistence {
 
   public getSelectedRevisionDetails() {
     return this.experiments.getSelectedRevisions().map(exp => {
-      const {
-        commit,
-        displayNameOrParent,
-        label,
-        displayColor,
-        logicalGroupName,
-        id
-      } = exp
+      const { commit, displayName, label, displayColor, logicalGroupName, id } =
+        exp
       const revision: Revision = {
         displayColor,
         errors: this.errors.getRevisionErrors(label),
@@ -219,7 +213,7 @@ export class PlotsModel extends ModelWithPersistence {
       }
 
       if (commit) {
-        revision.commit = displayNameOrParent
+        revision.commit = displayName
       }
       return revision
     })
