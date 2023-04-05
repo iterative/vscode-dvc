@@ -1484,6 +1484,38 @@ describe('App', () => {
     ).not.toBeInTheDocument()
   })
 
+  it('should update the scale of multiview plots when the number of revisions change', () => {
+    renderAppWithOptionalData({
+      template: complexTemplatePlotsFixture
+    })
+
+    const multiViewId = join('other', 'multiview.tsv')
+    const multiViewPlot = screen.getByTestId(`plot_${multiViewId}`)
+
+    expect(multiViewPlot).toHaveStyle('--scale: 5')
+
+    sendSetDataMessage({
+      template: {
+        ...complexTemplatePlotsFixture,
+        plots: [
+          complexTemplatePlotsFixture.plots[0],
+          {
+            entries: [
+              {
+                ...templatePlot,
+                id: join('other', 'multiview.tsv'),
+                revisions: ['a', 'b']
+              }
+            ],
+            group: TemplatePlotGroup.MULTI_VIEW
+          }
+        ]
+      }
+    })
+
+    expect(multiViewPlot).toHaveStyle('--scale: 2')
+  })
+
   describe('Virtualization', () => {
     const createCustomPlots = (nbOfPlots: number): CustomPlotsData => {
       const plots = []
