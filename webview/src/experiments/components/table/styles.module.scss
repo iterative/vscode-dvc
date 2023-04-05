@@ -559,7 +559,7 @@ $bullet-size: calc(var(--design-unit) * 4px);
         height: 100%;
 
         &:first-child {
-          margin-right: 2px;
+          margin-right: 20px;
         }
 
         .indicatorIcon {
@@ -656,20 +656,25 @@ $bullet-size: calc(var(--design-unit) * 4px);
   }
 }
 
-.showMoreCommits {
+.commitsAndBranchesNav {
   padding: 20px 16px;
   width: 100%;
 }
 
-.showMoreCommitsButton {
+.commitsAndBranchesNavButton {
   background: transparent;
   border: none;
   color: $accent-color;
   text-decoration: underline;
   font-size: 0.6rem;
+  cursor: pointer;
 
-  &:hover {
+  &:hover:not(:disabled) {
     text-decoration: none;
+  }
+
+  &:disabled {
+    opacity: 0.5;
   }
 }
 
@@ -998,4 +1003,8 @@ $badge-size: 0.85rem;
     opacity: 0.6;
     font-family: var(--vscode-font-family);
   }
+}
+
+.separator::before {
+  content: '|';
 }

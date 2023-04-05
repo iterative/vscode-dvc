@@ -14,17 +14,18 @@ import { BaseData } from '../../data'
 import { DOT_DVC, ExperimentFlag } from '../../cli/dvc/constants'
 import { gitPath } from '../../cli/git/constants'
 import { getGitPath } from '../../fileSystem'
+import { ExperimentsModel } from '../model'
 
 export const QUEUED_EXPERIMENT_PATH = join(DOT_DVC, 'tmp', 'exps')
 
 export class ExperimentsData extends BaseData<ExperimentsOutput> {
-  private readonly getNbOfCommitsToShow: () => number
+  private readonly experiments: ExperimentsModel
 
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
     updatesPaused: EventEmitter<boolean>,
-    getNbOfCommitsToShow: () => number
+    experiments: ExperimentsModel
   ) {
     super(
       dvcRoot,
@@ -40,7 +41,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
       ['dvc.lock', 'dvc.yaml', 'params.yaml', DOT_DVC]
     )
 
-    this.getNbOfCommitsToShow = getNbOfCommitsToShow
+    this.experiments = experiments
 
     void this.watchExpGitRefs()
     void this.managedUpdate(QUEUED_EXPERIMENT_PATH)
@@ -58,11 +59,16 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   }
 
   public async update(...args: (ExperimentFlag | string)[]): Promise<void> {
+    const flags = this.experiments.getIsBranchesView()
+      ? [ExperimentFlag.ALL_BRANCHES]
+      : [
+          ExperimentFlag.NUM_COMMIT,
+          this.experiments.getNbOfCommitsToShow().toString()
+        ]
     const data = await this.internalCommands.executeCommand<ExperimentsOutput>(
       AvailableCommands.EXP_SHOW,
       this.dvcRoot,
-      ExperimentFlag.NUM_COMMIT,
-      this.getNbOfCommitsToShow().toString(),
+      ...flags,
       ...args
     )
 

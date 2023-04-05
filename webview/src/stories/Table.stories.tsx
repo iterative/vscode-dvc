@@ -49,6 +49,7 @@ const tableData: TableDataState = {
   hasMoreCommits: true,
   hasRunningExperiment: true,
   hasValidDvcYaml: true,
+  isBranchesView: false,
   isShowingMoreCommits: true,
   rows: addCommitDataToMainBranch(rowsFixture).map(row => ({
     ...row,

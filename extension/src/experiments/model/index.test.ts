@@ -33,11 +33,7 @@ beforeEach(() => {
 describe('ExperimentsModel', () => {
   const runningExperiment = 'exp-12345'
 
-  const buildTestExperiment = (
-    testParam: number,
-    checkpoint_tip?: string,
-    name?: string
-  ) => {
+  const buildTestExperiment = (testParam: number, name?: string) => {
     const data = {
       params: {
         'params.yaml': {
@@ -45,16 +41,12 @@ describe('ExperimentsModel', () => {
         }
       }
     } as {
-      checkpoint_tip?: string
       name?: string
       params: {
         'params.yaml': {
           data: { test: number }
         }
       }
-    }
-    if (checkpoint_tip) {
-      data.checkpoint_tip = checkpoint_tip
     }
     if (name) {
       data.name = name
@@ -201,7 +193,7 @@ describe('ExperimentsModel', () => {
       ''
     )
 
-    const experiments = model.getAllRecords()
+    const experiments = model.getCombinedList()
 
     const changed: string[] = []
     for (const { deps, sha } of experiments) {
@@ -241,13 +233,13 @@ describe('ExperimentsModel', () => {
     experimentsModel.transformAndSet(
       {
         testBranch: {
-          baseline: buildTestExperiment(2, undefined, 'testBranch'),
-          exp1: buildTestExperiment(0, 'tip'),
-          exp2: buildTestExperiment(0, 'tip'),
-          exp3: buildTestExperiment(0, 'tip'),
-          exp4: buildTestExperiment(0, 'tip'),
-          exp5: buildTestExperiment(0, 'tip'),
-          tip: buildTestExperiment(0, 'tip', runningExperiment)
+          baseline: buildTestExperiment(2, 'testBranch'),
+          exp1: buildTestExperiment(0),
+          exp2: buildTestExperiment(0),
+          exp3: buildTestExperiment(0),
+          exp4: buildTestExperiment(0),
+          exp5: buildTestExperiment(0),
+          tip: buildTestExperiment(0, runningExperiment)
         },
         [EXPERIMENT_WORKSPACE_ID]: {
           baseline: buildTestExperiment(3)

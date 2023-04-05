@@ -104,6 +104,7 @@ export type TableData = {
   hasRunningExperiment: boolean
   hasValidDvcYaml: boolean
   isShowingMoreCommits: boolean
+  isBranchesView: boolean
   rows: Commit[]
   selectedForPlotsCount: number
   sorts: SortDefinition[]

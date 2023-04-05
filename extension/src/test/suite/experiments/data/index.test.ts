@@ -30,6 +30,7 @@ import {
 import { EXPERIMENTS_GIT_LOGS_REFS } from '../../../../experiments/data/constants'
 import { gitPath } from '../../../../cli/git/constants'
 import * as FileSystem from '../../../../fileSystem'
+import { ExperimentsModel } from '../../../../experiments/model'
 
 const MOCK_WORKSPACE_GIT_FOLDER = join(dvcDemoPath, '.mock-git')
 
@@ -95,7 +96,10 @@ suite('Experiments Data Test Suite', () => {
             }
           } as unknown as InternalCommands,
           disposable.track(new EventEmitter<boolean>()),
-          () => DEFAULT_NUM_OF_COMMITS_TO_SHOW
+          {
+            getIsBranchesView: () => false,
+            getNbOfCommitsToShow: () => DEFAULT_NUM_OF_COMMITS_TO_SHOW
+          } as ExperimentsModel
         )
       )
 
@@ -145,7 +149,10 @@ suite('Experiments Data Test Suite', () => {
             }
           } as unknown as InternalCommands,
           disposable.track(new EventEmitter<boolean>()),
-          () => DEFAULT_NUM_OF_COMMITS_TO_SHOW
+          {
+            getIsBranchesView: () => false,
+            getNbOfCommitsToShow: () => DEFAULT_NUM_OF_COMMITS_TO_SHOW
+          } as ExperimentsModel
         )
       )
 

@@ -2,7 +2,6 @@ import get from 'lodash.get'
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
 import { createSpec, CustomPlotsOrderValue, getFullValuePath } from './custom'
-import { getRevisionFirstThreeColumns } from './util'
 import {
   ColorScale,
   isImagePlot,
@@ -12,24 +11,19 @@ import {
   TemplatePlotEntry,
   TemplatePlotSection,
   PlotsType,
-  Revision,
   CustomPlotData,
   CustomPlotValues
 } from '../webview/contract'
-import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../cli/dvc/contract'
+import { PlotsOutput } from '../../cli/dvc/contract'
 import { splitColumnPath } from '../../experiments/columns/paths'
-import {
-  ColumnType,
-  Experiment,
-  isRunning
-} from '../../experiments/webview/contract'
+import { ColumnType, Experiment } from '../../experiments/webview/contract'
 import { TemplateOrder } from '../paths/collect'
 import {
   extendVegaSpec,
   isMultiViewPlot,
   truncateVerticalTitle
 } from '../vega/util'
-import { definedAndNonEmpty, reorderObjectList } from '../../util/array'
+import { definedAndNonEmpty } from '../../util/array'
 import { shortenForLabel } from '../../util/string'
 import {
   getDvcDataVersionInfo,
@@ -39,8 +33,6 @@ import {
   unmergeConcatenatedFields
 } from '../multiSource/collect'
 import { StrokeDashEncoding } from '../multiSource/constants'
-import { SelectedExperimentWithColor } from '../../experiments/model'
-import { Color } from '../../experiments/model/status/colors'
 import { exists } from '../../fileSystem'
 
 export const getCustomPlotId = (metric: string, param: string) =>
@@ -464,227 +456,23 @@ export const collectSelectedTemplatePlots = (
   return acc.length > 0 ? acc : undefined
 }
 
-export const collectCommitRevisionDetails = (
-  shas: {
+export const collectIdMappingDetails = (
+  commits: {
     id: string
     sha: string | undefined
-  }[]
+  }[],
+  experiments: { id: string; label: string }[]
 ) => {
-  const commitRevisions: Record<string, string> = {}
-  for (const { id, sha } of shas) {
+  const idMapping: Record<string, string> = {}
+  for (const { id, sha } of commits) {
     if (sha) {
-      commitRevisions[id] = shortenForLabel(sha)
+      idMapping[id] = shortenForLabel(sha)
     }
   }
-  return commitRevisions
-}
-
-const getOverrideRevision = (
-  displayColor: Color,
-  experiment: Experiment,
-  firstThreeColumns: string[],
-  fetchedRevs: Set<string>,
-  errors: string[] | undefined
-): Revision => {
-  const { commit, displayNameOrParent, logicalGroupName, id, label } =
-    experiment
-  const revision: Revision = {
-    displayColor,
-    errors,
-    fetched: fetchedRevs.has(label),
-    firstThreeColumns: getRevisionFirstThreeColumns(
-      firstThreeColumns,
-      experiment
-    ),
-    group: logicalGroupName,
-    id,
-    revision: label
+  for (const { id, label } of experiments) {
+    idMapping[label] = id
   }
-  if (commit) {
-    revision.commit = displayNameOrParent
-  }
-  return revision
-}
-
-const overrideWithWorkspace = (
-  orderMapping: { [label: string]: string },
-  selectedWithOverrides: Revision[],
-  displayColor: Color,
-  label: string,
-  firstThreeColumns: string[],
-  fetchedRevs: Set<string>,
-  errors: string[] | undefined
-): void => {
-  orderMapping[label] = EXPERIMENT_WORKSPACE_ID
-  selectedWithOverrides.push(
-    getOverrideRevision(
-      displayColor,
-      {
-        id: EXPERIMENT_WORKSPACE_ID,
-        label: EXPERIMENT_WORKSPACE_ID,
-        logicalGroupName: undefined
-      },
-      firstThreeColumns,
-      fetchedRevs,
-      errors
-    )
-  )
-}
-
-const isExperimentThatWillDisappearAtEnd = (
-  { id, sha, checkpoint_tip }: Experiment,
-  unfinishedRunningExperiments: { [id: string]: string }
-): boolean => {
-  const isCheckpointTip = sha === checkpoint_tip
-  return (
-    isCheckpointTip &&
-    unfinishedRunningExperiments[id] !== EXPERIMENT_WORKSPACE_ID
-  )
-}
-
-const getMostRecentFetchedCheckpointRevision = (
-  selectedRevision: SelectedExperimentWithColor,
-  fetchedRevs: Set<string>,
-  revisionsWithData: Set<string>,
-  checkpoints: Experiment[] | undefined,
-  firstThreeColumns: string[],
-  errors: string[] | undefined
-): Revision => {
-  const mostRecent =
-    checkpoints?.find(({ label }) => revisionsWithData.has(label)) ||
-    selectedRevision
-  return getOverrideRevision(
-    selectedRevision.displayColor,
-    mostRecent,
-    firstThreeColumns,
-    fetchedRevs,
-    errors
-  )
-}
-
-const overrideRevisionDetail = (
-  orderMapping: { [label: string]: string },
-  selectedWithOverrides: Revision[],
-  selectedRevision: SelectedExperimentWithColor,
-  fetchedRevs: Set<string>,
-  revisionsWithData: Set<string>,
-  checkpoints: Experiment[] | undefined,
-  firstThreeColumns: string[],
-  errors: string[] | undefined
-) => {
-  const { label } = selectedRevision
-
-  const mostRecent = getMostRecentFetchedCheckpointRevision(
-    selectedRevision,
-    fetchedRevs,
-    revisionsWithData,
-    checkpoints,
-    firstThreeColumns,
-    errors
-  )
-  orderMapping[label] = mostRecent.revision
-  selectedWithOverrides.push(mostRecent)
-}
-
-const collectRevisionDetail = (
-  orderMapping: { [label: string]: string },
-  selectedWithOverrides: Revision[],
-  selectedRevision: SelectedExperimentWithColor,
-  fetchedRevs: Set<string>,
-  revisionsWithData: Set<string>,
-  unfinishedRunningExperiments: { [id: string]: string },
-  getCheckpoints: (id: string) => Experiment[] | undefined,
-  getErrors: (label: string) => string[] | undefined,
-  firstThreeColumns: string[]
-) => {
-  const { label, status, id, displayColor } = selectedRevision
-  const errors = getErrors(label)
-
-  if (
-    !fetchedRevs.has(label) &&
-    unfinishedRunningExperiments[id] === EXPERIMENT_WORKSPACE_ID
-  ) {
-    return overrideWithWorkspace(
-      orderMapping,
-      selectedWithOverrides,
-      displayColor,
-      label,
-      firstThreeColumns,
-      fetchedRevs,
-      errors
-    )
-  }
-
-  if (
-    !fetchedRevs.has(label) &&
-    (isRunning(status) ||
-      isExperimentThatWillDisappearAtEnd(
-        selectedRevision,
-        unfinishedRunningExperiments
-      ))
-  ) {
-    return overrideRevisionDetail(
-      orderMapping,
-      selectedWithOverrides,
-      selectedRevision,
-      fetchedRevs,
-      revisionsWithData,
-      getCheckpoints(id),
-      firstThreeColumns,
-      errors
-    )
-  }
-
-  orderMapping[label] = label
-  selectedWithOverrides.push(
-    getOverrideRevision(
-      displayColor,
-      selectedRevision,
-      firstThreeColumns,
-      fetchedRevs,
-      errors
-    )
-  )
-}
-
-export const collectOverrideRevisionDetails = (
-  comparisonOrder: string[],
-  selectedRevisions: SelectedExperimentWithColor[],
-  fetchedRevs: Set<string>,
-  revisionsWithData: Set<string>,
-  unfinishedRunningExperiments: { [id: string]: string },
-  getCheckpoints: (id: string) => Experiment[] | undefined,
-  getErrors: (label: string) => string[] | undefined,
-  firstThreeColumns: string[]
-): {
-  overrideComparison: Revision[]
-  overrideRevisions: Revision[]
-} => {
-  const orderMapping: { [label: string]: string } = {}
-  const selectedWithOverrides: Revision[] = []
-
-  for (const selectedRevision of selectedRevisions) {
-    collectRevisionDetail(
-      orderMapping,
-      selectedWithOverrides,
-      selectedRevision,
-      fetchedRevs,
-      revisionsWithData,
-      unfinishedRunningExperiments,
-      getCheckpoints,
-      getErrors,
-      firstThreeColumns
-    )
-  }
-
-  return {
-    overrideComparison: reorderObjectList(
-      comparisonOrder.map(revision => orderMapping[revision]),
-      selectedWithOverrides,
-      'revision'
-    ),
-    overrideRevisions: selectedWithOverrides
-  }
+  return idMapping
 }
 
 export const collectOrderedRevisions = (

@@ -3,7 +3,6 @@ import isEmpty from 'lodash.isempty'
 import {
   collectData,
   collectTemplates,
-  collectOverrideRevisionDetails,
   collectCustomPlots,
   collectOrderedRevisions,
   collectImageUrl
@@ -13,10 +12,7 @@ import customPlotsFixture, {
   customPlotsOrderFixture,
   experimentsWithCommits
 } from '../../test/fixtures/expShow/base/customPlots'
-import {
-  ExperimentStatus,
-  EXPERIMENT_WORKSPACE_ID
-} from '../../cli/dvc/contract'
+import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { sameContents } from '../../util/array'
 import {
   CustomPlotData,
@@ -25,9 +21,10 @@ import {
   ImagePlot,
   TemplatePlot
 } from '../webview/contract'
-import { getCLICommitId } from '../../test/fixtures/plotsDiff/util'
-import { SelectedExperimentWithColor } from '../../experiments/model'
-import { Experiment } from '../../experiments/webview/contract'
+import {
+  getCLICommitId,
+  getCLIIdToLabel
+} from '../../test/fixtures/plotsDiff/util'
 import { exists } from '../../fileSystem'
 
 const mockedExists = jest.mocked(exists)
@@ -58,24 +55,11 @@ describe('collectCustomPlots', () => {
 
 describe('collectData', () => {
   it('should return the expected output from the test fixture', () => {
-    const mapping = {
-      '1ba7bcd': '1ba7bcd',
-      '42b8736': '42b8736',
-      '4fb124a': '4fb124a',
-      '53c3851': 'main',
-      workspace: EXPERIMENT_WORKSPACE_ID
-    }
+    const mapping = getCLIIdToLabel()
     const { revisionData, comparisonData } = collectData(
       plotsDiffFixture,
       mapping
     )
-    const revisions = [
-      EXPERIMENT_WORKSPACE_ID,
-      'main',
-      '42b8736',
-      '1ba7bcd',
-      '4fb124a'
-    ]
 
     const values =
       (logsLossPlot?.datapoints as {
@@ -83,6 +67,14 @@ describe('collectData', () => {
       }) || {}
 
     expect(isEmpty(values)).toBeFalsy()
+
+    const revisions = [
+      EXPERIMENT_WORKSPACE_ID,
+      'main',
+      '42b8736',
+      '1ba7bcd',
+      '4fb124a'
+    ]
 
     for (const revision of revisions) {
       const expectedValues = values[getCLICommitId(revision)].map(value => ({
@@ -113,7 +105,7 @@ describe('collectData', () => {
     expect(_1ba7bcd_heatmap).toBeDefined()
     expect(_1ba7bcd_heatmap).toStrictEqual(
       plotsDiffFixture.data[heatmapPlot].find(({ revisions }) =>
-        sameContents(revisions as string[], ['1ba7bcd'])
+        sameContents(revisions as string[], [getCLICommitId('1ba7bcd')])
       )
     )
   })
@@ -131,425 +123,6 @@ describe('collectTemplates', () => {
     ])
 
     expect(JSON.parse(templates[logsLossPath])).toStrictEqual(content)
-  })
-})
-
-describe('collectOverrideRevisionDetails', () => {
-  it('should override the revision details for running checkpoint tips', () => {
-    const runningId = 'b'
-    const runningGroup = `[${runningId}]`
-
-    const { overrideComparison, overrideRevisions } =
-      collectOverrideRevisionDetails(
-        ['a', 'b', 'c', 'd'],
-        [
-          {
-            checkpoint_tip: 'b',
-            displayColor: '#4299e1',
-            id: 'a',
-            label: 'a',
-            logicalGroupName: 'a',
-            sha: 'a',
-            status: ExperimentStatus.SUCCESS
-          },
-          {
-            checkpoint_tip: 'b',
-            displayColor: '#13adc7',
-            id: runningId,
-            label: 'b',
-            logicalGroupName: runningGroup,
-            sha: 'b',
-            status: ExperimentStatus.RUNNING
-          },
-          {
-            checkpoint_tip: 'c',
-            displayColor: '#48bb78',
-            id: 'c',
-            label: 'c',
-            logicalGroupName: 'c',
-            sha: 'c',
-            status: ExperimentStatus.SUCCESS
-          },
-          {
-            checkpoint_tip: 'd',
-            commit: {
-              author: 'John Smith',
-              date: '3 days ago',
-              message: 'Upgrade dependencies\n* upgrade dvc\n* upgrade dvclive',
-              tags: []
-            },
-            displayColor: '#f56565',
-            displayNameOrParent: 'Upgrade dependencies ...',
-            id: 'd',
-            label: 'd',
-            logicalGroupName: 'd',
-            sha: 'd',
-            status: ExperimentStatus.SUCCESS
-          }
-        ] as SelectedExperimentWithColor[],
-        new Set(['a', 'c', 'd', 'e']),
-        new Set(['a', 'c', 'd', 'e']),
-        {},
-        (id: string) =>
-          ({
-            [runningId]: [
-              {
-                checkpoint_tip: 'f',
-                id: 'f',
-                label: 'f',
-                logicalGroupName: runningGroup,
-                sha: 'f',
-                status: ExperimentStatus.SUCCESS
-              },
-              {
-                checkpoint_tip: 'e',
-                id: 'e',
-                label: 'e',
-                logicalGroupName: runningGroup,
-                sha: 'e',
-                status: ExperimentStatus.SUCCESS
-              }
-            ] as Experiment[]
-          }[id]),
-        () => undefined,
-        []
-      )
-    expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
-      'a',
-      'e',
-      'c',
-      'd'
-    ])
-    expect(overrideRevisions).toStrictEqual([
-      {
-        displayColor: '#4299e1',
-        errors: undefined,
-        fetched: true,
-        firstThreeColumns: [],
-        group: 'a',
-        id: 'a',
-        revision: 'a'
-      },
-      {
-        displayColor: '#13adc7',
-        errors: undefined,
-        fetched: true,
-        firstThreeColumns: [],
-        group: runningGroup,
-        id: 'e',
-        revision: 'e'
-      },
-      {
-        displayColor: '#48bb78',
-        errors: undefined,
-        fetched: true,
-        firstThreeColumns: [],
-        group: 'c',
-        id: 'c',
-        revision: 'c'
-      },
-      {
-        commit: 'Upgrade dependencies ...',
-        displayColor: '#f56565',
-        errors: undefined,
-        fetched: true,
-        firstThreeColumns: [],
-        group: 'd',
-        id: 'd',
-        revision: 'd'
-      }
-    ])
-  })
-
-  it('should override the revision details for checkpoint experiments which have finished running in the workspace', () => {
-    const runningId = 'b'
-    const runningGroup = `[${runningId}]`
-
-    const { overrideComparison, overrideRevisions } =
-      collectOverrideRevisionDetails(
-        ['a', 'b', 'c', 'd'],
-        [
-          {
-            checkpoint_tip: 'b',
-            displayColor: '#4299e1',
-            id: 'a',
-            label: 'a',
-            logicalGroupName: 'a',
-            sha: 'a',
-            status: ExperimentStatus.SUCCESS
-          },
-          {
-            checkpoint_tip: 'b',
-            displayColor: '#13adc7',
-            id: runningId,
-            label: 'b',
-            logicalGroupName: runningGroup,
-            sha: 'b',
-            status: ExperimentStatus.RUNNING
-          },
-          {
-            checkpoint_tip: 'c',
-            displayColor: '#48bb78',
-            id: 'c',
-            label: 'c',
-            logicalGroupName: 'c',
-            sha: 'c',
-            status: ExperimentStatus.SUCCESS
-          },
-          {
-            checkpoint_tip: 'd',
-            displayColor: '#f56565',
-            id: 'd',
-            label: 'd',
-            logicalGroupName: 'd',
-            sha: 'd',
-            status: ExperimentStatus.SUCCESS
-          }
-        ] as SelectedExperimentWithColor[],
-        new Set([]),
-        new Set(['a', 'c', 'd', 'e']),
-        { [runningId]: EXPERIMENT_WORKSPACE_ID },
-        (id: string) =>
-          ({
-            [runningId]: [
-              {
-                checkpoint_tip: 'f',
-                id: 'f',
-                label: 'f',
-                logicalGroupName: runningGroup,
-                sha: 'f',
-                status: ExperimentStatus.SUCCESS
-              },
-              {
-                checkpoint_tip: 'e',
-                id: 'e',
-                label: 'e',
-                logicalGroupName: runningGroup,
-                sha: 'e',
-                status: ExperimentStatus.SUCCESS
-              }
-            ] as Experiment[]
-          }[id]),
-        () => undefined,
-        []
-      )
-    expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
-      'a',
-      EXPERIMENT_WORKSPACE_ID,
-      'c',
-      'd'
-    ])
-    expect(overrideRevisions).toStrictEqual([
-      {
-        displayColor: '#4299e1',
-        errors: undefined,
-        fetched: false,
-        firstThreeColumns: [],
-        group: 'a',
-        id: 'a',
-        revision: 'a'
-      },
-      {
-        displayColor: '#13adc7',
-        errors: undefined,
-        fetched: false,
-        firstThreeColumns: [],
-        group: undefined,
-        id: EXPERIMENT_WORKSPACE_ID,
-        revision: EXPERIMENT_WORKSPACE_ID
-      },
-      {
-        displayColor: '#48bb78',
-        errors: undefined,
-        fetched: false,
-        firstThreeColumns: [],
-        group: 'c',
-        id: 'c',
-        revision: 'c'
-      },
-      {
-        displayColor: '#f56565',
-        errors: undefined,
-        fetched: false,
-        firstThreeColumns: [],
-        group: 'd',
-        id: 'd',
-        revision: 'd'
-      }
-    ])
-  })
-
-  it('should order the comparison revisions according to the provided', () => {
-    const runningId = 'b'
-    const runningGroup = `[${runningId}]`
-
-    const { overrideComparison, overrideRevisions } =
-      collectOverrideRevisionDetails(
-        ['a', 'b', 'c', 'd'].reverse(),
-        [
-          {
-            checkpoint_tip: 'b',
-            displayColor: '#4299e1',
-            id: 'a',
-            label: 'a',
-            logicalGroupName: 'a',
-            sha: 'a',
-            status: ExperimentStatus.SUCCESS
-          },
-          {
-            checkpoint_tip: 'b',
-            displayColor: '#13adc7',
-            id: runningId,
-            label: 'b',
-            logicalGroupName: runningGroup,
-            sha: 'b',
-            status: ExperimentStatus.RUNNING
-          },
-          {
-            checkpoint_tip: 'c',
-            displayColor: '#48bb78',
-            id: 'c',
-            label: 'c',
-            logicalGroupName: 'c',
-            sha: 'c',
-            status: ExperimentStatus.SUCCESS
-          },
-          {
-            checkpoint_tip: 'd',
-            displayColor: '#f56565',
-            id: 'd',
-            label: 'd',
-            logicalGroupName: 'd',
-            sha: 'd',
-            status: ExperimentStatus.SUCCESS
-          }
-        ] as SelectedExperimentWithColor[],
-        new Set([]),
-        new Set(['a', 'c', 'd', 'e']),
-        {},
-        (id: string) =>
-          ({
-            [runningId]: [
-              {
-                checkpoint_tip: 'f',
-                id: 'f',
-                label: 'f',
-                logicalGroupName: runningGroup,
-                sha: 'f',
-                status: ExperimentStatus.SUCCESS
-              },
-              {
-                checkpoint_tip: 'e',
-                id: 'e',
-                label: 'e',
-                logicalGroupName: runningGroup,
-                sha: 'e',
-                status: ExperimentStatus.SUCCESS
-              }
-            ] as Experiment[]
-          }[id]),
-        () => undefined,
-        []
-      )
-    expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
-      'd',
-      'c',
-      'e',
-      'a'
-    ])
-    expect(overrideRevisions.map(({ revision }) => revision)).toStrictEqual([
-      'a',
-      'e',
-      'c',
-      'd'
-    ])
-  })
-
-  it('should override the revision details for finished but unfetched checkpoint tips (based on available data)', () => {
-    const justFinishedRunningId = 'exp-was-running'
-    const { overrideComparison, overrideRevisions } =
-      collectOverrideRevisionDetails(
-        ['a', 'b', 'c', 'd'],
-        [
-          { label: 'a' },
-          {
-            checkpoint_tip: 'b',
-            displayColor: '#13adc7',
-            id: justFinishedRunningId,
-            label: 'b',
-            sha: 'b',
-            status: ExperimentStatus.SUCCESS
-          },
-          { label: 'c' },
-          { label: 'd' }
-        ] as SelectedExperimentWithColor[],
-        new Set([]),
-        new Set(['a', 'c', 'd', 'e']),
-        { [justFinishedRunningId]: justFinishedRunningId },
-        (id: string) =>
-          ({ [justFinishedRunningId]: [{ label: 'e' }] as Experiment[] }[id]),
-        () => undefined,
-        []
-      )
-    expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
-      'a',
-      'e',
-      'c',
-      'd'
-    ])
-    expect(overrideRevisions.map(({ revision }) => revision)).toStrictEqual([
-      'a',
-      'e',
-      'c',
-      'd'
-    ])
-  })
-
-  it('should override the revision errors for finished but unfetched checkpoint tips (based on available data)', () => {
-    const justFinishedRunningId = 'exp-was-running'
-    const errors = ["b's error"]
-    const { overrideComparison, overrideRevisions } =
-      collectOverrideRevisionDetails(
-        ['a', 'b', 'c', 'd'],
-        [
-          { label: 'a' },
-          {
-            checkpoint_tip: 'b',
-            displayColor: '#13adc7',
-            id: justFinishedRunningId,
-            label: 'b',
-            sha: 'b',
-            status: ExperimentStatus.SUCCESS
-          },
-          { label: 'c' },
-          { label: 'd' }
-        ] as SelectedExperimentWithColor[],
-        new Set([]),
-        new Set(['a', 'c', 'd', 'e']),
-        { [justFinishedRunningId]: justFinishedRunningId },
-        (id: string) =>
-          ({ [justFinishedRunningId]: [{ label: 'e' }] as Experiment[] }[id]),
-        (label: string) => {
-          if (label === 'b') {
-            return errors
-          }
-        },
-        []
-      )
-    expect(overrideComparison.map(({ revision }) => revision)).toStrictEqual([
-      'a',
-      'e',
-      'c',
-      'd'
-    ])
-    expect(
-      overrideRevisions.map(({ revision, errors }) => ({ errors, revision }))
-    ).toStrictEqual([
-      { errors: undefined, revision: 'a' },
-      { errors, revision: 'e' },
-      { errors: undefined, revision: 'c' },
-      { errors: undefined, revision: 'd' }
-    ])
   })
 })
 

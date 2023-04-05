@@ -1,4 +1,5 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import { useInView } from 'react-intersection-observer'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
@@ -6,6 +7,7 @@ import styles from './styles.module.scss'
 import { BatchSelectionProp, RowContent } from './Row'
 import { InstanceProp, RowProp } from './interfaces'
 import { ExperimentGroup } from './ExperimentGroup'
+import { ExperimentsState } from '../../store'
 
 const WorkspaceRowGroupWrapper: React.FC<
   {
@@ -54,6 +56,9 @@ export const TableBody: React.FC<
     projectHasCheckpoints,
     row
   }
+  const isBranchesView = useSelector(
+    (state: ExperimentsState) => state.tableData.isBranchesView
+  )
   const content =
     row.depth > 0 ? (
       <ExperimentGroup {...contentProps} />
@@ -74,7 +79,9 @@ export const TableBody: React.FC<
       {row.index === 2 && row.depth === 0 && (
         <tbody>
           <tr className={cx(styles.tr, styles.previousCommitsRow)}>
-            <td className={styles.th}>Previous Commits</td>
+            <td className={styles.th}>
+              {isBranchesView ? 'Other Branches' : 'Previous Commits'}
+            </td>
             <td
               className={styles.th}
               colSpan={row.getAllCells().length - 1}

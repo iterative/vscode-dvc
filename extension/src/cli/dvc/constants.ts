@@ -75,6 +75,7 @@ export enum QueueSubCommand {
 }
 
 export enum ExperimentFlag {
+  ALL_BRANCHES = '-a',
   NO_FETCH = '--no-fetch',
   QUEUE = '--queue',
   RESET = '--reset',
