@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.1] - 2023-04-05
+
+### 🚀 New Features and Enhancements
+
+- Add cli error indicator into plots webview [#3627](https://github.com/iterative/vscode-dvc/pull/3627) by [@mattseddon](https://github.com/mattseddon)
+- Add a branches view to the experiments table [#3614](https://github.com/iterative/vscode-dvc/pull/3614) by [@sroy3](https://github.com/sroy3)
+- Add a space after the checkbox action in the table [#3635](https://github.com/iterative/vscode-dvc/pull/3635) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Update webdriverio-monorepo and fix e2e tests [#3632](https://github.com/iterative/vscode-dvc/pull/3632) by [@sroy3](https://github.com/sroy3)
+
 ## [0.7.0] - 2023-04-03
 
 ### 🚀 New Features and Enhancements
