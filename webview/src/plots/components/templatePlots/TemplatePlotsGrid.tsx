@@ -1,6 +1,6 @@
 import cx from 'classnames'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
-import React, { useEffect, useCallback, useMemo } from 'react'
+import React, { useEffect, useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { changeDisabledDragIds } from './templatePlotsSlice'
 import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/VirtualizedGrid'
@@ -63,16 +63,14 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
     e.stopPropagation()
   }, [])
 
-  useEffect(() => {
-    const panels = document.querySelectorAll('.vega-bindings')
-    return () => {
-      for (const panel of Object.values(panels)) {
-        panel.removeEventListener('mouseenter', addDisabled)
-        panel.removeEventListener('mouseleave', removeDisabled)
-        panel.removeEventListener('click', disableClick)
-      }
-    }
-  }, [addDisabled, removeDisabled, disableClick])
+  const revisionsLength = multiView
+    ? entries
+        .map(
+          entry =>
+            plotDataStore[PlotsSection.TEMPLATE_PLOTS][entry].revisions?.length
+        )
+        .join('')
+    : ''
 
   const addEventsOnViewReady = useCallback(() => {
     const panels = document.querySelectorAll('.vega-bindings')
@@ -83,15 +81,14 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
     }
   }, [addDisabled, removeDisabled, disableClick])
 
-  const setEntriesOrder = (order: string[]) =>
-    setSectionEntries(groupIndex, order)
+  const [items, setItems] = useState<JSX.Element[]>([])
 
-  const plotClassName = cx(styles.plot, {
-    [styles.multiViewPlot]: multiView
-  })
+  useEffect(() => {
+    const plotClassName = cx(styles.plot, {
+      [styles.multiViewPlot]: multiView
+    })
 
-  const items = useMemo(
-    () =>
+    setItems(
       entries.map((plot: string) => {
         const colSpan =
           (multiView &&
@@ -117,9 +114,12 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
             />
           </div>
         )
-      }),
-    [entries, plotClassName, addEventsOnViewReady, nbItemsPerRow, multiView]
-  )
+      })
+    )
+  }, [entries, addEventsOnViewReady, nbItemsPerRow, multiView, revisionsLength])
+
+  const setEntriesOrder = (order: string[]) =>
+    setSectionEntries(groupIndex, order)
 
   return (
     <DragDropContainer
