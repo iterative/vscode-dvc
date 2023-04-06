@@ -67,8 +67,8 @@ const getDefaultColumnWithIndicatorsPlaceHolder = () =>
     },
     header: ExperimentHeader,
     id: EXPERIMENT_COLUMN_ID,
-    minSize: 215,
-    size: 215
+    minSize: 235,
+    size: 235
   })
 
 const getColumns = (columns: Column[]) => {
