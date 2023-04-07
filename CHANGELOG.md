@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.4] - 2023-04-06
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (2.53.0) [#3649](https://github.com/iterative/vscode-dvc/pull/3649) by [@mattseddon](https://github.com/mattseddon)
+- Add 20px to min width of experiments column [#3650](https://github.com/iterative/vscode-dvc/pull/3650) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.7.3] - 2023-04-05
 
 ### 🐛 Bug Fixes
