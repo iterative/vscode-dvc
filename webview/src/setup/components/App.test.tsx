@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import {
   MessageFromWebviewType,
   MessageToWebviewType
@@ -415,7 +415,7 @@ describe('App', () => {
         shareLiveToStudio: false
       })
       mockPostMessage.mockClear()
-      const button = screen.getByText('Show Experiments')
+      const button = screen.getAllByText('Show Experiments')[0]
       fireEvent.click(button)
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
@@ -439,7 +439,9 @@ describe('App', () => {
         sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
-      const buttons = await screen.findAllByRole('button')
+      const buttons = await within(
+        await screen.findByTestId('setup-studio-content')
+      ).findAllByRole('button')
       expect(buttons).toHaveLength(3)
     })
 
@@ -586,7 +588,8 @@ describe('App', () => {
         ...testData,
         sectionCollapsed: {
           [SetupSection.EXPERIMENTS]: false,
-          [SetupSection.STUDIO]: true
+          [SetupSection.STUDIO]: true,
+          [SetupSection.DVC]: false
         }
       })
       mockPostMessage.mockClear()
@@ -603,7 +606,8 @@ describe('App', () => {
         ...testData,
         sectionCollapsed: {
           [SetupSection.EXPERIMENTS]: true,
-          [SetupSection.STUDIO]: false
+          [SetupSection.STUDIO]: false,
+          [SetupSection.DVC]: false
         }
       })
       mockPostMessage.mockClear()

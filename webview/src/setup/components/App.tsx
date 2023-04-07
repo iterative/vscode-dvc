@@ -8,6 +8,7 @@ import {
   MessageToWebview
 } from 'dvc/src/webview/contract'
 import React, { useCallback, useState } from 'react'
+import { Dvc } from './Dvc'
 import { Experiments } from './Experiments'
 import { Studio } from './Studio'
 import { SetupContainer } from './SetupContainer'
@@ -84,20 +85,35 @@ export const App: React.FC = () => {
   return (
     <>
       <SetupContainer
+        sectionKey={SetupSection.DVC}
+        title="DVC"
+        sectionCollapsed={sectionCollapsed}
+        setSectionCollapsed={setSectionCollapsed}
+      >
+        <Dvc
+          canGitInitialize={canGitInitialize}
+          cliCompatible={cliCompatible}
+          isPythonExtensionInstalled={isPythonExtensionInstalled}
+          needsGitInitialized={needsGitInitialized}
+          needsGitCommit={needsGitCommit}
+          projectInitialized={projectInitialized}
+          pythonBinPath={pythonBinPath}
+          hasData={hasData}
+          setSectionCollapsed={setSectionCollapsed}
+        />
+      </SetupContainer>
+      <SetupContainer
         sectionKey={SetupSection.EXPERIMENTS}
         title="Experiments"
         sectionCollapsed={sectionCollapsed}
         setSectionCollapsed={setSectionCollapsed}
       >
         <Experiments
-          canGitInitialize={canGitInitialize}
-          cliCompatible={cliCompatible}
+          isDvcSetup={
+            projectInitialized && Boolean(cliCompatible) && !needsGitCommit
+          }
           hasData={hasData}
-          isPythonExtensionInstalled={isPythonExtensionInstalled}
-          needsGitInitialized={needsGitInitialized}
-          needsGitCommit={needsGitCommit}
-          projectInitialized={projectInitialized}
-          pythonBinPath={pythonBinPath}
+          setSectionCollapsed={setSectionCollapsed}
         />
       </SetupContainer>
       <SetupContainer

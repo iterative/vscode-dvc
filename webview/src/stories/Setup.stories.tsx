@@ -20,7 +20,8 @@ const DEFAULT_DATA: SetupData = {
   pythonBinPath: 'python',
   sectionCollapsed: {
     [SetupSection.EXPERIMENTS]: false,
-    [SetupSection.STUDIO]: true
+    [SetupSection.STUDIO]: true,
+    [SetupSection.DVC]: false
   },
   shareLiveToStudio: false
 }

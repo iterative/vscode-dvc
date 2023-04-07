@@ -13,7 +13,7 @@ import { Button } from '../../shared/components/button/Button'
 const Connect: React.FC = () => {
   return (
     <EmptyState isFullScreen={false}>
-      <div>
+      <div data-testid="setup-studio-content">
         <h1>
           Connect to <a href={STUDIO_URL}>Studio</a>
         </h1>
