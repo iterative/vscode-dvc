@@ -1,5 +1,6 @@
 import { Key } from 'webdriverio'
 import { ViewControl } from 'wdio-vscode-service'
+import { PlotsWebview } from './pageObjects/plotsWebview'
 
 const findProgressBars = () => $$('.monaco-progress-container')
 
@@ -160,6 +161,29 @@ export const createCustomPlot = async (): Promise<void> => {
   await browser.keys('Enter')
   await browser.waitUntil(() => addCustomPlot.elem.isDisplayed())
   return browser.keys('Enter')
+}
+
+export const deleteCustomPlot = async (): Promise<void> => {
+  const workbench = await browser.getWorkbench()
+  const removeCustomPlot = await workbench.executeCommand(
+    'DVC: Remove Custom Plot(s)'
+  )
+  await browser.waitUntil(() => removeCustomPlot.elem.isDisplayed())
+  await browser.keys('ArrowDown')
+  await browser.keys('Space')
+  return browser.keys('Enter')
+}
+
+export const waitForAllPlotsToRender = (
+  webview: PlotsWebview,
+  plotsAmount: number
+): Promise<true | void> => {
+  return browser.waitUntil(
+    async () => {
+      return (await webview.vegaVisualization$$.length) === plotsAmount
+    },
+    { timeout: 30000 }
+  )
 }
 
 export const findScmTreeItems = async () => {
