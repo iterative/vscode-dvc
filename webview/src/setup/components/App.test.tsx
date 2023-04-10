@@ -489,6 +489,24 @@ describe('App', () => {
       ).not.toBeInTheDocument()
     })
 
+    it('should show a loading screen if the project is loading in data', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        hasData: undefined,
+        isPythonExtensionInstalled: false,
+        isStudioConnected: false,
+        needsGitCommit: false,
+        needsGitInitialized: undefined,
+        projectInitialized: true,
+        pythonBinPath: undefined,
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      expect(screen.getByText('Loading Project...')).toBeInTheDocument()
+    })
+
     it('should show a screen saying that the project contains no data if dvc is installed, the project is initialized but has no data', () => {
       renderApp({
         canGitInitialize: false,
@@ -508,6 +526,7 @@ describe('App', () => {
         screen.getByText('Your project contains no data')
       ).toBeInTheDocument()
     })
+
     it('should enable the user to open the experiments webview when they have completed onboarding', () => {
       renderApp({
         canGitInitialize: false,
