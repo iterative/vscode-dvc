@@ -186,6 +186,14 @@ export const waitForAllPlotsToRender = (
   )
 }
 
+export const expectAllPlotsToBeFilled = async (webview: PlotsWebview) => {
+  const plots = await webview.vegaVisualization$$
+  for (const plot of plots) {
+    const plotNotEmpty = await webview.plotNotEmpty(plot)
+    expect(plotNotEmpty).toBe(true)
+  }
+}
+
 export const findScmTreeItems = async () => {
   const workspace = await browser.getWorkbench()
   const activityBar = workspace.getActivityBar()

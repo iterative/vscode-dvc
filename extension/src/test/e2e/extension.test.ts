@@ -5,6 +5,7 @@ import {
   deleteAllExistingExperiments,
   deleteCustomPlot,
   dismissAllNotifications,
+  expectAllPlotsToBeFilled,
   findDecorationTooltip,
   findScmTreeItems,
   getDVCActivityBarIcon,
@@ -24,8 +25,14 @@ before('should finish loading the extension', async function () {
   return dismissAllNotifications()
 })
 
-after(function () {
+after(async function () {
   this.timeout(60000)
+
+  try {
+    await deleteCustomPlot()
+  } catch {}
+  await dismissAllNotifications()
+
   return waitForDvcToFinish()
 })
 
@@ -135,6 +142,7 @@ describe('Experiments Table Webview', function () {
 describe('Plots Webview', function () {
   const webview = new PlotsWebview('plots')
 
+  // eslint-disable-next-line jest/expect-expect
   it('should load the plots webview with non-empty plots', async function () {
     this.timeout(60000)
     const workbench = await browser.getWorkbench()
@@ -146,16 +154,13 @@ describe('Plots Webview', function () {
 
     await waitForAllPlotsToRender(webview, 5)
 
-    const plots = await webview.vegaVisualization$$
-    for (const plot of plots) {
-      const plotNotEmpty = await webview.plotNotEmpty(plot)
-      expect(plotNotEmpty).toBe(true)
-    }
+    await expectAllPlotsToBeFilled(webview)
 
     await webview.unfocus()
     await closeAllEditors()
   })
 
+  // eslint-disable-next-line jest/expect-expect
   it('should create and delete a custom plot', async function () {
     this.timeout(60000)
     await createCustomPlot()
@@ -168,11 +173,7 @@ describe('Plots Webview', function () {
 
     await waitForAllPlotsToRender(webview, 6)
 
-    let plots = await webview.vegaVisualization$$
-    for (const plot of plots) {
-      const plotNotEmpty = await webview.plotNotEmpty(plot)
-      expect(plotNotEmpty).toBe(true)
-    }
+    await expectAllPlotsToBeFilled(webview)
 
     await webview.unfocus()
     await closeAllEditors()
@@ -185,22 +186,10 @@ describe('Plots Webview', function () {
 
     await waitForAllPlotsToRender(webview, 5)
 
-    plots = await webview.vegaVisualization$$
-    for (const plot of plots) {
-      const plotNotEmpty = await webview.plotNotEmpty(plot)
-      expect(plotNotEmpty).toBe(true)
-    }
+    await expectAllPlotsToBeFilled(webview)
 
     await webview.unfocus()
     await closeAllEditors()
-  })
-
-  after(async function () {
-    this.timeout(60000)
-    try {
-      await deleteCustomPlot()
-    } catch {}
-    await dismissAllNotifications()
   })
 })
 
