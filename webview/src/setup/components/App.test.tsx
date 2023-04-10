@@ -415,7 +415,7 @@ describe('App', () => {
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
-        needsGitCommit: false,
+        needsGitCommit: true,
         needsGitInitialized: true,
         projectInitialized: false,
         pythonBinPath: undefined,
@@ -424,6 +424,31 @@ describe('App', () => {
       })
 
       expect(screen.getByText('DVC is not setup')).toBeInTheDocument()
+    })
+
+    it('should open the dvc section when clicking the Setup DVC button on the dvc is not setup screen', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        hasData: false,
+        isPythonExtensionInstalled: false,
+        isStudioConnected: false,
+        needsGitCommit: true,
+        needsGitInitialized: true,
+        projectInitialized: false,
+        pythonBinPath: undefined,
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      const experimentsText = screen.getByText('DVC is not setup')
+      expect(experimentsText).toBeInTheDocument()
+
+      mockPostMessage.mockClear()
+      const button = screen.getByText('Setup DVC')
+      fireEvent.click(button)
+      expect(screen.getByText('DVC is not initialized')).toBeVisible()
+      expect(experimentsText).not.toBeVisible()
     })
 
     it('should show a screen saying that dvc is not setup if the project is initalized but dvc is not installed', () => {

@@ -36,6 +36,7 @@ export const Experiments: React.FC<ExperimentsProps> = ({
       </EmptyState>
     )
   }
+
   if (hasData === undefined) {
     return <EmptyState isFullScreen={false}>Loading Project...</EmptyState>
   }
