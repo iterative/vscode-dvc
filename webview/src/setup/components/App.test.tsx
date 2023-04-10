@@ -51,15 +51,15 @@ const renderApp = ({
 }
 
 describe('App', () => {
-  describe('Experiments', () => {
-    it('should send the initialized message on first render', () => {
-      render(<App />)
-      expect(mockPostMessage).toHaveBeenCalledWith({
-        type: MessageFromWebviewType.INITIALIZED
-      })
-      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+  it('should send the initialized message on first render', () => {
+    render(<App />)
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.INITIALIZED
     })
+    expect(mockPostMessage).toHaveBeenCalledTimes(1)
+  })
 
+  describe('DVC', () => {
     it('should show a screen saying that DVC is incompatible if the cli version is unexpected', () => {
       renderApp({
         canGitInitialize: false,
@@ -337,7 +337,7 @@ describe('App', () => {
       ).not.toBeInTheDocument()
     })
 
-    it('should send a message to initialize the project when clicking the Initialize Project buttons when the project is not initialized', () => {
+    it('should send a message to initialize the project when clicking the Initialize Project button when the project is not initialized', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
@@ -360,7 +360,7 @@ describe('App', () => {
       })
     })
 
-    it('should show a screen saying that the project contains no data if dvc is installed, the project is initialized but has no data', () => {
+    it('should open the experiments section when clicking the Open Experiments button when the project is initialized but has no data', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
@@ -375,9 +375,73 @@ describe('App', () => {
         shareLiveToStudio: false
       })
 
-      expect(
-        screen.getByText('Your project contains no data')
-      ).toBeInTheDocument()
+      mockPostMessage.mockClear()
+      const button = screen.getAllByText('Show Experiments')[0]
+      fireEvent.click(button)
+
+      expect(screen.getByText('Your project contains no data')).toBeVisible()
+      expect(screen.getByText('Setup Complete')).not.toBeVisible()
+    })
+
+    it('should enable the user to open the experiments webview when they have completed onboarding', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        hasData: true,
+        isPythonExtensionInstalled: true,
+        isStudioConnected: true,
+        needsGitCommit: false,
+        needsGitInitialized: false,
+        projectInitialized: true,
+        pythonBinPath: 'python',
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+      mockPostMessage.mockClear()
+      const button = screen.getAllByText('Show Experiments')[0]
+      fireEvent.click(button)
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW
+      })
+    })
+  })
+
+  describe('Experiments', () => {
+    it('should show a screen saying that dvc is not setup if the project is not initalized', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        hasData: false,
+        isPythonExtensionInstalled: false,
+        isStudioConnected: false,
+        needsGitCommit: false,
+        needsGitInitialized: true,
+        projectInitialized: false,
+        pythonBinPath: undefined,
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      expect(screen.getByText('DVC is not setup')).toBeInTheDocument()
+    })
+
+    it('should show a screen saying that dvc is not setup if the project is initalized but dvc is not installed', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        hasData: false,
+        isPythonExtensionInstalled: false,
+        isStudioConnected: false,
+        needsGitCommit: false,
+        needsGitInitialized: undefined,
+        projectInitialized: false,
+        pythonBinPath: undefined,
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      expect(screen.getByText('DVC is not setup')).toBeInTheDocument()
     })
 
     it('should not show a screen saying that the project contains no data if dvc is installed, the project is initialized and has data', () => {
@@ -400,6 +464,25 @@ describe('App', () => {
       ).not.toBeInTheDocument()
     })
 
+    it('should show a screen saying that the project contains no data if dvc is installed, the project is initialized but has no data', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        hasData: false,
+        isPythonExtensionInstalled: false,
+        isStudioConnected: false,
+        needsGitCommit: false,
+        needsGitInitialized: undefined,
+        projectInitialized: true,
+        pythonBinPath: undefined,
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      expect(
+        screen.getByText('Your project contains no data')
+      ).toBeInTheDocument()
+    })
     it('should enable the user to open the experiments webview when they have completed onboarding', () => {
       renderApp({
         canGitInitialize: false,
@@ -415,7 +498,7 @@ describe('App', () => {
         shareLiveToStudio: false
       })
       mockPostMessage.mockClear()
-      const button = screen.getAllByText('Show Experiments')[0]
+      const button = screen.getAllByText('Show Experiments')[1]
       fireEvent.click(button)
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
@@ -582,38 +665,66 @@ describe('App', () => {
     }
     const experimentsText = 'Your project contains no data'
     const studioButtonText = 'Update Token'
+    const dvcText = 'Setup Complete'
 
-    it('should render the app with the Studio section collapsed if the Experiments section is focused', () => {
+    it('should render the app with other sections collapsed if the DVC section is focused', () => {
+      renderApp({
+        ...testData,
+        sectionCollapsed: {
+          [SetupSection.EXPERIMENTS]: true,
+          [SetupSection.STUDIO]: true,
+          [SetupSection.DVC]: false
+        }
+      })
+      mockPostMessage.mockClear()
+      const dvc = screen.getByText('DVC')
+      expect(dvc).toBeVisible()
+      expect(screen.queryByText(dvcText)).toBeVisible()
+      const experiments = screen.getByText('Experiments')
+      expect(experiments).toBeVisible()
+      expect(screen.getByText(experimentsText)).not.toBeVisible()
+      const studio = screen.getByText('Studio')
+      expect(studio).toBeVisible()
+      expect(screen.queryByText(studioButtonText)).not.toBeVisible()
+    })
+
+    it('should render the app with other sections collapsed if the Experiments section is focused', () => {
       renderApp({
         ...testData,
         sectionCollapsed: {
           [SetupSection.EXPERIMENTS]: false,
           [SetupSection.STUDIO]: true,
-          [SetupSection.DVC]: false
+          [SetupSection.DVC]: true
         }
       })
       mockPostMessage.mockClear()
       const studio = screen.getByText('Studio')
       expect(studio).toBeVisible()
       expect(screen.queryByText(studioButtonText)).not.toBeVisible()
+      const dvc = screen.getByText('DVC')
+      expect(dvc).toBeVisible()
+      expect(screen.queryByText(dvcText)).not.toBeVisible()
       const experiments = screen.getByText('Experiments')
       expect(experiments).toBeVisible()
       expect(screen.getByText(experimentsText)).toBeVisible()
     })
 
-    it('should render the app with the Experiments section collapsed if the Studio section is focused', () => {
+    it('should render the app with other sections collapsed if the Studio section is focused', () => {
       renderApp({
         ...testData,
         sectionCollapsed: {
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.STUDIO]: false,
-          [SetupSection.DVC]: false
+          [SetupSection.DVC]: true
         }
       })
       mockPostMessage.mockClear()
       const studio = screen.getByText('Studio')
       expect(studio).toBeVisible()
       expect(screen.queryByText(studioButtonText)).toBeVisible()
+      const dvc = screen.getByText('DVC')
+      expect(dvc).toBeVisible()
+      expect(screen.queryByText(dvcText)).not.toBeVisible()
       const experiments = screen.getByText('Experiments')
       expect(experiments).toBeVisible()
       expect(screen.getByText(experimentsText)).not.toBeVisible()
