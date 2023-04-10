@@ -22,7 +22,6 @@ export const Experiments: React.FC<ExperimentsProps> = ({
     return (
       <EmptyState isFullScreen={false}>
         <h1>DVC is not setup</h1>
-        {/* TBD review text */}
         <p>DVC needs to be setup before you can access experiments.</p>
         <Button
           onClick={() =>
