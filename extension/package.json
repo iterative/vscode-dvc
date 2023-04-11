@@ -1449,7 +1449,7 @@
       },
       {
         "view": "dvc.views.welcome",
-        "contents": "New to the extension?\n[Show Walkthrough](command:dvc.getStarted)\n\nThe extension is currently unable to initialize.\n[Show Setup](command:dvc.showExperimentsSetup)",
+        "contents": "New to the extension?\n[Show Walkthrough](command:dvc.getStarted)\n\nThe extension is currently unable to initialize.\n[Show Setup](command:dvc.showDvcSetup)",
         "when": "true"
       },
       {
@@ -1491,7 +1491,7 @@
           {
             "id": "dvc.installDVC",
             "title": "Install DVC",
-            "description": "This extension requires DVC to be installed.\n\n[Show Setup](command:dvc.showExperimentsSetup)\n",
+            "description": "This extension requires DVC to be installed.\n\n[Show Setup](command:dvc.showDvcSetup)\n",
             "media": {
               "markdown": "resources/walkthrough/install-dvc.md"
             },
