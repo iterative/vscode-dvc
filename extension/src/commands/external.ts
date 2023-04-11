@@ -97,6 +97,7 @@ export enum RegisteredCommands {
 
   SETUP_SHOW = 'dvc.showSetup',
   SETUP_SHOW_EXPERIMENTS = 'dvc.showExperimentsSetup',
+  SETUP_SHOW_DVC = 'dvc.showDvcSetup',
   SELECT_FOCUSED_PROJECTS = 'dvc.selectFocusedProjects',
 
   ADD_STUDIO_ACCESS_TOKEN = 'dvc.addStudioAccessToken',
