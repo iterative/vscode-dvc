@@ -38,7 +38,6 @@ export interface Experiment extends BaseExperimentFields {
   label: string
   logicalGroupName?: string
   metrics?: MetricOrParamColumns
-  mutable?: boolean
   outs?: MetricOrParamColumns
   params?: MetricOrParamColumns
   selected?: boolean

@@ -20,9 +20,9 @@ export const STUDIO_ENDPOINT = 'https://studio.iterative.ai/api/live'
 type ExperimentDetails = {
   baselineSha: string
   sha: string
-  metrics: ValueTreeRoot | undefined
+  metrics: ValueTreeRoot | undefined | null
   name: string
-  params: ValueTreeRoot
+  params: ValueTreeRoot | null
 }
 
 type RequestBody = {

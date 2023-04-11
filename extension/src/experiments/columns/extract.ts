@@ -28,7 +28,7 @@ const extractFileMetricsOrParams = (
 }
 
 const extractMetricsOrParams = (
-  valueTreeRoot?: ValueTreeRoot
+  valueTreeRoot?: ValueTreeRoot | null
 ): { columns: MetricOrParamColumns; errors: string[] } | undefined => {
   if (!valueTreeRoot) {
     return
@@ -46,7 +46,7 @@ const extractMetricsOrParams = (
 }
 
 const extractDeps = (
-  columns?: Deps,
+  columns?: Deps | null,
   commit?: Experiment
 ): DepColumns | undefined => {
   if (!columns) {

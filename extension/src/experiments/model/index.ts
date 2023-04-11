@@ -1,7 +1,7 @@
 import { Memento } from 'vscode'
 import { SortDefinition, sortExperiments } from './sortBy'
 import { FilterDefinition, filterExperiment, getFilterId } from './filterBy'
-import { collectExperiments } from './collect'
+import { collectExperiments, collectExperiments_ } from './collect'
 import {
   collectColoredStatus,
   collectFinishedRunningExperiments,
@@ -26,7 +26,8 @@ import {
 import { definedAndNonEmpty, reorderListSubset } from '../../util/array'
 import {
   ExperimentsOutput,
-  EXPERIMENT_WORKSPACE_ID
+  EXPERIMENT_WORKSPACE_ID,
+  ExpShowOutput
 } from '../../cli/dvc/contract'
 import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
@@ -109,6 +110,21 @@ export class ExperimentsModel extends ModelWithPersistence {
   ) {
     const { workspace, commits, experimentsByCommit, runningExperiments } =
       collectExperiments(data, dvcLiveOnly, commitsOutput)
+
+    this.workspace = workspace
+    this.commits = commits
+    this.experimentsByCommit = experimentsByCommit
+
+    this.setColoredStatus(runningExperiments)
+  }
+
+  public transformAndSet_(
+    data: ExpShowOutput,
+    dvcLiveOnly: boolean,
+    commitsOutput: string
+  ) {
+    const { workspace, commits, experimentsByCommit, runningExperiments } =
+      collectExperiments_(data, dvcLiveOnly, commitsOutput)
 
     this.workspace = workspace
     this.commits = commits

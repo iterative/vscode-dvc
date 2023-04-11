@@ -55,7 +55,7 @@ export enum ExperimentStatus {
   SUCCESS = 'Success'
 }
 
-export const EXPERIMENT_WORKSPACE_ID = 'workspace'
+export const EXPERIMENT_WORKSPACE_ID = 'workspace' as const
 
 export interface BaseExperimentFields {
   name?: string
@@ -69,13 +69,14 @@ export interface BaseExperimentFields {
 type Dep = { hash: null | string; size: null | number; nfiles: null | number }
 type Out = Dep & { use_cache: boolean; is_data_source: boolean }
 
+type Outs = RelPathObject<Out>
 export type Deps = RelPathObject<Dep>
 
 export interface ExperimentFields extends BaseExperimentFields {
-  params?: ValueTreeRoot
-  metrics?: ValueTreeRoot
-  deps?: Deps
-  outs?: RelPathObject<Out>
+  params?: ValueTreeRoot | null
+  metrics?: ValueTreeRoot | null
+  deps?: Deps | null
+  outs?: RelPathObject<Out> | null
   error?: ErrorContents
 }
 
@@ -95,6 +96,73 @@ export interface ExperimentsOutput {
     baseline: ExperimentFieldsOrError
   }
 }
+
+type ValueTreeOrError_ = { data: ValueTree } | DvcError
+type MetricsOrParams = RelPathObject<ValueTreeOrError_>
+
+type ExpStateData = {
+  rev: string
+  timestamp: string | null
+  params: MetricsOrParams | null
+  metrics: MetricsOrParams | null
+  deps: Deps | null
+  outs: Outs | null
+  meta: { has_checkpoints: boolean }
+}
+
+export const ExperimentExecutor = {
+  DVC_TASK: 'dvc-task',
+  [EXPERIMENT_WORKSPACE_ID]: EXPERIMENT_WORKSPACE_ID
+} as const
+
+export type Executor =
+  | {
+      state: ExperimentStatus.QUEUED
+      name: typeof ExperimentExecutor.DVC_TASK
+      local: {
+        root: null
+        log: null
+        pid: null
+        returncode: null
+        task_id: string
+      }
+    }
+  | {
+      state:
+        | ExperimentStatus.RUNNING
+        | ExperimentStatus.FAILED
+        | ExperimentStatus.SUCCESS
+      name: (typeof ExperimentExecutor)[keyof typeof ExperimentExecutor] | null
+      local: {
+        root: string
+        log: string
+        pid: number
+        task_id?: string
+        returncode: null | number
+      } | null
+    }
+  | null
+
+export type ExpWithError = {
+  rev: string
+  name?: string
+} & DvcError
+
+export type ExpState =
+  | {
+      rev: string
+      name?: string
+      data: ExpStateData
+    }
+  | ExpWithError
+
+export type ExpRange = {
+  revs: ExpState[]
+  name?: string
+  executor: Executor
+}
+
+export type ExpShowOutput = (ExpState & { experiments?: ExpRange[] | null })[]
 
 export interface PlotsData {
   [path: string]: Plot[]
