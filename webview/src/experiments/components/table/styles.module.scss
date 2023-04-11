@@ -79,6 +79,74 @@ $bullet-size: calc(var(--design-unit) * 4px);
   background-color: $header-border-color;
 }
 
+// Concrete selectors
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.experiments {
+  box-sizing: border-box;
+  height: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+table {
+  display: inline-block;
+  border-collapse: collapse;
+}
+
+tr {
+  position: relative;
+  background-color: $row-bg-color;
+  width: fit-content;
+}
+
+td,
+th {
+  white-space: nowrap;
+  min-width: 0;
+  position: relative;
+
+  &:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+
+    &::after {
+      content: '';
+      height: 100%;
+      position: absolute;
+      top: 0;
+      width: 6px;
+      right: 0;
+      transition: box-shadow 0.25s;
+    }
+  }
+}
+
+table.withExpColumnShadow tr > *:first-child {
+  &::after {
+    box-shadow: 3px 0px 3px $shadow;
+  }
+
+  > div::after {
+    display: none;
+  }
+}
+
+.cellContents {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+ul {
+  padding-left: 1rem;
+}
+
 .iconMenu {
   position: absolute;
   left: 0;
@@ -108,14 +176,6 @@ $bullet-size: calc(var(--design-unit) * 4px);
 
   ul[role='menu'] {
     margin: 4px 0px 0px 0px;
-  }
-}
-
-// Concrete selectors
-
-@keyframes spin {
-  100% {
-    transform: rotate(360deg);
   }
 }
 
@@ -228,13 +288,6 @@ $bullet-size: calc(var(--design-unit) * 4px);
   }
 }
 
-.experiments {
-  box-sizing: border-box;
-  height: 100%;
-  display: flex;
-  flex-flow: column nowrap;
-}
-
 .experimentGroup {
   .nestedRow {
     .experimentCell {
@@ -249,19 +302,37 @@ $bullet-size: calc(var(--design-unit) * 4px);
   }
 }
 
-ul {
-  padding-left: 1rem;
-}
+.bodyRow {
+  border-bottom: $row-border;
 
-table {
-  display: inline-block;
-  border-collapse: collapse;
-}
+  &:not(.rowSelected) {
+    & > *:first-child {
+      background-color: $row-bg-color;
+    }
+  }
 
-tr {
-  position: relative;
-  background-color: $row-bg-color;
-  width: fit-content;
+  &.rowSelected {
+    border-color: $row-border-selected-color;
+
+    td {
+      color: $row-fg-selected-color;
+      border-bottom-color: $row-border-selected-color;
+      background-color: $row-bg-selected-color;
+    }
+
+    .experimentCell {
+      background-color: $row-bg-color;
+
+      &::before {
+        background-color: $row-bg-selected-color;
+      }
+    }
+
+    .expandedRowArrow,
+    .contractedRowArrow {
+      border-color: $selected-icon-color;
+    }
+  }
 
   &:hover.rowSelected {
     &::after {
@@ -293,77 +364,6 @@ tr {
       background-color: $border-color;
     }
   }
-
-  > *:first-child {
-    position: sticky;
-    left: 0;
-    z-index: 3;
-
-    &::after {
-      content: '';
-      height: 100%;
-      position: absolute;
-      top: 0;
-      width: 6px;
-      right: 0;
-      transition: box-shadow 0.25s;
-    }
-
-    &.headerCell {
-      &::after {
-        bottom: auto;
-        left: auto;
-        background-color: transparent;
-      }
-
-      &::before {
-        @extend %headerCellBorderBottom;
-      }
-    }
-  }
-
-  &.rowSelected {
-    border-color: $row-border-selected-color;
-
-    td {
-      color: $row-fg-selected-color;
-      border-bottom-color: $row-border-selected-color;
-      background-color: $row-bg-selected-color;
-    }
-
-    .experimentCell {
-      background-color: $row-bg-color;
-
-      &::before {
-        background-color: $row-bg-selected-color;
-      }
-    }
-
-    .expandedRowArrow,
-    .contractedRowArrow {
-      border-color: $selected-icon-color;
-    }
-  }
-}
-
-table.withExpColumnShadow tr > *:first-child {
-  &::after {
-    box-shadow: 3px 0px 3px $shadow;
-  }
-
-  > div::after {
-    display: none;
-  }
-}
-
-.bodyRow {
-  border-bottom: $row-border;
-
-  &:not(.rowSelected) {
-    & > *:first-child {
-      background-color: $row-bg-color;
-    }
-  }
 }
 
 .headRow {
@@ -377,6 +377,7 @@ table.withExpColumnShadow tr > *:first-child {
     // should be on parent div, not span to work on text-overflow: ellipsis
     pointer-events: none;
   }
+
   .cellContents {
     @extend %truncateLeftChild;
     display: block;
@@ -471,13 +472,6 @@ table.withExpColumnShadow tr > *:first-child {
   color: $changed-color;
 }
 
-td,
-th {
-  white-space: nowrap;
-  min-width: 0;
-  position: relative;
-}
-
 th {
   height: auto;
   background-color: $header-bg-color;
@@ -564,7 +558,7 @@ td {
   }
 }
 
-.placeholderHeaderCell {
+%headerCellBase {
   background-color: $header-bg-color;
   .cellContents {
     padding: 0.31rem $cell-padding;
@@ -574,6 +568,10 @@ td {
     @extend %cellBorderLeft;
     background-color: $header-border-color;
   }
+}
+
+.placeholderHeaderCell {
+  @extend %headerCellBase;
 
   &:first-child::before {
     display: none;
@@ -581,7 +579,7 @@ td {
 }
 
 .headerCell {
-  @extend .placeholderHeaderCell;
+  @extend %headerCellBase;
   color: $header-fg-color;
   text-align: center;
   font-weight: 400;
@@ -594,6 +592,18 @@ td {
     width: 100%;
     height: 1px;
     background-color: $header-border-color;
+  }
+
+  &:first-child {
+    &::after {
+      bottom: auto;
+      left: auto;
+      background-color: transparent;
+    }
+
+    &::before {
+      @extend %headerCellBorderBottom;
+    }
   }
 
   &.leafHeader::after {
@@ -683,10 +693,6 @@ td {
   font-size: 0.65rem;
 }
 
-.staticColumn {
-  transform: translate(0, 0) !important;
-}
-
 .columnResizer {
   right: -4px;
   width: 10px;
@@ -712,11 +718,6 @@ td {
   &.isResizing::after {
     display: block;
   }
-}
-
-.cellContents {
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .error {
