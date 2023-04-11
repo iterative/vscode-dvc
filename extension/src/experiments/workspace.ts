@@ -23,7 +23,7 @@ import {
   getFileExtension,
   hasDvcYamlFile
 } from '../fileSystem'
-import { quickPickOneOrInput } from '../vscode/quickPick'
+import { quickPickManyValues, quickPickOneOrInput } from '../vscode/quickPick'
 import { pickFile } from '../vscode/resourcePicker'
 
 export enum scriptCommand {
@@ -355,7 +355,8 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
         updatesPaused,
         resourceLocator,
         this.workspaceState,
-        () => this.checkOrAddPipeline(dvcRoot)
+        () => this.checkOrAddPipeline(dvcRoot),
+        (branches?: string[]) => this.selectBranches(branches)
       )
     )
 
@@ -427,6 +428,28 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   public hasRunningExperiment() {
     return Object.values(this.repositories).some(experiments =>
       experiments.hasRunningExperiment()
+    )
+  }
+
+  public async selectBranches(branches?: string[]) {
+    const cwd = await this.getDvcRoot()
+    if (!cwd) {
+      return
+    }
+    const allBranches =
+      branches ||
+      (await this.internalCommands.executeCommand<string[]>(
+        AvailableCommands.GIT_GET_BRANCHES,
+        cwd
+      ))
+    const branchesToSelect = allBranches.filter(
+      branch => branch.indexOf('*') !== 0
+    )
+    return await quickPickManyValues(
+      branchesToSelect.map(branch => ({ label: branch, value: branch })),
+      {
+        title: 'Select the branch(es) you want to add' as Title
+      }
     )
   }
 

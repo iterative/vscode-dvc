@@ -11,6 +11,7 @@ export const gitPath = {
 
 export enum Command {
   ADD = 'add',
+  BRANCH = 'branch',
   CLEAN = 'clean',
   COMMIT = 'commit',
   DIFF = 'diff',

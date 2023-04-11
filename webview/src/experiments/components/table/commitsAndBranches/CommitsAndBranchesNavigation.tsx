@@ -1,13 +1,14 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
+import { AddAndRemoveBranches } from './AddAndRemoveBranches'
 import {
   showLessCommits,
   showMoreCommits,
   switchToBranchesView,
   switchToCommitsView
-} from './messages'
-import styles from './styles.module.scss'
-import { ExperimentsState } from '../../store'
+} from '../messages'
+import styles from '../styles.module.scss'
+import { ExperimentsState } from '../../../store'
 
 export const CommitsAndBranchesNavigation: React.FC = () => {
   const { hasMoreCommits, isBranchesView, isShowingMoreCommits } = useSelector(
@@ -34,6 +35,9 @@ export const CommitsAndBranchesNavigation: React.FC = () => {
           Show Less Commits
         </button>
       )}
+
+      <AddAndRemoveBranches />
+
       <span className={styles.separator} />
 
       <button

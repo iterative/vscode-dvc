@@ -77,6 +77,7 @@ export const buildExperiments = (
       resourceLocator,
       buildMockMemento(),
       mockCheckOrAddPipeline,
+      () => Promise.resolve([]),
       mockExperimentsData,
       buildMockData<FileSystemData>()
     )

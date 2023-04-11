@@ -102,6 +102,9 @@ export class Experiments extends BaseRepository<TableData> {
   private dvcLiveOnlySignalFile: string
 
   private readonly addStage: () => Promise<boolean>
+  private readonly selectBranches: (
+    branches?: string[]
+  ) => Promise<string[] | undefined>
 
   constructor(
     dvcRoot: string,
@@ -110,6 +113,7 @@ export class Experiments extends BaseRepository<TableData> {
     resourceLocator: ResourceLocator,
     workspaceState: Memento,
     addStage: () => Promise<boolean>,
+    selectBranches: (branches?: string[]) => Promise<string[] | undefined>,
     cliData?: ExperimentsData,
     fileSystemData?: FileSystemData
   ) {
@@ -122,6 +126,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.internalCommands = internalCommands
     this.addStage = addStage
+    this.selectBranches = selectBranches
 
     this.onDidChangeIsParamsFileFocused = this.paramsFileFocused.event
     this.onDidChangeExperiments = this.experimentsChanged.event
@@ -568,6 +573,7 @@ export class Experiments extends BaseRepository<TableData> {
           this.dvcRoot
         ),
       () => this.addStage(),
+      (branches?: string[]) => this.selectBranches(branches),
       () =>
         this.internalCommands.executeCommand<number>(
           AvailableCommands.GIT_GET_NUM_COMMITS,
