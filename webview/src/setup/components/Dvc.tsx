@@ -18,7 +18,7 @@ import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Beaker } from '../../shared/components/icons'
 import { IconButton } from '../../shared/components/button/IconButton'
 
-export type ExperimentsProps = {
+export type DvcProps = {
   canGitInitialize: boolean | undefined
   cliCompatible: boolean | undefined
   isPythonExtensionInstalled: boolean
@@ -26,11 +26,11 @@ export type ExperimentsProps = {
   needsGitCommit: boolean
   projectInitialized: boolean
   pythonBinPath: string | undefined
-  hasData: boolean | undefined
+  isExperimentsAvailable: boolean | undefined
   setSectionCollapsed: (sectionCollapsed: SectionCollapsed) => void
 }
 
-export const Dvc: React.FC<ExperimentsProps> = ({
+export const Dvc: React.FC<DvcProps> = ({
   canGitInitialize,
   cliCompatible,
   isPythonExtensionInstalled,
@@ -39,7 +39,7 @@ export const Dvc: React.FC<ExperimentsProps> = ({
   projectInitialized,
   pythonBinPath,
   setSectionCollapsed,
-  hasData
+  isExperimentsAvailable
 }) => {
   if (cliCompatible === false) {
     return <CliIncompatible checkCompatibility={checkCompatibility} />
@@ -79,7 +79,7 @@ export const Dvc: React.FC<ExperimentsProps> = ({
         appearance="primary"
         icon={Beaker}
         onClick={
-          hasData
+          isExperimentsAvailable
             ? showExperiments
             : () =>
                 setSectionCollapsed({

@@ -98,7 +98,7 @@ export const App: React.FC = () => {
           needsGitCommit={needsGitCommit}
           projectInitialized={projectInitialized}
           pythonBinPath={pythonBinPath}
-          hasData={hasData}
+          isExperimentsAvailable={hasData}
           setSectionCollapsed={setSectionCollapsed}
         />
       </SetupContainer>
@@ -109,9 +109,7 @@ export const App: React.FC = () => {
         setSectionCollapsed={setSectionCollapsed}
       >
         <Experiments
-          isDvcSetup={
-            projectInitialized && Boolean(cliCompatible) && !needsGitCommit
-          }
+          isDvcSetup={projectInitialized && !!cliCompatible && !needsGitCommit}
           hasData={hasData}
           setSectionCollapsed={setSectionCollapsed}
         />
