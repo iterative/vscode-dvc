@@ -135,6 +135,7 @@ export const SectionContainer: React.FC<
               content={tooltipContent}
               placement="bottom-end"
               interactive
+              appendTo={document.body}
             >
               <div
                 className={styles.infoTooltipToggle}
