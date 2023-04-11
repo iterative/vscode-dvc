@@ -683,30 +683,6 @@ td {
   font-size: 0.65rem;
 }
 
-.webviewHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-%arrow {
-  background: none;
-  border: none;
-  color: $header-fg-color;
-  position: absolute;
-  top: 5px;
-}
-
-.arrowLeft {
-  @extend %arrow;
-  left: -2px;
-}
-
-.arrowRight {
-  @extend %arrow;
-  right: -2px;
-}
-
 .staticColumn {
   transform: translate(0, 0) !important;
 }
