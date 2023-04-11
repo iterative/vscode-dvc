@@ -83,6 +83,7 @@ export interface SectionContainerProps<T extends PlotsSection | SetupSection> {
   title: string
   className?: string
   stickyHeaderTop?: number
+  disabled?: boolean
 }
 
 const InfoIcon = () => (
@@ -100,9 +101,10 @@ export const SectionContainer: React.FC<
   title,
   className,
   stickyHeaderTop = 0,
-  headerChildren
+  headerChildren,
+  disabled
 }) => {
-  const open = !sectionCollapsed
+  const open = !disabled && !sectionCollapsed
 
   const tooltipContent = (
     <div className={styles.infoTooltip}>
@@ -126,7 +128,10 @@ export const SectionContainer: React.FC<
       className={cx(styles.sectionContainerWrapper, className)}
       data-testid="section-container"
     >
-      <details open={open} className={styles.sectionContainer}>
+      <details
+        open={open}
+        className={cx(styles.sectionContainer, disabled && styles.disabled)}
+      >
         <summary onClick={toggleSection} style={{ top: stickyHeaderTop }}>
           <div className={styles.summaryTitle}>
             <Icon
@@ -141,6 +146,7 @@ export const SectionContainer: React.FC<
               content={tooltipContent}
               placement="bottom-end"
               interactive
+              disabled={disabled}
             >
               <div
                 className={styles.infoTooltipToggle}

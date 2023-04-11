@@ -410,7 +410,7 @@ describe('App', () => {
   })
 
   describe('Experiments', () => {
-    it('should show a screen saying that dvc is not setup if the project is not initalized', () => {
+    it('should be disabled if the project is not initalized', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
@@ -425,35 +425,12 @@ describe('App', () => {
         shareLiveToStudio: false
       })
 
-      expect(screen.getByText('DVC is not setup')).toBeInTheDocument()
+      const experiments = screen.getAllByTestId('section-container')[1]
+      const details = within(experiments).getByRole('group')
+      expect(details).not.toHaveAttribute('open')
     })
 
-    it('should open the dvc section when clicking the Setup DVC button on the dvc is not setup screen', () => {
-      renderApp({
-        canGitInitialize: false,
-        cliCompatible: true,
-        hasData: false,
-        isPythonExtensionInstalled: false,
-        isStudioConnected: false,
-        needsGitCommit: true,
-        needsGitInitialized: true,
-        projectInitialized: false,
-        pythonBinPath: undefined,
-        sectionCollapsed: undefined,
-        shareLiveToStudio: false
-      })
-
-      const experimentsText = screen.getByText('DVC is not setup')
-      expect(experimentsText).toBeInTheDocument()
-
-      mockPostMessage.mockClear()
-      const button = screen.getByText('Setup DVC')
-      fireEvent.click(button)
-      expect(screen.getByText('DVC is not initialized')).toBeVisible()
-      expect(experimentsText).not.toBeVisible()
-    })
-
-    it('should show a screen saying that dvc is not setup if the project is initalized but dvc is not installed', () => {
+    it('should be disabled if the project is initalized but dvc is not installed', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
@@ -468,7 +445,9 @@ describe('App', () => {
         shareLiveToStudio: false
       })
 
-      expect(screen.getByText('DVC is not setup')).toBeInTheDocument()
+      const experiments = screen.getAllByTestId('section-container')[1]
+      const details = within(experiments).getByRole('group')
+      expect(details).not.toHaveAttribute('open')
     })
 
     it('should not show a screen saying that the project contains no data if dvc is installed, the project is initialized and has data', () => {

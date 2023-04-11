@@ -25,6 +25,15 @@ $gap: 20px;
     z-index: 3;
     gap: $gap;
   }
+
+  &.disabled {
+    opacity: 0.5;
+    user-select: none;
+
+    summary {
+      cursor: default;
+    }
+  }
 }
 
 .insideSection {

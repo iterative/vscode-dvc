@@ -106,13 +106,9 @@ export const App: React.FC = () => {
         title="Experiments"
         sectionCollapsed={sectionCollapsed}
         setSectionCollapsed={setSectionCollapsed}
+        disabled={!projectInitialized || !cliCompatible}
       >
-        <Experiments
-          needsGitCommit={needsGitCommit}
-          isDvcSetup={projectInitialized && !!cliCompatible}
-          hasData={hasData}
-          setSectionCollapsed={setSectionCollapsed}
-        />
+        <Experiments needsGitCommit={needsGitCommit} hasData={hasData} />
       </SetupContainer>
       <SetupContainer
         sectionKey={SetupSection.STUDIO}

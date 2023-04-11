@@ -11,12 +11,14 @@ export const SetupContainer: React.FC<{
   sectionKey: SetupSection
   setSectionCollapsed: (value: typeof DEFAULT_SECTION_COLLAPSED) => void
   title: string
+  disabled?: boolean
 }> = ({
   children,
   sectionCollapsed,
   sectionKey,
   setSectionCollapsed,
-  title
+  title,
+  disabled
 }) => (
   <SectionContainer
     sectionCollapsed={sectionCollapsed[sectionKey]}
@@ -28,6 +30,7 @@ export const SetupContainer: React.FC<{
         [sectionKey]: !sectionCollapsed[sectionKey]
       })
     }
+    disabled={disabled}
   >
     {children}
   </SectionContainer>
