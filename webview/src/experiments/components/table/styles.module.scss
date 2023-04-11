@@ -79,10 +79,6 @@ $bullet-size: calc(var(--design-unit) * 4px);
   background-color: $header-border-color;
 }
 
-.hidden {
-  visibility: hidden;
-}
-
 .iconMenu {
   position: absolute;
   left: 0;
@@ -237,404 +233,389 @@ $bullet-size: calc(var(--design-unit) * 4px);
   height: 100%;
   display: flex;
   flex-flow: column nowrap;
+}
 
-  .experimentGroup {
-    .nestedRow {
-      .experimentCell {
-        .innerCell {
-          padding-left: calc($nested-row-padding + $edge-padding);
+.experimentGroup {
+  .nestedRow {
+    .experimentCell {
+      .innerCell {
+        padding-left: calc($nested-row-padding + $edge-padding);
 
-          .rowActions {
-            left: calc(($cell-padding + $nested-row-padding) * -1);
-          }
+        .rowActions {
+          left: calc(($cell-padding + $nested-row-padding) * -1);
         }
       }
     }
   }
+}
 
-  ul {
-    padding-left: 1rem;
-  }
+ul {
+  padding-left: 1rem;
+}
 
-  table {
-    display: inline-block;
-    border-collapse: collapse;
-  }
+table {
+  display: inline-block;
+  border-collapse: collapse;
+}
 
-  summary {
-    white-space: nowrap;
-    cursor: pointer;
-    h2,
-    h3 {
-      margin: 0.25em;
-      white-space: nowrap;
-      display: inline-block;
-    }
-  }
+tr {
+  position: relative;
+  background-color: $row-bg-color;
+  width: fit-content;
 
-  .depthSpacer {
-    width: 1rem;
-  }
-
-  tr {
-    position: relative;
-    background-color: $row-bg-color;
-    width: fit-content;
-
-    &:hover.rowSelected {
-      &::after {
-        box-shadow: inset 0 0 20px $shadow;
-        content: '';
-        top: 0;
-        right: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 4;
-        position: absolute;
-        pointer-events: none;
-      }
-
-      td:not(.experimentCell):hover::before,
-      td:hover + td::before {
-        background-color: $row-border-selected-color;
-      }
-    }
-
-    &:hover:not(.rowSelected) {
-      td:not(.experimentCell),
-      .experimentCell::before {
-        background-color: $row-hover-background-color;
-      }
-
-      td:not(.experimentCell):hover::before,
-      td:hover + td::before {
-        background-color: $border-color;
-      }
-    }
-
-    > *:first-child {
-      position: sticky;
-      left: 0;
-      z-index: 3;
-
-      &::after {
-        content: '';
-        height: 100%;
-        position: absolute;
-        top: 0;
-        width: 6px;
-        right: 0;
-        transition: box-shadow 0.25s;
-      }
-
-      &.headerCell {
-        &::after {
-          bottom: auto;
-          left: auto;
-          background-color: transparent;
-        }
-
-        &::before {
-          @extend %headerCellBorderBottom;
-        }
-      }
-    }
-
-    &.rowSelected {
-      border-color: $row-border-selected-color;
-
-      td {
-        color: $row-fg-selected-color;
-        border-bottom-color: $row-border-selected-color;
-        background-color: $row-bg-selected-color;
-      }
-
-      .experimentCell {
-        background-color: $row-bg-color;
-
-        &::before {
-          background-color: $row-bg-selected-color;
-        }
-      }
-
-      .expandedRowArrow,
-      .contractedRowArrow {
-        border-color: $selected-icon-color;
-      }
-    }
-  }
-
-  table.withExpColumnShadow tr > *:first-child {
+  &:hover.rowSelected {
     &::after {
-      box-shadow: 3px 0px 3px $shadow;
-    }
-
-    > div::after {
-      display: none;
-    }
-  }
-
-  .bodyRow {
-    border-bottom: $row-border;
-
-    &:not(.rowSelected) {
-      & > *:first-child {
-        background-color: $row-bg-color;
-      }
-    }
-  }
-
-  .headRow {
-    font-size: 0.7rem;
-
-    .headerCellWrapper {
-      @extend %truncateLeftParent;
-      direction: rtl;
-      opacity: 0.6;
-      // to prevent extra dragLeave and dragEnter fired
-      // should be on parent div, not span to work on text-overflow: ellipsis
+      box-shadow: inset 0 0 20px $shadow;
+      content: '';
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 4;
+      position: absolute;
       pointer-events: none;
     }
-    .cellContents {
-      @extend %truncateLeftChild;
-      display: block;
 
-      span[draggable='true'] {
-        display: block;
-        cursor: grab;
-      }
-    }
-
-    & > *:first-child {
-      background-color: $header-bg-color;
-    }
-
-    &:last-child,
-    .firstLevelHeader {
-      .paramHeaderCell,
-      &.paramHeaderCell {
-        color: $params-color;
-      }
-
-      .metricHeaderCell,
-      &.metricHeaderCell {
-        color: $metrics-color;
-      }
-
-      .depHeaderCell,
-      &.depHeaderCell {
-        color: $deps-color;
-      }
-    }
-
-    &:last-child {
-      font-size: 0.7rem;
-
-      .headerCell {
-        text-align: right;
-      }
-
-      .headerCellWrapper {
-        opacity: 1;
-      }
-
-      .experimentHeader {
-        @extend %headerCellPadding;
-        padding-left: $cell-padding;
-        text-align: left;
-        direction: ltr;
-        overflow-x: hidden;
-        text-overflow: ellipsis;
-      }
+    td:not(.experimentCell):hover::before,
+    td:hover + td::before {
+      background-color: $row-border-selected-color;
     }
   }
 
-  .workspaceRowGroup {
-    border: none;
+  &:hover:not(.rowSelected) {
+    td:not(.experimentCell),
+    .experimentCell::before {
+      background-color: $row-hover-background-color;
+    }
+
+    td:not(.experimentCell):hover::before,
+    td:hover + td::before {
+      background-color: $border-color;
+    }
+  }
+
+  > *:first-child {
     position: sticky;
-    top: var(--table-head-height);
-    z-index: 4;
-    background-color: $row-bg-color;
-
-    &.withShadow {
-      box-shadow: 0 5px 8px -2px $shadow;
-
-      tr {
-        border-bottom: none;
-      }
-    }
-
-    .innerCell {
-      padding: 5px 10px;
-
-      .rowActions {
-        visibility: hidden;
-      }
-    }
-
-    .innerCell,
-    .timestampInnerCell {
-      height: 100%;
-      width: 100%;
-      background-color: transparent;
-    }
-
-    .timestampInnerCell {
-      height: 42px;
-    }
-  }
-
-  .workspaceChange,
-  .depChange {
-    color: $changed-color;
-  }
-
-  td,
-  th {
-    white-space: nowrap;
-    min-width: 0;
-    position: relative;
-  }
-
-  th {
-    height: auto;
-    background-color: $header-bg-color;
-
-    .dropTarget {
-      position: absolute;
-      right: -3px;
-      bottom: 0;
-      width: 3px;
-      z-index: -1;
-      height: var(--table-head-height);
-      background-color: $header-resizer-color;
-      z-index: 1;
-      display: none;
-
-      &.active {
-        display: block;
-      }
-    }
-  }
-
-  td {
-    height: auto;
-    font-size: 0.8rem;
-    line-height: 2rem;
-    align-items: center;
-
-    &:not(.experimentCell)::before {
-      @extend %cellBorderLeft;
-    }
-
-    &:first-child {
-      .innerCell {
-        padding-left: $edge-padding;
-      }
-    }
-
-    &:last-child {
-      .innerCell {
-        padding-right: $edge-padding;
-      }
-    }
-  }
-
-  .experimentCell {
-    .innerCell {
-      display: flex;
-      flex-flow: row nowrap;
-      justify-content: flex-start;
-
-      .bullet {
-        cursor: pointer;
-      }
-
-      .rowActions {
-        display: inline-flex;
-        align-items: center;
-        position: relative;
-
-        left: -$cell-padding;
-        height: 100%;
-
-        &:first-child {
-          margin-right: 20px;
-        }
-
-        .indicatorIcon {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: 1.3rem;
-          height: 2rem;
-          padding: 0;
-          margin: 0;
-        }
-
-        .indicatorCount {
-          z-index: 2;
-          &[title='0'] {
-            display: none;
-          }
-        }
-      }
-    }
-  }
-
-  .placeholderHeaderCell {
-    background-color: $header-bg-color;
-    .cellContents {
-      padding: 0.31rem $cell-padding;
-    }
-
-    &::before {
-      @extend %cellBorderLeft;
-      background-color: $header-border-color;
-    }
-
-    &:first-child::before {
-      display: none;
-    }
-  }
-
-  .headerCell {
-    @extend .placeholderHeaderCell;
-    color: $header-fg-color;
-    text-align: center;
-    font-weight: 400;
+    left: 0;
+    z-index: 3;
 
     &::after {
       content: '';
+      height: 100%;
       position: absolute;
-      bottom: 0;
-      left: 1px;
-      width: 100%;
-      height: 1px;
-      background-color: $header-border-color;
+      top: 0;
+      width: 6px;
+      right: 0;
+      transition: box-shadow 0.25s;
     }
 
-    &.leafHeader::after {
-      display: none;
-    }
-
-    &.headerCellDropTarget {
-      background: $header-dnd-drop-background;
-      outline-width: 2px;
-      outline-style: dashed;
-      outline-color: $header-dnd-outline;
-      outline-offset: -4px;
-
-      .iconMenu ul[role='menu'] {
+    &.headerCell {
+      &::after {
+        bottom: auto;
+        left: auto;
         background-color: transparent;
+      }
+
+      &::before {
+        @extend %headerCellBorderBottom;
       }
     }
   }
 
-  .oneRowHeaderCell {
-    vertical-align: bottom;
-    height: 50px;
+  &.rowSelected {
+    border-color: $row-border-selected-color;
+
+    td {
+      color: $row-fg-selected-color;
+      border-bottom-color: $row-border-selected-color;
+      background-color: $row-bg-selected-color;
+    }
+
+    .experimentCell {
+      background-color: $row-bg-color;
+
+      &::before {
+        background-color: $row-bg-selected-color;
+      }
+    }
+
+    .expandedRowArrow,
+    .contractedRowArrow {
+      border-color: $selected-icon-color;
+    }
   }
+}
+
+table.withExpColumnShadow tr > *:first-child {
+  &::after {
+    box-shadow: 3px 0px 3px $shadow;
+  }
+
+  > div::after {
+    display: none;
+  }
+}
+
+.bodyRow {
+  border-bottom: $row-border;
+
+  &:not(.rowSelected) {
+    & > *:first-child {
+      background-color: $row-bg-color;
+    }
+  }
+}
+
+.headRow {
+  font-size: 0.7rem;
+
+  .headerCellWrapper {
+    @extend %truncateLeftParent;
+    direction: rtl;
+    opacity: 0.6;
+    // to prevent extra dragLeave and dragEnter fired
+    // should be on parent div, not span to work on text-overflow: ellipsis
+    pointer-events: none;
+  }
+  .cellContents {
+    @extend %truncateLeftChild;
+    display: block;
+
+    span[draggable='true'] {
+      display: block;
+      cursor: grab;
+    }
+  }
+
+  & > *:first-child {
+    background-color: $header-bg-color;
+  }
+
+  &:last-child,
+  .firstLevelHeader {
+    .paramHeaderCell,
+    &.paramHeaderCell {
+      color: $params-color;
+    }
+
+    .metricHeaderCell,
+    &.metricHeaderCell {
+      color: $metrics-color;
+    }
+
+    .depHeaderCell,
+    &.depHeaderCell {
+      color: $deps-color;
+    }
+  }
+
+  &:last-child {
+    font-size: 0.7rem;
+
+    .headerCell {
+      text-align: right;
+    }
+
+    .headerCellWrapper {
+      opacity: 1;
+    }
+
+    .experimentHeader {
+      @extend %headerCellPadding;
+      padding-left: $cell-padding;
+      text-align: left;
+      direction: ltr;
+      overflow-x: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+.workspaceRowGroup {
+  border: none;
+  position: sticky;
+  top: var(--table-head-height);
+  z-index: 4;
+  background-color: $row-bg-color;
+
+  &.withShadow {
+    box-shadow: 0 5px 8px -2px $shadow;
+
+    tr {
+      border-bottom: none;
+    }
+  }
+
+  .innerCell {
+    padding: 5px 10px;
+
+    .rowActions {
+      visibility: hidden;
+    }
+  }
+
+  .innerCell,
+  .timestampInnerCell {
+    height: 100%;
+    width: 100%;
+    background-color: transparent;
+  }
+
+  .timestampInnerCell {
+    height: 42px;
+  }
+}
+
+.workspaceChange,
+.depChange {
+  color: $changed-color;
+}
+
+td,
+th {
+  white-space: nowrap;
+  min-width: 0;
+  position: relative;
+}
+
+th {
+  height: auto;
+  background-color: $header-bg-color;
+
+  .dropTarget {
+    position: absolute;
+    right: -3px;
+    bottom: 0;
+    width: 3px;
+    z-index: -1;
+    height: var(--table-head-height);
+    background-color: $header-resizer-color;
+    z-index: 1;
+    display: none;
+
+    &.active {
+      display: block;
+    }
+  }
+}
+
+td {
+  height: auto;
+  font-size: 0.8rem;
+  line-height: 2rem;
+  align-items: center;
+
+  &:not(.experimentCell)::before {
+    @extend %cellBorderLeft;
+  }
+
+  &:first-child {
+    .innerCell {
+      padding-left: $edge-padding;
+    }
+  }
+
+  &:last-child {
+    .innerCell {
+      padding-right: $edge-padding;
+    }
+  }
+}
+
+.experimentCell {
+  .innerCell {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+
+    .bullet {
+      cursor: pointer;
+    }
+
+    .rowActions {
+      display: inline-flex;
+      align-items: center;
+      position: relative;
+
+      left: -$cell-padding;
+      height: 100%;
+
+      &:first-child {
+        margin-right: 20px;
+      }
+
+      .indicatorIcon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.3rem;
+        height: 2rem;
+        padding: 0;
+        margin: 0;
+      }
+
+      .indicatorCount {
+        z-index: 2;
+        &[title='0'] {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
+.placeholderHeaderCell {
+  background-color: $header-bg-color;
+  .cellContents {
+    padding: 0.31rem $cell-padding;
+  }
+
+  &::before {
+    @extend %cellBorderLeft;
+    background-color: $header-border-color;
+  }
+
+  &:first-child::before {
+    display: none;
+  }
+}
+
+.headerCell {
+  @extend .placeholderHeaderCell;
+  color: $header-fg-color;
+  text-align: center;
+  font-weight: 400;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 1px;
+    width: 100%;
+    height: 1px;
+    background-color: $header-border-color;
+  }
+
+  &.leafHeader::after {
+    display: none;
+  }
+
+  &.headerCellDropTarget {
+    background: $header-dnd-drop-background;
+    outline-width: 2px;
+    outline-style: dashed;
+    outline-color: $header-dnd-outline;
+    outline-offset: -4px;
+
+    .iconMenu ul[role='menu'] {
+      background-color: transparent;
+    }
+  }
+}
+
+.oneRowHeaderCell {
+  vertical-align: bottom;
+  height: 50px;
 }
 
 .previousCommitsRow {
@@ -700,30 +681,6 @@ $bullet-size: calc(var(--design-unit) * 4px);
 
 .starSwitch .cellHintTooltip {
   font-size: 0.65rem;
-}
-
-.webviewHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-%arrow {
-  background: none;
-  border: none;
-  color: $header-fg-color;
-  position: absolute;
-  top: 5px;
-}
-
-.arrowLeft {
-  @extend %arrow;
-  left: -2px;
-}
-
-.arrowRight {
-  @extend %arrow;
-  right: -2px;
 }
 
 .staticColumn {
