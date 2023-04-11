@@ -1,11 +1,7 @@
 import { join } from 'path'
 import { collectFiles } from './collect'
-import {
-  ExperimentsOutput,
-  ExperimentStatus,
-  EXPERIMENT_WORKSPACE_ID
-} from '../../cli/dvc/contract'
-import expShowFixture from '../../test/fixtures/expShow/base/output'
+import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
+import expShowFixture from '../../test/fixtures/expShow/base/output_'
 
 describe('collectFiles', () => {
   it('should collect all of the available files from the test fixture', () => {
@@ -17,70 +13,81 @@ describe('collectFiles', () => {
   })
 
   it('should handle an error being returned', () => {
-    const workspace = {
-      [EXPERIMENT_WORKSPACE_ID]: {
-        baseline: {
-          error: { msg: 'bad things are happening', type: 'today' }
-        }
+    const workspaceOnly = [
+      {
+        error: { msg: 'bad things are happening', type: 'today' },
+        rev: EXPERIMENT_WORKSPACE_ID
       }
-    }
+    ]
 
-    expect(collectFiles(workspace, [])).toStrictEqual([])
+    expect(collectFiles(workspaceOnly, [])).toStrictEqual([])
   })
 
   it('should handle a missing params key', () => {
-    const workspace = {
-      [EXPERIMENT_WORKSPACE_ID]: {
-        baseline: {
-          data: {
-            metrics: {
-              'logs.json': {}
-            }
-          }
-        }
+    const workspaceOnly = [
+      {
+        data: {
+          deps: null,
+          meta: { has_checkpoints: false },
+          metrics: {
+            'logs.json': { data: {} }
+          },
+          outs: null,
+          params: null,
+          rev: EXPERIMENT_WORKSPACE_ID,
+          timestamp: null
+        },
+        rev: EXPERIMENT_WORKSPACE_ID
       }
-    }
+    ]
 
-    expect(collectFiles(workspace, [])).toStrictEqual(['logs.json'])
+    expect(collectFiles(workspaceOnly, [])).toStrictEqual(['logs.json'])
   })
 
   it('should handle a missing metrics key', () => {
-    const workspace = {
-      [EXPERIMENT_WORKSPACE_ID]: {
-        baseline: {
-          data: {
-            params: {
-              'params.yaml': {}
-            }
-          }
-        }
+    const workspaceOnly = [
+      {
+        data: {
+          deps: null,
+          meta: { has_checkpoints: false },
+          metrics: null,
+          outs: null,
+          params: { 'params.yaml': { data: {} } },
+          rev: EXPERIMENT_WORKSPACE_ID,
+          timestamp: null
+        },
+        rev: EXPERIMENT_WORKSPACE_ID
       }
-    }
+    ]
 
-    expect(collectFiles(workspace, [])).toStrictEqual(['params.yaml'])
+    expect(collectFiles(workspaceOnly, [])).toStrictEqual(['params.yaml'])
   })
 
   it('should collect all of the available files from a more complex example', () => {
-    const workspace = {
-      [EXPERIMENT_WORKSPACE_ID]: {
-        baseline: {
-          data: {
-            metrics: {
-              'logs.json': {},
-              'metrics.json': {},
-              'summary.json': {}
-            },
-            params: {
-              'further/nested/params.yaml': {},
-              'nested/params.yaml': {},
-              'params.yaml': {}
-            }
-          }
-        }
+    const workspaceOnly = [
+      {
+        data: {
+          deps: null,
+          meta: { has_checkpoints: false },
+          metrics: {
+            'logs.json': { data: {} },
+            'metrics.json': { data: {} },
+            'summary.json': { data: {} }
+          },
+          outs: null,
+          params: {
+            'further/nested/params.yaml': { data: {} },
+            'nested/params.yaml': { data: {} },
+            'params.yaml': { data: {} }
+          },
+          rev: EXPERIMENT_WORKSPACE_ID,
+          timestamp: null
+        },
+        rev: EXPERIMENT_WORKSPACE_ID
       }
-    } as ExperimentsOutput
+    ]
 
-    const files = collectFiles(workspace, [])
+    const files = collectFiles(workspaceOnly, [])
     files.sort()
 
     expect(files).toStrictEqual([
@@ -94,27 +101,28 @@ describe('collectFiles', () => {
   })
 
   it('should not remove a previously collected file if it is deleted (removal breaks live updates logged by dvclive)', () => {
-    const workspace = {
-      [EXPERIMENT_WORKSPACE_ID]: {
-        baseline: {
-          data: {
-            executor: EXPERIMENT_WORKSPACE_ID,
-            metrics: {},
-            params: {
-              'params.yaml': {
-                data: {
-                  epochs: 100
-                }
+    const workspaceOnly = [
+      {
+        data: {
+          deps: null,
+          meta: { has_checkpoints: false },
+          metrics: null,
+          outs: null,
+          params: {
+            'params.yaml': {
+              data: {
+                epochs: 100
               }
-            },
-            status: ExperimentStatus.RUNNING,
-            timestamp: null
-          }
-        }
+            }
+          },
+          rev: EXPERIMENT_WORKSPACE_ID,
+          timestamp: null
+        },
+        rev: EXPERIMENT_WORKSPACE_ID
       }
-    } as ExperimentsOutput
+    ]
 
-    expect(collectFiles(workspace, ['dvclive.json'])).toStrictEqual([
+    expect(collectFiles(workspaceOnly, ['dvclive.json'])).toStrictEqual([
       'params.yaml',
       'dvclive.json'
     ])

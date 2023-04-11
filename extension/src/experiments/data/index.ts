@@ -9,7 +9,7 @@ import {
 import { getRelativePattern } from '../../fileSystem/relativePattern'
 import { createFileSystemWatcher } from '../../fileSystem/watcher'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import { ExperimentsOutput } from '../../cli/dvc/contract'
+import { ExpShowOutput } from '../../cli/dvc/contract'
 import { BaseData } from '../../data'
 import { DOT_DVC, ExperimentFlag } from '../../cli/dvc/constants'
 import { gitPath } from '../../cli/git/constants'
@@ -18,7 +18,7 @@ import { ExperimentsModel } from '../model'
 
 export const QUEUED_EXPERIMENT_PATH = join(DOT_DVC, 'tmp', 'exps')
 
-export class ExperimentsData extends BaseData<ExperimentsOutput> {
+export class ExperimentsData extends BaseData<ExpShowOutput> {
   private readonly experiments: ExperimentsModel
 
   constructor(
@@ -43,8 +43,8 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
 
     this.experiments = experiments
 
-    void this.watchExpGitRefs()
-    void this.managedUpdate(QUEUED_EXPERIMENT_PATH)
+    void this.watchExpGitRefs() // drop all refs that aren't HEAD
+    void this.managedUpdate(QUEUED_EXPERIMENT_PATH) // can also drop full vs partial updates (https://github.com/iterative/dvc/pull/9170#issuecomment-1467937058)
   }
 
   public managedUpdate(path?: string) {
@@ -65,8 +65,8 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
           ExperimentFlag.NUM_COMMIT,
           this.experiments.getNbOfCommitsToShow().toString()
         ]
-    const data = await this.internalCommands.executeCommand<ExperimentsOutput>(
-      AvailableCommands.EXP_SHOW,
+    const data = await this.internalCommands.executeCommand<ExpShowOutput>(
+      AvailableCommands.EXP_SHOW_,
       this.dvcRoot,
       ...flags,
       ...args
@@ -77,7 +77,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     return this.notifyChanged(data)
   }
 
-  protected collectFiles(data: ExperimentsOutput) {
+  protected collectFiles(data: ExpShowOutput) {
     this.collectedFiles = collectFiles(data, this.collectedFiles)
   }
 

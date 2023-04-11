@@ -4,13 +4,13 @@ import { getRelativePattern } from '../fileSystem/relativePattern'
 import { createFileSystemWatcher } from '../fileSystem/watcher'
 import { ProcessManager } from '../process/manager'
 import { InternalCommands } from '../commands/internal'
-import { ExperimentsOutput, PlotsOutputOrError } from '../cli/dvc/contract'
+import { ExpShowOutput, PlotsOutputOrError } from '../cli/dvc/contract'
 import { uniqueValues } from '../util/array'
 import { DeferredDisposable } from '../class/deferred'
 import { isSameOrChild } from '../fileSystem'
 
 export abstract class BaseData<
-  T extends { data: PlotsOutputOrError; revs: string[] } | ExperimentsOutput
+  T extends { data: PlotsOutputOrError; revs: string[] } | ExpShowOutput
 > extends DeferredDisposable {
   public readonly onDidUpdate: Event<T>
 

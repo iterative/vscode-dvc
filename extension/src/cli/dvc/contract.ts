@@ -100,7 +100,7 @@ export interface ExperimentsOutput {
 type ValueTreeOrError_ = { data: ValueTree } | DvcError
 type MetricsOrParams = RelPathObject<ValueTreeOrError_>
 
-type ExpStateData = {
+export type ExpStateData = {
   rev: string
   timestamp: string | null
   params: MetricsOrParams | null

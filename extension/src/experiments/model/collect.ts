@@ -335,7 +335,7 @@ export const collectExperiments = (
   return acc
 }
 
-const hasError = (expState: ExpState): expState is ExpWithError =>
+export const hasError = (expState: ExpState): expState is ExpWithError =>
   !!(expState as { error?: unknown }).error
 
 const transformExpState = (experiment: Experiment, expState: ExpState) => {

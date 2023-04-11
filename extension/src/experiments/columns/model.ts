@@ -1,8 +1,15 @@
 import { EventEmitter, Memento } from 'vscode'
-import { collectChanges, collectColumns, collectParamsFiles } from './collect'
+import {
+  collectChanges,
+  collectChanges_,
+  collectColumns,
+  collectColumns_,
+  collectParamsFiles,
+  collectParamsFiles_
+} from './collect'
 import { EXPERIMENT_COLUMN_ID, timestampColumn } from './constants'
 import { Column, ColumnType } from '../webview/contract'
-import { ExperimentsOutput } from '../../cli/dvc/contract'
+import { ExpShowOutput, ExperimentsOutput } from '../../cli/dvc/contract'
 import { PersistenceKey } from '../../persistence/constants'
 import { PathSelectionModel, Status } from '../../path/selection/model'
 
@@ -56,6 +63,13 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     return Promise.all([
       this.transformAndSetColumns(data),
       this.transformAndSetChanges(data)
+    ])
+  }
+
+  public transformAndSet_(data: ExpShowOutput) {
+    return Promise.all([
+      this.transformAndSetColumns_(data),
+      this.transformAndSetChanges_(data)
     ])
   }
 
@@ -170,7 +184,28 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     this.paramsFiles = paramsFiles
   }
 
+  private async transformAndSetColumns_(data: ExpShowOutput) {
+    const [columns, paramsFiles] = await Promise.all([
+      collectColumns_(data),
+      collectParamsFiles_(this.dvcRoot, data)
+    ])
+
+    this.setNewStatuses(columns)
+
+    this.data = columns
+
+    if (this.columnOrderState.length === 0) {
+      this.setColumnOrder(this.getColumnOrderFromData())
+    }
+
+    this.paramsFiles = paramsFiles
+  }
+
   private transformAndSetChanges(data: ExperimentsOutput) {
     this.columnsChanges = collectChanges(data)
+  }
+
+  private transformAndSetChanges_(data: ExpShowOutput) {
+    this.columnsChanges = collectChanges_(data)
   }
 }

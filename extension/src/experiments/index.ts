@@ -37,7 +37,11 @@ import { DecorationProvider } from './model/decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
 import { ResourceLocator } from '../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { ExperimentsOutput, EXPERIMENT_WORKSPACE_ID } from '../cli/dvc/contract'
+import {
+  ExperimentsOutput,
+  EXPERIMENT_WORKSPACE_ID,
+  ExpShowOutput
+} from '../cli/dvc/contract'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { FileSystemData } from '../fileSystem/data'
@@ -64,7 +68,7 @@ export type ModifiedExperimentAndRunCommandId =
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeIsParamsFileFocused: Event<string | undefined>
-  public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
+  public readonly onDidChangeExperiments: Event<void>
   public readonly onDidChangeColumns: Event<void>
   public readonly onDidChangeColumnOrderOrStatus: Event<void>
   public readonly onDidChangeCheckpoints: Event<void>
@@ -83,7 +87,7 @@ export class Experiments extends BaseRepository<TableData> {
   )
 
   private readonly experimentsChanged = this.dispose.track(
-    new EventEmitter<ExperimentsOutput | void>()
+    new EventEmitter<void>()
   )
 
   private readonly checkpointsChanged = this.dispose.track(
@@ -161,7 +165,7 @@ export class Experiments extends BaseRepository<TableData> {
       fileSystemData || new FileSystemData(dvcRoot)
     )
 
-    this.dispose.track(this.cliData.onDidUpdate(data => this.setState(data)))
+    this.dispose.track(this.cliData.onDidUpdate(data => this.setState_(data)))
     this.dispose.track(
       this.fileSystemData.onDidUpdate(data => {
         const hadCheckpoints = this.hasCheckpoints()
@@ -203,7 +207,23 @@ export class Experiments extends BaseRepository<TableData> {
       this.experiments.transformAndSet(data, dvcLiveOnly, commitsOutput)
     ])
 
-    return this.notifyChanged(data)
+    return this.notifyChanged()
+  }
+
+  public async setState_(data: ExpShowOutput) {
+    const dvcLiveOnly = await this.checkSignalFile()
+    const [lastCommit] = data.slice(-1)
+    const commitsOutput = await this.internalCommands.executeCommand(
+      AvailableCommands.GIT_GET_COMMIT_MESSAGES,
+      this.dvcRoot,
+      lastCommit.rev
+    )
+    await Promise.all([
+      this.columns.transformAndSet_(data),
+      this.experiments.transformAndSet_(data, dvcLiveOnly, commitsOutput)
+    ])
+
+    return this.notifyChanged()
   }
 
   public hasCheckpoints() {
@@ -543,13 +563,13 @@ export class Experiments extends BaseRepository<TableData> {
     )
   }
 
-  private notifyChanged(data?: ExperimentsOutput) {
+  private notifyChanged() {
     this.decorationProvider.setState(
       this.experiments.getLabels(),
       this.experiments.getLabelsToDecorate(),
       this.experiments.getErrors()
     )
-    this.experimentsChanged.fire(data)
+    this.experimentsChanged.fire()
     this.notifyColumnsChanged()
   }
 

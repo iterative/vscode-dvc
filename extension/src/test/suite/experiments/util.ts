@@ -5,6 +5,7 @@ import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
 import expShowFixture from '../../fixtures/expShow/base/output'
+import expShowFixture_ from '../../fixtures/expShow/base/output_'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import {
   buildDependencies,
@@ -183,12 +184,12 @@ const buildExperimentsDataDependencies = (disposer: Disposer) => {
   ).returns(undefined)
 
   const { dvcReader, internalCommands } = buildInternalCommands(disposer)
-  const mockExperimentShow = stub(dvcReader, 'expShow').resolves(expShowFixture)
-  return { internalCommands, mockCreateFileSystemWatcher, mockExperimentShow }
+  const mockExpShow = stub(dvcReader, 'expShow_').resolves(expShowFixture_)
+  return { internalCommands, mockCreateFileSystemWatcher, mockExpShow }
 }
 
 export const buildExperimentsData = (disposer: SafeWatcherDisposer) => {
-  const { internalCommands, mockExperimentShow, mockCreateFileSystemWatcher } =
+  const { internalCommands, mockExpShow, mockCreateFileSystemWatcher } =
     buildExperimentsDataDependencies(disposer)
 
   const data = disposer.track(
@@ -203,7 +204,7 @@ export const buildExperimentsData = (disposer: SafeWatcherDisposer) => {
     )
   )
 
-  return { data, mockCreateFileSystemWatcher, mockExperimentShow }
+  return { data, mockCreateFileSystemWatcher, mockExpShow }
 }
 
 export const stubWorkspaceExperimentsGetters = (

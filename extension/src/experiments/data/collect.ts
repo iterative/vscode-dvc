@@ -1,14 +1,19 @@
-import { ExperimentsOutput } from '../../cli/dvc/contract'
+import { ExpShowOutput } from '../../cli/dvc/contract'
 import { uniqueValues } from '../../util/array'
+import { getData_ } from '../columns/collect'
 
 export const collectFiles = (
-  data: ExperimentsOutput,
+  output: ExpShowOutput,
   existingFiles: string[]
 ): string[] => {
+  const [workspace] = output
+
+  const data = getData_(workspace)
+
   return uniqueValues([
     ...Object.keys({
-      ...data?.workspace.baseline?.data?.params,
-      ...data?.workspace.baseline?.data?.metrics
+      ...data?.params,
+      ...data?.metrics
     }).filter(Boolean),
     ...existingFiles
   ])

@@ -8,6 +8,10 @@ import {
 } from './metricsAndParams'
 import { Column } from '../../webview/contract'
 import {
+  ExpRange,
+  ExpShowOutput,
+  ExpState,
+  ExpStateData,
   ExperimentFields,
   ExperimentFieldsOrError,
   ExperimentsCommitOutput,
@@ -16,7 +20,7 @@ import {
 import { standardizePath } from '../../../fileSystem/path'
 import { timestampColumn } from '../constants'
 import { sortCollectedArray } from '../../../util/array'
-import { isCheckpoint } from '../../model/collect'
+import { hasError, isCheckpoint } from '../../model/collect'
 
 const collectFromExperiment = (
   acc: ColumnAccumulator,
@@ -59,6 +63,38 @@ export const collectColumns = (data: ExperimentsOutput): Column[] => {
   return hasNoData ? [] : columns
 }
 
+const collectFromExperiments = (
+  acc: ColumnAccumulator,
+  experiments?: ExpRange[] | null
+) => {
+  if (!experiments) {
+    return
+  }
+  for (const { revs } of experiments) {
+    collectFromExperiment(acc, revs[0])
+  }
+}
+
+export const collectColumns_ = (output: ExpShowOutput): Column[] => {
+  const acc: ColumnAccumulator = {}
+
+  acc.timestamp = timestampColumn
+
+  for (const expState of output) {
+    if (hasError(expState)) {
+      continue
+    }
+
+    collectFromExperiment(acc, expState)
+    collectFromExperiments(acc, expState.experiments)
+  }
+
+  const columns = Object.values(acc)
+  const hasNoData = isEqual(columns, [timestampColumn])
+
+  return hasNoData ? [] : columns
+}
+
 const getData = (value?: {
   baseline?: ExperimentFieldsOrError
 }): ExperimentFields | undefined => value?.baseline?.data
@@ -80,11 +116,49 @@ export const collectChanges = (data: ExperimentsOutput): string[] => {
   return sortCollectedArray(changes)
 }
 
+export const getData_ = (expState: ExpState): ExpStateData | undefined => {
+  if (hasError(expState)) {
+    return
+  }
+  return expState?.data
+}
+
+export const collectChanges_ = (output: ExpShowOutput): string[] => {
+  const changes: string[] = []
+
+  const [workspaceData, currentCommitData] = output
+  const workspace = getData_(workspaceData)
+  const currentCommit = getData_(currentCommitData)
+
+  if (!(workspace && currentCommit)) {
+    return changes
+  }
+
+  collectMetricAndParamChanges(changes, workspace, currentCommit)
+  collectDepChanges(changes, workspace, currentCommit)
+
+  return sortCollectedArray(changes)
+}
+
 export const collectParamsFiles = (
   dvcRoot: string,
   data: ExperimentsOutput
 ): Set<string> => {
   const files = Object.keys(data.workspace.baseline.data?.params || {})
+    .filter(Boolean)
+    .map(file => standardizePath(join(dvcRoot, file)))
+  return new Set(files)
+}
+
+export const collectParamsFiles_ = (
+  dvcRoot: string,
+  output: ExpShowOutput
+): Set<string> => {
+  const [workspace] = output
+  if (hasError(workspace)) {
+    return new Set()
+  }
+  const files = Object.keys(workspace.data.params || {})
     .filter(Boolean)
     .map(file => standardizePath(join(dvcRoot, file)))
   return new Set(files)
