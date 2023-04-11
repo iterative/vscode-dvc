@@ -51,7 +51,8 @@ export class WebviewMessages {
 
   private readonly addStage: () => Promise<boolean>
   private readonly selectBranches: (
-    branches?: string[]
+    branches?: string[],
+    branchesToRemove?: string[]
   ) => Promise<string[] | undefined>
 
   private readonly getNumCommits: () => Promise<number>
@@ -71,7 +72,10 @@ export class WebviewMessages {
     ) => Promise<string | undefined>,
     hasStages: () => Promise<string>,
     addStage: () => Promise<boolean>,
-    selectBranches: (branches?: string[]) => Promise<string[] | undefined>,
+    selectBranches: (
+      branches?: string[],
+      branchesToRemove?: string[]
+    ) => Promise<string[] | undefined>,
     getNumCommits: () => Promise<number>,
     update: () => Promise<void>
   ) {
@@ -245,7 +249,10 @@ export class WebviewMessages {
   }
 
   private async addBranches() {
-    const selectedBranches = await this.selectBranches()
+    const selectedBranches = await this.selectBranches(
+      undefined,
+      this.experiments.getBranchesToShow()
+    )
     if (!selectedBranches) {
       return
     }

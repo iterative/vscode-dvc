@@ -356,7 +356,8 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
         resourceLocator,
         this.workspaceState,
         () => this.checkOrAddPipeline(dvcRoot),
-        (branches?: string[]) => this.selectBranches(branches)
+        (branches?: string[], branchesToRemove?: string[]) =>
+          this.selectBranches(branches, branchesToRemove)
       )
     )
 
@@ -431,7 +432,10 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
   }
 
-  public async selectBranches(branches?: string[]) {
+  public async selectBranches(
+    branches?: string[],
+    branchesToRemove?: string[]
+  ) {
     const cwd = await this.getDvcRoot()
     if (!cwd) {
       return
@@ -443,7 +447,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
         cwd
       ))
     const branchesToSelect = allBranches.filter(
-      branch => branch.indexOf('*') !== 0
+      branch => branch.indexOf('*') !== 0 && !branchesToRemove?.includes(branch)
     )
     return await quickPickManyValues(
       branchesToSelect.map(branch => ({ label: branch, value: branch })),

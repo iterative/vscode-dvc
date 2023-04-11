@@ -103,7 +103,8 @@ export class Experiments extends BaseRepository<TableData> {
 
   private readonly addStage: () => Promise<boolean>
   private readonly selectBranches: (
-    branches?: string[]
+    branches?: string[],
+    branchesToRemove?: string[]
   ) => Promise<string[] | undefined>
 
   constructor(
@@ -113,7 +114,10 @@ export class Experiments extends BaseRepository<TableData> {
     resourceLocator: ResourceLocator,
     workspaceState: Memento,
     addStage: () => Promise<boolean>,
-    selectBranches: (branches?: string[]) => Promise<string[] | undefined>,
+    selectBranches: (
+      branches?: string[],
+      branchesToRemove?: string[]
+    ) => Promise<string[] | undefined>,
     cliData?: ExperimentsData,
     fileSystemData?: FileSystemData
   ) {
@@ -573,7 +577,8 @@ export class Experiments extends BaseRepository<TableData> {
           this.dvcRoot
         ),
       () => this.addStage(),
-      (branches?: string[]) => this.selectBranches(branches),
+      (branches?: string[], branchesToRemove?: string[]) =>
+        this.selectBranches(branches, branchesToRemove),
       () =>
         this.internalCommands.executeCommand<number>(
           AvailableCommands.GIT_GET_NUM_COMMITS,
