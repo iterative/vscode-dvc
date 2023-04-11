@@ -95,7 +95,6 @@ export const App: React.FC = () => {
           cliCompatible={cliCompatible}
           isPythonExtensionInstalled={isPythonExtensionInstalled}
           needsGitInitialized={needsGitInitialized}
-          needsGitCommit={needsGitCommit}
           projectInitialized={projectInitialized}
           pythonBinPath={pythonBinPath}
           isExperimentsAvailable={hasData}
@@ -109,7 +108,8 @@ export const App: React.FC = () => {
         setSectionCollapsed={setSectionCollapsed}
       >
         <Experiments
-          isDvcSetup={projectInitialized && !!cliCompatible && !needsGitCommit}
+          needsGitCommit={needsGitCommit}
+          isDvcSetup={projectInitialized && !!cliCompatible}
           hasData={hasData}
           setSectionCollapsed={setSectionCollapsed}
         />

@@ -22,6 +22,7 @@ const renderApp = ({
   isPythonExtensionInstalled,
   isStudioConnected,
   needsGitInitialized,
+  needsGitCommit,
   projectInitialized,
   pythonBinPath,
   sectionCollapsed,
@@ -38,6 +39,7 @@ const renderApp = ({
           hasData,
           isPythonExtensionInstalled,
           isStudioConnected,
+          needsGitCommit,
           needsGitInitialized,
           projectInitialized,
           pythonBinPath,
@@ -487,6 +489,24 @@ describe('App', () => {
       expect(
         screen.queryByText('Your project contains no data')
       ).not.toBeInTheDocument()
+    })
+
+    it('should show a screen saying there needs to be a git commit if the project is initialized, dvc is installed, but has not git commit', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        hasData: false,
+        isPythonExtensionInstalled: false,
+        isStudioConnected: false,
+        needsGitCommit: true,
+        needsGitInitialized: false,
+        projectInitialized: true,
+        pythonBinPath: undefined,
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      expect(screen.getByText('No Git commits detected')).toBeInTheDocument()
     })
 
     it('should show a loading screen if the project is loading in data', () => {

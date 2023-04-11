@@ -10,10 +10,9 @@ import {
   installDvc,
   selectPythonInterpreter,
   setupWorkspace,
-  showExperiments,
-  showScmPanel
+  showExperiments
 } from './messages'
-import { NeedsGitCommit } from './NeedsGitCommit'
+
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Beaker } from '../../shared/components/icons'
 import { IconButton } from '../../shared/components/button/IconButton'
@@ -23,7 +22,6 @@ export type DvcProps = {
   cliCompatible: boolean | undefined
   isPythonExtensionInstalled: boolean
   needsGitInitialized: boolean | undefined
-  needsGitCommit: boolean
   projectInitialized: boolean
   pythonBinPath: string | undefined
   isExperimentsAvailable: boolean | undefined
@@ -35,7 +33,6 @@ export const Dvc: React.FC<DvcProps> = ({
   cliCompatible,
   isPythonExtensionInstalled,
   needsGitInitialized,
-  needsGitCommit,
   projectInitialized,
   pythonBinPath,
   setSectionCollapsed,
@@ -66,10 +63,6 @@ export const Dvc: React.FC<DvcProps> = ({
         needsGitInitialized={needsGitInitialized}
       />
     )
-  }
-
-  if (needsGitCommit) {
-    return <NeedsGitCommit showScmPanel={showScmPanel} />
   }
 
   return (

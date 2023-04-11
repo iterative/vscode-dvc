@@ -1,7 +1,8 @@
 import React from 'react'
 import { SectionCollapsed } from 'dvc/src/setup/webview/contract'
-import { showExperiments } from './messages'
+import { showExperiments, showScmPanel } from './messages'
 import { NoData } from './NoData'
+import { NeedsGitCommit } from './NeedsGitCommit'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { IconButton } from '../../shared/components/button/IconButton'
 import { Beaker } from '../../shared/components/icons'
@@ -11,12 +12,14 @@ export type ExperimentsProps = {
   isDvcSetup: boolean
   hasData: boolean | undefined
   setSectionCollapsed: (sectionCollapsed: SectionCollapsed) => void
+  needsGitCommit: boolean
 }
 
 export const Experiments: React.FC<ExperimentsProps> = ({
   isDvcSetup,
   hasData,
-  setSectionCollapsed
+  setSectionCollapsed,
+  needsGitCommit
 }) => {
   if (!isDvcSetup) {
     return (
@@ -35,6 +38,10 @@ export const Experiments: React.FC<ExperimentsProps> = ({
         />
       </EmptyState>
     )
+  }
+
+  if (needsGitCommit) {
+    return <NeedsGitCommit showScmPanel={showScmPanel} />
   }
 
   if (hasData === undefined) {
