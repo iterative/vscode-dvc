@@ -10,6 +10,7 @@ $edge-padding: 0.8rem;
 $cell-padding: 0.5rem;
 $workspace-row-edge-margin: $edge-padding - $cell-padding;
 $bullet-size: calc(var(--design-unit) * 4px);
+$badge-size: 0.85rem;
 
 // Extendable Silent Rules
 %expandableRowArrow {
@@ -100,6 +101,19 @@ $bullet-size: calc(var(--design-unit) * 4px);
   }
 }
 
+.noSelect {
+  user-select: none;
+}
+
+.isColumnResizing {
+  @extend .noSelect;
+  cursor: col-resize;
+
+  * {
+    cursor: col-resize;
+  }
+}
+
 .experiments {
   box-sizing: border-box;
   height: 100%;
@@ -147,6 +161,43 @@ table.withExpColumnShadow tr > *:first-child {
   }
 
   > div::after {
+    display: none;
+  }
+}
+
+.indicatorIcon {
+  display: inline-block;
+  position: relative;
+  border: none;
+  background: none;
+  padding: 0;
+  text-align: center;
+  padding: 0.25rem;
+  margin: 0.025rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  cursor: pointer;
+  svg {
+    fill: $icon-color;
+  }
+}
+
+.indicatorCount {
+  position: absolute;
+  bottom: 3px;
+  right: -2px;
+  font-weight: bold;
+  background-color: $indicator-badge-background;
+  color: $indicator-badge-foreground;
+  border-radius: 100%;
+  width: $badge-size;
+  height: $badge-size;
+  line-height: $badge-size;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 0.5rem;
+
+  &[aria-label='0'] {
     display: none;
   }
 }
@@ -827,49 +878,8 @@ td {
   font-size: 0.9em;
 }
 
-$badge-size: 0.85rem;
-
-.indicatorIcon {
-  display: inline-block;
-  position: relative;
-  border: none;
-  background: none;
-  padding: 0;
-  text-align: center;
-  padding: 0.25rem;
-  margin: 0.025rem;
-  width: 1.5rem;
-  height: 1.5rem;
-  cursor: pointer;
-  svg {
-    fill: $icon-color;
-  }
-}
-
-.indicatorCount {
-  position: absolute;
-  bottom: 3px;
-  right: -2px;
-  font-weight: bold;
-  background-color: $indicator-badge-background;
-  color: $indicator-badge-foreground;
-  border-radius: 100%;
-  width: $badge-size;
-  height: $badge-size;
-  line-height: $badge-size;
-  text-align: center;
-  vertical-align: middle;
-  font-size: 0.5rem;
-}
-
 .cellTooltip {
   padding: 2px 6px;
-}
-
-.indicatorCount {
-  &[aria-label='0'] {
-    display: none;
-  }
 }
 
 .experimentCell {
