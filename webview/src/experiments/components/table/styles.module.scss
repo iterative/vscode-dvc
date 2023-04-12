@@ -87,6 +87,15 @@ $bullet-size: calc(var(--design-unit) * 4px);
   }
 }
 
+.isColumnResizing {
+  @extend .noSelect;
+  cursor: col-resize;
+
+  * {
+    cursor: col-resize;
+  }
+}
+
 .experiments {
   box-sizing: border-box;
   height: 100%;
@@ -933,15 +942,6 @@ $badge-size: 0.85rem;
 
 .noSelect {
   user-select: none;
-}
-
-.isColumnResizing {
-  @extend .noSelect;
-  cursor: col-resize;
-
-  * {
-    cursor: col-resize;
-  }
 }
 
 .buttonAsLink {
