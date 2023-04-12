@@ -80,19 +80,6 @@ $badge-size: 0.85rem;
   background-color: $header-border-color;
 }
 
-%headerCellBase {
-  background-color: $header-bg-color;
-
-  .cellContents {
-    padding: 0.31rem $cell-padding;
-  }
-
-  &::before {
-    @extend %cellBorderLeft;
-    background-color: $header-border-color;
-  }
-}
-
 // Concrete selectors
 
 @keyframes spin {
@@ -236,9 +223,16 @@ th {
   height: auto;
   background-color: $header-bg-color;
   font-size: 0.7rem;
+  background-color: $header-bg-color;
+
+  &::before {
+    @extend %cellBorderLeft;
+    background-color: $header-border-color;
+  }
 
   .cellContents {
     @extend %truncateLeftChild;
+    padding: 0.31rem $cell-padding;
     display: block;
 
     span[draggable='true'] {
@@ -249,15 +243,12 @@ th {
 }
 
 .placeholderHeaderCell {
-  @extend %headerCellBase;
-
   &:first-child::before {
     display: none;
   }
 }
 
 .headerCell {
-  @extend %headerCellBase;
   color: $header-fg-color;
   text-align: center;
   font-weight: 400;
