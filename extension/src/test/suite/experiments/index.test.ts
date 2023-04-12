@@ -320,7 +320,8 @@ suite('Experiments Test Suite', () => {
         dvcExecutor,
         mockCheckOrAddPipeline,
         messageSpy,
-        mockUpdateExperimentsData
+        mockUpdateExperimentsData,
+        mockSelectBranches
       } = buildExperiments(disposable, expShowFixture)
       const mockExecuteCommand = stub(
         internalCommands,
@@ -338,6 +339,7 @@ suite('Experiments Test Suite', () => {
         messageSpy,
         mockCheckOrAddPipeline,
         mockExecuteCommand,
+        mockSelectBranches,
         mockUpdateExperimentsData
       }
     }
@@ -1417,6 +1419,34 @@ suite('Experiments Test Suite', () => {
 
       expect(mockUpdateExperimentsData).to.be.calledOnce
       expect(experimentsModel.getIsBranchesView()).to.be.false
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it.only('should handle a message to select branches', async () => {
+      const {
+        experiments,
+        experimentsModel,
+        messageSpy,
+        mockUpdateExperimentsData,
+        mockSelectBranches
+      } = setupExperimentsAndMockCommands()
+
+      const webview = await experiments.showWebview()
+      messageSpy.resetHistory()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const selectBranchesToShowSpy = spy(
+        experimentsModel,
+        'selectBranchesToShow'
+      )
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SELECT_BRANCHES
+      })
+
+      expect(mockSelectBranches).to.be.calledOnce
+      mockSelectBranches.resolves(['main', 'other'])
+
+      expect(selectBranchesToShowSpy).to.be.calledOnceWith(['main', 'other'])
+      expect(mockUpdateExperimentsData).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 
