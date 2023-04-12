@@ -87,6 +87,10 @@ $bullet-size: calc(var(--design-unit) * 4px);
   }
 }
 
+.noSelect {
+  user-select: none;
+}
+
 .isColumnResizing {
   @extend .noSelect;
   cursor: col-resize;
@@ -938,10 +942,6 @@ $badge-size: 0.85rem;
       }
     }
   }
-}
-
-.noSelect {
-  user-select: none;
 }
 
 .buttonAsLink {
