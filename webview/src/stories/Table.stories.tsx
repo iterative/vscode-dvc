@@ -42,7 +42,7 @@ const tableData: TableDataState = {
   columns: columnsFixture,
   filteredCount: 0,
   filters: ['params:params.yaml:lr'],
-  hasBranchesSelected: false,
+  hasBranchesToSelect: true,
   hasCheckpoints: true,
   hasColumns: true,
   hasConfig: true,

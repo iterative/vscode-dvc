@@ -356,8 +356,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
         resourceLocator,
         this.workspaceState,
         () => this.checkOrAddPipeline(dvcRoot),
-        (branches?: string[], branchesToRemove?: string[]) =>
-          this.selectBranches(branches, branchesToRemove)
+        (branchesSelected: string[]) => this.selectBranches(branchesSelected)
       )
     )
 
@@ -432,27 +431,25 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
   }
 
-  public async selectBranches(
-    branches?: string[],
-    branchesToRemove?: string[]
-  ) {
+  public async selectBranches(branchesSelected: string[]) {
     const cwd = await this.getDvcRoot()
     if (!cwd) {
       return
     }
-    const allBranches =
-      branches ||
-      (await this.internalCommands.executeCommand<string[]>(
-        AvailableCommands.GIT_GET_BRANCHES,
-        cwd
-      ))
-    const branchesToSelect = allBranches.filter(
-      branch => branch.indexOf('*') !== 0 && !branchesToRemove?.includes(branch)
+    const allBranches = await this.internalCommands.executeCommand<string[]>(
+      AvailableCommands.GIT_GET_BRANCHES,
+      cwd
     )
     return await quickPickManyValues(
-      branchesToSelect.map(branch => ({ label: branch, value: branch })),
+      allBranches
+        .filter(branch => branch.indexOf('*') !== 0)
+        .map(branch => ({
+          label: branch,
+          picked: branchesSelected.includes(branch),
+          value: branch
+        })),
       {
-        title: 'Select the branch(es) you want to add' as Title
+        title: Title.SELECT_BRANCHES
       }
     )
   }

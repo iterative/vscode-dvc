@@ -44,7 +44,9 @@ export const CommitsAndBranchesNavigation: React.FC = () => {
         className={styles.commitsAndBranchesNavButton}
         onClick={isBranchesView ? switchToCommitsView : switchToBranchesView}
       >
-        {isBranchesView ? 'Switch to Commits View' : 'Switch to Branches View'}
+        {isBranchesView
+          ? 'Switch to Commits View'
+          : 'Switch to All Branches View'}
       </button>
     </div>
   )

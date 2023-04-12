@@ -14,7 +14,7 @@ import {
   updateColumnWidths,
   updateFilteredCount,
   updateFilters,
-  updateHasBranchesSelected,
+  updateHasBranchesToSelect,
   updateHasCheckpoints,
   updateHasColumns,
   updateHasConfig,
@@ -57,9 +57,9 @@ export const App: React.FC<Record<string, unknown>> = () => {
               case 'filters':
                 dispatch(updateFilters(data.data.filters))
                 continue
-              case 'hasBranchesSelected':
+              case 'hasBranchesToSelect':
                 dispatch(
-                  updateHasBranchesSelected(data.data.hasBranchesSelected)
+                  updateHasBranchesToSelect(data.data.hasBranchesToSelect)
                 )
                 continue
               case 'hasCheckpoints':

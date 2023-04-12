@@ -9,7 +9,7 @@ const tableDataFixture: TableData = {
   columnWidths: {},
   filteredCount: 0,
   filters: [],
-  hasBranchesSelected: false,
+  hasBranchesToSelect: true,
   hasCheckpoints: true,
   hasColumns: true,
   hasConfig: true,

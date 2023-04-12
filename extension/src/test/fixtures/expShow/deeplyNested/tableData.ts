@@ -12,7 +12,7 @@ const data: TableData = {
     'params:params.yaml:nested1.doubled',
     'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b.doubled'
   ],
-  hasBranchesSelected: false,
+  hasBranchesToSelect: true,
   hasCheckpoints: false,
   hasColumns: true,
   hasConfig: true,

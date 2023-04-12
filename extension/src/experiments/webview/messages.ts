@@ -51,8 +51,7 @@ export class WebviewMessages {
 
   private readonly addStage: () => Promise<boolean>
   private readonly selectBranches: (
-    branches?: string[],
-    branchesToRemove?: string[]
+    branchesSelected: string[]
   ) => Promise<string[] | undefined>
 
   private readonly getNumCommits: () => Promise<number>
@@ -73,8 +72,7 @@ export class WebviewMessages {
     hasStages: () => Promise<string>,
     addStage: () => Promise<boolean>,
     selectBranches: (
-      branches?: string[],
-      branchesToRemove?: string[]
+      branchesSelected: string[]
     ) => Promise<string[] | undefined>,
     getNumCommits: () => Promise<number>,
     update: () => Promise<void>
@@ -231,11 +229,8 @@ export class WebviewMessages {
 
       case MessageFromWebviewType.SHOW_LESS_COMMITS:
         return this.changeCommitsToShow(-1)
-      case MessageFromWebviewType.ADD_BRANCH:
-        return this.addBranches()
-
-      case MessageFromWebviewType.REMOVE_BRANCH:
-        return this.removeBranches()
+      case MessageFromWebviewType.SELECT_BRANCHES:
+        return this.addAndRemoveBranches()
 
       case MessageFromWebviewType.SWITCH_BRANCHES_VIEW:
         return this.switchToBranchesView()
@@ -248,26 +243,14 @@ export class WebviewMessages {
     }
   }
 
-  private async addBranches() {
-    const selectedBranches = await this.selectBranches(
-      undefined,
-      this.experiments.getBranchesToShow()
-    )
-    if (!selectedBranches) {
-      return
-    }
-    this.experiments.addBranchesToShow(selectedBranches)
-    await this.update()
-  }
-
-  private async removeBranches() {
+  private async addAndRemoveBranches() {
     const selectedBranches = await this.selectBranches(
       this.experiments.getBranchesToShow()
     )
     if (!selectedBranches) {
       return
     }
-    this.experiments.removeBranchesToShow(selectedBranches)
+    this.experiments.selectBranchesToShow(selectedBranches)
     await this.update()
   }
 
@@ -307,7 +290,8 @@ export class WebviewMessages {
       columns: this.columns.getSelected(),
       filteredCount: this.experiments.getFilteredCount(),
       filters: this.experiments.getFilterPaths(),
-      hasBranchesSelected: this.experiments.getBranchesToShow().length > 0,
+      hasBranchesToSelect:
+        this.experiments.getAvailableBranchesToShow().length > 0,
       hasCheckpoints: this.checkpoints.hasCheckpoints(),
       hasColumns: this.columns.hasNonDefaultColumns(),
       hasConfig: this.hasConfig,

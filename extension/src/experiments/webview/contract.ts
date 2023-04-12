@@ -97,7 +97,7 @@ export type TableData = {
   columnWidths: Record<string, number>
   filteredCount: number
   filters: string[]
-  hasBranchesSelected: boolean
+  hasBranchesToSelect: boolean
   hasCheckpoints: boolean
   hasColumns: boolean
   hasConfig: boolean

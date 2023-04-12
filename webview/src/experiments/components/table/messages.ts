@@ -33,12 +33,7 @@ export const switchToCommitsView = () => {
   sendMessage({ type: MessageFromWebviewType.SWITCH_COMMITS_VIEW })
 }
 
-export const addBranches = () =>
+export const selectBranches = () =>
   sendMessage({
-    type: MessageFromWebviewType.ADD_BRANCH
-  })
-
-export const removeBranches = () =>
-  sendMessage({
-    type: MessageFromWebviewType.REMOVE_BRANCH
+    type: MessageFromWebviewType.SELECT_BRANCHES
   })

@@ -103,8 +103,7 @@ export class Experiments extends BaseRepository<TableData> {
 
   private readonly addStage: () => Promise<boolean>
   private readonly selectBranches: (
-    branches?: string[],
-    branchesToRemove?: string[]
+    branchesSelected: string[]
   ) => Promise<string[] | undefined>
 
   constructor(
@@ -115,8 +114,7 @@ export class Experiments extends BaseRepository<TableData> {
     workspaceState: Memento,
     addStage: () => Promise<boolean>,
     selectBranches: (
-      branches?: string[],
-      branchesToRemove?: string[]
+      branchesSelected: string[]
     ) => Promise<string[] | undefined>,
     cliData?: ExperimentsData,
     fileSystemData?: FileSystemData
@@ -549,6 +547,15 @@ export class Experiments extends BaseRepository<TableData> {
     )
     this.experimentsChanged.fire(data)
     this.notifyColumnsChanged()
+    void this.updateAvailableBranchesToSelect()
+  }
+
+  private async updateAvailableBranchesToSelect() {
+    const allBranches = await this.internalCommands.executeCommand<string[]>(
+      AvailableCommands.GIT_GET_BRANCHES,
+      this.dvcRoot
+    )
+    this.experiments.setAvailableBranchesToShow(allBranches)
   }
 
   private notifyColumnsChanged() {
@@ -577,8 +584,7 @@ export class Experiments extends BaseRepository<TableData> {
           this.dvcRoot
         ),
       () => this.addStage(),
-      (branches?: string[], branchesToRemove?: string[]) =>
-        this.selectBranches(branches, branchesToRemove),
+      (branchesSelected: string[]) => this.selectBranches(branchesSelected),
       () =>
         this.internalCommands.executeCommand<number>(
           AvailableCommands.GIT_GET_NUM_COMMITS,

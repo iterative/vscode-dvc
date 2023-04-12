@@ -62,6 +62,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   private numberOfCommitsToShow: number
   private isBranchesView: boolean
   private branchesToShow: string[] = []
+  private availableBranchesToShow: string[] = []
 
   private filters: Map<string, FilterDefinition> = new Map()
 
@@ -413,20 +414,23 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.isBranchesView
   }
 
-  public addBranchesToShow(branches: string[]) {
-    this.branchesToShow.push(...branches)
-    this.persistBranchesToShow()
-  }
-
-  public removeBranchesToShow(branches: string[]) {
-    this.branchesToShow = this.branchesToShow.filter(
-      branch => !branches.includes(branch)
-    )
+  public selectBranchesToShow(branches: string[]) {
+    this.branchesToShow = branches
     this.persistBranchesToShow()
   }
 
   public getBranchesToShow() {
     return this.branchesToShow
+  }
+
+  public setAvailableBranchesToShow(branches: string[]) {
+    this.availableBranchesToShow = branches.filter(
+      branch => !this.branchesToShow.includes(branch)
+    )
+  }
+
+  public getAvailableBranchesToShow() {
+    return this.availableBranchesToShow
   }
 
   private findIndexByPath(pathToRemove: string) {

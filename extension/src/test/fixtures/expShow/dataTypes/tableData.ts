@@ -9,7 +9,7 @@ export const data: TableData = {
   columnWidths: {},
   filteredCount: 0,
   filters: [],
-  hasBranchesSelected: false,
+  hasBranchesToSelect: true,
   hasCheckpoints: false,
   hasColumns: true,
   hasConfig: true,
