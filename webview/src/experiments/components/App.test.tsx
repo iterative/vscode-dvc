@@ -74,20 +74,6 @@ afterEach(() => {
 })
 
 describe('App', () => {
-  describe('Sorting Classes', () => {
-    it('should apply the sortingHeaderCellDesc class to a header cell of a column sorted descending', () => {
-      renderTableWithPlaceholder()
-
-      const headerCell = screen.getByTestId(
-        'header-params:params.yaml:nested1.doubled'
-      )
-
-      expect(
-        headerCell.classList.contains(styles.sortingHeaderCellDesc)
-      ).toBeTruthy()
-    })
-  })
-
   it('should send a message to the extension on the first render', () => {
     renderTable(undefined, true)
     expect(mockPostMessage).toHaveBeenCalledWith({

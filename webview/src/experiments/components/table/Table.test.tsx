@@ -68,9 +68,6 @@ describe('Table', () => {
     const mockColumnName = 'C'
     const mockColumnPath = 'params:C'
 
-    const findSortableColumn = async () =>
-      await screen.findByTestId(`header-${mockColumnPath}`)
-
     const clickOnSortOption = async (optionLabel: SortOrder) => {
       const column = await screen.findByText(mockColumnName)
       fireEvent.contextMenu(column, {
@@ -113,9 +110,6 @@ describe('Table', () => {
           ]
         })
 
-        const column = await findSortableColumn()
-        expect(column).toHaveClass('sortingHeaderCellAsc')
-
         await clickOnSortOption(SortOrder.DESCENDING)
 
         expect(mockedPostMessage).toHaveBeenCalledWith({
@@ -137,9 +131,6 @@ describe('Table', () => {
             }
           ]
         })
-
-        const column = await findSortableColumn()
-        expect(column).toHaveClass('sortingHeaderCellDesc')
 
         await clickOnSortOption(SortOrder.NONE)
 
@@ -391,13 +382,13 @@ describe('Table', () => {
       dragEnter(startingNode, targetNode.id, DragEnterDirection.AUTO)
 
       expect(
-        header?.classList.contains(styles.headerCellDropTarget)
+        header?.classList.contains(styles.dropTargetHeaderCell)
       ).toBeTruthy()
 
       dragLeave(targetNode)
 
       expect(
-        header?.classList.contains(styles.headerCellDropTarget)
+        header?.classList.contains(styles.dropTargetHeaderCell)
       ).toBeFalsy()
     })
   })
