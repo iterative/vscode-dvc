@@ -130,11 +130,7 @@ const registerExperimentNameCommands = (
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_APPLY,
     ({ dvcRoot, id }: ExperimentDetails) =>
-      experiments.getExpNameThenRun(
-        AvailableCommands.EXPERIMENT_APPLY,
-        dvcRoot,
-        id
-      )
+      experiments.runCommand(AvailableCommands.EXPERIMENT_APPLY, dvcRoot, id)
   )
 
   internalCommands.registerExternalCliCommand(
@@ -164,7 +160,7 @@ const registerExperimentInputCommands = (
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
     ({ dvcRoot, id }: ExperimentDetails) =>
-      experiments.getExpNameAndInputThenRun(
+      experiments.getInputAndRun(
         getBranchExperimentCommand(experiments),
         Title.ENTER_BRANCH_NAME,
         dvcRoot,
@@ -184,7 +180,7 @@ const registerExperimentInputCommands = (
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_SHARE_AS_BRANCH,
     ({ dvcRoot, id }: ExperimentDetails) =>
-      experiments.getExpNameAndInputThenRun(
+      experiments.getInputAndRun(
         getShareExperimentAsBranchCommand(internalCommands),
         Title.ENTER_BRANCH_NAME,
         dvcRoot,
@@ -204,7 +200,7 @@ const registerExperimentInputCommands = (
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_SHARE_AS_COMMIT,
     ({ dvcRoot, id }: ExperimentDetails) =>
-      experiments.getExpNameAndInputThenRun(
+      experiments.getInputAndRun(
         getShareExperimentAsCommitCommand(internalCommands),
         Title.ENTER_COMMIT_MESSAGE,
         dvcRoot,

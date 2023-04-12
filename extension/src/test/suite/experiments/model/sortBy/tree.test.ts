@@ -17,76 +17,142 @@ import { dvcDemoPath } from '../../../../util'
 import { buildMetricOrParamPath } from '../../../../../experiments/columns/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
 import {
-  ExperimentsOutput,
-  EXPERIMENT_WORKSPACE_ID
+  EXPERIMENT_WORKSPACE_ID,
+  ExpShowOutput,
+  ExperimentStatus
 } from '../../../../../cli/dvc/contract'
 import { WEBVIEW_TEST_TIMEOUT } from '../../../timeouts'
 import { starredSort } from '../../../../../experiments/model/sortBy/constants'
 
 suite('Experiments Sort By Tree Test Suite', () => {
-  const testData = {
-    [EXPERIMENT_WORKSPACE_ID]: {
-      baseline: {
-        data: {
-          executor: EXPERIMENT_WORKSPACE_ID,
-          timestamp: null
-        }
-      }
+  const testData: ExpShowOutput = [
+    {
+      data: {
+        deps: null,
+        meta: { has_checkpoints: false },
+        metrics: null,
+        outs: null,
+        params: null,
+        rev: EXPERIMENT_WORKSPACE_ID,
+        timestamp: null
+      },
+      rev: EXPERIMENT_WORKSPACE_ID
     },
-    testBranch: {
-      baseline: {
-        data: {}
+    {
+      data: {
+        deps: null,
+        meta: { has_checkpoints: false },
+        metrics: null,
+        outs: null,
+        params: null,
+        rev: 'testBranch',
+        timestamp: null
       },
-      exp1: {
-        data: {
-          params: {
-            'params.yaml': {
+      experiments: [
+        {
+          executor: {
+            local: null,
+            name: EXPERIMENT_WORKSPACE_ID,
+            state: ExperimentStatus.RUNNING
+          },
+          revs: [
+            {
               data: {
-                testparam: 1,
-                testparam2: 1
-              }
+                deps: null,
+                meta: { has_checkpoints: false },
+                metrics: null,
+                outs: null,
+                params: {
+                  'params.yaml': {
+                    data: {
+                      testParam: 1,
+                      testParam2: 1
+                    }
+                  }
+                },
+                rev: 'exp1',
+                timestamp: null
+              },
+              rev: 'exp1'
             }
-          }
-        }
-      },
-      exp2: {
-        data: {
-          params: {
-            'params.yaml': {
+          ]
+        },
+        {
+          executor: null,
+          revs: [
+            {
               data: {
-                testparam: 3,
-                testparam2: 1
-              }
+                deps: null,
+                meta: { has_checkpoints: false },
+                metrics: null,
+                outs: null,
+                params: {
+                  'params.yaml': {
+                    data: {
+                      testParam: 3,
+                      testParam2: 1
+                    }
+                  }
+                },
+                rev: 'exp2',
+                timestamp: null
+              },
+              rev: 'exp2'
             }
-          }
-        }
-      },
-      exp3: {
-        data: {
-          params: {
-            'params.yaml': {
+          ]
+        },
+        {
+          executor: null,
+          revs: [
+            {
               data: {
-                testparam: 2,
-                testparam2: 2
-              }
+                deps: null,
+                meta: { has_checkpoints: false },
+                metrics: null,
+                outs: null,
+                params: {
+                  'params.yaml': {
+                    data: {
+                      testParam: 2,
+                      testParam2: 2
+                    }
+                  }
+                },
+                rev: 'exp3',
+                timestamp: null
+              },
+              rev: 'exp3'
             }
-          }
-        }
-      },
-      exp4: {
-        data: {
-          params: {
-            'params.yaml': {
+          ]
+        },
+        {
+          executor: null,
+          revs: [
+            {
               data: {
-                testparam: 4,
-                testparam2: 2
-              }
+                deps: null,
+                meta: { has_checkpoints: false },
+                metrics: null,
+                outs: null,
+                params: {
+                  'params.yaml': {
+                    data: {
+                      testParam: 4,
+                      testParam2: 2
+                    }
+                  }
+                },
+                rev: 'exp4',
+                timestamp: null
+              },
+              rev: 'exp4'
             }
-          }
+          ]
         }
-      }
+      ],
+      rev: 'testBranch'
     }
-  } as unknown as ExperimentsOutput
+  ]
 
   const disposable = Disposable.fn()
 
@@ -106,8 +172,6 @@ suite('Experiments Sort By Tree Test Suite', () => {
     })
 
     it('should be able to properly add and remove sorts with a variety of commands', async () => {
-      // setup
-
       const mockShowQuickPick = stub(window, 'showQuickPick')
 
       const { experiments, messageSpy } = buildExperiments(disposable, testData)
@@ -143,11 +207,11 @@ suite('Experiments Sort By Tree Test Suite', () => {
       ]
       const testParamPathArray: [ColumnType, ...string[]] = [
         ...testParamParentPathArray,
-        'testparam'
+        'testParam'
       ]
       const otherTestParamPathArray: [ColumnType, ...string[]] = [
         ...testParamParentPathArray,
-        'testparam2'
+        'testParam2'
       ]
       const testParamPath = buildMetricOrParamPath(...testParamPathArray)
       const otherTestParamPath = buildMetricOrParamPath(
@@ -163,8 +227,6 @@ suite('Experiments Sort By Tree Test Suite', () => {
 
       stub(WorkspaceExperiments.prototype, 'getDvcRoots').returns([dvcDemoPath])
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
-
-      // Setup done, perform the test
 
       mockSortQuickPicks(testParamPath, false)
       const tableChangedPromise = experimentsUpdatedEvent(experiments)

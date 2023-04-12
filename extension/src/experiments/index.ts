@@ -37,11 +37,7 @@ import { DecorationProvider } from './model/decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
 import { ResourceLocator } from '../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
-import {
-  ExperimentsOutput,
-  EXPERIMENT_WORKSPACE_ID,
-  ExpShowOutput
-} from '../cli/dvc/contract'
+import { EXPERIMENT_WORKSPACE_ID, ExpShowOutput } from '../cli/dvc/contract'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { FileSystemData } from '../fileSystem/data'
@@ -165,7 +161,7 @@ export class Experiments extends BaseRepository<TableData> {
       fileSystemData || new FileSystemData(dvcRoot)
     )
 
-    this.dispose.track(this.cliData.onDidUpdate(data => this.setState_(data)))
+    this.dispose.track(this.cliData.onDidUpdate(data => this.setState(data)))
     this.dispose.track(
       this.fileSystemData.onDidUpdate(data => {
         const hadCheckpoints = this.hasCheckpoints()
@@ -194,30 +190,9 @@ export class Experiments extends BaseRepository<TableData> {
     return this.cliData.managedUpdate()
   }
 
-  public async setState(data: ExperimentsOutput) {
+  public async setState(data: ExpShowOutput) {
     const dvcLiveOnly = await this.checkSignalFile()
-    const dataKeys = Object.keys(data)
-    const commitsOutput = await this.internalCommands.executeCommand(
-      AvailableCommands.GIT_GET_COMMIT_MESSAGES,
-      this.dvcRoot,
-      dataKeys[dataKeys.length - 1]
-    )
-    await Promise.all([
-      this.columns.transformAndSet(data),
-      this.experiments.transformAndSet(data, dvcLiveOnly, commitsOutput)
-    ])
-
-    return this.notifyChanged()
-  }
-
-  public async setState_(data: ExpShowOutput) {
-    const dvcLiveOnly = await this.checkSignalFile()
-    const [lastCommit] = data.slice(-1)
-    const commitsOutput = await this.internalCommands.executeCommand(
-      AvailableCommands.GIT_GET_COMMIT_MESSAGES,
-      this.dvcRoot,
-      lastCommit.rev
-    )
+    const commitsOutput = await this.getCommitOutput(data)
     await Promise.all([
       this.columns.transformAndSet_(data),
       this.experiments.transformAndSet_(data, dvcLiveOnly, commitsOutput)
@@ -249,7 +224,10 @@ export class Experiments extends BaseRepository<TableData> {
   public toggleExperimentStatus(
     id: string
   ): Color | typeof UNSELECTED | undefined {
-    if (this.experiments.isRunningInWorkspace(id)) {
+    if (
+      this.experiments.isRunningInWorkspace(id) &&
+      !this.experiments.isSelected(id)
+    ) {
       return this.experiments.isSelected(EXPERIMENT_WORKSPACE_ID)
         ? undefined
         : this.toggleExperimentStatus(EXPERIMENT_WORKSPACE_ID)
@@ -259,6 +237,7 @@ export class Experiments extends BaseRepository<TableData> {
     if (!selected && !this.experiments.canSelect()) {
       return
     }
+
     const status = this.experiments.toggleStatus(id)
     this.notifyChanged()
     return status
@@ -486,13 +465,6 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getExperiments()
   }
 
-  public getExperimentDisplayName(experimentId: string) {
-    const experiment = this.experiments
-      .getCombinedList()
-      .find(({ id }) => id === experimentId)
-    return experiment?.name || experiment?.label
-  }
-
   public getRevisions() {
     return this.experiments.getRevisions()
   }
@@ -578,6 +550,18 @@ export class Experiments extends BaseRepository<TableData> {
     return this.webviewMessages.sendWebviewMessage()
   }
 
+  private getCommitOutput(data: ExpShowOutput | undefined) {
+    if (!data?.length) {
+      return
+    }
+    const [lastCommit] = data.slice(-1)
+    return this.internalCommands.executeCommand(
+      AvailableCommands.GIT_GET_COMMIT_MESSAGES,
+      this.dvcRoot,
+      lastCommit.rev
+    )
+  }
+
   private createWebviewMessageHandler() {
     const webviewMessages = new WebviewMessages(
       this.dvcRoot,
@@ -621,13 +605,11 @@ export class Experiments extends BaseRepository<TableData> {
       return overrideId
     }
 
-    const experiment = await pickExperiment(
+    return await pickExperiment(
       this.experiments.getCombinedList(),
       this.getFirstThreeColumnOrder(),
       Title.SELECT_BASE_EXPERIMENT
     )
-
-    return experiment?.id
   }
 
   private watchActiveEditor() {

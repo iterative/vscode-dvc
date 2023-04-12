@@ -23,7 +23,6 @@ import {
   RegisteredCommands
 } from '../../../../commands/external'
 import { buildPlots } from '../../plots/util'
-import expShowFixture from '../../../fixtures/expShow/base/output'
 import { ExperimentsTree } from '../../../../experiments/model/tree'
 import { buildExperiments, stubWorkspaceExperimentsGetters } from '../util'
 import { WEBVIEW_TEST_TIMEOUT } from '../../timeouts'
@@ -62,17 +61,23 @@ suite('Experiments Tree Test Suite', () => {
     it('should be able to toggle whether an experiment is shown in the plots webview with dvc.views.experiments.toggleStatus', async () => {
       const mockNow = getMockNow()
 
-      const { plots, messageSpy, plotsModel } = await buildPlots(disposable)
+      const { plots, messageSpy, plotsModel, experiments } = await buildPlots(
+        disposable
+      )
 
       const expectedRevisions: { displayColor: string; id: string }[] = []
 
       const [{ id }] = plotsModel.getSelectedRevisionDetails()
+      const mockCheckForFinishedWorkspaceExperiment = stub(
+        experiments,
+        'checkForFinishedWorkspaceExperiment'
+      )
 
       for (const {
         id,
         displayColor
       } of plotsModel.getSelectedRevisionDetails()) {
-        expectedRevisions.push({ displayColor, id: id as string })
+        expectedRevisions.push({ displayColor, id })
       }
 
       const webview = await plots.showWebview()
@@ -95,6 +100,11 @@ suite('Experiments Tree Test Suite', () => {
         const { id } = expectedRevisions.pop() as { id: string }
 
         bypassProcessManagerDebounce(mockNow, updateCall)
+        const messageSent = new Promise(resolve =>
+          mockCheckForFinishedWorkspaceExperiment.callsFake(() =>
+            resolve(undefined)
+          )
+        )
         const unSelected = await commands.executeCommand(
           RegisteredCommands.EXPERIMENT_TOGGLE,
           {
@@ -105,6 +115,8 @@ suite('Experiments Tree Test Suite', () => {
         updateCall = updateCall + 1
 
         expect(unSelected).to.equal(UNSELECTED)
+        await messageSent
+        mockCheckForFinishedWorkspaceExperiment.resetBehavior()
       }
 
       expect(
@@ -132,61 +144,6 @@ suite('Experiments Tree Test Suite', () => {
         template: null
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
-
-    it('should set the workspace to selected when trying to toggle a checkpoint experiment that is running in the workspace', async () => {
-      const { experiments } = buildExperiments(disposable, {
-        '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77': {
-          '4fb124aebddb2adf1545030907687fa9a4c80e70': {
-            data: {
-              ...expShowFixture['53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'][
-                '4fb124aebddb2adf1545030907687fa9a4c80e70'
-              ].data,
-              executor: EXPERIMENT_WORKSPACE_ID
-            }
-          },
-          baseline:
-            expShowFixture['53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'].baseline
-        },
-        workspace: expShowFixture.workspace
-      })
-      const isWorkspaceSelected = (): boolean =>
-        !!experiments
-          .getWorkspaceAndCommits()
-          .find(({ id }) => id === EXPERIMENT_WORKSPACE_ID)?.selected
-
-      await experiments.isReady()
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
-      expect(isWorkspaceSelected()).to.be.true
-
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TOGGLE, {
-        dvcRoot: dvcDemoPath,
-        id: EXPERIMENT_WORKSPACE_ID
-      })
-
-      expect(isWorkspaceSelected()).to.be.false
-
-      const selected = await commands.executeCommand(
-        RegisteredCommands.EXPERIMENT_TOGGLE,
-        {
-          dvcRoot: dvcDemoPath,
-          id: 'exp-e7a67'
-        }
-      )
-      expect(!!selected).to.be.true
-
-      expect(isWorkspaceSelected()).to.be.true
-
-      const notReselected = await commands.executeCommand(
-        RegisteredCommands.EXPERIMENT_TOGGLE,
-        {
-          dvcRoot: dvcDemoPath,
-          id: 'exp-e7a67'
-        }
-      )
-      expect(notReselected).to.be.undefined
-
-      expect(isWorkspaceSelected()).to.be.true
-    })
 
     it('should not show queued experiments in the dvc.views.experimentsTree.selectExperiments quick pick', async () => {
       await buildPlots(disposable)

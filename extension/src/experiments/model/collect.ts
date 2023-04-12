@@ -281,7 +281,7 @@ const formatCommitMessage = (commit: string) => {
 }
 
 const getCommitData = (
-  commitsOutput: string
+  commitsOutput: string | undefined
 ): { [sha: string]: CommitData } => {
   if (!commitsOutput) {
     return {}
@@ -450,13 +450,15 @@ const collectExpRange = (
 
   const { name, rev } = expState
 
+  const label =
+    rev === EXPERIMENT_WORKSPACE_ID
+      ? EXPERIMENT_WORKSPACE_ID
+      : shortenForLabel(rev)
+
   const experiment = transformExpState(
     {
-      id: name || rev,
-      label:
-        rev === EXPERIMENT_WORKSPACE_ID
-          ? EXPERIMENT_WORKSPACE_ID
-          : shortenForLabel(rev)
+      id: name || label,
+      label
     },
     expState
   )
@@ -504,7 +506,7 @@ const setWorkspaceAsRunning = (
 export const collectExperiments_ = (
   output: ExpShowOutput,
   dvcLiveOnly: boolean,
-  commitsOutput: string
+  commitsOutput: string | undefined
 ): ExperimentsAccumulator => {
   const acc: ExperimentsAccumulator = {
     commits: [],

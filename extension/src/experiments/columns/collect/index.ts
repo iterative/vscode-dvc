@@ -120,11 +120,15 @@ export const getData_ = (expState: ExpState): ExpStateData | undefined => {
   if (hasError(expState)) {
     return
   }
-  return expState?.data
+  return expState.data
 }
 
 export const collectChanges_ = (output: ExpShowOutput): string[] => {
   const changes: string[] = []
+
+  if (!(output.length > 1)) {
+    return changes
+  }
 
   const [workspaceData, currentCommitData] = output
   const workspace = getData_(workspaceData)

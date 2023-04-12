@@ -300,7 +300,7 @@ const data: Commit[] = [
       },
       {
         displayColor: undefined,
-        id: '489fd8bdaa709f7330aac342e051a9431c625481',
+        id: '489fd8b',
         sha: '489fd8bdaa709f7330aac342e051a9431c625481',
         label: '489fd8b',
         error:
@@ -387,7 +387,7 @@ const data: Commit[] = [
             'c3961d777cfbd7727f9fde4851896006'
           )
         },
-        id: '90aea7f2482117a55dfcadcdb901aaa6610fbbc9',
+        id: '90aea7f',
         label: '90aea7f',
         params: {
           'params.yaml': {
@@ -436,7 +436,7 @@ const data: Commit[] = [
           )
         },
         error: 'Experiment run failed.',
-        id: '55d492c9c633912685351b32df91bfe1f9ecefb9',
+        id: '55d492c',
         label: '55d492c',
         metrics: {},
         params: {

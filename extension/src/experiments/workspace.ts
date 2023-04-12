@@ -164,16 +164,12 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    const tasks = await this.getRepository(cwd).pickQueueTasksToKill()
+    const taskIds = await this.getRepository(cwd).pickQueueTasksToKill()
 
-    if (!tasks || isEmpty(tasks)) {
+    if (!taskIds || isEmpty(taskIds)) {
       return
     }
-    return this.runCommand(
-      AvailableCommands.QUEUE_KILL,
-      cwd,
-      ...tasks.map(({ id }) => id)
-    )
+    return this.runCommand(AvailableCommands.QUEUE_KILL, cwd, ...taskIds)
   }
 
   public async selectExperimentsToRemove() {
@@ -182,15 +178,17 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    const experiments = await this.getRepository(cwd).pickExperimentsToRemove()
-    if (!experiments || isEmpty(experiments)) {
+    const experimentIds = await this.getRepository(
+      cwd
+    ).pickExperimentsToRemove()
+    if (!experimentIds || isEmpty(experimentIds)) {
       return
     }
 
     return this.runCommand(
       AvailableCommands.EXPERIMENT_REMOVE,
       cwd,
-      ...experiments?.map(({ id }) => id)
+      ...experimentIds
     )
   }
 
@@ -285,37 +283,24 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    const experiment = await this.pickExperiment(cwd)
+    const experimentId = await this.pickExperiment(cwd)
 
-    if (!experiment) {
+    if (!experimentId) {
       return
     }
-    return this.getInputAndRun(runCommand, title, cwd, experiment.name)
+    return this.getInputAndRun(runCommand, title, cwd, experimentId)
   }
 
-  public getExpNameAndInputThenRun(
+  public async getInputAndRun(
     runCommand: (...args: Args) => Promise<void> | void,
     title: Title,
-    cwd: string,
-    id: string
+    ...args: Args
   ) {
-    const name = this.getRepository(cwd)?.getExperimentDisplayName(id)
-
-    if (!name) {
+    const input = await getInput(title)
+    if (!input) {
       return
     }
-
-    return this.getInputAndRun(runCommand, title, cwd, name)
-  }
-
-  public getExpNameThenRun(commandId: CommandId, cwd: string, id: string) {
-    const name = this.getRepository(cwd)?.getExperimentDisplayName(id)
-
-    if (!name) {
-      return
-    }
-
-    return this.runCommand(commandId, cwd, name)
+    return runCommand(...args, input)
   }
 
   public async getCwdIntegerInputAndRun(
@@ -522,33 +507,19 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
 
   private async pickExpThenRun(
     commandId: CommandId,
-    pickFunc: (
-      cwd: string
-    ) => Thenable<{ id: string; name: string } | undefined> | undefined
+    pickFunc: (cwd: string) => Thenable<string | undefined> | undefined
   ) {
     const cwd = await this.getFocusedOrOnlyOrPickProject()
     if (!cwd) {
       return
     }
 
-    const experiment = await pickFunc(cwd)
+    const experimentId = await pickFunc(cwd)
 
-    if (!experiment) {
+    if (!experimentId) {
       return
     }
-    return this.runCommand(commandId, cwd, experiment.name)
-  }
-
-  private async getInputAndRun(
-    runCommand: (...args: Args) => Promise<void> | void,
-    title: Title,
-    ...args: Args
-  ) {
-    const input = await getInput(title)
-    if (!input) {
-      return
-    }
-    return runCommand(...args, input)
+    return this.runCommand(commandId, cwd, experimentId)
   }
 
   private pickExperiment(cwd: string) {

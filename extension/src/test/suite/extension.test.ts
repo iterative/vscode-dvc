@@ -8,7 +8,7 @@ import { mockHasCheckpoints } from './experiments/util'
 import { Disposable } from '../../extension'
 import * as Python from '../../extensions/python'
 import { DvcReader } from '../../cli/dvc/reader'
-import expShowFixture from '../fixtures/expShow/base/output'
+import expShowFixture from '../fixtures/expShow/base/output_'
 import plotsDiffFixture from '../fixtures/plotsDiff/output'
 import * as Disposer from '../../util/disposable'
 import { RegisteredCommands } from '../../commands/external'
@@ -93,7 +93,7 @@ suite('Extension Test Suite', () => {
       )
 
       mockHasCheckpoints(expShowFixture)
-      const mockExpShow = stub(DvcReader.prototype, 'expShow')
+      const mockExpShow = stub(DvcReader.prototype, 'expShow_')
       const mockDataStatus = stub(DvcReader.prototype, 'dataStatus')
       const mockPlotsDiff = stub(DvcReader.prototype, 'plotsDiff')
 

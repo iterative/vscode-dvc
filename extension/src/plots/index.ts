@@ -220,8 +220,9 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private waitForInitialData(experiments: Experiments) {
     const waitForInitialExpData = this.dispose.track(
-      experiments.onDidChangeExperiments(() => {
+      experiments.onDidChangeExperiments(async () => {
         // if (data) {
+        await experiments.isReady()
         this.dispose.untrack(waitForInitialExpData)
         waitForInitialExpData.dispose()
         // get this from experiments, do not recalc
@@ -281,11 +282,10 @@ export class Plots extends BaseRepository<TPlotsData> {
   private onDidUpdateData() {
     this.dispose.track(
       this.data.onDidUpdate(async ({ data, revs }) => {
-        const cliIdToLabel = this.plots.getCLIIdToLabel()
         await Promise.all([
           this.plots.transformAndSetPlots(data, revs),
-          this.paths.transformAndSet(data, revs, cliIdToLabel),
-          this.errors.transformAndSet(data, revs, cliIdToLabel)
+          this.paths.transformAndSet(data, revs),
+          this.errors.transformAndSet(data, revs)
         ])
         this.notifyChanged()
       })

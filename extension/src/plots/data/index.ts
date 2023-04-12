@@ -48,7 +48,7 @@ export class PlotsData extends BaseData<{
 
   public async update(): Promise<void> {
     this.notifyTriggered()
-    const revs = this.model.getSelectedOrderedCliIds()
+    const revs = this.model.getSelectedOrderedIds()
 
     const args = this.getArgs(revs)
     const data = await this.internalCommands.executeCommand<PlotsOutputOrError>(

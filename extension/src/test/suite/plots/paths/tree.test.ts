@@ -90,7 +90,7 @@ suite('Plots Paths Tree Test Suite', () => {
 
       const noneSelected: QuickPickItemWithValue<PlotPath>[] = []
       const allSelected: QuickPickItemWithValue<PlotPath>[] = Object.keys(
-        plotsDiffFixture
+        plotsDiffFixture.data
       ).map(path => ({ label: path, value: { path } as PlotPath }))
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
@@ -153,7 +153,7 @@ suite('Plots Paths Tree Test Suite', () => {
         'exp-e7a67',
         'test-branch',
         'exp-83425',
-        '53c3851'
+        'main'
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })

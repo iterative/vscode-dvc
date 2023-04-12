@@ -1,6 +1,6 @@
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
-import rowsFixture from '../expShow/base/rows'
+import rowsFixture from '../expShow/base/rows_'
 import { extendVegaSpec, isMultiViewPlot } from '../../../plots/vega/util'
 import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../../cli/dvc/contract'
 import {
@@ -19,7 +19,6 @@ import {
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
-import { getCLICommitId, replaceCommitCLIId } from './util'
 import { formatDate } from '../../../util/date'
 import { ColumnType, Commit } from '../../../experiments/webview/contract'
 
@@ -29,7 +28,7 @@ const basicVega = {
       type: PlotsType.VEGA,
       revisions: [
         EXPERIMENT_WORKSPACE_ID,
-        '53c3851',
+        'main',
         'test-branch',
         'exp-83425',
         'exp-e7a67'
@@ -82,7 +81,7 @@ const basicVega = {
             timestamp: '1641966351758'
           }
         ],
-        '53c3851': [
+        main: [
           {
             loss: '2.298783302307129',
             step: '0',
@@ -375,7 +374,7 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['53c3851'],
+      revisions: ['main'],
       url: joinFunc(baseUrl, '53c3851_plots_acc.png')
     },
     {
@@ -402,7 +401,7 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['53c3851'],
+      revisions: ['main'],
       url: joinFunc(baseUrl, '53c3851_plots_heatmap.png')
     },
     {
@@ -429,7 +428,7 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
     },
     {
       type: PlotsType.IMAGE,
-      revisions: ['53c3851'],
+      revisions: ['main'],
       url: joinFunc(baseUrl, '53c3851_plots_loss.png')
     },
     {
@@ -467,9 +466,9 @@ export const getMultiSourceOutput = (): PlotsOutput => ({
 export const REVISIONS = [
   EXPERIMENT_WORKSPACE_ID,
   'main',
-  '4fb124a',
-  '42b8736',
-  '1ba7bcd'
+  'exp-e7a67',
+  'test-branch',
+  'exp-83425'
 ]
 
 const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
@@ -491,12 +490,10 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
             data: {
               values:
                 REVISIONS.flatMap(revision =>
-                  originalPlot.datapoints?.[getCLICommitId(revision)].map(
-                    values => ({
-                      ...values,
-                      rev: revision
-                    })
-                  )
+                  originalPlot.datapoints?.[revision].map(values => ({
+                    ...values,
+                    rev: revision
+                  }))
                 ) || []
             }
           } as TopLevelSpec,
@@ -552,12 +549,12 @@ export const getRevisions = (): Revision[] => {
         {
           type: ColumnType.METRICS,
           path: 'summary.json:loss',
-          value: 1.9293040037155151
+          value: 1.775016188621521
         },
         {
           type: ColumnType.METRICS,
           path: 'summary.json:accuracy',
-          value: 0.4668000042438507
+          value: 0.5926499962806702
         }
       ],
       group: undefined
@@ -658,7 +655,7 @@ export const getRevisions = (): Revision[] => {
         }
       ],
       id: 'exp-83425',
-      revision: '1ba7bcd',
+      revision: EXPERIMENT_WORKSPACE_ID,
       displayColor: _1ba7bcd,
       group: '[exp-83425]'
     }
@@ -699,13 +696,13 @@ export const getComparisonWebviewMessage = (
   for (const [path, plots] of Object.entries(getImageData(baseUrl, joinFunc))) {
     const revisionsAcc: ComparisonRevisionData = {}
     for (const { url, revisions } of plots) {
-      const revision = replaceCommitCLIId(revisions?.[0])
-      if (!revision) {
+      const id = revisions?.[0]
+      if (!id) {
         continue
       }
-      revisionsAcc[revision] = {
+      revisionsAcc[id] = {
         url: `${url}?${MOCK_IMAGE_MTIME}`,
-        revision,
+        id,
         errors: undefined,
         loading: false
       }

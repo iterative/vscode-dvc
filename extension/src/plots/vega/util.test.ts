@@ -75,8 +75,8 @@ describe('getColorScale', () => {
     const [firstColor, secondColor] = copyOriginalColors()
     expect(
       getColorScale([
-        { displayColor: firstColor, revision: 'main' },
-        { displayColor: secondColor, revision: EXPERIMENT_WORKSPACE_ID }
+        { displayColor: firstColor, id: 'main' },
+        { displayColor: secondColor, id: EXPERIMENT_WORKSPACE_ID }
       ])
     ).toStrictEqual({
       domain: ['main', EXPERIMENT_WORKSPACE_ID],

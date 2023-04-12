@@ -13,11 +13,15 @@ import { customPlotsOrderFixture } from '../../test/fixtures/expShow/base/custom
 import { ErrorsModel } from '../errors/model'
 
 const mockedRevisions = [
-  { displayColor: 'white', label: EXPERIMENT_WORKSPACE_ID },
-  { displayColor: 'red', label: 'main' },
-  { displayColor: 'blue', label: '71f31cf' },
-  { displayColor: 'black', label: 'e93c7e6' },
-  { displayColor: 'brown', label: 'ffbe811' }
+  {
+    displayColor: 'white',
+    id: EXPERIMENT_WORKSPACE_ID,
+    label: EXPERIMENT_WORKSPACE_ID
+  },
+  { displayColor: 'red', id: 'main', label: 'main' },
+  { displayColor: 'blue', id: '71f31cf', label: '71f31cf' },
+  { displayColor: 'black', id: 'e93c7e6', label: 'e93c7e6' },
+  { displayColor: 'brown', id: 'ffbe811', label: 'ffbe811' }
 ]
 
 describe('plotsModel', () => {
@@ -170,14 +174,14 @@ describe('plotsModel', () => {
     ).toStrictEqual([
       ...newOrder,
       ...mockedRevisions
-        .map(({ label }) => label)
+        .map(({ id }) => id)
         .filter(revision => !newOrder.includes(revision))
     ])
   })
 
   it('should send previously selected revisions to the end of the list', () => {
     const allRevisions = mockedRevisions.slice(0, 3)
-    const revisionDropped = allRevisions.filter(({ label }) => label !== 'main')
+    const revisionDropped = allRevisions.filter(({ id }) => id !== 'main')
     const revisionReAdded = allRevisions
 
     mockedGetSelectedRevisions

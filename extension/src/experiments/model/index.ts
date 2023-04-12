@@ -121,7 +121,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   public transformAndSet_(
     data: ExpShowOutput,
     dvcLiveOnly: boolean,
-    commitsOutput: string
+    commitsOutput: string | undefined
   ) {
     const { workspace, commits, experimentsByCommit, runningExperiments } =
       collectExperiments_(data, dvcLiveOnly, commitsOutput)
@@ -300,7 +300,7 @@ export class ExperimentsModel extends ModelWithPersistence {
       ...this.commits.map(commit => {
         return {
           ...this.addDetails(commit),
-          hasChildren: !!this.experimentsByCommit.get(commit.label),
+          hasChildren: !!this.experimentsByCommit.get(commit.id),
           type: ExperimentType.COMMIT
         }
       })
@@ -437,7 +437,7 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   private getExperimentsByCommit(commit: Experiment) {
     const experiments = this.experimentsByCommit
-      .get(commit.label)
+      .get(commit.id)
       ?.map(experiment => this.addDetails(experiment))
     if (!experiments) {
       return

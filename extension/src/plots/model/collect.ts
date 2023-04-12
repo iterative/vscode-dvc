@@ -24,7 +24,6 @@ import {
   truncateVerticalTitle
 } from '../vega/util'
 import { definedAndNonEmpty } from '../../util/array'
-import { shortenForLabel } from '../../util/string'
 import {
   getDvcDataVersionInfo,
   isConcatenatedField,
@@ -54,7 +53,7 @@ const getValues = (
 
     if (metricValue !== undefined && paramValue !== undefined) {
       values.push({
-        expName: experiment.name || experiment.label,
+        id: experiment.id,
         metric: metricValue,
         param: paramValue
       })
@@ -121,30 +120,21 @@ export type ComparisonData = {
   }
 }
 
-export type CLIRevisionIdToLabel = { [shortSha: string]: string }
-
 const collectImageData = (
   acc: ComparisonData,
   path: string,
-  plot: ImagePlot,
-  cliIdToLabel: CLIRevisionIdToLabel
+  plot: ImagePlot
 ) => {
-  const rev = plot.revisions?.[0]
-  if (!rev) {
+  const id = plot.revisions?.[0]
+  if (!id) {
     return
   }
 
-  const label = cliIdToLabel[rev]
-
-  if (!label) {
-    return
+  if (!acc[id]) {
+    acc[id] = {}
   }
 
-  if (!acc[label]) {
-    acc[label] = {}
-  }
-
-  acc[label][path] = plot
+  acc[id][path] = plot
 }
 
 const collectDatapoints = (
@@ -168,17 +158,15 @@ const collectDatapoints = (
 const collectPlotData = (
   acc: RevisionData,
   path: string,
-  plot: TemplatePlot,
-  cliIdToLabel: CLIRevisionIdToLabel
+  plot: TemplatePlot
 ) => {
   for (const id of plot.revisions || []) {
-    const label = cliIdToLabel[id]
-    if (!acc[label]) {
-      acc[label] = {}
+    if (!acc[id]) {
+      acc[id] = {}
     }
-    acc[label][path] = []
+    acc[id][path] = []
 
-    collectDatapoints(acc, path, label, plot.datapoints?.[id])
+    collectDatapoints(acc, path, id, plot.datapoints?.[id])
   }
 }
 
@@ -187,26 +175,18 @@ type DataAccumulator = {
   comparisonData: ComparisonData
 }
 
-const collectPathData = (
-  acc: DataAccumulator,
-  path: string,
-  plots: Plot[],
-  cliIdToLabel: CLIRevisionIdToLabel
-) => {
+const collectPathData = (acc: DataAccumulator, path: string, plots: Plot[]) => {
   for (const plot of plots) {
     if (isImagePlot(plot)) {
-      collectImageData(acc.comparisonData, path, plot, cliIdToLabel)
+      collectImageData(acc.comparisonData, path, plot)
       continue
     }
 
-    collectPlotData(acc.revisionData, path, plot, cliIdToLabel)
+    collectPlotData(acc.revisionData, path, plot)
   }
 }
 
-export const collectData = (
-  output: PlotsOutput,
-  cliIdToLabel: CLIRevisionIdToLabel
-): DataAccumulator => {
+export const collectData = (output: PlotsOutput): DataAccumulator => {
   const { data } = output
   const acc = {
     comparisonData: {},
@@ -214,7 +194,7 @@ export const collectData = (
   } as DataAccumulator
 
   for (const [path, plots] of Object.entries(data)) {
-    collectPathData(acc, path, plots, cliIdToLabel)
+    collectPathData(acc, path, plots)
   }
 
   return acc
@@ -456,32 +436,12 @@ export const collectSelectedTemplatePlots = (
   return acc.length > 0 ? acc : undefined
 }
 
-export const collectIdMappingDetails = (
-  commits: {
-    id: string
-    sha: string | undefined
-  }[],
-  experiments: { id: string; label: string }[]
-) => {
-  const idMapping: Record<string, string> = {}
-  for (const { id, sha } of commits) {
-    if (sha) {
-      idMapping[id] = shortenForLabel(sha)
-    }
-  }
-  for (const { id, label } of experiments) {
-    idMapping[label] = id
-  }
-  return idMapping
-}
-
 export const collectOrderedRevisions = (
   revisions: {
     id: string
-    label: string
     Created?: string | null
   }[]
-): { id: string; label: string; Created?: string | null }[] => {
+): { id: string; Created?: string | null }[] => {
   return [...revisions].sort((a, b) => {
     if (a.id === 'workspace') {
       return -1

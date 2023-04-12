@@ -18,47 +18,24 @@ describe('collectErrors', () => {
           path: 'fun::plot',
           rev: EXPERIMENT_WORKSPACE_ID
         }
-      ],
-      {}
+      ]
     )
 
     expect(errors).toStrictEqual([])
   })
 
-  it('should correctly handle the cliIdToLabel mapping for removing existing errors', () => {
-    const errors = collectErrors(
-      { data: {} },
-      [EXPERIMENT_WORKSPACE_ID, 'ff2489c'],
-      [
-        {
-          msg: 'unexpected error',
-          path: 'fun::plot',
-          rev: EXPERIMENT_WORKSPACE_ID
-        },
-        {
-          msg: 'unexpected error',
-          path: 'fun::plot',
-          rev: 'main'
-        }
-      ],
-      { [EXPERIMENT_WORKSPACE_ID]: EXPERIMENT_WORKSPACE_ID, ff2489c: 'main' }
-    )
-
-    expect(errors).toStrictEqual([])
-  })
-
-  it('should correctly handle the cliIdToLabel mapping for replacing errors', () => {
+  it('should correctly replace errors', () => {
     const newError = {
       msg: 'new error',
       name: 'fun::plot',
-      rev: 'ff2489c',
+      rev: 'main',
       source: 'metrics.json',
       type: 'unexpected'
     }
 
     const errors = collectErrors(
       { data: {}, errors: [newError] },
-      [EXPERIMENT_WORKSPACE_ID, 'ff2489c'],
+      [EXPERIMENT_WORKSPACE_ID, 'main'],
       [
         {
           msg: 'unexpected error',
@@ -70,8 +47,7 @@ describe('collectErrors', () => {
           path: 'fun::plot',
           rev: 'main'
         }
-      ],
-      { [EXPERIMENT_WORKSPACE_ID]: EXPERIMENT_WORKSPACE_ID, ff2489c: 'main' }
+      ]
     )
 
     expect(errors).toStrictEqual([
@@ -83,7 +59,7 @@ describe('collectErrors', () => {
     const newError = {
       msg: 'Blue screen of death',
       name: 'fun::plot',
-      rev: 'd7ad114',
+      rev: 'main',
       source: 'metrics.json',
       type: 'unexpected'
     }
@@ -100,8 +76,7 @@ describe('collectErrors', () => {
           path: 'fun::plot',
           rev: EXPERIMENT_WORKSPACE_ID
         }
-      ],
-      { d7ad114: 'main' }
+      ]
     )
 
     expect(errors).toStrictEqual([

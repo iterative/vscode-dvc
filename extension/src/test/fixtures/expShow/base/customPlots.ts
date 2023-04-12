@@ -27,22 +27,21 @@ export const experimentsWithCommits: Experiment[] = [
         accuracy: 0.3484833240509033
       }
     },
-    name: 'main',
     params: { 'params.yaml': { dropout: 0.122, epochs: 5 } }
   },
   {
-    id: '12345',
+    id: 'exp-e7a67',
     metrics: {
       'summary.json': {
         accuracy: 0.3724166750907898,
         loss: 2.0205044746398926
       }
     },
-    label: 'exp-e7a67',
+    label: '1224',
     params: { 'params.yaml': { dropout: 0.15, epochs: 2 } }
   },
   {
-    id: '12345',
+    id: 'test-branch',
     label: '123',
     metrics: {
       'summary.json': {
@@ -50,11 +49,10 @@ export const experimentsWithCommits: Experiment[] = [
         loss: 1.9293040037155151
       }
     },
-    name: 'test-branch',
     params: { 'params.yaml': { dropout: 0.122, epochs: 2 } }
   },
   {
-    id: '12345',
+    id: 'exp-83425',
     label: '123',
     metrics: {
       'summary.json': {
@@ -62,7 +60,6 @@ export const experimentsWithCommits: Experiment[] = [
         loss: 1.775016188621521
       }
     },
-    name: 'exp-83425',
     params: { 'params.yaml': { dropout: 0.124, epochs: 5 } }
   }
 ]
@@ -125,22 +122,22 @@ const data: CustomPlotsData = {
       },
       values: [
         {
-          expName: 'main',
+          id: 'main',
           metric: 2.048856019973755,
           param: 0.122
         },
         {
-          expName: 'exp-e7a67',
+          id: 'exp-e7a67',
           metric: 2.0205044746398926,
           param: 0.15
         },
         {
-          expName: 'test-branch',
+          id: 'test-branch',
           metric: 1.9293040037155151,
           param: 0.122
         },
         {
-          expName: 'exp-83425',
+          id: 'exp-83425',
           metric: 1.775016188621521,
           param: 0.124
         }
@@ -152,22 +149,22 @@ const data: CustomPlotsData = {
       param: 'params.yaml:epochs',
       values: [
         {
-          expName: 'main',
+          id: 'main',
           metric: 0.3484833240509033,
           param: 5
         },
         {
-          expName: 'exp-e7a67',
+          id: 'exp-e7a67',
           metric: 0.3724166750907898,
           param: 2
         },
         {
-          expName: 'test-branch',
+          id: 'test-branch',
           metric: 0.4668000042438507,
           param: 2
         },
         {
-          expName: 'exp-83425',
+          id: 'exp-83425',
           metric: 0.5926499962806702,
           param: 5
         }

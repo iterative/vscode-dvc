@@ -95,12 +95,12 @@ export const isMultiViewByCommitPlot = (
 ): boolean => !template || getFacetField(template) === COMMIT_FIELD
 
 export const getColorScale = (
-  revisions: { displayColor: Color; revision: string }[]
+  revisions: { displayColor: Color; id: string }[]
 ): ColorScale | undefined => {
   const acc: ColorScale = { domain: [], range: [] }
 
-  for (const { revision, displayColor } of revisions) {
-    acc.domain.push(revision)
+  for (const { id, displayColor } of revisions) {
+    acc.domain.push(id)
     acc.range.push(displayColor)
   }
 

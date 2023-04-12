@@ -14,8 +14,8 @@ import {
 } from 'vscode'
 import { buildExperiments, stubWorkspaceExperimentsGetters } from './util'
 import { Disposable } from '../../../extension'
-import expShowFixture from '../../fixtures/expShow/base/output'
-import rowsFixture from '../../fixtures/expShow/base/rows'
+import expShowFixture from '../../fixtures/expShow/base/output_'
+import rowsFixture from '../../fixtures/expShow/base/rows_'
 import columnsFixture, {
   dataColumnOrder as columnsOrderFixture
 } from '../../fixtures/expShow/base/columns'
@@ -74,6 +74,8 @@ import {
 import { ConfigKey } from '../../../vscode/config'
 import {
   EXPERIMENT_WORKSPACE_ID,
+  Executor,
+  ExpShowOutput,
   ExperimentStatus
 } from '../../../cli/dvc/contract'
 import * as Time from '../../../util/time'
@@ -119,10 +121,7 @@ suite('Experiments Test Suite', () => {
     it('should be able to make the experiment webview visible', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('train')
 
-      const { experiments, messageSpy } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, messageSpy } = buildExperiments(disposable)
 
       const webview = await experiments.showWebview()
 
@@ -176,10 +175,7 @@ suite('Experiments Test Suite', () => {
       stub(DvcReader.prototype, 'listStages').resolves(undefined)
       stub(FileSystem, 'hasDvcYamlFile').returns(true)
 
-      const { experiments, messageSpy } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
@@ -192,10 +188,7 @@ suite('Experiments Test Suite', () => {
       stub(DvcReader.prototype, 'listStages').resolves(undefined)
       stub(FileSystem, 'hasDvcYamlFile').returns(false)
 
-      const { experiments, messageSpy } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
@@ -210,10 +203,7 @@ suite('Experiments Test Suite', () => {
       stub(DvcReader.prototype, 'listStages').resolves('')
       stub(FileSystem, 'hasDvcYamlFile').returns(false)
 
-      const { experiments, messageSpy } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
@@ -225,10 +215,7 @@ suite('Experiments Test Suite', () => {
     it('should set hasConfig to false if there are no stages', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('')
 
-      const { experiments, messageSpy } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
@@ -240,10 +227,7 @@ suite('Experiments Test Suite', () => {
     it('should set hasConfig to true if there are stages', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('train')
 
-      const { experiments, messageSpy } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
@@ -254,10 +238,7 @@ suite('Experiments Test Suite', () => {
 
     it('should set hasMoreCommits to true if there are more commits to show', async () => {
       stub(GitReader.prototype, 'getNumCommits').resolves(5)
-      const { experiments, messageSpy } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
@@ -268,10 +249,7 @@ suite('Experiments Test Suite', () => {
 
     it('should set hasMoreCommits to false if there are more commits to show', async () => {
       stub(GitReader.prototype, 'getNumCommits').resolves(1)
-      const { experiments, messageSpy } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
@@ -281,10 +259,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set isShowingMoreCommits to true if it is showing more than the current commit', async () => {
-      const { experiments, messageSpy } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
@@ -295,10 +270,7 @@ suite('Experiments Test Suite', () => {
 
     it('should set isShowingMoreCommits to false it is showing only the current commit', async () => {
       stub(GitReader.prototype, 'getNumCommits').resolves(1)
-      const { experiments, messageSpy } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
@@ -325,7 +297,7 @@ suite('Experiments Test Suite', () => {
         mockCheckOrAddPipeline,
         messageSpy,
         mockUpdateExperimentsData
-      } = buildExperiments(disposable, expShowFixture)
+      } = buildExperiments(disposable)
       const mockExecuteCommand = stub(
         internalCommands,
         'executeCommand'
@@ -347,7 +319,7 @@ suite('Experiments Test Suite', () => {
     }
 
     it('should handle a column reordered message from the webview', async () => {
-      const { experiments } = buildExperiments(disposable, expShowFixture)
+      const { experiments } = buildExperiments(disposable)
 
       const webview = await experiments.showWebview()
 
@@ -389,7 +361,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a column resized message from the webview', async () => {
-      const { experiments } = buildExperiments(disposable, expShowFixture)
+      const { experiments } = buildExperiments(disposable)
 
       const webview = await experiments.showWebview()
 
@@ -423,7 +395,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a column sorted message from the webview', async () => {
-      const { experiments } = buildExperiments(disposable, expShowFixture)
+      const { experiments } = buildExperiments(disposable)
 
       const webview = await experiments.showWebview()
 
@@ -458,7 +430,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a column sort removed from the webview', async () => {
-      const { experiments } = buildExperiments(disposable, expShowFixture)
+      const { experiments } = buildExperiments(disposable)
 
       const webview = await experiments.showWebview()
 
@@ -1035,7 +1007,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to focus the sorts tree', async () => {
-      const { experiments } = buildExperiments(disposable, expShowFixture)
+      const { experiments } = buildExperiments(disposable)
 
       const webview = await experiments.showWebview()
 
@@ -1068,7 +1040,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to focus the filters tree', async () => {
-      const { experiments } = buildExperiments(disposable, expShowFixture)
+      const { experiments } = buildExperiments(disposable)
 
       const webview = await experiments.showWebview()
 
@@ -1101,7 +1073,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to update the table depth', async () => {
-      const { experiments } = buildExperiments(disposable, expShowFixture)
+      const { experiments } = buildExperiments(disposable)
       const inputEvent = getInputBoxEvent('0')
       const tableMaxDepthChanged = configurationChangeEvent(
         ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT,
@@ -1427,13 +1399,6 @@ suite('Experiments Test Suite', () => {
   describe('Sorting', () => {
     it('should be able to sort', async () => {
       const { internalCommands } = buildInternalCommands(disposable)
-      const buildTestExperiment = (testParam: number) => ({
-        params: {
-          'params.yaml': {
-            data: { test: testParam }
-          }
-        }
-      })
 
       const messageSpy = spy(BaseWebview.prototype, 'show')
 
@@ -1456,19 +1421,106 @@ suite('Experiments Test Suite', () => {
         )
       )
 
-      void experiments.setState({
-        [EXPERIMENT_WORKSPACE_ID]: {
-          baseline: { data: buildTestExperiment(10) }
-        },
-        testBranch: {
-          baseline: {
-            data: { name: 'testBranch', ...buildTestExperiment(10) }
+      const testData: ExpShowOutput = [
+        {
+          data: {
+            deps: null,
+            meta: { has_checkpoints: false },
+            metrics: null,
+            outs: null,
+            params: null,
+            rev: EXPERIMENT_WORKSPACE_ID,
+            timestamp: null
           },
-          testExp1: { data: buildTestExperiment(2) },
-          testExp2: { data: buildTestExperiment(1) },
-          testExp3: { data: buildTestExperiment(3) }
+          rev: EXPERIMENT_WORKSPACE_ID
+        },
+        {
+          data: {
+            deps: null,
+            meta: { has_checkpoints: false },
+            metrics: null,
+            outs: null,
+            params: null,
+            rev: 'testBranch',
+            timestamp: null
+          },
+          experiments: [
+            {
+              executor: null,
+              revs: [
+                {
+                  data: {
+                    deps: null,
+                    meta: { has_checkpoints: false },
+                    metrics: null,
+                    outs: null,
+                    params: {
+                      'params.yaml': {
+                        data: {
+                          test: 2
+                        }
+                      }
+                    },
+                    rev: 'exp1',
+                    timestamp: null
+                  },
+                  rev: 'exp1'
+                }
+              ]
+            },
+            {
+              executor: null,
+              revs: [
+                {
+                  data: {
+                    deps: null,
+                    meta: { has_checkpoints: false },
+                    metrics: null,
+                    outs: null,
+                    params: {
+                      'params.yaml': {
+                        data: {
+                          test: 1
+                        }
+                      }
+                    },
+                    rev: 'exp2',
+                    timestamp: null
+                  },
+                  rev: 'exp2'
+                }
+              ]
+            },
+            {
+              executor: null,
+              revs: [
+                {
+                  data: {
+                    deps: null,
+                    meta: { has_checkpoints: false },
+                    metrics: null,
+                    outs: null,
+                    params: {
+                      'params.yaml': {
+                        data: {
+                          test: 3
+                        }
+                      }
+                    },
+                    rev: 'exp3',
+                    timestamp: null
+                  },
+                  rev: 'exp3'
+                }
+              ]
+            }
+          ],
+          name: 'testBranch',
+          rev: 'testBranch'
         }
-      })
+      ]
+
+      void experiments.setState(testData)
 
       messageSpy.resetHistory()
 
@@ -1481,7 +1533,6 @@ suite('Experiments Test Suite', () => {
             displayColor: undefined,
             id: EXPERIMENT_WORKSPACE_ID,
             label: EXPERIMENT_WORKSPACE_ID,
-            params: { 'params.yaml': { test: 10 } },
             selected: false,
             starred: false
           },
@@ -1489,37 +1540,31 @@ suite('Experiments Test Suite', () => {
             displayColor: undefined,
             id: 'testBranch',
             label: 'testBranch',
-            name: 'testBranch',
-            params: { 'params.yaml': { test: 10 } },
             selected: false,
-            sha: 'testBranch',
             starred: false,
             subRows: [
               {
                 displayColor: undefined,
-                id: 'testExp1',
-                label: 'testExp',
+                id: 'exp1',
+                label: 'exp1',
                 params: { 'params.yaml': { test: 2 } },
                 selected: false,
-                sha: 'testExp1',
                 starred: false
               },
               {
                 displayColor: undefined,
-                id: 'testExp2',
-                label: 'testExp',
+                id: 'exp2',
+                label: 'exp2',
                 params: { 'params.yaml': { test: 1 } },
                 selected: false,
-                sha: 'testExp2',
                 starred: false
               },
               {
                 displayColor: undefined,
-                id: 'testExp3',
-                label: 'testExp',
+                id: 'exp3',
+                label: 'exp3',
                 params: { 'params.yaml': { test: 3 } },
                 selected: false,
-                sha: 'testExp3',
                 starred: false
               }
             ]
@@ -1561,7 +1606,6 @@ suite('Experiments Test Suite', () => {
             displayColor: undefined,
             id: EXPERIMENT_WORKSPACE_ID,
             label: EXPERIMENT_WORKSPACE_ID,
-            params: { 'params.yaml': { test: 10 } },
             selected: false,
             starred: false
           },
@@ -1569,37 +1613,31 @@ suite('Experiments Test Suite', () => {
             displayColor: undefined,
             id: 'testBranch',
             label: 'testBranch',
-            name: 'testBranch',
-            params: { 'params.yaml': { test: 10 } },
             selected: false,
-            sha: 'testBranch',
             starred: false,
             subRows: [
               {
                 displayColor: undefined,
-                id: 'testExp2',
-                label: 'testExp',
+                id: 'exp2',
+                label: 'exp2',
                 params: { 'params.yaml': { test: 1 } },
                 selected: false,
-                sha: 'testExp2',
                 starred: false
               },
               {
                 displayColor: undefined,
-                id: 'testExp1',
-                label: 'testExp',
+                id: 'exp1',
+                label: 'exp1',
                 params: { 'params.yaml': { test: 2 } },
                 selected: false,
-                sha: 'testExp1',
                 starred: false
               },
               {
                 displayColor: undefined,
-                id: 'testExp3',
-                label: 'testExp',
+                id: 'exp3',
+                label: 'exp3',
                 params: { 'params.yaml': { test: 3 } },
                 selected: false,
-                sha: 'testExp3',
                 starred: false
               }
             ]
@@ -1696,9 +1734,8 @@ suite('Experiments Test Suite', () => {
         mockMemento.get('experimentsStatus:test'),
         'the correct statuses are persisted'
       ).to.deep.equal({
-        '489fd8bdaa709f7330aac342e051a9431c625481': 0,
-        '55d492c9c633912685351b32df91bfe1f9ecefb9': 0,
-        'exp-83425': 0,
+        '489fd8b': 0,
+        '55d492c': 0,
         'exp-e7a67': colors[1],
         'exp-f13bca': 0,
         main: 0,
@@ -1792,9 +1829,8 @@ suite('Experiments Test Suite', () => {
         mockMemento.get('experimentsStatus:test'),
         'the correct statuses have been recorded in the memento'
       ).to.deep.equal({
-        '489fd8bdaa709f7330aac342e051a9431c625481': 0,
-        '55d492c9c633912685351b32df91bfe1f9ecefb9': 0,
-        'exp-83425': 0,
+        '489fd8b': 0,
+        '55d492c': 0,
         'exp-e7a67': 0,
         'exp-f13bca': 0,
         main: 0,
@@ -1952,22 +1988,32 @@ suite('Experiments Test Suite', () => {
 
   describe('Empty repository', () => {
     it('should not show any experiments in the experiments tree when there are no columns', async () => {
-      const { experiments } = buildExperiments(disposable, {
-        [EXPERIMENT_WORKSPACE_ID]: {
-          baseline: {
-            data: {
-              deps: {}
-            }
+      const { experiments } = buildExperiments(disposable, [
+        {
+          rev: EXPERIMENT_WORKSPACE_ID,
+          data: {
+            rev: EXPERIMENT_WORKSPACE_ID,
+            deps: null,
+            timestamp: null,
+            metrics: null,
+            params: null,
+            outs: null,
+            meta: { has_checkpoints: false }
           }
         },
-        b9f016df00d499f6d2a73e7dc34d1600c78066eb: {
-          baseline: {
-            data: {
-              deps: {}
-            }
+        {
+          rev: 'b9f016df00d499f6d2a73e7dc34d1600c78066eb',
+          data: {
+            rev: 'b9f016df00d499f6d2a73e7dc34d1600c78066eb',
+            deps: null,
+            timestamp: null,
+            metrics: null,
+            params: null,
+            outs: null,
+            meta: { has_checkpoints: false }
           }
         }
-      })
+      ])
       await experiments.isReady()
 
       expect(
@@ -1983,7 +2029,20 @@ suite('Experiments Test Suite', () => {
 
   describe('setState', () => {
     it('should clean up after a killed DVCLive process that was running an experiment outside of the DVC context', async () => {
-      const defaultExperimentsData = { workspace: { baseline: { data: {} } } }
+      const defaultExperimentsData = [
+        {
+          rev: EXPERIMENT_WORKSPACE_ID,
+          data: {
+            timestamp: null,
+            rev: EXPERIMENT_WORKSPACE_ID,
+            params: null,
+            metrics: null,
+            deps: null,
+            outs: null,
+            meta: { has_checkpoints: false }
+          }
+        }
+      ]
 
       const { experiments, mockCheckSignalFile, mockUpdateExperimentsData } =
         buildExperiments(disposable, defaultExperimentsData)
@@ -2037,9 +2096,54 @@ suite('Experiments Test Suite', () => {
       const colors = copyOriginalColors()
       const [color] = colors
       const commit = 'df3f8647a47e403c9c4aa6562cad0b74afbe900b'
-      const expCommit = 'c0f48cf6c3eb589d48979df82c6bbe78c1ee5d61'
-      const expName = 'fizzy-dilemma'
+      const name = 'fizzy-dilemma'
       const params = { 'params.yaml': { data: { lr: 1 } } }
+      const getCommitData = (executor: Executor | null) => ({
+        rev: commit,
+        data: {
+          rev: commit,
+          params,
+          metrics: null,
+          deps: null,
+          timestamp: null,
+          outs: null,
+          meta: { has_checkpoints: false }
+        },
+        experiments: [
+          {
+            name,
+            executor,
+            revs: [
+              {
+                data: {
+                  deps: null,
+                  meta: { has_checkpoints: false },
+                  metrics: null,
+                  outs: null,
+                  params,
+                  rev: EXPERIMENT_WORKSPACE_ID,
+                  timestamp: null
+                },
+                rev: EXPERIMENT_WORKSPACE_ID,
+                name
+              }
+            ]
+          }
+        ]
+      })
+
+      const workspace = {
+        rev: EXPERIMENT_WORKSPACE_ID,
+        data: {
+          rev: EXPERIMENT_WORKSPACE_ID,
+          params,
+          metrics: null,
+          deps: null,
+          timestamp: null,
+          outs: null,
+          meta: { has_checkpoints: false }
+        }
+      }
 
       const getSelectedIdsWithColor = (
         experiments: Experiments
@@ -2053,32 +2157,19 @@ suite('Experiments Test Suite', () => {
         displayColor: color
       }
       const selectedExperiment = {
-        id: expName,
+        id: name,
         displayColor: color
       }
       const bothSelected = [selectedWorkspace, selectedExperiment]
 
-      const data = {
-        workspace: {
-          baseline: {
-            data: {
-              executor: EXPERIMENT_WORKSPACE_ID,
-              params,
-              status: ExperimentStatus.RUNNING
-            }
-          }
-        },
-        [commit]: {
-          baseline: {
-            data: {}
-          }
-        }
-      }
-
-      const { experiments, experimentsModel } = buildExperiments(
-        disposable,
-        data
-      )
+      const { experiments, experimentsModel } = buildExperiments(disposable, [
+        workspace,
+        getCommitData({
+          local: null,
+          state: ExperimentStatus.RUNNING,
+          name: EXPERIMENT_WORKSPACE_ID
+        })
+      ])
 
       await experiments.isReady()
 
@@ -2096,27 +2187,7 @@ suite('Experiments Test Suite', () => {
         experiments.onDidChangeExperiments(() => resolve(undefined))
       )
 
-      await experiments.setState({
-        workspace: {
-          baseline: {
-            data: {
-              executor: null,
-              params
-            }
-          }
-        },
-        [commit]: {
-          ...data[commit],
-          [expCommit]: {
-            data: {
-              name: expName,
-              params,
-              status: ExperimentStatus.SUCCESS,
-              timestamp: '2020-11-21T19:58:22'
-            }
-          }
-        }
-      })
+      await experiments.setState([workspace, getCommitData(null)])
 
       await experimentsChanged
 

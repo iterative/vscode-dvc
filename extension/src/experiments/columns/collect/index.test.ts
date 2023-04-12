@@ -1,10 +1,14 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
-import { join } from 'path'
-import { collectChanges, collectColumns } from '.'
+import {
+  collectChanges,
+  collectChanges_,
+  collectColumns,
+  collectColumns_
+} from '.'
 import { timestampColumn } from '../constants'
-import { buildDepPath, buildMetricOrParamPath } from '../paths'
+import { buildMetricOrParamPath } from '../paths'
 import { Column, ColumnType } from '../../webview/contract'
-import outputFixture from '../../../test/fixtures/expShow/base/output'
+import outputFixture from '../../../test/fixtures/expShow/base/output_'
 import columnsFixture from '../../../test/fixtures/expShow/base/columns'
 import workspaceChangesFixture from '../../../test/fixtures/expShow/base/workspaceChanges'
 import uncommittedDepsFixture from '../../../test/fixtures/expShow/uncommittedDeps/output'
@@ -23,7 +27,7 @@ mockedGetConfigValue.mockImplementation(() => 5)
 
 describe('collectColumns', () => {
   it('should return a value equal to the columns fixture when given the output fixture', () => {
-    const columns = collectColumns(outputFixture)
+    const columns = collectColumns_(outputFixture)
     expect(columns).toStrictEqual(columnsFixture)
   })
 
@@ -429,70 +433,6 @@ describe('collectColumns', () => {
 
     expect(onlyHasPrimitiveChild).toBeUndefined()
   })
-
-  it('should collect all params and metrics from the test fixture', () => {
-    expect(collectColumns(outputFixture).map(({ path }) => path)).toStrictEqual(
-      [
-        timestampColumn.path,
-        buildMetricOrParamPath(ColumnType.METRICS, 'summary.json'),
-        buildMetricOrParamPath(ColumnType.METRICS, 'summary.json', 'loss'),
-        buildMetricOrParamPath(ColumnType.METRICS, 'summary.json', 'accuracy'),
-        buildMetricOrParamPath(ColumnType.METRICS, 'summary.json', 'val_loss'),
-        buildMetricOrParamPath(
-          ColumnType.METRICS,
-          'summary.json',
-          'val_accuracy'
-        ),
-        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
-        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'code_names'),
-        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'epochs'),
-        buildMetricOrParamPath(
-          ColumnType.PARAMS,
-          'params.yaml',
-          'learning_rate'
-        ),
-        buildMetricOrParamPath(
-          ColumnType.PARAMS,
-          'params.yaml',
-          'dvc_logs_dir'
-        ),
-        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'log_file'),
-        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'dropout'),
-        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'process'),
-        buildMetricOrParamPath(
-          ColumnType.PARAMS,
-          'params.yaml',
-          'process',
-          'threshold'
-        ),
-        buildMetricOrParamPath(
-          ColumnType.PARAMS,
-          'params.yaml',
-          'process',
-          'test_arg'
-        ),
-        buildMetricOrParamPath(
-          ColumnType.PARAMS,
-          join('nested', 'params.yaml')
-        ),
-        buildMetricOrParamPath(
-          ColumnType.PARAMS,
-          join('nested', 'params.yaml'),
-          'test'
-        ),
-        buildDepPath('data'),
-        buildDepPath('data', 'data.xml'),
-        buildDepPath('src'),
-        buildDepPath('src', 'prepare.py'),
-        buildDepPath('data', 'prepared'),
-        buildDepPath('src', 'featurization.py'),
-        buildDepPath('data', 'features'),
-        buildDepPath('src', 'train.py'),
-        buildDepPath('model.pkl'),
-        buildDepPath('src', 'evaluate.py')
-      ]
-    )
-  })
 })
 
 describe('collectChanges', () => {
@@ -523,7 +463,7 @@ describe('collectChanges', () => {
   })
 
   it('should return the expected data from the output fixture', () => {
-    const changes = collectChanges(outputFixture)
+    const changes = collectChanges_(outputFixture)
     expect(changes).toStrictEqual(workspaceChangesFixture)
   })
 

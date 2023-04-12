@@ -76,24 +76,22 @@ const removeImages = (
   // eslint-disable-next-line sonarjs/cognitive-complexity
 ): ComparisonRevisionData => {
   const filteredRevisionData: ComparisonRevisionData = {}
-  for (const [revision, data] of Object.entries(revisionsData)) {
+  for (const [id, data] of Object.entries(revisionsData)) {
     if (
       (path === comparisonTableFixture.plots[0].path &&
-        ['main', '4fb124a'].includes(revision)) ||
-      revision === EXPERIMENT_WORKSPACE_ID
+        ['main', '4fb124a'].includes(id)) ||
+      id === EXPERIMENT_WORKSPACE_ID
     ) {
-      filteredRevisionData[revision] = {
+      filteredRevisionData[id] = {
         errors:
-          revision === 'main'
-            ? [`FileNotFoundError: ${path} not found.`]
-            : undefined,
+          id === 'main' ? [`FileNotFoundError: ${path} not found.`] : undefined,
+        id,
         loading: false,
-        revision,
         url: undefined
       }
       continue
     }
-    filteredRevisionData[revision] = data
+    filteredRevisionData[id] = data
   }
   return filteredRevisionData
 }

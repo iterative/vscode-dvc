@@ -57,6 +57,7 @@ describe('ComparisonTable', () => {
 
   const selectedRevisions: Revision[] = plotsRevisionsFixture
   const revisions = selectedRevisions.map(({ revision }) => revision)
+  const ids = selectedRevisions.map(({ id }) => id)
   const namedRevisions = selectedRevisions.map(
     ({ revision, group }) => `${revision}${group || ''}`
   )
@@ -107,21 +108,21 @@ describe('ComparisonTable', () => {
   it('should show the pinned column first', () => {
     renderTable()
 
-    const [firstColumn, secondColumn] = screen.getAllByRole('columnheader')
-    const [firstExperiment, secondExperiment] = revisions
+    const [, secondColumn, thirdColumn] = screen.getAllByRole('columnheader')
+    const [, secondExperiment, thirdExperiment] = revisions
 
-    const expectedFirstColumn = screen.getByText(firstExperiment)
+    const expectedFirstColumn = screen.getByText(secondExperiment)
 
-    expect(firstColumn.textContent).toBe(expectedFirstColumn.textContent)
+    expect(secondColumn.textContent).toBe(expectedFirstColumn.textContent)
 
-    fireEvent.click(getPin(screen.getByText(secondExperiment)), {
+    fireEvent.click(getPin(screen.getByText(thirdExperiment)), {
       bubbles: true,
       cancelable: true
     })
 
     const [pinnedColumn] = getHeaders()
 
-    expect(pinnedColumn.textContent).toBe(secondColumn.textContent)
+    expect(pinnedColumn.textContent).toBe(thirdColumn.textContent)
   })
 
   it('should send a reorder message when a column is pinned', () => {
@@ -142,10 +143,7 @@ describe('ComparisonTable', () => {
 
     expect(mockPostMessage).toHaveBeenCalledTimes(1)
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: [
-        thirdExperiment,
-        ...revisions.filter(rev => rev !== thirdExperiment)
-      ],
+      payload: [ids[2], ...ids.filter(rev => rev !== ids[2])],
       type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON
     })
   })
@@ -153,30 +151,30 @@ describe('ComparisonTable', () => {
   it('should unpin a column with a second click', () => {
     renderTable()
 
-    const [firstColumn, secondColumn] = screen.getAllByRole('columnheader')
-    const [firstExperiment, secondExperiment] = revisions
+    const [, secondColumn, thirdColumn] = screen.getAllByRole('columnheader')
+    const [, secondExperiment, thirdExperiment] = revisions
 
-    const expectedFirstColumn = screen.getByText(firstExperiment)
+    const expectedFirstColumn = screen.getByText(secondExperiment)
 
-    expect(firstColumn.textContent).toBe(expectedFirstColumn.textContent)
+    expect(secondColumn.textContent).toBe(expectedFirstColumn.textContent)
 
-    fireEvent.click(getPin(screen.getByText(secondExperiment)), {
+    fireEvent.click(getPin(screen.getByText(thirdExperiment)), {
       bubbles: true,
       cancelable: true
     })
 
     const [pinnedColumn] = getHeaders()
     expect(pinnedColumn.getAttribute('draggable')).toBe('false')
-    expect(pinnedColumn.textContent).toBe(secondColumn.textContent)
+    expect(pinnedColumn.textContent).toBe(thirdColumn.textContent)
 
-    fireEvent.click(getPin(screen.getByText(secondExperiment)), {
+    fireEvent.click(getPin(screen.getByText(thirdExperiment)), {
       bubbles: true,
       cancelable: true
     })
 
     const [unpinnedColumn] = getHeaders()
     expect(unpinnedColumn.getAttribute('draggable')).toBe('true')
-    expect(unpinnedColumn.textContent).toBe(secondColumn.textContent)
+    expect(unpinnedColumn.textContent).toBe(thirdColumn.textContent)
   })
 
   it('should have as many twice as many rows as there are plots entries', () => {
@@ -251,7 +249,12 @@ describe('ComparisonTable', () => {
     const newRevName = 'newRev'
     const newRevisions = [
       ...selectedRevisions,
-      { displayColor: '#000000', fetched: true, revision: newRevName }
+      {
+        displayColor: '#000000',
+        fetched: true,
+        id: newRevName,
+        revision: newRevName
+      }
     ] as Revision[]
 
     renderTable(
@@ -274,8 +277,8 @@ describe('ComparisonTable', () => {
           ...revisions,
           [revisionWithNoData]: {
             errors: undefined,
+            id: revisionWithNoData,
             loading: false,
-            revision: revisionWithNoData,
             url: undefined
           }
         }
@@ -307,8 +310,8 @@ describe('ComparisonTable', () => {
           ...revisions,
           [revisionWithNoData]: {
             errors: ['this is an error'],
+            id: revisionWithNoData,
             loading: false,
-            revision: revisionWithNoData,
             url: undefined
           }
         }
@@ -320,8 +323,8 @@ describe('ComparisonTable', () => {
           fetched: true,
           firstThreeColumns: [],
           group: undefined,
-          id: 'noData',
-          revision: revisionWithNoData
+          id: revisionWithNoData,
+          revision: 'noData'
         }
       ]
     })
@@ -398,18 +401,12 @@ describe('ComparisonTable', () => {
         namedRevisions[4]
       ]
 
-      const expectedRevisions = [
-        revisions[0],
-        revisions[3],
-        revisions[1],
-        revisions[2],
-        revisions[4]
-      ]
+      const expectedIds = [ids[0], ids[3], ids[1], ids[2], ids[4]]
 
       expect(headers).toStrictEqual(expectedNamedRevisions)
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
-        payload: expectedRevisions,
+        payload: expectedIds,
         type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON
       })
     })

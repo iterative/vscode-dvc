@@ -7,7 +7,7 @@ import { Disposable } from '../../../../../extension'
 import columnsFixture, {
   dataColumnOrder as columnsOrderFixture
 } from '../../../../fixtures/expShow/base/columns'
-import rowsFixture from '../../../../fixtures/expShow/base/rows'
+import rowsFixture from '../../../../fixtures/expShow/base/rows_'
 import workspaceChangesFixture from '../../../../fixtures/expShow/base/workspaceChanges'
 import { WorkspaceExperiments } from '../../../../../experiments/workspace'
 import {

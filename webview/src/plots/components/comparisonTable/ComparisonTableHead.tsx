@@ -57,20 +57,20 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
     }
   }, [ribbonHeight, headRef])
 
-  const items = columns.map(({ revision, displayColor, group }) => {
+  const items = columns.map(({ revision, id, displayColor, group }) => {
     const isPinned = revision === pinnedColumn
     return (
       <th
-        key={revision}
-        id={revision}
+        key={id}
+        id={id}
         className={cx(styles.comparisonTableHeader, {
           [styles.pinnedColumnHeader]: isPinned,
-          [styles.draggedColumn]: draggedId === revision
+          [styles.draggedColumn]: draggedId === id
         })}
       >
         <ComparisonTableHeader
           isPinned={isPinned}
-          onClicked={() => setPinnedColumn(revision)}
+          onClicked={() => setPinnedColumn(id)}
           displayColor={displayColor}
         >
           {revision}
@@ -84,7 +84,7 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
     <thead data-testid="comparison-table-head" ref={headRef}>
       <tr>
         <DragDropContainer
-          order={columns.map(col => col.revision)}
+          order={columns.map(col => col.id)}
           setOrder={setColumnsOrder}
           disabledDropIds={[pinnedColumn]}
           items={items}

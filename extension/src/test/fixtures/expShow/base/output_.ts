@@ -467,10 +467,10 @@ const data: ExpShowOutput = [
         name: 'exp-83425',
         revs: [
           {
-            rev: 'workspace',
+            rev: EXPERIMENT_WORKSPACE_ID,
             name: 'exp-83425',
             data: {
-              rev: 'workspace',
+              rev: EXPERIMENT_WORKSPACE_ID,
               meta: { has_checkpoints: true },
               deps: {
                 [join('data', 'data.xml')]: {

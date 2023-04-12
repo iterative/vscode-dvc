@@ -165,17 +165,13 @@ suite('Workspace Experiments Test Suite', () => {
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
         [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
-        Thenable<
-          QuickPickItem[] | QuickPickItemWithValue<{ id: string }> | undefined
-        >
+        Thenable<QuickPickItem[] | QuickPickItemWithValue<string> | undefined>
       >
       mockShowQuickPick
         .onFirstCall()
         .resolves({
-          value: { id: EXPERIMENT_WORKSPACE_ID }
-        } as QuickPickItemWithValue<{
-          id: string
-        }>)
+          value: EXPERIMENT_WORKSPACE_ID
+        } as QuickPickItemWithValue<string>)
         .onSecondCall()
         .resolves([
           {
@@ -224,17 +220,13 @@ suite('Workspace Experiments Test Suite', () => {
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
         [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
-        Thenable<
-          QuickPickItem[] | QuickPickItemWithValue<{ id: string }> | undefined
-        >
+        Thenable<QuickPickItem[] | QuickPickItemWithValue<string> | undefined>
       >
       mockShowQuickPick
         .onFirstCall()
         .resolves({
-          value: { id: EXPERIMENT_WORKSPACE_ID }
-        } as QuickPickItemWithValue<{
-          id: string
-        }>)
+          value: EXPERIMENT_WORKSPACE_ID
+        } as QuickPickItemWithValue<string>)
         .onSecondCall()
         .resolves([
           {
@@ -286,17 +278,13 @@ suite('Workspace Experiments Test Suite', () => {
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
         [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
-        Thenable<
-          QuickPickItem[] | QuickPickItemWithValue<{ id: string }> | undefined
-        >
+        Thenable<QuickPickItem[] | QuickPickItemWithValue<string> | undefined>
       >
       mockShowQuickPick
         .onFirstCall()
         .resolves({
-          value: { id: EXPERIMENT_WORKSPACE_ID }
-        } as QuickPickItemWithValue<{
-          id: string
-        }>)
+          value: EXPERIMENT_WORKSPACE_ID
+        } as QuickPickItemWithValue<string>)
         .onSecondCall()
         .resolves([
           {
@@ -471,13 +459,13 @@ suite('Workspace Experiments Test Suite', () => {
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
         [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
-        Thenable<QuickPickItemWithValue<{ id: string }>[] | undefined>
+        Thenable<QuickPickItemWithValue<string>[] | undefined>
       >
 
       mockShowQuickPick.resolves([
         {
-          value: { id: queueTaskId }
-        } as QuickPickItemWithValue<{ id: string }>
+          value: queueTaskId
+        } as QuickPickItemWithValue<string>
       ])
 
       const { experiments } = buildExperiments(disposable)
@@ -496,7 +484,7 @@ suite('Workspace Experiments Test Suite', () => {
               '2020-12-29T15:31:52'
             )}, loss:2.0205045, accuracy:0.37241668`,
             label: '4fb124a',
-            value: { id: queueTaskId, name: 'exp-e7a67' }
+            value: queueTaskId
           }
         ],
         {
@@ -566,8 +554,8 @@ suite('Workspace Experiments Test Suite', () => {
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const mockShowQuickPick = stub(window, 'showQuickPick').resolves({
-        value: { id: selectedExperiment, name: selectedExperiment }
-      } as QuickPickItemWithValue<{ id: string; name: string }>)
+        value: selectedExperiment
+      } as QuickPickItemWithValue<string>)
       const mockExperimentApply = stub(DvcExecutor.prototype, 'experimentApply')
 
       await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_APPLY)
@@ -584,10 +572,7 @@ suite('Workspace Experiments Test Suite', () => {
               '2020-12-29T15:31:52'
             )}, loss:2.0205045, accuracy:0.37241668`,
             label: '4fb124a',
-            value: {
-              id: 'exp-e7a67',
-              name: 'exp-e7a67'
-            }
+            value: 'exp-e7a67'
           },
           {
             description: '[test-branch]',
@@ -595,30 +580,21 @@ suite('Workspace Experiments Test Suite', () => {
               '2020-12-29T15:28:59'
             )}, loss:1.9293040, accuracy:0.46680000`,
             label: '42b8736',
-            value: {
-              id: 'test-branch',
-              name: 'test-branch'
-            }
+            value: 'test-branch'
           },
           {
             description: '[exp-83425]',
             detail: `Created:${formatDate(
               '2020-12-29T15:27:02'
             )}, loss:1.7750162, accuracy:0.59265000`,
-            label: '1ba7bcd',
-            value: {
-              id: 'exp-83425',
-              name: 'exp-83425'
-            }
+            label: 'workspace',
+            value: 'exp-83425'
           },
           {
             description: undefined,
             detail: 'Created:-, loss:-, accuracy:-',
             label: '489fd8b',
-            value: {
-              id: '489fd8bdaa709f7330aac342e051a9431c625481',
-              name: '489fd8b'
-            }
+            value: '489fd8b'
           },
           {
             description: '[exp-f13bca]',
@@ -626,7 +602,7 @@ suite('Workspace Experiments Test Suite', () => {
               '2020-12-29T15:26:36'
             )}, loss:-, accuracy:-`,
             label: 'f0f9186',
-            value: { id: 'exp-f13bca', name: 'exp-f13bca' }
+            value: 'exp-f13bca'
           },
           {
             description: undefined,
@@ -634,10 +610,7 @@ suite('Workspace Experiments Test Suite', () => {
               '2020-12-29T15:25:27'
             )}, loss:-, accuracy:-`,
             label: '55d492c',
-            value: {
-              id: '55d492c9c633912685351b32df91bfe1f9ecefb9',
-              name: '55d492c'
-            }
+            value: '55d492c'
           }
         ],
         {
@@ -662,8 +635,8 @@ suite('Workspace Experiments Test Suite', () => {
       const inputEvent = getInputBoxEvent(mockBranch)
 
       stub(window, 'showQuickPick').resolves({
-        value: { id: testExperiment, name: testExperiment }
-      } as QuickPickItemWithValue<{ id: string; name: string }>)
+        value: testExperiment
+      } as QuickPickItemWithValue<string>)
 
       const mockExperimentBranch = stub(
         DvcExecutor.prototype,
@@ -700,8 +673,8 @@ suite('Workspace Experiments Test Suite', () => {
       const inputEvent = getInputBoxEvent(mockBranch)
 
       stub(window, 'showQuickPick').resolves({
-        value: { id: testExperiment, name: testExperiment }
-      } as QuickPickItemWithValue<{ id: string; name: string }>)
+        value: testExperiment
+      } as QuickPickItemWithValue<string>)
 
       const mockExperimentBranch = stub(
         DvcExecutor.prototype,
@@ -763,8 +736,8 @@ suite('Workspace Experiments Test Suite', () => {
       const inputEvent = getInputBoxEvent(mockCommit)
 
       stub(window, 'showQuickPick').resolves({
-        value: { id: testExperiment, name: testExperiment }
-      } as QuickPickItemWithValue<{ id: string; name: string }>)
+        value: testExperiment
+      } as QuickPickItemWithValue<string>)
 
       const mockExperimentApply = stub(
         DvcExecutor.prototype,
@@ -812,10 +785,7 @@ suite('Workspace Experiments Test Suite', () => {
     it('should ask the user to pick experiment(s) and then remove selected ones from the workspace', async () => {
       const mockExperiment = 'exp-e7a67'
       const secondMockExperiment = 'exp-83425'
-      type QuickPickReturnValue = QuickPickItemWithValue<{
-        id: string
-        name: string
-      }>[]
+      type QuickPickReturnValue = QuickPickItemWithValue<string>[]
 
       const { experiments } = buildExperiments(disposable)
 
@@ -832,16 +802,16 @@ suite('Workspace Experiments Test Suite', () => {
         .onFirstCall()
         .resolves([
           {
-            value: { id: mockExperiment, name: mockExperiment }
+            value: mockExperiment
           }
         ] as QuickPickReturnValue)
         .onSecondCall()
         .resolves([
           {
-            value: { id: mockExperiment, name: mockExperiment }
+            value: mockExperiment
           },
           {
-            value: { id: secondMockExperiment, name: secondMockExperiment }
+            value: secondMockExperiment
           }
         ] as QuickPickReturnValue)
       const mockExperimentRemove = stub(
@@ -858,10 +828,7 @@ suite('Workspace Experiments Test Suite', () => {
               '2020-12-29T15:31:52'
             )}, loss:2.0205045, accuracy:0.37241668`,
             label: '4fb124a',
-            value: {
-              id: 'exp-e7a67',
-              name: 'exp-e7a67'
-            }
+            value: 'exp-e7a67'
           },
           {
             description: '[test-branch]',
@@ -869,30 +836,21 @@ suite('Workspace Experiments Test Suite', () => {
               '2020-12-29T15:28:59'
             )}, loss:1.9293040, accuracy:0.46680000`,
             label: '42b8736',
-            value: {
-              id: 'test-branch',
-              name: 'test-branch'
-            }
+            value: 'test-branch'
           },
           {
             description: '[exp-83425]',
             detail: `Created:${formatDate(
               '2020-12-29T15:27:02'
             )}, loss:1.7750162, accuracy:0.59265000`,
-            label: '1ba7bcd',
-            value: {
-              id: 'exp-83425',
-              name: 'exp-83425'
-            }
+            label: EXPERIMENT_WORKSPACE_ID,
+            value: 'exp-83425'
           },
           {
             description: undefined,
             detail: 'Created:-, loss:-, accuracy:-',
             label: '489fd8b',
-            value: {
-              id: '489fd8bdaa709f7330aac342e051a9431c625481',
-              name: '489fd8b'
-            }
+            value: '489fd8b'
           },
           {
             description: '[exp-f13bca]',
@@ -900,7 +858,7 @@ suite('Workspace Experiments Test Suite', () => {
               '2020-12-29T15:26:36'
             )}, loss:-, accuracy:-`,
             label: 'f0f9186',
-            value: { id: 'exp-f13bca', name: 'exp-f13bca' }
+            value: 'exp-f13bca'
           },
           {
             description: undefined,
@@ -908,10 +866,7 @@ suite('Workspace Experiments Test Suite', () => {
               '2020-12-29T15:25:27'
             )}, loss:-, accuracy:-`,
             label: '90aea7f',
-            value: {
-              id: '90aea7f2482117a55dfcadcdb901aaa6610fbbc9',
-              name: '90aea7f'
-            }
+            value: '90aea7f'
           },
           {
             description: undefined,
@@ -919,10 +874,7 @@ suite('Workspace Experiments Test Suite', () => {
               '2020-12-29T15:25:27'
             )}, loss:-, accuracy:-`,
             label: '55d492c',
-            value: {
-              id: '55d492c9c633912685351b32df91bfe1f9ecefb9',
-              name: '55d492c'
-            }
+            value: '55d492c'
           }
         ],
         {

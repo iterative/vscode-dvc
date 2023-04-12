@@ -19,12 +19,9 @@ const getMessage = (error: PlotError): string => {
 export const collectErrors = (
   data: PlotsOutput,
   revs: string[],
-  errors: Error[],
-  cliIdToLabel: { [id: string]: string }
+  errors: Error[]
 ): Error[] => {
-  const fetchedRevs = new Set(
-    revs.map((rev: string) => cliIdToLabel[rev] || rev)
-  )
+  const fetchedRevs = new Set(revs)
 
   const existingErrors = errors.filter(({ rev }) => !fetchedRevs.has(rev))
   const newErrors = data?.errors || []
@@ -36,7 +33,7 @@ export const collectErrors = (
       return {
         msg: getMessage(error),
         path: name,
-        rev: cliIdToLabel[rev] || rev
+        rev
       }
     })
   ]

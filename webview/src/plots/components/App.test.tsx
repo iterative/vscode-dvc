@@ -231,8 +231,8 @@ describe('App', () => {
             revisions: {
               ad2b5ec: {
                 errors: undefined,
+                id: 'ad2b5ec',
                 loading: true,
-                revision: 'ad2b5ec',
                 url: undefined
               }
             }
@@ -244,7 +244,7 @@ describe('App', () => {
             fetched: false,
             firstThreeColumns: [],
             group: '[exp-a270a]',
-            id: 'ad2b5ec854a447d00d9dfa9cdf88211a39a17813',
+            id: 'ad2b5ec',
             revision: 'ad2b5ec'
           }
         ],
@@ -260,7 +260,7 @@ describe('App', () => {
           fetched: false,
           firstThreeColumns: [],
           group: '[exp-a270a]',
-          id: 'ad2b5ec854a447d00d9dfa9cdf88211a39a17813',
+          id: 'ad2b5ec',
           revision: 'ad2b5ec'
         }
       ],

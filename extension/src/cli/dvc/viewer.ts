@@ -51,13 +51,13 @@ export class DvcViewer extends Disposable implements ICli {
     return this.createProcess(name, cwd, args)
   }
 
-  public queueLogs(cwd: string, expName: string) {
+  public queueLogs(cwd: string, id: string) {
     return this.run(
-      `${expName} logs`,
+      `${id} logs`,
       cwd,
       Command.QUEUE,
       QueueSubCommand.LOGS,
-      expName,
+      id,
       Flag.FOLLOW
     )
   }

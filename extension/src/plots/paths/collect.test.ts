@@ -13,74 +13,63 @@ import { TemplatePlotGroup, PlotsType } from '../webview/contract'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import { Shape, StrokeDash } from '../multiSource/constants'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
-import { CLIRevisionIdToLabel } from '../model/collect'
-import { getCLIIdToLabel } from '../../test/fixtures/plotsDiff/util'
 import { REVISIONS } from '../../test/fixtures/plotsDiff'
 
 describe('collectPaths', () => {
-  const revisions = [
-    EXPERIMENT_WORKSPACE_ID,
-    'main',
-    '4fb124a',
-    '42b8736',
-    '1ba7bcd'
-  ]
   it('should return the expected data from the test fixture', () => {
-    expect(
-      collectPaths([], plotsDiffFixture, REVISIONS, getCLIIdToLabel())
-    ).toStrictEqual([
+    expect(collectPaths([], plotsDiffFixture, REVISIONS)).toStrictEqual([
       {
         hasChildren: false,
         parentPath: 'plots',
         path: join('plots', 'acc.png'),
-        revisions: new Set(revisions),
+        revisions: new Set(REVISIONS),
         type: new Set(['comparison'])
       },
       {
         hasChildren: true,
         parentPath: undefined,
         path: 'plots',
-        revisions: new Set(revisions)
+        revisions: new Set(REVISIONS)
       },
       {
         hasChildren: false,
         parentPath: 'plots',
         path: join('plots', 'heatmap.png'),
-        revisions: new Set(revisions),
+        revisions: new Set(REVISIONS),
         type: new Set(['comparison'])
       },
       {
         hasChildren: false,
         parentPath: 'plots',
         path: join('plots', 'loss.png'),
-        revisions: new Set(revisions),
+        revisions: new Set(REVISIONS),
         type: new Set(['comparison'])
       },
       {
         hasChildren: false,
         parentPath: 'logs',
         path: join('logs', 'loss.tsv'),
-        revisions: new Set(revisions),
+        revisions: new Set(REVISIONS),
         type: new Set(['template-single'])
       },
       {
         hasChildren: true,
         parentPath: undefined,
         path: 'logs',
-        revisions: new Set(revisions)
+        revisions: new Set(REVISIONS)
       },
       {
         hasChildren: false,
         parentPath: 'logs',
         path: join('logs', 'acc.tsv'),
-        revisions: new Set(revisions),
+        revisions: new Set(REVISIONS),
         type: new Set(['template-single'])
       },
       {
         hasChildren: false,
         parentPath: undefined,
         path: 'predictions.json',
-        revisions: new Set(revisions),
+        revisions: new Set(REVISIONS),
         type: new Set(['template-multi'])
       }
     ])
@@ -88,18 +77,12 @@ describe('collectPaths', () => {
 
   it('should update the revision details when any revision is recollected', () => {
     const [remainingPath] = Object.keys(plotsDiffFixture)
-    const collectedPaths = collectPaths([], plotsDiffFixture, revisions, {})
+    const collectedPaths = collectPaths([], plotsDiffFixture, REVISIONS)
     expect(
       collectedPaths.filter(path => path.revisions.has(EXPERIMENT_WORKSPACE_ID))
     ).toHaveLength(collectedPaths.length)
 
-    const fetchedRevs = revisions.slice(0, 3)
-    const cliIdToLabel: CLIRevisionIdToLabel = {}
-    for (const rev of fetchedRevs) {
-      cliIdToLabel[rev] = rev
-    }
-
-    cliIdToLabel[fetchedRevs[2]] = 'some-branch'
+    const fetchedRevs = REVISIONS.slice(0, 3)
 
     const updatedPaths = collectPaths(
       collectedPaths,
@@ -134,11 +117,10 @@ describe('collectPaths', () => {
           ]
         }
       },
-      fetchedRevs,
-      cliIdToLabel
+      fetchedRevs
     )
 
-    for (const rev of Object.values(cliIdToLabel)) {
+    for (const rev of fetchedRevs) {
       expect(updatedPaths.filter(path => path.revisions.has(rev))).toHaveLength(
         remainingPath.split(sep).length
       )
@@ -155,12 +137,7 @@ describe('collectPaths', () => {
       type: new Set([PathType.TEMPLATE_SINGLE])
     }
 
-    const paths = collectPaths(
-      [mockPlotPath],
-      plotsDiffFixture,
-      ['bfc7f64'],
-      {}
-    )
+    const paths = collectPaths([mockPlotPath], plotsDiffFixture, ['bfc7f64'])
 
     expect(paths.some(plotPath => isEqual(plotPath, mockPlotPath))).toBeTruthy()
   })
@@ -205,7 +182,7 @@ describe('collectPaths', () => {
       }
     }
 
-    expect(collectPaths([], mockPlotsDiff, revisions, {})).toStrictEqual([
+    expect(collectPaths([], mockPlotsDiff, revisions)).toStrictEqual([
       {
         hasChildren: false,
         parentPath: join('logs', 'scalars'),
@@ -273,8 +250,7 @@ describe('collectPaths', () => {
           }
         ]
       },
-      [],
-      {}
+      []
     )
     expect(paths).toHaveLength(4)
     expect(paths).toStrictEqual([

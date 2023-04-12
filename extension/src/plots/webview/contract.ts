@@ -62,7 +62,7 @@ export type Revision = {
   fetched: boolean
   firstThreeColumns: RevisionFirstThreeColumns
   group?: string
-  id?: string
+  id: string
   revision: string
 }
 
@@ -74,7 +74,7 @@ export interface PlotsComparisonData {
 }
 
 export type CustomPlotValues = {
-  expName: string
+  id: string
   metric: number
   param: number
 }[]
@@ -149,7 +149,7 @@ export interface TemplatePlotsData {
 
 export type ComparisonPlot = {
   url: string | undefined
-  revision: string
+  id: string
   errors: string[] | undefined
   loading: boolean
 }

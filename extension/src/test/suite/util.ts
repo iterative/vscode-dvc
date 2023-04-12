@@ -19,7 +19,7 @@ import { Disposable, Disposer } from '../../extension'
 import { definedAndNonEmpty } from '../../util/array'
 import * as Time from '../../util/time'
 import { OutputChannel } from '../../vscode/outputChannel'
-import expShowFixture from '../fixtures/expShow/base/output'
+import expShowFixture from '../fixtures/expShow/base/output_'
 import plotsDiffFixture from '../fixtures/plotsDiff/output'
 import { BaseWebview } from '../../webview'
 import { ExperimentsData } from '../../experiments/data'
@@ -223,7 +223,7 @@ export const buildDependencies = (
 
   const mockPlotsDiff = stub(dvcReader, 'plotsDiff').resolves(plotsDiff)
 
-  const mockExperimentShow = stub(dvcReader, 'expShow').resolves(expShow)
+  const mockExpShow = stub(dvcReader, 'expShow_').resolves(expShow)
 
   const mockGetCommitMessages = stub(gitReader, 'getCommitMessages').resolves(
     ''
@@ -248,7 +248,7 @@ export const buildDependencies = (
     mockCheckSignalFile,
     mockCreateFileSystemWatcher,
     mockDataStatus,
-    mockExperimentShow,
+    mockExpShow,
     mockGetCommitMessages,
     mockPlotsDiff,
     resourceLocator,

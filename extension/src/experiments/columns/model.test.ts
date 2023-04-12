@@ -6,7 +6,7 @@ import { buildMockMemento } from '../../test/util'
 import { Status } from '../../path/selection/model'
 import { PersistenceKey } from '../../persistence/constants'
 import { ColumnType } from '../webview/contract'
-import outputFixture from '../../test/fixtures/expShow/base/output'
+import outputFixture from '../../test/fixtures/expShow/base/output_'
 import columnsFixture from '../../test/fixtures/expShow/base/columns'
 import {
   deeplyNestedColumnsWithHeightOf10,
@@ -64,7 +64,7 @@ describe('ColumnsModel', () => {
       buildMockMemento(),
       mockedColumnsOrderOrStatusChanged
     )
-    await model.transformAndSet(outputFixture)
+    await model.transformAndSet_(outputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
     expect(model.getSelected()).toStrictEqual(columnsFixture)
   })
@@ -284,7 +284,7 @@ describe('ColumnsModel', () => {
         }),
         mockedColumnsOrderOrStatusChanged
       )
-      await model.transformAndSet(outputFixture)
+      await model.transformAndSet_(outputFixture)
 
       expect(model.getFirstThreeColumnOrder()).toStrictEqual(
         persistedState.slice(1, 4)
@@ -303,7 +303,7 @@ describe('ColumnsModel', () => {
         buildMockMemento(),
         mockedColumnsOrderOrStatusChanged
       )
-      await model.transformAndSet(outputFixture)
+      await model.transformAndSet_(outputFixture)
 
       expect(model.getFirstThreeColumnOrder()).toStrictEqual([
         'Created',
@@ -398,7 +398,7 @@ describe('ColumnsModel', () => {
         mockMemento,
         mockedColumnsOrderOrStatusChanged
       )
-      await model.transformAndSet(outputFixture)
+      await model.transformAndSet_(outputFixture)
       expect(model.getSelected()).toStrictEqual(columnsFixture)
 
       const parentPath = 'params:params.yaml:process'
@@ -419,7 +419,7 @@ describe('ColumnsModel', () => {
         mockMemento,
         mockedColumnsOrderOrStatusChanged
       )
-      await model.transformAndSet(outputFixture)
+      await model.transformAndSet_(outputFixture)
       expect(model.getSelected()).not.toStrictEqual(columnsFixture)
 
       model.toggleStatus(parentPath)
@@ -437,7 +437,7 @@ describe('ColumnsModel', () => {
         mockMemento,
         mockedColumnsOrderOrStatusChanged
       )
-      await model.transformAndSet(outputFixture)
+      await model.transformAndSet_(outputFixture)
       expect(model.getSelected()).toStrictEqual(columnsFixture)
 
       const parentPath = 'metrics:summary.json'

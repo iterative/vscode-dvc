@@ -268,10 +268,7 @@ describe('pickExperiment', () => {
   })
 
   it('should add columns detail to quick pick items if columns order has been provided', async () => {
-    const expectedDetails = {
-      id: mockedExp1.id,
-      name: mockedExp1.name
-    }
+    const expectedDetails = mockedExp1.id
     const mockedExpListWithColumnData = [
       {
         ...mockedExpList[0],
@@ -319,7 +316,7 @@ describe('pickExperiment', () => {
             mockedExpListWithColumnData[0].Created
           )}, accuracy:0.37231666, val_loss:1.9979371`,
           label: 'abcdefb',
-          value: { id: 'abcdefb', name: 'exp-0580a' }
+          value: 'abcdefb'
         },
         {
           description: '[exp-c54c4]',
@@ -327,7 +324,7 @@ describe('pickExperiment', () => {
             mockedExpListWithColumnData[1].Created
           )}, accuracy:0.46680000, val_loss:1.8770883`,
           label: 'abcdefa',
-          value: { id: 'abcdefa', name: 'exp-c54c4' }
+          value: 'abcdefa'
         },
         {
           description: '[exp-054f1]',
@@ -335,7 +332,7 @@ describe('pickExperiment', () => {
             mockedExpListWithColumnData[2].Created
           )}, accuracy:0.55745000, val_loss:1.7749213`,
           label: 'abcdef1',
-          value: { id: 'abcdef1', name: 'exp-054f1' }
+          value: 'abcdef1'
         }
       ],
       {
@@ -373,16 +370,7 @@ describe('pickExperiments', () => {
   })
 
   it('should add columns detail to quick pick items if columns order has been provided', async () => {
-    const expectedDetails = [
-      {
-        id: mockedExp1.id,
-        name: mockedExp1.name
-      },
-      {
-        id: mockedExp2.id,
-        name: mockedExp2.name
-      }
-    ]
+    const expectedDetails = [mockedExp1.id, mockedExp2.id]
     const mockedExpListWithColumnData = [
       {
         ...mockedExpList[0],
@@ -430,7 +418,7 @@ describe('pickExperiments', () => {
             mockedExpListWithColumnData[0].Created
           )}, accuracy:0.37231666, val_loss:1.9979371`,
           label: 'abcdefb',
-          value: { id: 'abcdefb', name: 'exp-0580a' }
+          value: 'abcdefb'
         },
         {
           description: '[exp-c54c4]',
@@ -438,7 +426,7 @@ describe('pickExperiments', () => {
             mockedExpListWithColumnData[1].Created
           )}, accuracy:0.46680000, val_loss:1.8770883`,
           label: 'abcdefa',
-          value: { id: 'abcdefa', name: 'exp-c54c4' }
+          value: 'abcdefa'
         },
         {
           description: '[exp-054f1]',
@@ -446,7 +434,7 @@ describe('pickExperiments', () => {
             mockedExpListWithColumnData[2].Created
           )}, accuracy:0.55745000, val_loss:1.7749213`,
           label: 'abcdef1',
-          value: { id: 'abcdef1', name: 'exp-054f1' }
+          value: 'abcdef1'
         }
       ],
       {

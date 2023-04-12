@@ -24,7 +24,7 @@ export const ComparisonTable: React.FC = () => {
   const [comparisonPlots, setComparisonPlots] = useState<ComparisonPlots>([])
 
   const isPinned = (column: ComparisonTableColumn): boolean =>
-    column.revision === pinnedColumn.current
+    column.id === pinnedColumn.current
 
   const getPinnedColumnRevision = useCallback(
     () => revisions?.find(isPinned) || null,
@@ -59,10 +59,10 @@ export const ComparisonTable: React.FC = () => {
   }
 
   const setColumnsOrder = (order: string[]) => {
-    const newOrder = reorderObjectList<Revision>(order, columns, 'revision')
+    const newOrder = reorderObjectList<Revision>(order, columns, 'id')
     setColumns(newOrder)
     sendMessage({
-      payload: newOrder.map(({ revision }) => revision),
+      payload: newOrder.map(({ id }) => id),
       type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON
     })
   }
@@ -76,7 +76,7 @@ export const ComparisonTable: React.FC = () => {
           getPinnedColumnRevision(),
           ...columns.filter(column => !isPinned(column))
         ].filter(Boolean) as ComparisonTableColumn[]
-      ).map(({ revision }) => revision)
+      ).map(({ id }) => id)
     )
   }
 

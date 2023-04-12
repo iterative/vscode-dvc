@@ -38,10 +38,10 @@ suite('Plots Data Test Suite', () => {
     const { internalCommands, updatesPaused, mockPlotsDiff } =
       buildDependencies(disposable)
 
-    const mockGetSelectedOrderedCliIds = stub().returns(selectedRevisions)
+    const mockGetSelectedOrderedIds = stub().returns(selectedRevisions)
 
     const mockPlotsModel = {
-      getSelectedOrderedCliIds: mockGetSelectedOrderedCliIds
+      getSelectedOrderedIds: mockGetSelectedOrderedIds
     } as unknown as PlotsModel
 
     const data = disposable.track(
@@ -67,23 +67,6 @@ suite('Plots Data Test Suite', () => {
 
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath)
-    })
-
-    it('should call plots diff when an experiment is running in the workspace (live updates)', async () => {
-      const { data, mockPlotsDiff } = buildPlotsData([EXPERIMENT_WORKSPACE_ID])
-
-      await data.update()
-
-      expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath)
-    })
-
-    it('should call plots diff when an experiment is running in a temporary directory (live updates)', async () => {
-      const { data, mockPlotsDiff } = buildPlotsData(['a7739b5'])
-
-      await data.update()
-
-      expect(mockPlotsDiff).to.be.calledOnce
-      expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath, 'a7739b5')
     })
 
     it('should collect files and watch them for updates', async () => {
@@ -135,7 +118,7 @@ suite('Plots Data Test Suite', () => {
             executeCommand: mockExecuteCommand
           } as unknown as InternalCommands,
           {
-            getSelectedOrderedCliIds: () => []
+            getSelectedOrderedIds: () => []
           } as unknown as PlotsModel,
           disposable.track(new EventEmitter<boolean>())
         )

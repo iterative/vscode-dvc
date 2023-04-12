@@ -1,11 +1,9 @@
 import { stub } from 'sinon'
 import { EventEmitter } from 'vscode'
-import omit from 'lodash.omit'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
-import expShowFixture from '../../fixtures/expShow/base/output'
-import expShowFixture_ from '../../fixtures/expShow/base/output_'
+import expShowFixture from '../../fixtures/expShow/base/output_'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import {
   buildDependencies,
@@ -13,10 +11,7 @@ import {
   buildMockData,
   SafeWatcherDisposer
 } from '../util'
-import {
-  ExperimentsOutput,
-  EXPERIMENT_WORKSPACE_ID
-} from '../../../cli/dvc/contract'
+import { ExpShowOutput } from '../../../cli/dvc/contract'
 import { ExperimentsData } from '../../../experiments/data'
 import { CheckpointsModel } from '../../../experiments/checkpoints/model'
 import { FileSystemData } from '../../../fileSystem/data'
@@ -24,22 +19,23 @@ import * as Watcher from '../../../fileSystem/watcher'
 import { ExperimentsModel } from '../../../experiments/model'
 import { ColumnsModel } from '../../../experiments/columns/model'
 import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../../cli/dvc/constants'
+import { hasError } from '../../../experiments/model/collect'
 
-const hasCheckpoints = (data: ExperimentsOutput) => {
-  const [experimentsWithBaseline] = Object.values(
-    omit(data, EXPERIMENT_WORKSPACE_ID)
-  )
-  const [firstExperiment] = Object.values(
-    omit(experimentsWithBaseline, 'baseline')
-  )
-  const experimentFields = firstExperiment?.data
+const hasCheckpoints = (data: ExpShowOutput) => {
+  if (!data?.length) {
+    return false
+  }
 
-  return !!(
-    experimentFields?.checkpoint_parent || experimentFields?.checkpoint_tip
-  )
+  const [workspace] = data
+
+  if (hasError(workspace)) {
+    return false
+  }
+
+  return !!workspace.data.meta.has_checkpoints
 }
 
-export const mockHasCheckpoints = (data: ExperimentsOutput) =>
+export const mockHasCheckpoints = (data: ExpShowOutput) =>
   stub(CheckpointsModel.prototype, 'hasCheckpoints').returns(
     hasCheckpoints(data)
   )
@@ -58,7 +54,7 @@ export const buildExperiments = (
     internalCommands,
     messageSpy,
     mockCheckSignalFile,
-    mockExperimentShow,
+    mockExpShow,
     mockGetCommitMessages,
     updatesPaused,
     resourceLocator
@@ -83,7 +79,7 @@ export const buildExperiments = (
     )
   )
 
-  mockHasCheckpoints(experimentShowData)
+  mockHasCheckpoints(experimentShowData) // this can get removed too
 
   void experiments.setState(experimentShowData)
 
@@ -102,7 +98,7 @@ export const buildExperiments = (
     messageSpy,
     mockCheckOrAddPipeline,
     mockCheckSignalFile,
-    mockExperimentShow,
+    mockExpShow,
     mockExperimentsData,
     mockGetCommitMessages,
     mockUpdateExperimentsData,
@@ -184,7 +180,7 @@ const buildExperimentsDataDependencies = (disposer: Disposer) => {
   ).returns(undefined)
 
   const { dvcReader, internalCommands } = buildInternalCommands(disposer)
-  const mockExpShow = stub(dvcReader, 'expShow_').resolves(expShowFixture_)
+  const mockExpShow = stub(dvcReader, 'expShow_').resolves(expShowFixture)
   return { internalCommands, mockCreateFileSystemWatcher, mockExpShow }
 }
 

@@ -1,6 +1,5 @@
 import { EventEmitter, Memento } from 'vscode'
 import {
-  collectChanges,
   collectChanges_,
   collectColumns,
   collectColumns_,
@@ -60,10 +59,7 @@ export class ColumnsModel extends PathSelectionModel<Column> {
   }
 
   public transformAndSet(data: ExperimentsOutput) {
-    return Promise.all([
-      this.transformAndSetColumns(data),
-      this.transformAndSetChanges(data)
-    ])
+    return Promise.all([this.transformAndSetColumns(data)])
   }
 
   public transformAndSet_(data: ExpShowOutput) {
@@ -199,10 +195,6 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     }
 
     this.paramsFiles = paramsFiles
-  }
-
-  private transformAndSetChanges(data: ExperimentsOutput) {
-    this.columnsChanges = collectChanges(data)
   }
 
   private transformAndSetChanges_(data: ExpShowOutput) {
