@@ -35,7 +35,7 @@ beforeEach(() => {
 })
 
 describe('ExperimentsModel', () => {
-  it('should return the expected rows when given the output fixture_', () => {
+  it('should return the expected rows when given the output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
     model.transformAndSet(outputFixture, false, '')
     expect(model.getRowData()).toStrictEqual(rowsFixture)

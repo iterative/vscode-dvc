@@ -73,18 +73,18 @@ const walkValueTree = (
   }
 }
 
-export const walkValueFileRoot = (
+export const walkMetricsOrParamsFile = (
   acc: ColumnAccumulator,
   type: ColumnType,
-  root: MetricsOrParams
+  file: MetricsOrParams
 ) => {
-  for (const [file, value] of Object.entries(root)) {
+  for (const [path, value] of Object.entries(file)) {
     if (fileHasError(value)) {
       continue
     }
     const { data } = value
     if (data) {
-      walkValueTree(acc, type, data, [file])
+      walkValueTree(acc, type, data, [path])
     }
   }
 }
@@ -95,10 +95,10 @@ export const collectMetricsAndParams = (
 ) => {
   const { metrics, params } = data
   if (metrics) {
-    walkValueFileRoot(acc, ColumnType.METRICS, metrics)
+    walkMetricsOrParamsFile(acc, ColumnType.METRICS, metrics)
   }
   if (params) {
-    walkValueFileRoot(acc, ColumnType.PARAMS, params)
+    walkMetricsOrParamsFile(acc, ColumnType.PARAMS, params)
   }
 }
 
@@ -151,15 +151,15 @@ const collectFileChanges = (
 
 export const collectMetricAndParamChanges = (
   changes: string[],
-  workspaceData: ExpData,
-  commitData: ExpData
+  workspace: ExpData,
+  baseline: ExpData
 ) => {
   for (const type of [ColumnType.METRICS, ColumnType.PARAMS]) {
-    for (const [file, value] of Object.entries(workspaceData?.[type] || {}) as [
+    for (const [file, value] of Object.entries(workspace?.[type] || {}) as [
       string,
       FileDataOrError
     ][]) {
-      collectFileChanges(changes, type, commitData, file, value)
+      collectFileChanges(changes, type, baseline, file, value)
     }
   }
 }

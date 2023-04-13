@@ -555,7 +555,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   private getCommitOutput(data: ExpShowOutput | undefined) {
-    if (!data?.length) {
+    if (!(data && data.length > 1)) {
       return
     }
     const [lastCommit] = data.slice(-1)

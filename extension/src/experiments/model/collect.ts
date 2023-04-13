@@ -260,16 +260,8 @@ const setWorkspaceAsRunning = (
   acc: ExperimentsAccumulator,
   dvcLiveOnly: boolean
 ) => {
-  if (dvcLiveOnly) {
-    acc.workspace.executor = Executor.WORKSPACE
-    acc.workspace.status = ExperimentStatus.RUNNING
-    acc.runningExperiments.unshift({
-      executor: Executor.WORKSPACE,
-      id: EXPERIMENT_WORKSPACE_ID
-    })
-  }
-
   if (
+    dvcLiveOnly ||
     acc.runningExperiments.some(
       ({ executor, id }) =>
         executor === Executor.WORKSPACE && id !== EXPERIMENT_WORKSPACE_ID

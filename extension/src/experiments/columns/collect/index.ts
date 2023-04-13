@@ -79,16 +79,16 @@ export const collectChanges = (output: ExpShowOutput): string[] => {
     return changes
   }
 
-  const [workspaceData, currentCommitData] = output
+  const [workspaceData, baselineData] = output
   const workspace = getData(workspaceData)
-  const currentCommit = getData(currentCommitData)
+  const baseline = getData(baselineData)
 
-  if (!(workspace && currentCommit)) {
+  if (!(workspace && baseline)) {
     return changes
   }
 
-  collectMetricAndParamChanges(changes, workspace, currentCommit)
-  collectDepChanges(changes, workspace, currentCommit)
+  collectMetricAndParamChanges(changes, workspace, baseline)
+  collectDepChanges(changes, workspace, baseline)
 
   return sortCollectedArray(changes)
 }

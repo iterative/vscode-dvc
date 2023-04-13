@@ -50,13 +50,13 @@ export const collectDeps = (acc: ColumnAccumulator, data: ExpData) => {
 
 export const collectDepChanges = (
   changes: string[],
-  workspaceData: ExpData,
-  commitData: ExpData
+  workspace: ExpData,
+  baseline: ExpData
 ) => {
   for (const [file, { hash }] of Object.entries(
-    workspaceData?.[ColumnType.DEPS] || {}
+    workspace?.[ColumnType.DEPS] || {}
   )) {
-    if (get(commitData?.[ColumnType.DEPS], [file, 'hash']) !== hash) {
+    if (get(baseline?.[ColumnType.DEPS], [file, 'hash']) !== hash) {
       changes.push(buildDepPath(file))
     }
   }
