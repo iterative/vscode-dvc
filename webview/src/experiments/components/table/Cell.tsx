@@ -62,9 +62,9 @@ export const FirstCell: React.FC<
         {getIsPlaceholder() ? null : (
           <ErrorTooltip error={error}>
             <div
-              className={cx(styles.experimentCellContentsContainer, {
-                [styles.workspaceChange]: changesIfWorkspace,
-                [styles.error]: error
+              className={cx(styles.experimentCellTextWrapper, {
+                [styles.workspaceChangeText]: changesIfWorkspace,
+                [styles.errorText]: error
               })}
               {...clickAndEnterProps(
                 toggleExperiment,
@@ -93,8 +93,8 @@ export const CellWrapper: React.FC<
   return (
     <td
       className={cx({
-        [styles.workspaceChange]: changes?.includes(cell.column.id),
-        [styles.depChange]: cellHasChanges(cell.getValue() as CellValue)
+        [styles.workspaceChangeText]: changes?.includes(cell.column.id),
+        [styles.depChangeText]: cellHasChanges(cell.getValue() as CellValue)
       })}
       data-testid={cellId}
     >

@@ -80,6 +80,11 @@ $badge-size: 0.85rem;
   background-color: $header-border-color;
 }
 
+%cellContentsBase {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 // Concrete selectors
 
 @keyframes spin {
@@ -115,7 +120,6 @@ table {
 
 tr {
   position: relative;
-  background-color: $row-bg-color;
   width: fit-content;
 }
 
@@ -190,8 +194,7 @@ table.withExpColumnShadow tr > *:first-child {
 }
 
 .cellContents {
-  overflow: hidden;
-  text-overflow: ellipsis;
+  @extend %cellContentsBase;
 }
 
 ul {
@@ -408,6 +411,223 @@ th {
   }
 }
 
+// table body styles
+
+.bodyRow {
+  border-bottom: $row-border;
+
+  &:hover {
+    td:not(.experimentCell):hover::before,
+    td:hover + td::before {
+      background-color: $border-color;
+    }
+  }
+}
+
+.workspaceRowGroup {
+  border: none;
+  position: sticky;
+  top: var(--table-head-height);
+  z-index: 4;
+
+  &.withShadow {
+    box-shadow: 0 5px 8px -2px $shadow;
+
+    tr {
+      border-bottom: none;
+    }
+  }
+
+  .rowActions {
+    visibility: hidden;
+  }
+
+  .timestampInnerCell {
+    height: 42px;
+  }
+}
+
+.rowSelected {
+  border-color: $row-border-selected-color;
+
+  &:hover {
+    &::after {
+      box-shadow: inset 0 0 20px $shadow;
+      content: '';
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 4;
+      position: absolute;
+      pointer-events: none;
+    }
+
+    td:not(.experimentCell):hover::before,
+    td:hover + td::before {
+      background-color: $row-border-selected-color;
+    }
+  }
+}
+
+.nestedRow {
+  .experimentCell .innerCell {
+    padding-left: calc($nested-row-padding + $edge-padding);
+
+    .rowActions {
+      left: calc(($cell-padding + $nested-row-padding) * -1);
+    }
+  }
+}
+
+.previousCommitsRow {
+  border-bottom: $row-border;
+
+  td {
+    font-size: 0.6rem;
+    padding-left: 16px;
+  }
+}
+
+.rowGroup:last-child {
+  & > tr:last-child {
+    border-color: $row-bg-color;
+
+    &.rowSelected {
+      border-color: $row-bg-selected-color;
+    }
+  }
+
+  .experimentGroup {
+    &:last-child tr:last-child {
+      border-color: $row-bg-color;
+
+      &.rowSelected {
+        border-color: $row-bg-selected-color;
+      }
+    }
+  }
+}
+
+td {
+  height: auto;
+  font-size: 0.8rem;
+  line-height: 2rem;
+  align-items: center;
+  background-color: $row-bg-color;
+
+  &:not(.experimentCell)::before {
+    @extend %cellBorderLeft;
+  }
+
+  .rowSelected & {
+    &:not(.experimentCell) {
+      color: $row-fg-selected-color;
+      background-color: $row-bg-selected-color;
+    }
+
+    &.experimentCell::before {
+      background-color: $row-bg-selected-color;
+    }
+  }
+
+  .bodyRow:not(.rowSelected):hover & {
+    &:not(.experimentCell),
+    &.experimentCell::before {
+      background-color: $row-hover-background-color;
+    }
+  }
+
+  &:first-child {
+    .innerCell {
+      padding-left: $edge-padding;
+    }
+  }
+
+  &:last-child {
+    .innerCell {
+      padding-right: $edge-padding;
+    }
+  }
+}
+
+.innerCell {
+  @extend %baseInnerCell;
+  justify-content: flex-end;
+}
+
+.experimentCell {
+  &::before {
+    content: '';
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    position: absolute;
+    background-color: transparent;
+  }
+
+  .innerCell {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+  }
+}
+
+.rowActions {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  left: -$cell-padding;
+  height: 100%;
+
+  &:first-child {
+    margin-right: 20px;
+  }
+
+  .indicatorIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.3rem;
+    height: 2rem;
+    padding: 0;
+    margin: 0;
+  }
+
+  .indicatorCount {
+    z-index: 2;
+    &[title='0'] {
+      display: none;
+    }
+  }
+}
+
+.starSwitch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  cursor: pointer;
+
+  svg {
+    fill: $icon-color;
+
+    .rowSelected & {
+      fill: $selected-icon-color;
+    }
+  }
+
+  &[aria-checked='true'] svg {
+    fill: $row-action-star-checked;
+  }
+}
+
+.starSwitch .cellHintTooltip {
+  font-size: 0.65rem;
+}
+
 .bullet {
   visibility: visible;
   align-items: center;
@@ -488,6 +708,10 @@ th {
   transform: rotate(45deg);
   right: 1px;
   bottom: 2px;
+
+  .rowSelected & {
+    border-color: $selected-icon-color;
+  }
 }
 
 .contractedRowArrow {
@@ -495,288 +719,17 @@ th {
   transform: rotate(-45deg);
   right: 4px;
   bottom: 0;
-}
 
-.rowGroup:last-child {
-  & > tr:last-child {
-    border-color: $row-bg-color;
-
-    &.rowSelected {
-      border-color: $row-bg-selected-color;
-    }
-  }
-
-  .experimentGroup {
-    &:last-child tr:last-child {
-      border-color: $row-bg-color;
-
-      &.rowSelected {
-        border-color: $row-bg-selected-color;
-      }
-    }
+  .rowSelected & {
+    border-color: $selected-icon-color;
   }
 }
 
-.experimentGroup {
-  .nestedRow {
-    .experimentCell {
-      .innerCell {
-        padding-left: calc($nested-row-padding + $edge-padding);
-
-        .rowActions {
-          left: calc(($cell-padding + $nested-row-padding) * -1);
-        }
-      }
-    }
-  }
+.experimentCellTextWrapper {
+  @extend %cellContentsBase;
 }
 
-.bodyRow {
-  border-bottom: $row-border;
-
-  &:not(.rowSelected) {
-    & > *:first-child {
-      background-color: $row-bg-color;
-    }
-  }
-
-  &.rowSelected {
-    border-color: $row-border-selected-color;
-
-    td {
-      color: $row-fg-selected-color;
-      border-bottom-color: $row-border-selected-color;
-      background-color: $row-bg-selected-color;
-    }
-
-    .experimentCell {
-      background-color: $row-bg-color;
-
-      &::before {
-        background-color: $row-bg-selected-color;
-      }
-    }
-
-    .expandedRowArrow,
-    .contractedRowArrow {
-      border-color: $selected-icon-color;
-    }
-  }
-
-  &:hover.rowSelected {
-    &::after {
-      box-shadow: inset 0 0 20px $shadow;
-      content: '';
-      top: 0;
-      right: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 4;
-      position: absolute;
-      pointer-events: none;
-    }
-
-    td:not(.experimentCell):hover::before,
-    td:hover + td::before {
-      background-color: $row-border-selected-color;
-    }
-  }
-
-  &:hover:not(.rowSelected) {
-    td:not(.experimentCell),
-    .experimentCell::before {
-      background-color: $row-hover-background-color;
-    }
-
-    td:not(.experimentCell):hover::before,
-    td:hover + td::before {
-      background-color: $border-color;
-    }
-  }
-}
-
-.workspaceRowGroup {
-  border: none;
-  position: sticky;
-  top: var(--table-head-height);
-  z-index: 4;
-  background-color: $row-bg-color;
-
-  &.withShadow {
-    box-shadow: 0 5px 8px -2px $shadow;
-
-    tr {
-      border-bottom: none;
-    }
-  }
-
-  .innerCell {
-    padding: 5px 10px;
-
-    .rowActions {
-      visibility: hidden;
-    }
-  }
-
-  .innerCell,
-  .timestampInnerCell {
-    height: 100%;
-    width: 100%;
-    background-color: transparent;
-  }
-
-  .timestampInnerCell {
-    height: 42px;
-  }
-}
-
-.workspaceChange,
-.depChange {
-  color: $changed-color;
-}
-
-td {
-  height: auto;
-  font-size: 0.8rem;
-  line-height: 2rem;
-  align-items: center;
-
-  &:not(.experimentCell)::before {
-    @extend %cellBorderLeft;
-  }
-
-  &:first-child {
-    .innerCell {
-      padding-left: $edge-padding;
-    }
-  }
-
-  &:last-child {
-    .innerCell {
-      padding-right: $edge-padding;
-    }
-  }
-}
-
-.experimentCell {
-  .innerCell {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: flex-start;
-
-    .bullet {
-      cursor: pointer;
-    }
-
-    .rowActions {
-      display: inline-flex;
-      align-items: center;
-      position: relative;
-
-      left: -$cell-padding;
-      height: 100%;
-
-      &:first-child {
-        margin-right: 20px;
-      }
-
-      .indicatorIcon {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 1.3rem;
-        height: 2rem;
-        padding: 0;
-        margin: 0;
-      }
-
-      .indicatorCount {
-        z-index: 2;
-        &[title='0'] {
-          display: none;
-        }
-      }
-    }
-  }
-}
-
-.previousCommitsRow {
-  border-bottom: $row-border;
-
-  .th {
-    font-size: 0.6rem;
-    padding-left: 16px;
-
-    &::before {
-      display: none;
-    }
-  }
-
-  &:hover {
-    .th:not(.experimentCell) {
-      background: $bg-color;
-    }
-  }
-}
-
-.commitsAndBranchesNav {
-  padding: 20px 16px;
-  width: 100%;
-}
-
-.commitsAndBranchesNavButton {
-  background: transparent;
-  border: none;
-  color: $accent-color;
-  text-decoration: underline;
-  font-size: 0.6rem;
-  cursor: pointer;
-
-  &:hover:not(:disabled) {
-    text-decoration: none;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-  }
-}
-
-.starSwitch {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 14px;
-  cursor: pointer;
-
-  svg {
-    fill: $icon-color;
-
-    .rowSelected & {
-      fill: $selected-icon-color;
-    }
-  }
-
-  &[aria-checked='true'] svg {
-    fill: $row-action-star-checked;
-  }
-}
-
-.starSwitch .cellHintTooltip {
-  font-size: 0.65rem;
-}
-
-.error {
-  color: $error-color;
-}
-
-.experimentCellContentsContainer {
-  @extend .cellContents;
-  display: flex;
-  justify-content: flex-start;
-  text-align: left;
-}
-
-.experimentCellContents {
+.experimentCellText {
   @extend .cellContents;
   display: flex;
   flex-flow: row wrap;
@@ -795,13 +748,18 @@ td {
 .experimentCellSecondaryName {
   color: $meta-cell-color;
   font-size: 0.75em;
-  display: flex;
-  align-items: center;
+
+  > * {
+    vertical-align: middle;
+  }
 
   svg {
     min-width: 14px;
     min-height: 14px;
-    margin-right: 2px;
+  }
+
+  svg + span {
+    margin-left: -4px;
   }
 }
 
@@ -846,11 +804,6 @@ td {
   }
 }
 
-.innerCell {
-  @extend %baseInnerCell;
-  justify-content: flex-end;
-}
-
 .timestampInnerCell {
   @extend %baseInnerCell;
   @extend %truncateLeftParent;
@@ -873,26 +826,36 @@ td {
   padding: 2px 6px;
 }
 
-.experimentCell {
-  &::before {
-    content: '';
-    top: 0;
-    right: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    position: absolute;
-    background-color: transparent;
+.workspaceChangeText,
+.depChangeText {
+  color: $changed-color;
+}
+
+.errorText {
+  color: $error-color;
+}
+
+// commits/branches nav styles
+
+.commitsAndBranchesNav {
+  padding: 20px 16px;
+  width: 100%;
+}
+
+.commitsAndBranchesNavButton {
+  background: transparent;
+  border: none;
+  color: $accent-color;
+  text-decoration: underline;
+  font-size: 0.6rem;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    text-decoration: none;
   }
 
-  .innerCell {
-    .indicatorCount {
-      .experimentGroup & {
-        &[aria-label='0'] {
-          display: none;
-        }
-      }
-    }
+  &:disabled {
+    opacity: 0.5;
   }
 }
 

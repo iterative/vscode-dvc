@@ -78,19 +78,14 @@ export const TableBody: React.FC<
     <>
       {row.index === 2 && row.depth === 0 && (
         <tbody>
-          <tr className={cx(styles.tr, styles.previousCommitsRow)}>
-            <td className={styles.th}>
-              {isBranchesView ? 'Other Branches' : 'Previous Commits'}
-            </td>
-            <td
-              className={styles.th}
-              colSpan={row.getAllCells().length - 1}
-            ></td>
+          <tr className={styles.previousCommitsRow}>
+            <td>{isBranchesView ? 'Other Branches' : 'Previous Commits'}</td>
+            <td colSpan={row.getAllCells().length - 1}></td>
           </tr>
         </tbody>
       )}
       <tbody
-        className={cx(styles.rowGroup, styles.tbody, styles.normalRowGroup, {
+        className={cx(styles.rowGroup, {
           [styles.experimentGroup]: row.depth > 0,
           [styles.expandedGroup]: row.getIsExpanded() && row.subRows.length > 0
         })}
