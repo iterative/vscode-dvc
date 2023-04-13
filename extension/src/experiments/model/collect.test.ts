@@ -1,6 +1,4 @@
 import { collectExperiments } from './collect'
-import { Experiment } from '../webview/contract'
-import modifiedFixture from '../../test/fixtures/expShow/modified/output'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { COMMITS_SEPARATOR } from '../../cli/git/constants'
 
@@ -92,10 +90,8 @@ describe('collectExperiments', () => {
       `a123\nJohn Smith\n3 days ago\nrefNames:tag: v.1.1\nmessage:add new feature${COMMITS_SEPARATOR}b123\nrenovate[bot]\n5 weeks ago\nrefNames:\nmessage:update various dependencies\n* update dvc\n* update dvclive`
     )
     const [branch1, branch2] = commits
-    expect(branch1.displayNameOrParent).toStrictEqual('add new feature')
-    expect(branch2.displayNameOrParent).toStrictEqual(
-      'update various dependencies ...'
-    )
+    expect(branch1.displayName).toStrictEqual('add new feature')
+    expect(branch2.displayName).toStrictEqual('update various dependencies ...')
     expect(branch1.commit).toStrictEqual({
       author: 'John Smith',
       date: '3 days ago',
@@ -136,97 +132,5 @@ describe('collectExperiments', () => {
       ''
     )
     expect(experimentsByCommit.size).toStrictEqual(1)
-  })
-
-  it('should find three checkpoints on the tip', () => {
-    const { checkpointsByTip } = collectExperiments(
-      repoWithNestedCheckpoints,
-      false,
-      ''
-    )
-    const checkpoints = checkpointsByTip.get('tip1') as Experiment[]
-
-    expect(checkpoints?.length).toStrictEqual(3)
-  })
-
-  it('should find checkpoints in the correct order', () => {
-    const { checkpointsByTip } = collectExperiments(
-      repoWithNestedCheckpoints,
-      false,
-      ''
-    )
-    const checkpoints = checkpointsByTip.get('tip1') as Experiment[]
-    const [tip1cp1, tip1cp2, tip1cp3] = checkpoints
-    expect(tip1cp1.id).toStrictEqual('tip1cp1')
-    expect(tip1cp2.id).toStrictEqual('tip1cp2')
-    expect(tip1cp3.id).toStrictEqual('tip1cp3')
-  })
-
-  it('should handle the continuation of a modified checkpoint', () => {
-    const { checkpointsByTip } = collectExperiments(modifiedFixture, false, '')
-
-    const modifiedCheckpointTip = checkpointsByTip
-      .get('exp-01b3a')
-      ?.filter(checkpoint => checkpoint.displayNameOrParent?.includes('('))
-
-    expect(modifiedCheckpointTip).toHaveLength(1)
-    expect(modifiedCheckpointTip?.[0].displayNameOrParent).toStrictEqual(
-      '(3b0c6ac)'
-    )
-    expect(modifiedCheckpointTip?.[0].label).toStrictEqual('7e3cb21')
-
-    const modifiedCheckpoint = checkpointsByTip
-      .get('exp-9bc1b')
-      ?.filter(checkpoint => checkpoint.displayNameOrParent?.includes('('))
-
-    expect(modifiedCheckpoint).toHaveLength(1)
-    expect(modifiedCheckpoint?.[0].displayNameOrParent).toStrictEqual(
-      '(df39067)'
-    )
-    expect(modifiedCheckpoint?.[0].label).toStrictEqual('98cb38c')
-
-    for (const checkpoints of checkpointsByTip.values()) {
-      const continuationCheckpoints = checkpoints.filter(checkpoint => {
-        const { label, displayNameOrParent } = checkpoint
-        return (
-          displayNameOrParent?.includes('(') &&
-          !(label === '7e3cb21' && displayNameOrParent === '(3b0c6ac)') &&
-          !(label === '98cb38c' && displayNameOrParent === '(df39067)')
-        )
-      })
-      expect(continuationCheckpoints).toHaveLength(0)
-    }
-  })
-
-  it('should handle a checkpoint tip not having a name', () => {
-    const checkpointTipWithoutAName = '3fceabdcef3c7b97c7779f8ae0c69a5542eefaf5'
-
-    const repoWithNestedCheckpoints = {
-      [EXPERIMENT_WORKSPACE_ID]: { baseline: {} },
-      branchA: {
-        baseline: { data: {} },
-        [checkpointTipWithoutAName]: {
-          data: { checkpoint_tip: checkpointTipWithoutAName }
-        },
-        tip1cp1: {
-          data: { checkpoint_tip: checkpointTipWithoutAName }
-        },
-        tip1cp2: {
-          data: { checkpoint_tip: checkpointTipWithoutAName }
-        },
-        tip1cp3: {
-          data: { checkpoint_tip: checkpointTipWithoutAName }
-        }
-      }
-    }
-    const acc = collectExperiments(repoWithNestedCheckpoints, false, '')
-
-    const { experimentsByCommit, checkpointsByTip } = acc
-    const [experiment] = experimentsByCommit.get('branchA') || []
-
-    expect(experiment.id).toStrictEqual(checkpointTipWithoutAName)
-    expect(
-      checkpointsByTip.get(checkpointTipWithoutAName)?.length
-    ).toStrictEqual(3)
   })
 })

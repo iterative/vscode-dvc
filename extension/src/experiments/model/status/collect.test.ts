@@ -246,7 +246,7 @@ describe('collectColoredStatus', () => {
     expect(availableColors).toStrictEqual(colors.slice(1))
   })
 
-  it("should reassign the workspace's color when an experiment finishes running in the workspace", () => {
+  it("should duplicate the workspace's color when an experiment finishes running in the workspace", () => {
     const colors = copyOriginalColors()
     const { availableColors, coloredStatus } = collectColoredStatus(
       [
@@ -269,7 +269,7 @@ describe('collectColoredStatus', () => {
     )
     expect(coloredStatus).toStrictEqual({
       'exp-1': colors[0],
-      workspace: UNSELECTED
+      workspace: colors[0]
     })
 
     expect(availableColors).toStrictEqual(colors.slice(1))

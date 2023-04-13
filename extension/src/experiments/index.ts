@@ -21,6 +21,10 @@ import {
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
 import { Color } from './model/status/colors'
+import {
+  FetchedExperiment,
+  hasFinishedWorkspaceExperiment
+} from './model/status/collect'
 import { UNSELECTED } from './model/status'
 import { starredSort } from './model/sortBy/constants'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
@@ -247,6 +251,17 @@ export class Experiments extends BaseRepository<TableData> {
     return status
   }
 
+  public checkForFinishedWorkspaceExperiment(
+    fetchedExperiments: FetchedExperiment[]
+  ) {
+    if (!hasFinishedWorkspaceExperiment(fetchedExperiments)) {
+      return
+    }
+
+    this.experiments.unselectWorkspace()
+    this.notifyChanged()
+  }
+
   public getSorts() {
     return this.experiments.getSorts()
   }
@@ -467,10 +482,6 @@ export class Experiments extends BaseRepository<TableData> {
 
   public getRevisions() {
     return this.experiments.getRevisions()
-  }
-
-  public getSelectedExperiments() {
-    return this.experiments.getSelectedExperiments()
   }
 
   public async modifyExperimentParamsAndRun(

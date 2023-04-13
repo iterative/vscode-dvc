@@ -23,11 +23,7 @@ import {
   isRunningInQueue,
   RunningExperiment
 } from '../webview/contract'
-import {
-  definedAndNonEmpty,
-  reorderListSubset,
-  reorderObjectList
-} from '../../util/array'
+import { definedAndNonEmpty, reorderListSubset } from '../../util/array'
 import {
   ExperimentsOutput,
   EXPERIMENT_WORKSPACE_ID
@@ -148,14 +144,18 @@ export class ExperimentsModel extends ModelWithPersistence {
 
     const current = this.coloredStatus[id]
     if (current) {
-      this.unassignColor(current)
       this.coloredStatus[id] = UNSELECTED
+      this.unassignColor(current)
     } else if (this.availableColors.length > 0) {
       this.coloredStatus[id] = this.availableColors.shift() as Color
     }
 
     this.persistStatus()
     return this.coloredStatus[id]
+  }
+
+  public unselectWorkspace() {
+    this.coloredStatus[EXPERIMENT_WORKSPACE_ID] = UNSELECTED
   }
 
   public hasRunningExperiment() {
@@ -252,10 +252,6 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public getSelectedRevisions() {
     return this.getSelectedFromList(() => this.getCombinedList())
-  }
-
-  public getSelectedExperiments() {
-    return this.getSelectedFromList(() => this.getExperimentsAndQueued())
   }
 
   public setSelected(selectedExperiments: Experiment[]) {
@@ -498,6 +494,10 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   private unassignColor(color: Color) {
+    if (new Set(Object.values(this.coloredStatus)).has(color)) {
+      return
+    }
+
     this.availableColors.unshift(color)
     this.availableColors = reorderListSubset(
       this.availableColors,
@@ -567,10 +567,10 @@ export class ExperimentsModel extends ModelWithPersistence {
       }
     }
 
-    return reorderObjectList<SelectedExperimentWithColor>(
-      copyOriginalColors(),
-      acc,
-      'displayColor'
-    )
+    return copyOriginalColors()
+      .flatMap(orderedItem =>
+        acc.filter(item => item.displayColor === orderedItem)
+      )
+      .filter(Boolean)
   }
 }
