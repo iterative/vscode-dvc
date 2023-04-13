@@ -382,8 +382,12 @@ table.withExpColumnShadow tr > *:first-child {
     display: block;
 
     span[draggable='true'] {
-      display: block;
       cursor: grab;
+    }
+
+    .cellDraggable {
+      display: block;
+      padding: 0.31rem $cell-padding;
     }
   }
 
@@ -566,9 +570,6 @@ td {
 
 .placeholderHeaderCell {
   background-color: $header-bg-color;
-  .cellContents {
-    padding: 0.31rem $cell-padding;
-  }
 
   &::before {
     @extend %cellBorderLeft;
@@ -841,6 +842,7 @@ td {
   overflow-x: hidden;
   text-overflow: ellipsis;
   text-align: left;
+  pointer-events: none;
 }
 
 thead {
