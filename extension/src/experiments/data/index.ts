@@ -66,7 +66,7 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
           this.experiments.getNbOfCommitsToShow().toString()
         ]
     const data = await this.internalCommands.executeCommand<ExpShowOutput>(
-      AvailableCommands.EXP_SHOW_,
+      AvailableCommands.EXP_SHOW,
       this.dvcRoot,
       ...flags,
       ...args

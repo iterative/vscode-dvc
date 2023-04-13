@@ -1,6 +1,6 @@
 import { ExpShowOutput } from '../../cli/dvc/contract'
 import { uniqueValues } from '../../util/array'
-import { getData_ } from '../columns/collect'
+import { getData } from '../columns/collect'
 
 export const collectFiles = (
   output: ExpShowOutput,
@@ -12,7 +12,7 @@ export const collectFiles = (
 
   const [workspace] = output
 
-  const data = getData_(workspace)
+  const data = getData(workspace)
 
   return uniqueValues([
     ...Object.keys({

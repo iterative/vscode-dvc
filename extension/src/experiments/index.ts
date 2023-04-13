@@ -194,8 +194,8 @@ export class Experiments extends BaseRepository<TableData> {
     const dvcLiveOnly = await this.checkSignalFile()
     const commitsOutput = await this.getCommitOutput(data)
     await Promise.all([
-      this.columns.transformAndSet_(data),
-      this.experiments.transformAndSet_(data, dvcLiveOnly, commitsOutput)
+      this.columns.transformAndSet(data),
+      this.experiments.transformAndSet(data, dvcLiveOnly, commitsOutput)
     ])
 
     return this.notifyChanged()

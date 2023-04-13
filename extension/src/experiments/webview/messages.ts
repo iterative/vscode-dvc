@@ -22,7 +22,7 @@ import { getPositiveIntegerInput } from '../../vscode/inputBox'
 import { Title } from '../../vscode/title'
 import { ConfigKey, setConfigValue } from '../../vscode/config'
 import { Toast } from '../../vscode/toast'
-import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
+import { Executor, EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { stopWorkspaceExperiment } from '../processExecution'
 import { hasDvcYamlFile } from '../../fileSystem'
 import { NUM_OF_COMMITS_TO_INCREASE } from '../../cli/dvc/constants'
@@ -461,7 +461,7 @@ export class WebviewMessages {
       if (executor === EXPERIMENT_WORKSPACE_ID) {
         runningInWorkspace = true
       }
-      if (executor === 'dvc-task') {
+      if (executor === Executor.DVC_TASK) {
         runningInQueueIds.add(id)
       }
     }

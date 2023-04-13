@@ -94,7 +94,7 @@ suite('Experiments Data Test Suite', () => {
               if (command === AvailableCommands.GIT_GET_REPOSITORY_ROOT) {
                 return Promise.resolve(gitRoot)
               }
-              if (command === AvailableCommands.EXP_SHOW_) {
+              if (command === AvailableCommands.EXP_SHOW) {
                 return Promise.resolve([{ rev: EXPERIMENT_WORKSPACE_ID }])
               }
             }
@@ -150,7 +150,7 @@ suite('Experiments Data Test Suite', () => {
               if (command === AvailableCommands.GIT_GET_REPOSITORY_ROOT) {
                 return Promise.resolve(gitRoot)
               }
-              if (command === AvailableCommands.EXP_SHOW_) {
+              if (command === AvailableCommands.EXP_SHOW) {
                 return Promise.resolve([{ rev: EXPERIMENT_WORKSPACE_ID }])
               }
             }

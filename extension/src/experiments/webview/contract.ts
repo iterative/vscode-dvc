@@ -1,8 +1,4 @@
-import {
-  BaseExperimentFields,
-  ExperimentStatus,
-  ValueTree
-} from '../../cli/dvc/contract'
+import { Executor, ExperimentStatus, ValueTree } from '../../cli/dvc/contract'
 import { SortDefinition } from '../model/sortBy'
 
 export { ExperimentStatus } from '../../cli/dvc/contract'
@@ -20,7 +16,7 @@ export interface DepColumns {
   [path: string]: ValueWithChanges
 }
 
-export type RunningExperiment = { executor: string; id: string }
+export type RunningExperiment = { executor: Executor; id: string }
 
 export type CommitData = {
   author: string
@@ -29,11 +25,14 @@ export type CommitData = {
   date: string
 }
 
-export interface Experiment extends BaseExperimentFields {
+export type Experiment = {
+  commit?: CommitData
+  Created?: string
   deps?: DepColumns
   displayColor?: string
   displayName?: string
   error?: string
+  executor?: Executor
   id: string
   label: string
   logicalGroupName?: string
@@ -43,8 +42,8 @@ export interface Experiment extends BaseExperimentFields {
   selected?: boolean
   sha?: string
   starred?: boolean
-  Created?: string
-  commit?: CommitData
+  status?: ExperimentStatus
+  timestamp?: string | null
 }
 
 export const isRunning = (status: ExperimentStatus | undefined): boolean =>
@@ -59,7 +58,7 @@ export const isRunningInQueue = ({
 }: {
   status?: ExperimentStatus
   executor?: string | null
-}): boolean => isRunning(status) && executor === 'dvc-task'
+}): boolean => isRunning(status) && executor === Executor.DVC_TASK
 
 export interface Commit extends Experiment {
   subRows?: Experiment[]

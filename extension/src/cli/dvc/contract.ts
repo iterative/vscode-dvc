@@ -26,22 +26,13 @@ export type DataStatusOutput = {
 type SingleValue = string | number | boolean | null
 export type Value = SingleValue | SingleValue[]
 
-export interface ValueTreeOrError {
-  data?: ValueTree
-  error?: ErrorContents
-}
-
 type RelPathObject<T> = {
   [relPath: string]: T
 }
 
-export type ValueTreeRoot = RelPathObject<ValueTreeOrError>
-
-export interface ValueTreeNode {
+export interface ValueTree {
   [key: string]: Value | ValueTree
 }
-
-export type ValueTree = ValueTreeRoot | ValueTreeNode
 
 export const isValueTree = (
   value: Value | ValueTree
@@ -57,50 +48,19 @@ export enum ExperimentStatus {
 
 export const EXPERIMENT_WORKSPACE_ID = 'workspace' as const
 
-export interface BaseExperimentFields {
-  name?: string
-  timestamp?: string | null
-  status?: ExperimentStatus
-  executor?: string | null
-  checkpoint_tip?: string
-  checkpoint_parent?: string
-}
-
 type Dep = { hash: null | string; size: null | number; nfiles: null | number }
 type Out = Dep & { use_cache: boolean; is_data_source: boolean }
 
 type Outs = RelPathObject<Out>
 export type Deps = RelPathObject<Dep>
 
-export interface ExperimentFields extends BaseExperimentFields {
-  params?: ValueTreeRoot | null
-  metrics?: ValueTreeRoot | null
-  deps?: Deps | null
-  outs?: RelPathObject<Out> | null
-  error?: ErrorContents
-}
+export type FileDataOrError = { data: ValueTree } | DvcError
+export type MetricsOrParams = RelPathObject<FileDataOrError>
 
-export interface ExperimentFieldsOrError {
-  data?: ExperimentFields
-  error?: ErrorContents
-}
+export const fileHasError = (file: FileDataOrError): file is DvcError =>
+  !!(file as DvcError).error
 
-export interface ExperimentsCommitOutput {
-  [sha: string]: ExperimentFieldsOrError
-  baseline: ExperimentFieldsOrError
-}
-
-export interface ExperimentsOutput {
-  [name: string]: ExperimentsCommitOutput
-  [EXPERIMENT_WORKSPACE_ID]: {
-    baseline: ExperimentFieldsOrError
-  }
-}
-
-type ValueTreeOrError_ = { data: ValueTree } | DvcError
-type MetricsOrParams = RelPathObject<ValueTreeOrError_>
-
-export type ExpStateData = {
+export type ExpData = {
   rev: string
   timestamp: string | null
   params: MetricsOrParams | null
@@ -110,15 +70,15 @@ export type ExpStateData = {
   meta: { has_checkpoints: boolean }
 }
 
-export const ExperimentExecutor = {
-  DVC_TASK: 'dvc-task',
-  [EXPERIMENT_WORKSPACE_ID]: EXPERIMENT_WORKSPACE_ID
-} as const
+export enum Executor {
+  DVC_TASK = 'dvc-task',
+  WORKSPACE = 'workspace'
+}
 
-export type Executor =
+export type ExecutorState =
   | {
       state: ExperimentStatus.QUEUED
-      name: typeof ExperimentExecutor.DVC_TASK
+      name: typeof Executor.DVC_TASK
       local: {
         root: null
         log: null
@@ -132,7 +92,7 @@ export type Executor =
         | ExperimentStatus.RUNNING
         | ExperimentStatus.FAILED
         | ExperimentStatus.SUCCESS
-      name: (typeof ExperimentExecutor)[keyof typeof ExperimentExecutor] | null
+      name: Executor | null
       local: {
         root: string
         log: string
@@ -148,19 +108,23 @@ export type ExpWithError = {
   name?: string
 } & DvcError
 
-export type ExpState =
-  | {
-      rev: string
-      name?: string
-      data: ExpStateData
-    }
-  | ExpWithError
+type ExpWithData = {
+  rev: string
+  name?: string
+  data: ExpData
+}
+
+export type ExpState = ExpWithData | ExpWithError
 
 export type ExpRange = {
   revs: ExpState[]
   name?: string
-  executor: Executor
+  executor: ExecutorState
 }
+
+export const experimentHasError = (
+  expState: ExpState
+): expState is ExpWithError => !!(expState as { error?: unknown }).error
 
 export type ExpShowOutput = (ExpState & { experiments?: ExpRange[] | null })[]
 

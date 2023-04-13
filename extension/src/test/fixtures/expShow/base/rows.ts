@@ -4,7 +4,8 @@ import { copyOriginalColors } from '../../../../experiments/model/status/colors'
 import { shortenForLabel } from '../../../../util/string'
 import {
   ExperimentStatus,
-  EXPERIMENT_WORKSPACE_ID
+  EXPERIMENT_WORKSPACE_ID,
+  Executor
 } from '../../../../cli/dvc/contract'
 
 const valueWithNoChanges = (str: string) => ({
@@ -41,7 +42,7 @@ const data: Commit[] = [
       )
     },
     displayColor: colorsList[0],
-    executor: EXPERIMENT_WORKSPACE_ID,
+    executor: Executor.WORKSPACE,
     id: EXPERIMENT_WORKSPACE_ID,
     label: EXPERIMENT_WORKSPACE_ID,
     metrics: {
@@ -151,7 +152,7 @@ const data: Commit[] = [
         },
         displayColor: colorsList[1],
         displayName: '[exp-e7a67]',
-        executor: 'dvc-task',
+        executor: Executor.DVC_TASK,
         id: 'exp-e7a67',
         label: '4fb124a',
         logicalGroupName: '[exp-e7a67]',
@@ -267,7 +268,7 @@ const data: Commit[] = [
         },
         displayColor: undefined,
         displayName: '[exp-83425]',
-        executor: EXPERIMENT_WORKSPACE_ID,
+        executor: Executor.WORKSPACE,
         id: 'exp-83425',
         label: EXPERIMENT_WORKSPACE_ID,
         logicalGroupName: '[exp-83425]',

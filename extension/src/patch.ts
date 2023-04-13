@@ -1,11 +1,14 @@
 import { commands } from 'vscode'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import {
+  ExpData,
   ExpRange,
   ExpShowOutput,
   ExpState,
-  ExperimentFields,
-  ValueTreeRoot
+  ValueTree,
+  MetricsOrParams,
+  experimentHasError,
+  fileHasError
 } from './cli/dvc/contract'
 import { AvailableCommands, InternalCommands } from './commands/internal'
 import { Args, ExperimentFlag } from './cli/dvc/constants'
@@ -13,16 +16,15 @@ import { Response as UserResponse } from './vscode/response'
 import { Toast } from './vscode/toast'
 import { Modal } from './vscode/modal'
 import { RegisteredCommands } from './commands/external'
-import { hasError } from './experiments/model/collect'
 
 export const STUDIO_ENDPOINT = 'https://studio.iterative.ai/api/live'
 
 type ExperimentDetails = {
   baselineSha: string
   sha: string
-  metrics: ValueTreeRoot | undefined | null
+  metrics: MetricsOrParams | undefined | null
   name: string
-  params: ValueTreeRoot | null
+  params: ValueTree | null
 }
 
 type RequestBody = {
@@ -31,16 +33,19 @@ type RequestBody = {
   name: string
   baseline_sha: string
   experiment_rev: string
-  metrics: ValueTreeRoot
-  params: ValueTreeRoot
+  metrics: MetricsOrParams
+  params: ValueTree
   type: 'done'
 }
 
-const collectExperiment = (data: ExperimentFields) => {
+const collectExperiment = (data: ExpData) => {
   const { metrics, params } = data
 
-  const paramsAcc: ValueTreeRoot = {}
+  const paramsAcc: ValueTree = {}
   for (const [file, fileParams] of Object.entries(params || {})) {
+    if (fileHasError(fileParams)) {
+      continue
+    }
     const data = fileParams?.data
     if (data) {
       paramsAcc[file] = data
@@ -65,7 +70,7 @@ const findExperimentByName = (
     }
 
     const [exp] = experiment.revs
-    if (hasError(exp)) {
+    if (experimentHasError(exp)) {
       return
     }
 
@@ -170,7 +175,7 @@ const pushExperiment = async (
       dvcRoot
     ),
     internalCommands.executeCommand<ExpShowOutput>(
-      AvailableCommands.EXP_SHOW_,
+      AvailableCommands.EXP_SHOW,
       dvcRoot,
       ExperimentFlag.NO_FETCH
     )

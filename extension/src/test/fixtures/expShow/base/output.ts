@@ -1,7 +1,7 @@
 import { join } from '../../../util/path'
 import {
   EXPERIMENT_WORKSPACE_ID,
-  ExperimentExecutor,
+  Executor,
   ExperimentStatus,
   ExpShowOutput
 } from '../../../../cli/dvc/contract'
@@ -344,7 +344,7 @@ const data: ExpShowOutput = [
           }
         ],
         executor: {
-          name: 'dvc-task',
+          name: Executor.DVC_TASK,
           state: ExperimentStatus.RUNNING,
           local: null
         }
@@ -578,7 +578,7 @@ const data: ExpShowOutput = [
           }
         ],
         executor: {
-          name: ExperimentExecutor[EXPERIMENT_WORKSPACE_ID],
+          name: Executor.WORKSPACE,
           local: null,
           state: ExperimentStatus.RUNNING
         }
@@ -812,7 +812,7 @@ const data: ExpShowOutput = [
         ],
         executor: {
           state: ExperimentStatus.QUEUED,
-          name: ExperimentExecutor.DVC_TASK,
+          name: Executor.DVC_TASK,
           local: {
             root: null,
             log: null,

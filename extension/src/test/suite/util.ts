@@ -223,7 +223,7 @@ export const buildDependencies = (
 
   const mockPlotsDiff = stub(dvcReader, 'plotsDiff').resolves(plotsDiff)
 
-  const mockExpShow = stub(dvcReader, 'expShow_').resolves(expShow)
+  const mockExpShow = stub(dvcReader, 'expShow').resolves(expShow)
 
   const mockGetCommitMessages = stub(gitReader, 'getCommitMessages').resolves(
     ''

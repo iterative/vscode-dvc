@@ -1,7 +1,7 @@
 import { Memento } from 'vscode'
 import { SortDefinition, sortExperiments } from './sortBy'
 import { FilterDefinition, filterExperiment, getFilterId } from './filterBy'
-import { collectExperiments, collectExperiments_ } from './collect'
+import { collectExperiments } from './collect'
 import {
   collectColoredStatus,
   collectFinishedRunningExperiments,
@@ -24,11 +24,7 @@ import {
   RunningExperiment
 } from '../webview/contract'
 import { definedAndNonEmpty, reorderListSubset } from '../../util/array'
-import {
-  ExperimentsOutput,
-  EXPERIMENT_WORKSPACE_ID,
-  ExpShowOutput
-} from '../../cli/dvc/contract'
+import { EXPERIMENT_WORKSPACE_ID, ExpShowOutput } from '../../cli/dvc/contract'
 import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
 import { PersistenceKey } from '../../persistence/constants'
@@ -104,27 +100,12 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public transformAndSet(
-    data: ExperimentsOutput,
-    dvcLiveOnly: boolean,
-    commitsOutput: string
-  ) {
-    const { workspace, commits, experimentsByCommit, runningExperiments } =
-      collectExperiments(data, dvcLiveOnly, commitsOutput)
-
-    this.workspace = workspace
-    this.commits = commits
-    this.experimentsByCommit = experimentsByCommit
-
-    this.setColoredStatus(runningExperiments)
-  }
-
-  public transformAndSet_(
     data: ExpShowOutput,
     dvcLiveOnly: boolean,
     commitsOutput: string | undefined
   ) {
     const { workspace, commits, experimentsByCommit, runningExperiments } =
-      collectExperiments_(data, dvcLiveOnly, commitsOutput)
+      collectExperiments(data, dvcLiveOnly, commitsOutput)
 
     this.workspace = workspace
     this.commits = commits

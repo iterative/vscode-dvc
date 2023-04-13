@@ -93,7 +93,7 @@ suite('Extension Test Suite', () => {
       )
 
       mockHasCheckpoints(expShowFixture)
-      const mockExpShow = stub(DvcReader.prototype, 'expShow_')
+      const mockExpShow = stub(DvcReader.prototype, 'expShow')
       const mockDataStatus = stub(DvcReader.prototype, 'dataStatus')
       const mockPlotsDiff = stub(DvcReader.prototype, 'plotsDiff')
 

@@ -8,11 +8,11 @@ import {
 } from './util'
 import { buildDepPath } from '../paths'
 import { ColumnType } from '../../webview/contract'
-import { ExperimentFields } from '../../../cli/dvc/contract'
+import { ExpData } from '../../../cli/dvc/contract'
 import { getPathArray } from '../../../fileSystem/util'
 import { shortenForLabel } from '../../../util/string'
 
-export const collectDeps = (acc: ColumnAccumulator, data: ExperimentFields) => {
+export const collectDeps = (acc: ColumnAccumulator, data: ExpData) => {
   const { deps } = data
   if (!deps) {
     return
@@ -50,8 +50,8 @@ export const collectDeps = (acc: ColumnAccumulator, data: ExperimentFields) => {
 
 export const collectDepChanges = (
   changes: string[],
-  workspaceData: ExperimentFields,
-  commitData: ExperimentFields
+  workspaceData: ExpData,
+  commitData: ExpData
 ) => {
   for (const [file, { hash }] of Object.entries(
     workspaceData?.[ColumnType.DEPS] || {}

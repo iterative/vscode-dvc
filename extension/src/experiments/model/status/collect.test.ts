@@ -7,7 +7,8 @@ import { copyOriginalColors } from './colors'
 import { Experiment } from '../../webview/contract'
 import {
   ExperimentStatus,
-  EXPERIMENT_WORKSPACE_ID
+  EXPERIMENT_WORKSPACE_ID,
+  Executor
 } from '../../../cli/dvc/contract'
 
 describe('collectColoredStatus', () => {
@@ -222,12 +223,12 @@ describe('collectColoredStatus', () => {
     const { availableColors, coloredStatus } = collectColoredStatus(
       [
         {
-          executor: EXPERIMENT_WORKSPACE_ID,
+          executor: Executor.WORKSPACE,
           id: 'exp-1',
           status: ExperimentStatus.RUNNING
         },
         {
-          executor: EXPERIMENT_WORKSPACE_ID,
+          executor: Executor.WORKSPACE,
           id: 'exp-2',
           status: ExperimentStatus.RUNNING
         }
@@ -311,8 +312,8 @@ describe('collectFinishedRunningExperiments', () => {
     const finishedRunning = collectFinishedRunningExperiments(
       {},
       [{ Created: '2022-12-02T07:48:24', id: 'exp-1234' }] as Experiment[],
-      [{ executor: EXPERIMENT_WORKSPACE_ID, id: 'exp-1234' }],
-      [{ executor: EXPERIMENT_WORKSPACE_ID, id: 'exp-1234' }],
+      [{ executor: Executor.WORKSPACE, id: 'exp-1234' }],
+      [{ executor: Executor.WORKSPACE, id: 'exp-1234' }],
       {}
     )
     expect(finishedRunning).toStrictEqual({})
@@ -328,7 +329,7 @@ describe('collectFinishedRunningExperiments', () => {
         { Created: '2022-12-02T07:48:25', id: latestCreatedId },
         { Created: null, id: 'exp-null' }
       ] as Experiment[],
-      [{ executor: EXPERIMENT_WORKSPACE_ID, id: EXPERIMENT_WORKSPACE_ID }],
+      [{ executor: Executor.WORKSPACE, id: EXPERIMENT_WORKSPACE_ID }],
       [],
       { 'exp-456': UNSELECTED }
     )
@@ -347,7 +348,7 @@ describe('collectFinishedRunningExperiments', () => {
         { Created: '2022-12-02T07:48:25', id: latestCreatedId },
         { Created: null, id: 'exp-null' }
       ] as Experiment[],
-      [{ executor: EXPERIMENT_WORKSPACE_ID, id: latestCreatedId }],
+      [{ executor: Executor.WORKSPACE, id: latestCreatedId }],
       [],
       {}
     )
@@ -363,7 +364,7 @@ describe('collectFinishedRunningExperiments', () => {
       [
         { Created: '2022-12-02T07:48:25', id: previouslyCreatedId }
       ] as Experiment[],
-      [{ executor: EXPERIMENT_WORKSPACE_ID, id: previouslyCreatedId }],
+      [{ executor: Executor.WORKSPACE, id: previouslyCreatedId }],
       [],
       { [previouslyCreatedId]: UNSELECTED }
     )
@@ -380,7 +381,7 @@ describe('collectFinishedRunningExperiments', () => {
         { Created: '2022-12-02T07:48:25', id: latestCreatedId },
         { Created: null, id: 'exp-null' }
       ] as Experiment[],
-      [{ executor: 'dvc-task', id: latestCreatedId }],
+      [{ executor: Executor.DVC_TASK, id: latestCreatedId }],
       [],
       {}
     )
@@ -399,7 +400,7 @@ describe('collectFinishedRunningExperiments', () => {
         { Created: '2022-12-02T07:48:25', id: latestCreatedId },
         { Created: null, id: 'exp-null' }
       ] as Experiment[],
-      [{ executor: EXPERIMENT_WORKSPACE_ID, id: latestCreatedId }],
+      [{ executor: Executor.WORKSPACE, id: latestCreatedId }],
       [],
       {}
     )

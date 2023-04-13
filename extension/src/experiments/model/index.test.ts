@@ -7,7 +7,11 @@ import rowsFixture from '../../test/fixtures/expShow/base/rows'
 import deeplyNestedRowsFixture from '../../test/fixtures/expShow/deeplyNested/rows'
 import deeplyNestedOutputFixture from '../../test/fixtures/expShow/deeplyNested/output'
 import uncommittedDepsFixture from '../../test/fixtures/expShow/uncommittedDeps/output'
-import { buildMockMemento } from '../../test/util'
+import {
+  buildMockMemento,
+  generateCommitWithExperiments,
+  generateTestExpState
+} from '../../test/util'
 import { Experiment } from '../webview/contract'
 import { definedAndNonEmpty } from '../../util/array'
 import dataTypesRowsFixture from '../../test/fixtures/expShow/dataTypes/rows'
@@ -31,86 +35,43 @@ beforeEach(() => {
 })
 
 describe('ExperimentsModel', () => {
-  const runningExperiment = 'exp-12345'
-
-  const buildTestExperiment = (testParam: number, name?: string) => {
-    const data = {
-      params: {
-        'params.yaml': {
-          data: { test: testParam }
-        }
-      }
-    } as {
-      name?: string
-      params: {
-        'params.yaml': {
-          data: { test: number }
-        }
-      }
-    }
-    if (name) {
-      data.name = name
-    }
-
-    return { data }
-  }
-
   it('should return the expected rows when given the output fixture_', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet_(outputFixture, false, '')
+    model.transformAndSet(outputFixture, false, '')
     expect(model.getRowData()).toStrictEqual(rowsFixture)
   })
 
   it('should return the expected rows when given the survival fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet_(survivalOutputFixture, false, '')
+    model.transformAndSet(survivalOutputFixture, false, '')
     expect(model.getRowData()).toStrictEqual(survivalRowsFixture)
   })
 
   it('should set the workspace to running if a signal file for a DVCLive only experiment has been found', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    const dvcLiveOnly = {
-      [EXPERIMENT_WORKSPACE_ID]: {
-        baseline: {
-          data: {
-            timestamp: null,
-            params: {
-              'dvclive/params.yaml': {
-                data: {
-                  encoder_size: 128
-                }
-              }
-            },
-            deps: {},
-            outs: {},
-            status: ExperimentStatus.SUCCESS,
-            executor: null,
-            metrics: {
-              'dvclive/metrics.json': {
-                data: {
-                  train_loss: 0.015903037041425705,
-                  epoch: 49,
-                  step: 30
-                }
-              }
+    const dvcLiveOnly = [
+      generateTestExpState(EXPERIMENT_WORKSPACE_ID, {
+        params: {
+          'dvclive/params.yaml': {
+            data: {
+              encoder_size: 128
+            }
+          }
+        },
+        metrics: {
+          'dvclive/metrics.json': {
+            data: {
+              train_loss: 0.015903037041425705,
+              epoch: 49,
+              step: 30
             }
           }
         }
-      },
-      '399b45c9f676a10899671e146625d8694c7cce14': {
-        baseline: {
-          data: {
-            timestamp: '2022-12-07T09:36:20',
-            deps: {},
-            outs: {},
-            status: ExperimentStatus.SUCCESS,
-            executor: null,
-            metrics: {},
-            name: 'main'
-          }
-        }
-      }
-    }
+      }),
+      generateTestExpState('399b45c9f676a10899671e146625d8694c7cce14', {
+        timestamp: '2022-12-07T09:36:20'
+      })
+    ]
 
     model.transformAndSet(dvcLiveOnly, true, '')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -121,8 +82,7 @@ describe('ExperimentsModel', () => {
     model.transformAndSet(dvcLiveOnly, false, '')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const stoppedWorkspace = (model as any).workspace
-    expect(stoppedWorkspace?.executor).toBeNull()
-    expect(stoppedWorkspace?.status).toStrictEqual(ExperimentStatus.SUCCESS)
+    expect(stoppedWorkspace?.executor).toBeFalsy()
   })
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -138,30 +98,21 @@ describe('ExperimentsModel', () => {
     }
 
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(
-      {
-        [EXPERIMENT_WORKSPACE_ID]: {
-          baseline: {
-            data: {
-              executor: null,
-              params: { 'params.yaml': { data: { epochs: 100 } } },
-              status: ExperimentStatus.SUCCESS,
-              timestamp: null
-            }
-          }
+    const data = [
+      generateTestExpState(EXPERIMENT_WORKSPACE_ID, {
+        params: { 'params.yaml': { data: { epochs: 100 } } }
+      }),
+      generateCommitWithExperiments(
+        '0e7fbf190b78e7f8fdae6531bae123739e2db99b',
+        {
+          deps: existingDep,
+          params: { 'params.yaml': { data: { epochs: 100 } } },
+          timestamp: '2022-08-10T19:40:14'
         },
-        '0e7fbf190b78e7f8fdae6531bae123739e2db99b': {
-          baseline: {
-            data: {
-              deps: existingDep,
-              executor: null,
-              name: 'main',
-              params: { 'params.yaml': { data: { epochs: 100 } } },
-              status: ExperimentStatus.SUCCESS,
-              timestamp: '2022-08-10T19:40:14'
-            }
-          },
-          [shaWithChange]: {
+        [
+          {
+            rev: shaWithChange,
+            name: 'exp-750e4',
             data: {
               deps: {
                 ...existingDep,
@@ -171,27 +122,23 @@ describe('ExperimentsModel', () => {
                   size: 311710
                 }
               },
-              executor: null,
-              name: 'exp-750e4',
-              status: ExperimentStatus.SUCCESS,
               timestamp: '2022-08-11T23:04:39'
             }
           },
-          '46ce5efeba777f70a3f87177f9177995243ac828': {
+          {
+            rev: '46ce5efeba777f70a3f87177f9177995243ac828',
+            name: 'exp-d6ddc',
             data: {
               deps: existingDep,
-              executor: null,
-              name: 'exp-d6ddc',
               params: { 'params.yaml': { data: { epochs: 100 } } },
-              status: ExperimentStatus.SUCCESS,
               timestamp: '2022-08-11T22:55:46'
             }
           }
-        }
-      },
-      false,
-      ''
-    )
+        ]
+      )
+    ]
+
+    model.transformAndSet(data, false, '')
 
     const experiments = model.getCombinedList()
 
@@ -210,61 +157,73 @@ describe('ExperimentsModel', () => {
 
   it('should handle deps have all null properties (never been committed)', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet_(uncommittedDepsFixture, false, '')
+    model.transformAndSet(uncommittedDepsFixture, false, '')
     const [workspace] = model.getWorkspaceAndCommits()
     expect(workspace.deps).toStrictEqual({})
   })
 
   it('should return the expected rows when given the deeply nested output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet_(deeplyNestedOutputFixture, false, '')
+    model.transformAndSet(deeplyNestedOutputFixture, false, '')
     expect(model.getRowData()).toStrictEqual(deeplyNestedRowsFixture)
   })
 
   it('should return the expected rows when given the data types output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet_(dataTypesOutputFixture, false, '')
+    model.transformAndSet(dataTypesOutputFixture, false, '')
     expect(model.getRowData()).toStrictEqual(dataTypesRowsFixture)
   })
 
   it('should always limit the number of selected experiments to 7', () => {
+    const getParams = (value: number) => ({
+      params: {
+        'params.yaml': {
+          data: { test: value }
+        }
+      }
+    })
+
     const experimentsModel = new ExperimentsModel('', buildMockMemento())
 
+    const param0 = getParams(0)
+
     experimentsModel.transformAndSet(
-      {
-        testBranch: {
-          baseline: buildTestExperiment(2, 'testBranch'),
-          exp1: buildTestExperiment(0),
-          exp2: buildTestExperiment(0),
-          exp3: buildTestExperiment(0),
-          exp4: buildTestExperiment(0),
-          exp5: buildTestExperiment(0),
-          tip: buildTestExperiment(0, runningExperiment)
-        },
-        [EXPERIMENT_WORKSPACE_ID]: {
-          baseline: buildTestExperiment(3)
-        }
-      },
+      [
+        generateTestExpState(EXPERIMENT_WORKSPACE_ID, getParams(3)),
+        generateCommitWithExperiments('testBranch', getParams(2), [
+          param0,
+          param0,
+          param0,
+          param0,
+          param0,
+          param0,
+          param0,
+          param0,
+          param0
+        ])
+      ],
       false,
       ''
     )
 
     experimentsModel.setSelected([
-      { id: 'exp1' },
-      { id: 'exp2' },
-      { id: 'exp3' },
-      { id: 'exp4' },
-      { id: 'exp5' },
+      { id: 'exp-1' },
+      { id: 'exp-2' },
+      { id: 'exp-3' },
+      { id: 'exp-4' },
+      { id: 'exp-5' },
       { id: 'testBranch' },
-      { id: 'tip' },
-      { id: EXPERIMENT_WORKSPACE_ID }
+      { id: 'exp-6' },
+      { id: EXPERIMENT_WORKSPACE_ID },
+      { id: 'exp-7' },
+      { id: 'exp-8' }
     ] as Experiment[])
-    expect(experimentsModel.getSelectedRevisions()).toHaveLength(6)
+    expect(experimentsModel.getSelectedRevisions()).toHaveLength(7)
   })
 
   it('should fetch commit params', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet_(outputFixture, false, '')
+    model.transformAndSet(outputFixture, false, '')
 
     const commitParams = model.getExperimentParams('main')
     expect(definedAndNonEmpty(commitParams)).toBe(true)
@@ -272,7 +231,7 @@ describe('ExperimentsModel', () => {
 
   it('should fetch workspace params', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet_(outputFixture, false, '')
+    model.transformAndSet(outputFixture, false, '')
 
     const workspaceParams = model.getExperimentParams(EXPERIMENT_WORKSPACE_ID)
     expect(definedAndNonEmpty(workspaceParams)).toBe(true)
@@ -280,7 +239,7 @@ describe('ExperimentsModel', () => {
 
   it("should fetch an experiment's params", () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet_(outputFixture, false, '')
+    model.transformAndSet(outputFixture, false, '')
 
     const experimentParams = model.getExperimentParams('exp-e7a67')
     expect(definedAndNonEmpty(experimentParams)).toBe(true)
@@ -288,7 +247,7 @@ describe('ExperimentsModel', () => {
 
   it("should fetch an empty array if the experiment's params cannot be found", () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet_(outputFixture, false, '')
+    model.transformAndSet(outputFixture, false, '')
 
     const noParams = model.getExperimentParams('not-an-experiment')
     expect(definedAndNonEmpty(noParams)).toBe(false)

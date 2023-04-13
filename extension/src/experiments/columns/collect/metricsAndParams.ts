@@ -8,21 +8,19 @@ import {
 } from './util'
 import { ColumnType } from '../../webview/contract'
 import {
-  ExperimentFields,
+  ExpData,
   isValueTree,
   Value,
   ValueTree,
-  ValueTreeOrError,
-  ValueTreeRoot
+  FileDataOrError,
+  fileHasError,
+  MetricsOrParams
 } from '../../../cli/dvc/contract'
 import {
   buildMetricOrParamPath,
   FILE_SEPARATOR,
   METRIC_PARAM_SEPARATOR
 } from '../paths'
-
-export const typedValueTreeEntries = (value: NonNullable<ValueTree>) =>
-  Object.entries(value) as [string, Value | ValueTree][]
 
 const collectMetricOrParam = (
   acc: ColumnAccumulator,
@@ -66,7 +64,7 @@ const walkValueTree = (
   tree: ValueTree,
   ancestors: string[] = []
 ) => {
-  for (const [label, value] of typedValueTreeEntries(tree)) {
+  for (const [label, value] of Object.entries(tree)) {
     if (isValueTree(value)) {
       walkValueTree(acc, type, value, [...ancestors, label])
     } else {
@@ -78,9 +76,12 @@ const walkValueTree = (
 export const walkValueFileRoot = (
   acc: ColumnAccumulator,
   type: ColumnType,
-  root: ValueTreeRoot
+  root: MetricsOrParams
 ) => {
   for (const [file, value] of Object.entries(root)) {
+    if (fileHasError(value)) {
+      continue
+    }
     const { data } = value
     if (data) {
       walkValueTree(acc, type, data, [file])
@@ -90,7 +91,7 @@ export const walkValueFileRoot = (
 
 export const collectMetricsAndParams = (
   acc: ColumnAccumulator,
-  data: ExperimentFields
+  data: ExpData
 ) => {
   const { metrics, params } = data
   if (metrics) {
@@ -107,11 +108,11 @@ const collectChange = (
   file: string,
   key: string,
   value: Value | ValueTree,
-  commitData: ExperimentFields,
+  commitData: ExpData,
   ancestors: string[] = []
 ) => {
   if (isValueTree(value)) {
-    for (const [childKey, childValue] of typedValueTreeEntries(value)) {
+    for (const [childKey, childValue] of Object.entries(value)) {
       collectChange(changes, type, file, childKey, childValue, commitData, [
         ...ancestors,
         key
@@ -130,29 +131,33 @@ const collectChange = (
 const collectFileChanges = (
   changes: string[],
   type: ColumnType,
-  commitData: ExperimentFields,
+  commitData: ExpData,
   file: string,
-  value: ValueTreeOrError
+  value: FileDataOrError
 ) => {
+  if (fileHasError(value)) {
+    return
+  }
+
   const data = value.data
   if (!data) {
     return
   }
 
-  for (const [key, value] of typedValueTreeEntries(data)) {
+  for (const [key, value] of Object.entries(data)) {
     collectChange(changes, type, file, key, value, commitData)
   }
 }
 
 export const collectMetricAndParamChanges = (
   changes: string[],
-  workspaceData: ExperimentFields,
-  commitData: ExperimentFields
+  workspaceData: ExpData,
+  commitData: ExpData
 ) => {
   for (const type of [ColumnType.METRICS, ColumnType.PARAMS]) {
     for (const [file, value] of Object.entries(workspaceData?.[type] || {}) as [
       string,
-      ValueTreeOrError
+      FileDataOrError
     ][]) {
       collectFileChanges(changes, type, commitData, file, value)
     }

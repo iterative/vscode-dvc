@@ -75,6 +75,7 @@ import { ConfigKey } from '../../../vscode/config'
 import {
   EXPERIMENT_WORKSPACE_ID,
   Executor,
+  ExecutorState,
   ExpShowOutput,
   ExperimentStatus
 } from '../../../cli/dvc/contract'
@@ -1272,8 +1273,8 @@ suite('Experiments Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: [
-          ...mockExperimentIds.map(id => ({ executor: 'dvc-task', id })),
-          { executor: EXPERIMENT_WORKSPACE_ID, id: EXPERIMENT_WORKSPACE_ID }
+          ...mockExperimentIds.map(id => ({ executor: Executor.DVC_TASK, id })),
+          { executor: Executor.WORKSPACE, id: EXPERIMENT_WORKSPACE_ID }
         ],
         type: MessageFromWebviewType.STOP_EXPERIMENT
       })
@@ -2098,7 +2099,7 @@ suite('Experiments Test Suite', () => {
       const commit = 'df3f8647a47e403c9c4aa6562cad0b74afbe900b'
       const name = 'fizzy-dilemma'
       const params = { 'params.yaml': { data: { lr: 1 } } }
-      const getCommitData = (executor: Executor | null) => ({
+      const getCommitData = (executor: ExecutorState | null) => ({
         rev: commit,
         data: {
           rev: commit,
@@ -2167,7 +2168,7 @@ suite('Experiments Test Suite', () => {
         getCommitData({
           local: null,
           state: ExperimentStatus.RUNNING,
-          name: EXPERIMENT_WORKSPACE_ID
+          name: Executor.WORKSPACE
         })
       ])
 

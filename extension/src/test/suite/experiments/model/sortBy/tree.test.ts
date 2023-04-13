@@ -18,6 +18,7 @@ import { buildMetricOrParamPath } from '../../../../../experiments/columns/paths
 import { RegisteredCommands } from '../../../../../commands/external'
 import {
   EXPERIMENT_WORKSPACE_ID,
+  Executor,
   ExpShowOutput,
   ExperimentStatus
 } from '../../../../../cli/dvc/contract'
@@ -52,7 +53,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
         {
           executor: {
             local: null,
-            name: EXPERIMENT_WORKSPACE_ID,
+            name: Executor.WORKSPACE,
             state: ExperimentStatus.RUNNING
           },
           revs: [

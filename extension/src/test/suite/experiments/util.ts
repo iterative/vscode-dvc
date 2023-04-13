@@ -11,7 +11,7 @@ import {
   buildMockData,
   SafeWatcherDisposer
 } from '../util'
-import { ExpShowOutput } from '../../../cli/dvc/contract'
+import { ExpShowOutput, experimentHasError } from '../../../cli/dvc/contract'
 import { ExperimentsData } from '../../../experiments/data'
 import { CheckpointsModel } from '../../../experiments/checkpoints/model'
 import { FileSystemData } from '../../../fileSystem/data'
@@ -19,7 +19,6 @@ import * as Watcher from '../../../fileSystem/watcher'
 import { ExperimentsModel } from '../../../experiments/model'
 import { ColumnsModel } from '../../../experiments/columns/model'
 import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../../cli/dvc/constants'
-import { hasError } from '../../../experiments/model/collect'
 
 const hasCheckpoints = (data: ExpShowOutput) => {
   if (!data?.length) {
@@ -28,7 +27,7 @@ const hasCheckpoints = (data: ExpShowOutput) => {
 
   const [workspace] = data
 
-  if (hasError(workspace)) {
+  if (experimentHasError(workspace)) {
     return false
   }
 
@@ -180,7 +179,7 @@ const buildExperimentsDataDependencies = (disposer: Disposer) => {
   ).returns(undefined)
 
   const { dvcReader, internalCommands } = buildInternalCommands(disposer)
-  const mockExpShow = stub(dvcReader, 'expShow_').resolves(expShowFixture)
+  const mockExpShow = stub(dvcReader, 'expShow').resolves(expShowFixture)
   return { internalCommands, mockCreateFileSystemWatcher, mockExpShow }
 }
 
