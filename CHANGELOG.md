@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.5] - 2023-04-11
+
+### 🚀 New Features and Enhancements
+
+- Add Setup DVC Section [#3655](https://github.com/iterative/vscode-dvc/pull/3655) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Fix broken collapsed section info tooltips [#3669](https://github.com/iterative/vscode-dvc/pull/3669) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Add custom plot to e2e test [#3646](https://github.com/iterative/vscode-dvc/pull/3646) by [@julieg18](https://github.com/julieg18)
+- Clean up table styles [#3664](https://github.com/iterative/vscode-dvc/pull/3664) by [@julieg18](https://github.com/julieg18)
+
 ## [0.7.4] - 2023-04-06
 
 ### 🔨 Maintenance

@@ -16,7 +16,7 @@ DVC icon like this in the status bar:
 </p>
 
 If you see instead the crossed circle icon, click on the icon or follow the
-[Setup](command:dvc.showExperimentsSetup) wizard.
+[Setup](command:dvc.showDvcSetup) wizard.
 
 > **Note**: The correct Python interpreter must be set for the current workspace
 > when relying on the Python extension for auto environment activation.

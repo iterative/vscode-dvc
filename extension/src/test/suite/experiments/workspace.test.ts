@@ -927,9 +927,7 @@ suite('Workspace Experiments Test Suite', () => {
 
       await commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
 
-      expect(executeCommandSpy).to.have.been.calledWithMatch(
-        'dvc.showExperimentsSetup'
-      )
+      expect(executeCommandSpy).to.have.been.calledWithMatch('dvc.showDvcSetup')
     })
 
     it('should not show the experiments webview if the setup should be shown', async () => {
@@ -953,7 +951,7 @@ suite('Workspace Experiments Test Suite', () => {
 
       await commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
 
-      expect(executeCommandSpy).not.to.be.calledWith('dvc.showExperimentsSetup')
+      expect(executeCommandSpy).not.to.be.calledWith('dvc.showDvcSetup')
     })
 
     it('should show the experiments webview if the setup should not be shown', async () => {
