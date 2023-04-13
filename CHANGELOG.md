@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.6] - 2023-04-13
+
+### 🐛 Bug Fixes
+
+- fix(table): DnD landing zone covers the whole cell in the table [#3678](https://github.com/iterative/vscode-dvc/pull/3678) by [@shcheklein](https://github.com/shcheklein)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (2.54.0) [#3677](https://github.com/iterative/vscode-dvc/pull/3677) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.7.5] - 2023-04-11
 
 ### 🚀 New Features and Enhancements
