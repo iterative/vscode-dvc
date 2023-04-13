@@ -221,15 +221,12 @@ export class Plots extends BaseRepository<TPlotsData> {
   private waitForInitialData(experiments: Experiments) {
     const waitForInitialExpData = this.dispose.track(
       experiments.onDidChangeExperiments(async () => {
-        // if (data) {
         await experiments.isReady()
         this.dispose.untrack(waitForInitialExpData)
         waitForInitialExpData.dispose()
-        // get this from experiments, do not recalc
-        // this.data.setMetricFiles(data)
+        this.data.setMetricFiles(experiments.getRelativeMetricsFiles())
         this.setupExperimentsListener(experiments)
         void this.initializeData()
-        // }
       })
     )
   }
@@ -237,12 +234,10 @@ export class Plots extends BaseRepository<TPlotsData> {
   private setupExperimentsListener(experiments: Experiments) {
     this.dispose.track(
       experiments.onDidChangeExperiments(async () => {
-        // if (data) {
         await Promise.all([
-          this.plots.transformAndSetExperiments() // should be renamed
-          // this.data.setMetricFiles(data)
+          this.plots.transformAndSetExperiments(), // should be renamed
+          this.data.setMetricFiles(experiments.getRelativeMetricsFiles())
         ])
-        // }
 
         this.notifyChanged()
       })

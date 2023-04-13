@@ -521,6 +521,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.columns.hasNonDefaultColumns()
   }
 
+  public getRelativeMetricsFiles() {
+    return this.columns.getRelativeMetricsFiles()
+  }
+
   protected sendInitialWebviewData() {
     return this.webviewMessages.sendWebviewMessage()
   }

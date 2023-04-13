@@ -1,11 +1,10 @@
 import { commands } from 'vscode'
-import omit from 'lodash.omit'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import {
-  EXPERIMENT_WORKSPACE_ID,
+  ExpRange,
+  ExpShowOutput,
+  ExpState,
   ExperimentFields,
-  ExperimentsCommitOutput,
-  ExperimentsOutput,
   ValueTreeRoot
 } from './cli/dvc/contract'
 import { AvailableCommands, InternalCommands } from './commands/internal'
@@ -14,6 +13,7 @@ import { Response as UserResponse } from './vscode/response'
 import { Toast } from './vscode/toast'
 import { Modal } from './vscode/modal'
 import { RegisteredCommands } from './commands/external'
+import { hasError } from './experiments/model/collect'
 
 export const STUDIO_ENDPOINT = 'https://studio.iterative.ai/api/live'
 
@@ -52,23 +52,34 @@ const collectExperiment = (data: ExperimentFields) => {
 
 const findExperimentByName = (
   name: string,
-  baselineSha: string,
-  experimentsObject: ExperimentsCommitOutput
+  expState: ExpState & { experiments?: ExpRange[] | null }
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
-  for (const [sha, { data }] of Object.entries(experimentsObject)) {
-    if (data?.name !== name) {
+  if (!expState.experiments) {
+    return
+  }
+
+  for (const experiment of expState.experiments) {
+    if (experiment.name !== name) {
       continue
     }
+
+    const [exp] = experiment.revs
+    if (hasError(exp)) {
+      return
+    }
+
+    const { data, rev } = exp
 
     if (data) {
       const { metrics, params } = collectExperiment(data)
 
       return {
-        baselineSha,
+        baselineSha: expState.rev,
         metrics,
         name,
         params,
-        sha
+        sha: rev
       }
     }
   }
@@ -76,12 +87,10 @@ const findExperimentByName = (
 
 const collectExperimentDetails = (
   name: string,
-  expData: ExperimentsOutput
+  expData: ExpShowOutput
 ): ExperimentDetails | undefined => {
-  for (const [sha, experimentsObject] of Object.entries(
-    omit(expData, EXPERIMENT_WORKSPACE_ID)
-  )) {
-    const details = findExperimentByName(name, sha, experimentsObject)
+  for (const expState of expData.slice(1)) {
+    const details = findExperimentByName(name, expState)
     if (details) {
       return details
     }
@@ -155,19 +164,19 @@ const pushExperiment = async (
   name: string,
   studioAccessToken: string
 ) => {
-  const [repoUrl, expData] = await Promise.all([
+  const [repoUrl, expShowOutput] = await Promise.all([
     internalCommands.executeCommand(
       AvailableCommands.GIT_GET_REMOTE_URL,
       dvcRoot
     ),
-    internalCommands.executeCommand<ExperimentsOutput>(
-      AvailableCommands.EXP_SHOW,
+    internalCommands.executeCommand<ExpShowOutput>(
+      AvailableCommands.EXP_SHOW_,
       dvcRoot,
       ExperimentFlag.NO_FETCH
     )
   ])
 
-  const experimentDetails = collectExperimentDetails(name, expData)
+  const experimentDetails = collectExperimentDetails(name, expShowOutput)
 
   if (!repoUrl) {
     return Toast.showError(

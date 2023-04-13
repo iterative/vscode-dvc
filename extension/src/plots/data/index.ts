@@ -1,8 +1,7 @@
 import { Event, EventEmitter } from 'vscode'
-import { collectMetricsFiles, collectFiles } from './collect'
+import { collectFiles } from './collect'
 import {
   EXPERIMENT_WORKSPACE_ID,
-  ExperimentsOutput,
   PlotsOutputOrError
 } from '../../cli/dvc/contract'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
@@ -66,8 +65,7 @@ export class PlotsData extends BaseData<{
     return this.processManager.run('update')
   }
 
-  public setMetricFiles(data: ExperimentsOutput) {
-    const metricsFiles = collectMetricsFiles(data, this.metricFiles)
+  public setMetricFiles(metricsFiles: string[]) {
     if (!sameContents(metricsFiles, this.metricFiles)) {
       this.metricFiles = metricsFiles
       this.collectedFiles = uniqueValues([

@@ -14,8 +14,8 @@ import {
 } from 'vscode'
 import { buildExperiments, stubWorkspaceExperimentsGetters } from './util'
 import { Disposable } from '../../../extension'
-import expShowFixture from '../../fixtures/expShow/base/output_'
-import rowsFixture from '../../fixtures/expShow/base/rows_'
+import expShowFixture from '../../fixtures/expShow/base/output'
+import rowsFixture from '../../fixtures/expShow/base/rows'
 import columnsFixture, {
   dataColumnOrder as columnsOrderFixture
 } from '../../fixtures/expShow/base/columns'

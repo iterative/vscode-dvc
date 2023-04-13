@@ -1,6 +1,6 @@
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
-import rowsFixture from '../expShow/base/rows_'
+import rowsFixture from '../expShow/base/rows'
 import { extendVegaSpec, isMultiViewPlot } from '../../../plots/vega/util'
 import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../../cli/dvc/contract'
 import {

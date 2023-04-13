@@ -3,7 +3,7 @@ import { EventEmitter } from 'vscode'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
-import expShowFixture from '../../fixtures/expShow/base/output_'
+import expShowFixture from '../../fixtures/expShow/base/output'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import {
   buildDependencies,

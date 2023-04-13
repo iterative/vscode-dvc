@@ -3,6 +3,7 @@ import {
   collectChanges_,
   collectColumns,
   collectColumns_,
+  collectRelativeMetricsFiles,
   collectParamsFiles,
   collectParamsFiles_
 } from './collect'
@@ -17,6 +18,7 @@ export class ColumnsModel extends PathSelectionModel<Column> {
   private columnWidthsState: Record<string, number> = {}
   private columnsChanges: string[] = []
   private paramsFiles = new Set<string>()
+  private relativeMetricsFiles: string[] = []
 
   constructor(
     dvcRoot: string,
@@ -56,6 +58,10 @@ export class ColumnsModel extends PathSelectionModel<Column> {
 
   public getParamsFiles() {
     return this.paramsFiles
+  }
+
+  public getRelativeMetricsFiles() {
+    return this.relativeMetricsFiles
   }
 
   public transformAndSet(data: ExperimentsOutput) {
@@ -181,9 +187,10 @@ export class ColumnsModel extends PathSelectionModel<Column> {
   }
 
   private async transformAndSetColumns_(data: ExpShowOutput) {
-    const [columns, paramsFiles] = await Promise.all([
+    const [columns, paramsFiles, relativeMetricsFiles] = await Promise.all([
       collectColumns_(data),
-      collectParamsFiles_(this.dvcRoot, data)
+      collectParamsFiles_(this.dvcRoot, data),
+      collectRelativeMetricsFiles(data)
     ])
 
     this.setNewStatuses(columns)
@@ -195,6 +202,7 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     }
 
     this.paramsFiles = paramsFiles
+    this.relativeMetricsFiles = relativeMetricsFiles
   }
 
   private transformAndSetChanges_(data: ExpShowOutput) {

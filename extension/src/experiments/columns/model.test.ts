@@ -6,7 +6,7 @@ import { buildMockMemento } from '../../test/util'
 import { Status } from '../../path/selection/model'
 import { PersistenceKey } from '../../persistence/constants'
 import { ColumnType } from '../webview/contract'
-import outputFixture from '../../test/fixtures/expShow/base/output_'
+import outputFixture from '../../test/fixtures/expShow/base/output'
 import columnsFixture from '../../test/fixtures/expShow/base/columns'
 import {
   deeplyNestedColumnsWithHeightOf10,
@@ -75,7 +75,7 @@ describe('ColumnsModel', () => {
       buildMockMemento(),
       mockedColumnsOrderOrStatusChanged
     )
-    await model.transformAndSet(survivalOutputFixture)
+    await model.transformAndSet_(survivalOutputFixture)
     expect(model.getSelected()).toStrictEqual(survivalColumnsFixture)
   })
 
@@ -85,7 +85,7 @@ describe('ColumnsModel', () => {
       buildMockMemento(),
       mockedColumnsOrderOrStatusChanged
     )
-    await model.transformAndSet(deeplyNestedOutputFixture)
+    await model.transformAndSet_(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
     expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsFixture)
   })
@@ -97,7 +97,7 @@ describe('ColumnsModel', () => {
       buildMockMemento(),
       mockedColumnsOrderOrStatusChanged
     )
-    await model.transformAndSet(deeplyNestedOutputFixture)
+    await model.transformAndSet_(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
     expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithHeightOf10)
   })
@@ -109,7 +109,7 @@ describe('ColumnsModel', () => {
       buildMockMemento(),
       mockedColumnsOrderOrStatusChanged
     )
-    await model.transformAndSet(deeplyNestedOutputFixture)
+    await model.transformAndSet_(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
     expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithHeightOf3)
   })
@@ -121,7 +121,7 @@ describe('ColumnsModel', () => {
       buildMockMemento(),
       mockedColumnsOrderOrStatusChanged
     )
-    await model.transformAndSet(deeplyNestedOutputFixture)
+    await model.transformAndSet_(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
     expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithHeightOf2)
   })
@@ -133,7 +133,7 @@ describe('ColumnsModel', () => {
       buildMockMemento(),
       mockedColumnsOrderOrStatusChanged
     )
-    await model.transformAndSet(deeplyNestedOutputFixture)
+    await model.transformAndSet_(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
     expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithHeightOf1)
   })
@@ -145,7 +145,7 @@ describe('ColumnsModel', () => {
       buildMockMemento(),
       mockedColumnsOrderOrStatusChanged
     )
-    await model.transformAndSet(deeplyNestedOutputFixture)
+    await model.transformAndSet_(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
     expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithHeightOf10)
   })
@@ -157,7 +157,7 @@ describe('ColumnsModel', () => {
       buildMockMemento(),
       mockedColumnsOrderOrStatusChanged
     )
-    await model.transformAndSet(deeplyNestedOutputFixture)
+    await model.transformAndSet_(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
     expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithHeightOf10)
   })
@@ -168,7 +168,7 @@ describe('ColumnsModel', () => {
       buildMockMemento(),
       mockedColumnsOrderOrStatusChanged
     )
-    await model.transformAndSet(dataTypesOutputFixture)
+    await model.transformAndSet_(dataTypesOutputFixture)
     expect(model.getSelected()).toStrictEqual(dataTypesColumnsFixture)
   })
 

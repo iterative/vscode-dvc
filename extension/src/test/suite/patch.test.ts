@@ -39,13 +39,15 @@ suite('Patch Test Suite', () => {
       const mockStudioAccessToken = 'isat_12123123123123123'
       const mockRepoUrl = 'https://github.com/iterative/vscode-dvc-demo'
 
+      const id = 'exp-e7a67'
+
       const { internalCommands, gitReader, dvcReader } =
         buildInternalCommands(disposable)
 
       const mockGetRemoteUrl = stub(gitReader, 'getRemoteUrl').resolves(
         mockRepoUrl
       )
-      const mockExpShow = stub(dvcReader, 'expShow').resolves(expShowFixture)
+      const mockExpShow = stub(dvcReader, 'expShow_').resolves(expShowFixture)
 
       registerPatchCommand(internalCommands)
 
@@ -53,16 +55,38 @@ suite('Patch Test Suite', () => {
         AvailableCommands.EXP_PUSH,
         mockStudioAccessToken,
         dvcDemoPath,
-        'exp-e7a67'
+        id
       )
 
       expect(mockGetRemoteUrl).to.be.calledOnce
       expect(mockExpShow).to.be.calledOnce
       expect(mockFetch).to.be.calledOnce
 
-      const { metrics, name, params } = expShowFixture[
-        '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'
-      ]['4fb124aebddb2adf1545030907687fa9a4c80e70'].data as ExperimentFields
+      const { metrics, params } = (
+        expShowFixture
+          .find(({ rev }) => rev === '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77')
+          ?.experiments?.find(
+            ({ revs }) =>
+              revs[0].rev === '4fb124aebddb2adf1545030907687fa9a4c80e70'
+          )?.revs?.[0] as { data: ExperimentFields }
+      ).data
+
+      const body = mockFetch.lastCall.args[1]?.body
+
+      expect(JSON.parse((body as string) || '{}')).to.deep.equal({
+        baseline_sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
+        client: 'vscode',
+        experiment_rev: '4fb124aebddb2adf1545030907687fa9a4c80e70',
+        metrics,
+        name: id,
+        params: {
+          'params.yaml': params?.['params.yaml']?.data,
+          [join('nested', 'params.yaml')]:
+            params?.[join('nested', 'params.yaml')]?.data
+        },
+        repo_url: mockRepoUrl,
+        type: 'done'
+      })
 
       expect(mockFetch).to.be.calledWithExactly(STUDIO_ENDPOINT, {
         body: JSON.stringify({
@@ -70,7 +94,7 @@ suite('Patch Test Suite', () => {
           client: 'vscode',
           experiment_rev: '4fb124aebddb2adf1545030907687fa9a4c80e70',
           metrics,
-          name,
+          name: id,
           params: {
             'params.yaml': params?.['params.yaml']?.data,
             [join('nested', 'params.yaml')]:
@@ -103,11 +127,13 @@ suite('Patch Test Suite', () => {
       const mockGetRemoteUrl = stub(gitReader, 'getRemoteUrl').resolves(
         mockRepoUrl
       )
-      const mockExpShow = stub(dvcReader, 'expShow').resolves(expShowFixture)
+      const mockExpShow = stub(dvcReader, 'expShow_').resolves(expShowFixture)
 
       const mockErrorWithOptions = stub(Modal, 'errorWithOptions').resolves(
         Response.SHOW
       )
+
+      const id = 'exp-e7a67'
 
       registerPatchCommand(internalCommands)
 
@@ -115,7 +141,7 @@ suite('Patch Test Suite', () => {
         AvailableCommands.EXP_PUSH,
         mockStudioAccessToken,
         dvcDemoPath,
-        'exp-e7a67'
+        id
       )
 
       expect(mockGetRemoteUrl).to.be.calledOnce
@@ -126,9 +152,14 @@ suite('Patch Test Suite', () => {
         RegisteredCommands.SETUP_SHOW
       )
 
-      const { metrics, params, name } = expShowFixture[
-        '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'
-      ]['4fb124aebddb2adf1545030907687fa9a4c80e70'].data as ExperimentFields
+      const { metrics, params } = (
+        expShowFixture
+          .find(({ rev }) => rev === '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77')
+          ?.experiments?.find(
+            ({ revs }) =>
+              revs[0].rev === '4fb124aebddb2adf1545030907687fa9a4c80e70'
+          )?.revs?.[0] as { data: ExperimentFields }
+      ).data
 
       expect(mockFetch).to.be.calledWithExactly(STUDIO_ENDPOINT, {
         body: JSON.stringify({
@@ -136,7 +167,7 @@ suite('Patch Test Suite', () => {
           client: 'vscode',
           experiment_rev: '4fb124aebddb2adf1545030907687fa9a4c80e70',
           metrics,
-          name,
+          name: id,
           params: {
             'params.yaml': params?.['params.yaml']?.data,
             [join('nested', 'params.yaml')]:
@@ -165,7 +196,7 @@ suite('Patch Test Suite', () => {
       const mockGetRemoteUrl = stub(gitReader, 'getRemoteUrl').resolves(
         mockRepoUrl
       )
-      const mockExpShow = stub(dvcReader, 'expShow').resolves(expShowFixture)
+      const mockExpShow = stub(dvcReader, 'expShow_').resolves(expShowFixture)
 
       registerPatchCommand(internalCommands)
 

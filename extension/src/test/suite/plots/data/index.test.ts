@@ -126,11 +126,7 @@ suite('Plots Data Test Suite', () => {
 
       void data.update()
       await data.isReady()
-      data.setMetricFiles({
-        workspace: {
-          baseline: { data: { metrics: { [metricsFile]: { data: {} } } } }
-        }
-      })
+      data.setMetricFiles([metricsFile])
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect((data as any).collectedFiles).to.deep.equal([

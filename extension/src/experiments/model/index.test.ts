@@ -3,9 +3,7 @@ import { join } from 'path'
 import { commands } from 'vscode'
 import { ExperimentsModel } from '.'
 import outputFixture from '../../test/fixtures/expShow/base/output'
-import outputFixture_ from '../../test/fixtures/expShow/base/output_'
 import rowsFixture from '../../test/fixtures/expShow/base/rows'
-import rowsFixture_ from '../../test/fixtures/expShow/base/rows_'
 import deeplyNestedRowsFixture from '../../test/fixtures/expShow/deeplyNested/rows'
 import deeplyNestedOutputFixture from '../../test/fixtures/expShow/deeplyNested/output'
 import uncommittedDepsFixture from '../../test/fixtures/expShow/uncommittedDeps/output'
@@ -57,21 +55,15 @@ describe('ExperimentsModel', () => {
     return { data }
   }
 
-  it('should return the expected rows when given the output fixture', () => {
-    const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, false, '')
-    expect(model.getRowData()).toStrictEqual(rowsFixture)
-  })
-
   it('should return the expected rows when given the output fixture_', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet_(outputFixture_, false, '')
-    expect(model.getRowData()).toStrictEqual(rowsFixture_)
+    model.transformAndSet_(outputFixture, false, '')
+    expect(model.getRowData()).toStrictEqual(rowsFixture)
   })
 
   it('should return the expected rows when given the survival fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(survivalOutputFixture, false, '')
+    model.transformAndSet_(survivalOutputFixture, false, '')
     expect(model.getRowData()).toStrictEqual(survivalRowsFixture)
   })
 
@@ -218,20 +210,20 @@ describe('ExperimentsModel', () => {
 
   it('should handle deps have all null properties (never been committed)', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(uncommittedDepsFixture, false, '')
+    model.transformAndSet_(uncommittedDepsFixture, false, '')
     const [workspace] = model.getWorkspaceAndCommits()
     expect(workspace.deps).toStrictEqual({})
   })
 
   it('should return the expected rows when given the deeply nested output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(deeplyNestedOutputFixture, false, '')
+    model.transformAndSet_(deeplyNestedOutputFixture, false, '')
     expect(model.getRowData()).toStrictEqual(deeplyNestedRowsFixture)
   })
 
   it('should return the expected rows when given the data types output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(dataTypesOutputFixture, false, '')
+    model.transformAndSet_(dataTypesOutputFixture, false, '')
     expect(model.getRowData()).toStrictEqual(dataTypesRowsFixture)
   })
 
@@ -272,7 +264,7 @@ describe('ExperimentsModel', () => {
 
   it('should fetch commit params', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, false, '')
+    model.transformAndSet_(outputFixture, false, '')
 
     const commitParams = model.getExperimentParams('main')
     expect(definedAndNonEmpty(commitParams)).toBe(true)
@@ -280,7 +272,7 @@ describe('ExperimentsModel', () => {
 
   it('should fetch workspace params', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, false, '')
+    model.transformAndSet_(outputFixture, false, '')
 
     const workspaceParams = model.getExperimentParams(EXPERIMENT_WORKSPACE_ID)
     expect(definedAndNonEmpty(workspaceParams)).toBe(true)
@@ -288,7 +280,7 @@ describe('ExperimentsModel', () => {
 
   it("should fetch an experiment's params", () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, false, '')
+    model.transformAndSet_(outputFixture, false, '')
 
     const experimentParams = model.getExperimentParams('exp-e7a67')
     expect(definedAndNonEmpty(experimentParams)).toBe(true)
@@ -296,7 +288,7 @@ describe('ExperimentsModel', () => {
 
   it("should fetch an empty array if the experiment's params cannot be found", () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, false, '')
+    model.transformAndSet_(outputFixture, false, '')
 
     const noParams = model.getExperimentParams('not-an-experiment')
     expect(definedAndNonEmpty(noParams)).toBe(false)

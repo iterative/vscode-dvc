@@ -73,7 +73,7 @@ describe('CliReader', () => {
         getMockedProcess(JSON.stringify(expShowFixture))
       )
 
-      const cliOutput = await dvcReader.expShow(cwd)
+      const cliOutput = await dvcReader.expShow_(cwd)
       expect(cliOutput).toStrictEqual(expShowFixture)
       expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['exp', 'show', JSON_FLAG],

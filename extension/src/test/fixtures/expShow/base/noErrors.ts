@@ -1,5 +1,5 @@
 import { ExpShowOutput } from '../../../../cli/dvc/contract'
-import expShowFixture, { ERROR_SHAS } from './output_'
+import expShowFixture, { ERROR_SHAS } from './output'
 
 const excludeErrors = (): ExpShowOutput => {
   const expShowFixtureWithoutErrors: ExpShowOutput = []

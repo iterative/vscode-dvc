@@ -167,3 +167,17 @@ export const collectParamsFiles_ = (
     .map(file => standardizePath(join(dvcRoot, file)))
   return new Set(files)
 }
+
+export const collectRelativeMetricsFiles = (
+  output: ExpShowOutput
+): string[] => {
+  const [workspace] = output
+  if (hasError(workspace)) {
+    return []
+  }
+  const files = Object.keys(workspace.data.metrics || {})
+    .filter(Boolean)
+    .sort()
+
+  return [...new Set(files)]
+}

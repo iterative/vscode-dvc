@@ -3,12 +3,13 @@ import {
   collectChanges,
   collectChanges_,
   collectColumns,
-  collectColumns_
+  collectColumns_,
+  collectRelativeMetricsFiles
 } from '.'
 import { timestampColumn } from '../constants'
 import { buildMetricOrParamPath } from '../paths'
 import { Column, ColumnType } from '../../webview/contract'
-import outputFixture from '../../../test/fixtures/expShow/base/output_'
+import outputFixture from '../../../test/fixtures/expShow/base/output'
 import columnsFixture from '../../../test/fixtures/expShow/base/columns'
 import workspaceChangesFixture from '../../../test/fixtures/expShow/base/workspaceChanges'
 import uncommittedDepsFixture from '../../../test/fixtures/expShow/uncommittedDeps/output'
@@ -16,7 +17,8 @@ import {
   ExperimentsOutput,
   ExperimentStatus,
   EXPERIMENT_WORKSPACE_ID,
-  ValueTree
+  ValueTree,
+  ExpStateData
 } from '../../../cli/dvc/contract'
 import { getConfigValue } from '../../../vscode/config'
 
@@ -454,9 +456,11 @@ describe('collectChanges', () => {
   }
 
   it('should mark new dep files as changes', () => {
-    const changes = collectChanges(uncommittedDepsFixture)
+    const changes = collectChanges_(uncommittedDepsFixture)
     expect(changes).toStrictEqual(
-      Object.keys(uncommittedDepsFixture.workspace.baseline.data?.deps || {})
+      Object.keys(
+        (uncommittedDepsFixture[0] as { data: ExpStateData }).data.deps || {}
+      )
         .map(dep => `deps:${dep}`)
         .sort()
     )
@@ -758,6 +762,14 @@ describe('collectChanges', () => {
         'p',
         '0.025'
       )
+    ])
+  })
+})
+
+describe('collectRelativeMetricsFiles', () => {
+  it('should return the expected metrics files from the test fixture', () => {
+    expect(collectRelativeMetricsFiles(outputFixture)).toStrictEqual([
+      'summary.json'
     ])
   })
 })
