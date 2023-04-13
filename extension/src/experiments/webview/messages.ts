@@ -247,7 +247,6 @@ export class WebviewMessages {
     const selectedBranches = await this.selectBranches(
       this.experiments.getBranchesToShow()
     )
-
     if (!selectedBranches) {
       return
     }

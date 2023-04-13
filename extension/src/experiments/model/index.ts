@@ -424,9 +424,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public setAvailableBranchesToShow(branches: string[]) {
-    this.availableBranchesToShow = branches.filter(
-      branch => !this.branchesToShow.includes(branch)
-    )
+    this.availableBranchesToShow = branches
   }
 
   public getAvailableBranchesToShow() {
