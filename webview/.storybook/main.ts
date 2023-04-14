@@ -8,18 +8,7 @@ export default {
     'storybook-addon-themes',
     'storybook-addon-designs',
     '@storybook/addon-essentials',
-    '@storybook/addon-interactions',
-    {
-      name: '@storybook/preset-scss',
-      options: {
-        cssLoaderOptions: {
-          modules: {
-            localIdentName: '[path][name]__[local]--[hash:base64:5]',
-            auto: true
-          }
-        }
-      }
-    }
+    '@storybook/addon-interactions'
   ],
   core: {
     builder: 'webpack5'
@@ -30,8 +19,7 @@ export default {
   webpackFinal: (config: webpack.Configuration) => {
     return {
       ...config,
-      module: webpackConfig.module,
-      mode: 'development'
+      module: { ...config.module, rules: webpackConfig.module.rules }
     }
   }
 }
