@@ -279,7 +279,7 @@ describe('findOrCreateDvcYamlFile', () => {
 
     void findOrCreateDvcYamlFile(
       '/dir/my_project/',
-      '/dir/my_project/src/training/train.py',
+      join('dir', 'my_project', 'src', 'training', 'train.py'),
       'train',
       scriptCommand.PYTHON,
       false
