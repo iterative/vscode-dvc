@@ -712,7 +712,7 @@ describe('Experiments', () => {
       )
     })
 
-    it('should not display the current branche in the quick pick', async () => {
+    it('should not display the current branch in the quick pick', async () => {
       const allBranches = [
         '* WIP',
         'main',

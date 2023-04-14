@@ -414,7 +414,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.isBranchesView
   }
 
-  public selectBranchesToShow(branches: string[]) {
+  public setBranchesToShow(branches: string[]) {
     this.branchesToShow = branches
     this.persistBranchesToShow()
   }

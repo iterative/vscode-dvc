@@ -89,17 +89,17 @@ export class GitReader extends GitCli {
     )
     try {
       const revisions = await this.executeProcess(options)
-      return revisions.split('\n').length
+      return trimAndSplit(revisions).length
     } catch {
       return ''
     }
   }
 
   public async getBranches(cwd: string): Promise<string[]> {
-    const options = getOptions(cwd, Command.BRANCH)
+    const options = getOptions(cwd, Command.BRANCH, Flag.NO_MERGE)
     try {
       const branches = await this.executeProcess(options)
-      return branches.split('\n')
+      return trimAndSplit(branches)
     } catch {
       return []
     }

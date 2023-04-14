@@ -250,7 +250,7 @@ export class WebviewMessages {
     if (!selectedBranches) {
       return
     }
-    this.experiments.selectBranchesToShow(selectedBranches)
+    this.experiments.setBranchesToShow(selectedBranches)
     await this.update()
   }
 
