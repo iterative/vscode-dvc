@@ -1,5 +1,5 @@
 import { extractColumns } from './extract'
-import { generateTestExpData } from '../../test/util'
+import { generateTestExpData } from '../../test/util/experiments'
 
 describe('extractColumns', () => {
   it('should handle concatenating errors', () => {

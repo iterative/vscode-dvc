@@ -2,6 +2,7 @@ import { join } from 'path'
 import { collectFiles } from './collect'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import expShowFixture from '../../test/fixtures/expShow/base/output'
+import { generateTestExpShowOutput } from '../../test/util/experiments'
 
 describe('collectFiles', () => {
   it('should collect all of the available files from the test fixture', () => {
@@ -24,68 +25,35 @@ describe('collectFiles', () => {
   })
 
   it('should handle a missing params key', () => {
-    const workspaceOnly = [
-      {
-        data: {
-          deps: null,
-          meta: { has_checkpoints: false },
-          metrics: {
-            'logs.json': { data: {} }
-          },
-          outs: null,
-          params: null,
-          rev: EXPERIMENT_WORKSPACE_ID,
-          timestamp: null
-        },
-        rev: EXPERIMENT_WORKSPACE_ID
+    const workspaceOnly = generateTestExpShowOutput({
+      metrics: {
+        'logs.json': { data: {} }
       }
-    ]
-
+    })
     expect(collectFiles(workspaceOnly, [])).toStrictEqual(['logs.json'])
   })
 
   it('should handle a missing metrics key', () => {
-    const workspaceOnly = [
-      {
-        data: {
-          deps: null,
-          meta: { has_checkpoints: false },
-          metrics: null,
-          outs: null,
-          params: { 'params.yaml': { data: {} } },
-          rev: EXPERIMENT_WORKSPACE_ID,
-          timestamp: null
-        },
-        rev: EXPERIMENT_WORKSPACE_ID
-      }
-    ]
+    const workspaceOnly = generateTestExpShowOutput({
+      params: { 'params.yaml': { data: {} } }
+    })
 
     expect(collectFiles(workspaceOnly, [])).toStrictEqual(['params.yaml'])
   })
 
   it('should collect all of the available files from a more complex example', () => {
-    const workspaceOnly = [
-      {
-        data: {
-          deps: null,
-          meta: { has_checkpoints: false },
-          metrics: {
-            'logs.json': { data: {} },
-            'metrics.json': { data: {} },
-            'summary.json': { data: {} }
-          },
-          outs: null,
-          params: {
-            'further/nested/params.yaml': { data: {} },
-            'nested/params.yaml': { data: {} },
-            'params.yaml': { data: {} }
-          },
-          rev: EXPERIMENT_WORKSPACE_ID,
-          timestamp: null
-        },
-        rev: EXPERIMENT_WORKSPACE_ID
+    const workspaceOnly = generateTestExpShowOutput({
+      metrics: {
+        'logs.json': { data: {} },
+        'metrics.json': { data: {} },
+        'summary.json': { data: {} }
+      },
+      params: {
+        'further/nested/params.yaml': { data: {} },
+        'nested/params.yaml': { data: {} },
+        'params.yaml': { data: {} }
       }
-    ]
+    })
 
     const files = collectFiles(workspaceOnly, [])
     files.sort()
@@ -101,26 +69,15 @@ describe('collectFiles', () => {
   })
 
   it('should not remove a previously collected file if it is deleted (removal breaks live updates logged by dvclive)', () => {
-    const workspaceOnly = [
-      {
-        data: {
-          deps: null,
-          meta: { has_checkpoints: false },
-          metrics: null,
-          outs: null,
-          params: {
-            'params.yaml': {
-              data: {
-                epochs: 100
-              }
-            }
-          },
-          rev: EXPERIMENT_WORKSPACE_ID,
-          timestamp: null
-        },
-        rev: EXPERIMENT_WORKSPACE_ID
+    const workspaceOnly = generateTestExpShowOutput({
+      params: {
+        'params.yaml': {
+          data: {
+            epochs: 100
+          }
+        }
       }
-    ]
+    })
 
     expect(collectFiles(workspaceOnly, ['dvclive.json'])).toStrictEqual([
       'params.yaml',

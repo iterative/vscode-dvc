@@ -8,17 +8,12 @@ import columnsFixture from '../../../test/fixtures/expShow/base/columns'
 import workspaceChangesFixture from '../../../test/fixtures/expShow/base/workspaceChanges'
 import uncommittedDepsFixture from '../../../test/fixtures/expShow/uncommittedDeps/output'
 import {
-  EXPERIMENT_WORKSPACE_ID,
   ValueTree,
   ExpShowOutput,
   experimentHasError
 } from '../../../cli/dvc/contract'
 import { getConfigValue } from '../../../vscode/config'
-import {
-  generateCommitWithExperiments,
-  generateTestExpState,
-  generateWorkspaceOnlyExpShowOutput
-} from '../../../test/util'
+import { generateTestExpShowOutput } from '../../../test/util/experiments'
 
 jest.mock('../../../vscode/config')
 
@@ -33,7 +28,7 @@ describe('collectColumns', () => {
 
   it('should output both params and metrics when both are present', () => {
     const columns = collectColumns(
-      generateWorkspaceOnlyExpShowOutput({
+      generateTestExpShowOutput({
         metrics: {
           1: {
             data: { 2: 3 }
@@ -56,7 +51,7 @@ describe('collectColumns', () => {
 
   it('should omit params when none exist in the source data', () => {
     const columns = collectColumns(
-      generateWorkspaceOnlyExpShowOutput({
+      generateTestExpShowOutput({
         metrics: {
           1: {
             data: { 2: 3 }
@@ -71,50 +66,50 @@ describe('collectColumns', () => {
   })
 
   it('should return an empty array if no params and metrics are provided', () => {
-    const columns = collectColumns(generateWorkspaceOnlyExpShowOutput())
+    const columns = collectColumns(generateTestExpShowOutput({}))
     expect(columns).toStrictEqual([])
   })
 
   const exampleBigNumber = 3000000000
-  const data: ExpShowOutput = [
-    generateTestExpState(EXPERIMENT_WORKSPACE_ID, {
+
+  const data: ExpShowOutput = generateTestExpShowOutput(
+    {
       params: {
         'params.yaml': {
           data: { mixedParam: exampleBigNumber }
         }
       }
-    }),
-    generateCommitWithExperiments(
-      'branchA',
-      {
+    },
+    {
+      rev: 'branchA',
+      data: {
         params: {
           'params.yaml': {
             data: { mixedParam: 'string' }
           }
         }
       },
-      [
+      experiments: [
         {
-          rev: 'abcd',
-          name: 'exp1',
-          data: {
-            params: {
-              'params.yaml': {
-                data: { mixedParam: true }
-              }
+          params: {
+            'params.yaml': {
+              data: { mixedParam: true }
             }
           }
         }
       ]
-    ),
-    generateTestExpState('branchB', {
-      params: {
-        'params.yaml': {
-          data: { mixedParam: null }
+    },
+    {
+      rev: 'branchB',
+      data: {
+        params: {
+          'params.yaml': {
+            data: { mixedParam: null }
+          }
         }
       }
-    })
-  ]
+    }
+  )
 
   const columns = collectColumns(data)
 
@@ -143,54 +138,45 @@ describe('collectColumns', () => {
   })
 
   it('should find a different minNumber and maxNumber on a mixed param', () => {
-    const columns = collectColumns([
-      generateTestExpState(EXPERIMENT_WORKSPACE_ID),
-      generateCommitWithExperiments(
-        'branch1',
+    const columns = collectColumns(
+      generateTestExpShowOutput(
+        {},
         {
-          params: {
-            'params.yaml': {
-              data: { mixedNumber: null }
+          rev: 'branchA',
+          data: {
+            params: {
+              'params.yaml': {
+                data: { mixedNumber: null }
+              }
             }
-          }
-        },
-        [
-          {
-            rev: 'abcdef',
-            name: 'exp1',
-            data: {
+          },
+          experiments: [
+            {
               params: {
                 'params.yaml': {
                   data: { mixedNumber: 0 }
                 }
               }
-            }
-          },
-          {
-            rev: 'ghijkl',
-            name: 'exp2',
-            data: {
+            },
+            {
               params: {
                 'params.yaml': {
                   data: { mixedNumber: -1 }
                 }
               }
-            }
-          },
-          {
-            rev: 'mnopqr',
-            name: 'exp3',
-            data: {
+            },
+            {
               params: {
                 'params.yaml': {
                   data: { mixedNumber: 1 }
                 }
               }
             }
-          }
-        ]
+          ]
+        }
       )
-    ])
+    )
+
     const mixedParam = columns.find(
       column =>
         column.path ===
@@ -201,35 +187,37 @@ describe('collectColumns', () => {
     expect(mixedParam.maxNumber).toStrictEqual(1)
   })
 
-  const numericColumns = collectColumns([
-    generateTestExpState(EXPERIMENT_WORKSPACE_ID),
-    generateCommitWithExperiments(
-      'branch1',
+  const numericColumns = collectColumns(
+    generateTestExpShowOutput(
+      {},
       {
-        params: {
-          'params.yaml': {
-            data: { withNumbers: -1, withoutNumbers: 'a' }
-          }
-        }
-      },
-      [
-        {
+        rev: 'branch1',
+        data: {
           params: {
             'params.yaml': {
-              data: { withNumbers: 2, withoutNumbers: 'b' }
+              data: { withNumbers: -1, withoutNumbers: 'a' }
             }
           }
         },
-        {
-          params: {
-            'params.yaml': {
-              data: { withNumbers: 'c', withoutNumbers: 'b' }
+        experiments: [
+          {
+            params: {
+              'params.yaml': {
+                data: { withNumbers: 2, withoutNumbers: 'b' }
+              }
+            }
+          },
+          {
+            params: {
+              'params.yaml': {
+                data: { withNumbers: 'c', withoutNumbers: 'b' }
+              }
             }
           }
-        }
-      ]
+        ]
+      }
     )
-  ])
+  )
 
   const param = numericColumns.filter(
     column => column.type === ColumnType.PARAMS
@@ -257,41 +245,46 @@ describe('collectColumns', () => {
   })
 
   it('should aggregate multiple different field names', () => {
-    const columns = collectColumns([
-      generateTestExpState(EXPERIMENT_WORKSPACE_ID, {
-        params: {
-          'params.yaml': {
-            data: { one: 1 }
-          }
-        }
-      }),
-      generateCommitWithExperiments(
-        'branchA',
+    const columns = collectColumns(
+      generateTestExpShowOutput(
         {
           params: {
             'params.yaml': {
-              data: { two: 2 }
+              data: { one: 1 }
             }
           }
         },
-        [
-          {
+        {
+          rev: 'branchA',
+          data: {
             params: {
               'params.yaml': {
-                data: { three: 3 }
+                data: { two: 2 }
+              }
+            }
+          },
+          experiments: [
+            {
+              params: {
+                'params.yaml': {
+                  data: { three: 3 }
+                }
+              }
+            }
+          ]
+        },
+        {
+          rev: 'branchB',
+          data: {
+            params: {
+              'params.yaml': {
+                data: { four: 4 }
               }
             }
           }
-        ]
-      ),
-      generateTestExpState('branchB', {
-        params: {
-          'params.yaml': {
-            data: { four: 4 }
-          }
         }
-      })
-    ])
+      )
+    )
 
     const params = columns.filter(
       column =>
@@ -309,7 +302,7 @@ describe('collectColumns', () => {
 
   it('should create concatenated columns for nesting deeper than 5', () => {
     const columns = collectColumns(
-      generateWorkspaceOnlyExpShowOutput({
+      generateTestExpShowOutput({
         params: {
           'params.yaml': {
             data: {
@@ -358,7 +351,7 @@ describe('collectColumns', () => {
 
   it('should not report types for params and metrics without primitives or children for params and metrics without objects', () => {
     const columns = collectColumns(
-      generateWorkspaceOnlyExpShowOutput({
+      generateTestExpShowOutput({
         params: {
           'params.yaml': {
             data: {
@@ -438,22 +431,22 @@ describe('collectChanges', () => {
   })
 
   it('should return an empty array if there are no changes from the current commit and the workspace', () => {
-    const data: ExpShowOutput = [
-      generateTestExpState(EXPERIMENT_WORKSPACE_ID, mockedMetricsAndParams),
-      generateTestExpState(
-        'f8a6ee1997b193ebc774837a284081ff9e8dc2d5',
-        mockedMetricsAndParams
-      )
-    ]
+    const data: ExpShowOutput = generateTestExpShowOutput(
+      mockedMetricsAndParams,
+      {
+        data: mockedMetricsAndParams,
+        rev: 'f8a6ee1997b193ebc774837a284081ff9e8dc2d5'
+      }
+    )
 
     expect(collectChanges(data)).toStrictEqual([])
   })
 
   it('should collect the changes between the current commit and the workspace', () => {
-    const data: ExpShowOutput = [
-      generateTestExpState(EXPERIMENT_WORKSPACE_ID, mockedMetricsAndParams),
-      generateTestExpState('f8a6ee1997b193ebc774837a284081ff9e8dc2d5')
-    ]
+    const data: ExpShowOutput = generateTestExpShowOutput(
+      mockedMetricsAndParams,
+      { rev: 'f8a6ee1997b193ebc774837a284081ff9e8dc2d5' }
+    )
 
     expect(collectChanges(data)).toStrictEqual([
       'metrics:logs.json:acc',
@@ -466,15 +459,15 @@ describe('collectChanges', () => {
   })
 
   it('should not fail when the workspace does not have metrics but a previous commit does', () => {
-    const data: ExpShowOutput = [
-      generateTestExpState(EXPERIMENT_WORKSPACE_ID, {
+    const data: ExpShowOutput = generateTestExpShowOutput(
+      {
         params: mockedMetricsAndParams.params
-      }),
-      generateTestExpState(
-        'f8a6ee1997b193ebc774837a284081ff9e8dc2d5',
-        mockedMetricsAndParams
-      )
-    ]
+      },
+      {
+        data: mockedMetricsAndParams,
+        rev: 'f8a6ee1997b193ebc774837a284081ff9e8dc2d5'
+      }
+    )
 
     expect(collectChanges(data)).toStrictEqual([])
   })
@@ -489,135 +482,130 @@ describe('collectChanges', () => {
 
   it('should work for objects', () => {
     expect(
-      collectChanges([
-        generateTestExpState(
-          EXPERIMENT_WORKSPACE_ID,
+      collectChanges(
+        generateTestExpShowOutput(
           getParams({
             a: { b: 1, d: { e: 100 } }
-          })
-        ),
-        generateTestExpState(
-          '31c419826c6961bc0ec1d3900ac18bf904dcf82e',
-          getParams({
-            a: { b: 'c', d: { e: 'f' } }
-          })
+          }),
+          {
+            data: getParams({
+              a: { b: 'c', d: { e: 'f' } }
+            }),
+            rev: '31c419826c6961bc0ec1d3900ac18bf904dcf82e'
+          }
         )
-      ])
+      )
     ).toStrictEqual(['params:params.yaml:a.b', 'params:params.yaml:a.d.e'])
 
     expect(
-      collectChanges([
-        generateTestExpState(
-          EXPERIMENT_WORKSPACE_ID,
+      collectChanges(
+        generateTestExpShowOutput(
           getParams({
             a: { b: 'c', d: { e: 'f' } }
-          })
-        ),
-        generateTestExpState(
-          '31c419826c6961bc0ec1d3900ac18bf904dcf82e',
-          getParams({
-            a: { b: 'c', d: { e: 'f' } }
-          })
+          }),
+          {
+            data: getParams({
+              a: { b: 'c', d: { e: 'f' } }
+            }),
+            rev: '31c419826c6961bc0ec1d3900ac18bf904dcf82e'
+          }
         )
-      ])
+      )
     ).toStrictEqual([])
   })
 
   it('should work for arrays', () => {
     expect(
-      collectChanges([
-        generateTestExpState(
-          EXPERIMENT_WORKSPACE_ID,
+      collectChanges(
+        generateTestExpShowOutput(
           getParams({
             a: [1, 1]
-          })
-        ),
-        generateTestExpState(
-          '31c419826c6961bc0ec1d3900ac18bf904dcf82e',
-          getParams({
-            a: [1, 0]
-          })
+          }),
+          {
+            data: getParams({
+              a: [1, 0]
+            }),
+            rev: '31c419826c6961bc0ec1d3900ac18bf904dcf82e'
+          }
         )
-      ])
+      )
     ).toStrictEqual(['params:params.yaml:a'])
 
     expect(
-      collectChanges([
-        generateTestExpState(
-          EXPERIMENT_WORKSPACE_ID,
+      collectChanges(
+        generateTestExpShowOutput(
           getParams({
             a: [1, 0]
-          })
-        ),
-        generateTestExpState(
-          '31c419826c6961bc0ec1d3900ac18bf904dcf82e',
-          getParams({
-            a: [1, 0]
-          })
+          }),
+          {
+            data: getParams({
+              a: [1, 0]
+            }),
+            rev: '31c419826c6961bc0ec1d3900ac18bf904dcf82e'
+          }
         )
-      ])
+      )
     ).toStrictEqual([])
   })
 
   it('should work for nested arrays', () => {
     expect(
-      collectChanges([
-        generateTestExpState(
-          EXPERIMENT_WORKSPACE_ID,
+      collectChanges(
+        generateTestExpShowOutput(
           getParams({
             a: { b: [1, 1] }
-          })
-        ),
-        generateTestExpState(
-          '31c419826c6961bc0ec1d3900ac18bf904dcf82e',
-          getParams({
-            a: { b: [1, 0] }
-          })
+          }),
+          {
+            data: getParams({
+              a: { b: [1, 0] }
+            }),
+            rev: '31c419826c6961bc0ec1d3900ac18bf904dcf82e'
+          }
         )
-      ])
+      )
     ).toStrictEqual(['params:params.yaml:a.b'])
 
     expect(
-      collectChanges([
-        generateTestExpState(
-          EXPERIMENT_WORKSPACE_ID,
+      collectChanges(
+        generateTestExpShowOutput(
           getParams({
             a: { b: [1, 0] }
-          })
-        ),
-        generateTestExpState(
-          '31c419826c6961bc0ec1d3900ac18bf904dcf82e',
-          getParams({
-            a: { b: [1, 0] }
-          })
+          }),
+          {
+            data: getParams({
+              a: { b: [1, 0] }
+            }),
+            rev: '31c419826c6961bc0ec1d3900ac18bf904dcf82e'
+          }
         )
-      ])
+      )
     ).toStrictEqual([])
   })
 
   it('should work for missing nested arrays', () => {
     expect(
-      collectChanges([
-        generateTestExpState(EXPERIMENT_WORKSPACE_ID),
-        generateTestExpState(
-          '31c419826c6961bc0ec1d3900ac18bf904dcf82e',
-          getParams({
-            a: { b: [1, 0] }
-          })
+      collectChanges(
+        generateTestExpShowOutput(
+          {},
+          {
+            data: getParams({
+              a: { b: [1, 0] }
+            }),
+            rev: '31c419826c6961bc0ec1d3900ac18bf904dcf82e'
+          }
         )
-      ])
+      )
     ).toStrictEqual([])
 
     expect(
-      collectChanges([
-        generateTestExpState(
-          EXPERIMENT_WORKSPACE_ID,
+      collectChanges(
+        generateTestExpShowOutput(
           getParams({
             a: { b: [1, 0] }
-          })
-        ),
-        generateTestExpState('31c419826c6961bc0ec1d3900ac18bf904dcf82e')
-      ])
+          }),
+          { rev: '31c419826c6961bc0ec1d3900ac18bf904dcf82e' }
+        )
+      )
     ).toStrictEqual(['params:params.yaml:a.b'])
   })
 
@@ -629,27 +617,25 @@ describe('collectChanges', () => {
     }
 
     expect(
-      collectChanges([
-        generateTestExpState(EXPERIMENT_WORKSPACE_ID, getParams(nullParam)),
-        generateTestExpState(
-          '9c6ba26745d2fbc286a13b99011d5126b5a245dc',
-          getParams(nullParam)
-        )
-      ])
+      collectChanges(
+        generateTestExpShowOutput(getParams(nullParam), {
+          data: getParams(nullParam),
+          rev: '9c6ba26745d2fbc286a13b99011d5126b5a245dc'
+        })
+      )
     ).toStrictEqual([])
 
     expect(
-      collectChanges([
-        generateTestExpState(EXPERIMENT_WORKSPACE_ID, getParams(nullParam)),
-        generateTestExpState(
-          '9c6ba26745d2fbc286a13b99011d5126b5a245dc',
-          getParams({
+      collectChanges(
+        generateTestExpShowOutput(getParams(nullParam), {
+          data: getParams({
             param_tuning: {
               logistic_regression: 1
             }
-          })
-        )
-      ])
+          }),
+          rev: '9c6ba26745d2fbc286a13b99011d5126b5a245dc'
+        })
+      )
     ).toStrictEqual(['params:params.yaml:param_tuning.logistic_regression'])
   })
 
@@ -661,61 +647,60 @@ describe('collectChanges', () => {
       lr: 10000000
     }
 
-    const data = [
-      generateTestExpState(EXPERIMENT_WORKSPACE_ID, getParams(matchingParams)),
-      generateTestExpState(
-        '31c419826c6961bc0ec1d3900ac18bf904dcf82e',
-        getParams(matchingParams)
-      ),
-      generateTestExpState(
-        '1987d9de990090d73cf2afd73e6889d182585bf3',
-        getParams(differingParams)
-      ),
-      generateTestExpState(
-        '3d7fcb87062d136a2025f8c302312abe9593edf8',
-        getParams(differingParams)
-      )
-    ]
+    const data = generateTestExpShowOutput(
+      getParams(matchingParams),
+      {
+        rev: '31c419826c6961bc0ec1d3900ac18bf904dcf82e',
+        data: getParams(matchingParams)
+      },
+      {
+        rev: '1987d9de990090d73cf2afd73e6889d182585bf3',
+        data: getParams(differingParams)
+      },
+      {
+        rev: '3d7fcb87062d136a2025f8c302312abe9593edf8',
+        data: getParams(differingParams)
+      }
+    )
     expect(collectChanges(data)).toStrictEqual([])
   })
 
   it('should not fail when there is no commit data', () => {
-    const data: ExpShowOutput = [generateTestExpState(EXPERIMENT_WORKSPACE_ID)]
-
-    expect(collectChanges(data)).toStrictEqual([])
+    expect(collectChanges(generateTestExpShowOutput({}))).toStrictEqual([])
   })
 
   it('should collect the changes between the current commit and the workspace when the values are nested', () => {
-    const mockedWorkspace = generateTestExpState(EXPERIMENT_WORKSPACE_ID, {
-      params: {
-        'params.yaml': {
-          data: {
-            dropout: {
-              lower: { p: { '0.025': 0.45, '0.05': 0.55 } },
-              upper: { p: { '0.025': 0.7, '0.05': 0.85 } }
-            }
-          }
-        }
-      }
-    })
-
-    const mockedCommit = generateTestExpState(
-      'f8a6ee1997b193ebc774837a284081ff9e8dc2d5',
+    const data = generateTestExpShowOutput(
       {
         params: {
           'params.yaml': {
             data: {
               dropout: {
-                lower: { p: { '0.025': 0.45, '0.05': 0.5 } },
-                upper: { p: { '0.025': 0.9, '0.05': 0.85 } }
+                lower: { p: { '0.025': 0.45, '0.05': 0.55 } },
+                upper: { p: { '0.025': 0.7, '0.05': 0.85 } }
               }
             }
           }
         }
+      },
+      {
+        data: {
+          params: {
+            'params.yaml': {
+              data: {
+                dropout: {
+                  lower: { p: { '0.025': 0.45, '0.05': 0.5 } },
+                  upper: { p: { '0.025': 0.9, '0.05': 0.85 } }
+                }
+              }
+            }
+          }
+        },
+        rev: 'f8a6ee1997b193ebc774837a284081ff9e8dc2d5'
       }
     )
 
-    expect(collectChanges([mockedWorkspace, mockedCommit])).toStrictEqual([
+    expect(collectChanges(data)).toStrictEqual([
       buildMetricOrParamPath(
         ColumnType.PARAMS,
         'params.yaml',

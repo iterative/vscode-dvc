@@ -2,10 +2,8 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import { ColumnsModel } from './model'
 import { appendColumnToPath, buildMetricOrParamPath } from './paths'
 import { timestampColumn } from './constants'
-import {
-  buildMockMemento,
-  generateWorkspaceOnlyExpShowOutput
-} from '../../test/util'
+import { buildMockMemento } from '../../test/util'
+import { generateTestExpShowOutput } from '../../test/util/experiments'
 import { Status } from '../../path/selection/model'
 import { PersistenceKey } from '../../persistence/constants'
 import { ColumnType } from '../webview/contract'
@@ -53,7 +51,7 @@ describe('ColumnsModel', () => {
       buildMockMemento(),
       mockedColumnsOrderOrStatusChanged
     )
-    await model.transformAndSet(generateWorkspaceOnlyExpShowOutput())
+    await model.transformAndSet(generateTestExpShowOutput({}))
 
     expect(model.getSelected()).toStrictEqual([])
   })
@@ -178,7 +176,7 @@ describe('ColumnsModel', () => {
       'params.yaml'
     )
     const testParamPath = appendColumnToPath(paramsDotYamlPath, 'testParam')
-    const exampleData = generateWorkspaceOnlyExpShowOutput({
+    const exampleData = generateTestExpShowOutput({
       params: {
         'params.yaml': {
           data: {

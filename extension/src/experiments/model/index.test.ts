@@ -7,11 +7,8 @@ import rowsFixture from '../../test/fixtures/expShow/base/rows'
 import deeplyNestedRowsFixture from '../../test/fixtures/expShow/deeplyNested/rows'
 import deeplyNestedOutputFixture from '../../test/fixtures/expShow/deeplyNested/output'
 import uncommittedDepsFixture from '../../test/fixtures/expShow/uncommittedDeps/output'
-import {
-  buildMockMemento,
-  generateCommitWithExperiments,
-  generateTestExpState
-} from '../../test/util'
+import { buildMockMemento } from '../../test/util'
+import { generateTestExpShowOutput } from '../../test/util/experiments'
 import { Experiment } from '../webview/contract'
 import { definedAndNonEmpty } from '../../util/array'
 import dataTypesRowsFixture from '../../test/fixtures/expShow/dataTypes/rows'
@@ -49,8 +46,8 @@ describe('ExperimentsModel', () => {
 
   it('should set the workspace to running if a signal file for a DVCLive only experiment has been found', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    const dvcLiveOnly = [
-      generateTestExpState(EXPERIMENT_WORKSPACE_ID, {
+    const dvcLiveOnly = generateTestExpShowOutput(
+      {
         params: {
           'dvclive/params.yaml': {
             data: {
@@ -67,11 +64,14 @@ describe('ExperimentsModel', () => {
             }
           }
         }
-      }),
-      generateTestExpState('399b45c9f676a10899671e146625d8694c7cce14', {
-        timestamp: '2022-12-07T09:36:20'
-      })
-    ]
+      },
+      {
+        data: {
+          timestamp: '2022-12-07T09:36:20'
+        },
+        rev: '399b45c9f676a10899671e146625d8694c7cce14'
+      }
+    )
 
     model.transformAndSet(dvcLiveOnly, true, '')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -98,18 +98,18 @@ describe('ExperimentsModel', () => {
     }
 
     const model = new ExperimentsModel('', buildMockMemento())
-    const data = [
-      generateTestExpState(EXPERIMENT_WORKSPACE_ID, {
+    const data = generateTestExpShowOutput(
+      {
         params: { 'params.yaml': { data: { epochs: 100 } } }
-      }),
-      generateCommitWithExperiments(
-        '0e7fbf190b78e7f8fdae6531bae123739e2db99b',
-        {
+      },
+      {
+        rev: '0e7fbf190b78e7f8fdae6531bae123739e2db99b',
+        data: {
           deps: existingDep,
           params: { 'params.yaml': { data: { epochs: 100 } } },
           timestamp: '2022-08-10T19:40:14'
         },
-        [
+        experiments: [
           {
             rev: shaWithChange,
             name: 'exp-750e4',
@@ -135,8 +135,8 @@ describe('ExperimentsModel', () => {
             }
           }
         ]
-      )
-    ]
+      }
+    )
 
     model.transformAndSet(data, false, '')
 
@@ -187,24 +187,23 @@ describe('ExperimentsModel', () => {
 
     const param0 = getParams(0)
 
-    experimentsModel.transformAndSet(
-      [
-        generateTestExpState(EXPERIMENT_WORKSPACE_ID, getParams(3)),
-        generateCommitWithExperiments('testBranch', getParams(2), [
-          param0,
-          param0,
-          param0,
-          param0,
-          param0,
-          param0,
-          param0,
-          param0,
-          param0
-        ])
-      ],
-      false,
-      ''
-    )
+    const data = generateTestExpShowOutput(getParams(3), {
+      rev: 'testBranch',
+      data: getParams(2),
+      experiments: [
+        param0,
+        param0,
+        param0,
+        param0,
+        param0,
+        param0,
+        param0,
+        param0,
+        param0
+      ]
+    })
+
+    experimentsModel.transformAndSet(data, false, '')
 
     experimentsModel.setSelected([
       { id: 'exp-1' },

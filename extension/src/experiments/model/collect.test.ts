@@ -1,37 +1,29 @@
 import { collectExperiments } from './collect'
-import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { COMMITS_SEPARATOR } from '../../cli/git/constants'
-import {
-  generateCommitWithExperiments,
-  generateTestExpState,
-  generateWorkspaceOnlyExpShowOutput
-} from '../../test/util'
+import { generateTestExpShowOutput } from '../../test/util/experiments'
 
 describe('collectExperiments', () => {
   it('should return an empty array if no commits are present', () => {
     const { commits } = collectExperiments(
-      generateWorkspaceOnlyExpShowOutput(),
+      generateTestExpShowOutput({}),
       false,
       ''
     )
     expect(commits).toStrictEqual([])
   })
 
-  const expShowWithTwoCommits = [
-    generateTestExpState(EXPERIMENT_WORKSPACE_ID),
+  const expShowWithTwoCommits = generateTestExpShowOutput(
+    {},
     {
-      ...generateCommitWithExperiments(
-        '61bed4ce8913eca7f73ca754d65bc5daad1520e2',
-        {},
-        [{}, {}]
-      ),
-      name: 'branchA'
+      experiments: [{}, {}],
+      name: 'branchA',
+      rev: '61bed4ce8913eca7f73ca754d65bc5daad1520e2'
     },
     {
-      ...generateTestExpState('351e42ace3cb6a3a853c65bef285e60748cc6341'),
-      name: 'branchB'
+      name: 'branchB',
+      rev: '351e42ace3cb6a3a853c65bef285e60748cc6341'
     }
-  ]
+  )
 
   it('should define a workspace', () => {
     const { workspace } = collectExperiments(expShowWithTwoCommits, false, '')

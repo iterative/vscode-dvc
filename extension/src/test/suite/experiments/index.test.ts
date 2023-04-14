@@ -42,6 +42,7 @@ import {
   getMessageReceivedEmitter
 } from '../util'
 import { buildMockMemento, dvcDemoPath } from '../../util'
+import { generateTestExpShowOutput } from '../../util/experiments'
 import { SortDefinition } from '../../../experiments/model/sortBy'
 import {
   FilterDefinition,
@@ -75,8 +76,6 @@ import { ConfigKey } from '../../../vscode/config'
 import {
   EXPERIMENT_WORKSPACE_ID,
   Executor,
-  ExecutorState,
-  ExpShowOutput,
   ExperimentStatus
 } from '../../../cli/dvc/contract'
 import * as Time from '../../../util/time'
@@ -1422,106 +1421,43 @@ suite('Experiments Test Suite', () => {
         )
       )
 
-      const testData: ExpShowOutput = [
+      const data = generateTestExpShowOutput(
+        {},
         {
-          data: {
-            deps: null,
-            meta: { has_checkpoints: false },
-            metrics: null,
-            outs: null,
-            params: null,
-            rev: EXPERIMENT_WORKSPACE_ID,
-            timestamp: null
-          },
-          rev: EXPERIMENT_WORKSPACE_ID
-        },
-        {
-          data: {
-            deps: null,
-            meta: { has_checkpoints: false },
-            metrics: null,
-            outs: null,
-            params: null,
-            rev: 'testBranch',
-            timestamp: null
-          },
+          rev: 'testBranch',
           experiments: [
             {
-              executor: null,
-              revs: [
-                {
+              params: {
+                'params.yaml': {
                   data: {
-                    deps: null,
-                    meta: { has_checkpoints: false },
-                    metrics: null,
-                    outs: null,
-                    params: {
-                      'params.yaml': {
-                        data: {
-                          test: 2
-                        }
-                      }
-                    },
-                    rev: 'exp1',
-                    timestamp: null
-                  },
-                  rev: 'exp1'
+                    test: 2
+                  }
                 }
-              ]
+              }
             },
             {
-              executor: null,
-              revs: [
-                {
+              params: {
+                'params.yaml': {
                   data: {
-                    deps: null,
-                    meta: { has_checkpoints: false },
-                    metrics: null,
-                    outs: null,
-                    params: {
-                      'params.yaml': {
-                        data: {
-                          test: 1
-                        }
-                      }
-                    },
-                    rev: 'exp2',
-                    timestamp: null
-                  },
-                  rev: 'exp2'
+                    test: 1
+                  }
                 }
-              ]
+              }
             },
             {
-              executor: null,
-              revs: [
-                {
+              params: {
+                'params.yaml': {
                   data: {
-                    deps: null,
-                    meta: { has_checkpoints: false },
-                    metrics: null,
-                    outs: null,
-                    params: {
-                      'params.yaml': {
-                        data: {
-                          test: 3
-                        }
-                      }
-                    },
-                    rev: 'exp3',
-                    timestamp: null
-                  },
-                  rev: 'exp3'
+                    test: 3
+                  }
                 }
-              ]
+              }
             }
-          ],
-          name: 'testBranch',
-          rev: 'testBranch'
+          ]
         }
-      ]
+      )
 
-      void experiments.setState(testData)
+      void experiments.setState(data)
 
       messageSpy.resetHistory()
 
@@ -1546,24 +1482,30 @@ suite('Experiments Test Suite', () => {
             subRows: [
               {
                 displayColor: undefined,
-                id: 'exp1',
-                label: 'exp1',
+                displayName: '[exp-1]',
+                id: 'exp-1',
+                label: '111111',
+                logicalGroupName: '[exp-1]',
                 params: { 'params.yaml': { test: 2 } },
                 selected: false,
                 starred: false
               },
               {
                 displayColor: undefined,
-                id: 'exp2',
-                label: 'exp2',
+                displayName: '[exp-2]',
+                id: 'exp-2',
+                label: '222222',
+                logicalGroupName: '[exp-2]',
                 params: { 'params.yaml': { test: 1 } },
                 selected: false,
                 starred: false
               },
               {
                 displayColor: undefined,
-                id: 'exp3',
-                label: 'exp3',
+                displayName: '[exp-3]',
+                id: 'exp-3',
+                label: '333333',
+                logicalGroupName: '[exp-3]',
                 params: { 'params.yaml': { test: 3 } },
                 selected: false,
                 starred: false
@@ -1619,24 +1561,30 @@ suite('Experiments Test Suite', () => {
             subRows: [
               {
                 displayColor: undefined,
-                id: 'exp2',
-                label: 'exp2',
+                displayName: '[exp-2]',
+                id: 'exp-2',
+                label: '222222',
+                logicalGroupName: '[exp-2]',
                 params: { 'params.yaml': { test: 1 } },
                 selected: false,
                 starred: false
               },
               {
                 displayColor: undefined,
-                id: 'exp1',
-                label: 'exp1',
+                displayName: '[exp-1]',
+                id: 'exp-1',
+                label: '111111',
+                logicalGroupName: '[exp-1]',
                 params: { 'params.yaml': { test: 2 } },
                 selected: false,
                 starred: false
               },
               {
                 displayColor: undefined,
-                id: 'exp3',
-                label: 'exp3',
+                displayName: '[exp-3]',
+                id: 'exp-3',
+                label: '333333',
+                logicalGroupName: '[exp-3]',
                 params: { 'params.yaml': { test: 3 } },
                 selected: false,
                 starred: false
@@ -1989,32 +1937,11 @@ suite('Experiments Test Suite', () => {
 
   describe('Empty repository', () => {
     it('should not show any experiments in the experiments tree when there are no columns', async () => {
-      const { experiments } = buildExperiments(disposable, [
-        {
-          rev: EXPERIMENT_WORKSPACE_ID,
-          data: {
-            rev: EXPERIMENT_WORKSPACE_ID,
-            deps: null,
-            timestamp: null,
-            metrics: null,
-            params: null,
-            outs: null,
-            meta: { has_checkpoints: false }
-          }
-        },
-        {
-          rev: 'b9f016df00d499f6d2a73e7dc34d1600c78066eb',
-          data: {
-            rev: 'b9f016df00d499f6d2a73e7dc34d1600c78066eb',
-            deps: null,
-            timestamp: null,
-            metrics: null,
-            params: null,
-            outs: null,
-            meta: { has_checkpoints: false }
-          }
-        }
-      ])
+      const data = generateTestExpShowOutput(
+        {},
+        { rev: 'b9f016df00d499f6d2a73e7dc34d1600c78066eb' }
+      )
+      const { experiments } = buildExperiments(disposable, data)
       await experiments.isReady()
 
       expect(
@@ -2030,20 +1957,7 @@ suite('Experiments Test Suite', () => {
 
   describe('setState', () => {
     it('should clean up after a killed DVCLive process that was running an experiment outside of the DVC context', async () => {
-      const defaultExperimentsData = [
-        {
-          rev: EXPERIMENT_WORKSPACE_ID,
-          data: {
-            timestamp: null,
-            rev: EXPERIMENT_WORKSPACE_ID,
-            params: null,
-            metrics: null,
-            deps: null,
-            outs: null,
-            meta: { has_checkpoints: false }
-          }
-        }
-      ]
+      const defaultExperimentsData = generateTestExpShowOutput({})
 
       const { experiments, mockCheckSignalFile, mockUpdateExperimentsData } =
         buildExperiments(disposable, defaultExperimentsData)
@@ -2099,52 +2013,24 @@ suite('Experiments Test Suite', () => {
       const commit = 'df3f8647a47e403c9c4aa6562cad0b74afbe900b'
       const name = 'fizzy-dilemma'
       const params = { 'params.yaml': { data: { lr: 1 } } }
-      const getCommitData = (executor: ExecutorState | null) => ({
-        rev: commit,
-        data: {
+      const runningOutput = generateTestExpShowOutput(
+        { params },
+        {
           rev: commit,
-          params,
-          metrics: null,
-          deps: null,
-          timestamp: null,
-          outs: null,
-          meta: { has_checkpoints: false }
-        },
-        experiments: [
-          {
-            name,
-            executor,
-            revs: [
-              {
-                data: {
-                  deps: null,
-                  meta: { has_checkpoints: false },
-                  metrics: null,
-                  outs: null,
-                  params,
-                  rev: EXPERIMENT_WORKSPACE_ID,
-                  timestamp: null
-                },
-                rev: EXPERIMENT_WORKSPACE_ID,
-                name
+          experiments: [
+            {
+              rev: EXPERIMENT_WORKSPACE_ID,
+              data: { params },
+              name,
+              executor: {
+                local: null,
+                state: ExperimentStatus.RUNNING,
+                name: Executor.WORKSPACE
               }
-            ]
-          }
-        ]
-      })
-
-      const workspace = {
-        rev: EXPERIMENT_WORKSPACE_ID,
-        data: {
-          rev: EXPERIMENT_WORKSPACE_ID,
-          params,
-          metrics: null,
-          deps: null,
-          timestamp: null,
-          outs: null,
-          meta: { has_checkpoints: false }
+            }
+          ]
         }
-      }
+      )
 
       const getSelectedIdsWithColor = (
         experiments: Experiments
@@ -2163,14 +2049,10 @@ suite('Experiments Test Suite', () => {
       }
       const bothSelected = [selectedWorkspace, selectedExperiment]
 
-      const { experiments, experimentsModel } = buildExperiments(disposable, [
-        workspace,
-        getCommitData({
-          local: null,
-          state: ExperimentStatus.RUNNING,
-          name: Executor.WORKSPACE
-        })
-      ])
+      const { experiments, experimentsModel } = buildExperiments(
+        disposable,
+        runningOutput
+      )
 
       await experiments.isReady()
 
@@ -2188,7 +2070,22 @@ suite('Experiments Test Suite', () => {
         experiments.onDidChangeExperiments(() => resolve(undefined))
       )
 
-      await experiments.setState([workspace, getCommitData(null)])
+      await experiments.setState(
+        generateTestExpShowOutput(
+          { params },
+          {
+            rev: commit,
+            experiments: [
+              {
+                rev: '679c7ce7469020332154717126f88ce157ebc612',
+                data: { params },
+                name,
+                executor: null
+              }
+            ]
+          }
+        )
+      )
 
       await experimentsChanged
 

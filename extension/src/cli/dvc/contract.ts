@@ -30,7 +30,7 @@ type RelPathObject<T> = {
   [relPath: string]: T
 }
 
-export interface ValueTree {
+export type ValueTree = {
   [key: string]: Value | ValueTree
 }
 
@@ -75,33 +75,17 @@ export enum Executor {
   WORKSPACE = 'workspace'
 }
 
-export type ExecutorState =
-  | {
-      state: ExperimentStatus.QUEUED
-      name: typeof Executor.DVC_TASK
-      local: {
-        root: null
-        log: null
-        pid: null
-        returncode: null
-        task_id: string
-      }
-    }
-  | {
-      state:
-        | ExperimentStatus.RUNNING
-        | ExperimentStatus.FAILED
-        | ExperimentStatus.SUCCESS
-      name: Executor | null
-      local: {
-        root: string
-        log: string
-        pid: number
-        task_id?: string
-        returncode: null | number
-      } | null
-    }
-  | null
+export type ExecutorState = {
+  state: ExperimentStatus
+  name: Executor | null
+  local: {
+    root: string | null
+    log: string | null
+    pid: number | null
+    task_id?: string
+    returncode: null | number
+  } | null
+} | null
 
 export type ExpWithError = {
   rev: string

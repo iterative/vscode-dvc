@@ -14,146 +14,75 @@ import { QuickPickItemWithValue } from '../../../../../vscode/quickPick'
 import { buildExperiments, stubWorkspaceExperimentsGetters } from '../../util'
 import { experimentsUpdatedEvent } from '../../../util'
 import { dvcDemoPath } from '../../../../util'
+import { generateTestExpShowOutput } from '../../../../util/experiments'
 import { buildMetricOrParamPath } from '../../../../../experiments/columns/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
 import {
   EXPERIMENT_WORKSPACE_ID,
   Executor,
-  ExpShowOutput,
   ExperimentStatus
 } from '../../../../../cli/dvc/contract'
 import { WEBVIEW_TEST_TIMEOUT } from '../../../timeouts'
 import { starredSort } from '../../../../../experiments/model/sortBy/constants'
 
 suite('Experiments Sort By Tree Test Suite', () => {
-  const testData: ExpShowOutput = [
+  const data = generateTestExpShowOutput(
+    {},
     {
-      data: {
-        deps: null,
-        meta: { has_checkpoints: false },
-        metrics: null,
-        outs: null,
-        params: null,
-        rev: EXPERIMENT_WORKSPACE_ID,
-        timestamp: null
-      },
-      rev: EXPERIMENT_WORKSPACE_ID
-    },
-    {
-      data: {
-        deps: null,
-        meta: { has_checkpoints: false },
-        metrics: null,
-        outs: null,
-        params: null,
-        rev: 'testBranch',
-        timestamp: null
-      },
       experiments: [
         {
+          data: {
+            params: {
+              'params.yaml': {
+                data: {
+                  testParam: 1,
+                  testParam2: 1
+                }
+              }
+            }
+          },
           executor: {
             local: null,
             name: Executor.WORKSPACE,
             state: ExperimentStatus.RUNNING
           },
-          revs: [
-            {
-              data: {
-                deps: null,
-                meta: { has_checkpoints: false },
-                metrics: null,
-                outs: null,
-                params: {
-                  'params.yaml': {
-                    data: {
-                      testParam: 1,
-                      testParam2: 1
-                    }
-                  }
-                },
-                rev: 'exp1',
-                timestamp: null
-              },
-              rev: 'exp1'
-            }
-          ]
+          name: 'exp-1',
+          rev: EXPERIMENT_WORKSPACE_ID
         },
         {
-          executor: null,
-          revs: [
-            {
+          params: {
+            'params.yaml': {
               data: {
-                deps: null,
-                meta: { has_checkpoints: false },
-                metrics: null,
-                outs: null,
-                params: {
-                  'params.yaml': {
-                    data: {
-                      testParam: 3,
-                      testParam2: 1
-                    }
-                  }
-                },
-                rev: 'exp2',
-                timestamp: null
-              },
-              rev: 'exp2'
+                testParam: 3,
+                testParam2: 1
+              }
             }
-          ]
+          }
         },
         {
-          executor: null,
-          revs: [
-            {
+          params: {
+            'params.yaml': {
               data: {
-                deps: null,
-                meta: { has_checkpoints: false },
-                metrics: null,
-                outs: null,
-                params: {
-                  'params.yaml': {
-                    data: {
-                      testParam: 2,
-                      testParam2: 2
-                    }
-                  }
-                },
-                rev: 'exp3',
-                timestamp: null
-              },
-              rev: 'exp3'
+                testParam: 2,
+                testParam2: 2
+              }
             }
-          ]
+          }
         },
         {
-          executor: null,
-          revs: [
-            {
+          params: {
+            'params.yaml': {
               data: {
-                deps: null,
-                meta: { has_checkpoints: false },
-                metrics: null,
-                outs: null,
-                params: {
-                  'params.yaml': {
-                    data: {
-                      testParam: 4,
-                      testParam2: 2
-                    }
-                  }
-                },
-                rev: 'exp4',
-                timestamp: null
-              },
-              rev: 'exp4'
+                testParam: 4,
+                testParam2: 2
+              }
             }
-          ]
+          }
         }
       ],
       rev: 'testBranch'
     }
-  ]
+  )
 
   const disposable = Disposable.fn()
 
@@ -175,7 +104,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
     it('should be able to properly add and remove sorts with a variety of commands', async () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
 
-      const { experiments, messageSpy } = buildExperiments(disposable, testData)
+      const { experiments, messageSpy } = buildExperiments(disposable, data)
 
       await experiments.isReady()
       await experiments.showWebview()
