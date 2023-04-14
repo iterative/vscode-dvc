@@ -1,5 +1,6 @@
 import { Key } from 'webdriverio'
 import { ViewControl } from 'wdio-vscode-service'
+import { PlotsWebview } from './pageObjects/plotsWebview'
 
 const findProgressBars = () => $$('.monaco-progress-container')
 
@@ -151,6 +152,46 @@ export const closeAllEditors = async (): Promise<void> => {
   const workbench = await browser.getWorkbench()
   const editorView = workbench.getEditorView()
   return editorView.closeAllEditors()
+}
+
+export const createCustomPlot = async (): Promise<void> => {
+  const workbench = await browser.getWorkbench()
+  const addCustomPlot = await workbench.executeCommand('DVC: Add Custom Plot')
+  await browser.waitUntil(() => addCustomPlot.elem.isDisplayed())
+  await browser.keys('Enter')
+  await browser.waitUntil(() => addCustomPlot.elem.isDisplayed())
+  return browser.keys('Enter')
+}
+
+export const deleteCustomPlot = async (): Promise<void> => {
+  const workbench = await browser.getWorkbench()
+  const removeCustomPlot = await workbench.executeCommand(
+    'DVC: Remove Custom Plot(s)'
+  )
+  await browser.waitUntil(() => removeCustomPlot.elem.isDisplayed())
+  await browser.keys('ArrowDown')
+  await browser.keys('Space')
+  return browser.keys('Enter')
+}
+
+export const waitForAllPlotsToRender = (
+  webview: PlotsWebview,
+  plotsAmount: number
+): Promise<true | void> => {
+  return browser.waitUntil(
+    async () => {
+      return (await webview.vegaVisualization$$.length) === plotsAmount
+    },
+    { timeout: 30000 }
+  )
+}
+
+export const expectAllPlotsToBeFilled = async (webview: PlotsWebview) => {
+  const plots = await webview.vegaVisualization$$
+  for (const plot of plots) {
+    const plotNotEmpty = await webview.plotNotEmpty(plot)
+    expect(plotNotEmpty).toBe(true)
+  }
 }
 
 export const findScmTreeItems = async () => {

@@ -1,13 +1,17 @@
 import { join } from 'path'
 import {
   closeAllEditors,
+  createCustomPlot,
   deleteAllExistingExperiments,
+  deleteCustomPlot,
   dismissAllNotifications,
+  expectAllPlotsToBeFilled,
   findDecorationTooltip,
   findScmTreeItems,
   getDVCActivityBarIcon,
   getLabel,
   runModifiedExperiment,
+  waitForAllPlotsToRender,
   waitForDvcToFinish,
   waitForViewContainerToLoad
 } from './util.js'
@@ -21,8 +25,14 @@ before('should finish loading the extension', async function () {
   return dismissAllNotifications()
 })
 
-after(function () {
+after(async function () {
   this.timeout(60000)
+
+  try {
+    await deleteCustomPlot()
+  } catch {}
+  await dismissAllNotifications()
+
   return waitForDvcToFinish()
 })
 
@@ -130,32 +140,56 @@ describe('Experiments Table Webview', function () {
 })
 
 describe('Plots Webview', function () {
+  const webview = new PlotsWebview('plots')
+
+  // eslint-disable-next-line jest/expect-expect
   it('should load the plots webview with non-empty plots', async function () {
     this.timeout(60000)
-    const webview = new PlotsWebview('plots')
     const workbench = await browser.getWorkbench()
     await workbench.openCommandPrompt()
     await browser.keys([...'DVC: Show Plots', 'ArrowDown', 'Enter'])
 
     await waitForDvcToFinish()
-
     await webview.focus()
 
-    await browser.waitUntil(
-      async () => {
-        return (await webview.vegaVisualization$$.length) === 5
-      },
-      { timeout: 30000 }
-    )
+    await waitForAllPlotsToRender(webview, 5)
 
-    const plots = await webview.vegaVisualization$$
-
-    for (const plot of plots) {
-      const plotNotEmpty = await webview.plotNotEmpty(plot)
-      expect(plotNotEmpty).toBe(true)
-    }
+    await expectAllPlotsToBeFilled(webview)
 
     await webview.unfocus()
+    await closeAllEditors()
+  })
+
+  // eslint-disable-next-line jest/expect-expect
+  it('should create and delete a custom plot', async function () {
+    this.timeout(60000)
+    await createCustomPlot()
+    const workbench = await browser.getWorkbench()
+    await workbench.openCommandPrompt()
+    await workbench.executeCommand('DVC: Show Plots')
+
+    await waitForDvcToFinish()
+    await webview.focus()
+
+    await waitForAllPlotsToRender(webview, 6)
+
+    await expectAllPlotsToBeFilled(webview)
+
+    await webview.unfocus()
+    await closeAllEditors()
+
+    await deleteCustomPlot()
+    await workbench.executeCommand('DVC: Show Plots')
+
+    await waitForDvcToFinish()
+    await webview.focus()
+
+    await waitForAllPlotsToRender(webview, 5)
+
+    await expectAllPlotsToBeFilled(webview)
+
+    await webview.unfocus()
+    await closeAllEditors()
   })
 })
 

@@ -7,14 +7,13 @@ import { Icon } from '../../../shared/components/Icon'
 import { GitCommit } from '../../../shared/components/icons'
 
 export const CellSecondaryName: React.FC<{
-  displayNameOrParent: string
+  displayName: string
   commit?: CommitData
   sha?: string
-}> = ({ displayNameOrParent, commit, sha }) => {
+}> = ({ displayName, commit, sha }) => {
   const children = (
     <span className={styles.experimentCellSecondaryName}>
-      {commit && <Icon width={14} height={14} icon={GitCommit} />}{' '}
-      {displayNameOrParent}
+      {commit && <Icon width={14} height={14} icon={GitCommit} />} {displayName}
     </span>
   )
   if (!commit) {

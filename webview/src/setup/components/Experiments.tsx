@@ -1,26 +1,49 @@
 import React from 'react'
-import { CliIncompatible } from './CliIncompatible'
-import { CliUnavailable } from './CliUnavailable'
-import { ProjectUninitialized } from './ProjectUninitialized'
-import {
-  checkCompatibility,
-  initializeDvc,
-  initializeGit,
-  installDvc,
-  selectPythonInterpreter,
-  setupWorkspace,
-  showExperiments,
-  showScmPanel
-} from './messages'
-import { NeedsGitCommit } from './NeedsGitCommit'
+import { SectionCollapsed } from 'dvc/src/setup/webview/contract'
+import { showExperiments, showScmPanel } from './messages'
 import { NoData } from './NoData'
+import { NeedsGitCommit } from './NeedsGitCommit'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { IconButton } from '../../shared/components/button/IconButton'
 import { Beaker } from '../../shared/components/icons'
+import { Button } from '../../shared/components/button/Button'
 
-const ProjectSetup: React.FC<{ hasData: boolean | undefined }> = ({
-  hasData
+export type ExperimentsProps = {
+  isDvcSetup: boolean
+  hasData: boolean | undefined
+  setSectionCollapsed: (sectionCollapsed: SectionCollapsed) => void
+  needsGitCommit: boolean
+}
+
+export const Experiments: React.FC<ExperimentsProps> = ({
+  isDvcSetup,
+  hasData,
+  setSectionCollapsed,
+  needsGitCommit
 }) => {
+  if (!isDvcSetup) {
+    return (
+      <EmptyState isFullScreen={false}>
+        <h1>DVC is not setup</h1>
+        <p>DVC needs to be setup before you can access experiments.</p>
+        <Button
+          onClick={() =>
+            setSectionCollapsed({
+              dvc: false,
+              experiments: true,
+              studio: true
+            })
+          }
+          text="Setup DVC"
+        />
+      </EmptyState>
+    )
+  }
+
+  if (needsGitCommit) {
+    return <NeedsGitCommit showScmPanel={showScmPanel} />
+  }
+
   if (hasData === undefined) {
     return <EmptyState isFullScreen={false}>Loading Project...</EmptyState>
   }
@@ -40,59 +63,4 @@ const ProjectSetup: React.FC<{ hasData: boolean | undefined }> = ({
       />
     </EmptyState>
   )
-}
-
-export type ExperimentsProps = {
-  canGitInitialize: boolean | undefined
-  cliCompatible: boolean | undefined
-  hasData: boolean | undefined
-  isPythonExtensionInstalled: boolean
-  needsGitInitialized: boolean | undefined
-  needsGitCommit: boolean
-  projectInitialized: boolean
-  pythonBinPath: string | undefined
-}
-
-export const Experiments: React.FC<ExperimentsProps> = ({
-  canGitInitialize,
-  cliCompatible,
-  hasData,
-  isPythonExtensionInstalled,
-  needsGitInitialized,
-  needsGitCommit,
-  projectInitialized,
-  pythonBinPath
-}) => {
-  if (cliCompatible === false) {
-    return <CliIncompatible checkCompatibility={checkCompatibility} />
-  }
-
-  if (cliCompatible === undefined) {
-    return (
-      <CliUnavailable
-        installDvc={installDvc}
-        isPythonExtensionInstalled={isPythonExtensionInstalled}
-        pythonBinPath={pythonBinPath}
-        selectPythonInterpreter={selectPythonInterpreter}
-        setupWorkspace={setupWorkspace}
-      />
-    )
-  }
-
-  if (!projectInitialized) {
-    return (
-      <ProjectUninitialized
-        canGitInitialize={canGitInitialize}
-        initializeDvc={initializeDvc}
-        initializeGit={initializeGit}
-        needsGitInitialized={needsGitInitialized}
-      />
-    )
-  }
-
-  if (needsGitCommit) {
-    return <NeedsGitCommit showScmPanel={showScmPanel} />
-  }
-
-  return <ProjectSetup hasData={hasData} />
 }

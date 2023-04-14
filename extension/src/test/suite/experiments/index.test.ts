@@ -1,3 +1,4 @@
+/* eslint-disable sort-keys-fix/sort-keys-fix */
 import { join, resolve } from 'path'
 import { after, afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
@@ -71,7 +72,10 @@ import {
   RegisteredCommands
 } from '../../../commands/external'
 import { ConfigKey } from '../../../vscode/config'
-import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
+import {
+  EXPERIMENT_WORKSPACE_ID,
+  ExperimentStatus
+} from '../../../cli/dvc/contract'
 import * as Time from '../../../util/time'
 import { AvailableCommands } from '../../../commands/internal'
 import { Setup } from '../../../setup'
@@ -1910,7 +1914,7 @@ suite('Experiments Test Suite', () => {
         secondFilterDefinition
       ])
       const selected = testRepository
-        .getSelectedExperiments()
+        .getSelectedRevisions()
         .map(({ displayColor, id }) => ({ displayColor, id }))
       expect(
         selected,
@@ -1923,6 +1927,10 @@ suite('Experiments Test Suite', () => {
         {
           displayColor: colors[1],
           id: 'test-branch'
+        },
+        {
+          displayColor: colors[2],
+          id: EXPERIMENT_WORKSPACE_ID
         },
         {
           displayColor: colors[5],
@@ -2093,6 +2101,128 @@ suite('Experiments Test Suite', () => {
       expect(mockCheckSignalFile).to.be.called
       expect(mockDelay).to.be.called
       expect(mockUpdateExperimentsData).to.be.calledOnce
+    })
+  })
+
+  describe('checkForFinishedWorkspaceExperiment', () => {
+    it('should unselect the workspace record if it has the same color as an experiment', async () => {
+      const colors = copyOriginalColors()
+      const [color] = colors
+      const commit = 'df3f8647a47e403c9c4aa6562cad0b74afbe900b'
+      const expCommit = 'c0f48cf6c3eb589d48979df82c6bbe78c1ee5d61'
+      const expName = 'fizzy-dilemma'
+      const params = { 'params.yaml': { data: { lr: 1 } } }
+
+      const getSelectedIdsWithColor = (
+        experiments: Experiments
+      ): { id: string; displayColor: string }[] =>
+        experiments
+          .getSelectedRevisions()
+          .map(({ id, displayColor }) => ({ id, displayColor }))
+
+      const selectedWorkspace = {
+        id: EXPERIMENT_WORKSPACE_ID,
+        displayColor: color
+      }
+      const selectedExperiment = {
+        id: expName,
+        displayColor: color
+      }
+      const bothSelected = [selectedWorkspace, selectedExperiment]
+
+      const data = {
+        workspace: {
+          baseline: {
+            data: {
+              executor: EXPERIMENT_WORKSPACE_ID,
+              params,
+              status: ExperimentStatus.RUNNING
+            }
+          }
+        },
+        [commit]: {
+          baseline: {
+            data: {}
+          }
+        }
+      }
+
+      const { experiments, experimentsModel } = buildExperiments(
+        disposable,
+        data
+      )
+
+      await experiments.isReady()
+
+      expect(
+        experimentsModel.hasRunningExperiment(),
+        'should have a running experiment'
+      ).to.be.true
+
+      expect(
+        getSelectedIdsWithColor(experiments),
+        'should automatically select the running experiment'
+      ).to.deep.equal([selectedWorkspace])
+
+      const experimentsChanged = new Promise(resolve =>
+        experiments.onDidChangeExperiments(() => resolve(undefined))
+      )
+
+      await experiments.setState({
+        workspace: {
+          baseline: {
+            data: {
+              executor: null,
+              params
+            }
+          }
+        },
+        [commit]: {
+          ...data[commit],
+          [expCommit]: {
+            data: {
+              name: expName,
+              params,
+              status: ExperimentStatus.SUCCESS,
+              timestamp: '2020-11-21T19:58:22'
+            }
+          }
+        }
+      })
+
+      await experimentsChanged
+
+      expect(
+        getSelectedIdsWithColor(experiments),
+        "should apply the workspace's color to a newly created experiment"
+      ).to.deep.equal(bothSelected)
+
+      experiments.checkForFinishedWorkspaceExperiment([selectedWorkspace])
+
+      expect(
+        getSelectedIdsWithColor(experiments),
+        "should not remove the workspace's color if the experiment's data has not been fetched"
+      ).to.deep.equal(bothSelected)
+
+      experiments.checkForFinishedWorkspaceExperiment([
+        selectedExperiment,
+        selectedWorkspace
+      ])
+
+      expect(
+        getSelectedIdsWithColor(experiments),
+        "should remove the workspace's color once the experiment's data has been shown to be fetched"
+      ).to.deep.equal([selectedExperiment])
+
+      experiments.toggleExperimentStatus(EXPERIMENT_WORKSPACE_ID)
+
+      expect(
+        getSelectedIdsWithColor(experiments),
+        'should not duplicate the color when toggling another experiment'
+      ).to.deep.equal([
+        selectedExperiment,
+        { id: EXPERIMENT_WORKSPACE_ID, displayColor: colors[1] }
+      ])
     })
   })
 })
