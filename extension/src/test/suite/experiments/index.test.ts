@@ -1471,10 +1471,7 @@ suite('Experiments Test Suite', () => {
         mockSelectBranches
       } = setupExperimentsAndMockCommands()
       const mockSetBranchesToShow = stub(experimentsModel, 'setBranchesToShow')
-
-      const waitForBranchesToBeSelected = new Promise(resolve =>
-        mockSetBranchesToShow.callsFake(() => resolve(undefined))
-      )
+      mockSelectBranches.resolves(undefined)
 
       const webview = await experiments.showWebview()
       messageSpy.resetHistory()
@@ -1485,8 +1482,6 @@ suite('Experiments Test Suite', () => {
       })
 
       expect(mockSelectBranches).to.be.calledOnce
-
-      await waitForBranchesToBeSelected
 
       expect(mockSetBranchesToShow).not.to.be.calledOnceWith(['main', 'other'])
 

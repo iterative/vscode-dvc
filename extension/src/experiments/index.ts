@@ -547,15 +547,6 @@ export class Experiments extends BaseRepository<TableData> {
     )
     this.experimentsChanged.fire(data)
     this.notifyColumnsChanged()
-    void this.updateAvailableBranchesToSelect()
-  }
-
-  private async updateAvailableBranchesToSelect() {
-    const allBranches = await this.internalCommands.executeCommand<string[]>(
-      AvailableCommands.GIT_GET_BRANCHES,
-      this.dvcRoot
-    )
-    this.experiments.setAvailableBranchesToShow(allBranches)
   }
 
   private notifyColumnsChanged() {
