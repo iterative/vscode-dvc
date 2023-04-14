@@ -14,12 +14,14 @@ export type SetupData = {
 
 export enum SetupSection {
   EXPERIMENTS = 'experiments',
-  STUDIO = 'studio'
+  STUDIO = 'studio',
+  DVC = 'dvc'
 }
 
 export const DEFAULT_SECTION_COLLAPSED = {
   [SetupSection.EXPERIMENTS]: false,
-  [SetupSection.STUDIO]: false
+  [SetupSection.STUDIO]: false,
+  [SetupSection.DVC]: false
 }
 
 export type SectionCollapsed = typeof DEFAULT_SECTION_COLLAPSED

@@ -57,9 +57,10 @@ export class WebviewMessages {
     this.updateData = updateData
   }
 
-  public sendWebviewMessage() {
+  public async sendWebviewMessage() {
     const selectedRevisions = this.plots.getSelectedRevisionDetails()
-    void this.getWebview()?.show({
+
+    await this.getWebview()?.show({
       cliError: this.errors.getCliError()?.error || null,
       comparison: this.getComparisonPlots(),
       custom: this.getCustomPlots(),
@@ -69,6 +70,10 @@ export class WebviewMessages {
       selectedRevisions,
       template: this.getTemplatePlots(selectedRevisions)
     })
+
+    this.experiments.checkForFinishedWorkspaceExperiment(
+      selectedRevisions.filter(({ fetched }) => fetched)
+    )
   }
 
   public handleMessageFromWebview(message: MessageFromWebview) {

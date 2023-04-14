@@ -68,9 +68,8 @@ const getExperimentId = (
   return name || sha
 }
 
-const getDisplayNameOrParent = (
+const getDisplayName = (
   sha: string,
-  commitSha: string,
   experimentsObject: { [sha: string]: ExperimentFieldsOrError }
 ): string | undefined => {
   const experiment = experimentsObject[sha]?.data
@@ -78,56 +77,10 @@ const getDisplayNameOrParent = (
     return
   }
 
-  const {
-    checkpoint_parent: checkpointParent,
-    checkpoint_tip: checkpointTip,
-    name
-  } = experiment
-  if (
-    checkpointParent &&
-    commitSha !== checkpointParent &&
-    experimentsObject[checkpointParent]?.data?.checkpoint_tip !== checkpointTip
-  ) {
-    return `(${shortenForLabel(checkpointParent)})`
-  }
+  const { name } = experiment
   if (name) {
     return `[${name}]`
   }
-}
-
-const getLogicalGroupName = (
-  sha: string,
-  commitSha: string,
-  experimentsObject: { [sha: string]: ExperimentFieldsOrError }
-): string | undefined => {
-  const experiment = experimentsObject[sha]?.data
-
-  const { checkpoint_tip: checkpointTip = undefined, name = undefined } =
-    experiment || {}
-
-  if (name) {
-    return `[${name}]`
-  }
-
-  return (
-    getDisplayNameOrParent(sha, commitSha, experimentsObject) ||
-    (checkpointTip && checkpointTip !== sha
-      ? getLogicalGroupName(checkpointTip, commitSha, experimentsObject)
-      : undefined)
-  )
-}
-
-const getCheckpointTipId = (
-  checkpointTip: string | undefined,
-  experimentsObject: ExperimentsObject
-): string | undefined => {
-  if (!checkpointTip) {
-    return
-  }
-
-  const tip = experimentsObject[checkpointTip]?.data
-
-  return tip?.name || checkpointTip
 }
 
 const transformColumns = (
@@ -167,8 +120,7 @@ const transformExperimentData = (
   experimentFieldsOrError: ExperimentFieldsOrError,
   label: string | undefined,
   sha?: string,
-  displayNameOrParent?: string,
-  logicalGroupName?: string,
+  displayName?: string,
   commit?: Experiment
 ): Experiment => {
   const data = experimentFieldsOrError.data || {}
@@ -181,12 +133,12 @@ const transformExperimentData = (
     ...omit(data, Object.values(ColumnType))
   } as Experiment
 
-  if (displayNameOrParent) {
-    experiment.displayNameOrParent = displayNameOrParent
+  if (displayName) {
+    experiment.displayName = displayName
   }
 
-  if (logicalGroupName) {
-    experiment.logicalGroupName = logicalGroupName
+  if (experiment.name && displayName) {
+    experiment.logicalGroupName = displayName
   }
 
   if (sha) {
@@ -206,37 +158,28 @@ const transformExperimentOrCheckpointData = (
   sha: string,
   experimentData: ExperimentFieldsOrError,
   experimentsObject: ExperimentsObject,
-  commitSha: string,
   commit: Experiment
-): {
-  checkpointTipId?: string
-  experiment: Experiment | undefined
-} => {
+): Experiment | undefined => {
   const experimentFields = experimentData.data
   if (!experimentFields) {
     const error = experimentData?.error?.msg
-    return { experiment: { error, id: sha, label: shortenForLabel(sha) } }
+    return { error, id: sha, label: shortenForLabel(sha) }
   }
 
-  const checkpointTipId = getCheckpointTipId(
-    experimentFields.checkpoint_tip,
-    experimentsObject
-  )
+  if (isCheckpoint(experimentFields.checkpoint_tip, sha)) {
+    return
+  }
 
   const id = getExperimentId(sha, experimentFields)
 
-  return {
-    checkpointTipId,
-    experiment: transformExperimentData(
-      id,
-      experimentData,
-      shortenForLabel(sha),
-      sha,
-      getDisplayNameOrParent(sha, commitSha, experimentsObject),
-      getLogicalGroupName(sha, commitSha, experimentsObject),
-      commit
-    )
-  }
+  return transformExperimentData(
+    id,
+    experimentData,
+    shortenForLabel(sha),
+    sha,
+    getDisplayName(sha, experimentsObject),
+    commit
+  )
 }
 
 const collectHasRunningExperiment = (
@@ -249,44 +192,25 @@ const collectHasRunningExperiment = (
   }
 }
 
-const collectExperimentOrCheckpoint = (
-  acc: ExperimentsAccumulator,
-  experiment: Experiment,
-  commitName: string,
-  checkpointTipId: string | undefined
-) => {
-  const { checkpoint_tip: checkpointTip, sha } = experiment
-  if (isCheckpoint(checkpointTip, sha as string)) {
-    if (!checkpointTipId) {
-      return
-    }
-    addToMapArray(acc.checkpointsByTip, checkpointTipId, experiment)
-    return
-  }
-  addToMapArray(acc.experimentsByCommit, commitName, experiment)
-}
-
 const collectFromExperimentsObject = (
   acc: ExperimentsAccumulator,
   experimentsObject: ExperimentsObject,
-  commitSha: string,
   commit: Experiment
 ) => {
   const commitName = commit.label
 
   for (const [sha, experimentData] of Object.entries(experimentsObject)) {
-    const { checkpointTipId, experiment } = transformExperimentOrCheckpointData(
+    const experiment = transformExperimentOrCheckpointData(
       sha,
       experimentData,
       experimentsObject,
-      commitSha,
       commit
     )
     if (!experiment) {
       continue
     }
 
-    collectExperimentOrCheckpoint(acc, experiment, commitName, checkpointTipId)
+    addToMapArray(acc.experimentsByCommit, commitName, experiment)
     collectHasRunningExperiment(acc, experiment)
   }
 }
@@ -308,7 +232,7 @@ const collectFromCommits = (
     const commit = transformExperimentData(name, baseline, label, sha)
 
     if (commit) {
-      collectFromExperimentsObject(acc, experimentsObject, sha, commit)
+      collectFromExperimentsObject(acc, experimentsObject, commit)
       collectHasRunningExperiment(acc, commit)
 
       acc.commits.push(commit)
@@ -371,9 +295,7 @@ const addDataToCommits = (
   return commits.map(commit => {
     const { sha } = commit
     if (sha && commitMessages[sha]) {
-      commit.displayNameOrParent = formatCommitMessage(
-        commitMessages[sha].message
-      )
+      commit.displayName = formatCommitMessage(commitMessages[sha].message)
       commit.commit = commitMessages[sha]
     }
     return commit

@@ -215,7 +215,7 @@ const data: Commit[] = [
           )
         },
         displayColor: colorsList[1],
-        displayNameOrParent: '[exp-e7a67]',
+        displayName: '[exp-e7a67]',
         executor: 'dvc-task',
         id: 'exp-e7a67',
         label: '4fb124a',
@@ -307,7 +307,7 @@ const data: Commit[] = [
           )
         },
         displayColor: undefined,
-        displayNameOrParent: '[test-branch]',
+        displayName: '[test-branch]',
         executor: null,
         id: 'test-branch',
         label: '42b8736',
@@ -399,7 +399,7 @@ const data: Commit[] = [
           )
         },
         displayColor: undefined,
-        displayNameOrParent: '[exp-83425]',
+        displayName: '[exp-83425]',
         id: 'exp-83425',
         executor: null,
         label: '1ba7bcd',
@@ -498,7 +498,7 @@ const data: Commit[] = [
           )
         },
         displayColor: undefined,
-        displayNameOrParent: '[exp-f13bca]',
+        displayName: '[exp-f13bca]',
         executor: null,
         id: 'exp-f13bca',
         error:

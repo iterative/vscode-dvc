@@ -32,7 +32,7 @@ export type CommitData = {
 export interface Experiment extends BaseExperimentFields {
   deps?: DepColumns
   displayColor?: string
-  displayNameOrParent?: string
+  displayName?: string
   error?: string
   id: string
   label: string

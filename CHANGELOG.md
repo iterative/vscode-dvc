@@ -2,6 +2,50 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.6] - 2023-04-13
+
+### 🐛 Bug Fixes
+
+- fix(table): DnD landing zone covers the whole cell in the table [#3678](https://github.com/iterative/vscode-dvc/pull/3678) by [@shcheklein](https://github.com/shcheklein)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (2.54.0) [#3677](https://github.com/iterative/vscode-dvc/pull/3677) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.7.5] - 2023-04-11
+
+### 🚀 New Features and Enhancements
+
+- Add Setup DVC Section [#3655](https://github.com/iterative/vscode-dvc/pull/3655) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Fix broken collapsed section info tooltips [#3669](https://github.com/iterative/vscode-dvc/pull/3669) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Add custom plot to e2e test [#3646](https://github.com/iterative/vscode-dvc/pull/3646) by [@julieg18](https://github.com/julieg18)
+- Clean up table styles [#3664](https://github.com/iterative/vscode-dvc/pull/3664) by [@julieg18](https://github.com/julieg18)
+
+## [0.7.4] - 2023-04-06
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (2.53.0) [#3649](https://github.com/iterative/vscode-dvc/pull/3649) by [@mattseddon](https://github.com/mattseddon)
+- Add 20px to min width of experiments column [#3650](https://github.com/iterative/vscode-dvc/pull/3650) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.7.3] - 2023-04-05
+
+### 🐛 Bug Fixes
+
+- Make sure changing the number of revisions will trigger an update for the scale of the multiview plot [#3642](https://github.com/iterative/vscode-dvc/pull/3642) by [@sroy3](https://github.com/sroy3)
+- Show duplicate revisions when experiment finishes running in the workspace [#3641](https://github.com/iterative/vscode-dvc/pull/3641) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project dvclive (2.6.2) [#3645](https://github.com/iterative/vscode-dvc/pull/3645) by [@sroy3](https://github.com/sroy3)
+- Remove checkpoints from experiment collection [#3639](https://github.com/iterative/vscode-dvc/pull/3639) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.7.2] - 2023-04-05
 
 ### 🚀 New Features and Enhancements
