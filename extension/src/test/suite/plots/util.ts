@@ -10,10 +10,7 @@ import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { PlotsModel } from '../../../plots/model'
 import { PlotsData } from '../../../plots/data'
 import { Experiments } from '../../../experiments'
-import { buildDependencies, buildMockData } from '../util'
-import { FileSystemData } from '../../../fileSystem/data'
-import { ExperimentsData } from '../../../experiments/data'
-import { mockHasCheckpoints } from '../experiments/util'
+import { buildDependencies, buildMockExperimentsData } from '../util'
 import { MOCK_IMAGE_MTIME } from '../../fixtures/plotsDiff'
 import { PathsModel } from '../../../plots/paths/model'
 import { BaseWorkspaceWebviews } from '../../../webview/workspace'
@@ -49,8 +46,7 @@ export const buildPlots = async (
       resourceLocator,
       buildMockMemento(),
       () => Promise.resolve(true),
-      buildMockData<ExperimentsData>(),
-      buildMockData<FileSystemData>()
+      buildMockExperimentsData()
     )
   )
   const plots = disposer.track(
@@ -64,7 +60,6 @@ export const buildPlots = async (
     )
   )
 
-  mockHasCheckpoints(expShow)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const experimentsModel: ExperimentsModel = (experiments as any).experiments
   experimentsModel.setSelected([

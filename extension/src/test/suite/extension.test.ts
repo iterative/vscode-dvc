@@ -4,7 +4,6 @@ import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
 import { commands, workspace } from 'vscode'
 import { closeAllEditors, mockDisposable, mockDuration } from './util'
-import { mockHasCheckpoints } from './experiments/util'
 import { Disposable } from '../../extension'
 import * as Python from '../../extensions/python'
 import { DvcReader } from '../../cli/dvc/reader'
@@ -92,7 +91,6 @@ suite('Extension Test Suite', () => {
         })
       )
 
-      mockHasCheckpoints(expShowFixture)
       const mockExpShow = stub(DvcReader.prototype, 'expShow')
       const mockDataStatus = stub(DvcReader.prototype, 'dataStatus')
       const mockPlotsDiff = stub(DvcReader.prototype, 'plotsDiff')

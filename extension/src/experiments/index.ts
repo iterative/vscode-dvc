@@ -29,7 +29,6 @@ import { UNSELECTED } from './model/status'
 import { starredSort } from './model/sortBy/constants'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ColumnsModel } from './columns/model'
-import { CheckpointsModel } from './checkpoints/model'
 import { ExperimentsData } from './data'
 import { Experiment, ColumnType, TableData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
@@ -40,17 +39,13 @@ import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { EXPERIMENT_WORKSPACE_ID, ExpShowOutput } from '../cli/dvc/contract'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
-import { FileSystemData } from '../fileSystem/data'
 import { Title } from '../vscode/title'
 import { createTypedAccumulator } from '../util/object'
 import { pickPaths } from '../path/selection/quickPick'
 import { Toast } from '../vscode/toast'
 import { ConfigKey } from '../vscode/config'
 import { checkSignalFile, pollSignalFileForProcess } from '../fileSystem'
-import {
-  DVCLIVE_ONLY_RUNNING_SIGNAL_FILE,
-  ExperimentFlag
-} from '../cli/dvc/constants'
+import { DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
 
 export const ExperimentsScale = {
   ...omit(ColumnType, 'TIMESTAMP'),
@@ -71,12 +66,10 @@ export class Experiments extends BaseRepository<TableData> {
 
   public readonly viewKey = ViewKey.EXPERIMENTS
 
-  private readonly cliData: ExperimentsData
-  private readonly fileSystemData: FileSystemData
+  private readonly data: ExperimentsData
 
   private readonly experiments: ExperimentsModel
   private readonly columns: ColumnsModel
-  private readonly checkpoints: CheckpointsModel
 
   private readonly paramsFileFocused = this.dispose.track(
     new EventEmitter<string | undefined>()
@@ -114,8 +107,7 @@ export class Experiments extends BaseRepository<TableData> {
     resourceLocator: ResourceLocator,
     workspaceState: Memento,
     addStage: () => Promise<boolean>,
-    cliData?: ExperimentsData,
-    fileSystemData?: FileSystemData
+    data?: ExperimentsData
   ) {
     super(dvcRoot, resourceLocator.beaker)
 
@@ -145,10 +137,8 @@ export class Experiments extends BaseRepository<TableData> {
       )
     )
 
-    this.checkpoints = this.dispose.track(new CheckpointsModel())
-
-    this.cliData = this.dispose.track(
-      cliData ||
+    this.data = this.dispose.track(
+      data ||
         new ExperimentsData(
           dvcRoot,
           internalCommands,
@@ -157,26 +147,17 @@ export class Experiments extends BaseRepository<TableData> {
         )
     )
 
-    this.fileSystemData = this.dispose.track(
-      fileSystemData || new FileSystemData(dvcRoot)
-    )
-
-    this.dispose.track(this.cliData.onDidUpdate(data => this.setState(data)))
+    this.dispose.track(this.data.onDidUpdate(data => this.setState(data)))
     this.dispose.track(
-      this.fileSystemData.onDidUpdate(data => {
-        const hadCheckpoints = this.hasCheckpoints()
-        this.checkpoints.transformAndSet(data)
-        if (hadCheckpoints !== this.hasCheckpoints()) {
-          this.checkpointsChanged.fire()
-        }
-        void this.webviewMessages.changeHasConfig(true)
-      })
+      this.data.onDidChangeDvcYaml(() =>
+        this.webviewMessages.changeHasConfig(true)
+      )
     )
 
     this.dispose.track(
       workspace.onDidChangeConfiguration((event: ConfigurationChangeEvent) => {
         if (event.affectsConfiguration(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT)) {
-          void this.cliData.update()
+          void this.data.update()
         }
       })
     )
@@ -187,10 +168,11 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public update() {
-    return this.cliData.managedUpdate()
+    return this.data.managedUpdate()
   }
 
   public async setState(data: ExpShowOutput) {
+    const hadCheckpoints = this.hasCheckpoints()
     const dvcLiveOnly = await this.checkSignalFile()
     const commitsOutput = await this.getCommitOutput(data)
     await Promise.all([
@@ -198,11 +180,15 @@ export class Experiments extends BaseRepository<TableData> {
       this.experiments.transformAndSet(data, dvcLiveOnly, commitsOutput)
     ])
 
+    if (hadCheckpoints !== this.hasCheckpoints()) {
+      this.checkpointsChanged.fire()
+    }
+
     return this.notifyChanged()
   }
 
   public hasCheckpoints() {
-    return this.checkpoints.hasCheckpoints()
+    return this.experiments.hasCheckpoints()
   }
 
   public getChildColumns(path?: string) {
@@ -563,7 +549,6 @@ export class Experiments extends BaseRepository<TableData> {
       this.dvcRoot,
       this.experiments,
       this.columns,
-      this.checkpoints,
       () => this.getWebview(),
       () => this.notifyChanged(),
       () => this.selectColumns(),
@@ -584,7 +569,7 @@ export class Experiments extends BaseRepository<TableData> {
           AvailableCommands.GIT_GET_NUM_COMMITS,
           this.dvcRoot
         ),
-      (...args: (ExperimentFlag | string)[]) => this.cliData.update(...args)
+      () => this.data.update()
     )
 
     this.dispose.track(
@@ -626,7 +611,7 @@ export class Experiments extends BaseRepository<TableData> {
       void pollSignalFileForProcess(this.dvcLiveOnlySignalFile, () => {
         this.dvcLiveOnlyCleanupInitialized = false
         if (this.hasRunningExperiment()) {
-          void this.cliData.update()
+          void this.data.update()
         }
       })
     }

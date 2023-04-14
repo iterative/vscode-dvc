@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { EventEmitter } from 'vscode'
+import { Event, EventEmitter } from 'vscode'
 import { collectFiles } from './collect'
 import {
   EXPERIMENTS_GIT_LOGS_REFS,
@@ -19,7 +19,13 @@ import { ExperimentsModel } from '../model'
 export const QUEUED_EXPERIMENT_PATH = join(DOT_DVC, 'tmp', 'exps')
 
 export class ExperimentsData extends BaseData<ExpShowOutput> {
+  public readonly onDidChangeDvcYaml: Event<void>
+
   private readonly experiments: ExperimentsModel
+
+  private readonly dvcYamlChanged: EventEmitter<void> = this.dispose.track(
+    new EventEmitter<void>()
+  )
 
   constructor(
     dvcRoot: string,
@@ -31,34 +37,23 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
       dvcRoot,
       internalCommands,
       updatesPaused,
-      [
-        {
-          name: 'partialUpdate',
-          process: () => this.update(ExperimentFlag.NO_FETCH)
-        },
-        { name: 'fullUpdate', process: () => this.update() }
-      ],
+      [{ name: 'update', process: () => this.update() }],
       ['dvc.lock', 'dvc.yaml', 'params.yaml', DOT_DVC]
     )
 
     this.experiments = experiments
 
+    this.onDidChangeDvcYaml = this.dvcYamlChanged.event
+
     void this.watchExpGitRefs()
-    void this.managedUpdate(QUEUED_EXPERIMENT_PATH)
+    void this.managedUpdate()
   }
 
-  public managedUpdate(path?: string) {
-    if (
-      path?.includes(QUEUED_EXPERIMENT_PATH) ||
-      this.processManager.isOngoingOrQueued('fullUpdate')
-    ) {
-      return this.processManager.run('fullUpdate')
-    }
-
-    return this.processManager.run('partialUpdate')
+  public managedUpdate() {
+    return this.processManager.run('update')
   }
 
-  public async update(...args: (ExperimentFlag | string)[]): Promise<void> {
+  public async update(): Promise<void> {
     const flags = this.experiments.getIsBranchesView()
       ? [ExperimentFlag.ALL_BRANCHES]
       : [
@@ -68,8 +63,7 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
     const data = await this.internalCommands.executeCommand<ExpShowOutput>(
       AvailableCommands.EXP_SHOW,
       this.dvcRoot,
-      ...flags,
-      ...args
+      ...flags
     )
 
     this.collectFiles(data)
@@ -103,10 +97,14 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
           return
         }
 
+        if (path.endsWith('dvc.yaml')) {
+          this.dvcYamlChanged.fire()
+        }
+
         if (
           watchedRelPaths.some(watchedRelPath => path.includes(watchedRelPath))
         ) {
-          return this.managedUpdate(path)
+          return this.managedUpdate()
         }
       }
     )

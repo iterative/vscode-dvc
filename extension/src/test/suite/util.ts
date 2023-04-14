@@ -25,7 +25,6 @@ import { BaseWebview } from '../../webview'
 import { ExperimentsData } from '../../experiments/data'
 import { ResourceLocator } from '../../resourceLocator'
 import { DEFAULT_DEBOUNCE_WINDOW_MS } from '../../process/manager'
-import { FileSystemData } from '../../fileSystem/data'
 import * as FileSystem from '../../fileSystem'
 import * as Watcher from '../../fileSystem/watcher'
 import { MessageFromWebview } from '../../webview/contract'
@@ -182,14 +181,14 @@ export const buildInternalCommands = (disposer: Disposer) => {
   }
 }
 
-export const buildMockData = <T extends ExperimentsData | FileSystemData>(
-  update = stub()
-) =>
+export const buildMockExperimentsData = (update = stub()) =>
   ({
     dispose: stub(),
+    dvcYamlChanged: stub(),
+    onDidChangeDvcYaml: stub(),
     onDidUpdate: stub(),
     update
-  } as unknown as T)
+  } as unknown as ExperimentsData)
 
 export const buildResourceLocator = (disposer: Disposer): ResourceLocator =>
   disposer.track(new ResourceLocator(extensionUri))

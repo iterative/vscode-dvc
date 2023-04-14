@@ -17,7 +17,6 @@ import { ColumnsModel } from '../columns/model'
 import { splitColumnPath } from '../columns/paths'
 import { ExperimentsModel } from '../model'
 import { SortDefinition } from '../model/sortBy'
-import { CheckpointsModel } from '../checkpoints/model'
 import { getPositiveIntegerInput } from '../../vscode/inputBox'
 import { Title } from '../../vscode/title'
 import { ConfigKey, setConfigValue } from '../../vscode/config'
@@ -32,7 +31,6 @@ export class WebviewMessages {
 
   private readonly experiments: ExperimentsModel
   private readonly columns: ColumnsModel
-  private readonly checkpoints: CheckpointsModel
 
   private readonly getWebview: () => BaseWebview<TableData> | undefined
   private readonly notifyChanged: () => void
@@ -57,7 +55,6 @@ export class WebviewMessages {
     dvcRoot: string,
     experiments: ExperimentsModel,
     columns: ColumnsModel,
-    checkpoints: CheckpointsModel,
     getWebview: () => BaseWebview<TableData> | undefined,
     notifyChanged: () => void,
     selectColumns: () => Promise<void>,
@@ -73,7 +70,6 @@ export class WebviewMessages {
     this.dvcRoot = dvcRoot
     this.experiments = experiments
     this.columns = columns
-    this.checkpoints = checkpoints
     this.getWebview = getWebview
     this.notifyChanged = notifyChanged
     this.selectColumns = selectColumns
@@ -269,7 +265,7 @@ export class WebviewMessages {
       columns: this.columns.getSelected(),
       filteredCount: this.experiments.getFilteredCount(),
       filters: this.experiments.getFilterPaths(),
-      hasCheckpoints: this.checkpoints.hasCheckpoints(),
+      hasCheckpoints: this.experiments.hasCheckpoints(),
       hasColumns: this.columns.hasNonDefaultColumns(),
       hasConfig: this.hasConfig,
       hasMoreCommits: this.hasMoreCommits,

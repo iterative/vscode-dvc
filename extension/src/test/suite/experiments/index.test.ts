@@ -33,7 +33,7 @@ import {
 } from '../../../experiments/webview/contract'
 import {
   buildInternalCommands,
-  buildMockData,
+  buildMockExperimentsData,
   closeAllEditors,
   configurationChangeEvent,
   experimentsUpdatedEvent,
@@ -57,8 +57,6 @@ import { ColumnsModel } from '../../../experiments/columns/model'
 import { MessageFromWebviewType } from '../../../webview/contract'
 import { ExperimentsModel } from '../../../experiments/model'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
-import { FileSystemData } from '../../../fileSystem/data'
-import { ExperimentsData } from '../../../experiments/data'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
@@ -1416,8 +1414,7 @@ suite('Experiments Test Suite', () => {
           resourceLocator,
           buildMockMemento(),
           () => Promise.resolve(true),
-          buildMockData<ExperimentsData>(),
-          buildMockData<FileSystemData>()
+          buildMockExperimentsData()
         )
       )
 
@@ -1655,8 +1652,7 @@ suite('Experiments Test Suite', () => {
           {} as ResourceLocator,
           mockMemento,
           () => Promise.resolve(true),
-          buildMockData<ExperimentsData>(),
-          buildMockData<FileSystemData>()
+          buildMockExperimentsData()
         )
       )
       void testRepository.setState(expShowFixture)
@@ -1811,8 +1807,7 @@ suite('Experiments Test Suite', () => {
           {} as ResourceLocator,
           mockMemento,
           () => Promise.resolve(true),
-          buildMockData<ExperimentsData>(),
-          buildMockData<FileSystemData>()
+          buildMockExperimentsData()
         )
       )
       void testRepository.setState(expShowFixture)

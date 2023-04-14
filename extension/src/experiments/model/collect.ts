@@ -43,6 +43,7 @@ export type ExperimentItem = {
 type ExperimentsAccumulator = {
   commits: Experiment[]
   experimentsByCommit: Map<string, Experiment[]>
+  hasCheckpoints: boolean
   runningExperiments: RunningExperiment[]
   workspace: Experiment
 }
@@ -282,6 +283,20 @@ const setWorkspaceAsRunning = (
   }
 }
 
+const hasCheckpoints = (data: ExpShowOutput) => {
+  if (!data?.length) {
+    return false
+  }
+
+  const [workspace] = data
+
+  if (experimentHasError(workspace)) {
+    return false
+  }
+
+  return !!workspace.data.meta.has_checkpoints
+}
+
 export const collectExperiments = (
   output: ExpShowOutput,
   dvcLiveOnly: boolean,
@@ -290,6 +305,7 @@ export const collectExperiments = (
   const acc: ExperimentsAccumulator = {
     commits: [],
     experimentsByCommit: new Map(),
+    hasCheckpoints: hasCheckpoints(output),
     runningExperiments: [],
     workspace: { id: EXPERIMENT_WORKSPACE_ID, label: EXPERIMENT_WORKSPACE_ID }
   }
