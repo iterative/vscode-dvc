@@ -467,11 +467,18 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return false
     }
 
-    const { trainingScript, command } = await this.askForTrainingScript()
+    const { trainingScript, command, enteredManually } =
+      await this.askForTrainingScript()
     if (!trainingScript) {
       return false
     }
-    void findOrCreateDvcYamlFile(cwd, trainingScript, stageName, command)
+    void findOrCreateDvcYamlFile(
+      cwd,
+      trainingScript,
+      stageName,
+      command,
+      !enteredManually
+    )
     return true
   }
 
@@ -510,14 +517,19 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
         : pathOrSelect
 
     if (!trainingScript) {
-      return { command: undefined, trainingScript: undefined }
+      return {
+        command: undefined,
+        enteredManually: false,
+        trainingScript: undefined
+      }
     }
 
     const command =
       getScriptCommand(trainingScript) ||
       (await getInput(Title.ENTER_COMMAND_TO_RUN)) ||
       ''
-    return { command, trainingScript }
+    const enteredManually = pathOrSelect !== selectValue
+    return { command, enteredManually, trainingScript }
   }
 
   private async pickExpThenRun(
