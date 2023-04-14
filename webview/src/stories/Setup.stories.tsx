@@ -1,7 +1,11 @@
 import { Story, Meta } from '@storybook/react/types-6-0'
 import React from 'react'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
-import { SetupData, SetupSection } from 'dvc/src/setup/webview/contract'
+import {
+  DvcCliIndicator,
+  SetupData,
+  SetupSection
+} from 'dvc/src/setup/webview/contract'
 import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'
 import { App } from '../setup/components/App'
 
@@ -11,6 +15,11 @@ import '../shared/style.scss'
 const DEFAULT_DATA: SetupData = {
   canGitInitialize: false,
   cliCompatible: true,
+  dvcCliDetails: {
+    location: 'python',
+    type: DvcCliIndicator.AUTO,
+    version: '1.0.0'
+  },
   hasData: false,
   isPythonExtensionInstalled: true,
   isStudioConnected: true,

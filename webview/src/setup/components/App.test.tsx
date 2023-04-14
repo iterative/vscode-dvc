@@ -5,7 +5,11 @@ import {
 } from 'dvc/src/webview/contract'
 import '@testing-library/jest-dom/extend-expect'
 import React from 'react'
-import { SetupSection, SetupData } from 'dvc/src/setup/webview/contract'
+import {
+  SetupSection,
+  SetupData,
+  DvcCliIndicator
+} from 'dvc/src/setup/webview/contract'
 import { App } from './App'
 import { vsCodeApi } from '../../shared/api'
 
@@ -66,6 +70,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: false,
+        dvcCliDetails: {
+          location: 'dvc',
+          type: DvcCliIndicator.GLOBAL,
+          version: '1.0.0'
+        },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -92,6 +101,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: undefined,
+        dvcCliDetails: {
+          location: 'dvc',
+          type: DvcCliIndicator.GLOBAL,
+          version: undefined
+        },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -112,6 +126,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: undefined,
+        dvcCliDetails: {
+          location: 'dvc',
+          type: DvcCliIndicator.GLOBAL,
+          version: undefined
+        },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -136,8 +155,13 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: undefined,
+        dvcCliDetails: {
+          location: defaultInterpreter,
+          type: DvcCliIndicator.AUTO,
+          version: undefined
+        },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionInstalled: true,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -159,6 +183,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: undefined,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.MANUAL,
+          version: undefined
+        },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -182,6 +211,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: undefined,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.AUTO,
+          version: undefined
+        },
         hasData: false,
         isPythonExtensionInstalled: true,
         isStudioConnected: false,
@@ -205,6 +239,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: undefined,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.AUTO,
+          version: undefined
+        },
         hasData: false,
         isPythonExtensionInstalled: true,
         isStudioConnected: false,
@@ -228,6 +267,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.MANUAL,
+          version: '1.0.0'
+        },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -248,6 +292,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.MANUAL,
+          version: '1.0.0'
+        },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -266,6 +315,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: true,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.MANUAL,
+          version: '1.0.0'
+        },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -287,6 +341,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.MANUAL,
+          version: '1.0.0'
+        },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -305,6 +364,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.MANUAL,
+          version: '1.0.0'
+        },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -323,6 +387,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.MANUAL,
+          version: '1.0.0'
+        },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -343,6 +412,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.MANUAL,
+          version: '1.0.0'
+        },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -366,6 +440,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.MANUAL,
+          version: '1.0.0'
+        },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -389,6 +468,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.MANUAL,
+          version: '1.0.0'
+        },
         hasData: true,
         isPythonExtensionInstalled: true,
         isStudioConnected: true,
@@ -414,6 +498,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.MANUAL,
+          version: '1.0.0'
+        },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -432,6 +521,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.MANUAL,
+          version: '1.0.0'
+        },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -456,7 +550,12 @@ describe('App', () => {
     it('should show a screen saying that dvc is not setup if the project is initalized but dvc is not installed', () => {
       renderApp({
         canGitInitialize: false,
-        cliCompatible: true,
+        cliCompatible: false,
+        dvcCliDetails: {
+          location: 'dvc',
+          type: DvcCliIndicator.GLOBAL,
+          version: undefined
+        },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -475,6 +574,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.MANUAL,
+          version: '1.0.0'
+        },
         hasData: true,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -495,6 +599,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.MANUAL,
+          version: '1.0.0'
+        },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -513,6 +622,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.MANUAL,
+          version: '1.0.0'
+        },
         hasData: undefined,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -531,6 +645,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.MANUAL,
+          version: '1.0.0'
+        },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -551,6 +670,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.AUTO,
+          version: '1.0.0'
+        },
         hasData: true,
         isPythonExtensionInstalled: true,
         isStudioConnected: true,
@@ -576,6 +700,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.AUTO,
+          version: '1.0.0'
+        },
         hasData: false,
         isPythonExtensionInstalled: true,
         isStudioConnected: false,
@@ -596,6 +725,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.AUTO,
+          version: '1.0.0'
+        },
         hasData: false,
         isPythonExtensionInstalled: true,
         isStudioConnected: false,
@@ -620,6 +754,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.AUTO,
+          version: '1.0.0'
+        },
         hasData: false,
         isPythonExtensionInstalled: true,
         isStudioConnected: false,
@@ -644,6 +783,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.AUTO,
+          version: '1.0.0'
+        },
         hasData: false,
         isPythonExtensionInstalled: true,
         isStudioConnected: false,
@@ -671,6 +815,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.AUTO,
+          version: '1.0.0'
+        },
         hasData: false,
         isPythonExtensionInstalled: true,
         isStudioConnected: true,
@@ -695,6 +844,11 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.AUTO,
+          version: '1.0.0'
+        },
         hasData: false,
         isPythonExtensionInstalled: true,
         isStudioConnected: true,
@@ -718,6 +872,11 @@ describe('App', () => {
     const testData = {
       canGitInitialize: false,
       cliCompatible: true,
+      dvcCliDetails: {
+        location: 'python',
+        type: DvcCliIndicator.AUTO,
+        version: '1.0.0'
+      },
       hasData: false,
       isPythonExtensionInstalled: true,
       isStudioConnected: true,

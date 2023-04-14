@@ -1,6 +1,20 @@
+export enum DvcCliIndicator {
+  AUTO = 'auto',
+  MANUAL = 'manual',
+  GLOBAL = 'global',
+  UNKNOWN = 'unknown'
+}
+
+export type DvcCliDetails = {
+  location: string
+  type: DvcCliIndicator
+  version: string | undefined
+}
+
 export type SetupData = {
   canGitInitialize: boolean
   cliCompatible: boolean | undefined
+  dvcCliDetails: DvcCliDetails
   hasData: boolean | undefined
   isPythonExtensionInstalled: boolean
   isStudioConnected: boolean

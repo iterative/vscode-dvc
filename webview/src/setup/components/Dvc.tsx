@@ -1,5 +1,5 @@
 import React from 'react'
-import { SectionCollapsed } from 'dvc/src/setup/webview/contract'
+import { DvcCliDetails, SectionCollapsed } from 'dvc/src/setup/webview/contract'
 import { CliIncompatible } from './CliIncompatible'
 import { CliUnavailable } from './CliUnavailable'
 import { ProjectUninitialized } from './ProjectUninitialized'
@@ -20,6 +20,7 @@ import { IconButton } from '../../shared/components/button/IconButton'
 export type DvcProps = {
   canGitInitialize: boolean | undefined
   cliCompatible: boolean | undefined
+  dvcCliDetails: DvcCliDetails | undefined
   isPythonExtensionInstalled: boolean
   needsGitInitialized: boolean | undefined
   projectInitialized: boolean

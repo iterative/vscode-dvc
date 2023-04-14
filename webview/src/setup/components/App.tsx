@@ -1,7 +1,8 @@
 import {
   DEFAULT_SECTION_COLLAPSED,
   SetupSection,
-  SetupData
+  SetupData,
+  DvcCliDetails
 } from 'dvc/src/setup/webview/contract'
 import {
   MessageFromWebviewType,
@@ -17,6 +18,9 @@ import { sendMessage } from '../../shared/vscode'
 
 export const App: React.FC = () => {
   const [cliCompatible, setCliCompatible] = useState<boolean | undefined>(
+    undefined
+  )
+  const [dvcCliDetails, setDvcCliDetails] = useState<DvcCliDetails | undefined>(
     undefined
   )
   const [projectInitialized, setProjectInitialized] = useState<boolean>(false)
@@ -36,7 +40,6 @@ export const App: React.FC = () => {
   const [sectionCollapsed, setSectionCollapsed] = useState(
     DEFAULT_SECTION_COLLAPSED
   )
-
   const [isStudioConnected, setIsStudioConnected] = useState<boolean>(false)
   const [shareLiveToStudio, setShareLiveToStudioValue] =
     useState<boolean>(false)
@@ -47,6 +50,7 @@ export const App: React.FC = () => {
         setCanGitInitialized(data.data.canGitInitialize)
         setCliCompatible(data.data.cliCompatible)
         setHasData(data.data.hasData)
+        setDvcCliDetails(data.data.dvcCliDetails)
         setIsPythonExtensionInstalled(data.data.isPythonExtensionInstalled)
         setNeedsGitInitialized(data.data.needsGitInitialized)
         setNeedsGitCommit(data.data.needsGitCommit)
@@ -93,6 +97,7 @@ export const App: React.FC = () => {
         <Dvc
           canGitInitialize={canGitInitialize}
           cliCompatible={cliCompatible}
+          dvcCliDetails={dvcCliDetails}
           isPythonExtensionInstalled={isPythonExtensionInstalled}
           needsGitInitialized={needsGitInitialized}
           projectInitialized={projectInitialized}

@@ -8,7 +8,12 @@ import {
 } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import isEmpty from 'lodash.isempty'
-import { SetupSection, SetupData as TSetupData } from './webview/contract'
+import {
+  DvcCliDetails,
+  DvcCliIndicator,
+  SetupSection,
+  SetupData as TSetupData
+} from './webview/contract'
 import { collectSectionCollapsed } from './collect'
 import { WebviewMessages } from './webview/messages'
 import { validateTokenInput } from './inputBox'
@@ -84,6 +89,7 @@ export class Setup
 
   private cliAccessible = false
   private cliCompatible: boolean | undefined
+  private cliVersion: string | undefined
 
   private dotFolderWatcher?: Disposer
 
@@ -334,6 +340,33 @@ export class Setup
     return this.sendDataToWebview()
   }
 
+  private async getEnvDetails(): Promise<DvcCliDetails> {
+    const dvcPath = this.config.getCliPath()
+    const pythonBinPath = this.config.getPythonBinPath()
+    let version
+    const cwd = getFirstWorkspaceFolder()
+
+    if (cwd) {
+      version = await this.getCliVersion(cwd)
+    }
+
+    if (dvcPath || !pythonBinPath) {
+      return {
+        location: dvcPath || 'dvc',
+        type: DvcCliIndicator.GLOBAL,
+        version
+      }
+    }
+
+    return {
+      location: pythonBinPath,
+      type: this.config.isPythonExtensionUsed()
+        ? DvcCliIndicator.AUTO
+        : DvcCliIndicator.MANUAL,
+      version
+    }
+  }
+
   private async sendDataToWebview() {
     const projectInitialized = this.hasRoots()
     const hasData = this.getHasData()
@@ -348,9 +381,12 @@ export class Setup
 
     const pythonBinPath = await findPythonBinForInstall()
 
+    const dvcCliDetails = await this.getEnvDetails()
+
     this.webviewMessages.sendWebviewMessage({
       canGitInitialize,
       cliCompatible: this.cliCompatible,
+      dvcCliDetails,
       hasData,
       isPythonExtensionInstalled: isPythonExtensionInstalled(),
       isStudioConnected: this.studioIsConnected,
