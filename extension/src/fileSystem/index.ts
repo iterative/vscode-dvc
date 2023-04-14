@@ -1,4 +1,13 @@
-import { basename, extname, join, parse, relative, resolve, sep } from 'path'
+import {
+  basename,
+  extname,
+  join,
+  parse,
+  relative,
+  resolve,
+  sep,
+  format
+} from 'path'
 import {
   appendFileSync,
   ensureFileSync,
@@ -161,7 +170,7 @@ export const findOrCreateDvcYamlFile = (
 
   const scriptPath = applyRelativePath
     ? relative(cwd, trainingScript)
-    : trainingScript
+    : format(parse(trainingScript))
 
   const pipeline = `
 # Read about DVC pipeline configuration (https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#stages)
