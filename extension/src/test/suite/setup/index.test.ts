@@ -218,6 +218,7 @@ suite('Setup Test Suite', () => {
       setup.setCliCompatible(undefined)
       setup.setAvailable(false)
       await setup.setRoots()
+      stub(setup, 'getCliVersion').resolves(undefined)
 
       messageSpy.restore()
       const mockSendMessage = stub(BaseWebview.prototype, 'show')
@@ -238,6 +239,7 @@ suite('Setup Test Suite', () => {
       expect(mockSendMessage).to.be.calledWithExactly({
         canGitInitialize: true,
         cliCompatible: undefined,
+        dvcCliDetails: { location: 'dvc', type: 'global', version: undefined },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -278,6 +280,11 @@ suite('Setup Test Suite', () => {
       expect(mockSendMessage).to.be.calledWithExactly({
         canGitInitialize: true,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'dvc',
+          type: 'global',
+          version: MIN_CLI_VERSION
+        },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -324,6 +331,11 @@ suite('Setup Test Suite', () => {
       expect(mockSendMessage).to.be.calledWithExactly({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'dvc',
+          type: 'global',
+          version: MIN_CLI_VERSION
+        },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -370,6 +382,11 @@ suite('Setup Test Suite', () => {
       expect(mockSendMessage).to.be.calledWithExactly({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          location: 'dvc',
+          type: 'global',
+          version: MIN_CLI_VERSION
+        },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -568,6 +585,7 @@ suite('Setup Test Suite', () => {
       mockRunSetup.restore()
       stub(config, 'isPythonExtensionUsed').returns(false)
       stub(config, 'getPythonBinPath').resolves(join('python'))
+      stub(setup, 'getEnvDetails').resolves(undefined)
 
       mockVersion.resetBehavior()
       mockVersion
@@ -627,6 +645,7 @@ suite('Setup Test Suite', () => {
       mockExecuteCommand.restore()
       mockRunSetup.restore()
       stub(config, 'isPythonExtensionUsed').returns(true)
+      stub(setup, 'getEnvDetails').resolves(undefined)
 
       mockVersion.resetBehavior()
       mockVersion.rejects(new Error('no CLI here'))

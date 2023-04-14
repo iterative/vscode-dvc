@@ -340,7 +340,7 @@ export class Setup
     return this.sendDataToWebview()
   }
 
-  private async getEnvDetails(): Promise<DvcCliDetails> {
+  public async getEnvDetails(): Promise<DvcCliDetails> {
     const dvcPath = this.config.getCliPath()
     const pythonBinPath = this.config.getPythonBinPath()
     let version
