@@ -40,10 +40,10 @@ export const isValueTree = (
   !!(value && !Array.isArray(value) && typeof value === 'object')
 
 export enum ExperimentStatus {
-  FAILED = 'Failed',
-  QUEUED = 'Queued',
-  RUNNING = 'Running',
-  SUCCESS = 'Success'
+  FAILED = 'failed',
+  QUEUED = 'queued',
+  RUNNING = 'running',
+  SUCCESS = 'success'
 }
 
 export const EXPERIMENT_WORKSPACE_ID = 'workspace' as const
