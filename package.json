@@ -74,7 +74,7 @@
     "fastify": "3.29.5",
     "json5": "2.2.3",
     "loader-utils": "2.0.4",
-    "terser": "5.16.8",
+    "terser": "5.16.9",
     "trim-newlines": "3.0.1",
     "trim": "1.0.1"
   },
