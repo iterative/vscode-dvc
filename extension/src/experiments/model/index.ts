@@ -49,6 +49,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   private workspace = {} as Experiment
   private commits: Experiment[] = []
   private experimentsByCommit: Map<string, Experiment[]> = new Map()
+  private checkpoints = false
   private availableColors: Color[]
   private coloredStatus: ColoredStatus
   private starredExperiments: StarredExperiments
@@ -104,12 +105,18 @@ export class ExperimentsModel extends ModelWithPersistence {
     dvcLiveOnly: boolean,
     commitsOutput: string | undefined
   ) {
-    const { workspace, commits, experimentsByCommit, runningExperiments } =
-      collectExperiments(data, dvcLiveOnly, commitsOutput)
+    const {
+      workspace,
+      commits,
+      experimentsByCommit,
+      runningExperiments,
+      hasCheckpoints
+    } = collectExperiments(data, dvcLiveOnly, commitsOutput)
 
     this.workspace = workspace
     this.commits = commits
     this.experimentsByCommit = experimentsByCommit
+    this.checkpoints = hasCheckpoints
 
     this.setColoredStatus(runningExperiments)
   }
@@ -161,6 +168,10 @@ export class ExperimentsModel extends ModelWithPersistence {
       ({ id: runningId, executor }) =>
         executor === EXPERIMENT_WORKSPACE_ID && runningId === id
     )
+  }
+
+  public hasCheckpoints() {
+    return this.checkpoints
   }
 
   public setRevisionCollected(revisions: string[]) {

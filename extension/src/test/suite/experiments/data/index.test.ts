@@ -8,14 +8,10 @@ import {
   bypassProcessManagerDebounce,
   getArgOfCall,
   getMockNow,
-  getTimeSafeDisposer,
-  stubPrivateMemberMethod
+  getTimeSafeDisposer
 } from '../../util'
 import { dvcDemoPath, getTestWorkspaceFolder } from '../../../util'
-import {
-  ExperimentsData,
-  QUEUED_EXPERIMENT_PATH
-} from '../../../../experiments/data'
+import { ExperimentsData } from '../../../../experiments/data'
 import * as Watcher from '../../../../fileSystem/watcher'
 import {
   AvailableCommands,
@@ -23,10 +19,7 @@ import {
   InternalCommands
 } from '../../../../commands/internal'
 import { buildExperimentsData } from '../util'
-import {
-  ExperimentFlag,
-  DEFAULT_NUM_OF_COMMITS_TO_SHOW
-} from '../../../../cli/dvc/constants'
+import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../../../cli/dvc/constants'
 import { EXPERIMENTS_GIT_LOGS_REFS } from '../../../../experiments/data/constants'
 import { gitPath } from '../../../../cli/git/constants'
 import * as FileSystem from '../../../../fileSystem'
@@ -180,63 +173,6 @@ suite('Experiments Data Test Suite', () => {
       await dataUpdatedEvent
 
       expect(managedUpdateSpy).to.be.called
-    })
-
-    it('should not use exp show to fetch git refs external to the workspace if the path is not from a temp workspace', async () => {
-      const mockNow = getMockNow()
-      const { data, mockExpShow } = buildExperimentsData(disposable)
-
-      await data.isReady()
-      bypassProcessManagerDebounce(mockNow)
-      const mockIsOngoingOrQueued = stubPrivateMemberMethod(
-        data,
-        'processManager',
-        'isOngoingOrQueued'
-      ).returns(false)
-
-      mockExpShow.resetHistory()
-
-      await data.managedUpdate()
-
-      expect(mockIsOngoingOrQueued).to.be.calledWith('fullUpdate')
-      expect(mockExpShow).to.be.calledOnce
-      expect(mockExpShow).to.be.calledWithExactly(
-        dvcDemoPath,
-        ExperimentFlag.NUM_COMMIT,
-        DEFAULT_NUM_OF_COMMITS_TO_SHOW.toString(),
-        ExperimentFlag.NO_FETCH
-      )
-
-      bypassProcessManagerDebounce(mockNow, 2)
-      mockExpShow.resetHistory()
-
-      await data.managedUpdate(EXPERIMENTS_GIT_LOGS_REFS)
-
-      expect(mockExpShow).to.be.calledOnce
-      expect(mockExpShow).to.be.calledWithExactly(
-        dvcDemoPath,
-        ExperimentFlag.NUM_COMMIT,
-        DEFAULT_NUM_OF_COMMITS_TO_SHOW.toString(),
-        ExperimentFlag.NO_FETCH
-      )
-    })
-
-    it('should use exp show to fetch external git refs if the path to a temporary workspace (queued experiment) is provided', async () => {
-      const mockNow = getMockNow()
-      const { data, mockExpShow } = buildExperimentsData(disposable)
-
-      await data.isReady()
-      bypassProcessManagerDebounce(mockNow)
-      mockExpShow.resetHistory()
-
-      await data.managedUpdate(QUEUED_EXPERIMENT_PATH)
-
-      expect(mockExpShow).to.be.calledOnce
-      expect(mockExpShow).to.be.calledWithExactly(
-        dvcDemoPath,
-        ExperimentFlag.NUM_COMMIT,
-        DEFAULT_NUM_OF_COMMITS_TO_SHOW.toString()
-      )
     })
   })
 })

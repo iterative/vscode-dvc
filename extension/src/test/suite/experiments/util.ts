@@ -8,36 +8,14 @@ import { buildMockMemento, dvcDemoPath } from '../../util'
 import {
   buildDependencies,
   buildInternalCommands,
-  buildMockData,
+  buildMockExperimentsData,
   SafeWatcherDisposer
 } from '../util'
-import { ExpShowOutput, experimentHasError } from '../../../cli/dvc/contract'
 import { ExperimentsData } from '../../../experiments/data'
-import { CheckpointsModel } from '../../../experiments/checkpoints/model'
-import { FileSystemData } from '../../../fileSystem/data'
 import * as Watcher from '../../../fileSystem/watcher'
 import { ExperimentsModel } from '../../../experiments/model'
 import { ColumnsModel } from '../../../experiments/columns/model'
 import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../../cli/dvc/constants'
-
-const hasCheckpoints = (data: ExpShowOutput) => {
-  if (!data?.length) {
-    return false
-  }
-
-  const [workspace] = data
-
-  if (experimentHasError(workspace)) {
-    return false
-  }
-
-  return !!workspace.data.meta.has_checkpoints
-}
-
-export const mockHasCheckpoints = (data: ExpShowOutput) =>
-  stub(CheckpointsModel.prototype, 'hasCheckpoints').returns(
-    hasCheckpoints(data)
-  )
 
 export const buildExperiments = (
   disposer: Disposer,
@@ -60,7 +38,7 @@ export const buildExperiments = (
   } = buildDependencies(disposer, experimentShowData)
 
   const mockUpdateExperimentsData = stub()
-  const mockExperimentsData = buildMockData<ExperimentsData>(
+  const mockExperimentsData = buildMockExperimentsData(
     mockUpdateExperimentsData
   )
   const mockCheckOrAddPipeline = stub()
@@ -73,12 +51,9 @@ export const buildExperiments = (
       resourceLocator,
       buildMockMemento(),
       mockCheckOrAddPipeline,
-      mockExperimentsData,
-      buildMockData<FileSystemData>()
+      mockExperimentsData
     )
   )
-
-  mockHasCheckpoints(experimentShowData) // this can get removed too
 
   void experiments.setState(experimentShowData)
 
