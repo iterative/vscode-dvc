@@ -1,5 +1,6 @@
 import React from 'react'
 import { DvcCliDetails, SectionCollapsed } from 'dvc/src/setup/webview/contract'
+import { DvcEnvDetails } from './DvcEnvDetails'
 import { CliIncompatible } from './CliIncompatible'
 import { CliUnavailable } from './CliUnavailable'
 import { ProjectUninitialized } from './ProjectUninitialized'
@@ -32,6 +33,7 @@ export type DvcProps = {
 export const Dvc: React.FC<DvcProps> = ({
   canGitInitialize,
   cliCompatible,
+  dvcCliDetails,
   isPythonExtensionInstalled,
   needsGitInitialized,
   projectInitialized,
@@ -84,6 +86,7 @@ export const Dvc: React.FC<DvcProps> = ({
         }
         text="Show Experiments"
       />
+      {dvcCliDetails && <DvcEnvDetails {...dvcCliDetails} />}
     </EmptyState>
   )
 }
