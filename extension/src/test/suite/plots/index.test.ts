@@ -37,12 +37,12 @@ import { MessageFromWebviewType } from '../../../webview/contract'
 import { reorderObjectList, uniqueValues } from '../../../util/array'
 import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
-import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
 import { SelectedExperimentWithColor } from '../../../experiments/model'
 import { ErrorItem } from '../../../path/selection/tree'
 import { isErrorItem } from '../../../tree'
 import { RegisteredCommands } from '../../../commands/external'
 import { REVISIONS } from '../../fixtures/plotsDiff'
+import * as FileSystem from '../../../fileSystem'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -70,11 +70,11 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
-        EXPERIMENT_WORKSPACE_ID,
-        'exp-e7a67',
-        'test-branch',
-        'exp-83425',
-        'main'
+        REVISIONS[0],
+        REVISIONS[2],
+        REVISIONS[3],
+        REVISIONS[4],
+        REVISIONS[1]
       )
       mockPlotsDiff.resetHistory()
 
@@ -124,8 +124,8 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
-        EXPERIMENT_WORKSPACE_ID,
-        'main'
+        REVISIONS[0],
+        REVISIONS[1]
       )
     })
 
@@ -398,6 +398,7 @@ suite('Plots Test Suite', () => {
 
     it('should handle a plot zoomed message from the webview for an image', async () => {
       const { plots } = await buildPlots(disposable, plotsDiffFixture)
+      stub(FileSystem, 'openImageFileInEditor').resolves(true)
 
       const webview = await plots.showWebview()
 
@@ -575,11 +576,11 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.called
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
-        EXPERIMENT_WORKSPACE_ID,
-        'exp-e7a67',
-        'test-branch',
-        'exp-83425',
-        'main'
+        REVISIONS[0],
+        REVISIONS[2],
+        REVISIONS[3],
+        REVISIONS[4],
+        REVISIONS[1]
       )
       expect(
         instanceMessageSpy,
@@ -642,7 +643,7 @@ suite('Plots Test Suite', () => {
         }
       }
 
-      const brokenExp = 'exp-e7a67'
+      const brokenExp = REVISIONS[2]
 
       const reFetchedOutput = {
         data: {
@@ -699,8 +700,8 @@ suite('Plots Test Suite', () => {
         await buildPlots(disposable, multiSourcePlotsDiffFixture)
 
       stub(experiments, 'getSelectedRevisions').returns([
-        { id: EXPERIMENT_WORKSPACE_ID },
-        { id: 'main' }
+        { id: REVISIONS[0] },
+        { id: REVISIONS[1] }
       ] as SelectedExperimentWithColor[])
 
       const webview = await plots.showWebview()
@@ -736,20 +737,25 @@ suite('Plots Test Suite', () => {
       ).to.deep.equal(['dvc.yaml::Confusion-Matrix'])
 
       const expectedRevisions = [
-        `main::${join('evaluation', 'test', 'plots', 'confusion_matrix.json')}`,
-        `workspace::${join(
+        `${REVISIONS[1]}::${join(
           'evaluation',
           'test',
           'plots',
           'confusion_matrix.json'
         )}`,
-        `main::${join(
+        `${REVISIONS[0]}::${join(
+          'evaluation',
+          'test',
+          'plots',
+          'confusion_matrix.json'
+        )}`,
+        `${REVISIONS[1]}::${join(
           'evaluation',
           'train',
           'plots',
           'confusion_matrix.json'
         )}`,
-        `workspace::${join(
+        `${REVISIONS[0]}::${join(
           'evaluation',
           'train',
           'plots',
@@ -872,7 +878,7 @@ suite('Plots Test Suite', () => {
       ])
 
       expect(
-        errorsModel.getErrorPaths(plotsModel.getSelectedRevisions(), []),
+        errorsModel.getErrorPaths(plotsModel.getSelectedRevisionIds(), []),
         'should return the correct path to give the item a DecorationError'
       ).to.deep.equal(new Set([errorItems[0].path]))
 
@@ -889,7 +895,7 @@ suite('Plots Test Suite', () => {
       ).to.deep.equal([])
 
       expect(
-        errorsModel.getErrorPaths(plotsModel.getSelectedRevisions(), []),
+        errorsModel.getErrorPaths(plotsModel.getSelectedRevisionIds(), []),
         'should no long provide decorations to the plots paths tree'
       ).to.deep.equal(new Set([]))
     })

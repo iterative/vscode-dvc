@@ -334,13 +334,13 @@ suite('Experiments Tree Test Suite', () => {
 
       await experiments.isReady()
 
-      const mockExperiment = 'exp-e7a67'
+      const mockExperimentId = 'exp-e7a67'
 
       const mockExperimentApply = stub(
         DvcExecutor.prototype,
         'experimentApply'
       ).resolves(
-        `Changes for experiment '${mockExperiment}' have been applied to your current workspace.`
+        `Changes for experiment '${mockExperimentId}' have been applied to your current workspace.`
       )
       stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
@@ -348,13 +348,13 @@ suite('Experiments Tree Test Suite', () => {
         RegisteredCliCommands.EXPERIMENT_VIEW_APPLY,
         {
           dvcRoot: dvcDemoPath,
-          id: mockExperiment
+          id: mockExperimentId
         }
       )
 
       expect(mockExperimentApply).to.be.calledWithExactly(
         dvcDemoPath,
-        mockExperiment
+        mockExperimentId
       )
     })
 
@@ -385,14 +385,14 @@ suite('Experiments Tree Test Suite', () => {
       const { experiments } = buildExperiments(disposable)
       await experiments.isReady()
 
-      const mockExperiment = 'exp-e7a67'
+      const mockExperimentId = 'exp-e7a67'
       const mockBranch = 'it-is-a-branch'
 
       const mockExperimentBranch = stub(
         DvcExecutor.prototype,
         'experimentBranch'
       ).resolves(
-        `Git branch '${mockBranch}' has been created from experiment '${mockExperiment}'.        
+        `Git branch '${mockBranch}' has been created from experiment '${mockExperimentId}'.        
        To switch to the new branch run:
              git checkout ${mockBranch}`
       )
@@ -403,14 +403,14 @@ suite('Experiments Tree Test Suite', () => {
         RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
         {
           dvcRoot: dvcDemoPath,
-          id: mockExperiment
+          id: mockExperimentId
         }
       )
 
       expect(mockShowInputBox).to.be.calledOnce
       expect(mockExperimentBranch).to.be.calledWithExactly(
         dvcDemoPath,
-        mockExperiment,
+        mockExperimentId,
         mockBranch
       )
     })

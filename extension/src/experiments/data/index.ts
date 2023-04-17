@@ -43,8 +43,8 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
 
     this.experiments = experiments
 
-    void this.watchExpGitRefs() // drop all refs that aren't HEAD
-    void this.managedUpdate(QUEUED_EXPERIMENT_PATH) // can also drop full vs partial updates (https://github.com/iterative/dvc/pull/9170#issuecomment-1467937058)
+    void this.watchExpGitRefs()
+    void this.managedUpdate(QUEUED_EXPERIMENT_PATH)
   }
 
   public managedUpdate(path?: string) {

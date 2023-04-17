@@ -449,14 +449,6 @@ export class Experiments extends BaseRepository<TableData> {
     this.experiments.setRevisionCollected(revisions)
   }
 
-  public getCommitRevisions() {
-    return this.experiments.getCommitRevisions()
-  }
-
-  public getExperimentRevisions() {
-    return this.experiments.getExperimentRevisions()
-  }
-
   public getFinishedExperiments() {
     return this.experiments.getFinishedExperiments()
   }
@@ -465,8 +457,8 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getExperiments()
   }
 
-  public getRevisions() {
-    return this.experiments.getRevisions()
+  public getRevisionIds() {
+    return this.experiments.getRevisionIds()
   }
 
   public async modifyExperimentParamsAndRun(

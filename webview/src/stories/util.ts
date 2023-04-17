@@ -74,7 +74,7 @@ export const DISABLE_CHROMATIC_SNAPSHOTS = {
 export const addCommitDataToMainBranch = (rows: Commit[]) =>
   rows.map(row => {
     if (row.id === 'main' || row.id === 'master') {
-      row.displayName = 'Upgrading dependencies ...'
+      row.description = 'Upgrading dependencies ...'
       row.commit = {
         author: 'John Smith',
         message: 'Upgrading dependencies\n* upgrade dvc \n* upgrade dvclive',

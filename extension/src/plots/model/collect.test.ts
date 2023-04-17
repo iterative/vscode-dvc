@@ -22,6 +22,7 @@ import {
   TemplatePlot
 } from '../webview/contract'
 import { exists } from '../../fileSystem'
+import { REVISIONS } from '../../test/fixtures/plotsDiff'
 
 const mockedExists = jest.mocked(exists)
 
@@ -60,15 +61,7 @@ describe('collectData', () => {
 
     expect(isEmpty(values)).toBeFalsy()
 
-    const revisions = [
-      EXPERIMENT_WORKSPACE_ID,
-      'main',
-      'test-branch',
-      'exp-83425',
-      'exp-e7a67'
-    ]
-
-    for (const revision of revisions) {
+    for (const revision of REVISIONS) {
       const expectedValues = values[revision]?.map(value => ({
         ...value,
         rev: revision
@@ -76,7 +69,9 @@ describe('collectData', () => {
       expect(revisionData[revision][logsLossPath]).toStrictEqual(expectedValues)
     }
 
-    expect(Object.keys(revisionData)).toStrictEqual(revisions)
+    expect(Object.keys(revisionData).sort()).toStrictEqual(
+      [...REVISIONS].sort()
+    )
 
     expect(Object.keys(revisionData.main)).toStrictEqual([
       logsLossPath,

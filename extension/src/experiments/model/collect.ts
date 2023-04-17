@@ -5,9 +5,8 @@ import {
   Uri
 } from 'vscode'
 import { ExperimentType } from '.'
-import { ExperimentsAccumulator } from './accumulator'
 import { extractColumns } from '../columns/extract'
-import { Experiment, CommitData } from '../webview/contract'
+import { Experiment, CommitData, RunningExperiment } from '../webview/contract'
 import {
   EXPERIMENT_WORKSPACE_ID,
   ExperimentStatus,
@@ -39,6 +38,13 @@ export type ExperimentItem = {
   type: ExperimentType
   iconPath: ThemeIcon | Uri | Resource
   tooltip: MarkdownString | undefined
+}
+
+type ExperimentsAccumulator = {
+  commits: Experiment[]
+  experimentsByCommit: Map<string, Experiment[]>
+  runningExperiments: RunningExperiment[]
+  workspace: Experiment
 }
 
 const transformColumns = (
@@ -154,7 +160,7 @@ const addCommitData = (
   if (!commit) {
     return
   }
-  baseline.displayName = formatCommitMessage(commit.message)
+  baseline.description = formatCommitMessage(commit.message)
   baseline.commit = commit
 }
 
@@ -246,9 +252,9 @@ const collectExpRange = (
   )
 
   if (name) {
-    const displayName = `[${name}]`
-    experiment.displayName = displayName
-    experiment.logicalGroupName = displayName
+    const description = `[${name}]`
+    experiment.description = description
+    experiment.logicalGroupName = description
   }
 
   collectExecutorInfo(acc, experiment, executor)

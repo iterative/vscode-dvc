@@ -228,16 +228,8 @@ export class ExperimentsModel extends ModelWithPersistence {
     return result
   }
 
-  public getCommitRevisions() {
-    return this.commits.map(({ id, sha }) => ({ id, sha }))
-  }
-
-  public getExperimentRevisions() {
-    return this.getExperiments().map(({ id, label }) => ({ id, label }))
-  }
-
-  public getRevisions() {
-    return this.getCombinedList().map(({ label }) => label)
+  public getRevisionIds() {
+    return this.getCombinedList().map(({ id }) => id)
   }
 
   public getSelectedRevisions() {

@@ -16,7 +16,7 @@ import {
 } from '../../../cli/dvc/contract'
 import { standardizePath } from '../../../fileSystem/path'
 import { timestampColumn } from '../constants'
-import { sortCollectedArray } from '../../../util/array'
+import { sortCollectedArray, uniqueValues } from '../../../util/array'
 
 const collectFromExperiment = (
   acc: ColumnAccumulator,
@@ -65,7 +65,7 @@ export const collectColumns = (output: ExpShowOutput): Column[] => {
   return hasNoData ? [] : columns
 }
 
-export const getData = (expState: ExpState): ExpData | undefined => {
+export const getExpData = (expState: ExpState): ExpData | undefined => {
   if (experimentHasError(expState)) {
     return
   }
@@ -80,8 +80,8 @@ export const collectChanges = (output: ExpShowOutput): string[] => {
   }
 
   const [workspaceData, baselineData] = output
-  const workspace = getData(workspaceData)
-  const baseline = getData(baselineData)
+  const workspace = getExpData(workspaceData)
+  const baseline = getExpData(baselineData)
 
   if (!(workspace && baseline)) {
     return changes
@@ -110,13 +110,17 @@ export const collectParamsFiles = (
 export const collectRelativeMetricsFiles = (
   output: ExpShowOutput
 ): string[] => {
+  if (!output?.length) {
+    return []
+  }
+
   const [workspace] = output
   if (experimentHasError(workspace)) {
     return []
   }
-  const files = Object.keys(workspace.data.metrics || {})
+  const files = Object.keys(workspace.data?.metrics || {})
     .filter(Boolean)
     .sort()
 
-  return [...new Set(files)]
+  return uniqueValues(files)
 }

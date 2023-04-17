@@ -58,10 +58,6 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     return this.paramsFiles
   }
 
-  public getRelativeMetricsFiles() {
-    return this.relativeMetricsFiles
-  }
-
   public transformAndSet(data: ExpShowOutput) {
     return Promise.all([
       this.transformAndSetColumns(data),
@@ -71,6 +67,10 @@ export class ColumnsModel extends PathSelectionModel<Column> {
 
   public getChanges() {
     return this.columnsChanges
+  }
+
+  public getRelativeMetricsFiles() {
+    return this.relativeMetricsFiles
   }
 
   public setColumnOrder(columnOrder: string[]) {

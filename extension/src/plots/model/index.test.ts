@@ -12,7 +12,7 @@ import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { customPlotsOrderFixture } from '../../test/fixtures/expShow/base/customPlots'
 import { ErrorsModel } from '../errors/model'
 
-const mockedRevisions = [
+const mockedSelectedRevisions = [
   {
     displayColor: 'white',
     id: EXPERIMENT_WORKSPACE_ID,
@@ -139,7 +139,7 @@ describe('plotsModel', () => {
   })
 
   it('should reorder comparison revisions after receiving a message to reorder', () => {
-    mockedGetSelectedRevisions.mockReturnValue(mockedRevisions)
+    mockedGetSelectedRevisions.mockReturnValue(mockedSelectedRevisions)
 
     const mementoUpdateSpy = jest.spyOn(memento, 'update')
     const newOrder = [
@@ -163,7 +163,7 @@ describe('plotsModel', () => {
   })
 
   it('should always send new revisions to the end of the list', () => {
-    mockedGetSelectedRevisions.mockReturnValue(mockedRevisions)
+    mockedGetSelectedRevisions.mockReturnValue(mockedSelectedRevisions)
 
     const newOrder = ['71f31cf', 'e93c7e6']
 
@@ -173,14 +173,14 @@ describe('plotsModel', () => {
       model.getComparisonRevisions().map(({ revision }) => revision)
     ).toStrictEqual([
       ...newOrder,
-      ...mockedRevisions
+      ...mockedSelectedRevisions
         .map(({ id }) => id)
         .filter(revision => !newOrder.includes(revision))
     ])
   })
 
   it('should send previously selected revisions to the end of the list', () => {
-    const allRevisions = mockedRevisions.slice(0, 3)
+    const allRevisions = mockedSelectedRevisions.slice(0, 3)
     const revisionDropped = allRevisions.filter(({ id }) => id !== 'main')
     const revisionReAdded = allRevisions
 

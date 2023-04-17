@@ -16,7 +16,7 @@ import {
   QuickPickOptionsWithTitle
 } from '../../../../vscode/quickPick'
 import { PlotPath } from '../../../../plots/paths/collect'
-import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
+import { REVISIONS } from '../../../fixtures/plotsDiff'
 
 suite('Plots Paths Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -149,11 +149,11 @@ suite('Plots Paths Tree Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
-        EXPERIMENT_WORKSPACE_ID,
-        'exp-e7a67',
-        'test-branch',
-        'exp-83425',
-        'main'
+        REVISIONS[0],
+        REVISIONS[2],
+        REVISIONS[3],
+        REVISIONS[4],
+        REVISIONS[1]
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })

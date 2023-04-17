@@ -50,7 +50,7 @@ export const FirstCell: React.FC<
     }
   } = cell
   const {
-    original: { error, status, label, id, displayName = '' }
+    original: { error, status, label, id, description = '' }
   } = row
   const { toggleExperiment } = rowActionsProps
 
@@ -68,7 +68,7 @@ export const FirstCell: React.FC<
               })}
               {...clickAndEnterProps(
                 toggleExperiment,
-                [label, displayName],
+                [label, description],
                 true
               )}
               data-testid={`id___${id}`}

@@ -663,7 +663,7 @@ suite('Experiments Test Suite', () => {
       const { experiments } = buildExperiments(disposable)
       await experiments.isReady()
 
-      const mockExperiment = 'exp-e7a67'
+      const mockExperimentId = 'exp-e7a67'
       const mockBranch = 'it-is-a-branch-shared-to-the-remote'
       const inputEvent = getInputBoxEvent(mockBranch)
 
@@ -671,7 +671,7 @@ suite('Experiments Test Suite', () => {
         DvcExecutor.prototype,
         'experimentBranch'
       ).resolves(
-        `Git branch '${mockBranch}' has been created from experiment '${mockExperiment}'.        
+        `Git branch '${mockBranch}' has been created from experiment '${mockExperimentId}'.        
        To switch to the new branch run:
              git checkout ${mockBranch}`
       )
@@ -679,7 +679,7 @@ suite('Experiments Test Suite', () => {
         DvcExecutor.prototype,
         'experimentApply'
       ).resolves(
-        `Changes for experiment '${mockExperiment}' have been applied to your current workspace.`
+        `Changes for experiment '${mockExperimentId}' have been applied to your current workspace.`
       )
       const mockPush = stub(DvcExecutor.prototype, 'push').resolves(
         '10 files updated.'
@@ -698,7 +698,7 @@ suite('Experiments Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
-        payload: mockExperiment,
+        payload: mockExperimentId,
         type: MessageFromWebviewType.SHARE_EXPERIMENT_AS_BRANCH
       })
 
@@ -706,12 +706,12 @@ suite('Experiments Test Suite', () => {
       await branchPushedToRemote
       expect(mockExperimentBranch).to.be.calledWithExactly(
         dvcDemoPath,
-        mockExperiment,
+        mockExperimentId,
         mockBranch
       )
       expect(mockExperimentApply).to.be.calledWithExactly(
         dvcDemoPath,
-        mockExperiment
+        mockExperimentId
       )
       expect(mockPush).to.be.calledWithExactly(dvcDemoPath)
       expect(mockGitPush).to.be.calledWithExactly(dvcDemoPath, mockBranch)
@@ -721,7 +721,7 @@ suite('Experiments Test Suite', () => {
       const { experiments } = buildExperiments(disposable)
       await experiments.isReady()
 
-      const mockExperiment = 'exp-e7a67'
+      const mockExperimentId = 'exp-e7a67'
       const mockCommitMessage =
         'this is the very best version that I could come up with'
       const inputEvent = getInputBoxEvent(mockCommitMessage)
@@ -730,7 +730,7 @@ suite('Experiments Test Suite', () => {
         DvcExecutor.prototype,
         'experimentApply'
       ).resolves(
-        `Changes for experiment '${mockExperiment}' have been applied to your current workspace.`
+        `Changes for experiment '${mockExperimentId}' have been applied to your current workspace.`
       )
       const mockStageAndCommit = stub(
         GitExecutor.prototype,
@@ -754,7 +754,7 @@ suite('Experiments Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
-        payload: mockExperiment,
+        payload: mockExperimentId,
         type: MessageFromWebviewType.SHARE_EXPERIMENT_AS_COMMIT
       })
 
@@ -766,7 +766,7 @@ suite('Experiments Test Suite', () => {
       )
       expect(mockExperimentApply).to.be.calledWithExactly(
         dvcDemoPath,
-        mockExperiment
+        mockExperimentId
       )
       expect(mockPush).to.be.calledWithExactly(dvcDemoPath)
       expect(mockGitPush).to.be.calledWithExactly(dvcDemoPath)
@@ -1482,7 +1482,7 @@ suite('Experiments Test Suite', () => {
             subRows: [
               {
                 displayColor: undefined,
-                displayName: '[exp-1]',
+                description: '[exp-1]',
                 id: 'exp-1',
                 label: '111111',
                 logicalGroupName: '[exp-1]',
@@ -1492,7 +1492,7 @@ suite('Experiments Test Suite', () => {
               },
               {
                 displayColor: undefined,
-                displayName: '[exp-2]',
+                description: '[exp-2]',
                 id: 'exp-2',
                 label: '222222',
                 logicalGroupName: '[exp-2]',
@@ -1502,7 +1502,7 @@ suite('Experiments Test Suite', () => {
               },
               {
                 displayColor: undefined,
-                displayName: '[exp-3]',
+                description: '[exp-3]',
                 id: 'exp-3',
                 label: '333333',
                 logicalGroupName: '[exp-3]',
@@ -1561,7 +1561,7 @@ suite('Experiments Test Suite', () => {
             subRows: [
               {
                 displayColor: undefined,
-                displayName: '[exp-2]',
+                description: '[exp-2]',
                 id: 'exp-2',
                 label: '222222',
                 logicalGroupName: '[exp-2]',
@@ -1571,7 +1571,7 @@ suite('Experiments Test Suite', () => {
               },
               {
                 displayColor: undefined,
-                displayName: '[exp-1]',
+                description: '[exp-1]',
                 id: 'exp-1',
                 label: '111111',
                 logicalGroupName: '[exp-1]',
@@ -1581,7 +1581,7 @@ suite('Experiments Test Suite', () => {
               },
               {
                 displayColor: undefined,
-                displayName: '[exp-3]',
+                description: '[exp-3]',
                 id: 'exp-3',
                 label: '333333',
                 logicalGroupName: '[exp-3]',

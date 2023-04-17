@@ -50,7 +50,7 @@ const extractMetricsOrParams = (
 }
 
 const extractDeps = (
-  columns?: Deps | null,
+  columns: Deps | null,
   commit?: Experiment
 ): DepColumns | undefined => {
   if (!columns) {

@@ -783,8 +783,8 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.removeExperiments', () => {
     it('should ask the user to pick experiment(s) and then remove selected ones from the workspace', async () => {
-      const mockExperiment = 'exp-e7a67'
-      const secondMockExperiment = 'exp-83425'
+      const mockExperimentId = 'exp-e7a67'
+      const secondMockExperimentId = 'exp-83425'
       type QuickPickReturnValue = QuickPickItemWithValue<string>[]
 
       const { experiments } = buildExperiments(disposable)
@@ -802,16 +802,16 @@ suite('Workspace Experiments Test Suite', () => {
         .onFirstCall()
         .resolves([
           {
-            value: mockExperiment
+            value: mockExperimentId
           }
         ] as QuickPickReturnValue)
         .onSecondCall()
         .resolves([
           {
-            value: mockExperiment
+            value: mockExperimentId
           },
           {
-            value: secondMockExperiment
+            value: secondMockExperimentId
           }
         ] as QuickPickReturnValue)
       const mockExperimentRemove = stub(
@@ -884,14 +884,17 @@ suite('Workspace Experiments Test Suite', () => {
           title: 'Select Experiments to Remove'
         }
       )
-      expect(mockExperimentRemove).to.be.calledWith(dvcDemoPath, mockExperiment)
+      expect(mockExperimentRemove).to.be.calledWith(
+        dvcDemoPath,
+        mockExperimentId
+      )
 
       await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_REMOVE)
 
       expect(mockExperimentRemove).to.be.calledWith(
         dvcDemoPath,
-        mockExperiment,
-        secondMockExperiment
+        mockExperimentId,
+        secondMockExperimentId
       )
     })
   })

@@ -69,7 +69,7 @@ suite('Plots Data Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledWithExactly(dvcDemoPath)
     })
 
-    it('should collect files and watch them for updates', async () => {
+    it('should watch metrics files for updates', async () => {
       const mockNow = getMockNow()
       const parentDirectory = 'training'
       const metricsFile = join(parentDirectory, 'metrics.json')

@@ -10,7 +10,8 @@ import uncommittedDepsFixture from '../../../test/fixtures/expShow/uncommittedDe
 import {
   ValueTree,
   ExpShowOutput,
-  experimentHasError
+  experimentHasError,
+  EXPERIMENT_WORKSPACE_ID
 } from '../../../cli/dvc/contract'
 import { getConfigValue } from '../../../vscode/config'
 import { generateTestExpShowOutput } from '../../../test/util/experiments'
@@ -726,5 +727,22 @@ describe('collectRelativeMetricsFiles', () => {
     expect(collectRelativeMetricsFiles(outputFixture)).toStrictEqual([
       'summary.json'
     ])
+  })
+
+  it('should not fail when given an error', () => {
+    expect(
+      collectRelativeMetricsFiles([
+        {
+          rev: EXPERIMENT_WORKSPACE_ID,
+          error: { msg: 'I broke', type: 'not important' }
+        }
+      ])
+    ).toStrictEqual([])
+  })
+
+  it('should not fail when given empty output', () => {
+    const existingFiles: string[] = []
+
+    expect(collectRelativeMetricsFiles([])).toStrictEqual(existingFiles)
   })
 })

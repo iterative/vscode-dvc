@@ -30,7 +30,7 @@ export type Experiment = {
   Created?: string
   deps?: DepColumns
   displayColor?: string
-  displayName?: string
+  description?: string
   error?: string
   executor?: Executor
   id: string

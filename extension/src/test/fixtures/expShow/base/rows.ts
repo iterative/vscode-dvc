@@ -151,7 +151,7 @@ const data: Commit[] = [
           )
         },
         displayColor: colorsList[1],
-        displayName: '[exp-e7a67]',
+        description: '[exp-e7a67]',
         executor: Executor.DVC_TASK,
         id: 'exp-e7a67',
         label: '4fb124a',
@@ -210,7 +210,7 @@ const data: Commit[] = [
           )
         },
         displayColor: undefined,
-        displayName: '[test-branch]',
+        description: '[test-branch]',
         id: 'test-branch',
         label: '42b8736',
         logicalGroupName: '[test-branch]',
@@ -267,7 +267,7 @@ const data: Commit[] = [
           )
         },
         displayColor: undefined,
-        displayName: '[exp-83425]',
+        description: '[exp-83425]',
         executor: Executor.WORKSPACE,
         id: 'exp-83425',
         label: EXPERIMENT_WORKSPACE_ID,
@@ -336,7 +336,7 @@ const data: Commit[] = [
           )
         },
         displayColor: undefined,
-        displayName: '[exp-f13bca]',
+        description: '[exp-f13bca]',
         id: 'exp-f13bca',
         error:
           "unable to read: 'summary.json', JSON file structure is corrupted",

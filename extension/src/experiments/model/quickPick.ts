@@ -32,9 +32,9 @@ const getItemWithDescription = (
   firstThreeColumnOrder: string[]
 ) => {
   const item = getItem(experiment, firstThreeColumnOrder)
-  if (experiment.displayName) {
+  if (experiment.description) {
     item.description = `${experiment.commit ? '$(git-commit)' : ''}${
-      experiment.displayName
+      experiment.description
     }`
   }
   return item
@@ -104,10 +104,10 @@ const getExperimentItems = (
   firstThreeColumnOrder: string[]
 ): ExperimentItem[] =>
   experiments.map(experiment => {
-    const { label, id, displayName, commit } = experiment
+    const { label, id, description, commit } = experiment
     return {
       description:
-        displayName && `${commit ? '$(git-commit)' : ''}${displayName}`,
+        description && `${commit ? '$(git-commit)' : ''}${description}`,
       detail: getColumnPathsQuickPickDetail(experiment, firstThreeColumnOrder),
       label,
       value: id

@@ -102,10 +102,10 @@ describe('CliReader', () => {
       ])
     })
 
-    it('should return the default output if the cli returns an empty object (no commits)', async () => {
+    it('should return the default output if the cli returns an empty array (no commits)', async () => {
       const cwd = __dirname
       mockedCreateProcess.mockReturnValueOnce(
-        getMockedProcess(JSON.stringify({}))
+        getMockedProcess(JSON.stringify([]))
       )
 
       const cliOutput = await dvcReader.expShow(cwd)

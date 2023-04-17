@@ -173,7 +173,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private notifyChanged() {
-    const selectedRevisions = this.plots.getSelectedRevisions()
+    const selectedRevisions = this.plots.getSelectedRevisionIds()
     this.paths.setSelectedRevisions(selectedRevisions)
     const paths = this.paths.getTerminalNodes().map(({ path }) => path)
     this.decorationProvider.setState(
@@ -235,7 +235,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.dispose.track(
       experiments.onDidChangeExperiments(async () => {
         await Promise.all([
-          this.plots.transformAndSetExperiments(), // should be renamed
+          this.plots.removeStaleData(),
           this.data.setMetricFiles(experiments.getRelativeMetricsFiles())
         ])
 
@@ -251,7 +251,6 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private async initializeData() {
-    await this.plots.transformAndSetExperiments()
     this.triggerDataUpdate()
     await Promise.all([
       this.data.isReady(),
@@ -278,7 +277,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.dispose.track(
       this.data.onDidUpdate(async ({ data, revs }) => {
         await Promise.all([
-          this.plots.transformAndSetPlots(data, revs),
+          this.plots.transformAndSet(data, revs),
           this.paths.transformAndSet(data, revs),
           this.errors.transformAndSet(data, revs)
         ])
