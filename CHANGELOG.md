@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.7] - 2023-04-17
+
+### 🚀 New Features and Enhancements
+
+- Hidden: Add and remove branches to the experiments table [#3670](https://github.com/iterative/vscode-dvc/pull/3670) by [@sroy3](https://github.com/sroy3)
+
+### 🐛 Bug Fixes
+
+- fix(table): DnD behavior for groups [#3683](https://github.com/iterative/vscode-dvc/pull/3683) by [@shcheklein](https://github.com/shcheklein)
+- Do not convert the manually entered path into a relative path [#3686](https://github.com/iterative/vscode-dvc/pull/3686) by [@sroy3](https://github.com/sroy3)
+
 ## [0.7.6] - 2023-04-13
 
 ### 🐛 Bug Fixes
