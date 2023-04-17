@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { Event, EventEmitter } from 'vscode'
+import { EventEmitter } from 'vscode'
 import { collectFiles } from './collect'
 import {
   EXPERIMENTS_GIT_LOGS_REFS,
@@ -19,13 +19,7 @@ import { ExperimentsModel } from '../model'
 export const QUEUED_EXPERIMENT_PATH = join(DOT_DVC, 'tmp', 'exps')
 
 export class ExperimentsData extends BaseData<ExpShowOutput> {
-  public readonly onDidChangeDvcYaml: Event<void>
-
   private readonly experiments: ExperimentsModel
-
-  private readonly dvcYamlChanged: EventEmitter<void> = this.dispose.track(
-    new EventEmitter<void>()
-  )
 
   constructor(
     dvcRoot: string,
@@ -42,8 +36,6 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
     )
 
     this.experiments = experiments
-
-    this.onDidChangeDvcYaml = this.dvcYamlChanged.event
 
     void this.watchExpGitRefs()
     void this.managedUpdate()
@@ -95,10 +87,6 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
       (path: string) => {
         if (path.includes(EXPERIMENTS_GIT_REFS_EXEC)) {
           return
-        }
-
-        if (path.endsWith('dvc.yaml')) {
-          this.dvcYamlChanged.fire()
         }
 
         if (
