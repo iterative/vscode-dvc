@@ -46,6 +46,7 @@ export const tableData: TableData = {
   columns: columns as Column[],
   filteredCount: 0,
   filters: [],
+  hasBranchesToSelect: true,
   hasCheckpoints: false,
   hasColumns: true,
   hasConfig: true,
