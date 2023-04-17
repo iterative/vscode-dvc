@@ -37,7 +37,10 @@ export const reorderColumnIds = (
 export const leafColumnIds = (
   header: Header<Experiment, unknown>
 ): string[] => {
-  return header.column.getLeafColumns().map(col => col.id)
+  return header
+    .getLeafHeaders()
+    .filter(h => h.subHeaders.length === 0)
+    .map(h => h.column.id)
 }
 
 export const EXPERIMENT_COLUMN_ID = 'id'

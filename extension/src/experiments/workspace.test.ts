@@ -19,6 +19,7 @@ import {
   hasDvcYamlFile
 } from '../fileSystem'
 import { Toast } from '../vscode/toast'
+import { pickFile } from '../vscode/resourcePicker'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = jest.mocked(Disposable)
@@ -35,12 +36,14 @@ const mockedListStages = jest.fn()
 const mockedFindOrCreateDvcYamlFile = jest.mocked(findOrCreateDvcYamlFile)
 const mockedGetFileExtension = jest.mocked(getFileExtension)
 const mockedHasDvcYamlFile = jest.mocked(hasDvcYamlFile)
+const mockedPickFile = jest.mocked(pickFile)
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 jest.mock('../vscode/quickPick')
 jest.mock('../vscode/inputBox')
 jest.mock('../fileSystem')
+jest.mock('../vscode/resourcePicker')
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -442,7 +445,8 @@ describe('Experiments', () => {
         mockedDvcRoot,
         trainingScript,
         'train',
-        scriptCommand.PYTHON
+        scriptCommand.PYTHON,
+        false
       )
     })
 
@@ -482,7 +486,8 @@ describe('Experiments', () => {
         mockedDvcRoot,
         'path/to/training_script.py',
         'train',
-        scriptCommand.PYTHON
+        scriptCommand.PYTHON,
+        false
       )
     })
 
@@ -501,7 +506,8 @@ describe('Experiments', () => {
         mockedDvcRoot,
         'path/to/training_script.ipynb',
         'train',
-        scriptCommand.JUPYTER
+        scriptCommand.JUPYTER,
+        false
       )
     })
 
@@ -553,7 +559,53 @@ describe('Experiments', () => {
         mockedDvcRoot,
         'path/to/training_script.js',
         'train',
-        customCommand
+        customCommand,
+        false
+      )
+    })
+
+    it('should not convert the script path to relative if the path was entered manually', async () => {
+      const customCommand = 'node'
+
+      mockedGetValidInput.mockResolvedValueOnce('train')
+      mockedListStages.mockResolvedValueOnce('')
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedQuickPickOneOrInput.mockResolvedValueOnce(
+        'path/to/training_script.js'
+      )
+      mockedGetFileExtension.mockReturnValueOnce('.js')
+      mockedGetInput.mockResolvedValueOnce(customCommand)
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
+
+      expect(mockedFindOrCreateDvcYamlFile).toHaveBeenCalledWith(
+        mockedDvcRoot,
+        'path/to/training_script.js',
+        'train',
+        customCommand,
+        false
+      )
+    })
+
+    it('should convert the script path to relative if the path was not entered manually', async () => {
+      const customCommand = 'node'
+
+      mockedGetValidInput.mockResolvedValueOnce('train')
+      mockedListStages.mockResolvedValueOnce('')
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedQuickPickOneOrInput.mockResolvedValueOnce('select')
+      mockedPickFile.mockResolvedValueOnce('path/to/training_script.js')
+      mockedGetFileExtension.mockReturnValueOnce('.js')
+      mockedGetInput.mockResolvedValueOnce(customCommand)
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
+
+      expect(mockedFindOrCreateDvcYamlFile).toHaveBeenCalledWith(
+        mockedDvcRoot,
+        'path/to/training_script.js',
+        'train',
+        customCommand,
+        true
       )
     })
 
@@ -573,7 +625,8 @@ describe('Experiments', () => {
         mockedDvcRoot,
         'path/to/training_script.js',
         'train',
-        ''
+        '',
+        false
       )
     })
 
