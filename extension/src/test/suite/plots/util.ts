@@ -46,6 +46,7 @@ export const buildPlots = async (
       resourceLocator,
       buildMockMemento(),
       () => Promise.resolve(true),
+      () => Promise.resolve([]),
       buildMockExperimentsData()
     )
   )

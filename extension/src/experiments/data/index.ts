@@ -39,6 +39,7 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
 
     void this.watchExpGitRefs()
     void this.managedUpdate()
+    void this.updateAvailableBranchesToSelect()
   }
 
   public managedUpdate() {
@@ -67,6 +68,14 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
     this.collectedFiles = collectFiles(data, this.collectedFiles)
   }
 
+  private async updateAvailableBranchesToSelect() {
+    const allBranches = await this.internalCommands.executeCommand<string[]>(
+      AvailableCommands.GIT_GET_BRANCHES,
+      this.dvcRoot
+    )
+    this.experiments.setAvailableBranchesToShow(allBranches)
+  }
+
   private async watchExpGitRefs(): Promise<void> {
     const gitRoot = await this.internalCommands.executeCommand(
       AvailableCommands.GIT_GET_REPOSITORY_ROOT,
@@ -92,6 +101,7 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
         if (
           watchedRelPaths.some(watchedRelPath => path.includes(watchedRelPath))
         ) {
+          void this.updateAvailableBranchesToSelect()
           return this.managedUpdate()
         }
       }

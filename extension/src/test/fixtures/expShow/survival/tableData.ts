@@ -9,6 +9,7 @@ const data: TableData = {
   columnWidths: {},
   filteredCount: 0,
   filters: [],
+  hasBranchesToSelect: true,
   hasCheckpoints: true,
   hasColumns: true,
   hasConfig: true,

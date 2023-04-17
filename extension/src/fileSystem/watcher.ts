@@ -20,6 +20,7 @@ export const createFileSystemWatcher = (
       'FileSystemWatcher will not behave as expected under these circumstances.'
     )
   }
+
   const fileSystemWatcher = workspace.createFileSystemWatcher(glob)
   track(fileSystemWatcher)
   track(fileSystemWatcher.onDidCreate(uri => listener(uri.fsPath)))

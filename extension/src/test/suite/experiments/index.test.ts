@@ -294,16 +294,27 @@ suite('Experiments Test Suite', () => {
         dvcExecutor,
         mockCheckOrAddPipeline,
         messageSpy,
-        mockUpdateExperimentsData
-      } = buildExperiments(disposable)
+        mockUpdateExperimentsData,
+        mockSelectBranches
+      } = buildExperiments(disposable, expShowFixture)
       const mockExecuteCommand = stub(
         internalCommands,
         'executeCommand'
-      ).callsFake(commandId =>
-        commandId === AvailableCommands.GIT_GET_COMMIT_MESSAGES
-          ? Promise.resolve('')
-          : Promise.resolve(undefined)
-      )
+      ).callsFake(commandId => {
+        switch (commandId) {
+          case AvailableCommands.GIT_GET_COMMIT_MESSAGES:
+            return Promise.resolve('')
+          case AvailableCommands.GIT_GET_BRANCHES:
+            return Promise.resolve([
+              'main',
+              'other',
+              'one-more',
+              'important-fix'
+            ])
+          default:
+            return Promise.resolve(undefined)
+        }
+      })
       return {
         columnsModel,
         dvcExecutor,
@@ -312,6 +323,7 @@ suite('Experiments Test Suite', () => {
         messageSpy,
         mockCheckOrAddPipeline,
         mockExecuteCommand,
+        mockSelectBranches,
         mockUpdateExperimentsData
       }
     }
@@ -1392,6 +1404,63 @@ suite('Experiments Test Suite', () => {
       expect(mockUpdateExperimentsData).to.be.calledOnce
       expect(experimentsModel.getIsBranchesView()).to.be.false
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a message to select branches', async () => {
+      const {
+        experiments,
+        experimentsModel,
+        messageSpy,
+        mockUpdateExperimentsData,
+        mockSelectBranches
+      } = setupExperimentsAndMockCommands()
+      const mockSetBranchesToShow = stub(experimentsModel, 'setBranchesToShow')
+
+      const waitForBranchesToBeSelected = new Promise(resolve =>
+        mockSetBranchesToShow.callsFake(() => resolve(undefined))
+      )
+
+      const webview = await experiments.showWebview()
+      messageSpy.resetHistory()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SELECT_BRANCHES
+      })
+
+      expect(mockSelectBranches).to.be.calledOnce
+
+      await waitForBranchesToBeSelected
+
+      expect(mockSetBranchesToShow).to.be.calledOnceWith(['main', 'other'])
+
+      expect(mockUpdateExperimentsData).to.be.calledOnce
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should not update the selected branches when the user closes the select branches quick pick', async () => {
+      const {
+        experiments,
+        experimentsModel,
+        messageSpy,
+        mockUpdateExperimentsData,
+        mockSelectBranches
+      } = setupExperimentsAndMockCommands()
+      const mockSetBranchesToShow = stub(experimentsModel, 'setBranchesToShow')
+      mockSelectBranches.resolves(undefined)
+
+      const webview = await experiments.showWebview()
+      messageSpy.resetHistory()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SELECT_BRANCHES
+      })
+
+      expect(mockSelectBranches).to.be.calledOnce
+
+      expect(mockSetBranchesToShow).not.to.be.calledOnceWith(['main', 'other'])
+
+      expect(mockUpdateExperimentsData).not.to.be.calledOnce
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 
   describe('Sorting', () => {
@@ -1414,6 +1483,7 @@ suite('Experiments Test Suite', () => {
           resourceLocator,
           buildMockMemento(),
           () => Promise.resolve(true),
+          () => Promise.resolve([]),
           buildMockExperimentsData()
         )
       )
@@ -1652,6 +1722,7 @@ suite('Experiments Test Suite', () => {
           {} as ResourceLocator,
           mockMemento,
           () => Promise.resolve(true),
+          () => Promise.resolve([]),
           buildMockExperimentsData()
         )
       )
@@ -1807,6 +1878,7 @@ suite('Experiments Test Suite', () => {
           {} as ResourceLocator,
           mockMemento,
           () => Promise.resolve(true),
+          () => Promise.resolve([]),
           buildMockExperimentsData()
         )
       )
