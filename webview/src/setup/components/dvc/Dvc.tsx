@@ -2,8 +2,8 @@ import React from 'react'
 import { DvcCliDetails, SectionCollapsed } from 'dvc/src/setup/webview/contract'
 import { DvcEnvDetails } from './DvcEnvDetails'
 import { CliIncompatible } from './CliIncompatible'
-import { CliUnavailable } from './CliUnavailable'
 import { ProjectUninitialized } from './ProjectUninitialized'
+import { CliUnavailable } from './CliUnavailable'
 import {
   checkCompatibility,
   initializeDvc,
@@ -12,11 +12,10 @@ import {
   selectPythonInterpreter,
   setupWorkspace,
   showExperiments
-} from './messages'
-
-import { EmptyState } from '../../shared/components/emptyState/EmptyState'
-import { Beaker } from '../../shared/components/icons'
-import { IconButton } from '../../shared/components/button/IconButton'
+} from '../messages'
+import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
+import { Beaker } from '../../../shared/components/icons'
+import { IconButton } from '../../../shared/components/button/IconButton'
 
 export type DvcProps = {
   canGitInitialize: boolean | undefined

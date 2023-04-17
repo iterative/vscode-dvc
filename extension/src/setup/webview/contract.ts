@@ -1,8 +1,7 @@
 export enum DvcCliIndicator {
   AUTO = 'auto',
   MANUAL = 'manual',
-  GLOBAL = 'global',
-  UNKNOWN = 'unknown'
+  GLOBAL = 'global'
 }
 
 export type DvcCliDetails = {

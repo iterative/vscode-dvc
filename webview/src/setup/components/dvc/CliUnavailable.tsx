@@ -1,6 +1,6 @@
 import React from 'react'
-import { Button } from '../../shared/components/button/Button'
-import { EmptyState } from '../../shared/components/emptyState/EmptyState'
+import { Button } from '../../../shared/components/button/Button'
+import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 
 const Title: React.FC = () => <h1>DVC is currently unavailable</h1>
 

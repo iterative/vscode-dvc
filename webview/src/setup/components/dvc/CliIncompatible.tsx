@@ -1,7 +1,7 @@
 import React from 'react'
 import { MIN_CLI_VERSION } from 'dvc/src/cli/dvc/contract'
-import { EmptyState } from '../../shared/components/emptyState/EmptyState'
-import { Button } from '../../shared/components/button/Button'
+import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
+import { Button } from '../../../shared/components/button/Button'
 
 type CliIncompatibleProps = { checkCompatibility: () => void }
 

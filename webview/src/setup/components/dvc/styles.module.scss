@@ -1,0 +1,29 @@
+@import '../../../shared/variables.scss';
+
+.envDetails {
+  border: 1px solid $settings-border;
+  padding: 15px;
+  text-align: left;
+  font-size: 0.8125rem;
+  margin-top: 40px;
+  margin: 40px 20px 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 1rem;
+  color: $settings-header-foreground;
+}
+
+.text {
+  margin: 0;
+  margin: 5px 0;
+}
+
+.info {
+  margin: 0;
+
+  > span {
+    font-weight: bold;
+  }
+}

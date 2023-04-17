@@ -9,7 +9,7 @@ import {
   MessageToWebview
 } from 'dvc/src/webview/contract'
 import React, { useCallback, useState } from 'react'
-import { Dvc } from './Dvc'
+import { Dvc } from './dvc/Dvc'
 import { Experiments } from './Experiments'
 import { Studio } from './Studio'
 import { SetupContainer } from './SetupContainer'
