@@ -13,6 +13,7 @@ import { addStudioAccessToken } from './options'
 import { CliResult, CliStarted, typeCheckCommands } from '..'
 import { ContextKey, setContextValue } from '../../vscode/context'
 import { Config } from '../../config'
+import { DEFAULT_REMOTE } from '../git/constants'
 
 export const autoRegisteredCommands = {
   ADD: 'add',
@@ -22,6 +23,7 @@ export const autoRegisteredCommands = {
   EXPERIMENT_APPLY: 'experimentApply',
   EXPERIMENT_BRANCH: 'experimentBranch',
   EXPERIMENT_GARBAGE_COLLECT: 'experimentGarbageCollect',
+  EXPERIMENT_PUSH: 'experimentPush',
   EXPERIMENT_QUEUE: 'experimentRunQueue',
   EXPERIMENT_REMOVE: 'experimentRemove',
   EXPERIMENT_REMOVE_QUEUE: 'experimentRemoveQueue',
@@ -106,6 +108,15 @@ export class DvcExecutor extends DvcCli {
       ExperimentSubCommand.GARBAGE_COLLECT,
       Flag.FORCE,
       ...preserveFlags
+    )
+  }
+
+  public experimentPush(cwd: string, id: string) {
+    return this.executeExperimentProcess(
+      cwd,
+      ExperimentSubCommand.PUSH,
+      DEFAULT_REMOTE,
+      id
     )
   }
 

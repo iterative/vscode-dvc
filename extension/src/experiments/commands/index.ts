@@ -115,10 +115,22 @@ export const getShareExperimentToStudioCommand =
       return commands.executeCommand(RegisteredCommands.SETUP_SHOW)
     }
 
-    return internalCommands.executeCommand(
-      AvailableCommands.EXP_PUSH,
-      studioAccessToken,
-      dvcRoot,
-      id
-    )
+    return Toast.showProgress('Pushing Experiment', async progress => {
+      progress.report({ increment: 0 })
+
+      progress.report({ increment: 25, message: 'Pushing experiment...' })
+
+      await Toast.runCommandAndIncrementProgress(
+        () =>
+          internalCommands.executeCommand(
+            AvailableCommands.EXPERIMENT_PUSH,
+            dvcRoot,
+            id
+          ),
+        progress,
+        75
+      )
+
+      return Toast.delayProgressClosing()
+    })
   }

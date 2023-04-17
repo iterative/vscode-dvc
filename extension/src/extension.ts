@@ -52,7 +52,6 @@ import { stopProcesses } from './process/execution'
 import { Flag } from './cli/dvc/constants'
 import { LanguageClient } from './languageClient'
 import { collectRunningExperimentPids } from './experiments/processExecution/collect'
-import { registerPatchCommand } from './patch'
 import { DvcViewer } from './cli/dvc/viewer'
 import { registerSetupCommands } from './setup/register'
 import { Status } from './status'
@@ -200,7 +199,6 @@ export class Extension extends Disposable {
       )
     )
 
-    registerPatchCommand(this.internalCommands)
     registerExperimentCommands(
       this.experiments,
       this.internalCommands,

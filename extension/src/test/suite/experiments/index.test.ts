@@ -650,7 +650,7 @@ suite('Experiments Test Suite', () => {
         'getStudioAccessToken'
       )
 
-      const tokenAccessed = new Promise(resolve =>
+      const tokenNotFound = new Promise(resolve =>
         mockGetStudioAccessToken.callsFake(() => {
           resolve(undefined)
           return ''
@@ -662,11 +662,38 @@ suite('Experiments Test Suite', () => {
         type: MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO
       })
 
-      await tokenAccessed
+      await tokenNotFound
 
       expect(executeCommandSpy).to.be.calledWithExactly(
         RegisteredCommands.SETUP_SHOW
       )
+
+      mockGetStudioAccessToken.resetBehavior()
+
+      const tokenFound = new Promise(resolve =>
+        mockGetStudioAccessToken.callsFake(() => {
+          resolve(undefined)
+          return 'isat_token'
+        })
+      )
+      const mockExperimentPush = stub(DvcExecutor.prototype, 'experimentPush')
+      const commandExecuted = new Promise(resolve =>
+        mockExperimentPush.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(
+            `Pushed experiment ${mockExpId} to Git remote 'origin'`
+          )
+        })
+      )
+
+      mockMessageReceived.fire({
+        payload: mockExpId,
+        type: MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO
+      })
+
+      await Promise.all([tokenFound, commandExecuted])
+
+      expect(mockExperimentPush).to.be.calledWithExactly(dvcDemoPath, mockExpId)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to share an experiment as a new branch', async () => {

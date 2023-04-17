@@ -306,6 +306,24 @@ describe('CliExecutor', () => {
     })
   })
 
+  describe('experimentPush', () => {
+    it('should call createProcess with the correct parameters to push an existing experiment to the remote', async () => {
+      const cwd = __dirname
+      const stdout = ''
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
+
+      const output = await dvcExecutor.experimentPush(cwd, 'toric-sail')
+      expect(output).toStrictEqual(stdout)
+
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
+        args: ['exp', 'push', 'origin', 'toric-sail'],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
   describe('experimentRemove', () => {
     it('should call createProcess with the correct parameters to remove an existing experiment from the workspace', async () => {
       const cwd = __dirname
