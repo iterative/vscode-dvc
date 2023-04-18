@@ -21,9 +21,11 @@
 }
 
 .info {
+  padding: 0;
   margin: 0;
+  list-style: none;
+}
 
-  > span {
-    font-weight: bold;
-  }
+.bold {
+  font-weight: bold;
 }

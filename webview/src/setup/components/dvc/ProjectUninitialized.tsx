@@ -42,6 +42,7 @@ const GitUninitialized: React.FC<GitUninitializedProps> = ({
       <Header />
       <GitIsPrerequisite />
       <Button onClick={initializeGit} text="Initialize Git" />
+      {children}
     </EmptyState>
   )
 }
