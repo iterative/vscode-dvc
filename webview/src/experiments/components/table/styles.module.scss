@@ -113,18 +113,18 @@ $badge-size: 0.85rem;
   flex-flow: column nowrap;
 }
 
-table {
+.table {
   display: inline-block;
   border-collapse: collapse;
 }
 
-tr {
+.tr {
   position: relative;
   width: fit-content;
 }
 
-td,
-th {
+.td,
+.th {
   white-space: nowrap;
   min-width: 0;
   position: relative;
@@ -146,7 +146,7 @@ th {
   }
 }
 
-table.withExpColumnShadow tr > *:first-child {
+.table.withExpColumnShadow .tr > *:first-child {
   &::after {
     box-shadow: 3px 0px 3px $shadow;
   }
@@ -197,10 +197,6 @@ table.withExpColumnShadow tr > *:first-child {
   @extend %cellContentsBase;
 }
 
-ul {
-  padding-left: 1rem;
-}
-
 // table head styles
 
 .tableIndicators {
@@ -213,7 +209,7 @@ ul {
   text-align: left;
 }
 
-thead {
+.thead {
   background-color: $bg-color;
   transition: 0.25s all;
   box-shadow: none;
@@ -222,7 +218,7 @@ thead {
   z-index: 5;
 }
 
-th {
+.th {
   height: auto;
   background-color: $header-bg-color;
   font-size: 0.7rem;
@@ -417,8 +413,8 @@ th {
   border-bottom: $row-border;
 
   &:hover {
-    td:not(.experimentCell):hover::before,
-    td:hover + td::before {
+    .td:not(.experimentCell):hover::before,
+    .td:hover + .td::before {
       background-color: $border-color;
     }
   }
@@ -433,7 +429,7 @@ th {
   &.withShadow {
     box-shadow: 0 5px 8px -2px $shadow;
 
-    tr {
+    .tr {
       border-bottom: none;
     }
   }
@@ -463,19 +459,9 @@ th {
       pointer-events: none;
     }
 
-    td:not(.experimentCell):hover::before,
-    td:hover + td::before {
+    .td:not(.experimentCell):hover::before,
+    .td:hover + .td::before {
       background-color: $row-border-selected-color;
-    }
-  }
-}
-
-.nestedRow {
-  .experimentCell .innerCell {
-    padding-left: calc($nested-row-padding + $edge-padding);
-
-    .rowActions {
-      left: calc(($cell-padding + $nested-row-padding) * -1);
     }
   }
 }
@@ -483,14 +469,14 @@ th {
 .previousCommitsRow {
   border-bottom: $row-border;
 
-  td {
+  .td {
     font-size: 0.6rem;
     padding-left: 16px;
   }
 }
 
 .rowGroup:last-child {
-  & > tr:last-child {
+  & > .tr:last-child {
     border-color: $row-bg-color;
 
     &.rowSelected {
@@ -499,7 +485,7 @@ th {
   }
 
   .experimentGroup {
-    &:last-child tr:last-child {
+    &:last-child .tr:last-child {
       border-color: $row-bg-color;
 
       &.rowSelected {
@@ -509,7 +495,7 @@ th {
   }
 }
 
-td {
+.td {
   height: auto;
   font-size: 0.8rem;
   line-height: 2rem;
@@ -572,6 +558,10 @@ td {
     display: flex;
     flex-flow: row nowrap;
     justify-content: flex-start;
+
+    .nestedRow & {
+      padding-left: calc($nested-row-padding + $edge-padding);
+    }
   }
 }
 
@@ -584,6 +574,10 @@ td {
 
   &:first-child {
     margin-right: 20px;
+  }
+
+  .nestedRow & {
+    left: calc(($cell-padding + $nested-row-padding) * -1);
   }
 
   .indicatorIcon {

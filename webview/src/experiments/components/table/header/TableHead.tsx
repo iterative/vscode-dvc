@@ -13,6 +13,8 @@ import {
   isExperimentColumn
 } from '../../../util/columns'
 import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
+import styles from '../styles.module.scss'
+
 interface TableHeadProps {
   instance: Table<Experiment>
   root: HTMLElement | null
@@ -117,7 +119,7 @@ export const TableHead = ({
   }
 
   return (
-    <thead ref={wrapper}>
+    <thead className={styles.thead} ref={wrapper}>
       {headerGroups.map(headerGroup => (
         <MergedHeaderGroups
           key={headerGroup.id}
