@@ -781,6 +781,7 @@ suite('Setup Test Suite', () => {
       const mockUpdate = stub()
 
       stub(workspace, 'getConfiguration').returns({
+        get: stub(),
         update: mockUpdate
       } as unknown as WorkspaceConfiguration)
 
