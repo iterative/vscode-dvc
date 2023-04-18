@@ -112,8 +112,6 @@ export class PlotsModel extends ModelWithPersistence {
 
     this.fetchedRevs = new Set(revs)
 
-    this.experiments.setRevisionCollected(revs)
-
     this.deferred.resolve()
   }
 

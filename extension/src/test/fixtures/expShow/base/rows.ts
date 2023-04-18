@@ -41,7 +41,7 @@ const data: Commit[] = [
         'c3961d777cfbd7727f9fde4851896006'
       )
     },
-    displayColor: colorsList[0],
+    displayColor: undefined,
     executor: Executor.WORKSPACE,
     id: EXPERIMENT_WORKSPACE_ID,
     label: EXPERIMENT_WORKSPACE_ID,
@@ -68,7 +68,7 @@ const data: Commit[] = [
       }
     },
     status: ExperimentStatus.RUNNING,
-    selected: true,
+    selected: false,
     starred: false
   },
   {
@@ -150,7 +150,7 @@ const data: Commit[] = [
             'c3961d777cfbd7727f9fde4851896006'
           )
         },
-        displayColor: colorsList[1],
+        displayColor: undefined,
         description: '[exp-e7a67]',
         executor: Executor.DVC_TASK,
         id: 'exp-e7a67',
@@ -179,7 +179,7 @@ const data: Commit[] = [
           }
         },
         status: ExperimentStatus.RUNNING,
-        selected: true,
+        selected: false,
         sha: '4fb124aebddb2adf1545030907687fa9a4c80e70',
         starred: false,
         Created: '2020-12-29T15:31:52'
@@ -266,7 +266,7 @@ const data: Commit[] = [
             'c3961d777cfbd7727f9fde4851896006'
           )
         },
-        displayColor: undefined,
+        displayColor: colorsList[0],
         description: '[exp-83425]',
         executor: Executor.WORKSPACE,
         id: 'exp-83425',
@@ -294,7 +294,7 @@ const data: Commit[] = [
             test: true
           }
         },
-        selected: false,
+        selected: true,
         starred: false,
         status: ExperimentStatus.RUNNING,
         Created: '2020-12-29T15:27:02'

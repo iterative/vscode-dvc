@@ -1,15 +1,8 @@
 import { UNSELECTED } from '.'
-import {
-  collectColoredStatus,
-  collectFinishedRunningExperiments
-} from './collect'
+import { collectColoredStatus } from './collect'
 import { copyOriginalColors } from './colors'
 import { Experiment } from '../../webview/contract'
-import {
-  ExperimentStatus,
-  EXPERIMENT_WORKSPACE_ID,
-  Executor
-} from '../../../cli/dvc/contract'
+import { ExperimentStatus } from '../../../cli/dvc/contract'
 
 describe('collectColoredStatus', () => {
   const buildMockExperiments = (n: number, prefix = 'exp') => {
@@ -31,8 +24,7 @@ describe('collectColoredStatus', () => {
       new Map(),
       {},
       copyOriginalColors(),
-      new Set(),
-      {}
+      new Set()
     )
 
     expect(availableColors).toStrictEqual(colors)
@@ -53,8 +45,7 @@ describe('collectColoredStatus', () => {
       new Map(),
       {},
       copyOriginalColors(),
-      new Set(),
-      {}
+      new Set()
     )
 
     expect(availableColors).toStrictEqual(colors)
@@ -80,8 +71,7 @@ describe('collectColoredStatus', () => {
         exp7: colors[6]
       },
       [],
-      new Set(['exp8']),
-      {}
+      new Set(['exp8'])
     )
 
     expect(availableColors).toStrictEqual([])
@@ -114,8 +104,7 @@ describe('collectColoredStatus', () => {
         exp8: UNSELECTED
       },
       copyOriginalColors().slice(3),
-      new Set(['exp1']),
-      {}
+      new Set(['exp1'])
     )
 
     expect(coloredStatus).toStrictEqual({ exp1: colors[0] })
@@ -137,8 +126,7 @@ describe('collectColoredStatus', () => {
         exp9: colors[1]
       },
       unassignedColors,
-      new Set(),
-      {}
+      new Set()
     )
 
     expect(coloredStatus).toStrictEqual({
@@ -166,8 +154,7 @@ describe('collectColoredStatus', () => {
       new Map(),
       { exp9: colors[0] },
       unassignColors,
-      new Set(),
-      {}
+      new Set()
     )
 
     expect(availableColors).toStrictEqual(unassignColors)
@@ -200,8 +187,7 @@ describe('collectColoredStatus', () => {
         exp9: colors[5]
       },
       copyOriginalColors().slice(6),
-      new Set(['exp1', 'exp2', 'exp3']),
-      {}
+      new Set(['exp1', 'exp2', 'exp3'])
     )
 
     expect(availableColors).toStrictEqual([])
@@ -215,197 +201,6 @@ describe('collectColoredStatus', () => {
       exp7: colors[3],
       exp8: colors[4],
       exp9: colors[5]
-    })
-  })
-
-  it('should remove the unselected status of experiments running in the workspace (for getMostRecentExperiment)', () => {
-    const colors = copyOriginalColors()
-    const { availableColors, coloredStatus } = collectColoredStatus(
-      [
-        {
-          executor: Executor.WORKSPACE,
-          id: 'exp-1',
-          status: ExperimentStatus.RUNNING
-        },
-        {
-          executor: Executor.WORKSPACE,
-          id: 'exp-2',
-          status: ExperimentStatus.RUNNING
-        }
-      ] as Experiment[],
-      new Map(),
-      {
-        'exp-1': UNSELECTED,
-        'exp-2': colors[0]
-      },
-      colors.slice(1),
-      new Set(),
-      {}
-    )
-    expect(coloredStatus['exp-1']).toBeUndefined()
-    expect(coloredStatus['exp-2']).toStrictEqual(colors[0])
-    expect(availableColors).toStrictEqual(colors.slice(1))
-  })
-
-  it("should duplicate the workspace's color when an experiment finishes running in the workspace", () => {
-    const colors = copyOriginalColors()
-    const { availableColors, coloredStatus } = collectColoredStatus(
-      [
-        {
-          executor: null,
-          id: 'exp-1',
-          status: ExperimentStatus.SUCCESS
-        },
-        {
-          id: EXPERIMENT_WORKSPACE_ID
-        }
-      ] as Experiment[],
-      new Map(),
-      {
-        workspace: colors[0]
-      },
-      colors.slice(1),
-      new Set(),
-      { 'exp-1': EXPERIMENT_WORKSPACE_ID }
-    )
-    expect(coloredStatus).toStrictEqual({
-      'exp-1': colors[0],
-      workspace: colors[0]
-    })
-
-    expect(availableColors).toStrictEqual(colors.slice(1))
-  })
-
-  it('should not overwrite an experiments color if it has one and finishes running in the workspace', () => {
-    const colors = copyOriginalColors()
-    const { availableColors, coloredStatus } = collectColoredStatus(
-      [
-        {
-          executor: null,
-          id: 'exp-1',
-          status: ExperimentStatus.SUCCESS
-        },
-        {
-          id: EXPERIMENT_WORKSPACE_ID
-        }
-      ] as Experiment[],
-      new Map(),
-      {
-        'exp-1': colors[2],
-        workspace: colors[0]
-      },
-      colors.slice(1),
-      new Set(),
-      { 'exp-1': EXPERIMENT_WORKSPACE_ID }
-    )
-    expect(coloredStatus).toStrictEqual({
-      'exp-1': colors[2],
-      workspace: colors[0]
-    })
-
-    expect(availableColors).toStrictEqual(colors.slice(1))
-  })
-})
-
-describe('collectFinishedRunningExperiments', () => {
-  it('should return an empty object when an experiment is still running', () => {
-    const finishedRunning = collectFinishedRunningExperiments(
-      {},
-      [{ Created: '2022-12-02T07:48:24', id: 'exp-1234' }] as Experiment[],
-      [{ executor: Executor.WORKSPACE, id: 'exp-1234' }],
-      [{ executor: Executor.WORKSPACE, id: 'exp-1234' }],
-      {}
-    )
-    expect(finishedRunning).toStrictEqual({})
-  })
-
-  it('should return the most recently created and unseen (without a status) experiment if there is no longer an experiment running in the workspace', () => {
-    const latestCreatedId = 'exp-123'
-    const finishedRunning = collectFinishedRunningExperiments(
-      {},
-      [
-        { Created: '2022-12-02T10:48:24', id: 'exp-456' },
-        { Created: '2022-10-02T07:48:24', id: 'exp-789' },
-        { Created: '2022-12-02T07:48:25', id: latestCreatedId },
-        { Created: null, id: 'exp-null' }
-      ] as Experiment[],
-      [{ executor: Executor.WORKSPACE, id: EXPERIMENT_WORKSPACE_ID }],
-      [],
-      { 'exp-456': UNSELECTED }
-    )
-    expect(finishedRunning).toStrictEqual({
-      [latestCreatedId]: EXPERIMENT_WORKSPACE_ID
-    })
-  })
-
-  it('should return the most recently created experiment if there is no longer a checkpoint experiment running in the workspace', () => {
-    const latestCreatedId = 'exp-123'
-    const finishedRunning = collectFinishedRunningExperiments(
-      {},
-      [
-        { Created: '2022-12-02T07:48:24', id: 'exp-456' },
-        { Created: '2022-10-02T07:48:24', id: 'exp-789' },
-        { Created: '2022-12-02T07:48:25', id: latestCreatedId },
-        { Created: null, id: 'exp-null' }
-      ] as Experiment[],
-      [{ executor: Executor.WORKSPACE, id: latestCreatedId }],
-      [],
-      {}
-    )
-    expect(finishedRunning).toStrictEqual({
-      [latestCreatedId]: EXPERIMENT_WORKSPACE_ID
-    })
-  })
-
-  it('should not return an experiment if all of the experiments can be found in the status object', () => {
-    const previouslyCreatedId = 'exp-123'
-    const finishedRunning = collectFinishedRunningExperiments(
-      {},
-      [
-        { Created: '2022-12-02T07:48:25', id: previouslyCreatedId }
-      ] as Experiment[],
-      [{ executor: Executor.WORKSPACE, id: previouslyCreatedId }],
-      [],
-      { [previouslyCreatedId]: UNSELECTED }
-    )
-    expect(finishedRunning).toStrictEqual({})
-  })
-
-  it('should return the most recently created experiment if there is no longer an experiment running in the queue', () => {
-    const latestCreatedId = 'exp-123'
-    const finishedRunning = collectFinishedRunningExperiments(
-      {},
-      [
-        { Created: '2022-12-02T07:48:24', id: 'exp-456' },
-        { Created: '2022-10-02T07:48:24', id: 'exp-789' },
-        { Created: '2022-12-02T07:48:25', id: latestCreatedId },
-        { Created: null, id: 'exp-null' }
-      ] as Experiment[],
-      [{ executor: Executor.DVC_TASK, id: latestCreatedId }],
-      [],
-      {}
-    )
-    expect(finishedRunning).toStrictEqual({
-      [latestCreatedId]: latestCreatedId
-    })
-  })
-
-  it('should remove the id that was run in the workspace if a new one is found', () => {
-    const latestCreatedId = 'exp-123'
-    const finishedRunning = collectFinishedRunningExperiments(
-      { 'exp-previous': EXPERIMENT_WORKSPACE_ID },
-      [
-        { Created: '2022-12-02T07:48:24', id: 'exp-456' },
-        { Created: '2022-10-02T07:48:24', id: 'exp-789' },
-        { Created: '2022-12-02T07:48:25', id: latestCreatedId },
-        { Created: null, id: 'exp-null' }
-      ] as Experiment[],
-      [{ executor: Executor.WORKSPACE, id: latestCreatedId }],
-      [],
-      {}
-    )
-    expect(finishedRunning).toStrictEqual({
-      [latestCreatedId]: EXPERIMENT_WORKSPACE_ID
     })
   })
 })

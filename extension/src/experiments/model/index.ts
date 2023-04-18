@@ -4,7 +4,6 @@ import { FilterDefinition, filterExperiment, getFilterId } from './filterBy'
 import { collectExperiments } from './collect'
 import {
   collectColoredStatus,
-  collectFinishedRunningExperiments,
   collectSelected,
   collectStartedRunningExperiments
 } from './status/collect'
@@ -24,7 +23,7 @@ import {
   RunningExperiment
 } from '../webview/contract'
 import { definedAndNonEmpty, reorderListSubset } from '../../util/array'
-import { EXPERIMENT_WORKSPACE_ID, ExpShowOutput } from '../../cli/dvc/contract'
+import { ExpShowOutput } from '../../cli/dvc/contract'
 import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
 import { PersistenceKey } from '../../persistence/constants'
@@ -62,7 +61,6 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   private currentSorts: SortDefinition[]
   private running: RunningExperiment[] = []
-  private finishedRunning: { [id: string]: string } = {}
   private startedRunning: Set<string> = new Set()
 
   constructor(dvcRoot: string, workspaceState: Memento) {
@@ -136,14 +134,15 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public toggleStatus(id: string) {
+    const experiment = this.getExperimentsAndQueued().find(
+      ({ id: queuedId }) => queuedId === id
+    )
+
     if (
-      isQueued(
-        this.getExperimentsAndQueued().find(
-          ({ id: queuedId }) => queuedId === id
-        )?.status
-      )
+      experiment &&
+      (isQueued(experiment?.status) || isRunningInQueue(experiment))
     ) {
-      return
+      return UNSELECTED
     }
 
     const current = this.coloredStatus[id]
@@ -158,37 +157,12 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.coloredStatus[id]
   }
 
-  public unselectWorkspace() {
-    this.coloredStatus[EXPERIMENT_WORKSPACE_ID] = UNSELECTED
-  }
-
   public hasRunningExperiment() {
     return this.running.length > 0
   }
 
-  public isRunningInWorkspace(id: string) {
-    if (id === EXPERIMENT_WORKSPACE_ID) {
-      return false
-    }
-
-    return this.running.some(
-      ({ id: runningId, executor }) =>
-        executor === EXPERIMENT_WORKSPACE_ID && runningId === id
-    )
-  }
-
   public hasCheckpoints() {
     return this.checkpoints
-  }
-
-  public setRevisionCollected(revisions: string[]) {
-    for (const { id } of this.getExperimentsAndQueued().filter(({ label }) =>
-      revisions.includes(label)
-    )) {
-      if (this.finishedRunning[id]) {
-        delete this.finishedRunning[id]
-      }
-    }
   }
 
   public canSelect() {
@@ -260,7 +234,10 @@ export class ExperimentsModel extends ModelWithPersistence {
     }
 
     const { availableColors, coloredStatus } = collectSelected(
-      selectedExperiments.filter(({ status }) => !isQueued(status)),
+      selectedExperiments.filter(
+        ({ executor, status }) =>
+          !isQueued(status) && !isRunningInQueue({ executor, status })
+      ),
       this.getWorkspaceCommitsAndExperiments(),
       this.coloredStatus,
       this.availableColors
@@ -389,10 +366,6 @@ export class ExperimentsModel extends ModelWithPersistence {
     }))
   }
 
-  public getFinishedExperiments() {
-    return this.finishedRunning
-  }
-
   public setNbfCommitsToShow(numberOfCommitsToShow: number) {
     this.numberOfCommitsToShow = numberOfCommitsToShow
     this.persistNbOfCommitsToShow()
@@ -455,17 +428,14 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   private setColoredStatus(runningExperiments: RunningExperiment[]) {
     this.setRunning(runningExperiments)
-
     const { coloredStatus, availableColors } = collectColoredStatus(
       this.getWorkspaceAndCommits(),
       this.experimentsByCommit,
       this.coloredStatus,
       this.availableColors,
-      this.startedRunning,
-      this.finishedRunning
+      this.startedRunning
     )
     this.startedRunning = new Set()
-
     this.setColors(coloredStatus, availableColors)
 
     this.persistStatus()
@@ -475,14 +445,6 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.startedRunning = collectStartedRunningExperiments(
       this.running,
       stillRunning
-    )
-
-    this.finishedRunning = collectFinishedRunningExperiments(
-      { ...this.finishedRunning },
-      this.getExperimentsAndQueued(),
-      this.running,
-      stillRunning,
-      this.coloredStatus
     )
 
     this.running = stillRunning

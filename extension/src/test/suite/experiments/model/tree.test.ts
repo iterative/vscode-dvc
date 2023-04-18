@@ -38,6 +38,8 @@ import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 import { DvcReader } from '../../../../cli/dvc/reader'
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
 import { Revision } from '../../../../plots/webview/contract'
+import { BaseWebview } from '../../../../webview'
+import { Experiment } from '../../../../experiments/webview/contract'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = getTimeSafeDisposer()
@@ -61,17 +63,22 @@ suite('Experiments Tree Test Suite', () => {
     it('should be able to toggle whether an experiment is shown in the plots webview with dvc.views.experiments.toggleStatus', async () => {
       const mockNow = getMockNow()
 
-      const { plots, messageSpy, plotsModel, experiments } = await buildPlots(
-        disposable
-      )
+      const { plots, messageSpy, plotsModel, experimentsModel } =
+        await buildPlots(disposable)
+      messageSpy.restore()
+      const mockShow = stub(BaseWebview.prototype, 'show')
+
+      experimentsModel.setSelected([
+        { id: EXPERIMENT_WORKSPACE_ID },
+        { id: 'main' },
+        { id: 'test-branch' },
+        { id: 'exp-83425' },
+        { id: 'exp-f13bca' }
+      ] as Experiment[])
 
       const expectedRevisions: { displayColor: string; id: string }[] = []
 
       const [{ id }] = plotsModel.getSelectedRevisionDetails()
-      const mockCheckForFinishedWorkspaceExperiment = stub(
-        experiments,
-        'checkForFinishedWorkspaceExperiment'
-      )
 
       for (const {
         id,
@@ -86,7 +93,7 @@ suite('Experiments Tree Test Suite', () => {
 
       let updateCall = 1
       while (expectedRevisions.length > 0) {
-        const { selectedRevisions } = getFirstArgOfLastCall(messageSpy)
+        const { selectedRevisions } = mockShow.lastCall.firstArg
 
         expect(
           (selectedRevisions as Revision[]).map(({ displayColor, id }) => ({
@@ -95,16 +102,19 @@ suite('Experiments Tree Test Suite', () => {
           })),
           'a message is sent with colors for the currently selected experiments'
         ).to.deep.equal(expectedRevisions)
-        messageSpy.resetHistory()
+        mockShow.resetHistory()
+        mockShow.resetBehavior()
 
         const { id } = expectedRevisions.pop() as { id: string }
 
-        bypassProcessManagerDebounce(mockNow, updateCall)
         const messageSent = new Promise(resolve =>
-          mockCheckForFinishedWorkspaceExperiment.callsFake(() =>
+          mockShow.callsFake(() => {
             resolve(undefined)
-          )
+            return Promise.resolve(true)
+          })
         )
+
+        bypassProcessManagerDebounce(mockNow, updateCall)
         const unSelected = await commands.executeCommand(
           RegisteredCommands.EXPERIMENT_TOGGLE,
           {
@@ -116,16 +126,22 @@ suite('Experiments Tree Test Suite', () => {
 
         expect(unSelected).to.equal(UNSELECTED)
         await messageSent
-        mockCheckForFinishedWorkspaceExperiment.resetBehavior()
       }
 
       expect(
-        messageSpy,
+        mockShow,
         "when there are no experiments selected we don't send any template plots"
       ).to.be.calledWithMatch({
         template: null
       })
-      messageSpy.resetHistory()
+      mockShow.resetHistory()
+
+      const messageSent = new Promise(resolve =>
+        mockShow.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(true)
+        })
+      )
 
       bypassProcessManagerDebounce(mockNow, updateCall)
       const selected = await commands.executeCommand(
@@ -135,6 +151,8 @@ suite('Experiments Tree Test Suite', () => {
           id
         }
       )
+
+      await messageSent
 
       expect(selected, 'the experiment is now selected').to.equal(
         copyOriginalColors()[0]

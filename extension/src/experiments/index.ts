@@ -21,10 +21,6 @@ import {
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
 import { Color } from './model/status/colors'
-import {
-  FetchedExperiment,
-  hasFinishedWorkspaceExperiment
-} from './model/status/collect'
 import { UNSELECTED } from './model/status'
 import { starredSort } from './model/sortBy/constants'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
@@ -36,7 +32,7 @@ import { DecorationProvider } from './model/decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
 import { ResourceLocator } from '../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { EXPERIMENT_WORKSPACE_ID, ExpShowOutput } from '../cli/dvc/contract'
+import { ExpShowOutput } from '../cli/dvc/contract'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Title } from '../vscode/title'
@@ -217,15 +213,6 @@ export class Experiments extends BaseRepository<TableData> {
   public toggleExperimentStatus(
     id: string
   ): Color | typeof UNSELECTED | undefined {
-    if (
-      this.experiments.isRunningInWorkspace(id) &&
-      !this.experiments.isSelected(id)
-    ) {
-      return this.experiments.isSelected(EXPERIMENT_WORKSPACE_ID)
-        ? undefined
-        : this.toggleExperimentStatus(EXPERIMENT_WORKSPACE_ID)
-    }
-
     const selected = this.experiments.isSelected(id)
     if (!selected && !this.experiments.canSelect()) {
       return
@@ -234,17 +221,6 @@ export class Experiments extends BaseRepository<TableData> {
     const status = this.experiments.toggleStatus(id)
     this.notifyChanged()
     return status
-  }
-
-  public checkForFinishedWorkspaceExperiment(
-    fetchedExperiments: FetchedExperiment[]
-  ) {
-    if (!hasFinishedWorkspaceExperiment(fetchedExperiments)) {
-      return
-    }
-
-    this.experiments.unselectWorkspace()
-    this.notifyChanged()
   }
 
   public getSorts() {
@@ -436,14 +412,6 @@ export class Experiments extends BaseRepository<TableData> {
     }
 
     return this.experiments.getSelectedRevisions()
-  }
-
-  public setRevisionCollected(revisions: string[]) {
-    this.experiments.setRevisionCollected(revisions)
-  }
-
-  public getFinishedExperiments() {
-    return this.experiments.getFinishedExperiments()
   }
 
   public getExperiments() {
