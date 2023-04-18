@@ -1,12 +1,16 @@
-import React from 'react'
+import React, { ReactElement } from 'react'
 import { MIN_CLI_VERSION } from 'dvc/src/cli/dvc/contract'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { Button } from '../../../shared/components/button/Button'
 
-type CliIncompatibleProps = { checkCompatibility: () => void }
+type CliIncompatibleProps = {
+  checkCompatibility: () => void
+  children: ReactElement
+}
 
 export const CliIncompatible: React.FC<CliIncompatibleProps> = ({
-  checkCompatibility
+  checkCompatibility,
+  children
 }) => (
   <EmptyState isFullScreen={false}>
     <div>
@@ -15,6 +19,7 @@ export const CliIncompatible: React.FC<CliIncompatibleProps> = ({
       <p>The minimum version is {MIN_CLI_VERSION}.</p>
       <p>Please update your install and try again.</p>
       <Button text="Check Compatibility" onClick={checkCompatibility} />
+      {children}
     </div>
   </EmptyState>
 )

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactElement } from 'react'
 import { Button } from '../../../shared/components/button/Button'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 
@@ -10,6 +10,7 @@ export type CliUnavailableProps = {
   pythonBinPath: string | undefined
   selectPythonInterpreter: () => void
   setupWorkspace: () => void
+  children: ReactElement
 }
 
 const OfferToInstall: React.FC<{
@@ -40,7 +41,8 @@ export const CliUnavailable: React.FC<CliUnavailableProps> = ({
   isPythonExtensionInstalled,
   pythonBinPath,
   selectPythonInterpreter,
-  setupWorkspace
+  setupWorkspace,
+  children
 }) => {
   const SetupWorkspace: React.FC<{ description: string }> = ({
     description
@@ -60,6 +62,7 @@ export const CliUnavailable: React.FC<CliUnavailableProps> = ({
         <Title />
         <p>DVC & DVCLive cannot be auto-installed as Python was not located.</p>
         <SetupWorkspace description="To locate a Python Interpreter or DVC." />
+        {children}
       </EmptyState>
     )
   }
@@ -78,6 +81,7 @@ export const CliUnavailable: React.FC<CliUnavailableProps> = ({
           <SetupWorkspace description="To update the install location or locate DVC." />
         )}
       </OfferToInstall>
+      {children}
     </EmptyState>
   )
 }

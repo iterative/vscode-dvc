@@ -3,8 +3,17 @@ import { DvcCliDetails, DvcCliIndicator } from 'dvc/src/setup/webview/contract'
 import { MAX_CLI_VERSION, MIN_CLI_VERSION } from 'dvc/src/cli/dvc/contract'
 import styles from './styles.module.scss'
 
+// TBD this logic needs some improvement
+// 1. that "and" statement about versioning doesn't make sense with all phrases.
+// maybe just leave it as a separate sentence OR add it as an info block
+// 2. The extension can't find DVC BUT will show currently selected location...
+// rename to "Env Location", "Selected Env Location", "Env"? Or maybe hide
+// entirely when things arent installed...
+// 3. Text just needs better grammar as a whole probably
+// 4. Text should mention if it's set with python extension or manually
+
 const getTextBasedOffType = (type: string, version: string | undefined) => {
-  if (type === DvcCliIndicator.GLOBAL && !version) {
+  if (!version) {
     return "The extension can't find DVC "
   }
 

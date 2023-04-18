@@ -40,8 +40,14 @@ export const Dvc: React.FC<DvcProps> = ({
   setSectionCollapsed,
   isExperimentsAvailable
 }) => {
+  const children = <>{dvcCliDetails && <DvcEnvDetails {...dvcCliDetails} />}</>
+
   if (cliCompatible === false) {
-    return <CliIncompatible checkCompatibility={checkCompatibility} />
+    return (
+      <CliIncompatible checkCompatibility={checkCompatibility}>
+        {children}
+      </CliIncompatible>
+    )
   }
 
   if (cliCompatible === undefined) {
@@ -52,7 +58,9 @@ export const Dvc: React.FC<DvcProps> = ({
         pythonBinPath={pythonBinPath}
         selectPythonInterpreter={selectPythonInterpreter}
         setupWorkspace={setupWorkspace}
-      />
+      >
+        {children}
+      </CliUnavailable>
     )
   }
 
@@ -63,10 +71,11 @@ export const Dvc: React.FC<DvcProps> = ({
         initializeDvc={initializeDvc}
         initializeGit={initializeGit}
         needsGitInitialized={needsGitInitialized}
-      />
+      >
+        {children}
+      </ProjectUninitialized>
     )
   }
-
   return (
     <EmptyState isFullScreen={false}>
       <h1>Setup Complete</h1>
@@ -85,7 +94,7 @@ export const Dvc: React.FC<DvcProps> = ({
         }
         text="Show Experiments"
       />
-      {dvcCliDetails && <DvcEnvDetails {...dvcCliDetails} />}
+      {children}
     </EmptyState>
   )
 }

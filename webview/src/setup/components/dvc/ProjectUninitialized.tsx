@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactElement } from 'react'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { Button } from '../../../shared/components/button/Button'
 
@@ -7,6 +7,7 @@ const Header: React.FC = () => <h1>DVC is not initialized</h1>
 interface GitUninitializedProps {
   canGitInitialize: boolean | undefined
   initializeGit: () => void
+  children: ReactElement
 }
 
 const GitIsPrerequisite: React.FC = () => (
@@ -15,7 +16,8 @@ const GitIsPrerequisite: React.FC = () => (
 
 const GitUninitialized: React.FC<GitUninitializedProps> = ({
   canGitInitialize,
-  initializeGit
+  initializeGit,
+  children
 }) => {
   if (!canGitInitialize) {
     return (
@@ -30,6 +32,7 @@ const GitUninitialized: React.FC<GitUninitializedProps> = ({
           Please open a different folder which contains no Git repositories or a
           single existing Git repository at the root.
         </p>
+        {children}
       </EmptyState>
     )
   }
@@ -43,9 +46,10 @@ const GitUninitialized: React.FC<GitUninitializedProps> = ({
   )
 }
 
-const DvcUninitialized: React.FC<{ initializeDvc: () => void }> = ({
-  initializeDvc
-}) => (
+const DvcUninitialized: React.FC<{
+  initializeDvc: () => void
+  children: ReactElement
+}> = ({ initializeDvc, children }) => (
   <EmptyState isFullScreen={false}>
     <Header />
     <p>
@@ -54,6 +58,7 @@ const DvcUninitialized: React.FC<{ initializeDvc: () => void }> = ({
       to use DVC please read <a href="https://dvc.org/doc">our docs</a>.
     </p>
     <Button onClick={initializeDvc} text="Initialize Project"></Button>
+    {children}
   </EmptyState>
 )
 
@@ -62,22 +67,30 @@ export interface ProjectUninitializedProps {
   initializeDvc: () => void
   initializeGit: () => void
   needsGitInitialized: boolean | undefined
+  children: ReactElement
 }
 
 export const ProjectUninitialized: React.FC<ProjectUninitializedProps> = ({
   initializeDvc,
   needsGitInitialized,
   canGitInitialize,
-  initializeGit
+  initializeGit,
+  children
 }) => {
   if (needsGitInitialized) {
     return (
       <GitUninitialized
         initializeGit={initializeGit}
         canGitInitialize={canGitInitialize}
-      />
+      >
+        {children}
+      </GitUninitialized>
     )
   }
 
-  return <DvcUninitialized initializeDvc={initializeDvc} />
+  return (
+    <DvcUninitialized initializeDvc={initializeDvc}>
+      {children}
+    </DvcUninitialized>
+  )
 }
