@@ -100,9 +100,7 @@ export const buildSetup = (
         getHasData: () => hasData,
         showWebview: mockOpenExperiments
       } as unknown as WorkspaceExperiments,
-      {
-        setAvailability: stub()
-      } as unknown as Status,
+      { setAvailability: stub() } as unknown as Status,
       resourceLocator.dvcIcon,
       new StopWatch(),
       () => Promise.resolve([undefined]),

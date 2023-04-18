@@ -163,7 +163,7 @@ describe('App', () => {
           version: undefined
         },
         hasData: false,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionInstalled: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
