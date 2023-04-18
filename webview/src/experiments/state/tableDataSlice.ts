@@ -5,8 +5,8 @@ import {
   Experiment,
   TableData
 } from 'dvc/src/experiments/webview/contract'
-import { keepEqualOldReferencesInArray } from '../../../util/array'
-import { keepReferenceIfEqual } from '../../../util/objects'
+import { keepEqualOldReferencesInArray } from '../../util/array'
+import { keepReferenceIfEqual } from '../../util/objects'
 
 export interface TableDataState extends TableData {
   hasData?: boolean

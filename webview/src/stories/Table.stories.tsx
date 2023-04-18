@@ -26,7 +26,7 @@ import Experiments from '../experiments/components/Experiments'
 import './test-vscode-styles.scss'
 import '../shared/style.scss'
 import { experimentsReducers } from '../experiments/store'
-import { TableDataState } from '../experiments/components/table/tableDataSlice'
+import { TableDataState } from '../experiments/state/tableDataSlice'
 import { NORMAL_TOOLTIP_DELAY } from '../shared/components/tooltip/Tooltip'
 import {
   setExperimentsAsSelected,

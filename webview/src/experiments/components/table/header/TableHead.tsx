@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Table, Header, ColumnOrderState } from '@tanstack/react-table'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { MergedHeaderGroups } from './MergeHeaderGroups'
-import { setDropTarget } from '../headerDropTargetSlice'
+import { setDropTarget } from '../../../state/headerDropTargetSlice'
 import { ExperimentsState } from '../../../store'
 import { sendMessage } from '../../../../shared/vscode'
 import {

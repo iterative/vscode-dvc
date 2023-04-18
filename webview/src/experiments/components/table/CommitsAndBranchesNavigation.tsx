@@ -1,12 +1,12 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
+import styles from './styles.module.scss'
 import {
   showLessCommits,
   showMoreCommits,
   switchToBranchesView,
   switchToCommitsView
-} from './messages'
-import styles from './styles.module.scss'
+} from '../../util/messages'
 import { ExperimentsState } from '../../store'
 
 export const CommitsAndBranchesNavigation: React.FC = () => {

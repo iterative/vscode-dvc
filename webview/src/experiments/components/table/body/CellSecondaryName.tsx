@@ -1,10 +1,10 @@
 import React from 'react'
 import { VSCodeTag } from '@vscode/webview-ui-toolkit/react'
 import { CommitData } from 'dvc/src/experiments/webview/contract'
-import styles from './styles.module.scss'
-import Tooltip from '../../../shared/components/tooltip/Tooltip'
-import { Icon } from '../../../shared/components/Icon'
-import { GitCommit } from '../../../shared/components/icons'
+import styles from '../styles.module.scss'
+import Tooltip from '../../../../shared/components/tooltip/Tooltip'
+import { Icon } from '../../../../shared/components/Icon'
+import { GitCommit } from '../../../../shared/components/icons'
 
 export const CellSecondaryName: React.FC<{
   displayName: string

@@ -1,36 +1,14 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
-import { useInView } from 'react-intersection-observer'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
-import styles from './styles.module.scss'
-import { BatchSelectionProp, RowContent } from './Row'
-import { InstanceProp, RowProp } from './interfaces'
 import { ExperimentGroup } from './ExperimentGroup'
-import { ExperimentsState } from '../../store'
+import { BatchSelectionProp, RowContent } from './Row'
+import { WorkspaceRowGroup } from './WorkspaceRowGroup'
+import styles from '../styles.module.scss'
+import { InstanceProp, RowProp } from '../../../util/interfaces'
+import { ExperimentsState } from '../../../store'
 
-const WorkspaceRowGroupWrapper: React.FC<
-  {
-    children: React.ReactNode
-    root: HTMLElement | null
-    tableHeaderHeight: number
-  } & InstanceProp
-> = ({ children, root, tableHeaderHeight }) => {
-  const [ref, needsShadow] = useInView({
-    root,
-    rootMargin: `-${tableHeaderHeight + 15}px 0px 0px 0px`,
-    threshold: 1
-  })
-
-  return (
-    <tbody
-      ref={ref}
-      className={cx(styles.workspaceRowGroup, needsShadow && styles.withShadow)}
-    >
-      {children}
-    </tbody>
-  )
-}
 export const TableBody: React.FC<
   RowProp &
     InstanceProp &
@@ -67,32 +45,31 @@ export const TableBody: React.FC<
     )
 
   return row.original.id === EXPERIMENT_WORKSPACE_ID ? (
-    <WorkspaceRowGroupWrapper
+    <WorkspaceRowGroup
       tableHeaderHeight={tableHeaderHeight}
       root={root}
       instance={instance}
     >
       {content}
-    </WorkspaceRowGroupWrapper>
+    </WorkspaceRowGroup>
   ) : (
     <>
       {row.index === 2 && row.depth === 0 && (
         <tbody>
-          <tr className={cx(styles.tr, styles.previousCommitsRow)}>
-            <td className={styles.th}>
+          <tr className={styles.previousCommitsRow}>
+            <td className={styles.previousCommitsText}>
               {isBranchesView ? 'Other Branches' : 'Previous Commits'}
             </td>
             <td
-              className={styles.th}
+              className={styles.previousCommitsText}
               colSpan={row.getAllCells().length - 1}
             ></td>
           </tr>
         </tbody>
       )}
       <tbody
-        className={cx(styles.rowGroup, styles.tbody, styles.normalRowGroup, {
-          [styles.experimentGroup]: row.depth > 0,
-          [styles.expandedGroup]: row.getIsExpanded() && row.subRows.length > 0
+        className={cx(styles.rowGroup, {
+          [styles.experimentGroup]: row.depth > 0
         })}
       >
         {content}

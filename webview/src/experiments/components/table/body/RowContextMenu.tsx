@@ -7,11 +7,11 @@ import {
   isRunningInQueue
 } from 'dvc/src/experiments/webview/contract'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
-import { RowProp } from './interfaces'
-import { RowSelectionContext } from './RowSelectionContext'
-import { MessagesMenu } from '../../../shared/components/messagesMenu/MessagesMenu'
-import { MessagesMenuOptionProps } from '../../../shared/components/messagesMenu/MessagesMenuOption'
-import { cond } from '../../../util/helpers'
+import { RowProp } from '../../../util/interfaces'
+import { RowSelectionContext } from '../RowSelectionContext'
+import { MessagesMenu } from '../../../../shared/components/messagesMenu/MessagesMenu'
+import { MessagesMenuOptionProps } from '../../../../shared/components/messagesMenu/MessagesMenuOption'
+import { cond } from '../../../../util/helpers'
 
 const experimentMenuOption = (
   payload: string | string[] | { id: string; executor?: string | null }[],

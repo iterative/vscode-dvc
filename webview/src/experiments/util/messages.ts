@@ -1,5 +1,5 @@
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { sendMessage } from '../../../shared/vscode'
+import { sendMessage } from '../../shared/vscode'
 
 export const focusFiltersTree = () =>
   sendMessage({ type: MessageFromWebviewType.FOCUS_FILTERS_TREE })
