@@ -113,18 +113,18 @@ $badge-size: 0.85rem;
   flex-flow: column nowrap;
 }
 
-.table {
+.experimentsTable {
   display: inline-block;
   border-collapse: collapse;
 }
 
-.tr {
+.experimentsTr {
   position: relative;
   width: fit-content;
 }
 
-.td,
-.th {
+.experimentsTd,
+.experimentsTh {
   white-space: nowrap;
   min-width: 0;
   position: relative;
@@ -146,7 +146,7 @@ $badge-size: 0.85rem;
   }
 }
 
-.table.withExpColumnShadow .tr > *:first-child {
+.table.withExpColumnShadow .experimentsTr > *:first-child {
   &::after {
     box-shadow: 3px 0px 3px $shadow;
   }
@@ -209,7 +209,7 @@ $badge-size: 0.85rem;
   text-align: left;
 }
 
-.thead {
+.experimentsThead {
   background-color: $bg-color;
   transition: 0.25s all;
   box-shadow: none;
@@ -218,7 +218,7 @@ $badge-size: 0.85rem;
   z-index: 5;
 }
 
-.th {
+.experimentsTh {
   height: auto;
   background-color: $header-bg-color;
   font-size: 0.7rem;
@@ -413,8 +413,8 @@ $badge-size: 0.85rem;
   border-bottom: $row-border;
 
   &:hover {
-    .td:not(.experimentCell):hover::before,
-    .td:hover + .td::before {
+    .experimentsTd:not(.experimentCell):hover::before,
+    .experimentsTd:hover + .experimentsTd::before {
       background-color: $border-color;
     }
   }
@@ -429,7 +429,7 @@ $badge-size: 0.85rem;
   &.withShadow {
     box-shadow: 0 5px 8px -2px $shadow;
 
-    .tr {
+    .experimentsTr {
       border-bottom: none;
     }
   }
@@ -459,8 +459,8 @@ $badge-size: 0.85rem;
       pointer-events: none;
     }
 
-    .td:not(.experimentCell):hover::before,
-    .td:hover + .td::before {
+    .experimentsTd:not(.experimentCell):hover::before,
+    .experimentsTd:hover + .experimentsTd::before {
       background-color: $row-border-selected-color;
     }
   }
@@ -469,14 +469,14 @@ $badge-size: 0.85rem;
 .previousCommitsRow {
   border-bottom: $row-border;
 
-  .td {
+  .experimentsTd {
     font-size: 0.6rem;
     padding-left: 16px;
   }
 }
 
 .rowGroup:last-child {
-  & > .tr:last-child {
+  & > .experimentTr:last-child {
     border-color: $row-bg-color;
 
     &.rowSelected {
@@ -485,7 +485,7 @@ $badge-size: 0.85rem;
   }
 
   .experimentGroup {
-    &:last-child .tr:last-child {
+    &:last-child .experimentsTr:last-child {
       border-color: $row-bg-color;
 
       &.rowSelected {
@@ -495,7 +495,7 @@ $badge-size: 0.85rem;
   }
 }
 
-.td {
+.experimentsTd {
   height: auto;
   font-size: 0.8rem;
   line-height: 2rem;

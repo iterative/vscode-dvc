@@ -28,7 +28,7 @@ export const MergedHeaderGroups: React.FC<{
   onlyOneLine
 }) => {
   return (
-    <tr className={cx(styles.tr, styles.headRow)}>
+    <tr className={cx(styles.experimentsTr, styles.headRow)}>
       {headerGroup.headers.map((header: Header<Experiment, unknown>) => (
         <TableHeader
           setExpColumnNeedsShadow={setExpColumnNeedsShadow}

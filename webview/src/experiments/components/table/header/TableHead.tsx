@@ -119,7 +119,7 @@ export const TableHead = ({
   }
 
   return (
-    <thead className={styles.thead} ref={wrapper}>
+    <thead className={styles.experimentsThead} ref={wrapper}>
       {headerGroups.map(headerGroup => (
         <MergedHeaderGroups
           key={headerGroup.id}
