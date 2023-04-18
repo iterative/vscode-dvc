@@ -1,4 +1,5 @@
 export enum PersistenceKey {
+  EXPERIMENTS_BRANCHES = 'experimentsBranches:',
   EXPERIMENTS_FILTER_BY = 'experimentsFilterBy:',
   EXPERIMENTS_SORT_BY = 'experimentsSortBy:',
   EXPERIMENTS_STATUS = 'experimentsStatus:',

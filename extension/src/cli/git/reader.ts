@@ -7,6 +7,7 @@ import { trimAndSplit } from '../../util/stdout'
 import { isDirectory } from '../../fileSystem'
 
 export const autoRegisteredCommands = {
+  GIT_GET_BRANCHES: 'getBranches',
   GIT_GET_COMMIT_MESSAGES: 'getCommitMessages',
   GIT_GET_NUM_COMMITS: 'getNumCommits',
   GIT_GET_REMOTE_URL: 'getRemoteUrl',
@@ -88,9 +89,19 @@ export class GitReader extends GitCli {
     )
     try {
       const revisions = await this.executeProcess(options)
-      return revisions.split('\n').length
+      return trimAndSplit(revisions).length
     } catch {
       return ''
+    }
+  }
+
+  public async getBranches(cwd: string): Promise<string[]> {
+    const options = getOptions(cwd, Command.BRANCH, Flag.NO_MERGE)
+    try {
+      const branches = await this.executeProcess(options)
+      return trimAndSplit(branches)
+    } catch {
+      return []
     }
   }
 

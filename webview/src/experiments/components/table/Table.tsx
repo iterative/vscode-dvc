@@ -5,7 +5,7 @@ import styles from './styles.module.scss'
 import { TableHead } from './header/TableHead'
 import { RowSelectionContext } from './RowSelectionContext'
 import { Indicators } from './Indicators'
-import { CommitsAndBranchesNavigation } from './CommitsAndBranchesNavigation'
+import { CommitsAndBranchesNavigation } from './commitsAndBranches/CommitsAndBranchesNavigation'
 import { TableContent } from './body/TableContent'
 import { InstanceProp } from '../../util/interfaces'
 
