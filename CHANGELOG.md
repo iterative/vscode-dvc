@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.9] - 2023-04-18
+
+### 🔨 Maintenance
+
+- Update demo project [#3704](https://github.com/iterative/vscode-dvc/pull/3704) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.7.8] - 2023-04-17
 
 ### 🐛 Bug Fixes
