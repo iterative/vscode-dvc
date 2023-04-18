@@ -37,3 +37,15 @@ export const selectBranches = () =>
   sendMessage({
     type: MessageFromWebviewType.SELECT_BRANCHES
   })
+
+export const toggleExperiment = (id: string) =>
+  sendMessage({
+    payload: id,
+    type: MessageFromWebviewType.TOGGLE_EXPERIMENT
+  })
+
+export const toggleStarred = (id: string) =>
+  sendMessage({
+    payload: [id],
+    type: MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR
+  })

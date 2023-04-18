@@ -1,63 +1,17 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
+import cx from 'classnames'
 import React, { useCallback, useContext, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
-import cx from 'classnames'
-import {
-  Experiment,
-  isQueued,
-  isRunning
-} from 'dvc/src/experiments/webview/contract'
-import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
+import { isQueued, isRunning } from 'dvc/src/experiments/webview/contract'
 import { FirstCell, CellWrapper } from './Cell'
 import { RowContextMenu } from './RowContextMenu'
-import { RowProp } from '../../../util/interfaces'
 import styles from '../styles.module.scss'
+import { RowProp } from '../../../util/interfaces'
 import { RowSelectionContext } from '../RowSelectionContext'
-import { sendMessage } from '../../../../shared/vscode'
 import { ContextMenu } from '../../../../shared/components/contextMenu/ContextMenu'
 import { HandlerFunc } from '../../../../util/props'
-import { cond } from '../../../../util/helpers'
 import { ExperimentsState } from '../../../store'
-
-const getExperimentTypeClass = ({ status, selected }: Experiment) => {
-  if (isRunning(status)) {
-    return styles.runningExperiment
-  }
-  if (isQueued(status)) {
-    return styles.queuedExperiment
-  }
-  if (selected === false) {
-    return styles.unselectedExperiment
-  }
-
-  return styles.normalExperiment
-}
-
-const getRowClassNames = (
-  original: Experiment,
-  flatIndex: number,
-  isRowFocused: boolean,
-  isRowSelected: boolean,
-  isWorkspace: boolean,
-  className?: string
-) => {
-  return cx(
-    className,
-    styles.tr,
-    styles.bodyRow,
-    getExperimentTypeClass(original),
-    cond(
-      flatIndex % 2 !== 0 && !isRowSelected,
-      () => styles.oddRow,
-      () => styles.evenRow
-    ),
-    isWorkspace ? styles.workspaceRow : styles.normalRow,
-    styles.row,
-    isRowSelected && styles.rowSelected,
-    isRowFocused && styles.rowFocused
-  )
-}
+import { toggleExperiment, toggleStarred } from '../../../util/messages'
 
 export type BatchSelectionProp = {
   batchRowSelection: (prop: RowProp) => void
@@ -77,25 +31,10 @@ export const RowContent: React.FC<
     (state: ExperimentsState) => state.tableData.changes
   )
   const { getVisibleCells, original, index, getIsExpanded, subRows } = row
-  const { id } = original
+  const { displayColor, error, starred, id, status, selected } = original
   const [firstCell, ...cells] = getVisibleCells()
-  const { displayColor, error, starred } = original
   const isWorkspace = id === EXPERIMENT_WORKSPACE_ID
   const changesIfWorkspace = isWorkspace ? changes : undefined
-  const toggleExperiment = () => {
-    sendMessage({
-      payload: id,
-      type: MessageFromWebviewType.TOGGLE_EXPERIMENT
-    })
-  }
-
-  const toggleStarred = () => {
-    !isWorkspace &&
-      sendMessage({
-        payload: [id],
-        type: MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR
-      })
-  }
 
   const { toggleRowSelected, selectedRows } = useContext(RowSelectionContext)
 
@@ -131,6 +70,11 @@ export const RowContent: React.FC<
 
   const [menuActive, setMenuActive] = useState<boolean>(false)
 
+  const running = isRunning(status)
+  const queued = isQueued(status)
+  const unselected = selected === false
+  const isOdd = index % 2 !== 0 && !isRowSelected
+
   return (
     <ContextMenu
       disabled={contextMenuDisabled}
@@ -149,14 +93,18 @@ export const RowContent: React.FC<
       }
     >
       <tr
-        className={getRowClassNames(
-          original,
-          index,
-          menuActive,
-          isRowSelected,
-          isWorkspace,
-          className
-        )}
+        className={cx(className, styles.tr, styles.bodyRow, styles.row, {
+          [styles.runningExperiment]: running,
+          [styles.queuedExperiment]: queued,
+          [styles.unselectedExperiment]: !running && !queued && unselected,
+          [styles.normalExperiment]: !running && !queued && !unselected,
+          [styles.oddRow]: isOdd,
+          [styles.evenRow]: !isOdd,
+          [styles.workspaceRow]: isWorkspace,
+          [styles.normalRow]: !isWorkspace,
+          [styles.rowSelected]: isRowSelected,
+          [styles.rowFocused]: menuActive
+        })}
         tabIndex={0}
         aria-selected={isRowSelected}
         data-testid={isWorkspace && 'workspace-row'}
@@ -169,9 +117,9 @@ export const RowContent: React.FC<
           isRowSelected={isRowSelected}
           showSubRowStates={!getIsExpanded() && !isWorkspace}
           subRowStates={subRowStates}
-          toggleExperiment={toggleExperiment}
+          toggleExperiment={() => toggleExperiment(id)}
           toggleRowSelection={toggleRowSelection}
-          toggleStarred={toggleStarred}
+          toggleStarred={() => !isWorkspace && toggleStarred(id)}
         />
         {cells.map(cell => {
           const cellId = `${cell.column.id}___${cell.row.original.id}`
