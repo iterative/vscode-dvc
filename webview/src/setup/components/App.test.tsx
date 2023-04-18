@@ -22,6 +22,7 @@ const mockPostMessage = jest.mocked(postMessage)
 const renderApp = ({
   canGitInitialize,
   cliCompatible,
+  dvcCliDetails,
   hasData,
   isPythonExtensionInstalled,
   isStudioConnected,
@@ -40,6 +41,7 @@ const renderApp = ({
         data: {
           canGitInitialize,
           cliCompatible,
+          dvcCliDetails,
           hasData,
           isPythonExtensionInstalled,
           isStudioConnected,
@@ -490,6 +492,128 @@ describe('App', () => {
       expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW
       })
+    })
+
+    it('should show DVC CLI Info when DVC is unavailable', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: undefined,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.AUTO,
+          version: undefined
+        },
+        hasData: false,
+        isPythonExtensionInstalled: true,
+        isStudioConnected: false,
+        needsGitCommit: false,
+        needsGitInitialized: undefined,
+        projectInitialized: false,
+        pythonBinPath: 'python',
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      expect(screen.getByText('DVC CLI Info')).toBeInTheDocument()
+      expect(
+        screen.getByText("The extension can't find DVC.")
+      ).toBeInTheDocument()
+      expect(screen.getByText('Required Version:')).toBeInTheDocument()
+      expect(screen.queryByText('Location:')).not.toBeInTheDocument()
+      expect(screen.queryByText('Version:')).not.toBeInTheDocument()
+    })
+
+    it('should show DVC CLI Info when DVC is set globally', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: undefined,
+        dvcCliDetails: {
+          location: 'dvc',
+          type: DvcCliIndicator.GLOBAL,
+          version: '1.0.0'
+        },
+        hasData: false,
+        isPythonExtensionInstalled: true,
+        isStudioConnected: false,
+        needsGitCommit: false,
+        needsGitInitialized: undefined,
+        projectInitialized: false,
+        pythonBinPath: 'python',
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      expect(screen.getByText('DVC CLI Info')).toBeInTheDocument()
+      expect(
+        screen.getByText(
+          'The extension is using DVC installed within a global environment.'
+        )
+      ).toBeInTheDocument()
+      expect(screen.getByText('Required Version:')).toBeInTheDocument()
+      expect(screen.getByText('Location:')).toBeInTheDocument()
+      expect(screen.getByText('Version:')).toBeInTheDocument()
+    })
+
+    it('should show DVC CLI Info when DVC is set with the Python extension', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: undefined,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.AUTO,
+          version: '1.0.0'
+        },
+        hasData: false,
+        isPythonExtensionInstalled: true,
+        isStudioConnected: false,
+        needsGitCommit: false,
+        needsGitInitialized: undefined,
+        projectInitialized: false,
+        pythonBinPath: 'python',
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      expect(screen.getByText('DVC CLI Info')).toBeInTheDocument()
+      expect(
+        screen.getByText(
+          'The extension is using DVC installed within a python environment selected via the Python extension.'
+        )
+      ).toBeInTheDocument()
+      expect(screen.getByText('Required Version:')).toBeInTheDocument()
+      expect(screen.getByText('Location:')).toBeInTheDocument()
+      expect(screen.getByText('Version:')).toBeInTheDocument()
+    })
+
+    it('should show DVC CLI Info when DVC is set manually', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: undefined,
+        dvcCliDetails: {
+          location: 'python',
+          type: DvcCliIndicator.MANUAL,
+          version: '1.0.0'
+        },
+        hasData: false,
+        isPythonExtensionInstalled: true,
+        isStudioConnected: false,
+        needsGitCommit: false,
+        needsGitInitialized: undefined,
+        projectInitialized: false,
+        pythonBinPath: 'python',
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      expect(screen.getByText('DVC CLI Info')).toBeInTheDocument()
+      expect(
+        screen.getByText(
+          'The extension is using DVC installed within a python environment selected manually.'
+        )
+      ).toBeInTheDocument()
+      expect(screen.getByText('Required Version:')).toBeInTheDocument()
+      expect(screen.getByText('Location:')).toBeInTheDocument()
+      expect(screen.getByText('Version:')).toBeInTheDocument()
     })
   })
 

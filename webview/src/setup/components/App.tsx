@@ -66,6 +66,7 @@ export const App: React.FC = () => {
         setCanGitInitialized,
         setCliCompatible,
         setHasData,
+        setDvcCliDetails,
         setIsPythonExtensionInstalled,
         setNeedsGitInitialized,
         setNeedsGitCommit,
