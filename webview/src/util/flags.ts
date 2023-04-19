@@ -1,3 +1,3 @@
 export const featureFlag = {
-  ADD_REMOVE_BRANCHES: true
+  ADD_REMOVE_BRANCHES: false
 }
