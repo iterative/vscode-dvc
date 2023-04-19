@@ -400,5 +400,52 @@ describe('Table', () => {
         header?.classList.contains(styles.headerCellDropTarget)
       ).toBeFalsy()
     })
+
+    it('split group should be moving properly', async () => {
+      // test for https://github.com/iterative/vscode-dvc/issues/3679
+      const { getDraggableHeaderFromText } = renderExperimentsTable({
+        ...tableDataFixture
+      })
+
+      let headers = await getHeaders()
+
+      // splits metrics and params group into 4 subgroups
+      dragAndDrop(
+        screen.getByText('val_accuracy'),
+        getDraggableHeaderFromText('learning_rate'),
+        DragEnterDirection.AUTO
+      )
+
+      headers = await getHeaders()
+
+      expect(headers.indexOf('val_accuracy')).toBeGreaterThan(
+        headers.indexOf('learning_rate')
+      )
+
+      // note: moving the group here, not the leaf column
+      let metricGroups = screen.getAllByText('summary.json')
+      expect(metricGroups.length).toBe(2)
+
+      dragAndDrop(
+        metricGroups[1],
+        getDraggableHeaderFromText('learning_rate'),
+        DragEnterDirection.AUTO
+      )
+
+      headers = await getHeaders()
+
+      metricGroups = screen.getAllByText('summary.json')
+      const paramsGroups = screen.getAllByText('params.yaml')
+
+      expect(metricGroups.length).toBe(2)
+      expect(paramsGroups.length).toBe(2)
+
+      expect(headers.indexOf('val_accuracy')).toBeLessThan(
+        headers.indexOf('learning_rate')
+      )
+      expect(headers.indexOf('epochs')).toBeGreaterThan(
+        headers.indexOf('val_loss')
+      )
+    })
   })
 })
