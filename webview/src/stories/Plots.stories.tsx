@@ -25,9 +25,6 @@ import {
 } from './util'
 import { Plots } from '../plots/components/Plots'
 
-import './test-vscode-styles.scss'
-import '../shared/style.scss'
-import '../plots/components/styles.module.scss'
 import { feedStore } from '../plots/components/App'
 import { plotsReducers } from '../plots/store'
 
