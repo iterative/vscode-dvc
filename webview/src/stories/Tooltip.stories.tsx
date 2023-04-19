@@ -1,8 +1,6 @@
 import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
 
-import './test-vscode-styles.scss'
-import '../shared/style.scss'
 import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'
 import Tooltip from '../shared/components/tooltip/Tooltip'
 import { SelectMenu } from '../shared/components/selectMenu/SelectMenu'

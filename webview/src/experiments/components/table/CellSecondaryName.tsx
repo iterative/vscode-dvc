@@ -13,7 +13,8 @@ export const CellSecondaryName: React.FC<{
 }> = ({ description, commit, sha }) => {
   const children = (
     <span className={styles.experimentCellSecondaryName}>
-      {commit && <Icon width={14} height={14} icon={GitCommit} />} {description}
+      {commit && <Icon width={14} height={14} icon={GitCommit} />}{' '}
+      <span>{description}</span>
     </span>
   )
   if (!commit) {

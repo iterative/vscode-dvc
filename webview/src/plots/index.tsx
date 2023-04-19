@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { Provider } from 'react-redux'
-import '../shared/style.scss'
+import '../shared/styles.scss'
 import { App } from './components/App'
 import '../util/wdyr'
 import { plotsStore } from './store'
