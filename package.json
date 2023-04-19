@@ -54,7 +54,7 @@
     "eslint-plugin-react-hooks": "4.6.0",
     "eslint-plugin-sonarjs": "0.19.0",
     "eslint-plugin-sort-keys-fix": "1.1.2",
-    "eslint-plugin-testing-library": "5.10.2",
+    "eslint-plugin-testing-library": "5.10.3",
     "eslint-plugin-unicorn": "46.0.0",
     "husky": "8.0.3",
     "jest": "29.5.0",
@@ -64,7 +64,7 @@
     "prettier": "2.8.7",
     "prettier-config-standard": "5.0.0",
     "ts-node": "10.9.1",
-    "turbo": "1.9.0",
+    "turbo": "1.9.1",
     "typescript": "5.0.4"
   },
   "resolutions": {
