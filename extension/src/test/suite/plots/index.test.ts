@@ -496,7 +496,7 @@ suite('Plots Test Suite', () => {
 
       const mockSelectExperiments = stub(
         experiments,
-        'selectExperiments'
+        'selectExperimentsToPlot'
       ).resolves(undefined)
 
       const webview = await plots.showWebview()

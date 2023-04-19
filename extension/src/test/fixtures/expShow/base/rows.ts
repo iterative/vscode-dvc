@@ -150,7 +150,7 @@ const data: Commit[] = [
             'c3961d777cfbd7727f9fde4851896006'
           )
         },
-        displayColor: colorsList[1],
+        displayColor: undefined,
         description: '[exp-e7a67]',
         executor: Executor.DVC_TASK,
         id: 'exp-e7a67',
@@ -179,7 +179,7 @@ const data: Commit[] = [
           }
         },
         status: ExperimentStatus.RUNNING,
-        selected: true,
+        selected: false,
         sha: '4fb124aebddb2adf1545030907687fa9a4c80e70',
         starred: false,
         Created: '2020-12-29T15:31:52'

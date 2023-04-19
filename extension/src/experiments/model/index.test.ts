@@ -18,7 +18,8 @@ import survivalRowsFixture from '../../test/fixtures/expShow/survival/rows'
 
 import {
   ExperimentStatus,
-  EXPERIMENT_WORKSPACE_ID
+  EXPERIMENT_WORKSPACE_ID,
+  Executor
 } from '../../cli/dvc/contract'
 import { PersistenceKey } from '../../persistence/constants'
 
@@ -218,6 +219,68 @@ describe('ExperimentsModel', () => {
       { id: 'exp-8' }
     ] as Experiment[])
     expect(experimentsModel.getSelectedRevisions()).toHaveLength(7)
+  })
+
+  it('should swap an experiment running in the workspace for the workspace and not select an experiment running in the queue', () => {
+    const params = {
+      params: {
+        'params.yaml': {
+          data: {
+            lr: 0.000000000000001
+          }
+        }
+      }
+    }
+    const data = generateTestExpShowOutput(
+      {},
+      {
+        experiments: [
+          {
+            data: params,
+            executor: {
+              local: null,
+              name: Executor.WORKSPACE,
+              state: ExperimentStatus.RUNNING
+            },
+            name: 'unselectable-nuffy',
+            rev: EXPERIMENT_WORKSPACE_ID
+          },
+          {},
+          {},
+          {},
+          {
+            data: params,
+            executor: {
+              local: null,
+              name: Executor.DVC_TASK,
+              state: ExperimentStatus.RUNNING
+            },
+            name: 'unselectable-task',
+            rev: EXPERIMENT_WORKSPACE_ID
+          }
+        ],
+        rev: 'testBranch'
+      }
+    )
+
+    const model = new ExperimentsModel('', buildMockMemento())
+    model.transformAndSet(data, false, '')
+
+    expect(model.getSelectedRevisions().map(({ id }) => id)).toStrictEqual([
+      EXPERIMENT_WORKSPACE_ID
+    ])
+
+    model.setSelected([])
+    expect(model.getSelectedRevisions().map(({ id }) => id)).toStrictEqual([])
+
+    model.setSelected(model.getCombinedList())
+    expect(model.getSelectedRevisions().map(({ id }) => id)).toStrictEqual([
+      EXPERIMENT_WORKSPACE_ID,
+      'testBranch',
+      'exp-2',
+      'exp-3',
+      'exp-4'
+    ])
   })
 
   it('should fetch commit params', () => {

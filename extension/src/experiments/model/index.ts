@@ -5,26 +5,26 @@ import { collectExperiments } from './collect'
 import {
   collectColoredStatus,
   collectFinishedRunningExperiments,
-  collectSelected,
+  collectSelectable,
+  collectSelectedColors,
   collectStartedRunningExperiments
 } from './status/collect'
 import { Color, copyOriginalColors } from './status/colors'
-import {
-  canSelect,
-  limitToMaxSelected,
-  ColoredStatus,
-  tooManySelected,
-  UNSELECTED
-} from './status'
+import { canSelect, ColoredStatus, UNSELECTED } from './status'
 import { collectFlatExperimentParams } from './modify/collect'
 import {
   Experiment,
   isQueued,
+  isRunning,
   isRunningInQueue,
   RunningExperiment
 } from '../webview/contract'
 import { definedAndNonEmpty, reorderListSubset } from '../../util/array'
-import { EXPERIMENT_WORKSPACE_ID, ExpShowOutput } from '../../cli/dvc/contract'
+import {
+  EXPERIMENT_WORKSPACE_ID,
+  Executor,
+  ExpShowOutput
+} from '../../cli/dvc/contract'
 import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
 import { PersistenceKey } from '../../persistence/constants'
@@ -136,14 +136,16 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public toggleStatus(id: string) {
-    if (
-      isQueued(
-        this.getExperimentsAndQueued().find(
-          ({ id: queuedId }) => queuedId === id
-        )?.status
-      )
-    ) {
-      return
+    const experiment = this.getExperimentsAndQueued().find(
+      ({ id: expId }) => expId === id
+    )
+
+    if (experiment && isRunning(experiment.status)) {
+      return this.preventSelectionOfRunningExperiment(experiment)
+    }
+
+    if (isQueued(experiment?.status)) {
+      return UNSELECTED
     }
 
     const current = this.coloredStatus[id]
@@ -164,17 +166,6 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public hasRunningExperiment() {
     return this.running.length > 0
-  }
-
-  public isRunningInWorkspace(id: string) {
-    if (id === EXPERIMENT_WORKSPACE_ID) {
-      return false
-    }
-
-    return this.running.some(
-      ({ id: runningId, executor }) =>
-        executor === EXPERIMENT_WORKSPACE_ID && runningId === id
-    )
   }
 
   public hasCheckpoints() {
@@ -255,12 +246,12 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public setSelected(selectedExperiments: Experiment[]) {
-    if (tooManySelected(selectedExperiments)) {
-      selectedExperiments = limitToMaxSelected(selectedExperiments)
-    }
+    const possibleToSelect = collectSelectable(selectedExperiments, {
+      ...this.workspace
+    })
 
-    const { availableColors, coloredStatus } = collectSelected(
-      selectedExperiments.filter(({ status }) => !isQueued(status)),
+    const { availableColors, coloredStatus } = collectSelectedColors(
+      possibleToSelect,
       this.getWorkspaceCommitsAndExperiments(),
       this.coloredStatus,
       this.availableColors
@@ -503,6 +494,24 @@ export class ExperimentsModel extends ModelWithPersistence {
       this.availableColors,
       copyOriginalColors()
     )
+  }
+
+  private preventSelectionOfRunningExperiment(
+    experiment: Experiment
+  ): Color | undefined | typeof UNSELECTED {
+    if (isRunningInQueue(experiment)) {
+      return UNSELECTED
+    }
+
+    const { executor, id } = experiment
+    if (
+      executor === Executor.WORKSPACE &&
+      id !== EXPERIMENT_WORKSPACE_ID &&
+      !this.isSelected(id) &&
+      !this.isSelected(EXPERIMENT_WORKSPACE_ID)
+    ) {
+      return this.toggleStatus(EXPERIMENT_WORKSPACE_ID)
+    }
   }
 
   private persistSorts() {

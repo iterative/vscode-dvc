@@ -257,7 +257,7 @@ const registerExperimentQuickPickCommands = (
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_SELECT,
     (context: Context) =>
-      experiments.selectExperiments(getDvcRootFromContext(context))
+      experiments.selectExperimentsToPlot(getDvcRootFromContext(context))
   )
 
   internalCommands.registerExternalCommand(
