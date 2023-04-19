@@ -1,7 +1,7 @@
 // Variables
 
 @import '../../../shared/variables.scss';
-@import '../../../shared/styles.scss';
+@import '../../../shared/mixins.scss';
 
 $nested-row-padding: 1.35rem;
 $row-border: 1px solid $border-color;
@@ -946,7 +946,7 @@ $badge-size: 0.85rem;
 }
 
 .buttonAsLink {
-  @extend a;
+  @extend %link;
   background: none;
   border: none;
   padding: 0;
