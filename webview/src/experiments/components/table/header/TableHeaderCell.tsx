@@ -5,11 +5,7 @@ import { Header } from '@tanstack/react-table'
 import cx from 'classnames'
 import { useInView } from 'react-intersection-observer'
 import { TableHeaderCellContents } from './TableHeaderCellContents'
-import {
-  ContextMenuContent,
-  getMenuOptions,
-  SortOrder
-} from './ContextMenuContent'
+import { ContextMenuContent, getMenuOptions } from './ContextMenuContent'
 import styles from '../styles.module.scss'
 import { isExperimentColumn, isFirstLevelHeader } from '../../../util/columns'
 import { ExperimentsState } from '../../../store'
@@ -39,28 +35,22 @@ const calcResizerHeight = (header: Header<Experiment, unknown>) => {
 const getHeaderPropsArgs = (
   header: Header<Experiment, unknown>,
   headerDropTargetId: string,
-  sortEnabled: boolean,
-  sortOrder: SortOrder,
   onlyOneLine?: boolean
 ) => {
   const columnWithGroup = header.column.columnDef as ColumnWithGroup
   return {
     className: cx(
+      styles.experimentsTh,
       header.isPlaceholder ? styles.placeholderHeaderCell : styles.headerCell,
       {
         [styles.paramHeaderCell]: columnWithGroup.group === ColumnType.PARAMS,
         [styles.metricHeaderCell]: columnWithGroup.group === ColumnType.METRICS,
         [styles.depHeaderCell]: columnWithGroup.group === ColumnType.DEPS,
-        [styles.createdHeaderCell]: header.id === 'Created',
-        [styles.firstLevelHeader]: isFirstLevelHeader(header.column.id),
-        [styles.leafHeader]: header.subHeaders === undefined,
-        [styles.menuEnabled]: sortEnabled,
-        [styles.sortingHeaderCellAsc]: sortOrder === SortOrder.ASCENDING,
-        [styles.sortingHeaderCellDesc]:
-          sortOrder === SortOrder.DESCENDING && !header.isPlaceholder,
-        [styles.oneRowHeaderCell]: onlyOneLine
-      },
-      headerDropTargetId === header.id && styles.headerCellDropTarget
+        [styles.firstLevelHeaderCell]: isFirstLevelHeader(header.column.id),
+        [styles.leafHeaderCell]: header.subHeaders === undefined,
+        [styles.oneRowHeaderCell]: onlyOneLine,
+        [styles.dropTargetHeaderCell]: headerDropTargetId === header.id
+      }
     ),
     style: {
       position: undefined
@@ -161,13 +151,7 @@ export const TableHeaderCell: React.FC<{
       trigger="contextmenu"
     >
       <th
-        {...getHeaderPropsArgs(
-          header,
-          headerDropTargetId,
-          isSortable,
-          sortOrder,
-          onlyOneLine
-        )}
+        {...getHeaderPropsArgs(header, headerDropTargetId, onlyOneLine)}
         data-testid={`header-${id}${previousPlaceholder}`}
         key={id}
         tabIndex={0}
