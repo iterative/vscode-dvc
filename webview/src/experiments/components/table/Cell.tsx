@@ -55,7 +55,7 @@ export const FirstCell: React.FC<
   const { toggleExperiment } = rowActionsProps
 
   return (
-    <td className={styles.experimentCell}>
+    <td className={cx(styles.experimentsTd, styles.experimentCell)}>
       <div className={styles.innerCell} style={{ width: getSize() }}>
         <CellRowActions status={status} {...rowActionsProps} />
         <RowExpansionButton row={row} />
@@ -92,7 +92,7 @@ export const CellWrapper: React.FC<
 > = ({ cell, cellId, changes }) => {
   return (
     <td
-      className={cx({
+      className={cx(styles.experimentsTd, {
         [styles.workspaceChangeText]: changes?.includes(cell.column.id),
         [styles.depChangeText]: cellHasChanges(cell.getValue() as CellValue)
       })}

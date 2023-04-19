@@ -1,4 +1,5 @@
 import React from 'react'
+import cx from 'classnames'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import { HeaderGroup, Header } from '@tanstack/react-table'
 import { TableHeader } from './TableHeader'
@@ -27,7 +28,7 @@ export const MergedHeaderGroups: React.FC<{
   onlyOneLine
 }) => {
   return (
-    <tr className={styles.headRow}>
+    <tr className={cx(styles.experimentsTr, styles.headRow)}>
       {headerGroup.headers.map((header: Header<Experiment, unknown>) => (
         <TableHeader
           setExpColumnNeedsShadow={setExpColumnNeedsShadow}
