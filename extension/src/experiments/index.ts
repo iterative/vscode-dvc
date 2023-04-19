@@ -30,13 +30,18 @@ import { starredSort } from './model/sortBy/constants'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ColumnsModel } from './columns/model'
 import { ExperimentsData } from './data'
-import { Experiment, ColumnType, TableData } from './webview/contract'
+import {
+  Experiment,
+  ColumnType,
+  TableData,
+  isRunning
+} from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { DecorationProvider } from './model/decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
 import { ResourceLocator } from '../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { EXPERIMENT_WORKSPACE_ID, ExpShowOutput } from '../cli/dvc/contract'
+import { ExpShowOutput } from '../cli/dvc/contract'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Title } from '../vscode/title'
@@ -217,15 +222,6 @@ export class Experiments extends BaseRepository<TableData> {
   public toggleExperimentStatus(
     id: string
   ): Color | typeof UNSELECTED | undefined {
-    if (
-      this.experiments.isRunningInWorkspace(id) &&
-      !this.experiments.isSelected(id)
-    ) {
-      return this.experiments.isSelected(EXPERIMENT_WORKSPACE_ID)
-        ? undefined
-        : this.toggleExperimentStatus(EXPERIMENT_WORKSPACE_ID)
-    }
-
     const selected = this.experiments.isSelected(id)
     if (!selected && !this.experiments.canSelect()) {
       return
@@ -353,8 +349,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getWorkspaceCommitsAndExperiments()
   }
 
-  public async selectExperiments() {
-    const experiments = this.experiments.getWorkspaceCommitsAndExperiments()
+  public async selectExperimentsToPlot() {
+    const experiments = this.experiments
+      .getWorkspaceCommitsAndExperiments()
+      .filter(({ status }) => !isRunning(status))
 
     const selected = await pickExperimentsToPlot(
       experiments,

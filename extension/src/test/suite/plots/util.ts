@@ -100,6 +100,7 @@ export const buildPlots = async (
     data,
     errorsModel,
     experiments,
+    experimentsModel,
     messageSpy,
     mockGetModifiedTime,
     mockPlotsDiff,

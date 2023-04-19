@@ -142,12 +142,12 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.getRepository(dvcRoot).removeSorts()
   }
 
-  public async selectExperiments(overrideRoot?: string) {
+  public async selectExperimentsToPlot(overrideRoot?: string) {
     const dvcRoot = await this.getDvcRoot(overrideRoot)
     if (!dvcRoot) {
       return
     }
-    return this.getRepository(dvcRoot).selectExperiments()
+    return this.getRepository(dvcRoot).selectExperimentsToPlot()
   }
 
   public async selectColumns(overrideRoot?: string) {

@@ -924,17 +924,25 @@ suite('Experiments Test Suite', () => {
 
       await experiments.isReady()
 
-      const experimentToToggle = 'exp-e7a67'
-      const queuedExperiment = '90aea7f2482117a55dfcadcdb901aaa6610fbbc9'
+      const idToToggle = 'test-branch'
+      const runningInQueueId = 'exp-e7a67'
+      const queuedId = '90aea7f'
 
       const isExperimentSelected = (expId: string): boolean =>
         !!experimentsModel.getCombinedList().find(({ id }) => id === expId)
           ?.selected
 
-      expect(isExperimentSelected(experimentToToggle), 'experiment is selected')
-        .to.be.true
       expect(
-        isExperimentSelected(queuedExperiment),
+        isExperimentSelected(idToToggle),
+        'experiment is not initially selected'
+      ).to.be.false
+
+      expect(
+        isExperimentSelected(runningInQueueId),
+        'experiment running in the queue cannot be selected'
+      ).to.be.false
+      expect(
+        isExperimentSelected(queuedId),
         'queued experiment cannot be selected'
       ).to.be.false
 
@@ -945,27 +953,52 @@ suite('Experiments Test Suite', () => {
       const toggleSpy = spy(experimentsModel, 'toggleStatus')
 
       mockMessageReceived.fire({
-        payload: experimentToToggle,
+        payload: idToToggle,
         type: MessageFromWebviewType.TOGGLE_EXPERIMENT
       })
 
-      expect(toggleSpy).to.be.calledWith(experimentToToggle)
+      expect(toggleSpy).to.be.calledWith(idToToggle)
       toggleSpy.resetHistory()
 
       expect(
-        isExperimentSelected(experimentToToggle),
+        isExperimentSelected(idToToggle),
+        'experiment has been toggled to selected'
+      ).to.be.true
+
+      mockMessageReceived.fire({
+        payload: idToToggle,
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT
+      })
+
+      expect(toggleSpy).to.be.calledWith(idToToggle)
+      toggleSpy.resetHistory()
+
+      expect(
+        isExperimentSelected(idToToggle),
         'experiment has been toggled to unselected'
       ).to.be.false
 
       mockMessageReceived.fire({
-        payload: queuedExperiment,
+        payload: runningInQueueId,
         type: MessageFromWebviewType.TOGGLE_EXPERIMENT
       })
 
-      expect(toggleSpy).to.be.calledWith(queuedExperiment)
+      expect(toggleSpy).to.be.calledWith(runningInQueueId)
 
       expect(
-        isExperimentSelected(queuedExperiment),
+        isExperimentSelected(runningInQueueId),
+        'experiment running the queue cannot be selected'
+      ).to.be.false
+
+      mockMessageReceived.fire({
+        payload: queuedId,
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT
+      })
+
+      expect(toggleSpy).to.be.calledWith(queuedId)
+
+      expect(
+        isExperimentSelected(queuedId),
         'queued experiment cannot be selected'
       ).to.be.false
     }).timeout(WEBVIEW_TEST_TIMEOUT)
@@ -1180,9 +1213,10 @@ suite('Experiments Test Suite', () => {
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
-      const queuedId = '90aea7f2482117a55dfcadcdb901aaa6610fbbc9'
-      const expectedIds = ['exp-e7a67', 'test-branch']
-      const mockExperimentIds = [...expectedIds, queuedId]
+      const queuedId = '90aea7f'
+      const runningInQueueId = 'exp-e7a67'
+      const expectedIds = ['main', 'test-branch']
+      const mockExperimentIds = [...expectedIds, queuedId, runningInQueueId]
 
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
@@ -1202,7 +1236,7 @@ suite('Experiments Test Suite', () => {
       mockExperimentIds.sort()
       expect(
         selectExperimentIds,
-        'should exclude queued experiments from selection'
+        'should exclude queued experiments and experiments running in the queue from selection'
       ).to.deep.equal(expectedIds)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -1223,14 +1257,15 @@ suite('Experiments Test Suite', () => {
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
-      const mockExperimentIds = ['exp-e7a67', 'test-branch']
+      const runningInQueueId = 'exp-e7a67'
+      const mockExperimentIds = ['main', 'test-branch']
 
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const tableChangePromise = experimentsUpdatedEvent(experiments)
 
       mockMessageReceived.fire({
-        payload: mockExperimentIds,
+        payload: [...mockExperimentIds, runningInQueueId],
         type: MessageFromWebviewType.SET_EXPERIMENTS_AND_OPEN_PLOTS
       })
 
@@ -1752,11 +1787,11 @@ suite('Experiments Test Suite', () => {
       ).to.deep.equal({
         '489fd8b': 0,
         '55d492c': 0,
-        'exp-e7a67': colors[1],
+        'exp-e7a67': 0,
         'exp-f13bca': 0,
         main: 0,
         'test-branch': 0,
-        workspace: colors[0]
+        [EXPERIMENT_WORKSPACE_ID]: colors[0]
       })
 
       expect(
@@ -1840,7 +1875,7 @@ suite('Experiments Test Suite', () => {
         'both filters should be removed from memento after removeFilters is run against them'
       ).to.deep.equal([])
 
-      testRepository.toggleExperimentStatus('exp-e7a67')
+      testRepository.toggleExperimentStatus('exp-f13bca')
       expect(
         mockMemento.get('experimentsStatus:test'),
         'the correct statuses have been recorded in the memento'
@@ -1848,10 +1883,10 @@ suite('Experiments Test Suite', () => {
         '489fd8b': 0,
         '55d492c': 0,
         'exp-e7a67': 0,
-        'exp-f13bca': 0,
+        'exp-f13bca': colors[1],
         main: 0,
         'test-branch': 0,
-        workspace: colors[0]
+        [EXPERIMENT_WORKSPACE_ID]: colors[0]
       })
     })
 
@@ -1862,7 +1897,7 @@ suite('Experiments Test Suite', () => {
         'experimentsFilterBy:test': filterMapEntries,
         'experimentsSortBy:test': sortDefinitions,
         'experimentsStatus:test': {
-          'exp-83425': colors[0],
+          [EXPERIMENT_WORKSPACE_ID]: colors[0],
           'exp-e7a67': colors[5],
           'exp-f13bca': 0,
           'test-branch': colors[1]
@@ -1902,15 +1937,11 @@ suite('Experiments Test Suite', () => {
       ).to.deep.equal([
         {
           displayColor: colors[0],
-          id: 'exp-83425'
+          id: EXPERIMENT_WORKSPACE_ID
         },
         {
           displayColor: colors[1],
           id: 'test-branch'
-        },
-        {
-          displayColor: colors[2],
-          id: EXPERIMENT_WORKSPACE_ID
         },
         {
           displayColor: colors[5],
