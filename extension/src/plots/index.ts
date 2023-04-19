@@ -225,6 +225,8 @@ export class Plots extends BaseRepository<TPlotsData> {
         this.dispose.untrack(waitForInitialExpData)
         waitForInitialExpData.dispose()
         this.data.setMetricFiles(experiments.getRelativeMetricsFiles())
+        const collectInitialIdShas = () => this.plots.removeStaleData()
+        collectInitialIdShas()
         this.setupExperimentsListener(experiments)
         void this.initializeData()
       })

@@ -468,3 +468,13 @@ export const collectImageUrl = (
 
   return url
 }
+
+export const collectIdShas = (experiments: Experiment[]) => {
+  const idShas: Record<string, string> = {}
+  for (const { id, sha } of experiments) {
+    if (sha) {
+      idShas[id] = sha
+    }
+  }
+  return idShas
+}
