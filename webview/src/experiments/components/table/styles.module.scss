@@ -480,7 +480,7 @@ $badge-size: 0.85rem;
 }
 
 .rowGroup:last-child {
-  & > .experimentTr:last-child {
+  & > .experimentsTr:last-child {
     border-color: $row-bg-color;
 
     &.rowSelected {
