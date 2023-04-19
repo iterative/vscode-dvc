@@ -43,6 +43,7 @@ import { isErrorItem } from '../../../tree'
 import { RegisteredCommands } from '../../../commands/external'
 import { REVISIONS } from '../../fixtures/plotsDiff'
 import * as FileSystem from '../../../fileSystem'
+import { experimentHasError } from '../../../cli/dvc/contract'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -94,17 +95,31 @@ suite('Plots Test Suite', () => {
 
     it('should call plots diff with the commit whenever the current commit changes', async () => {
       const mockNow = getMockNow()
+      const noExperimentFixture = expShowFixtureWithoutErrors.map(exp => ({
+        ...exp,
+        experiments: null
+      }))
+
       const { data, experiments, mockPlotsDiff } = await buildPlots(
         disposable,
-        plotsDiffFixture
+        plotsDiffFixture,
+        noExperimentFixture
       )
+
       mockPlotsDiff.resetHistory()
 
-      const updatedExpShowFixture = expShowFixtureWithoutErrors.map(exp => {
+      const updatedExpShowFixture = noExperimentFixture.map(exp => {
         if (exp.rev === '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77') {
+          if (experimentHasError(exp)) {
+            throw new Error('Experiment should not have error')
+          }
+
           return {
             ...exp,
-            experiments: null,
+            data: {
+              ...exp.data,
+              rev: '9235a02880a0372545e5f7f4d79a5d9eee6331ac'
+            },
             rev: '9235a02880a0372545e5f7f4d79a5d9eee6331ac'
           }
         }
@@ -127,7 +142,7 @@ suite('Plots Test Suite', () => {
         REVISIONS[0],
         REVISIONS[1]
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should remove the temporary plots directory on dispose', async () => {
       const { mockRemoveDir, plots } = await buildPlots(

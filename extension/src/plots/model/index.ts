@@ -9,7 +9,8 @@ import {
   collectCustomPlots,
   getCustomPlotId,
   collectOrderedRevisions,
-  collectImageUrl
+  collectImageUrl,
+  collectIdShas
 } from './collect'
 import { getRevisionFirstThreeColumns } from './util'
 import {
@@ -43,7 +44,6 @@ import {
   reorderObjectList,
   sameContents
 } from '../../util/array'
-import { removeMissingKeysFromObject } from '../../util/object'
 import { TemplateOrder } from '../paths/collect'
 import { PersistenceKey } from '../../persistence/constants'
 import { ModelWithPersistence } from '../../persistence/model'
@@ -66,6 +66,7 @@ export class PlotsModel extends ModelWithPersistence {
   private sectionCollapsed: SectionCollapsed
 
   private fetchedRevs = new Set<string>()
+  private idShas: { [id: string]: string } = {}
 
   private comparisonData: ComparisonData = {}
   private comparisonOrder: string[]
@@ -118,17 +119,18 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public removeStaleData() {
-    const revisions = this.experiments.getRevisionIds()
-
-    this.comparisonData = removeMissingKeysFromObject(
-      revisions,
-      this.comparisonData
+    const idShas = collectIdShas(
+      this.experiments.getWorkspaceCommitsAndExperiments()
     )
 
-    this.revisionData = removeMissingKeysFromObject(
-      revisions,
-      this.revisionData
-    )
+    for (const id of Object.keys(this.idShas)) {
+      if (this.idShas[id] !== idShas[id]) {
+        this.deleteRevisionData(id)
+        this.fetchedRevs.delete(id)
+      }
+    }
+
+    this.idShas = idShas
   }
 
   public getCustomPlots(): CustomPlotsData | undefined {
