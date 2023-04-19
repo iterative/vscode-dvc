@@ -14,7 +14,7 @@ import { InstanceProp, RowProp } from './interfaces'
 import { RowSelectionContext } from './RowSelectionContext'
 import { TableBody } from './TableBody'
 import { Indicators } from './Indicators'
-import { CommitsAndBranchesNavigation } from './CommitsAndBranchesNavigation'
+import { CommitsAndBranchesNavigation } from './commitsAndBranches/CommitsAndBranchesNavigation'
 import { ExperimentsState } from '../../store'
 
 interface TableProps extends InstanceProp {

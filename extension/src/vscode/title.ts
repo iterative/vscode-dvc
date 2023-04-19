@@ -12,6 +12,7 @@ export enum Title {
   ENTER_STAGE_NAME = 'Enter a name for the main stage of your pipeline',
   GARBAGE_COLLECT_EXPERIMENTS = 'Garbage Collect Experiments',
   SHOW_SETUP = 'Show Setup',
+  SELECT_BRANCHES = 'Select the Branch(es) to Display in the Experiments Table',
   SELECT_BASE_EXPERIMENT = 'Select an Experiment to Use as a Base',
   SELECT_COLUMNS = 'Select Columns to Display in the Experiments Table',
   SELECT_EXPERIMENT = 'Select an Experiment',

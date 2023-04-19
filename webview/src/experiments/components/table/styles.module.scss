@@ -231,11 +231,9 @@ $badge-size: 0.85rem;
 
   .cellContents {
     @extend %truncateLeftChild;
-    padding: 0.31rem $cell-padding;
     display: block;
 
     span[draggable='true'] {
-      display: block;
       cursor: grab;
     }
   }
@@ -309,6 +307,11 @@ $badge-size: 0.85rem;
   }
 }
 
+.cellDraggable {
+  display: block;
+  padding: 0.31rem $cell-padding;
+}
+
 .leafHeaderCell::after {
   display: none;
 }
@@ -355,6 +358,7 @@ $badge-size: 0.85rem;
   overflow-x: hidden;
   text-overflow: ellipsis;
   text-align: left;
+  pointer-events: none;
 }
 
 .experimentHeader {

@@ -57,6 +57,8 @@ export class ExperimentsModel extends ModelWithPersistence {
   private starredExperiments: StarredExperiments
   private numberOfCommitsToShow: number
   private isBranchesView: boolean
+  private branchesToShow: string[] = []
+  private availableBranchesToShow: string[] = []
 
   private filters: Map<string, FilterDefinition> = new Map()
 
@@ -90,6 +92,11 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.numberOfCommitsToShow = this.revive<number>(
       PersistenceKey.NUMBER_OF_COMMITS_TO_SHOW,
       DEFAULT_NUM_OF_COMMITS_TO_SHOW
+    )
+
+    this.branchesToShow = this.revive<string[]>(
+      PersistenceKey.EXPERIMENTS_BRANCHES,
+      []
     )
 
     const assignedColors = new Set(
@@ -403,6 +410,23 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.isBranchesView
   }
 
+  public setBranchesToShow(branches: string[]) {
+    this.branchesToShow = branches
+    this.persistBranchesToShow()
+  }
+
+  public getBranchesToShow() {
+    return this.branchesToShow
+  }
+
+  public setAvailableBranchesToShow(branches: string[]) {
+    this.availableBranchesToShow = branches
+  }
+
+  public getAvailableBranchesToShow() {
+    return this.availableBranchesToShow
+  }
+
   private findIndexByPath(pathToRemove: string) {
     return this.currentSorts.findIndex(({ path }) => path === pathToRemove)
   }
@@ -504,6 +528,13 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.persist(
       PersistenceKey.NUMBER_OF_COMMITS_TO_SHOW,
       this.numberOfCommitsToShow
+    )
+  }
+
+  private persistBranchesToShow() {
+    return this.persist(
+      PersistenceKey.EXPERIMENTS_BRANCHES,
+      this.branchesToShow
     )
   }
 

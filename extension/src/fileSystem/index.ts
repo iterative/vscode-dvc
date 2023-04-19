@@ -1,4 +1,13 @@
-import { basename, extname, join, parse, relative, resolve, sep } from 'path'
+import {
+  basename,
+  extname,
+  join,
+  parse,
+  relative,
+  resolve,
+  sep,
+  format
+} from 'path'
 import {
   appendFileSync,
   ensureFileSync,
@@ -153,21 +162,24 @@ export const findOrCreateDvcYamlFile = (
   cwd: string,
   trainingScript: string,
   stageName: string,
-  command: string
+  command: string,
+  applyRelativePath: boolean
 ) => {
   const dvcYamlPath = `${cwd}/dvc.yaml`
   ensureFileSync(dvcYamlPath)
 
-  const relativeScript = relative(cwd, trainingScript)
+  const scriptPath = applyRelativePath
+    ? relative(cwd, trainingScript)
+    : format(parse(trainingScript))
 
   const pipeline = `
 # Read about DVC pipeline configuration (https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#stages)
 # to customize your stages even more
 stages:
   ${stageName}:
-    cmd: ${command} ${relativeScript}
+    cmd: ${command} ${scriptPath}
     deps:
-      - ${relativeScript}`
+      - ${scriptPath}`
 
   void openFileInEditor(dvcYamlPath)
   return appendFileSync(dvcYamlPath, pipeline)

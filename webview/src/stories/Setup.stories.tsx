@@ -5,9 +5,6 @@ import { SetupData, SetupSection } from 'dvc/src/setup/webview/contract'
 import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'
 import { App } from '../setup/components/App'
 
-import './test-vscode-styles.scss'
-import '../shared/style.scss'
-
 const DEFAULT_DATA: SetupData = {
   canGitInitialize: false,
   cliCompatible: true,
@@ -20,7 +17,8 @@ const DEFAULT_DATA: SetupData = {
   pythonBinPath: 'python',
   sectionCollapsed: {
     [SetupSection.EXPERIMENTS]: false,
-    [SetupSection.STUDIO]: true
+    [SetupSection.STUDIO]: true,
+    [SetupSection.DVC]: false
   },
   shareLiveToStudio: false
 }

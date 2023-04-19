@@ -2,6 +2,54 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.9] - 2023-04-18
+
+### 🔨 Maintenance
+
+- Update demo project [#3704](https://github.com/iterative/vscode-dvc/pull/3704) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.7.8] - 2023-04-17
+
+### 🐛 Bug Fixes
+
+- Turn off add/remove branches feature flag [#3702](https://github.com/iterative/vscode-dvc/pull/3702) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.7.7] - 2023-04-17
+
+### 🚀 New Features and Enhancements
+
+- Hidden: Add and remove branches to the experiments table [#3670](https://github.com/iterative/vscode-dvc/pull/3670) by [@sroy3](https://github.com/sroy3)
+
+### 🐛 Bug Fixes
+
+- fix(table): DnD behavior for groups [#3683](https://github.com/iterative/vscode-dvc/pull/3683) by [@shcheklein](https://github.com/shcheklein)
+- Do not convert the manually entered path into a relative path [#3686](https://github.com/iterative/vscode-dvc/pull/3686) by [@sroy3](https://github.com/sroy3)
+
+## [0.7.6] - 2023-04-13
+
+### 🐛 Bug Fixes
+
+- fix(table): DnD landing zone covers the whole cell in the table [#3678](https://github.com/iterative/vscode-dvc/pull/3678) by [@shcheklein](https://github.com/shcheklein)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (2.54.0) [#3677](https://github.com/iterative/vscode-dvc/pull/3677) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.7.5] - 2023-04-11
+
+### 🚀 New Features and Enhancements
+
+- Add Setup DVC Section [#3655](https://github.com/iterative/vscode-dvc/pull/3655) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Fix broken collapsed section info tooltips [#3669](https://github.com/iterative/vscode-dvc/pull/3669) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Add custom plot to e2e test [#3646](https://github.com/iterative/vscode-dvc/pull/3646) by [@julieg18](https://github.com/julieg18)
+- Clean up table styles [#3664](https://github.com/iterative/vscode-dvc/pull/3664) by [@julieg18](https://github.com/julieg18)
+
 ## [0.7.4] - 2023-04-06
 
 ### 🔨 Maintenance

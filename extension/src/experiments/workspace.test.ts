@@ -1,7 +1,11 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { Experiments } from '.'
 import { scriptCommand, WorkspaceExperiments } from './workspace'
-import { quickPickOne, quickPickOneOrInput } from '../vscode/quickPick'
+import {
+  quickPickManyValues,
+  quickPickOne,
+  quickPickOneOrInput
+} from '../vscode/quickPick'
 import {
   CommandId,
   AvailableCommands,
@@ -19,12 +23,14 @@ import {
   hasDvcYamlFile
 } from '../fileSystem'
 import { Toast } from '../vscode/toast'
+import { pickFile } from '../vscode/resourcePicker'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = jest.mocked(Disposable)
 const mockedDvcRoot = '/my/dvc/root'
 const mockedOtherDvcRoot = '/my/fun/dvc/root'
 const mockedQuickPickOne = jest.mocked(quickPickOne)
+const mockedQuickPickManyValues = jest.mocked(quickPickManyValues)
 const mockedQuickPickOneOrInput = jest.mocked(quickPickOneOrInput)
 const mockedGetValidInput = jest.mocked(getValidInput)
 const mockedPickExperiment = jest.fn()
@@ -35,12 +41,15 @@ const mockedListStages = jest.fn()
 const mockedFindOrCreateDvcYamlFile = jest.mocked(findOrCreateDvcYamlFile)
 const mockedGetFileExtension = jest.mocked(getFileExtension)
 const mockedHasDvcYamlFile = jest.mocked(hasDvcYamlFile)
+const mockedGetBranches = jest.fn()
+const mockedPickFile = jest.mocked(pickFile)
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 jest.mock('../vscode/quickPick')
 jest.mock('../vscode/inputBox')
 jest.mock('../fileSystem')
+jest.mock('../vscode/resourcePicker')
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -69,6 +78,11 @@ describe('Experiments', () => {
 
   mockedInternalCommands.registerCommand(AvailableCommands.STAGE_LIST, () =>
     mockedListStages()
+  )
+
+  mockedInternalCommands.registerCommand(
+    AvailableCommands.GIT_GET_BRANCHES,
+    () => mockedGetBranches()
   )
 
   const mockedUpdatesPaused = buildMockedEventEmitter<boolean>()
@@ -448,7 +462,8 @@ describe('Experiments', () => {
         mockedDvcRoot,
         trainingScript,
         'train',
-        scriptCommand.PYTHON
+        scriptCommand.PYTHON,
+        false
       )
     })
 
@@ -488,7 +503,8 @@ describe('Experiments', () => {
         mockedDvcRoot,
         'path/to/training_script.py',
         'train',
-        scriptCommand.PYTHON
+        scriptCommand.PYTHON,
+        false
       )
     })
 
@@ -507,7 +523,8 @@ describe('Experiments', () => {
         mockedDvcRoot,
         'path/to/training_script.ipynb',
         'train',
-        scriptCommand.JUPYTER
+        scriptCommand.JUPYTER,
+        false
       )
     })
 
@@ -559,7 +576,53 @@ describe('Experiments', () => {
         mockedDvcRoot,
         'path/to/training_script.js',
         'train',
-        customCommand
+        customCommand,
+        false
+      )
+    })
+
+    it('should not convert the script path to relative if the path was entered manually', async () => {
+      const customCommand = 'node'
+
+      mockedGetValidInput.mockResolvedValueOnce('train')
+      mockedListStages.mockResolvedValueOnce('')
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedQuickPickOneOrInput.mockResolvedValueOnce(
+        'path/to/training_script.js'
+      )
+      mockedGetFileExtension.mockReturnValueOnce('.js')
+      mockedGetInput.mockResolvedValueOnce(customCommand)
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
+
+      expect(mockedFindOrCreateDvcYamlFile).toHaveBeenCalledWith(
+        mockedDvcRoot,
+        'path/to/training_script.js',
+        'train',
+        customCommand,
+        false
+      )
+    })
+
+    it('should convert the script path to relative if the path was not entered manually', async () => {
+      const customCommand = 'node'
+
+      mockedGetValidInput.mockResolvedValueOnce('train')
+      mockedListStages.mockResolvedValueOnce('')
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedQuickPickOneOrInput.mockResolvedValueOnce('select')
+      mockedPickFile.mockResolvedValueOnce('path/to/training_script.js')
+      mockedGetFileExtension.mockReturnValueOnce('.js')
+      mockedGetInput.mockResolvedValueOnce(customCommand)
+
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
+
+      expect(mockedFindOrCreateDvcYamlFile).toHaveBeenCalledWith(
+        mockedDvcRoot,
+        'path/to/training_script.js',
+        'train',
+        customCommand,
+        true
       )
     })
 
@@ -579,7 +642,8 @@ describe('Experiments', () => {
         mockedDvcRoot,
         'path/to/training_script.js',
         'train',
-        ''
+        '',
+        false
       )
     })
 
@@ -659,6 +723,123 @@ describe('Experiments', () => {
       await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
       expect(showErrorSpy).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('selectBranches', () => {
+    it('should get all the branches from GIT_GET_BRANCHES command', async () => {
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedGetBranches.mockResolvedValueOnce(['main'])
+
+      await workspaceExperiments.selectBranches([])
+
+      expect(mockedGetBranches).toHaveBeenCalledTimes(1)
+    })
+
+    it('should show a quick pick to select many values when called', async () => {
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedGetBranches.mockResolvedValueOnce(['main'])
+
+      await workspaceExperiments.selectBranches([])
+
+      expect(mockedQuickPickManyValues).toHaveBeenCalledTimes(1)
+    })
+
+    it('should display all branches in the quick pick', async () => {
+      const allBranches = [
+        'main',
+        'special-branch',
+        'important-fix',
+        'exp-best'
+      ]
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+      mockedGetBranches.mockResolvedValueOnce(allBranches)
+
+      await workspaceExperiments.selectBranches([])
+
+      expect(mockedQuickPickManyValues).toHaveBeenCalledWith(
+        allBranches.map(branch =>
+          expect.objectContaining({ label: branch, value: branch })
+        ),
+        expect.anything()
+      )
+    })
+
+    it('should not display the current branch in the quick pick', async () => {
+      const allBranches = [
+        '* WIP',
+        'main',
+        'special-branch',
+        'important-fix',
+        'exp-best'
+      ]
+      mockedQuickPickOne.mockResolvedValue(mockedDvcRoot)
+      mockedGetBranches.mockResolvedValueOnce(allBranches)
+
+      await workspaceExperiments.selectBranches([])
+
+      expect(mockedQuickPickManyValues).toHaveBeenCalledWith(
+        allBranches
+          .slice(1)
+          .map(branch =>
+            expect.objectContaining({ label: branch, value: branch })
+          ),
+        expect.anything()
+      )
+
+      mockedQuickPickManyValues.mockResolvedValueOnce([])
+
+      const updatedAllBranches = [
+        'main',
+        '* special-branch',
+        'important-fix',
+        'exp-best'
+      ]
+
+      mockedGetBranches.mockResolvedValueOnce(updatedAllBranches)
+
+      await workspaceExperiments.selectBranches([])
+
+      expect(mockedQuickPickManyValues).toHaveBeenCalledWith(
+        [...updatedAllBranches.slice(0, 1), ...updatedAllBranches.slice(2)].map(
+          branch => expect.objectContaining({ label: branch, value: branch })
+        ),
+        expect.anything()
+      )
+    })
+
+    it('should mark the selected branches as picked in the quick pick', async () => {
+      const allBranches = [
+        'main',
+        'special-branch',
+        'important-fix',
+        'exp-best'
+      ]
+      const selectedBranches = ['main', 'exp-best']
+      mockedQuickPickOne.mockResolvedValue(mockedDvcRoot)
+      mockedGetBranches.mockResolvedValueOnce(allBranches)
+
+      await workspaceExperiments.selectBranches(selectedBranches)
+
+      expect(mockedQuickPickManyValues).toHaveBeenCalledWith(
+        [
+          { label: 'main', picked: true, value: 'main' },
+          { label: 'special-branch', picked: false, value: 'special-branch' },
+          { label: 'important-fix', picked: false, value: 'important-fix' },
+          { label: 'exp-best', picked: true, value: 'exp-best' }
+        ],
+        expect.anything()
+      )
+    })
+
+    it('should return early if no dvcRoot is selected', async () => {
+      mockedQuickPickOne.mockResolvedValue(undefined)
+      mockedGetBranches.mockResolvedValueOnce([])
+
+      await workspaceExperiments.selectBranches([])
+
+      expect(mockedGetBranches).not.toHaveBeenCalled()
+      expect(mockedQuickPickManyValues).not.toHaveBeenCalled()
     })
   })
 })

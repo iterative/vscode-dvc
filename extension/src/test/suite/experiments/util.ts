@@ -68,7 +68,7 @@ export const buildExperiments = (
     mockUpdateExperimentsData
   )
   const mockCheckOrAddPipeline = stub()
-
+  const mockSelectBranches = stub().resolves(['main', 'other'])
   const experiments = disposer.track(
     new Experiments(
       dvcRoot,
@@ -77,6 +77,7 @@ export const buildExperiments = (
       resourceLocator,
       buildMockMemento(),
       mockCheckOrAddPipeline,
+      mockSelectBranches,
       mockExperimentsData,
       buildMockData<FileSystemData>()
     )
@@ -104,6 +105,7 @@ export const buildExperiments = (
     mockExperimentShow,
     mockExperimentsData,
     mockGetCommitMessages,
+    mockSelectBranches,
     mockUpdateExperimentsData,
     resourceLocator,
     updatesPaused

@@ -1,8 +1,6 @@
 import { Story, Meta } from '@storybook/react/types-6-0'
 import React from 'react'
 
-import './test-vscode-styles.scss'
-import '../shared/style.scss'
 import { IconWrapper } from './components/IconWrapper'
 import { IconsWrapper } from './components/IconsWrapper'
 import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'

@@ -63,7 +63,7 @@ export const ColumnDragHandle: React.FC<{
         onDrop={onDrop}
         onDragLeave={onDragLeave}
       >
-        <span>
+        <span className={header.isPlaceholder ? '' : styles.cellDraggable}>
           {header.isPlaceholder
             ? null
             : flexRender(header.column.columnDef.header, header.getContext())}

@@ -46,6 +46,12 @@ export const SectionDescription = {
       .
     </span>
   ),
+  // Setup DVC
+  [SetupSection.DVC]: (
+    <span data-testid="tooltip-setup-dvc">
+      Configure the extension to start working with DVC.
+    </span>
+  ),
   // Setup Experiments
   [SetupSection.EXPERIMENTS]: (
     <span data-testid="tooltip-setup-experiments">
@@ -56,7 +62,7 @@ export const SectionDescription = {
       .
     </span>
   ),
-  // Setup Experiments
+  // Setup Studio
   [SetupSection.STUDIO]: (
     <span data-testid="tooltip-setup-studio">
       {"Configure the extension's connection to "}
@@ -135,6 +141,7 @@ export const SectionContainer: React.FC<
               content={tooltipContent}
               placement="bottom-end"
               interactive
+              appendTo={document.body}
             >
               <div
                 className={styles.infoTooltipToggle}
