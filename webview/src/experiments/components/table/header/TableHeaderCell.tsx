@@ -40,6 +40,7 @@ const getHeaderPropsArgs = (
   const columnWithGroup = header.column.columnDef as ColumnWithGroup
   return {
     className: cx(
+      styles.experimentsTh,
       header.isPlaceholder ? styles.placeholderHeaderCell : styles.headerCell,
       {
         [styles.paramHeaderCell]: columnWithGroup.group === ColumnType.PARAMS,

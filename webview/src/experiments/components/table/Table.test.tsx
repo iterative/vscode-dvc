@@ -165,9 +165,9 @@ describe('Table', () => {
 
       const workspaceCell = await screen.findByText(EXPERIMENT_WORKSPACE_ID)
 
-      expect(workspaceCell?.className.includes(styles.workspaceChange)).toBe(
-        false
-      )
+      expect(
+        workspaceCell?.className.includes(styles.workspaceChangeText)
+      ).toBe(false)
     })
 
     it("should have the workspaceChange class on the workspace's first cell (text) if there are workspace changes", () => {
@@ -175,7 +175,7 @@ describe('Table', () => {
 
       const workspaceCell = screen.getByTestId('id___workspace')
 
-      expect(workspaceCell.className.includes(styles.workspaceChange)).toBe(
+      expect(workspaceCell.className.includes(styles.workspaceChangeText)).toBe(
         true
       )
     })
@@ -185,7 +185,7 @@ describe('Table', () => {
 
       const row = await screen.findByTestId('Created___workspace')
 
-      expect(row?.className.includes(styles.workspaceChange)).toBe(false)
+      expect(row?.className.includes(styles.workspaceChangeText)).toBe(false)
     })
 
     it('should not have the workspaceChange class on a cell if there are changes to other columns but not this one', async () => {
@@ -193,7 +193,7 @@ describe('Table', () => {
 
       const row = await screen.findByTestId('Created___workspace')
 
-      expect(row?.className.includes(styles.workspaceChange)).toBe(false)
+      expect(row?.className.includes(styles.workspaceChangeText)).toBe(false)
     })
 
     it('should have the workspaceChange class on a cell if there are changes matching the column id', async () => {
@@ -201,7 +201,7 @@ describe('Table', () => {
 
       const row = await screen.findByTestId('Created___workspace')
 
-      expect(row?.className.includes(styles.workspaceChange)).toBe(true)
+      expect(row?.className.includes(styles.workspaceChangeText)).toBe(true)
     })
   })
 
