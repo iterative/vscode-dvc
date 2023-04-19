@@ -53,7 +53,7 @@ const getDefaultColumnWithIndicatorsPlaceHolder = () =>
         }
       } = cell as unknown as CellContext<Experiment, CellValue>
       return (
-        <div className={styles.experimentCellContents}>
+        <div className={styles.experimentCellText}>
           <span>{label}</span>
           {displayName && (
             <CellSecondaryName

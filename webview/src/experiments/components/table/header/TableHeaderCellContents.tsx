@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import cx from 'classnames'
-import { ColumnType, Experiment } from 'dvc/src/experiments/webview/contract'
+import { Experiment } from 'dvc/src/experiments/webview/contract'
 import { flexRender, Header } from '@tanstack/react-table'
 import { SortOrder } from './ContextMenuContent'
 import { ColumnResizer, ResizerHeight } from './ColumnResizer'
@@ -104,7 +104,7 @@ export const TableHeaderCellContents: React.FC<{
   setMenuSuppressed,
   resizerHeight
 }) => {
-  const isTimestamp = header.headerGroup.id === ColumnType.TIMESTAMP
+  const isTimestamp = header.id === 'Created'
   const columnIsResizing = header.column.getIsResizing()
 
   useEffect(() => {

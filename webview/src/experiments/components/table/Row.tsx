@@ -44,7 +44,7 @@ const getRowClassNames = (
 ) => {
   return cx(
     className,
-    styles.tr,
+    styles.experimentsTr,
     styles.bodyRow,
     getExperimentTypeClass(original),
     cond(
