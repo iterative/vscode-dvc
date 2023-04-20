@@ -835,28 +835,6 @@ $badge-size: 0.85rem;
 
 // below table styles
 
-.commitsAndBranchesNav {
-  padding: 20px 16px;
-  width: 100%;
-}
-
-.commitsAndBranchesNavButton {
-  background: transparent;
-  border: none;
-  color: $accent-color;
-  text-decoration: underline;
-  font-size: 0.6rem;
-  cursor: pointer;
-
-  &:hover:not(:disabled) {
-    text-decoration: none;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-  }
-}
-
 .buttonAsLink {
   @extend %link;
   background: none;
@@ -874,8 +852,4 @@ $badge-size: 0.85rem;
     opacity: 0.6;
     font-family: var(--vscode-font-family);
   }
-}
-
-.separator::before {
-  content: '|';
 }

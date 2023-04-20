@@ -46,6 +46,7 @@ export interface Experiment extends BaseExperimentFields {
   starred?: boolean
   Created?: string
   commit?: CommitData
+  branch?: string
 }
 
 export const isRunning = (status: ExperimentStatus | undefined): boolean =>

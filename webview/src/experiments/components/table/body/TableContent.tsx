@@ -1,6 +1,8 @@
-import React, { RefObject, useCallback, useContext } from 'react'
+import React, { Fragment, RefObject, useCallback, useContext } from 'react'
 import { useSelector } from 'react-redux'
 import { TableBody } from './TableBody'
+import { CommitsAndBranchesNavigation } from './commitsAndBranches/CommitsAndBranchesNavigation'
+import { BranchDivider } from './branchDivider/BranchDivider'
 import { RowSelectionContext } from '../RowSelectionContext'
 import { ExperimentsState } from '../../../store'
 import { InstanceProp, RowProp } from '../../../util/interfaces'
@@ -52,19 +54,37 @@ export const TableContent: React.FC<TableContentProps> = ({
     [flatRows, batchSelection, lastSelectedRow]
   )
 
+  const branches = [...new Set(rows.map(row => row.original.branch))]
+
   return (
     <>
-      {rows.map(row => (
-        <TableBody
-          tableHeaderHeight={tableHeadHeight}
-          root={tableRef.current}
-          row={row}
-          instance={instance}
-          key={row.id}
-          hasRunningExperiment={hasRunningExperiment}
-          projectHasCheckpoints={hasCheckpoints}
-          batchRowSelection={batchRowSelection}
-        />
+      {branches.map((branch, branchIndex) => (
+        <Fragment key={branch}>
+          {rows
+            .filter(row => row.original.branch === branch)
+            .map((row, i) => {
+              const isFirstRow =
+                (branchIndex === 0 && i === 1) || (branchIndex !== 0 && i === 0)
+              return (
+                <Fragment key={row.id}>
+                  {isFirstRow && branches.length > 1 && (
+                    <BranchDivider>{branch}</BranchDivider>
+                  )}
+                  <TableBody
+                    tableHeaderHeight={tableHeadHeight}
+                    root={tableRef.current}
+                    row={row}
+                    instance={instance}
+                    hasRunningExperiment={hasRunningExperiment}
+                    projectHasCheckpoints={hasCheckpoints}
+                    batchRowSelection={batchRowSelection}
+                    showPreviousRow={isFirstRow}
+                  />
+                </Fragment>
+              )
+            })}
+          <CommitsAndBranchesNavigation />
+        </Fragment>
       ))}
     </>
   )

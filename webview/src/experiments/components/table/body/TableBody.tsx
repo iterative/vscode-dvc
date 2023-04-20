@@ -5,18 +5,18 @@ import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { ExperimentGroup } from './ExperimentGroup'
 import { BatchSelectionProp, RowContent } from './Row'
 import { WorkspaceRowGroup } from './WorkspaceRowGroup'
+import { PreviousCommitsRow } from './PreviousCommitsRow'
 import styles from '../styles.module.scss'
 import { InstanceProp, RowProp } from '../../../util/interfaces'
 import { ExperimentsState } from '../../../store'
 
-export const TableBody: React.FC<
-  RowProp &
-    InstanceProp &
-    BatchSelectionProp & {
-      root: HTMLElement | null
-      tableHeaderHeight: number
-    }
-> = ({
+interface TableBodyProps extends RowProp, InstanceProp, BatchSelectionProp {
+  root: HTMLElement | null
+  tableHeaderHeight: number
+  showPreviousRow?: boolean
+}
+
+export const TableBody: React.FC<TableBodyProps> = ({
   row,
   instance,
   contextMenuDisabled,
@@ -24,7 +24,8 @@ export const TableBody: React.FC<
   hasRunningExperiment,
   batchRowSelection,
   root,
-  tableHeaderHeight
+  tableHeaderHeight,
+  showPreviousRow
 }) => {
   const contentProps = {
     batchRowSelection,
@@ -54,18 +55,6 @@ export const TableBody: React.FC<
     </WorkspaceRowGroup>
   ) : (
     <>
-      {row.index === 2 && row.depth === 0 && (
-        <tbody>
-          <tr className={cx(styles.previousCommitsRow, styles.experimentsTr)}>
-            <td
-              className={cx(styles.previousCommitsText, styles.experimentsTd)}
-            >
-              {isBranchesView ? 'Other Branches' : 'Previous Commits'}
-            </td>
-            <td colSpan={row.getAllCells().length - 1}></td>
-          </tr>
-        </tbody>
-      )}
       <tbody
         className={cx(styles.rowGroup, {
           [styles.experimentGroup]: row.depth > 0,
@@ -74,6 +63,12 @@ export const TableBody: React.FC<
       >
         {content}
       </tbody>
+      {showPreviousRow && row.depth === 0 && (
+        <PreviousCommitsRow
+          isBranchesView={isBranchesView}
+          nbColumns={row.getAllCells().length}
+        />
+      )}
     </>
   )
 }
