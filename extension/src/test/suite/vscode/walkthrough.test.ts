@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { commands } from 'vscode'
-import { restore, spy } from 'sinon'
+import { restore, stub } from 'sinon'
 import { closeAllEditors } from '../util'
 import { RegisteredCommands } from '../../../commands/external'
 
@@ -16,14 +16,19 @@ suite('Walkthrough Test Suite', () => {
 
   describe('dvc.getStarted', () => {
     it('should be able to show the walkthrough', async () => {
-      const executeCommandSpy = spy(commands, 'executeCommand')
+      const mockExecuteCommand = stub(commands, 'executeCommand')
+      mockExecuteCommand
+        .onFirstCall()
+        .callsFake((...args) => mockExecuteCommand.wrappedMethod(...args))
+        .onSecondCall()
+        .resolves(undefined)
 
       await expect(
         commands.executeCommand(RegisteredCommands.EXTENSION_GET_STARTED)
       ).to.be.eventually.equal(undefined)
 
-      expect(executeCommandSpy).to.be.calledTwice
-      expect(executeCommandSpy).to.be.calledWith(
+      expect(mockExecuteCommand).to.be.calledTwice
+      expect(mockExecuteCommand).to.be.calledWith(
         'workbench.action.openWalkthrough',
         'iterative.dvc#welcome'
       )
