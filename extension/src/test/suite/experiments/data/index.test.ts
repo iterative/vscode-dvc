@@ -98,8 +98,9 @@ suite('Experiments Data Test Suite', () => {
           disposable.track(new EventEmitter<boolean>()),
           {
             getIsBranchesView: () => false,
-            getNbOfCommitsToShow: () => DEFAULT_NUM_OF_COMMITS_TO_SHOW
-          } as ExperimentsModel
+            getNbOfCommitsToShow: () => DEFAULT_NUM_OF_COMMITS_TO_SHOW,
+            setAvailableBranchesToShow: stub()
+          } as unknown as ExperimentsModel
         )
       )
 
@@ -151,8 +152,9 @@ suite('Experiments Data Test Suite', () => {
           disposable.track(new EventEmitter<boolean>()),
           {
             getIsBranchesView: () => false,
-            getNbOfCommitsToShow: () => DEFAULT_NUM_OF_COMMITS_TO_SHOW
-          } as ExperimentsModel
+            getNbOfCommitsToShow: () => DEFAULT_NUM_OF_COMMITS_TO_SHOW,
+            setAvailableBranchesToShow: stub()
+          } as unknown as ExperimentsModel
         )
       )
 
