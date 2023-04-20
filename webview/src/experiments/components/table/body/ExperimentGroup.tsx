@@ -1,7 +1,7 @@
 import React from 'react'
 import { BatchSelectionProp } from './Row'
-import { RowProp } from './interfaces'
 import { NestedRow } from './NestedRow'
+import { RowProp } from '../../../util/interfaces'
 
 export const ExperimentGroup: React.FC<RowProp & BatchSelectionProp> = ({
   row,

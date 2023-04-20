@@ -26,7 +26,7 @@ import {
   updateRows,
   updateSelectedForPlotsCount,
   updateSorts
-} from './table/tableDataSlice'
+} from '../state/tableDataSlice'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 
 export const App: React.FC<Record<string, unknown>> = () => {
