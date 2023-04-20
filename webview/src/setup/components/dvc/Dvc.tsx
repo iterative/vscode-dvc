@@ -79,6 +79,7 @@ export const Dvc: React.FC<DvcProps> = ({
   return (
     <EmptyState isFullScreen={false}>
       <h1>Setup Complete</h1>
+      {children}
       <IconButton
         appearance="primary"
         icon={Beaker}
@@ -94,7 +95,6 @@ export const Dvc: React.FC<DvcProps> = ({
         }
         text="Show Experiments"
       />
-      {children}
     </EmptyState>
   )
 }

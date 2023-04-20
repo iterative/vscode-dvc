@@ -3,28 +3,33 @@ import { DvcCliDetails, DvcCliIndicator } from 'dvc/src/setup/webview/contract'
 import { MAX_CLI_VERSION, MIN_CLI_VERSION } from 'dvc/src/cli/dvc/contract'
 import styles from './styles.module.scss'
 
-const getTextBasedOffType = (type: string, version: string | undefined) => {
+const getLocationValue = (
+  location: string,
+  type: string,
+  version: string | undefined
+): string | undefined => {
   if (!version) {
-    return "The extension can't find DVC."
+    return undefined
   }
 
   switch (type) {
     case DvcCliIndicator.GLOBAL:
-      return 'The extension is using DVC installed within a global environment.'
+      return `${location} (global)`
     case DvcCliIndicator.AUTO:
-      return 'The extension is using DVC installed within a python environment selected via the Python extension.'
-    case DvcCliIndicator.MANUAL:
-      return 'The extension is using DVC installed within a python environment selected manually.'
+      return `${location} (selected via python extension)`
+    default:
+      return `${location} (selected manually)`
   }
 }
 
-const InfoListItem: React.FC<{ title: string; text: string }> = ({
+const InfoRow: React.FC<{ title: string; text: string | undefined }> = ({
   title,
   text
 }) => (
-  <li>
-    <span className={styles.bold}>{title}:</span> {text}
-  </li>
+  <tr>
+    <td className={styles.infoKey}>{title}</td>
+    <td className={styles.infoValue}>{text || 'Not found'}</td>
+  </tr>
 )
 
 export const DvcEnvDetails: React.FC<DvcCliDetails> = ({
@@ -34,20 +39,17 @@ export const DvcEnvDetails: React.FC<DvcCliDetails> = ({
 }) => {
   return (
     <div className={styles.envDetails}>
-      <h2 className={styles.title}>DVC CLI Info</h2>
-      <p className={styles.text}>{getTextBasedOffType(type, version)}</p>
-      <ul className={styles.info}>
-        {version && (
-          <>
-            <InfoListItem title="Location" text={location} />
-            <InfoListItem title="Version" text={version} />
-          </>
-        )}
-        <InfoListItem
-          title="Required Version"
-          text={`${MIN_CLI_VERSION} - ${MAX_CLI_VERSION}`}
-        />
-      </ul>
+      <table className={styles.info}>
+        <tbody>
+          <InfoRow title="Min Required Version" text={MIN_CLI_VERSION} />
+          <InfoRow title="Max Required Version" text={MAX_CLI_VERSION} />
+          <InfoRow
+            title="Location"
+            text={getLocationValue(location, type, version)}
+          />
+          <InfoRow title="Version" text={version} />
+        </tbody>
+      </table>
     </div>
   )
 }

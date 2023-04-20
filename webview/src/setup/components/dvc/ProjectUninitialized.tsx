@@ -23,6 +23,7 @@ const GitUninitialized: React.FC<GitUninitializedProps> = ({
     return (
       <EmptyState isFullScreen={false}>
         <Header />
+        {children}
         <GitIsPrerequisite />
         <p>
           The extension is unable to initialize a Git repository in this
@@ -32,7 +33,6 @@ const GitUninitialized: React.FC<GitUninitializedProps> = ({
           Please open a different folder which contains no Git repositories or a
           single existing Git repository at the root.
         </p>
-        {children}
       </EmptyState>
     )
   }
@@ -40,9 +40,9 @@ const GitUninitialized: React.FC<GitUninitializedProps> = ({
   return (
     <EmptyState isFullScreen={false}>
       <Header />
+      {children}
       <GitIsPrerequisite />
       <Button onClick={initializeGit} text="Initialize Git" />
-      {children}
     </EmptyState>
   )
 }
@@ -53,13 +53,13 @@ const DvcUninitialized: React.FC<{
 }> = ({ initializeDvc, children }) => (
   <EmptyState isFullScreen={false}>
     <Header />
+    {children}
     <p>
       The current workspace does not contain a DVC project. You can initialize a
       project which will enable features powered by DVC. To learn more about how
       to use DVC please read <a href="https://dvc.org/doc">our docs</a>.
     </p>
     <Button onClick={initializeDvc} text="Initialize Project"></Button>
-    {children}
   </EmptyState>
 )
 
