@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useContext, useMemo } from 'react'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import {
   ExperimentStatus,
@@ -7,11 +7,11 @@ import {
   isRunningInQueue
 } from 'dvc/src/experiments/webview/contract'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
-import { RowProp } from './interfaces'
-import { RowSelectionContext } from './RowSelectionContext'
-import { MessagesMenu } from '../../../shared/components/messagesMenu/MessagesMenu'
-import { MessagesMenuOptionProps } from '../../../shared/components/messagesMenu/MessagesMenuOption'
-import { cond } from '../../../util/helpers'
+import { RowProp } from '../../../util/interfaces'
+import { RowSelectionContext } from '../RowSelectionContext'
+import { MessagesMenu } from '../../../../shared/components/messagesMenu/MessagesMenu'
+import { MessagesMenuOptionProps } from '../../../../shared/components/messagesMenu/MessagesMenuOption'
+import { cond } from '../../../../util/helpers'
 
 const experimentMenuOption = (
   payload: string | string[] | { id: string; executor?: string | null }[],
@@ -36,21 +36,17 @@ const getMultiSelectMenuOptions = (
   selectedRowsList: RowProp[],
   hasRunningExperiment: boolean
 ) => {
-  const unstarredExperiments = selectedRowsList.filter(
-    ({
-      row: {
-        original: { starred }
-      }
-    }) => !starred
-  )
+  const filterStarredUnstarred = (isStarred: boolean) =>
+    selectedRowsList.filter(
+      ({
+        row: {
+          original: { starred }
+        }
+      }) => starred === isStarred
+    )
 
-  const starredExperiments = selectedRowsList.filter(
-    ({
-      row: {
-        original: { starred }
-      }
-    }) => starred
-  )
+  const unstarredExperiments = filterStarredUnstarred(false)
+  const starredExperiments = filterStarredUnstarred(true)
 
   const selectedIds = selectedRowsList.map(value => value.row.original.id)
 
@@ -286,8 +282,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
     depth
   }
 }) => {
-  const { selectedRows, clearSelectedRows } =
-    React.useContext(RowSelectionContext)
+  const { selectedRows, clearSelectedRows } = useContext(RowSelectionContext)
 
   const isWorkspace = id === EXPERIMENT_WORKSPACE_ID
 

@@ -29,7 +29,7 @@ const registerResourceCommands = (internalCommands: InternalCommands): void => {
 
   internalCommands.registerExternalCliCommand<Resource>(
     RegisteredCliCommands.COMMIT_TARGET,
-    getResourceCommand(internalCommands, AvailableCommands.COMMIT)
+    getSimpleResourceCommand(internalCommands, AvailableCommands.COMMIT)
   )
 }
 

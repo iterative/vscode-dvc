@@ -115,8 +115,7 @@ export const getCommitRootCommand =
       return
     }
 
-    await tryThenMaybeForce(
-      internalCommands,
+    await internalCommands.executeCommand(
       AvailableCommands.COMMIT,
       cwd as string
     )

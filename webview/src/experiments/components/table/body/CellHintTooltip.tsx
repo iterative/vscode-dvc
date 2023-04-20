@@ -1,9 +1,9 @@
 import React, { ReactNode, ReactElement } from 'react'
 import { TippyProps } from '@tippyjs/react'
-import styles from './styles.module.scss'
+import styles from '../styles.module.scss'
 import Tooltip, {
   NORMAL_TOOLTIP_DELAY
-} from '../../../shared/components/tooltip/Tooltip'
+} from '../../../../shared/components/tooltip/Tooltip'
 
 export type CellHintTooltipProps = {
   tooltipContent: ReactNode
