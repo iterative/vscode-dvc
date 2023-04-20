@@ -56,14 +56,13 @@ export const TableBody: React.FC<
     <>
       {row.index === 2 && row.depth === 0 && (
         <tbody>
-          <tr className={styles.previousCommitsRow}>
-            <td className={styles.previousCommitsText}>
+          <tr className={cx(styles.previousCommitsRow, styles.experimentsTr)}>
+            <td
+              className={cx(styles.previousCommitsText, styles.experimentsTd)}
+            >
               {isBranchesView ? 'Other Branches' : 'Previous Commits'}
             </td>
-            <td
-              className={styles.previousCommitsText}
-              colSpan={row.getAllCells().length - 1}
-            ></td>
+            <td colSpan={row.getAllCells().length - 1}></td>
           </tr>
         </tbody>
       )}
