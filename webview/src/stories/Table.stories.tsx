@@ -23,8 +23,6 @@ import {
 import { addCommitDataToMainBranch } from './util'
 import Experiments from '../experiments/components/Experiments'
 
-import './test-vscode-styles.scss'
-import '../shared/style.scss'
 import { experimentsReducers } from '../experiments/store'
 import { TableDataState } from '../experiments/components/table/tableDataSlice'
 import { NORMAL_TOOLTIP_DELAY } from '../shared/components/tooltip/Tooltip'
@@ -42,6 +40,7 @@ const tableData: TableDataState = {
   columns: columnsFixture,
   filteredCount: 0,
   filters: ['params:params.yaml:lr'],
+  hasBranchesToSelect: true,
   hasCheckpoints: true,
   hasColumns: true,
   hasConfig: true,

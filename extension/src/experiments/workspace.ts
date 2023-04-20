@@ -23,7 +23,7 @@ import {
   getFileExtension,
   hasDvcYamlFile
 } from '../fileSystem'
-import { quickPickOneOrInput } from '../vscode/quickPick'
+import { quickPickManyValues, quickPickOneOrInput } from '../vscode/quickPick'
 import { pickFile } from '../vscode/resourcePicker'
 
 export enum scriptCommand {
@@ -355,7 +355,8 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
         updatesPaused,
         resourceLocator,
         this.workspaceState,
-        () => this.checkOrAddPipeline(dvcRoot)
+        () => this.checkOrAddPipeline(dvcRoot),
+        (branchesSelected: string[]) => this.selectBranches(branchesSelected)
       )
     )
 
@@ -430,6 +431,29 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
   }
 
+  public async selectBranches(branchesSelected: string[]) {
+    const cwd = await this.getDvcRoot()
+    if (!cwd) {
+      return
+    }
+    const allBranches = await this.internalCommands.executeCommand<string[]>(
+      AvailableCommands.GIT_GET_BRANCHES,
+      cwd
+    )
+    return await quickPickManyValues(
+      allBranches
+        .filter(branch => branch.indexOf('*') !== 0)
+        .map(branch => ({
+          label: branch,
+          picked: branchesSelected.includes(branch),
+          value: branch
+        })),
+      {
+        title: Title.SELECT_BRANCHES
+      }
+    )
+  }
+
   private async shouldRun() {
     const cwd = await this.getFocusedOrOnlyOrPickProject()
     if (!cwd) {
@@ -467,11 +491,18 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return false
     }
 
-    const { trainingScript, command } = await this.askForTrainingScript()
+    const { trainingScript, command, enteredManually } =
+      await this.askForTrainingScript()
     if (!trainingScript) {
       return false
     }
-    void findOrCreateDvcYamlFile(cwd, trainingScript, stageName, command)
+    void findOrCreateDvcYamlFile(
+      cwd,
+      trainingScript,
+      stageName,
+      command,
+      !enteredManually
+    )
     return true
   }
 
@@ -510,14 +541,19 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
         : pathOrSelect
 
     if (!trainingScript) {
-      return { command: undefined, trainingScript: undefined }
+      return {
+        command: undefined,
+        enteredManually: false,
+        trainingScript: undefined
+      }
     }
 
     const command =
       getScriptCommand(trainingScript) ||
       (await getInput(Title.ENTER_COMMAND_TO_RUN)) ||
       ''
-    return { command, trainingScript }
+    const enteredManually = pathOrSelect !== selectValue
+    return { command, enteredManually, trainingScript }
   }
 
   private async pickExpThenRun(

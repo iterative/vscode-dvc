@@ -9,9 +9,6 @@ import {
 import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'
 import { App } from '../setup/components/App'
 
-import './test-vscode-styles.scss'
-import '../shared/style.scss'
-
 const DEFAULT_DATA: SetupData = {
   canGitInitialize: false,
   cliCompatible: true,

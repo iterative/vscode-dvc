@@ -50,6 +50,10 @@ export class WebviewMessages {
   private isShowingMoreCommits = true
 
   private readonly addStage: () => Promise<boolean>
+  private readonly selectBranches: (
+    branchesSelected: string[]
+  ) => Promise<string[] | undefined>
+
   private readonly getNumCommits: () => Promise<number>
   private readonly update: () => Promise<void>
 
@@ -67,6 +71,9 @@ export class WebviewMessages {
     ) => Promise<string | undefined>,
     hasStages: () => Promise<string>,
     addStage: () => Promise<boolean>,
+    selectBranches: (
+      branchesSelected: string[]
+    ) => Promise<string[] | undefined>,
     getNumCommits: () => Promise<number>,
     update: () => Promise<void>
   ) {
@@ -80,6 +87,7 @@ export class WebviewMessages {
     this.stopQueuedExperiments = stopQueuedExperiments
     this.hasStages = hasStages
     this.addStage = addStage
+    this.selectBranches = selectBranches
     this.getNumCommits = getNumCommits
     this.update = update
 
@@ -221,6 +229,8 @@ export class WebviewMessages {
 
       case MessageFromWebviewType.SHOW_LESS_COMMITS:
         return this.changeCommitsToShow(-1)
+      case MessageFromWebviewType.SELECT_BRANCHES:
+        return this.addAndRemoveBranches()
 
       case MessageFromWebviewType.SWITCH_BRANCHES_VIEW:
         return this.switchToBranchesView()
@@ -231,6 +241,17 @@ export class WebviewMessages {
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
+  }
+
+  private async addAndRemoveBranches() {
+    const selectedBranches = await this.selectBranches(
+      this.experiments.getBranchesToShow()
+    )
+    if (!selectedBranches) {
+      return
+    }
+    this.experiments.setBranchesToShow(selectedBranches)
+    await this.update()
   }
 
   private async switchToBranchesView() {
@@ -269,6 +290,8 @@ export class WebviewMessages {
       columns: this.columns.getSelected(),
       filteredCount: this.experiments.getFilteredCount(),
       filters: this.experiments.getFilterPaths(),
+      hasBranchesToSelect:
+        this.experiments.getAvailableBranchesToShow().length > 0,
       hasCheckpoints: this.checkpoints.hasCheckpoints(),
       hasColumns: this.columns.hasNonDefaultColumns(),
       hasConfig: this.hasConfig,

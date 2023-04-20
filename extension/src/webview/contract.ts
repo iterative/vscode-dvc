@@ -69,7 +69,8 @@ export enum MessageFromWebviewType {
   SHOW_MORE_COMMITS = 'show-more-commits',
   SHOW_LESS_COMMITS = 'show-less-commits',
   SWITCH_BRANCHES_VIEW = 'show-all-branches',
-  SWITCH_COMMITS_VIEW = 'show-commits'
+  SWITCH_COMMITS_VIEW = 'show-commits',
+  SELECT_BRANCHES = 'select-branches'
 }
 
 export type ColumnResizePayload = {
@@ -236,6 +237,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.SHOW_LESS_COMMITS }
   | { type: MessageFromWebviewType.SWITCH_BRANCHES_VIEW }
   | { type: MessageFromWebviewType.SWITCH_COMMITS_VIEW }
+  | { type: MessageFromWebviewType.SELECT_BRANCHES }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA

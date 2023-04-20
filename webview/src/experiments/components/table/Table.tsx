@@ -14,7 +14,7 @@ import { InstanceProp, RowProp } from './interfaces'
 import { RowSelectionContext } from './RowSelectionContext'
 import { TableBody } from './TableBody'
 import { Indicators } from './Indicators'
-import { CommitsAndBranchesNavigation } from './CommitsAndBranchesNavigation'
+import { CommitsAndBranchesNavigation } from './commitsAndBranches/CommitsAndBranchesNavigation'
 import { ExperimentsState } from '../../store'
 
 interface TableProps extends InstanceProp {
@@ -77,7 +77,10 @@ export const Table: React.FC<TableProps> = ({
     >
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
       <table
-        className={cx(expColumnNeedsShadow && styles.withExpColumnShadow)}
+        className={cx(
+          styles.experimentsTable,
+          expColumnNeedsShadow && styles.withExpColumnShadow
+        )}
         ref={tableRef}
         onKeyUp={e => {
           if (e.key === 'Escape') {

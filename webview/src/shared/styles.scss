@@ -1,3 +1,5 @@
+@import './mixins.scss';
+
 * {
   box-sizing: border-box;
   outline: none;
@@ -46,13 +48,5 @@ button {
 }
 
 a {
-  color: var(--vscode-textLink-foreground);
-
-  &:hover {
-    color: var(--vscode-textLink-activeForeground);
-  }
-
-  &:active {
-    color: var(--vscode-textLink-activeForeground);
-  }
+  @extend %link;
 }

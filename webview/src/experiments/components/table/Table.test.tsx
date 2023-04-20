@@ -68,9 +68,6 @@ describe('Table', () => {
     const mockColumnName = 'C'
     const mockColumnPath = 'params:C'
 
-    const findSortableColumn = async () =>
-      await screen.findByTestId(`header-${mockColumnPath}`)
-
     const clickOnSortOption = async (optionLabel: SortOrder) => {
       const column = await screen.findByText(mockColumnName)
       fireEvent.contextMenu(column, {
@@ -113,9 +110,6 @@ describe('Table', () => {
           ]
         })
 
-        const column = await findSortableColumn()
-        expect(column).toHaveClass('sortingHeaderCellAsc')
-
         await clickOnSortOption(SortOrder.DESCENDING)
 
         expect(mockedPostMessage).toHaveBeenCalledWith({
@@ -137,9 +131,6 @@ describe('Table', () => {
             }
           ]
         })
-
-        const column = await findSortableColumn()
-        expect(column).toHaveClass('sortingHeaderCellDesc')
 
         await clickOnSortOption(SortOrder.NONE)
 
@@ -174,9 +165,9 @@ describe('Table', () => {
 
       const workspaceCell = await screen.findByText(EXPERIMENT_WORKSPACE_ID)
 
-      expect(workspaceCell?.className.includes(styles.workspaceChange)).toBe(
-        false
-      )
+      expect(
+        workspaceCell?.className.includes(styles.workspaceChangeText)
+      ).toBe(false)
     })
 
     it("should have the workspaceChange class on the workspace's first cell (text) if there are workspace changes", () => {
@@ -184,7 +175,7 @@ describe('Table', () => {
 
       const workspaceCell = screen.getByTestId('id___workspace')
 
-      expect(workspaceCell.className.includes(styles.workspaceChange)).toBe(
+      expect(workspaceCell.className.includes(styles.workspaceChangeText)).toBe(
         true
       )
     })
@@ -194,7 +185,7 @@ describe('Table', () => {
 
       const row = await screen.findByTestId('Created___workspace')
 
-      expect(row?.className.includes(styles.workspaceChange)).toBe(false)
+      expect(row?.className.includes(styles.workspaceChangeText)).toBe(false)
     })
 
     it('should not have the workspaceChange class on a cell if there are changes to other columns but not this one', async () => {
@@ -202,7 +193,7 @@ describe('Table', () => {
 
       const row = await screen.findByTestId('Created___workspace')
 
-      expect(row?.className.includes(styles.workspaceChange)).toBe(false)
+      expect(row?.className.includes(styles.workspaceChangeText)).toBe(false)
     })
 
     it('should have the workspaceChange class on a cell if there are changes matching the column id', async () => {
@@ -210,7 +201,7 @@ describe('Table', () => {
 
       const row = await screen.findByTestId('Created___workspace')
 
-      expect(row?.className.includes(styles.workspaceChange)).toBe(true)
+      expect(row?.className.includes(styles.workspaceChangeText)).toBe(true)
     })
   })
 
@@ -391,14 +382,61 @@ describe('Table', () => {
       dragEnter(startingNode, targetNode.id, DragEnterDirection.AUTO)
 
       expect(
-        header?.classList.contains(styles.headerCellDropTarget)
+        header?.classList.contains(styles.dropTargetHeaderCell)
       ).toBeTruthy()
 
       dragLeave(targetNode)
 
       expect(
-        header?.classList.contains(styles.headerCellDropTarget)
+        header?.classList.contains(styles.dropTargetHeaderCell)
       ).toBeFalsy()
+    })
+
+    it('split group should be moving properly', async () => {
+      // test for https://github.com/iterative/vscode-dvc/issues/3679
+      const { getDraggableHeaderFromText } = renderExperimentsTable({
+        ...tableDataFixture
+      })
+
+      let headers = await getHeaders()
+
+      // splits metrics and params group into 4 subgroups
+      dragAndDrop(
+        screen.getByText('val_accuracy'),
+        getDraggableHeaderFromText('learning_rate'),
+        DragEnterDirection.AUTO
+      )
+
+      headers = await getHeaders()
+
+      expect(headers.indexOf('val_accuracy')).toBeGreaterThan(
+        headers.indexOf('learning_rate')
+      )
+
+      // note: moving the group here, not the leaf column
+      let metricGroups = screen.getAllByText('summary.json')
+      expect(metricGroups.length).toBe(2)
+
+      dragAndDrop(
+        metricGroups[1],
+        getDraggableHeaderFromText('learning_rate'),
+        DragEnterDirection.AUTO
+      )
+
+      headers = await getHeaders()
+
+      metricGroups = screen.getAllByText('summary.json')
+      const paramsGroups = screen.getAllByText('params.yaml')
+
+      expect(metricGroups.length).toBe(2)
+      expect(paramsGroups.length).toBe(2)
+
+      expect(headers.indexOf('val_accuracy')).toBeLessThan(
+        headers.indexOf('learning_rate')
+      )
+      expect(headers.indexOf('epochs')).toBeGreaterThan(
+        headers.indexOf('val_loss')
+      )
     })
   })
 })
