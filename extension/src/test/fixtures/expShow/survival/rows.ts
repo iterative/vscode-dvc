@@ -316,7 +316,7 @@ const data: Commit[] = [
     starred: false
   },
   {
-    id: 'a49e03966a1f9f1299ec222ebc4bed8625d2c54d',
+    id: 'a49e039',
     label: 'a49e039',
     sha: 'a49e03966a1f9f1299ec222ebc4bed8625d2c54d',
     Created: '2021-07-16T19:50:39',
@@ -473,7 +473,7 @@ const data: Commit[] = [
     starred: false
   },
   {
-    id: '4f7b50c3d171a11b6cfcd04416a16fc80b61018d',
+    id: '4f7b50c',
     label: '4f7b50c',
     sha: '4f7b50c3d171a11b6cfcd04416a16fc80b61018d',
     Created: '2021-07-16T19:48:45',

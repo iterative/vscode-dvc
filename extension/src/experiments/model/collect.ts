@@ -171,11 +171,11 @@ const collectExpState = (
   commitData: { [sha: string]: CommitData }
 ): Experiment | undefined => {
   const { rev, name } = expState
-  const id = name || rev
   const label =
     rev === EXPERIMENT_WORKSPACE_ID
       ? EXPERIMENT_WORKSPACE_ID
       : name || shortenForLabel(rev)
+  const id = name || label
 
   const experiment: Experiment = { id, label }
 
