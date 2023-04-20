@@ -120,29 +120,20 @@ suite('Source Control Management Test Suite', () => {
       expect(executeCommandSpy).to.be.calledWith('workbench.scm.focus')
     })
 
-    it('should prompt to force if dvc.commit fails', async () => {
+    it('should not prompt to force if dvc.commit fails', async () => {
       const mockCommit = stub(DvcExecutor.prototype, 'commit')
         .onFirstCall()
         .rejects({
           stderr: 'Use `-f` to force.'
         })
-        .onSecondCall()
-        .resolves('')
-      const mockShowWarningMessage = stub(
-        window,
-        'showWarningMessage'
-      ).resolves('Force' as unknown as MessageItem)
-
       stubPrivatePrototypeMethod(WorkspaceRepositories, 'hasChanges').returns(
         true
       )
 
       await commands.executeCommand(RegisteredCliCommands.COMMIT, { rootUri })
 
-      expect(mockCommit).to.be.calledTwice
-      expect(mockShowWarningMessage).to.be.calledOnce
-      expect(mockCommit).to.be.calledWith(dvcDemoPath)
-      expect(mockCommit).to.be.calledWith(dvcDemoPath, '-f')
+      expect(mockCommit).to.be.calledOnce
+      expect(mockCommit).to.be.calledWithExactly(dvcDemoPath)
     })
 
     it('should be able to run dvc.commitTarget without error', async () => {
@@ -154,30 +145,6 @@ suite('Source Control Management Test Suite', () => {
       })
 
       expect(mockCommit).to.be.calledOnce
-    })
-
-    it('should prompt to force if dvc.commitTarget fails', async () => {
-      const mockCommit = stub(DvcExecutor.prototype, 'commit')
-        .onFirstCall()
-        .rejects({
-          stderr: 'Use `-f` to force.'
-        })
-        .onSecondCall()
-        .resolves('')
-      const mockShowWarningMessage = stub(
-        window,
-        'showWarningMessage'
-      ).resolves('Force' as unknown as MessageItem)
-
-      await commands.executeCommand(RegisteredCliCommands.COMMIT_TARGET, {
-        dvcRoot: dvcDemoPath,
-        resourceUri
-      })
-
-      expect(mockCommit).to.be.calledTwice
-      expect(mockShowWarningMessage).to.be.calledOnce
-      expect(mockCommit).to.be.calledWith(dvcDemoPath, relPath)
-      expect(mockCommit).to.be.calledWith(dvcDemoPath, relPath, '-f')
     })
 
     it('should not prompt to force if dvc.pull fails without a prompt error', async () => {
