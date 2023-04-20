@@ -4,12 +4,12 @@ import {
   ExperimentStatus,
   isQueued
 } from 'dvc/src/experiments/webview/contract'
-import { Indicator } from './Indicators'
-import { addStarredFilter, openPlotsWebview } from './messages'
-import styles from './styles.module.scss'
 import { CellHintTooltip } from './CellHintTooltip'
-import { clickAndEnterProps } from '../../../util/props'
-import { Clock, StarFull, StarEmpty } from '../../../shared/components/icons'
+import { Indicator } from '../Indicators'
+import { addStarredFilter, openPlotsWebview } from '../../../util/messages'
+import styles from '../styles.module.scss'
+import { clickAndEnterProps } from '../../../../util/props'
+import { Clock, StarFull, StarEmpty } from '../../../../shared/components/icons'
 
 export type CellRowActionsProps = {
   bulletColor?: string
