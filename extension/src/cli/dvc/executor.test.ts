@@ -167,28 +167,12 @@ describe('CliExecutor', () => {
   })
 
   describe('commit', () => {
-    it('should call createProcess with the correct parameters to commit a repository', async () => {
+    it('should call createProcess with the correct parameters to force commit a repository (by default)', async () => {
       const cwd = __dirname
       const stdout = updatingLockFile
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await dvcExecutor.commit(cwd)
-      expect(output).toStrictEqual(stdout)
-
-      expect(mockedCreateProcess).toHaveBeenCalledWith({
-        args: ['commit'],
-        cwd,
-        env: mockedEnv,
-        executable: 'dvc'
-      })
-    })
-
-    it('should call createProcess with the correct parameters to force commit a repository', async () => {
-      const cwd = __dirname
-      const stdout = updatingLockFile
-      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
-
-      const output = await dvcExecutor.commit(cwd, Flag.FORCE)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toHaveBeenCalledWith({
@@ -199,7 +183,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should call createProcess with the correct parameters to commit a target', async () => {
+    it('should call createProcess with the correct parameters to commit a target (force by default)', async () => {
       const cwd = __dirname
       const relPath = join(
         'data',
@@ -211,28 +195,6 @@ describe('CliExecutor', () => {
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await dvcExecutor.commit(cwd, relPath)
-      expect(output).toStrictEqual(stdout)
-
-      expect(mockedCreateProcess).toHaveBeenCalledWith({
-        args: ['commit', relPath],
-        cwd,
-        env: mockedEnv,
-        executable: 'dvc'
-      })
-    })
-
-    it('should call createProcess with the correct parameters to force commit a target', async () => {
-      const cwd = __dirname
-      const relPath = join(
-        'data',
-        'fashion-mnist',
-        'raw',
-        't10k-images-idx3-ubyte.gz'
-      )
-      const stdout = updatingLockFile
-      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
-
-      const output = await dvcExecutor.commit(cwd, relPath, Flag.FORCE)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toHaveBeenCalledWith({
