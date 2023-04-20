@@ -10,7 +10,7 @@ interface ErrorCellProps {
 
 export const ErrorCell: React.FC<ErrorCellProps> = ({ error }) => (
   <ErrorTooltip error={error}>
-    <div className={cx(styles.innerCell, styles.error)}>
+    <div className={cx(styles.innerCell, styles.errorText)}>
       <CellContents>!</CellContents>
     </div>
   </ErrorTooltip>

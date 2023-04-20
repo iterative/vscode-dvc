@@ -9,7 +9,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ name }) => {
   return (
     <OverflowHoverTooltip content={name}>
-      <div className={styles.headerCellWrapper}>
+      <div className={styles.headerCellText}>
         <span>{name}</span>
       </div>
     </OverflowHoverTooltip>

@@ -93,18 +93,24 @@ export const RowContent: React.FC<
       }
     >
       <tr
-        className={cx(className, styles.tr, styles.bodyRow, styles.row, {
-          [styles.runningExperiment]: running,
-          [styles.queuedExperiment]: queued,
-          [styles.unselectedExperiment]: !running && !queued && unselected,
-          [styles.normalExperiment]: !running && !queued && !unselected,
-          [styles.oddRow]: isOdd,
-          [styles.evenRow]: !isOdd,
-          [styles.workspaceRow]: isWorkspace,
-          [styles.normalRow]: !isWorkspace,
-          [styles.rowSelected]: isRowSelected,
-          [styles.rowFocused]: menuActive
-        })}
+        className={cx(
+          className,
+          styles.experimentsTr,
+          styles.bodyRow,
+          styles.row,
+          {
+            [styles.runningExperiment]: running,
+            [styles.queuedExperiment]: queued,
+            [styles.unselectedExperiment]: !running && !queued && unselected,
+            [styles.normalExperiment]: !running && !queued && !unselected,
+            [styles.oddRow]: isOdd,
+            [styles.evenRow]: !isOdd,
+            [styles.workspaceRow]: isWorkspace,
+            [styles.normalRow]: !isWorkspace,
+            [styles.rowSelected]: isRowSelected,
+            [styles.rowFocused]: menuActive
+          }
+        )}
         tabIndex={0}
         aria-selected={isRowSelected}
         data-testid={isWorkspace && 'workspace-row'}

@@ -69,7 +69,8 @@ export const TableBody: React.FC<
       )}
       <tbody
         className={cx(styles.rowGroup, {
-          [styles.experimentGroup]: row.depth > 0
+          [styles.experimentGroup]: row.depth > 0,
+          [styles.expandedGroup]: row.getIsExpanded() && row.subRows.length > 0
         })}
       >
         {content}

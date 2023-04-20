@@ -22,7 +22,7 @@ export const AddStage: React.FC<AddStageProps> = ({ hasValidDvcYaml }) => (
       disabled={!hasValidDvcYaml}
     />
     {!hasValidDvcYaml && (
-      <p className={styles.error}>
+      <p className={styles.errorText}>
         Your dvc.yaml file should contain valid yaml before adding any pipeline
         stages.
       </p>

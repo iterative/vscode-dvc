@@ -30,7 +30,10 @@ export const Table: React.FC<TableProps> = ({
     >
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
       <table
-        className={cx(expColumnNeedsShadow && styles.withExpColumnShadow)}
+        className={cx(
+          styles.experimentsTable,
+          expColumnNeedsShadow && styles.withExpColumnShadow
+        )}
         ref={tableRef}
         onKeyUp={e => {
           if (e.key === 'Escape') {
