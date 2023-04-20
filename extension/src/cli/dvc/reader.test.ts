@@ -94,23 +94,22 @@ describe('CliReader', () => {
       })
 
       const cliOutput = await dvcReader.expShow(cwd)
-      expect(cliOutput).toStrictEqual({
-        [EXPERIMENT_WORKSPACE_ID]: {
-          baseline: { error: { msg: unexpectedStderr, type: 'Caught error' } }
+      expect(cliOutput).toStrictEqual([
+        {
+          error: { msg: unexpectedStderr, type: 'Caught error' },
+          rev: EXPERIMENT_WORKSPACE_ID
         }
-      })
+      ])
     })
 
-    it('should return the default output if the cli returns an empty object (no commits)', async () => {
+    it('should return the default output if the cli returns an empty array (no commits)', async () => {
       const cwd = __dirname
       mockedCreateProcess.mockReturnValueOnce(
-        getMockedProcess(JSON.stringify({}))
+        getMockedProcess(JSON.stringify([]))
       )
 
       const cliOutput = await dvcReader.expShow(cwd)
-      expect(cliOutput).toStrictEqual({
-        [EXPERIMENT_WORKSPACE_ID]: { baseline: {} }
-      })
+      expect(cliOutput).toStrictEqual([{ rev: EXPERIMENT_WORKSPACE_ID }])
     })
   })
 

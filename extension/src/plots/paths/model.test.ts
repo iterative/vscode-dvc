@@ -6,7 +6,6 @@ import { buildMockMemento } from '../../test/util'
 import { PlotsType, TemplatePlotGroup } from '../webview/contract'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { ErrorsModel } from '../errors/model'
-import { getCLIIdToLabel } from '../../test/fixtures/plotsDiff/util'
 import { REVISIONS } from '../../test/fixtures/plotsDiff'
 
 describe('PathsModel', () => {
@@ -33,7 +32,7 @@ describe('PathsModel', () => {
       buildMockErrorsModel(),
       buildMockMemento()
     )
-    model.transformAndSet(plotsDiffFixture, REVISIONS, getCLIIdToLabel())
+    model.transformAndSet(plotsDiffFixture, REVISIONS)
     model.setSelectedRevisions(REVISIONS)
     expect(model.getTerminalNodes()).toStrictEqual([
       {
@@ -144,7 +143,7 @@ describe('PathsModel', () => {
       buildMockErrorsModel(),
       buildMockMemento()
     )
-    model.transformAndSet(plotsDiffFixture, REVISIONS, {})
+    model.transformAndSet(plotsDiffFixture, REVISIONS)
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
@@ -166,7 +165,7 @@ describe('PathsModel', () => {
       buildMockErrorsModel(),
       buildMockMemento()
     )
-    model.transformAndSet(plotsDiffFixture, REVISIONS, {})
+    model.transformAndSet(plotsDiffFixture, REVISIONS)
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
@@ -196,7 +195,7 @@ describe('PathsModel', () => {
       buildMockErrorsModel(),
       buildMockMemento()
     )
-    model.transformAndSet(plotsDiffFixture, REVISIONS, {})
+    model.transformAndSet(plotsDiffFixture, REVISIONS)
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
@@ -231,8 +230,7 @@ describe('PathsModel', () => {
 
     model.transformAndSet(
       { data: { ...plotsDiffFixture.data, ...previousPlotFixture.data } },
-      [...REVISIONS, commitBeforePlots],
-      {}
+      [...REVISIONS, commitBeforePlots]
     )
 
     const expectedOrderAllRevisions = [
@@ -273,8 +271,7 @@ describe('PathsModel', () => {
     )
     model.transformAndSet(
       { data: { ...plotsDiffFixture.data, ...previousPlotFixture.data } },
-      [...REVISIONS, commitBeforePlots],
-      {}
+      [...REVISIONS, commitBeforePlots]
     )
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
@@ -301,12 +298,12 @@ describe('PathsModel', () => {
       buildMockMemento()
     )
 
-    model.transformAndSet(plotsDiffFixture, REVISIONS, {})
+    model.transformAndSet(plotsDiffFixture, REVISIONS)
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     expect(model.getTemplateOrder()).toStrictEqual(originalTemplateOrder)
 
-    model.transformAndSet(previousPlotFixture, [commitBeforePlots], {})
+    model.transformAndSet(previousPlotFixture, [commitBeforePlots])
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID, commitBeforePlots])
 
     expect(model.getTemplateOrder()).toStrictEqual([
@@ -321,7 +318,7 @@ describe('PathsModel', () => {
       buildMockErrorsModel(),
       buildMockMemento()
     )
-    model.transformAndSet(plotsDiffFixture, REVISIONS, {})
+    model.transformAndSet(plotsDiffFixture, REVISIONS)
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     model.setTemplateOrder([logsLossGroup, logsAccGroup, multiViewGroup])
@@ -337,7 +334,7 @@ describe('PathsModel', () => {
       buildMockErrorsModel(),
       buildMockMemento()
     )
-    model.transformAndSet(plotsDiffFixture, REVISIONS, {})
+    model.transformAndSet(plotsDiffFixture, REVISIONS)
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     expect(model.getComparisonPaths()).toStrictEqual([
@@ -363,7 +360,7 @@ describe('PathsModel', () => {
       buildMockErrorsModel(),
       buildMockMemento()
     )
-    model.transformAndSet(plotsDiffFixture, REVISIONS, getCLIIdToLabel())
+    model.transformAndSet(plotsDiffFixture, REVISIONS)
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     const rootChildren = model.getChildren(undefined, {
@@ -475,8 +472,7 @@ describe('PathsModel', () => {
           type: 'Caught Error'
         }
       },
-      [EXPERIMENT_WORKSPACE_ID],
-      {}
+      [EXPERIMENT_WORKSPACE_ID]
     )
 
     expect(model.getTerminalNodes()).toStrictEqual([])

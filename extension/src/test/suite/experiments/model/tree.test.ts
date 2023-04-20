@@ -23,7 +23,6 @@ import {
   RegisteredCommands
 } from '../../../../commands/external'
 import { buildPlots } from '../../plots/util'
-import expShowFixture from '../../../fixtures/expShow/base/output'
 import { ExperimentsTree } from '../../../../experiments/model/tree'
 import { buildExperiments, stubWorkspaceExperimentsGetters } from '../util'
 import { WEBVIEW_TEST_TIMEOUT } from '../../timeouts'
@@ -39,6 +38,8 @@ import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 import { DvcReader } from '../../../../cli/dvc/reader'
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
 import { Revision } from '../../../../plots/webview/contract'
+import { BaseWebview } from '../../../../webview'
+import { Experiment } from '../../../../experiments/webview/contract'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = getTimeSafeDisposer()
@@ -62,7 +63,17 @@ suite('Experiments Tree Test Suite', () => {
     it('should be able to toggle whether an experiment is shown in the plots webview with dvc.views.experiments.toggleStatus', async () => {
       const mockNow = getMockNow()
 
-      const { plots, messageSpy, plotsModel } = await buildPlots(disposable)
+      const { plots, messageSpy, plotsModel, experimentsModel } =
+        await buildPlots(disposable)
+      messageSpy.restore()
+      const mockShow = stub(BaseWebview.prototype, 'show')
+
+      experimentsModel.setSelected([
+        { id: EXPERIMENT_WORKSPACE_ID },
+        { id: 'main' },
+        { id: 'test-branch' },
+        { id: 'exp-f13bca' }
+      ] as Experiment[])
 
       const expectedRevisions: { displayColor: string; id: string }[] = []
 
@@ -72,7 +83,7 @@ suite('Experiments Tree Test Suite', () => {
         id,
         displayColor
       } of plotsModel.getSelectedRevisionDetails()) {
-        expectedRevisions.push({ displayColor, id: id as string })
+        expectedRevisions.push({ displayColor, id })
       }
 
       const webview = await plots.showWebview()
@@ -81,7 +92,7 @@ suite('Experiments Tree Test Suite', () => {
 
       let updateCall = 1
       while (expectedRevisions.length > 0) {
-        const { selectedRevisions } = getFirstArgOfLastCall(messageSpy)
+        const { selectedRevisions } = mockShow.lastCall.firstArg
 
         expect(
           (selectedRevisions as Revision[]).map(({ displayColor, id }) => ({
@@ -90,9 +101,17 @@ suite('Experiments Tree Test Suite', () => {
           })),
           'a message is sent with colors for the currently selected experiments'
         ).to.deep.equal(expectedRevisions)
-        messageSpy.resetHistory()
+        mockShow.resetHistory()
+        mockShow.resetBehavior()
 
         const { id } = expectedRevisions.pop() as { id: string }
+
+        const messageSent = new Promise(resolve =>
+          mockShow.callsFake(() => {
+            resolve(undefined)
+            return Promise.resolve(true)
+          })
+        )
 
         bypassProcessManagerDebounce(mockNow, updateCall)
         const unSelected = await commands.executeCommand(
@@ -105,15 +124,23 @@ suite('Experiments Tree Test Suite', () => {
         updateCall = updateCall + 1
 
         expect(unSelected).to.equal(UNSELECTED)
+        await messageSent
       }
 
       expect(
-        messageSpy,
+        mockShow,
         "when there are no experiments selected we don't send any template plots"
       ).to.be.calledWithMatch({
         template: null
       })
-      messageSpy.resetHistory()
+      mockShow.resetHistory()
+
+      const messageSent = new Promise(resolve =>
+        mockShow.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(true)
+        })
+      )
 
       bypassProcessManagerDebounce(mockNow, updateCall)
       const selected = await commands.executeCommand(
@@ -124,6 +151,8 @@ suite('Experiments Tree Test Suite', () => {
         }
       )
 
+      await messageSent
+
       expect(selected, 'the experiment is now selected').to.equal(
         copyOriginalColors()[0]
       )
@@ -132,61 +161,6 @@ suite('Experiments Tree Test Suite', () => {
         template: null
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
-
-    it('should set the workspace to selected when trying to toggle a checkpoint experiment that is running in the workspace', async () => {
-      const { experiments } = buildExperiments(disposable, {
-        '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77': {
-          '4fb124aebddb2adf1545030907687fa9a4c80e70': {
-            data: {
-              ...expShowFixture['53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'][
-                '4fb124aebddb2adf1545030907687fa9a4c80e70'
-              ].data,
-              executor: EXPERIMENT_WORKSPACE_ID
-            }
-          },
-          baseline:
-            expShowFixture['53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'].baseline
-        },
-        workspace: expShowFixture.workspace
-      })
-      const isWorkspaceSelected = (): boolean =>
-        !!experiments
-          .getWorkspaceAndCommits()
-          .find(({ id }) => id === EXPERIMENT_WORKSPACE_ID)?.selected
-
-      await experiments.isReady()
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
-      expect(isWorkspaceSelected()).to.be.true
-
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_TOGGLE, {
-        dvcRoot: dvcDemoPath,
-        id: EXPERIMENT_WORKSPACE_ID
-      })
-
-      expect(isWorkspaceSelected()).to.be.false
-
-      const selected = await commands.executeCommand(
-        RegisteredCommands.EXPERIMENT_TOGGLE,
-        {
-          dvcRoot: dvcDemoPath,
-          id: 'exp-e7a67'
-        }
-      )
-      expect(!!selected).to.be.true
-
-      expect(isWorkspaceSelected()).to.be.true
-
-      const notReselected = await commands.executeCommand(
-        RegisteredCommands.EXPERIMENT_TOGGLE,
-        {
-          dvcRoot: dvcDemoPath,
-          id: 'exp-e7a67'
-        }
-      )
-      expect(notReselected).to.be.undefined
-
-      expect(isWorkspaceSelected()).to.be.true
-    })
 
     it('should not show queued experiments in the dvc.views.experimentsTree.selectExperiments quick pick', async () => {
       await buildPlots(disposable)
@@ -377,13 +351,13 @@ suite('Experiments Tree Test Suite', () => {
 
       await experiments.isReady()
 
-      const mockExperiment = 'exp-e7a67'
+      const mockExperimentId = 'exp-e7a67'
 
       const mockExperimentApply = stub(
         DvcExecutor.prototype,
         'experimentApply'
       ).resolves(
-        `Changes for experiment '${mockExperiment}' have been applied to your current workspace.`
+        `Changes for experiment '${mockExperimentId}' have been applied to your current workspace.`
       )
       stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
@@ -391,13 +365,13 @@ suite('Experiments Tree Test Suite', () => {
         RegisteredCliCommands.EXPERIMENT_VIEW_APPLY,
         {
           dvcRoot: dvcDemoPath,
-          id: mockExperiment
+          id: mockExperimentId
         }
       )
 
       expect(mockExperimentApply).to.be.calledWithExactly(
         dvcDemoPath,
-        mockExperiment
+        mockExperimentId
       )
     })
 
@@ -428,14 +402,14 @@ suite('Experiments Tree Test Suite', () => {
       const { experiments } = buildExperiments(disposable)
       await experiments.isReady()
 
-      const mockExperiment = 'exp-e7a67'
+      const mockExperimentId = 'exp-e7a67'
       const mockBranch = 'it-is-a-branch'
 
       const mockExperimentBranch = stub(
         DvcExecutor.prototype,
         'experimentBranch'
       ).resolves(
-        `Git branch '${mockBranch}' has been created from experiment '${mockExperiment}'.        
+        `Git branch '${mockBranch}' has been created from experiment '${mockExperimentId}'.        
        To switch to the new branch run:
              git checkout ${mockBranch}`
       )
@@ -446,14 +420,14 @@ suite('Experiments Tree Test Suite', () => {
         RegisteredCliCommands.EXPERIMENT_VIEW_BRANCH,
         {
           dvcRoot: dvcDemoPath,
-          id: mockExperiment
+          id: mockExperimentId
         }
       )
 
       expect(mockShowInputBox).to.be.calledOnce
       expect(mockExperimentBranch).to.be.calledWithExactly(
         dvcDemoPath,
-        mockExperiment,
+        mockExperimentId,
         mockBranch
       )
     })

@@ -1,71 +1,75 @@
 import {
-  ExperimentsOutput,
+  ExpShowOutput,
   ExperimentStatus,
   EXPERIMENT_WORKSPACE_ID
 } from '../../../../cli/dvc/contract'
 
-const data: ExperimentsOutput = {
-  [EXPERIMENT_WORKSPACE_ID]: {
-    baseline: {
-      data: {
-        timestamp: null,
-        params: {
-          'params.yaml': {
-            data: {
-              nested1: {
-                doubled: 'first instance!',
-                nested2: {
-                  nested3: {
-                    nested4: {
-                      nested5: { nested6: { nested7: 'Lucky!' } },
-                      nested5b: {
-                        nested6: 'Wow!!!!!!!!!!!!!!!!!!!!',
-                        doubled: 'second instance!'
-                      }
+const data: ExpShowOutput = [
+  {
+    rev: EXPERIMENT_WORKSPACE_ID,
+    data: {
+      deps: null,
+      meta: { has_checkpoints: false },
+      metrics: null,
+      params: {
+        'params.yaml': {
+          data: {
+            nested1: {
+              doubled: 'first instance!',
+              nested2: {
+                nested3: {
+                  nested4: {
+                    nested5: { nested6: { nested7: 'Lucky!' } },
+                    nested5b: {
+                      nested6: 'Wow!!!!!!!!!!!!!!!!!!!!',
+                      doubled: 'second instance!'
                     }
                   }
                 }
-              },
-              outlier: 1
-            }
+              }
+            },
+            outlier: 1
           }
-        },
-        status: ExperimentStatus.SUCCESS,
-        executor: null
-      }
+        }
+      },
+      outs: null,
+      rev: EXPERIMENT_WORKSPACE_ID,
+      timestamp: null
     }
   },
-  '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77': {
-    baseline: {
-      data: {
-        timestamp: '2020-11-21T19:58:22',
-        params: {
-          'params.yaml': {
-            data: {
-              nested1: {
-                doubled: 'first instance!',
-                nested2: {
-                  nested3: {
-                    nested4: {
-                      nested5: { nested6: { nested7: 'Lucky!' } },
-                      nested5b: {
-                        nested6: 'Wow!!!!!!!!!!!!!!!!!!!!',
-                        doubled: 'second instance!'
-                      }
+  {
+    rev: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
+    data: {
+      deps: null,
+      meta: { has_checkpoints: false },
+      metrics: null,
+      params: {
+        'params.yaml': {
+          data: {
+            nested1: {
+              doubled: 'first instance!',
+              nested2: {
+                nested3: {
+                  nested4: {
+                    nested5: { nested6: { nested7: 'Lucky!' } },
+                    nested5b: {
+                      nested6: 'Wow!!!!!!!!!!!!!!!!!!!!',
+                      doubled: 'second instance!'
                     }
                   }
                 }
-              },
-              outlier: 1
-            }
+              }
+            },
+            outlier: 1
           }
-        },
-        status: ExperimentStatus.SUCCESS,
-        executor: null,
-        name: 'main'
-      }
-    }
+        }
+      },
+      outs: null,
+      rev: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
+      timestamp: '2020-11-21T19:58:22'
+    },
+    name: 'main'
   }
-}
+]
 
 export default data

@@ -49,16 +49,16 @@ const getDefaultColumnWithIndicatorsPlaceHolder = () =>
     cell: (cell: CellContext<Column, CellValue>) => {
       const {
         row: {
-          original: { label, displayName, commit, sha }
+          original: { label, description, commit, sha }
         }
       } = cell as unknown as CellContext<Experiment, CellValue>
       return (
         <div className={styles.experimentCellText}>
           <span>{label}</span>
-          {displayName && (
+          {description && (
             <CellSecondaryName
               sha={sha}
-              displayName={displayName}
+              description={description}
               commit={commit}
             />
           )}

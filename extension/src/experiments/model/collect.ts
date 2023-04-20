@@ -4,23 +4,19 @@ import {
   TreeItemCollapsibleState,
   Uri
 } from 'vscode'
-import omit from 'lodash.omit'
 import { ExperimentType } from '.'
-import { ExperimentsAccumulator } from './accumulator'
 import { extractColumns } from '../columns/extract'
+import { Experiment, CommitData, RunningExperiment } from '../webview/contract'
 import {
-  Experiment,
-  ColumnType,
-  isRunning,
-  CommitData
-} from '../webview/contract'
-import {
-  ExperimentFieldsOrError,
-  ExperimentFields,
-  ExperimentsCommitOutput,
-  ExperimentsOutput,
   EXPERIMENT_WORKSPACE_ID,
-  ExperimentStatus
+  ExperimentStatus,
+  ExpShowOutput,
+  ExpState,
+  Executor,
+  ExpRange,
+  ExecutorState,
+  experimentHasError,
+  ExpData
 } from '../../cli/dvc/contract'
 import { addToMapArray } from '../../util/map'
 import { RegisteredCommands } from '../../commands/external'
@@ -44,48 +40,17 @@ export type ExperimentItem = {
   tooltip: MarkdownString | undefined
 }
 
-type ExperimentsObject = { [sha: string]: ExperimentFieldsOrError }
-
-export const isCheckpoint = (
-  checkpointTip: string | undefined,
-  sha: string
-): checkpointTip is string => !!(checkpointTip && checkpointTip !== sha)
-
-const getExperimentId = (
-  sha: string,
-  experimentsFields?: ExperimentFields
-): string => {
-  if (!experimentsFields) {
-    return sha
-  }
-
-  const { name, checkpoint_tip } = experimentsFields
-
-  if (isCheckpoint(checkpoint_tip, sha)) {
-    return sha
-  }
-
-  return name || sha
-}
-
-const getDisplayName = (
-  sha: string,
-  experimentsObject: { [sha: string]: ExperimentFieldsOrError }
-): string | undefined => {
-  const experiment = experimentsObject[sha]?.data
-  if (!experiment) {
-    return
-  }
-
-  const { name } = experiment
-  if (name) {
-    return `[${name}]`
-  }
+type ExperimentsAccumulator = {
+  commits: Experiment[]
+  experimentsByCommit: Map<string, Experiment[]>
+  hasCheckpoints: boolean
+  runningExperiments: RunningExperiment[]
+  workspace: Experiment
 }
 
 const transformColumns = (
   experiment: Experiment,
-  experimentFields: ExperimentFields,
+  experimentFields: ExpData,
   commit?: Experiment
 ) => {
   const { error, metrics, params, deps, Created } = extractColumns(
@@ -107,136 +72,6 @@ const transformColumns = (
   }
   if (error) {
     experiment.error = error
-  }
-}
-
-const mergeErrors = (
-  experimentFieldsOrError: ExperimentFieldsOrError
-): string | undefined =>
-  experimentFieldsOrError.error?.msg || experimentFieldsOrError.data?.error?.msg
-
-const transformExperimentData = (
-  id: string,
-  experimentFieldsOrError: ExperimentFieldsOrError,
-  label: string | undefined,
-  sha?: string,
-  displayName?: string,
-  commit?: Experiment
-): Experiment => {
-  const data = experimentFieldsOrError.data || {}
-
-  const error = mergeErrors(experimentFieldsOrError)
-
-  const experiment = {
-    id,
-    label,
-    ...omit(data, Object.values(ColumnType))
-  } as Experiment
-
-  if (displayName) {
-    experiment.displayName = displayName
-  }
-
-  if (experiment.name && displayName) {
-    experiment.logicalGroupName = displayName
-  }
-
-  if (sha) {
-    experiment.sha = sha
-  }
-
-  if (error) {
-    experiment.error = error
-  }
-
-  transformColumns(experiment, data, commit)
-
-  return experiment
-}
-
-const transformExperimentOrCheckpointData = (
-  sha: string,
-  experimentData: ExperimentFieldsOrError,
-  experimentsObject: ExperimentsObject,
-  commit: Experiment
-): Experiment | undefined => {
-  const experimentFields = experimentData.data
-  if (!experimentFields) {
-    const error = experimentData?.error?.msg
-    return { error, id: sha, label: shortenForLabel(sha) }
-  }
-
-  if (isCheckpoint(experimentFields.checkpoint_tip, sha)) {
-    return
-  }
-
-  const id = getExperimentId(sha, experimentFields)
-
-  return transformExperimentData(
-    id,
-    experimentData,
-    shortenForLabel(sha),
-    sha,
-    getDisplayName(sha, experimentsObject),
-    commit
-  )
-}
-
-const collectHasRunningExperiment = (
-  acc: ExperimentsAccumulator,
-  experiment: Experiment
-) => {
-  const { executor, id, status } = experiment
-  if (isRunning(status) && executor) {
-    acc.runningExperiments.push({ executor, id })
-  }
-}
-
-const collectFromExperimentsObject = (
-  acc: ExperimentsAccumulator,
-  experimentsObject: ExperimentsObject,
-  commit: Experiment
-) => {
-  const commitName = commit.label
-
-  for (const [sha, experimentData] of Object.entries(experimentsObject)) {
-    const experiment = transformExperimentOrCheckpointData(
-      sha,
-      experimentData,
-      experimentsObject,
-      commit
-    )
-    if (!experiment) {
-      continue
-    }
-
-    addToMapArray(acc.experimentsByCommit, commitName, experiment)
-    collectHasRunningExperiment(acc, experiment)
-  }
-}
-
-const collectFromCommits = (
-  acc: ExperimentsAccumulator,
-  commitsObject: { [name: string]: ExperimentsCommitOutput }
-) => {
-  for (const [sha, { baseline, ...experimentsObject }] of Object.entries(
-    commitsObject
-  )) {
-    let name = baseline.data?.name
-    let label = name
-
-    if (!name) {
-      name = sha
-      label = shortenForLabel(name)
-    }
-    const commit = transformExperimentData(name, baseline, label, sha)
-
-    if (commit) {
-      collectFromExperimentsObject(acc, experimentsObject, commit)
-      collectHasRunningExperiment(acc, commit)
-
-      acc.commits.push(commit)
-    }
   }
 }
 
@@ -274,8 +109,8 @@ const formatCommitMessage = (commit: string) => {
   return `${lines[0]}${lines.length > 1 ? ' ...' : ''}`
 }
 
-const getCommitMessages = (
-  commitsOutput: string
+const getCommitData = (
+  commitsOutput: string | undefined
 ): { [sha: string]: CommitData } => {
   if (!commitsOutput) {
     return {}
@@ -287,44 +122,210 @@ const getCommitMessages = (
   return Object.fromEntries(commits) as { [sha: string]: CommitData }
 }
 
-const addDataToCommits = (
-  commits: Experiment[],
-  commitsOutput: string
-): Experiment[] => {
-  const commitMessages = getCommitMessages(commitsOutput)
-  return commits.map(commit => {
-    const { sha } = commit
-    if (sha && commitMessages[sha]) {
-      commit.displayName = formatCommitMessage(commitMessages[sha].message)
-      commit.commit = commitMessages[sha]
-    }
-    return commit
-  })
+const transformExpState = (
+  experiment: Experiment,
+  expState: ExpState,
+  baseline?: Experiment
+) => {
+  const { rev } = expState
+
+  if (rev.length === 40) {
+    experiment.sha = rev
+  }
+
+  if (experimentHasError(expState)) {
+    const error = expState.error.msg
+    experiment.error = error
+    return experiment
+  }
+
+  const { data } = expState
+  if (data) {
+    transformColumns(experiment, data, baseline)
+  }
+
+  return experiment
+}
+
+const addCommitData = (
+  baseline: Experiment,
+  commitData: { [sha: string]: CommitData } = {}
+): void => {
+  const { sha } = baseline
+  if (!sha) {
+    return
+  }
+
+  const commit = commitData[sha]
+
+  if (!commit) {
+    return
+  }
+  baseline.description = formatCommitMessage(commit.message)
+  baseline.commit = commit
+}
+
+const collectExpState = (
+  acc: ExperimentsAccumulator,
+  expState: ExpState,
+  commitData: { [sha: string]: CommitData }
+): Experiment | undefined => {
+  const { rev, name } = expState
+  const label =
+    rev === EXPERIMENT_WORKSPACE_ID
+      ? EXPERIMENT_WORKSPACE_ID
+      : name || shortenForLabel(rev)
+  const id = name || label
+
+  const experiment: Experiment = { id, label }
+
+  const baseline = transformExpState(experiment, expState)
+
+  if (rev === EXPERIMENT_WORKSPACE_ID && !name) {
+    acc.workspace = baseline
+    return
+  }
+
+  addCommitData(baseline, commitData)
+
+  acc.commits.push(baseline)
+  return baseline
+}
+
+const getExecutor = (experiment: Experiment): Executor => {
+  if ([experiment.executor, experiment.id].includes(EXPERIMENT_WORKSPACE_ID)) {
+    return Executor.WORKSPACE
+  }
+  return Executor.DVC_TASK
+}
+
+const collectExecutorInfo = (
+  acc: ExperimentsAccumulator,
+  experiment: Experiment,
+  executor: ExecutorState
+): void => {
+  if (!executor) {
+    return
+  }
+
+  const { name, state } = executor
+
+  if (name && state === ExperimentStatus.RUNNING) {
+    experiment.executor = name
+  }
+  if (state && state !== ExperimentStatus.SUCCESS) {
+    experiment.status = state
+  }
+
+  if (experiment.status === ExperimentStatus.RUNNING) {
+    acc.runningExperiments.push({
+      executor: getExecutor(experiment),
+      id: experiment.id
+    })
+  }
+}
+
+const collectExpRange = (
+  acc: ExperimentsAccumulator,
+  baseline: Experiment,
+  expRange: ExpRange
+): void => {
+  const { revs, executor } = expRange
+  if (!revs?.length) {
+    return
+  }
+  const expState = revs[0]
+
+  const { name, rev } = expState
+
+  const label =
+    rev === EXPERIMENT_WORKSPACE_ID
+      ? EXPERIMENT_WORKSPACE_ID
+      : shortenForLabel(rev)
+
+  const experiment = transformExpState(
+    {
+      id: name || label,
+      label
+    },
+    expState,
+    baseline
+  )
+
+  if (name) {
+    const description = `[${name}]`
+    experiment.description = description
+    experiment.logicalGroupName = description
+  }
+
+  collectExecutorInfo(acc, experiment, executor)
+
+  addToMapArray(acc.experimentsByCommit, baseline.id, experiment)
+}
+
+const setWorkspaceAsRunning = (
+  acc: ExperimentsAccumulator,
+  dvcLiveOnly: boolean
+) => {
+  if (
+    dvcLiveOnly ||
+    acc.runningExperiments.some(
+      ({ executor, id }) =>
+        executor === Executor.WORKSPACE && id !== EXPERIMENT_WORKSPACE_ID
+    )
+  ) {
+    acc.workspace.executor = Executor.WORKSPACE
+    acc.workspace.status = ExperimentStatus.RUNNING
+    acc.runningExperiments.unshift({
+      executor: Executor.WORKSPACE,
+      id: EXPERIMENT_WORKSPACE_ID
+    })
+  }
+}
+
+const hasCheckpoints = (data: ExpShowOutput) => {
+  if (!data?.length) {
+    return false
+  }
+
+  const [workspace] = data
+
+  if (experimentHasError(workspace)) {
+    return false
+  }
+
+  return !!workspace.data.meta.has_checkpoints
 }
 
 export const collectExperiments = (
-  data: ExperimentsOutput,
+  output: ExpShowOutput,
   dvcLiveOnly: boolean,
-  commitsOutput: string
+  commitsOutput: string | undefined
 ): ExperimentsAccumulator => {
-  const { workspace, ...commitsObject } = data
-
-  const workspaceBaseline = transformExperimentData(
-    EXPERIMENT_WORKSPACE_ID,
-    workspace.baseline,
-    EXPERIMENT_WORKSPACE_ID
-  )
-
-  if (dvcLiveOnly) {
-    workspaceBaseline.executor = EXPERIMENT_WORKSPACE_ID
-    workspaceBaseline.status = ExperimentStatus.RUNNING
+  const acc: ExperimentsAccumulator = {
+    commits: [],
+    experimentsByCommit: new Map(),
+    hasCheckpoints: hasCheckpoints(output),
+    runningExperiments: [],
+    workspace: { id: EXPERIMENT_WORKSPACE_ID, label: EXPERIMENT_WORKSPACE_ID }
   }
 
-  const acc = new ExperimentsAccumulator(workspaceBaseline)
+  const commitData = getCommitData(commitsOutput)
 
-  collectFromCommits(acc, commitsObject)
+  for (const expState of output) {
+    const baseline = collectExpState(acc, expState, commitData)
+    const { experiments } = expState
 
-  acc.commits = addDataToCommits(acc.commits, commitsOutput)
+    if (!(baseline && experiments?.length)) {
+      continue
+    }
+
+    for (const expRange of experiments) {
+      collectExpRange(acc, baseline, expRange)
+    }
+  }
+
+  setWorkspaceAsRunning(acc, dvcLiveOnly)
 
   return acc
 }

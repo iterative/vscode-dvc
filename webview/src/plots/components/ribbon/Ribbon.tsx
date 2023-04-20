@@ -82,7 +82,7 @@ export const Ribbon: React.FC = () => {
       {revisions.map(revision => (
         <RibbonBlock
           revision={revision}
-          key={revision.revision}
+          key={revision.id}
           onClear={() => removeRevision(revision.id || '')}
         />
       ))}

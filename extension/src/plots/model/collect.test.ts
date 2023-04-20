@@ -21,11 +21,8 @@ import {
   ImagePlot,
   TemplatePlot
 } from '../webview/contract'
-import {
-  getCLICommitId,
-  getCLIIdToLabel
-} from '../../test/fixtures/plotsDiff/util'
 import { exists } from '../../fileSystem'
+import { REVISIONS } from '../../test/fixtures/plotsDiff'
 
 const mockedExists = jest.mocked(exists)
 
@@ -55,11 +52,7 @@ describe('collectCustomPlots', () => {
 
 describe('collectData', () => {
   it('should return the expected output from the test fixture', () => {
-    const mapping = getCLIIdToLabel()
-    const { revisionData, comparisonData } = collectData(
-      plotsDiffFixture,
-      mapping
-    )
+    const { revisionData, comparisonData } = collectData(plotsDiffFixture)
 
     const values =
       (logsLossPlot?.datapoints as {
@@ -68,23 +61,17 @@ describe('collectData', () => {
 
     expect(isEmpty(values)).toBeFalsy()
 
-    const revisions = [
-      EXPERIMENT_WORKSPACE_ID,
-      'main',
-      '42b8736',
-      '1ba7bcd',
-      '4fb124a'
-    ]
-
-    for (const revision of revisions) {
-      const expectedValues = values[getCLICommitId(revision)].map(value => ({
+    for (const revision of REVISIONS) {
+      const expectedValues = values[revision]?.map(value => ({
         ...value,
         rev: revision
       }))
       expect(revisionData[revision][logsLossPath]).toStrictEqual(expectedValues)
     }
 
-    expect(Object.keys(revisionData)).toStrictEqual(revisions)
+    expect(Object.keys(revisionData).sort()).toStrictEqual(
+      [...REVISIONS].sort()
+    )
 
     expect(Object.keys(revisionData.main)).toStrictEqual([
       logsLossPath,
@@ -100,12 +87,12 @@ describe('collectData', () => {
       join('plots', 'loss.png')
     ])
 
-    const _1ba7bcd_heatmap = comparisonData['1ba7bcd'][heatmapPlot]
+    const testBranchHeatmap = comparisonData['test-branch'][heatmapPlot]
 
-    expect(_1ba7bcd_heatmap).toBeDefined()
-    expect(_1ba7bcd_heatmap).toStrictEqual(
+    expect(testBranchHeatmap).toBeDefined()
+    expect(testBranchHeatmap).toStrictEqual(
       plotsDiffFixture.data[heatmapPlot].find(({ revisions }) =>
-        sameContents(revisions as string[], [getCLICommitId('1ba7bcd')])
+        sameContents(revisions as string[], ['test-branch'])
       )
     )
   })

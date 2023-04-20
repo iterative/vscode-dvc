@@ -4,15 +4,16 @@ import { getRelativePattern } from '../fileSystem/relativePattern'
 import { createFileSystemWatcher } from '../fileSystem/watcher'
 import { ProcessManager } from '../process/manager'
 import { InternalCommands } from '../commands/internal'
-import { ExperimentsOutput, PlotsOutputOrError } from '../cli/dvc/contract'
+import { ExpShowOutput, PlotsOutputOrError } from '../cli/dvc/contract'
 import { uniqueValues } from '../util/array'
 import { DeferredDisposable } from '../class/deferred'
 import { isSameOrChild } from '../fileSystem'
 
 export abstract class BaseData<
-  T extends { data: PlotsOutputOrError; revs: string[] } | ExperimentsOutput
+  T extends { data: PlotsOutputOrError; revs: string[] } | ExpShowOutput
 > extends DeferredDisposable {
   public readonly onDidUpdate: Event<T>
+  public readonly onDidChangeDvcYaml: Event<void>
 
   protected readonly dvcRoot: string
   protected readonly processManager: ProcessManager
@@ -23,6 +24,10 @@ export abstract class BaseData<
 
   private readonly updated: EventEmitter<T> = this.dispose.track(
     new EventEmitter()
+  )
+
+  private readonly dvcYamlChanged: EventEmitter<void> = this.dispose.track(
+    new EventEmitter<void>()
   )
 
   constructor(
@@ -41,6 +46,8 @@ export abstract class BaseData<
     this.internalCommands = internalCommands
     this.onDidUpdate = this.updated.event
     this.staticFiles = staticFiles
+
+    this.onDidChangeDvcYaml = this.dvcYamlChanged.event
 
     this.watchFiles()
 
@@ -79,6 +86,10 @@ export abstract class BaseData<
           )
         ) {
           void this.managedUpdate(path)
+        }
+
+        if (path.endsWith('dvc.yaml')) {
+          this.dvcYamlChanged.fire()
         }
       }
     )

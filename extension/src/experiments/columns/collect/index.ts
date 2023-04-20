@@ -8,20 +8,24 @@ import {
 } from './metricsAndParams'
 import { Column } from '../../webview/contract'
 import {
-  ExperimentFields,
-  ExperimentFieldsOrError,
-  ExperimentsCommitOutput,
-  ExperimentsOutput
+  ExpRange,
+  ExpShowOutput,
+  ExpState,
+  ExpData,
+  experimentHasError
 } from '../../../cli/dvc/contract'
 import { standardizePath } from '../../../fileSystem/path'
 import { timestampColumn } from '../constants'
-import { sortCollectedArray } from '../../../util/array'
-import { isCheckpoint } from '../../model/collect'
+import { sortCollectedArray, uniqueValues } from '../../../util/array'
 
 const collectFromExperiment = (
   acc: ColumnAccumulator,
-  experiment: ExperimentFieldsOrError
+  experiment: ExpState
 ) => {
+  if (experimentHasError(experiment)) {
+    return
+  }
+
   const { data } = experiment
   if (data) {
     collectMetricsAndParams(acc, data)
@@ -29,63 +33,94 @@ const collectFromExperiment = (
   }
 }
 
-const collectFromCommit = (
+const collectFromExperiments = (
   acc: ColumnAccumulator,
-  commit: ExperimentsCommitOutput
+  experiments?: ExpRange[] | null
 ) => {
-  const { baseline, ...rest } = commit
-  collectFromExperiment(acc, baseline)
-  for (const [sha, experiment] of Object.entries(rest)) {
-    if (isCheckpoint(experiment.data?.checkpoint_tip, sha)) {
-      continue
-    }
-    collectFromExperiment(acc, experiment)
+  if (!experiments) {
+    return
+  }
+  for (const { revs } of experiments) {
+    collectFromExperiment(acc, revs[0])
   }
 }
 
-export const collectColumns = (data: ExperimentsOutput): Column[] => {
+export const collectColumns = (output: ExpShowOutput): Column[] => {
   const acc: ColumnAccumulator = {}
 
   acc.timestamp = timestampColumn
 
-  const { workspace, ...rest } = data
-  collectFromCommit(acc, workspace)
-  for (const commit of Object.values(rest)) {
-    collectFromCommit(acc, commit)
+  for (const expState of output) {
+    if (experimentHasError(expState)) {
+      continue
+    }
+
+    collectFromExperiment(acc, expState)
+    collectFromExperiments(acc, expState.experiments)
   }
+
   const columns = Object.values(acc)
   const hasNoData = isEqual(columns, [timestampColumn])
 
   return hasNoData ? [] : columns
 }
 
-const getData = (value?: {
-  baseline?: ExperimentFieldsOrError
-}): ExperimentFields | undefined => value?.baseline?.data
+export const getExpData = (expState: ExpState): ExpData | undefined => {
+  if (experimentHasError(expState)) {
+    return
+  }
+  return expState.data
+}
 
-export const collectChanges = (data: ExperimentsOutput): string[] => {
+export const collectChanges = (output: ExpShowOutput): string[] => {
   const changes: string[] = []
 
-  const [workspaceData, currentCommitData] = Object.values(data)
-  const workspace = getData(workspaceData)
-  const currentCommit = getData(currentCommitData)
-
-  if (!(workspace && currentCommit)) {
+  if (!(output.length > 1)) {
     return changes
   }
 
-  collectMetricAndParamChanges(changes, workspace, currentCommit)
-  collectDepChanges(changes, workspace, currentCommit)
+  const [workspaceData, baselineData] = output
+  const workspace = getExpData(workspaceData)
+  const baseline = getExpData(baselineData)
+
+  if (!(workspace && baseline)) {
+    return changes
+  }
+
+  collectMetricAndParamChanges(changes, workspace, baseline)
+  collectDepChanges(changes, workspace, baseline)
 
   return sortCollectedArray(changes)
 }
 
 export const collectParamsFiles = (
   dvcRoot: string,
-  data: ExperimentsOutput
+  output: ExpShowOutput
 ): Set<string> => {
-  const files = Object.keys(data.workspace.baseline.data?.params || {})
+  const [workspace] = output
+  if (experimentHasError(workspace)) {
+    return new Set()
+  }
+  const files = Object.keys(workspace.data.params || {})
     .filter(Boolean)
     .map(file => standardizePath(join(dvcRoot, file)))
   return new Set(files)
+}
+
+export const collectRelativeMetricsFiles = (
+  output: ExpShowOutput
+): string[] => {
+  if (!output?.length) {
+    return []
+  }
+
+  const [workspace] = output
+  if (experimentHasError(workspace)) {
+    return []
+  }
+  const files = Object.keys(workspace.data?.metrics || {})
+    .filter(Boolean)
+    .sort()
+
+  return uniqueValues(files)
 }

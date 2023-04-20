@@ -9,7 +9,7 @@ import {
 import { getRelativePattern } from '../../fileSystem/relativePattern'
 import { createFileSystemWatcher } from '../../fileSystem/watcher'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import { ExperimentsOutput } from '../../cli/dvc/contract'
+import { ExpShowOutput } from '../../cli/dvc/contract'
 import { BaseData } from '../../data'
 import { DOT_DVC, ExperimentFlag } from '../../cli/dvc/constants'
 import { gitPath } from '../../cli/git/constants'
@@ -18,7 +18,7 @@ import { ExperimentsModel } from '../model'
 
 export const QUEUED_EXPERIMENT_PATH = join(DOT_DVC, 'tmp', 'exps')
 
-export class ExperimentsData extends BaseData<ExperimentsOutput> {
+export class ExperimentsData extends BaseData<ExpShowOutput> {
   private readonly experiments: ExperimentsModel
 
   constructor(
@@ -31,46 +31,32 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
       dvcRoot,
       internalCommands,
       updatesPaused,
-      [
-        {
-          name: 'partialUpdate',
-          process: () => this.update(ExperimentFlag.NO_FETCH)
-        },
-        { name: 'fullUpdate', process: () => this.update() }
-      ],
+      [{ name: 'update', process: () => this.update() }],
       ['dvc.lock', 'dvc.yaml', 'params.yaml', DOT_DVC]
     )
 
     this.experiments = experiments
 
     void this.watchExpGitRefs()
-    void this.managedUpdate(QUEUED_EXPERIMENT_PATH)
+    void this.managedUpdate()
     void this.updateAvailableBranchesToSelect()
   }
 
-  public managedUpdate(path?: string) {
-    if (
-      path?.includes(QUEUED_EXPERIMENT_PATH) ||
-      this.processManager.isOngoingOrQueued('fullUpdate')
-    ) {
-      return this.processManager.run('fullUpdate')
-    }
-
-    return this.processManager.run('partialUpdate')
+  public managedUpdate() {
+    return this.processManager.run('update')
   }
 
-  public async update(...args: (ExperimentFlag | string)[]): Promise<void> {
+  public async update(): Promise<void> {
     const flags = this.experiments.getIsBranchesView()
       ? [ExperimentFlag.ALL_BRANCHES]
       : [
           ExperimentFlag.NUM_COMMIT,
           this.experiments.getNbOfCommitsToShow().toString()
         ]
-    const data = await this.internalCommands.executeCommand<ExperimentsOutput>(
+    const data = await this.internalCommands.executeCommand<ExpShowOutput>(
       AvailableCommands.EXP_SHOW,
       this.dvcRoot,
-      ...flags,
-      ...args
+      ...flags
     )
 
     this.collectFiles(data)
@@ -78,7 +64,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     return this.notifyChanged(data)
   }
 
-  protected collectFiles(data: ExperimentsOutput) {
+  protected collectFiles(data: ExpShowOutput) {
     this.collectedFiles = collectFiles(data, this.collectedFiles)
   }
 
@@ -116,7 +102,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
           watchedRelPaths.some(watchedRelPath => path.includes(watchedRelPath))
         ) {
           void this.updateAvailableBranchesToSelect()
-          return this.managedUpdate(path)
+          return this.managedUpdate()
         }
       }
     )

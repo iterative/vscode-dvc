@@ -8,6 +8,7 @@ import deeplyNestedRowsFixture from '../../test/fixtures/expShow/deeplyNested/ro
 import deeplyNestedOutputFixture from '../../test/fixtures/expShow/deeplyNested/output'
 import uncommittedDepsFixture from '../../test/fixtures/expShow/uncommittedDeps/output'
 import { buildMockMemento } from '../../test/util'
+import { generateTestExpShowOutput } from '../../test/util/experiments'
 import { Experiment } from '../webview/contract'
 import { definedAndNonEmpty } from '../../util/array'
 import dataTypesRowsFixture from '../../test/fixtures/expShow/dataTypes/rows'
@@ -17,7 +18,8 @@ import survivalRowsFixture from '../../test/fixtures/expShow/survival/rows'
 
 import {
   ExperimentStatus,
-  EXPERIMENT_WORKSPACE_ID
+  EXPERIMENT_WORKSPACE_ID,
+  Executor
 } from '../../cli/dvc/contract'
 import { PersistenceKey } from '../../persistence/constants'
 
@@ -31,30 +33,6 @@ beforeEach(() => {
 })
 
 describe('ExperimentsModel', () => {
-  const runningExperiment = 'exp-12345'
-
-  const buildTestExperiment = (testParam: number, name?: string) => {
-    const data = {
-      params: {
-        'params.yaml': {
-          data: { test: testParam }
-        }
-      }
-    } as {
-      name?: string
-      params: {
-        'params.yaml': {
-          data: { test: number }
-        }
-      }
-    }
-    if (name) {
-      data.name = name
-    }
-
-    return { data }
-  }
-
   it('should return the expected rows when given the output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
     model.transformAndSet(outputFixture, false, '')
@@ -69,48 +47,32 @@ describe('ExperimentsModel', () => {
 
   it('should set the workspace to running if a signal file for a DVCLive only experiment has been found', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    const dvcLiveOnly = {
-      [EXPERIMENT_WORKSPACE_ID]: {
-        baseline: {
-          data: {
-            timestamp: null,
-            params: {
-              'dvclive/params.yaml': {
-                data: {
-                  encoder_size: 128
-                }
-              }
-            },
-            deps: {},
-            outs: {},
-            status: ExperimentStatus.SUCCESS,
-            executor: null,
-            metrics: {
-              'dvclive/metrics.json': {
-                data: {
-                  train_loss: 0.015903037041425705,
-                  epoch: 49,
-                  step: 30
-                }
-              }
+    const dvcLiveOnly = generateTestExpShowOutput(
+      {
+        params: {
+          'dvclive/params.yaml': {
+            data: {
+              encoder_size: 128
+            }
+          }
+        },
+        metrics: {
+          'dvclive/metrics.json': {
+            data: {
+              train_loss: 0.015903037041425705,
+              epoch: 49,
+              step: 30
             }
           }
         }
       },
-      '399b45c9f676a10899671e146625d8694c7cce14': {
-        baseline: {
-          data: {
-            timestamp: '2022-12-07T09:36:20',
-            deps: {},
-            outs: {},
-            status: ExperimentStatus.SUCCESS,
-            executor: null,
-            metrics: {},
-            name: 'main'
-          }
-        }
+      {
+        data: {
+          timestamp: '2022-12-07T09:36:20'
+        },
+        rev: '399b45c9f676a10899671e146625d8694c7cce14'
       }
-    }
+    )
 
     model.transformAndSet(dvcLiveOnly, true, '')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -121,8 +83,7 @@ describe('ExperimentsModel', () => {
     model.transformAndSet(dvcLiveOnly, false, '')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const stoppedWorkspace = (model as any).workspace
-    expect(stoppedWorkspace?.executor).toBeNull()
-    expect(stoppedWorkspace?.status).toStrictEqual(ExperimentStatus.SUCCESS)
+    expect(stoppedWorkspace?.executor).toBeFalsy()
   })
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -138,30 +99,21 @@ describe('ExperimentsModel', () => {
     }
 
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(
+    const data = generateTestExpShowOutput(
       {
-        [EXPERIMENT_WORKSPACE_ID]: {
-          baseline: {
-            data: {
-              executor: null,
-              params: { 'params.yaml': { data: { epochs: 100 } } },
-              status: ExperimentStatus.SUCCESS,
-              timestamp: null
-            }
-          }
+        params: { 'params.yaml': { data: { epochs: 100 } } }
+      },
+      {
+        rev: '0e7fbf190b78e7f8fdae6531bae123739e2db99b',
+        data: {
+          deps: existingDep,
+          params: { 'params.yaml': { data: { epochs: 100 } } },
+          timestamp: '2022-08-10T19:40:14'
         },
-        '0e7fbf190b78e7f8fdae6531bae123739e2db99b': {
-          baseline: {
-            data: {
-              deps: existingDep,
-              executor: null,
-              name: 'main',
-              params: { 'params.yaml': { data: { epochs: 100 } } },
-              status: ExperimentStatus.SUCCESS,
-              timestamp: '2022-08-10T19:40:14'
-            }
-          },
-          [shaWithChange]: {
+        experiments: [
+          {
+            rev: shaWithChange,
+            name: 'exp-750e4',
             data: {
               deps: {
                 ...existingDep,
@@ -171,27 +123,23 @@ describe('ExperimentsModel', () => {
                   size: 311710
                 }
               },
-              executor: null,
-              name: 'exp-750e4',
-              status: ExperimentStatus.SUCCESS,
               timestamp: '2022-08-11T23:04:39'
             }
           },
-          '46ce5efeba777f70a3f87177f9177995243ac828': {
+          {
+            rev: '46ce5efeba777f70a3f87177f9177995243ac828',
+            name: 'exp-d6ddc',
             data: {
               deps: existingDep,
-              executor: null,
-              name: 'exp-d6ddc',
               params: { 'params.yaml': { data: { epochs: 100 } } },
-              status: ExperimentStatus.SUCCESS,
               timestamp: '2022-08-11T22:55:46'
             }
           }
-        }
-      },
-      false,
-      ''
+        ]
+      }
     )
+
+    model.transformAndSet(data, false, '')
 
     const experiments = model.getCombinedList()
 
@@ -228,38 +176,111 @@ describe('ExperimentsModel', () => {
   })
 
   it('should always limit the number of selected experiments to 7', () => {
+    const getParams = (value: number) => ({
+      params: {
+        'params.yaml': {
+          data: { test: value }
+        }
+      }
+    })
+
     const experimentsModel = new ExperimentsModel('', buildMockMemento())
 
-    experimentsModel.transformAndSet(
-      {
-        testBranch: {
-          baseline: buildTestExperiment(2, 'testBranch'),
-          exp1: buildTestExperiment(0),
-          exp2: buildTestExperiment(0),
-          exp3: buildTestExperiment(0),
-          exp4: buildTestExperiment(0),
-          exp5: buildTestExperiment(0),
-          tip: buildTestExperiment(0, runningExperiment)
-        },
-        [EXPERIMENT_WORKSPACE_ID]: {
-          baseline: buildTestExperiment(3)
-        }
-      },
-      false,
-      ''
-    )
+    const param0 = getParams(0)
+
+    const data = generateTestExpShowOutput(getParams(3), {
+      rev: 'testBranch',
+      data: getParams(2),
+      experiments: [
+        param0,
+        param0,
+        param0,
+        param0,
+        param0,
+        param0,
+        param0,
+        param0,
+        param0
+      ]
+    })
+
+    experimentsModel.transformAndSet(data, false, '')
 
     experimentsModel.setSelected([
-      { id: 'exp1' },
-      { id: 'exp2' },
-      { id: 'exp3' },
-      { id: 'exp4' },
-      { id: 'exp5' },
+      { id: 'exp-1' },
+      { id: 'exp-2' },
+      { id: 'exp-3' },
+      { id: 'exp-4' },
+      { id: 'exp-5' },
       { id: 'testBranch' },
-      { id: 'tip' },
-      { id: EXPERIMENT_WORKSPACE_ID }
+      { id: 'exp-6' },
+      { id: EXPERIMENT_WORKSPACE_ID },
+      { id: 'exp-7' },
+      { id: 'exp-8' }
     ] as Experiment[])
-    expect(experimentsModel.getSelectedRevisions()).toHaveLength(6)
+    expect(experimentsModel.getSelectedRevisions()).toHaveLength(7)
+  })
+
+  it('should swap an experiment running in the workspace for the workspace and not select an experiment running in the queue', () => {
+    const params = {
+      params: {
+        'params.yaml': {
+          data: {
+            lr: 0.000000000000001
+          }
+        }
+      }
+    }
+    const data = generateTestExpShowOutput(
+      {},
+      {
+        experiments: [
+          {
+            data: params,
+            executor: {
+              local: null,
+              name: Executor.WORKSPACE,
+              state: ExperimentStatus.RUNNING
+            },
+            name: 'unselectable-nuffy',
+            rev: EXPERIMENT_WORKSPACE_ID
+          },
+          {},
+          {},
+          {},
+          {
+            data: params,
+            executor: {
+              local: null,
+              name: Executor.DVC_TASK,
+              state: ExperimentStatus.RUNNING
+            },
+            name: 'unselectable-task',
+            rev: EXPERIMENT_WORKSPACE_ID
+          }
+        ],
+        rev: 'testBranch'
+      }
+    )
+
+    const model = new ExperimentsModel('', buildMockMemento())
+    model.transformAndSet(data, false, '')
+
+    expect(model.getSelectedRevisions().map(({ id }) => id)).toStrictEqual([
+      EXPERIMENT_WORKSPACE_ID
+    ])
+
+    model.setSelected([])
+    expect(model.getSelectedRevisions().map(({ id }) => id)).toStrictEqual([])
+
+    model.setSelected(model.getCombinedList())
+    expect(model.getSelectedRevisions().map(({ id }) => id)).toStrictEqual([
+      EXPERIMENT_WORKSPACE_ID,
+      'testBranch',
+      'exp-2',
+      'exp-3',
+      'exp-4'
+    ])
   })
 
   it('should fetch commit params', () => {

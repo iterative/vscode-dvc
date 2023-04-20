@@ -8,7 +8,7 @@ const data = {
       type: 'vega',
       revisions: [
         EXPERIMENT_WORKSPACE_ID,
-        '53c3851',
+        'main',
         'test-branch',
         'exp-83425',
         'exp-e7a67'
@@ -61,7 +61,7 @@ const data = {
             timestamp: '1641966351759'
           }
         ],
-        '53c3851': [
+        main: [
           {
             acc: '0.123',
             step: '0',
@@ -332,7 +332,7 @@ const data = {
       type: 'vega',
       revisions: [
         EXPERIMENT_WORKSPACE_ID,
-        '53c3851',
+        'main',
         'test-branch',
         'exp-83425',
         'exp-e7a67'
@@ -10340,7 +10340,7 @@ const data = {
           { actual: 5, predicted: 0 },
           { actual: 6, predicted: 0 }
         ],
-        '53c3851': [
+        main: [
           { actual: 7, predicted: 7 },
           { actual: 2, predicted: 0 },
           { actual: 1, predicted: 1 },

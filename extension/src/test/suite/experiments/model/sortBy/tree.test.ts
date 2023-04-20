@@ -14,79 +14,75 @@ import { QuickPickItemWithValue } from '../../../../../vscode/quickPick'
 import { buildExperiments, stubWorkspaceExperimentsGetters } from '../../util'
 import { experimentsUpdatedEvent } from '../../../util'
 import { dvcDemoPath } from '../../../../util'
+import { generateTestExpShowOutput } from '../../../../util/experiments'
 import { buildMetricOrParamPath } from '../../../../../experiments/columns/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
 import {
-  ExperimentsOutput,
-  EXPERIMENT_WORKSPACE_ID
+  EXPERIMENT_WORKSPACE_ID,
+  Executor,
+  ExperimentStatus
 } from '../../../../../cli/dvc/contract'
 import { WEBVIEW_TEST_TIMEOUT } from '../../../timeouts'
 import { starredSort } from '../../../../../experiments/model/sortBy/constants'
 
 suite('Experiments Sort By Tree Test Suite', () => {
-  const testData = {
-    [EXPERIMENT_WORKSPACE_ID]: {
-      baseline: {
-        data: {
-          executor: EXPERIMENT_WORKSPACE_ID,
-          timestamp: null
-        }
-      }
-    },
-    testBranch: {
-      baseline: {
-        data: {}
-      },
-      exp1: {
-        data: {
+  const data = generateTestExpShowOutput(
+    {},
+    {
+      experiments: [
+        {
+          data: {
+            params: {
+              'params.yaml': {
+                data: {
+                  testParam: 1,
+                  testParam2: 1
+                }
+              }
+            }
+          },
+          executor: {
+            local: null,
+            name: Executor.WORKSPACE,
+            state: ExperimentStatus.RUNNING
+          },
+          name: 'exp-1',
+          rev: EXPERIMENT_WORKSPACE_ID
+        },
+        {
           params: {
             'params.yaml': {
               data: {
-                testparam: 1,
-                testparam2: 1
+                testParam: 3,
+                testParam2: 1
+              }
+            }
+          }
+        },
+        {
+          params: {
+            'params.yaml': {
+              data: {
+                testParam: 2,
+                testParam2: 2
+              }
+            }
+          }
+        },
+        {
+          params: {
+            'params.yaml': {
+              data: {
+                testParam: 4,
+                testParam2: 2
               }
             }
           }
         }
-      },
-      exp2: {
-        data: {
-          params: {
-            'params.yaml': {
-              data: {
-                testparam: 3,
-                testparam2: 1
-              }
-            }
-          }
-        }
-      },
-      exp3: {
-        data: {
-          params: {
-            'params.yaml': {
-              data: {
-                testparam: 2,
-                testparam2: 2
-              }
-            }
-          }
-        }
-      },
-      exp4: {
-        data: {
-          params: {
-            'params.yaml': {
-              data: {
-                testparam: 4,
-                testparam2: 2
-              }
-            }
-          }
-        }
-      }
+      ],
+      rev: 'testBranch'
     }
-  } as unknown as ExperimentsOutput
+  )
 
   const disposable = Disposable.fn()
 
@@ -106,11 +102,9 @@ suite('Experiments Sort By Tree Test Suite', () => {
     })
 
     it('should be able to properly add and remove sorts with a variety of commands', async () => {
-      // setup
-
       const mockShowQuickPick = stub(window, 'showQuickPick')
 
-      const { experiments, messageSpy } = buildExperiments(disposable, testData)
+      const { experiments, messageSpy } = buildExperiments(disposable, data)
 
       await experiments.isReady()
       await experiments.showWebview()
@@ -143,11 +137,11 @@ suite('Experiments Sort By Tree Test Suite', () => {
       ]
       const testParamPathArray: [ColumnType, ...string[]] = [
         ...testParamParentPathArray,
-        'testparam'
+        'testParam'
       ]
       const otherTestParamPathArray: [ColumnType, ...string[]] = [
         ...testParamParentPathArray,
-        'testparam2'
+        'testParam2'
       ]
       const testParamPath = buildMetricOrParamPath(...testParamPathArray)
       const otherTestParamPath = buildMetricOrParamPath(
@@ -163,8 +157,6 @@ suite('Experiments Sort By Tree Test Suite', () => {
 
       stub(WorkspaceExperiments.prototype, 'getDvcRoots').returns([dvcDemoPath])
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
-
-      // Setup done, perform the test
 
       mockSortQuickPicks(testParamPath, false)
       const tableChangedPromise = experimentsUpdatedEvent(experiments)
