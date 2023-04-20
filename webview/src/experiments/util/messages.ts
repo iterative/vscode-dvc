@@ -1,5 +1,5 @@
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { sendMessage } from '../../../shared/vscode'
+import { sendMessage } from '../../shared/vscode'
 
 export const focusFiltersTree = () =>
   sendMessage({ type: MessageFromWebviewType.FOCUS_FILTERS_TREE })
@@ -36,4 +36,16 @@ export const switchToCommitsView = () => {
 export const selectBranches = () =>
   sendMessage({
     type: MessageFromWebviewType.SELECT_BRANCHES
+  })
+
+export const toggleExperiment = (id: string) =>
+  sendMessage({
+    payload: id,
+    type: MessageFromWebviewType.TOGGLE_EXPERIMENT
+  })
+
+export const toggleStarred = (id: string) =>
+  sendMessage({
+    payload: [id],
+    type: MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR
   })

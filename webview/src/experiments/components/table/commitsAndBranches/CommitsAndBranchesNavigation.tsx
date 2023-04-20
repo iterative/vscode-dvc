@@ -6,7 +6,7 @@ import {
   showMoreCommits,
   switchToBranchesView,
   switchToCommitsView
-} from '../messages'
+} from '../../../util/messages'
 import styles from '../styles.module.scss'
 import { ExperimentsState } from '../../../store'
 
