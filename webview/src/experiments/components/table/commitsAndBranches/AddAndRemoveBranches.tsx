@@ -2,7 +2,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import styles from '../styles.module.scss'
 import { ExperimentsState } from '../../../store'
-import { selectBranches } from '../messages'
+import { selectBranches } from '../../../util/messages'
 import { featureFlag } from '../../../../util/flags'
 
 export const AddAndRemoveBranches: React.FC = () => {
