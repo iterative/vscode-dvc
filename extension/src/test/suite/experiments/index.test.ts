@@ -1587,7 +1587,6 @@ suite('Experiments Test Suite', () => {
                 description: '[exp-1]',
                 id: 'exp-1',
                 label: '111111',
-                logicalGroupName: '[exp-1]',
                 params: { 'params.yaml': { test: 2 } },
                 selected: false,
                 starred: false
@@ -1597,7 +1596,6 @@ suite('Experiments Test Suite', () => {
                 description: '[exp-2]',
                 id: 'exp-2',
                 label: '222222',
-                logicalGroupName: '[exp-2]',
                 params: { 'params.yaml': { test: 1 } },
                 selected: false,
                 starred: false
@@ -1607,7 +1605,6 @@ suite('Experiments Test Suite', () => {
                 description: '[exp-3]',
                 id: 'exp-3',
                 label: '333333',
-                logicalGroupName: '[exp-3]',
                 params: { 'params.yaml': { test: 3 } },
                 selected: false,
                 starred: false
@@ -1666,7 +1663,6 @@ suite('Experiments Test Suite', () => {
                 description: '[exp-2]',
                 id: 'exp-2',
                 label: '222222',
-                logicalGroupName: '[exp-2]',
                 params: { 'params.yaml': { test: 1 } },
                 selected: false,
                 starred: false
@@ -1676,7 +1672,6 @@ suite('Experiments Test Suite', () => {
                 description: '[exp-1]',
                 id: 'exp-1',
                 label: '111111',
-                logicalGroupName: '[exp-1]',
                 params: { 'params.yaml': { test: 2 } },
                 selected: false,
                 starred: false
@@ -1686,7 +1681,6 @@ suite('Experiments Test Suite', () => {
                 description: '[exp-3]',
                 id: 'exp-3',
                 label: '333333',
-                logicalGroupName: '[exp-3]',
                 params: { 'params.yaml': { test: 3 } },
                 selected: false,
                 starred: false

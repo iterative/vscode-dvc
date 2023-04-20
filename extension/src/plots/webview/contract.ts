@@ -61,9 +61,9 @@ export type Revision = {
   errors?: string[]
   fetched: boolean
   firstThreeColumns: RevisionFirstThreeColumns
-  group?: string
+  description: string | undefined
   id: string
-  revision: string
+  label: string
 }
 
 export interface PlotsComparisonData {
