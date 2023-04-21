@@ -83,7 +83,7 @@ export const Ribbon: React.FC = () => {
         <RibbonBlock
           revision={revision}
           key={revision.id}
-          onClear={() => removeRevision(revision.id || '')}
+          onClear={() => removeRevision(revision.id)}
         />
       ))}
     </ul>

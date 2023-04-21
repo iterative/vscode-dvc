@@ -536,7 +536,8 @@ export const getRevisions = (): Revision[] => {
   return [
     {
       id: EXPERIMENT_WORKSPACE_ID,
-      revision: EXPERIMENT_WORKSPACE_ID,
+      label: EXPERIMENT_WORKSPACE_ID,
+      description: undefined,
       displayColor: workspace,
       errors: undefined,
       fetched: true,
@@ -556,8 +557,7 @@ export const getRevisions = (): Revision[] => {
           path: 'summary.json:accuracy',
           value: 0.5926499962806702
         }
-      ],
-      group: undefined
+      ]
     },
     {
       errors: undefined,
@@ -580,9 +580,9 @@ export const getRevisions = (): Revision[] => {
         }
       ],
       id: 'main',
-      revision: 'main',
+      label: 'main',
       displayColor: main,
-      group: undefined
+      description: undefined
     },
     {
       errors: undefined,
@@ -605,9 +605,9 @@ export const getRevisions = (): Revision[] => {
         }
       ],
       id: 'exp-e7a67',
-      revision: '4fb124a',
+      label: '4fb124a',
       displayColor: _4fb124a,
-      group: '[exp-e7a67]'
+      description: '[exp-e7a67]'
     },
     {
       errors: undefined,
@@ -630,9 +630,9 @@ export const getRevisions = (): Revision[] => {
         }
       ],
       id: 'test-branch',
-      revision: '42b8736',
+      label: '42b8736',
       displayColor: _42b8736,
-      group: '[test-branch]'
+      description: '[test-branch]'
     },
     {
       errors: undefined,
@@ -655,9 +655,9 @@ export const getRevisions = (): Revision[] => {
         }
       ],
       id: 'exp-83425',
-      revision: EXPERIMENT_WORKSPACE_ID,
+      label: EXPERIMENT_WORKSPACE_ID,
       displayColor: _1ba7bcd,
-      group: '[exp-83425]'
+      description: '[exp-83425]'
     }
   ]
 }

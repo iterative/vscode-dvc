@@ -56,10 +56,10 @@ describe('ComparisonTable', () => {
   })
 
   const selectedRevisions: Revision[] = plotsRevisionsFixture
-  const revisions = selectedRevisions.map(({ revision }) => revision)
+  const revisions = selectedRevisions.map(({ label }) => label)
   const ids = selectedRevisions.map(({ id }) => id)
   const namedRevisions = selectedRevisions.map(
-    ({ revision, group }) => `${revision}${group || ''}`
+    ({ label, description }) => `${label}${description || ''}`
   )
 
   const renderTable = (
@@ -223,7 +223,7 @@ describe('ComparisonTable', () => {
     expect(headers).toStrictEqual(namedRevisions)
 
     const filteredRevisions = selectedRevisions.filter(
-      ({ revision }) => revision !== revisions[3]
+      ({ label }) => label !== revisions[3]
     )
 
     renderTable(
@@ -237,7 +237,7 @@ describe('ComparisonTable', () => {
     headers = getHeaders().map(header => header.textContent)
 
     const expectedRevisions = filteredRevisions.map(
-      ({ revision, group }) => `${revision}${group || ''}`
+      ({ label, description }) => `${label}${description || ''}`
     )
 
     expect(headers).toStrictEqual(expectedRevisions)
@@ -253,7 +253,7 @@ describe('ComparisonTable', () => {
         displayColor: '#000000',
         fetched: true,
         id: newRevName,
-        revision: newRevName
+        label: newRevName
       }
     ] as Revision[]
 
@@ -286,12 +286,12 @@ describe('ComparisonTable', () => {
       revisions: [
         ...comparisonTableFixture.revisions,
         {
+          description: undefined,
           displayColor: '#f56565',
           fetched: true,
           firstThreeColumns: [],
-          group: undefined,
           id: 'noData',
-          revision: revisionWithNoData
+          label: revisionWithNoData
         }
       ]
     })
@@ -319,12 +319,12 @@ describe('ComparisonTable', () => {
       revisions: [
         ...comparisonTableFixture.revisions,
         {
+          description: undefined,
           displayColor: '#f56565',
           fetched: true,
           firstThreeColumns: [],
-          group: undefined,
           id: revisionWithNoData,
-          revision: 'noData'
+          label: 'noData'
         }
       ]
     })

@@ -155,7 +155,6 @@ const data: Commit[] = [
         executor: Executor.DVC_TASK,
         id: 'exp-e7a67',
         label: '4fb124a',
-        logicalGroupName: '[exp-e7a67]',
         metrics: {
           'summary.json': {
             loss: 2.0205044746398926,
@@ -213,7 +212,6 @@ const data: Commit[] = [
         description: '[test-branch]',
         id: 'test-branch',
         label: '42b8736',
-        logicalGroupName: '[test-branch]',
         metrics: {
           'summary.json': {
             loss: 1.9293040037155151,
@@ -271,7 +269,6 @@ const data: Commit[] = [
         executor: Executor.WORKSPACE,
         id: 'exp-83425',
         label: EXPERIMENT_WORKSPACE_ID,
-        logicalGroupName: '[exp-83425]',
         metrics: {
           'summary.json': {
             loss: 1.775016188621521,
@@ -341,7 +338,6 @@ const data: Commit[] = [
         error:
           "unable to read: 'summary.json', JSON file structure is corrupted",
         label: 'f0f9186',
-        logicalGroupName: '[exp-f13bca]',
         metrics: {},
         params: {
           'params.yaml': {

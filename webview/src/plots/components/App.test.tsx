@@ -240,12 +240,12 @@ describe('App', () => {
         ],
         revisions: [
           {
+            description: '[exp-a270a]',
             displayColor: '#945dd6',
             fetched: false,
             firstThreeColumns: [],
-            group: '[exp-a270a]',
             id: 'ad2b5ec',
-            revision: 'ad2b5ec'
+            label: 'ad2b5ec'
           }
         ],
         width: DEFAULT_NB_ITEMS_PER_ROW
@@ -256,12 +256,12 @@ describe('App', () => {
       sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
       selectedRevisions: [
         {
+          description: '[exp-a270a]',
           displayColor: '#945dd6',
           fetched: false,
           firstThreeColumns: [],
-          group: '[exp-a270a]',
           id: 'ad2b5ec',
-          revision: 'ad2b5ec'
+          label: 'ad2b5ec'
         }
       ],
       template: null
@@ -1903,7 +1903,7 @@ describe('App', () => {
 
       expect(getDisplayedRevisionOrder()).toStrictEqual(
         plotsRevisionsFixture.map(rev =>
-          rev.group ? rev.group.slice(1, -1) + rev.revision : rev.revision
+          rev.description ? rev.label + rev.description : rev.label
         )
       )
     })
@@ -1980,7 +1980,7 @@ describe('App', () => {
       renderAppWithOptionalData({
         comparison: comparisonTableFixture,
         selectedRevisions: plotsRevisionsFixture.map(rev => {
-          if (rev.revision === 'main') {
+          if (rev.label === 'main') {
             return {
               ...rev,
               errors: ['error']
@@ -1997,7 +1997,7 @@ describe('App', () => {
       renderAppWithOptionalData({
         comparison: comparisonTableFixture,
         selectedRevisions: plotsRevisionsFixture.map(rev => {
-          if (rev.revision === 'main') {
+          if (rev.label === 'main') {
             return {
               ...rev,
               errors: ['error'],
