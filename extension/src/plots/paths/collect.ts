@@ -22,7 +22,6 @@ import {
   StrokeDashValue
 } from '../multiSource/constants'
 import { MultiSourceEncoding } from '../multiSource/collect'
-import { CLIRevisionIdToLabel } from '../model/collect'
 import { truncate } from '../../util/string'
 
 export enum PathType {
@@ -75,56 +74,45 @@ const getType = (
 
 const filterRevisionIfFetched = (
   existingPaths: PlotPath[],
-  fetchedRevs: string[],
-  cliIdToLabel: CLIRevisionIdToLabel
+  fetchedRevs: string[]
 ) => {
   return existingPaths.map(existing => {
     const revisions = existing.revisions
-    for (const rev of fetchedRevs) {
-      const id = cliIdToLabel[rev] || rev
+    for (const id of fetchedRevs) {
       revisions.delete(id)
     }
     return { ...existing, revisions }
   })
 }
 
-const collectImageRevision = (
-  acc: Set<string>,
-  plot: ImagePlot,
-  cliIdToLabel: { [id: string]: string }
-): void => {
-  const revision = plot.revisions?.[0]
-  if (revision) {
-    acc.add(cliIdToLabel[revision] || revision)
+const collectImageRevision = (acc: Set<string>, plot: ImagePlot): void => {
+  const id = plot.revisions?.[0]
+  if (id) {
+    acc.add(id)
   }
 }
 
 const collectTemplateRevisions = (
   acc: Set<string>,
-  plot: TemplatePlot,
-  cliIdToLabel: { [id: string]: string }
+  plot: TemplatePlot
 ): void => {
-  for (const [revision, datapoints] of Object.entries(plot?.datapoints || {})) {
+  for (const [id, datapoints] of Object.entries(plot?.datapoints || {})) {
     if (datapoints.length > 0) {
-      acc.add(cliIdToLabel[revision] || revision)
+      acc.add(id)
     }
   }
 }
 
-const collectPathRevisions = (
-  data: PlotsData,
-  path: string,
-  cliIdToLabel: { [id: string]: string }
-): Set<string> => {
+const collectPathRevisions = (data: PlotsData, path: string): Set<string> => {
   const revisions = new Set<string>()
 
   for (const plot of data[path] || []) {
     if (isImagePlot(plot)) {
-      collectImageRevision(revisions, plot, cliIdToLabel)
+      collectImageRevision(revisions, plot)
       continue
     }
 
-    collectTemplateRevisions(revisions, plot, cliIdToLabel)
+    collectTemplateRevisions(revisions, plot)
   }
 
   return revisions
@@ -186,15 +174,11 @@ const addRevisionsToPath = (
   return acc
 }
 
-const collectDataPaths = (
-  acc: PlotPath[],
-  data: PlotsData,
-  cliIdToLabel: { [id: string]: string }
-) => {
+const collectDataPaths = (acc: PlotPath[], data: PlotsData) => {
   const paths = Object.keys(data)
 
   for (const path of paths) {
-    const revisions = collectPathRevisions(data, path, cliIdToLabel)
+    const revisions = collectPathRevisions(data, path)
     acc = addRevisionsToPath(acc, data, path, revisions)
   }
   return acc
@@ -202,14 +186,13 @@ const collectDataPaths = (
 
 const collectErrorRevisions = (
   path: string,
-  errors: PlotError[],
-  cliIdToLabel: { [id: string]: string }
+  errors: PlotError[]
 ): Set<string> => {
   const acc = new Set<string>()
   for (const error of errors) {
     const { name, rev } = error
     if (name === path) {
-      acc.add(cliIdToLabel[rev] || rev)
+      acc.add(rev)
     }
   }
   return acc
@@ -218,15 +201,14 @@ const collectErrorRevisions = (
 const collectErrorPaths = (
   acc: PlotPath[],
   data: PlotsData,
-  errors: PlotError[],
-  cliIdToLabel: { [id: string]: string }
+  errors: PlotError[]
 ) => {
   const paths = errors.map(({ name }) => name)
   for (const path of paths) {
     if (!path) {
       continue
     }
-    const revisions = collectErrorRevisions(path, errors, cliIdToLabel)
+    const revisions = collectErrorRevisions(path, errors)
     acc = addRevisionsToPath(acc, data, path, revisions)
   }
   return acc
@@ -235,21 +217,16 @@ const collectErrorPaths = (
 export const collectPaths = (
   existingPaths: PlotPath[],
   output: PlotsOutput,
-  fetchedRevs: string[],
-  cliIdToLabel: { [id: string]: string }
+  fetchedRevs: string[]
 ): PlotPath[] => {
-  let acc: PlotPath[] = filterRevisionIfFetched(
-    existingPaths,
-    fetchedRevs,
-    cliIdToLabel
-  )
+  let acc: PlotPath[] = filterRevisionIfFetched(existingPaths, fetchedRevs)
 
   const { data, errors } = output
 
-  acc = collectDataPaths(acc, data, cliIdToLabel)
+  acc = collectDataPaths(acc, data)
 
   if (errors?.length) {
-    acc = collectErrorPaths(acc, data, errors, cliIdToLabel)
+    acc = collectErrorPaths(acc, data, errors)
   }
 
   return acc

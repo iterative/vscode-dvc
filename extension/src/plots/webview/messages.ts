@@ -220,7 +220,7 @@ export class WebviewMessages {
   }
 
   private selectExperimentsFromWebview() {
-    void this.experiments.selectExperiments()
+    void this.experiments.selectExperimentsToPlot()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_SELECT_EXPERIMENTS,
       undefined,

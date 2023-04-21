@@ -43,15 +43,11 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     this.selectedRevisions = selectedRevisions
   }
 
-  public transformAndSet(
-    output: PlotsOutputOrError,
-    revs: string[],
-    cliIdToLabel: { [id: string]: string }
-  ) {
+  public transformAndSet(output: PlotsOutputOrError, revs: string[]) {
     if (isDvcError(output)) {
       this.handleCliError()
     } else {
-      const paths = collectPaths(this.data, output, revs, cliIdToLabel)
+      const paths = collectPaths(this.data, output, revs)
 
       this.setNewStatuses(paths)
       this.data = paths

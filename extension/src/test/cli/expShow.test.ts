@@ -4,7 +4,11 @@ import { expect } from 'chai'
 import { TEMP_DIR } from './constants'
 import { dvcReader, initializeDemoRepo, initializeEmptyRepo } from './util'
 import { dvcDemoPath } from '../util'
-import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
+import {
+  EXPERIMENT_WORKSPACE_ID,
+  fileHasError,
+  experimentHasError
+} from '../../cli/dvc/contract'
 
 suite('exp show --show-json', () => {
   // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -13,8 +17,9 @@ suite('exp show --show-json', () => {
       await initializeDemoRepo()
       const output = await dvcReader.expShow(dvcDemoPath)
 
-      expect(output.workspace, 'should have a workspace key').not.to.be
-        .undefined
+      const [workspace] = output
+
+      expect(workspace, 'should have a workspace key').not.to.be.undefined
 
       expect(
         Object.keys(output),
@@ -22,48 +27,49 @@ suite('exp show --show-json', () => {
       ).to.have.lengthOf.greaterThanOrEqual(2)
 
       // each entry under output
-      for (const [key, obj] of Object.entries(output)) {
-        expect(obj, 'should have a child object').to.be.an('object')
+      for (const commit of output) {
+        if (experimentHasError(commit)) {
+          throw new Error('Commit should not have an error')
+          continue
+        }
 
-        expect(obj.baseline, 'should have a baseline entry').to.be.an('object')
+        expect(commit, 'should have a child object').to.be.an('object')
 
-        expect(
-          obj.baseline.data,
-          'should have data inside of the baseline'
-        ).to.be.an('object')
+        expect(commit, 'should have a baseline entry').to.be.an('object')
 
-        expect(obj.baseline.data?.timestamp, 'should have a timestamp').to.be.a(
-          key === EXPERIMENT_WORKSPACE_ID ? 'null' : 'string'
-        )
-
-        expect(obj.baseline.data?.params, 'should have params').to.be.an(
+        expect(commit.data, 'should have data inside of the baseline').to.be.an(
           'object'
         )
-        expect(obj.baseline.data?.metrics, 'should have metrics').to.be.an(
-          'object'
+
+        expect(commit.data?.timestamp, 'should have a timestamp').to.be.a(
+          'string'
         )
+
+        expect(commit.data?.params, 'should have params').to.be.an('object')
+        expect(commit.data?.metrics, 'should have metrics').to.be.an('object')
 
         // each metric or param file
         for (const file of Object.values({
-          ...obj.baseline.data?.params,
-          ...obj.baseline.data?.metrics
+          ...commit.data?.params,
+          ...commit.data?.metrics
         })) {
           expect(file, 'should have children').to.be.an('object')
+          if (fileHasError(file)) {
+            throw new Error('File should not have an error')
+          }
           expect(file.data, 'should have a data entry').to.be.an('object')
           expect(isEmpty(file.data), 'should have data').to.be.false
         }
 
-        expect(obj.baseline.data?.metrics, 'should have metrics').to.be.an(
-          'object'
-        )
+        expect(commit.data?.metrics, 'should have metrics').to.be.an('object')
 
-        expect(obj.baseline.data?.deps, 'should have deps').to.be.an('object')
-        expect(obj.baseline.data?.outs, 'should have outs').to.be.an('object')
+        expect(commit.data?.deps, 'should have deps').to.be.an('object')
+        expect(commit.data?.outs, 'should have outs').to.be.an('object')
 
         // each deps or outs file
         for (const file of Object.values({
-          ...obj.baseline.data?.deps,
-          ...obj.baseline.data?.outs
+          ...commit.data?.deps,
+          ...commit.data?.outs
         })) {
           expect(file.hash, 'should have a hash').to.be.a('string')
           expect(file.size, 'should have a size').to.be.a('number')
@@ -81,9 +87,11 @@ suite('exp show --show-json', () => {
       await initializeEmptyRepo()
       const output = await dvcReader.expShow(TEMP_DIR)
 
-      expect(output).to.deep.equal({
-        [EXPERIMENT_WORKSPACE_ID]: { baseline: {} }
-      })
+      expect(output).to.deep.equal([
+        {
+          rev: EXPERIMENT_WORKSPACE_ID
+        }
+      ])
     })
   })
 })

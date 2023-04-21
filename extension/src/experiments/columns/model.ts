@@ -1,8 +1,13 @@
 import { EventEmitter, Memento } from 'vscode'
-import { collectChanges, collectColumns, collectParamsFiles } from './collect'
+import {
+  collectChanges,
+  collectColumns,
+  collectRelativeMetricsFiles,
+  collectParamsFiles
+} from './collect'
 import { EXPERIMENT_COLUMN_ID, timestampColumn } from './constants'
 import { Column, ColumnType } from '../webview/contract'
-import { ExperimentsOutput } from '../../cli/dvc/contract'
+import { ExpShowOutput } from '../../cli/dvc/contract'
 import { PersistenceKey } from '../../persistence/constants'
 import { PathSelectionModel, Status } from '../../path/selection/model'
 
@@ -11,6 +16,7 @@ export class ColumnsModel extends PathSelectionModel<Column> {
   private columnWidthsState: Record<string, number> = {}
   private columnsChanges: string[] = []
   private paramsFiles = new Set<string>()
+  private relativeMetricsFiles: string[] = []
 
   constructor(
     dvcRoot: string,
@@ -52,7 +58,7 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     return this.paramsFiles
   }
 
-  public transformAndSet(data: ExperimentsOutput) {
+  public transformAndSet(data: ExpShowOutput) {
     return Promise.all([
       this.transformAndSetColumns(data),
       this.transformAndSetChanges(data)
@@ -61,6 +67,10 @@ export class ColumnsModel extends PathSelectionModel<Column> {
 
   public getChanges() {
     return this.columnsChanges
+  }
+
+  public getRelativeMetricsFiles() {
+    return this.relativeMetricsFiles
   }
 
   public setColumnOrder(columnOrder: string[]) {
@@ -153,10 +163,11 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     ]
   }
 
-  private async transformAndSetColumns(data: ExperimentsOutput) {
-    const [columns, paramsFiles] = await Promise.all([
+  private async transformAndSetColumns(data: ExpShowOutput) {
+    const [columns, paramsFiles, relativeMetricsFiles] = await Promise.all([
       collectColumns(data),
-      collectParamsFiles(this.dvcRoot, data)
+      collectParamsFiles(this.dvcRoot, data),
+      collectRelativeMetricsFiles(data)
     ])
 
     this.setNewStatuses(columns)
@@ -168,9 +179,10 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     }
 
     this.paramsFiles = paramsFiles
+    this.relativeMetricsFiles = relativeMetricsFiles
   }
 
-  private transformAndSetChanges(data: ExperimentsOutput) {
+  private transformAndSetChanges(data: ExpShowOutput) {
     this.columnsChanges = collectChanges(data)
   }
 }

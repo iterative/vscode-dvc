@@ -173,7 +173,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private notifyChanged() {
-    const selectedRevisions = this.plots.getSelectedRevisions()
+    const selectedRevisions = this.plots.getSelectedRevisionIds()
     this.paths.setSelectedRevisions(selectedRevisions)
     const paths = this.paths.getTerminalNodes().map(({ path }) => path)
     this.decorationProvider.setState(
@@ -220,27 +220,26 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private waitForInitialData(experiments: Experiments) {
     const waitForInitialExpData = this.dispose.track(
-      experiments.onDidChangeExperiments(data => {
-        if (data) {
-          this.dispose.untrack(waitForInitialExpData)
-          waitForInitialExpData.dispose()
-          this.data.setMetricFiles(data)
-          this.setupExperimentsListener(experiments)
-          void this.initializeData()
-        }
+      experiments.onDidChangeExperiments(async () => {
+        await experiments.isReady()
+        this.dispose.untrack(waitForInitialExpData)
+        waitForInitialExpData.dispose()
+        this.data.setMetricFiles(experiments.getRelativeMetricsFiles())
+        const collectInitialIdShas = () => this.plots.removeStaleData()
+        collectInitialIdShas()
+        this.setupExperimentsListener(experiments)
+        void this.initializeData()
       })
     )
   }
 
   private setupExperimentsListener(experiments: Experiments) {
     this.dispose.track(
-      experiments.onDidChangeExperiments(async data => {
-        if (data) {
-          await Promise.all([
-            this.plots.transformAndSetExperiments(),
-            this.data.setMetricFiles(data)
-          ])
-        }
+      experiments.onDidChangeExperiments(async () => {
+        await Promise.all([
+          this.plots.removeStaleData(),
+          this.data.setMetricFiles(experiments.getRelativeMetricsFiles())
+        ])
 
         this.notifyChanged()
       })
@@ -254,7 +253,6 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private async initializeData() {
-    await this.plots.transformAndSetExperiments()
     this.triggerDataUpdate()
     await Promise.all([
       this.data.isReady(),
@@ -280,11 +278,10 @@ export class Plots extends BaseRepository<TPlotsData> {
   private onDidUpdateData() {
     this.dispose.track(
       this.data.onDidUpdate(async ({ data, revs }) => {
-        const cliIdToLabel = this.plots.getCLIIdToLabel()
         await Promise.all([
-          this.plots.transformAndSetPlots(data, revs),
-          this.paths.transformAndSet(data, revs, cliIdToLabel),
-          this.errors.transformAndSet(data, revs, cliIdToLabel)
+          this.plots.transformAndSet(data, revs),
+          this.paths.transformAndSet(data, revs),
+          this.errors.transformAndSet(data, revs)
         ])
         this.notifyChanged()
       })

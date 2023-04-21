@@ -53,7 +53,7 @@ export const ComparisonTableCell: React.FC<ComparisonTableCellProps> = ({
       <img
         draggable={false}
         src={plot.url}
-        alt={`Plot of ${path} (${plot.revision})`}
+        alt={`Plot of ${path} (${plot.id})`}
       />
     </button>
   )

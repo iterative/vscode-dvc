@@ -1,8 +1,9 @@
 import {
   Deps,
-  ExperimentFields,
-  ValueTreeOrError,
-  ValueTreeRoot
+  ExpData,
+  FileDataOrError,
+  MetricsOrParams,
+  fileHasError
 } from '../../cli/dvc/contract'
 import { shortenForLabel } from '../../util/string'
 import {
@@ -14,13 +15,16 @@ import {
 const extractFileMetricsOrParams = (
   acc: { columns: MetricOrParamColumns; errors: string[] },
   file: string,
-  dataOrError: ValueTreeOrError
+  dataOrError: FileDataOrError
 ) => {
-  const data = dataOrError?.data
-  const error = dataOrError?.error?.msg
-  if (error) {
-    acc.errors.push(error)
+  if (fileHasError(dataOrError)) {
+    const error = dataOrError?.error?.msg
+    if (error) {
+      acc.errors.push(error)
+    }
+    return
   }
+  const data = dataOrError?.data
   if (!data) {
     return
   }
@@ -28,9 +32,9 @@ const extractFileMetricsOrParams = (
 }
 
 const extractMetricsOrParams = (
-  valueTreeRoot?: ValueTreeRoot
+  metricsOrParams?: MetricsOrParams | null
 ): { columns: MetricOrParamColumns; errors: string[] } | undefined => {
-  if (!valueTreeRoot) {
+  if (!metricsOrParams) {
     return
   }
   const acc: { columns: MetricOrParamColumns; errors: string[] } = {
@@ -38,7 +42,7 @@ const extractMetricsOrParams = (
     errors: []
   }
 
-  for (const [file, dataOrError] of Object.entries(valueTreeRoot)) {
+  for (const [file, dataOrError] of Object.entries(metricsOrParams)) {
     extractFileMetricsOrParams(acc, file, dataOrError)
   }
 
@@ -46,7 +50,7 @@ const extractMetricsOrParams = (
 }
 
 const extractDeps = (
-  columns?: Deps,
+  columns: Deps | null,
   commit?: Experiment
 ): DepColumns | undefined => {
   if (!columns) {
@@ -77,7 +81,7 @@ type Columns = {
 }
 
 export const extractColumns = (
-  experiment: ExperimentFields,
+  experiment: ExpData,
   commit?: Experiment
 ): Columns => {
   const metricsData = extractMetricsOrParams(experiment.metrics)

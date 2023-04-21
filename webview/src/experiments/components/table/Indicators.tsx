@@ -1,8 +1,12 @@
 import React, { MouseEventHandler, ReactElement, ReactNode } from 'react'
 import { useSelector } from 'react-redux'
 import styles from './styles.module.scss'
-import { CellHintTooltip } from './CellHintTooltip'
-import { focusFiltersTree, focusSortsTree, openPlotsWebview } from './messages'
+import { CellHintTooltip } from './body/CellHintTooltip'
+import {
+  focusFiltersTree,
+  focusSortsTree,
+  openPlotsWebview
+} from '../../util/messages'
 import { Icon } from '../../../shared/components/Icon'
 import {
   Filter,

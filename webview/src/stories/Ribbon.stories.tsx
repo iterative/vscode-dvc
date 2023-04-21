@@ -56,7 +56,7 @@ export const WithLoading = Template.bind({})
 WithLoading.args = {
   data: {
     selectedRevisions: plotsRevisionsFixtureWithCommit.map(item => {
-      if (['main', '42b8736'].includes(item.revision)) {
+      if (['main', '42b8736'].includes(item.label)) {
         return { ...item, fetched: false }
       }
       return item
@@ -68,7 +68,7 @@ export const WithErrors = Template.bind({})
 WithErrors.args = {
   data: {
     selectedRevisions: plotsRevisionsFixtureWithCommit.map(item => {
-      if (['main', '42b8736'].includes(item.revision)) {
+      if (['main', '42b8736'].includes(item.label)) {
         return {
           ...item,
           errors: [

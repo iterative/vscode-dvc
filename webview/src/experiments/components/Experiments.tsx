@@ -27,8 +27,8 @@ import styles from './table/styles.module.scss'
 import { AddColumns, Welcome } from './GetStarted'
 import { RowSelectionProvider } from './table/RowSelectionContext'
 import { CellValue } from './table/content/Cell'
-import { CellSecondaryName } from './table/CellSecondaryName'
 import { AddStage } from './AddStage'
+import { ExperimentCell } from './table/content/ExperimentCell'
 import { buildColumns, columnHelper } from '../util/buildColumns'
 import { sendMessage } from '../../shared/vscode'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
@@ -49,20 +49,17 @@ const getDefaultColumnWithIndicatorsPlaceHolder = () =>
     cell: (cell: CellContext<Column, CellValue>) => {
       const {
         row: {
-          original: { label, displayName, commit, sha }
+          original: { label, description, commit, sha, error }
         }
       } = cell as unknown as CellContext<Experiment, CellValue>
       return (
-        <div className={styles.experimentCellText}>
-          <span>{label}</span>
-          {displayName && (
-            <CellSecondaryName
-              sha={sha}
-              displayName={displayName}
-              commit={commit}
-            />
-          )}
-        </div>
+        <ExperimentCell
+          commit={commit}
+          description={description}
+          error={error}
+          label={label}
+          sha={sha}
+        />
       )
     },
     header: ExperimentHeader,

@@ -68,7 +68,7 @@ export class DvcExecutor extends DvcCli {
   }
 
   public commit(cwd: string, ...args: Args) {
-    return this.blockAndExecuteProcess(cwd, Command.COMMIT, ...args)
+    return this.blockAndExecuteProcess(cwd, Command.COMMIT, ...args, Flag.FORCE)
   }
 
   public experimentApply(cwd: string, experimentName: string) {
@@ -193,9 +193,14 @@ export class DvcExecutor extends DvcCli {
 
   private async blockAndExecuteProcess(cwd: string, ...args: Args) {
     this.setRunning(true)
-    const output = await this.executeDvcProcess(cwd, ...args)
-    this.setRunning(false)
-    return output
+    try {
+      const output = await this.executeDvcProcess(cwd, ...args)
+      this.setRunning(false)
+      return output
+    } catch (error) {
+      this.setRunning(false)
+      throw error
+    }
   }
 
   private setRunning(running: boolean) {
