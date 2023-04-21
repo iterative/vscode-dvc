@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.0] - 2023-04-21
+
+### 🚀 New Features and Enhancements
+
+- Bump min DVC version to 2.55.0 (live metrics for experiments running outside the workspace) [#3665](https://github.com/iterative/vscode-dvc/pull/3665) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix broken experiments table column shadow [#3729](https://github.com/iterative/vscode-dvc/pull/3729) by [@julieg18](https://github.com/julieg18)
+- Set scm running context to false if command fails [#3727](https://github.com/iterative/vscode-dvc/pull/3727) by [@mattseddon](https://github.com/mattseddon)
+- Force commit action by default [#3726](https://github.com/iterative/vscode-dvc/pull/3726) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Stop importing CSS into storybook files [#3696](https://github.com/iterative/vscode-dvc/pull/3696) by [@julieg18](https://github.com/julieg18)
+- Clean up shared styles [#3716](https://github.com/iterative/vscode-dvc/pull/3716) by [@julieg18](https://github.com/julieg18)
+- Group table styles [#3667](https://github.com/iterative/vscode-dvc/pull/3667) by [@julieg18](https://github.com/julieg18)
+- Clean up table file structure [#3706](https://github.com/iterative/vscode-dvc/pull/3706) by [@sroy3](https://github.com/sroy3)
+- Fix warnings produced by integration tests [#3728](https://github.com/iterative/vscode-dvc/pull/3728) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.7.9] - 2023-04-18
 
 ### 🔨 Maintenance
