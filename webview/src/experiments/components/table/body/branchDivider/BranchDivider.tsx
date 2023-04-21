@@ -5,7 +5,7 @@ import { Icon } from '../../../../../shared/components/Icon'
 import { GitMerge } from '../../../../../shared/components/icons'
 
 export const BranchDivider: React.FC<PropsWithChildren> = ({ children }) => (
-  <tbody>
+  <tbody data-testid="branch-name">
     <tr>
       <td className={tablesStyles.experimentsTd}>
         <div className={styles.branchName}>

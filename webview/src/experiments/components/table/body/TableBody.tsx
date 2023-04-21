@@ -55,6 +55,12 @@ export const TableBody: React.FC<TableBodyProps> = ({
     </WorkspaceRowGroup>
   ) : (
     <>
+      {showPreviousRow && row.depth === 0 && (
+        <PreviousCommitsRow
+          isBranchesView={isBranchesView}
+          nbColumns={row.getAllCells().length}
+        />
+      )}
       <tbody
         className={cx(styles.rowGroup, {
           [styles.experimentGroup]: row.depth > 0,
@@ -63,12 +69,6 @@ export const TableBody: React.FC<TableBodyProps> = ({
       >
         {content}
       </tbody>
-      {showPreviousRow && row.depth === 0 && (
-        <PreviousCommitsRow
-          isBranchesView={isBranchesView}
-          nbColumns={row.getAllCells().length}
-        />
-      )}
     </>
   )
 }
