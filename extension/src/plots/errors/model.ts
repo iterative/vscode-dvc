@@ -22,16 +22,12 @@ export class ErrorsModel extends Disposable {
     this.dvcRoot = dvcRoot
   }
 
-  public transformAndSet(
-    output: PlotsOutputOrError,
-    revs: string[],
-    cliIdToLabel: { [id: string]: string }
-  ) {
+  public transformAndSet(output: PlotsOutputOrError, revs: string[]) {
     if (isDvcError(output)) {
       return this.handleCliError(output)
     }
 
-    this.errors = collectErrors(output, revs, this.errors, cliIdToLabel)
+    this.errors = collectErrors(output, revs, this.errors)
     this.cliError = undefined
   }
 

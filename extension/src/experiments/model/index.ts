@@ -5,28 +5,25 @@ import { collectExperiments } from './collect'
 import {
   collectColoredStatus,
   collectFinishedRunningExperiments,
-  collectSelected,
+  collectSelectable,
+  collectSelectedColors,
   collectStartedRunningExperiments
 } from './status/collect'
 import { Color, copyOriginalColors } from './status/colors'
-import {
-  canSelect,
-  limitToMaxSelected,
-  ColoredStatus,
-  tooManySelected,
-  UNSELECTED
-} from './status'
+import { canSelect, ColoredStatus, UNSELECTED } from './status'
 import { collectFlatExperimentParams } from './modify/collect'
 import {
   Experiment,
   isQueued,
+  isRunning,
   isRunningInQueue,
   RunningExperiment
 } from '../webview/contract'
 import { definedAndNonEmpty, reorderListSubset } from '../../util/array'
 import {
-  ExperimentsOutput,
-  EXPERIMENT_WORKSPACE_ID
+  EXPERIMENT_WORKSPACE_ID,
+  Executor,
+  ExpShowOutput
 } from '../../cli/dvc/contract'
 import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
@@ -52,6 +49,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   private workspace = {} as Experiment
   private commits: Experiment[] = []
   private experimentsByCommit: Map<string, Experiment[]> = new Map()
+  private checkpoints = false
   private availableColors: Color[]
   private coloredStatus: ColoredStatus
   private starredExperiments: StarredExperiments
@@ -110,16 +108,22 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public transformAndSet(
-    data: ExperimentsOutput,
+    data: ExpShowOutput,
     dvcLiveOnly: boolean,
-    commitsOutput: string
+    commitsOutput: string | undefined
   ) {
-    const { workspace, commits, experimentsByCommit, runningExperiments } =
-      collectExperiments(data, dvcLiveOnly, commitsOutput)
+    const {
+      workspace,
+      commits,
+      experimentsByCommit,
+      runningExperiments,
+      hasCheckpoints
+    } = collectExperiments(data, dvcLiveOnly, commitsOutput)
 
     this.workspace = workspace
     this.commits = commits
     this.experimentsByCommit = experimentsByCommit
+    this.checkpoints = hasCheckpoints
 
     this.setColoredStatus(runningExperiments)
   }
@@ -132,14 +136,16 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public toggleStatus(id: string) {
-    if (
-      isQueued(
-        this.getExperimentsAndQueued().find(
-          ({ id: queuedId }) => queuedId === id
-        )?.status
-      )
-    ) {
-      return
+    const experiment = this.getExperimentsAndQueued().find(
+      ({ id: expId }) => expId === id
+    )
+
+    if (experiment && isRunning(experiment.status)) {
+      return this.preventSelectionOfRunningExperiment(experiment)
+    }
+
+    if (isQueued(experiment?.status)) {
+      return UNSELECTED
     }
 
     const current = this.coloredStatus[id]
@@ -162,15 +168,8 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.running.length > 0
   }
 
-  public isRunningInWorkspace(id: string) {
-    if (id === EXPERIMENT_WORKSPACE_ID) {
-      return false
-    }
-
-    return this.running.some(
-      ({ id: runningId, executor }) =>
-        executor === EXPERIMENT_WORKSPACE_ID && runningId === id
-    )
+  public hasCheckpoints() {
+    return this.checkpoints
   }
 
   public setRevisionCollected(revisions: string[]) {
@@ -238,16 +237,8 @@ export class ExperimentsModel extends ModelWithPersistence {
     return result
   }
 
-  public getCommitRevisions() {
-    return this.commits.map(({ id, sha }) => ({ id, sha }))
-  }
-
-  public getExperimentRevisions() {
-    return this.getExperiments().map(({ id, label }) => ({ id, label }))
-  }
-
-  public getRevisions() {
-    return this.getCombinedList().map(({ label }) => label)
+  public getRevisionIds() {
+    return this.getCombinedList().map(({ id }) => id)
   }
 
   public getSelectedRevisions() {
@@ -255,12 +246,12 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public setSelected(selectedExperiments: Experiment[]) {
-    if (tooManySelected(selectedExperiments)) {
-      selectedExperiments = limitToMaxSelected(selectedExperiments)
-    }
+    const possibleToSelect = collectSelectable(selectedExperiments, {
+      ...this.workspace
+    })
 
-    const { availableColors, coloredStatus } = collectSelected(
-      selectedExperiments.filter(({ status }) => !isQueued(status)),
+    const { availableColors, coloredStatus } = collectSelectedColors(
+      possibleToSelect,
       this.getWorkspaceCommitsAndExperiments(),
       this.coloredStatus,
       this.availableColors
@@ -291,7 +282,7 @@ export class ExperimentsModel extends ModelWithPersistence {
       ...this.commits.map(commit => {
         return {
           ...this.addDetails(commit),
-          hasChildren: !!this.experimentsByCommit.get(commit.label),
+          hasChildren: !!this.experimentsByCommit.get(commit.id),
           type: ExperimentType.COMMIT
         }
       })
@@ -445,7 +436,7 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   private getExperimentsByCommit(commit: Experiment) {
     const experiments = this.experimentsByCommit
-      .get(commit.label)
+      .get(commit.id)
       ?.map(experiment => this.addDetails(experiment))
     if (!experiments) {
       return
@@ -503,6 +494,24 @@ export class ExperimentsModel extends ModelWithPersistence {
       this.availableColors,
       copyOriginalColors()
     )
+  }
+
+  private preventSelectionOfRunningExperiment(
+    experiment: Experiment
+  ): Color | undefined | typeof UNSELECTED {
+    if (isRunningInQueue(experiment)) {
+      return UNSELECTED
+    }
+
+    const { executor, id } = experiment
+    if (
+      executor === Executor.WORKSPACE &&
+      id !== EXPERIMENT_WORKSPACE_ID &&
+      !this.isSelected(id) &&
+      !this.isSelected(EXPERIMENT_WORKSPACE_ID)
+    ) {
+      return this.toggleStatus(EXPERIMENT_WORKSPACE_ID)
+    }
   }
 
   private persistSorts() {

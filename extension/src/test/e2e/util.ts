@@ -34,9 +34,9 @@ const dvcIsWorking = async (): Promise<boolean> => {
   )
 }
 
-export const waitForDvcToFinish = async (): Promise<void> => {
+export const waitForDvcToFinish = async (timeout = 60000): Promise<void> => {
   await browser.waitUntil(async () => !(await dvcIsWorking()), {
-    timeout: 60000
+    timeout
   })
 }
 

@@ -32,9 +32,9 @@ const getItemWithDescription = (
   firstThreeColumnOrder: string[]
 ) => {
   const item = getItem(experiment, firstThreeColumnOrder)
-  if (experiment.displayName) {
+  if (experiment.description) {
     item.description = `${experiment.commit ? '$(git-commit)' : ''}${
-      experiment.displayName
+      experiment.description
     }`
   }
   return item
@@ -92,12 +92,11 @@ export const pickExperimentsToPlot = (
   )
 }
 
-type ExperimentDetails = { id: string; name: string }
 type ExperimentItem = {
   description: string | undefined
   detail: string
   label: string
-  value: ExperimentDetails
+  value: string
 }
 
 const getExperimentItems = (
@@ -105,21 +104,18 @@ const getExperimentItems = (
   firstThreeColumnOrder: string[]
 ): ExperimentItem[] =>
   experiments.map(experiment => {
-    const { label, id, name, displayName, commit } = experiment
+    const { label, id, description, commit } = experiment
     return {
       description:
-        displayName && `${commit ? '$(git-commit)' : ''}${displayName}`,
+        description && `${commit ? '$(git-commit)' : ''}${description}`,
       detail: getColumnPathsQuickPickDetail(experiment, firstThreeColumnOrder),
       label,
-      value: {
-        id,
-        name: name || label
-      }
+      value: id
     }
   })
 
-type QuickPickExperiment = typeof quickPickValue<ExperimentDetails>
-type QuickPickExperiments = typeof quickPickManyValues<ExperimentDetails>
+type QuickPickExperiment = typeof quickPickValue<string>
+type QuickPickExperiments = typeof quickPickManyValues<string>
 
 const pickExperimentOrExperiments = <
   T extends QuickPickExperiment | QuickPickExperiments
@@ -146,7 +142,7 @@ export const pickExperiment = (
   experiments: Experiment[],
   firstThreeColumnOrder: string[],
   title: Title = Title.SELECT_EXPERIMENT
-): Thenable<ExperimentDetails | undefined> =>
+): Thenable<string | undefined> =>
   pickExperimentOrExperiments<QuickPickExperiment>(
     experiments,
     firstThreeColumnOrder,
@@ -158,7 +154,7 @@ export const pickExperiments = (
   experiments: Experiment[],
   firstThreeColumnOrder: string[],
   title: Title = Title.SELECT_EXPERIMENTS
-): Thenable<ExperimentDetails[] | undefined> =>
+): Thenable<string[] | undefined> =>
   pickExperimentOrExperiments<QuickPickExperiments>(
     experiments,
     firstThreeColumnOrder,

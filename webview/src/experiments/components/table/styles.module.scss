@@ -146,7 +146,7 @@ $badge-size: 0.85rem;
   }
 }
 
-.table.withExpColumnShadow .experimentsTr > *:first-child {
+.experimentsTable.withExpColumnShadow .experimentsTr > *:first-child {
   &::after {
     box-shadow: 3px 0px 3px $shadow;
   }
@@ -473,7 +473,7 @@ $badge-size: 0.85rem;
 .previousCommitsRow {
   border-bottom: $row-border;
 
-  .experimentsTd {
+  .previousCommitsText {
     font-size: 0.6rem;
     padding-left: 16px;
   }
@@ -686,6 +686,7 @@ $badge-size: 0.85rem;
   left: 2px;
   position: relative;
   width: 16px;
+  margin-right: 4px;
 }
 
 .rowArrowContainer {
@@ -729,15 +730,12 @@ $badge-size: 0.85rem;
 
 .experimentCellText {
   @extend .cellContents;
-  display: flex;
-  flex-flow: row wrap;
+  display: block;
   line-height: normal;
   direction: ltr;
-  align-items: center;
   cursor: text;
 
   > * {
-    margin: 0 0.5em;
     overflow: hidden;
     text-overflow: ellipsis;
   }
@@ -746,6 +744,7 @@ $badge-size: 0.85rem;
 .experimentCellSecondaryName {
   color: $meta-cell-color;
   font-size: 0.75em;
+  display: block;
 
   > * {
     vertical-align: middle;

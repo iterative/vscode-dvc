@@ -1,6 +1,4 @@
 import { join } from 'path'
-import merge from 'lodash.merge'
-import cloneDeep from 'lodash.clonedeep'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore, spy, stub } from 'sinon'
@@ -39,14 +37,13 @@ import { MessageFromWebviewType } from '../../../webview/contract'
 import { reorderObjectList, uniqueValues } from '../../../util/array'
 import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
-import {
-  ExperimentStatus,
-  EXPERIMENT_WORKSPACE_ID
-} from '../../../cli/dvc/contract'
 import { SelectedExperimentWithColor } from '../../../experiments/model'
 import { ErrorItem } from '../../../path/selection/tree'
 import { isErrorItem } from '../../../tree'
 import { RegisteredCommands } from '../../../commands/external'
+import { REVISIONS } from '../../fixtures/plotsDiff'
+import * as FileSystem from '../../../fileSystem'
+import { experimentHasError } from '../../../cli/dvc/contract'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -74,11 +71,11 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
-        EXPERIMENT_WORKSPACE_ID,
-        'exp-e7a67',
-        'test-branch',
-        'exp-83425',
-        '53c3851'
+        REVISIONS[0],
+        REVISIONS[2],
+        REVISIONS[3],
+        REVISIONS[4],
+        REVISIONS[1]
       )
       mockPlotsDiff.resetHistory()
 
@@ -96,80 +93,39 @@ suite('Plots Test Suite', () => {
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should call plots diff with running experiment revisions but not checkpoints', async () => {
-      const mockNow = getMockNow()
-      const { mockPlotsDiff, data, experiments } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
-      mockPlotsDiff.resetHistory()
-
-      const updatedExpShowFixture = merge(
-        cloneDeep(expShowFixtureWithoutErrors),
-        {
-          '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77': {
-            checkpoint: {
-              data: {
-                checkpoint_tip: 'experiment'
-              }
-            },
-            experiment: {
-              data: {
-                checkpoint_tip: 'experiment',
-                executor: 'dvc-task',
-                name: 'exp-e1new',
-                status: ExperimentStatus.RUNNING,
-                timestamp: '2023-03-23T09:02:20'
-              }
-            }
-          }
-        }
-      )
-
-      const dataUpdateEvent = new Promise(resolve =>
-        disposable.track(data.onDidUpdate(() => resolve(undefined)))
-      )
-
-      bypassProcessManagerDebounce(mockNow)
-      void experiments.setState(updatedExpShowFixture)
-
-      await dataUpdateEvent
-
-      expect(mockPlotsDiff).to.be.calledOnce
-      expect(mockPlotsDiff).to.be.calledWithExactly(
-        dvcDemoPath,
-        EXPERIMENT_WORKSPACE_ID,
-        'exp-e1new',
-        'exp-e7a67',
-        'test-branch',
-        'exp-83425',
-        '53c3851'
-      )
-    })
-
     it('should call plots diff with the commit whenever the current commit changes', async () => {
       const mockNow = getMockNow()
+      const noExperimentFixture = expShowFixtureWithoutErrors.map(exp => ({
+        ...exp,
+        experiments: null
+      }))
+
       const { data, experiments, mockPlotsDiff } = await buildPlots(
         disposable,
-        plotsDiffFixture
+        plotsDiffFixture,
+        noExperimentFixture
       )
+
       mockPlotsDiff.resetHistory()
 
-      const committedExperiment = {
-        baseline: merge(
-          cloneDeep(
-            expShowFixtureWithoutErrors[
-              '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'
-            ]['4fb124aebddb2adf1545030907687fa9a4c80e70']
-          ),
-          { data: { name: 'main' } }
-        )
-      }
+      const updatedExpShowFixture = noExperimentFixture.map(exp => {
+        if (exp.rev === '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77') {
+          if (experimentHasError(exp)) {
+            throw new Error('Experiment should not have error')
+          }
 
-      const updatedExpShowFixture = {
-        '9235a02880a0372545e5f7f4d79a5d9eee6331ac': committedExperiment,
-        workspace: committedExperiment
-      }
+          return {
+            ...exp,
+            data: {
+              ...exp.data,
+              rev: '9235a02880a0372545e5f7f4d79a5d9eee6331ac'
+            },
+            rev: '9235a02880a0372545e5f7f4d79a5d9eee6331ac'
+          }
+        }
+
+        return exp
+      })
 
       const dataUpdateEvent = new Promise(resolve =>
         disposable.track(data.onDidUpdate(() => resolve(undefined)))
@@ -183,10 +139,10 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.calledOnce
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
-        EXPERIMENT_WORKSPACE_ID,
-        '9235a02'
+        REVISIONS[0],
+        REVISIONS[1]
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should remove the temporary plots directory on dispose', async () => {
       const { mockRemoveDir, plots } = await buildPlots(
@@ -293,11 +249,11 @@ suite('Plots Test Suite', () => {
 
       const mockSetComparisonOrder = spy(plotsModel, 'setComparisonOrder')
       const mockComparisonOrder = [
-        '1ba7bcd',
-        EXPERIMENT_WORKSPACE_ID,
-        'main',
-        '4fb124a',
-        '42b8736'
+        REVISIONS[2],
+        REVISIONS[0],
+        REVISIONS[3],
+        REVISIONS[1],
+        REVISIONS[4]
       ]
 
       messageSpy.resetHistory()
@@ -320,7 +276,7 @@ suite('Plots Test Suite', () => {
           revisions: reorderObjectList(
             mockComparisonOrder,
             comparisonPlotsFixture.revisions,
-            'revision'
+            'id'
           )
         }
       })
@@ -457,6 +413,7 @@ suite('Plots Test Suite', () => {
 
     it('should handle a plot zoomed message from the webview for an image', async () => {
       const { plots } = await buildPlots(disposable, plotsDiffFixture)
+      stub(FileSystem, 'openImageFileInEditor').resolves(true)
 
       const webview = await plots.showWebview()
 
@@ -554,7 +511,7 @@ suite('Plots Test Suite', () => {
 
       const mockSelectExperiments = stub(
         experiments,
-        'selectExperiments'
+        'selectExperimentsToPlot'
       ).resolves(undefined)
 
       const webview = await plots.showWebview()
@@ -634,11 +591,11 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.called
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
-        EXPERIMENT_WORKSPACE_ID,
-        'exp-e7a67',
-        'test-branch',
-        'exp-83425',
-        '53c3851'
+        REVISIONS[0],
+        REVISIONS[2],
+        REVISIONS[3],
+        REVISIONS[4],
+        REVISIONS[1]
       )
       expect(
         instanceMessageSpy,
@@ -659,11 +616,13 @@ suite('Plots Test Suite', () => {
 
       const {
         comparison: comparisonData,
+        custom: customData,
         sectionCollapsed,
         template: templateData
       } = getFirstArgOfLastCall(messageSpy)
 
       expect(comparisonData).to.deep.equal(comparisonPlotsFixture)
+      expect(customData).to.deep.equal(customPlotsFixture)
       expect(sectionCollapsed).to.deep.equal(DEFAULT_SECTION_COLLAPSED)
       expect(templateData).to.deep.equal(templatePlotsFixture)
 
@@ -678,7 +637,7 @@ suite('Plots Test Suite', () => {
         template: templatePlotsFixture
       }
 
-      expect(messageSpy).to.be.calledWith(expectedPlotsData)
+      expect(messageSpy).to.be.calledWithMatch(expectedPlotsData)
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
@@ -699,8 +658,7 @@ suite('Plots Test Suite', () => {
         }
       }
 
-      const brokenExp = 'exp-e7a67'
-      const brokenRev = '4fb124a'
+      const brokenExp = REVISIONS[2]
 
       const reFetchedOutput = {
         data: {
@@ -734,7 +692,7 @@ suite('Plots Test Suite', () => {
           ...Object.keys(plotsModel.comparisonData)
         ])
 
-      expect(getExistingRevisions(plotsModel)).to.contain(brokenRev)
+      expect(getExistingRevisions(plotsModel)).to.contain(brokenExp)
 
       mockPlotsDiff.resetBehavior()
       mockPlotsDiff.resolves(reFetchedOutput)
@@ -749,7 +707,7 @@ suite('Plots Test Suite', () => {
       expect(
         getExistingRevisions(plotsModel),
         'the revision should not exist in the underlying data'
-      ).not.to.contain(brokenRev)
+      ).not.to.contain(brokenExp)
     })
 
     it('should send the correct data to the webview for flexible plots', async () => {
@@ -757,8 +715,8 @@ suite('Plots Test Suite', () => {
         await buildPlots(disposable, multiSourcePlotsDiffFixture)
 
       stub(experiments, 'getSelectedRevisions').returns([
-        { label: EXPERIMENT_WORKSPACE_ID },
-        { label: 'main' }
+        { id: REVISIONS[0] },
+        { id: REVISIONS[1] }
       ] as SelectedExperimentWithColor[])
 
       const webview = await plots.showWebview()
@@ -794,20 +752,25 @@ suite('Plots Test Suite', () => {
       ).to.deep.equal(['dvc.yaml::Confusion-Matrix'])
 
       const expectedRevisions = [
-        `main::${join('evaluation', 'test', 'plots', 'confusion_matrix.json')}`,
-        `workspace::${join(
+        `${REVISIONS[1]}::${join(
           'evaluation',
           'test',
           'plots',
           'confusion_matrix.json'
         )}`,
-        `main::${join(
+        `${REVISIONS[0]}::${join(
+          'evaluation',
+          'test',
+          'plots',
+          'confusion_matrix.json'
+        )}`,
+        `${REVISIONS[1]}::${join(
           'evaluation',
           'train',
           'plots',
           'confusion_matrix.json'
         )}`,
-        `workspace::${join(
+        `${REVISIONS[0]}::${join(
           'evaluation',
           'train',
           'plots',
@@ -930,7 +893,7 @@ suite('Plots Test Suite', () => {
       ])
 
       expect(
-        errorsModel.getErrorPaths(plotsModel.getSelectedRevisions(), []),
+        errorsModel.getErrorPaths(plotsModel.getSelectedRevisionIds(), []),
         'should return the correct path to give the item a DecorationError'
       ).to.deep.equal(new Set([errorItems[0].path]))
 
@@ -947,7 +910,7 @@ suite('Plots Test Suite', () => {
       ).to.deep.equal([])
 
       expect(
-        errorsModel.getErrorPaths(plotsModel.getSelectedRevisions(), []),
+        errorsModel.getErrorPaths(plotsModel.getSelectedRevisionIds(), []),
         'should no long provide decorations to the plots paths tree'
       ).to.deep.equal(new Set([]))
     })

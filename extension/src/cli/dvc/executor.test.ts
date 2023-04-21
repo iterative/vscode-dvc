@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
-import { Flag, GcPreserveFlag } from './constants'
+import { Flag, GcPreserveFlag, UNEXPECTED_ERROR_CODE } from './constants'
 import { DvcExecutor } from './executor'
 import { CliResult, CliStarted } from '..'
 import { createProcess } from '../../process/execution'
@@ -9,6 +9,7 @@ import { flushPromises, getMockedProcess } from '../../test/util/jest'
 import { getProcessEnv } from '../../env'
 import { Config } from '../../config'
 import { ContextKey, setContextValue } from '../../vscode/context'
+import { MaybeConsoleError } from '../error'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -92,6 +93,37 @@ describe('CliExecutor', () => {
         executable: 'dvc'
       })
     })
+
+    it('should set the correct context value if the command fails', async () => {
+      const cwd = __dirname
+      const relPath = join('data', 'MNIST', 'raw')
+      const unexpectedError = new Error(
+        'unexpected error - something something'
+      )
+      const unexpectedStderr = 'This is very unexpected'
+      ;(unexpectedError as MaybeConsoleError).exitCode = UNEXPECTED_ERROR_CODE
+      ;(unexpectedError as MaybeConsoleError).stderr = unexpectedStderr
+      mockedCreateProcess.mockImplementationOnce(() => {
+        throw unexpectedError
+      })
+
+      let error
+
+      try {
+        await dvcExecutor.add(cwd, relPath)
+      } catch (thrownError) {
+        error = thrownError
+      }
+
+      expect((error as MaybeConsoleError).stderr).toStrictEqual(
+        unexpectedStderr
+      )
+
+      expect(mockedSetContextValue).toHaveBeenLastCalledWith(
+        ContextKey.SCM_RUNNING,
+        false
+      )
+    })
   })
 
   describe('checkout', () => {
@@ -167,28 +199,12 @@ describe('CliExecutor', () => {
   })
 
   describe('commit', () => {
-    it('should call createProcess with the correct parameters to commit a repository', async () => {
+    it('should call createProcess with the correct parameters to force commit a repository (by default)', async () => {
       const cwd = __dirname
       const stdout = updatingLockFile
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await dvcExecutor.commit(cwd)
-      expect(output).toStrictEqual(stdout)
-
-      expect(mockedCreateProcess).toHaveBeenCalledWith({
-        args: ['commit'],
-        cwd,
-        env: mockedEnv,
-        executable: 'dvc'
-      })
-    })
-
-    it('should call createProcess with the correct parameters to force commit a repository', async () => {
-      const cwd = __dirname
-      const stdout = updatingLockFile
-      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
-
-      const output = await dvcExecutor.commit(cwd, Flag.FORCE)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toHaveBeenCalledWith({
@@ -199,7 +215,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should call createProcess with the correct parameters to commit a target', async () => {
+    it('should call createProcess with the correct parameters to commit a target (force by default)', async () => {
       const cwd = __dirname
       const relPath = join(
         'data',
@@ -211,28 +227,6 @@ describe('CliExecutor', () => {
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await dvcExecutor.commit(cwd, relPath)
-      expect(output).toStrictEqual(stdout)
-
-      expect(mockedCreateProcess).toHaveBeenCalledWith({
-        args: ['commit', relPath],
-        cwd,
-        env: mockedEnv,
-        executable: 'dvc'
-      })
-    })
-
-    it('should call createProcess with the correct parameters to force commit a target', async () => {
-      const cwd = __dirname
-      const relPath = join(
-        'data',
-        'fashion-mnist',
-        'raw',
-        't10k-images-idx3-ubyte.gz'
-      )
-      const stdout = updatingLockFile
-      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
-
-      const output = await dvcExecutor.commit(cwd, relPath, Flag.FORCE)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toHaveBeenCalledWith({

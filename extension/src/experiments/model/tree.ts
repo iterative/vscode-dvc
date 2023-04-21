@@ -181,7 +181,7 @@ export class ExperimentsTree
         command: RegisteredCommands.EXPERIMENT_TOGGLE,
         title: 'toggle'
       },
-      description: experiment.displayName,
+      description: experiment.description,
       dvcRoot,
       iconPath: this.getExperimentIcon(experiment),
       id: experiment.id,

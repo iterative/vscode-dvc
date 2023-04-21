@@ -7,7 +7,6 @@ export const data = [
   {
     id: EXPERIMENT_WORKSPACE_ID,
     label: EXPERIMENT_WORKSPACE_ID,
-    executor: null,
     params: {
       'params.yaml': {
         nested1: {
@@ -29,16 +28,12 @@ export const data = [
     },
     displayColor: undefined,
     selected: false,
-    status: ExperimentStatus.SUCCESS,
     starred: false
   },
   {
     id: 'main',
     label: 'main',
     Created: '2020-11-21T19:58:22',
-    status: ExperimentStatus.SUCCESS,
-    executor: null,
-    name: 'main',
     sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     params: {
       'params.yaml': {

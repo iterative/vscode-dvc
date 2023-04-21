@@ -14,11 +14,11 @@ import { STUDIO_ENDPOINT, registerPatchCommand } from '../../patch'
 import { AvailableCommands } from '../../commands/internal'
 import expShowFixture from '../fixtures/expShow/base/output'
 import { dvcDemoPath } from '../util'
-import { ExperimentFields } from '../../cli/dvc/contract'
 import { Toast } from '../../vscode/toast'
 import { Modal } from '../../vscode/modal'
 import { Response } from '../../vscode/response'
 import { RegisteredCommands } from '../../commands/external'
+import { ExpData } from '../../cli/dvc/contract'
 
 suite('Patch Test Suite', () => {
   const disposable = Disposable.fn()
@@ -39,6 +39,8 @@ suite('Patch Test Suite', () => {
       const mockStudioAccessToken = 'isat_12123123123123123'
       const mockRepoUrl = 'https://github.com/iterative/vscode-dvc-demo'
 
+      const id = 'exp-e7a67'
+
       const { internalCommands, gitReader, dvcReader } =
         buildInternalCommands(disposable)
 
@@ -53,16 +55,39 @@ suite('Patch Test Suite', () => {
         AvailableCommands.EXP_PUSH,
         mockStudioAccessToken,
         dvcDemoPath,
-        'exp-e7a67'
+        id
       )
 
       expect(mockGetRemoteUrl).to.be.calledOnce
       expect(mockExpShow).to.be.calledOnce
       expect(mockFetch).to.be.calledOnce
 
-      const { metrics, name, params } = expShowFixture[
-        '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'
-      ]['4fb124aebddb2adf1545030907687fa9a4c80e70'].data as ExperimentFields
+      const { metrics, params } = (
+        expShowFixture
+          .find(({ rev }) => rev === '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77')
+          ?.experiments?.find(
+            ({ revs }) =>
+              revs[0].rev === '4fb124aebddb2adf1545030907687fa9a4c80e70'
+          )?.revs?.[0] as { data: ExpData }
+      ).data
+
+      const body = mockFetch.lastCall.args[1]?.body
+
+      expect(JSON.parse((body as string) || '{}')).to.deep.equal({
+        baseline_sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
+        client: 'vscode',
+        experiment_rev: '4fb124aebddb2adf1545030907687fa9a4c80e70',
+        metrics,
+        name: id,
+        params: {
+          'params.yaml': (params?.['params.yaml'] as { data: unknown })?.data,
+          [join('nested', 'params.yaml')]: (
+            params?.[join('nested', 'params.yaml')] as { data: unknown }
+          )?.data
+        },
+        repo_url: mockRepoUrl,
+        type: 'done'
+      })
 
       expect(mockFetch).to.be.calledWithExactly(STUDIO_ENDPOINT, {
         body: JSON.stringify({
@@ -70,11 +95,12 @@ suite('Patch Test Suite', () => {
           client: 'vscode',
           experiment_rev: '4fb124aebddb2adf1545030907687fa9a4c80e70',
           metrics,
-          name,
+          name: id,
           params: {
-            'params.yaml': params?.['params.yaml']?.data,
-            [join('nested', 'params.yaml')]:
-              params?.[join('nested', 'params.yaml')]?.data
+            'params.yaml': (params?.['params.yaml'] as { data: unknown })?.data,
+            [join('nested', 'params.yaml')]: (
+              params?.[join('nested', 'params.yaml')] as { data: unknown }
+            )?.data
           },
           repo_url: mockRepoUrl,
           type: 'done'
@@ -109,13 +135,15 @@ suite('Patch Test Suite', () => {
         Response.SHOW
       )
 
+      const id = 'exp-e7a67'
+
       registerPatchCommand(internalCommands)
 
       await internalCommands.executeCommand(
         AvailableCommands.EXP_PUSH,
         mockStudioAccessToken,
         dvcDemoPath,
-        'exp-e7a67'
+        id
       )
 
       expect(mockGetRemoteUrl).to.be.calledOnce
@@ -126,9 +154,14 @@ suite('Patch Test Suite', () => {
         RegisteredCommands.SETUP_SHOW
       )
 
-      const { metrics, params, name } = expShowFixture[
-        '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'
-      ]['4fb124aebddb2adf1545030907687fa9a4c80e70'].data as ExperimentFields
+      const { metrics, params } = (
+        expShowFixture
+          .find(({ rev }) => rev === '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77')
+          ?.experiments?.find(
+            ({ revs }) =>
+              revs[0].rev === '4fb124aebddb2adf1545030907687fa9a4c80e70'
+          )?.revs?.[0] as { data: ExpData }
+      ).data
 
       expect(mockFetch).to.be.calledWithExactly(STUDIO_ENDPOINT, {
         body: JSON.stringify({
@@ -136,11 +169,12 @@ suite('Patch Test Suite', () => {
           client: 'vscode',
           experiment_rev: '4fb124aebddb2adf1545030907687fa9a4c80e70',
           metrics,
-          name,
+          name: id,
           params: {
-            'params.yaml': params?.['params.yaml']?.data,
-            [join('nested', 'params.yaml')]:
-              params?.[join('nested', 'params.yaml')]?.data
+            'params.yaml': (params?.['params.yaml'] as { data: unknown })?.data,
+            [join('nested', 'params.yaml')]: (
+              params?.[join('nested', 'params.yaml')] as { data: unknown }
+            )?.data
           },
           repo_url: mockRepoUrl,
           type: 'done'

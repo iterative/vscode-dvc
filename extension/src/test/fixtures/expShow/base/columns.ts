@@ -218,27 +218,6 @@ const data: Column[] = [
   },
   {
     type: ColumnType.PARAMS,
-    hasChildren: false,
-    maxStringLength: 6,
-    label: 'test_arg',
-    parentPath: buildMetricOrParamPath(
-      ColumnType.PARAMS,
-      'params.yaml',
-      'process'
-    ),
-    path: buildMetricOrParamPath(
-      ColumnType.PARAMS,
-      'params.yaml',
-      'process',
-      'test_arg'
-    ),
-    pathArray: [ColumnType.PARAMS, 'params.yaml', 'process', 'test_arg'],
-    types: ['string', 'number'],
-    maxNumber: 3,
-    minNumber: 3
-  },
-  {
-    type: ColumnType.PARAMS,
     hasChildren: true,
     label: nestedParamsFile,
     parentPath: ColumnType.PARAMS,
@@ -347,6 +326,27 @@ const data: Column[] = [
     pathArray: [ColumnType.DEPS, join('src', 'evaluate.py')],
     type: ColumnType.DEPS,
     types: ['string']
+  },
+  {
+    type: ColumnType.PARAMS,
+    hasChildren: false,
+    maxStringLength: 6,
+    label: 'test_arg',
+    parentPath: buildMetricOrParamPath(
+      ColumnType.PARAMS,
+      'params.yaml',
+      'process'
+    ),
+    path: buildMetricOrParamPath(
+      ColumnType.PARAMS,
+      'params.yaml',
+      'process',
+      'test_arg'
+    ),
+    pathArray: [ColumnType.PARAMS, 'params.yaml', 'process', 'test_arg'],
+    types: ['string', 'number'],
+    maxNumber: 3,
+    minNumber: 3
   }
 ]
 

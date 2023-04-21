@@ -1,24 +1,24 @@
-import {
-  ExperimentFieldsOrError,
-  ExperimentsOutput
-} from '../../../../cli/dvc/contract'
-import expShowFixture, { errorShas } from './output'
+import { ExpShowOutput } from '../../../../cli/dvc/contract'
+import expShowFixture, { ERROR_SHAS } from './output'
 
-const excludeErrors = (): ExperimentsOutput => {
-  const { workspace, ...commitsObject } = expShowFixture
-  const expShowFixtureWithoutErrors: ExperimentsOutput = { workspace }
+const excludeErrors = (): ExpShowOutput => {
+  const expShowFixtureWithoutErrors: ExpShowOutput = []
 
-  for (const [sha, { baseline, ...experimentsObject }] of Object.entries(
-    commitsObject
-  )) {
-    const experiments: { [sha: string]: ExperimentFieldsOrError } = {}
-    for (const [sha, experiment] of Object.entries(experimentsObject)) {
-      if (!errorShas.includes(sha)) {
-        experiments[sha] = experiment
+  for (const expState of expShowFixture) {
+    const expStateWithoutErrors = { ...expState }
+    if (expState.experiments) {
+      const experiments = []
+      for (const exp of expState.experiments) {
+        if (!ERROR_SHAS.includes(exp.revs[0].rev)) {
+          experiments.push(exp)
+        }
       }
+      expStateWithoutErrors.experiments = experiments
     }
-    expShowFixtureWithoutErrors[sha] = { baseline, ...experiments }
+
+    expShowFixtureWithoutErrors.push(expStateWithoutErrors)
   }
+
   return expShowFixtureWithoutErrors
 }
 

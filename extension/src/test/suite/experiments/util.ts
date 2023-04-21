@@ -1,6 +1,5 @@
 import { stub } from 'sinon'
 import { EventEmitter } from 'vscode'
-import omit from 'lodash.omit'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
@@ -9,39 +8,14 @@ import { buildMockMemento, dvcDemoPath } from '../../util'
 import {
   buildDependencies,
   buildInternalCommands,
-  buildMockData,
+  buildMockExperimentsData,
   SafeWatcherDisposer
 } from '../util'
-import {
-  ExperimentsOutput,
-  EXPERIMENT_WORKSPACE_ID
-} from '../../../cli/dvc/contract'
 import { ExperimentsData } from '../../../experiments/data'
-import { CheckpointsModel } from '../../../experiments/checkpoints/model'
-import { FileSystemData } from '../../../fileSystem/data'
 import * as Watcher from '../../../fileSystem/watcher'
 import { ExperimentsModel } from '../../../experiments/model'
 import { ColumnsModel } from '../../../experiments/columns/model'
 import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../../cli/dvc/constants'
-
-const hasCheckpoints = (data: ExperimentsOutput) => {
-  const [experimentsWithBaseline] = Object.values(
-    omit(data, EXPERIMENT_WORKSPACE_ID)
-  )
-  const [firstExperiment] = Object.values(
-    omit(experimentsWithBaseline, 'baseline')
-  )
-  const experimentFields = firstExperiment?.data
-
-  return !!(
-    experimentFields?.checkpoint_parent || experimentFields?.checkpoint_tip
-  )
-}
-
-export const mockHasCheckpoints = (data: ExperimentsOutput) =>
-  stub(CheckpointsModel.prototype, 'hasCheckpoints').returns(
-    hasCheckpoints(data)
-  )
 
 export const buildExperiments = (
   disposer: Disposer,
@@ -57,14 +31,14 @@ export const buildExperiments = (
     internalCommands,
     messageSpy,
     mockCheckSignalFile,
-    mockExperimentShow,
+    mockExpShow,
     mockGetCommitMessages,
     updatesPaused,
     resourceLocator
   } = buildDependencies(disposer, experimentShowData)
 
   const mockUpdateExperimentsData = stub()
-  const mockExperimentsData = buildMockData<ExperimentsData>(
+  const mockExperimentsData = buildMockExperimentsData(
     mockUpdateExperimentsData
   )
   const mockCheckOrAddPipeline = stub()
@@ -78,12 +52,9 @@ export const buildExperiments = (
       buildMockMemento(),
       mockCheckOrAddPipeline,
       mockSelectBranches,
-      mockExperimentsData,
-      buildMockData<FileSystemData>()
+      mockExperimentsData
     )
   )
-
-  mockHasCheckpoints(experimentShowData)
 
   void experiments.setState(experimentShowData)
 
@@ -102,7 +73,7 @@ export const buildExperiments = (
     messageSpy,
     mockCheckOrAddPipeline,
     mockCheckSignalFile,
-    mockExperimentShow,
+    mockExpShow,
     mockExperimentsData,
     mockGetCommitMessages,
     mockSelectBranches,
@@ -185,12 +156,12 @@ const buildExperimentsDataDependencies = (disposer: Disposer) => {
   ).returns(undefined)
 
   const { dvcReader, internalCommands } = buildInternalCommands(disposer)
-  const mockExperimentShow = stub(dvcReader, 'expShow').resolves(expShowFixture)
-  return { internalCommands, mockCreateFileSystemWatcher, mockExperimentShow }
+  const mockExpShow = stub(dvcReader, 'expShow').resolves(expShowFixture)
+  return { internalCommands, mockCreateFileSystemWatcher, mockExpShow }
 }
 
 export const buildExperimentsData = (disposer: SafeWatcherDisposer) => {
-  const { internalCommands, mockExperimentShow, mockCreateFileSystemWatcher } =
+  const { internalCommands, mockExpShow, mockCreateFileSystemWatcher } =
     buildExperimentsDataDependencies(disposer)
 
   const data = disposer.track(
@@ -200,12 +171,13 @@ export const buildExperimentsData = (disposer: SafeWatcherDisposer) => {
       disposer.track(new EventEmitter<boolean>()),
       {
         getIsBranchesView: () => false,
-        getNbOfCommitsToShow: () => DEFAULT_NUM_OF_COMMITS_TO_SHOW
-      } as ExperimentsModel
+        getNbOfCommitsToShow: () => DEFAULT_NUM_OF_COMMITS_TO_SHOW,
+        setAvailableBranchesToShow: stub()
+      } as unknown as ExperimentsModel
     )
   )
 
-  return { data, mockCreateFileSystemWatcher, mockExperimentShow }
+  return { data, mockCreateFileSystemWatcher, mockExpShow }
 }
 
 export const stubWorkspaceExperimentsGetters = (

@@ -1,8 +1,9 @@
 import { extractColumns } from './extract'
+import { generateTestExpData } from '../../test/util/experiments'
 
 describe('extractColumns', () => {
   it('should handle concatenating errors', () => {
-    const data = {
+    const data = generateTestExpData({
       metrics: {
         'summary.json': {
           error: { msg: 'metrics file is busted', type: 'fatal' }
@@ -13,7 +14,7 @@ describe('extractColumns', () => {
           error: { msg: 'this is also broken', type: 'impossible' }
         }
       }
-    }
+    })
 
     const { error } = extractColumns(data)
     expect(error).toStrictEqual('metrics file is busted\nthis is also broken')
