@@ -129,7 +129,7 @@ describe('Experiments Table Webview', function () {
     expect(finalRows.length).toStrictEqual(initialRows + experimentRow)
     await webview.unfocus()
     await closeAllEditors()
-    await waitForDvcToFinish(90000)
+    await waitForDvcToFinish(180000)
     const workbench = await browser.getWorkbench()
     return workbench.executeCommand('Terminal: Kill All Terminals')
   })
