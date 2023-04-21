@@ -202,9 +202,9 @@ export class PlotsModel extends ModelWithPersistence {
   public getSelectedRevisionDetails() {
     const selectedRevisions: Revision[] = []
     for (const experiment of this.experiments.getSelectedRevisions()) {
-      const { commit, description, label, displayColor, logicalGroupName, id } =
-        experiment
+      const { commit, description, label, displayColor, id } = experiment
       const revision: Revision = {
+        description: commit ? undefined : description,
         displayColor,
         errors: this.errors.getRevisionErrors(id),
         fetched: this.fetchedRevs.has(id),
@@ -212,9 +212,8 @@ export class PlotsModel extends ModelWithPersistence {
           this.experiments.getFirstThreeColumnOrder(),
           experiment
         ),
-        group: logicalGroupName,
         id,
-        revision: label
+        label
       }
 
       if (commit) {

@@ -158,7 +158,7 @@ describe('plotsModel', () => {
     )
 
     expect(
-      model.getComparisonRevisions().map(({ revision }) => revision)
+      model.getComparisonRevisions().map(({ label }) => label)
     ).toStrictEqual(newOrder)
   })
 
@@ -170,7 +170,7 @@ describe('plotsModel', () => {
     model.setComparisonOrder(newOrder)
 
     expect(
-      model.getComparisonRevisions().map(({ revision }) => revision)
+      model.getComparisonRevisions().map(({ label }) => label)
     ).toStrictEqual([
       ...newOrder,
       ...mockedSelectedRevisions
@@ -196,19 +196,19 @@ describe('plotsModel', () => {
     model.setComparisonOrder(initialOrder)
 
     expect(
-      model.getComparisonRevisions().map(({ revision }) => revision)
+      model.getComparisonRevisions().map(({ label }) => label)
     ).toStrictEqual(initialOrder)
 
     model.setComparisonOrder()
 
     expect(
-      model.getComparisonRevisions().map(({ revision }) => revision)
+      model.getComparisonRevisions().map(({ label }) => label)
     ).toStrictEqual(initialOrder.filter(revision => revision !== 'main'))
 
     model.setComparisonOrder()
 
     expect(
-      model.getComparisonRevisions().map(({ revision }) => revision)
+      model.getComparisonRevisions().map(({ label }) => label)
     ).toStrictEqual([EXPERIMENT_WORKSPACE_ID, '71f31cf', 'main'])
   })
 })

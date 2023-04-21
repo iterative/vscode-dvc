@@ -193,13 +193,12 @@ suite('Experiments Tree Test Suite', () => {
     it('should be able to select / de-select experiments using dvc.views.experimentsTree.selectExperiments', async () => {
       const { plots, plotsModel, messageSpy } = await buildPlots(disposable)
 
-      const [{ revision: selectedDisplayName, displayColor }] =
-        plotsModel.getSelectedRevisionDetails()
+      const [{ label, displayColor }] = plotsModel.getSelectedRevisionDetails()
 
       const selectedItem = {
-        description: selectedDisplayName,
+        description: label,
         label: '',
-        value: { id: selectedDisplayName }
+        value: { id: label }
       }
 
       await plots.showWebview()
@@ -239,12 +238,12 @@ suite('Experiments Tree Test Suite', () => {
       const { selectedRevisions } = getFirstArgOfLastCall(messageSpy)
 
       expect(
-        (selectedRevisions as Revision[]).map(({ displayColor, revision }) => ({
+        (selectedRevisions as Revision[]).map(({ displayColor, label }) => ({
           displayColor,
-          revision
+          label
         })),
         'a message is sent with colors for the currently selected experiments'
-      ).to.deep.equal([{ displayColor, revision: selectedDisplayName }])
+      ).to.deep.equal([{ displayColor, label }])
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to remove an experiment with dvc.views.experimentsTree.removeExperiment', async () => {

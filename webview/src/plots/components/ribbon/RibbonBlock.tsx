@@ -33,29 +33,40 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
   onClear
 }) => {
   const {
-    firstThreeColumns,
     commit,
+    description,
+    displayColor,
     errors,
     fetched,
-    group,
+    firstThreeColumns,
     id,
-    revision: rev,
-    displayColor
+    label
   } = revision
-  const exp = group?.replace(/[[\]]/g, '') || rev
 
   const mainContent = (
     <li
       className={styles.block}
       style={{ borderColor: displayColor }}
-      data-testid={`ribbon-${id || 'no-id'}`}
+      data-testid={`ribbon-${id}`}
     >
       <div className={styles.label}>
-        <div className={styles.title}>
-          {exp}
-          <CopyButton value={exp} className={styles.copyButton} />
-        </div>
-        {group && <div className={styles.subtitle}>{rev}</div>}
+        {description ? (
+          <>
+            <div className={styles.subtitle}>{label}</div>
+            <div className={styles.title}>
+              {description}
+              <CopyButton
+                value={description.replace(/[[\]]/g, '')}
+                className={styles.copyButton}
+              />
+            </div>
+          </>
+        ) : (
+          <div className={styles.title}>
+            {label}
+            <CopyButton value={label} className={styles.copyButton} />
+          </div>
+        )}
       </div>
       <div className={styles.iconPlaceholder}>
         <RevisionIcon errors={errors} fetched={fetched} />

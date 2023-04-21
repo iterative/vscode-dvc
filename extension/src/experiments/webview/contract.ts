@@ -35,7 +35,6 @@ export type Experiment = {
   executor?: Executor
   id: string
   label: string
-  logicalGroupName?: string
   metrics?: MetricOrParamColumns
   outs?: MetricOrParamColumns
   params?: MetricOrParamColumns

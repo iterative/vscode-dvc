@@ -57,28 +57,32 @@ export const ComparisonTableHead: React.FC<ComparisonTableHeadProps> = ({
     }
   }, [ribbonHeight, headRef])
 
-  const items = columns.map(({ revision, id, displayColor, group }) => {
-    const isPinned = revision === pinnedColumn
-    return (
-      <th
-        key={id}
-        id={id}
-        className={cx(styles.comparisonTableHeader, {
-          [styles.pinnedColumnHeader]: isPinned,
-          [styles.draggedColumn]: draggedId === id
-        })}
-      >
-        <ComparisonTableHeader
-          isPinned={isPinned}
-          onClicked={() => setPinnedColumn(id)}
-          displayColor={displayColor}
+  const items = columns.map(
+    ({ label, id, displayColor, description, commit }) => {
+      const isPinned = label === pinnedColumn
+      return (
+        <th
+          key={id}
+          id={id}
+          className={cx(styles.comparisonTableHeader, {
+            [styles.pinnedColumnHeader]: isPinned,
+            [styles.draggedColumn]: draggedId === id
+          })}
         >
-          {revision}
-          {group && <span className={styles.experimentName}>{group}</span>}
-        </ComparisonTableHeader>
-      </th>
-    )
-  })
+          <ComparisonTableHeader
+            isPinned={isPinned}
+            onClicked={() => setPinnedColumn(id)}
+            displayColor={displayColor}
+          >
+            {label}
+            {!commit && description && (
+              <span className={styles.experimentName}>{description}</span>
+            )}
+          </ComparisonTableHeader>
+        </th>
+      )
+    }
+  )
 
   return (
     <thead data-testid="comparison-table-head" ref={headRef}>

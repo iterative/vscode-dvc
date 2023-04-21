@@ -253,9 +253,7 @@ const collectExpRange = (
   )
 
   if (name) {
-    const description = `[${name}]`
-    experiment.description = description
-    experiment.logicalGroupName = description
+    experiment.description = `[${name}]`
   }
 
   collectExecutorInfo(acc, experiment, executor)
