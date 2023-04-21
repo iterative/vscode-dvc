@@ -9,25 +9,29 @@ import {
   fileHasError,
   experimentHasError
 } from '../../cli/dvc/contract'
+import { ExperimentFlag } from '../../cli/dvc/constants'
 
 suite('exp show --show-json', () => {
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('Demo Repository', () => {
     it('should return the expected output', async () => {
       await initializeDemoRepo()
-      const output = await dvcReader.expShow(dvcDemoPath)
+      const output = await dvcReader.expShow(
+        dvcDemoPath,
+        ExperimentFlag.NUM_COMMIT,
+        '3'
+      )
 
-      const [workspace] = output
+      const [workspace, ...commits] = output
 
       expect(workspace, 'should have a workspace key').not.to.be.undefined
 
       expect(
         Object.keys(output),
-        'should have at least two entries'
-      ).to.have.lengthOf.greaterThanOrEqual(2)
+        'should have an entry for each commit and one for the workspace'
+      ).to.have.lengthOf(4)
 
-      // each entry under output
-      for (const commit of output) {
+      for (const commit of commits) {
         if (experimentHasError(commit)) {
           throw new Error('Commit should not have an error')
           continue
@@ -41,17 +45,16 @@ suite('exp show --show-json', () => {
           'object'
         )
 
-        expect(commit.data?.timestamp, 'should have a timestamp').to.be.a(
+        expect(commit.data.timestamp, 'should have a timestamp').to.be.a(
           'string'
         )
 
-        expect(commit.data?.params, 'should have params').to.be.an('object')
-        expect(commit.data?.metrics, 'should have metrics').to.be.an('object')
+        expect(commit.data.params, 'should have params').to.be.an('object')
+        expect(commit.data.metrics, 'should have metrics').to.be.an('object')
 
-        // each metric or param file
         for (const file of Object.values({
-          ...commit.data?.params,
-          ...commit.data?.metrics
+          ...commit.data.params,
+          ...commit.data.metrics
         })) {
           expect(file, 'should have children').to.be.an('object')
           if (fileHasError(file)) {
@@ -61,12 +64,9 @@ suite('exp show --show-json', () => {
           expect(isEmpty(file.data), 'should have data').to.be.false
         }
 
-        expect(commit.data?.metrics, 'should have metrics').to.be.an('object')
+        expect(commit.data.deps, 'should have deps').to.be.an('object')
+        expect(commit.data.outs, 'should have outs').to.be.an('object')
 
-        expect(commit.data?.deps, 'should have deps').to.be.an('object')
-        expect(commit.data?.outs, 'should have outs').to.be.an('object')
-
-        // each deps or outs file
         for (const file of Object.values({
           ...commit.data?.deps,
           ...commit.data?.outs
