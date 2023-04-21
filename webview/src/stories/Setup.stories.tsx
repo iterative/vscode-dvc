@@ -1,11 +1,7 @@
 import { Story, Meta } from '@storybook/react/types-6-0'
 import React from 'react'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
-import {
-  DvcCliIndicator,
-  SetupData,
-  SetupSection
-} from 'dvc/src/setup/webview/contract'
+import { SetupData, SetupSection } from 'dvc/src/setup/webview/contract'
 import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'
 import { App } from '../setup/components/App'
 
@@ -13,8 +9,7 @@ const DEFAULT_DATA: SetupData = {
   canGitInitialize: false,
   cliCompatible: true,
   dvcCliDetails: {
-    location: 'python',
-    type: DvcCliIndicator.AUTO,
+    location: 'path/to/python -m dvc',
     version: '1.0.0'
   },
   hasData: false,
@@ -81,6 +76,10 @@ CompletedConnected.args = getUpdatedArgs({
 export const NoCLIPythonNotFound = Template.bind({})
 NoCLIPythonNotFound.args = getUpdatedArgs({
   cliCompatible: undefined,
+  dvcCliDetails: {
+    location: undefined,
+    version: undefined
+  },
   isPythonExtensionInstalled: false,
   pythonBinPath: undefined
 })
@@ -88,6 +87,10 @@ NoCLIPythonNotFound.args = getUpdatedArgs({
 export const NoCLIPythonExtensionUsed = Template.bind({})
 NoCLIPythonExtensionUsed.args = getUpdatedArgs({
   cliCompatible: undefined,
+  dvcCliDetails: {
+    location: '/opt/homebrew/Caskroom/miniforge/base/bin/python -m dvc',
+    version: undefined
+  },
   isPythonExtensionInstalled: true,
   pythonBinPath: '/opt/homebrew/Caskroom/miniforge/base/bin/python'
 })
@@ -95,6 +98,10 @@ NoCLIPythonExtensionUsed.args = getUpdatedArgs({
 export const NoCLIPythonExtensionNotUsed = Template.bind({})
 NoCLIPythonExtensionNotUsed.args = getUpdatedArgs({
   cliCompatible: undefined,
+  dvcCliDetails: {
+    location: '.env/bin/python -m dvc',
+    version: undefined
+  },
   isPythonExtensionInstalled: false,
   pythonBinPath: '.env/bin/python'
 })

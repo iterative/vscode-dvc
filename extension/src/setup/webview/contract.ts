@@ -5,8 +5,9 @@ export enum DvcCliIndicator {
 }
 
 export type DvcCliDetails = {
-  location: string
-  type: DvcCliIndicator
+  location: string | undefined
+  // TBD remove type entirely if we decide it's not useful
+  type?: DvcCliIndicator
   version: string | undefined
 }
 

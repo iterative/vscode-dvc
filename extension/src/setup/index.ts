@@ -10,7 +10,6 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import isEmpty from 'lodash.isempty'
 import {
   DvcCliDetails,
-  DvcCliIndicator,
   SetupSection,
   SetupData as TSetupData
 } from './webview/contract'
@@ -352,17 +351,15 @@ export class Setup
 
     if (dvcPath || !pythonBinPath) {
       return {
-        location: dvcPath || 'dvc',
-        type: DvcCliIndicator.GLOBAL,
+        location: dvcPath ? 'dvc' : undefined,
         version
       }
     }
-
+    // TBD if were going to keep this command logic we need to
+    // 1. possibly pull args from somewhere (see getOptions())
+    // 2. rename location to command
     return {
-      location: pythonBinPath,
-      type: this.config.isPythonExtensionUsed()
-        ? DvcCliIndicator.AUTO
-        : DvcCliIndicator.MANUAL,
+      location: `${pythonBinPath} -m dvc`,
       version
     }
   }
