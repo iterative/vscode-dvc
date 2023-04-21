@@ -1,28 +1,16 @@
 import React from 'react'
-import { VSCodeTag } from '@vscode/webview-ui-toolkit/react'
 import { CommitData } from 'dvc/src/experiments/webview/contract'
+import { VSCodeTag } from '@vscode/webview-ui-toolkit/react'
 import styles from '../styles.module.scss'
-import Tooltip from '../../../../shared/components/tooltip/Tooltip'
 import { Icon } from '../../../../shared/components/Icon'
 import { GitCommit } from '../../../../shared/components/icons'
 
-export const CellSecondaryName: React.FC<{
-  description: string
-  commit?: CommitData
+export const CommitTooltipContent: React.FC<{
   sha?: string
-}> = ({ description, commit, sha }) => {
-  const children = (
-    <span className={styles.experimentCellSecondaryName}>
-      {commit && <Icon width={14} height={14} icon={GitCommit} />}{' '}
-      <span>{description}</span>
-    </span>
-  )
-  if (!commit) {
-    return children
-  }
-
+  commit: CommitData
+}> = ({ sha, commit }) => {
   const { tags, author, message, date } = commit
-  const tooltipContent = (
+  return (
     <div className={styles.experimentCellSecondaryNameTooltip}>
       <div>
         <p className={styles.sha}>
@@ -43,16 +31,5 @@ export const CellSecondaryName: React.FC<{
       </p>
       <p className={styles.message}>{message}</p>
     </div>
-  )
-
-  return (
-    <Tooltip
-      placement="bottom-start"
-      appendTo={document.body}
-      content={tooltipContent}
-      interactive
-    >
-      {children}
-    </Tooltip>
   )
 }
