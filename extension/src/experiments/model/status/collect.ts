@@ -1,15 +1,22 @@
-import { canSelect, ColoredStatus, UNSELECTED } from '.'
+import {
+  canSelect,
+  ColoredStatus,
+  limitToMaxSelected,
+  tooManySelected,
+  UNSELECTED
+} from '.'
 import { Color, copyOriginalColors } from './colors'
 import { hasKey } from '../../../util/object'
 import {
   Experiment,
   isQueued,
   isRunning,
+  isRunningInQueue,
   RunningExperiment
 } from '../../webview/contract'
 import { definedAndNonEmpty, reorderListSubset } from '../../../util/array'
 import { flattenMapValues } from '../../../util/map'
-import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
+import { Executor, EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
 
 const canAssign = (
   coloredStatus: ColoredStatus,
@@ -187,7 +194,50 @@ const assignSelected = (
   return { availableColors, coloredStatus }
 }
 
-export const collectSelected = (
+const cannotSelect = (
+  ids: Set<string>,
+  { executor, id, status }: Experiment
+): boolean =>
+  isQueued(status) || isRunningInQueue({ executor, status }) || ids.has(id)
+
+const shouldSelectWorkspace = ({ executor, status }: Experiment): boolean =>
+  executor === Executor.WORKSPACE && isRunning(status)
+
+const collectWorkspace = (
+  acc: Experiment[],
+  collectedIds: Set<string>,
+  workspace: Experiment
+) => {
+  if (!collectedIds.has(EXPERIMENT_WORKSPACE_ID)) {
+    acc.push(workspace)
+  }
+  collectedIds.add(EXPERIMENT_WORKSPACE_ID)
+}
+
+export const collectSelectable = (
+  selectedExperiments: Experiment[],
+  workspace: Experiment
+): Experiment[] => {
+  const acc: Experiment[] = []
+  const collectedIds = new Set<string>()
+
+  for (const experiment of selectedExperiments) {
+    if (cannotSelect(collectedIds, experiment)) {
+      continue
+    }
+
+    if (shouldSelectWorkspace(experiment)) {
+      collectWorkspace(acc, collectedIds, workspace)
+      continue
+    }
+    acc.push(experiment)
+    collectedIds.add(experiment.id)
+  }
+
+  return tooManySelected(acc) ? limitToMaxSelected(acc) : acc
+}
+
+export const collectSelectedColors = (
   selectedExperiments: Experiment[],
   experiments: Experiment[],
   previousStatus: ColoredStatus,
@@ -217,7 +267,10 @@ export const collectStartedRunningExperiments = (
   const acc = new Set<string>()
 
   for (const { id: runningId, executor } of nowRunning) {
-    if (previouslyRunning.some(({ id }) => id === runningId)) {
+    if (
+      executor === Executor.DVC_TASK ||
+      previouslyRunning.some(({ id }) => id === runningId)
+    ) {
       continue
     }
     acc.add(

@@ -17,12 +17,11 @@ import { ColumnsModel } from '../columns/model'
 import { splitColumnPath } from '../columns/paths'
 import { ExperimentsModel } from '../model'
 import { SortDefinition } from '../model/sortBy'
-import { CheckpointsModel } from '../checkpoints/model'
 import { getPositiveIntegerInput } from '../../vscode/inputBox'
 import { Title } from '../../vscode/title'
 import { ConfigKey, setConfigValue } from '../../vscode/config'
 import { Toast } from '../../vscode/toast'
-import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
+import { Executor, EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { stopWorkspaceExperiment } from '../processExecution'
 import { hasDvcYamlFile } from '../../fileSystem'
 import { NUM_OF_COMMITS_TO_INCREASE } from '../../cli/dvc/constants'
@@ -32,7 +31,6 @@ export class WebviewMessages {
 
   private readonly experiments: ExperimentsModel
   private readonly columns: ColumnsModel
-  private readonly checkpoints: CheckpointsModel
 
   private readonly getWebview: () => BaseWebview<TableData> | undefined
   private readonly notifyChanged: () => void
@@ -61,7 +59,6 @@ export class WebviewMessages {
     dvcRoot: string,
     experiments: ExperimentsModel,
     columns: ColumnsModel,
-    checkpoints: CheckpointsModel,
     getWebview: () => BaseWebview<TableData> | undefined,
     notifyChanged: () => void,
     selectColumns: () => Promise<void>,
@@ -80,7 +77,6 @@ export class WebviewMessages {
     this.dvcRoot = dvcRoot
     this.experiments = experiments
     this.columns = columns
-    this.checkpoints = checkpoints
     this.getWebview = getWebview
     this.notifyChanged = notifyChanged
     this.selectColumns = selectColumns
@@ -292,7 +288,7 @@ export class WebviewMessages {
       filters: this.experiments.getFilterPaths(),
       hasBranchesToSelect:
         this.experiments.getAvailableBranchesToShow().length > 0,
-      hasCheckpoints: this.checkpoints.hasCheckpoints(),
+      hasCheckpoints: this.experiments.hasCheckpoints(),
       hasColumns: this.columns.hasNonDefaultColumns(),
       hasConfig: this.hasConfig,
       hasMoreCommits: this.hasMoreCommits,
@@ -484,7 +480,7 @@ export class WebviewMessages {
       if (executor === EXPERIMENT_WORKSPACE_ID) {
         runningInWorkspace = true
       }
-      if (executor === 'dvc-task') {
+      if (executor === Executor.DVC_TASK) {
         runningInQueueIds.add(id)
       }
     }

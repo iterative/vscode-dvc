@@ -1,12 +1,14 @@
 import { commands } from 'vscode'
-import omit from 'lodash.omit'
 import fetch, { Response as FetchResponse } from 'node-fetch'
 import {
-  EXPERIMENT_WORKSPACE_ID,
-  ExperimentFields,
-  ExperimentsCommitOutput,
-  ExperimentsOutput,
-  ValueTreeRoot
+  ExpData,
+  ExpRange,
+  ExpShowOutput,
+  ExpState,
+  ValueTree,
+  MetricsOrParams,
+  experimentHasError,
+  fileHasError
 } from './cli/dvc/contract'
 import { AvailableCommands, InternalCommands } from './commands/internal'
 import { Args, ExperimentFlag } from './cli/dvc/constants'
@@ -20,9 +22,9 @@ export const STUDIO_ENDPOINT = 'https://studio.iterative.ai/api/live'
 type ExperimentDetails = {
   baselineSha: string
   sha: string
-  metrics: ValueTreeRoot | undefined
+  metrics: MetricsOrParams | undefined | null
   name: string
-  params: ValueTreeRoot
+  params: ValueTree | null
 }
 
 type RequestBody = {
@@ -31,16 +33,19 @@ type RequestBody = {
   name: string
   baseline_sha: string
   experiment_rev: string
-  metrics: ValueTreeRoot
-  params: ValueTreeRoot
+  metrics: MetricsOrParams
+  params: ValueTree
   type: 'done'
 }
 
-const collectExperiment = (data: ExperimentFields) => {
+const collectExperiment = (data: ExpData) => {
   const { metrics, params } = data
 
-  const paramsAcc: ValueTreeRoot = {}
+  const paramsAcc: ValueTree = {}
   for (const [file, fileParams] of Object.entries(params || {})) {
+    if (fileHasError(fileParams)) {
+      continue
+    }
     const data = fileParams?.data
     if (data) {
       paramsAcc[file] = data
@@ -52,23 +57,34 @@ const collectExperiment = (data: ExperimentFields) => {
 
 const findExperimentByName = (
   name: string,
-  baselineSha: string,
-  experimentsObject: ExperimentsCommitOutput
+  expState: ExpState & { experiments?: ExpRange[] | null }
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
-  for (const [sha, { data }] of Object.entries(experimentsObject)) {
-    if (data?.name !== name) {
+  if (!expState.experiments) {
+    return
+  }
+
+  for (const experiment of expState.experiments) {
+    if (experiment.name !== name) {
       continue
     }
+
+    const [exp] = experiment.revs
+    if (experimentHasError(exp)) {
+      return
+    }
+
+    const { data, rev } = exp
 
     if (data) {
       const { metrics, params } = collectExperiment(data)
 
       return {
-        baselineSha,
+        baselineSha: expState.rev,
         metrics,
         name,
         params,
-        sha
+        sha: rev
       }
     }
   }
@@ -76,12 +92,10 @@ const findExperimentByName = (
 
 const collectExperimentDetails = (
   name: string,
-  expData: ExperimentsOutput
+  expData: ExpShowOutput
 ): ExperimentDetails | undefined => {
-  for (const [sha, experimentsObject] of Object.entries(
-    omit(expData, EXPERIMENT_WORKSPACE_ID)
-  )) {
-    const details = findExperimentByName(name, sha, experimentsObject)
+  for (const expState of expData.slice(1)) {
+    const details = findExperimentByName(name, expState)
     if (details) {
       return details
     }
@@ -155,19 +169,19 @@ const pushExperiment = async (
   name: string,
   studioAccessToken: string
 ) => {
-  const [repoUrl, expData] = await Promise.all([
+  const [repoUrl, expShowOutput] = await Promise.all([
     internalCommands.executeCommand(
       AvailableCommands.GIT_GET_REMOTE_URL,
       dvcRoot
     ),
-    internalCommands.executeCommand<ExperimentsOutput>(
+    internalCommands.executeCommand<ExpShowOutput>(
       AvailableCommands.EXP_SHOW,
       dvcRoot,
       ExperimentFlag.NO_FETCH
     )
   ])
 
-  const experimentDetails = collectExperimentDetails(name, expData)
+  const experimentDetails = collectExperimentDetails(name, expShowOutput)
 
   if (!repoUrl) {
     return Toast.showError(

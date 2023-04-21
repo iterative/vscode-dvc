@@ -11,11 +11,11 @@ import {
 import {
   DataStatusOutput,
   DvcError,
-  ExperimentsOutput,
   EXPERIMENT_WORKSPACE_ID,
   PlotsOutput,
   PlotsOutputOrError,
-  RawPlotsOutput
+  RawPlotsOutput,
+  ExpShowOutput
 } from './contract'
 import { getOptions } from './options'
 import { typeCheckCommands } from '..'
@@ -24,12 +24,8 @@ import { Logger } from '../../common/logger'
 import { parseNonStandardJson } from '../../util/json'
 import { definedAndNonEmpty } from '../../util/array'
 
-const defaultExperimentsOutput: ExperimentsOutput = {
-  [EXPERIMENT_WORKSPACE_ID]: { baseline: {} }
-}
-
 export const isDvcError = <
-  T extends ExperimentsOutput | DataStatusOutput | RawPlotsOutput
+  T extends ExpShowOutput | DataStatusOutput | RawPlotsOutput
 >(
   dataOrError: T | DvcError
 ): dataOrError is DvcError =>
@@ -68,19 +64,17 @@ export class DvcReader extends DvcCli {
   public async expShow(
     cwd: string,
     ...flags: (ExperimentFlag | string)[]
-  ): Promise<ExperimentsOutput> {
-    const output = await this.readProcess<ExperimentsOutput>(
+  ): Promise<ExpShowOutput> {
+    const output = await this.readProcess<ExpShowOutput>(
       cwd,
-      JSON.stringify(defaultExperimentsOutput),
+      JSON.stringify([]),
       Command.EXPERIMENT,
       SubCommand.SHOW,
       ...flags,
       Flag.JSON
     )
     if (isDvcError(output) || isEmpty(output)) {
-      return {
-        [EXPERIMENT_WORKSPACE_ID]: { baseline: output as DvcError | {} }
-      }
+      return [{ rev: EXPERIMENT_WORKSPACE_ID, ...(output as DvcError) }]
     }
     return output
   }
@@ -150,7 +144,7 @@ export class DvcReader extends DvcCli {
   }
 
   private async readProcess<
-    T extends DataStatusOutput | ExperimentsOutput | RawPlotsOutput
+    T extends DataStatusOutput | ExpShowOutput | RawPlotsOutput
   >(cwd: string, defaultValue: string, ...args: Args): Promise<T | DvcError> {
     try {
       const output =

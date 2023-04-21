@@ -38,7 +38,7 @@ import { DvcReader } from '../../../../../cli/dvc/reader'
 import {
   Value,
   ValueTree,
-  ValueTreeOrError
+  FileDataOrError
 } from '../../../../../cli/dvc/contract'
 
 suite('Experiments Filter By Tree Test Suite', () => {
@@ -86,7 +86,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       const [workspace, main] = rowsFixture
 
-      const gte45 = (value: ValueTreeOrError | ValueTree | Value): boolean =>
+      const gte45 = (value: FileDataOrError | ValueTree | Value): boolean =>
         !!(value && typeof value === 'number' && value >= 0.45)
 
       const filteredRows = [

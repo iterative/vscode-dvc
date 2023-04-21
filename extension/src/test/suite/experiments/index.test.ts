@@ -33,7 +33,7 @@ import {
 } from '../../../experiments/webview/contract'
 import {
   buildInternalCommands,
-  buildMockData,
+  buildMockExperimentsData,
   closeAllEditors,
   configurationChangeEvent,
   experimentsUpdatedEvent,
@@ -42,6 +42,7 @@ import {
   getMessageReceivedEmitter
 } from '../util'
 import { buildMockMemento, dvcDemoPath } from '../../util'
+import { generateTestExpShowOutput } from '../../util/experiments'
 import { SortDefinition } from '../../../experiments/model/sortBy'
 import {
   FilterDefinition,
@@ -56,8 +57,6 @@ import { ColumnsModel } from '../../../experiments/columns/model'
 import { MessageFromWebviewType } from '../../../webview/contract'
 import { ExperimentsModel } from '../../../experiments/model'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
-import { FileSystemData } from '../../../fileSystem/data'
-import { ExperimentsData } from '../../../experiments/data'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
@@ -74,6 +73,7 @@ import {
 import { ConfigKey } from '../../../vscode/config'
 import {
   EXPERIMENT_WORKSPACE_ID,
+  Executor,
   ExperimentStatus
 } from '../../../cli/dvc/contract'
 import * as Time from '../../../util/time'
@@ -119,10 +119,7 @@ suite('Experiments Test Suite', () => {
     it('should be able to make the experiment webview visible', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('train')
 
-      const { experiments, messageSpy } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, messageSpy } = buildExperiments(disposable)
 
       const webview = await experiments.showWebview()
 
@@ -176,10 +173,7 @@ suite('Experiments Test Suite', () => {
       stub(DvcReader.prototype, 'listStages').resolves(undefined)
       stub(FileSystem, 'hasDvcYamlFile').returns(true)
 
-      const { experiments, messageSpy } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
@@ -192,10 +186,7 @@ suite('Experiments Test Suite', () => {
       stub(DvcReader.prototype, 'listStages').resolves(undefined)
       stub(FileSystem, 'hasDvcYamlFile').returns(false)
 
-      const { experiments, messageSpy } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
@@ -210,10 +201,7 @@ suite('Experiments Test Suite', () => {
       stub(DvcReader.prototype, 'listStages').resolves('')
       stub(FileSystem, 'hasDvcYamlFile').returns(false)
 
-      const { experiments, messageSpy } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
@@ -225,10 +213,7 @@ suite('Experiments Test Suite', () => {
     it('should set hasConfig to false if there are no stages', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('')
 
-      const { experiments, messageSpy } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
@@ -240,10 +225,7 @@ suite('Experiments Test Suite', () => {
     it('should set hasConfig to true if there are stages', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('train')
 
-      const { experiments, messageSpy } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
@@ -254,10 +236,7 @@ suite('Experiments Test Suite', () => {
 
     it('should set hasMoreCommits to true if there are more commits to show', async () => {
       stub(GitReader.prototype, 'getNumCommits').resolves(5)
-      const { experiments, messageSpy } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
@@ -268,10 +247,7 @@ suite('Experiments Test Suite', () => {
 
     it('should set hasMoreCommits to false if there are more commits to show', async () => {
       stub(GitReader.prototype, 'getNumCommits').resolves(1)
-      const { experiments, messageSpy } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
@@ -281,10 +257,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set isShowingMoreCommits to true if it is showing more than the current commit', async () => {
-      const { experiments, messageSpy } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
@@ -295,10 +268,7 @@ suite('Experiments Test Suite', () => {
 
     it('should set isShowingMoreCommits to false it is showing only the current commit', async () => {
       stub(GitReader.prototype, 'getNumCommits').resolves(1)
-      const { experiments, messageSpy } = buildExperiments(
-        disposable,
-        expShowFixture
-      )
+      const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
@@ -359,7 +329,7 @@ suite('Experiments Test Suite', () => {
     }
 
     it('should handle a column reordered message from the webview', async () => {
-      const { experiments } = buildExperiments(disposable, expShowFixture)
+      const { experiments } = buildExperiments(disposable)
 
       const webview = await experiments.showWebview()
 
@@ -401,7 +371,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a column resized message from the webview', async () => {
-      const { experiments } = buildExperiments(disposable, expShowFixture)
+      const { experiments } = buildExperiments(disposable)
 
       const webview = await experiments.showWebview()
 
@@ -435,7 +405,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a column sorted message from the webview', async () => {
-      const { experiments } = buildExperiments(disposable, expShowFixture)
+      const { experiments } = buildExperiments(disposable)
 
       const webview = await experiments.showWebview()
 
@@ -470,7 +440,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a column sort removed from the webview', async () => {
-      const { experiments } = buildExperiments(disposable, expShowFixture)
+      const { experiments } = buildExperiments(disposable)
 
       const webview = await experiments.showWebview()
 
@@ -703,7 +673,7 @@ suite('Experiments Test Suite', () => {
       const { experiments } = buildExperiments(disposable)
       await experiments.isReady()
 
-      const mockExperiment = 'exp-e7a67'
+      const mockExperimentId = 'exp-e7a67'
       const mockBranch = 'it-is-a-branch-shared-to-the-remote'
       const inputEvent = getInputBoxEvent(mockBranch)
 
@@ -711,7 +681,7 @@ suite('Experiments Test Suite', () => {
         DvcExecutor.prototype,
         'experimentBranch'
       ).resolves(
-        `Git branch '${mockBranch}' has been created from experiment '${mockExperiment}'.        
+        `Git branch '${mockBranch}' has been created from experiment '${mockExperimentId}'.        
        To switch to the new branch run:
              git checkout ${mockBranch}`
       )
@@ -719,7 +689,7 @@ suite('Experiments Test Suite', () => {
         DvcExecutor.prototype,
         'experimentApply'
       ).resolves(
-        `Changes for experiment '${mockExperiment}' have been applied to your current workspace.`
+        `Changes for experiment '${mockExperimentId}' have been applied to your current workspace.`
       )
       const mockPush = stub(DvcExecutor.prototype, 'push').resolves(
         '10 files updated.'
@@ -738,7 +708,7 @@ suite('Experiments Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
-        payload: mockExperiment,
+        payload: mockExperimentId,
         type: MessageFromWebviewType.SHARE_EXPERIMENT_AS_BRANCH
       })
 
@@ -746,12 +716,12 @@ suite('Experiments Test Suite', () => {
       await branchPushedToRemote
       expect(mockExperimentBranch).to.be.calledWithExactly(
         dvcDemoPath,
-        mockExperiment,
+        mockExperimentId,
         mockBranch
       )
       expect(mockExperimentApply).to.be.calledWithExactly(
         dvcDemoPath,
-        mockExperiment
+        mockExperimentId
       )
       expect(mockPush).to.be.calledWithExactly(dvcDemoPath)
       expect(mockGitPush).to.be.calledWithExactly(dvcDemoPath, mockBranch)
@@ -761,7 +731,7 @@ suite('Experiments Test Suite', () => {
       const { experiments } = buildExperiments(disposable)
       await experiments.isReady()
 
-      const mockExperiment = 'exp-e7a67'
+      const mockExperimentId = 'exp-e7a67'
       const mockCommitMessage =
         'this is the very best version that I could come up with'
       const inputEvent = getInputBoxEvent(mockCommitMessage)
@@ -770,7 +740,7 @@ suite('Experiments Test Suite', () => {
         DvcExecutor.prototype,
         'experimentApply'
       ).resolves(
-        `Changes for experiment '${mockExperiment}' have been applied to your current workspace.`
+        `Changes for experiment '${mockExperimentId}' have been applied to your current workspace.`
       )
       const mockStageAndCommit = stub(
         GitExecutor.prototype,
@@ -794,7 +764,7 @@ suite('Experiments Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
-        payload: mockExperiment,
+        payload: mockExperimentId,
         type: MessageFromWebviewType.SHARE_EXPERIMENT_AS_COMMIT
       })
 
@@ -806,7 +776,7 @@ suite('Experiments Test Suite', () => {
       )
       expect(mockExperimentApply).to.be.calledWithExactly(
         dvcDemoPath,
-        mockExperiment
+        mockExperimentId
       )
       expect(mockPush).to.be.calledWithExactly(dvcDemoPath)
       expect(mockGitPush).to.be.calledWithExactly(dvcDemoPath)
@@ -954,17 +924,25 @@ suite('Experiments Test Suite', () => {
 
       await experiments.isReady()
 
-      const experimentToToggle = 'exp-e7a67'
-      const queuedExperiment = '90aea7f2482117a55dfcadcdb901aaa6610fbbc9'
+      const idToToggle = 'test-branch'
+      const runningInQueueId = 'exp-e7a67'
+      const queuedId = '90aea7f'
 
       const isExperimentSelected = (expId: string): boolean =>
         !!experimentsModel.getCombinedList().find(({ id }) => id === expId)
           ?.selected
 
-      expect(isExperimentSelected(experimentToToggle), 'experiment is selected')
-        .to.be.true
       expect(
-        isExperimentSelected(queuedExperiment),
+        isExperimentSelected(idToToggle),
+        'experiment is not initially selected'
+      ).to.be.false
+
+      expect(
+        isExperimentSelected(runningInQueueId),
+        'experiment running in the queue cannot be selected'
+      ).to.be.false
+      expect(
+        isExperimentSelected(queuedId),
         'queued experiment cannot be selected'
       ).to.be.false
 
@@ -975,27 +953,52 @@ suite('Experiments Test Suite', () => {
       const toggleSpy = spy(experimentsModel, 'toggleStatus')
 
       mockMessageReceived.fire({
-        payload: experimentToToggle,
+        payload: idToToggle,
         type: MessageFromWebviewType.TOGGLE_EXPERIMENT
       })
 
-      expect(toggleSpy).to.be.calledWith(experimentToToggle)
+      expect(toggleSpy).to.be.calledWith(idToToggle)
       toggleSpy.resetHistory()
 
       expect(
-        isExperimentSelected(experimentToToggle),
+        isExperimentSelected(idToToggle),
+        'experiment has been toggled to selected'
+      ).to.be.true
+
+      mockMessageReceived.fire({
+        payload: idToToggle,
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT
+      })
+
+      expect(toggleSpy).to.be.calledWith(idToToggle)
+      toggleSpy.resetHistory()
+
+      expect(
+        isExperimentSelected(idToToggle),
         'experiment has been toggled to unselected'
       ).to.be.false
 
       mockMessageReceived.fire({
-        payload: queuedExperiment,
+        payload: runningInQueueId,
         type: MessageFromWebviewType.TOGGLE_EXPERIMENT
       })
 
-      expect(toggleSpy).to.be.calledWith(queuedExperiment)
+      expect(toggleSpy).to.be.calledWith(runningInQueueId)
 
       expect(
-        isExperimentSelected(queuedExperiment),
+        isExperimentSelected(runningInQueueId),
+        'experiment running the queue cannot be selected'
+      ).to.be.false
+
+      mockMessageReceived.fire({
+        payload: queuedId,
+        type: MessageFromWebviewType.TOGGLE_EXPERIMENT
+      })
+
+      expect(toggleSpy).to.be.calledWith(queuedId)
+
+      expect(
+        isExperimentSelected(queuedId),
         'queued experiment cannot be selected'
       ).to.be.false
     }).timeout(WEBVIEW_TEST_TIMEOUT)
@@ -1047,7 +1050,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to focus the sorts tree', async () => {
-      const { experiments } = buildExperiments(disposable, expShowFixture)
+      const { experiments } = buildExperiments(disposable)
 
       const webview = await experiments.showWebview()
 
@@ -1080,7 +1083,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to focus the filters tree', async () => {
-      const { experiments } = buildExperiments(disposable, expShowFixture)
+      const { experiments } = buildExperiments(disposable)
 
       const webview = await experiments.showWebview()
 
@@ -1113,7 +1116,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to update the table depth', async () => {
-      const { experiments } = buildExperiments(disposable, expShowFixture)
+      const { experiments } = buildExperiments(disposable)
       const inputEvent = getInputBoxEvent('0')
       const tableMaxDepthChanged = configurationChangeEvent(
         ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT,
@@ -1210,9 +1213,10 @@ suite('Experiments Test Suite', () => {
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
-      const queuedId = '90aea7f2482117a55dfcadcdb901aaa6610fbbc9'
-      const expectedIds = ['exp-e7a67', 'test-branch']
-      const mockExperimentIds = [...expectedIds, queuedId]
+      const queuedId = '90aea7f'
+      const runningInQueueId = 'exp-e7a67'
+      const expectedIds = ['main', 'test-branch']
+      const mockExperimentIds = [...expectedIds, queuedId, runningInQueueId]
 
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
@@ -1232,7 +1236,7 @@ suite('Experiments Test Suite', () => {
       mockExperimentIds.sort()
       expect(
         selectExperimentIds,
-        'should exclude queued experiments from selection'
+        'should exclude queued experiments and experiments running in the queue from selection'
       ).to.deep.equal(expectedIds)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -1253,14 +1257,15 @@ suite('Experiments Test Suite', () => {
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
-      const mockExperimentIds = ['exp-e7a67', 'test-branch']
+      const runningInQueueId = 'exp-e7a67'
+      const mockExperimentIds = ['main', 'test-branch']
 
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const tableChangePromise = experimentsUpdatedEvent(experiments)
 
       mockMessageReceived.fire({
-        payload: mockExperimentIds,
+        payload: [...mockExperimentIds, runningInQueueId],
         type: MessageFromWebviewType.SET_EXPERIMENTS_AND_OPEN_PLOTS
       })
 
@@ -1312,8 +1317,8 @@ suite('Experiments Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: [
-          ...mockExperimentIds.map(id => ({ executor: 'dvc-task', id })),
-          { executor: EXPERIMENT_WORKSPACE_ID, id: EXPERIMENT_WORKSPACE_ID }
+          ...mockExperimentIds.map(id => ({ executor: Executor.DVC_TASK, id })),
+          { executor: Executor.WORKSPACE, id: EXPERIMENT_WORKSPACE_ID }
         ],
         type: MessageFromWebviewType.STOP_EXPERIMENT
       })
@@ -1496,13 +1501,6 @@ suite('Experiments Test Suite', () => {
   describe('Sorting', () => {
     it('should be able to sort', async () => {
       const { internalCommands } = buildInternalCommands(disposable)
-      const buildTestExperiment = (testParam: number) => ({
-        params: {
-          'params.yaml': {
-            data: { test: testParam }
-          }
-        }
-      })
 
       const messageSpy = spy(BaseWebview.prototype, 'show')
 
@@ -1521,24 +1519,47 @@ suite('Experiments Test Suite', () => {
           buildMockMemento(),
           () => Promise.resolve(true),
           () => Promise.resolve([]),
-          buildMockData<ExperimentsData>(),
-          buildMockData<FileSystemData>()
+          buildMockExperimentsData()
         )
       )
 
-      void experiments.setState({
-        [EXPERIMENT_WORKSPACE_ID]: {
-          baseline: { data: buildTestExperiment(10) }
-        },
-        testBranch: {
-          baseline: {
-            data: { name: 'testBranch', ...buildTestExperiment(10) }
-          },
-          testExp1: { data: buildTestExperiment(2) },
-          testExp2: { data: buildTestExperiment(1) },
-          testExp3: { data: buildTestExperiment(3) }
+      const data = generateTestExpShowOutput(
+        {},
+        {
+          rev: 'testBranch',
+          experiments: [
+            {
+              params: {
+                'params.yaml': {
+                  data: {
+                    test: 2
+                  }
+                }
+              }
+            },
+            {
+              params: {
+                'params.yaml': {
+                  data: {
+                    test: 1
+                  }
+                }
+              }
+            },
+            {
+              params: {
+                'params.yaml': {
+                  data: {
+                    test: 3
+                  }
+                }
+              }
+            }
+          ]
         }
-      })
+      )
+
+      void experiments.setState(data)
 
       messageSpy.resetHistory()
 
@@ -1551,7 +1572,6 @@ suite('Experiments Test Suite', () => {
             displayColor: undefined,
             id: EXPERIMENT_WORKSPACE_ID,
             label: EXPERIMENT_WORKSPACE_ID,
-            params: { 'params.yaml': { test: 10 } },
             selected: false,
             starred: false
           },
@@ -1559,37 +1579,34 @@ suite('Experiments Test Suite', () => {
             displayColor: undefined,
             id: 'testBranch',
             label: 'testBranch',
-            name: 'testBranch',
-            params: { 'params.yaml': { test: 10 } },
             selected: false,
-            sha: 'testBranch',
             starred: false,
             subRows: [
               {
                 displayColor: undefined,
-                id: 'testExp1',
-                label: 'testExp',
+                description: '[exp-1]',
+                id: 'exp-1',
+                label: '111111',
                 params: { 'params.yaml': { test: 2 } },
                 selected: false,
-                sha: 'testExp1',
                 starred: false
               },
               {
                 displayColor: undefined,
-                id: 'testExp2',
-                label: 'testExp',
+                description: '[exp-2]',
+                id: 'exp-2',
+                label: '222222',
                 params: { 'params.yaml': { test: 1 } },
                 selected: false,
-                sha: 'testExp2',
                 starred: false
               },
               {
                 displayColor: undefined,
-                id: 'testExp3',
-                label: 'testExp',
+                description: '[exp-3]',
+                id: 'exp-3',
+                label: '333333',
                 params: { 'params.yaml': { test: 3 } },
                 selected: false,
-                sha: 'testExp3',
                 starred: false
               }
             ]
@@ -1631,7 +1648,6 @@ suite('Experiments Test Suite', () => {
             displayColor: undefined,
             id: EXPERIMENT_WORKSPACE_ID,
             label: EXPERIMENT_WORKSPACE_ID,
-            params: { 'params.yaml': { test: 10 } },
             selected: false,
             starred: false
           },
@@ -1639,37 +1655,34 @@ suite('Experiments Test Suite', () => {
             displayColor: undefined,
             id: 'testBranch',
             label: 'testBranch',
-            name: 'testBranch',
-            params: { 'params.yaml': { test: 10 } },
             selected: false,
-            sha: 'testBranch',
             starred: false,
             subRows: [
               {
                 displayColor: undefined,
-                id: 'testExp2',
-                label: 'testExp',
+                description: '[exp-2]',
+                id: 'exp-2',
+                label: '222222',
                 params: { 'params.yaml': { test: 1 } },
                 selected: false,
-                sha: 'testExp2',
                 starred: false
               },
               {
                 displayColor: undefined,
-                id: 'testExp1',
-                label: 'testExp',
+                description: '[exp-1]',
+                id: 'exp-1',
+                label: '111111',
                 params: { 'params.yaml': { test: 2 } },
                 selected: false,
-                sha: 'testExp1',
                 starred: false
               },
               {
                 displayColor: undefined,
-                id: 'testExp3',
-                label: 'testExp',
+                description: '[exp-3]',
+                id: 'exp-3',
+                label: '333333',
                 params: { 'params.yaml': { test: 3 } },
                 selected: false,
-                sha: 'testExp3',
                 starred: false
               }
             ]
@@ -1739,8 +1752,7 @@ suite('Experiments Test Suite', () => {
           mockMemento,
           () => Promise.resolve(true),
           () => Promise.resolve([]),
-          buildMockData<ExperimentsData>(),
-          buildMockData<FileSystemData>()
+          buildMockExperimentsData()
         )
       )
       void testRepository.setState(expShowFixture)
@@ -1767,14 +1779,13 @@ suite('Experiments Test Suite', () => {
         mockMemento.get('experimentsStatus:test'),
         'the correct statuses are persisted'
       ).to.deep.equal({
-        '489fd8bdaa709f7330aac342e051a9431c625481': 0,
-        '55d492c9c633912685351b32df91bfe1f9ecefb9': 0,
-        'exp-83425': 0,
-        'exp-e7a67': colors[1],
+        '489fd8b': 0,
+        '55d492c': 0,
+        'exp-e7a67': 0,
         'exp-f13bca': 0,
         main: 0,
         'test-branch': 0,
-        workspace: colors[0]
+        [EXPERIMENT_WORKSPACE_ID]: colors[0]
       })
 
       expect(
@@ -1858,19 +1869,18 @@ suite('Experiments Test Suite', () => {
         'both filters should be removed from memento after removeFilters is run against them'
       ).to.deep.equal([])
 
-      testRepository.toggleExperimentStatus('exp-e7a67')
+      testRepository.toggleExperimentStatus('exp-f13bca')
       expect(
         mockMemento.get('experimentsStatus:test'),
         'the correct statuses have been recorded in the memento'
       ).to.deep.equal({
-        '489fd8bdaa709f7330aac342e051a9431c625481': 0,
-        '55d492c9c633912685351b32df91bfe1f9ecefb9': 0,
-        'exp-83425': 0,
+        '489fd8b': 0,
+        '55d492c': 0,
         'exp-e7a67': 0,
-        'exp-f13bca': 0,
+        'exp-f13bca': colors[1],
         main: 0,
         'test-branch': 0,
-        workspace: colors[0]
+        [EXPERIMENT_WORKSPACE_ID]: colors[0]
       })
     })
 
@@ -1881,7 +1891,7 @@ suite('Experiments Test Suite', () => {
         'experimentsFilterBy:test': filterMapEntries,
         'experimentsSortBy:test': sortDefinitions,
         'experimentsStatus:test': {
-          'exp-83425': colors[0],
+          [EXPERIMENT_WORKSPACE_ID]: colors[0],
           'exp-e7a67': colors[5],
           'exp-f13bca': 0,
           'test-branch': colors[1]
@@ -1898,8 +1908,7 @@ suite('Experiments Test Suite', () => {
           mockMemento,
           () => Promise.resolve(true),
           () => Promise.resolve([]),
-          buildMockData<ExperimentsData>(),
-          buildMockData<FileSystemData>()
+          buildMockExperimentsData()
         )
       )
       void testRepository.setState(expShowFixture)
@@ -1922,15 +1931,11 @@ suite('Experiments Test Suite', () => {
       ).to.deep.equal([
         {
           displayColor: colors[0],
-          id: 'exp-83425'
+          id: EXPERIMENT_WORKSPACE_ID
         },
         {
           displayColor: colors[1],
           id: 'test-branch'
-        },
-        {
-          displayColor: colors[2],
-          id: EXPERIMENT_WORKSPACE_ID
         },
         {
           displayColor: colors[5],
@@ -2024,22 +2029,11 @@ suite('Experiments Test Suite', () => {
 
   describe('Empty repository', () => {
     it('should not show any experiments in the experiments tree when there are no columns', async () => {
-      const { experiments } = buildExperiments(disposable, {
-        [EXPERIMENT_WORKSPACE_ID]: {
-          baseline: {
-            data: {
-              deps: {}
-            }
-          }
-        },
-        b9f016df00d499f6d2a73e7dc34d1600c78066eb: {
-          baseline: {
-            data: {
-              deps: {}
-            }
-          }
-        }
-      })
+      const data = generateTestExpShowOutput(
+        {},
+        { rev: 'b9f016df00d499f6d2a73e7dc34d1600c78066eb' }
+      )
+      const { experiments } = buildExperiments(disposable, data)
       await experiments.isReady()
 
       expect(
@@ -2055,7 +2049,7 @@ suite('Experiments Test Suite', () => {
 
   describe('setState', () => {
     it('should clean up after a killed DVCLive process that was running an experiment outside of the DVC context', async () => {
-      const defaultExperimentsData = { workspace: { baseline: { data: {} } } }
+      const defaultExperimentsData = generateTestExpShowOutput({})
 
       const { experiments, mockCheckSignalFile, mockUpdateExperimentsData } =
         buildExperiments(disposable, defaultExperimentsData)
@@ -2109,9 +2103,26 @@ suite('Experiments Test Suite', () => {
       const colors = copyOriginalColors()
       const [color] = colors
       const commit = 'df3f8647a47e403c9c4aa6562cad0b74afbe900b'
-      const expCommit = 'c0f48cf6c3eb589d48979df82c6bbe78c1ee5d61'
-      const expName = 'fizzy-dilemma'
+      const name = 'fizzy-dilemma'
       const params = { 'params.yaml': { data: { lr: 1 } } }
+      const runningOutput = generateTestExpShowOutput(
+        { params },
+        {
+          rev: commit,
+          experiments: [
+            {
+              rev: EXPERIMENT_WORKSPACE_ID,
+              data: { params },
+              name,
+              executor: {
+                local: null,
+                state: ExperimentStatus.RUNNING,
+                name: Executor.WORKSPACE
+              }
+            }
+          ]
+        }
+      )
 
       const getSelectedIdsWithColor = (
         experiments: Experiments
@@ -2125,31 +2136,14 @@ suite('Experiments Test Suite', () => {
         displayColor: color
       }
       const selectedExperiment = {
-        id: expName,
+        id: name,
         displayColor: color
       }
       const bothSelected = [selectedWorkspace, selectedExperiment]
 
-      const data = {
-        workspace: {
-          baseline: {
-            data: {
-              executor: EXPERIMENT_WORKSPACE_ID,
-              params,
-              status: ExperimentStatus.RUNNING
-            }
-          }
-        },
-        [commit]: {
-          baseline: {
-            data: {}
-          }
-        }
-      }
-
       const { experiments, experimentsModel } = buildExperiments(
         disposable,
-        data
+        runningOutput
       )
 
       await experiments.isReady()
@@ -2168,27 +2162,22 @@ suite('Experiments Test Suite', () => {
         experiments.onDidChangeExperiments(() => resolve(undefined))
       )
 
-      await experiments.setState({
-        workspace: {
-          baseline: {
-            data: {
-              executor: null,
-              params
-            }
+      await experiments.setState(
+        generateTestExpShowOutput(
+          { params },
+          {
+            rev: commit,
+            experiments: [
+              {
+                rev: '679c7ce7469020332154717126f88ce157ebc612',
+                data: { params },
+                name,
+                executor: null
+              }
+            ]
           }
-        },
-        [commit]: {
-          ...data[commit],
-          [expCommit]: {
-            data: {
-              name: expName,
-              params,
-              status: ExperimentStatus.SUCCESS,
-              timestamp: '2020-11-21T19:58:22'
-            }
-          }
-        }
-      })
+        )
+      )
 
       await experimentsChanged
 

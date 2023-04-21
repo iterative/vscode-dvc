@@ -1,20 +1,20 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
-import { join } from 'path'
-import { collectChanges, collectColumns } from '.'
+import { collectChanges, collectColumns, collectRelativeMetricsFiles } from '.'
 import { timestampColumn } from '../constants'
-import { buildDepPath, buildMetricOrParamPath } from '../paths'
+import { buildMetricOrParamPath } from '../paths'
 import { Column, ColumnType } from '../../webview/contract'
 import outputFixture from '../../../test/fixtures/expShow/base/output'
 import columnsFixture from '../../../test/fixtures/expShow/base/columns'
 import workspaceChangesFixture from '../../../test/fixtures/expShow/base/workspaceChanges'
 import uncommittedDepsFixture from '../../../test/fixtures/expShow/uncommittedDeps/output'
 import {
-  ExperimentsOutput,
-  ExperimentStatus,
-  EXPERIMENT_WORKSPACE_ID,
-  ValueTree
+  ValueTree,
+  ExpShowOutput,
+  experimentHasError,
+  EXPERIMENT_WORKSPACE_ID
 } from '../../../cli/dvc/contract'
 import { getConfigValue } from '../../../vscode/config'
+import { generateTestExpShowOutput } from '../../../test/util/experiments'
 
 jest.mock('../../../vscode/config')
 
@@ -28,26 +28,22 @@ describe('collectColumns', () => {
   })
 
   it('should output both params and metrics when both are present', () => {
-    const columns = collectColumns({
-      [EXPERIMENT_WORKSPACE_ID]: {
-        baseline: {
-          data: {
-            metrics: {
-              1: {
-                data: { 2: 3 }
-              }
-            },
-            params: {
-              a: {
-                data: {
-                  b: 'c'
-                }
-              }
+    const columns = collectColumns(
+      generateTestExpShowOutput({
+        metrics: {
+          1: {
+            data: { 2: 3 }
+          }
+        },
+        params: {
+          a: {
+            data: {
+              b: 'c'
             }
           }
         }
-      }
-    })
+      })
+    )
     const params = columns.find(column => column.type === ColumnType.PARAMS)
     const metrics = columns.find(column => column.type === ColumnType.METRICS)
     expect(params).toBeDefined()
@@ -55,19 +51,15 @@ describe('collectColumns', () => {
   })
 
   it('should omit params when none exist in the source data', () => {
-    const columns = collectColumns({
-      [EXPERIMENT_WORKSPACE_ID]: {
-        baseline: {
-          data: {
-            metrics: {
-              1: {
-                data: { 2: 3 }
-              }
-            }
+    const columns = collectColumns(
+      generateTestExpShowOutput({
+        metrics: {
+          1: {
+            data: { 2: 3 }
           }
         }
-      }
-    })
+      })
+    )
     const params = columns.find(column => column.type === ColumnType.PARAMS)
     const metrics = columns.find(column => column.type === ColumnType.METRICS)
     expect(params).toBeUndefined()
@@ -75,59 +67,52 @@ describe('collectColumns', () => {
   })
 
   it('should return an empty array if no params and metrics are provided', () => {
-    const columns = collectColumns({
-      [EXPERIMENT_WORKSPACE_ID]: {
-        baseline: {}
-      }
-    })
+    const columns = collectColumns(generateTestExpShowOutput({}))
     expect(columns).toStrictEqual([])
   })
 
   const exampleBigNumber = 3000000000
-  const columns = collectColumns({
-    branchA: {
-      baseline: {
-        data: {
-          params: {
-            'params.yaml': {
-              data: { mixedParam: 'string' }
-            }
+
+  const data: ExpShowOutput = generateTestExpShowOutput(
+    {
+      params: {
+        'params.yaml': {
+          data: { mixedParam: exampleBigNumber }
+        }
+      }
+    },
+    {
+      rev: 'branchA',
+      data: {
+        params: {
+          'params.yaml': {
+            data: { mixedParam: 'string' }
           }
         }
       },
-      otherExp: {
-        data: {
+      experiments: [
+        {
           params: {
             'params.yaml': {
               data: { mixedParam: true }
             }
           }
         }
-      }
+      ]
     },
-    branchB: {
-      baseline: {
-        data: {
-          params: {
-            'params.yaml': {
-              data: { mixedParam: null }
-            }
-          }
-        }
-      }
-    },
-    [EXPERIMENT_WORKSPACE_ID]: {
-      baseline: {
-        data: {
-          params: {
-            'params.yaml': {
-              data: { mixedParam: exampleBigNumber }
-            }
+    {
+      rev: 'branchB',
+      data: {
+        params: {
+          'params.yaml': {
+            data: { mixedParam: null }
           }
         }
       }
     }
-  })
+  )
+
+  const columns = collectColumns(data)
 
   const exampleMixedParam = columns.find(
     column =>
@@ -154,49 +139,45 @@ describe('collectColumns', () => {
   })
 
   it('should find a different minNumber and maxNumber on a mixed param', () => {
-    const columns = collectColumns({
-      branch1: {
-        baseline: {
+    const columns = collectColumns(
+      generateTestExpShowOutput(
+        {},
+        {
+          rev: 'branchA',
           data: {
             params: {
               'params.yaml': {
                 data: { mixedNumber: null }
               }
             }
-          }
-        },
-        exp1: {
-          data: {
-            params: {
-              'params.yaml': {
-                data: { mixedNumber: 0 }
+          },
+          experiments: [
+            {
+              params: {
+                'params.yaml': {
+                  data: { mixedNumber: 0 }
+                }
+              }
+            },
+            {
+              params: {
+                'params.yaml': {
+                  data: { mixedNumber: -1 }
+                }
+              }
+            },
+            {
+              params: {
+                'params.yaml': {
+                  data: { mixedNumber: 1 }
+                }
               }
             }
-          }
-        },
-        exp2: {
-          data: {
-            params: {
-              'params.yaml': {
-                data: { mixedNumber: -1 }
-              }
-            }
-          }
-        },
-        exp3: {
-          data: {
-            params: {
-              'params.yaml': {
-                data: { mixedNumber: 1 }
-              }
-            }
-          }
+          ]
         }
-      },
-      [EXPERIMENT_WORKSPACE_ID]: {
-        baseline: {}
-      }
-    })
+      )
+    )
+
     const mixedParam = columns.find(
       column =>
         column.path ===
@@ -207,40 +188,38 @@ describe('collectColumns', () => {
     expect(mixedParam.maxNumber).toStrictEqual(1)
   })
 
-  const numericColumns = collectColumns({
-    branch1: {
-      baseline: {
+  const numericColumns = collectColumns(
+    generateTestExpShowOutput(
+      {},
+      {
+        rev: 'branch1',
         data: {
           params: {
             'params.yaml': {
               data: { withNumbers: -1, withoutNumbers: 'a' }
             }
           }
-        }
-      },
-      exp1: {
-        data: {
-          params: {
-            'params.yaml': {
-              data: { withNumbers: 2, withoutNumbers: 'b' }
+        },
+        experiments: [
+          {
+            params: {
+              'params.yaml': {
+                data: { withNumbers: 2, withoutNumbers: 'b' }
+              }
+            }
+          },
+          {
+            params: {
+              'params.yaml': {
+                data: { withNumbers: 'c', withoutNumbers: 'b' }
+              }
             }
           }
-        }
-      },
-      exp2: {
-        data: {
-          params: {
-            'params.yaml': {
-              data: { withNumbers: 'c', withoutNumbers: 'b' }
-            }
-          }
-        }
+        ]
       }
-    },
-    [EXPERIMENT_WORKSPACE_ID]: {
-      baseline: {}
-    }
-  })
+    )
+  )
+
   const param = numericColumns.filter(
     column => column.type === ColumnType.PARAMS
   )
@@ -267,29 +246,36 @@ describe('collectColumns', () => {
   })
 
   it('should aggregate multiple different field names', () => {
-    const columns = collectColumns({
-      branchA: {
-        baseline: {
+    const columns = collectColumns(
+      generateTestExpShowOutput(
+        {
+          params: {
+            'params.yaml': {
+              data: { one: 1 }
+            }
+          }
+        },
+        {
+          rev: 'branchA',
           data: {
             params: {
               'params.yaml': {
                 data: { two: 2 }
               }
             }
-          }
-        },
-        otherExp: {
-          data: {
-            params: {
-              'params.yaml': {
-                data: { three: 3 }
+          },
+          experiments: [
+            {
+              params: {
+                'params.yaml': {
+                  data: { three: 3 }
+                }
               }
             }
-          }
-        }
-      },
-      branchB: {
-        baseline: {
+          ]
+        },
+        {
+          rev: 'branchB',
           data: {
             params: {
               'params.yaml': {
@@ -298,19 +284,8 @@ describe('collectColumns', () => {
             }
           }
         }
-      },
-      [EXPERIMENT_WORKSPACE_ID]: {
-        baseline: {
-          data: {
-            params: {
-              'params.yaml': {
-                data: { one: 1 }
-              }
-            }
-          }
-        }
-      }
-    })
+      )
+    )
 
     const params = columns.filter(
       column =>
@@ -327,25 +302,21 @@ describe('collectColumns', () => {
   })
 
   it('should create concatenated columns for nesting deeper than 5', () => {
-    const columns = collectColumns({
-      [EXPERIMENT_WORKSPACE_ID]: {
-        baseline: {
-          data: {
-            params: {
-              'params.yaml': {
-                data: {
-                  one: {
-                    two: {
-                      three: { four: { five: { six: { seven: 'Lucky!' } } } }
-                    }
-                  }
+    const columns = collectColumns(
+      generateTestExpShowOutput({
+        params: {
+          'params.yaml': {
+            data: {
+              one: {
+                two: {
+                  three: { four: { five: { six: { seven: 'Lucky!' } } } }
                 }
               }
             }
           }
         }
-      }
-    })
+      })
+    )
 
     expect(columns.map(({ path }) => path)).toStrictEqual([
       timestampColumn.path,
@@ -380,23 +351,19 @@ describe('collectColumns', () => {
   })
 
   it('should not report types for params and metrics without primitives or children for params and metrics without objects', () => {
-    const columns = collectColumns({
-      [EXPERIMENT_WORKSPACE_ID]: {
-        baseline: {
-          data: {
-            params: {
-              'params.yaml': {
-                data: {
-                  onlyHasChild: {
-                    onlyHasPrimitive: 1
-                  }
-                }
+    const columns = collectColumns(
+      generateTestExpShowOutput({
+        params: {
+          'params.yaml': {
+            data: {
+              onlyHasChild: {
+                onlyHasPrimitive: 1
               }
             }
           }
         }
-      }
-    })
+      })
+    )
 
     const objectParam = columns.find(
       column =>
@@ -429,94 +396,31 @@ describe('collectColumns', () => {
 
     expect(onlyHasPrimitiveChild).toBeUndefined()
   })
-
-  it('should collect all params and metrics from the test fixture', () => {
-    expect(collectColumns(outputFixture).map(({ path }) => path)).toStrictEqual(
-      [
-        timestampColumn.path,
-        buildMetricOrParamPath(ColumnType.METRICS, 'summary.json'),
-        buildMetricOrParamPath(ColumnType.METRICS, 'summary.json', 'loss'),
-        buildMetricOrParamPath(ColumnType.METRICS, 'summary.json', 'accuracy'),
-        buildMetricOrParamPath(ColumnType.METRICS, 'summary.json', 'val_loss'),
-        buildMetricOrParamPath(
-          ColumnType.METRICS,
-          'summary.json',
-          'val_accuracy'
-        ),
-        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
-        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'code_names'),
-        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'epochs'),
-        buildMetricOrParamPath(
-          ColumnType.PARAMS,
-          'params.yaml',
-          'learning_rate'
-        ),
-        buildMetricOrParamPath(
-          ColumnType.PARAMS,
-          'params.yaml',
-          'dvc_logs_dir'
-        ),
-        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'log_file'),
-        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'dropout'),
-        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'process'),
-        buildMetricOrParamPath(
-          ColumnType.PARAMS,
-          'params.yaml',
-          'process',
-          'threshold'
-        ),
-        buildMetricOrParamPath(
-          ColumnType.PARAMS,
-          'params.yaml',
-          'process',
-          'test_arg'
-        ),
-        buildMetricOrParamPath(
-          ColumnType.PARAMS,
-          join('nested', 'params.yaml')
-        ),
-        buildMetricOrParamPath(
-          ColumnType.PARAMS,
-          join('nested', 'params.yaml'),
-          'test'
-        ),
-        buildDepPath('data'),
-        buildDepPath('data', 'data.xml'),
-        buildDepPath('src'),
-        buildDepPath('src', 'prepare.py'),
-        buildDepPath('data', 'prepared'),
-        buildDepPath('src', 'featurization.py'),
-        buildDepPath('data', 'features'),
-        buildDepPath('src', 'train.py'),
-        buildDepPath('model.pkl'),
-        buildDepPath('src', 'evaluate.py')
-      ]
-    )
-  })
 })
 
 describe('collectChanges', () => {
-  const mockedExperimentData = {
-    baseline: {
-      data: {
-        metrics: {
-          'logs.json': {
-            data: { acc: 0.752, loss: 1.1647908687591553, step: 9 }
-          }
-        },
-        params: {
-          'params.yaml': {
-            data: { lr: 0.0005, seed: 473987, weight_decay: 0 }
-          }
-        }
+  const mockedMetricsAndParams = {
+    metrics: {
+      'logs.json': {
+        data: { acc: 0.752, loss: 1.1647908687591553, step: 9 }
+      }
+    },
+    params: {
+      'params.yaml': {
+        data: { lr: 0.0005, seed: 473987, weight_decay: 0 }
       }
     }
   }
 
   it('should mark new dep files as changes', () => {
     const changes = collectChanges(uncommittedDepsFixture)
+    const [workspace] = uncommittedDepsFixture
+    if (experimentHasError(workspace)) {
+      throw new Error('Experiment should not have error')
+    }
+
     expect(changes).toStrictEqual(
-      Object.keys(uncommittedDepsFixture.workspace.baseline.data?.deps || {})
+      Object.keys(workspace.data.deps || {})
         .map(dep => `deps:${dep}`)
         .sort()
     )
@@ -528,23 +432,22 @@ describe('collectChanges', () => {
   })
 
   it('should return an empty array if there are no changes from the current commit and the workspace', () => {
-    const data: ExperimentsOutput = {
-      f8a6ee1997b193ebc774837a284081ff9e8dc2d5: mockedExperimentData,
-      workspace: mockedExperimentData
-    }
+    const data: ExpShowOutput = generateTestExpShowOutput(
+      mockedMetricsAndParams,
+      {
+        data: mockedMetricsAndParams,
+        rev: 'f8a6ee1997b193ebc774837a284081ff9e8dc2d5'
+      }
+    )
 
     expect(collectChanges(data)).toStrictEqual([])
   })
 
   it('should collect the changes between the current commit and the workspace', () => {
-    const data: ExperimentsOutput = {
-      workspace: mockedExperimentData,
-      f8a6ee1997b193ebc774837a284081ff9e8dc2d5: {
-        baseline: {
-          data: {}
-        }
-      }
-    }
+    const data: ExpShowOutput = generateTestExpShowOutput(
+      mockedMetricsAndParams,
+      { rev: 'f8a6ee1997b193ebc774837a284081ff9e8dc2d5' }
+    )
 
     expect(collectChanges(data)).toStrictEqual([
       'metrics:logs.json:acc',
@@ -557,140 +460,153 @@ describe('collectChanges', () => {
   })
 
   it('should not fail when the workspace does not have metrics but a previous commit does', () => {
-    const data: ExperimentsOutput = {
-      [EXPERIMENT_WORKSPACE_ID]: {
-        baseline: {
-          data: {
-            params: mockedExperimentData.baseline.data.params
-          }
-        }
+    const data: ExpShowOutput = generateTestExpShowOutput(
+      {
+        params: mockedMetricsAndParams.params
       },
-      f8a6ee1997b193ebc774837a284081ff9e8dc2d5: mockedExperimentData
-    }
+      {
+        data: mockedMetricsAndParams,
+        rev: 'f8a6ee1997b193ebc774837a284081ff9e8dc2d5'
+      }
+    )
 
     expect(collectChanges(data)).toStrictEqual([])
   })
 
-  const updateParams = (data: ValueTree) => ({
-    baseline: {
-      data: {
-        timestamp: null,
-        params: {
-          'params.yaml': {
-            data
-          }
-        },
-        status: ExperimentStatus.SUCCESS,
-        executor: null
+  const getParams = (data: ValueTree) => ({
+    params: {
+      'params.yaml': {
+        data
       }
     }
   })
 
   it('should work for objects', () => {
     expect(
-      collectChanges({
-        workspace: updateParams({
-          a: { b: 1, d: { e: 100 } }
-        }),
-        '31c419826c6961bc0ec1d3900ac18bf904dcf82e': updateParams({
-          a: { b: 'c', d: { e: 'f' } }
-        })
-      })
+      collectChanges(
+        generateTestExpShowOutput(
+          getParams({
+            a: { b: 1, d: { e: 100 } }
+          }),
+          {
+            data: getParams({
+              a: { b: 'c', d: { e: 'f' } }
+            }),
+            rev: '31c419826c6961bc0ec1d3900ac18bf904dcf82e'
+          }
+        )
+      )
     ).toStrictEqual(['params:params.yaml:a.b', 'params:params.yaml:a.d.e'])
 
     expect(
-      collectChanges({
-        workspace: updateParams({
-          a: { b: 'c', d: { e: 'f' } }
-        }),
-        '31c419826c6961bc0ec1d3900ac18bf904dcf82e': updateParams({
-          a: { b: 'c', d: { e: 'f' } }
-        })
-      })
+      collectChanges(
+        generateTestExpShowOutput(
+          getParams({
+            a: { b: 'c', d: { e: 'f' } }
+          }),
+          {
+            data: getParams({
+              a: { b: 'c', d: { e: 'f' } }
+            }),
+            rev: '31c419826c6961bc0ec1d3900ac18bf904dcf82e'
+          }
+        )
+      )
     ).toStrictEqual([])
   })
 
   it('should work for arrays', () => {
     expect(
-      collectChanges({
-        workspace: updateParams({
-          a: [1, 1]
-        }),
-        '31c419826c6961bc0ec1d3900ac18bf904dcf82e': updateParams({
-          a: [1, 0]
-        })
-      })
+      collectChanges(
+        generateTestExpShowOutput(
+          getParams({
+            a: [1, 1]
+          }),
+          {
+            data: getParams({
+              a: [1, 0]
+            }),
+            rev: '31c419826c6961bc0ec1d3900ac18bf904dcf82e'
+          }
+        )
+      )
     ).toStrictEqual(['params:params.yaml:a'])
 
     expect(
-      collectChanges({
-        workspace: updateParams({
-          a: [1, 0]
-        }),
-        '31c419826c6961bc0ec1d3900ac18bf904dcf82e': updateParams({
-          a: [1, 0]
-        })
-      })
+      collectChanges(
+        generateTestExpShowOutput(
+          getParams({
+            a: [1, 0]
+          }),
+          {
+            data: getParams({
+              a: [1, 0]
+            }),
+            rev: '31c419826c6961bc0ec1d3900ac18bf904dcf82e'
+          }
+        )
+      )
     ).toStrictEqual([])
   })
 
   it('should work for nested arrays', () => {
     expect(
-      collectChanges({
-        workspace: updateParams({
-          a: { b: [1, 1] }
-        }),
-        '31c419826c6961bc0ec1d3900ac18bf904dcf82e': updateParams({
-          a: { b: [1, 0] }
-        })
-      })
+      collectChanges(
+        generateTestExpShowOutput(
+          getParams({
+            a: { b: [1, 1] }
+          }),
+          {
+            data: getParams({
+              a: { b: [1, 0] }
+            }),
+            rev: '31c419826c6961bc0ec1d3900ac18bf904dcf82e'
+          }
+        )
+      )
     ).toStrictEqual(['params:params.yaml:a.b'])
 
     expect(
-      collectChanges({
-        workspace: updateParams({
-          a: { b: [1, 0] }
-        }),
-        '31c419826c6961bc0ec1d3900ac18bf904dcf82e': updateParams({
-          a: { b: [1, 0] }
-        })
-      })
+      collectChanges(
+        generateTestExpShowOutput(
+          getParams({
+            a: { b: [1, 0] }
+          }),
+          {
+            data: getParams({
+              a: { b: [1, 0] }
+            }),
+            rev: '31c419826c6961bc0ec1d3900ac18bf904dcf82e'
+          }
+        )
+      )
     ).toStrictEqual([])
   })
 
   it('should work for missing nested arrays', () => {
     expect(
-      collectChanges({
-        [EXPERIMENT_WORKSPACE_ID]: {
-          baseline: {
-            data: {
-              timestamp: null,
-              status: ExperimentStatus.SUCCESS,
-              executor: null
-            }
+      collectChanges(
+        generateTestExpShowOutput(
+          {},
+          {
+            data: getParams({
+              a: { b: [1, 0] }
+            }),
+            rev: '31c419826c6961bc0ec1d3900ac18bf904dcf82e'
           }
-        },
-        '31c419826c6961bc0ec1d3900ac18bf904dcf82e': updateParams({
-          a: { b: [1, 0] }
-        })
-      })
+        )
+      )
     ).toStrictEqual([])
 
     expect(
-      collectChanges({
-        workspace: updateParams({
-          a: { b: [1, 0] }
-        }),
-        '31c419826c6961bc0ec1d3900ac18bf904dcf82e': {
-          baseline: {
-            data: {
-              timestamp: null,
-              status: ExperimentStatus.SUCCESS,
-              executor: null
-            }
-          }
-        }
-      })
+      collectChanges(
+        generateTestExpShowOutput(
+          getParams({
+            a: { b: [1, 0] }
+          }),
+          { rev: '31c419826c6961bc0ec1d3900ac18bf904dcf82e' }
+        )
+      )
     ).toStrictEqual(['params:params.yaml:a.b'])
   })
 
@@ -702,21 +618,25 @@ describe('collectChanges', () => {
     }
 
     expect(
-      collectChanges({
-        workspace: updateParams(nullParam),
-        '9c6ba26745d2fbc286a13b99011d5126b5a245dc': updateParams(nullParam)
-      })
+      collectChanges(
+        generateTestExpShowOutput(getParams(nullParam), {
+          data: getParams(nullParam),
+          rev: '9c6ba26745d2fbc286a13b99011d5126b5a245dc'
+        })
+      )
     ).toStrictEqual([])
 
     expect(
-      collectChanges({
-        workspace: updateParams(nullParam),
-        '9c6ba26745d2fbc286a13b99011d5126b5a245dc': updateParams({
-          param_tuning: {
-            logistic_regression: 1
-          }
+      collectChanges(
+        generateTestExpShowOutput(getParams(nullParam), {
+          data: getParams({
+            param_tuning: {
+              logistic_regression: 1
+            }
+          }),
+          rev: '9c6ba26745d2fbc286a13b99011d5126b5a245dc'
         })
-      })
+      )
     ).toStrictEqual(['params:params.yaml:param_tuning.logistic_regression'])
   })
 
@@ -728,32 +648,43 @@ describe('collectChanges', () => {
       lr: 10000000
     }
 
-    const data = {
-      workspace: updateParams(matchingParams),
-      '31c419826c6961bc0ec1d3900ac18bf904dcf82e': updateParams(matchingParams),
-      '1987d9de990090d73cf2afd73e6889d182585bf3': updateParams(differingParams),
-      '3d7fcb87062d136a2025f8c302312abe9593edf8': updateParams(differingParams)
-    }
+    const data = generateTestExpShowOutput(
+      getParams(matchingParams),
+      {
+        rev: '31c419826c6961bc0ec1d3900ac18bf904dcf82e',
+        data: getParams(matchingParams)
+      },
+      {
+        rev: '1987d9de990090d73cf2afd73e6889d182585bf3',
+        data: getParams(differingParams)
+      },
+      {
+        rev: '3d7fcb87062d136a2025f8c302312abe9593edf8',
+        data: getParams(differingParams)
+      }
+    )
     expect(collectChanges(data)).toStrictEqual([])
   })
 
   it('should not fail when there is no commit data', () => {
-    const data: ExperimentsOutput = {
-      [EXPERIMENT_WORKSPACE_ID]: {
-        baseline: {
-          data: {
-            params: mockedExperimentData.baseline.data.params
-          }
-        }
-      }
-    }
-
-    expect(collectChanges(data)).toStrictEqual([])
+    expect(collectChanges(generateTestExpShowOutput({}))).toStrictEqual([])
   })
 
   it('should collect the changes between the current commit and the workspace when the values are nested', () => {
-    const mockedCommitDropoutData = {
-      baseline: {
+    const data = generateTestExpShowOutput(
+      {
+        params: {
+          'params.yaml': {
+            data: {
+              dropout: {
+                lower: { p: { '0.025': 0.45, '0.05': 0.55 } },
+                upper: { p: { '0.025': 0.7, '0.05': 0.85 } }
+              }
+            }
+          }
+        }
+      },
+      {
         data: {
           params: {
             'params.yaml': {
@@ -765,41 +696,10 @@ describe('collectChanges', () => {
               }
             }
           }
-        }
+        },
+        rev: 'f8a6ee1997b193ebc774837a284081ff9e8dc2d5'
       }
-    }
-
-    const mockedWorkspaceDropoutData = {
-      baseline: {
-        data: {
-          params: {
-            'params.yaml': {
-              data: {
-                dropout: {
-                  lower: { p: { '0.025': 0.45, '0.05': 0.55 } },
-                  upper: { p: { '0.025': 0.7, '0.05': 0.85 } }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
-    const mockedCommitData = Object.assign(
-      { ...mockedExperimentData },
-      { ...mockedCommitDropoutData }
     )
-
-    const mockedWorkspaceData = Object.assign(
-      { ...mockedExperimentData },
-      { ...mockedWorkspaceDropoutData }
-    )
-
-    const data: ExperimentsOutput = {
-      f8a6ee1997b193ebc774837a284081ff9e8dc2d5: mockedCommitData,
-      workspace: mockedWorkspaceData
-    }
 
     expect(collectChanges(data)).toStrictEqual([
       buildMetricOrParamPath(
@@ -819,5 +719,30 @@ describe('collectChanges', () => {
         '0.025'
       )
     ])
+  })
+})
+
+describe('collectRelativeMetricsFiles', () => {
+  it('should return the expected metrics files from the test fixture', () => {
+    expect(collectRelativeMetricsFiles(outputFixture)).toStrictEqual([
+      'summary.json'
+    ])
+  })
+
+  it('should not fail when given an error', () => {
+    expect(
+      collectRelativeMetricsFiles([
+        {
+          rev: EXPERIMENT_WORKSPACE_ID,
+          error: { msg: 'I broke', type: 'not important' }
+        }
+      ])
+    ).toStrictEqual([])
+  })
+
+  it('should not fail when given empty output', () => {
+    const existingFiles: string[] = []
+
+    expect(collectRelativeMetricsFiles([])).toStrictEqual(existingFiles)
   })
 })

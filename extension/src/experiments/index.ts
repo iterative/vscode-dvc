@@ -29,28 +29,28 @@ import { UNSELECTED } from './model/status'
 import { starredSort } from './model/sortBy/constants'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ColumnsModel } from './columns/model'
-import { CheckpointsModel } from './checkpoints/model'
 import { ExperimentsData } from './data'
-import { Experiment, ColumnType, TableData } from './webview/contract'
+import {
+  Experiment,
+  ColumnType,
+  TableData,
+  isRunning
+} from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { DecorationProvider } from './model/decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
 import { ResourceLocator } from '../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { ExperimentsOutput, EXPERIMENT_WORKSPACE_ID } from '../cli/dvc/contract'
+import { ExpShowOutput } from '../cli/dvc/contract'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
-import { FileSystemData } from '../fileSystem/data'
 import { Title } from '../vscode/title'
 import { createTypedAccumulator } from '../util/object'
 import { pickPaths } from '../path/selection/quickPick'
 import { Toast } from '../vscode/toast'
 import { ConfigKey } from '../vscode/config'
 import { checkSignalFile, pollSignalFileForProcess } from '../fileSystem'
-import {
-  DVCLIVE_ONLY_RUNNING_SIGNAL_FILE,
-  ExperimentFlag
-} from '../cli/dvc/constants'
+import { DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
 
 export const ExperimentsScale = {
   ...omit(ColumnType, 'TIMESTAMP'),
@@ -64,26 +64,24 @@ export type ModifiedExperimentAndRunCommandId =
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeIsParamsFileFocused: Event<string | undefined>
-  public readonly onDidChangeExperiments: Event<ExperimentsOutput | void>
+  public readonly onDidChangeExperiments: Event<void>
   public readonly onDidChangeColumns: Event<void>
   public readonly onDidChangeColumnOrderOrStatus: Event<void>
   public readonly onDidChangeCheckpoints: Event<void>
 
   public readonly viewKey = ViewKey.EXPERIMENTS
 
-  private readonly cliData: ExperimentsData
-  private readonly fileSystemData: FileSystemData
+  private readonly data: ExperimentsData
 
   private readonly experiments: ExperimentsModel
   private readonly columns: ColumnsModel
-  private readonly checkpoints: CheckpointsModel
 
   private readonly paramsFileFocused = this.dispose.track(
     new EventEmitter<string | undefined>()
   )
 
   private readonly experimentsChanged = this.dispose.track(
-    new EventEmitter<ExperimentsOutput | void>()
+    new EventEmitter<void>()
   )
 
   private readonly checkpointsChanged = this.dispose.track(
@@ -120,8 +118,7 @@ export class Experiments extends BaseRepository<TableData> {
     selectBranches: (
       branchesSelected: string[]
     ) => Promise<string[] | undefined>,
-    cliData?: ExperimentsData,
-    fileSystemData?: FileSystemData
+    data?: ExperimentsData
   ) {
     super(dvcRoot, resourceLocator.beaker)
 
@@ -152,10 +149,8 @@ export class Experiments extends BaseRepository<TableData> {
       )
     )
 
-    this.checkpoints = this.dispose.track(new CheckpointsModel())
-
-    this.cliData = this.dispose.track(
-      cliData ||
+    this.data = this.dispose.track(
+      data ||
         new ExperimentsData(
           dvcRoot,
           internalCommands,
@@ -164,26 +159,17 @@ export class Experiments extends BaseRepository<TableData> {
         )
     )
 
-    this.fileSystemData = this.dispose.track(
-      fileSystemData || new FileSystemData(dvcRoot)
-    )
-
-    this.dispose.track(this.cliData.onDidUpdate(data => this.setState(data)))
+    this.dispose.track(this.data.onDidUpdate(data => this.setState(data)))
     this.dispose.track(
-      this.fileSystemData.onDidUpdate(data => {
-        const hadCheckpoints = this.hasCheckpoints()
-        this.checkpoints.transformAndSet(data)
-        if (hadCheckpoints !== this.hasCheckpoints()) {
-          this.checkpointsChanged.fire()
-        }
-        void this.webviewMessages.changeHasConfig(true)
-      })
+      this.data.onDidChangeDvcYaml(() =>
+        this.webviewMessages.changeHasConfig(true)
+      )
     )
 
     this.dispose.track(
       workspace.onDidChangeConfiguration((event: ConfigurationChangeEvent) => {
         if (event.affectsConfiguration(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT)) {
-          void this.cliData.update()
+          void this.data.update()
         }
       })
     )
@@ -194,27 +180,27 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public update() {
-    return this.cliData.managedUpdate()
+    return this.data.managedUpdate()
   }
 
-  public async setState(data: ExperimentsOutput) {
+  public async setState(data: ExpShowOutput) {
+    const hadCheckpoints = this.hasCheckpoints()
     const dvcLiveOnly = await this.checkSignalFile()
-    const dataKeys = Object.keys(data)
-    const commitsOutput = await this.internalCommands.executeCommand(
-      AvailableCommands.GIT_GET_COMMIT_MESSAGES,
-      this.dvcRoot,
-      dataKeys[dataKeys.length - 1]
-    )
+    const commitsOutput = await this.getCommitOutput(data)
     await Promise.all([
       this.columns.transformAndSet(data),
       this.experiments.transformAndSet(data, dvcLiveOnly, commitsOutput)
     ])
 
-    return this.notifyChanged(data)
+    if (hadCheckpoints !== this.hasCheckpoints()) {
+      this.checkpointsChanged.fire()
+    }
+
+    return this.notifyChanged()
   }
 
   public hasCheckpoints() {
-    return this.checkpoints.hasCheckpoints()
+    return this.experiments.hasCheckpoints()
   }
 
   public getChildColumns(path?: string) {
@@ -236,16 +222,11 @@ export class Experiments extends BaseRepository<TableData> {
   public toggleExperimentStatus(
     id: string
   ): Color | typeof UNSELECTED | undefined {
-    if (this.experiments.isRunningInWorkspace(id)) {
-      return this.experiments.isSelected(EXPERIMENT_WORKSPACE_ID)
-        ? undefined
-        : this.toggleExperimentStatus(EXPERIMENT_WORKSPACE_ID)
-    }
-
     const selected = this.experiments.isSelected(id)
     if (!selected && !this.experiments.canSelect()) {
       return
     }
+
     const status = this.experiments.toggleStatus(id)
     this.notifyChanged()
     return status
@@ -368,8 +349,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getWorkspaceCommitsAndExperiments()
   }
 
-  public async selectExperiments() {
-    const experiments = this.experiments.getWorkspaceCommitsAndExperiments()
+  public async selectExperimentsToPlot() {
+    const experiments = this.experiments
+      .getWorkspaceCommitsAndExperiments()
+      .filter(({ status }) => !isRunning(status))
 
     const selected = await pickExperimentsToPlot(
       experiments,
@@ -457,14 +440,6 @@ export class Experiments extends BaseRepository<TableData> {
     this.experiments.setRevisionCollected(revisions)
   }
 
-  public getCommitRevisions() {
-    return this.experiments.getCommitRevisions()
-  }
-
-  public getExperimentRevisions() {
-    return this.experiments.getExperimentRevisions()
-  }
-
   public getFinishedExperiments() {
     return this.experiments.getFinishedExperiments()
   }
@@ -473,15 +448,8 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getExperiments()
   }
 
-  public getExperimentDisplayName(experimentId: string) {
-    const experiment = this.experiments
-      .getCombinedList()
-      .find(({ id }) => id === experimentId)
-    return experiment?.name || experiment?.label
-  }
-
-  public getRevisions() {
-    return this.experiments.getRevisions()
+  public getRevisionIds() {
+    return this.experiments.getRevisionIds()
   }
 
   public async modifyExperimentParamsAndRun(
@@ -536,6 +504,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.columns.hasNonDefaultColumns()
   }
 
+  public getRelativeMetricsFiles() {
+    return this.columns.getRelativeMetricsFiles()
+  }
+
   protected sendInitialWebviewData() {
     return this.webviewMessages.sendWebviewMessage()
   }
@@ -550,13 +522,13 @@ export class Experiments extends BaseRepository<TableData> {
     )
   }
 
-  private notifyChanged(data?: ExperimentsOutput) {
+  private notifyChanged() {
     this.decorationProvider.setState(
       this.experiments.getLabels(),
       this.experiments.getLabelsToDecorate(),
       this.experiments.getErrors()
     )
-    this.experimentsChanged.fire(data)
+    this.experimentsChanged.fire()
     this.notifyColumnsChanged()
   }
 
@@ -565,12 +537,23 @@ export class Experiments extends BaseRepository<TableData> {
     return this.webviewMessages.sendWebviewMessage()
   }
 
+  private getCommitOutput(data: ExpShowOutput | undefined) {
+    if (!(data && data.length > 1)) {
+      return
+    }
+    const [lastCommit] = data.slice(-1)
+    return this.internalCommands.executeCommand(
+      AvailableCommands.GIT_GET_COMMIT_MESSAGES,
+      this.dvcRoot,
+      lastCommit.rev
+    )
+  }
+
   private createWebviewMessageHandler() {
     const webviewMessages = new WebviewMessages(
       this.dvcRoot,
       this.experiments,
       this.columns,
-      this.checkpoints,
       () => this.getWebview(),
       () => this.notifyChanged(),
       () => this.selectColumns(),
@@ -592,7 +575,7 @@ export class Experiments extends BaseRepository<TableData> {
           AvailableCommands.GIT_GET_NUM_COMMITS,
           this.dvcRoot
         ),
-      (...args: (ExperimentFlag | string)[]) => this.cliData.update(...args)
+      () => this.data.update()
     )
 
     this.dispose.track(
@@ -609,13 +592,11 @@ export class Experiments extends BaseRepository<TableData> {
       return overrideId
     }
 
-    const experiment = await pickExperiment(
+    return await pickExperiment(
       this.experiments.getCombinedList(),
       this.getFirstThreeColumnOrder(),
       Title.SELECT_BASE_EXPERIMENT
     )
-
-    return experiment?.id
   }
 
   private watchActiveEditor() {
@@ -636,7 +617,7 @@ export class Experiments extends BaseRepository<TableData> {
       void pollSignalFileForProcess(this.dvcLiveOnlySignalFile, () => {
         this.dvcLiveOnlyCleanupInitialized = false
         if (this.hasRunningExperiment()) {
-          void this.cliData.update()
+          void this.data.update()
         }
       })
     }

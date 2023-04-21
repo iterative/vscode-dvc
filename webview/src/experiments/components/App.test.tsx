@@ -18,7 +18,7 @@ import {
 } from 'dvc/src/experiments/webview/contract'
 import { buildMetricOrParamPath } from 'dvc/src/experiments/columns/paths'
 import dataTypesTableFixture from 'dvc/src/test/fixtures/expShow/dataTypes/tableData'
-import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
+import { EXPERIMENT_WORKSPACE_ID, Executor } from 'dvc/src/cli/dvc/contract'
 import { useIsFullyContained } from './overflowHoverTooltip/useIsFullyContained'
 import styles from './table/styles.module.scss'
 import { vsCodeApi } from '../../shared/api'
@@ -158,7 +158,7 @@ describe('App', () => {
   })
 
   describe('Row expansion', () => {
-    const experimentLabel = '1ba7bcd'
+    const experimentLabel = '4fb124a'
 
     it('should maintain expansion status when rows are reordered', () => {
       renderTable()
@@ -206,7 +206,6 @@ describe('App', () => {
         ...changedRows[1],
         id: changedCommitName,
         label: changedCommitName,
-        name: changedCommitName,
         sha: '99999dfb4aa5fb41915610c3a256b418fc095610'
       }
 
@@ -249,7 +248,7 @@ describe('App', () => {
     }
 
     const selectSomeSubRows = () => {
-      clickRowCheckbox('1ba7bcd')
+      clickRowCheckbox('489fd8b')
       clickRowCheckbox('4fb124a')
 
       return 2
@@ -257,7 +256,7 @@ describe('App', () => {
 
     const starSomeSubRows = () => {
       const starredFixture = setExperimentsAsStarred(tableDataFixture, [
-        '1ba7bcd',
+        '489fd8b',
         '4fb124a'
       ])
 
@@ -322,10 +321,10 @@ describe('App', () => {
     it('should send a message to the extension to toggle an experiment when the row is clicked', () => {
       renderTable()
 
-      const testClick = (label: string, id = label) => {
+      const testClick = (element: HTMLElement, id: string) => {
         mockPostMessage.mockReset()
 
-        fireEvent.click(screen.getByText(label))
+        fireEvent.click(element)
 
         expect(mockPostMessage).toHaveBeenCalledTimes(1)
         expect(mockPostMessage).toHaveBeenCalledWith({
@@ -334,10 +333,14 @@ describe('App', () => {
         })
       }
 
-      testClick(EXPERIMENT_WORKSPACE_ID)
-      testClick('main')
-      testClick('[exp-e7a67]', 'exp-e7a67')
-      testClick('1ba7bcd', 'exp-83425')
+      const [workspace, experimentRunningInWorkspace] = screen.getAllByText(
+        EXPERIMENT_WORKSPACE_ID
+      )
+
+      testClick(workspace, EXPERIMENT_WORKSPACE_ID)
+      testClick(experimentRunningInWorkspace, 'exp-83425')
+      testClick(screen.getByText('main'), 'main')
+      testClick(screen.getByText('[exp-e7a67]'), 'exp-e7a67')
     })
 
     it('should send a message to the extension to toggle an experiment when Enter or Space is pressed on the row', () => {
@@ -381,14 +384,16 @@ describe('App', () => {
       })
       expect(mockPostMessage).not.toHaveBeenCalled()
     })
+
     it('should not send a message if row label was selected', () => {
       renderTable()
       mockPostMessage.mockClear()
 
       const testRowId = EXPERIMENT_WORKSPACE_ID
+      const getWorkspace = () => screen.getAllByText(testRowId)[0]
 
       createWindowTextSelection(testRowId, 5)
-      fireEvent.click(screen.getByText(testRowId))
+      fireEvent.click(getWorkspace())
 
       expect(mockPostMessage).not.toHaveBeenCalledTimes(1)
       expect(mockPostMessage).not.toHaveBeenCalledWith({
@@ -399,7 +404,7 @@ describe('App', () => {
       mockPostMessage.mockClear()
 
       clearSelection()
-      fireEvent.click(screen.getByText(testRowId))
+      fireEvent.click(getWorkspace())
 
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
@@ -979,7 +984,7 @@ describe('App', () => {
       stopOption && fireEvent.click(stopOption)
 
       expect(sendMessage).toHaveBeenCalledWith({
-        payload: [{ executor: 'dvc-task', id: 'exp-e7a67' }],
+        payload: [{ executor: Executor.DVC_TASK, id: 'exp-e7a67' }],
         type: MessageFromWebviewType.STOP_EXPERIMENT
       })
     })
@@ -987,7 +992,7 @@ describe('App', () => {
     it('should enable the user to stop an experiment running in the workspace', () => {
       renderTable()
 
-      const target = screen.getByText(EXPERIMENT_WORKSPACE_ID)
+      const [target] = screen.getAllByText(EXPERIMENT_WORKSPACE_ID)
       fireEvent.contextMenu(target, { bubbles: true })
 
       advanceTimersByTime(100)
@@ -1005,7 +1010,7 @@ describe('App', () => {
 
       expect(sendMessage).toHaveBeenCalledWith({
         payload: [
-          { executor: EXPERIMENT_WORKSPACE_ID, id: EXPERIMENT_WORKSPACE_ID }
+          { executor: Executor.WORKSPACE, id: EXPERIMENT_WORKSPACE_ID }
         ],
         type: MessageFromWebviewType.STOP_EXPERIMENT
       })
@@ -1069,9 +1074,9 @@ describe('App', () => {
       renderTableWithoutRunningExperiments()
 
       clickRowCheckbox('4fb124a')
-      clickRowCheckbox('1ba7bcd', true)
+      clickRowCheckbox('489fd8b', true)
 
-      expect(selectedRows().length).toBe(3)
+      expect(selectedRows().length).toBe(4)
 
       const target = screen.getByText('4fb124a')
       fireEvent.contextMenu(target, { bubbles: true })
@@ -1085,19 +1090,19 @@ describe('App', () => {
     it('should allow batch selection from the bottom up too', () => {
       renderTableWithoutRunningExperiments()
 
-      clickRowCheckbox('1ba7bcd')
+      clickRowCheckbox('489fd8b')
       clickRowCheckbox('4fb124a', true)
 
-      expect(selectedRows()).toHaveLength(3)
+      expect(selectedRows()).toHaveLength(4)
     })
 
     it('should present the Clear selected rows option when multiple rows are selected', () => {
       renderTableWithoutRunningExperiments()
 
       clickRowCheckbox('4fb124a')
-      clickRowCheckbox('1ba7bcd', true)
+      clickRowCheckbox('489fd8b', true)
 
-      expect(selectedRows().length).toBe(3)
+      expect(selectedRows().length).toBe(4)
 
       const target = screen.getByText('4fb124a')
       fireEvent.contextMenu(target, { bubbles: true })
@@ -1114,9 +1119,9 @@ describe('App', () => {
       renderTable()
 
       clickRowCheckbox('4fb124a')
-      clickRowCheckbox('1ba7bcd', true)
+      clickRowCheckbox('489fd8b', true)
 
-      expect(selectedRows().length).toBe(3)
+      expect(selectedRows().length).toBe(4)
 
       fireEvent.keyUp(getRow('42b8736'), { bubbles: true, key: 'Escape' })
 

@@ -3,6 +3,7 @@ import { ColumnsModel } from './model'
 import { appendColumnToPath, buildMetricOrParamPath } from './paths'
 import { timestampColumn } from './constants'
 import { buildMockMemento } from '../../test/util'
+import { generateTestExpShowOutput } from '../../test/util/experiments'
 import { Status } from '../../path/selection/model'
 import { PersistenceKey } from '../../persistence/constants'
 import { ColumnType } from '../webview/contract'
@@ -22,7 +23,6 @@ import survivalOutputFixture from '../../test/fixtures/expShow/survival/output'
 import survivalColumnsFixture from '../../test/fixtures/expShow/survival/columns'
 import { getConfigValue } from '../../vscode/config'
 import { buildMockedEventEmitter } from '../../test/util/jest'
-import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 
 jest.mock('../../vscode/config')
 jest.mock('@hediet/std/disposable')
@@ -51,9 +51,7 @@ describe('ColumnsModel', () => {
       buildMockMemento(),
       mockedColumnsOrderOrStatusChanged
     )
-    await model.transformAndSet({
-      [EXPERIMENT_WORKSPACE_ID]: { baseline: {} }
-    })
+    await model.transformAndSet(generateTestExpShowOutput({}))
 
     expect(model.getSelected()).toStrictEqual([])
   })
@@ -177,22 +175,17 @@ describe('ColumnsModel', () => {
       ColumnType.PARAMS,
       'params.yaml'
     )
-    const testParamPath = appendColumnToPath(paramsDotYamlPath, 'testparam')
-    const exampleData = {
-      [EXPERIMENT_WORKSPACE_ID]: {
-        baseline: {
+    const testParamPath = appendColumnToPath(paramsDotYamlPath, 'testParam')
+    const exampleData = generateTestExpShowOutput({
+      params: {
+        'params.yaml': {
           data: {
-            params: {
-              'params.yaml': {
-                data: {
-                  testparam: true
-                }
-              }
-            }
+            testParam: true
           }
         }
       }
-    }
+    })
+
     it('Shows all items when given no persisted status', async () => {
       const model = new ColumnsModel(
         exampleDvcRoot,
@@ -211,11 +204,11 @@ describe('ColumnsModel', () => {
         },
         {
           hasChildren: false,
-          label: 'testparam',
+          label: 'testParam',
           maxStringLength: 4,
           parentPath: paramsDotYamlPath,
           path: testParamPath,
-          pathArray: [ColumnType.PARAMS, 'params.yaml', 'testparam'],
+          pathArray: [ColumnType.PARAMS, 'params.yaml', 'testParam'],
           type: ColumnType.PARAMS,
           types: ['boolean']
         }
