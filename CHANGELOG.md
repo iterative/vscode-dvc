@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.1] - 2023-04-24
+
+### 🚀 New Features and Enhancements
+
+- Standardize how experiment information is displayed in plots ribbon [#3725](https://github.com/iterative/vscode-dvc/pull/3725) by [@mattseddon](https://github.com/mattseddon)
+- Match the way Studio displays experiment name information in the table [#3723](https://github.com/iterative/vscode-dvc/pull/3723) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix scheduled CLI output test (workspace has no timestamp) [#3734](https://github.com/iterative/vscode-dvc/pull/3734) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Fix e2e tests failing  [#3737](https://github.com/iterative/vscode-dvc/pull/3737) by [@julieg18](https://github.com/julieg18)
+
 ## [0.8.0] - 2023-04-21
 
 ### 🚀 New Features and Enhancements
