@@ -13,7 +13,7 @@
     "vscode-languageserver": "8.1.0",
     "vscode-languageserver-textdocument": "1.0.8",
     "vscode-uri": "3.0.7",
-    "yaml": "2.2.1"
+    "yaml": "2.2.2"
   },
   "scripts": {
     "build": "yarn webpack --mode production",
