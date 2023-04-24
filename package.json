@@ -64,7 +64,7 @@
     "prettier": "2.8.7",
     "prettier-config-standard": "5.0.0",
     "ts-node": "10.9.1",
-    "turbo": "1.9.1",
+    "turbo": "1.9.2",
     "typescript": "5.0.4"
   },
   "resolutions": {
