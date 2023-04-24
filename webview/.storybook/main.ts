@@ -11,7 +11,6 @@ export default {
   staticDirs: ['../../extension/src/test/fixtures/plotsDiff/staticImages'],
   addons: [
     'storybook-addon-themes',
-    'storybook-addon-designs',
     '@storybook/addon-essentials',
     '@storybook/addon-interactions',
     {

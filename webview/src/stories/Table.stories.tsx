@@ -100,13 +100,6 @@ export default {
     tableData
   },
   component: Experiments,
-  parameters: {
-    design: {
-      type: 'figma',
-      url: 'https://www.figma.com/file/AuQXbrFj60xA2QXOjo9Z65/Experiments-Panel-%E2%80%A2-496'
-    },
-    layout: 'fullscreen'
-  },
   title: 'Table'
 } as Meta
 
