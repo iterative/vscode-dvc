@@ -9,3 +9,11 @@
     color: var(--vscode-textLink-activeForeground);
   }
 }
+
+%buttonAsLink {
+  @extend %link;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}

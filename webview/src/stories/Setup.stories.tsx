@@ -9,7 +9,7 @@ const DEFAULT_DATA: SetupData = {
   canGitInitialize: false,
   cliCompatible: true,
   dvcCliDetails: {
-    location: 'path/to/python -m dvc',
+    exampleCommand: 'path/to/python -m dvc',
     version: '1.0.0'
   },
   hasData: false,
@@ -77,7 +77,7 @@ export const NoCLIPythonNotFound = Template.bind({})
 NoCLIPythonNotFound.args = getUpdatedArgs({
   cliCompatible: undefined,
   dvcCliDetails: {
-    location: undefined,
+    exampleCommand: undefined,
     version: undefined
   },
   isPythonExtensionInstalled: false,
@@ -88,7 +88,7 @@ export const NoCLIPythonExtensionUsed = Template.bind({})
 NoCLIPythonExtensionUsed.args = getUpdatedArgs({
   cliCompatible: undefined,
   dvcCliDetails: {
-    location: '/opt/homebrew/Caskroom/miniforge/base/bin/python -m dvc',
+    exampleCommand: '/opt/homebrew/Caskroom/miniforge/base/bin/python -m dvc',
     version: undefined
   },
   isPythonExtensionInstalled: true,
@@ -99,7 +99,7 @@ export const NoCLIPythonExtensionNotUsed = Template.bind({})
 NoCLIPythonExtensionNotUsed.args = getUpdatedArgs({
   cliCompatible: undefined,
   dvcCliDetails: {
-    location: '.env/bin/python -m dvc',
+    exampleCommand: '.env/bin/python -m dvc',
     version: undefined
   },
   isPythonExtensionInstalled: false,

@@ -2,30 +2,41 @@
 @import '../../../shared/mixins.scss';
 
 .envDetails {
+  margin: 0 auto;
   text-align: left;
   margin-bottom: 1rem;
 }
 
-.infoKey,
-.infoValue {
+.envDetailsKey,
+.envDetailsValue {
   padding: 5px;
 }
 
-.infoKey {
+.envDetailsKey {
   font-weight: bold;
   white-space: nowrap;
+  vertical-align: top;
 }
 
-.infoValue {
+.envDetailsValue {
   padding-left: 50px;
+  display: flex;
+  flex-direction: column;
+}
+
+.separator {
+  margin: 0 5px;
+
+  &::before {
+    content: '|';
+  }
 }
 
 .buttonAsLink {
-  @extend %link;
-  // TBD Move these into %buttonAsLink mixin?
-  background: none;
-  border: none;
-  padding: 0;
+  @extend %buttonAsLink;
   font-size: inherit;
-  cursor: pointer;
+}
+
+.sideBySideButtons > *:not(:first-child) {
+  margin-left: 15px;
 }

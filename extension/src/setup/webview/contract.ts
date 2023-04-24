@@ -1,13 +1,5 @@
-export enum DvcCliIndicator {
-  AUTO = 'auto',
-  MANUAL = 'manual',
-  GLOBAL = 'global'
-}
-
 export type DvcCliDetails = {
-  location: string | undefined
-  // TBD remove type entirely if we decide it's not useful
-  type?: DvcCliIndicator
+  exampleCommand: string | undefined
   version: string | undefined
 }
 

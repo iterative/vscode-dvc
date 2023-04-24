@@ -2,43 +2,59 @@ import React, { ReactElement } from 'react'
 import { DvcCliDetails } from 'dvc/src/setup/webview/contract'
 import { MAX_CLI_VERSION, MIN_CLI_VERSION } from 'dvc/src/cli/dvc/contract'
 import styles from './styles.module.scss'
-import { setupWorkspace } from '../messages'
+import { selectPythonInterpreter, setupWorkspace } from '../messages'
 
 const InfoRow: React.FC<{
   title: string
   text: string | ReactElement
 }> = ({ title, text }) => (
   <tr>
-    <td className={styles.infoKey}>{title}</td>
-    <td className={styles.infoValue}>{text}</td>
+    <td className={styles.envDetailsKey}>{title}</td>
+    <td className={styles.envDetailsValue}>{text}</td>
   </tr>
 )
 
-export const DvcEnvDetails: React.FC<DvcCliDetails> = ({
-  location,
-  version
+interface DvcEnvDetailsProps extends DvcCliDetails {
+  isPythonExtensionInstalled: boolean
+}
+
+export const DvcEnvDetails: React.FC<DvcEnvDetailsProps> = ({
+  exampleCommand,
+  version,
+  isPythonExtensionInstalled
 }) => {
-  const commandText = location || 'Not found'
+  const versionText = `${
+    version || 'Not found'
+  } (required >= ${MIN_CLI_VERSION} and < ${MAX_CLI_VERSION}.0.0)`
+  const commandText = exampleCommand || 'Not found'
   const command = (
-    <span>
-      <span className={styles.code}>{commandText}</span> (
-      <button className={styles.buttonAsLink} onClick={setupWorkspace}>
-        Setup workspace
-      </button>
-      )
-    </span>
+    <>
+      <span className={styles.command}>{commandText}</span>
+      <span className={styles.actions}>
+        <button className={styles.buttonAsLink} onClick={setupWorkspace}>
+          Configure
+        </button>
+        {isPythonExtensionInstalled && (
+          <>
+            <span className={styles.separator} />
+            <button
+              className={styles.buttonAsLink}
+              onClick={selectPythonInterpreter}
+            >
+              Select Python Interpreter
+            </button>
+          </>
+        )}
+      </span>
+    </>
   )
 
   return (
-    <div className={styles.envDetails}>
-      <table className={styles.info}>
-        <tbody>
-          <InfoRow title="Min Required Version" text={MIN_CLI_VERSION} />
-          <InfoRow title="Max Required Version" text={MAX_CLI_VERSION} />
-          <InfoRow title="Command" text={command} />
-          <InfoRow title="Version" text={version || 'Not found'} />
-        </tbody>
-      </table>
-    </div>
+    <table data-testid="dvc-env-details" className={styles.envDetails}>
+      <tbody>
+        {version && <InfoRow title="Command" text={command} />}
+        <InfoRow title="Version" text={versionText} />
+      </tbody>
+    </table>
   )
 }

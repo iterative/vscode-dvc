@@ -9,7 +9,6 @@ import {
   initializeDvc,
   initializeGit,
   installDvc,
-  selectPythonInterpreter,
   setupWorkspace,
   showExperiments
 } from '../messages'
@@ -40,7 +39,16 @@ export const Dvc: React.FC<DvcProps> = ({
   setSectionCollapsed,
   isExperimentsAvailable
 }) => {
-  const children = <>{dvcCliDetails && <DvcEnvDetails {...dvcCliDetails} />}</>
+  const children = (
+    <>
+      {dvcCliDetails && (
+        <DvcEnvDetails
+          {...dvcCliDetails}
+          isPythonExtensionInstalled={isPythonExtensionInstalled}
+        />
+      )}
+    </>
+  )
 
   if (cliCompatible === false) {
     return (
@@ -54,9 +62,7 @@ export const Dvc: React.FC<DvcProps> = ({
     return (
       <CliUnavailable
         installDvc={installDvc}
-        isPythonExtensionInstalled={isPythonExtensionInstalled}
         pythonBinPath={pythonBinPath}
-        selectPythonInterpreter={selectPythonInterpreter}
         setupWorkspace={setupWorkspace}
       >
         {children}

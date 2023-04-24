@@ -3,13 +3,10 @@ import {
   MessageFromWebviewType,
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
+import { MAX_CLI_VERSION, MIN_CLI_VERSION } from 'dvc/src/cli/dvc/contract'
 import '@testing-library/jest-dom/extend-expect'
 import React from 'react'
-import {
-  SetupSection,
-  SetupData,
-  DvcCliIndicator
-} from 'dvc/src/setup/webview/contract'
+import { SetupSection, SetupData } from 'dvc/src/setup/webview/contract'
 import { App } from './App'
 import { vsCodeApi } from '../../shared/api'
 
@@ -73,8 +70,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: false,
         dvcCliDetails: {
-          location: 'dvc',
-          type: DvcCliIndicator.GLOBAL,
+          exampleCommand: 'dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -104,8 +100,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: undefined,
         dvcCliDetails: {
-          location: 'dvc',
-          type: DvcCliIndicator.GLOBAL,
+          exampleCommand: 'dvc',
           version: undefined
         },
         hasData: false,
@@ -129,8 +124,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: undefined,
         dvcCliDetails: {
-          location: 'dvc',
-          type: DvcCliIndicator.GLOBAL,
+          exampleCommand: 'dvc',
           version: undefined
         },
         hasData: false,
@@ -158,8 +152,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: undefined,
         dvcCliDetails: {
-          location: defaultInterpreter,
-          type: DvcCliIndicator.AUTO,
+          exampleCommand: `${defaultInterpreter} -m dvc`,
           version: undefined
         },
         hasData: false,
@@ -186,8 +179,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: undefined,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.MANUAL,
+          exampleCommand: 'python -m dvc',
           version: undefined
         },
         hasData: false,
@@ -201,7 +193,7 @@ describe('App', () => {
         shareLiveToStudio: false
       })
 
-      const button = screen.getByText('Setup The Workspace')
+      const button = screen.getByText('Configure')
       fireEvent.click(button)
 
       expect(mockPostMessage).toHaveBeenCalledWith({
@@ -214,8 +206,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: undefined,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.AUTO,
+          exampleCommand: 'python -m dvc',
           version: undefined
         },
         hasData: false,
@@ -229,11 +220,11 @@ describe('App', () => {
         shareLiveToStudio: false
       })
 
-      const button = screen.getByText('Select Python Interpreter')
+      const button = screen.getByText('Configure')
       fireEvent.click(button)
 
       expect(mockPostMessage).toHaveBeenCalledWith({
-        type: MessageFromWebviewType.SELECT_PYTHON_INTERPRETER
+        type: MessageFromWebviewType.SETUP_WORKSPACE
       })
     })
 
@@ -242,8 +233,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: undefined,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.AUTO,
+          exampleCommand: 'python -m dvc',
           version: undefined
         },
         hasData: false,
@@ -270,8 +260,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.MANUAL,
+          exampleCommand: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -295,8 +284,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.MANUAL,
+          exampleCommand: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -318,8 +306,7 @@ describe('App', () => {
         canGitInitialize: true,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.MANUAL,
+          exampleCommand: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -344,8 +331,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.MANUAL,
+          exampleCommand: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -367,8 +353,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.MANUAL,
+          exampleCommand: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -390,8 +375,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.MANUAL,
+          exampleCommand: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -415,8 +399,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.MANUAL,
+          exampleCommand: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -443,8 +426,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.MANUAL,
+          exampleCommand: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -471,8 +453,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.MANUAL,
+          exampleCommand: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: true,
@@ -494,7 +475,159 @@ describe('App', () => {
       })
     })
 
-    // TBD add back tests when we have a more agreed upon solution
+    it('should show the user the version if dvc is installed', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        dvcCliDetails: {
+          exampleCommand: 'python -m dvc',
+          version: '1.0.0'
+        },
+        hasData: true,
+        isPythonExtensionInstalled: true,
+        isStudioConnected: true,
+        needsGitCommit: false,
+        needsGitInitialized: false,
+        projectInitialized: true,
+        pythonBinPath: 'python',
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      const envDetails = screen.getByTestId('dvc-env-details')
+      const exampleCommand = `1.0.0 (required >= ${MIN_CLI_VERSION} and < ${MAX_CLI_VERSION}.0.0)`
+
+      expect(within(envDetails).getByText('Version')).toBeInTheDocument()
+      expect(within(envDetails).getByText(exampleCommand)).toBeInTheDocument()
+    })
+
+    it('should tell the user that version is not found if dvc is not installed', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: false,
+        dvcCliDetails: {
+          exampleCommand: 'dvc',
+          version: undefined
+        },
+        hasData: false,
+        isPythonExtensionInstalled: false,
+        isStudioConnected: false,
+        needsGitCommit: false,
+        needsGitInitialized: undefined,
+        projectInitialized: false,
+        pythonBinPath: undefined,
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+      const envDetails = screen.getByTestId('dvc-env-details')
+      const exampleCommand = `Not found (required >= ${MIN_CLI_VERSION} and < ${MAX_CLI_VERSION}.0.0)`
+
+      expect(within(envDetails).getByText('Version')).toBeInTheDocument()
+      expect(within(envDetails).getByText(exampleCommand)).toBeInTheDocument()
+    })
+
+    it('should show the user an example command if dvc is installed', () => {
+      const exampleCommand = 'python -m dvc'
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        dvcCliDetails: {
+          exampleCommand,
+          version: '1.0.0'
+        },
+        hasData: true,
+        isPythonExtensionInstalled: true,
+        isStudioConnected: true,
+        needsGitCommit: false,
+        needsGitInitialized: false,
+        projectInitialized: true,
+        pythonBinPath: 'python',
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      const envDetails = screen.getByTestId('dvc-env-details')
+
+      expect(within(envDetails).getByText('Command')).toBeInTheDocument()
+      expect(within(envDetails).getByText(exampleCommand)).toBeInTheDocument()
+    })
+
+    it('should show user an example command with a "Configure" button if dvc is installed without the python extension', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        dvcCliDetails: {
+          exampleCommand: 'dvc',
+          version: '1.0.0'
+        },
+        hasData: true,
+        isPythonExtensionInstalled: false,
+        isStudioConnected: true,
+        needsGitCommit: false,
+        needsGitInitialized: false,
+        projectInitialized: true,
+        pythonBinPath: undefined,
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      const envDetails = screen.getByTestId('dvc-env-details')
+
+      expect(within(envDetails).getByText('Command')).toBeInTheDocument()
+
+      const configureButton = within(envDetails).getByText('Configure')
+
+      expect(configureButton).toBeInTheDocument()
+      expect(
+        within(envDetails).queryByText('Select Python Interpreter')
+      ).not.toBeInTheDocument()
+
+      fireEvent.click(configureButton)
+
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SETUP_WORKSPACE
+      })
+    })
+
+    it('should show user an example command with "Configure" and "Select Python Interpreter" buttons if dvc is installed with the python extension', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        dvcCliDetails: {
+          exampleCommand: 'python -m dvc',
+          version: '1.0.0'
+        },
+        hasData: true,
+        isPythonExtensionInstalled: true,
+        isStudioConnected: true,
+        needsGitCommit: false,
+        needsGitInitialized: false,
+        projectInitialized: true,
+        pythonBinPath: 'python',
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      const envDetails = screen.getByTestId('dvc-env-details')
+
+      expect(within(envDetails).getByText('Command')).toBeInTheDocument()
+
+      const configureButton = within(envDetails).getByText('Configure')
+      const selectButton = within(envDetails).getByText(
+        'Select Python Interpreter'
+      )
+
+      expect(configureButton).toBeInTheDocument()
+      expect(selectButton).toBeInTheDocument()
+
+      mockPostMessage.mockClear()
+
+      fireEvent.click(selectButton)
+
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SELECT_PYTHON_INTERPRETER
+      })
+    })
   })
 
   describe('Experiments', () => {
@@ -503,8 +636,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.MANUAL,
+          exampleCommand: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -526,8 +658,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.MANUAL,
+          exampleCommand: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -556,8 +687,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: false,
         dvcCliDetails: {
-          location: 'dvc',
-          type: DvcCliIndicator.GLOBAL,
+          exampleCommand: 'dvc',
           version: undefined
         },
         hasData: false,
@@ -579,8 +709,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.MANUAL,
+          exampleCommand: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: true,
@@ -604,8 +733,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.MANUAL,
+          exampleCommand: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -627,8 +755,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.MANUAL,
+          exampleCommand: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: undefined,
@@ -650,8 +777,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.MANUAL,
+          exampleCommand: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -675,8 +801,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.AUTO,
+          exampleCommand: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: true,
@@ -705,8 +830,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.AUTO,
+          exampleCommand: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -730,8 +854,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.AUTO,
+          exampleCommand: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -759,8 +882,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.AUTO,
+          exampleCommand: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -788,8 +910,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.AUTO,
+          exampleCommand: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -820,8 +941,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.AUTO,
+          exampleCommand: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -849,8 +969,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'python',
-          type: DvcCliIndicator.AUTO,
+          exampleCommand: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -877,8 +996,7 @@ describe('App', () => {
       canGitInitialize: false,
       cliCompatible: true,
       dvcCliDetails: {
-        location: 'python',
-        type: DvcCliIndicator.AUTO,
+        exampleCommand: 'python -m dvc',
         version: '1.0.0'
       },
       hasData: false,

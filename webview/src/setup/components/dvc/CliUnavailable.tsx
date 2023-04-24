@@ -1,4 +1,5 @@
 import React, { ReactElement } from 'react'
+import styles from './styles.module.scss'
 import { Button } from '../../../shared/components/button/Button'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 
@@ -6,82 +7,41 @@ const Title: React.FC = () => <h1>DVC is currently unavailable</h1>
 
 export type CliUnavailableProps = {
   installDvc: () => void
-  isPythonExtensionInstalled: boolean
   pythonBinPath: string | undefined
-  selectPythonInterpreter: () => void
   setupWorkspace: () => void
   children: ReactElement
 }
 
-const OfferToInstall: React.FC<{
-  children: React.ReactNode
-  pythonBinPath: string
-  installDvc: () => void
-}> = ({ installDvc, pythonBinPath, children }) => (
-  <div>
-    <p>DVC & DVCLive can be auto-installed as packages with {pythonBinPath}</p>
-    <Button onClick={installDvc} text="Install" />
-    {children}
-  </div>
-)
-
-const UpdateInterpreterOrFind: React.FC<{
-  action: string
-  description: string
-  onClick: () => void
-}> = ({ action, description, onClick }) => (
-  <div>
-    <p>{description}</p>
-    <Button onClick={onClick} text={action} />
-  </div>
-)
-
 export const CliUnavailable: React.FC<CliUnavailableProps> = ({
   installDvc,
-  isPythonExtensionInstalled,
   pythonBinPath,
-  selectPythonInterpreter,
   setupWorkspace,
   children
 }) => {
-  const SetupWorkspace: React.FC<{ description: string }> = ({
-    description
-  }) => (
-    <UpdateInterpreterOrFind
-      description={description}
-      action="Setup The Workspace"
-      onClick={setupWorkspace}
-    />
-  )
-
   const canInstall = !!pythonBinPath
 
-  if (!canInstall) {
-    return (
-      <EmptyState isFullScreen={false}>
-        <Title />
-        {children}
-        <p>DVC & DVCLive cannot be auto-installed as Python was not located.</p>
-        <SetupWorkspace description="To locate a Python Interpreter or DVC." />
-      </EmptyState>
-    )
-  }
+  const contents = canInstall ? (
+    <>
+      <p>
+        DVC & DVCLive can be auto-installed as packages with {pythonBinPath}
+      </p>
+      <div className={styles.sideBySideButtons}>
+        <Button onClick={installDvc} text="Install" />
+        <Button onClick={setupWorkspace} text="Configure" />
+      </div>
+    </>
+  ) : (
+    <>
+      <p>DVC & DVCLive cannot be auto-installed as Python was not located.</p>
+      <Button onClick={setupWorkspace} text="Configure" />
+    </>
+  )
 
   return (
     <EmptyState isFullScreen={false}>
       <Title />
       {children}
-      <OfferToInstall pythonBinPath={pythonBinPath} installDvc={installDvc}>
-        {isPythonExtensionInstalled ? (
-          <UpdateInterpreterOrFind
-            action="Select Python Interpreter"
-            description="To update the interpreter and/or locate DVC."
-            onClick={selectPythonInterpreter}
-          />
-        ) : (
-          <SetupWorkspace description="To update the install location or locate DVC." />
-        )}
-      </OfferToInstall>
+      {contents}
     </EmptyState>
   )
 }

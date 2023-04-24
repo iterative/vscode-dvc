@@ -857,12 +857,8 @@ $badge-size: 0.85rem;
 }
 
 .buttonAsLink {
-  @extend %link;
-  background: none;
-  border: none;
-  padding: 0;
+  @extend %buttonAsLink;
   font-size: 0.65rem;
-  cursor: pointer;
 }
 
 .addConfigButton {

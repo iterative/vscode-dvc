@@ -56,6 +56,7 @@ import { GLOBAL_WEBVIEW_DVCROOT } from '../webview/factory'
 import { ConfigKey, getConfigValue } from '../vscode/config'
 import { getValidInput } from '../vscode/inputBox'
 import { Title } from '../vscode/title'
+import { getOptions } from '../cli/dvc/options'
 
 export type SetupWebviewWebview = BaseWebview<TSetupData>
 
@@ -339,11 +340,27 @@ export class Setup
     return this.sendDataToWebview()
   }
 
+  public getExampleCommand(
+    pythonBinPath: string | undefined,
+    dvcPath: string,
+    cwd: string
+  ) {
+    const { args, executable } = getOptions(pythonBinPath, dvcPath, cwd)
+    const commandArgs = args.join(' ').length === 0 ? '' : ` ${args.join(' ')}`
+    const command = executable + commandArgs
+    return command + commandArgs
+  }
+
   public async getEnvDetails(): Promise<DvcCliDetails> {
     const dvcPath = this.config.getCliPath()
     const pythonBinPath = this.config.getPythonBinPath()
     let version
     const cwd = getFirstWorkspaceFolder()
+    const exampleCommand = this.getExampleCommand(
+      pythonBinPath,
+      dvcPath,
+      cwd || ''
+    )
 
     if (cwd) {
       version = await this.getCliVersion(cwd)
@@ -351,15 +368,13 @@ export class Setup
 
     if (dvcPath || !pythonBinPath) {
       return {
-        location: dvcPath ? 'dvc' : undefined,
+        exampleCommand: dvcPath ? exampleCommand : undefined,
         version
       }
     }
-    // TBD if were going to keep this command logic we need to
-    // 1. possibly pull args from somewhere (see getOptions())
-    // 2. rename location to command
+
     return {
-      location: `${pythonBinPath} -m dvc`,
+      exampleCommand,
       version
     }
   }
