@@ -20,7 +20,7 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@reduxjs/toolkit": "1.9.3",
+    "@reduxjs/toolkit": "1.9.4",
     "@tanstack/react-table": "8.8.5",
     "@tippyjs/react": "4.2.6",
     "@vscode/webview-ui-toolkit": "1.2.2",
