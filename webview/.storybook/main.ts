@@ -2,6 +2,11 @@ import webpack from 'webpack'
 import webpackConfig from '../webpack.config'
 
 export default {
+  reactOptions: { fastRefresh: true },
+  framework: {
+    name: '@storybook/react-webpack5',
+    options: {}
+  },
   stories: ['../src/**/*.stories.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
   staticDirs: ['../../extension/src/test/fixtures/plotsDiff/staticImages'],
   addons: [

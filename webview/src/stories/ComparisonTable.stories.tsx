@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Meta, Story } from '@storybook/react/types-6-0'
+import type { StoryFn, Meta } from '@storybook/react'
 import { configureStore } from '@reduxjs/toolkit'
 import { userEvent, within } from '@storybook/testing-library'
 import React from 'react'
@@ -36,7 +36,7 @@ export default {
   title: 'Comparison Table'
 } as Meta
 
-const Template: Story = ({ plots, revisions }) => {
+const Template: StoryFn = ({ plots, revisions }) => {
   const store = configureStore({
     reducer: plotsReducers
   })

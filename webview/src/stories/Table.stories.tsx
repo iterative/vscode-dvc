@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 import React from 'react'
 import { Provider } from 'react-redux'
-import { Meta, Story } from '@storybook/react/types-6-0'
+import type { StoryFn, Meta } from '@storybook/react'
 import rowsFixture from 'dvc/src/test/fixtures/expShow/base/rows'
 import columnsFixture from 'dvc/src/test/fixtures/expShow/base/columns'
 import workspaceChangesFixture from 'dvc/src/test/fixtures/expShow/base/workspaceChanges'
@@ -110,7 +110,7 @@ export default {
   title: 'Table'
 } as Meta
 
-const Template: Story<{ tableData: TableDataState }> = ({ tableData }) => {
+const Template: StoryFn<{ tableData: TableDataState }> = ({ tableData }) => {
   return (
     <Provider
       store={configureStore({
@@ -242,7 +242,7 @@ WithNoSortsOrFilters.args = {
   }
 }
 
-export const Scrolled: Story<{ tableData: TableDataState }> = ({
+export const Scrolled: StoryFn<{ tableData: TableDataState }> = ({
   tableData
 }) => {
   return (

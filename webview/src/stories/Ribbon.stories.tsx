@@ -1,5 +1,5 @@
 import React from 'react'
-import { Story, Meta } from '@storybook/react/types-6-0'
+import type { StoryFn, Meta } from '@storybook/react'
 import { Provider, useDispatch } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
@@ -37,7 +37,7 @@ export default {
   title: 'Plots Ribbon'
 } as Meta
 
-const Template: Story<{
+const Template: StoryFn<{
   data?: PlotsData
 }> = ({ data }) => {
   const store = configureStore({ reducer: plotsReducers })

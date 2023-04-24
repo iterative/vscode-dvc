@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react/types-6-0'
+import type { StoryFn, Meta } from '@storybook/react'
 import React from 'react'
 import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'
 import { SelectMenu } from '../shared/components/selectMenu/SelectMenu'
@@ -82,7 +82,7 @@ export default {
   title: 'Icon Menu'
 } as Meta
 
-const Template: Story<{
+const Template: StoryFn<{
   items: IconMenuItemProps[]
 }> = ({ items }) => (
   <WebviewWrapper>

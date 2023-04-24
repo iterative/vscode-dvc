@@ -1,4 +1,4 @@
-import { Story, Meta } from '@storybook/react/types-6-0'
+import type { StoryFn, Meta } from '@storybook/react'
 import React from 'react'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
 import { SetupData, SetupSection } from 'dvc/src/setup/webview/contract'
@@ -37,7 +37,7 @@ export default {
   title: 'Setup'
 } as Meta
 
-const Template: Story = ({ data }) => {
+const Template: StoryFn = ({ data }) => {
   const app = <App />
   window.postMessage(
     {
