@@ -319,7 +319,10 @@ const fillTemplate = (
   datapoints: unknown[]
 ): TopLevelSpec => {
   return JSON.parse(
-    template.replace('"<DVC_METRIC_DATA>"', JSON.stringify(datapoints))
+    template
+      .replace('"<DVC_METRIC_DATA>"', JSON.stringify(datapoints))
+      .replace('"width":300', '"width":3000')
+      .replace('"height":300', '"height":3000')
   ) as TopLevelSpec
 }
 
