@@ -14,12 +14,12 @@
   font-size: 0.6rem;
   cursor: pointer;
 
-  &:hover:not(:disabled) {
-    text-decoration: none;
-  }
-
   &:disabled {
     opacity: 0.5;
+  }
+
+  &:hover:not(:disabled) {
+    text-decoration: none;
   }
 }
 
