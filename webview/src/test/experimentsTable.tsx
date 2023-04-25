@@ -38,6 +38,7 @@ export const renderTable = (data = tableDataFixture, noData?: boolean) => {
       queries: { ...queries, ...customQueries }
     }
   )
+
   !noData && setTableData(data)
   return renderedTable
 }

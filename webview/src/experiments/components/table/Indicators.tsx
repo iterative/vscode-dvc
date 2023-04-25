@@ -5,16 +5,19 @@ import { CellHintTooltip } from './body/CellHintTooltip'
 import {
   focusFiltersTree,
   focusSortsTree,
-  openPlotsWebview
+  openPlotsWebview,
+  selectBranches
 } from '../../util/messages'
 import { Icon } from '../../../shared/components/Icon'
 import {
   Filter,
+  GitMerge,
   GraphScatter,
   SortPrecedence
 } from '../../../shared/components/icons'
 import { pluralize } from '../../../util/strings'
 import { ExperimentsState } from '../../store'
+import { featureFlag } from '../../../util/flags'
 
 export type CounterBadgeProps = {
   count?: number
@@ -81,6 +84,10 @@ export const Indicators = () => {
   const selectedForPlotsCount = useSelector(
     (state: ExperimentsState) => state.tableData.selectedForPlotsCount
   )
+  const branchesSelected = useSelector(
+    (state: ExperimentsState) =>
+      Math.max(state.tableData.branches.length - 1, 0) // We always have one branch by default (the current one which is not selected)
+  )
 
   const sortsCount = sorts?.length
   const filtersCount = filters?.length
@@ -124,6 +131,20 @@ export const Indicators = () => {
       >
         <Icon width={16} height={16} icon={Filter} />
       </Indicator>
+      {featureFlag.ADD_REMOVE_BRANCHES && (
+        <Indicator
+          count={branchesSelected}
+          aria-label="branches"
+          onClick={selectBranches}
+          tooltipContent={formatCountMessage(
+            'Branches',
+            branchesSelected,
+            'Selected'
+          )}
+        >
+          <Icon width={16} height={16} icon={GitMerge} />
+        </Indicator>
+      )}
     </div>
   )
 }

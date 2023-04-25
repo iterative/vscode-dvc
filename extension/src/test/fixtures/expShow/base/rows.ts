@@ -15,8 +15,9 @@ const valueWithNoChanges = (str: string) => ({
 
 const colorsList = copyOriginalColors()
 
-const data: Commit[] = [
+export const rowsFixtureWithBranches: Commit[] = [
   {
+    branch: 'current',
     deps: {
       [join('data', 'data.xml')]: valueWithNoChanges(
         '22a1a2931c8370d3aeedd7183606fd7f'
@@ -72,6 +73,7 @@ const data: Commit[] = [
     starred: false
   },
   {
+    branch: 'current',
     deps: {
       [join('data', 'data.xml')]: valueWithNoChanges(
         '22a1a2931c8370d3aeedd7183606fd7f'
@@ -126,6 +128,7 @@ const data: Commit[] = [
     starred: false,
     subRows: [
       {
+        branch: 'current',
         deps: {
           [join('data', 'data.xml')]: valueWithNoChanges(
             '22a1a2931c8370d3aeedd7183606fd7f'
@@ -184,6 +187,7 @@ const data: Commit[] = [
         Created: '2020-12-29T15:31:52'
       },
       {
+        branch: 'current',
         deps: {
           [join('data', 'data.xml')]: valueWithNoChanges(
             '22a1a2931c8370d3aeedd7183606fd7f'
@@ -240,6 +244,7 @@ const data: Commit[] = [
         Created: '2020-12-29T15:28:59'
       },
       {
+        branch: 'current',
         deps: {
           [join('data', 'data.xml')]: valueWithNoChanges(
             '22a1a2931c8370d3aeedd7183606fd7f'
@@ -297,6 +302,7 @@ const data: Commit[] = [
         Created: '2020-12-29T15:27:02'
       },
       {
+        branch: 'current',
         displayColor: undefined,
         id: '489fd8b',
         sha: '489fd8bdaa709f7330aac342e051a9431c625481',
@@ -308,6 +314,7 @@ const data: Commit[] = [
         status: ExperimentStatus.FAILED
       },
       {
+        branch: 'current',
         deps: {
           [join('data', 'data.xml')]: valueWithNoChanges(
             '22a1a2931c8370d3aeedd7183606fd7f'
@@ -359,6 +366,7 @@ const data: Commit[] = [
         Created: '2020-12-29T15:26:36'
       },
       {
+        branch: 'current',
         displayColor: undefined,
         deps: {
           [join('data', 'data.xml')]: valueWithNoChanges(
@@ -407,6 +415,7 @@ const data: Commit[] = [
         Created: '2020-12-29T15:25:27'
       },
       {
+        branch: 'current',
         displayColor: undefined,
         deps: {
           [join('data', 'data.xml')]: valueWithNoChanges(
@@ -461,4 +470,15 @@ const data: Commit[] = [
   }
 ]
 
-export default data
+const rowsFixtureWithoutBranches = [
+  ...rowsFixtureWithBranches.map(({ branch, ...row }) =>
+    row.subRows
+      ? {
+          ...row,
+          subRows: row.subRows?.map(({ branch, ...subRow }) => subRow)
+        }
+      : row
+  )
+]
+
+export default rowsFixtureWithoutBranches
