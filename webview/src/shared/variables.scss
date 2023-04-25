@@ -1,15 +1,24 @@
+/* common */
+$bullet-size: 9px;
+$tooltip-border: var(--vscode-editorHoverWidget-border);
+$hover-background-color: var(--vscode-list-hoverBackground);
+$shadow: var(--vscode-widget-shadow);
+
+/* common colors */
 $fg-color: var(--vscode-editor-foreground);
 $bg-color: var(--vscode-editor-background);
-$bullet-size: 9px;
 $watermark-color: var(--vscode-descriptionForeground);
-
 $border-color: var(--vscode-checkbox-border);
 $metrics-color: var(--vscode-dvc-metrics);
 $params-color: var(--vscode-dvc-params);
 $deps-color: var(--vscode-dvc-deps);
 $changed-color: var(--vscode-dvc-workspaceChanged);
 $error-color: var(--vscode-errorForeground);
+$meta-cell-color: var(--vscode-descriptionForeground);
+$accent-color: var(--button-primary-background);
+$accent-color-transparent: var(--accent-transparency-3);
 
+/* experiments table */
 $row-bg-color: $bg-color;
 $header-fg-color: $fg-color;
 $row-bg-alt-color: var(--vscode-sideBar-background);
@@ -20,30 +29,19 @@ $header-bg-color: $bg-color;
 $header-border-color: $border-color;
 $header-dnd-outline: var(--contrast-active-border);
 $header-dnd-drop-background: var(--vscode-editorGroup-dropBackground);
-$meta-cell-color: var(--vscode-descriptionForeground);
 $header-resizer-color: var(--vscode-sash-hoverBorder);
 $header-drop-target-color: var(--vscode-focusBorder);
-$tooltip-border: var(--vscode-editorHoverWidget-border);
-
-$hover-background-color: var(--vscode-list-hoverBackground);
 $row-hover-background-color: var(--vscode-list-hoverBackground);
-
-$accent-color: var(--button-primary-background);
-$accent-color-transparent: var(--accent-transparency-3);
-
-$indicator-badge-background: var(--vscode-activityBarBadge-background);
-$indicator-badge-foreground: var(--vscode-activityBarBadge-foreground);
-
 $icon-color: var(--vscode-descriptionForeground);
 $selected-icon-color: var(
   --vscode-list-activeSelectionIconForeground,
   var(--vscode-descriptionForeground)
 );
 $row-action-star-checked: var(--vscode-editorLightBulb-foreground);
-
-$shadow: var(--vscode-widget-shadow);
-
-$plot-block-bg-color: var(--vscode-dropdown-background);
-
 $checkbox-background: var(--checkbox-background);
 $checkbox-border: var(--checkbox-border);
+$indicator-badge-background: var(--vscode-activityBarBadge-background);
+$indicator-badge-foreground: var(--vscode-activityBarBadge-foreground);
+
+/* plots */
+$plot-block-bg-color: var(--vscode-dropdown-background);
