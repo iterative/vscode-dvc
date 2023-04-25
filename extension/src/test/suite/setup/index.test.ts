@@ -239,7 +239,7 @@ suite('Setup Test Suite', () => {
       expect(mockSendMessage).to.be.calledWithExactly({
         canGitInitialize: true,
         cliCompatible: undefined,
-        dvcCliDetails: { location: 'dvc', type: 'global', version: undefined },
+        dvcCliDetails: { exampleCommand: 'dvc', version: undefined },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -280,11 +280,7 @@ suite('Setup Test Suite', () => {
       expect(mockSendMessage).to.be.calledWithExactly({
         canGitInitialize: true,
         cliCompatible: true,
-        dvcCliDetails: {
-          location: 'dvc',
-          type: 'global',
-          version: MIN_CLI_VERSION
-        },
+        dvcCliDetails: { exampleCommand: 'dvc', version: '2.55.0' },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -332,8 +328,7 @@ suite('Setup Test Suite', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'dvc',
-          type: 'global',
+          exampleCommand: 'dvc',
           version: MIN_CLI_VERSION
         },
         hasData: false,
@@ -383,8 +378,7 @@ suite('Setup Test Suite', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          location: 'dvc',
-          type: 'global',
+          exampleCommand: 'dvc',
           version: MIN_CLI_VERSION
         },
         hasData: false,

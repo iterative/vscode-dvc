@@ -89,7 +89,6 @@ export class Setup
 
   private cliAccessible = false
   private cliCompatible: boolean | undefined
-  private cliVersion: string | undefined
 
   private dotFolderWatcher?: Disposer
 
@@ -340,42 +339,18 @@ export class Setup
     return this.sendDataToWebview()
   }
 
-  public getExampleCommand(
-    pythonBinPath: string | undefined,
-    dvcPath: string,
-    cwd: string
-  ) {
-    const { args, executable } = getOptions(pythonBinPath, dvcPath, cwd)
-    const commandArgs = args.join(' ').length === 0 ? '' : ` ${args.join(' ')}`
-    const command = executable + commandArgs
-    return command + commandArgs
-  }
-
   public async getEnvDetails(): Promise<DvcCliDetails> {
     const dvcPath = this.config.getCliPath()
     const pythonBinPath = this.config.getPythonBinPath()
-    let version
     const cwd = getFirstWorkspaceFolder()
-    const exampleCommand = this.getExampleCommand(
-      pythonBinPath,
-      dvcPath,
-      cwd || ''
-    )
 
-    if (cwd) {
-      version = await this.getCliVersion(cwd)
-    }
-
-    if (dvcPath || !pythonBinPath) {
-      return {
-        exampleCommand: dvcPath ? exampleCommand : undefined,
-        version
-      }
-    }
+    const { args, executable } = getOptions(pythonBinPath, dvcPath, cwd || '')
+    const commandArgs = args.join(' ').length === 0 ? '' : ` ${args.join(' ')}`
+    const exampleCommand = executable + commandArgs
 
     return {
       exampleCommand,
-      version
+      version: cwd ? await this.getCliVersion(cwd) : undefined
     }
   }
 

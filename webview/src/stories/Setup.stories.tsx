@@ -77,7 +77,7 @@ export const NoCLIPythonNotFound = Template.bind({})
 NoCLIPythonNotFound.args = getUpdatedArgs({
   cliCompatible: undefined,
   dvcCliDetails: {
-    exampleCommand: undefined,
+    exampleCommand: 'dvc',
     version: undefined
   },
   isPythonExtensionInstalled: false,
