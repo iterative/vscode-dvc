@@ -21,6 +21,7 @@ window.acquireVsCodeApi = () =>
 export const preview: Preview = {
   parameters: {
     actions: { argTypesRegex: '^on[A-Z].*' },
+    backgrounds: { disable: true },
     viewport: {
       viewports,
       defaultViewport: 'default'
