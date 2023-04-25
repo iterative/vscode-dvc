@@ -52,7 +52,9 @@ describe('Experiments Table Webview', function () {
   const workspaceRow = 1
   const commitRows = 3
   const previousCommitRow = 1
-  const initialRows = headerRows + workspaceRow + commitRows + previousCommitRow
+  const actionsRow = 1
+  const initialRows =
+    headerRows + workspaceRow + commitRows + previousCommitRow + actionsRow
 
   it('should load as an editor', async function () {
     const workbench = await browser.getWorkbench()
