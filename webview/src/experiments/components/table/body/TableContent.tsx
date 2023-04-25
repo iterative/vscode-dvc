@@ -19,12 +19,10 @@ export const TableContent: React.FC<TableContentProps> = ({
 }) => {
   const { rows, flatRows } = instance.getRowModel()
   const { batchSelection, lastSelectedRow } = useContext(RowSelectionContext)
-  const hasCheckpoints = useSelector(
-    (state: ExperimentsState) => state.tableData.hasCheckpoints
+  const { hasCheckpoints, hasRunningExperiment, branches } = useSelector(
+    (state: ExperimentsState) => state.tableData
   )
-  const hasRunningExperiment = useSelector(
-    (state: ExperimentsState) => state.tableData.hasRunningExperiment
-  )
+
   const batchRowSelection = useCallback(
     ({ row: { id } }: RowProp) => {
       const lastSelectedRowId = lastSelectedRow?.row.id ?? ''
@@ -53,8 +51,6 @@ export const TableContent: React.FC<TableContentProps> = ({
     },
     [flatRows, batchSelection, lastSelectedRow]
   )
-
-  const branches = [...new Set(rows.map(row => row.original.branch))]
 
   return (
     <>

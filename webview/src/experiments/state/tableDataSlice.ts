@@ -10,9 +10,11 @@ import { keepReferenceIfEqual } from '../../util/objects'
 
 export interface TableDataState extends TableData {
   hasData?: boolean
+  branches: string[]
 }
 
 export const tableDataInitialState: TableDataState = {
+  branches: ['current'],
   changes: [],
   columnOrder: [],
   columnWidths: {},
@@ -103,6 +105,9 @@ export const tableDataSlice = createSlice({
         state.rows,
         action.payload
       ) as Experiment[]
+      state.branches = [
+        ...new Set(state.rows.map(row => row.branch))
+      ] as string[]
     },
     updateSelectedForPlotsCount: (state, action: PayloadAction<number>) => {
       state.selectedForPlotsCount = action.payload

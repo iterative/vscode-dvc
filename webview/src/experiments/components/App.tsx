@@ -91,7 +91,12 @@ export const App: React.FC<Record<string, unknown>> = () => {
                 )
                 continue
               case 'rows':
-                dispatch(updateRows(data.data.rows))
+                dispatch(
+                  updateRows(
+                    // Setting any branch for now just so that it isn't undefined. It does not matter the label for now as it is not shown
+                    data.data.rows.map(row => ({ ...row, branch: 'current' }))
+                  )
+                )
                 continue
               case 'selectedForPlotsCount':
                 dispatch(

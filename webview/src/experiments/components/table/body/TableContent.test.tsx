@@ -808,11 +808,16 @@ describe('TableContent', () => {
     })
   } as unknown as Table<Experiment>
 
-  const renderTableContent = (rowsInstance = instance) => {
+  const renderTableContent = (
+    rowsInstance = instance,
+    branches = ['current']
+  ) => {
     return render(
       <Provider
         store={configureStore({
-          preloadedState: { tableData },
+          preloadedState: {
+            tableData: { ...tableData, branches }
+          },
           reducer: experimentsReducers
         })}
       >
@@ -849,7 +854,7 @@ describe('TableContent', () => {
         ]
       })
     } as unknown as Table<Experiment>
-    renderTableContent(multipleBranchesInstance)
+    renderTableContent(multipleBranchesInstance, ['current', 'new-branch'])
 
     expect(screen.getAllByTestId('branch-name').length).toBe(2)
     expect(screen.getByText('current')).toBeInTheDocument()

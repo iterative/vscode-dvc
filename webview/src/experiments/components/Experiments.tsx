@@ -160,17 +160,13 @@ export const ExperimentsTable: React.FC = () => {
     autoResetAll: false,
     columnResizeMode: 'onChange',
     columns: columns as ColumnDef<Commit, unknown>[],
-    // Setting any branch for now just so that it isn't undefined. It does not matter the label for now as it is not shown
-
-    data: data.map(row => ({ ...row, branch: 'current' })),
+    data,
     defaultColumn,
     enableColumnResizing: true,
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
     getRowId,
-    // Setting any branch for now just so that it isn't undefined. It does not matter the label for now as it is not shown
-    getSubRows: row =>
-      row.subRows?.map(subRow => ({ ...subRow, branch: 'current' })),
+    getSubRows: row => row.subRows,
     onColumnSizingChange: setColumnSizing,
     onExpandedChange: setExpanded,
     state: {
