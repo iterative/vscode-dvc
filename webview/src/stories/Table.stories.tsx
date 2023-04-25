@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import React from 'react'
 import { Provider } from 'react-redux'
 import { Meta, Story } from '@storybook/react/types-6-0'
-import rowsFixture from 'dvc/src/test/fixtures/expShow/base/rows'
+import { rowsFixtureWithBranches } from 'dvc/src/test/fixtures/expShow/base/rows'
 import columnsFixture from 'dvc/src/test/fixtures/expShow/base/columns'
 import workspaceChangesFixture from 'dvc/src/test/fixtures/expShow/base/workspaceChanges'
 import deeplyNestedTableData from 'dvc/src/test/fixtures/expShow/deeplyNested/tableData'
@@ -14,6 +14,7 @@ import {
   ExperimentStatus,
   isRunning
 } from 'dvc/src/experiments/webview/contract'
+import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import {
   within,
   userEvent,
@@ -22,7 +23,6 @@ import {
 } from '@storybook/testing-library'
 import { addCommitDataToMainBranch } from './util'
 import Experiments from '../experiments/components/Experiments'
-
 import { experimentsReducers } from '../experiments/store'
 import { TableDataState } from '../experiments/state/tableDataSlice'
 import { NORMAL_TOOLTIP_DELAY } from '../shared/components/tooltip/Tooltip'
@@ -30,8 +30,10 @@ import {
   setExperimentsAsSelected,
   setExperimentsAsStarred
 } from '../test/tableDataFixture'
+import { featureFlag } from '../util/flags'
 
 const tableData: TableDataState = {
+  branches: ['current'],
   changes: workspaceChangesFixture,
   columnOrder: [],
   columnWidths: {
@@ -50,10 +52,12 @@ const tableData: TableDataState = {
   hasValidDvcYaml: true,
   isBranchesView: false,
   isShowingMoreCommits: true,
-  rows: addCommitDataToMainBranch(rowsFixture).map(row => ({
+  rows: addCommitDataToMainBranch(rowsFixtureWithBranches).map(row => ({
     ...row,
+    branch: 'current',
     subRows: row.subRows?.map(experiment => ({
       ...experiment,
+      branch: 'current',
       starred: experiment.starred || experiment.label === '42b8736'
     }))
   })),
@@ -67,7 +71,7 @@ const tableData: TableDataState = {
 const noRunningExperiments = {
   ...tableData,
   hasRunningExperiment: false,
-  rows: addCommitDataToMainBranch(rowsFixture).map(row => ({
+  rows: addCommitDataToMainBranch(rowsFixtureWithBranches).map(row => ({
     ...row,
     status: ExperimentStatus.SUCCESS,
     subRows: row.subRows?.map(experiment => ({
@@ -82,7 +86,7 @@ const noRunningExperiments = {
 const noRunningExperimentsNoCheckpoints = {
   ...noRunningExperiments,
   hasCheckpoints: false,
-  rows: addCommitDataToMainBranch(rowsFixture).map(row => ({
+  rows: addCommitDataToMainBranch(rowsFixtureWithBranches).map(row => ({
     ...row,
     status: ExperimentStatus.SUCCESS,
     subRows: row.subRows?.map(experiment => ({
@@ -131,6 +135,7 @@ export const WithSurvivalData = Template.bind({})
 WithSurvivalData.args = {
   tableData: {
     ...survivalTableData,
+    branches: ['current'],
     hasData: true,
     rows: addCommitDataToMainBranch(survivalTableData.rows)
   }
@@ -142,9 +147,12 @@ const tableDataWithSomeSelectedExperiments = setExperimentsAsSelected(
   ['4fb124a', '42b8736', '1ba7bcd']
 )
 WithMiddleStates.args = {
-  tableData: setExperimentsAsStarred(tableDataWithSomeSelectedExperiments, [
-    '1ba7bcd'
-  ])
+  tableData: {
+    ...setExperimentsAsStarred(tableDataWithSomeSelectedExperiments, [
+      '1ba7bcd'
+    ]),
+    branches: ['current']
+  }
 }
 WithMiddleStates.play = async ({ canvasElement }) => {
   await within(canvasElement).findByText('4fb124a')
@@ -194,6 +202,7 @@ export const WithAllDataTypes = Template.bind({})
 WithAllDataTypes.args = {
   tableData: {
     ...dataTypesTableFixture,
+    branches: ['current'],
     hasData: true,
     rows: addCommitDataToMainBranch(dataTypesTableFixture.rows)
   }
@@ -210,6 +219,7 @@ export const WithDeeplyNestedHeaders = Template.bind({})
 WithDeeplyNestedHeaders.args = {
   tableData: {
     ...deeplyNestedTableData,
+    branches: ['current'],
     hasData: true,
     rows: addCommitDataToMainBranch(deeplyNestedTableData.rows)
   }
@@ -220,7 +230,7 @@ LoadingData.args = { tableData: undefined }
 
 export const WithNoExperiments = Template.bind({})
 WithNoExperiments.args = {
-  tableData: { ...tableData, rows: [rowsFixture[0]] }
+  tableData: { ...tableData, rows: [rowsFixtureWithBranches[0]] }
 }
 
 export const WithNoColumns = Template.bind({})
@@ -282,5 +292,45 @@ Scrolled.parameters = {
         type: 'desktop'
       }
     }
+  }
+}
+
+export const WithMultipleBranches = Template.bind({})
+const rowsWithoutWorkspace = survivalTableData.rows.filter(
+  row => row.id !== EXPERIMENT_WORKSPACE_ID
+)
+Object.assign(featureFlag, { ADD_REMOVE_BRANCHES: true })
+const branches = ['current', 'other-branch', 'branch-14786']
+
+WithMultipleBranches.args = {
+  tableData: {
+    ...tableData,
+    branches,
+    rows: [
+      ...survivalTableData.rows.map(row => ({
+        ...row,
+        branch: branches[0],
+        subRows: row.subRows?.map(subRow => ({
+          ...subRow,
+          branch: branches[0]
+        }))
+      })),
+      ...rowsWithoutWorkspace.map(row => ({
+        ...row,
+        branch: branches[1],
+        subRows: row.subRows?.map(subRow => ({
+          ...subRow,
+          branch: branches[1]
+        }))
+      })),
+      ...rowsWithoutWorkspace.map(row => ({
+        ...row,
+        branch: branches[2],
+        subRows: row.subRows?.map(subRow => ({
+          ...subRow,
+          branch: branches[2]
+        }))
+      }))
+    ]
   }
 }

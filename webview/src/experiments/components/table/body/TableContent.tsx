@@ -1,6 +1,8 @@
-import React, { RefObject, useCallback, useContext } from 'react'
+import React, { Fragment, RefObject, useCallback, useContext } from 'react'
 import { useSelector } from 'react-redux'
 import { TableBody } from './TableBody'
+import { CommitsAndBranchesNavigation } from './commitsAndBranches/CommitsAndBranchesNavigation'
+import { BranchDivider } from './branchDivider/BranchDivider'
 import { RowSelectionContext } from '../RowSelectionContext'
 import { ExperimentsState } from '../../../store'
 import { InstanceProp, RowProp } from '../../../util/interfaces'
@@ -17,12 +19,10 @@ export const TableContent: React.FC<TableContentProps> = ({
 }) => {
   const { rows, flatRows } = instance.getRowModel()
   const { batchSelection, lastSelectedRow } = useContext(RowSelectionContext)
-  const hasCheckpoints = useSelector(
-    (state: ExperimentsState) => state.tableData.hasCheckpoints
+  const { hasCheckpoints, hasRunningExperiment, branches } = useSelector(
+    (state: ExperimentsState) => state.tableData
   )
-  const hasRunningExperiment = useSelector(
-    (state: ExperimentsState) => state.tableData.hasRunningExperiment
-  )
+
   const batchRowSelection = useCallback(
     ({ row: { id } }: RowProp) => {
       const lastSelectedRowId = lastSelectedRow?.row.id ?? ''
@@ -54,18 +54,39 @@ export const TableContent: React.FC<TableContentProps> = ({
 
   return (
     <>
-      {rows.map(row => (
-        <TableBody
-          tableHeaderHeight={tableHeadHeight}
-          root={tableRef.current}
-          row={row}
-          instance={instance}
-          key={row.id}
-          hasRunningExperiment={hasRunningExperiment}
-          projectHasCheckpoints={hasCheckpoints}
-          batchRowSelection={batchRowSelection}
-        />
-      ))}
+      {branches.map((branch, branchIndex) => {
+        const branchRows = rows.filter(row => row.original.branch === branch)
+        const firstPreviousCommitId = branchRows
+          .slice(branchIndex === 0 ? 2 : 1)
+          .find(row => row.depth === 0)?.id
+        return (
+          <Fragment key={branch}>
+            {branchRows.map((row, i) => {
+              const isFirstRow =
+                (branchIndex === 0 && i === 1) || (branchIndex !== 0 && i === 0)
+              return (
+                <Fragment key={row.id}>
+                  {isFirstRow && branches.length > 1 && (
+                    <BranchDivider>{branch}</BranchDivider>
+                  )}
+                  <TableBody
+                    tableHeaderHeight={tableHeadHeight}
+                    root={tableRef.current}
+                    row={row}
+                    instance={instance}
+                    hasRunningExperiment={hasRunningExperiment}
+                    projectHasCheckpoints={hasCheckpoints}
+                    batchRowSelection={batchRowSelection}
+                    showPreviousRow={row.id === firstPreviousCommitId}
+                    isLast={i === branchRows.length - 1}
+                  />
+                </Fragment>
+              )
+            })}
+            <CommitsAndBranchesNavigation />
+          </Fragment>
+        )
+      })}
     </>
   )
 }
