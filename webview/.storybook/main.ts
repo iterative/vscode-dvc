@@ -1,13 +1,12 @@
-import webpack from 'webpack'
+import type { StorybookConfig } from '@storybook/react-webpack5'
 import webpackConfig from '../webpack.config'
 
-export default {
-  reactOptions: { fastRefresh: true },
+export const config: StorybookConfig = {
   framework: {
     name: '@storybook/react-webpack5',
-    options: {}
+    options: { fastRefresh: true }
   },
-  stories: ['../src/**/*.stories.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
+  stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)'],
   staticDirs: ['../../extension/src/test/fixtures/plotsDiff/staticImages'],
   addons: [
     'storybook-addon-themes',
@@ -25,13 +24,10 @@ export default {
       }
     }
   ],
-  core: {
-    builder: 'webpack5'
-  },
   typescript: {
     reactDocgen: false
   },
-  webpackFinal: (config: webpack.Configuration) => {
+  webpackFinal: config => {
     return {
       ...config,
       module: webpackConfig.module,
@@ -39,3 +35,5 @@ export default {
     }
   }
 }
+
+export default config
