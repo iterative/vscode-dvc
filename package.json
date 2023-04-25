@@ -64,7 +64,7 @@
     "prettier": "2.8.7",
     "prettier-config-standard": "5.0.0",
     "ts-node": "10.9.1",
-    "turbo": "1.9.2",
+    "turbo": "1.9.3",
     "typescript": "5.0.4"
   },
   "resolutions": {
@@ -74,7 +74,7 @@
     "fastify": "3.29.5",
     "json5": "2.2.3",
     "loader-utils": "2.0.4",
-    "terser": "5.16.9",
+    "terser": "5.17.0",
     "trim-newlines": "3.0.1",
     "trim": "1.0.1"
   },

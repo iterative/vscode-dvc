@@ -57,10 +57,12 @@ export const tableData: TableData = {
   isShowingMoreCommits: true,
   rows: [
     {
+      branch: 'current',
       id: EXPERIMENT_WORKSPACE_ID,
       label: EXPERIMENT_WORKSPACE_ID
     },
     {
+      branch: 'current',
       id: 'main',
       label: 'main'
     }

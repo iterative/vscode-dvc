@@ -19,6 +19,7 @@ import {
   Error,
   Filter,
   GitCommit,
+  GitMerge,
   GraphLine,
   GraphScatter,
   Gripper,
@@ -82,6 +83,9 @@ const Template: StoryFn = () => {
       </IconWrapper>
       <IconWrapper name="GitCommit">
         <Icon icon={GitCommit} />
+      </IconWrapper>
+      <IconWrapper name="GitMerge">
+        <Icon icon={GitMerge} />
       </IconWrapper>
       <IconWrapper name="GraphLine">
         <Icon icon={GraphLine} />
