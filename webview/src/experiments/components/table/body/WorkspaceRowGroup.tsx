@@ -1,15 +1,16 @@
 import cx from 'classnames'
-import React from 'react'
+import React, { PropsWithChildren } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { InstanceProp } from '../../../util/interfaces'
 import styles from '../styles.module.scss'
 
+interface WorkspaceRowGroupProps extends InstanceProp {
+  root: HTMLElement | null
+  tableHeaderHeight: number
+}
+
 export const WorkspaceRowGroup: React.FC<
-  {
-    children: React.ReactNode
-    root: HTMLElement | null
-    tableHeaderHeight: number
-  } & InstanceProp
+  PropsWithChildren<WorkspaceRowGroupProps>
 > = ({ children, root, tableHeaderHeight }) => {
   const [ref, needsShadow] = useInView({
     root,

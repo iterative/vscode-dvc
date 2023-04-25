@@ -11,12 +11,12 @@ export const PreviousCommitsRow: React.FC<PreviousCommitsRowProps> = ({
   isBranchesView,
   nbColumns
 }) => (
-  <tbody>
+  <thead>
     <tr className={cx(styles.previousCommitsRow)}>
-      <td className={cx(styles.previousCommitsText, styles.experimentsTd)}>
+      <th className={cx(styles.previousCommitsText, styles.experimentsTd)}>
         {isBranchesView ? 'Other Branches' : 'Previous Commits'}
-      </td>
-      <td colSpan={nbColumns - 1}></td>
+      </th>
+      <th colSpan={nbColumns - 1}></th>
     </tr>
-  </tbody>
+  </thead>
 )

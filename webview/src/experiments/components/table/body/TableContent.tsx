@@ -78,6 +78,7 @@ export const TableContent: React.FC<TableContentProps> = ({
                     projectHasCheckpoints={hasCheckpoints}
                     batchRowSelection={batchRowSelection}
                     showPreviousRow={row.id === firstPreviousCommitId}
+                    isLast={i === branchRows.length - 1}
                   />
                 </Fragment>
               )

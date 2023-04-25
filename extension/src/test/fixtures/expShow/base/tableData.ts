@@ -1,5 +1,5 @@
 import { TableData } from '../../../../experiments/webview/contract'
-import { rowsFixture } from './rows'
+import { rowsFixtureWithBranches } from './rows'
 import columnsFixture from './columns'
 
 const tableDataFixture: TableData = {
@@ -18,7 +18,7 @@ const tableDataFixture: TableData = {
   hasValidDvcYaml: true,
   isShowingMoreCommits: true,
   isBranchesView: false,
-  rows: rowsFixture,
+  rows: rowsFixtureWithBranches,
   selectedForPlotsCount: 2,
   sorts: []
 }

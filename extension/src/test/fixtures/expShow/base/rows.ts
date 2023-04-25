@@ -15,7 +15,7 @@ const valueWithNoChanges = (str: string) => ({
 
 const colorsList = copyOriginalColors()
 
-export const rowsFixture: Commit[] = [
+export const rowsFixtureWithBranches: Commit[] = [
   {
     branch: 'current',
     deps: {
@@ -471,7 +471,7 @@ export const rowsFixture: Commit[] = [
 ]
 
 const rowsFixtureWithoutBranches = [
-  ...rowsFixture.map(({ branch, ...row }) =>
+  ...rowsFixtureWithBranches.map(({ branch, ...row }) =>
     row.subRows
       ? {
           ...row,

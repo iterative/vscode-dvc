@@ -476,10 +476,12 @@ $badge-size: 0.85rem;
   .previousCommitsText {
     font-size: 0.6rem;
     padding-left: 16px;
+    font-weight: normal;
+    text-align: left;
   }
 }
 
-.rowGroup:last-child {
+.lastRowGroup {
   & > .experimentsTr:last-child {
     border-color: $row-bg-color;
 

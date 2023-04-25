@@ -14,6 +14,7 @@ interface TableBodyProps extends RowProp, InstanceProp, BatchSelectionProp {
   root: HTMLElement | null
   tableHeaderHeight: number
   showPreviousRow?: boolean
+  isLast?: boolean
 }
 
 export const TableBody: React.FC<TableBodyProps> = ({
@@ -25,7 +26,8 @@ export const TableBody: React.FC<TableBodyProps> = ({
   batchRowSelection,
   root,
   tableHeaderHeight,
-  showPreviousRow
+  showPreviousRow,
+  isLast
 }) => {
   const contentProps = {
     batchRowSelection,
@@ -64,7 +66,8 @@ export const TableBody: React.FC<TableBodyProps> = ({
       <tbody
         className={cx(styles.rowGroup, {
           [styles.experimentGroup]: row.depth > 0,
-          [styles.expandedGroup]: row.getIsExpanded() && row.subRows.length > 0
+          [styles.expandedGroup]: row.getIsExpanded() && row.subRows.length > 0,
+          [styles.lastRowGroup]: isLast
         })}
       >
         {content}
