@@ -47,8 +47,12 @@
       "dependsOn": ["^lint:prettier"],
       "outputs": []
     },
+    "lint:css": {
+      "dependsOn": ["^lint:css"],
+      "outputs": []
+    },
     "lint": {
-      "dependsOn": ["lint:prettier", "lint:eslint", "lint:build"],
+      "dependsOn": ["lint:prettier", "lint:eslint", "lint:css", "lint:build"],
       "outputs": []
     },
     "dev": {
