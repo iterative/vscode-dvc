@@ -316,10 +316,14 @@ const transformRevisionData = (
 
 const fillTemplate = (
   template: string,
-  datapoints: unknown[]
+  datapoints: unknown[],
+  size: [number, number]
 ): TopLevelSpec => {
   return JSON.parse(
-    template.replace('"<DVC_METRIC_DATA>"', JSON.stringify(datapoints))
+    template
+      .replace('"<DVC_METRIC_DATA>"', JSON.stringify(datapoints))
+      .replace('"width":300', `"width":${size[0]}`)
+      .replace('"height":300', `"height":${size[1]}`)
   ) as TopLevelSpec
 }
 
@@ -332,7 +336,8 @@ const collectTemplatePlot = (
   nbItemsPerRow: number,
   height: number,
   revisionColors: ColorScale | undefined,
-  multiSourceEncoding: MultiSourceEncoding
+  multiSourceEncoding: MultiSourceEncoding,
+  screenDimensions: [number, number]
 ) => {
   const isMultiView = isMultiViewPlot(
     JSON.parse(template) as TopLevelSpec | VisualizationSpec
@@ -350,8 +355,12 @@ const collectTemplatePlot = (
     return
   }
 
+  const plotWidth = screenDimensions[0] / nbItemsPerRow
+  const ratios = [2, 9 / 5, 4 / 3, 1, 3 / 4, 3 / 5]
+  const plotHeight = plotWidth / ratios[height]
+
   const content = extendVegaSpec(
-    fillTemplate(template, datapoints),
+    fillTemplate(template, datapoints, [plotWidth, plotHeight]),
     nbItemsPerRow,
     height,
     {
@@ -377,7 +386,8 @@ const collectTemplateGroup = (
   nbItemsPerRow: number,
   height: number,
   revisionColors: ColorScale | undefined,
-  multiSourceEncoding: MultiSourceEncoding
+  multiSourceEncoding: MultiSourceEncoding,
+  screenDimensions: [number, number]
 ): TemplatePlotEntry[] => {
   const acc: TemplatePlotEntry[] = []
   for (const path of paths) {
@@ -396,7 +406,8 @@ const collectTemplateGroup = (
       nbItemsPerRow,
       height,
       revisionColors,
-      multiSourceEncoding
+      multiSourceEncoding,
+      screenDimensions
     )
   }
   return acc
@@ -410,7 +421,8 @@ export const collectSelectedTemplatePlots = (
   nbItemsPerRow: number,
   height: number,
   revisionColors: ColorScale | undefined,
-  multiSourceEncoding: MultiSourceEncoding
+  multiSourceEncoding: MultiSourceEncoding,
+  screenDimensions: [number, number]
 ): TemplatePlotSection[] | undefined => {
   const acc: TemplatePlotSection[] = []
   for (const templateGroup of order) {
@@ -423,7 +435,8 @@ export const collectSelectedTemplatePlots = (
       nbItemsPerRow,
       height,
       revisionColors,
-      multiSourceEncoding
+      multiSourceEncoding,
+      screenDimensions
     )
     if (!definedAndNonEmpty(entries)) {
       continue

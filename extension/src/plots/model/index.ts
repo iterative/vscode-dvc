@@ -75,6 +75,7 @@ export class PlotsModel extends ModelWithPersistence {
   private templates: TemplateAccumulator = {}
   private multiSourceVariations: MultiSourceVariations = {}
   private multiSourceEncoding: MultiSourceEncoding = {}
+  private screenDimensions: [number, number] = [1000, 500]
 
   constructor(
     dvcRoot: string,
@@ -335,6 +336,14 @@ export class PlotsModel extends ModelWithPersistence {
     return this.multiSourceEncoding
   }
 
+  public setScreenDimensions(dimensions: [number, number]) {
+    this.screenDimensions = dimensions
+  }
+
+  public getScreenDimensions() {
+    return this.screenDimensions
+  }
+
   private handleCliError() {
     this.comparisonData = {}
     this.revisionData = {}
@@ -437,7 +446,8 @@ export class PlotsModel extends ModelWithPersistence {
       this.getNbItemsPerRowOrWidth(PlotsSection.TEMPLATE_PLOTS),
       this.getHeight(PlotsSection.TEMPLATE_PLOTS),
       this.getRevisionColors(),
-      this.multiSourceEncoding
+      this.multiSourceEncoding,
+      this.screenDimensions
     )
   }
 }

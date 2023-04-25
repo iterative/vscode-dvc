@@ -13,6 +13,7 @@ import { Modal } from '../../shared/components/modal/Modal'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
 import { GetStarted } from '../../shared/components/getStarted/GetStarted'
 import { PlotsState } from '../store'
+import { sendDimensions } from './messages'
 
 const PlotsContent = () => {
   const dispatch = useDispatch()
@@ -31,15 +32,18 @@ const PlotsContent = () => {
 
   useLayoutEffect(() => {
     const onResize = () => {
-      wrapperRef.current &&
-        dispatch(
-          setMaxNbPlotsPerRow(
-            // Plots grid have a 20px margin around it, we subtract 20 * 2 from the wrapper width to get the max available space
-            wrapperRef.current.getBoundingClientRect().width - 40
-          )
-        )
+      if (wrapperRef.current) {
+        // Plots grid have a 20px margin around it, we subtract 20 * 2 from the wrapper width to get the max available space
+        const wrapperClientRect = wrapperRef.current.getBoundingClientRect()
+        const width = wrapperClientRect.width - 40
+        const height = wrapperClientRect.height
+
+        dispatch(setMaxNbPlotsPerRow(width))
+        sendDimensions(width, height)
+      }
     }
     window.addEventListener('resize', onResize)
+    onResize()
 
     return () => {
       window.removeEventListener('resize', onResize)

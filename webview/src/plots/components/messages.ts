@@ -21,3 +21,9 @@ export const selectRevisions = () => {
     type: MessageFromWebviewType.SELECT_EXPERIMENTS
   })
 }
+
+export const sendDimensions = (width: number, height: number) =>
+  sendMessage({
+    payload: [width, height],
+    type: MessageFromWebviewType.SET_PLOTS_SCREEN_DIMENSIONS
+  })

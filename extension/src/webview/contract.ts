@@ -52,6 +52,7 @@ export enum MessageFromWebviewType {
   SET_STUDIO_SHARE_EXPERIMENTS_LIVE = 'set-studio-share-experiments-live',
   SHARE_EXPERIMENT_AS_BRANCH = 'share-experiment-as-branch',
   SHARE_EXPERIMENT_AS_COMMIT = 'share-experiment-as-commit',
+  SET_PLOTS_SCREEN_DIMENSIONS = 'set-plots-screen-dimensions',
   TOGGLE_PLOTS_SECTION = 'toggle-plots-section',
   REMOVE_CUSTOM_PLOTS = 'remove-custom-plots',
   REMOVE_STUDIO_TOKEN = 'remove-studio-token',
@@ -238,6 +239,10 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.SWITCH_BRANCHES_VIEW }
   | { type: MessageFromWebviewType.SWITCH_COMMITS_VIEW }
   | { type: MessageFromWebviewType.SELECT_BRANCHES }
+  | {
+      type: MessageFromWebviewType.SET_PLOTS_SCREEN_DIMENSIONS
+      payload: [number, number]
+    }
 
 export type MessageToWebview<T extends WebviewData> = {
   type: MessageToWebviewType.SET_DATA

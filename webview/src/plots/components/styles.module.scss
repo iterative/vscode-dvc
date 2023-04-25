@@ -135,27 +135,27 @@ $gap: 20px;
 }
 
 .ratioSmaller .plot {
-  aspect-ratio: 2 / 1;
+  aspect-ratio: calc(var(--scale) * 2 / 1);
 }
 
 .ratioSmall .plot {
-  aspect-ratio: 9 / 5;
+  aspect-ratio: calc(var(--scale) * 9 / 5);
 }
 
 .ratioRegular .plot {
-  aspect-ratio: 4 / 3;
+  aspect-ratio: calc(var(--scale) * 4 / 3);
 }
 
 .ratioSquare .plot {
-  aspect-ratio: 1;
+  aspect-ratio: var(--scale);
 }
 
 .ratioVerticalNormal .plot {
-  aspect-ratio: 3 / 4;
+  aspect-ratio: calc(var(--scale) * 3 / 4);
 }
 
 .ratioVerticalLarger .plot {
-  aspect-ratio: 3 / 5;
+  aspect-ratio: calc(var(--scale) * 3 / 5);
 }
 
 .plot img,
@@ -166,7 +166,6 @@ $gap: 20px;
 }
 
 .plot.multiViewPlot {
-  aspect-ratio: calc(0.8 * var(--scale) + 0.2);
   grid-column: span var(--scale);
 }
 

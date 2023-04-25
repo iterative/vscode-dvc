@@ -116,9 +116,15 @@ export class WebviewMessages {
           { isImage: !!message.payload },
           undefined
         )
+      case MessageFromWebviewType.SET_PLOTS_SCREEN_DIMENSIONS:
+        return this.setScreenDimensions(message.payload)
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
+  }
+
+  private setScreenDimensions(dimensions: [number, number]) {
+    this.plots.setScreenDimensions(dimensions)
   }
 
   private setPlotSize(
