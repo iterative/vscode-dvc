@@ -280,7 +280,7 @@ suite('Setup Test Suite', () => {
       expect(mockSendMessage).to.be.calledWithExactly({
         canGitInitialize: true,
         cliCompatible: true,
-        dvcCliDetails: { exampleCommand: 'dvc', version: '2.55.0' },
+        dvcCliDetails: { exampleCommand: 'dvc', version: MIN_CLI_VERSION },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,

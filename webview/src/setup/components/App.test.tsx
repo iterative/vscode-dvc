@@ -576,11 +576,12 @@ describe('App', () => {
       expect(within(envDetails).getByText('Command')).toBeInTheDocument()
 
       const configureButton = within(envDetails).getByText('Configure')
+      const selectButton = within(envDetails).queryByText(
+        'Select Python Interpreter'
+      )
 
       expect(configureButton).toBeInTheDocument()
-      expect(
-        within(envDetails).queryByText('Select Python Interpreter')
-      ).not.toBeInTheDocument()
+      expect(selectButton).not.toBeInTheDocument()
 
       fireEvent.click(configureButton)
 
