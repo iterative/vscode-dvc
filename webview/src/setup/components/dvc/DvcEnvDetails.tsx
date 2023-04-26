@@ -10,7 +10,7 @@ interface DvcEnvDetailsProps extends DvcCliDetails {
 }
 
 export const DvcEnvDetails: React.FC<DvcEnvDetailsProps> = ({
-  exampleCommand,
+  command,
   version,
   isPythonExtensionInstalled
 }) => {
@@ -23,7 +23,7 @@ export const DvcEnvDetails: React.FC<DvcEnvDetailsProps> = ({
       <tbody>
         {version && (
           <DvcEnvCommandRow
-            exampleCommand={exampleCommand}
+            command={command}
             isPythonExtensionInstalled={isPythonExtensionInstalled}
           />
         )}

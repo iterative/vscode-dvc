@@ -1,5 +1,5 @@
 export type DvcCliDetails = {
-  exampleCommand: string
+  command: string
   version: string | undefined
 }
 

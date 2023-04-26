@@ -239,7 +239,7 @@ suite('Setup Test Suite', () => {
       expect(mockSendMessage).to.be.calledWithExactly({
         canGitInitialize: true,
         cliCompatible: undefined,
-        dvcCliDetails: { exampleCommand: 'dvc', version: undefined },
+        dvcCliDetails: { command: 'dvc', version: undefined },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -280,7 +280,7 @@ suite('Setup Test Suite', () => {
       expect(mockSendMessage).to.be.calledWithExactly({
         canGitInitialize: true,
         cliCompatible: true,
-        dvcCliDetails: { exampleCommand: 'dvc', version: MIN_CLI_VERSION },
+        dvcCliDetails: { command: 'dvc', version: MIN_CLI_VERSION },
         hasData: false,
         isPythonExtensionInstalled: false,
         isStudioConnected: false,
@@ -328,7 +328,7 @@ suite('Setup Test Suite', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'dvc',
+          command: 'dvc',
           version: MIN_CLI_VERSION
         },
         hasData: false,
@@ -378,7 +378,7 @@ suite('Setup Test Suite', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'dvc',
+          command: 'dvc',
           version: MIN_CLI_VERSION
         },
         hasData: false,
@@ -579,7 +579,7 @@ suite('Setup Test Suite', () => {
       mockRunSetup.restore()
       stub(config, 'isPythonExtensionUsed').returns(false)
       stub(config, 'getPythonBinPath').resolves(join('python'))
-      stub(setup, 'getEnvDetails').resolves(undefined)
+      stub(setup, 'getDvcCliDetails').resolves(undefined)
 
       mockVersion.resetBehavior()
       mockVersion
@@ -639,7 +639,7 @@ suite('Setup Test Suite', () => {
       mockExecuteCommand.restore()
       mockRunSetup.restore()
       stub(config, 'isPythonExtensionUsed').returns(true)
-      stub(setup, 'getEnvDetails').resolves(undefined)
+      stub(setup, 'getDvcCliDetails').resolves(undefined)
 
       mockVersion.resetBehavior()
       mockVersion.rejects(new Error('no CLI here'))

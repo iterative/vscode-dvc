@@ -339,17 +339,17 @@ export class Setup
     return this.sendDataToWebview()
   }
 
-  public async getEnvDetails(): Promise<DvcCliDetails> {
+  public async getDvcCliDetails(): Promise<DvcCliDetails> {
     const dvcPath = this.config.getCliPath()
     const pythonBinPath = this.config.getPythonBinPath()
     const cwd = getFirstWorkspaceFolder()
 
     const { args, executable } = getOptions(pythonBinPath, dvcPath, cwd || '')
     const commandArgs = args.length === 0 ? '' : ` ${args.join(' ')}`
-    const exampleCommand = executable + commandArgs
+    const command = executable + commandArgs
 
     return {
-      exampleCommand,
+      command,
       version: cwd ? await this.getCliVersion(cwd) : undefined
     }
   }
@@ -368,7 +368,7 @@ export class Setup
 
     const pythonBinPath = await findPythonBinForInstall()
 
-    const dvcCliDetails = await this.getEnvDetails()
+    const dvcCliDetails = await this.getDvcCliDetails()
 
     this.webviewMessages.sendWebviewMessage({
       canGitInitialize,

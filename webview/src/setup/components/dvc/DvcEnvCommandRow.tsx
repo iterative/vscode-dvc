@@ -4,16 +4,16 @@ import styles from './styles.module.scss'
 import { selectPythonInterpreter, setupWorkspace } from '../messages'
 
 interface DvcEnvCommandRowProps {
-  exampleCommand: string
+  command: string
   isPythonExtensionInstalled: boolean
 }
 
 export const DvcEnvCommandRow: React.FC<DvcEnvCommandRowProps> = ({
-  exampleCommand,
+  command,
   isPythonExtensionInstalled
 }) => {
-  const commandText = exampleCommand || 'Not found'
-  const command = (
+  const commandText = command || 'Not found'
+  const commandValue = (
     <>
       <span className={styles.command}>{commandText}</span>
       <span className={styles.actions}>
@@ -35,5 +35,5 @@ export const DvcEnvCommandRow: React.FC<DvcEnvCommandRowProps> = ({
     </>
   )
 
-  return <DvcEnvInfoRow title="Command" text={command} />
+  return <DvcEnvInfoRow title="Command" text={commandValue} />
 }

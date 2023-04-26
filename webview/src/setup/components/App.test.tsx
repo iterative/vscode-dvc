@@ -70,7 +70,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: false,
         dvcCliDetails: {
-          exampleCommand: 'dvc',
+          command: 'dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -100,7 +100,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: undefined,
         dvcCliDetails: {
-          exampleCommand: 'dvc',
+          command: 'dvc',
           version: undefined
         },
         hasData: false,
@@ -124,7 +124,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: undefined,
         dvcCliDetails: {
-          exampleCommand: 'dvc',
+          command: 'dvc',
           version: undefined
         },
         hasData: false,
@@ -152,7 +152,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: undefined,
         dvcCliDetails: {
-          exampleCommand: `${defaultInterpreter} -m dvc`,
+          command: `${defaultInterpreter} -m dvc`,
           version: undefined
         },
         hasData: false,
@@ -179,7 +179,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: undefined,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: undefined
         },
         hasData: false,
@@ -206,7 +206,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: undefined,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: undefined
         },
         hasData: false,
@@ -233,7 +233,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: undefined,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: undefined
         },
         hasData: false,
@@ -260,7 +260,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -284,7 +284,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -306,7 +306,7 @@ describe('App', () => {
         canGitInitialize: true,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -331,7 +331,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -353,7 +353,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -375,7 +375,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -399,7 +399,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -426,7 +426,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -453,7 +453,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: true,
@@ -480,7 +480,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: true,
@@ -495,10 +495,10 @@ describe('App', () => {
       })
 
       const envDetails = screen.getByTestId('dvc-env-details')
-      const exampleCommand = `1.0.0 (required >= ${MIN_CLI_VERSION} and < ${MAX_CLI_VERSION}.0.0)`
+      const command = `1.0.0 (required >= ${MIN_CLI_VERSION} and < ${MAX_CLI_VERSION}.0.0)`
 
       expect(within(envDetails).getByText('Version')).toBeInTheDocument()
-      expect(within(envDetails).getByText(exampleCommand)).toBeInTheDocument()
+      expect(within(envDetails).getByText(command)).toBeInTheDocument()
     })
 
     it('should tell the user that version is not found if dvc is not installed', () => {
@@ -506,7 +506,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: false,
         dvcCliDetails: {
-          exampleCommand: 'dvc',
+          command: 'dvc',
           version: undefined
         },
         hasData: false,
@@ -520,19 +520,19 @@ describe('App', () => {
         shareLiveToStudio: false
       })
       const envDetails = screen.getByTestId('dvc-env-details')
-      const exampleCommand = `Not found (required >= ${MIN_CLI_VERSION} and < ${MAX_CLI_VERSION}.0.0)`
+      const command = `Not found (required >= ${MIN_CLI_VERSION} and < ${MAX_CLI_VERSION}.0.0)`
 
       expect(within(envDetails).getByText('Version')).toBeInTheDocument()
-      expect(within(envDetails).getByText(exampleCommand)).toBeInTheDocument()
+      expect(within(envDetails).getByText(command)).toBeInTheDocument()
     })
 
     it('should show the user an example command if dvc is installed', () => {
-      const exampleCommand = 'python -m dvc'
+      const command = 'python -m dvc'
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand,
+          command,
           version: '1.0.0'
         },
         hasData: true,
@@ -549,7 +549,7 @@ describe('App', () => {
       const envDetails = screen.getByTestId('dvc-env-details')
 
       expect(within(envDetails).getByText('Command')).toBeInTheDocument()
-      expect(within(envDetails).getByText(exampleCommand)).toBeInTheDocument()
+      expect(within(envDetails).getByText(command)).toBeInTheDocument()
     })
 
     it('should show user an example command with a "Configure" button if dvc is installed without the python extension', () => {
@@ -557,7 +557,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'dvc',
+          command: 'dvc',
           version: '1.0.0'
         },
         hasData: true,
@@ -595,7 +595,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: true,
@@ -637,7 +637,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -659,7 +659,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -688,7 +688,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: false,
         dvcCliDetails: {
-          exampleCommand: 'dvc',
+          command: 'dvc',
           version: undefined
         },
         hasData: false,
@@ -710,7 +710,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: true,
@@ -734,7 +734,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -756,7 +756,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: undefined,
@@ -778,7 +778,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -802,7 +802,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: true,
@@ -831,7 +831,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -855,7 +855,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -883,7 +883,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -911,7 +911,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -942,7 +942,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -970,7 +970,7 @@ describe('App', () => {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
-          exampleCommand: 'python -m dvc',
+          command: 'python -m dvc',
           version: '1.0.0'
         },
         hasData: false,
@@ -997,7 +997,7 @@ describe('App', () => {
       canGitInitialize: false,
       cliCompatible: true,
       dvcCliDetails: {
-        exampleCommand: 'python -m dvc',
+        command: 'python -m dvc',
         version: '1.0.0'
       },
       hasData: false,
