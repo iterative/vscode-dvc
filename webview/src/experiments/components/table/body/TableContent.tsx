@@ -1,7 +1,6 @@
 import React, { Fragment, RefObject, useCallback, useContext } from 'react'
 import { useSelector } from 'react-redux'
 import { TableBody } from './TableBody'
-import { CommitsAndBranchesNavigation } from './commitsAndBranches/CommitsAndBranchesNavigation'
 import { BranchDivider } from './branchDivider/BranchDivider'
 import { RowSelectionContext } from '../RowSelectionContext'
 import { ExperimentsState } from '../../../store'
@@ -56,9 +55,14 @@ export const TableContent: React.FC<TableContentProps> = ({
     <>
       {branches.map((branch, branchIndex) => {
         const branchRows = rows.filter(row => row.original.branch === branch)
-        const firstPreviousCommitId = branchRows
-          .slice(branchIndex === 0 ? 2 : 1)
-          .find(row => row.depth === 0)?.id
+        const skipToIndex = branchIndex === 0 ? 2 : 1
+        const firstPreviousCommitIndex = branchRows.findIndex(
+          (row, i) => i >= skipToIndex && row.depth === 0
+        )
+        const rowBeforePreviousCommitsId =
+          firstPreviousCommitIndex > 0
+            ? branchRows[firstPreviousCommitIndex - 1].id
+            : branchRows.at(-1)?.id
         return (
           <Fragment key={branch}>
             {branchRows.map((row, i) => {
@@ -66,9 +70,7 @@ export const TableContent: React.FC<TableContentProps> = ({
                 (branchIndex === 0 && i === 1) || (branchIndex !== 0 && i === 0)
               return (
                 <Fragment key={row.id}>
-                  {isFirstRow && branches.length > 1 && (
-                    <BranchDivider>{branch}</BranchDivider>
-                  )}
+                  {isFirstRow && <BranchDivider>{branch}</BranchDivider>}
                   <TableBody
                     tableHeaderHeight={tableHeadHeight}
                     root={tableRef.current}
@@ -77,13 +79,12 @@ export const TableContent: React.FC<TableContentProps> = ({
                     hasRunningExperiment={hasRunningExperiment}
                     projectHasCheckpoints={hasCheckpoints}
                     batchRowSelection={batchRowSelection}
-                    showPreviousRow={row.id === firstPreviousCommitId}
+                    showPreviousRow={row.id === rowBeforePreviousCommitsId}
                     isLast={i === branchRows.length - 1}
                   />
                 </Fragment>
               )
             })}
-            <CommitsAndBranchesNavigation />
           </Fragment>
         )
       })}

@@ -832,13 +832,7 @@ describe('TableContent', () => {
     )
   }
 
-  it('should not display the branches names before its rows if there is only one branch', () => {
-    renderTableContent()
-
-    expect(screen.queryByTestId('branch-name')).not.toBeInTheDocument()
-  })
-
-  it('should display the branches names before its rows if there are more than one branch', () => {
+  it('should display the branches names before its rows', () => {
     const instanceRows = instance.getRowModel()
     const multipleBranchesInstance = {
       ...instance,
