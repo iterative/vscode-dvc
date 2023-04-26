@@ -345,7 +345,7 @@ export class Setup
     const cwd = getFirstWorkspaceFolder()
 
     const { args, executable } = getOptions(pythonBinPath, dvcPath, cwd || '')
-    const commandArgs = args.join(' ').length === 0 ? '' : ` ${args.join(' ')}`
+    const commandArgs = args.length === 0 ? '' : ` ${args.join(' ')}`
     const exampleCommand = executable + commandArgs
 
     return {
