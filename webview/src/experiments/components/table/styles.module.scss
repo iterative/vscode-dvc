@@ -203,13 +203,14 @@ $badge-size: 0.85rem;
 // table head styles
 
 .tableIndicators {
-  position: fixed;
+  display: inline-block;
+  position: absolute;
+  height: 0;
+  overflow: visible;
   top: 0;
   left: 0;
-  z-index: 5;
   font-size: 0.7rem;
-  padding: 0.2rem 0.5rem;
-  text-align: left;
+  padding: 0.2rem 0.7rem;
 }
 
 .experimentsThead {
@@ -312,10 +313,6 @@ $badge-size: 0.85rem;
 .cellDraggable {
   display: block;
   padding: 0.31rem $cell-padding;
-}
-
-.leafHeaderCell::after {
-  display: none;
 }
 
 .oneRowHeaderCell {

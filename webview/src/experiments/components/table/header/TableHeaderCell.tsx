@@ -12,6 +12,7 @@ import { ExperimentsState } from '../../../store'
 import { ContextMenu } from '../../../../shared/components/contextMenu/ContextMenu'
 import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
 import { ColumnWithGroup } from '../../../util/buildColumns'
+import { Indicators } from '../Indicators'
 
 const getPercentResizer = (depth: number) => `${100 + depth * 105}%`
 
@@ -162,6 +163,7 @@ export const TableHeaderCell: React.FC<{
             setExpColumnNeedsShadow={setExpColumnNeedsShadow}
             root={root}
           >
+            {depth === 1 && <Indicators />}
             {cellContents}
           </WithExpColumnNeedsShadowUpdates>
         ) : (

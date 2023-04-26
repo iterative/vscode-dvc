@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 import React from 'react'
 import { Provider, useDispatch } from 'react-redux'
-import { Story, Meta } from '@storybook/react/types-6-0'
+import type { StoryFn, Meta } from '@storybook/react'
 import { userEvent, within } from '@storybook/testing-library'
 import {
   PlotsData,
@@ -77,7 +77,7 @@ export default {
   title: 'Plots'
 } as Meta
 
-const Template: Story<{
+const Template: StoryFn<{
   data?: PlotsData
 }> = ({ data }) => {
   const store = configureStore({ reducer: plotsReducers })

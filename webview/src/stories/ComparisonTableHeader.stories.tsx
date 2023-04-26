@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react/types-6-0'
+import type { StoryFn, Meta } from '@storybook/react'
 import React from 'react'
 import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'
 import { ComparisonTableHeader } from '../plots/components/comparisonTable/ComparisonTableHeader'
@@ -19,7 +19,7 @@ export default {
   title: 'Comparison Table Header'
 } as Meta
 
-const Template: Story<{
+const Template: StoryFn<{
   displayColor: string
   name: string
   onClicked: () => void

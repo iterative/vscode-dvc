@@ -4,7 +4,6 @@ import cx from 'classnames'
 import styles from './styles.module.scss'
 import { TableHead } from './header/TableHead'
 import { RowSelectionContext } from './RowSelectionContext'
-import { Indicators } from './Indicators'
 import { TableContent } from './body/TableContent'
 import { InstanceProp } from '../../util/interfaces'
 
@@ -53,7 +52,6 @@ export const Table: React.FC<TableProps> = ({
           tableHeadHeight={tableHeadHeight}
         />
       </table>
-      <Indicators />
     </div>
   )
 }
