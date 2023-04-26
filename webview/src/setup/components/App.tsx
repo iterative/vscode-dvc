@@ -10,7 +10,7 @@ import {
 import React, { useCallback, useState } from 'react'
 import { Dvc } from './Dvc'
 import { Experiments } from './Experiments'
-import { Studio } from './Studio'
+import { Studio } from './studio/Studio'
 import { SetupContainer } from './SetupContainer'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 import { sendMessage } from '../../shared/vscode'
@@ -44,6 +44,9 @@ export const App: React.FC = () => {
   useVsCodeMessaging(
     useCallback(
       ({ data }: { data: MessageToWebview<SetupData> }) => {
+        if (!data?.data) {
+          return
+        }
         setCanGitInitialized(data.data.canGitInitialize)
         setCliCompatible(data.data.cliCompatible)
         setHasData(data.data.hasData)
@@ -123,7 +126,9 @@ export const App: React.FC = () => {
         <Studio
           isStudioConnected={isStudioConnected}
           shareLiveToStudio={shareLiveToStudio}
+          setSectionCollapsed={setSectionCollapsed}
           setShareLiveToStudio={setShareLiveToStudio}
+          cliCompatible={!!cliCompatible}
         />
       </SetupContainer>
     </>
