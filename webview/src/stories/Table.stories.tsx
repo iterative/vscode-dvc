@@ -115,7 +115,9 @@ const Template: StoryFn<{ tableData: TableDataState }> = ({ tableData }) => {
         reducer: experimentsReducers
       })}
     >
-      <Experiments />
+      <div style={{ height: '900px', overflow: 'auto' }}>
+        <Experiments />
+      </div>
     </Provider>
   )
 }
