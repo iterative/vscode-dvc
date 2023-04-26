@@ -39,15 +39,11 @@ export const Dvc: React.FC<DvcProps> = ({
   setSectionCollapsed,
   isExperimentsAvailable
 }) => {
-  const children = (
-    <>
-      {dvcCliDetails && (
-        <DvcEnvDetails
-          {...dvcCliDetails}
-          isPythonExtensionInstalled={isPythonExtensionInstalled}
-        />
-      )}
-    </>
+  const children = dvcCliDetails && (
+    <DvcEnvDetails
+      {...dvcCliDetails}
+      isPythonExtensionInstalled={isPythonExtensionInstalled}
+    />
   )
 
   if (cliCompatible === false) {

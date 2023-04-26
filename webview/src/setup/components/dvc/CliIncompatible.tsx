@@ -1,16 +1,14 @@
-import React, { ReactElement } from 'react'
+import React, { PropsWithChildren } from 'react'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { Button } from '../../../shared/components/button/Button'
 
 type CliIncompatibleProps = {
   checkCompatibility: () => void
-  children: ReactElement
 }
 
-export const CliIncompatible: React.FC<CliIncompatibleProps> = ({
-  checkCompatibility,
-  children
-}) => (
+export const CliIncompatible: React.FC<
+  PropsWithChildren<CliIncompatibleProps>
+> = ({ checkCompatibility, children }) => (
   <EmptyState isFullScreen={false}>
     <div>
       <h1>DVC is incompatible</h1>

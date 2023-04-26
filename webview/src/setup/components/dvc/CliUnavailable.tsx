@@ -1,23 +1,17 @@
-import React, { ReactElement } from 'react'
+import React, { PropsWithChildren } from 'react'
 import styles from './styles.module.scss'
 import { Button } from '../../../shared/components/button/Button'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
-
-const Title: React.FC = () => <h1>DVC is currently unavailable</h1>
 
 export type CliUnavailableProps = {
   installDvc: () => void
   pythonBinPath: string | undefined
   setupWorkspace: () => void
-  children: ReactElement
 }
 
-export const CliUnavailable: React.FC<CliUnavailableProps> = ({
-  installDvc,
-  pythonBinPath,
-  setupWorkspace,
-  children
-}) => {
+export const CliUnavailable: React.FC<
+  PropsWithChildren<CliUnavailableProps>
+> = ({ installDvc, pythonBinPath, setupWorkspace, children }) => {
   const canInstall = !!pythonBinPath
 
   const contents = canInstall ? (
@@ -39,7 +33,7 @@ export const CliUnavailable: React.FC<CliUnavailableProps> = ({
 
   return (
     <EmptyState isFullScreen={false}>
-      <Title />
+      <h1>DVC is currently unavailable</h1>
       {children}
       {contents}
     </EmptyState>
