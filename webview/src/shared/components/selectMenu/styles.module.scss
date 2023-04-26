@@ -1,10 +1,11 @@
-@import '../../../shared/variables.scss';
+@import '../../../shared/variables';
 
 .item {
   display: flex;
   cursor: pointer;
   height: 24px;
   padding: 2px 6px;
+
   &:hover {
     background-color: $hover-background-color;
   }

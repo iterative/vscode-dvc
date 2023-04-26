@@ -22,11 +22,11 @@ export const RibbonBlockTooltip: React.FC<{
           <ErrorTooltipContent error={errors.join('\n')} />
         </div>
       )}
-      <table className={styles.columnsTable}>
+      <table>
         <tbody>
           {firstThreeColumns.map(({ path, value, type }) => (
             <tr key={path}>
-              <td className={cx(styles[`${type}Key`])}>
+              <td className={cx(styles.tooltipColumn, styles[`${type}Key`])}>
                 <span className={styles.tooltipPathWrapper}>{path}</span>
               </td>
               <td>

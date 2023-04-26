@@ -11,13 +11,16 @@ $font: var(--vscode-font-family);
   font-size: 0.8rem;
   transition: none;
   white-space: nowrap;
+
   & > :global(.tippy-arrow) {
     color: $background;
     z-index: 1;
+
     ::before {
       overflow: hidden;
     }
   }
+
   & > :global(.tippy-content) {
     color: $foreground;
     white-space: nowrap;
