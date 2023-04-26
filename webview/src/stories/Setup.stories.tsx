@@ -114,17 +114,20 @@ CliFoundButNotCompatible.args = getUpdatedArgs({
 export const CannotInitializeGit = Template.bind({})
 CannotInitializeGit.args = getUpdatedArgs({
   canGitInitialize: false,
-  needsGitInitialized: true
+  needsGitInitialized: true,
+  projectInitialized: false
 })
 
 export const CanInitializeGit = Template.bind({})
 CanInitializeGit.args = getUpdatedArgs({
   canGitInitialize: true,
-  needsGitInitialized: true
+  needsGitInitialized: true,
+  projectInitialized: false
 })
 
 export const DvcUninitialized = Template.bind({})
 DvcUninitialized.args = getUpdatedArgs({
   canGitInitialize: undefined,
-  needsGitInitialized: undefined
+  needsGitInitialized: undefined,
+  projectInitialized: false
 })

@@ -279,7 +279,7 @@ describe('App', () => {
       ).not.toBeInTheDocument()
     })
 
-    it('should not show a screen saying that DVC is not initialized if the project is not initialized and git is uninitialized', () => {
+    it('should show a screen saying that DVC is not initialized if the project is not initialized and git is uninitialized', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
