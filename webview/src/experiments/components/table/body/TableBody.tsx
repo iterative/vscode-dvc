@@ -1,19 +1,15 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { ExperimentGroup } from './ExperimentGroup'
 import { BatchSelectionProp, RowContent } from './Row'
 import { WorkspaceRowGroup } from './WorkspaceRowGroup'
-import { PreviousCommitsRow } from './PreviousCommitsRow'
 import styles from '../styles.module.scss'
 import { InstanceProp, RowProp } from '../../../util/interfaces'
-import { ExperimentsState } from '../../../store'
 
 interface TableBodyProps extends RowProp, InstanceProp, BatchSelectionProp {
   root: HTMLElement | null
   tableHeaderHeight: number
-  showPreviousRow?: boolean
   isLast?: boolean
 }
 
@@ -26,7 +22,6 @@ export const TableBody: React.FC<TableBodyProps> = ({
   batchRowSelection,
   root,
   tableHeaderHeight,
-  showPreviousRow,
   isLast
 }) => {
   const contentProps = {
@@ -37,9 +32,6 @@ export const TableBody: React.FC<TableBodyProps> = ({
     projectHasCheckpoints,
     row
   }
-  const isBranchesView = useSelector(
-    (state: ExperimentsState) => state.tableData.isBranchesView
-  )
   const content =
     row.depth > 0 ? (
       <ExperimentGroup {...contentProps} />
@@ -66,12 +58,6 @@ export const TableBody: React.FC<TableBodyProps> = ({
       >
         {content}
       </tbody>
-      {showPreviousRow && (
-        <PreviousCommitsRow
-          isBranchesView={isBranchesView}
-          nbColumns={row.getAllCells().length}
-        />
-      )}
     </>
   )
 }

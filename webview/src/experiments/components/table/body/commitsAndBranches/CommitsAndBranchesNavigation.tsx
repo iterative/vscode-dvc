@@ -1,5 +1,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
+import { AddAndRemoveBranches } from './AddAndRemoveBranches'
 import styles from './styles.module.scss'
 import {
   showLessCommits,
@@ -34,6 +35,8 @@ export const CommitsAndBranchesNavigation: React.FC = () => {
           Show Less Commits
         </button>
       )}
+
+      <AddAndRemoveBranches />
 
       <span className={styles.separator} />
 

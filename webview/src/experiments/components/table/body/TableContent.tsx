@@ -55,14 +55,7 @@ export const TableContent: React.FC<TableContentProps> = ({
     <>
       {branches.map((branch, branchIndex) => {
         const branchRows = rows.filter(row => row.original.branch === branch)
-        const skipToIndex = branchIndex === 0 ? 2 : 1
-        const firstPreviousCommitIndex = branchRows.findIndex(
-          (row, i) => i >= skipToIndex && row.depth === 0
-        )
-        const rowBeforePreviousCommitsId =
-          firstPreviousCommitIndex > 0
-            ? branchRows[firstPreviousCommitIndex - 1].id
-            : branchRows.at(-1)?.id
+
         return (
           <Fragment key={branch}>
             {branchRows.map((row, i) => {
@@ -79,7 +72,6 @@ export const TableContent: React.FC<TableContentProps> = ({
                     hasRunningExperiment={hasRunningExperiment}
                     projectHasCheckpoints={hasCheckpoints}
                     batchRowSelection={batchRowSelection}
-                    showPreviousRow={row.id === rowBeforePreviousCommitsId}
                     isLast={i === branchRows.length - 1}
                   />
                 </Fragment>
