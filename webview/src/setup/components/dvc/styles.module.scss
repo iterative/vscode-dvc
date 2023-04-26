@@ -1,5 +1,5 @@
-@import '../../../shared/variables.scss';
-@import '../../../shared/mixins.scss';
+@import '../../../shared/variables';
+@import '../../../shared/mixins';
 
 .envDetails {
   margin: 0 auto;
@@ -34,6 +34,7 @@
 
 .buttonAsLink {
   @extend %buttonAsLink;
+
   font-size: inherit;
 }
 
