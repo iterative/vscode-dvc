@@ -40,8 +40,7 @@ export const Connect: React.FC = () => {
           onClick={saveStudioToken}
         />
         <p>
-          {"Don't Have an account?\n"}
-          <a href={STUDIO_URL}>Get Started</a>
+          Don&apos;t Have an account? <a href={STUDIO_URL}>Get Started</a>
         </p>
       </div>
     </EmptyState>

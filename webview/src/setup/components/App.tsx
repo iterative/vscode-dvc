@@ -44,6 +44,9 @@ export const App: React.FC = () => {
   useVsCodeMessaging(
     useCallback(
       ({ data }: { data: MessageToWebview<SetupData> }) => {
+        if (!data?.data) {
+          return
+        }
         setCanGitInitialized(data.data.canGitInitialize)
         setCliCompatible(data.data.cliCompatible)
         setHasData(data.data.hasData)
