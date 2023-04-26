@@ -1,5 +1,5 @@
 import React from 'react'
-import { Story, Meta } from '@storybook/react/types-6-0'
+import type { StoryFn, Meta } from '@storybook/react'
 
 import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'
 import Tooltip from '../shared/components/tooltip/Tooltip'
@@ -20,7 +20,7 @@ export default {
   title: 'Tooltip'
 } as Meta
 
-const Template: Story = args => (
+const Template: StoryFn = args => (
   <div
     style={{
       backgroundColor: 'gray',

@@ -1,4 +1,4 @@
-import { Story, Meta } from '@storybook/react/types-6-0'
+import type { StoryFn, Meta } from '@storybook/react'
 import React from 'react'
 
 import { IconWrapper } from './components/IconWrapper'
@@ -42,7 +42,7 @@ export default {
   title: 'Icons'
 } as Meta
 
-const Template: Story = () => {
+const Template: StoryFn = () => {
   return (
     <IconsWrapper>
       <IconWrapper name="Add">

@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react/types-6-0'
+import type { StoryFn, Meta } from '@storybook/react'
 import React from 'react'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'
@@ -18,7 +18,7 @@ export default {
   title: 'Context Menu'
 } as Meta
 
-const Template: Story<ContextMenuProps> = () => {
+const Template: StoryFn<ContextMenuProps> = () => {
   return (
     <WebviewWrapper>
       <ContextMenu
