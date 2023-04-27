@@ -44,7 +44,7 @@ const ExperimentHeader = () => (
   <div className={styles.experimentHeader}>Experiment</div>
 )
 
-const getDefaultColumnWithIndicatorsPlaceHolder = () =>
+const getDefaultColumn = () =>
   columnHelper.accessor(() => EXPERIMENT_COLUMN_ID, {
     cell: (cell: CellContext<Column, CellValue>) => {
       const {
@@ -91,7 +91,7 @@ const getColumns = (columns: Column[]) => {
     []
 
   return [
-    getDefaultColumnWithIndicatorsPlaceHolder(),
+    getDefaultColumn(),
     ...timestampColumn,
     ...buildColumns(columns, ColumnType.METRICS),
     ...buildColumns(columns, ColumnType.PARAMS),

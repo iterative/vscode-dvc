@@ -103,9 +103,9 @@ describe('App', () => {
         shareLiveToStudio: false
       })
 
-      expect(
-        screen.getByText('DVC is currently unavailable')
-      ).toBeInTheDocument()
+      expect(screen.getAllByText('DVC is currently unavailable')).toHaveLength(
+        2
+      )
     })
 
     it('should tell the user they cannot install DVC without a Python interpreter', () => {

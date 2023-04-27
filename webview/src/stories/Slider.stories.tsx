@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react/types-6-0'
+import type { StoryFn, Meta } from '@storybook/react'
 import React from 'react'
 import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'
 import { Slider } from '../shared/components/slider/Slider'
@@ -14,7 +14,7 @@ export default {
   title: 'Slider'
 } as Meta
 
-const Template: Story<{
+const Template: StoryFn<{
   maximum: number
   defaultValue: number
   label: string
