@@ -33,7 +33,6 @@ export const buildSetup = (
     messageSpy,
     resourceLocator,
     internalCommands,
-    dvcExecutor,
     dvcReader,
     gitExecutor,
     gitReader
@@ -99,7 +98,6 @@ export const buildSetup = (
 
   return {
     config,
-    dvcExecutor,
     internalCommands,
     messageSpy,
     mockAutoInstallDvc,

@@ -2,13 +2,13 @@ import { join } from 'path'
 import { getDVCAppDir, getIterativeAppDir } from './appdirs'
 import { getProcessPlatform } from '../env'
 
-const mockedUserConfigDir = require('appdirs').userConfigDir
-const mockedGetProcessPlatform = jest.mocked(getProcessPlatform)
-const mockedJoin = jest.mocked(join)
-
 jest.mock('appdirs', () => ({ userConfigDir: jest.fn() }))
 jest.mock('../env')
 jest.mock('path')
+
+const mockedUserConfigDir = require('appdirs').userConfigDir
+const mockedGetProcessPlatform = jest.mocked(getProcessPlatform)
+const mockedJoin = jest.mocked(join)
 
 beforeEach(() => {
   jest.resetAllMocks()
