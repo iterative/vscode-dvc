@@ -182,7 +182,6 @@ export class Extension extends Disposable {
 
     this.setup = this.dispose.track(
       new Setup(
-        context,
         config,
         this.internalCommands,
         this.experiments,

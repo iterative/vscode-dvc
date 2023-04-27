@@ -1,11 +1,5 @@
-import {
-  Event,
-  EventEmitter,
-  ExtensionContext,
-  SecretStorage,
-  ViewColumn,
-  workspace
-} from 'vscode'
+import { join } from 'path'
+import { Event, EventEmitter, ViewColumn, workspace } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import isEmpty from 'lodash.isempty'
 import { SetupSection, SetupData as TSetupData } from './webview/contract'
@@ -14,7 +8,7 @@ import { WebviewMessages } from './webview/messages'
 import { validateTokenInput } from './inputBox'
 import { findPythonBinForInstall } from './autoInstall'
 import { run, runWithRecheck, runWorkspace } from './runner'
-import { STUDIO_ACCESS_TOKEN_KEY, isStudioAccessToken } from './token'
+import { isStudioAccessToken } from './token'
 import { pickFocusedProjects } from './quickPick'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
@@ -47,11 +41,15 @@ import { createFileSystemWatcher } from '../fileSystem/watcher'
 import { EventName } from '../telemetry/constants'
 import { WorkspaceScale } from '../telemetry/collect'
 import { gitPath } from '../cli/git/constants'
-import { DOT_DVC } from '../cli/dvc/constants'
+import { Flag, ConfigKey as DvcConfigKey, DOT_DVC } from '../cli/dvc/constants'
 import { GLOBAL_WEBVIEW_DVCROOT } from '../webview/factory'
-import { ConfigKey, getConfigValue } from '../vscode/config'
+import {
+  ConfigKey as ExtensionConfigKey,
+  getConfigValue
+} from '../vscode/config'
 import { getValidInput } from '../vscode/inputBox'
 import { Title } from '../vscode/title'
+import { getDVCAppDir } from '../util/appdirs'
 
 export type SetupWebviewWebview = BaseWebview<TSetupData>
 
@@ -87,14 +85,12 @@ export class Setup
 
   private dotFolderWatcher?: Disposer
 
-  private readonly secrets: SecretStorage
   private studioAccessToken: string | undefined = undefined
   private studioIsConnected = false
 
   private focusedSection: SetupSection | undefined = undefined
 
   constructor(
-    context: ExtensionContext,
     config: Config,
     internalCommands: InternalCommands,
     experiments: WorkspaceExperiments,
@@ -147,31 +143,15 @@ export class Setup
     this.watchConfigurationDetailsForChanges()
     this.watchDotFolderForChanges()
     this.watchPathForChanges(stopWatch)
-
-    this.secrets = context.secrets
-
-    void this.getSecret(STUDIO_ACCESS_TOKEN_KEY).then(
-      async studioAccessToken => {
-        this.studioAccessToken = studioAccessToken
-        await this.updateIsStudioConnected()
-        this.deferred.resolve()
-      }
-    )
-
-    this.dispose.track(
-      context.secrets.onDidChange(async e => {
-        if (e.key !== STUDIO_ACCESS_TOKEN_KEY) {
-          return
-        }
-
-        this.studioAccessToken = await this.getSecret(STUDIO_ACCESS_TOKEN_KEY)
-        return this.updateIsStudioConnected()
-      })
-    )
+    this.watchDvcConfigs()
 
     this.dispose.track(
       workspace.onDidChangeConfiguration(e => {
-        if (e.affectsConfiguration(ConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE)) {
+        if (
+          e.affectsConfiguration(
+            ExtensionConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE
+          )
+        ) {
           return this.sendDataToWebview()
         }
       })
@@ -243,6 +223,7 @@ export class Setup
 
   public setCliCompatible(compatible: boolean | undefined) {
     this.cliCompatible = compatible
+    void this.updateIsStudioConnected()
     const incompatible = compatible === undefined ? undefined : !compatible
     void setContextValue(ContextKey.CLI_INCOMPATIBLE, incompatible)
   }
@@ -256,7 +237,7 @@ export class Setup
   }
 
   public shouldBeShown() {
-    return !this.cliCompatible || !this.hasRoots() || !this.getHasData()
+    return !this.getCliCompatible() || !this.hasRoots() || !this.getHasData()
   }
 
   public async selectFocusedProjects() {
@@ -300,11 +281,54 @@ export class Setup
     }
   }
 
-  public removeStudioAccessToken() {
-    return this.removeSecret(STUDIO_ACCESS_TOKEN_KEY)
+  public async removeStudioAccessToken() {
+    if (!this.getCliCompatible()) {
+      return
+    }
+
+    if (this.dvcRoots.length !== 1) {
+      const cwd = getFirstWorkspaceFolder()
+      if (!cwd) {
+        return
+      }
+      return this.internalCommands.executeCommand(
+        AvailableCommands.CONFIG,
+        cwd,
+        Flag.GLOBAL,
+        Flag.UNSET,
+        DvcConfigKey.STUDIO_TOKEN
+      )
+    }
+
+    const cwd = this.dvcRoots[0]
+
+    try {
+      await this.internalCommands.executeCommand(
+        AvailableCommands.CONFIG,
+        cwd,
+        Flag.LOCAL,
+        Flag.UNSET,
+        DvcConfigKey.STUDIO_TOKEN
+      )
+    } catch {}
+    try {
+      return await this.internalCommands.executeCommand(
+        AvailableCommands.CONFIG,
+        cwd,
+        Flag.GLOBAL,
+        Flag.UNSET,
+        DvcConfigKey.STUDIO_TOKEN
+      )
+    } catch {}
   }
 
   public async saveStudioAccessToken() {
+    const cwd = this.dvcRoots[0] || getFirstWorkspaceFolder()
+
+    if (!cwd) {
+      return
+    }
+
     const token = await getValidInput(
       Title.ENTER_STUDIO_TOKEN,
       validateTokenInput,
@@ -314,12 +338,19 @@ export class Setup
       return
     }
 
-    return this.storeSecret(STUDIO_ACCESS_TOKEN_KEY, token)
+    await this.internalCommands.executeCommand(
+      AvailableCommands.CONFIG,
+      cwd,
+      Flag.GLOBAL,
+      DvcConfigKey.STUDIO_TOKEN,
+      token
+    )
+    return this.updateIsStudioConnected()
   }
 
   public getStudioLiveShareToken() {
     return getConfigValue<boolean>(
-      ConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE,
+      ExtensionConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE,
       false
     )
       ? this.getStudioAccessToken()
@@ -350,7 +381,7 @@ export class Setup
 
     this.webviewMessages.sendWebviewMessage({
       canGitInitialize,
-      cliCompatible: this.cliCompatible,
+      cliCompatible: this.getCliCompatible(),
       hasData,
       isPythonExtensionInstalled: isPythonExtensionInstalled(),
       isStudioConnected: this.studioIsConnected,
@@ -359,7 +390,9 @@ export class Setup
       projectInitialized,
       pythonBinPath: getBinDisplayText(pythonBinPath),
       sectionCollapsed: collectSectionCollapsed(this.focusedSection),
-      shareLiveToStudio: getConfigValue(ConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE)
+      shareLiveToStudio: getConfigValue(
+        ExtensionConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE
+      )
     })
     this.focusedSection = undefined
   }
@@ -538,7 +571,11 @@ export class Setup
         const trySetupWithVenv =
           previousPythonBinPath !== this.config.getPythonBinPath()
 
-        if (!this.cliAccessible || !this.cliCompatible || trySetupWithVenv) {
+        if (
+          !this.cliAccessible ||
+          !this.getCliCompatible() ||
+          trySetupWithVenv
+        ) {
           this.workspaceChanged.fire()
         }
       }
@@ -579,6 +616,10 @@ export class Setup
     return this.workspaceChanged.fire()
   }
 
+  private getCliCompatible() {
+    return this.cliCompatible
+  }
+
   private async getEventProperties() {
     return {
       ...(this.cliAccessible ? await this.collectWorkspaceScale() : {}),
@@ -592,7 +633,8 @@ export class Setup
     }
   }
 
-  private updateIsStudioConnected() {
+  private async updateIsStudioConnected() {
+    await this.setStudioAccessToken()
     const storedToken = this.getStudioAccessToken()
     const isConnected = isStudioAccessToken(storedToken)
     return this.setStudioIsConnected(isConnected)
@@ -604,22 +646,54 @@ export class Setup
     return setContextValue(ContextKey.STUDIO_CONNECTED, isConnected)
   }
 
-  private getSecret(key: string) {
-    const secrets = this.getSecrets()
-    return secrets.get(key)
+  private watchDvcConfigs() {
+    const createWatcher = (watchedPath: string) =>
+      createFileSystemWatcher(
+        disposable => this.dispose.track(disposable),
+        getRelativePattern(watchedPath, '**'),
+        path => {
+          if (
+            path.endsWith(join('dvc', 'config')) ||
+            path.endsWith(join('dvc', 'config.local'))
+          ) {
+            void this.updateIsStudioConnected()
+          }
+        }
+      )
+
+    const globalConfigPath = getDVCAppDir()
+
+    createWatcher(globalConfigPath)
+
+    for (const workspaceFolder of getWorkspaceFolders()) {
+      createWatcher(workspaceFolder)
+    }
   }
 
-  private storeSecret(key: string, value: string) {
-    const secrets = this.getSecrets()
-    return secrets.store(key, value)
-  }
+  private async setStudioAccessToken() {
+    if (!this.getCliCompatible()) {
+      this.studioAccessToken = undefined
+      return
+    }
 
-  private removeSecret(key: string) {
-    const secrets = this.getSecrets()
-    return secrets.delete(key)
-  }
+    if (this.dvcRoots.length !== 1) {
+      const cwd = getFirstWorkspaceFolder()
+      if (!cwd) {
+        this.studioAccessToken = undefined
+        return
+      }
+      this.studioAccessToken = await this.internalCommands.executeCommand(
+        AvailableCommands.CONFIG,
+        cwd,
+        DvcConfigKey.STUDIO_TOKEN
+      )
+      return
+    }
 
-  private getSecrets() {
-    return this.secrets
+    this.studioAccessToken = await this.internalCommands.executeCommand(
+      AvailableCommands.CONFIG,
+      this.dvcRoots[0],
+      DvcConfigKey.STUDIO_TOKEN
+    )
   }
 }

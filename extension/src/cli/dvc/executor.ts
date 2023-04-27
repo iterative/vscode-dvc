@@ -18,6 +18,7 @@ export const autoRegisteredCommands = {
   ADD: 'add',
   CHECKOUT: 'checkout',
   COMMIT: 'commit',
+  CONFIG: 'config',
   EXPERIMENT_APPLY: 'experimentApply',
   EXPERIMENT_BRANCH: 'experimentBranch',
   EXPERIMENT_GARBAGE_COLLECT: 'experimentGarbageCollect',
@@ -69,6 +70,10 @@ export class DvcExecutor extends DvcCli {
 
   public commit(cwd: string, ...args: Args) {
     return this.blockAndExecuteProcess(cwd, Command.COMMIT, ...args, Flag.FORCE)
+  }
+
+  public config(cwd: string, ...args: Args) {
+    return this.executeDvcProcess(cwd, Command.CONFIG, ...args)
   }
 
   public experimentApply(cwd: string, experimentName: string) {
