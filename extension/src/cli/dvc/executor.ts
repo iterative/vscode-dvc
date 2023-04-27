@@ -20,13 +20,13 @@ export const autoRegisteredCommands = {
   CHECKOUT: 'checkout',
   COMMIT: 'commit',
   CONFIG: 'config',
-  EXPERIMENT_APPLY: 'experimentApply',
-  EXPERIMENT_BRANCH: 'experimentBranch',
-  EXPERIMENT_GARBAGE_COLLECT: 'experimentGarbageCollect',
-  EXPERIMENT_PUSH: 'experimentPush',
-  EXPERIMENT_QUEUE: 'experimentRunQueue',
-  EXPERIMENT_REMOVE: 'experimentRemove',
-  EXPERIMENT_REMOVE_QUEUE: 'experimentRemoveQueue',
+  EXP_APPLY: 'expApply',
+  EXP_BRANCH: 'expBranch',
+  EXP_GARBAGE_COLLECT: 'expGarbageCollect',
+  EXP_PUSH: 'expPush',
+  EXP_QUEUE: 'expRunQueue',
+  EXP_REMOVE: 'expRemove',
+  EXP_REMOVE_QUEUE: 'expRemoveQueue',
   INIT: 'init',
   IS_SCM_COMMAND_RUNNING: 'isScmCommandRunning',
   MOVE: 'move',
@@ -78,7 +78,7 @@ export class DvcExecutor extends DvcCli {
     return this.executeDvcProcess(cwd, Command.CONFIG, ...args)
   }
 
-  public experimentApply(cwd: string, experimentName: string) {
+  public expApply(cwd: string, experimentName: string) {
     return this.executeExperimentProcess(
       cwd,
       ExperimentSubCommand.APPLY,
@@ -86,11 +86,7 @@ export class DvcExecutor extends DvcCli {
     )
   }
 
-  public experimentBranch(
-    cwd: string,
-    experimentName: string,
-    branchName: string
-  ) {
+  public expBranch(cwd: string, experimentName: string, branchName: string) {
     return this.executeExperimentProcess(
       cwd,
       ExperimentSubCommand.BRANCH,
@@ -99,10 +95,7 @@ export class DvcExecutor extends DvcCli {
     )
   }
 
-  public experimentGarbageCollect(
-    cwd: string,
-    ...preserveFlags: GcPreserveFlag[]
-  ) {
+  public expGarbageCollect(cwd: string, ...preserveFlags: GcPreserveFlag[]) {
     return this.executeExperimentProcess(
       cwd,
       ExperimentSubCommand.GARBAGE_COLLECT,
@@ -111,7 +104,7 @@ export class DvcExecutor extends DvcCli {
     )
   }
 
-  public experimentPush(cwd: string, id: string) {
+  public expPush(cwd: string, id: string) {
     return this.executeExperimentProcess(
       cwd,
       ExperimentSubCommand.PUSH,
@@ -120,7 +113,7 @@ export class DvcExecutor extends DvcCli {
     )
   }
 
-  public experimentRemove(cwd: string, ...experimentNames: string[]) {
+  public expRemove(cwd: string, ...experimentNames: string[]) {
     return this.executeExperimentProcess(
       cwd,
       ExperimentSubCommand.REMOVE,
@@ -128,11 +121,11 @@ export class DvcExecutor extends DvcCli {
     )
   }
 
-  public experimentRemoveQueue(cwd: string) {
-    return this.experimentRemove(cwd, ExperimentFlag.QUEUE)
+  public expRemoveQueue(cwd: string) {
+    return this.expRemove(cwd, ExperimentFlag.QUEUE)
   }
 
-  public experimentRunQueue(cwd: string, ...args: Args) {
+  public expRunQueue(cwd: string, ...args: Args) {
     return this.executeExperimentProcess(
       cwd,
       ExperimentSubCommand.RUN,

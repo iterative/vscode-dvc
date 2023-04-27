@@ -551,7 +551,7 @@ suite('Experiments Test Suite', () => {
 
       const mockExperimentApply = stub(
         DvcExecutor.prototype,
-        'experimentApply'
+        'expApply'
       ).resolves(undefined)
 
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
@@ -577,7 +577,7 @@ suite('Experiments Test Suite', () => {
 
       const mockExperimentBranch = stub(
         DvcExecutor.prototype,
-        'experimentBranch'
+        'expBranch'
       ).resolves('undefined')
 
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
@@ -675,9 +675,9 @@ suite('Experiments Test Suite', () => {
           return 'isat_token'
         })
       )
-      const mockExperimentPush = stub(DvcExecutor.prototype, 'experimentPush')
+      const mockexpPush = stub(DvcExecutor.prototype, 'expPush')
       const commandExecuted = new Promise(resolve =>
-        mockExperimentPush.callsFake(() => {
+        mockexpPush.callsFake(() => {
           resolve(undefined)
           return Promise.resolve(
             `Pushed experiment ${mockExpId} to Git remote 'origin'`
@@ -692,7 +692,7 @@ suite('Experiments Test Suite', () => {
 
       await Promise.all([tokenFound, commandExecuted])
 
-      expect(mockExperimentPush).to.be.calledWithExactly(dvcDemoPath, mockExpId)
+      expect(mockexpPush).to.be.calledWithExactly(dvcDemoPath, mockExpId)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to modify an experiment's params and queue an experiment", async () => {
@@ -709,10 +709,9 @@ suite('Experiments Test Suite', () => {
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
-      const mockQueueExperiment = stub(
-        dvcExecutor,
-        'experimentRunQueue'
-      ).resolves(undefined)
+      const mockQueueExperiment = stub(dvcExecutor, 'expRunQueue').resolves(
+        undefined
+      )
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -817,7 +816,7 @@ suite('Experiments Test Suite', () => {
 
       const mockExperimentRemove = stub(
         DvcExecutor.prototype,
-        'experimentRemove'
+        'expRemove'
       ).resolves(undefined)
 
       mockMessageReceived.fire({

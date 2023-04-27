@@ -154,10 +154,9 @@ suite('Workspace Experiments Test Suite', () => {
 
       const { dvcExecutor, experiments } = buildExperiments(disposable)
 
-      const mockExperimentRunQueue = stub(
-        dvcExecutor,
-        'experimentRunQueue'
-      ).resolves('true')
+      const mockExperimentRunQueue = stub(dvcExecutor, 'expRunQueue').resolves(
+        'true'
+      )
 
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
@@ -325,7 +324,7 @@ suite('Workspace Experiments Test Suite', () => {
 
       const mockExperimentRunQueue = stub(
         DvcExecutor.prototype,
-        'experimentRunQueue'
+        'expRunQueue'
       ).resolves('true')
 
       stubWorkspaceExperimentsGetters(dvcDemoPath)
@@ -339,7 +338,7 @@ suite('Workspace Experiments Test Suite', () => {
     it('should send a telemetry event containing a duration when an experiment is queued', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('train')
 
-      stub(DvcExecutor.prototype, 'experimentRunQueue').resolves('true')
+      stub(DvcExecutor.prototype, 'expRunQueue').resolves('true')
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
@@ -371,7 +370,7 @@ suite('Workspace Experiments Test Suite', () => {
         undefined
       )
 
-      stub(DvcExecutor.prototype, 'experimentRunQueue').callsFake(() => {
+      stub(DvcExecutor.prototype, 'expRunQueue').callsFake(() => {
         throw new Error(mockErrorMessage)
       })
 
@@ -554,7 +553,7 @@ suite('Workspace Experiments Test Suite', () => {
       const mockShowQuickPick = stub(window, 'showQuickPick').resolves({
         value: selectedExperiment
       } as QuickPickItemWithValue<string>)
-      const mockExperimentApply = stub(DvcExecutor.prototype, 'experimentApply')
+      const mockExperimentApply = stub(DvcExecutor.prototype, 'expApply')
 
       await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_APPLY)
 
@@ -638,7 +637,7 @@ suite('Workspace Experiments Test Suite', () => {
 
       const mockExperimentBranch = stub(
         DvcExecutor.prototype,
-        'experimentBranch'
+        'expBranch'
       ).resolves(
         `Git branch '${mockBranch}' has been created from experiment '${testExperiment}'.        
      To switch to the new branch run:
@@ -691,10 +690,7 @@ suite('Workspace Experiments Test Suite', () => {
             value: secondMockExperimentId
           }
         ] as QuickPickReturnValue)
-      const mockExperimentRemove = stub(
-        DvcExecutor.prototype,
-        'experimentRemove'
-      )
+      const mockExperimentRemove = stub(DvcExecutor.prototype, 'expRemove')
 
       await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_REMOVE)
       expect(mockShowQuickPick).calledWithExactly(
@@ -786,10 +782,7 @@ suite('Workspace Experiments Test Suite', () => {
 
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
-      const mockExperimentRemove = stub(
-        DvcExecutor.prototype,
-        'experimentRemove'
-      )
+      const mockExperimentRemove = stub(DvcExecutor.prototype, 'expRemove')
 
       await commands.executeCommand(
         RegisteredCliCommands.EXPERIMENT_REMOVE_QUEUE
