@@ -1,0 +1,43 @@
+@import '../../../shared/variables';
+@import '../../../shared/mixins';
+
+.envDetails {
+  margin: 0 auto;
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.envDetailsKey,
+.envDetailsValue {
+  padding: 5px;
+}
+
+.envDetailsKey {
+  font-weight: bold;
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+.envDetailsValue {
+  padding-left: 50px;
+  display: flex;
+  flex-direction: column;
+}
+
+.separator {
+  margin: 0 5px;
+
+  &::before {
+    content: '|';
+  }
+}
+
+.buttonAsLink {
+  @extend %buttonAsLink;
+
+  font-size: inherit;
+}
+
+.sideBySideButtons > *:not(:first-child) {
+  margin-left: 15px;
+}
