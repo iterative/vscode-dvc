@@ -578,21 +578,17 @@ export class Setup
   }
 
   private watchDotFolderForChanges() {
-    const cwd = getFirstWorkspaceFolder()
-
-    if (!cwd) {
-      return
-    }
-
     const disposer = Disposable.fn()
     this.dotFolderWatcher = disposer
     this.dispose.track(this.dotFolderWatcher)
 
-    return createFileSystemWatcher(
-      disposable => disposer.track(disposable),
-      getRelativePattern(cwd, '**'),
-      path => this.dotFolderListener(disposer, path)
-    )
+    for (const workspaceFolder of getWorkspaceFolders()) {
+      createFileSystemWatcher(
+        disposable => disposer.track(disposable),
+        getRelativePattern(workspaceFolder, '**'),
+        path => this.dotFolderListener(disposer, path)
+      )
+    }
   }
 
   private dotFolderListener(disposer: Disposer, path: string) {
