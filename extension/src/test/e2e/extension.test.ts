@@ -51,10 +51,8 @@ describe('Experiments Table Webview', function () {
   const headerRows = 3
   const workspaceRow = 1
   const commitRows = 3
-  const previousCommitRow = 1
-  const actionsRow = 1
-  const initialRows =
-    headerRows + workspaceRow + commitRows + previousCommitRow + actionsRow
+  const branchRow = 1
+  const initialRows = headerRows + workspaceRow + commitRows + branchRow
 
   it('should load as an editor', async function () {
     const workbench = await browser.getWorkbench()
@@ -109,7 +107,7 @@ describe('Experiments Table Webview', function () {
 
     const currentRows = await webview.row$$
 
-    const newRow = currentRows[headerRows + workspaceRow + 1]
+    const newRow = currentRows[headerRows + workspaceRow + branchRow + 1]
 
     const experimentName = (await webview.getExperimentName(newRow)) as string
 
