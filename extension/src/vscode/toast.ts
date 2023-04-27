@@ -75,8 +75,8 @@ export class Toast {
     })
   }
 
-  static delayProgressClosing() {
-    return delay(5000)
+  static delayProgressClosing(ms = 5000) {
+    return delay(ms)
   }
 
   private static waitForResponse(

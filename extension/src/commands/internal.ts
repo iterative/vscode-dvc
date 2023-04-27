@@ -18,7 +18,7 @@ import { Disposable } from '../class/dispose'
 type Command = (...args: Args) => unknown | Promise<unknown>
 
 export const AvailableCommands = Object.assign(
-  { EXP_PUSH: 'expPush' } as const,
+  {},
   DvcExecutorCommands,
   DvcReaderCommands,
   DvcRunnerCommands,
@@ -30,7 +30,7 @@ export const AvailableCommands = Object.assign(
   typeof DvcRunnerCommands &
   typeof DvcViewerCommands &
   typeof GitExecutorCommands &
-  typeof GitReaderCommands & { EXP_PUSH: 'expPush' }
+  typeof GitReaderCommands
 export type CommandId =
   (typeof AvailableCommands)[keyof typeof AvailableCommands]
 

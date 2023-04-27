@@ -115,10 +115,10 @@ export const getShareExperimentToStudioCommand =
       return commands.executeCommand(RegisteredCommands.SETUP_SHOW)
     }
 
-    return Toast.showProgress('Pushing Experiment', async progress => {
+    return Toast.showProgress('Sharing', async progress => {
       progress.report({ increment: 0 })
 
-      progress.report({ increment: 25, message: 'Pushing experiment...' })
+      progress.report({ increment: 25, message: 'Running exp push...' })
 
       await Toast.runCommandAndIncrementProgress(
         () =>
@@ -131,6 +131,6 @@ export const getShareExperimentToStudioCommand =
         75
       )
 
-      return Toast.delayProgressClosing()
+      return Toast.delayProgressClosing(15000)
     })
   }
