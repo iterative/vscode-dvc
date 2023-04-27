@@ -35,8 +35,9 @@ export class WebviewMessages {
   public sendWebviewMessage({
     canGitInitialize,
     cliCompatible,
+    dvcCliDetails,
     hasData,
-    isPythonExtensionInstalled,
+    isPythonExtensionUsed,
     isStudioConnected,
     needsGitCommit,
     needsGitInitialized,
@@ -48,8 +49,9 @@ export class WebviewMessages {
     void this.getWebview()?.show({
       canGitInitialize,
       cliCompatible,
+      dvcCliDetails,
       hasData,
-      isPythonExtensionInstalled,
+      isPythonExtensionUsed,
       isStudioConnected,
       needsGitCommit,
       needsGitInitialized,
