@@ -24,7 +24,6 @@ import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Resource } from '../resourceLocator'
-import { isPythonExtensionInstalled } from '../extensions/python'
 import {
   findAbsoluteDvcRootPath,
   findDvcRootPaths,
@@ -354,9 +353,18 @@ export class Setup
     }
   }
 
+  private isDVCBeingUsedGlobally() {
+    const dvcPath = this.config.getCliPath()
+    const pythonBinPath = this.config.getPythonBinPath()
+
+    return dvcPath || !pythonBinPath
+  }
+
   private async sendDataToWebview() {
     const projectInitialized = this.hasRoots()
     const hasData = this.getHasData()
+
+    const isPythonExtensionUsed = await this.isPythonExtensionUsed()
 
     const needsGitInitialized =
       !projectInitialized && !!(await this.needsGitInit())
@@ -375,7 +383,8 @@ export class Setup
       cliCompatible: this.cliCompatible,
       dvcCliDetails,
       hasData,
-      isPythonExtensionInstalled: isPythonExtensionInstalled(),
+      isPythonExtensionUsed:
+        !this.isDVCBeingUsedGlobally() && isPythonExtensionUsed,
       isStudioConnected: this.studioIsConnected,
       needsGitCommit,
       needsGitInitialized,

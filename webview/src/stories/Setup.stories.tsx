@@ -13,7 +13,7 @@ const DEFAULT_DATA: SetupData = {
     version: '1.0.0'
   },
   hasData: false,
-  isPythonExtensionInstalled: true,
+  isPythonExtensionUsed: true,
   isStudioConnected: true,
   needsGitCommit: false,
   needsGitInitialized: false,
@@ -65,7 +65,6 @@ NoDataNotConnected.args = getUpdatedArgs({
 })
 
 export const CompletedConnected = Template.bind({})
-
 CompletedConnected.args = getUpdatedArgs({
   hasData: true,
   isStudioConnected: true,
@@ -80,30 +79,18 @@ NoCLIPythonNotFound.args = getUpdatedArgs({
     command: 'dvc',
     version: undefined
   },
-  isPythonExtensionInstalled: false,
+  isPythonExtensionUsed: false,
   pythonBinPath: undefined
 })
 
-export const NoCLIPythonExtensionUsed = Template.bind({})
-NoCLIPythonExtensionUsed.args = getUpdatedArgs({
+export const NoCLIPythonFound = Template.bind({})
+NoCLIPythonFound.args = getUpdatedArgs({
   cliCompatible: undefined,
   dvcCliDetails: {
     command: '/opt/homebrew/Caskroom/miniforge/base/bin/python -m dvc',
     version: undefined
   },
-  isPythonExtensionInstalled: true,
   pythonBinPath: '/opt/homebrew/Caskroom/miniforge/base/bin/python'
-})
-
-export const NoCLIPythonExtensionNotUsed = Template.bind({})
-NoCLIPythonExtensionNotUsed.args = getUpdatedArgs({
-  cliCompatible: undefined,
-  dvcCliDetails: {
-    command: '.env/bin/python -m dvc',
-    version: undefined
-  },
-  isPythonExtensionInstalled: false,
-  pythonBinPath: '.env/bin/python'
 })
 
 export const CliFoundButNotCompatible = Template.bind({})
@@ -130,4 +117,9 @@ DvcUninitialized.args = getUpdatedArgs({
   canGitInitialize: undefined,
   needsGitInitialized: undefined,
   projectInitialized: false
+})
+
+export const CliFoundManually = Template.bind({})
+CliFoundManually.args = getUpdatedArgs({
+  isPythonExtensionUsed: false
 })

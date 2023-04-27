@@ -8,7 +8,7 @@ export type SetupData = {
   cliCompatible: boolean | undefined
   dvcCliDetails: DvcCliDetails
   hasData: boolean | undefined
-  isPythonExtensionInstalled: boolean
+  isPythonExtensionUsed: boolean
   isStudioConnected: boolean
   needsGitCommit: boolean
   needsGitInitialized: boolean | undefined

@@ -6,25 +6,25 @@ import styles from './styles.module.scss'
 import { DvcEnvCommandRow } from './DvcEnvCommandRow'
 
 interface DvcEnvDetailsProps extends DvcCliDetails {
-  isPythonExtensionInstalled: boolean
+  isPythonExtensionUsed: boolean
 }
 
 export const DvcEnvDetails: React.FC<DvcEnvDetailsProps> = ({
   command,
   version,
-  isPythonExtensionInstalled
+  isPythonExtensionUsed
 }) => {
   const versionText = `${
     version || 'Not found'
-  } (required >= ${MIN_CLI_VERSION} and < ${MAX_CLI_VERSION}.0.0)`
+  } (${MIN_CLI_VERSION} <= required < ${MAX_CLI_VERSION}.0.0)`
 
   return (
     <table data-testid="dvc-env-details" className={styles.envDetails}>
       <tbody>
         {version && (
           <DvcEnvCommandRow
+            isPythonExtensionUsed={isPythonExtensionUsed}
             command={command}
-            isPythonExtensionInstalled={isPythonExtensionInstalled}
           />
         )}
         <DvcEnvInfoRow title="Version" text={versionText} />

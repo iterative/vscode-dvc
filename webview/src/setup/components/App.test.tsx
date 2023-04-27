@@ -21,7 +21,7 @@ const renderApp = ({
   cliCompatible,
   dvcCliDetails,
   hasData,
-  isPythonExtensionInstalled,
+  isPythonExtensionUsed,
   isStudioConnected,
   needsGitInitialized,
   needsGitCommit,
@@ -40,7 +40,7 @@ const renderApp = ({
           cliCompatible,
           dvcCliDetails,
           hasData,
-          isPythonExtensionInstalled,
+          isPythonExtensionUsed,
           isStudioConnected,
           needsGitCommit,
           needsGitInitialized,
@@ -74,7 +74,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -104,7 +104,7 @@ describe('App', () => {
           version: undefined
         },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -128,7 +128,7 @@ describe('App', () => {
           version: undefined
         },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -156,7 +156,7 @@ describe('App', () => {
           version: undefined
         },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -183,7 +183,7 @@ describe('App', () => {
           version: undefined
         },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -210,7 +210,7 @@ describe('App', () => {
           version: undefined
         },
         hasData: false,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionUsed: true,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -237,7 +237,7 @@ describe('App', () => {
           version: undefined
         },
         hasData: false,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionUsed: true,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -264,7 +264,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -288,7 +288,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: true,
@@ -310,7 +310,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: true,
@@ -335,7 +335,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: true,
@@ -357,7 +357,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -379,7 +379,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -403,7 +403,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -430,7 +430,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -457,7 +457,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: true,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionUsed: true,
         isStudioConnected: true,
         needsGitCommit: false,
         needsGitInitialized: false,
@@ -484,7 +484,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: true,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionUsed: true,
         isStudioConnected: true,
         needsGitCommit: false,
         needsGitInitialized: false,
@@ -495,7 +495,7 @@ describe('App', () => {
       })
 
       const envDetails = screen.getByTestId('dvc-env-details')
-      const command = `1.0.0 (required >= ${MIN_CLI_VERSION} and < ${MAX_CLI_VERSION}.0.0)`
+      const command = `1.0.0 (${MIN_CLI_VERSION} <= required < ${MAX_CLI_VERSION}.0.0)`
 
       expect(within(envDetails).getByText('Version')).toBeInTheDocument()
       expect(within(envDetails).getByText(command)).toBeInTheDocument()
@@ -510,7 +510,7 @@ describe('App', () => {
           version: undefined
         },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -520,7 +520,7 @@ describe('App', () => {
         shareLiveToStudio: false
       })
       const envDetails = screen.getByTestId('dvc-env-details')
-      const command = `Not found (required >= ${MIN_CLI_VERSION} and < ${MAX_CLI_VERSION}.0.0)`
+      const command = `Not found (${MIN_CLI_VERSION} <= required < ${MAX_CLI_VERSION}.0.0)`
 
       expect(within(envDetails).getByText('Version')).toBeInTheDocument()
       expect(within(envDetails).getByText(command)).toBeInTheDocument()
@@ -536,7 +536,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: true,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionUsed: true,
         isStudioConnected: true,
         needsGitCommit: false,
         needsGitInitialized: false,
@@ -561,7 +561,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: true,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: true,
         needsGitCommit: false,
         needsGitInitialized: false,
@@ -599,7 +599,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: true,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionUsed: true,
         isStudioConnected: true,
         needsGitCommit: false,
         needsGitInitialized: false,
@@ -641,7 +641,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: true,
         needsGitInitialized: true,
@@ -663,7 +663,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: true,
         needsGitInitialized: true,
@@ -692,7 +692,7 @@ describe('App', () => {
           version: undefined
         },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -714,7 +714,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: true,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -738,7 +738,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: true,
         needsGitInitialized: false,
@@ -760,7 +760,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: undefined,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -782,7 +782,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -806,7 +806,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: true,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionUsed: true,
         isStudioConnected: true,
         needsGitCommit: false,
         needsGitInitialized: false,
@@ -835,7 +835,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionUsed: true,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: false,
@@ -859,7 +859,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionUsed: true,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: false,
@@ -887,7 +887,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionUsed: true,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: false,
@@ -915,7 +915,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionUsed: true,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: false,
@@ -946,7 +946,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionUsed: true,
         isStudioConnected: true,
         needsGitCommit: false,
         needsGitInitialized: false,
@@ -974,7 +974,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionUsed: true,
         isStudioConnected: true,
         needsGitCommit: false,
         needsGitInitialized: false,
@@ -1001,7 +1001,7 @@ describe('App', () => {
         version: '1.0.0'
       },
       hasData: false,
-      isPythonExtensionInstalled: true,
+      isPythonExtensionUsed: true,
       isStudioConnected: true,
       needsGitCommit: false,
       needsGitInitialized: false,

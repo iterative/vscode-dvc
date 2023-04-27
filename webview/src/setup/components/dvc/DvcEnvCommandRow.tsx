@@ -5,12 +5,12 @@ import { selectPythonInterpreter, setupWorkspace } from '../messages'
 
 interface DvcEnvCommandRowProps {
   command: string
-  isPythonExtensionInstalled: boolean
+  isPythonExtensionUsed: boolean
 }
 
 export const DvcEnvCommandRow: React.FC<DvcEnvCommandRowProps> = ({
   command,
-  isPythonExtensionInstalled
+  isPythonExtensionUsed
 }) => {
   const commandText = command || 'Not found'
   const commandValue = (
@@ -20,7 +20,7 @@ export const DvcEnvCommandRow: React.FC<DvcEnvCommandRowProps> = ({
         <button className={styles.buttonAsLink} onClick={setupWorkspace}>
           Configure
         </button>
-        {isPythonExtensionInstalled && (
+        {isPythonExtensionUsed && (
           <>
             <span className={styles.separator} />
             <button

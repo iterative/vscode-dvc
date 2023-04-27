@@ -20,7 +20,7 @@ export type DvcProps = {
   canGitInitialize: boolean | undefined
   cliCompatible: boolean | undefined
   dvcCliDetails: DvcCliDetails | undefined
-  isPythonExtensionInstalled: boolean
+  isPythonExtensionUsed: boolean
   needsGitInitialized: boolean | undefined
   projectInitialized: boolean
   pythonBinPath: string | undefined
@@ -32,7 +32,7 @@ export const Dvc: React.FC<DvcProps> = ({
   canGitInitialize,
   cliCompatible,
   dvcCliDetails,
-  isPythonExtensionInstalled,
+  isPythonExtensionUsed,
   needsGitInitialized,
   projectInitialized,
   pythonBinPath,
@@ -42,7 +42,7 @@ export const Dvc: React.FC<DvcProps> = ({
   const children = dvcCliDetails && (
     <DvcEnvDetails
       {...dvcCliDetails}
-      isPythonExtensionInstalled={isPythonExtensionInstalled}
+      isPythonExtensionUsed={isPythonExtensionUsed}
     />
   )
 

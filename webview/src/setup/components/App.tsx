@@ -34,7 +34,7 @@ export const App: React.FC = () => {
   const [pythonBinPath, setPythonBinPath] = useState<string | undefined>(
     undefined
   )
-  const [isPythonExtensionInstalled, setIsPythonExtensionInstalled] =
+  const [isPythonExtensionUsed, setisPythonExtensionUsed] =
     useState<boolean>(false)
   const [hasData, setHasData] = useState<boolean | undefined>(false)
   const [sectionCollapsed, setSectionCollapsed] = useState(
@@ -51,7 +51,7 @@ export const App: React.FC = () => {
         setCliCompatible(data.data.cliCompatible)
         setHasData(data.data.hasData)
         setDvcCliDetails(data.data.dvcCliDetails)
-        setIsPythonExtensionInstalled(data.data.isPythonExtensionInstalled)
+        setisPythonExtensionUsed(data.data.isPythonExtensionUsed)
         setNeedsGitInitialized(data.data.needsGitInitialized)
         setNeedsGitCommit(data.data.needsGitCommit)
         setProjectInitialized(data.data.projectInitialized)
@@ -67,7 +67,7 @@ export const App: React.FC = () => {
         setCliCompatible,
         setHasData,
         setDvcCliDetails,
-        setIsPythonExtensionInstalled,
+        setisPythonExtensionUsed,
         setNeedsGitInitialized,
         setNeedsGitCommit,
         setProjectInitialized,
@@ -99,7 +99,7 @@ export const App: React.FC = () => {
           canGitInitialize={canGitInitialize}
           cliCompatible={cliCompatible}
           dvcCliDetails={dvcCliDetails}
-          isPythonExtensionInstalled={isPythonExtensionInstalled}
+          isPythonExtensionUsed={isPythonExtensionUsed}
           needsGitInitialized={needsGitInitialized}
           projectInitialized={projectInitialized}
           pythonBinPath={pythonBinPath}
