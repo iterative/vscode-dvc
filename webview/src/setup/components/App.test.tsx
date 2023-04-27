@@ -3,6 +3,7 @@ import {
   MessageFromWebviewType,
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
+import { MAX_CLI_VERSION, MIN_CLI_VERSION } from 'dvc/src/cli/dvc/contract'
 import '@testing-library/jest-dom/extend-expect'
 import React from 'react'
 import { SetupSection, SetupData } from 'dvc/src/setup/webview/contract'
@@ -18,8 +19,9 @@ const mockPostMessage = jest.mocked(postMessage)
 const renderApp = ({
   canGitInitialize,
   cliCompatible,
+  dvcCliDetails,
   hasData,
-  isPythonExtensionInstalled,
+  isPythonExtensionUsed,
   isStudioConnected,
   needsGitInitialized,
   needsGitCommit,
@@ -36,8 +38,9 @@ const renderApp = ({
         data: {
           canGitInitialize,
           cliCompatible,
+          dvcCliDetails,
           hasData,
-          isPythonExtensionInstalled,
+          isPythonExtensionUsed,
           isStudioConnected,
           needsGitCommit,
           needsGitInitialized,
@@ -66,8 +69,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: false,
+        dvcCliDetails: {
+          command: 'dvc',
+          version: '1.0.0'
+        },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -92,8 +99,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: undefined,
+        dvcCliDetails: {
+          command: 'dvc',
+          version: undefined
+        },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -112,8 +123,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: undefined,
+        dvcCliDetails: {
+          command: 'dvc',
+          version: undefined
+        },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -136,8 +151,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: undefined,
+        dvcCliDetails: {
+          command: `${defaultInterpreter} -m dvc`,
+          version: undefined
+        },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -159,8 +178,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: undefined,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: undefined
+        },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -170,7 +193,7 @@ describe('App', () => {
         shareLiveToStudio: false
       })
 
-      const button = screen.getByText('Setup The Workspace')
+      const button = screen.getByText('Configure')
       fireEvent.click(button)
 
       expect(mockPostMessage).toHaveBeenCalledWith({
@@ -182,8 +205,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: undefined,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: undefined
+        },
         hasData: false,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionUsed: true,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -193,11 +220,11 @@ describe('App', () => {
         shareLiveToStudio: false
       })
 
-      const button = screen.getByText('Select Python Interpreter')
+      const button = screen.getByText('Configure')
       fireEvent.click(button)
 
       expect(mockPostMessage).toHaveBeenCalledWith({
-        type: MessageFromWebviewType.SELECT_PYTHON_INTERPRETER
+        type: MessageFromWebviewType.SETUP_WORKSPACE
       })
     })
 
@@ -205,8 +232,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: undefined,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: undefined
+        },
         hasData: false,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionUsed: true,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -228,8 +259,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -244,12 +279,16 @@ describe('App', () => {
       ).not.toBeInTheDocument()
     })
 
-    it('should not show a screen saying that DVC is not initialized if the project is not initialized and git is uninitialized', () => {
+    it('should show a screen saying that DVC is not initialized if the project is not initialized and git is uninitialized', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: true,
@@ -266,8 +305,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: true,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: true,
@@ -287,8 +330,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: true,
@@ -305,8 +352,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -323,8 +374,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -343,8 +398,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -366,8 +425,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -389,8 +452,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
         hasData: true,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionUsed: true,
         isStudioConnected: true,
         needsGitCommit: false,
         needsGitInitialized: false,
@@ -407,6 +474,161 @@ describe('App', () => {
         type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW
       })
     })
+
+    it('should show the user the version if dvc is installed', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
+        hasData: true,
+        isPythonExtensionUsed: true,
+        isStudioConnected: true,
+        needsGitCommit: false,
+        needsGitInitialized: false,
+        projectInitialized: true,
+        pythonBinPath: 'python',
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      const envDetails = screen.getByTestId('dvc-env-details')
+      const command = `1.0.0 (${MIN_CLI_VERSION} <= required < ${MAX_CLI_VERSION}.0.0)`
+
+      expect(within(envDetails).getByText('Version')).toBeInTheDocument()
+      expect(within(envDetails).getByText(command)).toBeInTheDocument()
+    })
+
+    it('should tell the user that version is not found if dvc is not installed', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: false,
+        dvcCliDetails: {
+          command: 'dvc',
+          version: undefined
+        },
+        hasData: false,
+        isPythonExtensionUsed: false,
+        isStudioConnected: false,
+        needsGitCommit: false,
+        needsGitInitialized: undefined,
+        projectInitialized: false,
+        pythonBinPath: undefined,
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+      const envDetails = screen.getByTestId('dvc-env-details')
+      const command = `Not found (${MIN_CLI_VERSION} <= required < ${MAX_CLI_VERSION}.0.0)`
+
+      expect(within(envDetails).getByText('Version')).toBeInTheDocument()
+      expect(within(envDetails).getByText(command)).toBeInTheDocument()
+    })
+
+    it('should show the user an example command if dvc is installed', () => {
+      const command = 'python -m dvc'
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        dvcCliDetails: {
+          command,
+          version: '1.0.0'
+        },
+        hasData: true,
+        isPythonExtensionUsed: true,
+        isStudioConnected: true,
+        needsGitCommit: false,
+        needsGitInitialized: false,
+        projectInitialized: true,
+        pythonBinPath: 'python',
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      const envDetails = screen.getByTestId('dvc-env-details')
+
+      expect(within(envDetails).getByText('Command')).toBeInTheDocument()
+      expect(within(envDetails).getByText(command)).toBeInTheDocument()
+    })
+
+    it('should show user an example command with a "Configure" button if dvc is installed without the python extension', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        dvcCliDetails: {
+          command: 'dvc',
+          version: '1.0.0'
+        },
+        hasData: true,
+        isPythonExtensionUsed: false,
+        isStudioConnected: true,
+        needsGitCommit: false,
+        needsGitInitialized: false,
+        projectInitialized: true,
+        pythonBinPath: undefined,
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      const envDetails = screen.getByTestId('dvc-env-details')
+
+      expect(within(envDetails).getByText('Command')).toBeInTheDocument()
+
+      const configureButton = within(envDetails).getByText('Configure')
+      const selectButton = within(envDetails).queryByText(
+        'Select Python Interpreter'
+      )
+
+      expect(configureButton).toBeInTheDocument()
+      expect(selectButton).not.toBeInTheDocument()
+
+      fireEvent.click(configureButton)
+
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SETUP_WORKSPACE
+      })
+    })
+
+    it('should show user an example command with "Configure" and "Select Python Interpreter" buttons if dvc is installed with the python extension', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
+        hasData: true,
+        isPythonExtensionUsed: true,
+        isStudioConnected: true,
+        needsGitCommit: false,
+        needsGitInitialized: false,
+        projectInitialized: true,
+        pythonBinPath: 'python',
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      const envDetails = screen.getByTestId('dvc-env-details')
+
+      expect(within(envDetails).getByText('Command')).toBeInTheDocument()
+
+      const configureButton = within(envDetails).getByText('Configure')
+      const selectButton = within(envDetails).getByText(
+        'Select Python Interpreter'
+      )
+
+      expect(configureButton).toBeInTheDocument()
+      expect(selectButton).toBeInTheDocument()
+
+      mockPostMessage.mockClear()
+
+      fireEvent.click(selectButton)
+
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SELECT_PYTHON_INTERPRETER
+      })
+    })
   })
 
   describe('Experiments', () => {
@@ -414,8 +636,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: true,
         needsGitInitialized: true,
@@ -432,8 +658,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: true,
         needsGitInitialized: true,
@@ -456,9 +686,13 @@ describe('App', () => {
     it('should show a screen saying that dvc is not setup if the project is initalized but dvc is not installed', () => {
       renderApp({
         canGitInitialize: false,
-        cliCompatible: true,
+        cliCompatible: false,
+        dvcCliDetails: {
+          command: 'dvc',
+          version: undefined
+        },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -475,8 +709,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
         hasData: true,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -495,8 +733,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: true,
         needsGitInitialized: false,
@@ -513,8 +755,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
         hasData: undefined,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -531,8 +777,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: undefined,
@@ -551,8 +801,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
         hasData: true,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionUsed: true,
         isStudioConnected: true,
         needsGitCommit: false,
         needsGitInitialized: false,
@@ -576,8 +830,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
         hasData: false,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionUsed: true,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: false,
@@ -596,8 +854,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
         hasData: false,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionUsed: true,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: false,
@@ -620,8 +882,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
         hasData: false,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionUsed: true,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: false,
@@ -644,8 +910,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
         hasData: false,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionUsed: true,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: false,
@@ -671,8 +941,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
         hasData: false,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionUsed: true,
         isStudioConnected: true,
         needsGitCommit: false,
         needsGitInitialized: false,
@@ -695,8 +969,12 @@ describe('App', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
         hasData: false,
-        isPythonExtensionInstalled: true,
+        isPythonExtensionUsed: true,
         isStudioConnected: true,
         needsGitCommit: false,
         needsGitInitialized: false,
@@ -718,8 +996,12 @@ describe('App', () => {
     const testData = {
       canGitInitialize: false,
       cliCompatible: true,
+      dvcCliDetails: {
+        command: 'python -m dvc',
+        version: '1.0.0'
+      },
       hasData: false,
-      isPythonExtensionInstalled: true,
+      isPythonExtensionUsed: true,
       isStudioConnected: true,
       needsGitCommit: false,
       needsGitInitialized: false,

@@ -1,12 +1,17 @@
 @import '../../../../../shared/variables';
 
 .branchName {
-  padding: 0 20px 10px;
+  padding: 0 20px;
   display: flex;
   align-items: center;
   gap: 4px;
+  font-size: 0.6rem;
 }
 
 .icon {
   fill: $accent-color;
+}
+
+.branchActions {
+  text-align: left;
 }

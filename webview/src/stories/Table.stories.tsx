@@ -264,7 +264,7 @@ export const Scrolled: StoryFn<{ tableData: TableDataState }> = ({
 Scrolled.play = async ({ canvasElement }) => {
   await findByText(canvasElement, '90aea7f')
   const rows = getAllByRole(canvasElement, 'row')
-  const lastRow = rows[rows.length - 1]
+  const lastRow = rows[rows.length - 2]
   const lastRowCells = within(lastRow).getAllByRole('cell')
   const lastCell = lastRowCells[lastRowCells.length - 1]
   lastCell.scrollIntoView()
