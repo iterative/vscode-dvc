@@ -8,7 +8,6 @@ import {
   switchToBranchesView,
   switchToCommitsView
 } from '../../../../util/messages'
-import tableStyles from '../../styles.module.scss'
 import { ExperimentsState } from '../../../../store'
 
 export const CommitsAndBranchesNavigation: React.FC = () => {
@@ -17,46 +16,38 @@ export const CommitsAndBranchesNavigation: React.FC = () => {
   )
 
   return (
-    <tbody>
-      <tr>
-        <td className={tableStyles.experimentsTd}>
-          <div className={styles.commitsAndBranchesNav}>
-            {hasMoreCommits && (
-              <button
-                className={styles.commitsAndBranchesNavButton}
-                onClick={showMoreCommits}
-                disabled={isBranchesView}
-              >
-                Show More Commits
-              </button>
-            )}
-            {isShowingMoreCommits && (
-              <button
-                className={styles.commitsAndBranchesNavButton}
-                onClick={showLessCommits}
-                disabled={isBranchesView}
-              >
-                Show Less Commits
-              </button>
-            )}
+    <div className={styles.commitsAndBranchesNav}>
+      {hasMoreCommits && (
+        <button
+          className={styles.commitsAndBranchesNavButton}
+          onClick={showMoreCommits}
+          disabled={isBranchesView}
+        >
+          Show More Commits
+        </button>
+      )}
+      {isShowingMoreCommits && (
+        <button
+          className={styles.commitsAndBranchesNavButton}
+          onClick={showLessCommits}
+          disabled={isBranchesView}
+        >
+          Show Less Commits
+        </button>
+      )}
 
-            <AddAndRemoveBranches />
+      <AddAndRemoveBranches />
 
-            <span className={styles.separator} />
+      <span className={styles.separator} />
 
-            <button
-              className={styles.commitsAndBranchesNavButton}
-              onClick={
-                isBranchesView ? switchToCommitsView : switchToBranchesView
-              }
-            >
-              {isBranchesView
-                ? 'Switch to Commits View'
-                : 'Switch to All Branches View'}
-            </button>
-          </div>
-        </td>
-      </tr>
-    </tbody>
+      <button
+        className={styles.commitsAndBranchesNavButton}
+        onClick={isBranchesView ? switchToCommitsView : switchToBranchesView}
+      >
+        {isBranchesView
+          ? 'Switch to Commits View'
+          : 'Switch to All Branches View'}
+      </button>
+    </div>
   )
 }
