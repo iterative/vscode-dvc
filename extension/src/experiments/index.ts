@@ -477,7 +477,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     await Toast.showOutput(
       this.internalCommands.executeCommand<string>(
-        AvailableCommands.EXPERIMENT_QUEUE,
+        AvailableCommands.EXP_QUEUE,
         this.dvcRoot,
         ...paramsToModify
       )

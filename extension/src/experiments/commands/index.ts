@@ -8,12 +8,7 @@ import { RegisteredCommands } from '../../commands/external'
 export const getBranchExperimentCommand =
   (experiments: WorkspaceExperiments) =>
   (cwd: string, name: string, input: string) =>
-    experiments.runCommand(
-      AvailableCommands.EXPERIMENT_BRANCH,
-      cwd,
-      name,
-      input
-    )
+    experiments.runCommand(AvailableCommands.EXP_BRANCH, cwd, name, input)
 
 export const getShareExperimentToStudioCommand =
   (internalCommands: InternalCommands, setup: Setup) =>
@@ -31,7 +26,7 @@ export const getShareExperimentToStudioCommand =
       await Toast.runCommandAndIncrementProgress(
         () =>
           internalCommands.executeCommand(
-            AvailableCommands.EXPERIMENT_PUSH,
+            AvailableCommands.EXP_PUSH,
             dvcRoot,
             id
           ),
