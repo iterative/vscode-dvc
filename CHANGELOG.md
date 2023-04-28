@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.2] - 2023-04-27
+
+### 🚀 New Features and Enhancements
+
+- Add multiple branches support inside the experiments table [#3735](https://github.com/iterative/vscode-dvc/pull/3735) by [@sroy3](https://github.com/sroy3)
+- Add CLI incompatible screen to Studio section [#3763](https://github.com/iterative/vscode-dvc/pull/3763) by [@mattseddon](https://github.com/mattseddon)
+- Make the table more compact with branches and actions [#3765](https://github.com/iterative/vscode-dvc/pull/3765) by [@sroy3](https://github.com/sroy3)
+- Show DVC Cli Details in DVC Setup [#3688](https://github.com/iterative/vscode-dvc/pull/3688) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Watch all workspace folders for changes in dot folders [#3769](https://github.com/iterative/vscode-dvc/pull/3769) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Add Stylelint [#3736](https://github.com/iterative/vscode-dvc/pull/3736) by [@julieg18](https://github.com/julieg18)
+- Upgrade Storybook to v7 [#3744](https://github.com/iterative/vscode-dvc/pull/3744) by [@mattseddon](https://github.com/mattseddon)
+- Switch executeDvcProcess method to protected [#3770](https://github.com/iterative/vscode-dvc/pull/3770) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.8.1] - 2023-04-24
 
 ### 🚀 New Features and Enhancements

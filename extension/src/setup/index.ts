@@ -2,7 +2,11 @@ import { join } from 'path'
 import { Event, EventEmitter, ViewColumn, workspace } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import isEmpty from 'lodash.isempty'
-import { SetupSection, SetupData as TSetupData } from './webview/contract'
+import {
+  DvcCliDetails,
+  SetupSection,
+  SetupData as TSetupData
+} from './webview/contract'
 import { collectSectionCollapsed } from './collect'
 import { WebviewMessages } from './webview/messages'
 import { validateTokenInput } from './inputBox'
@@ -14,7 +18,6 @@ import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Resource } from '../resourceLocator'
-import { isPythonExtensionInstalled } from '../extensions/python'
 import {
   findAbsoluteDvcRootPath,
   findDvcRootPaths,
@@ -50,6 +53,7 @@ import {
 import { getValidInput } from '../vscode/inputBox'
 import { Title } from '../vscode/title'
 import { getDVCAppDir } from '../util/appdirs'
+import { getOptions } from '../cli/dvc/options'
 
 export type SetupWebviewWebview = BaseWebview<TSetupData>
 
@@ -365,9 +369,33 @@ export class Setup
     return this.sendDataToWebview()
   }
 
+  public async getDvcCliDetails(): Promise<DvcCliDetails> {
+    const dvcPath = this.config.getCliPath()
+    const pythonBinPath = this.config.getPythonBinPath()
+    const cwd = getFirstWorkspaceFolder()
+
+    const { args, executable } = getOptions(pythonBinPath, dvcPath, cwd || '')
+    const commandArgs = args.length === 0 ? '' : ` ${args.join(' ')}`
+    const command = executable + commandArgs
+
+    return {
+      command,
+      version: cwd ? await this.getCliVersion(cwd) : undefined
+    }
+  }
+
+  private isDVCBeingUsedGlobally() {
+    const dvcPath = this.config.getCliPath()
+    const pythonBinPath = this.config.getPythonBinPath()
+
+    return dvcPath || !pythonBinPath
+  }
+
   private async sendDataToWebview() {
     const projectInitialized = this.hasRoots()
     const hasData = this.getHasData()
+
+    const isPythonExtensionUsed = await this.isPythonExtensionUsed()
 
     const needsGitInitialized =
       !projectInitialized && !!(await this.needsGitInit())
@@ -379,11 +407,15 @@ export class Setup
 
     const pythonBinPath = await findPythonBinForInstall()
 
+    const dvcCliDetails = await this.getDvcCliDetails()
+
     this.webviewMessages.sendWebviewMessage({
       canGitInitialize,
       cliCompatible: this.getCliCompatible(),
+      dvcCliDetails,
       hasData,
-      isPythonExtensionInstalled: isPythonExtensionInstalled(),
+      isPythonExtensionUsed:
+        !this.isDVCBeingUsedGlobally() && isPythonExtensionUsed,
       isStudioConnected: this.studioIsConnected,
       needsGitCommit,
       needsGitInitialized,
@@ -583,21 +615,17 @@ export class Setup
   }
 
   private watchDotFolderForChanges() {
-    const cwd = getFirstWorkspaceFolder()
-
-    if (!cwd) {
-      return
-    }
-
     const disposer = Disposable.fn()
     this.dotFolderWatcher = disposer
     this.dispose.track(this.dotFolderWatcher)
 
-    return createFileSystemWatcher(
-      disposable => disposer.track(disposable),
-      getRelativePattern(cwd, '**'),
-      path => this.dotFolderListener(disposer, path)
-    )
+    for (const workspaceFolder of getWorkspaceFolders()) {
+      createFileSystemWatcher(
+        disposable => disposer.track(disposable),
+        getRelativePattern(workspaceFolder, '**'),
+        path => this.dotFolderListener(disposer, path)
+      )
+    }
   }
 
   private dotFolderListener(disposer: Disposer, path: string) {

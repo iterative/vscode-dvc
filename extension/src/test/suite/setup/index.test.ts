@@ -218,6 +218,7 @@ suite('Setup Test Suite', () => {
       setup.setCliCompatible(undefined)
       setup.setAvailable(false)
       await setup.setRoots()
+      stub(setup, 'getCliVersion').resolves(undefined)
 
       messageSpy.restore()
       const mockSendMessage = stub(BaseWebview.prototype, 'show')
@@ -238,8 +239,9 @@ suite('Setup Test Suite', () => {
       expect(mockSendMessage).to.be.calledWithExactly({
         canGitInitialize: true,
         cliCompatible: undefined,
+        dvcCliDetails: { command: 'dvc', version: undefined },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: true,
         needsGitInitialized: true,
@@ -278,8 +280,9 @@ suite('Setup Test Suite', () => {
       expect(mockSendMessage).to.be.calledWithExactly({
         canGitInitialize: true,
         cliCompatible: true,
+        dvcCliDetails: { command: 'dvc', version: MIN_CLI_VERSION },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: true,
         needsGitInitialized: true,
@@ -324,8 +327,12 @@ suite('Setup Test Suite', () => {
       expect(mockSendMessage).to.be.calledWithExactly({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'dvc',
+          version: MIN_CLI_VERSION
+        },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
         needsGitInitialized: false,
@@ -370,8 +377,12 @@ suite('Setup Test Suite', () => {
       expect(mockSendMessage).to.be.calledWithExactly({
         canGitInitialize: false,
         cliCompatible: true,
+        dvcCliDetails: {
+          command: 'dvc',
+          version: MIN_CLI_VERSION
+        },
         hasData: false,
-        isPythonExtensionInstalled: false,
+        isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: true,
         needsGitInitialized: false,
@@ -568,6 +579,7 @@ suite('Setup Test Suite', () => {
       mockRunSetup.restore()
       stub(config, 'isPythonExtensionUsed').returns(false)
       stub(config, 'getPythonBinPath').resolves(join('python'))
+      stub(setup, 'getDvcCliDetails').resolves(undefined)
 
       mockVersion.resetBehavior()
       mockVersion
@@ -627,6 +639,7 @@ suite('Setup Test Suite', () => {
       mockExecuteCommand.restore()
       mockRunSetup.restore()
       stub(config, 'isPythonExtensionUsed').returns(true)
+      stub(setup, 'getDvcCliDetails').resolves(undefined)
 
       mockVersion.resetBehavior()
       mockVersion.rejects(new Error('no CLI here'))
@@ -746,6 +759,7 @@ suite('Setup Test Suite', () => {
       const mockUpdate = stub()
 
       stub(workspace, 'getConfiguration').returns({
+        get: stub(),
         update: mockUpdate
       } as unknown as WorkspaceConfiguration)
 

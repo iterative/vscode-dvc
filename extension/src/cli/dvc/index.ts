@@ -21,7 +21,7 @@ export class DvcCli extends Cli {
     this.extensionConfig = config
   }
 
-  public executeDvcProcess(cwd: string, ...args: Args): Promise<string> {
+  protected executeDvcProcess(cwd: string, ...args: Args): Promise<string> {
     const options = this.getOptions(cwd, ...args)
     return this.executeProcess(options)
   }

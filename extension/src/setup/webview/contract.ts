@@ -1,8 +1,14 @@
+export type DvcCliDetails = {
+  command: string
+  version: string | undefined
+}
+
 export type SetupData = {
   canGitInitialize: boolean
   cliCompatible: boolean | undefined
+  dvcCliDetails: DvcCliDetails
   hasData: boolean | undefined
-  isPythonExtensionInstalled: boolean
+  isPythonExtensionUsed: boolean
   isStudioConnected: boolean
   needsGitCommit: boolean
   needsGitInitialized: boolean | undefined

@@ -80,7 +80,8 @@ describe('executeDvcProcess', () => {
       }
     )
 
-    await cli.executeDvcProcess(cwd, ...args)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (cli as any).executeDvcProcess(cwd, ...args)
 
     expect(mockedCreateProcess).toHaveBeenCalledWith({
       args,
@@ -119,7 +120,8 @@ describe('executeDvcProcess', () => {
       }
     )
 
-    await expect(cli.executeDvcProcess(cwd, ...args)).rejects.toThrow()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await expect((cli as any).executeDvcProcess(cwd, ...args)).rejects.toThrow()
 
     expect(mockedCreateProcess).toHaveBeenCalledWith({
       args,
