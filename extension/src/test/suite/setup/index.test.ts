@@ -4,7 +4,6 @@ import { ensureFileSync, remove } from 'fs-extra'
 import { expect } from 'chai'
 import { SinonStub, restore, spy, stub } from 'sinon'
 import {
-  EventEmitter,
   QuickPickItem,
   Uri,
   WorkspaceConfiguration,
@@ -31,7 +30,7 @@ import {
 import { isDirectory } from '../../../fileSystem'
 import { gitPath } from '../../../cli/git/constants'
 import { join } from '../../util/path'
-import { DOT_DVC } from '../../../cli/dvc/constants'
+import { ConfigKey, DOT_DVC, Flag } from '../../../cli/dvc/constants'
 import * as Config from '../../../vscode/config'
 import { dvcDemoPath } from '../../util'
 import {
@@ -43,10 +42,11 @@ import { StopWatch } from '../../../util/time'
 import { MIN_CLI_VERSION } from '../../../cli/dvc/contract'
 import { run } from '../../../setup/runner'
 import * as Python from '../../../extensions/python'
-import { STUDIO_ACCESS_TOKEN_KEY } from '../../../setup/token'
 import { ContextKey } from '../../../vscode/context'
 import { Setup } from '../../../setup'
 import { SetupSection } from '../../../setup/webview/contract'
+import { DvcExecutor } from '../../../cli/dvc/executor'
+import { getFirstWorkspaceFolder } from '../../../vscode/workspaceFolders'
 
 suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
@@ -694,42 +694,13 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should handle a message from the webview to save the user's Studio access token", async () => {
-      const secretsChanged = disposable.track(
-        new EventEmitter<{ key: string }>()
-      )
       const mockToken = 'isat_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
 
-      const mockSecrets: { [key: string]: string } = {}
-
-      const onDidChange = secretsChanged.event
-      const mockGetSecret = (key: string): Promise<string | undefined> =>
-        Promise.resolve(mockSecrets[key])
-      const mockStoreSecret = (key: string, value: string) => {
-        mockSecrets[key] = value
-        secretsChanged.fire({ key })
-        return Promise.resolve(undefined)
-      }
-
-      const mockSecretStorage = {
-        delete: stub(),
-        get: mockGetSecret,
-        onDidChange,
-        store: mockStoreSecret
-      }
-
-      const secretsChangedEvent = new Promise(resolve =>
-        onDidChange(() => resolve(undefined))
-      )
-
-      const { setup, mockExecuteCommand } = buildSetup(
-        disposable,
-        false,
-        false,
-        false,
-        false,
-        mockSecretStorage
-      )
+      const { setup, mockExecuteCommand, messageSpy } = buildSetup(disposable)
       mockExecuteCommand.restore()
+
+      const mockConfig = stub(DvcExecutor.prototype, 'config')
+      mockConfig.resolves('')
 
       const executeCommandSpy = spy(commands, 'executeCommand')
       const webview = await setup.showWebview()
@@ -737,27 +708,40 @@ suite('Setup Test Suite', () => {
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
-      expect(executeCommandSpy).to.be.calledWithExactly(
-        'setContext',
-        ContextKey.STUDIO_CONNECTED,
-        false
-      )
+      mockConfig.resetBehavior()
+      mockConfig.resolves(mockToken)
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(Setup.prototype as any, 'getCliCompatible').returns(true)
 
       const mockInputBox = stub(window, 'showInputBox').resolves(mockToken)
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub(Setup.prototype as any, 'getSecrets').returns(mockSecretStorage)
+      messageSpy.restore()
+      executeCommandSpy.resetHistory()
+      const messageSent = new Promise(resolve =>
+        stub(BaseWebview.prototype, 'show').callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(true)
+        })
+      )
 
       mockMessageReceived.fire({
         type: MessageFromWebviewType.SAVE_STUDIO_TOKEN
       })
 
-      await secretsChangedEvent
+      await messageSent
 
       expect(mockInputBox).to.be.called
-
-      expect(await mockGetSecret(STUDIO_ACCESS_TOKEN_KEY)).to.equal(mockToken)
-
+      expect(mockConfig).to.be.calledWithExactly(
+        getFirstWorkspaceFolder(),
+        Flag.GLOBAL,
+        ConfigKey.STUDIO_TOKEN,
+        mockToken
+      )
+      expect(mockConfig).to.be.calledWithExactly(
+        getFirstWorkspaceFolder(),
+        ConfigKey.STUDIO_TOKEN
+      )
       expect(executeCommandSpy).to.be.calledWithExactly(
         'setContext',
         ContextKey.STUDIO_CONNECTED,
@@ -790,19 +774,26 @@ suite('Setup Test Suite', () => {
       )
     })
 
-    it('should be able to delete the Studio access token from secrets storage', async () => {
-      const mockDelete = stub()
-      stub(
+    it('should be able to delete the Studio access token from the global dvc config', async () => {
+      const mockConfig = stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        Setup.prototype as any,
-        'getSecrets'
-      ).returns({ delete: mockDelete })
+        DvcExecutor.prototype,
+        'config'
+      ).resolves(undefined)
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(Setup.prototype as any, 'getCliCompatible').returns(true)
 
       await commands.executeCommand(
         RegisteredCommands.REMOVE_STUDIO_ACCESS_TOKEN
       )
 
-      expect(mockDelete).to.be.calledWithExactly(STUDIO_ACCESS_TOKEN_KEY)
+      expect(mockConfig).to.be.calledWithExactly(
+        dvcDemoPath,
+        Flag.GLOBAL,
+        Flag.UNSET,
+        ConfigKey.STUDIO_TOKEN
+      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to open the experiments webview', async () => {

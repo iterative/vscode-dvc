@@ -20,6 +20,7 @@ export enum Command {
   ADD = 'add',
   CHECKOUT = 'checkout',
   COMMIT = 'commit',
+  CONFIG = 'config',
   DATA = 'data',
   EXPERIMENT = 'exp',
   INITIALIZE = 'init',
@@ -46,7 +47,9 @@ export enum Flag {
   ALL_COMMITS = '-A',
   FOLLOW = '-f',
   FORCE = '-f',
+  GLOBAL = '--global',
   GRANULAR = '--granular',
+  LOCAL = '--local',
   JOBS = '-j',
   JSON = '--json',
   KILL = '--kill',
@@ -56,6 +59,7 @@ export enum Flag {
   SET_PARAM = '-S',
   SPLIT = '--split',
   UNCHANGED = '--unchanged',
+  UNSET = '--unset',
   VERSION = '--version'
 }
 
@@ -90,8 +94,18 @@ export enum GcPreserveFlag {
   WORKSPACE = '--workspace'
 }
 
+export enum ConfigKey {
+  STUDIO_TOKEN = 'studio.token'
+}
+
 type Target = string
 
 type Flags = Flag | ExperimentFlag | GcPreserveFlag
 
-export type Args = (Command | Target | ExperimentSubCommand | Flags)[]
+export type Args = (
+  | Command
+  | Target
+  | ExperimentSubCommand
+  | Flags
+  | ConfigKey
+)[]
