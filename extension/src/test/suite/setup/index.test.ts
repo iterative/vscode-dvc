@@ -393,6 +393,55 @@ suite('Setup Test Suite', () => {
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should send the expected message to the webview when there a global CLI available', async () => {
+      const { config, setup, messageSpy } = buildSetup(disposable, false, false)
+
+      await config.isReady()
+
+      setup.setCliCompatible(true)
+      setup.setAvailable(true)
+      await setup.setRoots()
+      stub(setup, 'getCliVersion').callsFake((_, tryGlobalCli) =>
+        tryGlobalCli
+          ? Promise.resolve(MIN_CLI_VERSION)
+          : Promise.resolve(undefined)
+      )
+
+      messageSpy.restore()
+      const mockSendMessage = stub(BaseWebview.prototype, 'show')
+
+      const messageSent = new Promise(resolve =>
+        mockSendMessage.callsFake(data => {
+          resolve(undefined)
+          return Promise.resolve(!!data)
+        })
+      )
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      await messageSent
+
+      expect(mockSendMessage).to.be.calledOnce
+      expect(mockSendMessage).to.be.calledWithExactly({
+        canGitInitialize: false,
+        cliCompatible: true,
+        dvcCliDetails: {
+          command: 'dvc',
+          version: MIN_CLI_VERSION
+        },
+        hasData: false,
+        isPythonExtensionUsed: false,
+        isStudioConnected: false,
+        needsGitCommit: true,
+        needsGitInitialized: false,
+        projectInitialized: true,
+        pythonBinPath: undefined,
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should setup the appropriate watchers', async () => {
       const { setup, mockRunSetup, onDidChangeWorkspace } =
         await buildSetupWithWatchers(disposable)
