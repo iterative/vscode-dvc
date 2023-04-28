@@ -378,9 +378,18 @@ export class Setup
     const commandArgs = args.length === 0 ? '' : ` ${args.join(' ')}`
     const command = executable + commandArgs
 
+    if (!cwd) {
+      return {
+        command,
+        version: undefined
+      }
+    }
+
+    const version = await this.getCliVersion(cwd)
+
     return {
       command,
-      version: cwd ? await this.getCliVersion(cwd) : undefined
+      version: version || (await this.getCliVersion(cwd, true))
     }
   }
 
