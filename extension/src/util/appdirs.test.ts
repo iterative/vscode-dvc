@@ -23,6 +23,7 @@ describe('getIterativeAppDir', () => {
     )
     expect(getIterativeAppDir()).toStrictEqual(mockedAppDir + '/' + 'iterative')
   })
+
   it('should return the correct path on Windows', () => {
     mockedJoin.mockImplementation((...paths: string[]) => paths.join('\\'))
     mockedGetProcessPlatform.mockReturnValueOnce('win32')
@@ -45,6 +46,7 @@ describe('getDVCAppDir', () => {
     )
     expect(getDVCAppDir()).toStrictEqual(mockedAppDir + '/' + 'dvc')
   })
+
   it('should return the correct path on Windows', () => {
     mockedJoin.mockImplementationOnce((...paths: string[]) => paths.join('\\'))
     mockedGetProcessPlatform.mockReturnValueOnce('win32')
