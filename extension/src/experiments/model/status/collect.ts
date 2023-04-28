@@ -33,13 +33,13 @@ const collectStatus = (acc: ColoredStatus, experiment: Experiment): void => {
 }
 
 const collectExistingStatuses = (
-  experiments: Experiment[],
+  workspaceAndCommits: Experiment[],
   experimentsByCommit: Map<string, Experiment[]>,
   previousStatus: ColoredStatus
 ): ColoredStatus => {
   const existingStatuses: ColoredStatus = {}
   for (const experiment of [
-    ...experiments,
+    ...workspaceAndCommits,
     ...flattenMapValues(experimentsByCommit)
   ]) {
     const { id } = experiment
@@ -56,7 +56,6 @@ const collectExistingStatuses = (
 const collectStartedRunningColors = (
   coloredStatus: ColoredStatus,
   availableColors: Color[],
-  unassignedColors: Color[],
   startedRunning: Set<string>
 ): void => {
   for (const id of startedRunning) {
@@ -64,7 +63,7 @@ const collectStartedRunningColors = (
       continue
     }
 
-    if (canAssign(coloredStatus, unassignedColors)) {
+    if (canAssign(coloredStatus, availableColors)) {
       coloredStatus[id] = availableColors.shift() as Color
     }
   }
@@ -97,7 +96,7 @@ const duplicateFinishedWorkspaceExperiment = (
   }
 }
 
-export const unassignColors = (
+const unassignColors = (
   experiments: Experiment[],
   current: ColoredStatus,
   unassigned: Color[]
@@ -106,18 +105,20 @@ export const unassignColors = (
     return copyOriginalColors()
   }
 
+  const acc = new Set(unassigned)
+
   const experimentIds = new Set(experiments.map(({ id }) => id))
   for (const [id, color] of Object.entries(current)) {
     if (color && !experimentIds.has(id)) {
-      unassigned.unshift(color)
+      acc.add(color)
     }
   }
 
-  return reorderListSubset(unassigned, copyOriginalColors())
+  return reorderListSubset([...acc], copyOriginalColors())
 }
 
 export const collectColoredStatus = (
-  experiments: Experiment[],
+  workspaceAndCommits: Experiment[],
   experimentsByCommit: Map<string, Experiment[]>,
   previousStatus: ColoredStatus,
   unassignedColors: Color[],
@@ -125,33 +126,39 @@ export const collectColoredStatus = (
   finishedRunning: { [id: string]: string }
 ): { coloredStatus: ColoredStatus; availableColors: Color[] } => {
   const flatExperimentsByCommit = flattenMapValues(experimentsByCommit)
-  const availableColors = unassignColors(
-    [...experiments, ...flatExperimentsByCommit],
+  let availableColors = unassignColors(
+    [...workspaceAndCommits, ...flatExperimentsByCommit],
     previousStatus,
     unassignedColors
   )
 
   const coloredStatus = collectExistingStatuses(
-    experiments,
+    workspaceAndCommits,
     experimentsByCommit,
     previousStatus
   )
 
-  collectStartedRunningColors(
-    coloredStatus,
-    availableColors,
-    unassignedColors,
-    startedRunning
+  const selectedColors = new Set(Object.values(coloredStatus).filter(Boolean))
+  availableColors = availableColors.filter(
+    availableColor => !selectedColors.has(availableColor)
   )
 
-  for (const experiment of [...experiments, ...flatExperimentsByCommit]) {
+  collectStartedRunningColors(coloredStatus, availableColors, startedRunning)
+
+  for (const experiment of [
+    ...workspaceAndCommits,
+    ...flatExperimentsByCommit
+  ]) {
     collectStatus(coloredStatus, experiment)
     removeUnselectedExperimentRunningInWorkspace(coloredStatus, experiment)
   }
 
   duplicateFinishedWorkspaceExperiment(coloredStatus, finishedRunning)
 
-  return { availableColors, coloredStatus }
+  return {
+    availableColors,
+    coloredStatus
+  }
 }
 
 const unassignUnselected = (
