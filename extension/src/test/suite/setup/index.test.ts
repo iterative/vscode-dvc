@@ -393,7 +393,7 @@ suite('Setup Test Suite', () => {
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should send the expected message to the webview when there a global CLI available', async () => {
+    it('should send the expected message to the webview when there is a global CLI available', async () => {
       const { config, setup, messageSpy } = buildSetup(disposable, false, false)
 
       await config.isReady()
