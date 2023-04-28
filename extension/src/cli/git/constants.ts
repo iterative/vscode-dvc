@@ -13,13 +13,11 @@ export enum Command {
   ADD = 'add',
   BRANCH = 'branch',
   CLEAN = 'clean',
-  COMMIT = 'commit',
   DIFF = 'diff',
   INITIALIZE = 'init',
   LOG = 'log',
   LS_FILES = 'ls-files',
   LS_REMOTE = 'ls-remote',
-  PUSH = 'push',
   RESET = 'reset',
   REV_PARSE = 'rev-parse',
   REV_LIST = 'rev-list'
@@ -35,7 +33,6 @@ export enum Flag {
   FULL_HISTORY = '--full-history',
   GET_URL = '--get-url',
   HARD = '--hard',
-  MESSAGE = '-m',
   NAME_ONLY = '--name-only',
   NO_EMPTY_DIRECTORY = '--no-empty-directory',
   NO_MERGE = '--no-merge',
@@ -45,7 +42,6 @@ export enum Flag {
   QUIET = '-q',
   RAW_WITH_NUL = '-z',
   SEPARATE_WITH_NULL = '-z',
-  SET_UPSTREAM = '--set-upstream',
   SHOW_TOPLEVEL = '--show-toplevel'
 }
 

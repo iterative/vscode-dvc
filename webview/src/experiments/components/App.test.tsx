@@ -863,8 +863,6 @@ describe('App', () => {
         'Apply to Workspace',
         'Create new Branch',
         'Share to Studio',
-        'Commit and Share',
-        'Share as Branch',
         'Modify and Run',
         'Modify and Resume',
         'Modify and Queue',
@@ -884,7 +882,7 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(12)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(10)
 
       fireEvent.click(window, { bubbles: true })
       advanceTimersByTime(100)
@@ -898,7 +896,7 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(12)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(10)
 
       const commit = getRow('main')
       fireEvent.click(commit, { bubbles: true })
@@ -913,13 +911,13 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(12)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(10)
 
       fireEvent.contextMenu(within(row).getByText('[exp-e7a67]'), {
         bubbles: true
       })
       advanceTimersByTime(200)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(12)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(10)
     })
 
     it('should present the Remove experiment option for the checkpoint tips', () => {

@@ -50,8 +50,6 @@ export enum MessageFromWebviewType {
   SET_EXPERIMENTS_FOR_PLOTS = 'set-experiments-for-plots',
   SET_EXPERIMENTS_AND_OPEN_PLOTS = 'set-experiments-and-open-plots',
   SET_STUDIO_SHARE_EXPERIMENTS_LIVE = 'set-studio-share-experiments-live',
-  SHARE_EXPERIMENT_AS_BRANCH = 'share-experiment-as-branch',
-  SHARE_EXPERIMENT_AS_COMMIT = 'share-experiment-as-commit',
   TOGGLE_PLOTS_SECTION = 'toggle-plots-section',
   REMOVE_CUSTOM_PLOTS = 'remove-custom-plots',
   REMOVE_STUDIO_TOKEN = 'remove-studio-token',
@@ -211,14 +209,6 @@ export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE
       payload: boolean
-    }
-  | {
-      type: MessageFromWebviewType.SHARE_EXPERIMENT_AS_BRANCH
-      payload: string
-    }
-  | {
-      type: MessageFromWebviewType.SHARE_EXPERIMENT_AS_COMMIT
-      payload: string
     }
   | { type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_HEIGHT }
   | { type: MessageFromWebviewType.CHECK_CLI_COMPATIBLE }

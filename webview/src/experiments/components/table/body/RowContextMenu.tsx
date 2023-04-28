@@ -205,14 +205,6 @@ const getSingleSelectMenuOptions = (
       MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO,
       true
     ),
-    hideIfRunningOrNotExperiment(
-      'Commit and Share',
-      MessageFromWebviewType.SHARE_EXPERIMENT_AS_COMMIT
-    ),
-    hideIfRunningOrNotExperiment(
-      'Share as Branch',
-      MessageFromWebviewType.SHARE_EXPERIMENT_AS_BRANCH
-    ),
     ...getRunResumeOptions(
       hideIfRunning,
       projectHasCheckpoints,
