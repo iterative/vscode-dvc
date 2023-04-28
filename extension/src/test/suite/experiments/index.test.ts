@@ -10,7 +10,8 @@ import {
   workspace,
   Uri,
   QuickPickItem,
-  ViewColumn
+  ViewColumn,
+  CancellationToken
 } from 'vscode'
 import { buildExperiments, stubWorkspaceExperimentsGetters } from './util'
 import { Disposable } from '../../../extension'
@@ -34,6 +35,7 @@ import {
 import {
   buildInternalCommands,
   buildMockExperimentsData,
+  bypassProgressCloseDelay,
   closeAllEditors,
   configurationChangeEvent,
   experimentsUpdatedEvent,
@@ -84,6 +86,8 @@ import { DvcReader } from '../../../cli/dvc/reader'
 import { DvcViewer } from '../../../cli/dvc/viewer'
 import { DEFAULT_NB_ITEMS_PER_ROW } from '../../../plots/webview/contract'
 import { GitReader } from '../../../cli/git/reader'
+import { Toast } from '../../../vscode/toast'
+import { Response } from '../../../vscode/response'
 
 const { openFileInEditor } = FileSystem
 
@@ -633,7 +637,7 @@ suite('Experiments Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle a message to share an experiment to Studio', async () => {
+    it('should handle a message to share an experiment', async () => {
       const { experiments } = buildExperiments(disposable)
       await experiments.isReady()
 
@@ -656,15 +660,24 @@ suite('Experiments Test Suite', () => {
         })
       )
 
+      const mockAskShowOrCloseOrNever = stub(Toast, 'askShowOrCloseOrNever')
+
+      const userPrompted = new Promise(resolve =>
+        mockAskShowOrCloseOrNever.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(Response.SHOW)
+        })
+      )
+
       mockMessageReceived.fire({
         payload: mockExpId,
-        type: MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO
+        type: MessageFromWebviewType.SHARE_EXPERIMENT
       })
 
-      await tokenNotFound
+      await Promise.all([tokenNotFound, userPrompted])
 
       expect(executeCommandSpy).to.be.calledWithExactly(
-        RegisteredCommands.SETUP_SHOW
+        RegisteredCommands.SETUP_SHOW_STUDIO_CONNECT
       )
 
       mockGetStudioAccessToken.resetBehavior()
@@ -675,24 +688,42 @@ suite('Experiments Test Suite', () => {
           return 'isat_token'
         })
       )
-      const mockexpPush = stub(DvcExecutor.prototype, 'expPush')
+
+      const mockExpPush = stub(DvcExecutor.prototype, 'expPush')
+      const mockShowProgress = stub(Toast, 'showProgress')
+      bypassProgressCloseDelay()
+
+      const mockReport = stub()
+
+      mockShowProgress.callsFake((title, callback) => {
+        expect(title).to.equal(`Sharing ${mockExpId}`)
+
+        const progress = { report: mockReport }
+        return callback(progress, {} as CancellationToken)
+      })
+
       const commandExecuted = new Promise(resolve =>
-        mockexpPush.callsFake(() => {
+        mockExpPush.callsFake(() => {
           resolve(undefined)
           return Promise.resolve(
-            `Pushed experiment ${mockExpId} to Git remote 'origin'`
+            "Experiment major-lamb is up to date on Git remote 'origin'.\nView your experiments at \nhttps://studio.iterative.ai/user/mattseddon/projects/vscode-dvc-demo-ynm6t3jxdx"
           )
         })
       )
 
       mockMessageReceived.fire({
         payload: mockExpId,
-        type: MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO
+        type: MessageFromWebviewType.SHARE_EXPERIMENT
       })
 
       await Promise.all([tokenFound, commandExecuted])
 
-      expect(mockexpPush).to.be.calledWithExactly(dvcDemoPath, mockExpId)
+      expect(mockExpPush).to.be.calledWithExactly(dvcDemoPath, mockExpId)
+      expect(mockReport).to.be.calledWithExactly({
+        increment: 75,
+        message:
+          "Experiment major-lamb is up to date on Git remote 'origin'.\nView your experiments in [Studio](https://studio.iterative.ai/user/mattseddon/projects/vscode-dvc-demo-ynm6t3jxdx)"
+      })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to modify an experiment's params and queue an experiment", async () => {

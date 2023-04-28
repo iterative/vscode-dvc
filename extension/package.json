@@ -506,7 +506,7 @@
         "icon": "$(play)"
       },
       {
-        "title": "Share to Studio",
+        "title": "Share",
         "command": "dvc.views.experiments.shareExperimentToStudio",
         "category": "DVC",
         "icon": "$(repo-push)"
@@ -599,7 +599,7 @@
           "default": null
         },
         "dvc.studio.shareExperimentsLive": {
-          "description": "Automatically share all new experiment metrics and plots logged with DVCLive to Studio. This option will only take effect once Studio is connected.",
+          "description": "Automatically share all new experiment metrics and plots logged with DVCLive to Studio. This option will only take effect once Studio is connected (studio.token is set).",
           "type": "boolean",
           "default": false
         }

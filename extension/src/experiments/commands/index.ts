@@ -3,6 +3,13 @@ import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { Toast } from '../../vscode/toast'
 import { WorkspaceExperiments } from '../workspace'
 import { Setup } from '../../setup'
+import { Response } from '../../vscode/response'
+import {
+  ConfigKey,
+  getConfigValue,
+  setUserConfigValue
+} from '../../vscode/config'
+import { STUDIO_URL } from '../../setup/webview/contract'
 import { RegisteredCommands } from '../../commands/external'
 
 export const getBranchExperimentCommand =
@@ -10,30 +17,70 @@ export const getBranchExperimentCommand =
   (cwd: string, name: string, input: string) =>
     experiments.runCommand(AvailableCommands.EXP_BRANCH, cwd, name, input)
 
+const promptToAddStudioToken = async () => {
+  const response = await Toast.askShowOrCloseOrNever(
+    `Experiments can be automatically shared to [Studio](${STUDIO_URL}) by setting the studio.token in your config.`
+  )
+
+  if (!response || response === Response.CLOSE) {
+    return
+  }
+  if (response === Response.SHOW) {
+    return commands.executeCommand(RegisteredCommands.SETUP_SHOW_STUDIO_CONNECT)
+  }
+  if (response === Response.NEVER) {
+    return setUserConfigValue(ConfigKey.DO_NOT_RECOMMEND_ADD_STUDIO_TOKEN, true)
+  }
+}
+
+const convertUrlTextToLink = (stdout: string) => {
+  const experimentAtRegex = /\sat\s+(https:\/\/studio\.iterative\.ai\/.*$)/
+  const match = stdout.match(experimentAtRegex)
+  if (!(match?.[0] && match?.[1])) {
+    return stdout
+  }
+  return stdout.replace(match[0], ` in [Studio](${match[1]})`)
+}
+
 export const getShareExperimentToStudioCommand =
   (internalCommands: InternalCommands, setup: Setup) =>
   ({ dvcRoot, id }: { dvcRoot: string; id: string }) => {
     const studioAccessToken = setup.getStudioAccessToken()
-    if (!studioAccessToken) {
-      return commands.executeCommand(RegisteredCommands.SETUP_SHOW)
+    if (
+      !(
+        getConfigValue(ConfigKey.DO_NOT_RECOMMEND_ADD_STUDIO_TOKEN) ||
+        studioAccessToken
+      )
+    ) {
+      void promptToAddStudioToken()
     }
 
-    return Toast.showProgress('Sharing', async progress => {
+    return Toast.showProgress(`Sharing ${id}`, async progress => {
       progress.report({ increment: 0 })
 
       progress.report({ increment: 25, message: 'Running exp push...' })
 
-      await Toast.runCommandAndIncrementProgress(
-        () =>
-          internalCommands.executeCommand(
-            AvailableCommands.EXP_PUSH,
-            dvcRoot,
-            id
-          ),
-        progress,
-        75
-      )
+      const remainingProgress = 75
 
-      return Toast.delayProgressClosing(15000)
+      try {
+        const stdout = await internalCommands.executeCommand(
+          AvailableCommands.EXP_PUSH,
+          dvcRoot,
+          id
+        )
+
+        progress.report({
+          increment: remainingProgress,
+          message: convertUrlTextToLink(stdout)
+        })
+
+        return Toast.delayProgressClosing(15000)
+      } catch (error: unknown) {
+        progress.report({
+          increment: remainingProgress,
+          message: (error as Error)?.message || 'an unexpected error occurred'
+        })
+      }
+      return Toast.delayProgressClosing(60000)
     })
   }

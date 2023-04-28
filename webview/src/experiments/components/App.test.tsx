@@ -862,7 +862,7 @@ describe('App', () => {
         'Show Logs',
         'Apply to Workspace',
         'Create new Branch',
-        'Share to Studio',
+        'Share',
         'Modify and Run',
         'Modify and Resume',
         'Modify and Queue',
@@ -1014,7 +1014,7 @@ describe('App', () => {
       })
     })
 
-    it('should enable the user to share an experiment to Studio', () => {
+    it('should enable the user to share an experiment', () => {
       renderTableWithoutRunningExperiments()
 
       const target = screen.getByText('4fb124a')
@@ -1023,10 +1023,10 @@ describe('App', () => {
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
-      expect(itemLabels).toContain('Share to Studio')
+      expect(itemLabels).toContain('Share')
 
       const shareOption = menuitems.find(item =>
-        item.textContent?.includes('Share to Studio')
+        item.textContent?.includes('Share')
       )
 
       expect(shareOption).toBeDefined()
@@ -1035,7 +1035,7 @@ describe('App', () => {
 
       expect(sendMessage).toHaveBeenCalledWith({
         payload: 'exp-e7a67',
-        type: MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO
+        type: MessageFromWebviewType.SHARE_EXPERIMENT
       })
     })
 
