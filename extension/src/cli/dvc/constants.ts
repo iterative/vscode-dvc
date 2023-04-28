@@ -67,6 +67,7 @@ export enum ExperimentSubCommand {
   APPLY = 'apply',
   BRANCH = 'branch',
   GARBAGE_COLLECT = 'gc',
+  PUSH = 'push',
   REMOVE = 'remove',
   RUN = 'run'
 }
