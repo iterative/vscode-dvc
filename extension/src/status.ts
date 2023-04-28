@@ -58,9 +58,9 @@ export class Status extends Disposable {
   }
 
   private setState(isWorking: boolean) {
-    const { indicator, tooltip } = this.getEnvDetails()
+    const indicator = this.getEnvIndicator()
     this.statusBarItem.text = this.getText(isWorking, indicator)
-    this.statusBarItem.tooltip = tooltip
+    this.statusBarItem.tooltip = this.getEnvIndicator()
 
     this.statusBarItem.color = this.getColor()
 
@@ -91,39 +91,23 @@ export class Status extends Disposable {
       return
     }
 
-    if (this.available) {
-      return {
-        command: RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-        title: Title.SETUP_WORKSPACE
-      }
-    }
-
     return {
       command: RegisteredCommands.SETUP_SHOW,
       title: Title.SHOW_SETUP
     }
   }
 
-  private getEnvDetails() {
+  private getEnvIndicator() {
     const dvcPath = this.config.getCliPath()
     const pythonBinPath = this.config.getPythonBinPath()
     if (dvcPath || !pythonBinPath) {
-      return {
-        indicator: '(Global)',
-        tooltip: `Locate DVC at: ${dvcPath || 'dvc'}`
-      }
+      return '(Global)'
     }
 
     if (this.config.isPythonExtensionUsed()) {
-      return {
-        indicator: '(Auto)',
-        tooltip: `Locate DVC in the Python environment selected by the Python extension: ${pythonBinPath}`
-      }
+      return '(Auto)'
     }
 
-    return {
-      indicator: '(Manual)',
-      tooltip: `Locate DVC in this Python environment: ${pythonBinPath}`
-    }
+    return '(Manual)'
   }
 }
