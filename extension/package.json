@@ -564,6 +564,11 @@
           "type": "boolean",
           "default": null
         },
+        "dvc.doNotRecommendAddStudioToken": {
+          "description": "Do not prompt to add a studio.token to the global DVC config, which enables automatic sharing of experiments to Studio.",
+          "type": "boolean",
+          "default": null
+        },
         "dvc.doNotShowCliUnavailable": {
           "description": "Do not warn when the workspace contains a DVC project but the DVC binary is unavailable.",
           "type": "boolean",

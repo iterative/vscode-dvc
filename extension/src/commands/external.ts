@@ -14,7 +14,7 @@ export enum RegisteredCliCommands {
 
   EXPERIMENT_VIEW_APPLY = 'dvc.views.experiments.applyExperiment',
   EXPERIMENT_VIEW_BRANCH = 'dvc.views.experiments.branchExperiment',
-  EXPERIMENT_VIEW_PUSH = 'dvc.views.experiments.pushExperiment',
+  EXPERIMENT_VIEW_SHARE = 'dvc.views.experiments.shareExperiment',
   EXPERIMENT_VIEW_REMOVE = 'dvc.views.experiments.removeExperiment',
   EXPERIMENT_VIEW_SHOW_LOGS = 'dvc.views.experiments.showLogs',
   EXPERIMENT_VIEW_STOP = 'dvc.views.experiments.stopQueueExperiment',
@@ -100,7 +100,6 @@ export enum RegisteredCommands {
   ADD_STUDIO_ACCESS_TOKEN = 'dvc.addStudioAccessToken',
   UPDATE_STUDIO_ACCESS_TOKEN = 'dvc.updateStudioAccessToken',
   REMOVE_STUDIO_ACCESS_TOKEN = 'dvc.removeStudioAccessToken',
-  EXPERIMENT_VIEW_SHARE_TO_STUDIO = 'dvc.views.experiments.shareExperimentToStudio',
   SETUP_SHOW_STUDIO_CONNECT = 'dvc.showStudioConnect',
   SETUP_SHOW_STUDIO_SETTINGS = 'dvc.showStudioSettings',
 

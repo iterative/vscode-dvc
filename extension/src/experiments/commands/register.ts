@@ -292,8 +292,8 @@ export const registerExperimentCommands = (
       experiments.getRepository(dvcRoot).toggleExperimentStatus(id)
   )
 
-  internalCommands.registerExternalCommand(
-    RegisteredCommands.EXPERIMENT_VIEW_SHARE_TO_STUDIO,
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_VIEW_SHARE,
     getShareExperimentToStudioCommand(internalCommands, setup)
   )
 
