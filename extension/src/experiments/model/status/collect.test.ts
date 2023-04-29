@@ -303,7 +303,44 @@ describe('collectColoredStatus', () => {
       workspace: colors[0]
     })
 
-    expect(availableColors).toStrictEqual(colors.slice(1))
+    expect(availableColors).toStrictEqual(
+      colors.filter(color => ![colors[2], colors[0]].includes(color))
+    )
+  })
+
+  it('should prevent colors being available when they are already assigned', () => {
+    const colors = copyOriginalColors()
+    const selectedColor = colors[2]
+    const { availableColors, coloredStatus } = collectColoredStatus(
+      [
+        {
+          executor: null,
+          id: 'exp-1',
+          status: ExperimentStatus.SUCCESS
+        },
+        {
+          id: EXPERIMENT_WORKSPACE_ID
+        },
+        { id: 'main' }
+      ] as Experiment[],
+      new Map(),
+      {
+        'exp-1': selectedColor,
+        workspace: UNSELECTED
+      },
+      colors,
+      new Set(),
+      { 'exp-1': EXPERIMENT_WORKSPACE_ID }
+    )
+    expect(coloredStatus).toStrictEqual({
+      'exp-1': selectedColor,
+      main: UNSELECTED,
+      workspace: UNSELECTED
+    })
+
+    expect(availableColors).toStrictEqual(
+      colors.filter(color => color !== selectedColor)
+    )
   })
 })
 

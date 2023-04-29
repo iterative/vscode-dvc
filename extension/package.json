@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.8.1",
+  "version": "0.8.2",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -383,18 +383,6 @@
         "category": "DVC"
       },
       {
-        "title": "Share Experiment as Branch",
-        "command": "dvc.shareExperimentAsBranch",
-        "category": "DVC",
-        "icon": "$(repo-push)"
-      },
-      {
-        "title": "Commit and Share Experiment",
-        "command": "dvc.shareExperimentAsCommit",
-        "category": "DVC",
-        "icon": "$(repo-push)"
-      },
-      {
         "title": "Show Commands",
         "command": "dvc.showCommands",
         "category": "DVC"
@@ -516,18 +504,6 @@
         "command": "dvc.views.experiments.resetAndRunCheckpointExperiment",
         "category": "DVC",
         "icon": "$(play)"
-      },
-      {
-        "title": "Share as Branch",
-        "command": "dvc.views.experiments.shareExperimentAsBranch",
-        "category": "DVC",
-        "icon": "$(repo-push)"
-      },
-      {
-        "title": "Commit and Share",
-        "command": "dvc.views.experiments.shareExperimentAsCommit",
-        "category": "DVC",
-        "icon": "$(repo-push)"
       },
       {
         "title": "Share to Studio",
@@ -847,14 +823,6 @@
           "when": "false"
         },
         {
-          "command": "dvc.shareExperimentAsBranch",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
-        },
-        {
-          "command": "dvc.shareExperimentAsCommit",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
-        },
-        {
           "command": "dvc.showExperiments",
           "when": "dvc.commands.available && dvc.project.available"
         },
@@ -912,14 +880,6 @@
         },
         {
           "command": "dvc.views.experiments.resetAndRunCheckpointExperiment",
-          "when": "false"
-        },
-        {
-          "command": "dvc.views.experiments.shareExperimentAsBranch",
-          "when": "false"
-        },
-        {
-          "command": "dvc.views.experiments.shareExperimentAsCommit",
           "when": "false"
         },
         {
@@ -1189,16 +1149,6 @@
         {
           "command": "dvc.views.experiments.shareExperimentToStudio",
           "group": "1_share@0",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == experiment && !dvc.experiment.running"
-        },
-        {
-          "command": "dvc.views.experiments.shareExperimentAsCommit",
-          "group": "1_share@1",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == experiment && !dvc.experiment.running"
-        },
-        {
-          "command": "dvc.views.experiments.shareExperimentAsBranch",
-          "group": "1_share@2",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == experiment && !dvc.experiment.running"
         },
         {
@@ -1653,7 +1603,7 @@
     "vscode-languageclient": "8.1.0"
   },
   "devDependencies": {
-    "@swc/core": "1.3.52",
+    "@swc/core": "1.3.53",
     "@swc/jest": "0.2.26",
     "@types/chai": "4.3.4",
     "@types/chai-as-promised": "7.1.5",
@@ -1677,10 +1627,10 @@
     "@types/vscode": "1.64.0",
     "@vscode/test-electron": "2.3.0",
     "@vscode/vsce": "2.19.0",
-    "@wdio/cli": "8.8.4",
-    "@wdio/local-runner": "8.8.4",
-    "@wdio/mocha-framework": "8.8.4",
-    "@wdio/spec-reporter": "8.8.4",
+    "@wdio/cli": "8.8.6",
+    "@wdio/local-runner": "8.8.6",
+    "@wdio/mocha-framework": "8.8.6",
+    "@wdio/spec-reporter": "8.8.6",
     "chai": "4.3.7",
     "chai-as-promised": "7.1.1",
     "clean-webpack-plugin": "4.0.0",
@@ -1698,9 +1648,9 @@
     "ts-loader": "9.4.2",
     "vscode-uri": "3.0.7",
     "wdio-vscode-service": "5.0.0",
-    "webdriverio": "8.8.4",
+    "webdriverio": "8.8.6",
     "webpack": "5.80.0",
-    "webpack-cli": "5.0.1"
+    "webpack-cli": "5.0.2"
   },
   "peerDependencies": {
     "typescript": "*"

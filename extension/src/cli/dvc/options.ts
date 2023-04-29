@@ -21,6 +21,7 @@ const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
     ...env,
     DVCLIVE_OPEN: 'false',
     DVC_NO_ANALYTICS: 'true',
+    GIT_TERMINAL_PROMPT: '0',
     PATH
   }
 }

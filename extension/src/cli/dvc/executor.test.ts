@@ -24,6 +24,7 @@ const mockedGetProcessEnv = jest.mocked(getProcessEnv)
 const mockedEnv = {
   DVCLIVE_OPEN: 'false',
   DVC_NO_ANALYTICS: 'true',
+  GIT_TERMINAL_PROMPT: '0',
   PATH: '/some/special/path'
 }
 
@@ -238,13 +239,13 @@ describe('CliExecutor', () => {
     })
   })
 
-  describe('experimentApply', () => {
+  describe('expApply', () => {
     it('should call createProcess with the correct parameters to apply an existing experiment to the workspace', async () => {
       const cwd = ''
       const stdout = 'Test output that will be passed along'
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await dvcExecutor.experimentApply(cwd, 'exp-test')
+      const output = await dvcExecutor.expApply(cwd, 'exp-test')
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toHaveBeenCalledWith({
@@ -256,7 +257,7 @@ describe('CliExecutor', () => {
     })
   })
 
-  describe('experimentBranch', () => {
+  describe('expBranch', () => {
     it('should call createProcess with the correct parameters to create a new branch from an existing experiment', async () => {
       const cwd = __dirname
       const stdout =
@@ -265,7 +266,7 @@ describe('CliExecutor', () => {
         '\t\tgit checkout some-branch'
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await dvcExecutor.experimentBranch(
+      const output = await dvcExecutor.expBranch(
         cwd,
         'exp-0898f',
         'some-branch'
@@ -281,7 +282,7 @@ describe('CliExecutor', () => {
     })
   })
 
-  describe('experimentGarbageCollect', () => {
+  describe('expGarbageCollect', () => {
     it('should call createProcess with the correct parameters to garbage collect experiments', async () => {
       const cwd = __dirname
       const stdout =
@@ -290,7 +291,7 @@ describe('CliExecutor', () => {
         "Removed 45 experiments. To remove unused cache files use 'dvc gc'. "
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await dvcExecutor.experimentGarbageCollect(
+      const output = await dvcExecutor.expGarbageCollect(
         cwd,
         GcPreserveFlag.WORKSPACE,
         GcPreserveFlag.QUEUED
@@ -306,13 +307,31 @@ describe('CliExecutor', () => {
     })
   })
 
-  describe('experimentRemove', () => {
+  describe('expPush', () => {
+    it('should call createProcess with the correct parameters to push an existing experiment to the remote', async () => {
+      const cwd = __dirname
+      const stdout = ''
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
+
+      const output = await dvcExecutor.expPush(cwd, 'toric-sail')
+      expect(output).toStrictEqual(stdout)
+
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
+        args: ['exp', 'push', 'origin', 'toric-sail'],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
+  describe('expRemove', () => {
     it('should call createProcess with the correct parameters to remove an existing experiment from the workspace', async () => {
       const cwd = __dirname
       const stdout = ''
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await dvcExecutor.experimentRemove(cwd, 'exp-dfd12')
+      const output = await dvcExecutor.expRemove(cwd, 'exp-dfd12')
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toHaveBeenCalledWith({
@@ -324,13 +343,13 @@ describe('CliExecutor', () => {
     })
   })
 
-  describe('experimentRemoveQueue', () => {
+  describe('expRemoveQueue', () => {
     it('should call createProcess with the correct parameters to remove all existing queued experiments from the workspace', async () => {
       const cwd = __dirname
       const stdout = ''
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await dvcExecutor.experimentRemoveQueue(cwd)
+      const output = await dvcExecutor.expRemoveQueue(cwd)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toHaveBeenCalledWith({
@@ -342,13 +361,13 @@ describe('CliExecutor', () => {
     })
   })
 
-  describe('experimentRunQueue', () => {
+  describe('expRunQueue', () => {
     it('should call createProcess with the correct parameters to queue an experiment for later execution', async () => {
       const cwd = __dirname
       const stdout = "Queued experiment 'bbf5c01' for future execution."
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
-      const output = await dvcExecutor.experimentRunQueue(cwd)
+      const output = await dvcExecutor.expRunQueue(cwd)
       expect(output).toStrictEqual(stdout)
 
       expect(mockedCreateProcess).toHaveBeenCalledWith({

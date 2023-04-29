@@ -7,7 +7,7 @@ import { Config } from '../../config'
 export class DvcCli extends Cli {
   public autoRegisteredCommands: string[] = []
 
-  protected readonly config: Config
+  protected readonly extensionConfig: Config
 
   constructor(
     config: Config,
@@ -18,7 +18,7 @@ export class DvcCli extends Cli {
   ) {
     super(emitters)
 
-    this.config = config
+    this.extensionConfig = config
   }
 
   protected executeDvcProcess(cwd: string, ...args: Args): Promise<string> {
@@ -36,8 +36,8 @@ export class DvcCli extends Cli {
 
   protected getOptions(cwd: string, ...args: Args) {
     return getOptions(
-      this.config.getPythonBinPath(),
-      this.config.getCliPath(),
+      this.extensionConfig.getPythonBinPath(),
+      this.extensionConfig.getCliPath(),
       cwd,
       ...args
     )

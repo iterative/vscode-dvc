@@ -256,7 +256,7 @@ suite('Experiments Tree Test Suite', () => {
 
       const mockExperimentRemove = stub(
         DvcExecutor.prototype,
-        'experimentRemove'
+        'expRemove'
       ).resolves('')
 
       stubPrivatePrototypeMethod(
@@ -280,7 +280,7 @@ suite('Experiments Tree Test Suite', () => {
 
       const mockExperimentRemove = stub(
         DvcExecutor.prototype,
-        'experimentRemove'
+        'expRemove'
       ).resolves('')
 
       stubPrivatePrototypeMethod(
@@ -309,7 +309,7 @@ suite('Experiments Tree Test Suite', () => {
 
       const mockExperimentRemove = stub(
         DvcExecutor.prototype,
-        'experimentRemove'
+        'expRemove'
       ).resolves('')
 
       stubPrivatePrototypeMethod(
@@ -354,7 +354,7 @@ suite('Experiments Tree Test Suite', () => {
 
       const mockExperimentApply = stub(
         DvcExecutor.prototype,
-        'experimentApply'
+        'expApply'
       ).resolves(
         `Changes for experiment '${mockExperimentId}' have been applied to your current workspace.`
       )
@@ -378,10 +378,7 @@ suite('Experiments Tree Test Suite', () => {
       const { experiments } = buildExperiments(disposable)
       await experiments.isReady()
 
-      const mockExperimentBranch = stub(
-        DvcExecutor.prototype,
-        'experimentBranch'
-      )
+      const mockExperimentBranch = stub(DvcExecutor.prototype, 'expBranch')
       const mockShowInputBox = stub(window, 'showInputBox').resolves(undefined)
       stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
@@ -406,7 +403,7 @@ suite('Experiments Tree Test Suite', () => {
 
       const mockExperimentBranch = stub(
         DvcExecutor.prototype,
-        'experimentBranch'
+        'expBranch'
       ).resolves(
         `Git branch '${mockBranch}' has been created from experiment '${mockExperimentId}'.        
        To switch to the new branch run:
@@ -440,10 +437,9 @@ suite('Experiments Tree Test Suite', () => {
 
       await experiments.isReady()
 
-      const mockExperimentRunQueue = stub(
-        dvcExecutor,
-        'experimentRunQueue'
-      ).resolves('true')
+      const mockExperimentRunQueue = stub(dvcExecutor, 'expRunQueue').resolves(
+        'true'
+      )
 
       const [mockGetOnlyOrPickProject] = stubWorkspaceExperimentsGetters(
         '',

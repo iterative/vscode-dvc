@@ -86,7 +86,12 @@ describe('executeDvcProcess', () => {
     expect(mockedCreateProcess).toHaveBeenCalledWith({
       args,
       cwd,
-      env: { ...processEnv, DVCLIVE_OPEN: 'false', DVC_NO_ANALYTICS: 'true' },
+      env: {
+        ...processEnv,
+        DVCLIVE_OPEN: 'false',
+        DVC_NO_ANALYTICS: 'true',
+        GIT_TERMINAL_PROMPT: '0'
+      },
       executable: 'dvc'
     })
   })
@@ -129,6 +134,7 @@ describe('executeDvcProcess', () => {
       env: {
         DVCLIVE_OPEN: 'false',
         DVC_NO_ANALYTICS: 'true',
+        GIT_TERMINAL_PROMPT: '0',
         PATH: joinEnvPath('/some/path/to', existingPath),
         SECRET_KEY
       },

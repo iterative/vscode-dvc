@@ -185,11 +185,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    return this.runCommand(
-      AvailableCommands.EXPERIMENT_REMOVE,
-      cwd,
-      ...experimentIds
-    )
+    return this.runCommand(AvailableCommands.EXP_REMOVE, cwd, ...experimentIds)
   }
 
   public async modifyExperimentParamsAndRun(
