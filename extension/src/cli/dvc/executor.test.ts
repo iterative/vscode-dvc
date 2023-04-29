@@ -24,6 +24,7 @@ const mockedGetProcessEnv = jest.mocked(getProcessEnv)
 const mockedEnv = {
   DVCLIVE_OPEN: 'false',
   DVC_NO_ANALYTICS: 'true',
+  GIT_TERMINAL_PROMPT: '0',
   PATH: '/some/special/path'
 }
 
