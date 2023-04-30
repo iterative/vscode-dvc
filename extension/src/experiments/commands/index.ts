@@ -42,7 +42,7 @@ const convertUrlTextToLink = (stdout: string) => {
   return stdout.replace(match[0], ` in [Studio](${match[1]})`)
 }
 
-export const getShareExperimentToStudioCommand =
+export const getPushExperimentCommand =
   (internalCommands: InternalCommands, setup: Setup) =>
   ({ dvcRoot, id }: { dvcRoot: string; id: string }) => {
     const studioAccessToken = setup.getStudioAccessToken()
@@ -55,10 +55,10 @@ export const getShareExperimentToStudioCommand =
       void promptToAddStudioToken()
     }
 
-    return Toast.showProgress(`Sharing ${id}`, async progress => {
+    return Toast.showProgress('exp push', async progress => {
       progress.report({ increment: 0 })
 
-      progress.report({ increment: 25, message: 'Running exp push...' })
+      progress.report({ increment: 25, message: `Pushing ${id}...` })
 
       const remainingProgress = 75
 

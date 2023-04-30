@@ -1,7 +1,4 @@
-import {
-  getBranchExperimentCommand,
-  getShareExperimentToStudioCommand
-} from '.'
+import { getBranchExperimentCommand, getPushExperimentCommand } from '.'
 import { pickGarbageCollectionFlags } from '../quickPick'
 import { WorkspaceExperiments } from '../workspace'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
@@ -293,8 +290,8 @@ export const registerExperimentCommands = (
   )
 
   internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_VIEW_SHARE,
-    getShareExperimentToStudioCommand(internalCommands, setup)
+    RegisteredCliCommands.EXPERIMENT_VIEW_PUSH,
+    getPushExperimentCommand(internalCommands, setup)
   )
 
   internalCommands.registerExternalCliCommand(

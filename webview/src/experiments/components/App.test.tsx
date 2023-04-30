@@ -862,7 +862,7 @@ describe('App', () => {
         'Show Logs',
         'Apply to Workspace',
         'Create new Branch',
-        'Share',
+        'Push',
         'Modify and Run',
         'Modify and Resume',
         'Modify and Queue',
@@ -1023,10 +1023,10 @@ describe('App', () => {
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
-      expect(itemLabels).toContain('Share')
+      expect(itemLabels).toContain('Push')
 
       const shareOption = menuitems.find(item =>
-        item.textContent?.includes('Share')
+        item.textContent?.includes('Push')
       )
 
       expect(shareOption).toBeDefined()
@@ -1035,7 +1035,7 @@ describe('App', () => {
 
       expect(sendMessage).toHaveBeenCalledWith({
         payload: 'exp-e7a67',
-        type: MessageFromWebviewType.SHARE_EXPERIMENT
+        type: MessageFromWebviewType.PUSH_EXPERIMENT
       })
     })
 

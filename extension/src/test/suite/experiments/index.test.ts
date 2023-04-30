@@ -637,7 +637,7 @@ suite('Experiments Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle a message to share an experiment', async () => {
+    it('should handle a message to push an experiment', async () => {
       const { experiments } = buildExperiments(disposable)
       await experiments.isReady()
 
@@ -647,6 +647,7 @@ suite('Experiments Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const executeCommandSpy = spy(commands, 'executeCommand')
+      const mockExpPush = stub(DvcExecutor.prototype, 'expPush')
 
       const mockGetStudioAccessToken = stub(
         Setup.prototype,
@@ -671,7 +672,7 @@ suite('Experiments Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: mockExpId,
-        type: MessageFromWebviewType.SHARE_EXPERIMENT
+        type: MessageFromWebviewType.PUSH_EXPERIMENT
       })
 
       await Promise.all([tokenNotFound, userPrompted])
@@ -689,14 +690,13 @@ suite('Experiments Test Suite', () => {
         })
       )
 
-      const mockExpPush = stub(DvcExecutor.prototype, 'expPush')
       const mockShowProgress = stub(Toast, 'showProgress')
       bypassProgressCloseDelay()
 
       const mockReport = stub()
 
       mockShowProgress.callsFake((title, callback) => {
-        expect(title).to.equal(`Sharing ${mockExpId}`)
+        expect(title).to.equal('exp push')
 
         const progress = { report: mockReport }
         return callback(progress, {} as CancellationToken)
@@ -713,7 +713,7 @@ suite('Experiments Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: mockExpId,
-        type: MessageFromWebviewType.SHARE_EXPERIMENT
+        type: MessageFromWebviewType.PUSH_EXPERIMENT
       })
 
       await Promise.all([tokenFound, commandExecuted])
