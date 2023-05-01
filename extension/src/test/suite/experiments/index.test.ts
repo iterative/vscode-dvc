@@ -671,7 +671,7 @@ suite('Experiments Test Suite', () => {
       )
 
       mockMessageReceived.fire({
-        payload: mockExpId,
+        payload: [mockExpId],
         type: MessageFromWebviewType.PUSH_EXPERIMENT
       })
 
@@ -712,7 +712,7 @@ suite('Experiments Test Suite', () => {
       )
 
       mockMessageReceived.fire({
-        payload: mockExpId,
+        payload: [mockExpId],
         type: MessageFromWebviewType.PUSH_EXPERIMENT
       })
 
