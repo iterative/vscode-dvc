@@ -23,25 +23,33 @@ const showInstallProgress = (
   Toast.showProgress('Installing packages', async progress => {
     progress.report({ increment: 0 })
 
-    await Toast.runCommandAndIncrementProgress(
-      async () => {
-        await installPackages(root, pythonBinPath, 'dvclive')
-        return 'DVCLive Installed'
-      },
-      progress,
-      25
-    )
+    try {
+      await Toast.runCommandAndIncrementProgress(
+        async () => {
+          await installPackages(root, pythonBinPath, 'dvclive')
+          return 'DVCLive Installed'
+        },
+        progress,
+        25
+      )
+    } catch (error: unknown) {
+      return Toast.reportProgressError(error, progress)
+    }
 
-    await Toast.runCommandAndIncrementProgress(
-      async () => {
-        await installPackages(root, pythonBinPath, 'dvc')
-        return 'DVC Installed'
-      },
-      progress,
-      75
-    )
+    try {
+      await Toast.runCommandAndIncrementProgress(
+        async () => {
+          await installPackages(root, pythonBinPath, 'dvc')
+          return 'DVC Installed'
+        },
+        progress,
+        75
+      )
 
-    return Toast.delayProgressClosing()
+      return Toast.delayProgressClosing()
+    } catch (error: unknown) {
+      return Toast.reportProgressError(error, progress)
+    }
   })
 
 export const autoInstallDvc = async (): Promise<unknown> => {
