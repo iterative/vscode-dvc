@@ -62,25 +62,17 @@ export const getPushExperimentCommand =
 
       const remainingProgress = 75
 
-      try {
-        const stdout = await internalCommands.executeCommand(
-          AvailableCommands.EXP_PUSH,
-          dvcRoot,
-          id
-        )
+      const stdout = await internalCommands.executeCommand(
+        AvailableCommands.EXP_PUSH,
+        dvcRoot,
+        id
+      )
 
-        progress.report({
-          increment: remainingProgress,
-          message: convertUrlTextToLink(stdout)
-        })
+      progress.report({
+        increment: remainingProgress,
+        message: convertUrlTextToLink(stdout)
+      })
 
-        return Toast.delayProgressClosing(15000)
-      } catch (error: unknown) {
-        progress.report({
-          increment: remainingProgress,
-          message: (error as Error)?.message || 'an unexpected error occurred'
-        })
-      }
-      return Toast.delayProgressClosing(60000)
+      return Toast.delayProgressClosing(15000)
     })
   }
