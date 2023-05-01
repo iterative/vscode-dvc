@@ -160,7 +160,8 @@ const registerExperimentInputCommands = (
 
 const registerExperimentQuickPickCommands = (
   experiments: WorkspaceExperiments,
-  internalCommands: InternalCommands
+  internalCommands: InternalCommands,
+  setup: Setup
 ): void => {
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_GARBAGE_COLLECT,
@@ -218,6 +219,11 @@ const registerExperimentQuickPickCommands = (
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.QUEUE_KILL,
     () => experiments.selectQueueTasksToKill()
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_PUSH,
+    () => experiments.selectExperimentsToPush(setup)
   )
 
   internalCommands.registerExternalCliCommand(
@@ -280,7 +286,7 @@ export const registerExperimentCommands = (
   registerExperimentCwdCommands(experiments, internalCommands)
   registerExperimentNameCommands(experiments, internalCommands)
   registerExperimentInputCommands(experiments, internalCommands)
-  registerExperimentQuickPickCommands(experiments, internalCommands)
+  registerExperimentQuickPickCommands(experiments, internalCommands, setup)
   registerExperimentRunCommands(experiments, internalCommands, setup)
 
   internalCommands.registerExternalCommand(

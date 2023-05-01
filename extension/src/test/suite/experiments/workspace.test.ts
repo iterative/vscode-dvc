@@ -13,6 +13,7 @@ import { Experiments } from '../../../experiments'
 import * as QuickPick from '../../../vscode/quickPick'
 import { DvcExecutor } from '../../../cli/dvc/executor'
 import {
+  bypassProgressCloseDelay,
   closeAllEditors,
   getInputBoxEvent,
   getTimeSafeDisposer,
@@ -657,6 +658,112 @@ suite('Workspace Experiments Test Suite', () => {
     })
   })
 
+  describe('dvc.pushExperiments', () => {
+    it('should ask the user to pick experiment(s) and then push selected ones to the remote', async () => {
+      bypassProgressCloseDelay()
+      const mockExperimentId = 'exp-e7a67'
+      const secondMockExperimentId = 'exp-83425'
+      type QuickPickReturnValue = QuickPickItemWithValue<string>[]
+      stub(Setup.prototype, 'getStudioAccessToken').returns('isat_token')
+
+      const { experiments } = buildExperiments(disposable)
+
+      await experiments.isReady()
+
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
+
+      const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
+        [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
+        Thenable<QuickPickReturnValue | undefined>
+      >
+
+      mockShowQuickPick
+        .onFirstCall()
+        .resolves([
+          {
+            value: mockExperimentId
+          }
+        ] as QuickPickReturnValue)
+        .onSecondCall()
+        .resolves([
+          {
+            value: mockExperimentId
+          },
+          {
+            value: secondMockExperimentId
+          }
+        ] as QuickPickReturnValue)
+      const mockExpPush = stub(DvcExecutor.prototype, 'expPush')
+
+      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_PUSH)
+      expect(mockShowQuickPick).calledWithExactly(
+        [
+          {
+            description: '[exp-e7a67]',
+            detail: `Created:${formatDate(
+              '2020-12-29T15:31:52'
+            )}, loss:2.0205045, accuracy:0.37241668`,
+            label: '4fb124a',
+            value: 'exp-e7a67'
+          },
+          {
+            description: '[test-branch]',
+            detail: `Created:${formatDate(
+              '2020-12-29T15:28:59'
+            )}, loss:1.9293040, accuracy:0.46680000`,
+            label: '42b8736',
+            value: 'test-branch'
+          },
+          {
+            description: '[exp-83425]',
+            detail: `Created:${formatDate(
+              '2020-12-29T15:27:02'
+            )}, loss:1.7750162, accuracy:0.59265000`,
+            label: EXPERIMENT_WORKSPACE_ID,
+            value: 'exp-83425'
+          },
+          {
+            description: undefined,
+            detail: 'Created:-, loss:-, accuracy:-',
+            label: '489fd8b',
+            value: '489fd8b'
+          },
+          {
+            description: '[exp-f13bca]',
+            detail: `Created:${formatDate(
+              '2020-12-29T15:26:36'
+            )}, loss:-, accuracy:-`,
+            label: 'f0f9186',
+            value: 'exp-f13bca'
+          },
+          {
+            description: undefined,
+            detail: `Created:${formatDate(
+              '2020-12-29T15:25:27'
+            )}, loss:-, accuracy:-`,
+            label: '55d492c',
+            value: '55d492c'
+          }
+        ],
+        {
+          canPickMany: true,
+          matchOnDescription: true,
+          matchOnDetail: true,
+          title: 'Select Experiment(s) to Push'
+        }
+      )
+      expect(mockExpPush).to.be.calledWith(dvcDemoPath, mockExperimentId)
+
+      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_PUSH)
+
+      expect(mockExpPush).to.be.calledWith(
+        dvcDemoPath,
+        mockExperimentId,
+        secondMockExperimentId
+      )
+    })
+  })
+
   describe('dvc.removeExperiments', () => {
     it('should ask the user to pick experiment(s) and then remove selected ones from the workspace', async () => {
       const mockExperimentId = 'exp-e7a67'
@@ -754,7 +861,7 @@ suite('Workspace Experiments Test Suite', () => {
           canPickMany: true,
           matchOnDescription: true,
           matchOnDetail: true,
-          title: 'Select Experiments to Remove'
+          title: 'Select Experiment(s) to Remove'
         }
       )
       expect(mockExperimentRemove).to.be.calledWith(

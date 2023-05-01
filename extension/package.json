@@ -297,6 +297,11 @@
         }
       },
       {
+        "title": "Push Experiment(s)",
+        "command": "dvc.pushExperiments",
+        "category": "DVC"
+      },
+      {
         "title": "Remove Experiment(s)",
         "command": "dvc.removeExperiments",
         "category": "DVC"
@@ -760,6 +765,10 @@
         {
           "command": "dvc.modifyExperimentParamsResetAndRun",
           "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && dvc.experiment.checkpoints"
+        },
+        {
+          "command": "dvc.pushExperiments",
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
         },
         {
           "command": "dvc.queueExperiment",
