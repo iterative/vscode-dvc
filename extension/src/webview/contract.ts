@@ -25,6 +25,7 @@ export enum MessageFromWebviewType {
   OPEN_PLOTS_WEBVIEW = 'open-plots-webview',
   OPEN_STUDIO = 'open-studio',
   OPEN_STUDIO_PROFILE = 'open-studio-profile',
+  PUSH_EXPERIMENT = 'push-experiment',
   REMOVE_COLUMN_SORT = 'remove-column-sort',
   REMOVE_EXPERIMENT = 'remove-experiment',
   REORDER_COLUMNS = 'reorder-columns',
@@ -36,7 +37,6 @@ export enum MessageFromWebviewType {
   RESIZE_COLUMN = 'resize-column',
   RESIZE_PLOTS = 'resize-plots',
   SAVE_STUDIO_TOKEN = 'save-studio-token',
-  SHARE_EXPERIMENT_TO_STUDIO = 'share-experiment-to-studio',
   SHOW_EXPERIMENT_LOGS = 'show-experiment-logs',
   STOP_EXPERIMENT = 'stop-experiment',
   SORT_COLUMN = 'sort-column',
@@ -154,7 +154,7 @@ export type MessageFromWebview =
     }
   | { type: MessageFromWebviewType.SHOW_EXPERIMENT_LOGS; payload: string }
   | {
-      type: MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO
+      type: MessageFromWebviewType.PUSH_EXPERIMENT
       payload: string
     }
   | {

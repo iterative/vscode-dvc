@@ -506,8 +506,8 @@
         "icon": "$(play)"
       },
       {
-        "title": "Share to Studio",
-        "command": "dvc.views.experiments.shareExperimentToStudio",
+        "title": "Push",
+        "command": "dvc.views.experiments.pushExperiment",
         "category": "DVC",
         "icon": "$(repo-push)"
       },
@@ -564,6 +564,11 @@
           "type": "boolean",
           "default": null
         },
+        "dvc.doNotRecommendAddStudioToken": {
+          "description": "Do not prompt to add a studio.token to the global DVC config, which enables automatic sharing of experiments to Studio.",
+          "type": "boolean",
+          "default": null
+        },
         "dvc.doNotShowCliUnavailable": {
           "description": "Do not warn when the workspace contains a DVC project but the DVC binary is unavailable.",
           "type": "boolean",
@@ -599,7 +604,7 @@
           "default": null
         },
         "dvc.studio.shareExperimentsLive": {
-          "description": "Automatically share all new experiment metrics and plots logged with DVCLive to Studio. This option will only take effect once Studio is connected.",
+          "description": "Automatically share all new experiment metrics and plots logged with DVCLive to Studio. This option will only take effect once Studio is connected (studio.token is set).",
           "type": "boolean",
           "default": false
         }
@@ -883,7 +888,7 @@
           "when": "false"
         },
         {
-          "command": "dvc.views.experiments.shareExperimentToStudio",
+          "command": "dvc.views.experiments.pushExperiment",
           "when": "false"
         },
         {
@@ -1147,7 +1152,7 @@
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|queued)$/ && !dvc.experiment.running"
         },
         {
-          "command": "dvc.views.experiments.shareExperimentToStudio",
+          "command": "dvc.views.experiments.pushExperiment",
           "group": "1_share@0",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == experiment && !dvc.experiment.running"
         },

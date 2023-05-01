@@ -194,9 +194,9 @@ export class WebviewMessages {
       case MessageFromWebviewType.ADD_CONFIGURATION: {
         return this.addConfiguration()
       }
-      case MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO:
+      case MessageFromWebviewType.PUSH_EXPERIMENT:
         return commands.executeCommand(
-          RegisteredCommands.EXPERIMENT_VIEW_SHARE_TO_STUDIO,
+          RegisteredCliCommands.EXPERIMENT_VIEW_PUSH,
           { dvcRoot: this.dvcRoot, id: message.payload }
         )
 

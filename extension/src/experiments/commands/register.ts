@@ -1,7 +1,4 @@
-import {
-  getBranchExperimentCommand,
-  getShareExperimentToStudioCommand
-} from '.'
+import { getBranchExperimentCommand, getPushExperimentCommand } from '.'
 import { pickGarbageCollectionFlags } from '../quickPick'
 import { WorkspaceExperiments } from '../workspace'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
@@ -292,9 +289,9 @@ export const registerExperimentCommands = (
       experiments.getRepository(dvcRoot).toggleExperimentStatus(id)
   )
 
-  internalCommands.registerExternalCommand(
-    RegisteredCommands.EXPERIMENT_VIEW_SHARE_TO_STUDIO,
-    getShareExperimentToStudioCommand(internalCommands, setup)
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_VIEW_PUSH,
+    getPushExperimentCommand(internalCommands, setup)
   )
 
   internalCommands.registerExternalCliCommand(

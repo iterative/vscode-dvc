@@ -201,8 +201,8 @@ const getSingleSelectMenuOptions = (
       MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
     ),
     hideIfRunningOrNotExperiment(
-      'Share to Studio',
-      MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO,
+      'Push',
+      MessageFromWebviewType.PUSH_EXPERIMENT,
       true
     ),
     ...getRunResumeOptions(
