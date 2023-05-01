@@ -9,7 +9,7 @@ import {
   Uri
 } from 'vscode'
 import { ExperimentType } from '.'
-import { collectDeletable, ExperimentItem } from './collect'
+import { collectExperimentType, ExperimentItem } from './collect'
 import { MAX_SELECTED_EXPERIMENTS } from './status'
 import { getDataFromColumnPaths } from './util'
 import { WorkspaceExperiments } from '../workspace'
@@ -69,7 +69,7 @@ export class ExperimentsTree
     this.experiments = experiments
     this.resourceLocator = resourceLocator
 
-    this.registerWorkaroundCommand()
+    this.registerWorkaroundCommands()
 
     this.updateDescriptionOnChange()
   }
@@ -123,24 +123,44 @@ export class ExperimentsTree
     )
   }
 
-  private registerWorkaroundCommand() {
+  private registerWorkaroundCommands() {
+    const callCommandWithSelected = async (
+      command:
+        | RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE
+        | RegisteredCliCommands.EXPERIMENT_VIEW_PUSH,
+      experimentItem: ExperimentItem | string,
+      types: ExperimentType[]
+    ) => {
+      const selected = [
+        ...this.getSelectedExperimentItems(),
+        experimentItem
+      ] as (string | ExperimentItem)[]
+
+      const acc = collectExperimentType(selected, new Set(types))
+
+      for (const [dvcRoot, ids] of Object.entries(acc)) {
+        await commands.executeCommand(command, { dvcRoot, ids: [...ids] })
+      }
+    }
+
     commands.registerCommand(
       'dvc.views.experimentsTree.removeExperiment',
-      async experimentItem => {
-        const selected = [
-          ...this.getSelectedExperimentItems(),
-          experimentItem
-        ] as (string | ExperimentItem)[]
+      (experimentItem: ExperimentItem) =>
+        callCommandWithSelected(
+          RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE,
+          experimentItem,
+          [ExperimentType.EXPERIMENT, ExperimentType.QUEUED]
+        )
+    )
 
-        const deletable = collectDeletable(selected)
-
-        for (const [dvcRoot, ids] of Object.entries(deletable)) {
-          await commands.executeCommand(
-            RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE,
-            { dvcRoot, ids }
-          )
-        }
-      }
+    commands.registerCommand(
+      'dvc.views.experimentsTree.pushExperiment',
+      (experimentItem: ExperimentItem) =>
+        callCommandWithSelected(
+          RegisteredCliCommands.EXPERIMENT_VIEW_PUSH,
+          experimentItem,
+          [ExperimentType.EXPERIMENT]
+        )
     )
   }
 

@@ -155,7 +155,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.SHOW_EXPERIMENT_LOGS; payload: string }
   | {
       type: MessageFromWebviewType.PUSH_EXPERIMENT
-      payload: string
+      payload: string[]
     }
   | {
       type: MessageFromWebviewType.REMOVE_COLUMN_SORT

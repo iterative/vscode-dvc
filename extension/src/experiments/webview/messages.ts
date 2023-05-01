@@ -197,7 +197,7 @@ export class WebviewMessages {
       case MessageFromWebviewType.PUSH_EXPERIMENT:
         return commands.executeCommand(
           RegisteredCliCommands.EXPERIMENT_VIEW_PUSH,
-          { dvcRoot: this.dvcRoot, id: message.payload }
+          { dvcRoot: this.dvcRoot, ids: message.payload }
         )
 
       case MessageFromWebviewType.SHOW_EXPERIMENT_LOGS:

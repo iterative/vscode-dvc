@@ -512,6 +512,12 @@
         "icon": "$(repo-push)"
       },
       {
+        "title": "Push",
+        "command": "dvc.views.experimentsTree.pushExperiment",
+        "category": "DVC",
+        "icon": "$(repo-push)"
+      },
+      {
         "title": "Show Logs",
         "command": "dvc.views.experiments.showLogs",
         "category": "DVC"
@@ -864,6 +870,14 @@
           "when": "false"
         },
         {
+          "command": "dvc.views.experiments.pushExperiment",
+          "when": "false"
+        },
+        {
+          "command": "dvc.views.experimentsTree.pushExperiment",
+          "when": "false"
+        },
+        {
           "command": "dvc.views.experiments.queueExperiment",
           "when": "false"
         },
@@ -885,10 +899,6 @@
         },
         {
           "command": "dvc.views.experiments.resetAndRunCheckpointExperiment",
-          "when": "false"
-        },
-        {
-          "command": "dvc.views.experiments.pushExperiment",
           "when": "false"
         },
         {
@@ -1152,7 +1162,7 @@
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|queued)$/ && !dvc.experiment.running"
         },
         {
-          "command": "dvc.views.experiments.pushExperiment",
+          "command": "dvc.views.experimentsTree.pushExperiment",
           "group": "1_share@0",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == experiment && !dvc.experiment.running"
         },

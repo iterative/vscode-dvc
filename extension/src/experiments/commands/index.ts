@@ -44,7 +44,7 @@ const convertUrlTextToLink = (stdout: string) => {
 
 export const getPushExperimentCommand =
   (internalCommands: InternalCommands, setup: Setup) =>
-  ({ dvcRoot, id }: { dvcRoot: string; id: string }) => {
+  ({ dvcRoot, ids }: { dvcRoot: string; ids: string[] }) => {
     const studioAccessToken = setup.getStudioAccessToken()
     if (
       !(
@@ -58,14 +58,14 @@ export const getPushExperimentCommand =
     return Toast.showProgress('exp push', async progress => {
       progress.report({ increment: 0 })
 
-      progress.report({ increment: 25, message: `Pushing ${id}...` })
+      progress.report({ increment: 25, message: `Pushing ${ids.join(' ')}...` })
 
       const remainingProgress = 75
 
       const stdout = await internalCommands.executeCommand(
         AvailableCommands.EXP_PUSH,
         dvcRoot,
-        id
+        ...ids
       )
 
       progress.report({
