@@ -2,6 +2,7 @@ export enum RegisteredCliCommands {
   EXPERIMENT_APPLY = 'dvc.applyExperiment',
   EXPERIMENT_BRANCH = 'dvc.branchExperiment',
   EXPERIMENT_GARBAGE_COLLECT = 'dvc.experimentGarbageCollect',
+  EXPERIMENT_PUSH = 'dvc.pushExperiments',
   EXPERIMENT_REMOVE = 'dvc.removeExperiments',
   EXPERIMENT_REMOVE_QUEUE = 'dvc.removeExperimentQueue',
   EXPERIMENT_RESET_AND_RUN = 'dvc.resetAndRunCheckpointExperiment',
