@@ -215,10 +215,9 @@ suite('Setup Test Suite', () => {
 
       await config.isReady()
 
-      setup.setCliCompatible(undefined)
+      setup.setCliCompatibleAndVersion(undefined, undefined)
       setup.setAvailable(false)
       await setup.setRoots()
-      stub(setup, 'getCliVersion').resolves(undefined)
 
       messageSpy.restore()
       const mockSendMessage = stub(BaseWebview.prototype, 'show')
@@ -257,7 +256,7 @@ suite('Setup Test Suite', () => {
 
       await config.isReady()
 
-      setup.setCliCompatible(true)
+      setup.setCliCompatibleAndVersion(true, MIN_CLI_VERSION)
       setup.setAvailable(true)
       await setup.setRoots()
 
@@ -304,7 +303,7 @@ suite('Setup Test Suite', () => {
 
       await config.isReady()
 
-      setup.setCliCompatible(true)
+      setup.setCliCompatibleAndVersion(true, MIN_CLI_VERSION)
       setup.setAvailable(true)
       await setup.setRoots()
 
@@ -354,58 +353,9 @@ suite('Setup Test Suite', () => {
 
       await config.isReady()
 
-      setup.setCliCompatible(true)
+      setup.setCliCompatibleAndVersion(true, MIN_CLI_VERSION)
       setup.setAvailable(true)
       await setup.setRoots()
-
-      messageSpy.restore()
-      const mockSendMessage = stub(BaseWebview.prototype, 'show')
-
-      const messageSent = new Promise(resolve =>
-        mockSendMessage.callsFake(data => {
-          resolve(undefined)
-          return Promise.resolve(!!data)
-        })
-      )
-
-      const webview = await setup.showWebview()
-      await webview.isReady()
-
-      await messageSent
-
-      expect(mockSendMessage).to.be.calledOnce
-      expect(mockSendMessage).to.be.calledWithExactly({
-        canGitInitialize: false,
-        cliCompatible: true,
-        dvcCliDetails: {
-          command: 'dvc',
-          version: MIN_CLI_VERSION
-        },
-        hasData: false,
-        isPythonExtensionUsed: false,
-        isStudioConnected: false,
-        needsGitCommit: true,
-        needsGitInitialized: false,
-        projectInitialized: true,
-        pythonBinPath: undefined,
-        sectionCollapsed: undefined,
-        shareLiveToStudio: false
-      })
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
-    it('should send the expected message to the webview when there is a global CLI available', async () => {
-      const { config, setup, messageSpy } = buildSetup(disposable, false, false)
-
-      await config.isReady()
-
-      setup.setCliCompatible(true)
-      setup.setAvailable(true)
-      await setup.setRoots()
-      stub(setup, 'getCliVersion').callsFake((_, tryGlobalCli) =>
-        tryGlobalCli
-          ? Promise.resolve(MIN_CLI_VERSION)
-          : Promise.resolve(undefined)
-      )
 
       messageSpy.restore()
       const mockSendMessage = stub(BaseWebview.prototype, 'show')

@@ -105,6 +105,7 @@ const warnUser = (
 type CanRunCli = {
   isAvailable: boolean
   isCompatible: boolean | undefined
+  version: string | undefined
 }
 
 export const isCliCompatible = (
@@ -146,7 +147,8 @@ const processVersionDetails = (
   warnUser(setup, cliCompatible, version)
   return {
     isAvailable,
-    isCompatible
+    isCompatible,
+    version
   }
 }
 
@@ -171,7 +173,7 @@ const tryGlobalFallbackVersion = async (
     setup.unsetPythonBinPath()
   }
 
-  return { isAvailable, isCompatible }
+  return { isAvailable, isCompatible, version }
 }
 
 const extensionCanAutoRunCli = async (

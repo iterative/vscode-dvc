@@ -86,6 +86,7 @@ export class Setup
 
   private cliAccessible = false
   private cliCompatible: boolean | undefined
+  private cliVersion: string | undefined
 
   private dotFolderWatcher?: Disposer
 
@@ -225,8 +226,12 @@ export class Setup
     return available
   }
 
-  public setCliCompatible(compatible: boolean | undefined) {
+  public setCliCompatibleAndVersion(
+    compatible: boolean | undefined,
+    version: string | undefined
+  ) {
     this.cliCompatible = compatible
+    this.cliVersion = version
     void this.updateIsStudioConnected()
     const incompatible = compatible === undefined ? undefined : !compatible
     void setContextValue(ContextKey.CLI_INCOMPATIBLE, incompatible)
@@ -369,7 +374,7 @@ export class Setup
     return this.sendDataToWebview()
   }
 
-  public async getDvcCliDetails(): Promise<DvcCliDetails> {
+  public getDvcCliDetails(): DvcCliDetails {
     const dvcPath = this.config.getCliPath()
     const pythonBinPath = this.config.getPythonBinPath()
     const cwd = getFirstWorkspaceFolder()
@@ -378,18 +383,9 @@ export class Setup
     const commandArgs = args.length === 0 ? '' : ` ${args.join(' ')}`
     const command = executable + commandArgs
 
-    if (!cwd) {
-      return {
-        command,
-        version: undefined
-      }
-    }
-
-    const version = await this.getCliVersion(cwd)
-
     return {
       command,
-      version: version || (await this.getCliVersion(cwd, true))
+      version: this.cliVersion
     }
   }
 
@@ -416,12 +412,10 @@ export class Setup
 
     const pythonBinPath = await findPythonBinForInstall()
 
-    const dvcCliDetails = await this.getDvcCliDetails()
-
     this.webviewMessages.sendWebviewMessage({
       canGitInitialize,
       cliCompatible: this.getCliCompatible(),
-      dvcCliDetails,
+      dvcCliDetails: this.getDvcCliDetails(),
       hasData,
       isPythonExtensionUsed:
         !this.isDVCBeingUsedGlobally() && isPythonExtensionUsed,

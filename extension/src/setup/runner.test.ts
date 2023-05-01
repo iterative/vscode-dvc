@@ -74,7 +74,7 @@ const mockedInitialize = jest.fn()
 const mockedIsPythonExtensionUsed = jest.fn()
 const mockedResetMembers = jest.fn()
 const mockedSetAvailable = jest.fn()
-const mockedSetCliCompatible = jest.fn()
+const mockedSetCliCompatibleAndVersion = jest.fn()
 const mockedSetRoots = jest.fn()
 const mockedShowSetup = jest.fn()
 const mockedShouldWarnUserIfCLIUnavailable = jest.fn()
@@ -280,7 +280,7 @@ describe('run', () => {
     isPythonExtensionUsed: mockedIsPythonExtensionUsed,
     resetMembers: mockedResetMembers,
     setAvailable: mockedSetAvailable,
-    setCliCompatible: mockedSetCliCompatible,
+    setCliCompatibleAndVersion: mockedSetCliCompatibleAndVersion,
     setRoots: mockedSetRoots,
     shouldWarnUserIfCLIUnavailable: mockedShouldWarnUserIfCLIUnavailable,
     showSetup: mockedShowSetup,
@@ -617,7 +617,7 @@ describe('runWithRecheck', () => {
     isPythonExtensionUsed: mockedIsPythonExtensionUsed,
     resetMembers: mockedResetMembers,
     setAvailable: mockedSetAvailable,
-    setCliCompatible: mockedSetCliCompatible,
+    setCliCompatibleAndVersion: mockedSetCliCompatibleAndVersion,
     setRoots: mockedSetRoots,
     shouldWarnUserIfCLIUnavailable: mockedShouldWarnUserIfCLIUnavailable,
     showSetup: mockedShowSetup,
