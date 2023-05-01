@@ -74,6 +74,10 @@ $gap: 20px;
   }
 }
 
+:global(.ReactVirtualized__Grid) {
+  width: max-content !important;
+}
+
 :global(.ReactVirtualized__Grid__innerScrollContainer),
 .noBigGrid {
   width: calc(100% - $gap * 2) !important;

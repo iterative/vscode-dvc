@@ -39,6 +39,8 @@ export class WebviewMessages {
   private readonly selectPlots: () => Promise<void>
   private readonly updateData: () => Promise<void>
 
+  private sendPlotsBackTimeout: NodeJS.Timeout | undefined
+
   constructor(
     paths: PathsModel,
     plots: PlotsModel,
@@ -125,6 +127,7 @@ export class WebviewMessages {
 
   private setScreenDimensions(dimensions: [number, number]) {
     this.plots.setScreenDimensions(dimensions)
+    this.debounceSendPlotsBack(PlotsSection.TEMPLATE_PLOTS)
   }
 
   private setPlotSize(
@@ -140,18 +143,25 @@ export class WebviewMessages {
       undefined
     )
 
-    switch (section) {
-      case PlotsSection.COMPARISON_TABLE:
-        this.sendComparisonPlots()
-        break
-      case PlotsSection.CUSTOM_PLOTS:
-        this.sendCustomPlots()
-        break
-      case PlotsSection.TEMPLATE_PLOTS:
-        this.sendTemplatePlots()
-        break
-      default:
-    }
+    this.debounceSendPlotsBack(section)
+  }
+
+  private debounceSendPlotsBack(section: string) {
+    clearTimeout(this.sendPlotsBackTimeout)
+    this.sendPlotsBackTimeout = setTimeout(() => {
+      switch (section) {
+        case PlotsSection.COMPARISON_TABLE:
+          this.sendComparisonPlots()
+          break
+        case PlotsSection.CUSTOM_PLOTS:
+          this.sendCustomPlots()
+          break
+        case PlotsSection.TEMPLATE_PLOTS:
+          this.sendTemplatePlots()
+          break
+        default:
+      }
+    }, 500)
   }
 
   private setSectionCollapsed(collapsed: Partial<SectionCollapsed>) {
