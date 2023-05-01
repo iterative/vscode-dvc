@@ -11,11 +11,6 @@ import {
 import { getFirstWorkspaceFolder } from '../../vscode/workspaceFolders'
 import { delay } from '../../util/time'
 import { SetupSection } from '../../setup/webview/contract'
-// TBD Can we simplify further?
-export const warnUnableToVerifyVersion = () =>
-  Toast.warnWithOptions(
-    'The extension cannot initialize as we were unable to verify the DVC CLI version.'
-  )
 
 const warnWithSetupAction = async (
   setup: IExtensionSetup,
@@ -27,6 +22,11 @@ const warnWithSetupAction = async (
     return setup.showSetup(SetupSection.DVC)
   }
 }
+
+export const warnUnableToVerifyVersion = () =>
+  Toast.warnWithOptions(
+    'The extension cannot initialize as we were unable to verify the DVC CLI version.'
+  )
 
 export const warnVersionIncompatible = (
   setup: IExtensionSetup,
@@ -45,22 +45,21 @@ export const warnAheadOfLatestTested = (): void => {
 }
 
 const warnUserCLIInaccessible = async (
-  setup: IExtensionSetup,
-  warningText: string
+  setup: IExtensionSetup
 ): Promise<void> => {
   if (getConfigValue<boolean>(ConfigKey.DO_NOT_SHOW_CLI_UNAVAILABLE)) {
     return
   }
 
   const response = await Toast.warnWithOptions(
-    warningText,
+    'An error was thrown when trying to access the CLI.',
     Response.SHOW_SETUP,
     Response.NEVER
   )
 
   switch (response) {
     case Response.SHOW_SETUP:
-      return setup.showSetup(SetupSection.EXPERIMENTS)
+      return setup.showSetup(SetupSection.DVC)
     case Response.NEVER:
       return setUserConfigValue(ConfigKey.DO_NOT_SHOW_CLI_UNAVAILABLE, true)
   }
@@ -82,10 +81,7 @@ const warnUser = (
     case CliCompatible.NO_MAJOR_VERSION_AHEAD:
       return warnVersionIncompatible(setup, 'extension')
     case CliCompatible.NO_NOT_FOUND:
-      void warnUserCLIInaccessible(
-        setup,
-        'An error was thrown when trying to access the CLI.'
-      )
+      void warnUserCLIInaccessible(setup)
       return
     case CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED:
       return warnAheadOfLatestTested()
@@ -146,24 +142,11 @@ const tryGlobalFallbackVersion = async (
   const tryGlobal = await getVersionDetails(setup, cwd, true)
   const { cliCompatible, isAvailable, isCompatible } = tryGlobal
 
-  if (setup.shouldWarnUserIfCLIUnavailable() && !isCompatible) {
-    void warnUserCLIInaccessible(
-      setup,
-      'The extension is unable to initialize as the DVC CLI was not located.'
-    )
-  }
-  if (
-    setup.shouldWarnUserIfCLIUnavailable() &&
-    cliCompatible === CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED
-  ) {
-    warnAheadOfLatestTested()
-  }
-
   if (isCompatible) {
     setup.unsetPythonBinPath()
   }
 
-  return { isAvailable, isCompatible }
+  return processVersionDetails(setup, cliCompatible, isAvailable, isCompatible)
 }
 
 const extensionCanAutoRunCli = async (
@@ -179,6 +162,7 @@ const extensionCanAutoRunCli = async (
   if (pythonCliCompatible === CliCompatible.NO_NOT_FOUND) {
     return tryGlobalFallbackVersion(setup, cwd)
   }
+
   return processVersionDetails(
     setup,
     pythonCliCompatible,

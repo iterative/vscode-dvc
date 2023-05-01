@@ -19,11 +19,7 @@ import { Toast } from '../vscode/toast'
 import { Response } from '../vscode/response'
 import { VscodePython } from '../extensions/python'
 import { executeProcess } from '../process/execution'
-import {
-  LATEST_TESTED_CLI_VERSION,
-  MAX_CLI_VERSION,
-  MIN_CLI_VERSION
-} from '../cli/dvc/contract'
+import { LATEST_TESTED_CLI_VERSION, MIN_CLI_VERSION } from '../cli/dvc/contract'
 import { extractSemver, ParsedSemver } from '../cli/dvc/version'
 import { delay } from '../util/time'
 import { Title } from '../vscode/title'
@@ -472,9 +468,8 @@ describe('run', () => {
     await flushPromises()
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
-      `The extension is unable to initialize. The CLI was not located using the interpreter provided by the Python extension. ${belowMinVersion} is installed globally. For auto Python environment activation, ensure the correct interpreter is set. Active Python interpreter: ${mockedPythonPath}.`,
-      Response.SHOW_SETUP,
-      Response.NEVER
+      'The extension cannot initialize because you are using the wrong version of the CLI',
+      Response.SHOW_SETUP
     )
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(2)
     expect(mockedResetMembers).toHaveBeenCalledTimes(1)
@@ -539,7 +534,8 @@ describe('run', () => {
     await flushPromises()
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
-      `The extension cannot initialize because you are using version ${MajorAhead} of the DVC CLI. The expected version is ${MIN_CLI_VERSION} <= DVC < ${MAX_CLI_VERSION}. Please upgrade to the most recent version of the extension and reload this window.`
+      'The extension cannot initialize because you are using the wrong version of the extension',
+      'Setup'
     )
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
     expect(mockedResetMembers).toHaveBeenCalledTimes(1)
@@ -564,7 +560,7 @@ describe('run', () => {
     await flushPromises()
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
-      `The extension is unable to initialize. The CLI was not located using the interpreter provided by the Python extension. The CLI is also not installed globally. For auto Python environment activation, ensure the correct interpreter is set. Active Python interpreter: ${mockedPythonPath}.`,
+      'An error was thrown when trying to access the CLI.',
       Response.SHOW_SETUP,
       Response.NEVER
     )
