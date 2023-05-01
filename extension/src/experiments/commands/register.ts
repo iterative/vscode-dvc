@@ -1,9 +1,4 @@
-import {
-  getBranchExperimentCommand,
-  getShareExperimentAsBranchCommand,
-  getShareExperimentAsCommitCommand,
-  getShareExperimentToStudioCommand
-} from '.'
+import { getBranchExperimentCommand, getPushExperimentCommand } from '.'
 import { pickGarbageCollectionFlags } from '../quickPick'
 import { WorkspaceExperiments } from '../workspace'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
@@ -26,7 +21,7 @@ const registerExperimentCwdCommands = (
     RegisteredCliCommands.QUEUE_EXPERIMENT,
     () =>
       experiments.pauseUpdatesThenRun(() =>
-        experiments.getCwdThenReport(AvailableCommands.EXPERIMENT_QUEUE)
+        experiments.getCwdThenReport(AvailableCommands.EXP_QUEUE)
       )
   )
 
@@ -112,8 +107,7 @@ const registerExperimentCwdCommands = (
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_REMOVE_QUEUE,
-    () =>
-      experiments.getCwdThenReport(AvailableCommands.EXPERIMENT_REMOVE_QUEUE)
+    () => experiments.getCwdThenReport(AvailableCommands.EXP_REMOVE_QUEUE)
   )
 }
 
@@ -123,24 +117,19 @@ const registerExperimentNameCommands = (
 ): void => {
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_APPLY,
-    () =>
-      experiments.getCwdAndExpNameThenRun(AvailableCommands.EXPERIMENT_APPLY)
+    () => experiments.getCwdAndExpNameThenRun(AvailableCommands.EXP_APPLY)
   )
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_APPLY,
     ({ dvcRoot, id }: ExperimentDetails) =>
-      experiments.runCommand(AvailableCommands.EXPERIMENT_APPLY, dvcRoot, id)
+      experiments.runCommand(AvailableCommands.EXP_APPLY, dvcRoot, id)
   )
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE,
     ({ dvcRoot, ids }: { dvcRoot: string; ids: string[] }) =>
-      experiments.runCommand(
-        AvailableCommands.EXPERIMENT_REMOVE,
-        dvcRoot,
-        ...ids
-      )
+      experiments.runCommand(AvailableCommands.EXP_REMOVE, dvcRoot, ...ids)
   )
 }
 
@@ -167,57 +156,18 @@ const registerExperimentInputCommands = (
         id
       )
   )
-
-  internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_SHARE_AS_BRANCH,
-    () =>
-      experiments.getCwdExpNameAndInputThenRun(
-        getShareExperimentAsBranchCommand(internalCommands),
-        Title.ENTER_BRANCH_NAME
-      )
-  )
-
-  internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_VIEW_SHARE_AS_BRANCH,
-    ({ dvcRoot, id }: ExperimentDetails) =>
-      experiments.getInputAndRun(
-        getShareExperimentAsBranchCommand(internalCommands),
-        Title.ENTER_BRANCH_NAME,
-        dvcRoot,
-        id
-      )
-  )
-
-  internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_SHARE_AS_COMMIT,
-    () =>
-      experiments.getCwdExpNameAndInputThenRun(
-        getShareExperimentAsCommitCommand(internalCommands),
-        Title.ENTER_COMMIT_MESSAGE
-      )
-  )
-
-  internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_VIEW_SHARE_AS_COMMIT,
-    ({ dvcRoot, id }: ExperimentDetails) =>
-      experiments.getInputAndRun(
-        getShareExperimentAsCommitCommand(internalCommands),
-        Title.ENTER_COMMIT_MESSAGE,
-        dvcRoot,
-        id
-      )
-  )
 }
 
 const registerExperimentQuickPickCommands = (
   experiments: WorkspaceExperiments,
-  internalCommands: InternalCommands
+  internalCommands: InternalCommands,
+  setup: Setup
 ): void => {
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_GARBAGE_COLLECT,
     () =>
       experiments.getCwdAndQuickPickThenRun(
-        AvailableCommands.EXPERIMENT_GARBAGE_COLLECT,
+        AvailableCommands.EXP_GARBAGE_COLLECT,
         pickGarbageCollectionFlags
       )
   )
@@ -269,6 +219,11 @@ const registerExperimentQuickPickCommands = (
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.QUEUE_KILL,
     () => experiments.selectQueueTasksToKill()
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_PUSH,
+    () => experiments.selectExperimentsToPush(setup)
   )
 
   internalCommands.registerExternalCliCommand(
@@ -331,7 +286,7 @@ export const registerExperimentCommands = (
   registerExperimentCwdCommands(experiments, internalCommands)
   registerExperimentNameCommands(experiments, internalCommands)
   registerExperimentInputCommands(experiments, internalCommands)
-  registerExperimentQuickPickCommands(experiments, internalCommands)
+  registerExperimentQuickPickCommands(experiments, internalCommands, setup)
   registerExperimentRunCommands(experiments, internalCommands, setup)
 
   internalCommands.registerExternalCommand(
@@ -340,9 +295,9 @@ export const registerExperimentCommands = (
       experiments.getRepository(dvcRoot).toggleExperimentStatus(id)
   )
 
-  internalCommands.registerExternalCommand(
-    RegisteredCommands.EXPERIMENT_VIEW_SHARE_TO_STUDIO,
-    getShareExperimentToStudioCommand(internalCommands, setup)
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_VIEW_PUSH,
+    getPushExperimentCommand(internalCommands, setup)
   )
 
   internalCommands.registerExternalCliCommand(

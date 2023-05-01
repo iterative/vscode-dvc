@@ -33,6 +33,7 @@ export const buildSetup = (
     messageSpy,
     resourceLocator,
     internalCommands,
+    dvcExecutor,
     dvcReader,
     gitExecutor,
     gitReader
@@ -78,6 +79,8 @@ export const buildSetup = (
     })
   )
 
+  stub(dvcExecutor, 'config').resolves('')
+
   const setup = disposer.track(
     new Setup(
       config,
@@ -118,6 +121,7 @@ export const buildSetup = (
 export const buildSetupWithWatchers = async (disposer: Disposer) => {
   const mockEmitter = disposer.track(new EventEmitter())
   const mockInternalCommands = {
+    executeCommand: stub(),
     registerExternalCliCommand: stub(),
     registerExternalCommand: stub()
   } as unknown as InternalCommands

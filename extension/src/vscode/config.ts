@@ -1,12 +1,13 @@
 import { ConfigurationTarget, workspace } from 'vscode'
 
 export enum ConfigKey {
+  DO_NOT_RECOMMEND_ADD_STUDIO_TOKEN = 'dvc.doNotRecommendAddStudioToken',
   DO_NOT_RECOMMEND_RED_HAT = 'dvc.doNotRecommendRedHatExtension',
   DO_NOT_SHOW_CLI_UNAVAILABLE = 'dvc.doNotShowCliUnavailable',
   DO_NOT_SHOW_WALKTHROUGH_AFTER_INSTALL = 'dvc.doNotShowWalkthroughAfterInstall',
+  DVC_PATH = 'dvc.dvcPath',
   EXP_TABLE_HEAD_MAX_HEIGHT = 'dvc.experimentsTableHeadMaxHeight',
   FOCUSED_PROJECTS = 'dvc.focusedProjects',
-  DVC_PATH = 'dvc.dvcPath',
   PYTHON_PATH = 'dvc.pythonPath',
   STUDIO_SHARE_EXPERIMENTS_LIVE = 'dvc.studio.shareExperimentsLive'
 }

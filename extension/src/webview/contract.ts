@@ -25,6 +25,7 @@ export enum MessageFromWebviewType {
   OPEN_PLOTS_WEBVIEW = 'open-plots-webview',
   OPEN_STUDIO = 'open-studio',
   OPEN_STUDIO_PROFILE = 'open-studio-profile',
+  PUSH_EXPERIMENT = 'push-experiment',
   REMOVE_COLUMN_SORT = 'remove-column-sort',
   REMOVE_EXPERIMENT = 'remove-experiment',
   REORDER_COLUMNS = 'reorder-columns',
@@ -36,7 +37,6 @@ export enum MessageFromWebviewType {
   RESIZE_COLUMN = 'resize-column',
   RESIZE_PLOTS = 'resize-plots',
   SAVE_STUDIO_TOKEN = 'save-studio-token',
-  SHARE_EXPERIMENT_TO_STUDIO = 'share-experiment-to-studio',
   SHOW_EXPERIMENT_LOGS = 'show-experiment-logs',
   STOP_EXPERIMENT = 'stop-experiment',
   SORT_COLUMN = 'sort-column',
@@ -50,8 +50,6 @@ export enum MessageFromWebviewType {
   SET_EXPERIMENTS_FOR_PLOTS = 'set-experiments-for-plots',
   SET_EXPERIMENTS_AND_OPEN_PLOTS = 'set-experiments-and-open-plots',
   SET_STUDIO_SHARE_EXPERIMENTS_LIVE = 'set-studio-share-experiments-live',
-  SHARE_EXPERIMENT_AS_BRANCH = 'share-experiment-as-branch',
-  SHARE_EXPERIMENT_AS_COMMIT = 'share-experiment-as-commit',
   TOGGLE_PLOTS_SECTION = 'toggle-plots-section',
   REMOVE_CUSTOM_PLOTS = 'remove-custom-plots',
   REMOVE_STUDIO_TOKEN = 'remove-studio-token',
@@ -156,8 +154,8 @@ export type MessageFromWebview =
     }
   | { type: MessageFromWebviewType.SHOW_EXPERIMENT_LOGS; payload: string }
   | {
-      type: MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO
-      payload: string
+      type: MessageFromWebviewType.PUSH_EXPERIMENT
+      payload: string[]
     }
   | {
       type: MessageFromWebviewType.REMOVE_COLUMN_SORT
@@ -211,14 +209,6 @@ export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE
       payload: boolean
-    }
-  | {
-      type: MessageFromWebviewType.SHARE_EXPERIMENT_AS_BRANCH
-      payload: string
-    }
-  | {
-      type: MessageFromWebviewType.SHARE_EXPERIMENT_AS_COMMIT
-      payload: string
     }
   | { type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_HEIGHT }
   | { type: MessageFromWebviewType.CHECK_CLI_COMPATIBLE }

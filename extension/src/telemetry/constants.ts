@@ -127,14 +127,13 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_FILTERS_REMOVE_ALL]: undefined
   [EventName.EXPERIMENT_GARBAGE_COLLECT]: undefined
   [EventName.EXPERIMENT_METRICS_AND_PARAMS_TOGGLE]: undefined
+  [EventName.EXPERIMENT_PUSH]: undefined
   [EventName.EXPERIMENT_REMOVE]: undefined
   [EventName.EXPERIMENT_REMOVE_QUEUE]: undefined
   [EventName.EXPERIMENT_RESUME]: undefined
   [EventName.EXPERIMENT_RUN]: undefined
   [EventName.EXPERIMENT_RESET_AND_RUN]: undefined
   [EventName.EXPERIMENT_SELECT]: undefined
-  [EventName.EXPERIMENT_SHARE_AS_BRANCH]: undefined
-  [EventName.EXPERIMENT_SHARE_AS_COMMIT]: undefined
   [EventName.EXPERIMENT_SHOW]: undefined
   [EventName.EXPERIMENT_SORT_ADD_STARRED]: undefined
   [EventName.EXPERIMENT_SORT_ADD]: undefined
@@ -146,9 +145,6 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_VIEW_BRANCH]: undefined
   [EventName.EXPERIMENT_VIEW_PUSH]: undefined
   [EventName.EXPERIMENT_VIEW_REMOVE]: undefined
-  [EventName.EXPERIMENT_VIEW_SHARE_AS_BRANCH]: undefined
-  [EventName.EXPERIMENT_VIEW_SHARE_AS_COMMIT]: undefined
-  [EventName.EXPERIMENT_VIEW_SHARE_TO_STUDIO]: undefined
   [EventName.EXPERIMENT_VIEW_SHOW_LOGS]: undefined
   [EventName.EXPERIMENT_VIEW_STOP]: undefined
   [EventName.QUEUE_EXPERIMENT]: undefined

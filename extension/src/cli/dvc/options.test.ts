@@ -11,6 +11,7 @@ const mockedPATH = '/some/special/path'
 const mockedEnv = {
   DVCLIVE_OPEN: 'false',
   DVC_NO_ANALYTICS: 'true',
+  GIT_TERMINAL_PROMPT: '0',
   PATH: mockedPATH
 }
 const mockedGetProcessEnv = jest.mocked(getProcessEnv)
@@ -42,6 +43,7 @@ describe('getOptions', () => {
       env: {
         DVCLIVE_OPEN: 'false',
         DVC_NO_ANALYTICS: 'true',
+        GIT_TERMINAL_PROMPT: '0',
         PATH: joinEnvPath(join('path', 'to', 'python', '.venv'), mockedPATH)
       },
       executable: pythonBinPath
@@ -58,6 +60,7 @@ describe('getOptions', () => {
       env: {
         DVCLIVE_OPEN: 'false',
         DVC_NO_ANALYTICS: 'true',
+        GIT_TERMINAL_PROMPT: '0',
         PATH: joinEnvPath(join('path', 'to', 'python', '.venv'), mockedPATH)
       },
       executable: cliPath

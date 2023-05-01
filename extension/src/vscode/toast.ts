@@ -75,6 +75,22 @@ export class Toast {
     })
   }
 
+  static reportProgressError(
+    error: unknown,
+    progress: Progress<{
+      message?: string | undefined
+      increment?: number | undefined
+    }>
+  ) {
+    const message = (error as Error)?.message || 'an unexpected error occurred'
+
+    progress.report({
+      increment: 0,
+      message
+    })
+    return Toast.delayProgressClosing(60000)
+  }
+
   static delayProgressClosing(ms = 5000) {
     return delay(ms)
   }

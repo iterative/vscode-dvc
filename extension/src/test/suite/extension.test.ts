@@ -94,6 +94,7 @@ suite('Extension Test Suite', () => {
       const mockExpShow = stub(DvcReader.prototype, 'expShow')
       const mockDataStatus = stub(DvcReader.prototype, 'dataStatus')
       const mockPlotsDiff = stub(DvcReader.prototype, 'plotsDiff')
+      stub(DvcExecutor.prototype, 'config').resolves('')
 
       stub(DvcReader.prototype, 'root').resolves('.')
 
