@@ -57,13 +57,14 @@ export class Config extends DeferredDisposable {
   }
 
   public async setPythonBinPath() {
-    this.pythonBinPath = await this.getConfigOrExtensionPythonBinPath()
-    return this.deferred.resolve()
+    const pythonBinPath = await this.getConfigOrExtensionPythonBinPath()
+    this.pythonBinPath = pythonBinPath
+    this.deferred.resolve()
   }
 
   public async setPythonAndNotifyIfChanged() {
     const oldPath = this.pythonBinPath
-    this.pythonBinPath = await this.getConfigOrExtensionPythonBinPath()
+    await this.setPythonBinPath()
     this.notifyIfChanged(oldPath, this.pythonBinPath)
   }
 
