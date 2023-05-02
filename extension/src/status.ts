@@ -92,7 +92,7 @@ export class Status extends Disposable {
     }
 
     return {
-      command: RegisteredCommands.SETUP_SHOW,
+      command: RegisteredCommands.SETUP_SHOW_DVC,
       title: Title.SHOW_SETUP
     }
   }

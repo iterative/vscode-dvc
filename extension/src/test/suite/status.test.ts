@@ -35,7 +35,7 @@ suite('Status Test Suite', () => {
     const waitingText = '$(circle-large-outline) DVC (Global)'
 
     const setupShowCommand = {
-      command: RegisteredCommands.SETUP_SHOW,
+      command: RegisteredCommands.SETUP_SHOW_DVC,
       title: Title.SHOW_SETUP
     }
 
