@@ -451,6 +451,24 @@ describe('run', () => {
     expect(mockedInitialize).toHaveBeenCalledTimes(1)
   })
 
+  it('should send a specific message to the user if the extension is unable to verify the version', async () => {
+    const unverifyableVersion = 'not a valid version'
+    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
+    mockedShouldWarnUserIfCLIUnavailable.mockReturnValueOnce(true)
+    mockedGetCliVersion.mockResolvedValueOnce(unverifyableVersion)
+
+    await run(setup)
+    await flushPromises()
+    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
+    expect(mockedWarnWithOptions).toHaveBeenCalledWith(
+      'The extension cannot initialize as we were unable to verify the DVC CLI version.',
+      Response.SHOW_SETUP
+    )
+    expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
+    expect(mockedResetMembers).toHaveBeenCalledTimes(1)
+    expect(mockedInitialize).not.toHaveBeenCalled()
+  })
+
   it('should send a specific message to the user if the Python extension is being used, the CLI is not available in the virtual environment and the global CLI is not compatible', async () => {
     const belowMinVersion = '2.0.0'
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)

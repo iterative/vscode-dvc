@@ -23,14 +23,14 @@ const warnWithSetupAction = async (
   }
 }
 
-export const warnUnableToVerifyVersion = (setup: IExtensionSetup) => {
+const warnUnableToVerifyVersion = (setup: IExtensionSetup) => {
   void warnWithSetupAction(
     setup,
     'The extension cannot initialize as we were unable to verify the DVC CLI version.'
   )
 }
 
-export const warnVersionIncompatible = (
+const warnVersionIncompatible = (
   setup: IExtensionSetup,
   update: 'CLI' | 'extension'
 ): void => {
@@ -40,7 +40,7 @@ export const warnVersionIncompatible = (
   )
 }
 
-export const warnAheadOfLatestTested = (): void => {
+const warnAheadOfLatestTested = (): void => {
   void Toast.warnWithOptions(
     `The located DVC CLI is at least a minor version ahead of the latest version the extension was tested with (${LATEST_TESTED_CLI_VERSION}). This could lead to unexpected behaviour. Please upgrade to the most recent version of the extension and reload this window.`
   )
