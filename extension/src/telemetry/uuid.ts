@@ -1,8 +1,8 @@
 import { join } from 'path'
 import isEmpty from 'lodash.isempty'
 import { v4 } from 'uuid'
-import { getProcessPlatform } from '../env'
 import { exists, loadJson, writeJson } from '../fileSystem'
+import { getDVCAppDir, getIterativeAppDir } from '../util/appdirs'
 
 type UserConfig = {
   user_id?: string
@@ -40,19 +40,15 @@ const writeMissingConfigs = (
 }
 
 const readOrCreateConfig = (): string | undefined => {
-  const { userConfigDir } = require('appdirs') as {
-    userConfigDir: (appName: string) => string
-  }
+  const dvcAppDir = getDVCAppDir()
+  const iterativeAppDir = getIterativeAppDir()
 
-  const legacyDirectory =
-    getProcessPlatform() === 'win32'
-      ? join('iterative', 'dvc', 'user_id')
-      : join('dvc', 'user_id')
+  const legacyDirectory = join(dvcAppDir, 'user_id')
 
-  const legacyConfigPath = userConfigDir(legacyDirectory)
+  const legacyConfigPath = legacyDirectory
   const legacyConfig = loadConfig(legacyConfigPath)
 
-  const configPath = userConfigDir(join('iterative', 'telemetry'))
+  const configPath = join(iterativeAppDir, 'telemetry')
   const config = loadConfig(configPath)
 
   const user_id = legacyConfig.user_id || config.user_id || v4()

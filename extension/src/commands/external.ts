@@ -2,13 +2,12 @@ export enum RegisteredCliCommands {
   EXPERIMENT_APPLY = 'dvc.applyExperiment',
   EXPERIMENT_BRANCH = 'dvc.branchExperiment',
   EXPERIMENT_GARBAGE_COLLECT = 'dvc.experimentGarbageCollect',
+  EXPERIMENT_PUSH = 'dvc.pushExperiments',
   EXPERIMENT_REMOVE = 'dvc.removeExperiments',
   EXPERIMENT_REMOVE_QUEUE = 'dvc.removeExperimentQueue',
   EXPERIMENT_RESET_AND_RUN = 'dvc.resetAndRunCheckpointExperiment',
   EXPERIMENT_RESUME = 'dvc.resumeCheckpointExperiment',
   EXPERIMENT_RUN = 'dvc.runExperiment',
-  EXPERIMENT_SHARE_AS_BRANCH = 'dvc.shareExperimentAsBranch',
-  EXPERIMENT_SHARE_AS_COMMIT = 'dvc.shareExperimentAsCommit',
   QUEUE_EXPERIMENT = 'dvc.queueExperiment',
   QUEUE_KILL = 'dvc.stopQueuedExperiments',
   QUEUE_START = 'dvc.startExperimentsQueue',
@@ -16,9 +15,8 @@ export enum RegisteredCliCommands {
 
   EXPERIMENT_VIEW_APPLY = 'dvc.views.experiments.applyExperiment',
   EXPERIMENT_VIEW_BRANCH = 'dvc.views.experiments.branchExperiment',
+  EXPERIMENT_VIEW_PUSH = 'dvc.views.experiments.pushExperiment',
   EXPERIMENT_VIEW_REMOVE = 'dvc.views.experiments.removeExperiment',
-  EXPERIMENT_VIEW_SHARE_AS_BRANCH = 'dvc.views.experiments.shareExperimentAsBranch',
-  EXPERIMENT_VIEW_SHARE_AS_COMMIT = 'dvc.views.experiments.shareExperimentAsCommit',
   EXPERIMENT_VIEW_SHOW_LOGS = 'dvc.views.experiments.showLogs',
   EXPERIMENT_VIEW_STOP = 'dvc.views.experiments.stopQueueExperiment',
 
@@ -103,7 +101,6 @@ export enum RegisteredCommands {
   ADD_STUDIO_ACCESS_TOKEN = 'dvc.addStudioAccessToken',
   UPDATE_STUDIO_ACCESS_TOKEN = 'dvc.updateStudioAccessToken',
   REMOVE_STUDIO_ACCESS_TOKEN = 'dvc.removeStudioAccessToken',
-  EXPERIMENT_VIEW_SHARE_TO_STUDIO = 'dvc.views.experiments.shareExperimentToStudio',
   SETUP_SHOW_STUDIO_CONNECT = 'dvc.showStudioConnect',
   SETUP_SHOW_STUDIO_SETTINGS = 'dvc.showStudioSettings',
 

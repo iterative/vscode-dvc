@@ -8,6 +8,7 @@ import * as Python from '../../../python'
 import { autoInstallDvc } from '../../../setup/autoInstall'
 import * as WorkspaceFolders from '../../../vscode/workspaceFolders'
 import { bypassProgressCloseDelay } from '../util'
+import { Toast } from '../../../vscode/toast'
 
 const { getDefaultPython } = Python
 
@@ -87,6 +88,65 @@ suite('Auto Install Test Suite', () => {
         cwd,
         defaultPython,
         'dvclive'
+      )
+    })
+
+    it('should show an error message and exit early if DVCLive fails to install', async () => {
+      bypassProgressCloseDelay()
+      const cwd = __dirname
+      stub(PythonExtension, 'getPythonExecutionDetails').resolves(undefined)
+      stub(Python, 'findPythonBin').resolves(defaultPython)
+      const mockInstallPackages = stub(Python, 'installPackages').rejects(
+        new Error('Failed to install DVCLive')
+      )
+      stub(WorkspaceFolders, 'getFirstWorkspaceFolder').returns(cwd)
+
+      const showProgressSpy = spy(window, 'withProgress')
+      const showErrorSpy = spy(window, 'showErrorMessage')
+
+      await autoInstallDvc()
+
+      expect(showProgressSpy).to.be.called
+      expect(showErrorSpy).not.to.be.called
+      expect(mockInstallPackages).to.be.calledOnce
+      expect(mockInstallPackages).to.be.calledWithExactly(
+        cwd,
+        defaultPython,
+        'dvclive'
+      )
+    })
+
+    it('should show an error message if DVC fails to install', async () => {
+      bypassProgressCloseDelay()
+      const cwd = __dirname
+      stub(PythonExtension, 'getPythonExecutionDetails').resolves(undefined)
+      stub(Python, 'findPythonBin').resolves(defaultPython)
+      const mockInstallPackages = stub(Python, 'installPackages')
+        .onFirstCall()
+        .resolves(undefined)
+        .onSecondCall()
+        .rejects(new Error('Network error'))
+      stub(WorkspaceFolders, 'getFirstWorkspaceFolder').returns(cwd)
+
+      const showProgressSpy = spy(window, 'withProgress')
+      const showErrorSpy = spy(window, 'showErrorMessage')
+      const reportProgressErrorSpy = spy(Toast, 'reportProgressError')
+
+      await autoInstallDvc()
+
+      expect(showProgressSpy).to.be.called
+      expect(showErrorSpy).not.to.be.called
+      expect(reportProgressErrorSpy).to.be.calledOnce
+      expect(mockInstallPackages).to.be.calledTwice
+      expect(mockInstallPackages).to.be.calledWithExactly(
+        cwd,
+        defaultPython,
+        'dvclive'
+      )
+      expect(mockInstallPackages).to.be.calledWithExactly(
+        cwd,
+        defaultPython,
+        'dvc'
       )
     })
   })

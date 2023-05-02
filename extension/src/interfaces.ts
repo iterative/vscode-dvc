@@ -17,7 +17,10 @@ export interface IExtensionSetup {
 
   setAvailable: (available: boolean) => void
   getAvailable: () => boolean
-  setCliCompatible: (compatible: boolean | undefined) => void
+  setCliCompatibleAndVersion: (
+    compatible: boolean | undefined,
+    version: string | undefined
+  ) => void
   setRoots: () => Promise<void>
   unsetPythonBinPath: () => void
 }

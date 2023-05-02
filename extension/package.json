@@ -297,6 +297,11 @@
         }
       },
       {
+        "title": "Push Experiment(s)",
+        "command": "dvc.pushExperiments",
+        "category": "DVC"
+      },
+      {
         "title": "Remove Experiment(s)",
         "command": "dvc.removeExperiments",
         "category": "DVC"
@@ -381,18 +386,6 @@
         "title": "Setup the Workspace",
         "command": "dvc.setupWorkspace",
         "category": "DVC"
-      },
-      {
-        "title": "Share Experiment as Branch",
-        "command": "dvc.shareExperimentAsBranch",
-        "category": "DVC",
-        "icon": "$(repo-push)"
-      },
-      {
-        "title": "Commit and Share Experiment",
-        "command": "dvc.shareExperimentAsCommit",
-        "category": "DVC",
-        "icon": "$(repo-push)"
       },
       {
         "title": "Show Commands",
@@ -518,20 +511,14 @@
         "icon": "$(play)"
       },
       {
-        "title": "Share as Branch",
-        "command": "dvc.views.experiments.shareExperimentAsBranch",
+        "title": "Push",
+        "command": "dvc.views.experiments.pushExperiment",
         "category": "DVC",
         "icon": "$(repo-push)"
       },
       {
-        "title": "Commit and Share",
-        "command": "dvc.views.experiments.shareExperimentAsCommit",
-        "category": "DVC",
-        "icon": "$(repo-push)"
-      },
-      {
-        "title": "Share to Studio",
-        "command": "dvc.views.experiments.shareExperimentToStudio",
+        "title": "Push",
+        "command": "dvc.views.experimentsTree.pushExperiment",
         "category": "DVC",
         "icon": "$(repo-push)"
       },
@@ -588,6 +575,11 @@
           "type": "boolean",
           "default": null
         },
+        "dvc.doNotRecommendAddStudioToken": {
+          "description": "Do not prompt to add a studio.token to the global DVC config, which enables automatic sharing of experiments to Studio.",
+          "type": "boolean",
+          "default": null
+        },
         "dvc.doNotShowCliUnavailable": {
           "description": "Do not warn when the workspace contains a DVC project but the DVC binary is unavailable.",
           "type": "boolean",
@@ -623,7 +615,7 @@
           "default": null
         },
         "dvc.studio.shareExperimentsLive": {
-          "description": "Automatically share all new experiment metrics and plots logged with DVCLive to Studio. This option will only take effect once Studio is connected.",
+          "description": "Automatically share all new experiment metrics and plots logged with DVCLive to Studio. This option will only take effect once Studio is connected (studio.token is set).",
           "type": "boolean",
           "default": false
         }
@@ -775,6 +767,10 @@
           "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && dvc.experiment.checkpoints"
         },
         {
+          "command": "dvc.pushExperiments",
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
+        },
+        {
           "command": "dvc.queueExperiment",
           "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
         },
@@ -847,14 +843,6 @@
           "when": "false"
         },
         {
-          "command": "dvc.shareExperimentAsBranch",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
-        },
-        {
-          "command": "dvc.shareExperimentAsCommit",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
-        },
-        {
           "command": "dvc.showExperiments",
           "when": "dvc.commands.available && dvc.project.available"
         },
@@ -891,6 +879,14 @@
           "when": "false"
         },
         {
+          "command": "dvc.views.experiments.pushExperiment",
+          "when": "false"
+        },
+        {
+          "command": "dvc.views.experimentsTree.pushExperiment",
+          "when": "false"
+        },
+        {
           "command": "dvc.views.experiments.queueExperiment",
           "when": "false"
         },
@@ -912,18 +908,6 @@
         },
         {
           "command": "dvc.views.experiments.resetAndRunCheckpointExperiment",
-          "when": "false"
-        },
-        {
-          "command": "dvc.views.experiments.shareExperimentAsBranch",
-          "when": "false"
-        },
-        {
-          "command": "dvc.views.experiments.shareExperimentAsCommit",
-          "when": "false"
-        },
-        {
-          "command": "dvc.views.experiments.shareExperimentToStudio",
           "when": "false"
         },
         {
@@ -1187,18 +1171,8 @@
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|queued)$/ && !dvc.experiment.running"
         },
         {
-          "command": "dvc.views.experiments.shareExperimentToStudio",
+          "command": "dvc.views.experimentsTree.pushExperiment",
           "group": "1_share@0",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == experiment && !dvc.experiment.running"
-        },
-        {
-          "command": "dvc.views.experiments.shareExperimentAsCommit",
-          "group": "1_share@1",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == experiment && !dvc.experiment.running"
-        },
-        {
-          "command": "dvc.views.experiments.shareExperimentAsBranch",
-          "group": "1_share@2",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == experiment && !dvc.experiment.running"
         },
         {
@@ -1700,7 +1674,7 @@
     "wdio-vscode-service": "5.0.0",
     "webdriverio": "8.8.6",
     "webpack": "5.80.0",
-    "webpack-cli": "5.0.1"
+    "webpack-cli": "5.0.2"
   },
   "peerDependencies": {
     "typescript": "*"

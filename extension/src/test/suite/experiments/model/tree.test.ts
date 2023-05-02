@@ -12,6 +12,7 @@ import { ExperimentType } from '../../../../experiments/model'
 import { UNSELECTED } from '../../../../experiments/model/status'
 import {
   bypassProcessManagerDebounce,
+  bypassProgressCloseDelay,
   getFirstArgOfLastCall,
   getMockNow,
   getTimeSafeDisposer,
@@ -256,7 +257,7 @@ suite('Experiments Tree Test Suite', () => {
 
       const mockExperimentRemove = stub(
         DvcExecutor.prototype,
-        'experimentRemove'
+        'expRemove'
       ).resolves('')
 
       stubPrivatePrototypeMethod(
@@ -280,7 +281,7 @@ suite('Experiments Tree Test Suite', () => {
 
       const mockExperimentRemove = stub(
         DvcExecutor.prototype,
-        'experimentRemove'
+        'expRemove'
       ).resolves('')
 
       stubPrivatePrototypeMethod(
@@ -309,7 +310,7 @@ suite('Experiments Tree Test Suite', () => {
 
       const mockExperimentRemove = stub(
         DvcExecutor.prototype,
-        'experimentRemove'
+        'expRemove'
       ).resolves('')
 
       stubPrivatePrototypeMethod(
@@ -345,6 +346,99 @@ suite('Experiments Tree Test Suite', () => {
       )
     })
 
+    it('should be able to push an experiment with dvc.views.experimentsTree.pushExperiment', async () => {
+      bypassProgressCloseDelay()
+      const mockExperimentId = 'exp-to-push'
+      const mockExperiment = {
+        dvcRoot: dvcDemoPath,
+        id: mockExperimentId,
+        type: ExperimentType.EXPERIMENT
+      }
+
+      const mockExpPush = stub(DvcExecutor.prototype, 'expPush').resolves('')
+
+      stubPrivatePrototypeMethod(
+        ExperimentsTree,
+        'getSelectedExperimentItems'
+      ).returns([mockExperiment])
+
+      await commands.executeCommand(
+        'dvc.views.experimentsTree.pushExperiment',
+        mockExperiment
+      )
+
+      expect(mockExpPush).to.be.calledWithExactly(dvcDemoPath, mockExperimentId)
+    })
+
+    it('should be able to push the provided experiment with dvc.views.experimentsTree.pushExperiment (if no experiments are selected)', async () => {
+      bypassProgressCloseDelay()
+      const mockExperiment = 'exp-to-push'
+
+      const mockExpPush = stub(DvcExecutor.prototype, 'expPush').resolves('')
+
+      stubPrivatePrototypeMethod(
+        ExperimentsTree,
+        'getSelectedExperimentItems'
+      ).returns([])
+
+      await commands.executeCommand(
+        'dvc.views.experimentsTree.pushExperiment',
+        {
+          dvcRoot: dvcDemoPath,
+          id: mockExperiment,
+          type: ExperimentType.EXPERIMENT
+        }
+      )
+
+      expect(mockExpPush).to.be.calledWithExactly(dvcDemoPath, mockExperiment)
+    })
+
+    it('should be able to push multiple experiments with dvc.views.experimentsTree.pushExperiment', async () => {
+      bypassProgressCloseDelay()
+      const mockFirstExperimentId = 'first-exp-pushed'
+      const mockSecondExperimentId = 'second-exp-pushed'
+      const mockQueuedExperimentLabel = 'queued-excluded'
+
+      const mockExpPush = stub(DvcExecutor.prototype, 'expPush').resolves('')
+
+      stubPrivatePrototypeMethod(
+        ExperimentsTree,
+        'getSelectedExperimentItems'
+      ).returns([
+        dvcDemoPath,
+        {
+          dvcRoot: dvcDemoPath,
+          label: mockQueuedExperimentLabel,
+          type: ExperimentType.QUEUED
+        },
+        {
+          dvcRoot: dvcDemoPath,
+          id: mockFirstExperimentId,
+          type: ExperimentType.EXPERIMENT
+        },
+        {
+          dvcRoot: dvcDemoPath,
+          id: 'workspace-excluded',
+          type: ExperimentType.WORKSPACE
+        }
+      ])
+
+      await commands.executeCommand(
+        'dvc.views.experimentsTree.pushExperiment',
+        {
+          dvcRoot: dvcDemoPath,
+          id: mockSecondExperimentId,
+          type: ExperimentType.EXPERIMENT
+        }
+      )
+
+      expect(mockExpPush).to.be.calledWithExactly(
+        dvcDemoPath,
+        mockFirstExperimentId,
+        mockSecondExperimentId
+      )
+    })
+
     it('should be able to apply an experiment to the workspace with dvc.views.experiments.applyExperiment', async () => {
       const { experiments } = buildExperiments(disposable)
 
@@ -354,7 +448,7 @@ suite('Experiments Tree Test Suite', () => {
 
       const mockExperimentApply = stub(
         DvcExecutor.prototype,
-        'experimentApply'
+        'expApply'
       ).resolves(
         `Changes for experiment '${mockExperimentId}' have been applied to your current workspace.`
       )
@@ -378,10 +472,7 @@ suite('Experiments Tree Test Suite', () => {
       const { experiments } = buildExperiments(disposable)
       await experiments.isReady()
 
-      const mockExperimentBranch = stub(
-        DvcExecutor.prototype,
-        'experimentBranch'
-      )
+      const mockExperimentBranch = stub(DvcExecutor.prototype, 'expBranch')
       const mockShowInputBox = stub(window, 'showInputBox').resolves(undefined)
       stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
@@ -406,7 +497,7 @@ suite('Experiments Tree Test Suite', () => {
 
       const mockExperimentBranch = stub(
         DvcExecutor.prototype,
-        'experimentBranch'
+        'expBranch'
       ).resolves(
         `Git branch '${mockBranch}' has been created from experiment '${mockExperimentId}'.        
        To switch to the new branch run:
@@ -440,10 +531,9 @@ suite('Experiments Tree Test Suite', () => {
 
       await experiments.isReady()
 
-      const mockExperimentRunQueue = stub(
-        dvcExecutor,
-        'experimentRunQueue'
-      ).resolves('true')
+      const mockExperimentRunQueue = stub(dvcExecutor, 'expRunQueue').resolves(
+        'true'
+      )
 
       const [mockGetOnlyOrPickProject] = stubWorkspaceExperimentsGetters(
         '',

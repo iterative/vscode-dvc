@@ -179,12 +179,12 @@ export const checkAvailable = async (
   setup: IExtensionSetup,
   dvcRootOrFirstFolder: string
 ) => {
-  const { isAvailable, isCompatible } = await extensionCanRunCli(
+  const { isAvailable, version, isCompatible } = await extensionCanRunCli(
     setup,
     dvcRootOrFirstFolder
   )
 
-  setup.setCliCompatible(isCompatible)
+  setup.setCliCompatibleAndVersion(isCompatible, version)
   setup.setAvailable(isAvailable)
 
   if (setup.hasRoots() && isAvailable) {

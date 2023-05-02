@@ -10,7 +10,8 @@ import {
   workspace,
   Uri,
   QuickPickItem,
-  ViewColumn
+  ViewColumn,
+  CancellationToken
 } from 'vscode'
 import { buildExperiments, stubWorkspaceExperimentsGetters } from './util'
 import { Disposable } from '../../../extension'
@@ -34,6 +35,7 @@ import {
 import {
   buildInternalCommands,
   buildMockExperimentsData,
+  bypassProgressCloseDelay,
   closeAllEditors,
   configurationChangeEvent,
   experimentsUpdatedEvent,
@@ -64,7 +66,6 @@ import * as VscodeContext from '../../../vscode/context'
 import { Title } from '../../../vscode/title'
 import { EXP_RWLOCK_FILE, ExperimentFlag } from '../../../cli/dvc/constants'
 import { DvcExecutor } from '../../../cli/dvc/executor'
-import { GitExecutor } from '../../../cli/git/executor'
 import { WorkspacePlots } from '../../../plots/workspace'
 import {
   RegisteredCliCommands,
@@ -85,6 +86,8 @@ import { DvcReader } from '../../../cli/dvc/reader'
 import { DvcViewer } from '../../../cli/dvc/viewer'
 import { DEFAULT_NB_ITEMS_PER_ROW } from '../../../plots/webview/contract'
 import { GitReader } from '../../../cli/git/reader'
+import { Toast } from '../../../vscode/toast'
+import { Response } from '../../../vscode/response'
 
 const { openFileInEditor } = FileSystem
 
@@ -552,7 +555,7 @@ suite('Experiments Test Suite', () => {
 
       const mockExperimentApply = stub(
         DvcExecutor.prototype,
-        'experimentApply'
+        'expApply'
       ).resolves(undefined)
 
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
@@ -578,7 +581,7 @@ suite('Experiments Test Suite', () => {
 
       const mockExperimentBranch = stub(
         DvcExecutor.prototype,
-        'experimentBranch'
+        'expBranch'
       ).resolves('undefined')
 
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
@@ -634,7 +637,7 @@ suite('Experiments Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle a message to share an experiment to Studio', async () => {
+    it('should handle a message to push an experiment', async () => {
       const { experiments } = buildExperiments(disposable)
       await experiments.isReady()
 
@@ -644,142 +647,83 @@ suite('Experiments Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const executeCommandSpy = spy(commands, 'executeCommand')
+      const mockExpPush = stub(DvcExecutor.prototype, 'expPush')
 
       const mockGetStudioAccessToken = stub(
         Setup.prototype,
         'getStudioAccessToken'
       )
 
-      const tokenAccessed = new Promise(resolve =>
+      const tokenNotFound = new Promise(resolve =>
         mockGetStudioAccessToken.callsFake(() => {
           resolve(undefined)
-          return undefined
+          return ''
+        })
+      )
+
+      const mockAskShowOrCloseOrNever = stub(Toast, 'askShowOrCloseOrNever')
+
+      const userPrompted = new Promise(resolve =>
+        mockAskShowOrCloseOrNever.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(Response.SHOW)
         })
       )
 
       mockMessageReceived.fire({
-        payload: mockExpId,
-        type: MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO
+        payload: [mockExpId],
+        type: MessageFromWebviewType.PUSH_EXPERIMENT
       })
 
-      await tokenAccessed
+      await Promise.all([tokenNotFound, userPrompted])
 
       expect(executeCommandSpy).to.be.calledWithExactly(
-        RegisteredCommands.SETUP_SHOW
+        RegisteredCommands.SETUP_SHOW_STUDIO_CONNECT
       )
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle a message to share an experiment as a new branch', async () => {
-      const { experiments } = buildExperiments(disposable)
-      await experiments.isReady()
+      mockGetStudioAccessToken.resetBehavior()
 
-      const mockExperimentId = 'exp-e7a67'
-      const mockBranch = 'it-is-a-branch-shared-to-the-remote'
-      const inputEvent = getInputBoxEvent(mockBranch)
-
-      const mockExperimentBranch = stub(
-        DvcExecutor.prototype,
-        'experimentBranch'
-      ).resolves(
-        `Git branch '${mockBranch}' has been created from experiment '${mockExperimentId}'.        
-       To switch to the new branch run:
-             git checkout ${mockBranch}`
-      )
-      const mockExperimentApply = stub(
-        DvcExecutor.prototype,
-        'experimentApply'
-      ).resolves(
-        `Changes for experiment '${mockExperimentId}' have been applied to your current workspace.`
-      )
-      const mockPush = stub(DvcExecutor.prototype, 'push').resolves(
-        '10 files updated.'
-      )
-      const mockGitPush = stub(GitExecutor.prototype, 'pushBranch')
-      const branchPushedToRemote = new Promise(resolve =>
-        mockGitPush.callsFake(() => {
+      const tokenFound = new Promise(resolve =>
+        mockGetStudioAccessToken.callsFake(() => {
           resolve(undefined)
-          return Promise.resolve(`${mockBranch} pushed to remote`)
+          return 'isat_token'
         })
       )
 
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
+      const mockShowProgress = stub(Toast, 'showProgress')
+      bypassProgressCloseDelay()
 
-      const webview = await experiments.showWebview()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockReport = stub()
 
-      mockMessageReceived.fire({
-        payload: mockExperimentId,
-        type: MessageFromWebviewType.SHARE_EXPERIMENT_AS_BRANCH
+      mockShowProgress.callsFake((title, callback) => {
+        expect(title).to.equal('exp push')
+
+        const progress = { report: mockReport }
+        return callback(progress, {} as CancellationToken)
       })
 
-      await inputEvent
-      await branchPushedToRemote
-      expect(mockExperimentBranch).to.be.calledWithExactly(
-        dvcDemoPath,
-        mockExperimentId,
-        mockBranch
-      )
-      expect(mockExperimentApply).to.be.calledWithExactly(
-        dvcDemoPath,
-        mockExperimentId
-      )
-      expect(mockPush).to.be.calledWithExactly(dvcDemoPath)
-      expect(mockGitPush).to.be.calledWithExactly(dvcDemoPath, mockBranch)
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
-    it('should handle a message to share an experiment as a commit', async () => {
-      const { experiments } = buildExperiments(disposable)
-      await experiments.isReady()
-
-      const mockExperimentId = 'exp-e7a67'
-      const mockCommitMessage =
-        'this is the very best version that I could come up with'
-      const inputEvent = getInputBoxEvent(mockCommitMessage)
-
-      const mockExperimentApply = stub(
-        DvcExecutor.prototype,
-        'experimentApply'
-      ).resolves(
-        `Changes for experiment '${mockExperimentId}' have been applied to your current workspace.`
-      )
-      const mockStageAndCommit = stub(
-        GitExecutor.prototype,
-        'stageAndCommit'
-      ).resolves(`[current-branch 67effdbc] ${mockCommitMessage}`)
-
-      const mockPush = stub(DvcExecutor.prototype, 'push').resolves(
-        '100000 files updated.'
-      )
-      const mockGitPush = stub(GitExecutor.prototype, 'pushBranch')
-      const branchPushedToRemote = new Promise(resolve =>
-        mockGitPush.callsFake(() => {
+      const commandExecuted = new Promise(resolve =>
+        mockExpPush.callsFake(() => {
           resolve(undefined)
-          return Promise.resolve('current-branch pushed to remote')
+          return Promise.resolve(
+            "Experiment major-lamb is up to date on Git remote 'origin'.\nView your experiments at \nhttps://studio.iterative.ai/user/mattseddon/projects/vscode-dvc-demo-ynm6t3jxdx"
+          )
         })
       )
 
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
-
-      const webview = await experiments.showWebview()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
-
       mockMessageReceived.fire({
-        payload: mockExperimentId,
-        type: MessageFromWebviewType.SHARE_EXPERIMENT_AS_COMMIT
+        payload: [mockExpId],
+        type: MessageFromWebviewType.PUSH_EXPERIMENT
       })
 
-      await inputEvent
-      await branchPushedToRemote
-      expect(mockStageAndCommit).to.be.calledWithExactly(
-        dvcDemoPath,
-        mockCommitMessage
-      )
-      expect(mockExperimentApply).to.be.calledWithExactly(
-        dvcDemoPath,
-        mockExperimentId
-      )
-      expect(mockPush).to.be.calledWithExactly(dvcDemoPath)
-      expect(mockGitPush).to.be.calledWithExactly(dvcDemoPath)
+      await Promise.all([tokenFound, commandExecuted])
+
+      expect(mockExpPush).to.be.calledWithExactly(dvcDemoPath, mockExpId)
+      expect(mockReport).to.be.calledWithExactly({
+        increment: 75,
+        message:
+          "Experiment major-lamb is up to date on Git remote 'origin'.\nView your experiments in [Studio](https://studio.iterative.ai/user/mattseddon/projects/vscode-dvc-demo-ynm6t3jxdx)"
+      })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to modify an experiment's params and queue an experiment", async () => {
@@ -796,10 +740,9 @@ suite('Experiments Test Suite', () => {
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
-      const mockQueueExperiment = stub(
-        dvcExecutor,
-        'experimentRunQueue'
-      ).resolves(undefined)
+      const mockQueueExperiment = stub(dvcExecutor, 'expRunQueue').resolves(
+        undefined
+      )
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -904,7 +847,7 @@ suite('Experiments Test Suite', () => {
 
       const mockExperimentRemove = stub(
         DvcExecutor.prototype,
-        'experimentRemove'
+        'expRemove'
       ).resolves(undefined)
 
       mockMessageReceived.fire({

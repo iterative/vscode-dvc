@@ -174,17 +174,6 @@ export class WebviewMessages {
       case MessageFromWebviewType.OPEN_PLOTS_WEBVIEW:
         return this.showPlotsToSide()
 
-      case MessageFromWebviewType.SHARE_EXPERIMENT_AS_BRANCH:
-        return commands.executeCommand(
-          RegisteredCliCommands.EXPERIMENT_VIEW_SHARE_AS_BRANCH,
-          { dvcRoot: this.dvcRoot, id: message.payload }
-        )
-      case MessageFromWebviewType.SHARE_EXPERIMENT_AS_COMMIT:
-        return commands.executeCommand(
-          RegisteredCliCommands.EXPERIMENT_VIEW_SHARE_AS_COMMIT,
-          { dvcRoot: this.dvcRoot, id: message.payload }
-        )
-
       case MessageFromWebviewType.SET_EXPERIMENTS_FOR_PLOTS:
         return this.setSelectedExperiments(message.payload)
 
@@ -205,10 +194,10 @@ export class WebviewMessages {
       case MessageFromWebviewType.ADD_CONFIGURATION: {
         return this.addConfiguration()
       }
-      case MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO:
+      case MessageFromWebviewType.PUSH_EXPERIMENT:
         return commands.executeCommand(
-          RegisteredCommands.EXPERIMENT_VIEW_SHARE_TO_STUDIO,
-          { dvcRoot: this.dvcRoot, id: message.payload }
+          RegisteredCliCommands.EXPERIMENT_VIEW_PUSH,
+          { dvcRoot: this.dvcRoot, ids: message.payload }
         )
 
       case MessageFromWebviewType.SHOW_EXPERIMENT_LOGS:

@@ -801,6 +801,7 @@ describe('App', () => {
     })
   })
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('Row Context Menu', () => {
     beforeAll(() => {
       jest.useFakeTimers()
@@ -862,9 +863,7 @@ describe('App', () => {
         'Show Logs',
         'Apply to Workspace',
         'Create new Branch',
-        'Share to Studio',
-        'Commit and Share',
-        'Share as Branch',
+        'Push',
         'Modify and Run',
         'Modify and Resume',
         'Modify and Queue',
@@ -884,7 +883,7 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(12)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(10)
 
       fireEvent.click(window, { bubbles: true })
       advanceTimersByTime(100)
@@ -898,7 +897,7 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(12)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(10)
 
       const commit = getRow('main')
       fireEvent.click(commit, { bubbles: true })
@@ -913,13 +912,13 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(12)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(10)
 
       fireEvent.contextMenu(within(row).getByText('[exp-e7a67]'), {
         bubbles: true
       })
       advanceTimersByTime(200)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(12)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(10)
     })
 
     it('should present the Remove experiment option for the checkpoint tips', () => {
@@ -934,7 +933,7 @@ describe('App', () => {
       expect(itemLabels).toContain('Remove')
     })
 
-    it('should present the Remove option if multiple checkpoint tip rows are selected', () => {
+    it('should present the remove option if only experiments are selected', () => {
       renderTableWithoutRunningExperiments()
 
       clickRowCheckbox('4fb124a')
@@ -946,10 +945,10 @@ describe('App', () => {
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
-      expect(itemLabels).toContain('Remove Selected Rows')
+      expect(itemLabels).toContain('Remove Selected')
 
       const removeOption = menuitems.find(item =>
-        item.textContent?.includes('Remove Selected Rows')
+        item.textContent?.includes('Remove Selected')
       )
 
       expect(removeOption).toBeDefined()
@@ -959,6 +958,34 @@ describe('App', () => {
       expect(sendMessage).toHaveBeenCalledWith({
         payload: ['exp-e7a67', 'test-branch'],
         type: MessageFromWebviewType.REMOVE_EXPERIMENT
+      })
+    })
+
+    it('should present the push option if only experiments are selected', () => {
+      renderTableWithoutRunningExperiments()
+
+      clickRowCheckbox('4fb124a')
+      clickRowCheckbox('42b8736')
+
+      const target = screen.getByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems.map(item => item.textContent)
+      expect(itemLabels).toContain('Push Selected')
+
+      const pushOption = menuitems.find(item =>
+        item.textContent?.includes('Push Selected')
+      )
+
+      expect(pushOption).toBeDefined()
+
+      pushOption && fireEvent.click(pushOption)
+
+      expect(sendMessage).toHaveBeenCalledWith({
+        payload: ['exp-e7a67', 'test-branch'],
+        type: MessageFromWebviewType.PUSH_EXPERIMENT
       })
     })
 
@@ -1016,7 +1043,7 @@ describe('App', () => {
       })
     })
 
-    it('should enable the user to share an experiment to Studio', () => {
+    it('should enable the user to share an experiment', () => {
       renderTableWithoutRunningExperiments()
 
       const target = screen.getByText('4fb124a')
@@ -1025,10 +1052,10 @@ describe('App', () => {
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
       const itemLabels = menuitems.map(item => item.textContent)
-      expect(itemLabels).toContain('Share to Studio')
+      expect(itemLabels).toContain('Push')
 
       const shareOption = menuitems.find(item =>
-        item.textContent?.includes('Share to Studio')
+        item.textContent?.includes('Push')
       )
 
       expect(shareOption).toBeDefined()
@@ -1036,8 +1063,8 @@ describe('App', () => {
       shareOption && fireEvent.click(shareOption)
 
       expect(sendMessage).toHaveBeenCalledWith({
-        payload: 'exp-e7a67',
-        type: MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO
+        payload: ['exp-e7a67'],
+        type: MessageFromWebviewType.PUSH_EXPERIMENT
       })
     })
 
@@ -1108,8 +1135,13 @@ describe('App', () => {
       fireEvent.contextMenu(target, { bubbles: true })
 
       advanceTimersByTime(100)
-      const clearOption = screen.getByText('Clear row selection')
-      fireEvent.click(clearOption)
+
+      const menuitems = screen.getAllByRole('menuitem')
+
+      const clearOption = menuitems.find(item =>
+        item.textContent?.includes('Clear')
+      )
+      clearOption && fireEvent.click(clearOption)
 
       advanceTimersByTime(100)
       expect(selectedRows().length).toBe(0)

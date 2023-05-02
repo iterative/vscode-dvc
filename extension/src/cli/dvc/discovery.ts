@@ -93,6 +93,7 @@ const warnUser = (
 type CanRunCli = {
   isAvailable: boolean
   isCompatible: boolean | undefined
+  version: string | undefined
 }
 
 export const isCliCompatible = (
@@ -115,7 +116,6 @@ const getVersionDetails = async (
 ): Promise<
   CanRunCli & {
     cliCompatible: CliCompatible
-    version: string | undefined
   }
 > => {
   const version = await setup.getCliVersion(cwd, tryGlobalCli)
@@ -128,12 +128,15 @@ const processVersionDetails = (
   setup: IExtensionSetup,
   cliCompatible: CliCompatible,
   isAvailable: boolean,
-  isCompatible: boolean | undefined
+  isCompatible: boolean | undefined,
+  version: string | undefined
 ): CanRunCli => {
   warnUser(setup, cliCompatible)
+
   return {
     isAvailable,
-    isCompatible
+    isCompatible,
+    version
   }
 }
 
@@ -142,13 +145,19 @@ const tryGlobalFallbackVersion = async (
   cwd: string
 ): Promise<CanRunCli> => {
   const tryGlobal = await getVersionDetails(setup, cwd, true)
-  const { cliCompatible, isAvailable, isCompatible } = tryGlobal
+  const { cliCompatible, isAvailable, isCompatible, version } = tryGlobal
 
   if (isCompatible) {
     setup.unsetPythonBinPath()
   }
 
-  return processVersionDetails(setup, cliCompatible, isAvailable, isCompatible)
+  return processVersionDetails(
+    setup,
+    cliCompatible,
+    isAvailable,
+    isCompatible,
+    version
+  )
 }
 
 const extensionCanAutoRunCli = async (
@@ -158,7 +167,8 @@ const extensionCanAutoRunCli = async (
   const {
     cliCompatible: pythonCliCompatible,
     isAvailable: pythonVersionIsAvailable,
-    isCompatible: pythonVersionIsCompatible
+    isCompatible: pythonVersionIsCompatible,
+    version: pythonVersion
   } = await getVersionDetails(setup, cwd)
 
   if (pythonCliCompatible === CliCompatible.NO_NOT_FOUND) {
@@ -169,7 +179,8 @@ const extensionCanAutoRunCli = async (
     setup,
     pythonCliCompatible,
     pythonVersionIsAvailable,
-    pythonVersionIsCompatible
+    pythonVersionIsCompatible,
+    pythonVersion
   )
 }
 
@@ -181,12 +192,16 @@ export const extensionCanRunCli = async (
     return extensionCanAutoRunCli(setup, cwd)
   }
 
-  const { cliCompatible, isAvailable, isCompatible } = await getVersionDetails(
-    setup,
-    cwd
-  )
+  const { cliCompatible, isAvailable, isCompatible, version } =
+    await getVersionDetails(setup, cwd)
 
-  return processVersionDetails(setup, cliCompatible, isAvailable, isCompatible)
+  return processVersionDetails(
+    setup,
+    cliCompatible,
+    isAvailable,
+    isCompatible,
+    version
+  )
 }
 
 const checkVersion = async (

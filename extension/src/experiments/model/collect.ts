@@ -328,10 +328,10 @@ export const collectExperiments = (
   return acc
 }
 
-type DeletableExperimentAccumulator = { [dvcRoot: string]: Set<string> }
+type ExperimentTypesAccumulator = { [dvcRoot: string]: Set<string> }
 
 const initializeAccumulatorRoot = (
-  acc: DeletableExperimentAccumulator,
+  acc: ExperimentTypesAccumulator,
   dvcRoot: string
 ) => {
   if (!acc[dvcRoot]) {
@@ -340,12 +340,12 @@ const initializeAccumulatorRoot = (
 }
 
 const collectExperimentItem = (
-  acc: DeletableExperimentAccumulator,
-  deletable: Set<string>,
+  acc: ExperimentTypesAccumulator,
+  types: Set<string>,
   experimentItem: ExperimentItem
 ) => {
   const { dvcRoot, type, id, label } = experimentItem
-  if (!deletable.has(type)) {
+  if (!types.has(type)) {
     return
   }
   initializeAccumulatorRoot(acc, dvcRoot)
@@ -357,18 +357,17 @@ const collectExperimentItem = (
   acc[dvcRoot].add(id)
 }
 
-export const collectDeletable = (
-  experimentItems: (string | ExperimentItem)[]
-): DeletableExperimentAccumulator => {
-  const deletable = new Set([ExperimentType.EXPERIMENT, ExperimentType.QUEUED])
-
-  const acc: DeletableExperimentAccumulator = {}
+export const collectExperimentType = (
+  experimentItems: (string | ExperimentItem)[],
+  types: Set<ExperimentType>
+): ExperimentTypesAccumulator => {
+  const acc: ExperimentTypesAccumulator = {}
   for (const experimentItem of experimentItems) {
     if (typeof experimentItem === 'string') {
       continue
     }
 
-    collectExperimentItem(acc, deletable, experimentItem)
+    collectExperimentItem(acc, types, experimentItem)
   }
 
   return acc

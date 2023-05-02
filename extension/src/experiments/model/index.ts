@@ -79,10 +79,8 @@ export class ExperimentsModel extends ModelWithPersistence {
         []
       )
     )
-    this.coloredStatus = this.revive<ColoredStatus>(
-      PersistenceKey.EXPERIMENTS_STATUS,
-      {}
-    )
+
+    this.coloredStatus = this.reviveColoredStatus()
     this.starredExperiments = this.revive<StarredExperiments>(
       PersistenceKey.EXPERIMENTS_STARS,
       {}
@@ -581,5 +579,21 @@ export class ExperimentsModel extends ModelWithPersistence {
         acc.filter(item => item.displayColor === orderedItem)
       )
       .filter(Boolean)
+  }
+
+  private reviveColoredStatus() {
+    const uniqueStatus: ColoredStatus = {}
+    const colors = new Set<Color>()
+    for (const [id, color] of Object.entries(
+      this.revive<ColoredStatus>(PersistenceKey.EXPERIMENTS_STATUS, {})
+    )) {
+      if (color) {
+        uniqueStatus[id] = colors.has(color) ? UNSELECTED : color
+        colors.add(color)
+        continue
+      }
+      uniqueStatus[id] = UNSELECTED
+    }
+    return uniqueStatus
   }
 }

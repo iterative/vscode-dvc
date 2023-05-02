@@ -121,7 +121,7 @@ export class DvcReader extends DvcCli {
   public globalVersion(cwd: string): Promise<string> {
     const options = getOptions(
       undefined,
-      this.config.getCliPath(),
+      this.extensionConfig.getCliPath(),
       cwd,
       Flag.VERSION
     )
