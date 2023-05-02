@@ -468,7 +468,7 @@ describe('run', () => {
     await flushPromises()
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
-      'The extension cannot initialize because you are using the wrong version of the CLI',
+      'The extension cannot initialize because you are using the wrong version of the CLI.',
       Response.SHOW_SETUP
     )
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(2)
@@ -534,7 +534,7 @@ describe('run', () => {
     await flushPromises()
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
-      'The extension cannot initialize because you are using the wrong version of the extension',
+      'The extension cannot initialize because you are using the wrong version of the extension.',
       'Setup'
     )
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)

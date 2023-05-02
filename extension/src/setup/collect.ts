@@ -13,5 +13,6 @@ export const collectSectionCollapsed = (
       acc[section as SetupSection] = true
     }
   }
+
   return acc
 }

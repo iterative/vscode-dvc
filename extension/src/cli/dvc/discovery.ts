@@ -23,10 +23,12 @@ const warnWithSetupAction = async (
   }
 }
 
-export const warnUnableToVerifyVersion = () =>
-  Toast.warnWithOptions(
+export const warnUnableToVerifyVersion = (setup: IExtensionSetup) => {
+  void warnWithSetupAction(
+    setup,
     'The extension cannot initialize as we were unable to verify the DVC CLI version.'
   )
+}
 
 export const warnVersionIncompatible = (
   setup: IExtensionSetup,
@@ -34,7 +36,7 @@ export const warnVersionIncompatible = (
 ): void => {
   void warnWithSetupAction(
     setup,
-    `The extension cannot initialize because you are using the wrong version of the ${update}`
+    `The extension cannot initialize because you are using the wrong version of the ${update}.`
   )
 }
 
@@ -76,7 +78,7 @@ const warnUser = (
     case CliCompatible.NO_BEHIND_MIN_VERSION:
       return warnVersionIncompatible(setup, 'CLI')
     case CliCompatible.NO_CANNOT_VERIFY:
-      void warnUnableToVerifyVersion()
+      void warnUnableToVerifyVersion(setup)
       return
     case CliCompatible.NO_MAJOR_VERSION_AHEAD:
       return warnVersionIncompatible(setup, 'extension')
