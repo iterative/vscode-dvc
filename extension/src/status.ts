@@ -58,8 +58,9 @@ export class Status extends Disposable {
   }
 
   private setState(isWorking: boolean) {
-    const indicator = this.getEnvIndicator()
+    const { indicator, tooltip } = this.getEnvDetails()
     this.statusBarItem.text = this.getText(isWorking, indicator)
+    this.statusBarItem.tooltip = tooltip
 
     this.statusBarItem.color = this.getColor()
 
@@ -96,17 +97,26 @@ export class Status extends Disposable {
     }
   }
 
-  private getEnvIndicator() {
+  private getEnvDetails() {
     const dvcPath = this.config.getCliPath()
     const pythonBinPath = this.config.getPythonBinPath()
     if (dvcPath || !pythonBinPath) {
-      return '(Global)'
+      return {
+        indicator: '(Global)',
+        tooltip: `Locate DVC at: ${dvcPath || 'dvc'}`
+      }
     }
 
     if (this.config.isPythonExtensionUsed()) {
-      return '(Auto)'
+      return {
+        indicator: '(Auto)',
+        tooltip: `Locate DVC in the Python environment selected by the Python extension: ${pythonBinPath}`
+      }
     }
 
-    return '(Manual)'
+    return {
+      indicator: '(Manual)',
+      tooltip: `Locate DVC in this Python environment: ${pythonBinPath}`
+    }
   }
 }

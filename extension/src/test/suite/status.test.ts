@@ -123,10 +123,7 @@ suite('Status Test Suite', () => {
       await status.setAvailability(false)
 
       expect(mockStatusBarItem.text).to.equal(disabledText)
-      expect(mockStatusBarItem.command).to.deep.equal({
-        command: RegisteredCommands.SETUP_SHOW,
-        title: Title.SHOW_SETUP
-      })
+      expect(mockStatusBarItem.command).to.deep.equal(setupShowCommand)
     })
 
     it('should floor the number of workers at 0', async () => {
@@ -224,6 +221,7 @@ suite('Status Test Suite', () => {
       await status.setAvailability(true)
 
       expect(mockStatusBarItem.text).to.equal(waitingText)
+      expect(mockStatusBarItem.tooltip).to.equal('Locate DVC at: dvc')
 
       const mockPythonPath = resolve('a', 'virtual', 'environment')
 
@@ -234,6 +232,9 @@ suite('Status Test Suite', () => {
       expect(mockStatusBarItem.text).to.equal(
         '$(circle-large-outline) DVC (Auto)'
       )
+      expect(mockStatusBarItem.tooltip).to.equal(
+        `Locate DVC in the Python environment selected by the Python extension: ${mockPythonPath}`
+      )
 
       setupMocks(false, undefined, mockPythonPath)
 
@@ -241,6 +242,9 @@ suite('Status Test Suite', () => {
 
       expect(mockStatusBarItem.text).to.equal(
         '$(circle-large-outline) DVC (Manual)'
+      )
+      expect(mockStatusBarItem.tooltip).to.equal(
+        `Locate DVC in this Python environment: ${mockPythonPath}`
       )
 
       const mockDvcPath = resolve('path', 'to', 'dvc')
@@ -252,6 +256,9 @@ suite('Status Test Suite', () => {
       expect(mockStatusBarItem.text).to.equal(
         '$(circle-large-outline) DVC (Global)'
       )
+      expect(mockStatusBarItem.tooltip).to.equal(
+        `Locate DVC at: ${mockDvcPath}`
+      )
 
       setupMocks(false, 'dvc', mockPythonPath)
 
@@ -260,6 +267,7 @@ suite('Status Test Suite', () => {
       expect(mockStatusBarItem.text).to.equal(
         '$(circle-large-outline) DVC (Global)'
       )
+      expect(mockStatusBarItem.tooltip).to.equal('Locate DVC at: dvc')
     })
   })
 })
