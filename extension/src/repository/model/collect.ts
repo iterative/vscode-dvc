@@ -1,4 +1,4 @@
-import { join, relative, resolve } from 'path'
+import { join, relative, resolve, sep } from 'path'
 import { Uri } from 'vscode'
 import { Resource } from '../commands'
 import { addToMapSet } from '../../util/map'
@@ -195,6 +195,33 @@ const uncommitNotInCache = (
   return ('un' + status) as ExtendedStatus
 }
 
+const collectMissingTracked = (
+  trackedDecorations: Set<String>,
+  path: string,
+  add: boolean
+) => {
+  if (add) {
+    trackedDecorations.add(path)
+  }
+}
+
+const fillGapsInTrackedDecorations = (
+  rootDepth: number,
+  trackedDecorations: Set<string>
+) => {
+  for (const path of trackedDecorations) {
+    const pathArray = getPathArray(path)
+    let add = false
+    for (let idx = rootDepth; idx < pathArray.length; idx++) {
+      const currPath = getPath(pathArray, idx)
+      if (trackedDecorations.has(currPath)) {
+        add = true
+      }
+      collectMissingTracked(trackedDecorations, currPath, add)
+    }
+  }
+}
+
 const collectGroupWithMissingAncestors = (
   acc: DataStatusAccumulator,
   dvcRoot: string,
@@ -214,6 +241,11 @@ const collectGroupWithMissingAncestors = (
 
     addToTracked(acc.trackedDecorations, absPath, originalStatus)
   }
+
+  fillGapsInTrackedDecorations(
+    dvcRoot.split(sep).length + 1,
+    acc.trackedDecorations
+  )
 }
 
 export const collectDataStatus = (
