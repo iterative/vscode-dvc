@@ -1,5 +1,5 @@
-import React from 'react'
-import { DvcCliDetails, SectionCollapsed } from 'dvc/src/setup/webview/contract'
+import React, { useEffect, useState } from 'react'
+import { DvcCliDetails, SetupSection } from 'dvc/src/setup/webview/contract'
 import { DvcEnvDetails } from './DvcEnvDetails'
 import { CliIncompatible } from './CliIncompatible'
 import { ProjectUninitialized } from './ProjectUninitialized'
@@ -9,12 +9,10 @@ import {
   initializeDvc,
   initializeGit,
   installDvc,
-  setupWorkspace,
-  showExperiments
+  setupWorkspace
 } from '../messages'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
-import { Beaker } from '../../../shared/components/icons'
-import { IconButton } from '../../../shared/components/button/IconButton'
+import { usePrevious } from '../../../shared/hooks/usePrevious'
 
 export type DvcProps = {
   canGitInitialize: boolean | undefined
@@ -24,8 +22,8 @@ export type DvcProps = {
   needsGitInitialized: boolean | undefined
   projectInitialized: boolean
   pythonBinPath: string | undefined
-  isExperimentsAvailable: boolean | undefined
-  setSectionCollapsed: (sectionCollapsed: SectionCollapsed) => void
+  closeSection: (section: SetupSection) => void
+  hasReceivedMessageFromVsCode: boolean
 }
 
 export const Dvc: React.FC<DvcProps> = ({
@@ -36,9 +34,27 @@ export const Dvc: React.FC<DvcProps> = ({
   needsGitInitialized,
   projectInitialized,
   pythonBinPath,
-  setSectionCollapsed,
-  isExperimentsAvailable
+  hasReceivedMessageFromVsCode,
+  closeSection
 }) => {
+  const [isComplete, setIsComplete] = useState<boolean | undefined>(undefined)
+
+  const previousIsComplete = usePrevious(isComplete)
+
+  useEffect(() => {
+    if (projectInitialized && cliCompatible) {
+      setIsComplete(true)
+    } else if (hasReceivedMessageFromVsCode) {
+      setIsComplete(false)
+    }
+  }, [projectInitialized, cliCompatible, hasReceivedMessageFromVsCode])
+
+  useEffect(() => {
+    if (isComplete && previousIsComplete === false) {
+      closeSection(SetupSection.DVC)
+    }
+  }, [isComplete, previousIsComplete, closeSection])
+
   const children = dvcCliDetails && (
     <DvcEnvDetails
       {...dvcCliDetails}
@@ -82,21 +98,6 @@ export const Dvc: React.FC<DvcProps> = ({
     <EmptyState isFullScreen={false}>
       <h1>Setup Complete</h1>
       {children}
-      <IconButton
-        appearance="primary"
-        icon={Beaker}
-        onClick={
-          isExperimentsAvailable
-            ? showExperiments
-            : () =>
-                setSectionCollapsed({
-                  dvc: true,
-                  experiments: false,
-                  studio: true
-                })
-        }
-        text="Show Experiments"
-      />
     </EmptyState>
   )
 }

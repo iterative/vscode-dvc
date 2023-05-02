@@ -43,6 +43,8 @@ export const App: React.FC = () => {
   const [isStudioConnected, setIsStudioConnected] = useState<boolean>(false)
   const [shareLiveToStudio, setShareLiveToStudioValue] =
     useState<boolean>(false)
+  const [hasReceivedMessageFromVsCode, setHasReceivedMessageFromVsCode] =
+    useState(false)
 
   useVsCodeMessaging(
     useCallback(
@@ -64,6 +66,8 @@ export const App: React.FC = () => {
           setSectionCollapsed(data.data.sectionCollapsed)
         }
         setShareLiveToStudioValue(data.data.shareLiveToStudio)
+        // TBD There is probably a better way to go about this...
+        setHasReceivedMessageFromVsCode(true)
       },
       [
         setCanGitInitialized,
@@ -90,6 +94,10 @@ export const App: React.FC = () => {
     })
   }
 
+  const closeSection = (section: SetupSection) => {
+    setSectionCollapsed({ ...sectionCollapsed, [section]: true })
+  }
+
   return (
     <>
       <SetupContainer
@@ -106,8 +114,8 @@ export const App: React.FC = () => {
           needsGitInitialized={needsGitInitialized}
           projectInitialized={projectInitialized}
           pythonBinPath={pythonBinPath}
-          isExperimentsAvailable={hasData}
-          setSectionCollapsed={setSectionCollapsed}
+          closeSection={closeSection}
+          hasReceivedMessageFromVsCode={hasReceivedMessageFromVsCode}
         />
       </SetupContainer>
       <SetupContainer
