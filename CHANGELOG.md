@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.4] - 2023-05-02
+
+### 🐛 Bug Fixes
+
+- Fix missing tracked decorations [#3801](https://github.com/iterative/vscode-dvc/pull/3801) by [@mattseddon](https://github.com/mattseddon)
+- Hide push option when an experiment is running [#3808](https://github.com/iterative/vscode-dvc/pull/3808) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (2.56.0) [#3805](https://github.com/iterative/vscode-dvc/pull/3805) by [@sroy3](https://github.com/sroy3)
+- WorkspaceExperiments housekeeping [#3797](https://github.com/iterative/vscode-dvc/pull/3797) by [@mattseddon](https://github.com/mattseddon)
+- Wait for config to be ready before accessing values [#3799](https://github.com/iterative/vscode-dvc/pull/3799) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.8.3] - 2023-05-01
 
 ### 🚀 New Features and Enhancements
