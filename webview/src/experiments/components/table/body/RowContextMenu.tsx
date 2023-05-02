@@ -211,7 +211,7 @@ const getSingleSelectMenuOptions = (
       [id],
       'Push',
       MessageFromWebviewType.PUSH_EXPERIMENT,
-      isNotExperiment,
+      isNotExperiment || hasRunningExperiment,
       true
     ),
     ...getRunResumeOptions(

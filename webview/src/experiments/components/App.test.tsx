@@ -1068,6 +1068,18 @@ describe('App', () => {
       })
     })
 
+    it('should not enable the user to share an experiment whilst an experiment is running', () => {
+      renderTable()
+
+      const target = screen.getByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems.map(item => item.textContent)
+      expect(itemLabels).not.toContain('Push')
+    })
+
     it('should always present the Plots options if multiple rows are selected', () => {
       renderTableWithoutRunningExperiments()
 
