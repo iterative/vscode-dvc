@@ -577,7 +577,7 @@ suite('Setup Test Suite', () => {
       mockExecuteCommand.restore()
       mockRunSetup.restore()
       stub(config, 'isPythonExtensionUsed').returns(false)
-      stub(config, 'getPythonBinPath').resolves(join('python'))
+      stub(config, 'getPythonBinPath').returns(join('python'))
 
       mockVersion.resetBehavior()
       mockVersion
