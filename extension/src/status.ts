@@ -60,7 +60,6 @@ export class Status extends Disposable {
   private setState(isWorking: boolean) {
     const indicator = this.getEnvIndicator()
     this.statusBarItem.text = this.getText(isWorking, indicator)
-    this.statusBarItem.tooltip = this.getEnvIndicator()
 
     this.statusBarItem.color = this.getColor()
 
