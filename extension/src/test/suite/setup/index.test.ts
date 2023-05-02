@@ -215,10 +215,9 @@ suite('Setup Test Suite', () => {
 
       await config.isReady()
 
-      setup.setCliCompatible(undefined)
+      setup.setCliCompatibleAndVersion(undefined, undefined)
       setup.setAvailable(false)
       await setup.setRoots()
-      stub(setup, 'getCliVersion').resolves(undefined)
 
       messageSpy.restore()
       const mockSendMessage = stub(BaseWebview.prototype, 'show')
@@ -257,7 +256,7 @@ suite('Setup Test Suite', () => {
 
       await config.isReady()
 
-      setup.setCliCompatible(true)
+      setup.setCliCompatibleAndVersion(true, MIN_CLI_VERSION)
       setup.setAvailable(true)
       await setup.setRoots()
 
@@ -304,7 +303,7 @@ suite('Setup Test Suite', () => {
 
       await config.isReady()
 
-      setup.setCliCompatible(true)
+      setup.setCliCompatibleAndVersion(true, MIN_CLI_VERSION)
       setup.setAvailable(true)
       await setup.setRoots()
 
@@ -354,7 +353,7 @@ suite('Setup Test Suite', () => {
 
       await config.isReady()
 
-      setup.setCliCompatible(true)
+      setup.setCliCompatibleAndVersion(true, MIN_CLI_VERSION)
       setup.setAvailable(true)
       await setup.setRoots()
 
@@ -579,7 +578,6 @@ suite('Setup Test Suite', () => {
       mockRunSetup.restore()
       stub(config, 'isPythonExtensionUsed').returns(false)
       stub(config, 'getPythonBinPath').resolves(join('python'))
-      stub(setup, 'getDvcCliDetails').resolves(undefined)
 
       mockVersion.resetBehavior()
       mockVersion
@@ -639,7 +637,6 @@ suite('Setup Test Suite', () => {
       mockExecuteCommand.restore()
       mockRunSetup.restore()
       stub(config, 'isPythonExtensionUsed').returns(true)
-      stub(setup, 'getDvcCliDetails').resolves(undefined)
 
       mockVersion.resetBehavior()
       mockVersion.rejects(new Error('no CLI here'))
@@ -759,7 +756,6 @@ suite('Setup Test Suite', () => {
       const mockUpdate = stub()
 
       stub(workspace, 'getConfiguration').returns({
-        get: stub(),
         update: mockUpdate
       } as unknown as WorkspaceConfiguration)
 

@@ -1,6 +1,7 @@
 import { EventEmitter, Memento } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import { Experiments, ModifiedExperimentAndRunCommandId } from '.'
+import { getPushExperimentCommand } from './commands'
 import { TableData } from './webview/contract'
 import { Args } from '../cli/dvc/constants'
 import {
@@ -9,6 +10,7 @@ import {
   InternalCommands
 } from '../commands/internal'
 import { ResourceLocator } from '../resourceLocator'
+import { Setup } from '../setup'
 import { Toast } from '../vscode/toast'
 import {
   getInput,
@@ -170,6 +172,22 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
     return this.runCommand(AvailableCommands.QUEUE_KILL, cwd, ...taskIds)
+  }
+
+  public async selectExperimentsToPush(setup: Setup) {
+    const dvcRoot = await this.getFocusedOrOnlyOrPickProject()
+    if (!dvcRoot) {
+      return
+    }
+
+    const ids = await this.getRepository(dvcRoot).pickExperimentsToPush()
+    if (!ids || isEmpty(ids)) {
+      return
+    }
+
+    const pushCommand = getPushExperimentCommand(this.internalCommands, setup)
+
+    return pushCommand({ dvcRoot, ids })
   }
 
   public async selectExperimentsToRemove() {

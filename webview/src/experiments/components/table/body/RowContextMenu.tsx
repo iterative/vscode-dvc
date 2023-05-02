@@ -50,12 +50,12 @@ const getMultiSelectMenuOptions = (
 
   const selectedIds = selectedRowsList.map(value => value.row.original.id)
 
-  const removableRowIds = selectedRowsList
+  const experimentRowIds = selectedRowsList
     .filter(value => value.row.depth === 1)
     .map(value => value.row.original.id)
 
-  const hideRemoveOption =
-    removableRowIds.length !== selectedRowsList.length || hasRunningExperiment
+  const hideExperimentOnlyOption =
+    experimentRowIds.length !== selectedRowsList.length || hasRunningExperiment
 
   const stoppableRows = selectedRowsList
     .filter(value => isRunning(value.row.original.status))
@@ -105,17 +105,24 @@ const getMultiSelectMenuOptions = (
       true
     ),
     experimentMenuOption(
-      removableRowIds,
-      'Remove Selected Rows',
+      experimentRowIds,
+      'Push Selected',
+      MessageFromWebviewType.PUSH_EXPERIMENT,
+      hideExperimentOnlyOption,
+      true
+    ),
+    experimentMenuOption(
+      experimentRowIds,
+      'Remove Selected',
       MessageFromWebviewType.REMOVE_EXPERIMENT,
-      hideRemoveOption,
+      hideExperimentOnlyOption,
       true
     ),
     {
       divider: true,
       id: 'clear-selection',
       keyboardShortcut: 'Esc',
-      label: 'Clear row selection'
+      label: 'Clear'
     }
   ]
 }
@@ -200,9 +207,11 @@ const getSingleSelectMenuOptions = (
       'Create new Branch',
       MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
     ),
-    hideIfRunningOrNotExperiment(
-      'Share to Studio',
-      MessageFromWebviewType.SHARE_EXPERIMENT_TO_STUDIO,
+    experimentMenuOption(
+      [id],
+      'Push',
+      MessageFromWebviewType.PUSH_EXPERIMENT,
+      isNotExperiment,
       true
     ),
     ...getRunResumeOptions(

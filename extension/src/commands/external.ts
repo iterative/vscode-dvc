@@ -2,6 +2,7 @@ export enum RegisteredCliCommands {
   EXPERIMENT_APPLY = 'dvc.applyExperiment',
   EXPERIMENT_BRANCH = 'dvc.branchExperiment',
   EXPERIMENT_GARBAGE_COLLECT = 'dvc.experimentGarbageCollect',
+  EXPERIMENT_PUSH = 'dvc.pushExperiments',
   EXPERIMENT_REMOVE = 'dvc.removeExperiments',
   EXPERIMENT_REMOVE_QUEUE = 'dvc.removeExperimentQueue',
   EXPERIMENT_RESET_AND_RUN = 'dvc.resetAndRunCheckpointExperiment',
@@ -100,7 +101,6 @@ export enum RegisteredCommands {
   ADD_STUDIO_ACCESS_TOKEN = 'dvc.addStudioAccessToken',
   UPDATE_STUDIO_ACCESS_TOKEN = 'dvc.updateStudioAccessToken',
   REMOVE_STUDIO_ACCESS_TOKEN = 'dvc.removeStudioAccessToken',
-  EXPERIMENT_VIEW_SHARE_TO_STUDIO = 'dvc.views.experiments.shareExperimentToStudio',
   SETUP_SHOW_STUDIO_CONNECT = 'dvc.showStudioConnect',
   SETUP_SHOW_STUDIO_SETTINGS = 'dvc.showStudioSettings',
 

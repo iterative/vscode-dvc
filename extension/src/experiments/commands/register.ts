@@ -1,7 +1,4 @@
-import {
-  getBranchExperimentCommand,
-  getShareExperimentToStudioCommand
-} from '.'
+import { getBranchExperimentCommand, getPushExperimentCommand } from '.'
 import { pickGarbageCollectionFlags } from '../quickPick'
 import { WorkspaceExperiments } from '../workspace'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
@@ -163,7 +160,8 @@ const registerExperimentInputCommands = (
 
 const registerExperimentQuickPickCommands = (
   experiments: WorkspaceExperiments,
-  internalCommands: InternalCommands
+  internalCommands: InternalCommands,
+  setup: Setup
 ): void => {
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_GARBAGE_COLLECT,
@@ -221,6 +219,11 @@ const registerExperimentQuickPickCommands = (
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.QUEUE_KILL,
     () => experiments.selectQueueTasksToKill()
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_PUSH,
+    () => experiments.selectExperimentsToPush(setup)
   )
 
   internalCommands.registerExternalCliCommand(
@@ -283,7 +286,7 @@ export const registerExperimentCommands = (
   registerExperimentCwdCommands(experiments, internalCommands)
   registerExperimentNameCommands(experiments, internalCommands)
   registerExperimentInputCommands(experiments, internalCommands)
-  registerExperimentQuickPickCommands(experiments, internalCommands)
+  registerExperimentQuickPickCommands(experiments, internalCommands, setup)
   registerExperimentRunCommands(experiments, internalCommands, setup)
 
   internalCommands.registerExternalCommand(
@@ -292,9 +295,9 @@ export const registerExperimentCommands = (
       experiments.getRepository(dvcRoot).toggleExperimentStatus(id)
   )
 
-  internalCommands.registerExternalCommand(
-    RegisteredCommands.EXPERIMENT_VIEW_SHARE_TO_STUDIO,
-    getShareExperimentToStudioCommand(internalCommands, setup)
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.EXPERIMENT_VIEW_PUSH,
+    getPushExperimentCommand(internalCommands, setup)
   )
 
   internalCommands.registerExternalCliCommand(
