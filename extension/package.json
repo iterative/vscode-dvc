@@ -1623,7 +1623,7 @@
     "node-fetch": "2.6.9",
     "tree-kill": "1.2.2",
     "uuid": "9.0.0",
-    "vega-util": "1.17.1",
+    "vega-util": "1.17.2",
     "vscode-languageclient": "8.1.0"
   },
   "devDependencies": {
