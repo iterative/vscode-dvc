@@ -34,9 +34,9 @@ suite('Status Test Suite', () => {
     const loadingText = '$(loading~spin) DVC (Global)'
     const waitingText = '$(circle-large-outline) DVC (Global)'
 
-    const setupWorkspaceCommand = {
-      command: RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
-      title: Title.SETUP_WORKSPACE
+    const setupShowCommand = {
+      command: RegisteredCommands.SETUP_SHOW,
+      title: Title.SHOW_SETUP
     }
 
     it('should show the correct status of the cli', async () => {
@@ -88,7 +88,7 @@ suite('Status Test Suite', () => {
       await status.setAvailability(true)
 
       expect(mockStatusBarItem.text).to.equal(waitingText)
-      expect(mockStatusBarItem.command).to.deep.equal(setupWorkspaceCommand)
+      expect(mockStatusBarItem.command).to.deep.equal(setupShowCommand)
 
       processStarted.fire(firstFinishedCommand)
 
@@ -118,13 +118,13 @@ suite('Status Test Suite', () => {
       })
 
       expect(mockStatusBarItem.text).to.equal(waitingText)
-      expect(mockStatusBarItem.command).to.deep.equal(setupWorkspaceCommand)
+      expect(mockStatusBarItem.command).to.deep.equal(setupShowCommand)
 
       await status.setAvailability(false)
 
       expect(mockStatusBarItem.text).to.equal(disabledText)
       expect(mockStatusBarItem.command).to.deep.equal({
-        command: RegisteredCommands.SETUP_SHOW,
+        command: RegisteredCommands.SETUP_SHOW_DVC,
         title: Title.SHOW_SETUP
       })
     })

@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.8.4",
+  "version": "0.8.5",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -1662,7 +1662,7 @@
     "fork-ts-checker-webpack-plugin": "8.0.0",
     "jest": "29.5.0",
     "jest-environment-node": "29.5.0",
-    "lint-staged": "13.2.1",
+    "lint-staged": "13.2.2",
     "mocha": "10.2.0",
     "mock-require": "3.0.3",
     "process-exists": "4.1.0",
@@ -1673,7 +1673,7 @@
     "vscode-uri": "3.0.7",
     "wdio-vscode-service": "5.0.0",
     "webdriverio": "8.8.6",
-    "webpack": "5.80.0",
+    "webpack": "5.81.0",
     "webpack-cli": "5.0.2"
   },
   "peerDependencies": {
