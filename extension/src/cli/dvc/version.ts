@@ -5,9 +5,8 @@ import {
 } from './contract'
 
 export enum CliCompatible {
-  NO_BEHIND_MIN_VERSION = 'no-behind-min-version',
   NO_CANNOT_VERIFY = 'no-cannot-verify',
-  NO_MAJOR_VERSION_AHEAD = 'no-major-version-ahead',
+  NO_INCOMPATIBLE = 'no-incompatible',
   NO_NOT_FOUND = 'no-not-found',
   YES_MINOR_VERSION_AHEAD_OF_TESTED = 'yes-minor-version-ahead-of-tested',
   YES = 'yes'
@@ -49,23 +48,20 @@ const checkCLIVersion = (currentSemVer: {
     minor: currentMinor,
     patch: currentPatch
   } = currentSemVer
-
-  if (currentMajor >= Number(MAX_CLI_VERSION)) {
-    return CliCompatible.NO_MAJOR_VERSION_AHEAD
-  }
-
   const {
     major: minMajor,
     minor: minMinor,
     patch: minPatch
   } = extractSemver(MIN_CLI_VERSION) as ParsedSemver
 
-  if (
+  const isAheadMaxVersion = currentMajor >= Number(MAX_CLI_VERSION)
+  const isBehindMinVersion =
     currentMajor < minMajor ||
     currentMinor < minMinor ||
     (currentMinor === minMinor && currentPatch < Number(minPatch))
-  ) {
-    return CliCompatible.NO_BEHIND_MIN_VERSION
+
+  if (isAheadMaxVersion || isBehindMinVersion) {
+    return CliCompatible.NO_INCOMPATIBLE
   }
 
   return cliIsCompatible(currentMajor, currentMinor)
