@@ -30,13 +30,10 @@ const warnUnableToVerifyVersion = (setup: IExtensionSetup) => {
   )
 }
 
-const warnVersionIncompatible = (
-  setup: IExtensionSetup,
-  update: 'CLI' | 'extension'
-): void => {
+const warnVersionIncompatible = (setup: IExtensionSetup): void => {
   void warnWithSetupAction(
     setup,
-    `The extension cannot initialize because you are using the wrong version of the ${update}.`
+    'The extension cannot initialize because the DVC CLI version is incompatible.'
   )
 }
 
@@ -75,13 +72,11 @@ const warnUser = (
     return
   }
   switch (cliCompatible) {
-    case CliCompatible.NO_BEHIND_MIN_VERSION:
-      return warnVersionIncompatible(setup, 'CLI')
+    case CliCompatible.NO_INCOMPATIBLE:
+      return warnVersionIncompatible(setup)
     case CliCompatible.NO_CANNOT_VERIFY:
       void warnUnableToVerifyVersion(setup)
       return
-    case CliCompatible.NO_MAJOR_VERSION_AHEAD:
-      return warnVersionIncompatible(setup, 'extension')
     case CliCompatible.NO_NOT_FOUND:
       void warnUserCLIInaccessible(setup)
       return
