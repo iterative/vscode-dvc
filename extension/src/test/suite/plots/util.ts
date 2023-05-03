@@ -25,13 +25,8 @@ export const buildPlots = async (
   plotsDiff: PlotsOutput | undefined = undefined,
   expShow = expShowFixtureWithoutErrors
 ) => {
-  const {
-    internalCommands,
-    mockPlotsDiff,
-    messageSpy,
-    updatesPaused,
-    resourceLocator
-  } = buildDependencies(disposer, expShow, plotsDiff)
+  const { internalCommands, mockPlotsDiff, messageSpy, resourceLocator } =
+    buildDependencies(disposer, expShow, plotsDiff)
 
   const mockRemoveDir = stub(FileSystem, 'removeDir').returns(undefined)
   const mockGetModifiedTime = stub(FileSystem, 'getModifiedTime').returns(
@@ -42,7 +37,6 @@ export const buildPlots = async (
     new Experiments(
       dvcDemoPath,
       internalCommands,
-      updatesPaused,
       resourceLocator,
       buildMockMemento(),
       () => Promise.resolve(true),
@@ -55,7 +49,6 @@ export const buildPlots = async (
       dvcDemoPath,
       internalCommands,
       experiments,
-      updatesPaused,
       resourceLocator.scatterGraph,
       buildMockMemento()
     )

@@ -228,8 +228,6 @@ export const buildDependencies = (
     ''
   )
 
-  const updatesPaused = disposer.track(new EventEmitter<boolean>())
-
   const resourceLocator = buildResourceLocator(disposer)
 
   const messageSpy = spy(BaseWebview.prototype, 'show')
@@ -250,8 +248,7 @@ export const buildDependencies = (
     mockExpShow,
     mockGetCommitMessages,
     mockPlotsDiff,
-    resourceLocator,
-    updatesPaused
+    resourceLocator
   }
 }
 

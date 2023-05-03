@@ -33,7 +33,6 @@ export abstract class BaseData<
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
-    updatesPaused: EventEmitter<boolean>,
     updateProcesses: { name: string; process: () => Promise<unknown> }[],
     staticFiles: string[] = []
   ) {
@@ -41,7 +40,7 @@ export abstract class BaseData<
 
     this.dvcRoot = dvcRoot
     this.processManager = this.dispose.track(
-      new ProcessManager(updatesPaused, ...updateProcesses)
+      new ProcessManager(...updateProcesses)
     )
     this.internalCommands = internalCommands
     this.onDidUpdate = this.updated.event

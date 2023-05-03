@@ -1,10 +1,4 @@
-import {
-  commands,
-  env,
-  EventEmitter,
-  ExtensionContext,
-  ViewColumn
-} from 'vscode'
+import { commands, env, ExtensionContext, ViewColumn } from 'vscode'
 import { DvcExecutor } from './cli/dvc/executor'
 import { DvcRunner } from './cli/dvc/runner'
 import { DvcReader } from './cli/dvc/reader'
@@ -73,10 +67,6 @@ export class Extension extends Disposable {
   private readonly gitExecutor: GitExecutor
   private readonly gitReader: GitReader
 
-  private updatesPaused: EventEmitter<boolean> = this.dispose.track(
-    new EventEmitter<boolean>()
-  )
-
   constructor(context: ExtensionContext) {
     super()
 
@@ -130,11 +120,7 @@ export class Extension extends Disposable {
     const status = this.dispose.track(new Status(config, ...clis))
 
     this.experiments = this.dispose.track(
-      new WorkspaceExperiments(
-        this.internalCommands,
-        this.updatesPaused,
-        context.workspaceState
-      )
+      new WorkspaceExperiments(this.internalCommands, context.workspaceState)
     )
 
     this.plots = this.dispose.track(
@@ -290,20 +276,11 @@ export class Extension extends Disposable {
     this.resetMembers()
 
     await Promise.all([
-      this.repositories.create(this.getRoots(), this.updatesPaused),
+      this.repositories.create(this.getRoots()),
       this.repositoriesTree.initialize(this.getRoots()),
-      this.experiments.create(
-        this.getRoots(),
-        this.updatesPaused,
-        this.resourceLocator
-      )
+      this.experiments.create(this.getRoots(), this.resourceLocator)
     ])
-    this.plots.create(
-      this.getRoots(),
-      this.updatesPaused,
-      this.resourceLocator,
-      this.experiments
-    )
+    this.plots.create(this.getRoots(), this.resourceLocator, this.experiments)
 
     return Promise.all([
       this.repositories.isReady(),

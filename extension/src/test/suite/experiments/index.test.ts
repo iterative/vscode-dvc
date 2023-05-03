@@ -4,7 +4,6 @@ import { after, afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore, SinonStub } from 'sinon'
 import {
-  EventEmitter,
   window,
   commands,
   workspace,
@@ -1447,8 +1446,6 @@ suite('Experiments Test Suite', () => {
 
       const messageSpy = spy(BaseWebview.prototype, 'show')
 
-      const updatesPaused = disposable.track(new EventEmitter<boolean>())
-
       const resourceLocator = disposable.track(
         new ResourceLocator(extensionUri)
       )
@@ -1457,7 +1454,6 @@ suite('Experiments Test Suite', () => {
         new Experiments(
           dvcDemoPath,
           internalCommands,
-          updatesPaused,
           resourceLocator,
           buildMockMemento(),
           () => Promise.resolve(true),
@@ -1690,7 +1686,6 @@ suite('Experiments Test Suite', () => {
         new Experiments(
           'test',
           internalCommands,
-          {} as EventEmitter<boolean>,
           {} as ResourceLocator,
           mockMemento,
           () => Promise.resolve(true),
@@ -1846,7 +1841,6 @@ suite('Experiments Test Suite', () => {
         new Experiments(
           'test',
           internalCommands,
-          {} as EventEmitter<boolean>,
           {} as ResourceLocator,
           mockMemento,
           () => Promise.resolve(true),

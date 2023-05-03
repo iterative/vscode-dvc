@@ -26,13 +26,11 @@ export class PlotsData extends BaseData<{
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
-    model: PlotsModel,
-    updatesPaused: EventEmitter<boolean>
+    model: PlotsModel
   ) {
     super(
       dvcRoot,
       internalCommands,
-      updatesPaused,
       [
         {
           name: 'update',

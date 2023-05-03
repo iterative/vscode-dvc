@@ -1,4 +1,3 @@
-import { EventEmitter } from 'vscode'
 import { InternalCommands } from '../commands/internal'
 import { Disposables, reset } from '../util/disposable'
 import { quickPickOne } from '../vscode/quickPick'
@@ -17,13 +16,9 @@ export abstract class BaseWorkspace<
     this.internalCommands = internalCommands
   }
 
-  public create(
-    dvcRoots: string[],
-    updatesPaused: EventEmitter<boolean>,
-    ...args: U[]
-  ): T[] {
+  public create(dvcRoots: string[], ...args: U[]): T[] {
     const repositories = dvcRoots.map(dvcRoot =>
-      this.createRepository(dvcRoot, updatesPaused, ...args)
+      this.createRepository(dvcRoot, ...args)
     )
 
     void Promise.all(repositories.map(repository => repository.isReady())).then(
@@ -65,9 +60,5 @@ export abstract class BaseWorkspace<
     this.repositories[dvcRoot] = repository
   }
 
-  abstract createRepository(
-    dvcRoot: string,
-    updatesPaused: EventEmitter<boolean>,
-    ...args: U[]
-  ): T
+  abstract createRepository(dvcRoot: string, ...args: U[]): T
 }

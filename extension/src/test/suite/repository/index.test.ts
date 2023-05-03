@@ -41,7 +41,6 @@ suite('Repository Test Suite', () => {
         mockDataStatus,
         mockGetAllUntracked,
         mockGetHasChanges,
-        updatesPaused,
         treeDataChanged
       } = buildDependencies(disposable)
 
@@ -57,12 +56,7 @@ suite('Repository Test Suite', () => {
       mockGetHasChanges.resolves(true)
 
       const { setScmDecorationStateSpy, setScmStateSpy } =
-        await buildRepository(
-          disposable,
-          internalCommands,
-          updatesPaused,
-          treeDataChanged
-        )
+        await buildRepository(disposable, internalCommands, treeDataChanged)
 
       const modified = makeAbsPathSet(
         dvcDemoPath,
@@ -172,7 +166,6 @@ suite('Repository Test Suite', () => {
         mockGetHasChanges,
         mockNow,
         onDidChangeTreeData,
-        updatesPaused,
         treeDataChanged
       } = buildDependencies(disposable)
 
@@ -222,12 +215,7 @@ suite('Repository Test Suite', () => {
         )
 
       const { repository, setScmDecorationStateSpy, setScmStateSpy } =
-        await buildRepository(
-          disposable,
-          internalCommands,
-          updatesPaused,
-          treeDataChanged
-        )
+        await buildRepository(disposable, internalCommands, treeDataChanged)
 
       bypassProcessManagerDebounce(mockNow)
 
@@ -323,7 +311,6 @@ suite('Repository Test Suite', () => {
         mockGetHasChanges,
         mockNow,
         onDidChangeTreeData,
-        updatesPaused,
         treeDataChanged
       } = buildDependencies(disposable)
 
@@ -357,12 +344,7 @@ suite('Repository Test Suite', () => {
         setErrorDecorationStateSpy,
         setScmDecorationStateSpy,
         setScmStateSpy
-      } = await buildRepository(
-        disposable,
-        internalCommands,
-        updatesPaused,
-        treeDataChanged
-      )
+      } = await buildRepository(disposable, internalCommands, treeDataChanged)
 
       bypassProcessManagerDebounce(mockNow)
 

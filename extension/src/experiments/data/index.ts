@@ -1,5 +1,4 @@
 import { join } from 'path'
-import { EventEmitter } from 'vscode'
 import { collectFiles } from './collect'
 import {
   EXPERIMENTS_GIT_LOGS_REFS,
@@ -24,13 +23,11 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
-    updatesPaused: EventEmitter<boolean>,
     experiments: ExperimentsModel
   ) {
     super(
       dvcRoot,
       internalCommands,
-      updatesPaused,
       [{ name: 'update', process: () => this.update() }],
       ['dvc.lock', 'dvc.yaml', 'params.yaml', DOT_DVC]
     )
