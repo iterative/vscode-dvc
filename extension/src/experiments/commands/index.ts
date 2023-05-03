@@ -1,5 +1,9 @@
 import { commands } from 'vscode'
-import { AvailableCommands, InternalCommands } from '../../commands/internal'
+import {
+  AvailableCommands,
+  CommandId,
+  InternalCommands
+} from '../../commands/internal'
 import { Toast } from '../../vscode/toast'
 import { WorkspaceExperiments } from '../workspace'
 import { Setup } from '../../setup'
@@ -11,6 +15,7 @@ import {
 } from '../../vscode/config'
 import { STUDIO_URL } from '../../setup/webview/contract'
 import { RegisteredCommands } from '../../commands/external'
+import { Args } from '../../cli/constants'
 
 export const getBranchExperimentCommand =
   (experiments: WorkspaceExperiments) =>
@@ -42,7 +47,37 @@ const convertUrlTextToLink = (stdout: string) => {
   return stdout.replace(match[0], ` in [Studio](${match[1]})`)
 }
 
-export const getPushExperimentCommand =
+const runCommandWithProgress = (
+  internalCommands: InternalCommands,
+  title: string,
+  initialMessage: string,
+  commandId: CommandId,
+  cwd: string,
+  ...args: Args
+) =>
+  Toast.showProgress(title, async progress => {
+    progress.report({ increment: 0 })
+
+    progress.report({
+      increment: 25,
+      message: initialMessage
+    })
+
+    const stdout = await internalCommands.executeCommand(
+      commandId,
+      cwd,
+      ...args
+    )
+
+    progress.report({
+      increment: 75,
+      message: convertUrlTextToLink(stdout)
+    })
+
+    return Toast.delayProgressClosing(15000)
+  })
+
+export const getPushWithProgress =
   (internalCommands: InternalCommands, setup: Setup) =>
   ({ dvcRoot, ids }: { dvcRoot: string; ids: string[] }) => {
     const studioAccessToken = setup.getStudioAccessToken()
@@ -54,25 +89,30 @@ export const getPushExperimentCommand =
     ) {
       void promptToAddStudioToken()
     }
-
-    return Toast.showProgress('exp push', async progress => {
-      progress.report({ increment: 0 })
-
-      progress.report({ increment: 25, message: `Pushing ${ids.join(' ')}...` })
-
-      const remainingProgress = 75
-
-      const stdout = await internalCommands.executeCommand(
-        AvailableCommands.EXP_PUSH,
-        dvcRoot,
-        ...ids
-      )
-
-      progress.report({
-        increment: remainingProgress,
-        message: convertUrlTextToLink(stdout)
-      })
-
-      return Toast.delayProgressClosing(15000)
-    })
+    return runCommandWithProgress(
+      internalCommands,
+      'exp push',
+      'Pushing...',
+      AvailableCommands.EXP_PUSH,
+      dvcRoot,
+      ...ids
+    )
   }
+
+export const getQueueWithProgress =
+  (internalCommands: InternalCommands) =>
+  ({
+    dvcRoot,
+    paramsToModify = []
+  }: {
+    dvcRoot: string
+    paramsToModify?: string[]
+  }) =>
+    runCommandWithProgress(
+      internalCommands,
+      'exp run --queue',
+      'Queueing...',
+      AvailableCommands.EXP_QUEUE,
+      dvcRoot,
+      ...paramsToModify
+    )

@@ -1,7 +1,7 @@
 import { EventEmitter, Memento } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import { Experiments, ModifiedExperimentAndRunCommandId } from '.'
-import { getPushExperimentCommand } from './commands'
+import { getPushWithProgress, getQueueWithProgress } from './commands'
 import { TableData } from './webview/contract'
 import { Args } from '../cli/dvc/constants'
 import {
@@ -145,7 +145,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    const pushCommand = getPushExperimentCommand(this.internalCommands, setup)
+    const pushCommand = getPushWithProgress(this.internalCommands, setup)
 
     return pushCommand({ dvcRoot, ids })
   }
@@ -180,6 +180,20 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return await repository.modifyExperimentParamsAndRun(commandId, overrideId)
   }
 
+  public async queueExperiment() {
+    const cwd = await this.shouldRun()
+    if (!cwd) {
+      void Toast.showOutput(
+        Promise.resolve('Please setup a pipeline to perform this operation')
+      )
+      return
+    }
+
+    const queueWithProgress = getQueueWithProgress(this.internalCommands)
+
+    await queueWithProgress({ dvcRoot: cwd })
+  }
+
   public async modifyExperimentParamsAndQueue(
     overrideRoot?: string,
     overrideId?: string
@@ -204,7 +218,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     const cwd = await this.shouldRun()
 
     if (!cwd) {
-      return 'Could not run task'
+      return 'Please setup a pipeline to perform this operation'
     }
 
     return this.internalCommands.executeCommand(commandId, cwd)
@@ -404,6 +418,18 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
   }
 
+  public async shouldRun() {
+    const cwd = await this.getFocusedOrOnlyOrPickProject()
+    if (!cwd) {
+      return
+    }
+    const shouldContinue = await this.checkOrAddPipeline(cwd)
+    if (!shouldContinue) {
+      return
+    }
+    return cwd
+  }
+
   private async getRepositoryThenUpdate(
     method:
       | 'addFilter'
@@ -421,18 +447,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
     return this.getRepository(dvcRoot)[method]()
-  }
-
-  private async shouldRun() {
-    const cwd = await this.getFocusedOrOnlyOrPickProject()
-    if (!cwd) {
-      return
-    }
-    const shouldContinue = await this.checkOrAddPipeline(cwd)
-    if (!shouldContinue) {
-      return
-    }
-    return cwd
   }
 
   private async checkOrAddPipeline(cwd: string) {

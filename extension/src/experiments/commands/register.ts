@@ -1,4 +1,4 @@
-import { getBranchExperimentCommand, getPushExperimentCommand } from '.'
+import { getBranchExperimentCommand, getPushWithProgress } from '.'
 import { pickGarbageCollectionFlags } from '../quickPick'
 import { WorkspaceExperiments } from '../workspace'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
@@ -19,10 +19,7 @@ const registerExperimentCwdCommands = (
 ): void => {
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.QUEUE_EXPERIMENT,
-    () =>
-      experiments.pauseUpdatesThenRun(() =>
-        experiments.getCwdThenReport(AvailableCommands.EXP_QUEUE)
-      )
+    () => experiments.pauseUpdatesThenRun(() => experiments.queueExperiment())
   )
 
   internalCommands.registerExternalCliCommand(
@@ -297,7 +294,7 @@ export const registerExperimentCommands = (
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_PUSH,
-    getPushExperimentCommand(internalCommands, setup)
+    getPushWithProgress(internalCommands, setup)
   )
 
   internalCommands.registerExternalCliCommand(

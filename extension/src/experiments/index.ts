@@ -29,6 +29,7 @@ import { UNSELECTED } from './model/status'
 import { starredSort } from './model/sortBy/constants'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ColumnsModel } from './columns/model'
+import { getQueueWithProgress } from './commands'
 import { ExperimentsData } from './data'
 import {
   Experiment,
@@ -47,7 +48,6 @@ import { BaseRepository } from '../webview/repository'
 import { Title } from '../vscode/title'
 import { createTypedAccumulator } from '../util/object'
 import { pickPaths } from '../path/selection/quickPick'
-import { Toast } from '../vscode/toast'
 import { ConfigKey } from '../vscode/config'
 import { checkSignalFile, pollSignalFileForProcess } from '../fileSystem'
 import { DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
@@ -483,13 +483,9 @@ export class Experiments extends BaseRepository<TableData> {
       return
     }
 
-    await Toast.showOutput(
-      this.internalCommands.executeCommand<string>(
-        AvailableCommands.EXP_QUEUE,
-        this.dvcRoot,
-        ...paramsToModify
-      )
-    )
+    const queueWithProgress = getQueueWithProgress(this.internalCommands)
+
+    await queueWithProgress({ dvcRoot: this.dvcRoot, paramsToModify })
     return this.notifyChanged()
   }
 
