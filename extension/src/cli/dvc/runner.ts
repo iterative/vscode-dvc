@@ -22,8 +22,9 @@ import {
 } from '../util'
 
 export const autoRegisteredCommands = {
-  EXPERIMENT_RESET_AND_RUN: 'runExperimentReset',
-  EXPERIMENT_RUN: 'runExperiment'
+  EXP_RESET_AND_RUN: 'runExperimentReset',
+  EXP_RUN: 'runExperiment',
+  EXP_RUN_QUEUE: 'runQueue'
 } as const
 
 export class DvcRunner extends Disposable implements ICli {
@@ -101,6 +102,10 @@ export class DvcRunner extends Disposable implements ICli {
 
   public runExperimentReset(dvcRoot: string, ...args: Args) {
     return this.runExperiment(dvcRoot, ExperimentFlag.RESET, ...args)
+  }
+
+  public runQueue(dvcRoot: string, ...args: Args) {
+    return this.runExperiment(dvcRoot, ExperimentFlag.QUEUE, ...args)
   }
 
   public async run(cwd: string, ...args: Args) {

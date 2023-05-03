@@ -71,9 +71,8 @@ describe('Experiments', () => {
     mockedExpFunc(...args)
   )
 
-  mockedInternalCommands.registerCommand(
-    AvailableCommands.EXPERIMENT_RUN,
-    (...args) => mockedRun(...args)
+  mockedInternalCommands.registerCommand(AvailableCommands.EXP_RUN, (...args) =>
+    mockedRun(...args)
   )
 
   mockedInternalCommands.registerCommand(AvailableCommands.STAGE_LIST, () =>

@@ -48,7 +48,7 @@ const registerExperimentCwdCommands = (
 
   const modifyExperimentParamsAndRun = () =>
     experiments.pauseUpdatesThenRun(() =>
-      experiments.modifyExperimentParamsAndRun(AvailableCommands.EXPERIMENT_RUN)
+      experiments.modifyExperimentParamsAndRun(AvailableCommands.EXP_RUN)
     )
 
   internalCommands.registerExternalCliCommand(
@@ -67,7 +67,7 @@ const registerExperimentCwdCommands = (
   }: ExperimentDetails) =>
     experiments.pauseUpdatesThenRun(() =>
       experiments.modifyExperimentParamsAndRun(
-        AvailableCommands.EXPERIMENT_RUN,
+        AvailableCommands.EXP_RUN,
         dvcRoot,
         id
       )
@@ -88,7 +88,7 @@ const registerExperimentCwdCommands = (
     () =>
       experiments.pauseUpdatesThenRun(() =>
         experiments.modifyExperimentParamsAndRun(
-          AvailableCommands.EXPERIMENT_RESET_AND_RUN
+          AvailableCommands.EXP_RESET_AND_RUN
         )
       )
   )
@@ -98,7 +98,7 @@ const registerExperimentCwdCommands = (
     ({ dvcRoot, id }: ExperimentDetails) =>
       experiments.pauseUpdatesThenRun(() =>
         experiments.modifyExperimentParamsAndRun(
-          AvailableCommands.EXPERIMENT_RESET_AND_RUN,
+          AvailableCommands.EXP_RESET_AND_RUN,
           dvcRoot,
           id
         )
@@ -240,19 +240,19 @@ const registerExperimentRunCommands = (
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_RUN,
     showSetupOrExecuteCommand(setup, () =>
-      experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RUN)
+      experiments.getCwdThenRun(AvailableCommands.EXP_RUN)
     )
   )
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_RESUME,
-    () => experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RUN)
+    () => experiments.getCwdThenRun(AvailableCommands.EXP_RUN)
   )
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_RESET_AND_RUN,
     showSetupOrExecuteCommand(setup, () =>
-      experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RESET_AND_RUN)
+      experiments.getCwdThenRun(AvailableCommands.EXP_RESET_AND_RUN)
     )
   )
 

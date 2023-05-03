@@ -142,7 +142,7 @@ suite('Workspace Experiments Test Suite', () => {
       ).resolves(undefined)
 
       stub(DvcReader.prototype, 'listStages').resolves('train')
-      await workspaceExperiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RUN)
+      await workspaceExperiments.getCwdThenRun(AvailableCommands.EXP_RUN)
 
       expect(mockQuickPickOne).not.to.be.calledOnce
       expect(mockRunExperiment).to.be.calledWith(dvcDemoPath)

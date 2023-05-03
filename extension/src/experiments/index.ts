@@ -59,8 +59,8 @@ export const ExperimentsScale = {
 } as const
 
 export type ModifiedExperimentAndRunCommandId =
-  | typeof AvailableCommands.EXPERIMENT_RUN
-  | typeof AvailableCommands.EXPERIMENT_RESET_AND_RUN
+  | typeof AvailableCommands.EXP_RUN
+  | typeof AvailableCommands.EXP_RESET_AND_RUN
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeIsParamsFileFocused: Event<string | undefined>
@@ -481,6 +481,24 @@ export class Experiments extends BaseRepository<TableData> {
     const paramsToModify = await this.pickAndModifyParams(experimentId)
     if (!paramsToModify) {
       return
+    }
+
+    if (
+      paramsToModify.some(param => {
+        try {
+          JSON.parse(param)
+          return false
+        } catch {
+          return param.includes(',')
+        }
+      })
+    ) {
+      await this.internalCommands.executeCommand(
+        AvailableCommands.EXP_RUN_QUEUE,
+        this.dvcRoot,
+        ...paramsToModify
+      )
+      return this.notifyChanged()
     }
 
     await Toast.showOutput(
