@@ -3,11 +3,11 @@ import React, { MouseEvent, ReactNode } from 'react'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import { STUDIO_URL, SetupSection } from 'dvc/src/setup/webview/contract'
 import styles from './styles.module.scss'
+import { InfoTooltip } from './InfoTooltip'
 import { Icon } from '../Icon'
-import { ChevronDown, ChevronRight, Info } from '../icons'
+import { ChevronDown, ChevronRight } from '../icons'
 import { isSelecting } from '../../../util/strings'
 import { isTooltip } from '../../../util/helpers'
-import Tooltip from '../tooltip/Tooltip'
 import { IconMenu } from '../iconMenu/IconMenu'
 import { IconMenuItemProps } from '../iconMenu/IconMenuItem'
 
@@ -83,11 +83,8 @@ export interface SectionContainerProps<T extends PlotsSection | SetupSection> {
   title: string
   className?: string
   stickyHeaderTop?: number
+  isComplete?: boolean
 }
-
-const InfoIcon = () => (
-  <Icon icon={Info} width={16} height={16} className={styles.infoIcon} />
-)
 
 export const SectionContainer: React.FC<
   SectionContainerProps<PlotsSection | SetupSection>
@@ -100,16 +97,10 @@ export const SectionContainer: React.FC<
   title,
   className,
   stickyHeaderTop = 0,
-  headerChildren
+  headerChildren,
+  isComplete
 }) => {
   const open = !sectionCollapsed
-
-  const tooltipContent = (
-    <div className={styles.infoTooltip}>
-      <InfoIcon />
-      {SectionDescription[sectionKey]}
-    </div>
-  )
 
   const toggleSection = (e: MouseEvent) => {
     e.preventDefault()
@@ -137,19 +128,7 @@ export const SectionContainer: React.FC<
               className={styles.detailsIcon}
             />
             {title}
-            <Tooltip
-              content={tooltipContent}
-              placement="bottom-end"
-              interactive
-              appendTo={document.body}
-            >
-              <div
-                className={styles.infoTooltipToggle}
-                data-testid="info-tooltip-toggle"
-              >
-                <InfoIcon />
-              </div>
-            </Tooltip>
+            <InfoTooltip isComplete={isComplete} sectionKey={sectionKey} />
           </div>
 
           {headerChildren}

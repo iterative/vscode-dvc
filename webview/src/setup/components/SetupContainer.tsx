@@ -11,17 +11,20 @@ export const SetupContainer: React.FC<{
   sectionKey: SetupSection
   setSectionCollapsed: (value: typeof DEFAULT_SECTION_COLLAPSED) => void
   title: string
+  isComplete?: boolean
 }> = ({
   children,
   sectionCollapsed,
   sectionKey,
   setSectionCollapsed,
-  title
+  title,
+  isComplete
 }) => (
   <SectionContainer
     sectionCollapsed={sectionCollapsed[sectionKey]}
     sectionKey={sectionKey}
     title={title}
+    isComplete={isComplete}
     onToggleSection={() =>
       setSectionCollapsed({
         ...sectionCollapsed,

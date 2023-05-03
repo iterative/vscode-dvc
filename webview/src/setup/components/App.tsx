@@ -97,6 +97,7 @@ export const App: React.FC = () => {
         title="DVC"
         sectionCollapsed={sectionCollapsed}
         setSectionCollapsed={setSectionCollapsed}
+        isComplete={cliCompatible && projectInitialized}
       >
         <Dvc
           canGitInitialize={canGitInitialize}
@@ -115,6 +116,7 @@ export const App: React.FC = () => {
         title="Experiments"
         sectionCollapsed={sectionCollapsed}
         setSectionCollapsed={setSectionCollapsed}
+        isComplete={hasData}
       >
         <Experiments
           needsGitCommit={needsGitCommit}
