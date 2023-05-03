@@ -251,6 +251,55 @@ describe('collectDataStatus', () => {
       makeAbsPathSet(dvcDemoPath, rawDataDir)
     )
   })
+
+  it('should fill in the gaps for tracked decorations', () => {
+    const data = {
+      not_in_remote: [
+        join('static', 'uploads', 'images', '2019-12-14', 'devsprints.png')
+      ],
+      unchanged: [
+        join('static', 'uploads', 'images', '2019-09-26', 'dvc-org.png')
+      ],
+      uncommitted: {
+        added: [
+          join(
+            'static',
+            'uploads',
+            'images',
+            '2017-05-15',
+            '20190925_181739.jpg'
+          )
+        ],
+        modified: [join('static', 'uploads') + sep]
+      }
+    }
+    const collected = collectDataStatus(dvcDemoPath, data)
+
+    expect(
+      collected.trackedDecorations.has(
+        join(
+          dvcDemoPath,
+          'static',
+          'uploads',
+          'images',
+          '2019-09-26',
+          'dvc-org.png'
+        )
+      )
+    ).toBe(true)
+
+    expect(
+      collected.trackedDecorations.has(
+        join(dvcDemoPath, 'static', 'uploads', 'images')
+      )
+    ).toBe(true)
+
+    expect(
+      collected.trackedDecorations.has(
+        join(dvcDemoPath, 'static', 'uploads', 'images', '2019-09-26')
+      )
+    ).toBe(true)
+  })
 })
 
 const makeUri = (...paths: string[]): Uri =>

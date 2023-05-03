@@ -2,6 +2,43 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.4] - 2023-05-02
+
+### 🐛 Bug Fixes
+
+- Fix missing tracked decorations [#3801](https://github.com/iterative/vscode-dvc/pull/3801) by [@mattseddon](https://github.com/mattseddon)
+- Hide push option when an experiment is running [#3808](https://github.com/iterative/vscode-dvc/pull/3808) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (2.56.0) [#3805](https://github.com/iterative/vscode-dvc/pull/3805) by [@sroy3](https://github.com/sroy3)
+- WorkspaceExperiments housekeeping [#3797](https://github.com/iterative/vscode-dvc/pull/3797) by [@mattseddon](https://github.com/mattseddon)
+- Wait for config to be ready before accessing values [#3799](https://github.com/iterative/vscode-dvc/pull/3799) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.8.3] - 2023-05-01
+
+### 🚀 New Features and Enhancements
+
+- Use dvc config to store and access studio.token [#3768](https://github.com/iterative/vscode-dvc/pull/3768) by [@mattseddon](https://github.com/mattseddon)
+- Integrate remaining share experiment command with the extension (exp push) [#3781](https://github.com/iterative/vscode-dvc/pull/3781) by [@mattseddon](https://github.com/mattseddon)
+- Add multi-select versions of exp push [#3792](https://github.com/iterative/vscode-dvc/pull/3792) by [@mattseddon](https://github.com/mattseddon)
+- Add push experiment(s) to the command palette [#3793](https://github.com/iterative/vscode-dvc/pull/3793) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Ensure duplicate colors are not made available during collection [#3780](https://github.com/iterative/vscode-dvc/pull/3780) by [@mattseddon](https://github.com/mattseddon)
+- Add GIT_TERMINAL_PROMPT=0 to DVC environment variables [#3779](https://github.com/iterative/vscode-dvc/pull/3779) by [@mattseddon](https://github.com/mattseddon)
+- Fix available revisions for multi view plots [#3774](https://github.com/iterative/vscode-dvc/pull/3774) by [@sroy3](https://github.com/sroy3)
+- Display progress errors to users [#3791](https://github.com/iterative/vscode-dvc/pull/3791) by [@mattseddon](https://github.com/mattseddon)
+- Fix dvc details version incorrectly showing "Not Found"  [#3787](https://github.com/iterative/vscode-dvc/pull/3787) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Use exp push to share experiments to Studio [#3701](https://github.com/iterative/vscode-dvc/pull/3701) by [@mattseddon](https://github.com/mattseddon)
+- Remove commit and share and share as branch options [#3771](https://github.com/iterative/vscode-dvc/pull/3771) by [@mattseddon](https://github.com/mattseddon)
+- Stub dvc config calls in integration tests [#3777](https://github.com/iterative/vscode-dvc/pull/3777) by [@mattseddon](https://github.com/mattseddon)
+- Rename exp commands to closer match CLI [#3778](https://github.com/iterative/vscode-dvc/pull/3778) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.8.2] - 2023-04-27
 
 ### 🚀 New Features and Enhancements

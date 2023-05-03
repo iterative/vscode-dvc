@@ -374,7 +374,8 @@ export class Setup
     return this.sendDataToWebview()
   }
 
-  public getDvcCliDetails(): DvcCliDetails {
+  private async getDvcCliDetails(): Promise<DvcCliDetails> {
+    await this.config.isReady()
     const dvcPath = this.config.getCliPath()
     const pythonBinPath = this.config.getPythonBinPath()
     const cwd = getFirstWorkspaceFolder()
@@ -389,18 +390,14 @@ export class Setup
     }
   }
 
-  private isDVCBeingUsedGlobally() {
-    const dvcPath = this.config.getCliPath()
-    const pythonBinPath = this.config.getPythonBinPath()
-
-    return dvcPath || !pythonBinPath
-  }
-
   private async sendDataToWebview() {
     const projectInitialized = this.hasRoots()
     const hasData = this.getHasData()
 
-    const isPythonExtensionUsed = await this.isPythonExtensionUsed()
+    const [isPythonExtensionUsed, dvcCliDetails] = await Promise.all([
+      this.isPythonExtensionUsed(),
+      this.getDvcCliDetails()
+    ])
 
     const needsGitInitialized =
       !projectInitialized && !!(await this.needsGitInit())
@@ -415,10 +412,9 @@ export class Setup
     this.webviewMessages.sendWebviewMessage({
       canGitInitialize,
       cliCompatible: this.getCliCompatible(),
-      dvcCliDetails: this.getDvcCliDetails(),
+      dvcCliDetails,
       hasData,
-      isPythonExtensionUsed:
-        !this.isDVCBeingUsedGlobally() && isPythonExtensionUsed,
+      isPythonExtensionUsed,
       isStudioConnected: this.studioIsConnected,
       needsGitCommit,
       needsGitInitialized,
