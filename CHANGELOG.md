@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.5] - 2023-05-03
+
+### 🚀 New Features and Enhancements
+
+- Simplify DVC CLI Location/Version Logic [#3784](https://github.com/iterative/vscode-dvc/pull/3784) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Add stylelint to precommit hook [#3807](https://github.com/iterative/vscode-dvc/pull/3807) by [@julieg18](https://github.com/julieg18)
+
 ## [0.8.4] - 2023-05-02
 
 ### 🐛 Bug Fixes
