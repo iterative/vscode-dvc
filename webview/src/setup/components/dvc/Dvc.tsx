@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { DvcCliDetails, SetupSection } from 'dvc/src/setup/webview/contract'
+import {
+  DvcCliDetails,
+  SetupSection,
+  SectionCollapsed
+} from 'dvc/src/setup/webview/contract'
 import { DvcEnvDetails } from './DvcEnvDetails'
 import { CliIncompatible } from './CliIncompatible'
 import { ProjectUninitialized } from './ProjectUninitialized'
@@ -22,7 +26,7 @@ export type DvcProps = {
   needsGitInitialized: boolean | undefined
   projectInitialized: boolean
   pythonBinPath: string | undefined
-  closeSection: (section: SetupSection) => void
+  setSectionCollapsed: (sectionCollapsed: SectionCollapsed) => void
   hasReceivedMessageFromVsCode: boolean
 }
 
@@ -35,7 +39,7 @@ export const Dvc: React.FC<DvcProps> = ({
   projectInitialized,
   pythonBinPath,
   hasReceivedMessageFromVsCode,
-  closeSection
+  setSectionCollapsed
 }) => {
   const [isComplete, setIsComplete] = useState<boolean | undefined>(undefined)
 
@@ -51,9 +55,13 @@ export const Dvc: React.FC<DvcProps> = ({
 
   useEffect(() => {
     if (isComplete && previousIsComplete === false) {
-      closeSection(SetupSection.DVC)
+      setSectionCollapsed({
+        [SetupSection.DVC]: false,
+        [SetupSection.EXPERIMENTS]: true,
+        [SetupSection.STUDIO]: true
+      })
     }
-  }, [isComplete, previousIsComplete, closeSection])
+  }, [isComplete, previousIsComplete, setSectionCollapsed])
 
   const children = dvcCliDetails && (
     <DvcEnvDetails

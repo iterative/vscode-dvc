@@ -8,6 +8,9 @@ import { CodeBlock } from '../../shared/components/codeBlock/CodeBlock'
 import { CodeSlider } from '../../shared/components/codeSlider/CodeSlider'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 
+// 1. experiment section hanges (dvclive???)
+// 2. leaning toward maybe opening experiments but don't autoclose?
+
 export const NoData: React.FC = () => {
   return (
     <EmptyState isFullScreen={false}>

@@ -114,7 +114,7 @@ export const App: React.FC = () => {
           needsGitInitialized={needsGitInitialized}
           projectInitialized={projectInitialized}
           pythonBinPath={pythonBinPath}
-          closeSection={closeSection}
+          setSectionCollapsed={setSectionCollapsed}
           hasReceivedMessageFromVsCode={hasReceivedMessageFromVsCode}
         />
       </SetupContainer>
