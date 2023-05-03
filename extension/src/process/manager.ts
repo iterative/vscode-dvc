@@ -1,4 +1,3 @@
-import { EventEmitter } from 'vscode'
 import { getCurrentEpoch } from '../util/time'
 import { Disposable } from '../class/dispose'
 
@@ -10,12 +9,10 @@ export class ProcessManager extends Disposable {
     { process: () => Promise<unknown>; lastStarted?: number }
   > = {}
 
-  private paused = false
   private queued = new Set<string>()
   private locked = new Set<string>()
 
   constructor(
-    processesPaused: EventEmitter<boolean>,
     ...processes: { name: string; process: () => Promise<unknown> }[]
   ) {
     super()
@@ -23,17 +20,6 @@ export class ProcessManager extends Disposable {
     for (const { name, process } of processes) {
       this.processes[name] = { process }
     }
-
-    const onDidPauseProcesses = processesPaused.event
-
-    this.dispose.track(
-      onDidPauseProcesses(paused => {
-        this.paused = paused
-        if (!this.paused) {
-          return this.runQueued()
-        }
-      })
-    )
   }
 
   public async run(name: string): Promise<void> {
@@ -44,7 +30,7 @@ export class ProcessManager extends Disposable {
       return
     }
 
-    if (this.anyOngoing() || this.paused) {
+    if (this.anyOngoing()) {
       return this.queue(name)
     }
 

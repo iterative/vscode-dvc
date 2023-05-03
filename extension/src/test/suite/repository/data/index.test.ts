@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore, spy, stub } from 'sinon'
-import { EventEmitter } from 'vscode'
 import { buildRepositoryData } from '../util'
 import { dvcDemoPath } from '../../../util'
 import { fireWatcher } from '../../../../fileSystem/watcher'
@@ -51,14 +50,10 @@ suite('Repository Data Test Suite', () => {
       }
 
       const data = disposable.track(
-        new RepositoryData(
-          dvcDemoPath,
-          {
-            dispose: stub(),
-            executeCommand: mockExecuteCommand
-          } as unknown as InternalCommands,
-          disposable.track(new EventEmitter())
-        )
+        new RepositoryData(dvcDemoPath, {
+          dispose: stub(),
+          executeCommand: mockExecuteCommand
+        } as unknown as InternalCommands)
       )
       await data.isReady()
 

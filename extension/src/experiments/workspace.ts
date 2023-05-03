@@ -59,22 +59,17 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     new EventEmitter<void>()
   )
 
-  public readonly updatesPaused: EventEmitter<boolean>
-
   private readonly checkpointsChanged: EventEmitter<void>
 
   private focusedParamsDvcRoot: string | undefined
 
   constructor(
     internalCommands: InternalCommands,
-    updatesPaused: EventEmitter<boolean>,
     workspaceState: Memento,
     experiments?: Record<string, Experiments>,
     checkpointsChanged?: EventEmitter<void>
   ) {
     super(internalCommands, workspaceState, experiments)
-
-    this.updatesPaused = updatesPaused
 
     this.checkpointsChanged = this.dispose.track(
       checkpointsChanged || new EventEmitter()
@@ -210,12 +205,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.internalCommands.executeCommand(commandId, cwd)
   }
 
-  public async pauseUpdatesThenRun(func: () => Promise<void> | undefined) {
-    this.updatesPaused.fire(true)
-    await func()
-    this.updatesPaused.fire(false)
-  }
-
   public getCwdThenReport(commandId: CommandId) {
     return Toast.showOutput(this.getCwdThenRun(commandId))
   }
@@ -293,16 +282,11 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
   }
 
-  public createRepository(
-    dvcRoot: string,
-    updatesPaused: EventEmitter<boolean>,
-    resourceLocator: ResourceLocator
-  ) {
+  public createRepository(dvcRoot: string, resourceLocator: ResourceLocator) {
     const experiments = this.dispose.track(
       new Experiments(
         dvcRoot,
         this.internalCommands,
-        updatesPaused,
         resourceLocator,
         this.workspaceState,
         () => this.checkOrAddPipeline(dvcRoot),

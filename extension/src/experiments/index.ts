@@ -111,7 +111,6 @@ export class Experiments extends BaseRepository<TableData> {
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
-    updatesPaused: EventEmitter<boolean>,
     resourceLocator: ResourceLocator,
     workspaceState: Memento,
     addStage: () => Promise<boolean>,
@@ -150,13 +149,7 @@ export class Experiments extends BaseRepository<TableData> {
     )
 
     this.data = this.dispose.track(
-      data ||
-        new ExperimentsData(
-          dvcRoot,
-          internalCommands,
-          updatesPaused,
-          this.experiments
-        )
+      data || new ExperimentsData(dvcRoot, internalCommands, this.experiments)
     )
 
     this.dispose.track(this.data.onDidUpdate(data => this.setState(data)))

@@ -279,7 +279,6 @@ suite('Experiments Filter By Tree Test Suite', () => {
       const workspaceExperiments = disposable.track(
         new WorkspaceExperiments(
           internalCommands,
-          disposable.track(new EventEmitter()),
           buildMockMemento(),
           { [dvcDemoPath]: experiments },
           disposable.track(new EventEmitter())

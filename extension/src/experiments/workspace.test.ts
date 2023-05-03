@@ -85,11 +85,8 @@ describe('Experiments', () => {
     () => mockedGetBranches()
   )
 
-  const mockedUpdatesPaused = buildMockedEventEmitter<boolean>()
-
   const workspaceExperiments = new WorkspaceExperiments(
     mockedInternalCommands,
-    mockedUpdatesPaused,
     buildMockMemento(),
     {
       '/my/dvc/root': {
@@ -134,19 +131,6 @@ describe('Experiments', () => {
       await workspaceExperiments.getCwdThenReport(mockedCommandId)
 
       expect(mockedExpFunc).not.toHaveBeenCalled()
-    })
-  })
-
-  describe('pauseUpdatesThenRun', () => {
-    it('should pause updates, run the function and then flush the queue', async () => {
-      const mockedFunc = jest.fn()
-
-      await workspaceExperiments.pauseUpdatesThenRun(mockedFunc)
-
-      expect(mockedUpdatesPaused.fire).toHaveBeenCalledTimes(2)
-      expect(mockedUpdatesPaused.fire).toHaveBeenCalledWith(true)
-      expect(mockedUpdatesPaused.fire).toHaveBeenLastCalledWith(false)
-      expect(mockedFunc).toHaveBeenCalledTimes(1)
     })
   })
 
