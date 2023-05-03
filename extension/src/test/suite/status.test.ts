@@ -35,7 +35,7 @@ suite('Status Test Suite', () => {
     const waitingText = '$(circle-large-outline) DVC (Global)'
 
     const setupShowCommand = {
-      command: RegisteredCommands.SETUP_SHOW_DVC,
+      command: RegisteredCommands.SETUP_SHOW,
       title: Title.SHOW_SETUP
     }
 
@@ -123,7 +123,10 @@ suite('Status Test Suite', () => {
       await status.setAvailability(false)
 
       expect(mockStatusBarItem.text).to.equal(disabledText)
-      expect(mockStatusBarItem.command).to.deep.equal(setupShowCommand)
+      expect(mockStatusBarItem.command).to.deep.equal({
+        command: RegisteredCommands.SETUP_SHOW_DVC,
+        title: Title.SHOW_SETUP
+      })
     })
 
     it('should floor the number of workers at 0', async () => {

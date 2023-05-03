@@ -91,6 +91,13 @@ export class Status extends Disposable {
       return
     }
 
+    if (this.available) {
+      return {
+        command: RegisteredCommands.SETUP_SHOW,
+        title: Title.SHOW_SETUP
+      }
+    }
+
     return {
       command: RegisteredCommands.SETUP_SHOW_DVC,
       title: Title.SHOW_SETUP
