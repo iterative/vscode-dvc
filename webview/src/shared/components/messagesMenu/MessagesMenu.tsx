@@ -7,12 +7,10 @@ import {
 
 export interface MessagesMenuProps {
   options: MessagesMenuOptionProps[]
-  hideOnClick: (() => void) | undefined
   onOptionSelected?: () => void
 }
 
 export const MessagesMenu: React.FC<MessagesMenuProps> = ({
-  hideOnClick,
   options,
   onOptionSelected
 }) => (
@@ -20,7 +18,6 @@ export const MessagesMenu: React.FC<MessagesMenuProps> = ({
     {options.map(option => (
       <MessagesMenuOption
         key={option.label}
-        hideOnClick={hideOnClick}
         {...option}
         onOptionSelected={onOptionSelected}
       />

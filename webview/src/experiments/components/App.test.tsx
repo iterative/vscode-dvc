@@ -940,6 +940,21 @@ describe('App', () => {
       expect(screen.queryByRole('menuitem')).not.toBeInTheDocument()
     })
 
+    it('should be removed with a left click on a different row', () => {
+      renderTableWithoutRunningExperiments()
+
+      const row = getRow('4fb124a')
+      fireEvent.contextMenu(row, { bubbles: true })
+
+      advanceTimersByTime(100)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(10)
+
+      const commit = getRow('main')
+      fireEvent.click(commit, { bubbles: true })
+      advanceTimersByTime(100)
+      expect(screen.queryByRole('menuitem')).not.toBeInTheDocument()
+    })
+
     it('should be moved with a right click on the same row (not toggle)', () => {
       renderTableWithoutRunningExperiments()
 

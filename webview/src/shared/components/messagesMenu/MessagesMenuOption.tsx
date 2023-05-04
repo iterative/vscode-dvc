@@ -7,7 +7,6 @@ import { sendMessage } from '../../vscode'
 
 export interface MessagesMenuOptionProps {
   id: string
-  hideOnClick?: () => void
   label: string
   message?: MessageFromWebview
   disabled?: boolean
@@ -20,7 +19,6 @@ export const MessagesMenuOption: React.FC<
 > = ({
   label,
   message,
-  hideOnClick,
   disabled,
   divider,
   onOptionSelected,
@@ -32,7 +30,6 @@ export const MessagesMenuOption: React.FC<
     }
     !!message && sendMessage(message)
     onOptionSelected?.()
-    hideOnClick?.()
   }
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) =>

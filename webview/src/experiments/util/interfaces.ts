@@ -9,7 +9,6 @@ export interface RowProp {
   row: Row<Experiment>
   hasRunningExperiment?: boolean
   projectHasCheckpoints?: boolean
-  hideOnClick?: () => void
 }
 
 export interface CellProp {

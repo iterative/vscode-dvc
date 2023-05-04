@@ -6,7 +6,7 @@
 
 .item {
   display: flex;
-  cursor: pointer;
+  cursor: default;
   height: 24px;
   padding: 2px 6px;
 
@@ -27,7 +27,7 @@
 
 .disabledItem {
   opacity: $disabled-opacity;
-  cursor: pointer;
+  cursor: default;
 
   &:hover {
     background-color: $bg-color;

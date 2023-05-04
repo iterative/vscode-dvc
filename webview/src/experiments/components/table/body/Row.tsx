@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import React, { useCallback, useContext, useMemo, useState } from 'react'
+import React, { useCallback, useContext, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { isQueued, isRunning } from 'dvc/src/experiments/webview/contract'
@@ -72,10 +72,6 @@ export const RowContent: React.FC<
   const unselected = selected === false
   const isOdd = index % 2 !== 0 && !isRowSelected
 
-  const [hideOnClick, setHideOnClick] = useState<(() => void) | undefined>(
-    undefined
-  )
-
   return (
     <ContextMenu
       content={
@@ -83,13 +79,10 @@ export const RowContent: React.FC<
           row={row}
           projectHasCheckpoints={projectHasCheckpoints}
           hasRunningExperiment={hasRunningExperiment}
-          hideOnClick={hideOnClick}
         />
       }
-      setHideOnClick={setHideOnClick}
     >
       <tr
-        onClick={() => hideOnClick?.()}
         className={cx(
           className,
           styles.experimentsTr,

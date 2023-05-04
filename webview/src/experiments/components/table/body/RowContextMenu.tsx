@@ -289,8 +289,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
   row: {
     original: { status, starred, id, executor },
     depth
-  },
-  hideOnClick
+  }
 }) => {
   const { selectedRows, clearSelectedRows } = useContext(RowSelectionContext)
 
@@ -323,7 +322,6 @@ export const RowContextMenu: React.FC<RowProp> = ({
   return (
     (contextMenuOptions.length > 0 && (
       <MessagesMenu
-        hideOnClick={hideOnClick}
         options={contextMenuOptions}
         onOptionSelected={() => clearSelectedRows?.()}
       />
