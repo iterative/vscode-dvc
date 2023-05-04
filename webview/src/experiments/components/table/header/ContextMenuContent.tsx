@@ -32,7 +32,7 @@ const sortOption = (
   isSortable: boolean
 ) => {
   const sortOrder = currentSort
-  const disabled = sortOrder === label
+  const disabled = !isSortable || sortOrder === label
   const descending = label === SortOrder.DESCENDING
   const path = columnId
   const removeSortMessage = {
@@ -52,7 +52,7 @@ const sortOption = (
         }
 
   return {
-    disabled: !isSortable || disabled,
+    disabled,
     id: label,
     label,
     message

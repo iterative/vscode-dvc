@@ -27,6 +27,7 @@
 
 .disabledItem {
   opacity: $disabled-opacity;
+  cursor: pointer;
 
   &:hover {
     background-color: $bg-color;

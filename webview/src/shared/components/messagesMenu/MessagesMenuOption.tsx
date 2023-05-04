@@ -46,6 +46,7 @@ export const MessagesMenuOption: React.FC<
         </div>
       )}
       <div
+        aria-disabled={disabled}
         className={cx(styles.item, disabled && styles.disabledItem)}
         onClick={sendTheMessage}
         onKeyDown={onKeyDown}
@@ -54,7 +55,7 @@ export const MessagesMenuOption: React.FC<
         tabIndex={0}
       >
         <div
-          className={cx(styles.itemLabel)}
+          className={styles.itemLabel}
           data-testid="messages-menu-option-label"
         >
           {label}

@@ -19,6 +19,8 @@ export const clickAndEnterProps: <T>(
       isSelecting(textsForSelection) ||
       (checkForTooltip && isTooltip(e.target as HTMLElement, ['BODY']))
     ) {
+      e.preventDefault()
+      e.stopPropagation()
       return
     }
 
