@@ -119,7 +119,7 @@ export const App: React.FC = () => {
         title="Experiments"
         sectionCollapsed={sectionCollapsed}
         setSectionCollapsed={setSectionCollapsed}
-        isComplete={hasData}
+        isComplete={!!hasData}
         hasError={!isDvcSetup}
       >
         <Experiments
