@@ -31,7 +31,7 @@ export const sortOption = (
   columnId: string
 ) => {
   const sortOrder = currentSort
-  const hidden = sortOrder === label
+  const disabled = sortOrder === label
   const descending = label === SortOrder.DESCENDING
   const path = columnId
   const removeSortMessage = {
@@ -51,7 +51,7 @@ export const sortOption = (
         }
 
   return {
-    hidden,
+    disabled,
     id: label,
     label,
     message
@@ -66,7 +66,6 @@ export interface HeaderMenuProps {
 export interface HeaderMenuDescription {
   menuOptions: MessagesMenuOptionProps[]
   sortOptions: MessagesMenuOptionProps[]
-  menuEnabled: boolean
 }
 
 export const getSortOptions = (
@@ -106,7 +105,7 @@ export const getMenuOptions = (
   const leafColumn = header.column
   const menuOptions: MessagesMenuOptionProps[] = [
     {
-      hidden: isFromExperimentColumn(header),
+      disabled: isFromExperimentColumn(header),
       id: 'hide-column',
       label: 'Hide Column',
       message: {
@@ -115,7 +114,7 @@ export const getMenuOptions = (
       }
     },
     {
-      hidden:
+      disabled:
         (header.column.columnDef as ColumnWithGroup).group !==
         ColumnType.PARAMS,
       id: 'open-to-the-side',
@@ -135,10 +134,8 @@ export const getMenuOptions = (
   ]
 
   const { isSortable, sortOptions, sortOrder } = getSortOptions(header, sorts)
-  const visibleOptions = menuOptions.filter(option => !option.hidden).length
-  const menuEnabled = isSortable || visibleOptions > 0
 
-  return { isSortable, menuEnabled, menuOptions, sortOptions, sortOrder }
+  return { isSortable, menuOptions, sortOptions, sortOrder }
 }
 
 export const ContextMenuContent: React.FC<HeaderMenuProps> = ({

@@ -10,7 +10,7 @@ export interface MessagesMenuOptionProps {
   hideOnClick?: () => void
   label: string
   message?: MessageFromWebview
-  hidden?: boolean
+  disabled?: boolean
   divider?: boolean
   keyboardShortcut?: string
 }
@@ -21,13 +21,13 @@ export const MessagesMenuOption: React.FC<
   label,
   message,
   hideOnClick,
-  hidden,
+  disabled,
   divider,
   onOptionSelected,
   keyboardShortcut
 }) => {
   const sendTheMessage = () => {
-    if (hidden) {
+    if (disabled) {
       return
     }
     !!message && sendMessage(message)
@@ -46,7 +46,7 @@ export const MessagesMenuOption: React.FC<
         </div>
       )}
       <div
-        className={cx(styles.item, hidden && styles.disabled)}
+        className={cx(styles.item, disabled && styles.disabledItem)}
         onClick={sendTheMessage}
         onKeyDown={onKeyDown}
         role="menuitem"

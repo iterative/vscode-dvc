@@ -113,7 +113,7 @@ export const TableHeaderCell: React.FC<{
   )
   const { sorts } = useSelector((state: ExperimentsState) => state.tableData)
 
-  const { menuEnabled, isSortable, sortOrder } = useMemo(() => {
+  const { isSortable, sortOrder } = useMemo(() => {
     return getMenuOptions(header, sorts)
   }, [header, sorts])
   const isDraggable = !isPlaceholder && !isExperimentColumn(id)
@@ -154,7 +154,7 @@ export const TableHeaderCell: React.FC<{
   return (
     <ContextMenu
       content={menuContent}
-      disabled={!menuEnabled || menuSuppressed}
+      disabled={menuSuppressed}
       trigger="contextmenu"
       setHideOnClick={setHideOnClick}
     >
