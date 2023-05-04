@@ -163,6 +163,7 @@ const addCommitData = (
   }
   baseline.description = formatCommitMessage(commit.message)
   baseline.commit = commit
+  baseline.branch = 'a'
 }
 
 const collectExpState = (
@@ -170,7 +171,7 @@ const collectExpState = (
   expState: ExpState,
   commitData: { [sha: string]: CommitData }
 ): Experiment | undefined => {
-  const { rev, name } = expState
+  const { rev, name, branch } = expState
   const label =
     rev === EXPERIMENT_WORKSPACE_ID
       ? EXPERIMENT_WORKSPACE_ID
@@ -180,6 +181,7 @@ const collectExpState = (
   const experiment: Experiment = { id, label }
 
   const baseline = transformExpState(experiment, expState)
+  baseline.branch = branch
 
   if (rev === EXPERIMENT_WORKSPACE_ID && !name) {
     acc.workspace = baseline

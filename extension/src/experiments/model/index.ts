@@ -53,7 +53,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   private availableColors: Color[]
   private coloredStatus: ColoredStatus
   private starredExperiments: StarredExperiments
-  private numberOfCommitsToShow: number
+  private numberOfCommitsToShow: Record<string, number>
   private isBranchesView: boolean
   private branchesToShow: string[] = []
   private availableBranchesToShow: string[] = []
@@ -85,9 +85,9 @@ export class ExperimentsModel extends ModelWithPersistence {
       PersistenceKey.EXPERIMENTS_STARS,
       {}
     )
-    this.numberOfCommitsToShow = this.revive<number>(
+    this.numberOfCommitsToShow = this.revive<Record<string, number>>(
       PersistenceKey.NUMBER_OF_COMMITS_TO_SHOW,
-      DEFAULT_NUM_OF_COMMITS_TO_SHOW
+      {}
     )
 
     this.branchesToShow = this.revive<string[]>(
@@ -382,12 +382,17 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.finishedRunning
   }
 
-  public setNbfCommitsToShow(numberOfCommitsToShow: number) {
-    this.numberOfCommitsToShow = numberOfCommitsToShow
+  public setNbfCommitsToShow(numberOfCommitsToShow: number, branch: string) {
+    this.numberOfCommitsToShow[branch] = numberOfCommitsToShow
+    debugger
     this.persistNbOfCommitsToShow()
   }
 
-  public getNbOfCommitsToShow() {
+  public getNbOfCommitsToShow(branch: string) {
+    return this.numberOfCommitsToShow[branch] || DEFAULT_NUM_OF_COMMITS_TO_SHOW
+  }
+
+  public getAllNbOfCommitsToShow() {
     return this.numberOfCommitsToShow
   }
 

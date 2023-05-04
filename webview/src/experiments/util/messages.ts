@@ -15,13 +15,15 @@ export const addStarredFilter = () =>
     type: MessageFromWebviewType.ADD_STARRED_EXPERIMENT_FILTER
   })
 
-export const showMoreCommits = () =>
+export const showMoreCommits = (branch: string) =>
   sendMessage({
+    payload: branch,
     type: MessageFromWebviewType.SHOW_MORE_COMMITS
   })
 
-export const showLessCommits = () =>
+export const showLessCommits = (branch: string) =>
   sendMessage({
+    payload: branch,
     type: MessageFromWebviewType.SHOW_LESS_COMMITS
   })
 

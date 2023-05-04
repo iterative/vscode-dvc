@@ -99,10 +99,10 @@ export type TableData = {
   hasCheckpoints: boolean
   hasColumns: boolean
   hasConfig: boolean
-  hasMoreCommits: boolean
+  hasMoreCommits: Record<string, boolean>
   hasRunningExperiment: boolean
   hasValidDvcYaml: boolean
-  isShowingMoreCommits: boolean
+  isShowingMoreCommits: Record<string, boolean>
   isBranchesView: boolean
   rows: Commit[]
   selectedForPlotsCount: number

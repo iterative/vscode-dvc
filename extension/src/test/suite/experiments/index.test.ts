@@ -1311,11 +1311,12 @@ suite('Experiments Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
+        payload: 'main',
         type: MessageFromWebviewType.SHOW_MORE_COMMITS
       })
 
       expect(mockUpdateExperimentsData).to.be.calledOnce
-      expect(setNbfCommitsToShowSpy).to.be.calledWith(5)
+      expect(setNbfCommitsToShowSpy).to.be.calledWith(5, 'main')
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to show less commits', async () => {
@@ -1336,11 +1337,12 @@ suite('Experiments Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
+        payload: 'main',
         type: MessageFromWebviewType.SHOW_LESS_COMMITS
       })
 
       expect(mockUpdateExperimentsData).to.be.calledOnce
-      expect(setNbfCommitsToShowSpy).to.be.calledWith(1)
+      expect(setNbfCommitsToShowSpy).to.be.calledWith(1, 'main')
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to switch to branches view', async () => {

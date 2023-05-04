@@ -10,26 +10,32 @@ import {
 } from '../../../../util/messages'
 import { ExperimentsState } from '../../../../store'
 
-export const CommitsAndBranchesNavigation: React.FC = () => {
+interface CommitsAndBranchesNavigationProps {
+  branch: string
+}
+
+export const CommitsAndBranchesNavigation: React.FC<
+  CommitsAndBranchesNavigationProps
+> = ({ branch }) => {
   const { hasMoreCommits, isBranchesView, isShowingMoreCommits } = useSelector(
     (state: ExperimentsState) => state.tableData
   )
 
   return (
     <div className={styles.commitsAndBranchesNav}>
-      {hasMoreCommits && (
+      {hasMoreCommits[branch] && (
         <button
           className={styles.commitsAndBranchesNavButton}
-          onClick={showMoreCommits}
+          onClick={() => showMoreCommits(branch)}
           disabled={isBranchesView}
         >
           Show More Commits
         </button>
       )}
-      {isShowingMoreCommits && (
+      {isShowingMoreCommits[branch] && (
         <button
           className={styles.commitsAndBranchesNavButton}
-          onClick={showLessCommits}
+          onClick={() => showLessCommits(branch)}
           disabled={isBranchesView}
         >
           Show Less Commits

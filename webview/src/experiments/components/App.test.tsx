@@ -1528,19 +1528,19 @@ describe('App', () => {
 
   describe('Show more commits', () => {
     it('should display a show more commits button if the table data hasMoreCommits is set to true', () => {
-      renderTable({ ...tableDataFixture, hasMoreCommits: true })
+      renderTable({ ...tableDataFixture, hasMoreCommits: { main: true } })
 
       expect(screen.getByText('Show More Commits')).toBeInTheDocument()
     })
 
     it('should not display a show more commits button if the table data hasMoreCommits is set to false', () => {
-      renderTable({ ...tableDataFixture, hasMoreCommits: false })
+      renderTable({ ...tableDataFixture, hasMoreCommits: { main: false } })
 
       expect(screen.queryByText('Show More Commits')).not.toBeInTheDocument()
     })
 
     it('should send a message to show more commits when the show more commits button is clicked', () => {
-      renderTable({ ...tableDataFixture, hasMoreCommits: true })
+      renderTable({ ...tableDataFixture, hasMoreCommits: { main: true } })
 
       fireEvent.click(screen.getByText('Show More Commits'))
 
@@ -1550,19 +1550,22 @@ describe('App', () => {
     })
 
     it('should display a show less commits button if the table data isShowingMoreCommits is set to true', () => {
-      renderTable({ ...tableDataFixture, isShowingMoreCommits: true })
+      renderTable({ ...tableDataFixture, isShowingMoreCommits: { main: true } })
 
       expect(screen.getByText('Show Less Commits')).toBeInTheDocument()
     })
 
     it('should not display a show less commits button if the table data isShowingMoreCommits is set to false', () => {
-      renderTable({ ...tableDataFixture, isShowingMoreCommits: false })
+      renderTable({
+        ...tableDataFixture,
+        isShowingMoreCommits: { main: false }
+      })
 
       expect(screen.queryByText('Show Less Commits')).not.toBeInTheDocument()
     })
 
     it('should send a message to show less commits when the show less commits button is clicked', () => {
-      renderTable({ ...tableDataFixture, isShowingMoreCommits: true })
+      renderTable({ ...tableDataFixture, isShowingMoreCommits: { main: true } })
 
       fireEvent.click(screen.getByText('Show Less Commits'))
 

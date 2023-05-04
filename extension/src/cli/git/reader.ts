@@ -80,18 +80,13 @@ export class GitReader extends GitCli {
     return new Set([...files, ...dirs])
   }
 
-  public async getNumCommits(cwd: string) {
-    const options = getOptions(
-      cwd,
-      Command.REV_LIST,
-      Flag.FULL_HISTORY,
-      Flag.ALL
-    )
+  public async getNumCommits(cwd: string, branch: string) {
+    const options = getOptions(cwd, Command.REV_LIST, Flag.COUNT, branch)
     try {
-      const revisions = await this.executeProcess(options)
-      return trimAndSplit(revisions).length
+      const nbCommits = await this.executeProcess(options)
+      return Number.parseInt(nbCommits)
     } catch {
-      return ''
+      return 0
     }
   }
 
@@ -99,6 +94,7 @@ export class GitReader extends GitCli {
     const options = getOptions(cwd, Command.BRANCH, Flag.NO_MERGE)
     try {
       const branches = await this.executeProcess(options)
+      const test = trimAndSplit(branches)
       return trimAndSplit(branches)
     } catch {
       return []

@@ -578,10 +578,11 @@ export class Experiments extends BaseRepository<TableData> {
         ),
       () => this.addStage(),
       (branchesSelected: string[]) => this.selectBranches(branchesSelected),
-      () =>
+      (branch: string) =>
         this.internalCommands.executeCommand<number>(
           AvailableCommands.GIT_GET_NUM_COMMITS,
-          this.dvcRoot
+          this.dvcRoot,
+          branch
         ),
       () => this.data.update()
     )

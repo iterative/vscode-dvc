@@ -26,11 +26,11 @@ export const tableDataInitialState: TableDataState = {
   hasColumns: false,
   hasConfig: false,
   hasData: false,
-  hasMoreCommits: false,
+  hasMoreCommits: {},
   hasRunningExperiment: false,
   hasValidDvcYaml: true,
   isBranchesView: false,
-  isShowingMoreCommits: true,
+  isShowingMoreCommits: {},
   rows: [],
   selectedForPlotsCount: 0,
   sorts: []
@@ -85,8 +85,14 @@ export const tableDataSlice = createSlice({
     updateHasConfig: (state, action: PayloadAction<boolean>) => {
       state.hasConfig = action.payload
     },
-    updateHasMoreCommits: (state, action: PayloadAction<boolean>) => {
-      state.hasMoreCommits = action.payload
+    updateHasMoreCommits: (
+      state,
+      action: PayloadAction<Record<string, boolean>>
+    ) => {
+      state.hasMoreCommits = keepReferenceIfEqual(
+        state.hasMoreCommits,
+        action.payload
+      ) as Record<string, boolean>
     },
     updateHasRunningExperiment: (state, action: PayloadAction<boolean>) => {
       state.hasRunningExperiment = action.payload
@@ -97,8 +103,14 @@ export const tableDataSlice = createSlice({
     updateIsBranchesView: (state, action: PayloadAction<boolean>) => {
       state.isBranchesView = action.payload
     },
-    updateIsShowingMoreCommits: (state, action: PayloadAction<boolean>) => {
-      state.isShowingMoreCommits = action.payload
+    updateIsShowingMoreCommits: (
+      state,
+      action: PayloadAction<Record<string, boolean>>
+    ) => {
+      state.isShowingMoreCommits = keepReferenceIfEqual(
+        state.isShowingMoreCommits,
+        action.payload
+      ) as Record<string, boolean>
     },
     updateRows: (state, action: PayloadAction<Experiment[]>) => {
       state.rows = keepEqualOldReferencesInArray(

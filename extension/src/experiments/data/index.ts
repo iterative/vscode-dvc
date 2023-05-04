@@ -46,18 +46,42 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
     return this.processManager.run('update')
   }
 
-  public async update(): Promise<void> {
-    const flags = this.experiments.getIsBranchesView()
-      ? [ExperimentFlag.ALL_BRANCHES]
-      : [
-          ExperimentFlag.NUM_COMMIT,
-          this.experiments.getNbOfCommitsToShow().toString()
-        ]
+  private async expShow(flags: (ExperimentFlag | string)[], branch?: string) {
+    // TODO if !branch get current branch
     const data = await this.internalCommands.executeCommand<ExpShowOutput>(
       AvailableCommands.EXP_SHOW,
       this.dvcRoot,
       ...flags
     )
+    return data.map(exp => ({ ...exp, branch }))
+  }
+
+  public async update(): Promise<void> {
+    let data: ExpShowOutput = []
+    const isBranchesView = this.experiments.getIsBranchesView()
+    const branches = this.experiments.getBranchesToShow()
+    if (isBranchesView) {
+      data = await this.expShow([ExperimentFlag.ALL_BRANCHES])
+    } else {
+      const output = []
+      for (const branch of branches) {
+        const branchFlags = [
+          ExperimentFlag.REV,
+          branch,
+          ExperimentFlag.NUM_COMMIT,
+          this.experiments.getNbOfCommitsToShow(branch).toString()
+        ]
+        output.push(
+          new Promise<void>(async resolve => {
+            const newData = await this.expShow(branchFlags, branch)
+            data.push(...newData)
+            resolve()
+          })
+        )
+      }
+
+      await Promise.all(output)
+    }
 
     this.collectFiles(data)
 
