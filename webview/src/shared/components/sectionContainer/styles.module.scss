@@ -62,7 +62,11 @@ $gap: 20px;
   fill: $passed-color;
 }
 
-.incompletedIcon {
+.incompleteIcon {
+  fill: $fg-color;
+}
+
+.errorIcon {
   fill: $error-color;
 }
 

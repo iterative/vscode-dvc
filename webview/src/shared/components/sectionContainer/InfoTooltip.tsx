@@ -25,12 +25,12 @@ const getIcon = (icon?: TooltipIconType) => {
 
   if (icon === TooltipIconType.ERROR) {
     props.icon = Error
-    props.className = cx(styles.infoIcon, styles.incompletedIcon)
+    props.className = cx(styles.infoIcon, styles.errorIcon)
   }
 
   if (icon === TooltipIconType.INCOMPLETE) {
     props.icon = Pass
-    props.className = cx(styles.infoIcon, styles.incompletedIcon)
+    props.className = cx(styles.infoIcon, styles.incompleteIcon)
   }
 
   if (icon === TooltipIconType.PASSED) {
