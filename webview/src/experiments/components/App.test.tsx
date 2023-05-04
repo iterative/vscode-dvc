@@ -729,7 +729,7 @@ describe('App', () => {
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })
 
-    it('should have the same options in the empty placeholders', () => {
+    it('should have the same enabled options in the empty placeholders', () => {
       renderTableWithPlaceholder()
       const header = screen.getByTestId('header-Created')
       const placeholders = screen.getAllByTestId(/header-Created.+placeholder/)
@@ -756,7 +756,7 @@ describe('App', () => {
       }
     })
 
-    it('should have the same options in the empty placeholders of the Experiment column', () => {
+    it('should have the same enabled options in the empty placeholders of the Experiment column', () => {
       renderTableWithPlaceholder()
       const header = screen.getByTestId('header-id')
       const placeholders = screen.getAllByTestId(/header-id.+placeholder/)
@@ -823,7 +823,7 @@ describe('App', () => {
       expect(menu).toBeDefined()
     })
 
-    it('should present the correct options for the workspace row with no checkpoints', () => {
+    it('should enable the correct options for the workspace row with no checkpoints', () => {
       renderTableWithPlaceholder()
 
       const target = screen.getByTestId('workspace-row')
@@ -856,7 +856,7 @@ describe('App', () => {
       ])
     })
 
-    it('should present the correct option for an experiment with checkpoints and close on esc', () => {
+    it('should enable the correct option for an experiment with checkpoints and close on esc', () => {
       renderTableWithoutRunningExperiments()
 
       const target = screen.getByText('[exp-e7a67]')
@@ -917,7 +917,7 @@ describe('App', () => {
       expect(screen.queryAllByRole('menuitem')).toHaveLength(10)
     })
 
-    it('should present the Remove experiment option for the checkpoint tips', () => {
+    it('should enable the Remove experiment option for the checkpoint tips', () => {
       renderTableWithoutRunningExperiments()
 
       const target = screen.getByText('4fb124a')
@@ -931,7 +931,7 @@ describe('App', () => {
       expect(itemLabels).toContain('Remove')
     })
 
-    it('should present the remove option if only experiments are selected', () => {
+    it('should enable the remove option if only experiments are selected', () => {
       renderTableWithoutRunningExperiments()
 
       clickRowCheckbox('4fb124a')
@@ -961,7 +961,7 @@ describe('App', () => {
       })
     })
 
-    it('should present the push option if only experiments are selected', () => {
+    it('should enable the push option if only experiments are selected', () => {
       renderTableWithoutRunningExperiments()
 
       clickRowCheckbox('4fb124a')
@@ -991,7 +991,7 @@ describe('App', () => {
       })
     })
 
-    it('should present the stop option if only running experiments are selected', () => {
+    it('should enable the stop option if only running experiments are selected', () => {
       renderTable()
 
       clickRowCheckbox('4fb124a')
@@ -1090,7 +1090,7 @@ describe('App', () => {
       expect(itemLabels).not.toContain('Push')
     })
 
-    it('should always present the Plots options if multiple rows are selected', () => {
+    it('should always enable the Plots options if multiple rows are selected', () => {
       renderTableWithoutRunningExperiments()
 
       clickRowCheckbox('4fb124a')
