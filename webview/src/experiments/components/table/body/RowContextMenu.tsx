@@ -140,13 +140,19 @@ const getRunResumeOptions = (
   const resetNeedsSeparator = !hideVaryAndRun && projectHasCheckpoints
   const runNeedsSeparator = !hideVaryAndRun && !projectHasCheckpoints
 
-  return [
-    hideIfRunning(
-      'Modify and Run',
-      MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN,
-      !projectHasCheckpoints,
-      resetNeedsSeparator
-    ),
+  const options = []
+  if (projectHasCheckpoints) {
+    options.push(
+      hideIfRunning(
+        'Modify and Run',
+        MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN,
+        false,
+        resetNeedsSeparator
+      )
+    )
+  }
+
+  options.push(
     hideIfRunning(
       projectHasCheckpoints ? 'Modify and Resume' : 'Modify and Run',
       MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_AND_RUN,
@@ -157,7 +163,9 @@ const getRunResumeOptions = (
       'Modify and Queue',
       MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE
     )
-  ]
+  )
+
+  return options
 }
 
 const getSingleSelectMenuOptions = (
@@ -281,7 +289,8 @@ export const RowContextMenu: React.FC<RowProp> = ({
   row: {
     original: { status, starred, id, executor },
     depth
-  }
+  },
+  hideOnClick
 }) => {
   const { selectedRows, clearSelectedRows } = useContext(RowSelectionContext)
 
@@ -314,6 +323,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
   return (
     (contextMenuOptions.length > 0 && (
       <MessagesMenu
+        hideOnClick={hideOnClick}
         options={contextMenuOptions}
         onOptionSelected={() => clearSelectedRows?.()}
       />

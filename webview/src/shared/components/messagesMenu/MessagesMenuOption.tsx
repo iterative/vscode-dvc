@@ -1,4 +1,5 @@
 import React from 'react'
+import cx from 'classnames'
 import { MessageFromWebview } from 'dvc/src/webview/contract'
 import { VSCodeDivider } from '@vscode/webview-ui-toolkit/react'
 import styles from './styles.module.scss'
@@ -6,6 +7,7 @@ import { sendMessage } from '../../vscode'
 
 export interface MessagesMenuOptionProps {
   id: string
+  hideOnClick?: () => void
   label: string
   message?: MessageFromWebview
   hidden?: boolean
@@ -15,10 +17,22 @@ export interface MessagesMenuOptionProps {
 
 export const MessagesMenuOption: React.FC<
   MessagesMenuOptionProps & { onOptionSelected?: () => void }
-> = ({ label, message, divider, onOptionSelected, keyboardShortcut }) => {
+> = ({
+  label,
+  message,
+  hideOnClick,
+  hidden,
+  divider,
+  onOptionSelected,
+  keyboardShortcut
+}) => {
   const sendTheMessage = () => {
+    if (hidden) {
+      return
+    }
     !!message && sendMessage(message)
     onOptionSelected?.()
+    hideOnClick?.()
   }
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) =>
@@ -32,7 +46,7 @@ export const MessagesMenuOption: React.FC<
         </div>
       )}
       <div
-        className={styles.item}
+        className={cx(styles.item, hidden && styles.disabled)}
         onClick={sendTheMessage}
         onKeyDown={onKeyDown}
         role="menuitem"
@@ -40,7 +54,7 @@ export const MessagesMenuOption: React.FC<
         tabIndex={0}
       >
         <div
-          className={styles.itemLabel}
+          className={cx(styles.itemLabel)}
           data-testid="messages-menu-option-label"
         >
           {label}

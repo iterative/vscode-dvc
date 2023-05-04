@@ -25,6 +25,14 @@
   text-overflow: ellipsis;
 }
 
+.disabled {
+  opacity: var(--disabled-opacity);
+
+  &:hover {
+    background-color: $bg-color;
+  }
+}
+
 .itemIcon {
   width: 13px;
 }

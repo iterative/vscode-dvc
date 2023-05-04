@@ -5,7 +5,6 @@ import { RowProp } from '../../../util/interfaces'
 
 export const NestedRow: React.FC<RowProp & BatchSelectionProp> = ({
   row,
-  contextMenuDisabled,
   projectHasCheckpoints,
   hasRunningExperiment,
   batchRowSelection
@@ -14,7 +13,6 @@ export const NestedRow: React.FC<RowProp & BatchSelectionProp> = ({
     <RowContent
       row={row}
       className={styles.nestedRow}
-      contextMenuDisabled={contextMenuDisabled}
       projectHasCheckpoints={projectHasCheckpoints}
       hasRunningExperiment={hasRunningExperiment}
       batchRowSelection={batchRowSelection}

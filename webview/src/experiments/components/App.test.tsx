@@ -742,6 +742,7 @@ describe('App', () => {
         jest.advanceTimersByTime(100)
         const menuitems = screen
           .getAllByRole('menuitem')
+          .filter(item => !item.className.includes('disabled'))
           .map(item => item.textContent)
 
         expect(menuitems).toStrictEqual([
@@ -768,6 +769,7 @@ describe('App', () => {
         jest.advanceTimersByTime(100)
         const menuitems = screen
           .getAllByRole('menuitem')
+          .filter(item => !item.className.includes('disabled'))
           .map(item => item.textContent)
 
         expect(menuitems).toStrictEqual(['Set Max Header Height'])
@@ -829,11 +831,13 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
       expect(itemLabels).toStrictEqual(['Modify and Run', 'Modify and Queue'])
     })
 
-    it('should present the correct options for the main row with checkpoints', () => {
+    it('should enable the correct options for the main row with checkpoints', () => {
       renderTableWithoutRunningExperiments()
 
       const target = screen.getByText('main')
@@ -841,7 +845,9 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
       expect(itemLabels).toStrictEqual([
         'Modify and Run',
         'Modify and Resume',
@@ -858,7 +864,9 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
       expect(itemLabels).toStrictEqual([
         'Show Logs',
         'Apply to Workspace',
@@ -885,24 +893,12 @@ describe('App', () => {
       advanceTimersByTime(100)
       expect(screen.getAllByRole('menuitem')).toHaveLength(10)
 
-      fireEvent.click(window, { bubbles: true })
+      fireEvent.click(row, {
+        bubbles: true
+      })
       advanceTimersByTime(100)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
-    })
 
-    it('should be removed with a left click on a different row', () => {
-      renderTableWithoutRunningExperiments()
-
-      const row = getRow('4fb124a')
-      fireEvent.contextMenu(row, { bubbles: true })
-
-      advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(10)
-
-      const commit = getRow('main')
-      fireEvent.click(commit, { bubbles: true })
-      advanceTimersByTime(100)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
+      expect(screen.queryByRole('menuitem')).not.toBeInTheDocument()
     })
 
     it('should be moved with a right click on the same row (not toggle)', () => {
@@ -929,7 +925,9 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
       expect(itemLabels).toContain('Remove')
     })
 
@@ -944,7 +942,9 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
       expect(itemLabels).toContain('Remove Selected')
 
       const removeOption = menuitems.find(item =>
@@ -972,7 +972,9 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
       expect(itemLabels).toContain('Push Selected')
 
       const pushOption = menuitems.find(item =>
@@ -999,7 +1001,9 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
       expect(itemLabels).toContain('Stop')
 
       const stopOption = menuitems.find(item =>
@@ -1024,7 +1028,9 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
       expect(itemLabels).toContain('Stop')
 
       const stopOption = menuitems.find(item =>
@@ -1051,7 +1057,9 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
       expect(itemLabels).toContain('Push')
 
       const shareOption = menuitems.find(item =>
@@ -1076,7 +1084,9 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
       expect(itemLabels).not.toContain('Push')
     })
 
@@ -1091,7 +1101,9 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
       expect(itemLabels).toContain('Plot and Show')
       expect(itemLabels).toContain('Plot')
 
@@ -1122,7 +1134,9 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
       expect(itemLabels).toContain('Star')
     })
 

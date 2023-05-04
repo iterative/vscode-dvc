@@ -7,22 +7,23 @@ import {
 
 export interface MessagesMenuProps {
   options: MessagesMenuOptionProps[]
+  hideOnClick: (() => void) | undefined
   onOptionSelected?: () => void
 }
 
 export const MessagesMenu: React.FC<MessagesMenuProps> = ({
+  hideOnClick,
   options,
   onOptionSelected
 }) => (
   <div className={styles.messagesMenu} role="menu" data-testid="messages-menu">
-    {options
-      .filter(({ hidden }) => !hidden)
-      .map(option => (
-        <MessagesMenuOption
-          key={option.label}
-          {...option}
-          onOptionSelected={onOptionSelected}
-        />
-      ))}
+    {options.map(option => (
+      <MessagesMenuOption
+        key={option.label}
+        hideOnClick={hideOnClick}
+        {...option}
+        onOptionSelected={onOptionSelected}
+      />
+    ))}
   </div>
 )

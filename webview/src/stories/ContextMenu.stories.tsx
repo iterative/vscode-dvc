@@ -24,6 +24,7 @@ const Template: StoryFn<ContextMenuProps> = () => {
       <ContextMenu
         content={
           <MessagesMenu
+            hideOnClick={() => {}}
             options={[
               {
                 id: 'apply-to-workspace',
@@ -36,6 +37,7 @@ const Template: StoryFn<ContextMenuProps> = () => {
             ]}
           />
         }
+        setHideOnClick={() => {}}
       >
         <div>
           <Icon width={15} icon={Lines} />

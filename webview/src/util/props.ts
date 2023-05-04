@@ -15,9 +15,6 @@ export const clickAndEnterProps: <T>(
   onKeyDown: React.KeyboardEventHandler<T>
 } = (handler, textsForSelection = [], checkForTooltip = false) => ({
   onClick: e => {
-    e.preventDefault()
-    e.stopPropagation()
-
     if (
       isSelecting(textsForSelection) ||
       (checkForTooltip && isTooltip(e.target as HTMLElement, ['BODY']))
@@ -28,8 +25,6 @@ export const clickAndEnterProps: <T>(
     handler({ mouse: e })
   },
   onKeyDown: e => {
-    e.preventDefault()
-    e.stopPropagation()
     if (e.key === 'Enter' || e.key === ' ') {
       handler()
     }

@@ -22,7 +22,6 @@ export const RowContent: React.FC<
 > = ({
   row,
   className,
-  contextMenuDisabled,
   projectHasCheckpoints,
   hasRunningExperiment,
   batchRowSelection
@@ -68,31 +67,29 @@ export const RowContent: React.FC<
     }
   }, [subRows, selectedRows])
 
-  const [menuActive, setMenuActive] = useState<boolean>(false)
-
   const running = isRunning(status)
   const queued = isQueued(status)
   const unselected = selected === false
   const isOdd = index % 2 !== 0 && !isRowSelected
 
+  const [hideOnClick, setHideOnClick] = useState<(() => void) | undefined>(
+    undefined
+  )
+
   return (
     <ContextMenu
-      disabled={contextMenuDisabled}
-      onShow={() => {
-        setMenuActive(true)
-      }}
-      onHide={() => {
-        setMenuActive(false)
-      }}
       content={
         <RowContextMenu
           row={row}
           projectHasCheckpoints={projectHasCheckpoints}
           hasRunningExperiment={hasRunningExperiment}
+          hideOnClick={hideOnClick}
         />
       }
+      setHideOnClick={setHideOnClick}
     >
       <tr
+        onClick={() => hideOnClick?.()}
         className={cx(
           className,
           styles.experimentsTr,
@@ -107,8 +104,7 @@ export const RowContent: React.FC<
             [styles.evenRow]: !isOdd,
             [styles.workspaceRow]: isWorkspace,
             [styles.normalRow]: !isWorkspace,
-            [styles.rowSelected]: isRowSelected,
-            [styles.rowFocused]: menuActive
+            [styles.rowSelected]: isRowSelected
           }
         )}
         tabIndex={0}

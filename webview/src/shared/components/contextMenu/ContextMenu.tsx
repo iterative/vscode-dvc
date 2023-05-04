@@ -1,47 +1,45 @@
-import React from 'react'
+import React, { Dispatch, SetStateAction } from 'react'
 import { Instance } from 'tippy.js'
 import Tooltip from '../tooltip/Tooltip'
 
-const positionContextMenuAndDisableEvents = (
-  instance: Instance,
-  event: PointerEvent
-) => {
-  event.preventDefault()
-  instance.setProps({
-    getReferenceClientRect() {
-      const { top, bottom, height } = instance.reference.getBoundingClientRect()
-      return {
-        bottom,
-        height,
-        left: event.clientX,
-        right: event.clientX,
-        top,
-        width: 0
-      } as DOMRect
+const positionContextMenuAndDisableEvents =
+  (setHideOnClick: Dispatch<SetStateAction<(() => void) | undefined>>) =>
+  (instance: Instance, event: PointerEvent) => {
+    event.preventDefault()
+    instance.setProps({
+      getReferenceClientRect() {
+        const { top, bottom, height } =
+          instance.reference.getBoundingClientRect()
+        return {
+          bottom,
+          height,
+          left: event.clientX,
+          right: event.clientX,
+          top,
+          width: 0
+        } as DOMRect
+      }
+    })
+
+    const handleDefaultEvent = (e: Event) => {
+      e.preventDefault()
     }
-  })
 
-  const handleDefaultEvent = (e: Event) => {
-    e.preventDefault()
+    instance.reference.removeEventListener('contextmenu', handleDefaultEvent)
+    instance.reference.addEventListener('contextmenu', handleDefaultEvent)
+
+    const hideOnClick = () => {
+      !instance.state.isDestroyed && instance.hide()
+    }
+
+    setHideOnClick(() => hideOnClick)
   }
-
-  instance.reference.removeEventListener('contextmenu', handleDefaultEvent)
-  instance.reference.addEventListener('contextmenu', handleDefaultEvent)
-
-  const hideOnClick = () => {
-    !instance.state.isDestroyed && instance.hide()
-  }
-
-  instance.popper.removeEventListener('click', hideOnClick)
-  instance.popper.addEventListener('click', hideOnClick)
-
-  window.addEventListener('click', hideOnClick, { once: true })
-}
 
 export interface ContextMenuProps {
   children: React.ReactElement
   content?: React.ReactNode
   disabled?: boolean
+  setHideOnClick: Dispatch<SetStateAction<(() => void) | undefined>>
   onShow?: () => void
   onHide?: () => void
   trigger?: string
@@ -53,6 +51,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
   disabled,
   onShow,
   onHide,
+  setHideOnClick,
   trigger = 'contextmenu'
 }) => (
   <Tooltip
@@ -61,7 +60,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     placement="bottom-start"
     interactive
     isContextMenu={true}
-    onTrigger={positionContextMenuAndDisableEvents}
+    onTrigger={positionContextMenuAndDisableEvents(setHideOnClick)}
     onClickOutside={(instance: Instance) => instance.hide()}
     hideOnClick={false}
     content={content}

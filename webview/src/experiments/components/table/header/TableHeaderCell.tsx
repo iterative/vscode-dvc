@@ -140,7 +140,13 @@ export const TableHeaderCell: React.FC<{
     />
   )
 
-  const menuContent = <ContextMenuContent header={header} />
+  const [hideOnClick, setHideOnClick] = useState<(() => void) | undefined>(
+    undefined
+  )
+
+  const menuContent = (
+    <ContextMenuContent header={header} hideOnClick={hideOnClick} />
+  )
   const previousPlaceholder = isPlaceholder
     ? `_previous_placeholder_${depth}`
     : ''
@@ -150,8 +156,10 @@ export const TableHeaderCell: React.FC<{
       content={menuContent}
       disabled={!menuEnabled || menuSuppressed}
       trigger="contextmenu"
+      setHideOnClick={setHideOnClick}
     >
       <th
+        onClick={() => hideOnClick?.()}
         {...getHeaderPropsArgs(header, headerDropTargetId, onlyOneLine)}
         data-testid={`header-${id}${previousPlaceholder}`}
         key={id}

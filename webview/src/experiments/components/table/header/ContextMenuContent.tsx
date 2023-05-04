@@ -60,6 +60,7 @@ export const sortOption = (
 
 export interface HeaderMenuProps {
   header: Header<Experiment, unknown>
+  hideOnClick: (() => void) | undefined
 }
 
 export interface HeaderMenuDescription {
@@ -140,7 +141,10 @@ export const getMenuOptions = (
   return { isSortable, menuEnabled, menuOptions, sortOptions, sortOrder }
 }
 
-export const ContextMenuContent: React.FC<HeaderMenuProps> = ({ header }) => {
+export const ContextMenuContent: React.FC<HeaderMenuProps> = ({
+  header,
+  hideOnClick
+}) => {
   const { sorts } = useSelector((state: ExperimentsState) => state.tableData)
 
   const { menuOptions, sortOptions } = useMemo(() => {
@@ -149,11 +153,11 @@ export const ContextMenuContent: React.FC<HeaderMenuProps> = ({ header }) => {
 
   return (
     <div>
-      <MessagesMenu options={menuOptions} />
+      <MessagesMenu options={menuOptions} hideOnClick={hideOnClick} />
       {sortOptions.length > 0 && (
         <>
           <VSCodeDivider />
-          <MessagesMenu options={sortOptions} />
+          <MessagesMenu options={sortOptions} hideOnClick={hideOnClick} />
         </>
       )}
     </div>
