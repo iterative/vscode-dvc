@@ -6,42 +6,46 @@ import styles from './styles.module.scss'
 import { SectionDescription } from './SectionContainer'
 import Tooltip from '../tooltip/Tooltip'
 import { Icon } from '../Icon'
-import { Info, PassFilled, Pass } from '../icons'
+import { Info, PassFilled, Error, Pass } from '../icons'
 
-const getIcon = (isComplete?: boolean) => {
-  const commonProps = {
+export enum TooltipIconType {
+  PASSED = 'pass-filled',
+  INFO = 'info',
+  ERROR = 'error',
+  INCOMPLETE = 'pass'
+}
+
+const getIcon = (icon?: TooltipIconType) => {
+  const props = {
+    className: styles.infoIcon,
     height: 16,
+    icon: Info,
     width: 16
   }
 
-  if (isComplete === false) {
-    return (
-      <Icon
-        {...commonProps}
-        icon={Pass}
-        className={cx(styles.infoIcon, styles.incompletedIcon)}
-      />
-    )
+  if (icon === TooltipIconType.ERROR) {
+    props.icon = Error
+    props.className = cx(styles.infoIcon, styles.incompletedIcon)
   }
 
-  if (isComplete === true) {
-    return (
-      <Icon
-        {...commonProps}
-        icon={PassFilled}
-        className={cx(styles.infoIcon, styles.completedIcon)}
-      />
-    )
+  if (icon === TooltipIconType.INCOMPLETE) {
+    props.icon = Pass
+    props.className = cx(styles.infoIcon, styles.incompletedIcon)
   }
 
-  return <Icon {...commonProps} icon={Info} className={styles.infoIcon} />
+  if (icon === TooltipIconType.PASSED) {
+    props.icon = PassFilled
+    props.className = cx(styles.infoIcon, styles.completedIcon)
+  }
+
+  return <Icon {...props} />
 }
 
 export const InfoTooltip: React.FC<{
   sectionKey: PlotsSection | SetupSection
-  isComplete?: boolean
-}> = ({ isComplete, sectionKey }) => {
-  const infoIcon = getIcon(isComplete)
+  icon?: TooltipIconType
+}> = ({ icon, sectionKey }) => {
+  const infoIcon = getIcon(icon)
 
   const tooltipContent = (
     <div className={styles.infoTooltip}>

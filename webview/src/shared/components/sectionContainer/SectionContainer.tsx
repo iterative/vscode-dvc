@@ -3,7 +3,7 @@ import React, { MouseEvent, ReactNode } from 'react'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import { STUDIO_URL, SetupSection } from 'dvc/src/setup/webview/contract'
 import styles from './styles.module.scss'
-import { InfoTooltip } from './InfoTooltip'
+import { InfoTooltip, TooltipIconType } from './InfoTooltip'
 import { Icon } from '../Icon'
 import { ChevronDown, ChevronRight } from '../icons'
 import { isSelecting } from '../../../util/strings'
@@ -83,7 +83,7 @@ export interface SectionContainerProps<T extends PlotsSection | SetupSection> {
   title: string
   className?: string
   stickyHeaderTop?: number
-  isComplete?: boolean
+  icon?: TooltipIconType
 }
 
 export const SectionContainer: React.FC<
@@ -98,7 +98,7 @@ export const SectionContainer: React.FC<
   className,
   stickyHeaderTop = 0,
   headerChildren,
-  isComplete
+  icon
 }) => {
   const open = !sectionCollapsed
 
@@ -128,7 +128,7 @@ export const SectionContainer: React.FC<
               className={styles.detailsIcon}
             />
             {title}
-            <InfoTooltip isComplete={isComplete} sectionKey={sectionKey} />
+            <InfoTooltip icon={icon} sectionKey={sectionKey} />
           </div>
 
           {headerChildren}
