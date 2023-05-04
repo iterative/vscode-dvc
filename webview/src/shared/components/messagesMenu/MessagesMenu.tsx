@@ -5,7 +5,7 @@ import {
   MessagesMenuOptionProps
 } from './MessagesMenuOption'
 
-export interface MessagesMenuProps {
+interface MessagesMenuProps {
   options: MessagesMenuOptionProps[]
   onOptionSelected?: () => void
 }

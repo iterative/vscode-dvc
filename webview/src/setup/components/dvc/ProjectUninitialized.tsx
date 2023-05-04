@@ -2,7 +2,7 @@ import React, { PropsWithChildren } from 'react'
 import { GitUninitialized } from './GitUnitialized'
 import { DvcUninitialized } from './DvcUnitialized'
 
-export interface ProjectUninitializedProps {
+interface ProjectUninitializedProps {
   canGitInitialize: boolean | undefined
   initializeDvc: () => void
   initializeGit: () => void

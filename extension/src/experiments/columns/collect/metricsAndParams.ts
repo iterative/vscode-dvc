@@ -73,7 +73,7 @@ const walkValueTree = (
   }
 }
 
-export const walkMetricsOrParamsFile = (
+const walkMetricsOrParamsFile = (
   acc: ColumnAccumulator,
   type: ColumnType,
   file: MetricsOrParams

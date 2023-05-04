@@ -5,7 +5,7 @@ import Tooltip, {
   NORMAL_TOOLTIP_DELAY
 } from '../../../../shared/components/tooltip/Tooltip'
 
-export type CellHintTooltipProps = {
+type CellHintTooltipProps = {
   tooltipContent: ReactNode
   tooltipOffset?: [number, number]
   children: ReactElement

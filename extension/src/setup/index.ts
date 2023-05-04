@@ -14,7 +14,6 @@ import { findPythonBinForInstall } from './autoInstall'
 import { run, runWithRecheck, runWorkspace } from './runner'
 import { isStudioAccessToken } from './token'
 import { pickFocusedProjects } from './quickPick'
-import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Resource } from '../resourceLocator'
@@ -54,8 +53,6 @@ import { getValidInput } from '../vscode/inputBox'
 import { Title } from '../vscode/title'
 import { getDVCAppDir } from '../util/appdirs'
 import { getOptions } from '../cli/dvc/options'
-
-export type SetupWebviewWebview = BaseWebview<TSetupData>
 
 export class Setup
   extends BaseRepository<TSetupData>

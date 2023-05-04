@@ -21,7 +21,7 @@ export type CellValue = Value | ValueWithChanges
 export const isValueWithChanges = (raw: CellValue): raw is ValueWithChanges =>
   typeof (raw as ValueWithChanges)?.changes === 'boolean'
 
-export const cellValue = (raw: CellValue) =>
+const cellValue = (raw: CellValue) =>
   isValueWithChanges(raw) ? raw.value : raw
 
 export const Cell: React.FC<CellContext<Experiment, CellValue>> = cell => {

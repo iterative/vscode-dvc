@@ -3,7 +3,7 @@ import styles from './styles.module.scss'
 import { Button } from '../../../shared/components/button/Button'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 
-export type CliUnavailableProps = {
+type CliUnavailableProps = {
   installDvc: () => void
   pythonBinPath: string | undefined
   setupWorkspace: () => void

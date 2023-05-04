@@ -7,7 +7,7 @@ import { reverseOfLegendSuppressionUpdate } from 'dvc/src/plots/vega/util'
 import styles from './styles.module.scss'
 import { getThemeValue, ThemeProperty } from '../../util/styles'
 
-export type ZoomedInPlotProps = {
+type ZoomedInPlotProps = {
   props: VegaLiteProps
 }
 

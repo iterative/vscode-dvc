@@ -6,7 +6,7 @@ import {
   TableData
 } from 'dvc/src/experiments/webview/contract'
 
-export const defaultColumn = ['Experiment', 'Created']
+const defaultColumn = ['Experiment', 'Created']
 
 export const commonColumnFields = {
   hasChildren: false,
@@ -14,7 +14,7 @@ export const commonColumnFields = {
   type: ColumnType.PARAMS
 }
 
-export const columns = [
+const columns = [
   {
     hasChildren: false,
     type: ColumnType.TIMESTAMP

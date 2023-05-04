@@ -31,7 +31,7 @@ import { PersistenceKey } from '../../persistence/constants'
 import { sum } from '../../util/math'
 import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../cli/dvc/constants'
 
-export type StarredExperiments = Record<string, boolean | undefined>
+type StarredExperiments = Record<string, boolean | undefined>
 
 export type SelectedExperimentWithColor = Experiment & {
   displayColor: Color

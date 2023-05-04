@@ -12,7 +12,7 @@ class TestStream extends Duplex {
   _read(_size: number) {}
 }
 
-export let server: Connection
+let server: Connection
 export let client: Connection
 
 export const setupTestConnections = (

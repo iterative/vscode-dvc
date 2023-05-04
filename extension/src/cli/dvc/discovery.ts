@@ -91,9 +91,7 @@ type CanRunCli = {
   version: string | undefined
 }
 
-export const isCliCompatible = (
-  cliCompatible: CliCompatible
-): boolean | undefined => {
+const isCliCompatible = (cliCompatible: CliCompatible): boolean | undefined => {
   if (cliCompatible === CliCompatible.NO_NOT_FOUND) {
     return
   }
