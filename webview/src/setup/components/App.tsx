@@ -134,7 +134,7 @@ export const App: React.FC = () => {
         title="Studio"
         sectionCollapsed={sectionCollapsed}
         setSectionCollapsed={setSectionCollapsed}
-        hasError={!!cliCompatible}
+        hasError={!cliCompatible}
       >
         <Studio
           isStudioConnected={isStudioConnected}
