@@ -723,7 +723,10 @@ describe('App', () => {
       advanceTimersByTime(100)
 
       const menuitems = screen.getAllByRole('menuitem')
-      expect(menuitems).toHaveLength(3)
+      expect(menuitems).toHaveLength(6)
+      expect(
+        menuitems.filter(item => !item.className.includes('disabled'))
+      ).toHaveLength(3)
 
       fireEvent.keyDown(paramsFileHeader, { bubbles: true, key: 'Escape' })
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
