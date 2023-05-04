@@ -9,15 +9,16 @@ import { Icon } from '../Icon'
 import { Info, PassFilled, Error, Pass } from '../icons'
 
 export enum TooltipIconType {
-  PASSED = 'pass-filled',
-  INFO = 'info',
-  ERROR = 'error',
-  INCOMPLETE = 'pass'
+  PASSED = 'icon-pass-filled',
+  INFO = 'icon-info',
+  ERROR = 'icon-error',
+  INCOMPLETE = 'icon-pass'
 }
 
 const getIcon = (icon?: TooltipIconType) => {
   const props = {
     className: styles.infoIcon,
+    'data-testid': icon || TooltipIconType.INFO,
     height: 16,
     icon: Info,
     width: 16
