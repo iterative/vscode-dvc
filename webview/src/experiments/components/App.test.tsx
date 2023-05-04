@@ -732,6 +732,24 @@ describe('App', () => {
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })
 
+    it('should not close when a disabled item is clicked', () => {
+      renderTableWithoutRunningExperiments()
+
+      const paramsFileHeader = screen.getByText('params.yaml')
+      fireEvent.contextMenu(paramsFileHeader, { bubbles: true })
+
+      advanceTimersByTime(100)
+
+      const disabledMenuItem = screen
+        .getAllByRole('menuitem')
+        .find(item => item.className.includes('disabled'))
+
+      expect(disabledMenuItem).toBeDefined()
+
+      disabledMenuItem && fireEvent.click(disabledMenuItem, { bubbles: true })
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(6)
+    })
+
     it('should have the same enabled options in the empty placeholders', () => {
       renderTableWithPlaceholder()
       const header = screen.getByTestId('header-Created')
@@ -885,6 +903,24 @@ describe('App', () => {
 
       fireEvent.keyDown(menuitems[0], { bubbles: true, key: 'Escape' })
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
+    })
+
+    it('should not close when a disabled item is clicked', () => {
+      renderTableWithoutRunningExperiments()
+
+      const target = screen.getByText('main')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+
+      const disabledMenuItem = screen
+        .getAllByRole('menuitem')
+        .find(item => item.className.includes('disabled'))
+
+      expect(disabledMenuItem).toBeDefined()
+
+      disabledMenuItem && fireEvent.click(disabledMenuItem, { bubbles: true })
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(10)
     })
 
     it('should be removed with a left click', () => {
