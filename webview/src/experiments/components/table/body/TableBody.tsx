@@ -16,7 +16,6 @@ interface TableBodyProps extends RowProp, InstanceProp, BatchSelectionProp {
 export const TableBody: React.FC<TableBodyProps> = ({
   row,
   instance,
-  contextMenuDisabled,
   projectHasCheckpoints,
   hasRunningExperiment,
   batchRowSelection,
@@ -26,7 +25,6 @@ export const TableBody: React.FC<TableBodyProps> = ({
 }) => {
   const contentProps = {
     batchRowSelection,
-    contextMenuDisabled,
     hasRunningExperiment,
     key: row.id,
     projectHasCheckpoints,

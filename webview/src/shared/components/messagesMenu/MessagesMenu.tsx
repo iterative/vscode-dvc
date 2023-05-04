@@ -15,14 +15,12 @@ export const MessagesMenu: React.FC<MessagesMenuProps> = ({
   onOptionSelected
 }) => (
   <div className={styles.messagesMenu} role="menu" data-testid="messages-menu">
-    {options
-      .filter(({ hidden }) => !hidden)
-      .map(option => (
-        <MessagesMenuOption
-          key={option.label}
-          {...option}
-          onOptionSelected={onOptionSelected}
-        />
-      ))}
+    {options.map(option => (
+      <MessagesMenuOption
+        key={option.label}
+        {...option}
+        onOptionSelected={onOptionSelected}
+      />
+    ))}
   </div>
 )

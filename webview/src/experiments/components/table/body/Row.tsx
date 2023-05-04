@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import React, { useCallback, useContext, useMemo, useState } from 'react'
+import React, { useCallback, useContext, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { isQueued, isRunning } from 'dvc/src/experiments/webview/contract'
@@ -22,7 +22,6 @@ export const RowContent: React.FC<
 > = ({
   row,
   className,
-  contextMenuDisabled,
   projectHasCheckpoints,
   hasRunningExperiment,
   batchRowSelection
@@ -68,8 +67,6 @@ export const RowContent: React.FC<
     }
   }, [subRows, selectedRows])
 
-  const [menuActive, setMenuActive] = useState<boolean>(false)
-
   const running = isRunning(status)
   const queued = isQueued(status)
   const unselected = selected === false
@@ -77,13 +74,6 @@ export const RowContent: React.FC<
 
   return (
     <ContextMenu
-      disabled={contextMenuDisabled}
-      onShow={() => {
-        setMenuActive(true)
-      }}
-      onHide={() => {
-        setMenuActive(false)
-      }}
       content={
         <RowContextMenu
           row={row}
@@ -107,8 +97,7 @@ export const RowContent: React.FC<
             [styles.evenRow]: !isOdd,
             [styles.workspaceRow]: isWorkspace,
             [styles.normalRow]: !isWorkspace,
-            [styles.rowSelected]: isRowSelected,
-            [styles.rowFocused]: menuActive
+            [styles.rowSelected]: isRowSelected
           }
         )}
         tabIndex={0}
