@@ -8,7 +8,6 @@ export interface InstanceProp {
 export interface RowProp {
   row: Row<Experiment>
   hasRunningWorkspaceExperiment?: boolean
-  projectHasCheckpoints?: boolean
 }
 
 export interface CellProp {

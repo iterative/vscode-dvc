@@ -74,7 +74,7 @@ export const App: React.FC<Record<string, unknown>> = () => {
               case 'hasMoreCommits':
                 dispatch(updateHasMoreCommits(data.data.hasMoreCommits))
                 continue
-              case 'hasRunningExperiment':
+              case 'hasRunningWorkspaceExperiment':
                 dispatch(
                   updateHasRunningWorkspaceExperiment(
                     data.data.hasRunningWorkspaceExperiment
