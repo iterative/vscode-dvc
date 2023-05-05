@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.6] - 2023-05-04
+
+### 🚀 New Features and Enhancements
+
+- Remove pausing of data updates when running/queueing experiments [#3815](https://github.com/iterative/vscode-dvc/pull/3815) by [@mattseddon](https://github.com/mattseddon)
+- Keep experiments table context menu consistent by showing disabled items [#3825](https://github.com/iterative/vscode-dvc/pull/3825) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.8.5] - 2023-05-03
 
 ### 🚀 New Features and Enhancements

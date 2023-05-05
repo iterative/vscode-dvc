@@ -1,4 +1,5 @@
 import { join } from 'path'
+import { browser } from '@wdio/globals'
 import {
   closeAllEditors,
   createCustomPlot,
