@@ -496,6 +496,7 @@ describe('App', () => {
       ],
       rows: [
         {
+          branch: 'main',
           id: EXPERIMENT_WORKSPACE_ID,
           label: EXPERIMENT_WORKSPACE_ID,
           metrics: {
@@ -510,6 +511,7 @@ describe('App', () => {
           }
         },
         {
+          branch: 'main',
           id: 'main',
           label: 'main',
           metrics: {

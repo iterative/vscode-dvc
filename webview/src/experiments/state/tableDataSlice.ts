@@ -7,6 +7,7 @@ import {
 } from 'dvc/src/experiments/webview/contract'
 import { keepEqualOldReferencesInArray } from '../../util/array'
 import { keepReferenceIfEqual } from '../../util/objects'
+import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 
 export interface TableDataState extends TableData {
   hasData?: boolean
@@ -117,9 +118,16 @@ export const tableDataSlice = createSlice({
         state.rows,
         action.payload
       ) as Experiment[]
+      const branchWithWorkspace = state.rows.find(
+        row => row.id === EXPERIMENT_WORKSPACE_ID
+      )?.branch
+      const branches = state.rows
+        .map(row => row.branch)
+        .filter(branch => branch !== branchWithWorkspace)
       state.branches = [
-        ...new Set(state.rows.map(row => row.branch))
-      ] as string[]
+        branchWithWorkspace,
+        ...[...new Set(branches].sort()
+      ].filter(Boolean) as string[]
     },
     updateSelectedForPlotsCount: (state, action: PayloadAction<number>) => {
       state.selectedForPlotsCount = action.payload

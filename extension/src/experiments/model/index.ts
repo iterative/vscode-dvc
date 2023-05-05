@@ -90,6 +90,10 @@ export class ExperimentsModel extends ModelWithPersistence {
       {}
     )
 
+    if (typeof this.numberOfCommitsToShow === 'number') {
+      this.numberOfCommitsToShow = {}
+    }
+
     this.branchesToShow = this.revive<string[]>(
       PersistenceKey.EXPERIMENTS_BRANCHES,
       []
@@ -384,7 +388,6 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public setNbfCommitsToShow(numberOfCommitsToShow: number, branch: string) {
     this.numberOfCommitsToShow[branch] = numberOfCommitsToShow
-    debugger
     this.persistNbOfCommitsToShow()
   }
 

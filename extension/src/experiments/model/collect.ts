@@ -163,7 +163,6 @@ const addCommitData = (
   }
   baseline.description = formatCommitMessage(commit.message)
   baseline.commit = commit
-  baseline.branch = 'a'
 }
 
 const collectExpState = (
@@ -172,13 +171,16 @@ const collectExpState = (
   commitData: { [sha: string]: CommitData }
 ): Experiment | undefined => {
   const { rev, name, branch } = expState
+  if (rev === EXPERIMENT_WORKSPACE_ID && acc.workspace) {
+    return
+  }
   const label =
     rev === EXPERIMENT_WORKSPACE_ID
       ? EXPERIMENT_WORKSPACE_ID
       : name || shortenForLabel(rev)
   const id = name || label
 
-  const experiment: Experiment = { id, label }
+  const experiment: Experiment = { id, label } as unknown as Experiment
 
   const baseline = transformExpState(experiment, expState)
   baseline.branch = branch
@@ -247,6 +249,7 @@ const collectExpRange = (
 
   const experiment = transformExpState(
     {
+      branch: 'main',
       id: name || label,
       label
     },
@@ -307,7 +310,11 @@ export const collectExperiments = (
     experimentsByCommit: new Map(),
     hasCheckpoints: hasCheckpoints(output),
     runningExperiments: [],
-    workspace: { id: EXPERIMENT_WORKSPACE_ID, label: EXPERIMENT_WORKSPACE_ID }
+    workspace: {
+      branch: 'main',
+      id: EXPERIMENT_WORKSPACE_ID,
+      label: EXPERIMENT_WORKSPACE_ID
+    }
   }
 
   const commitData = getCommitData(commitsOutput)

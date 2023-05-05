@@ -47,7 +47,6 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
   }
 
   private async expShow(flags: (ExperimentFlag | string)[], branch?: string) {
-    // TODO if !branch get current branch
     const data = await this.internalCommands.executeCommand<ExpShowOutput>(
       AvailableCommands.EXP_SHOW,
       this.dvcRoot,
@@ -59,10 +58,23 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
   public async update(): Promise<void> {
     let data: ExpShowOutput = []
     const isBranchesView = this.experiments.getIsBranchesView()
-    const branches = this.experiments.getBranchesToShow()
+
     if (isBranchesView) {
-      data = await this.expShow([ExperimentFlag.ALL_BRANCHES])
+      data = (await this.expShow([
+        ExperimentFlag.ALL_BRANCHES
+      ])) as ExpShowOutput
     } else {
+      const currentBranch = await this.internalCommands.executeCommand<string>(
+        AvailableCommands.GIT_GET_CURRENT_BRANCH,
+        this.dvcRoot
+      )
+      let branches = this.experiments.getBranchesToShow()
+
+      if (!branches.includes(currentBranch)) {
+        branches.push(currentBranch)
+        this.experiments.setBranchesToShow(branches)
+      }
+
       const output = []
       for (const branch of branches) {
         const branchFlags = [
@@ -73,7 +85,10 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
         ]
         output.push(
           new Promise<void>(async resolve => {
-            const newData = await this.expShow(branchFlags, branch)
+            const newData = (await this.expShow(
+              branchFlags,
+              branch
+            )) as ExpShowOutput
             data.push(...newData)
             resolve()
           })

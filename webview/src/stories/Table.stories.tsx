@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import React from 'react'
 import { Provider } from 'react-redux'
 import type { StoryFn, Meta } from '@storybook/react'
-import { rowsFixtureWithBranches } from 'dvc/src/test/fixtures/expShow/base/rows'
+import rowsFicture from 'dvc/src/test/fixtures/expShow/base/rows'
 import columnsFixture from 'dvc/src/test/fixtures/expShow/base/columns'
 import workspaceChangesFixture from 'dvc/src/test/fixtures/expShow/base/workspaceChanges'
 import deeplyNestedTableData from 'dvc/src/test/fixtures/expShow/deeplyNested/tableData'
@@ -52,7 +52,7 @@ const tableData: TableDataState = {
   hasValidDvcYaml: true,
   isBranchesView: false,
   isShowingMoreCommits: { main: true },
-  rows: addCommitDataToMainBranch(rowsFixtureWithBranches).map(row => ({
+  rows: addCommitDataToMainBranch(rowsFicture).map(row => ({
     ...row,
     branch: 'current',
     subRows: row.subRows?.map(experiment => ({
@@ -71,7 +71,7 @@ const tableData: TableDataState = {
 const noRunningExperiments = {
   ...tableData,
   hasRunningExperiment: false,
-  rows: addCommitDataToMainBranch(rowsFixtureWithBranches).map(row => ({
+  rows: addCommitDataToMainBranch(rowsFicture).map(row => ({
     ...row,
     status: ExperimentStatus.SUCCESS,
     subRows: row.subRows?.map(experiment => ({
@@ -86,7 +86,7 @@ const noRunningExperiments = {
 const noRunningExperimentsNoCheckpoints = {
   ...noRunningExperiments,
   hasCheckpoints: false,
-  rows: addCommitDataToMainBranch(rowsFixtureWithBranches).map(row => ({
+  rows: addCommitDataToMainBranch(rowsFicture).map(row => ({
     ...row,
     status: ExperimentStatus.SUCCESS,
     subRows: row.subRows?.map(experiment => ({
@@ -223,7 +223,7 @@ LoadingData.args = { tableData: undefined }
 
 export const WithNoExperiments = Template.bind({})
 WithNoExperiments.args = {
-  tableData: { ...tableData, rows: [rowsFixtureWithBranches[0]] }
+  tableData: { ...tableData, rows: [rowsFicture[0]] }
 }
 
 export const WithNoColumns = Template.bind({})

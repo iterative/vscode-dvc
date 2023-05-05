@@ -98,7 +98,10 @@ export class WebviewMessages {
     update && this.sendWebviewMessage()
   }
 
-  public sendWebviewMessage() {
+  public sendWebviewMessage(doNotCheckNbCommits?: boolean) {
+    if (!doNotCheckNbCommits) {
+      this.changeHasMoreOrLessCommits(true)
+    }
     const webview = this.getWebview()
     void webview?.show(this.getWebviewData())
   }
@@ -237,6 +240,7 @@ export class WebviewMessages {
     }
     this.experiments.setBranchesToShow(selectedBranches)
     await this.update()
+    await this.changeHasMoreOrLessCommits(true)
   }
 
   private async switchToBranchesView() {
@@ -258,7 +262,7 @@ export class WebviewMessages {
         Math.min(nbOfCommitsToShow, availableNbCommits) > 1
     }
 
-    update && this.sendWebviewMessage()
+    update && this.sendWebviewMessage(true)
   }
 
   private async changeCommitsToShow(change: 1 | -1, branch: string) {
