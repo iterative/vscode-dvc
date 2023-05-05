@@ -23,7 +23,7 @@ export const RowContent: React.FC<
   row,
   className,
   projectHasCheckpoints,
-  hasRunningExperiment,
+  hasRunningWorkspaceExperiment,
   batchRowSelection
 }): JSX.Element => {
   const changes = useSelector(
@@ -78,7 +78,7 @@ export const RowContent: React.FC<
         <RowContextMenu
           row={row}
           projectHasCheckpoints={projectHasCheckpoints}
-          hasRunningExperiment={hasRunningExperiment}
+          hasRunningWorkspaceExperiment={hasRunningWorkspaceExperiment}
         />
       }
     >

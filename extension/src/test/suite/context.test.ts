@@ -67,14 +67,14 @@ suite('Context Test Suite', () => {
   const buildMockExperiments = (
     filters: FilterDefinition[] = [],
     sorts: SortDefinition[] = [],
-    experimentRunning = false,
-    queuedExperimentRunning = false
+    workspaceExperimentRunning = false,
+    experimentRunning = false
   ) => {
     return {
       getFilters: () => filters,
       getSorts: () => sorts,
       hasRunningExperiment: () => experimentRunning,
-      hasRunningQueuedExperiment: () => queuedExperimentRunning
+      hasRunningWorkspaceExperiment: () => workspaceExperimentRunning
     }
   }
 
@@ -88,7 +88,7 @@ suite('Context Test Suite', () => {
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('Context', () => {
-    it('should set the dvc.experiment.running context to true whenever an experiment is running in the runner', async () => {
+    it('should set the dvc.experiment.running.workspace context to true whenever an experiment is running in the runner', async () => {
       const { executeCommandSpy, onDidStartProcess, processStarted } =
         buildContext(true)
 
@@ -101,12 +101,12 @@ suite('Context Test Suite', () => {
 
       expect(executeCommandSpy).to.be.calledWith(
         'setContext',
-        'dvc.experiment.running',
+        'dvc.experiment.running.workspace',
         true
       )
     })
 
-    it('should set the dvc.experiment.running context to true whenever the data shows an experiment is running', async () => {
+    it('should set the dvc.experiment.running.workspace context to true whenever the data shows an experiment is running', async () => {
       const {
         executeCommandSpy,
         experimentsChanged,
@@ -137,12 +137,12 @@ suite('Context Test Suite', () => {
 
       expect(executeCommandSpy).to.be.calledWith(
         'setContext',
-        'dvc.experiment.running',
+        'dvc.experiment.running.workspace',
         true
       )
     })
 
-    it('should set the dvc.experiment.running context to false whenever the runner is not running and the data shows no experiment is running', async () => {
+    it('should set the dvc.experiment.running.workspace context to false whenever the runner is not running and the data shows no experiment is running', async () => {
       const {
         executeCommandSpy,
         experimentsChanged,
@@ -164,7 +164,7 @@ suite('Context Test Suite', () => {
 
       expect(executeCommandSpy).to.be.calledWith(
         'setContext',
-        'dvc.experiment.running',
+        'dvc.experiment.running.workspace',
         false
       )
     })

@@ -361,7 +361,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
 
   public hasRunningExperiment() {
     return Object.values(this.repositories).some(experiments =>
-      experiments.hasRunningExperiment()
+      experiments.hasRunningWorkspaceExperiment()
     )
   }
 

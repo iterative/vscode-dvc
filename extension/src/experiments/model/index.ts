@@ -166,6 +166,10 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.running.length > 0
   }
 
+  public hasRunningWorkspaceExperiment() {
+    return this.running.some(({ executor }) => executor === Executor.WORKSPACE)
+  }
+
   public hasCheckpoints() {
     return this.checkpoints
   }

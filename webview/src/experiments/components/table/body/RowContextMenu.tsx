@@ -34,7 +34,7 @@ const experimentMenuOption = (
 
 const getMultiSelectMenuOptions = (
   selectedRowsList: RowProp[],
-  hasRunningExperiment: boolean
+  hasRunningWorkspaceExperiment: boolean
 ) => {
   const filterStarredUnstarred = (isStarred: boolean) =>
     selectedRowsList.filter(
@@ -51,11 +51,14 @@ const getMultiSelectMenuOptions = (
   const selectedIds = selectedRowsList.map(value => value.row.original.id)
 
   const experimentRowIds = selectedRowsList
-    .filter(value => value.row.depth === 1)
+    .filter(
+      value => value.row.depth === 1 && !isRunning(value.row.original.status)
+    )
     .map(value => value.row.original.id)
 
   const disableExperimentOnlyOption =
-    experimentRowIds.length !== selectedRowsList.length || hasRunningExperiment
+    experimentRowIds.length !== selectedRowsList.length ||
+    hasRunningWorkspaceExperiment
 
   const stoppableRows = selectedRowsList
     .filter(value => isRunning(value.row.original.status))
@@ -172,7 +175,7 @@ const getSingleSelectMenuOptions = (
   id: string,
   isWorkspace: boolean,
   projectHasCheckpoints: boolean,
-  hasRunningExperiment: boolean,
+  hasRunningWorkspaceExperiment: boolean,
   depth: number,
   status?: ExperimentStatus,
   starred?: boolean,
@@ -190,7 +193,7 @@ const getSingleSelectMenuOptions = (
       id,
       label,
       type,
-      disabled || hasRunningExperiment,
+      disabled || hasRunningWorkspaceExperiment || isRunning(status),
       divider
     )
 
@@ -219,7 +222,7 @@ const getSingleSelectMenuOptions = (
       [id],
       'Push',
       MessageFromWebviewType.PUSH_EXPERIMENT,
-      isNotExperiment || hasRunningExperiment,
+      isNotExperiment || hasRunningWorkspaceExperiment || isRunning(status),
       true
     ),
     ...getRunResumeOptions(
@@ -232,7 +235,7 @@ const getSingleSelectMenuOptions = (
       starred ? 'Unstar' : 'Star',
       MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR,
       isWorkspace,
-      !hasRunningExperiment
+      !hasRunningWorkspaceExperiment
     ),
     experimentMenuOption(
       [{ executor, id }],
@@ -254,7 +257,7 @@ const getContextMenuOptions = (
   id: string,
   isWorkspace: boolean,
   projectHasCheckpoints: boolean,
-  hasRunningExperiment: boolean,
+  hasRunningWorkspaceExperiment: boolean,
   depth: number,
   selectedRows: Record<string, RowProp | undefined>,
   status?: ExperimentStatus,
@@ -268,13 +271,17 @@ const getContextMenuOptions = (
 
   return cond(
     isFromSelection && selectedRowsList.length > 1,
-    () => getMultiSelectMenuOptions(selectedRowsList, hasRunningExperiment),
+    () =>
+      getMultiSelectMenuOptions(
+        selectedRowsList,
+        hasRunningWorkspaceExperiment
+      ),
     () =>
       getSingleSelectMenuOptions(
         id,
         isWorkspace,
         projectHasCheckpoints,
-        hasRunningExperiment,
+        hasRunningWorkspaceExperiment,
         depth,
         status,
         starred,
@@ -284,7 +291,7 @@ const getContextMenuOptions = (
 }
 
 export const RowContextMenu: React.FC<RowProp> = ({
-  hasRunningExperiment = false,
+  hasRunningWorkspaceExperiment = false,
   projectHasCheckpoints = false,
   row: {
     original: { status, starred, id, executor },
@@ -300,7 +307,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
       id,
       isWorkspace,
       projectHasCheckpoints,
-      hasRunningExperiment,
+      hasRunningWorkspaceExperiment,
       depth,
       selectedRows,
       status,
@@ -316,7 +323,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
     id,
     projectHasCheckpoints,
     selectedRows,
-    hasRunningExperiment
+    hasRunningWorkspaceExperiment
   ])
 
   return (

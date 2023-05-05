@@ -877,7 +877,7 @@ describe('App', () => {
       ])
     })
 
-    it('should enable the correct option for an experiment with checkpoints and close on esc', () => {
+    it('should enable the correct options for an experiment that is not running and close on esc', () => {
       renderTableWithoutRunningExperiments()
 
       const target = screen.getByText('[exp-e7a67]')
@@ -889,7 +889,6 @@ describe('App', () => {
         .filter(item => !item.className.includes('disabled'))
         .map(item => item.textContent)
       expect(itemLabels).toStrictEqual([
-        'Show Logs',
         'Apply to Workspace',
         'Create new Branch',
         'Push',
@@ -897,11 +896,31 @@ describe('App', () => {
         'Modify and Resume',
         'Modify and Queue',
         'Star',
-        'Stop',
         'Remove'
       ])
 
       fireEvent.keyDown(menuitems[0], { bubbles: true, key: 'Escape' })
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
+    })
+
+    it('should enable the correct options for a running experiment', () => {
+      renderTable()
+
+      const target = screen.getByText('[exp-e7a67]')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
+      expect(itemLabels).toStrictEqual(['Show Logs', 'Star', 'Stop'])
+
+      fireEvent.click(menuitems[0], { bubbles: true, key: 'Escape' })
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: 'exp-e7a67',
+        type: MessageFromWebviewType.SHOW_EXPERIMENT_LOGS
+      })
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })
 

@@ -19,7 +19,7 @@ import {
   updateHasColumns,
   updateHasConfig,
   updateHasMoreCommits,
-  updateHasRunningExperiment,
+  updateHasRunningWorkspaceExperiment,
   updateHasValidDvcYaml,
   updateIsBranchesView,
   updateIsShowingMoreCommits,
@@ -76,7 +76,9 @@ export const App: React.FC<Record<string, unknown>> = () => {
                 continue
               case 'hasRunningExperiment':
                 dispatch(
-                  updateHasRunningExperiment(data.data.hasRunningExperiment)
+                  updateHasRunningWorkspaceExperiment(
+                    data.data.hasRunningWorkspaceExperiment
+                  )
                 )
                 continue
               case 'hasValidDvcYaml':

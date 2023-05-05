@@ -100,7 +100,7 @@ export type TableData = {
   hasColumns: boolean
   hasConfig: boolean
   hasMoreCommits: boolean
-  hasRunningExperiment: boolean
+  hasRunningWorkspaceExperiment: boolean
   hasValidDvcYaml: boolean
   isShowingMoreCommits: boolean
   isBranchesView: boolean

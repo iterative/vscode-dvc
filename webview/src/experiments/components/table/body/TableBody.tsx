@@ -17,7 +17,7 @@ export const TableBody: React.FC<TableBodyProps> = ({
   row,
   instance,
   projectHasCheckpoints,
-  hasRunningExperiment,
+  hasRunningWorkspaceExperiment,
   batchRowSelection,
   root,
   tableHeaderHeight,
@@ -25,7 +25,7 @@ export const TableBody: React.FC<TableBodyProps> = ({
 }) => {
   const contentProps = {
     batchRowSelection,
-    hasRunningExperiment,
+    hasRunningWorkspaceExperiment,
     key: row.id,
     projectHasCheckpoints,
     row

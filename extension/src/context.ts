@@ -53,10 +53,22 @@ export class Context extends Disposable {
   }
 
   private setIsExperimentRunning(repositories: Experiments[] = []) {
+    const workspaceRunningInRunner = this.dvcRunner.isExperimentRunning()
+
+    const getContextValue = (
+      method: 'hasRunningWorkspaceExperiment' | 'hasRunningExperiment'
+    ): boolean =>
+      workspaceRunningInRunner ||
+      repositories.some(experiments => experiments[method]())
+
+    void setContextValue(
+      ContextKey.EXPERIMENT_RUNNING_WORKSPACE,
+      getContextValue('hasRunningWorkspaceExperiment')
+    )
+
     void setContextValue(
       ContextKey.EXPERIMENT_RUNNING,
-      this.dvcRunner.isExperimentRunning() ||
-        repositories.some(experiments => experiments.hasRunningExperiment())
+      getContextValue('hasRunningExperiment')
     )
   }
 }
