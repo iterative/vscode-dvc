@@ -1,4 +1,5 @@
 import { Key } from 'webdriverio'
+import { $$, browser } from '@wdio/globals'
 import { ViewControl } from 'wdio-vscode-service'
 import { PlotsWebview } from './pageObjects/plotsWebview'
 

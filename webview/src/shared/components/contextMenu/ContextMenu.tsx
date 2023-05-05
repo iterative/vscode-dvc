@@ -21,15 +21,20 @@ const positionContextMenuAndDisableEvents = (
     }
   })
 
-  const handleDefaultEvent = (e: Event) => {
-    e.preventDefault()
+  const handleDefaultEvent = (event: Event) => {
+    event.preventDefault()
   }
 
   instance.reference.removeEventListener('contextmenu', handleDefaultEvent)
   instance.reference.addEventListener('contextmenu', handleDefaultEvent)
 
-  const hideOnClick = () => {
-    !instance.state.isDestroyed && instance.hide()
+  const hideOnClick = (event: Event) => {
+    if (
+      event.target instanceof HTMLElement &&
+      !event.target.closest('[aria-disabled=true]')
+    ) {
+      !instance.state.isDestroyed && instance.hide()
+    }
   }
 
   instance.popper.removeEventListener('click', hideOnClick)

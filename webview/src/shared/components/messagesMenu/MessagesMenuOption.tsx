@@ -1,4 +1,5 @@
 import React from 'react'
+import cx from 'classnames'
 import { MessageFromWebview } from 'dvc/src/webview/contract'
 import { VSCodeDivider } from '@vscode/webview-ui-toolkit/react'
 import styles from './styles.module.scss'
@@ -8,15 +9,25 @@ export interface MessagesMenuOptionProps {
   id: string
   label: string
   message?: MessageFromWebview
-  hidden?: boolean
+  disabled?: boolean
   divider?: boolean
   keyboardShortcut?: string
 }
 
 export const MessagesMenuOption: React.FC<
   MessagesMenuOptionProps & { onOptionSelected?: () => void }
-> = ({ label, message, divider, onOptionSelected, keyboardShortcut }) => {
+> = ({
+  label,
+  message,
+  disabled,
+  divider,
+  onOptionSelected,
+  keyboardShortcut
+}) => {
   const sendTheMessage = () => {
+    if (disabled) {
+      return
+    }
     !!message && sendMessage(message)
     onOptionSelected?.()
   }
@@ -32,7 +43,8 @@ export const MessagesMenuOption: React.FC<
         </div>
       )}
       <div
-        className={styles.item}
+        aria-disabled={disabled}
+        className={cx(styles.item, disabled && styles.disabledItem)}
         onClick={sendTheMessage}
         onKeyDown={onKeyDown}
         role="menuitem"

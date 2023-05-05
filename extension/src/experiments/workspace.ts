@@ -33,7 +33,7 @@ export enum scriptCommand {
   PYTHON = 'python'
 }
 
-export const getScriptCommand = (script: string) => {
+const getScriptCommand = (script: string) => {
   switch (getFileExtension(script)) {
     case '.py':
       return scriptCommand.PYTHON
@@ -59,22 +59,17 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     new EventEmitter<void>()
   )
 
-  public readonly updatesPaused: EventEmitter<boolean>
-
   private readonly checkpointsChanged: EventEmitter<void>
 
   private focusedParamsDvcRoot: string | undefined
 
   constructor(
     internalCommands: InternalCommands,
-    updatesPaused: EventEmitter<boolean>,
     workspaceState: Memento,
     experiments?: Record<string, Experiments>,
     checkpointsChanged?: EventEmitter<void>
   ) {
     super(internalCommands, workspaceState, experiments)
-
-    this.updatesPaused = updatesPaused
 
     this.checkpointsChanged = this.dispose.track(
       checkpointsChanged || new EventEmitter()
@@ -95,83 +90,43 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
   }
 
-  public async addFilter(overrideRoot?: string) {
-    const dvcRoot = await this.getDvcRoot(overrideRoot)
-    if (!dvcRoot) {
-      return
-    }
-    return this.getRepository(dvcRoot).addFilter()
+  public addFilter(overrideRoot?: string) {
+    return this.getRepositoryThenUpdate('addFilter', overrideRoot)
   }
 
-  public async addStarredFilter(overrideRoot?: string) {
-    const dvcRoot = await this.getDvcRoot(overrideRoot)
-    if (!dvcRoot) {
-      return
-    }
-    return this.getRepository(dvcRoot).addStarredFilter()
+  public addStarredFilter(overrideRoot?: string) {
+    return this.getRepositoryThenUpdate('addStarredFilter', overrideRoot)
   }
 
-  public async removeFilters() {
-    const dvcRoot = await this.getFocusedOrOnlyOrPickProject()
-    if (!dvcRoot) {
-      return
-    }
-    return this.getRepository(dvcRoot).removeFilters()
+  public removeFilters() {
+    return this.getRepositoryThenUpdate('removeFilters')
   }
 
-  public async addSort(overrideRoot?: string) {
-    const dvcRoot = await this.getDvcRoot(overrideRoot)
-    if (!dvcRoot) {
-      return
-    }
-    return this.getRepository(dvcRoot).addSort()
+  public addSort(overrideRoot?: string) {
+    return this.getRepositoryThenUpdate('addSort', overrideRoot)
   }
 
-  public async addStarredSort(overrideRoot?: string) {
-    const dvcRoot = await this.getDvcRoot(overrideRoot)
-    if (!dvcRoot) {
-      return
-    }
-    return this.getRepository(dvcRoot).addStarredSort()
+  public addStarredSort(overrideRoot?: string) {
+    return this.getRepositoryThenUpdate('addStarredSort', overrideRoot)
   }
 
-  public async removeSorts() {
-    const dvcRoot = await this.getFocusedOrOnlyOrPickProject()
-    if (!dvcRoot) {
-      return
-    }
-
-    return this.getRepository(dvcRoot).removeSorts()
+  public removeSorts() {
+    return this.getRepositoryThenUpdate('removeSorts')
   }
 
-  public async selectExperimentsToPlot(overrideRoot?: string) {
-    const dvcRoot = await this.getDvcRoot(overrideRoot)
-    if (!dvcRoot) {
-      return
-    }
-    return this.getRepository(dvcRoot).selectExperimentsToPlot()
+  public selectExperimentsToPlot(overrideRoot?: string) {
+    return this.getRepositoryThenUpdate('selectExperimentsToPlot', overrideRoot)
   }
 
-  public async selectColumns(overrideRoot?: string) {
-    const dvcRoot = await this.getDvcRoot(overrideRoot)
-    if (!dvcRoot) {
-      return
-    }
-    return this.getRepository(dvcRoot).selectColumns()
+  public selectColumns(overrideRoot?: string) {
+    return this.getRepositoryThenUpdate('selectColumns', overrideRoot)
   }
 
-  public async selectQueueTasksToKill() {
-    const cwd = await this.getFocusedOrOnlyOrPickProject()
-    if (!cwd) {
-      return
-    }
-
-    const taskIds = await this.getRepository(cwd).pickQueueTasksToKill()
-
-    if (!taskIds || isEmpty(taskIds)) {
-      return
-    }
-    return this.runCommand(AvailableCommands.QUEUE_KILL, cwd, ...taskIds)
+  public selectQueueTasksToKill() {
+    return this.pickIdsThenRun(
+      'pickQueueTasksToKill',
+      AvailableCommands.QUEUE_KILL
+    )
   }
 
   public async selectExperimentsToPush(setup: Setup) {
@@ -190,20 +145,11 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return pushCommand({ dvcRoot, ids })
   }
 
-  public async selectExperimentsToRemove() {
-    const cwd = await this.getFocusedOrOnlyOrPickProject()
-    if (!cwd) {
-      return
-    }
-
-    const experimentIds = await this.getRepository(
-      cwd
-    ).pickExperimentsToRemove()
-    if (!experimentIds || isEmpty(experimentIds)) {
-      return
-    }
-
-    return this.runCommand(AvailableCommands.EXP_REMOVE, cwd, ...experimentIds)
+  public selectExperimentsToRemove() {
+    return this.pickIdsThenRun(
+      'pickExperimentsToRemove',
+      AvailableCommands.EXP_REMOVE
+    )
   }
 
   public async modifyExperimentParamsAndRun(
@@ -257,12 +203,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     }
 
     return this.internalCommands.executeCommand(commandId, cwd)
-  }
-
-  public async pauseUpdatesThenRun(func: () => Promise<void> | undefined) {
-    this.updatesPaused.fire(true)
-    await func()
-    this.updatesPaused.fire(false)
   }
 
   public getCwdThenReport(commandId: CommandId) {
@@ -342,16 +282,11 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
   }
 
-  public createRepository(
-    dvcRoot: string,
-    updatesPaused: EventEmitter<boolean>,
-    resourceLocator: ResourceLocator
-  ) {
+  public createRepository(dvcRoot: string, resourceLocator: ResourceLocator) {
     const experiments = this.dispose.track(
       new Experiments(
         dvcRoot,
         this.internalCommands,
-        updatesPaused,
         resourceLocator,
         this.workspaceState,
         () => this.checkOrAddPipeline(dvcRoot),
@@ -451,6 +386,25 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
         title: Title.SELECT_BRANCHES
       }
     )
+  }
+
+  private async getRepositoryThenUpdate(
+    method:
+      | 'addFilter'
+      | 'addStarredFilter'
+      | 'removeFilters'
+      | 'addSort'
+      | 'addStarredSort'
+      | 'removeSorts'
+      | 'selectExperimentsToPlot'
+      | 'selectColumns',
+    overrideRoot?: string
+  ) {
+    const dvcRoot = await this.getDvcRoot(overrideRoot)
+    if (!dvcRoot) {
+      return
+    }
+    return this.getRepository(dvcRoot)[method]()
   }
 
   private async shouldRun() {
@@ -553,6 +507,25 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       ''
     const enteredManually = pathOrSelect !== selectValue
     return { command, enteredManually, trainingScript }
+  }
+
+  private async pickIdsThenRun(
+    pickMethod: 'pickQueueTasksToKill' | 'pickExperimentsToRemove',
+    commandId:
+      | typeof AvailableCommands.QUEUE_KILL
+      | typeof AvailableCommands.EXP_REMOVE
+  ) {
+    const cwd = await this.getFocusedOrOnlyOrPickProject()
+    if (!cwd) {
+      return
+    }
+
+    const ids = await this.getRepository(cwd)[pickMethod]()
+
+    if (!ids || isEmpty(ids)) {
+      return
+    }
+    return this.runCommand(commandId, cwd, ...ids)
   }
 
   private async pickExpThenRun(

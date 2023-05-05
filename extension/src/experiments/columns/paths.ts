@@ -12,9 +12,10 @@ const FILE_SPLIT_REGEX = new RegExp(
   `([^${FILE_SEPARATOR}]*)(?:${FILE_SEPARATOR}([^${FILE_SEPARATOR}]*))?(?:${FILE_SEPARATOR}(.*))?`
 )
 
-export const encodeColumn = (segment: string) =>
+const encodeColumn = (segment: string) =>
   segment.replace(ENCODE_METRIC_PARAM_REGEX, ENCODED_METRIC_PARAM_SEPARATOR)
-export const decodeColumn = (segment: string) =>
+
+const decodeColumn = (segment: string) =>
   segment.replace(DECODE_METRIC_PARAM_REGEX, METRIC_PARAM_SEPARATOR)
 
 export const appendColumnToPath = (...pathSegments: string[]) => {

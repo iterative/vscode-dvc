@@ -31,7 +31,6 @@ export const buildDependencies = (disposer: Disposer) => {
 
   const treeDataChanged = disposer.track(new EventEmitter<void>())
   const onDidChangeTreeData = treeDataChanged.event
-  const updatesPaused = disposer.track(new EventEmitter<boolean>())
 
   return {
     internalCommands,
@@ -41,8 +40,7 @@ export const buildDependencies = (disposer: Disposer) => {
     mockGetHasChanges,
     mockNow,
     onDidChangeTreeData,
-    treeDataChanged,
-    updatesPaused
+    treeDataChanged
   }
 }
 
@@ -52,17 +50,14 @@ export const buildRepositoryData = async (disposer: SafeWatcherDisposer) => {
     mockCreateFileSystemWatcher,
     mockDataStatus,
     mockGetAllUntracked,
-    mockNow,
-    updatesPaused
+    mockNow
   } = buildDependencies(disposer)
 
   mockDataStatus.resolves({})
   mockGetAllUntracked.resolves(new Set())
   mockNow.returns(FIRST_TRUTHY_TIME)
 
-  const data = disposer.track(
-    new RepositoryData(dvcDemoPath, internalCommands, updatesPaused)
-  )
+  const data = disposer.track(new RepositoryData(dvcDemoPath, internalCommands))
   await data.isReady()
 
   mockDataStatus.resetHistory()
@@ -78,12 +73,11 @@ export const buildRepositoryData = async (disposer: SafeWatcherDisposer) => {
 export const buildRepository = async (
   disposer: SafeWatcherDisposer,
   internalCommands: InternalCommands,
-  updatesPaused: EventEmitter<boolean>,
   treeDataChanged: EventEmitter<void>,
   dvcRoot = dvcDemoPath
 ) => {
   const repository = disposer.track(
-    new Repository(dvcRoot, internalCommands, updatesPaused, treeDataChanged)
+    new Repository(dvcRoot, internalCommands, treeDataChanged)
   )
 
   const setErrorDecorationStateSpy = spyOnPrivateMemberMethod(

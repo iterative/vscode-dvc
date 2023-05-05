@@ -18,7 +18,7 @@ import {
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { useIsSectionComplete } from '../../hooks/useIsSectionComplete'
 
-export type DvcProps = {
+type DvcProps = {
   canGitInitialize: boolean | undefined
   cliCompatible: boolean | undefined
   dvcCliDetails: DvcCliDetails | undefined

@@ -1,6 +1,5 @@
 import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
-import { EventEmitter } from 'vscode'
 import { expect } from 'chai'
 import { restore, spy, stub } from 'sinon'
 import { PlotsData } from '../../../../plots/data'
@@ -35,8 +34,7 @@ suite('Plots Data Test Suite', () => {
   })
 
   const buildPlotsData = (selectedRevisions: string[] = []) => {
-    const { internalCommands, updatesPaused, mockPlotsDiff } =
-      buildDependencies(disposable)
+    const { internalCommands, mockPlotsDiff } = buildDependencies(disposable)
 
     const mockGetSelectedOrderedIds = stub().returns(selectedRevisions)
 
@@ -45,12 +43,7 @@ suite('Plots Data Test Suite', () => {
     } as unknown as PlotsModel
 
     const data = disposable.track(
-      new PlotsData(
-        dvcDemoPath,
-        internalCommands,
-        mockPlotsModel,
-        updatesPaused
-      )
+      new PlotsData(dvcDemoPath, internalCommands, mockPlotsModel)
     )
 
     return {
@@ -119,8 +112,7 @@ suite('Plots Data Test Suite', () => {
           } as unknown as InternalCommands,
           {
             getSelectedOrderedIds: () => []
-          } as unknown as PlotsModel,
-          disposable.track(new EventEmitter<boolean>())
+          } as unknown as PlotsModel
         )
       )
 

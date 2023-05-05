@@ -6,7 +6,7 @@
 
 .item {
   display: flex;
-  cursor: pointer;
+  cursor: default;
   height: 24px;
   padding: 2px 6px;
 
@@ -23,6 +23,15 @@
   width: 165px;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.disabledItem {
+  opacity: $disabled-opacity;
+  cursor: default;
+
+  &:hover {
+    background-color: $bg-color;
+  }
 }
 
 .itemIcon {

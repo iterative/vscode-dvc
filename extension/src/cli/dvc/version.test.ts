@@ -127,34 +127,34 @@ describe('isVersionCompatible', () => {
     )
   })
 
-  it('should return behind min version if the provided version is a patch version before the minimum expected version', () => {
+  it('should return behind incompatible if the provided version is a patch version before the minimum expected version', () => {
     const isCompatible = isVersionCompatible(
       [minMajor, minMinor, minPatch - 1].join('.')
     )
 
-    expect(isCompatible).toStrictEqual(CliCompatible.NO_BEHIND_MIN_VERSION)
+    expect(isCompatible).toStrictEqual(CliCompatible.NO_INCOMPATIBLE)
   })
 
-  it('should return behind min version if the provided minor version is before the minimum expected version', () => {
+  it('should return behind incompatible if the provided minor version is before the minimum expected version', () => {
     const isCompatible = isVersionCompatible(
       [minMajor, minMinor - 1, minPatch + 100].join('.')
     )
 
-    expect(isCompatible).toStrictEqual(CliCompatible.NO_BEHIND_MIN_VERSION)
+    expect(isCompatible).toStrictEqual(CliCompatible.NO_INCOMPATIBLE)
   })
 
-  it('should return behind min version if the provided major version is before the minimum expected version', () => {
+  it('should return behind incompatible if the provided major version is before the minimum expected version', () => {
     const isCompatible = isVersionCompatible(
       [minMajor - 1, minMinor + 1000, minPatch + 100].join('.')
     )
 
-    expect(isCompatible).toStrictEqual(CliCompatible.NO_BEHIND_MIN_VERSION)
+    expect(isCompatible).toStrictEqual(CliCompatible.NO_INCOMPATIBLE)
   })
 
-  it('should return major ahead if the provided major version is above the expected major version', () => {
+  it('should return incompatible if the provided major version is above the expected major version', () => {
     const isCompatible = isVersionCompatible('3.0.0')
 
-    expect(isCompatible).toStrictEqual(CliCompatible.NO_MAJOR_VERSION_AHEAD)
+    expect(isCompatible).toStrictEqual(CliCompatible.NO_INCOMPATIBLE)
   })
 
   it('should return cannot verify if the provided version is malformed', () => {

@@ -397,7 +397,7 @@ export enum EncodingType {
   STROKE_DASH = 'strokeDash'
 }
 
-export type EncodingElement =
+type EncodingElement =
   | {
       type: EncodingType.STROKE_DASH
       value: StrokeDashValue

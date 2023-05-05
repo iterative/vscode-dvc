@@ -15,7 +15,7 @@ const config = {
 } as Config
 
 export const dvcReader = new DvcReader(config)
-export const dvcExecutor = new DvcExecutor(
+const dvcExecutor = new DvcExecutor(
   config,
   () => undefined,
   () => Promise.resolve('')

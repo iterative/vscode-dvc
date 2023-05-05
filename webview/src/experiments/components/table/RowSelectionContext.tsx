@@ -1,7 +1,7 @@
 import React, { createContext, useState } from 'react'
 import { RowProp } from '../../util/interfaces'
 
-export interface RowSelectionContextValue {
+interface RowSelectionContextValue {
   selectedRows: Record<string, RowProp | undefined>
   lastSelectedRow?: RowProp
   toggleRowSelected?: (row: RowProp) => void

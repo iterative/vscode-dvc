@@ -17,12 +17,12 @@ const experimentMenuOption = (
   payload: string | string[] | { id: string; executor?: string | null }[],
   label: string,
   type: MessageFromWebviewType,
-  hidden?: boolean,
+  disabled?: boolean,
   divider?: boolean
 ) => {
   return {
+    disabled,
     divider,
-    hidden,
     id: type,
     label,
     message: {
@@ -54,7 +54,7 @@ const getMultiSelectMenuOptions = (
     .filter(value => value.row.depth === 1)
     .map(value => value.row.original.id)
 
-  const hideExperimentOnlyOption =
+  const disableExperimentOnlyOption =
     experimentRowIds.length !== selectedRowsList.length || hasRunningExperiment
 
   const stoppableRows = selectedRowsList
@@ -64,7 +64,7 @@ const getMultiSelectMenuOptions = (
       id: value.row.original.id
     }))
 
-  const hideStopOption = stoppableRows.length !== selectedRowsList.length
+  const disableStopOption = stoppableRows.length !== selectedRowsList.length
 
   const toggleStarOption = (ids: string[], label: string) =>
     experimentMenuOption(
@@ -101,21 +101,21 @@ const getMultiSelectMenuOptions = (
       stoppableRows,
       'Stop',
       MessageFromWebviewType.STOP_EXPERIMENT,
-      hideStopOption,
+      disableStopOption,
       true
     ),
     experimentMenuOption(
       experimentRowIds,
       'Push Selected',
       MessageFromWebviewType.PUSH_EXPERIMENT,
-      hideExperimentOnlyOption,
+      disableExperimentOnlyOption,
       true
     ),
     experimentMenuOption(
       experimentRowIds,
       'Remove Selected',
       MessageFromWebviewType.REMOVE_EXPERIMENT,
-      hideExperimentOnlyOption,
+      disableExperimentOnlyOption,
       true
     ),
     {
@@ -128,36 +128,44 @@ const getMultiSelectMenuOptions = (
 }
 
 const getRunResumeOptions = (
-  hideIfRunning: (
+  disableIfRunning: (
     label: string,
     type: MessageFromWebviewType,
-    hidden?: boolean,
+    disabled?: boolean,
     divider?: boolean
   ) => MessagesMenuOptionProps,
   projectHasCheckpoints: boolean,
-  hideVaryAndRun: boolean
+  disableVaryAndRun: boolean
 ) => {
-  const resetNeedsSeparator = !hideVaryAndRun && projectHasCheckpoints
-  const runNeedsSeparator = !hideVaryAndRun && !projectHasCheckpoints
+  const resetNeedsSeparator = !disableVaryAndRun && projectHasCheckpoints
+  const runNeedsSeparator = !disableVaryAndRun && !projectHasCheckpoints
 
-  return [
-    hideIfRunning(
-      'Modify and Run',
-      MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN,
-      !projectHasCheckpoints,
-      resetNeedsSeparator
-    ),
-    hideIfRunning(
+  const options = []
+  if (projectHasCheckpoints) {
+    options.push(
+      disableIfRunning(
+        'Modify and Run',
+        MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN,
+        false,
+        resetNeedsSeparator
+      )
+    )
+  }
+
+  options.push(
+    disableIfRunning(
       projectHasCheckpoints ? 'Modify and Resume' : 'Modify and Run',
       MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_AND_RUN,
       false,
       runNeedsSeparator
     ),
-    hideIfRunning(
+    disableIfRunning(
       'Modify and Queue',
       MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE
     )
-  ]
+  )
+
+  return options
 }
 
 const getSingleSelectMenuOptions = (
@@ -172,25 +180,25 @@ const getSingleSelectMenuOptions = (
 ) => {
   const isNotExperiment = isQueued(status) || isWorkspace || depth <= 0
 
-  const hideIfRunning = (
+  const disableIfRunning = (
     label: string,
     type: MessageFromWebviewType,
-    hidden?: boolean,
+    disabled?: boolean,
     divider?: boolean
   ) =>
     experimentMenuOption(
       id,
       label,
       type,
-      hidden || hasRunningExperiment,
+      disabled || hasRunningExperiment,
       divider
     )
 
-  const hideIfRunningOrNotExperiment = (
+  const disableIfRunningOrNotExperiment = (
     label: string,
     type: MessageFromWebviewType,
     divider?: boolean
-  ) => hideIfRunning(label, type, isNotExperiment, divider)
+  ) => disableIfRunning(label, type, isNotExperiment, divider)
 
   return [
     experimentMenuOption(
@@ -199,11 +207,11 @@ const getSingleSelectMenuOptions = (
       MessageFromWebviewType.SHOW_EXPERIMENT_LOGS,
       !isRunningInQueue({ executor, status })
     ),
-    hideIfRunningOrNotExperiment(
+    disableIfRunningOrNotExperiment(
       'Apply to Workspace',
       MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE
     ),
-    hideIfRunningOrNotExperiment(
+    disableIfRunningOrNotExperiment(
       'Create new Branch',
       MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
     ),
@@ -211,11 +219,11 @@ const getSingleSelectMenuOptions = (
       [id],
       'Push',
       MessageFromWebviewType.PUSH_EXPERIMENT,
-      isNotExperiment,
+      isNotExperiment || hasRunningExperiment,
       true
     ),
     ...getRunResumeOptions(
-      hideIfRunning,
+      disableIfRunning,
       projectHasCheckpoints,
       isNotExperiment
     ),
@@ -233,7 +241,7 @@ const getSingleSelectMenuOptions = (
       !isRunning(status),
       id !== EXPERIMENT_WORKSPACE_ID
     ),
-    hideIfRunning(
+    disableIfRunning(
       'Remove',
       MessageFromWebviewType.REMOVE_EXPERIMENT,
       depth !== 1,

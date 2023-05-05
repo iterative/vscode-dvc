@@ -23,17 +23,9 @@ export class WorkspaceRepositories extends BaseWorkspace<Repository> {
     return cwd
   }
 
-  public createRepository(
-    dvcRoot: string,
-    updatesPaused: EventEmitter<boolean>
-  ): Repository {
+  public createRepository(dvcRoot: string): Repository {
     const repository = this.dispose.track(
-      new Repository(
-        dvcRoot,
-        this.internalCommands,
-        updatesPaused,
-        this.treeDataChanged
-      )
+      new Repository(dvcRoot, this.internalCommands, this.treeDataChanged)
     )
 
     this.setRepository(dvcRoot, repository)

@@ -75,15 +75,13 @@ export type ColumnResizePayload = {
   id: string
   width: number
 }
+
 export type PlotsResizedPayload = {
   section: PlotsSection
   nbItemsPerRow: number
   height: PlotHeight
 }
-export type PlotSectionRenamedPayload = {
-  section: PlotsSection
-  name: string
-}
+
 export type PlotsTemplatesReordered = {
   group: TemplatePlotGroup
   paths: string[]

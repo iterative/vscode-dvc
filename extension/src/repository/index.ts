@@ -28,7 +28,6 @@ export class Repository extends DeferredDisposable {
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
-    updatesPaused: EventEmitter<boolean>,
     treeDataChanged: EventEmitter<void>
   ) {
     super()
@@ -36,7 +35,7 @@ export class Repository extends DeferredDisposable {
     this.dvcRoot = dvcRoot
     this.model = this.dispose.track(new RepositoryModel(dvcRoot))
     this.data = this.dispose.track(
-      new RepositoryData(dvcRoot, internalCommands, updatesPaused)
+      new RepositoryData(dvcRoot, internalCommands)
     )
 
     this.errorDecorationProvider = this.dispose.track(
