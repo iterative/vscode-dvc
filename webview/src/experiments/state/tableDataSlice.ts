@@ -126,7 +126,7 @@ export const tableDataSlice = createSlice({
         .filter(branch => branch !== branchWithWorkspace)
       state.branches = [
         branchWithWorkspace,
-        ...[...new Set(branches].sort()
+        ...[...new Set(branches)].sort()
       ].filter(Boolean) as string[]
     },
     updateSelectedForPlotsCount: (state, action: PayloadAction<number>) => {
