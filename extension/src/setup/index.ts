@@ -43,7 +43,12 @@ import { createFileSystemWatcher } from '../fileSystem/watcher'
 import { EventName } from '../telemetry/constants'
 import { WorkspaceScale } from '../telemetry/collect'
 import { gitPath } from '../cli/git/constants'
-import { Flag, ConfigKey as DvcConfigKey, DOT_DVC } from '../cli/dvc/constants'
+import {
+  Flag,
+  ConfigKey as DvcConfigKey,
+  DOT_DVC,
+  Args
+} from '../cli/dvc/constants'
 import { GLOBAL_WEBVIEW_DVCROOT } from '../webview/factory'
 import {
   ConfigKey as ExtensionConfigKey,
@@ -297,8 +302,7 @@ export class Setup
       if (!cwd) {
         return
       }
-      return this.internalCommands.executeCommand(
-        AvailableCommands.CONFIG,
+      return await this.accessConfig(
         cwd,
         Flag.GLOBAL,
         Flag.UNSET,
@@ -308,24 +312,19 @@ export class Setup
 
     const cwd = this.dvcRoots[0]
 
-    try {
-      await this.internalCommands.executeCommand(
-        AvailableCommands.CONFIG,
-        cwd,
-        Flag.LOCAL,
-        Flag.UNSET,
-        DvcConfigKey.STUDIO_TOKEN
-      )
-    } catch {}
-    try {
-      return await this.internalCommands.executeCommand(
-        AvailableCommands.CONFIG,
-        cwd,
-        Flag.GLOBAL,
-        Flag.UNSET,
-        DvcConfigKey.STUDIO_TOKEN
-      )
-    } catch {}
+    await this.accessConfig(
+      cwd,
+      Flag.LOCAL,
+      Flag.UNSET,
+      DvcConfigKey.STUDIO_TOKEN
+    )
+
+    return await this.accessConfig(
+      cwd,
+      Flag.GLOBAL,
+      Flag.UNSET,
+      DvcConfigKey.STUDIO_TOKEN
+    )
   }
 
   public async saveStudioAccessToken() {
@@ -344,13 +343,7 @@ export class Setup
       return
     }
 
-    await this.internalCommands.executeCommand(
-      AvailableCommands.CONFIG,
-      cwd,
-      Flag.GLOBAL,
-      DvcConfigKey.STUDIO_TOKEN,
-      token
-    )
+    await this.accessConfig(cwd, Flag.GLOBAL, DvcConfigKey.STUDIO_TOKEN, token)
     return this.updateIsStudioConnected()
   }
 
@@ -706,18 +699,25 @@ export class Setup
         this.studioAccessToken = undefined
         return
       }
-      this.studioAccessToken = await this.internalCommands.executeCommand(
-        AvailableCommands.CONFIG,
+      this.studioAccessToken = await this.accessConfig(
         cwd,
         DvcConfigKey.STUDIO_TOKEN
       )
-      return
     }
 
-    this.studioAccessToken = await this.internalCommands.executeCommand(
-      AvailableCommands.CONFIG,
+    this.studioAccessToken = await this.accessConfig(
       this.dvcRoots[0],
       DvcConfigKey.STUDIO_TOKEN
     )
+  }
+
+  private async accessConfig(cwd: string, ...args: Args) {
+    try {
+      return await this.internalCommands.executeCommand(
+        AvailableCommands.CONFIG,
+        cwd,
+        ...args
+      )
+    } catch {}
   }
 }
