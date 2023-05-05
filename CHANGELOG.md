@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.7] - 2023-05-05
+
+### 🐛 Bug Fixes
+
+- Ensure that accessing the DVC config doesn't throw an error [#3831](https://github.com/iterative/vscode-dvc/pull/3831) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Add import/no-unused-modules rule to eslint config [#3826](https://github.com/iterative/vscode-dvc/pull/3826) by [@mattseddon](https://github.com/mattseddon)
+- Increase default width and decrease min width of experiments column [#3833](https://github.com/iterative/vscode-dvc/pull/3833) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.8.6] - 2023-05-04
 
 ### 🚀 New Features and Enhancements
