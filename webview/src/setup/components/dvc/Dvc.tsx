@@ -56,9 +56,9 @@ export const Dvc: React.FC<DvcProps> = ({
   useEffect(() => {
     if (isComplete && previousIsComplete === false) {
       setSectionCollapsed({
-        [SetupSection.DVC]: false,
-        [SetupSection.EXPERIMENTS]: true,
-        [SetupSection.STUDIO]: true
+        [SetupSection.DVC]: true,
+        [SetupSection.EXPERIMENTS]: false,
+        [SetupSection.STUDIO]: false
       })
     }
   }, [isComplete, previousIsComplete, setSectionCollapsed])

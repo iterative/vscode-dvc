@@ -94,10 +94,6 @@ export const App: React.FC = () => {
     })
   }
 
-  const closeSection = (section: SetupSection) => {
-    setSectionCollapsed({ ...sectionCollapsed, [section]: true })
-  }
-
   return (
     <>
       <SetupContainer
