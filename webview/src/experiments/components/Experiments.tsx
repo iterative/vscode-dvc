@@ -64,8 +64,8 @@ const getDefaultColumn = () =>
     },
     header: ExperimentHeader,
     id: EXPERIMENT_COLUMN_ID,
-    minSize: 235,
-    size: 235
+    minSize: 230,
+    size: 240
   })
 
 const getColumns = (columns: Column[]) => {
