@@ -474,15 +474,11 @@ describe('App', () => {
 
       renderApp(dvcNotSetup)
 
-      const dvcDetails = within(
-        screen.getAllByTestId('section-container')[0]
-      ).getByRole('group')
-      const experimentsDetails = within(
-        screen.getAllByTestId('section-container')[1]
-      ).getByRole('group')
-      const studioDetails = within(
-        screen.getAllByTestId('section-container')[2]
-      ).getByRole('group')
+      const dvcDetails = screen.getByTestId('dvc-section-details')
+      const experimentsDetails = screen.getByTestId(
+        'experiments-section-details'
+      )
+      const studioDetails = screen.getByTestId('studio-section-details')
 
       expect(dvcDetails).toHaveAttribute('open')
       expect(experimentsDetails).not.toHaveAttribute('open')
