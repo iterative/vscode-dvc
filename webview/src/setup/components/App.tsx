@@ -66,7 +66,6 @@ export const App: React.FC = () => {
           setSectionCollapsed(data.data.sectionCollapsed)
         }
         setShareLiveToStudioValue(data.data.shareLiveToStudio)
-        // TBD There is probably a better way to go about this...
         setHasReceivedMessageFromVsCode(true)
       },
       [

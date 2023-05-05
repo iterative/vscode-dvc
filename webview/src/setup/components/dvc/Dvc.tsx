@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import {
   DvcCliDetails,
   SetupSection,
@@ -16,7 +16,7 @@ import {
   setupWorkspace
 } from '../messages'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
-import { usePrevious } from '../../../shared/hooks/usePrevious'
+import { useIsSectionComplete } from '../../hooks/useIsSectionComplete'
 
 export type DvcProps = {
   canGitInitialize: boolean | undefined
@@ -41,27 +41,17 @@ export const Dvc: React.FC<DvcProps> = ({
   hasReceivedMessageFromVsCode,
   setSectionCollapsed
 }) => {
-  const [isComplete, setIsComplete] = useState<boolean | undefined>(undefined)
+  const isSetup = projectInitialized && !!cliCompatible
 
-  const previousIsComplete = usePrevious(isComplete)
+  const onCompletion = () => {
+    setSectionCollapsed({
+      [SetupSection.DVC]: true,
+      [SetupSection.EXPERIMENTS]: false,
+      [SetupSection.STUDIO]: false
+    })
+  }
 
-  useEffect(() => {
-    if (projectInitialized && cliCompatible) {
-      setIsComplete(true)
-    } else if (hasReceivedMessageFromVsCode) {
-      setIsComplete(false)
-    }
-  }, [projectInitialized, cliCompatible, hasReceivedMessageFromVsCode])
-
-  useEffect(() => {
-    if (isComplete && previousIsComplete === false) {
-      setSectionCollapsed({
-        [SetupSection.DVC]: true,
-        [SetupSection.EXPERIMENTS]: false,
-        [SetupSection.STUDIO]: false
-      })
-    }
-  }, [isComplete, previousIsComplete, setSectionCollapsed])
+  useIsSectionComplete(isSetup, hasReceivedMessageFromVsCode, onCompletion)
 
   const children = dvcCliDetails && (
     <DvcEnvDetails
