@@ -29,7 +29,7 @@ const getIconMenuItems = (
   }
 ]
 
-export const ColumnDragHandle: React.FC<{
+const ColumnDragHandle: React.FC<{
   disabled: boolean
   header: Header<Experiment, unknown>
   onDragEnter: DragFunction

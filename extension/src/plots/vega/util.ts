@@ -262,7 +262,7 @@ export const truncateVerticalTitle = (
 const isEndValue = (valueType: string) =>
   ['string', 'number', 'boolean'].includes(valueType)
 
-export const truncateTitles = (
+const truncateTitles = (
   spec: TopLevelSpec,
   width: number,
   height: number,

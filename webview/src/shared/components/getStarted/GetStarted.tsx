@@ -1,7 +1,7 @@
 import React from 'react'
 import { EmptyState } from '../emptyState/EmptyState'
 
-export type GetStartedProps = {
+type GetStartedProps = {
   addItems: React.ReactNode
   showEmpty: boolean
   welcome: React.ReactNode

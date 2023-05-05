@@ -8,7 +8,6 @@ import { PlotsModel } from './model'
 import { collectEncodingElements, collectScale } from './paths/collect'
 import { PathsModel } from './paths/model'
 import { pickCustomPlots, pickMetricAndParam } from './model/quickPick'
-import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Experiments } from '../experiments'
@@ -21,8 +20,6 @@ import { pickPaths } from '../path/selection/quickPick'
 import { ErrorDecorationProvider } from '../tree/decorationProvider/error'
 import { DecoratableTreeItemScheme } from '../tree'
 import { Title } from '../vscode/title'
-
-export type PlotsWebview = BaseWebview<TPlotsData>
 
 export class Plots extends BaseRepository<TPlotsData> {
   public readonly viewKey = ViewKey.PLOTS

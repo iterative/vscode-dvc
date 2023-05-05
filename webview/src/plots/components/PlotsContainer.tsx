@@ -18,7 +18,7 @@ import { Slider } from '../../shared/components/slider/Slider'
 import { PlotsState } from '../store'
 import { SectionContainer } from '../../shared/components/sectionContainer/SectionContainer'
 
-export interface PlotsContainerProps {
+interface PlotsContainerProps {
   sectionCollapsed: boolean
   sectionKey: PlotsSection
   title: string

@@ -2,7 +2,7 @@ import { act } from 'react-dom/test-utils'
 import { DragEnterDirection } from '../shared/components/dragDrop/util'
 import { idToNode } from '../util/helpers'
 
-export type SpyableEventCurrentTargetDistances =
+type SpyableEventCurrentTargetDistances =
   typeof import('../shared/components/dragDrop/currentTarget')
 
 const testStorage = new Map()

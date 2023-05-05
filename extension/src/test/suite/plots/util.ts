@@ -104,20 +104,3 @@ export const buildPlots = async (
     webviewMessages
   }
 }
-
-export const buildWorkspacePlots = (disposer: Disposer) => {
-  const { config, internalCommands, messageSpy, resourceLocator } =
-    buildDependencies(disposer)
-
-  const workspacePlots = disposer.track(
-    new WorkspacePlots(internalCommands, buildMockMemento())
-  )
-
-  return {
-    config,
-    internalCommands,
-    messageSpy,
-    resourceLocator,
-    workspacePlots
-  }
-}

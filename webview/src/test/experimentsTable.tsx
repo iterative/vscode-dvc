@@ -91,7 +91,7 @@ export const clickRowCheckbox = (label: string, multiSelection?: boolean) => {
   })
 }
 
-export const toggleExpansion = (label: string, btnTitle: string) => {
+const toggleExpansion = (label: string, btnTitle: string) => {
   const button = within(getRow(label)).getByTitle(`${btnTitle} Row`)
   fireEvent.click(button)
 }

@@ -11,7 +11,7 @@ export type BaseType =
 
 export type Any = BaseType | BaseType[]
 
-export type Obj = { [key: string]: Any }
+type Obj = { [key: string]: Any }
 
 export const keepReferenceIfEqual = (old: BaseType, recent: BaseType) =>
   isEqual(old, recent) ? old : recent

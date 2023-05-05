@@ -51,7 +51,7 @@ import { registerSetupCommands } from './setup/register'
 import { Status } from './status'
 import { registerPersistenceCommands } from './persistence/register'
 
-export class Extension extends Disposable {
+class Extension extends Disposable {
   protected readonly internalCommands: InternalCommands
 
   private readonly resourceLocator: ResourceLocator

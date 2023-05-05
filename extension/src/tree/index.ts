@@ -32,7 +32,7 @@ export const getDecoratableTreeItem = (
   return new TreeItem(decoratableUri, collapsibleState)
 }
 
-export type ErrorItem = { error: string }
+type ErrorItem = { error: string }
 
 export const isErrorItem = (
   maybeErrorItem: unknown

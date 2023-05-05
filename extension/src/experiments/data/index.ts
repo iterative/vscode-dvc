@@ -1,4 +1,3 @@
-import { join } from 'path'
 import { collectFiles } from './collect'
 import {
   EXPERIMENTS_GIT_LOGS_REFS,
@@ -14,8 +13,6 @@ import { DOT_DVC, ExperimentFlag } from '../../cli/dvc/constants'
 import { gitPath } from '../../cli/git/constants'
 import { getGitPath } from '../../fileSystem'
 import { ExperimentsModel } from '../model'
-
-export const QUEUED_EXPERIMENT_PATH = join(DOT_DVC, 'tmp', 'exps')
 
 export class ExperimentsData extends BaseData<ExpShowOutput> {
   private readonly experiments: ExperimentsModel

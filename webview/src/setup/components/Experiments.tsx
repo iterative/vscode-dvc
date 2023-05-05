@@ -8,7 +8,7 @@ import { IconButton } from '../../shared/components/button/IconButton'
 import { Beaker } from '../../shared/components/icons'
 import { Button } from '../../shared/components/button/Button'
 
-export type ExperimentsProps = {
+type ExperimentsProps = {
   isDvcSetup: boolean
   hasData: boolean | undefined
   setSectionCollapsed: (sectionCollapsed: SectionCollapsed) => void

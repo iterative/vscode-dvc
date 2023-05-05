@@ -33,7 +33,7 @@ export enum scriptCommand {
   PYTHON = 'python'
 }
 
-export const getScriptCommand = (script: string) => {
+const getScriptCommand = (script: string) => {
   switch (getFileExtension(script)) {
     case '.py':
       return scriptCommand.PYTHON
