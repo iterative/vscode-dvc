@@ -6,13 +6,12 @@ import styles from './styles.module.scss'
 import { SectionDescription } from './SectionContainer'
 import Tooltip from '../tooltip/Tooltip'
 import { Icon } from '../Icon'
-import { Info, PassFilled, Error, Pass } from '../icons'
+import { Info, PassFilled, Error } from '../icons'
 
 export enum TooltipIconType {
   PASSED = 'icon-pass-filled',
   INFO = 'icon-info',
-  ERROR = 'icon-error',
-  INCOMPLETE = 'icon-pass'
+  ERROR = 'icon-error'
 }
 
 const getIcon = (icon?: TooltipIconType) => {
@@ -27,11 +26,6 @@ const getIcon = (icon?: TooltipIconType) => {
   if (icon === TooltipIconType.ERROR) {
     props.icon = Error
     props.className = cx(styles.infoIcon, styles.errorIcon)
-  }
-
-  if (icon === TooltipIconType.INCOMPLETE) {
-    props.icon = Pass
-    props.className = cx(styles.infoIcon, styles.incompleteIcon)
   }
 
   if (icon === TooltipIconType.PASSED) {

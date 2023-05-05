@@ -631,7 +631,7 @@ describe('App', () => {
       })
     })
 
-    it('should show an incomplete icon if DVC is not setup', () => {
+    it('should show an error icon if DVC is not setup', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
@@ -653,7 +653,7 @@ describe('App', () => {
       const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[0]
 
       expect(
-        within(iconWrapper).getByTestId(TooltipIconType.INCOMPLETE)
+        within(iconWrapper).getByTestId(TooltipIconType.ERROR)
       ).toBeInTheDocument()
     })
 
@@ -877,7 +877,7 @@ describe('App', () => {
       })
     })
 
-    it('should show an incomplete icon if experiments are not setup', () => {
+    it('should show an error icon if experiments are not setup', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
@@ -899,7 +899,7 @@ describe('App', () => {
       const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[1]
 
       expect(
-        within(iconWrapper).getByTestId(TooltipIconType.INCOMPLETE)
+        within(iconWrapper).getByTestId(TooltipIconType.ERROR)
       ).toBeInTheDocument()
     })
 
@@ -1065,7 +1065,7 @@ describe('App', () => {
       })
     })
 
-    it('should show an error icon if dvc is not setup', () => {
+    it('should show an error icon if dvc is not compatible', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: false,
@@ -1088,6 +1088,32 @@ describe('App', () => {
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.ERROR)
+      ).toBeInTheDocument()
+    })
+
+    it('should show an info icon if dvc is compatible but studio is not connected', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
+        hasData: true,
+        isPythonExtensionUsed: true,
+        isStudioConnected: false,
+        needsGitCommit: false,
+        needsGitInitialized: false,
+        projectInitialized: true,
+        pythonBinPath: 'python',
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[2]
+
+      expect(
+        within(iconWrapper).getByTestId(TooltipIconType.INFO)
       ).toBeInTheDocument()
     })
   })
@@ -1148,7 +1174,7 @@ describe('App', () => {
       })
     })
 
-    it('should show an info icon if dvc is setup', () => {
+    it('should show an passed icon if connected', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
@@ -1158,7 +1184,7 @@ describe('App', () => {
         },
         hasData: false,
         isPythonExtensionUsed: false,
-        isStudioConnected: false,
+        isStudioConnected: true,
         needsGitCommit: true,
         needsGitInitialized: false,
         projectInitialized: true,
@@ -1170,7 +1196,7 @@ describe('App', () => {
       const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[2]
 
       expect(
-        within(iconWrapper).getByTestId(TooltipIconType.INFO)
+        within(iconWrapper).getByTestId(TooltipIconType.PASSED)
       ).toBeInTheDocument()
     })
   })

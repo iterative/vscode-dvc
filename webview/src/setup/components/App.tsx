@@ -90,7 +90,7 @@ export const App: React.FC = () => {
     })
   }
 
-  const isDvcSetup = cliCompatible && projectInitialized
+  const isDvcSetup = !!cliCompatible && projectInitialized
 
   return (
     <>
@@ -99,8 +99,7 @@ export const App: React.FC = () => {
         title="DVC"
         sectionCollapsed={sectionCollapsed}
         setSectionCollapsed={setSectionCollapsed}
-        isComplete={isDvcSetup}
-        hasError={false}
+        isSetup={isDvcSetup}
       >
         <Dvc
           canGitInitialize={canGitInitialize}
@@ -119,8 +118,7 @@ export const App: React.FC = () => {
         title="Experiments"
         sectionCollapsed={sectionCollapsed}
         setSectionCollapsed={setSectionCollapsed}
-        isComplete={!!hasData}
-        hasError={!isDvcSetup}
+        isSetup={isDvcSetup && !!hasData}
       >
         <Experiments
           needsGitCommit={needsGitCommit}
@@ -134,7 +132,8 @@ export const App: React.FC = () => {
         title="Studio"
         sectionCollapsed={sectionCollapsed}
         setSectionCollapsed={setSectionCollapsed}
-        hasError={!cliCompatible}
+        isSetup={!!cliCompatible}
+        isDisconnected={!isStudioConnected}
       >
         <Studio
           isStudioConnected={isStudioConnected}
