@@ -1071,12 +1071,12 @@
         {
           "command": "dvc.startExperimentsQueue",
           "group": "navigation@4",
-          "when": "dvc.experiments.webview.active && !dvc.experiment.running.workspace && dvc.commands.available"
+          "when": "dvc.experiments.webview.active && dvc.commands.available"
         },
         {
           "command": "dvc.startExperimentsQueue",
           "group": "navigation@4",
-          "when": "dvc.params.file.active && !dvc.experiment.running.workspace && dvc.commands.available"
+          "when": "dvc.params.file.active && dvc.commands.available"
         },
         {
           "command": "dvc.queueExperiment",
@@ -1234,7 +1234,7 @@
         },
         {
           "command": "dvc.stopAllRunningExperiments",
-          "when": "view == dvc.views.experimentsTree && !dvc.experiments.webview.active && dvc.experiment.running.workspace",
+          "when": "view == dvc.views.experimentsTree && !dvc.experiments.webview.active && dvc.experiment.running",
           "group": "1_run@1"
         },
         {
