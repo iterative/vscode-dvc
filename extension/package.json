@@ -362,8 +362,8 @@
         "category": "DVC"
       },
       {
-        "title": "Stop Running Queued Experiment(s)",
-        "command": "dvc.stopQueuedExperiments",
+        "title": "Stop Running Experiment(s)",
+        "command": "dvc.stopExperiments",
         "category": "DVC"
       },
       {
@@ -827,7 +827,7 @@
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
-          "command": "dvc.stopQueuedExperiments",
+          "command": "dvc.stopExperiments",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
@@ -1286,11 +1286,6 @@
           "command": "dvc.stopExperimentsQueue",
           "when": "view == dvc.views.experimentsTree",
           "group": "3_queue@3"
-        },
-        {
-          "command": "dvc.stopQueuedExperiments",
-          "when": "view == dvc.views.experimentsTree",
-          "group": "3_queue@5"
         },
         {
           "command": "dvc.addExperimentsTableSort",
