@@ -14,41 +14,29 @@ export enum TooltipIconType {
   ERROR = 'error'
 }
 
-const getIcon = (iconType: TooltipIconType = TooltipIconType.INFO) => {
-  const defaultProps = {
-    'data-testid': iconType,
-    height: 16,
-    width: 16
-  }
-
-  if (iconType === TooltipIconType.ERROR) {
-    return (
-      <Icon
-        {...defaultProps}
-        icon={Error}
-        className={cx(styles.infoIcon, styles.errorIcon)}
-      />
-    )
-  }
-
-  if (iconType === TooltipIconType.PASSED) {
-    return (
-      <Icon
-        {...defaultProps}
-        icon={PassFilled}
-        className={cx(styles.infoIcon, styles.completedIcon)}
-      />
-    )
-  }
-
-  return <Icon {...defaultProps} icon={Info} className={styles.infoIcon} />
+const tooltipIcons = {
+  [TooltipIconType.PASSED]: PassFilled,
+  [TooltipIconType.INFO]: Info,
+  [TooltipIconType.ERROR]: Error
 }
 
 export const InfoTooltip: React.FC<{
   sectionKey: PlotsSection | SetupSection
   icon?: TooltipIconType
-}> = ({ icon, sectionKey }) => {
-  const infoIcon = getIcon(icon)
+}> = ({ icon = TooltipIconType.INFO, sectionKey }) => {
+  const infoIcon = (
+    <Icon
+      data-testid={icon}
+      width={16}
+      height={16}
+      icon={tooltipIcons[icon]}
+      className={cx(
+        styles.infoIcon,
+        icon === TooltipIconType.ERROR && styles.errorIcon,
+        icon === TooltipIconType.PASSED && styles.completedIcon
+      )}
+    />
+  )
 
   const tooltipContent = (
     <div className={styles.infoTooltip}>
