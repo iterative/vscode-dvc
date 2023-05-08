@@ -6,7 +6,12 @@ import {
 } from 'vscode'
 import { ExperimentType } from '.'
 import { extractColumns } from '../columns/extract'
-import { Experiment, CommitData, RunningExperiment } from '../webview/contract'
+import {
+  Experiment,
+  CommitData,
+  RunningExperiment,
+  isQueued
+} from '../webview/contract'
 import {
   EXPERIMENT_WORKSPACE_ID,
   ExperimentStatus,
@@ -370,5 +375,30 @@ export const collectExperimentType = (
     collectExperimentItem(acc, types, experimentItem)
   }
 
+  return acc
+}
+
+const collectExperimentsAndCommit = (
+  acc: Experiment[],
+  commit: Experiment,
+  experiments: Experiment[] = []
+): void => {
+  acc.push(commit)
+  for (const experiment of experiments) {
+    if (isQueued(experiment.status)) {
+      continue
+    }
+    acc.push(experiment)
+  }
+}
+
+export const collectOrderedCommitsAndExperiments = (
+  commits: Experiment[],
+  getExperimentsByCommit: (commit: Experiment) => Experiment[] | undefined
+): Experiment[] => {
+  const acc: Experiment[] = []
+  for (const commit of commits) {
+    collectExperimentsAndCommit(acc, commit, getExperimentsByCommit(commit))
+  }
   return acc
 }

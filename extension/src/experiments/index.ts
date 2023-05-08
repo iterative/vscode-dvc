@@ -371,9 +371,9 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
-  public pickExperiment() {
+  public pickCommitOrExperiment() {
     return pickExperiment(
-      this.experiments.getExperiments(),
+      this.experiments.getCommitsAndExperiments(),
       this.getFirstThreeColumnOrder()
     )
   }

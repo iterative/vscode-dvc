@@ -1,7 +1,10 @@
 import { Memento } from 'vscode'
 import { SortDefinition, sortExperiments } from './sortBy'
 import { FilterDefinition, filterExperiment, getFilterId } from './filterBy'
-import { collectExperiments } from './collect'
+import {
+  collectExperiments,
+  collectOrderedCommitsAndExperiments
+} from './collect'
 import {
   collectColoredStatus,
   collectFinishedRunningExperiments,
@@ -317,6 +320,12 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.getExperimentsAndQueued().filter(({ status }) => {
       return !isQueued(status)
     })
+  }
+
+  public getCommitsAndExperiments() {
+    return collectOrderedCommitsAndExperiments(this.commits, commit =>
+      this.getExperimentsByCommit(commit)
+    )
   }
 
   public getExperimentsAndQueued() {

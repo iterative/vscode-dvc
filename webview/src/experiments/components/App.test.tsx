@@ -858,7 +858,7 @@ describe('App', () => {
       expect(itemLabels).toStrictEqual(['Modify and Run', 'Modify and Queue'])
     })
 
-    it('should enable the correct options for the main row with checkpoints', () => {
+    it('should enable the correct options for a commit with checkpoints', () => {
       renderTableWithoutRunningExperiments()
 
       const target = screen.getByText('main')
@@ -870,8 +870,30 @@ describe('App', () => {
         .filter(item => !item.className.includes('disabled'))
         .map(item => item.textContent)
       expect(itemLabels).toStrictEqual([
+        'Apply to Workspace',
+        'Create new Branch',
         'Modify and Run',
         'Modify and Resume',
+        'Modify and Queue',
+        'Star'
+      ])
+    })
+
+    it('should enable the correct options for a commit without checkpoints', () => {
+      renderTableWithoutRunningExperiments(false)
+
+      const target = screen.getByText('main')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
+      expect(itemLabels).toStrictEqual([
+        'Apply to Workspace',
+        'Create new Branch',
+        'Modify and Run',
         'Modify and Queue',
         'Star'
       ])
