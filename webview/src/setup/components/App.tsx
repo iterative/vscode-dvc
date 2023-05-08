@@ -90,6 +90,8 @@ export const App: React.FC = () => {
     })
   }
 
+  const isDvcSetup = !!cliCompatible && projectInitialized
+
   return (
     <>
       <SetupContainer
@@ -97,6 +99,7 @@ export const App: React.FC = () => {
         title="DVC"
         sectionCollapsed={sectionCollapsed}
         setSectionCollapsed={setSectionCollapsed}
+        isSetup={isDvcSetup}
       >
         <Dvc
           canGitInitialize={canGitInitialize}
@@ -115,6 +118,7 @@ export const App: React.FC = () => {
         title="Experiments"
         sectionCollapsed={sectionCollapsed}
         setSectionCollapsed={setSectionCollapsed}
+        isSetup={isDvcSetup && !!hasData}
       >
         <Experiments
           needsGitCommit={needsGitCommit}
@@ -128,6 +132,8 @@ export const App: React.FC = () => {
         title="Studio"
         sectionCollapsed={sectionCollapsed}
         setSectionCollapsed={setSectionCollapsed}
+        isSetup={!!cliCompatible}
+        isConnected={isStudioConnected}
       >
         <Studio
           isStudioConnected={isStudioConnected}

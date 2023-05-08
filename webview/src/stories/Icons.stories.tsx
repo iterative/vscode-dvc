@@ -24,6 +24,7 @@ import {
   GraphScatter,
   Gripper,
   Lines,
+  PassFilled,
   Pin,
   Refresh,
   SortPrecedence,
@@ -98,6 +99,9 @@ const Template: StoryFn = () => {
       </IconWrapper>
       <IconWrapper name="Lines">
         <Icon icon={Lines} />
+      </IconWrapper>
+      <IconWrapper name="PassFilled">
+        <Icon icon={PassFilled} />
       </IconWrapper>
       <IconWrapper name="Pin">
         <Icon icon={Pin} />

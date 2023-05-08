@@ -9,6 +9,7 @@ import React from 'react'
 import { SetupSection, SetupData } from 'dvc/src/setup/webview/contract'
 import { App } from './App'
 import { vsCodeApi } from '../../shared/api'
+import { TooltipIconType } from '../../shared/components/sectionContainer/InfoTooltip'
 
 jest.mock('../../shared/api')
 jest.mock('../../shared/components/codeSlider/CodeSlider')
@@ -629,6 +630,58 @@ describe('App', () => {
         type: MessageFromWebviewType.SELECT_PYTHON_INTERPRETER
       })
     })
+
+    it('should show an error icon if DVC is not setup', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
+        hasData: false,
+        isPythonExtensionUsed: false,
+        isStudioConnected: false,
+        needsGitCommit: false,
+        needsGitInitialized: undefined,
+        projectInitialized: false,
+        pythonBinPath: undefined,
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[0]
+
+      expect(
+        within(iconWrapper).getByTestId(TooltipIconType.ERROR)
+      ).toBeInTheDocument()
+    })
+
+    it('should show a passed icon if DVC CLI is compatible and project is initialized', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
+        hasData: true,
+        isPythonExtensionUsed: true,
+        isStudioConnected: true,
+        needsGitCommit: false,
+        needsGitInitialized: false,
+        projectInitialized: true,
+        pythonBinPath: 'python',
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[0]
+
+      expect(
+        within(iconWrapper).getByTestId(TooltipIconType.PASSED)
+      ).toBeInTheDocument()
+    })
   })
 
   describe('Experiments', () => {
@@ -823,6 +876,84 @@ describe('App', () => {
         type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW
       })
     })
+
+    it('should show an error icon if experiments are not setup', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
+        hasData: false,
+        isPythonExtensionUsed: false,
+        isStudioConnected: false,
+        needsGitCommit: false,
+        needsGitInitialized: undefined,
+        projectInitialized: true,
+        pythonBinPath: undefined,
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[1]
+
+      expect(
+        within(iconWrapper).getByTestId(TooltipIconType.ERROR)
+      ).toBeInTheDocument()
+    })
+
+    it('should show an error icon if dvc is not setup', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: false,
+        dvcCliDetails: {
+          command: 'dvc',
+          version: '1.0.0'
+        },
+        hasData: false,
+        isPythonExtensionUsed: false,
+        isStudioConnected: false,
+        needsGitCommit: false,
+        needsGitInitialized: undefined,
+        projectInitialized: false,
+        pythonBinPath: undefined,
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[1]
+
+      expect(
+        within(iconWrapper).getByTestId(TooltipIconType.ERROR)
+      ).toBeInTheDocument()
+    })
+
+    it('should show a passed icon if experiments are setup', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
+        hasData: true,
+        isPythonExtensionUsed: true,
+        isStudioConnected: true,
+        needsGitCommit: false,
+        needsGitInitialized: false,
+        projectInitialized: true,
+        pythonBinPath: 'python',
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[1]
+
+      expect(
+        within(iconWrapper).getByTestId(TooltipIconType.PASSED)
+      ).toBeInTheDocument()
+    })
   })
 
   describe('Studio not connected', () => {
@@ -933,6 +1064,58 @@ describe('App', () => {
         type: MessageFromWebviewType.SAVE_STUDIO_TOKEN
       })
     })
+
+    it('should show an error icon if dvc is not compatible', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: false,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
+        hasData: false,
+        isPythonExtensionUsed: false,
+        isStudioConnected: false,
+        needsGitCommit: false,
+        needsGitInitialized: undefined,
+        projectInitialized: true,
+        pythonBinPath: undefined,
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[2]
+
+      expect(
+        within(iconWrapper).getByTestId(TooltipIconType.ERROR)
+      ).toBeInTheDocument()
+    })
+
+    it('should show an info icon if dvc is compatible but studio is not connected', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
+        hasData: true,
+        isPythonExtensionUsed: true,
+        isStudioConnected: false,
+        needsGitCommit: false,
+        needsGitInitialized: false,
+        projectInitialized: true,
+        pythonBinPath: 'python',
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[2]
+
+      expect(
+        within(iconWrapper).getByTestId(TooltipIconType.INFO)
+      ).toBeInTheDocument()
+    })
   })
 
   describe('Studio connected', () => {
@@ -989,6 +1172,32 @@ describe('App', () => {
       expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.SAVE_STUDIO_TOKEN
       })
+    })
+
+    it('should show a passed icon if connected', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: '1.0.0'
+        },
+        hasData: false,
+        isPythonExtensionUsed: false,
+        isStudioConnected: true,
+        needsGitCommit: true,
+        needsGitInitialized: false,
+        projectInitialized: true,
+        pythonBinPath: undefined,
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[2]
+
+      expect(
+        within(iconWrapper).getByTestId(TooltipIconType.PASSED)
+      ).toBeInTheDocument()
     })
   })
 
