@@ -48,7 +48,7 @@ const tableData: TableDataState = {
   hasConfig: true,
   hasData: true,
   hasMoreCommits: true,
-  hasRunningExperiment: true,
+  hasRunningWorkspaceExperiment: true,
   hasValidDvcYaml: true,
   isBranchesView: false,
   isShowingMoreCommits: true,
@@ -70,7 +70,7 @@ const tableData: TableDataState = {
 
 const noRunningExperiments = {
   ...tableData,
-  hasRunningExperiment: false,
+  hasRunningWorkspaceExperiment: false,
   rows: addCommitDataToMainBranch(rowsFixtureWithBranches).map(row => ({
     ...row,
     status: ExperimentStatus.SUCCESS,

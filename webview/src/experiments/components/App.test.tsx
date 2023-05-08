@@ -877,7 +877,7 @@ describe('App', () => {
       ])
     })
 
-    it('should enable the correct option for an experiment with checkpoints and close on esc', () => {
+    it('should enable the correct options for an experiment that is not running and close on esc', () => {
       renderTableWithoutRunningExperiments()
 
       const target = screen.getByText('[exp-e7a67]')
@@ -889,7 +889,6 @@ describe('App', () => {
         .filter(item => !item.className.includes('disabled'))
         .map(item => item.textContent)
       expect(itemLabels).toStrictEqual([
-        'Show Logs',
         'Apply to Workspace',
         'Create new Branch',
         'Push',
@@ -897,11 +896,31 @@ describe('App', () => {
         'Modify and Resume',
         'Modify and Queue',
         'Star',
-        'Stop',
         'Remove'
       ])
 
       fireEvent.keyDown(menuitems[0], { bubbles: true, key: 'Escape' })
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
+    })
+
+    it('should enable the correct options for a running experiment', () => {
+      renderTable()
+
+      const target = screen.getByText('[exp-e7a67]')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
+      expect(itemLabels).toStrictEqual(['Show Logs', 'Star', 'Stop'])
+
+      fireEvent.click(menuitems[0], { bubbles: true, key: 'Escape' })
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: 'exp-e7a67',
+        type: MessageFromWebviewType.SHOW_EXPERIMENT_LOGS
+      })
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })
 
@@ -971,7 +990,7 @@ describe('App', () => {
       expect(screen.queryAllByRole('menuitem')).toHaveLength(10)
     })
 
-    it('should enable the Remove experiment option for the checkpoint tips', () => {
+    it('should enable the remove option for an experiment', () => {
       renderTableWithoutRunningExperiments()
 
       const target = screen.getByText('4fb124a')
@@ -1015,6 +1034,23 @@ describe('App', () => {
       })
     })
 
+    it('should disable the remove selected option if an experiment is running in the workspace', () => {
+      renderTable()
+
+      clickRowCheckbox('4fb124a')
+      clickRowCheckbox('42b8736')
+
+      const target = screen.getByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
+      expect(itemLabels).not.toContain('Remove Selected')
+    })
+
     it('should enable the push option if only experiments are selected', () => {
       renderTableWithoutRunningExperiments()
 
@@ -1045,6 +1081,23 @@ describe('App', () => {
       })
     })
 
+    it('should disable the push selected option if an experiment is running in the workspace', () => {
+      renderTable()
+
+      clickRowCheckbox('4fb124a')
+      clickRowCheckbox('42b8736')
+
+      const target = screen.getByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
+      expect(itemLabels).not.toContain('Push Selected')
+    })
+
     it('should enable the stop option if only running experiments are selected', () => {
       renderTable()
 
@@ -1072,6 +1125,53 @@ describe('App', () => {
         payload: [{ executor: Executor.DVC_TASK, id: 'exp-e7a67' }],
         type: MessageFromWebviewType.STOP_EXPERIMENT
       })
+    })
+
+    it('should enable the stop option if multiple running experiments are selected', () => {
+      renderTable()
+
+      clickRowCheckbox('4fb124a')
+      clickRowCheckbox('[exp-83425]')
+
+      const target = screen.getByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
+      expect(itemLabels).toContain('Stop')
+
+      const stopOption = menuitems.find(item =>
+        item.textContent?.includes('Stop')
+      )
+
+      expect(stopOption).toBeDefined()
+
+      stopOption && fireEvent.click(stopOption)
+
+      expect(sendMessage).toHaveBeenCalledWith({
+        payload: ['exp-e7a67', 'exp-83425'],
+        type: MessageFromWebviewType.STOP_EXPERIMENT
+      })
+    })
+
+    it('should disable the stop option if finished experiments are selected', () => {
+      renderTable()
+
+      clickRowCheckbox('4fb124a')
+      clickRowCheckbox('90aea7f')
+
+      const target = screen.getByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
+      expect(itemLabels).not.toContain('Stop')
     })
 
     it('should enable the user to stop an experiment running in the workspace', () => {
@@ -1130,10 +1230,24 @@ describe('App', () => {
       })
     })
 
-    it('should not enable the user to share an experiment whilst an experiment is running', () => {
+    it('should not enable the user to share a running experiment', () => {
       renderTable()
 
       const target = screen.getByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
+      expect(itemLabels).not.toContain('Push')
+    })
+
+    it('should not enable the user to share an experiment whilst one is running in the workspace', () => {
+      renderTable()
+
+      const target = screen.getByText('42b8736')
       fireEvent.contextMenu(target, { bubbles: true })
 
       advanceTimersByTime(100)

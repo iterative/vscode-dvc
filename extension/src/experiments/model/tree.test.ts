@@ -15,7 +15,6 @@ import { ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
 import { getMarkdownString } from '../../vscode/markdownString'
 import { DecoratableTreeItemScheme, getDecoratableUri } from '../../tree'
-import { ExperimentStatus } from '../webview/contract'
 import { formatDate } from '../../util/date'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 
@@ -144,8 +143,7 @@ describe('ExperimentsTree', () => {
           id: 'exp-67899',
           label: 'f0778b3',
           selected: true,
-          status: ExperimentStatus.RUNNING,
-          type: ExperimentType.EXPERIMENT
+          type: ExperimentType.RUNNING
         },
         {
           displayColor: undefined,
@@ -169,7 +167,6 @@ describe('ExperimentsTree', () => {
           hasChildren: false,
           id: 'f81f1b5',
           label: 'f81f1b5',
-          status: ExperimentStatus.QUEUED,
           type: ExperimentType.QUEUED
         }
       ]
@@ -215,7 +212,7 @@ describe('ExperimentsTree', () => {
           id: 'exp-67899',
           label: 'f0778b3',
           tooltip: undefined,
-          type: ExperimentType.EXPERIMENT
+          type: ExperimentType.RUNNING
         },
         {
           collapsibleState: 0,

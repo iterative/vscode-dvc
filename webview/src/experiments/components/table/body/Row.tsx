@@ -19,13 +19,7 @@ export type BatchSelectionProp = {
 
 export const RowContent: React.FC<
   RowProp & { className?: string } & BatchSelectionProp
-> = ({
-  row,
-  className,
-  projectHasCheckpoints,
-  hasRunningExperiment,
-  batchRowSelection
-}): JSX.Element => {
+> = ({ row, className, batchRowSelection }): JSX.Element => {
   const changes = useSelector(
     (state: ExperimentsState) => state.tableData.changes
   )
@@ -73,15 +67,7 @@ export const RowContent: React.FC<
   const isOdd = index % 2 !== 0 && !isRowSelected
 
   return (
-    <ContextMenu
-      content={
-        <RowContextMenu
-          row={row}
-          projectHasCheckpoints={projectHasCheckpoints}
-          hasRunningExperiment={hasRunningExperiment}
-        />
-      }
-    >
+    <ContextMenu content={<RowContextMenu row={row} />}>
       <tr
         className={cx(
           className,

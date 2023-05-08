@@ -135,7 +135,7 @@ suite('Experiments Test Suite', () => {
         hasCheckpoints: true,
         hasColumns: true,
         hasConfig: true,
-        hasRunningExperiment: true,
+        hasRunningWorkspaceExperiment: true,
         hasValidDvcYaml: true,
         rows: rowsFixture,
         sorts: []
@@ -2019,7 +2019,7 @@ suite('Experiments Test Suite', () => {
 
       void experiments.setState(defaultExperimentsData)
       await dataUpdated
-      expect(experiments.hasRunningExperiment()).to.be.true
+      expect(experiments.hasRunningWorkspaceExperiment()).to.be.true
       expect(getCleanupInitialized(experiments)).to.be.true
 
       processKilled = true
@@ -2086,7 +2086,7 @@ suite('Experiments Test Suite', () => {
       await experiments.isReady()
 
       expect(
-        experimentsModel.hasRunningExperiment(),
+        experimentsModel.hasRunningWorkspaceExperiment(),
         'should have a running experiment'
       ).to.be.true
 

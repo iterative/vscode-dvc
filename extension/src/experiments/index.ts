@@ -490,6 +490,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.hasRunningExperiment()
   }
 
+  public hasRunningWorkspaceExperiment() {
+    return this.experiments.hasRunningWorkspaceExperiment()
+  }
+
   public getFirstThreeColumnOrder() {
     return this.columns.getFirstThreeColumnOrder()
   }
@@ -617,7 +621,7 @@ export class Experiments extends BaseRepository<TableData> {
       this.dvcLiveOnlyCleanupInitialized = true
       void pollSignalFileForProcess(this.dvcLiveOnlySignalFile, () => {
         this.dvcLiveOnlyCleanupInitialized = false
-        if (this.hasRunningExperiment()) {
+        if (this.hasRunningWorkspaceExperiment()) {
           void this.data.update()
         }
       })
