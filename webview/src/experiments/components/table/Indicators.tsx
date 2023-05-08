@@ -19,11 +19,11 @@ import { pluralize } from '../../../util/strings'
 import { ExperimentsState } from '../../store'
 import { featureFlag } from '../../../util/flags'
 
-export type CounterBadgeProps = {
+type CounterBadgeProps = {
   count?: number
 }
 
-export const CounterBadge: React.FC<CounterBadgeProps> = ({ count }) => {
+const CounterBadge: React.FC<CounterBadgeProps> = ({ count }) => {
   return count ? (
     <span
       className={styles.indicatorCount}

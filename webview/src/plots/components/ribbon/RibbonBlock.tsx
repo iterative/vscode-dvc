@@ -13,11 +13,6 @@ interface RibbonBlockProps {
   onClear: () => void
 }
 
-export enum CopyTooltip {
-  NORMAL = 'Copy',
-  COPIED = 'Copied'
-}
-
 const RevisionIcon: React.FC<{ fetched: boolean; errors?: string[] }> = ({
   fetched,
   errors

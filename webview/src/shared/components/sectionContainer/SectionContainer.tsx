@@ -73,7 +73,7 @@ export const SectionDescription = {
   )
 } as const
 
-export interface SectionContainerProps<T extends PlotsSection | SetupSection> {
+interface SectionContainerProps<T extends PlotsSection | SetupSection> {
   children: ReactNode
   menuItems?: IconMenuItemProps[]
   headerChildren?: ReactNode

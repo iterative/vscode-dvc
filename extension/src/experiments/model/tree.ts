@@ -35,7 +35,7 @@ import { Experiment, ExperimentStatus, isRunning } from '../webview/contract'
 import { getMarkdownString } from '../../vscode/markdownString'
 import { truncateFromLeft } from '../../util/string'
 
-export type ExperimentAugmented = Experiment & {
+type ExperimentAugmented = Experiment & {
   hasChildren: boolean
   selected?: boolean
   starred: boolean

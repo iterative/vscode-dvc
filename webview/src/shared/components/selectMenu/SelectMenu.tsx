@@ -1,7 +1,7 @@
 import React from 'react'
 import { SelectMenuOption, SelectMenuOptionProps } from './SelectMenuOption'
 
-export interface SelectMenuProps {
+interface SelectMenuProps {
   options: SelectMenuOptionProps[]
   onClick: (id: string) => void
 }

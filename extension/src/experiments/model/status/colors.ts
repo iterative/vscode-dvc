@@ -1,4 +1,4 @@
-export const colorsList = [
+const colorsList = [
   '#945dd6',
   '#13adc7',
   '#f46837',
@@ -11,6 +11,3 @@ export const colorsList = [
 export type Color = (typeof colorsList)[number]
 
 export const copyOriginalColors = (): Color[] => [...colorsList]
-
-export const copyReverseOriginalColors = (): Color[] =>
-  [...colorsList].reverse()

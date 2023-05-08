@@ -16,7 +16,7 @@ import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { Beaker } from '../../../shared/components/icons'
 import { IconButton } from '../../../shared/components/button/IconButton'
 
-export type DvcProps = {
+type DvcProps = {
   canGitInitialize: boolean | undefined
   cliCompatible: boolean | undefined
   dvcCliDetails: DvcCliDetails | undefined

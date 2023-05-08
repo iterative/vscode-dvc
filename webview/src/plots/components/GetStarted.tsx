@@ -6,7 +6,7 @@ import { sendMessage } from '../../shared/vscode'
 import { StartButton } from '../../shared/components/button/StartButton'
 import { RefreshButton } from '../../shared/components/button/RefreshButton'
 
-export type AddPlotsProps = {
+type AddPlotsProps = {
   hasUnselectedPlots: boolean
   hasNoCustomPlots: boolean
   cliError: string | undefined
