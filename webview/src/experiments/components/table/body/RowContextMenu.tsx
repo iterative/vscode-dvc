@@ -229,11 +229,11 @@ const getSingleSelectMenuOptions = (
       divider
     )
 
-  const disableIfRunningOrNotExperiment = (
+  const disableIfRunningOrWorkspace = (
     label: string,
     type: MessageFromWebviewType,
     divider?: boolean
-  ) => disableIfRunning(label, type, isNotExperiment, divider)
+  ) => disableIfRunning(label, type, isWorkspace, divider)
 
   return [
     experimentMenuOption(
@@ -242,11 +242,11 @@ const getSingleSelectMenuOptions = (
       MessageFromWebviewType.SHOW_EXPERIMENT_LOGS,
       !isRunningInQueue({ executor, status })
     ),
-    disableIfRunningOrNotExperiment(
+    disableIfRunningOrWorkspace(
       'Apply to Workspace',
       MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE
     ),
-    disableIfRunningOrNotExperiment(
+    disableIfRunningOrWorkspace(
       'Create new Branch',
       MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
     ),

@@ -1163,12 +1163,12 @@
         {
           "command": "dvc.views.experiments.applyExperiment",
           "group": "inline@1",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == experiment && !dvc.experiment.running.workspace"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|commit)$/ && !dvc.experiment.running.workspace"
         },
         {
           "command": "dvc.views.experiments.branchExperiment",
           "group": "inline@2",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == experiment && !dvc.experiment.running.workspace"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|commit)$/ && !dvc.experiment.running.workspace"
         },
         {
           "command": "dvc.views.experimentsTree.removeExperiment",

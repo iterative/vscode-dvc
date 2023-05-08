@@ -60,9 +60,12 @@ export const renderTableWithSortingData = () => {
   return renderTable(sortingTableDataFixture)
 }
 
-export const renderTableWithoutRunningExperiments = () => {
+export const renderTableWithoutRunningExperiments = (
+  hasCheckpoints?: boolean
+) => {
   renderTable({
     ...tableDataFixture,
+    hasCheckpoints: hasCheckpoints ?? tableDataFixture.hasCheckpoints,
     hasRunningWorkspaceExperiment: false,
     rows: tableDataFixture.rows.map(row => ({
       ...row,
