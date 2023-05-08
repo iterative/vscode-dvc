@@ -31,7 +31,7 @@ import {
 } from '../../commands/external'
 import { sum } from '../../util/math'
 import { Disposable } from '../../class/dispose'
-import { Experiment, ExperimentStatus, isRunning } from '../webview/contract'
+import { Experiment } from '../webview/contract'
 import { getMarkdownString } from '../../vscode/markdownString'
 import { truncateFromLeft } from '../../util/string'
 
@@ -238,17 +238,15 @@ export class ExperimentsTree
 
   private getExperimentIcon({
     displayColor,
-    status,
     type,
     selected
   }: {
     displayColor?: string
     label: string
-    status?: ExperimentStatus
     type?: ExperimentType
     selected?: boolean
   }): ThemeIcon | Uri | Resource {
-    if (isRunning(status)) {
+    if (type === ExperimentType.RUNNING) {
       return this.getUriOrIcon(displayColor, IconName.LOADING_SPIN)
     }
     if (type === ExperimentType.QUEUED) {
