@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.8] - 2023-05-08
+
+### 🚀 New Features and Enhancements
+
+- Add completion status to setup sections [#3823](https://github.com/iterative/vscode-dvc/pull/3823) by [@julieg18](https://github.com/julieg18)
+- Enable experiment operations when experiment(s) are running in the queue [#3832](https://github.com/iterative/vscode-dvc/pull/3832) by [@mattseddon](https://github.com/mattseddon)
+- Enable running exp apply and exp branch against commits [#3834](https://github.com/iterative/vscode-dvc/pull/3834) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.8.7] - 2023-05-05
 
 ### 🐛 Bug Fixes
