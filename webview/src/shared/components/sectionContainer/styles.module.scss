@@ -47,15 +47,11 @@ $gap: 20px;
   display: flex;
   align-items: center;
   cursor: initial;
+  margin-left: 6px;
 }
 
 .infoIcon {
   fill: $accent-color;
-  margin-left: 6px;
-
-  .infoTooltip & {
-    margin-left: 0;
-  }
 }
 
 .completedIcon {

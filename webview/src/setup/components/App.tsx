@@ -133,7 +133,7 @@ export const App: React.FC = () => {
         sectionCollapsed={sectionCollapsed}
         setSectionCollapsed={setSectionCollapsed}
         isSetup={!!cliCompatible}
-        isDisconnected={!isStudioConnected}
+        isConnected={isStudioConnected}
       >
         <Studio
           isStudioConnected={isStudioConnected}

@@ -5,35 +5,43 @@ import { SetupSection } from 'dvc/src/setup/webview/contract'
 import styles from './styles.module.scss'
 import { SectionDescription } from './SectionContainer'
 import Tooltip from '../tooltip/Tooltip'
-import { Icon } from '../Icon'
+import { Icon, IconValue } from '../Icon'
 import { Info, PassFilled, Error } from '../icons'
 
 export enum TooltipIconType {
-  PASSED = 'icon-pass-filled',
-  INFO = 'icon-info',
-  ERROR = 'icon-error'
+  PASSED = 'pass-filled',
+  INFO = 'info',
+  ERROR = 'error'
 }
 
-const getIcon = (icon?: TooltipIconType) => {
-  const props = {
-    className: styles.infoIcon,
-    'data-testid': icon || TooltipIconType.INFO,
-    height: 16,
-    icon: Info,
-    width: 16
+export const TooltipIconTypeConst = {
+  PASSED: PassFilled
+}
+
+const getIconProps = (
+  iconType: TooltipIconType,
+  icon: IconValue,
+  className?: string
+) => ({
+  className: cx(styles.infoIcon, className),
+  'data-testid': iconType,
+  height: 16,
+  icon,
+  width: 16
+})
+
+const getIcon = (iconType: TooltipIconType = TooltipIconType.INFO) => {
+  if (iconType === TooltipIconType.ERROR) {
+    return <Icon {...getIconProps(iconType, Error, styles.errorIcon)} />
   }
 
-  if (icon === TooltipIconType.ERROR) {
-    props.icon = Error
-    props.className = cx(styles.infoIcon, styles.errorIcon)
+  if (iconType === TooltipIconType.PASSED) {
+    return (
+      <Icon {...getIconProps(iconType, PassFilled, styles.completedIcon)} />
+    )
   }
 
-  if (icon === TooltipIconType.PASSED) {
-    props.icon = PassFilled
-    props.className = cx(styles.infoIcon, styles.completedIcon)
-  }
-
-  return <Icon {...props} />
+  return <Icon {...getIconProps(iconType, Info)} />
 }
 
 export const InfoTooltip: React.FC<{

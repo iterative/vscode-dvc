@@ -657,7 +657,7 @@ describe('App', () => {
       ).toBeInTheDocument()
     })
 
-    it('should show an complete icon if DVC is not setup', () => {
+    it('should show a passed icon if DVC CLI is compatible and project is initialized', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
@@ -929,7 +929,7 @@ describe('App', () => {
       ).toBeInTheDocument()
     })
 
-    it('should show an passed icon if experiments are setup', () => {
+    it('should show a passed icon if experiments are setup', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
@@ -1174,7 +1174,7 @@ describe('App', () => {
       })
     })
 
-    it('should show an passed icon if connected', () => {
+    it('should show a passed icon if connected', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,

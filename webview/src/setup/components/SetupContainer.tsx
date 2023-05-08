@@ -6,12 +6,12 @@ import React from 'react'
 import { SectionContainer } from '../../shared/components/sectionContainer/SectionContainer'
 import { TooltipIconType } from '../../shared/components/sectionContainer/InfoTooltip'
 
-const getTooltipIconType = (isSetup: boolean, isDisconnected?: boolean) => {
+const getTooltipIconType = (isSetup: boolean, isConnected = true) => {
   if (!isSetup) {
     return TooltipIconType.ERROR
   }
 
-  return isDisconnected ? TooltipIconType.INFO : TooltipIconType.PASSED
+  return isConnected ? TooltipIconType.PASSED : TooltipIconType.INFO
 }
 
 export const SetupContainer: React.FC<{
@@ -21,7 +21,7 @@ export const SetupContainer: React.FC<{
   setSectionCollapsed: (value: typeof DEFAULT_SECTION_COLLAPSED) => void
   title: string
   isSetup: boolean
-  isDisconnected?: boolean
+  isConnected?: boolean
 }> = ({
   children,
   sectionCollapsed,
@@ -29,13 +29,13 @@ export const SetupContainer: React.FC<{
   setSectionCollapsed,
   title,
   isSetup,
-  isDisconnected
+  isConnected
 }) => (
   <SectionContainer
     sectionCollapsed={sectionCollapsed[sectionKey]}
     sectionKey={sectionKey}
     title={title}
-    icon={getTooltipIconType(isSetup, isDisconnected)}
+    icon={getTooltipIconType(isSetup, isConnected)}
     onToggleSection={() =>
       setSectionCollapsed({
         ...sectionCollapsed,
