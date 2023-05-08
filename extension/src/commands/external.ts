@@ -9,7 +9,6 @@ export enum RegisteredCliCommands {
   EXPERIMENT_RESUME = 'dvc.resumeCheckpointExperiment',
   EXPERIMENT_RUN = 'dvc.runExperiment',
   QUEUE_EXPERIMENT = 'dvc.queueExperiment',
-  QUEUE_KILL = 'dvc.stopQueuedExperiments',
   QUEUE_START = 'dvc.startExperimentsQueue',
   QUEUE_STOP = 'dvc.stopExperimentsQueue',
 
@@ -62,6 +61,7 @@ export enum RegisteredCommands {
   EXPERIMENT_SORT_REMOVE = 'dvc.views.experimentsSortByTree.removeSort',
   EXPERIMENT_SORTS_REMOVE = 'dvc.removeExperimentsTableSorts',
   EXPERIMENT_SORTS_REMOVE_ALL = 'dvc.views.experimentsSortByTree.removeAllSorts',
+  EXPERIMENT_STOP = 'dvc.stopExperiments',
   EXPERIMENT_TOGGLE = 'dvc.views.experiments.toggleStatus',
   STOP_EXPERIMENTS = 'dvc.stopAllRunningExperiments',
 

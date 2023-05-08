@@ -208,18 +208,22 @@ const collectExecutorInfo = (
   acc: ExperimentsAccumulator,
   experiment: Experiment,
   executor: ExecutorState
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 ): void => {
   if (!executor) {
     return
   }
 
-  const { name, state } = executor
+  const { name, state, local } = executor
 
   if (name && state === ExperimentStatus.RUNNING) {
     experiment.executor = name
   }
   if (state && state !== ExperimentStatus.SUCCESS) {
     experiment.status = state
+  }
+  if (local?.pid) {
+    experiment.executorPid = local.pid
   }
 
   if (experiment.status === ExperimentStatus.RUNNING) {

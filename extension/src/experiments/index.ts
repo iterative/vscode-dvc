@@ -30,6 +30,7 @@ import { starredSort } from './model/sortBy/constants'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ColumnsModel } from './columns/model'
 import { ExperimentsData } from './data'
+import { stopWorkspaceExperiment } from './processExecution'
 import {
   Experiment,
   ColumnType,
@@ -41,7 +42,11 @@ import { DecorationProvider } from './model/decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
 import { ResourceLocator } from '../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { ExpShowOutput } from '../cli/dvc/contract'
+import {
+  EXPERIMENT_WORKSPACE_ID,
+  Executor,
+  ExpShowOutput
+} from '../cli/dvc/contract'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Title } from '../vscode/title'
@@ -378,11 +383,11 @@ export class Experiments extends BaseRepository<TableData> {
     )
   }
 
-  public pickQueueTasksToKill() {
+  public pickRunningExperiments() {
     return pickExperiments(
-      this.experiments.getRunningQueueTasks(),
+      this.experiments.getRunningExperiments(),
       this.getFirstThreeColumnOrder(),
-      Title.SELECT_QUEUE_KILL
+      Title.SELECT_EXPERIMENTS_STOP
     )
   }
 
@@ -486,6 +491,36 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+  public stopExperiments(ids: string[]) {
+    const experiments = this.experiments.getExperiments()
+    const idSet = new Set(ids)
+    let pidRunningInWorkspace
+    const runningInQueueIds = new Set<string>()
+    for (const { executor, id, executorPid } of experiments) {
+      if (!idSet.has(id)) {
+        continue
+      }
+      if (executor === EXPERIMENT_WORKSPACE_ID && executorPid) {
+        pidRunningInWorkspace = executorPid
+      }
+      if (executor === Executor.DVC_TASK) {
+        runningInQueueIds.add(id)
+      }
+    }
+
+    if (runningInQueueIds.size > 0) {
+      void this.internalCommands.executeCommand(
+        AvailableCommands.QUEUE_KILL,
+        this.dvcRoot,
+        ...runningInQueueIds
+      )
+      if (pidRunningInWorkspace) {
+        void stopWorkspaceExperiment(pidRunningInWorkspace)
+      }
+    }
+  }
+
   public hasRunningExperiment() {
     return this.experiments.hasRunningExperiment()
   }
@@ -562,12 +597,7 @@ export class Experiments extends BaseRepository<TableData> {
       () => this.getWebview(),
       () => this.notifyChanged(),
       () => this.selectColumns(),
-      (dvcRoot: string, ...ids: string[]) =>
-        this.internalCommands.executeCommand(
-          AvailableCommands.QUEUE_KILL,
-          dvcRoot,
-          ...ids
-        ),
+      (ids: string[]) => this.stopExperiments(ids),
       () =>
         this.internalCommands.executeCommand(
           AvailableCommands.STAGE_LIST,

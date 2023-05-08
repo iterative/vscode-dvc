@@ -20,9 +20,6 @@ import { SortDefinition } from '../model/sortBy'
 import { getPositiveIntegerInput } from '../../vscode/inputBox'
 import { Title } from '../../vscode/title'
 import { ConfigKey, setConfigValue } from '../../vscode/config'
-import { Toast } from '../../vscode/toast'
-import { Executor, EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
-import { stopWorkspaceExperiment } from '../processExecution'
 import { hasDvcYamlFile } from '../../fileSystem'
 import { NUM_OF_COMMITS_TO_INCREASE } from '../../cli/dvc/constants'
 
@@ -35,10 +32,7 @@ export class WebviewMessages {
   private readonly getWebview: () => BaseWebview<TableData> | undefined
   private readonly notifyChanged: () => void
   private readonly selectColumns: () => Promise<void>
-  private readonly stopQueuedExperiments: (
-    dvcRoot: string,
-    ...ids: string[]
-  ) => Promise<string | undefined>
+  private readonly stopExperiments: (ids: string[]) => void
 
   private readonly hasStages: () => Promise<string | undefined>
 
@@ -62,10 +56,7 @@ export class WebviewMessages {
     getWebview: () => BaseWebview<TableData> | undefined,
     notifyChanged: () => void,
     selectColumns: () => Promise<void>,
-    stopQueuedExperiments: (
-      dvcRoot: string,
-      ...ids: string[]
-    ) => Promise<string | undefined>,
+    stopExperiments: (ids: string[]) => void,
     hasStages: () => Promise<string>,
     addStage: () => Promise<boolean>,
     selectBranches: (
@@ -80,7 +71,7 @@ export class WebviewMessages {
     this.getWebview = getWebview
     this.notifyChanged = notifyChanged
     this.selectColumns = selectColumns
-    this.stopQueuedExperiments = stopQueuedExperiments
+    this.stopExperiments = stopExperiments
     this.hasStages = hasStages
     this.addStage = addStage
     this.selectBranches = selectBranches
@@ -187,8 +178,8 @@ export class WebviewMessages {
         return this.setMaxTableHeadDepth()
       }
 
-      case MessageFromWebviewType.STOP_EXPERIMENT: {
-        return this.stopExperiments(message.payload)
+      case MessageFromWebviewType.STOP_EXPERIMENTS: {
+        return this.stopExperimentsAndSend(message.payload)
       }
 
       case MessageFromWebviewType.ADD_CONFIGURATION: {
@@ -443,37 +434,9 @@ export class WebviewMessages {
     )
   }
 
-  private stopExperiments(
-    runningExperiments: { id: string; executor?: string | null }[]
-  ) {
-    const { runningInQueueIds, runningInWorkspace } =
-      this.groupRunningExperiments(runningExperiments)
-
-    if (runningInQueueIds.size > 0) {
-      void Toast.showOutput(
-        this.stopQueuedExperiments(this.dvcRoot, ...runningInQueueIds)
-      )
-    }
-    if (runningInWorkspace) {
-      void stopWorkspaceExperiment(this.dvcRoot)
-    }
+  private stopExperimentsAndSend(ids: string[]) {
+    this.stopExperiments(ids)
 
     sendTelemetryEvent(EventName.EXPERIMENT_VIEW_STOP, undefined, undefined)
-  }
-
-  private groupRunningExperiments(
-    experiments: { executor?: string | null; id: string }[]
-  ) {
-    let runningInWorkspace = false
-    const runningInQueueIds = new Set<string>()
-    for (const { executor, id } of experiments) {
-      if (executor === EXPERIMENT_WORKSPACE_ID) {
-        runningInWorkspace = true
-      }
-      if (executor === Executor.DVC_TASK) {
-        runningInQueueIds.add(id)
-      }
-    }
-    return { runningInQueueIds, runningInWorkspace }
   }
 }

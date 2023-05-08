@@ -122,11 +122,20 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.getRepositoryThenUpdate('selectColumns', overrideRoot)
   }
 
-  public selectQueueTasksToKill() {
-    return this.pickIdsThenRun(
-      'pickQueueTasksToKill',
-      AvailableCommands.QUEUE_KILL
-    )
+  public async selectExperimentsToStop() {
+    const cwd = await this.getFocusedOrOnlyOrPickProject()
+    if (!cwd) {
+      return
+    }
+
+    const repository = this.getRepository(cwd)
+
+    const ids = await repository.pickRunningExperiments()
+
+    if (!ids || isEmpty(ids)) {
+      return
+    }
+    return repository.stopExperiments(ids)
   }
 
   public async selectExperimentsToPush(setup: Setup) {
@@ -145,11 +154,18 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return pushCommand({ dvcRoot, ids })
   }
 
-  public selectExperimentsToRemove() {
-    return this.pickIdsThenRun(
-      'pickExperimentsToRemove',
-      AvailableCommands.EXP_REMOVE
-    )
+  public async selectExperimentsToRemove() {
+    const cwd = await this.getFocusedOrOnlyOrPickProject()
+    if (!cwd) {
+      return
+    }
+
+    const ids = await this.getRepository(cwd).pickExperimentsToRemove()
+
+    if (!ids || isEmpty(ids)) {
+      return
+    }
+    return this.runCommand(AvailableCommands.EXP_REMOVE, cwd, ...ids)
   }
 
   public async modifyExperimentParamsAndRun(
@@ -509,25 +525,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       ''
     const enteredManually = pathOrSelect !== selectValue
     return { command, enteredManually, trainingScript }
-  }
-
-  private async pickIdsThenRun(
-    pickMethod: 'pickQueueTasksToKill' | 'pickExperimentsToRemove',
-    commandId:
-      | typeof AvailableCommands.QUEUE_KILL
-      | typeof AvailableCommands.EXP_REMOVE
-  ) {
-    const cwd = await this.getFocusedOrOnlyOrPickProject()
-    if (!cwd) {
-      return
-    }
-
-    const ids = await this.getRepository(cwd)[pickMethod]()
-
-    if (!ids || isEmpty(ids)) {
-      return
-    }
-    return this.runCommand(commandId, cwd, ...ids)
   }
 
   private async pickExpThenRun(

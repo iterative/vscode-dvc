@@ -1,14 +1,7 @@
-import { join } from 'path'
-import { EXP_RWLOCK_FILE } from '../../cli/dvc/constants'
-import { getPidFromFile } from '../../fileSystem'
 import { Toast } from '../../vscode/toast'
 import { processExists, stopProcesses } from '../../process/execution'
 
-export const stopWorkspaceExperiment = async (dvcRoot: string) => {
-  const pid = await getPidFromFile(join(dvcRoot, EXP_RWLOCK_FILE))
-  if (!pid) {
-    return
-  }
+export const stopWorkspaceExperiment = async (pid: number) => {
   if (!(await processExists(pid))) {
     return
   }

@@ -334,9 +334,9 @@ export class ExperimentsModel extends ModelWithPersistence {
     )
   }
 
-  public getRunningQueueTasks() {
+  public getRunningExperiments() {
     return this.getExperimentsAndQueued().filter(experiment =>
-      isRunningInQueue(experiment)
+      isRunning(experiment.status)
     )
   }
 

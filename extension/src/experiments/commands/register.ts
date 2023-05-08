@@ -200,9 +200,9 @@ const registerExperimentQuickPickCommands = (
       experiments.selectColumns(getDvcRootFromContext(context))
   )
 
-  internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.QUEUE_KILL,
-    () => experiments.selectQueueTasksToKill()
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENT_STOP,
+    () => experiments.selectExperimentsToStop()
   )
 
   internalCommands.registerExternalCliCommand(

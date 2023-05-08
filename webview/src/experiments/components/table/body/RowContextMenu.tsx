@@ -135,7 +135,7 @@ const getMultiSelectMenuOptions = (
     experimentMenuOption(
       selectedIds,
       'Stop',
-      MessageFromWebviewType.STOP_EXPERIMENT,
+      MessageFromWebviewType.STOP_EXPERIMENTS,
       disableStopOption,
       true
     ),
@@ -270,9 +270,9 @@ const getSingleSelectMenuOptions = (
       !hasRunningWorkspaceExperiment
     ),
     experimentMenuOption(
-      [{ executor, id }],
+      [id],
       'Stop',
-      MessageFromWebviewType.STOP_EXPERIMENT,
+      MessageFromWebviewType.STOP_EXPERIMENTS,
       !isRunning(status),
       id !== EXPERIMENT_WORKSPACE_ID
     ),

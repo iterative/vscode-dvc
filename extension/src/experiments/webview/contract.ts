@@ -33,6 +33,7 @@ export type Experiment = {
   description?: string
   error?: string
   executor?: Executor
+  executorPid?: number
   id: string
   label: string
   metrics?: MetricOrParamColumns
