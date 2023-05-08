@@ -14,10 +14,6 @@ export enum TooltipIconType {
   ERROR = 'error'
 }
 
-export const TooltipIconTypeConst = {
-  PASSED: PassFilled
-}
-
 const getIcon = (iconType: TooltipIconType = TooltipIconType.INFO) => {
   const defaultProps = {
     'data-testid': iconType,
