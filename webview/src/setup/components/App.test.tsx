@@ -56,6 +56,16 @@ const renderApp = ({
   )
 }
 
+const sendSetDataMessage = (data: SetupData) => {
+  const message = new MessageEvent('message', {
+    data: {
+      data,
+      type: MessageToWebviewType.SET_DATA
+    }
+  })
+  fireEvent(window, message)
+}
+
 describe('App', () => {
   it('should send the initialized message on first render', () => {
     render(<App />)
@@ -422,8 +432,8 @@ describe('App', () => {
       })
     })
 
-    it('should open the experiments section when clicking the Open Experiments button when the project is initialized but has no data', () => {
-      renderApp({
+    it('should autoclose and open other sections when user finishes setup', () => {
+      const dvcNotSetup = {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
@@ -434,30 +444,25 @@ describe('App', () => {
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
-        needsGitInitialized: undefined,
-        projectInitialized: true,
+        needsGitInitialized: true,
+        projectInitialized: false,
         pythonBinPath: undefined,
-        sectionCollapsed: undefined,
+        sectionCollapsed: {
+          [SetupSection.DVC]: false,
+          [SetupSection.STUDIO]: true,
+          [SetupSection.EXPERIMENTS]: true
+        },
         shareLiveToStudio: false
-      })
+      }
 
-      mockPostMessage.mockClear()
-      const button = screen.getAllByText('Show Experiments')[0]
-      fireEvent.click(button)
-
-      expect(screen.getByText('Your project contains no data')).toBeVisible()
-      expect(screen.getByText('Setup Complete')).not.toBeVisible()
-    })
-
-    it('should enable the user to open the experiments webview when they have completed onboarding', () => {
-      renderApp({
+      const dvcSetup = {
         canGitInitialize: false,
         cliCompatible: true,
         dvcCliDetails: {
           command: 'python -m dvc',
           version: '1.0.0'
         },
-        hasData: true,
+        hasData: false,
         isPythonExtensionUsed: true,
         isStudioConnected: true,
         needsGitCommit: false,
@@ -466,14 +471,25 @@ describe('App', () => {
         pythonBinPath: 'python',
         sectionCollapsed: undefined,
         shareLiveToStudio: false
-      })
-      mockPostMessage.mockClear()
-      const button = screen.getAllByText('Show Experiments')[0]
-      fireEvent.click(button)
-      expect(mockPostMessage).toHaveBeenCalledTimes(1)
-      expect(mockPostMessage).toHaveBeenCalledWith({
-        type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW
-      })
+      }
+
+      renderApp(dvcNotSetup)
+
+      const dvcDetails = screen.getByTestId('dvc-section-details')
+      const experimentsDetails = screen.getByTestId(
+        'experiments-section-details'
+      )
+      const studioDetails = screen.getByTestId('studio-section-details')
+
+      expect(dvcDetails).toHaveAttribute('open')
+      expect(experimentsDetails).not.toHaveAttribute('open')
+      expect(studioDetails).not.toHaveAttribute('open')
+
+      sendSetDataMessage(dvcSetup)
+
+      expect(dvcDetails).not.toHaveAttribute('open')
+      expect(experimentsDetails).toHaveAttribute('open')
+      expect(studioDetails).toHaveAttribute('open')
     })
 
     it('should show the user the version if dvc is installed', () => {
@@ -869,8 +885,7 @@ describe('App', () => {
         shareLiveToStudio: false
       })
       mockPostMessage.mockClear()
-      const button = screen.getAllByText('Show Experiments')[1]
-      fireEvent.click(button)
+      fireEvent.click(screen.getByText('Show Experiments'))
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW

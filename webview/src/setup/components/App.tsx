@@ -43,6 +43,8 @@ export const App: React.FC = () => {
   const [isStudioConnected, setIsStudioConnected] = useState<boolean>(false)
   const [shareLiveToStudio, setShareLiveToStudioValue] =
     useState<boolean>(false)
+  const [hasReceivedMessageFromVsCode, setHasReceivedMessageFromVsCode] =
+    useState(false)
 
   useVsCodeMessaging(
     useCallback(
@@ -64,6 +66,7 @@ export const App: React.FC = () => {
           setSectionCollapsed(data.data.sectionCollapsed)
         }
         setShareLiveToStudioValue(data.data.shareLiveToStudio)
+        setHasReceivedMessageFromVsCode(true)
       },
       [
         setCanGitInitialized,
@@ -109,8 +112,8 @@ export const App: React.FC = () => {
           needsGitInitialized={needsGitInitialized}
           projectInitialized={projectInitialized}
           pythonBinPath={pythonBinPath}
-          isExperimentsAvailable={hasData}
           setSectionCollapsed={setSectionCollapsed}
+          hasReceivedMessageFromVsCode={hasReceivedMessageFromVsCode}
         />
       </SetupContainer>
       <SetupContainer
