@@ -439,6 +439,55 @@ suite('Experiments Tree Test Suite', () => {
       )
     })
 
+    it('should be able to stop multiple running experiments with dvc.views.experimentsTree.stopExperiment', async () => {
+      bypassProgressCloseDelay()
+      const mockFirstExperimentId = 'first-exp-stopped'
+      const mockSecondExperimentId = 'second-exp-stopped'
+      const mockQueuedExperimentLabel = 'queued-excluded'
+
+      const mockStopExperiments = stub(
+        WorkspaceExperiments.prototype,
+        'stopExperiments'
+      ).resolves(undefined)
+
+      stubPrivatePrototypeMethod(
+        ExperimentsTree,
+        'getSelectedExperimentItems'
+      ).returns([
+        dvcDemoPath,
+        {
+          dvcRoot: dvcDemoPath,
+          label: mockQueuedExperimentLabel,
+          type: ExperimentType.QUEUED
+        },
+        {
+          dvcRoot: dvcDemoPath,
+          id: mockFirstExperimentId,
+          type: ExperimentType.RUNNING
+        },
+        {
+          dvcRoot: dvcDemoPath,
+          id: 'workspace-excluded',
+          type: ExperimentType.WORKSPACE
+        }
+      ])
+
+      await commands.executeCommand(
+        'dvc.views.experimentsTree.stopExperiment',
+        {
+          dvcRoot: dvcDemoPath,
+          id: mockSecondExperimentId,
+          type: ExperimentType.RUNNING
+        }
+      )
+
+      expect(mockStopExperiments).to.be.calledWithExactly(
+        dvcDemoPath,
+        mockFirstExperimentId,
+        mockSecondExperimentId
+      )
+    })
+
     it('should be able to apply an experiment to the workspace with dvc.views.experiments.applyExperiment', async () => {
       const { experiments } = buildExperiments(disposable)
 
