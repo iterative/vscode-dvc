@@ -499,14 +499,10 @@ describe('App', () => {
       })
 
       const envDetails = screen.getByTestId('dvc-env-details')
-      const firstVersionLine = `1.0.0 (required >= ${MIN_CLI_VERSION})`
-      const secondVersionLine = `Extension has been tested on versions up to ${LATEST_TESTED_CLI_VERSION}.`
+      const firstVersionLine = `1.0.0 (required ${MIN_CLI_VERSION} and above, tested with ${LATEST_TESTED_CLI_VERSION})`
 
       expect(within(envDetails).getByText('Version')).toBeInTheDocument()
       expect(within(envDetails).getByText(firstVersionLine)).toBeInTheDocument()
-      expect(
-        within(envDetails).getByText(secondVersionLine)
-      ).toBeInTheDocument()
     })
 
     it('should tell the user that version is not found if dvc is not installed', () => {
@@ -528,7 +524,7 @@ describe('App', () => {
         shareLiveToStudio: false
       })
       const envDetails = screen.getByTestId('dvc-env-details')
-      const version = `Not found (required >= ${MIN_CLI_VERSION})`
+      const version = `Not found (required ${MIN_CLI_VERSION} and above, tested with ${LATEST_TESTED_CLI_VERSION})`
 
       expect(within(envDetails).getByText('Version')).toBeInTheDocument()
       expect(within(envDetails).getByText(version)).toBeInTheDocument()

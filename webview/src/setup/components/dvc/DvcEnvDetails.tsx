@@ -21,8 +21,7 @@ export const DvcEnvDetails: React.FC<DvcEnvDetailsProps> = ({
     <>
       <span>{`${
         version || 'Not found'
-      } (required >= ${MIN_CLI_VERSION})`}</span>
-      <span>{`Extension has been tested on versions up to ${LATEST_TESTED_CLI_VERSION}.`}</span>
+      } (required ${MIN_CLI_VERSION} and above, tested with ${LATEST_TESTED_CLI_VERSION})`}</span>
     </>
   )
 
