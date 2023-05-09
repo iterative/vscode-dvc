@@ -117,7 +117,11 @@ export const SectionContainer: React.FC<
       className={cx(styles.sectionContainerWrapper, className)}
       data-testid="section-container"
     >
-      <details open={open} className={styles.sectionContainer}>
+      <details
+        data-testid={`${sectionKey}-section-details`}
+        open={open}
+        className={styles.sectionContainer}
+      >
         <summary onClick={toggleSection} style={{ top: stickyHeaderTop }}>
           <div className={styles.summaryTitle}>
             <Icon
