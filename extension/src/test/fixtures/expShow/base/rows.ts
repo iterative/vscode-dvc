@@ -272,7 +272,6 @@ export const rowsFixtureWithBranches: Commit[] = [
         displayColor: undefined,
         description: '[exp-83425]',
         executor: Executor.WORKSPACE,
-        executorPid: 1234,
         id: 'exp-83425',
         label: EXPERIMENT_WORKSPACE_ID,
         metrics: {

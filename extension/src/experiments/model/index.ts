@@ -3,7 +3,9 @@ import { SortDefinition, sortExperiments } from './sortBy'
 import { FilterDefinition, filterExperiment, getFilterId } from './filterBy'
 import {
   collectExperiments,
-  collectOrderedCommitsAndExperiments
+  collectOrderedCommitsAndExperiments,
+  collectRunningQueueTaskIds,
+  collectWorkspaceExecutorPid as collectWorkspaceRunDetails
 } from './collect'
 import {
   collectColoredStatus,
@@ -338,6 +340,15 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.getExperimentsAndQueued().filter(experiment =>
       isRunning(experiment.status)
     )
+  }
+
+  public getStopDetails(idsToStop: string[]) {
+    const running = [...this.running]
+    const ids = new Set(idsToStop)
+    return {
+      runningInQueueIds: collectRunningQueueTaskIds(ids, running),
+      workspaceDetails: collectWorkspaceRunDetails(ids, running)
+    }
   }
 
   public getRowData() {

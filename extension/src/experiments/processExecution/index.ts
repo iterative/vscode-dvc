@@ -1,16 +1,16 @@
-import { Toast } from '../../vscode/toast'
 import { processExists, stopProcesses } from '../../process/execution'
 
-export const stopWorkspaceExperiment = async (pid: number) => {
+export const stopWorkspaceExperiment = async (id: string, pid: number) => {
   if (!(await processExists(pid))) {
-    return
+    return `process executing ${id} was not found.`
   }
 
-  void Toast.showOutput(
-    stopProcesses([pid]).then(stopped =>
-      stopped
-        ? 'The experiment running in the workspace was stopped.'
-        : 'Failed to stop the experiment running in the workspace.'
-    )
-  )
+  const failedToStop = `failed to kill ${id}.`
+
+  try {
+    const stopped = await stopProcesses([pid])
+    return stopped ? `${id} has been killed.` : failedToStop
+  } catch {
+    return failedToStop
+  }
 }

@@ -10,7 +10,8 @@ import {
   Experiment,
   CommitData,
   RunningExperiment,
-  isQueued
+  isQueued,
+  isRunning
 } from '../webview/contract'
 import {
   EXPERIMENT_WORKSPACE_ID,
@@ -28,6 +29,7 @@ import { RegisteredCommands } from '../../commands/external'
 import { Resource } from '../../resourceLocator'
 import { shortenForLabel } from '../../util/string'
 import { COMMITS_SEPARATOR } from '../../cli/git/constants'
+import { createValidInteger } from '../../util/number'
 
 export type ExperimentItem = {
   command?: {
@@ -205,16 +207,14 @@ const getExecutor = (experiment: Experiment): Executor => {
 }
 
 const collectExecutorInfo = (
-  acc: ExperimentsAccumulator,
   experiment: Experiment,
   executor: ExecutorState
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 ): void => {
   if (!executor) {
     return
   }
 
-  const { name, state, local } = executor
+  const { name, state } = executor
 
   if (name && state === ExperimentStatus.RUNNING) {
     experiment.executor = name
@@ -222,16 +222,21 @@ const collectExecutorInfo = (
   if (state && state !== ExperimentStatus.SUCCESS) {
     experiment.status = state
   }
-  if (local?.pid) {
-    experiment.executorPid = local.pid
-  }
+}
 
-  if (experiment.status === ExperimentStatus.RUNNING) {
-    acc.runningExperiments.push({
-      executor: getExecutor(experiment),
-      id: experiment.id
-    })
+const collectRunningExperiment = (
+  acc: ExperimentsAccumulator,
+  experiment: Experiment,
+  executor: ExecutorState
+): void => {
+  if (!isRunning(experiment.status)) {
+    return
   }
+  acc.runningExperiments.push({
+    executor: getExecutor(experiment),
+    id: experiment.id,
+    pid: createValidInteger(executor?.local?.pid)
+  })
 }
 
 const collectExpRange = (
@@ -265,7 +270,8 @@ const collectExpRange = (
     experiment.description = `[${name}]`
   }
 
-  collectExecutorInfo(acc, experiment, executor)
+  collectExecutorInfo(experiment, executor)
+  collectRunningExperiment(acc, experiment, executor)
 
   addToMapArray(acc.experimentsByCommit, baseline.id, experiment)
 }
@@ -405,4 +411,34 @@ export const collectOrderedCommitsAndExperiments = (
     collectExperimentsAndCommit(acc, commit, getExperimentsByCommit(commit))
   }
   return acc
+}
+
+export const collectRunningQueueTaskIds = (
+  ids: Set<string>,
+  runningExperiments: RunningExperiment[]
+): string[] | undefined => {
+  const runningInQueueIds = new Set<string>()
+  for (const { executor, id } of runningExperiments) {
+    if (!ids.has(id)) {
+      continue
+    }
+    if (executor === Executor.DVC_TASK) {
+      runningInQueueIds.add(id)
+    }
+  }
+  return runningInQueueIds.size > 0 ? [...runningInQueueIds] : undefined
+}
+
+export const collectWorkspaceExecutorPid = (
+  ids: Set<string>,
+  runningExperiments: RunningExperiment[]
+): { pid: number; id: string } | undefined => {
+  for (const { executor, id, pid } of runningExperiments) {
+    if (!ids.has(id)) {
+      continue
+    }
+    if (executor === EXPERIMENT_WORKSPACE_ID && pid) {
+      return { id, pid }
+    }
+  }
 }

@@ -16,7 +16,11 @@ export interface DepColumns {
   [path: string]: ValueWithChanges
 }
 
-export type RunningExperiment = { executor: Executor; id: string }
+export type RunningExperiment = {
+  executor: Executor
+  id: string
+  pid?: number | null
+}
 
 export type CommitData = {
   author: string
@@ -33,7 +37,6 @@ export type Experiment = {
   description?: string
   error?: string
   executor?: Executor
-  executorPid?: number
   id: string
   label: string
   metrics?: MetricOrParamColumns

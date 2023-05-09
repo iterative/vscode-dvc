@@ -127,7 +127,8 @@ export class ExperimentsTree
     const callCommandWithSelected = async (
       command:
         | RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE
-        | RegisteredCliCommands.EXPERIMENT_VIEW_PUSH,
+        | RegisteredCliCommands.EXPERIMENT_VIEW_PUSH
+        | RegisteredCommands.EXPERIMENT_VIEW_STOP,
       experimentItem: ExperimentItem | string,
       types: ExperimentType[]
     ) => {
@@ -160,6 +161,16 @@ export class ExperimentsTree
           RegisteredCliCommands.EXPERIMENT_VIEW_PUSH,
           experimentItem,
           [ExperimentType.EXPERIMENT]
+        )
+    )
+
+    commands.registerCommand(
+      'dvc.views.experimentsTree.stopExperiment',
+      (experimentItem: ExperimentItem) =>
+        callCommandWithSelected(
+          RegisteredCommands.EXPERIMENT_VIEW_STOP,
+          experimentItem,
+          [ExperimentType.RUNNING]
         )
     )
   }

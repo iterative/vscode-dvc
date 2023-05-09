@@ -42,11 +42,7 @@ import { DecorationProvider } from './model/decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
 import { ResourceLocator } from '../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
-import {
-  EXPERIMENT_WORKSPACE_ID,
-  Executor,
-  ExpShowOutput
-} from '../cli/dvc/contract'
+import { ExpShowOutput } from '../cli/dvc/contract'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Title } from '../vscode/title'
@@ -491,34 +487,30 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   public stopExperiments(ids: string[]) {
-    const experiments = this.experiments.getExperiments()
-    const idSet = new Set(ids)
-    let pidRunningInWorkspace
-    const runningInQueueIds = new Set<string>()
-    for (const { executor, id, executorPid } of experiments) {
-      if (!idSet.has(id)) {
-        continue
-      }
-      if (executor === EXPERIMENT_WORKSPACE_ID && executorPid) {
-        pidRunningInWorkspace = executorPid
-      }
-      if (executor === Executor.DVC_TASK) {
-        runningInQueueIds.add(id)
-      }
+    const { runningInQueueIds, workspaceDetails } =
+      this.experiments.getStopDetails(ids)
+
+    const promises: Promise<string | void>[] = []
+
+    if (runningInQueueIds) {
+      promises.push(
+        this.internalCommands.executeCommand(
+          AvailableCommands.QUEUE_KILL,
+          this.dvcRoot,
+          ...runningInQueueIds
+        )
+      )
+    }
+    if (workspaceDetails) {
+      promises.push(
+        stopWorkspaceExperiment(workspaceDetails.id, workspaceDetails.pid)
+      )
     }
 
-    if (runningInQueueIds.size > 0) {
-      void this.internalCommands.executeCommand(
-        AvailableCommands.QUEUE_KILL,
-        this.dvcRoot,
-        ...runningInQueueIds
-      )
-      if (pidRunningInWorkspace) {
-        void stopWorkspaceExperiment(pidRunningInWorkspace)
-      }
-    }
+    return Toast.showOutput(
+      Promise.all(promises).then(output => output.filter(Boolean).join('\n'))
+    )
   }
 
   public hasRunningExperiment() {
@@ -597,7 +589,6 @@ export class Experiments extends BaseRepository<TableData> {
       () => this.getWebview(),
       () => this.notifyChanged(),
       () => this.selectColumns(),
-      (ids: string[]) => this.stopExperiments(ids),
       () =>
         this.internalCommands.executeCommand(
           AvailableCommands.STAGE_LIST,

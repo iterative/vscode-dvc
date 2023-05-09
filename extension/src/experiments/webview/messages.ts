@@ -32,7 +32,6 @@ export class WebviewMessages {
   private readonly getWebview: () => BaseWebview<TableData> | undefined
   private readonly notifyChanged: () => void
   private readonly selectColumns: () => Promise<void>
-  private readonly stopExperiments: (ids: string[]) => void
 
   private readonly hasStages: () => Promise<string | undefined>
 
@@ -56,7 +55,6 @@ export class WebviewMessages {
     getWebview: () => BaseWebview<TableData> | undefined,
     notifyChanged: () => void,
     selectColumns: () => Promise<void>,
-    stopExperiments: (ids: string[]) => void,
     hasStages: () => Promise<string>,
     addStage: () => Promise<boolean>,
     selectBranches: (
@@ -71,7 +69,6 @@ export class WebviewMessages {
     this.getWebview = getWebview
     this.notifyChanged = notifyChanged
     this.selectColumns = selectColumns
-    this.stopExperiments = stopExperiments
     this.hasStages = hasStages
     this.addStage = addStage
     this.selectBranches = selectBranches
@@ -179,7 +176,13 @@ export class WebviewMessages {
       }
 
       case MessageFromWebviewType.STOP_EXPERIMENTS: {
-        return this.stopExperimentsAndSend(message.payload)
+        return commands.executeCommand(
+          RegisteredCommands.EXPERIMENT_VIEW_STOP,
+          {
+            dvcRoot: this.dvcRoot,
+            ids: message.payload
+          }
+        )
       }
 
       case MessageFromWebviewType.ADD_CONFIGURATION: {
@@ -432,11 +435,5 @@ export class WebviewMessages {
       RegisteredCommands.EXPERIMENT_AND_PLOTS_SHOW,
       this.dvcRoot
     )
-  }
-
-  private stopExperimentsAndSend(ids: string[]) {
-    this.stopExperiments(ids)
-
-    sendTelemetryEvent(EventName.EXPERIMENT_VIEW_STOP, undefined, undefined)
   }
 }

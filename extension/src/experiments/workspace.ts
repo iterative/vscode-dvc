@@ -128,14 +128,16 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    const repository = this.getRepository(cwd)
-
-    const ids = await repository.pickRunningExperiments()
+    const ids = await this.getRepository(cwd).pickRunningExperiments()
 
     if (!ids || isEmpty(ids)) {
       return
     }
-    return repository.stopExperiments(ids)
+    return this.stopExperiments(cwd, ...ids)
+  }
+
+  public stopExperiments(dvcRoot: string, ...ids: string[]) {
+    return this.getRepository(dvcRoot).stopExperiments(ids)
   }
 
   public async selectExperimentsToPush(setup: Setup) {

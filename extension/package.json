@@ -430,6 +430,18 @@
         "category": "DVC"
       },
       {
+        "title": "Stop",
+        "command": "dvc.views.experimentsTree.stopExperiment",
+        "category": "DVC",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "title": "Stop",
+        "command": "dvc.views.experiments.stopExperiment",
+        "category": "DVC",
+        "icon": "$(debug-stop)"
+      },
+      {
         "title": "Stop All Running Experiments",
         "command": "dvc.stopAllRunningExperiments",
         "category": "DVC",
@@ -915,6 +927,14 @@
           "when": "false"
         },
         {
+          "command": "dvc.views.experimentsTree.stopExperiment",
+          "when": "false"
+        },
+        {
+          "command": "dvc.views.experiments.stopExperiment",
+          "when": "false"
+        },
+        {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
           "when": "false"
         },
@@ -1159,6 +1179,11 @@
           "command": "dvc.views.experimentsFilterByTree.removeFilter",
           "group": "inline",
           "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available && viewItem != dvcRoot"
+        },
+        {
+          "command": "dvc.views.experimentsTree.stopExperiment",
+          "group": "inline@0",
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == running"
         },
         {
           "command": "dvc.views.experiments.applyExperiment",
