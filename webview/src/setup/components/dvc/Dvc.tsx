@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import {
-  DvcCliDetails,
-  SetupSection,
-  SectionCollapsed
-} from 'dvc/src/setup/webview/contract'
+import { useDispatch } from 'react-redux'
+import { DvcCliDetails, SetupSection } from 'dvc/src/setup/webview/contract'
 import { DvcEnvDetails } from './DvcEnvDetails'
 import { CliIncompatible } from './CliIncompatible'
 import { ProjectUninitialized } from './ProjectUninitialized'
@@ -17,6 +14,7 @@ import {
 } from '../messages'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { usePrevious } from '../../hooks/usePrevious'
+import { updateSectionCollapsed } from '../../state/setupDataSlice'
 
 type DvcProps = {
   canGitInitialize: boolean | undefined
@@ -26,7 +24,6 @@ type DvcProps = {
   needsGitInitialized: boolean | undefined
   projectInitialized: boolean
   pythonBinPath: string | undefined
-  setSectionCollapsed: (sectionCollapsed: SectionCollapsed) => void
   hasReceivedMessageFromVsCode: boolean
 }
 
@@ -38,9 +35,9 @@ export const Dvc: React.FC<DvcProps> = ({
   needsGitInitialized,
   projectInitialized,
   pythonBinPath,
-  hasReceivedMessageFromVsCode,
-  setSectionCollapsed
+  hasReceivedMessageFromVsCode
 }) => {
+  const dispatch = useDispatch()
   const [isComplete, setIsComplete] = useState<boolean | null>(null)
   const previousIsComplete = usePrevious(isComplete)
 
@@ -52,18 +49,20 @@ export const Dvc: React.FC<DvcProps> = ({
     }
 
     if (previousIsComplete === false && isComplete) {
-      setSectionCollapsed({
-        [SetupSection.DVC]: true,
-        [SetupSection.EXPERIMENTS]: false,
-        [SetupSection.STUDIO]: false
-      })
+      dispatch(
+        updateSectionCollapsed({
+          [SetupSection.DVC]: true,
+          [SetupSection.EXPERIMENTS]: false,
+          [SetupSection.STUDIO]: false
+        })
+      )
     }
   }, [
+    dispatch,
     projectInitialized,
     cliCompatible,
     isComplete,
     previousIsComplete,
-    setSectionCollapsed,
     hasReceivedMessageFromVsCode
   ])
 

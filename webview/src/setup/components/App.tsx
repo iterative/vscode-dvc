@@ -1,50 +1,41 @@
 import {
-  DEFAULT_SECTION_COLLAPSED,
   SetupSection,
   SetupData,
-  DvcCliDetails
+  DEFAULT_SECTION_COLLAPSED
 } from 'dvc/src/setup/webview/contract'
 import {
   MessageFromWebviewType,
   MessageToWebview
 } from 'dvc/src/webview/contract'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Dvc } from './dvc/Dvc'
 import { Experiments } from './Experiments'
 import { Studio } from './studio/Studio'
 import { SetupContainer } from './SetupContainer'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 import { sendMessage } from '../../shared/vscode'
+import { update, updateShareLiveToStudio } from '../state/setupDataSlice'
+import { SetupState } from '../store'
 
 export const App: React.FC = () => {
-  const [cliCompatible, setCliCompatible] = useState<boolean | undefined>(
-    undefined
-  )
-  const [dvcCliDetails, setDvcCliDetails] = useState<DvcCliDetails | undefined>(
-    undefined
-  )
-  const [projectInitialized, setProjectInitialized] = useState<boolean>(false)
-  const [needsGitInitialized, setNeedsGitInitialized] = useState<
-    boolean | undefined
-  >(false)
-  const [canGitInitialize, setCanGitInitialized] = useState<
-    boolean | undefined
-  >(false)
-  const [needsGitCommit, setNeedsGitCommit] = useState<boolean>(false)
-  const [pythonBinPath, setPythonBinPath] = useState<string | undefined>(
-    undefined
-  )
-  const [isPythonExtensionUsed, setisPythonExtensionUsed] =
-    useState<boolean>(false)
-  const [hasData, setHasData] = useState<boolean | undefined>(false)
-  const [sectionCollapsed, setSectionCollapsed] = useState(
-    DEFAULT_SECTION_COLLAPSED
-  )
-  const [isStudioConnected, setIsStudioConnected] = useState<boolean>(false)
-  const [shareLiveToStudio, setShareLiveToStudioValue] =
-    useState<boolean>(false)
-  const [hasReceivedMessageFromVsCode, setHasReceivedMessageFromVsCode] =
-    useState(false)
+  const {
+    canGitInitialize,
+    cliCompatible,
+    dvcCliDetails,
+    hasData,
+    hasReceivedMessageFromVsCode,
+    isPythonExtensionUsed,
+    isStudioConnected,
+    needsGitCommit,
+    needsGitInitialized,
+    projectInitialized,
+    pythonBinPath,
+    sectionCollapsed,
+    shareLiveToStudio
+  } = useSelector((state: SetupState) => state.setupData)
+
+  const dispatch = useDispatch()
 
   useVsCodeMessaging(
     useCallback(
@@ -52,41 +43,14 @@ export const App: React.FC = () => {
         if (!data?.data) {
           return
         }
-        setCanGitInitialized(data.data.canGitInitialize)
-        setCliCompatible(data.data.cliCompatible)
-        setHasData(data.data.hasData)
-        setDvcCliDetails(data.data.dvcCliDetails)
-        setisPythonExtensionUsed(data.data.isPythonExtensionUsed)
-        setNeedsGitInitialized(data.data.needsGitInitialized)
-        setNeedsGitCommit(data.data.needsGitCommit)
-        setProjectInitialized(data.data.projectInitialized)
-        setPythonBinPath(data.data.pythonBinPath)
-        setIsStudioConnected(data.data.isStudioConnected)
-        if (data.data.sectionCollapsed) {
-          setSectionCollapsed(data.data.sectionCollapsed)
-        }
-        setShareLiveToStudioValue(data.data.shareLiveToStudio)
-        setHasReceivedMessageFromVsCode(true)
+        dispatch(update(data.data))
       },
-      [
-        setCanGitInitialized,
-        setCliCompatible,
-        setHasData,
-        setDvcCliDetails,
-        setisPythonExtensionUsed,
-        setNeedsGitInitialized,
-        setNeedsGitCommit,
-        setProjectInitialized,
-        setPythonBinPath,
-        setIsStudioConnected,
-        setSectionCollapsed,
-        setShareLiveToStudioValue
-      ]
+      [dispatch]
     )
   )
 
   const setShareLiveToStudio = (shouldShareLive: boolean) => {
-    setShareLiveToStudioValue(shouldShareLive)
+    dispatch(updateShareLiveToStudio(shouldShareLive))
     sendMessage({
       payload: shouldShareLive,
       type: MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE
@@ -100,8 +64,7 @@ export const App: React.FC = () => {
       <SetupContainer
         sectionKey={SetupSection.DVC}
         title="DVC"
-        sectionCollapsed={sectionCollapsed}
-        setSectionCollapsed={setSectionCollapsed}
+        sectionCollapsed={sectionCollapsed || DEFAULT_SECTION_COLLAPSED}
         isSetup={isDvcSetup}
       >
         <Dvc
@@ -112,36 +75,31 @@ export const App: React.FC = () => {
           needsGitInitialized={needsGitInitialized}
           projectInitialized={projectInitialized}
           pythonBinPath={pythonBinPath}
-          setSectionCollapsed={setSectionCollapsed}
           hasReceivedMessageFromVsCode={hasReceivedMessageFromVsCode}
         />
       </SetupContainer>
       <SetupContainer
         sectionKey={SetupSection.EXPERIMENTS}
         title="Experiments"
-        sectionCollapsed={sectionCollapsed}
-        setSectionCollapsed={setSectionCollapsed}
+        sectionCollapsed={sectionCollapsed || DEFAULT_SECTION_COLLAPSED}
         isSetup={isDvcSetup && !!hasData}
       >
         <Experiments
           needsGitCommit={needsGitCommit}
           isDvcSetup={projectInitialized && !!cliCompatible}
           hasData={hasData}
-          setSectionCollapsed={setSectionCollapsed}
         />
       </SetupContainer>
       <SetupContainer
         sectionKey={SetupSection.STUDIO}
         title="Studio"
-        sectionCollapsed={sectionCollapsed}
-        setSectionCollapsed={setSectionCollapsed}
+        sectionCollapsed={sectionCollapsed || DEFAULT_SECTION_COLLAPSED}
         isSetup={!!cliCompatible}
         isConnected={isStudioConnected}
       >
         <Studio
           isStudioConnected={isStudioConnected}
           shareLiveToStudio={shareLiveToStudio}
-          setSectionCollapsed={setSectionCollapsed}
           setShareLiveToStudio={setShareLiveToStudio}
           cliCompatible={!!cliCompatible}
         />

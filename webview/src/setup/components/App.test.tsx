@@ -1,4 +1,6 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
+import { configureStore } from '@reduxjs/toolkit'
+import { Provider } from 'react-redux'
 import {
   MessageFromWebviewType,
   MessageToWebviewType
@@ -10,6 +12,7 @@ import { SetupSection, SetupData } from 'dvc/src/setup/webview/contract'
 import { App } from './App'
 import { vsCodeApi } from '../../shared/api'
 import { TooltipIconType } from '../../shared/components/sectionContainer/InfoTooltip'
+import { setupReducers } from '../store'
 
 jest.mock('../../shared/api')
 jest.mock('../../shared/components/codeSlider/CodeSlider')
@@ -31,7 +34,11 @@ const renderApp = ({
   sectionCollapsed,
   shareLiveToStudio
 }: SetupData) => {
-  render(<App />)
+  render(
+    <Provider store={configureStore({ reducer: setupReducers })}>
+      <App />
+    </Provider>
+  )
   fireEvent(
     window,
     new MessageEvent('message', {
@@ -68,7 +75,11 @@ const sendSetDataMessage = (data: SetupData) => {
 
 describe('App', () => {
   it('should send the initialized message on first render', () => {
-    render(<App />)
+    render(
+      <Provider store={configureStore({ reducer: setupReducers })}>
+        <App />
+      </Provider>
+    )
     expect(mockPostMessage).toHaveBeenCalledWith({
       type: MessageFromWebviewType.INITIALIZED
     })

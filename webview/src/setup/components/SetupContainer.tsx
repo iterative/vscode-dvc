@@ -3,8 +3,10 @@ import {
   SetupSection
 } from 'dvc/src/setup/webview/contract'
 import React from 'react'
+import { useDispatch } from 'react-redux'
 import { SectionContainer } from '../../shared/components/sectionContainer/SectionContainer'
 import { TooltipIconType } from '../../shared/components/sectionContainer/InfoTooltip'
+import { updateSectionCollapsed } from '../state/setupDataSlice'
 
 const getTooltipIconType = (isSetup: boolean, isConnected = true) => {
   if (!isSetup) {
@@ -18,7 +20,6 @@ export const SetupContainer: React.FC<{
   children: React.ReactNode
   sectionCollapsed: typeof DEFAULT_SECTION_COLLAPSED
   sectionKey: SetupSection
-  setSectionCollapsed: (value: typeof DEFAULT_SECTION_COLLAPSED) => void
   title: string
   isSetup: boolean
   isConnected?: boolean
@@ -26,23 +27,28 @@ export const SetupContainer: React.FC<{
   children,
   sectionCollapsed,
   sectionKey,
-  setSectionCollapsed,
   title,
   isSetup,
   isConnected
-}) => (
-  <SectionContainer
-    sectionCollapsed={sectionCollapsed[sectionKey]}
-    sectionKey={sectionKey}
-    title={title}
-    icon={getTooltipIconType(isSetup, isConnected)}
-    onToggleSection={() =>
-      setSectionCollapsed({
-        ...sectionCollapsed,
-        [sectionKey]: !sectionCollapsed[sectionKey]
-      })
-    }
-  >
-    {children}
-  </SectionContainer>
-)
+}) => {
+  const dispatch = useDispatch()
+
+  return (
+    <SectionContainer
+      sectionCollapsed={sectionCollapsed[sectionKey]}
+      sectionKey={sectionKey}
+      title={title}
+      icon={getTooltipIconType(isSetup, isConnected)}
+      onToggleSection={() =>
+        dispatch(
+          updateSectionCollapsed({
+            ...sectionCollapsed,
+            [sectionKey]: !sectionCollapsed[sectionKey]
+          })
+        )
+      }
+    >
+      {children}
+    </SectionContainer>
+  )
+}
