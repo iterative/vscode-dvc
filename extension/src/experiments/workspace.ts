@@ -210,7 +210,9 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   }
 
   public getCwdAndExpNameThenRun(commandId: CommandId) {
-    return this.pickExpThenRun(commandId, cwd => this.pickExperiment(cwd))
+    return this.pickExpThenRun(commandId, cwd =>
+      this.pickCommitOrExperiment(cwd)
+    )
   }
 
   public async getCwdAndQuickPickThenRun(
@@ -237,7 +239,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    const experimentId = await this.pickExperiment(cwd)
+    const experimentId = await this.pickCommitOrExperiment(cwd)
 
     if (!experimentId) {
       return
@@ -545,7 +547,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.runCommand(commandId, cwd, experimentId)
   }
 
-  private pickExperiment(cwd: string) {
-    return this.getRepository(cwd).pickExperiment()
+  private pickCommitOrExperiment(cwd: string) {
+    return this.getRepository(cwd).pickCommitOrExperiment()
   }
 }

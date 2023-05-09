@@ -281,7 +281,8 @@ export class WebviewMessages {
       hasColumns: this.columns.hasNonDefaultColumns(),
       hasConfig: this.hasConfig,
       hasMoreCommits: this.hasMoreCommits,
-      hasRunningExperiment: this.experiments.hasRunningExperiment(),
+      hasRunningWorkspaceExperiment:
+        this.experiments.hasRunningWorkspaceExperiment(),
       hasValidDvcYaml: this.hasValidDvcYaml,
       isBranchesView: this.experiments.getIsBranchesView(),
       isShowingMoreCommits: this.isShowingMoreCommits,

@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.8.6",
+  "version": "0.8.8",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -664,11 +664,11 @@
         },
         {
           "command": "dvc.applyExperiment",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace"
         },
         {
           "command": "dvc.branchExperiment",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace"
         },
         {
           "command": "dvc.checkout",
@@ -708,7 +708,7 @@
         },
         {
           "command": "dvc.experimentGarbageCollect",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace"
         },
         {
           "command": "dvc.findInFolder",
@@ -752,35 +752,35 @@
         },
         {
           "command": "dvc.modifyExperimentParamsAndQueue",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace"
         },
         {
           "command": "dvc.modifyExperimentParamsAndRun",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && !dvc.experiment.checkpoints"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace && !dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.modifyExperimentParamsAndResume",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && dvc.experiment.checkpoints"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace && dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.modifyExperimentParamsResetAndRun",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && dvc.experiment.checkpoints"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace && dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.pushExperiments",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace"
         },
         {
           "command": "dvc.queueExperiment",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace"
         },
         {
           "command": "dvc.removeExperiments",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace"
         },
         {
           "command": "dvc.removeExperimentQueue",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace"
         },
         {
           "command": "dvc.removeExperimentsTableFilters",
@@ -808,15 +808,15 @@
         },
         {
           "command": "dvc.runExperiment",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && !dvc.experiment.checkpoints"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace && !dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.resumeCheckpointExperiment",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && dvc.experiment.checkpoints"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace && dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.resetAndRunCheckpointExperiment",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running && dvc.experiment.checkpoints"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace && dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.startExperimentsQueue",
@@ -1029,59 +1029,64 @@
       ],
       "editor/title": [
         {
-          "command": "dvc.runExperiment",
+          "command": "dvc.stopAllRunningExperiments",
           "group": "navigation@0",
-          "when": "dvc.params.file.active && !dvc.experiment.running && dvc.commands.available && !dvc.experiment.checkpoints"
-        },
-        {
-          "command": "dvc.runExperiment",
-          "group": "navigation@0",
-          "when": "dvc.experiments.webview.active && !dvc.experiment.running && dvc.commands.available && !dvc.experiment.checkpoints"
+          "when": "dvc.params.file.active && dvc.experiment.running && dvc.commands.available"
         },
         {
           "command": "dvc.stopAllRunningExperiments",
           "group": "navigation@0",
-          "when": "dvc.experiment.running && dvc.commands.available"
+          "when": "dvc.experiments.webview.active && dvc.experiment.running && dvc.commands.available"
+        },
+        {
+          "command": "dvc.runExperiment",
+          "group": "navigation@1",
+          "when": "dvc.params.file.active && !dvc.experiment.running.workspace && dvc.commands.available && !dvc.experiment.checkpoints"
+        },
+        {
+          "command": "dvc.runExperiment",
+          "group": "navigation@1",
+          "when": "dvc.experiments.webview.active && !dvc.experiment.running.workspace && dvc.commands.available && !dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.resetAndRunCheckpointExperiment",
-          "group": "navigation@1",
-          "when": "dvc.experiments.webview.active && !dvc.experiment.running && dvc.commands.available && dvc.experiment.checkpoints"
+          "group": "navigation@2",
+          "when": "dvc.experiments.webview.active && !dvc.experiment.running.workspace && dvc.commands.available && dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.resetAndRunCheckpointExperiment",
-          "group": "navigation@1",
-          "when": "dvc.params.file.active && !dvc.experiment.running && dvc.commands.available && dvc.experiment.checkpoints"
+          "group": "navigation@2",
+          "when": "dvc.params.file.active && !dvc.experiment.running.workspace && dvc.commands.available && dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.resumeCheckpointExperiment",
-          "group": "navigation@2",
-          "when": "dvc.experiments.webview.active && !dvc.experiment.running && dvc.commands.available && dvc.experiment.checkpoints"
+          "group": "navigation@3",
+          "when": "dvc.experiments.webview.active && !dvc.experiment.running.workspace && dvc.commands.available && dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.resumeCheckpointExperiment",
-          "group": "navigation@2",
-          "when": "dvc.params.file.active && !dvc.experiment.running && dvc.commands.available && dvc.experiment.checkpoints"
+          "group": "navigation@3",
+          "when": "dvc.params.file.active && !dvc.experiment.running.workspace && dvc.commands.available && dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.startExperimentsQueue",
-          "group": "navigation@3",
-          "when": "dvc.experiments.webview.active && !dvc.experiment.running && dvc.commands.available"
+          "group": "navigation@4",
+          "when": "dvc.experiments.webview.active && dvc.commands.available"
         },
         {
           "command": "dvc.startExperimentsQueue",
-          "group": "navigation@3",
-          "when": "dvc.params.file.active && !dvc.experiment.running && dvc.commands.available"
+          "group": "navigation@4",
+          "when": "dvc.params.file.active && dvc.commands.available"
         },
         {
           "command": "dvc.queueExperiment",
-          "group": "navigation@4",
-          "when": "dvc.experiments.webview.active && !dvc.experiment.running && dvc.commands.available"
+          "group": "navigation@5",
+          "when": "dvc.experiments.webview.active && !dvc.experiment.running.workspace && dvc.commands.available"
         },
         {
           "command": "dvc.queueExperiment",
-          "group": "navigation@4",
-          "when": "dvc.params.file.active && !dvc.experiment.running && dvc.commands.available"
+          "group": "navigation@5",
+          "when": "dvc.params.file.active && !dvc.experiment.running.workspace && dvc.commands.available"
         }
       ],
       "view/item/context": [
@@ -1158,42 +1163,42 @@
         {
           "command": "dvc.views.experiments.applyExperiment",
           "group": "inline@1",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == experiment && !dvc.experiment.running"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|commit)$/ && !dvc.experiment.running.workspace"
         },
         {
           "command": "dvc.views.experiments.branchExperiment",
           "group": "inline@2",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == experiment && !dvc.experiment.running"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|commit)$/ && !dvc.experiment.running.workspace"
         },
         {
           "command": "dvc.views.experimentsTree.removeExperiment",
           "group": "inline@3",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|queued)$/ && !dvc.experiment.running"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|queued)$/ && !dvc.experiment.running.workspace"
         },
         {
           "command": "dvc.views.experimentsTree.pushExperiment",
           "group": "1_share@0",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == experiment && !dvc.experiment.running"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == experiment && !dvc.experiment.running.workspace"
         },
         {
           "command": "dvc.views.experiments.runExperiment",
           "group": "2_modify@1",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|commit|experiment|queued)$/ && !dvc.experiment.running && !dvc.experiment.checkpoints"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|commit|experiment|queued)$/ && !dvc.experiment.running.workspace && !dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.views.experiments.resetAndRunCheckpointExperiment",
           "group": "2_modify@1",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|commit|experiment|queued)$/ && !dvc.experiment.running && dvc.experiment.checkpoints"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|commit|experiment|queued)$/ && !dvc.experiment.running.workspace && dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.views.experiments.resumeCheckpointExperiment",
           "group": "2_modify@2",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|commit|experiment|queued)$/ && !dvc.experiment.running && dvc.experiment.checkpoints"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|commit|experiment|queued)$/ && !dvc.experiment.running.workspace && dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.views.experiments.queueExperiment",
           "group": "2_modify@3",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|commit|experiment|queued)$/ && !dvc.experiment.running"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|commit|experiment|queued)$/ && !dvc.experiment.running.workspace"
         }
       ],
       "view/title": [
@@ -1214,17 +1219,17 @@
         },
         {
           "command": "dvc.runExperiment",
-          "when": "view == dvc.views.experimentsTree && !dvc.experiment.running && !dvc.experiment.checkpoints",
+          "when": "view == dvc.views.experimentsTree && !dvc.experiment.running.workspace && !dvc.experiment.checkpoints",
           "group": "navigation@1"
         },
         {
           "command": "dvc.resetAndRunCheckpointExperiment",
-          "when": "view == dvc.views.experimentsTree && !dvc.experiment.running && dvc.experiment.checkpoints",
+          "when": "view == dvc.views.experimentsTree && !dvc.experiment.running.workspace && dvc.experiment.checkpoints",
           "group": "navigation@1"
         },
         {
           "command": "dvc.resumeCheckpointExperiment",
-          "when": "view == dvc.views.experimentsTree && !dvc.experiment.running && dvc.experiment.checkpoints",
+          "when": "view == dvc.views.experimentsTree && !dvc.experiment.running.workspace && dvc.experiment.checkpoints",
           "group": "navigation@2"
         },
         {
@@ -1249,27 +1254,27 @@
         },
         {
           "command": "dvc.modifyExperimentParamsAndRun",
-          "when": "view == dvc.views.experimentsTree && !dvc.experiment.running && !dvc.experiment.checkpoints",
+          "when": "view == dvc.views.experimentsTree && !dvc.experiment.running.workspace && !dvc.experiment.checkpoints",
           "group": "2_modify@1"
         },
         {
           "command": "dvc.modifyExperimentParamsAndResume",
-          "when": "view == dvc.views.experimentsTree && !dvc.experiment.running && dvc.experiment.checkpoints",
+          "when": "view == dvc.views.experimentsTree && !dvc.experiment.running.workspace && dvc.experiment.checkpoints",
           "group": "2_modify@1"
         },
         {
           "command": "dvc.modifyExperimentParamsResetAndRun",
-          "when": "view == dvc.views.experimentsTree && !dvc.experiment.running && dvc.experiment.checkpoints",
+          "when": "view == dvc.views.experimentsTree && !dvc.experiment.running.workspace && dvc.experiment.checkpoints",
           "group": "2_modify@2"
         },
         {
           "command": "dvc.modifyExperimentParamsAndQueue",
-          "when": "view == dvc.views.experimentsTree && !dvc.experiment.running",
+          "when": "view == dvc.views.experimentsTree && !dvc.experiment.running.workspace",
           "group": "2_modify@3"
         },
         {
           "command": "dvc.queueExperiment",
-          "when": "view == dvc.views.experimentsTree && !dvc.experiment.running",
+          "when": "view == dvc.views.experimentsTree && !dvc.experiment.running.workspace",
           "group": "3_queue@1"
         },
         {
@@ -1627,9 +1632,9 @@
     "vscode-languageclient": "8.1.0"
   },
   "devDependencies": {
-    "@swc/core": "1.3.55",
+    "@swc/core": "1.3.56",
     "@swc/jest": "0.2.26",
-    "@types/chai": "4.3.4",
+    "@types/chai": "4.3.5",
     "@types/chai-as-promised": "7.1.5",
     "@types/copy-webpack-plugin": "10.1.0",
     "@types/fs-extra": "11.0.1",

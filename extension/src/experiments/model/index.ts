@@ -1,7 +1,10 @@
 import { Memento } from 'vscode'
 import { SortDefinition, sortExperiments } from './sortBy'
 import { FilterDefinition, filterExperiment, getFilterId } from './filterBy'
-import { collectExperiments } from './collect'
+import {
+  collectExperiments,
+  collectOrderedCommitsAndExperiments
+} from './collect'
 import {
   collectColoredStatus,
   collectFinishedRunningExperiments,
@@ -23,7 +26,8 @@ import { definedAndNonEmpty, reorderListSubset } from '../../util/array'
 import {
   EXPERIMENT_WORKSPACE_ID,
   Executor,
-  ExpShowOutput
+  ExpShowOutput,
+  ExperimentStatus
 } from '../../cli/dvc/contract'
 import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
@@ -39,10 +43,11 @@ export type SelectedExperimentWithColor = Experiment & {
 }
 
 export enum ExperimentType {
-  WORKSPACE = 'workspace',
   COMMIT = 'commit',
   EXPERIMENT = 'experiment',
-  QUEUED = 'queued'
+  RUNNING = 'running',
+  QUEUED = 'queued',
+  WORKSPACE = 'workspace'
 }
 
 export class ExperimentsModel extends ModelWithPersistence {
@@ -164,6 +169,10 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public hasRunningExperiment() {
     return this.running.length > 0
+  }
+
+  public hasRunningWorkspaceExperiment() {
+    return this.running.some(({ executor }) => executor === Executor.WORKSPACE)
   }
 
   public hasCheckpoints() {
@@ -313,6 +322,12 @@ export class ExperimentsModel extends ModelWithPersistence {
     })
   }
 
+  public getCommitsAndExperiments() {
+    return collectOrderedCommitsAndExperiments(this.commits, commit =>
+      this.getExperimentsByCommit(commit)
+    )
+  }
+
   public getExperimentsAndQueued() {
     return flattenMapValues(this.experimentsByCommit).map(experiment =>
       this.addDetails(experiment)
@@ -372,9 +387,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.getExperimentsByCommit(commit)?.map(experiment => ({
       ...experiment,
       hasChildren: false,
-      type: isQueued(experiment.status)
-        ? ExperimentType.QUEUED
-        : ExperimentType.EXPERIMENT
+      type: this.getExperimentType(experiment.status)
     }))
   }
 
@@ -554,6 +567,17 @@ export class ExperimentsModel extends ModelWithPersistence {
       selected: this.isSelected(id),
       starred: !!this.isStarred(id)
     }
+  }
+
+  private getExperimentType(status?: ExperimentStatus) {
+    if (isQueued(status)) {
+      return ExperimentType.QUEUED
+    }
+    if (isRunning(status)) {
+      return ExperimentType.RUNNING
+    }
+
+    return ExperimentType.EXPERIMENT
   }
 
   private getDisplayColor(id: string) {

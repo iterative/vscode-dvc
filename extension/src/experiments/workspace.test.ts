@@ -33,7 +33,7 @@ const mockedQuickPickOne = jest.mocked(quickPickOne)
 const mockedQuickPickManyValues = jest.mocked(quickPickManyValues)
 const mockedQuickPickOneOrInput = jest.mocked(quickPickOneOrInput)
 const mockedGetValidInput = jest.mocked(getValidInput)
-const mockedPickExperiment = jest.fn()
+const mockedPickCommitOrExperiment = jest.fn()
 const mockedGetInput = jest.mocked(getInput)
 const mockedRun = jest.fn()
 const mockedExpFunc = jest.fn()
@@ -91,7 +91,7 @@ describe('Experiments', () => {
     {
       '/my/dvc/root': {
         getDvcRoot: () => mockedDvcRoot,
-        pickExperiment: mockedPickExperiment,
+        pickCommitOrExperiment: mockedPickCommitOrExperiment,
         showWebview: mockedShowWebview
       } as unknown as Experiments,
       '/my/fun/dvc/root': {
@@ -138,12 +138,12 @@ describe('Experiments', () => {
     it('should call the correct function with the correct parameters if a project and experiment are picked', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       mockedListStages.mockResolvedValueOnce('train')
-      mockedPickExperiment.mockResolvedValueOnce('a123456')
+      mockedPickCommitOrExperiment.mockResolvedValueOnce('a123456')
 
       await workspaceExperiments.getCwdAndExpNameThenRun(mockedCommandId)
 
       expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
-      expect(mockedPickExperiment).toHaveBeenCalledTimes(1)
+      expect(mockedPickCommitOrExperiment).toHaveBeenCalledTimes(1)
       expect(mockedExpFunc).toHaveBeenCalledTimes(1)
       expect(mockedExpFunc).toHaveBeenCalledWith(mockedDvcRoot, 'a123456')
     })
@@ -240,7 +240,7 @@ describe('Experiments', () => {
     it('should call the correct function with the correct parameters if a project and experiment are picked and an input provided', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       mockedListStages.mockResolvedValueOnce('train')
-      mockedPickExperiment.mockResolvedValueOnce('a123456')
+      mockedPickCommitOrExperiment.mockResolvedValueOnce('a123456')
       mockedGetInput.mockResolvedValueOnce('abc123')
 
       await workspaceExperiments.getCwdExpNameAndInputThenRun(
@@ -250,7 +250,7 @@ describe('Experiments', () => {
       )
 
       expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
-      expect(mockedPickExperiment).toHaveBeenCalledTimes(1)
+      expect(mockedPickCommitOrExperiment).toHaveBeenCalledTimes(1)
       expect(mockedExpFunc).toHaveBeenCalledTimes(1)
       expect(mockedExpFunc).toHaveBeenCalledWith(
         mockedDvcRoot,
@@ -276,7 +276,7 @@ describe('Experiments', () => {
     it('should not call the function if user input is not provided', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       mockedListStages.mockResolvedValueOnce('train')
-      mockedPickExperiment.mockResolvedValueOnce({
+      mockedPickCommitOrExperiment.mockResolvedValueOnce({
         id: 'b456789',
         name: 'exp-456'
       })
@@ -296,7 +296,7 @@ describe('Experiments', () => {
     it('should check and ask for the creation of a pipeline stage before running the command', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       mockedListStages.mockResolvedValueOnce('')
-      mockedPickExperiment.mockResolvedValueOnce({
+      mockedPickCommitOrExperiment.mockResolvedValueOnce({
         id: 'a123456',
         name: 'exp-123'
       })

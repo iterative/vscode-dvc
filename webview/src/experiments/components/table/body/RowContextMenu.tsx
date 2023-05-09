@@ -1,4 +1,5 @@
 import React, { useContext, useMemo } from 'react'
+import { useSelector } from 'react-redux'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import {
   ExperimentStatus,
@@ -12,6 +13,7 @@ import { RowSelectionContext } from '../RowSelectionContext'
 import { MessagesMenu } from '../../../../shared/components/messagesMenu/MessagesMenu'
 import { MessagesMenuOptionProps } from '../../../../shared/components/messagesMenu/MessagesMenuOption'
 import { cond } from '../../../../util/helpers'
+import { ExperimentsState } from '../../../store'
 
 const experimentMenuOption = (
   payload: string | string[] | { id: string; executor?: string | null }[],
@@ -32,39 +34,78 @@ const experimentMenuOption = (
   } as MessagesMenuOptionProps
 }
 
-const getMultiSelectMenuOptions = (
+const collectIdByStarred = (
+  starredExperimentIds: string[],
+  unstarredExperimentIds: string[],
+  starred: boolean | undefined,
+  id: string
+) => (starred ? starredExperimentIds.push(id) : unstarredExperimentIds.push(id))
+
+const isRunningOrNotExperiment = (
+  status: ExperimentStatus | undefined,
+  depth: number,
+  hasRunningWorkspaceExperiment: boolean
+): boolean => isRunning(status) || depth !== 1 || hasRunningWorkspaceExperiment
+
+const collectDisabledOptions = (
   selectedRowsList: RowProp[],
-  hasRunningExperiment: boolean
+  hasRunningWorkspaceExperiment: boolean
 ) => {
-  const filterStarredUnstarred = (isStarred: boolean) =>
-    selectedRowsList.filter(
-      ({
-        row: {
-          original: { starred }
-        }
-      }) => starred === isStarred
+  const selectedIds: string[] = []
+  const starredExperimentIds: string[] = []
+  const unstarredExperimentIds: string[] = []
+  let disableExperimentOnlyOption = false
+  let disablePlotOption = false
+  let disableStopOption = false
+
+  for (const { row } of selectedRowsList) {
+    const { original, depth } = row
+    const { starred, status, id } = original
+
+    selectedIds.push(id)
+
+    collectIdByStarred(
+      starredExperimentIds,
+      unstarredExperimentIds,
+      starred,
+      id
     )
 
-  const unstarredExperiments = filterStarredUnstarred(false)
-  const starredExperiments = filterStarredUnstarred(true)
+    if (
+      isRunningOrNotExperiment(status, depth, hasRunningWorkspaceExperiment)
+    ) {
+      disableExperimentOnlyOption = true
+    }
 
-  const selectedIds = selectedRowsList.map(value => value.row.original.id)
+    if (isRunning(status)) {
+      disablePlotOption = true
+      continue
+    }
+    disableStopOption = true
+  }
 
-  const experimentRowIds = selectedRowsList
-    .filter(value => value.row.depth === 1)
-    .map(value => value.row.original.id)
+  return {
+    disableExperimentOnlyOption,
+    disablePlotOption,
+    disableStopOption,
+    selectedIds,
+    starredExperimentIds,
+    unstarredExperimentIds
+  }
+}
 
-  const disableExperimentOnlyOption =
-    experimentRowIds.length !== selectedRowsList.length || hasRunningExperiment
-
-  const stoppableRows = selectedRowsList
-    .filter(value => isRunning(value.row.original.status))
-    .map(value => ({
-      executor: value.row.original.executor,
-      id: value.row.original.id
-    }))
-
-  const disableStopOption = stoppableRows.length !== selectedRowsList.length
+const getMultiSelectMenuOptions = (
+  selectedRowsList: RowProp[],
+  hasRunningWorkspaceExperiment: boolean
+) => {
+  const {
+    disableExperimentOnlyOption,
+    disablePlotOption,
+    disableStopOption,
+    selectedIds,
+    starredExperimentIds,
+    unstarredExperimentIds
+  } = collectDisabledOptions(selectedRowsList, hasRunningWorkspaceExperiment)
 
   const toggleStarOption = (ids: string[], label: string) =>
     experimentMenuOption(
@@ -75,44 +116,38 @@ const getMultiSelectMenuOptions = (
     )
 
   return [
-    toggleStarOption(
-      unstarredExperiments.map(value => value.row.original.id),
-      'Star'
-    ),
-    toggleStarOption(
-      starredExperiments.map(value => value.row.original.id),
-      'Unstar'
-    ),
+    toggleStarOption(unstarredExperimentIds, 'Star'),
+    toggleStarOption(starredExperimentIds, 'Unstar'),
     experimentMenuOption(
       selectedIds,
       'Plot',
       MessageFromWebviewType.SET_EXPERIMENTS_FOR_PLOTS,
-      false,
+      disablePlotOption,
       true
     ),
     experimentMenuOption(
       selectedIds,
       'Plot and Show',
       MessageFromWebviewType.SET_EXPERIMENTS_AND_OPEN_PLOTS,
-      false,
+      disablePlotOption,
       false
     ),
     experimentMenuOption(
-      stoppableRows,
+      selectedIds,
       'Stop',
       MessageFromWebviewType.STOP_EXPERIMENT,
       disableStopOption,
       true
     ),
     experimentMenuOption(
-      experimentRowIds,
+      selectedIds,
       'Push Selected',
       MessageFromWebviewType.PUSH_EXPERIMENT,
       disableExperimentOnlyOption,
       true
     ),
     experimentMenuOption(
-      experimentRowIds,
+      selectedIds,
       'Remove Selected',
       MessageFromWebviewType.REMOVE_EXPERIMENT,
       disableExperimentOnlyOption,
@@ -172,7 +207,7 @@ const getSingleSelectMenuOptions = (
   id: string,
   isWorkspace: boolean,
   projectHasCheckpoints: boolean,
-  hasRunningExperiment: boolean,
+  hasRunningWorkspaceExperiment: boolean,
   depth: number,
   status?: ExperimentStatus,
   starred?: boolean,
@@ -190,15 +225,15 @@ const getSingleSelectMenuOptions = (
       id,
       label,
       type,
-      disabled || hasRunningExperiment,
+      disabled || hasRunningWorkspaceExperiment || isRunning(status),
       divider
     )
 
-  const disableIfRunningOrNotExperiment = (
+  const disableIfRunningOrWorkspace = (
     label: string,
     type: MessageFromWebviewType,
     divider?: boolean
-  ) => disableIfRunning(label, type, isNotExperiment, divider)
+  ) => disableIfRunning(label, type, isWorkspace, divider)
 
   return [
     experimentMenuOption(
@@ -207,11 +242,11 @@ const getSingleSelectMenuOptions = (
       MessageFromWebviewType.SHOW_EXPERIMENT_LOGS,
       !isRunningInQueue({ executor, status })
     ),
-    disableIfRunningOrNotExperiment(
+    disableIfRunningOrWorkspace(
       'Apply to Workspace',
       MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE
     ),
-    disableIfRunningOrNotExperiment(
+    disableIfRunningOrWorkspace(
       'Create new Branch',
       MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
     ),
@@ -219,7 +254,7 @@ const getSingleSelectMenuOptions = (
       [id],
       'Push',
       MessageFromWebviewType.PUSH_EXPERIMENT,
-      isNotExperiment || hasRunningExperiment,
+      isNotExperiment || hasRunningWorkspaceExperiment || isRunning(status),
       true
     ),
     ...getRunResumeOptions(
@@ -232,7 +267,7 @@ const getSingleSelectMenuOptions = (
       starred ? 'Unstar' : 'Star',
       MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR,
       isWorkspace,
-      !hasRunningExperiment
+      !hasRunningWorkspaceExperiment
     ),
     experimentMenuOption(
       [{ executor, id }],
@@ -254,7 +289,7 @@ const getContextMenuOptions = (
   id: string,
   isWorkspace: boolean,
   projectHasCheckpoints: boolean,
-  hasRunningExperiment: boolean,
+  hasRunningWorkspaceExperiment: boolean,
   depth: number,
   selectedRows: Record<string, RowProp | undefined>,
   status?: ExperimentStatus,
@@ -268,13 +303,17 @@ const getContextMenuOptions = (
 
   return cond(
     isFromSelection && selectedRowsList.length > 1,
-    () => getMultiSelectMenuOptions(selectedRowsList, hasRunningExperiment),
+    () =>
+      getMultiSelectMenuOptions(
+        selectedRowsList,
+        hasRunningWorkspaceExperiment
+      ),
     () =>
       getSingleSelectMenuOptions(
         id,
         isWorkspace,
         projectHasCheckpoints,
-        hasRunningExperiment,
+        hasRunningWorkspaceExperiment,
         depth,
         status,
         starred,
@@ -284,14 +323,16 @@ const getContextMenuOptions = (
 }
 
 export const RowContextMenu: React.FC<RowProp> = ({
-  hasRunningExperiment = false,
-  projectHasCheckpoints = false,
   row: {
     original: { status, starred, id, executor },
     depth
   }
 }) => {
   const { selectedRows, clearSelectedRows } = useContext(RowSelectionContext)
+  const {
+    hasRunningWorkspaceExperiment,
+    hasCheckpoints: projectHasCheckpoints
+  } = useSelector((state: ExperimentsState) => state.tableData)
 
   const isWorkspace = id === EXPERIMENT_WORKSPACE_ID
 
@@ -300,7 +341,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
       id,
       isWorkspace,
       projectHasCheckpoints,
-      hasRunningExperiment,
+      hasRunningWorkspaceExperiment,
       depth,
       selectedRows,
       status,
@@ -316,7 +357,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
     id,
     projectHasCheckpoints,
     selectedRows,
-    hasRunningExperiment
+    hasRunningWorkspaceExperiment
   ])
 
   return (
