@@ -488,7 +488,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public stopExperiments(ids: string[]) {
-    const { runningInQueueIds, workspaceDetails } =
+    const { runningInQueueIds, runningInWorkspaceId } =
       this.experiments.getStopDetails(ids)
 
     const promises: Promise<string | void>[] = []
@@ -502,10 +502,8 @@ export class Experiments extends BaseRepository<TableData> {
         )
       )
     }
-    if (workspaceDetails) {
-      promises.push(
-        stopWorkspaceExperiment(workspaceDetails.id, workspaceDetails.pid)
-      )
+    if (runningInWorkspaceId) {
+      promises.push(stopWorkspaceExperiment(this.dvcRoot, runningInWorkspaceId))
     }
 
     return Toast.showOutput(

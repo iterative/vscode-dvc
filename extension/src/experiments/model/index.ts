@@ -4,8 +4,8 @@ import { FilterDefinition, filterExperiment, getFilterId } from './filterBy'
 import {
   collectExperiments,
   collectOrderedCommitsAndExperiments,
-  collectRunningQueueTaskIds,
-  collectWorkspaceExecutorPid as collectWorkspaceRunDetails
+  collectRunningInQueue,
+  collectRunningInWorkspace
 } from './collect'
 import {
   collectColoredStatus,
@@ -346,8 +346,8 @@ export class ExperimentsModel extends ModelWithPersistence {
     const running = [...this.running]
     const ids = new Set(idsToStop)
     return {
-      runningInQueueIds: collectRunningQueueTaskIds(ids, running),
-      workspaceDetails: collectWorkspaceRunDetails(ids, running)
+      runningInQueueIds: collectRunningInQueue(ids, running),
+      runningInWorkspaceId: collectRunningInWorkspace(ids, running)
     }
   }
 

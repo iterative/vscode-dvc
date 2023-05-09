@@ -29,7 +29,6 @@ import { RegisteredCommands } from '../../commands/external'
 import { Resource } from '../../resourceLocator'
 import { shortenForLabel } from '../../util/string'
 import { COMMITS_SEPARATOR } from '../../cli/git/constants'
-import { createValidInteger } from '../../util/number'
 
 export type ExperimentItem = {
   command?: {
@@ -226,16 +225,14 @@ const collectExecutorInfo = (
 
 const collectRunningExperiment = (
   acc: ExperimentsAccumulator,
-  experiment: Experiment,
-  executor: ExecutorState
+  experiment: Experiment
 ): void => {
   if (!isRunning(experiment.status)) {
     return
   }
   acc.runningExperiments.push({
     executor: getExecutor(experiment),
-    id: experiment.id,
-    pid: createValidInteger(executor?.local?.pid)
+    id: experiment.id
   })
 }
 
@@ -271,7 +268,7 @@ const collectExpRange = (
   }
 
   collectExecutorInfo(experiment, executor)
-  collectRunningExperiment(acc, experiment, executor)
+  collectRunningExperiment(acc, experiment)
 
   addToMapArray(acc.experimentsByCommit, baseline.id, experiment)
 }
@@ -413,7 +410,7 @@ export const collectOrderedCommitsAndExperiments = (
   return acc
 }
 
-export const collectRunningQueueTaskIds = (
+export const collectRunningInQueue = (
   ids: Set<string>,
   runningExperiments: RunningExperiment[]
 ): string[] | undefined => {
@@ -429,16 +426,16 @@ export const collectRunningQueueTaskIds = (
   return runningInQueueIds.size > 0 ? [...runningInQueueIds] : undefined
 }
 
-export const collectWorkspaceExecutorPid = (
+export const collectRunningInWorkspace = (
   ids: Set<string>,
   runningExperiments: RunningExperiment[]
-): { pid: number; id: string } | undefined => {
-  for (const { executor, id, pid } of runningExperiments) {
+): string | undefined => {
+  for (const { executor, id } of runningExperiments) {
     if (!ids.has(id)) {
       continue
     }
-    if (executor === EXPERIMENT_WORKSPACE_ID && pid) {
-      return { id, pid }
+    if (executor === EXPERIMENT_WORKSPACE_ID) {
+      return id
     }
   }
 }

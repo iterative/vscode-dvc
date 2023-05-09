@@ -19,7 +19,6 @@ export interface DepColumns {
 export type RunningExperiment = {
   executor: Executor
   id: string
-  pid?: number | null
 }
 
 export type CommitData = {
