@@ -1249,6 +1249,11 @@ suite('Experiments Test Suite', () => {
 
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
       const mockPid = 1234
+      const mockGetPidFromFile = stub(FileSystem, 'getPidFromFile')
+        .onFirstCall()
+        .resolves(mockPid)
+        .onSecondCall()
+        .resolves(undefined)
       const mockProcessExists = stub(
         ProcessExecution,
         'processExists'
@@ -1262,6 +1267,7 @@ suite('Experiments Test Suite', () => {
       await Promise.all([experimentsKilled, workspaceStopped])
 
       expect(mockQueueKill).to.be.calledWith(dvcDemoPath, 'exp-e7a67')
+      expect(mockGetPidFromFile).to.be.calledTwice
       expect(mockProcessExists).to.be.calledWithExactly(mockPid)
       expect(mockStopProcesses).to.be.calledWithExactly([mockPid])
     }).timeout(WEBVIEW_TEST_TIMEOUT)
