@@ -3,7 +3,7 @@ import {
   MessageFromWebviewType,
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
-import { MAX_CLI_VERSION, MIN_CLI_VERSION } from 'dvc/src/cli/dvc/contract'
+import { MIN_CLI_VERSION } from 'dvc/src/cli/dvc/contract'
 import '@testing-library/jest-dom/extend-expect'
 import React from 'react'
 import { SetupSection, SetupData } from 'dvc/src/setup/webview/contract'
@@ -496,7 +496,7 @@ describe('App', () => {
       })
 
       const envDetails = screen.getByTestId('dvc-env-details')
-      const command = `1.0.0 (${MIN_CLI_VERSION} <= required < ${MAX_CLI_VERSION}.0.0)`
+      const command = `1.0.0 (required >= ${MIN_CLI_VERSION})`
 
       expect(within(envDetails).getByText('Version')).toBeInTheDocument()
       expect(within(envDetails).getByText(command)).toBeInTheDocument()
@@ -521,7 +521,7 @@ describe('App', () => {
         shareLiveToStudio: false
       })
       const envDetails = screen.getByTestId('dvc-env-details')
-      const command = `Not found (${MIN_CLI_VERSION} <= required < ${MAX_CLI_VERSION}.0.0)`
+      const command = `Not found (required >= ${MIN_CLI_VERSION})`
 
       expect(within(envDetails).getByText('Version')).toBeInTheDocument()
       expect(within(envDetails).getByText(command)).toBeInTheDocument()

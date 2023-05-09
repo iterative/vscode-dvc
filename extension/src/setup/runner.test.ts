@@ -20,7 +20,6 @@ import { Response } from '../vscode/response'
 import { VscodePython } from '../extensions/python'
 import { executeProcess } from '../process/execution'
 import { LATEST_TESTED_CLI_VERSION, MIN_CLI_VERSION } from '../cli/dvc/contract'
-import { extractSemver, ParsedSemver } from '../cli/dvc/version'
 import { delay } from '../util/time'
 import { Title } from '../vscode/title'
 
@@ -492,31 +491,6 @@ describe('run', () => {
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(2)
     expect(mockedResetMembers).toHaveBeenCalledTimes(1)
     expect(mockedInitialize).not.toHaveBeenCalled()
-  })
-
-  it('should send a specific message and initialize if the Python extension is being used, the CLI is not available in the virtual environment and the global CLI is a minor version ahead of the expected version', async () => {
-    const { major, minor, patch } = extractSemver(
-      LATEST_TESTED_CLI_VERSION
-    ) as ParsedSemver
-    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
-    mockedHasRoots.mockReturnValueOnce(true)
-    mockedShouldWarnUserIfCLIUnavailable
-      .mockReturnValueOnce(true)
-      .mockReturnValueOnce(true)
-    mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
-    mockedGetCliVersion
-      .mockResolvedValueOnce(undefined)
-      .mockResolvedValueOnce([major, minor + 1, patch].join('.'))
-
-    await run(setup)
-    await flushPromises()
-    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
-    expect(mockedWarnWithOptions).toHaveBeenCalledWith(
-      `The located DVC CLI is at least a minor version ahead of the latest version the extension was tested with (${LATEST_TESTED_CLI_VERSION}). This could lead to unexpected behaviour. Please upgrade to the most recent version of the extension and reload this window.`
-    )
-    expect(mockedGetCliVersion).toHaveBeenCalledTimes(2)
-    expect(mockedResetMembers).not.toHaveBeenCalled()
-    expect(mockedInitialize).toHaveBeenCalledTimes(1)
   })
 
   it('should send a specific message to the user if the Python extension is not being used and the CLI is not available', async () => {
