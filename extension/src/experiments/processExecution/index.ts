@@ -6,10 +6,16 @@ export const stopWorkspaceExperiment = async (dvcRoot: string, id: string) => {
 
   await collectDvcRootPids(pids, dvcRoot)
 
+  const notFound = `process executing ${id} was not found.`
+
+  if (pids.size === 0) {
+    return notFound
+  }
+
   const [pid] = [...pids]
 
   if (!pid || !(await processExists(pid))) {
-    return `process executing ${id} was not found.`
+    return notFound
   }
 
   const failedToStop = `failed to kill ${id}.`
