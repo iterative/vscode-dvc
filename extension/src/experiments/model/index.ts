@@ -286,7 +286,11 @@ export class ExperimentsModel extends ModelWithPersistence {
       {
         ...this.addDetails(this.workspace),
         hasChildren: false,
-        type: ExperimentType.WORKSPACE
+        type: this.running.some(
+          ({ executor }) => executor === Executor.WORKSPACE
+        )
+          ? ExperimentType.RUNNING
+          : ExperimentType.WORKSPACE
       },
       ...this.commits.map(commit => {
         return {

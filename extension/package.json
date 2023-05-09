@@ -1243,6 +1243,11 @@
           "group": "navigation@2"
         },
         {
+          "command": "dvc.stopAllRunningExperiments",
+          "when": "view == dvc.views.experimentsTree && dvc.experiments.webview.active && dvc.experiment.running",
+          "group": "navigation@0"
+        },
+        {
           "command": "dvc.runExperiment",
           "when": "view == dvc.views.experimentsTree && !dvc.experiment.running.workspace && !dvc.experiment.checkpoints",
           "group": "navigation@1"
@@ -1261,11 +1266,6 @@
           "command": "dvc.stopAllRunningExperiments",
           "when": "view == dvc.views.experimentsTree && !dvc.experiments.webview.active && dvc.experiment.running",
           "group": "1_run@1"
-        },
-        {
-          "command": "dvc.stopAllRunningExperiments",
-          "when": "view == dvc.views.experimentsTree && dvc.experiments.webview.active && dvc.experiment.running",
-          "group": "navigation@1"
         },
         {
           "command": "dvc.views.experimentsTree.selectExperiments",
