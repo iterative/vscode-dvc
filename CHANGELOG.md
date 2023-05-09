@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.9] - 2023-05-09
+
+### 🚀 New Features and Enhancements
+
+- Autoclose DVC Section if completed [#3809](https://github.com/iterative/vscode-dvc/pull/3809) by [@julieg18](https://github.com/julieg18)
+
 ## [0.8.8] - 2023-05-08
 
 ### 🚀 New Features and Enhancements
