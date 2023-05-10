@@ -18,11 +18,9 @@ export const DvcEnvDetails: React.FC<DvcEnvDetailsProps> = ({
   isPythonExtensionUsed
 }) => {
   const versionText = (
-    <>
-      <span>{`${
-        version || 'Not found'
-      } (required ${MIN_CLI_VERSION} and above, tested with ${LATEST_TESTED_CLI_VERSION})`}</span>
-    </>
+    <span>{`${
+      version || 'Not found'
+    } (required ${MIN_CLI_VERSION} and above, tested with ${LATEST_TESTED_CLI_VERSION})`}</span>
   )
 
   return (
