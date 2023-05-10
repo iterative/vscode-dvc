@@ -42,7 +42,7 @@ import { GitExecutor } from './cli/git/executor'
 import { GitReader } from './cli/git/reader'
 import { Setup } from './setup'
 import { definedAndNonEmpty } from './util/array'
-import { stopProcesses } from './process/execution'
+import { esmModulesImported, stopProcesses } from './process/execution'
 import { Flag } from './cli/dvc/constants'
 import { LanguageClient } from './languageClient'
 import { collectRunningExperimentPids } from './experiments/processExecution/collect'
@@ -304,8 +304,10 @@ class Extension extends Disposable {
 let extension: undefined | Extension
 
 export function activate(context: ExtensionContext): void {
-  extension = new Extension(context)
-  context.subscriptions.push(extension)
+  void esmModulesImported.then(() => {
+    extension = new Extension(context)
+    context.subscriptions.push(extension)
+  })
 }
 
 export function deactivate(): void {

@@ -6,12 +6,14 @@ require('../../../vscode/mockModule')
 
 const importModuleAfterMockingVsCode = () => {
   const { Cli } = require('../../../cli')
-  return { Cli }
+  const { esmModulesImported } = require('../../../process/execution')
+  return { Cli, esmModulesImported }
 }
 
 const main = async () => {
-  const { Cli } = importModuleAfterMockingVsCode()
+  const { Cli, esmModulesImported } = importModuleAfterMockingVsCode()
 
+  await esmModulesImported
   const cli = new Cli()
 
   const options = getOptions('background')

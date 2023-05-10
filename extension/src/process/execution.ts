@@ -2,10 +2,35 @@ import { ChildProcess } from 'child_process'
 import { Readable } from 'stream'
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import execa from 'execa'
-import doesProcessExists from 'process-exists'
+import { Deferred } from '@hediet/std/synchronization'
 import kill from 'tree-kill'
 import { getProcessPlatform } from '../env'
+
+const deferred = new Deferred()
+export const esmModulesImported = deferred.promise
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+type EsmExeca = typeof import('execa').execa
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+type EsmProcessExists = typeof import('process-exists').processExists
+
+const envCanImportEsm = process.env.NODE_ENV !== 'test'
+
+let execa: EsmExeca
+let doesProcessExist: EsmProcessExists
+const importEsmModules = async () => {
+  const [{ execa: esmExeca }, { processExists: esmProcessExists }] =
+    await Promise.all([import('execa'), import('process-exists')])
+  execa = esmExeca
+  doesProcessExist = esmProcessExists
+  deferred.resolve()
+}
+
+if (envCanImportEsm) {
+  void importEsmModules()
+}
 
 interface RunningProcess extends ChildProcess {
   all?: Readable
@@ -86,7 +111,7 @@ export const executeProcess = async (
 }
 
 export const processExists = (pid: number): Promise<boolean> =>
-  doesProcessExists(pid)
+  doesProcessExist(pid)
 
 export const stopProcesses = async (pids: number[]): Promise<boolean> => {
   let allKilled = true
