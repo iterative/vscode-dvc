@@ -30,6 +30,7 @@ import { starredSort } from './model/sortBy/constants'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ColumnsModel } from './columns/model'
 import { ExperimentsData } from './data'
+import { stopWorkspaceExperiment } from './processExecution'
 import {
   Experiment,
   ColumnType,
@@ -378,11 +379,11 @@ export class Experiments extends BaseRepository<TableData> {
     )
   }
 
-  public pickQueueTasksToKill() {
+  public pickRunningExperiments() {
     return pickExperiments(
-      this.experiments.getRunningQueueTasks(),
+      this.experiments.getRunningExperiments(),
       this.getFirstThreeColumnOrder(),
-      Title.SELECT_QUEUE_KILL
+      Title.SELECT_EXPERIMENTS_STOP
     )
   }
 
@@ -486,6 +487,30 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
+  public stopExperiments(ids: string[]) {
+    const { runningInQueueIds, runningInWorkspaceId } =
+      this.experiments.getStopDetails(ids)
+
+    const promises: Promise<string | void>[] = []
+
+    if (runningInQueueIds) {
+      promises.push(
+        this.internalCommands.executeCommand(
+          AvailableCommands.QUEUE_KILL,
+          this.dvcRoot,
+          ...runningInQueueIds
+        )
+      )
+    }
+    if (runningInWorkspaceId) {
+      promises.push(stopWorkspaceExperiment(this.dvcRoot, runningInWorkspaceId))
+    }
+
+    return Toast.showOutput(
+      Promise.all(promises).then(output => output.filter(Boolean).join('\n'))
+    )
+  }
+
   public hasRunningExperiment() {
     return this.experiments.hasRunningExperiment()
   }
@@ -562,12 +587,6 @@ export class Experiments extends BaseRepository<TableData> {
       () => this.getWebview(),
       () => this.notifyChanged(),
       () => this.selectColumns(),
-      (dvcRoot: string, ...ids: string[]) =>
-        this.internalCommands.executeCommand(
-          AvailableCommands.QUEUE_KILL,
-          dvcRoot,
-          ...ids
-        ),
       () =>
         this.internalCommands.executeCommand(
           AvailableCommands.STAGE_LIST,

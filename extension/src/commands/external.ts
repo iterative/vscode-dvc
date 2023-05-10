@@ -9,7 +9,6 @@ export enum RegisteredCliCommands {
   EXPERIMENT_RESUME = 'dvc.resumeCheckpointExperiment',
   EXPERIMENT_RUN = 'dvc.runExperiment',
   QUEUE_EXPERIMENT = 'dvc.queueExperiment',
-  QUEUE_KILL = 'dvc.stopQueuedExperiments',
   QUEUE_START = 'dvc.startExperimentsQueue',
   QUEUE_STOP = 'dvc.stopExperimentsQueue',
 
@@ -18,7 +17,6 @@ export enum RegisteredCliCommands {
   EXPERIMENT_VIEW_PUSH = 'dvc.views.experiments.pushExperiment',
   EXPERIMENT_VIEW_REMOVE = 'dvc.views.experiments.removeExperiment',
   EXPERIMENT_VIEW_SHOW_LOGS = 'dvc.views.experiments.showLogs',
-  EXPERIMENT_VIEW_STOP = 'dvc.views.experiments.stopQueueExperiment',
 
   EXPERIMENT_VIEW_QUEUE = 'dvc.views.experiments.queueExperiment',
   EXPERIMENT_VIEW_RESUME = 'dvc.views.experiments.resumeCheckpointExperiment',
@@ -62,7 +60,9 @@ export enum RegisteredCommands {
   EXPERIMENT_SORT_REMOVE = 'dvc.views.experimentsSortByTree.removeSort',
   EXPERIMENT_SORTS_REMOVE = 'dvc.removeExperimentsTableSorts',
   EXPERIMENT_SORTS_REMOVE_ALL = 'dvc.views.experimentsSortByTree.removeAllSorts',
+  EXPERIMENT_STOP = 'dvc.stopExperiments',
   EXPERIMENT_TOGGLE = 'dvc.views.experiments.toggleStatus',
+  EXPERIMENT_VIEW_STOP = 'dvc.views.experiments.stopExperiment',
   STOP_EXPERIMENTS = 'dvc.stopAllRunningExperiments',
 
   PLOTS_PATH_TOGGLE = 'dvc.views.plotsPathsTree.toggleStatus',

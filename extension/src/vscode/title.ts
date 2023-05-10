@@ -31,7 +31,7 @@ export enum Title {
   SELECT_CUSTOM_PLOTS_TO_REMOVE = 'Select Custom Plot(s) to Remove',
   SELECT_PARAM_TO_MODIFY = 'Select Param(s) to Modify',
   SELECT_PLOTS = 'Select Plots to Display',
-  SELECT_QUEUE_KILL = 'Select Queue Task(s) to Kill',
+  SELECT_EXPERIMENTS_STOP = 'Select Experiments to Stop',
   SELECT_SORT_DIRECTION = 'Select Sort Direction',
   SELECT_SORTS_TO_REMOVE = 'Select Sort(s) to Remove',
   SELECT_TRAINING_SCRIPT = 'Select your training script',

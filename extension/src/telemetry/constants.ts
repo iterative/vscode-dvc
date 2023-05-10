@@ -148,7 +148,7 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_VIEW_SHOW_LOGS]: undefined
   [EventName.EXPERIMENT_VIEW_STOP]: undefined
   [EventName.QUEUE_EXPERIMENT]: undefined
-  [EventName.QUEUE_KILL]: undefined
+  [EventName.EXPERIMENT_STOP]: undefined
   [EventName.QUEUE_START]: undefined
   [EventName.QUEUE_STOP]: undefined
 

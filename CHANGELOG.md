@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.10] - 2023-05-09
+
+### 🚀 New Features and Enhancements
+
+- Combine/enhance commands used to stop experiments [#3840](https://github.com/iterative/vscode-dvc/pull/3840) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Prevent queued experiment from being selected as most recent [#3846](https://github.com/iterative/vscode-dvc/pull/3846) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.8.9] - 2023-05-09
+
+### 🚀 New Features and Enhancements
+
+- Autoclose DVC Section if completed [#3809](https://github.com/iterative/vscode-dvc/pull/3809) by [@julieg18](https://github.com/julieg18)
+
 ## [0.8.8] - 2023-05-08
 
 ### 🚀 New Features and Enhancements

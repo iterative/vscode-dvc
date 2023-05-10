@@ -11,12 +11,12 @@ export const formatNumber = (value: number): string => {
 }
 
 export const isValidStringInteger = (
-  input: string | undefined
+  input: string | undefined | null
 ): input is string =>
   !!input && Number.parseInt(input) === Number.parseFloat(input)
 
 export const createValidInteger = (
-  input: string | number | undefined
+  input: string | number | undefined | null
 ): number | undefined => {
   if (typeof input === 'number') {
     return validateNumericInteger(input)
