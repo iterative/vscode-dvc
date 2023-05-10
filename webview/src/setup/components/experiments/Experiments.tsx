@@ -1,5 +1,5 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { NoData } from './NoData'
 import { NeedsGitCommit } from './NeedsGitCommit'
 import { showExperiments, showScmPanel } from '../messages'
@@ -7,20 +7,18 @@ import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { IconButton } from '../../../shared/components/button/IconButton'
 import { Beaker } from '../../../shared/components/icons'
 import { Button } from '../../../shared/components/button/Button'
-import { updateSectionCollapsed } from '../../state/setupDataSlice'
+import { updateSectionCollapsed } from '../../state/webviewSlice'
+import { SetupState } from '../../store'
 
 type ExperimentsProps = {
   isDvcSetup: boolean
-  hasData: boolean | undefined
-  needsGitCommit: boolean
 }
 
-export const Experiments: React.FC<ExperimentsProps> = ({
-  isDvcSetup,
-  hasData,
-  needsGitCommit
-}) => {
+export const Experiments: React.FC<ExperimentsProps> = ({ isDvcSetup }) => {
   const dispatch = useDispatch()
+  const { needsGitCommit, hasData } = useSelector(
+    (state: SetupState) => state.experiments
+  )
 
   if (!isDvcSetup) {
     return (

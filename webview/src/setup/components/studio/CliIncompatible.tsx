@@ -3,10 +3,11 @@ import { useDispatch } from 'react-redux'
 import { STUDIO_URL } from 'dvc/src/setup/webview/contract'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { Button } from '../../../shared/components/button/Button'
-import { updateSectionCollapsed } from '../../state/setupDataSlice'
+import { updateSectionCollapsed } from '../../state/webviewSlice'
 
 export const CliIncompatible: React.FC = () => {
   const dispatch = useDispatch()
+
   return (
     <EmptyState isFullScreen={false}>
       <h1>DVC is currently unavailable</h1>

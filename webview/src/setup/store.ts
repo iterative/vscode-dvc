@@ -1,8 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit'
-import setupDataReducer from './state/setupDataSlice'
+import dvcReducer from './state/dvcSlice'
+import studioReducer from './state/studioSlice'
+import experimentsReducer from './state/experimentsSlice'
+import webviewReducer from './state/webviewSlice'
 
 export const setupReducers = {
-  setupData: setupDataReducer
+  dvc: dvcReducer,
+  experiments: experimentsReducer,
+  studio: studioReducer,
+  webview: webviewReducer
 }
 
 export const setupStore = configureStore({

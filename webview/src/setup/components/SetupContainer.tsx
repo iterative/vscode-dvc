@@ -6,7 +6,7 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 import { SectionContainer } from '../../shared/components/sectionContainer/SectionContainer'
 import { TooltipIconType } from '../../shared/components/sectionContainer/InfoTooltip'
-import { updateSectionCollapsed } from '../state/setupDataSlice'
+import { updateSectionCollapsed } from '../state/webviewSlice'
 
 const getTooltipIconType = (isSetup: boolean, isConnected = true) => {
   if (!isSetup) {

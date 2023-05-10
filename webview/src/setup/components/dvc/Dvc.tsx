@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { DvcCliDetails, SetupSection } from 'dvc/src/setup/webview/contract'
+import { useDispatch, useSelector } from 'react-redux'
+import { SetupSection } from 'dvc/src/setup/webview/contract'
 import { DvcEnvDetails } from './DvcEnvDetails'
 import { CliIncompatible } from './CliIncompatible'
 import { ProjectUninitialized } from './ProjectUninitialized'
@@ -14,37 +14,30 @@ import {
 } from '../messages'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { usePrevious } from '../../hooks/usePrevious'
-import { updateSectionCollapsed } from '../../state/setupDataSlice'
+import { updateSectionCollapsed } from '../../state/webviewSlice'
+import { SetupState } from '../../store'
 
-type DvcProps = {
-  canGitInitialize: boolean | undefined
-  cliCompatible: boolean | undefined
-  dvcCliDetails: DvcCliDetails | undefined
-  isPythonExtensionUsed: boolean
-  needsGitInitialized: boolean | undefined
-  projectInitialized: boolean
-  pythonBinPath: string | undefined
-  hasReceivedMessageFromVsCode: boolean
-}
-
-export const Dvc: React.FC<DvcProps> = ({
-  canGitInitialize,
-  cliCompatible,
-  dvcCliDetails,
-  isPythonExtensionUsed,
-  needsGitInitialized,
-  projectInitialized,
-  pythonBinPath,
-  hasReceivedMessageFromVsCode
-}) => {
+export const Dvc: React.FC = () => {
   const dispatch = useDispatch()
+  const hasWebviewData = useSelector(
+    (state: SetupState) => state.webview.hasData
+  )
+  const {
+    canGitInitialize,
+    cliCompatible,
+    dvcCliDetails,
+    isPythonExtensionUsed,
+    needsGitInitialized,
+    projectInitialized,
+    pythonBinPath
+  } = useSelector((state: SetupState) => state.dvc)
   const [isComplete, setIsComplete] = useState<boolean | null>(null)
   const previousIsComplete = usePrevious(isComplete)
 
   useEffect(() => {
     const isSetup = projectInitialized && !!cliCompatible
 
-    if (hasReceivedMessageFromVsCode) {
+    if (hasWebviewData) {
       setIsComplete(isSetup)
     }
 
@@ -63,7 +56,7 @@ export const Dvc: React.FC<DvcProps> = ({
     cliCompatible,
     isComplete,
     previousIsComplete,
-    hasReceivedMessageFromVsCode
+    hasWebviewData
   ])
 
   const children = dvcCliDetails && (
@@ -73,7 +66,7 @@ export const Dvc: React.FC<DvcProps> = ({
     />
   )
 
-  if (!hasReceivedMessageFromVsCode) {
+  if (!hasWebviewData) {
     return <EmptyState isFullScreen={false}>Loading...</EmptyState>
   }
 
