@@ -41,15 +41,17 @@ export class OutputChannel extends Disposable {
   private onDidCompleteProcess(cli: ICli) {
     this.dispose.track(
       cli.onDidCompleteProcess(
-        ({ command, duration, exitCode, pid, stderr }) => {
+        ({ command, duration, exitCode, pid, errorOutput }) => {
           const processStatus =
-            exitCode && stderr ? ProcessStatus.FAILED : ProcessStatus.COMPLETED
+            exitCode && errorOutput
+              ? ProcessStatus.FAILED
+              : ProcessStatus.COMPLETED
 
           const baseOutput = this.getBaseOutput(pid, command, processStatus)
           const completionOutput = this.getCompletionOutput(
             exitCode,
             duration,
-            stderr
+            errorOutput
           )
 
           return this.outputChannel.append(`${baseOutput}${completionOutput}\n`)
@@ -75,7 +77,7 @@ export class OutputChannel extends Disposable {
   private getCompletionOutput(
     exitCode: number | null,
     duration: number,
-    stderr?: string
+    errorOutput?: string
   ) {
     let completionOutput = ''
     if (exitCode) {
@@ -84,8 +86,8 @@ export class OutputChannel extends Disposable {
 
     completionOutput += ` (${duration}ms)`
 
-    if (exitCode && stderr) {
-      completionOutput += `\n${stderr}`
+    if (exitCode && errorOutput) {
+      completionOutput += `\n${errorOutput}`
     }
 
     return completionOutput

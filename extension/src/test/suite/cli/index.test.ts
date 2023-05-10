@@ -8,6 +8,7 @@ import { getTimeSafeDisposer } from '../util'
 import { createProcess, processExists } from '../../../process/execution'
 import { createValidInteger } from '../../../util/number'
 import { Cli, CliEvent, CliResult } from '../../../cli'
+import { MaybeConsoleError } from '../../../cli/error'
 
 suite('CLI Suite', () => {
   const disposable = getTimeSafeDisposer()
@@ -20,6 +21,7 @@ suite('CLI Suite', () => {
     disposable.dispose()
   })
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('Cli', () => {
     it('should be able to create a background process that does not exit when the parent process exits', async () => {
       const options = getOptions('child')
@@ -99,6 +101,35 @@ suite('CLI Suite', () => {
       const processIsStillExecuting = await processExists(executingPid)
 
       expect(processIsStillExecuting).to.be.false
+    })
+
+    it('should capture all of the stdout and stderr and send it through the processCompleted event emitter if the process fails', async () => {
+      const processStarted = disposable.track(new EventEmitter<CliEvent>())
+      const processCompleted = disposable.track(new EventEmitter<CliResult>())
+
+      const cli = disposable.track(
+        new Cli({ processCompleted, processStarted })
+      )
+
+      const processCompletedEvent = new Promise<CliResult>(resolve =>
+        disposable.track(processCompleted.event(event => resolve(event)))
+      )
+      const options = getOptions('failed')
+
+      let maybeConsoleError
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (cli as any).executeProcess(options)
+      } catch (error: unknown) {
+        maybeConsoleError = error as MaybeConsoleError
+      }
+
+      expect(maybeConsoleError?.stderr).not.to.contain('stdout')
+      expect(maybeConsoleError?.stderr).to.contain('stderr')
+
+      const { errorOutput } = await processCompletedEvent
+      expect(errorOutput).to.contain('stdout')
+      expect(errorOutput).to.contain('stderr')
     })
   })
 })

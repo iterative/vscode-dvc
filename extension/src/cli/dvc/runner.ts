@@ -164,8 +164,8 @@ export class DvcRunner extends Disposable implements ICli {
         {
           ...baseEvent,
           duration: stopWatch.getElapsedTime(),
-          exitCode,
-          stderr
+          errorOutput: stderr,
+          exitCode
         },
         this.processCompleted
       )

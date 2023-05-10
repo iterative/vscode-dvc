@@ -77,8 +77,8 @@ export class ViewableCliProcess extends DeferredDisposable {
         {
           ...baseEvent,
           duration: stopWatch.getElapsedTime(),
-          exitCode,
-          stderr
+          errorOutput: stderr,
+          exitCode
         },
         processCompleted
       )
