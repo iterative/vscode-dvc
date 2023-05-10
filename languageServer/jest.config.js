@@ -1,7 +1,6 @@
 module.exports = {
-  collectCoverageFrom: ['src/**/*.{ts,tsx}', '!**/*.test.*', '!src/test/*'],
   coverageDirectory: 'coverage/jest',
-  coveragePathIgnorePatterns: ['<rootDir>/src/test/'],
+  coveragePathIgnorePatterns: ['<rootDir>/src/test/', '/node_modules/'],
   coverageReporters: ['json'],
   testEnvironment: 'node',
   testPathIgnorePatterns: ['<rootDir>/dist/'],
