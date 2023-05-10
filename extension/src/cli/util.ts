@@ -7,8 +7,8 @@ export const notifyStarted = (
   processStarted: EventEmitter<CliEvent>
 ): void => processStarted.fire(baseEvent)
 
-export const transformChunkToString = (chunk: Buffer): string =>
-  chunk
+export const transformChunkToString = (chunk: unknown): string =>
+  (chunk as Buffer)
     .toString()
     .split(/(\r?\n)/g)
     .join('\r')
@@ -18,7 +18,7 @@ export const notifyOutput = (
   processOutput: EventEmitter<string>
 ): void => {
   process.all?.on('data', chunk =>
-    processOutput.fire(transformChunkToString(chunk as Buffer))
+    processOutput.fire(transformChunkToString(chunk))
   )
 }
 

@@ -80,10 +80,7 @@ export class Cli extends Disposable implements ICli {
         void this.dispose.untrack(process)
       })
 
-      process.all?.on(
-        'data',
-        chunk => (all += transformChunkToString(chunk as Buffer))
-      )
+      process.all?.on('data', chunk => (all += transformChunkToString(chunk)))
 
       const { stdout, exitCode } = await process
 
@@ -119,7 +116,7 @@ export class Cli extends Disposable implements ICli {
 
       backgroundProcess.all?.on(
         'data',
-        chunk => (all += transformChunkToString(chunk as Buffer))
+        chunk => (all += transformChunkToString(chunk))
       )
 
       return await this.getOutputAndDisconnect(
