@@ -1,8 +1,4 @@
-import {
-  SetupSection,
-  SetupData,
-  DEFAULT_SECTION_COLLAPSED
-} from 'dvc/src/setup/webview/contract'
+import { SetupSection, SetupData } from 'dvc/src/setup/webview/contract'
 import {
   MessageFromWebviewType,
   MessageToWebview
@@ -39,9 +35,6 @@ import {
 } from '../state/experimentsSlice'
 
 export const App: React.FC = () => {
-  const sectionCollapsed = useSelector(
-    (state: SetupState) => state.webview.sectionCollapsed
-  )
   const { projectInitialized, cliCompatible } = useSelector(
     (state: SetupState) => state.dvc
   )
@@ -125,7 +118,6 @@ export const App: React.FC = () => {
       <SetupContainer
         sectionKey={SetupSection.DVC}
         title="DVC"
-        sectionCollapsed={sectionCollapsed || DEFAULT_SECTION_COLLAPSED}
         isSetup={isDvcSetup}
       >
         <Dvc />
@@ -133,7 +125,6 @@ export const App: React.FC = () => {
       <SetupContainer
         sectionKey={SetupSection.EXPERIMENTS}
         title="Experiments"
-        sectionCollapsed={sectionCollapsed || DEFAULT_SECTION_COLLAPSED}
         isSetup={isDvcSetup && !!hasExperimentsData}
       >
         <Experiments isDvcSetup={projectInitialized && !!cliCompatible} />
@@ -141,7 +132,6 @@ export const App: React.FC = () => {
       <SetupContainer
         sectionKey={SetupSection.STUDIO}
         title="Studio"
-        sectionCollapsed={sectionCollapsed || DEFAULT_SECTION_COLLAPSED}
         isSetup={!!cliCompatible}
         isConnected={isStudioConnected}
       >
