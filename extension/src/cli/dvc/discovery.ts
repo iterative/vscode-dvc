@@ -1,8 +1,3 @@
-import {
-  LATEST_TESTED_CLI_VERSION,
-  MAX_CLI_VERSION,
-  MIN_CLI_VERSION
-} from './contract'
 import { CliCompatible, isVersionCompatible } from './version'
 import { IExtensionSetup } from '../../interfaces'
 import { Toast } from '../../vscode/toast'
@@ -12,93 +7,71 @@ import {
   getConfigValue,
   setUserConfigValue
 } from '../../vscode/config'
-import { getPythonBinPath } from '../../extensions/python'
 import { getFirstWorkspaceFolder } from '../../vscode/workspaceFolders'
 import { delay } from '../../util/time'
 import { SetupSection } from '../../setup/webview/contract'
 
-export const warnUnableToVerifyVersion = () =>
-  Toast.warnWithOptions(
-    'The extension cannot initialize as we were unable to verify the DVC CLI version.'
-  )
+const warnWithSetupAction = async (
+  setup: IExtensionSetup,
+  warningText: string
+): Promise<void> => {
+  const response = await Toast.warnWithOptions(warningText, Response.SHOW_SETUP)
 
-export const warnVersionIncompatible = (
-  version: string,
-  update: 'CLI' | 'extension'
-): void => {
-  void Toast.warnWithOptions(
-    `The extension cannot initialize because you are using version ${version} of the DVC CLI. The expected version is ${MIN_CLI_VERSION} <= DVC < ${MAX_CLI_VERSION}. Please upgrade to the most recent version of the ${update} and reload this window.`
+  if (response === Response.SHOW_SETUP) {
+    return setup.showSetup(SetupSection.DVC)
+  }
+}
+
+const warnUnableToVerifyVersion = (setup: IExtensionSetup) => {
+  void warnWithSetupAction(
+    setup,
+    'The extension cannot initialize as we were unable to verify the DVC CLI version.'
   )
 }
 
-export const warnAheadOfLatestTested = (): void => {
-  void Toast.warnWithOptions(
-    `The located DVC CLI is at least a minor version ahead of the latest version the extension was tested with (${LATEST_TESTED_CLI_VERSION}). This could lead to unexpected behaviour. Please upgrade to the most recent version of the extension and reload this window.`
+const warnVersionIncompatible = (setup: IExtensionSetup): void => {
+  void warnWithSetupAction(
+    setup,
+    'The extension cannot initialize because the DVC CLI version is incompatible.'
   )
 }
 
 const warnUserCLIInaccessible = async (
-  setup: IExtensionSetup,
-  warningText: string
+  setup: IExtensionSetup
 ): Promise<void> => {
   if (getConfigValue<boolean>(ConfigKey.DO_NOT_SHOW_CLI_UNAVAILABLE)) {
     return
   }
 
   const response = await Toast.warnWithOptions(
-    warningText,
+    'An error was thrown when trying to access the CLI.',
     Response.SHOW_SETUP,
     Response.NEVER
   )
 
   switch (response) {
     case Response.SHOW_SETUP:
-      return setup.showSetup(SetupSection.EXPERIMENTS)
+      return setup.showSetup(SetupSection.DVC)
     case Response.NEVER:
       return setUserConfigValue(ConfigKey.DO_NOT_SHOW_CLI_UNAVAILABLE, true)
   }
 }
 
-const warnUserCLIInaccessibleAnywhere = async (
-  setup: IExtensionSetup,
-  globalDvcVersion: string | undefined
-): Promise<void> => {
-  const binPath = await getPythonBinPath()
-
-  return warnUserCLIInaccessible(
-    setup,
-    `The extension is unable to initialize. The CLI was not located using the interpreter provided by the Python extension. ${
-      globalDvcVersion ? globalDvcVersion + ' is' : 'The CLI is also not'
-    } installed globally. For auto Python environment activation, ensure the correct interpreter is set. Active Python interpreter: ${
-      binPath || 'unset'
-    }.`
-  )
-}
-
 const warnUser = (
   setup: IExtensionSetup,
-  cliCompatible: CliCompatible,
-  version: string | undefined
+  cliCompatible: CliCompatible
 ): void => {
   if (!setup.shouldWarnUserIfCLIUnavailable()) {
     return
   }
   switch (cliCompatible) {
-    case CliCompatible.NO_BEHIND_MIN_VERSION:
-      return warnVersionIncompatible(version as string, 'CLI')
+    case CliCompatible.NO_INCOMPATIBLE:
+      return warnVersionIncompatible(setup)
     case CliCompatible.NO_CANNOT_VERIFY:
-      void warnUnableToVerifyVersion()
+      void warnUnableToVerifyVersion(setup)
       return
-    case CliCompatible.NO_MAJOR_VERSION_AHEAD:
-      return warnVersionIncompatible(version as string, 'extension')
     case CliCompatible.NO_NOT_FOUND:
-      void warnUserCLIInaccessible(
-        setup,
-        'An error was thrown when trying to access the CLI.'
-      )
-      return
-    case CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED:
-      return warnAheadOfLatestTested()
+      void warnUserCLIInaccessible(setup)
   }
 }
 
@@ -108,17 +81,12 @@ type CanRunCli = {
   version: string | undefined
 }
 
-export const isCliCompatible = (
-  cliCompatible: CliCompatible
-): boolean | undefined => {
+const isCliCompatible = (cliCompatible: CliCompatible): boolean | undefined => {
   if (cliCompatible === CliCompatible.NO_NOT_FOUND) {
     return
   }
 
-  return [
-    CliCompatible.YES,
-    CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED
-  ].includes(cliCompatible)
+  return cliCompatible === CliCompatible.YES
 }
 
 const getVersionDetails = async (
@@ -128,7 +96,6 @@ const getVersionDetails = async (
 ): Promise<
   CanRunCli & {
     cliCompatible: CliCompatible
-    version: string | undefined
   }
 > => {
   const version = await setup.getCliVersion(cwd, tryGlobalCli)
@@ -140,11 +107,12 @@ const getVersionDetails = async (
 const processVersionDetails = (
   setup: IExtensionSetup,
   cliCompatible: CliCompatible,
-  version: string | undefined,
   isAvailable: boolean,
-  isCompatible: boolean | undefined
+  isCompatible: boolean | undefined,
+  version: string | undefined
 ): CanRunCli => {
-  warnUser(setup, cliCompatible, version)
+  warnUser(setup, cliCompatible)
+
   return {
     isAvailable,
     isCompatible,
@@ -159,21 +127,17 @@ const tryGlobalFallbackVersion = async (
   const tryGlobal = await getVersionDetails(setup, cwd, true)
   const { cliCompatible, isAvailable, isCompatible, version } = tryGlobal
 
-  if (setup.shouldWarnUserIfCLIUnavailable() && !isCompatible) {
-    void warnUserCLIInaccessibleAnywhere(setup, version)
-  }
-  if (
-    setup.shouldWarnUserIfCLIUnavailable() &&
-    cliCompatible === CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED
-  ) {
-    warnAheadOfLatestTested()
-  }
-
   if (isCompatible) {
     setup.unsetPythonBinPath()
   }
 
-  return { isAvailable, isCompatible, version }
+  return processVersionDetails(
+    setup,
+    cliCompatible,
+    isAvailable,
+    isCompatible,
+    version
+  )
 }
 
 const extensionCanAutoRunCli = async (
@@ -190,12 +154,13 @@ const extensionCanAutoRunCli = async (
   if (pythonCliCompatible === CliCompatible.NO_NOT_FOUND) {
     return tryGlobalFallbackVersion(setup, cwd)
   }
+
   return processVersionDetails(
     setup,
     pythonCliCompatible,
-    pythonVersion,
     pythonVersionIsAvailable,
-    pythonVersionIsCompatible
+    pythonVersionIsCompatible,
+    pythonVersion
   )
 }
 
@@ -213,9 +178,9 @@ export const extensionCanRunCli = async (
   return processVersionDetails(
     setup,
     cliCompatible,
-    version,
     isAvailable,
-    isCompatible
+    isCompatible,
+    version
   )
 }
 

@@ -16,7 +16,10 @@ export interface DepColumns {
   [path: string]: ValueWithChanges
 }
 
-export type RunningExperiment = { executor: Executor; id: string }
+export type RunningExperiment = {
+  executor: Executor
+  id: string
+}
 
 export type CommitData = {
   author: string
@@ -100,7 +103,7 @@ export type TableData = {
   hasColumns: boolean
   hasConfig: boolean
   hasMoreCommits: Record<string, boolean>
-  hasRunningExperiment: boolean
+  hasRunningWorkspaceExperiment: boolean
   hasValidDvcYaml: boolean
   isShowingMoreCommits: Record<string, boolean>
   isBranchesView: boolean

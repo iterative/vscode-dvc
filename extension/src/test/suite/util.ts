@@ -88,7 +88,7 @@ export const experimentsUpdatedEvent = (experiments: Experiments) =>
     experiments.dispose.track(experiments.onDidChangeExperiments(resolve))
   })
 
-export const getFirstArgOfCall = (spy: SinonSpy, call: number) =>
+const getFirstArgOfCall = (spy: SinonSpy, call: number) =>
   spy.getCall(call).firstArg
 
 export const getArgOfCall = (spy: SinonSpy, call: number, arg: number) =>
@@ -192,7 +192,7 @@ export const buildMockExperimentsData = (update = stub()) =>
     update
   } as unknown as ExperimentsData)
 
-export const buildResourceLocator = (disposer: Disposer): ResourceLocator =>
+const buildResourceLocator = (disposer: Disposer): ResourceLocator =>
   disposer.track(new ResourceLocator(extensionUri))
 
 export const buildDependencies = (
@@ -230,8 +230,6 @@ export const buildDependencies = (
     ''
   )
 
-  const updatesPaused = disposer.track(new EventEmitter<boolean>())
-
   const resourceLocator = buildResourceLocator(disposer)
 
   const messageSpy = spy(BaseWebview.prototype, 'show')
@@ -252,8 +250,7 @@ export const buildDependencies = (
     mockExpShow,
     mockGetCommitMessages,
     mockPlotsDiff,
-    resourceLocator,
-    updatesPaused
+    resourceLocator
   }
 }
 
@@ -280,17 +277,6 @@ export const stubPrivatePrototypeMethod = <T extends { prototype: unknown }>(
   classWithPrivateMethod: T,
   method: string
 ) => stubPrivateMethod(classWithPrivateMethod.prototype, method)
-
-export const stubPrivateMemberMethod = <T>(
-  classWithPrivateMember: T,
-  memberName: string,
-  method: string
-) => stubPrivateMethod((classWithPrivateMember as any)[memberName], method)
-
-export const spyOnPrivateMethod = <T>(
-  classWithPrivateMember: T,
-  method: string
-) => spy(classWithPrivateMember as any, method)
 
 export const spyOnPrivateMemberMethod = <T>(
   classWithPrivateMember: T,

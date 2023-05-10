@@ -1,7 +1,12 @@
 import { Memento } from 'vscode'
 import { SortDefinition, sortExperiments } from './sortBy'
 import { FilterDefinition, filterExperiment, getFilterId } from './filterBy'
-import { collectExperiments } from './collect'
+import {
+  collectExperiments,
+  collectOrderedCommitsAndExperiments,
+  collectRunningInQueue,
+  collectRunningInWorkspace
+} from './collect'
 import {
   collectColoredStatus,
   collectFinishedRunningExperiments,
@@ -23,7 +28,8 @@ import { definedAndNonEmpty, reorderListSubset } from '../../util/array'
 import {
   EXPERIMENT_WORKSPACE_ID,
   Executor,
-  ExpShowOutput
+  ExpShowOutput,
+  ExperimentStatus
 } from '../../cli/dvc/contract'
 import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
@@ -31,7 +37,7 @@ import { PersistenceKey } from '../../persistence/constants'
 import { sum } from '../../util/math'
 import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../cli/dvc/constants'
 
-export type StarredExperiments = Record<string, boolean | undefined>
+type StarredExperiments = Record<string, boolean | undefined>
 
 export type SelectedExperimentWithColor = Experiment & {
   displayColor: Color
@@ -39,10 +45,11 @@ export type SelectedExperimentWithColor = Experiment & {
 }
 
 export enum ExperimentType {
-  WORKSPACE = 'workspace',
   COMMIT = 'commit',
   EXPERIMENT = 'experiment',
-  QUEUED = 'queued'
+  RUNNING = 'running',
+  QUEUED = 'queued',
+  WORKSPACE = 'workspace'
 }
 
 export class ExperimentsModel extends ModelWithPersistence {
@@ -170,6 +177,10 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.running.length > 0
   }
 
+  public hasRunningWorkspaceExperiment() {
+    return this.running.some(({ executor }) => executor === Executor.WORKSPACE)
+  }
+
   public hasCheckpoints() {
     return this.checkpoints
   }
@@ -279,7 +290,11 @@ export class ExperimentsModel extends ModelWithPersistence {
       {
         ...this.addDetails(this.workspace),
         hasChildren: false,
-        type: ExperimentType.WORKSPACE
+        type: this.running.some(
+          ({ executor }) => executor === Executor.WORKSPACE
+        )
+          ? ExperimentType.RUNNING
+          : ExperimentType.WORKSPACE
       },
       ...this.commits.map(commit => {
         return {
@@ -317,16 +332,31 @@ export class ExperimentsModel extends ModelWithPersistence {
     })
   }
 
+  public getCommitsAndExperiments() {
+    return collectOrderedCommitsAndExperiments(this.commits, commit =>
+      this.getExperimentsByCommit(commit)
+    )
+  }
+
   public getExperimentsAndQueued() {
     return flattenMapValues(this.experimentsByCommit).map(experiment =>
       this.addDetails(experiment)
     )
   }
 
-  public getRunningQueueTasks() {
+  public getRunningExperiments() {
     return this.getExperimentsAndQueued().filter(experiment =>
-      isRunningInQueue(experiment)
+      isRunning(experiment.status)
     )
+  }
+
+  public getStopDetails(idsToStop: string[]) {
+    const running = [...this.running]
+    const ids = new Set(idsToStop)
+    return {
+      runningInQueueIds: collectRunningInQueue(ids, running),
+      runningInWorkspaceId: collectRunningInWorkspace(ids, running)
+    }
   }
 
   public getRowData() {
@@ -376,9 +406,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.getExperimentsByCommit(commit)?.map(experiment => ({
       ...experiment,
       hasChildren: false,
-      type: isQueued(experiment.status)
-        ? ExperimentType.QUEUED
-        : ExperimentType.EXPERIMENT
+      type: this.getExperimentType(experiment.status)
     }))
   }
 
@@ -562,6 +590,17 @@ export class ExperimentsModel extends ModelWithPersistence {
       selected: this.isSelected(id),
       starred: !!this.isStarred(id)
     }
+  }
+
+  private getExperimentType(status?: ExperimentStatus) {
+    if (isQueued(status)) {
+      return ExperimentType.QUEUED
+    }
+    if (isRunning(status)) {
+      return ExperimentType.RUNNING
+    }
+
+    return ExperimentType.EXPERIMENT
   }
 
   private getDisplayColor(id: string) {

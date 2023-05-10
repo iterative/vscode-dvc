@@ -26,16 +26,6 @@ export const addToMapSet = <K = string, V = unknown>(
   }
 }
 
-export const addToMapCount = (
-  key: string,
-  map: Map<string, number>
-): number => {
-  let count = map.get(key) || 0
-  count++
-  map.set(key, count)
-  return count
-}
-
 export const flattenMapValues = <T>(map: Map<string, T[]>): T[] => {
   const iterator: IterableIterator<T[]> = map.values()
   return [...iterator].flat()

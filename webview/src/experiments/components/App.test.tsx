@@ -18,7 +18,7 @@ import {
 } from 'dvc/src/experiments/webview/contract'
 import { buildMetricOrParamPath } from 'dvc/src/experiments/columns/paths'
 import dataTypesTableFixture from 'dvc/src/test/fixtures/expShow/dataTypes/tableData'
-import { EXPERIMENT_WORKSPACE_ID, Executor } from 'dvc/src/cli/dvc/contract'
+import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { useIsFullyContained } from './overflowHoverTooltip/useIsFullyContained'
 import styles from './table/styles.module.scss'
 import { vsCodeApi } from '../../shared/api'
@@ -725,13 +725,34 @@ describe('App', () => {
       advanceTimersByTime(100)
 
       const menuitems = screen.getAllByRole('menuitem')
-      expect(menuitems).toHaveLength(3)
+      expect(menuitems).toHaveLength(6)
+      expect(
+        menuitems.filter(item => !item.className.includes('disabled'))
+      ).toHaveLength(3)
 
       fireEvent.keyDown(paramsFileHeader, { bubbles: true, key: 'Escape' })
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })
 
-    it('should have the same options in the empty placeholders', () => {
+    it('should not close when a disabled item is clicked', () => {
+      renderTableWithoutRunningExperiments()
+
+      const paramsFileHeader = screen.getByText('params.yaml')
+      fireEvent.contextMenu(paramsFileHeader, { bubbles: true })
+
+      advanceTimersByTime(100)
+
+      const disabledMenuItem = screen
+        .getAllByRole('menuitem')
+        .find(item => item.className.includes('disabled'))
+
+      expect(disabledMenuItem).toBeDefined()
+
+      disabledMenuItem && fireEvent.click(disabledMenuItem, { bubbles: true })
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(6)
+    })
+
+    it('should have the same enabled options in the empty placeholders', () => {
       renderTableWithPlaceholder()
       const header = screen.getByTestId('header-Created')
       const placeholders = screen.getAllByTestId(/header-Created.+placeholder/)
@@ -744,6 +765,7 @@ describe('App', () => {
         jest.advanceTimersByTime(100)
         const menuitems = screen
           .getAllByRole('menuitem')
+          .filter(item => !item.className.includes('disabled'))
           .map(item => item.textContent)
 
         expect(menuitems).toStrictEqual([
@@ -757,7 +779,7 @@ describe('App', () => {
       }
     })
 
-    it('should have the same options in the empty placeholders of the Experiment column', () => {
+    it('should have the same enabled options in the empty placeholders of the Experiment column', () => {
       renderTableWithPlaceholder()
       const header = screen.getByTestId('header-id')
       const placeholders = screen.getAllByTestId(/header-id.+placeholder/)
@@ -770,6 +792,7 @@ describe('App', () => {
         jest.advanceTimersByTime(100)
         const menuitems = screen
           .getAllByRole('menuitem')
+          .filter(item => !item.className.includes('disabled'))
           .map(item => item.textContent)
 
         expect(menuitems).toStrictEqual(['Set Max Header Height'])
@@ -823,7 +846,7 @@ describe('App', () => {
       expect(menu).toBeDefined()
     })
 
-    it('should present the correct options for the workspace row with no checkpoints', () => {
+    it('should enable the correct options for the workspace row with no checkpoints', () => {
       renderTableWithPlaceholder()
 
       const target = screen.getByTestId('workspace-row')
@@ -831,11 +854,13 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
       expect(itemLabels).toStrictEqual(['Modify and Run', 'Modify and Queue'])
     })
 
-    it('should present the correct options for the main row with checkpoints', () => {
+    it('should enable the correct options for a commit with checkpoints', () => {
       renderTableWithoutRunningExperiments()
 
       const target = screen.getByText('main')
@@ -843,8 +868,12 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
       expect(itemLabels).toStrictEqual([
+        'Apply to Workspace',
+        'Create new Branch',
         'Modify and Run',
         'Modify and Resume',
         'Modify and Queue',
@@ -852,7 +881,27 @@ describe('App', () => {
       ])
     })
 
-    it('should present the correct option for an experiment with checkpoints and close on esc', () => {
+    it('should enable the correct options for a commit without checkpoints', () => {
+      renderTableWithoutRunningExperiments(false)
+
+      const target = screen.getByText('main')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
+      expect(itemLabels).toStrictEqual([
+        'Apply to Workspace',
+        'Create new Branch',
+        'Modify and Run',
+        'Modify and Queue',
+        'Star'
+      ])
+    })
+
+    it('should enable the correct options for an experiment that is not running and close on esc', () => {
       renderTableWithoutRunningExperiments()
 
       const target = screen.getByText('[exp-e7a67]')
@@ -860,9 +909,10 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
       expect(itemLabels).toStrictEqual([
-        'Show Logs',
         'Apply to Workspace',
         'Create new Branch',
         'Push',
@@ -870,12 +920,50 @@ describe('App', () => {
         'Modify and Resume',
         'Modify and Queue',
         'Star',
-        'Stop',
         'Remove'
       ])
 
       fireEvent.keyDown(menuitems[0], { bubbles: true, key: 'Escape' })
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
+    })
+
+    it('should enable the correct options for a running experiment', () => {
+      renderTable()
+
+      const target = screen.getByText('[exp-e7a67]')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
+      expect(itemLabels).toStrictEqual(['Show Logs', 'Star', 'Stop'])
+
+      fireEvent.click(menuitems[0], { bubbles: true, key: 'Escape' })
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: 'exp-e7a67',
+        type: MessageFromWebviewType.SHOW_EXPERIMENT_LOGS
+      })
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
+    })
+
+    it('should not close when a disabled item is clicked', () => {
+      renderTableWithoutRunningExperiments()
+
+      const target = screen.getByText('main')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+
+      const disabledMenuItem = screen
+        .getAllByRole('menuitem')
+        .find(item => item.className.includes('disabled'))
+
+      expect(disabledMenuItem).toBeDefined()
+
+      disabledMenuItem && fireEvent.click(disabledMenuItem, { bubbles: true })
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(10)
     })
 
     it('should be removed with a left click', () => {
@@ -887,9 +975,12 @@ describe('App', () => {
       advanceTimersByTime(100)
       expect(screen.getAllByRole('menuitem')).toHaveLength(10)
 
-      fireEvent.click(window, { bubbles: true })
+      fireEvent.click(row, {
+        bubbles: true
+      })
       advanceTimersByTime(100)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
+
+      expect(screen.queryByRole('menuitem')).not.toBeInTheDocument()
     })
 
     it('should be removed with a left click on a different row', () => {
@@ -904,7 +995,7 @@ describe('App', () => {
       const commit = getRow('main')
       fireEvent.click(commit, { bubbles: true })
       advanceTimersByTime(100)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
+      expect(screen.queryByRole('menuitem')).not.toBeInTheDocument()
     })
 
     it('should be moved with a right click on the same row (not toggle)', () => {
@@ -923,7 +1014,7 @@ describe('App', () => {
       expect(screen.queryAllByRole('menuitem')).toHaveLength(10)
     })
 
-    it('should present the Remove experiment option for the checkpoint tips', () => {
+    it('should enable the remove option for an experiment', () => {
       renderTableWithoutRunningExperiments()
 
       const target = screen.getByText('4fb124a')
@@ -931,11 +1022,13 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
       expect(itemLabels).toContain('Remove')
     })
 
-    it('should present the remove option if only experiments are selected', () => {
+    it('should enable the remove option if only experiments are selected', () => {
       renderTableWithoutRunningExperiments()
 
       clickRowCheckbox('4fb124a')
@@ -946,7 +1039,9 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
       expect(itemLabels).toContain('Remove Selected')
 
       const removeOption = menuitems.find(item =>
@@ -963,7 +1058,24 @@ describe('App', () => {
       })
     })
 
-    it('should present the push option if only experiments are selected', () => {
+    it('should disable the remove selected option if an experiment is running in the workspace', () => {
+      renderTable()
+
+      clickRowCheckbox('4fb124a')
+      clickRowCheckbox('42b8736')
+
+      const target = screen.getByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
+      expect(itemLabels).not.toContain('Remove Selected')
+    })
+
+    it('should enable the push option if only experiments are selected', () => {
       renderTableWithoutRunningExperiments()
 
       clickRowCheckbox('4fb124a')
@@ -974,7 +1086,9 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
       expect(itemLabels).toContain('Push Selected')
 
       const pushOption = menuitems.find(item =>
@@ -991,7 +1105,24 @@ describe('App', () => {
       })
     })
 
-    it('should present the stop option if only running experiments are selected', () => {
+    it('should disable the push selected option if an experiment is running in the workspace', () => {
+      renderTable()
+
+      clickRowCheckbox('4fb124a')
+      clickRowCheckbox('42b8736')
+
+      const target = screen.getByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
+      expect(itemLabels).not.toContain('Push Selected')
+    })
+
+    it('should enable the stop option if only running experiments are selected', () => {
       renderTable()
 
       clickRowCheckbox('4fb124a')
@@ -1001,7 +1132,9 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
       expect(itemLabels).toContain('Stop')
 
       const stopOption = menuitems.find(item =>
@@ -1013,9 +1146,56 @@ describe('App', () => {
       stopOption && fireEvent.click(stopOption)
 
       expect(sendMessage).toHaveBeenCalledWith({
-        payload: [{ executor: Executor.DVC_TASK, id: 'exp-e7a67' }],
-        type: MessageFromWebviewType.STOP_EXPERIMENT
+        payload: ['exp-e7a67'],
+        type: MessageFromWebviewType.STOP_EXPERIMENTS
       })
+    })
+
+    it('should enable the stop option if multiple running experiments are selected', () => {
+      renderTable()
+
+      clickRowCheckbox('4fb124a')
+      clickRowCheckbox('[exp-83425]')
+
+      const target = screen.getByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
+      expect(itemLabels).toContain('Stop')
+
+      const stopOption = menuitems.find(item =>
+        item.textContent?.includes('Stop')
+      )
+
+      expect(stopOption).toBeDefined()
+
+      stopOption && fireEvent.click(stopOption)
+
+      expect(sendMessage).toHaveBeenCalledWith({
+        payload: ['exp-e7a67', 'exp-83425'],
+        type: MessageFromWebviewType.STOP_EXPERIMENTS
+      })
+    })
+
+    it('should disable the stop option if finished experiments are selected', () => {
+      renderTable()
+
+      clickRowCheckbox('4fb124a')
+      clickRowCheckbox('90aea7f')
+
+      const target = screen.getByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
+      expect(itemLabels).not.toContain('Stop')
     })
 
     it('should enable the user to stop an experiment running in the workspace', () => {
@@ -1026,7 +1206,9 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
       expect(itemLabels).toContain('Stop')
 
       const stopOption = menuitems.find(item =>
@@ -1038,10 +1220,8 @@ describe('App', () => {
       stopOption && fireEvent.click(stopOption)
 
       expect(sendMessage).toHaveBeenCalledWith({
-        payload: [
-          { executor: Executor.WORKSPACE, id: EXPERIMENT_WORKSPACE_ID }
-        ],
-        type: MessageFromWebviewType.STOP_EXPERIMENT
+        payload: [EXPERIMENT_WORKSPACE_ID],
+        type: MessageFromWebviewType.STOP_EXPERIMENTS
       })
     })
 
@@ -1053,7 +1233,9 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
       expect(itemLabels).toContain('Push')
 
       const shareOption = menuitems.find(item =>
@@ -1070,7 +1252,35 @@ describe('App', () => {
       })
     })
 
-    it('should always present the Plots options if multiple rows are selected', () => {
+    it('should not enable the user to share a running experiment', () => {
+      renderTable()
+
+      const target = screen.getByText('4fb124a')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
+      expect(itemLabels).not.toContain('Push')
+    })
+
+    it('should not enable the user to share an experiment whilst one is running in the workspace', () => {
+      renderTable()
+
+      const target = screen.getByText('42b8736')
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
+      expect(itemLabels).not.toContain('Push')
+    })
+
+    it('should always enable the Plots options if multiple rows are selected', () => {
       renderTableWithoutRunningExperiments()
 
       clickRowCheckbox('4fb124a')
@@ -1081,7 +1291,9 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
       expect(itemLabels).toContain('Plot and Show')
       expect(itemLabels).toContain('Plot')
 
@@ -1112,7 +1324,9 @@ describe('App', () => {
 
       advanceTimersByTime(100)
       const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems.map(item => item.textContent)
+      const itemLabels = menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
       expect(itemLabels).toContain('Star')
     })
 

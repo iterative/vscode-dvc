@@ -14,7 +14,7 @@ const tableDataFixture: TableData = {
   hasColumns: true,
   hasConfig: true,
   hasMoreCommits: { current: true },
-  hasRunningExperiment: true,
+  hasRunningWorkspaceExperiment: true,
   hasValidDvcYaml: true,
   isShowingMoreCommits: { current: true },
   isBranchesView: false,

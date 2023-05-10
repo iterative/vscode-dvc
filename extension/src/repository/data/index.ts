@@ -43,16 +43,12 @@ export class RepositoryData extends DeferredDisposable {
     new EventEmitter()
   )
 
-  constructor(
-    dvcRoot: string,
-    internalCommands: InternalCommands,
-    updatesPaused: EventEmitter<boolean>
-  ) {
+  constructor(dvcRoot: string, internalCommands: InternalCommands) {
     super()
 
     this.dvcRoot = dvcRoot
     this.processManager = this.dispose.track(
-      new ProcessManager(updatesPaused, {
+      new ProcessManager({
         name: 'update',
         process: () => this.update()
       })

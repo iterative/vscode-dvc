@@ -19,12 +19,7 @@ import { Toast } from '../vscode/toast'
 import { Response } from '../vscode/response'
 import { VscodePython } from '../extensions/python'
 import { executeProcess } from '../process/execution'
-import {
-  LATEST_TESTED_CLI_VERSION,
-  MAX_CLI_VERSION,
-  MIN_CLI_VERSION
-} from '../cli/dvc/contract'
-import { extractSemver, ParsedSemver } from '../cli/dvc/version'
+import { LATEST_TESTED_CLI_VERSION, MIN_CLI_VERSION } from '../cli/dvc/contract'
 import { delay } from '../util/time'
 import { Title } from '../vscode/title'
 
@@ -455,6 +450,24 @@ describe('run', () => {
     expect(mockedInitialize).toHaveBeenCalledTimes(1)
   })
 
+  it('should send a specific message to the user if the extension is unable to verify the version', async () => {
+    const unverifyableVersion = 'not a valid version'
+    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
+    mockedShouldWarnUserIfCLIUnavailable.mockReturnValueOnce(true)
+    mockedGetCliVersion.mockResolvedValueOnce(unverifyableVersion)
+
+    await run(setup)
+    await flushPromises()
+    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
+    expect(mockedWarnWithOptions).toHaveBeenCalledWith(
+      'The extension cannot initialize as we were unable to verify the DVC CLI version.',
+      Response.SHOW_SETUP
+    )
+    expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
+    expect(mockedResetMembers).toHaveBeenCalledTimes(1)
+    expect(mockedInitialize).not.toHaveBeenCalled()
+  })
+
   it('should send a specific message to the user if the Python extension is being used, the CLI is not available in the virtual environment and the global CLI is not compatible', async () => {
     const belowMinVersion = '2.0.0'
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
@@ -472,38 +485,12 @@ describe('run', () => {
     await flushPromises()
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
-      `The extension is unable to initialize. The CLI was not located using the interpreter provided by the Python extension. ${belowMinVersion} is installed globally. For auto Python environment activation, ensure the correct interpreter is set. Active Python interpreter: ${mockedPythonPath}.`,
-      Response.SHOW_SETUP,
-      Response.NEVER
+      'The extension cannot initialize because the DVC CLI version is incompatible.',
+      Response.SHOW_SETUP
     )
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(2)
     expect(mockedResetMembers).toHaveBeenCalledTimes(1)
     expect(mockedInitialize).not.toHaveBeenCalled()
-  })
-
-  it('should send a specific message and initialize if the Python extension is being used, the CLI is not available in the virtual environment and the global CLI is a minor version ahead of the expected version', async () => {
-    const { major, minor, patch } = extractSemver(
-      LATEST_TESTED_CLI_VERSION
-    ) as ParsedSemver
-    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
-    mockedHasRoots.mockReturnValueOnce(true)
-    mockedShouldWarnUserIfCLIUnavailable
-      .mockReturnValueOnce(true)
-      .mockReturnValueOnce(true)
-    mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
-    mockedGetCliVersion
-      .mockResolvedValueOnce(undefined)
-      .mockResolvedValueOnce([major, minor + 1, patch].join('.'))
-
-    await run(setup)
-    await flushPromises()
-    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
-    expect(mockedWarnWithOptions).toHaveBeenCalledWith(
-      `The located DVC CLI is at least a minor version ahead of the latest version the extension was tested with (${LATEST_TESTED_CLI_VERSION}). This could lead to unexpected behaviour. Please upgrade to the most recent version of the extension and reload this window.`
-    )
-    expect(mockedGetCliVersion).toHaveBeenCalledTimes(2)
-    expect(mockedResetMembers).not.toHaveBeenCalled()
-    expect(mockedInitialize).toHaveBeenCalledTimes(1)
   })
 
   it('should send a specific message to the user if the Python extension is not being used and the CLI is not available', async () => {
@@ -539,7 +526,8 @@ describe('run', () => {
     await flushPromises()
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
-      `The extension cannot initialize because you are using version ${MajorAhead} of the DVC CLI. The expected version is ${MIN_CLI_VERSION} <= DVC < ${MAX_CLI_VERSION}. Please upgrade to the most recent version of the extension and reload this window.`
+      'The extension cannot initialize because the DVC CLI version is incompatible.',
+      'Setup'
     )
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
     expect(mockedResetMembers).toHaveBeenCalledTimes(1)
@@ -564,7 +552,7 @@ describe('run', () => {
     await flushPromises()
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
-      `The extension is unable to initialize. The CLI was not located using the interpreter provided by the Python extension. The CLI is also not installed globally. For auto Python environment activation, ensure the correct interpreter is set. Active Python interpreter: ${mockedPythonPath}.`,
+      'An error was thrown when trying to access the CLI.',
       Response.SHOW_SETUP,
       Response.NEVER
     )

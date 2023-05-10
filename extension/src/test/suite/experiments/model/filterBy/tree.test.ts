@@ -110,7 +110,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         hasCheckpoints: true,
         hasColumns: true,
         hasConfig: true,
-        hasRunningExperiment: true,
+        hasRunningWorkspaceExperiment: true,
         hasValidDvcYaml: true,
         rows: filteredRows,
         sorts: []
@@ -143,7 +143,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         hasCheckpoints: true,
         hasColumns: true,
         hasConfig: true,
-        hasRunningExperiment: true,
+        hasRunningWorkspaceExperiment: true,
         hasValidDvcYaml: true,
         rows: [workspace, main],
         sorts: []
@@ -279,7 +279,6 @@ suite('Experiments Filter By Tree Test Suite', () => {
       const workspaceExperiments = disposable.track(
         new WorkspaceExperiments(
           internalCommands,
-          disposable.track(new EventEmitter()),
           buildMockMemento(),
           { [dvcDemoPath]: experiments },
           disposable.track(new EventEmitter())
@@ -387,7 +386,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         hasCheckpoints: true,
         hasColumns: true,
         hasConfig: true,
-        hasRunningExperiment: true,
+        hasRunningWorkspaceExperiment: true,
         hasValidDvcYaml: true,
         rows: filteredRows,
         sorts: []

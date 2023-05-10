@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
-import { EventEmitter, RelativePattern } from 'vscode'
+import { RelativePattern } from 'vscode'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
 import { ensureFileSync, removeSync } from 'fs-extra'
@@ -92,7 +92,6 @@ suite('Experiments Data Test Suite', () => {
               }
             }
           } as unknown as InternalCommands,
-          disposable.track(new EventEmitter<boolean>()),
           {
             getBranchesToShow: () => ['current'],
             getIsBranchesView: () => false,
@@ -153,7 +152,6 @@ suite('Experiments Data Test Suite', () => {
               }
             }
           } as unknown as InternalCommands,
-          disposable.track(new EventEmitter<boolean>()),
           {
             getBranchesToShow: () => ['current'],
             getIsBranchesView: () => false,

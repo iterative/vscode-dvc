@@ -26,13 +26,8 @@ export const buildPlots = async (
   plotsDiff: PlotsOutput | undefined = undefined,
   expShow = expShowFixtureWithoutErrors
 ) => {
-  const {
-    internalCommands,
-    mockPlotsDiff,
-    messageSpy,
-    updatesPaused,
-    resourceLocator
-  } = buildDependencies(disposer, expShow, plotsDiff)
+  const { internalCommands, mockPlotsDiff, messageSpy, resourceLocator } =
+    buildDependencies(disposer, expShow, plotsDiff)
 
   const mockRemoveDir = stub(FileSystem, 'removeDir').returns(undefined)
   const mockGetModifiedTime = stub(FileSystem, 'getModifiedTime').returns(
@@ -43,7 +38,6 @@ export const buildPlots = async (
     new Experiments(
       dvcDemoPath,
       internalCommands,
-      updatesPaused,
       resourceLocator,
       buildMockMemento({
         [`${PersistenceKey.EXPERIMENTS_BRANCHES}${dvcDemoPath}`]: ['current'],
@@ -61,7 +55,6 @@ export const buildPlots = async (
       dvcDemoPath,
       internalCommands,
       experiments,
-      updatesPaused,
       resourceLocator.scatterGraph,
       buildMockMemento()
     )
@@ -115,22 +108,5 @@ export const buildPlots = async (
     plots,
     plotsModel,
     webviewMessages
-  }
-}
-
-export const buildWorkspacePlots = (disposer: Disposer) => {
-  const { config, internalCommands, messageSpy, resourceLocator } =
-    buildDependencies(disposer)
-
-  const workspacePlots = disposer.track(
-    new WorkspacePlots(internalCommands, buildMockMemento())
-  )
-
-  return {
-    config,
-    internalCommands,
-    messageSpy,
-    resourceLocator,
-    workspacePlots
   }
 }

@@ -47,11 +47,19 @@ $gap: 20px;
   display: flex;
   align-items: center;
   cursor: initial;
+  margin-left: 6px;
 }
 
 .infoIcon {
   fill: $accent-color;
-  margin-left: 6px;
+}
+
+.completedIcon {
+  fill: $passed-color;
+}
+
+.errorIcon {
+  fill: $error-color;
 }
 
 .infoTooltip {
@@ -64,11 +72,6 @@ $gap: 20px;
   font-size: 13px;
   font-weight: 400;
   cursor: auto;
-
-  svg {
-    min-width: 16px;
-    min-height: 16px;
-  }
 
   a {
     text-decoration: none;

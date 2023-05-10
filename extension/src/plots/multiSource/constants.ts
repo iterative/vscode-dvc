@@ -12,12 +12,12 @@ export type StrokeDashValue = (typeof StrokeDash)[number]
 export const Shape = ['square', 'circle', 'triangle', 'diamond'] as const
 export type ShapeValue = (typeof Shape)[number]
 
-export type Scale<T extends StrokeDashValue | ShapeValue> = {
+type Scale<T extends StrokeDashValue | ShapeValue> = {
   domain: string[]
   range: T[]
 }
 
-export type Encoding<T extends StrokeDashValue | ShapeValue> = {
+type Encoding<T extends StrokeDashValue | ShapeValue> = {
   scale: Scale<T>
 } & { field: string }
 

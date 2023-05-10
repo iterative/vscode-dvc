@@ -48,7 +48,7 @@ const tableData: TableDataState = {
   hasConfig: true,
   hasData: true,
   hasMoreCommits: { main: true },
-  hasRunningExperiment: true,
+  hasRunningWorkspaceExperiment: true,
   hasValidDvcYaml: true,
   isBranchesView: false,
   isShowingMoreCommits: { main: true },

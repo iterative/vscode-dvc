@@ -28,7 +28,7 @@ export const tableDataInitialState: TableDataState = {
   hasConfig: false,
   hasData: false,
   hasMoreCommits: {},
-  hasRunningExperiment: false,
+  hasRunningWorkspaceExperiment: false,
   hasValidDvcYaml: true,
   isBranchesView: false,
   isShowingMoreCommits: {},
@@ -95,8 +95,11 @@ export const tableDataSlice = createSlice({
         action.payload
       ) as Record<string, boolean>
     },
-    updateHasRunningExperiment: (state, action: PayloadAction<boolean>) => {
-      state.hasRunningExperiment = action.payload
+    updateHasRunningWorkspaceExperiment: (
+      state,
+      action: PayloadAction<boolean>
+    ) => {
+      state.hasRunningWorkspaceExperiment = action.payload
     },
     updateHasValidDvcYaml: (state, action: PayloadAction<boolean>) => {
       state.hasValidDvcYaml = action.payload
@@ -155,7 +158,7 @@ export const {
   updateHasColumns,
   updateHasConfig,
   updateHasMoreCommits,
-  updateHasRunningExperiment,
+  updateHasRunningWorkspaceExperiment,
   updateHasValidDvcYaml,
   updateIsBranchesView,
   updateIsShowingMoreCommits,

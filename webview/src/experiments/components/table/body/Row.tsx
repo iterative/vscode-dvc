@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import React, { useCallback, useContext, useMemo, useState } from 'react'
+import React, { useCallback, useContext, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { isQueued, isRunning } from 'dvc/src/experiments/webview/contract'
@@ -19,14 +19,7 @@ export type BatchSelectionProp = {
 
 export const RowContent: React.FC<
   RowProp & { className?: string } & BatchSelectionProp
-> = ({
-  row,
-  className,
-  contextMenuDisabled,
-  projectHasCheckpoints,
-  hasRunningExperiment,
-  batchRowSelection
-}): JSX.Element => {
+> = ({ row, className, batchRowSelection }): JSX.Element => {
   const changes = useSelector(
     (state: ExperimentsState) => state.tableData.changes
   )
@@ -68,30 +61,13 @@ export const RowContent: React.FC<
     }
   }, [subRows, selectedRows])
 
-  const [menuActive, setMenuActive] = useState<boolean>(false)
-
   const running = isRunning(status)
   const queued = isQueued(status)
   const unselected = selected === false
   const isOdd = index % 2 !== 0 && !isRowSelected
 
   return (
-    <ContextMenu
-      disabled={contextMenuDisabled}
-      onShow={() => {
-        setMenuActive(true)
-      }}
-      onHide={() => {
-        setMenuActive(false)
-      }}
-      content={
-        <RowContextMenu
-          row={row}
-          projectHasCheckpoints={projectHasCheckpoints}
-          hasRunningExperiment={hasRunningExperiment}
-        />
-      }
-    >
+    <ContextMenu content={<RowContextMenu row={row} />}>
       <tr
         className={cx(
           className,
@@ -107,8 +83,7 @@ export const RowContent: React.FC<
             [styles.evenRow]: !isOdd,
             [styles.workspaceRow]: isWorkspace,
             [styles.normalRow]: !isWorkspace,
-            [styles.rowSelected]: isRowSelected,
-            [styles.rowFocused]: menuActive
+            [styles.rowSelected]: isRowSelected
           }
         )}
         tabIndex={0}

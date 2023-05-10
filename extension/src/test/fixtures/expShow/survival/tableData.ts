@@ -14,7 +14,7 @@ const data: TableData = {
   hasColumns: true,
   hasConfig: true,
   hasMoreCommits: { main: true },
-  hasRunningExperiment: true,
+  hasRunningWorkspaceExperiment: true,
   hasValidDvcYaml: true,
   isBranchesView: false,
   isShowingMoreCommits: { main: true },

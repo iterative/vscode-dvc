@@ -1,4 +1,5 @@
 import { BasePage, IPageDecorator, PageDecorator } from 'wdio-vscode-service'
+import { browser } from '@wdio/globals'
 import { webview as webviewLocators } from './locators.js'
 import * as locators from './locators.js'
 

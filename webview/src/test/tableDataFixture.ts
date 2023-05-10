@@ -1,9 +1,5 @@
-import { copyReverseOriginalColors } from 'dvc/src/experiments/model/status/colors'
-import {
-  ExperimentStatus,
-  Commit,
-  TableData
-} from 'dvc/src/experiments/webview/contract'
+import { copyOriginalColors } from 'dvc/src/experiments/model/status/colors'
+import { Commit, TableData } from 'dvc/src/experiments/webview/contract'
 
 const matchAndTransform = (
   rows: Commit[],
@@ -24,7 +20,7 @@ const matchAndTransform = (
   })
 }
 
-export const transformRows = (
+const transformRows = (
   fixture: TableData,
   labelOrIds: string[],
   transform: (source: Commit) => Commit
@@ -60,10 +56,10 @@ export const setExperimentsAsSelected = (
   fixture: TableData,
   labelOrIds: string[]
 ) => {
-  let colors = copyReverseOriginalColors()
+  let colors = [...copyOriginalColors()].reverse()
   const nextColor = () => {
     if (colors.length === 0) {
-      colors = copyReverseOriginalColors()
+      colors = copyOriginalColors()
     }
     return colors.pop()
   }
@@ -74,7 +70,3 @@ export const setExperimentsAsSelected = (
     selected: true
   }))
 }
-export const setExperimentsAsRunning = setRowProperty(
-  'status',
-  ExperimentStatus.RUNNING
-)

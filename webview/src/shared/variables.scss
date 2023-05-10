@@ -17,6 +17,7 @@ $error-color: var(--vscode-errorForeground);
 $meta-cell-color: var(--vscode-descriptionForeground);
 $accent-color: var(--button-primary-background);
 $accent-color-transparent: var(--accent-transparency-3);
+$passed-color: var(--vscode-testing-iconPassed);
 
 /* experiments table */
 $row-bg-color: $bg-color;
@@ -42,6 +43,7 @@ $checkbox-background: var(--checkbox-background);
 $checkbox-border: var(--checkbox-border);
 $indicator-badge-background: var(--vscode-activityBarBadge-background);
 $indicator-badge-foreground: var(--vscode-activityBarBadge-foreground);
+$disabled-opacity: var(--disabled-opacity);
 
 /* plots */
 $plot-block-bg-color: var(--vscode-dropdown-background);

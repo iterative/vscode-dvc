@@ -43,6 +43,8 @@ export const App: React.FC = () => {
   const [isStudioConnected, setIsStudioConnected] = useState<boolean>(false)
   const [shareLiveToStudio, setShareLiveToStudioValue] =
     useState<boolean>(false)
+  const [hasReceivedMessageFromVsCode, setHasReceivedMessageFromVsCode] =
+    useState(false)
 
   useVsCodeMessaging(
     useCallback(
@@ -64,6 +66,7 @@ export const App: React.FC = () => {
           setSectionCollapsed(data.data.sectionCollapsed)
         }
         setShareLiveToStudioValue(data.data.shareLiveToStudio)
+        setHasReceivedMessageFromVsCode(true)
       },
       [
         setCanGitInitialized,
@@ -90,6 +93,8 @@ export const App: React.FC = () => {
     })
   }
 
+  const isDvcSetup = !!cliCompatible && projectInitialized
+
   return (
     <>
       <SetupContainer
@@ -97,6 +102,7 @@ export const App: React.FC = () => {
         title="DVC"
         sectionCollapsed={sectionCollapsed}
         setSectionCollapsed={setSectionCollapsed}
+        isSetup={isDvcSetup}
       >
         <Dvc
           canGitInitialize={canGitInitialize}
@@ -106,8 +112,8 @@ export const App: React.FC = () => {
           needsGitInitialized={needsGitInitialized}
           projectInitialized={projectInitialized}
           pythonBinPath={pythonBinPath}
-          isExperimentsAvailable={hasData}
           setSectionCollapsed={setSectionCollapsed}
+          hasReceivedMessageFromVsCode={hasReceivedMessageFromVsCode}
         />
       </SetupContainer>
       <SetupContainer
@@ -115,6 +121,7 @@ export const App: React.FC = () => {
         title="Experiments"
         sectionCollapsed={sectionCollapsed}
         setSectionCollapsed={setSectionCollapsed}
+        isSetup={isDvcSetup && !!hasData}
       >
         <Experiments
           needsGitCommit={needsGitCommit}
@@ -128,6 +135,8 @@ export const App: React.FC = () => {
         title="Studio"
         sectionCollapsed={sectionCollapsed}
         setSectionCollapsed={setSectionCollapsed}
+        isSetup={!!cliCompatible}
+        isConnected={isStudioConnected}
       >
         <Studio
           isStudioConnected={isStudioConnected}

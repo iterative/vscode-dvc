@@ -12,6 +12,7 @@ import { Provider } from 'react-redux'
 import deeplyNestedTableDataFixture from 'dvc/src/test/fixtures/expShow/deeplyNested/tableData'
 import tableDataFixture from 'dvc/src/test/fixtures/expShow/base/tableData'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
+import { ExperimentStatus } from 'dvc/src/cli/dvc/contract'
 import { tableData as sortingTableDataFixture } from './sort'
 import { customQueries, getRow } from './queries'
 import { App } from '../experiments/components/App'
@@ -59,10 +60,21 @@ export const renderTableWithSortingData = () => {
   return renderTable(sortingTableDataFixture)
 }
 
-export const renderTableWithoutRunningExperiments = () => {
+export const renderTableWithoutRunningExperiments = (
+  hasCheckpoints?: boolean
+) => {
   renderTable({
     ...tableDataFixture,
-    hasRunningExperiment: false
+    hasCheckpoints: hasCheckpoints ?? tableDataFixture.hasCheckpoints,
+    hasRunningWorkspaceExperiment: false,
+    rows: tableDataFixture.rows.map(row => ({
+      ...row,
+      status: ExperimentStatus.SUCCESS,
+      subRows: row.subRows?.map(subRow => ({
+        ...subRow,
+        status: ExperimentStatus.SUCCESS
+      }))
+    }))
   })
 }
 
@@ -91,7 +103,7 @@ export const clickRowCheckbox = (label: string, multiSelection?: boolean) => {
   })
 }
 
-export const toggleExpansion = (label: string, btnTitle: string) => {
+const toggleExpansion = (label: string, btnTitle: string) => {
   const button = within(getRow(label)).getByTitle(`${btnTitle} Row`)
   fireEvent.click(button)
 }

@@ -69,6 +69,23 @@ module.exports = {
       rules: {
         'unicorn/filename-case': 'off'
       }
+    },
+    {
+      files: [
+        'src/extension.ts',
+        '**/*.stories.tsx',
+        '**/stories/util.ts',
+        '**/__mocks__/**',
+        'src/test/util/index.ts',
+        'src/test/e2e/**',
+        'src/test/suite/index.ts',
+        '**/*Slice.ts',
+        '**/store.ts',
+        '**/contract.ts'
+      ],
+      rules: {
+        'import/no-unused-modules': 'off'
+      }
     }
   ],
   plugins: [
@@ -104,6 +121,7 @@ module.exports = {
     'etc/no-commented-out-code': 'error',
     'etc/no-assign-mutated-array': 'error',
     'import/no-unresolved': 'off',
+    'import/no-unused-modules': [2, { unusedExports: true }],
     'import/order': [
       'error',
       {

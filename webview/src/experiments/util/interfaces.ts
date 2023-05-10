@@ -7,9 +7,7 @@ export interface InstanceProp {
 
 export interface RowProp {
   row: Row<Experiment>
-  contextMenuDisabled?: boolean
-  hasRunningExperiment?: boolean
-  projectHasCheckpoints?: boolean
+  hasRunningWorkspaceExperiment?: boolean
 }
 
 export interface CellProp {

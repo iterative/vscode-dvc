@@ -2,7 +2,7 @@ import React, { DragEvent } from 'react'
 
 export type DragFunction = (e: DragEvent<HTMLElement>) => void
 
-export interface DraggableProps {
+interface DraggableProps {
   id: string
   disabled: boolean
   children: JSX.Element

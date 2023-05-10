@@ -30,6 +30,7 @@ import { starredSort } from './model/sortBy/constants'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ColumnsModel } from './columns/model'
 import { ExperimentsData } from './data'
+import { stopWorkspaceExperiment } from './processExecution'
 import {
   Experiment,
   ColumnType,
@@ -111,7 +112,6 @@ export class Experiments extends BaseRepository<TableData> {
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
-    updatesPaused: EventEmitter<boolean>,
     resourceLocator: ResourceLocator,
     workspaceState: Memento,
     addStage: () => Promise<boolean>,
@@ -150,13 +150,7 @@ export class Experiments extends BaseRepository<TableData> {
     )
 
     this.data = this.dispose.track(
-      data ||
-        new ExperimentsData(
-          dvcRoot,
-          internalCommands,
-          updatesPaused,
-          this.experiments
-        )
+      data || new ExperimentsData(dvcRoot, internalCommands, this.experiments)
     )
 
     this.dispose.track(this.data.onDidUpdate(data => this.setState(data)))
@@ -378,18 +372,18 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
-  public pickExperiment() {
+  public pickCommitOrExperiment() {
     return pickExperiment(
-      this.experiments.getExperiments(),
+      this.experiments.getCommitsAndExperiments(),
       this.getFirstThreeColumnOrder()
     )
   }
 
-  public pickQueueTasksToKill() {
+  public pickRunningExperiments() {
     return pickExperiments(
-      this.experiments.getRunningQueueTasks(),
+      this.experiments.getRunningExperiments(),
       this.getFirstThreeColumnOrder(),
-      Title.SELECT_QUEUE_KILL
+      Title.SELECT_EXPERIMENTS_STOP
     )
   }
 
@@ -493,8 +487,36 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
+  public stopExperiments(ids: string[]) {
+    const { runningInQueueIds, runningInWorkspaceId } =
+      this.experiments.getStopDetails(ids)
+
+    const promises: Promise<string | void>[] = []
+
+    if (runningInQueueIds) {
+      promises.push(
+        this.internalCommands.executeCommand(
+          AvailableCommands.QUEUE_KILL,
+          this.dvcRoot,
+          ...runningInQueueIds
+        )
+      )
+    }
+    if (runningInWorkspaceId) {
+      promises.push(stopWorkspaceExperiment(this.dvcRoot, runningInWorkspaceId))
+    }
+
+    return Toast.showOutput(
+      Promise.all(promises).then(output => output.filter(Boolean).join('\n'))
+    )
+  }
+
   public hasRunningExperiment() {
     return this.experiments.hasRunningExperiment()
+  }
+
+  public hasRunningWorkspaceExperiment() {
+    return this.experiments.hasRunningWorkspaceExperiment()
   }
 
   public getFirstThreeColumnOrder() {
@@ -565,12 +587,6 @@ export class Experiments extends BaseRepository<TableData> {
       () => this.getWebview(),
       () => this.notifyChanged(),
       () => this.selectColumns(),
-      (dvcRoot: string, ...ids: string[]) =>
-        this.internalCommands.executeCommand(
-          AvailableCommands.QUEUE_KILL,
-          dvcRoot,
-          ...ids
-        ),
       () =>
         this.internalCommands.executeCommand(
           AvailableCommands.STAGE_LIST,
@@ -625,7 +641,7 @@ export class Experiments extends BaseRepository<TableData> {
       this.dvcLiveOnlyCleanupInitialized = true
       void pollSignalFileForProcess(this.dvcLiveOnlySignalFile, () => {
         this.dvcLiveOnlyCleanupInitialized = false
-        if (this.hasRunningExperiment()) {
+        if (this.hasRunningWorkspaceExperiment()) {
           void this.data.update()
         }
       })

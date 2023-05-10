@@ -447,8 +447,8 @@ suite('Workspace Experiments Test Suite', () => {
     })
   })
 
-  describe('dvc.stopQueuedExperiments', () => {
-    it('should be able to kill running queue tasks', async () => {
+  describe('dvc.stopExperiments', () => {
+    it('should be able to stop any running experiment', async () => {
       const mockQueueKill = stub(DvcExecutor.prototype, 'queueKill').resolves(
         undefined
       )
@@ -472,7 +472,7 @@ suite('Workspace Experiments Test Suite', () => {
 
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
-      await commands.executeCommand(RegisteredCliCommands.QUEUE_KILL)
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_STOP)
 
       expect(mockShowQuickPick).to.be.calledWithExactly(
         [
@@ -483,13 +483,21 @@ suite('Workspace Experiments Test Suite', () => {
             )}, loss:2.0205045, accuracy:0.37241668`,
             label: '4fb124a',
             value: queueTaskId
+          },
+          {
+            description: '[exp-83425]',
+            detail: `Created:${formatDate(
+              '2020-12-29T15:27:02'
+            )}, loss:1.7750162, accuracy:0.59265000`,
+            label: 'workspace',
+            value: 'exp-83425'
           }
         ],
         {
           canPickMany: true,
           matchOnDescription: true,
           matchOnDetail: true,
-          title: Title.SELECT_QUEUE_KILL
+          title: Title.SELECT_EXPERIMENTS_STOP
         }
       )
       expect(mockQueueKill).to.be.calledOnce
@@ -542,7 +550,7 @@ suite('Workspace Experiments Test Suite', () => {
   })
 
   describe('dvc.applyExperiment', () => {
-    it('should ask the user to pick an experiment and then apply that experiment to the workspace', async () => {
+    it('should ask the user to pick a commit or experiment and then apply it to the workspace', async () => {
       const selectedExperiment = 'test-branch'
 
       const { experiments } = buildExperiments(disposable)
@@ -562,8 +570,17 @@ suite('Workspace Experiments Test Suite', () => {
         dvcDemoPath,
         selectedExperiment
       )
+
       expect(mockShowQuickPick).to.be.calledWith(
         [
+          {
+            description: undefined,
+            detail: `Created:${formatDate(
+              '2020-11-21T19:58:22'
+            )}, loss:2.0488560, accuracy:0.34848332`,
+            label: 'main',
+            value: 'main'
+          },
           {
             description: '[exp-e7a67]',
             detail: `Created:${formatDate(

@@ -27,7 +27,7 @@ export type CellRowActionsProps = {
   toggleStarred: () => void
 }
 
-export type CellRowActionProps = {
+type CellRowActionProps = {
   showSubRowStates: boolean
   subRowsAffected: number
   children: ReactElement
@@ -36,7 +36,7 @@ export type CellRowActionProps = {
   onClick?: MouseEventHandler
 }
 
-export const CellRowAction: React.FC<CellRowActionProps> = ({
+const CellRowAction: React.FC<CellRowActionProps> = ({
   showSubRowStates,
   subRowsAffected,
   children,

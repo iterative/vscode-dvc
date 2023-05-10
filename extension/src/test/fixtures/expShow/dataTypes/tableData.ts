@@ -14,7 +14,7 @@ export const data: TableData = {
   hasColumns: true,
   hasConfig: true,
   hasMoreCommits: { main: true },
-  hasRunningExperiment: false,
+  hasRunningWorkspaceExperiment: false,
   hasValidDvcYaml: true,
   isShowingMoreCommits: { main: true },
   isBranchesView: false,

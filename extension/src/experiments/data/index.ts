@@ -1,5 +1,3 @@
-import { join } from 'path'
-import { EventEmitter } from 'vscode'
 import { collectFiles } from './collect'
 import {
   EXPERIMENTS_GIT_LOGS_REFS,
@@ -16,21 +14,17 @@ import { gitPath } from '../../cli/git/constants'
 import { getGitPath } from '../../fileSystem'
 import { ExperimentsModel } from '../model'
 
-export const QUEUED_EXPERIMENT_PATH = join(DOT_DVC, 'tmp', 'exps')
-
 export class ExperimentsData extends BaseData<ExpShowOutput> {
   private readonly experiments: ExperimentsModel
 
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
-    updatesPaused: EventEmitter<boolean>,
     experiments: ExperimentsModel
   ) {
     super(
       dvcRoot,
       internalCommands,
-      updatesPaused,
       [{ name: 'update', process: () => this.update() }],
       ['dvc.lock', 'dvc.yaml', 'params.yaml', DOT_DVC]
     )

@@ -2,6 +2,71 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.10] - 2023-05-09
+
+### 🚀 New Features and Enhancements
+
+- Combine/enhance commands used to stop experiments [#3840](https://github.com/iterative/vscode-dvc/pull/3840) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Prevent queued experiment from being selected as most recent [#3846](https://github.com/iterative/vscode-dvc/pull/3846) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.8.9] - 2023-05-09
+
+### 🚀 New Features and Enhancements
+
+- Autoclose DVC Section if completed [#3809](https://github.com/iterative/vscode-dvc/pull/3809) by [@julieg18](https://github.com/julieg18)
+
+## [0.8.8] - 2023-05-08
+
+### 🚀 New Features and Enhancements
+
+- Add completion status to setup sections [#3823](https://github.com/iterative/vscode-dvc/pull/3823) by [@julieg18](https://github.com/julieg18)
+- Enable experiment operations when experiment(s) are running in the queue [#3832](https://github.com/iterative/vscode-dvc/pull/3832) by [@mattseddon](https://github.com/mattseddon)
+- Enable running exp apply and exp branch against commits [#3834](https://github.com/iterative/vscode-dvc/pull/3834) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.8.7] - 2023-05-05
+
+### 🐛 Bug Fixes
+
+- Ensure that accessing the DVC config doesn't throw an error [#3831](https://github.com/iterative/vscode-dvc/pull/3831) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Add import/no-unused-modules rule to eslint config [#3826](https://github.com/iterative/vscode-dvc/pull/3826) by [@mattseddon](https://github.com/mattseddon)
+- Increase default width and decrease min width of experiments column [#3833](https://github.com/iterative/vscode-dvc/pull/3833) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.8.6] - 2023-05-04
+
+### 🚀 New Features and Enhancements
+
+- Remove pausing of data updates when running/queueing experiments [#3815](https://github.com/iterative/vscode-dvc/pull/3815) by [@mattseddon](https://github.com/mattseddon)
+- Keep experiments table context menu consistent by showing disabled items [#3825](https://github.com/iterative/vscode-dvc/pull/3825) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.8.5] - 2023-05-03
+
+### 🚀 New Features and Enhancements
+
+- Simplify DVC CLI Location/Version Logic [#3784](https://github.com/iterative/vscode-dvc/pull/3784) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Add stylelint to precommit hook [#3807](https://github.com/iterative/vscode-dvc/pull/3807) by [@julieg18](https://github.com/julieg18)
+
+## [0.8.4] - 2023-05-02
+
+### 🐛 Bug Fixes
+
+- Fix missing tracked decorations [#3801](https://github.com/iterative/vscode-dvc/pull/3801) by [@mattseddon](https://github.com/mattseddon)
+- Hide push option when an experiment is running [#3808](https://github.com/iterative/vscode-dvc/pull/3808) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (2.56.0) [#3805](https://github.com/iterative/vscode-dvc/pull/3805) by [@sroy3](https://github.com/sroy3)
+- WorkspaceExperiments housekeeping [#3797](https://github.com/iterative/vscode-dvc/pull/3797) by [@mattseddon](https://github.com/mattseddon)
+- Wait for config to be ready before accessing values [#3799](https://github.com/iterative/vscode-dvc/pull/3799) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.8.3] - 2023-05-01
 
 ### 🚀 New Features and Enhancements

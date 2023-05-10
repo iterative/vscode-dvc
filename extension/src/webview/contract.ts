@@ -38,7 +38,7 @@ export enum MessageFromWebviewType {
   RESIZE_PLOTS = 'resize-plots',
   SAVE_STUDIO_TOKEN = 'save-studio-token',
   SHOW_EXPERIMENT_LOGS = 'show-experiment-logs',
-  STOP_EXPERIMENT = 'stop-experiment',
+  STOP_EXPERIMENTS = 'stop-experiments',
   SORT_COLUMN = 'sort-column',
   TOGGLE_EXPERIMENT = 'toggle-experiment',
   TOGGLE_EXPERIMENT_STAR = 'toggle-experiment-star',
@@ -75,15 +75,13 @@ export type ColumnResizePayload = {
   id: string
   width: number
 }
+
 export type PlotsResizedPayload = {
   section: PlotsSection
   nbItemsPerRow: number
   height: PlotHeight
 }
-export type PlotSectionRenamedPayload = {
-  section: PlotsSection
-  name: string
-}
+
 export type PlotsTemplatesReordered = {
   group: TemplatePlotGroup
   paths: string[]
@@ -149,8 +147,8 @@ export type MessageFromWebview =
       payload: SortDefinition
     }
   | {
-      type: MessageFromWebviewType.STOP_EXPERIMENT
-      payload: { id: string; executor?: string | null }[]
+      type: MessageFromWebviewType.STOP_EXPERIMENTS
+      payload: string[]
     }
   | { type: MessageFromWebviewType.SHOW_EXPERIMENT_LOGS; payload: string }
   | {

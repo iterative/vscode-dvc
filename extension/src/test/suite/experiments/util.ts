@@ -1,5 +1,4 @@
 import { stub } from 'sinon'
-import { EventEmitter } from 'vscode'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
@@ -35,7 +34,6 @@ export const buildExperiments = (
     mockCheckSignalFile,
     mockExpShow,
     mockGetCommitMessages,
-    updatesPaused,
     resourceLocator
   } = buildDependencies(disposer, experimentShowData)
 
@@ -56,7 +54,6 @@ export const buildExperiments = (
     new Experiments(
       dvcRoot,
       internalCommands,
-      updatesPaused,
       resourceLocator,
       mockMemento,
       mockCheckOrAddPipeline,
@@ -87,8 +84,7 @@ export const buildExperiments = (
     mockGetCommitMessages,
     mockSelectBranches,
     mockUpdateExperimentsData,
-    resourceLocator,
-    updatesPaused
+    resourceLocator
   }
 }
 
@@ -98,24 +94,17 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
     experiments: mockExperiments,
     gitReader,
     messageSpy,
-    updatesPaused,
     resourceLocator
   } = buildExperiments(disposer, expShowFixture, 'other/dvc/root')
 
   stub(gitReader, 'getGitRepositoryRoot').resolves(dvcDemoPath)
   const workspaceExperiments = disposer.track(
-    new WorkspaceExperiments(
-      internalCommands,
-      updatesPaused,
-      buildMockMemento(),
-      {
-        'other/dvc/root': mockExperiments
-      }
-    )
+    new WorkspaceExperiments(internalCommands, buildMockMemento(), {
+      'other/dvc/root': mockExperiments
+    })
   )
   const [experiments] = workspaceExperiments.create(
     [dvcDemoPath],
-    updatesPaused,
     resourceLocator
   )
 
@@ -124,26 +113,15 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
 }
 
 export const buildSingleRepoExperiments = (disposer: SafeWatcherDisposer) => {
-  const {
-    config,
-    internalCommands,
-    gitReader,
-    messageSpy,
-    updatesPaused,
-    resourceLocator
-  } = buildDependencies(disposer)
+  const { config, internalCommands, gitReader, messageSpy, resourceLocator } =
+    buildDependencies(disposer)
 
   stub(gitReader, 'getGitRepositoryRoot').resolves(dvcDemoPath)
   const workspaceExperiments = disposer.track(
-    new WorkspaceExperiments(
-      internalCommands,
-      updatesPaused,
-      buildMockMemento()
-    )
+    new WorkspaceExperiments(internalCommands, buildMockMemento())
   )
   const [experiments] = workspaceExperiments.create(
     [dvcDemoPath],
-    updatesPaused,
     resourceLocator
   )
 
@@ -175,19 +153,14 @@ export const buildExperimentsData = (disposer: SafeWatcherDisposer) => {
     buildExperimentsDataDependencies(disposer)
 
   const data = disposer.track(
-    new ExperimentsData(
-      dvcDemoPath,
-      internalCommands,
-      disposer.track(new EventEmitter<boolean>()),
-      {
-        getBranchesToShow: () => ['current'],
-        getIsBranchesView: () => false,
-        getNbOfCommitsToShow: () => ({
-          current: DEFAULT_NUM_OF_COMMITS_TO_SHOW
-        }),
-        setAvailableBranchesToShow: stub()
-      } as unknown as ExperimentsModel
-    )
+    new ExperimentsData(dvcDemoPath, internalCommands, {
+      getBranchesToShow: () => ['current'],
+      getIsBranchesView: () => false,
+      getNbOfCommitsToShow: () => ({
+        current: DEFAULT_NUM_OF_COMMITS_TO_SHOW
+      }),
+      setAvailableBranchesToShow: stub()
+    } as unknown as ExperimentsModel)
   )
 
   return { data, mockCreateFileSystemWatcher, mockExpShow }

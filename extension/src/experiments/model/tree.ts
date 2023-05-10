@@ -31,16 +31,11 @@ import {
 } from '../../commands/external'
 import { sum } from '../../util/math'
 import { Disposable } from '../../class/dispose'
-import {
-  Commit,
-  Experiment,
-  ExperimentStatus,
-  isRunning
-} from '../webview/contract'
+import { Commit, Experiment } from '../webview/contract'
 import { getMarkdownString } from '../../vscode/markdownString'
 import { truncateFromLeft } from '../../util/string'
 
-export type ExperimentAugmented = Experiment & {
+type ExperimentAugmented = Experiment & {
   hasChildren: boolean
   selected?: boolean
   starred: boolean
@@ -129,29 +124,10 @@ export class ExperimentsTree
   }
 
   private registerWorkaroundCommands() {
-    const callCommandWithSelected = async (
-      command:
-        | RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE
-        | RegisteredCliCommands.EXPERIMENT_VIEW_PUSH,
-      experimentItem: ExperimentItem | string,
-      types: ExperimentType[]
-    ) => {
-      const selected = [
-        ...this.getSelectedExperimentItems(),
-        experimentItem
-      ] as (string | ExperimentItem)[]
-
-      const acc = collectExperimentType(selected, new Set(types))
-
-      for (const [dvcRoot, ids] of Object.entries(acc)) {
-        await commands.executeCommand(command, { dvcRoot, ids: [...ids] })
-      }
-    }
-
     commands.registerCommand(
       'dvc.views.experimentsTree.removeExperiment',
       (experimentItem: ExperimentItem) =>
-        callCommandWithSelected(
+        this.callCommandWithSelected(
           RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE,
           experimentItem,
           [ExperimentType.EXPERIMENT, ExperimentType.QUEUED]
@@ -161,12 +137,42 @@ export class ExperimentsTree
     commands.registerCommand(
       'dvc.views.experimentsTree.pushExperiment',
       (experimentItem: ExperimentItem) =>
-        callCommandWithSelected(
+        this.callCommandWithSelected(
           RegisteredCliCommands.EXPERIMENT_VIEW_PUSH,
           experimentItem,
           [ExperimentType.EXPERIMENT]
         )
     )
+
+    commands.registerCommand(
+      'dvc.views.experimentsTree.stopExperiment',
+      (experimentItem: ExperimentItem) =>
+        this.callCommandWithSelected(
+          RegisteredCommands.EXPERIMENT_VIEW_STOP,
+          experimentItem,
+          [ExperimentType.RUNNING]
+        )
+    )
+  }
+
+  private async callCommandWithSelected(
+    command:
+      | RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE
+      | RegisteredCliCommands.EXPERIMENT_VIEW_PUSH
+      | RegisteredCommands.EXPERIMENT_VIEW_STOP,
+    experimentItem: ExperimentItem | string,
+    types: ExperimentType[]
+  ) {
+    const selected = [...this.getSelectedExperimentItems(), experimentItem] as (
+      | string
+      | ExperimentItem
+    )[]
+
+    const acc = collectExperimentType(selected, new Set(types))
+
+    for (const [dvcRoot, ids] of Object.entries(acc)) {
+      await commands.executeCommand(command, { dvcRoot, ids: [...ids] })
+    }
   }
 
   private async getRootElements() {
@@ -243,17 +249,15 @@ export class ExperimentsTree
 
   private getExperimentIcon({
     displayColor,
-    status,
     type,
     selected
   }: {
     displayColor?: string
     label: string
-    status?: ExperimentStatus
     type?: ExperimentType
     selected?: boolean
   }): ThemeIcon | Uri | Resource {
-    if (isRunning(status)) {
+    if (type === ExperimentType.RUNNING) {
       return this.getUriOrIcon(displayColor, IconName.LOADING_SPIN)
     }
     if (type === ExperimentType.QUEUED) {

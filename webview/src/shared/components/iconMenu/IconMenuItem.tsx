@@ -13,7 +13,7 @@ export interface IconMenuItemProps {
   hidden?: boolean
 }
 
-export interface IconMenuItemAllProps extends IconMenuItemProps {
+interface IconMenuItemAllProps extends IconMenuItemProps {
   tooltipTarget: TippyProps['singleton']
   menuTarget: TippyProps['singleton']
 }

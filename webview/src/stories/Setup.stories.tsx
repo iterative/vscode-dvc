@@ -66,6 +66,7 @@ NoDataNotConnected.args = getUpdatedArgs({
 
 export const CompletedConnected = Template.bind({})
 CompletedConnected.args = getUpdatedArgs({
+  cliCompatible: true,
   hasData: true,
   isStudioConnected: true,
   sectionCollapsed: undefined,

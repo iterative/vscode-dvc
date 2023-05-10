@@ -4,7 +4,6 @@ import { after, afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore, SinonStub } from 'sinon'
 import {
-  EventEmitter,
   window,
   commands,
   workspace,
@@ -64,7 +63,7 @@ import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
 import * as VscodeContext from '../../../vscode/context'
 import { Title } from '../../../vscode/title'
-import { EXP_RWLOCK_FILE, ExperimentFlag } from '../../../cli/dvc/constants'
+import { ExperimentFlag } from '../../../cli/dvc/constants'
 import { DvcExecutor } from '../../../cli/dvc/executor'
 import { WorkspacePlots } from '../../../plots/workspace'
 import {
@@ -136,7 +135,7 @@ suite('Experiments Test Suite', () => {
         hasCheckpoints: true,
         hasColumns: true,
         hasConfig: true,
-        hasRunningExperiment: true,
+        hasRunningWorkspaceExperiment: true,
         hasValidDvcYaml: true,
         rows: rowsFixture,
         sorts: []
@@ -1248,32 +1247,29 @@ suite('Experiments Test Suite', () => {
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
-      const mockExperimentIds = ['exp-e7a67', 'test-branch']
+      const mockExperimentIds = ['exp-e7a67', 'exp-83425']
 
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
       const mockPid = 1234
-      const mockGetPidFromFile = stub(FileSystem, 'getPidFromFile').resolves(
-        mockPid
-      )
+      const mockGetPidFromFile = stub(FileSystem, 'getPidFromFile')
+        .onFirstCall()
+        .resolves(mockPid)
+        .onSecondCall()
+        .resolves(undefined)
       const mockProcessExists = stub(
         ProcessExecution,
         'processExists'
       ).resolves(true)
 
       mockMessageReceived.fire({
-        payload: [
-          ...mockExperimentIds.map(id => ({ executor: Executor.DVC_TASK, id })),
-          { executor: Executor.WORKSPACE, id: EXPERIMENT_WORKSPACE_ID }
-        ],
-        type: MessageFromWebviewType.STOP_EXPERIMENT
+        payload: mockExperimentIds,
+        type: MessageFromWebviewType.STOP_EXPERIMENTS
       })
 
       await Promise.all([experimentsKilled, workspaceStopped])
 
-      expect(mockQueueKill).to.be.calledWith(dvcDemoPath, ...mockExperimentIds)
-      expect(mockGetPidFromFile).to.be.calledWithExactly(
-        join(dvcDemoPath, EXP_RWLOCK_FILE)
-      )
+      expect(mockQueueKill).to.be.calledWith(dvcDemoPath, 'exp-e7a67')
+      expect(mockGetPidFromFile).to.be.calledTwice
       expect(mockProcessExists).to.be.calledWithExactly(mockPid)
       expect(mockStopProcesses).to.be.calledWithExactly([mockPid])
     }).timeout(WEBVIEW_TEST_TIMEOUT)
@@ -1451,8 +1447,6 @@ suite('Experiments Test Suite', () => {
 
       const messageSpy = spy(BaseWebview.prototype, 'show')
 
-      const updatesPaused = disposable.track(new EventEmitter<boolean>())
-
       const resourceLocator = disposable.track(
         new ResourceLocator(extensionUri)
       )
@@ -1461,7 +1455,6 @@ suite('Experiments Test Suite', () => {
         new Experiments(
           dvcDemoPath,
           internalCommands,
-          updatesPaused,
           resourceLocator,
           buildMockMemento(),
           () => Promise.resolve(true),
@@ -1704,7 +1697,6 @@ suite('Experiments Test Suite', () => {
         new Experiments(
           'test',
           internalCommands,
-          {} as EventEmitter<boolean>,
           {} as ResourceLocator,
           mockMemento,
           () => Promise.resolve(true),
@@ -1860,7 +1852,6 @@ suite('Experiments Test Suite', () => {
         new Experiments(
           'test',
           internalCommands,
-          {} as EventEmitter<boolean>,
           {} as ResourceLocator,
           mockMemento,
           () => Promise.resolve(true),
@@ -2039,7 +2030,7 @@ suite('Experiments Test Suite', () => {
 
       void experiments.setState(defaultExperimentsData)
       await dataUpdated
-      expect(experiments.hasRunningExperiment()).to.be.true
+      expect(experiments.hasRunningWorkspaceExperiment()).to.be.true
       expect(getCleanupInitialized(experiments)).to.be.true
 
       processKilled = true
@@ -2106,7 +2097,7 @@ suite('Experiments Test Suite', () => {
       await experiments.isReady()
 
       expect(
-        experimentsModel.hasRunningExperiment(),
+        experimentsModel.hasRunningWorkspaceExperiment(),
         'should have a running experiment'
       ).to.be.true
 
