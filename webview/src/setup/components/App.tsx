@@ -10,7 +10,7 @@ import {
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Dvc } from './dvc/Dvc'
-import { Experiments } from './Experiments'
+import { Experiments } from './experiments/Experiments'
 import { Studio } from './studio/Studio'
 import { SetupContainer } from './SetupContainer'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
