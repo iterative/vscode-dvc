@@ -329,8 +329,10 @@ describe('ExperimentsModel', () => {
 
     model.setNbfCommitsToShow(42, 'main')
 
-    expect(memento.get(PersistenceKey.NUMBER_OF_COMMITS_TO_SHOW)).toBe({
-      main: 42
-    })
+    expect(memento.get(PersistenceKey.NUMBER_OF_COMMITS_TO_SHOW)).toStrictEqual(
+      {
+        main: 42
+      }
+    )
   })
 })

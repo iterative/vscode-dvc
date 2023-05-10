@@ -16,6 +16,8 @@ import * as Watcher from '../../../fileSystem/watcher'
 import { ExperimentsModel } from '../../../experiments/model'
 import { ColumnsModel } from '../../../experiments/columns/model'
 import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../../cli/dvc/constants'
+import { PersistenceKey } from '../../../persistence/constants'
+import { GitReader } from '../../../cli/git/reader'
 
 export const buildExperiments = (
   disposer: Disposer,
@@ -43,13 +45,20 @@ export const buildExperiments = (
   )
   const mockCheckOrAddPipeline = stub()
   const mockSelectBranches = stub().resolves(['main', 'other'])
+  const mockMemento = buildMockMemento({
+    [`${PersistenceKey.EXPERIMENTS_BRANCHES}${dvcRoot}`]: ['current'],
+    [`${PersistenceKey.NUMBER_OF_COMMITS_TO_SHOW}${dvcRoot}`]: {
+      current: 5
+    }
+  })
+
   const experiments = disposer.track(
     new Experiments(
       dvcRoot,
       internalCommands,
       updatesPaused,
       resourceLocator,
-      buildMockMemento(),
+      mockMemento,
       mockCheckOrAddPipeline,
       mockSelectBranches,
       mockExperimentsData
@@ -161,6 +170,7 @@ const buildExperimentsDataDependencies = (disposer: Disposer) => {
 }
 
 export const buildExperimentsData = (disposer: SafeWatcherDisposer) => {
+  stub(GitReader.prototype, 'getCurrentBranch').resolves('current')
   const { internalCommands, mockExpShow, mockCreateFileSystemWatcher } =
     buildExperimentsDataDependencies(disposer)
 
@@ -170,8 +180,11 @@ export const buildExperimentsData = (disposer: SafeWatcherDisposer) => {
       internalCommands,
       disposer.track(new EventEmitter<boolean>()),
       {
+        getBranchesToShow: () => ['current'],
         getIsBranchesView: () => false,
-        getNbOfCommitsToShow: () => DEFAULT_NUM_OF_COMMITS_TO_SHOW,
+        getNbOfCommitsToShow: () => ({
+          current: DEFAULT_NUM_OF_COMMITS_TO_SHOW
+        }),
         setAvailableBranchesToShow: stub()
       } as unknown as ExperimentsModel
     )

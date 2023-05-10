@@ -19,6 +19,7 @@ import { ExperimentsModel } from '../../../experiments/model'
 import { Experiment } from '../../../experiments/webview/contract'
 import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../../cli/dvc/contract'
 import { ErrorsModel } from '../../../plots/errors/model'
+import { PersistenceKey } from '../../../persistence/constants'
 
 export const buildPlots = async (
   disposer: Disposer,
@@ -44,7 +45,12 @@ export const buildPlots = async (
       internalCommands,
       updatesPaused,
       resourceLocator,
-      buildMockMemento(),
+      buildMockMemento({
+        [`${PersistenceKey.EXPERIMENTS_BRANCHES}${dvcDemoPath}`]: ['current'],
+        [`${PersistenceKey.NUMBER_OF_COMMITS_TO_SHOW}${dvcDemoPath}`]: {
+          current: 5
+        }
+      }),
       () => Promise.resolve(true),
       () => Promise.resolve([]),
       buildMockExperimentsData()

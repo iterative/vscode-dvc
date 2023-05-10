@@ -171,9 +171,6 @@ const collectExpState = (
   commitData: { [sha: string]: CommitData }
 ): Experiment | undefined => {
   const { rev, name, branch } = expState
-  if (rev === EXPERIMENT_WORKSPACE_ID && acc.workspace) {
-    return
-  }
   const label =
     rev === EXPERIMENT_WORKSPACE_ID
       ? EXPERIMENT_WORKSPACE_ID
@@ -240,7 +237,7 @@ const collectExpRange = (
   }
   const expState = revs[0]
 
-  const { name, rev } = expState
+  const { name, rev, branch } = expState
 
   const label =
     rev === EXPERIMENT_WORKSPACE_ID
@@ -249,7 +246,7 @@ const collectExpRange = (
 
   const experiment = transformExpState(
     {
-      branch: 'main',
+      branch,
       id: name || label,
       label
     },
@@ -311,7 +308,7 @@ export const collectExperiments = (
     hasCheckpoints: hasCheckpoints(output),
     runningExperiments: [],
     workspace: {
-      branch: 'main',
+      branch: '',
       id: EXPERIMENT_WORKSPACE_ID,
       label: EXPERIMENT_WORKSPACE_ID
     }

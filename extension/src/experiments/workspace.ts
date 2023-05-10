@@ -441,7 +441,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
     return await quickPickManyValues(
       allBranches.map(branch => {
-        const branchName = branch.replace('* ', '')
+        const branchName = branch.replace('* (', '').replace(')', '')
         return {
           label: branchName,
           picked: branchesSelected.includes(branchName),

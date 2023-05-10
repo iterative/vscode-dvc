@@ -238,13 +238,13 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasMoreCommits to true if there are more commits to show', async () => {
-      stub(GitReader.prototype, 'getNumCommits').resolves(5)
+      stub(GitReader.prototype, 'getNumCommits').resolves(100)
       const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
       expect(messageSpy).to.be.calledWithMatch({
-        hasMoreCommits: true
+        hasMoreCommits: { current: true }
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -255,28 +255,30 @@ suite('Experiments Test Suite', () => {
       await experiments.showWebview()
 
       expect(messageSpy).to.be.calledWithMatch({
-        hasMoreCommits: false
+        hasMoreCommits: { current: false }
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set isShowingMoreCommits to true if it is showing more than the current commit', async () => {
+      stub(GitReader.prototype, 'getNumCommits').resolves(100)
       const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
       expect(messageSpy).to.be.calledWithMatch({
-        isShowingMoreCommits: true
+        isShowingMoreCommits: { current: true }
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set isShowingMoreCommits to false it is showing only the current commit', async () => {
+      stub(GitReader.prototype, 'getCurrentBranch').resolves('current')
       stub(GitReader.prototype, 'getNumCommits').resolves(1)
       const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
       expect(messageSpy).to.be.calledWithMatch({
-        isShowingMoreCommits: false
+        isShowingMoreCommits: { current: false }
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
@@ -1514,6 +1516,7 @@ suite('Experiments Test Suite', () => {
       expect(messageSpy).to.be.calledWithMatch({
         rows: [
           {
+            branch: 'current',
             displayColor: undefined,
             id: EXPERIMENT_WORKSPACE_ID,
             label: EXPERIMENT_WORKSPACE_ID,
@@ -1521,6 +1524,7 @@ suite('Experiments Test Suite', () => {
             starred: false
           },
           {
+            branch: 'current',
             displayColor: undefined,
             id: 'testBranch',
             label: 'testBranch',
@@ -1528,6 +1532,7 @@ suite('Experiments Test Suite', () => {
             starred: false,
             subRows: [
               {
+                branch: 'current',
                 displayColor: undefined,
                 description: '[exp-1]',
                 id: 'exp-1',
@@ -1537,6 +1542,7 @@ suite('Experiments Test Suite', () => {
                 starred: false
               },
               {
+                branch: 'current',
                 displayColor: undefined,
                 description: '[exp-2]',
                 id: 'exp-2',
@@ -1546,6 +1552,7 @@ suite('Experiments Test Suite', () => {
                 starred: false
               },
               {
+                branch: 'current',
                 displayColor: undefined,
                 description: '[exp-3]',
                 id: 'exp-3',
@@ -1590,6 +1597,7 @@ suite('Experiments Test Suite', () => {
       expect(messageSpy).to.be.calledWithMatch({
         rows: [
           {
+            branch: 'current',
             displayColor: undefined,
             id: EXPERIMENT_WORKSPACE_ID,
             label: EXPERIMENT_WORKSPACE_ID,
@@ -1597,6 +1605,7 @@ suite('Experiments Test Suite', () => {
             starred: false
           },
           {
+            branch: 'current',
             displayColor: undefined,
             id: 'testBranch',
             label: 'testBranch',
@@ -1604,6 +1613,7 @@ suite('Experiments Test Suite', () => {
             starred: false,
             subRows: [
               {
+                branch: 'current',
                 displayColor: undefined,
                 description: '[exp-2]',
                 id: 'exp-2',
@@ -1613,6 +1623,7 @@ suite('Experiments Test Suite', () => {
                 starred: false
               },
               {
+                branch: 'current',
                 displayColor: undefined,
                 description: '[exp-1]',
                 id: 'exp-1',
@@ -1622,6 +1633,7 @@ suite('Experiments Test Suite', () => {
                 starred: false
               },
               {
+                branch: 'current',
                 displayColor: undefined,
                 description: '[exp-3]',
                 id: 'exp-3',

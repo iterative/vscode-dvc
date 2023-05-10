@@ -8,8 +8,8 @@ import { isDirectory } from '../../fileSystem'
 
 export const autoRegisteredCommands = {
   GIT_GET_BRANCHES: 'getBranches',
-  GIT_GET_CURRENT_BRANCH: 'getCurrentBranch',
   GIT_GET_COMMIT_MESSAGES: 'getCommitMessages',
+  GIT_GET_CURRENT_BRANCH: 'getCurrentBranch',
   GIT_GET_NUM_COMMITS: 'getNumCommits',
   GIT_GET_REMOTE_URL: 'getRemoteUrl',
   GIT_GET_REPOSITORY_ROOT: 'getGitRepositoryRoot',
@@ -105,11 +105,10 @@ export class GitReader extends GitCli {
     const options = getOptions(cwd, Command.BRANCH)
     try {
       const branches = await this.executeProcess(options)
-      const currentBranch = trimAndSplit(branches)[0]
+      return trimAndSplit(branches)[0]
         .replace('* (', '')
         .replace(')', '')
         .replace('HEAD detached at ', '')
-      return currentBranch
     } catch {
       return ''
     }

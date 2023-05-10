@@ -8,7 +8,7 @@ describe('sortExperiments', () => {
   const testLabel = 'f0778b3'
   const testTimestamp = '2021-01-14T10:57:59'
   const irrelevantExperimentData = {
-    branch: 'main',
+    branch: 'current',
     checkpoint_parent: 'f81f1b5a1248b9d9f595fb53136298c69f908e66',
     checkpoint_tip: 'd3f4a0d3661c5977540d2205d819470cf0d2145a',
     id: testId,
@@ -31,7 +31,7 @@ describe('sortExperiments', () => {
     ).toStrictEqual(unsortedRows)
   })
 
-  it('Maintains the same order if all items are equal with a single sort', () => {
+  it('currenttains the same order if all items are equal with a single sort', () => {
     const testData = [
       {
         ...irrelevantExperimentData,
@@ -81,7 +81,7 @@ describe('sortExperiments', () => {
     ).toStrictEqual([1, 2, 3])
   })
 
-  it('Should maintain the same order if all items are equal in a multi-sort', () => {
+  it('Should currenttain the same order if all items are equal in a multi-sort', () => {
     const testData = [
       {
         ...irrelevantExperimentData,

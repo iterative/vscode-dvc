@@ -33,7 +33,7 @@ export const customPlotsInitialState: CustomPlotsState = {
 
 export const customPlotsSlice = createSlice({
   initialState: customPlotsInitialState,
-  name: 'custom',
+  name: 'main',
   reducers: {
     changeDisabledDragIds: (state, action: PayloadAction<string[]>) => {
       state.disabledDragPlotIds = action.payload

@@ -9,7 +9,7 @@ import {
 import { getRelativePattern } from '../../fileSystem/relativePattern'
 import { createFileSystemWatcher } from '../../fileSystem/watcher'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import { ExpShowOutput } from '../../cli/dvc/contract'
+import { EXPERIMENT_WORKSPACE_ID, ExpShowOutput } from '../../cli/dvc/contract'
 import { BaseData } from '../../data'
 import { DOT_DVC, ExperimentFlag } from '../../cli/dvc/constants'
 import { gitPath } from '../../cli/git/constants'
@@ -46,6 +46,36 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
     return this.processManager.run('update')
   }
 
+  public async update(): Promise<void> {
+    const isBranchesView = this.experiments.getIsBranchesView()
+    const data: ExpShowOutput = isBranchesView
+      ? ((await this.expShow([ExperimentFlag.ALL_BRANCHES])) as ExpShowOutput)
+      : await this.updateCommitsView()
+
+    this.collectFiles(data)
+
+    return this.notifyChanged(data)
+  }
+
+  protected collectFiles(data: ExpShowOutput) {
+    this.collectedFiles = collectFiles(data, this.collectedFiles)
+  }
+
+  private async getBranchesToShowWithCurrent() {
+    const currentBranch = await this.internalCommands.executeCommand<string>(
+      AvailableCommands.GIT_GET_CURRENT_BRANCH,
+      this.dvcRoot
+    )
+
+    const branches = this.experiments.getBranchesToShow()
+
+    if (!branches.includes(currentBranch)) {
+      branches.push(currentBranch)
+      this.experiments.setBranchesToShow(branches)
+    }
+    return { branches, currentBranch }
+  }
+
   private async expShow(flags: (ExperimentFlag | string)[], branch?: string) {
     const data = await this.internalCommands.executeCommand<ExpShowOutput>(
       AvailableCommands.EXP_SHOW,
@@ -55,56 +85,44 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
     return data.map(exp => ({ ...exp, branch }))
   }
 
-  public async update(): Promise<void> {
-    let data: ExpShowOutput = []
-    const isBranchesView = this.experiments.getIsBranchesView()
+  private async updateCommitsView() {
+    const data: ExpShowOutput = []
 
-    if (isBranchesView) {
-      data = (await this.expShow([
-        ExperimentFlag.ALL_BRANCHES
-      ])) as ExpShowOutput
-    } else {
-      const currentBranch = await this.internalCommands.executeCommand<string>(
-        AvailableCommands.GIT_GET_CURRENT_BRANCH,
-        this.dvcRoot
+    const { branches, currentBranch } =
+      await this.getBranchesToShowWithCurrent()
+
+    const output = []
+    for (const branch of branches) {
+      const branchFlags = [
+        ExperimentFlag.REV,
+        branch,
+        ExperimentFlag.NUM_COMMIT,
+        this.experiments.getNbOfCommitsToShow(branch).toString()
+      ]
+      output.push(
+        new Promise<void>((resolve, reject) => {
+          this.expShow(branchFlags, branch)
+            .then(output => {
+              const newData = output as ExpShowOutput
+              if (branch !== currentBranch) {
+                const workspaceIndex = newData.findIndex(
+                  exp => exp.rev === EXPERIMENT_WORKSPACE_ID
+                )
+                newData.splice(workspaceIndex, 1)
+              }
+              data.push(...newData)
+              resolve()
+            })
+            .catch(() => {
+              reject(new Error('Output failed'))
+            })
+        })
       )
-      let branches = this.experiments.getBranchesToShow()
-
-      if (!branches.includes(currentBranch)) {
-        branches.push(currentBranch)
-        this.experiments.setBranchesToShow(branches)
-      }
-
-      const output = []
-      for (const branch of branches) {
-        const branchFlags = [
-          ExperimentFlag.REV,
-          branch,
-          ExperimentFlag.NUM_COMMIT,
-          this.experiments.getNbOfCommitsToShow(branch).toString()
-        ]
-        output.push(
-          new Promise<void>(async resolve => {
-            const newData = (await this.expShow(
-              branchFlags,
-              branch
-            )) as ExpShowOutput
-            data.push(...newData)
-            resolve()
-          })
-        )
-      }
-
-      await Promise.all(output)
     }
 
-    this.collectFiles(data)
+    await Promise.all(output)
 
-    return this.notifyChanged(data)
-  }
-
-  protected collectFiles(data: ExpShowOutput) {
-    this.collectedFiles = collectFiles(data, this.collectedFiles)
+    return data
   }
 
   private async updateAvailableBranchesToSelect() {

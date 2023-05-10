@@ -496,7 +496,7 @@ describe('App', () => {
       ],
       rows: [
         {
-          branch: 'main',
+          branch: 'current',
           id: EXPERIMENT_WORKSPACE_ID,
           label: EXPERIMENT_WORKSPACE_ID,
           metrics: {
@@ -511,7 +511,7 @@ describe('App', () => {
           }
         },
         {
-          branch: 'main',
+          branch: 'current',
           id: 'main',
           label: 'main',
           metrics: {
@@ -1530,29 +1530,33 @@ describe('App', () => {
 
   describe('Show more commits', () => {
     it('should display a show more commits button if the table data hasMoreCommits is set to true', () => {
-      renderTable({ ...tableDataFixture, hasMoreCommits: { main: true } })
+      renderTable({ ...tableDataFixture, hasMoreCommits: { current: true } })
 
       expect(screen.getByText('Show More Commits')).toBeInTheDocument()
     })
 
     it('should not display a show more commits button if the table data hasMoreCommits is set to false', () => {
-      renderTable({ ...tableDataFixture, hasMoreCommits: { main: false } })
+      renderTable({ ...tableDataFixture, hasMoreCommits: { current: false } })
 
       expect(screen.queryByText('Show More Commits')).not.toBeInTheDocument()
     })
 
     it('should send a message to show more commits when the show more commits button is clicked', () => {
-      renderTable({ ...tableDataFixture, hasMoreCommits: { main: true } })
+      renderTable({ ...tableDataFixture, hasMoreCommits: { current: true } })
 
       fireEvent.click(screen.getByText('Show More Commits'))
 
       expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: 'current',
         type: MessageFromWebviewType.SHOW_MORE_COMMITS
       })
     })
 
     it('should display a show less commits button if the table data isShowingMoreCommits is set to true', () => {
-      renderTable({ ...tableDataFixture, isShowingMoreCommits: { main: true } })
+      renderTable({
+        ...tableDataFixture,
+        isShowingMoreCommits: { current: true }
+      })
 
       expect(screen.getByText('Show Less Commits')).toBeInTheDocument()
     })
@@ -1560,18 +1564,22 @@ describe('App', () => {
     it('should not display a show less commits button if the table data isShowingMoreCommits is set to false', () => {
       renderTable({
         ...tableDataFixture,
-        isShowingMoreCommits: { main: false }
+        isShowingMoreCommits: { current: false }
       })
 
       expect(screen.queryByText('Show Less Commits')).not.toBeInTheDocument()
     })
 
     it('should send a message to show less commits when the show less commits button is clicked', () => {
-      renderTable({ ...tableDataFixture, isShowingMoreCommits: { main: true } })
+      renderTable({
+        ...tableDataFixture,
+        isShowingMoreCommits: { current: true }
+      })
 
       fireEvent.click(screen.getByText('Show Less Commits'))
 
       expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: 'current',
         type: MessageFromWebviewType.SHOW_LESS_COMMITS
       })
     })

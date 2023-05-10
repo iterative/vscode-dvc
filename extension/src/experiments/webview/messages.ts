@@ -100,7 +100,7 @@ export class WebviewMessages {
 
   public sendWebviewMessage(doNotCheckNbCommits?: boolean) {
     if (!doNotCheckNbCommits) {
-      this.changeHasMoreOrLessCommits(true)
+      void this.changeHasMoreOrLessCommits(true)
     }
     const webview = this.getWebview()
     void webview?.show(this.getWebviewData())

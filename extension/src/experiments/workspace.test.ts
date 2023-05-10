@@ -759,9 +759,9 @@ describe('Experiments', () => {
       )
     })
 
-    it('should not display the current branch in the quick pick', async () => {
+    it('should display the current branch in the quick pick', async () => {
       const allBranches = [
-        '* WIP',
+        '* (HEAD detached at XXXX)',
         'main',
         'special-branch',
         'important-fix',
@@ -773,11 +773,17 @@ describe('Experiments', () => {
       await workspaceExperiments.selectBranches([])
 
       expect(mockedQuickPickManyValues).toHaveBeenCalledWith(
-        allBranches
-          .slice(1)
-          .map(branch =>
-            expect.objectContaining({ label: branch, value: branch })
-          ),
+        [
+          expect.objectContaining({
+            label: 'HEAD detached at XXXX',
+            value: 'HEAD detached at XXXX'
+          }),
+          ...allBranches
+            .slice(1)
+            .map(branch =>
+              expect.objectContaining({ label: branch, value: branch })
+            )
+        ],
         expect.anything()
       )
 
@@ -785,7 +791,7 @@ describe('Experiments', () => {
 
       const updatedAllBranches = [
         'main',
-        '* special-branch',
+        '* (special-branch)',
         'important-fix',
         'exp-best'
       ]
@@ -795,8 +801,12 @@ describe('Experiments', () => {
       await workspaceExperiments.selectBranches([])
 
       expect(mockedQuickPickManyValues).toHaveBeenCalledWith(
-        [...updatedAllBranches.slice(0, 1), ...updatedAllBranches.slice(2)].map(
-          branch => expect.objectContaining({ label: branch, value: branch })
+        [
+          ...updatedAllBranches.slice(0, 1),
+          'special-branch',
+          ...updatedAllBranches.slice(2)
+        ].map(branch =>
+          expect.objectContaining({ label: branch, value: branch })
         ),
         expect.anything()
       )

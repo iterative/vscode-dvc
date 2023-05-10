@@ -50,7 +50,7 @@ describe('limitToMaxSelected', () => {
       limitToMaxSelected([
         ...mockedExperiments,
         {
-          branch: 'main',
+          branch: 'current',
           id: '1',
           label: 'R',
           status: ExperimentStatus.RUNNING
