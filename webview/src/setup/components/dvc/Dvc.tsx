@@ -22,15 +22,9 @@ export const Dvc: React.FC = () => {
   const hasWebviewData = useSelector(
     (state: SetupState) => state.webview.hasData
   )
-  const {
-    canGitInitialize,
-    cliCompatible,
-    dvcCliDetails,
-    isPythonExtensionUsed,
-    needsGitInitialized,
-    projectInitialized,
-    pythonBinPath
-  } = useSelector((state: SetupState) => state.dvc)
+  const { cliCompatible, dvcCliDetails, projectInitialized } = useSelector(
+    (state: SetupState) => state.dvc
+  )
   const [isComplete, setIsComplete] = useState<boolean | null>(null)
   const previousIsComplete = usePrevious(isComplete)
 
@@ -59,12 +53,7 @@ export const Dvc: React.FC = () => {
     hasWebviewData
   ])
 
-  const children = dvcCliDetails && (
-    <DvcEnvDetails
-      {...dvcCliDetails}
-      isPythonExtensionUsed={isPythonExtensionUsed}
-    />
-  )
+  const children = dvcCliDetails && <DvcEnvDetails {...dvcCliDetails} />
 
   if (!hasWebviewData) {
     return <EmptyState isFullScreen={false}>Loading...</EmptyState>
@@ -80,11 +69,7 @@ export const Dvc: React.FC = () => {
 
   if (cliCompatible === undefined) {
     return (
-      <CliUnavailable
-        installDvc={installDvc}
-        pythonBinPath={pythonBinPath}
-        setupWorkspace={setupWorkspace}
-      >
+      <CliUnavailable installDvc={installDvc} setupWorkspace={setupWorkspace}>
         {children}
       </CliUnavailable>
     )
@@ -93,10 +78,8 @@ export const Dvc: React.FC = () => {
   if (!projectInitialized) {
     return (
       <ProjectUninitialized
-        canGitInitialize={canGitInitialize}
         initializeDvc={initializeDvc}
         initializeGit={initializeGit}
-        needsGitInitialized={needsGitInitialized}
       >
         {children}
       </ProjectUninitialized>
