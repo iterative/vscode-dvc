@@ -79,10 +79,10 @@ suite('Output Channel Test Suite', () => {
         command: 'some command',
         cwd,
         duration: 20,
+        errorOutput:
+          'THIS IS AN IMPOSSIBLE ERROR. THIS ERROR CANNOT OCCUR. IF THIS ERROR OCCURS, SEE YOUR IBM REPRESENTATIVE.',
         exitCode: -9,
-        pid: 12345,
-        stderr:
-          'THIS IS AN IMPOSSIBLE ERROR. THIS ERROR CANNOT OCCUR. IF THIS ERROR OCCURS, SEE YOUR IBM REPRESENTATIVE.'
+        pid: 12345
       })
 
       expect(mockOutputChannel).to.be.called
