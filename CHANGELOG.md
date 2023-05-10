@@ -2,16 +2,6 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.8.11] - 2023-05-10
-
-### 🚀 New Features and Enhancements
-
-- Update DVC Setup Version Details [#3850](https://github.com/iterative/vscode-dvc/pull/3850) by [@julieg18](https://github.com/julieg18)
-
-### 🔨 Maintenance
-
-- Update all webdriver packages [#3855](https://github.com/iterative/vscode-dvc/pull/3855) by [@mattseddon](https://github.com/mattseddon)
-
 ## [0.8.10] - 2023-05-09
 
 ### 🚀 New Features and Enhancements
