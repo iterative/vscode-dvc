@@ -1,12 +1,9 @@
-import {
-  DEFAULT_SECTION_COLLAPSED,
-  SetupSection
-} from 'dvc/src/setup/webview/contract'
+import { SetupSection } from 'dvc/src/setup/webview/contract'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { SectionContainer } from '../../shared/components/sectionContainer/SectionContainer'
 import { TooltipIconType } from '../../shared/components/sectionContainer/InfoTooltip'
-import { updateSectionCollapsed } from '../state/webviewSlice'
+import { toggleSectionCollapsed } from '../state/webviewSlice'
 import { SetupState } from '../store'
 
 const getTooltipIconType = (isSetup: boolean, isConnected = true) => {
@@ -24,9 +21,9 @@ export const SetupContainer: React.FC<{
   isSetup: boolean
   isConnected?: boolean
 }> = ({ children, sectionKey, title, isSetup, isConnected }) => {
-  const sectionCollapsed =
-    useSelector((state: SetupState) => state.webview.sectionCollapsed) ||
-    DEFAULT_SECTION_COLLAPSED
+  const sectionCollapsed = useSelector(
+    (state: SetupState) => state.webview.sectionCollapsed
+  )
   const dispatch = useDispatch()
 
   return (
@@ -35,14 +32,7 @@ export const SetupContainer: React.FC<{
       sectionKey={sectionKey}
       title={title}
       icon={getTooltipIconType(isSetup, isConnected)}
-      onToggleSection={() =>
-        dispatch(
-          updateSectionCollapsed({
-            ...sectionCollapsed,
-            [sectionKey]: !sectionCollapsed[sectionKey]
-          })
-        )
-      }
+      onToggleSection={() => dispatch(toggleSectionCollapsed(sectionKey))}
     >
       {children}
     </SectionContainer>

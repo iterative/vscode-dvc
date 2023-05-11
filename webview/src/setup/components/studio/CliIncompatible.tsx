@@ -1,6 +1,6 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import { STUDIO_URL } from 'dvc/src/setup/webview/contract'
+import { STUDIO_URL, SetupSection } from 'dvc/src/setup/webview/contract'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { Button } from '../../../shared/components/button/Button'
 import { updateSectionCollapsed } from '../../state/webviewSlice'
@@ -19,9 +19,9 @@ export const CliIncompatible: React.FC = () => {
         onClick={() =>
           dispatch(
             updateSectionCollapsed({
-              dvc: false,
-              experiments: true,
-              studio: true
+              [SetupSection.DVC]: false,
+              [SetupSection.EXPERIMENTS]: true,
+              [SetupSection.STUDIO]: true
             })
           )
         }

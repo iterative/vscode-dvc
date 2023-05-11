@@ -1,5 +1,6 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { SetupSection } from 'dvc/src/setup/webview/contract'
 import { NoData } from './NoData'
 import { NeedsGitCommit } from './NeedsGitCommit'
 import { showExperiments, showScmPanel } from '../messages'
@@ -29,9 +30,9 @@ export const Experiments: React.FC<ExperimentsProps> = ({ isDvcSetup }) => {
           onClick={() =>
             dispatch(
               updateSectionCollapsed({
-                dvc: false,
-                experiments: true,
-                studio: true
+                [SetupSection.DVC]: false,
+                [SetupSection.EXPERIMENTS]: true,
+                [SetupSection.STUDIO]: true
               })
             )
           }
