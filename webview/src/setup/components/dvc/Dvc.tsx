@@ -5,13 +5,6 @@ import { DvcEnvDetails } from './DvcEnvDetails'
 import { CliIncompatible } from './CliIncompatible'
 import { ProjectUninitialized } from './ProjectUninitialized'
 import { CliUnavailable } from './CliUnavailable'
-import {
-  checkCompatibility,
-  initializeDvc,
-  initializeGit,
-  installDvc,
-  setupWorkspace
-} from '../messages'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { usePrevious } from '../../hooks/usePrevious'
 import { updateSectionCollapsed } from '../../state/webviewSlice'
@@ -22,15 +15,9 @@ export const Dvc: React.FC = () => {
   const hasWebviewData = useSelector(
     (state: SetupState) => state.webview.hasData
   )
-  const {
-    canGitInitialize,
-    cliCompatible,
-    dvcCliDetails,
-    isPythonExtensionUsed,
-    needsGitInitialized,
-    projectInitialized,
-    pythonBinPath
-  } = useSelector((state: SetupState) => state.dvc)
+  const { cliCompatible, dvcCliDetails, projectInitialized } = useSelector(
+    (state: SetupState) => state.dvc
+  )
   const [isComplete, setIsComplete] = useState<boolean | null>(null)
   const previousIsComplete = usePrevious(isComplete)
 
@@ -59,48 +46,22 @@ export const Dvc: React.FC = () => {
     hasWebviewData
   ])
 
-  const children = dvcCliDetails && (
-    <DvcEnvDetails
-      {...dvcCliDetails}
-      isPythonExtensionUsed={isPythonExtensionUsed}
-    />
-  )
+  const children = dvcCliDetails && <DvcEnvDetails {...dvcCliDetails} />
 
   if (!hasWebviewData) {
     return <EmptyState isFullScreen={false}>Loading...</EmptyState>
   }
 
   if (cliCompatible === false) {
-    return (
-      <CliIncompatible checkCompatibility={checkCompatibility}>
-        {children}
-      </CliIncompatible>
-    )
+    return <CliIncompatible>{children}</CliIncompatible>
   }
 
   if (cliCompatible === undefined) {
-    return (
-      <CliUnavailable
-        installDvc={installDvc}
-        pythonBinPath={pythonBinPath}
-        setupWorkspace={setupWorkspace}
-      >
-        {children}
-      </CliUnavailable>
-    )
+    return <CliUnavailable>{children}</CliUnavailable>
   }
 
   if (!projectInitialized) {
-    return (
-      <ProjectUninitialized
-        canGitInitialize={canGitInitialize}
-        initializeDvc={initializeDvc}
-        initializeGit={initializeGit}
-        needsGitInitialized={needsGitInitialized}
-      >
-        {children}
-      </ProjectUninitialized>
-    )
+    return <ProjectUninitialized>{children}</ProjectUninitialized>
   }
   return (
     <EmptyState isFullScreen={false}>
