@@ -50,11 +50,11 @@ export const tableData: TableData = {
   hasCheckpoints: false,
   hasColumns: true,
   hasConfig: true,
-  hasMoreCommits: { main: true },
+  hasMoreCommits: { current: true },
   hasRunningWorkspaceExperiment: false,
   hasValidDvcYaml: true,
   isBranchesView: false,
-  isShowingMoreCommits: { main: true },
+  isShowingMoreCommits: { current: true },
   rows: [
     {
       branch: 'current',

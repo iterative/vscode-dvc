@@ -31,7 +31,7 @@ describe('sortExperiments', () => {
     ).toStrictEqual(unsortedRows)
   })
 
-  it('currenttains the same order if all items are equal with a single sort', () => {
+  it('Maintains the same order if all items are equal with a single sort', () => {
     const testData = [
       {
         ...irrelevantExperimentData,
@@ -81,7 +81,7 @@ describe('sortExperiments', () => {
     ).toStrictEqual([1, 2, 3])
   })
 
-  it('Should currenttain the same order if all items are equal in a multi-sort', () => {
+  it('Should maintain the same order if all items are equal in a multi-sort', () => {
     const testData = [
       {
         ...irrelevantExperimentData,

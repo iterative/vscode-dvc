@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import React from 'react'
 import { Provider } from 'react-redux'
 import type { StoryFn, Meta } from '@storybook/react'
-import rowsFicture from 'dvc/src/test/fixtures/expShow/base/rows'
+import rowsFixture from 'dvc/src/test/fixtures/expShow/base/rows'
 import columnsFixture from 'dvc/src/test/fixtures/expShow/base/columns'
 import workspaceChangesFixture from 'dvc/src/test/fixtures/expShow/base/workspaceChanges'
 import deeplyNestedTableData from 'dvc/src/test/fixtures/expShow/deeplyNested/tableData'
@@ -30,7 +30,6 @@ import {
   setExperimentsAsSelected,
   setExperimentsAsStarred
 } from '../test/tableDataFixture'
-import { featureFlag } from '../util/flags'
 
 const tableData: TableDataState = {
   branches: ['current'],
@@ -47,12 +46,12 @@ const tableData: TableDataState = {
   hasColumns: true,
   hasConfig: true,
   hasData: true,
-  hasMoreCommits: { main: true },
+  hasMoreCommits: { current: true },
   hasRunningWorkspaceExperiment: true,
   hasValidDvcYaml: true,
   isBranchesView: false,
-  isShowingMoreCommits: { main: true },
-  rows: addCommitDataToMainBranch(rowsFicture).map(row => ({
+  isShowingMoreCommits: { current: true },
+  rows: addCommitDataToMainBranch(rowsFixture).map(row => ({
     ...row,
     branch: 'current',
     subRows: row.subRows?.map(experiment => ({
@@ -71,7 +70,7 @@ const tableData: TableDataState = {
 const noRunningExperiments = {
   ...tableData,
   hasRunningExperiment: false,
-  rows: addCommitDataToMainBranch(rowsFicture).map(row => ({
+  rows: addCommitDataToMainBranch(rowsFixture).map(row => ({
     ...row,
     status: ExperimentStatus.SUCCESS,
     subRows: row.subRows?.map(experiment => ({
@@ -86,7 +85,7 @@ const noRunningExperiments = {
 const noRunningExperimentsNoCheckpoints = {
   ...noRunningExperiments,
   hasCheckpoints: false,
-  rows: addCommitDataToMainBranch(rowsFicture).map(row => ({
+  rows: addCommitDataToMainBranch(rowsFixture).map(row => ({
     ...row,
     status: ExperimentStatus.SUCCESS,
     subRows: row.subRows?.map(experiment => ({
@@ -223,7 +222,7 @@ LoadingData.args = { tableData: undefined }
 
 export const WithNoExperiments = Template.bind({})
 WithNoExperiments.args = {
-  tableData: { ...tableData, rows: [rowsFicture[0]] }
+  tableData: { ...tableData, rows: [rowsFixture[0]] }
 }
 
 export const WithNoColumns = Template.bind({})
@@ -292,7 +291,6 @@ export const WithMultipleBranches = Template.bind({})
 const rowsWithoutWorkspace = survivalTableData.rows.filter(
   row => row.id !== EXPERIMENT_WORKSPACE_ID
 )
-Object.assign(featureFlag, { ADD_REMOVE_BRANCHES: true })
 const branches = ['current', 'other-branch', 'branch-14786']
 
 WithMultipleBranches.args = {

@@ -13,11 +13,11 @@ const data: TableData = {
   hasCheckpoints: true,
   hasColumns: true,
   hasConfig: true,
-  hasMoreCommits: { main: true },
+  hasMoreCommits: { current: true },
   hasRunningWorkspaceExperiment: true,
   hasValidDvcYaml: true,
   isBranchesView: false,
-  isShowingMoreCommits: { main: true },
+  isShowingMoreCommits: { current: true },
   rows: rowsFixture,
   selectedForPlotsCount: 0,
   sorts: []

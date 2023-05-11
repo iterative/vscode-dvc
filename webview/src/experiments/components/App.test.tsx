@@ -54,14 +54,12 @@ import {
 import { clearSelection, createWindowTextSelection } from '../../test/selection'
 import { sendMessage } from '../../shared/vscode'
 import { setExperimentsAsStarred } from '../../test/tableDataFixture'
-import { featureFlag } from '../../util/flags'
 
 jest.mock('../../shared/api')
 jest.mock('../../util/styles')
 jest.mock('./overflowHoverTooltip/useIsFullyContained', () => ({
   useIsFullyContained: jest.fn()
 }))
-const mockedFeatureFlags = jest.mocked(featureFlag)
 const mockedUseIsFullyContained = jest.mocked(useIsFullyContained)
 
 const { postMessage } = vsCodeApi
@@ -1876,10 +1874,6 @@ describe('App', () => {
   })
 
   describe('Add / Remove branches', () => {
-    beforeEach(() => {
-      mockedFeatureFlags.ADD_REMOVE_BRANCHES = true
-    })
-
     it('should send a message to select branches when clicking the select branches button', () => {
       renderTable()
 
@@ -1898,26 +1892,6 @@ describe('App', () => {
       expect(mockPostMessage).not.toHaveBeenCalledWith({
         type: MessageFromWebviewType.SELECT_BRANCHES
       })
-    })
-  })
-
-  describe('Feature flags', () => {
-    it('should not show the add/remove branches buttons if the feature flag is off', () => {
-      mockedFeatureFlags.ADD_REMOVE_BRANCHES = false
-
-      renderTable()
-
-      expect(
-        screen.queryByText('Select Branch(es) to Show')
-      ).not.toBeInTheDocument()
-    })
-
-    it('should show the add/remove branches buttons if the feature flag is on', () => {
-      mockedFeatureFlags.ADD_REMOVE_BRANCHES = true
-
-      renderTable()
-
-      expect(screen.getByText('Select Branch(es) to Show')).toBeInTheDocument()
     })
   })
 })
