@@ -112,8 +112,6 @@ If you have added any icon (custom or from codicon), you will have to run
 `yarn svgr` or `yarn install` to ensure the icon is now available in the
 codebase.
 
-You should also add any added icon to `webview/src/stories/Icons.stories.tsx`.
-
 To use an icon, import it from `webview/src/shared/components/icons` (from the
 index file, not the file itself) and use it with the `<Icon />` component
 filling its `icon` prop with your imported icon.
