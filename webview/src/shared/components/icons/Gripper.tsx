@@ -1,7 +1,6 @@
 import * as React from 'react'
-import { SVGProps } from 'react'
-
-const SvgGripper = (props: SVGProps<SVGSVGElement>) => (
+import type { SVGProps } from 'react'
+const Gripper = (props: SVGProps<SVGSVGElement>) => (
   <svg
     width={16}
     height={16}
@@ -13,5 +12,4 @@ const SvgGripper = (props: SVGProps<SVGSVGElement>) => (
     <path d="M5 3h2v2H5zm0 4h2v2H5zm0 4h2v2H5zm4-8h2v2H9zm0 4h2v2H9zm0 4h2v2H9z" />
   </svg>
 )
-
-export default SvgGripper
+export default Gripper

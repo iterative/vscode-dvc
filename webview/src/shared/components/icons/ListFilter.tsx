@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { SVGProps } from 'react'
-const SvgListFilter = (props: SVGProps<SVGSVGElement>) => (
+import type { SVGProps } from 'react'
+const ListFilter = (props: SVGProps<SVGSVGElement>) => (
   <svg
     width={16}
     height={16}
@@ -12,4 +12,4 @@ const SvgListFilter = (props: SVGProps<SVGSVGElement>) => (
     <path d="M6 12v-1h4v1H6zM4 7h8v1H4V7zm10-4v1H2V3h12z" />
   </svg>
 )
-export default SvgListFilter
+export default ListFilter

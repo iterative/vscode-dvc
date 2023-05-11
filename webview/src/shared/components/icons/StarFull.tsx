@@ -1,7 +1,6 @@
 import * as React from 'react'
-import { SVGProps } from 'react'
-
-const SvgStarFull = (props: SVGProps<SVGSVGElement>) => (
+import type { SVGProps } from 'react'
+const StarFull = (props: SVGProps<SVGSVGElement>) => (
   <svg
     width={16}
     height={16}
@@ -17,5 +16,4 @@ const SvgStarFull = (props: SVGProps<SVGSVGElement>) => (
     />
   </svg>
 )
-
-export default SvgStarFull
+export default StarFull
