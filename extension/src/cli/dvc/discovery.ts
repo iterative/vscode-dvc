@@ -1,4 +1,3 @@
-import { LATEST_TESTED_CLI_VERSION } from './contract'
 import { CliCompatible, isVersionCompatible } from './version'
 import { IExtensionSetup } from '../../interfaces'
 import { Toast } from '../../vscode/toast'
@@ -34,12 +33,6 @@ const warnVersionIncompatible = (setup: IExtensionSetup): void => {
   void warnWithSetupAction(
     setup,
     'The extension cannot initialize because the DVC CLI version is incompatible.'
-  )
-}
-
-const warnAheadOfLatestTested = (): void => {
-  void Toast.warnWithOptions(
-    `The located DVC CLI is at least a minor version ahead of the latest version the extension was tested with (${LATEST_TESTED_CLI_VERSION}). This could lead to unexpected behaviour. Please upgrade to the most recent version of the extension and reload this window.`
   )
 }
 
@@ -79,9 +72,6 @@ const warnUser = (
       return
     case CliCompatible.NO_NOT_FOUND:
       void warnUserCLIInaccessible(setup)
-      return
-    case CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED:
-      return warnAheadOfLatestTested()
   }
 }
 
@@ -96,10 +86,7 @@ const isCliCompatible = (cliCompatible: CliCompatible): boolean | undefined => {
     return
   }
 
-  return [
-    CliCompatible.YES,
-    CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED
-  ].includes(cliCompatible)
+  return cliCompatible === CliCompatible.YES
 }
 
 const getVersionDetails = async (

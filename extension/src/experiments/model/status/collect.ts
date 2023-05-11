@@ -293,7 +293,9 @@ const getMostRecentExperiment = (
   coloredStatus: ColoredStatus
 ): Experiment | undefined =>
   experiments
-    .filter(({ id }) => coloredStatus[id] === undefined)
+    .filter(
+      ({ id, status }) => coloredStatus[id] === undefined && !isQueued(status)
+    )
     .sort(({ Created: aCreated }, { Created: bCreated }) => {
       if (!aCreated) {
         return 1

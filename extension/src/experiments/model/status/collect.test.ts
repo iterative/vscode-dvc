@@ -356,11 +356,16 @@ describe('collectFinishedRunningExperiments', () => {
     expect(finishedRunning).toStrictEqual({})
   })
 
-  it('should return the most recently created and unseen (without a status) experiment if there is no longer an experiment running in the workspace', () => {
+  it('should return the most recently created and unseen and unqueued (without a status) experiment if there is no longer an experiment running in the workspace', () => {
     const latestCreatedId = 'exp-123'
     const finishedRunning = collectFinishedRunningExperiments(
       {},
       [
+        {
+          Created: '2023-12-01T10:48:24',
+          id: 'exp-queued',
+          status: ExperimentStatus.QUEUED
+        },
         { Created: '2022-12-02T10:48:24', id: 'exp-456' },
         { Created: '2022-10-02T07:48:24', id: 'exp-789' },
         { Created: '2022-12-02T07:48:25', id: latestCreatedId },

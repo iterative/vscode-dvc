@@ -5,7 +5,7 @@ import {
 } from '../../cli/dvc/constants'
 import { getPidFromFile } from '../../fileSystem'
 
-const collectDvcRootPids = async (
+export const collectDvcRootPids = async (
   acc: Set<number>,
   dvcRoot: string
 ): Promise<void> => {

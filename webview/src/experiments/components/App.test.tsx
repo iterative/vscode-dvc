@@ -18,7 +18,7 @@ import {
 } from 'dvc/src/experiments/webview/contract'
 import { buildMetricOrParamPath } from 'dvc/src/experiments/columns/paths'
 import dataTypesTableFixture from 'dvc/src/test/fixtures/expShow/dataTypes/tableData'
-import { EXPERIMENT_WORKSPACE_ID, Executor } from 'dvc/src/cli/dvc/contract'
+import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { useIsFullyContained } from './overflowHoverTooltip/useIsFullyContained'
 import styles from './table/styles.module.scss'
 import { vsCodeApi } from '../../shared/api'
@@ -1144,8 +1144,8 @@ describe('App', () => {
       stopOption && fireEvent.click(stopOption)
 
       expect(sendMessage).toHaveBeenCalledWith({
-        payload: [{ executor: Executor.DVC_TASK, id: 'exp-e7a67' }],
-        type: MessageFromWebviewType.STOP_EXPERIMENT
+        payload: ['exp-e7a67'],
+        type: MessageFromWebviewType.STOP_EXPERIMENTS
       })
     })
 
@@ -1175,7 +1175,7 @@ describe('App', () => {
 
       expect(sendMessage).toHaveBeenCalledWith({
         payload: ['exp-e7a67', 'exp-83425'],
-        type: MessageFromWebviewType.STOP_EXPERIMENT
+        type: MessageFromWebviewType.STOP_EXPERIMENTS
       })
     })
 
@@ -1218,10 +1218,8 @@ describe('App', () => {
       stopOption && fireEvent.click(stopOption)
 
       expect(sendMessage).toHaveBeenCalledWith({
-        payload: [
-          { executor: Executor.WORKSPACE, id: EXPERIMENT_WORKSPACE_ID }
-        ],
-        type: MessageFromWebviewType.STOP_EXPERIMENT
+        payload: [EXPERIMENT_WORKSPACE_ID],
+        type: MessageFromWebviewType.STOP_EXPERIMENTS
       })
     })
 
