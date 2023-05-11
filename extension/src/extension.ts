@@ -304,11 +304,10 @@ class Extension extends Disposable {
 
 let extension: undefined | Extension
 
-export function activate(context: ExtensionContext): void {
-  void esmModulesImported.then(() => {
-    extension = new Extension(context)
-    context.subscriptions.push(extension)
-  })
+export async function activate(context: ExtensionContext): Promise<void> {
+  await esmModulesImported
+  extension = new Extension(context)
+  context.subscriptions.push(extension)
 }
 
 export function deactivate(): void {
