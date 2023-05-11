@@ -1,10 +1,10 @@
-import {
-  DEFAULT_SECTION_COLLAPSED,
-  SetupSection
-} from 'dvc/src/setup/webview/contract'
+import { SetupSection } from 'dvc/src/setup/webview/contract'
 import React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { SectionContainer } from '../../shared/components/sectionContainer/SectionContainer'
 import { TooltipIconType } from '../../shared/components/sectionContainer/InfoTooltip'
+import { toggleSectionCollapsed } from '../state/webviewSlice'
+import { SetupState } from '../store'
 
 const getTooltipIconType = (isSetup: boolean, isConnected = true) => {
   if (!isSetup) {
@@ -16,33 +16,25 @@ const getTooltipIconType = (isSetup: boolean, isConnected = true) => {
 
 export const SetupContainer: React.FC<{
   children: React.ReactNode
-  sectionCollapsed: typeof DEFAULT_SECTION_COLLAPSED
   sectionKey: SetupSection
-  setSectionCollapsed: (value: typeof DEFAULT_SECTION_COLLAPSED) => void
   title: string
   isSetup: boolean
   isConnected?: boolean
-}> = ({
-  children,
-  sectionCollapsed,
-  sectionKey,
-  setSectionCollapsed,
-  title,
-  isSetup,
-  isConnected
-}) => (
-  <SectionContainer
-    sectionCollapsed={sectionCollapsed[sectionKey]}
-    sectionKey={sectionKey}
-    title={title}
-    icon={getTooltipIconType(isSetup, isConnected)}
-    onToggleSection={() =>
-      setSectionCollapsed({
-        ...sectionCollapsed,
-        [sectionKey]: !sectionCollapsed[sectionKey]
-      })
-    }
-  >
-    {children}
-  </SectionContainer>
-)
+}> = ({ children, sectionKey, title, isSetup, isConnected }) => {
+  const sectionCollapsed = useSelector(
+    (state: SetupState) => state.webview.sectionCollapsed
+  )
+  const dispatch = useDispatch()
+
+  return (
+    <SectionContainer
+      sectionCollapsed={sectionCollapsed[sectionKey]}
+      sectionKey={sectionKey}
+      title={title}
+      icon={getTooltipIconType(isSetup, isConnected)}
+      onToggleSection={() => dispatch(toggleSectionCollapsed(sectionKey))}
+    >
+      {children}
+    </SectionContainer>
+  )
+}

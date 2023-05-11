@@ -1,6 +1,6 @@
 import React from 'react'
-import { EmptyState } from '../../shared/components/emptyState/EmptyState'
-import { Button } from '../../shared/components/button/Button'
+import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
+import { Button } from '../../../shared/components/button/Button'
 
 type NeedsGitCommitProps = { showScmPanel: () => void }
 
