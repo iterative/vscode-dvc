@@ -6,8 +6,8 @@ import {
 } from 'dvc/src/setup/webview/contract'
 
 export type WebviewState = {
-  sectionCollapsed: SectionCollapsed
   hasData: boolean
+  sectionCollapsed: SectionCollapsed
 }
 
 export const webviewInitialState: WebviewState = {
