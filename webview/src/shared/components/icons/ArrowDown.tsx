@@ -16,4 +16,5 @@ const ArrowDown = (props: SVGProps<SVGSVGElement>) => (
     />
   </svg>
 )
+
 export default ArrowDown

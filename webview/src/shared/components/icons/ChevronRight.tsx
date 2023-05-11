@@ -1,7 +1,6 @@
 import * as React from 'react'
 import type { SVGProps } from 'react'
 const ChevronRight = (props: SVGProps<SVGSVGElement>) => (
-  <svg
     width={16}
     height={16}
     viewBox="0 0 16 16"
