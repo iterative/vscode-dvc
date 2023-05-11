@@ -19,7 +19,10 @@ import {
   InternalCommands
 } from '../../../../commands/internal'
 import { buildExperimentsData } from '../util'
-import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../../../cli/dvc/constants'
+import {
+  DEFAULT_NUM_OF_COMMITS_TO_SHOW,
+  ExperimentFlag
+} from '../../../../cli/dvc/constants'
 import { EXPERIMENTS_GIT_LOGS_REFS } from '../../../../experiments/data/constants'
 import { gitPath } from '../../../../cli/git/constants'
 import * as FileSystem from '../../../../fileSystem'
@@ -181,6 +184,51 @@ suite('Experiments Data Test Suite', () => {
       await dataUpdatedEvent
 
       expect(managedUpdateSpy).to.be.called
+    })
+
+    it('should return the output from all branches if isBranchView', async () => {
+      const { data, mockExpShow, mockGetIsBranchView } =
+        buildExperimentsData(disposable)
+      mockGetIsBranchView.returns(true)
+
+      await data.update()
+
+      expect(mockExpShow).to.be.calledWith(
+        dvcDemoPath,
+        ExperimentFlag.ALL_BRANCHES
+      )
+    })
+
+    it('should call exp show for each branch to show', async () => {
+      stub(ExperimentsData.prototype, 'managedUpdate').resolves()
+      const branchesToShow = [
+        'current',
+        'my-other-branch',
+        'secret-branch',
+        'old-branch'
+      ]
+      const { data, mockExpShow, mockGetBranchesToShow } =
+        buildExperimentsData(disposable)
+
+      mockGetBranchesToShow.returns(branchesToShow)
+
+      await data.update()
+
+      expect(mockExpShow).to.have.callCount(branchesToShow.length)
+    })
+
+    it('should add the current branch to the exp show output', async () => {
+      stub(ExperimentsData.prototype, 'managedUpdate').resolves()
+      const { data, mockExpShow, mockGetBranchesToShow } = buildExperimentsData(
+        disposable,
+        'branch-283498'
+      )
+
+      mockGetBranchesToShow.returns(['current'])
+
+      await data.update()
+
+      expect(mockExpShow).to.have.callCount(2)
     })
   })
 })

@@ -105,10 +105,13 @@ export class GitReader extends GitCli {
     const options = getOptions(cwd, Command.BRANCH)
     try {
       const branches = await this.executeProcess(options)
-      return trimAndSplit(branches)[0]
-        .replace('* (', '')
-        .replace(')', '')
-        .replace('HEAD detached at ', '')
+      return (
+        trimAndSplit(branches)
+          .find(branch => branch.indexOf('*') === 0)
+          ?.replace('* ', '')
+          .replace('(HEAD detached at ', '')
+          .replace(')', '') || ''
+      )
     } catch {
       return ''
     }

@@ -147,23 +147,36 @@ const buildExperimentsDataDependencies = (disposer: Disposer) => {
   return { internalCommands, mockCreateFileSystemWatcher, mockExpShow }
 }
 
-export const buildExperimentsData = (disposer: SafeWatcherDisposer) => {
-  stub(GitReader.prototype, 'getCurrentBranch').resolves('current')
+export const buildExperimentsData = (
+  disposer: SafeWatcherDisposer,
+  currentBranch = 'current'
+) => {
+  stub(GitReader.prototype, 'getCurrentBranch').resolves(currentBranch)
+
   const { internalCommands, mockExpShow, mockCreateFileSystemWatcher } =
     buildExperimentsDataDependencies(disposer)
 
+  const mockGetIsBranchView = stub().returns(false)
+  const mockGetBranchesToShow = stub().returns(['current'])
   const data = disposer.track(
     new ExperimentsData(dvcDemoPath, internalCommands, {
-      getBranchesToShow: () => ['current'],
-      getIsBranchesView: () => false,
+      getBranchesToShow: mockGetBranchesToShow,
+      getIsBranchesView: mockGetIsBranchView,
       getNbOfCommitsToShow: () => ({
         current: DEFAULT_NUM_OF_COMMITS_TO_SHOW
       }),
-      setAvailableBranchesToShow: stub()
+      setAvailableBranchesToShow: stub(),
+      setBranchesToShow: stub()
     } as unknown as ExperimentsModel)
   )
 
-  return { data, mockCreateFileSystemWatcher, mockExpShow }
+  return {
+    data,
+    mockCreateFileSystemWatcher,
+    mockExpShow,
+    mockGetBranchesToShow,
+    mockGetIsBranchView
+  }
 }
 
 export const stubWorkspaceExperimentsGetters = (
