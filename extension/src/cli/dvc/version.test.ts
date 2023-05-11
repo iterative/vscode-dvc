@@ -91,22 +91,14 @@ describe('isVersionCompatible', () => {
     expect(isCompatible).toStrictEqual(CliCompatible.YES)
   })
 
-  it('should return not found if the version provided is undefined', () => {
-    const isCompatible = isVersionCompatible(undefined)
-
-    expect(isCompatible).toStrictEqual(CliCompatible.NO_NOT_FOUND)
-  })
-
-  it('should return minor version ahead of tested for a version with a minor higher as the latest tested minor and any patch', () => {
+  it('should be compatible for a version with a minor higher as the latest tested minor and any patch', () => {
     expect(0).toBeLessThan(latestTestedPatch)
 
     let isCompatible = isVersionCompatible(
       [latestTestedMajor, latestTestedMinor + 1, 0].join('.')
     )
 
-    expect(isCompatible).toStrictEqual(
-      CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED
-    )
+    expect(isCompatible).toStrictEqual(CliCompatible.YES)
 
     isCompatible = isVersionCompatible(
       [latestTestedMajor, latestTestedMinor + 1, latestTestedPatch + 1000].join(
@@ -114,17 +106,19 @@ describe('isVersionCompatible', () => {
       )
     )
 
-    expect(isCompatible).toStrictEqual(
-      CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED
-    )
+    expect(isCompatible).toStrictEqual(CliCompatible.YES)
 
     isCompatible = isVersionCompatible(
       [latestTestedMajor, latestTestedMinor + 1, latestTestedPatch].join('.')
     )
 
-    expect(isCompatible).toStrictEqual(
-      CliCompatible.YES_MINOR_VERSION_AHEAD_OF_TESTED
-    )
+    expect(isCompatible).toStrictEqual(CliCompatible.YES)
+  })
+
+  it('should return not found if the version provided is undefined', () => {
+    const isCompatible = isVersionCompatible(undefined)
+
+    expect(isCompatible).toStrictEqual(CliCompatible.NO_NOT_FOUND)
   })
 
   it('should return behind incompatible if the provided version is a patch version before the minimum expected version', () => {

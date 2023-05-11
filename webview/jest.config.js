@@ -1,15 +1,13 @@
 /* global module */
 
 module.exports = {
-  collectCoverageFrom: [
-    'src/**/*.{ts,tsx}',
-    '!**/*.test.*',
-    '!src/stories/**/*.{ts,tsx}',
-    '!src/test/*',
-    '!src/shared/components/icons/*',
-    '!src/util/wdyr.ts'
-  ],
   coverageDirectory: 'coverage/jest',
+  coveragePathIgnorePatterns: [
+    '<rootDir>/src/test/',
+    '/node_modules/',
+    '<rootDir>/src/stories/',
+    '<rootDir>/src/util/wdyr.ts'
+  ],
   coverageReporters: ['json'],
   globals: {
     __webpack_public_path__: true

@@ -1,23 +1,29 @@
-import { join } from 'path'
-import { EXP_RWLOCK_FILE } from '../../cli/dvc/constants'
-import { getPidFromFile } from '../../fileSystem'
-import { Toast } from '../../vscode/toast'
+import { collectDvcRootPids } from './collect'
 import { processExists, stopProcesses } from '../../process/execution'
 
-export const stopWorkspaceExperiment = async (dvcRoot: string) => {
-  const pid = await getPidFromFile(join(dvcRoot, EXP_RWLOCK_FILE))
-  if (!pid) {
-    return
-  }
-  if (!(await processExists(pid))) {
-    return
+export const stopWorkspaceExperiment = async (dvcRoot: string, id: string) => {
+  const pids = new Set<number>()
+
+  await collectDvcRootPids(pids, dvcRoot)
+
+  const notFound = `process executing ${id} was not found.`
+
+  if (pids.size === 0) {
+    return notFound
   }
 
-  void Toast.showOutput(
-    stopProcesses([pid]).then(stopped =>
-      stopped
-        ? 'The experiment running in the workspace was stopped.'
-        : 'Failed to stop the experiment running in the workspace.'
-    )
-  )
+  const [pid] = [...pids]
+
+  if (!pid || !(await processExists(pid))) {
+    return notFound
+  }
+
+  const failedToStop = `failed to kill ${id}.`
+
+  try {
+    const stopped = await stopProcesses([pid])
+    return stopped ? `${id} has been killed.` : failedToStop
+  } catch {
+    return failedToStop
+  }
 }

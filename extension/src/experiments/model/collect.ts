@@ -10,7 +10,8 @@ import {
   Experiment,
   CommitData,
   RunningExperiment,
-  isQueued
+  isQueued,
+  isRunning
 } from '../webview/contract'
 import {
   EXPERIMENT_WORKSPACE_ID,
@@ -205,7 +206,6 @@ const getExecutor = (experiment: Experiment): Executor => {
 }
 
 const collectExecutorInfo = (
-  acc: ExperimentsAccumulator,
   experiment: Experiment,
   executor: ExecutorState
 ): void => {
@@ -221,13 +221,19 @@ const collectExecutorInfo = (
   if (state && state !== ExperimentStatus.SUCCESS) {
     experiment.status = state
   }
+}
 
-  if (experiment.status === ExperimentStatus.RUNNING) {
-    acc.runningExperiments.push({
-      executor: getExecutor(experiment),
-      id: experiment.id
-    })
+const collectRunningExperiment = (
+  acc: ExperimentsAccumulator,
+  experiment: Experiment
+): void => {
+  if (!isRunning(experiment.status)) {
+    return
   }
+  acc.runningExperiments.push({
+    executor: getExecutor(experiment),
+    id: experiment.id
+  })
 }
 
 const collectExpRange = (
@@ -261,7 +267,8 @@ const collectExpRange = (
     experiment.description = `[${name}]`
   }
 
-  collectExecutorInfo(acc, experiment, executor)
+  collectExecutorInfo(experiment, executor)
+  collectRunningExperiment(acc, experiment)
 
   addToMapArray(acc.experimentsByCommit, baseline.id, experiment)
 }
@@ -401,4 +408,34 @@ export const collectOrderedCommitsAndExperiments = (
     collectExperimentsAndCommit(acc, commit, getExperimentsByCommit(commit))
   }
   return acc
+}
+
+export const collectRunningInQueue = (
+  ids: Set<string>,
+  runningExperiments: RunningExperiment[]
+): string[] | undefined => {
+  const runningInQueueIds = new Set<string>()
+  for (const { executor, id } of runningExperiments) {
+    if (!ids.has(id)) {
+      continue
+    }
+    if (executor === Executor.DVC_TASK) {
+      runningInQueueIds.add(id)
+    }
+  }
+  return runningInQueueIds.size > 0 ? [...runningInQueueIds] : undefined
+}
+
+export const collectRunningInWorkspace = (
+  ids: Set<string>,
+  runningExperiments: RunningExperiment[]
+): string | undefined => {
+  for (const { executor, id } of runningExperiments) {
+    if (!ids.has(id)) {
+      continue
+    }
+    if (executor === EXPERIMENT_WORKSPACE_ID) {
+      return id
+    }
+  }
 }

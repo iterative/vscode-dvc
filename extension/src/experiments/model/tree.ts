@@ -124,29 +124,10 @@ export class ExperimentsTree
   }
 
   private registerWorkaroundCommands() {
-    const callCommandWithSelected = async (
-      command:
-        | RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE
-        | RegisteredCliCommands.EXPERIMENT_VIEW_PUSH,
-      experimentItem: ExperimentItem | string,
-      types: ExperimentType[]
-    ) => {
-      const selected = [
-        ...this.getSelectedExperimentItems(),
-        experimentItem
-      ] as (string | ExperimentItem)[]
-
-      const acc = collectExperimentType(selected, new Set(types))
-
-      for (const [dvcRoot, ids] of Object.entries(acc)) {
-        await commands.executeCommand(command, { dvcRoot, ids: [...ids] })
-      }
-    }
-
     commands.registerCommand(
       'dvc.views.experimentsTree.removeExperiment',
       (experimentItem: ExperimentItem) =>
-        callCommandWithSelected(
+        this.callCommandWithSelected(
           RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE,
           experimentItem,
           [ExperimentType.EXPERIMENT, ExperimentType.QUEUED]
@@ -156,12 +137,42 @@ export class ExperimentsTree
     commands.registerCommand(
       'dvc.views.experimentsTree.pushExperiment',
       (experimentItem: ExperimentItem) =>
-        callCommandWithSelected(
+        this.callCommandWithSelected(
           RegisteredCliCommands.EXPERIMENT_VIEW_PUSH,
           experimentItem,
           [ExperimentType.EXPERIMENT]
         )
     )
+
+    commands.registerCommand(
+      'dvc.views.experimentsTree.stopExperiment',
+      (experimentItem: ExperimentItem) =>
+        this.callCommandWithSelected(
+          RegisteredCommands.EXPERIMENT_VIEW_STOP,
+          experimentItem,
+          [ExperimentType.RUNNING]
+        )
+    )
+  }
+
+  private async callCommandWithSelected(
+    command:
+      | RegisteredCliCommands.EXPERIMENT_VIEW_REMOVE
+      | RegisteredCliCommands.EXPERIMENT_VIEW_PUSH
+      | RegisteredCommands.EXPERIMENT_VIEW_STOP,
+    experimentItem: ExperimentItem | string,
+    types: ExperimentType[]
+  ) {
+    const selected = [...this.getSelectedExperimentItems(), experimentItem] as (
+      | string
+      | ExperimentItem
+    )[]
+
+    const acc = collectExperimentType(selected, new Set(types))
+
+    for (const [dvcRoot, ids] of Object.entries(acc)) {
+      await commands.executeCommand(command, { dvcRoot, ids: [...ids] })
+    }
   }
 
   private async getRootElements() {

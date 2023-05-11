@@ -64,7 +64,7 @@
     "postcss": "8.4.23",
     "prettier": "2.8.8",
     "prettier-config-standard": "5.0.0",
-    "stylelint": "15.6.0",
+    "stylelint": "15.6.1",
     "stylelint-config-standard-scss": "9.0.0",
     "ts-node": "10.9.1",
     "turbo": "1.9.3",
@@ -72,7 +72,7 @@
   },
   "resolutions": {
     "decode-uri-component": "0.2.2",
-    "@types/react": "18.2.0",
+    "@types/react": "18.2.4",
     "**/recursive-readdir/minimatch": "6.2.0",
     "fastify": "3.29.5",
     "json5": "2.2.3",

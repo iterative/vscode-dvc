@@ -1,15 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { DvcCliDetails, SetupData } from 'dvc/src/setup/webview/contract'
 
-export type DvcState = Pick<
+export type DvcState = Omit<
   SetupData,
-  | 'canGitInitialize'
-  | 'cliCompatible'
-  | 'dvcCliDetails'
-  | 'isPythonExtensionUsed'
-  | 'projectInitialized'
-  | 'needsGitInitialized'
-  | 'pythonBinPath'
+  | 'hasData'
+  | 'isStudioConnected'
+  | 'needsGitCommit'
+  | 'sectionCollapsed'
+  | 'shareLiveToStudio'
 >
 
 export const dvcInitialState: DvcState = {

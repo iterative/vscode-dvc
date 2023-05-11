@@ -5,7 +5,10 @@ import {
   MessageFromWebviewType,
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
-import { MAX_CLI_VERSION, MIN_CLI_VERSION } from 'dvc/src/cli/dvc/contract'
+import {
+  LATEST_TESTED_CLI_VERSION,
+  MIN_CLI_VERSION
+} from 'dvc/src/cli/dvc/contract'
 import '@testing-library/jest-dom/extend-expect'
 import React from 'react'
 import { SetupSection, SetupData } from 'dvc/src/setup/webview/contract'
@@ -503,7 +506,7 @@ describe('App', () => {
       expect(studioDetails).toHaveAttribute('open')
     })
 
-    it('should show the user the version if dvc is installed', () => {
+    it('should show the user the version, min version, and latested tested version if dvc is installed', () => {
       renderApp({
         canGitInitialize: false,
         cliCompatible: true,
@@ -523,10 +526,10 @@ describe('App', () => {
       })
 
       const envDetails = screen.getByTestId('dvc-env-details')
-      const command = `1.0.0 (${MIN_CLI_VERSION} <= required < ${MAX_CLI_VERSION}.0.0)`
+      const firstVersionLine = `1.0.0 (required ${MIN_CLI_VERSION} and above, tested with ${LATEST_TESTED_CLI_VERSION})`
 
       expect(within(envDetails).getByText('Version')).toBeInTheDocument()
-      expect(within(envDetails).getByText(command)).toBeInTheDocument()
+      expect(within(envDetails).getByText(firstVersionLine)).toBeInTheDocument()
     })
 
     it('should tell the user that version is not found if dvc is not installed', () => {
@@ -548,10 +551,10 @@ describe('App', () => {
         shareLiveToStudio: false
       })
       const envDetails = screen.getByTestId('dvc-env-details')
-      const command = `Not found (${MIN_CLI_VERSION} <= required < ${MAX_CLI_VERSION}.0.0)`
+      const version = `Not found (required ${MIN_CLI_VERSION} and above, tested with ${LATEST_TESTED_CLI_VERSION})`
 
       expect(within(envDetails).getByText('Version')).toBeInTheDocument()
-      expect(within(envDetails).getByText(command)).toBeInTheDocument()
+      expect(within(envDetails).getByText(version)).toBeInTheDocument()
     })
 
     it('should show the user an example command if dvc is installed', () => {

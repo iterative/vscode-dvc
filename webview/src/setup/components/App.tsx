@@ -11,7 +11,7 @@ import { Studio } from './studio/Studio'
 import { SetupContainer } from './SetupContainer'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 import { sendMessage } from '../../shared/vscode'
-import { SetupState } from '../store'
+import { SetupDispatch, SetupState } from '../store'
 import {
   updateSectionCollapsed,
   updateHasData as updateWebviewHasData
@@ -34,6 +34,58 @@ import {
   updateNeedsGitCommit
 } from '../state/experimentsSlice'
 
+const feedStore = (
+  data: MessageToWebview<SetupData>,
+  dispatch: SetupDispatch
+) => {
+  if (!data?.data) {
+    return
+  }
+  dispatch(updateWebviewHasData())
+  for (const key of Object.keys(data.data)) {
+    switch (key) {
+      case 'canGitInitialize':
+        dispatch(updateCanGitInitalized(data.data.canGitInitialize))
+        continue
+      case 'cliCompatible':
+        dispatch(updateCliCompatible(data.data.cliCompatible))
+        continue
+      case 'dvcCliDetails':
+        dispatch(updateDvcCliDetails(data.data.dvcCliDetails))
+        continue
+      case 'hasData':
+        dispatch(updateExperimentsHasData(data.data.hasData))
+        continue
+      case 'isPythonExtensionUsed':
+        dispatch(updateIsPythonExtensionUsed(data.data.isPythonExtensionUsed))
+        continue
+      case 'isStudioConnected':
+        dispatch(updateIsStudioConnected(data.data.isStudioConnected))
+        continue
+      case 'needsGitCommit':
+        dispatch(updateNeedsGitCommit(data.data.needsGitCommit))
+        continue
+      case 'needsGitInitialized':
+        dispatch(updateNeedsGitInitialized(data.data.needsGitInitialized))
+        continue
+      case 'projectInitialized':
+        dispatch(updateProjectInitialized(data.data.projectInitialized))
+        continue
+      case 'pythonBinPath':
+        dispatch(updatePythonBinPath(data.data.pythonBinPath))
+        continue
+      case 'sectionCollapsed':
+        dispatch(updateSectionCollapsed(data.data.sectionCollapsed))
+        continue
+      case 'shareLiveToStudio':
+        dispatch(updateShareLiveToStudio(data.data.shareLiveToStudio))
+        continue
+      default:
+        continue
+    }
+  }
+}
+
 export const App: React.FC = () => {
   const { projectInitialized, cliCompatible } = useSelector(
     (state: SetupState) => state.dvc
@@ -50,54 +102,7 @@ export const App: React.FC = () => {
   useVsCodeMessaging(
     useCallback(
       ({ data }: { data: MessageToWebview<SetupData> }) => {
-        if (!data?.data) {
-          return
-        }
-        dispatch(updateWebviewHasData())
-        for (const key of Object.keys(data.data)) {
-          switch (key) {
-            case 'canGitInitialize':
-              dispatch(updateCanGitInitalized(data.data.canGitInitialize))
-              continue
-            case 'cliCompatible':
-              dispatch(updateCliCompatible(data.data.cliCompatible))
-              continue
-            case 'dvcCliDetails':
-              dispatch(updateDvcCliDetails(data.data.dvcCliDetails))
-              continue
-            case 'hasData':
-              dispatch(updateExperimentsHasData(data.data.hasData))
-              continue
-            case 'isPythonExtensionUsed':
-              dispatch(
-                updateIsPythonExtensionUsed(data.data.isPythonExtensionUsed)
-              )
-              continue
-            case 'isStudioConnected':
-              dispatch(updateIsStudioConnected(data.data.isStudioConnected))
-              continue
-            case 'needsGitCommit':
-              dispatch(updateNeedsGitCommit(data.data.needsGitCommit))
-              continue
-            case 'needsGitInitialized':
-              dispatch(updateNeedsGitInitialized(data.data.needsGitInitialized))
-              continue
-            case 'projectInitialized':
-              dispatch(updateProjectInitialized(data.data.projectInitialized))
-              continue
-            case 'pythonBinPath':
-              dispatch(updatePythonBinPath(data.data.pythonBinPath))
-              continue
-            case 'sectionCollapsed':
-              dispatch(updateSectionCollapsed(data.data.sectionCollapsed))
-              continue
-            case 'shareLiveToStudio':
-              dispatch(updateShareLiveToStudio(data.data.shareLiveToStudio))
-              continue
-            default:
-              continue
-          }
-        }
+        feedStore(data, dispatch)
       },
       [dispatch]
     )

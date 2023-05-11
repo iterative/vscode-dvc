@@ -579,7 +579,7 @@ const data: ExpShowOutput = [
         ],
         executor: {
           name: Executor.WORKSPACE,
-          local: null,
+          local: { pid: 1234, root: null, log: null, returncode: null },
           state: ExperimentStatus.RUNNING
         }
       },
