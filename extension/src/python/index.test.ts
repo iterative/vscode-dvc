@@ -1,10 +1,11 @@
 import { join } from 'path'
-import { setupVenv } from '.'
+import { setupTestVenv } from '.'
 import { Process, createProcess } from '../process/execution'
 import { getProcessPlatform } from '../env'
 
 jest.mock('../env')
 jest.mock('../process/execution')
+jest.mock('../util/esm')
 
 const mockedGetProcessPlatform = jest.mocked(getProcessPlatform)
 const mockedCreateProcess = jest.mocked(createProcess)
@@ -16,7 +17,7 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-describe('setupVenv', () => {
+describe('setupTestVenv', () => {
   it('should create the correct python processes on sane operating systems', async () => {
     mockedCreateProcess.mockResolvedValue(mockedProcess)
     mockedGetProcessPlatform.mockReturnValue('freebsd')
@@ -24,7 +25,7 @@ describe('setupVenv', () => {
     const envDir = '.env'
     const cwd = __dirname
 
-    await setupVenv(__dirname, envDir, 'dvc')
+    await setupTestVenv(__dirname, envDir, 'dvc')
 
     expect(mockedCreateProcess).toHaveBeenCalledTimes(3)
     expect(mockedCreateProcess).toHaveBeenCalledWith({
@@ -53,7 +54,7 @@ describe('setupVenv', () => {
     const envDir = '.env'
     const cwd = __dirname
 
-    await setupVenv(__dirname, envDir, '-r', 'requirements.txt')
+    await setupTestVenv(__dirname, envDir, '-r', 'requirements.txt')
 
     expect(mockedCreateProcess).toHaveBeenCalledTimes(3)
     expect(mockedCreateProcess).toHaveBeenCalledWith({

@@ -2,10 +2,9 @@ import { ChildProcess } from 'child_process'
 import { Readable } from 'stream'
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import execa from 'execa'
-import doesProcessExists from 'process-exists'
 import kill from 'tree-kill'
 import { getProcessPlatform } from '../env'
+import { doesProcessExist, execa } from '../util/esm'
 
 interface RunningProcess extends ChildProcess {
   all?: Readable
@@ -86,7 +85,7 @@ export const executeProcess = async (
 }
 
 export const processExists = (pid: number): Promise<boolean> =>
-  doesProcessExists(pid)
+  doesProcessExist(pid)
 
 export const stopProcesses = async (pids: number[]): Promise<boolean> => {
   let allKilled = true
