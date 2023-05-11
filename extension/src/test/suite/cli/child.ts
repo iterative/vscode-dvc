@@ -6,7 +6,7 @@ require('../../../vscode/mockModule')
 
 const importModuleAfterMockingVsCode = () => {
   const { Cli } = require('../../../cli')
-  const { esmModulesImported } = require('../../../process/execution')
+  const { esmModulesImported } = require('../../../util/esm')
   return { Cli, esmModulesImported }
 }
 

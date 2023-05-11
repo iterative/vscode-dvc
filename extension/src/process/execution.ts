@@ -2,35 +2,9 @@ import { ChildProcess } from 'child_process'
 import { Readable } from 'stream'
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { Deferred } from '@hediet/std/synchronization'
 import kill from 'tree-kill'
 import { getProcessPlatform } from '../env'
-
-const deferred = new Deferred()
-export const esmModulesImported = deferred.promise
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-type EsmExeca = typeof import('execa').execa
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-type EsmProcessExists = typeof import('process-exists').processExists
-
-const shouldImportEsm = !process.env.JEST_WORKER_ID
-
-let execa: EsmExeca
-let doesProcessExist: EsmProcessExists
-const importEsmModules = async () => {
-  const [{ execa: esmExeca }, { processExists: esmProcessExists }] =
-    await Promise.all([import('execa'), import('process-exists')])
-  execa = esmExeca
-  doesProcessExist = esmProcessExists
-  deferred.resolve()
-}
-
-if (shouldImportEsm) {
-  void importEsmModules()
-}
+import { doesProcessExist, execa } from '../util/esm'
 
 interface RunningProcess extends ChildProcess {
   all?: Readable

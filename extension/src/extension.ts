@@ -42,7 +42,7 @@ import { GitExecutor } from './cli/git/executor'
 import { GitReader } from './cli/git/reader'
 import { Setup } from './setup'
 import { definedAndNonEmpty } from './util/array'
-import { esmModulesImported, stopProcesses } from './process/execution'
+import { stopProcesses } from './process/execution'
 import { Flag } from './cli/dvc/constants'
 import { LanguageClient } from './languageClient'
 import { collectRunningExperimentPids } from './experiments/processExecution/collect'
@@ -50,6 +50,7 @@ import { DvcViewer } from './cli/dvc/viewer'
 import { registerSetupCommands } from './setup/register'
 import { Status } from './status'
 import { registerPersistenceCommands } from './persistence/register'
+import { esmModulesImported } from './util/esm'
 
 class Extension extends Disposable {
   protected readonly internalCommands: InternalCommands

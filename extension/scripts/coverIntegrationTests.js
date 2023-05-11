@@ -22,28 +22,25 @@ activationEvents = packageJson.activationEvents
 packageJson.activationEvents = ['onStartupFinished']
 writeFileSync(packageJsonPath, JSON.stringify(packageJson))
 
-getExeca().then(execa => {
+getExeca().then(async execa => {
   const tests = execa('node', [join(cwd, 'dist', 'test', 'runTest.js')], {
     cwd
   })
 
   pipe(tests)
-  tests
-    .then(() => {})
-    .catch(() => {
-      failed = true
-    })
-    .finally(() => {
-      packageJson.activationEvents = activationEvents
+  try {
+    await tests
+  } catch {
+    failed = true
+  }
+  packageJson.activationEvents = activationEvents
 
-      writeFileSync(packageJsonPath, JSON.stringify(packageJson))
+  writeFileSync(packageJsonPath, JSON.stringify(packageJson))
 
-      const prettier = execa('prettier', ['--write', 'package.json'], { cwd })
-      pipe(prettier)
-      prettier.then(() => {
-        if (failed) {
-          process.exit(1)
-        }
-      })
-    })
+  const prettier = execa('prettier', ['--write', 'package.json'], { cwd })
+  pipe(prettier)
+  await prettier
+  if (failed) {
+    process.exit(1)
+  }
 })

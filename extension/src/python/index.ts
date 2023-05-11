@@ -3,12 +3,8 @@ import { getVenvBinPath } from './path'
 import { getProcessPlatform } from '../env'
 import { exists } from '../fileSystem'
 import { Logger } from '../common/logger'
-import {
-  createProcess,
-  esmModulesImported,
-  executeProcess,
-  Process
-} from '../process/execution'
+import { createProcess, executeProcess, Process } from '../process/execution'
+import { esmModulesImported } from '../util/esm'
 
 const sendOutput = (process: Process) => {
   process.all?.on('data', chunk =>
