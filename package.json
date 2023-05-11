@@ -72,7 +72,7 @@
   },
   "resolutions": {
     "decode-uri-component": "0.2.2",
-    "@types/react": "18.2.2",
+    "@types/react": "18.2.5",
     "**/recursive-readdir/minimatch": "6.2.0",
     "fastify": "3.29.5",
     "json5": "2.2.3",

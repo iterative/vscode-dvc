@@ -1,17 +1,15 @@
 import React, { PropsWithChildren } from 'react'
+import { useSelector } from 'react-redux'
 import styles from './styles.module.scss'
 import { Button } from '../../../shared/components/button/Button'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
+import { SetupState } from '../../store'
+import { installDvc, setupWorkspace } from '../messages'
 
-type CliUnavailableProps = {
-  installDvc: () => void
-  pythonBinPath: string | undefined
-  setupWorkspace: () => void
-}
-
-export const CliUnavailable: React.FC<
-  PropsWithChildren<CliUnavailableProps>
-> = ({ installDvc, pythonBinPath, setupWorkspace, children }) => {
+export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
+  const pythonBinPath = useSelector(
+    (state: SetupState) => state.dvc.pythonBinPath
+  )
   const canInstall = !!pythonBinPath
 
   const contents = canInstall ? (
