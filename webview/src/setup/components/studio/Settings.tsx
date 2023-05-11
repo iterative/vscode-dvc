@@ -1,13 +1,18 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
 import { saveStudioToken, removeStudioToken } from '../messages'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { Button } from '../../../shared/components/button/Button'
+import { SetupState } from '../../store'
 
 export const Settings: React.FC<{
-  shareLiveToStudio: boolean
   setShareLiveToStudio: (shareLiveToStudio: boolean) => void
-}> = ({ shareLiveToStudio, setShareLiveToStudio }) => {
+}> = ({ setShareLiveToStudio }) => {
+  const shareLiveToStudio = useSelector(
+    (state: SetupState) => state.studio.shareLiveToStudio
+  )
+
   return (
     <EmptyState isFullScreen={false}>
       <div>

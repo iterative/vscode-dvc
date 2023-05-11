@@ -9,19 +9,14 @@ export const Studio: React.FC<{
   cliCompatible: boolean
   setShareLiveToStudio: (shareLiveToStudio: boolean) => void
 }> = ({ cliCompatible, setShareLiveToStudio }) => {
-  const { isStudioConnected, shareLiveToStudio } = useSelector(
-    (state: SetupState) => state.studio
-  )
+  const { isStudioConnected } = useSelector((state: SetupState) => state.studio)
 
   if (!cliCompatible) {
     return <CliIncompatible />
   }
 
   return isStudioConnected ? (
-    <Settings
-      shareLiveToStudio={shareLiveToStudio}
-      setShareLiveToStudio={setShareLiveToStudio}
-    />
+    <Settings setShareLiveToStudio={setShareLiveToStudio} />
   ) : (
     <Connect />
   )
