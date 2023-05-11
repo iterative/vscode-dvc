@@ -2,7 +2,7 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { NoData } from './NoData'
 import { NeedsGitCommit } from './NeedsGitCommit'
-import { showExperiments, showScmPanel } from '../messages'
+import { showExperiments } from '../messages'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { IconButton } from '../../../shared/components/button/IconButton'
 import { Beaker } from '../../../shared/components/icons'
@@ -42,7 +42,7 @@ export const Experiments: React.FC<ExperimentsProps> = ({ isDvcSetup }) => {
   }
 
   if (needsGitCommit) {
-    return <NeedsGitCommit showScmPanel={showScmPanel} />
+    return <NeedsGitCommit />
   }
 
   if (hasData === undefined) {

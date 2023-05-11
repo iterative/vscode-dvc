@@ -5,13 +5,6 @@ import { DvcEnvDetails } from './DvcEnvDetails'
 import { CliIncompatible } from './CliIncompatible'
 import { ProjectUninitialized } from './ProjectUninitialized'
 import { CliUnavailable } from './CliUnavailable'
-import {
-  checkCompatibility,
-  initializeDvc,
-  initializeGit,
-  installDvc,
-  setupWorkspace
-} from '../messages'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { usePrevious } from '../../hooks/usePrevious'
 import { updateSectionCollapsed } from '../../state/webviewSlice'
@@ -60,30 +53,15 @@ export const Dvc: React.FC = () => {
   }
 
   if (cliCompatible === false) {
-    return (
-      <CliIncompatible checkCompatibility={checkCompatibility}>
-        {children}
-      </CliIncompatible>
-    )
+    return <CliIncompatible>{children}</CliIncompatible>
   }
 
   if (cliCompatible === undefined) {
-    return (
-      <CliUnavailable installDvc={installDvc} setupWorkspace={setupWorkspace}>
-        {children}
-      </CliUnavailable>
-    )
+    return <CliUnavailable>{children}</CliUnavailable>
   }
 
   if (!projectInitialized) {
-    return (
-      <ProjectUninitialized
-        initializeDvc={initializeDvc}
-        initializeGit={initializeGit}
-      >
-        {children}
-      </ProjectUninitialized>
-    )
+    return <ProjectUninitialized>{children}</ProjectUninitialized>
   }
   return (
     <EmptyState isFullScreen={false}>

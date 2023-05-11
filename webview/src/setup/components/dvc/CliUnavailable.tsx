@@ -4,15 +4,9 @@ import styles from './styles.module.scss'
 import { Button } from '../../../shared/components/button/Button'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { SetupState } from '../../store'
+import { installDvc, setupWorkspace } from '../messages'
 
-type CliUnavailableProps = {
-  installDvc: () => void
-  setupWorkspace: () => void
-}
-
-export const CliUnavailable: React.FC<
-  PropsWithChildren<CliUnavailableProps>
-> = ({ installDvc, setupWorkspace, children }) => {
+export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
   const pythonBinPath = useSelector(
     (state: SetupState) => state.dvc.pythonBinPath
   )
