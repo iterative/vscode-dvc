@@ -1,7 +1,7 @@
 import { Event, EventEmitter } from 'vscode'
 import { getCommandString } from './command'
 import { CliError, MaybeConsoleError } from './error'
-import { notifyCompleted, notifyStarted } from './util'
+import { notifyCompleted, notifyStarted, transformChunkToString } from './util'
 import { createProcess, Process, ProcessOptions } from '../process/execution'
 import { StopWatch } from '../util/time'
 import { Disposable } from '../class/dispose'
@@ -13,7 +13,7 @@ export type CliEvent = {
 }
 
 export type CliResult = CliEvent & {
-  stderr?: string
+  errorOutput?: string
   duration: number
   exitCode: number | null
 }
@@ -72,12 +72,15 @@ export class Cli extends Disposable implements ICli {
 
   protected async executeProcess(options: ProcessOptions): Promise<string> {
     const { baseEvent, stopWatch } = this.getProcessDetails(options)
+    let all = ''
     try {
       const process = this.dispose.track(this.createProcess(baseEvent, options))
 
       void process.on('close', () => {
         void this.dispose.untrack(process)
       })
+
+      process.all?.on('data', chunk => (all += transformChunkToString(chunk)))
 
       const { stdout, exitCode } = await process
 
@@ -96,18 +99,26 @@ export class Cli extends Disposable implements ICli {
         error as MaybeConsoleError,
         options,
         baseEvent,
-        stopWatch.getElapsedTime()
+        stopWatch.getElapsedTime(),
+        all
       )
     }
   }
 
   protected async createBackgroundProcess(options: ProcessOptions) {
     const { baseEvent, stopWatch } = this.getProcessDetails(options)
+    let all = ''
     try {
       const backgroundProcess = this.createProcess(baseEvent, {
         detached: true,
         ...options
       })
+
+      backgroundProcess.all?.on(
+        'data',
+        chunk => (all += transformChunkToString(chunk))
+      )
+
       return await this.getOutputAndDisconnect(
         baseEvent,
         backgroundProcess,
@@ -118,7 +129,8 @@ export class Cli extends Disposable implements ICli {
         error as MaybeConsoleError,
         options,
         baseEvent,
-        stopWatch.getElapsedTime()
+        stopWatch.getElapsedTime(),
+        all
       )
     }
   }
@@ -170,7 +182,8 @@ export class Cli extends Disposable implements ICli {
     error: MaybeConsoleError,
     options: ProcessOptions,
     baseEvent: CliEvent,
-    duration: number
+    duration: number,
+    all: string
   ) {
     const cliError = new CliError({
       baseError: error,
@@ -180,8 +193,8 @@ export class Cli extends Disposable implements ICli {
       {
         ...baseEvent,
         duration,
-        exitCode: cliError.exitCode,
-        stderr: cliError.stderr
+        errorOutput: all || cliError.stderr,
+        exitCode: cliError.exitCode
       },
       this.processCompleted
     )

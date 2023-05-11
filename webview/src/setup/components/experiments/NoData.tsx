@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import React from 'react'
-import pyTorch from '../snippets/pyTorch.py'
-import huggingFace from '../snippets/huggingFace.py'
-import keras from '../snippets/keras.py'
-import pythonApi from '../snippets/pythonApi.py'
-import { CodeBlock } from '../../shared/components/codeBlock/CodeBlock'
-import { CodeSlider } from '../../shared/components/codeSlider/CodeSlider'
-import { EmptyState } from '../../shared/components/emptyState/EmptyState'
+import pyTorch from '../../snippets/pyTorch.py'
+import huggingFace from '../../snippets/huggingFace.py'
+import keras from '../../snippets/keras.py'
+import pythonApi from '../../snippets/pythonApi.py'
+import { CodeBlock } from '../../../shared/components/codeBlock/CodeBlock'
+import { CodeSlider } from '../../../shared/components/codeSlider/CodeSlider'
+import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 
 export const NoData: React.FC = () => {
   return (

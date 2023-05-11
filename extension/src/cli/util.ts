@@ -7,31 +7,32 @@ export const notifyStarted = (
   processStarted: EventEmitter<CliEvent>
 ): void => processStarted.fire(baseEvent)
 
+export const transformChunkToString = (chunk: unknown): string =>
+  (chunk as Buffer)
+    .toString()
+    .split(/(\r?\n)/g)
+    .join('\r')
+
 export const notifyOutput = (
   process: Process,
   processOutput: EventEmitter<string>
 ): void => {
   process.all?.on('data', chunk =>
-    processOutput.fire(
-      (chunk as Buffer)
-        .toString()
-        .split(/(\r?\n)/g)
-        .join('\r')
-    )
+    processOutput.fire(transformChunkToString(chunk))
   )
 }
 
 export const notifyCompleted = (
-  { command, pid, cwd, duration, exitCode, stderr }: CliResult,
+  { command, pid, cwd, duration, exitCode, errorOutput: stderr }: CliResult,
   processCompleted: EventEmitter<CliResult>
 ): void =>
   processCompleted.fire({
     command,
     cwd,
     duration,
+    errorOutput: stderr?.replace(/\n+/g, '\n'),
     exitCode,
-    pid,
-    stderr: stderr?.replace(/\n+/g, '\n')
+    pid
   })
 
 export const captureStdErr = (process: Process): string => {
