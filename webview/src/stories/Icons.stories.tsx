@@ -13,8 +13,7 @@ import {
   Clock,
   Close,
   Copy,
-  Dots,
-  DownArrow,
+  ArrowDown,
   Ellipsis,
   Error,
   Filter,
@@ -23,15 +22,15 @@ import {
   GraphLine,
   GraphScatter,
   Gripper,
-  Lines,
+  ListFilter,
   PassFilled,
-  Pin,
+  Pinned,
   Refresh,
   SortPrecedence,
   StarEmpty,
   StarFull,
   Trash,
-  UpArrow
+  ArrowUp
 } from '../shared/components/icons'
 
 export default {
@@ -67,14 +66,11 @@ const Template: StoryFn = () => {
       <IconWrapper name="Copy">
         <Icon icon={Copy} />
       </IconWrapper>
-      <IconWrapper name="Dots">
-        <Icon icon={Dots} />
-      </IconWrapper>
-      <IconWrapper name="DownArrow">
-        <Icon icon={DownArrow} />
-      </IconWrapper>
       <IconWrapper name="Ellipsis">
         <Icon icon={Ellipsis} />
+      </IconWrapper>
+      <IconWrapper name="ArrowDown">
+        <Icon icon={ArrowDown} />
       </IconWrapper>
       <IconWrapper name="Error">
         <Icon icon={Error} />
@@ -97,14 +93,14 @@ const Template: StoryFn = () => {
       <IconWrapper name="Gripper">
         <Icon icon={Gripper} />
       </IconWrapper>
-      <IconWrapper name="Lines">
-        <Icon icon={Lines} />
+      <IconWrapper name="ListFilter">
+        <Icon icon={ListFilter} />
       </IconWrapper>
       <IconWrapper name="PassFilled">
         <Icon icon={PassFilled} />
       </IconWrapper>
-      <IconWrapper name="Pin">
-        <Icon icon={Pin} />
+      <IconWrapper name="Pinned">
+        <Icon icon={Pinned} />
       </IconWrapper>
       <IconWrapper name="Refresh">
         <Icon icon={Refresh} />
@@ -121,8 +117,8 @@ const Template: StoryFn = () => {
       <IconWrapper name="Trash">
         <Icon icon={Trash} />
       </IconWrapper>
-      <IconWrapper name="UpArrow">
-        <Icon icon={UpArrow} />
+      <IconWrapper name="ArrowUp">
+        <Icon icon={ArrowUp} />
       </IconWrapper>
     </IconsWrapper>
   )
