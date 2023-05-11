@@ -16,7 +16,7 @@ type EsmExeca = typeof import('execa').execa
 // @ts-ignore
 type EsmProcessExists = typeof import('process-exists').processExists
 
-const envCanImportEsm = process.env.NODE_ENV !== 'test'
+const shouldImportEsm = !process.env.JEST_WORKER_ID
 
 let execa: EsmExeca
 let doesProcessExist: EsmProcessExists
@@ -28,7 +28,7 @@ const importEsmModules = async () => {
   deferred.resolve()
 }
 
-if (envCanImportEsm) {
+if (shouldImportEsm) {
   void importEsmModules()
 }
 
