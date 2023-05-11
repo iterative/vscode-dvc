@@ -1,7 +1,7 @@
 import { Deferred } from '@hediet/std/synchronization'
 
 const deferred = new Deferred()
-export const esmModulesImported = deferred.promise
+export const esmPackagesImported = deferred.promise
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -14,7 +14,7 @@ const shouldImportEsm = !process.env.JEST_WORKER_ID
 
 let execa: EsmExeca
 let doesProcessExist: EsmProcessExists
-const importEsmModules = async () => {
+const importEsmPackages = async () => {
   const [{ execa: esmExeca }, { processExists: esmProcessExists }] =
     await Promise.all([import('execa'), import('process-exists')])
   execa = esmExeca
@@ -23,7 +23,7 @@ const importEsmModules = async () => {
 }
 
 if (shouldImportEsm) {
-  void importEsmModules()
+  void importEsmPackages()
 }
 
 export { execa, doesProcessExist }
