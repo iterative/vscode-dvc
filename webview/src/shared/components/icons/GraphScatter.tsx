@@ -1,7 +1,6 @@
 import * as React from 'react'
-import { SVGProps } from 'react'
-
-const SvgGraphScatter = (props: SVGProps<SVGSVGElement>) => (
+import type { SVGProps } from 'react'
+const GraphScatter = (props: SVGProps<SVGSVGElement>) => (
   <svg
     width={16}
     height={16}
@@ -18,5 +17,4 @@ const SvgGraphScatter = (props: SVGProps<SVGSVGElement>) => (
     <rect x={12} y={8} width={2} height={2} />
   </svg>
 )
-
-export default SvgGraphScatter
+export default GraphScatter

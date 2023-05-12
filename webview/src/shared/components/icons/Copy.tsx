@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { SVGProps } from 'react'
-const SvgCopy = (props: SVGProps<SVGSVGElement>) => (
+import type { SVGProps } from 'react'
+const Copy = (props: SVGProps<SVGSVGElement>) => (
   <svg
     width={16}
     height={16}
@@ -21,4 +21,4 @@ const SvgCopy = (props: SVGProps<SVGSVGElement>) => (
     />
   </svg>
 )
-export default SvgCopy
+export default Copy

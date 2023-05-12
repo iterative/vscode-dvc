@@ -25,7 +25,7 @@
     "build": "yarn turbo run package",
     "install-frozen-lockfile": "./scripts/install-frozen-lockfile.sh",
     "dev-server": "yarn turbo run dev --parallel",
-    "postinstall": "husky install && git submodule init && git submodule update",
+    "postinstall": "husky install && git submodule init && git submodule update && yarn svgr",
     "storybook": "yarn workspace dvc-vscode-webview storybook",
     "build-storybook": "yarn turbo run build-storybook --filter=dvc-vscode-webview",
     "setup:venv": "yarn turbo run lint:build && yarn workspace dvc run setup-venv",

@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { SVGProps } from 'react'
-const SvgArrowUp = (props: SVGProps<SVGSVGElement>) => (
+import type { SVGProps } from 'react'
+const ArrowUp = (props: SVGProps<SVGSVGElement>) => (
   <svg
     width={16}
     height={16}
@@ -16,4 +16,4 @@ const SvgArrowUp = (props: SVGProps<SVGSVGElement>) => (
     />
   </svg>
 )
-export default SvgArrowUp
+export default ArrowUp
