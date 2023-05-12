@@ -1,6 +1,6 @@
 import * as React from 'react'
 import type { SVGProps } from 'react'
-const Check = (props: SVGProps<SVGSVGElement>) => (
+const ArrowDown = (props: SVGProps<SVGSVGElement>) => (
   <svg
     width={16}
     height={16}
@@ -12,8 +12,8 @@ const Check = (props: SVGProps<SVGSVGElement>) => (
     <path
       fillRule="evenodd"
       clipRule="evenodd"
-      d="M14.431 3.323l-8.47 10-.79-.036-3.35-4.77.818-.574 2.978 4.24 8.051-9.506.764.646z"
+      d="M3.147 9l5 5h.707l5-5-.707-.707L9 12.439V2H8v10.44L3.854 8.292 3.147 9z"
     />
   </svg>
 )
-export default Check
+export default ArrowDown
