@@ -19,13 +19,24 @@ export default {
 
 const Template: StoryFn = () => {
   return (
-    <IconsWrapper>
-      {Object.values(Icons).map(IconComponent => (
-        <IconWrapper key={IconComponent.name} name={IconComponent.name}>
-          <Icon icon={IconComponent} />
-        </IconWrapper>
-      ))}
-    </IconsWrapper>
+    <>
+      <IconsWrapper>
+        {Object.values(Icons).map(IconComponent => (
+          <IconWrapper key={IconComponent.name} name={IconComponent.name}>
+            <Icon icon={IconComponent} />
+          </IconWrapper>
+        ))}
+      </IconsWrapper>
+      <p>
+        <a href="https://microsoft.github.io/vscode-codicons/dist/codicon.html">
+          Other icons that can be added
+        </a>
+      </p>
+      <p>
+        Copy the icon name, add it to `codicons` constant in
+        `webview/icons/generate.mjs` and run `yarn svgr`.
+      </p>
+    </>
   )
 }
 
