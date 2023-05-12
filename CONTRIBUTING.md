@@ -104,7 +104,7 @@ available before adding one.
 If none of the icons fit the purpose, you can select one from
 [VS Code codicon](https://microsoft.github.io/vscode-codicons/dist/codicon.html).
 Once you know which icon you want to add, copy its name and add it to
-`webview/icons/generate.mjs` in the `codicons` constant. If, by some unfortunate
+`webview/icons/codicons.mjs` in the `codicons` constant. If, by some unfortunate
 circumstance, none of the codicon meets your needs, you can add a custom SVG to
 the `webview/icons` directory.
 

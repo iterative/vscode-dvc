@@ -8,6 +8,7 @@ import {
   writeFile
 } from 'node:fs/promises'
 import path from 'path'
+import { codicons } from './codicons.mjs'
 
 const iconsPath = 'src/shared/components/icons/'
 
@@ -31,51 +32,21 @@ try {
 }
 
 const codiconsPath = '../node_modules/@vscode/codicons/src/icons'
-const codicons = [
-  'add',
-  'arrow-up',
-  'arrow-down',
-  'beaker',
-  'check',
-  'chevron-down',
-  'chevron-right',
-  'close',
-  'copy',
-  'ellipsis',
-  'error',
-  'filter',
-  'git-commit',
-  'git-merge',
-  'graph-line',
-  'graph-scatter',
-  'gripper',
-  'info',
-  'list-filter',
-  'pass-filled',
-  'pinned',
-  'refresh',
-  'sort-precedence',
-  'star-empty',
-  'star-full',
-  'trash'
-]
 
 const allIcons = [
   ...customIcons,
   ...codicons.map(codicon => `${codiconsPath}/${codicon}.svg`)
 ]
 
-const toPascalCase = string =>
-  `${string}`
-    .toLowerCase()
-    .replace(new RegExp(/[-_]+/, 'g'), ' ')
-    .replace(new RegExp(/[^\w\s]/, 'g'), '')
-    .replace(
-      new RegExp(/\s+(.)(\w*)/, 'g'),
-      ($1, $2, $3) => `${$2.toUpperCase() + $3}`
-    )
-    .replace(new RegExp(/\w/), s => s.toUpperCase())
+function toPascalCase(text) {
+  return text.replace(/(^\w|-\w)/g, clearAndUpper)
+}
 
+function clearAndUpper(text) {
+  return text.replace(/-/, '').toUpperCase()
+}
+
+const components = []
 await Promise.all(
   allIcons.map(async icon => {
     try {
@@ -90,14 +61,22 @@ await Promise.all(
         { componentName }
       )
       await writeFile(`${iconsPath}${componentName}.tsx`, svgComponent)
-      await appendFile(
-        `${iconsPath}index.ts`,
-        `export { default as ${componentName} } from './${componentName}'\n`
-      )
+      components.push(componentName)
     } catch (err) {
       console.error(err.message)
     }
   })
+)
+
+await appendFile(
+  `${iconsPath}index.ts`,
+  components
+    .sort()
+    .map(
+      componentName =>
+        `export { default as ${componentName} } from './${componentName}'\n`
+    )
+    .join('')
 )
 
 console.log(`Icons were generated to ${iconsPath}`)
