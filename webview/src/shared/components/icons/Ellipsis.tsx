@@ -1,7 +1,6 @@
 import * as React from 'react'
-import { SVGProps } from 'react'
-
-const SvgEllipsis = (props: SVGProps<SVGSVGElement>) => (
+import type { SVGProps } from 'react'
+const Ellipsis = (props: SVGProps<SVGSVGElement>) => (
   <svg
     width={16}
     height={16}
@@ -13,5 +12,4 @@ const SvgEllipsis = (props: SVGProps<SVGSVGElement>) => (
     <path d="M4 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm5 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm5 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
   </svg>
 )
-
-export default SvgEllipsis
+export default Ellipsis

@@ -10,7 +10,11 @@ import {
   DragFunction
 } from '../../../../shared/components/dragDrop/Draggable'
 import { IconMenu } from '../../../../shared/components/iconMenu/IconMenu'
-import { DownArrow, Lines, UpArrow } from '../../../../shared/components/icons'
+import {
+  ArrowDown,
+  ListFilter,
+  ArrowUp
+} from '../../../../shared/components/icons'
 
 const getIconMenuItems = (
   sortEnabled: boolean,
@@ -19,12 +23,12 @@ const getIconMenuItems = (
 ) => [
   {
     hidden: !sortEnabled || sortOrder === SortOrder.NONE,
-    icon: (sortOrder === SortOrder.DESCENDING && DownArrow) || UpArrow,
+    icon: (sortOrder === SortOrder.DESCENDING && ArrowDown) || ArrowUp,
     tooltip: 'Table Sorted By'
   },
   {
     hidden: !hasFilter,
-    icon: Lines,
+    icon: ListFilter,
     tooltip: 'Table Filtered By'
   }
 ]

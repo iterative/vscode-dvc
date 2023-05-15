@@ -5,6 +5,7 @@ import {
   ColumnType,
   TableData
 } from 'dvc/src/experiments/webview/contract'
+import defaultTableData from 'dvc/src/test/fixtures/expShow/base/tableData'
 
 const defaultColumn = ['Experiment', 'Created']
 
@@ -40,20 +41,9 @@ const columns = [
 ]
 
 export const tableData: TableData = {
-  changes: [],
-  columnOrder: [],
-  columnWidths: {},
+  ...defaultTableData,
   columns: columns as Column[],
-  filteredCount: 0,
-  filters: [],
-  hasBranchesToSelect: true,
-  hasCheckpoints: false,
-  hasColumns: true,
-  hasConfig: true,
-  hasMoreCommits: { current: true },
   hasRunningWorkspaceExperiment: false,
-  hasValidDvcYaml: true,
-  isShowingMoreCommits: { current: true },
   rows: [
     {
       branch: 'current',
@@ -66,8 +56,7 @@ export const tableData: TableData = {
       label: 'main'
     }
   ],
-  selectedForPlotsCount: 0,
-  sorts: []
+  selectedForPlotsCount: 0
 }
 
 export const getHeaders = async () => {

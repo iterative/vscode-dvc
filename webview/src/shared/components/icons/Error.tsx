@@ -1,7 +1,6 @@
 import * as React from 'react'
-import { SVGProps } from 'react'
-
-const SvgError = (props: SVGProps<SVGSVGElement>) => (
+import type { SVGProps } from 'react'
+const Error = (props: SVGProps<SVGSVGElement>) => (
   <svg
     width={16}
     height={16}
@@ -17,5 +16,4 @@ const SvgError = (props: SVGProps<SVGSVGElement>) => (
     />
   </svg>
 )
-
-export default SvgError
+export default Error

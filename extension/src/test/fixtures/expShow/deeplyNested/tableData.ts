@@ -1,25 +1,17 @@
 import columns from './columns'
 import rows from './rows'
+import defaultData from '../base/tableData'
 import { TableData } from '../../../../experiments/webview/contract'
 
 const data: TableData = {
-  changes: [],
-  columnOrder: [],
+  ...defaultData,
   columns,
-  columnWidths: {},
-  filteredCount: 0,
   filters: [
     'params:params.yaml:nested1.doubled',
     'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b.doubled'
   ],
-  hasBranchesToSelect: true,
   hasCheckpoints: false,
-  hasColumns: true,
-  hasConfig: true,
-  hasMoreCommits: { current: true },
   hasRunningWorkspaceExperiment: false,
-  hasValidDvcYaml: true,
-  isShowingMoreCommits: { current: true },
   rows,
   selectedForPlotsCount: 0,
   sorts: [

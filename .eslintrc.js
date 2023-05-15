@@ -190,9 +190,11 @@ module.exports = {
     'unicorn/no-process-exit': 'off',
     'unicorn/no-useless-undefined': 'off',
     'unicorn/numeric-separators-style': 'off',
+    'unicorn/prefer-at': 'off',
     'unicorn/prefer-event-target': 'off',
     'unicorn/prefer-module': 'off',
     'unicorn/prefer-node-protocol': 'off',
+    'unicorn/prefer-string-replace-all': 'off',
     'unicorn/prefer-top-level-await': 'off',
     'unicorn/prevent-abbreviations': 'off',
     'unicorn/switch-case-braces': 'off'
