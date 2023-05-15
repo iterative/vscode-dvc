@@ -53,7 +53,6 @@ export const SectionContainer: React.FC<
   const toggleSection = (e: MouseEvent) => {
     e.preventDefault()
     if (
-      /* add extra element text here */
       !isSelecting(tooltipTexts) &&
       !isTooltip(e.target as Element, ['SUMMARY', 'BODY'])
     ) {

@@ -12,7 +12,7 @@ export const SetupContainer: React.FC<{
   title: string
   icon: TooltipIconType
   secondaryTooltipText?: JSX.Element
-}> = ({ children, sectionKey, title, icon }) => {
+}> = ({ children, sectionKey, title, icon, secondaryTooltipText }) => {
   const sectionCollapsed = useSelector(
     (state: SetupState) => state.webview.sectionCollapsed
   )
@@ -25,6 +25,7 @@ export const SetupContainer: React.FC<{
       title={title}
       icon={icon}
       onToggleSection={() => dispatch(toggleSectionCollapsed(sectionKey))}
+      secondaryTooltipText={secondaryTooltipText}
     >
       {children}
     </SectionContainer>

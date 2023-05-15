@@ -83,6 +83,8 @@ export const SectionDescription: React.FC<
 > = ({ sectionKey, children }) => (
   <span data-testid={sectionDescriptionTestIds[sectionKey]}>
     {SectionDescriptionMainText[sectionKey]}
-    <span className={styles.infoTooltipSecondaryText}>{children}</span>
+    {children && (
+      <span className={styles.infoTooltipSecondaryText}>{children}</span>
+    )}
   </span>
 )

@@ -21,6 +21,7 @@ import {
   updateCanGitInitalized,
   updateCliCompatible,
   updateDvcCliDetails,
+  updateIsAboveLatestTestedVersion,
   updateIsPythonExtensionUsed,
   updateNeedsGitInitialized,
   updateProjectInitialized,
@@ -80,6 +81,11 @@ const feedStore = (
       case 'isPythonExtensionUsed':
         dispatch(updateIsPythonExtensionUsed(data.data.isPythonExtensionUsed))
         continue
+      case 'isAboveLatestTestedVersion':
+        dispatch(
+          updateIsAboveLatestTestedVersion(data.data.isAboveLatestTestedVersion)
+        )
+        continue
       case 'isStudioConnected':
         dispatch(updateIsStudioConnected(data.data.isStudioConnected))
         continue
@@ -108,9 +114,8 @@ const feedStore = (
 }
 
 export const App: React.FC = () => {
-  const { projectInitialized, cliCompatible } = useSelector(
-    (state: SetupState) => state.dvc
-  )
+  const { projectInitialized, cliCompatible, isAboveLatestTestedVersion } =
+    useSelector((state: SetupState) => state.dvc)
   const hasExperimentsData = useSelector(
     (state: SetupState) => state.experiments.hasData
   )
@@ -144,12 +149,14 @@ export const App: React.FC = () => {
       <SetupContainer
         sectionKey={SetupSection.DVC}
         title="DVC"
-        icon={getDvcStatusIcon(isDvcSetup, false)}
+        icon={getDvcStatusIcon(isDvcSetup, !!isAboveLatestTestedVersion)}
         secondaryTooltipText={
-          <>
-            Warning! Your version is below the latest tested version which could
-            lead to unexpected behavior.
-          </>
+          isAboveLatestTestedVersion ? (
+            <span>
+              Warning, the located version is above the latest tested version
+              which could lead to unexpected behavior.
+            </span>
+          ) : undefined
         }
       >
         <Dvc />

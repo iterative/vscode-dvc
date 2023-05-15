@@ -44,13 +44,15 @@ export class WebviewMessages {
     projectInitialized,
     pythonBinPath,
     sectionCollapsed,
-    shareLiveToStudio
+    shareLiveToStudio,
+    isAboveLatestTestedVersion
   }: SetupData) {
     void this.getWebview()?.show({
       canGitInitialize,
       cliCompatible,
       dvcCliDetails,
       hasData,
+      isAboveLatestTestedVersion,
       isPythonExtensionUsed,
       isStudioConnected,
       needsGitCommit,

@@ -99,6 +99,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -129,6 +130,7 @@ describe('App', () => {
           version: undefined
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -153,6 +155,7 @@ describe('App', () => {
           version: undefined
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -181,6 +184,7 @@ describe('App', () => {
           version: undefined
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -208,6 +212,7 @@ describe('App', () => {
           version: undefined
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -235,6 +240,7 @@ describe('App', () => {
           version: undefined
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: true,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -262,6 +268,7 @@ describe('App', () => {
           version: undefined
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: true,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -289,6 +296,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -313,6 +321,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -335,6 +344,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -360,6 +370,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -382,6 +393,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -404,6 +416,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -428,6 +441,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -455,6 +469,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -477,6 +492,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: true,
         isStudioConnected: true,
         needsGitCommit: false,
@@ -515,6 +531,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: true,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: true,
         isStudioConnected: true,
         needsGitCommit: false,
@@ -541,6 +558,7 @@ describe('App', () => {
           version: undefined
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -567,6 +585,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: true,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: true,
         isStudioConnected: true,
         needsGitCommit: false,
@@ -592,6 +611,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: true,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: true,
         needsGitCommit: false,
@@ -630,6 +650,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: true,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: true,
         isStudioConnected: true,
         needsGitCommit: false,
@@ -670,6 +691,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -696,6 +718,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: true,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: true,
         isStudioConnected: true,
         needsGitCommit: false,
@@ -724,6 +747,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: true,
@@ -746,6 +770,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: true,
@@ -775,6 +800,7 @@ describe('App', () => {
           version: undefined
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -797,6 +823,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: true,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -821,6 +848,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: true,
@@ -843,6 +871,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: undefined,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -865,6 +894,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -889,6 +919,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: true,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: true,
         isStudioConnected: true,
         needsGitCommit: false,
@@ -915,6 +946,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -941,6 +973,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -967,6 +1000,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: true,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: true,
         isStudioConnected: true,
         needsGitCommit: false,
@@ -995,6 +1029,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: true,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -1019,6 +1054,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: true,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -1047,6 +1083,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: true,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -1075,6 +1112,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: true,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -1103,6 +1141,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -1129,6 +1168,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: true,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: true,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -1158,6 +1198,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: true,
         isStudioConnected: true,
         needsGitCommit: false,
@@ -1186,6 +1227,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: true,
         isStudioConnected: true,
         needsGitCommit: false,
@@ -1212,6 +1254,7 @@ describe('App', () => {
           version: '1.0.0'
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: true,
         needsGitCommit: true,
@@ -1239,6 +1282,7 @@ describe('App', () => {
         version: '1.0.0'
       },
       hasData: false,
+      isAboveLatestTestedVersion: false,
       isPythonExtensionUsed: true,
       isStudioConnected: true,
       needsGitCommit: false,

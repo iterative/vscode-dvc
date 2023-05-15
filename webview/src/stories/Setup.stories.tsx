@@ -13,6 +13,7 @@ const DEFAULT_DATA: SetupData = {
     version: '1.0.0'
   },
   hasData: false,
+  isAboveLatestTestedVersion: false,
   isPythonExtensionUsed: true,
   isStudioConnected: true,
   needsGitCommit: false,

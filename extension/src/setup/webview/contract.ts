@@ -16,6 +16,7 @@ export type SetupData = {
   pythonBinPath: string | undefined
   sectionCollapsed: typeof DEFAULT_SECTION_COLLAPSED | undefined
   shareLiveToStudio: boolean
+  isAboveLatestTestedVersion: boolean | undefined
 }
 
 export enum SetupSection {
