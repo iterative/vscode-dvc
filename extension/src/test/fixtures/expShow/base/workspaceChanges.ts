@@ -1,5 +1,3 @@
-import { buildDepPath } from '../../../../experiments/columns/paths'
-
 const data = [
   'metrics:summary.json:accuracy',
   'metrics:summary.json:loss',
