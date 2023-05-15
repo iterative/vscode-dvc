@@ -1,7 +1,4 @@
-import {
-  ExperimentStatus,
-  EXPERIMENT_WORKSPACE_ID
-} from '../../../../cli/dvc/contract'
+import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 import { Commit } from '../../../../experiments/webview/contract'
 
 const data: Commit[] = [

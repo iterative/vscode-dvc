@@ -13,7 +13,7 @@ import { PlotsPicker, PlotsPickerProps } from './PlotsPicker'
 import styles from './styles.module.scss'
 import { IconMenuItemProps } from '../../shared/components/iconMenu/IconMenuItem'
 import { sendMessage } from '../../shared/vscode'
-import { Lines, Add, Trash } from '../../shared/components/icons'
+import { ListFilter, Add, Trash } from '../../shared/components/icons'
 import { Slider } from '../../shared/components/slider/Slider'
 import { PlotsState } from '../store'
 import { SectionContainer } from '../../shared/components/sectionContainer/SectionContainer'
@@ -65,7 +65,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
 
   if (menu) {
     menuItems.unshift({
-      icon: Lines,
+      icon: ListFilter,
       onClickNode: <PlotsPicker {...menu} />,
       tooltip: 'Select Plots'
     })
