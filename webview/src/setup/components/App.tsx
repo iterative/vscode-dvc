@@ -38,12 +38,13 @@ import {
 
 const getDvcStatusIcon = (
   isDvcSetup: boolean,
-  isVersionBelowLatestTested: boolean
+  isVersionAboveLatestTested: boolean
 ) => {
   if (!isDvcSetup) {
     return TooltipIconType.ERROR
   }
-  return isVersionBelowLatestTested
+
+  return isVersionAboveLatestTested
     ? TooltipIconType.WARNING
     : TooltipIconType.PASSED
 }

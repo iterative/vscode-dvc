@@ -125,3 +125,8 @@ export const CliFoundManually = Template.bind({})
 CliFoundManually.args = getUpdatedArgs({
   isPythonExtensionUsed: false
 })
+
+export const CliAboveLatestTested = Template.bind({})
+CliAboveLatestTested.args = getUpdatedArgs({
+  isAboveLatestTestedVersion: true
+})

@@ -28,6 +28,7 @@ const renderApp = ({
   cliCompatible,
   dvcCliDetails,
   hasData,
+  isAboveLatestTestedVersion,
   isPythonExtensionUsed,
   isStudioConnected,
   needsGitInitialized,
@@ -51,6 +52,7 @@ const renderApp = ({
           cliCompatible,
           dvcCliDetails,
           hasData,
+          isAboveLatestTestedVersion,
           isPythonExtensionUsed,
           isStudioConnected,
           needsGitCommit,
@@ -702,7 +704,9 @@ describe('App', () => {
         shareLiveToStudio: false
       })
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[0]
+      const iconWrapper = within(
+        screen.getByTestId('dvc-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.ERROR)
@@ -729,10 +733,49 @@ describe('App', () => {
         shareLiveToStudio: false
       })
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[0]
+      const iconWrapper = within(
+        screen.getByTestId('dvc-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.PASSED)
+      ).toBeInTheDocument()
+    })
+
+    it('should add a warning icon and message if version is above the latest tested version', () => {
+      renderApp({
+        canGitInitialize: false,
+        cliCompatible: true,
+        dvcCliDetails: {
+          command: 'path/to/python -m dvc',
+          version: '1.0.0'
+        },
+        hasData: false,
+        isAboveLatestTestedVersion: true,
+        isPythonExtensionUsed: true,
+        isStudioConnected: true,
+        needsGitCommit: false,
+        needsGitInitialized: false,
+        projectInitialized: true,
+        pythonBinPath: 'python',
+        sectionCollapsed: undefined,
+        shareLiveToStudio: false
+      })
+
+      const iconWrapper = within(
+        screen.getByTestId('dvc-section-details')
+      ).getByTestId('info-tooltip-toggle')
+
+      expect(
+        within(iconWrapper).getByTestId(TooltipIconType.WARNING)
+      ).toBeInTheDocument()
+
+      fireEvent.mouseEnter(iconWrapper)
+
+      expect(
+        screen.getByText(
+          'Warning, the located version is above the latest tested version which could lead to unexpected behavior.'
+        )
       ).toBeInTheDocument()
     })
   })
@@ -957,7 +1000,9 @@ describe('App', () => {
         shareLiveToStudio: false
       })
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[1]
+      const iconWrapper = within(
+        screen.getByTestId('experiments-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.ERROR)
@@ -984,7 +1029,9 @@ describe('App', () => {
         shareLiveToStudio: false
       })
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[1]
+      const iconWrapper = within(
+        screen.getByTestId('experiments-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.ERROR)
@@ -1011,7 +1058,9 @@ describe('App', () => {
         shareLiveToStudio: false
       })
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[1]
+      const iconWrapper = within(
+        screen.getByTestId('experiments-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.PASSED)
@@ -1152,7 +1201,9 @@ describe('App', () => {
         shareLiveToStudio: false
       })
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[2]
+      const iconWrapper = within(
+        screen.getByTestId('studio-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.ERROR)
@@ -1179,7 +1230,9 @@ describe('App', () => {
         shareLiveToStudio: false
       })
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[2]
+      const iconWrapper = within(
+        screen.getByTestId('studio-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.INFO)
@@ -1265,7 +1318,9 @@ describe('App', () => {
         shareLiveToStudio: false
       })
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[2]
+      const iconWrapper = within(
+        screen.getByTestId('studio-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.PASSED)
