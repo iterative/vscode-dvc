@@ -5,10 +5,10 @@
     "**/*.test.*",
     "**/constants.ts",
     "**/contract.ts",
-    "demo/**",
-    "extension/src/test/**",
-    "languageServer/src/test/**",
-    "webview/src/shared/components/icons/**"
+    "demo/",
+    "extension/src/test/",
+    "languageServer/src/test/",
+    "webview/src/shared/components/icons/"
   ],
   "checks": {
     "file-lines": {

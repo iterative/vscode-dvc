@@ -1,12 +1,9 @@
 import React from 'react'
-import { EmptyState } from '../../shared/components/emptyState/EmptyState'
-import { Button } from '../../shared/components/button/Button'
+import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
+import { Button } from '../../../shared/components/button/Button'
+import { showScmPanel } from '../messages'
 
-type NeedsGitCommitProps = { showScmPanel: () => void }
-
-export const NeedsGitCommit: React.FC<NeedsGitCommitProps> = ({
-  showScmPanel
-}) => (
+export const NeedsGitCommit: React.FC = () => (
   <EmptyState isFullScreen={false}>
     <div>
       <h1>No Git commits detected</h1>

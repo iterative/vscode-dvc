@@ -4,6 +4,7 @@ import { getProcessPlatform } from '../env'
 import { exists } from '../fileSystem'
 import { Logger } from '../common/logger'
 import { createProcess, executeProcess, Process } from '../process/execution'
+import { esmPackagesImported } from '../util/esm'
 
 const sendOutput = (process: Process) => {
   process.all?.on('data', chunk =>
@@ -29,11 +30,12 @@ export const installPackages = (
 export const getDefaultPython = (): string =>
   getProcessPlatform() === 'win32' ? 'python' : 'python3'
 
-export const setupVenv = async (
+export const setupTestVenv = async (
   cwd: string,
   envDir: string,
   ...installArgs: string[]
 ) => {
+  await esmPackagesImported
   if (!exists(join(cwd, envDir))) {
     const initVenv = createProcess({
       args: ['-m', 'venv', envDir],
