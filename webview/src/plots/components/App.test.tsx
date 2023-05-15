@@ -53,7 +53,7 @@ import {
   dragEnter,
   dragLeave
 } from '../../test/dragDrop'
-import { SectionDescription } from '../../shared/components/sectionContainer/SectionContainer'
+import { SectionDescriptionMainText } from '../../shared/components/sectionContainer/SectionDescription'
 import { DragEnterDirection } from '../../shared/components/dragDrop/util'
 import { clearSelection, createWindowTextSelection } from '../../test/selection'
 import * as EventCurrentTargetDistances from '../../shared/components/dragDrop/currentTarget'
@@ -648,7 +648,7 @@ describe('App', () => {
     const summaryElement = await screen.findByText('Custom')
     createWindowTextSelection(
       // eslint-disable-next-line testing-library/no-node-access
-      SectionDescription['custom-plots'].props.children,
+      SectionDescriptionMainText['custom-plots'].props.children,
       2
     )
     fireEvent.click(summaryElement, {

@@ -62,6 +62,10 @@ $gap: 20px;
   fill: $error-color;
 }
 
+.warningIcon {
+  fill: $warn-color;
+}
+
 .infoTooltip {
   max-width: 340px;
   margin-left: 5px;
@@ -76,4 +80,10 @@ $gap: 20px;
   a {
     text-decoration: none;
   }
+}
+
+.infoTooltipSecondaryText {
+  font-style: italic;
+  display: block;
+  margin-top: 10px;
 }

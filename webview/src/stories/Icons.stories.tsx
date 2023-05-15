@@ -31,7 +31,8 @@ import {
   StarEmpty,
   StarFull,
   Trash,
-  UpArrow
+  UpArrow,
+  Warning
 } from '../shared/components/icons'
 
 export default {
@@ -123,6 +124,9 @@ const Template: StoryFn = () => {
       </IconWrapper>
       <IconWrapper name="UpArrow">
         <Icon icon={UpArrow} />
+      </IconWrapper>
+      <IconWrapper name="Warning">
+        <Icon icon={Warning} />
       </IconWrapper>
     </IconsWrapper>
   )

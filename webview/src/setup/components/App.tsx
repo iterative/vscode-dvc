@@ -15,6 +15,27 @@ import { Studio } from './studio/Studio'
 import { SetupContainer } from './SetupContainer'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 import { sendMessage } from '../../shared/vscode'
+import { TooltipIconType } from '../../shared/components/sectionContainer/InfoTooltip'
+
+const getDvcStatusIcon = (
+  isDvcSetup: boolean,
+  isVersionBelowLatestTested: boolean
+) => {
+  if (!isDvcSetup) {
+    return TooltipIconType.ERROR
+  }
+  return isVersionBelowLatestTested
+    ? TooltipIconType.WARNING
+    : TooltipIconType.PASSED
+}
+
+const getStudioStatusIcon = (cliCompatible: boolean, isConnected: boolean) => {
+  if (!cliCompatible) {
+    return TooltipIconType.ERROR
+  }
+
+  return isConnected ? TooltipIconType.PASSED : TooltipIconType.INFO
+}
 
 export const App: React.FC = () => {
   const [cliCompatible, setCliCompatible] = useState<boolean | undefined>(
@@ -102,7 +123,13 @@ export const App: React.FC = () => {
         title="DVC"
         sectionCollapsed={sectionCollapsed}
         setSectionCollapsed={setSectionCollapsed}
-        isSetup={isDvcSetup}
+        icon={getDvcStatusIcon(isDvcSetup, false)}
+        secondaryTooltipText={
+          <>
+            Warning! Your version is below the latest tested version which could
+            lead to unexpected behavior.
+          </>
+        }
       >
         <Dvc
           canGitInitialize={canGitInitialize}
@@ -121,7 +148,9 @@ export const App: React.FC = () => {
         title="Experiments"
         sectionCollapsed={sectionCollapsed}
         setSectionCollapsed={setSectionCollapsed}
-        isSetup={isDvcSetup && !!hasData}
+        icon={
+          isDvcSetup && hasData ? TooltipIconType.PASSED : TooltipIconType.ERROR
+        }
       >
         <Experiments
           needsGitCommit={needsGitCommit}
@@ -135,8 +164,7 @@ export const App: React.FC = () => {
         title="Studio"
         sectionCollapsed={sectionCollapsed}
         setSectionCollapsed={setSectionCollapsed}
-        isSetup={!!cliCompatible}
-        isConnected={isStudioConnected}
+        icon={getStudioStatusIcon(!!cliCompatible, isStudioConnected)}
       >
         <Studio
           isStudioConnected={isStudioConnected}

@@ -1,29 +1,33 @@
-import React from 'react'
+import React, { PropsWithChildren } from 'react'
 import cx from 'classnames'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import { SetupSection } from 'dvc/src/setup/webview/contract'
 import styles from './styles.module.scss'
-import { SectionDescription } from './SectionContainer'
+import { SectionDescription } from './SectionDescription'
 import Tooltip from '../tooltip/Tooltip'
+import { Info, PassFilled, Error, Warning } from '../icons'
 import { Icon } from '../Icon'
-import { Info, PassFilled, Error } from '../icons'
 
 export enum TooltipIconType {
   PASSED = 'pass-filled',
   INFO = 'info',
-  ERROR = 'error'
+  ERROR = 'error',
+  WARNING = 'warning'
 }
 
 const tooltipIcons = {
   [TooltipIconType.PASSED]: PassFilled,
   [TooltipIconType.INFO]: Info,
-  [TooltipIconType.ERROR]: Error
+  [TooltipIconType.ERROR]: Error,
+  [TooltipIconType.WARNING]: Warning
 }
 
-export const InfoTooltip: React.FC<{
-  sectionKey: PlotsSection | SetupSection
-  icon?: TooltipIconType
-}> = ({ icon = TooltipIconType.INFO, sectionKey }) => {
+export const InfoTooltip: React.FC<
+  PropsWithChildren<{
+    sectionKey: PlotsSection | SetupSection
+    icon?: TooltipIconType
+  }>
+> = ({ icon = TooltipIconType.INFO, sectionKey, children }) => {
   const infoIcon = (
     <Icon
       data-testid={icon}
@@ -33,7 +37,8 @@ export const InfoTooltip: React.FC<{
       className={cx(
         styles.infoIcon,
         icon === TooltipIconType.ERROR && styles.errorIcon,
-        icon === TooltipIconType.PASSED && styles.completedIcon
+        icon === TooltipIconType.PASSED && styles.completedIcon,
+        icon === TooltipIconType.WARNING && styles.warningIcon
       )}
     />
   )
@@ -41,7 +46,9 @@ export const InfoTooltip: React.FC<{
   const tooltipContent = (
     <div className={styles.infoTooltip}>
       {infoIcon}
-      {SectionDescription[sectionKey]}
+      <SectionDescription sectionKey={sectionKey}>
+        {children}
+      </SectionDescription>
     </div>
   )
 
