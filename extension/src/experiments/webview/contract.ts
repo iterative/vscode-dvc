@@ -46,7 +46,7 @@ export type Experiment = {
   starred?: boolean
   status?: ExperimentStatus
   timestamp?: string | null
-  branch: string
+  branch: string | undefined
 }
 
 export const isRunning = (status: ExperimentStatus | undefined): boolean =>
@@ -106,7 +106,6 @@ export type TableData = {
   hasRunningWorkspaceExperiment: boolean
   hasValidDvcYaml: boolean
   isShowingMoreCommits: Record<string, boolean>
-  isBranchesView: boolean
   rows: Commit[]
   selectedForPlotsCount: number
   sorts: SortDefinition[]

@@ -41,10 +41,33 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
   }
 
   public async update(): Promise<void> {
-    const isBranchesView = this.experiments.getIsBranchesView()
-    const data: ExpShowOutput = isBranchesView
-      ? ((await this.expShow([ExperimentFlag.ALL_BRANCHES])) as ExpShowOutput)
-      : await this.updateCommitsView()
+    const data: ExpShowOutput = []
+
+    const { branches, currentBranch } =
+      await this.getBranchesToShowWithCurrent()
+
+    await Promise.all(
+      branches.map(async branch => {
+        const branchFlags = [
+          ExperimentFlag.REV,
+          branch,
+          ExperimentFlag.NUM_COMMIT,
+          this.experiments.getNbOfCommitsToShow(branch).toString()
+        ]
+        const output = (await this.expShow(
+          branchFlags,
+          branch
+        )) as ExpShowOutput
+
+        if (branch !== currentBranch) {
+          const workspaceIndex = output.findIndex(
+            exp => exp.rev === EXPERIMENT_WORKSPACE_ID
+          )
+          output.splice(workspaceIndex, 1)
+        }
+        data.push(...output)
+      })
+    )
 
     this.collectFiles(data)
 
@@ -77,46 +100,6 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
       ...flags
     )
     return data.map(exp => ({ ...exp, branch }))
-  }
-
-  private async updateCommitsView() {
-    const data: ExpShowOutput = []
-
-    const { branches, currentBranch } =
-      await this.getBranchesToShowWithCurrent()
-
-    const output = []
-    for (const branch of branches) {
-      const branchFlags = [
-        ExperimentFlag.REV,
-        branch,
-        ExperimentFlag.NUM_COMMIT,
-        this.experiments.getNbOfCommitsToShow(branch).toString()
-      ]
-      output.push(
-        new Promise<void>((resolve, reject) => {
-          this.expShow(branchFlags, branch)
-            .then(output => {
-              const newData = output as ExpShowOutput
-              if (branch !== currentBranch) {
-                const workspaceIndex = newData.findIndex(
-                  exp => exp.rev === EXPERIMENT_WORKSPACE_ID
-                )
-                newData.splice(workspaceIndex, 1)
-              }
-              data.push(...newData)
-              resolve()
-            })
-            .catch(() => {
-              reject(new Error('Output failed'))
-            })
-        })
-      )
-    }
-
-    await Promise.all(output)
-
-    return data
   }
 
   private async updateAvailableBranchesToSelect() {

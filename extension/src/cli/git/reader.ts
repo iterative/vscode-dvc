@@ -3,7 +3,7 @@ import { GitCli } from '.'
 import { Command, Flag } from './constants'
 import { getOptions } from './options'
 import { typeCheckCommands } from '..'
-import { trimAndSplit } from '../../util/stdout'
+import { cleanUpBranchName, trimAndSplit } from '../../util/stdout'
 import { isDirectory } from '../../fileSystem'
 
 export const autoRegisteredCommands = {
@@ -95,7 +95,7 @@ export class GitReader extends GitCli {
     const options = getOptions(cwd, Command.BRANCH, Flag.NO_MERGE)
     try {
       const branches = await this.executeProcess(options)
-      return trimAndSplit(branches)
+      return trimAndSplit(branches).map(cleanUpBranchName)
     } catch {
       return []
     }
@@ -105,13 +105,10 @@ export class GitReader extends GitCli {
     const options = getOptions(cwd, Command.BRANCH)
     try {
       const branches = await this.executeProcess(options)
-      return (
-        trimAndSplit(branches)
-          .find(branch => branch.indexOf('*') === 0)
-          ?.replace('* ', '')
-          .replace('(HEAD detached at ', '')
-          .replace(')', '') || ''
+      const currentBranch = trimAndSplit(branches).find(
+        branch => branch.indexOf('*') === 0
       )
+      return (currentBranch && cleanUpBranchName(currentBranch)) || ''
     } catch {
       return ''
     }

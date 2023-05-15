@@ -53,7 +53,6 @@ export const tableData: TableData = {
   hasMoreCommits: { current: true },
   hasRunningWorkspaceExperiment: false,
   hasValidDvcYaml: true,
-  isBranchesView: false,
   isShowingMoreCommits: { current: true },
   rows: [
     {

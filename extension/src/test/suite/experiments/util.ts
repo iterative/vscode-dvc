@@ -156,12 +156,10 @@ export const buildExperimentsData = (
   const { internalCommands, mockExpShow, mockCreateFileSystemWatcher } =
     buildExperimentsDataDependencies(disposer)
 
-  const mockGetIsBranchView = stub().returns(false)
   const mockGetBranchesToShow = stub().returns(['current'])
   const data = disposer.track(
     new ExperimentsData(dvcDemoPath, internalCommands, {
       getBranchesToShow: mockGetBranchesToShow,
-      getIsBranchesView: mockGetIsBranchView,
       getNbOfCommitsToShow: () => ({
         current: DEFAULT_NUM_OF_COMMITS_TO_SHOW
       }),
@@ -174,8 +172,7 @@ export const buildExperimentsData = (
     data,
     mockCreateFileSystemWatcher,
     mockExpShow,
-    mockGetBranchesToShow,
-    mockGetIsBranchView
+    mockGetBranchesToShow
   }
 }
 

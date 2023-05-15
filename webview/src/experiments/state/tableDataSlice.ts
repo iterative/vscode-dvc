@@ -30,7 +30,6 @@ export const tableDataInitialState: TableDataState = {
   hasMoreCommits: {},
   hasRunningWorkspaceExperiment: false,
   hasValidDvcYaml: true,
-  isBranchesView: false,
   isShowingMoreCommits: {},
   rows: [],
   selectedForPlotsCount: 0,
@@ -104,9 +103,6 @@ export const tableDataSlice = createSlice({
     updateHasValidDvcYaml: (state, action: PayloadAction<boolean>) => {
       state.hasValidDvcYaml = action.payload
     },
-    updateIsBranchesView: (state, action: PayloadAction<boolean>) => {
-      state.isBranchesView = action.payload
-    },
     updateIsShowingMoreCommits: (
       state,
       action: PayloadAction<Record<string, boolean>>
@@ -160,7 +156,6 @@ export const {
   updateHasMoreCommits,
   updateHasRunningWorkspaceExperiment,
   updateHasValidDvcYaml,
-  updateIsBranchesView,
   updateIsShowingMoreCommits,
   updateRows,
   updateSelectedForPlotsCount,

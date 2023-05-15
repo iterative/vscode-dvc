@@ -214,12 +214,6 @@ export class WebviewMessages {
       case MessageFromWebviewType.SELECT_BRANCHES:
         return this.addAndRemoveBranches()
 
-      case MessageFromWebviewType.SWITCH_BRANCHES_VIEW:
-        return this.switchToBranchesView()
-
-      case MessageFromWebviewType.SWITCH_COMMITS_VIEW:
-        return this.switchCommitsView()
-
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
@@ -235,16 +229,6 @@ export class WebviewMessages {
     this.experiments.setBranchesToShow(selectedBranches)
     await this.update()
     await this.changeHasMoreOrLessCommits(true)
-  }
-
-  private async switchToBranchesView() {
-    this.experiments.setIsBranchesView(true)
-    await this.update()
-  }
-
-  private async switchCommitsView() {
-    this.experiments.setIsBranchesView(false)
-    await this.update()
   }
 
   private async changeHasMoreOrLessCommits(update?: boolean) {
@@ -286,7 +270,6 @@ export class WebviewMessages {
       hasRunningWorkspaceExperiment:
         this.experiments.hasRunningWorkspaceExperiment(),
       hasValidDvcYaml: this.hasValidDvcYaml,
-      isBranchesView: this.experiments.getIsBranchesView(),
       isShowingMoreCommits: this.isShowingMoreCommits,
       rows: this.experiments.getRowData(),
       selectedForPlotsCount: this.experiments.getSelectedRevisions().length,

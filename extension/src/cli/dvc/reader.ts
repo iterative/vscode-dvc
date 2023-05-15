@@ -75,7 +75,11 @@ export class DvcReader extends DvcCli {
     )
     if (isDvcError(output) || isEmpty(output)) {
       return [
-        { branch: '', rev: EXPERIMENT_WORKSPACE_ID, ...(output as DvcError) }
+        {
+          branch: undefined,
+          rev: EXPERIMENT_WORKSPACE_ID,
+          ...(output as DvcError)
+        }
       ]
     }
     return output

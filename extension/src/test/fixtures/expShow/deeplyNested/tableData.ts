@@ -19,7 +19,6 @@ const data: TableData = {
   hasMoreCommits: { current: true },
   hasRunningWorkspaceExperiment: false,
   hasValidDvcYaml: true,
-  isBranchesView: false,
   isShowingMoreCommits: { current: true },
   rows,
   selectedForPlotsCount: 0,

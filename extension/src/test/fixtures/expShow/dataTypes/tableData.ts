@@ -17,7 +17,6 @@ export const data: TableData = {
   hasRunningWorkspaceExperiment: false,
   hasValidDvcYaml: true,
   isShowingMoreCommits: { current: true },
-  isBranchesView: false,
   rows,
   selectedForPlotsCount: 0,
   sorts: []

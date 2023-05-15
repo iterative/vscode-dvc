@@ -183,10 +183,9 @@ const collectExpState = (
       : name || shortenForLabel(rev)
   const id = name || label
 
-  const experiment: Experiment = { id, label } as unknown as Experiment
+  const experiment: Experiment = { branch, id, label } as unknown as Experiment
 
   const baseline = transformExpState(experiment, expState)
-  baseline.branch = branch
 
   if (rev === EXPERIMENT_WORKSPACE_ID && !name) {
     acc.workspace = baseline
@@ -321,7 +320,7 @@ export const collectExperiments = (
     hasCheckpoints: hasCheckpoints(output),
     runningExperiments: [],
     workspace: {
-      branch: '',
+      branch: undefined,
       id: EXPERIMENT_WORKSPACE_ID,
       label: EXPERIMENT_WORKSPACE_ID
     }

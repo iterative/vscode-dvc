@@ -27,14 +27,6 @@ export const showLessCommits = (branch: string) =>
     type: MessageFromWebviewType.SHOW_LESS_COMMITS
   })
 
-export const switchToBranchesView = () => {
-  sendMessage({ type: MessageFromWebviewType.SWITCH_BRANCHES_VIEW })
-}
-
-export const switchToCommitsView = () => {
-  sendMessage({ type: MessageFromWebviewType.SWITCH_COMMITS_VIEW })
-}
-
 export const selectBranches = () =>
   sendMessage({
     type: MessageFromWebviewType.SELECT_BRANCHES
