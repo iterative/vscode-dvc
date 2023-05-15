@@ -9,16 +9,16 @@ import {
 } from '@testing-library/react'
 import { IconMenu } from './IconMenu'
 import { IconMenuItemProps } from './IconMenuItem'
-import { Add, Lines, UpArrow } from '../icons'
+import { Add, ListFilter, ArrowUp } from '../icons'
 
 const items: IconMenuItemProps[] = [
   {
-    icon: UpArrow,
+    icon: ArrowUp,
     onClick: jest.fn,
     tooltip: 'Move Up'
   },
   {
-    icon: Lines,
+    icon: ListFilter,
     onClickNode: 'On Click Node',
     tooltip: 'Choose metrics'
   }

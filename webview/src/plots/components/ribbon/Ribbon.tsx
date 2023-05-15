@@ -7,7 +7,7 @@ import { RibbonBlock } from './RibbonBlock'
 import { update } from './ribbonSlice'
 import { IconButton } from '../../../shared/components/button/IconButton'
 import { PlotsState } from '../../store'
-import { Lines, Refresh } from '../../../shared/components/icons'
+import { ListFilter, Refresh } from '../../../shared/components/icons'
 import { refreshRevisions, removeRevision, selectRevisions } from '../messages'
 
 const MAX_NB_EXP = 7
@@ -67,7 +67,7 @@ export const Ribbon: React.FC = () => {
       <li className={styles.buttonWrapper}>
         <IconButton
           onClick={selectRevisions}
-          icon={Lines}
+          icon={ListFilter}
           text={`${revisions.length} of ${MAX_NB_EXP}`}
         />
       </li>

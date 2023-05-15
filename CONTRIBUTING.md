@@ -93,3 +93,25 @@ There are some discrepancies between the Storybook environment and the
 environment of a real VS Code extension, custom themes being a big one. Always
 make sure to try out changed components in the full dev environment before
 merging!
+
+## Adding and using icons (SVGs)
+
+Before adding one or more icons, check the available icons in
+`webview/src/shared/component/icons`. You can also start Storybook and verify
+the icons' story to see all the icons at once. Try to pick one that's already
+available before adding one.
+
+If none of the icons fit the purpose, you can select one from
+[VS Code codicon](https://microsoft.github.io/vscode-codicons/dist/codicon.html).
+Once you know which icon you want to add, copy its name and add it to
+`webview/icons/codicons.mjs` in the `codicons` constant. If, by some unfortunate
+circumstance, none of the codicon meets your needs, you can add a custom SVG to
+the `webview/icons` directory.
+
+If you have added any icon (custom or from codicon), you will have to run
+`yarn svgr` or `yarn install` to ensure the icon is now available in the
+codebase.
+
+To use an icon, import it from `webview/src/shared/components/icons` (from the
+index file, not the file itself) and use it with the `<Icon />` component
+filling its `icon` prop with your imported icon.

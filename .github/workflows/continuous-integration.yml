@@ -38,6 +38,8 @@ jobs:
 
       - run: yarn run install-frozen-lockfile
 
+      - run: yarn svgr
+
       - run: yarn run lint
 
       - uses: paambaati/codeclimate-action@v4.0.0

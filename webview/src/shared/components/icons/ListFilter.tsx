@@ -1,6 +1,6 @@
 import * as React from 'react'
 import type { SVGProps } from 'react'
-const Add = (props: SVGProps<SVGSVGElement>) => (
+const ListFilter = (props: SVGProps<SVGSVGElement>) => (
   <svg
     width={16}
     height={16}
@@ -9,7 +9,7 @@ const Add = (props: SVGProps<SVGSVGElement>) => (
     fill="currentColor"
     {...props}
   >
-    <path d="M14 7v1H8v6H7V8H1V7h6V1h1v6h6z" />
+    <path d="M6 12v-1h4v1H6zM4 7h8v1H4V7zm10-4v1H2V3h12z" />
   </svg>
 )
-export default Add
+export default ListFilter
