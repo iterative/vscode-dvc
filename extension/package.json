@@ -1676,7 +1676,7 @@
     "@types/uuid": "9.0.1",
     "@types/vega": "3.2.0",
     "@types/vscode": "1.64.0",
-    "@vscode/test-electron": "2.3.0",
+    "@vscode/test-electron": "2.3.2",
     "@vscode/vsce": "2.19.0",
     "@wdio/cli": "8.10.1",
     "@wdio/local-runner": "8.10.1",
