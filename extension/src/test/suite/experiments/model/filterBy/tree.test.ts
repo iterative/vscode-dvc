@@ -102,18 +102,9 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       const filteredTableData: Partial<TableData> = {
         changes: workspaceChangesFixture,
-        columnOrder: columnsOrderFixture,
-        columnWidths: {},
-        columns: columnsFixture,
         filteredCount: 1,
         filters: [accuracyPath],
-        hasCheckpoints: true,
-        hasColumns: true,
-        hasConfig: true,
-        hasRunningWorkspaceExperiment: true,
-        hasValidDvcYaml: true,
-        rows: filteredRows,
-        sorts: []
+        rows: filteredRows
       }
 
       expect(messageSpy).to.be.calledWithMatch(filteredTableData)
@@ -135,18 +126,10 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       const unfilteredTableData: Partial<TableData> = {
         changes: workspaceChangesFixture,
-        columnOrder: columnsOrderFixture,
-        columnWidths: {},
         columns: columnsFixture,
         filteredCount: 0,
         filters: [],
-        hasCheckpoints: true,
-        hasColumns: true,
-        hasConfig: true,
-        hasRunningWorkspaceExperiment: true,
-        hasValidDvcYaml: true,
-        rows: [workspace, main],
-        sorts: []
+        rows: [workspace, main]
       }
 
       expect(messageSpy).to.be.calledWithMatch(unfilteredTableData)
@@ -379,17 +362,10 @@ suite('Experiments Filter By Tree Test Suite', () => {
       const filteredTableData: Partial<TableData> = {
         changes: workspaceChangesFixture,
         columnOrder: columnsOrderFixture,
-        columnWidths: {},
         columns: columnsFixture,
         filteredCount: 6,
         filters: ['starred'],
-        hasCheckpoints: true,
-        hasColumns: true,
-        hasConfig: true,
-        hasRunningWorkspaceExperiment: true,
-        hasValidDvcYaml: true,
-        rows: filteredRows,
-        sorts: []
+        rows: filteredRows
       }
 
       expect(messageSpy).to.be.calledWithMatch(filteredTableData)
