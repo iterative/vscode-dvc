@@ -37,15 +37,15 @@ export class WebviewMessages {
 
   private hasConfig = false
   private hasValidDvcYaml = true
-  private hasMoreCommits = false
-  private isShowingMoreCommits = true
+  private hasMoreCommits: Record<string, boolean> = {}
+  private isShowingMoreCommits: Record<string, boolean> = {}
 
   private readonly addStage: () => Promise<boolean>
   private readonly selectBranches: (
     branchesSelected: string[]
   ) => Promise<string[] | undefined>
 
-  private readonly getNumCommits: () => Promise<number>
+  private readonly getNumCommits: (branch: string) => Promise<number>
   private readonly update: () => Promise<void>
 
   constructor(
@@ -60,7 +60,7 @@ export class WebviewMessages {
     selectBranches: (
       branchesSelected: string[]
     ) => Promise<string[] | undefined>,
-    getNumCommits: () => Promise<number>,
+    getNumCommits: (branch: string) => Promise<number>,
     update: () => Promise<void>
   ) {
     this.dvcRoot = dvcRoot
@@ -86,7 +86,10 @@ export class WebviewMessages {
     update && this.sendWebviewMessage()
   }
 
-  public sendWebviewMessage() {
+  public sendWebviewMessage(doNotCheckNbCommits?: boolean) {
+    if (!doNotCheckNbCommits) {
+      void this.changeHasMoreOrLessCommits(true)
+    }
     const webview = this.getWebview()
     void webview?.show(this.getWebviewData())
   }
@@ -204,18 +207,12 @@ export class WebviewMessages {
         )
 
       case MessageFromWebviewType.SHOW_MORE_COMMITS:
-        return this.changeCommitsToShow(1)
+        return this.changeCommitsToShow(1, message.payload)
 
       case MessageFromWebviewType.SHOW_LESS_COMMITS:
-        return this.changeCommitsToShow(-1)
+        return this.changeCommitsToShow(-1, message.payload)
       case MessageFromWebviewType.SELECT_BRANCHES:
         return this.addAndRemoveBranches()
-
-      case MessageFromWebviewType.SWITCH_BRANCHES_VIEW:
-        return this.switchToBranchesView()
-
-      case MessageFromWebviewType.SWITCH_COMMITS_VIEW:
-        return this.switchCommitsView()
 
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
@@ -231,31 +228,26 @@ export class WebviewMessages {
     }
     this.experiments.setBranchesToShow(selectedBranches)
     await this.update()
-  }
-
-  private async switchToBranchesView() {
-    this.experiments.setIsBranchesView(true)
-    await this.update()
-  }
-
-  private async switchCommitsView() {
-    this.experiments.setIsBranchesView(false)
-    await this.update()
+    await this.changeHasMoreOrLessCommits(true)
   }
 
   private async changeHasMoreOrLessCommits(update?: boolean) {
-    const availableNbCommits = await this.getNumCommits()
-    const nbOfCommitsToShow = this.experiments.getNbOfCommitsToShow()
-    this.hasMoreCommits = availableNbCommits > nbOfCommitsToShow
-    this.isShowingMoreCommits =
-      Math.min(nbOfCommitsToShow, availableNbCommits) > 1
-    update && this.sendWebviewMessage()
+    for (const branch of this.experiments.getBranchesToShow()) {
+      const availableNbCommits = await this.getNumCommits(branch)
+      const nbOfCommitsToShow = this.experiments.getNbOfCommitsToShow(branch)
+      this.hasMoreCommits[branch] = availableNbCommits > nbOfCommitsToShow
+      this.isShowingMoreCommits[branch] =
+        Math.min(nbOfCommitsToShow, availableNbCommits) > 1
+    }
+
+    update && this.sendWebviewMessage(true)
   }
 
-  private async changeCommitsToShow(change: 1 | -1) {
+  private async changeCommitsToShow(change: 1 | -1, branch: string) {
     this.experiments.setNbfCommitsToShow(
-      this.experiments.getNbOfCommitsToShow() +
-        NUM_OF_COMMITS_TO_INCREASE * change
+      this.experiments.getNbOfCommitsToShow(branch) +
+        NUM_OF_COMMITS_TO_INCREASE * change,
+      branch
     )
     await this.update()
     await this.changeHasMoreOrLessCommits(true)
@@ -278,7 +270,6 @@ export class WebviewMessages {
       hasRunningWorkspaceExperiment:
         this.experiments.hasRunningWorkspaceExperiment(),
       hasValidDvcYaml: this.hasValidDvcYaml,
-      isBranchesView: this.experiments.getIsBranchesView(),
       isShowingMoreCommits: this.isShowingMoreCommits,
       rows: this.experiments.getRowData(),
       selectedForPlotsCount: this.experiments.getSelectedRevisions().length,

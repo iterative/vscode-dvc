@@ -92,6 +92,7 @@ describe('pickExperimentsToPlot', () => {
   it('should fill the quick pick item details with column values', async () => {
     const selectedExperiment = {
       Created: '2022-08-19T08:17:22',
+      branch: 'main',
       deps: {
         'data/data.xml': { changes: false, value: '22a1a29' }
       },
@@ -184,6 +185,7 @@ describe('pickExperimentsToPlot', () => {
 })
 
 const mockedExp1 = {
+  branch: 'main',
   description: '[exp-0580a]',
   id: 'abcdefb',
   label: 'abcdefb',
@@ -191,6 +193,7 @@ const mockedExp1 = {
 }
 
 const mockedExp2 = {
+  branch: 'main',
   description: '[exp-c54c4]',
   id: 'abcdefa',
   label: 'abcdefa',
@@ -201,54 +204,63 @@ const mockedExpList = [
   mockedExp1,
   mockedExp2,
   {
+    branch: 'main',
     description: '[exp-054f1]',
     id: 'abcdef1',
     label: 'abcdef1',
     name: 'exp-054f1'
   },
   {
+    branch: 'main',
     description: '[exp-ae4fa]',
     id: 'abcdef2',
     label: 'abcdef2',
     name: 'exp-ae4fa'
   },
   {
+    branch: 'main',
     description: '[exp-1324e]',
     id: 'abcdef3',
     label: 'abcdef3',
     name: 'exp-1324e'
   },
   {
+    branch: 'main',
     description: '[exp-3bd24]',
     id: 'abcdef4',
     label: 'abcdef4',
     name: 'exp-3bd24'
   },
   {
+    branch: 'main',
     description: '[exp-5d170]',
     id: 'abcdef5',
     label: 'abcdef5',
     name: 'exp-5d170'
   },
   {
+    branch: 'main',
     description: '[exp-9fe22]',
     id: 'abcdef6',
     label: 'abcdef6',
     name: 'exp-9fe22'
   },
   {
+    branch: 'main',
     description: '[exp-b707b]',
     id: 'abcdef7',
     label: 'abcdef7',
     name: 'exp-b707b'
   },
   {
+    branch: 'main',
     description: '[exp-47694]',
     id: 'abcdef8',
     label: 'abcdef8',
     name: 'exp-47694'
   },
   {
+    branch: 'main',
     description: '[exp-59807]',
     id: 'abcdef9',
     label: 'abcdef9',

@@ -49,7 +49,12 @@ describe('limitToMaxSelected', () => {
     expect(
       limitToMaxSelected([
         ...mockedExperiments,
-        { id: '1', label: 'R', status: ExperimentStatus.RUNNING }
+        {
+          branch: 'main',
+          id: '1',
+          label: 'R',
+          status: ExperimentStatus.RUNNING
+        }
       ])
         .map(({ label }) => label)
         .sort()

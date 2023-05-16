@@ -54,14 +54,12 @@ import {
 import { clearSelection, createWindowTextSelection } from '../../test/selection'
 import { sendMessage } from '../../shared/vscode'
 import { setExperimentsAsStarred } from '../../test/tableDataFixture'
-import { featureFlag } from '../../util/flags'
 
 jest.mock('../../shared/api')
 jest.mock('../../util/styles')
 jest.mock('./overflowHoverTooltip/useIsFullyContained', () => ({
   useIsFullyContained: jest.fn()
 }))
-const mockedFeatureFlags = jest.mocked(featureFlag)
 const mockedUseIsFullyContained = jest.mocked(useIsFullyContained)
 
 const { postMessage } = vsCodeApi
@@ -339,7 +337,7 @@ describe('App', () => {
 
       testClick(workspace, EXPERIMENT_WORKSPACE_ID)
       testClick(experimentRunningInWorkspace, 'exp-83425')
-      testClick(screen.getByText('main'), 'main')
+      testClick(screen.getAllByText('main')[1], 'main')
       testClick(screen.getByText('[exp-e7a67]'), 'exp-e7a67')
     })
 
@@ -348,7 +346,7 @@ describe('App', () => {
 
       mockPostMessage.mockClear()
 
-      const testRowLabel = screen.getByText('main')
+      const testRowLabel = screen.getAllByText('main')[1]
 
       testRowLabel.focus()
 
@@ -420,7 +418,7 @@ describe('App', () => {
       const testRowId = 'main'
 
       createWindowTextSelection(selectedTestRowId, 5)
-      fireEvent.click(screen.getByText(testRowId))
+      fireEvent.click(screen.getAllByText(testRowId)[1])
 
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
@@ -496,6 +494,7 @@ describe('App', () => {
       ],
       rows: [
         {
+          branch: 'main',
           id: EXPERIMENT_WORKSPACE_ID,
           label: EXPERIMENT_WORKSPACE_ID,
           metrics: {
@@ -510,6 +509,7 @@ describe('App', () => {
           }
         },
         {
+          branch: 'main',
           id: 'main',
           label: 'main',
           metrics: {
@@ -861,7 +861,7 @@ describe('App', () => {
     it('should enable the correct options for a commit with checkpoints', () => {
       renderTableWithoutRunningExperiments()
 
-      const target = screen.getByText('main')
+      const target = screen.getAllByText('main')[1]
       fireEvent.contextMenu(target, { bubbles: true })
 
       advanceTimersByTime(100)
@@ -882,7 +882,7 @@ describe('App', () => {
     it('should enable the correct options for a commit without checkpoints', () => {
       renderTableWithoutRunningExperiments(false)
 
-      const target = screen.getByText('main')
+      const target = screen.getAllByText('main')[1]
       fireEvent.contextMenu(target, { bubbles: true })
 
       advanceTimersByTime(100)
@@ -949,7 +949,7 @@ describe('App', () => {
     it('should not close when a disabled item is clicked', () => {
       renderTableWithoutRunningExperiments()
 
-      const target = screen.getByText('main')
+      const target = screen.getAllByText('main')[1]
       fireEvent.contextMenu(target, { bubbles: true })
 
       advanceTimersByTime(100)
@@ -1742,131 +1742,62 @@ describe('App', () => {
 
   describe('Show more commits', () => {
     it('should display a show more commits button if the table data hasMoreCommits is set to true', () => {
-      renderTable({ ...tableDataFixture, hasMoreCommits: true })
+      renderTable({ ...tableDataFixture, hasMoreCommits: { main: true } })
 
       expect(screen.getByText('Show More Commits')).toBeInTheDocument()
     })
 
     it('should not display a show more commits button if the table data hasMoreCommits is set to false', () => {
-      renderTable({ ...tableDataFixture, hasMoreCommits: false })
+      renderTable({ ...tableDataFixture, hasMoreCommits: { main: false } })
 
       expect(screen.queryByText('Show More Commits')).not.toBeInTheDocument()
     })
 
     it('should send a message to show more commits when the show more commits button is clicked', () => {
-      renderTable({ ...tableDataFixture, hasMoreCommits: true })
+      renderTable({ ...tableDataFixture, hasMoreCommits: { main: true } })
 
       fireEvent.click(screen.getByText('Show More Commits'))
 
       expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: 'main',
         type: MessageFromWebviewType.SHOW_MORE_COMMITS
       })
     })
 
     it('should display a show less commits button if the table data isShowingMoreCommits is set to true', () => {
-      renderTable({ ...tableDataFixture, isShowingMoreCommits: true })
+      renderTable({
+        ...tableDataFixture,
+        isShowingMoreCommits: { main: true }
+      })
 
       expect(screen.getByText('Show Less Commits')).toBeInTheDocument()
     })
 
     it('should not display a show less commits button if the table data isShowingMoreCommits is set to false', () => {
-      renderTable({ ...tableDataFixture, isShowingMoreCommits: false })
+      renderTable({
+        ...tableDataFixture,
+        isShowingMoreCommits: { main: false }
+      })
 
       expect(screen.queryByText('Show Less Commits')).not.toBeInTheDocument()
     })
 
     it('should send a message to show less commits when the show less commits button is clicked', () => {
-      renderTable({ ...tableDataFixture, isShowingMoreCommits: true })
+      renderTable({
+        ...tableDataFixture,
+        isShowingMoreCommits: { main: true }
+      })
 
       fireEvent.click(screen.getByText('Show Less Commits'))
 
       expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: 'main',
         type: MessageFromWebviewType.SHOW_LESS_COMMITS
       })
-    })
-
-    it('should show a button to switch to branches view if isBranchesView is set to false', () => {
-      renderTable({ ...tableDataFixture, isBranchesView: false })
-
-      expect(
-        screen.getByText('Switch to All Branches View')
-      ).toBeInTheDocument()
-    })
-
-    it('should not show a button to switch to branches view if isBranchesView is set to true', () => {
-      renderTable({ ...tableDataFixture, isBranchesView: true })
-
-      expect(
-        screen.queryByText('Switch to All Branches View')
-      ).not.toBeInTheDocument()
-    })
-
-    it('should send a message to switch to branches view when clicking the switch to branches view button', () => {
-      renderTable({ ...tableDataFixture, isBranchesView: false })
-
-      fireEvent.click(screen.getByText('Switch to All Branches View'))
-
-      expect(mockPostMessage).toHaveBeenCalledWith({
-        type: MessageFromWebviewType.SWITCH_BRANCHES_VIEW
-      })
-    })
-
-    it('should show a button to switch to commits view if isBranchesView is set to true', () => {
-      renderTable({ ...tableDataFixture, isBranchesView: true })
-
-      expect(screen.getByText('Switch to Commits View')).toBeInTheDocument()
-    })
-
-    it('should not show a button to switch to commits view if isBranchesView is set to false', () => {
-      renderTable({ ...tableDataFixture, isBranchesView: false })
-
-      expect(
-        screen.queryByText('Switch to Commits View')
-      ).not.toBeInTheDocument()
-    })
-
-    it('should send a message to switch to commits view when clicking the switch to commits view button', () => {
-      renderTable({ ...tableDataFixture, isBranchesView: true })
-
-      fireEvent.click(screen.getByText('Switch to Commits View'))
-
-      expect(mockPostMessage).toHaveBeenCalledWith({
-        type: MessageFromWebviewType.SWITCH_COMMITS_VIEW
-      })
-    })
-
-    it('should disable the show more and show less commits buttons when isBranchView is set to true', () => {
-      renderTable({ ...tableDataFixture, isBranchesView: true })
-
-      expect(screen.getByText('Show More Commits')).toHaveProperty(
-        'disabled',
-        true
-      )
-      expect(screen.getByText('Show Less Commits')).toHaveProperty(
-        'disabled',
-        true
-      )
-    })
-
-    it('should not disable the show more and show less commits buttons when isBranchView is set to false', () => {
-      renderTable({ ...tableDataFixture, isBranchesView: false })
-
-      expect(screen.getByText('Show More Commits')).toHaveProperty(
-        'disabled',
-        false
-      )
-      expect(screen.getByText('Show Less Commits')).toHaveProperty(
-        'disabled',
-        false
-      )
     })
   })
 
   describe('Add / Remove branches', () => {
-    beforeEach(() => {
-      mockedFeatureFlags.ADD_REMOVE_BRANCHES = true
-    })
-
     it('should send a message to select branches when clicking the select branches button', () => {
       renderTable()
 
@@ -1885,26 +1816,6 @@ describe('App', () => {
       expect(mockPostMessage).not.toHaveBeenCalledWith({
         type: MessageFromWebviewType.SELECT_BRANCHES
       })
-    })
-  })
-
-  describe('Feature flags', () => {
-    it('should not show the add/remove branches buttons if the feature flag is off', () => {
-      mockedFeatureFlags.ADD_REMOVE_BRANCHES = false
-
-      renderTable()
-
-      expect(
-        screen.queryByText('Select Branch(es) to Show')
-      ).not.toBeInTheDocument()
-    })
-
-    it('should show the add/remove branches buttons if the feature flag is on', () => {
-      mockedFeatureFlags.ADD_REMOVE_BRANCHES = true
-
-      renderTable()
-
-      expect(screen.getByText('Select Branch(es) to Show')).toBeInTheDocument()
     })
   })
 })

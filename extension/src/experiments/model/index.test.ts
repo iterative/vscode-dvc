@@ -318,17 +318,21 @@ describe('ExperimentsModel', () => {
   it('should set the number of commits to show correctly', () => {
     const model = new ExperimentsModel('', buildMockMemento())
 
-    model.setNbfCommitsToShow(42)
+    model.setNbfCommitsToShow(42, 'special-branch')
 
-    expect(model.getNbOfCommitsToShow()).toBe(42)
+    expect(model.getNbOfCommitsToShow('special-branch')).toBe(42)
   })
 
   it('should persist the number of commits to show when changing it', () => {
     const memento = buildMockMemento()
     const model = new ExperimentsModel('', memento)
 
-    model.setNbfCommitsToShow(42)
+    model.setNbfCommitsToShow(42, 'main')
 
-    expect(memento.get(PersistenceKey.NUMBER_OF_COMMITS_TO_SHOW)).toBe(42)
+    expect(memento.get(PersistenceKey.NUMBER_OF_COMMITS_TO_SHOW)).toStrictEqual(
+      {
+        main: 42
+      }
+    )
   })
 })

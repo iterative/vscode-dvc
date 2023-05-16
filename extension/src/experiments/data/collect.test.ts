@@ -16,6 +16,7 @@ describe('collectFiles', () => {
   it('should handle an error being returned', () => {
     const workspaceOnly = [
       {
+        branch: 'main',
         error: { msg: 'bad things are happening', type: 'today' },
         rev: EXPERIMENT_WORKSPACE_ID
       }

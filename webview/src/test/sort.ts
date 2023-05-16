@@ -46,12 +46,12 @@ export const tableData: TableData = {
   hasRunningWorkspaceExperiment: false,
   rows: [
     {
-      branch: 'current',
+      branch: 'main',
       id: EXPERIMENT_WORKSPACE_ID,
       label: EXPERIMENT_WORKSPACE_ID
     },
     {
-      branch: 'current',
+      branch: 'main',
       id: 'main',
       label: 'main'
     }

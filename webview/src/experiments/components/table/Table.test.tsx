@@ -41,7 +41,7 @@ describe('Table', () => {
     const tableData = {
       ...sortingTableDataFixture,
       ...partialTableData,
-      branches: ['current']
+      branches: ['main']
     }
     return render(
       <Provider
@@ -261,7 +261,7 @@ describe('Table', () => {
 
       const tableDataWithColumnSetting: TableDataState = {
         ...sortingTableDataFixture,
-        branches: ['current'],
+        branches: ['main'],
         columnWidths
       }
       render(
@@ -302,7 +302,7 @@ describe('Table', () => {
 
       const tableDataWithColumnSetting: TableDataState = {
         ...sortingTableDataFixture,
-        branches: ['current'],
+        branches: ['main'],
         columnWidths
       }
       render(
