@@ -110,6 +110,9 @@ describe('App', () => {
       })
 
       expect(screen.getByText('DVC is incompatible')).toBeInTheDocument()
+      expect(
+        screen.getByText('Please update your install and try again.')
+      ).toBeInTheDocument()
 
       const button = screen.getByText('Check Compatibility')
       expect(button).toBeInTheDocument()
@@ -120,13 +123,15 @@ describe('App', () => {
       })
     })
 
-    it('should show a screen saying that DVC is not installed if the cli is unavailable', () => {
+    it('should tell the user than they can auto upgrade DVC if DVC is incompatible and python is available', () => {
+      const pythonBinPath = 'path/to/python'
+
       renderApp({
         canGitInitialize: false,
-        cliCompatible: undefined,
+        cliCompatible: false,
         dvcCliDetails: {
           command: 'dvc',
-          version: undefined
+          version: '1.0.0'
         },
         hasData: false,
         isPythonExtensionUsed: false,
@@ -134,14 +139,27 @@ describe('App', () => {
         needsGitCommit: false,
         needsGitInitialized: undefined,
         projectInitialized: false,
-        pythonBinPath: undefined,
+        pythonBinPath,
         sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
 
-      expect(screen.getAllByText('DVC is currently unavailable')).toHaveLength(
-        2
-      )
+      expect(screen.getByText('DVC is incompatible')).toBeInTheDocument()
+      expect(
+        screen.getByText(
+          `DVC can be automatically upgraded with ${pythonBinPath}`
+        )
+      ).toBeInTheDocument()
+
+      const compatibityButton = screen.getByText('Check Compatibility')
+      expect(compatibityButton).toBeInTheDocument()
+      const upgradeButton = screen.getByText('Upgrade')
+      expect(upgradeButton).toBeInTheDocument()
+
+      fireEvent.click(upgradeButton)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.UPGRADE_DVC
+      })
     })
 
     it('should tell the user they cannot install DVC without a Python interpreter', () => {
