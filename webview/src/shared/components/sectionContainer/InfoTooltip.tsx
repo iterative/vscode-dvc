@@ -16,10 +16,13 @@ export enum TooltipIconType {
 }
 
 const tooltipIcons = {
-  [TooltipIconType.PASSED]: PassFilled,
-  [TooltipIconType.INFO]: Info,
-  [TooltipIconType.ERROR]: Error,
-  [TooltipIconType.WARNING]: Warning
+  [TooltipIconType.PASSED]: {
+    className: styles.completedIcon,
+    icon: PassFilled
+  },
+  [TooltipIconType.INFO]: { className: undefined, icon: Info },
+  [TooltipIconType.ERROR]: { className: styles.errorIcon, icon: Error },
+  [TooltipIconType.WARNING]: { className: styles.warningIcon, icon: Warning }
 }
 
 export const InfoTooltip: React.FC<
@@ -33,13 +36,8 @@ export const InfoTooltip: React.FC<
       data-testid={icon}
       width={16}
       height={16}
-      icon={tooltipIcons[icon]}
-      className={cx(
-        styles.infoIcon,
-        icon === TooltipIconType.ERROR && styles.errorIcon,
-        icon === TooltipIconType.PASSED && styles.completedIcon,
-        icon === TooltipIconType.WARNING && styles.warningIcon
-      )}
+      icon={tooltipIcons[icon].icon}
+      className={cx(styles.infoIcon, tooltipIcons[icon].className)}
     />
   )
 
