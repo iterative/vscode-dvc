@@ -40,6 +40,7 @@ export class WebviewMessages {
     needsGitInitialized,
     projectInitialized,
     pythonBinPath,
+    remoteList,
     sectionCollapsed,
     shareLiveToStudio
   }: SetupData) {
@@ -54,6 +55,7 @@ export class WebviewMessages {
       needsGitInitialized,
       projectInitialized,
       pythonBinPath,
+      remoteList,
       sectionCollapsed,
       shareLiveToStudio
     })

@@ -44,6 +44,7 @@ export const buildSetup = (
 
   const mockEmitter = disposer.track(new EventEmitter())
   stub(dvcReader, 'root').resolves(mockDvcRoot)
+  stub(dvcExecutor, 'remote').resolves('')
   const mockVersion = stub(dvcReader, 'version').resolves(MIN_CLI_VERSION)
   const mockGlobalVersion = stub(dvcReader, 'globalVersion').resolves(
     MIN_CLI_VERSION

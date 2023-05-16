@@ -32,6 +32,7 @@ export const Experiments: React.FC<ExperimentsProps> = ({ isDvcSetup }) => {
               updateSectionCollapsed({
                 [SetupSection.DVC]: false,
                 [SetupSection.EXPERIMENTS]: true,
+                [SetupSection.REMOTE]: true,
                 [SetupSection.STUDIO]: true
               })
             )

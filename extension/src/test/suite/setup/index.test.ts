@@ -246,6 +246,7 @@ suite('Setup Test Suite', () => {
         needsGitInitialized: true,
         projectInitialized: false,
         pythonBinPath: undefined,
+        remoteList: undefined,
         sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
@@ -287,6 +288,7 @@ suite('Setup Test Suite', () => {
         needsGitInitialized: true,
         projectInitialized: false,
         pythonBinPath: undefined,
+        remoteList: undefined,
         sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
@@ -337,6 +339,7 @@ suite('Setup Test Suite', () => {
         needsGitInitialized: false,
         projectInitialized: false,
         pythonBinPath: undefined,
+        remoteList: undefined,
         sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
@@ -387,6 +390,7 @@ suite('Setup Test Suite', () => {
         needsGitInitialized: false,
         projectInitialized: true,
         pythonBinPath: undefined,
+        remoteList: undefined,
         sectionCollapsed: undefined,
         shareLiveToStudio: false
       })

@@ -1,0 +1,25 @@
+@import '../../../shared/variables';
+@import '../../../shared/mixins';
+
+.remoteDetails {
+  margin: 0 auto;
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.remoteKey,
+.remoteValue {
+  padding: 5px;
+}
+
+.remoteKey {
+  font-weight: bold;
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+.remoteValue {
+  padding-left: 50px;
+  display: flex;
+  flex-direction: column;
+}

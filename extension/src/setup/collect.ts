@@ -1,4 +1,10 @@
-import { DEFAULT_SECTION_COLLAPSED, SetupSection } from './webview/contract'
+import isEmpty from 'lodash.isempty'
+import {
+  DEFAULT_SECTION_COLLAPSED,
+  RemoteList,
+  SetupSection
+} from './webview/contract'
+import { trimAndSplit } from '../util/stdout'
 
 export const collectSectionCollapsed = (
   focusedSection?: SetupSection
@@ -15,4 +21,25 @@ export const collectSectionCollapsed = (
   }
 
   return acc
+}
+
+export const collectRemoteList = async (
+  dvcRoots: string[],
+  getRemoteList: (cwd: string) => Promise<string | undefined>
+): Promise<RemoteList> => {
+  const acc: { [alias: string]: string } = {}
+
+  for (const dvcRoot of dvcRoots) {
+    const remoteList = await getRemoteList(dvcRoot)
+    if (!remoteList) {
+      continue
+    }
+    const remotes = trimAndSplit(remoteList)
+    for (const remote of remotes) {
+      const [alias, storage] = remote.split(/\s+/)
+      acc[alias] = storage
+    }
+  }
+
+  return isEmpty(acc) ? undefined : acc
 }

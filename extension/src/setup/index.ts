@@ -7,7 +7,7 @@ import {
   SetupSection,
   SetupData as TSetupData
 } from './webview/contract'
-import { collectSectionCollapsed } from './collect'
+import { collectRemoteList, collectSectionCollapsed } from './collect'
 import { WebviewMessages } from './webview/messages'
 import { validateTokenInput } from './inputBox'
 import { findPythonBinForInstall } from './autoInstall'
@@ -47,7 +47,8 @@ import {
   Flag,
   ConfigKey as DvcConfigKey,
   DOT_DVC,
-  Args
+  Args,
+  SubCommand
 } from '../cli/dvc/constants'
 import { GLOBAL_WEBVIEW_DVCROOT } from '../webview/factory'
 import {
@@ -375,14 +376,28 @@ export class Setup
     }
   }
 
+  private async getRemoteList() {
+    await this.config.isReady()
+
+    if (!this.hasRoots()) {
+      return undefined
+    }
+
+    return collectRemoteList(this.dvcRoots, (cwd: string) =>
+      this.accessRemote(cwd, SubCommand.LIST)
+    )
+  }
+
   private async sendDataToWebview() {
     const projectInitialized = this.hasRoots()
     const hasData = this.getHasData()
 
-    const [isPythonExtensionUsed, dvcCliDetails] = await Promise.all([
-      this.isPythonExtensionUsed(),
-      this.getDvcCliDetails()
-    ])
+    const [isPythonExtensionUsed, dvcCliDetails, remoteList] =
+      await Promise.all([
+        this.isPythonExtensionUsed(),
+        this.getDvcCliDetails(),
+        this.getRemoteList()
+      ])
 
     const needsGitInitialized =
       !projectInitialized && !!(await this.needsGitInit())
@@ -405,6 +420,7 @@ export class Setup
       needsGitInitialized,
       projectInitialized,
       pythonBinPath: getBinDisplayText(pythonBinPath),
+      remoteList,
       sectionCollapsed: collectSectionCollapsed(this.focusedSection),
       shareLiveToStudio: getConfigValue(
         ExtensionConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE
@@ -705,13 +721,23 @@ export class Setup
     )
   }
 
-  private async accessConfig(cwd: string, ...args: Args) {
+  private accessConfig(cwd: string, ...args: Args) {
+    return this.accessDvc(AvailableCommands.CONFIG, cwd, ...args)
+  }
+
+  private accessRemote(cwd: string, ...args: Args) {
+    return this.accessDvc(AvailableCommands.REMOTE, cwd, ...args)
+  }
+
+  private async accessDvc(
+    commandId:
+      | typeof AvailableCommands.CONFIG
+      | typeof AvailableCommands.REMOTE,
+    cwd: string,
+    ...args: Args
+  ) {
     try {
-      return await this.internalCommands.executeCommand(
-        AvailableCommands.CONFIG,
-        cwd,
-        ...args
-      )
+      return await this.internalCommands.executeCommand(commandId, cwd, ...args)
     } catch {}
   }
 }

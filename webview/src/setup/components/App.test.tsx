@@ -37,6 +37,7 @@ const DEFAULT_DATA = {
   needsGitInitialized: false,
   projectInitialized: true,
   pythonBinPath: undefined,
+  remoteList: undefined,
   sectionCollapsed: undefined,
   shareLiveToStudio: false
 }
@@ -115,7 +116,7 @@ describe('App', () => {
       })
 
       expect(screen.getAllByText('DVC is currently unavailable')).toHaveLength(
-        2
+        3
       )
     })
 
@@ -244,14 +245,6 @@ describe('App', () => {
         projectInitialized: false
       })
 
-      expect(screen.queryByText('Initialize Git')).not.toBeInTheDocument()
-    })
-
-    it('should show a screen saying that DVC is not initialized if the project is not initialized and dvc is installed', () => {
-      renderApp({
-        projectInitialized: false
-      })
-
       expect(screen.getByText('DVC is not initialized')).toBeInTheDocument()
     })
 
@@ -281,8 +274,9 @@ describe('App', () => {
         projectInitialized: false,
         sectionCollapsed: {
           [SetupSection.DVC]: false,
-          [SetupSection.STUDIO]: true,
-          [SetupSection.EXPERIMENTS]: true
+          [SetupSection.EXPERIMENTS]: true,
+          [SetupSection.REMOTE]: true,
+          [SetupSection.STUDIO]: true
         }
       }
 
@@ -402,307 +396,284 @@ describe('App', () => {
 
     it('should show a passed icon if DVC CLI is compatible and project is initialized', () => {
       renderApp()
+    })
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[0]
+    expect(screen.getByText('DVC is not setup')).toBeInTheDocument()
+  })
 
-      expect(
-        within(iconWrapper).getByTestId(TooltipIconType.PASSED)
-      ).toBeInTheDocument()
+  it('should open the dvc section when clicking the Setup DVC button on the dvc is not setup screen', () => {
+    renderApp({
+      projectInitialized: false
+    })
+
+    const experimentsText = screen.getByText('DVC is not setup')
+    expect(experimentsText).toBeInTheDocument()
+
+    mockPostMessage.mockClear()
+    const button = screen.getByText('Setup DVC')
+    fireEvent.click(button)
+    expect(screen.getByText('DVC is not initialized')).toBeVisible()
+    expect(experimentsText).not.toBeVisible()
+  })
+
+  it('should show a screen saying that dvc is not setup if the project is initialized but dvc is not found', () => {
+    renderApp({
+      cliCompatible: false,
+      dvcCliDetails: {
+        command: 'dvc',
+        version: undefined
+      }
+    })
+
+    expect(screen.getByText('DVC is not setup')).toBeInTheDocument()
+  })
+
+  it('should not show a screen saying that the project contains no data if dvc is installed, the project is initialized and has data', () => {
+    renderApp({
+      hasData: true
+    })
+
+    expect(
+      screen.queryByText('Your project contains no data')
+    ).not.toBeInTheDocument()
+  })
+
+  it('should show a screen saying there needs to be a git commit if the project is initialized, dvc is installed, but has not git commit', () => {
+    renderApp({
+      needsGitCommit: true
+    })
+
+    expect(screen.getByText('No Git commits detected')).toBeInTheDocument()
+  })
+
+  it('should show a loading screen if the project is loading in data', () => {
+    renderApp({
+      hasData: undefined
+    })
+
+    expect(screen.getByText('Loading Project...')).toBeInTheDocument()
+  })
+
+  it('should show a screen saying that the project contains no data if dvc is installed, the project is initialized but has no data', () => {
+    renderApp()
+
+    expect(
+      screen.getByText('Your project contains no data')
+    ).toBeInTheDocument()
+  })
+
+  it('should enable the user to open the experiments webview when they have completed onboarding', () => {
+    renderApp({
+      hasData: true
+    })
+    mockPostMessage.mockClear()
+    fireEvent.click(screen.getByText('Show Experiments'))
+    expect(mockPostMessage).toHaveBeenCalledTimes(1)
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW
     })
   })
 
-  describe('Experiments', () => {
-    it('should show a screen saying that dvc is not setup if the project is not initialized', () => {
-      renderApp({
-        projectInitialized: false
-      })
+  it('should show an error icon if experiments are not setup', () => {
+    renderApp()
 
-      expect(screen.getByText('DVC is not setup')).toBeInTheDocument()
+    const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[1]
+
+    expect(
+      within(iconWrapper).getByTestId(TooltipIconType.ERROR)
+    ).toBeInTheDocument()
+  })
+
+  it('should show an error icon if dvc is not setup', () => {
+    renderApp({
+      cliCompatible: false
     })
 
-    it('should open the dvc section when clicking the Setup DVC button on the dvc is not setup screen', () => {
-      renderApp({
-        projectInitialized: false
-      })
+    const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[1]
 
-      const experimentsText = screen.getByText('DVC is not setup')
-      expect(experimentsText).toBeInTheDocument()
+    expect(
+      within(iconWrapper).getByTestId(TooltipIconType.ERROR)
+    ).toBeInTheDocument()
+  })
 
-      mockPostMessage.mockClear()
-      const button = screen.getByText('Setup DVC')
-      fireEvent.click(button)
-      expect(screen.getByText('DVC is not initialized')).toBeVisible()
-      expect(experimentsText).not.toBeVisible()
+  it('should show a passed icon if experiments are setup', () => {
+    renderApp({
+      hasData: true
     })
 
-    it('should show a screen saying that dvc is not setup if the project is initialized but dvc is not found', () => {
-      renderApp({
-        cliCompatible: false,
-        dvcCliDetails: {
-          command: 'dvc',
-          version: undefined
-        }
-      })
+    const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[1]
 
-      expect(screen.getByText('DVC is not setup')).toBeInTheDocument()
-    })
+    expect(
+      within(iconWrapper).getByTestId(TooltipIconType.PASSED)
+    ).toBeInTheDocument()
+  })
+})
 
-    it('should not show a screen saying that the project contains no data if dvc is installed, the project is initialized and has data', () => {
-      renderApp({
-        hasData: true
-      })
+describe('Studio not connected', () => {
+  it('should show three buttons which walk the user through saving a token', async () => {
+    renderApp()
+    const buttons = await within(
+      await screen.findByTestId('setup-studio-content')
+    ).findAllByRole('button')
+    expect(buttons).toHaveLength(3)
+  })
 
-      expect(
-        screen.queryByText('Your project contains no data')
-      ).not.toBeInTheDocument()
-    })
+  it('should show a button which opens Studio', () => {
+    renderApp()
 
-    it('should show a screen saying there needs to be a git commit if the project is initialized, dvc is installed, but has not git commit', () => {
-      renderApp({
-        needsGitCommit: true
-      })
-
-      expect(screen.getByText('No Git commits detected')).toBeInTheDocument()
-    })
-
-    it('should show a loading screen if the project is loading in data', () => {
-      renderApp({
-        hasData: undefined
-      })
-
-      expect(screen.getByText('Loading Project...')).toBeInTheDocument()
-    })
-
-    it('should show a screen saying that the project contains no data if dvc is installed, the project is initialized but has no data', () => {
-      renderApp()
-
-      expect(
-        screen.getByText('Your project contains no data')
-      ).toBeInTheDocument()
-    })
-
-    it('should enable the user to open the experiments webview when they have completed onboarding', () => {
-      renderApp({
-        hasData: true
-      })
-      mockPostMessage.mockClear()
-      fireEvent.click(screen.getByText('Show Experiments'))
-      expect(mockPostMessage).toHaveBeenCalledTimes(1)
-      expect(mockPostMessage).toHaveBeenCalledWith({
-        type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW
-      })
-    })
-
-    it('should show an error icon if experiments are not setup', () => {
-      renderApp()
-
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[1]
-
-      expect(
-        within(iconWrapper).getByTestId(TooltipIconType.ERROR)
-      ).toBeInTheDocument()
-    })
-
-    it('should show an error icon if dvc is not setup', () => {
-      renderApp({
-        cliCompatible: false
-      })
-
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[1]
-
-      expect(
-        within(iconWrapper).getByTestId(TooltipIconType.ERROR)
-      ).toBeInTheDocument()
-    })
-
-    it('should show a passed icon if experiments are setup', () => {
-      renderApp({
-        hasData: true
-      })
-
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[1]
-
-      expect(
-        within(iconWrapper).getByTestId(TooltipIconType.PASSED)
-      ).toBeInTheDocument()
+    mockPostMessage.mockClear()
+    const button = screen.getByText('Get Token')
+    fireEvent.click(button)
+    expect(mockPostMessage).toHaveBeenCalledTimes(1)
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.OPEN_STUDIO_PROFILE
     })
   })
 
-  describe('Studio not connected', () => {
-    it('should show three buttons which walk the user through saving a token', async () => {
-      renderApp()
-      const buttons = await within(
-        await screen.findByTestId('setup-studio-content')
-      ).findAllByRole('button')
-      expect(buttons).toHaveLength(3)
-    })
+  it("should show a button which allows the user's to save their Studio access token", () => {
+    renderApp()
 
-    it('should show a button which opens Studio', () => {
-      renderApp()
-
-      mockPostMessage.mockClear()
-      const button = screen.getByText('Sign In')
-      fireEvent.click(button)
-      expect(mockPostMessage).toHaveBeenCalledTimes(1)
-      expect(mockPostMessage).toHaveBeenCalledWith({
-        type: MessageFromWebviewType.OPEN_STUDIO
-      })
-    })
-
-    it("should show a button which opens the user's Studio profile", () => {
-      renderApp()
-
-      mockPostMessage.mockClear()
-      const button = screen.getByText('Get Token')
-      fireEvent.click(button)
-      expect(mockPostMessage).toHaveBeenCalledTimes(1)
-      expect(mockPostMessage).toHaveBeenCalledWith({
-        type: MessageFromWebviewType.OPEN_STUDIO_PROFILE
-      })
-    })
-
-    it("should show a button which allows the user's to save their Studio access token", () => {
-      renderApp()
-
-      mockPostMessage.mockClear()
-      const button = screen.getByText('Save')
-      fireEvent.click(button)
-      expect(mockPostMessage).toHaveBeenCalledTimes(1)
-      expect(mockPostMessage).toHaveBeenCalledWith({
-        type: MessageFromWebviewType.SAVE_STUDIO_TOKEN
-      })
-    })
-
-    it('should show an error icon if dvc is not compatible', () => {
-      renderApp({
-        cliCompatible: false
-      })
-
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[2]
-
-      expect(
-        within(iconWrapper).getByTestId(TooltipIconType.ERROR)
-      ).toBeInTheDocument()
-    })
-
-    it('should show an info icon if dvc is compatible but studio is not connected', () => {
-      renderApp()
-
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[2]
-
-      expect(
-        within(iconWrapper).getByTestId(TooltipIconType.INFO)
-      ).toBeInTheDocument()
+    mockPostMessage.mockClear()
+    const button = screen.getByText('Save')
+    fireEvent.click(button)
+    expect(mockPostMessage).toHaveBeenCalledTimes(1)
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.SAVE_STUDIO_TOKEN
     })
   })
 
-  describe('Studio connected', () => {
-    it('should render a checkbox which can be used to update dvc.studio.shareExperimentsLive', () => {
-      const shareExperimentsLive = false
-      renderApp({
-        isStudioConnected: true
-      })
-
-      mockPostMessage.mockClear()
-      const checkbox = screen.getByRole('checkbox')
-      fireEvent.click(checkbox)
-      expect(mockPostMessage).toHaveBeenCalledWith({
-        payload: !shareExperimentsLive,
-        type: MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE
-      })
+  it('should show an error icon if dvc is not compatible', () => {
+    renderApp({
+      cliCompatible: false
     })
 
-    it('should enable the user to update their studio token', () => {
-      renderApp({
-        isStudioConnected: true
-      })
-      mockPostMessage.mockClear()
-      const button = screen.getByText('Update Token')
-      fireEvent.click(button)
-      expect(mockPostMessage).toHaveBeenCalledWith({
-        type: MessageFromWebviewType.SAVE_STUDIO_TOKEN
-      })
+    const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[3]
+
+    expect(
+      within(iconWrapper).getByTestId(TooltipIconType.ERROR)
+    ).toBeInTheDocument()
+  })
+
+  it('should show an info icon if dvc is compatible but studio is not connected', () => {
+    renderApp()
+
+    const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[3]
+
+    expect(
+      within(iconWrapper).getByTestId(TooltipIconType.INFO)
+    ).toBeInTheDocument()
+  })
+})
+
+describe('Studio connected', () => {
+  it('should render a checkbox which can be used to update dvc.studio.shareExperimentsLive', () => {
+    const shareExperimentsLive = false
+    renderApp({
+      isStudioConnected: true
     })
 
-    it('should show a passed icon if connected', () => {
-      renderApp({
-        isStudioConnected: true
-      })
-
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[2]
-
-      expect(
-        within(iconWrapper).getByTestId(TooltipIconType.PASSED)
-      ).toBeInTheDocument()
+    mockPostMessage.mockClear()
+    const checkbox = screen.getByRole('checkbox')
+    fireEvent.click(checkbox)
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      payload: !shareExperimentsLive,
+      type: MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE
     })
   })
 
-  describe('focused section', () => {
-    const experimentsText = 'Your project contains no data'
-    const studioButtonText = 'Update Token'
-    const dvcText = 'Setup Complete'
+  it('should enable the user to update their studio token', () => {
+    renderApp({
+      isStudioConnected: true
+    })
+    mockPostMessage.mockClear()
+    const button = screen.getByText('Update Token')
+    fireEvent.click(button)
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.SAVE_STUDIO_TOKEN
+    })
+  })
 
-    it('should render the app with other sections collapsed if the DVC section is focused', () => {
-      renderApp({
-        isStudioConnected: true,
-        sectionCollapsed: {
-          [SetupSection.EXPERIMENTS]: true,
-          [SetupSection.STUDIO]: true,
-          [SetupSection.DVC]: false
-        }
-      })
-      mockPostMessage.mockClear()
-      const dvc = screen.getByText('DVC')
-      expect(dvc).toBeVisible()
-      expect(screen.queryByText(dvcText)).toBeVisible()
-      const experiments = screen.getByText('Experiments')
-      expect(experiments).toBeVisible()
-      expect(screen.getByText(experimentsText)).not.toBeVisible()
-      const studio = screen.getByText('Studio')
-      expect(studio).toBeVisible()
-      expect(screen.queryByText(studioButtonText)).not.toBeVisible()
+  it('should show a passed icon if connected', () => {
+    renderApp({
+      isStudioConnected: true
     })
 
-    it('should render the app with other sections collapsed if the Experiments section is focused', () => {
-      renderApp({
-        isStudioConnected: true,
-        sectionCollapsed: {
-          [SetupSection.EXPERIMENTS]: false,
-          [SetupSection.STUDIO]: true,
-          [SetupSection.DVC]: true
-        }
-      })
-      mockPostMessage.mockClear()
-      const studio = screen.getByText('Studio')
-      expect(studio).toBeVisible()
-      expect(screen.queryByText(studioButtonText)).not.toBeVisible()
-      const dvc = screen.getByText('DVC')
-      expect(dvc).toBeVisible()
-      expect(screen.queryByText(dvcText)).not.toBeVisible()
-      const experiments = screen.getByText('Experiments')
-      expect(experiments).toBeVisible()
-      expect(screen.getByText(experimentsText)).toBeVisible()
-    })
+    const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[3]
 
-    it('should render the app with other sections collapsed if the Studio section is focused', () => {
-      renderApp({
-        isStudioConnected: true,
-        sectionCollapsed: {
-          [SetupSection.EXPERIMENTS]: true,
-          [SetupSection.STUDIO]: false,
-          [SetupSection.DVC]: true
-        }
-      })
-      mockPostMessage.mockClear()
-      const studio = screen.getByText('Studio')
-      expect(studio).toBeVisible()
-      expect(screen.queryByText(studioButtonText)).toBeVisible()
-      const dvc = screen.getByText('DVC')
-      expect(dvc).toBeVisible()
-      expect(screen.queryByText(dvcText)).not.toBeVisible()
-      const experiments = screen.getByText('Experiments')
-      expect(experiments).toBeVisible()
-      expect(screen.getByText(experimentsText)).not.toBeVisible()
+    expect(
+      within(iconWrapper).getByTestId(TooltipIconType.PASSED)
+    ).toBeInTheDocument()
+  })
+})
+
+describe('focused section', () => {
+  const experimentsText = 'Your project contains no data'
+  const studioButtonText = 'Update Token'
+  const dvcText = 'Setup Complete'
+
+  it('should render the app with other sections collapsed if the DVC section is focused', () => {
+    renderApp({
+      isStudioConnected: true,
+      sectionCollapsed: {
+        [SetupSection.DVC]: false,
+        [SetupSection.EXPERIMENTS]: true,
+        [SetupSection.REMOTE]: true,
+        [SetupSection.STUDIO]: true
+      }
     })
+    mockPostMessage.mockClear()
+    const dvc = screen.getByText('DVC')
+    expect(dvc).toBeVisible()
+    expect(screen.queryByText(dvcText)).toBeVisible()
+    const experiments = screen.getByText('Experiments')
+    expect(experiments).toBeVisible()
+    expect(screen.getByText(experimentsText)).not.toBeVisible()
+    const studio = screen.getByText('Studio')
+    expect(studio).toBeVisible()
+    expect(screen.queryByText(studioButtonText)).not.toBeVisible()
+  })
+
+  it('should render the app with other sections collapsed if the Experiments section is focused', () => {
+    renderApp({
+      isStudioConnected: true,
+      sectionCollapsed: {
+        [SetupSection.DVC]: true,
+        [SetupSection.EXPERIMENTS]: false,
+        [SetupSection.REMOTE]: true,
+        [SetupSection.STUDIO]: true
+      }
+    })
+    mockPostMessage.mockClear()
+    const studio = screen.getByText('Studio')
+    expect(studio).toBeVisible()
+    expect(screen.queryByText(studioButtonText)).not.toBeVisible()
+    const dvc = screen.getByText('DVC')
+    expect(dvc).toBeVisible()
+    expect(screen.queryByText(dvcText)).not.toBeVisible()
+    const experiments = screen.getByText('Experiments')
+    expect(experiments).toBeVisible()
+    expect(screen.getByText(experimentsText)).toBeVisible()
+  })
+
+  it('should render the app with other sections collapsed if the Studio section is focused', () => {
+    renderApp({
+      isStudioConnected: true,
+      sectionCollapsed: {
+        [SetupSection.DVC]: true,
+        [SetupSection.EXPERIMENTS]: true,
+        [SetupSection.REMOTE]: true,
+        [SetupSection.STUDIO]: false
+      }
+    })
+    mockPostMessage.mockClear()
+    const studio = screen.getByText('Studio')
+    expect(studio).toBeVisible()
+    expect(screen.queryByText(studioButtonText)).toBeVisible()
+    const dvc = screen.getByText('DVC')
+    expect(dvc).toBeVisible()
+    expect(screen.queryByText(dvcText)).not.toBeVisible()
+    const experiments = screen.getByText('Experiments')
+    expect(experiments).toBeVisible()
+    expect(screen.getByText(experimentsText)).not.toBeVisible()
   })
 })

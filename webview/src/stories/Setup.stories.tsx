@@ -22,10 +22,12 @@ const DEFAULT_DATA: SetupData = {
   needsGitInitialized: false,
   projectInitialized: true,
   pythonBinPath: 'python',
+  remoteList: undefined,
   sectionCollapsed: {
+    [SetupSection.DVC]: false,
     [SetupSection.EXPERIMENTS]: false,
-    [SetupSection.STUDIO]: true,
-    [SetupSection.DVC]: false
+    [SetupSection.REMOTE]: false,
+    [SetupSection.STUDIO]: true
   },
   shareLiveToStudio: false
 }
