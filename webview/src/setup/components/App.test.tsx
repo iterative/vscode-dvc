@@ -528,7 +528,7 @@ describe('App', () => {
       const envDetails = screen.getByTestId('dvc-env-details')
       const firstVersionLine = `1.0.0 (required ${MIN_CLI_VERSION} and above, tested with ${LATEST_TESTED_CLI_VERSION})`
 
-      expect(within(envDetails).getByText('Version')).toBeInTheDocument()
+      expect(within(envDetails).getByText('Version:')).toBeInTheDocument()
       expect(within(envDetails).getByText(firstVersionLine)).toBeInTheDocument()
     })
 
@@ -553,7 +553,7 @@ describe('App', () => {
       const envDetails = screen.getByTestId('dvc-env-details')
       const version = `Not found (required ${MIN_CLI_VERSION} and above, tested with ${LATEST_TESTED_CLI_VERSION})`
 
-      expect(within(envDetails).getByText('Version')).toBeInTheDocument()
+      expect(within(envDetails).getByText('Version:')).toBeInTheDocument()
       expect(within(envDetails).getByText(version)).toBeInTheDocument()
     })
 
@@ -579,7 +579,7 @@ describe('App', () => {
 
       const envDetails = screen.getByTestId('dvc-env-details')
 
-      expect(within(envDetails).getByText('Command')).toBeInTheDocument()
+      expect(within(envDetails).getByText('Command:')).toBeInTheDocument()
       expect(within(envDetails).getByText(command)).toBeInTheDocument()
     })
 
@@ -604,7 +604,7 @@ describe('App', () => {
 
       const envDetails = screen.getByTestId('dvc-env-details')
 
-      expect(within(envDetails).getByText('Command')).toBeInTheDocument()
+      expect(within(envDetails).getByText('Command:')).toBeInTheDocument()
 
       const configureButton = within(envDetails).getByText('Configure')
       const selectButton = within(envDetails).queryByText(
@@ -642,7 +642,7 @@ describe('App', () => {
 
       const envDetails = screen.getByTestId('dvc-env-details')
 
-      expect(within(envDetails).getByText('Command')).toBeInTheDocument()
+      expect(within(envDetails).getByText('Command:')).toBeInTheDocument()
 
       const configureButton = within(envDetails).getByText('Configure')
       const selectButton = within(envDetails).getByText(
