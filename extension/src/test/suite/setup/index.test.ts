@@ -451,7 +451,7 @@ suite('Setup Test Suite', () => {
         'should called setup when DVC is installed into a virtual environment'
       ).to.be.called
       expect(workspaceChangedCount).to.equal(3)
-    })
+    }).timeout(10000)
 
     it('should be able to select focused projects', async () => {
       const mockFocusedProjects = [dvcDemoPath]

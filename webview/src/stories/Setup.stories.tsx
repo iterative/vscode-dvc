@@ -1,9 +1,12 @@
 import type { StoryFn, Meta } from '@storybook/react'
 import React from 'react'
+import { Provider, useDispatch } from 'react-redux'
+import { configureStore } from '@reduxjs/toolkit'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
 import { SetupData, SetupSection } from 'dvc/src/setup/webview/contract'
 import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'
-import { App } from '../setup/components/App'
+import { App, feedStore } from '../setup/components/App'
+import { setupReducers } from '../setup/store'
 
 const DEFAULT_DATA: SetupData = {
   canGitInitialize: false,
@@ -35,6 +38,17 @@ const getUpdatedArgs = (data: Partial<SetupData>): { data: SetupData } => ({
   }
 })
 
+const MockedState: React.FC<{ data: SetupData; children: React.ReactNode }> = ({
+  children,
+  data
+}) => {
+  const dispatch = useDispatch()
+  const message = { data, type: MessageToWebviewType.SET_DATA }
+  feedStore(message, dispatch)
+
+  return <>{children}</>
+}
+
 export default {
   args: {},
   component: App,
@@ -43,7 +57,13 @@ export default {
 } as Meta
 
 const Template: StoryFn = ({ data }) => {
-  const app = <App />
+  const app = (
+    <Provider store={configureStore({ reducer: setupReducers })}>
+      <MockedState data={data}>
+        <App />
+      </MockedState>
+    </Provider>
+  )
   window.postMessage(
     {
       data,

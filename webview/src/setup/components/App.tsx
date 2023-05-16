@@ -56,8 +56,7 @@ const getStudioStatusIcon = (cliCompatible: boolean, isConnected: boolean) => {
 
   return isConnected ? TooltipIconType.PASSED : TooltipIconType.INFO
 }
-
-const feedStore = (
+export const feedStore = (
   data: MessageToWebview<SetupData>,
   dispatch: SetupDispatch
 ) => {
