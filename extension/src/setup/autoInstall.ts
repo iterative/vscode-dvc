@@ -16,6 +16,28 @@ export const findPythonBinForInstall = async (): Promise<
   )
 }
 
+const showUpgradeProgress = (
+  root: string,
+  pythonBinPath: string
+): Thenable<unknown> =>
+  Toast.showProgress('Upgrading DVC', async progress => {
+    progress.report({ increment: 0 })
+    try {
+      await Toast.runCommandAndIncrementProgress(
+        async () => {
+          await installPackages(root, pythonBinPath, 'dvc')
+          return 'DVC Upgraded'
+        },
+        progress,
+        100
+      )
+
+      return Toast.delayProgressClosing()
+    } catch (error: unknown) {
+      return Toast.reportProgressError(error, progress)
+    }
+  })
+
 const showInstallProgress = (
   root: string,
   pythonBinPath: string
@@ -52,7 +74,9 @@ const showInstallProgress = (
     }
   })
 
-export const autoInstallDvc = async (): Promise<unknown> => {
+const getArgsAndRunCommand = async (
+  command: (root: string, pythonBinPath: string) => Thenable<unknown>
+): Promise<unknown> => {
   const pythonBinPath = await findPythonBinForInstall()
   const root = getFirstWorkspaceFolder()
 
@@ -68,5 +92,13 @@ export const autoInstallDvc = async (): Promise<unknown> => {
     )
   }
 
-  return showInstallProgress(root, pythonBinPath)
+  return command(root, pythonBinPath)
+}
+
+export const autoInstallDvc = (): Promise<unknown> => {
+  return getArgsAndRunCommand(showInstallProgress)
+}
+
+export const autoUpgradeDvc = (): Promise<unknown> => {
+  return getArgsAndRunCommand(showUpgradeProgress)
 }

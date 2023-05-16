@@ -9,7 +9,7 @@ import { BaseWebview } from '../../webview'
 import { sendTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { selectPythonInterpreter } from '../../extensions/python'
-import { autoInstallDvc } from '../autoInstall'
+import { autoInstallDvc, autoUpgradeDvc } from '../autoInstall'
 import {
   RegisteredCliCommands,
   RegisteredCommands
@@ -78,6 +78,8 @@ export class WebviewMessages {
         return this.selectPythonInterpreter()
       case MessageFromWebviewType.INSTALL_DVC:
         return this.installDvc()
+      case MessageFromWebviewType.UPGRADE_DVC:
+        return this.upgradeDvc()
       case MessageFromWebviewType.SETUP_WORKSPACE:
         return commands.executeCommand(
           RegisteredCommands.EXTENSION_SETUP_WORKSPACE
@@ -128,6 +130,12 @@ export class WebviewMessages {
       undefined
     )
     return selectPythonInterpreter()
+  }
+
+  private upgradeDvc() {
+    sendTelemetryEvent(EventName.VIEWS_SETUP_UPGRADE_DVC, undefined, undefined)
+
+    return autoUpgradeDvc()
   }
 
   private installDvc() {
