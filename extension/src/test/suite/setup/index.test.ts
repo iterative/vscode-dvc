@@ -240,6 +240,7 @@ suite('Setup Test Suite', () => {
         cliCompatible: undefined,
         dvcCliDetails: { command: 'dvc', version: undefined },
         hasData: false,
+        isAboveLatestTestedVersion: undefined,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: true,
@@ -281,6 +282,7 @@ suite('Setup Test Suite', () => {
         cliCompatible: true,
         dvcCliDetails: { command: 'dvc', version: MIN_CLI_VERSION },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: true,
@@ -331,6 +333,7 @@ suite('Setup Test Suite', () => {
           version: MIN_CLI_VERSION
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: false,
@@ -381,6 +384,7 @@ suite('Setup Test Suite', () => {
           version: MIN_CLI_VERSION
         },
         hasData: false,
+        isAboveLatestTestedVersion: false,
         isPythonExtensionUsed: false,
         isStudioConnected: false,
         needsGitCommit: true,
