@@ -1314,7 +1314,7 @@ suite('Experiments Test Suite', () => {
       })
 
       expect(mockUpdateExperimentsData).to.be.calledOnce
-      expect(setNbfCommitsToShowSpy).to.be.calledWith(5, 'main')
+      expect(setNbfCommitsToShowSpy).to.be.calledWith(7, 'main')
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to show less commits', async () => {
@@ -1340,7 +1340,7 @@ suite('Experiments Test Suite', () => {
       })
 
       expect(mockUpdateExperimentsData).to.be.calledOnce
-      expect(setNbfCommitsToShowSpy).to.be.calledWith(1, 'main')
+      expect(setNbfCommitsToShowSpy).to.be.calledWith(3, 'main')
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to select branches', async () => {
