@@ -121,10 +121,13 @@ const getCommitData = (
   if (!commitsOutput) {
     return {}
   }
-  const commits = commitsOutput.split(COMMITS_SEPARATOR).map(commit => {
-    const { hash, ...rest } = getCommitDataFromOutput(commit)
-    return [hash, { ...rest }]
-  })
+  const commits = commitsOutput
+    .split(COMMITS_SEPARATOR)
+    .filter(Boolean)
+    .map(commit => {
+      const { hash, ...rest } = getCommitDataFromOutput(commit)
+      return [hash, { ...rest }]
+    })
   return Object.fromEntries(commits) as { [sha: string]: CommitData }
 }
 

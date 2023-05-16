@@ -53,9 +53,11 @@ export class GitReader extends GitCli {
     const options = getOptions(
       cwd,
       Command.LOG,
-      `${sha}^..HEAD`,
+      sha,
       Flag.PRETTY_FORMAT_COMMIT_MESSAGE,
-      Flag.SEPARATE_WITH_NULL
+      Flag.SEPARATE_WITH_NULL,
+      Flag.NUMBER,
+      '1'
     )
     try {
       return await this.executeProcess(options)
