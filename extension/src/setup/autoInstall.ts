@@ -26,7 +26,7 @@ const showUpgradeProgress = (
       await Toast.runCommandAndIncrementProgress(
         async () => {
           await installPackages(root, pythonBinPath, 'dvc')
-          return 'DVC Upgraded'
+          return 'Upgraded successfully'
         },
         progress,
         100

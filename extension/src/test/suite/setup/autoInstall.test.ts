@@ -74,7 +74,7 @@ suite('Auto Install Test Suite', () => {
       const showProgressSpy = spy(window, 'withProgress')
       const showErrorSpy = spy(window, 'showErrorMessage')
 
-      await autoInstallDvc()
+      await autoUpgradeDvc()
 
       expect(showProgressSpy).to.be.called
       expect(showErrorSpy).not.to.be.called
