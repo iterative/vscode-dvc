@@ -153,9 +153,9 @@ export const App: React.FC = () => {
         secondaryTooltipText={
           isAboveLatestTestedVersion ? (
             <>
-              Warning, the located version is above the latest tested version
-              which could lead to unexpected behavior. Please upgrade to the
-              most recent version of the extension and reload this window.
+              The located version is above the latest tested version, which
+              could lead to unexpected behavior. Please upgrade to the most
+              recent version of the extension and reload this window.
             </>
           ) : undefined
         }
