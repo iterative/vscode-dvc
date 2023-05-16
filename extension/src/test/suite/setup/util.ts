@@ -61,6 +61,7 @@ export const buildSetup = (
   )
 
   const mockAutoInstallDvc = stub(AutoInstall, 'autoInstallDvc')
+  const mockAutoUpgradeDvc = stub(AutoInstall, 'autoUpgradeDvc')
   stub(AutoInstall, 'findPythonBinForInstall').resolves(undefined)
 
   const mockOpenExperiments = fake()
@@ -104,6 +105,7 @@ export const buildSetup = (
     internalCommands,
     messageSpy,
     mockAutoInstallDvc,
+    mockAutoUpgradeDvc,
     mockExecuteCommand,
     mockGetGitRepositoryRoot,
     mockGlobalVersion,
