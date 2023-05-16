@@ -390,7 +390,7 @@ suite('Setup Test Suite', () => {
         needsGitInitialized: false,
         projectInitialized: true,
         pythonBinPath: undefined,
-        remoteList: undefined,
+        remoteList: { [dvcDemoPath]: undefined },
         sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
