@@ -1,16 +1,20 @@
 import React from 'react'
 import { RemoteList } from 'dvc/src/setup/webview/contract'
-import { CliIncompatible } from './CliIncompatible'
 import { DvcUninitialized } from './DvcUninitialized'
 import styles from './styles.module.scss'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
+import { CliIncompatible } from '../shared/CliIncompatible'
 
 export const Remote: React.FC<{
   cliCompatible: boolean
   remoteList: RemoteList
 }> = ({ cliCompatible, remoteList }) => {
   if (!cliCompatible) {
-    return <CliIncompatible />
+    return (
+      <CliIncompatible>
+        <p>Locate DVC to connect to a remote</p>
+      </CliIncompatible>
+    )
   }
 
   if (!remoteList) {
