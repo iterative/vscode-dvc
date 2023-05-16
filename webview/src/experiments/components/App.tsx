@@ -21,7 +21,6 @@ import {
   updateHasMoreCommits,
   updateHasRunningWorkspaceExperiment,
   updateHasValidDvcYaml,
-  updateIsBranchesView,
   updateIsShowingMoreCommits,
   updateRows,
   updateSelectedForPlotsCount,
@@ -84,28 +83,13 @@ export const App: React.FC<Record<string, unknown>> = () => {
               case 'hasValidDvcYaml':
                 dispatch(updateHasValidDvcYaml(data.data.hasValidDvcYaml))
                 continue
-              case 'isBranchesView':
-                dispatch(updateIsBranchesView(data.data.isBranchesView))
-                continue
               case 'isShowingMoreCommits':
                 dispatch(
                   updateIsShowingMoreCommits(data.data.isShowingMoreCommits)
                 )
                 continue
               case 'rows':
-                dispatch(
-                  updateRows(
-                    // Setting any branch for now just so that it isn't undefined. It does not matter the label for now as it is not shown
-                    data.data.rows.map(row => ({
-                      ...row,
-                      branch: 'current',
-                      subRows: row.subRows?.map(subRow => ({
-                        ...subRow,
-                        branch: 'current'
-                      }))
-                    }))
-                  )
-                )
+                dispatch(updateRows(data.data.rows))
                 continue
               case 'selectedForPlotsCount':
                 dispatch(

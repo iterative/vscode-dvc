@@ -80,11 +80,11 @@ export enum QueueSubCommand {
 }
 
 export enum ExperimentFlag {
-  ALL_BRANCHES = '-a',
   NO_FETCH = '--no-fetch',
   QUEUE = '--queue',
   RESET = '--reset',
-  NUM_COMMIT = '-n'
+  NUM_COMMIT = '-n',
+  REV = '--rev'
 }
 
 export enum GcPreserveFlag {

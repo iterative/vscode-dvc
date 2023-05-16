@@ -15,6 +15,8 @@ import * as Watcher from '../../../fileSystem/watcher'
 import { ExperimentsModel } from '../../../experiments/model'
 import { ColumnsModel } from '../../../experiments/columns/model'
 import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../../cli/dvc/constants'
+import { PersistenceKey } from '../../../persistence/constants'
+import { GitReader } from '../../../cli/git/reader'
 
 export const buildExperiments = (
   disposer: Disposer,
@@ -41,12 +43,19 @@ export const buildExperiments = (
   )
   const mockCheckOrAddPipeline = stub()
   const mockSelectBranches = stub().resolves(['main', 'other'])
+  const mockMemento = buildMockMemento({
+    [`${PersistenceKey.EXPERIMENTS_BRANCHES}${dvcRoot}`]: ['main'],
+    [`${PersistenceKey.NUMBER_OF_COMMITS_TO_SHOW}${dvcRoot}`]: {
+      main: 5
+    }
+  })
+
   const experiments = disposer.track(
     new Experiments(
       dvcRoot,
       internalCommands,
       resourceLocator,
-      buildMockMemento(),
+      mockMemento,
       mockCheckOrAddPipeline,
       mockSelectBranches,
       mockExperimentsData
@@ -138,19 +147,33 @@ const buildExperimentsDataDependencies = (disposer: Disposer) => {
   return { internalCommands, mockCreateFileSystemWatcher, mockExpShow }
 }
 
-export const buildExperimentsData = (disposer: SafeWatcherDisposer) => {
+export const buildExperimentsData = (
+  disposer: SafeWatcherDisposer,
+  currentBranch = 'main'
+) => {
+  stub(GitReader.prototype, 'getCurrentBranch').resolves(currentBranch)
+
   const { internalCommands, mockExpShow, mockCreateFileSystemWatcher } =
     buildExperimentsDataDependencies(disposer)
 
+  const mockGetBranchesToShow = stub().returns(['main'])
   const data = disposer.track(
     new ExperimentsData(dvcDemoPath, internalCommands, {
-      getIsBranchesView: () => false,
-      getNbOfCommitsToShow: () => DEFAULT_NUM_OF_COMMITS_TO_SHOW,
-      setAvailableBranchesToShow: stub()
+      getBranchesToShow: mockGetBranchesToShow,
+      getNbOfCommitsToShow: () => ({
+        main: DEFAULT_NUM_OF_COMMITS_TO_SHOW
+      }),
+      setAvailableBranchesToShow: stub(),
+      setBranchesToShow: stub()
     } as unknown as ExperimentsModel)
   )
 
-  return { data, mockCreateFileSystemWatcher, mockExpShow }
+  return {
+    data,
+    mockCreateFileSystemWatcher,
+    mockExpShow,
+    mockGetBranchesToShow
+  }
 }
 
 export const stubWorkspaceExperimentsGetters = (

@@ -1,5 +1,5 @@
 import { TableData } from '../../../../experiments/webview/contract'
-import { rowsFixtureWithBranches } from './rows'
+import rowsFixture from './rows'
 import columnsFixture from './columns'
 
 const tableDataFixture: TableData = {
@@ -13,12 +13,11 @@ const tableDataFixture: TableData = {
   hasCheckpoints: true,
   hasColumns: true,
   hasConfig: true,
-  hasMoreCommits: true,
+  hasMoreCommits: { main: true },
   hasRunningWorkspaceExperiment: true,
   hasValidDvcYaml: true,
-  isShowingMoreCommits: true,
-  isBranchesView: false,
-  rows: rowsFixtureWithBranches,
+  isShowingMoreCommits: { main: true },
+  rows: rowsFixture,
   selectedForPlotsCount: 2,
   sorts: []
 }

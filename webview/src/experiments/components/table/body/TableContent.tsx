@@ -61,7 +61,9 @@ export const TableContent: React.FC<TableContentProps> = ({
                 (branchIndex === 0 && i === 1) || (branchIndex !== 0 && i === 0)
               return (
                 <Fragment key={row.id}>
-                  {isFirstRow && <BranchDivider>{branch}</BranchDivider>}
+                  {isFirstRow && (
+                    <BranchDivider branch={branch}>{branch}</BranchDivider>
+                  )}
                   <TableBody
                     tableHeaderHeight={tableHeadHeight}
                     root={tableRef.current}

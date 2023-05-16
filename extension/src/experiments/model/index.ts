@@ -60,8 +60,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   private availableColors: Color[]
   private coloredStatus: ColoredStatus
   private starredExperiments: StarredExperiments
-  private numberOfCommitsToShow: number
-  private isBranchesView: boolean
+  private numberOfCommitsToShow: Record<string, number>
   private branchesToShow: string[] = []
   private availableBranchesToShow: string[] = []
 
@@ -92,10 +91,14 @@ export class ExperimentsModel extends ModelWithPersistence {
       PersistenceKey.EXPERIMENTS_STARS,
       {}
     )
-    this.numberOfCommitsToShow = this.revive<number>(
+    this.numberOfCommitsToShow = this.revive<Record<string, number>>(
       PersistenceKey.NUMBER_OF_COMMITS_TO_SHOW,
-      DEFAULT_NUM_OF_COMMITS_TO_SHOW
+      {}
     )
+
+    if (typeof this.numberOfCommitsToShow === 'number') {
+      this.numberOfCommitsToShow = {}
+    }
 
     this.branchesToShow = this.revive<string[]>(
       PersistenceKey.EXPERIMENTS_BRANCHES,
@@ -108,8 +111,6 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.availableColors = copyOriginalColors().filter(
       color => !assignedColors.has(color)
     )
-
-    this.isBranchesView = false
   }
 
   public transformAndSet(
@@ -410,21 +411,17 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.finishedRunning
   }
 
-  public setNbfCommitsToShow(numberOfCommitsToShow: number) {
-    this.numberOfCommitsToShow = numberOfCommitsToShow
+  public setNbfCommitsToShow(numberOfCommitsToShow: number, branch: string) {
+    this.numberOfCommitsToShow[branch] = numberOfCommitsToShow
     this.persistNbOfCommitsToShow()
   }
 
-  public getNbOfCommitsToShow() {
+  public getNbOfCommitsToShow(branch: string) {
+    return this.numberOfCommitsToShow[branch] || DEFAULT_NUM_OF_COMMITS_TO_SHOW
+  }
+
+  public getAllNbOfCommitsToShow() {
     return this.numberOfCommitsToShow
-  }
-
-  public setIsBranchesView(isBranchesView: boolean) {
-    this.isBranchesView = isBranchesView
-  }
-
-  public getIsBranchesView() {
-    return this.isBranchesView
   }
 
   public setBranchesToShow(branches: string[]) {
