@@ -44,9 +44,9 @@ export const buildExperiments = (
   const mockCheckOrAddPipeline = stub()
   const mockSelectBranches = stub().resolves(['main', 'other'])
   const mockMemento = buildMockMemento({
-    [`${PersistenceKey.EXPERIMENTS_BRANCHES}${dvcRoot}`]: ['current'],
+    [`${PersistenceKey.EXPERIMENTS_BRANCHES}${dvcRoot}`]: ['main'],
     [`${PersistenceKey.NUMBER_OF_COMMITS_TO_SHOW}${dvcRoot}`]: {
-      current: 5
+      main: 5
     }
   })
 
@@ -149,19 +149,19 @@ const buildExperimentsDataDependencies = (disposer: Disposer) => {
 
 export const buildExperimentsData = (
   disposer: SafeWatcherDisposer,
-  currentBranch = 'current'
+  currentBranch = 'main'
 ) => {
   stub(GitReader.prototype, 'getCurrentBranch').resolves(currentBranch)
 
   const { internalCommands, mockExpShow, mockCreateFileSystemWatcher } =
     buildExperimentsDataDependencies(disposer)
 
-  const mockGetBranchesToShow = stub().returns(['current'])
+  const mockGetBranchesToShow = stub().returns(['main'])
   const data = disposer.track(
     new ExperimentsData(dvcDemoPath, internalCommands, {
       getBranchesToShow: mockGetBranchesToShow,
       getNbOfCommitsToShow: () => ({
-        current: DEFAULT_NUM_OF_COMMITS_TO_SHOW
+        main: DEFAULT_NUM_OF_COMMITS_TO_SHOW
       }),
       setAvailableBranchesToShow: stub(),
       setBranchesToShow: stub()

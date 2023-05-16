@@ -32,7 +32,7 @@ import {
 } from '../test/tableDataFixture'
 
 const tableData: TableDataState = {
-  branches: ['current'],
+  branches: ['main'],
   changes: workspaceChangesFixture,
   columnOrder: [],
   columnWidths: {
@@ -46,16 +46,16 @@ const tableData: TableDataState = {
   hasColumns: true,
   hasConfig: true,
   hasData: true,
-  hasMoreCommits: { current: true },
+  hasMoreCommits: { main: true },
   hasRunningWorkspaceExperiment: true,
   hasValidDvcYaml: true,
-  isShowingMoreCommits: { current: true },
+  isShowingMoreCommits: { main: true },
   rows: addCommitDataToMainBranch(rowsFixture).map(row => ({
     ...row,
-    branch: 'current',
+    branch: 'main',
     subRows: row.subRows?.map(experiment => ({
       ...experiment,
-      branch: 'current',
+      branch: 'main',
       starred: experiment.starred || experiment.label === '42b8736'
     }))
   })),
@@ -126,7 +126,7 @@ export const WithSurvivalData = Template.bind({})
 WithSurvivalData.args = {
   tableData: {
     ...survivalTableData,
-    branches: ['current'],
+    branches: ['main'],
     hasData: true,
     rows: addCommitDataToMainBranch(survivalTableData.rows)
   }
@@ -142,7 +142,7 @@ WithMiddleStates.args = {
     ...setExperimentsAsStarred(tableDataWithSomeSelectedExperiments, [
       '1ba7bcd'
     ]),
-    branches: ['current']
+    branches: ['main']
   }
 }
 WithMiddleStates.play = async ({ canvasElement }) => {
@@ -193,7 +193,7 @@ export const WithAllDataTypes = Template.bind({})
 WithAllDataTypes.args = {
   tableData: {
     ...dataTypesTableFixture,
-    branches: ['current'],
+    branches: ['main'],
     hasData: true,
     rows: addCommitDataToMainBranch(dataTypesTableFixture.rows)
   }
@@ -210,7 +210,7 @@ export const WithDeeplyNestedHeaders = Template.bind({})
 WithDeeplyNestedHeaders.args = {
   tableData: {
     ...deeplyNestedTableData,
-    branches: ['current'],
+    branches: ['main'],
     hasData: true,
     rows: addCommitDataToMainBranch(deeplyNestedTableData.rows)
   }
@@ -290,7 +290,7 @@ export const WithMultipleBranches = Template.bind({})
 const rowsWithoutWorkspace = survivalTableData.rows.filter(
   row => row.id !== EXPERIMENT_WORKSPACE_ID
 )
-const branches = ['current', 'other-branch', 'branch-14786']
+const branches = ['main', 'other-branch', 'branch-14786']
 
 WithMultipleBranches.args = {
   tableData: {

@@ -5,7 +5,7 @@ import {
 
 const data: ExpShowOutput = [
   {
-    branch: 'current',
+    branch: 'main',
     rev: EXPERIMENT_WORKSPACE_ID,
     data: {
       meta: { has_checkpoints: false },
@@ -64,7 +64,7 @@ const data: ExpShowOutput = [
     }
   },
   {
-    branch: 'current',
+    branch: 'main',
     rev: '852d4fbd10638ceca4de50ee68d6125b2915f23b',
     data: {
       deps: null,

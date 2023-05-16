@@ -14,7 +14,7 @@ export const ERROR_SHAS = [
 
 const data: ExpShowOutput = [
   {
-    branch: 'current',
+    branch: 'main',
     rev: EXPERIMENT_WORKSPACE_ID,
     data: {
       rev: EXPERIMENT_WORKSPACE_ID,
@@ -123,7 +123,7 @@ const data: ExpShowOutput = [
     }
   },
   {
-    branch: 'current',
+    branch: 'main',
     rev: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     name: 'main',
     data: {
@@ -236,7 +236,7 @@ const data: ExpShowOutput = [
         name: 'exp-e7a67',
         revs: [
           {
-            branch: 'current',
+            branch: 'main',
             rev: '4fb124aebddb2adf1545030907687fa9a4c80e70',
             name: 'exp-e7a67',
             data: {
@@ -356,7 +356,7 @@ const data: ExpShowOutput = [
         name: 'test-branch',
         revs: [
           {
-            branch: 'current',
+            branch: 'main',
             rev: '42b8736b08170529903cd203a1f40382a4b4a8cd',
             name: 'test-branch',
             data: {
@@ -472,7 +472,7 @@ const data: ExpShowOutput = [
         name: 'exp-83425',
         revs: [
           {
-            branch: 'current',
+            branch: 'main',
             rev: EXPERIMENT_WORKSPACE_ID,
             name: 'exp-83425',
             data: {
@@ -591,7 +591,7 @@ const data: ExpShowOutput = [
       {
         revs: [
           {
-            branch: 'current',
+            branch: 'main',
             rev: ERROR_SHAS[0],
             error: {
               type: 'YAMLFileCorruptedError',
@@ -605,7 +605,7 @@ const data: ExpShowOutput = [
         name: 'exp-f13bca',
         revs: [
           {
-            branch: 'current',
+            branch: 'main',
             rev: ERROR_SHAS[1],
             name: 'exp-f13bca',
             data: {
@@ -718,7 +718,7 @@ const data: ExpShowOutput = [
       {
         revs: [
           {
-            branch: 'current',
+            branch: 'main',
             rev: '90aea7f2482117a55dfcadcdb901aaa6610fbbc9',
             data: {
               rev: '90aea7f2482117a55dfcadcdb901aaa6610fbbc9',
@@ -833,7 +833,7 @@ const data: ExpShowOutput = [
       {
         revs: [
           {
-            branch: 'current',
+            branch: 'main',
             rev: ERROR_SHAS[2],
             data: {
               rev: ERROR_SHAS[2],

@@ -8,7 +8,7 @@ describe('sortExperiments', () => {
   const testLabel = 'f0778b3'
   const testTimestamp = '2021-01-14T10:57:59'
   const irrelevantExperimentData = {
-    branch: 'current',
+    branch: 'main',
     checkpoint_parent: 'f81f1b5a1248b9d9f595fb53136298c69f908e66',
     checkpoint_tip: 'd3f4a0d3661c5977540d2205d819470cf0d2145a',
     id: testId,

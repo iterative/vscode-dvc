@@ -93,9 +93,9 @@ suite('Experiments Data Test Suite', () => {
             }
           } as unknown as InternalCommands,
           {
-            getBranchesToShow: () => ['current'],
+            getBranchesToShow: () => ['main'],
             getNbOfCommitsToShow: () => ({
-              current: DEFAULT_NUM_OF_COMMITS_TO_SHOW
+              main: DEFAULT_NUM_OF_COMMITS_TO_SHOW
             }),
             setAvailableBranchesToShow: stub(),
             setBranchesToShow: stub()
@@ -152,9 +152,9 @@ suite('Experiments Data Test Suite', () => {
             }
           } as unknown as InternalCommands,
           {
-            getBranchesToShow: () => ['current'],
+            getBranchesToShow: () => ['main'],
             getNbOfCommitsToShow: () => ({
-              current: DEFAULT_NUM_OF_COMMITS_TO_SHOW
+              main: DEFAULT_NUM_OF_COMMITS_TO_SHOW
             }),
             setAvailableBranchesToShow: stub(),
             setBranchesToShow: stub()
@@ -184,7 +184,7 @@ suite('Experiments Data Test Suite', () => {
     it('should call exp show for each branch to show', async () => {
       stub(ExperimentsData.prototype, 'managedUpdate').resolves()
       const branchesToShow = [
-        'current',
+        'main',
         'my-other-branch',
         'secret-branch',
         'old-branch'
@@ -206,7 +206,7 @@ suite('Experiments Data Test Suite', () => {
         'branch-283498'
       )
 
-      mockGetBranchesToShow.returns(['current'])
+      mockGetBranchesToShow.returns(['main'])
 
       await data.update()
 

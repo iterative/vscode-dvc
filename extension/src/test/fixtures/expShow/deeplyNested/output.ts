@@ -5,7 +5,7 @@ import {
 
 const data: ExpShowOutput = [
   {
-    branch: 'current',
+    branch: 'main',
     rev: EXPERIMENT_WORKSPACE_ID,
     data: {
       deps: null,
@@ -38,7 +38,7 @@ const data: ExpShowOutput = [
     }
   },
   {
-    branch: 'current',
+    branch: 'main',
     rev: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     data: {
       deps: null,

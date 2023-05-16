@@ -27,7 +27,7 @@ describe('TableContent', () => {
           index: 1,
           original: {
             Created: '2023-04-20T05:14:46',
-            branch: 'current',
+            branch: 'main',
             commit: {
               author: 'Matt Seddon',
               date: '31 hours ago',
@@ -115,7 +115,7 @@ describe('TableContent', () => {
           originalSubRows: [
             {
               Created: '2023-04-21T12:04:32',
-              branch: 'current',
+              branch: 'main',
               deps: {
                 data: {
                   changes: false,
@@ -161,7 +161,7 @@ describe('TableContent', () => {
               index: 0,
               original: {
                 Created: '2023-04-21T12:04:32',
-                branch: 'current',
+                branch: 'main',
                 deps: {
                   data: {
                     changes: false,
@@ -210,7 +210,7 @@ describe('TableContent', () => {
           index: 1,
           original: {
             Created: '2023-04-20T05:14:46',
-            branch: 'current',
+            branch: 'main',
             commit: {
               author: 'Matt Seddon',
               date: '31 hours ago',
@@ -298,7 +298,7 @@ describe('TableContent', () => {
           originalSubRows: [
             {
               Created: '2023-04-21T12:04:32',
-              branch: 'current',
+              branch: 'main',
               deps: {
                 data: {
                   changes: false,
@@ -348,7 +348,7 @@ describe('TableContent', () => {
               index: 0,
               original: {
                 Created: '2023-04-21T12:04:32',
-                branch: 'current',
+                branch: 'main',
                 deps: {
                   data: {
                     changes: false,
@@ -399,7 +399,7 @@ describe('TableContent', () => {
           index: 0,
           original: {
             Created: '2023-04-21T12:04:32',
-            branch: 'current',
+            branch: 'main',
             deps: {
               data: {
                 changes: false,
@@ -448,7 +448,7 @@ describe('TableContent', () => {
           index: 2,
           original: {
             Created: '2023-04-17T00:50:06',
-            branch: 'current',
+            branch: 'main',
             commit: {
               author: 'Matt Seddon',
               date: '4 days ago',
@@ -500,7 +500,7 @@ describe('TableContent', () => {
           index: 3,
           original: {
             Created: '2023-04-17T00:49:44',
-            branch: 'current',
+            branch: 'main',
             commit: {
               author: 'Matt Seddon',
               date: '4 days ago',
@@ -555,7 +555,7 @@ describe('TableContent', () => {
           id: '0',
           index: 0,
           original: {
-            branch: 'current',
+            branch: 'main',
             deps: {
               data: {
                 changes: false,
@@ -601,7 +601,7 @@ describe('TableContent', () => {
           index: 1,
           original: {
             Created: '2023-04-20T05:14:46',
-            branch: 'current',
+            branch: 'main',
             commit: {
               author: 'Matt Seddon',
               date: '31 hours ago',
@@ -655,7 +655,7 @@ describe('TableContent', () => {
           index: 0,
           original: {
             Created: '2023-04-21T12:04:32',
-            branch: 'current',
+            branch: 'main',
             deps: {
               data: {
                 changes: false,
@@ -704,7 +704,7 @@ describe('TableContent', () => {
           index: 2,
           original: {
             Created: '2023-04-17T00:50:06',
-            branch: 'current',
+            branch: 'main',
             commit: {
               author: 'Matt Seddon',
               date: '4 days ago',
@@ -758,7 +758,7 @@ describe('TableContent', () => {
           index: 3,
           original: {
             Created: '2023-04-17T00:49:44',
-            branch: 'current',
+            branch: 'main',
             commit: {
               author: 'Matt Seddon',
               date: '4 days ago',
@@ -808,10 +808,7 @@ describe('TableContent', () => {
     })
   } as unknown as Table<Experiment>
 
-  const renderTableContent = (
-    rowsInstance = instance,
-    branches = ['current']
-  ) => {
+  const renderTableContent = (rowsInstance = instance, branches = ['main']) => {
     return render(
       <Provider
         store={configureStore({
@@ -848,10 +845,10 @@ describe('TableContent', () => {
         ]
       })
     } as unknown as Table<Experiment>
-    renderTableContent(multipleBranchesInstance, ['current', 'new-branch'])
+    renderTableContent(multipleBranchesInstance, ['main', 'new-branch'])
 
     expect(screen.getAllByTestId('branch-name').length).toBe(2)
-    expect(screen.getByText('current')).toBeInTheDocument()
+    expect(screen.getByText('main')).toBeInTheDocument()
     expect(screen.getByText('new-branch')).toBeInTheDocument()
   })
 })

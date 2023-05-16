@@ -337,7 +337,7 @@ describe('App', () => {
 
       testClick(workspace, EXPERIMENT_WORKSPACE_ID)
       testClick(experimentRunningInWorkspace, 'exp-83425')
-      testClick(screen.getByText('main'), 'main')
+      testClick(screen.getAllByText('main')[1], 'main')
       testClick(screen.getByText('[exp-e7a67]'), 'exp-e7a67')
     })
 
@@ -346,7 +346,7 @@ describe('App', () => {
 
       mockPostMessage.mockClear()
 
-      const testRowLabel = screen.getByText('main')
+      const testRowLabel = screen.getAllByText('main')[1]
 
       testRowLabel.focus()
 
@@ -418,7 +418,7 @@ describe('App', () => {
       const testRowId = 'main'
 
       createWindowTextSelection(selectedTestRowId, 5)
-      fireEvent.click(screen.getByText(testRowId))
+      fireEvent.click(screen.getAllByText(testRowId)[1])
 
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
       expect(mockPostMessage).toHaveBeenCalledWith({
@@ -494,7 +494,7 @@ describe('App', () => {
       ],
       rows: [
         {
-          branch: 'current',
+          branch: 'main',
           id: EXPERIMENT_WORKSPACE_ID,
           label: EXPERIMENT_WORKSPACE_ID,
           metrics: {
@@ -509,7 +509,7 @@ describe('App', () => {
           }
         },
         {
-          branch: 'current',
+          branch: 'main',
           id: 'main',
           label: 'main',
           metrics: {
@@ -861,7 +861,7 @@ describe('App', () => {
     it('should enable the correct options for a commit with checkpoints', () => {
       renderTableWithoutRunningExperiments()
 
-      const target = screen.getByText('main')
+      const target = screen.getAllByText('main')[1]
       fireEvent.contextMenu(target, { bubbles: true })
 
       advanceTimersByTime(100)
@@ -882,7 +882,7 @@ describe('App', () => {
     it('should enable the correct options for a commit without checkpoints', () => {
       renderTableWithoutRunningExperiments(false)
 
-      const target = screen.getByText('main')
+      const target = screen.getAllByText('main')[1]
       fireEvent.contextMenu(target, { bubbles: true })
 
       advanceTimersByTime(100)
@@ -949,7 +949,7 @@ describe('App', () => {
     it('should not close when a disabled item is clicked', () => {
       renderTableWithoutRunningExperiments()
 
-      const target = screen.getByText('main')
+      const target = screen.getAllByText('main')[1]
       fireEvent.contextMenu(target, { bubbles: true })
 
       advanceTimersByTime(100)
@@ -1742,24 +1742,24 @@ describe('App', () => {
 
   describe('Show more commits', () => {
     it('should display a show more commits button if the table data hasMoreCommits is set to true', () => {
-      renderTable({ ...tableDataFixture, hasMoreCommits: { current: true } })
+      renderTable({ ...tableDataFixture, hasMoreCommits: { main: true } })
 
       expect(screen.getByText('Show More Commits')).toBeInTheDocument()
     })
 
     it('should not display a show more commits button if the table data hasMoreCommits is set to false', () => {
-      renderTable({ ...tableDataFixture, hasMoreCommits: { current: false } })
+      renderTable({ ...tableDataFixture, hasMoreCommits: { main: false } })
 
       expect(screen.queryByText('Show More Commits')).not.toBeInTheDocument()
     })
 
     it('should send a message to show more commits when the show more commits button is clicked', () => {
-      renderTable({ ...tableDataFixture, hasMoreCommits: { current: true } })
+      renderTable({ ...tableDataFixture, hasMoreCommits: { main: true } })
 
       fireEvent.click(screen.getByText('Show More Commits'))
 
       expect(mockPostMessage).toHaveBeenCalledWith({
-        payload: 'current',
+        payload: 'main',
         type: MessageFromWebviewType.SHOW_MORE_COMMITS
       })
     })
@@ -1767,7 +1767,7 @@ describe('App', () => {
     it('should display a show less commits button if the table data isShowingMoreCommits is set to true', () => {
       renderTable({
         ...tableDataFixture,
-        isShowingMoreCommits: { current: true }
+        isShowingMoreCommits: { main: true }
       })
 
       expect(screen.getByText('Show Less Commits')).toBeInTheDocument()
@@ -1776,7 +1776,7 @@ describe('App', () => {
     it('should not display a show less commits button if the table data isShowingMoreCommits is set to false', () => {
       renderTable({
         ...tableDataFixture,
-        isShowingMoreCommits: { current: false }
+        isShowingMoreCommits: { main: false }
       })
 
       expect(screen.queryByText('Show Less Commits')).not.toBeInTheDocument()
@@ -1785,13 +1785,13 @@ describe('App', () => {
     it('should send a message to show less commits when the show less commits button is clicked', () => {
       renderTable({
         ...tableDataFixture,
-        isShowingMoreCommits: { current: true }
+        isShowingMoreCommits: { main: true }
       })
 
       fireEvent.click(screen.getByText('Show Less Commits'))
 
       expect(mockPostMessage).toHaveBeenCalledWith({
-        payload: 'current',
+        payload: 'main',
         type: MessageFromWebviewType.SHOW_LESS_COMMITS
       })
     })

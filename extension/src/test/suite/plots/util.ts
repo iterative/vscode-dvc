@@ -40,9 +40,9 @@ export const buildPlots = async (
       internalCommands,
       resourceLocator,
       buildMockMemento({
-        [`${PersistenceKey.EXPERIMENTS_BRANCHES}${dvcDemoPath}`]: ['current'],
+        [`${PersistenceKey.EXPERIMENTS_BRANCHES}${dvcDemoPath}`]: ['main'],
         [`${PersistenceKey.NUMBER_OF_COMMITS_TO_SHOW}${dvcDemoPath}`]: {
-          current: 5
+          main: 5
         }
       }),
       () => Promise.resolve(true),

@@ -19,7 +19,7 @@ export const customPlotsOrderFixture: CustomPlotsOrderValue[] = [
 
 export const experimentsWithCommits: Experiment[] = [
   {
-    branch: 'current',
+    branch: 'main',
     id: 'main',
     label: 'label',
     metrics: {
@@ -31,7 +31,7 @@ export const experimentsWithCommits: Experiment[] = [
     params: { 'params.yaml': { dropout: 0.122, epochs: 5 } }
   },
   {
-    branch: 'current',
+    branch: 'main',
     id: 'exp-e7a67',
     metrics: {
       'summary.json': {
@@ -43,7 +43,7 @@ export const experimentsWithCommits: Experiment[] = [
     params: { 'params.yaml': { dropout: 0.15, epochs: 2 } }
   },
   {
-    branch: 'current',
+    branch: 'main',
     id: 'test-branch',
     label: '123',
     metrics: {
@@ -55,7 +55,7 @@ export const experimentsWithCommits: Experiment[] = [
     params: { 'params.yaml': { dropout: 0.122, epochs: 2 } }
   },
   {
-    branch: 'current',
+    branch: 'main',
     id: 'exp-83425',
     label: '123',
     metrics: {

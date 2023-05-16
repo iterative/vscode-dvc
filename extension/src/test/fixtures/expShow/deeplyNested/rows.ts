@@ -2,7 +2,7 @@ import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 
 export const data = [
   {
-    branch: 'current',
+    branch: 'main',
     id: EXPERIMENT_WORKSPACE_ID,
     label: EXPERIMENT_WORKSPACE_ID,
     params: {
@@ -29,7 +29,7 @@ export const data = [
     starred: false
   },
   {
-    branch: 'current',
+    branch: 'main',
     id: 'main',
     label: 'main',
     Created: '2020-11-21T19:58:22',

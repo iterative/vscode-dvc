@@ -243,7 +243,7 @@ suite('Experiments Test Suite', () => {
       await experiments.showWebview()
 
       expect(messageSpy).to.be.calledWithMatch({
-        hasMoreCommits: { current: true }
+        hasMoreCommits: { main: true }
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -254,7 +254,7 @@ suite('Experiments Test Suite', () => {
       await experiments.showWebview()
 
       expect(messageSpy).to.be.calledWithMatch({
-        hasMoreCommits: { current: false }
+        hasMoreCommits: { main: false }
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -265,7 +265,7 @@ suite('Experiments Test Suite', () => {
       await experiments.showWebview()
 
       expect(messageSpy).to.be.calledWithMatch({
-        isShowingMoreCommits: { current: true }
+        isShowingMoreCommits: { main: true }
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -277,7 +277,7 @@ suite('Experiments Test Suite', () => {
       await experiments.showWebview()
 
       expect(messageSpy).to.be.calledWithMatch({
-        isShowingMoreCommits: { current: false }
+        isShowingMoreCommits: { main: false }
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
@@ -1469,7 +1469,7 @@ suite('Experiments Test Suite', () => {
       expect(messageSpy).to.be.calledWithMatch({
         rows: [
           {
-            branch: 'current',
+            branch: 'main',
             displayColor: undefined,
             id: EXPERIMENT_WORKSPACE_ID,
             label: EXPERIMENT_WORKSPACE_ID,
@@ -1477,7 +1477,7 @@ suite('Experiments Test Suite', () => {
             starred: false
           },
           {
-            branch: 'current',
+            branch: 'main',
             displayColor: undefined,
             id: 'testBranch',
             label: 'testBranch',
@@ -1485,7 +1485,7 @@ suite('Experiments Test Suite', () => {
             starred: false,
             subRows: [
               {
-                branch: 'current',
+                branch: 'main',
                 displayColor: undefined,
                 description: '[exp-1]',
                 id: 'exp-1',
@@ -1495,7 +1495,7 @@ suite('Experiments Test Suite', () => {
                 starred: false
               },
               {
-                branch: 'current',
+                branch: 'main',
                 displayColor: undefined,
                 description: '[exp-2]',
                 id: 'exp-2',
@@ -1505,7 +1505,7 @@ suite('Experiments Test Suite', () => {
                 starred: false
               },
               {
-                branch: 'current',
+                branch: 'main',
                 displayColor: undefined,
                 description: '[exp-3]',
                 id: 'exp-3',
@@ -1550,7 +1550,7 @@ suite('Experiments Test Suite', () => {
       expect(messageSpy).to.be.calledWithMatch({
         rows: [
           {
-            branch: 'current',
+            branch: 'main',
             displayColor: undefined,
             id: EXPERIMENT_WORKSPACE_ID,
             label: EXPERIMENT_WORKSPACE_ID,
@@ -1558,7 +1558,7 @@ suite('Experiments Test Suite', () => {
             starred: false
           },
           {
-            branch: 'current',
+            branch: 'main',
             displayColor: undefined,
             id: 'testBranch',
             label: 'testBranch',
@@ -1566,7 +1566,7 @@ suite('Experiments Test Suite', () => {
             starred: false,
             subRows: [
               {
-                branch: 'current',
+                branch: 'main',
                 displayColor: undefined,
                 description: '[exp-2]',
                 id: 'exp-2',
@@ -1576,7 +1576,7 @@ suite('Experiments Test Suite', () => {
                 starred: false
               },
               {
-                branch: 'current',
+                branch: 'main',
                 displayColor: undefined,
                 description: '[exp-1]',
                 id: 'exp-1',
@@ -1586,7 +1586,7 @@ suite('Experiments Test Suite', () => {
                 starred: false
               },
               {
-                branch: 'current',
+                branch: 'main',
                 displayColor: undefined,
                 description: '[exp-3]',
                 id: 'exp-3',

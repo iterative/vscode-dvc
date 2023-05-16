@@ -13,10 +13,10 @@ const tableDataFixture: TableData = {
   hasCheckpoints: true,
   hasColumns: true,
   hasConfig: true,
-  hasMoreCommits: { current: true },
+  hasMoreCommits: { main: true },
   hasRunningWorkspaceExperiment: true,
   hasValidDvcYaml: true,
-  isShowingMoreCommits: { current: true },
+  isShowingMoreCommits: { main: true },
   rows: rowsFixture,
   selectedForPlotsCount: 2,
   sorts: []
