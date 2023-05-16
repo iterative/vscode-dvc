@@ -34,7 +34,7 @@ import {
   updateNeedsGitCommit
 } from '../state/experimentsSlice'
 
-const feedStore = (
+export const feedStore = (
   data: MessageToWebview<SetupData>,
   dispatch: SetupDispatch
 ) => {
