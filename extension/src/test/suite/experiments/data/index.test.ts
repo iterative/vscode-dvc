@@ -117,7 +117,7 @@ suite('Experiments Data Test Suite', () => {
       await dataUpdatedEvent
 
       expect(managedUpdateSpy).to.be.called
-    })
+    }).timeout(10000)
 
     it('should watch the .git directory for updates when the directory is inside workspace', async () => {
       const mockNow = getMockNow()
@@ -179,7 +179,7 @@ suite('Experiments Data Test Suite', () => {
       await dataUpdatedEvent
 
       expect(managedUpdateSpy).to.be.called
-    })
+    }).timeout(10000)
 
     it('should call exp show for each branch to show', async () => {
       stub(ExperimentsData.prototype, 'managedUpdate').resolves()

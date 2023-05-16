@@ -41,6 +41,7 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
   }
 
   public async update(): Promise<void> {
+    void this.updateAvailableBranchesToSelect()
     const data: ExpShowOutput = []
 
     const { branches, currentBranch } =
@@ -135,7 +136,6 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
         if (
           watchedRelPaths.some(watchedRelPath => path.includes(watchedRelPath))
         ) {
-          void this.updateAvailableBranchesToSelect()
           return this.managedUpdate()
         }
       }
