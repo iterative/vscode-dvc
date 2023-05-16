@@ -152,10 +152,11 @@ export const App: React.FC = () => {
         icon={getDvcStatusIcon(isDvcSetup, !!isAboveLatestTestedVersion)}
         secondaryTooltipText={
           isAboveLatestTestedVersion ? (
-            <span>
+            <>
               Warning, the located version is above the latest tested version
-              which could lead to unexpected behavior.
-            </span>
+              which could lead to unexpected behavior. Please upgrade to the
+              most recent version of the extension and reload this window.
+            </>
           ) : undefined
         }
       >
