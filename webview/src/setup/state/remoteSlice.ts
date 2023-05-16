@@ -9,11 +9,14 @@ export const remoteInitialState: RemoteState = {
 
 export const remoteSlice = createSlice({
   initialState: remoteInitialState,
-  name: 'studio',
+  name: 'remote',
   reducers: {
     updateRemoteList: (
       state,
-      action: PayloadAction<{ [alias: string]: string } | undefined>
+      action: PayloadAction<
+        | { [dvcRoot: string]: { [alias: string]: string } | undefined }
+        | undefined
+      >
     ) => {
       state.remoteList = action.payload
     }

@@ -1,4 +1,3 @@
-import isEmpty from 'lodash.isempty'
 import {
   DEFAULT_SECTION_COLLAPSED,
   RemoteList,
@@ -27,19 +26,22 @@ export const collectRemoteList = async (
   dvcRoots: string[],
   getRemoteList: (cwd: string) => Promise<string | undefined>
 ): Promise<RemoteList> => {
-  const acc: { [alias: string]: string } = {}
+  const acc: { [dvcRoot: string]: { [alias: string]: string } | undefined } = {}
 
   for (const dvcRoot of dvcRoots) {
     const remoteList = await getRemoteList(dvcRoot)
     if (!remoteList) {
+      acc[dvcRoot] = undefined
       continue
     }
     const remotes = trimAndSplit(remoteList)
+    const dvcRootRemotes: { [alias: string]: string } = {}
     for (const remote of remotes) {
-      const [alias, storage] = remote.split(/\s+/)
-      acc[alias] = storage
+      const [alias, url] = remote.split(/\s+/)
+      dvcRootRemotes[alias] = url
     }
+    acc[dvcRoot] = dvcRootRemotes
   }
 
-  return isEmpty(acc) ? undefined : acc
+  return acc
 }

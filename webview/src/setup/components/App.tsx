@@ -145,7 +145,7 @@ export const App: React.FC = () => {
       <SetupContainer
         sectionKey={SetupSection.REMOTE}
         title="Remote"
-        isSetup={!!remoteList}
+        isSetup={!!(remoteList && Object.values(remoteList).some(Boolean))}
       >
         <Remote cliCompatible={!!cliCompatible} remoteList={remoteList} />
       </SetupContainer>

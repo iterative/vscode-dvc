@@ -146,3 +146,17 @@ export const CliFoundManually = Template.bind({})
 CliFoundManually.args = getUpdatedArgs({
   isPythonExtensionUsed: false
 })
+
+export const MonorepoRemoteSetup = Template.bind({})
+MonorepoRemoteSetup.args = getUpdatedArgs({
+  remoteList: {
+    '/Users/thatguy/projects/vscode-dvc/rootA': undefined,
+    '/Users/thatguy/projects/vscode-dvc/rootB': {
+      backup: 's3://dvc-public/remote/mnist-vscode',
+      storage: 'gdrive://appDataFolder'
+    },
+    '/Users/thatguy/projects/vscode-dvc/rootC': {
+      storage: 'gdrive://appDataFolder'
+    }
+  }
+})

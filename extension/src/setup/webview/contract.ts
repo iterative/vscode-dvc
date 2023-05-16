@@ -3,7 +3,9 @@ export type DvcCliDetails = {
   version: string | undefined
 }
 
-export type RemoteList = { [alias: string]: string } | undefined
+export type RemoteList =
+  | { [dvcRoot: string]: { [alias: string]: string } | undefined }
+  | undefined
 
 export type SetupData = {
   canGitInitialize: boolean

@@ -7,19 +7,29 @@
   margin-bottom: 1rem;
 }
 
-.remoteKey,
-.remoteValue {
+.dvcRoot,
+.alias,
+.remote {
   padding: 5px;
 }
 
-.remoteKey {
+.dvcRoot,
+.alias {
   font-weight: bold;
-  white-space: nowrap;
   vertical-align: top;
 }
 
-.remoteValue {
+.alias,
+.remote {
+  white-space: nowrap;
+}
+
+.remote {
   padding-left: 50px;
   display: flex;
   flex-direction: column;
+}
+
+.empty {
+  text-align: center;
 }
