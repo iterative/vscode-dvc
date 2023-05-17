@@ -5,9 +5,9 @@ import { TEMP_DIR } from './constants'
 import { dvcReader, initializeDemoRepo, initializeEmptyRepo } from './util'
 import { dvcDemoPath } from '../util'
 import {
-  EXPERIMENT_WORKSPACE_ID,
   fileHasError,
-  experimentHasError
+  experimentHasError,
+  DEFAULT_EXP_SHOW_OUTPUT
 } from '../../cli/dvc/contract'
 import { ExperimentFlag } from '../../cli/dvc/constants'
 
@@ -87,11 +87,7 @@ suite('exp show --show-json', () => {
       await initializeEmptyRepo()
       const output = await dvcReader.expShow(TEMP_DIR)
 
-      expect(output).to.deep.equal([
-        {
-          rev: EXPERIMENT_WORKSPACE_ID
-        }
-      ])
+      expect(output).to.deep.equal(DEFAULT_EXP_SHOW_OUTPUT)
     })
   })
 })
