@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.13] - 2023-05-17
+
+### 🚀 New Features and Enhancements
+
+- Add colons (":") to setup DVC details [#3903](https://github.com/iterative/vscode-dvc/pull/3903) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Do not attempt to get commit message for the workspace record [#3914](https://github.com/iterative/vscode-dvc/pull/3914) by [@mattseddon](https://github.com/mattseddon)
+- Cleanup old branches before showing the experiments table [#3917](https://github.com/iterative/vscode-dvc/pull/3917) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Update dvc to 2.57.1 and bump LATEST_TESTED_VERSION [#3919](https://github.com/iterative/vscode-dvc/pull/3919) by [@sroy3](https://github.com/sroy3)
+
 ## [0.8.12] - 2023-05-16
 
 ### 🚀 New Features and Enhancements
