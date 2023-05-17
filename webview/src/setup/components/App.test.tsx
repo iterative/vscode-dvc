@@ -534,6 +534,18 @@ describe('App', () => {
       renderApp()
 
       mockPostMessage.mockClear()
+      const button = screen.getByText('Sign In')
+      fireEvent.click(button)
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.OPEN_STUDIO
+      })
+    })
+
+    it("should show a button which opens the user's Studio profile", () => {
+      renderApp()
+
+      mockPostMessage.mockClear()
       const button = screen.getByText('Get Token')
       fireEvent.click(button)
       expect(mockPostMessage).toHaveBeenCalledTimes(1)
