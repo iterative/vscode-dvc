@@ -318,17 +318,44 @@ describe('ExperimentsModel', () => {
   it('should set the number of commits to show correctly', () => {
     const model = new ExperimentsModel('', buildMockMemento())
 
-    model.setNbfCommitsToShow(42)
+    model.setNbfCommitsToShow(42, 'special-branch')
 
-    expect(model.getNbOfCommitsToShow()).toBe(42)
+    expect(model.getNbOfCommitsToShow('special-branch')).toBe(42)
   })
 
   it('should persist the number of commits to show when changing it', () => {
     const memento = buildMockMemento()
     const model = new ExperimentsModel('', memento)
 
-    model.setNbfCommitsToShow(42)
+    model.setNbfCommitsToShow(42, 'main')
 
-    expect(memento.get(PersistenceKey.NUMBER_OF_COMMITS_TO_SHOW)).toBe(42)
+    expect(memento.get(PersistenceKey.NUMBER_OF_COMMITS_TO_SHOW)).toStrictEqual(
+      {
+        main: 42
+      }
+    )
+  })
+
+  it('should remove outdated branches to show when calling pruneBranchesToShow', () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+
+    model.setBranchesToShow(['one', 'old', 'two', 'three', 'older'])
+    model.pruneBranchesToShow(['one', 'two', 'three', 'four', 'five', 'six'])
+
+    expect(model.getBranchesToShow()).toStrictEqual(['one', 'two', 'three'])
+  })
+
+  it('should persist the branches to show when calling pruneBranchesToShow', () => {
+    const memento = buildMockMemento()
+    const model = new ExperimentsModel('', memento)
+
+    model.setBranchesToShow(['one', 'old', 'two', 'three', 'older'])
+    model.pruneBranchesToShow(['one', 'two', 'three', 'four', 'five', 'six'])
+
+    expect(memento.get(PersistenceKey.EXPERIMENTS_BRANCHES)).toStrictEqual([
+      'one',
+      'two',
+      'three'
+    ])
   })
 })

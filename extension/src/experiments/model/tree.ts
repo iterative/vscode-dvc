@@ -31,7 +31,7 @@ import {
 } from '../../commands/external'
 import { sum } from '../../util/math'
 import { Disposable } from '../../class/dispose'
-import { Experiment } from '../webview/contract'
+import { Commit, Experiment } from '../webview/contract'
 import { getMarkdownString } from '../../vscode/markdownString'
 import { truncateFromLeft } from '../../util/string'
 
@@ -119,7 +119,7 @@ export class ExperimentsTree
     }
 
     return Promise.resolve(
-      this.getExperimentsByCommit(element.dvcRoot, element)
+      this.getExperimentsByCommit(element.dvcRoot, element as unknown as Commit)
     )
   }
 

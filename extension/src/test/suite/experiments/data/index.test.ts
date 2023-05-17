@@ -47,6 +47,7 @@ suite('Experiments Data Test Suite', () => {
 
     it('should debounce all calls to update that are made within 200ms', async () => {
       const { data, mockExpShow } = buildExperimentsData(disposable)
+      await data.isReady()
 
       await Promise.all([
         data.managedUpdate(),
@@ -93,9 +94,13 @@ suite('Experiments Data Test Suite', () => {
             }
           } as unknown as InternalCommands,
           {
-            getIsBranchesView: () => false,
-            getNbOfCommitsToShow: () => DEFAULT_NUM_OF_COMMITS_TO_SHOW,
-            setAvailableBranchesToShow: stub()
+            getBranchesToShow: () => ['main'],
+            getNbOfCommitsToShow: () => ({
+              main: DEFAULT_NUM_OF_COMMITS_TO_SHOW
+            }),
+            pruneBranchesToShow: stub(),
+            setAvailableBranchesToShow: stub(),
+            setBranchesToShow: stub()
           } as unknown as ExperimentsModel
         )
       )
@@ -149,9 +154,13 @@ suite('Experiments Data Test Suite', () => {
             }
           } as unknown as InternalCommands,
           {
-            getIsBranchesView: () => false,
-            getNbOfCommitsToShow: () => DEFAULT_NUM_OF_COMMITS_TO_SHOW,
-            setAvailableBranchesToShow: stub()
+            getBranchesToShow: () => ['main'],
+            getNbOfCommitsToShow: () => ({
+              main: DEFAULT_NUM_OF_COMMITS_TO_SHOW
+            }),
+            pruneBranchesToShow: stub(),
+            setAvailableBranchesToShow: stub(),
+            setBranchesToShow: stub()
           } as unknown as ExperimentsModel
         )
       )
@@ -174,5 +183,54 @@ suite('Experiments Data Test Suite', () => {
 
       expect(managedUpdateSpy).to.be.called
     }).timeout(10000)
+
+    it('should call exp show for each branch to show', async () => {
+      stub(ExperimentsData.prototype, 'managedUpdate').resolves()
+      const branchesToShow = [
+        'main',
+        'my-other-branch',
+        'secret-branch',
+        'old-branch'
+      ]
+      const { data, mockExpShow, mockGetBranchesToShow } =
+        buildExperimentsData(disposable)
+
+      mockGetBranchesToShow.returns(branchesToShow)
+
+      await data.update()
+
+      expect(mockExpShow).to.have.callCount(branchesToShow.length)
+    })
+
+    it('should prune any old branches to show before calling exp show on them', async () => {
+      stub(ExperimentsData.prototype, 'managedUpdate').resolves()
+      const branchesToShow = [
+        'main',
+        'my-other-branch',
+        'secret-branch',
+        'old-branch'
+      ]
+      const { data, mockPruneBranchesToShow, mockGetBranchesToShow } =
+        buildExperimentsData(disposable)
+      mockGetBranchesToShow.returns(branchesToShow)
+
+      await data.update()
+
+      expect(mockPruneBranchesToShow).to.be.calledOnce
+    })
+
+    it('should add the current branch to the exp show output', async () => {
+      stub(ExperimentsData.prototype, 'managedUpdate').resolves()
+      const { data, mockExpShow, mockGetBranchesToShow } = buildExperimentsData(
+        disposable,
+        'branch-283498'
+      )
+
+      mockGetBranchesToShow.returns(['main'])
+
+      await data.update()
+
+      expect(mockExpShow).to.have.callCount(2)
+    })
   })
 })

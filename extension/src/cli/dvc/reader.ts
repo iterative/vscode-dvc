@@ -74,7 +74,13 @@ export class DvcReader extends DvcCli {
       Flag.JSON
     )
     if (isDvcError(output) || isEmpty(output)) {
-      return [{ rev: EXPERIMENT_WORKSPACE_ID, ...(output as DvcError) }]
+      return [
+        {
+          branch: undefined,
+          rev: EXPERIMENT_WORKSPACE_ID,
+          ...(output as DvcError)
+        }
+      ]
     }
     return output
   }

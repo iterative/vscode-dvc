@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.8.11",
+  "version": "0.8.13",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -1698,7 +1698,7 @@
     "vscode-uri": "3.0.7",
     "wdio-vscode-service": "5.1.0",
     "webdriverio": "8.10.1",
-    "webpack": "5.82.0",
+    "webpack": "5.82.1",
     "webpack-cli": "5.1.1"
   },
   "peerDependencies": {

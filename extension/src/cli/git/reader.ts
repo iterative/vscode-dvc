@@ -3,12 +3,13 @@ import { GitCli } from '.'
 import { Command, Flag } from './constants'
 import { getOptions } from './options'
 import { typeCheckCommands } from '..'
-import { trimAndSplit } from '../../util/stdout'
+import { cleanUpBranchName, trimAndSplit } from '../../util/stdout'
 import { isDirectory } from '../../fileSystem'
 
 export const autoRegisteredCommands = {
   GIT_GET_BRANCHES: 'getBranches',
   GIT_GET_COMMIT_MESSAGES: 'getCommitMessages',
+  GIT_GET_CURRENT_BRANCH: 'getCurrentBranch',
   GIT_GET_NUM_COMMITS: 'getNumCommits',
   GIT_GET_REMOTE_URL: 'getRemoteUrl',
   GIT_GET_REPOSITORY_ROOT: 'getGitRepositoryRoot',
@@ -52,9 +53,11 @@ export class GitReader extends GitCli {
     const options = getOptions(
       cwd,
       Command.LOG,
-      `${sha}^..HEAD`,
+      sha,
       Flag.PRETTY_FORMAT_COMMIT_MESSAGE,
-      Flag.SEPARATE_WITH_NULL
+      Flag.SEPARATE_WITH_NULL,
+      Flag.NUMBER,
+      '1'
     )
     try {
       return await this.executeProcess(options)
@@ -80,18 +83,13 @@ export class GitReader extends GitCli {
     return new Set([...files, ...dirs])
   }
 
-  public async getNumCommits(cwd: string) {
-    const options = getOptions(
-      cwd,
-      Command.REV_LIST,
-      Flag.FULL_HISTORY,
-      Flag.ALL
-    )
+  public async getNumCommits(cwd: string, branch: string) {
+    const options = getOptions(cwd, Command.REV_LIST, Flag.COUNT, branch)
     try {
-      const revisions = await this.executeProcess(options)
-      return trimAndSplit(revisions).length
+      const nbCommits = await this.executeProcess(options)
+      return Number.parseInt(nbCommits)
     } catch {
-      return ''
+      return 0
     }
   }
 
@@ -99,9 +97,22 @@ export class GitReader extends GitCli {
     const options = getOptions(cwd, Command.BRANCH, Flag.NO_MERGE)
     try {
       const branches = await this.executeProcess(options)
-      return trimAndSplit(branches)
+      return trimAndSplit(branches).map(cleanUpBranchName)
     } catch {
       return []
+    }
+  }
+
+  public async getCurrentBranch(cwd: string): Promise<string> {
+    const options = getOptions(cwd, Command.BRANCH)
+    try {
+      const branches = await this.executeProcess(options)
+      const currentBranch = trimAndSplit(branches).find(
+        branch => branch.indexOf('*') === 0
+      )
+      return (currentBranch && cleanUpBranchName(currentBranch)) || ''
+    } catch {
+      return ''
     }
   }
 

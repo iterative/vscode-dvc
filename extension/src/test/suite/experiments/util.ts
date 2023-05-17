@@ -15,6 +15,7 @@ import * as Watcher from '../../../fileSystem/watcher'
 import { ExperimentsModel } from '../../../experiments/model'
 import { ColumnsModel } from '../../../experiments/columns/model'
 import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../../cli/dvc/constants'
+import { PersistenceKey } from '../../../persistence/constants'
 
 export const buildExperiments = (
   disposer: Disposer,
@@ -41,12 +42,19 @@ export const buildExperiments = (
   )
   const mockCheckOrAddPipeline = stub()
   const mockSelectBranches = stub().resolves(['main', 'other'])
+  const mockMemento = buildMockMemento({
+    [`${PersistenceKey.EXPERIMENTS_BRANCHES}${dvcRoot}`]: ['main'],
+    [`${PersistenceKey.NUMBER_OF_COMMITS_TO_SHOW}${dvcRoot}`]: {
+      main: 5
+    }
+  })
+
   const experiments = disposer.track(
     new Experiments(
       dvcRoot,
       internalCommands,
       resourceLocator,
-      buildMockMemento(),
+      mockMemento,
       mockCheckOrAddPipeline,
       mockSelectBranches,
       mockExperimentsData
@@ -133,24 +141,50 @@ const buildExperimentsDataDependencies = (disposer: Disposer) => {
     'createFileSystemWatcher'
   ).returns(undefined)
 
-  const { dvcReader, internalCommands } = buildInternalCommands(disposer)
+  const { dvcReader, gitReader, internalCommands } =
+    buildInternalCommands(disposer)
   const mockExpShow = stub(dvcReader, 'expShow').resolves(expShowFixture)
-  return { internalCommands, mockCreateFileSystemWatcher, mockExpShow }
+  return {
+    gitReader,
+    internalCommands,
+    mockCreateFileSystemWatcher,
+    mockExpShow
+  }
 }
 
-export const buildExperimentsData = (disposer: SafeWatcherDisposer) => {
-  const { internalCommands, mockExpShow, mockCreateFileSystemWatcher } =
-    buildExperimentsDataDependencies(disposer)
+export const buildExperimentsData = (
+  disposer: SafeWatcherDisposer,
+  currentBranch = 'main'
+) => {
+  const {
+    internalCommands,
+    mockExpShow,
+    mockCreateFileSystemWatcher,
+    gitReader
+  } = buildExperimentsDataDependencies(disposer)
 
+  stub(gitReader, 'getCurrentBranch').resolves(currentBranch)
+  stub(gitReader, 'getBranches').resolves(['one'])
+
+  const mockGetBranchesToShow = stub().returns(['main'])
+  const mockPruneBranchesToShow = stub()
   const data = disposer.track(
     new ExperimentsData(dvcDemoPath, internalCommands, {
-      getIsBranchesView: () => false,
+      getBranchesToShow: mockGetBranchesToShow,
       getNbOfCommitsToShow: () => DEFAULT_NUM_OF_COMMITS_TO_SHOW,
-      setAvailableBranchesToShow: stub()
+      pruneBranchesToShow: mockPruneBranchesToShow,
+      setAvailableBranchesToShow: stub(),
+      setBranchesToShow: stub()
     } as unknown as ExperimentsModel)
   )
 
-  return { data, mockCreateFileSystemWatcher, mockExpShow }
+  return {
+    data,
+    mockCreateFileSystemWatcher,
+    mockExpShow,
+    mockGetBranchesToShow,
+    mockPruneBranchesToShow
+  }
 }
 
 export const stubWorkspaceExperimentsGetters = (

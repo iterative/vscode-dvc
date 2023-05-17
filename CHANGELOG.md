@@ -2,6 +2,47 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.13] - 2023-05-17
+
+### 🚀 New Features and Enhancements
+
+- Add colons (":") to setup DVC details [#3903](https://github.com/iterative/vscode-dvc/pull/3903) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Do not attempt to get commit message for the workspace record [#3914](https://github.com/iterative/vscode-dvc/pull/3914) by [@mattseddon](https://github.com/mattseddon)
+- Cleanup old branches before showing the experiments table [#3917](https://github.com/iterative/vscode-dvc/pull/3917) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Update dvc to 2.57.1 and bump LATEST_TESTED_VERSION [#3919](https://github.com/iterative/vscode-dvc/pull/3919) by [@sroy3](https://github.com/sroy3)
+
+## [0.8.12] - 2023-05-16
+
+### 🚀 New Features and Enhancements
+
+- Send all stderr and stdout to the output channel when a DVC process fails [#3857](https://github.com/iterative/vscode-dvc/pull/3857) by [@mattseddon](https://github.com/mattseddon)
+- Call exp show with multiple branches [#3827](https://github.com/iterative/vscode-dvc/pull/3827) by [@sroy3](https://github.com/sroy3)
+
+### 🐛 Bug Fixes
+
+- Pin dvc-studio-client in demo project as a temporary fix [#3899](https://github.com/iterative/vscode-dvc/pull/3899) by [@mattseddon](https://github.com/mattseddon)
+- Debounce calls to git branch [#3887](https://github.com/iterative/vscode-dvc/pull/3887) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update coverage path ignore patterns [#3859](https://github.com/iterative/vscode-dvc/pull/3859) by [@mattseddon](https://github.com/mattseddon)
+- Update CodeClimate exclude patterns [#3858](https://github.com/iterative/vscode-dvc/pull/3858) by [@mattseddon](https://github.com/mattseddon)
+- Add redux to setup webview [#3851](https://github.com/iterative/vscode-dvc/pull/3851) by [@julieg18](https://github.com/julieg18)
+- Lower setup section prop drilling [#3862](https://github.com/iterative/vscode-dvc/pull/3862) by [@julieg18](https://github.com/julieg18)
+- Update blocked ESM only packages (execa, process-exists) [#3856](https://github.com/iterative/vscode-dvc/pull/3856) by [@mattseddon](https://github.com/mattseddon)
+- Cleanup icons [#3871](https://github.com/iterative/vscode-dvc/pull/3871) by [@sroy3](https://github.com/sroy3)
+- Simplify table data fixtures [#3876](https://github.com/iterative/vscode-dvc/pull/3876) by [@sroy3](https://github.com/sroy3)
+- Remove node-fetch as a dependency (not used) [#3892](https://github.com/iterative/vscode-dvc/pull/3892) by [@mattseddon](https://github.com/mattseddon)
+- Increase timeouts of flaky tests [#3888](https://github.com/iterative/vscode-dvc/pull/3888) by [@mattseddon](https://github.com/mattseddon)
+- Fix broken setup stories [#3896](https://github.com/iterative/vscode-dvc/pull/3896) by [@julieg18](https://github.com/julieg18)
+- Revert demo project to latest commit on main [#3900](https://github.com/iterative/vscode-dvc/pull/3900) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.8.11] - 2023-05-10
 
 ### 🚀 New Features and Enhancements

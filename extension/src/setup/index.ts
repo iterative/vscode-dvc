@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { Event, EventEmitter, ViewColumn, workspace } from 'vscode'
+import { Event, EventEmitter, workspace } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import isEmpty from 'lodash.isempty'
 import {
@@ -76,7 +76,6 @@ export class Setup
   private readonly internalCommands: InternalCommands
 
   private readonly webviewMessages: WebviewMessages
-  private readonly showExperiments: () => void
   private readonly getHasData: () => boolean | undefined
   private readonly collectWorkspaceScale: () => Promise<WorkspaceScale>
 
@@ -129,10 +128,6 @@ export class Setup
 
     if (this.webview) {
       void this.sendDataToWebview()
-    }
-
-    this.showExperiments = () => {
-      void experiments.showWebview(this.dvcRoots[0], ViewColumn.Active)
     }
 
     this.getHasData = () => experiments.getHasData()
@@ -423,8 +418,7 @@ export class Setup
   private createWebviewMessageHandler() {
     const webviewMessages = new WebviewMessages(
       () => this.getWebview(),
-      () => this.initializeGit(),
-      () => this.showExperiments()
+      () => this.initializeGit()
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>

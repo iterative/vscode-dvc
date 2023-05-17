@@ -6,7 +6,7 @@ export const DvcEnvInfoRow: React.FC<{
   text: string | ReactElement
 }> = ({ title, text }) => (
   <tr>
-    <td className={styles.envDetailsKey}>{title}</td>
+    <td className={styles.envDetailsKey}>{title}:</td>
     <td className={styles.envDetailsValue}>{text}</td>
   </tr>
 )
