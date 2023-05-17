@@ -63,7 +63,7 @@ export const buildSetup = (
   const mockAutoInstallDvc = stub(AutoInstall, 'autoInstallDvc')
   stub(AutoInstall, 'findPythonBinForInstall').resolves(undefined)
 
-  const mockOpenExperiments = fake()
+  const mockShowWebview = stub(WorkspaceExperiments.prototype, 'showWebview')
 
   const mockRunSetup = stub(Runner, 'run').resolves(undefined)
 
@@ -88,7 +88,7 @@ export const buildSetup = (
       {
         columnsChanged: mockEmitter,
         getHasData: () => hasData,
-        showWebview: mockOpenExperiments
+        showWebview: mockShowWebview
       } as unknown as WorkspaceExperiments,
       { setAvailability: stub() } as unknown as Status,
       resourceLocator.dvcIcon,
@@ -108,9 +108,9 @@ export const buildSetup = (
     mockGetGitRepositoryRoot,
     mockGlobalVersion,
     mockInitializeGit,
-    mockOpenExperiments,
     mockOpenExternal,
     mockRunSetup,
+    mockShowWebview,
     mockVersion,
     resourceLocator,
     setup,
