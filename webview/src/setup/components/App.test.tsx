@@ -282,7 +282,7 @@ describe('App', () => {
         sectionCollapsed: {
           [SetupSection.DVC]: false,
           [SetupSection.EXPERIMENTS]: true,
-          [SetupSection.REMOTE]: true,
+          [SetupSection.REMOTES]: true,
           [SetupSection.STUDIO]: true
         }
       }
@@ -641,7 +641,7 @@ describe('App', () => {
         sectionCollapsed: {
           [SetupSection.DVC]: false,
           [SetupSection.EXPERIMENTS]: true,
-          [SetupSection.REMOTE]: true,
+          [SetupSection.REMOTES]: true,
           [SetupSection.STUDIO]: true
         }
       })
@@ -663,7 +663,7 @@ describe('App', () => {
         sectionCollapsed: {
           [SetupSection.DVC]: true,
           [SetupSection.EXPERIMENTS]: false,
-          [SetupSection.REMOTE]: true,
+          [SetupSection.REMOTES]: true,
           [SetupSection.STUDIO]: true
         }
       })
@@ -685,7 +685,7 @@ describe('App', () => {
         sectionCollapsed: {
           [SetupSection.DVC]: true,
           [SetupSection.EXPERIMENTS]: true,
-          [SetupSection.REMOTE]: true,
+          [SetupSection.REMOTES]: true,
           [SetupSection.STUDIO]: false
         }
       })
@@ -699,6 +699,97 @@ describe('App', () => {
       const experiments = screen.getByText('Experiments')
       expect(experiments).toBeVisible()
       expect(screen.getByText(experimentsText)).not.toBeVisible()
+    })
+  })
+
+  describe('Remotes', () => {
+    it('should show the setup DVC button if the remoteList is undefined (no projects)', () => {
+      renderApp({
+        remoteList: undefined,
+        sectionCollapsed: {
+          [SetupSection.DVC]: true,
+          [SetupSection.EXPERIMENTS]: true,
+          [SetupSection.REMOTES]: false,
+          [SetupSection.STUDIO]: true
+        }
+      })
+
+      const setupDVCButton = screen.getByText('Setup DVC')
+
+      expect(setupDVCButton).toBeInTheDocument()
+      expect(setupDVCButton).toBeVisible()
+    })
+
+    it('should show the connect to remote storage screen if no remotes are connected', () => {
+      renderApp({
+        remoteList: { demo: undefined, 'example-get-started': undefined },
+        sectionCollapsed: {
+          [SetupSection.DVC]: true,
+          [SetupSection.EXPERIMENTS]: true,
+          [SetupSection.REMOTES]: false,
+          [SetupSection.STUDIO]: true
+        }
+      })
+
+      const setupDVCButton = screen.getByText('Connect to Remote Storage')
+
+      expect(setupDVCButton).toBeInTheDocument()
+      expect(setupDVCButton).toBeVisible()
+    })
+
+    it('should show the list of remotes there is only one project in the workspace', () => {
+      renderApp({
+        remoteList: {
+          'example-get-started': { drive: 'gdrive://appDataFolder' }
+        },
+        sectionCollapsed: {
+          [SetupSection.DVC]: true,
+          [SetupSection.EXPERIMENTS]: true,
+          [SetupSection.REMOTES]: false,
+          [SetupSection.STUDIO]: true
+        }
+      })
+
+      const setupDVCButton = screen.getByText('Remote Storage Connected')
+
+      expect(setupDVCButton).toBeInTheDocument()
+      expect(setupDVCButton).toBeVisible()
+
+      expect(screen.getByText('drive')).toBeInTheDocument()
+      expect(screen.getByText('gdrive://appDataFolder')).toBeInTheDocument()
+      expect(screen.queryByText('example-get-started')).not.toBeInTheDocument()
+    })
+
+    it('should show the list of remotes by project if there are multiple projects and one has remote(s) connected', () => {
+      renderApp({
+        remoteList: {
+          demo: undefined,
+          'example-get-started': {
+            drive: 'gdrive://appDataFolder',
+            storage: 's3://some-bucket'
+          }
+        },
+        sectionCollapsed: {
+          [SetupSection.DVC]: true,
+          [SetupSection.EXPERIMENTS]: true,
+          [SetupSection.REMOTES]: false,
+          [SetupSection.STUDIO]: true
+        }
+      })
+
+      const setupDVCButton = screen.getByText('Remote Storage Connected')
+
+      expect(setupDVCButton).toBeInTheDocument()
+      expect(setupDVCButton).toBeVisible()
+
+      expect(screen.getByText('demo')).toBeInTheDocument()
+      expect(screen.getAllByText('-')).toHaveLength(2)
+
+      expect(screen.getByText('example-get-started')).toBeInTheDocument()
+      expect(screen.getByText('drive')).toBeInTheDocument()
+      expect(screen.getByText('gdrive://appDataFolder')).toBeInTheDocument()
+      expect(screen.getByText('storage')).toBeInTheDocument()
+      expect(screen.getByText('s3://some-bucket')).toBeInTheDocument()
     })
   })
 })

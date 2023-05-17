@@ -33,7 +33,7 @@ export const Dvc: React.FC = () => {
         updateSectionCollapsed({
           [SetupSection.DVC]: true,
           [SetupSection.EXPERIMENTS]: false,
-          [SetupSection.REMOTE]: false,
+          [SetupSection.REMOTES]: false,
           [SetupSection.STUDIO]: false
         })
       )

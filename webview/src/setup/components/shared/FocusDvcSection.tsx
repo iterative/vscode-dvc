@@ -14,7 +14,7 @@ export const FocusDvcSection = () => {
           updateSectionCollapsed({
             [SetupSection.DVC]: false,
             [SetupSection.EXPERIMENTS]: true,
-            [SetupSection.REMOTE]: true,
+            [SetupSection.REMOTES]: true,
             [SetupSection.STUDIO]: true
           })
         )

@@ -63,7 +63,7 @@ export const SectionDescription = {
     </span>
   ),
   // Setup Remote
-  [SetupSection.REMOTE]: (
+  [SetupSection.REMOTES]: (
     <span data-testid="tooltip-setup-remote">
       Configure DVC to work with{' '}
       <a href="https://dvc.org/doc/user-guide/data-management/remote-storage">

@@ -26,7 +26,7 @@ const DEFAULT_DATA: SetupData = {
   sectionCollapsed: {
     [SetupSection.DVC]: false,
     [SetupSection.EXPERIMENTS]: false,
-    [SetupSection.REMOTE]: false,
+    [SetupSection.REMOTES]: false,
     [SetupSection.STUDIO]: true
   },
   shareLiveToStudio: false
@@ -91,6 +91,7 @@ CompletedConnected.args = getUpdatedArgs({
   cliCompatible: true,
   hasData: true,
   isStudioConnected: true,
+  remoteList: { demo: undefined },
   sectionCollapsed: undefined,
   shareLiveToStudio: true
 })
@@ -147,8 +148,25 @@ CliFoundManually.args = getUpdatedArgs({
   isPythonExtensionUsed: false
 })
 
-export const MonorepoRemoteSetup = Template.bind({})
-MonorepoRemoteSetup.args = getUpdatedArgs({
+export const ProjectRemoteSetup = Template.bind({})
+ProjectRemoteSetup.args = getUpdatedArgs({
+  remoteList: {
+    '/Users/thatguy/projects/vscode-dvc/rootB': {
+      backup: 's3://dvc-public/remote/mnist-vscode',
+      storage:
+        'https://drive.google.com/drive/folders/1qAhh2GVwOe9luC7TxB63yLv73fjKN66W'
+    }
+  },
+  sectionCollapsed: {
+    [SetupSection.DVC]: true,
+    [SetupSection.EXPERIMENTS]: true,
+    [SetupSection.REMOTES]: false,
+    [SetupSection.STUDIO]: true
+  }
+})
+
+export const MultiProjectRemoteSetup = Template.bind({})
+MultiProjectRemoteSetup.args = getUpdatedArgs({
   remoteList: {
     '/Users/thatguy/projects/vscode-dvc/rootA': undefined,
     '/Users/thatguy/projects/vscode-dvc/rootB': {
@@ -158,5 +176,11 @@ MonorepoRemoteSetup.args = getUpdatedArgs({
     '/Users/thatguy/projects/vscode-dvc/rootC': {
       storage: 'gdrive://appDataFolder'
     }
+  },
+  sectionCollapsed: {
+    [SetupSection.DVC]: true,
+    [SetupSection.EXPERIMENTS]: true,
+    [SetupSection.REMOTES]: false,
+    [SetupSection.STUDIO]: true
   }
 })

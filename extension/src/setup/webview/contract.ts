@@ -26,14 +26,14 @@ export type SetupData = {
 export enum SetupSection {
   DVC = 'dvc',
   EXPERIMENTS = 'experiments',
-  REMOTE = 'remote',
+  REMOTES = 'remotes',
   STUDIO = 'studio'
 }
 
 export const DEFAULT_SECTION_COLLAPSED = {
   [SetupSection.DVC]: false,
   [SetupSection.EXPERIMENTS]: false,
-  [SetupSection.REMOTE]: false,
+  [SetupSection.REMOTES]: false,
   [SetupSection.STUDIO]: false
 }
 

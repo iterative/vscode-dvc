@@ -9,7 +9,7 @@ import { Dvc } from './dvc/Dvc'
 import { Experiments } from './experiments/Experiments'
 import { Studio } from './studio/Studio'
 import { SetupContainer } from './SetupContainer'
-import { Remote } from './remote/Remote'
+import { Remotes } from './remote/Remotes'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 import { sendMessage } from '../../shared/vscode'
 import { SetupDispatch, SetupState } from '../store'
@@ -143,11 +143,11 @@ export const App: React.FC = () => {
         <Experiments isDvcSetup={projectInitialized && !!cliCompatible} />
       </SetupContainer>
       <SetupContainer
-        sectionKey={SetupSection.REMOTE}
-        title="Remote"
+        sectionKey={SetupSection.REMOTES}
+        title="Remotes"
         isSetup={!!(remoteList && Object.values(remoteList).some(Boolean))}
       >
-        <Remote cliCompatible={!!cliCompatible} remoteList={remoteList} />
+        <Remotes cliCompatible={!!cliCompatible} remoteList={remoteList} />
       </SetupContainer>
       <SetupContainer
         sectionKey={SetupSection.STUDIO}
