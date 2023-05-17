@@ -230,7 +230,7 @@ export class Setup
   ) {
     this.cliCompatible = compatible
     this.cliVersion = version
-    void this.updateIsStudioConnected()
+    void this.updateStudioAndSend()
     const incompatible = compatible === undefined ? undefined : !compatible
     void setContextValue(ContextKey.CLI_INCOMPATIBLE, incompatible)
   }
@@ -340,7 +340,7 @@ export class Setup
     }
 
     await this.accessConfig(cwd, Flag.GLOBAL, DvcConfigKey.STUDIO_TOKEN, token)
-    return this.updateIsStudioConnected()
+    return this.updateStudioAndSend()
   }
 
   public getStudioLiveShareToken() {
@@ -660,16 +660,16 @@ export class Setup
     }
   }
 
+  private async updateStudioAndSend() {
+    await this.updateIsStudioConnected()
+    return this.sendDataToWebview()
+  }
+
   private async updateIsStudioConnected() {
     await this.setStudioAccessToken()
     const storedToken = this.getStudioAccessToken()
     const isConnected = isStudioAccessToken(storedToken)
-    return this.setStudioIsConnected(isConnected)
-  }
-
-  private setStudioIsConnected(isConnected: boolean) {
     this.studioIsConnected = isConnected
-    void this.sendDataToWebview()
     return setContextValue(ContextKey.STUDIO_CONNECTED, isConnected)
   }
 
@@ -683,7 +683,7 @@ export class Setup
             path.endsWith(join('dvc', 'config')) ||
             path.endsWith(join('dvc', 'config.local'))
           ) {
-            void this.updateIsStudioConnected()
+            void this.updateStudioAndSend()
           }
         }
       )
