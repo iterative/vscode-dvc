@@ -395,7 +395,9 @@ describe('App', () => {
         projectInitialized: false
       })
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[0]
+      const iconWrapper = within(
+        screen.getByTestId('dvc-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.ERROR)
@@ -406,7 +408,9 @@ describe('App', () => {
       renderApp({ remoteList: { mockRoot: undefined } })
       expect(screen.queryByText('DVC is not setup')).not.toBeInTheDocument()
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[0]
+      const iconWrapper = within(
+        screen.getByTestId('dvc-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.PASSED)
@@ -522,7 +526,9 @@ describe('App', () => {
     it('should show an error icon if experiments are not setup', () => {
       renderApp()
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[1]
+      const iconWrapper = within(
+        screen.getByTestId('experiments-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.ERROR)
@@ -534,7 +540,9 @@ describe('App', () => {
         cliCompatible: false
       })
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[1]
+      const iconWrapper = within(
+        screen.getByTestId('experiments-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.ERROR)
@@ -546,7 +554,9 @@ describe('App', () => {
         hasData: true
       })
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[1]
+      const iconWrapper = within(
+        screen.getByTestId('experiments-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.PASSED)
@@ -604,7 +614,9 @@ describe('App', () => {
         cliCompatible: false
       })
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[3]
+      const iconWrapper = within(
+        screen.getByTestId('studio-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.ERROR)
@@ -614,7 +626,9 @@ describe('App', () => {
     it('should show an info icon if dvc is compatible but studio is not connected', () => {
       renderApp()
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[3]
+      const iconWrapper = within(
+        screen.getByTestId('studio-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.INFO)
@@ -655,7 +669,9 @@ describe('App', () => {
         isStudioConnected: true
       })
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[3]
+      const iconWrapper = within(
+        screen.getByTestId('studio-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.PASSED)
