@@ -188,6 +188,7 @@ export const buildMockExperimentsData = (update = stub()) =>
     getCurrentBranchesToShow: () => ['current'],
     onDidChangeDvcYaml: stub(),
     onDidUpdate: stub(),
+    pruneBranchesToShow: stub(),
     setCurrentBranchesToShow: stub(),
     update
   } as unknown as ExperimentsData)
