@@ -37,6 +37,7 @@ const DEFAULT_DATA = {
   needsGitInitialized: false,
   projectInitialized: true,
   pythonBinPath: undefined,
+  remoteList: undefined,
   sectionCollapsed: undefined,
   shareLiveToStudio: false
 }
@@ -115,7 +116,7 @@ describe('App', () => {
       })
 
       expect(screen.getAllByText('DVC is currently unavailable')).toHaveLength(
-        2
+        3
       )
     })
 
@@ -221,7 +222,12 @@ describe('App', () => {
     it('should show a screen saying that DVC is not initialized if the project is not initialized and git is uninitialized', () => {
       renderApp({ needsGitInitialized: true, projectInitialized: false })
 
-      expect(screen.getByText('DVC is not initialized')).toBeInTheDocument()
+      const uninitializedText = screen.getAllByText('DVC is not initialized')
+
+      expect(uninitializedText).toHaveLength(2)
+      for (const text of uninitializedText) {
+        expect(text).toBeInTheDocument()
+      }
     })
 
     it('should offer to initialize Git if it is possible', () => {
@@ -244,19 +250,13 @@ describe('App', () => {
         projectInitialized: false
       })
 
-      expect(screen.queryByText('Initialize Git')).not.toBeInTheDocument()
-    })
+      const uninitialized = screen.getAllByText('DVC is not initialized')
 
-    it('should show a screen saying that DVC is not initialized if the project is not initialized and dvc is installed', () => {
-      renderApp({
-        projectInitialized: false
-      })
-
-      expect(screen.getByText('DVC is not initialized')).toBeInTheDocument()
+      expect(uninitialized).toHaveLength(4)
     })
 
     it('should not show a screen saying that DVC is not initialized if the project is initialized and dvc is installed', () => {
-      renderApp()
+      renderApp({ remoteList: { mocRoot: undefined } })
 
       expect(
         screen.queryByText('DVC is not initialized')
@@ -281,8 +281,9 @@ describe('App', () => {
         projectInitialized: false,
         sectionCollapsed: {
           [SetupSection.DVC]: false,
-          [SetupSection.STUDIO]: true,
-          [SetupSection.EXPERIMENTS]: true
+          [SetupSection.EXPERIMENTS]: true,
+          [SetupSection.REMOTES]: true,
+          [SetupSection.STUDIO]: true
         }
       }
 
@@ -401,7 +402,8 @@ describe('App', () => {
     })
 
     it('should show a passed icon if DVC CLI is compatible and project is initialized', () => {
-      renderApp()
+      renderApp({ remoteList: { mockRoot: undefined } })
+      expect(screen.queryByText('DVC is not setup')).not.toBeInTheDocument()
 
       const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[0]
 
@@ -409,20 +411,11 @@ describe('App', () => {
         within(iconWrapper).getByTestId(TooltipIconType.PASSED)
       ).toBeInTheDocument()
     })
-  })
-
-  describe('Experiments', () => {
-    it('should show a screen saying that dvc is not setup if the project is not initialized', () => {
-      renderApp({
-        projectInitialized: false
-      })
-
-      expect(screen.getByText('DVC is not setup')).toBeInTheDocument()
-    })
 
     it('should open the dvc section when clicking the Setup DVC button on the dvc is not setup screen', () => {
       renderApp({
-        projectInitialized: false
+        projectInitialized: false,
+        remoteList: { mockRoot: undefined }
       })
 
       const experimentsText = screen.getByText('DVC is not setup')
@@ -578,7 +571,7 @@ describe('App', () => {
         cliCompatible: false
       })
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[2]
+      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[3]
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.ERROR)
@@ -588,7 +581,7 @@ describe('App', () => {
     it('should show an info icon if dvc is compatible but studio is not connected', () => {
       renderApp()
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[2]
+      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[3]
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.INFO)
@@ -629,7 +622,7 @@ describe('App', () => {
         isStudioConnected: true
       })
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[2]
+      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[3]
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.PASSED)
@@ -646,9 +639,10 @@ describe('App', () => {
       renderApp({
         isStudioConnected: true,
         sectionCollapsed: {
+          [SetupSection.DVC]: false,
           [SetupSection.EXPERIMENTS]: true,
-          [SetupSection.STUDIO]: true,
-          [SetupSection.DVC]: false
+          [SetupSection.REMOTES]: true,
+          [SetupSection.STUDIO]: true
         }
       })
       mockPostMessage.mockClear()
@@ -667,9 +661,10 @@ describe('App', () => {
       renderApp({
         isStudioConnected: true,
         sectionCollapsed: {
+          [SetupSection.DVC]: true,
           [SetupSection.EXPERIMENTS]: false,
-          [SetupSection.STUDIO]: true,
-          [SetupSection.DVC]: true
+          [SetupSection.REMOTES]: true,
+          [SetupSection.STUDIO]: true
         }
       })
       mockPostMessage.mockClear()
@@ -688,9 +683,10 @@ describe('App', () => {
       renderApp({
         isStudioConnected: true,
         sectionCollapsed: {
+          [SetupSection.DVC]: true,
           [SetupSection.EXPERIMENTS]: true,
-          [SetupSection.STUDIO]: false,
-          [SetupSection.DVC]: true
+          [SetupSection.REMOTES]: true,
+          [SetupSection.STUDIO]: false
         }
       })
       mockPostMessage.mockClear()
@@ -703,6 +699,97 @@ describe('App', () => {
       const experiments = screen.getByText('Experiments')
       expect(experiments).toBeVisible()
       expect(screen.getByText(experimentsText)).not.toBeVisible()
+    })
+  })
+
+  describe('Remotes', () => {
+    it('should show the setup DVC button if the remoteList is undefined (no projects)', () => {
+      renderApp({
+        remoteList: undefined,
+        sectionCollapsed: {
+          [SetupSection.DVC]: true,
+          [SetupSection.EXPERIMENTS]: true,
+          [SetupSection.REMOTES]: false,
+          [SetupSection.STUDIO]: true
+        }
+      })
+
+      const setupDVCButton = screen.getByText('Setup DVC')
+
+      expect(setupDVCButton).toBeInTheDocument()
+      expect(setupDVCButton).toBeVisible()
+    })
+
+    it('should show the connect to remote storage screen if no remotes are connected', () => {
+      renderApp({
+        remoteList: { demo: undefined, 'example-get-started': undefined },
+        sectionCollapsed: {
+          [SetupSection.DVC]: true,
+          [SetupSection.EXPERIMENTS]: true,
+          [SetupSection.REMOTES]: false,
+          [SetupSection.STUDIO]: true
+        }
+      })
+
+      const setupDVCButton = screen.getByText('Connect to Remote Storage')
+
+      expect(setupDVCButton).toBeInTheDocument()
+      expect(setupDVCButton).toBeVisible()
+    })
+
+    it('should show the list of remotes if there is only one project in the workspace', () => {
+      renderApp({
+        remoteList: {
+          'example-get-started': { drive: 'gdrive://appDataFolder' }
+        },
+        sectionCollapsed: {
+          [SetupSection.DVC]: true,
+          [SetupSection.EXPERIMENTS]: true,
+          [SetupSection.REMOTES]: false,
+          [SetupSection.STUDIO]: true
+        }
+      })
+
+      const setupDVCButton = screen.getByText('Remote Storage Connected')
+
+      expect(setupDVCButton).toBeInTheDocument()
+      expect(setupDVCButton).toBeVisible()
+
+      expect(screen.getByText('drive')).toBeInTheDocument()
+      expect(screen.getByText('gdrive://appDataFolder')).toBeInTheDocument()
+      expect(screen.queryByText('example-get-started')).not.toBeInTheDocument()
+    })
+
+    it('should show the list of remotes by project if there are multiple projects and one has remote(s) connected', () => {
+      renderApp({
+        remoteList: {
+          demo: undefined,
+          'example-get-started': {
+            drive: 'gdrive://appDataFolder',
+            storage: 's3://some-bucket'
+          }
+        },
+        sectionCollapsed: {
+          [SetupSection.DVC]: true,
+          [SetupSection.EXPERIMENTS]: true,
+          [SetupSection.REMOTES]: false,
+          [SetupSection.STUDIO]: true
+        }
+      })
+
+      const setupDVCButton = screen.getByText('Remote Storage Connected')
+
+      expect(setupDVCButton).toBeInTheDocument()
+      expect(setupDVCButton).toBeVisible()
+
+      expect(screen.getByText('demo')).toBeInTheDocument()
+      expect(screen.getAllByText('-')).toHaveLength(2)
+
+      expect(screen.getByText('example-get-started')).toBeInTheDocument()
+      expect(screen.getByText('drive')).toBeInTheDocument()
+      expect(screen.getByText('gdrive://appDataFolder')).toBeInTheDocument()
+      expect(screen.getByText('storage')).toBeInTheDocument()
+      expect(screen.getByText('s3://some-bucket')).toBeInTheDocument()
     })
   })
 })
