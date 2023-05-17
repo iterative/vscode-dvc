@@ -12,9 +12,8 @@ export const CliIncompatible: React.FC<PropsWithChildren> = ({ children }) => {
   )
   const canUpgrade = !!pythonBinPath
 
-  const contents = canUpgrade ? (
+  const conditionalContents = canUpgrade ? (
     <>
-      <p>DVC can be automatically upgraded with {pythonBinPath}</p>
       <div className={styles.sideBySideButtons}>
         <Button onClick={upgradeDvc} text="Upgrade" />
         <Button text="Check Compatibility" onClick={checkCompatibility} />
@@ -32,7 +31,7 @@ export const CliIncompatible: React.FC<PropsWithChildren> = ({ children }) => {
       <div>
         <h1>DVC is incompatible</h1>
         {children}
-        {contents}
+        {conditionalContents}
       </div>
     </EmptyState>
   )

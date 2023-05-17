@@ -145,11 +145,6 @@ describe('App', () => {
       })
 
       expect(screen.getByText('DVC is incompatible')).toBeInTheDocument()
-      expect(
-        screen.getByText(
-          `DVC can be automatically upgraded with ${pythonBinPath}`
-        )
-      ).toBeInTheDocument()
 
       const compatibityButton = screen.getByText('Check Compatibility')
       expect(compatibityButton).toBeInTheDocument()
