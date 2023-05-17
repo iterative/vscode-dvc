@@ -123,7 +123,7 @@ describe('App', () => {
 
       const compatibityButton = screen.getByText('Check Compatibility')
       expect(compatibityButton).toBeInTheDocument()
-      const upgradeButton = screen.getByText('Upgrade')
+      const upgradeButton = screen.getByText('Upgrade (pip)')
       expect(upgradeButton).toBeInTheDocument()
 
       fireEvent.click(upgradeButton)
