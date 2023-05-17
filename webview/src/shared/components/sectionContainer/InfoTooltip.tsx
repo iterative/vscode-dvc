@@ -31,19 +31,19 @@ export const InfoTooltip: React.FC<
     icon?: TooltipIconType
   }>
 > = ({ icon = TooltipIconType.INFO, sectionKey, children }) => {
-  const infoIcon = (
+  const indicatorIcon = (
     <Icon
       data-testid={icon}
       width={16}
       height={16}
       icon={tooltipIcons[icon].icon}
-      className={cx(styles.infoIcon, tooltipIcons[icon].className)}
+      className={cx(styles.indicatorIcon, tooltipIcons[icon].className)}
     />
   )
 
   const tooltipContent = (
     <div className={styles.infoTooltip}>
-      {infoIcon}
+      {indicatorIcon}
       <SectionDescription sectionKey={sectionKey}>
         {children}
       </SectionDescription>
@@ -61,7 +61,7 @@ export const InfoTooltip: React.FC<
         className={styles.infoTooltipToggle}
         data-testid="info-tooltip-toggle"
       >
-        {infoIcon}
+        {indicatorIcon}
       </div>
     </Tooltip>
   )
