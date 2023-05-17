@@ -85,6 +85,13 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
       this.dvcRoot
     )
 
+    const allBranches = await this.internalCommands.executeCommand<string[]>(
+      AvailableCommands.GIT_GET_BRANCHES,
+      this.dvcRoot
+    )
+
+    this.experiments.pruneBranchesToShow(allBranches)
+
     const branches = this.experiments.getBranchesToShow()
 
     if (!branches.includes(currentBranch)) {
