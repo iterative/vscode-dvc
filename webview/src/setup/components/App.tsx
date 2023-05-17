@@ -9,6 +9,7 @@ import { Dvc } from './dvc/Dvc'
 import { Experiments } from './experiments/Experiments'
 import { Studio } from './studio/Studio'
 import { SetupContainer } from './SetupContainer'
+import { Remotes } from './remote/Remotes'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 import { sendMessage } from '../../shared/vscode'
 import { SetupDispatch, SetupState } from '../store'
@@ -26,13 +27,14 @@ import {
   updatePythonBinPath
 } from '../state/dvcSlice'
 import {
-  updateIsStudioConnected,
-  updateShareLiveToStudio
-} from '../state/studioSlice'
-import {
   updateHasData as updateExperimentsHasData,
   updateNeedsGitCommit
 } from '../state/experimentsSlice'
+import { updateRemoteList } from '../state/remoteSlice'
+import {
+  updateIsStudioConnected,
+  updateShareLiveToStudio
+} from '../state/studioSlice'
 
 export const feedStore = (
   data: MessageToWebview<SetupData>,
@@ -80,6 +82,10 @@ export const feedStore = (
       case 'shareLiveToStudio':
         dispatch(updateShareLiveToStudio(data.data.shareLiveToStudio))
         continue
+      case 'remoteList':
+        dispatch(updateRemoteList(data.data.remoteList))
+        continue
+
       default:
         continue
     }
@@ -93,6 +99,8 @@ export const App: React.FC = () => {
   const hasExperimentsData = useSelector(
     (state: SetupState) => state.experiments.hasData
   )
+  const { remoteList } = useSelector((state: SetupState) => state.remote)
+
   const isStudioConnected = useSelector(
     (state: SetupState) => state.studio.isStudioConnected
   )
@@ -133,6 +141,13 @@ export const App: React.FC = () => {
         isSetup={isDvcSetup && !!hasExperimentsData}
       >
         <Experiments isDvcSetup={projectInitialized && !!cliCompatible} />
+      </SetupContainer>
+      <SetupContainer
+        sectionKey={SetupSection.REMOTES}
+        title="Remotes"
+        isSetup={!!(remoteList && Object.values(remoteList).some(Boolean))}
+      >
+        <Remotes cliCompatible={!!cliCompatible} remoteList={remoteList} />
       </SetupContainer>
       <SetupContainer
         sectionKey={SetupSection.STUDIO}

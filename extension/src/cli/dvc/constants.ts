@@ -30,6 +30,7 @@ export enum Command {
   PUSH = 'push',
   QUEUE = 'queue',
   REMOVE = 'remove',
+  REMOTE = 'remote',
   ROOT = 'root',
   PARAMS = 'params',
   METRICS = 'metrics',

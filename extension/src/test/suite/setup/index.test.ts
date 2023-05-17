@@ -262,6 +262,7 @@ suite('Setup Test Suite', () => {
         needsGitInitialized: true,
         projectInitialized: false,
         pythonBinPath: undefined,
+        remoteList: undefined,
         sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
@@ -303,6 +304,7 @@ suite('Setup Test Suite', () => {
         needsGitInitialized: true,
         projectInitialized: false,
         pythonBinPath: undefined,
+        remoteList: undefined,
         sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
@@ -353,6 +355,7 @@ suite('Setup Test Suite', () => {
         needsGitInitialized: false,
         projectInitialized: false,
         pythonBinPath: undefined,
+        remoteList: undefined,
         sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
@@ -403,6 +406,7 @@ suite('Setup Test Suite', () => {
         needsGitInitialized: false,
         projectInitialized: true,
         pythonBinPath: undefined,
+        remoteList: { [dvcDemoPath]: undefined },
         sectionCollapsed: undefined,
         shareLiveToStudio: false
       })
@@ -809,19 +813,30 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to open the experiments webview', async () => {
-      const { messageSpy, setup, mockOpenExperiments } = buildSetup(disposable)
+      const { messageSpy, setup, mockShowWebview, mockExecuteCommand } =
+        buildSetup(disposable)
 
       const webview = await setup.showWebview()
       await webview.isReady()
+      mockExecuteCommand.restore()
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const showWebviewCalled = new Promise(resolve =>
+        mockShowWebview.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      )
+      stub(Setup.prototype, 'shouldBeShown').returns(false)
 
       messageSpy.resetHistory()
       mockMessageReceived.fire({
         type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW
       })
 
-      expect(mockOpenExperiments).to.be.calledOnce
+      await showWebviewCalled
+      expect(mockShowWebview).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should send the appropriate messages to the webview to focus different sections', async () => {
