@@ -41,11 +41,17 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
   }
 
   public async update(): Promise<void> {
-    void this.updateAvailableBranchesToSelect()
+    const allBranches = await this.internalCommands.executeCommand<string[]>(
+      AvailableCommands.GIT_GET_BRANCHES,
+      this.dvcRoot
+    )
+
+    void this.updateAvailableBranchesToSelect(allBranches)
     const data: ExpShowOutput = []
 
-    const { branches, currentBranch } =
-      await this.getBranchesToShowWithCurrent()
+    const { branches, currentBranch } = await this.getBranchesToShowWithCurrent(
+      allBranches
+    )
 
     await Promise.all(
       branches.map(async branch => {
@@ -55,6 +61,7 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
           ExperimentFlag.NUM_COMMIT,
           this.experiments.getNbOfCommitsToShow(branch).toString()
         ]
+
         const output = (await this.expShow(
           branchFlags,
           branch
@@ -79,14 +86,9 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
     this.collectedFiles = collectFiles(data, this.collectedFiles)
   }
 
-  private async getBranchesToShowWithCurrent() {
+  private async getBranchesToShowWithCurrent(allBranches: string[]) {
     const currentBranch = await this.internalCommands.executeCommand<string>(
       AvailableCommands.GIT_GET_CURRENT_BRANCH,
-      this.dvcRoot
-    )
-
-    const allBranches = await this.internalCommands.executeCommand<string[]>(
-      AvailableCommands.GIT_GET_BRANCHES,
       this.dvcRoot
     )
 
@@ -110,11 +112,13 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
     return data.map(exp => ({ ...exp, branch }))
   }
 
-  private async updateAvailableBranchesToSelect() {
-    const allBranches = await this.internalCommands.executeCommand<string[]>(
-      AvailableCommands.GIT_GET_BRANCHES,
-      this.dvcRoot
-    )
+  private async updateAvailableBranchesToSelect(branches?: string[]) {
+    const allBranches =
+      branches ||
+      (await this.internalCommands.executeCommand<string[]>(
+        AvailableCommands.GIT_GET_BRANCHES,
+        this.dvcRoot
+      ))
     this.experiments.setAvailableBranchesToShow(allBranches)
   }
 
