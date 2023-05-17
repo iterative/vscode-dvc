@@ -1,11 +1,11 @@
 import { SetupSection } from 'dvc/src/setup/webview/contract'
 import { updateSectionCollapsed } from '../../state/webviewSlice'
 
-const getAllSections = (collaspsed: boolean) => ({
-  [SetupSection.DVC]: collaspsed,
-  [SetupSection.EXPERIMENTS]: collaspsed,
-  [SetupSection.REMOTES]: collaspsed,
-  [SetupSection.STUDIO]: collaspsed
+const getAllSections = (collapsed: boolean) => ({
+  [SetupSection.DVC]: collapsed,
+  [SetupSection.EXPERIMENTS]: collapsed,
+  [SetupSection.REMOTES]: collapsed,
+  [SetupSection.STUDIO]: collapsed
 })
 
 export const focusSection = (section: SetupSection) =>

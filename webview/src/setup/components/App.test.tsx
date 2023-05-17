@@ -737,7 +737,7 @@ describe('App', () => {
       expect(setupDVCButton).toBeVisible()
     })
 
-    it('should show the list of remotes there is only one project in the workspace', () => {
+    it('should show the list of remotes if there is only one project in the workspace', () => {
       renderApp({
         remoteList: {
           'example-get-started': { drive: 'gdrive://appDataFolder' }

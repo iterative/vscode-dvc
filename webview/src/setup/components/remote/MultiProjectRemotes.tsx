@@ -6,24 +6,22 @@ export const MultiProjectRemotes: React.FC<{
   remoteList: NonNullable<RemoteList>
 }> = ({ remoteList }) => (
   <table data-testid="remote-details" className={styles.remoteDetails}>
-    <tbody>
-      {Object.entries(remoteList).map(([dvcRoot, remotes]) => {
-        return remotes ? (
-          Object.entries(remotes).map(([alias, remote], i) => (
-            <tr key={[alias, remote].join('-')}>
-              {i === 0 ? <td className={styles.alias}>{dvcRoot}</td> : <td />}
-              <td className={styles.alias}>{alias}</td>
-              <td className={styles.remote}>{remote}</td>
-            </tr>
-          ))
-        ) : (
-          <tr key={dvcRoot}>
-            <td className={styles.alias}>{dvcRoot}</td>
-            <td className={styles.empty}>-</td>
-            <td className={styles.empty}>-</td>
+    {Object.entries(remoteList).map(([dvcRoot, remotes]) => {
+      return remotes ? (
+        Object.entries(remotes).map(([alias, remote], i) => (
+          <tr key={[alias, remote].join('-')}>
+            {i === 0 ? <th className={styles.alias}>{dvcRoot}</th> : <th />}
+            <th className={styles.alias}>{alias}</th>
+            <th className={styles.remote}>{remote}</th>
           </tr>
-        )
-      })}
-    </tbody>
+        ))
+      ) : (
+        <tr key={dvcRoot}>
+          <th className={styles.alias}>{dvcRoot}</th>
+          <th className={styles.empty}>-</th>
+          <th className={styles.empty}>-</th>
+        </tr>
+      )
+    })}
   </table>
 )

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { SetupData } from 'dvc/src/setup/webview/contract'
+import { RemoteList, SetupData } from 'dvc/src/setup/webview/contract'
 
 export type RemoteState = Pick<SetupData, 'remoteList'>
 
@@ -11,13 +11,7 @@ export const remoteSlice = createSlice({
   initialState: remoteInitialState,
   name: 'remote',
   reducers: {
-    updateRemoteList: (
-      state,
-      action: PayloadAction<
-        | { [dvcRoot: string]: { [alias: string]: string } | undefined }
-        | undefined
-      >
-    ) => {
+    updateRemoteList: (state, action: PayloadAction<RemoteList>) => {
       state.remoteList = action.payload
     }
   }
