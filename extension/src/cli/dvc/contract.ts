@@ -60,6 +60,13 @@ export type MetricsOrParams = RelPathObject<FileDataOrError>
 export const fileHasError = (file: FileDataOrError): file is DvcError =>
   !!(file as DvcError).error
 
+export const DEFAULT_EXP_SHOW_OUTPUT = [
+  {
+    branch: undefined,
+    rev: EXPERIMENT_WORKSPACE_ID
+  }
+]
+
 export type ExpData = {
   rev: string
   timestamp: string | null
