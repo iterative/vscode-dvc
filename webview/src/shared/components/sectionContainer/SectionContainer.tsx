@@ -23,7 +23,7 @@ interface SectionContainerProps<T extends PlotsSection | SetupSection> {
   className?: string
   stickyHeaderTop?: number
   icon?: TooltipIconType
-  secondaryTooltipText?: JSX.Element
+  overrideSectionDescription?: JSX.Element
 }
 
 export const SectionContainer: React.FC<
@@ -39,16 +39,17 @@ export const SectionContainer: React.FC<
   stickyHeaderTop = 0,
   headerChildren,
   icon,
-  secondaryTooltipText
+  overrideSectionDescription
 }) => {
   const open = !sectionCollapsed
 
   const sectionDescription = SectionDescriptionMainText[sectionKey]
-  const tooltipTexts = [title, sectionDescription.props.children]
-
-  if (secondaryTooltipText) {
-    tooltipTexts.push(secondaryTooltipText.props.children)
-  }
+  const tooltipTexts = [
+    title,
+    overrideSectionDescription
+      ? overrideSectionDescription.props.children
+      : sectionDescription.props.children
+  ]
 
   const toggleSection = (e: MouseEvent) => {
     e.preventDefault()
@@ -80,9 +81,11 @@ export const SectionContainer: React.FC<
               className={styles.detailsIcon}
             />
             {title}
-            <InfoTooltip icon={icon} sectionKey={sectionKey}>
-              {secondaryTooltipText}
-            </InfoTooltip>
+            <InfoTooltip
+              icon={icon}
+              sectionKey={sectionKey}
+              overrideSectionDescription={overrideSectionDescription}
+            />
           </div>
 
           {headerChildren}

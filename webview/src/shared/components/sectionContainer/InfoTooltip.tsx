@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from 'react'
+import React from 'react'
 import cx from 'classnames'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import { SetupSection } from 'dvc/src/setup/webview/contract'
@@ -25,12 +25,15 @@ const tooltipIcons = {
   [TooltipIconType.WARNING]: { className: styles.warningIcon, icon: Warning }
 }
 
-export const InfoTooltip: React.FC<
-  PropsWithChildren<{
-    sectionKey: PlotsSection | SetupSection
-    icon?: TooltipIconType
-  }>
-> = ({ icon = TooltipIconType.INFO, sectionKey, children }) => {
+export const InfoTooltip: React.FC<{
+  sectionKey: PlotsSection | SetupSection
+  icon?: TooltipIconType
+  overrideSectionDescription?: JSX.Element
+}> = ({
+  icon = TooltipIconType.INFO,
+  sectionKey,
+  overrideSectionDescription
+}) => {
   const indicatorIcon = (
     <Icon
       data-testid={icon}
@@ -44,9 +47,10 @@ export const InfoTooltip: React.FC<
   const tooltipContent = (
     <div className={styles.infoTooltip}>
       {indicatorIcon}
-      <SectionDescription sectionKey={sectionKey}>
-        {children}
-      </SectionDescription>
+      <SectionDescription
+        sectionKey={sectionKey}
+        overrideSectionDescription={overrideSectionDescription}
+      />
     </div>
   )
 

@@ -774,7 +774,7 @@ describe('App', () => {
 
       expect(
         screen.getByText(
-          'The located version is above the latest tested version, which could lead to unexpected behavior. Please upgrade to the most recent version of the extension and reload this window.'
+          'The located version has not been tested against the extension. If you are experiencing unexpected behaviour, first try to update the extension. If there are no updates available, please downgrade DVC to the same minor version as displayed and reload the window.'
         )
       ).toBeInTheDocument()
     })

@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from 'react'
+import React from 'react'
 import { STUDIO_URL, SetupSection } from 'dvc/src/setup/webview/contract'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import styles from './styles.module.scss'
@@ -76,15 +76,17 @@ export const SectionDescriptionMainText = {
   )
 } as const
 
-export const SectionDescription: React.FC<
-  PropsWithChildren<{
-    sectionKey: SetupSection | PlotsSection
-  }>
-> = ({ sectionKey, children }) => (
+export const SectionDescription: React.FC<{
+  sectionKey: SetupSection | PlotsSection
+  overrideSectionDescription?: JSX.Element
+}> = ({ sectionKey, overrideSectionDescription }) => (
   <span data-testid={sectionDescriptionTestIds[sectionKey]}>
-    {SectionDescriptionMainText[sectionKey]}
-    {children && (
-      <span className={styles.infoTooltipSecondaryText}>{children}</span>
+    {overrideSectionDescription ? (
+      <span className={styles.infoTooltipeEphasizedText}>
+        {overrideSectionDescription}
+      </span>
+    ) : (
+      (SectionDescriptionMainText[sectionKey] as JSX.Element)
     )}
   </span>
 )
