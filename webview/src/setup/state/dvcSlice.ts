@@ -18,7 +18,8 @@ export const dvcInitialState: DvcState = {
   isPythonExtensionUsed: false,
   needsGitInitialized: false,
   projectInitialized: false,
-  pythonBinPath: undefined
+  pythonBinPath: undefined,
+  remoteList: undefined
 }
 
 export const dvcSlice = createSlice({

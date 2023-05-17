@@ -7,8 +7,8 @@ import { ProjectUninitialized } from './ProjectUninitialized'
 import { CliUnavailable } from './CliUnavailable'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { usePrevious } from '../../hooks/usePrevious'
-import { updateSectionCollapsed } from '../../state/webviewSlice'
 import { SetupState } from '../../store'
+import { closeSection } from '../shared/util'
 
 export const Dvc: React.FC = () => {
   const dispatch = useDispatch()
@@ -29,13 +29,7 @@ export const Dvc: React.FC = () => {
     }
 
     if (previousIsComplete === false && isComplete) {
-      dispatch(
-        updateSectionCollapsed({
-          [SetupSection.DVC]: true,
-          [SetupSection.EXPERIMENTS]: false,
-          [SetupSection.STUDIO]: false
-        })
-      )
+      dispatch(closeSection(SetupSection.DVC))
     }
   }, [
     dispatch,

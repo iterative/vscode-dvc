@@ -14,6 +14,8 @@ const sectionDescriptionTestIds = {
   [SetupSection.DVC]: 'tooltip-setup-dvc',
   // Setup Experiments
   [SetupSection.EXPERIMENTS]: 'tooltip-setup-experiments',
+  // Setup Remote
+  [SetupSection.REMOTES]: 'tooltip-setup-remote',
   // Setup Studio
   [SetupSection.STUDIO]: 'tooltip-setup-studio'
 }
@@ -61,6 +63,16 @@ export const SectionDescriptionMainText = {
       Configure the extension to start tracking and visualizing{' '}
       <a href="https://dvc.org/doc/start/experiment-management/experiments">
         experiments
+      </a>
+      .
+    </>
+  ),
+  // Setup Remote
+  [SetupSection.REMOTES]: (
+    <>
+      Configure DVC to work with{' '}
+      <a href="https://dvc.org/doc/user-guide/data-management/remote-storage">
+        remote data storage
       </a>
       .
     </>

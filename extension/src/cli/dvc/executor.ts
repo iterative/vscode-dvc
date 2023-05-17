@@ -7,7 +7,8 @@ import {
   ExperimentSubCommand,
   Flag,
   GcPreserveFlag,
-  QueueSubCommand
+  QueueSubCommand,
+  SubCommand
 } from './constants'
 import { addStudioAccessToken } from './options'
 import { CliResult, CliStarted, typeCheckCommands } from '..'
@@ -35,6 +36,7 @@ export const autoRegisteredCommands = {
   QUEUE_KILL: 'queueKill',
   QUEUE_START: 'queueStart',
   QUEUE_STOP: 'queueStop',
+  REMOTE: 'remote',
   REMOVE: 'remove'
 } as const
 
@@ -194,6 +196,10 @@ export class DvcExecutor extends DvcCli {
 
   public remove(cwd: string, ...args: Args) {
     return this.blockAndExecuteProcess(cwd, Command.REMOVE, ...args)
+  }
+
+  public remote(cwd: string, arg: typeof SubCommand.LIST) {
+    return this.executeDvcProcess(cwd, Command.REMOTE, arg)
   }
 
   private executeExperimentProcess(cwd: string, ...args: Args) {
