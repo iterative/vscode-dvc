@@ -42,7 +42,7 @@ import { DecorationProvider } from './model/decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
 import { ResourceLocator } from '../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { ExpShowOutput } from '../cli/dvc/contract'
+import { EXPERIMENT_WORKSPACE_ID, ExpShowOutput } from '../cli/dvc/contract'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Title } from '../vscode/title'
@@ -574,6 +574,9 @@ export class Experiments extends BaseRepository<TableData> {
     }
     let output = ''
     for (const commit of data) {
+      if (commit.rev === EXPERIMENT_WORKSPACE_ID) {
+        continue
+      }
       output += await this.internalCommands.executeCommand(
         AvailableCommands.GIT_GET_COMMIT_MESSAGES,
         this.dvcRoot,
