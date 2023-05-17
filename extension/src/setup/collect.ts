@@ -25,8 +25,8 @@ export const collectSectionCollapsed = (
 export const collectRemoteList = async (
   dvcRoots: string[],
   getRemoteList: (cwd: string) => Promise<string | undefined>
-): Promise<RemoteList> => {
-  const acc: { [dvcRoot: string]: { [alias: string]: string } | undefined } = {}
+): Promise<NonNullable<RemoteList>> => {
+  const acc: NonNullable<RemoteList> = {}
 
   for (const dvcRoot of dvcRoots) {
     const remoteList = await getRemoteList(dvcRoot)
