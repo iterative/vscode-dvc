@@ -18,7 +18,7 @@ import {
   updateHasData as updateWebviewHasData
 } from '../state/webviewSlice'
 import {
-  updateCanGitInitalized,
+  updateCanGitInitialize,
   updateCliCompatible,
   updateDvcCliDetails,
   updateIsPythonExtensionUsed,
@@ -47,7 +47,7 @@ export const feedStore = (
   for (const key of Object.keys(data.data)) {
     switch (key) {
       case 'canGitInitialize':
-        dispatch(updateCanGitInitalized(data.data.canGitInitialize))
+        dispatch(updateCanGitInitialize(data.data.canGitInitialize))
         continue
       case 'cliCompatible':
         dispatch(updateCliCompatible(data.data.cliCompatible))
