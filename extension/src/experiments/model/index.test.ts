@@ -335,4 +335,27 @@ describe('ExperimentsModel', () => {
       }
     )
   })
+
+  it('should remove outdated branches to show when calling pruneBranchesToShow', () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+
+    model.setBranchesToShow(['one', 'old', 'two', 'three', 'older'])
+    model.pruneBranchesToShow(['one', 'two', 'three', 'four', 'five', 'six'])
+
+    expect(model.getBranchesToShow()).toStrictEqual(['one', 'two', 'three'])
+  })
+
+  it('should persist the branches to show when calling pruneBranchesToShow', () => {
+    const memento = buildMockMemento()
+    const model = new ExperimentsModel('', memento)
+
+    model.setBranchesToShow(['one', 'old', 'two', 'three', 'older'])
+    model.pruneBranchesToShow(['one', 'two', 'three', 'four', 'five', 'six'])
+
+    expect(memento.get(PersistenceKey.EXPERIMENTS_BRANCHES)).toStrictEqual([
+      'one',
+      'two',
+      'three'
+    ])
+  })
 })

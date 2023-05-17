@@ -16,7 +16,6 @@ import { ExperimentsModel } from '../../../experiments/model'
 import { ColumnsModel } from '../../../experiments/columns/model'
 import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../../cli/dvc/constants'
 import { PersistenceKey } from '../../../persistence/constants'
-import { GitReader } from '../../../cli/git/reader'
 
 export const buildExperiments = (
   disposer: Disposer,
@@ -142,27 +141,38 @@ const buildExperimentsDataDependencies = (disposer: Disposer) => {
     'createFileSystemWatcher'
   ).returns(undefined)
 
-  const { dvcReader, internalCommands } = buildInternalCommands(disposer)
+  const { dvcReader, gitReader, internalCommands } =
+    buildInternalCommands(disposer)
   const mockExpShow = stub(dvcReader, 'expShow').resolves(expShowFixture)
-  return { internalCommands, mockCreateFileSystemWatcher, mockExpShow }
+  return {
+    gitReader,
+    internalCommands,
+    mockCreateFileSystemWatcher,
+    mockExpShow
+  }
 }
 
 export const buildExperimentsData = (
   disposer: SafeWatcherDisposer,
   currentBranch = 'main'
 ) => {
-  stub(GitReader.prototype, 'getCurrentBranch').resolves(currentBranch)
+  const {
+    internalCommands,
+    mockExpShow,
+    mockCreateFileSystemWatcher,
+    gitReader
+  } = buildExperimentsDataDependencies(disposer)
 
-  const { internalCommands, mockExpShow, mockCreateFileSystemWatcher } =
-    buildExperimentsDataDependencies(disposer)
+  stub(gitReader, 'getCurrentBranch').resolves(currentBranch)
+  stub(gitReader, 'getBranches').resolves(['one'])
 
   const mockGetBranchesToShow = stub().returns(['main'])
+  const mockPruneBranchesToShow = stub()
   const data = disposer.track(
     new ExperimentsData(dvcDemoPath, internalCommands, {
       getBranchesToShow: mockGetBranchesToShow,
-      getNbOfCommitsToShow: () => ({
-        main: DEFAULT_NUM_OF_COMMITS_TO_SHOW
-      }),
+      getNbOfCommitsToShow: () => DEFAULT_NUM_OF_COMMITS_TO_SHOW,
+      pruneBranchesToShow: mockPruneBranchesToShow,
       setAvailableBranchesToShow: stub(),
       setBranchesToShow: stub()
     } as unknown as ExperimentsModel)
@@ -172,7 +182,8 @@ export const buildExperimentsData = (
     data,
     mockCreateFileSystemWatcher,
     mockExpShow,
-    mockGetBranchesToShow
+    mockGetBranchesToShow,
+    mockPruneBranchesToShow
   }
 }
 

@@ -429,6 +429,13 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.persistBranchesToShow()
   }
 
+  public pruneBranchesToShow(branches: string[]) {
+    this.branchesToShow = this.branchesToShow.filter(branch =>
+      branches.includes(branch)
+    )
+    this.persistBranchesToShow()
+  }
+
   public getBranchesToShow() {
     return this.branchesToShow
   }
