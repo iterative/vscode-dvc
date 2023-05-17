@@ -90,11 +90,13 @@ export type ExecutorState = {
 export type ExpWithError = {
   rev: string
   name?: string
+  branch: string | undefined
 } & DvcError
 
 type ExpWithData = {
   rev: string
   name?: string
+  branch: string | undefined
   data: ExpData
 }
 

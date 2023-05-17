@@ -4,6 +4,7 @@ import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 
 const data: Commit[] = [
   {
+    branch: 'main',
     id: EXPERIMENT_WORKSPACE_ID,
     label: EXPERIMENT_WORKSPACE_ID,
     metrics: {
@@ -159,6 +160,7 @@ const data: Commit[] = [
     starred: false
   },
   {
+    branch: 'main',
     id: 'main',
     label: 'main',
     sha: '3d5adcb974bb2c85917a5d61a489b933adaa2b7f',
@@ -316,6 +318,7 @@ const data: Commit[] = [
     starred: false
   },
   {
+    branch: 'main',
     id: 'a49e039',
     label: 'a49e039',
     sha: 'a49e03966a1f9f1299ec222ebc4bed8625d2c54d',
@@ -473,6 +476,7 @@ const data: Commit[] = [
     starred: false
   },
   {
+    branch: 'main',
     id: '4f7b50c',
     label: '4f7b50c',
     sha: '4f7b50c3d171a11b6cfcd04416a16fc80b61018d',

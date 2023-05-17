@@ -17,7 +17,6 @@ import {
 } from '../../../shared/components/icons'
 import { pluralize } from '../../../util/strings'
 import { ExperimentsState } from '../../store'
-import { featureFlag } from '../../../util/flags'
 
 type CounterBadgeProps = {
   count?: number
@@ -131,20 +130,18 @@ export const Indicators = () => {
       >
         <Icon width={16} height={16} icon={Filter} />
       </Indicator>
-      {featureFlag.ADD_REMOVE_BRANCHES && (
-        <Indicator
-          count={branchesSelected}
-          aria-label="branches"
-          onClick={selectBranches}
-          tooltipContent={formatCountMessage(
-            'Branches',
-            branchesSelected,
-            'Selected'
-          )}
-        >
-          <Icon width={16} height={16} icon={GitMerge} />
-        </Indicator>
-      )}
+      <Indicator
+        count={branchesSelected}
+        aria-label="branches"
+        onClick={selectBranches}
+        tooltipContent={formatCountMessage(
+          'Branches',
+          branchesSelected,
+          'Selected'
+        )}
+      >
+        <Icon width={16} height={16} icon={GitMerge} />
+      </Indicator>
     </div>
   )
 }

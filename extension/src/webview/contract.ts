@@ -223,8 +223,8 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.ADD_CONFIGURATION }
   | { type: MessageFromWebviewType.ZOOM_PLOT; payload?: string }
   | { type: MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW }
-  | { type: MessageFromWebviewType.SHOW_MORE_COMMITS }
-  | { type: MessageFromWebviewType.SHOW_LESS_COMMITS }
+  | { type: MessageFromWebviewType.SHOW_MORE_COMMITS; payload: string }
+  | { type: MessageFromWebviewType.SHOW_LESS_COMMITS; payload: string }
   | { type: MessageFromWebviewType.SWITCH_BRANCHES_VIEW }
   | { type: MessageFromWebviewType.SWITCH_COMMITS_VIEW }
   | { type: MessageFromWebviewType.SELECT_BRANCHES }

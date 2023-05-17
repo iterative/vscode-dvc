@@ -1,9 +1,10 @@
 import { getByText, queryHelpers, screen, within } from '@testing-library/react'
 
 export const getRow = (queryText: string): HTMLElement => {
+  const index = queryText === 'main' ? 1 : 0
   const testRow = screen
     .getAllByRole('row')
-    .find(row => within(row).queryByText(queryText))
+    .filter(row => within(row).queryByText(queryText))[index]
   if (!testRow) {
     throw new Error(`Couldn't find a row with the text "${queryText}"`)
   }

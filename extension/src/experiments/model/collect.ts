@@ -121,10 +121,13 @@ const getCommitData = (
   if (!commitsOutput) {
     return {}
   }
-  const commits = commitsOutput.split(COMMITS_SEPARATOR).map(commit => {
-    const { hash, ...rest } = getCommitDataFromOutput(commit)
-    return [hash, { ...rest }]
-  })
+  const commits = commitsOutput
+    .split(COMMITS_SEPARATOR)
+    .filter(Boolean)
+    .map(commit => {
+      const { hash, ...rest } = getCommitDataFromOutput(commit)
+      return [hash, { ...rest }]
+    })
   return Object.fromEntries(commits) as { [sha: string]: CommitData }
 }
 
@@ -176,14 +179,14 @@ const collectExpState = (
   expState: ExpState,
   commitData: { [sha: string]: CommitData }
 ): Experiment | undefined => {
-  const { rev, name } = expState
+  const { rev, name, branch } = expState
   const label =
     rev === EXPERIMENT_WORKSPACE_ID
       ? EXPERIMENT_WORKSPACE_ID
       : name || shortenForLabel(rev)
   const id = name || label
 
-  const experiment: Experiment = { id, label }
+  const experiment: Experiment = { branch, id, label } as unknown as Experiment
 
   const baseline = transformExpState(experiment, expState)
 
@@ -248,6 +251,7 @@ const collectExpRange = (
   const expState = revs[0]
 
   const { name, rev } = expState
+  const { branch, id } = baseline
 
   const label =
     rev === EXPERIMENT_WORKSPACE_ID
@@ -256,6 +260,7 @@ const collectExpRange = (
 
   const experiment = transformExpState(
     {
+      branch,
       id: name || label,
       label
     },
@@ -270,7 +275,7 @@ const collectExpRange = (
   collectExecutorInfo(experiment, executor)
   collectRunningExperiment(acc, experiment)
 
-  addToMapArray(acc.experimentsByCommit, baseline.id, experiment)
+  addToMapArray(acc.experimentsByCommit, id, experiment)
 }
 
 const setWorkspaceAsRunning = (
@@ -317,7 +322,11 @@ export const collectExperiments = (
     experimentsByCommit: new Map(),
     hasCheckpoints: hasCheckpoints(output),
     runningExperiments: [],
-    workspace: { id: EXPERIMENT_WORKSPACE_ID, label: EXPERIMENT_WORKSPACE_ID }
+    workspace: {
+      branch: undefined,
+      id: EXPERIMENT_WORKSPACE_ID,
+      label: EXPERIMENT_WORKSPACE_ID
+    }
   }
 
   const commitData = getCommitData(commitsOutput)

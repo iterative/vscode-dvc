@@ -7,7 +7,7 @@ import {
 import { getRelativePattern } from '../../fileSystem/relativePattern'
 import { createFileSystemWatcher } from '../../fileSystem/watcher'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import { ExpShowOutput } from '../../cli/dvc/contract'
+import { EXPERIMENT_WORKSPACE_ID, ExpShowOutput } from '../../cli/dvc/contract'
 import { BaseData } from '../../data'
 import { DOT_DVC, ExperimentFlag } from '../../cli/dvc/constants'
 import { gitPath } from '../../cli/git/constants'
@@ -41,17 +41,40 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
   }
 
   public async update(): Promise<void> {
-    void this.updateAvailableBranchesToSelect()
-    const flags = this.experiments.getIsBranchesView()
-      ? [ExperimentFlag.ALL_BRANCHES]
-      : [
+    const allBranches = await this.internalCommands.executeCommand<string[]>(
+      AvailableCommands.GIT_GET_BRANCHES,
+      this.dvcRoot
+    )
+
+    void this.updateAvailableBranchesToSelect(allBranches)
+    const data: ExpShowOutput = []
+
+    const { branches, currentBranch } = await this.getBranchesToShowWithCurrent(
+      allBranches
+    )
+
+    await Promise.all(
+      branches.map(async branch => {
+        const branchFlags = [
+          ExperimentFlag.REV,
+          branch,
           ExperimentFlag.NUM_COMMIT,
-          this.experiments.getNbOfCommitsToShow().toString()
+          this.experiments.getNbOfCommitsToShow(branch).toString()
         ]
-    const data = await this.internalCommands.executeCommand<ExpShowOutput>(
-      AvailableCommands.EXP_SHOW,
-      this.dvcRoot,
-      ...flags
+
+        const output = (await this.expShow(
+          branchFlags,
+          branch
+        )) as ExpShowOutput
+
+        if (branch !== currentBranch) {
+          const workspaceIndex = output.findIndex(
+            exp => exp.rev === EXPERIMENT_WORKSPACE_ID
+          )
+          output.splice(workspaceIndex, 1)
+        }
+        data.push(...output)
+      })
     )
 
     this.collectFiles(data)
@@ -63,11 +86,39 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
     this.collectedFiles = collectFiles(data, this.collectedFiles)
   }
 
-  private async updateAvailableBranchesToSelect() {
-    const allBranches = await this.internalCommands.executeCommand<string[]>(
-      AvailableCommands.GIT_GET_BRANCHES,
+  private async getBranchesToShowWithCurrent(allBranches: string[]) {
+    const currentBranch = await this.internalCommands.executeCommand<string>(
+      AvailableCommands.GIT_GET_CURRENT_BRANCH,
       this.dvcRoot
     )
+
+    this.experiments.pruneBranchesToShow(allBranches)
+
+    const branches = this.experiments.getBranchesToShow()
+
+    if (!branches.includes(currentBranch)) {
+      branches.push(currentBranch)
+      this.experiments.setBranchesToShow(branches)
+    }
+    return { branches, currentBranch }
+  }
+
+  private async expShow(flags: (ExperimentFlag | string)[], branch?: string) {
+    const data = await this.internalCommands.executeCommand<ExpShowOutput>(
+      AvailableCommands.EXP_SHOW,
+      this.dvcRoot,
+      ...flags
+    )
+    return data.map(exp => ({ ...exp, branch }))
+  }
+
+  private async updateAvailableBranchesToSelect(branches?: string[]) {
+    const allBranches =
+      branches ||
+      (await this.internalCommands.executeCommand<string[]>(
+        AvailableCommands.GIT_GET_BRANCHES,
+        this.dvcRoot
+      ))
     this.experiments.setAvailableBranchesToShow(allBranches)
   }
 

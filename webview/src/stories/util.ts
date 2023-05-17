@@ -82,6 +82,6 @@ export const addCommitDataToMainBranch = (rows: Commit[]) =>
         date: '4 days ago'
       }
     }
-    row.branch = row.branch || 'current'
+    row.branch = row.branch || 'main'
     return row
   })

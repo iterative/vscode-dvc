@@ -5,7 +5,14 @@ import { Icon } from '../../../../../shared/components/Icon'
 import { GitMerge } from '../../../../../shared/components/icons'
 import { CommitsAndBranchesNavigation } from '../commitsAndBranches/CommitsAndBranchesNavigation'
 
-export const BranchDivider: React.FC<PropsWithChildren> = ({ children }) => (
+interface BranchDividerProps {
+  branch: string
+}
+
+export const BranchDivider: React.FC<PropsWithChildren<BranchDividerProps>> = ({
+  children,
+  branch
+}) => (
   <thead data-testid="branch-name">
     <tr>
       <th className={tablesStyles.experimentsTd}>
@@ -20,7 +27,7 @@ export const BranchDivider: React.FC<PropsWithChildren> = ({ children }) => (
         </div>
       </th>
       <th colSpan={9999} className={styles.branchActions}>
-        <CommitsAndBranchesNavigation />
+        <CommitsAndBranchesNavigation branch={branch} />
       </th>
     </tr>
   </thead>

@@ -25,12 +25,12 @@ export enum Command {
 
 export enum Flag {
   ALL = '--all',
+  COUNT = '--count',
   DIRECTORIES = '-d',
   DIRECTORY = '--directory',
   DOT = '.',
   EXCLUDE_STANDARD = '--exclude-standard',
   FORCE = '-f',
-  FULL_HISTORY = '--full-history',
   GET_URL = '--get-url',
   HARD = '--hard',
   NAME_ONLY = '--name-only',

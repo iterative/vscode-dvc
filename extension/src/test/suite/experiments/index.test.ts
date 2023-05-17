@@ -237,13 +237,13 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasMoreCommits to true if there are more commits to show', async () => {
-      stub(GitReader.prototype, 'getNumCommits').resolves(5)
+      stub(GitReader.prototype, 'getNumCommits').resolves(100)
       const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
       expect(messageSpy).to.be.calledWithMatch({
-        hasMoreCommits: true
+        hasMoreCommits: { main: true }
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -254,28 +254,30 @@ suite('Experiments Test Suite', () => {
       await experiments.showWebview()
 
       expect(messageSpy).to.be.calledWithMatch({
-        hasMoreCommits: false
+        hasMoreCommits: { main: false }
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set isShowingMoreCommits to true if it is showing more than the current commit', async () => {
+      stub(GitReader.prototype, 'getNumCommits').resolves(100)
       const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
       expect(messageSpy).to.be.calledWithMatch({
-        isShowingMoreCommits: true
+        isShowingMoreCommits: { main: true }
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set isShowingMoreCommits to false it is showing only the current commit', async () => {
+      stub(GitReader.prototype, 'getCurrentBranch').resolves('current')
       stub(GitReader.prototype, 'getNumCommits').resolves(1)
       const { experiments, messageSpy } = buildExperiments(disposable)
 
       await experiments.showWebview()
 
       expect(messageSpy).to.be.calledWithMatch({
-        isShowingMoreCommits: false
+        isShowingMoreCommits: { main: false }
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
@@ -1307,11 +1309,12 @@ suite('Experiments Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
+        payload: 'main',
         type: MessageFromWebviewType.SHOW_MORE_COMMITS
       })
 
       expect(mockUpdateExperimentsData).to.be.calledOnce
-      expect(setNbfCommitsToShowSpy).to.be.calledWith(5)
+      expect(setNbfCommitsToShowSpy).to.be.calledWith(7, 'main')
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to show less commits', async () => {
@@ -1332,51 +1335,12 @@ suite('Experiments Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
+        payload: 'main',
         type: MessageFromWebviewType.SHOW_LESS_COMMITS
       })
 
       expect(mockUpdateExperimentsData).to.be.calledOnce
-      expect(setNbfCommitsToShowSpy).to.be.calledWith(1)
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
-    it('should handle a message to switch to branches view', async () => {
-      const {
-        experiments,
-        experimentsModel,
-        messageSpy,
-        mockUpdateExperimentsData
-      } = setupExperimentsAndMockCommands()
-
-      const webview = await experiments.showWebview()
-      messageSpy.resetHistory()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
-
-      mockMessageReceived.fire({
-        type: MessageFromWebviewType.SWITCH_BRANCHES_VIEW
-      })
-
-      expect(mockUpdateExperimentsData).to.be.calledOnce
-      expect(experimentsModel.getIsBranchesView()).to.be.true
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
-    it('should handle a message to switch to commits view', async () => {
-      const {
-        experiments,
-        experimentsModel,
-        messageSpy,
-        mockUpdateExperimentsData
-      } = setupExperimentsAndMockCommands()
-
-      const webview = await experiments.showWebview()
-      messageSpy.resetHistory()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
-
-      mockMessageReceived.fire({
-        type: MessageFromWebviewType.SWITCH_COMMITS_VIEW
-      })
-
-      expect(mockUpdateExperimentsData).to.be.calledOnce
-      expect(experimentsModel.getIsBranchesView()).to.be.false
+      expect(setNbfCommitsToShowSpy).to.be.calledWith(3, 'main')
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to select branches', async () => {
@@ -1505,6 +1469,7 @@ suite('Experiments Test Suite', () => {
       expect(messageSpy).to.be.calledWithMatch({
         rows: [
           {
+            branch: 'main',
             displayColor: undefined,
             id: EXPERIMENT_WORKSPACE_ID,
             label: EXPERIMENT_WORKSPACE_ID,
@@ -1512,6 +1477,7 @@ suite('Experiments Test Suite', () => {
             starred: false
           },
           {
+            branch: 'main',
             displayColor: undefined,
             id: 'testBranch',
             label: 'testBranch',
@@ -1519,6 +1485,7 @@ suite('Experiments Test Suite', () => {
             starred: false,
             subRows: [
               {
+                branch: 'main',
                 displayColor: undefined,
                 description: '[exp-1]',
                 id: 'exp-1',
@@ -1528,6 +1495,7 @@ suite('Experiments Test Suite', () => {
                 starred: false
               },
               {
+                branch: 'main',
                 displayColor: undefined,
                 description: '[exp-2]',
                 id: 'exp-2',
@@ -1537,6 +1505,7 @@ suite('Experiments Test Suite', () => {
                 starred: false
               },
               {
+                branch: 'main',
                 displayColor: undefined,
                 description: '[exp-3]',
                 id: 'exp-3',
@@ -1581,6 +1550,7 @@ suite('Experiments Test Suite', () => {
       expect(messageSpy).to.be.calledWithMatch({
         rows: [
           {
+            branch: 'main',
             displayColor: undefined,
             id: EXPERIMENT_WORKSPACE_ID,
             label: EXPERIMENT_WORKSPACE_ID,
@@ -1588,6 +1558,7 @@ suite('Experiments Test Suite', () => {
             starred: false
           },
           {
+            branch: 'main',
             displayColor: undefined,
             id: 'testBranch',
             label: 'testBranch',
@@ -1595,6 +1566,7 @@ suite('Experiments Test Suite', () => {
             starred: false,
             subRows: [
               {
+                branch: 'main',
                 displayColor: undefined,
                 description: '[exp-2]',
                 id: 'exp-2',
@@ -1604,6 +1576,7 @@ suite('Experiments Test Suite', () => {
                 starred: false
               },
               {
+                branch: 'main',
                 displayColor: undefined,
                 description: '[exp-1]',
                 id: 'exp-1',
@@ -1613,6 +1586,7 @@ suite('Experiments Test Suite', () => {
                 starred: false
               },
               {
+                branch: 'main',
                 displayColor: undefined,
                 description: '[exp-3]',
                 id: 'exp-3',
