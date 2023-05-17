@@ -1,5 +1,6 @@
 import React, { createContext, useState } from 'react'
 import { RowProp } from '../../util/interfaces'
+import { getCompositeId } from '../../util/rows'
 
 interface RowSelectionContextValue {
   selectedRows: Record<string, RowProp | undefined>
@@ -28,14 +29,16 @@ export const RowSelectionProvider: React.FC<{ children: React.ReactNode }> = ({
   const toggleRowSelected = (rowProp: RowProp) => {
     const {
       row: {
-        original: { id }
+        original: { id, branch }
       }
     } = rowProp
+    const compositeId = getCompositeId(id, branch)
+
     setSelectedRows({
       ...selectedRows,
-      [id]: selectedRows[id] ? undefined : rowProp
+      [compositeId]: selectedRows[compositeId] ? undefined : rowProp
     })
-    setSelectionHistory([id, ...selectionHistory])
+    setSelectionHistory([compositeId, ...selectionHistory])
   }
 
   const batchSelection = (batch: RowProp[]) => {
@@ -44,10 +47,11 @@ export const RowSelectionProvider: React.FC<{ children: React.ReactNode }> = ({
     for (const rowProp of batch) {
       const {
         row: {
-          original: { id }
+          original: { id, branch }
         }
       } = rowProp
-      selectedRowsCopy[id] = rowProp
+      const compositeId = getCompositeId(id, branch)
+      selectedRowsCopy[compositeId] = rowProp
     }
 
     setSelectedRows(selectedRowsCopy)
@@ -55,10 +59,10 @@ export const RowSelectionProvider: React.FC<{ children: React.ReactNode }> = ({
       ...batch.map(
         ({
           row: {
-            original: { id }
+            original: { id, branch }
           }
           // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        }) => id
+        }) => getCompositeId(id, branch)
       ),
       ...selectionHistory
     ])

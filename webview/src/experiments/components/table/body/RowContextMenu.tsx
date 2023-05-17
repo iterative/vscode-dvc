@@ -14,6 +14,7 @@ import { MessagesMenu } from '../../../../shared/components/messagesMenu/Message
 import { MessagesMenuOptionProps } from '../../../../shared/components/messagesMenu/MessagesMenuOption'
 import { cond } from '../../../../util/helpers'
 import { ExperimentsState } from '../../../store'
+import { getCompositeId } from '../../../util/rows'
 
 const experimentMenuOption = (
   payload: string | string[] | { id: string; executor?: string | null }[],
@@ -107,13 +108,14 @@ const getMultiSelectMenuOptions = (
     unstarredExperimentIds
   } = collectDisabledOptions(selectedRowsList, hasRunningWorkspaceExperiment)
 
-  const toggleStarOption = (ids: string[], label: string) =>
-    experimentMenuOption(
+  const toggleStarOption = (ids: string[], label: string) => {
+    return experimentMenuOption(
       ids,
       label,
       MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR,
       ids.length === 0
     )
+  }
 
   return [
     toggleStarOption(unstarredExperimentIds, 'Star'),
@@ -287,6 +289,7 @@ const getSingleSelectMenuOptions = (
 
 const getContextMenuOptions = (
   id: string,
+  branch: string | undefined,
   isWorkspace: boolean,
   projectHasCheckpoints: boolean,
   hasRunningWorkspaceExperiment: boolean,
@@ -296,7 +299,7 @@ const getContextMenuOptions = (
   starred?: boolean,
   executor?: string | null
 ) => {
-  const isFromSelection = !!selectedRows[id]
+  const isFromSelection = !!selectedRows[getCompositeId(id, branch)]
   const selectedRowsList = Object.values(selectedRows).filter(
     value => value !== undefined
   ) as RowProp[]
@@ -324,7 +327,7 @@ const getContextMenuOptions = (
 
 export const RowContextMenu: React.FC<RowProp> = ({
   row: {
-    original: { status, starred, id, executor },
+    original: { branch, status, starred, id, executor },
     depth
   }
 }) => {
@@ -339,6 +342,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
   const contextMenuOptions = useMemo(() => {
     return getContextMenuOptions(
       id,
+      branch,
       isWorkspace,
       projectHasCheckpoints,
       hasRunningWorkspaceExperiment,
@@ -349,6 +353,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
       executor
     )
   }, [
+    branch,
     executor,
     status,
     starred,
