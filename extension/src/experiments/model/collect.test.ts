@@ -85,4 +85,47 @@ describe('collectExperiments', () => {
       tags: []
     })
   })
+
+  it('should not collect the same experiment twice', () => {
+    const main = {
+      experiments: [
+        {
+          name: 'campy-pall',
+          rev: '0b4b001dfaa8f2c4cd2a62238699131ab2c679ea'
+        },
+        {
+          name: 'shyer-stir',
+          rev: '450e672f0d8913517ab2ab443f5d87b34f308290'
+        }
+      ],
+      name: 'main',
+      rev: '61bed4ce8913eca7f73ca754d65bc5daad1520e2'
+    }
+
+    const expShowWithDuplicateCommits = generateTestExpShowOutput(
+      {},
+      main,
+      {
+        name: 'branchOffMainWithCommit',
+        rev: '351e42ace3cb6a3a853c65bef285e60748cc6341'
+      },
+      main
+    )
+
+    const { experimentsByCommit, commits } = collectExperiments(
+      expShowWithDuplicateCommits,
+      false,
+      ''
+    )
+
+    expect(commits.length).toStrictEqual(3)
+
+    const experiments = experimentsByCommit.get('main')
+
+    expect(experiments?.length).toStrictEqual(2)
+    expect(experiments?.map(({ id }) => id).sort()).toStrictEqual([
+      'campy-pall',
+      'shyer-stir'
+    ])
+  })
 })
