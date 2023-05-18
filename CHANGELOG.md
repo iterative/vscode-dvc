@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.16] - 2023-05-18
+
+### 🚀 New Features and Enhancements
+
+- Add setup warning about latest tested version  [#3895](https://github.com/iterative/vscode-dvc/pull/3895) by [@julieg18](https://github.com/julieg18)
+- Add upgrade dvc button to setup when incompatible [#3904](https://github.com/iterative/vscode-dvc/pull/3904) by [@julieg18](https://github.com/julieg18)
+
 ## [0.8.15] - 2023-05-18
 
 ### 🐛 Bug Fixes
