@@ -138,6 +138,22 @@ suite('Setup Test Suite', () => {
       expect(mockAutoInstallDvc).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should handle an auto upgrade dvc message from the webview', async () => {
+      const { messageSpy, setup, mockAutoUpgradeDvc } = buildSetup(disposable)
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.UPGRADE_DVC
+      })
+
+      expect(mockAutoUpgradeDvc).to.be.calledOnce
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should handle a select Python interpreter message from the webview', async () => {
       const { messageSpy, mockExecuteCommand, setup } = buildSetup(disposable)
       const setInterpreterCommand = 'python.setInterpreter'

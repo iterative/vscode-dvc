@@ -97,6 +97,9 @@ describe('App', () => {
       })
 
       expect(screen.getByText('DVC is incompatible')).toBeInTheDocument()
+      expect(
+        screen.getByText('Please update your install and try again.')
+      ).toBeInTheDocument()
 
       const button = screen.getByText('Check Compatibility')
       expect(button).toBeInTheDocument()
@@ -107,18 +110,27 @@ describe('App', () => {
       })
     })
 
-    it('should show a screen saying that DVC is not installed if the cli is unavailable', () => {
+    it('should tell the user than they can auto upgrade DVC if DVC is incompatible and python is available', () => {
       renderApp({
-        cliCompatible: undefined,
+        cliCompatible: false,
         dvcCliDetails: {
           command: 'dvc',
-          version: undefined
-        }
+          version: '1.0.0'
+        },
+        pythonBinPath: 'python'
       })
 
-      expect(screen.getAllByText('DVC is currently unavailable')).toHaveLength(
-        3
-      )
+      expect(screen.getByText('DVC is incompatible')).toBeInTheDocument()
+
+      const compatibityButton = screen.getByText('Check Compatibility')
+      expect(compatibityButton).toBeInTheDocument()
+      const upgradeButton = screen.getByText('Upgrade (pip)')
+      expect(upgradeButton).toBeInTheDocument()
+
+      fireEvent.click(upgradeButton)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.UPGRADE_DVC
+      })
     })
 
     it('should tell the user they cannot install DVC without a Python interpreter', () => {

@@ -62,6 +62,7 @@ export const buildSetup = (
   )
 
   const mockAutoInstallDvc = stub(AutoInstall, 'autoInstallDvc')
+  const mockAutoUpgradeDvc = stub(AutoInstall, 'autoUpgradeDvc')
   stub(AutoInstall, 'findPythonBinForInstall').resolves(undefined)
 
   const mockShowWebview = stub(WorkspaceExperiments.prototype, 'showWebview')
@@ -105,6 +106,7 @@ export const buildSetup = (
     internalCommands,
     messageSpy,
     mockAutoInstallDvc,
+    mockAutoUpgradeDvc,
     mockExecuteCommand,
     mockGetGitRepositoryRoot,
     mockGlobalVersion,
