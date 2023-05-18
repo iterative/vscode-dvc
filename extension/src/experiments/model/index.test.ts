@@ -141,7 +141,7 @@ describe('ExperimentsModel', () => {
 
     model.transformAndSet(data, false, '')
 
-    const experiments = model.getCombinedList()
+    const experiments = model.getUniqueList()
 
     const changed: string[] = []
     for (const { deps, sha } of experiments) {
@@ -273,7 +273,7 @@ describe('ExperimentsModel', () => {
     model.setSelected([])
     expect(model.getSelectedRevisions().map(({ id }) => id)).toStrictEqual([])
 
-    model.setSelected(model.getCombinedList())
+    model.setSelected(model.getUniqueList())
     expect(model.getSelectedRevisions().map(({ id }) => id)).toStrictEqual([
       EXPERIMENT_WORKSPACE_ID,
       'testBranch',

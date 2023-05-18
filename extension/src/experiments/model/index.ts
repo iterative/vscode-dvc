@@ -248,11 +248,25 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getRevisionIds() {
-    return this.getCombinedList().map(({ id }) => id)
+    return this.getUniqueList().map(({ id }) => id)
   }
 
   public getSelectedRevisions() {
-    return this.getSelectedFromList(() => this.getCombinedList())
+    const acc: SelectedExperimentWithColor[] = []
+
+    for (const experiment of this.getUniqueList()) {
+      const { id } = experiment
+      const displayColor = this.coloredStatus[id]
+      if (displayColor) {
+        acc.push({ ...experiment, displayColor } as SelectedExperimentWithColor)
+      }
+    }
+
+    return copyOriginalColors()
+      .flatMap(orderedItem =>
+        acc.filter(item => item.displayColor === orderedItem)
+      )
+      .filter(Boolean)
   }
 
   public setSelected(selectedExperiments: Experiment[]) {
@@ -273,7 +287,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getLabels() {
-    return this.getCombinedList().map(({ label }) => label)
+    return this.getUniqueList().map(({ label }) => label)
   }
 
   public getLabelsToDecorate() {
@@ -309,14 +323,14 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public getErrors() {
     return new Set(
-      this.getCombinedList()
+      this.getUniqueList()
         .filter(({ error }) => error)
         .map(({ label }) => label)
     )
   }
 
   public getExperimentParams(id: string) {
-    const params = this.getCombinedList().find(
+    const params = this.getUniqueList().find(
       experiment => experiment.id === id
     )?.params
 
@@ -395,8 +409,24 @@ export class ExperimentsModel extends ModelWithPersistence {
     return filtered.length
   }
 
-  public getCombinedList() {
-    return [this.workspace, ...this.commits, ...this.getExperimentsAndQueued()]
+  public getUniqueList() {
+    const uniqueList: Experiment[] = [this.workspace]
+    const ids = new Set<string>()
+
+    for (const experiment of [
+      ...this.commits,
+      ...this.getExperimentsAndQueued()
+    ]) {
+      const { id } = experiment
+      if (ids.has(id)) {
+        continue
+      }
+
+      uniqueList.push(experiment)
+      ids.add(id)
+    }
+
+    return uniqueList
   }
 
   public getExperimentsByCommitForTree(commit: Experiment) {
@@ -610,11 +640,15 @@ export class ExperimentsModel extends ModelWithPersistence {
   private getSelectedFromList(getList: () => Experiment[]) {
     const acc: SelectedExperimentWithColor[] = []
 
+    const ids = new Set<string>()
+
     for (const experiment of getList()) {
-      const displayColor = this.coloredStatus[experiment.id]
-      if (displayColor) {
+      const { id } = experiment
+      const displayColor = this.coloredStatus[id]
+      if (displayColor && !ids.has(id)) {
         acc.push({ ...experiment, displayColor } as SelectedExperimentWithColor)
       }
+      ids.add(id)
     }
 
     return copyOriginalColors()
