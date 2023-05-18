@@ -1,0 +1,35 @@
+@import '../../../shared/variables';
+@import '../../../shared/mixins';
+
+.remoteDetails {
+  margin: 0 auto;
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.dvcRoot,
+.alias,
+.remote {
+  padding: 5px;
+}
+
+.dvcRoot,
+.alias {
+  font-weight: bold;
+  vertical-align: top;
+}
+
+.alias,
+.remote {
+  white-space: nowrap;
+}
+
+.remote {
+  padding-left: 50px;
+  display: flex;
+  flex-direction: column;
+}
+
+.empty {
+  text-align: center;
+}

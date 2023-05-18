@@ -2,7 +2,8 @@ import {
   isVersionCompatible,
   extractSemver,
   ParsedSemver,
-  CliCompatible
+  CliCompatible,
+  isAboveLatestTestedVersion
 } from './version'
 import { MIN_CLI_VERSION, LATEST_TESTED_CLI_VERSION } from './contract'
 
@@ -159,5 +160,49 @@ describe('isVersionCompatible', () => {
     isCompatible = isVersionCompatible('1,2,3')
 
     expect(isCompatible).toStrictEqual(CliCompatible.NO_CANNOT_VERIFY)
+  })
+})
+
+describe('isAboveLatestTestedVersion', () => {
+  it('should return undefined if version is undefined', () => {
+    const result = isAboveLatestTestedVersion(undefined)
+
+    expect(result).toStrictEqual(undefined)
+  })
+
+  it('should return true for a version with a minor higher as the latest tested minor and any patch', () => {
+    const {
+      major: latestTestedMajor,
+      minor: latestTestedMinor,
+      patch: latestTestedPatch
+    } = extractSemver(LATEST_TESTED_CLI_VERSION) as ParsedSemver
+
+    expect(0).toBeLessThan(latestTestedPatch)
+
+    let result = isAboveLatestTestedVersion(
+      [latestTestedMajor, latestTestedMinor + 1, 0].join('.')
+    )
+
+    expect(result).toStrictEqual(true)
+
+    result = isAboveLatestTestedVersion(
+      [latestTestedMajor, latestTestedMinor + 1, latestTestedPatch + 1000].join(
+        '.'
+      )
+    )
+
+    expect(result).toStrictEqual(true)
+
+    result = isAboveLatestTestedVersion(
+      [latestTestedMajor, latestTestedMinor + 1, latestTestedPatch].join('.')
+    )
+
+    expect(result).toStrictEqual(true)
+  })
+
+  it('should return false if version is below the latest tested version', () => {
+    const result = isAboveLatestTestedVersion(MIN_CLI_VERSION)
+
+    expect(result).toStrictEqual(false)
   })
 })

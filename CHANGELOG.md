@@ -2,6 +2,51 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.16] - 2023-05-18
+
+### 🚀 New Features and Enhancements
+
+- Add setup warning about latest tested version  [#3895](https://github.com/iterative/vscode-dvc/pull/3895) by [@julieg18](https://github.com/julieg18)
+- Add upgrade dvc button to setup when incompatible [#3904](https://github.com/iterative/vscode-dvc/pull/3904) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (2.57.2) [#3931](https://github.com/iterative/vscode-dvc/pull/3931) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.8.15] - 2023-05-18
+
+### 🐛 Bug Fixes
+
+- Ensure unique list of experiment passed to the rest of the app [#3925](https://github.com/iterative/vscode-dvc/pull/3925) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.8.14] - 2023-05-18
+
+### 🚀 New Features and Enhancements
+
+- Add Remotes section to setup webview [#3901](https://github.com/iterative/vscode-dvc/pull/3901) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Make use of show experiments command for setup page [#3910](https://github.com/iterative/vscode-dvc/pull/3910) by [@mattseddon](https://github.com/mattseddon)
+- Add default test data to setup app tests [#3908](https://github.com/iterative/vscode-dvc/pull/3908) by [@mattseddon](https://github.com/mattseddon)
+- Fix typo in setup reducers [#3912](https://github.com/iterative/vscode-dvc/pull/3912) by [@mattseddon](https://github.com/mattseddon)
+- Create default exp show output constant [#3911](https://github.com/iterative/vscode-dvc/pull/3911) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.8.13] - 2023-05-17
+
+### 🚀 New Features and Enhancements
+
+- Add colons (":") to setup DVC details [#3903](https://github.com/iterative/vscode-dvc/pull/3903) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Do not attempt to get commit message for the workspace record [#3914](https://github.com/iterative/vscode-dvc/pull/3914) by [@mattseddon](https://github.com/mattseddon)
+- Cleanup old branches before showing the experiments table [#3917](https://github.com/iterative/vscode-dvc/pull/3917) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Update dvc to 2.57.1 and bump LATEST_TESTED_VERSION [#3919](https://github.com/iterative/vscode-dvc/pull/3919) by [@sroy3](https://github.com/sroy3)
+
 ## [0.8.12] - 2023-05-16
 
 ### 🚀 New Features and Enhancements

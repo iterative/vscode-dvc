@@ -1,4 +1,8 @@
-import { MAX_CLI_VERSION, MIN_CLI_VERSION } from './contract'
+import {
+  LATEST_TESTED_CLI_VERSION,
+  MAX_CLI_VERSION,
+  MIN_CLI_VERSION
+} from './contract'
 
 export enum CliCompatible {
   NO_CANNOT_VERIFY = 'no-cannot-verify',
@@ -66,4 +70,20 @@ export const isVersionCompatible = (
   }
 
   return checkCLIVersion(currentSemVer)
+}
+
+export const isAboveLatestTestedVersion = (version: string | undefined) => {
+  if (!version) {
+    return undefined
+  }
+
+  const { major: currentMajor, minor: currentMinor } = extractSemver(
+    version
+  ) as ParsedSemver
+
+  const { major: latestTestedMajor, minor: latestTestedMinor } = extractSemver(
+    LATEST_TESTED_CLI_VERSION
+  ) as ParsedSemver
+
+  return currentMajor === latestTestedMajor && currentMinor > latestTestedMinor
 }

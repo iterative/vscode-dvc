@@ -9,7 +9,7 @@ import { BaseWebview } from '../../webview'
 import { sendTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { selectPythonInterpreter } from '../../extensions/python'
-import { autoInstallDvc } from '../autoInstall'
+import { autoInstallDvc, autoUpgradeDvc } from '../autoInstall'
 import {
   RegisteredCliCommands,
   RegisteredCommands
@@ -20,16 +20,13 @@ import { openUrl } from '../../vscode/external'
 export class WebviewMessages {
   private readonly getWebview: () => BaseWebview<TSetupData> | undefined
   private readonly initializeGit: () => void
-  private readonly showExperiments: () => void
 
   constructor(
     getWebview: () => BaseWebview<TSetupData> | undefined,
-    initializeGit: () => void,
-    showExperiments: () => void
+    initializeGit: () => void
   ) {
     this.getWebview = getWebview
     this.initializeGit = initializeGit
-    this.showExperiments = showExperiments
   }
 
   public sendWebviewMessage({
@@ -43,20 +40,24 @@ export class WebviewMessages {
     needsGitInitialized,
     projectInitialized,
     pythonBinPath,
+    remoteList,
     sectionCollapsed,
-    shareLiveToStudio
+    shareLiveToStudio,
+    isAboveLatestTestedVersion
   }: SetupData) {
     void this.getWebview()?.show({
       canGitInitialize,
       cliCompatible,
       dvcCliDetails,
       hasData,
+      isAboveLatestTestedVersion,
       isPythonExtensionUsed,
       isStudioConnected,
       needsGitCommit,
       needsGitInitialized,
       projectInitialized,
       pythonBinPath,
+      remoteList,
       sectionCollapsed,
       shareLiveToStudio
     })
@@ -78,6 +79,8 @@ export class WebviewMessages {
         return this.selectPythonInterpreter()
       case MessageFromWebviewType.INSTALL_DVC:
         return this.installDvc()
+      case MessageFromWebviewType.UPGRADE_DVC:
+        return this.upgradeDvc()
       case MessageFromWebviewType.SETUP_WORKSPACE:
         return commands.executeCommand(
           RegisteredCommands.EXTENSION_SETUP_WORKSPACE
@@ -100,7 +103,7 @@ export class WebviewMessages {
           message.payload
         )
       case MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW:
-        return this.showExperiments()
+        return commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
 
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
@@ -128,6 +131,12 @@ export class WebviewMessages {
       undefined
     )
     return selectPythonInterpreter()
+  }
+
+  private upgradeDvc() {
+    sendTelemetryEvent(EventName.VIEWS_SETUP_UPGRADE_DVC, undefined, undefined)
+
+    return autoUpgradeDvc()
   }
 
   private installDvc() {

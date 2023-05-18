@@ -626,7 +626,7 @@ export class Experiments extends BaseRepository<TableData> {
     }
 
     return await pickExperiment(
-      this.experiments.getCombinedList(),
+      this.experiments.getUniqueList(),
       this.getFirstThreeColumnOrder(),
       Title.SELECT_BASE_EXPERIMENT
     )

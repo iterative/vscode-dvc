@@ -159,6 +159,6 @@ suite('Config Test Suite', () => {
         config.getFocusedProjects(),
         'should exclude projects that are outside of the workspace'
       ).to.equal(undefined)
-    })
+    }).timeout(10000)
   })
 })

@@ -1,8 +1,9 @@
 import cx from 'classnames'
 import React, { MouseEvent, ReactNode } from 'react'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
-import { STUDIO_URL, SetupSection } from 'dvc/src/setup/webview/contract'
+import { SetupSection } from 'dvc/src/setup/webview/contract'
 import styles from './styles.module.scss'
+import { SectionDescriptionMainText } from './SectionDescription'
 import { InfoTooltip, TooltipIconType } from './InfoTooltip'
 import { Icon } from '../Icon'
 import { ChevronDown, ChevronRight } from '../icons'
@@ -10,68 +11,6 @@ import { isSelecting } from '../../../util/strings'
 import { isTooltip } from '../../../util/helpers'
 import { IconMenu } from '../iconMenu/IconMenu'
 import { IconMenuItemProps } from '../iconMenu/IconMenuItem'
-
-export const SectionDescription = {
-  // "Custom"
-  [PlotsSection.CUSTOM_PLOTS]: (
-    <span data-testid="tooltip-custom-plots">
-      Generated custom linear plots comparing chosen metrics and params in all
-      experiments in the table.
-    </span>
-  ),
-  // "Images"
-  [PlotsSection.COMPARISON_TABLE]: (
-    <span data-testid="tooltip-comparison-plots">
-      Images (e.g. any <code>.jpg</code>, <code>.svg</code>, or
-      <code>.png</code> file) rendered side by side across experiments. They
-      should be registered as{' '}
-      <a href="https://dvc.org/doc/user-guide/experiment-management/visualizing-plots">
-        plots
-      </a>
-      .
-    </span>
-  ),
-  // "Data Series"
-  [PlotsSection.TEMPLATE_PLOTS]: (
-    <span data-testid="tooltip-template-plots">
-      Any <code>JSON</code>, <code>YAML</code>, <code>CSV</code>, or{' '}
-      <code>TSV</code> file(s) with data points, visualized using{' '}
-      <a href="https://dvc.org/doc/user-guide/experiment-management/visualizing-plots#plot-templates-data-series-only">
-        plot templates
-      </a>
-      . Either predefined (e.g. confusion matrix, linear) or{' '}
-      <a href="https://dvc.org/doc/command-reference/plots/templates#custom-templates">
-        custom Vega-lite templates
-      </a>
-      .
-    </span>
-  ),
-  // Setup DVC
-  [SetupSection.DVC]: (
-    <span data-testid="tooltip-setup-dvc">
-      Configure the extension to start working with DVC.
-    </span>
-  ),
-  // Setup Experiments
-  [SetupSection.EXPERIMENTS]: (
-    <span data-testid="tooltip-setup-experiments">
-      Configure the extension to start tracking and visualizing{' '}
-      <a href="https://dvc.org/doc/start/experiment-management/experiments">
-        experiments
-      </a>
-      .
-    </span>
-  ),
-  // Setup Studio
-  [SetupSection.STUDIO]: (
-    <span data-testid="tooltip-setup-studio">
-      {"Configure the extension's connection to "}
-      <a href={STUDIO_URL}>Studio</a>.<br />
-      Studio provides a collaboration platform for Machine Learning and is free
-      for small teams and individual contributors.
-    </span>
-  )
-} as const
 
 interface SectionContainerProps<T extends PlotsSection | SetupSection> {
   children: ReactNode
@@ -84,6 +23,7 @@ interface SectionContainerProps<T extends PlotsSection | SetupSection> {
   className?: string
   stickyHeaderTop?: number
   icon?: TooltipIconType
+  overrideSectionDescription?: JSX.Element
 }
 
 export const SectionContainer: React.FC<
@@ -98,14 +38,23 @@ export const SectionContainer: React.FC<
   className,
   stickyHeaderTop = 0,
   headerChildren,
-  icon
+  icon,
+  overrideSectionDescription
 }) => {
   const open = !sectionCollapsed
+
+  const sectionDescription = SectionDescriptionMainText[sectionKey]
+  const tooltipTexts = [
+    title,
+    overrideSectionDescription
+      ? overrideSectionDescription.props.children
+      : sectionDescription.props.children
+  ]
 
   const toggleSection = (e: MouseEvent) => {
     e.preventDefault()
     if (
-      !isSelecting([title, SectionDescription[sectionKey].props.children]) &&
+      !isSelecting(tooltipTexts) &&
       !isTooltip(e.target as Element, ['SUMMARY', 'BODY'])
     ) {
       onToggleSection()
@@ -132,7 +81,11 @@ export const SectionContainer: React.FC<
               className={styles.detailsIcon}
             />
             {title}
-            <InfoTooltip icon={icon} sectionKey={sectionKey} />
+            <InfoTooltip
+              icon={icon}
+              sectionKey={sectionKey}
+              overrideSectionDescription={overrideSectionDescription}
+            />
           </div>
 
           {headerChildren}

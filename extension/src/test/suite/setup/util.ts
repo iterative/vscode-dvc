@@ -44,6 +44,7 @@ export const buildSetup = (
 
   const mockEmitter = disposer.track(new EventEmitter())
   stub(dvcReader, 'root').resolves(mockDvcRoot)
+  stub(dvcExecutor, 'remote').resolves('')
   const mockVersion = stub(dvcReader, 'version').resolves(MIN_CLI_VERSION)
   const mockGlobalVersion = stub(dvcReader, 'globalVersion').resolves(
     MIN_CLI_VERSION
@@ -61,9 +62,10 @@ export const buildSetup = (
   )
 
   const mockAutoInstallDvc = stub(AutoInstall, 'autoInstallDvc')
+  const mockAutoUpgradeDvc = stub(AutoInstall, 'autoUpgradeDvc')
   stub(AutoInstall, 'findPythonBinForInstall').resolves(undefined)
 
-  const mockOpenExperiments = fake()
+  const mockShowWebview = stub(WorkspaceExperiments.prototype, 'showWebview')
 
   const mockRunSetup = stub(Runner, 'run').resolves(undefined)
 
@@ -88,7 +90,7 @@ export const buildSetup = (
       {
         columnsChanged: mockEmitter,
         getHasData: () => hasData,
-        showWebview: mockOpenExperiments
+        showWebview: mockShowWebview
       } as unknown as WorkspaceExperiments,
       { setAvailability: stub() } as unknown as Status,
       resourceLocator.dvcIcon,
@@ -104,13 +106,14 @@ export const buildSetup = (
     internalCommands,
     messageSpy,
     mockAutoInstallDvc,
+    mockAutoUpgradeDvc,
     mockExecuteCommand,
     mockGetGitRepositoryRoot,
     mockGlobalVersion,
     mockInitializeGit,
-    mockOpenExperiments,
     mockOpenExternal,
     mockRunSetup,
+    mockShowWebview,
     mockVersion,
     resourceLocator,
     setup,

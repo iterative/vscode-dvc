@@ -10,12 +10,12 @@ import {
 } from './constants'
 import {
   DataStatusOutput,
+  DEFAULT_EXP_SHOW_OUTPUT,
   DvcError,
-  EXPERIMENT_WORKSPACE_ID,
+  ExpShowOutput,
   PlotsOutput,
   PlotsOutputOrError,
-  RawPlotsOutput,
-  ExpShowOutput
+  RawPlotsOutput
 } from './contract'
 import { getOptions } from './options'
 import { typeCheckCommands } from '..'
@@ -76,8 +76,7 @@ export class DvcReader extends DvcCli {
     if (isDvcError(output) || isEmpty(output)) {
       return [
         {
-          branch: undefined,
-          rev: EXPERIMENT_WORKSPACE_ID,
+          ...DEFAULT_EXP_SHOW_OUTPUT[0],
           ...(output as DvcError)
         }
       ]
