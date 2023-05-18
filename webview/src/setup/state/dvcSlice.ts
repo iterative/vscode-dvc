@@ -26,7 +26,7 @@ export const dvcSlice = createSlice({
   initialState: dvcInitialState,
   name: 'dvc',
   reducers: {
-    updateCanGitInitalized: (state, action: PayloadAction<boolean>) => {
+    updateCanGitInitialize: (state, action: PayloadAction<boolean>) => {
       state.canGitInitialize = action.payload
     },
     updateCliCompatible: (
@@ -66,7 +66,7 @@ export const dvcSlice = createSlice({
 })
 
 export const {
-  updateCanGitInitalized,
+  updateCanGitInitialize,
   updateCliCompatible,
   updateDvcCliDetails,
   updateIsAboveLatestTestedVersion,
