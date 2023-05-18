@@ -31,6 +31,7 @@ const DEFAULT_DATA = {
     version: '1.0.0'
   },
   hasData: false,
+  isAboveLatestTestedVersion: false,
   isPythonExtensionUsed: false,
   isStudioConnected: false,
   needsGitCommit: false,
@@ -406,7 +407,9 @@ describe('App', () => {
         projectInitialized: false
       })
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[0]
+      const iconWrapper = within(
+        screen.getByTestId('dvc-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.ERROR)
@@ -417,11 +420,45 @@ describe('App', () => {
       renderApp({ remoteList: { mockRoot: undefined } })
       expect(screen.queryByText('DVC is not setup')).not.toBeInTheDocument()
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[0]
+      const iconWrapper = within(
+        screen.getByTestId('dvc-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.PASSED)
       ).toBeInTheDocument()
+    })
+
+    it('should add a warning icon and message if version is above the latest tested version', () => {
+      renderApp({
+        isAboveLatestTestedVersion: true
+      })
+
+      const iconWrapper = within(
+        screen.getByTestId('dvc-section-details')
+      ).getByTestId('info-tooltip-toggle')
+
+      expect(
+        within(iconWrapper).getByTestId(TooltipIconType.WARNING)
+      ).toBeInTheDocument()
+
+      fireEvent.mouseEnter(iconWrapper)
+
+      expect(
+        screen.getByText(
+          'The located version has not been tested against the extension. If you are experiencing unexpected behaviour, first try to update the extension. If there are no updates available, please downgrade DVC to the same minor version as displayed and reload the window.'
+        )
+      ).toBeInTheDocument()
+    })
+  })
+
+  describe('Experiments', () => {
+    it('should show a screen saying that dvc is not setup if the project is not initialized', () => {
+      renderApp({
+        projectInitialized: false
+      })
+
+      expect(screen.getByText('DVC is not setup')).toBeInTheDocument()
     })
 
     it('should open the dvc section when clicking the Setup DVC button on the dvc is not setup screen', () => {
@@ -501,7 +538,9 @@ describe('App', () => {
     it('should show an error icon if experiments are not setup', () => {
       renderApp()
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[1]
+      const iconWrapper = within(
+        screen.getByTestId('experiments-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.ERROR)
@@ -513,7 +552,9 @@ describe('App', () => {
         cliCompatible: false
       })
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[1]
+      const iconWrapper = within(
+        screen.getByTestId('experiments-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.ERROR)
@@ -525,7 +566,9 @@ describe('App', () => {
         hasData: true
       })
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[1]
+      const iconWrapper = within(
+        screen.getByTestId('experiments-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.PASSED)
@@ -583,7 +626,9 @@ describe('App', () => {
         cliCompatible: false
       })
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[3]
+      const iconWrapper = within(
+        screen.getByTestId('studio-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.ERROR)
@@ -593,7 +638,9 @@ describe('App', () => {
     it('should show an info icon if dvc is compatible but studio is not connected', () => {
       renderApp()
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[3]
+      const iconWrapper = within(
+        screen.getByTestId('studio-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.INFO)
@@ -634,7 +681,9 @@ describe('App', () => {
         isStudioConnected: true
       })
 
-      const iconWrapper = screen.getAllByTestId('info-tooltip-toggle')[3]
+      const iconWrapper = within(
+        screen.getByTestId('studio-section-details')
+      ).getByTestId('info-tooltip-toggle')
 
       expect(
         within(iconWrapper).getByTestId(TooltipIconType.PASSED)

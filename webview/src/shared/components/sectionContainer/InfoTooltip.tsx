@@ -3,45 +3,54 @@ import cx from 'classnames'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import { SetupSection } from 'dvc/src/setup/webview/contract'
 import styles from './styles.module.scss'
-import { SectionDescription } from './SectionContainer'
+import { SectionDescription } from './SectionDescription'
 import Tooltip from '../tooltip/Tooltip'
+import { Info, PassFilled, Error, Warning } from '../icons'
 import { Icon } from '../Icon'
-import { Info, PassFilled, Error } from '../icons'
 
 export enum TooltipIconType {
   PASSED = 'pass-filled',
   INFO = 'info',
-  ERROR = 'error'
+  ERROR = 'error',
+  WARNING = 'warning'
 }
 
 const tooltipIcons = {
-  [TooltipIconType.PASSED]: PassFilled,
-  [TooltipIconType.INFO]: Info,
-  [TooltipIconType.ERROR]: Error
+  [TooltipIconType.PASSED]: {
+    className: styles.completedIcon,
+    icon: PassFilled
+  },
+  [TooltipIconType.INFO]: { className: undefined, icon: Info },
+  [TooltipIconType.ERROR]: { className: styles.errorIcon, icon: Error },
+  [TooltipIconType.WARNING]: { className: styles.warningIcon, icon: Warning }
 }
 
 export const InfoTooltip: React.FC<{
   sectionKey: PlotsSection | SetupSection
   icon?: TooltipIconType
-}> = ({ icon = TooltipIconType.INFO, sectionKey }) => {
-  const infoIcon = (
+  overrideSectionDescription?: JSX.Element
+}> = ({
+  icon = TooltipIconType.INFO,
+  sectionKey,
+  overrideSectionDescription
+}) => {
+  const indicatorIcon = (
     <Icon
       data-testid={icon}
       width={16}
       height={16}
-      icon={tooltipIcons[icon]}
-      className={cx(
-        styles.infoIcon,
-        icon === TooltipIconType.ERROR && styles.errorIcon,
-        icon === TooltipIconType.PASSED && styles.completedIcon
-      )}
+      icon={tooltipIcons[icon].icon}
+      className={cx(styles.indicatorIcon, tooltipIcons[icon].className)}
     />
   )
 
   const tooltipContent = (
     <div className={styles.infoTooltip}>
-      {infoIcon}
-      {SectionDescription[sectionKey]}
+      {indicatorIcon}
+      <SectionDescription
+        sectionKey={sectionKey}
+        overrideSectionDescription={overrideSectionDescription}
+      />
     </div>
   )
 
@@ -56,7 +65,7 @@ export const InfoTooltip: React.FC<{
         className={styles.infoTooltipToggle}
         data-testid="info-tooltip-toggle"
       >
-        {infoIcon}
+        {indicatorIcon}
       </div>
     </Tooltip>
   )
