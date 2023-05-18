@@ -873,7 +873,7 @@ suite('Experiments Test Suite', () => {
       const queuedId = '90aea7f'
 
       const isExperimentSelected = (expId: string): boolean =>
-        !!experimentsModel.getCombinedList().find(({ id }) => id === expId)
+        !!experimentsModel.getUniqueList().find(({ id }) => id === expId)
           ?.selected
 
       expect(
@@ -1101,7 +1101,7 @@ suite('Experiments Test Suite', () => {
       const areExperimentsStarred = (expIds: string[]): boolean =>
         expIds
           .map(expId =>
-            experimentsModel.getCombinedList().find(({ id }) => id === expId)
+            experimentsModel.getUniqueList().find(({ id }) => id === expId)
           )
           .every(exp => exp?.starred)
 
