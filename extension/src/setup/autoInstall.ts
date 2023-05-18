@@ -22,6 +22,9 @@ const showUpgradeProgress = (
 ): Thenable<unknown> =>
   Toast.showProgress('Upgrading DVC', async progress => {
     progress.report({ increment: 0 })
+
+    progress.report({ increment: 25, message: 'Updating packages...' })
+
     try {
       await Toast.runCommandAndIncrementProgress(
         async () => {
@@ -29,7 +32,7 @@ const showUpgradeProgress = (
           return 'Upgraded successfully'
         },
         progress,
-        100
+        75
       )
 
       return Toast.delayProgressClosing()
