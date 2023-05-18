@@ -297,7 +297,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getWorkspaceAndCommits() {
-    return [
+    const experiments = [
       {
         ...this.addDetails(this.workspace),
         hasChildren: false,
@@ -306,15 +306,18 @@ export class ExperimentsModel extends ModelWithPersistence {
         )
           ? ExperimentType.RUNNING
           : ExperimentType.WORKSPACE
-      },
-      ...this.commits.map(commit => {
-        return {
-          ...this.addDetails(commit),
-          hasChildren: !!this.experimentsByCommit.get(commit.id),
-          type: ExperimentType.COMMIT
-        }
-      })
+      }
     ]
+
+    for (const commit of this.getCommits()) {
+      experiments.push({
+        ...this.addDetails(commit),
+        hasChildren: !!this.experimentsByCommit.get(commit.id),
+        type: ExperimentType.COMMIT
+      })
+    }
+
+    return experiments
   }
 
   public getWorkspaceCommitsAndExperiments() {
@@ -344,7 +347,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getCommitsAndExperiments() {
-    return collectOrderedCommitsAndExperiments(this.commits, commit =>
+    return collectOrderedCommitsAndExperiments(this.getCommits(), commit =>
       this.getExperimentsByCommit(commit)
     )
   }
@@ -401,7 +404,11 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getExperimentCount() {
-    return sum([this.getExperimentsAndQueued().length, this.commits.length, 1])
+    return sum([
+      this.getExperimentsAndQueued().length,
+      this.getCommits().length,
+      1
+    ])
   }
 
   public getFilteredCount() {
@@ -410,23 +417,11 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getUniqueList() {
-    const uniqueList: Experiment[] = [this.workspace]
-    const ids = new Set<string>()
-
-    for (const experiment of [
-      ...this.commits,
+    return [
+      this.workspace,
+      ...this.getCommits(),
       ...this.getExperimentsAndQueued()
-    ]) {
-      const { id } = experiment
-      if (ids.has(id)) {
-        continue
-      }
-
-      uniqueList.push(experiment)
-      ids.add(id)
-    }
-
-    return uniqueList
+    ]
   }
 
   public getExperimentsByCommitForTree(commit: Experiment) {
@@ -482,6 +477,20 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.currentSorts.findIndex(({ path }) => path === pathToRemove)
   }
 
+  private getCommits() {
+    const ids = new Set<string>()
+    const commits: Experiment[] = []
+    for (const commit of this.commits) {
+      const { id } = commit
+      if (ids.has(id)) {
+        continue
+      }
+      commits.push(commit)
+      ids.add(id)
+    }
+    return commits
+  }
+
   private getFilteredExperiments() {
     const acc: Experiment[] = []
 
@@ -497,7 +506,10 @@ export class ExperimentsModel extends ModelWithPersistence {
   private getExperimentsByCommit(commit: Experiment) {
     const experiments = this.experimentsByCommit
       .get(commit.id)
-      ?.map(experiment => this.addDetails(experiment))
+      ?.map(experiment => ({
+        ...this.addDetails(experiment),
+        branch: commit.branch
+      }))
     if (!experiments) {
       return
     }
