@@ -7,7 +7,7 @@ import {
   SetupSection,
   SetupData as TSetupData
 } from './webview/contract'
-import { collectSectionCollapsed } from './collect'
+import { collectRemoteList, collectSectionCollapsed } from './collect'
 import { WebviewMessages } from './webview/messages'
 import { validateTokenInput } from './inputBox'
 import { findPythonBinForInstall } from './autoInstall'
@@ -47,7 +47,8 @@ import {
   Flag,
   ConfigKey as DvcConfigKey,
   DOT_DVC,
-  Args
+  Args,
+  SubCommand
 } from '../cli/dvc/constants'
 import { GLOBAL_WEBVIEW_DVCROOT } from '../webview/factory'
 import {
@@ -58,6 +59,7 @@ import { getValidInput } from '../vscode/inputBox'
 import { Title } from '../vscode/title'
 import { getDVCAppDir } from '../util/appdirs'
 import { getOptions } from '../cli/dvc/options'
+import { isAboveLatestTestedVersion } from '../cli/dvc/version'
 
 export class Setup
   extends BaseRepository<TSetupData>
@@ -229,7 +231,7 @@ export class Setup
   ) {
     this.cliCompatible = compatible
     this.cliVersion = version
-    void this.updateIsStudioConnected()
+    void this.updateStudioAndSend()
     const incompatible = compatible === undefined ? undefined : !compatible
     void setContextValue(ContextKey.CLI_INCOMPATIBLE, incompatible)
   }
@@ -339,7 +341,7 @@ export class Setup
     }
 
     await this.accessConfig(cwd, Flag.GLOBAL, DvcConfigKey.STUDIO_TOKEN, token)
-    return this.updateIsStudioConnected()
+    return this.updateStudioAndSend()
   }
 
   public getStudioLiveShareToken() {
@@ -375,14 +377,28 @@ export class Setup
     }
   }
 
+  private async getRemoteList() {
+    await this.config.isReady()
+
+    if (!this.hasRoots()) {
+      return undefined
+    }
+
+    return collectRemoteList(this.dvcRoots, (cwd: string) =>
+      this.accessRemote(cwd, SubCommand.LIST)
+    )
+  }
+
   private async sendDataToWebview() {
     const projectInitialized = this.hasRoots()
     const hasData = this.getHasData()
 
-    const [isPythonExtensionUsed, dvcCliDetails] = await Promise.all([
-      this.isPythonExtensionUsed(),
-      this.getDvcCliDetails()
-    ])
+    const [isPythonExtensionUsed, dvcCliDetails, remoteList] =
+      await Promise.all([
+        this.isPythonExtensionUsed(),
+        this.getDvcCliDetails(),
+        this.getRemoteList()
+      ])
 
     const needsGitInitialized =
       !projectInitialized && !!(await this.needsGitInit())
@@ -399,12 +415,14 @@ export class Setup
       cliCompatible: this.getCliCompatible(),
       dvcCliDetails,
       hasData,
+      isAboveLatestTestedVersion: isAboveLatestTestedVersion(this.cliVersion),
       isPythonExtensionUsed,
       isStudioConnected: this.studioIsConnected,
       needsGitCommit,
       needsGitInitialized,
       projectInitialized,
       pythonBinPath: getBinDisplayText(pythonBinPath),
+      remoteList,
       sectionCollapsed: collectSectionCollapsed(this.focusedSection),
       shareLiveToStudio: getConfigValue(
         ExtensionConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE
@@ -644,16 +662,16 @@ export class Setup
     }
   }
 
+  private async updateStudioAndSend() {
+    await this.updateIsStudioConnected()
+    return this.sendDataToWebview()
+  }
+
   private async updateIsStudioConnected() {
     await this.setStudioAccessToken()
     const storedToken = this.getStudioAccessToken()
     const isConnected = isStudioAccessToken(storedToken)
-    return this.setStudioIsConnected(isConnected)
-  }
-
-  private setStudioIsConnected(isConnected: boolean) {
     this.studioIsConnected = isConnected
-    void this.sendDataToWebview()
     return setContextValue(ContextKey.STUDIO_CONNECTED, isConnected)
   }
 
@@ -667,7 +685,7 @@ export class Setup
             path.endsWith(join('dvc', 'config')) ||
             path.endsWith(join('dvc', 'config.local'))
           ) {
-            void this.updateIsStudioConnected()
+            void this.updateStudioAndSend()
           }
         }
       )
@@ -705,13 +723,23 @@ export class Setup
     )
   }
 
-  private async accessConfig(cwd: string, ...args: Args) {
+  private accessConfig(cwd: string, ...args: Args) {
+    return this.accessDvc(AvailableCommands.CONFIG, cwd, ...args)
+  }
+
+  private accessRemote(cwd: string, ...args: Args) {
+    return this.accessDvc(AvailableCommands.REMOTE, cwd, ...args)
+  }
+
+  private async accessDvc(
+    commandId:
+      | typeof AvailableCommands.CONFIG
+      | typeof AvailableCommands.REMOTE,
+    cwd: string,
+    ...args: Args
+  ) {
     try {
-      return await this.internalCommands.executeCommand(
-        AvailableCommands.CONFIG,
-        cwd,
-        ...args
-      )
+      return await this.internalCommands.executeCommand(commandId, cwd, ...args)
     } catch {}
   }
 }

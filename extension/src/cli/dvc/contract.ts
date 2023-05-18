@@ -1,7 +1,7 @@
 import { Plot } from '../../plots/webview/contract'
 
 export const MIN_CLI_VERSION = '2.55.0'
-export const LATEST_TESTED_CLI_VERSION = '2.57.1'
+export const LATEST_TESTED_CLI_VERSION = '2.57.2'
 export const MAX_CLI_VERSION = '3'
 
 type ErrorContents = { type: string; msg: string }
@@ -59,6 +59,13 @@ export type MetricsOrParams = RelPathObject<FileDataOrError>
 
 export const fileHasError = (file: FileDataOrError): file is DvcError =>
   !!(file as DvcError).error
+
+export const DEFAULT_EXP_SHOW_OUTPUT = [
+  {
+    branch: undefined,
+    rev: EXPERIMENT_WORKSPACE_ID
+  }
+]
 
 export type ExpData = {
   rev: string

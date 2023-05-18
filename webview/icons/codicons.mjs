@@ -24,5 +24,6 @@ export const codicons = [
   'sort-precedence',
   'star-empty',
   'star-full',
-  'trash'
+  'trash',
+  'warning'
 ]

@@ -83,6 +83,7 @@ export const EventName = Object.assign(
     VIEWS_SETUP_SELECT_PYTHON_INTERPRETER:
       'views.setup.selectPythonInterpreter',
     VIEWS_SETUP_SHOW_SCM_FOR_COMMIT: 'views.setup.showScmForCommit',
+    VIEWS_SETUP_UPGRADE_DVC: 'view.setup.upgradeDvc',
 
     VIEWS_TERMINAL_CLOSED: 'views.terminal.closed',
     VIEWS_TERMINAL_CREATED: 'views.terminal.created',
@@ -269,6 +270,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_SETUP_SHOW_SCM_FOR_COMMIT]: undefined
   [EventName.VIEWS_SETUP_INIT_GIT]: undefined
   [EventName.VIEWS_SETUP_INSTALL_DVC]: undefined
+  [EventName.VIEWS_SETUP_UPGRADE_DVC]: undefined
 
   [EventName.SETUP_SHOW]: undefined
   [EventName.SETUP_SHOW_EXPERIMENTS]: undefined

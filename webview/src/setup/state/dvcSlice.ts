@@ -14,17 +14,19 @@ export const dvcInitialState: DvcState = {
   canGitInitialize: false,
   cliCompatible: undefined,
   dvcCliDetails: undefined,
+  isAboveLatestTestedVersion: undefined,
   isPythonExtensionUsed: false,
   needsGitInitialized: false,
   projectInitialized: false,
-  pythonBinPath: undefined
+  pythonBinPath: undefined,
+  remoteList: undefined
 }
 
 export const dvcSlice = createSlice({
   initialState: dvcInitialState,
   name: 'dvc',
   reducers: {
-    updateCanGitInitalized: (state, action: PayloadAction<boolean>) => {
+    updateCanGitInitialize: (state, action: PayloadAction<boolean>) => {
       state.canGitInitialize = action.payload
     },
     updateCliCompatible: (
@@ -38,6 +40,12 @@ export const dvcSlice = createSlice({
       action: PayloadAction<DvcCliDetails | undefined>
     ) => {
       state.dvcCliDetails = action.payload
+    },
+    updateIsAboveLatestTestedVersion: (
+      state,
+      action: PayloadAction<boolean | undefined>
+    ) => {
+      state.isAboveLatestTestedVersion = action.payload
     },
     updateIsPythonExtensionUsed: (state, action: PayloadAction<boolean>) => {
       state.isPythonExtensionUsed = action.payload
@@ -58,9 +66,10 @@ export const dvcSlice = createSlice({
 })
 
 export const {
-  updateCanGitInitalized,
+  updateCanGitInitialize,
   updateCliCompatible,
   updateDvcCliDetails,
+  updateIsAboveLatestTestedVersion,
   updateIsPythonExtensionUsed,
   updateNeedsGitInitialized,
   updateProjectInitialized,
