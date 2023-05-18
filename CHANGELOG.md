@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.15] - 2023-05-18
+
+### 🐛 Bug Fixes
+
+- Ensure unique list of experiment passed to the rest of the app [#3925](https://github.com/iterative/vscode-dvc/pull/3925) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.8.14] - 2023-05-18
 
 ### 🚀 New Features and Enhancements
