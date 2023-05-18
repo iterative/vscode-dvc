@@ -637,27 +637,6 @@ export class ExperimentsModel extends ModelWithPersistence {
     return color
   }
 
-  private getSelectedFromList(getList: () => Experiment[]) {
-    const acc: SelectedExperimentWithColor[] = []
-
-    const ids = new Set<string>()
-
-    for (const experiment of getList()) {
-      const { id } = experiment
-      const displayColor = this.coloredStatus[id]
-      if (displayColor && !ids.has(id)) {
-        acc.push({ ...experiment, displayColor } as SelectedExperimentWithColor)
-      }
-      ids.add(id)
-    }
-
-    return copyOriginalColors()
-      .flatMap(orderedItem =>
-        acc.filter(item => item.displayColor === orderedItem)
-      )
-      .filter(Boolean)
-  }
-
   private reviveColoredStatus() {
     const uniqueStatus: ColoredStatus = {}
     const colors = new Set<Color>()
