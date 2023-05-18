@@ -59,6 +59,7 @@ import { getValidInput } from '../vscode/inputBox'
 import { Title } from '../vscode/title'
 import { getDVCAppDir } from '../util/appdirs'
 import { getOptions } from '../cli/dvc/options'
+import { isAboveLatestTestedVersion } from '../cli/dvc/version'
 
 export class Setup
   extends BaseRepository<TSetupData>
@@ -414,6 +415,7 @@ export class Setup
       cliCompatible: this.getCliCompatible(),
       dvcCliDetails,
       hasData,
+      isAboveLatestTestedVersion: isAboveLatestTestedVersion(this.cliVersion),
       isPythonExtensionUsed,
       isStudioConnected: this.studioIsConnected,
       needsGitCommit,
