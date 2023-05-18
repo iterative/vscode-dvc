@@ -110,46 +110,48 @@ const getMultiSelectMenuOptions = (
 
   const toggleStarOption = (ids: string[], label: string) => {
     return experimentMenuOption(
-      ids,
+      [...new Set(ids)],
       label,
       MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR,
       ids.length === 0
     )
   }
 
+  const ids = [...new Set(selectedIds)]
+
   return [
     toggleStarOption(unstarredExperimentIds, 'Star'),
     toggleStarOption(starredExperimentIds, 'Unstar'),
     experimentMenuOption(
-      selectedIds,
+      ids,
       'Plot',
       MessageFromWebviewType.SET_EXPERIMENTS_FOR_PLOTS,
       disablePlotOption,
       true
     ),
     experimentMenuOption(
-      selectedIds,
+      ids,
       'Plot and Show',
       MessageFromWebviewType.SET_EXPERIMENTS_AND_OPEN_PLOTS,
       disablePlotOption,
       false
     ),
     experimentMenuOption(
-      selectedIds,
+      ids,
       'Stop',
       MessageFromWebviewType.STOP_EXPERIMENTS,
       disableStopOption,
       true
     ),
     experimentMenuOption(
-      selectedIds,
+      ids,
       'Push Selected',
       MessageFromWebviewType.PUSH_EXPERIMENT,
       disableExperimentOnlyOption,
       true
     ),
     experimentMenuOption(
-      selectedIds,
+      ids,
       'Remove Selected',
       MessageFromWebviewType.REMOVE_EXPERIMENT,
       disableExperimentOnlyOption,
