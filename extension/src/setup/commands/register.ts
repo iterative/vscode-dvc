@@ -1,17 +1,14 @@
 import { commands } from 'vscode'
-import { Setup } from '.'
-import { run } from './runner'
-import { SetupSection } from './webview/contract'
-import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
-import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
-import { definedAndNonEmpty } from '../util/array'
-import { Toast } from '../vscode/toast'
-import { SubCommand } from '../cli/dvc/constants'
-import { getOnlyOrPickProject } from '../workspace/util'
-import { getInput } from '../vscode/inputBox'
-import { Title } from '../vscode/title'
-import { quickPickYesOrNo } from '../vscode/quickPick'
+import { getAddRemoteCommand } from '.'
+import { Setup } from '..'
+import { run } from '../runner'
+import { SetupSection } from '../webview/contract'
+import { AvailableCommands, InternalCommands } from '../../commands/internal'
+import {
+  RegisteredCliCommands,
+  RegisteredCommands
+} from '../../commands/external'
+import { getFirstWorkspaceFolder } from '../../vscode/workspaceFolders'
 
 const registerSetupConfigCommands = (
   setup: Setup,
@@ -109,65 +106,7 @@ export const registerSetupCommands = (
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.REMOTE_ADD,
-    // eslint-disable-next-line sonarjs/cognitive-complexity
-    async () => {
-      const dvcRoots = setup.getRoots()
-      if (!definedAndNonEmpty(dvcRoots)) {
-        return Toast.showError('Cannot add a remote without a DVC project')
-      }
-      const dvcRoot = await getOnlyOrPickProject(dvcRoots)
-
-      if (!dvcRoot) {
-        return
-      }
-
-      const name = await getInput(Title.ENTER_REMOTE_NAME)
-      if (!name) {
-        return
-      }
-
-      const url = await getInput(Title.ENTER_REMOTE_URL)
-      if (!url) {
-        return
-      }
-
-      const args = ['--project', name, url]
-
-      const remoteList = await internalCommands.executeCommand(
-        AvailableCommands.REMOTE,
-        dvcRoot,
-        SubCommand.LIST
-      )
-
-      let yesOrNo
-      if (remoteList) {
-        yesOrNo = await quickPickYesOrNo(
-          'make this new remote the default',
-          'the current default is correct',
-          {
-            placeHolder:
-              'Would you like to set this new remote as the default?',
-            title: Title.SET_REMOTE_AS_DEFAULT
-          }
-        )
-        if (yesOrNo === undefined) {
-          return
-        }
-      }
-
-      if (!remoteList || yesOrNo) {
-        args.unshift('-d')
-      }
-
-      return await Toast.showOutput(
-        internalCommands.executeCommand(
-          AvailableCommands.REMOTE,
-          dvcRoot,
-          SubCommand.ADD,
-          ...args
-        )
-      )
-    }
+    getAddRemoteCommand(setup, internalCommands)
   )
 
   registerSetupConfigCommands(setup, internalCommands)

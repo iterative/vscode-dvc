@@ -48,7 +48,7 @@ import { SetupSection } from '../../../setup/webview/contract'
 import { DvcExecutor } from '../../../cli/dvc/executor'
 import { getFirstWorkspaceFolder } from '../../../vscode/workspaceFolders'
 
-suite.only('Setup Test Suite', () => {
+suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
 
   beforeEach(() => {
