@@ -148,6 +148,19 @@ CliFoundManually.args = getUpdatedArgs({
   isPythonExtensionUsed: false
 })
 
+export const NoRemoteSetup = Template.bind({})
+NoRemoteSetup.args = getUpdatedArgs({
+  remoteList: {
+    '/Users/thatguy/projects/vscode-dvc/rootB': undefined
+  },
+  sectionCollapsed: {
+    [SetupSection.DVC]: true,
+    [SetupSection.EXPERIMENTS]: true,
+    [SetupSection.REMOTES]: false,
+    [SetupSection.STUDIO]: true
+  }
+})
+
 export const ProjectRemoteSetup = Template.bind({})
 ProjectRemoteSetup.args = getUpdatedArgs({
   remoteList: {

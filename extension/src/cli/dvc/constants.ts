@@ -38,6 +38,7 @@ export enum Command {
 }
 
 export enum SubCommand {
+  ADD = 'add',
   DIFF = 'diff',
   LIST = 'list',
   STATUS = 'status',

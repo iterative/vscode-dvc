@@ -1,5 +1,7 @@
 import React from 'react'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
+import { StartButton } from '../../../shared/components/button/StartButton'
+import { addRemote } from '../messages'
 
 export const Connect: React.FC = () => (
   <EmptyState isFullScreen={false}>
@@ -18,5 +20,6 @@ export const Connect: React.FC = () => (
       </a>{' '}
       for details on how to connect to a remote
     </p>
+    <StartButton onClick={() => addRemote()} text="Add Remote" />
   </EmptyState>
 )

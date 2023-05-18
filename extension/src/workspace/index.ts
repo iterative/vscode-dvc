@@ -1,6 +1,6 @@
+import { getOnlyOrPickProject } from './util'
 import { InternalCommands } from '../commands/internal'
 import { Disposables, reset } from '../util/disposable'
-import { quickPickOne } from '../vscode/quickPick'
 import { DeferredDisposable } from '../class/deferred'
 
 export abstract class BaseWorkspace<
@@ -39,17 +39,9 @@ export abstract class BaseWorkspace<
     this.resetDeferred()
   }
 
-  public async getOnlyOrPickProject() {
+  public getOnlyOrPickProject() {
     const dvcRoots = this.getDvcRoots()
-
-    if (dvcRoots.length === 1) {
-      return dvcRoots[0]
-    }
-
-    return await quickPickOne(
-      dvcRoots,
-      'Select which project to run command against'
-    )
+    return getOnlyOrPickProject(dvcRoots)
   }
 
   public getRepository(dvcRoot: string) {
