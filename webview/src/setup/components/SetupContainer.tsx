@@ -6,21 +6,13 @@ import { TooltipIconType } from '../../shared/components/sectionContainer/InfoTo
 import { toggleSectionCollapsed } from '../state/webviewSlice'
 import { SetupState } from '../store'
 
-const getTooltipIconType = (isSetup: boolean, isConnected = true) => {
-  if (!isSetup) {
-    return TooltipIconType.ERROR
-  }
-
-  return isConnected ? TooltipIconType.PASSED : TooltipIconType.INFO
-}
-
 export const SetupContainer: React.FC<{
   children: React.ReactNode
   sectionKey: SetupSection
   title: string
-  isSetup: boolean
-  isConnected?: boolean
-}> = ({ children, sectionKey, title, isSetup, isConnected }) => {
+  icon: TooltipIconType
+  overrideSectionDescription?: JSX.Element
+}> = ({ children, sectionKey, title, icon, overrideSectionDescription }) => {
   const sectionCollapsed = useSelector(
     (state: SetupState) => state.webview.sectionCollapsed
   )
@@ -31,8 +23,9 @@ export const SetupContainer: React.FC<{
       sectionCollapsed={sectionCollapsed[sectionKey]}
       sectionKey={sectionKey}
       title={title}
-      icon={getTooltipIconType(isSetup, isConnected)}
+      icon={icon}
       onToggleSection={() => dispatch(toggleSectionCollapsed(sectionKey))}
+      overrideSectionDescription={overrideSectionDescription}
     >
       {children}
     </SectionContainer>
