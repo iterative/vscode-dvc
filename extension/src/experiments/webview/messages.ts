@@ -407,7 +407,7 @@ export class WebviewMessages {
 
   private setSelectedExperiments(ids: string[]) {
     const experiments = this.experiments
-      .getCombinedList()
+      .getUniqueList()
       .filter(({ id }) => ids.includes(id))
 
     this.experiments.setSelected(experiments)

@@ -251,16 +251,25 @@ const collectExpRange = (
   const expState = revs[0]
 
   const { name, rev } = expState
-  const { branch, id } = baseline
+  const { id: baselineId } = baseline
 
   const label =
     rev === EXPERIMENT_WORKSPACE_ID
       ? EXPERIMENT_WORKSPACE_ID
       : shortenForLabel(rev)
 
+  const experimentId = name || label
+
+  if (
+    acc.experimentsByCommit
+      .get(baselineId)
+      ?.find(({ id }) => id === experimentId)
+  ) {
+    return
+  }
+
   const experiment = transformExpState(
     {
-      branch,
       id: name || label,
       label
     },
@@ -275,7 +284,7 @@ const collectExpRange = (
   collectExecutorInfo(experiment, executor)
   collectRunningExperiment(acc, experiment)
 
-  addToMapArray(acc.experimentsByCommit, id, experiment)
+  addToMapArray(acc.experimentsByCommit, baselineId, experiment)
 }
 
 const setWorkspaceAsRunning = (
