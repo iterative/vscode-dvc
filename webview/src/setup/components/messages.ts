@@ -25,6 +25,10 @@ export const installDvc = () => {
   sendMessage({ type: MessageFromWebviewType.INSTALL_DVC })
 }
 
+export const upgradeDvc = () => {
+  sendMessage({ type: MessageFromWebviewType.UPGRADE_DVC })
+}
+
 export const selectPythonInterpreter = () => {
   sendMessage({ type: MessageFromWebviewType.SELECT_PYTHON_INTERPRETER })
 }

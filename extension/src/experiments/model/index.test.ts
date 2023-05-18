@@ -141,7 +141,7 @@ describe('ExperimentsModel', () => {
 
     model.transformAndSet(data, false, '')
 
-    const experiments = model.getCombinedList()
+    const experiments = model.getUniqueList()
 
     const changed: string[] = []
     for (const { deps, sha } of experiments) {
@@ -273,7 +273,7 @@ describe('ExperimentsModel', () => {
     model.setSelected([])
     expect(model.getSelectedRevisions().map(({ id }) => id)).toStrictEqual([])
 
-    model.setSelected(model.getCombinedList())
+    model.setSelected(model.getUniqueList())
     expect(model.getSelectedRevisions().map(({ id }) => id)).toStrictEqual([
       EXPERIMENT_WORKSPACE_ID,
       'testBranch',
@@ -357,5 +357,61 @@ describe('ExperimentsModel', () => {
       'two',
       'three'
     ])
+  })
+
+  it('should handle duplicate commits being returned in the data', () => {
+    const main = {
+      experiments: [
+        {
+          name: 'campy-pall',
+          rev: '0b4b001dfaa8f2c4cd2a62238699131ab2c679ea'
+        },
+        {
+          name: 'shyer-stir',
+          rev: '450e672f0d8913517ab2ab443f5d87b34f308290'
+        }
+      ],
+      name: 'main',
+      rev: '61bed4ce8913eca7f73ca754d65bc5daad1520e2'
+    }
+
+    const expShowWithDuplicateCommits = generateTestExpShowOutput(
+      {},
+      main,
+      {
+        name: 'branchOffMainWithCommit',
+        rev: '351e42ace3cb6a3a853c65bef285e60748cc6341'
+      },
+      main
+    )
+
+    const model = new ExperimentsModel('', buildMockMemento())
+    model.transformAndSet(expShowWithDuplicateCommits, false, '')
+    const distinctTreeItems = model.getWorkspaceAndCommits()
+    expect(distinctTreeItems).toHaveLength(3)
+
+    const tableRows = model.getRowData()
+    expect(tableRows).toHaveLength(4)
+    expect(tableRows.map(({ id }) => id)).toStrictEqual([
+      EXPERIMENT_WORKSPACE_ID,
+      'main',
+      'branchOffMainWithCommit',
+      'main'
+    ])
+
+    const tableExperimentRows = (
+      tableRows[1] as unknown as { subRows: Experiment[] }
+    ).subRows
+
+    const duplicateTableExperimentRows = (
+      tableRows[3] as unknown as { subRows: Experiment[] }
+    ).subRows
+
+    expect(tableExperimentRows).toHaveLength(2)
+    expect(tableExperimentRows.map(({ id }) => id)).toStrictEqual([
+      'campy-pall',
+      'shyer-stir'
+    ])
+    expect(tableExperimentRows).toStrictEqual(duplicateTableExperimentRows)
   })
 })
