@@ -47,10 +47,9 @@ import { Flag } from './cli/dvc/constants'
 import { LanguageClient } from './languageClient'
 import { collectRunningExperimentPids } from './experiments/processExecution/collect'
 import { DvcViewer } from './cli/dvc/viewer'
-import { registerSetupCommands } from './setup/register'
+import { registerSetupCommands } from './setup/commands/register'
 import { Status } from './status'
 import { registerPersistenceCommands } from './persistence/register'
-import { esmPackagesImported } from './util/esm'
 
 class Extension extends Disposable {
   protected readonly internalCommands: InternalCommands
@@ -304,8 +303,7 @@ class Extension extends Disposable {
 
 let extension: undefined | Extension
 
-export async function activate(context: ExtensionContext): Promise<void> {
-  await esmPackagesImported
+export function activate(context: ExtensionContext): void {
   extension = new Extension(context)
   context.subscriptions.push(extension)
 }

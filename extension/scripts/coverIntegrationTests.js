@@ -1,10 +1,6 @@
 const { resolve, join } = require('path')
 const { writeFileSync } = require('fs-extra')
-
-const getExeca = async () => {
-  const { execa } = await import('execa')
-  return execa
-}
+const execa = require('execa')
 
 let activationEvents = []
 let failed
@@ -22,7 +18,7 @@ activationEvents = packageJson.activationEvents
 packageJson.activationEvents = ['onStartupFinished']
 writeFileSync(packageJsonPath, JSON.stringify(packageJson))
 
-getExeca().then(async execa => {
+const runCover = async () => {
   const tests = execa('node', [join(cwd, 'dist', 'test', 'runTest.js')], {
     cwd
   })
@@ -43,4 +39,6 @@ getExeca().then(async execa => {
   if (failed) {
     process.exit(1)
   }
-})
+}
+
+runCover()

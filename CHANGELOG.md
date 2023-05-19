@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.18] - 2023-05-19
+
+### 🚀 New Features and Enhancements
+
+- Add command to add remote [#3929](https://github.com/iterative/vscode-dvc/pull/3929) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix row selection (duplicate experiments) [#3921](https://github.com/iterative/vscode-dvc/pull/3921) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Rename remote folder to remotes [#3930](https://github.com/iterative/vscode-dvc/pull/3930) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.8.17] - 2023-05-19
+
+### 🐛 Bug Fixes
+
+- Fix extension initialization on Windows (esm imports broken) [#3937](https://github.com/iterative/vscode-dvc/pull/3937) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Fix test console errors (add tbody) [#3927](https://github.com/iterative/vscode-dvc/pull/3927) by [@mattseddon](https://github.com/mattseddon)
+- Increase timeout of flaky test [#3923](https://github.com/iterative/vscode-dvc/pull/3923) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.8.16] - 2023-05-18
+
+### 🚀 New Features and Enhancements
+
+- Add setup warning about latest tested version  [#3895](https://github.com/iterative/vscode-dvc/pull/3895) by [@julieg18](https://github.com/julieg18)
+- Add upgrade dvc button to setup when incompatible [#3904](https://github.com/iterative/vscode-dvc/pull/3904) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (2.57.2) [#3931](https://github.com/iterative/vscode-dvc/pull/3931) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.8.15] - 2023-05-18
 
 ### 🐛 Bug Fixes

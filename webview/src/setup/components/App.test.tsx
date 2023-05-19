@@ -792,10 +792,32 @@ describe('App', () => {
         }
       })
 
-      const setupDVCButton = screen.getByText('Connect to Remote Storage')
+      const title = screen.getByText('Connect to Remote Storage')
 
-      expect(setupDVCButton).toBeInTheDocument()
-      expect(setupDVCButton).toBeVisible()
+      expect(title).toBeInTheDocument()
+      expect(title).toBeVisible()
+    })
+
+    it('should allow the user to connect a remote if they do not already have one', () => {
+      renderApp({
+        remoteList: { demo: undefined, 'example-get-started': undefined },
+        sectionCollapsed: {
+          [SetupSection.DVC]: true,
+          [SetupSection.EXPERIMENTS]: true,
+          [SetupSection.REMOTES]: false,
+          [SetupSection.STUDIO]: true
+        }
+      })
+      mockPostMessage.mockReset()
+      const startButton = screen.getByText('Add Remote')
+
+      expect(startButton).toBeInTheDocument()
+      expect(startButton).toBeVisible()
+      fireEvent.click(startButton)
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.REMOTE_ADD
+      })
     })
 
     it('should show the list of remotes if there is only one project in the workspace', () => {

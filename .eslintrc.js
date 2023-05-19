@@ -3,6 +3,7 @@ module.exports = {
   env: {
     'jest/globals': true
   },
+
   extends: [
     'prettier-standard/prettier-file',
     'plugin:@typescript-eslint/eslint-recommended',
@@ -22,7 +23,8 @@ module.exports = {
     '**/*.js',
     '*.d.ts',
     'tsconfig.json',
-    'webpack.config.ts'
+    'webpack.config.ts',
+    'scripts/virtualenv-install.ts'
   ],
   overrides: [
     {

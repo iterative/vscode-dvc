@@ -38,6 +38,7 @@ export enum Command {
 }
 
 export enum SubCommand {
+  ADD = 'add',
   DIFF = 'diff',
   LIST = 'list',
   STATUS = 'status',
@@ -47,13 +48,15 @@ export enum SubCommand {
 export enum Flag {
   ALL_COMMITS = '-A',
   FOLLOW = '-f',
+  DEFAULT = '-d',
   FORCE = '-f',
   GLOBAL = '--global',
   GRANULAR = '--granular',
-  LOCAL = '--local',
   JOBS = '-j',
   JSON = '--json',
   KILL = '--kill',
+  LOCAL = '--local',
+  PROJECT = '--project',
   NUM_COMMIT = '-n',
   OUTPUT_PATH = '-o',
   SUBDIRECTORY = '--subdir',

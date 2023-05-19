@@ -5,7 +5,6 @@ import { getProcessPlatform } from '../env'
 
 jest.mock('../env')
 jest.mock('../process/execution')
-jest.mock('../util/esm')
 
 const mockedGetProcessPlatform = jest.mocked(getProcessPlatform)
 const mockedCreateProcess = jest.mocked(createProcess)
