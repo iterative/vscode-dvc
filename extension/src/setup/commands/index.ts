@@ -18,21 +18,18 @@ const noExistingOrUserConfirms = async (
     SubCommand.LIST
   )
 
-  let yesOrNo
-  if (remoteList) {
-    yesOrNo = await quickPickYesOrNo(
-      'make this new remote the default',
-      'the current default is correct',
-      {
-        placeHolder: 'Would you like to set this new remote as the default?',
-        title: Title.SET_REMOTE_AS_DEFAULT
-      }
-    )
-    if (yesOrNo === undefined) {
-      return
-    }
+  if (!remoteList) {
+    return true
   }
-  return !remoteList || yesOrNo
+
+  return await quickPickYesOrNo(
+    'make this new remote the default',
+    'keep the current default',
+    {
+      placeHolder: 'Would you like to set this new remote as the default?',
+      title: Title.SET_REMOTE_AS_DEFAULT
+    }
+  )
 }
 
 const addRemoteToProject = async (
