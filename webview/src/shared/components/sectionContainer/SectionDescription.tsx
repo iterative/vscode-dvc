@@ -58,7 +58,7 @@ export const SectionDescriptionMainText = {
     </>
   ),
   // Setup Get Started
-  [SetupSection.GET_STARTED]: <>Get started with the VsCode DVC extension</>,
+  [SetupSection.GET_STARTED]: <>Get started with the extension</>,
   // Setup DVC
   [SetupSection.DVC]: <>Configure the extension to start working with DVC.</>,
   // Setup Experiments

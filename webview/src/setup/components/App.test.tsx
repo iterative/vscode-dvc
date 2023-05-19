@@ -294,6 +294,7 @@ describe('App', () => {
         projectInitialized: false,
         sectionCollapsed: {
           [SetupSection.DVC]: false,
+          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: true,
           [SetupSection.STUDIO]: true
@@ -701,6 +702,7 @@ describe('App', () => {
         isStudioConnected: true,
         sectionCollapsed: {
           [SetupSection.DVC]: false,
+          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: true,
           [SetupSection.STUDIO]: true
@@ -723,6 +725,7 @@ describe('App', () => {
         isStudioConnected: true,
         sectionCollapsed: {
           [SetupSection.DVC]: true,
+          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: false,
           [SetupSection.REMOTES]: true,
           [SetupSection.STUDIO]: true
@@ -745,6 +748,7 @@ describe('App', () => {
         isStudioConnected: true,
         sectionCollapsed: {
           [SetupSection.DVC]: true,
+          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: true,
           [SetupSection.STUDIO]: false
@@ -769,6 +773,7 @@ describe('App', () => {
         remoteList: undefined,
         sectionCollapsed: {
           [SetupSection.DVC]: true,
+          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: false,
           [SetupSection.STUDIO]: true
@@ -786,6 +791,7 @@ describe('App', () => {
         remoteList: { demo: undefined, 'example-get-started': undefined },
         sectionCollapsed: {
           [SetupSection.DVC]: true,
+          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: false,
           [SetupSection.STUDIO]: true
@@ -803,6 +809,7 @@ describe('App', () => {
         remoteList: { demo: undefined, 'example-get-started': undefined },
         sectionCollapsed: {
           [SetupSection.DVC]: true,
+          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: false,
           [SetupSection.STUDIO]: true
@@ -827,6 +834,7 @@ describe('App', () => {
         },
         sectionCollapsed: {
           [SetupSection.DVC]: true,
+          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: false,
           [SetupSection.STUDIO]: true
@@ -854,6 +862,7 @@ describe('App', () => {
         },
         sectionCollapsed: {
           [SetupSection.DVC]: true,
+          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: false,
           [SetupSection.STUDIO]: true

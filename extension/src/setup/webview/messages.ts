@@ -73,6 +73,8 @@ export class WebviewMessages {
         return commands.executeCommand(RegisteredCliCommands.INIT)
       case MessageFromWebviewType.INITIALIZE_GIT:
         return this.gitInit()
+      case MessageFromWebviewType.SHOW_WALKTHROUGH:
+        return commands.executeCommand(RegisteredCommands.EXTENSION_GET_STARTED)
       case MessageFromWebviewType.SHOW_SCM_PANEL:
         return this.showScmForCommit()
       case MessageFromWebviewType.SELECT_PYTHON_INTERPRETER:
