@@ -12,6 +12,7 @@ import { ContextMenu } from '../../../../shared/components/contextMenu/ContextMe
 import { HandlerFunc } from '../../../../util/props'
 import { ExperimentsState } from '../../../store'
 import { toggleExperiment, toggleStarred } from '../../../util/messages'
+import { getCompositeId } from '../../../util/rows'
 
 export type BatchSelectionProp = {
   batchRowSelection: (prop: RowProp) => void
@@ -24,14 +25,15 @@ export const RowContent: React.FC<
     (state: ExperimentsState) => state.tableData.changes
   )
   const { getVisibleCells, original, index, getIsExpanded, subRows } = row
-  const { displayColor, error, starred, id, status, selected } = original
+  const { branch, displayColor, error, starred, id, status, selected } =
+    original
   const [firstCell, ...cells] = getVisibleCells()
   const isWorkspace = id === EXPERIMENT_WORKSPACE_ID
   const changesIfWorkspace = isWorkspace ? changes : undefined
 
   const { toggleRowSelected, selectedRows } = useContext(RowSelectionContext)
 
-  const isRowSelected = !!selectedRows[id]
+  const isRowSelected = !!selectedRows[getCompositeId(id, branch)]
 
   const toggleRowSelection = useCallback<HandlerFunc<HTMLElement>>(
     args => {
@@ -52,7 +54,12 @@ export const RowContent: React.FC<
       subRows?.filter(subRow => subRow.original.selected).length ?? 0
 
     const selections =
-      subRows?.filter(subRow => selectedRows[subRow.original.id]).length ?? 0
+      subRows?.filter(
+        subRow =>
+          selectedRows[
+            getCompositeId(subRow.original.id, subRow.original.branch)
+          ]
+      ).length ?? 0
 
     return {
       plotSelections,
