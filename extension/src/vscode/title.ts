@@ -6,6 +6,8 @@ export enum Title {
   ENTER_EXPERIMENT_WORKER_COUNT = 'Enter the Number of Queue Workers',
   ENTER_FILTER_VALUE = 'Enter a Filter Value',
   ENTER_RELATIVE_DESTINATION = 'Enter a Destination Relative to the Root',
+  ENTER_REMOTE_NAME = 'Enter a Name for the Remote',
+  ENTER_REMOTE_URL = 'Enter the URL for the Remote',
   ENTER_PATH_OR_CHOOSE_FILE = 'Enter the path to your training script or select it',
   ENTER_STUDIO_USERNAME = 'Enter your Studio username',
   ENTER_STUDIO_TOKEN = 'Enter your Studio access token',
@@ -36,7 +38,8 @@ export enum Title {
   SELECT_SORTS_TO_REMOVE = 'Select Sort(s) to Remove',
   SELECT_TRAINING_SCRIPT = 'Select your training script',
   SETUP_WORKSPACE = 'Setup the Workspace',
-  SET_EXPERIMENTS_HEADER_HEIGHT = 'Set Maximum Experiment Table Header Height'
+  SET_EXPERIMENTS_HEADER_HEIGHT = 'Set Maximum Experiment Table Header Height',
+  SET_REMOTE_AS_DEFAULT = 'Set Default Remote'
 }
 
 export const getEnterValueTitle = (path: string): Title =>

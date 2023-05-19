@@ -52,3 +52,6 @@ export const saveStudioToken = () =>
 
 export const removeStudioToken = () =>
   sendMessage({ type: MessageFromWebviewType.REMOVE_STUDIO_TOKEN })
+
+export const addRemote = () =>
+  sendMessage({ type: MessageFromWebviewType.REMOTE_ADD })

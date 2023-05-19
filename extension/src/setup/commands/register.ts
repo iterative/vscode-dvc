@@ -1,10 +1,14 @@
 import { commands } from 'vscode'
-import { Setup } from '.'
-import { run } from './runner'
-import { SetupSection } from './webview/contract'
-import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
-import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
+import { getAddRemoteCommand } from '.'
+import { Setup } from '..'
+import { run } from '../runner'
+import { SetupSection } from '../webview/contract'
+import { AvailableCommands, InternalCommands } from '../../commands/internal'
+import {
+  RegisteredCliCommands,
+  RegisteredCommands
+} from '../../commands/external'
+import { getFirstWorkspaceFolder } from '../../vscode/workspaceFolders'
 
 const registerSetupConfigCommands = (
   setup: Setup,
@@ -98,6 +102,11 @@ export const registerSetupCommands = (
         await internalCommands.executeCommand(AvailableCommands.INIT, root)
       }
     }
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.REMOTE_ADD,
+    getAddRemoteCommand(setup, internalCommands)
   )
 
   registerSetupConfigCommands(setup, internalCommands)
