@@ -453,6 +453,26 @@ describe('App', () => {
     })
   })
 
+  describe('Get Started', () => {
+    it('should show a button that takes the user to the "Get Started" walkthrough', () => {
+      renderApp()
+
+      expect(
+        within(screen.getByTestId('get-started-section-details')).getAllByText(
+          'Get Started'
+        )
+      ).toHaveLength(2)
+      const walkthroughButton = screen.getByText('Show Walkthrough')
+
+      expect(walkthroughButton).toBeInTheDocument()
+
+      fireEvent.click(walkthroughButton)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SHOW_WALKTHROUGH
+      })
+    })
+  })
+
   describe('Experiments', () => {
     it('should show a screen saying that dvc is not setup if the project is not initialized', () => {
       renderApp({
