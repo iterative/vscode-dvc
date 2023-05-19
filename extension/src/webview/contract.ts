@@ -63,6 +63,7 @@ export enum MessageFromWebviewType {
   INITIALIZE_GIT = 'initialize-git',
   SHOW_SCM_PANEL = 'show-scm-panel',
   INSTALL_DVC = 'install-dvc',
+  UPGRADE_DVC = 'upgrade-dvc',
   SETUP_WORKSPACE = 'setup-workspace',
   ZOOM_PLOT = 'zoom-plot',
   SHOW_MORE_COMMITS = 'show-more-commits',
@@ -216,6 +217,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.INITIALIZE_GIT }
   | { type: MessageFromWebviewType.SHOW_SCM_PANEL }
   | { type: MessageFromWebviewType.INSTALL_DVC }
+  | { type: MessageFromWebviewType.UPGRADE_DVC }
   | { type: MessageFromWebviewType.SETUP_WORKSPACE }
   | { type: MessageFromWebviewType.OPEN_STUDIO }
   | { type: MessageFromWebviewType.OPEN_STUDIO_PROFILE }

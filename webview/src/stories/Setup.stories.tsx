@@ -16,6 +16,7 @@ const DEFAULT_DATA: SetupData = {
     version: '1.0.0'
   },
   hasData: false,
+  isAboveLatestTestedVersion: false,
   isPythonExtensionUsed: true,
   isStudioConnected: true,
   needsGitCommit: false,
@@ -146,6 +147,11 @@ DvcUninitialized.args = getUpdatedArgs({
 export const CliFoundManually = Template.bind({})
 CliFoundManually.args = getUpdatedArgs({
   isPythonExtensionUsed: false
+})
+
+export const CliAboveLatestTested = Template.bind({})
+CliAboveLatestTested.args = getUpdatedArgs({
+  isAboveLatestTestedVersion: true
 })
 
 export const NoRemoteSetup = Template.bind({})

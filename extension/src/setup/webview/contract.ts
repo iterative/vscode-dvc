@@ -21,6 +21,7 @@ export type SetupData = {
   remoteList: RemoteList
   sectionCollapsed: typeof DEFAULT_SECTION_COLLAPSED | undefined
   shareLiveToStudio: boolean
+  isAboveLatestTestedVersion: boolean | undefined
 }
 
 export enum SetupSection {

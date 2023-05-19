@@ -5,7 +5,7 @@ import { window } from 'vscode'
 import { Disposable } from '../../../extension'
 import * as PythonExtension from '../../../extensions/python'
 import * as Python from '../../../python'
-import { autoInstallDvc } from '../../../setup/autoInstall'
+import { autoInstallDvc, autoUpgradeDvc } from '../../../setup/autoInstall'
 import * as WorkspaceFolders from '../../../vscode/workspaceFolders'
 import { bypassProgressCloseDelay } from '../util'
 import { Toast } from '../../../vscode/toast'
@@ -23,9 +23,98 @@ suite('Auto Install Test Suite', () => {
     disposable.dispose()
   })
 
-  describe('autoInstallDvc', () => {
-    const defaultPython = getDefaultPython()
+  const defaultPython = getDefaultPython()
 
+  describe('autoUpgradeDvc', () => {
+    it('should return early if no Python interpreter is found', async () => {
+      stub(PythonExtension, 'getPythonExecutionDetails').resolves(undefined)
+      stub(Python, 'findPythonBin').resolves(undefined)
+      const mockInstallPackages = stub(Python, 'installPackages').resolves(
+        undefined
+      )
+
+      const showProgressSpy = spy(window, 'withProgress')
+      const showErrorSpy = spy(window, 'showErrorMessage')
+
+      await autoUpgradeDvc()
+
+      expect(showProgressSpy).not.to.be.called
+      expect(showErrorSpy).to.be.called
+      expect(mockInstallPackages).not.to.be.called
+    })
+
+    it('should return early if there is no workspace folder open', async () => {
+      stub(PythonExtension, 'getPythonExecutionDetails').resolves(undefined)
+      stub(Python, 'findPythonBin').resolves(defaultPython)
+      const mockInstallPackages = stub(Python, 'installPackages').resolves(
+        undefined
+      )
+      stub(WorkspaceFolders, 'getFirstWorkspaceFolder').returns(undefined)
+
+      const showProgressSpy = spy(window, 'withProgress')
+      const showErrorSpy = spy(window, 'showErrorMessage')
+
+      await autoUpgradeDvc()
+
+      expect(showProgressSpy).not.to.be.called
+      expect(showErrorSpy).to.be.called
+      expect(mockInstallPackages).not.to.be.called
+    })
+
+    it('should install DVC if a Python interpreter is found', async () => {
+      bypassProgressCloseDelay()
+      const cwd = __dirname
+      stub(PythonExtension, 'getPythonExecutionDetails').resolves(undefined)
+      stub(Python, 'findPythonBin').resolves(defaultPython)
+      const mockInstallPackages = stub(Python, 'installPackages').resolves(
+        undefined
+      )
+      stub(WorkspaceFolders, 'getFirstWorkspaceFolder').returns(cwd)
+
+      const showProgressSpy = spy(window, 'withProgress')
+      const showErrorSpy = spy(window, 'showErrorMessage')
+
+      await autoUpgradeDvc()
+
+      expect(showProgressSpy).to.be.called
+      expect(showErrorSpy).not.to.be.called
+      expect(mockInstallPackages).to.be.called
+      expect(mockInstallPackages).to.be.calledWithExactly(
+        cwd,
+        defaultPython,
+        'dvc'
+      )
+    })
+
+    it('should show an error message if DVC fails to install', async () => {
+      bypassProgressCloseDelay()
+      const cwd = __dirname
+      stub(PythonExtension, 'getPythonExecutionDetails').resolves(undefined)
+      stub(Python, 'findPythonBin').resolves(defaultPython)
+      const mockInstallPackages = stub(Python, 'installPackages')
+        .onFirstCall()
+        .rejects(new Error('Network error'))
+      stub(WorkspaceFolders, 'getFirstWorkspaceFolder').returns(cwd)
+
+      const showProgressSpy = spy(window, 'withProgress')
+      const showErrorSpy = spy(window, 'showErrorMessage')
+      const reportProgressErrorSpy = spy(Toast, 'reportProgressError')
+
+      await autoUpgradeDvc()
+
+      expect(showProgressSpy).to.be.called
+      expect(showErrorSpy).not.to.be.called
+      expect(reportProgressErrorSpy).to.be.calledOnce
+      expect(mockInstallPackages).to.be.called
+      expect(mockInstallPackages).to.be.calledWithExactly(
+        cwd,
+        defaultPython,
+        'dvc'
+      )
+    })
+  })
+
+  describe('autoInstallDvc', () => {
     it('should return early if no Python interpreter is found', async () => {
       stub(PythonExtension, 'getPythonExecutionDetails').resolves(undefined)
       stub(Python, 'findPythonBin').resolves(undefined)

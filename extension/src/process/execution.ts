@@ -2,9 +2,10 @@ import { ChildProcess } from 'child_process'
 import { Readable } from 'stream'
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
+import execa from 'execa'
+import doesProcessExist from 'process-exists'
 import kill from 'tree-kill'
 import { getProcessPlatform } from '../env'
-import { doesProcessExist, execa } from '../util/esm'
 
 interface RunningProcess extends ChildProcess {
   all?: Readable

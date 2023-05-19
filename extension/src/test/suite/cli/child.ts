@@ -4,15 +4,13 @@ import { delay } from '../../../util/time'
 
 require('../../../vscode/mockModule')
 
-const importModuleAfterMockingVsCode = async () => {
+const importModuleAfterMockingVsCode = () => {
   const { Cli } = require('../../../cli')
-  const { esmPackagesImported } = require('../../../util/esm')
-  await esmPackagesImported
   return { Cli }
 }
 
 const main = async () => {
-  const { Cli } = await importModuleAfterMockingVsCode()
+  const { Cli } = importModuleAfterMockingVsCode()
 
   const cli = new Cli()
 
