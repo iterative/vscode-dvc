@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { join, resolve } from 'path'
 require('dvc/src/vscode/mockModule')
 

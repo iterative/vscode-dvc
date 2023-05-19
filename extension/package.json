@@ -101,6 +101,12 @@
         "icon": "$(add)"
       },
       {
+        "title": "Add Remote",
+        "command": "dvc.addRemote",
+        "category": "DVC",
+        "icon": "$(add)"
+      },
+      {
         "title": "Filter Experiments Table to Starred",
         "command": "dvc.addStarredExperimentsTableFilter",
         "category": "DVC",
@@ -653,6 +659,10 @@
         {
           "command": "dvc.addExperimentsTableSort",
           "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.addRemote",
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace"
         },
         {
           "command": "dvc.addStarredExperimentsTableFilter",

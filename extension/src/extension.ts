@@ -47,7 +47,7 @@ import { Flag } from './cli/dvc/constants'
 import { LanguageClient } from './languageClient'
 import { collectRunningExperimentPids } from './experiments/processExecution/collect'
 import { DvcViewer } from './cli/dvc/viewer'
-import { registerSetupCommands } from './setup/register'
+import { registerSetupCommands } from './setup/commands/register'
 import { Status } from './status'
 import { registerPersistenceCommands } from './persistence/register'
 

@@ -51,6 +51,7 @@ export enum MessageFromWebviewType {
   SET_EXPERIMENTS_AND_OPEN_PLOTS = 'set-experiments-and-open-plots',
   SET_STUDIO_SHARE_EXPERIMENTS_LIVE = 'set-studio-share-experiments-live',
   TOGGLE_PLOTS_SECTION = 'toggle-plots-section',
+  REMOTE_ADD = 'remote-add',
   REMOVE_CUSTOM_PLOTS = 'remove-custom-plots',
   REMOVE_STUDIO_TOKEN = 'remove-studio-token',
   MODIFY_EXPERIMENT_PARAMS_AND_QUEUE = 'modify-experiment-params-and-queue',
@@ -160,6 +161,7 @@ export type MessageFromWebview =
       type: MessageFromWebviewType.REMOVE_COLUMN_SORT
       payload: string
     }
+  | { type: MessageFromWebviewType.REMOTE_ADD }
   | {
       type: MessageFromWebviewType.REMOVE_CUSTOM_PLOTS
     }

@@ -41,6 +41,8 @@ export enum RegisteredCliCommands {
   REMOVE_TARGET = 'dvc.removeTarget',
   RENAME_TARGET = 'dvc.renameTarget',
 
+  REMOTE_ADD = 'dvc.addRemote',
+
   GIT_STAGE_ALL = 'dvc.gitStageAll',
   GIT_UNSTAGE_ALL = 'dvc.gitUnstageAll'
 }

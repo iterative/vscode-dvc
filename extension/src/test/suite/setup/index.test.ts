@@ -69,6 +69,7 @@ suite('Setup Test Suite', () => {
     ])
   })
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('Setup', () => {
     it('should handle an initialize git message from the webview', async () => {
       const { messageSpy, setup, mockInitializeGit } = buildSetup(disposable)
@@ -841,6 +842,103 @@ suite('Setup Test Suite', () => {
 
       await showWebviewCalled
       expect(mockShowWebview).to.be.calledOnce
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a message to add a remote', async () => {
+      const { messageSpy, setup, mockExecuteCommand } = buildSetup(disposable)
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+      mockExecuteCommand.restore()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const mockRemote = stub(DvcExecutor.prototype, 'remote')
+
+      const remoteAdded = new Promise(resolve =>
+        mockRemote.callsFake((cwd, ...args) => {
+          if (args.includes('add')) {
+            resolve(undefined)
+          }
+          return Promise.resolve('')
+        })
+      )
+
+      const mockShowInputBox = stub(window, 'showInputBox')
+        .onFirstCall()
+        .resolves('storage')
+        .onSecondCall()
+        .resolves('s3://my-bucket')
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.REMOTE_ADD
+      })
+
+      await remoteAdded
+
+      expect(mockShowInputBox).to.be.calledTwice
+      expect(
+        mockRemote,
+        'new remote is set as the default'
+      ).to.be.calledWithExactly(
+        dvcDemoPath,
+        'add',
+        '-d',
+        '--project',
+        'storage',
+        's3://my-bucket'
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should be able to add a remote', async () => {
+      const mockRemote = stub(DvcExecutor.prototype, 'remote')
+
+      const remoteAdded = new Promise(resolve =>
+        mockRemote.callsFake((cwd, ...args) => {
+          if (args.includes('list')) {
+            return Promise.resolve('storage s3://my-bucket')
+          }
+
+          if (args.includes('add')) {
+            resolve(undefined)
+          }
+          return Promise.resolve('')
+        })
+      )
+
+      const mockShowInputBox = stub(window, 'showInputBox')
+        .onFirstCall()
+        .resolves('backup')
+        .onSecondCall()
+        .resolves('s3://my-backup-bucket')
+
+      const mockShowQuickPick = (
+        stub(window, 'showQuickPick') as SinonStub<
+          [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
+          Thenable<QuickPickItemWithValue<boolean> | undefined>
+        >
+      ).resolves({
+        label: 'No',
+        value: false
+      })
+
+      await commands.executeCommand(RegisteredCliCommands.REMOTE_ADD)
+
+      await remoteAdded
+
+      expect(mockShowInputBox).to.be.calledTwice
+      expect(mockShowQuickPick).to.be.calledOnce
+      expect(
+        mockRemote,
+        'should not set a remote as the default unless the user explicitly chooses to'
+      ).to.be.calledWithExactly(
+        dvcDemoPath,
+        'add',
+        '--project',
+        'backup',
+        's3://my-backup-bucket'
+      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should send the appropriate messages to the webview to focus different sections', async () => {
