@@ -9,6 +9,7 @@ import { Dvc } from './dvc/Dvc'
 import { Experiments } from './experiments/Experiments'
 import { Studio } from './studio/Studio'
 import { SetupContainer } from './SetupContainer'
+import { GetStarted } from './GetStarted'
 import { Remotes } from './remotes/Remotes'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 import { sendMessage } from '../../shared/vscode'
@@ -170,6 +171,13 @@ export const App: React.FC = () => {
         }
       >
         <Dvc />
+      </SetupContainer>
+      <SetupContainer
+        sectionKey={SetupSection.GET_STARTED}
+        title="Get Started"
+        icon={TooltipIconType.INFO}
+      >
+        <GetStarted />
       </SetupContainer>
       <SetupContainer
         sectionKey={SetupSection.EXPERIMENTS}
