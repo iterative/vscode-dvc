@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.18] - 2023-05-19
+
+### 🚀 New Features and Enhancements
+
+- Add command to add remote [#3929](https://github.com/iterative/vscode-dvc/pull/3929) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix row selection (duplicate experiments) [#3921](https://github.com/iterative/vscode-dvc/pull/3921) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Rename remote folder to remotes [#3930](https://github.com/iterative/vscode-dvc/pull/3930) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.8.17] - 2023-05-19
 
 ### 🐛 Bug Fixes
