@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.17] - 2023-05-19
+
+### 🐛 Bug Fixes
+
+- Fix extension initialization on Windows (esm imports broken) [#3937](https://github.com/iterative/vscode-dvc/pull/3937) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Fix test console errors (add tbody) [#3927](https://github.com/iterative/vscode-dvc/pull/3927) by [@mattseddon](https://github.com/mattseddon)
+- Increase timeout of flaky test [#3923](https://github.com/iterative/vscode-dvc/pull/3923) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.8.16] - 2023-05-18
 
 ### 🚀 New Features and Enhancements
