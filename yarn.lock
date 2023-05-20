@@ -10279,13 +10279,13 @@ eslint-module-utils@^2.7.4:
   dependencies:
     debug "^3.2.7"
 
-eslint-plugin-check-file@2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-check-file/-/eslint-plugin-check-file-2.2.0.tgz#000b59175077411ff7c353ce38218ae736c22b60"
-  integrity sha512-1eUUqM4ZavOAZd9VNOjb8ZbZ/ym9t8Wu7ur59hQ0kfB+8TX8Kw4FD1kgWOVmKF/HVginGnqdiH/Px2ZXFgrtaA==
+eslint-plugin-check-file@2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-check-file/-/eslint-plugin-check-file-2.3.0.tgz#2efd46c89e45367593c589ac5d69544e8c4c6993"
+  integrity sha512-oTaKN2bdBJO8YpiuixhRgQwIPI3gXKHrgYWhO3POsXuwcXimPXUTqhgbPZpdndpgdD9GJn61y1F2s4S4Z0/xxA==
   dependencies:
     is-glob "^4.0.3"
-    micromatch "^4.0.4"
+    micromatch "^4.0.5"
     requireindex "^1.2.0"
 
 eslint-plugin-es@^3.0.0:
