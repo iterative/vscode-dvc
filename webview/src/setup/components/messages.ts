@@ -1,6 +1,10 @@
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { sendMessage } from '../../shared/vscode'
 
+export const showWalkthrough = () => {
+  sendMessage({ type: MessageFromWebviewType.SHOW_WALKTHROUGH })
+}
+
 export const checkCompatibility = () => {
   sendMessage({ type: MessageFromWebviewType.CHECK_CLI_COMPATIBLE })
 }

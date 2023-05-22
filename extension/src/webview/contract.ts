@@ -38,6 +38,7 @@ export enum MessageFromWebviewType {
   RESIZE_PLOTS = 'resize-plots',
   SAVE_STUDIO_TOKEN = 'save-studio-token',
   SHOW_EXPERIMENT_LOGS = 'show-experiment-logs',
+  SHOW_WALKTHROUGH = 'show-walkthrough',
   STOP_EXPERIMENTS = 'stop-experiments',
   SORT_COLUMN = 'sort-column',
   TOGGLE_EXPERIMENT = 'toggle-experiment',
@@ -215,6 +216,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.CHECK_CLI_COMPATIBLE }
   | { type: MessageFromWebviewType.INITIALIZE_DVC }
   | { type: MessageFromWebviewType.INITIALIZE_GIT }
+  | { type: MessageFromWebviewType.SHOW_WALKTHROUGH }
   | { type: MessageFromWebviewType.SHOW_SCM_PANEL }
   | { type: MessageFromWebviewType.INSTALL_DVC }
   | { type: MessageFromWebviewType.UPGRADE_DVC }
