@@ -50,6 +50,7 @@ import { DvcViewer } from './cli/dvc/viewer'
 import { registerSetupCommands } from './setup/commands/register'
 import { Status } from './status'
 import { registerPersistenceCommands } from './persistence/register'
+import { showSetupOrExecuteCommand } from './commands/util'
 
 class Extension extends Disposable {
   protected readonly internalCommands: InternalCommands
@@ -194,15 +195,11 @@ class Extension extends Disposable {
     registerSetupCommands(this.setup, this.internalCommands)
     this.internalCommands.registerExternalCommand(
       RegisteredCommands.EXPERIMENT_AND_PLOTS_SHOW,
-      async (context: VsCodeContext) => {
-        if (this.setup.shouldBeShown()) {
-          await commands.executeCommand(RegisteredCommands.SETUP_SHOW)
-          return
-        }
+      showSetupOrExecuteCommand(this.setup, async (context: VsCodeContext) => {
         const dvcRoot = getDvcRootFromContext(context)
         await this.experiments.showWebview(dvcRoot, ViewColumn.Active)
         await this.plots.showWebview(dvcRoot, ViewColumn.Beside)
-      }
+      })
     )
 
     this.dispose.track(

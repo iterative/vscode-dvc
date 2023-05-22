@@ -1185,8 +1185,10 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to compare experiments plots', async () => {
-      const mockShouldBeShown = stub(Setup.prototype, 'shouldBeShown')
-      mockShouldBeShown.returns(false)
+      const mockIsDvcSetup = stub(Setup.prototype, 'isDvcSetup')
+      mockIsDvcSetup.returns(true)
+      const mockIsExperimentsSetup = stub(Setup.prototype, 'isExperimentsSetup')
+      mockIsExperimentsSetup.returns(true)
       const { experiments, experimentsModel } = buildExperiments(disposable)
       const mockShowPlots = stub(WorkspacePlots.prototype, 'showWebview')
 

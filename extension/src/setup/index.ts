@@ -244,8 +244,12 @@ export class Setup
     return !!this.webview?.isActive
   }
 
-  public shouldBeShown() {
-    return !this.getCliCompatible() || !this.hasRoots() || !this.getHasData()
+  public isDvcSetup() {
+    return this.getCliCompatible() && this.hasRoots()
+  }
+
+  public isExperimentsSetup() {
+    return this.getHasData()
   }
 
   public async selectFocusedProjects() {

@@ -398,7 +398,8 @@ suite('Workspace Experiments Test Suite', () => {
         DvcRunner.prototype,
         'runExperiment'
       ).resolves(undefined)
-      stub(Setup.prototype, 'shouldBeShown').returns(false)
+      stub(Setup.prototype, 'isDvcSetup').returns(true)
+      stub(Setup.prototype, 'isExperimentsSetup').returns(true)
 
       stubWorkspaceExperimentsGetters(dvcDemoPath)
 
@@ -434,7 +435,8 @@ suite('Workspace Experiments Test Suite', () => {
         DvcRunner.prototype,
         'runExperimentReset'
       ).resolves(undefined)
-      stub(Setup.prototype, 'shouldBeShown').returns(false)
+      stub(Setup.prototype, 'isDvcSetup').returns(true)
+      stub(Setup.prototype, 'isExperimentsSetup').returns(true)
 
       stubWorkspaceExperimentsGetters(dvcDemoPath)
 
@@ -917,26 +919,37 @@ suite('Workspace Experiments Test Suite', () => {
   })
 
   describe('dvc.showExperiments', () => {
-    it('should show the setup if it should be shown', async () => {
-      const executeCommandSpy = spy(commands, 'executeCommand')
-
-      stub(Setup.prototype, 'shouldBeShown').returns(true)
-
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
-
-      expect(executeCommandSpy).to.have.been.calledWithMatch('dvc.showDvcSetup')
-    })
-
-    it('should not show the experiments webview if the setup should be shown', async () => {
-      const showPlotsWebviewSpy = stub(
+    it('should show the dvc setup section if dvc is not setup', async () => {
+      const showExperimentsWebviewSpy = stub(
         WorkspaceExperiments.prototype,
         'showWebview'
       )
-      stub(Setup.prototype, 'shouldBeShown').returns(true)
+      const executeCommandSpy = spy(commands, 'executeCommand')
+
+      stub(Setup.prototype, 'isDvcSetup').returns(false)
+      stub(Setup.prototype, 'isExperimentsSetup').returns(false)
 
       await commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
 
-      expect(showPlotsWebviewSpy).not.to.be.called
+      expect(showExperimentsWebviewSpy).not.to.be.called
+      expect(executeCommandSpy).to.have.been.calledWithMatch('dvc.showDvcSetup')
+    })
+
+    it('should show the experiments setup section if dvc is setup but experiments are not', async () => {
+      const showExperimentsWebviewSpy = stub(
+        WorkspaceExperiments.prototype,
+        'showWebview'
+      )
+      const executeCommandSpy = spy(commands, 'executeCommand')
+      stub(Setup.prototype, 'isDvcSetup').returns(true)
+      stub(Setup.prototype, 'isExperimentsSetup').returns(false)
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
+
+      expect(showExperimentsWebviewSpy).not.to.be.called
+      expect(executeCommandSpy).to.have.been.calledWithMatch(
+        'dvc.showExperimentsSetup'
+      )
     })
 
     it('should not show the setup if it should not be shown', async () => {
@@ -944,23 +957,26 @@ suite('Workspace Experiments Test Suite', () => {
 
       stub(WorkspaceExperiments.prototype, 'showWebview').resolves()
 
-      stub(Setup.prototype, 'shouldBeShown').returns(false)
+      stub(Setup.prototype, 'isDvcSetup').returns(true)
+      stub(Setup.prototype, 'isExperimentsSetup').returns(true)
 
       await commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
 
       expect(executeCommandSpy).not.to.be.calledWith('dvc.showDvcSetup')
+      expect(executeCommandSpy).not.to.be.calledWith('dvc.showExperimentsSetup')
     })
 
     it('should show the experiments webview if the setup should not be shown', async () => {
-      const showPlotsWebviewSpy = stub(
+      const showExperimentsWebviewSpy = stub(
         WorkspaceExperiments.prototype,
         'showWebview'
       ).resolves()
-      stub(Setup.prototype, 'shouldBeShown').returns(false)
+      stub(Setup.prototype, 'isDvcSetup').returns(true)
+      stub(Setup.prototype, 'isExperimentsSetup').returns(true)
 
       await commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
 
-      expect(showPlotsWebviewSpy).to.be.called
+      expect(showExperimentsWebviewSpy).to.be.called
     })
   })
 })

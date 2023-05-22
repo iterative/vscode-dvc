@@ -851,7 +851,8 @@ suite('Setup Test Suite', () => {
           return Promise.resolve(undefined)
         })
       )
-      stub(Setup.prototype, 'shouldBeShown').returns(false)
+      stub(Setup.prototype, 'isDvcSetup').returns(true)
+      stub(Setup.prototype, 'isExperimentsSetup').returns(true)
 
       messageSpy.resetHistory()
       mockMessageReceived.fire({
