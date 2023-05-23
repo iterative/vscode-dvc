@@ -67,7 +67,7 @@
     "stylelint": "15.6.1",
     "stylelint-config-standard-scss": "9.0.0",
     "ts-node": "10.9.1",
-    "turbo": "1.9.5",
+    "turbo": "1.9.6",
     "typescript": "5.0.4"
   },
   "resolutions": {
