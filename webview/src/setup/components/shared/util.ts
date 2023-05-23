@@ -3,6 +3,7 @@ import { updateSectionCollapsed } from '../../state/webviewSlice'
 
 const getAllSections = (collapsed: boolean) => ({
   [SetupSection.DVC]: collapsed,
+  [SetupSection.GET_STARTED]: collapsed,
   [SetupSection.EXPERIMENTS]: collapsed,
   [SetupSection.REMOTES]: collapsed,
   [SetupSection.STUDIO]: collapsed

@@ -189,6 +189,24 @@ suite('Setup Test Suite', () => {
       expect(mockExecuteCommand).to.be.calledWithExactly(showScmPanelCommand)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should handle a show walkthrough message from the webview', async () => {
+      const { messageSpy, mockExecuteCommand, setup } = buildSetup(disposable)
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SHOW_WALKTHROUGH
+      })
+
+      expect(mockExecuteCommand).to.be.calledWithExactly(
+        RegisteredCommands.EXTENSION_GET_STARTED
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should handle a setup the workspace message from the webview', async () => {
       const { messageSpy, mockExecuteCommand, setup } = buildSetup(disposable)
 

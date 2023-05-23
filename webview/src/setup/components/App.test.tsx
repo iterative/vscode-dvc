@@ -294,6 +294,7 @@ describe('App', () => {
         projectInitialized: false,
         sectionCollapsed: {
           [SetupSection.DVC]: false,
+          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: true,
           [SetupSection.STUDIO]: true
@@ -449,6 +450,26 @@ describe('App', () => {
           'The located version has not been tested against the extension. If you are experiencing unexpected behaviour, first try to update the extension. If there are no updates available, please downgrade DVC to the same minor version as displayed and reload the window.'
         )
       ).toBeInTheDocument()
+    })
+  })
+
+  describe('Get Started', () => {
+    it('should show a button that takes the user to the "Get Started" walkthrough', () => {
+      renderApp()
+
+      expect(
+        within(screen.getByTestId('get-started-section-details')).getAllByText(
+          'Get Started'
+        )
+      ).toHaveLength(2)
+      const walkthroughButton = screen.getByText('Show Walkthrough')
+
+      expect(walkthroughButton).toBeInTheDocument()
+
+      fireEvent.click(walkthroughButton)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SHOW_WALKTHROUGH
+      })
     })
   })
 
@@ -701,6 +722,7 @@ describe('App', () => {
         isStudioConnected: true,
         sectionCollapsed: {
           [SetupSection.DVC]: false,
+          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: true,
           [SetupSection.STUDIO]: true
@@ -723,6 +745,7 @@ describe('App', () => {
         isStudioConnected: true,
         sectionCollapsed: {
           [SetupSection.DVC]: true,
+          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: false,
           [SetupSection.REMOTES]: true,
           [SetupSection.STUDIO]: true
@@ -745,6 +768,7 @@ describe('App', () => {
         isStudioConnected: true,
         sectionCollapsed: {
           [SetupSection.DVC]: true,
+          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: true,
           [SetupSection.STUDIO]: false
@@ -769,6 +793,7 @@ describe('App', () => {
         remoteList: undefined,
         sectionCollapsed: {
           [SetupSection.DVC]: true,
+          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: false,
           [SetupSection.STUDIO]: true
@@ -786,6 +811,7 @@ describe('App', () => {
         remoteList: { demo: undefined, 'example-get-started': undefined },
         sectionCollapsed: {
           [SetupSection.DVC]: true,
+          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: false,
           [SetupSection.STUDIO]: true
@@ -803,6 +829,7 @@ describe('App', () => {
         remoteList: { demo: undefined, 'example-get-started': undefined },
         sectionCollapsed: {
           [SetupSection.DVC]: true,
+          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: false,
           [SetupSection.STUDIO]: true
@@ -827,6 +854,7 @@ describe('App', () => {
         },
         sectionCollapsed: {
           [SetupSection.DVC]: true,
+          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: false,
           [SetupSection.STUDIO]: true
@@ -854,6 +882,7 @@ describe('App', () => {
         },
         sectionCollapsed: {
           [SetupSection.DVC]: true,
+          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: false,
           [SetupSection.STUDIO]: true
