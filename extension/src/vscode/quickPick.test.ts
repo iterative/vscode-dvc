@@ -105,13 +105,13 @@ describe('quickPickManyValues', () => {
 describe('quickPickOne', () => {
   it('should call window.showQuickPick with the correct arguments', async () => {
     mockedShowQuickPick.mockResolvedValueOnce(undefined)
-    const placeHolder = 'my placeholder'
+    const title = 'my title'
 
-    const noResponse = await quickPickOne(['a', 'b', 'c'], placeHolder)
+    const noResponse = await quickPickOne(['a', 'b', 'c'], title)
 
     expect(mockedShowQuickPick).toHaveBeenCalledWith(['a', 'b', 'c'], {
       canPickMany: false,
-      placeHolder
+      title
     })
     expect(noResponse).toStrictEqual(undefined)
   })

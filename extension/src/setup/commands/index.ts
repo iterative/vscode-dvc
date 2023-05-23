@@ -93,24 +93,15 @@ export const getAddRemoteCommand =
     return addRemoteToProject(internalCommands, dvcRoot)
   }
 
-const getRemoteItems = (remotes: string[]): QuickPickItemWithValue[] => {
-  const acc: QuickPickItemWithValue[] = []
-  for (const remote of remotes) {
-    const [name, url] = remote.split(/\s+/)
-    acc.push({ description: url, label: name, value: name })
-  }
-  return acc
-}
-
-const getOnlyOrPickRemote = async (
-  remotes: string[],
+const getOnlyOrPickRemote = async <T>(
+  remotes: QuickPickItemWithValue<T>[],
   title: Title
-): Promise<string | undefined> => {
+): Promise<T | undefined> => {
   if (remotes.length === 1) {
-    return remotes[0].split(/\s+/)[0]
+    return remotes[0].value
   }
 
-  return await quickPickValue(getRemoteItems(remotes), {
+  return await quickPickValue(remotes, {
     title
   })
 }
@@ -123,7 +114,7 @@ enum ModifyOptions {
 const modifyRemoteName = async (
   internalCommands: InternalCommands,
   dvcRoot: string,
-  remote: string
+  remote: { name: string; config: typeof Flag.LOCAL | typeof Flag.PROJECT }
 ): Promise<void> => {
   const newName = await getInput(Title.ENTER_REMOTE_NAME)
   if (!newName) {
@@ -134,7 +125,8 @@ const modifyRemoteName = async (
       AvailableCommands.REMOTE,
       dvcRoot,
       SubCommand.RENAME,
-      remote,
+      remote.config,
+      remote.name,
       newName
     )
   )
@@ -143,7 +135,7 @@ const modifyRemoteName = async (
 const modifyRemoteUrl = async (
   internalCommands: InternalCommands,
   dvcRoot: string,
-  remote: string
+  remote: { name: string; config: typeof Flag.LOCAL | typeof Flag.PROJECT }
 ): Promise<void> => {
   const newUrl = await getInput(Title.ENTER_REMOTE_URL)
   if (!newUrl) {
@@ -152,9 +144,10 @@ const modifyRemoteUrl = async (
   return await Toast.showOutput(
     internalCommands.executeCommand(
       AvailableCommands.REMOTE,
-      SubCommand.MODIFY,
       dvcRoot,
-      remote,
+      SubCommand.MODIFY,
+      remote.config,
+      remote.name,
       'url',
       newUrl
     )
@@ -164,7 +157,7 @@ const modifyRemoteUrl = async (
 const modifyRemote = async (
   internalCommands: InternalCommands,
   dvcRoot: string,
-  remote: string
+  remote: { name: string; config: typeof Flag.LOCAL | typeof Flag.PROJECT }
 ): Promise<void> => {
   const option = await quickPickOne(
     Object.values(ModifyOptions),
@@ -184,17 +177,60 @@ const modifyRemote = async (
   }
 }
 
+const collectModifyItems = (
+  localRemoteList: string,
+  projectRemoteList: string
+): QuickPickItemWithValue<{
+  config: typeof Flag.LOCAL | typeof Flag.PROJECT
+  name: string
+}>[] => {
+  const acc: QuickPickItemWithValue<{
+    config: typeof Flag.LOCAL | typeof Flag.PROJECT
+    name: string
+  }>[] = []
+  for (const localRemote of trimAndSplit(localRemoteList)) {
+    const config = Flag.LOCAL
+    const [name, url] = localRemote.split(/\s+/)
+    acc.push({
+      description: `(${config.slice(2)} config)`,
+      detail: url,
+      label: `${name}`,
+      value: { config, name }
+    })
+  }
+
+  for (const projectRemote of trimAndSplit(projectRemoteList)) {
+    const config = Flag.PROJECT
+    const [name, url] = projectRemote.split(/\s+/)
+    acc.push({
+      description: `(${config.slice(2)} config)`,
+      detail: url,
+      label: `${name}`,
+      value: { config, name }
+    })
+  }
+  return acc
+}
+
 const pickRemoteAndModify = async (
   internalCommands: InternalCommands,
   dvcRoot: string
 ): Promise<void> => {
-  const remoteList = await internalCommands.executeCommand(
-    AvailableCommands.REMOTE,
-    dvcRoot,
-    SubCommand.LIST
-  )
-
-  const remotes = trimAndSplit(remoteList)
+  const [localRemoteList, projectRemoteList] = await Promise.all([
+    internalCommands.executeCommand(
+      AvailableCommands.REMOTE,
+      dvcRoot,
+      SubCommand.LIST,
+      Flag.LOCAL
+    ),
+    internalCommands.executeCommand(
+      AvailableCommands.REMOTE,
+      dvcRoot,
+      SubCommand.LIST,
+      Flag.PROJECT
+    )
+  ])
+  const remotes = collectModifyItems(localRemoteList, projectRemoteList)
 
   if (!definedAndNonEmpty(remotes)) {
     return Toast.showError('No remotes to modify')
@@ -226,6 +262,15 @@ export const getModifyRemoteCommand =
     return pickRemoteAndModify(internalCommands, dvcRoot)
   }
 
+const collectRemoveItems = (remotes: string[]): QuickPickItemWithValue[] => {
+  const acc: QuickPickItemWithValue[] = []
+  for (const remote of remotes) {
+    const [name, url] = remote.split(/\s+/)
+    acc.push({ detail: url, label: name, value: name })
+  }
+  return acc
+}
+
 const pickRemoteAndRemove = async (
   internalCommands: InternalCommands,
   dvcRoot: string
@@ -243,7 +288,7 @@ const pickRemoteAndRemove = async (
   }
 
   const remote = await getOnlyOrPickRemote(
-    remotes,
+    collectRemoveItems(remotes),
     Title.SELECT_REMOTE_TO_REMOVE
   )
   if (!remote) {
