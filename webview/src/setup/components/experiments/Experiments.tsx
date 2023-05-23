@@ -2,6 +2,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { NoData } from './NoData'
 import { NeedsGitCommit } from './NeedsGitCommit'
+import { DvcLiveExamples } from './DvcLiveExamples'
 import { showExperiments } from '../messages'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { IconButton } from '../../../shared/components/button/IconButton'
@@ -43,12 +44,17 @@ export const Experiments: React.FC<ExperimentsProps> = ({ isDvcSetup }) => {
   return (
     <EmptyState isFullScreen={false}>
       <h1>Setup Complete</h1>
+      <p>
+        Learn more about using DVCLive in the{' '}
+        <a href="https://dvc.org/doc/dvclive">docs</a>.
+      </p>
       <IconButton
         appearance="primary"
         icon={Beaker}
         onClick={showExperiments}
         text="Show Experiments"
       />
+      <DvcLiveExamples />
     </EmptyState>
   )
 }
