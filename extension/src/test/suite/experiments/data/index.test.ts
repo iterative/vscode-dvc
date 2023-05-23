@@ -19,7 +19,10 @@ import {
   InternalCommands
 } from '../../../../commands/internal'
 import { buildExperimentsData } from '../util'
-import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../../../cli/dvc/constants'
+import {
+  DEFAULT_NUM_OF_COMMITS_TO_SHOW,
+  ExperimentFlag
+} from '../../../../cli/dvc/constants'
 import { EXPERIMENTS_GIT_LOGS_REFS } from '../../../../experiments/data/constants'
 import { gitPath } from '../../../../cli/git/constants'
 import * as FileSystem from '../../../../fileSystem'
@@ -184,24 +187,6 @@ suite('Experiments Data Test Suite', () => {
       expect(managedUpdateSpy).to.be.called
     }).timeout(10000)
 
-    it('should call exp show for each branch to show', async () => {
-      stub(ExperimentsData.prototype, 'managedUpdate').resolves()
-      const branchesToShow = [
-        'main',
-        'my-other-branch',
-        'secret-branch',
-        'old-branch'
-      ]
-      const { data, mockExpShow, mockGetBranchesToShow } =
-        buildExperimentsData(disposable)
-
-      mockGetBranchesToShow.returns(branchesToShow)
-
-      await data.update()
-
-      expect(mockExpShow).to.have.callCount(branchesToShow.length)
-    })
-
     it('should prune any old branches to show before calling exp show on them', async () => {
       stub(ExperimentsData.prototype, 'managedUpdate').resolves()
       const branchesToShow = [
@@ -226,11 +211,19 @@ suite('Experiments Data Test Suite', () => {
         'branch-283498'
       )
 
-      mockGetBranchesToShow.returns(['main'])
+      mockGetBranchesToShow.returns([])
 
       await data.update()
 
-      expect(mockExpShow).to.have.callCount(2)
+      expect(mockExpShow).to.have.been.calledWithMatch(
+        dvcDemoPath,
+        ExperimentFlag.REV,
+        'branch-283498~0',
+        ExperimentFlag.REV,
+        'branch-283498~1',
+        ExperimentFlag.REV,
+        'branch-283498~2'
+      )
     })
   })
 })
