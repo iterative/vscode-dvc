@@ -17,7 +17,7 @@ import { Toast } from '../../vscode/toast'
 import { getOnlyOrPickProject } from '../../workspace/util'
 import { extractRemoteDetails } from '../collect'
 
-export const runCallback = async (
+export const runCallbackOnDvcRoot = async (
   setup: Setup,
   internalCommands: InternalCommands,
   callback: (
@@ -120,6 +120,7 @@ enum ModifyOptions {
 type RemoteWithConfig = {
   config: typeof Flag.LOCAL | typeof Flag.PROJECT
   name: string
+  url: string
 }
 
 const modifyRemoteName = async (
@@ -127,7 +128,8 @@ const modifyRemoteName = async (
   dvcRoot: string,
   remote: RemoteWithConfig
 ): Promise<void> => {
-  const newName = await getInput(Title.ENTER_REMOTE_NAME)
+  const { config, name } = remote
+  const newName = await getInput(Title.ENTER_REMOTE_NAME, name)
   if (!newName) {
     return
   }
@@ -136,8 +138,8 @@ const modifyRemoteName = async (
       AvailableCommands.REMOTE,
       dvcRoot,
       SubCommand.RENAME,
-      remote.config,
-      remote.name,
+      config,
+      name,
       newName
     )
   )
@@ -148,7 +150,8 @@ const modifyRemoteUrl = async (
   dvcRoot: string,
   remote: RemoteWithConfig
 ): Promise<void> => {
-  const newUrl = await getInput(Title.ENTER_REMOTE_URL)
+  const { name, config, url } = remote
+  const newUrl = await getInput(Title.ENTER_REMOTE_URL, url)
   if (!newUrl) {
     return
   }
@@ -157,8 +160,8 @@ const modifyRemoteUrl = async (
       AvailableCommands.REMOTE,
       dvcRoot,
       SubCommand.MODIFY,
-      remote.config,
-      remote.name,
+      config,
+      name,
       'url',
       newUrl
     )
@@ -199,7 +202,7 @@ const collectFromRemoteList = (
       description: `(${config.slice(2)} config)`,
       detail: url,
       label: `${name}`,
-      value: { config, name }
+      value: { config, name, url }
     })
   }
 }
@@ -264,7 +267,7 @@ const confirmAndRemove = async (
   remote: string
 ): Promise<void> => {
   const removalConfirmed = await Modal.warnOfConsequences(
-    'Are you sure you want to remove this remote? This could be IRREVERSIBLE!',
+    'Are you sure you want to remove this remote from your config(s)? This could be IRREVERSIBLE!',
     Response.REMOVE
   )
 

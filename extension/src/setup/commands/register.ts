@@ -3,7 +3,7 @@ import {
   addRemoteToProject,
   pickRemoteAndModify,
   pickRemoteAndRemove,
-  runCallback
+  runCallbackOnDvcRoot
 } from '.'
 import { Setup } from '..'
 import { run } from '../runner'
@@ -111,17 +111,17 @@ export const registerSetupCommands = (
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.REMOTE_ADD,
-    () => runCallback(setup, internalCommands, addRemoteToProject)
+    () => runCallbackOnDvcRoot(setup, internalCommands, addRemoteToProject)
   )
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.REMOTE_MODIFY,
-    () => runCallback(setup, internalCommands, pickRemoteAndModify)
+    () => runCallbackOnDvcRoot(setup, internalCommands, pickRemoteAndModify)
   )
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.REMOTE_REMOVE,
-    () => runCallback(setup, internalCommands, pickRemoteAndRemove)
+    () => runCallbackOnDvcRoot(setup, internalCommands, pickRemoteAndRemove)
   )
 
   registerSetupConfigCommands(setup, internalCommands)
