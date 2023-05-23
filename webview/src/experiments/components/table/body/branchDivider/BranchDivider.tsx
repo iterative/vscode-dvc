@@ -3,7 +3,7 @@ import styles from './styles.module.scss'
 import tablesStyles from '../../styles.module.scss'
 import { Icon } from '../../../../../shared/components/Icon'
 import { GitMerge } from '../../../../../shared/components/icons'
-import { CommitsAndBranchesNavigation } from '../commitsAndBranches/CommitsAndBranchesNavigation'
+import { CommitsAndBranchesNavigation } from '../../commitsAndBranches/CommitsAndBranchesNavigation'
 
 interface BranchDividerProps {
   branch: string

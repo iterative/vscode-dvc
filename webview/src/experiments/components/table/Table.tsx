@@ -5,6 +5,7 @@ import styles from './styles.module.scss'
 import { TableHead } from './header/TableHead'
 import { RowSelectionContext } from './RowSelectionContext'
 import { TableContent } from './body/TableContent'
+import { TableFooter } from './TableFooter'
 import { InstanceProp } from '../../util/interfaces'
 
 interface TableProps extends InstanceProp {
@@ -51,6 +52,7 @@ export const Table: React.FC<TableProps> = ({
           tableRef={tableRef}
           tableHeadHeight={tableHeadHeight}
         />
+        <TableFooter />
       </table>
     </div>
   )

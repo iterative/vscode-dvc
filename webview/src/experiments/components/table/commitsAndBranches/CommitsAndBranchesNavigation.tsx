@@ -1,9 +1,8 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { AddAndRemoveBranches } from './AddAndRemoveBranches'
 import styles from './styles.module.scss'
-import { showLessCommits, showMoreCommits } from '../../../../util/messages'
-import { ExperimentsState } from '../../../../store'
+import { showLessCommits, showMoreCommits } from '../../../util/messages'
+import { ExperimentsState } from '../../../store'
 
 interface CommitsAndBranchesNavigationProps {
   branch: string
@@ -34,8 +33,6 @@ export const CommitsAndBranchesNavigation: React.FC<
           Show Less Commits
         </button>
       )}
-
-      <AddAndRemoveBranches />
     </div>
   )
 }

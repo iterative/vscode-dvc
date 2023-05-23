@@ -850,3 +850,13 @@ $badge-size: 0.85rem;
     font-family: var(--vscode-font-family);
   }
 }
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  left: 0;
+  z-index: 10;
+  background: $bg-color;
+  padding: 10px 20px;
+}
