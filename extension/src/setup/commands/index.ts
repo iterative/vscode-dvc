@@ -257,29 +257,11 @@ const collectRemoveItems = (remotes: string[]): QuickPickItemWithValue[] => {
   return acc
 }
 
-export const pickRemoteAndRemove = async (
+const confirmAndRemove = async (
   internalCommands: InternalCommands,
-  dvcRoot: string
+  dvcRoot: string,
+  remote: string
 ): Promise<void> => {
-  const remoteList = await internalCommands.executeCommand(
-    AvailableCommands.REMOTE,
-    dvcRoot,
-    SubCommand.LIST
-  )
-
-  const remotes = trimAndSplit(remoteList)
-
-  if (!definedAndNonEmpty(remotes)) {
-    return Toast.showError('No remotes to remove')
-  }
-
-  const remote = await getOnlyOrPickRemote(
-    collectRemoveItems(remotes),
-    Title.SELECT_REMOTE_TO_REMOVE
-  )
-  if (!remote) {
-    return
-  }
   const removalConfirmed = await Modal.warnOfConsequences(
     'Are you sure you want to remove this remote? This could be IRREVERSIBLE!',
     Response.REMOVE
@@ -308,4 +290,31 @@ export const pickRemoteAndRemove = async (
       remote
     )
   } catch {}
+}
+
+export const pickRemoteAndRemove = async (
+  internalCommands: InternalCommands,
+  dvcRoot: string
+): Promise<void> => {
+  const remoteList = await internalCommands.executeCommand(
+    AvailableCommands.REMOTE,
+    dvcRoot,
+    SubCommand.LIST
+  )
+
+  const remotes = trimAndSplit(remoteList)
+
+  if (!definedAndNonEmpty(remotes)) {
+    return Toast.showError('No remotes to remove')
+  }
+
+  const remote = await getOnlyOrPickRemote(
+    collectRemoveItems(remotes),
+    Title.SELECT_REMOTE_TO_REMOVE
+  )
+  if (!remote) {
+    return
+  }
+
+  return confirmAndRemove(internalCommands, dvcRoot, remote)
 }
