@@ -15,6 +15,7 @@ import { Response } from '../../vscode/response'
 import { Title } from '../../vscode/title'
 import { Toast } from '../../vscode/toast'
 import { getOnlyOrPickProject } from '../../workspace/util'
+import { extractRemoteDetails } from '../collect'
 
 export const runCallback = async (
   setup: Setup,
@@ -193,7 +194,7 @@ const collectFromRemoteList = (
   config: typeof Flag.LOCAL | typeof Flag.PROJECT
 ): void => {
   for (const remote of trimAndSplit(remoteList ?? '')) {
-    const [name, url] = remote.split(/\s+/)
+    const [name, url] = extractRemoteDetails(remote)
     acc.push({
       description: `(${config.slice(2)} config)`,
       detail: url,
@@ -251,7 +252,7 @@ export const pickRemoteAndModify = async (
 const collectRemoveItems = (remotes: string[]): QuickPickItemWithValue[] => {
   const acc: QuickPickItemWithValue[] = []
   for (const remote of remotes) {
-    const [name, url] = remote.split(/\s+/)
+    const [name, url] = extractRemoteDetails(remote)
     acc.push({ detail: url, label: name, value: name })
   }
   return acc

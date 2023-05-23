@@ -22,6 +22,9 @@ export const collectSectionCollapsed = (
   return acc
 }
 
+export const extractRemoteDetails = (remote: string): string[] =>
+  remote.split(/\s+/)
+
 export const collectRemoteList = async (
   dvcRoots: string[],
   getRemoteList: (cwd: string) => Promise<string | undefined>
@@ -37,7 +40,7 @@ export const collectRemoteList = async (
     const remotes = trimAndSplit(remoteList)
     const dvcRootRemotes: { [name: string]: string } = {}
     for (const remote of remotes) {
-      const [name, url] = remote.split(/\s+/)
+      const [name, url] = extractRemoteDetails(remote)
       dvcRootRemotes[name] = url
     }
     acc[dvcRoot] = dvcRootRemotes

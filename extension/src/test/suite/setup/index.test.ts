@@ -963,6 +963,7 @@ suite('Setup Test Suite', () => {
 
     it('should be able to rename a remote', async () => {
       const mockRemote = stub(DvcExecutor.prototype, 'remote')
+      const newName = 'better-name'
 
       const remoteRenamed = new Promise(resolve =>
         mockRemote.callsFake((_, ...args) => {
@@ -981,9 +982,7 @@ suite('Setup Test Suite', () => {
         })
       )
 
-      const mockShowInputBox = stub(window, 'showInputBox').resolves(
-        'better-name'
-      )
+      const mockShowInputBox = stub(window, 'showInputBox').resolves(newName)
 
       const mockShowQuickPick = (
         stub(window, 'showQuickPick') as SinonStub<
@@ -1003,7 +1002,7 @@ suite('Setup Test Suite', () => {
         'rename',
         '--project',
         'storage',
-        'better-name'
+        newName
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
