@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.20] - 2023-05-23
+
+### 🚀 New Features and Enhancements
+
+- Add DVCLive reference to Experiments "Setup Complete" [#3948](https://github.com/iterative/vscode-dvc/pull/3948) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Update demo and latest tested version to `2.58.0` [#3949](https://github.com/iterative/vscode-dvc/pull/3949) by [@julieg18](https://github.com/julieg18)
+
 ## [0.8.19] - 2023-05-22
 
 ### 🚀 New Features and Enhancements
