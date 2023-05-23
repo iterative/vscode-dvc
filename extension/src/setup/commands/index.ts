@@ -178,8 +178,8 @@ const modifyRemote = async (
 }
 
 const collectModifyItems = (
-  localRemoteList: string,
-  projectRemoteList: string
+  localRemoteList: string | undefined,
+  projectRemoteList: string | undefined
 ): QuickPickItemWithValue<{
   config: typeof Flag.LOCAL | typeof Flag.PROJECT
   name: string
@@ -188,7 +188,7 @@ const collectModifyItems = (
     config: typeof Flag.LOCAL | typeof Flag.PROJECT
     name: string
   }>[] = []
-  for (const localRemote of trimAndSplit(localRemoteList)) {
+  for (const localRemote of trimAndSplit(localRemoteList ?? '')) {
     const config = Flag.LOCAL
     const [name, url] = localRemote.split(/\s+/)
     acc.push({
@@ -199,7 +199,7 @@ const collectModifyItems = (
     })
   }
 
-  for (const projectRemote of trimAndSplit(projectRemoteList)) {
+  for (const projectRemote of trimAndSplit(projectRemoteList ?? '')) {
     const config = Flag.PROJECT
     const [name, url] = projectRemote.split(/\s+/)
     acc.push({
