@@ -294,6 +294,12 @@
         "icon": "$(play)"
       },
       {
+        "title": "Modify Remote",
+        "command": "dvc.modifyRemote",
+        "category": "DVC",
+        "icon": "$(database)"
+      },
+      {
         "title": "Queue Experiment",
         "command": "dvc.queueExperiment",
         "category": "DVC",
@@ -747,6 +753,10 @@
         {
           "command": "dvc.init",
           "when": "dvc.commands.available && !dvc.cli.incompatible && !dvc.project.available && !dvc.scm.command.running"
+        },
+        {
+          "command": "dvc.modifyRemote",
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace"
         },
         {
           "command": "dvc.moveTargets",

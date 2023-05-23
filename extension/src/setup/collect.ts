@@ -35,10 +35,10 @@ export const collectRemoteList = async (
       continue
     }
     const remotes = trimAndSplit(remoteList)
-    const dvcRootRemotes: { [alias: string]: string } = {}
+    const dvcRootRemotes: { [name: string]: string } = {}
     for (const remote of remotes) {
-      const [alias, url] = remote.split(/\s+/)
-      dvcRootRemotes[alias] = url
+      const [name, url] = remote.split(/\s+/)
+      dvcRootRemotes[name] = url
     }
     acc[dvcRoot] = dvcRootRemotes
   }

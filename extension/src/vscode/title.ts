@@ -33,6 +33,7 @@ export enum Title {
   SELECT_CUSTOM_PLOTS_TO_REMOVE = 'Select Custom Plot(s) to Remove',
   SELECT_PARAM_TO_MODIFY = 'Select Param(s) to Modify',
   SELECT_PLOTS = 'Select Plots to Display',
+  SELECT_REMOTE_TO_MODIFY = 'Select a Remote to Modify',
   SELECT_EXPERIMENTS_STOP = 'Select Experiments to Stop',
   SELECT_SORT_DIRECTION = 'Select Sort Direction',
   SELECT_SORTS_TO_REMOVE = 'Select Sort(s) to Remove',

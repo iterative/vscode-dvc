@@ -188,6 +188,7 @@ export interface IEventNamePropertyMapping {
   [EventName.RENAME_TARGET]: undefined
 
   [EventName.REMOTE_ADD]: undefined
+  [EventName.REMOTE_MODIFY]: undefined
 
   [EventName.GIT_STAGE_ALL]: undefined
   [EventName.GIT_UNSTAGE_ALL]: undefined

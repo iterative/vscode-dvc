@@ -3,6 +3,8 @@ import { RemoteList } from 'dvc/src/setup/webview/contract'
 import { MultiProjectRemotes } from './MultiProjectRemotes'
 import { ProjectRemotes } from './ProjectRemotes'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
+import { Button } from '../../../shared/components/button/Button'
+import { addRemote, modifyRemote } from '../messages'
 
 export const RemoteDetails: React.FC<{
   remoteList: NonNullable<RemoteList>
@@ -18,6 +20,19 @@ export const RemoteDetails: React.FC<{
           remotes={remoteValues[0] as { [alias: string]: string }}
         />
       )}
+      <Button text="Modify" onClick={modifyRemote} />
+      <Button
+        appearance="secondary"
+        isNested={true}
+        onClick={addRemote}
+        text="Add"
+      />
+      <Button
+        appearance="secondary"
+        isNested={true}
+        onClick={() => undefined}
+        text="Remove"
+      />
     </EmptyState>
   )
 }

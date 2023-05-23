@@ -53,6 +53,7 @@ export enum MessageFromWebviewType {
   SET_STUDIO_SHARE_EXPERIMENTS_LIVE = 'set-studio-share-experiments-live',
   TOGGLE_PLOTS_SECTION = 'toggle-plots-section',
   REMOTE_ADD = 'remote-add',
+  REMOTE_MODIFY = 'remote-modify',
   REMOVE_CUSTOM_PLOTS = 'remove-custom-plots',
   REMOVE_STUDIO_TOKEN = 'remove-studio-token',
   MODIFY_EXPERIMENT_PARAMS_AND_QUEUE = 'modify-experiment-params-and-queue',
@@ -163,6 +164,7 @@ export type MessageFromWebview =
       payload: string
     }
   | { type: MessageFromWebviewType.REMOTE_ADD }
+  | { type: MessageFromWebviewType.REMOTE_MODIFY }
   | {
       type: MessageFromWebviewType.REMOVE_CUSTOM_PLOTS
     }
