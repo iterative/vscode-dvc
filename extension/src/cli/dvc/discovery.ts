@@ -127,7 +127,7 @@ const tryGlobalFallbackVersion = async (
   const tryGlobal = await getVersionDetails(setup, cwd, true)
   const { cliCompatible, isAvailable, isCompatible, version } = tryGlobal
 
-  if (isCompatible) {
+  if (version) {
     setup.unsetPythonBinPath()
   }
 
