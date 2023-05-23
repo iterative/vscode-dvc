@@ -45,8 +45,8 @@ export const Experiments: React.FC<ExperimentsProps> = ({ isDvcSetup }) => {
     <EmptyState isFullScreen={false}>
       <h1>Setup Complete</h1>
       <p>
-        Learn more about using <a href="https://dvc.org/doc/dvclive">DVCLive</a>{' '}
-        in your project in its docs.
+        Learn more about using DVCLive in the{' '}
+        <a href="https://dvc.org/doc/dvclive">docs</a>.
       </p>
       <IconButton
         appearance="primary"
