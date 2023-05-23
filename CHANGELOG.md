@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.19] - 2023-05-22
+
+### 🚀 New Features and Enhancements
+
+- Add "Get Started" section to Setup [#3943](https://github.com/iterative/vscode-dvc/pull/3943) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Remove code slider fixed height [#3936](https://github.com/iterative/vscode-dvc/pull/3936) by [@julieg18](https://github.com/julieg18)
+
 ## [0.8.18] - 2023-05-19
 
 ### 🚀 New Features and Enhancements
