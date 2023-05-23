@@ -127,9 +127,15 @@ const tryGlobalFallbackVersion = async (
   const tryGlobal = await getVersionDetails(setup, cwd, true)
   const { cliCompatible, isAvailable, isCompatible, version } = tryGlobal
 
-  if (version) {
-    setup.unsetPythonBinPath()
+  if (!isCompatible) {
+    return {
+      isAvailable,
+      isCompatible,
+      version
+    }
   }
+
+  setup.unsetPythonBinPath()
 
   return processVersionDetails(
     setup,
@@ -152,7 +158,11 @@ const extensionCanAutoRunCli = async (
   } = await getVersionDetails(setup, cwd)
 
   if (pythonCliCompatible === CliCompatible.NO_NOT_FOUND) {
-    return tryGlobalFallbackVersion(setup, cwd)
+    const globalResults = await tryGlobalFallbackVersion(setup, cwd)
+
+    if (globalResults.isCompatible) {
+      return globalResults
+    }
   }
 
   return processVersionDetails(
