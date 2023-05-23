@@ -1,8 +1,9 @@
 import { commands } from 'vscode'
 import {
-  getAddRemoteCommand,
-  getModifyRemoteCommand,
-  getRemoveRemoteCommand
+  addRemoteToProject,
+  pickRemoteAndModify,
+  pickRemoteAndRemove,
+  runCallback
 } from '.'
 import { Setup } from '..'
 import { run } from '../runner'
@@ -110,17 +111,17 @@ export const registerSetupCommands = (
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.REMOTE_ADD,
-    getAddRemoteCommand(setup, internalCommands)
+    () => runCallback(setup, internalCommands, addRemoteToProject)
   )
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.REMOTE_MODIFY,
-    getModifyRemoteCommand(setup, internalCommands)
+    () => runCallback(setup, internalCommands, pickRemoteAndModify)
   )
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.REMOTE_REMOVE,
-    getRemoveRemoteCommand(setup, internalCommands)
+    () => runCallback(setup, internalCommands, pickRemoteAndRemove)
   )
 
   registerSetupConfigCommands(setup, internalCommands)

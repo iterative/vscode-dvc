@@ -16,6 +16,26 @@ import { Title } from '../../vscode/title'
 import { Toast } from '../../vscode/toast'
 import { getOnlyOrPickProject } from '../../workspace/util'
 
+export const runCallback = async (
+  setup: Setup,
+  internalCommands: InternalCommands,
+  callback: (
+    internalCommands: InternalCommands,
+    dvcRoot: string
+  ) => Promise<void>
+): Promise<void> => {
+  const dvcRoots = setup.getRoots()
+  if (!definedAndNonEmpty(dvcRoots)) {
+    return Toast.showError('Cannot operate on remotes without a DVC project')
+  }
+  const dvcRoot = await getOnlyOrPickProject(dvcRoots)
+  if (!dvcRoot) {
+    return
+  }
+
+  return callback(internalCommands, dvcRoot)
+}
+
 const noExistingOrUserConfirms = async (
   internalCommands: InternalCommands,
   dvcRoot: string
@@ -40,7 +60,7 @@ const noExistingOrUserConfirms = async (
   )
 }
 
-const addRemoteToProject = async (
+export const addRemoteToProject = async (
   internalCommands: InternalCommands,
   dvcRoot: string
 ): Promise<void> => {
@@ -78,21 +98,6 @@ const addRemoteToProject = async (
   )
 }
 
-export const getAddRemoteCommand =
-  (setup: Setup, internalCommands: InternalCommands) =>
-  async (): Promise<void> => {
-    const dvcRoots = setup.getRoots()
-    if (!definedAndNonEmpty(dvcRoots)) {
-      return Toast.showError('Cannot add a remote without a DVC project')
-    }
-    const dvcRoot = await getOnlyOrPickProject(dvcRoots)
-
-    if (!dvcRoot) {
-      return
-    }
-    return addRemoteToProject(internalCommands, dvcRoot)
-  }
-
 const getOnlyOrPickRemote = async <T>(
   remotes: QuickPickItemWithValue<T>[],
   title: Title
@@ -111,10 +116,15 @@ enum ModifyOptions {
   URL = 'URL'
 }
 
+type RemoteWithConfig = {
+  config: typeof Flag.LOCAL | typeof Flag.PROJECT
+  name: string
+}
+
 const modifyRemoteName = async (
   internalCommands: InternalCommands,
   dvcRoot: string,
-  remote: { name: string; config: typeof Flag.LOCAL | typeof Flag.PROJECT }
+  remote: RemoteWithConfig
 ): Promise<void> => {
   const newName = await getInput(Title.ENTER_REMOTE_NAME)
   if (!newName) {
@@ -135,7 +145,7 @@ const modifyRemoteName = async (
 const modifyRemoteUrl = async (
   internalCommands: InternalCommands,
   dvcRoot: string,
-  remote: { name: string; config: typeof Flag.LOCAL | typeof Flag.PROJECT }
+  remote: RemoteWithConfig
 ): Promise<void> => {
   const newUrl = await getInput(Title.ENTER_REMOTE_URL)
   if (!newUrl) {
@@ -157,7 +167,7 @@ const modifyRemoteUrl = async (
 const modifyRemote = async (
   internalCommands: InternalCommands,
   dvcRoot: string,
-  remote: { name: string; config: typeof Flag.LOCAL | typeof Flag.PROJECT }
+  remote: RemoteWithConfig
 ): Promise<void> => {
   const option = await quickPickOne(
     Object.values(ModifyOptions),
@@ -177,42 +187,33 @@ const modifyRemote = async (
   }
 }
 
+const collectFromRemoteList = (
+  acc: QuickPickItemWithValue<RemoteWithConfig>[],
+  remoteList: string | undefined,
+  config: typeof Flag.LOCAL | typeof Flag.PROJECT
+): void => {
+  for (const remote of trimAndSplit(remoteList ?? '')) {
+    const [name, url] = remote.split(/\s+/)
+    acc.push({
+      description: `(${config.slice(2)} config)`,
+      detail: url,
+      label: `${name}`,
+      value: { config, name }
+    })
+  }
+}
+
 const collectModifyItems = (
   localRemoteList: string | undefined,
   projectRemoteList: string | undefined
-): QuickPickItemWithValue<{
-  config: typeof Flag.LOCAL | typeof Flag.PROJECT
-  name: string
-}>[] => {
-  const acc: QuickPickItemWithValue<{
-    config: typeof Flag.LOCAL | typeof Flag.PROJECT
-    name: string
-  }>[] = []
-  for (const localRemote of trimAndSplit(localRemoteList ?? '')) {
-    const config = Flag.LOCAL
-    const [name, url] = localRemote.split(/\s+/)
-    acc.push({
-      description: `(${config.slice(2)} config)`,
-      detail: url,
-      label: `${name}`,
-      value: { config, name }
-    })
-  }
-
-  for (const projectRemote of trimAndSplit(projectRemoteList ?? '')) {
-    const config = Flag.PROJECT
-    const [name, url] = projectRemote.split(/\s+/)
-    acc.push({
-      description: `(${config.slice(2)} config)`,
-      detail: url,
-      label: `${name}`,
-      value: { config, name }
-    })
-  }
+): QuickPickItemWithValue<RemoteWithConfig>[] => {
+  const acc: QuickPickItemWithValue<RemoteWithConfig>[] = []
+  collectFromRemoteList(acc, localRemoteList, Flag.LOCAL)
+  collectFromRemoteList(acc, projectRemoteList, Flag.PROJECT)
   return acc
 }
 
-const pickRemoteAndModify = async (
+export const pickRemoteAndModify = async (
   internalCommands: InternalCommands,
   dvcRoot: string
 ): Promise<void> => {
@@ -247,21 +248,6 @@ const pickRemoteAndModify = async (
   return modifyRemote(internalCommands, dvcRoot, remote)
 }
 
-export const getModifyRemoteCommand =
-  (setup: Setup, internalCommands: InternalCommands) =>
-  async (): Promise<void> => {
-    const dvcRoots = setup.getRoots()
-    if (!definedAndNonEmpty(dvcRoots)) {
-      return Toast.showError('Cannot modify a remote without a DVC project')
-    }
-    const dvcRoot = await getOnlyOrPickProject(dvcRoots)
-
-    if (!dvcRoot) {
-      return
-    }
-    return pickRemoteAndModify(internalCommands, dvcRoot)
-  }
-
 const collectRemoveItems = (remotes: string[]): QuickPickItemWithValue[] => {
   const acc: QuickPickItemWithValue[] = []
   for (const remote of remotes) {
@@ -271,7 +257,7 @@ const collectRemoveItems = (remotes: string[]): QuickPickItemWithValue[] => {
   return acc
 }
 
-const pickRemoteAndRemove = async (
+export const pickRemoteAndRemove = async (
   internalCommands: InternalCommands,
   dvcRoot: string
 ): Promise<void> => {
@@ -294,12 +280,12 @@ const pickRemoteAndRemove = async (
   if (!remote) {
     return
   }
-  const shouldRemove = await Modal.warnOfConsequences(
-    'This action is irreversible. Are you sure you want to remove this remote?',
+  const removalConfirmed = await Modal.warnOfConsequences(
+    'Are you sure you want to remove this remote? This could be IRREVERSIBLE!',
     Response.REMOVE
   )
 
-  if (shouldRemove !== Response.REMOVE) {
+  if (removalConfirmed !== Response.REMOVE) {
     return
   }
 
@@ -323,18 +309,3 @@ const pickRemoteAndRemove = async (
     )
   } catch {}
 }
-
-export const getRemoveRemoteCommand =
-  (setup: Setup, internalCommands: InternalCommands) =>
-  async (): Promise<void> => {
-    const dvcRoots = setup.getRoots()
-    if (!definedAndNonEmpty(dvcRoots)) {
-      return Toast.showError('Cannot modify a remote without a DVC project')
-    }
-    const dvcRoot = await getOnlyOrPickProject(dvcRoots)
-
-    if (!dvcRoot) {
-      return
-    }
-    return pickRemoteAndRemove(internalCommands, dvcRoot)
-  }
