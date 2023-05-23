@@ -4,6 +4,7 @@ import { ensureFileSync, remove } from 'fs-extra'
 import { expect } from 'chai'
 import { SinonStub, restore, spy, stub } from 'sinon'
 import {
+  MessageItem,
   QuickPickItem,
   Uri,
   WorkspaceConfiguration,
@@ -47,6 +48,7 @@ import { Setup } from '../../../setup'
 import { SetupSection } from '../../../setup/webview/contract'
 import { DvcExecutor } from '../../../cli/dvc/executor'
 import { getFirstWorkspaceFolder } from '../../../vscode/workspaceFolders'
+import { Response } from '../../../vscode/response'
 
 suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
@@ -874,7 +876,7 @@ suite('Setup Test Suite', () => {
       const mockRemote = stub(DvcExecutor.prototype, 'remote')
 
       const remoteAdded = new Promise(resolve =>
-        mockRemote.callsFake((cwd, ...args) => {
+        mockRemote.callsFake((_, ...args) => {
           if (args.includes('add')) {
             resolve(undefined)
           }
@@ -913,7 +915,7 @@ suite('Setup Test Suite', () => {
       const mockRemote = stub(DvcExecutor.prototype, 'remote')
 
       const remoteAdded = new Promise(resolve =>
-        mockRemote.callsFake((cwd, ...args) => {
+        mockRemote.callsFake((_, ...args) => {
           if (args.includes('list')) {
             return Promise.resolve('storage s3://my-bucket')
           }
@@ -956,6 +958,177 @@ suite('Setup Test Suite', () => {
         '--project',
         'backup',
         's3://my-backup-bucket'
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should be able to rename a remote', async () => {
+      const mockRemote = stub(DvcExecutor.prototype, 'remote')
+      const newName = 'better-name'
+
+      const remoteRenamed = new Promise(resolve =>
+        mockRemote.callsFake((_, ...args) => {
+          if (args.includes('list') && args.includes('--project')) {
+            return Promise.resolve('storage s3://my-bucket')
+          }
+
+          if (args.includes('list')) {
+            return Promise.resolve('')
+          }
+
+          if (args.includes('rename')) {
+            resolve(undefined)
+          }
+          return Promise.resolve('')
+        })
+      )
+
+      const mockShowInputBox = stub(window, 'showInputBox').resolves(newName)
+
+      const mockShowQuickPick = (
+        stub(window, 'showQuickPick') as SinonStub<
+          [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
+          Thenable<string | undefined>
+        >
+      ).resolves('Name')
+
+      await commands.executeCommand(RegisteredCliCommands.REMOTE_MODIFY)
+
+      await remoteRenamed
+
+      expect(mockShowInputBox).to.be.calledOnce
+      expect(mockShowQuickPick).to.be.calledOnce
+      expect(mockRemote).to.be.calledWithExactly(
+        dvcDemoPath,
+        'rename',
+        '--project',
+        'storage',
+        newName
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a message to modify a remote (modify URL)', async () => {
+      const { messageSpy, setup, mockExecuteCommand } = buildSetup(disposable)
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+      mockExecuteCommand.restore()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const mockRemote = stub(DvcExecutor.prototype, 'remote')
+      const projectConfigUrl = 's3://different-url'
+
+      const remoteModified = new Promise(resolve =>
+        mockRemote.callsFake((_, ...args) => {
+          if (args.includes('list') && args.includes('--project')) {
+            return Promise.resolve(
+              `storage ${projectConfigUrl}\nbackup s3://my-backup-bucket`
+            )
+          }
+
+          if (args.includes('list') && args.includes('--local')) {
+            return Promise.resolve('storage s3://my-bucket')
+          }
+
+          if (args.includes('modify')) {
+            resolve(undefined)
+          }
+          return Promise.resolve('')
+        })
+      )
+
+      const mockShowInputBox = stub(window, 'showInputBox').resolves(
+        projectConfigUrl
+      )
+
+      const mockShowQuickPick = (
+        stub(window, 'showQuickPick') as SinonStub<
+          [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
+          Thenable<
+            | string
+            | undefined
+            | QuickPickItemWithValue<{ config: string; name: string }>
+          >
+        >
+      )
+        .onFirstCall()
+        .resolves({
+          label: 'storage',
+          value: { config: '--local', name: 'storage' }
+        })
+        .onSecondCall()
+        .resolves('URL')
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.REMOTE_MODIFY
+      })
+
+      await remoteModified
+
+      expect(mockShowInputBox).to.be.calledOnce
+      expect(mockShowQuickPick).to.be.calledTwice
+      expect(mockRemote).to.be.calledWithExactly(
+        dvcDemoPath,
+        'modify',
+        '--local',
+        'storage',
+        'url',
+        projectConfigUrl
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a message to remove a remote', async () => {
+      const { messageSpy, setup, mockExecuteCommand } = buildSetup(disposable)
+
+      const webview = await setup.showWebview()
+      await webview.isReady()
+      mockExecuteCommand.restore()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const mockRemote = stub(DvcExecutor.prototype, 'remote')
+
+      let calls = 0
+
+      const remoteRemoved = new Promise(resolve =>
+        mockRemote.callsFake((_, ...args) => {
+          if (args.includes('list')) {
+            return Promise.resolve('storage s3://my-bucket')
+          }
+
+          if (args.includes('remove')) {
+            calls = calls + 1
+          }
+          if (calls === 2) {
+            resolve(undefined)
+          }
+          return Promise.resolve('')
+        })
+      )
+
+      stub(window, 'showWarningMessage').resolves(
+        Response.REMOVE as unknown as MessageItem
+      )
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.REMOTE_REMOVE
+      })
+
+      await remoteRemoved
+
+      expect(mockRemote).to.be.calledWithExactly(
+        dvcDemoPath,
+        'remove',
+        '--local',
+        'storage'
+      )
+      expect(mockRemote).to.be.calledWithExactly(
+        dvcDemoPath,
+        'remove',
+        '--project',
+        'storage'
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
