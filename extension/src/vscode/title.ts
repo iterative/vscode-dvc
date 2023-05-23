@@ -1,7 +1,7 @@
 export enum Title {
   CHOOSE_RESOURCES = 'Choose Resources to Add to the Dataset',
   ENTER_BRANCH_NAME = 'Enter a Name for the New Branch',
-  ENTER_COMMAND_TO_RUN = 'Enter the command that will run your script (e.g., python, sh, go run...)',
+  ENTER_COMMAND_TO_RUN = 'Enter the Command to Run your Script (e.g., python, sh, go run...)',
   ENTER_COMMIT_MESSAGE = 'Enter a Commit Message',
   ENTER_EXPERIMENT_WORKER_COUNT = 'Enter the Number of Queue Workers',
   ENTER_FILTER_VALUE = 'Enter a Filter Value',
@@ -11,7 +11,7 @@ export enum Title {
   ENTER_PATH_OR_CHOOSE_FILE = 'Enter the path to your training script or select it',
   ENTER_STUDIO_USERNAME = 'Enter your Studio username',
   ENTER_STUDIO_TOKEN = 'Enter your Studio access token',
-  ENTER_STAGE_NAME = 'Enter a name for the main stage of your pipeline',
+  ENTER_STAGE_NAME = 'Enter a Name for the Main Stage of your Pipeline',
   GARBAGE_COLLECT_EXPERIMENTS = 'Garbage Collect Experiments',
   SHOW_SETUP = 'Show Setup',
   SELECT_BRANCHES = 'Select the Branch(es) to Display in the Experiments Table',
@@ -36,9 +36,9 @@ export enum Title {
   SELECT_EXPERIMENTS_STOP = 'Select Experiments to Stop',
   SELECT_SORT_DIRECTION = 'Select Sort Direction',
   SELECT_SORTS_TO_REMOVE = 'Select Sort(s) to Remove',
-  SELECT_TRAINING_SCRIPT = 'Select your training script',
+  SELECT_TRAINING_SCRIPT = 'Select your Training Script',
   SETUP_WORKSPACE = 'Setup the Workspace',
-  SET_EXPERIMENTS_HEADER_HEIGHT = 'Set Maximum Experiment Table Header Height',
+  SET_EXPERIMENTS_HEADER_HEIGHT = 'Set the Maximum Experiment Table Header Height',
   SET_REMOTE_AS_DEFAULT = 'Set Default Remote'
 }
 
