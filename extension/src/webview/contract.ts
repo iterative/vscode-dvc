@@ -54,6 +54,7 @@ export enum MessageFromWebviewType {
   TOGGLE_PLOTS_SECTION = 'toggle-plots-section',
   REMOTE_ADD = 'remote-add',
   REMOTE_MODIFY = 'remote-modify',
+  REMOTE_REMOVE = 'remote-remove',
   REMOVE_CUSTOM_PLOTS = 'remove-custom-plots',
   REMOVE_STUDIO_TOKEN = 'remove-studio-token',
   MODIFY_EXPERIMENT_PARAMS_AND_QUEUE = 'modify-experiment-params-and-queue',
@@ -165,6 +166,7 @@ export type MessageFromWebview =
     }
   | { type: MessageFromWebviewType.REMOTE_ADD }
   | { type: MessageFromWebviewType.REMOTE_MODIFY }
+  | { type: MessageFromWebviewType.REMOTE_REMOVE }
   | {
       type: MessageFromWebviewType.REMOVE_CUSTOM_PLOTS
     }

@@ -1,5 +1,9 @@
 import { commands } from 'vscode'
-import { getAddRemoteCommand, getModifyRemoteCommand } from '.'
+import {
+  getAddRemoteCommand,
+  getModifyRemoteCommand,
+  getRemoveRemoteCommand
+} from '.'
 import { Setup } from '..'
 import { run } from '../runner'
 import { SetupSection } from '../webview/contract'
@@ -112,6 +116,11 @@ export const registerSetupCommands = (
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.REMOTE_MODIFY,
     getModifyRemoteCommand(setup, internalCommands)
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.REMOTE_REMOVE,
+    getRemoveRemoteCommand(setup, internalCommands)
   )
 
   registerSetupConfigCommands(setup, internalCommands)

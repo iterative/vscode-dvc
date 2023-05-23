@@ -4,7 +4,7 @@ import { MultiProjectRemotes } from './MultiProjectRemotes'
 import { ProjectRemotes } from './ProjectRemotes'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { Button } from '../../../shared/components/button/Button'
-import { addRemote, modifyRemote } from '../messages'
+import { addRemote, modifyRemote, removeRemote } from '../messages'
 
 export const RemoteDetails: React.FC<{
   remoteList: NonNullable<RemoteList>
@@ -30,7 +30,7 @@ export const RemoteDetails: React.FC<{
       <Button
         appearance="secondary"
         isNested={true}
-        onClick={() => undefined}
+        onClick={removeRemote}
         text="Remove"
       />
     </EmptyState>

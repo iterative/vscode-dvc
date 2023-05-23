@@ -335,6 +335,12 @@
         "icon": "$(close-all)"
       },
       {
+        "title": "Remove Remote",
+        "command": "dvc.removeRemote",
+        "category": "DVC",
+        "icon": "$(trash)"
+      },
+      {
         "title": "Remove Studio Access Token",
         "command": "dvc.removeStudioAccessToken",
         "category": "DVC"
@@ -821,6 +827,10 @@
         {
           "command": "dvc.removeExperimentsTableSorts",
           "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.removeRemote",
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace"
         },
         {
           "command": "dvc.removeStudioAccessToken",

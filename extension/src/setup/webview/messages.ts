@@ -110,6 +110,9 @@ export class WebviewMessages {
         return commands.executeCommand(RegisteredCliCommands.REMOTE_ADD)
       case MessageFromWebviewType.REMOTE_MODIFY:
         return commands.executeCommand(RegisteredCliCommands.REMOTE_MODIFY)
+      case MessageFromWebviewType.REMOTE_REMOVE:
+        return commands.executeCommand(RegisteredCliCommands.REMOTE_REMOVE)
+
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }

@@ -62,3 +62,6 @@ export const addRemote = () =>
 
 export const modifyRemote = () =>
   sendMessage({ type: MessageFromWebviewType.REMOTE_MODIFY })
+
+export const removeRemote = () =>
+  sendMessage({ type: MessageFromWebviewType.REMOTE_REMOVE })
