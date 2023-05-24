@@ -761,6 +761,8 @@ $badge-size: 0.85rem;
 .experimentCellSecondaryNameTooltip {
   white-space: normal;
   padding: 5px;
+  width: min-content;
+  width: 100%;
 
   &,
   p,
@@ -796,6 +798,9 @@ $badge-size: 0.85rem;
   .message {
     white-space: pre-wrap;
     margin: 0;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
