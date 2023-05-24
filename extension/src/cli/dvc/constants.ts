@@ -41,6 +41,9 @@ export enum SubCommand {
   ADD = 'add',
   DIFF = 'diff',
   LIST = 'list',
+  MODIFY = 'modify',
+  REMOVE = 'remove',
+  RENAME = 'rename',
   STATUS = 'status',
   SHOW = 'show'
 }
