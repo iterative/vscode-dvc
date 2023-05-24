@@ -1,6 +1,6 @@
 import { Plot } from '../../plots/webview/contract'
 
-export const MIN_CLI_VERSION = '2.57.0'
+export const MIN_CLI_VERSION = '2.58.1'
 export const LATEST_TESTED_CLI_VERSION = '2.58.1'
 export const MAX_CLI_VERSION = '3'
 

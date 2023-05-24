@@ -69,10 +69,6 @@ export class WebviewMessages {
       selectedRevisions,
       template: this.getTemplatePlots(selectedRevisions)
     })
-
-    this.experiments.checkForFinishedWorkspaceExperiment(
-      selectedRevisions.filter(({ fetched }) => fetched)
-    )
   }
 
   public handleMessageFromWebview(message: MessageFromWebview) {

@@ -9,7 +9,6 @@ import {
 } from './collect'
 import {
   collectColoredStatus,
-  collectFinishedRunningExperiments,
   collectSelectable,
   collectSelectedColors,
   collectStartedRunningExperiments
@@ -21,7 +20,6 @@ import {
   Experiment,
   isQueued,
   isRunning,
-  isRunningInQueue,
   RunningExperiment
 } from '../webview/contract'
 import { definedAndNonEmpty, reorderListSubset } from '../../util/array'
@@ -146,10 +144,6 @@ export class ExperimentsModel extends ModelWithPersistence {
       ({ id: expId }) => expId === id
     )
 
-    if (experiment && isRunning(experiment.status)) {
-      return this.preventSelectionOfRunningExperiment(experiment)
-    }
-
     if (isQueued(experiment?.status)) {
       return UNSELECTED
     }
@@ -270,9 +264,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public setSelected(selectedExperiments: Experiment[]) {
-    const possibleToSelect = collectSelectable(selectedExperiments, {
-      ...this.workspace
-    })
+    const possibleToSelect = collectSelectable(selectedExperiments)
 
     const { availableColors, coloredStatus } = collectSelectedColors(
       possibleToSelect,
@@ -524,8 +516,7 @@ export class ExperimentsModel extends ModelWithPersistence {
       this.experimentsByCommit,
       this.coloredStatus,
       this.availableColors,
-      this.startedRunning,
-      this.finishedRunning
+      this.startedRunning
     )
     this.startedRunning = new Set()
 
@@ -538,14 +529,6 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.startedRunning = collectStartedRunningExperiments(
       this.running,
       stillRunning
-    )
-
-    this.finishedRunning = collectFinishedRunningExperiments(
-      { ...this.finishedRunning },
-      this.getExperimentsAndQueued(),
-      this.running,
-      stillRunning,
-      this.coloredStatus
     )
 
     this.running = stillRunning
@@ -566,24 +549,6 @@ export class ExperimentsModel extends ModelWithPersistence {
       this.availableColors,
       copyOriginalColors()
     )
-  }
-
-  private preventSelectionOfRunningExperiment(
-    experiment: Experiment
-  ): Color | undefined | typeof UNSELECTED {
-    if (isRunningInQueue(experiment)) {
-      return UNSELECTED
-    }
-
-    const { executor, id } = experiment
-    if (
-      executor === Executor.WORKSPACE &&
-      id !== EXPERIMENT_WORKSPACE_ID &&
-      !this.isSelected(id) &&
-      !this.isSelected(EXPERIMENT_WORKSPACE_ID)
-    ) {
-      return this.toggleStatus(EXPERIMENT_WORKSPACE_ID)
-    }
   }
 
   private persistSorts() {

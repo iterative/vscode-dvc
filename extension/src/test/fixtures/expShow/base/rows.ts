@@ -42,7 +42,7 @@ const rowsFixture: Commit[] = [
         'c3961d777cfbd7727f9fde4851896006'
       )
     },
-    displayColor: colorsList[0],
+    displayColor: undefined,
     executor: Executor.WORKSPACE,
     id: EXPERIMENT_WORKSPACE_ID,
     label: EXPERIMENT_WORKSPACE_ID,
@@ -69,7 +69,7 @@ const rowsFixture: Commit[] = [
       }
     },
     status: ExperimentStatus.RUNNING,
-    selected: true,
+    selected: false,
     starred: false
   },
   {
@@ -269,7 +269,7 @@ const rowsFixture: Commit[] = [
             'c3961d777cfbd7727f9fde4851896006'
           )
         },
-        displayColor: undefined,
+        displayColor: colorsList[0],
         description: '[exp-83425]',
         executor: Executor.WORKSPACE,
         id: 'exp-83425',
@@ -296,7 +296,7 @@ const rowsFixture: Commit[] = [
             test: true
           }
         },
-        selected: false,
+        selected: true,
         starred: false,
         status: ExperimentStatus.RUNNING,
         Created: '2020-12-29T15:27:02'
