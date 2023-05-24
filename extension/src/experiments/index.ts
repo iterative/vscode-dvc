@@ -52,7 +52,6 @@ import { Toast } from '../vscode/toast'
 import { ConfigKey } from '../vscode/config'
 import { checkSignalFile, pollSignalFileForProcess } from '../fileSystem'
 import { DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
-import { COMMITS_SEPARATOR } from '../cli/git/constants'
 
 export const ExperimentsScale = {
   ...omit(ColumnType, 'TIMESTAMP'),
@@ -568,23 +567,22 @@ export class Experiments extends BaseRepository<TableData> {
     return this.webviewMessages.sendWebviewMessage()
   }
 
-  private async getCommitOutput(data: ExpShowOutput | undefined) {
+  private getCommitOutput(data: ExpShowOutput | undefined) {
     if (!data || data.length === 0) {
       return
     }
-    let output = ''
-    for (const commit of data) {
-      if (commit.rev === EXPERIMENT_WORKSPACE_ID) {
+    const revs = new Set<string>()
+    for (const { rev } of data) {
+      if (rev === EXPERIMENT_WORKSPACE_ID) {
         continue
       }
-      output += await this.internalCommands.executeCommand(
-        AvailableCommands.GIT_GET_COMMIT_MESSAGES,
-        this.dvcRoot,
-        commit.rev
-      )
-      output += COMMITS_SEPARATOR
+      revs.add(rev)
     }
-    return output
+    return this.internalCommands.executeCommand(
+      AvailableCommands.GIT_GET_COMMIT_MESSAGES,
+      this.dvcRoot,
+      ...revs
+    )
   }
 
   private createWebviewMessageHandler() {
