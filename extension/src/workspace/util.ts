@@ -7,8 +7,5 @@ export const getOnlyOrPickProject = async (
     return dvcRoots[0]
   }
 
-  return await quickPickOne(
-    dvcRoots,
-    'Select which project to run command against'
-  )
+  return await quickPickOne(dvcRoots, 'Select a Project to Run Command Against')
 }
