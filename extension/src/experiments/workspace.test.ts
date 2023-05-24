@@ -42,6 +42,7 @@ const mockedFindOrCreateDvcYamlFile = jest.mocked(findOrCreateDvcYamlFile)
 const mockedGetFileExtension = jest.mocked(getFileExtension)
 const mockedHasDvcYamlFile = jest.mocked(hasDvcYamlFile)
 const mockedGetBranches = jest.fn()
+const mockedGetCurrentBranch = jest.fn()
 const mockedPickFile = jest.mocked(pickFile)
 
 jest.mock('vscode')
@@ -83,6 +84,11 @@ describe('Experiments', () => {
   mockedInternalCommands.registerCommand(
     AvailableCommands.GIT_GET_BRANCHES,
     () => mockedGetBranches()
+  )
+
+  mockedInternalCommands.registerCommand(
+    AvailableCommands.GIT_GET_CURRENT_BRANCH,
+    () => mockedGetCurrentBranch()
   )
 
   const workspaceExperiments = new WorkspaceExperiments(
@@ -743,7 +749,7 @@ describe('Experiments', () => {
       )
     })
 
-    it('should display the current branch in the quick pick', async () => {
+    it('should not display the current branch in the quick pick', async () => {
       const allBranches = [
         '* (HEAD detached at XXXX)',
         'main',
@@ -756,7 +762,7 @@ describe('Experiments', () => {
 
       await workspaceExperiments.selectBranches([])
 
-      expect(mockedQuickPickManyValues).toHaveBeenCalledWith(
+      expect(mockedQuickPickManyValues).not.toHaveBeenCalledWith(
         [
           expect.objectContaining({
             label: 'HEAD detached at XXXX',
@@ -784,7 +790,7 @@ describe('Experiments', () => {
 
       await workspaceExperiments.selectBranches([])
 
-      expect(mockedQuickPickManyValues).toHaveBeenCalledWith(
+      expect(mockedQuickPickManyValues).not.toHaveBeenCalledWith(
         [
           ...updatedAllBranches.slice(0, 1),
           'special-branch',

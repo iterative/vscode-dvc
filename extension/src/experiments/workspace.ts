@@ -394,15 +394,20 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       AvailableCommands.GIT_GET_BRANCHES,
       cwd
     )
+    const currentBranch = await this.internalCommands.executeCommand<string>(
+      AvailableCommands.GIT_GET_CURRENT_BRANCH,
+      cwd
+    )
     return await quickPickManyValues(
-      allBranches.map(branch => {
-        const branchName = branch.replace('* (', '').replace(')', '')
-        return {
-          label: branchName,
-          picked: branchesSelected.includes(branchName),
-          value: branchName
-        }
-      }),
+      allBranches
+        .filter(branch => branch !== currentBranch)
+        .map(branch => {
+          return {
+            label: branch,
+            picked: branchesSelected.includes(branch),
+            value: branch
+          }
+        }),
       {
         title: Title.SELECT_BRANCHES
       }
