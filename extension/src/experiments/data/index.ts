@@ -63,16 +63,17 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
       }
     }
 
-    const output = await this.internalCommands.executeCommand<ExpShowOutput>(
+    const data = await this.internalCommands.executeCommand<ExpShowOutput>(
       AvailableCommands.EXP_SHOW,
       this.dvcRoot,
       ...flags
     )
 
-    const data = output.map((out, i) => ({
-      ...out,
-      branch: i === 0 ? currentBranch : branchList[i - 1]
-    }))
+    // eslint-disable-next-line unicorn/no-array-for-each
+    data.forEach(
+      (output, i) =>
+        (output.branch = i === 0 ? currentBranch : branchList[i - 1])
+    )
 
     this.collectFiles(data)
 
@@ -97,7 +98,6 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
       branches.push(currentBranch)
       this.experiments.setBranchesToShow(branches)
     }
-
     return { branches, currentBranch }
   }
 
