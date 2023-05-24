@@ -1,11 +1,9 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import styles from './styles.module.scss'
+import { CommitsButton, CommitsButtonType } from './CommitsButton'
 import { showLessCommits, showMoreCommits } from '../../../../util/messages'
 import { ExperimentsState } from '../../../../store'
-import { Icon } from '../../../../../shared/components/Icon'
-import { Add, Remove } from '../../../../../shared/components/icons'
-import Tooltip from '../../../../../shared/components/tooltip/Tooltip'
 
 interface CommitsNavigationProps {
   branch: string
@@ -20,26 +18,16 @@ export const CommitsNavigation: React.FC<CommitsNavigationProps> = ({
 
   return (
     <div className={styles.commitsNav}>
-      <Tooltip content={<>Show More Commits</>}>
-        <button
-          className={styles.commitsButton}
-          onClick={() => showMoreCommits(branch)}
-          disabled={!hasMoreCommits[branch]}
-          aria-label="Show More Commits"
-        >
-          <Icon icon={Add} className={styles.commitsIcon} />
-        </button>
-      </Tooltip>
-      <Tooltip content={<>Show Less Commits</>}>
-        <button
-          className={styles.commitsButton}
-          onClick={() => showLessCommits(branch)}
-          disabled={!isShowingMoreCommits[branch]}
-          aria-label="Show Less Commits"
-        >
-          <Icon icon={Remove} className={styles.commitsIcon} />
-        </button>
-      </Tooltip>
+      <CommitsButton
+        type={CommitsButtonType.MORE}
+        action={() => showMoreCommits(branch)}
+        disabled={!hasMoreCommits[branch]}
+      />
+      <CommitsButton
+        type={CommitsButtonType.LESS}
+        action={() => showLessCommits(branch)}
+        disabled={!isShowingMoreCommits[branch]}
+      />
     </div>
   )
 }
