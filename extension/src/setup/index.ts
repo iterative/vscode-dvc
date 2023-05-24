@@ -245,11 +245,11 @@ export class Setup
   }
 
   public isDvcSetup() {
-    return this.getCliCompatible() && this.hasRoots()
+    return !!this.getCliCompatible() && this.hasRoots()
   }
 
   public isExperimentsSetup() {
-    return this.getHasData()
+    return !!this.getHasData()
   }
 
   public async selectFocusedProjects() {

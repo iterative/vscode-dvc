@@ -835,6 +835,24 @@ suite('Setup Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should be to tell us if dvc and experiments is setup', async () => {
+      const { setup } = buildSetup(disposable, false, false)
+
+      expect(setup.isExperimentsSetup()).to.be.false
+
+      setup.setCliCompatibleAndVersion(true, MIN_CLI_VERSION)
+      setup.setAvailable(true)
+      await setup.setRoots()
+
+      expect(setup.isDvcSetup()).to.be.true
+
+      setup.setCliCompatibleAndVersion(undefined, undefined)
+      setup.setAvailable(false)
+      await setup.setRoots()
+
+      expect(setup.isDvcSetup()).to.be.false
+    })
+
     it('should handle a message to open the experiments webview', async () => {
       const { messageSpy, setup, mockShowWebview, mockExecuteCommand } =
         buildSetup(disposable)
