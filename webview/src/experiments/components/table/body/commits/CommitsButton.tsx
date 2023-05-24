@@ -1,37 +1,21 @@
 import React from 'react'
 import styles from './styles.module.scss'
 import { Icon, IconValue } from '../../../../../shared/components/Icon'
-import { Add, Remove } from '../../../../../shared/components/icons'
 import Tooltip from '../../../../../shared/components/tooltip/Tooltip'
-
-type CommitsButtonType = {
+export interface CommitsButtonProps {
   icon: IconValue
   moreOrLess: 'More' | 'Less'
-}
-
-export const CommitsButtonType: { [key: string]: CommitsButtonType } = {
-  LESS: {
-    icon: Remove,
-    moreOrLess: 'Less'
-  },
-  MORE: {
-    icon: Add,
-    moreOrLess: 'More'
-  }
-}
-
-interface CommitsButtonProps {
-  type: CommitsButtonType
   action: () => void
-  disabled?: boolean
+  disabled: boolean
 }
 
 export const CommitsButton: React.FC<CommitsButtonProps> = ({
-  type,
+  icon,
+  moreOrLess,
   action,
   disabled
 }) => {
-  const text = `Show ${type.moreOrLess} Commits`
+  const text = `Show ${moreOrLess} Commits`
   return (
     <Tooltip content={<>{text}</>}>
       <button
@@ -40,7 +24,7 @@ export const CommitsButton: React.FC<CommitsButtonProps> = ({
         disabled={disabled}
         aria-label={text}
       >
-        <Icon icon={type.icon} className={styles.commitsIcon} />
+        <Icon icon={icon} className={styles.commitsIcon} />
       </button>
     </Tooltip>
   )
