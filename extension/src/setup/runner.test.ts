@@ -485,8 +485,9 @@ describe('run', () => {
     await flushPromises()
     expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
     expect(mockedWarnWithOptions).toHaveBeenCalledWith(
-      'The extension cannot initialize because the DVC CLI version is incompatible.',
-      Response.SHOW_SETUP
+      'An error was thrown when trying to access the CLI.',
+      Response.SHOW_SETUP,
+      Response.NEVER
     )
     expect(mockedGetCliVersion).toHaveBeenCalledTimes(2)
     expect(mockedResetMembers).toHaveBeenCalledTimes(1)

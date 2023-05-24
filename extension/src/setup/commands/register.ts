@@ -1,5 +1,10 @@
 import { commands } from 'vscode'
-import { getAddRemoteCommand } from '.'
+import {
+  addRemoteToProject,
+  pickRemoteAndModify,
+  pickRemoteAndRemove,
+  runCallbackOnDvcRoot
+} from '.'
 import { Setup } from '..'
 import { run } from '../runner'
 import { SetupSection } from '../webview/contract'
@@ -106,7 +111,17 @@ export const registerSetupCommands = (
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.REMOTE_ADD,
-    getAddRemoteCommand(setup, internalCommands)
+    () => runCallbackOnDvcRoot(setup, internalCommands, addRemoteToProject)
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.REMOTE_MODIFY,
+    () => runCallbackOnDvcRoot(setup, internalCommands, pickRemoteAndModify)
+  )
+
+  internalCommands.registerExternalCliCommand(
+    RegisteredCliCommands.REMOTE_REMOVE,
+    () => runCallbackOnDvcRoot(setup, internalCommands, pickRemoteAndRemove)
   )
 
   registerSetupConfigCommands(setup, internalCommands)

@@ -18843,10 +18843,10 @@ stylelint-scss@^4.6.0:
     postcss-selector-parser "^6.0.11"
     postcss-value-parser "^4.2.0"
 
-stylelint@15.6.1:
-  version "15.6.1"
-  resolved "https://registry.yarnpkg.com/stylelint/-/stylelint-15.6.1.tgz#e4cd33a3af88587b99a5d1328aedd8c298b6dc81"
-  integrity sha512-d8icFBlVl93Elf3Z5ABQNOCe4nx69is3D/NZhDLAie1eyYnpxfeKe7pCfqzT5W4F8vxHCLSDfV8nKNJzogvV2Q==
+stylelint@15.6.2:
+  version "15.6.2"
+  resolved "https://registry.yarnpkg.com/stylelint/-/stylelint-15.6.2.tgz#06d9005b62a83b72887eed623520e9b472af8c15"
+  integrity sha512-fjQWwcdUye4DU+0oIxNGwawIPC5DvG5kdObY5Sg4rc87untze3gC/5g/ikePqVjrAsBUZjwMN+pZsAYbDO6ArQ==
   dependencies:
     "@csstools/css-parser-algorithms" "^2.1.1"
     "@csstools/css-tokenizer" "^2.1.1"
@@ -20040,10 +20040,10 @@ vega-label@~1.2.1:
     vega-scenegraph "^4.9.2"
     vega-util "^1.15.2"
 
-vega-lite@5.9.1:
-  version "5.9.1"
-  resolved "https://registry.yarnpkg.com/vega-lite/-/vega-lite-5.9.1.tgz#09ec7789ccc37959c5fb539edfc6ff95e025b051"
-  integrity sha512-mJCSzKMWHacEEQpRzMGKL1sfieVMk06awLaxLEI50/65+uzia+R3VC2lPXYwzTi+6UvWbFGPJ9rybT8e3gmn3A==
+vega-lite@5.9.2:
+  version "5.9.2"
+  resolved "https://registry.yarnpkg.com/vega-lite/-/vega-lite-5.9.2.tgz#b5b08b932c2e6ce9c48915c4de3c8dd0130907c9"
+  integrity sha512-HLzsDCzZQGabicmnG8weS26xMXssvrTbyKcCKFXSnO2RBffD5Q6W2Mvyz5+VVVk9JjEW+Im04cB9y4QQwtDEOQ==
   dependencies:
     "@types/clone" "~2.1.1"
     clone "~2.1.2"
