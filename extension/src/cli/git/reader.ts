@@ -94,7 +94,7 @@ export class GitReader extends GitCli {
   }
 
   public async getBranches(cwd: string): Promise<string[]> {
-    const options = getOptions(cwd, Command.BRANCH, Flag.NO_MERGE)
+    const options = getOptions(cwd, Command.BRANCH)
     try {
       const branches = await this.executeProcess(options)
       return trimAndSplit(branches).map(cleanUpBranchName)

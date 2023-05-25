@@ -52,7 +52,7 @@ describe('GitReader', () => {
       const cliOutput = await gitReader.getBranches(cwd)
       expect(cliOutput).toStrictEqual(branches)
       expect(mockedCreateProcess).toHaveBeenCalledWith({
-        args: ['branch', '--no-merge'],
+        args: ['branch'],
         cwd,
         executable: 'git'
       })

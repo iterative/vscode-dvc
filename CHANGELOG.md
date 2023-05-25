@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.21] - 2023-05-25
+
+### 🚀 New Features and Enhancements
+
+- Add basic remote management [#3956](https://github.com/iterative/vscode-dvc/pull/3956) by [@mattseddon](https://github.com/mattseddon)
+- Revert one expShow call [#3970](https://github.com/iterative/vscode-dvc/pull/3970) by [@sroy3](https://github.com/sroy3)
+- Show all branches when selecting [#3969](https://github.com/iterative/vscode-dvc/pull/3969) by [@sroy3](https://github.com/sroy3)
+
+### 🐛 Bug Fixes
+
+- Fix DVC setup showing false info on incompatible global DVC [#3961](https://github.com/iterative/vscode-dvc/pull/3961) by [@julieg18](https://github.com/julieg18)
+- Fix overflowing message [#3968](https://github.com/iterative/vscode-dvc/pull/3968) by [@sroy3](https://github.com/sroy3)
+
+### 🔨 Maintenance
+
+- Standardize title entries to title case [#3955](https://github.com/iterative/vscode-dvc/pull/3955) by [@mattseddon](https://github.com/mattseddon)
+- Use expShow once with multiple revisions [#3941](https://github.com/iterative/vscode-dvc/pull/3941) by [@sroy3](https://github.com/sroy3)
+- Update demo project and latest tested CLI version (2.58.1) [#3964](https://github.com/iterative/vscode-dvc/pull/3964) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.8.20] - 2023-05-23
+
+### 🚀 New Features and Enhancements
+
+- Add DVCLive reference to Experiments "Setup Complete" [#3948](https://github.com/iterative/vscode-dvc/pull/3948) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Update demo and latest tested version to `2.58.0` [#3949](https://github.com/iterative/vscode-dvc/pull/3949) by [@julieg18](https://github.com/julieg18)
+
 ## [0.8.19] - 2023-05-22
 
 ### 🚀 New Features and Enhancements

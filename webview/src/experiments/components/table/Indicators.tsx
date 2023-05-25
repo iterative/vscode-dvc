@@ -39,18 +39,21 @@ export const Indicator = ({
   count,
   'aria-label': ariaLabel,
   tooltipContent,
-  onClick
+  onClick,
+  disabled
 }: CounterBadgeProps & {
   'aria-label'?: string
   onClick?: MouseEventHandler
   tooltipContent?: ReactNode
   children: ReactElement
+  disabled?: boolean
 }) => {
   const content = (
     <button
       className={styles.indicatorIcon}
       aria-label={ariaLabel}
       onClick={onClick}
+      disabled={disabled}
     >
       {children}
       <CounterBadge count={count} />
@@ -86,6 +89,10 @@ export const Indicators = () => {
   const branchesSelected = useSelector(
     (state: ExperimentsState) =>
       Math.max(state.tableData.branches.length - 1, 0) // We always have one branch by default (the current one which is not selected)
+  )
+
+  const { hasBranchesToSelect } = useSelector(
+    (state: ExperimentsState) => state.tableData
   )
 
   const sortsCount = sorts?.length
@@ -139,6 +146,7 @@ export const Indicators = () => {
           branchesSelected,
           'Selected'
         )}
+        disabled={!hasBranchesToSelect}
       >
         <Icon width={16} height={16} icon={GitMerge} />
       </Indicator>

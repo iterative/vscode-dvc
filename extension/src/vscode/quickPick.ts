@@ -35,11 +35,11 @@ export const quickPickManyValues: <T = string>(
 
 export const quickPickOne = (
   items: string[],
-  placeHolder: string
+  title: string
 ): Thenable<string | undefined> =>
   window.showQuickPick(items, {
     canPickMany: false,
-    placeHolder
+    title
   })
 
 const createQuickPick = <T>(

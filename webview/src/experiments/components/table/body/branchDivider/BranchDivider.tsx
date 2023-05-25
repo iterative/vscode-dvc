@@ -3,7 +3,7 @@ import styles from './styles.module.scss'
 import tablesStyles from '../../styles.module.scss'
 import { Icon } from '../../../../../shared/components/Icon'
 import { GitMerge } from '../../../../../shared/components/icons'
-import { CommitsAndBranchesNavigation } from '../commitsAndBranches/CommitsAndBranchesNavigation'
+import { CommitsNavigation } from '../commits/CommitsNavigation'
 
 interface BranchDividerProps {
   branch: string
@@ -24,11 +24,11 @@ export const BranchDivider: React.FC<PropsWithChildren<BranchDividerProps>> = ({
             height={12}
           />
           {children}
+
+          <CommitsNavigation branch={branch} />
         </div>
       </th>
-      <th colSpan={9999} className={styles.branchActions}>
-        <CommitsAndBranchesNavigation branch={branch} />
-      </th>
+      <th colSpan={9999} className={styles.branchActions}></th>
     </tr>
   </thead>
 )

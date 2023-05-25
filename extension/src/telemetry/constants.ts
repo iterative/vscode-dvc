@@ -50,12 +50,18 @@ export const EventName = Object.assign(
       'views.experimentsTable.columnSortRemoved',
     VIEWS_EXPERIMENTS_TABLE_RESIZE_COLUMN:
       'views.experimentsTable.columnResized',
+    VIEWS_EXPERIMENTS_TABLE_SELECT_BRANCHES:
+      'views.experimentsTable.selectBranches',
     VIEWS_EXPERIMENTS_TABLE_SELECT_COLUMNS:
       'views.experimentsTable.selectColumns',
     VIEWS_EXPERIMENTS_TABLE_SELECT_EXPERIMENTS_FOR_PLOTS:
       'views.experimentsTable.selectExperimentsForPlots',
     VIEWS_EXPERIMENTS_TABLE_SET_MAX_HEADER_HEIGHT:
       'views.experimentsTable.updateHeaderMaxHeight',
+    VIEWS_EXPERIMENTS_TABLE_SHOW_LESS_COMMITS:
+      'views.experimentsTable.showLessCommits',
+    VIEWS_EXPERIMENTS_TABLE_SHOW_MORE_COMMITS:
+      'views.experimentsTable.showMoreCommits',
     VIEWS_EXPERIMENTS_TABLE_SORT_COLUMN:
       'views.experimentsTable.columnSortAdded',
 
@@ -188,6 +194,8 @@ export interface IEventNamePropertyMapping {
   [EventName.RENAME_TARGET]: undefined
 
   [EventName.REMOTE_ADD]: undefined
+  [EventName.REMOTE_MODIFY]: undefined
+  [EventName.REMOTE_REMOVE]: undefined
 
   [EventName.GIT_STAGE_ALL]: undefined
   [EventName.GIT_UNSTAGE_ALL]: undefined
@@ -230,10 +238,13 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN]: {
     path: string
   }
+  [EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_BRANCHES]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_COLUMNS]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_EXPERIMENTS_FOR_PLOTS]: {
     experimentCount: number
   }
+  [EventName.VIEWS_EXPERIMENTS_TABLE_SHOW_MORE_COMMITS]: undefined
+  [EventName.VIEWS_EXPERIMENTS_TABLE_SHOW_LESS_COMMITS]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_OPEN_PARAMS_FILE]: {
     path: string
   }

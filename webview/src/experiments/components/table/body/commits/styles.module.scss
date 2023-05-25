@@ -1,22 +1,30 @@
 @import '../../../../../shared/variables';
 
-.commitsAndBranchesNav {
+.commitsNav {
   text-align: left;
+  font-size: 0.6rem;
+  display: flex;
+  align-items: center;
 }
 
-.commitsAndBranchesNavButton {
+.commitsButton {
   background: transparent;
   border: none;
-  color: $accent-color;
+  color: $meta-cell-color;
   text-decoration: underline;
-  font-size: 0.6rem;
   cursor: pointer;
 
   &:disabled {
     opacity: 0.5;
+    cursor: auto;
   }
 
   &:hover:not(:disabled) {
     text-decoration: none;
   }
+}
+
+.commitsIcon {
+  width: 10px;
+  height: 10px;
 }

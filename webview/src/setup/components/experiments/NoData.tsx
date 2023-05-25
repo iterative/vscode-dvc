@@ -1,11 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import React from 'react'
-import pyTorch from '../../snippets/pyTorch.py'
-import huggingFace from '../../snippets/huggingFace.py'
-import keras from '../../snippets/keras.py'
-import pythonApi from '../../snippets/pythonApi.py'
+import { DvcLiveExamples } from './DvcLiveExamples'
 import { CodeBlock } from '../../../shared/components/codeBlock/CodeBlock'
-import { CodeSlider } from '../../../shared/components/codeSlider/CodeSlider'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 
 export const NoData: React.FC = () => {
@@ -26,30 +21,7 @@ export const NoData: React.FC = () => {
         ). Once you have successfully added DVCLive to your project, do not
         forget to run your script to see experiments and plots in action.
       </div>
-      <CodeSlider
-        codeBlocks={[
-          {
-            children: pyTorch.toString(),
-            language: 'python',
-            title: 'PyTorch Lightning'
-          },
-          {
-            children: huggingFace.toString(),
-            language: 'python',
-            title: 'Hugging Face'
-          },
-          {
-            children: keras.toString(),
-            language: 'python',
-            title: 'Keras'
-          },
-          {
-            children: pythonApi.toString(),
-            language: 'python',
-            title: 'General Python API'
-          }
-        ]}
-      />
+      <DvcLiveExamples />
     </EmptyState>
   )
 }
