@@ -141,7 +141,12 @@ export class DvcRunner extends Disposable implements ICli {
   }
 
   private createProcess({ cwd, args }: { cwd: string; args: Args }): Process {
-    const options = this.getOptions(cwd, args)
+    const options = getOptions(
+      this.config.getPythonBinPath(),
+      this.config.getCliPath(),
+      cwd,
+      ...args
+    )
     const command = getCommandString(options)
     const stopWatch = new StopWatch()
     const process = this.dispose.track(createProcess(options))
@@ -167,15 +172,6 @@ export class DvcRunner extends Disposable implements ICli {
     })
 
     return process
-  }
-
-  private getOptions(cwd: string, args: Args) {
-    return getOptions(
-      this.config.getPythonBinPath(),
-      this.config.getCliPath(),
-      cwd,
-      ...args
-    )
   }
 
   private startProcess(cwd: string, args: Args) {
