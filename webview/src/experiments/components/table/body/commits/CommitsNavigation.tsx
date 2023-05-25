@@ -16,24 +16,24 @@ export const CommitsNavigation: React.FC<CommitsNavigationProps> = ({
     (state: ExperimentsState) => state.tableData
   )
 
-  const commitsButtons: { [key: string]: CommitsButtonProps } = {
-    LESS: {
-      action: () => showLessCommits(branch),
-      disabled: !isShowingMoreCommits[branch],
-      icon: Remove,
-      moreOrLess: 'Less'
-    },
-    MORE: {
+  const commitsButtons: CommitsButtonProps[] = [
+    {
       action: () => showMoreCommits(branch),
       disabled: !hasMoreCommits[branch],
       icon: Add,
       moreOrLess: 'More'
+    },
+    {
+      action: () => showLessCommits(branch),
+      disabled: !isShowingMoreCommits[branch],
+      icon: Remove,
+      moreOrLess: 'Less'
     }
-  }
+  ]
 
   return (
     <div className={styles.commitsNav}>
-      {Object.values(commitsButtons).map(commitButton => (
+      {commitsButtons.map(commitButton => (
         <CommitsButton key={commitButton.moreOrLess} {...commitButton} />
       ))}
     </div>

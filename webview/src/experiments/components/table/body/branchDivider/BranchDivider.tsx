@@ -24,11 +24,11 @@ export const BranchDivider: React.FC<PropsWithChildren<BranchDividerProps>> = ({
             height={12}
           />
           {children}
+
+          <CommitsNavigation branch={branch} />
         </div>
       </th>
-      <th colSpan={9999} className={styles.branchActions}>
-        <CommitsNavigation branch={branch} />
-      </th>
+      <th colSpan={9999} className={styles.branchActions}></th>
     </tr>
   </thead>
 )
