@@ -417,14 +417,6 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getSelectedRevisions()
   }
 
-  public setRevisionCollected(revisions: string[]) {
-    this.experiments.setRevisionCollected(revisions)
-  }
-
-  public getFinishedExperiments() {
-    return this.experiments.getFinishedExperiments()
-  }
-
   public getExperiments() {
     return this.experiments.getExperiments()
   }
