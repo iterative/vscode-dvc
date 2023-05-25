@@ -7,7 +7,7 @@ import {
 import { getRelativePattern } from '../../fileSystem/relativePattern'
 import { createFileSystemWatcher } from '../../fileSystem/watcher'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import { EXPERIMENT_WORKSPACE_ID, ExpShowOutput } from '../../cli/dvc/contract'
+import { ExpShowOutput } from '../../cli/dvc/contract'
 import { BaseData } from '../../data'
 import { DOT_DVC, ExperimentFlag } from '../../cli/dvc/constants'
 import { gitPath } from '../../cli/git/constants'
@@ -47,34 +47,32 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
     )
 
     void this.updateAvailableBranchesToSelect(allBranches)
-    const data: ExpShowOutput = []
 
     const { branches, currentBranch } = await this.getBranchesToShowWithCurrent(
       allBranches
     )
 
-    await Promise.all(
-      branches.map(async branch => {
-        const branchFlags = [
-          ExperimentFlag.REV,
-          branch,
-          ExperimentFlag.NUM_COMMIT,
-          this.experiments.getNbOfCommitsToShow(branch).toString()
-        ]
+    const flags = []
+    const branchList: string[] = []
 
-        const output = (await this.expShow(
-          branchFlags,
-          branch
-        )) as ExpShowOutput
+    for (const branch of branches) {
+      const nbOfCommitsToShow = this.experiments.getNbOfCommitsToShow(branch)
+      for (let i = 0; i < nbOfCommitsToShow; i++) {
+        flags.push(ExperimentFlag.REV, `${branch}~${i}`)
+        branchList.push(branch)
+      }
+    }
 
-        if (branch !== currentBranch) {
-          const workspaceIndex = output.findIndex(
-            exp => exp.rev === EXPERIMENT_WORKSPACE_ID
-          )
-          output.splice(workspaceIndex, 1)
-        }
-        data.push(...output)
-      })
+    const data = await this.internalCommands.executeCommand<ExpShowOutput>(
+      AvailableCommands.EXP_SHOW,
+      this.dvcRoot,
+      ...flags
+    )
+
+    // eslint-disable-next-line unicorn/no-array-for-each
+    data.forEach(
+      (output, i) =>
+        (output.branch = i === 0 ? currentBranch : branchList[i - 1])
     )
 
     this.collectFiles(data)
@@ -101,15 +99,6 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
       this.experiments.setBranchesToShow(branches)
     }
     return { branches, currentBranch }
-  }
-
-  private async expShow(flags: (ExperimentFlag | string)[], branch?: string) {
-    const data = await this.internalCommands.executeCommand<ExpShowOutput>(
-      AvailableCommands.EXP_SHOW,
-      this.dvcRoot,
-      ...flags
-    )
-    return data.map(exp => ({ ...exp, branch }))
   }
 
   private async updateAvailableBranchesToSelect(branches?: string[]) {
