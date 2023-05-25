@@ -113,18 +113,14 @@ export class ExperimentsModel extends ModelWithPersistence {
     )
   }
 
-  public transformAndSet(
-    data: ExpShowOutput,
-    dvcLiveOnly: boolean,
-    commitsOutput: string | undefined
-  ) {
+  public transformAndSet(data: ExpShowOutput, dvcLiveOnly: boolean) {
     const {
       workspace,
       commits,
       experimentsByCommit,
       runningExperiments,
       hasCheckpoints
-    } = collectExperiments(data, dvcLiveOnly, commitsOutput)
+    } = collectExperiments(data, dvcLiveOnly)
 
     this.workspace = workspace
     this.commits = commits

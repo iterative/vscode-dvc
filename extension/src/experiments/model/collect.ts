@@ -28,7 +28,6 @@ import { addToMapArray } from '../../util/map'
 import { RegisteredCommands } from '../../commands/external'
 import { Resource } from '../../resourceLocator'
 import { shortenForLabel } from '../../util/string'
-import { COMMITS_SEPARATOR } from '../../cli/git/constants'
 
 export type ExperimentItem = {
   command?: {
@@ -81,7 +80,7 @@ const transformColumns = (
   }
 }
 
-const getCommitDataFromOutput = (
+export const getCommitDataFromOutput = (
   output: string
 ): CommitData & { hash: string } => {
   const data: CommitData & { hash: string } = {
@@ -110,25 +109,9 @@ const getCommitDataFromOutput = (
   return data
 }
 
-const formatCommitMessage = (commit: string) => {
+export const formatCommitMessage = (commit: string) => {
   const lines = commit.split('\n').filter(Boolean)
   return `${lines[0]}${lines.length > 1 ? ' ...' : ''}`
-}
-
-const getCommitData = (
-  commitsOutput: string | undefined
-): { [sha: string]: CommitData } => {
-  if (!commitsOutput) {
-    return {}
-  }
-  const commits = commitsOutput
-    .split(COMMITS_SEPARATOR)
-    .filter(Boolean)
-    .map(commit => {
-      const { hash, ...rest } = getCommitDataFromOutput(commit)
-      return [hash, { ...rest }]
-    })
-  return Object.fromEntries(commits) as { [sha: string]: CommitData }
 }
 
 const transformExpState = (
@@ -156,37 +139,32 @@ const transformExpState = (
   return experiment
 }
 
-const addCommitData = (
-  baseline: Experiment,
-  commitData: { [sha: string]: CommitData } = {}
-): void => {
-  const { sha } = baseline
-  if (!sha) {
+const addCommitData = (baseline: Experiment, commitData?: CommitData): void => {
+  if (!commitData) {
     return
   }
-
-  const commit = commitData[sha]
-
-  if (!commit) {
-    return
-  }
-  baseline.description = formatCommitMessage(commit.message)
-  baseline.commit = commit
+  baseline.description = formatCommitMessage(commitData.message)
+  baseline.commit = commitData
 }
 
 const collectExpState = (
   acc: ExperimentsAccumulator,
-  expState: ExpState,
-  commitData: { [sha: string]: CommitData }
+  expState: ExpState
 ): Experiment | undefined => {
-  const { rev, name, branch } = expState
+  const { rev, name, branch, commit, description } = expState
   const label =
     rev === EXPERIMENT_WORKSPACE_ID
       ? EXPERIMENT_WORKSPACE_ID
       : name || shortenForLabel(rev)
   const id = name || label
 
-  const experiment: Experiment = { branch, id, label } as unknown as Experiment
+  const experiment: Experiment = {
+    branch,
+    id,
+    label,
+    commit,
+    description
+  } as unknown as Experiment
 
   const baseline = transformExpState(experiment, expState)
 
@@ -194,8 +172,6 @@ const collectExpState = (
     acc.workspace = baseline
     return
   }
-
-  addCommitData(baseline, commitData)
 
   acc.commits.push(baseline)
   return baseline
@@ -323,8 +299,7 @@ const hasCheckpoints = (data: ExpShowOutput) => {
 
 export const collectExperiments = (
   output: ExpShowOutput,
-  dvcLiveOnly: boolean,
-  commitsOutput: string | undefined
+  dvcLiveOnly: boolean
 ): ExperimentsAccumulator => {
   const acc: ExperimentsAccumulator = {
     commits: [],
@@ -338,10 +313,8 @@ export const collectExperiments = (
     }
   }
 
-  const commitData = getCommitData(commitsOutput)
-
   for (const expState of output) {
-    const baseline = collectExpState(acc, expState, commitData)
+    const baseline = collectExpState(acc, expState)
     const { experiments } = expState
 
     if (!(baseline && experiments?.length)) {
