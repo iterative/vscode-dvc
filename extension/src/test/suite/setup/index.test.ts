@@ -7,7 +7,6 @@ import {
   MessageItem,
   QuickPickItem,
   Uri,
-  WorkspaceConfiguration,
   commands,
   window,
   workspace
@@ -315,6 +314,7 @@ suite('Setup Test Suite', () => {
       await messageSent
 
       expect(mockSendMessage).to.be.calledOnce
+
       expect(mockSendMessage).to.be.calledWithExactly({
         canGitInitialize: true,
         cliCompatible: true,
@@ -329,7 +329,7 @@ suite('Setup Test Suite', () => {
         pythonBinPath: undefined,
         remoteList: undefined,
         sectionCollapsed: undefined,
-        shareLiveToStudio: false
+        shareLiveToStudio: true
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -381,7 +381,7 @@ suite('Setup Test Suite', () => {
         pythonBinPath: undefined,
         remoteList: undefined,
         sectionCollapsed: undefined,
-        shareLiveToStudio: false
+        shareLiveToStudio: true
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -433,7 +433,7 @@ suite('Setup Test Suite', () => {
         pythonBinPath: undefined,
         remoteList: { [dvcDemoPath]: undefined },
         sectionCollapsed: undefined,
-        shareLiveToStudio: false
+        shareLiveToStudio: true
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -791,27 +791,26 @@ suite('Setup Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle a message to set dvc.studio.shareExperimentsLive', async () => {
-      const { setup } = buildSetup(disposable)
+    it('should handle a message to set studio.offline (share live experiments)', async () => {
+      const { mockConfig, setup } = buildSetup(disposable)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(setup as any, 'getCliCompatible').returns(true)
+
       const webview = await setup.showWebview()
       await webview.isReady()
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
-
-      const mockUpdate = stub()
-
-      stub(workspace, 'getConfiguration').returns({
-        update: mockUpdate
-      } as unknown as WorkspaceConfiguration)
 
       mockMessageReceived.fire({
         payload: false,
         type: MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE
       })
 
-      expect(mockUpdate).to.be.calledWithExactly(
-        Config.ConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE,
-        false
+      expect(mockConfig).to.be.calledWithExactly(
+        dvcDemoPath,
+        '--global',
+        'studio.offline',
+        'true'
       )
     })
 

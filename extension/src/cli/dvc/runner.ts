@@ -5,7 +5,7 @@ import {
   ExperimentFlag,
   ExperimentSubCommand
 } from './constants'
-import { addStudioAccessToken, getOptions } from './options'
+import { getOptions } from './options'
 import { CliResult, CliStarted, ICli, typeCheckCommands } from '..'
 import { getCommandString } from '../command'
 import { Config } from '../../config'
@@ -46,15 +46,10 @@ export class DvcRunner extends Disposable implements ICli {
   private readonly pseudoTerminal: PseudoTerminal
   private currentProcess: Process | undefined
   private readonly config: Config
-  private readonly getStudioLiveShareToken: () => string | undefined
 
-  constructor(
-    config: Config,
-    getStudioLiveShareToken: () => string | undefined
-  ) {
+  constructor(config: Config) {
     super()
     this.config = config
-    this.getStudioLiveShareToken = getStudioLiveShareToken
 
     this.processCompleted = this.dispose.track(new EventEmitter<CliResult>())
     this.onDidCompleteProcess = this.processCompleted.event
@@ -175,15 +170,12 @@ export class DvcRunner extends Disposable implements ICli {
   }
 
   private getOptions(cwd: string, args: Args) {
-    const options = getOptions(
+    return getOptions(
       this.config.getPythonBinPath(),
       this.config.getCliPath(),
       cwd,
       ...args
     )
-
-    const studioAccessToken = this.getStudioLiveShareToken()
-    return addStudioAccessToken(options, studioAccessToken)
   }
 
   private startProcess(cwd: string, args: Args) {

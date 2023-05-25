@@ -670,7 +670,7 @@ describe('App', () => {
   })
 
   describe('Studio connected', () => {
-    it('should render a checkbox which can be used to update dvc.studio.shareExperimentsLive', () => {
+    it('should render a checkbox which can be used to update studio.offline in the global DVC config', () => {
       const shareExperimentsLive = false
       renderApp({
         isStudioConnected: true
