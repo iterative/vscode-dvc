@@ -398,8 +398,10 @@ suite('Workspace Experiments Test Suite', () => {
         DvcRunner.prototype,
         'runExperiment'
       ).resolves(undefined)
-      stub(Setup.prototype, 'isDvcSetup').returns(true)
-      stub(Setup.prototype, 'isExperimentsSetup').returns(true)
+      stub(Setup.prototype, 'shouldBeShown').returns({
+        dvc: true,
+        experiments: true
+      })
 
       stubWorkspaceExperimentsGetters(dvcDemoPath)
 
@@ -435,8 +437,10 @@ suite('Workspace Experiments Test Suite', () => {
         DvcRunner.prototype,
         'runExperimentReset'
       ).resolves(undefined)
-      stub(Setup.prototype, 'isDvcSetup').returns(true)
-      stub(Setup.prototype, 'isExperimentsSetup').returns(true)
+      stub(Setup.prototype, 'shouldBeShown').returns({
+        dvc: true,
+        experiments: true
+      })
 
       stubWorkspaceExperimentsGetters(dvcDemoPath)
 
@@ -926,8 +930,10 @@ suite('Workspace Experiments Test Suite', () => {
       )
       const executeCommandSpy = spy(commands, 'executeCommand')
 
-      stub(Setup.prototype, 'isDvcSetup').returns(false)
-      stub(Setup.prototype, 'isExperimentsSetup').returns(false)
+      stub(Setup.prototype, 'shouldBeShown').returns({
+        dvc: false,
+        experiments: false
+      })
 
       await commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
 
@@ -941,8 +947,10 @@ suite('Workspace Experiments Test Suite', () => {
         'showWebview'
       )
       const executeCommandSpy = spy(commands, 'executeCommand')
-      stub(Setup.prototype, 'isDvcSetup').returns(true)
-      stub(Setup.prototype, 'isExperimentsSetup').returns(false)
+      stub(Setup.prototype, 'shouldBeShown').returns({
+        dvc: true,
+        experiments: false
+      })
 
       await commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
 
@@ -957,8 +965,10 @@ suite('Workspace Experiments Test Suite', () => {
 
       stub(WorkspaceExperiments.prototype, 'showWebview').resolves()
 
-      stub(Setup.prototype, 'isDvcSetup').returns(true)
-      stub(Setup.prototype, 'isExperimentsSetup').returns(true)
+      stub(Setup.prototype, 'shouldBeShown').returns({
+        dvc: true,
+        experiments: true
+      })
 
       await commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
 
@@ -971,8 +981,10 @@ suite('Workspace Experiments Test Suite', () => {
         WorkspaceExperiments.prototype,
         'showWebview'
       ).resolves()
-      stub(Setup.prototype, 'isDvcSetup').returns(true)
-      stub(Setup.prototype, 'isExperimentsSetup').returns(true)
+      stub(Setup.prototype, 'shouldBeShown').returns({
+        dvc: true,
+        experiments: true
+      })
 
       await commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
 
