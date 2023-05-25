@@ -232,15 +232,10 @@ describe('App', () => {
       ).not.toBeInTheDocument()
     })
 
-    it('should show a screen saying that DVC is not initialized if the project is not initialized and git is uninitialized', () => {
+    it('should show a screen saying that Git is not initialized if the project is not initialized and git is uninitialized', () => {
       renderApp({ needsGitInitialized: true, projectInitialized: false })
 
-      const uninitializedText = screen.getAllByText('DVC is not initialized')
-
-      expect(uninitializedText).toHaveLength(2)
-      for (const text of uninitializedText) {
-        expect(text).toBeInTheDocument()
-      }
+      expect(screen.getByText('Git is not initialized')).toBeInTheDocument()
     })
 
     it('should offer to initialize Git if it is possible', () => {
@@ -265,7 +260,7 @@ describe('App', () => {
 
       const uninitialized = screen.getAllByText('DVC is not initialized')
 
-      expect(uninitialized).toHaveLength(4)
+      expect(uninitialized).toHaveLength(2)
     })
 
     it('should not show a screen saying that DVC is not initialized if the project is initialized and dvc is installed', () => {

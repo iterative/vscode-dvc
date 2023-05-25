@@ -27,7 +27,7 @@ export const GitUninitialized: React.FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <EmptyState isFullScreen={false}>
-      <h1>DVC is not initialized</h1>
+      <h1>Git is not initialized</h1>
       {children}
       <p>A Git repository is a prerequisite of project initialization.</p>
       {conditionalContent}
