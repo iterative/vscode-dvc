@@ -21,6 +21,7 @@ export const codicons = [
   'pass-filled',
   'pinned',
   'refresh',
+  'remove',
   'sort-precedence',
   'star-empty',
   'star-full',

@@ -226,6 +226,11 @@ export class WebviewMessages {
     if (!selectedBranches) {
       return
     }
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_BRANCHES,
+      undefined,
+      undefined
+    )
     this.experiments.setBranchesToShow(selectedBranches)
     await this.update()
     await this.changeHasMoreOrLessCommits(true)
@@ -244,6 +249,13 @@ export class WebviewMessages {
   }
 
   private async changeCommitsToShow(change: 1 | -1, branch: string) {
+    sendTelemetryEvent(
+      change === 1
+        ? EventName.VIEWS_EXPERIMENTS_TABLE_SHOW_MORE_COMMITS
+        : EventName.VIEWS_EXPERIMENTS_TABLE_SHOW_LESS_COMMITS,
+      undefined,
+      undefined
+    )
     this.experiments.setNbfCommitsToShow(
       this.experiments.getNbOfCommitsToShow(branch) +
         NUM_OF_COMMITS_TO_INCREASE * change,

@@ -1741,22 +1741,16 @@ describe('App', () => {
   })
 
   describe('Show more commits', () => {
-    it('should display a show more commits button if the table data hasMoreCommits is set to true', () => {
+    it('should display a show more commits button', () => {
       renderTable({ ...tableDataFixture, hasMoreCommits: { main: true } })
 
-      expect(screen.getByText('Show More Commits')).toBeInTheDocument()
-    })
-
-    it('should not display a show more commits button if the table data hasMoreCommits is set to false', () => {
-      renderTable({ ...tableDataFixture, hasMoreCommits: { main: false } })
-
-      expect(screen.queryByText('Show More Commits')).not.toBeInTheDocument()
+      expect(screen.getByLabelText('Show More Commits')).toBeInTheDocument()
     })
 
     it('should send a message to show more commits when the show more commits button is clicked', () => {
       renderTable({ ...tableDataFixture, hasMoreCommits: { main: true } })
 
-      fireEvent.click(screen.getByText('Show More Commits'))
+      fireEvent.click(screen.getByLabelText('Show More Commits'))
 
       expect(mockPostMessage).toHaveBeenCalledWith({
         payload: 'main',
@@ -1764,22 +1758,24 @@ describe('App', () => {
       })
     })
 
-    it('should display a show less commits button if the table data isShowingMoreCommits is set to true', () => {
+    it('should disable the show more commits button if the table data hasMoreCommits is set to false', () => {
+      renderTable({ ...tableDataFixture, hasMoreCommits: { main: false } })
+
+      fireEvent.click(screen.getByLabelText('Show More Commits'))
+
+      expect(mockPostMessage).not.toHaveBeenCalledWith({
+        payload: 'main',
+        type: MessageFromWebviewType.SHOW_MORE_COMMITS
+      })
+    })
+
+    it('should display a show less commits button', () => {
       renderTable({
         ...tableDataFixture,
         isShowingMoreCommits: { main: true }
       })
 
-      expect(screen.getByText('Show Less Commits')).toBeInTheDocument()
-    })
-
-    it('should not display a show less commits button if the table data isShowingMoreCommits is set to false', () => {
-      renderTable({
-        ...tableDataFixture,
-        isShowingMoreCommits: { main: false }
-      })
-
-      expect(screen.queryByText('Show Less Commits')).not.toBeInTheDocument()
+      expect(screen.getByLabelText('Show Less Commits')).toBeInTheDocument()
     })
 
     it('should send a message to show less commits when the show less commits button is clicked', () => {
@@ -1788,9 +1784,23 @@ describe('App', () => {
         isShowingMoreCommits: { main: true }
       })
 
-      fireEvent.click(screen.getByText('Show Less Commits'))
+      fireEvent.click(screen.getByLabelText('Show Less Commits'))
 
       expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: 'main',
+        type: MessageFromWebviewType.SHOW_LESS_COMMITS
+      })
+    })
+
+    it('should disable the show less commits button if the table data isShowingMoreCommits is set to false', () => {
+      renderTable({
+        ...tableDataFixture,
+        isShowingMoreCommits: { main: false }
+      })
+
+      fireEvent.click(screen.getByLabelText('Show Less Commits'))
+
+      expect(mockPostMessage).not.toHaveBeenCalledWith({
         payload: 'main',
         type: MessageFromWebviewType.SHOW_LESS_COMMITS
       })
@@ -1801,7 +1811,7 @@ describe('App', () => {
     it('should send a message to select branches when clicking the select branches button', () => {
       renderTable()
 
-      fireEvent.click(screen.getByText('Select Branch(es) to Show'))
+      fireEvent.click(screen.getByLabelText('branches'))
 
       expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.SELECT_BRANCHES
@@ -1811,7 +1821,7 @@ describe('App', () => {
     it('should disable the select branches button if there are no branches to select', () => {
       renderTable({ ...tableDataFixture, hasBranchesToSelect: false })
 
-      fireEvent.click(screen.getByText('Select Branch(es) to Show'))
+      fireEvent.click(screen.getByLabelText('branches'))
 
       expect(mockPostMessage).not.toHaveBeenCalledWith({
         type: MessageFromWebviewType.SELECT_BRANCHES
