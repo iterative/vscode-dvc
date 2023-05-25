@@ -35,7 +35,6 @@ export enum Flag {
   HARD = '--hard',
   NAME_ONLY = '--name-only',
   NO_EMPTY_DIRECTORY = '--no-empty-directory',
-  NO_MERGE = '--no-merge',
   NUMBER = '-n',
   PRETTY_FORMAT_COMMIT_MESSAGE = '--pretty=format:%H%n%an%n%ar%nrefNames:%D%nmessage:%B',
   OTHERS = '--others',
