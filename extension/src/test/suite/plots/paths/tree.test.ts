@@ -130,7 +130,7 @@ suite('Plots Paths Tree Test Suite', () => {
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should be able to refresh revision data for all plots using dvc.views.plotsPathsTree.refreshPlots', async () => {
+    it('should be able to refresh revision data for all plots using dvc.views.plots.refreshPlots', async () => {
       const { data, mockPlotsDiff, plots } = await buildPlots(
         disposable,
         plotsDiffFixture

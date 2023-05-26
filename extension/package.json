@@ -577,7 +577,7 @@
       },
       {
         "title": "Refresh Plots for Selected Experiments",
-        "command": "dvc.views.plotsPathsTree.refreshPlots",
+        "command": "dvc.views.plots.refreshPlots",
         "category": "DVC",
         "icon": "$(refresh)"
       },
@@ -989,7 +989,7 @@
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
-          "command": "dvc.views.plotsPathsTree.refreshPlots",
+          "command": "dvc.views.plots.refreshPlots",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
@@ -1383,7 +1383,7 @@
           "group": "navigation@2"
         },
         {
-          "command": "dvc.views.plotsPathsTree.refreshPlots",
+          "command": "dvc.views.plots.refreshPlots",
           "when": "view == dvc.views.plotsPathsTree",
           "group": "navigation@3"
         }
