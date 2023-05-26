@@ -19,16 +19,16 @@ import { openUrl } from '../../vscode/external'
 export class WebviewMessages {
   private readonly getWebview: () => BaseWebview<TSetupData> | undefined
   private readonly initializeGit: () => void
-  private readonly setStudioOffline: (offline: boolean) => Promise<void>
+  private readonly updateStudioOffline: (offline: boolean) => Promise<void>
 
   constructor(
     getWebview: () => BaseWebview<TSetupData> | undefined,
     initializeGit: () => void,
-    setStudioOffline: (shareLive: boolean) => Promise<void>
+    updateStudioOffline: (shareLive: boolean) => Promise<void>
   ) {
     this.getWebview = getWebview
     this.initializeGit = initializeGit
-    this.setStudioOffline = setStudioOffline
+    this.updateStudioOffline = updateStudioOffline
   }
 
   public sendWebviewMessage({
@@ -102,7 +102,7 @@ export class WebviewMessages {
           RegisteredCommands.REMOVE_STUDIO_ACCESS_TOKEN
         )
       case MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE:
-        return this.setStudioOffline(message.payload)
+        return this.updateStudioOffline(message.payload)
       case MessageFromWebviewType.OPEN_EXPERIMENTS_WEBVIEW:
         return commands.executeCommand(RegisteredCommands.EXPERIMENT_SHOW)
       case MessageFromWebviewType.REMOTE_ADD:

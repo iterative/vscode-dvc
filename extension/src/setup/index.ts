@@ -407,7 +407,7 @@ export class Setup
     const webviewMessages = new WebviewMessages(
       () => this.getWebview(),
       () => this.initializeGit(),
-      (offline: boolean) => this.setStudioOffline(offline)
+      (offline: boolean) => this.updateStudioOffline(offline)
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>
@@ -673,46 +673,24 @@ export class Setup
   }
 
   private async setStudioValues() {
-    if (!this.getCliCompatible()) {
+    const cwd = this.getCwd()
+
+    if (!cwd) {
       this.studioAccessToken = undefined
       this.shareLiveToStudio = undefined
       return
     }
 
-    if (this.dvcRoots.length !== 1) {
-      const cwd = getFirstWorkspaceFolder()
-      if (!cwd) {
-        this.studioAccessToken = undefined
-        this.shareLiveToStudio = undefined
-        return
-      }
-
-      ;[this.studioAccessToken] = await Promise.all([
-        this.accessConfig(cwd, ConfigKey.STUDIO_TOKEN),
-        this.getStudioShareLive(cwd)
-      ])
-      return
-    }
-
-    ;[this.studioAccessToken] = await Promise.all([
-      this.accessConfig(this.dvcRoots[0], ConfigKey.STUDIO_TOKEN),
-      this.getStudioShareLive(this.dvcRoots[0])
+    ;[this.studioAccessToken, this.shareLiveToStudio] = await Promise.all([
+      this.accessConfig(cwd, ConfigKey.STUDIO_TOKEN),
+      (await this.accessConfig(cwd, ConfigKey.STUDIO_OFFLINE)) !== 'true'
     ])
   }
 
-  private async getStudioShareLive(cwd: string) {
-    this.shareLiveToStudio =
-      (await this.accessConfig(cwd, ConfigKey.STUDIO_OFFLINE)) !== 'true'
-  }
-
-  private async setStudioOffline(shareLive: boolean) {
+  private async updateStudioOffline(shareLive: boolean) {
     const offline = !shareLive
-    if (!this.getCliCompatible()) {
-      return
-    }
 
-    const cwd =
-      this.dvcRoots.length === 1 ? this.dvcRoots[0] : getFirstWorkspaceFolder()
+    const cwd = this.getCwd()
 
     if (!cwd) {
       return
@@ -724,6 +702,15 @@ export class Setup
       ConfigKey.STUDIO_OFFLINE,
       String(offline)
     )
+  }
+
+  private getCwd() {
+    if (!this.getCliCompatible()) {
+      return
+    }
+    return this.dvcRoots.length === 1
+      ? this.dvcRoots[0]
+      : getFirstWorkspaceFolder()
   }
 
   private accessConfig(cwd: string, ...args: Args) {
