@@ -71,7 +71,6 @@ export const EventName = Object.assign(
     VIEWS_PLOTS_CREATED: 'views.plots.created',
     VIEWS_PLOTS_EXPERIMENT_TOGGLE: 'views.plots.toggleExperimentStatus',
     VIEWS_PLOTS_FOCUS_CHANGED: 'views.plots.focusChanged',
-    VIEWS_PLOTS_MANUAL_REFRESH: 'views.plots.manualRefresh',
     VIEWS_PLOTS_REVISIONS_REORDERED: 'views.plots.revisionsReordered',
     VIEWS_PLOTS_SECTION_RESIZED: 'views.plots.sectionResized',
     VIEWS_PLOTS_SECTION_TOGGLE: 'views.plots.toggleSection',
@@ -252,7 +251,6 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_CLOSED]: undefined
   [EventName.VIEWS_PLOTS_CREATED]: undefined
   [EventName.VIEWS_PLOTS_FOCUS_CHANGED]: WebviewFocusChangedProperties
-  [EventName.VIEWS_PLOTS_MANUAL_REFRESH]: undefined
   [EventName.VIEWS_PLOTS_REVISIONS_REORDERED]: undefined
   [EventName.VIEWS_PLOTS_COMPARISON_ROWS_REORDERED]: undefined
   [EventName.VIEWS_PLOTS_SECTION_RESIZED]: {
