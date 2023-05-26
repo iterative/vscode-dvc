@@ -837,6 +837,28 @@ suite('Setup Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should check if experiments and dvc are setup', async () => {
+      const { setup } = buildSetup(disposable, false, false)
+
+      setup.setCliCompatibleAndVersion(true, MIN_CLI_VERSION)
+      setup.setAvailable(true)
+      await setup.setRoots()
+
+      expect(setup.shouldBeShown()).to.deep.equal({
+        dvc: true,
+        experiments: false
+      })
+
+      setup.setCliCompatibleAndVersion(undefined, undefined)
+      setup.setAvailable(false)
+      await setup.setRoots()
+
+      expect(setup.shouldBeShown()).to.deep.equal({
+        dvc: false,
+        experiments: false
+      })
+    })
+
     it('should handle a message to open the experiments webview', async () => {
       const { messageSpy, setup, mockShowWebview, mockExecuteCommand } =
         buildSetup(disposable)
@@ -853,7 +875,10 @@ suite('Setup Test Suite', () => {
           return Promise.resolve(undefined)
         })
       )
-      stub(Setup.prototype, 'shouldBeShown').returns(false)
+      stub(Setup.prototype, 'shouldBeShown').returns({
+        dvc: true,
+        experiments: true
+      })
 
       messageSpy.resetHistory()
       mockMessageReceived.fire({
