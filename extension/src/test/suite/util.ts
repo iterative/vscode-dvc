@@ -36,6 +36,7 @@ import { SetupData } from '../../setup/webview/contract'
 import { DvcViewer } from '../../cli/dvc/viewer'
 import { Toast } from '../../vscode/toast'
 import { GitExecutor } from '../../cli/git/executor'
+import { DvcConfig } from '../../cli/dvc/config'
 
 export const mockDisposable = {
   dispose: stub()
@@ -140,6 +141,7 @@ export const bypassProcessManagerDebounce = (
 
 export const buildInternalCommands = (disposer: Disposer) => {
   const config = disposer.track(new Config())
+  const dvcConfig = disposer.track(new DvcConfig(config))
   const dvcReader = disposer.track(new DvcReader(config))
   const dvcRunner = disposer.track(new DvcRunner(config))
   const dvcExecutor = disposer.track(new DvcExecutor(config))
@@ -154,6 +156,7 @@ export const buildInternalCommands = (disposer: Disposer) => {
   const internalCommands = disposer.track(
     new InternalCommands(
       outputChannel,
+      dvcConfig,
       dvcExecutor,
       dvcReader,
       dvcRunner,
@@ -165,6 +168,7 @@ export const buildInternalCommands = (disposer: Disposer) => {
 
   return {
     config,
+    dvcConfig,
     dvcExecutor,
     dvcReader,
     dvcRunner,
@@ -197,6 +201,7 @@ export const buildDependencies = (
 ) => {
   const {
     config,
+    dvcConfig,
     dvcExecutor,
     dvcReader,
     dvcRunner,
@@ -231,6 +236,7 @@ export const buildDependencies = (
 
   return {
     config,
+    dvcConfig,
     dvcExecutor,
     dvcReader,
     dvcRunner,

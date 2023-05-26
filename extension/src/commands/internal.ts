@@ -2,6 +2,7 @@ import { commands } from 'vscode'
 import { RegisteredCliCommands, RegisteredCommands } from './external'
 import { ICli } from '../cli'
 import { Args } from '../cli/constants'
+import { autoRegisteredCommands as DvcConfigCommands } from '../cli/dvc/config'
 import { autoRegisteredCommands as DvcExecutorCommands } from '../cli/dvc/executor'
 import { autoRegisteredCommands as DvcReaderCommands } from '../cli/dvc/reader'
 import { autoRegisteredCommands as DvcRunnerCommands } from '../cli/dvc/runner'
@@ -19,18 +20,21 @@ type Command = (...args: Args) => unknown | Promise<unknown>
 
 export const AvailableCommands = Object.assign(
   {},
+  DvcConfigCommands,
   DvcExecutorCommands,
   DvcReaderCommands,
   DvcRunnerCommands,
   DvcViewerCommands,
   GitExecutorCommands,
   GitReaderCommands
-) as typeof DvcExecutorCommands &
+) as typeof DvcConfigCommands &
+  typeof DvcExecutorCommands &
   typeof DvcReaderCommands &
   typeof DvcRunnerCommands &
   typeof DvcViewerCommands &
   typeof GitExecutorCommands &
   typeof GitReaderCommands
+
 export type CommandId =
   (typeof AvailableCommands)[keyof typeof AvailableCommands]
 
