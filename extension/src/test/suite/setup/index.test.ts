@@ -793,13 +793,17 @@ suite('Setup Test Suite', () => {
 
     it('should handle a message to set studio.offline (share live experiments)', async () => {
       const { mockConfig, setup } = buildSetup(disposable)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub(setup as any, 'getCliCompatible').returns(true)
-
       const webview = await setup.showWebview()
       await webview.isReady()
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(setup as any, 'getCliCompatible')
+        .onFirstCall()
+        .returns(true)
+        .onSecondCall()
+        .returns(undefined)
 
       mockMessageReceived.fire({
         payload: false,
@@ -812,6 +816,14 @@ suite('Setup Test Suite', () => {
         'studio.offline',
         'true'
       )
+      mockConfig.resetHistory()
+
+      mockMessageReceived.fire({
+        payload: false,
+        type: MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE
+      })
+
+      expect(mockConfig).not.to.be.called
     })
 
     it('should be able to delete the Studio access token from the global dvc config', async () => {
