@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.22] - 2023-05-26
+
+### 🚀 New Features and Enhancements
+
+- Use icons to show more or less commits and select branches [#3972](https://github.com/iterative/vscode-dvc/pull/3972) by [@sroy3](https://github.com/sroy3)
+- Simplify setup section text blocks [#3981](https://github.com/iterative/vscode-dvc/pull/3981) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Fix setup redirection logic [#3953](https://github.com/iterative/vscode-dvc/pull/3953) by [@julieg18](https://github.com/julieg18)
+
 ## [0.8.21] - 2023-05-25
 
 ### 🚀 New Features and Enhancements
