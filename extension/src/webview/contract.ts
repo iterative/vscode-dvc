@@ -38,7 +38,7 @@ export enum MessageFromWebviewType {
   RESIZE_PLOTS = 'resize-plots',
   SAVE_STUDIO_TOKEN = 'save-studio-token',
   SHOW_EXPERIMENT_LOGS = 'show-experiment-logs',
-  SHOW_WALKTHROUGH = 'show-walkthrough',
+  SHOW_WALKTHROUGH = 'show-walkthough',
   STOP_EXPERIMENTS = 'stop-experiments',
   SORT_COLUMN = 'sort-column',
   TOGGLE_EXPERIMENT = 'toggle-experiment',
@@ -156,6 +156,7 @@ export type MessageFromWebview =
       payload: string[]
     }
   | { type: MessageFromWebviewType.SHOW_EXPERIMENT_LOGS; payload: string }
+  | { type: MessageFromWebviewType.SHOW_WALKTHROUGH }
   | {
       type: MessageFromWebviewType.PUSH_EXPERIMENT
       payload: string[]

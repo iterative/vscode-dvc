@@ -11,11 +11,19 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
     (state: SetupState) => state.dvc.pythonBinPath
   )
   const canInstall = !!pythonBinPath
+  const installationSentence = (
+    <>
+      The extension supports all{' '}
+      <a href="https://dvc.org/doc/install">installation types</a> and can
+      auto-install recommended packages for you.
+    </>
+  )
 
-  const contents = canInstall ? (
+  const conditionalContents = canInstall ? (
     <>
       <p>
-        DVC & DVCLive can be auto-installed as packages with {pythonBinPath}
+        {installationSentence} DVC & DVCLive can be auto-installed with{' '}
+        {pythonBinPath}.
       </p>
       <div className={styles.sideBySideButtons}>
         <Button onClick={installDvc} text="Install" />
@@ -24,7 +32,10 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
     </>
   ) : (
     <>
-      <p>DVC & DVCLive cannot be auto-installed as Python was not located.</p>
+      <p>
+        {installationSentence} DVC & DVCLive cannot be auto-installed as Python
+        was not located.
+      </p>
       <Button onClick={setupWorkspace} text="Configure" />
     </>
   )
@@ -33,7 +44,13 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
     <EmptyState isFullScreen={false}>
       <h1>DVC is currently unavailable</h1>
       {children}
-      {contents}
+      <p>
+        New to DVC? Check out <a href="https://dvc.org/">dvc.org</a> to learn
+        more or our{' '}
+        <a href="https://github.com/iterative/vscode-dvc-demo">demo</a> to
+        quickly try the extension.{' '}
+      </p>
+      {conditionalContents}
     </EmptyState>
   )
 }

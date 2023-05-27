@@ -11,6 +11,8 @@ export const DvcUninitialized: React.FC<PropsWithChildren> = ({ children }) => (
       The current workspace does not contain a DVC project. You can initialize a
       project which will enable features powered by DVC. To learn more about how
       to use DVC please read <a href="https://dvc.org/doc">our docs</a>.
+      Interested in trying a demo project? Check out our{' '}
+      <a href="https://github.com/iterative/vscode-dvc-demo">extension demo</a>.
     </p>
     <Button onClick={initializeDvc} text="Initialize Project"></Button>
   </EmptyState>

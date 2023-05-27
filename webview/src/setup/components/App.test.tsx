@@ -144,7 +144,7 @@ describe('App', () => {
 
       expect(
         screen.getByText(
-          'DVC & DVCLive cannot be auto-installed as Python was not located.'
+          /DVC & DVCLive cannot be auto-installed as Python was not located./
         )
       ).toBeInTheDocument()
       expect(screen.queryByText('Install')).not.toBeInTheDocument()
@@ -161,11 +161,11 @@ describe('App', () => {
         pythonBinPath: defaultInterpreter
       })
 
-      expect(
-        screen.getByText(
-          `DVC & DVCLive can be auto-installed as packages with ${defaultInterpreter}`
-        )
-      ).toBeInTheDocument()
+      const sentenceReg = new RegExp(
+        `DVC & DVCLive can be auto-installed with ${defaultInterpreter}.`
+      )
+
+      expect(screen.getByText(sentenceReg)).toBeInTheDocument()
       expect(screen.getByText('Install')).toBeInTheDocument()
     })
 

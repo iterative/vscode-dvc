@@ -1518,32 +1518,6 @@
         "description": "Your first steps to build better models faster with experiment tracking and dataset versioning",
         "steps": [
           {
-            "id": "dvc.installDVC",
-            "title": "Install DVC",
-            "description": "This extension requires DVC to be installed.\n\n[Show Setup](command:dvc.showDvcSetup)\n",
-            "media": {
-              "markdown": "resources/walkthrough/install-dvc.md"
-            },
-            "completionEvents": [
-              "onLink:https://dvc.org",
-              "onLink:https://dvc.org/doc/install",
-              "onCommand:dvc.setupWorkspace"
-            ]
-          },
-          {
-            "id": "dvc.setupProject",
-            "title": "Setup a DVC Project",
-            "description": "Try an example DVC project or set one up quickly, and start tracking datasets, models, metrics, and plots\n\n[Example Project](https://github.com/iterative/example-get-started)\n",
-            "media": {
-              "markdown": "resources/walkthrough/setup-project.md"
-            },
-            "completionEvents": [
-              "onLink:https://github.com/iterative/example-get-started",
-              "onLink:https://github.com/iterative/vscode-dvc-demo",
-              "onLink:https://dvc.org/doc/dvclive"
-            ]
-          },
-          {
             "id": "dvc.showCommands",
             "title": "Available Commands",
             "description": "See all available commands.\n[View Commands](command:dvc.showCommands)",
