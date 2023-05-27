@@ -26,27 +26,24 @@ export const registerWalkthroughCommands = (
   )
 }
 
-export const showWalkthroughOnFirstUse = async (
+export const showSetupOnFirstUse = async (
   isNewAppInstall: boolean
 ): Promise<void> => {
   if (
     !isNewAppInstall ||
-    getConfigValue<boolean>(ConfigKey.DO_NOT_SHOW_WALKTHROUGH_AFTER_INSTALL)
+    getConfigValue<boolean>(ConfigKey.DO_NOT_SHOW_SETUP_AFTER_INSTALL)
   ) {
     return
   }
 
   const response = await Toast.askShowOrCloseOrNever(
-    'Need help? There is a walkthrough.'
+    'Need help? Go to our setup view.'
   )
 
   if (response === Response.SHOW) {
-    void commands.executeCommand(RegisteredCommands.EXTENSION_GET_STARTED)
+    void commands.executeCommand(RegisteredCommands.SETUP_SHOW_DVC)
   }
   if (response === Response.NEVER) {
-    void setUserConfigValue(
-      ConfigKey.DO_NOT_SHOW_WALKTHROUGH_AFTER_INSTALL,
-      true
-    )
+    void setUserConfigValue(ConfigKey.DO_NOT_SHOW_SETUP_AFTER_INSTALL, true)
   }
 }

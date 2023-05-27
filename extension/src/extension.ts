@@ -30,7 +30,7 @@ import { RegisteredCommands } from './commands/external'
 import { StopWatch } from './util/time'
 import {
   registerWalkthroughCommands,
-  showWalkthroughOnFirstUse
+  showSetupOnFirstUse
 } from './vscode/walkthrough'
 import { WorkspaceRepositories } from './repository/workspace'
 import { recommendRedHatExtensionOnce } from './vscode/recommend'
@@ -263,7 +263,7 @@ class Extension extends Disposable {
 
     registerPersistenceCommands(context.workspaceState, this.internalCommands)
 
-    void showWalkthroughOnFirstUse(env.isNewAppInstall)
+    void showSetupOnFirstUse(env.isNewAppInstall)
     this.dispose.track(recommendRedHatExtensionOnce())
 
     this.dispose.track(new LanguageClient())
