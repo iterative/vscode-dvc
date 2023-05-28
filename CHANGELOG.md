@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.0] - 2023-05-28
+
+### 🚀 New Features and Enhancements
+
+- Bump min version of DVC to 2.57.0 (Live share to studio config option) [#3976](https://github.com/iterative/vscode-dvc/pull/3976) by [@mattseddon](https://github.com/mattseddon)
+- Bump min version of DVC to 2.58.1 (Enable live plots for experiments running outside of the workspace) [#3965](https://github.com/iterative/vscode-dvc/pull/3965) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix issues with messages from the plots webview [#3986](https://github.com/iterative/vscode-dvc/pull/3986) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Add DvcConfig class [#3987](https://github.com/iterative/vscode-dvc/pull/3987) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.8.22] - 2023-05-26
 
 ### 🚀 New Features and Enhancements
