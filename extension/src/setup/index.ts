@@ -714,22 +714,18 @@ export class Setup
   }
 
   private accessConfig(cwd: string, ...args: Args) {
-    return this.accessDvc(AvailableCommands.CONFIG, cwd, ...args)
+    return this.internalCommands.executeCommand(
+      AvailableCommands.CONFIG,
+      cwd,
+      ...args
+    )
   }
 
   private accessRemote(cwd: string, ...args: Args) {
-    return this.accessDvc(AvailableCommands.REMOTE, cwd, ...args)
-  }
-
-  private async accessDvc(
-    commandId:
-      | typeof AvailableCommands.CONFIG
-      | typeof AvailableCommands.REMOTE,
-    cwd: string,
-    ...args: Args
-  ) {
-    try {
-      return await this.internalCommands.executeCommand(commandId, cwd, ...args)
-    } catch {}
+    return this.internalCommands.executeCommand(
+      AvailableCommands.REMOTE,
+      cwd,
+      ...args
+    )
   }
 }

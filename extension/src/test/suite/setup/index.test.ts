@@ -45,9 +45,9 @@ import * as Python from '../../../extensions/python'
 import { ContextKey } from '../../../vscode/context'
 import { Setup } from '../../../setup'
 import { SetupSection } from '../../../setup/webview/contract'
-import { DvcExecutor } from '../../../cli/dvc/executor'
 import { getFirstWorkspaceFolder } from '../../../vscode/workspaceFolders'
 import { Response } from '../../../vscode/response'
+import { DvcConfig } from '../../../cli/dvc/config'
 
 suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
@@ -741,7 +741,7 @@ suite('Setup Test Suite', () => {
       const { setup, mockExecuteCommand, messageSpy } = buildSetup(disposable)
       mockExecuteCommand.restore()
 
-      const mockConfig = stub(DvcExecutor.prototype, 'config')
+      const mockConfig = stub(DvcConfig.prototype, 'config')
       mockConfig.resolves('')
 
       const executeCommandSpy = spy(commands, 'executeCommand')
@@ -829,7 +829,7 @@ suite('Setup Test Suite', () => {
     it('should be able to delete the Studio access token from the global dvc config', async () => {
       const mockConfig = stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        DvcExecutor.prototype,
+        DvcConfig.prototype,
         'config'
       ).resolves(undefined)
 
@@ -909,7 +909,7 @@ suite('Setup Test Suite', () => {
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
-      const mockRemote = stub(DvcExecutor.prototype, 'remote')
+      const mockRemote = stub(DvcConfig.prototype, 'remote')
 
       const remoteAdded = new Promise(resolve =>
         mockRemote.callsFake((_, ...args) => {
@@ -948,7 +948,7 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to add a remote', async () => {
-      const mockRemote = stub(DvcExecutor.prototype, 'remote')
+      const mockRemote = stub(DvcConfig.prototype, 'remote')
 
       const remoteAdded = new Promise(resolve =>
         mockRemote.callsFake((_, ...args) => {
@@ -998,7 +998,7 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to rename a remote', async () => {
-      const mockRemote = stub(DvcExecutor.prototype, 'remote')
+      const mockRemote = stub(DvcConfig.prototype, 'remote')
       const newName = 'better-name'
 
       const remoteRenamed = new Promise(resolve =>
@@ -1051,7 +1051,7 @@ suite('Setup Test Suite', () => {
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
-      const mockRemote = stub(DvcExecutor.prototype, 'remote')
+      const mockRemote = stub(DvcConfig.prototype, 'remote')
       const projectConfigUrl = 's3://different-url'
 
       const remoteModified = new Promise(resolve =>
@@ -1123,7 +1123,7 @@ suite('Setup Test Suite', () => {
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
-      const mockRemote = stub(DvcExecutor.prototype, 'remote')
+      const mockRemote = stub(DvcConfig.prototype, 'remote')
 
       let calls = 0
 

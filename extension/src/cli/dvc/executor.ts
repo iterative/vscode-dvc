@@ -16,7 +16,6 @@ export const autoRegisteredCommands = {
   ADD: 'add',
   CHECKOUT: 'checkout',
   COMMIT: 'commit',
-  CONFIG: 'config',
   EXP_APPLY: 'expApply',
   EXP_BRANCH: 'expBranch',
   EXP_GARBAGE_COLLECT: 'expGarbageCollect',
@@ -32,7 +31,6 @@ export const autoRegisteredCommands = {
   QUEUE_KILL: 'queueKill',
   QUEUE_START: 'queueStart',
   QUEUE_STOP: 'queueStop',
-  REMOTE: 'remote',
   REMOVE: 'remove'
 } as const
 
@@ -54,10 +52,6 @@ export class DvcExecutor extends DvcCli {
 
   public commit(cwd: string, ...args: Args) {
     return this.blockAndExecuteProcess(cwd, Command.COMMIT, ...args, Flag.FORCE)
-  }
-
-  public config(cwd: string, ...args: Args) {
-    return this.executeDvcProcess(cwd, Command.CONFIG, ...args)
   }
 
   public expApply(cwd: string, experimentName: string) {
@@ -172,10 +166,6 @@ export class DvcExecutor extends DvcCli {
 
   public remove(cwd: string, ...args: Args) {
     return this.blockAndExecuteProcess(cwd, Command.REMOVE, ...args)
-  }
-
-  public remote(cwd: string, ...args: Args) {
-    return this.executeDvcProcess(cwd, Command.REMOTE, ...args)
   }
 
   private executeExperimentProcess(cwd: string, ...args: Args) {
