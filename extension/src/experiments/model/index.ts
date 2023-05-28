@@ -9,7 +9,6 @@ import {
 } from './collect'
 import {
   collectColoredStatus,
-  collectFinishedRunningExperiments,
   collectSelectable,
   collectSelectedColors,
   collectStartedRunningExperiments
@@ -21,12 +20,10 @@ import {
   Experiment,
   isQueued,
   isRunning,
-  isRunningInQueue,
   RunningExperiment
 } from '../webview/contract'
 import { definedAndNonEmpty, reorderListSubset } from '../../util/array'
 import {
-  EXPERIMENT_WORKSPACE_ID,
   Executor,
   ExpShowOutput,
   ExperimentStatus
@@ -68,7 +65,6 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   private currentSorts: SortDefinition[]
   private running: RunningExperiment[] = []
-  private finishedRunning: { [id: string]: string } = {}
   private startedRunning: Set<string> = new Set()
 
   constructor(dvcRoot: string, workspaceState: Memento) {
@@ -146,10 +142,6 @@ export class ExperimentsModel extends ModelWithPersistence {
       ({ id: expId }) => expId === id
     )
 
-    if (experiment && isRunning(experiment.status)) {
-      return this.preventSelectionOfRunningExperiment(experiment)
-    }
-
     if (isQueued(experiment?.status)) {
       return UNSELECTED
     }
@@ -166,10 +158,6 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.coloredStatus[id]
   }
 
-  public unselectWorkspace() {
-    this.coloredStatus[EXPERIMENT_WORKSPACE_ID] = UNSELECTED
-  }
-
   public hasRunningExperiment() {
     return this.running.length > 0
   }
@@ -180,16 +168,6 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public hasCheckpoints() {
     return this.checkpoints
-  }
-
-  public setRevisionCollected(revisions: string[]) {
-    for (const { id } of this.getExperimentsAndQueued().filter(({ label }) =>
-      revisions.includes(label)
-    )) {
-      if (this.finishedRunning[id]) {
-        delete this.finishedRunning[id]
-      }
-    }
   }
 
   public canSelect() {
@@ -270,9 +248,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public setSelected(selectedExperiments: Experiment[]) {
-    const possibleToSelect = collectSelectable(selectedExperiments, {
-      ...this.workspace
-    })
+    const possibleToSelect = collectSelectable(selectedExperiments)
 
     const { availableColors, coloredStatus } = collectSelectedColors(
       possibleToSelect,
@@ -432,10 +408,6 @@ export class ExperimentsModel extends ModelWithPersistence {
     }))
   }
 
-  public getFinishedExperiments() {
-    return this.finishedRunning
-  }
-
   public setNbfCommitsToShow(numberOfCommitsToShow: number, branch: string) {
     this.numberOfCommitsToShow[branch] = numberOfCommitsToShow
     this.persistNbOfCommitsToShow()
@@ -524,8 +496,7 @@ export class ExperimentsModel extends ModelWithPersistence {
       this.experimentsByCommit,
       this.coloredStatus,
       this.availableColors,
-      this.startedRunning,
-      this.finishedRunning
+      this.startedRunning
     )
     this.startedRunning = new Set()
 
@@ -538,14 +509,6 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.startedRunning = collectStartedRunningExperiments(
       this.running,
       stillRunning
-    )
-
-    this.finishedRunning = collectFinishedRunningExperiments(
-      { ...this.finishedRunning },
-      this.getExperimentsAndQueued(),
-      this.running,
-      stillRunning,
-      this.coloredStatus
     )
 
     this.running = stillRunning
@@ -566,24 +529,6 @@ export class ExperimentsModel extends ModelWithPersistence {
       this.availableColors,
       copyOriginalColors()
     )
-  }
-
-  private preventSelectionOfRunningExperiment(
-    experiment: Experiment
-  ): Color | undefined | typeof UNSELECTED {
-    if (isRunningInQueue(experiment)) {
-      return UNSELECTED
-    }
-
-    const { executor, id } = experiment
-    if (
-      executor === Executor.WORKSPACE &&
-      id !== EXPERIMENT_WORKSPACE_ID &&
-      !this.isSelected(id) &&
-      !this.isSelected(EXPERIMENT_WORKSPACE_ID)
-    ) {
-      return this.toggleStatus(EXPERIMENT_WORKSPACE_ID)
-    }
   }
 
   private persistSorts() {
