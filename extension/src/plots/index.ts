@@ -198,13 +198,13 @@ export class Plots extends BaseRepository<TPlotsData> {
     experiments: Experiments
   ) {
     const webviewMessages = new WebviewMessages(
+      this.dvcRoot,
       paths,
       plots,
       errors,
       experiments,
       () => this.getWebview(),
-      () => this.selectPlots(),
-      () => this.data.update()
+      () => this.selectPlots()
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>

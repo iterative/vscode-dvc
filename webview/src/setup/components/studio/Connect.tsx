@@ -13,13 +13,11 @@ export const Connect: React.FC = () => {
         </h1>
         <p>
           Share experiments and plots with collaborators directly from your IDE.
-        </p>
-        <p>
-          An{' '}
+          Start sending data with an{' '}
           <a href="https://dvc.org/doc/studio/user-guide/projects-and-experiments/live-metrics-and-plots#set-up-an-access-token">
             access token
           </a>{' '}
-          can be generated from your Studio profile page.
+          generated from your Studio profile page.
         </p>
         <Button
           appearance="primary"
