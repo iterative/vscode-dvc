@@ -103,7 +103,8 @@ export enum GcPreserveFlag {
 }
 
 export enum ConfigKey {
-  STUDIO_TOKEN = 'studio.token'
+  STUDIO_TOKEN = 'studio.token',
+  STUDIO_OFFLINE = 'studio.offline'
 }
 
 type Target = string

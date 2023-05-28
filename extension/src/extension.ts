@@ -84,18 +84,10 @@ class Extension extends Disposable {
     this.gitExecutor = this.dispose.track(new GitExecutor())
     this.gitReader = this.dispose.track(new GitReader())
 
-    const getStudioLiveShareToken = () => this.setup.getStudioLiveShareToken()
-
-    this.dvcExecutor = this.dispose.track(
-      new DvcExecutor(config, getStudioLiveShareToken, cwd =>
-        this.gitReader.getRemoteUrl(cwd)
-      )
-    )
+    this.dvcExecutor = this.dispose.track(new DvcExecutor(config))
 
     this.dvcReader = this.dispose.track(new DvcReader(config))
-    this.dvcRunner = this.dispose.track(
-      new DvcRunner(config, getStudioLiveShareToken)
-    )
+    this.dvcRunner = this.dispose.track(new DvcRunner(config))
     this.dvcViewer = this.dispose.track(new DvcViewer(config))
 
     const clis = [

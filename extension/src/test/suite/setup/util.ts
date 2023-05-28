@@ -81,7 +81,7 @@ export const buildSetup = (
     })
   )
 
-  stub(dvcExecutor, 'config').resolves('')
+  const mockConfig = stub(dvcExecutor, 'config').resolves('')
 
   const setup = disposer.track(
     new Setup(
@@ -107,6 +107,7 @@ export const buildSetup = (
     messageSpy,
     mockAutoInstallDvc,
     mockAutoUpgradeDvc,
+    mockConfig,
     mockExecuteCommand,
     mockGetGitRepositoryRoot,
     mockGlobalVersion,
