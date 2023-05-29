@@ -18,7 +18,6 @@ import { TooltipIconType } from '../../shared/components/sectionContainer/InfoTo
 import { setupReducers } from '../store'
 
 jest.mock('../../shared/api')
-jest.mock('../../shared/components/codeSlider/CodeSlider')
 
 const { postMessage } = vsCodeApi
 const mockPostMessage = jest.mocked(postMessage)

@@ -33,3 +33,38 @@
 .empty {
   text-align: center;
 }
+
+.storageSlider {
+  margin-top: 40px;
+
+  vscode-panels {
+    width: max-content;
+    margin: 0 auto;
+    white-space: pre-wrap;
+  }
+}
+
+.storageView {
+  text-align: left;
+  padding: 0;
+  width: max-content;
+  margin: 0 50px;
+}
+
+.storageDetails {
+  background-color: transparent !important;
+  letter-spacing: 0.04em;
+  color: $watermark-color;
+  font-family: sans-serif;
+  line-height: 1.6;
+}
+
+.infoIcon {
+  fill: $accent-color;
+  margin-bottom: -3px;
+}
+
+.warnIcon {
+  fill: $warn-color;
+  margin-bottom: -3px;
+}
