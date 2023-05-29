@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PropsWithChildren } from 'react'
 import {
   VSCodePanels,
   VSCodePanelTab,
@@ -17,10 +17,20 @@ const WarnIcon: React.FC = () => (
   <Icon icon={Warning} width={16} height={16} className={styles.warnIcon} />
 )
 
-const EnableCloudVersioning: React.FC = () => (
-  <CodeBlock language="bash">
-    dvc remote modify myremote version_aware true
-  </CodeBlock>
+const CloudVersioning: React.FC<PropsWithChildren> = ({ children }) => (
+  <>
+    <p>
+      <InfoIcon />{' '}
+      <a href="https://dvc.org/doc/user-guide/data-management/cloud-versioning">
+        Cloud versioning
+      </a>{' '}
+      requires {children}
+      {'\n'} To enable run:
+    </p>
+    <CodeBlock language="bash">
+      dvc remote modify myremote version_aware true
+    </CodeBlock>
+  </>
 )
 
 const storageTypes = [
@@ -39,18 +49,12 @@ const storageTypes = [
           <InfoIcon /> The AWS user needs the following permissions:{'\n'}{' '}
           s3:ListBucket, s3:GetObject, s3:PutObject, s3:DeleteObject.
         </p>
-        <p>
-          <InfoIcon />{' '}
-          <a href="https://dvc.org/doc/user-guide/data-management/cloud-versioning">
-            Cloud Versioning
-          </a>{' '}
-          requires{' '}
+        <CloudVersioning>
           <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html">
             S3 versioning
           </a>{' '}
-          enabled on the bucket.{'\n'} To enable run:
-        </p>
-        <EnableCloudVersioning />
+          enabled on the bucket.
+        </CloudVersioning>
         <p>
           For custom authentication see the{' '}
           <a href="https://dvc.org/doc/user-guide/data-management/remote-storage/amazon-s3#custom-authentication">
@@ -80,18 +84,12 @@ const storageTypes = [
           you use a service account or other ways to authenticate (
           <a href="https://stackoverflow.com/a/53307505/298182">more info</a>).
         </p>
-        <p>
-          <InfoIcon />{' '}
-          <a href="https://dvc.org/doc/user-guide/data-management/cloud-versioning">
-            Cloud Versioning
-          </a>{' '}
-          requires{' '}
+        <CloudVersioning>
           <a href="https://cloud.google.com/storage/docs/object-versioning">
             Object versioning
           </a>{' '}
-          enabled on the bucket.{'\n'} To enable run:
-        </p>
-        <EnableCloudVersioning />
+          enabled on the bucket.
+        </CloudVersioning>
         <p>
           For custom authentication see the{' '}
           <a href="https://dvc.org/doc/user-guide/data-management/remote-storage/google-cloud-storage#custom-authentication">
@@ -112,18 +110,12 @@ const storageTypes = [
           </a>{' '}
           for details on how to authenticate.
         </p>
-        <p>
-          <InfoIcon />{' '}
-          <a href="https://dvc.org/doc/user-guide/data-management/cloud-versioning">
-            Cloud Versioning
-          </a>{' '}
-          requires{' '}
+        <CloudVersioning>
           <a href="https://learn.microsoft.com/en-us/azure/storage/blobs/versioning-overview">
             Blob versioning
           </a>{' '}
-          enabled on the storage account and container.{'\n'} To enable run:
-        </p>
-        <EnableCloudVersioning />
+          enabled on the storage account and container.
+        </CloudVersioning>
       </div>
     ),
     title: 'Azure Blob Storage'
@@ -164,6 +156,7 @@ const storageTypes = [
             </a>
           </li>
         </ul>
+        <p>None of these remotes currently support cloud versioning.</p>
       </div>
     ),
     title: 'Other'

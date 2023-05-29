@@ -29,14 +29,10 @@ export const VSCodeProgressRing: React.FC = () => {
   return <div />
 }
 
-export const VSCodePanels: React.FC<PropsWithChildren> = ({ children }) => (
-  <div>{children}</div>
-)
+const MockComponentWithChildren: React.FC<PropsWithChildren> = ({
+  children
+}) => <div>{children}</div>
 
-export const VSCodePanelTab: React.FC<PropsWithChildren> = ({ children }) => (
-  <div>{children}</div>
-)
-
-export const VSCodePanelView: React.FC<PropsWithChildren> = ({ children }) => (
-  <div>{children}</div>
-)
+export const VSCodePanels = MockComponentWithChildren
+export const VSCodePanelTab = MockComponentWithChildren
+export const VSCodePanelView = MockComponentWithChildren
