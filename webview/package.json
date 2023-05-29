@@ -75,7 +75,7 @@
     "lint-staged": "13.2.2",
     "raw-loader": "4.0.2",
     "sass": "1.62.1",
-    "sass-loader": "13.2.2",
+    "sass-loader": "13.3.0",
     "storybook": "7.0.12",
     "storybook-addon-themes": "6.1.0",
     "style-loader": "3.3.3",
