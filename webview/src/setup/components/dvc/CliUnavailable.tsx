@@ -33,8 +33,8 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
   ) : (
     <>
       <p>
-        {installationSentence} DVC & DVCLive cannot be auto-installed as Python
-        was not located.
+        {installationSentence} Unfortunately, DVC & DVCLive cannot be
+        auto-installed as Python was not located.
       </p>
       <Button onClick={setupWorkspace} text="Configure" />
     </>
