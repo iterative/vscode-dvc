@@ -454,6 +454,37 @@ describe('App', () => {
   })
 
   describe('Get Started', () => {
+    it('should show a screen saying that dvc is not setup if DVC is not found or initialized', () => {
+      renderApp({
+        cliCompatible: undefined
+      })
+
+      const details = screen.getByTestId('get-started-section-details')
+
+      expect(within(details).getByText('DVC is not setup')).toBeInTheDocument()
+
+      sendSetDataMessage({ ...DEFAULT_DATA, projectInitialized: false })
+
+      expect(within(details).getByText('DVC is not setup')).toBeInTheDocument()
+    })
+
+    it('should open the dvc section when clicking the Setup DVC button on the dvc is not setup screen', () => {
+      renderApp({
+        projectInitialized: false,
+        remoteList: { mockRoot: undefined }
+      })
+
+      const details = screen.getByTestId('get-started-section-details')
+      const getStartedText = within(details).getByText('DVC is not setup')
+      expect(getStartedText).toBeInTheDocument()
+
+      mockPostMessage.mockClear()
+      const button = within(details).getByText('Setup DVC')
+      fireEvent.click(button)
+      expect(screen.getByText('DVC is not initialized')).toBeVisible()
+      expect(getStartedText).not.toBeVisible()
+    })
+
     it('should show a button that takes the user to the "Get Started" walkthrough', () => {
       renderApp()
 
@@ -479,7 +510,9 @@ describe('App', () => {
         projectInitialized: false
       })
 
-      expect(screen.getByText('DVC is not setup')).toBeInTheDocument()
+      const details = screen.getByTestId('experiments-section-details')
+
+      expect(within(details).getByText('DVC is not setup')).toBeInTheDocument()
     })
 
     it('should open the dvc section when clicking the Setup DVC button on the dvc is not setup screen', () => {
@@ -488,11 +521,12 @@ describe('App', () => {
         remoteList: { mockRoot: undefined }
       })
 
-      const experimentsText = screen.getByText('DVC is not setup')
+      const details = screen.getByTestId('experiments-section-details')
+      const experimentsText = within(details).getByText('DVC is not setup')
       expect(experimentsText).toBeInTheDocument()
 
       mockPostMessage.mockClear()
-      const button = screen.getByText('Setup DVC')
+      const button = within(details).getByText('Setup DVC')
       fireEvent.click(button)
       expect(screen.getByText('DVC is not initialized')).toBeVisible()
       expect(experimentsText).not.toBeVisible()
@@ -507,7 +541,8 @@ describe('App', () => {
         }
       })
 
-      expect(screen.getByText('DVC is not setup')).toBeInTheDocument()
+      const details = screen.getByTestId('experiments-section-details')
+      expect(within(details).getByText('DVC is not setup')).toBeInTheDocument()
     })
 
     it('should not show a screen saying that the project contains no data if dvc is installed, the project is initialized and has data', () => {

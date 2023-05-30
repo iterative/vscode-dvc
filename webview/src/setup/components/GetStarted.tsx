@@ -1,20 +1,20 @@
 import React from 'react'
 import { showWalkthrough } from './messages'
-import { CliIncompatible } from './shared/CliIncompatible'
+import { DvcNotSetup } from './shared/DvcNotSetup'
 import { Button } from '../../shared/components/button/Button'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 
-export const GetStarted: React.FC<{ cliCompatible: boolean | undefined }> = ({
-  cliCompatible
+export const GetStarted: React.FC<{ isDvcSetup: boolean }> = ({
+  isDvcSetup
 }) => {
-  if (!cliCompatible) {
+  if (!isDvcSetup) {
     return (
-      <CliIncompatible>
+      <DvcNotSetup>
         <p>
           This extension&apos;s features cannot be accessed without DVC being
           installed.
         </p>
-      </CliIncompatible>
+      </DvcNotSetup>
     )
   }
 
