@@ -12,7 +12,7 @@ export const GetStarted: React.FC<{ isDvcSetup: boolean }> = ({
       <DvcNotSetup>
         <p>
           This extension&apos;s features cannot be accessed without DVC being
-          installed.
+          setup.
         </p>
       </DvcNotSetup>
     )
