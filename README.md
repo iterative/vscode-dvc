@@ -153,7 +153,7 @@ These are the VS Code [settings] available for the Extension:
 | `dvc.experimentsTableHeadMaxHeight` | Maximum height of experiment table head rows.                                                                                                            |
 | `dvc.studio.shareExperimentsLive`   | Automatically share all new experiment metrics and plots logged with DVCLive to Studio. This option will only take effect once Studio is connected.      |
 | `dvc.focusedProjects`               | A subset of paths to the workspace's available DVC projects. Using this option will override project auto-discovery.                                     |
-| `dvc.doNotShowSetupAfterInstall`    | Do not prompt to show the Get Started page after installing. Useful for pre-configured development environments                                          |
+| `dvc.doNotShowSetupAfterInstall`    | Do not prompt to show the setup page after installing. Useful for pre-configured development environments                                                |
 | `dvc.doNotRecommendAddStudioToken`  | Do not prompt to add a [studio.token] to the global DVC config, which enables automatic sharing of experiments to [Studio].                              |
 | `dvc.doNotRecommendRedHatExtension` | Do not prompt to install the Red Hat YAML extension, which helps with DVC YAML schema validation (`dvc.yaml` and `.dvc` files).                          |
 | `dvc.doNotShowCliUnavailable`       | Do not warn when the workspace contains a DVC project but the DVC binary is unavailable.                                                                 |

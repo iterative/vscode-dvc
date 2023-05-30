@@ -25,17 +25,17 @@ beforeEach(() => {
 })
 
 describe('showSetupOnFirstUse', () => {
-  it('should ask to show the setup after a new install', async () => {
+  it('should ask to show the setup page after a new install', async () => {
     await showSetupOnFirstUse(true)
     expect(mockedAskShowOrCloseOrNever).toHaveBeenCalledTimes(1)
   })
 
-  it('should not ask to show the setup when the install is not new', async () => {
+  it('should not ask to show the setup page when the install is not new', async () => {
     await showSetupOnFirstUse(false)
     expect(mockedAskShowOrCloseOrNever).not.toHaveBeenCalled()
   })
 
-  it('should not ask to show the setup when the user has set a config option', async () => {
+  it('should not ask to show the setup page when the user has set a config option', async () => {
     mockedGetConfigValue.mockReturnValueOnce(true)
     await showSetupOnFirstUse(true)
     expect(mockedAskShowOrCloseOrNever).not.toHaveBeenCalled()
@@ -56,7 +56,7 @@ describe('showSetupOnFirstUse', () => {
     )
   })
 
-  it('should show the setup if the user responds with show', async () => {
+  it('should show the setup page if the user responds with show', async () => {
     mockedAskShowOrCloseOrNever.mockResolvedValueOnce(Response.SHOW)
     await showSetupOnFirstUse(true)
 
