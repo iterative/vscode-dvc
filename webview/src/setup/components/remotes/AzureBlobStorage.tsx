@@ -15,7 +15,7 @@ export const AzureBlobStorage = () => (
       <a href="https://learn.microsoft.com/en-us/azure/storage/blobs/versioning-overview">
         Blob versioning
       </a>{' '}
-      enabled on the storage account{'\n'}and container.{' '}
+      enabled on the storage account and container.
     </CloudVersioning>
   </div>
 )
