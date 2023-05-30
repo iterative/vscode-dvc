@@ -1718,7 +1718,7 @@
     "shx": "0.3.4",
     "sinon": "15.1.0",
     "sinon-chai": "3.7.0",
-    "ts-loader": "9.4.2",
+    "ts-loader": "9.4.3",
     "vscode-uri": "3.0.7",
     "wdio-vscode-service": "5.1.0",
     "webdriverio": "8.10.5",
