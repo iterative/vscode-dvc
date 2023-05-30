@@ -3,6 +3,7 @@ import styles from './styles.module.scss'
 import { InfoText } from './InfoText'
 import { CloudVersioning } from './CloudVersioning'
 import { CustomAuth } from './CustomAuth'
+import { ShowExtension } from './ShowExtension'
 
 export const AmazonS3 = () => (
   <div className={styles.storageDetails}>
@@ -13,7 +14,7 @@ export const AmazonS3 = () => (
       </a>
       . This reads the default AWS credentials file (if available) or env vars.
     </p>
-
+    <ShowExtension id="AmazonWebServices.aws-toolkit-vscode" name="AWS" />
     <InfoText>
       The AWS user needs the following permissions: s3:ListBucket, s3:GetObject,
       s3:PutObject, s3:DeleteObject.

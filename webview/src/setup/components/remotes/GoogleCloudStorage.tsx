@@ -2,6 +2,7 @@ import React from 'react'
 import styles from './styles.module.scss'
 import { CloudVersioning } from './CloudVersioning'
 import { CustomAuth } from './CustomAuth'
+import { ShowExtension } from './ShowExtension'
 import { Icon } from '../../../shared/components/Icon'
 import { Warning } from '../../../shared/components/icons'
 
@@ -14,6 +15,7 @@ export const GoogleCloudStorage: React.FC = () => (
       </a>
       . This reads the default GCP key file.
     </p>
+    <ShowExtension id="GoogleCloudTools.cloudcode" name="Google Cloud Code" />
     <p>
       <Icon icon={Warning} width={16} height={16} className={styles.warnIcon} />{' '}
       Make sure to run{' '}
