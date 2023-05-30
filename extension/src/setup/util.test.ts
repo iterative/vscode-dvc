@@ -62,7 +62,7 @@ describe('showSetupOnFirstUse', () => {
 
     expect(mockedSetConfigValue).not.toHaveBeenCalled()
     expect(mockedExecuteCommand).toHaveBeenCalledWith(
-      RegisteredCommands.SETUP_SHOW_DVC
+      RegisteredCommands.SETUP_SHOW
     )
   })
 

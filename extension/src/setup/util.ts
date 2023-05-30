@@ -19,7 +19,7 @@ export const showSetupOnFirstUse = async (
   )
 
   if (response === Response.SHOW) {
-    void commands.executeCommand(RegisteredCommands.SETUP_SHOW_DVC)
+    void commands.executeCommand(RegisteredCommands.SETUP_SHOW)
   }
   if (response === Response.NEVER) {
     void setUserConfigValue(ConfigKey.DO_NOT_SHOW_SETUP_AFTER_INSTALL, true)
