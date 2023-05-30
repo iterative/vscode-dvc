@@ -1,13 +1,13 @@
 import { commands } from 'vscode'
-import { showSetupOnFirstUse } from './walkthrough'
-import { ConfigKey, getConfigValue, setUserConfigValue } from './config'
-import { Toast } from './toast'
-import { Response } from './response'
+import { showSetupOnFirstUse } from './util'
+import { ConfigKey, getConfigValue, setUserConfigValue } from '../vscode/config'
+import { Toast } from '../vscode/toast'
+import { Response } from '../vscode/response'
 import { RegisteredCommands } from '../commands/external'
 
 jest.mock('vscode')
-jest.mock('./toast')
-jest.mock('./config')
+jest.mock('../vscode/toast')
+jest.mock('../vscode/config')
 
 const mockedCommands = jest.mocked(commands)
 const mockedExecuteCommand = jest.fn()
@@ -19,10 +19,6 @@ const mockedSetConfigValue = jest.mocked(setUserConfigValue)
 const mockedToast = jest.mocked(Toast)
 const mockedAskShowOrCloseOrNever = jest.fn()
 mockedToast.askShowOrCloseOrNever = mockedAskShowOrCloseOrNever
-
-// TBD to do
-// rename files and move to setup
-// test with a fresh install
 
 beforeEach(() => {
   jest.resetAllMocks()

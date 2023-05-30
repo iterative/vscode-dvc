@@ -28,10 +28,8 @@ import {
 } from './telemetry'
 import { RegisteredCommands } from './commands/external'
 import { StopWatch } from './util/time'
-import {
-  registerWalkthroughCommands,
-  showSetupOnFirstUse
-} from './vscode/walkthrough'
+import { registerWalkthroughCommands } from './vscode/walkthrough'
+import { showSetupOnFirstUse } from './setup/util'
 import { WorkspaceRepositories } from './repository/workspace'
 import { recommendRedHatExtensionOnce } from './vscode/recommend'
 import { WorkspacePlots } from './plots/workspace'
