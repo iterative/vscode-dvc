@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import React from 'react'
-import { CodeSlider } from '../../../shared/components/codeSlider/CodeSlider'
+import { CodeSlider } from './CodeSlider'
 import pyTorch from '../../snippets/pyTorch.py'
 import huggingFace from '../../snippets/huggingFace.py'
 import keras from '../../snippets/keras.py'
