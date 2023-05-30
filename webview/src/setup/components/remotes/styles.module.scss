@@ -34,8 +34,8 @@
   text-align: center;
 }
 
-.storageSlider {
-  margin-top: 40px;
+.supportedStorage {
+  margin-top: 20px;
 
   vscode-panels {
     width: max-content;
@@ -44,19 +44,16 @@
   }
 }
 
-.storageView {
-  text-align: left;
-  padding: 0;
-  width: max-content;
-  margin: 0 50px;
-}
-
 .storageDetails {
   background-color: transparent !important;
-  letter-spacing: 0.04em;
   color: $watermark-color;
   font-family: sans-serif;
+  letter-spacing: 0.04em;
   line-height: 1.6;
+  margin: 0 50px;
+  padding: 0;
+  text-align: left;
+  width: max-content;
 }
 
 .infoIcon {

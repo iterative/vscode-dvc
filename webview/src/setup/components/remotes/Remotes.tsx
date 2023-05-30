@@ -3,7 +3,7 @@ import { RemoteList } from 'dvc/src/setup/webview/contract'
 import { Connect } from './Connect'
 import { DvcUninitialized } from './DvcUninitialized'
 import { RemoteDetails } from './RemoteDetails'
-import { StorageSlider } from './StorageSlider'
+import { SupportedStorage } from './SupportedStorage'
 import { CliIncompatible } from '../shared/CliIncompatible'
 
 export const Remotes: React.FC<{
@@ -14,7 +14,7 @@ export const Remotes: React.FC<{
     return (
       <CliIncompatible>
         <p>Locate DVC to connect to a remote</p>
-        <StorageSlider />
+        <SupportedStorage />
       </CliIncompatible>
     )
   }

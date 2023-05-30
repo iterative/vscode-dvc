@@ -1,5 +1,5 @@
 import React from 'react'
-import { StorageSlider } from './StorageSlider'
+import { SupportedStorage } from './SupportedStorage'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { StartButton } from '../../../shared/components/button/StartButton'
 import { addRemote } from '../messages'
@@ -22,6 +22,6 @@ export const Connect: React.FC = () => (
       for details on how to connect to a remote
     </p>
     <StartButton onClick={() => addRemote()} text="Add Remote" />
-    <StorageSlider />
+    <SupportedStorage />
   </EmptyState>
 )
