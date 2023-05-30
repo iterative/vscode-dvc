@@ -98,8 +98,8 @@ CompletedConnected.args = getUpdatedArgs({
   shareLiveToStudio: true
 })
 
-export const NoCLIPythonNotFound = Template.bind({})
-NoCLIPythonNotFound.args = getUpdatedArgs({
+export const CLIPythonNotFound = Template.bind({})
+CLIPythonNotFound.args = getUpdatedArgs({
   cliCompatible: undefined,
   dvcCliDetails: {
     command: 'dvc',
@@ -109,8 +109,8 @@ NoCLIPythonNotFound.args = getUpdatedArgs({
   pythonBinPath: undefined
 })
 
-export const NoCLIPythonFound = Template.bind({})
-NoCLIPythonFound.args = getUpdatedArgs({
+export const CLIPythonFound = Template.bind({})
+CLIPythonFound.args = getUpdatedArgs({
   cliCompatible: undefined,
   dvcCliDetails: {
     command: '/opt/homebrew/Caskroom/miniforge/base/bin/python -m dvc',
