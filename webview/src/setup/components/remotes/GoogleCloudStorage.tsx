@@ -28,7 +28,7 @@ export const GoogleCloudStorage: React.FC = () => (
       <a href="https://cloud.google.com/storage/docs/object-versioning">
         Object versioning
       </a>{' '}
-      enabled on the bucket.
+      enabled on the bucket.{'\n'}
     </CloudVersioning>
     <CustomAuth href="https://dvc.org/doc/user-guide/data-management/remote-storage/google-cloud-storage#custom-authentication" />
   </div>

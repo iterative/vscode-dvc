@@ -24,7 +24,7 @@ export const AmazonS3 = () => (
       <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html">
         S3 versioning
       </a>{' '}
-      enabled on the bucket.
+      enabled on the bucket.{'\n'}
     </CloudVersioning>
     <CustomAuth href="https://dvc.org/doc/user-guide/data-management/remote-storage/amazon-s3#custom-authentication" />
   </div>
