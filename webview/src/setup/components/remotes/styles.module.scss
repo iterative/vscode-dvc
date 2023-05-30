@@ -38,19 +38,18 @@
   margin-top: 20px;
 
   vscode-panels {
-    width: max-content;
+    width: 500px;
     margin: 0 auto;
-    white-space: pre-wrap;
   }
 }
 
 .storageDetails {
+  white-space: pre-wrap;
   background-color: transparent !important;
   color: $watermark-color;
   font-family: sans-serif;
   letter-spacing: 0.04em;
   line-height: 1.6;
-  margin: 0 50px;
   padding: 0;
   text-align: left;
   width: max-content;

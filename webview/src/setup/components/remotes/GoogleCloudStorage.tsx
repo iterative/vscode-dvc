@@ -12,7 +12,7 @@ export const GoogleCloudStorage: React.FC = () => (
       <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html">
         glcoud CLI authorization
       </a>
-      .{'\n'}This reads the default GCP key file.
+      . This reads the default GCP key file.
     </p>
     <p>
       <Icon icon={Warning} width={16} height={16} className={styles.warnIcon} />{' '}
@@ -20,8 +20,7 @@ export const GoogleCloudStorage: React.FC = () => (
       <a href="https://cloud.google.com/sdk/gcloud/reference/auth/application-default/login">
         gcloud auth application-default login
       </a>{' '}
-      unless{'\n'}
-      you use a service account or other ways to authenticate (
+      unless you use a service account or other ways to authenticate (
       <a href="https://stackoverflow.com/a/53307505/298182">more info</a>).
     </p>
     <CloudVersioning>

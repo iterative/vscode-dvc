@@ -11,15 +11,13 @@ export const AmazonS3 = () => (
       <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html">
         AWS CLI config
       </a>
-      .{'\n'}This reads the default AWS credentials file (if available) or env
-      vars.
+      . This reads the default AWS credentials file (if available) or env vars.
     </p>
-    <p>
-      <InfoText>
-        The AWS user needs the following permissions:{'\n'} s3:ListBucket,
-        s3:GetObject, s3:PutObject, s3:DeleteObject.
-      </InfoText>
-    </p>
+
+    <InfoText>
+      The AWS user needs the following permissions: s3:ListBucket, s3:GetObject,
+      s3:PutObject, s3:DeleteObject.
+    </InfoText>
     <CloudVersioning>
       <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html">
         S3 versioning
