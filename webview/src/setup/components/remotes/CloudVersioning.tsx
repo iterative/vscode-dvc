@@ -1,7 +1,7 @@
 import React, { PropsWithChildren } from 'react'
 import { CloudVersioningLink } from './CloudVersioningLink'
 import { InfoText } from './InfoText'
-import { CodeBlock } from '../../../shared/components/codeBlock/CodeBlock'
+import { CodeBlock } from '../shared/CodeBlock'
 
 export const CloudVersioning: React.FC<PropsWithChildren> = ({ children }) => (
   <>

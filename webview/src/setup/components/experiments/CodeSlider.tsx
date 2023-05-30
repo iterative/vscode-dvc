@@ -5,7 +5,7 @@ import {
 } from '@vscode/webview-ui-toolkit/react'
 import React from 'react'
 import styles from './styles.module.scss'
-import { CodeBlock, CodeBlockProps } from '../codeBlock/CodeBlock'
+import { CodeBlock, CodeBlockProps } from '../shared/CodeBlock'
 
 interface CodeBlockWithTitle extends CodeBlockProps {
   title: string
