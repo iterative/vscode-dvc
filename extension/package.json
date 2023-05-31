@@ -615,8 +615,8 @@
           "type": "boolean",
           "default": null
         },
-        "dvc.doNotShowWalkthroughAfterInstall": {
-          "description": "Do not prompt to show the Get Started page after installing. Useful for pre-configured development environments.",
+        "dvc.doNotShowSetupAfterInstall": {
+          "description": "Do not prompt to show the setup page after installing. Useful for pre-configured development environments.",
           "type": "boolean",
           "default": null
         },
