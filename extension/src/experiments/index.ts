@@ -21,22 +21,13 @@ import {
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
 import { Color } from './model/status/colors'
-import {
-  FetchedExperiment,
-  hasFinishedWorkspaceExperiment
-} from './model/status/collect'
 import { UNSELECTED } from './model/status'
 import { starredSort } from './model/sortBy/constants'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ColumnsModel } from './columns/model'
 import { ExperimentsData } from './data'
 import { stopWorkspaceExperiment } from './processExecution'
-import {
-  Experiment,
-  ColumnType,
-  TableData,
-  isRunning
-} from './webview/contract'
+import { Experiment, ColumnType, TableData } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { DecorationProvider } from './model/decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
@@ -227,17 +218,6 @@ export class Experiments extends BaseRepository<TableData> {
     return status
   }
 
-  public checkForFinishedWorkspaceExperiment(
-    fetchedExperiments: FetchedExperiment[]
-  ) {
-    if (!hasFinishedWorkspaceExperiment(fetchedExperiments)) {
-      return
-    }
-
-    this.experiments.unselectWorkspace()
-    this.notifyChanged()
-  }
-
   public getSorts() {
     return this.experiments.getSorts()
   }
@@ -345,9 +325,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public async selectExperimentsToPlot() {
-    const experiments = this.experiments
-      .getWorkspaceCommitsAndExperiments()
-      .filter(({ status }) => !isRunning(status))
+    const experiments = this.experiments.getWorkspaceCommitsAndExperiments()
 
     const selected = await pickExperimentsToPlot(
       experiments,
@@ -437,14 +415,6 @@ export class Experiments extends BaseRepository<TableData> {
     }
 
     return this.experiments.getSelectedRevisions()
-  }
-
-  public setRevisionCollected(revisions: string[]) {
-    this.experiments.setRevisionCollected(revisions)
-  }
-
-  public getFinishedExperiments() {
-    return this.experiments.getFinishedExperiments()
   }
 
   public getExperiments() {

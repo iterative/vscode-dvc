@@ -300,6 +300,9 @@ const setWorkspaceAsRunning = (
   ) {
     acc.workspace.executor = Executor.WORKSPACE
     acc.workspace.status = ExperimentStatus.RUNNING
+  }
+
+  if (dvcLiveOnly) {
     acc.runningExperiments.unshift({
       executor: Executor.WORKSPACE,
       id: EXPERIMENT_WORKSPACE_ID

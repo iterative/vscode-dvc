@@ -10,6 +10,7 @@ export const codicons = [
   'copy',
   'ellipsis',
   'error',
+  'extensions',
   'filter',
   'git-commit',
   'git-merge',

@@ -2,6 +2,45 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.1] - 2023-05-31
+
+### 🚀 New Features and Enhancements
+
+- Add storage types details to remote setup page [#3996](https://github.com/iterative/vscode-dvc/pull/3996) by [@mattseddon](https://github.com/mattseddon)
+- Add link to show applicable extension for each storage provider [#4004](https://github.com/iterative/vscode-dvc/pull/4004) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Move CodeSlider into Setup folder [#4005](https://github.com/iterative/vscode-dvc/pull/4005) by [@mattseddon](https://github.com/mattseddon)
+- Create shared panels component [#4006](https://github.com/iterative/vscode-dvc/pull/4006) by [@mattseddon](https://github.com/mattseddon)
+- Fix styles of supported storage panels [#4007](https://github.com/iterative/vscode-dvc/pull/4007) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.9.0] - 2023-05-28
+
+### 🚀 New Features and Enhancements
+
+- Bump min version of DVC to 2.57.0 (Live share to studio config option) [#3976](https://github.com/iterative/vscode-dvc/pull/3976) by [@mattseddon](https://github.com/mattseddon)
+- Bump min version of DVC to 2.58.1 (Enable live plots for experiments running outside of the workspace) [#3965](https://github.com/iterative/vscode-dvc/pull/3965) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix issues with messages from the plots webview [#3986](https://github.com/iterative/vscode-dvc/pull/3986) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Add DvcConfig class [#3987](https://github.com/iterative/vscode-dvc/pull/3987) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.8.22] - 2023-05-26
+
+### 🚀 New Features and Enhancements
+
+- Use icons to show more or less commits and select branches [#3972](https://github.com/iterative/vscode-dvc/pull/3972) by [@sroy3](https://github.com/sroy3)
+- Simplify setup section text blocks [#3981](https://github.com/iterative/vscode-dvc/pull/3981) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Fix setup redirection logic [#3953](https://github.com/iterative/vscode-dvc/pull/3953) by [@julieg18](https://github.com/julieg18)
+
 ## [0.8.21] - 2023-05-25
 
 ### 🚀 New Features and Enhancements

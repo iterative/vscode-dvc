@@ -13,7 +13,6 @@ import { Logger } from '../../common/logger'
 import { Experiments } from '../../experiments'
 import { sendTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
-import { Toast } from '../../vscode/toast'
 import {
   MessageFromWebview,
   MessageFromWebviewType,
@@ -30,6 +29,7 @@ import { RegisteredCommands } from '../../commands/external'
 import { ErrorsModel } from '../errors/model'
 
 export class WebviewMessages {
+  private readonly dvcRoot: string
   private readonly paths: PathsModel
   private readonly plots: PlotsModel
   private readonly errors: ErrorsModel
@@ -37,24 +37,23 @@ export class WebviewMessages {
 
   private readonly getWebview: () => BaseWebview<TPlotsData> | undefined
   private readonly selectPlots: () => Promise<void>
-  private readonly updateData: () => Promise<void>
 
   constructor(
+    dvcRoot: string,
     paths: PathsModel,
     plots: PlotsModel,
     errors: ErrorsModel,
     experiments: Experiments,
     getWebview: () => BaseWebview<TPlotsData> | undefined,
-    selectPlots: () => Promise<void>,
-    updateData: () => Promise<void>
+    selectPlots: () => Promise<void>
   ) {
+    this.dvcRoot = dvcRoot
     this.paths = paths
     this.plots = plots
     this.errors = errors
     this.experiments = experiments
     this.getWebview = getWebview
     this.selectPlots = selectPlots
-    this.updateData = updateData
   }
 
   public async sendWebviewMessage() {
@@ -70,16 +69,15 @@ export class WebviewMessages {
       selectedRevisions,
       template: this.getTemplatePlots(selectedRevisions)
     })
-
-    this.experiments.checkForFinishedWorkspaceExperiment(
-      selectedRevisions.filter(({ fetched }) => fetched)
-    )
   }
 
   public handleMessageFromWebview(message: MessageFromWebview) {
     switch (message.type) {
       case MessageFromWebviewType.ADD_CUSTOM_PLOT:
-        return commands.executeCommand(RegisteredCommands.PLOTS_CUSTOM_ADD)
+        return commands.executeCommand(
+          RegisteredCommands.PLOTS_CUSTOM_ADD,
+          this.dvcRoot
+        )
       case MessageFromWebviewType.RESIZE_PLOTS:
         return this.setPlotSize(
           message.payload.section,
@@ -101,9 +99,15 @@ export class WebviewMessages {
       case MessageFromWebviewType.SELECT_EXPERIMENTS:
         return this.selectExperimentsFromWebview()
       case MessageFromWebviewType.REMOVE_CUSTOM_PLOTS:
-        return commands.executeCommand(RegisteredCommands.PLOTS_CUSTOM_REMOVE)
+        return commands.executeCommand(
+          RegisteredCommands.PLOTS_CUSTOM_REMOVE,
+          this.dvcRoot
+        )
       case MessageFromWebviewType.REFRESH_REVISIONS:
-        return this.refreshData()
+        return commands.executeCommand(
+          RegisteredCommands.PLOTS_REFRESH,
+          this.dvcRoot
+        )
       case MessageFromWebviewType.TOGGLE_EXPERIMENT:
         return this.setExperimentStatus(message.payload)
       case MessageFromWebviewType.ZOOM_PLOT:
@@ -232,16 +236,6 @@ export class WebviewMessages {
     this.experiments.toggleExperimentStatus(id)
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_EXPERIMENT_TOGGLE,
-      undefined,
-      undefined
-    )
-  }
-
-  private refreshData() {
-    void Toast.infoWithOptions('Attempting to refresh visible plots data.')
-    void this.updateData()
-    sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_MANUAL_REFRESH,
       undefined,
       undefined
     )

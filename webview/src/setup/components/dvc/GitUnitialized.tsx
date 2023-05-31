@@ -10,26 +10,25 @@ export const GitUninitialized: React.FC<PropsWithChildren> = ({ children }) => {
     (state: SetupState) => state.dvc.canGitInitialize
   )
 
+  const startingSentence =
+    'A Git repository is a prerequisite of project initialization.'
+
   const conditionalContent = canGitInitialize ? (
-    <Button onClick={initializeGit} text="Initialize Git" />
-  ) : (
     <>
-      <p>
-        The extension is unable to initialize a Git repository in this
-        workspace.
-      </p>
-      <p>
-        Please open a different folder which contains no Git repositories or a
-        single existing Git repository at the root.
-      </p>
+      <p>{startingSentence}</p>
+      <Button onClick={initializeGit} text="Initialize Git" />
     </>
+  ) : (
+    <p>
+      {startingSentence} Please open a different folder which contains no Git
+      repositories or a single existing Git repository at the root.
+    </p>
   )
 
   return (
     <EmptyState isFullScreen={false}>
       <h1>DVC is not initialized</h1>
       {children}
-      <p>A Git repository is a prerequisite of project initialization.</p>
       {conditionalContent}
     </EmptyState>
   )

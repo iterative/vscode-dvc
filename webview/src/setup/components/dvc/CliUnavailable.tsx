@@ -15,7 +15,9 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
     <>
       The extension supports all{' '}
       <a href="https://dvc.org/doc/install">installation types</a> and can
-      auto-install recommended packages for you.
+      auto-install recommended packages via{' '}
+      <a href="https://packaging.python.org/en/latest/key_projects/#pip">pip</a>
+      .
     </>
   )
 
@@ -26,15 +28,15 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
         {pythonBinPath}.
       </p>
       <div className={styles.sideBySideButtons}>
-        <Button onClick={installDvc} text="Install" />
+        <Button onClick={installDvc} text="Install (pip)" />
         <Button onClick={setupWorkspace} text="Configure" />
       </div>
     </>
   ) : (
     <>
       <p>
-        {installationSentence} DVC & DVCLive cannot be auto-installed as Python
-        was not located.
+        {installationSentence} Unfortunately, DVC & DVCLive cannot be
+        auto-installed as Python was not located.
       </p>
       <Button onClick={setupWorkspace} text="Configure" />
     </>
@@ -46,9 +48,8 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
       {children}
       <p>
         New to DVC? Check out <a href="https://dvc.org/">dvc.org</a> to learn
-        more or our{' '}
-        <a href="https://github.com/iterative/vscode-dvc-demo">demo</a> to
-        quickly try the extension.{' '}
+        more or quickly try the extension with our{' '}
+        <a href="https://github.com/iterative/vscode-dvc-demo">demo</a>.
       </p>
       {conditionalContents}
     </EmptyState>

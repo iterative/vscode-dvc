@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { restore, spy, stub } from 'sinon'
+import { restore, spy } from 'sinon'
 import { window, Event } from 'vscode'
 import { Disposable, Disposer } from '../../../../extension'
 import { Config } from '../../../../config'
@@ -8,8 +8,6 @@ import { DvcRunner } from '../../../../cli/dvc/runner'
 import { CliResult, CliStarted } from '../../../../cli'
 import { WEBVIEW_TEST_TIMEOUT } from '../../timeouts'
 import { spyOnPrivateMemberMethod } from '../../util'
-import * as ProcessExecution from '../../../../process/execution'
-import { dvcDemoPath } from '../../../util'
 
 suite('DVC Runner Test Suite', () => {
   const disposable = Disposable.fn()
@@ -28,11 +26,8 @@ suite('DVC Runner Test Suite', () => {
         getCliPath: () => 'sleep',
         getPythonBinPath: () => undefined
       } as Config
-      const mockGetStudioLiveShareToken = () => undefined
 
-      const dvcRunner = disposable.track(
-        new DvcRunner(mockConfig, mockGetStudioLiveShareToken)
-      )
+      const dvcRunner = disposable.track(new DvcRunner(mockConfig))
 
       const windowErrorMessageSpy = spy(window, 'showErrorMessage')
       const cwd = __dirname
@@ -48,11 +43,8 @@ suite('DVC Runner Test Suite', () => {
         getCliPath: () => 'sleep',
         getPythonBinPath: () => undefined
       } as Config
-      const mockGetStudioLiveShareToken = () => undefined
 
-      const dvcRunner = disposable.track(
-        new DvcRunner(mockConfig, mockGetStudioLiveShareToken)
-      )
+      const dvcRunner = disposable.track(new DvcRunner(mockConfig))
       const cwd = __dirname
 
       const onDidCompleteProcess = (): Promise<void> =>
@@ -116,11 +108,8 @@ suite('DVC Runner Test Suite', () => {
         getCliPath: () => 'echo',
         getPythonBinPath: () => undefined
       } as Config
-      const mockGetStudioLiveShareToken = () => undefined
 
-      const dvcRunner = disposable.track(
-        new DvcRunner(mockConfig, mockGetStudioLiveShareToken)
-      )
+      const dvcRunner = disposable.track(new DvcRunner(mockConfig))
 
       const started = onDidStartOrCompleteProcess(dvcRunner.onDidStartProcess)
       const completed = onDidStartOrCompleteProcess(
@@ -140,43 +129,5 @@ suite('DVC Runner Test Suite', () => {
       expect(output.includes(text)).to.be.true
       return completed
     }).timeout(WEBVIEW_TEST_TIMEOUT)
-
-    it('should add STUDIO_TOKEN to the environment if sendLiveToStudio is true and a studio access token is present', async () => {
-      const mockCreateProcess = stub(ProcessExecution, 'createProcess').returns(
-        {
-          dispose: () => undefined,
-          on: stub()
-        } as unknown as ProcessExecution.Process
-      )
-      const mockStudioAccessToken = 'isat_ASASDDVSBVSDVCACAS'
-
-      const mockConfig = {
-        getCliPath: () => 'echo',
-        getPythonBinPath: () => undefined
-      } as Config
-      const mockGetStudioLiveShareToken = stub()
-        .onFirstCall()
-        .returns(mockStudioAccessToken)
-        .onSecondCall()
-        .returns(undefined)
-
-      const dvcRunner = disposable.track(
-        new DvcRunner(mockConfig, mockGetStudioLiveShareToken)
-      )
-
-      await dvcRunner.runExperiment(dvcDemoPath)
-
-      expect(mockCreateProcess).to.be.calledWithMatch({
-        env: { STUDIO_TOKEN: mockStudioAccessToken }
-      })
-
-      mockCreateProcess.resetHistory()
-
-      await dvcRunner.runExperiment(dvcDemoPath)
-
-      expect(mockCreateProcess).not.to.be.calledWithMatch({
-        env: { STUDIO_TOKEN: mockStudioAccessToken }
-      })
-    })
   })
 })
