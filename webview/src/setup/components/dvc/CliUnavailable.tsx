@@ -15,7 +15,9 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
     <>
       The extension supports all{' '}
       <a href="https://dvc.org/doc/install">installation types</a> and can
-      auto-install recommended packages for you.
+      auto-install recommended packages via{' '}
+      <a href="https://packaging.python.org/en/latest/key_projects/#pip">pip</a>
+      .
     </>
   )
 
