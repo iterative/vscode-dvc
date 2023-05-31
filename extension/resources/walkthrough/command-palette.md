@@ -1,8 +1,8 @@
+# Command Palette
+
 > ℹ️ The extension's features cannot be accessed until DVC is installed and a
 > DVC project is available in the workspace. Please refer to the
 > [setup page](command:dvc.dvc.showDvcSetup) if you have not setup DVC yet.
-
-# Command Palette
 
 This extension makes extensive use of the
 [Command Palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette).

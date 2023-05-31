@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.9.2",
+  "version": "0.9.3",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -1473,7 +1473,7 @@
       },
       {
         "view": "dvc.views.welcome",
-        "contents": "New to the extension?\n[Show Walkthrough](command:dvc.getStarted)\n\nThe extension is currently unable to initialize.\n[Show Setup](command:dvc.showDvcSetup)",
+        "contents": "The extension is currently unable to initialize.\n[Show Setup](command:dvc.showDvcSetup)",
         "when": "true"
       },
       {
