@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.1] - 2023-05-31
+
+### 🚀 New Features and Enhancements
+
+- Add storage types details to remote setup page [#3996](https://github.com/iterative/vscode-dvc/pull/3996) by [@mattseddon](https://github.com/mattseddon)
+- Add link to show applicable extension for each storage provider [#4004](https://github.com/iterative/vscode-dvc/pull/4004) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Move CodeSlider into Setup folder [#4005](https://github.com/iterative/vscode-dvc/pull/4005) by [@mattseddon](https://github.com/mattseddon)
+- Create shared panels component [#4006](https://github.com/iterative/vscode-dvc/pull/4006) by [@mattseddon](https://github.com/mattseddon)
+- Fix styles of supported storage panels [#4007](https://github.com/iterative/vscode-dvc/pull/4007) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.9.0] - 2023-05-28
 
 ### 🚀 New Features and Enhancements
