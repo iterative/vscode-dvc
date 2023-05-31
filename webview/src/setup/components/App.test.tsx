@@ -18,7 +18,6 @@ import { TooltipIconType } from '../../shared/components/sectionContainer/InfoTo
 import { setupReducers } from '../store'
 
 jest.mock('../../shared/api')
-jest.mock('../../shared/components/codeSlider/CodeSlider')
 
 const { postMessage } = vsCodeApi
 const mockPostMessage = jest.mocked(postMessage)
@@ -166,7 +165,7 @@ describe('App', () => {
       )
 
       expect(screen.getByText(sentenceReg)).toBeInTheDocument()
-      expect(screen.getByText('Install')).toBeInTheDocument()
+      expect(screen.getByText('Install (pip)')).toBeInTheDocument()
     })
 
     it('should let the user find another Python interpreter to install DVC when the Python extension is not installed', () => {
@@ -216,7 +215,7 @@ describe('App', () => {
         pythonBinPath: 'python'
       })
 
-      const button = screen.getByText('Install')
+      const button = screen.getByText('Install (pip)')
       fireEvent.click(button)
 
       expect(mockPostMessage).toHaveBeenCalledWith({
@@ -705,7 +704,7 @@ describe('App', () => {
   })
 
   describe('Studio connected', () => {
-    it('should render a checkbox which can be used to update dvc.studio.shareExperimentsLive', () => {
+    it('should render a checkbox which can be used to update studio.offline in the global DVC config', () => {
       const shareExperimentsLive = false
       renderApp({
         isStudioConnected: true

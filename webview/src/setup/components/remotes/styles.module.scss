@@ -33,3 +33,34 @@
 .empty {
   text-align: center;
 }
+
+.supportedStorage {
+  margin-top: 20px;
+
+  vscode-panels {
+    width: 500px;
+    margin: 0 auto;
+  }
+}
+
+.storageDetails {
+  white-space: pre-wrap;
+  background-color: transparent !important;
+  color: $watermark-color;
+  font-family: sans-serif;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  padding: 0;
+  text-align: left;
+  width: max-content;
+}
+
+.infoIcon {
+  fill: $accent-color;
+  margin-bottom: -3px;
+}
+
+.warnIcon {
+  fill: $warn-color;
+  margin-bottom: -3px;
+}

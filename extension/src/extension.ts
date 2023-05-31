@@ -1,4 +1,5 @@
 import { commands, env, ExtensionContext, ViewColumn } from 'vscode'
+import { DvcConfig } from './cli/dvc/config'
 import { DvcExecutor } from './cli/dvc/executor'
 import { DvcRunner } from './cli/dvc/runner'
 import { DvcReader } from './cli/dvc/reader'
@@ -61,6 +62,7 @@ class Extension extends Disposable {
   private readonly plots: WorkspacePlots
   private readonly setup: Setup
   private readonly repositoriesTree: RepositoriesTree
+  private readonly dvcConfig: DvcConfig
   private readonly dvcExecutor: DvcExecutor
   private readonly dvcReader: DvcReader
   private readonly dvcRunner: DvcRunner
@@ -84,21 +86,14 @@ class Extension extends Disposable {
     this.gitExecutor = this.dispose.track(new GitExecutor())
     this.gitReader = this.dispose.track(new GitReader())
 
-    const getStudioLiveShareToken = () => this.setup.getStudioLiveShareToken()
-
-    this.dvcExecutor = this.dispose.track(
-      new DvcExecutor(config, getStudioLiveShareToken, cwd =>
-        this.gitReader.getRemoteUrl(cwd)
-      )
-    )
-
+    this.dvcConfig = this.dispose.track(new DvcConfig(config))
+    this.dvcExecutor = this.dispose.track(new DvcExecutor(config))
     this.dvcReader = this.dispose.track(new DvcReader(config))
-    this.dvcRunner = this.dispose.track(
-      new DvcRunner(config, getStudioLiveShareToken)
-    )
+    this.dvcRunner = this.dispose.track(new DvcRunner(config))
     this.dvcViewer = this.dispose.track(new DvcViewer(config))
 
     const clis = [
+      this.dvcConfig,
       this.dvcExecutor,
       this.dvcReader,
       this.dvcRunner,

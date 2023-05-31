@@ -15,11 +15,7 @@ const config = {
 } as Config
 
 export const dvcReader = new DvcReader(config)
-const dvcExecutor = new DvcExecutor(
-  config,
-  () => undefined,
-  () => Promise.resolve('')
-)
+const dvcExecutor = new DvcExecutor(config)
 const gitExecutor = new GitExecutor()
 
 let demoInitialized: Promise<string>

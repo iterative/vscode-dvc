@@ -1,6 +1,6 @@
 import React from 'react'
 import { DvcLiveExamples } from './DvcLiveExamples'
-import { CodeBlock } from '../../../shared/components/codeBlock/CodeBlock'
+import { CodeBlock } from '../shared/CodeBlock'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 
 export const NoData: React.FC = () => {

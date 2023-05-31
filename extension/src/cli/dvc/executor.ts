@@ -1,4 +1,3 @@
-import { EventEmitter } from 'vscode'
 import { DvcCli } from '.'
 import {
   Args,
@@ -9,17 +8,14 @@ import {
   GcPreserveFlag,
   QueueSubCommand
 } from './constants'
-import { addStudioAccessToken } from './options'
-import { CliResult, CliStarted, typeCheckCommands } from '..'
+import { typeCheckCommands } from '..'
 import { ContextKey, setContextValue } from '../../vscode/context'
-import { Config } from '../../config'
 import { DEFAULT_REMOTE } from '../git/constants'
 
 export const autoRegisteredCommands = {
   ADD: 'add',
   CHECKOUT: 'checkout',
   COMMIT: 'commit',
-  CONFIG: 'config',
   EXP_APPLY: 'expApply',
   EXP_BRANCH: 'expBranch',
   EXP_GARBAGE_COLLECT: 'expGarbageCollect',
@@ -35,7 +31,6 @@ export const autoRegisteredCommands = {
   QUEUE_KILL: 'queueKill',
   QUEUE_START: 'queueStart',
   QUEUE_STOP: 'queueStop',
-  REMOTE: 'remote',
   REMOVE: 'remove'
 } as const
 
@@ -45,23 +40,7 @@ export class DvcExecutor extends DvcCli {
     this
   )
 
-  private readonly getStudioLiveShareToken: () => string | undefined
-  private readonly getRepoUrl: (cwd: string) => Promise<string>
   private scmCommandRunning = false
-
-  constructor(
-    config: Config,
-    getStudioLiveShareToken: () => string | undefined,
-    getRepoUrl: (cwd: string) => Promise<string>,
-    emitters?: {
-      processStarted: EventEmitter<CliStarted>
-      processCompleted: EventEmitter<CliResult>
-    }
-  ) {
-    super(config, emitters)
-    this.getStudioLiveShareToken = getStudioLiveShareToken
-    this.getRepoUrl = getRepoUrl
-  }
 
   public add(cwd: string, target: string) {
     return this.blockAndExecuteProcess(cwd, Command.ADD, target)
@@ -73,10 +52,6 @@ export class DvcExecutor extends DvcCli {
 
   public commit(cwd: string, ...args: Args) {
     return this.blockAndExecuteProcess(cwd, Command.COMMIT, ...args, Flag.FORCE)
-  }
-
-  public config(cwd: string, ...args: Args) {
-    return this.executeDvcProcess(cwd, Command.CONFIG, ...args)
   }
 
   public expApply(cwd: string, experimentName: string) {
@@ -168,7 +143,7 @@ export class DvcExecutor extends DvcCli {
     )
   }
 
-  public async queueStart(cwd: string, jobs: string) {
+  public queueStart(cwd: string, jobs: string) {
     const options = this.getOptions(
       cwd,
       Command.QUEUE,
@@ -176,12 +151,8 @@ export class DvcExecutor extends DvcCli {
       Flag.JOBS,
       jobs
     )
-    const studioAccessToken = this.getStudioLiveShareToken()
-    const repoUrl = studioAccessToken ? await this.getRepoUrl(cwd) : undefined
 
-    return this.createBackgroundProcess(
-      addStudioAccessToken(options, studioAccessToken, repoUrl)
-    )
+    return this.createBackgroundProcess(options)
   }
 
   public queueStop(cwd: string, ...args: Args) {
@@ -195,10 +166,6 @@ export class DvcExecutor extends DvcCli {
 
   public remove(cwd: string, ...args: Args) {
     return this.blockAndExecuteProcess(cwd, Command.REMOVE, ...args)
-  }
-
-  public remote(cwd: string, ...args: Args) {
-    return this.executeDvcProcess(cwd, Command.REMOTE, ...args)
   }
 
   private executeExperimentProcess(cwd: string, ...args: Args) {

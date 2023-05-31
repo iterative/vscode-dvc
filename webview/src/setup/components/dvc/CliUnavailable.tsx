@@ -28,7 +28,7 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
         {pythonBinPath}.
       </p>
       <div className={styles.sideBySideButtons}>
-        <Button onClick={installDvc} text="Install" />
+        <Button onClick={installDvc} text="Install (pip)" />
         <Button onClick={setupWorkspace} text="Configure" />
       </div>
     </>
