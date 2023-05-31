@@ -165,7 +165,7 @@ describe('App', () => {
           `DVC & DVCLive can be auto-installed as packages with ${defaultInterpreter}`
         )
       ).toBeInTheDocument()
-      expect(screen.getByText('Install')).toBeInTheDocument()
+      expect(screen.getByText('Install (pip)')).toBeInTheDocument()
     })
 
     it('should let the user find another Python interpreter to install DVC when the Python extension is not installed', () => {
@@ -215,7 +215,7 @@ describe('App', () => {
         pythonBinPath: 'python'
       })
 
-      const button = screen.getByText('Install')
+      const button = screen.getByText('Install (pip)')
       fireEvent.click(button)
 
       expect(mockPostMessage).toHaveBeenCalledWith({

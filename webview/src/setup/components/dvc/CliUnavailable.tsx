@@ -18,7 +18,7 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
         DVC & DVCLive can be auto-installed as packages with {pythonBinPath}
       </p>
       <div className={styles.sideBySideButtons}>
-        <Button onClick={installDvc} text="Install" />
+        <Button onClick={installDvc} text="Install (pip)" />
         <Button onClick={setupWorkspace} text="Configure" />
       </div>
     </>
