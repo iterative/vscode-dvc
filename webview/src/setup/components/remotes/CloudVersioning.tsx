@@ -6,8 +6,7 @@ import { CodeBlock } from '../shared/CodeBlock'
 export const CloudVersioning: React.FC<PropsWithChildren> = ({ children }) => (
   <>
     <InfoText>
-      <CloudVersioningLink /> requires {children}
-      {'\n'} To enable run:
+      <CloudVersioningLink /> requires <span>{children}</span> To enable run:
     </InfoText>
     <CodeBlock language="bash">
       dvc remote modify myremote version_aware true

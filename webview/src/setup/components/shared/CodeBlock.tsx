@@ -3,7 +3,7 @@ import React from 'react'
 import Highlight, { defaultProps, Language } from 'prism-react-renderer'
 import styles from './styles.module.scss'
 
-export interface CodeBlockProps {
+interface CodeBlockProps {
   language: Language
   children: string
   inline?: boolean

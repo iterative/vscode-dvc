@@ -1,6 +1,7 @@
 import React from 'react'
 import styles from './styles.module.scss'
 import { CloudVersioning } from './CloudVersioning'
+import { ShowExtension } from './ShowExtension'
 
 export const AzureBlobStorage = () => (
   <div className={styles.storageDetails}>
@@ -11,6 +12,10 @@ export const AzureBlobStorage = () => (
       </a>{' '}
       for details on how to authenticate.
     </p>
+    <ShowExtension
+      id="ms-azuretools.vscode-azurestorage"
+      name="Azure Storage"
+    />
     <CloudVersioning>
       <a href="https://learn.microsoft.com/en-us/azure/storage/blobs/versioning-overview">
         Blob versioning

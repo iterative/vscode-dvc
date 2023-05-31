@@ -38,11 +38,9 @@ export const OtherStorageTypes: React.FC = () => (
         </a>
       </li>
     </ul>
-    <p>
-      <InfoText>
-        <CloudVersioningLink /> is not currently supported by any of these
-        remotes.
-      </InfoText>
-    </p>
+    <InfoText>
+      <CloudVersioningLink /> is not currently supported by any of these
+      remotes.
+    </InfoText>
   </div>
 )

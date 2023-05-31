@@ -1,6 +1,6 @@
 import React from 'react'
 import { RemoteList } from 'dvc/src/setup/webview/contract'
-import { StorageSlider } from './StorageSlider'
+import { SupportedStorage } from './SupportedStorage'
 import { MultiProjectRemotes } from './MultiProjectRemotes'
 import { ProjectRemotes } from './ProjectRemotes'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
@@ -34,7 +34,7 @@ export const RemoteDetails: React.FC<{
         onClick={removeRemote}
         text="Remove"
       />
-      <StorageSlider />
+      <SupportedStorage />
     </EmptyState>
   )
 }
