@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.3] - 2023-05-31
+
+### 🚀 New Features and Enhancements
+
+- Add capabilities to text mentioning storage provider extensions [#4015](https://github.com/iterative/vscode-dvc/pull/4015) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Improve "Get Started" walkthrough and welcome section [#4020](https://github.com/iterative/vscode-dvc/pull/4020) by [@julieg18](https://github.com/julieg18)
+
 ## [0.9.2] - 2023-05-31
 
 ### 🚀 New Features and Enhancements
