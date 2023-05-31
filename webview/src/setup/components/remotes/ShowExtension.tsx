@@ -3,10 +3,11 @@ import styles from './styles.module.scss'
 import { Icon } from '../../../shared/components/Icon'
 import { Extensions } from '../../../shared/components/icons'
 
-export const ShowExtension: React.FC<{ id: string; name: string }> = ({
-  id,
-  name
-}) => {
+export const ShowExtension: React.FC<{
+  capabilities: string
+  id: string
+  name: string
+}> = ({ capabilities, id, name }) => {
   const idQuery = `"@id:${id}"`
 
   return (
@@ -17,7 +18,7 @@ export const ShowExtension: React.FC<{ id: string; name: string }> = ({
         height={16}
         className={styles.infoIcon}
       />{' '}
-      View the{' '}
+      The{' '}
       <a
         href={`command:workbench.extensions.search?${encodeURIComponent(
           idQuery
@@ -25,7 +26,7 @@ export const ShowExtension: React.FC<{ id: string; name: string }> = ({
       >
         {name}
       </a>{' '}
-      extension.
+      extension can be used to <span>{capabilities}</span>.
     </p>
   )
 }

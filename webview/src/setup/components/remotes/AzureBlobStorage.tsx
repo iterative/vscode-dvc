@@ -13,6 +13,7 @@ export const AzureBlobStorage = () => (
       for details on how to authenticate.
     </p>
     <ShowExtension
+      capabilities="create storage accounts and manage blob containers"
       id="ms-azuretools.vscode-azurestorage"
       name="Azure Storage"
     />

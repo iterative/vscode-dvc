@@ -15,7 +15,11 @@ export const GoogleCloudStorage: React.FC = () => (
       </a>
       . This reads the default GCP key file.
     </p>
-    <ShowExtension id="GoogleCloudTools.cloudcode" name="Google Cloud Code" />
+    <ShowExtension
+      id="GoogleCloudTools.cloudcode"
+      name="Google Cloud Code"
+      capabilities="create projects and provides snippets for working with the Cloud Storage API"
+    />
     <p>
       <Icon icon={Warning} width={16} height={16} className={styles.warnIcon} />{' '}
       Make sure to run{' '}

@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.2] - 2023-05-31
+
+### 🚀 New Features and Enhancements
+
+- Consolidate Setup and "Get Started" walkthrough [#3993](https://github.com/iterative/vscode-dvc/pull/3993) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Increase width of supported storage to remove scrollbar [#4016](https://github.com/iterative/vscode-dvc/pull/4016) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Add "(pip)" to setup install button [#4013](https://github.com/iterative/vscode-dvc/pull/4013) by [@julieg18](https://github.com/julieg18)
+
 ## [0.9.1] - 2023-05-31
 
 ### 🚀 New Features and Enhancements
