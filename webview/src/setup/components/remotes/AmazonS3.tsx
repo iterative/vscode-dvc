@@ -14,7 +14,11 @@ export const AmazonS3 = () => (
       </a>
       . This reads the default AWS credentials file (if available) or env vars.
     </p>
-    <ShowExtension id="AmazonWebServices.aws-toolkit-vscode" name="AWS" />
+    <ShowExtension
+      id="AmazonWebServices.aws-toolkit-vscode"
+      name="AWS Toolkit"
+      capabilities="manage AWS profiles and S3 buckets"
+    />
     <InfoText>
       The AWS user needs the following permissions: s3:ListBucket, s3:GetObject,
       s3:PutObject, s3:DeleteObject.
