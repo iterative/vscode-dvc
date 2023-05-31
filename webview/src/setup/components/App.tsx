@@ -59,6 +59,10 @@ const getStudioStatusIcon = (cliCompatible: boolean, isConnected: boolean) => {
 
   return isConnected ? TooltipIconType.PASSED : TooltipIconType.INFO
 }
+
+const getGetStartedIcon = (isDvcSetup: boolean) =>
+  isDvcSetup ? TooltipIconType.INFO : TooltipIconType.ERROR
+
 export const feedStore = (
   data: MessageToWebview<SetupData>,
   dispatch: SetupDispatch
@@ -175,9 +179,9 @@ export const App: React.FC = () => {
       <SetupContainer
         sectionKey={SetupSection.GET_STARTED}
         title="Get Started"
-        icon={TooltipIconType.INFO}
+        icon={getGetStartedIcon(isDvcSetup)}
       >
-        <GetStarted />
+        <GetStarted isDvcSetup={isDvcSetup} />
       </SetupContainer>
       <SetupContainer
         sectionKey={SetupSection.EXPERIMENTS}
