@@ -46,9 +46,8 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
       {children}
       <p>
         New to DVC? Check out <a href="https://dvc.org/">dvc.org</a> to learn
-        more or our{' '}
-        <a href="https://github.com/iterative/vscode-dvc-demo">demo</a> to
-        quickly try the extension.{' '}
+        more or quickly try the extension with our{' '}
+        <a href="https://github.com/iterative/vscode-dvc-demo">demo</a>.
       </p>
       {conditionalContents}
     </EmptyState>
