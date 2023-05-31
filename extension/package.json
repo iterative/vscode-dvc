@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.9.1",
+  "version": "0.9.2",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -615,8 +615,8 @@
           "type": "boolean",
           "default": null
         },
-        "dvc.doNotShowWalkthroughAfterInstall": {
-          "description": "Do not prompt to show the Get Started page after installing. Useful for pre-configured development environments.",
+        "dvc.doNotShowSetupAfterInstall": {
+          "description": "Do not prompt to show the setup page after installing. Useful for pre-configured development environments.",
           "type": "boolean",
           "default": null
         },
@@ -1512,32 +1512,6 @@
         "title": "Get Started",
         "description": "Your first steps to build better models faster with experiment tracking and dataset versioning",
         "steps": [
-          {
-            "id": "dvc.installDVC",
-            "title": "Install DVC",
-            "description": "This extension requires DVC to be installed.\n\n[Show Setup](command:dvc.showDvcSetup)\n",
-            "media": {
-              "markdown": "resources/walkthrough/install-dvc.md"
-            },
-            "completionEvents": [
-              "onLink:https://dvc.org",
-              "onLink:https://dvc.org/doc/install",
-              "onCommand:dvc.setupWorkspace"
-            ]
-          },
-          {
-            "id": "dvc.setupProject",
-            "title": "Setup a DVC Project",
-            "description": "Try an example DVC project or set one up quickly, and start tracking datasets, models, metrics, and plots\n\n[Example Project](https://github.com/iterative/example-get-started)\n",
-            "media": {
-              "markdown": "resources/walkthrough/setup-project.md"
-            },
-            "completionEvents": [
-              "onLink:https://github.com/iterative/example-get-started",
-              "onLink:https://github.com/iterative/vscode-dvc-demo",
-              "onLink:https://dvc.org/doc/dvclive"
-            ]
-          },
           {
             "id": "dvc.showCommands",
             "title": "Available Commands",

@@ -1,9 +1,23 @@
 import React from 'react'
 import { showWalkthrough } from './messages'
+import { DvcNotSetup } from './shared/DvcNotSetup'
 import { Button } from '../../shared/components/button/Button'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 
-export const GetStarted: React.FC = () => {
+export const GetStarted: React.FC<{ isDvcSetup: boolean }> = ({
+  isDvcSetup
+}) => {
+  if (!isDvcSetup) {
+    return (
+      <DvcNotSetup>
+        <p>
+          This extension&apos;s features cannot be accessed without DVC being
+          setup.
+        </p>
+      </DvcNotSetup>
+    )
+  }
+
   return (
     <EmptyState isFullScreen={false}>
       <h1>Get Started</h1>

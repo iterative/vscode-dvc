@@ -1,9 +1,5 @@
 # Experiments Table
 
-> ❗ DVC should be installed and DVC project available in the workspace for this
-> and the next steps to work properly. Please refer to first two steps of this
-> guide.
-
 As you change code, parameters, data and run new experiments this table will
 keep all the details about your iterations. It can be manipulated and configured
 using the [DVC side panel](command:workbench.view.extension.dvc-views). This is
