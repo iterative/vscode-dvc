@@ -1402,7 +1402,7 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('Sorting', () => {
-    it('should be able to sort', async () => {
+    it.only('should be able to sort', async () => {
       const { internalCommands } = buildInternalCommands(disposable)
 
       const messageSpy = spy(BaseWebview.prototype, 'show')
