@@ -71,11 +71,7 @@ import {
   RegisteredCommands
 } from '../../../commands/external'
 import { ConfigKey } from '../../../vscode/config'
-import {
-  EXPERIMENT_WORKSPACE_ID,
-  Executor,
-  ExperimentStatus
-} from '../../../cli/dvc/contract'
+import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
 import * as Time from '../../../util/time'
 import { AvailableCommands } from '../../../commands/internal'
 import { Setup } from '../../../setup'
@@ -931,8 +927,8 @@ suite('Experiments Test Suite', () => {
 
       expect(
         isExperimentSelected(runningInQueueId),
-        'experiment running the queue cannot be selected'
-      ).to.be.false
+        'experiment running in the queue can be selected'
+      ).to.be.true
 
       mockMessageReceived.fire({
         payload: queuedId,
@@ -1159,8 +1155,8 @@ suite('Experiments Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       const queuedId = '90aea7f'
       const runningInQueueId = 'exp-e7a67'
-      const expectedIds = ['main', 'test-branch']
-      const mockExperimentIds = [...expectedIds, queuedId, runningInQueueId]
+      const expectedIds = ['main', 'test-branch', runningInQueueId]
+      const mockExperimentIds = [...expectedIds, queuedId]
 
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
@@ -1177,7 +1173,7 @@ suite('Experiments Test Suite', () => {
         .getSelectedRevisions()
         .map(({ id }) => id)
         .sort()
-      mockExperimentIds.sort()
+      expectedIds.sort()
       expect(
         selectExperimentIds,
         'should exclude queued experiments and experiments running in the queue from selection'
@@ -1185,8 +1181,10 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to compare experiments plots', async () => {
-      const mockShouldBeShown = stub(Setup.prototype, 'shouldBeShown')
-      mockShouldBeShown.returns(false)
+      stub(Setup.prototype, 'shouldBeShown').returns({
+        dvc: true,
+        experiments: true
+      })
       const { experiments, experimentsModel } = buildExperiments(disposable)
       const mockShowPlots = stub(WorkspacePlots.prototype, 'showWebview')
 
@@ -1202,14 +1200,14 @@ suite('Experiments Test Suite', () => {
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       const runningInQueueId = 'exp-e7a67'
-      const mockExperimentIds = ['main', 'test-branch']
+      const mockExperimentIds = ['main', 'test-branch', runningInQueueId]
 
       stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const tableChangePromise = experimentsUpdatedEvent(experiments)
 
       mockMessageReceived.fire({
-        payload: [...mockExperimentIds, runningInQueueId],
+        payload: mockExperimentIds,
         type: MessageFromWebviewType.SET_EXPERIMENTS_AND_OPEN_PLOTS
       })
 
@@ -1697,11 +1695,12 @@ suite('Experiments Test Suite', () => {
       ).to.deep.equal({
         '489fd8b': 0,
         '55d492c': 0,
+        'exp-83425': colors[0],
         'exp-e7a67': 0,
         'exp-f13bca': 0,
         main: 0,
         'test-branch': 0,
-        [EXPERIMENT_WORKSPACE_ID]: colors[0]
+        [EXPERIMENT_WORKSPACE_ID]: 0
       })
 
       expect(
@@ -1792,11 +1791,12 @@ suite('Experiments Test Suite', () => {
       ).to.deep.equal({
         '489fd8b': 0,
         '55d492c': 0,
+        'exp-83425': colors[0],
         'exp-e7a67': 0,
         'exp-f13bca': colors[1],
         main: 0,
         'test-branch': 0,
-        [EXPERIMENT_WORKSPACE_ID]: colors[0]
+        [EXPERIMENT_WORKSPACE_ID]: 0
       })
     })
 
@@ -1807,7 +1807,7 @@ suite('Experiments Test Suite', () => {
         'experimentsFilterBy:test': filterMapEntries,
         'experimentsSortBy:test': sortDefinitions,
         'experimentsStatus:test': {
-          [EXPERIMENT_WORKSPACE_ID]: colors[0],
+          'exp-83425': colors[0],
           'exp-e7a67': colors[5],
           'exp-f13bca': 0,
           'test-branch': colors[1]
@@ -1846,7 +1846,7 @@ suite('Experiments Test Suite', () => {
       ).to.deep.equal([
         {
           displayColor: colors[0],
-          id: EXPERIMENT_WORKSPACE_ID
+          id: 'exp-83425'
         },
         {
           displayColor: colors[1],
@@ -2010,123 +2010,6 @@ suite('Experiments Test Suite', () => {
       expect(mockCheckSignalFile).to.be.called
       expect(mockDelay).to.be.called
       expect(mockUpdateExperimentsData).to.be.calledOnce
-    })
-  })
-
-  describe('checkForFinishedWorkspaceExperiment', () => {
-    it('should unselect the workspace record if it has the same color as an experiment', async () => {
-      const colors = copyOriginalColors()
-      const [color] = colors
-      const commit = 'df3f8647a47e403c9c4aa6562cad0b74afbe900b'
-      const name = 'fizzy-dilemma'
-      const params = { 'params.yaml': { data: { lr: 1 } } }
-      const runningOutput = generateTestExpShowOutput(
-        { params },
-        {
-          rev: commit,
-          experiments: [
-            {
-              rev: EXPERIMENT_WORKSPACE_ID,
-              data: { params },
-              name,
-              executor: {
-                local: null,
-                state: ExperimentStatus.RUNNING,
-                name: Executor.WORKSPACE
-              }
-            }
-          ]
-        }
-      )
-
-      const getSelectedIdsWithColor = (
-        experiments: Experiments
-      ): { id: string; displayColor: string }[] =>
-        experiments
-          .getSelectedRevisions()
-          .map(({ id, displayColor }) => ({ id, displayColor }))
-
-      const selectedWorkspace = {
-        id: EXPERIMENT_WORKSPACE_ID,
-        displayColor: color
-      }
-      const selectedExperiment = {
-        id: name,
-        displayColor: color
-      }
-      const bothSelected = [selectedWorkspace, selectedExperiment]
-
-      const { experiments, experimentsModel } = buildExperiments(
-        disposable,
-        runningOutput
-      )
-
-      await experiments.isReady()
-
-      expect(
-        experimentsModel.hasRunningWorkspaceExperiment(),
-        'should have a running experiment'
-      ).to.be.true
-
-      expect(
-        getSelectedIdsWithColor(experiments),
-        'should automatically select the running experiment'
-      ).to.deep.equal([selectedWorkspace])
-
-      const experimentsChanged = new Promise(resolve =>
-        experiments.onDidChangeExperiments(() => resolve(undefined))
-      )
-
-      await experiments.setState(
-        generateTestExpShowOutput(
-          { params },
-          {
-            rev: commit,
-            experiments: [
-              {
-                rev: '679c7ce7469020332154717126f88ce157ebc612',
-                data: { params },
-                name,
-                executor: null
-              }
-            ]
-          }
-        )
-      )
-
-      await experimentsChanged
-
-      expect(
-        getSelectedIdsWithColor(experiments),
-        "should apply the workspace's color to a newly created experiment"
-      ).to.deep.equal(bothSelected)
-
-      experiments.checkForFinishedWorkspaceExperiment([selectedWorkspace])
-
-      expect(
-        getSelectedIdsWithColor(experiments),
-        "should not remove the workspace's color if the experiment's data has not been fetched"
-      ).to.deep.equal(bothSelected)
-
-      experiments.checkForFinishedWorkspaceExperiment([
-        selectedExperiment,
-        selectedWorkspace
-      ])
-
-      expect(
-        getSelectedIdsWithColor(experiments),
-        "should remove the workspace's color once the experiment's data has been shown to be fetched"
-      ).to.deep.equal([selectedExperiment])
-
-      experiments.toggleExperimentStatus(EXPERIMENT_WORKSPACE_ID)
-
-      expect(
-        getSelectedIdsWithColor(experiments),
-        'should not duplicate the color when toggling another experiment'
-      ).to.deep.equal([
-        selectedExperiment,
-        { id: EXPERIMENT_WORKSPACE_ID, displayColor: colors[1] }
-      ])
     })
   })
 })

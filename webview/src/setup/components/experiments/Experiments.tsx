@@ -8,7 +8,7 @@ import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { IconButton } from '../../../shared/components/button/IconButton'
 import { Beaker } from '../../../shared/components/icons'
 import { SetupState } from '../../store'
-import { FocusDvcSection } from '../shared/FocusDvcSection'
+import { DvcNotSetup } from '../shared/DvcNotSetup'
 
 type ExperimentsProps = {
   isDvcSetup: boolean
@@ -21,11 +21,9 @@ export const Experiments: React.FC<ExperimentsProps> = ({ isDvcSetup }) => {
 
   if (!isDvcSetup) {
     return (
-      <EmptyState isFullScreen={false}>
-        <h1>DVC is not setup</h1>
+      <DvcNotSetup>
         <p>DVC needs to be setup before you can access experiments.</p>
-        <FocusDvcSection />
-      </EmptyState>
+      </DvcNotSetup>
     )
   }
 

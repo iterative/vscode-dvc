@@ -56,7 +56,6 @@ const collectDisabledOptions = (
   const starredExperimentIds: string[] = []
   const unstarredExperimentIds: string[] = []
   let disableExperimentOnlyOption = false
-  let disablePlotOption = false
   let disableStopOption = false
 
   for (const { row } of selectedRowsList) {
@@ -78,16 +77,13 @@ const collectDisabledOptions = (
       disableExperimentOnlyOption = true
     }
 
-    if (isRunning(status)) {
-      disablePlotOption = true
-      continue
+    if (!isRunning(status)) {
+      disableStopOption = true
     }
-    disableStopOption = true
   }
 
   return {
     disableExperimentOnlyOption,
-    disablePlotOption,
     disableStopOption,
     selectedIds,
     starredExperimentIds,
@@ -101,7 +97,6 @@ const getMultiSelectMenuOptions = (
 ) => {
   const {
     disableExperimentOnlyOption,
-    disablePlotOption,
     disableStopOption,
     selectedIds,
     starredExperimentIds,
@@ -126,14 +121,14 @@ const getMultiSelectMenuOptions = (
       ids,
       'Plot',
       MessageFromWebviewType.SET_EXPERIMENTS_FOR_PLOTS,
-      disablePlotOption,
+      false,
       true
     ),
     experimentMenuOption(
       ids,
       'Plot and Show',
       MessageFromWebviewType.SET_EXPERIMENTS_AND_OPEN_PLOTS,
-      disablePlotOption,
+      false,
       false
     ),
     experimentMenuOption(

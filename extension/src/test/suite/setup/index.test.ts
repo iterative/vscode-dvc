@@ -7,7 +7,6 @@ import {
   MessageItem,
   QuickPickItem,
   Uri,
-  WorkspaceConfiguration,
   commands,
   window,
   workspace
@@ -46,9 +45,9 @@ import * as Python from '../../../extensions/python'
 import { ContextKey } from '../../../vscode/context'
 import { Setup } from '../../../setup'
 import { SetupSection } from '../../../setup/webview/contract'
-import { DvcExecutor } from '../../../cli/dvc/executor'
 import { getFirstWorkspaceFolder } from '../../../vscode/workspaceFolders'
 import { Response } from '../../../vscode/response'
+import { DvcConfig } from '../../../cli/dvc/config'
 
 suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
@@ -315,6 +314,7 @@ suite('Setup Test Suite', () => {
       await messageSent
 
       expect(mockSendMessage).to.be.calledOnce
+
       expect(mockSendMessage).to.be.calledWithExactly({
         canGitInitialize: true,
         cliCompatible: true,
@@ -329,7 +329,7 @@ suite('Setup Test Suite', () => {
         pythonBinPath: undefined,
         remoteList: undefined,
         sectionCollapsed: undefined,
-        shareLiveToStudio: false
+        shareLiveToStudio: true
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -381,7 +381,7 @@ suite('Setup Test Suite', () => {
         pythonBinPath: undefined,
         remoteList: undefined,
         sectionCollapsed: undefined,
-        shareLiveToStudio: false
+        shareLiveToStudio: true
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -433,7 +433,7 @@ suite('Setup Test Suite', () => {
         pythonBinPath: undefined,
         remoteList: { [dvcDemoPath]: undefined },
         sectionCollapsed: undefined,
-        shareLiveToStudio: false
+        shareLiveToStudio: true
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -741,7 +741,7 @@ suite('Setup Test Suite', () => {
       const { setup, mockExecuteCommand, messageSpy } = buildSetup(disposable)
       mockExecuteCommand.restore()
 
-      const mockConfig = stub(DvcExecutor.prototype, 'config')
+      const mockConfig = stub(DvcConfig.prototype, 'config')
       mockConfig.resolves('')
 
       const executeCommandSpy = spy(commands, 'executeCommand')
@@ -791,34 +791,45 @@ suite('Setup Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle a message to set dvc.studio.shareExperimentsLive', async () => {
-      const { setup } = buildSetup(disposable)
+    it('should handle a message to set studio.offline (share live experiments)', async () => {
+      const { mockConfig, setup } = buildSetup(disposable)
       const webview = await setup.showWebview()
       await webview.isReady()
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
-      const mockUpdate = stub()
-
-      stub(workspace, 'getConfiguration').returns({
-        update: mockUpdate
-      } as unknown as WorkspaceConfiguration)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(setup as any, 'getCliCompatible')
+        .onFirstCall()
+        .returns(true)
+        .onSecondCall()
+        .returns(undefined)
 
       mockMessageReceived.fire({
         payload: false,
         type: MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE
       })
 
-      expect(mockUpdate).to.be.calledWithExactly(
-        Config.ConfigKey.STUDIO_SHARE_EXPERIMENTS_LIVE,
-        false
+      expect(mockConfig).to.be.calledWithExactly(
+        dvcDemoPath,
+        '--global',
+        'studio.offline',
+        'true'
       )
+      mockConfig.resetHistory()
+
+      mockMessageReceived.fire({
+        payload: false,
+        type: MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE
+      })
+
+      expect(mockConfig).not.to.be.called
     })
 
     it('should be able to delete the Studio access token from the global dvc config', async () => {
       const mockConfig = stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        DvcExecutor.prototype,
+        DvcConfig.prototype,
         'config'
       ).resolves(undefined)
 
@@ -837,6 +848,28 @@ suite('Setup Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should check if experiments and dvc are setup', async () => {
+      const { setup } = buildSetup(disposable, false, false)
+
+      setup.setCliCompatibleAndVersion(true, MIN_CLI_VERSION)
+      setup.setAvailable(true)
+      await setup.setRoots()
+
+      expect(setup.shouldBeShown()).to.deep.equal({
+        dvc: true,
+        experiments: false
+      })
+
+      setup.setCliCompatibleAndVersion(undefined, undefined)
+      setup.setAvailable(false)
+      await setup.setRoots()
+
+      expect(setup.shouldBeShown()).to.deep.equal({
+        dvc: false,
+        experiments: false
+      })
+    })
+
     it('should handle a message to open the experiments webview', async () => {
       const { messageSpy, setup, mockShowWebview, mockExecuteCommand } =
         buildSetup(disposable)
@@ -853,7 +886,10 @@ suite('Setup Test Suite', () => {
           return Promise.resolve(undefined)
         })
       )
-      stub(Setup.prototype, 'shouldBeShown').returns(false)
+      stub(Setup.prototype, 'shouldBeShown').returns({
+        dvc: true,
+        experiments: true
+      })
 
       messageSpy.resetHistory()
       mockMessageReceived.fire({
@@ -873,7 +909,7 @@ suite('Setup Test Suite', () => {
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
-      const mockRemote = stub(DvcExecutor.prototype, 'remote')
+      const mockRemote = stub(DvcConfig.prototype, 'remote')
 
       const remoteAdded = new Promise(resolve =>
         mockRemote.callsFake((_, ...args) => {
@@ -912,7 +948,7 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to add a remote', async () => {
-      const mockRemote = stub(DvcExecutor.prototype, 'remote')
+      const mockRemote = stub(DvcConfig.prototype, 'remote')
 
       const remoteAdded = new Promise(resolve =>
         mockRemote.callsFake((_, ...args) => {
@@ -962,7 +998,7 @@ suite('Setup Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to rename a remote', async () => {
-      const mockRemote = stub(DvcExecutor.prototype, 'remote')
+      const mockRemote = stub(DvcConfig.prototype, 'remote')
       const newName = 'better-name'
 
       const remoteRenamed = new Promise(resolve =>
@@ -1015,7 +1051,7 @@ suite('Setup Test Suite', () => {
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
-      const mockRemote = stub(DvcExecutor.prototype, 'remote')
+      const mockRemote = stub(DvcConfig.prototype, 'remote')
       const projectConfigUrl = 's3://different-url'
 
       const remoteModified = new Promise(resolve =>
@@ -1087,7 +1123,7 @@ suite('Setup Test Suite', () => {
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
-      const mockRemote = stub(DvcExecutor.prototype, 'remote')
+      const mockRemote = stub(DvcConfig.prototype, 'remote')
 
       let calls = 0
 

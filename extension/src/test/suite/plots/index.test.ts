@@ -568,6 +568,7 @@ suite('Plots Test Suite', () => {
       const webview = await plots.showWebview()
       mockPlotsDiff.resetHistory()
       const instanceMessageSpy = spy(webview, 'show')
+      await webview.isReady()
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -583,11 +584,7 @@ suite('Plots Test Suite', () => {
       await dataUpdateEvent
 
       expect(mockSendTelemetryEvent).to.be.calledOnce
-      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_PLOTS_MANUAL_REFRESH,
-        undefined,
-        undefined
-      )
+      expect(mockSendTelemetryEvent).to.be.calledWith(EventName.PLOTS_REFRESH)
       expect(mockPlotsDiff).to.be.called
       expect(mockPlotsDiff).to.be.calledWithExactly(
         dvcDemoPath,
@@ -841,7 +838,8 @@ suite('Plots Test Suite', () => {
       })
 
       expect(executeCommandSpy).to.be.calledWithExactly(
-        RegisteredCommands.PLOTS_CUSTOM_ADD
+        RegisteredCommands.PLOTS_CUSTOM_ADD,
+        dvcDemoPath
       )
     })
 
@@ -857,7 +855,8 @@ suite('Plots Test Suite', () => {
       })
 
       expect(executeCommandSpy).to.be.calledWithExactly(
-        RegisteredCommands.PLOTS_CUSTOM_REMOVE
+        RegisteredCommands.PLOTS_CUSTOM_REMOVE,
+        dvcDemoPath
       )
     })
 

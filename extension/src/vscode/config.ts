@@ -4,12 +4,11 @@ export enum ConfigKey {
   DO_NOT_RECOMMEND_ADD_STUDIO_TOKEN = 'dvc.doNotRecommendAddStudioToken',
   DO_NOT_RECOMMEND_RED_HAT = 'dvc.doNotRecommendRedHatExtension',
   DO_NOT_SHOW_CLI_UNAVAILABLE = 'dvc.doNotShowCliUnavailable',
-  DO_NOT_SHOW_WALKTHROUGH_AFTER_INSTALL = 'dvc.doNotShowWalkthroughAfterInstall',
+  DO_NOT_SHOW_SETUP_AFTER_INSTALL = 'dvc.doNotShowSetupAfterInstall',
   DVC_PATH = 'dvc.dvcPath',
   EXP_TABLE_HEAD_MAX_HEIGHT = 'dvc.experimentsTableHeadMaxHeight',
   FOCUSED_PROJECTS = 'dvc.focusedProjects',
-  PYTHON_PATH = 'dvc.pythonPath',
-  STUDIO_SHARE_EXPERIMENTS_LIVE = 'dvc.studio.shareExperimentsLive'
+  PYTHON_PATH = 'dvc.pythonPath'
 }
 
 export const getConfigValue = <T = string, D = string>(

@@ -33,7 +33,7 @@ export const buildSetup = (
     messageSpy,
     resourceLocator,
     internalCommands,
-    dvcExecutor,
+    dvcConfig,
     dvcReader,
     gitExecutor,
     gitReader
@@ -44,7 +44,7 @@ export const buildSetup = (
 
   const mockEmitter = disposer.track(new EventEmitter())
   stub(dvcReader, 'root').resolves(mockDvcRoot)
-  const mockRemote = stub(dvcExecutor, 'remote').resolves('')
+  const mockRemote = stub(dvcConfig, 'remote').resolves('')
   const mockVersion = stub(dvcReader, 'version').resolves(MIN_CLI_VERSION)
   const mockGlobalVersion = stub(dvcReader, 'globalVersion').resolves(
     MIN_CLI_VERSION
@@ -81,7 +81,7 @@ export const buildSetup = (
     })
   )
 
-  stub(dvcExecutor, 'config').resolves('')
+  const mockConfig = stub(dvcConfig, 'config').resolves('')
 
   const setup = disposer.track(
     new Setup(
@@ -107,6 +107,7 @@ export const buildSetup = (
     messageSpy,
     mockAutoInstallDvc,
     mockAutoUpgradeDvc,
+    mockConfig,
     mockExecuteCommand,
     mockGetGitRepositoryRoot,
     mockGlobalVersion,

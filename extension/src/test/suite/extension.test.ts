@@ -22,6 +22,7 @@ import { DvcExecutor } from '../../cli/dvc/executor'
 import { dvcDemoPath } from '../util'
 import { Setup } from '../../setup'
 import { Flag } from '../../cli/dvc/constants'
+import { DvcConfig } from '../../cli/dvc/config'
 
 suite('Extension Test Suite', () => {
   const disposable = Disposable.fn()
@@ -94,7 +95,8 @@ suite('Extension Test Suite', () => {
       const mockExpShow = stub(DvcReader.prototype, 'expShow')
       const mockDataStatus = stub(DvcReader.prototype, 'dataStatus')
       const mockPlotsDiff = stub(DvcReader.prototype, 'plotsDiff')
-      stub(DvcExecutor.prototype, 'config').resolves('')
+      stub(DvcConfig.prototype, 'config').resolves('')
+      stub(DvcConfig.prototype, 'remote').resolves('')
 
       stub(DvcReader.prototype, 'root').resolves('.')
 

@@ -229,7 +229,7 @@ describe('ExperimentsModel', () => {
     expect(experimentsModel.getSelectedRevisions()).toHaveLength(7)
   })
 
-  it('should swap an experiment running in the workspace for the workspace and not select an experiment running in the queue', () => {
+  it('should not swap an experiment running in the workspace for the workspace and not prevent selection of an experiment running in the queue', () => {
     const params = {
       params: {
         'params.yaml': {
@@ -239,6 +239,9 @@ describe('ExperimentsModel', () => {
         }
       }
     }
+    const runningExpName = 'selectable-nuffy'
+    const runningTaskName = 'selectable-task'
+
     const data = generateTestExpShowOutput(
       {},
       {
@@ -250,7 +253,7 @@ describe('ExperimentsModel', () => {
               name: Executor.WORKSPACE,
               state: ExperimentStatus.RUNNING
             },
-            name: 'unselectable-nuffy',
+            name: runningExpName,
             rev: EXPERIMENT_WORKSPACE_ID
           },
           {},
@@ -263,7 +266,7 @@ describe('ExperimentsModel', () => {
               name: Executor.DVC_TASK,
               state: ExperimentStatus.RUNNING
             },
-            name: 'unselectable-task',
+            name: runningTaskName,
             rev: EXPERIMENT_WORKSPACE_ID
           }
         ],
@@ -275,7 +278,7 @@ describe('ExperimentsModel', () => {
     model.transformAndSet(data, false)
 
     expect(model.getSelectedRevisions().map(({ id }) => id)).toStrictEqual([
-      EXPERIMENT_WORKSPACE_ID
+      runningExpName
     ])
 
     model.setSelected([])
@@ -285,9 +288,11 @@ describe('ExperimentsModel', () => {
     expect(model.getSelectedRevisions().map(({ id }) => id)).toStrictEqual([
       EXPERIMENT_WORKSPACE_ID,
       'testBranch',
+      runningExpName,
       'exp-2',
       'exp-3',
-      'exp-4'
+      'exp-4',
+      runningTaskName
     ])
   })
 

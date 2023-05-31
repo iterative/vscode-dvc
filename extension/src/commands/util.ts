@@ -5,7 +5,15 @@ import { Context } from '../vscode/context'
 
 export const showSetupOrExecuteCommand =
   <T>(setup: Setup, callback: (context: Context) => Promise<T | undefined>) =>
-  (context: Context) =>
-    setup.shouldBeShown()
-      ? commands.executeCommand(RegisteredCommands.SETUP_SHOW_DVC)
-      : callback(context)
+  (context: Context) => {
+    const { dvc, experiments } = setup.shouldBeShown()
+    if (!dvc) {
+      return commands.executeCommand(RegisteredCommands.SETUP_SHOW_DVC)
+    }
+
+    if (!experiments) {
+      return commands.executeCommand(RegisteredCommands.SETUP_SHOW_EXPERIMENTS)
+    }
+
+    return callback(context)
+  }
