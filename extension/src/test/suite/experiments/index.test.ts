@@ -29,6 +29,7 @@ import {
 import {
   Column,
   ColumnType,
+  Commit,
   TableData
 } from '../../../experiments/webview/contract'
 import {
@@ -1400,7 +1401,7 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('Sorting', () => {
-    it.only('should be able to sort', async () => {
+    it('should be able to sort', async () => {
       const { internalCommands } = buildInternalCommands(disposable)
 
       const messageSpy = spy(BaseWebview.prototype, 'show')
@@ -1464,66 +1465,24 @@ suite('Experiments Test Suite', () => {
       await experiments.isReady()
       await experiments.showWebview()
 
-      expect(messageSpy).to.be.calledWithMatch({
-        rows: [
-          {
-            branch: 'main',
-            commit: undefined,
-            description: undefined,
-            displayColor: undefined,
-            id: EXPERIMENT_WORKSPACE_ID,
-            label: EXPERIMENT_WORKSPACE_ID,
-            selected: false,
-            starred: false
-          },
-          {
-            branch: 'main',
-            commit: undefined,
-            description: undefined,
-            displayColor: undefined,
-            id: 'testBranch',
-            label: 'testBranch',
-            selected: false,
-            starred: false,
-            subRows: [
-              {
-                branch: 'main',
-                displayColor: undefined,
-                commit: undefined,
-                description: '[exp-1]',
-                id: 'exp-1',
-                label: '111111',
-                params: { 'params.yaml': { test: 2 } },
-                selected: false,
-                starred: false
-              },
-              {
-                branch: 'main',
-                displayColor: undefined,
-                commit: undefined,
-                description: '[exp-2]',
-                id: 'exp-2',
-                label: '222222',
-                params: { 'params.yaml': { test: 1 } },
-                selected: false,
-                starred: false
-              },
-              {
-                branch: 'main',
-                displayColor: undefined,
-                commit: undefined,
-                description: '[exp-3]',
-                id: 'exp-3',
-                label: '333333',
-                params: { 'params.yaml': { test: 3 } },
-                selected: false,
-                starred: false
-              }
-            ]
+      const getIds = (rows: Commit[]) =>
+        rows.map(({ id, subRows }) => {
+          const data: { id: string; subRows?: string[] } = { id }
+
+          if (subRows) {
+            data.subRows = subRows.map(({ id }) => id)
           }
-        ],
-        sorts: []
-      })
+          return data
+        })
+
+      const { rows, sorts: noSorts } = messageSpy.lastCall.args[0]
+
+      expect(getIds(rows as Commit[])).to.deep.equal([
+        { id: EXPERIMENT_WORKSPACE_ID },
+        { id: 'testBranch', subRows: ['exp-1', 'exp-2', 'exp-3'] }
+      ])
+
+      expect(noSorts).to.deep.equal([])
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const sortPath = buildMetricOrParamPath(
@@ -1552,59 +1511,14 @@ suite('Experiments Test Suite', () => {
       await pickPromise
       await tableChangePromise
 
-      expect(messageSpy).to.be.calledWithMatch({
-        rows: [
-          {
-            branch: 'main',
-            displayColor: undefined,
-            id: EXPERIMENT_WORKSPACE_ID,
-            label: EXPERIMENT_WORKSPACE_ID,
-            selected: false,
-            starred: false
-          },
-          {
-            branch: 'main',
-            displayColor: undefined,
-            id: 'testBranch',
-            label: 'testBranch',
-            selected: false,
-            starred: false,
-            subRows: [
-              {
-                branch: 'main',
-                displayColor: undefined,
-                description: '[exp-2]',
-                id: 'exp-2',
-                label: '222222',
-                params: { 'params.yaml': { test: 1 } },
-                selected: false,
-                starred: false
-              },
-              {
-                branch: 'main',
-                displayColor: undefined,
-                description: '[exp-1]',
-                id: 'exp-1',
-                label: '111111',
-                params: { 'params.yaml': { test: 2 } },
-                selected: false,
-                starred: false
-              },
-              {
-                branch: 'main',
-                displayColor: undefined,
-                description: '[exp-3]',
-                id: 'exp-3',
-                label: '333333',
-                params: { 'params.yaml': { test: 3 } },
-                selected: false,
-                starred: false
-              }
-            ]
-          }
-        ],
-        sorts: [{ descending: false, path: sortPath }]
-      })
+      const { rows: sortedRows, sorts } = messageSpy.lastCall.args[0]
+
+      expect(getIds(sortedRows as Commit[])).to.deep.equal([
+        { id: EXPERIMENT_WORKSPACE_ID },
+        { id: 'testBranch', subRows: ['exp-2', 'exp-1', 'exp-3'] }
+      ])
+
+      expect(sorts).to.deep.equal([{ descending: false, path: sortPath }])
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 
