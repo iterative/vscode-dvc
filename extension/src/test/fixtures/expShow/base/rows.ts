@@ -18,6 +18,8 @@ const colorsList = copyOriginalColors()
 const rowsFixture: Commit[] = [
   {
     branch: 'main',
+    commit: undefined,
+    description: undefined,
     deps: {
       [join('data', 'data.xml')]: valueWithNoChanges(
         '22a1a2931c8370d3aeedd7183606fd7f'
@@ -74,6 +76,8 @@ const rowsFixture: Commit[] = [
   },
   {
     branch: 'main',
+    commit: undefined,
+    description: undefined,
     deps: {
       [join('data', 'data.xml')]: valueWithNoChanges(
         '22a1a2931c8370d3aeedd7183606fd7f'

@@ -100,11 +100,13 @@ export const getCommitDataFromOutput = (
   const message = output.match(/\nmessage:(.+)/s) || []
   data.message = message[1] || ''
 
-  const refNames = refNamesWithKey.slice('refNames:'.length)
-  data.tags = refNames
-    .split(', ')
-    .filter(item => item.startsWith('tag: '))
-    .map(item => item.slice('tag: '.length))
+  if (refNamesWithKey) {
+    const refNames = refNamesWithKey.slice('refNames:'.length)
+    data.tags = refNames
+      .split(', ')
+      .filter(item => item.startsWith('tag: '))
+      .map(item => item.slice('tag: '.length))
+  }
 
   return data
 }
@@ -139,14 +141,6 @@ const transformExpState = (
   return experiment
 }
 
-const addCommitData = (baseline: Experiment, commitData?: CommitData): void => {
-  if (!commitData) {
-    return
-  }
-  baseline.description = formatCommitMessage(commitData.message)
-  baseline.commit = commitData
-}
-
 const collectExpState = (
   acc: ExperimentsAccumulator,
   expState: ExpState
@@ -160,10 +154,10 @@ const collectExpState = (
 
   const experiment: Experiment = {
     branch,
-    id,
-    label,
     commit,
-    description
+    description,
+    id,
+    label
   } as unknown as Experiment
 
   const baseline = transformExpState(experiment, expState)

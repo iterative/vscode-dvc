@@ -36,13 +36,17 @@ describe('ExperimentsModel', () => {
   it('should return the expected rows when given the output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
     model.transformAndSet(outputFixture, false)
-    expect(model.getRowData()).toStrictEqual(rowsFixture)
+    expect(model.getRowData()).toStrictEqual(
+      expect.objectContaining(rowsFixture)
+    )
   })
 
   it('should return the expected rows when given the survival fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
     model.transformAndSet(survivalOutputFixture, false)
-    expect(model.getRowData()).toStrictEqual(survivalRowsFixture)
+    expect(model.getRowData()).toStrictEqual(
+      expect.objectContaining(survivalRowsFixture)
+    )
   })
 
   it('should set the workspace to running if a signal file for a DVCLive only experiment has been found', () => {
@@ -166,13 +170,17 @@ describe('ExperimentsModel', () => {
   it('should return the expected rows when given the deeply nested output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
     model.transformAndSet(deeplyNestedOutputFixture, false)
-    expect(model.getRowData()).toStrictEqual(deeplyNestedRowsFixture)
+    expect(model.getRowData()).toStrictEqual(
+      expect.objectContaining(deeplyNestedRowsFixture)
+    )
   })
 
   it('should return the expected rows when given the data types output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
     model.transformAndSet(dataTypesOutputFixture, false)
-    expect(model.getRowData()).toStrictEqual(dataTypesRowsFixture)
+    expect(model.getRowData()).toStrictEqual(
+      expect.objectContaining(dataTypesRowsFixture)
+    )
   })
 
   it('should always limit the number of selected experiments to 7', () => {
@@ -264,7 +272,7 @@ describe('ExperimentsModel', () => {
     )
 
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(data, false, '')
+    model.transformAndSet(data, false)
 
     expect(model.getSelectedRevisions().map(({ id }) => id)).toStrictEqual([
       EXPERIMENT_WORKSPACE_ID

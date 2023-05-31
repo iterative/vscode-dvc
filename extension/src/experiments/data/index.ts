@@ -7,7 +7,12 @@ import {
 import { getRelativePattern } from '../../fileSystem/relativePattern'
 import { createFileSystemWatcher } from '../../fileSystem/watcher'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import { EXPERIMENT_WORKSPACE_ID, ExpShowOutput } from '../../cli/dvc/contract'
+import {
+  EXPERIMENT_WORKSPACE_ID,
+  ExpRange,
+  ExpShowOutput,
+  ExpState
+} from '../../cli/dvc/contract'
 import { BaseData } from '../../data'
 import { DOT_DVC, ExperimentFlag } from '../../cli/dvc/constants'
 import { gitPath } from '../../cli/git/constants'
@@ -57,35 +62,11 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
     const { branches, currentBranch } = await this.getBranchesToShowWithCurrent(
       allBranches
     )
-
-    const flags = []
+    const flags: (ExperimentFlag | string)[] = []
     const hashes: Record<string, HashInfo> = {}
 
     for (const branch of branches) {
-      const nbOfCommitsToShow = this.experiments.getNbOfCommitsToShow(branch)
-
-      for (let i = 0; i < nbOfCommitsToShow; i++) {
-        const revision = `${branch}~${i}`
-
-        const commitDataOutput = await this.internalCommands.executeCommand(
-          AvailableCommands.GIT_GET_COMMIT_MESSAGES,
-          this.dvcRoot,
-          revision
-        )
-
-        const { hash, ...commitData } =
-          getCommitDataFromOutput(commitDataOutput)
-        if (hashes[hash]) {
-          hashes[hash].branches.push(branch)
-        } else {
-          hashes[hash] = {
-            branches: [branch],
-            ...commitData
-          }
-        }
-
-        flags.push(ExperimentFlag.REV, revision)
-      }
+      await this.collectRevisionGitDetails(branch, hashes, flags)
     }
 
     const output = await this.internalCommands.executeCommand<ExpShowOutput>(
@@ -99,16 +80,7 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
       if (out.rev === EXPERIMENT_WORKSPACE_ID) {
         data.push({ ...out, branch: currentBranch })
       } else {
-        const revision = hashes[out.rev]
-        const { branches, ...commit } = revision
-        for (const branch of branches) {
-          data.push({
-            ...out,
-            commit,
-            description: formatCommitMessage(commit.message),
-            branch
-          })
-        }
+        this.addDetailsToRevision(out, data, hashes)
       }
     }
 
@@ -119,6 +91,58 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
 
   protected collectFiles(data: ExpShowOutput) {
     this.collectedFiles = collectFiles(data, this.collectedFiles)
+  }
+
+  private async collectRevisionGitDetails(
+    branch: string,
+    hashes: Record<string, HashInfo>,
+    flags: (ExperimentFlag | string)[]
+  ) {
+    const nbOfCommitsToShow = this.experiments.getNbOfCommitsToShow(branch)
+
+    for (let i = 0; i < nbOfCommitsToShow; i++) {
+      const revision = `${branch}~${i}`
+
+      const commitDataOutput = await this.internalCommands.executeCommand(
+        AvailableCommands.GIT_GET_COMMIT_MESSAGES,
+        this.dvcRoot,
+        revision
+      )
+
+      const { hash, ...commitData } = getCommitDataFromOutput(commitDataOutput)
+
+      if (hashes[hash]) {
+        hashes[hash].branches.push(branch)
+      } else {
+        hashes[hash] = {
+          branches: [branch],
+          ...commitData
+        }
+      }
+
+      flags.push(ExperimentFlag.REV, revision)
+    }
+  }
+
+  private addDetailsToRevision(
+    out: ExpState & {
+      experiments?: ExpRange[] | null | undefined
+    },
+    data: ExpShowOutput,
+    hashes: Record<string, HashInfo>
+  ) {
+    const revision = hashes[out.rev]
+    if (revision) {
+      const { branches, ...commit } = revision
+      for (const branch of branches) {
+        data.push({
+          ...out,
+          branch,
+          commit,
+          description: formatCommitMessage(commit.message)
+        })
+      }
+    }
   }
 
   private async getBranchesToShowWithCurrent(allBranches: string[]) {

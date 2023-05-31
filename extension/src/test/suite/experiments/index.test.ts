@@ -1470,6 +1470,8 @@ suite('Experiments Test Suite', () => {
         rows: [
           {
             branch: 'main',
+            commit: undefined,
+            description: undefined,
             displayColor: undefined,
             id: EXPERIMENT_WORKSPACE_ID,
             label: EXPERIMENT_WORKSPACE_ID,
@@ -1478,6 +1480,8 @@ suite('Experiments Test Suite', () => {
           },
           {
             branch: 'main',
+            commit: undefined,
+            description: undefined,
             displayColor: undefined,
             id: 'testBranch',
             label: 'testBranch',
@@ -1487,6 +1491,7 @@ suite('Experiments Test Suite', () => {
               {
                 branch: 'main',
                 displayColor: undefined,
+                commit: undefined,
                 description: '[exp-1]',
                 id: 'exp-1',
                 label: '111111',
@@ -1497,6 +1502,7 @@ suite('Experiments Test Suite', () => {
               {
                 branch: 'main',
                 displayColor: undefined,
+                commit: undefined,
                 description: '[exp-2]',
                 id: 'exp-2',
                 label: '222222',
@@ -1507,6 +1513,7 @@ suite('Experiments Test Suite', () => {
               {
                 branch: 'main',
                 displayColor: undefined,
+                commit: undefined,
                 description: '[exp-3]',
                 id: 'exp-3',
                 label: '333333',

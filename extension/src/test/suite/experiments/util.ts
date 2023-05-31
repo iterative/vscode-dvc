@@ -165,6 +165,7 @@ export const buildExperimentsData = (
 
   stub(gitReader, 'getCurrentBranch').resolves(currentBranch)
   stub(gitReader, 'getBranches').resolves(['one'])
+  stub(gitReader, 'getCommitMessages').resolves('')
 
   const mockGetBranchesToShow = stub().returns(['main'])
   const mockPruneBranchesToShow = stub()
