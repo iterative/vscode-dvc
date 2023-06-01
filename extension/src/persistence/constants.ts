@@ -19,3 +19,7 @@ export enum PersistenceKey {
   PLOT_SELECTED_METRICS = 'plotSelectedMetrics:',
   PLOT_TEMPLATE_ORDER = 'plotTemplateOrder:'
 }
+
+export enum GlobalPersistenceKey {
+  INSTALLED = 'dvc.installed'
+}

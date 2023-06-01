@@ -1,5 +1,5 @@
 import { commands } from 'vscode'
-import { PersistenceKey } from './constants'
+import { GlobalPersistenceKey, PersistenceKey } from './constants'
 import { resetPersistedState } from './util'
 import { buildMockMemento } from '../test/util'
 import {
@@ -20,8 +20,9 @@ describe('Persistence util', () => {
   describe('resetPersistedState', () => {
     it('should reload the window', async () => {
       const workspaceState = buildMockMemento()
+      const globalState = buildMockMemento()
 
-      await resetPersistedState(workspaceState)
+      await resetPersistedState(workspaceState, globalState)
 
       expect(mockedCommands.executeCommand).toHaveBeenCalledWith(
         'workbench.action.reloadWindow'
@@ -29,14 +30,18 @@ describe('Persistence util', () => {
     })
 
     it('should reset all values from all dvc roots', async () => {
-      const persistedState = {
+      const persistedWorkspaceState = {
         [PersistenceKey.PLOT_HEIGHT + 'root1']: DEFAULT_HEIGHT,
         [PersistenceKey.PLOT_NB_ITEMS_PER_ROW_OR_WIDTH + 'root2']:
           DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH
       }
-      const workspaceState = buildMockMemento(persistedState)
+      const persistedGlobalState = {
+        [GlobalPersistenceKey.INSTALLED]: true
+      }
+      const workspaceState = buildMockMemento(persistedWorkspaceState)
+      const globalState = buildMockMemento(persistedGlobalState)
 
-      await resetPersistedState(workspaceState)
+      await resetPersistedState(workspaceState, globalState)
 
       expect(
         workspaceState.get(PersistenceKey.PLOT_HEIGHT + 'root1')
@@ -46,6 +51,7 @@ describe('Persistence util', () => {
           PersistenceKey.PLOT_NB_ITEMS_PER_ROW_OR_WIDTH + 'root2'
         )
       ).toBeUndefined()
+      expect(globalState.get(GlobalPersistenceKey.INSTALLED)).toBeUndefined()
     })
   })
 })
