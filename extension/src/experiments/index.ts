@@ -34,7 +34,7 @@ import { DecorationProvider } from './model/decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
 import { ResourceLocator } from '../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { ExpShowOutput } from '../cli/dvc/contract'
+import { ExperimentsOutput } from '../data'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Title } from '../vscode/title'
@@ -174,12 +174,7 @@ export class Experiments extends BaseRepository<TableData> {
     expShow,
     gitLog,
     order
-  }: {
-    currentBranch: string
-    expShow: ExpShowOutput
-    order: { branch: string; sha: string }[]
-    gitLog: string
-  }) {
+  }: ExperimentsOutput) {
     const data = combineOutputs(currentBranch, expShow, gitLog, order)
 
     const hadCheckpoints = this.hasCheckpoints()

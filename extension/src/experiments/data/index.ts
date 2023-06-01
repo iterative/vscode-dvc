@@ -8,18 +8,13 @@ import { getRelativePattern } from '../../fileSystem/relativePattern'
 import { createFileSystemWatcher } from '../../fileSystem/watcher'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { ExpShowOutput } from '../../cli/dvc/contract'
-import { BaseData } from '../../data'
+import { BaseData, ExperimentsOutput } from '../../data'
 import { Args, DOT_DVC, ExperimentFlag } from '../../cli/dvc/constants'
 import { COMMITS_SEPARATOR, gitPath } from '../../cli/git/constants'
 import { getGitPath } from '../../fileSystem'
 import { ExperimentsModel } from '../model'
 
-export class ExperimentsData extends BaseData<{
-  currentBranch: string
-  expShow: ExpShowOutput
-  order: { branch: string; sha: string }[]
-  gitLog: string
-}> {
+export class ExperimentsData extends BaseData<ExperimentsOutput> {
   private readonly experiments: ExperimentsModel
 
   constructor(
