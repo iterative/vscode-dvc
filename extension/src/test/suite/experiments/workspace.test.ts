@@ -637,14 +637,18 @@ suite('Workspace Experiments Test Suite', () => {
           {
             description:
               '$(git-commit)Improve "Get Started" walkthrough (#4020) ...',
-            detail: 'Created:21 Nov 2020, loss:2.0488560, accuracy:0.34848332',
+            detail: `Created:${formatDate(
+              '2020-11-21T19:58:22'
+            )}, loss:2.0488560, accuracy:0.34848332`,
             label: 'fe2919b',
             value: 'fe2919b'
           },
           {
             description:
               '$(git-commit)Add capabilities to text mentioning storage provider extensions (#4015)',
-            detail: 'Created:21 Nov 2020, loss:2.0488560, accuracy:0.34848332',
+            detail: `Created:${formatDate(
+              '2020-11-21T19:58:22'
+            )}, loss:2.0488560, accuracy:0.34848332`,
             label: '7df876c',
             value: '7df876c'
           }

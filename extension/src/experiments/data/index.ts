@@ -114,12 +114,12 @@ export class ExperimentsData extends BaseData<{
 
     this.experiments.pruneBranchesToShow(allBranches)
 
-    const branches = this.experiments.getBranchesToShow()
-
-    if (!branches.includes(currentBranch)) {
-      branches.push(currentBranch)
-      this.experiments.setBranchesToShow(branches)
-    }
+    const branches = [
+      currentBranch,
+      ...this.experiments
+        .getBranchesToShow()
+        .filter(branch => branch !== currentBranch)
+    ]
 
     return { branches, currentBranch }
   }
