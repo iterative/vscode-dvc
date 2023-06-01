@@ -51,17 +51,17 @@ export class GitReader extends GitCli {
 
   public async getCommitMessages(
     cwd: string,
-    rev: string,
-    revisions?: number
+    revision: string,
+    revisions: string
   ): Promise<string> {
     const options = getOptions(
       cwd,
       Command.LOG,
-      rev,
+      revision,
       Flag.PRETTY_FORMAT_COMMIT_MESSAGE,
       Flag.SEPARATE_WITH_NULL,
       Flag.NUMBER,
-      String(revisions || 1)
+      revisions
     )
     try {
       return await this.executeProcess(options)

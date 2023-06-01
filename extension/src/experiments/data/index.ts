@@ -14,7 +14,7 @@ import {
   ExpState
 } from '../../cli/dvc/contract'
 import { BaseData } from '../../data'
-import { DOT_DVC, ExperimentFlag } from '../../cli/dvc/constants'
+import { Args, DOT_DVC, ExperimentFlag } from '../../cli/dvc/constants'
 import { gitPath } from '../../cli/git/constants'
 import { getGitPath } from '../../fileSystem'
 import { ExperimentsModel } from '../model'
@@ -62,17 +62,17 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
     const { branches, currentBranch } = await this.getBranchesToShowWithCurrent(
       allBranches
     )
-    const flags: (ExperimentFlag | string)[] = []
+    const args: Args = []
     const hashes: Record<string, HashInfo> = {}
 
     for (const branch of branches) {
-      await this.collectRevisionGitDetails(branch, hashes, flags)
+      await this.collectRevisionGitDetails(branch, hashes, args)
     }
 
     const output = await this.internalCommands.executeCommand<ExpShowOutput>(
       AvailableCommands.EXP_SHOW,
       this.dvcRoot,
-      ...flags
+      ...args
     )
 
     const data: ExpShowOutput = []
@@ -96,7 +96,7 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
   private async collectRevisionGitDetails(
     branch: string,
     hashes: Record<string, HashInfo>,
-    flags: (ExperimentFlag | string)[]
+    args: Args
   ) {
     const nbOfCommitsToShow = this.experiments.getNbOfCommitsToShow(branch)
 
@@ -123,7 +123,7 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
     for (let i = 0; i < nbOfCommitsToShow; i++) {
       const revision = `${branch}~${i}`
 
-      flags.push(ExperimentFlag.REV, revision)
+      args.push(ExperimentFlag.REV, revision)
     }
   }
 
