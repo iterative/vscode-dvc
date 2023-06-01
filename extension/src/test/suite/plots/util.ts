@@ -2,6 +2,8 @@ import { Disposer } from '@hediet/std/disposable'
 import { stub } from 'sinon'
 import * as FileSystem from '../../../fileSystem'
 import expShowFixtureWithoutErrors from '../../fixtures/expShow/base/noErrors'
+import gitLogFixture from '../../fixtures/expShow/base/gitLog'
+import orderFixture from '../../fixtures/expShow/base/order'
 import { customPlotsOrderFixture } from '../../fixtures/expShow/base/customPlots'
 import { Plots } from '../../../plots'
 import { buildMockMemento, dvcDemoPath } from '../../util'
@@ -24,7 +26,10 @@ import { PersistenceKey } from '../../../persistence/constants'
 export const buildPlots = async (
   disposer: Disposer,
   plotsDiff: PlotsOutput | undefined = undefined,
-  expShow = expShowFixtureWithoutErrors
+  expShow = expShowFixtureWithoutErrors,
+  currentBranch = 'main',
+  gitLog = gitLogFixture,
+  order = orderFixture
 ) => {
   const { internalCommands, mockPlotsDiff, messageSpy, resourceLocator } =
     buildDependencies(disposer, expShow, plotsDiff)
@@ -71,7 +76,7 @@ export const buildPlots = async (
     { id: 'exp-f13bca' }
   ] as Experiment[])
 
-  void experiments.setState(expShow)
+  void experiments.setState({ currentBranch, expShow, gitLog, order })
 
   await plots.isReady()
 

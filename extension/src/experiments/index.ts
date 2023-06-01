@@ -10,6 +10,7 @@ import omit from 'lodash.omit'
 import { addStarredToColumns } from './columns/like'
 import { setContextForEditorTitleIcons } from './context'
 import { ExperimentsModel } from './model'
+import { combineOutputs } from './util'
 import {
   pickExperiment,
   pickExperiments,
@@ -168,7 +169,19 @@ export class Experiments extends BaseRepository<TableData> {
     return this.data.managedUpdate()
   }
 
-  public async setState(data: ExpShowOutput) {
+  public async setState({
+    currentBranch,
+    expShow,
+    gitLog,
+    order
+  }: {
+    currentBranch: string
+    expShow: ExpShowOutput
+    order: { branch: string; sha: string }[]
+    gitLog: string
+  }) {
+    const data = combineOutputs(currentBranch, expShow, gitLog, order)
+
     const hadCheckpoints = this.hasCheckpoints()
     const dvcLiveOnly = await this.checkSignalFile()
     await Promise.all([

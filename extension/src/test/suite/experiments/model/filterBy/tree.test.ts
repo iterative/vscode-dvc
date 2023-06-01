@@ -84,7 +84,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       await addFilterViaQuickInput(experiments, accuracyFilter)
 
-      const [workspace, main] = rowsFixture
+      const [workspace, main, fe2919b, _7df876c] = rowsFixture
 
       const gte45 = (value: FileDataOrError | ValueTree | Value): boolean =>
         !!(value && typeof value === 'number' && value >= 0.45)
@@ -97,7 +97,9 @@ suite('Experiments Filter By Tree Test Suite', () => {
             const accuracy = experiment.metrics?.['summary.json']?.accuracy
             return !!(accuracy === undefined || gte45(accuracy))
           })
-        }
+        },
+        fe2919b,
+        _7df876c
       ]
 
       const filteredTableData: Partial<TableData> = {
@@ -129,7 +131,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         columns: columnsFixture,
         filteredCount: 0,
         filters: [],
-        rows: [workspace, main]
+        rows: [workspace, main, fe2919b, _7df876c]
       }
 
       expect(messageSpy).to.be.calledWithMatch(unfilteredTableData)
@@ -349,14 +351,16 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       await addFilterViaQuickInput(experiments, starredFilter)
 
-      const [workspace, main] = rowsFixture
+      const [workspace, main, fe2919b, _7df876c] = rowsFixture
 
       const filteredRows = [
         workspace,
         {
           ...main,
           subRows: []
-        }
+        },
+        fe2919b,
+        _7df876c
       ]
 
       const filteredTableData: Partial<TableData> = {

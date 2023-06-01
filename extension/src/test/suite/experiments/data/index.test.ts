@@ -28,6 +28,7 @@ import { gitPath } from '../../../../cli/git/constants'
 import * as FileSystem from '../../../../fileSystem'
 import { ExperimentsModel } from '../../../../experiments/model'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
+import expShowFixture from '../../../fixtures/expShow/base/output'
 
 const MOCK_WORKSPACE_GIT_FOLDER = join(dvcDemoPath, '.mock-git')
 
@@ -91,6 +92,9 @@ suite('Experiments Data Test Suite', () => {
               if (command === AvailableCommands.GIT_GET_REPOSITORY_ROOT) {
                 return Promise.resolve(gitRoot)
               }
+              if (command === AvailableCommands.GIT_GET_COMMIT_MESSAGES) {
+                return Promise.resolve('')
+              }
               if (command === AvailableCommands.EXP_SHOW) {
                 return Promise.resolve([{ rev: EXPERIMENT_WORKSPACE_ID }])
               }
@@ -150,6 +154,9 @@ suite('Experiments Data Test Suite', () => {
             executeCommand: (command: CommandId) => {
               if (command === AvailableCommands.GIT_GET_REPOSITORY_ROOT) {
                 return Promise.resolve(gitRoot)
+              }
+              if (command === AvailableCommands.GIT_GET_COMMIT_MESSAGES) {
+                return Promise.resolve('')
               }
               if (command === AvailableCommands.EXP_SHOW) {
                 return Promise.resolve([{ rev: EXPERIMENT_WORKSPACE_ID }])
@@ -218,11 +225,11 @@ suite('Experiments Data Test Suite', () => {
       expect(mockExpShow).to.have.been.calledWithMatch(
         dvcDemoPath,
         ExperimentFlag.REV,
-        'branch-283498~0',
+        expShowFixture[1].rev,
         ExperimentFlag.REV,
-        'branch-283498~1',
+        expShowFixture[2].rev,
         ExperimentFlag.REV,
-        'branch-283498~2'
+        expShowFixture[3].rev
       )
     })
   })

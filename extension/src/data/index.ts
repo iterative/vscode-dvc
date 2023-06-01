@@ -10,7 +10,14 @@ import { DeferredDisposable } from '../class/deferred'
 import { isSameOrChild } from '../fileSystem'
 
 export abstract class BaseData<
-  T extends { data: PlotsOutputOrError; revs: string[] } | ExpShowOutput
+  T extends
+    | { data: PlotsOutputOrError; revs: string[] }
+    | {
+        currentBranch: string
+        expShow: ExpShowOutput
+        order: { branch: string; sha: string }[]
+        gitLog: string
+      }
 > extends DeferredDisposable {
   public readonly onDidUpdate: Event<T>
   public readonly onDidChangeDvcYaml: Event<void>

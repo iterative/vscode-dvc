@@ -7,6 +7,8 @@ import isEqual from 'lodash.isequal'
 import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import expShowFixtureWithoutErrors from '../../fixtures/expShow/base/noErrors'
+import gitLogFixture from '../../fixtures/expShow/base/gitLog'
+import orderFixture from '../../fixtures/expShow/base/order'
 import customPlotsFixture from '../../fixtures/expShow/base/customPlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
 import multiSourcePlotsDiffFixture from '../../fixtures/plotsDiff/multiSource'
@@ -44,6 +46,7 @@ import { RegisteredCommands } from '../../../commands/external'
 import { REVISIONS } from '../../fixtures/plotsDiff'
 import * as FileSystem from '../../../fileSystem'
 import { experimentHasError } from '../../../cli/dvc/contract'
+import { COMMITS_SEPARATOR } from '../../../cli/git/constants'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -100,6 +103,8 @@ suite('Plots Test Suite', () => {
         experiments: null
       }))
 
+      const newCommit = '9235a02880a0372545e5f7f4d79a5d9eee6331ac'
+
       const { data, experiments, mockPlotsDiff } = await buildPlots(
         disposable,
         plotsDiffFixture,
@@ -118,9 +123,9 @@ suite('Plots Test Suite', () => {
             ...exp,
             data: {
               ...exp.data,
-              rev: '9235a02880a0372545e5f7f4d79a5d9eee6331ac'
+              rev: newCommit
             },
-            rev: '9235a02880a0372545e5f7f4d79a5d9eee6331ac'
+            rev: newCommit
           }
         }
 
@@ -132,7 +137,12 @@ suite('Plots Test Suite', () => {
       )
 
       bypassProcessManagerDebounce(mockNow)
-      void experiments.setState(updatedExpShowFixture)
+      void experiments.setState({
+        currentBranch: 'main',
+        expShow: updatedExpShowFixture,
+        gitLog: newCommit + COMMITS_SEPARATOR + gitLogFixture,
+        order: [{ branch: 'main', sha: newCommit }, ...orderFixture]
+      })
 
       await dataUpdateEvent
 
@@ -615,13 +625,15 @@ suite('Plots Test Suite', () => {
         comparison: comparisonData,
         custom: customData,
         sectionCollapsed,
-        template: templateData
+        template: templateData,
+        selectedRevisions: selectedRevisionsData
       } = getFirstArgOfLastCall(messageSpy)
 
       expect(comparisonData).to.deep.equal(comparisonPlotsFixture)
       expect(customData).to.deep.equal(customPlotsFixture)
       expect(sectionCollapsed).to.deep.equal(DEFAULT_SECTION_COLLAPSED)
       expect(templateData).to.deep.equal(templatePlotsFixture)
+      expect(selectedRevisionsData).to.deep.equal(plotsRevisionsFixture)
 
       const expectedPlotsData: TPlotsData = {
         cliError: null,

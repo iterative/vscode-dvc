@@ -3,6 +3,8 @@ import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
 import expShowFixture from '../../fixtures/expShow/base/output'
+import gitLogFixture from '../../fixtures/expShow/base/gitLog'
+import orderFixture from '../../fixtures/expShow/base/order'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import {
   buildDependencies,
@@ -19,8 +21,11 @@ import { PersistenceKey } from '../../../persistence/constants'
 
 export const buildExperiments = (
   disposer: Disposer,
-  experimentShowData = expShowFixture,
-  dvcRoot = dvcDemoPath
+  expShow = expShowFixture,
+  dvcRoot = dvcDemoPath,
+  currentBranch = 'main',
+  gitLog = gitLogFixture,
+  order = orderFixture
 ) => {
   const {
     dvcExecutor,
@@ -34,7 +39,7 @@ export const buildExperiments = (
     mockExpShow,
     mockGetCommitMessages,
     resourceLocator
-  } = buildDependencies(disposer, experimentShowData)
+  } = buildDependencies(disposer, expShow)
 
   const mockUpdateExperimentsData = stub()
   const mockExperimentsData = buildMockExperimentsData(
@@ -61,7 +66,7 @@ export const buildExperiments = (
     )
   )
 
-  void experiments.setState(experimentShowData)
+  void experiments.setState({ currentBranch, expShow, gitLog, order })
 
   return {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any,
@@ -107,7 +112,12 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
     resourceLocator
   )
 
-  void experiments.setState(expShowFixture)
+  void experiments.setState({
+    currentBranch: 'main',
+    expShow: expShowFixture,
+    gitLog: gitLogFixture,
+    order: orderFixture
+  })
   return { experiments, internalCommands, messageSpy, workspaceExperiments }
 }
 
@@ -124,7 +134,12 @@ export const buildSingleRepoExperiments = (disposer: SafeWatcherDisposer) => {
     resourceLocator
   )
 
-  void experiments.setState(expShowFixture)
+  void experiments.setState({
+    currentBranch: 'main',
+    expShow: expShowFixture,
+    gitLog: gitLogFixture,
+    order: orderFixture
+  })
 
   return {
     config,
@@ -154,7 +169,8 @@ const buildExperimentsDataDependencies = (disposer: Disposer) => {
 
 export const buildExperimentsData = (
   disposer: SafeWatcherDisposer,
-  currentBranch = 'main'
+  currentBranch = 'main',
+  commitOutput = gitLogFixture
 ) => {
   const {
     internalCommands,
@@ -163,9 +179,9 @@ export const buildExperimentsData = (
     gitReader
   } = buildExperimentsDataDependencies(disposer)
 
-  stub(gitReader, 'getCurrentBranch').resolves(currentBranch)
   stub(gitReader, 'getBranches').resolves(['one'])
-  stub(gitReader, 'getCommitMessages').resolves('')
+  stub(gitReader, 'getCurrentBranch').resolves(currentBranch)
+  stub(gitReader, 'getCommitMessages').resolves(commitOutput)
 
   const mockGetBranchesToShow = stub().returns(['main'])
   const mockPruneBranchesToShow = stub()

@@ -8,7 +8,6 @@ import { ExperimentType } from '.'
 import { extractColumns } from '../columns/extract'
 import {
   Experiment,
-  CommitData,
   RunningExperiment,
   isQueued,
   isRunning
@@ -28,7 +27,6 @@ import { addToMapArray } from '../../util/map'
 import { RegisteredCommands } from '../../commands/external'
 import { Resource } from '../../resourceLocator'
 import { shortenForLabel } from '../../util/string'
-import { COMMITS_SEPARATOR } from '../../cli/git/constants'
 
 export type ExperimentItem = {
   command?: {
@@ -79,52 +77,6 @@ const transformColumns = (
   if (error) {
     experiment.error = error
   }
-}
-
-const collectCommitData = (
-  acc: (CommitData & { hash: string })[],
-  commit: string
-) => {
-  const [hash, author, date, refNamesWithKey] = commit
-    .split('\n')
-    .filter(Boolean)
-
-  if (!hash) {
-    return
-  }
-
-  const commitData: CommitData & { hash: string } = {
-    author: author || '',
-    date: date || '',
-    hash,
-    message: (commit.match(/\nmessage:(.+)/s) || [])[1] || '',
-    tags: []
-  }
-
-  if (refNamesWithKey) {
-    const refNames = refNamesWithKey.slice('refNames:'.length)
-    commitData.tags = refNames
-      .split(', ')
-      .filter(item => item.startsWith('tag: '))
-      .map(item => item.slice('tag: '.length))
-  }
-  acc.push(commitData)
-}
-
-export const collectCommitsData = (
-  output: string
-): (CommitData & { hash: string })[] => {
-  const acc: (CommitData & { hash: string })[] = []
-
-  for (const commit of output.split(COMMITS_SEPARATOR)) {
-    collectCommitData(acc, commit)
-  }
-  return acc
-}
-
-export const formatCommitMessage = (commit: string) => {
-  const lines = commit.split('\n').filter(Boolean)
-  return `${lines[0]}${lines.length > 1 ? ' ...' : ''}`
 }
 
 const transformExpState = (

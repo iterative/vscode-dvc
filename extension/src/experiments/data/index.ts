@@ -7,25 +7,19 @@ import {
 import { getRelativePattern } from '../../fileSystem/relativePattern'
 import { createFileSystemWatcher } from '../../fileSystem/watcher'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import {
-  EXPERIMENT_WORKSPACE_ID,
-  ExpRange,
-  ExpShowOutput,
-  ExpState
-} from '../../cli/dvc/contract'
+import { ExpShowOutput } from '../../cli/dvc/contract'
 import { BaseData } from '../../data'
 import { Args, DOT_DVC, ExperimentFlag } from '../../cli/dvc/constants'
-import { gitPath } from '../../cli/git/constants'
+import { COMMITS_SEPARATOR, gitPath } from '../../cli/git/constants'
 import { getGitPath } from '../../fileSystem'
 import { ExperimentsModel } from '../model'
-import { formatCommitMessage, collectCommitsData } from '../model/collect'
-import { CommitData } from '../webview/contract'
 
-interface HashInfo extends CommitData {
-  branches: string[]
-}
-
-export class ExperimentsData extends BaseData<ExpShowOutput> {
+export class ExperimentsData extends BaseData<{
+  currentBranch: string
+  expShow: ExpShowOutput
+  order: { branch: string; sha: string }[]
+  gitLog: string
+}> {
   private readonly experiments: ExperimentsModel
 
   constructor(
@@ -62,90 +56,54 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
     const { branches, currentBranch } = await this.getBranchesToShowWithCurrent(
       allBranches
     )
+    let gitLog = ''
+    const order: { branch: string; sha: string }[] = []
     const args: Args = []
-    const hashes: Record<string, HashInfo> = {}
 
     for (const branch of branches) {
-      await this.collectRevisionGitDetails(branch, hashes, args)
+      gitLog = await this.collectGitLogAndOrder(gitLog, branch, order, args)
     }
 
-    const output = await this.internalCommands.executeCommand<ExpShowOutput>(
+    const expShow = await this.internalCommands.executeCommand<ExpShowOutput>(
       AvailableCommands.EXP_SHOW,
       this.dvcRoot,
       ...args
     )
 
-    const data: ExpShowOutput = []
-    for (const out of output) {
-      if (out.rev === EXPERIMENT_WORKSPACE_ID) {
-        data.push({ ...out, branch: currentBranch })
-      } else {
-        this.addDetailsToRevision(out, data, hashes)
-      }
-    }
+    this.collectFiles({ expShow })
 
-    this.collectFiles(data)
-
-    return this.notifyChanged(data)
+    return this.notifyChanged({ currentBranch, expShow, gitLog, order })
   }
 
-  protected collectFiles(data: ExpShowOutput) {
-    this.collectedFiles = collectFiles(data, this.collectedFiles)
+  protected collectFiles({ expShow }: { expShow: ExpShowOutput }) {
+    this.collectedFiles = collectFiles(expShow, this.collectedFiles)
   }
 
-  private async collectRevisionGitDetails(
+  private async collectGitLogAndOrder(
+    gitLog: string,
     branch: string,
-    hashes: Record<string, HashInfo>,
+    order: { branch: string; sha: string }[],
     args: Args
   ) {
     const nbOfCommitsToShow = this.experiments.getNbOfCommitsToShow(branch)
 
-    const commitDataOutput = await this.internalCommands.executeCommand(
+    const branchGitLog = await this.internalCommands.executeCommand(
       AvailableCommands.GIT_GET_COMMIT_MESSAGES,
       this.dvcRoot,
       branch,
       String(nbOfCommitsToShow)
     )
+    gitLog = [gitLog, branchGitLog].join(COMMITS_SEPARATOR)
 
-    const commits = collectCommitsData(commitDataOutput)
-
-    for (const { hash, ...commitData } of commits) {
-      if (hashes[hash]) {
-        hashes[hash].branches.push(branch)
-      } else {
-        hashes[hash] = {
-          branches: [branch],
-          ...commitData
-        }
+    for (const commit of branchGitLog.split(COMMITS_SEPARATOR)) {
+      const [sha] = commit.split('\n')
+      order.push({ branch, sha })
+      if (args.includes(sha)) {
+        continue
       }
+      args.push(ExperimentFlag.REV, sha)
     }
-
-    for (let i = 0; i < nbOfCommitsToShow; i++) {
-      const revision = `${branch}~${i}`
-
-      args.push(ExperimentFlag.REV, revision)
-    }
-  }
-
-  private addDetailsToRevision(
-    out: ExpState & {
-      experiments?: ExpRange[] | null | undefined
-    },
-    data: ExpShowOutput,
-    hashes: Record<string, HashInfo>
-  ) {
-    const revision = hashes[out.rev]
-    if (revision) {
-      const { branches, ...commit } = revision
-      for (const branch of branches) {
-        data.push({
-          ...out,
-          branch,
-          commit,
-          description: formatCommitMessage(commit.message)
-        })
-      }
-    }
+    return gitLog
   }
 
   private async getBranchesToShowWithCurrent(allBranches: string[]) {

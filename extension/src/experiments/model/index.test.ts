@@ -3,7 +3,6 @@ import { join } from 'path'
 import { commands } from 'vscode'
 import { ExperimentsModel } from '.'
 import outputFixture from '../../test/fixtures/expShow/base/output'
-import rowsFixture from '../../test/fixtures/expShow/base/rows'
 import deeplyNestedRowsFixture from '../../test/fixtures/expShow/deeplyNested/rows'
 import deeplyNestedOutputFixture from '../../test/fixtures/expShow/deeplyNested/output'
 import uncommittedDepsFixture from '../../test/fixtures/expShow/uncommittedDeps/output'
@@ -33,14 +32,6 @@ beforeEach(() => {
 })
 
 describe('ExperimentsModel', () => {
-  it('should return the expected rows when given the output fixture', () => {
-    const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, false)
-    expect(model.getRowData()).toStrictEqual(
-      expect.objectContaining(rowsFixture)
-    )
-  })
-
   it('should return the expected rows when given the survival fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
     model.transformAndSet(survivalOutputFixture, false)

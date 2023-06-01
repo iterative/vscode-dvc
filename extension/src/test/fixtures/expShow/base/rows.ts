@@ -76,8 +76,14 @@ const rowsFixture: Commit[] = [
   },
   {
     branch: 'main',
-    commit: undefined,
-    description: undefined,
+    commit: {
+      author: 'github-actions[bot]',
+      date: '6 hours ago',
+      message:
+        'Update version and CHANGELOG for release (#4022)\n\nCo-authored-by: Olivaw[bot] <olivaw@iterative.ai>',
+      tags: ['0.9.3']
+    },
+    description: 'Update version and CHANGELOG for release (#4022) ...',
     deps: {
       [join('data', 'data.xml')]: valueWithNoChanges(
         '22a1a2931c8370d3aeedd7183606fd7f'
@@ -470,6 +476,135 @@ const rowsFixture: Commit[] = [
         Created: '2020-12-29T15:25:27'
       }
     ],
+    Created: '2020-11-21T19:58:22'
+  },
+  {
+    branch: 'main',
+    commit: {
+      author: 'Julie G',
+      date: '6 hours ago',
+      message:
+        'Improve "Get Started" walkthrough (#4020)\n\n* don\'t show walkthrough in sidebar welcome section\n* move admonition in command palette walkthrough step',
+      tags: []
+    },
+    description: 'Improve "Get Started" walkthrough (#4020) ...',
+    deps: {
+      [join('data', 'data.xml')]: valueWithNoChanges(
+        '22a1a2931c8370d3aeedd7183606fd7f'
+      ),
+      [join('data', 'features')]: valueWithNoChanges(
+        'f35d4cc2c552ac959ae602162b8543f3.dir'
+      ),
+      [join('data', 'prepared')]: valueWithNoChanges(
+        '153aad06d376b6595932470e459ef42a.dir'
+      ),
+      'model.pkl': valueWithNoChanges('46865edbf3d62fc5c039dd9d2b0567a4'),
+      [join('src', 'evaluate.py')]: valueWithNoChanges(
+        '44e714021a65edf881b1716e791d7f59'
+      ),
+      [join('src', 'featurization.py')]: valueWithNoChanges(
+        'e0265fc22f056a4b86d85c3056bc2894'
+      ),
+      [join('src', 'prepare.py')]: valueWithNoChanges(
+        'f09ea0c15980b43010257ccb9f0055e2'
+      ),
+      [join('src', 'train.py')]: valueWithNoChanges(
+        'c3961d777cfbd7727f9fde4851896006'
+      )
+    },
+    displayColor: undefined,
+    id: 'fe2919b',
+    label: 'fe2919b',
+    metrics: {
+      'summary.json': {
+        loss: 2.048856019973755,
+        accuracy: 0.3484833240509033,
+        val_loss: 1.9979369640350342,
+        val_accuracy: 0.4277999997138977
+      }
+    },
+    params: {
+      'params.yaml': {
+        code_names: [0, 1],
+        epochs: 5,
+        learning_rate: 2.1e-7,
+        dvc_logs_dir: 'dvc_logs',
+        log_file: 'logs.csv',
+        dropout: 0.122,
+        process: { threshold: 0.86, test_arg: 'string' }
+      },
+      [join('nested', 'params.yaml')]: {
+        test: true
+      }
+    },
+    selected: false,
+    sha: 'fe2919bb4394b30494bea905c253e10077b9a1bd',
+    starred: false,
+    Created: '2020-11-21T19:58:22'
+  },
+  {
+    branch: 'main',
+    commit: {
+      author: 'Matt Seddon',
+      date: '8 hours ago',
+      message:
+        'Add capabilities to text mentioning storage provider extensions (#4015)\n',
+      tags: []
+    },
+    description:
+      'Add capabilities to text mentioning storage provider extensions (#4015)',
+    deps: {
+      [join('data', 'data.xml')]: valueWithNoChanges(
+        '22a1a2931c8370d3aeedd7183606fd7f'
+      ),
+      [join('data', 'features')]: valueWithNoChanges(
+        'f35d4cc2c552ac959ae602162b8543f3.dir'
+      ),
+      [join('data', 'prepared')]: valueWithNoChanges(
+        '153aad06d376b6595932470e459ef42a.dir'
+      ),
+      'model.pkl': valueWithNoChanges('46865edbf3d62fc5c039dd9d2b0567a4'),
+      [join('src', 'evaluate.py')]: valueWithNoChanges(
+        '44e714021a65edf881b1716e791d7f59'
+      ),
+      [join('src', 'featurization.py')]: valueWithNoChanges(
+        'e0265fc22f056a4b86d85c3056bc2894'
+      ),
+      [join('src', 'prepare.py')]: valueWithNoChanges(
+        'f09ea0c15980b43010257ccb9f0055e2'
+      ),
+      [join('src', 'train.py')]: valueWithNoChanges(
+        'c3961d777cfbd7727f9fde4851896006'
+      )
+    },
+    displayColor: undefined,
+    id: '7df876c',
+    label: '7df876c',
+    metrics: {
+      'summary.json': {
+        loss: 2.048856019973755,
+        accuracy: 0.3484833240509033,
+        val_loss: 1.9979369640350342,
+        val_accuracy: 0.4277999997138977
+      }
+    },
+    params: {
+      'params.yaml': {
+        code_names: [0, 1],
+        epochs: 5,
+        learning_rate: 2.1e-7,
+        dvc_logs_dir: 'dvc_logs',
+        log_file: 'logs.csv',
+        dropout: 0.122,
+        process: { threshold: 0.86, test_arg: 'string' }
+      },
+      [join('nested', 'params.yaml')]: {
+        test: true
+      }
+    },
+    selected: false,
+    sha: '7df876cb5147800cd3e489d563bc6dcd67188621',
+    starred: false,
     Created: '2020-11-21T19:58:22'
   }
 ]

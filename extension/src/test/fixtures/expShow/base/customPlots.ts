@@ -32,6 +32,30 @@ export const experimentsWithCommits: Experiment[] = [
   },
   {
     branch: 'main',
+    id: 'fe2919b',
+    label: 'label',
+    metrics: {
+      'summary.json': {
+        loss: 2.048856019973755,
+        accuracy: 0.3484833240509033
+      }
+    },
+    params: { 'params.yaml': { dropout: 0.122, epochs: 5 } }
+  },
+  {
+    branch: 'main',
+    id: '7df876c',
+    label: 'label',
+    metrics: {
+      'summary.json': {
+        loss: 2.048856019973755,
+        accuracy: 0.3484833240509033
+      }
+    },
+    params: { 'params.yaml': { dropout: 0.122, epochs: 5 } }
+  },
+  {
+    branch: 'main',
     id: 'exp-e7a67',
     metrics: {
       'summary.json': {
@@ -131,6 +155,16 @@ const data: CustomPlotsData = {
           param: 0.122
         },
         {
+          id: 'fe2919b',
+          metric: 2.048856019973755,
+          param: 0.122
+        },
+        {
+          id: '7df876c',
+          metric: 2.048856019973755,
+          param: 0.122
+        },
+        {
           id: 'exp-e7a67',
           metric: 2.0205044746398926,
           param: 0.15
@@ -154,6 +188,16 @@ const data: CustomPlotsData = {
       values: [
         {
           id: 'main',
+          metric: 0.3484833240509033,
+          param: 5
+        },
+        {
+          id: 'fe2919b',
+          metric: 0.3484833240509033,
+          param: 5
+        },
+        {
+          id: '7df876c',
           metric: 0.3484833240509033,
           param: 5
         },

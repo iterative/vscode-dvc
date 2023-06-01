@@ -15,6 +15,8 @@ import {
 import { buildExperiments, stubWorkspaceExperimentsGetters } from './util'
 import { Disposable } from '../../../extension'
 import expShowFixture from '../../fixtures/expShow/base/output'
+import gitLogFixture from '../../fixtures/expShow/base/gitLog'
+import orderFixture from '../../fixtures/expShow/base/order'
 import rowsFixture from '../../fixtures/expShow/base/rows'
 import columnsFixture, {
   dataColumnOrder as columnsOrderFixture
@@ -107,10 +109,9 @@ suite('Experiments Test Suite', () => {
 
       const runs = experiments.getWorkspaceAndCommits()
 
-      expect(runs.map(experiment => experiment.label)).to.deep.equal([
-        EXPERIMENT_WORKSPACE_ID,
-        'main'
-      ])
+      expect(runs.map(experiment => experiment.label)).to.deep.equal(
+        rowsFixture.map(({ label }) => label)
+      )
     })
   })
 
@@ -1458,7 +1459,12 @@ suite('Experiments Test Suite', () => {
         }
       )
 
-      void experiments.setState(data)
+      void experiments.setState({
+        gitLog: '',
+        expShow: data,
+        currentBranch: 'testBranch',
+        order: [{ sha: 'testBranch', branch: 'testBranch' }]
+      })
 
       messageSpy.resetHistory()
 
@@ -1583,7 +1589,12 @@ suite('Experiments Test Suite', () => {
           buildMockExperimentsData()
         )
       )
-      void testRepository.setState(expShowFixture)
+      void testRepository.setState({
+        currentBranch: 'main',
+        gitLog: gitLogFixture,
+        expShow: expShowFixture,
+        order: orderFixture
+      })
       await testRepository.isReady()
       expect(
         mementoSpy,
@@ -1609,9 +1620,11 @@ suite('Experiments Test Suite', () => {
       ).to.deep.equal({
         '489fd8b': 0,
         '55d492c': 0,
+        '7df876c': 0,
         'exp-83425': colors[0],
         'exp-e7a67': 0,
         'exp-f13bca': 0,
+        fe2919b: 0,
         main: 0,
         'test-branch': 0,
         [EXPERIMENT_WORKSPACE_ID]: 0
@@ -1705,9 +1718,11 @@ suite('Experiments Test Suite', () => {
       ).to.deep.equal({
         '489fd8b': 0,
         '55d492c': 0,
+        '7df876c': 0,
         'exp-83425': colors[0],
         'exp-e7a67': 0,
         'exp-f13bca': colors[1],
+        fe2919b: 0,
         main: 0,
         'test-branch': 0,
         [EXPERIMENT_WORKSPACE_ID]: 0
@@ -1740,7 +1755,12 @@ suite('Experiments Test Suite', () => {
           buildMockExperimentsData()
         )
       )
-      void testRepository.setState(expShowFixture)
+      void testRepository.setState({
+        currentBranch: 'main',
+        gitLog: gitLogFixture,
+        expShow: expShowFixture,
+        order: orderFixture
+      })
       await testRepository.isReady()
 
       expect(mementoSpy).to.be.calledWith('experimentsSortBy:test', [])
@@ -1858,11 +1878,16 @@ suite('Experiments Test Suite', () => {
 
   describe('Empty repository', () => {
     it('should not show any experiments in the experiments tree when there are no columns', async () => {
-      const data = generateTestExpShowOutput(
-        {},
-        { rev: 'b9f016df00d499f6d2a73e7dc34d1600c78066eb' }
+      const rev = 'b9f016df00d499f6d2a73e7dc34d1600c78066eb'
+      const data = generateTestExpShowOutput({}, { rev })
+      const { experiments } = buildExperiments(
+        disposable,
+        data,
+        dvcDemoPath,
+        'funkyBranch',
+        '',
+        [{ sha: rev, branch: 'funkyBranch' }]
       )
-      const { experiments } = buildExperiments(disposable, data)
       await experiments.isReady()
 
       expect(
@@ -1881,7 +1906,14 @@ suite('Experiments Test Suite', () => {
       const defaultExperimentsData = generateTestExpShowOutput({})
 
       const { experiments, mockCheckSignalFile, mockUpdateExperimentsData } =
-        buildExperiments(disposable, defaultExperimentsData)
+        buildExperiments(
+          disposable,
+          defaultExperimentsData,
+          dvcDemoPath,
+          'main',
+          '',
+          []
+        )
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const getCleanupInitialized = (experiments: any) =>
@@ -1909,7 +1941,12 @@ suite('Experiments Test Suite', () => {
         )
       )
 
-      void experiments.setState(defaultExperimentsData)
+      void experiments.setState({
+        currentBranch: 'main',
+        gitLog: '',
+        expShow: defaultExperimentsData,
+        order: []
+      })
       await dataUpdated
       expect(experiments.hasRunningWorkspaceExperiment()).to.be.true
       expect(getCleanupInitialized(experiments)).to.be.true

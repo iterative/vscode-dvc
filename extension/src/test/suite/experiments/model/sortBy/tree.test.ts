@@ -104,7 +104,14 @@ suite('Experiments Sort By Tree Test Suite', () => {
     it('should be able to properly add and remove sorts with a variety of commands', async () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
 
-      const { experiments, messageSpy } = buildExperiments(disposable, data)
+      const { experiments, messageSpy } = buildExperiments(
+        disposable,
+        data,
+        dvcDemoPath,
+        'testBranch',
+        '',
+        [{ branch: 'testBranch', sha: 'testBranch' }]
+      )
 
       await experiments.isReady()
       await experiments.showWebview()
