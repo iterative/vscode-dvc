@@ -28,6 +28,7 @@ import { addToMapArray } from '../../util/map'
 import { RegisteredCommands } from '../../commands/external'
 import { Resource } from '../../resourceLocator'
 import { shortenForLabel } from '../../util/string'
+import { COMMITS_SEPARATOR } from '../../cli/git/constants'
 
 export type ExperimentItem = {
   command?: {
@@ -80,35 +81,45 @@ const transformColumns = (
   }
 }
 
-export const getCommitDataFromOutput = (
-  output: string
-): CommitData & { hash: string } => {
-  const data: CommitData & { hash: string } = {
-    author: '',
-    date: '',
-    hash: '',
-    message: '',
-    tags: []
-  }
-  const [hash, author, date, refNamesWithKey] = output
+const collectCommitData = (
+  acc: (CommitData & { hash: string })[],
+  commit: string
+) => {
+  const [hash, author, date, refNamesWithKey] = commit
     .split('\n')
     .filter(Boolean)
-  data.hash = hash
-  data.author = author
-  data.date = date
 
-  const message = output.match(/\nmessage:(.+)/s) || []
-  data.message = message[1] || ''
+  if (!hash) {
+    return
+  }
+
+  const commitData: CommitData & { hash: string } = {
+    author: author || '',
+    date: date || '',
+    hash,
+    message: (commit.match(/\nmessage:(.+)/s) || [])[1] || '',
+    tags: []
+  }
 
   if (refNamesWithKey) {
     const refNames = refNamesWithKey.slice('refNames:'.length)
-    data.tags = refNames
+    commitData.tags = refNames
       .split(', ')
       .filter(item => item.startsWith('tag: '))
       .map(item => item.slice('tag: '.length))
   }
+  acc.push(commitData)
+}
 
-  return data
+export const collectCommitsData = (
+  output: string
+): (CommitData & { hash: string })[] => {
+  const acc: (CommitData & { hash: string })[] = []
+
+  for (const commit of output.split(COMMITS_SEPARATOR)) {
+    collectCommitData(acc, commit)
+  }
+  return acc
 }
 
 export const formatCommitMessage = (commit: string) => {

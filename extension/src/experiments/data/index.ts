@@ -18,7 +18,7 @@ import { DOT_DVC, ExperimentFlag } from '../../cli/dvc/constants'
 import { gitPath } from '../../cli/git/constants'
 import { getGitPath } from '../../fileSystem'
 import { ExperimentsModel } from '../model'
-import { formatCommitMessage, getCommitDataFromOutput } from '../model/collect'
+import { formatCommitMessage, collectCommitsData } from '../model/collect'
 import { CommitData } from '../webview/contract'
 
 interface HashInfo extends CommitData {
@@ -100,17 +100,16 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
   ) {
     const nbOfCommitsToShow = this.experiments.getNbOfCommitsToShow(branch)
 
-    for (let i = 0; i < nbOfCommitsToShow; i++) {
-      const revision = `${branch}~${i}`
+    const commitDataOutput = await this.internalCommands.executeCommand(
+      AvailableCommands.GIT_GET_COMMIT_MESSAGES,
+      this.dvcRoot,
+      branch,
+      String(nbOfCommitsToShow)
+    )
 
-      const commitDataOutput = await this.internalCommands.executeCommand(
-        AvailableCommands.GIT_GET_COMMIT_MESSAGES,
-        this.dvcRoot,
-        revision
-      )
+    const commits = collectCommitsData(commitDataOutput)
 
-      const { hash, ...commitData } = getCommitDataFromOutput(commitDataOutput)
-
+    for (const { hash, ...commitData } of commits) {
       if (hashes[hash]) {
         hashes[hash].branches.push(branch)
       } else {
@@ -119,6 +118,10 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
           ...commitData
         }
       }
+    }
+
+    for (let i = 0; i < nbOfCommitsToShow; i++) {
+      const revision = `${branch}~${i}`
 
       flags.push(ExperimentFlag.REV, revision)
     }

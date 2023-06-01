@@ -49,15 +49,19 @@ export class GitReader extends GitCli {
     return !output
   }
 
-  public async getCommitMessages(cwd: string, sha: string): Promise<string> {
+  public async getCommitMessages(
+    cwd: string,
+    rev: string,
+    revisions?: number
+  ): Promise<string> {
     const options = getOptions(
       cwd,
       Command.LOG,
-      sha,
+      rev,
       Flag.PRETTY_FORMAT_COMMIT_MESSAGE,
       Flag.SEPARATE_WITH_NULL,
       Flag.NUMBER,
-      '1'
+      String(revisions || 1)
     )
     try {
       return await this.executeProcess(options)
