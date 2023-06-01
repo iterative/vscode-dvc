@@ -80,12 +80,12 @@ export class DvcExecutor extends DvcCli {
     )
   }
 
-  public expPush(cwd: string, id: string) {
+  public expPush(cwd: string, ...ids: string[]) {
     return this.executeExperimentProcess(
       cwd,
       ExperimentSubCommand.PUSH,
       DEFAULT_REMOTE,
-      id
+      ...ids
     )
   }
 
