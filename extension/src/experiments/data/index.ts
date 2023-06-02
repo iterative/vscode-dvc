@@ -111,12 +111,16 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
 
     this.experiments.pruneBranchesToShow(allBranches)
 
-    return [
+    const currentBranches = [
       currentBranch,
       ...this.experiments
         .getBranchesToShow()
         .filter(branch => branch !== currentBranch)
     ]
+
+    this.experiments.setBranchesToShow(currentBranches)
+
+    return currentBranches
   }
 
   private async updateAvailableBranchesToSelect(branches?: string[]) {

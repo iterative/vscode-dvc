@@ -1,5 +1,6 @@
 import React, { Fragment, RefObject, useCallback, useContext } from 'react'
 import { useSelector } from 'react-redux'
+import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { TableBody } from './TableBody'
 import { BranchDivider } from './branchDivider/BranchDivider'
 import { RowSelectionContext } from '../RowSelectionContext'
@@ -55,7 +56,7 @@ export const TableContent: React.FC<TableContentProps> = ({
         const branchRows = rows.filter(row => row.original.branch === branch)
 
         return (
-          <Fragment key={`${branch || 'no-branch'}-${branchIndex}`}>
+          <Fragment key={`${branch || EXPERIMENT_WORKSPACE_ID}`}>
             {branchRows.map((row, i) => {
               const isFirstRow =
                 (branchIndex === 0 && i === 1) || (branchIndex !== 0 && i === 0)
