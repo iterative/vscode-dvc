@@ -23,7 +23,6 @@ export const buildExperiments = (
   disposer: Disposer,
   expShow = expShowFixture,
   dvcRoot = dvcDemoPath,
-  currentBranch = 'main',
   gitLog = gitLogFixture,
   rowOrder = rowOrderFixture
 ) => {
@@ -67,7 +66,6 @@ export const buildExperiments = (
   )
 
   void experiments.setState({
-    currentBranch,
     expShow,
     gitLog,
     rowOrder
@@ -118,7 +116,6 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
   )
 
   void experiments.setState({
-    currentBranch: 'main',
     expShow: expShowFixture,
     gitLog: gitLogFixture,
     rowOrder: rowOrderFixture
@@ -140,7 +137,6 @@ export const buildSingleRepoExperiments = (disposer: SafeWatcherDisposer) => {
   )
 
   void experiments.setState({
-    currentBranch: 'main',
     expShow: expShowFixture,
     gitLog: gitLogFixture,
     rowOrder: rowOrderFixture

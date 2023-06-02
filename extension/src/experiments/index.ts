@@ -168,23 +168,12 @@ export class Experiments extends BaseRepository<TableData> {
     return this.data.managedUpdate()
   }
 
-  public async setState({
-    currentBranch,
-    expShow,
-    gitLog,
-    rowOrder
-  }: ExperimentsOutput) {
+  public async setState({ expShow, gitLog, rowOrder }: ExperimentsOutput) {
     const hadCheckpoints = this.hasCheckpoints()
     const dvcLiveOnly = await this.checkSignalFile()
     await Promise.all([
       this.columns.transformAndSet(expShow),
-      this.experiments.transformAndSet(
-        expShow,
-        gitLog,
-        currentBranch,
-        dvcLiveOnly,
-        rowOrder
-      )
+      this.experiments.transformAndSet(expShow, gitLog, dvcLiveOnly, rowOrder)
     ])
 
     if (hadCheckpoints !== this.hasCheckpoints()) {

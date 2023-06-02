@@ -6,7 +6,6 @@ describe('collectExperiments', () => {
     const { commits } = collectExperiments(
       generateTestExpShowOutput({}),
       '',
-      'main',
       false
     )
     expect(commits).toStrictEqual([])
@@ -26,34 +25,19 @@ describe('collectExperiments', () => {
   )
 
   it('should define a workspace', () => {
-    const { workspace } = collectExperiments(
-      expShowWithTwoCommits,
-      '',
-      'main',
-      false
-    )
+    const { workspace } = collectExperiments(expShowWithTwoCommits, '', false)
 
     expect(workspace).toBeDefined()
   })
 
   it('should find two branches from a repo with two branches', () => {
-    const { commits } = collectExperiments(
-      expShowWithTwoCommits,
-      '',
-      'main',
-      false
-    )
+    const { commits } = collectExperiments(expShowWithTwoCommits, '', false)
 
     expect(commits.length).toStrictEqual(2)
   })
 
   it('should list commits in the same order as they are collected', () => {
-    const { commits } = collectExperiments(
-      expShowWithTwoCommits,
-      '',
-      'main',
-      false
-    )
+    const { commits } = collectExperiments(expShowWithTwoCommits, '', false)
     const [commitA, commitB] = commits
 
     expect(commitA.id).toStrictEqual('branchA')
@@ -64,7 +48,6 @@ describe('collectExperiments', () => {
     const { experimentsByCommit } = collectExperiments(
       expShowWithTwoCommits,
       '',
-      'main',
       false
     )
     expect(experimentsByCommit.get('branchA')?.length).toStrictEqual(2)
@@ -74,7 +57,6 @@ describe('collectExperiments', () => {
     const { experimentsByCommit } = collectExperiments(
       expShowWithTwoCommits,
       '',
-      'main',
       false
     )
     expect(experimentsByCommit.get('branchB')).toBeUndefined()
@@ -109,7 +91,6 @@ describe('collectExperiments', () => {
     const { experimentsByCommit, commits } = collectExperiments(
       expShowWithDuplicateCommits,
       '',
-      'main',
       false
     )
 

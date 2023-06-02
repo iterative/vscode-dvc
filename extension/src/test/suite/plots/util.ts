@@ -27,7 +27,6 @@ export const buildPlots = async (
   disposer: Disposer,
   plotsDiff: PlotsOutput | undefined = undefined,
   expShow = expShowFixtureWithoutErrors,
-  currentBranch = 'main',
   gitLog = gitLogFixture,
   rowOrder = rowOrderFixture
 ) => {
@@ -77,7 +76,6 @@ export const buildPlots = async (
   ] as Experiment[])
 
   void experiments.setState({
-    currentBranch,
     expShow,
     gitLog,
     rowOrder

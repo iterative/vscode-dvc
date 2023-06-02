@@ -312,7 +312,6 @@ const hasCheckpoints = (data: ExpShowOutput) => {
 export const collectExperiments = (
   expShow: ExpShowOutput,
   gitLog: string,
-  currentBranch: string,
   dvcLiveOnly: boolean
 ): ExperimentsAccumulator => {
   const acc: ExperimentsAccumulator = {
@@ -321,7 +320,7 @@ export const collectExperiments = (
     hasCheckpoints: hasCheckpoints(expShow),
     runningExperiments: [],
     workspace: {
-      branch: currentBranch,
+      branch: undefined,
       id: EXPERIMENT_WORKSPACE_ID,
       label: EXPERIMENT_WORKSPACE_ID
     }

@@ -48,9 +48,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
 
     void this.updateAvailableBranchesToSelect(allBranches)
 
-    const { branches, currentBranch } = await this.getBranchesToShowWithCurrent(
-      allBranches
-    )
+    const branches = await this.getBranchesToShow(allBranches)
     let gitLog = ''
     const rowOrder: { branch: string; sha: string }[] = []
     const args: Args = []
@@ -68,7 +66,6 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     this.collectFiles({ expShow })
 
     return this.notifyChanged({
-      currentBranch,
       expShow,
       gitLog,
       rowOrder
@@ -106,7 +103,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     return gitLog
   }
 
-  private async getBranchesToShowWithCurrent(allBranches: string[]) {
+  private async getBranchesToShow(allBranches: string[]) {
     const currentBranch = await this.internalCommands.executeCommand<string>(
       AvailableCommands.GIT_GET_CURRENT_BRANCH,
       this.dvcRoot
@@ -114,14 +111,12 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
 
     this.experiments.pruneBranchesToShow(allBranches)
 
-    const branches = [
+    return [
       currentBranch,
       ...this.experiments
         .getBranchesToShow()
         .filter(branch => branch !== currentBranch)
     ]
-
-    return { branches, currentBranch }
   }
 
   private async updateAvailableBranchesToSelect(branches?: string[]) {

@@ -1462,7 +1462,6 @@ suite('Experiments Test Suite', () => {
       void experiments.setState({
         gitLog: '',
         expShow: data,
-        currentBranch: 'main',
         rowOrder: [
           { sha: '2d879497587b80b2d9e61f072d9dbe9c07a65357', branch: 'main' }
         ]
@@ -1598,7 +1597,6 @@ suite('Experiments Test Suite', () => {
         )
       )
       void testRepository.setState({
-        currentBranch: 'main',
         gitLog: gitLogFixture,
         expShow: expShowFixture,
         rowOrder: rowOrderFixture
@@ -1764,7 +1762,6 @@ suite('Experiments Test Suite', () => {
         )
       )
       void testRepository.setState({
-        currentBranch: 'main',
         gitLog: gitLogFixture,
         expShow: expShowFixture,
         rowOrder: rowOrderFixture
@@ -1892,7 +1889,6 @@ suite('Experiments Test Suite', () => {
         disposable,
         data,
         dvcDemoPath,
-        'funkyBranch',
         '',
         [{ sha: rev, branch: 'funkyBranch' }]
       )
@@ -1918,7 +1914,6 @@ suite('Experiments Test Suite', () => {
           disposable,
           defaultExperimentsData,
           dvcDemoPath,
-          'main',
           '',
           []
         )
@@ -1950,7 +1945,6 @@ suite('Experiments Test Suite', () => {
       )
 
       void experiments.setState({
-        currentBranch: 'main',
         gitLog: '',
         expShow: defaultExperimentsData,
         rowOrder: []

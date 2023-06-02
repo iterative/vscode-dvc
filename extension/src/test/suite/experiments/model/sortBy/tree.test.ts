@@ -108,7 +108,6 @@ suite('Experiments Sort By Tree Test Suite', () => {
         disposable,
         data,
         dvcDemoPath,
-        'main',
         '',
         [{ branch: 'main', sha: '2d879497587b80b2d9e61f072d9dbe9c07a65357' }]
       )

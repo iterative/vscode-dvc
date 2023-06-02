@@ -36,19 +36,13 @@ beforeEach(() => {
 describe('ExperimentsModel', () => {
   it('should return the expected rows when given the base fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(
-      outputFixture,
-      gitLogFixture,
-      'main',
-      false,
-      rowOrderFixture
-    )
+    model.transformAndSet(outputFixture, gitLogFixture, false, rowOrderFixture)
     expect(model.getRowData()).toStrictEqual(rowsFixture)
   })
 
   it('should return the expected rows when given the survival fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(survivalOutputFixture, '', 'main', false, [
+    model.transformAndSet(survivalOutputFixture, '', false, [
       { branch: 'main', sha: '3d5adcb974bb2c85917a5d61a489b933adaa2b7f' },
       { branch: 'main', sha: 'a49e03966a1f9f1299ec222ebc4bed8625d2c54d' },
       { branch: 'main', sha: '4f7b50c3d171a11b6cfcd04416a16fc80b61018d' }
@@ -87,13 +81,13 @@ describe('ExperimentsModel', () => {
       }
     )
 
-    model.transformAndSet(dvcLiveOnly, '', 'main', true, [])
+    model.transformAndSet(dvcLiveOnly, '', true, [])
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const runningWorkspace = (model as any).workspace
     expect(runningWorkspace?.executor).toStrictEqual(EXPERIMENT_WORKSPACE_ID)
     expect(runningWorkspace?.status).toStrictEqual(ExperimentStatus.RUNNING)
 
-    model.transformAndSet(dvcLiveOnly, '', 'main', false, [])
+    model.transformAndSet(dvcLiveOnly, '', false, [])
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const stoppedWorkspace = (model as any).workspace
     expect(stoppedWorkspace?.executor).toBeFalsy()
@@ -152,7 +146,7 @@ describe('ExperimentsModel', () => {
       }
     )
 
-    model.transformAndSet(data, '', 'main', false, [])
+    model.transformAndSet(data, '', false, [])
 
     const experiments = model.getCombinedList()
 
@@ -171,14 +165,14 @@ describe('ExperimentsModel', () => {
 
   it('should handle deps have all null properties (never been committed)', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(uncommittedDepsFixture, '', 'main', false, [])
+    model.transformAndSet(uncommittedDepsFixture, '', false, [])
     const [workspace] = model.getWorkspaceAndCommits()
     expect(workspace.deps).toStrictEqual({})
   })
 
   it('should return the expected rows when given the deeply nested output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(deeplyNestedOutputFixture, '', 'main', false, [
+    model.transformAndSet(deeplyNestedOutputFixture, '', false, [
       { branch: 'main', sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77' }
     ])
     expect(model.getRowData()).toStrictEqual(
@@ -188,7 +182,7 @@ describe('ExperimentsModel', () => {
 
   it('should return the expected rows when given the data types output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(dataTypesOutputFixture, '', 'main', false, [
+    model.transformAndSet(dataTypesOutputFixture, '', false, [
       { branch: 'main', sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77' }
     ])
     expect(model.getRowData()).toStrictEqual(
@@ -225,7 +219,7 @@ describe('ExperimentsModel', () => {
       ]
     })
 
-    experimentsModel.transformAndSet(data, '', 'main', false, [])
+    experimentsModel.transformAndSet(data, '', false, [])
 
     experimentsModel.setSelected([
       { id: 'exp-1' },
@@ -288,7 +282,7 @@ describe('ExperimentsModel', () => {
     )
 
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(data, '', 'main', false, [])
+    model.transformAndSet(data, '', false, [])
 
     expect(model.getSelectedRevisions().map(({ id }) => id)).toStrictEqual([
       runningExpName
@@ -311,7 +305,7 @@ describe('ExperimentsModel', () => {
 
   it('should fetch commit params', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, '', 'main', false, [])
+    model.transformAndSet(outputFixture, '', false, [])
 
     const commitParams = model.getExperimentParams('main')
     expect(definedAndNonEmpty(commitParams)).toBe(true)
@@ -319,7 +313,7 @@ describe('ExperimentsModel', () => {
 
   it('should fetch workspace params', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, '', 'main', false, [])
+    model.transformAndSet(outputFixture, '', false, [])
 
     const workspaceParams = model.getExperimentParams(EXPERIMENT_WORKSPACE_ID)
     expect(definedAndNonEmpty(workspaceParams)).toBe(true)
@@ -327,7 +321,7 @@ describe('ExperimentsModel', () => {
 
   it("should fetch an experiment's params", () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, '', 'main', false, [])
+    model.transformAndSet(outputFixture, '', false, [])
 
     const experimentParams = model.getExperimentParams('exp-e7a67')
     expect(definedAndNonEmpty(experimentParams)).toBe(true)
@@ -335,7 +329,7 @@ describe('ExperimentsModel', () => {
 
   it("should fetch an empty array if the experiment's params cannot be found", () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, '', 'main', false, [])
+    model.transformAndSet(outputFixture, '', false, [])
 
     const noParams = model.getExperimentParams('not-an-experiment')
     expect(definedAndNonEmpty(noParams)).toBe(false)

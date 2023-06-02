@@ -114,7 +114,6 @@ export class ExperimentsModel extends ModelWithPersistence {
   public transformAndSet(
     expShow: ExpShowOutput,
     gitLog: string,
-    currentBranch: string,
     dvcLiveOnly: boolean,
     rowOrder: { branch: string; sha: string }[]
   ) {
@@ -124,7 +123,7 @@ export class ExperimentsModel extends ModelWithPersistence {
       experimentsByCommit,
       runningExperiments,
       hasCheckpoints
-    } = collectExperiments(expShow, gitLog, currentBranch, dvcLiveOnly)
+    } = collectExperiments(expShow, gitLog, dvcLiveOnly)
 
     commits.sort((a, b) => (b.Created || '').localeCompare(a.Created || ''))
 
@@ -427,7 +426,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public setBranchesToShow(branches: string[]) {
-    this.branchesToShow = [...branches].sort()
+    this.branchesToShow = branches
     this.persistBranchesToShow()
   }
 
