@@ -7,6 +7,7 @@ import {
 import { ExperimentType } from '.'
 import { extractColumns } from '../columns/extract'
 import {
+  CommitData,
   Experiment,
   RunningExperiment,
   isQueued,
@@ -27,6 +28,7 @@ import { addToMapArray } from '../../util/map'
 import { RegisteredCommands } from '../../commands/external'
 import { Resource } from '../../resourceLocator'
 import { shortenForLabel } from '../../util/string'
+import { COMMITS_SEPARATOR } from '../../cli/git/constants'
 
 export type ExperimentItem = {
   command?: {
@@ -104,16 +106,28 @@ const transformExpState = (
   return experiment
 }
 
+const formatCommitMessage = (commit: string | undefined) => {
+  if (!commit) {
+    return undefined
+  }
+  const lines = commit.split('\n').filter(Boolean)
+  return `${lines[0]}${lines.length > 1 ? ' ...' : ''}`
+}
+
 const collectExpState = (
   acc: ExperimentsAccumulator,
-  expState: ExpState
+  expState: ExpState,
+  commitData: { [sha: string]: CommitData }
 ): Experiment | undefined => {
-  const { rev, name, branch, commit, description } = expState
+  const { rev, name, branch } = expState
   const label =
     rev === EXPERIMENT_WORKSPACE_ID
       ? EXPERIMENT_WORKSPACE_ID
       : name || shortenForLabel(rev)
   const id = name || label
+
+  const commit: CommitData | undefined = commitData[rev]
+  const description: string | undefined = formatCommitMessage(commit?.message)
 
   const experiment: Experiment = {
     branch,
@@ -121,7 +135,7 @@ const collectExpState = (
     description,
     id,
     label
-  } as unknown as Experiment
+  }
 
   const baseline = transformExpState(experiment, expState)
 
@@ -257,24 +271,66 @@ const hasCheckpoints = (data: ExpShowOutput) => {
   return !!workspace.data.meta.has_checkpoints
 }
 
+const collectCommitData = (
+  acc: { [sha: string]: CommitData },
+  commit: string
+) => {
+  const [sha, author, date, refNamesWithKey] = commit
+    .split('\n')
+    .filter(Boolean)
+
+  if (!sha) {
+    return
+  }
+
+  const commitData: CommitData = {
+    author: author || '',
+    date: date || '',
+    message: (commit.match(/\nmessage:(.+)/s) || [])[1] || '',
+    tags: []
+  }
+
+  if (refNamesWithKey) {
+    const refNames = refNamesWithKey.slice('refNames:'.length)
+    commitData.tags = refNames
+      .split(', ')
+      .filter(item => item.startsWith('tag: '))
+      .map(item => item.slice('tag: '.length))
+  }
+  acc[sha] = commitData
+}
+
+const collectCommitsData = (output: string): { [sha: string]: CommitData } => {
+  const acc: { [sha: string]: CommitData } = {}
+
+  for (const commit of output.split(COMMITS_SEPARATOR)) {
+    collectCommitData(acc, commit)
+  }
+  return acc
+}
+
 export const collectExperiments = (
-  output: ExpShowOutput,
+  expShow: ExpShowOutput,
+  gitLog: string,
+  currentBranch: string,
   dvcLiveOnly: boolean
 ): ExperimentsAccumulator => {
+  const commitData = collectCommitsData(gitLog)
+
   const acc: ExperimentsAccumulator = {
     commits: [],
     experimentsByCommit: new Map(),
-    hasCheckpoints: hasCheckpoints(output),
+    hasCheckpoints: hasCheckpoints(expShow),
     runningExperiments: [],
     workspace: {
-      branch: undefined,
+      branch: currentBranch,
       id: EXPERIMENT_WORKSPACE_ID,
       label: EXPERIMENT_WORKSPACE_ID
     }
   }
 
-  for (const expState of output) {
-    const baseline = collectExpState(acc, expState)
+  for (const expState of expShow) {
+    const baseline = collectExpState(acc, expState, commitData)
     const { experiments } = expState
 
     if (!(baseline && experiments?.length)) {

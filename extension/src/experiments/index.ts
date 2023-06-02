@@ -10,7 +10,6 @@ import omit from 'lodash.omit'
 import { addStarredToColumns } from './columns/like'
 import { setContextForEditorTitleIcons } from './context'
 import { ExperimentsModel } from './model'
-import { combineOutputs } from './util'
 import {
   pickExperiment,
   pickExperiments,
@@ -175,13 +174,17 @@ export class Experiments extends BaseRepository<TableData> {
     gitLog,
     order
   }: ExperimentsOutput) {
-    const data = combineOutputs(currentBranch, expShow, gitLog, order)
-
     const hadCheckpoints = this.hasCheckpoints()
     const dvcLiveOnly = await this.checkSignalFile()
     await Promise.all([
-      this.columns.transformAndSet(data),
-      this.experiments.transformAndSet(data, dvcLiveOnly)
+      this.columns.transformAndSet(expShow),
+      this.experiments.transformAndSet(
+        expShow,
+        gitLog,
+        currentBranch,
+        dvcLiveOnly,
+        order
+      )
     ])
 
     if (hadCheckpoints !== this.hasCheckpoints()) {

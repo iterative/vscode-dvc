@@ -80,7 +80,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
           }
         }
       ],
-      rev: 'testBranch'
+      rev: '2d879497587b80b2d9e61f072d9dbe9c07a65357'
     }
   )
 
@@ -108,9 +108,9 @@ suite('Experiments Sort By Tree Test Suite', () => {
         disposable,
         data,
         dvcDemoPath,
-        'testBranch',
+        'main',
         '',
-        [{ branch: 'testBranch', sha: 'testBranch' }]
+        [{ branch: 'main', sha: '2d879497587b80b2d9e61f072d9dbe9c07a65357' }]
       )
 
       await experiments.isReady()

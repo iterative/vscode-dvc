@@ -1,4 +1,3 @@
-import { CommitData } from '../../experiments/webview/contract'
 import { Plot } from '../../plots/webview/contract'
 
 export const MIN_CLI_VERSION = '2.58.1'
@@ -99,8 +98,6 @@ export type ExpWithError = {
   rev: string
   name?: string
   branch: string | undefined
-  commit?: CommitData
-  description?: string
 } & DvcError
 
 type ExpWithData = {
@@ -108,8 +105,6 @@ type ExpWithData = {
   name?: string
   branch: string | undefined
   data: ExpData
-  commit?: CommitData
-  description?: string
 }
 
 export type ExpState = ExpWithData | ExpWithError

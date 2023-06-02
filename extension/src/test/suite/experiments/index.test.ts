@@ -1426,7 +1426,7 @@ suite('Experiments Test Suite', () => {
       const data = generateTestExpShowOutput(
         {},
         {
-          rev: 'testBranch',
+          rev: '2d879497587b80b2d9e61f072d9dbe9c07a65357',
           experiments: [
             {
               params: {
@@ -1462,8 +1462,10 @@ suite('Experiments Test Suite', () => {
       void experiments.setState({
         gitLog: '',
         expShow: data,
-        currentBranch: 'testBranch',
-        order: [{ sha: 'testBranch', branch: 'testBranch' }]
+        currentBranch: 'main',
+        order: [
+          { sha: '2d879497587b80b2d9e61f072d9dbe9c07a65357', branch: 'main' }
+        ]
       })
 
       messageSpy.resetHistory()
@@ -1485,7 +1487,10 @@ suite('Experiments Test Suite', () => {
 
       expect(getIds(rows as Commit[])).to.deep.equal([
         { id: EXPERIMENT_WORKSPACE_ID },
-        { id: 'testBranch', subRows: ['exp-1', 'exp-2', 'exp-3'] }
+        {
+          id: '2d879497587b80b2d9e61f072d9dbe9c07a65357',
+          subRows: ['exp-1', 'exp-2', 'exp-3']
+        }
       ])
 
       expect(noSorts).to.deep.equal([])
@@ -1521,7 +1526,10 @@ suite('Experiments Test Suite', () => {
 
       expect(getIds(sortedRows as Commit[])).to.deep.equal([
         { id: EXPERIMENT_WORKSPACE_ID },
-        { id: 'testBranch', subRows: ['exp-2', 'exp-1', 'exp-3'] }
+        {
+          id: '2d879497587b80b2d9e61f072d9dbe9c07a65357',
+          subRows: ['exp-2', 'exp-1', 'exp-3']
+        }
       ])
 
       expect(sorts).to.deep.equal([{ descending: false, path: sortPath }])
