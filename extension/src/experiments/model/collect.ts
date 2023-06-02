@@ -106,6 +106,44 @@ const transformExpState = (
   return experiment
 }
 
+const collectCommitData = (
+  acc: { [sha: string]: CommitData },
+  commit: string
+) => {
+  const [sha, author, date, refNamesWithKey] = commit
+    .split('\n')
+    .filter(Boolean)
+
+  if (!sha) {
+    return
+  }
+
+  const commitData: CommitData = {
+    author: author || '',
+    date: date || '',
+    message: (commit.match(/\nmessage:(.+)/s) || [])[1] || '',
+    tags: []
+  }
+
+  if (refNamesWithKey) {
+    const refNames = refNamesWithKey.slice('refNames:'.length)
+    commitData.tags = refNames
+      .split(', ')
+      .filter(item => item.startsWith('tag: '))
+      .map(item => item.slice('tag: '.length))
+  }
+  acc[sha] = commitData
+}
+
+const collectCommitsData = (output: string): { [sha: string]: CommitData } => {
+  const acc: { [sha: string]: CommitData } = {}
+
+  for (const commit of output.split(COMMITS_SEPARATOR)) {
+    collectCommitData(acc, commit)
+  }
+  return acc
+}
+
 const formatCommitMessage = (commit: string | undefined) => {
   if (!commit) {
     return undefined
@@ -271,52 +309,12 @@ const hasCheckpoints = (data: ExpShowOutput) => {
   return !!workspace.data.meta.has_checkpoints
 }
 
-const collectCommitData = (
-  acc: { [sha: string]: CommitData },
-  commit: string
-) => {
-  const [sha, author, date, refNamesWithKey] = commit
-    .split('\n')
-    .filter(Boolean)
-
-  if (!sha) {
-    return
-  }
-
-  const commitData: CommitData = {
-    author: author || '',
-    date: date || '',
-    message: (commit.match(/\nmessage:(.+)/s) || [])[1] || '',
-    tags: []
-  }
-
-  if (refNamesWithKey) {
-    const refNames = refNamesWithKey.slice('refNames:'.length)
-    commitData.tags = refNames
-      .split(', ')
-      .filter(item => item.startsWith('tag: '))
-      .map(item => item.slice('tag: '.length))
-  }
-  acc[sha] = commitData
-}
-
-const collectCommitsData = (output: string): { [sha: string]: CommitData } => {
-  const acc: { [sha: string]: CommitData } = {}
-
-  for (const commit of output.split(COMMITS_SEPARATOR)) {
-    collectCommitData(acc, commit)
-  }
-  return acc
-}
-
 export const collectExperiments = (
   expShow: ExpShowOutput,
   gitLog: string,
   currentBranch: string,
   dvcLiveOnly: boolean
 ): ExperimentsAccumulator => {
-  const commitData = collectCommitsData(gitLog)
-
   const acc: ExperimentsAccumulator = {
     commits: [],
     experimentsByCommit: new Map(),
@@ -328,6 +326,8 @@ export const collectExperiments = (
       label: EXPERIMENT_WORKSPACE_ID
     }
   }
+
+  const commitData = collectCommitsData(gitLog)
 
   for (const expState of expShow) {
     const baseline = collectExpState(acc, expState, commitData)
