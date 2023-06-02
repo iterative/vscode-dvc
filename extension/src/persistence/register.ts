@@ -5,9 +5,10 @@ import { InternalCommands } from '../commands/internal'
 
 export const registerPersistenceCommands = (
   workspaceState: Memento,
+  globalState: Memento,
   internalCommands: InternalCommands
 ) => {
   internalCommands.registerExternalCommand(RegisteredCommands.RESET_STATE, () =>
-    resetPersistedState(workspaceState)
+    resetPersistedState(workspaceState, globalState)
   )
 }

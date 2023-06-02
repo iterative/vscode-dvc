@@ -1,4 +1,4 @@
-import { commands, env, ExtensionContext, ViewColumn } from 'vscode'
+import { commands, ExtensionContext, ViewColumn } from 'vscode'
 import { DvcConfig } from './cli/dvc/config'
 import { DvcExecutor } from './cli/dvc/executor'
 import { DvcRunner } from './cli/dvc/runner'
@@ -254,9 +254,13 @@ class Extension extends Disposable {
       ).contributes.walkthroughs[0].id
     )
 
-    registerPersistenceCommands(context.workspaceState, this.internalCommands)
+    registerPersistenceCommands(
+      context.workspaceState,
+      context.globalState,
+      this.internalCommands
+    )
 
-    void showSetupOnFirstUse(env.isNewAppInstall)
+    void showSetupOnFirstUse(context.globalState, context.workspaceState)
     this.dispose.track(recommendRedHatExtensionOnce())
 
     this.dispose.track(new LanguageClient())
