@@ -16,7 +16,7 @@ import { buildExperiments, stubWorkspaceExperimentsGetters } from './util'
 import { Disposable } from '../../../extension'
 import expShowFixture from '../../fixtures/expShow/base/output'
 import gitLogFixture from '../../fixtures/expShow/base/gitLog'
-import orderFixture from '../../fixtures/expShow/base/order'
+import rowOrderFixture from '../../fixtures/expShow/base/rowOrder'
 import rowsFixture from '../../fixtures/expShow/base/rows'
 import columnsFixture, {
   dataColumnOrder as columnsOrderFixture
@@ -871,7 +871,7 @@ suite('Experiments Test Suite', () => {
       const queuedId = '90aea7f'
 
       const isExperimentSelected = (expId: string): boolean =>
-        !!experimentsModel.getUniqueList().find(({ id }) => id === expId)
+        !!experimentsModel.getCombinedList().find(({ id }) => id === expId)
           ?.selected
 
       expect(
@@ -1099,7 +1099,7 @@ suite('Experiments Test Suite', () => {
       const areExperimentsStarred = (expIds: string[]): boolean =>
         expIds
           .map(expId =>
-            experimentsModel.getUniqueList().find(({ id }) => id === expId)
+            experimentsModel.getCombinedList().find(({ id }) => id === expId)
           )
           .every(exp => exp?.starred)
 
@@ -1463,7 +1463,7 @@ suite('Experiments Test Suite', () => {
         gitLog: '',
         expShow: data,
         currentBranch: 'main',
-        order: [
+        rowOrder: [
           { sha: '2d879497587b80b2d9e61f072d9dbe9c07a65357', branch: 'main' }
         ]
       })
@@ -1601,7 +1601,7 @@ suite('Experiments Test Suite', () => {
         currentBranch: 'main',
         gitLog: gitLogFixture,
         expShow: expShowFixture,
-        order: orderFixture
+        rowOrder: rowOrderFixture
       })
       await testRepository.isReady()
       expect(
@@ -1767,7 +1767,7 @@ suite('Experiments Test Suite', () => {
         currentBranch: 'main',
         gitLog: gitLogFixture,
         expShow: expShowFixture,
-        order: orderFixture
+        rowOrder: rowOrderFixture
       })
       await testRepository.isReady()
 
@@ -1953,7 +1953,7 @@ suite('Experiments Test Suite', () => {
         currentBranch: 'main',
         gitLog: '',
         expShow: defaultExperimentsData,
-        order: []
+        rowOrder: []
       })
       await dataUpdated
       expect(experiments.hasRunningWorkspaceExperiment()).to.be.true

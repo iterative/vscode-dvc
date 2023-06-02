@@ -8,7 +8,7 @@ import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import expShowFixtureWithoutErrors from '../../fixtures/expShow/base/noErrors'
 import gitLogFixture from '../../fixtures/expShow/base/gitLog'
-import orderFixture from '../../fixtures/expShow/base/order'
+import rowOrderFixture from '../../fixtures/expShow/base/rowOrder'
 import customPlotsFixture from '../../fixtures/expShow/base/customPlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
 import multiSourcePlotsDiffFixture from '../../fixtures/plotsDiff/multiSource'
@@ -141,7 +141,7 @@ suite('Plots Test Suite', () => {
         currentBranch: 'main',
         expShow: updatedExpShowFixture,
         gitLog: newCommit + COMMITS_SEPARATOR + gitLogFixture,
-        order: [{ branch: 'main', sha: newCommit }, ...orderFixture]
+        rowOrder: [{ branch: 'main', sha: newCommit }, ...rowOrderFixture]
       })
 
       await dataUpdateEvent

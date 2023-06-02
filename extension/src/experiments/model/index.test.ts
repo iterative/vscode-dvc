@@ -3,7 +3,7 @@ import { join } from 'path'
 import { commands } from 'vscode'
 import { ExperimentsModel } from '.'
 import gitLogFixture from '../../test/fixtures/expShow/base/gitLog'
-import orderFixture from '../../test/fixtures/expShow/base/order'
+import rowOrderFixture from '../../test/fixtures/expShow/base/rowOrder'
 import outputFixture from '../../test/fixtures/expShow/base/output'
 import rowsFixture from '../../test/fixtures/expShow/base/rows'
 import deeplyNestedRowsFixture from '../../test/fixtures/expShow/deeplyNested/rows'
@@ -41,7 +41,7 @@ describe('ExperimentsModel', () => {
       gitLogFixture,
       'main',
       false,
-      orderFixture
+      rowOrderFixture
     )
     expect(model.getRowData()).toStrictEqual(rowsFixture)
   })
@@ -154,7 +154,7 @@ describe('ExperimentsModel', () => {
 
     model.transformAndSet(data, '', 'main', false, [])
 
-    const experiments = model.getUniqueList()
+    const experiments = model.getCombinedList()
 
     const changed: string[] = []
     for (const { deps, sha } of experiments) {
@@ -297,7 +297,7 @@ describe('ExperimentsModel', () => {
     model.setSelected([])
     expect(model.getSelectedRevisions().map(({ id }) => id)).toStrictEqual([])
 
-    model.setSelected(model.getUniqueList())
+    model.setSelected(model.getCombinedList())
     expect(model.getSelectedRevisions().map(({ id }) => id)).toStrictEqual([
       EXPERIMENT_WORKSPACE_ID,
       'testBranch',
@@ -365,23 +365,23 @@ describe('ExperimentsModel', () => {
   it('should remove outdated branches to show when calling pruneBranchesToShow', () => {
     const model = new ExperimentsModel('', buildMockMemento())
 
-    model.setBranchesToShow(['one', 'old', 'two', 'three', 'older'])
-    model.pruneBranchesToShow(['one', 'two', 'three', 'four', 'five', 'six'])
+    model.setBranchesToShow(['A', 'old', 'B', 'C', 'older'])
+    model.pruneBranchesToShow(['A', 'B', 'C', 'four', 'five', 'six'])
 
-    expect(model.getBranchesToShow()).toStrictEqual(['one', 'two', 'three'])
+    expect(model.getBranchesToShow()).toStrictEqual(['A', 'B', 'C'])
   })
 
   it('should persist the branches to show when calling pruneBranchesToShow', () => {
     const memento = buildMockMemento()
     const model = new ExperimentsModel('', memento)
 
-    model.setBranchesToShow(['one', 'old', 'two', 'three', 'older'])
-    model.pruneBranchesToShow(['one', 'two', 'three', 'four', 'five', 'six'])
+    model.setBranchesToShow(['A', 'old', 'B', 'C', 'older'])
+    model.pruneBranchesToShow(['A', 'B', 'C', 'four', 'five', 'six'])
 
     expect(memento.get(PersistenceKey.EXPERIMENTS_BRANCHES)).toStrictEqual([
-      'one',
-      'two',
-      'three'
+      'A',
+      'B',
+      'C'
     ])
   })
 })

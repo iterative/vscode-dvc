@@ -12,7 +12,7 @@ import { isSameOrChild } from '../fileSystem'
 export type ExperimentsOutput = {
   currentBranch: string
   expShow: ExpShowOutput
-  order: { branch: string; sha: string }[]
+  rowOrder: { branch: string; sha: string }[]
   gitLog: string
 }
 

@@ -4,7 +4,7 @@ import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
 import expShowFixture from '../../fixtures/expShow/base/output'
 import gitLogFixture from '../../fixtures/expShow/base/gitLog'
-import orderFixture from '../../fixtures/expShow/base/order'
+import rowOrderFixture from '../../fixtures/expShow/base/rowOrder'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import {
   buildDependencies,
@@ -25,7 +25,7 @@ export const buildExperiments = (
   dvcRoot = dvcDemoPath,
   currentBranch = 'main',
   gitLog = gitLogFixture,
-  order = orderFixture
+  rowOrder = rowOrderFixture
 ) => {
   const {
     dvcExecutor,
@@ -66,7 +66,12 @@ export const buildExperiments = (
     )
   )
 
-  void experiments.setState({ currentBranch, expShow, gitLog, order })
+  void experiments.setState({
+    currentBranch,
+    expShow,
+    gitLog,
+    rowOrder
+  })
 
   return {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any,
@@ -116,7 +121,7 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
     currentBranch: 'main',
     expShow: expShowFixture,
     gitLog: gitLogFixture,
-    order: orderFixture
+    rowOrder: rowOrderFixture
   })
   return { experiments, internalCommands, messageSpy, workspaceExperiments }
 }
@@ -138,7 +143,7 @@ export const buildSingleRepoExperiments = (disposer: SafeWatcherDisposer) => {
     currentBranch: 'main',
     expShow: expShowFixture,
     gitLog: gitLogFixture,
-    order: orderFixture
+    rowOrder: rowOrderFixture
   })
 
   return {

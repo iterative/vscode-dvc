@@ -52,11 +52,11 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
       allBranches
     )
     let gitLog = ''
-    const order: { branch: string; sha: string }[] = []
+    const rowOrder: { branch: string; sha: string }[] = []
     const args: Args = []
 
     for (const branch of branches) {
-      gitLog = await this.collectGitLogAndOrder(gitLog, branch, order, args)
+      gitLog = await this.collectGitLogAndOrder(gitLog, branch, rowOrder, args)
     }
 
     const expShow = await this.internalCommands.executeCommand<ExpShowOutput>(
@@ -67,7 +67,12 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
 
     this.collectFiles({ expShow })
 
-    return this.notifyChanged({ currentBranch, expShow, gitLog, order })
+    return this.notifyChanged({
+      currentBranch,
+      expShow,
+      gitLog,
+      rowOrder
+    })
   }
 
   protected collectFiles({ expShow }: { expShow: ExpShowOutput }) {
@@ -77,7 +82,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   private async collectGitLogAndOrder(
     gitLog: string,
     branch: string,
-    order: { branch: string; sha: string }[],
+    rowOrder: { branch: string; sha: string }[],
     args: Args
   ) {
     const nbOfCommitsToShow = this.experiments.getNbOfCommitsToShow(branch)
@@ -92,7 +97,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
 
     for (const commit of branchGitLog.split(COMMITS_SEPARATOR)) {
       const [sha] = commit.split('\n')
-      order.push({ branch, sha })
+      rowOrder.push({ branch, sha })
       if (args.includes(sha)) {
         continue
       }

@@ -172,7 +172,7 @@ export class Experiments extends BaseRepository<TableData> {
     currentBranch,
     expShow,
     gitLog,
-    order
+    rowOrder
   }: ExperimentsOutput) {
     const hadCheckpoints = this.hasCheckpoints()
     const dvcLiveOnly = await this.checkSignalFile()
@@ -183,7 +183,7 @@ export class Experiments extends BaseRepository<TableData> {
         gitLog,
         currentBranch,
         dvcLiveOnly,
-        order
+        rowOrder
       )
     ])
 
@@ -586,7 +586,7 @@ export class Experiments extends BaseRepository<TableData> {
     }
 
     return await pickExperiment(
-      this.experiments.getUniqueList(),
+      this.experiments.getCombinedList(),
       this.getFirstThreeColumnOrder(),
       Title.SELECT_BASE_EXPERIMENT
     )

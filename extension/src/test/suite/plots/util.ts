@@ -3,7 +3,7 @@ import { stub } from 'sinon'
 import * as FileSystem from '../../../fileSystem'
 import expShowFixtureWithoutErrors from '../../fixtures/expShow/base/noErrors'
 import gitLogFixture from '../../fixtures/expShow/base/gitLog'
-import orderFixture from '../../fixtures/expShow/base/order'
+import rowOrderFixture from '../../fixtures/expShow/base/rowOrder'
 import { customPlotsOrderFixture } from '../../fixtures/expShow/base/customPlots'
 import { Plots } from '../../../plots'
 import { buildMockMemento, dvcDemoPath } from '../../util'
@@ -29,7 +29,7 @@ export const buildPlots = async (
   expShow = expShowFixtureWithoutErrors,
   currentBranch = 'main',
   gitLog = gitLogFixture,
-  order = orderFixture
+  rowOrder = rowOrderFixture
 ) => {
   const { internalCommands, mockPlotsDiff, messageSpy, resourceLocator } =
     buildDependencies(disposer, expShow, plotsDiff)
@@ -76,7 +76,12 @@ export const buildPlots = async (
     { id: 'exp-f13bca' }
   ] as Experiment[])
 
-  void experiments.setState({ currentBranch, expShow, gitLog, order })
+  void experiments.setState({
+    currentBranch,
+    expShow,
+    gitLog,
+    rowOrder
+  })
 
   await plots.isReady()
 
