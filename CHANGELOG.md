@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.4] - 2023-06-04
+
+### 🐛 Bug Fixes
+
+- Fix "show toast on new install" logic [#4024](https://github.com/iterative/vscode-dvc/pull/4024) by [@julieg18](https://github.com/julieg18)
+- Fix pushing multiple experiments [#4028](https://github.com/iterative/vscode-dvc/pull/4028) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.9.3] - 2023-05-31
 
 ### 🚀 New Features and Enhancements
