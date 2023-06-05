@@ -52,17 +52,16 @@ export const TableContent: React.FC<TableContentProps> = ({
 
   return (
     <>
-      {branches.map((branch, branchIndex) => {
+      {branches.map(branch => {
         const branchRows = rows.filter(row => row.original.branch === branch)
 
         return (
           <Fragment key={`${branch || EXPERIMENT_WORKSPACE_ID}`}>
             {branchRows.map((row, i) => {
-              const isFirstRow =
-                (branchIndex === 0 && i === 1) || (branchIndex !== 0 && i === 0)
+              const isFirstBranchRow = branch && i === 0
               return (
                 <Fragment key={row.id}>
-                  {isFirstRow && branch && (
+                  {isFirstBranchRow && (
                     <BranchDivider branch={branch}>{branch}</BranchDivider>
                   )}
                   <TableBody
