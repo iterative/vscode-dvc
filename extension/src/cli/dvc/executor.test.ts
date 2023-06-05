@@ -318,6 +318,23 @@ describe('CliExecutor', () => {
         executable: 'dvc'
       })
     })
+
+    it('should call createProcess with the correct parameters to push multiple experiments to the remote', async () => {
+      const cwd = __dirname
+      const stdout = ''
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
+      const mockExperimentIds = ['toric-sail', 'couth-bean', 'arced-ibex']
+
+      const output = await dvcExecutor.expPush(cwd, ...mockExperimentIds)
+      expect(output).toStrictEqual(stdout)
+
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
+        args: ['exp', 'push', 'origin', ...mockExperimentIds],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
   })
 
   describe('expRemove', () => {
