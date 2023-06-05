@@ -40,7 +40,7 @@
     "eslint": "8.41.0",
     "eslint-config-prettier": "8.8.0",
     "eslint-config-prettier-standard": "4.0.1",
-    "eslint-config-standard": "17.0.0",
+    "eslint-config-standard": "17.1.0",
     "eslint-plugin-check-file": "2.3.0",
     "eslint-plugin-etc": "2.0.3",
     "eslint-plugin-import": "2.27.5",
