@@ -249,8 +249,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasMoreCommits to true if there are more commits to show', async () => {
-      stub(GitReader.prototype, 'getNumCommits').resolves(100)
       const { experiments, messageSpy } = buildExperiments({
+        availableNbCommits: { main: 404 },
         disposer: disposable
       })
 
@@ -262,8 +262,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasMoreCommits to false if there are more commits to show', async () => {
-      stub(GitReader.prototype, 'getNumCommits').resolves(1)
       const { experiments, messageSpy } = buildExperiments({
+        availableNbCommits: { main: 1 },
         disposer: disposable
       })
 
@@ -275,8 +275,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set isShowingMoreCommits to true if it is showing more than the current commit', async () => {
-      stub(GitReader.prototype, 'getNumCommits').resolves(100)
       const { experiments, messageSpy } = buildExperiments({
+        availableNbCommits: { main: 40000 },
         disposer: disposable
       })
 
@@ -289,8 +289,8 @@ suite('Experiments Test Suite', () => {
 
     it('should set isShowingMoreCommits to false it is showing only the current commit', async () => {
       stub(GitReader.prototype, 'getCurrentBranch').resolves('current')
-      stub(GitReader.prototype, 'getNumCommits').resolves(1)
       const { experiments, messageSpy } = buildExperiments({
+        availableNbCommits: { main: 1 },
         disposer: disposable
       })
 
@@ -1498,6 +1498,7 @@ suite('Experiments Test Suite', () => {
       )
 
       void experiments.setState({
+        availableNbCommits: { main: 20 },
         gitLog: '',
         expShow: data,
         rowOrder: [
@@ -1975,6 +1976,7 @@ suite('Experiments Test Suite', () => {
       )
 
       void experiments.setState({
+        availableNbCommits: { main: 20 },
         gitLog: '',
         expShow: defaultExperimentsData,
         rowOrder: []

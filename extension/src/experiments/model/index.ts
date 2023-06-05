@@ -62,6 +62,8 @@ export class ExperimentsModel extends ModelWithPersistence {
   private numberOfCommitsToShow: Record<string, number>
   private branchesToShow: string[] = []
   private availableBranchesToShow: string[] = []
+  private hasMoreCommits: { [branch: string]: boolean } = {}
+  private isShowingMoreCommits: { [branch: string]: boolean } = {}
 
   private filters: Map<string, FilterDefinition> = new Map()
 
@@ -115,7 +117,8 @@ export class ExperimentsModel extends ModelWithPersistence {
     expShow: ExpShowOutput,
     gitLog: string,
     dvcLiveOnly: boolean,
-    rowOrder: { branch: string; sha: string }[]
+    rowOrder: { branch: string; sha: string }[],
+    availableNbCommits: { [branch: string]: number }
   ) {
     const {
       workspace,
@@ -124,6 +127,18 @@ export class ExperimentsModel extends ModelWithPersistence {
       runningExperiments,
       hasCheckpoints
     } = collectExperiments(expShow, gitLog, dvcLiveOnly)
+
+    this.hasMoreCommits = {}
+    this.isShowingMoreCommits = {}
+
+    for (const [branch, availableCommits] of Object.entries(
+      availableNbCommits
+    )) {
+      const nbOfCommitsToShow = this.getNbOfCommitsToShow(branch)
+      this.hasMoreCommits[branch] = availableCommits > nbOfCommitsToShow
+      this.isShowingMoreCommits[branch] =
+        Math.min(nbOfCommitsToShow, availableCommits) > 1
+    }
 
     commits.sort((a, b) => (b.Created || '').localeCompare(a.Created || ''))
 
@@ -381,6 +396,14 @@ export class ExperimentsModel extends ModelWithPersistence {
         }
       })
     ]
+  }
+
+  public getHasMoreCommits() {
+    return this.hasMoreCommits
+  }
+
+  public getIsShowingMoreCommits() {
+    return this.isShowingMoreCommits
   }
 
   public isSelected(id: string) {

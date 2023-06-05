@@ -138,6 +138,7 @@ suite('Plots Test Suite', () => {
 
       bypassProcessManagerDebounce(mockNow)
       void experiments.setState({
+        availableNbCommits: { main: 6 },
         expShow: updatedExpShowFixture,
         gitLog: newCommit + COMMITS_SEPARATOR + gitLogFixture,
         rowOrder: [{ branch: 'main', sha: newCommit }, ...rowOrderFixture]

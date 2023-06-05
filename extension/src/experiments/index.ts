@@ -168,12 +168,23 @@ export class Experiments extends BaseRepository<TableData> {
     return this.data.managedUpdate()
   }
 
-  public async setState({ expShow, gitLog, rowOrder }: ExperimentsOutput) {
+  public async setState({
+    availableNbCommits,
+    expShow,
+    gitLog,
+    rowOrder
+  }: ExperimentsOutput) {
     const hadCheckpoints = this.hasCheckpoints()
     const dvcLiveOnly = await this.checkSignalFile()
     await Promise.all([
       this.columns.transformAndSet(expShow),
-      this.experiments.transformAndSet(expShow, gitLog, dvcLiveOnly, rowOrder)
+      this.experiments.transformAndSet(
+        expShow,
+        gitLog,
+        dvcLiveOnly,
+        rowOrder,
+        availableNbCommits
+      )
     ])
 
     if (hadCheckpoints !== this.hasCheckpoints()) {
@@ -551,12 +562,6 @@ export class Experiments extends BaseRepository<TableData> {
         ),
       () => this.addStage(),
       (branchesSelected: string[]) => this.selectBranches(branchesSelected),
-      (branch: string) =>
-        this.internalCommands.executeCommand<number>(
-          AvailableCommands.GIT_GET_NUM_COMMITS,
-          this.dvcRoot,
-          branch
-        ),
       () => this.data.update()
     )
 

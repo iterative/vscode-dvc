@@ -37,15 +37,12 @@ export class WebviewMessages {
 
   private hasConfig = false
   private hasValidDvcYaml = true
-  private hasMoreCommits: Record<string, boolean> = {}
-  private isShowingMoreCommits: Record<string, boolean> = {}
 
   private readonly addStage: () => Promise<boolean>
   private readonly selectBranches: (
     branchesSelected: string[]
   ) => Promise<string[] | undefined>
 
-  private readonly getNumCommits: (branch: string) => Promise<number>
   private readonly update: () => Promise<void>
 
   constructor(
@@ -60,7 +57,6 @@ export class WebviewMessages {
     selectBranches: (
       branchesSelected: string[]
     ) => Promise<string[] | undefined>,
-    getNumCommits: (branch: string) => Promise<number>,
     update: () => Promise<void>
   ) {
     this.dvcRoot = dvcRoot
@@ -72,11 +68,9 @@ export class WebviewMessages {
     this.hasStages = hasStages
     this.addStage = addStage
     this.selectBranches = selectBranches
-    this.getNumCommits = getNumCommits
     this.update = update
 
     void this.changeHasConfig()
-    void this.changeHasMoreOrLessCommits()
   }
 
   public async changeHasConfig(update?: boolean) {
@@ -86,10 +80,7 @@ export class WebviewMessages {
     update && this.sendWebviewMessage()
   }
 
-  public sendWebviewMessage(doNotCheckNbCommits?: boolean) {
-    if (!doNotCheckNbCommits) {
-      void this.changeHasMoreOrLessCommits(true)
-    }
+  public sendWebviewMessage() {
     const webview = this.getWebview()
     void webview?.show(this.getWebviewData())
   }
@@ -233,19 +224,6 @@ export class WebviewMessages {
     )
     this.experiments.setBranchesToShow(selectedBranches)
     await this.update()
-    await this.changeHasMoreOrLessCommits(true)
-  }
-
-  private async changeHasMoreOrLessCommits(update?: boolean) {
-    for (const branch of this.experiments.getBranchesToShow()) {
-      const availableNbCommits = await this.getNumCommits(branch)
-      const nbOfCommitsToShow = this.experiments.getNbOfCommitsToShow(branch)
-      this.hasMoreCommits[branch] = availableNbCommits > nbOfCommitsToShow
-      this.isShowingMoreCommits[branch] =
-        Math.min(nbOfCommitsToShow, availableNbCommits) > 1
-    }
-
-    update && this.sendWebviewMessage(true)
   }
 
   private async changeCommitsToShow(change: 1 | -1, branch: string) {
@@ -262,7 +240,6 @@ export class WebviewMessages {
       branch
     )
     await this.update()
-    await this.changeHasMoreOrLessCommits(true)
   }
 
   private getWebviewData() {
@@ -278,11 +255,11 @@ export class WebviewMessages {
       hasCheckpoints: this.experiments.hasCheckpoints(),
       hasColumns: this.columns.hasNonDefaultColumns(),
       hasConfig: this.hasConfig,
-      hasMoreCommits: this.hasMoreCommits,
+      hasMoreCommits: this.experiments.getHasMoreCommits(),
       hasRunningWorkspaceExperiment:
         this.experiments.hasRunningWorkspaceExperiment(),
       hasValidDvcYaml: this.hasValidDvcYaml,
-      isShowingMoreCommits: this.isShowingMoreCommits,
+      isShowingMoreCommits: this.experiments.getIsShowingMoreCommits(),
       rows: this.experiments.getRowData(),
       selectedForPlotsCount: this.experiments.getSelectedRevisions().length,
       sorts: this.experiments.getSorts()

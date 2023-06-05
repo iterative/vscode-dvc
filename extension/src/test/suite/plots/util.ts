@@ -28,12 +28,14 @@ import { ErrorsModel } from '../../../plots/errors/model'
 import { PersistenceKey } from '../../../persistence/constants'
 
 export const buildPlots = async ({
+  availableNbCommits = { main: 5 },
   disposer,
   plotsDiff = undefined,
   expShow = expShowFixtureWithoutErrors,
   gitLog = gitLogFixture,
   rowOrder = rowOrderFixture
 }: {
+  availableNbCommits?: { [branch: string]: number }
   disposer: Disposer
   plotsDiff?: PlotsOutput | undefined
   expShow?: ExpShowOutput
@@ -86,6 +88,7 @@ export const buildPlots = async ({
   ] as Experiment[])
 
   void experiments.setState({
+    availableNbCommits,
     expShow,
     gitLog,
     rowOrder
