@@ -33,6 +33,12 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
+const DEFAULT_DATA: [string, boolean, { branch: string; sha: string }[]] = [
+  '',
+  false,
+  []
+]
+
 describe('ExperimentsModel', () => {
   it('should return the expected rows when given the base fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
@@ -87,7 +93,7 @@ describe('ExperimentsModel', () => {
     expect(runningWorkspace?.executor).toStrictEqual(EXPERIMENT_WORKSPACE_ID)
     expect(runningWorkspace?.status).toStrictEqual(ExperimentStatus.RUNNING)
 
-    model.transformAndSet(dvcLiveOnly, '', false, [])
+    model.transformAndSet(dvcLiveOnly, ...DEFAULT_DATA)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const stoppedWorkspace = (model as any).workspace
     expect(stoppedWorkspace?.executor).toBeFalsy()
@@ -146,7 +152,7 @@ describe('ExperimentsModel', () => {
       }
     )
 
-    model.transformAndSet(data, '', false, [])
+    model.transformAndSet(data, ...DEFAULT_DATA)
 
     const experiments = model.getCombinedList()
 
@@ -165,7 +171,7 @@ describe('ExperimentsModel', () => {
 
   it('should handle deps have all null properties (never been committed)', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(uncommittedDepsFixture, '', false, [])
+    model.transformAndSet(uncommittedDepsFixture, ...DEFAULT_DATA)
     const [workspace] = model.getWorkspaceAndCommits()
     expect(workspace.deps).toStrictEqual({})
   })
@@ -219,7 +225,7 @@ describe('ExperimentsModel', () => {
       ]
     })
 
-    experimentsModel.transformAndSet(data, '', false, [])
+    experimentsModel.transformAndSet(data, ...DEFAULT_DATA)
 
     experimentsModel.setSelected([
       { id: 'exp-1' },
@@ -282,7 +288,7 @@ describe('ExperimentsModel', () => {
     )
 
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(data, '', false, [])
+    model.transformAndSet(data, ...DEFAULT_DATA)
 
     expect(model.getSelectedRevisions().map(({ id }) => id)).toStrictEqual([
       runningExpName
@@ -305,7 +311,7 @@ describe('ExperimentsModel', () => {
 
   it('should fetch commit params', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, '', false, [])
+    model.transformAndSet(outputFixture, ...DEFAULT_DATA)
 
     const commitParams = model.getExperimentParams('main')
     expect(definedAndNonEmpty(commitParams)).toBe(true)
@@ -313,7 +319,7 @@ describe('ExperimentsModel', () => {
 
   it('should fetch workspace params', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, '', false, [])
+    model.transformAndSet(outputFixture, ...DEFAULT_DATA)
 
     const workspaceParams = model.getExperimentParams(EXPERIMENT_WORKSPACE_ID)
     expect(definedAndNonEmpty(workspaceParams)).toBe(true)
@@ -321,7 +327,7 @@ describe('ExperimentsModel', () => {
 
   it("should fetch an experiment's params", () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, '', false, [])
+    model.transformAndSet(outputFixture, ...DEFAULT_DATA)
 
     const experimentParams = model.getExperimentParams('exp-e7a67')
     expect(definedAndNonEmpty(experimentParams)).toBe(true)
@@ -329,7 +335,7 @@ describe('ExperimentsModel', () => {
 
   it("should fetch an empty array if the experiment's params cannot be found", () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, '', false, [])
+    model.transformAndSet(outputFixture, ...DEFAULT_DATA)
 
     const noParams = model.getExperimentParams('not-an-experiment')
     expect(definedAndNonEmpty(noParams)).toBe(false)

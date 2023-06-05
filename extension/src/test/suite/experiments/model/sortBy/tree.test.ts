@@ -104,13 +104,15 @@ suite('Experiments Sort By Tree Test Suite', () => {
     it('should be able to properly add and remove sorts with a variety of commands', async () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
 
-      const { experiments, messageSpy } = buildExperiments(
-        disposable,
-        data,
-        dvcDemoPath,
-        '',
-        [{ branch: 'main', sha: '2d879497587b80b2d9e61f072d9dbe9c07a65357' }]
-      )
+      const { experiments, messageSpy } = buildExperiments({
+        disposer: disposable,
+        dvcRoot: dvcDemoPath,
+        expShow: data,
+        gitLog: '',
+        rowOrder: [
+          { branch: 'main', sha: '2d879497587b80b2d9e61f072d9dbe9c07a65357' }
+        ]
+      })
 
       await experiments.isReady()
       await experiments.showWebview()
@@ -282,7 +284,9 @@ suite('Experiments Sort By Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should provide a shortcut to sort by starred experiments', async () => {
-      const { experiments, experimentsModel } = buildExperiments(disposable)
+      const { experiments, experimentsModel } = buildExperiments({
+        disposer: disposable
+      })
 
       await experiments.isReady()
 

@@ -18,14 +18,27 @@ import { ExperimentsModel } from '../../../experiments/model'
 import { ColumnsModel } from '../../../experiments/columns/model'
 import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../../cli/dvc/constants'
 import { PersistenceKey } from '../../../persistence/constants'
+import { ExpShowOutput } from '../../../cli/dvc/contract'
 
-export const buildExperiments = (
-  disposer: Disposer,
-  expShow = expShowFixture,
+export const DEFAULT_EXPERIMENTS_OUTPUT = {
+  expShow: expShowFixture,
+  gitLog: gitLogFixture,
+  rowOrder: rowOrderFixture
+}
+
+export const buildExperiments = ({
+  disposer,
   dvcRoot = dvcDemoPath,
+  expShow = expShowFixture,
   gitLog = gitLogFixture,
   rowOrder = rowOrderFixture
-) => {
+}: {
+  disposer: Disposer
+  dvcRoot?: string
+  expShow?: ExpShowOutput
+  gitLog?: string
+  rowOrder?: { branch: string; sha: string }[]
+}) => {
   const {
     dvcExecutor,
     dvcReader,
@@ -102,7 +115,11 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
     gitReader,
     messageSpy,
     resourceLocator
-  } = buildExperiments(disposer, expShowFixture, 'other/dvc/root')
+  } = buildExperiments({
+    disposer,
+    dvcRoot: 'other/dvc/root',
+    expShow: expShowFixture
+  })
 
   stub(gitReader, 'getGitRepositoryRoot').resolves(dvcDemoPath)
   const workspaceExperiments = disposer.track(
@@ -115,11 +132,7 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
     resourceLocator
   )
 
-  void experiments.setState({
-    expShow: expShowFixture,
-    gitLog: gitLogFixture,
-    rowOrder: rowOrderFixture
-  })
+  void experiments.setState(DEFAULT_EXPERIMENTS_OUTPUT)
   return { experiments, internalCommands, messageSpy, workspaceExperiments }
 }
 
@@ -136,11 +149,7 @@ export const buildSingleRepoExperiments = (disposer: SafeWatcherDisposer) => {
     resourceLocator
   )
 
-  void experiments.setState({
-    expShow: expShowFixture,
-    gitLog: gitLogFixture,
-    rowOrder: rowOrderFixture
-  })
+  void experiments.setState(DEFAULT_EXPERIMENTS_OUTPUT)
 
   return {
     config,

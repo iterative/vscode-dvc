@@ -63,7 +63,9 @@ suite('Experiments Filter By Tree Test Suite', () => {
     it('should be able to update the table data by adding and removing a filter', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('train')
 
-      const { experiments, messageSpy } = buildExperiments(disposable)
+      const { experiments, messageSpy } = buildExperiments({
+        disposer: disposable
+      })
 
       await experiments.isReady()
       await experiments.showWebview()
@@ -141,7 +143,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockShowInputBox = stub(window, 'showInputBox')
 
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
 
       await experiments.isReady()
 
@@ -258,7 +260,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
     it('should update the description when a filter is added or removed', async () => {
       const { experiments, experimentsModel, internalCommands } =
-        buildExperiments(disposable)
+        buildExperiments({ disposer: disposable })
       await experiments.isReady()
 
       const workspaceExperiments = disposable.track(
@@ -342,7 +344,9 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
     it('should be able to filter to starred experiments', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('train')
-      const { experiments, messageSpy } = buildExperiments(disposable)
+      const { experiments, messageSpy } = buildExperiments({
+        disposer: disposable
+      })
 
       await experiments.isReady()
       await experiments.showWebview()
@@ -376,7 +380,9 @@ suite('Experiments Filter By Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should provide a shortcut to filter to starred experiments', async () => {
-      const { experiments, experimentsModel } = buildExperiments(disposable)
+      const { experiments, experimentsModel } = buildExperiments({
+        disposer: disposable
+      })
 
       await experiments.isReady()
 

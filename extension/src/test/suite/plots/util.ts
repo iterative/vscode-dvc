@@ -19,17 +19,27 @@ import { BaseWorkspaceWebviews } from '../../../webview/workspace'
 import { WebviewMessages } from '../../../plots/webview/messages'
 import { ExperimentsModel } from '../../../experiments/model'
 import { Experiment } from '../../../experiments/webview/contract'
-import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../../cli/dvc/contract'
+import {
+  EXPERIMENT_WORKSPACE_ID,
+  ExpShowOutput,
+  PlotsOutput
+} from '../../../cli/dvc/contract'
 import { ErrorsModel } from '../../../plots/errors/model'
 import { PersistenceKey } from '../../../persistence/constants'
 
-export const buildPlots = async (
-  disposer: Disposer,
-  plotsDiff: PlotsOutput | undefined = undefined,
+export const buildPlots = async ({
+  disposer,
+  plotsDiff = undefined,
   expShow = expShowFixtureWithoutErrors,
   gitLog = gitLogFixture,
   rowOrder = rowOrderFixture
-) => {
+}: {
+  disposer: Disposer
+  plotsDiff?: PlotsOutput | undefined
+  expShow?: ExpShowOutput
+  gitLog?: string
+  rowOrder?: { branch: string; sha: string }[]
+}) => {
   const { internalCommands, mockPlotsDiff, messageSpy, resourceLocator } =
     buildDependencies(disposer, expShow, plotsDiff)
 

@@ -25,7 +25,10 @@ suite('Workspace Plots Test Suite', () => {
 
   describe('dvc.views.plots.addCustomPlot', () => {
     it('should be able to add a custom plot', async () => {
-      const { plotsModel } = await buildPlots(disposable, plotsDiffFixture)
+      const { plotsModel } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
 
       const mockGetMetricAndParam = stub(
         customPlotQuickPickUtil,
@@ -51,7 +54,10 @@ suite('Workspace Plots Test Suite', () => {
     })
 
     it('should not add a custom plot if user cancels', async () => {
-      const { plotsModel } = await buildPlots(disposable, plotsDiffFixture)
+      const { plotsModel } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
       const mockGetMetricAndParam = stub(
         customPlotQuickPickUtil,
         'pickMetricAndParam'
@@ -70,7 +76,10 @@ suite('Workspace Plots Test Suite', () => {
 
   describe('dvc.views.plots.removeCustomPlots', () => {
     it('should be able to remove a custom plot', async () => {
-      const { plotsModel } = await buildPlots(disposable, plotsDiffFixture)
+      const { plotsModel } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
 
       const mockSelectCustomPlots = stub(
         customPlotQuickPickUtil,
@@ -97,7 +106,10 @@ suite('Workspace Plots Test Suite', () => {
     })
 
     it('should not remove a custom plot if the user cancels', async () => {
-      const { plotsModel } = await buildPlots(disposable, plotsDiffFixture)
+      const { plotsModel } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
 
       const mockSelectCustomPlots = stub(
         customPlotQuickPickUtil,

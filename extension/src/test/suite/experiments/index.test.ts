@@ -12,11 +12,13 @@ import {
   ViewColumn,
   CancellationToken
 } from 'vscode'
-import { buildExperiments, stubWorkspaceExperimentsGetters } from './util'
+import {
+  DEFAULT_EXPERIMENTS_OUTPUT,
+  buildExperiments,
+  stubWorkspaceExperimentsGetters
+} from './util'
 import { Disposable } from '../../../extension'
 import expShowFixture from '../../fixtures/expShow/base/output'
-import gitLogFixture from '../../fixtures/expShow/base/gitLog'
-import rowOrderFixture from '../../fixtures/expShow/base/rowOrder'
 import rowsFixture from '../../fixtures/expShow/base/rows'
 import columnsFixture, {
   dataColumnOrder as columnsOrderFixture
@@ -103,7 +105,7 @@ suite('Experiments Test Suite', () => {
 
   describe('getExperiments', () => {
     it('should return the workspace and commit (HEAD revision)', async () => {
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
 
       await experiments.isReady()
 
@@ -119,7 +121,9 @@ suite('Experiments Test Suite', () => {
     it('should be able to make the experiment webview visible', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('train')
 
-      const { experiments, messageSpy } = buildExperiments(disposable)
+      const { experiments, messageSpy } = buildExperiments({
+        disposer: disposable
+      })
 
       const webview = await experiments.showWebview()
 
@@ -146,7 +150,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should only be able to open a single experiments webview', async () => {
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
 
       const windowSpy = spy(window, 'createWebviewPanel')
       const document = await openFileInEditor(resolve(dvcDemoPath, 'train.py'))
@@ -173,7 +177,9 @@ suite('Experiments Test Suite', () => {
       stub(DvcReader.prototype, 'listStages').resolves(undefined)
       stub(FileSystem, 'hasDvcYamlFile').returns(true)
 
-      const { experiments, messageSpy } = buildExperiments(disposable)
+      const { experiments, messageSpy } = buildExperiments({
+        disposer: disposable
+      })
 
       await experiments.showWebview()
 
@@ -186,7 +192,9 @@ suite('Experiments Test Suite', () => {
       stub(DvcReader.prototype, 'listStages').resolves(undefined)
       stub(FileSystem, 'hasDvcYamlFile').returns(false)
 
-      const { experiments, messageSpy } = buildExperiments(disposable)
+      const { experiments, messageSpy } = buildExperiments({
+        disposer: disposable
+      })
 
       await experiments.showWebview()
 
@@ -201,7 +209,9 @@ suite('Experiments Test Suite', () => {
       stub(DvcReader.prototype, 'listStages').resolves('')
       stub(FileSystem, 'hasDvcYamlFile').returns(false)
 
-      const { experiments, messageSpy } = buildExperiments(disposable)
+      const { experiments, messageSpy } = buildExperiments({
+        disposer: disposable
+      })
 
       await experiments.showWebview()
 
@@ -213,7 +223,9 @@ suite('Experiments Test Suite', () => {
     it('should set hasConfig to false if there are no stages', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('')
 
-      const { experiments, messageSpy } = buildExperiments(disposable)
+      const { experiments, messageSpy } = buildExperiments({
+        disposer: disposable
+      })
 
       await experiments.showWebview()
 
@@ -225,7 +237,9 @@ suite('Experiments Test Suite', () => {
     it('should set hasConfig to true if there are stages', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('train')
 
-      const { experiments, messageSpy } = buildExperiments(disposable)
+      const { experiments, messageSpy } = buildExperiments({
+        disposer: disposable
+      })
 
       await experiments.showWebview()
 
@@ -236,7 +250,9 @@ suite('Experiments Test Suite', () => {
 
     it('should set hasMoreCommits to true if there are more commits to show', async () => {
       stub(GitReader.prototype, 'getNumCommits').resolves(100)
-      const { experiments, messageSpy } = buildExperiments(disposable)
+      const { experiments, messageSpy } = buildExperiments({
+        disposer: disposable
+      })
 
       await experiments.showWebview()
 
@@ -247,7 +263,9 @@ suite('Experiments Test Suite', () => {
 
     it('should set hasMoreCommits to false if there are more commits to show', async () => {
       stub(GitReader.prototype, 'getNumCommits').resolves(1)
-      const { experiments, messageSpy } = buildExperiments(disposable)
+      const { experiments, messageSpy } = buildExperiments({
+        disposer: disposable
+      })
 
       await experiments.showWebview()
 
@@ -258,7 +276,9 @@ suite('Experiments Test Suite', () => {
 
     it('should set isShowingMoreCommits to true if it is showing more than the current commit', async () => {
       stub(GitReader.prototype, 'getNumCommits').resolves(100)
-      const { experiments, messageSpy } = buildExperiments(disposable)
+      const { experiments, messageSpy } = buildExperiments({
+        disposer: disposable
+      })
 
       await experiments.showWebview()
 
@@ -270,7 +290,9 @@ suite('Experiments Test Suite', () => {
     it('should set isShowingMoreCommits to false it is showing only the current commit', async () => {
       stub(GitReader.prototype, 'getCurrentBranch').resolves('current')
       stub(GitReader.prototype, 'getNumCommits').resolves(1)
-      const { experiments, messageSpy } = buildExperiments(disposable)
+      const { experiments, messageSpy } = buildExperiments({
+        disposer: disposable
+      })
 
       await experiments.showWebview()
 
@@ -298,7 +320,7 @@ suite('Experiments Test Suite', () => {
         messageSpy,
         mockUpdateExperimentsData,
         mockSelectBranches
-      } = buildExperiments(disposable, expShowFixture)
+      } = buildExperiments({ disposer: disposable, expShow: expShowFixture })
       const mockExecuteCommand = stub(
         internalCommands,
         'executeCommand'
@@ -331,7 +353,7 @@ suite('Experiments Test Suite', () => {
     }
 
     it('should handle a column reordered message from the webview', async () => {
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
 
       const webview = await experiments.showWebview()
 
@@ -373,7 +395,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a column resized message from the webview', async () => {
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
 
       const webview = await experiments.showWebview()
 
@@ -407,7 +429,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a column sorted message from the webview', async () => {
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
 
       const webview = await experiments.showWebview()
 
@@ -442,7 +464,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a column sort removed from the webview', async () => {
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
 
       const webview = await experiments.showWebview()
 
@@ -477,7 +499,9 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to hide a table column', async () => {
-      const { experiments, columnsModel } = buildExperiments(disposable)
+      const { experiments, columnsModel } = buildExperiments({
+        disposer: disposable
+      })
 
       const mockUnselect = stub(columnsModel, 'unselect')
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
@@ -545,7 +569,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to apply an experiment', async () => {
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
       await experiments.isReady()
 
       const webview = await experiments.showWebview()
@@ -572,7 +596,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to create a branch from an experiment', async () => {
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
       await experiments.isReady()
 
       const mockBranch = 'mock-branch-input'
@@ -604,7 +628,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to show the logs of an experiment', async () => {
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
       await experiments.isReady()
 
       const mockExpId = 'exp-e7a67'
@@ -637,7 +661,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to push an experiment', async () => {
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
       await experiments.isReady()
 
       const mockExpId = 'exp-e7a67'
@@ -727,7 +751,9 @@ suite('Experiments Test Suite', () => {
 
     it("should be able to handle a message to modify an experiment's params and queue an experiment", async () => {
       stub(DvcReader.prototype, 'listStages').resolves('train')
-      const { experiments, dvcExecutor } = buildExperiments(disposable)
+      const { experiments, dvcExecutor } = buildExperiments({
+        disposer: disposable
+      })
 
       const mockModifiedParams = [
         '-S',
@@ -763,7 +789,9 @@ suite('Experiments Test Suite', () => {
 
     it("should be able to handle a message to modify an experiment's params and run a new experiment", async () => {
       stub(DvcReader.prototype, 'listStages').resolves('train')
-      const { experiments, dvcRunner } = buildExperiments(disposable)
+      const { experiments, dvcRunner } = buildExperiments({
+        disposer: disposable
+      })
 
       const mockModifiedParams = [
         '-S',
@@ -801,7 +829,9 @@ suite('Experiments Test Suite', () => {
 
     it("should be able to handle a message to modify an experiment's params reset and run a new experiment", async () => {
       stub(DvcReader.prototype, 'listStages').resolves('train')
-      const { experiments, dvcRunner } = buildExperiments(disposable)
+      const { experiments, dvcRunner } = buildExperiments({
+        disposer: disposable
+      })
 
       const mockModifiedParams = [
         '-S',
@@ -838,7 +868,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to remove an experiment', async () => {
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -862,7 +892,9 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to toggle an experiment's status", async () => {
-      const { experiments, experimentsModel } = buildExperiments(disposable)
+      const { experiments, experimentsModel } = buildExperiments({
+        disposer: disposable
+      })
 
       await experiments.isReady()
 
@@ -992,7 +1024,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to focus the sorts tree', async () => {
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
 
       const webview = await experiments.showWebview()
 
@@ -1025,7 +1057,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to focus the filters tree', async () => {
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
 
       const webview = await experiments.showWebview()
 
@@ -1058,7 +1090,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to update the table depth', async () => {
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
       const inputEvent = getInputBoxEvent('0')
       const tableMaxDepthChanged = configurationChangeEvent(
         ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT,
@@ -1150,7 +1182,9 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to select experiments for plotting', async () => {
-      const { experiments, experimentsModel } = buildExperiments(disposable)
+      const { experiments, experimentsModel } = buildExperiments({
+        disposer: disposable
+      })
       await experiments.isReady()
 
       const webview = await experiments.showWebview()
@@ -1187,7 +1221,9 @@ suite('Experiments Test Suite', () => {
         dvc: true,
         experiments: true
       })
-      const { experiments, experimentsModel } = buildExperiments(disposable)
+      const { experiments, experimentsModel } = buildExperiments({
+        disposer: disposable
+      })
       const mockShowPlots = stub(WorkspacePlots.prototype, 'showWebview')
 
       const dataSent = new Promise(resolve =>
@@ -1225,7 +1261,9 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to stop experiments running', async () => {
-      const { experiments, dvcExecutor } = buildExperiments(disposable)
+      const { experiments, dvcExecutor } = buildExperiments({
+        disposer: disposable
+      })
       const mockQueueKill = stub(dvcExecutor, 'queueKill')
       const mockStopProcesses = stub(ProcessExecution, 'stopProcesses')
 
@@ -1596,11 +1634,7 @@ suite('Experiments Test Suite', () => {
           buildMockExperimentsData()
         )
       )
-      void testRepository.setState({
-        gitLog: gitLogFixture,
-        expShow: expShowFixture,
-        rowOrder: rowOrderFixture
-      })
+      void testRepository.setState(DEFAULT_EXPERIMENTS_OUTPUT)
       await testRepository.isReady()
       expect(
         mementoSpy,
@@ -1761,11 +1795,7 @@ suite('Experiments Test Suite', () => {
           buildMockExperimentsData()
         )
       )
-      void testRepository.setState({
-        gitLog: gitLogFixture,
-        expShow: expShowFixture,
-        rowOrder: rowOrderFixture
-      })
+      void testRepository.setState(DEFAULT_EXPERIMENTS_OUTPUT)
       await testRepository.isReady()
 
       expect(mementoSpy).to.be.calledWith('experimentsSortBy:test', [])
@@ -1825,7 +1855,7 @@ suite('Experiments Test Suite', () => {
         return Promise.resolve(undefined)
       })
 
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
       await experiments.isReady()
 
       expect(
@@ -1874,7 +1904,7 @@ suite('Experiments Test Suite', () => {
 
       const setContextValueSpy = spy(VscodeContext, 'setContextValue')
 
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
       await experiments.isReady()
 
       expect(setContextValueSpy).not.to.be.called
@@ -1885,13 +1915,13 @@ suite('Experiments Test Suite', () => {
     it('should not show any experiments in the experiments tree when there are no columns', async () => {
       const rev = 'b9f016df00d499f6d2a73e7dc34d1600c78066eb'
       const data = generateTestExpShowOutput({}, { rev })
-      const { experiments } = buildExperiments(
-        disposable,
-        data,
-        dvcDemoPath,
-        '',
-        [{ sha: rev, branch: 'funkyBranch' }]
-      )
+      const { experiments } = buildExperiments({
+        disposer: disposable,
+        expShow: data,
+        dvcRoot: dvcDemoPath,
+        gitLog: '',
+        rowOrder: [{ sha: rev, branch: 'funkyBranch' }]
+      })
       await experiments.isReady()
 
       expect(
@@ -1910,13 +1940,13 @@ suite('Experiments Test Suite', () => {
       const defaultExperimentsData = generateTestExpShowOutput({})
 
       const { experiments, mockCheckSignalFile, mockUpdateExperimentsData } =
-        buildExperiments(
-          disposable,
-          defaultExperimentsData,
-          dvcDemoPath,
-          '',
-          []
-        )
+        buildExperiments({
+          disposer: disposable,
+          expShow: defaultExperimentsData,
+          dvcRoot: dvcDemoPath,
+          gitLog: '',
+          rowOrder: []
+        })
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const getCleanupInitialized = (experiments: any) =>
