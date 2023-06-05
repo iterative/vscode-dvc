@@ -2,6 +2,7 @@ import { Memento } from 'vscode'
 import { SortDefinition, sortExperiments } from './sortBy'
 import { FilterDefinition, filterExperiment, getFilterId } from './filterBy'
 import {
+  collectAddRemoveCommitsDetails,
   collectExperiments,
   collectOrderedCommitsAndExperiments,
   collectRunningInQueue,
@@ -128,17 +129,13 @@ export class ExperimentsModel extends ModelWithPersistence {
       hasCheckpoints
     } = collectExperiments(expShow, gitLog, dvcLiveOnly)
 
-    this.hasMoreCommits = {}
-    this.isShowingMoreCommits = {}
+    const { hasMoreCommits, isShowingMoreCommits } =
+      collectAddRemoveCommitsDetails(availableNbCommits, (branch: string) =>
+        this.getNbOfCommitsToShow(branch)
+      )
 
-    for (const [branch, availableCommits] of Object.entries(
-      availableNbCommits
-    )) {
-      const nbOfCommitsToShow = this.getNbOfCommitsToShow(branch)
-      this.hasMoreCommits[branch] = availableCommits > nbOfCommitsToShow
-      this.isShowingMoreCommits[branch] =
-        Math.min(nbOfCommitsToShow, availableCommits) > 1
-    }
+    this.hasMoreCommits = hasMoreCommits
+    this.isShowingMoreCommits = isShowingMoreCommits
 
     commits.sort((a, b) => (b.Created || '').localeCompare(a.Created || ''))
 
