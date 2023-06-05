@@ -1,7 +1,10 @@
 import { EventEmitter, Memento } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import { Experiments, ModifiedExperimentAndRunCommandId } from '.'
-import { getPushExperimentCommand } from './commands'
+import {
+  getBranchExperimentCommand,
+  getPushExperimentCommand
+} from './commands'
 import { TableData } from './webview/contract'
 import { Args } from '../cli/dvc/constants'
 import {
@@ -248,10 +251,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     }
   }
 
-  public async getCwdExpNameAndInputThenRun(
-    runCommand: (cwd: string, ...args: Args) => Promise<void>,
-    title: Title
-  ) {
+  public async createExperimentBranch() {
     const cwd = await this.shouldRun()
     if (!cwd) {
       return
@@ -262,15 +262,22 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     if (!experimentId) {
       return
     }
-    return this.getInputAndRun(runCommand, title, cwd, experimentId)
+    return this.getInputAndRun(
+      getBranchExperimentCommand(this),
+      Title.ENTER_BRANCH_NAME,
+      `${experimentId}-branch`,
+      cwd,
+      experimentId
+    )
   }
 
   public async getInputAndRun(
     runCommand: (...args: Args) => Promise<void> | void,
     title: Title,
+    defaultValue: string,
     ...args: Args
   ) {
-    const input = await getInput(title)
+    const input = await getInput(title, defaultValue)
     if (!input) {
       return
     }
