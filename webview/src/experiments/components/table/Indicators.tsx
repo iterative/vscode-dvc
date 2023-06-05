@@ -88,7 +88,7 @@ export const Indicators = () => {
   )
   const branchesSelected = useSelector(
     (state: ExperimentsState) =>
-      Math.max(state.tableData.branches.length - 1, 0) // We always have one branch by default (the current one which is not selected)
+      Math.max(state.tableData.branches.filter(Boolean).length - 1, 0) // We always have one branch by default (the current one which is not selected) and undefined for the workspace
   )
 
   const { hasBranchesToSelect } = useSelector(
@@ -141,11 +141,11 @@ export const Indicators = () => {
         count={branchesSelected}
         aria-label="branches"
         onClick={selectBranches}
-        tooltipContent={formatCountMessage(
-          'Branches',
+        tooltipContent={`${branchesSelected || 'No'} ${pluralize(
+          'Branch',
           branchesSelected,
-          'Selected'
-        )}
+          'es'
+        )} Selected`}
         disabled={!hasBranchesToSelect}
       >
         <Icon width={16} height={16} icon={GitMerge} />

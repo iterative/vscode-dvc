@@ -38,10 +38,10 @@ suite('Plots Paths Tree Test Suite', () => {
 
     it('should be able to toggle whether a plot is selected with dvc.views.plotsPathsTree.toggleStatus', async () => {
       const [path] = Object.keys(plotsDiffFixture.data)
-      const { plots, messageSpy } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
+      const { plots, messageSpy } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
 
       await plots.showWebview()
 
@@ -80,10 +80,10 @@ suite('Plots Paths Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to select / de-select plots using dvc.views.plotsPathsTree.selectPlots', async () => {
-      const { plots, messageSpy } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
+      const { plots, messageSpy } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
 
       await plots.showWebview()
       messageSpy.resetHistory()
@@ -131,10 +131,10 @@ suite('Plots Paths Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to refresh revision data for all plots using dvc.views.plots.refreshPlots', async () => {
-      const { data, mockPlotsDiff, plots } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
+      const { data, mockPlotsDiff, plots } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
 
       await plots.showWebview()
 

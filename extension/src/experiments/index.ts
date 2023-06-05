@@ -33,7 +33,7 @@ import { DecorationProvider } from './model/decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
 import { ResourceLocator } from '../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { EXPERIMENT_WORKSPACE_ID, ExpShowOutput } from '../cli/dvc/contract'
+import { ExperimentsOutput } from '../data'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Title } from '../vscode/title'
@@ -43,7 +43,6 @@ import { Toast } from '../vscode/toast'
 import { ConfigKey } from '../vscode/config'
 import { checkSignalFile, pollSignalFileForProcess } from '../fileSystem'
 import { DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
-import { COMMITS_SEPARATOR } from '../cli/git/constants'
 
 export const ExperimentsScale = {
   ...omit(ColumnType, 'TIMESTAMP'),
@@ -169,13 +168,12 @@ export class Experiments extends BaseRepository<TableData> {
     return this.data.managedUpdate()
   }
 
-  public async setState(data: ExpShowOutput) {
+  public async setState({ expShow, gitLog, rowOrder }: ExperimentsOutput) {
     const hadCheckpoints = this.hasCheckpoints()
     const dvcLiveOnly = await this.checkSignalFile()
-    const commitsOutput = await this.getCommitOutput(data)
     await Promise.all([
-      this.columns.transformAndSet(data),
-      this.experiments.transformAndSet(data, dvcLiveOnly, commitsOutput)
+      this.columns.transformAndSet(expShow),
+      this.experiments.transformAndSet(expShow, gitLog, dvcLiveOnly, rowOrder)
     ])
 
     if (hadCheckpoints !== this.hasCheckpoints()) {
@@ -538,25 +536,6 @@ export class Experiments extends BaseRepository<TableData> {
     return this.webviewMessages.sendWebviewMessage()
   }
 
-  private async getCommitOutput(data: ExpShowOutput | undefined) {
-    if (!data || data.length === 0) {
-      return
-    }
-    let output = ''
-    for (const commit of data) {
-      if (commit.rev === EXPERIMENT_WORKSPACE_ID) {
-        continue
-      }
-      output += await this.internalCommands.executeCommand(
-        AvailableCommands.GIT_GET_COMMIT_MESSAGES,
-        this.dvcRoot,
-        commit.rev
-      )
-      output += COMMITS_SEPARATOR
-    }
-    return output
-  }
-
   private createWebviewMessageHandler() {
     const webviewMessages = new WebviewMessages(
       this.dvcRoot,
@@ -596,7 +575,7 @@ export class Experiments extends BaseRepository<TableData> {
     }
 
     return await pickExperiment(
-      this.experiments.getUniqueList(),
+      this.experiments.getCombinedList(),
       this.getFirstThreeColumnOrder(),
       Title.SELECT_BASE_EXPERIMENT
     )

@@ -560,6 +560,7 @@ export const getRevisions = (): Revision[] => {
       ]
     },
     {
+      commit: 'Update version and CHANGELOG for release (#4022) ...',
       errors: undefined,
       fetched: true,
       firstThreeColumns: [

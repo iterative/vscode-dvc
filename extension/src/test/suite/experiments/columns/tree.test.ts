@@ -41,7 +41,7 @@ suite('Experiments Columns Tree Test Suite', () => {
         'learning_rate'
       )
 
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
 
       await experiments.isReady()
 
@@ -81,7 +81,7 @@ suite('Experiments Columns Tree Test Suite', () => {
     it('should be able to toggle a parent and change the selected status of all of the children with dvc.views.experimentsColumnsTree.toggleStatus', async () => {
       const path = buildMetricOrParamPath(ColumnType.PARAMS, paramsFile)
 
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
 
       await experiments.isReady()
 
@@ -136,7 +136,7 @@ suite('Experiments Columns Tree Test Suite', () => {
       )
       const parentPath = appendColumnToPath(grandParentPath, 'process')
 
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
 
       await experiments.isReady()
 
@@ -207,7 +207,7 @@ suite('Experiments Columns Tree Test Suite', () => {
       )
       const parentPath = appendColumnToPath(grandParentPath, 'process')
 
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
 
       await experiments.isReady()
 
@@ -280,7 +280,7 @@ suite('Experiments Columns Tree Test Suite', () => {
       )
       const parentPath = appendColumnToPath(grandParentPath, 'process')
 
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
 
       await experiments.isReady()
 

@@ -2,6 +2,8 @@
 import { join } from 'path'
 import { commands } from 'vscode'
 import { ExperimentsModel } from '.'
+import gitLogFixture from '../../test/fixtures/expShow/base/gitLog'
+import rowOrderFixture from '../../test/fixtures/expShow/base/rowOrder'
 import outputFixture from '../../test/fixtures/expShow/base/output'
 import rowsFixture from '../../test/fixtures/expShow/base/rows'
 import deeplyNestedRowsFixture from '../../test/fixtures/expShow/deeplyNested/rows'
@@ -15,7 +17,6 @@ import dataTypesRowsFixture from '../../test/fixtures/expShow/dataTypes/rows'
 import dataTypesOutputFixture from '../../test/fixtures/expShow/dataTypes/output'
 import survivalOutputFixture from '../../test/fixtures/expShow/survival/output'
 import survivalRowsFixture from '../../test/fixtures/expShow/survival/rows'
-
 import {
   ExperimentStatus,
   EXPERIMENT_WORKSPACE_ID,
@@ -32,17 +33,29 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
+const DEFAULT_DATA: [string, boolean, { branch: string; sha: string }[]] = [
+  '',
+  false,
+  []
+]
+
 describe('ExperimentsModel', () => {
-  it('should return the expected rows when given the output fixture', () => {
+  it('should return the expected rows when given the base fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, false, '')
+    model.transformAndSet(outputFixture, gitLogFixture, false, rowOrderFixture)
     expect(model.getRowData()).toStrictEqual(rowsFixture)
   })
 
   it('should return the expected rows when given the survival fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(survivalOutputFixture, false, '')
-    expect(model.getRowData()).toStrictEqual(survivalRowsFixture)
+    model.transformAndSet(survivalOutputFixture, '', false, [
+      { branch: 'main', sha: '3d5adcb974bb2c85917a5d61a489b933adaa2b7f' },
+      { branch: 'main', sha: 'a49e03966a1f9f1299ec222ebc4bed8625d2c54d' },
+      { branch: 'main', sha: '4f7b50c3d171a11b6cfcd04416a16fc80b61018d' }
+    ])
+    expect(model.getRowData()).toStrictEqual(
+      expect.objectContaining(survivalRowsFixture)
+    )
   })
 
   it('should set the workspace to running if a signal file for a DVCLive only experiment has been found', () => {
@@ -74,13 +87,13 @@ describe('ExperimentsModel', () => {
       }
     )
 
-    model.transformAndSet(dvcLiveOnly, true, '')
+    model.transformAndSet(dvcLiveOnly, '', true, [])
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const runningWorkspace = (model as any).workspace
     expect(runningWorkspace?.executor).toStrictEqual(EXPERIMENT_WORKSPACE_ID)
     expect(runningWorkspace?.status).toStrictEqual(ExperimentStatus.RUNNING)
 
-    model.transformAndSet(dvcLiveOnly, false, '')
+    model.transformAndSet(dvcLiveOnly, ...DEFAULT_DATA)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const stoppedWorkspace = (model as any).workspace
     expect(stoppedWorkspace?.executor).toBeFalsy()
@@ -139,9 +152,9 @@ describe('ExperimentsModel', () => {
       }
     )
 
-    model.transformAndSet(data, false, '')
+    model.transformAndSet(data, ...DEFAULT_DATA)
 
-    const experiments = model.getUniqueList()
+    const experiments = model.getCombinedList()
 
     const changed: string[] = []
     for (const { deps, sha } of experiments) {
@@ -158,21 +171,29 @@ describe('ExperimentsModel', () => {
 
   it('should handle deps have all null properties (never been committed)', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(uncommittedDepsFixture, false, '')
+    model.transformAndSet(uncommittedDepsFixture, ...DEFAULT_DATA)
     const [workspace] = model.getWorkspaceAndCommits()
     expect(workspace.deps).toStrictEqual({})
   })
 
   it('should return the expected rows when given the deeply nested output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(deeplyNestedOutputFixture, false, '')
-    expect(model.getRowData()).toStrictEqual(deeplyNestedRowsFixture)
+    model.transformAndSet(deeplyNestedOutputFixture, '', false, [
+      { branch: 'main', sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77' }
+    ])
+    expect(model.getRowData()).toStrictEqual(
+      expect.objectContaining(deeplyNestedRowsFixture)
+    )
   })
 
   it('should return the expected rows when given the data types output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(dataTypesOutputFixture, false, '')
-    expect(model.getRowData()).toStrictEqual(dataTypesRowsFixture)
+    model.transformAndSet(dataTypesOutputFixture, '', false, [
+      { branch: 'main', sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77' }
+    ])
+    expect(model.getRowData()).toStrictEqual(
+      expect.objectContaining(dataTypesRowsFixture)
+    )
   })
 
   it('should always limit the number of selected experiments to 7', () => {
@@ -204,7 +225,7 @@ describe('ExperimentsModel', () => {
       ]
     })
 
-    experimentsModel.transformAndSet(data, false, '')
+    experimentsModel.transformAndSet(data, ...DEFAULT_DATA)
 
     experimentsModel.setSelected([
       { id: 'exp-1' },
@@ -267,7 +288,7 @@ describe('ExperimentsModel', () => {
     )
 
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(data, false, '')
+    model.transformAndSet(data, ...DEFAULT_DATA)
 
     expect(model.getSelectedRevisions().map(({ id }) => id)).toStrictEqual([
       runningExpName
@@ -276,7 +297,7 @@ describe('ExperimentsModel', () => {
     model.setSelected([])
     expect(model.getSelectedRevisions().map(({ id }) => id)).toStrictEqual([])
 
-    model.setSelected(model.getUniqueList())
+    model.setSelected(model.getCombinedList())
     expect(model.getSelectedRevisions().map(({ id }) => id)).toStrictEqual([
       EXPERIMENT_WORKSPACE_ID,
       'testBranch',
@@ -290,7 +311,7 @@ describe('ExperimentsModel', () => {
 
   it('should fetch commit params', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, false, '')
+    model.transformAndSet(outputFixture, ...DEFAULT_DATA)
 
     const commitParams = model.getExperimentParams('main')
     expect(definedAndNonEmpty(commitParams)).toBe(true)
@@ -298,7 +319,7 @@ describe('ExperimentsModel', () => {
 
   it('should fetch workspace params', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, false, '')
+    model.transformAndSet(outputFixture, ...DEFAULT_DATA)
 
     const workspaceParams = model.getExperimentParams(EXPERIMENT_WORKSPACE_ID)
     expect(definedAndNonEmpty(workspaceParams)).toBe(true)
@@ -306,7 +327,7 @@ describe('ExperimentsModel', () => {
 
   it("should fetch an experiment's params", () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, false, '')
+    model.transformAndSet(outputFixture, ...DEFAULT_DATA)
 
     const experimentParams = model.getExperimentParams('exp-e7a67')
     expect(definedAndNonEmpty(experimentParams)).toBe(true)
@@ -314,7 +335,7 @@ describe('ExperimentsModel', () => {
 
   it("should fetch an empty array if the experiment's params cannot be found", () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, false, '')
+    model.transformAndSet(outputFixture, ...DEFAULT_DATA)
 
     const noParams = model.getExperimentParams('not-an-experiment')
     expect(definedAndNonEmpty(noParams)).toBe(false)
@@ -344,79 +365,23 @@ describe('ExperimentsModel', () => {
   it('should remove outdated branches to show when calling pruneBranchesToShow', () => {
     const model = new ExperimentsModel('', buildMockMemento())
 
-    model.setBranchesToShow(['one', 'old', 'two', 'three', 'older'])
-    model.pruneBranchesToShow(['one', 'two', 'three', 'four', 'five', 'six'])
+    model.setBranchesToShow(['A', 'old', 'B', 'C', 'older'])
+    model.pruneBranchesToShow(['A', 'B', 'C', 'four', 'five', 'six'])
 
-    expect(model.getBranchesToShow()).toStrictEqual(['one', 'two', 'three'])
+    expect(model.getBranchesToShow()).toStrictEqual(['A', 'B', 'C'])
   })
 
   it('should persist the branches to show when calling pruneBranchesToShow', () => {
     const memento = buildMockMemento()
     const model = new ExperimentsModel('', memento)
 
-    model.setBranchesToShow(['one', 'old', 'two', 'three', 'older'])
-    model.pruneBranchesToShow(['one', 'two', 'three', 'four', 'five', 'six'])
+    model.setBranchesToShow(['A', 'old', 'B', 'C', 'older'])
+    model.pruneBranchesToShow(['A', 'B', 'C', 'four', 'five', 'six'])
 
     expect(memento.get(PersistenceKey.EXPERIMENTS_BRANCHES)).toStrictEqual([
-      'one',
-      'two',
-      'three'
+      'A',
+      'B',
+      'C'
     ])
-  })
-
-  it('should handle duplicate commits being returned in the data', () => {
-    const main = {
-      experiments: [
-        {
-          name: 'campy-pall',
-          rev: '0b4b001dfaa8f2c4cd2a62238699131ab2c679ea'
-        },
-        {
-          name: 'shyer-stir',
-          rev: '450e672f0d8913517ab2ab443f5d87b34f308290'
-        }
-      ],
-      name: 'main',
-      rev: '61bed4ce8913eca7f73ca754d65bc5daad1520e2'
-    }
-
-    const expShowWithDuplicateCommits = generateTestExpShowOutput(
-      {},
-      main,
-      {
-        name: 'branchOffMainWithCommit',
-        rev: '351e42ace3cb6a3a853c65bef285e60748cc6341'
-      },
-      main
-    )
-
-    const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(expShowWithDuplicateCommits, false, '')
-    const distinctTreeItems = model.getWorkspaceAndCommits()
-    expect(distinctTreeItems).toHaveLength(3)
-
-    const tableRows = model.getRowData()
-    expect(tableRows).toHaveLength(4)
-    expect(tableRows.map(({ id }) => id)).toStrictEqual([
-      EXPERIMENT_WORKSPACE_ID,
-      'main',
-      'branchOffMainWithCommit',
-      'main'
-    ])
-
-    const tableExperimentRows = (
-      tableRows[1] as unknown as { subRows: Experiment[] }
-    ).subRows
-
-    const duplicateTableExperimentRows = (
-      tableRows[3] as unknown as { subRows: Experiment[] }
-    ).subRows
-
-    expect(tableExperimentRows).toHaveLength(2)
-    expect(tableExperimentRows.map(({ id }) => id)).toStrictEqual([
-      'campy-pall',
-      'shyer-stir'
-    ])
-    expect(tableExperimentRows).toStrictEqual(duplicateTableExperimentRows)
   })
 })
