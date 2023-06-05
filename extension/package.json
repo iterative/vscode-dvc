@@ -1473,7 +1473,7 @@
       },
       {
         "view": "dvc.views.welcome",
-        "contents": "The extension is currently unable to initialize.\n[Show Setup](command:dvc.showDvcSetup)",
+        "contents": "The extension is currently unable to initialize.\n[Show Setup](command:dvc.showDvcSetup)\nNew to DVC? Check out [dvc.org](https://dvc.org/) to learn more or quickly try the extension with our [demo](https://github.com/iterative/vscode-dvc-demo).",
         "when": "true"
       },
       {
