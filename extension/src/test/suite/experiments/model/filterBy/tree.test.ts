@@ -63,7 +63,9 @@ suite('Experiments Filter By Tree Test Suite', () => {
     it('should be able to update the table data by adding and removing a filter', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('train')
 
-      const { experiments, messageSpy } = buildExperiments(disposable)
+      const { experiments, messageSpy } = buildExperiments({
+        disposer: disposable
+      })
 
       await experiments.isReady()
       await experiments.showWebview()
@@ -84,7 +86,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       await addFilterViaQuickInput(experiments, accuracyFilter)
 
-      const [workspace, main] = rowsFixture
+      const [workspace, main, fe2919b, _7df876c] = rowsFixture
 
       const gte45 = (value: FileDataOrError | ValueTree | Value): boolean =>
         !!(value && typeof value === 'number' && value >= 0.45)
@@ -97,7 +99,9 @@ suite('Experiments Filter By Tree Test Suite', () => {
             const accuracy = experiment.metrics?.['summary.json']?.accuracy
             return !!(accuracy === undefined || gte45(accuracy))
           })
-        }
+        },
+        fe2919b,
+        _7df876c
       ]
 
       const filteredTableData: Partial<TableData> = {
@@ -129,7 +133,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         columns: columnsFixture,
         filteredCount: 0,
         filters: [],
-        rows: [workspace, main]
+        rows: [workspace, main, fe2919b, _7df876c]
       }
 
       expect(messageSpy).to.be.calledWithMatch(unfilteredTableData)
@@ -139,7 +143,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockShowInputBox = stub(window, 'showInputBox')
 
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
 
       await experiments.isReady()
 
@@ -256,7 +260,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
     it('should update the description when a filter is added or removed', async () => {
       const { experiments, experimentsModel, internalCommands } =
-        buildExperiments(disposable)
+        buildExperiments({ disposer: disposable })
       await experiments.isReady()
 
       const workspaceExperiments = disposable.track(
@@ -340,7 +344,9 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
     it('should be able to filter to starred experiments', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('train')
-      const { experiments, messageSpy } = buildExperiments(disposable)
+      const { experiments, messageSpy } = buildExperiments({
+        disposer: disposable
+      })
 
       await experiments.isReady()
       await experiments.showWebview()
@@ -349,14 +355,16 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       await addFilterViaQuickInput(experiments, starredFilter)
 
-      const [workspace, main] = rowsFixture
+      const [workspace, main, fe2919b, _7df876c] = rowsFixture
 
       const filteredRows = [
         workspace,
         {
           ...main,
           subRows: []
-        }
+        },
+        fe2919b,
+        _7df876c
       ]
 
       const filteredTableData: Partial<TableData> = {
@@ -372,7 +380,9 @@ suite('Experiments Filter By Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should provide a shortcut to filter to starred experiments', async () => {
-      const { experiments, experimentsModel } = buildExperiments(disposable)
+      const { experiments, experimentsModel } = buildExperiments({
+        disposer: disposable
+      })
 
       await experiments.isReady()
 

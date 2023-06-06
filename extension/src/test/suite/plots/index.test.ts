@@ -7,6 +7,8 @@ import isEqual from 'lodash.isequal'
 import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import expShowFixtureWithoutErrors from '../../fixtures/expShow/base/noErrors'
+import gitLogFixture from '../../fixtures/expShow/base/gitLog'
+import rowOrderFixture from '../../fixtures/expShow/base/rowOrder'
 import customPlotsFixture from '../../fixtures/expShow/base/customPlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
 import multiSourcePlotsDiffFixture from '../../fixtures/plotsDiff/multiSource'
@@ -44,6 +46,7 @@ import { RegisteredCommands } from '../../../commands/external'
 import { REVISIONS } from '../../fixtures/plotsDiff'
 import * as FileSystem from '../../../fileSystem'
 import { experimentHasError } from '../../../cli/dvc/contract'
+import { COMMITS_SEPARATOR } from '../../../cli/git/constants'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -61,10 +64,10 @@ suite('Plots Test Suite', () => {
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('Plots', () => {
     it('should call plots diff once on instantiation with missing revisions if there are no plots', async () => {
-      const { mockPlotsDiff, messageSpy, plots, data } = await buildPlots(
-        disposable,
-        { data: {} }
-      )
+      const { mockPlotsDiff, messageSpy, plots, data } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: { data: {} }
+      })
 
       const managedUpdateSpy = spy(data, 'managedUpdate')
 
@@ -100,11 +103,13 @@ suite('Plots Test Suite', () => {
         experiments: null
       }))
 
-      const { data, experiments, mockPlotsDiff } = await buildPlots(
-        disposable,
-        plotsDiffFixture,
-        noExperimentFixture
-      )
+      const newCommit = '9235a02880a0372545e5f7f4d79a5d9eee6331ac'
+
+      const { data, experiments, mockPlotsDiff } = await buildPlots({
+        disposer: disposable,
+        expShow: noExperimentFixture,
+        plotsDiff: plotsDiffFixture
+      })
 
       mockPlotsDiff.resetHistory()
 
@@ -118,9 +123,9 @@ suite('Plots Test Suite', () => {
             ...exp,
             data: {
               ...exp.data,
-              rev: '9235a02880a0372545e5f7f4d79a5d9eee6331ac'
+              rev: newCommit
             },
-            rev: '9235a02880a0372545e5f7f4d79a5d9eee6331ac'
+            rev: newCommit
           }
         }
 
@@ -132,7 +137,12 @@ suite('Plots Test Suite', () => {
       )
 
       bypassProcessManagerDebounce(mockNow)
-      void experiments.setState(updatedExpShowFixture)
+      void experiments.setState({
+        availableNbCommits: { main: 6 },
+        expShow: updatedExpShowFixture,
+        gitLog: newCommit + COMMITS_SEPARATOR + gitLogFixture,
+        rowOrder: [{ branch: 'main', sha: newCommit }, ...rowOrderFixture]
+      })
 
       await dataUpdateEvent
 
@@ -145,10 +155,10 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should remove the temporary plots directory on dispose', async () => {
-      const { mockRemoveDir, plots } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
+      const { mockRemoveDir, plots } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
 
       plots.dispose()
 
@@ -159,7 +169,7 @@ suite('Plots Test Suite', () => {
     })
 
     it('should handle a section resized message from the webview', async () => {
-      const { plots, plotsModel } = await buildPlots(disposable)
+      const { plots, plotsModel } = await buildPlots({ disposer: disposable })
 
       const webview = await plots.showWebview()
 
@@ -198,7 +208,9 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a section collapsed message from the webview', async () => {
-      const { plots, plotsModel, messageSpy } = await buildPlots(disposable)
+      const { plots, plotsModel, messageSpy } = await buildPlots({
+        disposer: disposable
+      })
 
       const webview = await plots.showWebview()
 
@@ -237,10 +249,10 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a comparison revisions reordered message from the webview', async () => {
-      const { plots, plotsModel, messageSpy } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
+      const { plots, plotsModel, messageSpy } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
 
       const webview = await plots.showWebview()
 
@@ -289,10 +301,10 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a comparison rows reordered message from the webview', async () => {
-      const { plots, pathsModel, messageSpy } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
+      const { plots, pathsModel, messageSpy } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
 
       const webview = await plots.showWebview()
 
@@ -342,10 +354,10 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a template plots reordered message from the webview', async () => {
-      const { pathsModel, plots, messageSpy } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
+      const { pathsModel, plots, messageSpy } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
 
       const webview = await plots.showWebview()
 
@@ -392,7 +404,10 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a plot zoomed message from the webview', async () => {
-      const { plots } = await buildPlots(disposable, plotsDiffFixture)
+      const { plots } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
 
       const webview = await plots.showWebview()
 
@@ -412,7 +427,10 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a plot zoomed message from the webview for an image', async () => {
-      const { plots } = await buildPlots(disposable, plotsDiffFixture)
+      const { plots } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
       stub(FileSystem, 'openImageFileInEditor').resolves(true)
 
       const webview = await plots.showWebview()
@@ -434,7 +452,10 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should open an image when receiving a plot zoomed message from the webview with a payload', async () => {
-      const { plots } = await buildPlots(disposable, plotsDiffFixture)
+      const { plots } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
 
       const webview = await plots.showWebview()
       const imagePath = 'some/path/image.jpg'
@@ -455,10 +476,10 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a custom plots reordered message from the webview', async () => {
-      const { plots, plotsModel, messageSpy } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
+      const { plots, plotsModel, messageSpy } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
 
       const webview = await plots.showWebview()
 
@@ -504,10 +525,10 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a select experiments message from the webview', async () => {
-      const { plots, experiments } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
+      const { plots, experiments } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
 
       const mockSelectExperiments = stub(
         experiments,
@@ -533,7 +554,10 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a select plots message from the webview', async () => {
-      const { plots } = await buildPlots(disposable, plotsDiffFixture)
+      const { plots } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
 
       const mockSelectExperiments = stub(plots, 'selectPlots').resolves(
         undefined
@@ -558,10 +582,10 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to manually refresh plot revisions from the webview', async () => {
-      const { data, plots, mockPlotsDiff, messageSpy } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
+      const { data, plots, mockPlotsDiff, messageSpy } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
 
       messageSpy.restore()
 
@@ -601,10 +625,10 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to make the plots webview visible', async () => {
-      const { plots, messageSpy, mockPlotsDiff } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
+      const { plots, messageSpy, mockPlotsDiff } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
 
       const webview = await plots.showWebview()
       await webview.isReady()
@@ -615,13 +639,15 @@ suite('Plots Test Suite', () => {
         comparison: comparisonData,
         custom: customData,
         sectionCollapsed,
-        template: templateData
+        template: templateData,
+        selectedRevisions: selectedRevisionsData
       } = getFirstArgOfLastCall(messageSpy)
 
       expect(comparisonData).to.deep.equal(comparisonPlotsFixture)
       expect(customData).to.deep.equal(customPlotsFixture)
       expect(sectionCollapsed).to.deep.equal(DEFAULT_SECTION_COLLAPSED)
       expect(templateData).to.deep.equal(templatePlotsFixture)
+      expect(selectedRevisionsData).to.deep.equal(plotsRevisionsFixture)
 
       const expectedPlotsData: TPlotsData = {
         cliError: null,
@@ -675,10 +701,10 @@ suite('Plots Test Suite', () => {
         }
       }
 
-      const { mockPlotsDiff, plots, data, plotsModel } = await buildPlots(
-        disposable,
-        plotsDiffOutput
-      )
+      const { mockPlotsDiff, plots, data, plotsModel } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffOutput
+      })
 
       await plots.isReady()
 
@@ -709,7 +735,10 @@ suite('Plots Test Suite', () => {
 
     it('should send the correct data to the webview for flexible plots', async () => {
       const { experiments, plots, messageSpy, mockPlotsDiff } =
-        await buildPlots(disposable, multiSourcePlotsDiffFixture)
+        await buildPlots({
+          disposer: disposable,
+          plotsDiff: multiSourcePlotsDiffFixture
+        })
 
       stub(experiments, 'getSelectedRevisions').returns([
         { id: REVISIONS[0] },
@@ -797,10 +826,10 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a toggle experiment message from the webview', async () => {
-      const { plots, experiments } = await buildPlots(
-        disposable,
-        plotsDiffFixture
-      )
+      const { plots, experiments } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
 
       const mockSelectExperiments = stub(
         experiments,
@@ -827,7 +856,10 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle an add custom plot message from the webview', async () => {
-      const { plots } = await buildPlots(disposable, plotsDiffFixture)
+      const { plots } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
 
       const webview = await plots.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -844,7 +876,10 @@ suite('Plots Test Suite', () => {
     })
 
     it('should handle a remove custom plot message from the webview', async () => {
-      const { plots } = await buildPlots(disposable, plotsDiffFixture)
+      const { plots } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
 
       const webview = await plots.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -862,7 +897,7 @@ suite('Plots Test Suite', () => {
 
     it('should handle the CLI throwing an error', async () => {
       const { data, errorsModel, mockPlotsDiff, plots, plotsModel } =
-        await buildPlots(disposable, plotsDiffFixture)
+        await buildPlots({ disposer: disposable, plotsDiff: plotsDiffFixture })
 
       const mockErrorMsg = `'./dvc.yaml' is invalid.\n
     While parsing a flow sequence, in line 5, column 9

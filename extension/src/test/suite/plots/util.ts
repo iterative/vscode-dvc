@@ -2,6 +2,8 @@ import { Disposer } from '@hediet/std/disposable'
 import { stub } from 'sinon'
 import * as FileSystem from '../../../fileSystem'
 import expShowFixtureWithoutErrors from '../../fixtures/expShow/base/noErrors'
+import gitLogFixture from '../../fixtures/expShow/base/gitLog'
+import rowOrderFixture from '../../fixtures/expShow/base/rowOrder'
 import { customPlotsOrderFixture } from '../../fixtures/expShow/base/customPlots'
 import { Plots } from '../../../plots'
 import { buildMockMemento, dvcDemoPath } from '../../util'
@@ -17,15 +19,29 @@ import { BaseWorkspaceWebviews } from '../../../webview/workspace'
 import { WebviewMessages } from '../../../plots/webview/messages'
 import { ExperimentsModel } from '../../../experiments/model'
 import { Experiment } from '../../../experiments/webview/contract'
-import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../../cli/dvc/contract'
+import {
+  EXPERIMENT_WORKSPACE_ID,
+  ExpShowOutput,
+  PlotsOutput
+} from '../../../cli/dvc/contract'
 import { ErrorsModel } from '../../../plots/errors/model'
 import { PersistenceKey } from '../../../persistence/constants'
 
-export const buildPlots = async (
-  disposer: Disposer,
-  plotsDiff: PlotsOutput | undefined = undefined,
-  expShow = expShowFixtureWithoutErrors
-) => {
+export const buildPlots = async ({
+  availableNbCommits = { main: 5 },
+  disposer,
+  plotsDiff = undefined,
+  expShow = expShowFixtureWithoutErrors,
+  gitLog = gitLogFixture,
+  rowOrder = rowOrderFixture
+}: {
+  availableNbCommits?: { [branch: string]: number }
+  disposer: Disposer
+  plotsDiff?: PlotsOutput | undefined
+  expShow?: ExpShowOutput
+  gitLog?: string
+  rowOrder?: { branch: string; sha: string }[]
+}) => {
   const { internalCommands, mockPlotsDiff, messageSpy, resourceLocator } =
     buildDependencies(disposer, expShow, plotsDiff)
 
@@ -71,7 +87,12 @@ export const buildPlots = async (
     { id: 'exp-f13bca' }
   ] as Experiment[])
 
-  void experiments.setState(expShow)
+  void experiments.setState({
+    availableNbCommits,
+    expShow,
+    gitLog,
+    rowOrder
+  })
 
   await plots.isReady()
 

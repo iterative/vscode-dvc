@@ -36,3 +36,4 @@ const MockComponentWithChildren: React.FC<PropsWithChildren> = ({
 export const VSCodePanels = MockComponentWithChildren
 export const VSCodePanelTab = MockComponentWithChildren
 export const VSCodePanelView = MockComponentWithChildren
+export const VSCodeTag = MockComponentWithChildren

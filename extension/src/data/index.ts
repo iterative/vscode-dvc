@@ -9,8 +9,15 @@ import { uniqueValues } from '../util/array'
 import { DeferredDisposable } from '../class/deferred'
 import { isSameOrChild } from '../fileSystem'
 
+export type ExperimentsOutput = {
+  availableNbCommits: { [branch: string]: number }
+  expShow: ExpShowOutput
+  gitLog: string
+  rowOrder: { branch: string; sha: string }[]
+}
+
 export abstract class BaseData<
-  T extends { data: PlotsOutputOrError; revs: string[] } | ExpShowOutput
+  T extends { data: PlotsOutputOrError; revs: string[] } | ExperimentsOutput
 > extends DeferredDisposable {
   public readonly onDidUpdate: Event<T>
   public readonly onDidChangeDvcYaml: Event<void>

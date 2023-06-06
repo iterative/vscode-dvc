@@ -65,7 +65,7 @@ suite('Experiments Tree Test Suite', () => {
       const mockNow = getMockNow()
 
       const { plots, messageSpy, plotsModel, experimentsModel } =
-        await buildPlots(disposable)
+        await buildPlots({ disposer: disposable })
       messageSpy.restore()
       const mockShow = stub(BaseWebview.prototype, 'show')
 
@@ -164,7 +164,7 @@ suite('Experiments Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should not show queued experiments in the dvc.views.experimentsTree.selectExperiments quick pick', async () => {
-      await buildPlots(disposable)
+      await buildPlots({ disposer: disposable })
 
       const mockQuickPickLimitedValues = stub(
         QuickPickWrapper,
@@ -192,7 +192,9 @@ suite('Experiments Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to select / de-select experiments using dvc.views.experimentsTree.selectExperiments', async () => {
-      const { plots, plotsModel, messageSpy } = await buildPlots(disposable)
+      const { plots, plotsModel, messageSpy } = await buildPlots({
+        disposer: disposable
+      })
 
       const [{ label, displayColor }] = plotsModel.getSelectedRevisionDetails()
 
@@ -489,7 +491,7 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to apply an experiment to the workspace with dvc.views.experiments.applyExperiment', async () => {
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
 
       await experiments.isReady()
 
@@ -518,7 +520,7 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should not create a new branch from an experiment with dvc.views.experiments.branchExperiment if the user cancels', async () => {
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
       await experiments.isReady()
 
       const mockExperimentBranch = stub(DvcExecutor.prototype, 'expBranch')
@@ -538,7 +540,7 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to create a new branch from an experiment with dvc.views.experiments.branchExperiment', async () => {
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments({ disposer: disposable })
       await experiments.isReady()
 
       const mockExperimentId = 'exp-e7a67'
@@ -575,8 +577,9 @@ suite('Experiments Tree Test Suite', () => {
       const baseExperimentId = EXPERIMENT_WORKSPACE_ID
       stub(DvcReader.prototype, 'listStages').resolves('train')
 
-      const { dvcExecutor, experiments, experimentsModel } =
-        buildExperiments(disposable)
+      const { dvcExecutor, experiments, experimentsModel } = buildExperiments({
+        disposer: disposable
+      })
 
       await experiments.isReady()
 
@@ -638,8 +641,9 @@ suite('Experiments Tree Test Suite', () => {
       const baseExperimentId = EXPERIMENT_WORKSPACE_ID
       stub(DvcReader.prototype, 'listStages').resolves('train')
 
-      const { dvcRunner, experiments, experimentsModel } =
-        buildExperiments(disposable)
+      const { dvcRunner, experiments, experimentsModel } = buildExperiments({
+        disposer: disposable
+      })
 
       await experiments.isReady()
 
@@ -698,8 +702,9 @@ suite('Experiments Tree Test Suite', () => {
       const baseExperimentId = EXPERIMENT_WORKSPACE_ID
       stub(DvcReader.prototype, 'listStages').resolves('train')
 
-      const { dvcRunner, experiments, experimentsModel } =
-        buildExperiments(disposable)
+      const { dvcRunner, experiments, experimentsModel } = buildExperiments({
+        disposer: disposable
+      })
 
       await experiments.isReady()
 

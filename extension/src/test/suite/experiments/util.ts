@@ -3,6 +3,8 @@ import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
 import expShowFixture from '../../fixtures/expShow/base/output'
+import gitLogFixture from '../../fixtures/expShow/base/gitLog'
+import rowOrderFixture from '../../fixtures/expShow/base/rowOrder'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import {
   buildDependencies,
@@ -16,12 +18,30 @@ import { ExperimentsModel } from '../../../experiments/model'
 import { ColumnsModel } from '../../../experiments/columns/model'
 import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../../cli/dvc/constants'
 import { PersistenceKey } from '../../../persistence/constants'
+import { ExpShowOutput } from '../../../cli/dvc/contract'
 
-export const buildExperiments = (
-  disposer: Disposer,
-  experimentShowData = expShowFixture,
-  dvcRoot = dvcDemoPath
-) => {
+export const DEFAULT_EXPERIMENTS_OUTPUT = {
+  availableNbCommits: { main: 5 },
+  expShow: expShowFixture,
+  gitLog: gitLogFixture,
+  rowOrder: rowOrderFixture
+}
+
+export const buildExperiments = ({
+  availableNbCommits = { main: 5 },
+  disposer,
+  dvcRoot = dvcDemoPath,
+  expShow = expShowFixture,
+  gitLog = gitLogFixture,
+  rowOrder = rowOrderFixture
+}: {
+  availableNbCommits?: { [branch: string]: number }
+  disposer: Disposer
+  dvcRoot?: string
+  expShow?: ExpShowOutput
+  gitLog?: string
+  rowOrder?: { branch: string; sha: string }[]
+}) => {
   const {
     dvcExecutor,
     dvcReader,
@@ -34,7 +54,7 @@ export const buildExperiments = (
     mockExpShow,
     mockGetCommitMessages,
     resourceLocator
-  } = buildDependencies(disposer, experimentShowData)
+  } = buildDependencies(disposer, expShow)
 
   const mockUpdateExperimentsData = stub()
   const mockExperimentsData = buildMockExperimentsData(
@@ -61,7 +81,12 @@ export const buildExperiments = (
     )
   )
 
-  void experiments.setState(experimentShowData)
+  void experiments.setState({
+    availableNbCommits,
+    expShow,
+    gitLog,
+    rowOrder
+  })
 
   return {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any,
@@ -94,7 +119,11 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
     gitReader,
     messageSpy,
     resourceLocator
-  } = buildExperiments(disposer, expShowFixture, 'other/dvc/root')
+  } = buildExperiments({
+    disposer,
+    dvcRoot: 'other/dvc/root',
+    expShow: expShowFixture
+  })
 
   stub(gitReader, 'getGitRepositoryRoot').resolves(dvcDemoPath)
   const workspaceExperiments = disposer.track(
@@ -107,7 +136,7 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
     resourceLocator
   )
 
-  void experiments.setState(expShowFixture)
+  void experiments.setState(DEFAULT_EXPERIMENTS_OUTPUT)
   return { experiments, internalCommands, messageSpy, workspaceExperiments }
 }
 
@@ -124,7 +153,7 @@ export const buildSingleRepoExperiments = (disposer: SafeWatcherDisposer) => {
     resourceLocator
   )
 
-  void experiments.setState(expShowFixture)
+  void experiments.setState(DEFAULT_EXPERIMENTS_OUTPUT)
 
   return {
     config,
@@ -154,7 +183,8 @@ const buildExperimentsDataDependencies = (disposer: Disposer) => {
 
 export const buildExperimentsData = (
   disposer: SafeWatcherDisposer,
-  currentBranch = 'main'
+  currentBranch = 'main',
+  commitOutput = gitLogFixture
 ) => {
   const {
     internalCommands,
@@ -163,8 +193,10 @@ export const buildExperimentsData = (
     gitReader
   } = buildExperimentsDataDependencies(disposer)
 
-  stub(gitReader, 'getCurrentBranch').resolves(currentBranch)
   stub(gitReader, 'getBranches').resolves(['one'])
+  stub(gitReader, 'getCurrentBranch').resolves(currentBranch)
+  stub(gitReader, 'getCommitMessages').resolves(commitOutput)
+  stub(gitReader, 'getNumCommits').resolves(404)
 
   const mockGetBranchesToShow = stub().returns(['main'])
   const mockPruneBranchesToShow = stub()

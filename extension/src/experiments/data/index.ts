@@ -7,14 +7,14 @@ import {
 import { getRelativePattern } from '../../fileSystem/relativePattern'
 import { createFileSystemWatcher } from '../../fileSystem/watcher'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import { EXPERIMENT_WORKSPACE_ID, ExpShowOutput } from '../../cli/dvc/contract'
-import { BaseData } from '../../data'
-import { DOT_DVC, ExperimentFlag } from '../../cli/dvc/constants'
-import { gitPath } from '../../cli/git/constants'
+import { ExpShowOutput } from '../../cli/dvc/contract'
+import { BaseData, ExperimentsOutput } from '../../data'
+import { Args, DOT_DVC, ExperimentFlag } from '../../cli/dvc/constants'
+import { COMMITS_SEPARATOR, gitPath } from '../../cli/git/constants'
 import { getGitPath } from '../../fileSystem'
 import { ExperimentsModel } from '../model'
 
-export class ExperimentsData extends BaseData<ExpShowOutput> {
+export class ExperimentsData extends BaseData<ExperimentsOutput> {
   private readonly experiments: ExperimentsModel
 
   constructor(
@@ -47,46 +47,75 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
     )
 
     void this.updateAvailableBranchesToSelect(allBranches)
-    const data: ExpShowOutput = []
 
-    const { branches, currentBranch } = await this.getBranchesToShowWithCurrent(
-      allBranches
+    const branches = await this.getBranchesToShow(allBranches)
+    let gitLog = ''
+    const rowOrder: { branch: string; sha: string }[] = []
+    const availableNbCommits: { [branch: string]: number } = {}
+    const args: Args = []
+
+    for (const branch of branches) {
+      gitLog = await this.collectGitLogAndOrder(
+        gitLog,
+        branch,
+        rowOrder,
+        availableNbCommits,
+        args
+      )
+    }
+
+    const expShow = await this.internalCommands.executeCommand<ExpShowOutput>(
+      AvailableCommands.EXP_SHOW,
+      this.dvcRoot,
+      ...args
     )
 
-    await Promise.all(
-      branches.map(async branch => {
-        const branchFlags = [
-          ExperimentFlag.REV,
-          branch,
-          ExperimentFlag.NUM_COMMIT,
-          this.experiments.getNbOfCommitsToShow(branch).toString()
-        ]
+    this.collectFiles({ expShow })
 
-        const output = (await this.expShow(
-          branchFlags,
-          branch
-        )) as ExpShowOutput
-
-        if (branch !== currentBranch) {
-          const workspaceIndex = output.findIndex(
-            exp => exp.rev === EXPERIMENT_WORKSPACE_ID
-          )
-          output.splice(workspaceIndex, 1)
-        }
-        data.push(...output)
-      })
-    )
-
-    this.collectFiles(data)
-
-    return this.notifyChanged(data)
+    return this.notifyChanged({ availableNbCommits, expShow, gitLog, rowOrder })
   }
 
-  protected collectFiles(data: ExpShowOutput) {
-    this.collectedFiles = collectFiles(data, this.collectedFiles)
+  protected collectFiles({ expShow }: { expShow: ExpShowOutput }) {
+    this.collectedFiles = collectFiles(expShow, this.collectedFiles)
   }
 
-  private async getBranchesToShowWithCurrent(allBranches: string[]) {
+  private async collectGitLogAndOrder(
+    gitLog: string,
+    branch: string,
+    rowOrder: { branch: string; sha: string }[],
+    availableNbCommits: { [branch: string]: number },
+    args: Args
+  ) {
+    const nbOfCommitsToShow = this.experiments.getNbOfCommitsToShow(branch)
+
+    const [branchGitLog, totalCommits] = await Promise.all([
+      this.internalCommands.executeCommand(
+        AvailableCommands.GIT_GET_COMMIT_MESSAGES,
+        this.dvcRoot,
+        branch,
+        String(nbOfCommitsToShow)
+      ),
+      this.internalCommands.executeCommand<number>(
+        AvailableCommands.GIT_GET_NUM_COMMITS,
+        this.dvcRoot,
+        branch
+      )
+    ])
+    gitLog = [gitLog, branchGitLog].join(COMMITS_SEPARATOR)
+    availableNbCommits[branch] = totalCommits
+
+    for (const commit of branchGitLog.split(COMMITS_SEPARATOR)) {
+      const [sha] = commit.split('\n')
+      rowOrder.push({ branch, sha })
+      if (args.includes(sha)) {
+        continue
+      }
+      args.push(ExperimentFlag.REV, sha)
+    }
+    return gitLog
+  }
+
+  private async getBranchesToShow(allBranches: string[]) {
     const currentBranch = await this.internalCommands.executeCommand<string>(
       AvailableCommands.GIT_GET_CURRENT_BRANCH,
       this.dvcRoot
@@ -94,22 +123,16 @@ export class ExperimentsData extends BaseData<ExpShowOutput> {
 
     this.experiments.pruneBranchesToShow(allBranches)
 
-    const branches = this.experiments.getBranchesToShow()
+    const currentBranches = [
+      currentBranch,
+      ...this.experiments
+        .getBranchesToShow()
+        .filter(branch => branch !== currentBranch)
+    ]
 
-    if (!branches.includes(currentBranch)) {
-      branches.push(currentBranch)
-      this.experiments.setBranchesToShow(branches)
-    }
-    return { branches, currentBranch }
-  }
+    this.experiments.setBranchesToShow(currentBranches)
 
-  private async expShow(flags: (ExperimentFlag | string)[], branch?: string) {
-    const data = await this.internalCommands.executeCommand<ExpShowOutput>(
-      AvailableCommands.EXP_SHOW,
-      this.dvcRoot,
-      ...flags
-    )
-    return data.map(exp => ({ ...exp, branch }))
+    return currentBranches
   }
 
   private async updateAvailableBranchesToSelect(branches?: string[]) {

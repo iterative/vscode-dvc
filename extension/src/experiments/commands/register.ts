@@ -129,11 +129,7 @@ const registerExperimentInputCommands = (
 ): void => {
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_BRANCH,
-    () =>
-      experiments.getCwdExpNameAndInputThenRun(
-        getBranchExperimentCommand(experiments),
-        Title.ENTER_BRANCH_NAME
-      )
+    () => experiments.createExperimentBranch()
   )
 
   internalCommands.registerExternalCliCommand(
@@ -142,6 +138,7 @@ const registerExperimentInputCommands = (
       experiments.getInputAndRun(
         getBranchExperimentCommand(experiments),
         Title.ENTER_BRANCH_NAME,
+        `${id}-branch`,
         dvcRoot,
         id
       )

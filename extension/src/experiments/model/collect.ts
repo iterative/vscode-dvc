@@ -7,8 +7,8 @@ import {
 import { ExperimentType } from '.'
 import { extractColumns } from '../columns/extract'
 import {
-  Experiment,
   CommitData,
+  Experiment,
   RunningExperiment,
   isQueued,
   isRunning
@@ -81,56 +81,6 @@ const transformColumns = (
   }
 }
 
-const getCommitDataFromOutput = (
-  output: string
-): CommitData & { hash: string } => {
-  const data: CommitData & { hash: string } = {
-    author: '',
-    date: '',
-    hash: '',
-    message: '',
-    tags: []
-  }
-  const [hash, author, date, refNamesWithKey] = output
-    .split('\n')
-    .filter(Boolean)
-  data.hash = hash
-  data.author = author
-  data.date = date
-
-  const message = output.match(/\nmessage:(.+)/s) || []
-  data.message = message[1] || ''
-
-  const refNames = refNamesWithKey.slice('refNames:'.length)
-  data.tags = refNames
-    .split(', ')
-    .filter(item => item.startsWith('tag: '))
-    .map(item => item.slice('tag: '.length))
-
-  return data
-}
-
-const formatCommitMessage = (commit: string) => {
-  const lines = commit.split('\n').filter(Boolean)
-  return `${lines[0]}${lines.length > 1 ? ' ...' : ''}`
-}
-
-const getCommitData = (
-  commitsOutput: string | undefined
-): { [sha: string]: CommitData } => {
-  if (!commitsOutput) {
-    return {}
-  }
-  const commits = commitsOutput
-    .split(COMMITS_SEPARATOR)
-    .filter(Boolean)
-    .map(commit => {
-      const { hash, ...rest } = getCommitDataFromOutput(commit)
-      return [hash, { ...rest }]
-    })
-  return Object.fromEntries(commits) as { [sha: string]: CommitData }
-}
-
 const transformExpState = (
   experiment: Experiment,
   expState: ExpState,
@@ -156,22 +106,50 @@ const transformExpState = (
   return experiment
 }
 
-const addCommitData = (
-  baseline: Experiment,
-  commitData: { [sha: string]: CommitData } = {}
-): void => {
-  const { sha } = baseline
+const collectCommitData = (
+  acc: { [sha: string]: CommitData },
+  commit: string
+) => {
+  const [sha, author, date, refNamesWithKey] = commit
+    .split('\n')
+    .filter(Boolean)
+
   if (!sha) {
     return
   }
 
-  const commit = commitData[sha]
-
-  if (!commit) {
-    return
+  const commitData: CommitData = {
+    author: author || '',
+    date: date || '',
+    message: (commit.match(/\nmessage:(.+)/s) || [])[1] || '',
+    tags: []
   }
-  baseline.description = formatCommitMessage(commit.message)
-  baseline.commit = commit
+
+  if (refNamesWithKey) {
+    const refNames = refNamesWithKey.slice('refNames:'.length)
+    commitData.tags = refNames
+      .split(', ')
+      .filter(item => item.startsWith('tag: '))
+      .map(item => item.slice('tag: '.length))
+  }
+  acc[sha] = commitData
+}
+
+const collectCommitsData = (output: string): { [sha: string]: CommitData } => {
+  const acc: { [sha: string]: CommitData } = {}
+
+  for (const commit of output.split(COMMITS_SEPARATOR)) {
+    collectCommitData(acc, commit)
+  }
+  return acc
+}
+
+const formatCommitMessage = (commit: string | undefined) => {
+  if (!commit) {
+    return undefined
+  }
+  const lines = commit.split('\n').filter(Boolean)
+  return `${lines[0]}${lines.length > 1 ? ' ...' : ''}`
 }
 
 const collectExpState = (
@@ -179,14 +157,22 @@ const collectExpState = (
   expState: ExpState,
   commitData: { [sha: string]: CommitData }
 ): Experiment | undefined => {
-  const { rev, name, branch } = expState
+  const { rev, name } = expState
   const label =
     rev === EXPERIMENT_WORKSPACE_ID
       ? EXPERIMENT_WORKSPACE_ID
       : name || shortenForLabel(rev)
   const id = name || label
 
-  const experiment: Experiment = { branch, id, label } as unknown as Experiment
+  const commit: CommitData | undefined = commitData[rev]
+  const description: string | undefined = formatCommitMessage(commit?.message)
+
+  const experiment: Experiment = {
+    commit,
+    description,
+    id,
+    label
+  }
 
   const baseline = transformExpState(experiment, expState)
 
@@ -195,10 +181,30 @@ const collectExpState = (
     return
   }
 
-  addCommitData(baseline, commitData)
-
   acc.commits.push(baseline)
   return baseline
+}
+
+export const collectAddRemoveCommitsDetails = (
+  availableNbCommits: {
+    [branch: string]: number
+  },
+  getNbOfCommitsToShow: (branch: string) => number
+): {
+  hasMoreCommits: { [branch: string]: boolean }
+  isShowingMoreCommits: { [branch: string]: boolean }
+} => {
+  const hasMoreCommits: { [branch: string]: boolean } = {}
+  const isShowingMoreCommits: { [branch: string]: boolean } = {}
+
+  for (const [branch, availableCommits] of Object.entries(availableNbCommits)) {
+    const nbOfCommitsToShow = getNbOfCommitsToShow(branch)
+    hasMoreCommits[branch] = availableCommits > nbOfCommitsToShow
+    isShowingMoreCommits[branch] =
+      Math.min(nbOfCommitsToShow, availableCommits) > 1
+  }
+
+  return { hasMoreCommits, isShowingMoreCommits }
 }
 
 const getExecutor = (experiment: Experiment): Executor => {
@@ -325,25 +331,24 @@ const hasCheckpoints = (data: ExpShowOutput) => {
 }
 
 export const collectExperiments = (
-  output: ExpShowOutput,
-  dvcLiveOnly: boolean,
-  commitsOutput: string | undefined
+  expShow: ExpShowOutput,
+  gitLog: string,
+  dvcLiveOnly: boolean
 ): ExperimentsAccumulator => {
   const acc: ExperimentsAccumulator = {
     commits: [],
     experimentsByCommit: new Map(),
-    hasCheckpoints: hasCheckpoints(output),
+    hasCheckpoints: hasCheckpoints(expShow),
     runningExperiments: [],
     workspace: {
-      branch: undefined,
       id: EXPERIMENT_WORKSPACE_ID,
       label: EXPERIMENT_WORKSPACE_ID
     }
   }
 
-  const commitData = getCommitData(commitsOutput)
+  const commitData = collectCommitsData(gitLog)
 
-  for (const expState of output) {
+  for (const expState of expShow) {
     const baseline = collectExpState(acc, expState, commitData)
     const { experiments } = expState
 

@@ -16,7 +16,6 @@ import { buildMockMemento } from '../test/util'
 import { buildMockedEventEmitter } from '../test/util/jest'
 import { OutputChannel } from '../vscode/outputChannel'
 import { Title } from '../vscode/title'
-import { Args } from '../cli/dvc/constants'
 import {
   findOrCreateDvcYamlFile,
   getFileExtension,
@@ -44,6 +43,7 @@ const mockedHasDvcYamlFile = jest.mocked(hasDvcYamlFile)
 const mockedGetBranches = jest.fn()
 const mockedGetCurrentBranch = jest.fn()
 const mockedPickFile = jest.mocked(pickFile)
+const mockedExpBranch = jest.fn()
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -89,6 +89,11 @@ describe('Experiments', () => {
   mockedInternalCommands.registerCommand(
     AvailableCommands.GIT_GET_CURRENT_BRANCH,
     () => mockedGetCurrentBranch()
+  )
+
+  mockedInternalCommands.registerCommand(
+    AvailableCommands.EXP_BRANCH,
+    mockedExpBranch
   )
 
   const workspaceExperiments = new WorkspaceExperiments(
@@ -242,79 +247,61 @@ describe('Experiments', () => {
     })
   })
 
-  describe('getCwdExpNameAndInputThenRun', () => {
-    it('should call the correct function with the correct parameters if a project and experiment are picked and an input provided', async () => {
+  describe('createExperimentBranch', () => {
+    it('should create a branch with the correct name if a project and experiment are picked and an input provided', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       mockedListStages.mockResolvedValueOnce('train')
       mockedPickCommitOrExperiment.mockResolvedValueOnce('a123456')
       mockedGetInput.mockResolvedValueOnce('abc123')
 
-      await workspaceExperiments.getCwdExpNameAndInputThenRun(
-        (cwd: string, ...args: Args) =>
-          workspaceExperiments.runCommand(mockedCommandId, cwd, ...args),
-        'enter your password please' as Title
-      )
+      await workspaceExperiments.createExperimentBranch()
 
       expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
+      expect(mockedGetInput).toHaveBeenCalledWith(
+        Title.ENTER_BRANCH_NAME,
+        'a123456-branch'
+      )
       expect(mockedPickCommitOrExperiment).toHaveBeenCalledTimes(1)
-      expect(mockedExpFunc).toHaveBeenCalledTimes(1)
-      expect(mockedExpFunc).toHaveBeenCalledWith(
+      expect(mockedExpBranch).toHaveBeenCalledTimes(1)
+      expect(mockedExpBranch).toHaveBeenCalledWith(
         mockedDvcRoot,
         'a123456',
         'abc123'
       )
     })
 
-    it('should not call the function or ask for input if a project is not picked', async () => {
+    it('should not ask for a branch name if a project is not picked', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
 
-      await workspaceExperiments.getCwdExpNameAndInputThenRun(
-        (cwd: string, ...args: Args) =>
-          workspaceExperiments.runCommand(mockedCommandId, cwd, ...args),
-        'please name the branch' as Title
-      )
+      await workspaceExperiments.createExperimentBranch()
 
       expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
       expect(mockedGetInput).not.toHaveBeenCalled()
-      expect(mockedExpFunc).not.toHaveBeenCalled()
+      expect(mockedExpBranch).not.toHaveBeenCalled()
     })
 
-    it('should not call the function if user input is not provided', async () => {
+    it('should not create a branch if the user does not provide a name', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       mockedListStages.mockResolvedValueOnce('train')
-      mockedPickCommitOrExperiment.mockResolvedValueOnce({
-        id: 'b456789',
-        name: 'exp-456'
-      })
+      mockedPickCommitOrExperiment.mockResolvedValueOnce('exp-456')
       mockedGetInput.mockResolvedValueOnce(undefined)
 
-      await workspaceExperiments.getCwdExpNameAndInputThenRun(
-        (cwd: string, ...args: Args) =>
-          workspaceExperiments.runCommand(mockedCommandId, cwd, ...args),
-        'please enter your bank account number and sort code' as Title
-      )
+      await workspaceExperiments.createExperimentBranch()
 
       expect(mockedQuickPickOne).toHaveBeenCalledTimes(1)
       expect(mockedGetInput).toHaveBeenCalledTimes(1)
-      expect(mockedExpFunc).not.toHaveBeenCalled()
+      expect(mockedExpBranch).not.toHaveBeenCalled()
     })
 
-    it('should check and ask for the creation of a pipeline stage before running the command', async () => {
+    it('should check and ask for the creation of a pipeline stage before doing anything else', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       mockedListStages.mockResolvedValueOnce('')
-      mockedPickCommitOrExperiment.mockResolvedValueOnce({
-        id: 'a123456',
-        name: 'exp-123'
-      })
+      mockedPickCommitOrExperiment.mockResolvedValueOnce('exp-123')
       mockedGetInput.mockResolvedValueOnce('abc123')
 
-      await workspaceExperiments.getCwdExpNameAndInputThenRun(
-        (cwd: string, ...args: Args) =>
-          workspaceExperiments.runCommand(mockedCommandId, cwd, ...args),
-        'enter your password please' as Title
-      )
+      await workspaceExperiments.createExperimentBranch()
 
-      expect(mockedExpFunc).not.toHaveBeenCalled()
+      expect(mockedExpBranch).not.toHaveBeenCalled()
     })
   })
 

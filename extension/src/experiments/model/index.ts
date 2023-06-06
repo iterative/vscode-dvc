@@ -2,6 +2,7 @@ import { Memento } from 'vscode'
 import { SortDefinition, sortExperiments } from './sortBy'
 import { FilterDefinition, filterExperiment, getFilterId } from './filterBy'
 import {
+  collectAddRemoveCommitsDetails,
   collectExperiments,
   collectOrderedCommitsAndExperiments,
   collectRunningInQueue,
@@ -17,6 +18,7 @@ import { Color, copyOriginalColors } from './status/colors'
 import { canSelect, ColoredStatus, UNSELECTED } from './status'
 import { collectFlatExperimentParams } from './modify/collect'
 import {
+  Commit,
   Experiment,
   isQueued,
   isRunning,
@@ -53,6 +55,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   private workspace = {} as Experiment
   private commits: Experiment[] = []
   private experimentsByCommit: Map<string, Experiment[]> = new Map()
+  private rowOrder: { branch: string; sha: string }[] = []
   private checkpoints = false
   private availableColors: Color[]
   private coloredStatus: ColoredStatus
@@ -60,6 +63,8 @@ export class ExperimentsModel extends ModelWithPersistence {
   private numberOfCommitsToShow: Record<string, number>
   private branchesToShow: string[] = []
   private availableBranchesToShow: string[] = []
+  private hasMoreCommits: { [branch: string]: boolean } = {}
+  private isShowingMoreCommits: { [branch: string]: boolean } = {}
 
   private filters: Map<string, FilterDefinition> = new Map()
 
@@ -110,9 +115,11 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public transformAndSet(
-    data: ExpShowOutput,
+    expShow: ExpShowOutput,
+    gitLog: string,
     dvcLiveOnly: boolean,
-    commitsOutput: string | undefined
+    rowOrder: { branch: string; sha: string }[],
+    availableNbCommits: { [branch: string]: number }
   ) {
     const {
       workspace,
@@ -120,13 +127,28 @@ export class ExperimentsModel extends ModelWithPersistence {
       experimentsByCommit,
       runningExperiments,
       hasCheckpoints
-    } = collectExperiments(data, dvcLiveOnly, commitsOutput)
+    } = collectExperiments(expShow, gitLog, dvcLiveOnly)
 
+    const { hasMoreCommits, isShowingMoreCommits } =
+      collectAddRemoveCommitsDetails(availableNbCommits, (branch: string) =>
+        this.getNbOfCommitsToShow(branch)
+      )
+
+    this.hasMoreCommits = hasMoreCommits
+    this.isShowingMoreCommits = isShowingMoreCommits
+
+    commits.sort((a, b) => (b.Created || '').localeCompare(a.Created || ''))
+
+    this.rowOrder = rowOrder
     this.workspace = workspace
     this.commits = commits
     this.experimentsByCommit = experimentsByCommit
     this.checkpoints = hasCheckpoints
 
+    const isTransientError = this.hasRunningExperiment() && workspace.error
+    if (isTransientError) {
+      return
+    }
     this.setColoredStatus(runningExperiments)
   }
 
@@ -226,13 +248,13 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getRevisionIds() {
-    return this.getUniqueList().map(({ id }) => id)
+    return this.getCombinedList().map(({ id }) => id)
   }
 
   public getSelectedRevisions() {
     const acc: SelectedExperimentWithColor[] = []
 
-    for (const experiment of this.getUniqueList()) {
+    for (const experiment of this.getCombinedList()) {
       const { id } = experiment
       const displayColor = this.coloredStatus[id]
       if (displayColor) {
@@ -263,7 +285,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getLabels() {
-    return this.getUniqueList().map(({ label }) => label)
+    return this.getCombinedList().map(({ label }) => label)
   }
 
   public getLabelsToDecorate() {
@@ -285,7 +307,7 @@ export class ExperimentsModel extends ModelWithPersistence {
       }
     ]
 
-    for (const commit of this.getCommits()) {
+    for (const commit of this.commits) {
       experiments.push({
         ...this.addDetails(commit),
         hasChildren: !!this.experimentsByCommit.get(commit.id),
@@ -302,14 +324,14 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public getErrors() {
     return new Set(
-      this.getUniqueList()
+      this.getCombinedList()
         .filter(({ error }) => error)
         .map(({ label }) => label)
     )
   }
 
   public getExperimentParams(id: string) {
-    const params = this.getUniqueList().find(
+    const params = this.getCombinedList().find(
       experiment => experiment.id === id
     )?.params
 
@@ -323,7 +345,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getCommitsAndExperiments() {
-    return collectOrderedCommitsAndExperiments(this.getCommits(), commit =>
+    return collectOrderedCommitsAndExperiments(this.commits, commit =>
       this.getExperimentsByCommit(commit)
     )
   }
@@ -350,9 +372,15 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getRowData() {
+    const commitsBySha: { [sha: string]: Commit } = {}
+    for (const commit of this.commits) {
+      commitsBySha[commit.sha as string] = commit
+    }
+
     return [
-      this.addDetails(this.workspace),
-      ...this.commits.map(commit => {
+      { branch: undefined, ...this.addDetails(this.workspace) },
+      ...this.rowOrder.map(({ branch, sha }) => {
+        const commit = { ...commitsBySha[sha], branch }
         const experiments = this.getExperimentsByCommit(commit)
         const commitWithSelectedAndStarred = this.addDetails(commit)
 
@@ -371,6 +399,14 @@ export class ExperimentsModel extends ModelWithPersistence {
     ]
   }
 
+  public getHasMoreCommits() {
+    return this.hasMoreCommits
+  }
+
+  public getIsShowingMoreCommits() {
+    return this.isShowingMoreCommits
+  }
+
   public isSelected(id: string) {
     return !!this.coloredStatus[id]
   }
@@ -380,11 +416,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getExperimentCount() {
-    return sum([
-      this.getExperimentsAndQueued().length,
-      this.getCommits().length,
-      1
-    ])
+    return sum([this.getExperimentsAndQueued().length, this.commits.length, 1])
   }
 
   public getFilteredCount() {
@@ -392,12 +424,8 @@ export class ExperimentsModel extends ModelWithPersistence {
     return filtered.length
   }
 
-  public getUniqueList() {
-    return [
-      this.workspace,
-      ...this.getCommits(),
-      ...this.getExperimentsAndQueued()
-    ]
+  public getCombinedList() {
+    return [this.workspace, ...this.commits, ...this.getExperimentsAndQueued()]
   }
 
   public getExperimentsByCommitForTree(commit: Experiment) {
@@ -447,20 +475,6 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   private findIndexByPath(pathToRemove: string) {
     return this.currentSorts.findIndex(({ path }) => path === pathToRemove)
-  }
-
-  private getCommits() {
-    const ids = new Set<string>()
-    const commits: Experiment[] = []
-    for (const commit of this.commits) {
-      const { id } = commit
-      if (ids.has(id)) {
-        continue
-      }
-      commits.push(commit)
-      ids.add(id)
-    }
-    return commits
   }
 
   private getFilteredExperiments() {
