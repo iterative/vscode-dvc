@@ -1,4 +1,8 @@
-import { getPythonExecutionDetails } from '../extensions/python'
+import {
+  Environment,
+  getActiveEnvironmentInfo,
+  getPythonExecutionDetails
+} from '../extensions/python'
 import { findPythonBin, getDefaultPython, installPackages } from '../python'
 import { ConfigKey, getConfigValue } from '../vscode/config'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
@@ -16,9 +20,22 @@ export const findPythonBinForInstall = async (): Promise<
   )
 }
 
+export const findPythonEnvInfoForInstall = async (): Promise<
+  Environment | undefined
+> => {
+  const manualPython = getConfigValue(ConfigKey.PYTHON_PATH)
+  const autoPythonDetails = await getPythonExecutionDetails()
+
+  const isPythonExtensionUsed = !manualPython && !!autoPythonDetails?.join('')
+  const pythonExtensionActiveEnv = await getActiveEnvironmentInfo()
+
+  return isPythonExtensionUsed ? pythonExtensionActiveEnv : undefined
+}
+
 const showUpgradeProgress = (
   root: string,
-  pythonBinPath: string
+  pythonBinPath: string,
+  envInfo?: Environment
 ): Thenable<unknown> =>
   Toast.showProgress('Upgrading DVC', async progress => {
     progress.report({ increment: 0 })
@@ -28,7 +45,7 @@ const showUpgradeProgress = (
     try {
       await Toast.runCommandAndIncrementProgress(
         async () => {
-          await installPackages(root, pythonBinPath, 'dvc')
+          await installPackages(root, pythonBinPath, envInfo, 'dvc')
           return 'Upgraded successfully'
         },
         progress,
@@ -43,7 +60,8 @@ const showUpgradeProgress = (
 
 const showInstallProgress = (
   root: string,
-  pythonBinPath: string
+  pythonBinPath: string,
+  envInfo: Environment
 ): Thenable<unknown> =>
   Toast.showProgress('Installing packages', async progress => {
     progress.report({ increment: 0 })
@@ -51,7 +69,7 @@ const showInstallProgress = (
     try {
       await Toast.runCommandAndIncrementProgress(
         async () => {
-          await installPackages(root, pythonBinPath, 'dvclive')
+          await installPackages(root, pythonBinPath, envInfo, 'dvclive')
           return 'DVCLive Installed'
         },
         progress,
@@ -64,7 +82,7 @@ const showInstallProgress = (
     try {
       await Toast.runCommandAndIncrementProgress(
         async () => {
-          await installPackages(root, pythonBinPath, 'dvc')
+          await installPackages(root, pythonBinPath, envInfo, 'dvc')
           return 'DVC Installed'
         },
         progress,
@@ -78,10 +96,15 @@ const showInstallProgress = (
   })
 
 const getArgsAndRunCommand = async (
-  command: (root: string, pythonBinPath: string) => Thenable<unknown>
+  command: (
+    root: string,
+    pythonBinPath: string,
+    envInfo: Environment | undefined
+  ) => Thenable<unknown>
 ): Promise<unknown> => {
   const pythonBinPath = await findPythonBinForInstall()
   const root = getFirstWorkspaceFolder()
+  const pythonEnvInfo = await findPythonEnvInfoForInstall()
 
   if (!root) {
     return Toast.showError(
@@ -95,7 +118,7 @@ const getArgsAndRunCommand = async (
     )
   }
 
-  return command(root, pythonBinPath)
+  return command(root, pythonBinPath, pythonEnvInfo)
 }
 
 export const autoInstallDvc = (): Promise<unknown> => {

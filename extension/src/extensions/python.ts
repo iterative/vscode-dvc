@@ -11,12 +11,25 @@ interface Settings {
   }
 }
 
+export interface Environment {
+  id: string
+  environment: {
+    name: string | undefined
+    type: string
+    folderUri: Uri
+  }
+}
+
 export interface VscodePython {
   ready: Thenable<void>
   settings: Settings
+  environments: {
+    getActiveEnvironmentPath: () => { id: string }
+    known: Environment[]
+  }
 }
 
-const getPythonExtensionSettings = async (): Promise<Settings | undefined> => {
+const getPythonExtensionAPI = async (): Promise<VscodePython | undefined> => {
   const api = await getExtensionAPI<VscodePython>(PYTHON_EXTENSION_ID)
   if (!api) {
     return
@@ -24,14 +37,14 @@ const getPythonExtensionSettings = async (): Promise<Settings | undefined> => {
   try {
     await api.ready
   } catch {}
-  return api.settings
+  return api
 }
 
 export const getPythonExecutionDetails = async (): Promise<
   string[] | undefined
 > => {
-  const settings = await getPythonExtensionSettings()
-  return settings?.getExecutionDetails().execCommand
+  const api = await getPythonExtensionAPI()
+  return api?.settings?.getExecutionDetails().execCommand
 }
 
 export const getPythonBinPath = async (): Promise<string | undefined> => {
@@ -42,9 +55,20 @@ export const getPythonBinPath = async (): Promise<string | undefined> => {
   }
 }
 
+export const getActiveEnvironmentInfo = async (): Promise<
+  Environment | undefined
+> => {
+  const api = await getPythonExtensionAPI()
+  if (!api?.environments) {
+    return
+  }
+  const envPath = api.environments.getActiveEnvironmentPath()
+  return api.environments.known.find(({ id }) => id === envPath.id)
+}
+
 export const getOnDidChangePythonExecutionDetails = async () => {
-  const settings = await getPythonExtensionSettings()
-  return settings?.onDidChangeExecutionDetails
+  const api = await getPythonExtensionAPI()
+  return api?.settings?.onDidChangeExecutionDetails
 }
 
 export const isPythonExtensionInstalled = () => isInstalled(PYTHON_EXTENSION_ID)

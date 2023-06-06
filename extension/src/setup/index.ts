@@ -345,6 +345,9 @@ export class Setup
     const commandArgs = args.length === 0 ? '' : ` ${args.join(' ')}`
     const command = executable + commandArgs
 
+    // add a type here
+    // will tell the frontend if they need default pip mentions
+    // or just "Install"
     return {
       command,
       version: this.cliVersion

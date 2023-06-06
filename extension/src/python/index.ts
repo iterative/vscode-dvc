@@ -4,6 +4,8 @@ import { getProcessPlatform } from '../env'
 import { exists } from '../fileSystem'
 import { Logger } from '../common/logger'
 import { createProcess, executeProcess, Process } from '../process/execution'
+import { Toast } from '../vscode/toast'
+import { Environment } from '../extensions/python'
 
 const sendOutput = (process: Process) => {
   process.all?.on('data', chunk =>
@@ -12,18 +14,68 @@ const sendOutput = (process: Process) => {
   return process
 }
 
-export const installPackages = (
+const fileToCommandArgument = (value: string): string => {
+  if (!value) {
+    return value
+  }
+
+  const toCommandArgument =
+    value.includes(' ') && !value.startsWith('"') && !value.endsWith('"')
+      ? `"${value}"`
+      : value.toString()
+
+  return toCommandArgument.replace(/\\/g, '/')
+}
+
+const getCondaOptions = (
+  cwd: string,
+  envInfo: Environment,
+  ...args: string[]
+) => {
+  const defaultArgs = ['install', '-c', 'conda-forge', '-y']
+
+  if (envInfo.environment.name) {
+    defaultArgs.push('--name', envInfo.environment.name)
+  } else {
+    defaultArgs.push(
+      '--prefix',
+      // need to research on getting prefix path
+      // not sure if this is the best way
+      fileToCommandArgument(envInfo.environment.folderUri.path)
+    )
+  }
+
+  return {
+    args: [...defaultArgs, ...args],
+    cwd,
+    executable: 'conda'
+  }
+}
+
+export const getPipOptions = (
   cwd: string,
   pythonBin: string,
   ...args: string[]
-): Process => {
-  const options = {
+) => {
+  return {
     args: ['-m', 'pip', 'install', '--upgrade', ...args],
     cwd,
     executable: pythonBin
   }
+}
 
-  return createProcess(options)
+export const installPackages = (
+  cwd: string,
+  pythonBin: string,
+  envInfo: Environment | undefined,
+  ...args: string[]
+) => {
+  const envType = envInfo?.environment?.type
+  let opts = getPipOptions(cwd, pythonBin, ...args)
+  if (envInfo && envType === 'Conda') {
+    opts = getCondaOptions(cwd, envInfo, ...args)
+  }
+  return createProcess(opts)
 }
 
 export const getDefaultPython = (): string =>

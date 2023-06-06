@@ -15,12 +15,10 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
     <>
       The extension supports all{' '}
       <a href="https://dvc.org/doc/install">installation types</a> and can
-      auto-install recommended packages via{' '}
-      <a href="https://packaging.python.org/en/latest/key_projects/#pip">pip</a>
-      .
+      auto-install recommended packages.
     </>
   )
-
+  // the pip mentions will need to be conditional in the case of unknown environments
   const conditionalContents = canInstall ? (
     <>
       <p>
@@ -28,7 +26,7 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
         {pythonBinPath}.
       </p>
       <div className={styles.sideBySideButtons}>
-        <Button onClick={installDvc} text="Install (pip)" />
+        <Button onClick={installDvc} text="Install" />
         <Button onClick={setupWorkspace} text="Configure" />
       </div>
     </>
