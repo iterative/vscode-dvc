@@ -14,8 +14,8 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
   const installationSentence = (
     <>
       The extension supports all{' '}
-      <a href="https://dvc.org/doc/install">installation types</a> and can
-      auto-install recommended packages via{' '}
+      <a href="https://dvc.org/doc/install">installation types</a>. It can also
+      help to install needed packages via{' '}
       <a href="https://packaging.python.org/en/latest/key_projects/#pip">pip</a>
       .
     </>
@@ -46,11 +46,6 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
     <EmptyState isFullScreen={false}>
       <h1>DVC is currently unavailable</h1>
       {children}
-      <p>
-        New to DVC? Check out <a href="https://dvc.org/">dvc.org</a> to learn
-        more or quickly try the extension with our{' '}
-        <a href="https://github.com/iterative/vscode-dvc-demo">demo</a>.
-      </p>
       {conditionalContents}
     </EmptyState>
   )

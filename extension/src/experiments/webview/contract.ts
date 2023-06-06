@@ -46,7 +46,7 @@ export type Experiment = {
   starred?: boolean
   status?: ExperimentStatus
   timestamp?: string | null
-  branch?: string
+  branch?: string | undefined
 }
 
 export const isRunning = (status: ExperimentStatus | undefined): boolean =>

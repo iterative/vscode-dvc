@@ -2,6 +2,7 @@
 import { join } from 'path'
 import { commands } from 'vscode'
 import { ExperimentsModel } from '.'
+import { copyOriginalColors } from './status/colors'
 import gitLogFixture from '../../test/fixtures/expShow/base/gitLog'
 import rowOrderFixture from '../../test/fixtures/expShow/base/rowOrder'
 import outputFixture from '../../test/fixtures/expShow/base/output'
@@ -20,7 +21,9 @@ import survivalRowsFixture from '../../test/fixtures/expShow/survival/rows'
 import {
   ExperimentStatus,
   EXPERIMENT_WORKSPACE_ID,
-  Executor
+  Executor,
+  ExpWithError,
+  ExpShowOutput
 } from '../../cli/dvc/contract'
 import { PersistenceKey } from '../../persistence/constants'
 
@@ -39,6 +42,8 @@ const DEFAULT_DATA: [
   { branch: string; sha: string }[],
   { [branch: string]: number }
 ] = ['', false, [], { main: 2000 }]
+
+type TransformAndSetInputs = [ExpShowOutput, ...typeof DEFAULT_DATA]
 
 describe('ExperimentsModel', () => {
   it('should return the expected rows when given the base fixture', () => {
@@ -404,5 +409,117 @@ describe('ExperimentsModel', () => {
       'B',
       'C'
     ])
+  })
+
+  const getSelectedRevisions = (
+    model: ExperimentsModel
+  ): { id: string; displayColor: string }[] =>
+    model
+      .getSelectedRevisions()
+      .map(({ displayColor, id }) => ({ displayColor, id }))
+
+  it('should not update the status of experiments if exp show fails and there was a running experiment', () => {
+    const memento = buildMockMemento()
+    const model = new ExperimentsModel('', memento)
+    const colorList = copyOriginalColors()
+    const expectedSelection = [
+      { id: 'exp-83425', displayColor: colorList[0] },
+      { id: 'exp-e7a67', displayColor: colorList[1] },
+      { id: EXPERIMENT_WORKSPACE_ID, displayColor: colorList[2] }
+    ]
+
+    const runningExperimentData: TransformAndSetInputs = [
+      outputFixture,
+      gitLogFixture,
+      false,
+      [],
+      {
+        main: 2000
+      }
+    ]
+
+    const transientErrorData: TransformAndSetInputs = [
+      [
+        {
+          rev: EXPERIMENT_WORKSPACE_ID,
+          error: {
+            type: 'caught error',
+            msg:
+              'unexpected error - [Errno 2]' +
+              "No such file or directory: '.dvc/tmp/exps/run/ee47660cc5723ec201b88aa0fb8002e47508ee65/ee47660cc5723ec201b88aa0fb8002e47508ee65.run'" +
+              'Having any troubles? Hit us up at https://dvc.org/support, we are always happy to help!'
+          }
+        } as ExpWithError
+      ],
+      gitLogFixture,
+      false,
+      [],
+      {
+        main: 2000
+      }
+    ]
+
+    model.transformAndSet(...runningExperimentData)
+
+    model.toggleStatus('exp-e7a67')
+    model.toggleStatus(EXPERIMENT_WORKSPACE_ID)
+
+    expect(getSelectedRevisions(model)).toStrictEqual(expectedSelection)
+    expect(model.hasRunningExperiment()).toBe(true)
+
+    model.transformAndSet(...transientErrorData)
+
+    expect(getSelectedRevisions(model)).toStrictEqual(
+      expectedSelection.slice(2)
+    )
+    expect(model.hasRunningExperiment()).toBe(true)
+
+    model.transformAndSet(...runningExperimentData)
+
+    expect(getSelectedRevisions(model)).toStrictEqual(expectedSelection)
+    expect(model.hasRunningExperiment()).toBe(true)
+  })
+
+  it('should update the status of experiments if exp show fails and there was not a running experiment', () => {
+    const memento = buildMockMemento()
+    const model = new ExperimentsModel('', memento)
+    const colorList = copyOriginalColors()
+
+    const noRunningExperimentData: TransformAndSetInputs = [
+      survivalOutputFixture,
+      ...DEFAULT_DATA
+    ]
+
+    const unexpectedErrorData: TransformAndSetInputs = [
+      [
+        {
+          rev: EXPERIMENT_WORKSPACE_ID,
+          error: {
+            type: 'caught error',
+            msg: 'unexpected - error'
+          }
+        } as ExpWithError
+      ],
+      ...DEFAULT_DATA
+    ]
+
+    model.transformAndSet(...noRunningExperimentData)
+
+    model.toggleStatus('main')
+
+    expect(getSelectedRevisions(model)).toStrictEqual([
+      { id: 'main', displayColor: colorList[0] }
+    ])
+    expect(model.hasRunningExperiment()).toBe(false)
+
+    model.transformAndSet(...unexpectedErrorData)
+
+    expect(getSelectedRevisions(model)).toStrictEqual([])
+    expect(model.hasRunningExperiment()).toBe(false)
+
+    model.transformAndSet(...noRunningExperimentData)
+
+    expect(getSelectedRevisions(model)).toStrictEqual([])
+    expect(model.hasRunningExperiment()).toBe(false)
   })
 })

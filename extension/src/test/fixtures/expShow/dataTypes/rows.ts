@@ -3,7 +3,7 @@ import { Commit } from '../../../../experiments/webview/contract'
 
 const data: Commit[] = [
   {
-    branch: 'main',
+    branch: undefined,
     displayColor: undefined,
     id: EXPERIMENT_WORKSPACE_ID,
     label: EXPERIMENT_WORKSPACE_ID,
