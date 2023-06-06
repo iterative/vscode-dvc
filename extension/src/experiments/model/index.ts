@@ -2,6 +2,7 @@ import { Memento } from 'vscode'
 import { SortDefinition, sortExperiments } from './sortBy'
 import { FilterDefinition, filterExperiment, getFilterId } from './filterBy'
 import {
+  collectAddRemoveCommitsDetails,
   collectExperiments,
   collectOrderedCommitsAndExperiments,
   collectRunningInQueue,
@@ -62,6 +63,8 @@ export class ExperimentsModel extends ModelWithPersistence {
   private numberOfCommitsToShow: Record<string, number>
   private branchesToShow: string[] = []
   private availableBranchesToShow: string[] = []
+  private hasMoreCommits: { [branch: string]: boolean } = {}
+  private isShowingMoreCommits: { [branch: string]: boolean } = {}
 
   private filters: Map<string, FilterDefinition> = new Map()
 
@@ -115,7 +118,8 @@ export class ExperimentsModel extends ModelWithPersistence {
     expShow: ExpShowOutput,
     gitLog: string,
     dvcLiveOnly: boolean,
-    rowOrder: { branch: string; sha: string }[]
+    rowOrder: { branch: string; sha: string }[],
+    availableNbCommits: { [branch: string]: number }
   ) {
     const {
       workspace,
@@ -124,6 +128,14 @@ export class ExperimentsModel extends ModelWithPersistence {
       runningExperiments,
       hasCheckpoints
     } = collectExperiments(expShow, gitLog, dvcLiveOnly)
+
+    const { hasMoreCommits, isShowingMoreCommits } =
+      collectAddRemoveCommitsDetails(availableNbCommits, (branch: string) =>
+        this.getNbOfCommitsToShow(branch)
+      )
+
+    this.hasMoreCommits = hasMoreCommits
+    this.isShowingMoreCommits = isShowingMoreCommits
 
     commits.sort((a, b) => (b.Created || '').localeCompare(a.Created || ''))
 
@@ -381,6 +393,14 @@ export class ExperimentsModel extends ModelWithPersistence {
         }
       })
     ]
+  }
+
+  public getHasMoreCommits() {
+    return this.hasMoreCommits
+  }
+
+  public getIsShowingMoreCommits() {
+    return this.isShowingMoreCommits
   }
 
   public isSelected(id: string) {

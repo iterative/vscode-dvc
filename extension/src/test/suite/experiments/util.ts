@@ -21,18 +21,21 @@ import { PersistenceKey } from '../../../persistence/constants'
 import { ExpShowOutput } from '../../../cli/dvc/contract'
 
 export const DEFAULT_EXPERIMENTS_OUTPUT = {
+  availableNbCommits: { main: 5 },
   expShow: expShowFixture,
   gitLog: gitLogFixture,
   rowOrder: rowOrderFixture
 }
 
 export const buildExperiments = ({
+  availableNbCommits = { main: 5 },
   disposer,
   dvcRoot = dvcDemoPath,
   expShow = expShowFixture,
   gitLog = gitLogFixture,
   rowOrder = rowOrderFixture
 }: {
+  availableNbCommits?: { [branch: string]: number }
   disposer: Disposer
   dvcRoot?: string
   expShow?: ExpShowOutput
@@ -79,6 +82,7 @@ export const buildExperiments = ({
   )
 
   void experiments.setState({
+    availableNbCommits,
     expShow,
     gitLog,
     rowOrder
@@ -192,6 +196,7 @@ export const buildExperimentsData = (
   stub(gitReader, 'getBranches').resolves(['one'])
   stub(gitReader, 'getCurrentBranch').resolves(currentBranch)
   stub(gitReader, 'getCommitMessages').resolves(commitOutput)
+  stub(gitReader, 'getNumCommits').resolves(404)
 
   const mockGetBranchesToShow = stub().returns(['main'])
   const mockPruneBranchesToShow = stub()

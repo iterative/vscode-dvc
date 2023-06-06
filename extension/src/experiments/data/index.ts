@@ -51,10 +51,17 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     const branches = await this.getBranchesToShow(allBranches)
     let gitLog = ''
     const rowOrder: { branch: string; sha: string }[] = []
+    const availableNbCommits: { [branch: string]: number } = {}
     const args: Args = []
 
     for (const branch of branches) {
-      gitLog = await this.collectGitLogAndOrder(gitLog, branch, rowOrder, args)
+      gitLog = await this.collectGitLogAndOrder(
+        gitLog,
+        branch,
+        rowOrder,
+        availableNbCommits,
+        args
+      )
     }
 
     const expShow = await this.internalCommands.executeCommand<ExpShowOutput>(
@@ -65,11 +72,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
 
     this.collectFiles({ expShow })
 
-    return this.notifyChanged({
-      expShow,
-      gitLog,
-      rowOrder
-    })
+    return this.notifyChanged({ availableNbCommits, expShow, gitLog, rowOrder })
   }
 
   protected collectFiles({ expShow }: { expShow: ExpShowOutput }) {
@@ -80,17 +83,26 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     gitLog: string,
     branch: string,
     rowOrder: { branch: string; sha: string }[],
+    availableNbCommits: { [branch: string]: number },
     args: Args
   ) {
     const nbOfCommitsToShow = this.experiments.getNbOfCommitsToShow(branch)
 
-    const branchGitLog = await this.internalCommands.executeCommand(
-      AvailableCommands.GIT_GET_COMMIT_MESSAGES,
-      this.dvcRoot,
-      branch,
-      String(nbOfCommitsToShow)
-    )
+    const [branchGitLog, totalCommits] = await Promise.all([
+      this.internalCommands.executeCommand(
+        AvailableCommands.GIT_GET_COMMIT_MESSAGES,
+        this.dvcRoot,
+        branch,
+        String(nbOfCommitsToShow)
+      ),
+      this.internalCommands.executeCommand<number>(
+        AvailableCommands.GIT_GET_NUM_COMMITS,
+        this.dvcRoot,
+        branch
+      )
+    ])
     gitLog = [gitLog, branchGitLog].join(COMMITS_SEPARATOR)
+    availableNbCommits[branch] = totalCommits
 
     for (const commit of branchGitLog.split(COMMITS_SEPARATOR)) {
       const [sha] = commit.split('\n')

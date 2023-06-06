@@ -33,26 +33,39 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-const DEFAULT_DATA: [string, boolean, { branch: string; sha: string }[]] = [
-  '',
-  false,
-  []
-]
+const DEFAULT_DATA: [
+  string,
+  boolean,
+  { branch: string; sha: string }[],
+  { [branch: string]: number }
+] = ['', false, [], { main: 2000 }]
 
 describe('ExperimentsModel', () => {
   it('should return the expected rows when given the base fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, gitLogFixture, false, rowOrderFixture)
+    model.transformAndSet(
+      outputFixture,
+      gitLogFixture,
+      false,
+      rowOrderFixture,
+      { main: 6 }
+    )
     expect(model.getRowData()).toStrictEqual(rowsFixture)
   })
 
   it('should return the expected rows when given the survival fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(survivalOutputFixture, '', false, [
-      { branch: 'main', sha: '3d5adcb974bb2c85917a5d61a489b933adaa2b7f' },
-      { branch: 'main', sha: 'a49e03966a1f9f1299ec222ebc4bed8625d2c54d' },
-      { branch: 'main', sha: '4f7b50c3d171a11b6cfcd04416a16fc80b61018d' }
-    ])
+    model.transformAndSet(
+      survivalOutputFixture,
+      '',
+      false,
+      [
+        { branch: 'main', sha: '3d5adcb974bb2c85917a5d61a489b933adaa2b7f' },
+        { branch: 'main', sha: 'a49e03966a1f9f1299ec222ebc4bed8625d2c54d' },
+        { branch: 'main', sha: '4f7b50c3d171a11b6cfcd04416a16fc80b61018d' }
+      ],
+      { main: 700 }
+    )
     expect(model.getRowData()).toStrictEqual(
       expect.objectContaining(survivalRowsFixture)
     )
@@ -87,7 +100,7 @@ describe('ExperimentsModel', () => {
       }
     )
 
-    model.transformAndSet(dvcLiveOnly, '', true, [])
+    model.transformAndSet(dvcLiveOnly, '', true, [], { main: 2000 })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const runningWorkspace = (model as any).workspace
     expect(runningWorkspace?.executor).toStrictEqual(EXPERIMENT_WORKSPACE_ID)
@@ -178,9 +191,13 @@ describe('ExperimentsModel', () => {
 
   it('should return the expected rows when given the deeply nested output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(deeplyNestedOutputFixture, '', false, [
-      { branch: 'main', sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77' }
-    ])
+    model.transformAndSet(
+      deeplyNestedOutputFixture,
+      '',
+      false,
+      [{ branch: 'main', sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77' }],
+      { main: 10 }
+    )
     expect(model.getRowData()).toStrictEqual(
       expect.objectContaining(deeplyNestedRowsFixture)
     )
@@ -188,9 +205,13 @@ describe('ExperimentsModel', () => {
 
   it('should return the expected rows when given the data types output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(dataTypesOutputFixture, '', false, [
-      { branch: 'main', sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77' }
-    ])
+    model.transformAndSet(
+      dataTypesOutputFixture,
+      '',
+      false,
+      [{ branch: 'main', sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77' }],
+      { main: 10 }
+    )
     expect(model.getRowData()).toStrictEqual(
       expect.objectContaining(dataTypesRowsFixture)
     )

@@ -85,7 +85,6 @@ import * as ProcessExecution from '../../../process/execution'
 import { DvcReader } from '../../../cli/dvc/reader'
 import { DvcViewer } from '../../../cli/dvc/viewer'
 import { DEFAULT_NB_ITEMS_PER_ROW } from '../../../plots/webview/contract'
-import { GitReader } from '../../../cli/git/reader'
 import { Toast } from '../../../vscode/toast'
 import { Response } from '../../../vscode/response'
 
@@ -249,8 +248,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasMoreCommits to true if there are more commits to show', async () => {
-      stub(GitReader.prototype, 'getNumCommits').resolves(100)
       const { experiments, messageSpy } = buildExperiments({
+        availableNbCommits: { main: 404 },
         disposer: disposable
       })
 
@@ -262,8 +261,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasMoreCommits to false if there are more commits to show', async () => {
-      stub(GitReader.prototype, 'getNumCommits').resolves(1)
       const { experiments, messageSpy } = buildExperiments({
+        availableNbCommits: { main: 1 },
         disposer: disposable
       })
 
@@ -275,8 +274,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set isShowingMoreCommits to true if it is showing more than the current commit', async () => {
-      stub(GitReader.prototype, 'getNumCommits').resolves(100)
       const { experiments, messageSpy } = buildExperiments({
+        availableNbCommits: { main: 40000 },
         disposer: disposable
       })
 
@@ -288,11 +287,12 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set isShowingMoreCommits to false it is showing only the current commit', async () => {
-      stub(GitReader.prototype, 'getCurrentBranch').resolves('current')
-      stub(GitReader.prototype, 'getNumCommits').resolves(1)
-      const { experiments, messageSpy } = buildExperiments({
+      const { experiments, experimentsModel, messageSpy } = buildExperiments({
+        expShow: expShowFixture.slice(0, 2),
         disposer: disposable
       })
+
+      stub(experimentsModel, 'getNbOfCommitsToShow').returns(1)
 
       await experiments.showWebview()
 
@@ -1498,6 +1498,7 @@ suite('Experiments Test Suite', () => {
       )
 
       void experiments.setState({
+        availableNbCommits: { main: 20 },
         gitLog: '',
         expShow: data,
         rowOrder: [
@@ -1975,6 +1976,7 @@ suite('Experiments Test Suite', () => {
       )
 
       void experiments.setState({
+        availableNbCommits: { main: 20 },
         gitLog: '',
         expShow: defaultExperimentsData,
         rowOrder: []

@@ -10,9 +10,10 @@ import { DeferredDisposable } from '../class/deferred'
 import { isSameOrChild } from '../fileSystem'
 
 export type ExperimentsOutput = {
+  availableNbCommits: { [branch: string]: number }
   expShow: ExpShowOutput
-  rowOrder: { branch: string; sha: string }[]
   gitLog: string
+  rowOrder: { branch: string; sha: string }[]
 }
 
 export abstract class BaseData<

@@ -186,6 +186,28 @@ const collectExpState = (
   return baseline
 }
 
+export const collectAddRemoveCommitsDetails = (
+  availableNbCommits: {
+    [branch: string]: number
+  },
+  getNbOfCommitsToShow: (branch: string) => number
+): {
+  hasMoreCommits: { [branch: string]: boolean }
+  isShowingMoreCommits: { [branch: string]: boolean }
+} => {
+  const hasMoreCommits: { [branch: string]: boolean } = {}
+  const isShowingMoreCommits: { [branch: string]: boolean } = {}
+
+  for (const [branch, availableCommits] of Object.entries(availableNbCommits)) {
+    const nbOfCommitsToShow = getNbOfCommitsToShow(branch)
+    hasMoreCommits[branch] = availableCommits > nbOfCommitsToShow
+    isShowingMoreCommits[branch] =
+      Math.min(nbOfCommitsToShow, availableCommits) > 1
+  }
+
+  return { hasMoreCommits, isShowingMoreCommits }
+}
+
 const getExecutor = (experiment: Experiment): Executor => {
   if ([experiment.executor, experiment.id].includes(EXPERIMENT_WORKSPACE_ID)) {
     return Executor.WORKSPACE
