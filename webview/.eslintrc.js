@@ -3,7 +3,7 @@ const config = require('../.eslintrc')
 
 module.exports = {
   ...config,
-  ignorePatterns: [...config.ignorePatterns, 'storybook-static/**'],
+  ignorePatterns: [...config.ignorePatterns, 'storybook-static/**', '**/*.mjs'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     tsconfigRootDir: __dirname,
