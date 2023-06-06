@@ -145,6 +145,10 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.experimentsByCommit = experimentsByCommit
     this.checkpoints = hasCheckpoints
 
+    const isTransientError = this.hasRunningExperiment() && workspace.error
+    if (isTransientError) {
+      return
+    }
     this.setColoredStatus(runningExperiments)
   }
 
