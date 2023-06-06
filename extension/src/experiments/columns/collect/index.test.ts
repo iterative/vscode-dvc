@@ -733,7 +733,6 @@ describe('collectRelativeMetricsFiles', () => {
     expect(
       collectRelativeMetricsFiles([
         {
-          branch: 'main',
           rev: EXPERIMENT_WORKSPACE_ID,
           error: { msg: 'I broke', type: 'not important' }
         }

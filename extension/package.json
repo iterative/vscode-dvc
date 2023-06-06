@@ -1473,7 +1473,7 @@
       },
       {
         "view": "dvc.views.welcome",
-        "contents": "The extension is currently unable to initialize.\n[Show Setup](command:dvc.showDvcSetup)",
+        "contents": "The extension is currently unable to initialize.\n[Show Setup](command:dvc.showDvcSetup)\nNew to the extension? Watch a [demo of the extension](https://youtu.be/E26IaD7bNXg?t=1177) in action or quickly try the extension yourself with our [example project](https://github.com/iterative/example-dvc-experiments.git). Dive deeper into DVC at [dvc.org](https://dvc.org/).",
         "when": "true"
       },
       {
@@ -1651,7 +1651,7 @@
     "vscode-languageclient": "8.1.0"
   },
   "devDependencies": {
-    "@swc/core": "1.3.60",
+    "@swc/core": "1.3.61",
     "@swc/jest": "0.2.26",
     "@types/chai": "4.3.5",
     "@types/chai-as-promised": "7.1.5",

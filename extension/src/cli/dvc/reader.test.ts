@@ -97,7 +97,6 @@ describe('CliReader', () => {
       const cliOutput = await dvcReader.expShow(cwd)
       expect(cliOutput).toStrictEqual([
         {
-          branch: undefined,
           error: { msg: unexpectedStderr, type: 'Caught error' },
           rev: EXPERIMENT_WORKSPACE_ID
         }
@@ -111,9 +110,7 @@ describe('CliReader', () => {
       )
 
       const cliOutput = await dvcReader.expShow(cwd)
-      expect(cliOutput).toStrictEqual([
-        { branch: undefined, rev: EXPERIMENT_WORKSPACE_ID }
-      ])
+      expect(cliOutput).toStrictEqual([{ rev: EXPERIMENT_WORKSPACE_ID }])
     })
   })
 

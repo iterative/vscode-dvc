@@ -1,7 +1,5 @@
 // Sorting by size instead of alphabetical makes more sense here
 
-import { Commit } from 'dvc/src/experiments/webview/contract'
-
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 export const viewports = {
   small: {
@@ -70,18 +68,3 @@ export const CHROMATIC_VIEWPORTS_WITH_DELAY = {
 export const DISABLE_CHROMATIC_SNAPSHOTS = {
   chromatic: { disableSnapshot: true }
 }
-
-export const addCommitDataToMainBranch = (rows: Commit[]) =>
-  rows.map(row => {
-    if (row.id === 'main' || row.id === 'master') {
-      row.description = 'Upgrading dependencies ...'
-      row.commit = {
-        author: 'John Smith',
-        message: 'Upgrading dependencies\n* upgrade dvc \n* upgrade dvclive',
-        tags: ['tag-1', 'tag-2'],
-        date: '4 days ago'
-      }
-    }
-    row.branch = row.branch || 'main'
-    return row
-  })

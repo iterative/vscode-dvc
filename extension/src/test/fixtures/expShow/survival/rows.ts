@@ -4,7 +4,7 @@ import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 
 const data: Commit[] = [
   {
-    branch: 'main',
+    branch: undefined,
     id: EXPERIMENT_WORKSPACE_ID,
     label: EXPERIMENT_WORKSPACE_ID,
     metrics: {
