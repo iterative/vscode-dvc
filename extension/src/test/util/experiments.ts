@@ -25,7 +25,6 @@ const generateTestExpState = (
   data: Partial<ExpData> = {},
   name?: string
 ): ExpState => ({
-  branch: 'main',
   data: generateTestExpData({ ...data, rev }),
   name,
   rev

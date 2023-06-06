@@ -21,7 +21,6 @@ import {
   findByText,
   getAllByRole
 } from '@storybook/testing-library'
-import { addCommitDataToMainBranch } from './util'
 import Experiments from '../experiments/components/Experiments'
 import { experimentsReducers } from '../experiments/store'
 import { TableDataState } from '../experiments/state/tableDataSlice'
@@ -32,7 +31,7 @@ import {
 } from '../test/tableDataFixture'
 
 const tableData: TableDataState = {
-  branches: ['main'],
+  branches: [undefined, 'main'],
   changes: workspaceChangesFixture,
   columnOrder: [],
   columnWidths: {
@@ -50,15 +49,7 @@ const tableData: TableDataState = {
   hasRunningWorkspaceExperiment: true,
   hasValidDvcYaml: true,
   isShowingMoreCommits: { main: true },
-  rows: addCommitDataToMainBranch(rowsFixture).map(row => ({
-    ...row,
-    branch: 'main',
-    subRows: row.subRows?.map(experiment => ({
-      ...experiment,
-      branch: 'main',
-      starred: experiment.starred || experiment.label === '42b8736'
-    }))
-  })),
+  rows: rowsFixture,
   selectedForPlotsCount: 2,
   sorts: [
     { descending: true, path: 'params:params.yaml:epochs' },
@@ -68,8 +59,9 @@ const tableData: TableDataState = {
 
 const noRunningExperiments = {
   ...tableData,
-  hasRunningExperiment: false,
-  rows: addCommitDataToMainBranch(rowsFixture).map(row => ({
+  branches: [undefined, 'main'],
+  hasRunningWorkspaceExperiment: false,
+  rows: rowsFixture.map(row => ({
     ...row,
     status: ExperimentStatus.SUCCESS,
     subRows: row.subRows?.map(experiment => ({
@@ -84,7 +76,7 @@ const noRunningExperiments = {
 const noRunningExperimentsNoCheckpoints = {
   ...noRunningExperiments,
   hasCheckpoints: false,
-  rows: addCommitDataToMainBranch(rowsFixture).map(row => ({
+  rows: rowsFixture.map(row => ({
     ...row,
     status: ExperimentStatus.SUCCESS,
     subRows: row.subRows?.map(experiment => ({
@@ -126,9 +118,8 @@ export const WithSurvivalData = Template.bind({})
 WithSurvivalData.args = {
   tableData: {
     ...survivalTableData,
-    branches: ['main'],
-    hasData: true,
-    rows: addCommitDataToMainBranch(survivalTableData.rows)
+    branches: [undefined, 'main'],
+    hasData: true
   }
 }
 
@@ -142,7 +133,7 @@ WithMiddleStates.args = {
     ...setExperimentsAsStarred(tableDataWithSomeSelectedExperiments, [
       '1ba7bcd'
     ]),
-    branches: ['main']
+    branches: [undefined, 'main']
   }
 }
 WithMiddleStates.play = async ({ canvasElement }) => {
@@ -193,9 +184,8 @@ export const WithAllDataTypes = Template.bind({})
 WithAllDataTypes.args = {
   tableData: {
     ...dataTypesTableFixture,
-    branches: ['main'],
-    hasData: true,
-    rows: addCommitDataToMainBranch(dataTypesTableFixture.rows)
+    branches: [undefined, 'main'],
+    hasData: true
   }
 }
 WithAllDataTypes.play = async ({ canvasElement }) => {
@@ -210,9 +200,9 @@ export const WithDeeplyNestedHeaders = Template.bind({})
 WithDeeplyNestedHeaders.args = {
   tableData: {
     ...deeplyNestedTableData,
-    branches: ['main'],
+    branches: [undefined, 'main'],
     hasData: true,
-    rows: addCommitDataToMainBranch(deeplyNestedTableData.rows)
+    rows: deeplyNestedTableData.rows
   }
 }
 
@@ -294,8 +284,9 @@ const branches = ['main', 'other-branch', 'branch-14786']
 
 WithMultipleBranches.args = {
   tableData: {
-    ...tableData,
+    ...survivalTableData,
     branches,
+    hasData: true,
     rows: [
       ...survivalTableData.rows.map(row => ({
         ...row,

@@ -7,7 +7,6 @@ import { join } from '../../../util/path'
 // https://dagshub.com/kingabzpro/kaggle-titanic-dvc
 const data: ExpShowOutput = [
   {
-    branch: 'main',
     rev: EXPERIMENT_WORKSPACE_ID,
     data: {
       rev: EXPERIMENT_WORKSPACE_ID,
@@ -312,7 +311,6 @@ const data: ExpShowOutput = [
     }
   },
   {
-    branch: 'main',
     rev: '3d5adcb974bb2c85917a5d61a489b933adaa2b7f',
     data: {
       meta: { has_checkpoints: false },
@@ -618,7 +616,6 @@ const data: ExpShowOutput = [
     name: 'main'
   },
   {
-    branch: 'main',
     rev: 'a49e03966a1f9f1299ec222ebc4bed8625d2c54d',
     data: {
       rev: 'a49e03966a1f9f1299ec222ebc4bed8625d2c54d',
@@ -923,7 +920,6 @@ const data: ExpShowOutput = [
     }
   },
   {
-    branch: 'main',
     rev: '4f7b50c3d171a11b6cfcd04416a16fc80b61018d',
     data: {
       rev: '4f7b50c3d171a11b6cfcd04416a16fc80b61018d',
