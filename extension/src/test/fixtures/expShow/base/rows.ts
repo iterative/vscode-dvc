@@ -17,7 +17,7 @@ const colorsList = copyOriginalColors()
 
 const rowsFixture: Commit[] = [
   {
-    branch: 'main',
+    branch: undefined,
     commit: undefined,
     description: undefined,
     deps: {
