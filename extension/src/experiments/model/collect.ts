@@ -157,7 +157,7 @@ const collectExpState = (
   expState: ExpState,
   commitData: { [sha: string]: CommitData }
 ): Experiment | undefined => {
-  const { rev, name, branch } = expState
+  const { rev, name } = expState
   const label =
     rev === EXPERIMENT_WORKSPACE_ID
       ? EXPERIMENT_WORKSPACE_ID
@@ -168,7 +168,6 @@ const collectExpState = (
   const description: string | undefined = formatCommitMessage(commit?.message)
 
   const experiment: Experiment = {
-    branch,
     commit,
     description,
     id,
@@ -342,7 +341,6 @@ export const collectExperiments = (
     hasCheckpoints: hasCheckpoints(expShow),
     runningExperiments: [],
     workspace: {
-      branch: undefined,
       id: EXPERIMENT_WORKSPACE_ID,
       label: EXPERIMENT_WORKSPACE_ID
     }
