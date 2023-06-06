@@ -1,7 +1,7 @@
 import { Plot } from '../../plots/webview/contract'
 
 export const MIN_CLI_VERSION = '2.58.1'
-export const LATEST_TESTED_CLI_VERSION = '2.58.1'
+export const LATEST_TESTED_CLI_VERSION = '2.58.2'
 export const MAX_CLI_VERSION = '3'
 
 type ErrorContents = { type: string; msg: string }
