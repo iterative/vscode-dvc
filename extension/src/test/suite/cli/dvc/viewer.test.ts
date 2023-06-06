@@ -22,6 +22,7 @@ suite('DVC Viewer Test Suite', () => {
     it('should only be able to run a command once', async () => {
       const mockConfig = {
         getCliPath: () => 'sleep',
+        getPYTHONPATH: () => undefined,
         getPythonBinPath: () => undefined
       } as Config
       const dvcViewer = disposable.track(new DvcViewer(mockConfig))

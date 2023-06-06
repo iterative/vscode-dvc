@@ -35,11 +35,12 @@ export class DvcCli extends Cli {
   }
 
   protected getOptions(cwd: string, ...args: Args) {
-    return getOptions(
-      this.extensionConfig.getPythonBinPath(),
-      this.extensionConfig.getCliPath(),
+    return getOptions({
+      PYTHONPATH: this.extensionConfig.getPYTHONPATH(),
+      args: [...args],
+      cliPath: this.extensionConfig.getCliPath(),
       cwd,
-      ...args
-    )
+      pythonBinPath: this.extensionConfig.getPythonBinPath()
+    })
   }
 }
