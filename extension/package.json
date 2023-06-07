@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.9.4",
+  "version": "0.9.5",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -1657,7 +1657,7 @@
     "@types/chai-as-promised": "7.1.5",
     "@types/copy-webpack-plugin": "10.1.0",
     "@types/fs-extra": "11.0.1",
-    "@types/jest": "29.5.1",
+    "@types/jest": "29.5.2",
     "@types/js-yaml": "4.0.5",
     "@types/lodash.clonedeep": "4.5.7",
     "@types/lodash.get": "4.4.7",
