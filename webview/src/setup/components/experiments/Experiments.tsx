@@ -42,16 +42,16 @@ export const Experiments: React.FC<ExperimentsProps> = ({ isDvcSetup }) => {
   return (
     <EmptyState isFullScreen={false}>
       <h1>Setup Complete</h1>
-      <p>
-        Learn more about using DVCLive in the{' '}
-        <a href="https://dvc.org/doc/dvclive">docs</a>.
-      </p>
       <IconButton
         appearance="primary"
         icon={Beaker}
         onClick={showExperiments}
         text="Show Experiments"
       />
+      <p>
+        Learn more about using DVCLive in the{' '}
+        <a href="https://dvc.org/doc/dvclive">docs</a>.
+      </p>
       <DvcLiveExamples />
     </EmptyState>
   )
