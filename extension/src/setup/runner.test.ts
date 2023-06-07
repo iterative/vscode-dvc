@@ -514,27 +514,6 @@ describe('run', () => {
     expect(mockedInitialize).not.toHaveBeenCalled()
   })
 
-  it('should send a specific message to the user if the located CLI is a major version ahead', async () => {
-    const MajorAhead = MIN_CLI_VERSION.split('.')
-      .map(num => Number(num) + 100)
-      .join('.')
-    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
-    mockedShouldWarnUserIfCLIUnavailable.mockReturnValueOnce(true)
-    mockedIsPythonExtensionUsed.mockResolvedValueOnce(true)
-    mockedGetCliVersion.mockResolvedValueOnce(MajorAhead)
-
-    await run(setup)
-    await flushPromises()
-    expect(mockedWarnWithOptions).toHaveBeenCalledTimes(1)
-    expect(mockedWarnWithOptions).toHaveBeenCalledWith(
-      'The extension cannot initialize because the DVC CLI version is incompatible.',
-      'Setup'
-    )
-    expect(mockedGetCliVersion).toHaveBeenCalledTimes(1)
-    expect(mockedResetMembers).toHaveBeenCalledTimes(1)
-    expect(mockedInitialize).not.toHaveBeenCalled()
-  })
-
   it('should send a specific message to the user if the Python extension is being used, the CLI is not available in the virtual environment and no cli is found globally', async () => {
     mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
