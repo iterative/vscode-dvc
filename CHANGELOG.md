@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.5] - 2023-06-07
+
+### 🚀 New Features and Enhancements
+
+- Add default value for branch name when creating from experiment [#4037](https://github.com/iterative/vscode-dvc/pull/4037) by [@mattseddon](https://github.com/mattseddon)
+- Add a mapping from revision to branches while using only one exp show call [#3980](https://github.com/iterative/vscode-dvc/pull/3980) by [@sroy3](https://github.com/sroy3)
+- Move "new to DVC" text from setup to welcome view [#4040](https://github.com/iterative/vscode-dvc/pull/4040) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Fix table stories and data types [#4041](https://github.com/iterative/vscode-dvc/pull/4041) by [@mattseddon](https://github.com/mattseddon)
+- Do not drop experiment selection when an experiment is running and exp show errors [#4042](https://github.com/iterative/vscode-dvc/pull/4042) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Move git call into experiments data [#4036](https://github.com/iterative/vscode-dvc/pull/4036) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (2.58.2) [#4043](https://github.com/iterative/vscode-dvc/pull/4043) by [@mattseddon](https://github.com/mattseddon)
+- Exclude codicons.mjs from eslint [#4044](https://github.com/iterative/vscode-dvc/pull/4044) by [@mattseddon](https://github.com/mattseddon)
+- Remove max version of CLI (3.0 release) [#4049](https://github.com/iterative/vscode-dvc/pull/4049) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.9.4] - 2023-06-04
 
 ### 🐛 Bug Fixes
