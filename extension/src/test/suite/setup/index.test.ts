@@ -156,9 +156,9 @@ suite('Setup Test Suite', () => {
       expect(mockAutoUpgradeDvc).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle a select Python interpreter message from the webview', async () => {
-      const { messageSpy, mockExecuteCommand, setup } = buildSetup(disposable)
-      const setInterpreterCommand = 'python.setInterpreter'
+    it('should handle a update Python environment message from the webview', async () => {
+      const { messageSpy, setup } = buildSetup(disposable)
+      const mockShowQuickPick = stub(window, 'showQuickPick')
 
       const webview = await setup.showWebview()
       await webview.isReady()
@@ -167,10 +167,10 @@ suite('Setup Test Suite', () => {
 
       messageSpy.resetHistory()
       mockMessageReceived.fire({
-        type: MessageFromWebviewType.SELECT_PYTHON_INTERPRETER
+        type: MessageFromWebviewType.UPDATE_PYTHON_ENVIRONMENT
       })
 
-      expect(mockExecuteCommand).to.be.calledWithExactly(setInterpreterCommand)
+      expect(mockShowQuickPick).to.be.called
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a show source control panel message from the webview', async () => {

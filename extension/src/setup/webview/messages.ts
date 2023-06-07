@@ -8,13 +8,13 @@ import {
 import { BaseWebview } from '../../webview'
 import { sendTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
-import { selectPythonInterpreter } from '../../extensions/python'
 import { autoInstallDvc, autoUpgradeDvc } from '../autoInstall'
 import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../commands/external'
 import { openUrl } from '../../vscode/external'
+import { pickPythonExtensionAction } from '../quickPick'
 
 export class WebviewMessages {
   private readonly getWebview: () => BaseWebview<TSetupData> | undefined
@@ -79,8 +79,8 @@ export class WebviewMessages {
         return commands.executeCommand(RegisteredCommands.EXTENSION_GET_STARTED)
       case MessageFromWebviewType.SHOW_SCM_PANEL:
         return this.showScmForCommit()
-      case MessageFromWebviewType.SELECT_PYTHON_INTERPRETER:
-        return this.selectPythonInterpreter()
+      case MessageFromWebviewType.UPDATE_PYTHON_ENVIRONMENT:
+        return this.updatePythonEnvironment()
       case MessageFromWebviewType.INSTALL_DVC:
         return this.installDvc()
       case MessageFromWebviewType.UPGRADE_DVC:
@@ -131,13 +131,13 @@ export class WebviewMessages {
     return commands.executeCommand('workbench.view.scm')
   }
 
-  private selectPythonInterpreter() {
+  private updatePythonEnvironment() {
     sendTelemetryEvent(
-      EventName.VIEWS_SETUP_SELECT_PYTHON_INTERPRETER,
+      EventName.VIEWS_SETUP_UPDATE_PYTHON_ENVIRONMENT,
       undefined,
       undefined
     )
-    return selectPythonInterpreter()
+    return pickPythonExtensionAction()
   }
 
   private upgradeDvc() {

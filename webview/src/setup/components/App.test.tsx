@@ -376,7 +376,7 @@ describe('App', () => {
       })
     })
 
-    it('should show the user the command used to run DVC with "Configure" and "Select Python Interpreter" buttons if dvc is installed with the python extension', () => {
+    it('should show the user the command used to run DVC with "Configure" and "Update Python Environment" buttons if dvc is installed with the python extension', () => {
       renderApp({
         isPythonExtensionUsed: true
       })
@@ -387,7 +387,7 @@ describe('App', () => {
 
       const configureButton = within(envDetails).getByText('Configure')
       const selectButton = within(envDetails).getByText(
-        'Select Python Interpreter'
+        'Update Python Environment'
       )
 
       expect(configureButton).toBeInTheDocument()
@@ -398,7 +398,7 @@ describe('App', () => {
       fireEvent.click(selectButton)
 
       expect(mockPostMessage).toHaveBeenCalledWith({
-        type: MessageFromWebviewType.SELECT_PYTHON_INTERPRETER
+        type: MessageFromWebviewType.UPDATE_PYTHON_ENVIRONMENT
       })
     })
 
