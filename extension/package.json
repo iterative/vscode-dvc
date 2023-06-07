@@ -1657,7 +1657,7 @@
     "@types/chai-as-promised": "7.1.5",
     "@types/copy-webpack-plugin": "10.1.0",
     "@types/fs-extra": "11.0.1",
-    "@types/jest": "29.5.1",
+    "@types/jest": "29.5.2",
     "@types/js-yaml": "4.0.5",
     "@types/lodash.clonedeep": "4.5.7",
     "@types/lodash.get": "4.4.7",
@@ -1696,7 +1696,7 @@
     "vscode-uri": "3.0.7",
     "wdio-vscode-service": "5.1.0",
     "webdriverio": "8.10.5",
-    "webpack": "5.84.1",
+    "webpack": "5.85.0",
     "webpack-cli": "5.1.1"
   },
   "peerDependencies": {
