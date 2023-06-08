@@ -77,7 +77,7 @@ export const Welcome: React.FC = () => (
     />
     <p>
       Learn how to{' '}
-      <a href="https://dvc.org/doc/studio/user-guide/views/visualize-experiments">
+      <a href="https://dvc.org/doc/user-guide/experiment-management/visualizing-plots">
         visualize experiments
       </a>{' '}
       with DVC.
