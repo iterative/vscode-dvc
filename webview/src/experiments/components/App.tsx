@@ -9,6 +9,7 @@ import Experiments from './Experiments'
 import {
   update,
   updateChanges,
+  updateCliError,
   updateColumnOrder,
   updateColumns,
   updateColumnWidths,
@@ -40,6 +41,9 @@ export const App: React.FC<Record<string, unknown>> = () => {
             switch (key) {
               case 'changes':
                 dispatch(updateChanges(data.data.changes))
+                continue
+              case 'cliError':
+                dispatch(updateCliError(data.data.cliError))
                 continue
               case 'columnOrder':
                 dispatch(updateColumnOrder(data.data.columnOrder))

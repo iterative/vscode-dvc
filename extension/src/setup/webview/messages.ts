@@ -31,38 +31,8 @@ export class WebviewMessages {
     this.updateStudioOffline = updateStudioOffline
   }
 
-  public sendWebviewMessage({
-    canGitInitialize,
-    cliCompatible,
-    dvcCliDetails,
-    hasData,
-    isPythonExtensionUsed,
-    isStudioConnected,
-    needsGitCommit,
-    needsGitInitialized,
-    projectInitialized,
-    pythonBinPath,
-    remoteList,
-    sectionCollapsed,
-    shareLiveToStudio,
-    isAboveLatestTestedVersion
-  }: SetupData) {
-    void this.getWebview()?.show({
-      canGitInitialize,
-      cliCompatible,
-      dvcCliDetails,
-      hasData,
-      isAboveLatestTestedVersion,
-      isPythonExtensionUsed,
-      isStudioConnected,
-      needsGitCommit,
-      needsGitInitialized,
-      projectInitialized,
-      pythonBinPath,
-      remoteList,
-      sectionCollapsed,
-      shareLiveToStudio
-    })
+  public sendWebviewMessage(data: SetupData) {
+    void this.getWebview()?.show(data)
   }
 
   public handleMessageFromWebview(message: MessageFromWebview) {

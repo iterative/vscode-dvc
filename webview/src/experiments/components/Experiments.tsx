@@ -24,6 +24,7 @@ import {
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { Table } from './table/Table'
 import styles from './table/styles.module.scss'
+import { ErrorState } from './ErrorState'
 import { AddColumns, Welcome } from './GetStarted'
 import { RowSelectionProvider } from './table/RowSelectionContext'
 import { CellValue } from './table/content/Cell'
@@ -202,7 +203,18 @@ export const ExperimentsTable: React.FC = () => {
 }
 
 const Experiments: React.FC = () => {
-  const { hasData } = useSelector((state: ExperimentsState) => state.tableData)
+  const { cliError, hasData } = useSelector(
+    (state: ExperimentsState) => state.tableData
+  )
+
+  if (cliError) {
+    return (
+      <WebviewWrapper className={styles.experiments}>
+        <ErrorState cliError={cliError} />
+      </WebviewWrapper>
+    )
+  }
+
   return (
     <WebviewWrapper className={styles.experiments}>
       {hasData ? (

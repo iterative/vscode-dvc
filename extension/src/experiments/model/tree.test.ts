@@ -34,6 +34,7 @@ const mockedGetMarkdownString = jest.mocked(getMarkdownString)
 const {
   mockedExperiments,
   mockedGetCommitExperiments,
+  mockedGetCliError,
   mockedGetDvcRoots,
   mockedGetFirstThreeColumnOrder,
   mockedGetWorkspaceAndCommits
@@ -449,6 +450,37 @@ describe('ExperimentsTree', () => {
           type: ExperimentType.EXPERIMENT
         }
       ])
+    })
+
+    it('should return an error item if the repository has a CLI error', async () => {
+      const errorMsg = 'the CLI is broken :('
+      mockedGetCliError.mockReturnValueOnce(errorMsg)
+      const experiments = [
+        {
+          displayColor: undefined,
+          error: errorMsg,
+          hasChildren: false,
+          id: EXPERIMENT_WORKSPACE_ID,
+          label: EXPERIMENT_WORKSPACE_ID,
+          selected: false,
+          type: ExperimentType.WORKSPACE
+        }
+      ]
+
+      mockedGetWorkspaceAndCommits
+        .mockReturnValueOnce(experiments)
+        .mockReturnValueOnce(experiments)
+      mockedGetDvcRoots.mockReturnValueOnce(['repo'])
+      mockedGetFirstThreeColumnOrder.mockReturnValue([])
+
+      const experimentsTree = new ExperimentsTree(
+        mockedExperiments,
+        mockedResourceLocator
+      )
+
+      const children = await experimentsTree.getChildren()
+
+      expect(children).toStrictEqual([{ error: errorMsg }])
     })
   })
 

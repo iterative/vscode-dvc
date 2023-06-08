@@ -46,6 +46,7 @@ export const EventName = Object.assign(
     VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN: 'views.experimentsTable.columnHidden',
     VIEWS_EXPERIMENTS_TABLE_OPEN_PARAMS_FILE:
       'views.experimentsTable.paramsFileOpened',
+    VIEWS_EXPERIMENTS_TABLE_REFRESH: 'views.experimentsTable.refresh',
     VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_SORT:
       'views.experimentsTable.columnSortRemoved',
     VIEWS_EXPERIMENTS_TABLE_RESIZE_COLUMN:
@@ -229,6 +230,7 @@ export interface IEventNamePropertyMapping {
   }
   [EventName.VIEWS_EXPERIMENTS_TABLE_SET_MAX_HEADER_HEIGHT]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_SORT_COLUMN]: SortDefinition
+  [EventName.VIEWS_EXPERIMENTS_TABLE_REFRESH]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_SORT]: {
     path: string
   }

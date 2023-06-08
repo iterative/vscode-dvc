@@ -19,9 +19,12 @@ import { definedAndNonEmpty, sortCollectedArray } from '../../util/array'
 import {
   createTreeView,
   DecoratableTreeItemScheme,
+  ErrorItem,
+  getCliErrorTreeItem,
   getDecoratableTreeItem,
   getErrorTooltip,
   getRootItem,
+  isErrorItem,
   isRoot
 } from '../../tree'
 import { IconName, Resource, ResourceLocator } from '../../resourceLocator'
@@ -44,14 +47,14 @@ type ExperimentAugmented = Experiment & {
 
 export class ExperimentsTree
   extends Disposable
-  implements TreeDataProvider<string | ExperimentItem>
+  implements TreeDataProvider<string | ExperimentItem | ErrorItem>
 {
   public readonly onDidChangeTreeData: Event<string | void>
 
   private readonly experiments: WorkspaceExperiments
   private readonly resourceLocator: ResourceLocator
 
-  private readonly view: TreeView<string | ExperimentItem>
+  private readonly view: TreeView<string | ExperimentItem | ErrorItem>
   private viewed = false
 
   constructor(
@@ -63,7 +66,11 @@ export class ExperimentsTree
     this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.view = this.dispose.track(
-      createTreeView<ExperimentItem>('dvc.views.experimentsTree', this, true)
+      createTreeView<ExperimentItem | ErrorItem>(
+        'dvc.views.experimentsTree',
+        this,
+        true
+      )
     )
 
     this.experiments = experiments
@@ -77,6 +84,15 @@ export class ExperimentsTree
   public getTreeItem(element: string | ExperimentItem): TreeItem {
     if (isRoot(element)) {
       return getRootItem(element)
+    }
+
+    if (isErrorItem(element)) {
+      const { error } = element
+      return getCliErrorTreeItem(
+        error,
+        error,
+        DecoratableTreeItemScheme.EXPERIMENTS
+      )
     }
 
     const {
@@ -109,7 +125,7 @@ export class ExperimentsTree
 
   public getChildren(
     element?: string | ExperimentItem
-  ): Promise<string[] | ExperimentItem[]> {
+  ): Promise<string[] | ExperimentItem[] | ErrorItem[]> {
     if (!element) {
       return this.getRootElements()
     }
@@ -226,9 +242,17 @@ export class ExperimentsTree
     }
   }
 
-  private getWorkspaceAndCommits(dvcRoot: string): ExperimentItem[] {
-    return this.experiments
-      .getRepository(dvcRoot)
+  private getWorkspaceAndCommits(
+    dvcRoot: string
+  ): ExperimentItem[] | ErrorItem[] {
+    const repository = this.experiments.getRepository(dvcRoot)
+
+    const cliError = repository.getCliError()
+    if (cliError) {
+      return [{ error: cliError }]
+    }
+
+    return repository
       .getWorkspaceAndCommits()
       .map(experiment => this.formatExperiment(experiment, dvcRoot))
   }

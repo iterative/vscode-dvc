@@ -33,6 +33,7 @@ export enum MessageFromWebviewType {
   REORDER_PLOTS_COMPARISON_ROWS = 'reorder-plots-comparison-rows',
   REORDER_PLOTS_CUSTOM = 'reorder-plots-custom',
   REORDER_PLOTS_TEMPLATES = 'reorder-plots-templates',
+  REFRESH_EXP_DATA = 'refresh-exp-data',
   REFRESH_REVISIONS = 'refresh-revisions',
   RESIZE_COLUMN = 'resize-column',
   RESIZE_PLOTS = 'resize-plots',
@@ -199,6 +200,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.SELECT_EXPERIMENTS }
   | { type: MessageFromWebviewType.SELECT_PYTHON_INTERPRETER }
   | { type: MessageFromWebviewType.SELECT_PLOTS }
+  | { type: MessageFromWebviewType.REFRESH_EXP_DATA }
   | { type: MessageFromWebviewType.REFRESH_REVISIONS }
   | { type: MessageFromWebviewType.SELECT_COLUMNS }
   | { type: MessageFromWebviewType.FOCUS_FILTERS_TREE }

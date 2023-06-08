@@ -3,7 +3,7 @@ import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
 import styles from './styles.module.scss'
 import { RefreshButton } from '../../../shared/components/button/RefreshButton'
 import { refreshRevisions, zoomPlot } from '../messages'
-import { ErrorIcon } from '../ErrorIcon'
+import { ErrorIcon } from '../../../shared/components/errorIcon/ErrorIcon'
 
 type ComparisonTableCellProps = {
   path: string

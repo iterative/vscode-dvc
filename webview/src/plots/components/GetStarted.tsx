@@ -1,10 +1,10 @@
 import React from 'react'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
-import { ErrorIcon } from './ErrorIcon'
 import { refreshRevisions } from './messages'
 import { sendMessage } from '../../shared/vscode'
 import { StartButton } from '../../shared/components/button/StartButton'
 import { RefreshButton } from '../../shared/components/button/RefreshButton'
+import { ErrorIcon } from '../../shared/components/errorIcon/ErrorIcon'
 
 type AddPlotsProps = {
   hasUnselectedPlots: boolean

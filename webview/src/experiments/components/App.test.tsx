@@ -116,6 +116,20 @@ describe('App', () => {
     expect(noExperimentsState).toBeInTheDocument()
   })
 
+  it('should show a refresh button if there is a CLI error', () => {
+    renderTable({
+      ...tableDataFixture,
+      cliError: 'Error'
+    })
+
+    const refreshButton = screen.queryByText('Refresh')
+    expect(refreshButton).toBeInTheDocument()
+    refreshButton && fireEvent.click(refreshButton)
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.REFRESH_EXP_DATA
+    })
+  })
+
   it('should show the experiments table', () => {
     renderTable()
 
