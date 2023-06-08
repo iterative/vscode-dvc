@@ -127,13 +127,12 @@ This extension augments VS Code in the following ways:
 Open the Command Palette (`F1` or ⇧⌃P on Windows/Linux or ⇧⌘P on macOS) and type
 in one of the following commands:
 
-| Command                    | Description                                                                                                                 |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `DVC: Get Started`         | Open the extension's walkthrough. Which details all of the current features and provides links to extra learning resources. |
-| `View: Show DVC`           | Open the extension's view container.                                                                                        |
-| `DVC: Setup The Workspace` | Activate the extension's workspace setup wizard.                                                                            |
-| `DVC: Show Experiments`    | Show an interactive version of DVC's `exp show` [command](https://dvc.org/doc/command-reference/exp/show).                  |
-| `DVC: Show Plots`          | Show an interactive version of DVC's `plots diff` [command](https://dvc.org/doc/command-reference/plots/diff).              |
+| Command                 | Description                                                                                                    |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `DVC: Show Setup`       | Show the extension's setup page. Which can be used to setup the DVC project, view the walkthrough and more.    |
+| `View: Show DVC`        | Open the extension's view container.                                                                           |
+| `DVC: Show Experiments` | Show an interactive version of DVC's `exp show` [command](https://dvc.org/doc/command-reference/exp/show).     |
+| `DVC: Show Plots`       | Show an interactive version of DVC's `plots diff` [command](https://dvc.org/doc/command-reference/plots/diff). |
 
 Learn more about the extension's [commands].
 
