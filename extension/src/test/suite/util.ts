@@ -303,3 +303,12 @@ export const getTimeSafeDisposer = (): Disposer & {
 
 export const bypassProgressCloseDelay = () =>
   stub(Toast, 'delayProgressClosing').resolves(undefined)
+
+export const waitForEditorText = async (): Promise<unknown> => {
+  await Time.delay(500)
+  const text = window.activeTextEditor?.document.getText()
+  if (text) {
+    return
+  }
+  return waitForEditorText()
+}
