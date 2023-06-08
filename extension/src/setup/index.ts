@@ -341,7 +341,12 @@ export class Setup
     const pythonBinPath = this.config.getPythonBinPath()
     const cwd = getFirstWorkspaceFolder()
 
-    const { args, executable } = getOptions(pythonBinPath, dvcPath, cwd || '')
+    const { args, executable } = getOptions({
+      PYTHONPATH: this.config.getPYTHONPATH(),
+      cliPath: dvcPath,
+      cwd: cwd || '',
+      pythonBinPath
+    })
     const commandArgs = args.length === 0 ? '' : ` ${args.join(' ')}`
     const command = executable + commandArgs
 

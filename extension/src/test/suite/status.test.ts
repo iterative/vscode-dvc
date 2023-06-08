@@ -62,6 +62,7 @@ suite('Status Test Suite', () => {
         new Status(
           {
             getCliPath: () => undefined,
+            getPYTHONPATH: () => undefined,
             getPythonBinPath: () => undefined,
             isPythonExtensionUsed: () => false,
             isReady: () => Promise.resolve()
@@ -149,6 +150,7 @@ suite('Status Test Suite', () => {
         new Status(
           {
             getCliPath: () => undefined,
+            getPYTHONPATH: () => undefined,
             getPythonBinPath: () => undefined,
             isPythonExtensionUsed: () => false,
             isReady: () => Promise.resolve()
@@ -199,6 +201,7 @@ suite('Status Test Suite', () => {
       const status = disposable.track(
         new Status({
           getCliPath: mockGetCliPath,
+          getPYTHONPATH: () => undefined,
           getPythonBinPath: mockGetPythonBinPath,
           isPythonExtensionUsed: mockedIsPythonExtensionUsed,
           isReady: () => Promise.resolve()

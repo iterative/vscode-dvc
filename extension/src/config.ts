@@ -2,8 +2,10 @@ import { EventEmitter, Event, workspace } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import isEqual from 'lodash.isequal'
 import {
+  getOnDidChangePythonEnvironmentVariables,
   getOnDidChangePythonExecutionDetails,
   getPythonBinPath,
+  getPYTHONPATH,
   isPythonExtensionInstalled
 } from './extensions/python'
 import { ConfigKey, getConfigValue, setConfigValue } from './vscode/config'
@@ -19,6 +21,8 @@ export class Config extends DeferredDisposable {
   private pythonBinPath: string | undefined
 
   private dvcPath = this.getCliPath()
+
+  private PYTHONPATH: string | undefined
 
   private focusedProjects: string[] | undefined
 
@@ -40,6 +44,8 @@ export class Config extends DeferredDisposable {
 
     void this.onDidChangePythonExecutionDetails()
     this.onDidChangeExtensions()
+
+    void this.watchPYTHONPATH()
 
     this.onDidConfigurationChange()
   }
@@ -76,6 +82,10 @@ export class Config extends DeferredDisposable {
     void setConfigValue(ConfigKey.FOCUSED_PROJECTS, focusedProjects)
   }
 
+  public getPYTHONPATH() {
+    return this.PYTHONPATH
+  }
+
   public isPythonExtensionUsed() {
     return !getConfigValue(ConfigKey.PYTHON_PATH) && !!this.pythonBinPath
   }
@@ -95,6 +105,17 @@ export class Config extends DeferredDisposable {
     this.pythonExecutionDetailsListener = this.dispose.track(
       onDidChangePythonExecutionDetails?.(() => {
         void this.setPythonAndNotifyIfChanged()
+      })
+    )
+  }
+
+  private async watchPYTHONPATH() {
+    this.PYTHONPATH = await getPYTHONPATH()
+    const onDidChangePythonEnvironmentVariables =
+      await getOnDidChangePythonEnvironmentVariables()
+    this.pythonExecutionDetailsListener = this.dispose.track(
+      onDidChangePythonEnvironmentVariables?.(({ env }) => {
+        this.PYTHONPATH = env.PYTHONPATH
       })
     )
   }
