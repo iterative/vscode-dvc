@@ -141,12 +141,13 @@ export class DvcRunner extends Disposable implements ICli {
   }
 
   private createProcess({ cwd, args }: { cwd: string; args: Args }): Process {
-    const options = getOptions(
-      this.config.getPythonBinPath(),
-      this.config.getCliPath(),
+    const options = getOptions({
+      PYTHONPATH: this.config.getPYTHONPATH(),
+      args: [...args],
+      cliPath: this.config.getCliPath(),
       cwd,
-      ...args
-    )
+      pythonBinPath: this.config.getPythonBinPath()
+    })
     const command = getCommandString(options)
     const stopWatch = new StopWatch()
     const process = this.dispose.track(createProcess(options))

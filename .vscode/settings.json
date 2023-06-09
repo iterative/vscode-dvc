@@ -38,6 +38,7 @@
     "MNIST",
     "nfiles",
     "pseudoterminal",
+    "PYTHONPATH",
     "rwlock",
     "sonarjs",
     "spyable",

@@ -14,16 +14,23 @@ const getPATH = (existingPath: string, pythonBinPath?: string): string => {
   return joinEnvPath(python, existingPath)
 }
 
-const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
-  const env = getProcessEnv()
-  const PATH = getPATH(env?.PATH as string, pythonBinPath)
-  return {
-    ...env,
+const getEnv = (
+  pythonBinPath: string | undefined,
+  PYTHONPATH: string | undefined
+): NodeJS.ProcessEnv => {
+  const existingEnv = getProcessEnv()
+  const PATH = getPATH(existingEnv?.PATH as string, pythonBinPath)
+  const env: NodeJS.ProcessEnv = {
+    ...existingEnv,
     DVCLIVE_OPEN: 'false',
     DVC_NO_ANALYTICS: 'true',
     GIT_TERMINAL_PROMPT: '0',
     PATH
   }
+  if (PYTHONPATH) {
+    env.PYTHONPATH = PYTHONPATH
+  }
+  return env
 }
 
 const getArgs = (
@@ -35,18 +42,24 @@ const getArgs = (
 const getExecutable = (pythonBinPath: string | undefined, cliPath: string) =>
   cliPath || pythonBinPath || 'dvc'
 
-export const getOptions = (
-  pythonBinPath: string | undefined,
-  cliPath: string,
-  cwd: string,
-  ...originalArgs: Args
-): ExecutionOptions => {
+export const getOptions = ({
+  args = [],
+  cliPath,
+  cwd,
+  pythonBinPath,
+  PYTHONPATH
+}: {
+  args?: Args
+  cliPath: string
+  cwd: string
+  pythonBinPath: string | undefined
+  PYTHONPATH: string | undefined
+}): ExecutionOptions => {
   const executable = getExecutable(pythonBinPath, cliPath)
-  const args = getArgs(pythonBinPath, cliPath, ...originalArgs)
   return {
-    args,
+    args: getArgs(pythonBinPath, cliPath, ...args),
     cwd: getCaseSensitiveCwd(cwd),
-    env: getEnv(pythonBinPath),
+    env: getEnv(pythonBinPath, PYTHONPATH),
     executable
   }
 }

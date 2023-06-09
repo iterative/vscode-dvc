@@ -159,6 +159,13 @@ These are the VS Code [settings] available for the Extension:
 > **Note** that the `Setup The Workspace` command helps you set up the basic
 > ones at the [Workspace level] (saved to `.vscode/setting.json`).
 
+### Python
+
+This extension is integrated with Microsoft's [Python extension]. When possible,
+the Python extension's selected interpreter will be used to locate DVC. The
+`PYTHONPATH` environment variable identified via the [python.envFile] config
+setting is also respected.
+
 [python extension]:
   https://marketplace.visualstudio.com/items?itemName=ms-python.python
 [studio.token]:
@@ -166,6 +173,8 @@ These are the VS Code [settings] available for the Extension:
 [Studio]: https://studio.iterative.ai
 [workspace level]:
   https://code.visualstudio.com/docs/getstarted/settings#_workspace-settings
+[python.envFile]:
+  https://code.visualstudio.com/docs/python/environments#_use-of-the-pythonpath-variable
 
 ## Debugging
 

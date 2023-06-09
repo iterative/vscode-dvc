@@ -24,6 +24,7 @@ suite('DVC Runner Test Suite', () => {
     it('should only be able to run a single command at a time', async () => {
       const mockConfig = {
         getCliPath: () => 'sleep',
+        getPYTHONPATH: () => undefined,
         getPythonBinPath: () => undefined
       } as Config
 
@@ -41,6 +42,7 @@ suite('DVC Runner Test Suite', () => {
     it('should be able to stop a started command', async () => {
       const mockConfig = {
         getCliPath: () => 'sleep',
+        getPYTHONPATH: () => undefined,
         getPythonBinPath: () => undefined
       } as Config
 
@@ -106,6 +108,7 @@ suite('DVC Runner Test Suite', () => {
 
       const mockConfig = {
         getCliPath: () => 'echo',
+        getPYTHONPATH: () => undefined,
         getPythonBinPath: () => undefined
       } as Config
 

@@ -32,7 +32,7 @@ suite('Config Test Suite', () => {
       const extensionsChanged = disposable.track(new EventEmitter<void>())
 
       const config = disposable.track(new Config(extensionsChanged.event))
-      expect(mockGetExtensionAPI).to.be.calledTwice
+      expect(mockGetExtensionAPI).to.be.called
       expect(config.getPythonBinPath()).to.be.undefined
 
       const pythonBinPath = join('some', 'magic', 'python', 'path')
