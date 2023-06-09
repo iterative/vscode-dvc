@@ -6,9 +6,9 @@ import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { SetupState } from '../../store'
 import {
   installDvc,
-  updatePythonEnvironment,
-  setupWorkspace
-} from '../messages'
+  setupWorkspace,
+  updatePythonEnvironment
+} from '../../util/messages'
 
 export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
   const { pythonBinPath, isPythonExtensionUsed } = useSelector(

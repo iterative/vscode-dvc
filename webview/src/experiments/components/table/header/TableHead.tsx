@@ -2,11 +2,9 @@ import { Experiment } from 'dvc/src/experiments/webview/contract'
 import React, { DragEvent, useRef, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Table, Header, ColumnOrderState } from '@tanstack/react-table'
-import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { MergedHeaderGroups } from './MergeHeaderGroups'
 import { setDropTarget } from '../../../state/headerDropTargetSlice'
 import { ExperimentsState } from '../../../store'
-import { sendMessage } from '../../../../shared/vscode'
 import {
   leafColumnIds,
   reorderColumnIds,
@@ -14,6 +12,7 @@ import {
 } from '../../../util/columns'
 import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
 import styles from '../styles.module.scss'
+import { reorderColumns } from '../../../util/messages'
 
 interface TableHeadProps {
   instance: Table<Experiment>
@@ -109,10 +108,7 @@ export const TableHead = ({
       newOrder = reorderColumnIds(fullOrder, displacer, leafs)
 
       setColumnOrder(newOrder)
-      sendMessage({
-        payload: newOrder,
-        type: MessageFromWebviewType.REORDER_COLUMNS
-      })
+      reorderColumns(newOrder)
       onDragEnd()
       onOrderChange(newOrder)
     }

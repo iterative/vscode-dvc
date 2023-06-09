@@ -1,6 +1,6 @@
 import React from 'react'
 import { StartButton } from '../../../shared/components/button/StartButton'
-import { selectRevisions } from '../messages'
+import { selectRevisions } from '../../util/messages'
 
 export const Welcome: React.FC = () => (
   <div>

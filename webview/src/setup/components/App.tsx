@@ -1,8 +1,5 @@
 import { SetupSection, SetupData } from 'dvc/src/setup/webview/contract'
-import {
-  MessageFromWebviewType,
-  MessageToWebview
-} from 'dvc/src/webview/contract'
+import { MessageToWebview } from 'dvc/src/webview/contract'
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Dvc } from './dvc/Dvc'
@@ -12,7 +9,6 @@ import { SetupContainer } from './SetupContainer'
 import { GetStarted } from './GetStarted'
 import { Remotes } from './remotes/Remotes'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
-import { sendMessage } from '../../shared/vscode'
 import { TooltipIconType } from '../../shared/components/sectionContainer/InfoTooltip'
 import { SetupDispatch, SetupState } from '../store'
 import {
@@ -38,6 +34,7 @@ import {
   updateIsStudioConnected,
   updateShareLiveToStudio
 } from '../state/studioSlice'
+import { setStudioShareExperimentsLive } from '../util/messages'
 
 const getDvcStatusIcon = (
   isDvcSetup: boolean,
@@ -149,10 +146,7 @@ export const App: React.FC = () => {
 
   const setShareLiveToStudio = (shouldShareLive: boolean) => {
     dispatch(updateShareLiveToStudio(shouldShareLive))
-    sendMessage({
-      payload: shouldShareLive,
-      type: MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE
-    })
+    setStudioShareExperimentsLive(shouldShareLive)
   }
 
   const isDvcSetup = !!cliCompatible && projectInitialized

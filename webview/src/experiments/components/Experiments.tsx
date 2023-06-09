@@ -21,7 +21,6 @@ import {
   getExpandedRowModel,
   ColumnSizingState
 } from '@tanstack/react-table'
-import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { Table } from './table/Table'
 import styles from './table/styles.module.scss'
 import { ErrorState } from './emptyState/ErrorState'
@@ -31,11 +30,11 @@ import { CellValue } from './table/content/Cell'
 import { AddStage } from './AddStage'
 import { ExperimentCell } from './table/content/ExperimentCell'
 import { buildColumns, columnHelper } from '../util/buildColumns'
-import { sendMessage } from '../../shared/vscode'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { ExperimentsState } from '../store'
 import { EXPERIMENT_COLUMN_ID } from '../util/columns'
+import { resizeColumn } from '../util/messages'
 
 const DEFAULT_COLUMN_WIDTH = 90
 const MINIMUM_COLUMN_WIDTH = 90
@@ -109,10 +108,7 @@ const reportResizedColumn = (
     if (width !== columnWidths[id]) {
       window.clearTimeout(debounceTimer.current)
       debounceTimer.current = window.setTimeout(() => {
-        sendMessage({
-          payload: { id, width },
-          type: MessageFromWebviewType.RESIZE_COLUMN
-        })
+        resizeColumn(id, width)
       }, 500)
     }
   }

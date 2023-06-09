@@ -15,6 +15,21 @@ export const addStarredFilter = () =>
     type: MessageFromWebviewType.ADD_STARRED_EXPERIMENT_FILTER
   })
 
+export const addConfiguration = () =>
+  sendMessage({ type: MessageFromWebviewType.ADD_CONFIGURATION })
+
+export const reorderColumns = (newOrder: string[]) =>
+  sendMessage({
+    payload: newOrder,
+    type: MessageFromWebviewType.REORDER_COLUMNS
+  })
+
+export const resizeColumn = (id: string, width: number) =>
+  sendMessage({
+    payload: { id, width },
+    type: MessageFromWebviewType.RESIZE_COLUMN
+  })
+
 export const selectColumns = () =>
   sendMessage({ type: MessageFromWebviewType.SELECT_COLUMNS })
 
