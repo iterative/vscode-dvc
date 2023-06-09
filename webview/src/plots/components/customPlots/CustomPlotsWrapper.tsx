@@ -1,12 +1,11 @@
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { CustomPlots } from './CustomPlots'
 import { changeSize } from './customPlotsSlice'
 import { PlotsContainer } from '../PlotsContainer'
 import { PlotsState } from '../../store'
-import { sendMessage } from '../../../shared/vscode'
+import { addCustomPlot, removeCustomPlots } from '../messages'
 
 export const CustomPlotsWrapper: React.FC = () => {
   const { plotsIds, nbItemsPerRow, isCollapsed, height, enablePlotCreation } =
@@ -15,13 +14,6 @@ export const CustomPlotsWrapper: React.FC = () => {
   useEffect(() => {
     setSelectedPlots(plotsIds)
   }, [plotsIds, setSelectedPlots])
-  const addCustomPlot = () => {
-    sendMessage({ type: MessageFromWebviewType.ADD_CUSTOM_PLOT })
-  }
-
-  const removeCustomPlots = () => {
-    sendMessage({ type: MessageFromWebviewType.REMOVE_CUSTOM_PLOTS })
-  }
 
   const hasItems = plotsIds.length > 0
 

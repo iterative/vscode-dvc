@@ -15,6 +15,9 @@ export const addStarredFilter = () =>
     type: MessageFromWebviewType.ADD_STARRED_EXPERIMENT_FILTER
   })
 
+export const selectColumns = () =>
+  sendMessage({ type: MessageFromWebviewType.SELECT_COLUMNS })
+
 export const showMoreCommits = (branch: string) =>
   sendMessage({
     payload: branch,
