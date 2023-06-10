@@ -48,6 +48,7 @@ import { SetupSection } from '../../../setup/webview/contract'
 import { getFirstWorkspaceFolder } from '../../../vscode/workspaceFolders'
 import { Response } from '../../../vscode/response'
 import { DvcConfig } from '../../../cli/dvc/config'
+import * as QuickPickUtil from '../../../setup/quickPick'
 
 suite('Setup Test Suite', () => {
   const disposable = Disposable.fn()
@@ -156,12 +157,23 @@ suite('Setup Test Suite', () => {
       expect(mockAutoUpgradeDvc).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle a update Python environment message from the webview', async () => {
-      const { messageSpy, setup } = buildSetup(disposable)
-      const mockShowQuickPick = stub(window, 'showQuickPick')
+    it('should handle an update Python environment message from the webview', async () => {
+      const { messageSpy, setup, mockExecuteCommand } = buildSetup(disposable)
 
       const webview = await setup.showWebview()
       await webview.isReady()
+
+      const mockPickExtensionAction = stub(
+        QuickPickUtil,
+        'pickPythonExtensionAction'
+      )
+
+      const firstQuickPickEvent = new Promise(resolve => {
+        mockPickExtensionAction.onFirstCall().callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      })
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
@@ -170,7 +182,50 @@ suite('Setup Test Suite', () => {
         type: MessageFromWebviewType.UPDATE_PYTHON_ENVIRONMENT
       })
 
-      expect(mockShowQuickPick).to.be.called
+      await firstQuickPickEvent
+
+      expect(mockExecuteCommand).to.not.be.calledWithExactly(
+        'python.setInterpreter'
+      )
+      expect(mockExecuteCommand).to.not.be.calledWithExactly(
+        'python.createEnvironment'
+      )
+
+      const secondQuickPickEvent = new Promise(resolve => {
+        mockPickExtensionAction.onSecondCall().callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(1)
+        })
+      })
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.UPDATE_PYTHON_ENVIRONMENT
+      })
+
+      await secondQuickPickEvent
+
+      expect(mockExecuteCommand).to.be.calledWithExactly(
+        'python.createEnvironment'
+      )
+
+      const thirdQuickPickEvent = new Promise(resolve => {
+        mockPickExtensionAction.onThirdCall().callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(2)
+        })
+      })
+
+      messageSpy.resetHistory()
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.UPDATE_PYTHON_ENVIRONMENT
+      })
+
+      await thirdQuickPickEvent
+
+      expect(mockExecuteCommand).to.be.calledWithExactly(
+        'python.setInterpreter'
+      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a show source control panel message from the webview', async () => {

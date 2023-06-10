@@ -14,21 +14,23 @@ import {
   RegisteredCommands
 } from '../../commands/external'
 import { openUrl } from '../../vscode/external'
-import { pickPythonExtensionAction } from '../quickPick'
 
 export class WebviewMessages {
   private readonly getWebview: () => BaseWebview<TSetupData> | undefined
   private readonly initializeGit: () => void
   private readonly updateStudioOffline: (offline: boolean) => Promise<void>
+  private readonly updatePythonEnv: () => Promise<void>
 
   constructor(
     getWebview: () => BaseWebview<TSetupData> | undefined,
     initializeGit: () => void,
-    updateStudioOffline: (shareLive: boolean) => Promise<void>
+    updateStudioOffline: (shareLive: boolean) => Promise<void>,
+    updatePythonEnv: () => Promise<void>
   ) {
     this.getWebview = getWebview
     this.initializeGit = initializeGit
     this.updateStudioOffline = updateStudioOffline
+    this.updatePythonEnv = updatePythonEnv
   }
 
   public sendWebviewMessage({
@@ -137,7 +139,7 @@ export class WebviewMessages {
       undefined,
       undefined
     )
-    return pickPythonExtensionAction()
+    return this.updatePythonEnv()
   }
 
   private upgradeDvc() {

@@ -1,12 +1,13 @@
 import { join } from 'path'
-import { pickFocusedProjects } from './quickPick'
-import { quickPickManyValues } from '../vscode/quickPick'
+import { pickFocusedProjects, pickPythonExtensionAction } from './quickPick'
+import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
 import { Toast } from '../vscode/toast'
 import { Title } from '../vscode/title'
 
 jest.mock('../vscode/quickPick')
 
 const mockedQuickPickManyValues = jest.mocked(quickPickManyValues)
+const mockedQuickValue = jest.mocked(quickPickValue)
 
 const mockedToast = jest.mocked(Toast)
 const mockedShowError = jest.fn()
@@ -52,6 +53,31 @@ describe('pickFocusedProjects', () => {
         { label: mockedRoots[2], picked: false, value: mockedRoots[2] }
       ],
       { title: Title.SELECT_FOCUSED_PROJECTS }
+    )
+  })
+})
+
+describe('pickPythonExtensionAction', () => {
+  it('should call a quick pick with the correct values', () => {
+    void pickPythonExtensionAction()
+
+    expect(mockedQuickValue).toHaveBeenCalledWith(
+      [
+        {
+          description: 'Create an environment',
+          label: 'Create',
+          value: 1
+        },
+        {
+          description: 'Choose from already created environments',
+          label: 'Select',
+          value: 2
+        }
+      ],
+      {
+        placeHolder: 'Select or Create a Python Environment',
+        title: Title.UPDATE_PYTHON_ENVIRONMENT
+      }
     )
   })
 })
