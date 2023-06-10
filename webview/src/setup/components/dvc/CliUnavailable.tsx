@@ -33,13 +33,10 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
       </p>
       <div className={styles.sideBySideButtons}>
         <Button onClick={installDvc} text="Install (pip)" />
-        <Button onClick={setupWorkspace} text="Configure" />
         {isPythonExtensionUsed && (
-          <Button
-            onClick={updatePythonEnvironment}
-            text="Update Python Environment"
-          />
+          <Button onClick={updatePythonEnvironment} text="Update Env" />
         )}
+        <Button onClick={setupWorkspace} text="Configure" />
       </div>
     </>
   ) : (
