@@ -30,7 +30,7 @@ export const DvcEnvCommandRow: React.FC<DvcEnvCommandRowProps> = ({
               className={styles.buttonAsLink}
               onClick={updatePythonEnvironment}
             >
-              Update Python Environment
+              Update Env
             </button>
           </>
         )}
