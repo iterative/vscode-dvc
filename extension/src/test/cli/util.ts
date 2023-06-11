@@ -11,6 +11,7 @@ import { DOT_DVC } from '../../cli/dvc/constants'
 
 const config = {
   getCliPath: () => '',
+  getPYTHONPATH: () => undefined,
   getPythonBinPath: () => getVenvBinPath(TEMP_DIR, ENV_DIR, 'python')
 } as Config
 
