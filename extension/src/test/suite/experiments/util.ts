@@ -199,14 +199,12 @@ export const buildExperimentsData = (
   stub(gitReader, 'getNumCommits').resolves(404)
 
   const mockGetBranchesToShow = stub().returns(['main'])
-  const mockPruneBranchesToShow = stub()
+  const mockSetBranches = stub()
   const data = disposer.track(
     new ExperimentsData(dvcDemoPath, internalCommands, {
       getBranchesToShow: mockGetBranchesToShow,
       getNbOfCommitsToShow: () => DEFAULT_NUM_OF_COMMITS_TO_SHOW,
-      pruneBranchesToShow: mockPruneBranchesToShow,
-      setAvailableBranchesToShow: stub(),
-      setBranchesToShow: stub()
+      setBranches: mockSetBranches
     } as unknown as ExperimentsModel)
   )
 
@@ -215,7 +213,7 @@ export const buildExperimentsData = (
     mockCreateFileSystemWatcher,
     mockExpShow,
     mockGetBranchesToShow,
-    mockPruneBranchesToShow
+    mockSetBranches
   }
 }
 

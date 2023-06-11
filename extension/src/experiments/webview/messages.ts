@@ -222,7 +222,7 @@ export class WebviewMessages {
       undefined,
       undefined
     )
-    this.experiments.setBranchesToShow(selectedBranches)
+    this.experiments.setSelectedBranches(selectedBranches)
     await this.update()
   }
 
