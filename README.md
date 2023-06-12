@@ -2,10 +2,10 @@
 
 # DVC Extension for Visual Studio Code
 
-[![Version](https://vsmarketplacebadges.dev/version-short/iterative.dvc.svg)](https://marketplace.visualstudio.com/items?itemName=Iterative.dvc)
-[![Installs](https://vsmarketplacebadges.dev/installs/iterative.dvc.svg)](https://marketplace.visualstudio.com/items?itemName=Iterative.dvc)
-[![Downloads](https://vsmarketplacebadges.dev/downloads/iterative.dvc.svg)](https://marketplace.visualstudio.com/items?itemName=Iterative.dvc)
-[![Ratings](https://vsmarketplacebadges.dev/rating-short/iterative.dvc.svg)](https://marketplace.visualstudio.com/items?itemName=Iterative.dvc)
+![Version](https://img.shields.io/visual-studio-marketplace/v/iterative.dvc)
+![Installs](https://img.shields.io/visual-studio-marketplace/i/iterative.dvc)
+![Downloads](https://img.shields.io/visual-studio-marketplace/d/iterative.dvc)
+![Rating](https://img.shields.io/visual-studio-marketplace/r/iterative.dvc)
 
 [![Continuous Integration](https://github.com/iterative/vscode-dvc/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/iterative/vscode-dvc/actions/workflows/continuous-integration.yml)
 [![Maintainability](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/maintainability)](https://codeclimate.com/repos/608b5886f52398018b00264c/maintainability)
@@ -34,8 +34,8 @@ databases are required.
 - **Data Management**: Handle and version large datasets, files, and models
   effectively right from VS Code.
 
-> **Note**: We are in public beta and welcome early adopter feedback!  
-> Feel free to reach out [via Discord] or open [issues in GitHub].
+> **Note**: We always welcome feedback! Feel free to reach out [via Discord] or
+> open [issues in GitHub].
 >
 > [issues in github]: https://github.com/iterative/vscode-dvc/issues
 > [via discord]: https://discord.gg/BGCjJHvDHt
@@ -127,13 +127,12 @@ This extension augments VS Code in the following ways:
 Open the Command Palette (`F1` or ⇧⌃P on Windows/Linux or ⇧⌘P on macOS) and type
 in one of the following commands:
 
-| Command                    | Description                                                                                                                 |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `DVC: Get Started`         | Open the extension's walkthrough. Which details all of the current features and provides links to extra learning resources. |
-| `View: Show DVC`           | Open the extension's view container.                                                                                        |
-| `DVC: Setup The Workspace` | Activate the extension's workspace setup wizard.                                                                            |
-| `DVC: Show Experiments`    | Show an interactive version of DVC's `exp show` [command](https://dvc.org/doc/command-reference/exp/show).                  |
-| `DVC: Show Plots`          | Show an interactive version of DVC's `plots diff` [command](https://dvc.org/doc/command-reference/plots/diff).              |
+| Command                 | Description                                                                                                    |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `DVC: Show Setup`       | Show the extension's setup page. Which can be used to setup the DVC project, view the walkthrough and more.    |
+| `View: Show DVC`        | Open the extension's view container.                                                                           |
+| `DVC: Show Experiments` | Show an interactive version of DVC's `exp show` [command](https://dvc.org/doc/command-reference/exp/show).     |
+| `DVC: Show Plots`       | Show an interactive version of DVC's `plots diff` [command](https://dvc.org/doc/command-reference/plots/diff). |
 
 Learn more about the extension's [commands].
 
@@ -160,6 +159,13 @@ These are the VS Code [settings] available for the Extension:
 > **Note** that the `Setup The Workspace` command helps you set up the basic
 > ones at the [Workspace level] (saved to `.vscode/setting.json`).
 
+### Python
+
+This extension is integrated with Microsoft's [Python extension]. When possible,
+the Python extension's selected interpreter will be used to locate DVC. The
+`PYTHONPATH` environment variable identified via the [python.envFile] config
+setting is also respected.
+
 [python extension]:
   https://marketplace.visualstudio.com/items?itemName=ms-python.python
 [studio.token]:
@@ -167,6 +173,8 @@ These are the VS Code [settings] available for the Extension:
 [Studio]: https://studio.iterative.ai
 [workspace level]:
   https://code.visualstudio.com/docs/getstarted/settings#_workspace-settings
+[python.envFile]:
+  https://code.visualstudio.com/docs/python/environments#_use-of-the-pythonpath-variable
 
 ## Debugging
 

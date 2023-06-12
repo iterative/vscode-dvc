@@ -124,12 +124,13 @@ export class DvcReader extends DvcCli {
   }
 
   public globalVersion(cwd: string): Promise<string> {
-    const options = getOptions(
-      undefined,
-      this.extensionConfig.getCliPath(),
+    const options = getOptions({
+      PYTHONPATH: undefined,
+      args: [Flag.VERSION],
+      cliPath: this.extensionConfig.getCliPath(),
       cwd,
-      Flag.VERSION
-    )
+      pythonBinPath: undefined
+    })
 
     return this.executeProcess(options)
   }

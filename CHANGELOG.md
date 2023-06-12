@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0] - 2023-06-09
+
+### 🚀 New Features and Enhancements
+
+- Add PYTHONPATH to environment variables if the Python extension makes it available [#4045](https://github.com/iterative/vscode-dvc/pull/4045) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- fix(plots): correct the empty screen link to the dvc docs [#4068](https://github.com/iterative/vscode-dvc/pull/4068) by [@shcheklein](https://github.com/shcheklein)
+
+### 🔨 Maintenance
+
+- Fix failing tests [#4070](https://github.com/iterative/vscode-dvc/pull/4070) by [@mattseddon](https://github.com/mattseddon)
+
+## [0.9.6] - 2023-06-08
+
+### 🚀 New Features and Enhancements
+
+- Condense information on storage types for remote onboarding [#4051](https://github.com/iterative/vscode-dvc/pull/4051) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Remove mention of public beta from the README [#4052](https://github.com/iterative/vscode-dvc/pull/4052) by [@mattseddon](https://github.com/mattseddon)
+- Rearrange DVCLive examples in setup screen [#4055](https://github.com/iterative/vscode-dvc/pull/4055) by [@mattseddon](https://github.com/mattseddon)
+- Use shields.io for marketplace badges in README [#4063](https://github.com/iterative/vscode-dvc/pull/4063) by [@mattseddon](https://github.com/mattseddon)
+
 ## [0.9.5] - 2023-06-07
 
 ### 🚀 New Features and Enhancements

@@ -77,22 +77,21 @@ export class DvcViewer extends Disposable implements ICli {
   }
 
   private viewProcess(name: string, cwd: string, args: Args) {
+    const options = getOptions({
+      PYTHONPATH: this.config.getPYTHONPATH(),
+      args: [...args],
+      cliPath: this.config.getCliPath(),
+      cwd,
+      pythonBinPath: this.config.getPythonBinPath()
+    })
+
     return this.dispose.track(
       new ViewableCliProcess(
         `DVC: ${name}`,
-        this.getOptions(cwd, args),
+        options,
         this.processStarted,
         this.processCompleted
       )
-    )
-  }
-
-  private getOptions(cwd: string, args: Args) {
-    return getOptions(
-      this.config.getPythonBinPath(),
-      this.config.getCliPath(),
-      cwd,
-      ...args
     )
   }
 

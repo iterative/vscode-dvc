@@ -13,6 +13,7 @@ import expShowFixture from '../../test/fixtures/expShow/base/output'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output/minimal'
 import { Config } from '../../config'
 import { joinEnvPath } from '../../util/env'
+import { dvcDemoPath } from '../../test/util'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -34,6 +35,7 @@ const mockedEnv = {
 const JSON_FLAG = '--json'
 
 const mockedGetPythonBinPath = jest.fn()
+const mockedGetPYTHONPATH = jest.fn()
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -53,6 +55,7 @@ describe('CliReader', () => {
   const dvcReader = new DvcReader(
     {
       getCliPath: () => undefined,
+      getPYTHONPATH: mockedGetPYTHONPATH,
       getPythonBinPath: mockedGetPythonBinPath
     } as unknown as Config,
     {
@@ -310,6 +313,22 @@ describe('CliReader', () => {
       })
 
       await expect(dvcReader.version(cwd)).rejects.toBeTruthy()
+    })
+
+    it('should add PYTHONPATH to the environment used to create a DVC process when it is available from the extension config', async () => {
+      mockedGetPYTHONPATH.mockReturnValue(dvcDemoPath)
+      const cwd = __dirname
+      const stdout = '3.9.11'
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
+      const output = await dvcReader.version(cwd)
+
+      expect(output).toStrictEqual(stdout)
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
+        args: ['--version'],
+        cwd,
+        env: { ...mockedEnv, PYTHONPATH: dvcDemoPath },
+        executable: 'dvc'
+      })
     })
   })
 })

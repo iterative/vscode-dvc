@@ -42,6 +42,7 @@ describe('DvcConfig', () => {
   const dvcConfig = new DvcConfig(
     {
       getCliPath: () => undefined,
+      getPYTHONPATH: () => undefined,
       getPythonBinPath: () => undefined
     } as unknown as Config,
     {

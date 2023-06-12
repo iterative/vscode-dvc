@@ -21,7 +21,8 @@ import {
   buildDependencies,
   closeAllEditors,
   getActiveTextEditorFilename,
-  stubPrivatePrototypeMethod
+  stubPrivatePrototypeMethod,
+  waitForEditorText
 } from '../../util'
 import { dvcDemoPath } from '../../../util'
 import {
@@ -70,6 +71,7 @@ suite('Repositories Tree Test Suite', () => {
 
       await commands.executeCommand('workbench.action.files.newUntitledFile')
       await commands.executeCommand('editor.action.clipboardPasteAction')
+      await waitForEditorText()
 
       expect(
         Uri.file(window.activeTextEditor?.document.getText() as string).fsPath
@@ -85,6 +87,7 @@ suite('Repositories Tree Test Suite', () => {
 
       await commands.executeCommand('workbench.action.files.newUntitledFile')
       await commands.executeCommand('editor.action.clipboardPasteAction')
+      await waitForEditorText()
 
       expect(window.activeTextEditor?.document.getText()).to.equal(relPath)
     })

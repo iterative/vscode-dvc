@@ -11,12 +11,21 @@ interface Settings {
   }
 }
 
+type EnvironmentVariables = { readonly [key: string]: string | undefined }
+type EnvironmentVariablesChangeEvent = {
+  readonly env: EnvironmentVariables
+}
+
 export interface VscodePython {
   ready: Thenable<void>
   settings: Settings
+  environments: {
+    onDidEnvironmentVariablesChange: Event<EnvironmentVariablesChangeEvent>
+    getEnvironmentVariables(): EnvironmentVariables
+  }
 }
 
-const getPythonExtensionSettings = async (): Promise<Settings | undefined> => {
+const getPythonExtensionAPI = async (): Promise<VscodePython | undefined> => {
   const api = await getExtensionAPI<VscodePython>(PYTHON_EXTENSION_ID)
   if (!api) {
     return
@@ -24,14 +33,14 @@ const getPythonExtensionSettings = async (): Promise<Settings | undefined> => {
   try {
     await api.ready
   } catch {}
-  return api.settings
+  return api
 }
 
 export const getPythonExecutionDetails = async (): Promise<
   string[] | undefined
 > => {
-  const settings = await getPythonExtensionSettings()
-  return settings?.getExecutionDetails().execCommand
+  const api = await getPythonExtensionAPI()
+  return api?.settings?.getExecutionDetails().execCommand
 }
 
 export const getPythonBinPath = async (): Promise<string | undefined> => {
@@ -42,9 +51,19 @@ export const getPythonBinPath = async (): Promise<string | undefined> => {
   }
 }
 
+export const getPYTHONPATH = async (): Promise<string | undefined> => {
+  const api = await getPythonExtensionAPI()
+  return api?.environments?.getEnvironmentVariables().PYTHONPATH
+}
+
 export const getOnDidChangePythonExecutionDetails = async () => {
-  const settings = await getPythonExtensionSettings()
-  return settings?.onDidChangeExecutionDetails
+  const api = await getPythonExtensionAPI()
+  return api?.settings?.onDidChangeExecutionDetails
+}
+
+export const getOnDidChangePythonEnvironmentVariables = async () => {
+  const api = await getPythonExtensionAPI()
+  return api?.environments?.onDidEnvironmentVariablesChange
 }
 
 export const isPythonExtensionInstalled = () => isInstalled(PYTHON_EXTENSION_ID)
