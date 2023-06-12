@@ -33,6 +33,7 @@ import {
 const tableData: TableDataState = {
   branches: [undefined, 'main'],
   changes: workspaceChangesFixture,
+  cliError: undefined,
   columnOrder: [],
   columnWidths: {
     'params:params.yaml:dvc_logs_dir': 300
@@ -113,6 +114,86 @@ const Template: StoryFn<{ tableData: TableDataState }> = ({ tableData }) => {
 }
 
 export const WithData = Template.bind({})
+
+export const WithCliError = Template.bind({})
+WithCliError.args = {
+  tableData: {
+    ...tableData,
+    cliError: `ERROR: unrecognized arguments: -----borked
+
+usage: dvc plots diff [-h] [-q | -v] [--targets [<paths> ...]] [-t [<path>]]
+
+                      [-x <field>] [-y <field>] [--no-header] [--title <text>]
+
+                      [--x-label <text>] [--y-label <text>] [-o <path>]
+
+                      [--show-vega] [--open] [--html-template <path>]
+
+                      [revisions ...]
+
+
+
+Show multiple versions of a plot by overlaying them in a single image.
+
+Documentation: <https://man.dvc.org/plots/diff>
+
+
+
+positional arguments:
+
+  revisions             Git commits to plot from
+
+
+
+options:
+
+  -h, --help            show this help message and exit
+
+  -q, --quiet           Be quiet.
+
+  -v, --verbose         Be verbose.
+
+  --targets [<paths> ...]
+
+                        Specific plots to visualize. Accepts any file path or
+
+                        plot name from \`dvc.yaml\` file. Shows all tracked
+
+                        plots by default.
+
+  -t [<path>], --template [<path>]
+
+                        Special JSON or HTML schema file to inject with the
+
+                        data. See <https://man.dvc.org/plots#plot-
+
+                        templates>
+
+  -x <field>            Field name for X axis.
+
+  -y <field>            Field name for Y axis.
+
+  --no-header           Provided CSV or TSV datafile does not have a header.
+
+  --title <text>        Plot title.
+
+  --x-label <text>      X axis label
+
+  --y-label <text>      Y axis label
+
+  -o <path>, --out <path>
+
+                        Directory to save plots to.
+
+  --show-vega           Show output in Vega format.
+
+  --open                Open plot file directly in the browser.
+
+  --html-template <path>
+
+                        Custom HTML template for VEGA visualization.`
+  }
+}
 
 export const WithSurvivalData = Template.bind({})
 WithSurvivalData.args = {

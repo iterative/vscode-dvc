@@ -8,7 +8,11 @@ import { update } from './ribbonSlice'
 import { IconButton } from '../../../shared/components/button/IconButton'
 import { PlotsState } from '../../store'
 import { ListFilter, Refresh } from '../../../shared/components/icons'
-import { refreshRevisions, removeRevision, selectRevisions } from '../messages'
+import {
+  refreshRevisions,
+  removeRevision,
+  selectRevisions
+} from '../../util/messages'
 
 const MAX_NB_EXP = 7
 

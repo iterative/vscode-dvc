@@ -1474,6 +1474,30 @@ suite('Experiments Test Suite', () => {
       expect(mockUpdateExperimentsData).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should handle a message to refresh the exp show data', async () => {
+      const { experiments, mockUpdateExperimentsData } = buildExperiments({
+        disposer: disposable,
+        expShow: expShowFixture
+      })
+
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const expShowCalled = new Promise(resolve =>
+        mockUpdateExperimentsData.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve([])
+        })
+      )
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.REFRESH_EXP_DATA
+      })
+
+      await expShowCalled
+      expect(mockUpdateExperimentsData).to.be.calledOnce
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should not update the selected branches when the user closes the select branches quick pick', async () => {
       const {
         experiments,

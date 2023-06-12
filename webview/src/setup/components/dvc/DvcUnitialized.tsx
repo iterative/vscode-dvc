@@ -1,7 +1,7 @@
 import React, { PropsWithChildren } from 'react'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { Button } from '../../../shared/components/button/Button'
-import { initializeDvc } from '../messages'
+import { initializeDvc } from '../../util/messages'
 
 export const DvcUninitialized: React.FC<PropsWithChildren> = ({ children }) => (
   <EmptyState isFullScreen={false}>

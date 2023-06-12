@@ -46,6 +46,7 @@ export const EventName = Object.assign(
     VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN: 'views.experimentsTable.columnHidden',
     VIEWS_EXPERIMENTS_TABLE_OPEN_PARAMS_FILE:
       'views.experimentsTable.paramsFileOpened',
+    VIEWS_EXPERIMENTS_TABLE_REFRESH: 'views.experimentsTable.refresh',
     VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_SORT:
       'views.experimentsTable.columnSortRemoved',
     VIEWS_EXPERIMENTS_TABLE_RESIZE_COLUMN:
@@ -85,9 +86,9 @@ export const EventName = Object.assign(
     VIEWS_SETUP_FOCUS_CHANGED: 'views.setup.focusChanged',
     VIEWS_SETUP_INIT_GIT: 'views.setup.initializeGit',
     VIEWS_SETUP_INSTALL_DVC: 'views.setup.installDvc',
-    VIEWS_SETUP_SELECT_PYTHON_INTERPRETER:
-      'views.setup.selectPythonInterpreter',
     VIEWS_SETUP_SHOW_SCM_FOR_COMMIT: 'views.setup.showScmForCommit',
+    VIEWS_SETUP_UPDATE_PYTHON_ENVIRONMENT:
+      'views.setup.updatePythonEnvironment',
     VIEWS_SETUP_UPGRADE_DVC: 'view.setup.upgradeDvc',
 
     VIEWS_TERMINAL_CLOSED: 'views.terminal.closed',
@@ -229,6 +230,7 @@ export interface IEventNamePropertyMapping {
   }
   [EventName.VIEWS_EXPERIMENTS_TABLE_SET_MAX_HEADER_HEIGHT]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_SORT_COLUMN]: SortDefinition
+  [EventName.VIEWS_EXPERIMENTS_TABLE_REFRESH]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_SORT]: {
     path: string
   }
@@ -277,7 +279,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_SETUP_CLOSE]: undefined
   [EventName.VIEWS_SETUP_CREATED]: undefined
   [EventName.VIEWS_SETUP_FOCUS_CHANGED]: undefined
-  [EventName.VIEWS_SETUP_SELECT_PYTHON_INTERPRETER]: undefined
+  [EventName.VIEWS_SETUP_UPDATE_PYTHON_ENVIRONMENT]: undefined
   [EventName.VIEWS_SETUP_SHOW_SCM_FOR_COMMIT]: undefined
   [EventName.VIEWS_SETUP_INIT_GIT]: undefined
   [EventName.VIEWS_SETUP_INSTALL_DVC]: undefined

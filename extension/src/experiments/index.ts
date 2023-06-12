@@ -409,7 +409,10 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public getWorkspaceAndCommits() {
-    if (!this.columns.hasNonDefaultColumns()) {
+    if (
+      !this.experiments.getCliError() &&
+      !this.columns.hasNonDefaultColumns()
+    ) {
       return []
     }
 
@@ -499,6 +502,10 @@ export class Experiments extends BaseRepository<TableData> {
 
   public hasRunningWorkspaceExperiment() {
     return this.experiments.hasRunningWorkspaceExperiment()
+  }
+
+  public getCliError() {
+    return this.experiments.getCliError()
   }
 
   public getFirstThreeColumnOrder() {

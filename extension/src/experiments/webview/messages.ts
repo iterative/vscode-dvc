@@ -205,6 +205,9 @@ export class WebviewMessages {
       case MessageFromWebviewType.SELECT_BRANCHES:
         return this.addAndRemoveBranches()
 
+      case MessageFromWebviewType.REFRESH_EXP_DATA:
+        return this.refreshData()
+
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
@@ -242,9 +245,20 @@ export class WebviewMessages {
     await this.update()
   }
 
+  private refreshData() {
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_REFRESH,
+      undefined,
+      undefined
+    )
+
+    return this.update()
+  }
+
   private getWebviewData() {
     return {
       changes: this.columns.getChanges(),
+      cliError: this.experiments.getCliError(),
       columnOrder: this.columns.getColumnOrder(),
       columnWidths: this.columns.getColumnWidths(),
       columns: this.columns.getSelected(),

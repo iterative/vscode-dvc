@@ -1,7 +1,6 @@
 import React, { DragEvent, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
-import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { CustomPlot } from './CustomPlot'
 import styles from '../styles.module.scss'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
@@ -13,9 +12,9 @@ import { DropTarget } from '../DropTarget'
 import { VirtualizedGrid } from '../../../shared/components/virtualizedGrid/VirtualizedGrid'
 import { shouldUseVirtualizedGrid } from '../util'
 import { PlotsState } from '../../store'
-import { sendMessage } from '../../../shared/vscode'
 import { changeOrderWithDraggedInfo } from '../../../util/array'
 import { LoadingSection, sectionIsLoading } from '../LoadingSection'
+import { reorderCustomPlots } from '../../util/messages'
 
 interface CustomPlotsProps {
   plotsIds: string[]
@@ -40,10 +39,7 @@ export const CustomPlots: React.FC<CustomPlotsProps> = ({ plotsIds }) => {
 
   const setPlotsIdsOrder = (order: string[]): void => {
     setOrder(order)
-    sendMessage({
-      payload: order,
-      type: MessageFromWebviewType.REORDER_PLOTS_CUSTOM
-    })
+    reorderCustomPlots(order)
   }
 
   if (sectionIsLoading(selectedRevisions, hasItems)) {
