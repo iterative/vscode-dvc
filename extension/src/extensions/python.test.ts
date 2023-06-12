@@ -63,6 +63,10 @@ describe('getPythonBinPath', () => {
   })
 })
 
+describe('isActivePythonEnvGlobal', () => {
+  // TBD more tests here
+})
+
 describe('getOnDidChangePythonExecutionDetails', () => {
   it('should return the listener if the python ready promise rejects', async () => {
     mockedReady.mockRejectedValueOnce(undefined)

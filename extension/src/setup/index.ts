@@ -412,7 +412,8 @@ export class Setup
     const webviewMessages = new WebviewMessages(
       () => this.getWebview(),
       () => this.initializeGit(),
-      (offline: boolean) => this.updateStudioOffline(offline)
+      (offline: boolean) => this.updateStudioOffline(offline),
+      () => this.isPythonExtensionUsed()
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>

@@ -36,7 +36,7 @@ suite('Auto Install Test Suite', () => {
       const showProgressSpy = spy(window, 'withProgress')
       const showErrorSpy = spy(window, 'showErrorMessage')
 
-      await autoUpgradeDvc()
+      await autoUpgradeDvc(false)
 
       expect(showProgressSpy).not.to.be.called
       expect(showErrorSpy).to.be.called
@@ -54,7 +54,7 @@ suite('Auto Install Test Suite', () => {
       const showProgressSpy = spy(window, 'withProgress')
       const showErrorSpy = spy(window, 'showErrorMessage')
 
-      await autoUpgradeDvc()
+      await autoUpgradeDvc(false)
 
       expect(showProgressSpy).not.to.be.called
       expect(showErrorSpy).to.be.called
@@ -74,7 +74,7 @@ suite('Auto Install Test Suite', () => {
       const showProgressSpy = spy(window, 'withProgress')
       const showErrorSpy = spy(window, 'showErrorMessage')
 
-      await autoUpgradeDvc()
+      await autoUpgradeDvc(false)
 
       expect(showProgressSpy).to.be.called
       expect(showErrorSpy).not.to.be.called
@@ -100,7 +100,7 @@ suite('Auto Install Test Suite', () => {
       const showErrorSpy = spy(window, 'showErrorMessage')
       const reportProgressErrorSpy = spy(Toast, 'reportProgressError')
 
-      await autoUpgradeDvc()
+      await autoUpgradeDvc(false)
 
       expect(showProgressSpy).to.be.called
       expect(showErrorSpy).not.to.be.called
@@ -125,7 +125,7 @@ suite('Auto Install Test Suite', () => {
       const showProgressSpy = spy(window, 'withProgress')
       const showErrorSpy = spy(window, 'showErrorMessage')
 
-      await autoInstallDvc()
+      await autoInstallDvc(false)
 
       expect(showProgressSpy).not.to.be.called
       expect(showErrorSpy).to.be.called
@@ -143,7 +143,7 @@ suite('Auto Install Test Suite', () => {
       const showProgressSpy = spy(window, 'withProgress')
       const showErrorSpy = spy(window, 'showErrorMessage')
 
-      await autoInstallDvc()
+      await autoInstallDvc(false)
 
       expect(showProgressSpy).not.to.be.called
       expect(showErrorSpy).to.be.called
@@ -163,7 +163,7 @@ suite('Auto Install Test Suite', () => {
       const showProgressSpy = spy(window, 'withProgress')
       const showErrorSpy = spy(window, 'showErrorMessage')
 
-      await autoInstallDvc()
+      await autoInstallDvc(false)
 
       expect(showProgressSpy).to.be.called
       expect(showErrorSpy).not.to.be.called
@@ -193,7 +193,7 @@ suite('Auto Install Test Suite', () => {
       const showProgressSpy = spy(window, 'withProgress')
       const showErrorSpy = spy(window, 'showErrorMessage')
 
-      await autoInstallDvc()
+      await autoInstallDvc(false)
 
       expect(showProgressSpy).to.be.called
       expect(showErrorSpy).not.to.be.called
@@ -221,7 +221,7 @@ suite('Auto Install Test Suite', () => {
       const showErrorSpy = spy(window, 'showErrorMessage')
       const reportProgressErrorSpy = spy(Toast, 'reportProgressError')
 
-      await autoInstallDvc()
+      await autoInstallDvc(false)
 
       expect(showProgressSpy).to.be.called
       expect(showErrorSpy).not.to.be.called

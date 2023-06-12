@@ -9,26 +9,29 @@ import { BaseWebview } from '../../webview'
 import { sendTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { selectPythonInterpreter } from '../../extensions/python'
-import { autoInstallDvc, autoUpgradeDvc } from '../autoInstall'
 import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../commands/external'
 import { openUrl } from '../../vscode/external'
+import { autoInstallDvc, autoUpgradeDvc } from '../autoInstall'
 
 export class WebviewMessages {
   private readonly getWebview: () => BaseWebview<TSetupData> | undefined
   private readonly initializeGit: () => void
   private readonly updateStudioOffline: (offline: boolean) => Promise<void>
+  private isPythonExtensionUsed: () => Promise<boolean>
 
   constructor(
     getWebview: () => BaseWebview<TSetupData> | undefined,
     initializeGit: () => void,
-    updateStudioOffline: (shareLive: boolean) => Promise<void>
+    updateStudioOffline: (shareLive: boolean) => Promise<void>,
+    isPythonExtensionUsed: () => Promise<boolean>
   ) {
     this.getWebview = getWebview
     this.initializeGit = initializeGit
     this.updateStudioOffline = updateStudioOffline
+    this.isPythonExtensionUsed = isPythonExtensionUsed
   }
 
   public sendWebviewMessage({
@@ -140,16 +143,20 @@ export class WebviewMessages {
     return selectPythonInterpreter()
   }
 
-  private upgradeDvc() {
+  private async upgradeDvc() {
     sendTelemetryEvent(EventName.VIEWS_SETUP_UPGRADE_DVC, undefined, undefined)
 
-    return autoUpgradeDvc()
+    const isPythonExtensionUsed = await this.isPythonExtensionUsed()
+
+    return autoUpgradeDvc(isPythonExtensionUsed)
   }
 
-  private installDvc() {
+  private async installDvc() {
     sendTelemetryEvent(EventName.VIEWS_SETUP_INSTALL_DVC, undefined, undefined)
 
-    return autoInstallDvc()
+    const isPythonExtensionUsed = await this.isPythonExtensionUsed()
+
+    return autoInstallDvc(isPythonExtensionUsed)
   }
 
   private openStudio() {
