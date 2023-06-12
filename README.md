@@ -60,13 +60,11 @@ databases are required.
 
 1. [Install DVC](https://dvc.org/doc/install) on your system.
 2. Install [this extension] in VS Code.
-3. Follow the [Get Started](#useful-commands) walkthrough!
+3. Follow the steps set out on the [Setup](#useful-commands) page!
 
 <!-- prettier-ignore -->
 > 💡 Feel free to try our [example DVC project] first! Opening it [with Github
 > Codespaces] will include this extension automatically.
-
-![Initial Get Started page](https://raw.githubusercontent.com/iterative/vscode-dvc/main/extension/docs/walkthroughs.png)
 
 [this extension]:
   https://marketplace.visualstudio.com/items?itemName=Iterative.dvc
@@ -76,10 +74,10 @@ databases are required.
 
 ### Learn more about DVC (Data Version Control)
 
-See the DVC documentation to Get Started with [Experiment Versioning] or [Data
-Management]. For deeper learning, try our [free course]! [More resources]
+See the DVC documentation to Get Started with [Experiments] or [Data
+Management]. For deeper learning, try our [free course]! [More resources].
 
-[experiment versioning]: https://dvc.org/doc/start/experiments
+[experiments]: https://dvc.org/doc/start/experiments
 [data management]: https://dvc.org/doc/start/data-management
 [free course]: https://learn.iterative.ai/
 [more resources]:
@@ -167,15 +165,24 @@ the Python extension's selected interpreter will be used to locate DVC. The
 `PYTHONPATH` environment variable identified via the [python.envFile] config
 setting is also respected.
 
+### Studio
+
+[Studio] is a collaboration platform for Machine Learning teams. The extension
+will help you to connect to [Studio] by providing guidance and managing the
+required [DVC config options]. See the Studio section of the Setup page for more
+information.
+
 [python extension]:
   https://marketplace.visualstudio.com/items?itemName=ms-python.python
 [studio.token]:
   https://dvc.org/doc/user-guide/project-structure/configuration#studio
-[Studio]: https://studio.iterative.ai
+[studio]: https://studio.iterative.ai
 [workspace level]:
   https://code.visualstudio.com/docs/getstarted/settings#_workspace-settings
 [python.envFile]:
   https://code.visualstudio.com/docs/python/environments#_use-of-the-pythonpath-variable
+[dvc config options]:
+  https://dvc.org/doc/user-guide/project-structure/configuration#studio
 
 ## Debugging
 

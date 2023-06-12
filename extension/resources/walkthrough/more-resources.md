@@ -20,6 +20,9 @@
 - Check out the [DVC GitHub repository], where you can find and report issues,
   or [contribute] to the open-source project.
 
+- Get introduced to [Studio], the collaboration platform for Machine Learning
+  teams.
+
 [hands-on tour]: https://dvc.org/doc/start
 [user guide]: https://dvc.org/doc/user-guide
 [use cases]: https://dvc.org/doc/use-cases
@@ -31,3 +34,4 @@
 [blog]: https://dvc.org/blog
 [community]: https://dvc.org/community
 [dvc github repository]: https://github.com/iterative/dvc
+[studio]: https://studio.iterative.ai/
