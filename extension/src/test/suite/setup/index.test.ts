@@ -194,7 +194,9 @@ suite('Setup Test Suite', () => {
       const secondQuickPickEvent = new Promise(resolve => {
         mockPickExtensionAction.onSecondCall().callsFake(() => {
           resolve(undefined)
-          return Promise.resolve(1)
+          return Promise.resolve(
+            QuickPickUtil.PYTHON_EXTENSION_ACTION.CREATE_ENV
+          )
         })
       })
 
@@ -212,7 +214,9 @@ suite('Setup Test Suite', () => {
       const thirdQuickPickEvent = new Promise(resolve => {
         mockPickExtensionAction.onThirdCall().callsFake(() => {
           resolve(undefined)
-          return Promise.resolve(2)
+          return Promise.resolve(
+            QuickPickUtil.PYTHON_EXTENSION_ACTION.SET_INTERPRETER
+          )
         })
       })
 

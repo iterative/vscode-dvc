@@ -1,5 +1,9 @@
 import { join } from 'path'
-import { pickFocusedProjects, pickPythonExtensionAction } from './quickPick'
+import {
+  PYTHON_EXTENSION_ACTION,
+  pickFocusedProjects,
+  pickPythonExtensionAction
+} from './quickPick'
 import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
 import { Toast } from '../vscode/toast'
 import { Title } from '../vscode/title'
@@ -66,12 +70,12 @@ describe('pickPythonExtensionAction', () => {
         {
           description: 'Create an environment',
           label: 'Create',
-          value: 1
+          value: PYTHON_EXTENSION_ACTION.CREATE_ENV
         },
         {
           description: 'Choose from already created environments',
           label: 'Select',
-          value: 2
+          value: PYTHON_EXTENSION_ACTION.SET_INTERPRETER
         }
       ],
       {

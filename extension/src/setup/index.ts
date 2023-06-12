@@ -13,7 +13,11 @@ import { validateTokenInput } from './inputBox'
 import { findPythonBinForInstall } from './autoInstall'
 import { run, runWithRecheck, runWorkspace } from './runner'
 import { isStudioAccessToken } from './token'
-import { pickFocusedProjects, pickPythonExtensionAction } from './quickPick'
+import {
+  PYTHON_EXTENSION_ACTION,
+  pickFocusedProjects,
+  pickPythonExtensionAction
+} from './quickPick'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Resource } from '../resourceLocator'
@@ -508,7 +512,9 @@ export class Setup
       return
     }
 
-    return value === 1 ? createPythonEnv() : selectPythonInterpreter()
+    return value === PYTHON_EXTENSION_ACTION.CREATE_ENV
+      ? createPythonEnv()
+      : selectPythonInterpreter()
   }
 
   private needsGitCommit(needsGitInit: boolean) {
