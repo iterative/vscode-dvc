@@ -1,17 +1,16 @@
 import React, { createRef, useLayoutEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { AddPlots, Welcome } from './GetStarted'
+import { ErrorState } from './emptyState/ErrorState'
+import { GetStarted } from './emptyState/GetStarted'
 import { ZoomedInPlot } from './ZoomedInPlot'
 import { CustomPlotsWrapper } from './customPlots/CustomPlotsWrapper'
 import { TemplatePlotsWrapper } from './templatePlots/TemplatePlotsWrapper'
 import { ComparisonTableWrapper } from './comparisonTable/ComparisonTableWrapper'
 import { Ribbon } from './ribbon/Ribbon'
 import { setMaxNbPlotsPerRow, setZoomedInPlot } from './webviewSlice'
-import styles from './styles.module.scss'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { Modal } from '../../shared/components/modal/Modal'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
-import { GetStarted } from '../../shared/components/getStarted/GetStarted'
 import { PlotsState } from '../store'
 
 const PlotsContent = () => {
@@ -60,30 +59,26 @@ const PlotsContent = () => {
     </Modal>
   )
 
-  const hasNoCustomPlots = customPlotIds.length === 0
+  const hasCustomPlots = customPlotIds.length > 0
+
+  if (cliError) {
+    return (
+      <ErrorState
+        cliError={cliError}
+        hasCustomPlots={hasCustomPlots}
+        modal={modal}
+      />
+    )
+  }
 
   if (!hasComparisonData && !hasTemplateData) {
     return (
-      <div className={styles.getStartedWrapper}>
-        <GetStarted
-          addItems={
-            <AddPlots
-              hasUnselectedPlots={hasUnselectedPlots}
-              hasNoCustomPlots={hasNoCustomPlots}
-              cliError={cliError}
-            />
-          }
-          showEmpty={!hasPlots && !cliError}
-          welcome={<Welcome />}
-          isFullScreen={hasNoCustomPlots}
-        />
-        {!hasNoCustomPlots && (
-          <>
-            <CustomPlotsWrapper />
-            {modal}
-          </>
-        )}
-      </div>
+      <GetStarted
+        hasCustomPlots={hasCustomPlots}
+        hasPlots={hasPlots}
+        hasUnselectedPlots={hasUnselectedPlots}
+        modal={modal}
+      />
     )
   }
 
@@ -93,7 +88,6 @@ const PlotsContent = () => {
       <TemplatePlotsWrapper />
       <ComparisonTableWrapper />
       <CustomPlotsWrapper />
-
       {modal}
     </div>
   )

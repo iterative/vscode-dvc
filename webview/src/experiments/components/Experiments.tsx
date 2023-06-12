@@ -24,8 +24,8 @@ import {
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { Table } from './table/Table'
 import styles from './table/styles.module.scss'
-import { ErrorState } from './ErrorState'
-import { AddColumns, Welcome } from './GetStarted'
+import { ErrorState } from './emptyState/ErrorState'
+import { GetStarted } from './emptyState/GetStarted'
 import { RowSelectionProvider } from './table/RowSelectionContext'
 import { CellValue } from './table/content/Cell'
 import { AddStage } from './AddStage'
@@ -33,7 +33,6 @@ import { ExperimentCell } from './table/content/ExperimentCell'
 import { buildColumns, columnHelper } from '../util/buildColumns'
 import { sendMessage } from '../../shared/vscode'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
-import { GetStarted } from '../../shared/components/getStarted/GetStarted'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { ExperimentsState } from '../store'
 import { EXPERIMENT_COLUMN_ID } from '../util/columns'
@@ -186,13 +185,7 @@ export const ExperimentsTable: React.FC = () => {
   const hasOnlyDefaultColumns = columns.length <= 1
   const hasOnlyWorkspace = data.length <= 1
   if (hasOnlyDefaultColumns || hasOnlyWorkspace) {
-    return (
-      <GetStarted
-        addItems={<AddColumns />}
-        showEmpty={!hasColumns || hasOnlyWorkspace}
-        welcome={<Welcome />}
-      />
-    )
+    return <GetStarted showWelcome={!hasColumns || hasOnlyWorkspace} />
   }
   return (
     <RowSelectionProvider>
