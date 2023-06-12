@@ -33,8 +33,8 @@ export const upgradeDvc = () => {
   sendMessage({ type: MessageFromWebviewType.UPGRADE_DVC })
 }
 
-export const selectPythonInterpreter = () => {
-  sendMessage({ type: MessageFromWebviewType.SELECT_PYTHON_INTERPRETER })
+export const updatePythonEnvironment = () => {
+  sendMessage({ type: MessageFromWebviewType.UPDATE_PYTHON_ENVIRONMENT })
 }
 
 export const setupWorkspace = () => {

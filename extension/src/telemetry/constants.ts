@@ -86,9 +86,9 @@ export const EventName = Object.assign(
     VIEWS_SETUP_FOCUS_CHANGED: 'views.setup.focusChanged',
     VIEWS_SETUP_INIT_GIT: 'views.setup.initializeGit',
     VIEWS_SETUP_INSTALL_DVC: 'views.setup.installDvc',
-    VIEWS_SETUP_SELECT_PYTHON_INTERPRETER:
-      'views.setup.selectPythonInterpreter',
     VIEWS_SETUP_SHOW_SCM_FOR_COMMIT: 'views.setup.showScmForCommit',
+    VIEWS_SETUP_UPDATE_PYTHON_ENVIRONMENT:
+      'views.setup.updatePythonEnvironment',
     VIEWS_SETUP_UPGRADE_DVC: 'view.setup.upgradeDvc',
 
     VIEWS_TERMINAL_CLOSED: 'views.terminal.closed',
@@ -279,7 +279,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_SETUP_CLOSE]: undefined
   [EventName.VIEWS_SETUP_CREATED]: undefined
   [EventName.VIEWS_SETUP_FOCUS_CHANGED]: undefined
-  [EventName.VIEWS_SETUP_SELECT_PYTHON_INTERPRETER]: undefined
+  [EventName.VIEWS_SETUP_UPDATE_PYTHON_ENVIRONMENT]: undefined
   [EventName.VIEWS_SETUP_SHOW_SCM_FOR_COMMIT]: undefined
   [EventName.VIEWS_SETUP_INIT_GIT]: undefined
   [EventName.VIEWS_SETUP_INSTALL_DVC]: undefined
