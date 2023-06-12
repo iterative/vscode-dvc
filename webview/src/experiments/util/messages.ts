@@ -43,3 +43,6 @@ export const toggleStarred = (id: string) =>
     payload: [id],
     type: MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR
   })
+
+export const refreshData = () =>
+  sendMessage({ type: MessageFromWebviewType.REFRESH_EXP_DATA })

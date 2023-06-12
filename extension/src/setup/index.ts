@@ -79,6 +79,7 @@ export class Setup
 
   private readonly webviewMessages: WebviewMessages
   private readonly getHasData: () => boolean | undefined
+  private readonly getExpShowError: () => string | undefined
   private readonly collectWorkspaceScale: () => Promise<WorkspaceScale>
 
   private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
@@ -134,6 +135,7 @@ export class Setup
     }
 
     this.getHasData = () => experiments.getHasData()
+    this.getExpShowError = () => experiments.getCliError()
     const onDidChangeHasData = experiments.columnsChanged.event
     this.dispose.track(
       onDidChangeHasData(() =>
@@ -237,7 +239,7 @@ export class Setup
   public shouldBeShown(): { dvc: boolean; experiments: boolean } {
     return {
       dvc: !!this.getCliCompatible() && this.hasRoots(),
-      experiments: !!this.getHasData()
+      experiments: !!(this.getExpShowError() || this.getHasData())
     }
   }
 

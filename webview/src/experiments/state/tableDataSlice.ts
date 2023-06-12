@@ -16,6 +16,7 @@ export interface TableDataState extends TableData {
 export const tableDataInitialState: TableDataState = {
   branches: ['current'],
   changes: [],
+  cliError: undefined,
   columnOrder: [],
   columnWidths: {},
   columns: [],
@@ -47,6 +48,9 @@ export const tableDataSlice = createSlice({
     },
     updateChanges: (state, action: PayloadAction<string[]>) => {
       state.changes = action.payload
+    },
+    updateCliError: (state, action: PayloadAction<string | undefined>) => {
+      state.cliError = action.payload
     },
     updateColumnOrder: (state, action: PayloadAction<string[]>) => {
       state.columnOrder = action.payload
@@ -141,6 +145,7 @@ export const tableDataSlice = createSlice({
 export const {
   update,
   updateChanges,
+  updateCliError,
   updateColumnOrder,
   updateColumnWidths,
   updateColumns,
