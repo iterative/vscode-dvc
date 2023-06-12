@@ -21,7 +21,7 @@ import {
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
 import { Color } from './model/status/colors'
-import { UNSELECTED } from './model/status'
+import { MAX_SELECTED_EXPERIMENTS, UNSELECTED } from './model/status'
 import { starredSort } from './model/sortBy/constants'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ColumnsModel } from './columns/model'
@@ -40,9 +40,10 @@ import { Title } from '../vscode/title'
 import { createTypedAccumulator } from '../util/object'
 import { pickPaths } from '../path/selection/quickPick'
 import { Toast } from '../vscode/toast'
-import { ConfigKey } from '../vscode/config'
+import { ConfigKey, getConfigValue, setUserConfigValue } from '../vscode/config'
 import { checkSignalFile, pollSignalFileForProcess } from '../fileSystem'
 import { DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
+import { Response } from '../vscode/response'
 
 export const ExperimentsScale = {
   ...omit(ColumnType, 'TIMESTAMP'),
@@ -219,6 +220,7 @@ export class Experiments extends BaseRepository<TableData> {
   ): Color | typeof UNSELECTED | undefined {
     const selected = this.experiments.isSelected(id)
     if (!selected && !this.experiments.canSelect()) {
+      void this.informMaxSelected()
       return
     }
 
@@ -609,5 +611,19 @@ export class Experiments extends BaseRepository<TableData> {
       })
     }
     return dvcLiveOnly
+  }
+
+  private async informMaxSelected() {
+    if (getConfigValue(ConfigKey.DO_NOT_INFORM_MAX_PLOTTED, false)) {
+      return
+    }
+    const response = await Toast.infoWithOptions(
+      `Cannot plot more than ${MAX_SELECTED_EXPERIMENTS} experiments.`,
+      Response.NEVER
+    )
+
+    if (response === Response.NEVER) {
+      return setUserConfigValue(ConfigKey.DO_NOT_INFORM_MAX_PLOTTED, true)
+    }
   }
 }
