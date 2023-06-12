@@ -3,17 +3,6 @@
 
 $gap: 20px;
 
-.getStartedWrapper {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 100%;
-
-  > *:first-child {
-    flex-grow: 1;
-  }
-}
-
 .plots {
   width: 100%;
   height: 100%;
@@ -218,10 +207,6 @@ $gap: 20px;
   path {
     fill: $accent-color;
   }
-}
-
-.errorIcon {
-  color: $error-color;
 }
 
 .zoomablePlot {

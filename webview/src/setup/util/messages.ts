@@ -33,8 +33,8 @@ export const upgradeDvc = () => {
   sendMessage({ type: MessageFromWebviewType.UPGRADE_DVC })
 }
 
-export const selectPythonInterpreter = () => {
-  sendMessage({ type: MessageFromWebviewType.SELECT_PYTHON_INTERPRETER })
+export const updatePythonEnvironment = () => {
+  sendMessage({ type: MessageFromWebviewType.UPDATE_PYTHON_ENVIRONMENT })
 }
 
 export const setupWorkspace = () => {
@@ -53,6 +53,12 @@ export const openStudioProfile = () =>
 
 export const saveStudioToken = () =>
   sendMessage({ type: MessageFromWebviewType.SAVE_STUDIO_TOKEN })
+
+export const setStudioShareExperimentsLive = (shouldShareLive: boolean) =>
+  sendMessage({
+    payload: shouldShareLive,
+    type: MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE
+  })
 
 export const removeStudioToken = () =>
   sendMessage({ type: MessageFromWebviewType.REMOVE_STUDIO_TOKEN })

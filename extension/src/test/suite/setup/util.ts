@@ -26,7 +26,8 @@ export const buildSetup = (
   hasData = false,
   noDvcRoot = true,
   noGitRoot = true,
-  noGitCommits = true
+  noGitCommits = true,
+  cliError = undefined
 ) => {
   const {
     config,
@@ -89,6 +90,7 @@ export const buildSetup = (
       internalCommands,
       {
         columnsChanged: mockEmitter,
+        getCliError: () => cliError,
         getHasData: () => hasData,
         showWebview: mockShowWebview
       } as unknown as WorkspaceExperiments,

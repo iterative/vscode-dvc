@@ -53,6 +53,7 @@ export enum ExperimentType {
 
 export class ExperimentsModel extends ModelWithPersistence {
   private workspace = {} as Experiment
+  private cliError: undefined | string
   private commits: Experiment[] = []
   private experimentsByCommit: Map<string, Experiment[]> = new Map()
   private rowOrder: { branch: string; sha: string }[] = []
@@ -123,11 +124,12 @@ export class ExperimentsModel extends ModelWithPersistence {
     availableNbCommits: { [branch: string]: number }
   ) {
     const {
-      workspace,
+      cliError,
       commits,
       experimentsByCommit,
+      hasCheckpoints,
       runningExperiments,
-      hasCheckpoints
+      workspace
     } = collectExperiments(expShow, gitLog, dvcLiveOnly)
 
     const { hasMoreCommits, isShowingMoreCommits } =
@@ -142,6 +144,7 @@ export class ExperimentsModel extends ModelWithPersistence {
 
     this.rowOrder = rowOrder
     this.workspace = workspace
+    this.cliError = cliError
     this.commits = commits
     this.experimentsByCommit = experimentsByCommit
     this.checkpoints = hasCheckpoints
@@ -191,6 +194,10 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public hasCheckpoints() {
     return this.checkpoints
+  }
+
+  public getCliError() {
+    return this.cliError
   }
 
   public canSelect() {
@@ -324,11 +331,18 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getErrors() {
-    return new Set(
-      this.getCombinedList()
-        .filter(({ error }) => error)
-        .map(({ label }) => label)
-    )
+    const errors = new Set<string>()
+    for (const { error, label } of this.getCombinedList()) {
+      if (!error) {
+        continue
+      }
+      errors.add(label)
+    }
+    if (this.cliError) {
+      errors.add(this.cliError)
+    }
+
+    return errors
   }
 
   public getExperimentParams(id: string) {

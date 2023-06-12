@@ -2,12 +2,10 @@ import { TemplatePlotGroup } from 'dvc/src/plots/webview/contract'
 import React, { DragEvent, useState, useCallback } from 'react'
 import cx from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
-import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { AddedSection } from './AddedSection'
 import { TemplatePlotsGrid } from './TemplatePlotsGrid'
 import { PlotGroup, updateSections } from './templatePlotsSlice'
 import { removeFromPreviousAndAddToNewSection } from './util'
-import { sendMessage } from '../../../shared/vscode'
 import { createIDWithIndex, getIDIndex } from '../../../util/ids'
 import styles from '../styles.module.scss'
 import { shouldUseVirtualizedGrid } from '../util'
@@ -17,6 +15,7 @@ import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { isSameGroup } from '../../../shared/components/dragDrop/DragDropContainer'
 import { changeOrderWithDraggedInfo } from '../../../util/array'
 import { LoadingSection, sectionIsLoading } from '../LoadingSection'
+import { reorderTemplatePlots } from '../../util/messages'
 
 export enum NewSectionBlock {
   TOP = 'drop-section-top',
@@ -42,13 +41,7 @@ export const TemplatePlots: React.FC = () => {
   const dispatch = useDispatch()
 
   const sendReorderMessage = useCallback((sections: PlotGroup[]) => {
-    sendMessage({
-      payload: sections.map(section => ({
-        group: section.group,
-        paths: section.entries
-      })),
-      type: MessageFromWebviewType.REORDER_PLOTS_TEMPLATES
-    })
+    reorderTemplatePlots(sections)
   }, [])
 
   const setSections = useCallback(

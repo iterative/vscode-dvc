@@ -41,7 +41,8 @@ export enum Title {
   SELECT_TRAINING_SCRIPT = 'Select your Training Script',
   SETUP_WORKSPACE = 'Setup the Workspace',
   SET_EXPERIMENTS_HEADER_HEIGHT = 'Set the Maximum Experiment Table Header Height',
-  SET_REMOTE_AS_DEFAULT = 'Set Default Remote'
+  SET_REMOTE_AS_DEFAULT = 'Set Default Remote',
+  UPDATE_PYTHON_ENVIRONMENT = 'Update Python Environment (selected with the Python Extension)'
 }
 
 export const getEnterValueTitle = (path: string): Title =>

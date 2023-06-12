@@ -1,6 +1,6 @@
 import React from 'react'
-import { showWalkthrough } from './messages'
 import { DvcNotSetup } from './shared/DvcNotSetup'
+import { showWalkthrough } from '../util/messages'
 import { Button } from '../../shared/components/button/Button'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 

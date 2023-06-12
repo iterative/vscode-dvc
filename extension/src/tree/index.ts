@@ -32,7 +32,7 @@ export const getDecoratableTreeItem = (
   return new TreeItem(decoratableUri, collapsibleState)
 }
 
-type ErrorItem = { error: string }
+export type ErrorItem = { error: string }
 
 export const isErrorItem = (
   maybeErrorItem: unknown
@@ -45,11 +45,11 @@ export const getCliErrorLabel = (msg: string): string =>
   msg.split('\n')[0].replace(/'|"/g, '')
 
 export const getCliErrorTreeItem = (
-  path: string,
+  label: string,
   msg: string,
   decoratableTreeItemScheme: DecoratableTreeItemScheme
 ) => {
-  const treeItem = getDecoratableTreeItem(path, decoratableTreeItemScheme)
+  const treeItem = getDecoratableTreeItem(label, decoratableTreeItemScheme)
 
   treeItem.tooltip = getErrorTooltip(msg)
 

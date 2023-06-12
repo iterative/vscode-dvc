@@ -8,15 +8,14 @@ import React, {
 import { AnyAction } from '@reduxjs/toolkit'
 import { useDispatch, useSelector } from 'react-redux'
 import { PlotHeight, PlotsSection } from 'dvc/src/plots/webview/contract'
-import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { PlotsPicker, PlotsPickerProps } from './PlotsPicker'
 import styles from './styles.module.scss'
 import { IconMenuItemProps } from '../../shared/components/iconMenu/IconMenuItem'
-import { sendMessage } from '../../shared/vscode'
 import { ListFilter, Add, Trash } from '../../shared/components/icons'
 import { Slider } from '../../shared/components/slider/Slider'
 import { PlotsState } from '../store'
 import { SectionContainer } from '../../shared/components/sectionContainer/SectionContainer'
+import { resizePlots, togglePlotsSection } from '../util/messages'
 
 interface PlotsContainerProps {
   sectionCollapsed: boolean
@@ -96,25 +95,12 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
           nbItemsPerRowOrWidth: positiveNbItems
         })
       )
-      sendMessage({
-        payload: {
-          height: newHeight,
-          nbItemsPerRow: positiveNbItems,
-          section: sectionKey
-        },
-        type: MessageFromWebviewType.RESIZE_PLOTS
-      })
+      resizePlots(newHeight, positiveNbItems, sectionKey)
     },
     [dispatch, changeSize, sectionKey]
   )
 
-  const toggleSection = () =>
-    sendMessage({
-      payload: {
-        [sectionKey]: !sectionCollapsed
-      },
-      type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
-    })
+  const toggleSection = () => togglePlotsSection(sectionKey, sectionCollapsed)
 
   const plotHeights = Object.values(PlotHeight).filter(
     value => typeof value !== 'string'

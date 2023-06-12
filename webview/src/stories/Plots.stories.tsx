@@ -148,13 +148,30 @@ WithoutPlotsSelected.args = {
 export const WithCliError = Template.bind({})
 WithCliError.args = {
   data: {
-    cliError: 'some big bad error',
-    hasPlots: true,
-    hasUnselectedPlots: true,
-    sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
-    selectedRevisions: plotsRevisionsFixture
+    cliError: 'some big bad error'
   }
 }
+
+export const WithCliErrorAndCustomPlots = Template.bind({})
+WithCliErrorAndCustomPlots.args = {
+  data: {
+    cliError: 'some big bad error',
+    custom: customPlotsFixture
+  }
+}
+WithCliErrorAndCustomPlots.parameters = DISABLE_CHROMATIC_SNAPSHOTS
+
+export const WithCustomWithoutPlotsSelected = Template.bind({})
+WithCustomWithoutPlotsSelected.args = {
+  data: {
+    custom: customPlotsFixture,
+    hasPlots: true,
+    hasUnselectedPlots: false,
+    sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+    selectedRevisions: []
+  }
+}
+WithCustomWithoutPlotsSelected.parameters = DISABLE_CHROMATIC_SNAPSHOTS
 
 export const WithoutExperimentsSelected = Template.bind({})
 WithoutExperimentsSelected.args = {

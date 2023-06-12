@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import styles from './styles.module.scss'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { Button } from '../../../shared/components/button/Button'
-import { checkCompatibility, upgradeDvc } from '../messages'
+import { checkCompatibility, upgradeDvc } from '../../util/messages'
 import { SetupState } from '../../store'
 
 export const CliIncompatible: React.FC<PropsWithChildren> = ({ children }) => {

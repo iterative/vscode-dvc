@@ -560,4 +560,32 @@ describe('ExperimentsModel', () => {
     expect(getSelectedRevisions(model)).toStrictEqual([])
     expect(model.hasRunningExperiment()).toBe(false)
   })
+
+  it('should capture a Cli error when exp show fails', () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+
+    const errorMsg = 'a very unexpected error - (╯°□°）╯︵ ┻━┻'
+
+    const data = [
+      {
+        rev: EXPERIMENT_WORKSPACE_ID,
+        error: { msg: errorMsg, type: 'caught error' }
+      }
+    ]
+    model.transformAndSet(data, gitLogFixture, false, [], {
+      main: 6
+    })
+
+    expect(model.getCliError()).toStrictEqual(errorMsg)
+
+    model.transformAndSet(
+      outputFixture,
+      gitLogFixture,
+      false,
+      rowOrderFixture,
+      { main: 6 }
+    )
+
+    expect(model.getCliError()).toBe(undefined)
+  })
 })

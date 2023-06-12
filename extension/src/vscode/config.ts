@@ -1,6 +1,7 @@
 import { ConfigurationTarget, workspace } from 'vscode'
 
 export enum ConfigKey {
+  DO_NOT_INFORM_MAX_PLOTTED = 'dvc.doNotInformMaxExperimentsPlotted',
   DO_NOT_RECOMMEND_ADD_STUDIO_TOKEN = 'dvc.doNotRecommendAddStudioToken',
   DO_NOT_RECOMMEND_RED_HAT = 'dvc.doNotRecommendRedHatExtension',
   DO_NOT_SHOW_CLI_UNAVAILABLE = 'dvc.doNotShowCliUnavailable',

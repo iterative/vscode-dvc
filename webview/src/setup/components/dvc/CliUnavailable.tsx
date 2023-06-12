@@ -4,11 +4,15 @@ import styles from './styles.module.scss'
 import { Button } from '../../../shared/components/button/Button'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { SetupState } from '../../store'
-import { installDvc, setupWorkspace } from '../messages'
+import {
+  installDvc,
+  setupWorkspace,
+  updatePythonEnvironment
+} from '../../util/messages'
 
 export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
-  const pythonBinPath = useSelector(
-    (state: SetupState) => state.dvc.pythonBinPath
+  const { pythonBinPath, isPythonExtensionUsed } = useSelector(
+    (state: SetupState) => state.dvc
   )
   const canInstall = !!pythonBinPath
   const installationSentence = (
@@ -29,6 +33,9 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
       </p>
       <div className={styles.sideBySideButtons}>
         <Button onClick={installDvc} text="Install (pip)" />
+        {isPythonExtensionUsed && (
+          <Button onClick={updatePythonEnvironment} text="Update Env" />
+        )}
         <Button onClick={setupWorkspace} text="Configure" />
       </div>
     </>

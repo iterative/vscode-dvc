@@ -386,6 +386,19 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return allLoading
   }
 
+  public getCliError() {
+    const repositories = Object.values(this.repositories)
+    const errors = []
+    for (const repository of repositories) {
+      const cliError = repository.getCliError()
+      if (!cliError) {
+        continue
+      }
+      errors.push(cliError)
+    }
+    return errors.length > 0 ? errors.join('\n') : undefined
+  }
+
   public hasRunningExperiment() {
     return Object.values(this.repositories).some(experiments =>
       experiments.hasRunningExperiment()
