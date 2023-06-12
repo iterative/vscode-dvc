@@ -600,6 +600,11 @@
     "configuration": {
       "title": "DVC",
       "properties": {
+        "dvc.doNotInformMaxExperimentsPlotted": {
+          "description": "Do not inform when plotting more experiments is blocked (maximum number selected).",
+          "type": "boolean",
+          "default": null
+        },
         "dvc.doNotRecommendRedHatExtension": {
           "description": "Do not prompt to install the Red Hat YAML extension, which helps with DVC YAML schema validation.",
           "type": "boolean",
