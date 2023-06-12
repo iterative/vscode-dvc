@@ -7,7 +7,7 @@ import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { setZoomedInPlot } from './webviewSlice'
 import styles from './styles.module.scss'
 import { config } from './constants'
-import { zoomPlot } from './messages'
+import { zoomPlot } from '../util/messages'
 import { useGetPlot } from '../hooks/useGetPlot'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
 

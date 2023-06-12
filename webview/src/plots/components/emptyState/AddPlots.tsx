@@ -1,5 +1,9 @@
 import React from 'react'
-import { addCustomPlot, selectPlots, selectRevisions } from '../messages'
+import {
+  addCustomPlot,
+  selectPlots,
+  selectRevisions
+} from '../../util/messages'
 import { StartButton } from '../../../shared/components/button/StartButton'
 
 type AddPlotsProps = {

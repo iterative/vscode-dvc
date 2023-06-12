@@ -2,7 +2,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { DvcEnvInfoRow } from './DvcEnvInfoRow'
 import styles from './styles.module.scss'
-import { updatePythonEnvironment, setupWorkspace } from '../messages'
+import { setupWorkspace, updatePythonEnvironment } from '../../util/messages'
 import { SetupState } from '../../store'
 
 interface DvcEnvCommandRowProps {

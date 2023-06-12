@@ -2,7 +2,7 @@ import React from 'react'
 import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
 import styles from './styles.module.scss'
 import { RefreshButton } from '../../../shared/components/button/RefreshButton'
-import { refreshRevisions, zoomPlot } from '../messages'
+import { refreshRevisions, zoomPlot } from '../../util/messages'
 import { ErrorIcon } from '../../../shared/components/errorIcon/ErrorIcon'
 
 type ComparisonTableCellProps = {

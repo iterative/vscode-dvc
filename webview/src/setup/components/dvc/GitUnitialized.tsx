@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { Button } from '../../../shared/components/button/Button'
 import { SetupState } from '../../store'
-import { initializeGit } from '../messages'
+import { initializeGit } from '../../util/messages'
 
 export const GitUninitialized: React.FC<PropsWithChildren> = ({ children }) => {
   const canGitInitialize = useSelector(

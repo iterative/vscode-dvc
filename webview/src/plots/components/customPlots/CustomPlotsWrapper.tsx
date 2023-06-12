@@ -5,7 +5,7 @@ import { CustomPlots } from './CustomPlots'
 import { changeSize } from './customPlotsSlice'
 import { PlotsContainer } from '../PlotsContainer'
 import { PlotsState } from '../../store'
-import { addCustomPlot, removeCustomPlots } from '../messages'
+import { addCustomPlot, removeCustomPlots } from '../../util/messages'
 
 export const CustomPlotsWrapper: React.FC = () => {
   const { plotsIds, nbItemsPerRow, isCollapsed, height, enablePlotCreation } =

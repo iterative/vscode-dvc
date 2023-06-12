@@ -1,7 +1,7 @@
 import React from 'react'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { Button } from '../../../shared/components/button/Button'
-import { showScmPanel } from '../messages'
+import { showScmPanel } from '../../util/messages'
 
 export const NeedsGitCommit: React.FC = () => (
   <EmptyState isFullScreen={false}>

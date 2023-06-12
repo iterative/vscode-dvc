@@ -2,7 +2,7 @@ import React from 'react'
 import { SupportedStorage } from './SupportedStorage'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { StartButton } from '../../../shared/components/button/StartButton'
-import { addRemote } from '../messages'
+import { addRemote } from '../../util/messages'
 
 export const Connect: React.FC = () => (
   <EmptyState isFullScreen={false}>

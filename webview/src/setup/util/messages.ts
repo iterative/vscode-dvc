@@ -54,6 +54,12 @@ export const openStudioProfile = () =>
 export const saveStudioToken = () =>
   sendMessage({ type: MessageFromWebviewType.SAVE_STUDIO_TOKEN })
 
+export const setStudioShareExperimentsLive = (shouldShareLive: boolean) =>
+  sendMessage({
+    payload: shouldShareLive,
+    type: MessageFromWebviewType.SET_STUDIO_SHARE_EXPERIMENTS_LIVE
+  })
+
 export const removeStudioToken = () =>
   sendMessage({ type: MessageFromWebviewType.REMOVE_STUDIO_TOKEN })
 

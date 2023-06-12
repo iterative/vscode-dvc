@@ -1,6 +1,10 @@
 import React from 'react'
 import { STUDIO_URL } from 'dvc/src/setup/webview/contract'
-import { openStudio, openStudioProfile, saveStudioToken } from '../messages'
+import {
+  openStudio,
+  openStudioProfile,
+  saveStudioToken
+} from '../../util/messages'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { Button } from '../../../shared/components/button/Button'
 

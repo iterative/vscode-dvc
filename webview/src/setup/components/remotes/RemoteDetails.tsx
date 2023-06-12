@@ -5,7 +5,7 @@ import { MultiProjectRemotes } from './MultiProjectRemotes'
 import { ProjectRemotes } from './ProjectRemotes'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { Button } from '../../../shared/components/button/Button'
-import { addRemote, modifyRemote, removeRemote } from '../messages'
+import { addRemote, modifyRemote, removeRemote } from '../../util/messages'
 
 export const RemoteDetails: React.FC<{
   remoteList: NonNullable<RemoteList>
