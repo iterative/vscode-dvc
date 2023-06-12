@@ -13,7 +13,11 @@ import { validateTokenInput } from './inputBox'
 import { findPythonBinForInstall } from './autoInstall'
 import { run, runWithRecheck, runWorkspace } from './runner'
 import { isStudioAccessToken } from './token'
-import { pickFocusedProjects } from './quickPick'
+import {
+  PYTHON_EXTENSION_ACTION,
+  pickFocusedProjects,
+  pickPythonExtensionAction
+} from './quickPick'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Resource } from '../resourceLocator'
@@ -56,6 +60,7 @@ import { Title } from '../vscode/title'
 import { getDVCAppDir } from '../util/appdirs'
 import { getOptions } from '../cli/dvc/options'
 import { isAboveLatestTestedVersion } from '../cli/dvc/version'
+import { createPythonEnv, selectPythonInterpreter } from '../extensions/python'
 
 export class Setup
   extends BaseRepository<TSetupData>
@@ -412,7 +417,8 @@ export class Setup
     const webviewMessages = new WebviewMessages(
       () => this.getWebview(),
       () => this.initializeGit(),
-      (offline: boolean) => this.updateStudioOffline(offline)
+      (offline: boolean) => this.updateStudioOffline(offline),
+      () => this.updatePythonEnvironment()
     )
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message =>
@@ -502,6 +508,18 @@ export class Setup
     if (cwd) {
       void this.internalCommands.executeCommand(AvailableCommands.GIT_INIT, cwd)
     }
+  }
+
+  private async updatePythonEnvironment() {
+    const value = await pickPythonExtensionAction()
+
+    if (!value) {
+      return
+    }
+
+    return value === PYTHON_EXTENSION_ACTION.CREATE_ENV
+      ? createPythonEnv()
+      : selectPythonInterpreter()
   }
 
   private needsGitCommit(needsGitInit: boolean) {
