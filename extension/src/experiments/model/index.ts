@@ -62,7 +62,8 @@ export class ExperimentsModel extends ModelWithPersistence {
   private coloredStatus: ColoredStatus
   private starredExperiments: StarredExperiments
   private numberOfCommitsToShow: Record<string, number>
-  private branchesToShow: string[] = []
+  private currentBranch: string | undefined
+  private selectedBranches: string[] = []
   private availableBranchesToShow: string[] = []
   private hasMoreCommits: { [branch: string]: boolean } = {}
   private isShowingMoreCommits: { [branch: string]: boolean } = {}
@@ -102,7 +103,7 @@ export class ExperimentsModel extends ModelWithPersistence {
       this.numberOfCommitsToShow = {}
     }
 
-    this.branchesToShow = this.revive<string[]>(
+    this.selectedBranches = this.revive<string[]>(
       PersistenceKey.EXPERIMENTS_BRANCHES,
       []
     )
@@ -463,24 +464,24 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.numberOfCommitsToShow
   }
 
-  public setBranchesToShow(branches: string[]) {
-    this.branchesToShow = branches
+  public setBranches(currentBranch: string, allBranches: string[]) {
+    this.availableBranchesToShow = allBranches
+    this.currentBranch = currentBranch
+    this.selectedBranches = this.selectedBranches.filter(
+      branch => allBranches.includes(branch) && branch !== this.currentBranch
+    )
     this.persistBranchesToShow()
   }
 
-  public pruneBranchesToShow(branches: string[]) {
-    this.branchesToShow = this.branchesToShow.filter(branch =>
-      branches.includes(branch)
+  public setSelectedBranches(branches: string[]) {
+    this.selectedBranches = branches.filter(
+      branch => branch !== this.currentBranch
     )
     this.persistBranchesToShow()
   }
 
   public getBranchesToShow() {
-    return this.branchesToShow
-  }
-
-  public setAvailableBranchesToShow(branches: string[]) {
-    this.availableBranchesToShow = branches
+    return [this.currentBranch as string, ...this.selectedBranches]
   }
 
   public getAvailableBranchesToShow() {
@@ -588,7 +589,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   private persistBranchesToShow() {
     return this.persist(
       PersistenceKey.EXPERIMENTS_BRANCHES,
-      this.branchesToShow
+      this.selectedBranches
     )
   }
 

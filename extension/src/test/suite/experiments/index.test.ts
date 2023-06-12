@@ -1451,10 +1451,13 @@ suite('Experiments Test Suite', () => {
         mockUpdateExperimentsData,
         mockSelectBranches
       } = setupExperimentsAndMockCommands()
-      const mockSetBranchesToShow = stub(experimentsModel, 'setBranchesToShow')
+      const mockSetSelectedBranches = stub(
+        experimentsModel,
+        'setSelectedBranches'
+      )
 
       const waitForBranchesToBeSelected = new Promise(resolve =>
-        mockSetBranchesToShow.callsFake(() => resolve(undefined))
+        mockSetSelectedBranches.callsFake(() => resolve(undefined))
       )
 
       const webview = await experiments.showWebview()
@@ -1469,7 +1472,7 @@ suite('Experiments Test Suite', () => {
 
       await waitForBranchesToBeSelected
 
-      expect(mockSetBranchesToShow).to.be.calledOnceWith(['main', 'other'])
+      expect(mockSetSelectedBranches).to.be.calledOnceWith(['main', 'other'])
 
       expect(mockUpdateExperimentsData).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
@@ -1506,7 +1509,7 @@ suite('Experiments Test Suite', () => {
         mockUpdateExperimentsData,
         mockSelectBranches
       } = setupExperimentsAndMockCommands()
-      const mockSetBranchesToShow = stub(experimentsModel, 'setBranchesToShow')
+      const mockSetBranches = stub(experimentsModel, 'setBranches')
       mockSelectBranches.resolves(undefined)
 
       const webview = await experiments.showWebview()
@@ -1519,7 +1522,10 @@ suite('Experiments Test Suite', () => {
 
       expect(mockSelectBranches).to.be.calledOnce
 
-      expect(mockSetBranchesToShow).not.to.be.calledOnceWith(['main', 'other'])
+      expect(mockSetBranches).not.to.be.calledOnceWith('main', [
+        'main',
+        'other'
+      ])
 
       expect(mockUpdateExperimentsData).not.to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
