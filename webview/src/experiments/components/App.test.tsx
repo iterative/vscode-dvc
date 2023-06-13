@@ -847,6 +847,14 @@ describe('App', () => {
       jest.useRealTimers()
     })
 
+    const getEnabledOptions = () => {
+      advanceTimersByTime(100)
+      const menuitems = screen.getAllByRole('menuitem')
+      return menuitems
+        .filter(item => !item.className.includes('disabled'))
+        .map(item => item.textContent)
+    }
+
     it('should be available when there is data and no running experiments', () => {
       renderTableWithoutRunningExperiments()
 
@@ -864,12 +872,23 @@ describe('App', () => {
       const target = screen.getByTestId('workspace-row')
       fireEvent.contextMenu(target, { bubbles: true })
 
-      advanceTimersByTime(100)
-      const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems
-        .filter(item => !item.className.includes('disabled'))
-        .map(item => item.textContent)
-      expect(itemLabels).toStrictEqual(['Modify and Run', 'Modify and Queue'])
+      expect(getEnabledOptions()).toStrictEqual([
+        'Modify and Run',
+        'Modify and Queue'
+      ])
+    })
+
+    it('should enable the correct options for the workspace with checkpoints', () => {
+      renderTableWithoutRunningExperiments()
+
+      const [target] = screen.getAllByText(EXPERIMENT_WORKSPACE_ID)
+      fireEvent.contextMenu(target, { bubbles: true })
+
+      expect(getEnabledOptions()).toStrictEqual([
+        'Modify and Run',
+        'Modify and Resume',
+        'Modify and Queue'
+      ])
     })
 
     it('should enable the correct options for a commit with checkpoints', () => {
@@ -878,17 +897,9 @@ describe('App', () => {
       const target = screen.getAllByText('main')[1]
       fireEvent.contextMenu(target, { bubbles: true })
 
-      advanceTimersByTime(100)
-      const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems
-        .filter(item => !item.className.includes('disabled'))
-        .map(item => item.textContent)
-      expect(itemLabels).toStrictEqual([
+      expect(getEnabledOptions()).toStrictEqual([
         'Apply to Workspace',
         'Create new Branch',
-        'Modify and Run',
-        'Modify and Resume',
-        'Modify and Queue',
         'Star'
       ])
     })
@@ -899,16 +910,9 @@ describe('App', () => {
       const target = screen.getAllByText('main')[1]
       fireEvent.contextMenu(target, { bubbles: true })
 
-      advanceTimersByTime(100)
-      const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems
-        .filter(item => !item.className.includes('disabled'))
-        .map(item => item.textContent)
-      expect(itemLabels).toStrictEqual([
+      expect(getEnabledOptions()).toStrictEqual([
         'Apply to Workspace',
         'Create new Branch',
-        'Modify and Run',
-        'Modify and Queue',
         'Star'
       ])
     })
@@ -919,23 +923,18 @@ describe('App', () => {
       const target = screen.getByText('[exp-e7a67]')
       fireEvent.contextMenu(target, { bubbles: true })
 
-      advanceTimersByTime(100)
-      const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems
-        .filter(item => !item.className.includes('disabled'))
-        .map(item => item.textContent)
-      expect(itemLabels).toStrictEqual([
+      expect(getEnabledOptions()).toStrictEqual([
         'Apply to Workspace',
         'Create new Branch',
         'Push',
-        'Modify and Run',
-        'Modify and Resume',
-        'Modify and Queue',
         'Star',
         'Remove'
       ])
 
-      fireEvent.keyDown(menuitems[0], { bubbles: true, key: 'Escape' })
+      fireEvent.keyDown(screen.getAllByRole('menuitem')[0], {
+        bubbles: true,
+        key: 'Escape'
+      })
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
     })
 
@@ -945,14 +944,12 @@ describe('App', () => {
       const target = screen.getByText('[exp-e7a67]')
       fireEvent.contextMenu(target, { bubbles: true })
 
-      advanceTimersByTime(100)
-      const menuitems = screen.getAllByRole('menuitem')
-      const itemLabels = menuitems
-        .filter(item => !item.className.includes('disabled'))
-        .map(item => item.textContent)
-      expect(itemLabels).toStrictEqual(['Show Logs', 'Star', 'Stop'])
+      expect(getEnabledOptions()).toStrictEqual(['Show Logs', 'Star', 'Stop'])
 
-      fireEvent.click(menuitems[0], { bubbles: true, key: 'Escape' })
+      fireEvent.click(screen.getAllByRole('menuitem')[0], {
+        bubbles: true,
+        key: 'Escape'
+      })
       expect(mockPostMessage).toHaveBeenCalledWith({
         payload: 'exp-e7a67',
         type: MessageFromWebviewType.SHOW_EXPERIMENT_LOGS
