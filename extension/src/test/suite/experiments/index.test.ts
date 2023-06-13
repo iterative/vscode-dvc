@@ -775,12 +775,10 @@ suite('Experiments Test Suite', () => {
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
-      const mockExperimentId = 'mock-experiment-id'
       const tableChangePromise = experimentsUpdatedEvent(experiments)
 
       mockMessageReceived.fire({
-        payload: mockExperimentId,
-        type: MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE
+        type: MessageFromWebviewType.MODIFY_WORKSPACE_PARAMS_AND_QUEUE
       })
 
       await tableChangePromise
@@ -814,13 +812,11 @@ suite('Experiments Test Suite', () => {
       const webview = await experiments.showWebview()
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
-      const mockExperimentId = 'mock-experiment-id'
 
       const tableChangePromise = experimentsUpdatedEvent(experiments)
 
       mockMessageReceived.fire({
-        payload: mockExperimentId,
-        type: MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_AND_RUN
+        type: MessageFromWebviewType.MODIFY_WORKSPACE_PARAMS_AND_RUN
       })
 
       await tableChangePromise
@@ -850,7 +846,6 @@ suite('Experiments Test Suite', () => {
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
-      const mockExperimentId = 'mock-experiment-id'
       const mockRunExperiment = stub(dvcRunner, 'runExperiment').resolves(
         undefined
       )
@@ -858,8 +853,7 @@ suite('Experiments Test Suite', () => {
       const tableChangePromise = experimentsUpdatedEvent(experiments)
 
       mockMessageReceived.fire({
-        payload: mockExperimentId,
-        type: MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN
+        type: MessageFromWebviewType.MODIFY_WORKSPACE_PARAMS_RESET_AND_RUN
       })
 
       await tableChangePromise

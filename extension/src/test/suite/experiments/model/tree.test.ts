@@ -574,7 +574,6 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to queue an experiment from an existing one with dvc.views.experiments.queueExperiment', async () => {
-      const baseExperimentId = EXPERIMENT_WORKSPACE_ID
       stub(DvcReader.prototype, 'listStages').resolves('train')
 
       const { dvcExecutor, experiments, experimentsModel } = buildExperiments({
@@ -592,7 +591,7 @@ suite('Experiments Tree Test Suite', () => {
         experiments
       )
 
-      const getParamsSpy = spy(experimentsModel, 'getExperimentParams')
+      const getParamsSpy = spy(experimentsModel, 'getWorkspaceParams')
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
         [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
@@ -618,14 +617,12 @@ suite('Experiments Tree Test Suite', () => {
       await commands.executeCommand(
         RegisteredCliCommands.EXPERIMENT_VIEW_QUEUE,
         {
-          dvcRoot: dvcDemoPath,
-          id: baseExperimentId
+          dvcRoot: dvcDemoPath
         }
       )
 
       expect(mockGetOnlyOrPickProject).not.to.be.called
       expect(getParamsSpy).to.be.calledOnce
-      expect(getParamsSpy).to.be.calledWithExactly(baseExperimentId)
       expect(mockShowQuickPick).to.be.calledOnce
       expect(mockExperimentRunQueue).to.be.calledOnce
       expect(mockExperimentRunQueue).to.be.calledWith(
@@ -638,7 +635,6 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to run a new experiment from an existing one with dvc.views.experiments.runExperiment', async () => {
-      const baseExperimentId = EXPERIMENT_WORKSPACE_ID
       stub(DvcReader.prototype, 'listStages').resolves('train')
 
       const { dvcRunner, experiments, experimentsModel } = buildExperiments({
@@ -656,7 +652,7 @@ suite('Experiments Tree Test Suite', () => {
         experiments
       )
 
-      const getParamsSpy = spy(experimentsModel, 'getExperimentParams')
+      const getParamsSpy = spy(experimentsModel, 'getWorkspaceParams')
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
         [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
@@ -680,13 +676,11 @@ suite('Experiments Tree Test Suite', () => {
         .resolves('0.82')
 
       await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_VIEW_RUN, {
-        dvcRoot: dvcDemoPath,
-        id: baseExperimentId
+        dvcRoot: dvcDemoPath
       })
 
       expect(mockGetOnlyOrPickProject).not.to.be.called
       expect(getParamsSpy).to.be.calledOnce
-      expect(getParamsSpy).to.be.calledWithExactly(baseExperimentId)
       expect(mockShowQuickPick).to.be.calledOnce
       expect(mockRunExperiment).to.be.calledOnce
       expect(mockRunExperiment).to.be.calledWith(
@@ -699,7 +693,6 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to reset and run a new checkpoint experiment from an existing one with dvc.views.experiments.resetAndRunCheckpointExperiment', async () => {
-      const baseExperimentId = EXPERIMENT_WORKSPACE_ID
       stub(DvcReader.prototype, 'listStages').resolves('train')
 
       const { dvcRunner, experiments, experimentsModel } = buildExperiments({
@@ -718,7 +711,7 @@ suite('Experiments Tree Test Suite', () => {
         experiments
       )
 
-      const getParamsSpy = spy(experimentsModel, 'getExperimentParams')
+      const getParamsSpy = spy(experimentsModel, 'getWorkspaceParams')
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
         [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
@@ -744,14 +737,12 @@ suite('Experiments Tree Test Suite', () => {
       await commands.executeCommand(
         RegisteredCliCommands.EXPERIMENT_VIEW_RESET_AND_RUN,
         {
-          dvcRoot: dvcDemoPath,
-          id: baseExperimentId
+          dvcRoot: dvcDemoPath
         }
       )
 
       expect(mockGetOnlyOrPickProject).not.to.be.called
       expect(getParamsSpy).to.be.calledOnce
-      expect(getParamsSpy).to.be.calledWithExactly(baseExperimentId)
       expect(mockShowQuickPick).to.be.calledOnce
       expect(mockRunExperimentReset).to.be.calledOnce
       expect(mockRunExperimentReset).to.be.calledWith(

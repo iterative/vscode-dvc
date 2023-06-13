@@ -164,10 +164,10 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_VIEW_RUN]: undefined
   [EventName.EXPERIMENT_VIEW_RESET_AND_RUN]: undefined
 
-  [EventName.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE]: undefined
-  [EventName.MODIFY_EXPERIMENT_PARAMS_AND_RESUME]: undefined
-  [EventName.MODIFY_EXPERIMENT_PARAMS_AND_RUN]: undefined
-  [EventName.MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN]: undefined
+  [EventName.MODIFY_WORKSPACE_PARAMS_AND_QUEUE]: undefined
+  [EventName.MODIFY_WORKSPACE_PARAMS_AND_RESUME]: undefined
+  [EventName.MODIFY_WORKSPACE_PARAMS_AND_RUN]: undefined
+  [EventName.MODIFY_WORKSPACE_PARAMS_RESET_AND_RUN]: undefined
   [EventName.STOP_EXPERIMENTS]: { stopped: boolean; wasRunning: boolean }
 
   [EventName.PLOTS_PATH_TOGGLE]: undefined

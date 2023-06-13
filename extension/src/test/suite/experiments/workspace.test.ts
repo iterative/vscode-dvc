@@ -149,7 +149,7 @@ suite('Workspace Experiments Test Suite', () => {
     })
   }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-  describe('dvc.modifyExperimentParamsAndQueue', () => {
+  describe('dvc.modifyWorkspaceParamsAndQueue', () => {
     it('should be able to queue an experiment using an existing one as a base', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('train')
 
@@ -167,22 +167,16 @@ suite('Workspace Experiments Test Suite', () => {
         [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
         Thenable<QuickPickItem[] | QuickPickItemWithValue<string> | undefined>
       >
-      mockShowQuickPick
-        .onFirstCall()
-        .resolves({
-          value: EXPERIMENT_WORKSPACE_ID
-        } as QuickPickItemWithValue<string>)
-        .onSecondCall()
-        .resolves([
-          {
-            label: 'params.yaml:dropout',
-            value: { path: 'params.yaml:dropout', value: 0.122 }
-          },
-          {
-            label: 'params.yaml:process.threshold',
-            value: { path: 'params.yaml:process.threshold', value: 0.86 }
-          }
-        ] as QuickPickItemWithValue<Param>[])
+      mockShowQuickPick.onFirstCall().resolves([
+        {
+          label: 'params.yaml:dropout',
+          value: { path: 'params.yaml:dropout', value: 0.122 }
+        },
+        {
+          label: 'params.yaml:process.threshold',
+          value: { path: 'params.yaml:process.threshold', value: 0.86 }
+        }
+      ] as QuickPickItemWithValue<Param>[])
 
       stub(window, 'showInputBox')
         .onFirstCall()
@@ -191,7 +185,7 @@ suite('Workspace Experiments Test Suite', () => {
         .resolves('0.16')
 
       await commands.executeCommand(
-        RegisteredCliCommands.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE
+        RegisteredCliCommands.MODIFY_WORKSPACE_PARAMS_AND_QUEUE
       )
 
       expect(mockExperimentRunQueue).to.be.calledOnce
@@ -205,7 +199,7 @@ suite('Workspace Experiments Test Suite', () => {
     })
   })
 
-  describe('dvc.modifyExperimentParamsAndResume', () => {
+  describe('dvc.modifyWorkspaceParamsAndResume', () => {
     it('should be able to resume a checkpoint experiment using an existing one as a base', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('train')
 
@@ -222,22 +216,16 @@ suite('Workspace Experiments Test Suite', () => {
         [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
         Thenable<QuickPickItem[] | QuickPickItemWithValue<string> | undefined>
       >
-      mockShowQuickPick
-        .onFirstCall()
-        .resolves({
-          value: EXPERIMENT_WORKSPACE_ID
-        } as QuickPickItemWithValue<string>)
-        .onSecondCall()
-        .resolves([
-          {
-            label: 'params.yaml:dropout',
-            value: { path: 'params.yaml:dropout', value: 0.1 }
-          },
-          {
-            label: 'params.yaml:process.threshold',
-            value: { path: 'params.yaml:process.threshold', value: 0.15 }
-          }
-        ] as QuickPickItemWithValue<Param>[])
+      mockShowQuickPick.onFirstCall().resolves([
+        {
+          label: 'params.yaml:dropout',
+          value: { path: 'params.yaml:dropout', value: 0.1 }
+        },
+        {
+          label: 'params.yaml:process.threshold',
+          value: { path: 'params.yaml:process.threshold', value: 0.15 }
+        }
+      ] as QuickPickItemWithValue<Param>[])
 
       const dropout = '0.222222'
       const threshold = '0.1665'
@@ -249,7 +237,7 @@ suite('Workspace Experiments Test Suite', () => {
         .resolves(threshold)
 
       await commands.executeCommand(
-        RegisteredCliCommands.MODIFY_EXPERIMENT_PARAMS_AND_RESUME
+        RegisteredCliCommands.MODIFY_WORKSPACE_PARAMS_AND_RESUME
       )
 
       expect(mockExperimentRun).to.be.calledOnce
@@ -263,7 +251,7 @@ suite('Workspace Experiments Test Suite', () => {
     })
   })
 
-  describe('dvc.modifyExperimentParamsAndRun', () => {
+  describe('dvc.modifyWorkspaceParamsAndRun', () => {
     it('should be able to run an experiment using an existing one as a base', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('train')
 
@@ -280,22 +268,16 @@ suite('Workspace Experiments Test Suite', () => {
         [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
         Thenable<QuickPickItem[] | QuickPickItemWithValue<string> | undefined>
       >
-      mockShowQuickPick
-        .onFirstCall()
-        .resolves({
-          value: EXPERIMENT_WORKSPACE_ID
-        } as QuickPickItemWithValue<string>)
-        .onSecondCall()
-        .resolves([
-          {
-            label: 'params.yaml:dropout',
-            value: { path: 'params.yaml:dropout', value: 0.1 }
-          },
-          {
-            label: 'params.yaml:process.threshold',
-            value: { path: 'params.yaml:process.threshold', value: 0.15 }
-          }
-        ] as QuickPickItemWithValue<Param>[])
+      mockShowQuickPick.onFirstCall().resolves([
+        {
+          label: 'params.yaml:dropout',
+          value: { path: 'params.yaml:dropout', value: 0.1 }
+        },
+        {
+          label: 'params.yaml:process.threshold',
+          value: { path: 'params.yaml:process.threshold', value: 0.15 }
+        }
+      ] as QuickPickItemWithValue<Param>[])
 
       const dropout = '0.222222'
       const threshold = '0.1665'
@@ -307,7 +289,7 @@ suite('Workspace Experiments Test Suite', () => {
         .resolves(threshold)
 
       await commands.executeCommand(
-        RegisteredCliCommands.MODIFY_EXPERIMENT_PARAMS_AND_RUN
+        RegisteredCliCommands.MODIFY_WORKSPACE_PARAMS_AND_RUN
       )
 
       expect(mockExperimentRun).to.be.calledOnce

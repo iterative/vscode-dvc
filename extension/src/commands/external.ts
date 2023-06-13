@@ -23,10 +23,10 @@ export enum RegisteredCliCommands {
   EXPERIMENT_VIEW_RUN = 'dvc.views.experiments.runExperiment',
   EXPERIMENT_VIEW_RESET_AND_RUN = 'dvc.views.experiments.resetAndRunCheckpointExperiment',
 
-  MODIFY_EXPERIMENT_PARAMS_AND_QUEUE = 'dvc.modifyExperimentParamsAndQueue',
-  MODIFY_EXPERIMENT_PARAMS_AND_RESUME = 'dvc.modifyExperimentParamsAndResume',
-  MODIFY_EXPERIMENT_PARAMS_AND_RUN = 'dvc.modifyExperimentParamsAndRun',
-  MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN = 'dvc.modifyExperimentParamsResetAndRun',
+  MODIFY_WORKSPACE_PARAMS_AND_QUEUE = 'dvc.modifyWorkspaceParamsAndQueue',
+  MODIFY_WORKSPACE_PARAMS_AND_RESUME = 'dvc.modifyWorkspaceParamsAndResume',
+  MODIFY_WORKSPACE_PARAMS_AND_RUN = 'dvc.modifyWorkspaceParamsAndRun',
+  MODIFY_WORKSPACE_PARAMS_RESET_AND_RUN = 'dvc.modifyWorkspaceParamsResetAndRun',
 
   ADD_TARGET = 'dvc.addTarget',
   CHECKOUT = 'dvc.checkout',

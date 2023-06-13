@@ -162,7 +162,7 @@ const getMultiSelectMenuOptions = (
 }
 
 const getRunResumeOptions = (
-  disableIfRunning: (
+  disableIfRunningOrNotWorkspace: (
     label: string,
     type: MessageFromWebviewType,
     disabled?: boolean,
@@ -177,9 +177,9 @@ const getRunResumeOptions = (
   const options = []
   if (projectHasCheckpoints) {
     options.push(
-      disableIfRunning(
+      disableIfRunningOrNotWorkspace(
         'Modify and Run',
-        MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN,
+        MessageFromWebviewType.MODIFY_WORKSPACE_PARAMS_RESET_AND_RUN,
         false,
         resetNeedsSeparator
       )
@@ -187,15 +187,15 @@ const getRunResumeOptions = (
   }
 
   options.push(
-    disableIfRunning(
+    disableIfRunningOrNotWorkspace(
       projectHasCheckpoints ? 'Modify and Resume' : 'Modify and Run',
-      MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_AND_RUN,
+      MessageFromWebviewType.MODIFY_WORKSPACE_PARAMS_AND_RUN,
       false,
       runNeedsSeparator
     ),
-    disableIfRunning(
+    disableIfRunningOrNotWorkspace(
       'Modify and Queue',
-      MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE
+      MessageFromWebviewType.MODIFY_WORKSPACE_PARAMS_AND_QUEUE
     )
   )
 
@@ -234,6 +234,12 @@ const getSingleSelectMenuOptions = (
     divider?: boolean
   ) => disableIfRunning(label, type, isWorkspace, divider)
 
+  const disableIfRunningOrNotWorkspace = (
+    label: string,
+    type: MessageFromWebviewType,
+    divider?: boolean
+  ) => disableIfRunning(label, type, !isWorkspace, divider)
+
   return [
     experimentMenuOption(
       id,
@@ -257,7 +263,7 @@ const getSingleSelectMenuOptions = (
       true
     ),
     ...getRunResumeOptions(
-      disableIfRunning,
+      disableIfRunningOrNotWorkspace,
       projectHasCheckpoints,
       isNotExperiment
     ),
