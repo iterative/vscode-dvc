@@ -51,13 +51,13 @@ jobs:
 
       - run: yarn build-storybook
 
-      - name: Publish to Chromatic
-        uses: chromaui/action@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-          storybookBuildDir: 'webview/storybook-static'
-          exitOnceUploaded: true
-          autoAcceptChanges: 'main'
-          onlyChanged: true
-          externals: '**/*.scss'
+      # - name: Publish to Chromatic
+      #   uses: chromaui/action@v1
+      #   with:
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+      #     storybookBuildDir: 'webview/storybook-static'
+      #     exitOnceUploaded: true
+      #     autoAcceptChanges: 'main'
+      #     onlyChanged: true
+      #     externals: '**/*.scss'
