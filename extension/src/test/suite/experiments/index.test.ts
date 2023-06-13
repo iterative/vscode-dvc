@@ -753,7 +753,7 @@ suite('Experiments Test Suite', () => {
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it("should be able to handle a message to modify an experiment's params and queue an experiment", async () => {
+    it('should be able to handle a message to modify the workspace params and queue an experiment', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('train')
       const { experiments, dvcExecutor } = buildExperiments({
         disposer: disposable
@@ -789,7 +789,7 @@ suite('Experiments Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it("should be able to handle a message to modify an experiment's params and run a new experiment", async () => {
+    it('should be able to handle a message to modify the workspace params and run a new experiment', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('train')
       const { experiments, dvcRunner } = buildExperiments({
         disposer: disposable
@@ -827,7 +827,7 @@ suite('Experiments Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it("should be able to handle a message to modify an experiment's params reset and run a new experiment", async () => {
+    it('should be able to handle a message to modify the workspace params, reset and run a new experiment', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('train')
       const { experiments, dvcRunner } = buildExperiments({
         disposer: disposable
