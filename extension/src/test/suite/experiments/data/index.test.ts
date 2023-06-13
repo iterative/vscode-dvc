@@ -105,9 +105,7 @@ suite('Experiments Data Test Suite', () => {
             getNbOfCommitsToShow: () => ({
               main: DEFAULT_NUM_OF_COMMITS_TO_SHOW
             }),
-            pruneBranchesToShow: stub(),
-            setAvailableBranchesToShow: stub(),
-            setBranchesToShow: stub()
+            setBranches: stub()
           } as unknown as ExperimentsModel
         )
       )
@@ -168,9 +166,7 @@ suite('Experiments Data Test Suite', () => {
             getNbOfCommitsToShow: () => ({
               main: DEFAULT_NUM_OF_COMMITS_TO_SHOW
             }),
-            pruneBranchesToShow: stub(),
-            setAvailableBranchesToShow: stub(),
-            setBranchesToShow: stub()
+            setBranches: stub()
           } as unknown as ExperimentsModel
         )
       )
@@ -202,23 +198,21 @@ suite('Experiments Data Test Suite', () => {
         'secret-branch',
         'old-branch'
       ]
-      const { data, mockPruneBranchesToShow, mockGetBranchesToShow } =
+      const { data, mockSetBranches, mockGetBranchesToShow } =
         buildExperimentsData(disposable)
       mockGetBranchesToShow.returns(branchesToShow)
 
       await data.update()
 
-      expect(mockPruneBranchesToShow).to.be.calledOnce
+      expect(mockSetBranches).to.be.calledOnce
     })
 
-    it('should add the current branch to the exp show output', async () => {
+    it('should get the required commits from the git log output', async () => {
       stub(ExperimentsData.prototype, 'managedUpdate').resolves()
-      const { data, mockExpShow, mockGetBranchesToShow } = buildExperimentsData(
-        disposable,
-        'branch-283498'
-      )
+      const { data, mockExpShow, mockGetBranchesToShow } =
+        buildExperimentsData(disposable)
 
-      mockGetBranchesToShow.returns([])
+      mockGetBranchesToShow.returns(['main'])
 
       await data.update()
 

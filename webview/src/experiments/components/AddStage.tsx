@@ -1,9 +1,8 @@
-import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React from 'react'
 import styles from './table/styles.module.scss'
 import { IconButton } from '../../shared/components/button/IconButton'
 import { Add } from '../../shared/components/icons'
-import { sendMessage } from '../../shared/vscode'
+import { addConfiguration } from '../util/messages'
 
 interface AddStageProps {
   hasValidDvcYaml: boolean
@@ -14,10 +13,7 @@ export const AddStage: React.FC<AddStageProps> = ({ hasValidDvcYaml }) => (
     <p>Easily and efficiently reproduce your experiments </p>
     <IconButton
       icon={Add}
-      onClick={() =>
-        hasValidDvcYaml &&
-        sendMessage({ type: MessageFromWebviewType.ADD_CONFIGURATION })
-      }
+      onClick={() => hasValidDvcYaml && addConfiguration()}
       text="Add a Pipeline Stage"
       disabled={!hasValidDvcYaml}
     />

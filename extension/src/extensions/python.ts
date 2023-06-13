@@ -89,6 +89,10 @@ export const getOnDidChangePythonEnvironmentVariables = async () => {
 
 export const isPythonExtensionInstalled = () => isInstalled(PYTHON_EXTENSION_ID)
 
+export const createPythonEnv = () => {
+  void commands.executeCommand('python.createEnvironment')
+}
+
 export const selectPythonInterpreter = () => {
   void commands.executeCommand('python.setInterpreter')
 }

@@ -8,7 +8,6 @@ import {
 import { BaseWebview } from '../../webview'
 import { sendTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
-import { selectPythonInterpreter } from '../../extensions/python'
 import {
   RegisteredCliCommands,
   RegisteredCommands
@@ -20,52 +19,25 @@ export class WebviewMessages {
   private readonly getWebview: () => BaseWebview<TSetupData> | undefined
   private readonly initializeGit: () => void
   private readonly updateStudioOffline: (offline: boolean) => Promise<void>
-  private isPythonExtensionUsed: () => Promise<boolean>
+  private readonly isPythonExtensionUsed: () => Promise<boolean>
+  private readonly updatePythonEnv: () => Promise<void>
 
   constructor(
     getWebview: () => BaseWebview<TSetupData> | undefined,
     initializeGit: () => void,
     updateStudioOffline: (shareLive: boolean) => Promise<void>,
-    isPythonExtensionUsed: () => Promise<boolean>
+    isPythonExtensionUsed: () => Promise<boolean>,
+    updatePythonEnv: () => Promise<void>
   ) {
     this.getWebview = getWebview
     this.initializeGit = initializeGit
     this.updateStudioOffline = updateStudioOffline
     this.isPythonExtensionUsed = isPythonExtensionUsed
+    this.updatePythonEnv = updatePythonEnv
   }
 
-  public sendWebviewMessage({
-    canGitInitialize,
-    cliCompatible,
-    dvcCliDetails,
-    hasData,
-    isPythonExtensionUsed,
-    isStudioConnected,
-    needsGitCommit,
-    needsGitInitialized,
-    projectInitialized,
-    pythonBinPath,
-    remoteList,
-    sectionCollapsed,
-    shareLiveToStudio,
-    isAboveLatestTestedVersion
-  }: SetupData) {
-    void this.getWebview()?.show({
-      canGitInitialize,
-      cliCompatible,
-      dvcCliDetails,
-      hasData,
-      isAboveLatestTestedVersion,
-      isPythonExtensionUsed,
-      isStudioConnected,
-      needsGitCommit,
-      needsGitInitialized,
-      projectInitialized,
-      pythonBinPath,
-      remoteList,
-      sectionCollapsed,
-      shareLiveToStudio
-    })
+  public sendWebviewMessage(data: SetupData) {
+    void this.getWebview()?.show(data)
   }
 
   public handleMessageFromWebview(message: MessageFromWebview) {
@@ -82,8 +54,8 @@ export class WebviewMessages {
         return commands.executeCommand(RegisteredCommands.EXTENSION_GET_STARTED)
       case MessageFromWebviewType.SHOW_SCM_PANEL:
         return this.showScmForCommit()
-      case MessageFromWebviewType.SELECT_PYTHON_INTERPRETER:
-        return this.selectPythonInterpreter()
+      case MessageFromWebviewType.UPDATE_PYTHON_ENVIRONMENT:
+        return this.updatePythonEnvironment()
       case MessageFromWebviewType.INSTALL_DVC:
         return this.installDvc()
       case MessageFromWebviewType.UPGRADE_DVC:
@@ -134,13 +106,13 @@ export class WebviewMessages {
     return commands.executeCommand('workbench.view.scm')
   }
 
-  private selectPythonInterpreter() {
+  private updatePythonEnvironment() {
     sendTelemetryEvent(
-      EventName.VIEWS_SETUP_SELECT_PYTHON_INTERPRETER,
+      EventName.VIEWS_SETUP_UPDATE_PYTHON_ENVIRONMENT,
       undefined,
       undefined
     )
-    return selectPythonInterpreter()
+    return this.updatePythonEnv()
   }
 
   private async upgradeDvc() {

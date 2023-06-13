@@ -53,6 +53,7 @@ export enum ExperimentType {
 
 export class ExperimentsModel extends ModelWithPersistence {
   private workspace = {} as Experiment
+  private cliError: undefined | string
   private commits: Experiment[] = []
   private experimentsByCommit: Map<string, Experiment[]> = new Map()
   private rowOrder: { branch: string; sha: string }[] = []
@@ -61,7 +62,8 @@ export class ExperimentsModel extends ModelWithPersistence {
   private coloredStatus: ColoredStatus
   private starredExperiments: StarredExperiments
   private numberOfCommitsToShow: Record<string, number>
-  private branchesToShow: string[] = []
+  private currentBranch: string | undefined
+  private selectedBranches: string[] = []
   private availableBranchesToShow: string[] = []
   private hasMoreCommits: { [branch: string]: boolean } = {}
   private isShowingMoreCommits: { [branch: string]: boolean } = {}
@@ -101,7 +103,7 @@ export class ExperimentsModel extends ModelWithPersistence {
       this.numberOfCommitsToShow = {}
     }
 
-    this.branchesToShow = this.revive<string[]>(
+    this.selectedBranches = this.revive<string[]>(
       PersistenceKey.EXPERIMENTS_BRANCHES,
       []
     )
@@ -122,11 +124,12 @@ export class ExperimentsModel extends ModelWithPersistence {
     availableNbCommits: { [branch: string]: number }
   ) {
     const {
-      workspace,
+      cliError,
       commits,
       experimentsByCommit,
+      hasCheckpoints,
       runningExperiments,
-      hasCheckpoints
+      workspace
     } = collectExperiments(expShow, gitLog, dvcLiveOnly)
 
     const { hasMoreCommits, isShowingMoreCommits } =
@@ -141,6 +144,7 @@ export class ExperimentsModel extends ModelWithPersistence {
 
     this.rowOrder = rowOrder
     this.workspace = workspace
+    this.cliError = cliError
     this.commits = commits
     this.experimentsByCommit = experimentsByCommit
     this.checkpoints = hasCheckpoints
@@ -190,6 +194,10 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public hasCheckpoints() {
     return this.checkpoints
+  }
+
+  public getCliError() {
+    return this.cliError
   }
 
   public canSelect() {
@@ -323,11 +331,18 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getErrors() {
-    return new Set(
-      this.getCombinedList()
-        .filter(({ error }) => error)
-        .map(({ label }) => label)
-    )
+    const errors = new Set<string>()
+    for (const { error, label } of this.getCombinedList()) {
+      if (!error) {
+        continue
+      }
+      errors.add(label)
+    }
+    if (this.cliError) {
+      errors.add(this.cliError)
+    }
+
+    return errors
   }
 
   public getExperimentParams(id: string) {
@@ -449,24 +464,24 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.numberOfCommitsToShow
   }
 
-  public setBranchesToShow(branches: string[]) {
-    this.branchesToShow = branches
+  public setBranches(currentBranch: string, allBranches: string[]) {
+    this.availableBranchesToShow = allBranches
+    this.currentBranch = currentBranch
+    this.selectedBranches = this.selectedBranches.filter(
+      branch => allBranches.includes(branch) && branch !== this.currentBranch
+    )
     this.persistBranchesToShow()
   }
 
-  public pruneBranchesToShow(branches: string[]) {
-    this.branchesToShow = this.branchesToShow.filter(branch =>
-      branches.includes(branch)
+  public setSelectedBranches(branches: string[]) {
+    this.selectedBranches = branches.filter(
+      branch => branch !== this.currentBranch
     )
     this.persistBranchesToShow()
   }
 
   public getBranchesToShow() {
-    return this.branchesToShow
-  }
-
-  public setAvailableBranchesToShow(branches: string[]) {
-    this.availableBranchesToShow = branches
+    return [this.currentBranch as string, ...this.selectedBranches]
   }
 
   public getAvailableBranchesToShow() {
@@ -574,7 +589,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   private persistBranchesToShow() {
     return this.persist(
       PersistenceKey.EXPERIMENTS_BRANCHES,
-      this.branchesToShow
+      this.selectedBranches
     )
   }
 

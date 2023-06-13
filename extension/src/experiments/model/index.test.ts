@@ -388,24 +388,62 @@ describe('ExperimentsModel', () => {
     )
   })
 
-  it('should remove outdated branches to show when calling pruneBranchesToShow', () => {
+  it('should always return the current branch first', () => {
     const model = new ExperimentsModel('', buildMockMemento())
 
-    model.setBranchesToShow(['A', 'old', 'B', 'C', 'older'])
-    model.pruneBranchesToShow(['A', 'B', 'C', 'four', 'five', 'six'])
+    model.setSelectedBranches(['A', 'old', 'B', 'C', 'older'])
+    model.setBranches('six', ['A', 'B', 'C', 'four', 'five', 'six'])
 
-    expect(model.getBranchesToShow()).toStrictEqual(['A', 'B', 'C'])
+    expect(model.getBranchesToShow()).toStrictEqual(['six', 'A', 'B', 'C'])
   })
 
-  it('should persist the branches to show when calling pruneBranchesToShow', () => {
+  it('should remove outdated selected branches when calling setBranches', () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+
+    model.setSelectedBranches(['A', 'old', 'B', 'C', 'older'])
+    model.setBranches('main', ['A', 'B', 'C', 'four', 'five', 'six'])
+
+    expect(model.getBranchesToShow()).toStrictEqual(['main', 'A', 'B', 'C'])
+  })
+
+  it('should persist the selected branches when calling setBranches', () => {
     const memento = buildMockMemento()
     const model = new ExperimentsModel('', memento)
 
-    model.setBranchesToShow(['A', 'old', 'B', 'C', 'older'])
-    model.pruneBranchesToShow(['A', 'B', 'C', 'four', 'five', 'six'])
+    model.setSelectedBranches(['A', 'old', 'B', 'C', 'older'])
+    model.setBranches('main', ['A', 'B', 'C', 'four', 'five', 'six'])
 
     expect(memento.get(PersistenceKey.EXPERIMENTS_BRANCHES)).toStrictEqual([
       'A',
+      'B',
+      'C'
+    ])
+  })
+
+  it('should persist the selected branches when calling setSelectedBranches', () => {
+    const memento = buildMockMemento()
+    const model = new ExperimentsModel('', memento)
+
+    model.setSelectedBranches(['A', 'old', 'B', 'C', 'older'])
+
+    expect(memento.get(PersistenceKey.EXPERIMENTS_BRANCHES)).toStrictEqual([
+      'A',
+      'old',
+      'B',
+      'C',
+      'older'
+    ])
+  })
+
+  it('should remove the current branch from the selected branches and only persist the selected branches', () => {
+    const memento = buildMockMemento()
+    const model = new ExperimentsModel('', memento)
+
+    model.setSelectedBranches(['A', 'old', 'B', 'C', 'older'])
+    model.setBranches('A', ['A', 'B', 'C', 'four', 'five', 'six'])
+
+    expect(model.getBranchesToShow()).toStrictEqual(['A', 'B', 'C'])
+    expect(memento.get(PersistenceKey.EXPERIMENTS_BRANCHES)).toStrictEqual([
       'B',
       'C'
     ])
@@ -521,5 +559,33 @@ describe('ExperimentsModel', () => {
 
     expect(getSelectedRevisions(model)).toStrictEqual([])
     expect(model.hasRunningExperiment()).toBe(false)
+  })
+
+  it('should capture a Cli error when exp show fails', () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+
+    const errorMsg = 'a very unexpected error - (╯°□°）╯︵ ┻━┻'
+
+    const data = [
+      {
+        rev: EXPERIMENT_WORKSPACE_ID,
+        error: { msg: errorMsg, type: 'caught error' }
+      }
+    ]
+    model.transformAndSet(data, gitLogFixture, false, [], {
+      main: 6
+    })
+
+    expect(model.getCliError()).toStrictEqual(errorMsg)
+
+    model.transformAndSet(
+      outputFixture,
+      gitLogFixture,
+      false,
+      rowOrderFixture,
+      { main: 6 }
+    )
+
+    expect(model.getCliError()).toBe(undefined)
   })
 })

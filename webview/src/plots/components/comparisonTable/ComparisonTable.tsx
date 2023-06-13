@@ -2,7 +2,6 @@ import { ComparisonPlots, Revision } from 'dvc/src/plots/webview/contract'
 import { reorderObjectList } from 'dvc/src/util/array'
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useSelector } from 'react-redux'
-import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import {
   ComparisonTableColumn,
   ComparisonTableHead
@@ -10,9 +9,9 @@ import {
 import { ComparisionTableRows } from './ComparisonTableRows'
 import plotsStyles from '../styles.module.scss'
 import { withScale, withVariant } from '../../../util/styles'
-import { sendMessage } from '../../../shared/vscode'
 import { PlotsState } from '../../store'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
+import { reorderComparisonPlots } from '../../util/messages'
 
 export const ComparisonTable: React.FC = () => {
   const { revisions, plots, width } = useSelector(
@@ -61,10 +60,7 @@ export const ComparisonTable: React.FC = () => {
   const setColumnsOrder = (order: string[]) => {
     const newOrder = reorderObjectList<Revision>(order, columns, 'id')
     setColumns(newOrder)
-    sendMessage({
-      payload: newOrder.map(({ id }) => id),
-      type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON
-    })
+    reorderComparisonPlots(newOrder)
   }
 
   const changePinnedColumn = (column: string) => {

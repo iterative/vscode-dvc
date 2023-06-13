@@ -33,7 +33,6 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
 
     void this.watchExpGitRefs()
     void this.managedUpdate()
-    void this.updateAvailableBranchesToSelect()
   }
 
   public managedUpdate() {
@@ -41,14 +40,8 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   }
 
   public async update(): Promise<void> {
-    const allBranches = await this.internalCommands.executeCommand<string[]>(
-      AvailableCommands.GIT_GET_BRANCHES,
-      this.dvcRoot
-    )
-
-    void this.updateAvailableBranchesToSelect(allBranches)
-
-    const branches = await this.getBranchesToShow(allBranches)
+    await this.updateBranches()
+    const branches = this.experiments.getBranchesToShow()
     let gitLog = ''
     const rowOrder: { branch: string; sha: string }[] = []
     const availableNbCommits: { [branch: string]: number } = {}
@@ -115,34 +108,19 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     return gitLog
   }
 
-  private async getBranchesToShow(allBranches: string[]) {
-    const currentBranch = await this.internalCommands.executeCommand<string>(
-      AvailableCommands.GIT_GET_CURRENT_BRANCH,
-      this.dvcRoot
-    )
-
-    this.experiments.pruneBranchesToShow(allBranches)
-
-    const currentBranches = [
-      currentBranch,
-      ...this.experiments
-        .getBranchesToShow()
-        .filter(branch => branch !== currentBranch)
-    ]
-
-    this.experiments.setBranchesToShow(currentBranches)
-
-    return currentBranches
-  }
-
-  private async updateAvailableBranchesToSelect(branches?: string[]) {
-    const allBranches =
-      branches ||
-      (await this.internalCommands.executeCommand<string[]>(
+  private async updateBranches() {
+    const [currentBranch, allBranches] = await Promise.all([
+      this.internalCommands.executeCommand<string>(
+        AvailableCommands.GIT_GET_CURRENT_BRANCH,
+        this.dvcRoot
+      ),
+      this.internalCommands.executeCommand<string[]>(
         AvailableCommands.GIT_GET_BRANCHES,
         this.dvcRoot
-      ))
-    this.experiments.setAvailableBranchesToShow(allBranches)
+      )
+    ])
+
+    this.experiments.setBranches(currentBranch, allBranches)
   }
 
   private async watchExpGitRefs(): Promise<void> {

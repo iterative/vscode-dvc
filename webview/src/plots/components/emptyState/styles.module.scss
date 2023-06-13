@@ -1,0 +1,10 @@
+.emptyStateWrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+
+  > *:first-child {
+    flex-grow: 1;
+  }
+}

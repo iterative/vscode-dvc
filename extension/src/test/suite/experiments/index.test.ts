@@ -10,7 +10,10 @@ import {
   Uri,
   QuickPickItem,
   ViewColumn,
-  CancellationToken
+  CancellationToken,
+  WorkspaceConfiguration,
+  MessageItem,
+  ConfigurationTarget
 } from 'vscode'
 import {
   DEFAULT_EXPERIMENTS_OUTPUT,
@@ -87,6 +90,7 @@ import { DvcViewer } from '../../../cli/dvc/viewer'
 import { DEFAULT_NB_ITEMS_PER_ROW } from '../../../plots/webview/contract'
 import { Toast } from '../../../vscode/toast'
 import { Response } from '../../../vscode/response'
+import { MAX_SELECTED_EXPERIMENTS } from '../../../experiments/model/status'
 
 const { openFileInEditor } = FileSystem
 
@@ -977,6 +981,64 @@ suite('Experiments Test Suite', () => {
       ).to.be.false
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should show an information toast when the user tries to toggle an experiment when the max number are already selected', async () => {
+      const { experiments, experimentsModel } = buildExperiments({
+        disposer: disposable
+      })
+
+      await experiments.isReady()
+
+      const mockShowInformationMessage = stub(
+        window,
+        'showInformationMessage'
+      ).resolves(Response.NEVER as unknown as MessageItem)
+
+      const mockUpdate = stub()
+      const updateCalled = new Promise(resolve =>
+        mockUpdate.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve()
+        })
+      )
+      stub(workspace, 'getConfiguration').returns({
+        get: stub(),
+        update: mockUpdate
+      } as unknown as WorkspaceConfiguration)
+
+      const allExperiments =
+        experimentsModel.getWorkspaceCommitsAndExperiments()
+
+      const experimentsToSelect = allExperiments.slice(
+        0,
+        MAX_SELECTED_EXPERIMENTS
+      )
+
+      const overMaxSelected = allExperiments[MAX_SELECTED_EXPERIMENTS].id
+
+      experimentsModel.setSelected(experimentsToSelect)
+      expect(experiments.getSelectedRevisions()).to.have.lengthOf(
+        MAX_SELECTED_EXPERIMENTS
+      )
+
+      experiments.toggleExperimentStatus(overMaxSelected)
+
+      await updateCalled
+
+      expect(
+        !!experimentsModel
+          .getCombinedList()
+          .find(({ id }) => id === overMaxSelected)?.selected,
+        'experiment is not selected'
+      ).to.be.false
+
+      expect(mockShowInformationMessage).to.be.called
+      expect(mockUpdate).to.be.calledWithExactly(
+        ConfigKey.DO_NOT_INFORM_MAX_PLOTTED,
+        true,
+        ConfigurationTarget.Global
+      )
+    })
+
     it('should be able to handle a message to select columns', async () => {
       stub(DvcReader.prototype, 'listStages').resolves('train')
 
@@ -1389,10 +1451,13 @@ suite('Experiments Test Suite', () => {
         mockUpdateExperimentsData,
         mockSelectBranches
       } = setupExperimentsAndMockCommands()
-      const mockSetBranchesToShow = stub(experimentsModel, 'setBranchesToShow')
+      const mockSetSelectedBranches = stub(
+        experimentsModel,
+        'setSelectedBranches'
+      )
 
       const waitForBranchesToBeSelected = new Promise(resolve =>
-        mockSetBranchesToShow.callsFake(() => resolve(undefined))
+        mockSetSelectedBranches.callsFake(() => resolve(undefined))
       )
 
       const webview = await experiments.showWebview()
@@ -1407,8 +1472,32 @@ suite('Experiments Test Suite', () => {
 
       await waitForBranchesToBeSelected
 
-      expect(mockSetBranchesToShow).to.be.calledOnceWith(['main', 'other'])
+      expect(mockSetSelectedBranches).to.be.calledOnceWith(['main', 'other'])
 
+      expect(mockUpdateExperimentsData).to.be.calledOnce
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a message to refresh the exp show data', async () => {
+      const { experiments, mockUpdateExperimentsData } = buildExperiments({
+        disposer: disposable,
+        expShow: expShowFixture
+      })
+
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const expShowCalled = new Promise(resolve =>
+        mockUpdateExperimentsData.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve([])
+        })
+      )
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.REFRESH_EXP_DATA
+      })
+
+      await expShowCalled
       expect(mockUpdateExperimentsData).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
@@ -1420,7 +1509,7 @@ suite('Experiments Test Suite', () => {
         mockUpdateExperimentsData,
         mockSelectBranches
       } = setupExperimentsAndMockCommands()
-      const mockSetBranchesToShow = stub(experimentsModel, 'setBranchesToShow')
+      const mockSetBranches = stub(experimentsModel, 'setBranches')
       mockSelectBranches.resolves(undefined)
 
       const webview = await experiments.showWebview()
@@ -1433,7 +1522,10 @@ suite('Experiments Test Suite', () => {
 
       expect(mockSelectBranches).to.be.calledOnce
 
-      expect(mockSetBranchesToShow).not.to.be.calledOnceWith(['main', 'other'])
+      expect(mockSetBranches).not.to.be.calledOnceWith('main', [
+        'main',
+        'other'
+      ])
 
       expect(mockUpdateExperimentsData).not.to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)

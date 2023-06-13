@@ -33,6 +33,7 @@ export enum MessageFromWebviewType {
   REORDER_PLOTS_COMPARISON_ROWS = 'reorder-plots-comparison-rows',
   REORDER_PLOTS_CUSTOM = 'reorder-plots-custom',
   REORDER_PLOTS_TEMPLATES = 'reorder-plots-templates',
+  REFRESH_EXP_DATA = 'refresh-exp-data',
   REFRESH_REVISIONS = 'refresh-revisions',
   RESIZE_COLUMN = 'resize-column',
   RESIZE_PLOTS = 'resize-plots',
@@ -47,7 +48,6 @@ export enum MessageFromWebviewType {
   SELECT_EXPERIMENTS = 'select-experiments',
   SELECT_COLUMNS = 'select-columns',
   SELECT_PLOTS = 'select-plots',
-  SELECT_PYTHON_INTERPRETER = 'select-python-interpreter',
   SET_EXPERIMENTS_FOR_PLOTS = 'set-experiments-for-plots',
   SET_EXPERIMENTS_AND_OPEN_PLOTS = 'set-experiments-and-open-plots',
   SET_STUDIO_SHARE_EXPERIMENTS_LIVE = 'set-studio-share-experiments-live',
@@ -66,6 +66,7 @@ export enum MessageFromWebviewType {
   INITIALIZE_GIT = 'initialize-git',
   SHOW_SCM_PANEL = 'show-scm-panel',
   INSTALL_DVC = 'install-dvc',
+  UPDATE_PYTHON_ENVIRONMENT = 'update-python-environment',
   UPGRADE_DVC = 'upgrade-dvc',
   SETUP_WORKSPACE = 'setup-workspace',
   ZOOM_PLOT = 'zoom-plot',
@@ -197,8 +198,9 @@ export type MessageFromWebview =
     }
   | { type: MessageFromWebviewType.INITIALIZED }
   | { type: MessageFromWebviewType.SELECT_EXPERIMENTS }
-  | { type: MessageFromWebviewType.SELECT_PYTHON_INTERPRETER }
+  | { type: MessageFromWebviewType.UPDATE_PYTHON_ENVIRONMENT }
   | { type: MessageFromWebviewType.SELECT_PLOTS }
+  | { type: MessageFromWebviewType.REFRESH_EXP_DATA }
   | { type: MessageFromWebviewType.REFRESH_REVISIONS }
   | { type: MessageFromWebviewType.SELECT_COLUMNS }
   | { type: MessageFromWebviewType.FOCUS_FILTERS_TREE }
