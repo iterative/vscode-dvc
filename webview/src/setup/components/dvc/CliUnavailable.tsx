@@ -18,7 +18,10 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
   const installationSentence = (
     <>
       The extension supports all{' '}
-      <a href="https://dvc.org/doc/install">installation types</a>.
+      <a href="https://dvc.org/doc/install">installation types</a>. It can also
+      help to install needed packages via{' '}
+      <a href="https://packaging.python.org/en/latest/key_projects/#pip">pip</a>
+      .
     </>
   )
 
