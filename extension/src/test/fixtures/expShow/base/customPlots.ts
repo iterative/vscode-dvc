@@ -126,8 +126,8 @@ const data: CustomPlotsData = {
             encoding: {
               tooltip: [
                 {
-                  field: 'expName',
-                  title: 'name'
+                  field: 'id',
+                  title: 'id'
                 },
                 {
                   field: 'metric',
@@ -244,8 +244,8 @@ const data: CustomPlotsData = {
             encoding: {
               tooltip: [
                 {
-                  field: 'expName',
-                  title: 'name'
+                  field: 'id',
+                  title: 'id'
                 },
                 {
                   field: 'metric',
