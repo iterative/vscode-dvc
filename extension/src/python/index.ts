@@ -3,12 +3,7 @@ import { getVenvBinPath } from './path'
 import { getProcessPlatform } from '../env'
 import { exists } from '../fileSystem'
 import { Logger } from '../common/logger'
-import {
-  createProcess,
-  executeProcess,
-  Process,
-  ProcessOptions
-} from '../process/execution'
+import { createProcess, executeProcess, Process } from '../process/execution'
 
 const sendOutput = (process: Process) => {
   process.all?.on('data', chunk =>
@@ -22,7 +17,7 @@ export const installPackages = (
   pythonBin: string,
   ...args: string[]
 ): Process => {
-  const options: ProcessOptions = {
+  const options = {
     args: ['-m', 'pip', 'install', '--upgrade', ...args],
     cwd,
     executable: pythonBin
