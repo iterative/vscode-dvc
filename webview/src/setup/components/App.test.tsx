@@ -377,14 +377,14 @@ describe('App', () => {
       expect(within(envDetails).getByText(command)).toBeInTheDocument()
     })
 
-    it('should show the user the command used to run DVC with a "Configure" button if dvc is installed without the python extension', () => {
+    it('should show the user the command used to run DVC with a "Locate DVC" button if dvc is installed without the python extension', () => {
       renderApp()
 
       const envDetails = screen.getByTestId('dvc-env-details')
 
       expect(within(envDetails).getByText('Command:')).toBeInTheDocument()
 
-      const configureButton = within(envDetails).getByText('Configure')
+      const configureButton = within(envDetails).getByText('Locate DVC')
       const selectButton = within(envDetails).queryByText(
         'Select Python Interpreter'
       )
@@ -399,7 +399,7 @@ describe('App', () => {
       })
     })
 
-    it('should show the user the command used to run DVC with "Configure" and "Update Env" buttons if dvc is installed with the python extension', () => {
+    it('should show the user the command used to run DVC with "Locate DVC" and "Set Env" buttons if dvc is installed with the python extension', () => {
       renderApp({
         isPythonExtensionUsed: true
       })
@@ -408,8 +408,8 @@ describe('App', () => {
 
       expect(within(envDetails).getByText('Command:')).toBeInTheDocument()
 
-      const configureButton = within(envDetails).getByText('Configure')
-      const selectButton = within(envDetails).getByText('Update Env')
+      const configureButton = within(envDetails).getByText('Locate DVC')
+      const selectButton = within(envDetails).getByText('Set Env')
 
       expect(configureButton).toBeInTheDocument()
       expect(selectButton).toBeInTheDocument()
