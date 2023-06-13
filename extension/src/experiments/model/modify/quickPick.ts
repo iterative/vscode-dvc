@@ -6,8 +6,11 @@ import { definedAndNonEmpty } from '../../../util/array'
 import { getEnterValueTitle, Title } from '../../../vscode/title'
 import { Value } from '../../../cli/dvc/contract'
 
-const standardizeValue = (value: Value, isString: boolean): string => {
-  if (isString && typeof value === 'string') {
+const standardizeValue = (
+  value: Value,
+  wrapStringParamForCli = false
+): string => {
+  if (wrapStringParamForCli && typeof value === 'string') {
     return `'${value}'`
   }
   return typeof value === 'object' ? JSON.stringify(value) : String(value)
@@ -18,7 +21,7 @@ const pickParamsToModify = (
 ): Thenable<ParamWithIsString[] | undefined> =>
   quickPickManyValues<ParamWithIsString>(
     params.map(param => ({
-      description: standardizeValue(param.value, false),
+      description: standardizeValue(param.value),
       label: param.path,
       picked: false,
       value: param
@@ -33,7 +36,7 @@ const pickNewParamValues = async (
   for (const { path, value, isString } of paramsToModify) {
     const input = await getInput(
       getEnterValueTitle(path),
-      standardizeValue(value, false)
+      standardizeValue(value)
     )
     if (input === undefined) {
       return
@@ -46,17 +49,6 @@ const pickNewParamValues = async (
   return args
 }
 
-const addUnchanged = (args: string[], unchanged: ParamWithIsString[]) => {
-  for (const { path, value, isString } of unchanged) {
-    args.push(
-      Flag.SET_PARAM,
-      [path, standardizeValue(value, isString)].join('=')
-    )
-  }
-
-  return args
-}
-
 export const pickAndModifyParams = async (
   params: ParamWithIsString[]
 ): Promise<string[] | undefined> => {
@@ -66,14 +58,5 @@ export const pickAndModifyParams = async (
     return
   }
 
-  const args = await pickNewParamValues(paramsToModify)
-
-  if (!args) {
-    return
-  }
-
-  const paramPathsToModify = new Set(paramsToModify.map(param => param.path))
-  const unchanged = params.filter(param => !paramPathsToModify.has(param.path))
-
-  return addUnchanged(args, unchanged)
+  return pickNewParamValues(paramsToModify)
 }
