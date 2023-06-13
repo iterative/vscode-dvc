@@ -17,6 +17,7 @@ const DEFAULT_DATA: SetupData = {
   },
   hasData: false,
   isAboveLatestTestedVersion: false,
+  isPythonEnvironmentGlobal: false,
   isPythonExtensionUsed: true,
   isStudioConnected: true,
   needsGitCommit: false,

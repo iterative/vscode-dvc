@@ -31,6 +31,7 @@ const DEFAULT_DATA = {
   },
   hasData: false,
   isAboveLatestTestedVersion: false,
+  isPythonEnvironmentGlobal: false,
   isPythonExtensionUsed: false,
   isStudioConnected: false,
   needsGitCommit: false,
@@ -161,7 +162,7 @@ describe('App', () => {
       })
 
       const sentenceReg = new RegExp(
-        `DVC & DVCLive can be auto-installed with ${defaultInterpreter}.`
+        `Auto-install \\(pip\\) DVC & DVCLive with ${defaultInterpreter}`
       )
 
       expect(screen.getByText(sentenceReg)).toBeInTheDocument()
@@ -178,7 +179,7 @@ describe('App', () => {
         pythonBinPath: 'python'
       })
 
-      const button = screen.getByText('Configure')
+      const button = screen.getByText('Locate DVC')
       fireEvent.click(button)
 
       expect(mockPostMessage).toHaveBeenCalledWith({
@@ -197,7 +198,7 @@ describe('App', () => {
         pythonBinPath: 'python'
       })
 
-      const button = screen.getByText('Update Env')
+      const button = screen.getByText('Set Env')
       fireEvent.click(button)
 
       expect(mockPostMessage).toHaveBeenCalledWith({
@@ -221,6 +222,28 @@ describe('App', () => {
       expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.INSTALL_DVC
       })
+    })
+
+    it('should let the user auto-install DVC but warn the user that their selected env is global when the Python extension is installed', () => {
+      const defaultInterpreter = 'python'
+      renderApp({
+        cliCompatible: undefined,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: undefined
+        },
+        isPythonEnvironmentGlobal: true,
+        isPythonExtensionUsed: true,
+        pythonBinPath: defaultInterpreter
+      })
+
+      const button = screen.getByText('Set Env')
+      const sentenceReg = new RegExp(
+        `Auto-install \\(pip\\) DVC & DVCLive with ${defaultInterpreter} \\(Warning, not a virtual environment\\).`
+      )
+
+      expect(button).toBeInTheDocument()
+      expect(screen.getByText(sentenceReg)).toBeInTheDocument()
     })
 
     it('should not show a screen saying that DVC is not installed if the cli is available', () => {

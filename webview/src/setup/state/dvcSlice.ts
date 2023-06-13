@@ -15,6 +15,7 @@ export const dvcInitialState: DvcState = {
   cliCompatible: undefined,
   dvcCliDetails: undefined,
   isAboveLatestTestedVersion: undefined,
+  isPythonEnvironmentGlobal: undefined,
   isPythonExtensionUsed: false,
   needsGitInitialized: false,
   projectInitialized: false,
@@ -47,6 +48,12 @@ export const dvcSlice = createSlice({
     ) => {
       state.isAboveLatestTestedVersion = action.payload
     },
+    updateIsPythonEnvironmentGlobal: (
+      state,
+      action: PayloadAction<boolean | undefined>
+    ) => {
+      state.isPythonEnvironmentGlobal = action.payload
+    },
     updateIsPythonExtensionUsed: (state, action: PayloadAction<boolean>) => {
       state.isPythonExtensionUsed = action.payload
     },
@@ -70,6 +77,7 @@ export const {
   updateCliCompatible,
   updateDvcCliDetails,
   updateIsAboveLatestTestedVersion,
+  updateIsPythonEnvironmentGlobal,
   updateIsPythonExtensionUsed,
   updateNeedsGitInitialized,
   updateProjectInitialized,

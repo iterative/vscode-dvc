@@ -11,41 +11,39 @@ import {
 } from '../../util/messages'
 
 export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
-  const { pythonBinPath, isPythonExtensionUsed } = useSelector(
-    (state: SetupState) => state.dvc
-  )
+  const { pythonBinPath, isPythonExtensionUsed, isPythonEnvironmentGlobal } =
+    useSelector((state: SetupState) => state.dvc)
   const canInstall = !!pythonBinPath
   const installationSentence = (
     <>
       The extension supports all{' '}
-      <a href="https://dvc.org/doc/install">installation types</a>. It can also
-      help to install needed packages via{' '}
-      <a href="https://packaging.python.org/en/latest/key_projects/#pip">pip</a>
-      .
+      <a href="https://dvc.org/doc/install">installation types</a>.
     </>
   )
 
   const conditionalContents = canInstall ? (
     <>
       <p>
-        {installationSentence} DVC & DVCLive can be auto-installed with{' '}
-        {pythonBinPath}.
+        {installationSentence} Auto-install (pip) DVC & DVCLive with{' '}
+        {pythonBinPath}{' '}
+        {isPythonEnvironmentGlobal && '(Warning, not a virtual environment)'}.
       </p>
       <div className={styles.sideBySideButtons}>
         <Button onClick={installDvc} text="Install (pip)" />
         {isPythonExtensionUsed && (
-          <Button onClick={updatePythonEnvironment} text="Update Env" />
+          <Button onClick={updatePythonEnvironment} text="Set Env" />
         )}
-        <Button onClick={setupWorkspace} text="Configure" />
+        <Button onClick={setupWorkspace} text="Locate DVC" />
       </div>
     </>
   ) : (
     <>
       <p>
-        {installationSentence} Unfortunately, DVC & DVCLive cannot be
-        auto-installed as Python was not located.
+        {installationSentence} It can also help to install needed packages via
+        pip. Unfortunately, DVC & DVCLive cannot be auto-installed as Python was
+        not located.
       </p>
-      <Button onClick={setupWorkspace} text="Configure" />
+      <Button onClick={setupWorkspace} text="Locate DVC" />
     </>
   )
 
