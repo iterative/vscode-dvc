@@ -132,10 +132,20 @@ suite('Setup Test Suite', () => {
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
+      const mockIsPythonExtensionUsed = stub(setup, 'isPythonExtensionUsed')
+      const isExtensionUsedEvent = new Promise(resolve => {
+        mockIsPythonExtensionUsed.onFirstCall().callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(false)
+        })
+      })
+
       messageSpy.resetHistory()
       mockMessageReceived.fire({
         type: MessageFromWebviewType.INSTALL_DVC
       })
+
+      await isExtensionUsedEvent
 
       expect(mockAutoInstallDvc).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
@@ -148,10 +158,20 @@ suite('Setup Test Suite', () => {
 
       const mockMessageReceived = getMessageReceivedEmitter(webview)
 
+      const mockIsPythonExtensionUsed = stub(setup, 'isPythonExtensionUsed')
+      const isExtensionUsedEvent = new Promise(resolve => {
+        mockIsPythonExtensionUsed.onFirstCall().callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(false)
+        })
+      })
+
       messageSpy.resetHistory()
       mockMessageReceived.fire({
         type: MessageFromWebviewType.UPGRADE_DVC
       })
+
+      await isExtensionUsedEvent
 
       expect(mockAutoUpgradeDvc).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)

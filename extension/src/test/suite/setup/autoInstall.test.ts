@@ -82,6 +82,35 @@ suite('Auto Install Test Suite', () => {
       expect(mockInstallPackages).to.be.calledWithExactly(
         cwd,
         defaultPython,
+        false,
+        'dvc'
+      )
+    })
+
+    it('should pass the correct params to install function if python env is used and the active env is global', async () => {
+      bypassProgressCloseDelay()
+      const cwd = __dirname
+      stub(PythonExtension, 'getPythonExecutionDetails').resolves(['python'])
+      stub(Python, 'findPythonBin').resolves(defaultPython)
+      stub(PythonExtension, 'isActivePythonEnvGlobal').resolves(true)
+
+      const mockInstallPackages = stub(Python, 'installPackages').resolves(
+        undefined
+      )
+      stub(WorkspaceFolders, 'getFirstWorkspaceFolder').returns(cwd)
+
+      const showProgressSpy = spy(window, 'withProgress')
+      const showErrorSpy = spy(window, 'showErrorMessage')
+
+      await autoUpgradeDvc(true)
+
+      expect(showProgressSpy).to.be.called
+      expect(showErrorSpy).not.to.be.called
+      expect(mockInstallPackages).to.be.calledOnce
+      expect(mockInstallPackages).to.be.calledWithExactly(
+        cwd,
+        defaultPython,
+        true,
         'dvc'
       )
     })
@@ -109,6 +138,7 @@ suite('Auto Install Test Suite', () => {
       expect(mockInstallPackages).to.be.calledWithExactly(
         cwd,
         defaultPython,
+        false,
         'dvc'
       )
     })
@@ -155,6 +185,7 @@ suite('Auto Install Test Suite', () => {
       const cwd = __dirname
       stub(PythonExtension, 'getPythonExecutionDetails').resolves(undefined)
       stub(Python, 'findPythonBin').resolves(defaultPython)
+
       const mockInstallPackages = stub(Python, 'installPackages').resolves(
         undefined
       )
@@ -171,11 +202,47 @@ suite('Auto Install Test Suite', () => {
       expect(mockInstallPackages).to.be.calledWithExactly(
         cwd,
         defaultPython,
+        false,
         'dvc'
       )
       expect(mockInstallPackages).to.be.calledWithExactly(
         cwd,
         defaultPython,
+        false,
+        'dvclive'
+      )
+    })
+
+    it('should pass the correct params to install function if python env is used and the active env is global', async () => {
+      bypassProgressCloseDelay()
+      const cwd = __dirname
+      stub(PythonExtension, 'getPythonExecutionDetails').resolves(['python'])
+      stub(Python, 'findPythonBin').resolves(defaultPython)
+      stub(PythonExtension, 'isActivePythonEnvGlobal').resolves(true)
+
+      const mockInstallPackages = stub(Python, 'installPackages').resolves(
+        undefined
+      )
+      stub(WorkspaceFolders, 'getFirstWorkspaceFolder').returns(cwd)
+
+      const showProgressSpy = spy(window, 'withProgress')
+      const showErrorSpy = spy(window, 'showErrorMessage')
+
+      await autoInstallDvc(true)
+
+      expect(showProgressSpy).to.be.called
+      expect(showErrorSpy).not.to.be.called
+      expect(mockInstallPackages).to.be.calledTwice
+      expect(mockInstallPackages).to.be.calledWithExactly(
+        cwd,
+        defaultPython,
+        true,
+        'dvc'
+      )
+      expect(mockInstallPackages).to.be.calledWithExactly(
+        cwd,
+        defaultPython,
+        true,
         'dvclive'
       )
     })
@@ -201,6 +268,7 @@ suite('Auto Install Test Suite', () => {
       expect(mockInstallPackages).to.be.calledWithExactly(
         cwd,
         defaultPython,
+        false,
         'dvclive'
       )
     })
@@ -230,11 +298,13 @@ suite('Auto Install Test Suite', () => {
       expect(mockInstallPackages).to.be.calledWithExactly(
         cwd,
         defaultPython,
+        false,
         'dvclive'
       )
       expect(mockInstallPackages).to.be.calledWithExactly(
         cwd,
         defaultPython,
+        false,
         'dvc'
       )
     })

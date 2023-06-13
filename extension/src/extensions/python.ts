@@ -11,7 +11,7 @@ interface Settings {
   }
 }
 
-type EnvironmentVariables = { readonly [key: string]: string | undefined }
+type EnvironmentVariables = { readonly [key: string]: undefined }
 type EnvironmentVariablesChangeEvent = {
   readonly env: EnvironmentVariables
 }

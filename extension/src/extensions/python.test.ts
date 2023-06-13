@@ -2,7 +2,8 @@ import { extensions } from 'vscode'
 import {
   getPythonBinPath,
   getOnDidChangePythonExecutionDetails,
-  VscodePython
+  VscodePython,
+  isActivePythonEnvGlobal
 } from './python'
 import { executeProcess } from '../process/execution'
 
@@ -17,6 +18,7 @@ mockedExtensions.getExtension = mockedGetExtension
 
 const mockedReady = jest.fn()
 const mockedOnDidChangeExecutionDetails = jest.fn()
+const mockedGetActiveEnvironmentPath = jest.fn()
 let mockedExecCommand: string[] | undefined
 
 const mockedSettings = {
@@ -26,7 +28,16 @@ const mockedSettings = {
   onDidChangeExecutionDetails: mockedOnDidChangeExecutionDetails
 }
 
+const mockedEnvironments = {
+  getActiveEnvironmentPath: mockedGetActiveEnvironmentPath,
+  known: [
+    { id: '/usr/bin/python' },
+    { environment: { type: 'VirtualEnvironment' }, id: '/.venv/bin/python' }
+  ]
+}
+
 const mockedVscodePythonAPI = {
+  environments: mockedEnvironments,
   ready: mockedReady,
   settings: mockedSettings
 } as unknown as VscodePython
@@ -64,7 +75,25 @@ describe('getPythonBinPath', () => {
 })
 
 describe('isActivePythonEnvGlobal', () => {
-  // TBD more tests here
+  it('should return true if active env is global', async () => {
+    mockedGetActiveEnvironmentPath.mockReturnValueOnce({
+      id: '/usr/bin/python'
+    })
+
+    const result = await isActivePythonEnvGlobal()
+
+    expect(result).toStrictEqual(true)
+  })
+
+  it('should return false if active env is not global', async () => {
+    mockedGetActiveEnvironmentPath.mockReturnValueOnce({
+      id: '/.venv/bin/python'
+    })
+
+    const result = await isActivePythonEnvGlobal()
+
+    expect(result).toStrictEqual(false)
+  })
 })
 
 describe('getOnDidChangePythonExecutionDetails', () => {
