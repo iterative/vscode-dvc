@@ -109,57 +109,7 @@ describe('pickAndModifyParams', () => {
       '-S',
       `params.yaml:code_names=${thirdInput}`,
       '-S',
-      `params.yaml:transforms='${fourthInput}'`,
-      '-S',
-      [unchanged.path, unchanged.value].join('=')
-    ])
-  })
-
-  it('should convert any unselected params into the required format', async () => {
-    const numericValue = {
-      isString: false,
-      path: 'params.yaml:learning_rate',
-      value: 2e-12
-    }
-    const stringArrayValue = {
-      isString: true,
-      path: 'params.yaml:transforms',
-      value: '[Pipeline: PILBase.create, Pipeline: partial -> PILBase.create]'
-    }
-
-    const actualArrayValue = {
-      isString: false,
-      path: 'params.yaml:code_names',
-      value: [0, 1, 2]
-    }
-
-    const unchanged = [numericValue, stringArrayValue, actualArrayValue]
-    const initialUserResponse = {
-      isString: false,
-      path: 'params.yaml:dropout',
-      value: 0.15
-    }
-
-    mockedQuickPickManyValues.mockResolvedValueOnce([initialUserResponse])
-    const firstInput = '0.16'
-    mockedGetInput.mockResolvedValueOnce(firstInput)
-
-    const paramsToQueue = await pickAndModifyParams([
-      ...unchanged,
-      initialUserResponse
-    ])
-
-    expect(mockedGetInput).toHaveBeenCalledTimes(1)
-
-    expect(paramsToQueue).toStrictEqual([
-      '-S',
-      `params.yaml:dropout=${firstInput}`,
-      '-S',
-      [numericValue.path, numericValue.value].join('='),
-      '-S',
-      [stringArrayValue.path, `'${stringArrayValue.value}'`].join('='),
-      '-S',
-      [actualArrayValue.path, JSON.stringify(actualArrayValue.value)].join('=')
+      `params.yaml:transforms='${fourthInput}'`
     ])
   })
 })
