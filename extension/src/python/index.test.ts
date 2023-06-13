@@ -24,7 +24,7 @@ describe('setupTestVenv', () => {
     const envDir = '.env'
     const cwd = __dirname
 
-    await setupTestVenv(__dirname, envDir, false, 'dvc')
+    await setupTestVenv(__dirname, envDir, 'dvc')
 
     expect(mockedCreateProcess).toHaveBeenCalledTimes(3)
     expect(mockedCreateProcess).toHaveBeenCalledWith({
@@ -53,7 +53,7 @@ describe('setupTestVenv', () => {
     const envDir = '.env'
     const cwd = __dirname
 
-    await setupTestVenv(__dirname, envDir, false, '-r', 'requirements.txt')
+    await setupTestVenv(__dirname, envDir, '-r', 'requirements.txt')
 
     expect(mockedCreateProcess).toHaveBeenCalledTimes(3)
     expect(mockedCreateProcess).toHaveBeenCalledWith({
@@ -72,35 +72,6 @@ describe('setupTestVenv', () => {
       args: ['-m', 'pip', 'install', '--upgrade', '-r', 'requirements.txt'],
       cwd,
       executable: join(cwd, envDir, 'Scripts', 'python.exe')
-    })
-  })
-
-  it('should use a user flag if the python env is global', async () => {
-    mockedCreateProcess.mockResolvedValue(mockedProcess)
-    mockedGetProcessPlatform.mockReturnValue('freebsd')
-
-    const envDir = '.env'
-    const cwd = __dirname
-
-    await setupTestVenv(__dirname, envDir, true, 'dvc')
-
-    expect(mockedCreateProcess).toHaveBeenCalledTimes(3)
-    expect(mockedCreateProcess).toHaveBeenCalledWith({
-      args: ['-m', 'venv', envDir],
-      cwd,
-      executable: 'python3'
-    })
-
-    expect(mockedCreateProcess).toHaveBeenCalledWith({
-      args: ['-m', 'pip', 'install', '--upgrade', '--user', 'pip', 'wheel'],
-      cwd,
-      executable: join(cwd, envDir, 'bin', 'python')
-    })
-
-    expect(mockedCreateProcess).toHaveBeenCalledWith({
-      args: ['-m', 'pip', 'install', '--upgrade', '--user', 'dvc'],
-      cwd,
-      executable: join(cwd, envDir, 'bin', 'python')
     })
   })
 })

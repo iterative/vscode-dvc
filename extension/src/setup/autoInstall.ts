@@ -19,6 +19,8 @@ export const findPythonBinForInstall = async (): Promise<
   )
 }
 
+const getProcessGlobalArgs = (isGlobal: boolean) => (isGlobal ? ['--user'] : [])
+
 const showUpgradeProgress = (
   root: string,
   pythonBinPath: string,
@@ -32,7 +34,12 @@ const showUpgradeProgress = (
     try {
       await Toast.runCommandAndIncrementProgress(
         async () => {
-          await installPackages(root, pythonBinPath, isGlobalEnv, 'dvc')
+          await installPackages(
+            root,
+            pythonBinPath,
+            ...getProcessGlobalArgs(isGlobalEnv),
+            'dvc'
+          )
           return 'Upgraded successfully'
         },
         progress,
@@ -56,7 +63,12 @@ const showInstallProgress = (
     try {
       await Toast.runCommandAndIncrementProgress(
         async () => {
-          await installPackages(root, pythonBinPath, isGlobalEnv, 'dvclive')
+          await installPackages(
+            root,
+            pythonBinPath,
+            ...getProcessGlobalArgs(isGlobalEnv),
+            'dvclive'
+          )
           return 'DVCLive Installed'
         },
         progress,
@@ -69,7 +81,12 @@ const showInstallProgress = (
     try {
       await Toast.runCommandAndIncrementProgress(
         async () => {
-          await installPackages(root, pythonBinPath, isGlobalEnv, 'dvc')
+          await installPackages(
+            root,
+            pythonBinPath,
+            ...getProcessGlobalArgs(isGlobalEnv),
+            'dvc'
+          )
           return 'DVC Installed'
         },
         progress,

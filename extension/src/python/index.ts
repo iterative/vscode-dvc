@@ -20,20 +20,13 @@ const sendOutput = (process: Process) => {
 export const installPackages = (
   cwd: string,
   pythonBin: string,
-  isGlobalEnv: boolean,
   ...args: string[]
 ): Process => {
   const options: ProcessOptions = {
-    args: ['-m', 'pip', 'install', '--upgrade'],
+    args: ['-m', 'pip', 'install', '--upgrade', ...args],
     cwd,
     executable: pythonBin
   }
-
-  if (isGlobalEnv) {
-    options.args.push('--user')
-  }
-
-  options.args.push(...args)
 
   return createProcess(options)
 }
@@ -44,7 +37,6 @@ export const getDefaultPython = (): string =>
 export const setupTestVenv = async (
   cwd: string,
   envDir: string,
-  isGlobalEnv: boolean,
   ...installArgs: string[]
 ) => {
   if (!exists(join(cwd, envDir))) {
@@ -58,19 +50,12 @@ export const setupTestVenv = async (
 
   const venvPython = getVenvBinPath(cwd, envDir, 'python')
 
-  const venvUpgrade = installPackages(
-    cwd,
-    venvPython,
-    isGlobalEnv,
-    'pip',
-    'wheel'
-  )
+  const venvUpgrade = installPackages(cwd, venvPython, 'pip', 'wheel')
   await sendOutput(venvUpgrade)
 
   const installRequestedPackages = installPackages(
     cwd,
     venvPython,
-    isGlobalEnv,
     ...installArgs
   )
   return sendOutput(installRequestedPackages)

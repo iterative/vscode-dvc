@@ -82,12 +82,11 @@ suite('Auto Install Test Suite', () => {
       expect(mockInstallPackages).to.be.calledWithExactly(
         cwd,
         defaultPython,
-        false,
         'dvc'
       )
     })
 
-    it('should pass the correct params to install function if python env is used and the active env is global', async () => {
+    it('should install with a user flag if python env is used and the active env is global', async () => {
       bypassProgressCloseDelay()
       const cwd = __dirname
       stub(PythonExtension, 'getPythonExecutionDetails').resolves(['python'])
@@ -110,7 +109,7 @@ suite('Auto Install Test Suite', () => {
       expect(mockInstallPackages).to.be.calledWithExactly(
         cwd,
         defaultPython,
-        true,
+        '--user',
         'dvc'
       )
     })
@@ -138,7 +137,6 @@ suite('Auto Install Test Suite', () => {
       expect(mockInstallPackages).to.be.calledWithExactly(
         cwd,
         defaultPython,
-        false,
         'dvc'
       )
     })
@@ -202,18 +200,16 @@ suite('Auto Install Test Suite', () => {
       expect(mockInstallPackages).to.be.calledWithExactly(
         cwd,
         defaultPython,
-        false,
         'dvc'
       )
       expect(mockInstallPackages).to.be.calledWithExactly(
         cwd,
         defaultPython,
-        false,
         'dvclive'
       )
     })
 
-    it('should pass the correct params to install function if python env is used and the active env is global', async () => {
+    it('should install with a user flag if python env is used and the active env is global', async () => {
       bypassProgressCloseDelay()
       const cwd = __dirname
       stub(PythonExtension, 'getPythonExecutionDetails').resolves(['python'])
@@ -236,13 +232,13 @@ suite('Auto Install Test Suite', () => {
       expect(mockInstallPackages).to.be.calledWithExactly(
         cwd,
         defaultPython,
-        true,
+        '--user',
         'dvc'
       )
       expect(mockInstallPackages).to.be.calledWithExactly(
         cwd,
         defaultPython,
-        true,
+        '--user',
         'dvclive'
       )
     })
@@ -268,7 +264,6 @@ suite('Auto Install Test Suite', () => {
       expect(mockInstallPackages).to.be.calledWithExactly(
         cwd,
         defaultPython,
-        false,
         'dvclive'
       )
     })
@@ -298,13 +293,11 @@ suite('Auto Install Test Suite', () => {
       expect(mockInstallPackages).to.be.calledWithExactly(
         cwd,
         defaultPython,
-        false,
         'dvclive'
       )
       expect(mockInstallPackages).to.be.calledWithExactly(
         cwd,
         defaultPython,
-        false,
         'dvc'
       )
     })
