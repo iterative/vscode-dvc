@@ -129,14 +129,11 @@ export const deleteAllExistingExperiments = async () => {
 export const runModifiedExperiment = async () => {
   const workbench = await browser.getWorkbench()
   const options = await workbench.executeCommand(
-    'DVC: Modify Experiment Param(s) and Run'
+    'DVC: Modify Workspace Param(s) and Run'
   )
   await browser.waitUntil(() => options.elem.isDisplayed())
   await browser
     .action('key')
-    .down(Key.Enter)
-    .up(Key.Enter)
-    .pause(500)
     .down(Key.ArrowDown)
     .up(Key.ArrowDown)
     .down(Key.Space)

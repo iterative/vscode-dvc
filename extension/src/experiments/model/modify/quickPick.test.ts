@@ -17,7 +17,7 @@ describe('pickAndModifyParams', () => {
     mockedQuickPickManyValues.mockResolvedValueOnce(undefined)
 
     const paramsToQueue = await pickAndModifyParams([
-      { path: 'params.yaml:learning_rate', value: 2e-12 }
+      { isString: false, path: 'params.yaml:learning_rate', value: 2e-12 }
     ])
 
     expect(paramsToQueue).toBeUndefined()
@@ -25,10 +25,14 @@ describe('pickAndModifyParams', () => {
   })
 
   it('should return early if the user exits from the input box', async () => {
-    const unchanged = { path: 'params.yaml:learning_rate', value: 2e-12 }
+    const unchanged = {
+      isString: false,
+      path: 'params.yaml:learning_rate',
+      value: 2e-12
+    }
     const initialUserResponse = [
-      { path: 'params.yaml:dropout', value: 0.15 },
-      { path: 'params.yaml:process.threshold', value: 0.86 }
+      { isString: false, path: 'params.yaml:dropout', value: 0.15 },
+      { isString: false, path: 'params.yaml:process.threshold', value: 0.86 }
     ]
     mockedQuickPickManyValues.mockResolvedValueOnce(initialUserResponse)
     const firstInput = '0.16'
@@ -45,29 +49,56 @@ describe('pickAndModifyParams', () => {
   })
 
   it('should convert any selected params into the required format', async () => {
-    const unchanged = { path: 'params.yaml:learning_rate', value: 2e-12 }
+    const unchanged = {
+      isString: false,
+      path: 'params.yaml:learning_rate',
+      value: 2e-12
+    }
+
     const initialUserResponse = [
-      { path: 'params.yaml:dropout', value: 0.15 },
-      { path: 'params.yaml:process.threshold', value: 0.86 },
-      { path: 'params.yaml:code_names', value: [0, 1, 2] }
+      { isString: false, path: 'params.yaml:dropout', value: 0.15 },
+      { isString: false, path: 'params.yaml:process.threshold', value: 0.86 },
+      { isString: false, path: 'params.yaml:code_names', value: [0, 1, 2] },
+      {
+        isString: true,
+        path: 'params.yaml:transforms',
+        value: '[Pipeline: PILBase.create, Pipeline: partial -> PILBase.create]'
+      }
     ]
     mockedQuickPickManyValues.mockResolvedValueOnce(initialUserResponse)
     const firstInput = '0.16'
     const secondInput = '0.87'
     const thirdInput = '[0,1,3]'
+    const fourthInput = '[Pipeline: PILBase.create]'
     mockedGetInput.mockResolvedValueOnce(firstInput)
     mockedGetInput.mockResolvedValueOnce(secondInput)
     mockedGetInput.mockResolvedValueOnce(thirdInput)
+    mockedGetInput.mockResolvedValueOnce(fourthInput)
 
     const paramsToQueue = await pickAndModifyParams([
       unchanged,
       ...initialUserResponse
     ])
 
-    expect(mockedGetInput).toHaveBeenCalledTimes(3)
+    expect(mockedGetInput).toHaveBeenCalledTimes(4)
+    expect(mockedGetInput).toHaveBeenCalledWith(
+      'Enter a Value for params.yaml:dropout',
+      '0.15'
+    )
+
+    expect(mockedGetInput).toHaveBeenCalledWith(
+      'Enter a Value for params.yaml:process.threshold',
+      '0.86'
+    )
+
     expect(mockedGetInput).toHaveBeenCalledWith(
       'Enter a Value for params.yaml:code_names',
       '[0,1,2]'
+    )
+
+    expect(mockedGetInput).toHaveBeenCalledWith(
+      'Enter a Value for params.yaml:transforms',
+      '[Pipeline: PILBase.create, Pipeline: partial -> PILBase.create]'
     )
 
     expect(paramsToQueue).toStrictEqual([
@@ -78,8 +109,57 @@ describe('pickAndModifyParams', () => {
       '-S',
       `params.yaml:code_names=${thirdInput}`,
       '-S',
+      `params.yaml:transforms='${fourthInput}'`,
+      '-S',
       [unchanged.path, unchanged.value].join('=')
     ])
-    expect(mockedGetInput).toHaveBeenCalledTimes(3)
+  })
+
+  it('should convert any unselected params into the required format', async () => {
+    const numericValue = {
+      isString: false,
+      path: 'params.yaml:learning_rate',
+      value: 2e-12
+    }
+    const stringArrayValue = {
+      isString: true,
+      path: 'params.yaml:transforms',
+      value: '[Pipeline: PILBase.create, Pipeline: partial -> PILBase.create]'
+    }
+
+    const actualArrayValue = {
+      isString: false,
+      path: 'params.yaml:code_names',
+      value: [0, 1, 2]
+    }
+
+    const unchanged = [numericValue, stringArrayValue, actualArrayValue]
+    const initialUserResponse = {
+      isString: false,
+      path: 'params.yaml:dropout',
+      value: 0.15
+    }
+
+    mockedQuickPickManyValues.mockResolvedValueOnce([initialUserResponse])
+    const firstInput = '0.16'
+    mockedGetInput.mockResolvedValueOnce(firstInput)
+
+    const paramsToQueue = await pickAndModifyParams([
+      ...unchanged,
+      initialUserResponse
+    ])
+
+    expect(mockedGetInput).toHaveBeenCalledTimes(1)
+
+    expect(paramsToQueue).toStrictEqual([
+      '-S',
+      `params.yaml:dropout=${firstInput}`,
+      '-S',
+      [numericValue.path, numericValue.value].join('='),
+      '-S',
+      [stringArrayValue.path, `'${stringArrayValue.value}'`].join('='),
+      '-S',
+      [actualArrayValue.path, JSON.stringify(actualArrayValue.value)].join('=')
+    ])
   })
 })

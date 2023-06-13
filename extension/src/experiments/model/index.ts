@@ -345,10 +345,8 @@ export class ExperimentsModel extends ModelWithPersistence {
     return errors
   }
 
-  public getExperimentParams(id: string) {
-    const params = this.getCombinedList().find(
-      experiment => experiment.id === id
-    )?.params
+  public getWorkspaceParams() {
+    const params = this.workspace.params
 
     return collectFlatExperimentParams(params)
   }

@@ -1,4 +1,4 @@
-import { Param } from './collect'
+import { ParamWithIsString } from './collect'
 import { quickPickManyValues } from '../../../vscode/quickPick'
 import { getInput } from '../../../vscode/inputBox'
 import { Flag } from '../../../cli/dvc/constants'
@@ -6,13 +6,19 @@ import { definedAndNonEmpty } from '../../../util/array'
 import { getEnterValueTitle, Title } from '../../../vscode/title'
 import { Value } from '../../../cli/dvc/contract'
 
-const standardizeValue = (value: Value): string =>
-  typeof value === 'object' ? JSON.stringify(value) : String(value)
+const standardizeValue = (value: Value, isString: boolean): string => {
+  if (isString && typeof value === 'string') {
+    return `'${value}'`
+  }
+  return typeof value === 'object' ? JSON.stringify(value) : String(value)
+}
 
-const pickParamsToModify = (params: Param[]): Thenable<Param[] | undefined> =>
-  quickPickManyValues<Param>(
+const pickParamsToModify = (
+  params: ParamWithIsString[]
+): Thenable<ParamWithIsString[] | undefined> =>
+  quickPickManyValues<ParamWithIsString>(
     params.map(param => ({
-      description: standardizeValue(param.value),
+      description: standardizeValue(param.value, false),
       label: param.path,
       picked: false,
       value: param
@@ -21,32 +27,38 @@ const pickParamsToModify = (params: Param[]): Thenable<Param[] | undefined> =>
   )
 
 const pickNewParamValues = async (
-  paramsToModify: Param[]
+  paramsToModify: ParamWithIsString[]
 ): Promise<string[] | undefined> => {
   const args: string[] = []
-  for (const { path, value } of paramsToModify) {
+  for (const { path, value, isString } of paramsToModify) {
     const input = await getInput(
       getEnterValueTitle(path),
-      standardizeValue(value)
+      standardizeValue(value, false)
     )
     if (input === undefined) {
       return
     }
-    args.push(Flag.SET_PARAM, [path, standardizeValue(input.trim())].join('='))
+    args.push(
+      Flag.SET_PARAM,
+      [path, standardizeValue(input.trim(), isString)].join('=')
+    )
   }
   return args
 }
 
-const addUnchanged = (args: string[], unchanged: Param[]) => {
-  for (const { path, value } of unchanged) {
-    args.push(Flag.SET_PARAM, [path, standardizeValue(value)].join('='))
+const addUnchanged = (args: string[], unchanged: ParamWithIsString[]) => {
+  for (const { path, value, isString } of unchanged) {
+    args.push(
+      Flag.SET_PARAM,
+      [path, standardizeValue(value, isString)].join('=')
+    )
   }
 
   return args
 }
 
 export const pickAndModifyParams = async (
-  params: Param[]
+  params: ParamWithIsString[]
 ): Promise<string[] | undefined> => {
   const paramsToModify = await pickParamsToModify(params)
 
