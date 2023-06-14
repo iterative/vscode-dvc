@@ -73,6 +73,7 @@ const showUpgradeProgress = (
         root,
         successMessage: 'Upgraded successfully'
       })
+      return Toast.delayProgressClosing()
     } catch (error) {
       return Toast.reportProgressError(error, progress)
     }
