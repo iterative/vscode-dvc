@@ -420,7 +420,7 @@ describe('collectChanges', () => {
     }
 
     expect(changes).toStrictEqual(
-      Object.keys(workspace.data.deps || {})
+      Object.keys(workspace?.data?.deps || {})
         .map(dep => `deps:${dep}`)
         .sort()
     )

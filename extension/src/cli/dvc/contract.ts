@@ -100,7 +100,7 @@ export type ExpWithError = {
 type ExpWithData = {
   rev: string
   name?: string
-  data: ExpData
+  data?: ExpData
 }
 
 export type ExpState = ExpWithData | ExpWithError
