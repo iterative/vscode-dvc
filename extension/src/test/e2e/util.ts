@@ -1,6 +1,6 @@
 import { Key } from 'webdriverio'
 import { $$, browser } from '@wdio/globals'
-import { ViewControl } from 'wdio-vscode-service'
+import { ViewControl, Workbench } from 'wdio-vscode-service'
 import { PlotsWebview } from './pageObjects/plotsWebview.js'
 
 const findProgressBars = () => $$('.monaco-progress-container')
@@ -17,8 +17,8 @@ export const dismissAllNotifications = async (): Promise<void> => {
   await browser.waitUntil(async () => {
     const workbench = await browser.getWorkbench()
     const notifications = await workbench.getNotifications()
-    for (const n of notifications) {
-      await n.dismiss()
+    for (const notification of notifications) {
+      await notification.dismiss()
     }
     const openNotifications = await workbench.getNotifications()
     return openNotifications.length === 0
@@ -33,6 +33,50 @@ const dvcIsWorking = async (): Promise<boolean> => {
     statusBarItem =>
       statusBarItem.includes('loading~spin') && statusBarItem.includes('DVC')
   )
+}
+
+const notificationShown = async (
+  workbench: Workbench,
+  message: string
+): Promise<boolean> => {
+  const notifications = await workbench.getNotifications()
+  return notifications.some(
+    async notification => (await notification.elem.getText()) === message
+  )
+}
+
+const runDeleteCommand = async (
+  command: string,
+  nothingToDeleteMessage: string
+): Promise<void> => {
+  const workbench = await browser.getWorkbench()
+  const commandPalette = await workbench.executeCommand(command)
+
+  let nothingToDelete = false
+
+  await browser.waitUntil(async () => {
+    if (await notificationShown(workbench, nothingToDeleteMessage)) {
+      nothingToDelete = true
+      return true
+    }
+
+    return commandPalette.elem.isDisplayed()
+  })
+
+  if (nothingToDelete) {
+    return
+  }
+  await browser
+    .action('key')
+    .down(Key.Shift)
+    .down(Key.Tab)
+    .up(Key.Tab)
+    .up(Key.Shift)
+    .perform()
+
+  await browser.keys('Space')
+
+  return browser.keys('Enter')
 }
 
 export const waitForDvcToFinish = async (timeout = 60000): Promise<void> => {
@@ -100,46 +144,11 @@ export const waitForViewContainerToLoad = async (): Promise<void> => {
   )
 }
 
-export const deleteAllExistingExperiments = async () => {
-  const workbench = await browser.getWorkbench()
-
-  const deleteNonWorkspaceExperiments = await workbench.executeCommand(
-    'DVC: Remove Experiment(s)'
+export const deleteAllExistingExperiments = (): Promise<void> =>
+  runDeleteCommand(
+    'DVC: Remove Experiment(s)',
+    'There are no experiments to select.'
   )
-
-  let noExperiments = false
-
-  await browser.waitUntil(async () => {
-    const notifications = await workbench.getNotifications()
-    for (const notification of notifications) {
-      if (
-        (await notification.elem.getText()) ===
-        'There are no experiments to select.'
-      ) {
-        noExperiments = true
-        return true
-      }
-    }
-
-    return deleteNonWorkspaceExperiments.elem.isDisplayed()
-  })
-
-  if (noExperiments) {
-    return
-  }
-
-  await browser
-    .action('key')
-    .down(Key.Shift)
-    .down(Key.Tab)
-    .up(Key.Tab)
-    .up(Key.Shift)
-    .perform()
-
-  await browser.keys('Space')
-
-  return browser.keys('Enter')
-}
 
 export const runModifiedExperiment = async () => {
   const workbench = await browser.getWorkbench()
@@ -179,36 +188,11 @@ export const createCustomPlot = async (): Promise<void> => {
   return browser.keys('Enter')
 }
 
-export const deleteCustomPlot = async (): Promise<void> => {
-  const workbench = await browser.getWorkbench()
-  const removeCustomPlot = await workbench.executeCommand(
-    'DVC: Remove Custom Plot(s)'
+export const deleteCustomPlots = (): Promise<void> =>
+  runDeleteCommand(
+    'DVC: Remove Custom Plot(s)',
+    'There are no plots to remove.'
   )
-
-  let noCustomPlots = false
-
-  await browser.waitUntil(async () => {
-    const notifications = await workbench.getNotifications()
-    for (const notification of notifications) {
-      if (
-        (await notification.elem.getText()) === 'There are no plots to remove.'
-      ) {
-        noCustomPlots = true
-        return true
-      }
-    }
-
-    return removeCustomPlot.elem.isDisplayed()
-  })
-
-  if (noCustomPlots) {
-    return
-  }
-
-  await browser.keys('ArrowDown')
-  await browser.keys('Space')
-  return browser.keys('Enter')
-}
 
 export const waitForAllPlotsToRender = (
   webview: PlotsWebview,
