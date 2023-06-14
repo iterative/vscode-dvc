@@ -29,9 +29,7 @@ before('should finish loading the extension', async function () {
 after(async function () {
   this.timeout(60000)
 
-  try {
-    await deleteCustomPlot()
-  } catch {}
+  await deleteCustomPlot()
   await dismissAllNotifications()
 
   return waitForDvcToFinish()

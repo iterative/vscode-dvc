@@ -1,5 +1,5 @@
 import { Key } from 'webdriverio'
-import { $, $$, browser } from '@wdio/globals'
+import { $$, browser } from '@wdio/globals'
 import { ViewControl } from 'wdio-vscode-service'
 import { PlotsWebview } from './pageObjects/plotsWebview.js'
 
@@ -107,23 +107,38 @@ export const deleteAllExistingExperiments = async () => {
     'DVC: Remove Experiment(s)'
   )
 
-  try {
-    await browser.waitUntil(() =>
-      deleteNonWorkspaceExperiments.elem.isDisplayed()
-    )
+  let noExperiments = false
 
-    await browser
-      .action('key')
-      .down(Key.Shift)
-      .down(Key.Tab)
-      .up(Key.Tab)
-      .up(Key.Shift)
-      .perform()
+  await browser.waitUntil(async () => {
+    const notifications = await workbench.getNotifications()
+    for (const notification of notifications) {
+      if (
+        (await notification.elem.getText()) ===
+        'There are no experiments to select.'
+      ) {
+        noExperiments = true
+        return true
+      }
+    }
 
-    await browser.keys('Space')
+    return deleteNonWorkspaceExperiments.elem.isDisplayed()
+  })
 
-    return browser.keys('Enter')
-  } catch {}
+  if (noExperiments) {
+    return
+  }
+
+  await browser
+    .action('key')
+    .down(Key.Shift)
+    .down(Key.Tab)
+    .up(Key.Tab)
+    .up(Key.Shift)
+    .perform()
+
+  await browser.keys('Space')
+
+  return browser.keys('Enter')
 }
 
 export const runModifiedExperiment = async () => {
@@ -169,7 +184,27 @@ export const deleteCustomPlot = async (): Promise<void> => {
   const removeCustomPlot = await workbench.executeCommand(
     'DVC: Remove Custom Plot(s)'
   )
-  await browser.waitUntil(() => removeCustomPlot.elem.isDisplayed())
+
+  let noCustomPlots = false
+
+  await browser.waitUntil(async () => {
+    const notifications = await workbench.getNotifications()
+    for (const notification of notifications) {
+      if (
+        (await notification.elem.getText()) === 'There are no plots to remove.'
+      ) {
+        noCustomPlots = true
+        return true
+      }
+    }
+
+    return removeCustomPlot.elem.isDisplayed()
+  })
+
+  if (noCustomPlots) {
+    return
+  }
+
   await browser.keys('ArrowDown')
   await browser.keys('Space')
   return browser.keys('Enter')
@@ -195,18 +230,6 @@ export const expectAllPlotsToBeFilled = async (webview: PlotsWebview) => {
   }
 }
 
-const scrollToBottomOfScm = async () => {
-  await browser.pause(10000)
-  const scmView = await $("div[id='workbench.view.scm']")
-  const scrollable = await scmView.$("div[role='presentation']")
-
-  return browser
-    .action('wheel')
-    .pause(500)
-    .scroll({ ...(await scrollable.getLocation()), deltaY: 40000 })
-    .perform()
-}
-
 export const findScmTreeItems = async () => {
   const workbench = await browser.getWorkbench()
   const activityBar = workbench.getActivityBar()
@@ -214,7 +237,13 @@ export const findScmTreeItems = async () => {
 
   await sourceControlIcon?.openView()
 
-  await scrollToBottomOfScm()
+  const visibleItems = await findCurrentTreeItems()
+
+  await visibleItems[visibleItems.length - 1].click()
+
+  for (let i = 0; i < 20; i++) {
+    await browser.keys('ArrowDown')
+  }
 
   return findCurrentTreeItems()
 }
