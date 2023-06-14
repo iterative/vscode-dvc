@@ -17,7 +17,7 @@ describe('pickAndModifyParams', () => {
     mockedQuickPickManyValues.mockResolvedValueOnce(undefined)
 
     const paramsToQueue = await pickAndModifyParams([
-      { isString: false, path: 'params.yaml:learning_rate', value: 2e-12 }
+      { path: 'params.yaml:learning_rate', value: 2e-12 }
     ])
 
     expect(paramsToQueue).toBeUndefined()
@@ -26,13 +26,12 @@ describe('pickAndModifyParams', () => {
 
   it('should return early if the user exits from the input box', async () => {
     const unchanged = {
-      isString: false,
       path: 'params.yaml:learning_rate',
       value: 2e-12
     }
     const initialUserResponse = [
-      { isString: false, path: 'params.yaml:dropout', value: 0.15 },
-      { isString: false, path: 'params.yaml:process.threshold', value: 0.86 }
+      { path: 'params.yaml:dropout', value: 0.15 },
+      { path: 'params.yaml:process.threshold', value: 0.86 }
     ]
     mockedQuickPickManyValues.mockResolvedValueOnce(initialUserResponse)
     const firstInput = '0.16'
@@ -50,37 +49,38 @@ describe('pickAndModifyParams', () => {
 
   it('should convert any selected params into the required format', async () => {
     const unchanged = {
-      isString: false,
       path: 'params.yaml:learning_rate',
       value: 2e-12
     }
 
     const initialUserResponse = [
-      { isString: false, path: 'params.yaml:dropout', value: 0.15 },
-      { isString: false, path: 'params.yaml:process.threshold', value: 0.86 },
-      { isString: false, path: 'params.yaml:code_names', value: [0, 1, 2] },
+      { path: 'params.yaml:dropout', value: 0.15 },
+      { path: 'params.yaml:process.threshold', value: 0.86 },
+      { path: 'params.yaml:code_names', value: [0, 1, 2] },
+      { path: 'params.yaml:arch', value: 'resnet18' },
       {
-        isString: true,
         path: 'params.yaml:transforms',
         value: '[Pipeline: PILBase.create, Pipeline: partial -> PILBase.create]'
       }
     ]
     mockedQuickPickManyValues.mockResolvedValueOnce(initialUserResponse)
-    const firstInput = '0.16'
-    const secondInput = '0.87'
-    const thirdInput = '[0,1,3]'
-    const fourthInput = '[Pipeline: PILBase.create]'
-    mockedGetInput.mockResolvedValueOnce(firstInput)
-    mockedGetInput.mockResolvedValueOnce(secondInput)
-    mockedGetInput.mockResolvedValueOnce(thirdInput)
-    mockedGetInput.mockResolvedValueOnce(fourthInput)
+    const input1 = '0.16'
+    const input2 = '0.87,0.88'
+    const input3 = '[0,1,3]'
+    const input4 = 'resnet18,shufflenet_v2_x2_0'
+    const input5 = "'[Pipeline: PILBase.create]'" // user needs to quote
+    mockedGetInput.mockResolvedValueOnce(input1)
+    mockedGetInput.mockResolvedValueOnce(input2)
+    mockedGetInput.mockResolvedValueOnce(input3)
+    mockedGetInput.mockResolvedValueOnce(input4)
+    mockedGetInput.mockResolvedValueOnce(input5)
 
     const paramsToQueue = await pickAndModifyParams([
       unchanged,
       ...initialUserResponse
     ])
 
-    expect(mockedGetInput).toHaveBeenCalledTimes(4)
+    expect(mockedGetInput).toHaveBeenCalledTimes(5)
     expect(mockedGetInput).toHaveBeenCalledWith(
       'Enter a Value for params.yaml:dropout',
       '0.15'
@@ -97,19 +97,26 @@ describe('pickAndModifyParams', () => {
     )
 
     expect(mockedGetInput).toHaveBeenCalledWith(
+      'Enter a Value for params.yaml:arch',
+      'resnet18'
+    )
+
+    expect(mockedGetInput).toHaveBeenCalledWith(
       'Enter a Value for params.yaml:transforms',
       '[Pipeline: PILBase.create, Pipeline: partial -> PILBase.create]'
     )
 
     expect(paramsToQueue).toStrictEqual([
       '-S',
-      `params.yaml:dropout=${firstInput}`,
+      `params.yaml:dropout=${input1}`,
       '-S',
-      `params.yaml:process.threshold=${secondInput}`,
+      `params.yaml:process.threshold=${input2}`,
       '-S',
-      `params.yaml:code_names=${thirdInput}`,
+      `params.yaml:code_names=${input3}`,
       '-S',
-      `params.yaml:transforms='${fourthInput}'`
+      `params.yaml:arch=${input4}`,
+      '-S',
+      `params.yaml:transforms=${input5}`
     ])
   })
 })

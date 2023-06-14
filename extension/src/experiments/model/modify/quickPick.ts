@@ -1,4 +1,4 @@
-import { ParamWithIsString } from './collect'
+import { Param } from './collect'
 import { quickPickManyValues } from '../../../vscode/quickPick'
 import { getInput } from '../../../vscode/inputBox'
 import { Flag } from '../../../cli/dvc/constants'
@@ -6,20 +6,12 @@ import { definedAndNonEmpty } from '../../../util/array'
 import { getEnterValueTitle, Title } from '../../../vscode/title'
 import { Value } from '../../../cli/dvc/contract'
 
-const standardizeValue = (
-  value: Value,
-  wrapStringParamForCli = false
-): string => {
-  if (wrapStringParamForCli && typeof value === 'string') {
-    return `'${value}'`
-  }
+const standardizeValue = (value: Value): string => {
   return typeof value === 'object' ? JSON.stringify(value) : String(value)
 }
 
-const pickParamsToModify = (
-  params: ParamWithIsString[]
-): Thenable<ParamWithIsString[] | undefined> =>
-  quickPickManyValues<ParamWithIsString>(
+const pickParamsToModify = (params: Param[]): Thenable<Param[] | undefined> =>
+  quickPickManyValues<Param>(
     params.map(param => ({
       description: standardizeValue(param.value),
       label: param.path,
@@ -30,10 +22,10 @@ const pickParamsToModify = (
   )
 
 const pickNewParamValues = async (
-  paramsToModify: ParamWithIsString[]
+  paramsToModify: Param[]
 ): Promise<string[] | undefined> => {
   const args: string[] = []
-  for (const { path, value, isString } of paramsToModify) {
+  for (const { path, value } of paramsToModify) {
     const input = await getInput(
       getEnterValueTitle(path),
       standardizeValue(value)
@@ -41,16 +33,13 @@ const pickNewParamValues = async (
     if (input === undefined) {
       return
     }
-    args.push(
-      Flag.SET_PARAM,
-      [path, standardizeValue(input.trim(), isString)].join('=')
-    )
+    args.push(Flag.SET_PARAM, [path, standardizeValue(input.trim())].join('='))
   }
   return args
 }
 
 export const pickAndModifyParams = async (
-  params: ParamWithIsString[]
+  params: Param[]
 ): Promise<string[] | undefined> => {
   const paramsToModify = await pickParamsToModify(params)
 
