@@ -36,7 +36,7 @@ const checkCLIVersion = (currentSemVer: {
 
   const isBehindMinVersion =
     currentMajor < minMajor ||
-    currentMinor < minMinor ||
+    (currentMajor === minMajor && currentMinor < minMinor) ||
     (currentMinor === minMinor && currentPatch < Number(minPatch))
 
   if (isBehindMinVersion) {
@@ -80,5 +80,8 @@ export const isAboveLatestTestedVersion = (version: string | undefined) => {
     LATEST_TESTED_CLI_VERSION
   ) as ParsedSemver
 
-  return currentMajor === latestTestedMajor && currentMinor > latestTestedMinor
+  return (
+    currentMajor > latestTestedMajor ||
+    (currentMajor === latestTestedMajor && currentMinor > latestTestedMinor)
+  )
 }

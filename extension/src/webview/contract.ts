@@ -57,9 +57,9 @@ export enum MessageFromWebviewType {
   REMOTE_REMOVE = 'remote-remove',
   REMOVE_CUSTOM_PLOTS = 'remove-custom-plots',
   REMOVE_STUDIO_TOKEN = 'remove-studio-token',
-  MODIFY_EXPERIMENT_PARAMS_AND_QUEUE = 'modify-experiment-params-and-queue',
-  MODIFY_EXPERIMENT_PARAMS_AND_RUN = 'modify-experiment-params-and-run',
-  MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN = 'modify-experiment-params-reset-and-run',
+  MODIFY_WORKSPACE_PARAMS_AND_QUEUE = 'modify-workspace-params-and-queue',
+  MODIFY_WORKSPACE_PARAMS_AND_RUN = 'modify-workspace-params-and-run',
+  MODIFY_WORKSPACE_PARAMS_RESET_AND_RUN = 'modify-workspace-params-reset-and-run',
   SET_EXPERIMENTS_HEADER_HEIGHT = 'update-experiments-header-height',
   CHECK_CLI_COMPATIBLE = 'check-cli-compatible',
   INITIALIZE_DVC = 'initialize-dvc',
@@ -133,16 +133,13 @@ export type MessageFromWebview =
       payload: string
     }
   | {
-      type: MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE
-      payload: string
+      type: MessageFromWebviewType.MODIFY_WORKSPACE_PARAMS_AND_QUEUE
     }
   | {
-      type: MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_AND_RUN
-      payload: string
+      type: MessageFromWebviewType.MODIFY_WORKSPACE_PARAMS_AND_RUN
     }
   | {
-      type: MessageFromWebviewType.MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN
-      payload: string
+      type: MessageFromWebviewType.MODIFY_WORKSPACE_PARAMS_RESET_AND_RUN
     }
   | {
       type: MessageFromWebviewType.REMOVE_EXPERIMENT

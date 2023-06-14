@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3] - 2023-06-14
+
+### 🐛 Bug Fixes
+
+- Fix custom plot tooltips [#4102](https://github.com/iterative/vscode-dvc/pull/4102) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.0.0) [#4103](https://github.com/iterative/vscode-dvc/pull/4103) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.0.2] - 2023-06-13
+
+### 🐛 Bug Fixes
+
+- Correctly handle string arrays in modify and commands [#4092](https://github.com/iterative/vscode-dvc/pull/4092) by [@mattseddon](https://github.com/mattseddon)
+- Fix broken experiments table column shadow [#4099](https://github.com/iterative/vscode-dvc/pull/4099) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Drop commit/experiment support for modify and run/queue (only workspace supported as a base) [#4094](https://github.com/iterative/vscode-dvc/pull/4094) by [@mattseddon](https://github.com/mattseddon)
+- Only use selected params for modify and commands [#4095](https://github.com/iterative/vscode-dvc/pull/4095) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.1] - 2023-06-12
 
 ### 🚀 New Features and Enhancements

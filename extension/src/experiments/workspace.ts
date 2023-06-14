@@ -173,10 +173,9 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.runCommand(AvailableCommands.EXP_REMOVE, cwd, ...ids)
   }
 
-  public async modifyExperimentParamsAndRun(
+  public async modifyWorkspaceParamsAndRun(
     commandId: ModifiedExperimentAndRunCommandId,
-    overrideRoot?: string,
-    overrideId?: string
+    overrideRoot?: string
   ) {
     const cwd = await this.getDvcRoot(overrideRoot)
     if (!cwd) {
@@ -193,13 +192,10 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    return await repository.modifyExperimentParamsAndRun(commandId, overrideId)
+    return await repository.modifyWorkspaceParamsAndRun(commandId)
   }
 
-  public async modifyExperimentParamsAndQueue(
-    overrideRoot?: string,
-    overrideId?: string
-  ) {
+  public async modifyWorkspaceParamsAndQueue(overrideRoot?: string) {
     const cwd = await this.getDvcRoot(overrideRoot)
     if (!cwd) {
       return
@@ -213,7 +209,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    return await repository.modifyExperimentParamsAndQueue(overrideId)
+    return await repository.modifyWorkspaceParamsAndQueue()
   }
 
   public async getCwdThenRun(commandId: CommandId) {

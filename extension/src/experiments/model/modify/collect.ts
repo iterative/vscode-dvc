@@ -7,8 +7,10 @@ export type Param = {
   value: Value
 }
 
+export type ParamWithIsString = Param & { isString: boolean }
+
 const collectFromParamsFile = (
-  acc: { path: string; value: Value }[],
+  acc: ParamWithIsString[],
   key: string | undefined,
   value: Value | ValueTree,
   ancestors: string[] = []
@@ -24,13 +26,13 @@ const collectFromParamsFile = (
 
   const path = appendColumnToPath(...pathArray)
 
-  acc.push({ path, value })
+  acc.push({ isString: typeof value === 'string', path, value })
 }
 
 export const collectFlatExperimentParams = (
   params: MetricOrParamColumns = {}
 ) => {
-  const acc: { path: string; value: string | number | boolean }[] = []
+  const acc: ParamWithIsString[] = []
   for (const file of Object.keys(params)) {
     collectFromParamsFile(acc, undefined, params[file], [file])
   }

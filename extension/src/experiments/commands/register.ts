@@ -1,5 +1,4 @@
 import { getBranchExperimentCommand, getPushExperimentCommand } from '.'
-import { pickGarbageCollectionFlags } from '../quickPick'
 import { WorkspaceExperiments } from '../workspace'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import {
@@ -28,64 +27,61 @@ const registerExperimentCwdCommands = (
   )
 
   internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.MODIFY_EXPERIMENT_PARAMS_AND_QUEUE,
-    () => experiments.modifyExperimentParamsAndQueue()
+    RegisteredCliCommands.MODIFY_WORKSPACE_PARAMS_AND_QUEUE,
+    () => experiments.modifyWorkspaceParamsAndQueue()
   )
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_QUEUE,
-    ({ dvcRoot, id }: ExperimentDetails) =>
-      experiments.modifyExperimentParamsAndQueue(dvcRoot, id)
+    ({ dvcRoot }: ExperimentDetails) =>
+      experiments.modifyWorkspaceParamsAndQueue(dvcRoot)
   )
 
-  const modifyExperimentParamsAndRun = () =>
-    experiments.modifyExperimentParamsAndRun(AvailableCommands.EXPERIMENT_RUN)
+  const modifyWorkspaceParamsAndRun = () =>
+    experiments.modifyWorkspaceParamsAndRun(AvailableCommands.EXPERIMENT_RUN)
 
   internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.MODIFY_EXPERIMENT_PARAMS_AND_RESUME,
-    modifyExperimentParamsAndRun
+    RegisteredCliCommands.MODIFY_WORKSPACE_PARAMS_AND_RESUME,
+    modifyWorkspaceParamsAndRun
   )
 
   internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.MODIFY_EXPERIMENT_PARAMS_AND_RUN,
-    modifyExperimentParamsAndRun
+    RegisteredCliCommands.MODIFY_WORKSPACE_PARAMS_AND_RUN,
+    modifyWorkspaceParamsAndRun
   )
 
-  const modifyExperimentParamsAndRunFromView = ({
-    dvcRoot,
-    id
+  const modifyWorkspaceParamsAndRunFromView = ({
+    dvcRoot
   }: ExperimentDetails) =>
-    experiments.modifyExperimentParamsAndRun(
+    experiments.modifyWorkspaceParamsAndRun(
       AvailableCommands.EXPERIMENT_RUN,
-      dvcRoot,
-      id
+      dvcRoot
     )
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_RESUME,
-    modifyExperimentParamsAndRunFromView
+    modifyWorkspaceParamsAndRunFromView
   )
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_RUN,
-    modifyExperimentParamsAndRunFromView
+    modifyWorkspaceParamsAndRunFromView
   )
 
   internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.MODIFY_EXPERIMENT_PARAMS_RESET_AND_RUN,
+    RegisteredCliCommands.MODIFY_WORKSPACE_PARAMS_RESET_AND_RUN,
     () =>
-      experiments.modifyExperimentParamsAndRun(
+      experiments.modifyWorkspaceParamsAndRun(
         AvailableCommands.EXPERIMENT_RESET_AND_RUN
       )
   )
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_RESET_AND_RUN,
-    ({ dvcRoot, id }: ExperimentDetails) =>
-      experiments.modifyExperimentParamsAndRun(
+    ({ dvcRoot }: ExperimentDetails) =>
+      experiments.modifyWorkspaceParamsAndRun(
         AvailableCommands.EXPERIMENT_RESET_AND_RUN,
-        dvcRoot,
-        id
+        dvcRoot
       )
   )
 
@@ -150,15 +146,6 @@ const registerExperimentQuickPickCommands = (
   internalCommands: InternalCommands,
   setup: Setup
 ): void => {
-  internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_GARBAGE_COLLECT,
-    () =>
-      experiments.getCwdAndQuickPickThenRun(
-        AvailableCommands.EXP_GARBAGE_COLLECT,
-        pickGarbageCollectionFlags
-      )
-  )
-
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_FILTER_ADD,
     (context: Context) => experiments.addFilter(getDvcRootFromContext(context))
