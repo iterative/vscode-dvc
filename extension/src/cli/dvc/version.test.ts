@@ -146,10 +146,10 @@ describe('isVersionCompatible', () => {
     expect(isCompatible).toStrictEqual(CliCompatible.NO_INCOMPATIBLE)
   })
 
-  it('should return incompatible if the provided major version is above the expected major version', () => {
+  it('should return compatible if the CLI is a major version ahead of the current min version', () => {
     const isCompatible = isVersionCompatible('3.0.0')
 
-    expect(isCompatible).toStrictEqual(CliCompatible.NO_INCOMPATIBLE)
+    expect(isCompatible).toStrictEqual(CliCompatible.YES)
   })
 
   it('should return cannot verify if the provided version is malformed', () => {
@@ -204,5 +204,11 @@ describe('isAboveLatestTestedVersion', () => {
     const result = isAboveLatestTestedVersion(MIN_CLI_VERSION)
 
     expect(result).toStrictEqual(false)
+  })
+
+  it('should return true if the version is a major version ahead of the latest tested version', () => {
+    const result = isAboveLatestTestedVersion('3.0.0')
+
+    expect(result).toStrictEqual(true)
   })
 })
