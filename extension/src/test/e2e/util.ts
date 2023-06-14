@@ -1,5 +1,5 @@
 import { Key } from 'webdriverio'
-import { $$, browser } from '@wdio/globals'
+import { $, $$, browser } from '@wdio/globals'
 import { ViewControl } from 'wdio-vscode-service'
 import { PlotsWebview } from './pageObjects/plotsWebview.js'
 
@@ -142,7 +142,10 @@ export const runModifiedExperiment = async () => {
     .up(Key.Enter)
     .pause(100)
     .perform()
-  await browser.keys([...'0.005', 'Enter'])
+
+  const nonCachedParam = `0.00${Date.now()}`
+
+  await browser.keys([...nonCachedParam, 'Enter'])
   return workbench.executeCommand('DVC: Show Experiments')
 }
 
@@ -192,12 +195,26 @@ export const expectAllPlotsToBeFilled = async (webview: PlotsWebview) => {
   }
 }
 
+const scrollToBottomOfScm = async () => {
+  await browser.pause(10000)
+  const scmView = await $("div[id='workbench.view.scm']")
+  const scrollable = await scmView.$("div[role='presentation']")
+
+  return browser
+    .action('wheel')
+    .pause(500)
+    .scroll({ ...(await scrollable.getLocation()), deltaY: 40000 })
+    .perform()
+}
+
 export const findScmTreeItems = async () => {
-  const workspace = await browser.getWorkbench()
-  const activityBar = workspace.getActivityBar()
+  const workbench = await browser.getWorkbench()
+  const activityBar = workbench.getActivityBar()
   const sourceControlIcon = await activityBar.getViewControl('Source Control')
 
   await sourceControlIcon?.openView()
+
+  await scrollToBottomOfScm()
 
   return findCurrentTreeItems()
 }

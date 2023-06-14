@@ -230,12 +230,16 @@ describe('Source Control View', function () {
           const tooltip = await findDecorationTooltip(treeItem)
           expect(tooltip).toBeTruthy()
         }
-        return dvcTreeItemLabels.length > 0
+        return expectedScmItemLabels.length === dvcTreeItemLabels.length
       },
       {
         interval: 5000,
         timeout: 60000
       }
     )
+
+    expectedScmItemLabels.sort()
+    dvcTreeItemLabels.sort()
+    expect(expectedScmItemLabels).toStrictEqual(dvcTreeItemLabels)
   })
 })
