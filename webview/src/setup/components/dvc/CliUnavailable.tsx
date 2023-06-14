@@ -9,6 +9,7 @@ import {
   setupWorkspace,
   updatePythonEnvironment
 } from '../../util/messages'
+import { Warning } from '../../../shared/components/icons'
 
 export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
   const { pythonBinPath, isPythonExtensionUsed, isPythonEnvironmentGlobal } =
@@ -26,7 +27,13 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
       <p>
         {installationSentence} Auto-install (pip) DVC & DVCLive with{' '}
         {pythonBinPath}{' '}
-        {isPythonEnvironmentGlobal && '(Warning, not a virtual environment)'}.
+        {isPythonEnvironmentGlobal && (
+          <>
+            (<Warning className={styles.inlineWarningSvg} />{' '}
+            <span>Not a virtual environment)</span>
+          </>
+        )}
+        .
       </p>
       <div className={styles.sideBySideButtons}>
         <Button onClick={installDvc} text="Install (pip)" />
@@ -39,9 +46,8 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
   ) : (
     <>
       <p>
-        {installationSentence} It can also help to install needed packages via
-        pip. Unfortunately, DVC & DVCLive cannot be auto-installed as Python was
-        not located.
+        {installationSentence} DVC & DVCLive cannot be auto-installed as Python
+        was not located.
       </p>
       <Button onClick={setupWorkspace} text="Locate DVC" />
     </>

@@ -238,12 +238,9 @@ describe('App', () => {
       })
 
       const button = screen.getByText('Set Env')
-      const sentenceReg = new RegExp(
-        `Auto-install \\(pip\\) DVC & DVCLive with ${defaultInterpreter} \\(Warning, not a virtual environment\\).`
-      )
 
       expect(button).toBeInTheDocument()
-      expect(screen.getByText(sentenceReg)).toBeInTheDocument()
+      expect(screen.getByText('Not a virtual environment)')).toBeInTheDocument()
     })
 
     it('should not show a screen saying that DVC is not installed if the cli is available', () => {
