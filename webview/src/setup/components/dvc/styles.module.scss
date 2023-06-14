@@ -32,6 +32,13 @@
   }
 }
 
+.inlineWarningSvg {
+  vertical-align: middle;
+  fill: $warn-color;
+  width: 16px;
+  height: 16px;
+}
+
 .buttonAsLink {
   @extend %buttonAsLink;
 

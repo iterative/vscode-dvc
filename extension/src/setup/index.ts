@@ -60,7 +60,11 @@ import { Title } from '../vscode/title'
 import { getDVCAppDir } from '../util/appdirs'
 import { getOptions } from '../cli/dvc/options'
 import { isAboveLatestTestedVersion } from '../cli/dvc/version'
-import { createPythonEnv, selectPythonInterpreter } from '../extensions/python'
+import {
+  createPythonEnv,
+  isActivePythonEnvGlobal,
+  selectPythonInterpreter
+} from '../extensions/python'
 
 export class Setup
   extends BaseRepository<TSetupData>
@@ -396,12 +400,16 @@ export class Setup
 
     const pythonBinPath = await findPythonBinForInstall()
 
+    const isPythonEnvironmentGlobal =
+      isPythonExtensionUsed && (await isActivePythonEnvGlobal())
+
     this.webviewMessages.sendWebviewMessage({
       canGitInitialize,
       cliCompatible: this.getCliCompatible(),
       dvcCliDetails,
       hasData,
       isAboveLatestTestedVersion: isAboveLatestTestedVersion(this.cliVersion),
+      isPythonEnvironmentGlobal,
       isPythonExtensionUsed,
       isStudioConnected: this.studioIsConnected,
       needsGitCommit,

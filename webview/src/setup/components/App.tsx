@@ -20,6 +20,7 @@ import {
   updateCliCompatible,
   updateDvcCliDetails,
   updateIsAboveLatestTestedVersion,
+  updateIsPythonEnvironmentGlobal,
   updateIsPythonExtensionUsed,
   updateNeedsGitInitialized,
   updateProjectInitialized,
@@ -81,6 +82,11 @@ export const feedStore = (
         continue
       case 'hasData':
         dispatch(updateExperimentsHasData(data.data.hasData))
+        continue
+      case 'isPythonEnvironmentGlobal':
+        dispatch(
+          updateIsPythonEnvironmentGlobal(data.data.isPythonEnvironmentGlobal)
+        )
         continue
       case 'isPythonExtensionUsed':
         dispatch(updateIsPythonExtensionUsed(data.data.isPythonExtensionUsed))

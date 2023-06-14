@@ -21,7 +21,7 @@ export const DvcEnvCommandRow: React.FC<DvcEnvCommandRowProps> = ({
       <span className={styles.command}>{commandText}</span>
       <span className={styles.actions}>
         <button className={styles.buttonAsLink} onClick={setupWorkspace}>
-          Configure
+          Locate DVC
         </button>
         {isPythonExtensionUsed && (
           <>
@@ -30,7 +30,7 @@ export const DvcEnvCommandRow: React.FC<DvcEnvCommandRowProps> = ({
               className={styles.buttonAsLink}
               onClick={updatePythonEnvironment}
             >
-              Update Env
+              Set Env
             </button>
           </>
         )}

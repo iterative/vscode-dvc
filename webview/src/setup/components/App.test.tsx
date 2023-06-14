@@ -31,6 +31,7 @@ const DEFAULT_DATA = {
   },
   hasData: false,
   isAboveLatestTestedVersion: false,
+  isPythonEnvironmentGlobal: false,
   isPythonExtensionUsed: false,
   isStudioConnected: false,
   needsGitCommit: false,
@@ -161,7 +162,7 @@ describe('App', () => {
       })
 
       const sentenceReg = new RegExp(
-        `DVC & DVCLive can be auto-installed with ${defaultInterpreter}.`
+        `Auto-install \\(pip\\) DVC & DVCLive with ${defaultInterpreter}`
       )
 
       expect(screen.getByText(sentenceReg)).toBeInTheDocument()
@@ -178,7 +179,7 @@ describe('App', () => {
         pythonBinPath: 'python'
       })
 
-      const button = screen.getByText('Configure')
+      const button = screen.getByText('Locate DVC')
       fireEvent.click(button)
 
       expect(mockPostMessage).toHaveBeenCalledWith({
@@ -197,7 +198,7 @@ describe('App', () => {
         pythonBinPath: 'python'
       })
 
-      const button = screen.getByText('Update Env')
+      const button = screen.getByText('Set Env')
       fireEvent.click(button)
 
       expect(mockPostMessage).toHaveBeenCalledWith({
@@ -221,6 +222,25 @@ describe('App', () => {
       expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.INSTALL_DVC
       })
+    })
+
+    it('should let the user auto-install DVC but warn the user that their selected env is global when the Python extension is installed', () => {
+      const defaultInterpreter = 'python'
+      renderApp({
+        cliCompatible: undefined,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: undefined
+        },
+        isPythonEnvironmentGlobal: true,
+        isPythonExtensionUsed: true,
+        pythonBinPath: defaultInterpreter
+      })
+
+      const button = screen.getByText('Set Env')
+
+      expect(button).toBeInTheDocument()
+      expect(screen.getByText('Not a virtual environment)')).toBeInTheDocument()
     })
 
     it('should not show a screen saying that DVC is not installed if the cli is available', () => {
@@ -354,14 +374,14 @@ describe('App', () => {
       expect(within(envDetails).getByText(command)).toBeInTheDocument()
     })
 
-    it('should show the user the command used to run DVC with a "Configure" button if dvc is installed without the python extension', () => {
+    it('should show the user the command used to run DVC with a "Locate DVC" button if dvc is installed without the python extension', () => {
       renderApp()
 
       const envDetails = screen.getByTestId('dvc-env-details')
 
       expect(within(envDetails).getByText('Command:')).toBeInTheDocument()
 
-      const configureButton = within(envDetails).getByText('Configure')
+      const configureButton = within(envDetails).getByText('Locate DVC')
       const selectButton = within(envDetails).queryByText(
         'Select Python Interpreter'
       )
@@ -376,7 +396,7 @@ describe('App', () => {
       })
     })
 
-    it('should show the user the command used to run DVC with "Configure" and "Update Env" buttons if dvc is installed with the python extension', () => {
+    it('should show the user the command used to run DVC with "Locate DVC" and "Set Env" buttons if dvc is installed with the python extension', () => {
       renderApp({
         isPythonExtensionUsed: true
       })
@@ -385,8 +405,8 @@ describe('App', () => {
 
       expect(within(envDetails).getByText('Command:')).toBeInTheDocument()
 
-      const configureButton = within(envDetails).getByText('Configure')
-      const selectButton = within(envDetails).getByText('Update Env')
+      const configureButton = within(envDetails).getByText('Locate DVC')
+      const selectButton = within(envDetails).getByText('Set Env')
 
       expect(configureButton).toBeInTheDocument()
       expect(selectButton).toBeInTheDocument()
