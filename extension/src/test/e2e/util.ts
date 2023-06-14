@@ -104,26 +104,26 @@ export const deleteAllExistingExperiments = async () => {
   const workbench = await browser.getWorkbench()
 
   const deleteNonWorkspaceExperiments = await workbench.executeCommand(
-    'DVC: Garbage Collect Experiments'
-  )
-  await browser.waitUntil(() =>
-    deleteNonWorkspaceExperiments.elem.isDisplayed()
-  )
-  await browser.keys('Enter')
-
-  const deleteAllNonTagExperiments = await workbench.executeCommand(
-    'DVC: Garbage Collect Experiments'
+    'DVC: Remove Experiment(s)'
   )
 
-  await browser.waitUntil(() => deleteAllNonTagExperiments.elem.isDisplayed())
+  try {
+    await browser.waitUntil(() =>
+      deleteNonWorkspaceExperiments.elem.isDisplayed()
+    )
 
-  const tagOption = 'tags'
-  await browser.keys([...tagOption, 'ArrowDown', 'Space', 'ArrowUp'])
-  for (let i = 0; i < tagOption.length; i++) {
-    await browser.keys('Backspace')
-  }
-  await browser.keys(['w', 'o', 'ArrowDown', 'Space'])
-  return browser.keys('Enter')
+    await browser
+      .action('key')
+      .down(Key.Shift)
+      .down(Key.Tab)
+      .up(Key.Tab)
+      .up(Key.Shift)
+      .perform()
+
+    await browser.keys('Space')
+
+    return browser.keys('Enter')
+  } catch {}
 }
 
 export const runModifiedExperiment = async () => {

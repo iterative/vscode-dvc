@@ -1,5 +1,4 @@
 import { getBranchExperimentCommand, getPushExperimentCommand } from '.'
-import { pickGarbageCollectionFlags } from '../quickPick'
 import { WorkspaceExperiments } from '../workspace'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import {
@@ -147,15 +146,6 @@ const registerExperimentQuickPickCommands = (
   internalCommands: InternalCommands,
   setup: Setup
 ): void => {
-  internalCommands.registerExternalCliCommand(
-    RegisteredCliCommands.EXPERIMENT_GARBAGE_COLLECT,
-    () =>
-      experiments.getCwdAndQuickPickThenRun(
-        AvailableCommands.EXP_GARBAGE_COLLECT,
-        pickGarbageCollectionFlags
-      )
-  )
-
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_FILTER_ADD,
     (context: Context) => experiments.addFilter(getDvcRootFromContext(context))
