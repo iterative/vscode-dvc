@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3] - 2023-06-14
+
+### 🐛 Bug Fixes
+
+- Fix custom plot tooltips [#4102](https://github.com/iterative/vscode-dvc/pull/4102) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.0.0) [#4103](https://github.com/iterative/vscode-dvc/pull/4103) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.2] - 2023-06-13
 
 ### 🐛 Bug Fixes
