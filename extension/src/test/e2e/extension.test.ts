@@ -4,7 +4,7 @@ import {
   closeAllEditors,
   createCustomPlot,
   deleteAllExistingExperiments,
-  deleteCustomPlot,
+  deleteCustomPlots,
   dismissAllNotifications,
   expectAllPlotsToBeFilled,
   findDecorationTooltip,
@@ -29,9 +29,7 @@ before('should finish loading the extension', async function () {
 after(async function () {
   this.timeout(60000)
 
-  try {
-    await deleteCustomPlot()
-  } catch {}
+  await deleteCustomPlots()
   await dismissAllNotifications()
 
   return waitForDvcToFinish()
@@ -175,7 +173,7 @@ describe('Plots Webview', function () {
     await webview.unfocus()
     await closeAllEditors()
 
-    await deleteCustomPlot()
+    await deleteCustomPlots()
     await workbench.executeCommand('DVC: Show Plots')
 
     await waitForDvcToFinish()

@@ -393,13 +393,8 @@ export class Experiments extends BaseRepository<TableData> {
     )
   }
 
-  public async pickAndModifyParams(overrideId?: string) {
-    const id = await this.getExperimentId(overrideId)
-    if (!id) {
-      return
-    }
-
-    const params = this.experiments.getExperimentParams(id)
+  public pickAndModifyParams() {
+    const params = this.experiments.getWorkspaceParams()
 
     if (!params) {
       return
@@ -439,11 +434,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getRevisionIds()
   }
 
-  public async modifyExperimentParamsAndRun(
-    commandId: ModifiedExperimentAndRunCommandId,
-    experimentId?: string
+  public async modifyWorkspaceParamsAndRun(
+    commandId: ModifiedExperimentAndRunCommandId
   ) {
-    const paramsToModify = await this.pickAndModifyParams(experimentId)
+    const paramsToModify = await this.pickAndModifyParams()
     if (!paramsToModify) {
       return
     }
@@ -456,8 +450,8 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
-  public async modifyExperimentParamsAndQueue(experimentId?: string) {
-    const paramsToModify = await this.pickAndModifyParams(experimentId)
+  public async modifyWorkspaceParamsAndQueue() {
+    const paramsToModify = await this.pickAndModifyParams()
     if (!paramsToModify) {
       return
     }

@@ -5,7 +5,6 @@ import {
   ExperimentFlag,
   ExperimentSubCommand,
   Flag,
-  GcPreserveFlag,
   QueueSubCommand
 } from './constants'
 import { typeCheckCommands } from '..'
@@ -18,7 +17,6 @@ export const autoRegisteredCommands = {
   COMMIT: 'commit',
   EXP_APPLY: 'expApply',
   EXP_BRANCH: 'expBranch',
-  EXP_GARBAGE_COLLECT: 'expGarbageCollect',
   EXP_PUSH: 'expPush',
   EXP_QUEUE: 'expRunQueue',
   EXP_REMOVE: 'expRemove',
@@ -68,15 +66,6 @@ export class DvcExecutor extends DvcCli {
       ExperimentSubCommand.BRANCH,
       experimentName,
       branchName
-    )
-  }
-
-  public expGarbageCollect(cwd: string, ...preserveFlags: GcPreserveFlag[]) {
-    return this.executeExperimentProcess(
-      cwd,
-      ExperimentSubCommand.GARBAGE_COLLECT,
-      Flag.FORCE,
-      ...preserveFlags
     )
   }
 

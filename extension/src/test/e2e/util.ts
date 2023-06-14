@@ -1,6 +1,6 @@
 import { Key } from 'webdriverio'
 import { $$, browser } from '@wdio/globals'
-import { ViewControl } from 'wdio-vscode-service'
+import { ViewControl, Workbench } from 'wdio-vscode-service'
 import { PlotsWebview } from './pageObjects/plotsWebview.js'
 
 const findProgressBars = () => $$('.monaco-progress-container')
@@ -17,8 +17,8 @@ export const dismissAllNotifications = async (): Promise<void> => {
   await browser.waitUntil(async () => {
     const workbench = await browser.getWorkbench()
     const notifications = await workbench.getNotifications()
-    for (const n of notifications) {
-      await n.dismiss()
+    for (const notification of notifications) {
+      await notification.dismiss()
     }
     const openNotifications = await workbench.getNotifications()
     return openNotifications.length === 0
@@ -33,6 +33,50 @@ const dvcIsWorking = async (): Promise<boolean> => {
     statusBarItem =>
       statusBarItem.includes('loading~spin') && statusBarItem.includes('DVC')
   )
+}
+
+const notificationShown = async (
+  workbench: Workbench,
+  message: string
+): Promise<boolean> => {
+  const notifications = await workbench.getNotifications()
+  return notifications.some(
+    async notification => (await notification.elem.getText()) === message
+  )
+}
+
+const runDeleteCommand = async (
+  command: string,
+  nothingToDeleteMessage: string
+): Promise<void> => {
+  const workbench = await browser.getWorkbench()
+  const commandPalette = await workbench.executeCommand(command)
+
+  let nothingToDelete = false
+
+  await browser.waitUntil(async () => {
+    if (await notificationShown(workbench, nothingToDeleteMessage)) {
+      nothingToDelete = true
+      return true
+    }
+
+    return commandPalette.elem.isDisplayed()
+  })
+
+  if (nothingToDelete) {
+    return
+  }
+  await browser
+    .action('key')
+    .down(Key.Shift)
+    .down(Key.Tab)
+    .up(Key.Tab)
+    .up(Key.Shift)
+    .perform()
+
+  await browser.keys('Space')
+
+  return browser.keys('Enter')
 }
 
 export const waitForDvcToFinish = async (timeout = 60000): Promise<void> => {
@@ -100,43 +144,20 @@ export const waitForViewContainerToLoad = async (): Promise<void> => {
   )
 }
 
-export const deleteAllExistingExperiments = async () => {
-  const workbench = await browser.getWorkbench()
-
-  const deleteNonWorkspaceExperiments = await workbench.executeCommand(
-    'DVC: Garbage Collect Experiments'
+export const deleteAllExistingExperiments = (): Promise<void> =>
+  runDeleteCommand(
+    'DVC: Remove Experiment(s)',
+    'There are no experiments to select.'
   )
-  await browser.waitUntil(() =>
-    deleteNonWorkspaceExperiments.elem.isDisplayed()
-  )
-  await browser.keys('Enter')
-
-  const deleteAllNonTagExperiments = await workbench.executeCommand(
-    'DVC: Garbage Collect Experiments'
-  )
-
-  await browser.waitUntil(() => deleteAllNonTagExperiments.elem.isDisplayed())
-
-  const tagOption = 'tags'
-  await browser.keys([...tagOption, 'ArrowDown', 'Space', 'ArrowUp'])
-  for (let i = 0; i < tagOption.length; i++) {
-    await browser.keys('Backspace')
-  }
-  await browser.keys(['w', 'o', 'ArrowDown', 'Space'])
-  return browser.keys('Enter')
-}
 
 export const runModifiedExperiment = async () => {
   const workbench = await browser.getWorkbench()
   const options = await workbench.executeCommand(
-    'DVC: Modify Experiment Param(s) and Run'
+    'DVC: Modify Workspace Param(s) and Run'
   )
   await browser.waitUntil(() => options.elem.isDisplayed())
   await browser
     .action('key')
-    .down(Key.Enter)
-    .up(Key.Enter)
-    .pause(500)
     .down(Key.ArrowDown)
     .up(Key.ArrowDown)
     .down(Key.Space)
@@ -145,7 +166,10 @@ export const runModifiedExperiment = async () => {
     .up(Key.Enter)
     .pause(100)
     .perform()
-  await browser.keys([...'0.005', 'Enter'])
+
+  const nonCachedParam = `0.00${Date.now()}`
+
+  await browser.keys([...nonCachedParam, 'Enter'])
   return workbench.executeCommand('DVC: Show Experiments')
 }
 
@@ -164,16 +188,11 @@ export const createCustomPlot = async (): Promise<void> => {
   return browser.keys('Enter')
 }
 
-export const deleteCustomPlot = async (): Promise<void> => {
-  const workbench = await browser.getWorkbench()
-  const removeCustomPlot = await workbench.executeCommand(
-    'DVC: Remove Custom Plot(s)'
+export const deleteCustomPlots = (): Promise<void> =>
+  runDeleteCommand(
+    'DVC: Remove Custom Plot(s)',
+    'There are no plots to remove.'
   )
-  await browser.waitUntil(() => removeCustomPlot.elem.isDisplayed())
-  await browser.keys('ArrowDown')
-  await browser.keys('Space')
-  return browser.keys('Enter')
-}
 
 export const waitForAllPlotsToRender = (
   webview: PlotsWebview,
@@ -196,11 +215,19 @@ export const expectAllPlotsToBeFilled = async (webview: PlotsWebview) => {
 }
 
 export const findScmTreeItems = async () => {
-  const workspace = await browser.getWorkbench()
-  const activityBar = workspace.getActivityBar()
+  const workbench = await browser.getWorkbench()
+  const activityBar = workbench.getActivityBar()
   const sourceControlIcon = await activityBar.getViewControl('Source Control')
 
   await sourceControlIcon?.openView()
+
+  const visibleItems = await findCurrentTreeItems()
+
+  await visibleItems[visibleItems.length - 1].click()
+
+  for (let i = 0; i < 20; i++) {
+    await browser.keys('ArrowDown')
+  }
 
   return findCurrentTreeItems()
 }

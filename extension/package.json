@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "1.0.1",
+  "version": "1.0.3",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -201,11 +201,6 @@
         "icon": "$(discard)"
       },
       {
-        "title": "Garbage Collect Experiments",
-        "command": "dvc.experimentGarbageCollect",
-        "category": "DVC"
-      },
-      {
         "title": "Find in Folder...",
         "command": "dvc.findInFolder",
         "category": "DVC"
@@ -267,8 +262,8 @@
         "icon": "$(cloud-upload)"
       },
       {
-        "title": "Modify Experiment Param(s) and Queue",
-        "command": "dvc.modifyExperimentParamsAndQueue",
+        "title": "Modify Workspace Param(s) and Queue",
+        "command": "dvc.modifyWorkspaceParamsAndQueue",
         "category": "DVC",
         "icon": {
           "dark": "resources/dark/queue-experiment.svg",
@@ -276,20 +271,20 @@
         }
       },
       {
-        "title": "Modify Experiment Param(s) and Resume",
-        "command": "dvc.modifyExperimentParamsAndResume",
+        "title": "Modify Workspace Param(s) and Resume",
+        "command": "dvc.modifyWorkspaceParamsAndResume",
         "category": "DVC",
         "icon": "$(debug-continue-small)"
       },
       {
-        "title": "Modify Experiment Param(s) and Run",
-        "command": "dvc.modifyExperimentParamsAndRun",
+        "title": "Modify Workspace Param(s) and Run",
+        "command": "dvc.modifyWorkspaceParamsAndRun",
         "category": "DVC",
         "icon": "$(play)"
       },
       {
-        "title": "Modify Experiment Param(s) and Run",
-        "command": "dvc.modifyExperimentParamsResetAndRun",
+        "title": "Modify Workspace Param(s) and Run",
+        "command": "dvc.modifyWorkspaceParamsResetAndRun",
         "category": "DVC",
         "icon": "$(play)"
       },
@@ -741,10 +736,6 @@
           "when": "false"
         },
         {
-          "command": "dvc.experimentGarbageCollect",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace"
-        },
-        {
           "command": "dvc.findInFolder",
           "when": "false"
         },
@@ -789,19 +780,19 @@
           "when": "false"
         },
         {
-          "command": "dvc.modifyExperimentParamsAndQueue",
+          "command": "dvc.modifyWorkspaceParamsAndQueue",
           "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace"
         },
         {
-          "command": "dvc.modifyExperimentParamsAndRun",
+          "command": "dvc.modifyWorkspaceParamsAndRun",
           "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace && !dvc.experiment.checkpoints"
         },
         {
-          "command": "dvc.modifyExperimentParamsAndResume",
+          "command": "dvc.modifyWorkspaceParamsAndResume",
           "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace && dvc.experiment.checkpoints"
         },
         {
-          "command": "dvc.modifyExperimentParamsResetAndRun",
+          "command": "dvc.modifyWorkspaceParamsResetAndRun",
           "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace && dvc.experiment.checkpoints"
         },
         {
@@ -1238,22 +1229,22 @@
         {
           "command": "dvc.views.experiments.runExperiment",
           "group": "2_modify@1",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|commit|experiment|queued)$/ && !dvc.experiment.running.workspace && !dvc.experiment.checkpoints"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == workspace && !dvc.experiment.running.workspace && !dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.views.experiments.resetAndRunCheckpointExperiment",
           "group": "2_modify@1",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|commit|experiment|queued)$/ && !dvc.experiment.running.workspace && dvc.experiment.checkpoints"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == workspace && !dvc.experiment.running.workspace && dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.views.experiments.resumeCheckpointExperiment",
           "group": "2_modify@2",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|commit|experiment|queued)$/ && !dvc.experiment.running.workspace && dvc.experiment.checkpoints"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == workspace && !dvc.experiment.running.workspace && dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.views.experiments.queueExperiment",
           "group": "2_modify@3",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(workspace|commit|experiment|queued)$/ && !dvc.experiment.running.workspace"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == workspace && !dvc.experiment.running.workspace"
         }
       ],
       "view/title": [
@@ -1308,22 +1299,22 @@
           "group": "navigation@4"
         },
         {
-          "command": "dvc.modifyExperimentParamsAndRun",
+          "command": "dvc.modifyWorkspaceParamsAndRun",
           "when": "view == dvc.views.experimentsTree && !dvc.experiment.running.workspace && !dvc.experiment.checkpoints",
           "group": "2_modify@1"
         },
         {
-          "command": "dvc.modifyExperimentParamsAndResume",
+          "command": "dvc.modifyWorkspaceParamsAndResume",
           "when": "view == dvc.views.experimentsTree && !dvc.experiment.running.workspace && dvc.experiment.checkpoints",
           "group": "2_modify@1"
         },
         {
-          "command": "dvc.modifyExperimentParamsResetAndRun",
+          "command": "dvc.modifyWorkspaceParamsResetAndRun",
           "when": "view == dvc.views.experimentsTree && !dvc.experiment.running.workspace && dvc.experiment.checkpoints",
           "group": "2_modify@2"
         },
         {
-          "command": "dvc.modifyExperimentParamsAndQueue",
+          "command": "dvc.modifyWorkspaceParamsAndQueue",
           "when": "view == dvc.views.experimentsTree && !dvc.experiment.running.workspace",
           "group": "2_modify@3"
         },
@@ -1553,12 +1544,12 @@
           {
             "id": "dvc.runExperiments",
             "title": "Running Experiments",
-            "description": "Explore a few ways you can run or queue a new experiment.\n[Run an Experiment](command:dvc.modifyExperimentParamsAndRun)",
+            "description": "Explore a few ways you can run or queue a new experiment.\n[Run an Experiment](command:dvc.modifyWorkspaceParamsAndRun)",
             "media": {
               "markdown": "resources/walkthrough/run-experiments.md"
             },
             "completionEvents": [
-              "onCommand:dvc.modifyExperimentParamsAndRun"
+              "onCommand:dvc.modifyWorkspaceParamsAndRun"
             ]
           },
           {

@@ -14,7 +14,7 @@ export const BranchDivider: React.FC<PropsWithChildren<BranchDividerProps>> = ({
   branch
 }) => (
   <thead data-testid="branch-name">
-    <tr>
+    <tr className={tablesStyles.experimentsTr}>
       <th className={tablesStyles.experimentsTd}>
         <div className={styles.branchName}>
           <Icon

@@ -335,36 +335,12 @@ describe('ExperimentsModel', () => {
     ])
   })
 
-  it('should fetch commit params', () => {
-    const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, ...DEFAULT_DATA)
-
-    const commitParams = model.getExperimentParams('main')
-    expect(definedAndNonEmpty(commitParams)).toBe(true)
-  })
-
   it('should fetch workspace params', () => {
     const model = new ExperimentsModel('', buildMockMemento())
     model.transformAndSet(outputFixture, ...DEFAULT_DATA)
 
-    const workspaceParams = model.getExperimentParams(EXPERIMENT_WORKSPACE_ID)
+    const workspaceParams = model.getWorkspaceParams()
     expect(definedAndNonEmpty(workspaceParams)).toBe(true)
-  })
-
-  it("should fetch an experiment's params", () => {
-    const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, ...DEFAULT_DATA)
-
-    const experimentParams = model.getExperimentParams('exp-e7a67')
-    expect(definedAndNonEmpty(experimentParams)).toBe(true)
-  })
-
-  it("should fetch an empty array if the experiment's params cannot be found", () => {
-    const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, ...DEFAULT_DATA)
-
-    const noParams = model.getExperimentParams('not-an-experiment')
-    expect(definedAndNonEmpty(noParams)).toBe(false)
   })
 
   it('should set the number of commits to show correctly', () => {

@@ -97,8 +97,8 @@ export const createSpec = (title: string, metric: string, param: string) =>
         encoding: {
           tooltip: [
             {
-              field: 'expName',
-              title: 'name'
+              field: 'id',
+              title: 'id'
             },
             {
               field: 'metric',
