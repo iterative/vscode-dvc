@@ -201,11 +201,6 @@
         "icon": "$(discard)"
       },
       {
-        "title": "Garbage Collect Experiments",
-        "command": "dvc.experimentGarbageCollect",
-        "category": "DVC"
-      },
-      {
         "title": "Find in Folder...",
         "command": "dvc.findInFolder",
         "category": "DVC"
@@ -739,10 +734,6 @@
         {
           "command": "dvc.deleteTarget",
           "when": "false"
-        },
-        {
-          "command": "dvc.experimentGarbageCollect",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiment.running.workspace"
         },
         {
           "command": "dvc.findInFolder",

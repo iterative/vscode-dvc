@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
-import { Flag, GcPreserveFlag, UNEXPECTED_ERROR_CODE } from './constants'
+import { Flag, UNEXPECTED_ERROR_CODE } from './constants'
 import { DvcExecutor } from './executor'
 import { CliResult, CliStarted } from '..'
 import { createProcess } from '../../process/execution'
@@ -271,31 +271,6 @@ describe('CliExecutor', () => {
 
       expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['exp', 'branch', 'exp-0898f', 'some-branch'],
-        cwd,
-        env: mockedEnv,
-        executable: 'dvc'
-      })
-    })
-  })
-
-  describe('expGarbageCollect', () => {
-    it('should call createProcess with the correct parameters to garbage collect experiments', async () => {
-      const cwd = __dirname
-      const stdout =
-        'WARNING: This will remove all experiments except those derived from the workspace of the current repo. ' +
-        'Run queued experiments will be preserved. Run queued experiments will be removed.\n' +
-        "Removed 45 experiments. To remove unused cache files use 'dvc gc'. "
-      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
-
-      const output = await dvcExecutor.expGarbageCollect(
-        cwd,
-        GcPreserveFlag.WORKSPACE,
-        GcPreserveFlag.QUEUED
-      )
-      expect(output).toStrictEqual(stdout)
-
-      expect(mockedCreateProcess).toHaveBeenCalledWith({
-        args: ['exp', 'gc', '-f', '--workspace', '--queued'],
         cwd,
         env: mockedEnv,
         executable: 'dvc'

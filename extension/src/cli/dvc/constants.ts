@@ -94,14 +94,6 @@ export enum ExperimentFlag {
   REV = '--rev'
 }
 
-export enum GcPreserveFlag {
-  ALL_BRANCHES = '--all-branches',
-  ALL_TAGS = '--all-tags',
-  ALL_COMMITS = '--all-commits',
-  QUEUED = '--queued',
-  WORKSPACE = '--workspace'
-}
-
 export enum ConfigKey {
   STUDIO_TOKEN = 'studio.token',
   STUDIO_OFFLINE = 'studio.offline'
@@ -109,7 +101,7 @@ export enum ConfigKey {
 
 type Target = string
 
-type Flags = Flag | ExperimentFlag | GcPreserveFlag
+type Flags = Flag | ExperimentFlag
 
 export type Args = (
   | Command
