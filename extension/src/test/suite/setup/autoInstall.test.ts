@@ -36,7 +36,7 @@ suite('Auto Install Test Suite', () => {
       const showProgressSpy = spy(window, 'withProgress')
       const showErrorSpy = spy(window, 'showErrorMessage')
 
-      await autoUpgradeDvc()
+      await autoUpgradeDvc(false)
 
       expect(showProgressSpy).not.to.be.called
       expect(showErrorSpy).to.be.called
@@ -54,7 +54,7 @@ suite('Auto Install Test Suite', () => {
       const showProgressSpy = spy(window, 'withProgress')
       const showErrorSpy = spy(window, 'showErrorMessage')
 
-      await autoUpgradeDvc()
+      await autoUpgradeDvc(false)
 
       expect(showProgressSpy).not.to.be.called
       expect(showErrorSpy).to.be.called
@@ -74,7 +74,7 @@ suite('Auto Install Test Suite', () => {
       const showProgressSpy = spy(window, 'withProgress')
       const showErrorSpy = spy(window, 'showErrorMessage')
 
-      await autoUpgradeDvc()
+      await autoUpgradeDvc(false)
 
       expect(showProgressSpy).to.be.called
       expect(showErrorSpy).not.to.be.called
@@ -82,6 +82,34 @@ suite('Auto Install Test Suite', () => {
       expect(mockInstallPackages).to.be.calledWithExactly(
         cwd,
         defaultPython,
+        'dvc'
+      )
+    })
+
+    it('should install with a user flag if python env is used and the active env is global', async () => {
+      bypassProgressCloseDelay()
+      const cwd = __dirname
+      stub(PythonExtension, 'getPythonExecutionDetails').resolves(['python'])
+      stub(Python, 'findPythonBin').resolves(defaultPython)
+      stub(PythonExtension, 'isActivePythonEnvGlobal').resolves(true)
+
+      const mockInstallPackages = stub(Python, 'installPackages').resolves(
+        undefined
+      )
+      stub(WorkspaceFolders, 'getFirstWorkspaceFolder').returns(cwd)
+
+      const showProgressSpy = spy(window, 'withProgress')
+      const showErrorSpy = spy(window, 'showErrorMessage')
+
+      await autoUpgradeDvc(true)
+
+      expect(showProgressSpy).to.be.called
+      expect(showErrorSpy).not.to.be.called
+      expect(mockInstallPackages).to.be.calledOnce
+      expect(mockInstallPackages).to.be.calledWithExactly(
+        cwd,
+        defaultPython,
+        '--user',
         'dvc'
       )
     })
@@ -100,7 +128,7 @@ suite('Auto Install Test Suite', () => {
       const showErrorSpy = spy(window, 'showErrorMessage')
       const reportProgressErrorSpy = spy(Toast, 'reportProgressError')
 
-      await autoUpgradeDvc()
+      await autoUpgradeDvc(false)
 
       expect(showProgressSpy).to.be.called
       expect(showErrorSpy).not.to.be.called
@@ -125,7 +153,7 @@ suite('Auto Install Test Suite', () => {
       const showProgressSpy = spy(window, 'withProgress')
       const showErrorSpy = spy(window, 'showErrorMessage')
 
-      await autoInstallDvc()
+      await autoInstallDvc(false)
 
       expect(showProgressSpy).not.to.be.called
       expect(showErrorSpy).to.be.called
@@ -143,7 +171,7 @@ suite('Auto Install Test Suite', () => {
       const showProgressSpy = spy(window, 'withProgress')
       const showErrorSpy = spy(window, 'showErrorMessage')
 
-      await autoInstallDvc()
+      await autoInstallDvc(false)
 
       expect(showProgressSpy).not.to.be.called
       expect(showErrorSpy).to.be.called
@@ -155,6 +183,7 @@ suite('Auto Install Test Suite', () => {
       const cwd = __dirname
       stub(PythonExtension, 'getPythonExecutionDetails').resolves(undefined)
       stub(Python, 'findPythonBin').resolves(defaultPython)
+
       const mockInstallPackages = stub(Python, 'installPackages').resolves(
         undefined
       )
@@ -163,7 +192,7 @@ suite('Auto Install Test Suite', () => {
       const showProgressSpy = spy(window, 'withProgress')
       const showErrorSpy = spy(window, 'showErrorMessage')
 
-      await autoInstallDvc()
+      await autoInstallDvc(false)
 
       expect(showProgressSpy).to.be.called
       expect(showErrorSpy).not.to.be.called
@@ -176,6 +205,40 @@ suite('Auto Install Test Suite', () => {
       expect(mockInstallPackages).to.be.calledWithExactly(
         cwd,
         defaultPython,
+        'dvclive'
+      )
+    })
+
+    it('should install with a user flag if python env is used and the active env is global', async () => {
+      bypassProgressCloseDelay()
+      const cwd = __dirname
+      stub(PythonExtension, 'getPythonExecutionDetails').resolves(['python'])
+      stub(Python, 'findPythonBin').resolves(defaultPython)
+      stub(PythonExtension, 'isActivePythonEnvGlobal').resolves(true)
+
+      const mockInstallPackages = stub(Python, 'installPackages').resolves(
+        undefined
+      )
+      stub(WorkspaceFolders, 'getFirstWorkspaceFolder').returns(cwd)
+
+      const showProgressSpy = spy(window, 'withProgress')
+      const showErrorSpy = spy(window, 'showErrorMessage')
+
+      await autoInstallDvc(true)
+
+      expect(showProgressSpy).to.be.called
+      expect(showErrorSpy).not.to.be.called
+      expect(mockInstallPackages).to.be.calledTwice
+      expect(mockInstallPackages).to.be.calledWithExactly(
+        cwd,
+        defaultPython,
+        '--user',
+        'dvc'
+      )
+      expect(mockInstallPackages).to.be.calledWithExactly(
+        cwd,
+        defaultPython,
+        '--user',
         'dvclive'
       )
     })
@@ -193,7 +256,7 @@ suite('Auto Install Test Suite', () => {
       const showProgressSpy = spy(window, 'withProgress')
       const showErrorSpy = spy(window, 'showErrorMessage')
 
-      await autoInstallDvc()
+      await autoInstallDvc(false)
 
       expect(showProgressSpy).to.be.called
       expect(showErrorSpy).not.to.be.called
@@ -221,7 +284,7 @@ suite('Auto Install Test Suite', () => {
       const showErrorSpy = spy(window, 'showErrorMessage')
       const reportProgressErrorSpy = spy(Toast, 'reportProgressError')
 
-      await autoInstallDvc()
+      await autoInstallDvc(false)
 
       expect(showProgressSpy).to.be.called
       expect(showErrorSpy).not.to.be.called

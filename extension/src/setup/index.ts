@@ -420,6 +420,7 @@ export class Setup
       () => this.getWebview(),
       () => this.initializeGit(),
       (offline: boolean) => this.updateStudioOffline(offline),
+      () => this.isPythonExtensionUsed(),
       () => this.updatePythonEnvironment()
     )
     this.dispose.track(

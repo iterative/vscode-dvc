@@ -1,4 +1,8 @@
-import { getPythonExecutionDetails } from '../extensions/python'
+import { Progress } from 'vscode'
+import {
+  getPythonExecutionDetails,
+  isActivePythonEnvGlobal
+} from '../extensions/python'
 import { findPythonBin, getDefaultPython, installPackages } from '../python'
 import { ConfigKey, getConfigValue } from '../vscode/config'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
@@ -16,9 +20,43 @@ export const findPythonBinForInstall = async (): Promise<
   )
 }
 
+const getProcessGlobalArgs = (isGlobal: boolean) => (isGlobal ? ['--user'] : [])
+
+const installPackageAndIncrementProgress = ({
+  root,
+  pythonBinPath,
+  isGlobalEnv,
+  progress,
+  incrementAmount,
+  packageName,
+  successMessage
+}: {
+  root: string
+  pythonBinPath: string
+  isGlobalEnv: boolean
+  progress: Progress<{ message: string; amount: number }>
+  incrementAmount: number
+  packageName: string
+  successMessage: string
+}) =>
+  Toast.runCommandAndIncrementProgress(
+    async () => {
+      await installPackages(
+        root,
+        pythonBinPath,
+        ...getProcessGlobalArgs(isGlobalEnv),
+        packageName
+      )
+      return successMessage
+    },
+    progress,
+    incrementAmount
+  )
+
 const showUpgradeProgress = (
   root: string,
-  pythonBinPath: string
+  pythonBinPath: string,
+  isGlobalEnv: boolean
 ): Thenable<unknown> =>
   Toast.showProgress('Upgrading DVC', async progress => {
     progress.report({ increment: 0 })
@@ -26,15 +64,15 @@ const showUpgradeProgress = (
     progress.report({ increment: 25, message: 'Updating packages...' })
 
     try {
-      await Toast.runCommandAndIncrementProgress(
-        async () => {
-          await installPackages(root, pythonBinPath, 'dvc')
-          return 'Upgraded successfully'
-        },
+      await installPackageAndIncrementProgress({
+        incrementAmount: 75,
+        isGlobalEnv,
+        packageName: 'dvc',
         progress,
-        75
-      )
-
+        pythonBinPath,
+        root,
+        successMessage: 'Upgraded successfully'
+      })
       return Toast.delayProgressClosing()
     } catch (error: unknown) {
       return Toast.reportProgressError(error, progress)
@@ -43,33 +81,36 @@ const showUpgradeProgress = (
 
 const showInstallProgress = (
   root: string,
-  pythonBinPath: string
+  pythonBinPath: string,
+  isGlobalEnv: boolean
 ): Thenable<unknown> =>
   Toast.showProgress('Installing packages', async progress => {
     progress.report({ increment: 0 })
 
     try {
-      await Toast.runCommandAndIncrementProgress(
-        async () => {
-          await installPackages(root, pythonBinPath, 'dvclive')
-          return 'DVCLive Installed'
-        },
+      await installPackageAndIncrementProgress({
+        incrementAmount: 25,
+        isGlobalEnv,
+        packageName: 'dvclive',
         progress,
-        25
-      )
+        pythonBinPath,
+        root,
+        successMessage: 'DVCLive Installed'
+      })
     } catch (error: unknown) {
       return Toast.reportProgressError(error, progress)
     }
 
     try {
-      await Toast.runCommandAndIncrementProgress(
-        async () => {
-          await installPackages(root, pythonBinPath, 'dvc')
-          return 'DVC Installed'
-        },
+      await installPackageAndIncrementProgress({
+        incrementAmount: 75,
+        isGlobalEnv,
+        packageName: 'dvc',
         progress,
-        75
-      )
+        pythonBinPath,
+        root,
+        successMessage: 'DVC Installed'
+      })
 
       return Toast.delayProgressClosing()
     } catch (error: unknown) {
@@ -78,10 +119,17 @@ const showInstallProgress = (
   })
 
 const getArgsAndRunCommand = async (
-  command: (root: string, pythonBinPath: string) => Thenable<unknown>
+  isPythonExtensionUsed: boolean,
+  command: (
+    root: string,
+    pythonBinPath: string,
+    isGlobalEnv: boolean
+  ) => Thenable<unknown>
 ): Promise<unknown> => {
   const pythonBinPath = await findPythonBinForInstall()
   const root = getFirstWorkspaceFolder()
+  const isPythonEnvGlobal =
+    isPythonExtensionUsed && (await isActivePythonEnvGlobal())
 
   if (!root) {
     return Toast.showError(
@@ -95,13 +143,17 @@ const getArgsAndRunCommand = async (
     )
   }
 
-  return command(root, pythonBinPath)
+  return command(root, pythonBinPath, !!isPythonEnvGlobal)
 }
 
-export const autoInstallDvc = (): Promise<unknown> => {
-  return getArgsAndRunCommand(showInstallProgress)
+export const autoInstallDvc = (
+  isPythonExtensionUsed: boolean
+): Promise<unknown> => {
+  return getArgsAndRunCommand(isPythonExtensionUsed, showInstallProgress)
 }
 
-export const autoUpgradeDvc = (): Promise<unknown> => {
-  return getArgsAndRunCommand(showUpgradeProgress)
+export const autoUpgradeDvc = (
+  isPythonExtensionUsed: boolean
+): Promise<unknown> => {
+  return getArgsAndRunCommand(isPythonExtensionUsed, showUpgradeProgress)
 }

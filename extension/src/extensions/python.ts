@@ -16,10 +16,19 @@ type EnvironmentVariablesChangeEvent = {
   readonly env: EnvironmentVariables
 }
 
+interface Environment {
+  id: string
+  environment?: {
+    type: string
+  }
+}
+
 export interface VscodePython {
   ready: Thenable<void>
   settings: Settings
   environments: {
+    known: Environment[]
+    getActiveEnvironmentPath: () => { id: string }
     onDidEnvironmentVariablesChange: Event<EnvironmentVariablesChangeEvent>
     getEnvironmentVariables(): EnvironmentVariables
   }
@@ -54,6 +63,18 @@ export const getPythonBinPath = async (): Promise<string | undefined> => {
 export const getPYTHONPATH = async (): Promise<string | undefined> => {
   const api = await getPythonExtensionAPI()
   return api?.environments?.getEnvironmentVariables().PYTHONPATH
+}
+
+export const isActivePythonEnvGlobal = async (): Promise<
+  boolean | undefined
+> => {
+  const api = await getPythonExtensionAPI()
+  if (!api?.environments) {
+    return
+  }
+  const envPath = api.environments.getActiveEnvironmentPath()
+  const activeEnv = api.environments.known.find(({ id }) => id === envPath.id)
+  return activeEnv && !activeEnv.environment
 }
 
 export const getOnDidChangePythonExecutionDetails = async () => {
