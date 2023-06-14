@@ -1,3 +1,4 @@
+import { Progress } from 'vscode'
 import {
   getPythonExecutionDetails,
   isActivePythonEnvGlobal
@@ -21,6 +22,37 @@ export const findPythonBinForInstall = async (): Promise<
 
 const getProcessGlobalArgs = (isGlobal: boolean) => (isGlobal ? ['--user'] : [])
 
+const installPackageAndIncrementProgress = ({
+  root,
+  pythonBinPath,
+  isGlobalEnv,
+  progress,
+  incrementAmount,
+  packageName,
+  successMessage
+}: {
+  root: string
+  pythonBinPath: string
+  isGlobalEnv: boolean
+  progress: Progress<{ message: string; amount: number }>
+  incrementAmount: number
+  packageName: string
+  successMessage: string
+}) =>
+  Toast.runCommandAndIncrementProgress(
+    async () => {
+      await installPackages(
+        root,
+        pythonBinPath,
+        ...getProcessGlobalArgs(isGlobalEnv),
+        packageName
+      )
+      return successMessage
+    },
+    progress,
+    incrementAmount
+  )
+
 const showUpgradeProgress = (
   root: string,
   pythonBinPath: string,
@@ -32,22 +64,16 @@ const showUpgradeProgress = (
     progress.report({ increment: 25, message: 'Updating packages...' })
 
     try {
-      await Toast.runCommandAndIncrementProgress(
-        async () => {
-          await installPackages(
-            root,
-            pythonBinPath,
-            ...getProcessGlobalArgs(isGlobalEnv),
-            'dvc'
-          )
-          return 'Upgraded successfully'
-        },
+      await installPackageAndIncrementProgress({
+        incrementAmount: 75,
+        isGlobalEnv,
+        packageName: 'dvc',
         progress,
-        75
-      )
-
-      return Toast.delayProgressClosing()
-    } catch (error: unknown) {
+        pythonBinPath,
+        root,
+        successMessage: 'Upgraded successfully'
+      })
+    } catch (error) {
       return Toast.reportProgressError(error, progress)
     }
   })
@@ -61,37 +87,29 @@ const showInstallProgress = (
     progress.report({ increment: 0 })
 
     try {
-      await Toast.runCommandAndIncrementProgress(
-        async () => {
-          await installPackages(
-            root,
-            pythonBinPath,
-            ...getProcessGlobalArgs(isGlobalEnv),
-            'dvclive'
-          )
-          return 'DVCLive Installed'
-        },
+      await installPackageAndIncrementProgress({
+        incrementAmount: 25,
+        isGlobalEnv,
+        packageName: 'dvclive',
         progress,
-        25
-      )
+        pythonBinPath,
+        root,
+        successMessage: 'DVCLive Installed'
+      })
     } catch (error: unknown) {
       return Toast.reportProgressError(error, progress)
     }
 
     try {
-      await Toast.runCommandAndIncrementProgress(
-        async () => {
-          await installPackages(
-            root,
-            pythonBinPath,
-            ...getProcessGlobalArgs(isGlobalEnv),
-            'dvc'
-          )
-          return 'DVC Installed'
-        },
+      await installPackageAndIncrementProgress({
+        incrementAmount: 75,
+        isGlobalEnv,
+        packageName: 'dvc',
         progress,
-        75
-      )
+        pythonBinPath,
+        root,
+        successMessage: 'DVC Installed'
+      })
 
       return Toast.delayProgressClosing()
     } catch (error: unknown) {
