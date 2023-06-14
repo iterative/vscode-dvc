@@ -328,7 +328,7 @@ const hasCheckpoints = (data: ExpShowOutput) => {
     return false
   }
 
-  return !!workspace.data.meta.has_checkpoints
+  return !!workspace?.data?.meta.has_checkpoints
 }
 
 const collectCliError = (

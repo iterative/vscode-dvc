@@ -45,7 +45,7 @@ import { isErrorItem } from '../../../tree'
 import { RegisteredCommands } from '../../../commands/external'
 import { REVISIONS } from '../../fixtures/plotsDiff'
 import * as FileSystem from '../../../fileSystem'
-import { experimentHasError } from '../../../cli/dvc/contract'
+import { ExpShowOutput, experimentHasError } from '../../../cli/dvc/contract'
 import { COMMITS_SEPARATOR } from '../../../cli/git/constants'
 
 suite('Plots Test Suite', () => {
@@ -139,7 +139,7 @@ suite('Plots Test Suite', () => {
       bypassProcessManagerDebounce(mockNow)
       void experiments.setState({
         availableNbCommits: { main: 6 },
-        expShow: updatedExpShowFixture,
+        expShow: updatedExpShowFixture as ExpShowOutput,
         gitLog: newCommit + COMMITS_SEPARATOR + gitLogFixture,
         rowOrder: [{ branch: 'main', sha: newCommit }, ...rowOrderFixture]
       })

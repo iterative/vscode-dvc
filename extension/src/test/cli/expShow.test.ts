@@ -45,16 +45,16 @@ suite('exp show --show-json', () => {
           'object'
         )
 
-        expect(commit.data.timestamp, 'should have a timestamp').to.be.a(
+        expect(commit?.data?.timestamp, 'should have a timestamp').to.be.a(
           'string'
         )
 
-        expect(commit.data.params, 'should have params').to.be.an('object')
-        expect(commit.data.metrics, 'should have metrics').to.be.an('object')
+        expect(commit?.data?.params, 'should have params').to.be.an('object')
+        expect(commit?.data?.metrics, 'should have metrics').to.be.an('object')
 
         for (const file of Object.values({
-          ...commit.data.params,
-          ...commit.data.metrics
+          ...commit?.data?.params,
+          ...commit?.data?.metrics
         })) {
           expect(file, 'should have children').to.be.an('object')
           if (fileHasError(file)) {
@@ -64,8 +64,8 @@ suite('exp show --show-json', () => {
           expect(isEmpty(file.data), 'should have data').to.be.false
         }
 
-        expect(commit.data.deps, 'should have deps').to.be.an('object')
-        expect(commit.data.outs, 'should have outs').to.be.an('object')
+        expect(commit?.data?.deps, 'should have deps').to.be.an('object')
+        expect(commit?.data?.outs, 'should have outs').to.be.an('object')
 
         for (const file of Object.values({
           ...commit.data?.deps,
