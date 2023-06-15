@@ -13,7 +13,7 @@ Use `DVC: Show Experiments` from the
 [Command Palette](command:workbench.action.quickOpen?%22>DVC:%20Show%20Experiments%22)
 to open up the experiments table or access it.
 
-The table provides context menus to access basic operation on experiments and
+The table provides context menus to access basic operations on experiments and
 table headers. You can edit parameters, sort or filter, run new experiments and
 more:
 

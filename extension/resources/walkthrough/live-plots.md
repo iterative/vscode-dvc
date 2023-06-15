@@ -10,7 +10,7 @@ updates:
 </p>
 
 This functionality comes baked in when you update your plots files in your
-training code. For example like this, using the
+training code. For examples like this, use the
 [DVCLive](https://dvc.org/doc/dvclive) library that also
 [supports](https://dvc.org/doc/dvclive/ml-frameworks) many popular ML frameworks
 to automate this process:
