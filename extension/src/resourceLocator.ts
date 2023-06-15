@@ -5,8 +5,8 @@ import { ShapeValue, StrokeDashValue } from './plots/multiSource/constants'
 export type Resource = { dark: Uri; light: Uri }
 
 export enum IconName {
-  CIRCLE_FILLED = 'circle-filled',
-  CIRCLE_OUTLINE = 'circle-outline',
+  CIRCLE_FILLED = 'circle-large-filled',
+  CIRCLE_OUTLINE = 'circle-large',
   LOADING_SPIN = 'loading-spin',
   STROKE_DASH = 'stroke-dash'
 }

@@ -24,7 +24,7 @@ module.exports = {
     '*.d.ts',
     'tsconfig.json',
     'webpack.config.ts',
-    'scripts/virtualenv-install.ts'
+    'scripts/**'
   ],
   overrides: [
     {

@@ -22,7 +22,7 @@ describe('ResourceLocator', () => {
     const resourceLocator = new ResourceLocator(mockPath)
 
     const redCircleFilled = Uri.file(
-      'some/path/resources/experiments/circle-filled-#f14c4c.svg'
+      'some/path/resources/experiments/circle-large-filled-#f14c4c.svg'
     )
 
     expect(
@@ -30,7 +30,7 @@ describe('ResourceLocator', () => {
     ).toStrictEqual(redCircleFilled)
 
     const redCircleOutline = Uri.file(
-      'some/path/resources/experiments/circle-outline-#f14c4c.svg'
+      'some/path/resources/experiments/circle-large-#f14c4c.svg'
     )
 
     expect(

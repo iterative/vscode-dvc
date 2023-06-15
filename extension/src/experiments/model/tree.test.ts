@@ -194,7 +194,7 @@ describe('ExperimentsTree', () => {
           },
           description: undefined,
           dvcRoot: 'repo',
-          iconPath: getMockedUri('circle-filled', '#b180d7'),
+          iconPath: getMockedUri('circle-large-filled', '#b180d7'),
           id: 'exp-12345',
           label: '90aea7f',
           tooltip: undefined,
@@ -224,7 +224,7 @@ describe('ExperimentsTree', () => {
           },
           description: undefined,
           dvcRoot: 'repo',
-          iconPath: { id: 'circle-outline' },
+          iconPath: { id: 'circle-large' },
           id: 'exp-abcdef',
           label: 'e350702',
           tooltip: undefined,
@@ -239,7 +239,7 @@ describe('ExperimentsTree', () => {
           },
           description: undefined,
           dvcRoot: 'repo',
-          iconPath: { id: 'circle-outline' },
+          iconPath: { id: 'circle-large' },
           id: '139eabc',
           label: '139eabc',
           tooltip:
@@ -277,7 +277,7 @@ describe('ExperimentsTree', () => {
         description: 'f81f1b5',
         dvcRoot,
         hasChildren: true,
-        iconPath: getMockedUri('circle-filled', '#b180d7'),
+        iconPath: getMockedUri('circle-large-filled', '#b180d7'),
         id: 'f81f1b5',
         label: 'f81f1b5',
         tooltip: undefined,
@@ -628,7 +628,7 @@ describe('ExperimentsTree', () => {
         collapsibleState: 1,
         description: undefined,
         dvcRoot: 'demo',
-        iconPath: new ThemeIcon('circle-filled'),
+        iconPath: new ThemeIcon('circle-large-filled'),
         id: 'f0998a3',
         label: 'f0998a3',
         tooltip: undefined,
@@ -637,7 +637,7 @@ describe('ExperimentsTree', () => {
 
       expect(treeItem).toStrictEqual({
         ...mockedItem,
-        iconPath: { id: 'circle-filled' }
+        iconPath: { id: 'circle-large-filled' }
       })
     })
   })
