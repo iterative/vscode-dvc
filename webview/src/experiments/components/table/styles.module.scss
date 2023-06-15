@@ -630,16 +630,14 @@ $badge-size: 0.85rem;
 }
 
 .plotBox {
-  height: $checkbox-size;
-  width: $checkbox-size;
   background-color: $checkbox-background;
   border-radius: $checkbox-border-radius;
   border: $checkbox-border-width solid $checkbox-border;
-  svg: {
-    fill: $icon-color;
-  }
-
   cursor: pointer;
+  display: flex;
+  height: $checkbox-size;
+  width: $checkbox-size;
+  padding: 2px;
 }
 
 .running {

@@ -131,10 +131,15 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
           onClick={toggleExperiment}
         >
           <Icon
-            style={{ backgroundColor: plotColor }}
             className={styles.plotBox}
-            height={18}
-            width={18}
+            style={
+              plotColor
+                ? {
+                    backgroundColor: plotColor,
+                    fill: 'var(--vscode-editor-foreground)'
+                  }
+                : {}
+            }
             icon={GraphScatter}
           />
         </CellRowAction>
