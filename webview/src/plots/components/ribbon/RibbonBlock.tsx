@@ -1,5 +1,6 @@
 import { Revision } from 'dvc/src/plots/webview/contract'
 import React from 'react'
+import cx from 'classnames'
 import { VSCodeProgressRing } from '@vscode/webview-ui-toolkit/react'
 import styles from './styles.module.scss'
 import { RibbonBlockTooltip } from './RibbonBlockTooltip'
@@ -19,7 +20,9 @@ const RevisionIcon: React.FC<{ fetched: boolean; errors?: string[] }> = ({
 }) => (
   <div className={styles.iconPlaceholder}>
     {fetched && errors && '!'}
-    {!fetched && <VSCodeProgressRing className={styles.fetching} />}
+    {!fetched && (
+      <VSCodeProgressRing className={cx(styles.fetching, 'chromatic-ignore')} />
+    )}
   </div>
 )
 
