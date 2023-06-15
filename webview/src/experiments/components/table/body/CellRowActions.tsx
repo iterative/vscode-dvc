@@ -1,26 +1,37 @@
 import React, { MouseEventHandler, ReactElement } from 'react'
-import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
+import {
+  VSCodeCheckbox,
+  VSCodeProgressRing
+} from '@vscode/webview-ui-toolkit/react'
+import cx from 'classnames'
 import {
   ExperimentStatus,
-  isQueued
+  isQueued,
+  isRunning
 } from 'dvc/src/experiments/webview/contract'
 import { CellHintTooltip } from './CellHintTooltip'
 import { Indicator } from '../Indicators'
 import { addStarredFilter, openPlotsWebview } from '../../../util/messages'
 import styles from '../styles.module.scss'
 import { clickAndEnterProps } from '../../../../util/props'
-import { Clock, StarFull, StarEmpty } from '../../../../shared/components/icons'
+import {
+  Clock,
+  StarFull,
+  StarEmpty,
+  GraphScatter
+} from '../../../../shared/components/icons'
 
 export type CellRowActionsProps = {
-  bulletColor?: string
   isRowSelected: boolean
+  plotColor?: string
   showSubRowStates: boolean
   starred?: boolean
   status?: ExperimentStatus
   subRowStates: {
+    plotSelections: number
+    running: number
     selections: number
     stars: number
-    plotSelections: number
   }
   toggleExperiment: () => void
   toggleRowSelection: () => void
@@ -32,7 +43,7 @@ type CellRowActionProps = {
   subRowsAffected: number
   children: ReactElement
   testId: string
-  tooltipContent: string | ReactElement
+  tooltipContent: string | ReactElement | null
   onClick?: MouseEventHandler
 }
 
@@ -46,19 +57,39 @@ const CellRowAction: React.FC<CellRowActionProps> = ({
 }) => {
   const count = (showSubRowStates && subRowsAffected) || 0
 
-  return (
-    <CellHintTooltip tooltipContent={tooltipContent}>
-      <div className={styles.rowActions} data-testid={testId}>
-        <Indicator onClick={onClick} count={count}>
-          {children}
-        </Indicator>
-      </div>
-    </CellHintTooltip>
+  const action = (
+    <div className={styles.rowActions} data-testid={testId}>
+      <Indicator onClick={onClick} count={count}>
+        {children}
+      </Indicator>
+    </div>
+  )
+
+  return tooltipContent ? (
+    <CellHintTooltip tooltipContent={tooltipContent}>{action}</CellHintTooltip>
+  ) : (
+    action
   )
 }
 
 const getTooltipContent = (determiner: boolean, action: string): string =>
   'Click to ' + (determiner ? `un${action}` : action)
+
+const getRunningTooltipContent = (
+  running: boolean,
+  showSubRowStates: boolean,
+  subRowsRunning: number
+): string | null => {
+  if (running) {
+    return 'Experiment is currently running'
+  }
+
+  if (showSubRowStates && subRowsRunning) {
+    return `There are currently ${subRowsRunning} running under this commit.`
+  }
+
+  return null
+}
 
 type ClickableTooltipContentProps = {
   clickableText: string
@@ -81,16 +112,18 @@ const ClickableTooltipContent: React.FC<ClickableTooltipContentProps> = ({
 )
 
 export const CellRowActions: React.FC<CellRowActionsProps> = ({
-  bulletColor,
+  plotColor,
   status,
   toggleExperiment,
   isRowSelected,
   showSubRowStates,
   starred,
-  subRowStates: { selections, stars, plotSelections },
+  subRowStates: { plotSelections, running: subRowsRunning, selections, stars },
   toggleRowSelection,
   toggleStarred
 }) => {
+  const running = isRunning(status)
+
   return (
     <>
       <CellRowAction
@@ -103,6 +136,24 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
           {...clickAndEnterProps(toggleRowSelection)}
           checked={isRowSelected}
         />
+      </CellRowAction>
+      <CellRowAction
+        showSubRowStates={showSubRowStates}
+        subRowsAffected={subRowsRunning}
+        testId="row-action-running-indicator"
+        tooltipContent={getRunningTooltipContent(
+          running,
+          showSubRowStates,
+          subRowsRunning
+        )}
+      >
+        {running ? (
+          <VSCodeProgressRing
+            className={cx(styles.running, 'chromatic-ignore')}
+          />
+        ) : (
+          <div />
+        )}
       </CellRowAction>
       <CellRowAction
         showSubRowStates={showSubRowStates}
@@ -141,13 +192,16 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
           tooltipContent={
             <ClickableTooltipContent
               clickableText="Open the plots view"
-              helperText={getTooltipContent(!!bulletColor, 'plot')}
+              helperText={getTooltipContent(!!plotColor, 'plot')}
               onClick={openPlotsWebview}
             />
           }
           onClick={toggleExperiment}
         >
-          <span className={styles.bullet} style={{ color: bulletColor }} />
+          <GraphScatter
+            style={{ fill: plotColor }}
+            className={styles.plotIcon}
+          />
         </CellRowAction>
       )}
     </>
