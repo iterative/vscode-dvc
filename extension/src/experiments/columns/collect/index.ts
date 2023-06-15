@@ -101,7 +101,7 @@ export const collectParamsFiles = (
   if (experimentHasError(workspace)) {
     return new Set()
   }
-  const files = Object.keys(workspace.data.params || {})
+  const files = Object.keys(workspace?.data?.params || {})
     .filter(Boolean)
     .map(file => standardizePath(join(dvcRoot, file)))
   return new Set(files)

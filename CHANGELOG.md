@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.5] - 2023-06-14
+
+### 🐛 Bug Fixes
+
+- Fix never ending loading on no experiments data [#4117](https://github.com/iterative/vscode-dvc/pull/4117) by [@julieg18](https://github.com/julieg18)
+- Revert string quoting behaviour in modify and commands [#4116](https://github.com/iterative/vscode-dvc/pull/4116) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.0.4] - 2023-06-14
+
+### 🚀 New Features and Enhancements
+
+- Update Setup "dvc is unavailable" section text content [#4098](https://github.com/iterative/vscode-dvc/pull/4098) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Add `--user` flag to global dvc auto installation [#4091](https://github.com/iterative/vscode-dvc/pull/4091) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Remove garbage collect experiments command [#4104](https://github.com/iterative/vscode-dvc/pull/4104) by [@mattseddon](https://github.com/mattseddon)
+- Fix e2e tests [#4106](https://github.com/iterative/vscode-dvc/pull/4106) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.3] - 2023-06-14
 
 ### 🐛 Bug Fixes

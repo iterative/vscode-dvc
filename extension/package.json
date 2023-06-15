@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "1.0.3",
+  "version": "1.0.5",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -1669,7 +1669,7 @@
     "@types/uuid": "9.0.1",
     "@types/vega": "3.2.0",
     "@types/vscode": "1.64.0",
-    "@vscode/test-electron": "2.3.2",
+    "@vscode/test-electron": "2.3.3",
     "@vscode/vsce": "2.19.0",
     "@wdio/cli": "8.11.2",
     "@wdio/local-runner": "8.11.2",
