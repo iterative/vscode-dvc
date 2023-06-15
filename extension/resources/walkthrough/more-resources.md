@@ -30,7 +30,7 @@
 [python api]: https://dvc.org/doc/api-reference
 [free course]: https://learn.iterative.ai/
 [contribute]: https://dvc.org/doc/contributing/core
-[example project]: https://github.com/iterative/example-dvc-experiments
+[example project]: https://github.com/iterative/example-get-started-experiments
 [blog]: https://dvc.org/blog
 [community]: https://dvc.org/community
 [dvc github repository]: https://github.com/iterative/dvc
