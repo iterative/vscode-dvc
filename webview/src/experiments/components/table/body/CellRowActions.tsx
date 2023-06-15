@@ -131,7 +131,7 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
           onClick={toggleExperiment}
         >
           <Icon
-            style={{ fill: plotColor }}
+            style={{ backgroundColor: plotColor }}
             className={styles.plotBox}
             height={18}
             width={18}
