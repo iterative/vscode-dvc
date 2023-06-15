@@ -668,10 +668,10 @@ describe('App', () => {
 
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
-      const radioButton = within(getRow(EXPERIMENT_WORKSPACE_ID)).getByTestId(
+      const plotIcon = within(getRow(EXPERIMENT_WORKSPACE_ID)).getByTestId(
         'row-action-plot'
       )
-      fireEvent.mouseEnter(radioButton)
+      fireEvent.mouseEnter(plotIcon)
 
       advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
       const tooltip = screen.queryByRole('tooltip')
@@ -692,8 +692,8 @@ describe('App', () => {
 
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
-      const radioButton = within(getRow('main')).getByTestId('row-action-star')
-      fireEvent.mouseEnter(radioButton)
+      const starIcon = within(getRow('main')).getByTestId('row-action-star')
+      fireEvent.mouseEnter(starIcon)
 
       advanceTimersByTime(NORMAL_TOOLTIP_DELAY[0])
       const tooltip = screen.queryByRole('tooltip')

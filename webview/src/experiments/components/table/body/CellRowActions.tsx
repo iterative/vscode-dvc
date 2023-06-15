@@ -9,18 +9,24 @@ import { Indicator } from '../Indicators'
 import { addStarredFilter, openPlotsWebview } from '../../../util/messages'
 import styles from '../styles.module.scss'
 import { clickAndEnterProps } from '../../../../util/props'
-import { Clock, StarFull, StarEmpty } from '../../../../shared/components/icons'
+import {
+  Clock,
+  StarFull,
+  StarEmpty,
+  GraphScatter
+} from '../../../../shared/components/icons'
+import { Icon } from '../../../../shared/components/Icon'
 
 export type CellRowActionsProps = {
-  bulletColor?: string
   isRowSelected: boolean
+  plotColor?: string
   showSubRowStates: boolean
   starred?: boolean
   status?: ExperimentStatus
   subRowStates: {
+    plotSelections: number
     selections: number
     stars: number
-    plotSelections: number
   }
   toggleExperiment: () => void
   toggleRowSelection: () => void
@@ -37,12 +43,12 @@ type CellRowActionProps = {
 }
 
 const CellRowAction: React.FC<CellRowActionProps> = ({
+  children,
+  onClick,
   showSubRowStates,
   subRowsAffected,
-  children,
   testId,
-  tooltipContent,
-  onClick
+  tooltipContent
 }) => {
   const count = (showSubRowStates && subRowsAffected) || 0
 
@@ -81,13 +87,13 @@ const ClickableTooltipContent: React.FC<ClickableTooltipContentProps> = ({
 )
 
 export const CellRowActions: React.FC<CellRowActionsProps> = ({
-  bulletColor,
+  plotColor,
   status,
   toggleExperiment,
   isRowSelected,
   showSubRowStates,
   starred,
-  subRowStates: { selections, stars, plotSelections },
+  subRowStates: { plotSelections, selections, stars },
   toggleRowSelection,
   toggleStarred
 }) => {
@@ -104,6 +110,40 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
           checked={isRowSelected}
         />
       </CellRowAction>
+      {isQueued(status) ? (
+        <div className={styles.rowActions}>
+          <span className={styles.queued}>
+            <Clock />
+          </span>
+        </div>
+      ) : (
+        <CellRowAction
+          showSubRowStates={showSubRowStates}
+          subRowsAffected={plotSelections}
+          testId="row-action-plot"
+          tooltipContent={
+            <ClickableTooltipContent
+              clickableText="Open the plots view"
+              helperText={getTooltipContent(!!plotColor, 'plot')}
+              onClick={openPlotsWebview}
+            />
+          }
+          onClick={toggleExperiment}
+        >
+          <Icon
+            className={styles.plotBox}
+            style={
+              plotColor
+                ? {
+                    backgroundColor: plotColor,
+                    fill: 'var(--vscode-editor-foreground)'
+                  }
+                : {}
+            }
+            icon={GraphScatter}
+          />
+        </CellRowAction>
+      )}
       <CellRowAction
         showSubRowStates={showSubRowStates}
         subRowsAffected={stars}
@@ -127,29 +167,6 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
           {starred ? <StarFull /> : <StarEmpty />}
         </div>
       </CellRowAction>
-      {isQueued(status) ? (
-        <div className={styles.rowActions}>
-          <span className={styles.queued}>
-            <Clock />
-          </span>
-        </div>
-      ) : (
-        <CellRowAction
-          showSubRowStates={showSubRowStates}
-          subRowsAffected={plotSelections}
-          testId="row-action-plot"
-          tooltipContent={
-            <ClickableTooltipContent
-              clickableText="Open the plots view"
-              helperText={getTooltipContent(!!bulletColor, 'plot')}
-              onClick={openPlotsWebview}
-            />
-          }
-          onClick={toggleExperiment}
-        >
-          <span className={styles.bullet} style={{ color: bulletColor }} />
-        </CellRowAction>
-      )}
     </>
   )
 }
