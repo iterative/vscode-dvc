@@ -10,6 +10,28 @@ import {
   updatePythonEnvironment
 } from '../../util/messages'
 import { Warning } from '../../../shared/components/icons'
+import { ExtensionLink } from '../shared/ExtensionLink'
+import Tooltip from '../../../shared/components/tooltip/Tooltip'
+
+const PythonExtensionTooltip: React.FC<
+  PropsWithChildren<{ disabled: boolean }>
+> = ({ disabled, children }) => (
+  <Tooltip
+    content={
+      <span>
+        Install the{' '}
+        <ExtensionLink extensionId="ms-python.python">
+          Python extension
+        </ExtensionLink>
+        .
+      </span>
+    }
+    interactive={true}
+    disabled={disabled}
+  >
+    <span>{children}</span>
+  </Tooltip>
+)
 
 export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
   const { pythonBinPath, isPythonExtensionUsed, isPythonEnvironmentGlobal } =
@@ -35,21 +57,17 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
         )}
         .
       </p>
-      <div className={styles.sideBySideButtons}>
-        <Button onClick={installDvc} text="Install (pip)" />
-        {isPythonExtensionUsed && (
-          <Button onClick={updatePythonEnvironment} text="Set Env" />
-        )}
-        <Button onClick={setupWorkspace} text="Locate DVC" />
-      </div>
     </>
   ) : (
     <>
       <p>
         {installationSentence} DVC & DVCLive cannot be auto-installed as Python
-        was not located.
+        was not located. Install the{' '}
+        <ExtensionLink extensionId="ms-python.python">
+          Python extension
+        </ExtensionLink>{' '}
+        to detect or create python environments.
       </p>
-      <Button onClick={setupWorkspace} text="Locate DVC" />
     </>
   )
 
@@ -58,6 +76,23 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
       <h1>DVC is currently unavailable</h1>
       {children}
       {conditionalContents}
+      <div className={styles.sideBySideButtons}>
+        <PythonExtensionTooltip disabled={canInstall}>
+          <Button
+            disabled={!canInstall}
+            onClick={installDvc}
+            text="Install (pip)"
+          />
+        </PythonExtensionTooltip>
+        <PythonExtensionTooltip disabled={isPythonExtensionUsed}>
+          <Button
+            disabled={!isPythonExtensionUsed}
+            onClick={updatePythonEnvironment}
+            text="Set Env"
+          />
+        </PythonExtensionTooltip>
+        <Button onClick={setupWorkspace} text="Locate DVC" />
+      </div>
     </EmptyState>
   )
 }
