@@ -1,13 +1,9 @@
 import React, { MouseEventHandler, ReactElement } from 'react'
-import {
-  VSCodeCheckbox,
-  VSCodeProgressRing
-} from '@vscode/webview-ui-toolkit/react'
+import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
 import cx from 'classnames'
 import {
   ExperimentStatus,
-  isQueued,
-  isRunning
+  isQueued
 } from 'dvc/src/experiments/webview/contract'
 import { CellHintTooltip } from './CellHintTooltip'
 import { Indicator } from '../Indicators'
@@ -20,6 +16,7 @@ import {
   StarEmpty,
   GraphScatter
 } from '../../../../shared/components/icons'
+import { Icon } from '../../../../shared/components/Icon'
 
 export type CellRowActionsProps = {
   isRowSelected: boolean
@@ -29,7 +26,6 @@ export type CellRowActionsProps = {
   status?: ExperimentStatus
   subRowStates: {
     plotSelections: number
-    running: number
     selections: number
     stars: number
   }
@@ -39,6 +35,7 @@ export type CellRowActionsProps = {
 }
 
 type CellRowActionProps = {
+  className?: string
   showSubRowStates: boolean
   subRowsAffected: number
   children: ReactElement
@@ -48,17 +45,18 @@ type CellRowActionProps = {
 }
 
 const CellRowAction: React.FC<CellRowActionProps> = ({
+  children,
+  className,
+  onClick,
   showSubRowStates,
   subRowsAffected,
-  children,
   testId,
-  tooltipContent,
-  onClick
+  tooltipContent
 }) => {
   const count = (showSubRowStates && subRowsAffected) || 0
 
   const action = (
-    <div className={styles.rowActions} data-testid={testId}>
+    <div className={cx(styles.rowActions, className)} data-testid={testId}>
       <Indicator onClick={onClick} count={count}>
         {children}
       </Indicator>
@@ -74,22 +72,6 @@ const CellRowAction: React.FC<CellRowActionProps> = ({
 
 const getTooltipContent = (determiner: boolean, action: string): string =>
   'Click to ' + (determiner ? `un${action}` : action)
-
-const getRunningTooltipContent = (
-  running: boolean,
-  showSubRowStates: boolean,
-  subRowsRunning: number
-): string | null => {
-  if (running) {
-    return 'Experiment is currently running'
-  }
-
-  if (showSubRowStates && subRowsRunning) {
-    return `There are currently ${subRowsRunning} running under this commit.`
-  }
-
-  return null
-}
 
 type ClickableTooltipContentProps = {
   clickableText: string
@@ -118,12 +100,10 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
   isRowSelected,
   showSubRowStates,
   starred,
-  subRowStates: { plotSelections, running: subRowsRunning, selections, stars },
+  subRowStates: { plotSelections, selections, stars },
   toggleRowSelection,
   toggleStarred
 }) => {
-  const running = isRunning(status)
-
   return (
     <>
       <CellRowAction
@@ -137,24 +117,35 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
           checked={isRowSelected}
         />
       </CellRowAction>
-      <CellRowAction
-        showSubRowStates={showSubRowStates}
-        subRowsAffected={subRowsRunning}
-        testId="row-action-running-indicator"
-        tooltipContent={getRunningTooltipContent(
-          running,
-          showSubRowStates,
-          subRowsRunning
-        )}
-      >
-        {running ? (
-          <VSCodeProgressRing
-            className={cx(styles.running, 'chromatic-ignore')}
+      {isQueued(status) ? (
+        <div className={styles.rowActions}>
+          <span className={styles.queued}>
+            <Clock />
+          </span>
+        </div>
+      ) : (
+        <CellRowAction
+          showSubRowStates={showSubRowStates}
+          subRowsAffected={plotSelections}
+          testId="row-action-plot"
+          tooltipContent={
+            <ClickableTooltipContent
+              clickableText="Open the plots view"
+              helperText={getTooltipContent(!!plotColor, 'plot')}
+              onClick={openPlotsWebview}
+            />
+          }
+          onClick={toggleExperiment}
+        >
+          <Icon
+            style={{ fill: plotColor }}
+            className={styles.plotBox}
+            height={18}
+            width={18}
+            icon={GraphScatter}
           />
-        ) : (
-          <div />
-        )}
-      </CellRowAction>
+        </CellRowAction>
+      )}
       <CellRowAction
         showSubRowStates={showSubRowStates}
         subRowsAffected={stars}
@@ -177,33 +168,7 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
         >
           {starred ? <StarFull /> : <StarEmpty />}
         </div>
-      </CellRowAction>
-      {isQueued(status) ? (
-        <div className={styles.rowActions}>
-          <span className={styles.queued}>
-            <Clock />
-          </span>
-        </div>
-      ) : (
-        <CellRowAction
-          showSubRowStates={showSubRowStates}
-          subRowsAffected={plotSelections}
-          testId="row-action-plot"
-          tooltipContent={
-            <ClickableTooltipContent
-              clickableText="Open the plots view"
-              helperText={getTooltipContent(!!plotColor, 'plot')}
-              onClick={openPlotsWebview}
-            />
-          }
-          onClick={toggleExperiment}
-        >
-          <GraphScatter
-            style={{ fill: plotColor }}
-            className={styles.plotIcon}
-          />
-        </CellRowAction>
-      )}
+      </CellRowAction>{' '}
     </>
   )
 }

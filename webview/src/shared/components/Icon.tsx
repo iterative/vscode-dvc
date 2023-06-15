@@ -4,6 +4,7 @@ export type IconValue = (props: SVGProps<SVGSVGElement>) => JSX.Element
 interface IconProps {
   icon: IconValue
   className?: string
+  style?: { [key: string]: string | undefined }
   width?: number
   height?: number
 }

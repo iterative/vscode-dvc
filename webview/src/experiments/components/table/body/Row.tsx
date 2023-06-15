@@ -2,7 +2,6 @@ import cx from 'classnames'
 import React, { useCallback, useContext, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
-import { isRunning } from 'dvc/src/experiments/webview/contract'
 import { FirstCell, CellWrapper } from './Cell'
 import { RowContextMenu } from './RowContextMenu'
 import styles from '../styles.module.scss'
@@ -52,9 +51,6 @@ export const RowContent: React.FC<
     const plotSelections =
       subRows?.filter(subRow => subRow.original.selected).length ?? 0
 
-    const running =
-      subRows?.filter(subRow => isRunning(subRow.original.status)).length ?? 0
-
     const selections =
       subRows?.filter(
         subRow =>
@@ -65,7 +61,6 @@ export const RowContent: React.FC<
 
     return {
       plotSelections,
-      running,
       selections,
       stars
     }

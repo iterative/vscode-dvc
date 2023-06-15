@@ -451,11 +451,7 @@ $badge-size: 0.85rem;
     visibility: hidden;
   }
 
-  .running {
-    visibility: visible;
-  }
-
-  .plotIcon {
+  .plotBox {
     visibility: visible;
   }
 
@@ -634,14 +630,21 @@ $badge-size: 0.85rem;
   font-size: 0.65rem;
 }
 
-.plotIcon {
-  margin-top: 4px;
+.plotBox {
+  height: $checkbox-size;
+  width: $checkbox-size;
+  background-color: $checkbox-background;
+  border-radius: $checkbox-border-radius;
+  border: $checkbox-border-width solid $checkbox-border;
+  cursor: pointer;
 }
 
 .running {
-  position: relative;
-  height: 16px;
-  width: 16px;
+  display: inline-flex;
+  height: 12px;
+  width: 12px;
+  margin-right: 8px;
+  margin-left: -20px;
 }
 
 .queued {
