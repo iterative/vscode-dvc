@@ -1,6 +1,5 @@
 import React, { MouseEventHandler, ReactElement } from 'react'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
-import cx from 'classnames'
 import {
   ExperimentStatus,
   isQueued
@@ -35,18 +34,16 @@ export type CellRowActionsProps = {
 }
 
 type CellRowActionProps = {
-  className?: string
   showSubRowStates: boolean
   subRowsAffected: number
   children: ReactElement
   testId: string
-  tooltipContent: string | ReactElement | null
+  tooltipContent: string | ReactElement
   onClick?: MouseEventHandler
 }
 
 const CellRowAction: React.FC<CellRowActionProps> = ({
   children,
-  className,
   onClick,
   showSubRowStates,
   subRowsAffected,
@@ -55,18 +52,14 @@ const CellRowAction: React.FC<CellRowActionProps> = ({
 }) => {
   const count = (showSubRowStates && subRowsAffected) || 0
 
-  const action = (
-    <div className={cx(styles.rowActions, className)} data-testid={testId}>
-      <Indicator onClick={onClick} count={count}>
-        {children}
-      </Indicator>
-    </div>
-  )
-
-  return tooltipContent ? (
-    <CellHintTooltip tooltipContent={tooltipContent}>{action}</CellHintTooltip>
-  ) : (
-    action
+  return (
+    <CellHintTooltip tooltipContent={tooltipContent}>
+      <div className={styles.rowActions} data-testid={testId}>
+        <Indicator onClick={onClick} count={count}>
+          {children}
+        </Indicator>
+      </div>
+    </CellHintTooltip>
   )
 }
 
@@ -168,7 +161,7 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
         >
           {starred ? <StarFull /> : <StarEmpty />}
         </div>
-      </CellRowAction>{' '}
+      </CellRowAction>
     </>
   )
 }
