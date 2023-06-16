@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.6] - 2023-06-16
+
+### 🚀 New Features and Enhancements
+
+- Switch experiment table radio buttons to plot icons [#4121](https://github.com/iterative/vscode-dvc/pull/4121) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Fix "Get Started" walkthrough typos and outdated mentions [#4118](https://github.com/iterative/vscode-dvc/pull/4118) by [@julieg18](https://github.com/julieg18)
+- Update README with up to date information [#4126](https://github.com/iterative/vscode-dvc/pull/4126) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.5] - 2023-06-14
 
 ### 🐛 Bug Fixes
