@@ -58,9 +58,8 @@ databases are required.
 
 ## Quick start
 
-1. [Install DVC](https://dvc.org/doc/install) on your system.
-2. Install [this extension] in VS Code.
-3. Follow the steps set out on the [Setup](#useful-commands) page!
+1. Install [this extension] in VS Code.
+2. Follow the steps set out on the [Setup](#useful-commands) page!
 
 <!-- prettier-ignore -->
 > 💡 Feel free to try our [example DVC project] first! Opening it [with Github
@@ -68,7 +67,8 @@ databases are required.
 
 [this extension]:
   https://marketplace.visualstudio.com/items?itemName=Iterative.dvc
-[example dvc project]: https://github.com/iterative/example-get-started
+[example dvc project]:
+  https://github.com/iterative/example-get-started-experiments
 [with github codespaces]:
   https://docs.github.com/en/codespaces/getting-started/quickstart#creating-your-codespace
 
