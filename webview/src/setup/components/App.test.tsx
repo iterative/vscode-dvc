@@ -133,7 +133,7 @@ describe('App', () => {
       })
     })
 
-    it('should tell the user they cannot install DVC without a Python env', () => {
+    it('should tell the user they cannot install DVC without a Python interpreter', () => {
       renderApp({
         cliCompatible: undefined,
         dvcCliDetails: {
