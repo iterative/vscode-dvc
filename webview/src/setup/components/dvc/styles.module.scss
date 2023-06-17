@@ -45,6 +45,10 @@
   font-size: inherit;
 }
 
-.sideBySideButtons > *:not(:first-child) {
+.buttonWrapper {
+  display: inline-block;
+}
+
+.sideBySideButtons .buttonWrapper:not(:first-child) {
   margin-left: 15px;
 }

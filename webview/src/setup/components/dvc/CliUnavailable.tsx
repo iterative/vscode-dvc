@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from 'react'
+import React, { PropsWithChildren, ReactElement } from 'react'
 import { useSelector } from 'react-redux'
 import styles from './styles.module.scss'
 import { Button } from '../../../shared/components/button/Button'
@@ -13,12 +13,14 @@ import { Warning } from '../../../shared/components/icons'
 import { ExtensionLink } from '../shared/ExtensionLink'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
 
-const PythonExtensionTooltip: React.FC<
-  PropsWithChildren<{ disabled: boolean }>
-> = ({ disabled, children }) => (
+const PythonExtensionTooltip: React.FC<{
+  dataTestId: string
+  disabled: boolean
+  children: ReactElement
+}> = ({ dataTestId, disabled, children }) => (
   <Tooltip
     content={
-      <span>
+      <span data-testid={dataTestId}>
         Install the{' '}
         <ExtensionLink extensionId="ms-python.python">
           Python extension
@@ -77,21 +79,33 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
       {children}
       {conditionalContents}
       <div className={styles.sideBySideButtons}>
-        <PythonExtensionTooltip disabled={canInstall}>
-          <Button
-            disabled={!canInstall}
-            onClick={installDvc}
-            text="Install (pip)"
-          />
-        </PythonExtensionTooltip>
-        <PythonExtensionTooltip disabled={isPythonExtensionUsed}>
-          <Button
-            disabled={!isPythonExtensionUsed}
-            onClick={updatePythonEnvironment}
-            text="Set Env"
-          />
-        </PythonExtensionTooltip>
-        <Button onClick={setupWorkspace} text="Locate DVC" />
+        <span className={styles.buttonWrapper}>
+          <PythonExtensionTooltip
+            dataTestId="install-tooltip"
+            disabled={canInstall}
+          >
+            <Button
+              disabled={!canInstall}
+              onClick={installDvc}
+              text="Install (pip)"
+            />
+          </PythonExtensionTooltip>
+        </span>
+        <span className={styles.buttonWrapper}>
+          <PythonExtensionTooltip
+            dataTestId="set-env-tooltip"
+            disabled={isPythonExtensionUsed}
+          >
+            <Button
+              disabled={!isPythonExtensionUsed}
+              onClick={updatePythonEnvironment}
+              text="Set Env"
+            />
+          </PythonExtensionTooltip>
+        </span>
+        <span className={styles.buttonWrapper}>
+          <Button onClick={setupWorkspace} text="Locate DVC" />
+        </span>
       </div>
     </EmptyState>
   )
