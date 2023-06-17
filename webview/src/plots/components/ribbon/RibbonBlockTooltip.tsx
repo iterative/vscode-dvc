@@ -43,7 +43,7 @@ export const RibbonBlockTooltip: React.FC<{
         </tbody>
       </table>
       <p className={styles.tooltipTableDescription}>
-        *Reflects the first three columns in the table:
+        *Reflects the first three columns (minus Created) in the table:
       </p>
       {commit && (
         <p
@@ -65,7 +65,6 @@ export const RibbonBlockTooltip: React.FC<{
       content={tooltipContent}
       maxWidth="none"
       interactive
-      visible={true}
     >
       {children}
     </Tooltip>
