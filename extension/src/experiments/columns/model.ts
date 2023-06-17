@@ -46,7 +46,10 @@ export class ColumnsModel extends PathSelectionModel<Column> {
 
   public getFirstThreeColumnOrder(): string[] {
     return this.columnOrderState
-      .filter(path => this.status[path] && this.status[path] === 2)
+      .filter(
+        path =>
+          this.status[path] && this.status[path] === 2 && path !== 'Created'
+      )
       .slice(0, 3)
   }
 

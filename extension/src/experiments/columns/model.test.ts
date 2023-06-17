@@ -258,7 +258,7 @@ describe('ColumnsModel', () => {
       expect(model.getColumnOrder()).toStrictEqual(persistedState)
     })
 
-    it('should return the first three none hidden columns from the persisted state', async () => {
+    it('should return the first three none hidden columns (minus created) from the persisted state', async () => {
       const persistedState = [
         'id',
         'Created',
@@ -280,17 +280,17 @@ describe('ColumnsModel', () => {
       await model.transformAndSet(outputFixture)
 
       expect(model.getFirstThreeColumnOrder()).toStrictEqual(
-        persistedState.slice(1, 4)
+        persistedState.slice(2, 5)
       )
 
-      model.toggleStatus('Created')
+      model.toggleStatus('params:params.yaml:dvc_logs_dir')
 
       expect(model.getFirstThreeColumnOrder()).toStrictEqual(
-        persistedState.slice(2, 5)
+        persistedState.slice(3, 6)
       )
     })
 
-    it('should return the first three none hidden columns collected from data if state is empty', async () => {
+    it('should return the first three none hidden columns (minus created) collected from data if state is empty', async () => {
       const model = new ColumnsModel(
         exampleDvcRoot,
         buildMockMemento(),
@@ -299,9 +299,9 @@ describe('ColumnsModel', () => {
       await model.transformAndSet(outputFixture)
 
       expect(model.getFirstThreeColumnOrder()).toStrictEqual([
-        'Created',
         'metrics:summary.json:loss',
-        'metrics:summary.json:accuracy'
+        'metrics:summary.json:accuracy',
+        'metrics:summary.json:val_loss'
       ])
 
       model.toggleStatus('Created')

@@ -49,6 +49,13 @@
   }
 }
 
+.tooltipTableDescription {
+  margin: 4px 0 0 4px;
+  color: var(--vscode-descriptionForeground);
+  font-size: 0.75rem;
+  max-width: 250px;
+}
+
 .commitMessage {
   display: flex;
   align-items: center;
