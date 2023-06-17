@@ -23,14 +23,14 @@ export const notifyOutput = (
 }
 
 export const notifyCompleted = (
-  { command, pid, cwd, duration, exitCode, errorOutput: stderr }: CliResult,
+  { command, pid, cwd, duration, exitCode, errorOutput }: CliResult,
   processCompleted: EventEmitter<CliResult>
 ): void =>
   processCompleted.fire({
     command,
     cwd,
     duration,
-    errorOutput: stderr?.replace(/\n+/g, '\n'),
+    errorOutput: errorOutput?.replace(/\n+/g, '\n'),
     exitCode,
     pid
   })
