@@ -15,8 +15,12 @@ export const CliIncompatible: React.FC<PropsWithChildren> = ({ children }) => {
   const conditionalContents = canUpgrade ? (
     <>
       <div className={styles.sideBySideButtons}>
-        <Button onClick={upgradeDvc} text="Upgrade (pip)" />
-        <Button text="Check Compatibility" onClick={checkCompatibility} />
+        <span className={styles.buttonWrapper}>
+          <Button onClick={upgradeDvc} text="Upgrade (pip)" />
+        </span>
+        <span className={styles.buttonWrapper}>
+          <Button text="Check Compatibility" onClick={checkCompatibility} />
+        </span>
       </div>
     </>
   ) : (
