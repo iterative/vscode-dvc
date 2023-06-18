@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.7] - 2023-06-18
+
+### 🐛 Bug Fixes
+
+- Use regex to handle detached HEAD branch name in other languages [#4137](https://github.com/iterative/vscode-dvc/pull/4137) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.6] - 2023-06-16
 
 ### 🚀 New Features and Enhancements
