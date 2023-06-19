@@ -265,6 +265,7 @@ describe('ColumnsModel', () => {
         'params:params.yaml:dvc_logs_dir',
         'params:params.yaml:process.threshold',
         'params:params.yaml:process.test_arg',
+        'params:params.yaml:dropout',
         'deps:src/prepare.py',
         'deps:src/featurization.py'
       ]
