@@ -85,29 +85,33 @@ export const sendTelemetryEvent = (
     ? sanitizeProperties(eventName, properties)
     : undefined
   reporter.sendTelemetryEvent(
-    eventName as string,
+    eventName,
     { ...sanitizedProperties, user_id: getUserId() },
     measurements
   )
 }
 
-export const sendErrorTelemetryEvent = (
+const sendErrorTelemetryEvent = (
   eventName: EventName,
   e: Error,
   duration: number,
   properties = {} as IEventNamePropertyMapping[EventName]
-) =>
-  sendTelemetryEvent(
-    `errors.${String(eventName)}` as EventName,
-    {
-      ...properties,
-      error: e.message
-    } as unknown as IEventNamePropertyMapping[EventName],
-    {
-      duration
-    }
-  )
+) => {
+  if (isTestExecution() || isDebugSession()) {
+    return
+  }
+  const reporter = getTelemetryReporter()
 
+  const sanitizedProperties = properties
+    ? sanitizeProperties(eventName, properties)
+    : undefined
+
+  return reporter.sendTelemetryErrorEvent(
+    `errors.${String(eventName)}`,
+    { ...sanitizedProperties, errorMessage: e.message },
+    { duration }
+  )
+}
 export const sendTelemetryEventAndThrow = (
   eventName: EventName,
   e: Error,
