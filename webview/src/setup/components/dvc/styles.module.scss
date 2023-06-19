@@ -45,6 +45,11 @@
   font-size: inherit;
 }
 
-.sideBySideButtons > *:not(:first-child) {
+.sideBySideButtons *:not(:first-child) {
   margin-left: 15px;
+}
+
+.pythonExtInfo {
+  max-width: 350px;
+  margin: 8px auto;
 }
