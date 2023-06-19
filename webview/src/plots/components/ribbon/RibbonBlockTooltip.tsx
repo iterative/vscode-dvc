@@ -29,7 +29,7 @@ export const RibbonBlockTooltip: React.FC<{
               <td className={cx(styles.tooltipColumn, styles[`${type}Key`])}>
                 <span className={styles.tooltipPathWrapper}>{path}</span>
               </td>
-              <td>
+              <td className={styles.tooltipColumn}>
                 {typeof value === 'number' ? formatNumber(value) : value}
                 {value === '-' || (
                   <CopyButton
