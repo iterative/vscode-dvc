@@ -147,7 +147,6 @@ describe('App', () => {
           /DVC & DVCLive cannot be auto-installed as Python was not located./
         )
       ).toBeInTheDocument()
-      expect(screen.queryByText('Install')).not.toBeInTheDocument()
     })
 
     it('should tell the user they can auto-install DVC with a Python interpreter', () => {
@@ -169,7 +168,7 @@ describe('App', () => {
       expect(screen.getByText('Install (pip)')).toBeInTheDocument()
     })
 
-    it('should let the user find another Python interpreter to install DVC when the Python extension is not installed', () => {
+    it('should let the user locate DVC when the Python extension is not installed', () => {
       renderApp({
         cliCompatible: undefined,
         dvcCliDetails: {
@@ -185,6 +184,24 @@ describe('App', () => {
       expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.SETUP_WORKSPACE
       })
+    })
+
+    it('should show python extension info when dvc is unavailable and Python extension is not installed', () => {
+      renderApp({
+        cliCompatible: undefined,
+        dvcCliDetails: {
+          command: 'python -m dvc',
+          version: undefined
+        }
+      })
+
+      const infoText = screen.getByText(/detect or create python environments/)
+
+      expect(infoText).toBeInTheDocument()
+
+      sendSetDataMessage({ ...DEFAULT_DATA, isPythonExtensionUsed: true })
+
+      expect(infoText).not.toBeInTheDocument()
     })
 
     it('should let the user find or create another Python interpreter to install DVC when the Python extension is installed', () => {
