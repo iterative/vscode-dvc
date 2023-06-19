@@ -3,9 +3,10 @@
 You edit your code, edit or add more data, applying a new combination of
 hyperparameters- you have a new idea to try 💡!
 
-This extension provides many different ways to run a new experiment or queue one
-to be run later in the background or in parallel. This functionality wraps up
-the [`dvc exp run`](https://dvc.org/doc/command-reference/exp/run) command.
+This extension provides many different ways to run a new experiment. You can
+also queue one to be run later in the background or in parallel. This
+functionality wraps up the
+[`dvc exp run`](https://dvc.org/doc/command-reference/exp/run) command.
 
 The basic one is the set of buttons that are available when the experiments
 table or parameters file are open:

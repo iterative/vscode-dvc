@@ -74,16 +74,17 @@ rendered side by side for the selected experiments.
        alt="Plots: Custom" />
 </p>
 
-**Custom** plots compare a chosen [metric] and param across experiments.
+**Custom** plots compare a chosen [metric] and [param] across experiments.
 
 [metric]: https://dvc.org/doc/command-reference/metrics
+[param]: https://dvc.org/doc/command-reference/params
 
 <p align="center">
   <img src="images/plots-view-icon.png"
        alt="Plots View Icon" />
 </p>
 
-The **Plots Dashboard** can be configured and accessed from the _Plots_ and
-_Experiments_ side panels in the [**DVC View**](command:views.dvc-views).
+The **Plots Dashboard** can be configured and accessed from the _Plots_ side
+panel in the [**DVC View**](command:views.dvc-views).
 
 > This is equivalent to the [`dvc plots show`] and [`dvc plots diff`] commands.

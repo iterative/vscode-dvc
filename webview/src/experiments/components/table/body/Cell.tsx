@@ -1,6 +1,8 @@
 import { flexRender } from '@tanstack/react-table'
 import React, { ReactNode } from 'react'
+import { VSCodeProgressRing } from '@vscode/webview-ui-toolkit/react'
 import cx from 'classnames'
+import { isRunning } from 'dvc/src/experiments/webview/contract'
 import { CellRowActionsProps, CellRowActions } from './CellRowActions'
 import styles from '../styles.module.scss'
 import { CellValue, isValueWithChanges } from '../content/Cell'
@@ -59,6 +61,12 @@ export const FirstCell: React.FC<
       <div className={styles.innerCell} style={{ width: getSize() }}>
         <CellRowActions status={status} {...rowActionsProps} />
         <RowExpansionButton row={row} />
+        {isRunning(status) && (
+          <VSCodeProgressRing
+            className={cx(styles.running, 'chromatic-ignore')}
+          />
+        )}
+
         {getIsPlaceholder() ? null : (
           <ErrorTooltip error={error}>
             <div

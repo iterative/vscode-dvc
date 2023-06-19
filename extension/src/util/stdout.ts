@@ -6,4 +6,7 @@ export const trimAndSplit = (stdout: string): string[] =>
     .filter(Boolean)
 
 export const cleanUpBranchName = (branch: string) =>
-  branch.replace('* ', '').replace('(HEAD detached at ', '').replace(')', '')
+  branch
+    .replace('* ', '')
+    .replace(/\(HEAD\s\w+\s\w+\s/, '')
+    .replace(')', '')

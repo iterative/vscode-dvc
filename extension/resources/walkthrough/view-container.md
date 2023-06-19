@@ -23,7 +23,8 @@ project available in the workspace:
 > [GitHub](https://github.com/iterative/vscode-dvc/issues). We are happy to
 > help.
 
-If DVC and the extension are initialized, side bar will expose multiple views:
+If DVC and the extension are initialized, the side bar will expose multiple
+views:
 
 <p align="center">
 <img src="images/view-container.png"
@@ -36,6 +37,6 @@ If DVC and the extension are initialized, side bar will expose multiple views:
   columns.
 - `PLOTS`. Used to fine-tune the plots dashboard, e.g. by toggling plots
   visibility.
-- `FILTER BY`. Used to view, add, or remove metrics and parameters filters.
+- `FILTER BY`. Used to view, add, or remove metrics/parameters filters. These
+  will hide specific experiments in the table.
 - `SORT BY`. Used to display and configure how the experiments table is sorted.
-  These will hide specific experiments in the table.

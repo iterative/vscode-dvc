@@ -11,7 +11,7 @@
 
 - Browse all available [`dvc` commands] and [Python API] functions.
 
-- Take our [free course] and become a certified in Iterative.ai tools!
+- Take our [free course] and become certified in Iterative.ai tools!
 
 - Play with a ready-to-use [example project].
 
@@ -30,7 +30,7 @@
 [python api]: https://dvc.org/doc/api-reference
 [free course]: https://learn.iterative.ai/
 [contribute]: https://dvc.org/doc/contributing/core
-[example project]: https://github.com/iterative/example-get-started
+[example project]: https://github.com/iterative/example-get-started-experiments
 [blog]: https://dvc.org/blog
 [community]: https://dvc.org/community
 [dvc github repository]: https://github.com/iterative/dvc

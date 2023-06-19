@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "1.0.5",
+  "version": "1.0.7",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -1469,7 +1469,7 @@
       },
       {
         "view": "dvc.views.welcome",
-        "contents": "The extension is currently unable to initialize.\n[Show Setup](command:dvc.showDvcSetup)\nNew to the extension? Watch a [demo of the extension](https://youtu.be/E26IaD7bNXg?t=1177) in action or quickly try the extension yourself with our [example project](https://github.com/iterative/example-dvc-experiments.git). Dive deeper into DVC at [dvc.org](https://dvc.org/).",
+        "contents": "The extension is currently unable to initialize.\n[Show Setup](command:dvc.showDvcSetup)\nNew to the extension? Watch a [demo of the extension](https://youtu.be/E26IaD7bNXg?t=1177) in action or quickly try the extension yourself with our [example project](https://github.com/iterative/example-get-started-experiments). Dive deeper into DVC at [dvc.org](https://dvc.org/).",
         "when": "true"
       },
       {
@@ -1666,7 +1666,7 @@
     "@types/node": "16.x",
     "@types/react-vega": "7.0.0",
     "@types/sinon-chai": "3.2.9",
-    "@types/uuid": "9.0.1",
+    "@types/uuid": "9.0.2",
     "@types/vega": "3.2.0",
     "@types/vscode": "1.64.0",
     "@vscode/test-electron": "2.3.3",
@@ -1686,7 +1686,7 @@
     "mocha": "10.2.0",
     "mock-require": "3.0.3",
     "shx": "0.3.4",
-    "sinon": "15.1.0",
+    "sinon": "15.1.2",
     "sinon-chai": "3.7.0",
     "ts-loader": "9.4.3",
     "vscode-uri": "3.0.7",

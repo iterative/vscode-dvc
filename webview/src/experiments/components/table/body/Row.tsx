@@ -2,7 +2,6 @@ import cx from 'classnames'
 import React, { useCallback, useContext, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
-import { isQueued, isRunning } from 'dvc/src/experiments/webview/contract'
 import { FirstCell, CellWrapper } from './Cell'
 import { RowContextMenu } from './RowContextMenu'
 import styles from '../styles.module.scss'
@@ -24,9 +23,8 @@ export const RowContent: React.FC<
   const changes = useSelector(
     (state: ExperimentsState) => state.tableData.changes
   )
-  const { getVisibleCells, original, index, getIsExpanded, subRows } = row
-  const { branch, displayColor, error, starred, id, status, selected } =
-    original
+  const { getVisibleCells, original, getIsExpanded, subRows } = row
+  const { branch, displayColor, error, starred, id } = original
   const [firstCell, ...cells] = getVisibleCells()
   const isWorkspace = id === EXPERIMENT_WORKSPACE_ID
   const changesIfWorkspace = isWorkspace ? changes : undefined
@@ -68,11 +66,6 @@ export const RowContent: React.FC<
     }
   }, [subRows, selectedRows])
 
-  const running = isRunning(status)
-  const queued = isQueued(status)
-  const unselected = selected === false
-  const isOdd = index % 2 !== 0 && !isRowSelected
-
   return (
     <ContextMenu content={<RowContextMenu row={row} />}>
       <tr
@@ -82,14 +75,6 @@ export const RowContent: React.FC<
           styles.bodyRow,
           styles.row,
           {
-            [styles.runningExperiment]: running,
-            [styles.queuedExperiment]: queued,
-            [styles.unselectedExperiment]: !running && !queued && unselected,
-            [styles.normalExperiment]: !running && !queued && !unselected,
-            [styles.oddRow]: isOdd,
-            [styles.evenRow]: !isOdd,
-            [styles.workspaceRow]: isWorkspace,
-            [styles.normalRow]: !isWorkspace,
             [styles.rowSelected]: isRowSelected
           }
         )}
@@ -100,7 +85,7 @@ export const RowContent: React.FC<
         <FirstCell
           cell={firstCell}
           changesIfWorkspace={!!changesIfWorkspace?.length}
-          bulletColor={displayColor}
+          plotColor={displayColor}
           starred={starred}
           isRowSelected={isRowSelected}
           showSubRowStates={!getIsExpanded() && !isWorkspace}
