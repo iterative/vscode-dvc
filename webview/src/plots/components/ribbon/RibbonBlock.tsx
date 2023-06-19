@@ -7,7 +7,7 @@ import { RibbonBlockTooltip } from './RibbonBlockTooltip'
 import { Icon } from '../../../shared/components/Icon'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
 import { CopyButton } from '../../../shared/components/copyButton/CopyButton'
-import { Close } from '../../../shared/components/icons'
+import { Close, Info } from '../../../shared/components/icons'
 
 interface RibbonBlockProps {
   revision: Revision
@@ -47,6 +47,7 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
       style={{ borderColor: displayColor }}
       data-testid={`ribbon-${id}`}
     >
+      <Info className={styles.infoIcon} />
       <div className={styles.label}>
         {description ? (
           <>

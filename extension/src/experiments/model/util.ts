@@ -1,5 +1,4 @@
 import get from 'lodash.get'
-import { formatDate } from '../../util/date'
 import { formatNumber } from '../../util/number'
 import { truncateFromLeft } from '../../util/string'
 import { splitColumnPath } from '../columns/paths'
@@ -7,16 +6,9 @@ import { Experiment } from '../webview/contract'
 
 type Value = undefined | null | [] | string | number
 
-const isDate = (value: Value): boolean =>
-  !!(typeof value === 'string' && Date.parse(value))
-
 const getStringifiedValue = (value: Value): string => {
   if (Number.isNaN(value)) {
     return 'NaN'
-  }
-
-  if (isDate(value)) {
-    return formatDate(value as string)
   }
 
   if (Array.isArray(value)) {
