@@ -186,7 +186,7 @@ describe('App', () => {
       })
     })
 
-    it('should show "Set Env" and "Install (pip)" button tooltips when dvc is unavailable and Python extension is not installed', () => {
+    it('should show python extension info when dvc is unavailable and Python extension is not installed', () => {
       renderApp({
         cliCompatible: undefined,
         dvcCliDetails: {
@@ -195,17 +195,13 @@ describe('App', () => {
         }
       })
 
-      const installButton = screen.getByText('Install (pip)')
+      const infoText = screen.getByText(/detect or create python environments/)
 
-      fireEvent.mouseEnter(installButton, { bubbles: true })
+      expect(infoText).toBeInTheDocument()
 
-      expect(screen.getByTestId('install-tooltip')).toBeVisible()
+      sendSetDataMessage({ ...DEFAULT_DATA, isPythonExtensionUsed: true })
 
-      const setEnvButton = screen.getByText('Set Env')
-
-      fireEvent.mouseEnter(setEnvButton, { bubbles: true })
-
-      expect(screen.getByTestId('set-env-tooltip')).toBeVisible()
+      expect(infoText).not.toBeInTheDocument()
     })
 
     it('should let the user find or create another Python interpreter to install DVC when the Python extension is installed', () => {

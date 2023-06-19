@@ -45,10 +45,12 @@
   font-size: inherit;
 }
 
-.buttonWrapper {
-  display: inline-block;
+.sideBySideButtons *:not(:first-child) {
+  margin-left: 15px;
 }
 
-.sideBySideButtons .buttonWrapper:not(:first-child) {
-  margin-left: 15px;
+.pythonExtInfo {
+  max-width: 350px;
+  margin: 8px auto;
+  font-size: 0.75rem;
 }

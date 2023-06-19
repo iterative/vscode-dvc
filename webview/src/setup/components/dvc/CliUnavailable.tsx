@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, ReactElement } from 'react'
+import React, { PropsWithChildren } from 'react'
 import { useSelector } from 'react-redux'
 import styles from './styles.module.scss'
 import { Button } from '../../../shared/components/button/Button'
@@ -10,30 +10,7 @@ import {
   updatePythonEnvironment
 } from '../../util/messages'
 import { Warning } from '../../../shared/components/icons'
-import { ExtensionLink } from '../shared/ExtensionLink'
-import Tooltip from '../../../shared/components/tooltip/Tooltip'
-
-const PythonExtensionTooltip: React.FC<{
-  dataTestId: string
-  disabled: boolean
-  children: ReactElement
-}> = ({ dataTestId, disabled, children }) => (
-  <Tooltip
-    content={
-      <span data-testid={dataTestId}>
-        Install the{' '}
-        <ExtensionLink extensionId="ms-python.python">
-          Python extension
-        </ExtensionLink>
-        .
-      </span>
-    }
-    interactive={true}
-    disabled={disabled}
-  >
-    <span>{children}</span>
-  </Tooltip>
-)
+import { ShowExtension } from '../remotes/ShowExtension'
 
 export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
   const { pythonBinPath, isPythonExtensionUsed, isPythonEnvironmentGlobal } =
@@ -64,11 +41,7 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
     <>
       <p>
         {installationSentence} DVC & DVCLive cannot be auto-installed as Python
-        was not located. Install the{' '}
-        <ExtensionLink extensionId="ms-python.python">
-          Python extension
-        </ExtensionLink>{' '}
-        to detect or create python environments.
+        was not located.
       </p>
     </>
   )
@@ -79,34 +52,26 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
       {children}
       {conditionalContents}
       <div className={styles.sideBySideButtons}>
-        <span className={styles.buttonWrapper}>
-          <PythonExtensionTooltip
-            dataTestId="install-tooltip"
-            disabled={canInstall}
-          >
-            <Button
-              disabled={!canInstall}
-              onClick={installDvc}
-              text="Install (pip)"
-            />
-          </PythonExtensionTooltip>
-        </span>
-        <span className={styles.buttonWrapper}>
-          <PythonExtensionTooltip
-            dataTestId="set-env-tooltip"
-            disabled={isPythonExtensionUsed}
-          >
-            <Button
-              disabled={!isPythonExtensionUsed}
-              onClick={updatePythonEnvironment}
-              text="Set Env"
-            />
-          </PythonExtensionTooltip>
-        </span>
-        <span className={styles.buttonWrapper}>
-          <Button onClick={setupWorkspace} text="Locate DVC" />
-        </span>
+        <Button
+          disabled={!canInstall}
+          onClick={installDvc}
+          text="Install (pip)"
+        />
+        <Button
+          disabled={!isPythonExtensionUsed}
+          onClick={updatePythonEnvironment}
+          text="Set Env"
+        />
+        <Button onClick={setupWorkspace} text="Locate DVC" />
       </div>
+      {isPythonExtensionUsed || (
+        <ShowExtension
+          className={styles.pythonExtInfo}
+          id="ms-python.python"
+          name="Python"
+          capabilities="detect or create python environments"
+        />
+      )}
     </EmptyState>
   )
 }

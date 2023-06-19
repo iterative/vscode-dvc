@@ -8,9 +8,10 @@ export const ShowExtension: React.FC<{
   capabilities: string
   id: string
   name: string
-}> = ({ capabilities, id, name }) => {
+  className?: string
+}> = ({ capabilities, id, name, className }) => {
   return (
-    <p>
+    <p className={className}>
       <Icon
         icon={Extensions}
         width={16}
