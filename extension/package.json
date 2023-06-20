@@ -1509,6 +1509,17 @@
         "description": "Your first steps to build better models faster with experiment tracking and dataset versioning",
         "steps": [
           {
+            "id": "dvc.setupPage",
+            "title": "Setup Page",
+            "description": "Get started with DVC or setup additonal features.",
+            "media": {
+              "markdown": "resources/walkthrough/setup.md"
+            },
+            "completionEvents": [
+              "onCommand:dvc.setupPage"
+            ]
+          },
+          {
             "id": "dvc.showCommands",
             "title": "Available Commands",
             "description": "See all available commands.\n[View Commands](command:dvc.showCommands)",
