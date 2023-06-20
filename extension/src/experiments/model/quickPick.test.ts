@@ -11,9 +11,8 @@ import {
 } from '../../vscode/quickPick'
 import { Experiment } from '../webview/contract'
 import { Title } from '../../vscode/title'
-import { formatDate } from '../../util/date'
-
 import { Toast } from '../../vscode/toast'
+import { formatDate } from '../../util/date'
 
 jest.mock('../../vscode/quickPick')
 jest.mock('../../vscode/toast')
@@ -99,6 +98,13 @@ describe('pickExperimentsToPlot', () => {
       description: '[exp-123]',
       id: 'exp-123',
       label: '123fsf4',
+      metrics: {
+        'dvclive/metrics.json': {
+          data: {
+            accuracy: 0.78
+          }
+        }
+      },
       params: {
         'params.yaml': {
           prepare: { split: 0 }
@@ -116,6 +122,13 @@ describe('pickExperimentsToPlot', () => {
         description: '[exp-456]',
         id: 'exp-456',
         label: '456fsf4',
+        metrics: {
+          'dvclive/metrics.json': {
+            data: {
+              accuracy: 0.15
+            }
+          }
+        },
         params: {
           'params.yaml': {
             prepare: { split: 22000435560000 }
@@ -131,6 +144,13 @@ describe('pickExperimentsToPlot', () => {
         description: '[exp-789]',
         id: 'exp-789',
         label: '789fsf4',
+        metrics: {
+          'dvclive/metrics.json': {
+            data: {
+              accuracy: 0.35
+            }
+          }
+        },
         params: {
           'params.yaml': {
             prepare: { split: 0.000311111 }
@@ -142,7 +162,7 @@ describe('pickExperimentsToPlot', () => {
 
     mockedQuickPickLimitedValues.mockResolvedValueOnce([selectedExperiment])
     const picked = await pickExperimentsToPlot(mockedExperiments, [
-      'Created',
+      'metrics:dvclive/metrics.json:data.accuracy',
       'params:params.yaml:prepare.split',
       'deps:data/data.xml'
     ])
@@ -153,25 +173,19 @@ describe('pickExperimentsToPlot', () => {
       [
         {
           description: '[exp-123]',
-          detail: `Created:${formatDate(
-            mockedExperiments[0].Created as string
-          )}, split:0, data/data.xml:22a1a29`,
+          detail: 'accuracy:0.78, split:0, data/data.xml:22a1a29',
           label: '123fsf4',
           value: mockedExperiments[0]
         },
         {
           description: '[exp-456]',
-          detail: `Created:${formatDate(
-            mockedExperiments[1].Created as string
-          )}, split:2.2000436e+13, data/data.xml:22a1a29`,
+          detail: 'accuracy:0.15, split:2.2000436e+13, data/data.xml:22a1a29',
           label: '456fsf4',
           value: mockedExperiments[1]
         },
         {
           description: '[exp-789]',
-          detail: `Created:${formatDate(
-            mockedExperiments[2].Created as string
-          )}, split:0.00031111100, data/data.xml:22a1a29`,
+          detail: 'accuracy:0.35, split:0.00031111100, data/data.xml:22a1a29',
           label: '789fsf4',
           value: mockedExperiments[2]
         }
@@ -284,38 +298,50 @@ describe('pickExperiment', () => {
     const mockedExpListWithColumnData = [
       {
         ...mockedExpList[0],
-        Created: '2022-12-02T10:48:24',
         metrics: {
           'summary.json': {
             accuracy: 0.3723166584968567,
             val_loss: 1.9979370832443237
           }
+        },
+        params: {
+          'params.yaml': {
+            epochs: 7
+          }
         }
       },
       {
         ...mockedExpList[1],
-        Created: '2022-08-19T08:17:22',
         metrics: {
           'summary.json': {
             accuracy: 0.4668000042438507,
             val_loss: 1.8770883083343506
           }
+        },
+        params: {
+          'params.yaml': {
+            epochs: 8
+          }
         }
       },
       {
         ...mockedExpList[2],
-        Created: '2020-12-29T15:27:01',
         metrics: {
           'summary.json': {
             accuracy: 0.557449996471405,
             val_loss: 1.7749212980270386
+          }
+        },
+        params: {
+          'params.yaml': {
+            epochs: 5
           }
         }
       }
     ]
     mockedQuickPickValue.mockResolvedValueOnce(expectedDetails)
     const experiment = await pickExperiment(mockedExpListWithColumnData, [
-      'Created',
+      'params:params.yaml:epochs',
       'metrics:summary.json:accuracy',
       'metrics:summary.json:val_loss'
     ])
@@ -324,25 +350,19 @@ describe('pickExperiment', () => {
       [
         {
           description: '[exp-0580a]',
-          detail: `Created:${formatDate(
-            mockedExpListWithColumnData[0].Created
-          )}, accuracy:0.37231666, val_loss:1.9979371`,
+          detail: 'epochs:7, accuracy:0.37231666, val_loss:1.9979371',
           label: 'abcdefb',
           value: 'abcdefb'
         },
         {
           description: '[exp-c54c4]',
-          detail: `Created:${formatDate(
-            mockedExpListWithColumnData[1].Created
-          )}, accuracy:0.46680000, val_loss:1.8770883`,
+          detail: 'epochs:8, accuracy:0.46680000, val_loss:1.8770883',
           label: 'abcdefa',
           value: 'abcdefa'
         },
         {
           description: '[exp-054f1]',
-          detail: `Created:${formatDate(
-            mockedExpListWithColumnData[2].Created
-          )}, accuracy:0.55745000, val_loss:1.7749213`,
+          detail: 'epochs:5, accuracy:0.55745000, val_loss:1.7749213',
           label: 'abcdef1',
           value: 'abcdef1'
         }
@@ -390,7 +410,12 @@ describe('pickExperiments', () => {
         metrics: {
           'summary.json': {
             accuracy: 0.3723166584968567,
-            val_loss: 1.9979370832443237
+            date: '2022-12-02T10:48:24'
+          }
+        },
+        params: {
+          'params.yaml': {
+            epochs: 8
           }
         }
       },
@@ -400,7 +425,12 @@ describe('pickExperiments', () => {
         metrics: {
           'summary.json': {
             accuracy: 0.4668000042438507,
-            val_loss: 1.8770883083343506
+            date: '2022-08-19T08:17:22'
+          }
+        },
+        params: {
+          'params.yaml': {
+            epochs: 15
           }
         }
       },
@@ -410,41 +440,46 @@ describe('pickExperiments', () => {
         metrics: {
           'summary.json': {
             accuracy: 0.557449996471405,
-            val_loss: 1.7749212980270386
+            date: '2020-12-29T15:27:01'
+          }
+        },
+        params: {
+          'params.yaml': {
+            epochs: 20
           }
         }
       }
     ]
     mockedQuickPickManyValues.mockResolvedValueOnce(expectedDetails)
     const experiment = await pickExperiments(mockedExpListWithColumnData, [
-      'Created',
+      'params:params.yaml:epochs',
       'metrics:summary.json:accuracy',
-      'metrics:summary.json:val_loss'
+      'metrics:summary.json:date'
     ])
 
     expect(mockedQuickPickManyValues).toHaveBeenCalledWith(
       [
         {
           description: '[exp-0580a]',
-          detail: `Created:${formatDate(
-            mockedExpListWithColumnData[0].Created
-          )}, accuracy:0.37231666, val_loss:1.9979371`,
+          detail: `epochs:8, accuracy:0.37231666, date:${formatDate(
+            mockedExpListWithColumnData[0].metrics['summary.json'].date
+          )}`,
           label: 'abcdefb',
           value: 'abcdefb'
         },
         {
           description: '[exp-c54c4]',
-          detail: `Created:${formatDate(
-            mockedExpListWithColumnData[1].Created
-          )}, accuracy:0.46680000, val_loss:1.8770883`,
+          detail: `epochs:15, accuracy:0.46680000, date:${formatDate(
+            mockedExpListWithColumnData[1].metrics['summary.json'].date
+          )}`,
           label: 'abcdefa',
           value: 'abcdefa'
         },
         {
           description: '[exp-054f1]',
-          detail: `Created:${formatDate(
-            mockedExpListWithColumnData[2].Created
-          )}, accuracy:0.55745000, val_loss:1.7749213`,
+          detail: `epochs:20, accuracy:0.55745000, date:${formatDate(
+            mockedExpListWithColumnData[2].metrics['summary.json'].date
+          )}`,
           label: 'abcdef1',
           value: 'abcdef1'
         }

@@ -36,7 +36,6 @@ import { Title } from '../../../vscode/title'
 import { join } from '../../util/path'
 import { AvailableCommands } from '../../../commands/internal'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
-import { formatDate } from '../../../util/date'
 import { DvcReader } from '../../../cli/dvc/reader'
 import { Setup } from '../../../setup'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
@@ -468,17 +467,13 @@ suite('Workspace Experiments Test Suite', () => {
         [
           {
             description: '[exp-e7a67]',
-            detail: `Created:${formatDate(
-              '2020-12-29T15:31:52'
-            )}, loss:2.0205045, accuracy:0.37241668`,
+            detail: 'loss:2.0205045, accuracy:0.37241668, val_loss:1.9979371',
             label: '4fb124a',
             value: queueTaskId
           },
           {
             description: '[exp-83425]',
-            detail: `Created:${formatDate(
-              '2020-12-29T15:27:02'
-            )}, loss:1.7750162, accuracy:0.59265000`,
+            detail: 'loss:1.7750162, accuracy:0.59265000, val_loss:1.7233840',
             label: 'workspace',
             value: 'exp-83425'
           }
@@ -566,73 +561,57 @@ suite('Workspace Experiments Test Suite', () => {
           {
             description:
               '$(git-commit)Update version and CHANGELOG for release (#4022) ...',
-            detail: `Created:${formatDate(
-              '2020-11-21T19:58:22'
-            )}, loss:2.0488560, accuracy:0.34848332`,
+            detail: 'loss:2.0488560, accuracy:0.34848332, val_loss:1.9979370',
             label: 'main',
             value: 'main'
           },
           {
             description: '[exp-e7a67]',
-            detail: `Created:${formatDate(
-              '2020-12-29T15:31:52'
-            )}, loss:2.0205045, accuracy:0.37241668`,
+            detail: 'loss:2.0205045, accuracy:0.37241668, val_loss:1.9979371',
             label: '4fb124a',
             value: 'exp-e7a67'
           },
           {
             description: '[test-branch]',
-            detail: `Created:${formatDate(
-              '2020-12-29T15:28:59'
-            )}, loss:1.9293040, accuracy:0.46680000`,
+            detail: 'loss:1.9293040, accuracy:0.46680000, val_loss:1.8770883',
             label: '42b8736',
             value: 'test-branch'
           },
           {
             description: '[exp-83425]',
-            detail: `Created:${formatDate(
-              '2020-12-29T15:27:02'
-            )}, loss:1.7750162, accuracy:0.59265000`,
+            detail: 'loss:1.7750162, accuracy:0.59265000, val_loss:1.7233840',
             label: 'workspace',
             value: 'exp-83425'
           },
           {
             description: undefined,
-            detail: 'Created:-, loss:-, accuracy:-',
+            detail: 'loss:-, accuracy:-, val_loss:-',
             label: '489fd8b',
             value: '489fd8b'
           },
           {
             description: '[exp-f13bca]',
-            detail: `Created:${formatDate(
-              '2020-12-29T15:26:36'
-            )}, loss:-, accuracy:-`,
+            detail: 'loss:-, accuracy:-, val_loss:-',
             label: 'f0f9186',
             value: 'exp-f13bca'
           },
           {
             description: undefined,
-            detail: `Created:${formatDate(
-              '2020-12-29T15:25:27'
-            )}, loss:-, accuracy:-`,
+            detail: 'loss:-, accuracy:-, val_loss:-',
             label: '55d492c',
             value: '55d492c'
           },
           {
             description:
               '$(git-commit)Improve "Get Started" walkthrough (#4020) ...',
-            detail: `Created:${formatDate(
-              '2020-11-21T19:58:22'
-            )}, loss:2.0488560, accuracy:0.34848332`,
+            detail: 'loss:2.0488560, accuracy:0.34848332, val_loss:1.9979370',
             label: 'fe2919b',
             value: 'fe2919b'
           },
           {
             description:
               '$(git-commit)Add capabilities to text mentioning storage provider extensions (#4015)',
-            detail: `Created:${formatDate(
-              '2020-11-21T19:58:22'
-            )}, loss:2.0488560, accuracy:0.34848332`,
+            detail: 'loss:2.0488560, accuracy:0.34848332, val_loss:1.9979370',
             label: '7df876c',
             value: '7df876c'
           }
@@ -726,47 +705,37 @@ suite('Workspace Experiments Test Suite', () => {
         [
           {
             description: '[exp-e7a67]',
-            detail: `Created:${formatDate(
-              '2020-12-29T15:31:52'
-            )}, loss:2.0205045, accuracy:0.37241668`,
+            detail: 'loss:2.0205045, accuracy:0.37241668, val_loss:1.9979371',
             label: '4fb124a',
             value: 'exp-e7a67'
           },
           {
             description: '[test-branch]',
-            detail: `Created:${formatDate(
-              '2020-12-29T15:28:59'
-            )}, loss:1.9293040, accuracy:0.46680000`,
+            detail: 'loss:1.9293040, accuracy:0.46680000, val_loss:1.8770883',
             label: '42b8736',
             value: 'test-branch'
           },
           {
             description: '[exp-83425]',
-            detail: `Created:${formatDate(
-              '2020-12-29T15:27:02'
-            )}, loss:1.7750162, accuracy:0.59265000`,
+            detail: 'loss:1.7750162, accuracy:0.59265000, val_loss:1.7233840',
             label: EXPERIMENT_WORKSPACE_ID,
             value: 'exp-83425'
           },
           {
             description: undefined,
-            detail: 'Created:-, loss:-, accuracy:-',
+            detail: 'loss:-, accuracy:-, val_loss:-',
             label: '489fd8b',
             value: '489fd8b'
           },
           {
             description: '[exp-f13bca]',
-            detail: `Created:${formatDate(
-              '2020-12-29T15:26:36'
-            )}, loss:-, accuracy:-`,
+            detail: 'loss:-, accuracy:-, val_loss:-',
             label: 'f0f9186',
             value: 'exp-f13bca'
           },
           {
             description: undefined,
-            detail: `Created:${formatDate(
-              '2020-12-29T15:25:27'
-            )}, loss:-, accuracy:-`,
+            detail: 'loss:-, accuracy:-, val_loss:-',
             label: '55d492c',
             value: '55d492c'
           }
@@ -830,55 +799,43 @@ suite('Workspace Experiments Test Suite', () => {
         [
           {
             description: '[exp-e7a67]',
-            detail: `Created:${formatDate(
-              '2020-12-29T15:31:52'
-            )}, loss:2.0205045, accuracy:0.37241668`,
+            detail: 'loss:2.0205045, accuracy:0.37241668, val_loss:1.9979371',
             label: '4fb124a',
             value: 'exp-e7a67'
           },
           {
             description: '[test-branch]',
-            detail: `Created:${formatDate(
-              '2020-12-29T15:28:59'
-            )}, loss:1.9293040, accuracy:0.46680000`,
+            detail: 'loss:1.9293040, accuracy:0.46680000, val_loss:1.8770883',
             label: '42b8736',
             value: 'test-branch'
           },
           {
             description: '[exp-83425]',
-            detail: `Created:${formatDate(
-              '2020-12-29T15:27:02'
-            )}, loss:1.7750162, accuracy:0.59265000`,
+            detail: 'loss:1.7750162, accuracy:0.59265000, val_loss:1.7233840',
             label: EXPERIMENT_WORKSPACE_ID,
             value: 'exp-83425'
           },
           {
             description: undefined,
-            detail: 'Created:-, loss:-, accuracy:-',
+            detail: 'loss:-, accuracy:-, val_loss:-',
             label: '489fd8b',
             value: '489fd8b'
           },
           {
             description: '[exp-f13bca]',
-            detail: `Created:${formatDate(
-              '2020-12-29T15:26:36'
-            )}, loss:-, accuracy:-`,
+            detail: 'loss:-, accuracy:-, val_loss:-',
             label: 'f0f9186',
             value: 'exp-f13bca'
           },
           {
             description: undefined,
-            detail: `Created:${formatDate(
-              '2020-12-29T15:25:27'
-            )}, loss:-, accuracy:-`,
+            detail: 'loss:-, accuracy:-, val_loss:-',
             label: '90aea7f',
             value: '90aea7f'
           },
           {
             description: undefined,
-            detail: `Created:${formatDate(
-              '2020-12-29T15:25:27'
-            )}, loss:-, accuracy:-`,
+            detail: 'loss:-, accuracy:-, val_loss:-',
             label: '55d492c',
             value: '55d492c'
           }

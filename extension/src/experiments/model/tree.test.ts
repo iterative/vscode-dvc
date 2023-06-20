@@ -15,7 +15,6 @@ import { ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
 import { getMarkdownString } from '../../vscode/markdownString'
 import { DecoratableTreeItemScheme, getDecoratableUri } from '../../tree'
-import { formatDate } from '../../util/date'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 
 const mockedCommands = jest.mocked(commands)
@@ -334,6 +333,7 @@ describe('ExperimentsTree', () => {
           label: 'a123',
           params: {
             'params.yaml': {
+              epochs: 16,
               featurize: {
                 random_value: undefined
               }
@@ -353,6 +353,7 @@ describe('ExperimentsTree', () => {
           label: 'b456',
           params: {
             'params.yaml': {
+              epochs: 10,
               featurize: {
                 random_value: ['rbf', 'linear']
               }
@@ -372,6 +373,7 @@ describe('ExperimentsTree', () => {
           label: 'c789',
           params: {
             'params.yaml': {
+              epochs: 29,
               featurize: {
                 random_value: false
               }
@@ -390,7 +392,7 @@ describe('ExperimentsTree', () => {
         .mockReturnValueOnce(experiments)
       mockedGetDvcRoots.mockReturnValueOnce(['repo'])
       mockedGetFirstThreeColumnOrder.mockReturnValue([
-        'Created',
+        'params:params.yaml:epochs',
         'deps:data/data.xml',
         'params:params.yaml:featurize.random_value'
       ])
@@ -410,9 +412,8 @@ describe('ExperimentsTree', () => {
           iconPath: expect.anything(),
           id: 'exp-123',
           label: 'a123',
-          tooltip: `|||\n|:--|--|\n| Created | ${formatDate(
-            experiments[0].Created
-          )} |\n| data/data.xml | 22a1a29 |\n| ...ms.yaml:featurize.random_value | - |\n`,
+          tooltip:
+            '|||\n|:--|--|\n| params.yaml:epochs | 16 |\n| data/data.xml | 22a1a29 |\n| ...ms.yaml:featurize.random_value | - |\n',
           type: ExperimentType.EXPERIMENT
         },
         {
@@ -427,9 +428,8 @@ describe('ExperimentsTree', () => {
           iconPath: expect.anything(),
           id: 'exp-456',
           label: 'b456',
-          tooltip: `|||\n|:--|--|\n| Created | ${formatDate(
-            experiments[1].Created
-          )} |\n| data/data.xml | 22a1a29 |\n| ...ms.yaml:featurize.random_value | [rbf,linear] |\n`,
+          tooltip:
+            '|||\n|:--|--|\n| params.yaml:epochs | 10 |\n| data/data.xml | 22a1a29 |\n| ...ms.yaml:featurize.random_value | [rbf,linear] |\n',
           type: ExperimentType.EXPERIMENT
         },
         {
@@ -444,9 +444,8 @@ describe('ExperimentsTree', () => {
           iconPath: expect.anything(),
           id: 'exp-789',
           label: 'c789',
-          tooltip: `|||\n|:--|--|\n| Created | ${formatDate(
-            experiments[2].Created
-          )} |\n| data/data.xml | 22a1a29 |\n| ...ms.yaml:featurize.random_value | false |\n`,
+          tooltip:
+            '|||\n|:--|--|\n| params.yaml:epochs | 29 |\n| data/data.xml | 22a1a29 |\n| ...ms.yaml:featurize.random_value | false |\n',
           type: ExperimentType.EXPERIMENT
         }
       ])

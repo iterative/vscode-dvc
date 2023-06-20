@@ -1,9 +1,9 @@
 import get from 'lodash.get'
-import { formatDate } from '../../util/date'
 import { formatNumber } from '../../util/number'
 import { truncateFromLeft } from '../../util/string'
 import { splitColumnPath } from '../columns/paths'
 import { Experiment } from '../webview/contract'
+import { formatDate } from '../../util/date'
 
 type Value = undefined | null | [] | string | number
 
