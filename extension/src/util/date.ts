@@ -21,3 +21,11 @@ export const standardizeDate = (dateString: string): number => {
 
   return date.getTime()
 }
+
+export const formatDate = (value: string) => {
+  const dateFormatter = new Intl.DateTimeFormat([], {
+    dateStyle: 'medium'
+  })
+  const date = new Date(value)
+  return dateFormatter.format(date)
+}

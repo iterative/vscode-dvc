@@ -12,6 +12,7 @@ import {
 import { Experiment } from '../webview/contract'
 import { Title } from '../../vscode/title'
 import { Toast } from '../../vscode/toast'
+import { formatDate } from '../../util/date'
 
 jest.mock('../../vscode/quickPick')
 jest.mock('../../vscode/toast')
@@ -409,7 +410,7 @@ describe('pickExperiments', () => {
         metrics: {
           'summary.json': {
             accuracy: 0.3723166584968567,
-            val_loss: 1.9979370832443237
+            date: '2022-12-02T10:48:24'
           }
         },
         params: {
@@ -424,7 +425,7 @@ describe('pickExperiments', () => {
         metrics: {
           'summary.json': {
             accuracy: 0.4668000042438507,
-            val_loss: 1.8770883083343506
+            date: '2022-08-19T08:17:22'
           }
         },
         params: {
@@ -439,7 +440,7 @@ describe('pickExperiments', () => {
         metrics: {
           'summary.json': {
             accuracy: 0.557449996471405,
-            val_loss: 1.7749212980270386
+            date: '2020-12-29T15:27:01'
           }
         },
         params: {
@@ -453,26 +454,32 @@ describe('pickExperiments', () => {
     const experiment = await pickExperiments(mockedExpListWithColumnData, [
       'params:params.yaml:epochs',
       'metrics:summary.json:accuracy',
-      'metrics:summary.json:val_loss'
+      'metrics:summary.json:date'
     ])
 
     expect(mockedQuickPickManyValues).toHaveBeenCalledWith(
       [
         {
           description: '[exp-0580a]',
-          detail: 'epochs:8, accuracy:0.37231666, val_loss:1.9979371',
+          detail: `epochs:8, accuracy:0.37231666, date:${formatDate(
+            mockedExpListWithColumnData[0].metrics['summary.json'].date
+          )}`,
           label: 'abcdefb',
           value: 'abcdefb'
         },
         {
           description: '[exp-c54c4]',
-          detail: 'epochs:15, accuracy:0.46680000, val_loss:1.8770883',
+          detail: `epochs:15, accuracy:0.46680000, date:${formatDate(
+            mockedExpListWithColumnData[1].metrics['summary.json'].date
+          )}`,
           label: 'abcdefa',
           value: 'abcdefa'
         },
         {
           description: '[exp-054f1]',
-          detail: 'epochs:20, accuracy:0.55745000, val_loss:1.7749213',
+          detail: `epochs:20, accuracy:0.55745000, date:${formatDate(
+            mockedExpListWithColumnData[2].metrics['summary.json'].date
+          )}`,
           label: 'abcdef1',
           value: 'abcdef1'
         }
