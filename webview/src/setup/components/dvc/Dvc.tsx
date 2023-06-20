@@ -9,6 +9,8 @@ import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { usePrevious } from '../../hooks/usePrevious'
 import { SetupState } from '../../store'
 import { closeSection } from '../shared/util'
+import { showWalkthrough } from '../../util/messages'
+import { Button } from '../../../shared/components/button/Button'
 
 export const Dvc: React.FC = () => {
   const dispatch = useDispatch()
@@ -57,10 +59,16 @@ export const Dvc: React.FC = () => {
   if (!projectInitialized) {
     return <ProjectUninitialized>{children}</ProjectUninitialized>
   }
+
   return (
     <EmptyState isFullScreen={false}>
       <h1>Setup Complete</h1>
       {children}
+      <p>
+        New to the extension? Go through the walkthrough to familiarize yourself
+        with the different features.
+      </p>
+      <Button onClick={showWalkthrough} text="Show Walkthrough" />
     </EmptyState>
   )
 }

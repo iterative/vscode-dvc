@@ -12,8 +12,6 @@ const sectionDescriptionTestIds = {
   [PlotsSection.TEMPLATE_PLOTS]: 'tooltip-template-plots',
   // Setup DVC
   [SetupSection.DVC]: 'tooltip-setup-dvc',
-  // Setup Get Started
-  [SetupSection.GET_STARTED]: 'tooltip-setup-get-started',
   // Setup Experiments
   [SetupSection.EXPERIMENTS]: 'tooltip-setup-experiments',
   // Setup Remote
@@ -57,8 +55,6 @@ export const SectionDescriptionMainText = {
       .
     </>
   ),
-  // Setup Get Started
-  [SetupSection.GET_STARTED]: <>Get started with the extension</>,
   // Setup DVC
   [SetupSection.DVC]: <>Configure the extension to start working with DVC.</>,
   // Setup Experiments

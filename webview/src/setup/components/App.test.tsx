@@ -330,7 +330,6 @@ describe('App', () => {
         projectInitialized: false,
         sectionCollapsed: {
           [SetupSection.DVC]: false,
-          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: true,
           [SetupSection.STUDIO]: true
@@ -437,6 +436,21 @@ describe('App', () => {
       })
     })
 
+    it('should show a "Show Walkthrough" button if dvc is installed and a project is initalized', () => {
+      renderApp()
+
+      const walkthroughButton = within(
+        screen.getByTestId('dvc-section-details')
+      ).getByText('Show Walkthrough')
+
+      expect(walkthroughButton).toBeInTheDocument()
+
+      fireEvent.click(walkthroughButton)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SHOW_WALKTHROUGH
+      })
+    })
+
     it('should show an error icon if DVC is not initialized', () => {
       renderApp({
         projectInitialized: false
@@ -484,57 +498,6 @@ describe('App', () => {
           'The located version has not been tested against the extension. If you are experiencing unexpected behaviour, first try to update the extension. If there are no updates available, please downgrade DVC to the same minor version as displayed and reload the window.'
         )
       ).toBeInTheDocument()
-    })
-  })
-
-  describe('Get Started', () => {
-    it('should show a screen saying that dvc is not setup if DVC is not found or initialized', () => {
-      renderApp({
-        cliCompatible: undefined
-      })
-
-      const details = screen.getByTestId('get-started-section-details')
-
-      expect(within(details).getByText('DVC is not setup')).toBeInTheDocument()
-
-      sendSetDataMessage({ ...DEFAULT_DATA, projectInitialized: false })
-
-      expect(within(details).getByText('DVC is not setup')).toBeInTheDocument()
-    })
-
-    it('should open the dvc section when clicking the Setup DVC button on the dvc is not setup screen', () => {
-      renderApp({
-        projectInitialized: false,
-        remoteList: { mockRoot: undefined }
-      })
-
-      const details = screen.getByTestId('get-started-section-details')
-      const getStartedText = within(details).getByText('DVC is not setup')
-      expect(getStartedText).toBeInTheDocument()
-
-      mockPostMessage.mockClear()
-      const button = within(details).getByText('Setup DVC')
-      fireEvent.click(button)
-      expect(screen.getByText('DVC is not initialized')).toBeVisible()
-      expect(getStartedText).not.toBeVisible()
-    })
-
-    it('should show a button that takes the user to the "Get Started" walkthrough', () => {
-      renderApp()
-
-      expect(
-        within(screen.getByTestId('get-started-section-details')).getAllByText(
-          'Get Started'
-        )
-      ).toHaveLength(2)
-      const walkthroughButton = screen.getByText('Show Walkthrough')
-
-      expect(walkthroughButton).toBeInTheDocument()
-
-      fireEvent.click(walkthroughButton)
-      expect(mockPostMessage).toHaveBeenCalledWith({
-        type: MessageFromWebviewType.SHOW_WALKTHROUGH
-      })
     })
   })
 
@@ -791,7 +754,6 @@ describe('App', () => {
         isStudioConnected: true,
         sectionCollapsed: {
           [SetupSection.DVC]: false,
-          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: true,
           [SetupSection.STUDIO]: true
@@ -814,7 +776,6 @@ describe('App', () => {
         isStudioConnected: true,
         sectionCollapsed: {
           [SetupSection.DVC]: true,
-          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: false,
           [SetupSection.REMOTES]: true,
           [SetupSection.STUDIO]: true
@@ -837,7 +798,6 @@ describe('App', () => {
         isStudioConnected: true,
         sectionCollapsed: {
           [SetupSection.DVC]: true,
-          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: true,
           [SetupSection.STUDIO]: false
@@ -862,7 +822,6 @@ describe('App', () => {
         remoteList: undefined,
         sectionCollapsed: {
           [SetupSection.DVC]: true,
-          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: false,
           [SetupSection.STUDIO]: true
@@ -880,7 +839,6 @@ describe('App', () => {
         remoteList: { demo: undefined, 'example-get-started': undefined },
         sectionCollapsed: {
           [SetupSection.DVC]: true,
-          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: false,
           [SetupSection.STUDIO]: true
@@ -898,7 +856,6 @@ describe('App', () => {
         remoteList: { demo: undefined, 'example-get-started': undefined },
         sectionCollapsed: {
           [SetupSection.DVC]: true,
-          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: false,
           [SetupSection.STUDIO]: true
@@ -923,7 +880,6 @@ describe('App', () => {
         },
         sectionCollapsed: {
           [SetupSection.DVC]: true,
-          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: false,
           [SetupSection.STUDIO]: true
@@ -951,7 +907,6 @@ describe('App', () => {
         },
         sectionCollapsed: {
           [SetupSection.DVC]: true,
-          [SetupSection.GET_STARTED]: true,
           [SetupSection.EXPERIMENTS]: true,
           [SetupSection.REMOTES]: false,
           [SetupSection.STUDIO]: true
