@@ -1,4 +1,4 @@
-# Setup Page
+# Setup
 
 The extension's key features cannot be accessed until DVC is installed and a DVC
 project is available in the workspace. The

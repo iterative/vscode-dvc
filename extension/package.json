@@ -1510,7 +1510,7 @@
         "steps": [
           {
             "id": "dvc.setupPage",
-            "title": "Setup Page",
+            "title": "Setup",
             "description": "Get started with DVC or setup additonal features.",
             "media": {
               "markdown": "resources/walkthrough/setup.md"
