@@ -6,8 +6,9 @@ import styles from './styles.module.scss'
 import { Icon } from '../../../shared/components/Icon'
 import Tooltip from '../../../shared/components/tooltip/Tooltip'
 import { CopyButton } from '../../../shared/components/copyButton/CopyButton'
-import { GitCommit } from '../../../shared/components/icons'
+import { GitCommit, Info } from '../../../shared/components/icons'
 import { ErrorTooltipContent } from '../../../shared/components/tooltip/ErrorTooltip'
+import { showExperiments } from '../../../setup/util/messages'
 
 export const RibbonBlockTooltip: React.FC<{
   revision: Revision
@@ -43,7 +44,12 @@ export const RibbonBlockTooltip: React.FC<{
         </tbody>
       </table>
       <p className={styles.tooltipTableDescription}>
-        *Reflects the first three columns (minus Created) in the table
+        <Info className={styles.infoIcon} width={14} height={14} />
+        Reflects the first three columns (excluding Created) in the{' '}
+        <button onClick={showExperiments} className={styles.buttonAsLink}>
+          experiments table
+        </button>
+        .
       </p>
       {commit && (
         <p

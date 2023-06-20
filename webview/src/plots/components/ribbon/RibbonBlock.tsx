@@ -47,7 +47,7 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
       style={{ borderColor: displayColor }}
       data-testid={`ribbon-${id}`}
     >
-      <Info className={styles.infoIcon} />
+      <Info width={14} height={14} className={styles.infoIcon} />
       <div className={styles.label}>
         {description ? (
           <>

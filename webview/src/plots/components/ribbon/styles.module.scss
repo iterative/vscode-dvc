@@ -1,4 +1,5 @@
 @import '../../../shared/variables';
+@import '../../../shared/mixins';
 
 .copyButton {
   display: none;
@@ -51,9 +52,21 @@
 
 .tooltipTableDescription {
   margin: 4px 0 0 4px;
-  color: var(--vscode-descriptionForeground);
+  color: $description-color;
   font-size: 0.75rem;
   max-width: 250px;
+
+  .infoIcon {
+    margin-right: 3px;
+    color: $fg-color;
+    vertical-align: text-top;
+    min-width: 14px;
+    min-height: 14px;
+  }
+}
+
+.buttonAsLink {
+  @extend %buttonAsLink;
 }
 
 .commitMessage {
@@ -105,12 +118,10 @@
     height: 18px;
     width: 18px;
   }
-}
 
-.infoIcon {
-  width: 14px;
-  height: 14px;
-  margin-left: 5px;
+  .infoIcon {
+    margin-left: 5px;
+  }
 }
 
 .label {
