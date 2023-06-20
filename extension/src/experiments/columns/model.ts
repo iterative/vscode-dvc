@@ -45,12 +45,24 @@ export class ColumnsModel extends PathSelectionModel<Column> {
   }
 
   public getFirstThreeColumnOrder(): string[] {
-    return this.columnOrderState
-      .filter(
-        path =>
-          this.status[path] && this.status[path] === 2 && path !== 'Created'
-      )
-      .slice(0, 3)
+    const metrics: string[] = []
+    const params: string[] = []
+
+    const shouldBeShown = (path: string) =>
+      this.status[path] && this.status[path] === 2 && path !== 'Created'
+
+    for (const path of this.columnOrderState) {
+      if (!shouldBeShown(path)) {
+        continue
+      }
+      if (path.startsWith(ColumnType.METRICS)) {
+        metrics.push(path)
+      } else if (path.startsWith(ColumnType.PARAMS)) {
+        params.push(path)
+      }
+    }
+
+    return [...params.slice(0, 3), ...metrics.slice(0, 3)]
   }
 
   public getColumnWidths(): Record<string, number> {

@@ -44,8 +44,7 @@ export const RibbonBlockTooltip: React.FC<{
       </table>
       <p className={styles.tooltipTableDescription}>
         <Info className={styles.infoIcon} width={14} height={14} />
-        Reflects the first three columns (excluding Created) in the experiments
-        table.
+        Reflects the first three params and metrics in the experiments table.
       </p>
       {commit && (
         <p
