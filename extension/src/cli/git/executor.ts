@@ -17,13 +17,13 @@ export class GitExecutor extends GitCli {
   )
 
   public gitInit(cwd: string) {
-    const options = getOptions(cwd, Command.INITIALIZE)
+    const options = getOptions({ args: [Command.INITIALIZE], cwd })
 
     return this.executeProcess(options)
   }
 
   public reset(cwd: string, ...args: (Flag | Commit)[]) {
-    const options = getOptions(cwd, Command.RESET, ...args)
+    const options = getOptions({ args: [Command.RESET, ...args], cwd })
 
     return this.executeProcess(options)
   }
@@ -31,20 +31,17 @@ export class GitExecutor extends GitCli {
   public async resetWorkspace(cwd: string) {
     await this.reset(cwd, Flag.HARD, Commit.HEAD)
 
-    const options = getOptions(
-      cwd,
-      Command.CLEAN,
-      Flag.FORCE,
-      Flag.DIRECTORIES,
-      Flag.QUIET
-    )
+    const options = getOptions({
+      args: [Command.CLEAN, Flag.FORCE, Flag.DIRECTORIES, Flag.QUIET],
+      cwd
+    })
 
     return this.executeProcess(options)
   }
 
   public async stageAll(cwd: string) {
     const gitRoot = await this.getGitRepositoryRoot(cwd)
-    const options = getOptions(gitRoot, Command.ADD, Flag.DOT)
+    const options = getOptions({ args: [Command.ADD, Flag.DOT], cwd: gitRoot })
 
     return this.executeProcess(options)
   }
