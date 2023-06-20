@@ -42,10 +42,9 @@ export class OutputChannel extends Disposable {
     this.dispose.track(
       cli.onDidCompleteProcess(
         ({ command, duration, exitCode, pid, errorOutput }) => {
-          const processStatus =
-            exitCode && errorOutput
-              ? ProcessStatus.FAILED
-              : ProcessStatus.COMPLETED
+          const processStatus = this.assumeFailed(exitCode, errorOutput)
+            ? ProcessStatus.FAILED
+            : ProcessStatus.COMPLETED
 
           const baseOutput = this.getBaseOutput(pid, command, processStatus)
           const completionOutput = this.getCompletionOutput(
@@ -86,10 +85,17 @@ export class OutputChannel extends Disposable {
 
     completionOutput += ` (${duration}ms)`
 
-    if (exitCode && errorOutput) {
+    if (this.assumeFailed(exitCode, errorOutput)) {
       completionOutput += `\n${errorOutput}`
     }
 
     return completionOutput
+  }
+
+  private assumeFailed(
+    exitCode: number | null,
+    errorOutput: string | undefined
+  ): errorOutput is string {
+    return exitCode !== 0 && !!errorOutput
   }
 }

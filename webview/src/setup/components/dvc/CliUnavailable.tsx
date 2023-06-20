@@ -10,6 +10,7 @@ import {
   updatePythonEnvironment
 } from '../../util/messages'
 import { Warning } from '../../../shared/components/icons'
+import { ShowExtension } from '../remotes/ShowExtension'
 
 export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
   const { pythonBinPath, isPythonExtensionUsed, isPythonEnvironmentGlobal } =
@@ -35,13 +36,6 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
         )}
         .
       </p>
-      <div className={styles.sideBySideButtons}>
-        <Button onClick={installDvc} text="Install (pip)" />
-        {isPythonExtensionUsed && (
-          <Button onClick={updatePythonEnvironment} text="Set Env" />
-        )}
-        <Button onClick={setupWorkspace} text="Locate DVC" />
-      </div>
     </>
   ) : (
     <>
@@ -49,7 +43,6 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
         {installationSentence} DVC & DVCLive cannot be auto-installed as Python
         was not located.
       </p>
-      <Button onClick={setupWorkspace} text="Locate DVC" />
     </>
   )
 
@@ -58,6 +51,27 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
       <h1>DVC is currently unavailable</h1>
       {children}
       {conditionalContents}
+      <div className={styles.sideBySideButtons}>
+        <Button
+          disabled={!canInstall}
+          onClick={installDvc}
+          text="Install (pip)"
+        />
+        <Button
+          disabled={!isPythonExtensionUsed}
+          onClick={updatePythonEnvironment}
+          text="Set Env"
+        />
+        <Button onClick={setupWorkspace} text="Locate DVC" />
+      </div>
+      {isPythonExtensionUsed || (
+        <ShowExtension
+          className={styles.pythonExtInfo}
+          id="ms-python.python"
+          name="Python"
+          capabilities="detect or create python environments"
+        />
+      )}
     </EmptyState>
   )
 }

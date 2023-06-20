@@ -193,7 +193,7 @@ export class Cli extends Disposable implements ICli {
       {
         ...baseEvent,
         duration,
-        errorOutput: all || cliError.stderr,
+        errorOutput: all || cliError.stderr || error.message,
         exitCode: cliError.exitCode
       },
       this.processCompleted

@@ -19,7 +19,6 @@ import {
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
-import { formatDate } from '../../../util/date'
 import { ColumnType, Commit } from '../../../experiments/webview/contract'
 
 const basicVega = {
@@ -522,15 +521,6 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
   return [singleViewPlots, multiViewPlots]
 }
 
-const getMain = (): Commit =>
-  rowsFixture.find(({ id }) => id === 'main') as Commit
-const getMainExperiments = (): Commit[] => getMain().subRows as Commit[]
-
-export const findAndFormatCreated = (revisionId: string): string =>
-  formatDate(
-    getMainExperiments().find(({ id }) => id === revisionId)?.Created as string
-  )
-
 export const getRevisions = (): Revision[] => {
   const [workspace, main, _4fb124a, _42b8736, _1ba7bcd] = copyOriginalColors()
   return [
@@ -543,11 +533,6 @@ export const getRevisions = (): Revision[] => {
       fetched: true,
       firstThreeColumns: [
         {
-          type: 'Created',
-          path: 'Created',
-          value: '-'
-        },
-        {
           type: ColumnType.METRICS,
           path: 'summary.json:loss',
           value: 1.775016188621521
@@ -556,6 +541,11 @@ export const getRevisions = (): Revision[] => {
           type: ColumnType.METRICS,
           path: 'summary.json:accuracy',
           value: 0.5926499962806702
+        },
+        {
+          type: ColumnType.METRICS,
+          path: 'summary.json:val_loss',
+          value: 1.7233840227127075
         }
       ]
     },
@@ -565,11 +555,6 @@ export const getRevisions = (): Revision[] => {
       fetched: true,
       firstThreeColumns: [
         {
-          type: 'Created',
-          path: 'Created',
-          value: formatDate(getMain().Created as string)
-        },
-        {
           path: 'summary.json:loss',
           type: ColumnType.METRICS,
           value: 2.048856019973755
@@ -578,6 +563,11 @@ export const getRevisions = (): Revision[] => {
           path: 'summary.json:accuracy',
           type: ColumnType.METRICS,
           value: 0.3484833240509033
+        },
+        {
+          type: ColumnType.METRICS,
+          path: 'summary.json:val_loss',
+          value: 1.9979369640350342
         }
       ],
       id: 'main',
@@ -590,11 +580,6 @@ export const getRevisions = (): Revision[] => {
       fetched: true,
       firstThreeColumns: [
         {
-          type: 'Created',
-          path: 'Created',
-          value: findAndFormatCreated('exp-e7a67')
-        },
-        {
           type: ColumnType.METRICS,
           path: 'summary.json:loss',
           value: 2.0205044746398926
@@ -603,6 +588,11 @@ export const getRevisions = (): Revision[] => {
           type: ColumnType.METRICS,
           path: 'summary.json:accuracy',
           value: 0.3724166750907898
+        },
+        {
+          type: ColumnType.METRICS,
+          path: 'summary.json:val_loss',
+          value: 1.9979370832443237
         }
       ],
       id: 'exp-e7a67',
@@ -615,11 +605,6 @@ export const getRevisions = (): Revision[] => {
       fetched: true,
       firstThreeColumns: [
         {
-          type: 'Created',
-          path: 'Created',
-          value: findAndFormatCreated('test-branch')
-        },
-        {
           type: ColumnType.METRICS,
           path: 'summary.json:loss',
           value: 1.9293040037155151
@@ -628,6 +613,11 @@ export const getRevisions = (): Revision[] => {
           type: ColumnType.METRICS,
           path: 'summary.json:accuracy',
           value: 0.4668000042438507
+        },
+        {
+          type: ColumnType.METRICS,
+          path: 'summary.json:val_loss',
+          value: 1.8770883083343506
         }
       ],
       id: 'test-branch',
@@ -640,11 +630,6 @@ export const getRevisions = (): Revision[] => {
       fetched: true,
       firstThreeColumns: [
         {
-          type: 'Created',
-          path: 'Created',
-          value: findAndFormatCreated('exp-83425')
-        },
-        {
           type: ColumnType.METRICS,
           path: 'summary.json:loss',
           value: 1.775016188621521
@@ -653,6 +638,11 @@ export const getRevisions = (): Revision[] => {
           type: ColumnType.METRICS,
           path: 'summary.json:accuracy',
           value: 0.5926499962806702
+        },
+        {
+          type: ColumnType.METRICS,
+          path: 'summary.json:val_loss',
+          value: 1.7233840227127075
         }
       ],
       id: 'exp-83425',
