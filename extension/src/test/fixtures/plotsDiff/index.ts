@@ -533,6 +533,21 @@ export const getRevisions = (): Revision[] => {
       fetched: true,
       tooltipColumns: [
         {
+          path: 'params.yaml:code_names',
+          type: ColumnType.PARAMS,
+          value: '[0,1]'
+        },
+        {
+          path: 'params.yaml:epochs',
+          type: ColumnType.PARAMS,
+          value: 5
+        },
+        {
+          path: 'params.yaml:learning_rate',
+          type: ColumnType.PARAMS,
+          value: 2.1e-7
+        },
+        {
           type: ColumnType.METRICS,
           path: 'summary.json:loss',
           value: 1.775016188621521
@@ -554,6 +569,21 @@ export const getRevisions = (): Revision[] => {
       errors: undefined,
       fetched: true,
       tooltipColumns: [
+        {
+          path: 'params.yaml:code_names',
+          type: ColumnType.PARAMS,
+          value: '[0,1]'
+        },
+        {
+          path: 'params.yaml:epochs',
+          type: ColumnType.PARAMS,
+          value: 5
+        },
+        {
+          path: 'params.yaml:learning_rate',
+          type: ColumnType.PARAMS,
+          value: 2.1e-7
+        },
         {
           path: 'summary.json:loss',
           type: ColumnType.METRICS,
@@ -580,6 +610,21 @@ export const getRevisions = (): Revision[] => {
       fetched: true,
       tooltipColumns: [
         {
+          path: 'params.yaml:code_names',
+          type: ColumnType.PARAMS,
+          value: '[0,1]'
+        },
+        {
+          path: 'params.yaml:epochs',
+          type: ColumnType.PARAMS,
+          value: 2
+        },
+        {
+          path: 'params.yaml:learning_rate',
+          type: ColumnType.PARAMS,
+          value: 2e-12
+        },
+        {
           type: ColumnType.METRICS,
           path: 'summary.json:loss',
           value: 2.0205044746398926
@@ -605,6 +650,21 @@ export const getRevisions = (): Revision[] => {
       fetched: true,
       tooltipColumns: [
         {
+          path: 'params.yaml:code_names',
+          type: ColumnType.PARAMS,
+          value: '[0,1]'
+        },
+        {
+          path: 'params.yaml:epochs',
+          type: ColumnType.PARAMS,
+          value: 2
+        },
+        {
+          path: 'params.yaml:learning_rate',
+          type: ColumnType.PARAMS,
+          value: 2.2e-7
+        },
+        {
           type: ColumnType.METRICS,
           path: 'summary.json:loss',
           value: 1.9293040037155151
@@ -629,6 +689,21 @@ export const getRevisions = (): Revision[] => {
       errors: undefined,
       fetched: true,
       tooltipColumns: [
+        {
+          path: 'params.yaml:code_names',
+          type: ColumnType.PARAMS,
+          value: '[0,1]'
+        },
+        {
+          path: 'params.yaml:epochs',
+          type: ColumnType.PARAMS,
+          value: 5
+        },
+        {
+          path: 'params.yaml:learning_rate',
+          type: ColumnType.PARAMS,
+          value: 2.1e-7
+        },
         {
           type: ColumnType.METRICS,
           path: 'summary.json:loss',
