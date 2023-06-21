@@ -44,15 +44,12 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     return this.columnOrderState
   }
 
-  public getFirstThreeColumnOrder(): string[] {
+  public getTooltipColumnOrder(): string[] {
     const metrics: string[] = []
     const params: string[] = []
 
-    const shouldBeShown = (path: string) =>
-      this.status[path] && this.status[path] === 2 && path !== 'Created'
-
     for (const path of this.columnOrderState) {
-      if (!shouldBeShown(path)) {
+      if (this.status[path] !== 2) {
         continue
       }
       if (path.startsWith(ColumnType.METRICS)) {

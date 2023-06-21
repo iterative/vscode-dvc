@@ -60,7 +60,7 @@ export type Revision = {
   displayColor: Color
   errors?: string[]
   fetched: boolean
-  firstThreeColumns: RevisionFirstThreeColumns
+  tooltipColumns: RevisionFirstThreeColumns
   description: string | undefined
   id: string
   label: string

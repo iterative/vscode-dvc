@@ -36,7 +36,7 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
     displayColor,
     errors,
     fetched,
-    firstThreeColumns,
+    tooltipColumns,
     id,
     label
   } = revision
@@ -78,7 +78,7 @@ export const RibbonBlock: React.FC<RibbonBlockProps> = ({
     </li>
   )
 
-  return firstThreeColumns.length === 0 && !commit ? (
+  return tooltipColumns.length === 0 && !commit ? (
     mainContent
   ) : (
     <RibbonBlockTooltip revision={revision}>{mainContent}</RibbonBlockTooltip>

@@ -39,7 +39,7 @@ export const buildMockedExperiments = () => {
   const mockedGetSorts = jest.fn()
   const mockedGetSelectedRevisions = jest.fn()
   const mockedGetCommitExperiments = jest.fn()
-  const mockedGetFirstThreeColumnOrder = jest.fn()
+  const mockedGetTooltipColumnOrder = jest.fn()
   const mockedExperiments = {
     columnsChanged: mockedColumnsChanged,
     experimentsChanged: mockedExperimentsChanged,
@@ -51,9 +51,9 @@ export const buildMockedExperiments = () => {
         getCommitExperiments: mockedGetCommitExperiments,
         getFilter: mockedGetFilter,
         getFilters: mockedGetFilters,
-        getFirstThreeColumnOrder: mockedGetFirstThreeColumnOrder,
         getSelectedRevisions: mockedGetSelectedRevisions,
         getSorts: mockedGetSorts,
+        getTooltipColumnOrder: mockedGetTooltipColumnOrder,
         getWorkspaceAndCommits: mockedGetWorkspaceAndCommits
       } as unknown as Experiments),
     isReady: () => true
@@ -70,9 +70,9 @@ export const buildMockedExperiments = () => {
     mockedGetDvcRoots,
     mockedGetFilter,
     mockedGetFilters,
-    mockedGetFirstThreeColumnOrder,
     mockedGetSelectedRevisions,
     mockedGetSorts,
+    mockedGetTooltipColumnOrder,
     mockedGetWorkspaceAndCommits
   }
 }

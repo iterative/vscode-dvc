@@ -206,12 +206,12 @@ export class PlotsModel extends ModelWithPersistence {
         displayColor,
         errors: this.errors.getRevisionErrors(id),
         fetched: this.fetchedRevs.has(id),
-        firstThreeColumns: getRevisionFirstThreeColumns(
-          this.experiments.getFirstThreeColumnOrder(),
-          experiment
-        ),
         id,
-        label
+        label,
+        tooltipColumns: getRevisionFirstThreeColumns(
+          this.experiments.getTooltipColumnOrder(),
+          experiment
+        )
       }
 
       if (commit) {

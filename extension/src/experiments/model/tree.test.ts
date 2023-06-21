@@ -35,7 +35,7 @@ const {
   mockedGetCommitExperiments,
   mockedGetCliError,
   mockedGetDvcRoots,
-  mockedGetFirstThreeColumnOrder,
+  mockedGetTooltipColumnOrder,
   mockedGetWorkspaceAndCommits
 } = buildMockedExperiments()
 
@@ -179,7 +179,7 @@ describe('ExperimentsTree', () => {
         .mockReturnValueOnce(experiments)
 
       mockedGetDvcRoots.mockReturnValueOnce(['repo'])
-      mockedGetFirstThreeColumnOrder.mockReturnValue([])
+      mockedGetTooltipColumnOrder.mockReturnValue([])
 
       const children = await experimentsTree.getChildren()
 
@@ -294,7 +294,7 @@ describe('ExperimentsTree', () => {
         }
       ]
       mockedGetCommitExperiments.mockReturnValueOnce(experimentsByCommit)
-      mockedGetFirstThreeColumnOrder.mockReturnValue([])
+      mockedGetTooltipColumnOrder.mockReturnValue([])
 
       const children = await experimentsTree.getChildren(commit)
 
@@ -391,9 +391,8 @@ describe('ExperimentsTree', () => {
         .mockReturnValueOnce(experiments)
         .mockReturnValueOnce(experiments)
       mockedGetDvcRoots.mockReturnValueOnce(['repo'])
-      mockedGetFirstThreeColumnOrder.mockReturnValue([
+      mockedGetTooltipColumnOrder.mockReturnValue([
         'params:params.yaml:epochs',
-        'deps:data/data.xml',
         'params:params.yaml:featurize.random_value'
       ])
 
@@ -413,7 +412,7 @@ describe('ExperimentsTree', () => {
           id: 'exp-123',
           label: 'a123',
           tooltip:
-            '|||\n|:--|--|\n| params.yaml:epochs | 16 |\n| data/data.xml | 22a1a29 |\n| ...ms.yaml:featurize.random_value | - |\n',
+            '|||\n|:--|--|\n| params.yaml:epochs | 16 |\n| ...ms.yaml:featurize.random_value | - |\n',
           type: ExperimentType.EXPERIMENT
         },
         {
@@ -429,7 +428,7 @@ describe('ExperimentsTree', () => {
           id: 'exp-456',
           label: 'b456',
           tooltip:
-            '|||\n|:--|--|\n| params.yaml:epochs | 10 |\n| data/data.xml | 22a1a29 |\n| ...ms.yaml:featurize.random_value | [rbf,linear] |\n',
+            '|||\n|:--|--|\n| params.yaml:epochs | 10 |\n| ...ms.yaml:featurize.random_value | [rbf,linear] |\n',
           type: ExperimentType.EXPERIMENT
         },
         {
@@ -445,7 +444,7 @@ describe('ExperimentsTree', () => {
           id: 'exp-789',
           label: 'c789',
           tooltip:
-            '|||\n|:--|--|\n| params.yaml:epochs | 29 |\n| data/data.xml | 22a1a29 |\n| ...ms.yaml:featurize.random_value | false |\n',
+            '|||\n|:--|--|\n| params.yaml:epochs | 29 |\n| ...ms.yaml:featurize.random_value | false |\n',
           type: ExperimentType.EXPERIMENT
         }
       ])
@@ -470,7 +469,7 @@ describe('ExperimentsTree', () => {
         .mockReturnValueOnce(experiments)
         .mockReturnValueOnce(experiments)
       mockedGetDvcRoots.mockReturnValueOnce(['repo'])
-      mockedGetFirstThreeColumnOrder.mockReturnValue([])
+      mockedGetTooltipColumnOrder.mockReturnValue([])
 
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,

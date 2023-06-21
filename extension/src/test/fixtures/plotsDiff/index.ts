@@ -531,7 +531,7 @@ export const getRevisions = (): Revision[] => {
       displayColor: workspace,
       errors: undefined,
       fetched: true,
-      firstThreeColumns: [
+      tooltipColumns: [
         {
           type: ColumnType.METRICS,
           path: 'summary.json:loss',
@@ -553,7 +553,7 @@ export const getRevisions = (): Revision[] => {
       commit: 'Update version and CHANGELOG for release (#4022) ...',
       errors: undefined,
       fetched: true,
-      firstThreeColumns: [
+      tooltipColumns: [
         {
           path: 'summary.json:loss',
           type: ColumnType.METRICS,
@@ -578,7 +578,7 @@ export const getRevisions = (): Revision[] => {
     {
       errors: undefined,
       fetched: true,
-      firstThreeColumns: [
+      tooltipColumns: [
         {
           type: ColumnType.METRICS,
           path: 'summary.json:loss',
@@ -603,7 +603,7 @@ export const getRevisions = (): Revision[] => {
     {
       errors: undefined,
       fetched: true,
-      firstThreeColumns: [
+      tooltipColumns: [
         {
           type: ColumnType.METRICS,
           path: 'summary.json:loss',
@@ -628,7 +628,7 @@ export const getRevisions = (): Revision[] => {
     {
       errors: undefined,
       fetched: true,
-      firstThreeColumns: [
+      tooltipColumns: [
         {
           type: ColumnType.METRICS,
           path: 'summary.json:loss',
