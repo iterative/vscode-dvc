@@ -1,10 +1,11 @@
 @import '../../../shared/variables';
+@import '../../../shared/mixins';
 
 .copyButton {
   display: none;
   position: absolute;
   right: 0;
-  top: 3px;
+  top: 0;
 }
 
 .tooltipColumn {
@@ -38,15 +39,34 @@
 
   .copyButton {
     opacity: 0;
-    display: inline;
+    display: inline-block;
     position: static;
-    margin-top: 2px;
+    vertical-align: top;
     font-size: 0.8125rem;
   }
 
   &:hover .copyButton {
     opacity: 1;
   }
+}
+
+.tooltipTableDescription {
+  margin: 4px 0 0 4px;
+  color: $description-color;
+  font-size: 0.75rem;
+  max-width: 250px;
+
+  .infoIcon {
+    margin-right: 3px;
+    color: $fg-color;
+    vertical-align: text-top;
+    min-width: 14px;
+    min-height: 14px;
+  }
+}
+
+.buttonAsLink {
+  @extend %buttonAsLink;
 }
 
 .commitMessage {
@@ -97,6 +117,10 @@
   .fetching {
     height: 18px;
     width: 18px;
+  }
+
+  .infoIcon {
+    margin-left: 5px;
   }
 }
 
