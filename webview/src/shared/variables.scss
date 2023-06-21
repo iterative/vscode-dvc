@@ -1,8 +1,11 @@
+/* stylelint-disable custom-property-pattern -- VSCode variables are not camelCase */
+
 /* common */
 $bullet-size: 9px;
 $tooltip-border: var(--vscode-editorHoverWidget-border);
 $hover-background-color: var(--vscode-list-hoverBackground);
 $shadow: var(--vscode-widget-shadow);
+$font: var(--vscode-editor-font-family);
 
 /* common colors */
 $fg-color: var(--vscode-editor-foreground);
@@ -20,6 +23,8 @@ $accent-color: var(--button-primary-background);
 $accent-color-transparent: var(--accent-transparency-3);
 $passed-color: var(--vscode-testing-iconPassed);
 $description-color: var(--vscode-descriptionForeground);
+$link-fg-color: var(--vscode-textLink-foreground);
+$link-active-color: var(--vscode-textLink-activeForeground);
 
 /* experiments table */
 $row-bg-color: $bg-color;

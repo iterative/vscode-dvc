@@ -10,8 +10,20 @@ module.exports = {
       true,
       { ignorePseudoClasses: ['global'] }
     ],
-    'custom-property-pattern': null,
-    'selector-class-pattern': null,
+    'custom-property-pattern': [
+      '^[a-z][a-zA-Z0-9]+$',
+      {
+        message: selector =>
+          `Expected custom property name "${selector}" to be camelCase`
+      }
+    ],
+    'selector-class-pattern': [
+      '^[a-z][a-zA-Z0-9]+$',
+      {
+        message: selector =>
+          `Expected class selector "${selector}" to be camelCase`
+      }
+    ],
     'scss/percent-placeholder-pattern': null,
     'scss/dollar-variable-empty-line-before': [
       'always',
