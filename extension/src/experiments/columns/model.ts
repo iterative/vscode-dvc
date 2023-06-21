@@ -44,7 +44,7 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     return this.columnOrderState
   }
 
-  public getFirstThreeColumnOrder(): string[] {
+  public getSummaryColumnOrder(): string[] {
     const metrics: string[] = []
     const params: string[] = []
 

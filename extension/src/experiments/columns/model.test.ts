@@ -282,7 +282,7 @@ describe('ColumnsModel', () => {
       )
       await model.transformAndSet(outputFixture)
 
-      expect(model.getFirstThreeColumnOrder()).toStrictEqual([
+      expect(model.getSummaryColumnOrder()).toStrictEqual([
         'params:params.yaml:dvc_logs_dir',
         'params:params.yaml:process.threshold',
         'params:params.yaml:process.test_arg',
@@ -292,7 +292,7 @@ describe('ColumnsModel', () => {
 
       model.toggleStatus('params:params.yaml:dvc_logs_dir')
 
-      expect(model.getFirstThreeColumnOrder()).toStrictEqual([
+      expect(model.getSummaryColumnOrder()).toStrictEqual([
         'params:params.yaml:process.threshold',
         'params:params.yaml:process.test_arg',
         'params:params.yaml:dropout',
@@ -309,7 +309,7 @@ describe('ColumnsModel', () => {
       )
       await model.transformAndSet(outputFixture)
 
-      expect(model.getFirstThreeColumnOrder()).toStrictEqual([
+      expect(model.getSummaryColumnOrder()).toStrictEqual([
         'params:params.yaml:code_names',
         'params:params.yaml:epochs',
         'params:params.yaml:learning_rate',
@@ -320,7 +320,7 @@ describe('ColumnsModel', () => {
 
       model.toggleStatus('params:params.yaml:code_names')
 
-      expect(model.getFirstThreeColumnOrder()).toStrictEqual([
+      expect(model.getSummaryColumnOrder()).toStrictEqual([
         'params:params.yaml:epochs',
         'params:params.yaml:learning_rate',
         'params:params.yaml:dvc_logs_dir',
