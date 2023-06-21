@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.10] - 2023-06-21
+
+### 🚀 New Features and Enhancements
+
+- Add "Setup" section to "Get Started" walkthrough [#4154](https://github.com/iterative/vscode-dvc/pull/4154) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Support more languages (git branch) [#4150](https://github.com/iterative/vscode-dvc/pull/4150) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.9] - 2023-06-20
 
 ### 🚀 New Features and Enhancements
