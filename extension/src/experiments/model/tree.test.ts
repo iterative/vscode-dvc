@@ -35,7 +35,7 @@ const {
   mockedGetCommitExperiments,
   mockedGetCliError,
   mockedGetDvcRoots,
-  mockedGetTooltipColumnOrder,
+  mockedGetFirstThreeColumnOrder,
   mockedGetWorkspaceAndCommits
 } = buildMockedExperiments()
 
@@ -179,7 +179,7 @@ describe('ExperimentsTree', () => {
         .mockReturnValueOnce(experiments)
 
       mockedGetDvcRoots.mockReturnValueOnce(['repo'])
-      mockedGetTooltipColumnOrder.mockReturnValue([])
+      mockedGetFirstThreeColumnOrder.mockReturnValue([])
 
       const children = await experimentsTree.getChildren()
 
@@ -294,7 +294,7 @@ describe('ExperimentsTree', () => {
         }
       ]
       mockedGetCommitExperiments.mockReturnValueOnce(experimentsByCommit)
-      mockedGetTooltipColumnOrder.mockReturnValue([])
+      mockedGetFirstThreeColumnOrder.mockReturnValue([])
 
       const children = await experimentsTree.getChildren(commit)
 
@@ -391,7 +391,7 @@ describe('ExperimentsTree', () => {
         .mockReturnValueOnce(experiments)
         .mockReturnValueOnce(experiments)
       mockedGetDvcRoots.mockReturnValueOnce(['repo'])
-      mockedGetTooltipColumnOrder.mockReturnValue([
+      mockedGetFirstThreeColumnOrder.mockReturnValue([
         'params:params.yaml:epochs',
         'params:params.yaml:featurize.random_value'
       ])
@@ -469,7 +469,7 @@ describe('ExperimentsTree', () => {
         .mockReturnValueOnce(experiments)
         .mockReturnValueOnce(experiments)
       mockedGetDvcRoots.mockReturnValueOnce(['repo'])
-      mockedGetTooltipColumnOrder.mockReturnValue([])
+      mockedGetFirstThreeColumnOrder.mockReturnValue([])
 
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,

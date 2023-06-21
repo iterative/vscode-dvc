@@ -236,7 +236,7 @@ export class ExperimentsTree
       tooltip: this.getTooltip(
         experiment.error,
         experiment,
-        this.experiments.getRepository(dvcRoot).getTooltipColumnOrder()
+        this.experiments.getRepository(dvcRoot).getFirstThreeColumnOrder()
       ),
       type: experiment.type
     }
@@ -343,8 +343,8 @@ export class ExperimentsTree
     return [...this.view.selection]
   }
 
-  private getTooltipTable(experiment: Experiment, tooltipColumns: string[]) {
-    const data = getDataFromColumnPaths(experiment, tooltipColumns)
+  private getTooltipTable(experiment: Experiment, firstThreeColumns: string[]) {
+    const data = getDataFromColumnPaths(experiment, firstThreeColumns)
       .map(
         ({ truncatedValue: value, columnPath }) =>
           `| ${truncateFromLeft(columnPath, 30)} | ${value} |\n`
@@ -356,14 +356,14 @@ export class ExperimentsTree
   private getTooltip(
     error: string | undefined,
     experiment: Experiment,
-    tooltipColumns: string[]
+    firstThreeColumns: string[]
   ) {
     if (!error) {
-      if (tooltipColumns.length === 0) {
+      if (firstThreeColumns.length === 0) {
         return
       }
 
-      return this.getTooltipTable(experiment, tooltipColumns)
+      return this.getTooltipTable(experiment, firstThreeColumns)
     }
 
     return getErrorTooltip(error)

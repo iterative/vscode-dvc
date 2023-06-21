@@ -531,7 +531,7 @@ export const getRevisions = (): Revision[] => {
       displayColor: workspace,
       errors: undefined,
       fetched: true,
-      tooltipColumns: [
+      firstThreeColumns: [
         {
           path: 'params.yaml:code_names',
           type: ColumnType.PARAMS,
@@ -568,7 +568,7 @@ export const getRevisions = (): Revision[] => {
       commit: 'Update version and CHANGELOG for release (#4022) ...',
       errors: undefined,
       fetched: true,
-      tooltipColumns: [
+      firstThreeColumns: [
         {
           path: 'params.yaml:code_names',
           type: ColumnType.PARAMS,
@@ -608,7 +608,7 @@ export const getRevisions = (): Revision[] => {
     {
       errors: undefined,
       fetched: true,
-      tooltipColumns: [
+      firstThreeColumns: [
         {
           path: 'params.yaml:code_names',
           type: ColumnType.PARAMS,
@@ -648,7 +648,7 @@ export const getRevisions = (): Revision[] => {
     {
       errors: undefined,
       fetched: true,
-      tooltipColumns: [
+      firstThreeColumns: [
         {
           path: 'params.yaml:code_names',
           type: ColumnType.PARAMS,
@@ -688,7 +688,7 @@ export const getRevisions = (): Revision[] => {
     {
       errors: undefined,
       fetched: true,
-      tooltipColumns: [
+      firstThreeColumns: [
         {
           path: 'params.yaml:code_names',
           type: ColumnType.PARAMS,

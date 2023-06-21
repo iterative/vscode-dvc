@@ -243,9 +243,9 @@ describe('App', () => {
             description: '[exp-a270a]',
             displayColor: '#945dd6',
             fetched: false,
+            firstThreeColumns: [],
             id: 'ad2b5ec',
-            label: 'ad2b5ec',
-            tooltipColumns: []
+            label: 'ad2b5ec'
           }
         ],
         width: DEFAULT_NB_ITEMS_PER_ROW
@@ -259,9 +259,9 @@ describe('App', () => {
           description: '[exp-a270a]',
           displayColor: '#945dd6',
           fetched: false,
+          firstThreeColumns: [],
           id: 'ad2b5ec',
-          label: 'ad2b5ec',
-          tooltipColumns: []
+          label: 'ad2b5ec'
         }
       ],
       template: null

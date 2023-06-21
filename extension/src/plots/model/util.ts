@@ -3,10 +3,10 @@ import { Experiment } from '../../experiments/webview/contract'
 import { RevisionFirstThreeColumns } from '../webview/contract'
 
 export const getRevisionFirstThreeColumns = (
-  tooltipColumns: string[],
+  firstThreeColumns: string[],
   experiment: Experiment
 ): RevisionFirstThreeColumns =>
-  getDataFromColumnPaths(experiment, tooltipColumns).map(
+  getDataFromColumnPaths(experiment, firstThreeColumns).map(
     ({ columnPath: path, value, type }) => ({
       path,
       type,

@@ -289,9 +289,9 @@ describe('ComparisonTable', () => {
           description: undefined,
           displayColor: '#f56565',
           fetched: true,
+          firstThreeColumns: [],
           id: 'noData',
-          label: revisionWithNoData,
-          tooltipColumns: []
+          label: revisionWithNoData
         }
       ]
     })
@@ -322,9 +322,9 @@ describe('ComparisonTable', () => {
           description: undefined,
           displayColor: '#f56565',
           fetched: true,
+          firstThreeColumns: [],
           id: revisionWithNoData,
-          label: 'noData',
-          tooltipColumns: []
+          label: 'noData'
         }
       ]
     })
