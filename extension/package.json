@@ -1511,12 +1511,12 @@
           {
             "id": "dvc.setupPage",
             "title": "Setup",
-            "description": "Get started with DVC or setup additonal features.",
+            "description": "Get started with DVC or setup additonal features.\n[Show Setup](command:dvc.showSetup)",
             "media": {
               "markdown": "resources/walkthrough/setup.md"
             },
             "completionEvents": [
-              "onCommand:dvc.setupPage"
+              "onCommand:dvc.showSetup"
             ]
           },
           {
