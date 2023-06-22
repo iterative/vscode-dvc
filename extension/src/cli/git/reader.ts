@@ -9,7 +9,6 @@ import { isDirectory } from '../../fileSystem'
 export const autoRegisteredCommands = {
   GIT_GET_BRANCHES: 'getBranches',
   GIT_GET_COMMIT_MESSAGES: 'getCommitMessages',
-  GIT_GET_CURRENT_BRANCH: 'getCurrentBranch',
   GIT_GET_NUM_COMMITS: 'getNumCommits',
   GIT_GET_REMOTE_URL: 'getRemoteUrl',
   GIT_GET_REPOSITORY_ROOT: 'getGitRepositoryRoot',
@@ -105,28 +104,9 @@ export class GitReader extends GitCli {
     })
     try {
       const branches = await this.executeProcess(options)
-      return trimAndSplit(branches).map(branch =>
-        this.cleanUpBranchName(branch)
-      )
+      return trimAndSplit(branches)
     } catch {
       return []
-    }
-  }
-
-  public async getCurrentBranch(cwd: string): Promise<string> {
-    const options = getOptions({
-      args: [Command.BRANCH],
-      cwd,
-      env: { LANG: 'en_US.UTF-8' }
-    })
-    try {
-      const branches = await this.executeProcess(options)
-      const currentBranch = trimAndSplit(branches).find(
-        branch => branch.indexOf('*') === 0
-      )
-      return (currentBranch && this.cleanUpBranchName(currentBranch)) || ''
-    } catch {
-      return ''
     }
   }
 
@@ -160,12 +140,5 @@ export class GitReader extends GitCli {
 
   private getUris(repositoryRoot: string, relativePaths: string[]) {
     return relativePaths.map(path => resolve(repositoryRoot, path))
-  }
-
-  private cleanUpBranchName(branch: string) {
-    return branch
-      .replace('* ', '')
-      .replace(/\(HEAD\s\w+\s\w+\s/, '')
-      .replace(')', '')
   }
 }

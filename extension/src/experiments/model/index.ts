@@ -3,6 +3,7 @@ import { SortDefinition, sortExperiments } from './sortBy'
 import { FilterDefinition, filterExperiment, getFilterId } from './filterBy'
 import {
   collectAddRemoveCommitsDetails,
+  collectBranches,
   collectExperiments,
   collectOrderedCommitsAndExperiments,
   collectRunningInQueue,
@@ -462,11 +463,14 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.numberOfCommitsToShow
   }
 
-  public setBranches(currentBranch: string, allBranches: string[]) {
-    this.availableBranchesToShow = allBranches
+  public setBranches(allBranches: string[]) {
+    const { currentBranch, branches } = collectBranches(allBranches)
+
+    this.availableBranchesToShow = branches
     this.currentBranch = currentBranch
+
     this.selectedBranches = this.selectedBranches.filter(
-      branch => allBranches.includes(branch) && branch !== this.currentBranch
+      branch => branches.includes(branch) && branch !== this.currentBranch
     )
     this.persistBranchesToShow()
   }
