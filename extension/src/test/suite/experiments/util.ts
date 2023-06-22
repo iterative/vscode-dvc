@@ -183,7 +183,7 @@ const buildExperimentsDataDependencies = (disposer: Disposer) => {
 
 export const buildExperimentsData = (
   disposer: SafeWatcherDisposer,
-  currentBranch = 'main',
+  currentBranch = '* main',
   commitOutput = gitLogFixture
 ) => {
   const {
@@ -193,8 +193,7 @@ export const buildExperimentsData = (
     gitReader
   } = buildExperimentsDataDependencies(disposer)
 
-  stub(gitReader, 'getBranches').resolves(['one'])
-  stub(gitReader, 'getCurrentBranch').resolves(currentBranch)
+  stub(gitReader, 'getBranches').resolves([currentBranch, 'one'])
   stub(gitReader, 'getCommitMessages').resolves(commitOutput)
   stub(gitReader, 'getNumCommits').resolves(404)
 

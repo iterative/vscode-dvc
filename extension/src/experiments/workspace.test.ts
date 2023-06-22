@@ -41,7 +41,6 @@ const mockedFindOrCreateDvcYamlFile = jest.mocked(findOrCreateDvcYamlFile)
 const mockedGetFileExtension = jest.mocked(getFileExtension)
 const mockedHasDvcYamlFile = jest.mocked(hasDvcYamlFile)
 const mockedGetBranches = jest.fn()
-const mockedGetCurrentBranch = jest.fn()
 const mockedPickFile = jest.mocked(pickFile)
 const mockedExpBranch = jest.fn()
 
@@ -84,11 +83,6 @@ describe('Experiments', () => {
   mockedInternalCommands.registerCommand(
     AvailableCommands.GIT_GET_BRANCHES,
     () => mockedGetBranches()
-  )
-
-  mockedInternalCommands.registerCommand(
-    AvailableCommands.GIT_GET_CURRENT_BRANCH,
-    () => mockedGetCurrentBranch()
   )
 
   mockedInternalCommands.registerCommand(
@@ -700,7 +694,7 @@ describe('Experiments', () => {
   describe('selectBranches', () => {
     it('should get all the branches from GIT_GET_BRANCHES command', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
-      mockedGetBranches.mockResolvedValueOnce(['main'])
+      mockedGetBranches.mockResolvedValueOnce(['* main'])
 
       await workspaceExperiments.selectBranches([])
 
@@ -709,7 +703,7 @@ describe('Experiments', () => {
 
     it('should show a quick pick to select many values when called', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
-      mockedGetBranches.mockResolvedValueOnce(['main'])
+      mockedGetBranches.mockResolvedValueOnce(['* main'])
 
       await workspaceExperiments.selectBranches([])
 
@@ -750,17 +744,9 @@ describe('Experiments', () => {
       await workspaceExperiments.selectBranches([])
 
       expect(mockedQuickPickManyValues).not.toHaveBeenCalledWith(
-        [
-          expect.objectContaining({
-            label: 'HEAD detached at XXXX',
-            value: 'HEAD detached at XXXX'
-          }),
-          ...allBranches
-            .slice(1)
-            .map(branch =>
-              expect.objectContaining({ label: branch, value: branch })
-            )
-        ],
+        allBranches.map(branch =>
+          expect.objectContaining({ label: branch, value: branch })
+        ),
         expect.anything()
       )
 
@@ -778,11 +764,7 @@ describe('Experiments', () => {
       await workspaceExperiments.selectBranches([])
 
       expect(mockedQuickPickManyValues).not.toHaveBeenCalledWith(
-        [
-          ...updatedAllBranches.slice(0, 1),
-          'special-branch',
-          ...updatedAllBranches.slice(2)
-        ].map(branch =>
+        updatedAllBranches.map(branch =>
           expect.objectContaining({ label: branch, value: branch })
         ),
         expect.anything()
