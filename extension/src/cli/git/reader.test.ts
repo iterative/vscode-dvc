@@ -3,7 +3,7 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import { GitReader } from './reader'
 import { CliResult, CliStarted } from '..'
 import { createProcess } from '../../process/execution'
-import { getMockedProcess } from '../../test/util/jest'
+import { getFailingMockedProcess, getMockedProcess } from '../../test/util/jest'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -67,6 +67,33 @@ describe('GitReader', () => {
 
       const cliOutput = await gitReader.getBranches(cwd)
       expect(cliOutput).toStrictEqual([])
+    })
+  })
+
+  describe('version', () => {
+    it('should return the expected output', async () => {
+      const cwd = __dirname
+      mockedCreateProcess.mockReturnValueOnce(
+        getMockedProcess('git version 2.41.0')
+      )
+
+      const cliOutput = await gitReader.gitVersion(cwd)
+      expect(cliOutput).toBeDefined()
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
+        args: ['version'],
+        cwd,
+        executable: 'git'
+      })
+    })
+
+    it('should not fail if git is not available', async () => {
+      const cwd = __dirname
+      mockedCreateProcess.mockReturnValueOnce(
+        getFailingMockedProcess('git is not available')
+      )
+
+      const cliOutput = await gitReader.gitVersion(cwd)
+      expect(cliOutput).toBeUndefined()
     })
   })
 })

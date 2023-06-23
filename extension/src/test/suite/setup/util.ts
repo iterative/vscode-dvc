@@ -21,14 +21,23 @@ import { Status } from '../../../status'
 
 export const TEMP_DIR = join(dvcDemoPath, 'temp-empty-watcher-dir')
 
-export const buildSetup = (
-  disposer: Disposer,
+export const buildSetup = ({
+  disposer,
+  cliError = undefined,
+  gitVersion,
   hasData = false,
   noDvcRoot = true,
-  noGitRoot = true,
   noGitCommits = true,
-  cliError = undefined
-) => {
+  noGitRoot = true
+}: {
+  cliError?: undefined
+  disposer: Disposer
+  gitVersion?: string | null
+  hasData?: boolean
+  noDvcRoot?: boolean
+  noGitCommits?: boolean
+  noGitRoot?: boolean
+}) => {
   const {
     config,
     messageSpy,
@@ -39,6 +48,13 @@ export const buildSetup = (
     gitExecutor,
     gitReader
   } = buildDependencies(disposer)
+
+  if (gitVersion === undefined) {
+    gitVersion = 'git version 2.41.0'
+  }
+  if (gitVersion === null) {
+    gitVersion = undefined
+  }
 
   const mockDvcRoot = noDvcRoot ? undefined : dvcDemoPath
   const mockGitRoot = noGitRoot ? undefined : dvcDemoPath
@@ -54,6 +70,9 @@ export const buildSetup = (
     gitReader,
     'getGitRepositoryRoot'
   ).resolves(mockGitRoot)
+
+  const mockGitVersion = stub(gitReader, 'gitVersion').resolves(gitVersion)
+
   stub(gitReader, 'hasNoCommits').resolves(noGitCommits)
 
   const mockInitializeGit = stub(gitExecutor, 'gitInit')
@@ -112,6 +131,7 @@ export const buildSetup = (
     mockConfig,
     mockExecuteCommand,
     mockGetGitRepositoryRoot,
+    mockGitVersion,
     mockGlobalVersion,
     mockInitializeGit,
     mockOpenExternal,

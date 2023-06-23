@@ -97,6 +97,8 @@ export class Setup
   private cliCompatible: boolean | undefined
   private cliVersion: string | undefined
 
+  private gitAccessible: boolean | undefined
+
   private dotFolderWatcher?: Disposer
 
   private studioAccessToken: string | undefined = undefined
@@ -395,8 +397,7 @@ export class Setup
 
     const canGitInitialize = await this.canGitInitialize(needsGitInitialized)
 
-    const needsGitCommit =
-      needsGitInitialized || (await this.needsGitCommit(needsGitInitialized))
+    const needsGitCommit = await this.needsGitCommit(needsGitInitialized)
 
     const pythonBinPath = await findPythonBinForInstall()
 
@@ -485,13 +486,18 @@ export class Setup
     if (!needsGitInit) {
       return false
     }
+
     const nestedRoots = await Promise.all(
       getWorkspaceFolders().map(workspaceFolder =>
         findSubRootPaths(workspaceFolder, '.git')
       )
     )
 
-    return isEmpty(nestedRoots.flat())
+    if (!isEmpty(nestedRoots.flat())) {
+      return false
+    }
+
+    return this.getIsGitAccessible()
   }
 
   private async needsGitInit() {
@@ -504,14 +510,21 @@ export class Setup
       return undefined
     }
 
-    try {
-      return !(await this.internalCommands.executeCommand(
-        AvailableCommands.GIT_GET_REPOSITORY_ROOT,
-        cwd
-      ))
-    } catch {
+    return !(await this.internalCommands.executeCommand<string | undefined>(
+      AvailableCommands.GIT_GET_REPOSITORY_ROOT,
+      cwd
+    ))
+  }
+
+  private async getIsGitAccessible() {
+    if (this.gitAccessible) {
       return true
     }
+
+    this.gitAccessible = !!(await this.internalCommands.executeCommand<boolean>(
+      AvailableCommands.GIT_VERSION
+    ))
+    return this.gitAccessible
   }
 
   private initializeGit() {
@@ -533,7 +546,7 @@ export class Setup
       : selectPythonInterpreter()
   }
 
-  private needsGitCommit(needsGitInit: boolean) {
+  private async needsGitCommit(needsGitInit: boolean) {
     if (needsGitInit) {
       return true
     }
@@ -542,10 +555,10 @@ export class Setup
     if (!cwd) {
       return true
     }
-    return this.internalCommands.executeCommand<boolean>(
+    return !!(await this.internalCommands.executeCommand<boolean | undefined>(
       AvailableCommands.GIT_HAS_NO_COMMITS,
       cwd
-    )
+    ))
   }
 
   private runWorkspace() {

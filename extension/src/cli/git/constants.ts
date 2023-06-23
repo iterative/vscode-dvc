@@ -20,7 +20,8 @@ export enum Command {
   LS_REMOTE = 'ls-remote',
   RESET = 'reset',
   REV_PARSE = 'rev-parse',
-  REV_LIST = 'rev-list'
+  REV_LIST = 'rev-list',
+  VERSION = 'version'
 }
 
 export enum Flag {
