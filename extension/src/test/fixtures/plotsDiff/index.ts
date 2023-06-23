@@ -531,7 +531,22 @@ export const getRevisions = (): Revision[] => {
       displayColor: workspace,
       errors: undefined,
       fetched: true,
-      firstThreeColumns: [
+      summaryColumns: [
+        {
+          path: 'params.yaml:code_names',
+          type: ColumnType.PARAMS,
+          value: '[0,1]'
+        },
+        {
+          path: 'params.yaml:epochs',
+          type: ColumnType.PARAMS,
+          value: 5
+        },
+        {
+          path: 'params.yaml:learning_rate',
+          type: ColumnType.PARAMS,
+          value: 2.1e-7
+        },
         {
           type: ColumnType.METRICS,
           path: 'summary.json:loss',
@@ -553,7 +568,22 @@ export const getRevisions = (): Revision[] => {
       commit: 'Update version and CHANGELOG for release (#4022) ...',
       errors: undefined,
       fetched: true,
-      firstThreeColumns: [
+      summaryColumns: [
+        {
+          path: 'params.yaml:code_names',
+          type: ColumnType.PARAMS,
+          value: '[0,1]'
+        },
+        {
+          path: 'params.yaml:epochs',
+          type: ColumnType.PARAMS,
+          value: 5
+        },
+        {
+          path: 'params.yaml:learning_rate',
+          type: ColumnType.PARAMS,
+          value: 2.1e-7
+        },
         {
           path: 'summary.json:loss',
           type: ColumnType.METRICS,
@@ -578,7 +608,22 @@ export const getRevisions = (): Revision[] => {
     {
       errors: undefined,
       fetched: true,
-      firstThreeColumns: [
+      summaryColumns: [
+        {
+          path: 'params.yaml:code_names',
+          type: ColumnType.PARAMS,
+          value: '[0,1]'
+        },
+        {
+          path: 'params.yaml:epochs',
+          type: ColumnType.PARAMS,
+          value: 2
+        },
+        {
+          path: 'params.yaml:learning_rate',
+          type: ColumnType.PARAMS,
+          value: 2e-12
+        },
         {
           type: ColumnType.METRICS,
           path: 'summary.json:loss',
@@ -603,7 +648,22 @@ export const getRevisions = (): Revision[] => {
     {
       errors: undefined,
       fetched: true,
-      firstThreeColumns: [
+      summaryColumns: [
+        {
+          path: 'params.yaml:code_names',
+          type: ColumnType.PARAMS,
+          value: '[0,1]'
+        },
+        {
+          path: 'params.yaml:epochs',
+          type: ColumnType.PARAMS,
+          value: 2
+        },
+        {
+          path: 'params.yaml:learning_rate',
+          type: ColumnType.PARAMS,
+          value: 2.2e-7
+        },
         {
           type: ColumnType.METRICS,
           path: 'summary.json:loss',
@@ -628,7 +688,22 @@ export const getRevisions = (): Revision[] => {
     {
       errors: undefined,
       fetched: true,
-      firstThreeColumns: [
+      summaryColumns: [
+        {
+          path: 'params.yaml:code_names',
+          type: ColumnType.PARAMS,
+          value: '[0,1]'
+        },
+        {
+          path: 'params.yaml:epochs',
+          type: ColumnType.PARAMS,
+          value: 5
+        },
+        {
+          path: 'params.yaml:learning_rate',
+          type: ColumnType.PARAMS,
+          value: 2.1e-7
+        },
         {
           type: ColumnType.METRICS,
           path: 'summary.json:loss',

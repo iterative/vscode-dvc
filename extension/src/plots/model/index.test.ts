@@ -34,15 +34,15 @@ describe('plotsModel', () => {
       DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH
   })
   const mockedGetSelectedRevisions = jest.fn()
-  const mockedGetFirstThreeColumnOrder = jest.fn()
-  mockedGetFirstThreeColumnOrder.mockReturnValue([])
+  const mockedGetSummaryColumnOrder = jest.fn()
+  mockedGetSummaryColumnOrder.mockReturnValue([])
 
   beforeEach(() => {
     model = new PlotsModel(
       exampleDvcRoot,
       {
-        getFirstThreeColumnOrder: mockedGetFirstThreeColumnOrder,
         getSelectedRevisions: mockedGetSelectedRevisions,
+        getSummaryColumnOrder: mockedGetSummaryColumnOrder,
         isReady: () => Promise.resolve(undefined)
       } as unknown as Experiments,
       {
@@ -68,8 +68,8 @@ describe('plotsModel', () => {
     model = new PlotsModel(
       exampleDvcRoot,
       {
-        getFirstThreeColumnOrder: mockedGetFirstThreeColumnOrder,
         getSelectedRevisions: mockedGetSelectedRevisions,
+        getSummaryColumnOrder: mockedGetSummaryColumnOrder,
         isReady: () => Promise.resolve(undefined)
       } as unknown as Experiments,
       { getImageErrors: () => undefined } as unknown as ErrorsModel,
