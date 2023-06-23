@@ -20,18 +20,18 @@ type QuickPickItemAccumulator = {
 
 const getItem = (
   experiment: Experiment,
-  firstThreeColumnOrder: string[]
+  summaryColumnOrder: string[]
 ): QuickPickItemWithValue<Experiment | undefined> => ({
-  detail: getColumnPathsQuickPickDetail(experiment, firstThreeColumnOrder),
+  detail: getColumnPathsQuickPickDetail(experiment, summaryColumnOrder),
   label: experiment.label,
   value: experiment
 })
 
 const getItemWithDescription = (
   experiment: Experiment,
-  firstThreeColumnOrder: string[]
+  summaryColumnOrder: string[]
 ) => {
-  const item = getItem(experiment, firstThreeColumnOrder)
+  const item = getItem(experiment, summaryColumnOrder)
   if (experiment.description) {
     item.description = `${experiment.commit ? '$(git-commit)' : ''}${
       experiment.description
@@ -43,10 +43,10 @@ const getItemWithDescription = (
 const collectItem = (
   acc: QuickPickItemAccumulator,
   experiment: Experiment,
-  firstThreeColumnOrder: string[],
+  summaryColumnOrder: string[],
   transformer = getItem
 ) => {
-  const item = transformer(experiment, firstThreeColumnOrder)
+  const item = transformer(experiment, summaryColumnOrder)
   acc.items.push(item)
   if (experiment.selected) {
     acc.selectedItems.push(item)
@@ -56,7 +56,7 @@ const collectItem = (
 
 const collectItems = (
   experiments: Experiment[],
-  firstThreeColumnOrder: string[]
+  summaryColumnOrder: string[]
 ) => {
   const acc: QuickPickItemAccumulator = {
     items: [],
@@ -64,7 +64,7 @@ const collectItems = (
   }
 
   for (const experiment of experiments) {
-    collectItem(acc, experiment, firstThreeColumnOrder, getItemWithDescription)
+    collectItem(acc, experiment, summaryColumnOrder, getItemWithDescription)
   }
 
   return acc
@@ -72,16 +72,13 @@ const collectItems = (
 
 export const pickExperimentsToPlot = (
   experiments: Experiment[],
-  firstThreeColumnOrder: string[]
+  summaryColumnOrder: string[]
 ): Promise<Experiment[] | undefined> => {
   if (!definedAndNonEmpty(experiments)) {
     return Toast.showError(noExperimentsToSelect)
   }
 
-  const { items, selectedItems } = collectItems(
-    experiments,
-    firstThreeColumnOrder
-  )
+  const { items, selectedItems } = collectItems(experiments, summaryColumnOrder)
 
   return quickPickLimitedValues<Experiment | undefined>(
     items,
@@ -101,14 +98,14 @@ type ExperimentItem = {
 
 const getExperimentItems = (
   experiments: Experiment[],
-  firstThreeColumnOrder: string[]
+  summaryColumnOrder: string[]
 ): ExperimentItem[] =>
   experiments.map(experiment => {
     const { label, id, description, commit } = experiment
     return {
       description:
         description && `${commit ? '$(git-commit)' : ''}${description}`,
-      detail: getColumnPathsQuickPickDetail(experiment, firstThreeColumnOrder),
+      detail: getColumnPathsQuickPickDetail(experiment, summaryColumnOrder),
       label,
       value: id
     }
@@ -121,7 +118,7 @@ const pickExperimentOrExperiments = <
   T extends QuickPickExperiment | QuickPickExperiments
 >(
   experiments: Experiment[],
-  firstThreeColumnOrder: string[],
+  summaryColumnOrder: string[],
   title: Title,
   quickPick: T
 ): ReturnType<T> | Promise<undefined> => {
@@ -129,7 +126,7 @@ const pickExperimentOrExperiments = <
     return Toast.showError(noExperimentsToSelect)
   }
 
-  const items = getExperimentItems(experiments, firstThreeColumnOrder)
+  const items = getExperimentItems(experiments, summaryColumnOrder)
 
   return quickPick(items, {
     matchOnDescription: true,
@@ -140,24 +137,24 @@ const pickExperimentOrExperiments = <
 
 export const pickExperiment = (
   experiments: Experiment[],
-  firstThreeColumnOrder: string[],
+  summaryColumnOrder: string[],
   title: Title = Title.SELECT_EXPERIMENT
 ): Thenable<string | undefined> =>
   pickExperimentOrExperiments<QuickPickExperiment>(
     experiments,
-    firstThreeColumnOrder,
+    summaryColumnOrder,
     title,
     quickPickValue
   )
 
 export const pickExperiments = (
   experiments: Experiment[],
-  firstThreeColumnOrder: string[],
+  summaryColumnOrder: string[],
   title: Title = Title.SELECT_EXPERIMENTS
 ): Thenable<string[] | undefined> =>
   pickExperimentOrExperiments<QuickPickExperiments>(
     experiments,
-    firstThreeColumnOrder,
+    summaryColumnOrder,
     title,
     quickPickManyValues
   )

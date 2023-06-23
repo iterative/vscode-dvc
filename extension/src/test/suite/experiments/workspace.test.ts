@@ -467,13 +467,15 @@ suite('Workspace Experiments Test Suite', () => {
         [
           {
             description: '[exp-e7a67]',
-            detail: 'loss:2.0205045, accuracy:0.37241668, val_loss:1.9979371',
+            detail:
+              'code_names:[0,1], epochs:2, learning_rate:2e-12, loss:2.0205045, accuracy:0.37241668, val_loss:1.9979371',
             label: '4fb124a',
             value: queueTaskId
           },
           {
             description: '[exp-83425]',
-            detail: 'loss:1.7750162, accuracy:0.59265000, val_loss:1.7233840',
+            detail:
+              'code_names:[0,1], epochs:5, learning_rate:2.1e-7, loss:1.7750162, accuracy:0.59265000, val_loss:1.7233840',
             label: 'workspace',
             value: 'exp-83425'
           }
@@ -561,57 +563,66 @@ suite('Workspace Experiments Test Suite', () => {
           {
             description:
               '$(git-commit)Update version and CHANGELOG for release (#4022) ...',
-            detail: 'loss:2.0488560, accuracy:0.34848332, val_loss:1.9979370',
+            detail:
+              'code_names:[0,1], epochs:5, learning_rate:2.1e-7, loss:2.0488560, accuracy:0.34848332, val_loss:1.9979370',
             label: 'main',
             value: 'main'
           },
           {
             description: '[exp-e7a67]',
-            detail: 'loss:2.0205045, accuracy:0.37241668, val_loss:1.9979371',
+            detail:
+              'code_names:[0,1], epochs:2, learning_rate:2e-12, loss:2.0205045, accuracy:0.37241668, val_loss:1.9979371',
             label: '4fb124a',
             value: 'exp-e7a67'
           },
           {
             description: '[test-branch]',
-            detail: 'loss:1.9293040, accuracy:0.46680000, val_loss:1.8770883',
+            detail:
+              'code_names:[0,1], epochs:2, learning_rate:2.2e-7, loss:1.9293040, accuracy:0.46680000, val_loss:1.8770883',
             label: '42b8736',
             value: 'test-branch'
           },
           {
             description: '[exp-83425]',
-            detail: 'loss:1.7750162, accuracy:0.59265000, val_loss:1.7233840',
+            detail:
+              'code_names:[0,1], epochs:5, learning_rate:2.1e-7, loss:1.7750162, accuracy:0.59265000, val_loss:1.7233840',
             label: 'workspace',
             value: 'exp-83425'
           },
           {
             description: undefined,
-            detail: 'loss:-, accuracy:-, val_loss:-',
+            detail:
+              'code_names:-, epochs:-, learning_rate:-, loss:-, accuracy:-, val_loss:-',
             label: '489fd8b',
             value: '489fd8b'
           },
           {
             description: '[exp-f13bca]',
-            detail: 'loss:-, accuracy:-, val_loss:-',
+            detail:
+              'code_names:[0,1], epochs:5, learning_rate:2.1e-7, loss:-, accuracy:-, val_loss:-',
             label: 'f0f9186',
             value: 'exp-f13bca'
           },
           {
             description: undefined,
-            detail: 'loss:-, accuracy:-, val_loss:-',
+            detail:
+              'code_names:[0,2], epochs:5, learning_rate:2.1e-7, loss:-, accuracy:-, val_loss:-',
             label: '55d492c',
             value: '55d492c'
           },
           {
             description:
               '$(git-commit)Improve "Get Started" walkthrough (#4020) ...',
-            detail: 'loss:2.0488560, accuracy:0.34848332, val_loss:1.9979370',
+            detail:
+              'code_names:[0,1], epochs:5, learning_rate:2.1e-7, loss:2.0488560, accuracy:0.34848332, val_loss:1.9979370',
             label: 'fe2919b',
             value: 'fe2919b'
           },
           {
             description:
               '$(git-commit)Add capabilities to text mentioning storage provider extensions (#4015)',
-            detail: 'loss:2.0488560, accuracy:0.34848332, val_loss:1.9979370',
+            detail:
+              'code_names:[0,1], epochs:5, learning_rate:2.1e-7, loss:2.0488560, accuracy:0.34848332, val_loss:1.9979370',
             label: '7df876c',
             value: '7df876c'
           }
@@ -705,37 +716,43 @@ suite('Workspace Experiments Test Suite', () => {
         [
           {
             description: '[exp-e7a67]',
-            detail: 'loss:2.0205045, accuracy:0.37241668, val_loss:1.9979371',
+            detail:
+              'code_names:[0,1], epochs:2, learning_rate:2e-12, loss:2.0205045, accuracy:0.37241668, val_loss:1.9979371',
             label: '4fb124a',
             value: 'exp-e7a67'
           },
           {
             description: '[test-branch]',
-            detail: 'loss:1.9293040, accuracy:0.46680000, val_loss:1.8770883',
+            detail:
+              'code_names:[0,1], epochs:2, learning_rate:2.2e-7, loss:1.9293040, accuracy:0.46680000, val_loss:1.8770883',
             label: '42b8736',
             value: 'test-branch'
           },
           {
             description: '[exp-83425]',
-            detail: 'loss:1.7750162, accuracy:0.59265000, val_loss:1.7233840',
+            detail:
+              'code_names:[0,1], epochs:5, learning_rate:2.1e-7, loss:1.7750162, accuracy:0.59265000, val_loss:1.7233840',
             label: EXPERIMENT_WORKSPACE_ID,
             value: 'exp-83425'
           },
           {
             description: undefined,
-            detail: 'loss:-, accuracy:-, val_loss:-',
+            detail:
+              'code_names:-, epochs:-, learning_rate:-, loss:-, accuracy:-, val_loss:-',
             label: '489fd8b',
             value: '489fd8b'
           },
           {
             description: '[exp-f13bca]',
-            detail: 'loss:-, accuracy:-, val_loss:-',
+            detail:
+              'code_names:[0,1], epochs:5, learning_rate:2.1e-7, loss:-, accuracy:-, val_loss:-',
             label: 'f0f9186',
             value: 'exp-f13bca'
           },
           {
             description: undefined,
-            detail: 'loss:-, accuracy:-, val_loss:-',
+            detail:
+              'code_names:[0,2], epochs:5, learning_rate:2.1e-7, loss:-, accuracy:-, val_loss:-',
             label: '55d492c',
             value: '55d492c'
           }
@@ -799,43 +816,50 @@ suite('Workspace Experiments Test Suite', () => {
         [
           {
             description: '[exp-e7a67]',
-            detail: 'loss:2.0205045, accuracy:0.37241668, val_loss:1.9979371',
+            detail:
+              'code_names:[0,1], epochs:2, learning_rate:2e-12, loss:2.0205045, accuracy:0.37241668, val_loss:1.9979371',
             label: '4fb124a',
             value: 'exp-e7a67'
           },
           {
             description: '[test-branch]',
-            detail: 'loss:1.9293040, accuracy:0.46680000, val_loss:1.8770883',
+            detail:
+              'code_names:[0,1], epochs:2, learning_rate:2.2e-7, loss:1.9293040, accuracy:0.46680000, val_loss:1.8770883',
             label: '42b8736',
             value: 'test-branch'
           },
           {
             description: '[exp-83425]',
-            detail: 'loss:1.7750162, accuracy:0.59265000, val_loss:1.7233840',
+            detail:
+              'code_names:[0,1], epochs:5, learning_rate:2.1e-7, loss:1.7750162, accuracy:0.59265000, val_loss:1.7233840',
             label: EXPERIMENT_WORKSPACE_ID,
             value: 'exp-83425'
           },
           {
             description: undefined,
-            detail: 'loss:-, accuracy:-, val_loss:-',
+            detail:
+              'code_names:-, epochs:-, learning_rate:-, loss:-, accuracy:-, val_loss:-',
             label: '489fd8b',
             value: '489fd8b'
           },
           {
             description: '[exp-f13bca]',
-            detail: 'loss:-, accuracy:-, val_loss:-',
+            detail:
+              'code_names:[0,1], epochs:5, learning_rate:2.1e-7, loss:-, accuracy:-, val_loss:-',
             label: 'f0f9186',
             value: 'exp-f13bca'
           },
           {
             description: undefined,
-            detail: 'loss:-, accuracy:-, val_loss:-',
+            detail:
+              'code_names:[0,1], epochs:5, learning_rate:2.1e-7, loss:-, accuracy:-, val_loss:-',
             label: '90aea7f',
             value: '90aea7f'
           },
           {
             description: undefined,
-            detail: 'loss:-, accuracy:-, val_loss:-',
+            detail:
+              'code_names:[0,2], epochs:5, learning_rate:2.1e-7, loss:-, accuracy:-, val_loss:-',
             label: '55d492c',
             value: '55d492c'
           }

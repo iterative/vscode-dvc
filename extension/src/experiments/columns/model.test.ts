@@ -258,7 +258,7 @@ describe('ColumnsModel', () => {
       expect(model.getColumnOrder()).toStrictEqual(persistedState)
     })
 
-    it('should return the first three none hidden columns (minus created) from the persisted state', async () => {
+    it('should return the first three visible columns for both metrics and params from the persisted state', async () => {
       const persistedState = [
         'id',
         'Created',
@@ -266,6 +266,8 @@ describe('ColumnsModel', () => {
         'params:params.yaml:process.threshold',
         'params:params.yaml:process.test_arg',
         'params:params.yaml:dropout',
+        'metrics:summary.json:loss',
+        'metrics:summary.json:accuracy',
         'deps:src/prepare.py',
         'deps:src/featurization.py'
       ]
@@ -280,18 +282,26 @@ describe('ColumnsModel', () => {
       )
       await model.transformAndSet(outputFixture)
 
-      expect(model.getFirstThreeColumnOrder()).toStrictEqual(
-        persistedState.slice(2, 5)
-      )
+      expect(model.getSummaryColumnOrder()).toStrictEqual([
+        'params:params.yaml:dvc_logs_dir',
+        'params:params.yaml:process.threshold',
+        'params:params.yaml:process.test_arg',
+        'metrics:summary.json:loss',
+        'metrics:summary.json:accuracy'
+      ])
 
       model.toggleStatus('params:params.yaml:dvc_logs_dir')
 
-      expect(model.getFirstThreeColumnOrder()).toStrictEqual(
-        persistedState.slice(3, 6)
-      )
+      expect(model.getSummaryColumnOrder()).toStrictEqual([
+        'params:params.yaml:process.threshold',
+        'params:params.yaml:process.test_arg',
+        'params:params.yaml:dropout',
+        'metrics:summary.json:loss',
+        'metrics:summary.json:accuracy'
+      ])
     })
 
-    it('should return the first three none hidden columns (minus created) collected from data if state is empty', async () => {
+    it('should return the first three metric and param columns (none hidden) collected from data if state is empty', async () => {
       const model = new ColumnsModel(
         exampleDvcRoot,
         buildMockMemento(),
@@ -299,15 +309,21 @@ describe('ColumnsModel', () => {
       )
       await model.transformAndSet(outputFixture)
 
-      expect(model.getFirstThreeColumnOrder()).toStrictEqual([
+      expect(model.getSummaryColumnOrder()).toStrictEqual([
+        'params:params.yaml:code_names',
+        'params:params.yaml:epochs',
+        'params:params.yaml:learning_rate',
         'metrics:summary.json:loss',
         'metrics:summary.json:accuracy',
         'metrics:summary.json:val_loss'
       ])
 
-      model.toggleStatus('Created')
+      model.toggleStatus('params:params.yaml:code_names')
 
-      expect(model.getFirstThreeColumnOrder()).toStrictEqual([
+      expect(model.getSummaryColumnOrder()).toStrictEqual([
+        'params:params.yaml:epochs',
+        'params:params.yaml:learning_rate',
+        'params:params.yaml:dvc_logs_dir',
         'metrics:summary.json:loss',
         'metrics:summary.json:accuracy',
         'metrics:summary.json:val_loss'
