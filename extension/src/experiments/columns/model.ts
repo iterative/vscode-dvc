@@ -45,9 +45,8 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     return this.columnOrderState
   }
 
-  public getFirstThreeColumnOrder(): string[] {
+  public getSummaryColumnOrder(): string[] {
     const acc: SummaryAcc = { metrics: [], params: [] }
-
     for (const path of this.columnOrderState) {
       const reachedMaxSummaryOrderLength =
         acc.metrics.length >= 3 && acc.params.length >= 3

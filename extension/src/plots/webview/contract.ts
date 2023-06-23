@@ -49,7 +49,7 @@ export type ComparisonPlots = {
   revisions: ComparisonRevisionData
 }[]
 
-export type RevisionFirstThreeColumns = Array<{
+export type RevisionSummaryColumns = Array<{
   path: string
   value: string | number
   type: string
@@ -60,7 +60,7 @@ export type Revision = {
   displayColor: Color
   errors?: string[]
   fetched: boolean
-  firstThreeColumns: RevisionFirstThreeColumns
+  summaryColumns: RevisionSummaryColumns
   description: string | undefined
   id: string
   label: string
