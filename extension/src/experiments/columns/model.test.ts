@@ -258,7 +258,7 @@ describe('ColumnsModel', () => {
       expect(model.getColumnOrder()).toStrictEqual(persistedState)
     })
 
-    it('should return the first three metric and param columns (none hidden) from the persisted state', async () => {
+    it('should return the first three visible columns for both metrics and params from the persisted state', async () => {
       const persistedState = [
         'id',
         'Created',

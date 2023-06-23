@@ -6,6 +6,7 @@ import {
   collectParamsFiles
 } from './collect'
 import { EXPERIMENT_COLUMN_ID, timestampColumn } from './constants'
+import { SummaryAcc, collectFromColumnOrder } from './util'
 import { Column, ColumnType } from '../webview/contract'
 import { ExpShowOutput } from '../../cli/dvc/contract'
 import { PersistenceKey } from '../../persistence/constants'
@@ -45,21 +46,20 @@ export class ColumnsModel extends PathSelectionModel<Column> {
   }
 
   public getSummaryColumnOrder(): string[] {
-    const metrics: string[] = []
-    const params: string[] = []
-
+    const acc: SummaryAcc = { metrics: [], params: [] }
     for (const path of this.columnOrderState) {
-      if (this.status[path] !== 2) {
+      const reachedMaxSummaryOrderLength =
+        acc.metrics.length >= 3 && acc.params.length >= 3
+      if (
+        this.status[path] !== Status.SELECTED ||
+        reachedMaxSummaryOrderLength
+      ) {
         continue
       }
-      if (path.startsWith(ColumnType.METRICS)) {
-        metrics.push(path)
-      } else if (path.startsWith(ColumnType.PARAMS)) {
-        params.push(path)
-      }
+      collectFromColumnOrder(path, acc)
     }
 
-    return [...params.slice(0, 3), ...metrics.slice(0, 3)]
+    return [...acc.params.slice(0, 3), ...acc.metrics.slice(0, 3)]
   }
 
   public getColumnWidths(): Record<string, number> {
