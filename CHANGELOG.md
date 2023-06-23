@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.10] - 2023-06-21
+
+### 🚀 New Features and Enhancements
+
+- Add "Setup" section to "Get Started" walkthrough [#4154](https://github.com/iterative/vscode-dvc/pull/4154) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Support more languages (git branch) [#4150](https://github.com/iterative/vscode-dvc/pull/4150) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.0.9] - 2023-06-20
+
+### 🚀 New Features and Enhancements
+
+- Adjust plot ribbon tooltips [#4135](https://github.com/iterative/vscode-dvc/pull/4135) by [@julieg18](https://github.com/julieg18)
+- Remove Setup's "Get Started" Section [#4148](https://github.com/iterative/vscode-dvc/pull/4148) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Update the logic to identify a failed process [#4133](https://github.com/iterative/vscode-dvc/pull/4133) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.8] - 2023-06-20
 
 ### 🚀 New Features and Enhancements

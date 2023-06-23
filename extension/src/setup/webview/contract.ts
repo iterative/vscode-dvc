@@ -26,7 +26,6 @@ export type SetupData = {
 }
 
 export enum SetupSection {
-  GET_STARTED = 'get-started',
   DVC = 'dvc',
   EXPERIMENTS = 'experiments',
   REMOTES = 'remotes',
@@ -34,7 +33,6 @@ export enum SetupSection {
 }
 
 export const DEFAULT_SECTION_COLLAPSED = {
-  [SetupSection.GET_STARTED]: false,
   [SetupSection.DVC]: false,
   [SetupSection.EXPERIMENTS]: false,
   [SetupSection.REMOTES]: false,

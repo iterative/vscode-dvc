@@ -54,6 +54,7 @@ describe('GitReader', () => {
       expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['branch'],
         cwd,
+        env: { LANG: 'en_US.UTF-8' },
         executable: 'git'
       })
     })
@@ -66,61 +67,6 @@ describe('GitReader', () => {
 
       const cliOutput = await gitReader.getBranches(cwd)
       expect(cliOutput).toStrictEqual([])
-    })
-  })
-
-  describe('getCurrentBranch', () => {
-    it('should match the expected output', async () => {
-      const cwd = __dirname
-      const branches = ['* main', 'exp-12', 'fix-bug-11', 'other']
-      mockedCreateProcess.mockReturnValueOnce(
-        getMockedProcess(branches.join('\n'))
-      )
-
-      const cliOutput = await gitReader.getCurrentBranch(cwd)
-      expect(cliOutput).toStrictEqual('main')
-      expect(mockedCreateProcess).toHaveBeenCalledWith({
-        args: ['branch'],
-        cwd,
-        executable: 'git'
-      })
-    })
-
-    it('should match the expected output for detached HEAD', async () => {
-      const cwd = __dirname
-      const branches = [
-        '* (HEAD detached at 4d06da1b)',
-        'main',
-        'fix-bug-11',
-        'other'
-      ]
-      mockedCreateProcess.mockReturnValueOnce(
-        getMockedProcess(branches.join('\n'))
-      )
-
-      const cliOutput = await gitReader.getCurrentBranch(cwd)
-      expect(cliOutput).toStrictEqual('4d06da1b')
-    })
-
-    it('should return an empty string if the current branch cannot be found', async () => {
-      const cwd = __dirname
-      const branches = ['main', 'fix-bug-11', 'other']
-      mockedCreateProcess.mockReturnValueOnce(
-        getMockedProcess(branches.join('\n'))
-      )
-
-      const cliOutput = await gitReader.getCurrentBranch(cwd)
-      expect(cliOutput).toStrictEqual('')
-    })
-
-    it('should return an empty string if the cli returns any type of error', async () => {
-      const cwd = __dirname
-      mockedCreateProcess.mockImplementationOnce(() => {
-        throw new Error('unexpected error - something something')
-      })
-
-      const cliOutput = await gitReader.getCurrentBranch(cwd)
-      expect(cliOutput).toStrictEqual('')
     })
   })
 })

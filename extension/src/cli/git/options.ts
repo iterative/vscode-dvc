@@ -1,8 +1,24 @@
 import { Args } from './constants'
 import { ProcessOptions } from '../../process/execution'
 
-export const getOptions = (cwd: string, ...args: Args): ProcessOptions => ({
-  args,
+export const getOptions = ({
   cwd,
-  executable: 'git'
-})
+  args = [],
+  env
+}: {
+  cwd: string
+  args?: Args
+  env?: NodeJS.ProcessEnv
+}): ProcessOptions => {
+  const options: ProcessOptions = {
+    args,
+    cwd,
+    executable: 'git'
+  }
+
+  if (env) {
+    options.env = env
+  }
+
+  return options
+}

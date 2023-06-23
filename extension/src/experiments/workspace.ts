@@ -5,6 +5,7 @@ import {
   getBranchExperimentCommand,
   getPushExperimentCommand
 } from './commands'
+import { isCurrentBranch } from './model/collect'
 import { TableData } from './webview/contract'
 import { Args } from '../cli/dvc/constants'
 import {
@@ -410,13 +411,9 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       AvailableCommands.GIT_GET_BRANCHES,
       cwd
     )
-    const currentBranch = await this.internalCommands.executeCommand<string>(
-      AvailableCommands.GIT_GET_CURRENT_BRANCH,
-      cwd
-    )
     return await quickPickManyValues(
       allBranches
-        .filter(branch => branch !== currentBranch)
+        .filter(branch => !isCurrentBranch(branch))
         .map(branch => {
           return {
             label: branch,

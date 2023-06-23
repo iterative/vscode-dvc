@@ -3,13 +3,12 @@ import { GitCli } from '.'
 import { Command, Flag } from './constants'
 import { getOptions } from './options'
 import { typeCheckCommands } from '..'
-import { cleanUpBranchName, trimAndSplit } from '../../util/stdout'
+import { trimAndSplit } from '../../util/stdout'
 import { isDirectory } from '../../fileSystem'
 
 export const autoRegisteredCommands = {
   GIT_GET_BRANCHES: 'getBranches',
   GIT_GET_COMMIT_MESSAGES: 'getCommitMessages',
-  GIT_GET_CURRENT_BRANCH: 'getCurrentBranch',
   GIT_GET_NUM_COMMITS: 'getNumCommits',
   GIT_GET_REMOTE_URL: 'getRemoteUrl',
   GIT_GET_REPOSITORY_ROOT: 'getGitRepositoryRoot',
@@ -25,25 +24,20 @@ export class GitReader extends GitCli {
   )
 
   public async hasChanges(cwd: string) {
-    const options = getOptions(
-      cwd,
-      Command.DIFF,
-      Flag.NAME_ONLY,
-      Flag.RAW_WITH_NUL
-    )
+    const options = getOptions({
+      args: [Command.DIFF, Flag.NAME_ONLY, Flag.RAW_WITH_NUL],
+      cwd
+    })
     const output = await this.executeProcess(options)
 
     return !!output
   }
 
   public async hasNoCommits(cwd: string) {
-    const options = getOptions(
-      cwd,
-      Command.REV_LIST,
-      Flag.NUMBER,
-      '1',
-      Flag.ALL
-    )
+    const options = getOptions({
+      args: [Command.REV_LIST, Flag.NUMBER, '1', Flag.ALL],
+      cwd
+    })
     const output = await this.executeProcess(options)
 
     return !output
@@ -54,15 +48,17 @@ export class GitReader extends GitCli {
     revision: string,
     revisions: string
   ): Promise<string> {
-    const options = getOptions(
-      cwd,
-      Command.LOG,
-      revision,
-      Flag.PRETTY_FORMAT_COMMIT_MESSAGE,
-      Flag.SEPARATE_WITH_NULL,
-      Flag.NUMBER,
-      revisions
-    )
+    const options = getOptions({
+      args: [
+        Command.LOG,
+        revision,
+        Flag.PRETTY_FORMAT_COMMIT_MESSAGE,
+        Flag.SEPARATE_WITH_NULL,
+        Flag.NUMBER,
+        revisions
+      ],
+      cwd
+    })
     try {
       return await this.executeProcess(options)
     } catch {
@@ -71,7 +67,7 @@ export class GitReader extends GitCli {
   }
 
   public async getRemoteUrl(cwd: string): Promise<string> {
-    const options = getOptions(cwd, Command.LS_REMOTE, Flag.GET_URL)
+    const options = getOptions({ args: [Command.LS_REMOTE, Flag.GET_URL], cwd })
     try {
       return await this.executeProcess(options)
     } catch {
@@ -88,7 +84,10 @@ export class GitReader extends GitCli {
   }
 
   public async getNumCommits(cwd: string, branch: string) {
-    const options = getOptions(cwd, Command.REV_LIST, Flag.COUNT, branch)
+    const options = getOptions({
+      args: [Command.REV_LIST, Flag.COUNT, branch],
+      cwd
+    })
     try {
       const nbCommits = await this.executeProcess(options)
       return Number.parseInt(nbCommits)
@@ -98,37 +97,30 @@ export class GitReader extends GitCli {
   }
 
   public async getBranches(cwd: string): Promise<string[]> {
-    const options = getOptions(cwd, Command.BRANCH)
+    const options = getOptions({
+      args: [Command.BRANCH],
+      cwd,
+      env: { LANG: 'en_US.UTF-8' }
+    })
     try {
       const branches = await this.executeProcess(options)
-      return trimAndSplit(branches).map(cleanUpBranchName)
+      return trimAndSplit(branches)
     } catch {
       return []
     }
   }
 
-  public async getCurrentBranch(cwd: string): Promise<string> {
-    const options = getOptions(cwd, Command.BRANCH)
-    try {
-      const branches = await this.executeProcess(options)
-      const currentBranch = trimAndSplit(branches).find(
-        branch => branch.indexOf('*') === 0
-      )
-      return (currentBranch && cleanUpBranchName(currentBranch)) || ''
-    } catch {
-      return ''
-    }
-  }
-
   private async getUntrackedDirectories(cwd: string): Promise<string[]> {
-    const options = getOptions(
-      cwd,
-      Command.LS_FILES,
-      Flag.OTHERS,
-      Flag.EXCLUDE_STANDARD,
-      Flag.DIRECTORY,
-      Flag.NO_EMPTY_DIRECTORY
-    )
+    const options = getOptions({
+      args: [
+        Command.LS_FILES,
+        Flag.OTHERS,
+        Flag.EXCLUDE_STANDARD,
+        Flag.DIRECTORY,
+        Flag.NO_EMPTY_DIRECTORY
+      ],
+      cwd
+    })
 
     const output = await this.executeProcess(options)
     return this.getUris(cwd, trimAndSplit(output)).filter(path =>
@@ -137,12 +129,10 @@ export class GitReader extends GitCli {
   }
 
   private async getUntrackedFiles(cwd: string): Promise<string[]> {
-    const options = getOptions(
-      cwd,
-      Command.LS_FILES,
-      Flag.OTHERS,
-      Flag.EXCLUDE_STANDARD
-    )
+    const options = getOptions({
+      args: [Command.LS_FILES, Flag.OTHERS, Flag.EXCLUDE_STANDARD],
+      cwd
+    })
 
     const output = await this.executeProcess(options)
     return this.getUris(cwd, trimAndSplit(output))

@@ -6,7 +6,6 @@ import { Dvc } from './dvc/Dvc'
 import { Experiments } from './experiments/Experiments'
 import { Studio } from './studio/Studio'
 import { SetupContainer } from './SetupContainer'
-import { GetStarted } from './GetStarted'
 import { Remotes } from './remotes/Remotes'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 import { TooltipIconType } from '../../shared/components/sectionContainer/InfoTooltip'
@@ -57,9 +56,6 @@ const getStudioStatusIcon = (cliCompatible: boolean, isConnected: boolean) => {
 
   return isConnected ? TooltipIconType.PASSED : TooltipIconType.INFO
 }
-
-const getGetStartedIcon = (isDvcSetup: boolean) =>
-  isDvcSetup ? TooltipIconType.INFO : TooltipIconType.ERROR
 
 export const feedStore = (
   data: MessageToWebview<SetupData>,
@@ -175,13 +171,6 @@ export const App: React.FC = () => {
         }
       >
         <Dvc />
-      </SetupContainer>
-      <SetupContainer
-        sectionKey={SetupSection.GET_STARTED}
-        title="Get Started"
-        icon={getGetStartedIcon(isDvcSetup)}
-      >
-        <GetStarted isDvcSetup={isDvcSetup} />
       </SetupContainer>
       <SetupContainer
         sectionKey={SetupSection.EXPERIMENTS}

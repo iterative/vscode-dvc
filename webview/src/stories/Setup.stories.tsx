@@ -27,7 +27,6 @@ const DEFAULT_DATA: SetupData = {
   remoteList: undefined,
   sectionCollapsed: {
     [SetupSection.DVC]: false,
-    [SetupSection.GET_STARTED]: false,
     [SetupSection.EXPERIMENTS]: false,
     [SetupSection.REMOTES]: false,
     [SetupSection.STUDIO]: true
@@ -163,7 +162,6 @@ NoRemoteSetup.args = getUpdatedArgs({
   },
   sectionCollapsed: {
     [SetupSection.DVC]: true,
-    [SetupSection.GET_STARTED]: true,
     [SetupSection.EXPERIMENTS]: true,
     [SetupSection.REMOTES]: false,
     [SetupSection.STUDIO]: true
@@ -181,7 +179,6 @@ ProjectRemoteSetup.args = getUpdatedArgs({
   },
   sectionCollapsed: {
     [SetupSection.DVC]: true,
-    [SetupSection.GET_STARTED]: true,
     [SetupSection.EXPERIMENTS]: true,
     [SetupSection.REMOTES]: false,
     [SetupSection.STUDIO]: true
@@ -202,7 +199,6 @@ MultiProjectRemoteSetup.args = getUpdatedArgs({
   },
   sectionCollapsed: {
     [SetupSection.DVC]: true,
-    [SetupSection.GET_STARTED]: true,
     [SetupSection.EXPERIMENTS]: true,
     [SetupSection.REMOTES]: false,
     [SetupSection.STUDIO]: true
