@@ -10,13 +10,6 @@ module.exports = {
       true,
       { ignorePseudoClasses: ['global'] }
     ],
-    'custom-property-pattern': [
-      '^[a-z][a-zA-Z0-9]+$',
-      {
-        message: selector =>
-          `Expected custom property name "${selector}" to be camelCase`
-      }
-    ],
     'selector-class-pattern': [
       '^[a-z][a-zA-Z0-9]+$',
       {

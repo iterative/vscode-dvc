@@ -1,11 +1,17 @@
-/* stylelint-disable custom-property-pattern -- VSCode variables are not camelCase */
+/* stylelint-disable custom-property-pattern -- VSCode variables are not kebab-case */
 
 /* common */
 $bullet-size: 9px;
 $tooltip-border: var(--vscode-editorHoverWidget-border);
 $hover-background-color: var(--vscode-list-hoverBackground);
 $shadow: var(--vscode-widget-shadow);
-$font: var(--vscode-editor-font-family);
+$editor-font: var(--vscode-editor-font-family);
+$font: var(--vscode-font-family);
+$bg-transparency-1: var(--editor-background-transparency-1);
+$bg-transparency-5: var(--editor-background-transparency-5);
+$fg-transparency-1: var(--editor-foreground-transparency-1);
+$fg-transparency-4: var(--editor-foreground-transparency-4);
+$fg-transparency-5: var(--editor-foreground-transparency-5);
 
 /* common colors */
 $fg-color: var(--vscode-editor-foreground);
@@ -57,3 +63,9 @@ $disabled-opacity: var(--disabled-opacity);
 
 /* plots */
 $plot-block-bg-color: var(--vscode-dropdown-background);
+
+/* tooltips */
+$tooltip-border: var(--vscode-editorHoverWidget-border);
+$tooltip-drop-shadow: drop-shadow(0 0 4px var(--vscode-widget-shadow));
+$tooltip-foreground: var(--vscode-quickInput-foreground);
+$tooltip-background: var(--vscode-quickInput-background);

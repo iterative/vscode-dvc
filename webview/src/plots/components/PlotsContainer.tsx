@@ -164,7 +164,7 @@ export const PlotsContainer: React.FC<PlotsContainerProps> = ({
           })}
           style={
             {
-              '--nbPerRow': nbItemsPerRowOrWidth
+              '--nb-per-row': nbItemsPerRowOrWidth
             } as DetailedHTMLProps<
               HTMLAttributes<HTMLDivElement>,
               HTMLDivElement

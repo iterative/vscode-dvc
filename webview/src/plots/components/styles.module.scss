@@ -27,7 +27,7 @@ $gap: 20px;
   overflow: visible;
   cursor: grab;
   position: relative;
-  background: var(--editor-foreground-transparency-1);
+  background: $fg-transparency-1;
   border: none;
   padding-top: 5px;
 
@@ -179,7 +179,7 @@ $gap: 20px;
   display: flex;
 }
 
-/* stylelint-disable custom-property-pattern, selector-class-pattern -- 3rd party selectors */
+/* stylelint-disable selector-class-pattern -- 3rd party selectors */
 
 :global(.vega-bindings):not(:empty) {
   position: absolute;
@@ -236,7 +236,7 @@ $gap: 20px;
   display: grid;
   gap: $gap;
   grid-auto-flow: row;
-  grid-template-columns: repeat(var(--nbPerRow), 1fr);
+  grid-template-columns: repeat(var(--nb-per-row), 1fr);
 
   + .singleViewPlotsGrid,
   + .multiViewPlotsGrid {
@@ -266,9 +266,8 @@ $gap: 20px;
   }
 
   a:hover {
-    /* TBD this variable needs updating */
-    background-color: var(--editor-background-transparency-1) !important;
+    background-color: $bg-transparency-1 !important;
   }
 }
 
-/* stylelint-enable custom-property-pattern, selector-class-pattern */
+/* stylelint-enable selector-class-pattern */
