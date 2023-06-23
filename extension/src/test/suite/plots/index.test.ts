@@ -582,6 +582,7 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to manually refresh plot revisions from the webview', async () => {
+      const mockNow = getMockNow()
       const { data, plots, mockPlotsDiff, messageSpy } = await buildPlots({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
@@ -600,6 +601,8 @@ suite('Plots Test Suite', () => {
       const dataUpdateEvent = new Promise(resolve =>
         data.onDidUpdate(() => resolve(undefined))
       )
+
+      bypassProcessManagerDebounce(mockNow)
 
       mockMessageReceived.fire({
         type: MessageFromWebviewType.REFRESH_REVISIONS

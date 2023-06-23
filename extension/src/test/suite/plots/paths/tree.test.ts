@@ -17,6 +17,7 @@ import {
 } from '../../../../vscode/quickPick'
 import { PlotPath } from '../../../../plots/paths/collect'
 import { REVISIONS } from '../../../fixtures/plotsDiff'
+import { bypassProcessManagerDebounce, getMockNow } from '../../util'
 
 suite('Plots Paths Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -131,17 +132,21 @@ suite('Plots Paths Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to refresh revision data for all plots using dvc.views.plots.refreshPlots', async () => {
+      const mockNow = getMockNow()
       const { data, mockPlotsDiff, plots } = await buildPlots({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
       })
 
-      await plots.showWebview()
+      const webview = await plots.showWebview()
+      await webview.isReady()
 
       const dataUpdated = new Promise(resolve =>
         disposable.track(data.onDidUpdate(() => resolve(undefined)))
       )
       mockPlotsDiff.resetHistory()
+
+      bypassProcessManagerDebounce(mockNow)
 
       await commands.executeCommand(RegisteredCommands.PLOTS_REFRESH)
       await dataUpdated
