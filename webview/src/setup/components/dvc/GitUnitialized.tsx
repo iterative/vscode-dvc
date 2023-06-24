@@ -20,8 +20,9 @@ export const GitUninitialized: React.FC<PropsWithChildren> = ({ children }) => {
     </>
   ) : (
     <p>
-      {startingSentence} Please open a different folder which contains no Git
-      repositories or a single existing Git repository at the root.
+      {startingSentence} Please ensure Git is installed and a folder which
+      contains no Git repositories or a single existing Git repository at the
+      root is open.
     </p>
   )
 

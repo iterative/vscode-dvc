@@ -14,7 +14,8 @@ export const autoRegisteredCommands = {
   GIT_GET_REPOSITORY_ROOT: 'getGitRepositoryRoot',
   GIT_HAS_CHANGES: 'hasChanges',
   GIT_HAS_NO_COMMITS: 'hasNoCommits',
-  GIT_LIST_UNTRACKED: 'listUntracked'
+  GIT_LIST_UNTRACKED: 'listUntracked',
+  GIT_VERSION: 'gitVersion'
 } as const
 
 export class GitReader extends GitCli {
@@ -38,9 +39,10 @@ export class GitReader extends GitCli {
       args: [Command.REV_LIST, Flag.NUMBER, '1', Flag.ALL],
       cwd
     })
-    const output = await this.executeProcess(options)
-
-    return !output
+    try {
+      const output = await this.executeProcess(options)
+      return !output
+    } catch {}
   }
 
   public async getCommitMessages(
@@ -108,6 +110,13 @@ export class GitReader extends GitCli {
     } catch {
       return []
     }
+  }
+
+  public async gitVersion(cwd: string) {
+    try {
+      const options = getOptions({ args: [Command.VERSION], cwd })
+      return await this.executeProcess(getOptions(options))
+    } catch {}
   }
 
   private async getUntrackedDirectories(cwd: string): Promise<string[]> {
