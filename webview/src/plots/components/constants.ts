@@ -1,7 +1,7 @@
 import { Config } from 'vega-lite'
 
 const foregroundColor = 'var(--vscode-editor-foreground)'
-const backgroundColor = 'inital'
+const backgroundColor = 'transparent'
 const font = 'var(--vscode-editor-font-family)'
 const fontWeight = 'normal' as const
 
