@@ -33,7 +33,7 @@ import {
 const tableData: TableDataState = {
   branches: [undefined, 'main'],
   changes: workspaceChangesFixture,
-  cliError: undefined,
+  cliError: null,
   columnOrder: [],
   columnWidths: {
     'params:params.yaml:dvc_logs_dir': 300
