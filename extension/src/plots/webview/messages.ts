@@ -78,6 +78,8 @@ export class WebviewMessages {
           RegisteredCommands.PLOTS_CUSTOM_ADD,
           this.dvcRoot
         )
+      case MessageFromWebviewType.EXPORT_PLOT_AS_RAW_DATA:
+        return this.exportPlotAsRawData()
       case MessageFromWebviewType.RESIZE_PLOTS:
         return this.setPlotSize(
           message.payload.section,
@@ -336,5 +338,9 @@ export class WebviewMessages {
 
   private getCustomPlots() {
     return this.plots.getCustomPlots() || null
+  }
+
+  private exportPlotAsRawData() {
+    // export starting with window.savePlotDialog
   }
 }
