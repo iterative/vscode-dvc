@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.11] - 2023-06-26
+
+### 🚀 New Features and Enhancements
+
+- Use first three metrics and params in table tooltips & quick picks [#4155](https://github.com/iterative/vscode-dvc/pull/4155) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Handle Git not being installed (Setup) [#4165](https://github.com/iterative/vscode-dvc/pull/4165) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Further reduce the number of calls to Git [#4163](https://github.com/iterative/vscode-dvc/pull/4163) by [@mattseddon](https://github.com/mattseddon)
+- Bypass process manager debounce in refresh plot revisions tests [#4166](https://github.com/iterative/vscode-dvc/pull/4166) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.10] - 2023-06-21
 
 ### 🚀 New Features and Enhancements
