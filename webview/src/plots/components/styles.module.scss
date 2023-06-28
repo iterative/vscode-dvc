@@ -12,46 +12,6 @@ $gap: 20px;
   width: 100%;
 }
 
-:global(.vega-bindings):not(:empty) {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  background-color: $plot-block-bg-color;
-  color: $fg-color;
-  padding: 10px;
-  display: none;
-
-  label {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  input {
-    accent-color: $accent-color;
-    outline: none;
-  }
-}
-
-:global(.vega-embed) {
-  width: 100%;
-  height: 100%;
-  align-self: center;
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-
-  &:hover {
-    :global(.vega-bindings) {
-      display: block;
-    }
-  }
-
-  svg {
-    overflow: visible;
-  }
-}
-
 .singleViewPlotsGrid,
 .multiViewPlotsGrid {
   width: 100%;
@@ -63,36 +23,11 @@ $gap: 20px;
   }
 }
 
-:global(.ReactVirtualized__Grid__innerScrollContainer),
-.noBigGrid {
-  width: calc(100% - $gap * 2) !important;
-  max-width: none !important;
-  max-height: none !important;
-  height: auto !important;
-  margin-left: $gap;
-  display: grid;
-  gap: $gap;
-  grid-auto-flow: row;
-  grid-template-columns: repeat(var(--nbPerRow), 1fr);
-
-  + .singleViewPlotsGrid,
-  + .multiViewPlotsGrid {
-    margin-top: $gap;
-  }
-
-  // When editing the grid-template-column for any viewport or plot size, `getNbItemsPerRow` in the `./utils.ts` file should also be updated
-  .smallPlots & {
-    :global(.role-axis-title) text {
-      font-size: 10px;
-    }
-  }
-}
-
 .plot {
   overflow: visible;
   cursor: grab;
   position: relative;
-  background: var(--editor-foreground-transparency-1);
+  background: $fg-transparency-1;
   border: none;
   padding-top: 5px;
 
@@ -222,11 +157,6 @@ $gap: 20px;
   width: 80vw;
   height: calc(80vh - 100px);
 
-  :global(.chart-wrapper) {
-    width: 100%;
-    height: 100%;
-  }
-
   svg {
     background-color: transparent !important;
     width: 100%;
@@ -249,6 +179,78 @@ $gap: 20px;
   display: flex;
 }
 
+/* stylelint-disable selector-class-pattern -- 3rd party selectors */
+
+:global(.vega-bindings):not(:empty) {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background-color: $plot-block-bg-color;
+  color: $fg-color;
+  padding: 10px;
+  display: none;
+
+  label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  input {
+    accent-color: $accent-color;
+    outline: none;
+  }
+}
+
+:global(.vega-embed) {
+  width: 100%;
+  height: 100%;
+  align-self: center;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    :global(.vega-bindings) {
+      display: block;
+    }
+  }
+
+  svg {
+    overflow: visible;
+  }
+}
+
+.zoomedInPlot :global(.chart-wrapper) {
+  width: 100%;
+  height: 100%;
+}
+
+:global(.ReactVirtualized__Grid__innerScrollContainer),
+.noBigGrid {
+  width: calc(100% - $gap * 2) !important;
+  max-width: none !important;
+  max-height: none !important;
+  height: auto !important;
+  margin-left: $gap;
+  display: grid;
+  gap: $gap;
+  grid-auto-flow: row;
+  grid-template-columns: repeat(var(--nb-per-row), 1fr);
+
+  + .singleViewPlotsGrid,
+  + .multiViewPlotsGrid {
+    margin-top: $gap;
+  }
+
+  // When editing the grid-template-column for any viewport or plot size, `getNbItemsPerRow` in the `./utils.ts` file should also be updated
+  .smallPlots & {
+    :global(.role-axis-title) text {
+      font-size: 10px;
+    }
+  }
+}
+
 :global(.has-actions) {
   summary {
     background: $fg-color !important;
@@ -264,6 +266,8 @@ $gap: 20px;
   }
 
   a:hover {
-    background-color: var(--editor-background-transparency-1) !important;
+    background-color: $bg-transparency-1 !important;
   }
 }
+
+/* stylelint-enable selector-class-pattern */
