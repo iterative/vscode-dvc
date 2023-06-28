@@ -826,6 +826,6 @@ $badge-size: 0.85rem;
 
   p {
     opacity: 0.6;
-    font-family: var(--vscode-font-family);
+    font-family: $font;
   }
 }

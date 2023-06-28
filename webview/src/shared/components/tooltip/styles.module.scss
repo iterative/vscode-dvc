@@ -1,11 +1,8 @@
-$tooltip-border: var(--vscode-editorHoverWidget-border);
-$vscode-drop-shadow: drop-shadow(0 0 4px var(--vscode-widget-shadow));
-$foreground: var(--vscode-quickInput-foreground);
-$background: var(--vscode-quickInput-background);
-$font: var(--vscode-font-family);
+@import '../../variables';
 
+/* stylelint-disable selector-class-pattern -- third party selectors */
 :global(.tippy-box) {
-  filter: $vscode-drop-shadow;
+  filter: $tooltip-drop-shadow;
   font-family: $font;
   max-width: max-content;
   font-size: 0.8rem;
@@ -13,7 +10,7 @@ $font: var(--vscode-font-family);
   white-space: nowrap;
 
   & > :global(.tippy-arrow) {
-    color: $background;
+    color: $tooltip-background;
     z-index: 1;
 
     ::before {
@@ -22,13 +19,14 @@ $font: var(--vscode-font-family);
   }
 
   & > :global(.tippy-content) {
-    color: $foreground;
+    color: $tooltip-foreground;
     white-space: nowrap;
     padding: 0;
-    background-color: $background;
+    background-color: $tooltip-background;
     z-index: 2;
   }
 }
+/* stylelint-enable selector-class-pattern */
 
 .tooltipContent {
   border: 1px solid $tooltip-border;

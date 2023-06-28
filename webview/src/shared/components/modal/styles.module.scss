@@ -1,7 +1,7 @@
 @import '../../variables';
 
 .backdrop {
-  background-color: var(--editor-background-transparency-5);
+  background-color: $bg-transparency-5;
   position: fixed;
   top: 0;
   left: 0;
@@ -20,7 +20,7 @@
 }
 
 .modalContent {
-  background: var(--editor-foreground-transparency-1);
+  background: $fg-transparency-1;
   padding: 2rem;
 }
 

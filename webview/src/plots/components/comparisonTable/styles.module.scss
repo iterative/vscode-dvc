@@ -25,7 +25,7 @@ $gap: 4px;
 .header {
   padding: 10px 5px;
   color: $fg-color;
-  background-color: var(--editor-foreground-transparency-1);
+  background-color: $fg-transparency-1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -147,7 +147,7 @@ $gap: 4px;
     position: absolute;
     right: 0;
     top: 0;
-    background-color: var(--editor-foreground-transparency-4);
+    background-color: $fg-transparency-4;
     z-index: 5;
   }
 }

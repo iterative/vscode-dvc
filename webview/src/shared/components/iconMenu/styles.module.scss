@@ -4,7 +4,7 @@
   list-style: none;
   display: flex;
   padding: 2px;
-  border: 1px solid var(--editor-foreground-transparency-5);
+  border: 1px solid $fg-transparency-5;
   width: max-content;
   background-color: $bg-color;
   margin: 0;
@@ -23,7 +23,7 @@
   color: $fg-color;
 
   &:hover {
-    background-color: var(--editor-foreground-transparency-1);
+    background-color: $fg-transparency-1;
   }
 
   &.clickable {
