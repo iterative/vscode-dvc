@@ -19865,10 +19865,10 @@ vega-label@~1.2.1:
     vega-scenegraph "^4.9.2"
     vega-util "^1.15.2"
 
-vega-lite@5.10.0:
-  version "5.10.0"
-  resolved "https://registry.yarnpkg.com/vega-lite/-/vega-lite-5.10.0.tgz#63408c2b8229b8fd0ef7491eec55c593ea39306e"
-  integrity sha512-7+67sglf8E6z/j1EyuOYWhMM/kLoyjVFeDqEdKcZQQQTjjGaaV+y881B//qXKxV+gXc9AgYqWMr+JDxqDclBmg==
+vega-lite@5.11.0:
+  version "5.11.0"
+  resolved "https://registry.yarnpkg.com/vega-lite/-/vega-lite-5.11.0.tgz#ce7113f91753f96c17cf4b37c9ed5f98c2409c3e"
+  integrity sha512-2PmF7bbgNDDDcBWS4uZ3+I7aaQ3j9G+WaJTDtKMEBzkhADwei5CuYrwBcVk63hRZqvfeuIXxk4DBOlSW3hRx8Q==
   dependencies:
     "@types/clone" "~2.1.1"
     clone "~2.1.2"
