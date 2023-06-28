@@ -18,6 +18,7 @@ import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import {
   within,
   userEvent,
+  fireEvent,
   findByText,
   getAllByRole
 } from '@storybook/testing-library'
@@ -220,12 +221,15 @@ WithMiddleStates.args = {
 WithMiddleStates.play = async ({ canvasElement }) => {
   await within(canvasElement).findByText('4fb124a')
   const checkboxes = await within(canvasElement).findAllByRole('checkbox')
-  userEvent.click(checkboxes[1], { bubbles: true })
+  await userEvent.click(checkboxes[1])
   await delay(0)
-  userEvent.click(checkboxes[7], { bubbles: true, shiftKey: true })
+  fireEvent(
+    checkboxes[7],
+    new MouseEvent('click', { bubbles: true, shiftKey: true })
+  )
 
   const collapseButton = within(canvasElement).getByTitle('Contract Row')
-  userEvent.click(collapseButton)
+  return userEvent.click(collapseButton)
 }
 WithMiddleStates.parameters = { chromatic: { delay: 2000 } }
 
@@ -241,12 +245,15 @@ const contextMenuPlay = async ({
 }) => {
   const experiment = await within(canvasElement).findByText('[exp-e7a67]')
   const clientRect = experiment.getBoundingClientRect()
-  userEvent.click(experiment, {
-    bubbles: true,
-    button: 2,
-    clientX: clientRect.left,
-    clientY: clientRect.top
-  })
+  fireEvent(
+    experiment,
+    new MouseEvent('contextmenu', {
+      bubbles: true,
+      button: 2,
+      clientX: clientRect.left,
+      clientY: clientRect.top
+    })
+  )
 }
 
 export const WithContextMenu = Template.bind({})
@@ -271,7 +278,7 @@ WithAllDataTypes.args = {
 }
 WithAllDataTypes.play = async ({ canvasElement }) => {
   const falseCell = await within(canvasElement).findByText('false')
-  userEvent.hover(falseCell, { bubbles: true })
+  return userEvent.hover(falseCell)
 }
 WithAllDataTypes.parameters = {
   chromatic: { delay: NORMAL_TOOLTIP_DELAY[0] }
