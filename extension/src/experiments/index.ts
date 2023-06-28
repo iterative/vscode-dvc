@@ -340,7 +340,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     const selected = await pickExperimentsToPlot(
       experiments,
-      this.columns.getFirstThreeColumnOrder()
+      this.columns.getSummaryColumnOrder()
     )
     if (!selected) {
       return
@@ -365,14 +365,14 @@ export class Experiments extends BaseRepository<TableData> {
   public pickCommitOrExperiment() {
     return pickExperiment(
       this.experiments.getCommitsAndExperiments(),
-      this.getFirstThreeColumnOrder()
+      this.getSummaryColumnOrder()
     )
   }
 
   public pickRunningExperiments() {
     return pickExperiments(
       this.experiments.getRunningExperiments(),
-      this.getFirstThreeColumnOrder(),
+      this.getSummaryColumnOrder(),
       Title.SELECT_EXPERIMENTS_STOP
     )
   }
@@ -380,7 +380,7 @@ export class Experiments extends BaseRepository<TableData> {
   public pickExperimentsToRemove() {
     return pickExperiments(
       this.experiments.getExperimentsAndQueued(),
-      this.getFirstThreeColumnOrder(),
+      this.getSummaryColumnOrder(),
       Title.SELECT_EXPERIMENTS_REMOVE
     )
   }
@@ -388,7 +388,7 @@ export class Experiments extends BaseRepository<TableData> {
   public pickExperimentsToPush() {
     return pickExperiments(
       this.experiments.getExperiments(),
-      this.getFirstThreeColumnOrder(),
+      this.getSummaryColumnOrder(),
       Title.SELECT_EXPERIMENTS_PUSH
     )
   }
@@ -502,8 +502,8 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getCliError()
   }
 
-  public getFirstThreeColumnOrder() {
-    return this.columns.getFirstThreeColumnOrder()
+  public getSummaryColumnOrder() {
+    return this.columns.getSummaryColumnOrder()
   }
 
   public getColumnTerminalNodes() {
@@ -584,7 +584,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     return await pickExperiment(
       this.experiments.getCombinedList(),
-      this.getFirstThreeColumnOrder(),
+      this.getSummaryColumnOrder(),
       Title.SELECT_BASE_EXPERIMENT
     )
   }

@@ -109,18 +109,12 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   }
 
   private async updateBranches() {
-    const [currentBranch, allBranches] = await Promise.all([
-      this.internalCommands.executeCommand<string>(
-        AvailableCommands.GIT_GET_CURRENT_BRANCH,
-        this.dvcRoot
-      ),
-      this.internalCommands.executeCommand<string[]>(
-        AvailableCommands.GIT_GET_BRANCHES,
-        this.dvcRoot
-      )
-    ])
+    const allBranches = await this.internalCommands.executeCommand<string[]>(
+      AvailableCommands.GIT_GET_BRANCHES,
+      this.dvcRoot
+    )
 
-    this.experiments.setBranches(currentBranch, allBranches)
+    this.experiments.setBranches(allBranches)
   }
 
   private async watchExpGitRefs(): Promise<void> {

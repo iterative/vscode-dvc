@@ -10,6 +10,9 @@ export class GitCli extends Cli {
       cwd
     })
 
-    return standardizePath(await this.executeProcess(options))
+    try {
+      const path = await this.executeProcess(options)
+      return standardizePath(path)
+    } catch {}
   }
 }

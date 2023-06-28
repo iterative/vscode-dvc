@@ -13,7 +13,7 @@ export const RibbonBlockTooltip: React.FC<{
   revision: Revision
   children: ReactElement
 }> = ({ revision, children }) => {
-  const { firstThreeColumns, commit, errors } = revision
+  const { summaryColumns, commit, errors } = revision
 
   const tooltipContent = (
     <div>
@@ -24,7 +24,7 @@ export const RibbonBlockTooltip: React.FC<{
       )}
       <table>
         <tbody>
-          {firstThreeColumns.map(({ path, value, type }) => (
+          {summaryColumns.map(({ path, value, type }) => (
             <tr key={path}>
               <td className={cx(styles.tooltipColumn, styles[`${type}Key`])}>
                 <span className={styles.tooltipPathWrapper}>{path}</span>
@@ -44,14 +44,14 @@ export const RibbonBlockTooltip: React.FC<{
       </table>
       <p className={styles.tooltipTableDescription}>
         <Info className={styles.infoIcon} width={14} height={14} />
-        Reflects the first three columns (excluding Created) in the experiments
-        table.
+        Reflects the first three columns for both metrics and params in the
+        experiments table.
       </p>
       {commit && (
         <p
           className={cx(
             styles.commitMessage,
-            firstThreeColumns.length > 0 && styles.addTopBorder
+            summaryColumns.length > 0 && styles.addTopBorder
           )}
         >
           <Icon width={14} height={14} icon={GitCommit} />

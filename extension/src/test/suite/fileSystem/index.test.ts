@@ -32,7 +32,7 @@ suite('File System Test Suite', () => {
   describe('getGitPath', () => {
     it('should get the expected paths for the demo repository (submodule)', async () => {
       const reader = disposable.track(new GitReader())
-      const root = await reader.getGitRepositoryRoot(__dirname)
+      const root = (await reader.getGitRepositoryRoot(__dirname)) as string
       const submoduleDotGit = standardizePath(
         resolve(root, gitPath.DOT_GIT, 'modules', 'demo')
       )
@@ -46,7 +46,7 @@ suite('File System Test Suite', () => {
 
     it('should get the expected paths for this project', async () => {
       const reader = disposable.track(new GitReader())
-      const root = await reader.getGitRepositoryRoot(__dirname)
+      const root = (await reader.getGitRepositoryRoot(__dirname)) as string
       const rootDotGit = standardizePath(resolve(root, gitPath.DOT_GIT))
 
       const dotGitPath = getGitPath(root, gitPath.DOT_GIT)

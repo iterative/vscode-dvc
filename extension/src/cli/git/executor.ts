@@ -41,6 +41,11 @@ export class GitExecutor extends GitCli {
 
   public async stageAll(cwd: string) {
     const gitRoot = await this.getGitRepositoryRoot(cwd)
+
+    if (!gitRoot) {
+      return
+    }
+
     const options = getOptions({ args: [Command.ADD, Flag.DOT], cwd: gitRoot })
 
     return this.executeProcess(options)

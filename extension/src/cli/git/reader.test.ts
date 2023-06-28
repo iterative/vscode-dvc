@@ -3,7 +3,7 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import { GitReader } from './reader'
 import { CliResult, CliStarted } from '..'
 import { createProcess } from '../../process/execution'
-import { getMockedProcess } from '../../test/util/jest'
+import { getFailingMockedProcess, getMockedProcess } from '../../test/util/jest'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -70,59 +70,30 @@ describe('GitReader', () => {
     })
   })
 
-  describe('getCurrentBranch', () => {
-    it('should match the expected output', async () => {
+  describe('version', () => {
+    it('should return the expected output', async () => {
       const cwd = __dirname
-      const branches = ['* main', 'exp-12', 'fix-bug-11', 'other']
       mockedCreateProcess.mockReturnValueOnce(
-        getMockedProcess(branches.join('\n'))
+        getMockedProcess('git version 2.41.0')
       )
 
-      const cliOutput = await gitReader.getCurrentBranch(cwd)
-      expect(cliOutput).toStrictEqual('main')
+      const cliOutput = await gitReader.gitVersion(cwd)
+      expect(cliOutput).toBeDefined()
       expect(mockedCreateProcess).toHaveBeenCalledWith({
-        args: ['branch'],
+        args: ['version'],
         cwd,
-        env: { LANG: 'en_US.UTF-8' },
         executable: 'git'
       })
     })
 
-    it('should match the expected output for detached HEAD', async () => {
+    it('should not fail if git is not available', async () => {
       const cwd = __dirname
-      const branches = [
-        '* (HEAD detached at 4d06da1b)',
-        'main',
-        'fix-bug-11',
-        'other'
-      ]
       mockedCreateProcess.mockReturnValueOnce(
-        getMockedProcess(branches.join('\n'))
+        getFailingMockedProcess('git is not available')
       )
 
-      const cliOutput = await gitReader.getCurrentBranch(cwd)
-      expect(cliOutput).toStrictEqual('4d06da1b')
-    })
-
-    it('should return an empty string if the current branch cannot be found', async () => {
-      const cwd = __dirname
-      const branches = ['main', 'fix-bug-11', 'other']
-      mockedCreateProcess.mockReturnValueOnce(
-        getMockedProcess(branches.join('\n'))
-      )
-
-      const cliOutput = await gitReader.getCurrentBranch(cwd)
-      expect(cliOutput).toStrictEqual('')
-    })
-
-    it('should return an empty string if the cli returns any type of error', async () => {
-      const cwd = __dirname
-      mockedCreateProcess.mockImplementationOnce(() => {
-        throw new Error('unexpected error - something something')
-      })
-
-      const cliOutput = await gitReader.getCurrentBranch(cwd)
-      expect(cliOutput).toStrictEqual('')
+      const cliOutput = await gitReader.gitVersion(cwd)
+      expect(cliOutput).toBeUndefined()
     })
   })
 })

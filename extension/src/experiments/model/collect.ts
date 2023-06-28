@@ -478,3 +478,29 @@ export const collectRunningInWorkspace = (
     }
   }
 }
+
+export const isCurrentBranch = (branch: string) => branch.indexOf('*') === 0
+
+export const collectBranches = (
+  allBranches: string[]
+): { currentBranch: string; branches: string[] } => {
+  let currentBranch = ''
+  const branches: string[] = []
+
+  for (const branch of allBranches) {
+    const isCurrent = isCurrentBranch(branch)
+
+    const cleanBranch = branch
+      .replace('* ', '')
+      .replace(/\(HEAD\s\w+\s\w+\s/, '')
+      .replace(')', '')
+
+    if (!currentBranch && isCurrent) {
+      currentBranch = cleanBranch
+    }
+
+    branches.push(cleanBranch)
+  }
+
+  return { branches, currentBranch }
+}
