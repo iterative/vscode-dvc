@@ -1,3 +1,4 @@
+import { PlainObject } from 'react-vega'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import { sendMessage } from '../../shared/vscode'
@@ -89,9 +90,9 @@ export const togglePlotsSection = (
 export const zoomPlot = (imagePath?: string) =>
   sendMessage({ payload: imagePath, type: MessageFromWebviewType.ZOOM_PLOT })
 
-export const exportPlotAsRawData = (plotId: string) => {
+export const exportPlotAsRawData = (id: string, data?: PlainObject) => {
   sendMessage({
-    payload: plotId,
+    payload: { data, id },
     type: MessageFromWebviewType.EXPORT_PLOT_AS_RAW_DATA
   })
 }

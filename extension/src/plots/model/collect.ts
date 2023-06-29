@@ -196,7 +196,8 @@ export const collectData = (output: PlotsOutput): DataAccumulator => {
   for (const [path, plots] of Object.entries(data)) {
     collectPathData(acc, path, plots)
   }
-
+  // the comparisonData holds the needed "raw data" that we
+  // can save to a file
   return acc
 }
 
@@ -433,7 +434,35 @@ export const collectSelectedTemplatePlots = (
       group
     })
   }
+
   return acc.length > 0 ? acc : undefined
+}
+
+export const collectSelectedTemplatePlotRawData = ({
+  selectedRevisions,
+  path,
+  template,
+  revisionData,
+  multiSourceEncodingUpdate
+}: {
+  selectedRevisions: string[]
+  path: string
+  template: string
+  revisionData: RevisionData
+  multiSourceEncodingUpdate: { strokeDash: StrokeDashEncoding }
+}) => {
+  const isMultiView = isMultiViewPlot(
+    JSON.parse(template) as TopLevelSpec | VisualizationSpec
+  )
+  const { datapoints } = transformRevisionData(
+    path,
+    selectedRevisions,
+    revisionData,
+    isMultiView,
+    multiSourceEncodingUpdate
+  )
+
+  return datapoints
 }
 
 export const collectOrderedRevisions = (

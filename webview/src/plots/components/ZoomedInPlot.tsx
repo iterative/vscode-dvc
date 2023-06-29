@@ -10,10 +10,12 @@ import { useMutationObserver } from '../hooks/useMutationObserver'
 import { exportPlotAsRawData } from '../util/messages'
 
 type ZoomedInPlotProps = {
+  id: string
   props: VegaLiteProps
 }
 
 export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
+  id,
   props
 }: ZoomedInPlotProps) => {
   const zoomedInPlotRef = useRef<HTMLDivElement>(null)
@@ -38,7 +40,7 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
     const myAction = document.createElement('a')
     myAction.textContent = 'Save as Raw Data'
     myAction.addEventListener('click', () => {
-      exportPlotAsRawData('way to id the plot here')
+      exportPlotAsRawData(id, props.data)
     })
     myAction.classList.add(styles.vegaCustomAction)
     actions?.append(myAction)

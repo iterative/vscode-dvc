@@ -1,4 +1,5 @@
-import { commands } from 'vscode'
+import { window, Uri, commands } from 'vscode'
+import { PlainObject } from 'react-vega'
 import isEmpty from 'lodash.isempty'
 import {
   ComparisonPlot,
@@ -79,7 +80,10 @@ export class WebviewMessages {
           this.dvcRoot
         )
       case MessageFromWebviewType.EXPORT_PLOT_AS_RAW_DATA:
-        return this.exportPlotAsRawData()
+        return this.exportPlotAsRawData(
+          message.payload.id,
+          message.payload.data
+        )
       case MessageFromWebviewType.RESIZE_PLOTS:
         return this.setPlotSize(
           message.payload.section,
@@ -340,7 +344,25 @@ export class WebviewMessages {
     return this.plots.getCustomPlots() || null
   }
 
-  private exportPlotAsRawData() {
-    // export starting with window.savePlotDialog
+  private async exportPlotAsRawData(plotPath: string, data?: PlainObject) {
+    const result = await window.showSaveDialog({
+      defaultUri: Uri.file('data.json'),
+      filters: { JSON: ['json'] }
+    })
+
+    if (!result) {
+      return
+    }
+
+    const paths = this.paths.getTemplateOrder()
+    const selectedRevisions = this.plots.getSelectedRevisionDetails()
+
+    this.plots.saveAsTemplatePlotRawData(
+      paths,
+      selectedRevisions,
+      plotPath,
+      result.path,
+      data
+    )
   }
 }

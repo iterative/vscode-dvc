@@ -1,4 +1,6 @@
 import { Memento } from 'vscode'
+import { writeFileSync } from 'fs-extra'
+import { PlainObject } from 'react-vega'
 import {
   collectData,
   collectSelectedTemplatePlots,
@@ -10,7 +12,8 @@ import {
   getCustomPlotId,
   collectOrderedRevisions,
   collectImageUrl,
-  collectIdShas
+  collectIdShas,
+  collectSelectedTemplatePlotRawData
 } from './collect'
 import { getRevisionFirstThreeColumns } from './util'
 import {
@@ -55,6 +58,7 @@ import {
 } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
 import { ErrorsModel } from '../errors/model'
+import { openFileInEditor } from '../../fileSystem'
 
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
@@ -221,6 +225,21 @@ export class PlotsModel extends ModelWithPersistence {
     }
 
     return selectedRevisions
+  }
+
+  public saveAsTemplatePlotRawData(
+    order: TemplateOrder | undefined,
+    selectedRevisions: Revision[],
+    plotPath: string,
+    filePath: string,
+    data?: PlainObject
+  ) {
+    const rawData =
+      data ||
+      this.getSelectedTemplateRawData(order, selectedRevisions, plotPath)
+
+    writeFileSync(filePath, JSON.stringify(rawData, null, 4))
+    void openFileInEditor(filePath)
   }
 
   public getTemplatePlots(
@@ -437,5 +456,27 @@ export class PlotsModel extends ModelWithPersistence {
       this.getRevisionColors(),
       this.multiSourceEncoding
     )
+  }
+
+  private getSelectedTemplateRawData(
+    order: TemplateOrder | undefined,
+    selectedRevisions: Revision[],
+    path: string
+  ) {
+    if (!definedAndNonEmpty(order)) {
+      return
+    }
+
+    if (!definedAndNonEmpty(selectedRevisions)) {
+      return
+    }
+
+    return collectSelectedTemplatePlotRawData({
+      multiSourceEncodingUpdate: this.multiSourceEncoding[path] || {},
+      path,
+      revisionData: this.revisionData,
+      selectedRevisions: selectedRevisions.map(({ id }) => id),
+      template: this.templates[path]
+    })
   }
 }
