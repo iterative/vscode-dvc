@@ -196,8 +196,7 @@ export const collectData = (output: PlotsOutput): DataAccumulator => {
   for (const [path, plots] of Object.entries(data)) {
     collectPathData(acc, path, plots)
   }
-  // the comparisonData holds the needed "raw data" that we
-  // can save to a file
+
   return acc
 }
 
