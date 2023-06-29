@@ -67,7 +67,7 @@ WithPinnedColumn.play = async ({ canvasElement }) => {
   const mainHeader = await within(canvasElement).findByTestId('main-header')
   const pin = within(mainHeader).getByRole('button')
 
-  userEvent.click(pin)
+  return userEvent.click(pin)
 }
 
 const removeImages = (

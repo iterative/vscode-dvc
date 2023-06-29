@@ -93,7 +93,7 @@ export interface Column extends ColumnAggregateData {
 
 export type TableData = {
   changes: string[]
-  cliError: string | undefined
+  cliError: string | null
   columnOrder: string[]
   columns: Column[]
   columnWidths: Record<string, number>

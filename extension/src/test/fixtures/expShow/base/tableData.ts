@@ -3,7 +3,7 @@ import rowsFixture from './rows'
 import columnsFixture from './columns'
 
 const tableDataFixture: TableData = {
-  cliError: undefined,
+  cliError: null,
   changes: [],
   columnOrder: [],
   columns: columnsFixture,

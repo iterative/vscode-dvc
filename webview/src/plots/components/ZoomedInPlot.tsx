@@ -15,7 +15,7 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   props
 }: ZoomedInPlotProps) => {
   useEffect(() => {
-    const modalOpenClass = 'modal-open'
+    const modalOpenClass = 'modalOpen'
     document.body.classList.add(modalOpenClass)
 
     return () => {

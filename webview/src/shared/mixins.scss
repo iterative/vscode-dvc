@@ -1,12 +1,9 @@
 %link {
-  color: var(--vscode-textLink-foreground);
+  color: $link-fg-color;
 
-  &:hover {
-    color: var(--vscode-textLink-activeForeground);
-  }
-
+  &:hover,
   &:active {
-    color: var(--vscode-textLink-activeForeground);
+    color: $link-active-color;
   }
 }
 
