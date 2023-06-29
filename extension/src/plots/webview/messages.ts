@@ -345,12 +345,12 @@ export class WebviewMessages {
   }
 
   private async exportPlotAsRawData(plotPath: string, data?: PlainObject) {
-    const result = await window.showSaveDialog({
+    const file = await window.showSaveDialog({
       defaultUri: Uri.file('data.json'),
       filters: { JSON: ['json'] }
     })
 
-    if (!result) {
+    if (!file) {
       return
     }
 
@@ -361,7 +361,7 @@ export class WebviewMessages {
       paths,
       selectedRevisions,
       plotPath,
-      result.path,
+      file.path,
       data
     )
   }

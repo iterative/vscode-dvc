@@ -9,11 +9,7 @@ export const useMutationObserver = (
   const observer = useRef<MutationObserver | null>(null)
 
   useEffect(() => {
-    if (!targetEl.current) {
-      return
-    }
-
-    if (!observer.current) {
+    if (targetEl.current && !observer.current) {
       observer.current = new MutationObserver(onChange)
       observer.current?.observe(targetEl.current, OPTIONS)
       onChange()
