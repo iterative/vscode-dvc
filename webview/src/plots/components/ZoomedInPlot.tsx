@@ -46,7 +46,7 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
     actions?.append(myAction)
   }
 
-  useMutationObserver(zoomedInPlotRef.current, onPopupChange)
+  useMutationObserver(zoomedInPlotRef, onPopupChange)
 
   return (
     <div
@@ -66,7 +66,6 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
           export: true,
           source: false
         }}
-        className="vegaEmbed"
       />
     </div>
   )

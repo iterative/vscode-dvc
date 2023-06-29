@@ -1,29 +1,31 @@
-import { useEffect, useState } from 'react'
+import { MutableRefObject, useEffect, useRef } from 'react'
 
 const OPTIONS = { childList: true, subtree: true }
 
 export const useMutationObserver = (
-  targetEl: Node | null,
+  targetEl: MutableRefObject<HTMLElement | null>,
   onChange: () => void
 ) => {
-  const [observer, setObserver] = useState<MutationObserver | undefined>(
-    undefined
-  )
+  const observer = useRef<MutationObserver | null>(null)
 
   useEffect(() => {
-    if (!observer) {
-      const obs = new MutationObserver(onChange)
-      setObserver(obs)
+    if (!targetEl.current) {
+      return
     }
 
-    if (observer && targetEl) {
-      observer.observe(targetEl, OPTIONS)
+    if (!observer.current) {
+      observer.current = new MutationObserver(onChange)
+      observer.current?.observe(targetEl.current, OPTIONS)
+      onChange()
     }
 
     return () => {
-      if (observer) {
-        observer.disconnect()
+      if (!observer.current) {
+        return
       }
+
+      observer.current.disconnect()
+      observer.current = null
     }
   }, [observer, targetEl, onChange])
 }
