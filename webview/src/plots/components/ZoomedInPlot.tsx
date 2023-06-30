@@ -29,24 +29,24 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
     }
   }, [])
 
-  const onPopupChange = () => {
+  const onPlotChange = () => {
     const actions = zoomedInPlotRef.current?.querySelector('.vega-actions')
-    const customAction = actions?.querySelector(
+    const createdRawDataAction = actions?.querySelector(
       `.${styles.vegaCustomAction as string}`
     )
-    if (customAction) {
+    if (createdRawDataAction) {
       return
     }
-    const myAction = document.createElement('a')
-    myAction.textContent = 'Save as Raw Data'
-    myAction.addEventListener('click', () => {
+    const rawDataAction = document.createElement('a')
+    rawDataAction.textContent = 'Save as Raw Data'
+    rawDataAction.addEventListener('click', () => {
       exportPlotAsRawData(id, props.data)
     })
-    myAction.classList.add(styles.vegaCustomAction)
-    actions?.append(myAction)
+    rawDataAction.classList.add(styles.vegaCustomAction)
+    actions?.append(rawDataAction)
   }
 
-  useMutationObserver(zoomedInPlotRef, onPopupChange)
+  useMutationObserver(zoomedInPlotRef, onPlotChange)
 
   return (
     <div
