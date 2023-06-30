@@ -475,7 +475,7 @@ suite('Plots Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle a export template plot as raw data message from the webview', async () => {
+    it('should handle an export template plot as raw data message from the webview', async () => {
       const { plots } = await buildPlots({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
@@ -539,7 +539,7 @@ suite('Plots Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle a export custom plot as raw data message from the webview', async () => {
+    it('should handle an export custom plot as raw data message from the webview', async () => {
       const { plots } = await buildPlots({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
