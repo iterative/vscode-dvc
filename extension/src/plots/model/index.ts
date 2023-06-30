@@ -1,5 +1,4 @@
 import { Memento } from 'vscode'
-import { writeFileSync } from 'fs-extra'
 import { PlainObject } from 'react-vega'
 import {
   collectData,
@@ -58,7 +57,7 @@ import {
 } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
 import { ErrorsModel } from '../errors/model'
-import { openFileInEditor } from '../../fileSystem'
+import { openFileInEditor, writeJson } from '../../fileSystem'
 
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
@@ -228,17 +227,15 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public saveAsPlotRawData(
-    order: TemplateOrder | undefined,
     selectedRevisions: Revision[],
-    plotPath: string,
+    plotId: string,
     filePath: string,
     data?: PlainObject
   ) {
     const rawData =
-      data ||
-      this.getSelectedTemplateRawData(order, selectedRevisions, plotPath)
+      data || this.getSelectedTemplateRawData(selectedRevisions, plotId)
 
-    writeFileSync(filePath, JSON.stringify(rawData, null, 4))
+    writeJson(filePath, rawData, true)
     void openFileInEditor(filePath)
   }
 
@@ -459,18 +456,9 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   private getSelectedTemplateRawData(
-    order: TemplateOrder | undefined,
     selectedRevisions: Revision[],
     path: string
   ) {
-    if (!definedAndNonEmpty(order)) {
-      return
-    }
-
-    if (!definedAndNonEmpty(selectedRevisions)) {
-      return
-    }
-
     return collectSelectedTemplatePlotRawData({
       multiSourceEncodingUpdate: this.multiSourceEncoding[path] || {},
       path,

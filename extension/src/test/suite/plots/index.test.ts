@@ -2,7 +2,7 @@ import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore, spy, stub } from 'sinon'
-import { commands, Uri } from 'vscode'
+import { commands, Uri, window } from 'vscode'
 import isEqual from 'lodash.isequal'
 import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
@@ -472,6 +472,123 @@ suite('Plots Test Suite', () => {
       expect(mockExecuteCommands).to.be.calledWith(
         'vscode.open',
         Uri.file(imagePath)
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a export template plot as raw data message from the webview', async () => {
+      const { plots } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
+
+      const webview = await plots.showWebview()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockShowSaveDialog = stub(window, 'showSaveDialog')
+      const mockWriteJson = stub(FileSystem, 'writeJson')
+      const mockOpenFile = stub(FileSystem, 'openFileInEditor')
+      const exportFile = Uri.file('raw-data.json')
+      const templatePlot = templatePlotsFixture.plots[0].entries[0]
+
+      const undefinedFileEvent = new Promise(resolve =>
+        mockShowSaveDialog.onFirstCall().callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      )
+
+      mockMessageReceived.fire({
+        payload: { id: templatePlot.id },
+        type: MessageFromWebviewType.EXPORT_PLOT_AS_RAW_DATA
+      })
+
+      await undefinedFileEvent
+
+      expect(mockWriteJson).not.to.be.calledOnce
+      expect(mockOpenFile).not.to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.called
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_EXPORT_PLOT_AS_RAW_DATA,
+        undefined,
+        undefined
+      )
+
+      const exportFileEvent = new Promise(resolve =>
+        mockShowSaveDialog.onSecondCall().callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(exportFile)
+        })
+      )
+
+      mockMessageReceived.fire({
+        payload: { id: templatePlot.id },
+        type: MessageFromWebviewType.EXPORT_PLOT_AS_RAW_DATA
+      })
+
+      await exportFileEvent
+
+      expect(mockWriteJson).to.be.calledOnce
+      expect(mockWriteJson).to.be.calledWithExactly(
+        exportFile.path,
+        (templatePlot.content.data as { values: unknown[] }).values,
+        true
+      )
+      expect(mockOpenFile).to.be.calledOnce
+      expect(mockOpenFile).to.calledWithExactly(exportFile.path)
+      expect(mockSendTelemetryEvent).to.be.called
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_EXPORT_PLOT_AS_RAW_DATA,
+        undefined,
+        undefined
+      )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a export custom plot as raw data message from the webview', async () => {
+      const { plots } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
+
+      const webview = await plots.showWebview()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockShowSaveDialog = stub(window, 'showSaveDialog')
+      const mockWriteJson = stub(FileSystem, 'writeJson')
+      const mockOpenFile = stub(FileSystem, 'openFileInEditor')
+      const exportFile = Uri.file('raw-data.json')
+      const exportFileEvent = new Promise(resolve =>
+        mockShowSaveDialog.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(exportFile)
+        })
+      )
+      const customPlot = customPlotsFixture.plots[0]
+
+      mockMessageReceived.fire({
+        payload: {
+          data: { values: customPlot.values },
+          id: customPlot.id
+        },
+        type: MessageFromWebviewType.EXPORT_PLOT_AS_RAW_DATA
+      })
+
+      await exportFileEvent
+
+      expect(mockWriteJson).to.be.calledOnce
+      expect(mockWriteJson).to.be.calledWithExactly(
+        exportFile.path,
+        { values: customPlot.values },
+        true
+      )
+      expect(mockOpenFile).to.be.calledOnce
+      expect(mockOpenFile).to.calledWithExactly(exportFile.path)
+      expect(mockSendTelemetryEvent).to.be.calledOnce
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_EXPORT_PLOT_AS_RAW_DATA,
+        undefined,
+        undefined
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 

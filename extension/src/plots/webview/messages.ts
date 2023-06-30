@@ -344,7 +344,7 @@ export class WebviewMessages {
     return this.plots.getCustomPlots() || null
   }
 
-  private async exportPlotAsRawData(plotPath: string, data?: PlainObject) {
+  private async exportPlotAsRawData(plotId: string, data?: PlainObject) {
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_EXPORT_PLOT_AS_RAW_DATA,
       undefined,
@@ -360,15 +360,8 @@ export class WebviewMessages {
       return
     }
 
-    const paths = this.paths.getTemplateOrder()
     const selectedRevisions = this.plots.getSelectedRevisionDetails()
 
-    this.plots.saveAsPlotRawData(
-      paths,
-      selectedRevisions,
-      plotPath,
-      file.path,
-      data
-    )
+    this.plots.saveAsPlotRawData(selectedRevisions, plotId, file.path, data)
   }
 }
