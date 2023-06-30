@@ -345,12 +345,6 @@ export class WebviewMessages {
   }
 
   private async exportPlotAsRawData(plotId: string, data?: PlainObject) {
-    sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_EXPORT_PLOT_AS_RAW_DATA,
-      undefined,
-      undefined
-    )
-
     const file = await window.showSaveDialog({
       defaultUri: Uri.file('data.json'),
       filters: { JSON: ['json'] }
@@ -359,6 +353,12 @@ export class WebviewMessages {
     if (!file) {
       return
     }
+
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_EXPORT_PLOT_AS_RAW_DATA,
+      undefined,
+      undefined
+    )
 
     const selectedRevisions = this.plots.getSelectedRevisionDetails()
 

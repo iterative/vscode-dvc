@@ -507,12 +507,7 @@ suite('Plots Test Suite', () => {
 
       expect(mockWriteJson).not.to.be.calledOnce
       expect(mockOpenFile).not.to.be.calledOnce
-      expect(mockSendTelemetryEvent).to.be.called
-      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_PLOTS_EXPORT_PLOT_AS_RAW_DATA,
-        undefined,
-        undefined
-      )
+      expect(mockSendTelemetryEvent).not.to.be.called
 
       const exportFileEvent = new Promise(resolve =>
         mockShowSaveDialog.onSecondCall().callsFake(() => {
