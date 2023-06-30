@@ -40,9 +40,13 @@ const notificationShown = async (
   message: string
 ): Promise<boolean> => {
   const notifications = await workbench.getNotifications()
-  return notifications.some(
-    async notification => (await notification.elem.getText()) === message
-  )
+  for (const notif of notifications) {
+    const notifMessage = await notif.elem.getText()
+    if (message === notifMessage) {
+      return true
+    }
+  }
+  return false
 }
 
 const runDeleteCommand = async (
