@@ -235,7 +235,7 @@ export class PlotsModel extends ModelWithPersistence {
     const rawData =
       data || this.getSelectedTemplateRawData(selectedRevisions, plotId)
 
-    writeJson(filePath, rawData, true)
+    writeJson(filePath, rawData as Record<string, unknown>, true)
     void openFileInEditor(filePath)
   }
 

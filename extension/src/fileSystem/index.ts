@@ -208,7 +208,11 @@ export const loadJson = <T>(path: string): T | undefined => {
   }
 }
 
-export const writeJson = <T>(path: string, obj: T, format = false): void => {
+export const writeJson = <T extends Record<string, unknown>>(
+  path: string,
+  obj: T,
+  format = false
+): void => {
   ensureFileSync(path)
   const json = format ? JSON.stringify(obj, null, 4) : JSON.stringify(obj)
   return writeFileSync(path, json)
