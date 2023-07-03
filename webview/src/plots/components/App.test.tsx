@@ -1462,10 +1462,7 @@ describe('App', () => {
     fireEvent.click(customAction)
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: {
-        data: undefined,
-        id: complexTemplatePlotsFixture.plots[0].entries[0].id
-      },
+      payload: complexTemplatePlotsFixture.plots[0].entries[0].id,
       type: MessageFromWebviewType.EXPORT_PLOT_DATA
     })
   })

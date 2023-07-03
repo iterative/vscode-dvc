@@ -108,6 +108,17 @@ export const collectCustomPlots = ({
   return plots
 }
 
+export const collectCustomPlotRawData = (
+  orderValue: CustomPlotsOrderValue,
+  experiments: Experiment[]
+) => {
+  const { metric, param } = orderValue
+  const metricPath = getFullValuePath(ColumnType.METRICS, metric)
+  const paramPath = getFullValuePath(ColumnType.PARAMS, param)
+
+  return getValues(experiments, metricPath, paramPath)
+}
+
 type RevisionPathData = { [path: string]: Record<string, unknown>[] }
 
 export type RevisionData = {

@@ -1,4 +1,3 @@
-import { PlainObject } from 'react-vega'
 import { SortDefinition } from '../experiments/model/sortBy'
 import { TableData } from '../experiments/webview/contract'
 import {
@@ -101,7 +100,7 @@ export type MessageFromWebview =
     }
   | {
       type: MessageFromWebviewType.EXPORT_PLOT_DATA
-      payload: { id: string; data?: PlainObject }
+      payload: string
     }
   | {
       type: MessageFromWebviewType.REORDER_COLUMNS

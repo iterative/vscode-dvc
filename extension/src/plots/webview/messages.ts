@@ -1,5 +1,4 @@
-import { window, Uri, commands } from 'vscode'
-import { PlainObject } from 'react-vega'
+import { Uri, commands } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import {
   ComparisonPlot,
@@ -22,7 +21,11 @@ import {
 import { PlotsModel } from '../model'
 import { PathsModel } from '../paths/model'
 import { BaseWebview } from '../../webview'
-import { getModifiedTime, openImageFileInEditor } from '../../fileSystem'
+import {
+  getModifiedTime,
+  openImageFileInEditor,
+  showSaveDialog
+} from '../../fileSystem'
 import { reorderObjectList } from '../../util/array'
 import { CustomPlotsOrderValue } from '../model/custom'
 import { getCustomPlotId } from '../model/collect'
@@ -80,7 +83,7 @@ export class WebviewMessages {
           this.dvcRoot
         )
       case MessageFromWebviewType.EXPORT_PLOT_DATA:
-        return this.exportPlotData(message.payload.id, message.payload.data)
+        return this.exportPlotData(message.payload)
       case MessageFromWebviewType.RESIZE_PLOTS:
         return this.setPlotSize(
           message.payload.section,
@@ -341,11 +344,8 @@ export class WebviewMessages {
     return this.plots.getCustomPlots() || null
   }
 
-  private async exportPlotData(plotId: string, data?: PlainObject) {
-    const file = await window.showSaveDialog({
-      defaultUri: Uri.file('data.json'),
-      filters: { JSON: ['json'] }
-    })
+  private async exportPlotData(plotId: string) {
+    const file = await showSaveDialog(Uri.file('data.json'), { JSON: ['json'] })
 
     if (!file) {
       return
@@ -357,8 +357,6 @@ export class WebviewMessages {
       undefined
     )
 
-    const selectedRevisions = this.plots.getSelectedRevisionDetails()
-
-    this.plots.savePlotData(selectedRevisions, plotId, file.path, data)
+    this.plots.savePlotData(plotId, file.path)
   }
 }

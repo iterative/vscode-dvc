@@ -499,14 +499,14 @@ suite('Plots Test Suite', () => {
       )
 
       mockMessageReceived.fire({
-        payload: { id: templatePlot.id },
+        payload: templatePlot.id,
         type: MessageFromWebviewType.EXPORT_PLOT_DATA
       })
 
       await undefinedFileEvent
 
-      expect(mockWriteJson).not.to.be.calledOnce
-      expect(mockOpenFile).not.to.be.calledOnce
+      expect(mockWriteJson).not.to.be.called
+      expect(mockOpenFile).not.to.be.called
       expect(mockSendTelemetryEvent).not.to.be.called
 
       const exportFileEvent = new Promise(resolve =>
@@ -517,7 +517,7 @@ suite('Plots Test Suite', () => {
       )
 
       mockMessageReceived.fire({
-        payload: { id: templatePlot.id },
+        payload: templatePlot.id,
         type: MessageFromWebviewType.EXPORT_PLOT_DATA
       })
 
@@ -562,10 +562,7 @@ suite('Plots Test Suite', () => {
       const customPlot = customPlotsFixture.plots[0]
 
       mockMessageReceived.fire({
-        payload: {
-          data: { values: customPlot.values },
-          id: customPlot.id
-        },
+        payload: customPlot.id,
         type: MessageFromWebviewType.EXPORT_PLOT_DATA
       })
 
@@ -574,7 +571,7 @@ suite('Plots Test Suite', () => {
       expect(mockWriteJson).to.be.calledOnce
       expect(mockWriteJson).to.be.calledWithExactly(
         exportFile.path,
-        { values: customPlot.values },
+        customPlot.values,
         true
       )
       expect(mockOpenFile).to.be.calledOnce

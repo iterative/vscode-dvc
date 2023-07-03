@@ -1,5 +1,4 @@
 import { Memento } from 'vscode'
-import { PlainObject } from 'react-vega'
 import {
   collectData,
   collectSelectedTemplatePlots,
@@ -12,7 +11,8 @@ import {
   collectOrderedRevisions,
   collectImageUrl,
   collectIdShas,
-  collectSelectedTemplatePlotRawData
+  collectSelectedTemplatePlotRawData,
+  collectCustomPlotRawData
 } from './collect'
 import { getRevisionFirstThreeColumns } from './util'
 import {
@@ -226,16 +226,17 @@ export class PlotsModel extends ModelWithPersistence {
     return selectedRevisions
   }
 
-  public savePlotData(
-    selectedRevisions: Revision[],
-    plotId: string,
-    filePath: string,
-    data?: PlainObject
-  ) {
-    const rawData =
-      data || this.getSelectedTemplateRawData(selectedRevisions, plotId)
+  public savePlotData(plotId: string, filePath: string) {
+    const foundCustomPlot = this.customPlotsOrder.find(
+      ({ metric, param }) => getCustomPlotId(metric, param) === plotId
+    )
 
-    writeJson(filePath, rawData as Record<string, unknown>, true)
+    const rawData = foundCustomPlot
+      ? this.getCustomPlotData(foundCustomPlot)
+      : this.getSelectedTemplatePlotData(plotId)
+
+    writeJson(filePath, rawData as unknown as Record<string, unknown>, true)
+
     void openFileInEditor(filePath)
   }
 
@@ -455,10 +456,9 @@ export class PlotsModel extends ModelWithPersistence {
     )
   }
 
-  private getSelectedTemplateRawData(
-    selectedRevisions: Revision[],
-    path: string
-  ) {
+  private getSelectedTemplatePlotData(path: string) {
+    const selectedRevisions = this.getSelectedRevisionDetails()
+
     return collectSelectedTemplatePlotRawData({
       multiSourceEncodingUpdate: this.multiSourceEncoding[path] || {},
       path,
@@ -466,5 +466,13 @@ export class PlotsModel extends ModelWithPersistence {
       selectedRevisions: selectedRevisions.map(({ id }) => id),
       template: this.templates[path]
     })
+  }
+
+  private getCustomPlotData(orderValue: CustomPlotsOrderValue) {
+    const experiments = this.experiments
+      .getWorkspaceCommitsAndExperiments()
+      .filter(({ id }) => id !== EXPERIMENT_WORKSPACE_ID)
+
+    return collectCustomPlotRawData(orderValue, experiments)
   }
 }
