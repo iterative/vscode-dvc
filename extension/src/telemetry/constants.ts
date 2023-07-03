@@ -72,7 +72,7 @@ export const EventName = Object.assign(
       'views.plots.comparisonRowsReordered',
     VIEWS_PLOTS_CREATED: 'views.plots.created',
     VIEWS_PLOTS_EXPERIMENT_TOGGLE: 'views.plots.toggleExperimentStatus',
-    VIEWS_PLOTS_EXPORT_PLOT_AS_RAW_DATA: 'views.plots.exportPlotAsRawData',
+    VIEWS_PLOTS_EXPORT_PLOT_DATA: 'views.plots.exportPlotData',
     VIEWS_PLOTS_FOCUS_CHANGED: 'views.plots.focusChanged',
     VIEWS_PLOTS_REVISIONS_REORDERED: 'views.plots.revisionsReordered',
     VIEWS_PLOTS_SECTION_RESIZED: 'views.plots.sectionResized',
@@ -266,7 +266,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_SELECT_EXPERIMENTS]: undefined
   [EventName.VIEWS_PLOTS_SELECT_PLOTS]: undefined
   [EventName.VIEWS_PLOTS_EXPERIMENT_TOGGLE]: undefined
-  [EventName.VIEWS_PLOTS_EXPORT_PLOT_AS_RAW_DATA]: {
+  [EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA]: {
     id: string
     data?: PlainObject
   }

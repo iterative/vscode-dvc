@@ -7,7 +7,7 @@ import { reverseOfLegendSuppressionUpdate } from 'dvc/src/plots/vega/util'
 import styles from './styles.module.scss'
 import { getThemeValue, ThemeProperty } from '../../util/styles'
 import { useMutationObserver } from '../hooks/useMutationObserver'
-import { exportPlotAsRawData } from '../util/messages'
+import { exportPlotData } from '../util/messages'
 
 type ZoomedInPlotProps = {
   id: string
@@ -40,7 +40,7 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
     const rawDataAction = document.createElement('a')
     rawDataAction.textContent = 'Save Raw Data'
     rawDataAction.addEventListener('click', () => {
-      exportPlotAsRawData(id, props.data)
+      exportPlotData(id, props.data)
     })
     rawDataAction.classList.add(styles.vegaCustomAction)
     actions?.append(rawDataAction)

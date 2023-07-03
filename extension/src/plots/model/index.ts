@@ -226,7 +226,7 @@ export class PlotsModel extends ModelWithPersistence {
     return selectedRevisions
   }
 
-  public saveAsPlotRawData(
+  public savePlotData(
     selectedRevisions: Revision[],
     plotId: string,
     filePath: string,

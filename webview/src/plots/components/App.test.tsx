@@ -1466,7 +1466,7 @@ describe('App', () => {
         data: undefined,
         id: complexTemplatePlotsFixture.plots[0].entries[0].id
       },
-      type: MessageFromWebviewType.EXPORT_PLOT_AS_RAW_DATA
+      type: MessageFromWebviewType.EXPORT_PLOT_DATA
     })
   })
 

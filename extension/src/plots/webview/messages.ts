@@ -79,11 +79,8 @@ export class WebviewMessages {
           RegisteredCommands.PLOTS_CUSTOM_ADD,
           this.dvcRoot
         )
-      case MessageFromWebviewType.EXPORT_PLOT_AS_RAW_DATA:
-        return this.exportPlotAsRawData(
-          message.payload.id,
-          message.payload.data
-        )
+      case MessageFromWebviewType.EXPORT_PLOT_DATA:
+        return this.exportPlotData(message.payload.id, message.payload.data)
       case MessageFromWebviewType.RESIZE_PLOTS:
         return this.setPlotSize(
           message.payload.section,
@@ -344,7 +341,7 @@ export class WebviewMessages {
     return this.plots.getCustomPlots() || null
   }
 
-  private async exportPlotAsRawData(plotId: string, data?: PlainObject) {
+  private async exportPlotData(plotId: string, data?: PlainObject) {
     const file = await window.showSaveDialog({
       defaultUri: Uri.file('data.json'),
       filters: { JSON: ['json'] }
@@ -355,13 +352,13 @@ export class WebviewMessages {
     }
 
     sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_EXPORT_PLOT_AS_RAW_DATA,
+      EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA,
       undefined,
       undefined
     )
 
     const selectedRevisions = this.plots.getSelectedRevisionDetails()
 
-    this.plots.saveAsPlotRawData(selectedRevisions, plotId, file.path, data)
+    this.plots.savePlotData(selectedRevisions, plotId, file.path, data)
   }
 }

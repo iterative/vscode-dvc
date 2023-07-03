@@ -90,9 +90,9 @@ export const togglePlotsSection = (
 export const zoomPlot = (imagePath?: string) =>
   sendMessage({ payload: imagePath, type: MessageFromWebviewType.ZOOM_PLOT })
 
-export const exportPlotAsRawData = (id: string, data?: PlainObject) => {
+export const exportPlotData = (id: string, data?: PlainObject) => {
   sendMessage({
     payload: { data, id },
-    type: MessageFromWebviewType.EXPORT_PLOT_AS_RAW_DATA
+    type: MessageFromWebviewType.EXPORT_PLOT_DATA
   })
 }

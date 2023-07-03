@@ -475,7 +475,7 @@ suite('Plots Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle an export template plot as raw data message from the webview', async () => {
+    it('should handle an export template plot data from the webview', async () => {
       const { plots } = await buildPlots({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
@@ -500,7 +500,7 @@ suite('Plots Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: { id: templatePlot.id },
-        type: MessageFromWebviewType.EXPORT_PLOT_AS_RAW_DATA
+        type: MessageFromWebviewType.EXPORT_PLOT_DATA
       })
 
       await undefinedFileEvent
@@ -518,7 +518,7 @@ suite('Plots Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: { id: templatePlot.id },
-        type: MessageFromWebviewType.EXPORT_PLOT_AS_RAW_DATA
+        type: MessageFromWebviewType.EXPORT_PLOT_DATA
       })
 
       await exportFileEvent
@@ -533,13 +533,13 @@ suite('Plots Test Suite', () => {
       expect(mockOpenFile).to.calledWithExactly(exportFile.path)
       expect(mockSendTelemetryEvent).to.be.called
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_PLOTS_EXPORT_PLOT_AS_RAW_DATA,
+        EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA,
         undefined,
         undefined
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle an export custom plot as raw data message from the webview', async () => {
+    it('should handle an export custom plot data from the webview', async () => {
       const { plots } = await buildPlots({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
@@ -566,7 +566,7 @@ suite('Plots Test Suite', () => {
           data: { values: customPlot.values },
           id: customPlot.id
         },
-        type: MessageFromWebviewType.EXPORT_PLOT_AS_RAW_DATA
+        type: MessageFromWebviewType.EXPORT_PLOT_DATA
       })
 
       await exportFileEvent
@@ -581,7 +581,7 @@ suite('Plots Test Suite', () => {
       expect(mockOpenFile).to.calledWithExactly(exportFile.path)
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_PLOTS_EXPORT_PLOT_AS_RAW_DATA,
+        EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA,
         undefined,
         undefined
       )
