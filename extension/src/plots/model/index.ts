@@ -58,6 +58,7 @@ import {
 import { isDvcError } from '../../cli/dvc/reader'
 import { ErrorsModel } from '../errors/model'
 import { openFileInEditor, writeJson } from '../../fileSystem'
+import { Toast } from '../../vscode/toast'
 
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
@@ -235,9 +236,12 @@ export class PlotsModel extends ModelWithPersistence {
       ? this.getCustomPlotData(foundCustomPlot)
       : this.getSelectedTemplatePlotData(plotId)
 
-    writeJson(filePath, rawData as unknown as Record<string, unknown>, true)
-
-    void openFileInEditor(filePath)
+    try {
+      writeJson(filePath, rawData as unknown as Record<string, unknown>, true)
+      void openFileInEditor(filePath)
+    } catch {
+      void Toast.showError('Cannot write to file')
+    }
   }
 
   public getTemplatePlots(

@@ -475,7 +475,7 @@ suite('Plots Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle an export template plot data from the webview', async () => {
+    it('should handle an export template plot data message from the webview', async () => {
       const { plots } = await buildPlots({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
@@ -539,7 +539,7 @@ suite('Plots Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle an export custom plot data from the webview', async () => {
+    it('should handle an export custom plot data message from the webview', async () => {
       const { plots } = await buildPlots({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
@@ -582,6 +582,45 @@ suite('Plots Test Suite', () => {
         undefined,
         undefined
       )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a write JSON error thrown thrown when exporting plot data', async () => {
+      const { plots } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
+
+      const webview = await plots.showWebview()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockShowSaveDialog = stub(window, 'showSaveDialog')
+      const mockOpenFile = stub(FileSystem, 'openFileInEditor')
+      const exportFile = Uri.file('raw-data.json')
+      const templatePlot = templatePlotsFixture.plots[0].entries[0]
+      const mockShowInformationMessage = stub(window, 'showErrorMessage')
+      const mockWriteJson = stub(FileSystem, 'writeJson')
+        .onFirstCall()
+        .callsFake(() => {
+          throw new Error('json failed to write')
+        })
+
+      const exportFileEvent = new Promise(resolve =>
+        mockShowSaveDialog.onFirstCall().callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(exportFile)
+        })
+      )
+
+      mockMessageReceived.fire({
+        payload: templatePlot.id,
+        type: MessageFromWebviewType.EXPORT_PLOT_DATA
+      })
+
+      await exportFileEvent
+
+      expect(mockWriteJson).to.be.called
+      expect(mockOpenFile).not.to.be.called
+      expect(mockShowInformationMessage).to.be.called
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a custom plots reordered message from the webview', async () => {
