@@ -38,7 +38,7 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
       return
     }
     const rawDataAction = document.createElement('a')
-    rawDataAction.textContent = 'Save as Raw Data'
+    rawDataAction.textContent = 'Save Raw Data'
     rawDataAction.addEventListener('click', () => {
       exportPlotAsRawData(id, props.data)
     })

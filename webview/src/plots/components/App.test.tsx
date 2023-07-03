@@ -1442,6 +1442,34 @@ describe('App', () => {
     expect(screen.getByTestId('modal')).toBeInTheDocument()
   })
 
+  it('should add a custom action in zoomed in plot modal for exporting raw data', async () => {
+    renderAppWithOptionalData({
+      template: complexTemplatePlotsFixture
+    })
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
+
+    fireEvent.click(plot)
+
+    const modal = screen.getByTestId('modal')
+
+    const customAction = await within(modal).findByText('Save Raw Data')
+
+    expect(customAction).toBeInTheDocument()
+
+    fireEvent.click(customAction)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      payload: {
+        data: undefined,
+        id: complexTemplatePlotsFixture.plots[0].entries[0].id
+      },
+      type: MessageFromWebviewType.EXPORT_PLOT_AS_RAW_DATA
+    })
+  })
+
   it('should show a tooltip with the meaning of each plot section', () => {
     renderAppWithOptionalData({
       comparison: comparisonTableFixture,
