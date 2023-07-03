@@ -1442,7 +1442,7 @@ describe('App', () => {
     expect(screen.getByTestId('modal')).toBeInTheDocument()
   })
 
-  it('should add a custom action in zoomed in plot modal for exporting raw data', async () => {
+  it('should add a "export raw data" action to zoomed in plot modal', async () => {
     renderAppWithOptionalData({
       template: complexTemplatePlotsFixture
     })

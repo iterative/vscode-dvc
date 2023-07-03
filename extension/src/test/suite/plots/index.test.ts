@@ -584,7 +584,7 @@ suite('Plots Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle a write JSON error thrown thrown when exporting plot data', async () => {
+    it('should handle errors being thrown during file writing when exporting plot data', async () => {
       const { plots } = await buildPlots({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
@@ -601,7 +601,7 @@ suite('Plots Test Suite', () => {
       const mockWriteJson = stub(FileSystem, 'writeJson')
         .onFirstCall()
         .callsFake(() => {
-          throw new Error('json failed to write')
+          throw new Error('failed to convert obj to json')
         })
 
       const exportFileEvent = new Promise(resolve =>
