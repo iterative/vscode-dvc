@@ -169,6 +169,7 @@ $badge-size: 0.85rem;
   width: 1.5rem;
   height: 1.5rem;
   cursor: pointer;
+  border-radius: $checkbox-border-radius;
 
   svg {
     fill: $icon-color;
@@ -177,6 +178,10 @@ $badge-size: 0.85rem;
   &:disabled {
     opacity: 0.5;
     cursor: auto;
+  }
+
+  &:hover {
+    background-color: $hover-background-color;
   }
 }
 

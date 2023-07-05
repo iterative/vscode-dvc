@@ -135,7 +135,6 @@ suite('Experiments Test Suite', () => {
         columnOrder: columnsOrderFixture,
         columnWidths: {},
         columns: columnsFixture,
-        filteredCount: 0,
         filters: [],
         hasCheckpoints: true,
         hasColumns: true,
@@ -1070,7 +1069,6 @@ suite('Experiments Test Suite', () => {
         columnOrder: columnsOrderFixture,
         columnWidths: {},
         columns: [],
-        filteredCount: 0,
         filters: [],
         rows: rowsFixture,
         sorts: []
@@ -1312,6 +1310,37 @@ suite('Experiments Test Suite', () => {
         .map(({ id }) => id)
         .sort()
       expect(selectExperimentIds).to.deep.equal([...mockExperimentIds].sort())
+      expect(mockShowPlots).to.be.calledOnce
+      expect(mockShowPlots).to.be.calledWith(dvcDemoPath)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should be able to handle a message to open the plots webview', async () => {
+      stub(Setup.prototype, 'shouldBeShown').returns({
+        dvc: true,
+        experiments: true
+      })
+      const { experiments } = buildExperiments({
+        disposer: disposable
+      })
+      const mockShowPlots = stub(WorkspacePlots.prototype, 'showWebview')
+      const webviewOpened = new Promise(resolve =>
+        mockShowPlots.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      )
+
+      await experiments.isReady()
+
+      const webview = await experiments.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW
+      })
+
+      await webviewOpened
+
       expect(mockShowPlots).to.be.calledOnce
       expect(mockShowPlots).to.be.calledWith(dvcDemoPath)
     }).timeout(WEBVIEW_TEST_TIMEOUT)

@@ -20,7 +20,6 @@ export const tableDataInitialState: TableDataState = {
   columnOrder: [],
   columnWidths: {},
   columns: [],
-  filteredCount: 0,
   filters: [],
   hasBranchesToSelect: true,
   hasCheckpoints: false,
@@ -69,9 +68,6 @@ export const tableDataSlice = createSlice({
         state.columns,
         action.payload
       ) as Column[]
-    },
-    updateFilteredCount: (state, action: PayloadAction<number>) => {
-      state.filteredCount = action.payload
     },
     updateFilters: (state, action: PayloadAction<string[]>) => {
       state.filters = action.payload
@@ -149,7 +145,6 @@ export const {
   updateColumnOrder,
   updateColumnWidths,
   updateColumns,
-  updateFilteredCount,
   updateFilters,
   updateHasBranchesToSelect,
   updateHasCheckpoints,
