@@ -31,6 +31,7 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
           ...(props.config as Config),
           background: getThemeValue(ThemeProperty.MENU_BACKGROUND)
         }}
+        // need to add listeners and setState here too
         actions={{
           compiled: false,
           editor: false,

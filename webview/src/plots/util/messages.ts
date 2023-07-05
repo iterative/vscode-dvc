@@ -88,3 +88,10 @@ export const togglePlotsSection = (
 
 export const zoomPlot = (imagePath?: string) =>
   sendMessage({ payload: imagePath, type: MessageFromWebviewType.ZOOM_PLOT })
+
+export const updateSmoothPlotValues = (values: { [key: string]: number }) => {
+  sendMessage({
+    payload: values,
+    type: MessageFromWebviewType.UPDATE_SMOOTH_PLOT_VALUES
+  })
+}

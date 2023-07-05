@@ -70,6 +70,7 @@ export class PlotsModel extends ModelWithPersistence {
 
   private comparisonData: ComparisonData = {}
   private comparisonOrder: string[]
+  private smoothPlotValues: { [id: string]: number } = {}
 
   private revisionData: RevisionData = {}
   private templates: TemplateAccumulator = {}
@@ -98,6 +99,10 @@ export class PlotsModel extends ModelWithPersistence {
     )
     this.comparisonOrder = this.revive(PersistenceKey.PLOT_COMPARISON_ORDER, [])
     this.customPlotsOrder = this.revive(PersistenceKey.PLOTS_CUSTOM_ORDER, [])
+    this.smoothPlotValues = this.revive(
+      PersistenceKey.PLOTS_SMOOTH_PLOT_VALUES,
+      {}
+    )
 
     this.cleanupOutdatedCustomPlotsState()
     this.cleanupOutdatedTrendsState()
@@ -295,6 +300,15 @@ export class PlotsModel extends ModelWithPersistence {
       PersistenceKey.PLOT_NB_ITEMS_PER_ROW_OR_WIDTH,
       this.nbItemsPerRowOrWidth
     )
+  }
+
+  public updateSmoothPlotValues(values: { [id: string]: number }) {
+    this.smoothPlotValues = values
+    this.persist(PersistenceKey.PLOTS_SMOOTH_PLOT_VALUES, this.smoothPlotValues)
+  }
+
+  public getSmoothPlotValues() {
+    return this.smoothPlotValues
   }
 
   public getNbItemsPerRowOrWidth(section: PlotsSection) {

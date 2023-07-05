@@ -73,6 +73,7 @@ export class WebviewMessages {
 
   public handleMessageFromWebview(message: MessageFromWebview) {
     switch (message.type) {
+      // add a new type for updating smooth value (takes an id and value)
       case MessageFromWebviewType.ADD_CUSTOM_PLOT:
         return commands.executeCommand(
           RegisteredCommands.PLOTS_CUSTOM_ADD,
@@ -110,6 +111,8 @@ export class WebviewMessages {
         )
       case MessageFromWebviewType.TOGGLE_EXPERIMENT:
         return this.setExperimentStatus(message.payload)
+      case MessageFromWebviewType.UPDATE_SMOOTH_PLOT_VALUES:
+        return this.plots.updateSmoothPlotValues(message.payload)
       case MessageFromWebviewType.ZOOM_PLOT:
         if (message.payload) {
           const imagePath = this.revertCorrectUrl(message.payload)
@@ -279,7 +282,8 @@ export class WebviewMessages {
       nbItemsPerRow: this.plots.getNbItemsPerRowOrWidth(
         PlotsSection.TEMPLATE_PLOTS
       ),
-      plots
+      plots,
+      smoothPlotValues: this.plots.getSmoothPlotValues()
     }
   }
 

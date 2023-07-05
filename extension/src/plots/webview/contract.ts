@@ -145,6 +145,7 @@ export interface TemplatePlotsData {
   plots: TemplatePlotSection[]
   nbItemsPerRow: number
   height: PlotHeight
+  smoothPlotValues: { [id: string]: number }
 }
 
 export type ComparisonPlot = {

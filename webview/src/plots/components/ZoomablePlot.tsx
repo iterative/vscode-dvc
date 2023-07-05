@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux'
 import { VisualizationSpec } from 'react-vega'
 import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { setZoomedInPlot } from './webviewSlice'
+import { setSmoothPlotValue } from './templatePlots/templatePlotsSlice'
 import styles from './styles.module.scss'
 import { config } from './constants'
 import { zoomPlot } from '../util/messages'
@@ -27,7 +28,11 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   onViewReady,
   section
 }) => {
-  const { data, content: spec } = useGetPlot(section, id, createdSpec)
+  const {
+    data,
+    content: spec,
+    smoothValue
+  } = useGetPlot(section, id, createdSpec)
   const dispatch = useDispatch()
   const currentPlotProps = useRef<VegaLiteProps>()
 
@@ -59,7 +64,30 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
     <button className={styles.zoomablePlot} onClick={handleOnClick}>
       <GripIcon className={styles.plotGripIcon} />
       {currentPlotProps.current && (
-        <VegaLite {...plotProps} onNewView={onViewReady} />
+        <VegaLite
+          {...plotProps}
+          onNewView={view => {
+            if (smoothValue) {
+              const state = view.getState()
+              view.setState({
+                ...state,
+                signals: { ...state.signals, smooth: smoothValue }
+              })
+            }
+            if (onViewReady) {
+              onViewReady()
+            }
+          }}
+          signalListeners={
+            // TBD need to have a better way to check if plot is smooth
+            (spec?.params || []).find(({ name }) => name === 'smooth') && {
+              smooth: (_, value) =>
+                // this is going to get called a lot. Is there a way to update it when the
+                // user lets go of the input?
+                dispatch(setSmoothPlotValue({ id, value: value as number }))
+            }
+          }
+        />
       )}
     </button>
   )
