@@ -359,7 +359,6 @@ const collectTemplatePlot = (
       color: revisionColors
     }
   ) as VisualizationSpec
-  // the smooth value would be added here
   acc.push({
     content,
     id: path,
