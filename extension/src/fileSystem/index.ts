@@ -210,10 +210,12 @@ export const loadJson = <T>(path: string): T | undefined => {
 
 export const writeJson = <T extends Record<string, unknown>>(
   path: string,
-  obj: T
+  obj: T,
+  format = false
 ): void => {
   ensureFileSync(path)
-  return writeFileSync(path, JSON.stringify(obj))
+  const json = format ? JSON.stringify(obj, null, 4) : JSON.stringify(obj)
+  return writeFileSync(path, json)
 }
 
 export const getPidFromFile = async (
@@ -266,3 +268,8 @@ export const getBinDisplayText = (
     ? '.' + sep + relative(workspaceRoot, path)
     : path
 }
+
+export const showSaveDialog = (
+  defaultUri: Uri,
+  filters?: { [name: string]: string[] }
+) => window.showSaveDialog({ defaultUri, filters })

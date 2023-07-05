@@ -1,5 +1,11 @@
 import { join, relative, resolve } from 'path'
-import { appendFileSync, ensureDirSync, ensureFileSync, remove } from 'fs-extra'
+import {
+  appendFileSync,
+  ensureDirSync,
+  ensureFileSync,
+  remove,
+  writeFileSync
+} from 'fs-extra'
 import { TextDocument, window, workspace } from 'vscode'
 import {
   exists,
@@ -8,7 +14,8 @@ import {
   isDirectory,
   isSameOrChild,
   getModifiedTime,
-  findOrCreateDvcYamlFile
+  findOrCreateDvcYamlFile,
+  writeJson
 } from '.'
 import { dvcDemoPath } from '../test/util'
 import { DOT_DVC } from '../cli/dvc/constants'
@@ -21,12 +28,14 @@ jest.mock('fs-extra', () => {
     __esModule: true,
     ...actualModule,
     appendFileSync: jest.fn(),
-    ensureFileSync: jest.fn()
+    ensureFileSync: jest.fn(),
+    writeFileSync: jest.fn()
   }
 })
 
 const mockedAppendFileSync = jest.mocked(appendFileSync)
 const mockedEnsureFileSync = jest.mocked(ensureFileSync)
+const mockedWriteFileSync = jest.mocked(writeFileSync)
 const mockedWorkspace = jest.mocked(workspace)
 const mockedWindow = jest.mocked(window)
 const mockedOpenTextDocument = jest.fn()
@@ -37,6 +46,29 @@ mockedWindow.showTextDocument = mockedShowTextDocument
 
 beforeEach(() => {
   jest.resetAllMocks()
+})
+
+describe('writeJson', () => {
+  it('should write unformatted json in given file', () => {
+    writeJson('file-name.json', { array: [1, 2, 3], number: 1 })
+
+    expect(mockedWriteFileSync).toHaveBeenCalledWith(
+      'file-name.json',
+      '{"array":[1,2,3],"number":1}'
+    )
+  })
+
+  it('should write formatted json in given file', () => {
+    writeJson('file-name.json', { array: [1, 2, 3], number: 1 }, true)
+
+    const formattedJson =
+      '{\n    "array": [\n        1,\n        2,\n        3\n    ],\n    "number": 1\n}'
+
+    expect(mockedWriteFileSync).toHaveBeenCalledWith(
+      'file-name.json',
+      formattedJson
+    )
+  })
 })
 
 describe('findDvcRootPaths', () => {

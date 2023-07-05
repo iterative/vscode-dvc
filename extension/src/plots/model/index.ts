@@ -10,7 +10,9 @@ import {
   getCustomPlotId,
   collectOrderedRevisions,
   collectImageUrl,
-  collectIdShas
+  collectIdShas,
+  collectSelectedTemplatePlotRawData,
+  collectCustomPlotRawData
 } from './collect'
 import { getRevisionSummaryColumns } from './util'
 import {
@@ -55,6 +57,8 @@ import {
 } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
 import { ErrorsModel } from '../errors/model'
+import { openFileInEditor, writeJson } from '../../fileSystem'
+import { Toast } from '../../vscode/toast'
 
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
@@ -221,6 +225,23 @@ export class PlotsModel extends ModelWithPersistence {
     }
 
     return selectedRevisions
+  }
+
+  public savePlotData(plotId: string, filePath: string) {
+    const foundCustomPlot = this.customPlotsOrder.find(
+      ({ metric, param }) => getCustomPlotId(metric, param) === plotId
+    )
+
+    const rawData = foundCustomPlot
+      ? this.getCustomPlotData(foundCustomPlot)
+      : this.getSelectedTemplatePlotData(plotId)
+
+    try {
+      writeJson(filePath, rawData as unknown as Record<string, unknown>, true)
+      void openFileInEditor(filePath)
+    } catch {
+      void Toast.showError('Cannot write to file')
+    }
   }
 
   public getTemplatePlots(
@@ -437,5 +458,25 @@ export class PlotsModel extends ModelWithPersistence {
       this.getRevisionColors(),
       this.multiSourceEncoding
     )
+  }
+
+  private getSelectedTemplatePlotData(path: string) {
+    const selectedRevisions = this.getSelectedRevisionDetails()
+
+    return collectSelectedTemplatePlotRawData({
+      multiSourceEncodingUpdate: this.multiSourceEncoding[path] || {},
+      path,
+      revisionData: this.revisionData,
+      selectedRevisions: selectedRevisions.map(({ id }) => id),
+      template: this.templates[path]
+    })
+  }
+
+  private getCustomPlotData(orderValue: CustomPlotsOrderValue) {
+    const experiments = this.experiments
+      .getWorkspaceCommitsAndExperiments()
+      .filter(({ id }) => id !== EXPERIMENT_WORKSPACE_ID)
+
+    return collectCustomPlotRawData(orderValue, experiments)
   }
 }
