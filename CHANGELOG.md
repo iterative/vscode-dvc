@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.13] - 2023-07-05
+
+### 🚀 New Features and Enhancements
+
+- Add "Export Raw Data" option to plot popup [#4181](https://github.com/iterative/vscode-dvc/pull/4181) by [@julieg18](https://github.com/julieg18)
+- Improve table indicators [#4212](https://github.com/iterative/vscode-dvc/pull/4212) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix force SCM action regex [#4214](https://github.com/iterative/vscode-dvc/pull/4214) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.4.0) [#4208](https://github.com/iterative/vscode-dvc/pull/4208) by [@mattseddon](https://github.com/mattseddon)
+- Use `onNewView` instead of `MutationObserver` in zoomed in plot [#4218](https://github.com/iterative/vscode-dvc/pull/4218) by [@julieg18](https://github.com/julieg18)
+
 ## [1.0.12] - 2023-07-03
 
 ### 🚀 New Features and Enhancements
