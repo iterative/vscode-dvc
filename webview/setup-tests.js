@@ -4,15 +4,6 @@ window = {
   dispatchEvent: jest.fn()
 }
 
-const mutationObserverMock = jest.fn().mockImplementation(() => {
-  return {
-    disconnect: jest.fn(),
-    observe: jest.fn(),
-    takeRecords: jest.fn()
-  }
-})
-global.MutationObserver = mutationObserverMock
-
 const intersectionObserverMock = jest.fn().mockImplementation(() => {
   return {
     disconnect: jest.fn(),
