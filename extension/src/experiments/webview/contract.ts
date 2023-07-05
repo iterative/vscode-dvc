@@ -97,7 +97,6 @@ export type TableData = {
   columnOrder: string[]
   columns: Column[]
   columnWidths: Record<string, number>
-  filteredCount: number
   filters: string[]
   hasBranchesToSelect: boolean
   hasCheckpoints: boolean
