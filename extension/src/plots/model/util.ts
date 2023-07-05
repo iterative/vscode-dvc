@@ -1,12 +1,12 @@
 import { getDataFromColumnPaths } from '../../experiments/model/util'
 import { Experiment } from '../../experiments/webview/contract'
-import { RevisionFirstThreeColumns } from '../webview/contract'
+import { RevisionSummaryColumns } from '../webview/contract'
 
-export const getRevisionFirstThreeColumns = (
-  firstThreeColumns: string[],
+export const getRevisionSummaryColumns = (
+  summaryColumns: string[],
   experiment: Experiment
-): RevisionFirstThreeColumns =>
-  getDataFromColumnPaths(experiment, firstThreeColumns).map(
+): RevisionSummaryColumns =>
+  getDataFromColumnPaths(experiment, summaryColumns).map(
     ({ columnPath: path, value, type }) => ({
       path,
       type,

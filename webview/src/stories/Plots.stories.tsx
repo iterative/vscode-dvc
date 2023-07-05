@@ -247,7 +247,7 @@ ZoomedInPlot.play = async ({ canvasElement }) => {
   const plots = await within(canvasElement).findAllByTestId(/^plot_/)
   const plot = await within(plots[0]).findByRole('button')
 
-  userEvent.click(plot)
+  return userEvent.click(plot)
 }
 
 export const MultiviewZoomedInPlot = Template.bind({})
@@ -258,7 +258,7 @@ MultiviewZoomedInPlot.play = async ({ canvasElement }) => {
   await within(plot).findByRole('graphics-document')
   const plotButton = await within(plot).findByRole('button')
 
-  userEvent.click(plotButton)
+  return userEvent.click(plotButton)
 }
 
 export const SmoothTemplate = Template.bind({})

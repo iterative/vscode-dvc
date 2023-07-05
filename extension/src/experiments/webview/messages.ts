@@ -255,10 +255,10 @@ export class WebviewMessages {
     return this.update()
   }
 
-  private getWebviewData() {
+  private getWebviewData(): TableData {
     return {
       changes: this.columns.getChanges(),
-      cliError: this.experiments.getCliError(),
+      cliError: this.experiments.getCliError() || null,
       columnOrder: this.columns.getColumnOrder(),
       columnWidths: this.columns.getColumnWidths(),
       columns: this.columns.getSelected(),

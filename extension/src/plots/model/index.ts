@@ -14,7 +14,7 @@ import {
   collectSelectedTemplatePlotRawData,
   collectCustomPlotRawData
 } from './collect'
-import { getRevisionFirstThreeColumns } from './util'
+import { getRevisionSummaryColumns } from './util'
 import {
   checkForCustomPlotOptions,
   cleanupOldOrderValue,
@@ -210,12 +210,12 @@ export class PlotsModel extends ModelWithPersistence {
         displayColor,
         errors: this.errors.getRevisionErrors(id),
         fetched: this.fetchedRevs.has(id),
-        firstThreeColumns: getRevisionFirstThreeColumns(
-          this.experiments.getFirstThreeColumnOrder(),
-          experiment
-        ),
         id,
-        label
+        label,
+        summaryColumns: getRevisionSummaryColumns(
+          this.experiments.getSummaryColumnOrder(),
+          experiment
+        )
       }
 
       if (commit) {
