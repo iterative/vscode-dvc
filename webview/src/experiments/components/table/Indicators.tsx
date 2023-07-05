@@ -1,4 +1,4 @@
-import React, { MouseEventHandler, ReactElement, ReactNode } from 'react'
+import React, { MouseEventHandler, ReactElement } from 'react'
 import { useSelector } from 'react-redux'
 import styles from './styles.module.scss'
 import { CellHintTooltip } from './body/CellHintTooltip'
@@ -15,7 +15,6 @@ import {
   GraphScatter,
   SortPrecedence
 } from '../../../shared/components/icons'
-import { pluralize } from '../../../util/strings'
 import { ExperimentsState } from '../../store'
 
 type CounterBadgeProps = {
@@ -44,7 +43,7 @@ export const Indicator = ({
 }: CounterBadgeProps & {
   'aria-label'?: string
   onClick?: MouseEventHandler
-  tooltipContent?: ReactNode
+  tooltipContent?: string
   children: ReactElement
   disabled?: boolean
 }) => {
@@ -61,7 +60,7 @@ export const Indicator = ({
   )
 
   return tooltipContent ? (
-    <CellHintTooltip tooltipContent={tooltipContent} delay={[0, 0]}>
+    <CellHintTooltip tooltipContent={tooltipContent} delay={[1000, 0]}>
       {content}
     </CellHintTooltip>
   ) : (
@@ -69,20 +68,11 @@ export const Indicator = ({
   )
 }
 
-const formatCountMessage = (
-  item: string,
-  count: number | undefined,
-  descriptor = 'Applied'
-) => `${count || 'No'} ${pluralize(item, count)} ${descriptor}`
-
 export const Indicators = () => {
   const filters = useSelector(
     (state: ExperimentsState) => state.tableData.filters
   )
   const sorts = useSelector((state: ExperimentsState) => state.tableData.sorts)
-  const filteredCount = useSelector(
-    (state: ExperimentsState) => state.tableData.filteredCount
-  )
   const selectedForPlotsCount = useSelector(
     (state: ExperimentsState) => state.tableData.selectedForPlotsCount
   )
@@ -104,36 +94,23 @@ export const Indicators = () => {
         count={selectedForPlotsCount}
         aria-label="selected for plots"
         onClick={openPlotsWebview}
-        tooltipContent={formatCountMessage(
-          'Experiment',
-          selectedForPlotsCount,
-          'Selected for Plotting (Max 7)'
-        )}
+        tooltipContent="Show Plots"
       >
         <Icon width={16} height={16} icon={GraphScatter} />
       </Indicator>
       <Indicator
-        count={sorts?.length}
+        count={sortsCount}
         aria-label="sorts"
         onClick={focusSortsTree}
-        tooltipContent={formatCountMessage('Sort', sortsCount)}
+        tooltipContent="Show Sorts"
       >
         <Icon width={16} height={16} icon={SortPrecedence} />
       </Indicator>
       <Indicator
-        count={filters?.length}
+        count={filtersCount}
         aria-label="filters"
         onClick={focusFiltersTree}
-        tooltipContent={
-          <>
-            <div>{formatCountMessage('Filter', filtersCount)}</div>
-            {filtersCount ? (
-              <div>
-                {formatCountMessage('Experiment', filteredCount, 'Filtered')}
-              </div>
-            ) : null}
-          </>
-        }
+        tooltipContent="Show Filters"
       >
         <Icon width={16} height={16} icon={Filter} />
       </Indicator>
@@ -141,11 +118,7 @@ export const Indicators = () => {
         count={branchesSelected}
         aria-label="branches"
         onClick={selectBranches}
-        tooltipContent={`${branchesSelected || 'No'} ${pluralize(
-          'Branch',
-          branchesSelected,
-          'es'
-        )} Selected`}
+        tooltipContent="Select Branches"
         disabled={!hasBranchesToSelect}
       >
         <Icon width={16} height={16} icon={GitMerge} />
