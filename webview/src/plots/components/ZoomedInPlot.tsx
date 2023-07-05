@@ -6,7 +6,6 @@ import cloneDeep from 'lodash.clonedeep'
 import { reverseOfLegendSuppressionUpdate } from 'dvc/src/plots/vega/util'
 import styles from './styles.module.scss'
 import { getThemeValue, ThemeProperty } from '../../util/styles'
-import { useMutationObserver } from '../hooks/useMutationObserver'
 import { exportPlotData } from '../util/messages'
 
 type ZoomedInPlotProps = {
@@ -29,14 +28,8 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
     }
   }, [])
 
-  const onPlotChange = () => {
+  const onNewView = () => {
     const actions = zoomedInPlotRef.current?.querySelector('.vega-actions')
-    const createdRawDataAction = actions?.querySelector(
-      `.${styles.vegaCustomAction as string}`
-    )
-    if (createdRawDataAction) {
-      return
-    }
     const rawDataAction = document.createElement('a')
     rawDataAction.textContent = 'Save Raw Data'
     rawDataAction.addEventListener('click', () => {
@@ -45,8 +38,6 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
     rawDataAction.classList.add(styles.vegaCustomAction)
     actions?.append(rawDataAction)
   }
-
-  useMutationObserver(zoomedInPlotRef, onPlotChange)
 
   return (
     <div
@@ -66,6 +57,7 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
           export: true,
           source: false
         }}
+        onNewView={onNewView}
       />
     </div>
   )
