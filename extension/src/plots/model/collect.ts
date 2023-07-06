@@ -108,6 +108,17 @@ export const collectCustomPlots = ({
   return plots
 }
 
+export const collectCustomPlotRawData = (
+  orderValue: CustomPlotsOrderValue,
+  experiments: Experiment[]
+) => {
+  const { metric, param } = orderValue
+  const metricPath = getFullValuePath(ColumnType.METRICS, metric)
+  const paramPath = getFullValuePath(ColumnType.PARAMS, param)
+
+  return getValues(experiments, metricPath, paramPath)
+}
+
 type RevisionPathData = { [path: string]: Record<string, unknown>[] }
 
 export type RevisionData = {
@@ -432,7 +443,35 @@ export const collectSelectedTemplatePlots = (
       group
     })
   }
+
   return acc.length > 0 ? acc : undefined
+}
+
+export const collectSelectedTemplatePlotRawData = ({
+  selectedRevisions,
+  path,
+  template,
+  revisionData,
+  multiSourceEncodingUpdate
+}: {
+  selectedRevisions: string[]
+  path: string
+  template: string
+  revisionData: RevisionData
+  multiSourceEncodingUpdate: { strokeDash: StrokeDashEncoding }
+}) => {
+  const isMultiView = isMultiViewPlot(
+    JSON.parse(template) as TopLevelSpec | VisualizationSpec
+  )
+  const { datapoints } = transformRevisionData(
+    path,
+    selectedRevisions,
+    revisionData,
+    isMultiView,
+    multiSourceEncodingUpdate
+  )
+
+  return datapoints
 }
 
 export const collectOrderedRevisions = (

@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.13] - 2023-07-05
+
+### 🚀 New Features and Enhancements
+
+- Add "Export Raw Data" option to plot popup [#4181](https://github.com/iterative/vscode-dvc/pull/4181) by [@julieg18](https://github.com/julieg18)
+- Improve table indicators [#4212](https://github.com/iterative/vscode-dvc/pull/4212) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix force SCM action regex [#4214](https://github.com/iterative/vscode-dvc/pull/4214) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.4.0) [#4208](https://github.com/iterative/vscode-dvc/pull/4208) by [@mattseddon](https://github.com/mattseddon)
+- Use `onNewView` instead of `MutationObserver` in zoomed in plot [#4218](https://github.com/iterative/vscode-dvc/pull/4218) by [@julieg18](https://github.com/julieg18)
+
+## [1.0.12] - 2023-07-03
+
+### 🚀 New Features and Enhancements
+
+- Update plot smooth control background color [#4202](https://github.com/iterative/vscode-dvc/pull/4202) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Fix table webview stuck on error page [#4179](https://github.com/iterative/vscode-dvc/pull/4179) by [@julieg18](https://github.com/julieg18)
+- Fix unresolved promises in local e2e tests [#4195](https://github.com/iterative/vscode-dvc/pull/4195) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Add CSS selector & variable naming rules [#4162](https://github.com/iterative/vscode-dvc/pull/4162) by [@julieg18](https://github.com/julieg18)
+- Update latest tested version to `3.2.3` [#4197](https://github.com/iterative/vscode-dvc/pull/4197) by [@julieg18](https://github.com/julieg18)
+- Update demo project and latest tested CLI version (3.3.1) [#4204](https://github.com/iterative/vscode-dvc/pull/4204) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.11] - 2023-06-26
 
 ### 🚀 New Features and Enhancements

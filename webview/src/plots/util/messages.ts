@@ -8,6 +8,13 @@ export const addCustomPlot = () =>
     type: MessageFromWebviewType.ADD_CUSTOM_PLOT
   })
 
+export const exportPlotData = (id: string) => {
+  sendMessage({
+    payload: id,
+    type: MessageFromWebviewType.EXPORT_PLOT_DATA
+  })
+}
+
 export const refreshRevisions = () =>
   sendMessage({
     type: MessageFromWebviewType.REFRESH_REVISIONS
@@ -86,12 +93,12 @@ export const togglePlotsSection = (
     type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
   })
 
-export const zoomPlot = (imagePath?: string) =>
-  sendMessage({ payload: imagePath, type: MessageFromWebviewType.ZOOM_PLOT })
-
 export const updateSmoothPlotValues = (values: { [key: string]: number }) => {
   sendMessage({
     payload: values,
     type: MessageFromWebviewType.UPDATE_SMOOTH_PLOT_VALUES
   })
 }
+
+export const zoomPlot = (imagePath?: string) =>
+  sendMessage({ payload: imagePath, type: MessageFromWebviewType.ZOOM_PLOT })

@@ -1,4 +1,4 @@
-import { commands } from 'vscode'
+import { Uri, commands } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import {
   ComparisonPlot,
@@ -21,7 +21,11 @@ import {
 import { PlotsModel } from '../model'
 import { PathsModel } from '../paths/model'
 import { BaseWebview } from '../../webview'
-import { getModifiedTime, openImageFileInEditor } from '../../fileSystem'
+import {
+  getModifiedTime,
+  openImageFileInEditor,
+  showSaveDialog
+} from '../../fileSystem'
 import { reorderObjectList } from '../../util/array'
 import { CustomPlotsOrderValue } from '../model/custom'
 import { getCustomPlotId } from '../model/collect'
@@ -79,6 +83,8 @@ export class WebviewMessages {
           RegisteredCommands.PLOTS_CUSTOM_ADD,
           this.dvcRoot
         )
+      case MessageFromWebviewType.EXPORT_PLOT_DATA:
+        return this.exportPlotData(message.payload)
       case MessageFromWebviewType.RESIZE_PLOTS:
         return this.setPlotSize(
           message.payload.section,
@@ -340,5 +346,21 @@ export class WebviewMessages {
 
   private getCustomPlots() {
     return this.plots.getCustomPlots() || null
+  }
+
+  private async exportPlotData(plotId: string) {
+    const file = await showSaveDialog(Uri.file('data.json'), { JSON: ['json'] })
+
+    if (!file) {
+      return
+    }
+
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA,
+      undefined,
+      undefined
+    )
+
+    this.plots.savePlotData(plotId, file.path)
   }
 }

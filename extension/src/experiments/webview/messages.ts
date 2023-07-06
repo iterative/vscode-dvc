@@ -154,7 +154,7 @@ export class WebviewMessages {
         return this.focusSortsTree()
 
       case MessageFromWebviewType.OPEN_PLOTS_WEBVIEW:
-        return this.showPlotsToSide()
+        return this.showPlots()
 
       case MessageFromWebviewType.SET_EXPERIMENTS_FOR_PLOTS:
         return this.setSelectedExperiments(message.payload)
@@ -162,7 +162,7 @@ export class WebviewMessages {
       case MessageFromWebviewType.SET_EXPERIMENTS_AND_OPEN_PLOTS:
         return Promise.all([
           this.setSelectedExperiments(message.payload),
-          this.showPlotsToSide()
+          this.showPlots()
         ])
 
       case MessageFromWebviewType.SET_EXPERIMENTS_HEADER_HEIGHT: {
@@ -262,7 +262,6 @@ export class WebviewMessages {
       columnOrder: this.columns.getColumnOrder(),
       columnWidths: this.columns.getColumnWidths(),
       columns: this.columns.getSelected(),
-      filteredCount: this.experiments.getFilteredCount(),
       filters: this.experiments.getFilterPaths(),
       hasBranchesToSelect:
         this.experiments.getAvailableBranchesToShow().length > 0,
@@ -424,10 +423,7 @@ export class WebviewMessages {
     )
   }
 
-  private showPlotsToSide() {
-    return commands.executeCommand(
-      RegisteredCommands.EXPERIMENT_AND_PLOTS_SHOW,
-      this.dvcRoot
-    )
+  private showPlots() {
+    return commands.executeCommand(RegisteredCommands.PLOTS_SHOW, this.dvcRoot)
   }
 }

@@ -106,7 +106,6 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       const filteredTableData: Partial<TableData> = {
         changes: workspaceChangesFixture,
-        filteredCount: 1,
         filters: [accuracyPath],
         rows: filteredRows
       }
@@ -131,7 +130,6 @@ suite('Experiments Filter By Tree Test Suite', () => {
       const unfilteredTableData: Partial<TableData> = {
         changes: workspaceChangesFixture,
         columns: columnsFixture,
-        filteredCount: 0,
         filters: [],
         rows: [workspace, main, fe2919b, _7df876c]
       }
@@ -371,7 +369,6 @@ suite('Experiments Filter By Tree Test Suite', () => {
         changes: workspaceChangesFixture,
         columnOrder: columnsOrderFixture,
         columns: columnsFixture,
-        filteredCount: 6,
         filters: ['starred'],
         rows: filteredRows
       }

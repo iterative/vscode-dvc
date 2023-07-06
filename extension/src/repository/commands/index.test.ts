@@ -82,8 +82,28 @@ describe('getResourceCommand', () => {
     expect(mockedFunc).toHaveBeenCalledTimes(1)
   })
 
-  it('should return a function that calls warnOfConsequences if the first function fails with a force prompt', async () => {
-    const stderr = `I deed, but ${TRY_FORCE}`
+  it('should return a function that calls warnOfConsequences if the first function fails with a -f prompt', async () => {
+    const stderr = 'I deed. Use `-f` to force.'
+    const userCancelled = undefined
+    mockedFunc.mockRejectedValueOnce({ stderr })
+    mockedGetWarningResponse.mockResolvedValueOnce(userCancelled)
+
+    const commandToRegister = getResourceCommand(
+      mockedInternalCommands,
+      mockedCommandId
+    )
+
+    const undef = await commandToRegister({
+      dvcRoot: mockedDvcRoot,
+      resourceUri: { fsPath: mockedTarget } as Uri
+    })
+
+    expect(undef).toStrictEqual(userCancelled)
+    expect(mockedFunc).toHaveBeenCalledTimes(1)
+  })
+
+  it('should return a function that calls warnOfConsequences if the first function fails with a --force prompt', async () => {
+    const stderr = 'I deed, but Use `--force` to force.'
     const userCancelled = undefined
     mockedFunc.mockRejectedValueOnce({ stderr })
     mockedGetWarningResponse.mockResolvedValueOnce(userCancelled)

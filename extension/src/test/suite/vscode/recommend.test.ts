@@ -1,13 +1,22 @@
 import { join } from 'path'
-import { afterEach, beforeEach, describe, it, suite } from 'mocha'
+import { afterEach, before, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { MessageItem, Uri, window } from 'vscode'
 import { restore, stub } from 'sinon'
 import { closeAllEditors } from '../util'
 import { dvcDemoPath } from '../../util'
 import * as Extensions from '../../../vscode/extensions'
+import { recommendRedHatExtensionOnce } from '../../../vscode/recommend'
 
 suite('Recommend Test Suite', () => {
+  const openFileInEditor = (fileName: string) =>
+    window.showTextDocument(Uri.file(join(dvcDemoPath, fileName)))
+
+  before(async () => {
+    await openFileInEditor('dvc.lock') // clear any existing recommendation
+    return closeAllEditors()
+  })
+
   beforeEach(() => {
     restore()
   })
@@ -16,11 +25,9 @@ suite('Recommend Test Suite', () => {
     return closeAllEditors()
   })
 
-  const openFileInEditor = (fileName: string) =>
-    window.showTextDocument(Uri.file(join(dvcDemoPath, fileName)))
-
   describe('recommendRedHatExtensionOnce', () => {
     it('should only recommend the red hat yaml extension once per session', async () => {
+      recommendRedHatExtensionOnce()
       stub(Extensions, 'isInstalled').returns(false)
       const mockShowInformationMessage = stub(
         window,

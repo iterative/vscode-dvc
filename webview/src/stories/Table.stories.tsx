@@ -40,7 +40,6 @@ const tableData: TableDataState = {
     'params:params.yaml:dvc_logs_dir': 300
   },
   columns: columnsFixture,
-  filteredCount: 0,
   filters: ['params:params.yaml:lr'],
   hasBranchesToSelect: true,
   hasCheckpoints: true,

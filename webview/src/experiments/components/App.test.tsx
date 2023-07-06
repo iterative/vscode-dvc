@@ -774,7 +774,7 @@ describe('App', () => {
 
       for (const segment of entireColumn) {
         fireEvent.contextMenu(segment, { bubbles: true })
-        jest.advanceTimersByTime(100)
+        advanceTimersByTime(100)
         const menuitems = screen
           .getAllByRole('menuitem')
           .filter(item => !item.className.includes('disabled'))
@@ -801,7 +801,7 @@ describe('App', () => {
 
       for (const segment of entireColumn) {
         fireEvent.contextMenu(segment, { bubbles: true })
-        jest.advanceTimersByTime(100)
+        advanceTimersByTime(100)
         const menuitems = screen
           .getAllByRole('menuitem')
           .filter(item => !item.className.includes('disabled'))
@@ -821,7 +821,7 @@ describe('App', () => {
         )
         const placeholder = placeholders[0]
         fireEvent.contextMenu(placeholder, { bubbles: true })
-        jest.advanceTimersByTime(100)
+        advanceTimersByTime(100)
 
         const hideOption = screen.getByText('Hide Column')
 
@@ -1486,6 +1486,7 @@ describe('App', () => {
       renderTable({
         ...tableDataFixture
       })
+      jest.useFakeTimers()
       const selectedForPlotsIndicator =
         screen.getByLabelText('selected for plots')
       expect(selectedForPlotsIndicator).toHaveTextContent('2')
@@ -1493,12 +1494,10 @@ describe('App', () => {
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
       fireEvent.mouseEnter(selectedForPlotsIndicator)
-
+      advanceTimersByTime(1000)
       const tooltip = screen.getByRole('tooltip')
 
-      expect(tooltip).toHaveTextContent(
-        '2 Experiments Selected for Plotting (Max 7)'
-      )
+      expect(tooltip).toHaveTextContent('Show Plots')
 
       setTableData({
         ...tableDataFixture,
@@ -1510,9 +1509,6 @@ describe('App', () => {
       })
 
       expect(selectedForPlotsIndicator).toHaveTextContent('')
-      expect(tooltip).toHaveTextContent(
-        'No Experiments Selected for Plotting (Max 7)'
-      )
 
       setTableData({
         ...tableDataFixture,
@@ -1533,12 +1529,10 @@ describe('App', () => {
       })
 
       expect(selectedForPlotsIndicator).toHaveTextContent('1')
-      expect(tooltip).toHaveTextContent(
-        '1 Experiment Selected for Plotting (Max 7)'
-      )
+      jest.useRealTimers()
     })
 
-    it('should show not change the plotted indicator when plotted experiments are hidden', () => {
+    it('should not change the plotted indicator when plotted experiments are hidden', () => {
       const plottedExperiment = '4fb124a'
 
       renderTable({
@@ -1547,32 +1541,11 @@ describe('App', () => {
 
       expect(screen.getByText(plottedExperiment)).toBeInTheDocument()
 
-      const selectedForPlotsIndicator =
-        screen.getByLabelText('selected for plots')
-      expect(selectedForPlotsIndicator).toHaveTextContent('2')
-
-      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
-
-      fireEvent.mouseEnter(selectedForPlotsIndicator)
-
-      const expandedTooltip = screen.getByRole('tooltip')
-
-      expect(expandedTooltip).toHaveTextContent(
-        '2 Experiments Selected for Plotting (Max 7)'
-      )
-
-      fireEvent.mouseLeave(selectedForPlotsIndicator)
+      expect(screen.getByLabelText('selected for plots')).toHaveTextContent('2')
 
       contractRow('main')
 
-      expect(screen.queryByText(plottedExperiment)).not.toBeInTheDocument()
-      fireEvent.mouseEnter(selectedForPlotsIndicator)
-
-      const contractedTooltip = screen.getByRole('tooltip')
-
-      expect(contractedTooltip).toHaveTextContent(
-        '2 Experiments Selected for Plotting (Max 7)'
-      )
+      expect(screen.getByLabelText('selected for plots')).toHaveTextContent('2')
     })
 
     it('should show an indicator with the amount of applied sorts', () => {
@@ -1580,16 +1553,18 @@ describe('App', () => {
         ...tableDataFixture,
         sorts: []
       })
+      jest.useFakeTimers()
       const sortIndicator = screen.getByLabelText('sorts')
       expect(sortIndicator).toHaveTextContent('')
 
       expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
       fireEvent.mouseEnter(sortIndicator)
+      advanceTimersByTime(1000)
 
       const tooltip = screen.getByRole('tooltip')
 
-      expect(tooltip).toHaveTextContent('No Sorts Applied')
+      expect(tooltip).toHaveTextContent('Show Sorts')
 
       const { columns } = tableDataFixture
       const firstSortPath = columns[columns.length - 1].path
@@ -1599,7 +1574,6 @@ describe('App', () => {
         sorts: [{ descending: true, path: firstSortPath }]
       })
       expect(sortIndicator).toHaveTextContent('1')
-      expect(tooltip).toHaveTextContent('1 Sort Applied')
       setTableData({
         ...tableDataFixture,
         sorts: [
@@ -1608,7 +1582,7 @@ describe('App', () => {
         ]
       })
       expect(sortIndicator).toHaveTextContent('2')
-      expect(tooltip).toHaveTextContent('2 Sorts Applied')
+      jest.useRealTimers()
     })
   })
 
@@ -1617,16 +1591,18 @@ describe('App', () => {
       ...tableDataFixture,
       filters: []
     })
+    jest.useFakeTimers()
     const filterIndicator = screen.getByLabelText('filters')
     expect(filterIndicator).toHaveTextContent('')
 
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
     fireEvent.mouseEnter(filterIndicator)
+    advanceTimersByTime(1000)
 
     const tooltip = screen.getByRole('tooltip')
 
-    expect(tooltip).toHaveTextContent('No Filters Applied')
+    expect(tooltip).toHaveTextContent('Show Filters')
 
     const { columns } = tableDataFixture
     const firstFilterPath = columns[columns.length - 1].path
@@ -1636,33 +1612,89 @@ describe('App', () => {
       filters: [firstFilterPath]
     })
     expect(filterIndicator).toHaveTextContent('1')
-    expect(tooltip).toHaveTextContent('1 Filter Applied')
-    expect(tooltip).toHaveTextContent('No Experiments Filtered')
 
     setTableData({
       ...tableDataFixture,
-      filteredCount: 1,
       filters: [firstFilterPath, secondFilterPath]
     })
     expect(filterIndicator).toHaveTextContent('2')
-    expect(tooltip).toHaveTextContent('2 Filters Applied')
-    expect(tooltip).toHaveTextContent('1 Experiment Filtered')
 
     setTableData({
       ...tableDataFixture,
-      filteredCount: 10000,
       filters: [firstFilterPath, secondFilterPath]
     })
     expect(filterIndicator).toHaveTextContent('2')
-    expect(tooltip).toHaveTextContent('10000 Experiments Filtered')
 
     setTableData({
       ...tableDataFixture,
-      filteredCount: 10000,
       filters: []
     })
     expect(filterIndicator).toHaveTextContent('')
     expect(tooltip).not.toHaveTextContent('Experiment')
+    jest.useRealTimers()
+  })
+
+  it('should show a tooltip for the branches indicator', () => {
+    renderTable({
+      ...tableDataFixture
+    })
+    jest.useFakeTimers()
+    const branchesIndicator = screen.getByLabelText('branches')
+    expect(branchesIndicator).toHaveTextContent('')
+
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+    fireEvent.mouseEnter(branchesIndicator)
+    advanceTimersByTime(1000)
+
+    const tooltip = screen.getByRole('tooltip')
+
+    expect(tooltip).toHaveTextContent('Select Branches')
+    jest.useRealTimers()
+  })
+
+  it('should show an indicator for the number of branches selected', () => {
+    const branches = ['main', 'other', 'third']
+
+    let workspace
+    const rowsWithoutWorkspace = []
+    for (const row of tableDataFixture.rows) {
+      if (row.id !== EXPERIMENT_WORKSPACE_ID) {
+        rowsWithoutWorkspace.push(row)
+        continue
+      }
+      workspace = row
+    }
+
+    const multipleBranches = {
+      ...tableDataFixture,
+      branches,
+      hasData: true,
+      rows: [
+        workspace as Commit,
+        ...rowsWithoutWorkspace.map(row => ({
+          ...row,
+          branch: branches[0],
+          subRows: undefined
+        })),
+        ...rowsWithoutWorkspace.map(row => ({
+          ...row,
+          branch: branches[1],
+          subRows: undefined
+        })),
+        ...rowsWithoutWorkspace.map(row => ({
+          ...row,
+          branch: branches[2],
+          subRows: undefined
+        }))
+      ]
+    }
+
+    renderTable(multipleBranches)
+
+    const [indicator] = screen.getAllByLabelText('branches')
+
+    expect(indicator).toHaveTextContent(`${branches.length - 1}`)
   })
 
   it('should send a message to focus the relevant tree when clicked', () => {
@@ -1708,20 +1740,20 @@ describe('App', () => {
       renderTable()
       setTableData({ ...tableDataFixture, hasConfig: false })
 
-      expect(screen.getByText('Add a Pipeline Stage')).toBeInTheDocument()
+      expect(screen.getByText('Add Stage')).toBeInTheDocument()
     })
 
     it('should not show a add config button if the project has pipeline stages', () => {
       renderTable()
 
-      expect(screen.queryByText('Add a Pipeline Stage')).not.toBeInTheDocument()
+      expect(screen.queryByText('Add Stage')).not.toBeInTheDocument()
     })
 
     it('should send a message to the extension to add a pipeline stage when clicking on the add config button', () => {
       renderTable()
       setTableData({ ...tableDataFixture, hasConfig: false })
 
-      fireEvent.click(screen.getByText('Add a Pipeline Stage'))
+      fireEvent.click(screen.getByText('Add Stage'))
 
       expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.ADD_CONFIGURATION
@@ -1735,7 +1767,7 @@ describe('App', () => {
         hasConfig: false,
         hasValidDvcYaml: false
       })
-      const addPipelineButton = await screen.findByText('Add a Pipeline Stage')
+      const addPipelineButton = await screen.findByText('Add Stage')
 
       fireEvent.click(addPipelineButton)
 
@@ -1744,9 +1776,7 @@ describe('App', () => {
       })
 
       expect(
-        screen.getByText(
-          'Your dvc.yaml file should contain valid yaml before adding any pipeline stages.'
-        )
+        screen.getByText('A stage cannot be added to an invalid dvc.yaml file.')
       ).toBeInTheDocument()
     })
   })

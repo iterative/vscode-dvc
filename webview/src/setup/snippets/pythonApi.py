@@ -1,11 +1,13 @@
+import random
+import sys
 from dvclive import Live
 
 with Live(save_dvc_exp=True) as live:
-    live.log_param("epochs", NUM_EPOCHS)
-
-    for epoch in range(NUM_EPOCHS):
-        train_model(...)
-        metrics = evaluate_model(...)
-        for metric_name, value in metrics.items():
-            live.log_metric(metric_name, value)
+    epochs = int(sys.argv[1])
+    live.log_param("epochs", epochs)
+    for epoch in range(epochs):
+        live.log_metric("train/accuracy", epoch + random.random())
+        live.log_metric("train/loss", epochs - epoch - random.random())
+        live.log_metric("val/accuracy",epoch + random.random() )
+        live.log_metric("val/loss", epochs - epoch - random.random())
         live.next_step()
