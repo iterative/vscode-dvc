@@ -28,14 +28,10 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   onViewReady,
   section
 }) => {
-  const {
-    data,
-    content: spec,
-    smoothValue
-  } = useGetPlot(section, id, createdSpec)
+  const { data, content: spec } = useGetPlot(section, id, createdSpec)
   const dispatch = useDispatch()
   const currentPlotProps = useRef<VegaLiteProps>()
-  const handleOnViewReady = useSetupSmoothPlot(id, smoothValue)
+  const onPlotViewReady = useSetupSmoothPlot(id)
 
   const plotProps: VegaLiteProps = {
     actions: false,
@@ -69,7 +65,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
         <VegaLite
           {...plotProps}
           onNewView={view => {
-            handleOnViewReady(view)
+            onPlotViewReady(view)
             if (onViewReady) {
               onViewReady()
             }

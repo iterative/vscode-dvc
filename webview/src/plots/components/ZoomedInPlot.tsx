@@ -1,3 +1,4 @@
+import { View } from 'react-vega'
 import React, { useEffect, useRef } from 'react'
 import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { Config } from 'vega-lite'
@@ -7,6 +8,7 @@ import { reverseOfLegendSuppressionUpdate } from 'dvc/src/plots/vega/util'
 import styles from './styles.module.scss'
 import { getThemeValue, ThemeProperty } from '../../util/styles'
 import { exportPlotData } from '../util/messages'
+import { useSetupSmoothPlot } from '../hooks/useSetupSmoothPlot'
 
 type ZoomedInPlotProps = {
   id: string
@@ -18,6 +20,7 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   props
 }: ZoomedInPlotProps) => {
   const zoomedInPlotRef = useRef<HTMLDivElement>(null)
+  const onViewReady = useSetupSmoothPlot(id)
 
   useEffect(() => {
     const modalOpenClass = 'modalOpen'
@@ -28,7 +31,8 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
     }
   }, [])
 
-  const onNewView = () => {
+  const onNewView = (view: View) => {
+    onViewReady(view)
     const actions = zoomedInPlotRef.current?.querySelector('.vega-actions')
     const rawDataAction = document.createElement('a')
     rawDataAction.textContent = 'Save Raw Data'
@@ -51,7 +55,6 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
           ...(props.config as Config),
           background: getThemeValue(ThemeProperty.MENU_BACKGROUND)
         }}
-        // need to add listeners and setState here too
         actions={{
           compiled: false,
           editor: false,

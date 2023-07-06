@@ -19,9 +19,7 @@ export const useGetPlot = (
   const plotsSnapshots = useSelector(
     (state: PlotsState) => state[storeSection].plotsSnapshots
   )
-  const smoothPlotValues = useSelector(
-    (state: PlotsState) => state.template.smoothPlotValues
-  )
+
   const [data, setData] = useState<PlainObject | undefined>(undefined)
   const [content, setContent] = useState<VisualizationSpec | undefined>(spec)
 
@@ -49,5 +47,5 @@ export const useGetPlot = (
     setPlotData()
   }, [plotsSnapshots, setPlotData])
 
-  return { content, data, smoothValue: smoothPlotValues[id] }
+  return { content, data }
 }
