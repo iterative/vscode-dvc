@@ -1740,20 +1740,20 @@ describe('App', () => {
       renderTable()
       setTableData({ ...tableDataFixture, hasConfig: false })
 
-      expect(screen.getByText('Add a Pipeline Stage')).toBeInTheDocument()
+      expect(screen.getByText('Add Stage')).toBeInTheDocument()
     })
 
     it('should not show a add config button if the project has pipeline stages', () => {
       renderTable()
 
-      expect(screen.queryByText('Add a Pipeline Stage')).not.toBeInTheDocument()
+      expect(screen.queryByText('Add Stage')).not.toBeInTheDocument()
     })
 
     it('should send a message to the extension to add a pipeline stage when clicking on the add config button', () => {
       renderTable()
       setTableData({ ...tableDataFixture, hasConfig: false })
 
-      fireEvent.click(screen.getByText('Add a Pipeline Stage'))
+      fireEvent.click(screen.getByText('Add Stage'))
 
       expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.ADD_CONFIGURATION
@@ -1767,7 +1767,7 @@ describe('App', () => {
         hasConfig: false,
         hasValidDvcYaml: false
       })
-      const addPipelineButton = await screen.findByText('Add a Pipeline Stage')
+      const addPipelineButton = await screen.findByText('Add Stage')
 
       fireEvent.click(addPipelineButton)
 
@@ -1776,9 +1776,7 @@ describe('App', () => {
       })
 
       expect(
-        screen.getByText(
-          'Your dvc.yaml file should contain valid yaml before adding any pipeline stages.'
-        )
+        screen.getByText('A stage cannot be added to an invalid dvc.yaml file.')
       ).toBeInTheDocument()
     })
   })

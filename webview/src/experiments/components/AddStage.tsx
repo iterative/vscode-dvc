@@ -10,23 +10,30 @@ interface AddStageProps {
 
 export const AddStage: React.FC<AddStageProps> = ({ hasValidDvcYaml }) => (
   <div className={styles.addConfigButton}>
-    <p>Easily and efficiently reproduce your experiments </p>
+    <p>
+      Define a{' '}
+      <a href="https://dvc.org/doc/user-guide/pipelines/defining-pipelines">
+        pipeline
+      </a>{' '}
+      to improve experiment reproducibility.
+    </p>
     <IconButton
       icon={Add}
       onClick={() => hasValidDvcYaml && addConfiguration()}
-      text="Add a Pipeline Stage"
+      text="Add Stage"
       disabled={!hasValidDvcYaml}
     />
     {!hasValidDvcYaml && (
       <p className={styles.errorText}>
-        Your dvc.yaml file should contain valid yaml before adding any pipeline
-        stages.
+        A stage cannot be added to an invalid dvc.yaml file.
       </p>
     )}
     <p>
-      <a href="https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#stages">
-        Learn more
-      </a>
+      Learn more about{' '}
+      <a href="https://dvc.org/doc/user-guide/project-structure/dvcyaml-files">
+        dvc.yaml
+      </a>{' '}
+      files.
     </p>
   </div>
 )
