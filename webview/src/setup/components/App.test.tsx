@@ -918,14 +918,21 @@ describe('App', () => {
       expect(setupDVCButton).toBeInTheDocument()
       expect(setupDVCButton).toBeVisible()
 
-      expect(screen.getByText('demo')).toBeInTheDocument()
-      expect(screen.getAllByText('-')).toHaveLength(2)
+      const remotesSection = screen.getByTestId('remotes-section-details')
 
-      expect(screen.getByText('example-get-started')).toBeInTheDocument()
-      expect(screen.getByText('drive')).toBeInTheDocument()
-      expect(screen.getByText('gdrive://appDataFolder')).toBeInTheDocument()
-      expect(screen.getByText('storage')).toBeInTheDocument()
-      expect(screen.getByText('s3://some-bucket')).toBeInTheDocument()
+      expect(within(remotesSection).getByText('demo')).toBeInTheDocument()
+      expect(within(remotesSection).getAllByText('-')).toHaveLength(2)
+      expect(
+        within(remotesSection).getByText('example-get-started')
+      ).toBeInTheDocument()
+      expect(within(remotesSection).getByText('drive')).toBeInTheDocument()
+      expect(
+        within(remotesSection).getByText('gdrive://appDataFolder')
+      ).toBeInTheDocument()
+      expect(within(remotesSection).getByText('storage')).toBeInTheDocument()
+      expect(
+        within(remotesSection).getByText('s3://some-bucket')
+      ).toBeInTheDocument()
     })
   })
 })
