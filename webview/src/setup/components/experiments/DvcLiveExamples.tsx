@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import React from 'react'
 import styles from './styles.module.scss'
+import { OtherFrameworks } from './OtherFrameworks'
 import pyTorch from '../../snippets/pyTorch.py'
 import huggingFace from '../../snippets/huggingFace.py'
 import keras from '../../snippets/keras.py'
@@ -18,6 +19,10 @@ export const DvcLiveExamples: React.FC = () => {
       className={styles.dvcLiveExamples}
       panels={[
         {
+          children: <PythonCodeBlock>{pythonApi.toString()}</PythonCodeBlock>,
+          title: 'Python API'
+        },
+        {
           children: <PythonCodeBlock>{pyTorch.toString()}</PythonCodeBlock>,
           title: 'PyTorch Lightning'
         },
@@ -30,8 +35,8 @@ export const DvcLiveExamples: React.FC = () => {
           title: 'Keras'
         },
         {
-          children: <PythonCodeBlock>{pythonApi.toString()}</PythonCodeBlock>,
-          title: 'General Python API'
+          children: <OtherFrameworks />,
+          title: 'Other'
         }
       ]}
     />
