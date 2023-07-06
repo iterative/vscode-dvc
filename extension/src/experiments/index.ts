@@ -56,7 +56,7 @@ export type ModifiedExperimentAndRunCommandId =
   | typeof AvailableCommands.EXPERIMENT_RESET_AND_RUN
 
 export class Experiments extends BaseRepository<TableData> {
-  public readonly onDidChangeIsParamsFileFocused: Event<string | undefined>
+  public readonly onDidChangeIsExperimentsFileFocused: Event<string | undefined>
   public readonly onDidChangeExperiments: Event<void>
   public readonly onDidChangeColumns: Event<void>
   public readonly onDidChangeColumnOrderOrStatus: Event<void>
@@ -69,7 +69,7 @@ export class Experiments extends BaseRepository<TableData> {
   private readonly experiments: ExperimentsModel
   private readonly columns: ColumnsModel
 
-  private readonly paramsFileFocused = this.dispose.track(
+  private readonly experimentsFileFocused = this.dispose.track(
     new EventEmitter<string | undefined>()
   )
 
@@ -123,7 +123,7 @@ export class Experiments extends BaseRepository<TableData> {
     this.addStage = addStage
     this.selectBranches = selectBranches
 
-    this.onDidChangeIsParamsFileFocused = this.paramsFileFocused.event
+    this.onDidChangeIsExperimentsFileFocused = this.experimentsFileFocused.event
     this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeColumns = this.columnsChanged.event
     this.onDidChangeColumnOrderOrStatus = this.columnsOrderOrStatusChanged.event
@@ -594,7 +594,7 @@ export class Experiments extends BaseRepository<TableData> {
       this.dvcRoot,
       this.dispose,
       () => this.columns.getParamsFiles(),
-      this.paramsFileFocused,
+      this.experimentsFileFocused,
       this.onDidChangeColumns
     )
   }

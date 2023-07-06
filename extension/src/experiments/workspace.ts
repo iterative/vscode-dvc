@@ -65,7 +65,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
 
   private readonly checkpointsChanged: EventEmitter<void>
 
-  private focusedParamsDvcRoot: string | undefined
+  private focusedFileDvcRoot: string | undefined
 
   constructor(
     internalCommands: InternalCommands,
@@ -327,8 +327,8 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
 
     experiments.dispose.track(
-      experiments.onDidChangeIsParamsFileFocused(
-        dvcRoot => (this.focusedParamsDvcRoot = dvcRoot)
+      experiments.onDidChangeIsExperimentsFileFocused(
+        dvcRoot => (this.focusedFileDvcRoot = dvcRoot)
       )
     )
 
@@ -362,7 +362,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   public getFocusedOrOnlyOrPickProject() {
     return (
       this.focusedWebviewDvcRoot ||
-      this.focusedParamsDvcRoot ||
+      this.focusedFileDvcRoot ||
       this.getOnlyOrPickProject()
     )
   }
