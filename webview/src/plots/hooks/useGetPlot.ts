@@ -16,8 +16,11 @@ export const useGetPlot = (
 ) => {
   const isCustomPlot = section === PlotsSection.CUSTOM_PLOTS
   const storeSection = isCustomPlot ? 'custom' : 'template'
-  const { plotsSnapshots, smoothPlotValues = {} } = useSelector(
-    (state: PlotsState) => state[storeSection]
+  const plotsSnapshots = useSelector(
+    (state: PlotsState) => state[storeSection].plotsSnapshots
+  )
+  const smoothPlotValues = useSelector(
+    (state: PlotsState) => state.template.smoothPlotValues
   )
   const [data, setData] = useState<PlainObject | undefined>(undefined)
   const [content, setContent] = useState<VisualizationSpec | undefined>(spec)

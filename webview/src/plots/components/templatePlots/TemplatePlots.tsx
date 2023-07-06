@@ -44,9 +44,7 @@ export const TemplatePlots: React.FC = () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    return () => {
-      updateSmoothPlotValues(smoothPlotValues)
-    }
+    updateSmoothPlotValues(smoothPlotValues)
   }, [smoothPlotValues])
 
   const sendReorderMessage = useCallback((sections: PlotGroup[]) => {

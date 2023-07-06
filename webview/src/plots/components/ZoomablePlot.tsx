@@ -60,6 +60,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   if (!data && !spec) {
     return null
   }
+
   return (
     <button className={styles.zoomablePlot} onClick={handleOnClick}>
       <GripIcon className={styles.plotGripIcon} />
@@ -67,26 +68,33 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
         <VegaLite
           {...plotProps}
           onNewView={view => {
+            // move all this smooth code to its own function
+            const state = view.getState()
             if (smoothValue) {
-              const state = view.getState()
               view.setState({
                 ...state,
                 signals: { ...state.signals, smooth: smoothValue }
+              })
+            }
+            const smoothRange = document.querySelector(
+              `[data-id="${id}"] input[name="smooth"]`
+            )
+            if (smoothRange) {
+              smoothRange.addEventListener('change', (event: Event) => {
+                if (event.target) {
+                  dispatch(
+                    setSmoothPlotValue({
+                      id,
+                      value: Number((event.target as HTMLInputElement).value)
+                    })
+                  )
+                }
               })
             }
             if (onViewReady) {
               onViewReady()
             }
           }}
-          signalListeners={
-            // TBD need to have a better way to check if plot is smooth
-            (spec?.params || []).find(({ name }) => name === 'smooth') && {
-              smooth: (_, value) =>
-                // this is going to get called a lot. Is there a way to update it when the
-                // user lets go of the input?
-                dispatch(setSmoothPlotValue({ id, value: value as number }))
-            }
-          }
         />
       )}
     </button>

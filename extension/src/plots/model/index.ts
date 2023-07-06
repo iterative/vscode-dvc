@@ -303,7 +303,9 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public updateSmoothPlotValues(values: { [id: string]: number }) {
-    this.smoothPlotValues = values
+    for (const [key, value] of Object.entries(values)) {
+      this.smoothPlotValues[key] = value
+    }
     this.persist(PersistenceKey.PLOTS_SMOOTH_PLOT_VALUES, this.smoothPlotValues)
   }
 
