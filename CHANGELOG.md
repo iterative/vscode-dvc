@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.14] - 2023-07-06
+
+### 🚀 New Features and Enhancements
+
+- Add dvc.yaml into files used to show editor/title icons [#4228](https://github.com/iterative/vscode-dvc/pull/4228) by [@mattseddon](https://github.com/mattseddon)
+- Update DVCLive examples in Setup [#4224](https://github.com/iterative/vscode-dvc/pull/4224) by [@mattseddon](https://github.com/mattseddon)
+- Update copy around adding a new stage/defining a pipeline for a project without one [#4225](https://github.com/iterative/vscode-dvc/pull/4225) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.13] - 2023-07-05
 
 ### 🚀 New Features and Enhancements
