@@ -1072,7 +1072,7 @@
         {
           "command": "dvc.stopAllRunningExperiments",
           "group": "navigation@0",
-          "when": "dvc.params.file.active && dvc.experiment.running && dvc.commands.available"
+          "when": "dvc.experiments.file.active && dvc.experiment.running && dvc.commands.available"
         },
         {
           "command": "dvc.stopAllRunningExperiments",
@@ -1082,7 +1082,7 @@
         {
           "command": "dvc.runExperiment",
           "group": "navigation@1",
-          "when": "dvc.params.file.active && !dvc.experiment.running.workspace && dvc.commands.available && !dvc.experiment.checkpoints"
+          "when": "dvc.experiments.file.active && !dvc.experiment.running.workspace && dvc.commands.available && !dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.runExperiment",
@@ -1097,7 +1097,7 @@
         {
           "command": "dvc.resetAndRunCheckpointExperiment",
           "group": "navigation@2",
-          "when": "dvc.params.file.active && !dvc.experiment.running.workspace && dvc.commands.available && dvc.experiment.checkpoints"
+          "when": "dvc.experiments.file.active && !dvc.experiment.running.workspace && dvc.commands.available && dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.resumeCheckpointExperiment",
@@ -1107,7 +1107,7 @@
         {
           "command": "dvc.resumeCheckpointExperiment",
           "group": "navigation@3",
-          "when": "dvc.params.file.active && !dvc.experiment.running.workspace && dvc.commands.available && dvc.experiment.checkpoints"
+          "when": "dvc.experiments.file.active && !dvc.experiment.running.workspace && dvc.commands.available && dvc.experiment.checkpoints"
         },
         {
           "command": "dvc.startExperimentsQueue",
@@ -1117,7 +1117,7 @@
         {
           "command": "dvc.startExperimentsQueue",
           "group": "navigation@4",
-          "when": "dvc.params.file.active && dvc.commands.available"
+          "when": "dvc.experiments.file.active && dvc.commands.available"
         },
         {
           "command": "dvc.queueExperiment",
@@ -1127,7 +1127,7 @@
         {
           "command": "dvc.queueExperiment",
           "group": "navigation@5",
-          "when": "dvc.params.file.active && !dvc.experiment.running.workspace && dvc.commands.available"
+          "when": "dvc.experiments.file.active && !dvc.experiment.running.workspace && dvc.commands.available"
         }
       ],
       "view/item/context": [

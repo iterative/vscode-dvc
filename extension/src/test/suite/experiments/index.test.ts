@@ -1962,7 +1962,7 @@ suite('Experiments Test Suite', () => {
       await window.showTextDocument(paramsFile)
 
       const mockContext: { [key: string]: unknown } = {
-        'dvc.params.file.active': false
+        'dvc.experiments.file.active': false
       }
 
       const mockSetContextValue = stub(VscodeContext, 'setContextValue')
@@ -1975,8 +1975,8 @@ suite('Experiments Test Suite', () => {
       await experiments.isReady()
 
       expect(
-        mockContext['dvc.params.file.active'],
-        'should set dvc.params.file.active to true when a params file is open and the extension starts'
+        mockContext['dvc.experiments.file.active'],
+        'should set dvc.experiments.file.active to true when a params file is open and the extension starts'
       ).to.be.true
 
       mockSetContextValue.resetHistory()
@@ -1987,8 +1987,8 @@ suite('Experiments Test Suite', () => {
       await startupEditorClosed
 
       expect(
-        mockContext['dvc.params.file.active'],
-        'should set dvc.params.file.active to false when the params file in the active editor is closed'
+        mockContext['dvc.experiments.file.active'],
+        'should set dvc.experiments.file.active to false when the params file in the active editor is closed'
       ).to.be.false
 
       mockSetContextValue.resetHistory()
@@ -2001,16 +2001,16 @@ suite('Experiments Test Suite', () => {
       const activeEditorClosed = getActiveEditorUpdatedEvent()
 
       expect(
-        mockContext['dvc.params.file.active'],
-        'should set dvc.params.file.active to true when a params file is in the active editor'
+        mockContext['dvc.experiments.file.active'],
+        'should set dvc.experiments.file.active to true when a params file is in the active editor'
       ).to.be.true
 
       await closeAllEditors()
       await activeEditorClosed
 
       expect(
-        mockContext['dvc.params.file.active'],
-        'should set dvc.params.file.active to false when the params file in the active editor is closed again'
+        mockContext['dvc.experiments.file.active'],
+        'should set dvc.experiments.file.active to false when the params file in the active editor is closed again'
       ).to.be.false
     })
 

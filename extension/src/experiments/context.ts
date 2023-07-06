@@ -16,7 +16,7 @@ const setContextOnDidChangeParamsFiles = (
       return
     }
 
-    if (!getParamsFiles().has(path)) {
+    if (!getParamsFiles().has(path) && !path.endsWith('dvc.yaml')) {
       return
     }
     setActiveEditorContext(true)
@@ -39,21 +39,25 @@ const setContextOnDidChangeActiveEditor = (
     }
 
     const isParamsFile = getParamsFiles().has(path)
+    const isDvcYaml = path.endsWith('dvc.yaml')
 
-    setActiveEditorContext(isParamsFile)
+    setActiveEditorContext(isParamsFile || isDvcYaml)
   })
 
 export const setContextForEditorTitleIcons = (
   dvcRoot: string,
   disposer: (() => void) & Disposer,
   getParamsFiles: () => Set<string>,
-  paramsFileFocused: EventEmitter<string | undefined>,
+  experimentsFileFocused: EventEmitter<string | undefined>,
   onDidChangeColumns: Event<void>
 ): void => {
-  const setActiveEditorContext = (paramsFileActive: boolean) => {
-    void setContextValue(ContextKey.PARAMS_FILE_ACTIVE, paramsFileActive)
-    const activeDvcRoot = paramsFileActive ? dvcRoot : undefined
-    paramsFileFocused.fire(activeDvcRoot)
+  const setActiveEditorContext = (experimentsFileActive: boolean) => {
+    void setContextValue(
+      ContextKey.EXPERIMENTS_FILE_ACTIVE,
+      experimentsFileActive
+    )
+    const activeDvcRoot = experimentsFileActive ? dvcRoot : undefined
+    experimentsFileFocused.fire(activeDvcRoot)
   }
 
   disposer.track(
