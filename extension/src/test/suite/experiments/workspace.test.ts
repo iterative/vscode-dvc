@@ -103,10 +103,15 @@ suite('Workspace Experiments Test Suite', () => {
       expect(mockQuickPickOne).to.not.be.called
     })
 
-    it('should not prompt to pick a project if a params file is focused', async () => {
+    it('should not prompt to pick a project if a params file or dvc.yaml is focused', async () => {
       const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
         dvcDemoPath
       )
+      const mockRunExperiment = stub(
+        DvcRunner.prototype,
+        'runExperiment'
+      ).resolves(undefined)
+      stub(DvcReader.prototype, 'listStages').resolves('train')
 
       const { workspaceExperiments, experiments } =
         buildMultiRepoExperiments(disposable)
@@ -119,32 +124,37 @@ suite('Workspace Experiments Test Suite', () => {
 
       expect(await focusedWebview).to.equal(dvcDemoPath)
 
-      const focusedParamsFile = new Promise(resolve => {
-        const listener: Disposable = experiments.onDidChangeIsParamsFileFocused(
-          (event: string | undefined) => {
-            listener.dispose()
-            return resolve(event)
-          }
+      const getDvcRootFocusedEvent = () =>
+        new Promise(resolve => {
+          const listener: Disposable =
+            experiments.onDidChangeIsExperimentsFileFocused(
+              (event: string | undefined) => {
+                listener.dispose()
+                return resolve(event)
+              }
+            )
+        })
+
+      const testFile = async (path: string) => {
+        const focusedDvcRoot = getDvcRootFocusedEvent()
+        const uri = Uri.file(join(dvcDemoPath, path))
+        await window.showTextDocument(uri)
+
+        expect(await focusedDvcRoot).to.equal(dvcDemoPath)
+
+        mockQuickPickOne.resetHistory()
+
+        await workspaceExperiments.getCwdThenRun(
+          AvailableCommands.EXPERIMENT_RUN
         )
-      })
 
-      const paramsFile = Uri.file(join(dvcDemoPath, 'params.yaml'))
-      await window.showTextDocument(paramsFile)
+        expect(mockQuickPickOne).not.to.be.called
+        expect(mockRunExperiment).to.be.calledWith(dvcDemoPath)
+        return closeAllEditors()
+      }
 
-      expect(await focusedParamsFile).to.equal(dvcDemoPath)
-
-      mockQuickPickOne.resetHistory()
-
-      const mockRunExperiment = stub(
-        DvcRunner.prototype,
-        'runExperiment'
-      ).resolves(undefined)
-
-      stub(DvcReader.prototype, 'listStages').resolves('train')
-      await workspaceExperiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RUN)
-
-      expect(mockQuickPickOne).not.to.be.calledOnce
-      expect(mockRunExperiment).to.be.calledWith(dvcDemoPath)
+      await testFile('params.yaml')
+      await testFile('dvc.yaml')
     })
   }).timeout(WEBVIEW_TEST_TIMEOUT)
 
