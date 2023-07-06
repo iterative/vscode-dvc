@@ -5,12 +5,12 @@ import { useDispatch } from 'react-redux'
 import { VisualizationSpec } from 'react-vega'
 import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { setZoomedInPlot } from './webviewSlice'
-import { setSmoothPlotValue } from './templatePlots/templatePlotsSlice'
 import styles from './styles.module.scss'
 import { config } from './constants'
 import { zoomPlot } from '../util/messages'
 import { useGetPlot } from '../hooks/useGetPlot'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
+import { useSetupSmoothPlot } from '../hooks/useSetupSmoothPlot'
 
 interface ZoomablePlotProps {
   spec?: VisualizationSpec
@@ -35,6 +35,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   } = useGetPlot(section, id, createdSpec)
   const dispatch = useDispatch()
   const currentPlotProps = useRef<VegaLiteProps>()
+  const handleOnViewReady = useSetupSmoothPlot(id, smoothValue)
 
   const plotProps: VegaLiteProps = {
     actions: false,
@@ -68,29 +69,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
         <VegaLite
           {...plotProps}
           onNewView={view => {
-            // move all this smooth code to its own function
-            const state = view.getState()
-            if (smoothValue) {
-              view.setState({
-                ...state,
-                signals: { ...state.signals, smooth: smoothValue }
-              })
-            }
-            const smoothRange = document.querySelector(
-              `[data-id="${id}"] input[name="smooth"]`
-            )
-            if (smoothRange) {
-              smoothRange.addEventListener('change', (event: Event) => {
-                if (event.target) {
-                  dispatch(
-                    setSmoothPlotValue({
-                      id,
-                      value: Number((event.target as HTMLInputElement).value)
-                    })
-                  )
-                }
-              })
-            }
+            handleOnViewReady(view)
             if (onViewReady) {
               onViewReady()
             }
