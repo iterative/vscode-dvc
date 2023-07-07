@@ -2,12 +2,11 @@
   "Get Started with DVC pipelines": {
     "prefix": "dvc-help",
     "body": [
-      "# Snippets are provided by the DVC for VS Code extension to help with building dvc.yaml pipelines.",
-      "# These snippets are all prefixed with dvc-.",
+      "# The DVC for VS Code extension provides snippets to help with building dvc.yaml pipelines.",
+      "# These snippets, all prefixed with dvc-, are designed to give pointers on basic usage.",
       "# Type dvc- in the editor to see the list of available snippets.",
-      "# Each snippet is designed to give pointers on basic usage.",
-      "# For further details on building pipelines visit https://dvc.org/doc/user-guide/project-structure/dvcyaml-files",
-      "# If the redhat.yaml extension is installed then on-hover support will be provided for each of the keys in a dvc.yaml file."
+      "# Visit https://dvc.org/doc/user-guide/project-structure/dvcyaml-files for further details on building pipelines.",
+      "# On-hover information and completions will be provided for each of the keys in a dvc.yaml file if the redhat.yaml extension is installed."
     ],
     "description": "Information on the support provided for building dvc.yaml pipelines"
   },
