@@ -31,7 +31,8 @@
     "Machine Learning",
     "Data Science",
     "Visualization",
-    "SCM Providers"
+    "SCM Providers",
+    "Snippets"
   ],
   "galleryBanner": {
     "color": "#333",
@@ -1380,6 +1381,12 @@
         }
       ]
     },
+    "snippets": [
+      {
+        "language": "yaml",
+        "path": "./snippets/dvc-yaml.code-snippets"
+      }
+    ],
     "viewsContainers": {
       "activitybar": [
         {
