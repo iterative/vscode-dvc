@@ -50,5 +50,61 @@
       "      - \\${item}.${5:suffix for the templated output file, e.g. pkl}"
     ],
     "description": "Foreach stage template for dvc.yaml pipeline"
+  },
+  "Single File Plot Template": {
+    "prefix": "dvc-plot-single",
+    "body": [
+      "  - ${1:file, e.g. probs.json}:",
+      "      template: ${2|linear,simple,scatter,smooth,confusion,confusion_normalized,bar_horizontal,bar_horizontal_sorted|}",
+      "      x: ${3:x values, e.g. actual}",
+      "      y: ${4: y values, e.g. predicted}",
+      "      title: ${5:title, e.g. Predicted Probabilities}"
+    ],
+    "description": "Single file dvc.yaml top level plot template"
+  },
+  "Multi-file Plot Template": {
+    "prefix": "dvc-plot-multi",
+    "body": [
+      "  - ${1:name, e.g. Accuracy}:",
+      "      template: ${2|linear,simple,scatter,smooth,confusion,confusion_normalized,bar_horizontal,bar_horizontal_sorted|}",
+      "      x: ${3:x values, e.g. step}",
+      "      y: ",
+      "        ${4:file, e.g. training/plots/metrics/train/acc.tsv}: ${5:y values, e.g. acc}",
+      "        ${6:file, e.g. training/plots/metrics/test/acc.tsv}: ${7:y values, e.g. acc}",
+      "      y_label: ${8:y label, e.g. accuracy}"
+    ],
+    "description": "Multi-file dvc.yaml top level plot template"
+  },
+  "Bar Horizontal Plot Template": {
+    "prefix": "dvc-plot-bar-horizontal",
+    "body": [
+      "  - ${1:file, e.g. hist.csv}:",
+      "      template: bar_horizontal",
+      "      x: ${2:x values, e.g. preds}",
+      "      y: ${3: y values, e.g. digit}",
+      "      title: ${4:title, e.g. Histogram of Predictions}"
+    ],
+    "description": "Bar horizontal dvc.yaml top level plot template"
+  },
+  "Confusion Matrix Plot Template": {
+    "prefix": "dvc-plot-confusion",
+    "body": [
+      "  - ${1:name, e.g. Confusion Matrix}:",
+      "      template: confusion",
+      "      x: ${2:x values, e.g. actual}",
+      "      y:",
+      "        ${3:file, e.g. training/plots/sklearn/confusion_matrix.json}: ${4:y values, e.g. predicted}"
+    ],
+    "description": "Confusion matrix dvc.yaml top level plot template"
+  },
+  "Smooth Plot Template": {
+    "prefix": "dvc-plot-smooth",
+    "body": [
+      "  - ${1:file, e.g. acc.tsv}:",
+      "      x: ${2:x values, e.g. step}",
+      "      y: ${3: y values, e.g. acc}",
+      "      y_label: ${4: y label, e.g. accuracy}"
+    ],
+    "description": "Smooth dvc.yaml top level plot template"
   }
 }
