@@ -16,7 +16,7 @@ export const useGetPlot = (
 ) => {
   const isCustomPlot = section === PlotsSection.CUSTOM_PLOTS
   const storeSection = isCustomPlot ? 'custom' : 'template'
-  const plotsSnapshots = useSelector(
+  const snapshot = useSelector(
     (state: PlotsState) => state[storeSection].plotsSnapshots
   )
 
@@ -45,7 +45,7 @@ export const useGetPlot = (
 
   useEffect(() => {
     setPlotData()
-  }, [plotsSnapshots, setPlotData])
+  }, [snapshot, setPlotData])
 
   return { content, data }
 }

@@ -1046,7 +1046,7 @@ suite('Plots Test Suite', () => {
       )
     })
 
-    it('should handle a update smooth plot values message from the webview', async () => {
+    it('should handle an update smooth plot values message from the webview', async () => {
       const { plots, plotsModel } = await buildPlots({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
