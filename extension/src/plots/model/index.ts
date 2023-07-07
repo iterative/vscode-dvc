@@ -32,7 +32,8 @@ import {
   CustomPlotsData,
   DEFAULT_HEIGHT,
   DEFAULT_NB_ITEMS_PER_ROW,
-  PlotHeight
+  PlotHeight,
+  SmoothPlotValues
 } from '../webview/contract'
 import {
   EXPERIMENT_WORKSPACE_ID,
@@ -74,7 +75,7 @@ export class PlotsModel extends ModelWithPersistence {
 
   private comparisonData: ComparisonData = {}
   private comparisonOrder: string[]
-  private smoothPlotValues: { [id: string]: number } = {}
+  private smoothPlotValues: SmoothPlotValues = {}
 
   private revisionData: RevisionData = {}
   private templates: TemplateAccumulator = {}
@@ -323,7 +324,7 @@ export class PlotsModel extends ModelWithPersistence {
     )
   }
 
-  public updateSmoothPlotValues(values: { [id: string]: number }) {
+  public setSmoothPlotValues(values: SmoothPlotValues) {
     for (const [key, value] of Object.entries(values)) {
       this.smoothPlotValues[key] = value
     }

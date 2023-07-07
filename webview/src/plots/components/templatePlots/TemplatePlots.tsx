@@ -15,10 +15,7 @@ import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { isSameGroup } from '../../../shared/components/dragDrop/DragDropContainer'
 import { changeOrderWithDraggedInfo } from '../../../util/array'
 import { LoadingSection, sectionIsLoading } from '../LoadingSection'
-import {
-  reorderTemplatePlots,
-  updateSmoothPlotValues
-} from '../../util/messages'
+import { reorderTemplatePlots, setSmoothPlotValues } from '../../util/messages'
 
 export enum NewSectionBlock {
   TOP = 'drop-section-top',
@@ -44,7 +41,7 @@ export const TemplatePlots: React.FC = () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    updateSmoothPlotValues(smoothPlotValues)
+    setSmoothPlotValues(smoothPlotValues)
   }, [smoothPlotValues])
 
   const sendReorderMessage = useCallback((sections: PlotGroup[]) => {

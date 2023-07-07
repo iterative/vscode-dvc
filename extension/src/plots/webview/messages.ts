@@ -7,7 +7,8 @@ import {
   PlotsData as TPlotsData,
   PlotsSection,
   SectionCollapsed,
-  Revision
+  Revision,
+  SmoothPlotValues
 } from './contract'
 import { Logger } from '../../common/logger'
 import { Experiments } from '../../experiments'
@@ -77,7 +78,6 @@ export class WebviewMessages {
 
   public handleMessageFromWebview(message: MessageFromWebview) {
     switch (message.type) {
-      // add a new type for updating smooth value (takes an id and value)
       case MessageFromWebviewType.ADD_CUSTOM_PLOT:
         return commands.executeCommand(
           RegisteredCommands.PLOTS_CUSTOM_ADD,
@@ -117,8 +117,8 @@ export class WebviewMessages {
         )
       case MessageFromWebviewType.TOGGLE_EXPERIMENT:
         return this.setExperimentStatus(message.payload)
-      case MessageFromWebviewType.UPDATE_SMOOTH_PLOT_VALUES:
-        return this.plots.updateSmoothPlotValues(message.payload)
+      case MessageFromWebviewType.SET_SMOOTH_PLOT_VALUES:
+        return this.setSmoothPlotValues(message.payload)
       case MessageFromWebviewType.ZOOM_PLOT:
         if (message.payload) {
           const imagePath = this.revertCorrectUrl(message.payload)
@@ -196,6 +196,15 @@ export class WebviewMessages {
     this.sendTemplatePlots()
     sendTelemetryEvent(
       EventName.VIEWS_REORDER_PLOTS_TEMPLATES,
+      undefined,
+      undefined
+    )
+  }
+
+  private setSmoothPlotValues(values: SmoothPlotValues) {
+    this.plots.setSmoothPlotValues(values)
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_SET_SMOOTH_PLOT_VALUES,
       undefined,
       undefined
     )

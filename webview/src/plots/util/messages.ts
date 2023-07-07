@@ -92,11 +92,11 @@ export const togglePlotsSection = (
     },
     type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
   })
-// TBD review naming, compare to other plot functions/messages
-export const updateSmoothPlotValues = (values: { [key: string]: number }) => {
+
+export const setSmoothPlotValues = (values: { [key: string]: number }) => {
   sendMessage({
     payload: values,
-    type: MessageFromWebviewType.UPDATE_SMOOTH_PLOT_VALUES
+    type: MessageFromWebviewType.SET_SMOOTH_PLOT_VALUES
   })
 }
 

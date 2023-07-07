@@ -370,6 +370,7 @@ const collectTemplatePlot = (
       color: revisionColors
     }
   ) as VisualizationSpec
+
   acc.push({
     content,
     id: path,
