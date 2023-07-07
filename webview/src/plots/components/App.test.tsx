@@ -2122,5 +2122,91 @@ describe('App', () => {
       fireEvent(panel, clickEvent)
       expect(clickEvent.stopPropagation).toHaveBeenCalledTimes(1)
     })
+
+    describe('Smooth Plots', () => {
+      it('should send a message to save the value when a vega panel slider is interacted with', async () => {
+        renderAppWithOptionalData({ template: withVegaPanels })
+
+        const smoothPlot = screen.getByTestId(`plot_${smoothId}`)
+        await waitForVega(smoothPlot)
+
+        // eslint-disable-next-line testing-library/no-node-access
+        const slider = smoothPlot.querySelector(
+          '.vega-bindings input[name="smooth"]'
+        )
+        expect(slider).toBeInTheDocument()
+
+        fireEvent.change(slider as HTMLInputElement, { target: { value: 0.4 } })
+
+        expect(mockPostMessage).toHaveBeenCalledWith({
+          payload: { [smoothId]: 0.4 },
+          type: MessageFromWebviewType.SET_SMOOTH_PLOT_VALUES
+        })
+      })
+
+      it('should set a vega panel slider value when given a default value', async () => {
+        renderAppWithOptionalData({
+          template: { ...withVegaPanels, smoothPlotValues: { [smoothId]: 0.6 } }
+        })
+
+        const smoothPlot = screen.getByTestId(`plot_${smoothId}`)
+        await waitForVega(smoothPlot)
+
+        // eslint-disable-next-line testing-library/no-node-access
+        const slider = smoothPlot.querySelector(
+          '.vega-bindings input[name="smooth"]'
+        )
+        expect(slider).toBeInTheDocument()
+
+        expect(slider).toHaveValue('0.6')
+      })
+
+      it('should set the vega panel slider value of a zoomed in plot when given a default value', async () => {
+        renderAppWithOptionalData({
+          template: { ...withVegaPanels, smoothPlotValues: { [smoothId]: 0.6 } }
+        })
+
+        const smoothPlot = within(
+          screen.getByTestId(`plot_${smoothId}`)
+        ).getByRole('button')
+        fireEvent.click(smoothPlot)
+
+        const popup = screen.getByTestId('zoomed-in-plot')
+        await waitForVega(popup)
+
+        // eslint-disable-next-line testing-library/no-node-access
+        const slider = popup.querySelector(
+          '.vega-bindings input[name="smooth"]'
+        )
+        expect(slider).toBeInTheDocument()
+
+        expect(slider).toHaveValue('0.6')
+      })
+
+      it('should not send a message to save the value when a zoomed in plot vega panel slider is interacted with', async () => {
+        renderAppWithOptionalData({ template: withVegaPanels })
+
+        const smoothPlot = within(
+          screen.getByTestId(`plot_${smoothId}`)
+        ).getByRole('button')
+        fireEvent.click(smoothPlot)
+
+        const popup = screen.getByTestId('zoomed-in-plot')
+        await waitForVega(popup)
+
+        // eslint-disable-next-line testing-library/no-node-access
+        const slider = popup.querySelector(
+          '.vega-bindings input[name="smooth"]'
+        )
+        expect(slider).toBeInTheDocument()
+
+        fireEvent.change(slider as HTMLInputElement, { target: { value: 0.4 } })
+
+        expect(mockPostMessage).not.toHaveBeenCalledWith({
+          payload: { [smoothId]: 0.4 },
+          type: MessageFromWebviewType.SET_SMOOTH_PLOT_VALUES
+        })
+      })
+    })
   })
 })

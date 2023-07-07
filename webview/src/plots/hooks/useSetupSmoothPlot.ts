@@ -8,7 +8,7 @@ interface VegaState {
   data?: unknown
 }
 
-export const useSetupSmoothPlot = (id: string) => {
+export const useSetupSmoothPlot = (id: string, isZoomedIn = false) => {
   const dispatch = useDispatch()
   const smoothPlotValues = useSelector(
     (state: PlotsState) => state.template.smoothPlotValues
@@ -27,6 +27,10 @@ export const useSetupSmoothPlot = (id: string) => {
         ...state,
         signals: { ...state.signals, smooth: defaultValue }
       })
+    }
+
+    if (isZoomedIn) {
+      return
     }
 
     const smoothRange = document.querySelector(

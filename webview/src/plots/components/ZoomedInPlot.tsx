@@ -20,7 +20,7 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   props
 }: ZoomedInPlotProps) => {
   const zoomedInPlotRef = useRef<HTMLDivElement>(null)
-  const onViewReady = useSetupSmoothPlot(id)
+  const onViewReady = useSetupSmoothPlot(id, true)
 
   useEffect(() => {
     const modalOpenClass = 'modalOpen'
