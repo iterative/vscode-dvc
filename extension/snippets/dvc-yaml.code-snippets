@@ -1,0 +1,54 @@
+{
+  "Get Started with DVC pipelines": {
+    "prefix": "dvc-help",
+    "body": [
+      "# The DVC for VS Code extension provides snippets to help with building dvc.yaml pipelines.",
+      "# These snippets, all prefixed with dvc-, are designed to give pointers on basic usage.",
+      "# Type dvc- in the editor to see the list of available snippets.",
+      "# Visit https://dvc.org/doc/user-guide/project-structure/dvcyaml-files for further details on building pipelines.",
+      "# On-hover information and completions will be provided for each of the keys in a dvc.yaml file if the redhat.yaml extension is installed."
+    ],
+    "description": "Information on the support provided for building dvc.yaml pipelines"
+  },
+  "Pipeline Stage Template": {
+    "prefix": "dvc-pipeline-stage",
+    "body": [
+      "  ${1:stage name}:",
+      "    cmd: ${2:command for the stage, e.g. python train.py}",
+      "    deps:",
+      "      - ${3:list dependencies for the stage, e.g. train.py}",
+      "    params:",
+      "      - ${4:list params file(s) for the stage, e.g params.yaml}",
+      "    metrics:",
+      "      - ${5:list metric file(s) for the stage, e.g metrics.json}",
+      "    outs:",
+      "      - ${6:list output(s) of the stage, e.g. model.pkl}"
+    ],
+    "description": "Stage template for dvc.yaml pipeline"
+  },
+  "Minimal Pipeline Stage Template": {
+    "prefix": "dvc-pipeline-minimal-stage",
+    "body": [
+      "  ${1:stage name}:",
+      "    cmd: ${2:command for the stage, e.g. python train.py}",
+      "    deps:",
+      "      - ${3:list dependencies for the stage, e.g. train.py}",
+      "    outs:",
+      "      - ${4:list output(s) of the stage, e.g. model.pkl}"
+    ],
+    "description": "Minimal stage template for dvc.yaml pipeline"
+  },
+  "Foreach Pipeline Stage Template": {
+    "prefix": "dvc-pipeline-foreach-stage",
+    "body": [
+      "  ${1:stage name}:",
+      "    foreach:",
+      "      - ${2:list of simple values to iterate over}",
+      "    do:",
+      "      cmd: ${3:command to be run for each templated item, e.g python evaluate.py} \"\\${item}\"",
+      "      outs:",
+      "      - \\${item}.${5:suffix for the templated output file, e.g. pkl}"
+    ],
+    "description": "Foreach stage template for dvc.yaml pipeline"
+  }
+}

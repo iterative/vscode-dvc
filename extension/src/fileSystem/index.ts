@@ -173,13 +173,13 @@ export const findOrCreateDvcYamlFile = (
     : format(parse(trainingScript))
 
   const pipeline = `
-# Read about DVC pipeline configuration (https://dvc.org/doc/user-guide/project-structure/dvcyaml-files#stages)
-# to customize your stages even more
+# Type dvc-help in this file and hit enter to get more information on how the extension can help to setup pipelines
 stages:
   ${stageName}:
     cmd: ${command} ${scriptPath}
     deps:
-      - ${scriptPath}`
+      - ${scriptPath}
+`
 
   void openFileInEditor(dvcYamlPath)
   return appendFileSync(dvcYamlPath, pipeline)
