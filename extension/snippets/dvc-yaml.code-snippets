@@ -106,5 +106,31 @@
       "      y_label: ${4: y label, e.g. accuracy}"
     ],
     "description": "Smooth dvc.yaml top level plot template"
+  },
+  "Artifact": {
+    "prefix": "dvc-artifact",
+    "body": [
+      "  ${1:artifact id, e.g. cv-data}:",
+      "    path: ${2:path to artifact, e.g. data/data.xml}",
+      "    type: ${3:type of artifact, e.g. data}",
+      "    desc: '${4:artifact description, e.g. Preprocessed data for CV classification}'",
+      "    labels:",
+      "      - ${5:list of labels, e.g. resnet50}"
+    ],
+    "description": "dvc.yaml artifact template"
+  },
+  "Model Artifact": {
+    "prefix": "dvc-artifact-model",
+    "body": [
+      "  ${1:artifact id, e.g. cv-classification}:",
+      "    path: ${2:path to model, e.g. models/resnet.pt}",
+      "    type: model",
+      "    desc: '${3:model description, e.g. CV classification model, ResNet50}'",
+      "    labels:",
+      "      - ${4:list of labels, e.g. resnet50}",
+      "    meta:",
+      "      framework: ${5:framework name, e.g. pytorch}"
+    ],
+    "description": "dvc.yaml model artifact template"
   }
 }
