@@ -41,7 +41,9 @@ export const TemplatePlots: React.FC = () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    setSmoothPlotValues(smoothPlotValues)
+    if (Object.keys(smoothPlotValues).length > 0) {
+      setSmoothPlotValues(smoothPlotValues)
+    }
   }, [smoothPlotValues])
 
   const sendReorderMessage = useCallback((sections: PlotGroup[]) => {
