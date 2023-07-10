@@ -7,13 +7,11 @@ import { TEMP_DAG_FILE } from '../cli/dvc/constants'
 
 export class Pipeline extends DeferredDisposable {
   private readonly dvcRoot: string
-  private readonly internalCommands: InternalCommands
   private readonly data: PipelineData
 
   constructor(dvcRoot: string, internalCommands: InternalCommands) {
     super()
     this.dvcRoot = dvcRoot
-    this.internalCommands = internalCommands
     this.data = this.dispose.track(new PipelineData(dvcRoot, internalCommands))
 
     void this.initialize()
