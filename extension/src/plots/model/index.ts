@@ -1,4 +1,5 @@
 import { Memento } from 'vscode'
+import { writeFileSync } from 'fs-extra'
 import {
   collectData,
   collectSelectedTemplatePlots,
@@ -59,6 +60,7 @@ import { isDvcError } from '../../cli/dvc/reader'
 import { ErrorsModel } from '../errors/model'
 import { openFileInEditor, writeJson } from '../../fileSystem'
 import { Toast } from '../../vscode/toast'
+import { PlotExportType } from '../../webview/contract'
 
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
@@ -227,7 +229,7 @@ export class PlotsModel extends ModelWithPersistence {
     return selectedRevisions
   }
 
-  public savePlotData(plotId: string, filePath: string) {
+  public savePlotData(plotId: string, filePath: string, type: PlotExportType) {
     const foundCustomPlot = this.customPlotsOrder.find(
       ({ metric, param }) => getCustomPlotId(metric, param) === plotId
     )
@@ -237,7 +239,12 @@ export class PlotsModel extends ModelWithPersistence {
       : this.getSelectedTemplatePlotData(plotId)
 
     try {
-      writeJson(filePath, rawData as unknown as Record<string, unknown>, true)
+      if (type === PlotExportType.JSON) {
+        writeJson(filePath, rawData as unknown as Record<string, unknown>, true)
+      } else {
+        // convert raw data to csv then add here
+        writeFileSync(filePath, 'csv data here')
+      }
       void openFileInEditor(filePath)
     } catch {
       void Toast.showError('Cannot write to file')

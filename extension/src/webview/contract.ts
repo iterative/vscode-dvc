@@ -94,13 +94,21 @@ export type PlotsTemplatesReordered = {
   paths: string[]
 }[]
 
+export enum PlotExportType {
+  JSON = 'json',
+  CSV = 'csv'
+}
+
 export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.ADD_CUSTOM_PLOT
     }
   | {
       type: MessageFromWebviewType.EXPORT_PLOT_DATA
-      payload: string
+      payload: {
+        id: string
+        type: PlotExportType
+      }
     }
   | {
       type: MessageFromWebviewType.REORDER_COLUMNS

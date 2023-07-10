@@ -16,6 +16,7 @@ import { EventName } from '../../telemetry/constants'
 import {
   MessageFromWebview,
   MessageFromWebviewType,
+  PlotExportType,
   PlotsTemplatesReordered
 } from '../../webview/contract'
 import { PlotsModel } from '../model'
@@ -83,7 +84,7 @@ export class WebviewMessages {
           this.dvcRoot
         )
       case MessageFromWebviewType.EXPORT_PLOT_DATA:
-        return this.exportPlotData(message.payload)
+        return this.exportPlotData(message.payload.id, message.payload.type)
       case MessageFromWebviewType.RESIZE_PLOTS:
         return this.setPlotSize(
           message.payload.section,
@@ -344,8 +345,10 @@ export class WebviewMessages {
     return this.plots.getCustomPlots() || null
   }
 
-  private async exportPlotData(plotId: string) {
-    const file = await showSaveDialog(Uri.file('data.json'), { JSON: ['json'] })
+  private async exportPlotData(plotId: string, type: PlotExportType) {
+    const file = await showSaveDialog(Uri.file(`data.${type}`), {
+      [type.toUpperCase()]: [type]
+    })
 
     if (!file) {
       return
@@ -357,6 +360,6 @@ export class WebviewMessages {
       undefined
     )
 
-    this.plots.savePlotData(plotId, file.path)
+    this.plots.savePlotData(plotId, file.path, type)
   }
 }

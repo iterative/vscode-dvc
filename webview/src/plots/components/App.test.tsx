@@ -32,7 +32,8 @@ import {
 } from 'dvc/src/plots/webview/contract'
 import {
   MessageFromWebviewType,
-  MessageToWebviewType
+  MessageToWebviewType,
+  PlotExportType
 } from 'dvc/src/webview/contract'
 import { act } from 'react-dom/test-utils'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
@@ -1455,14 +1456,17 @@ describe('App', () => {
 
     const modal = screen.getByTestId('modal')
 
-    const customAction = await within(modal).findByText('Save Raw Data')
+    const customAction = await within(modal).findByText('Save as JSON')
 
     expect(customAction).toBeInTheDocument()
 
     fireEvent.click(customAction)
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: complexTemplatePlotsFixture.plots[0].entries[0].id,
+      payload: {
+        id: complexTemplatePlotsFixture.plots[0].entries[0].id,
+        type: PlotExportType.JSON
+      },
       type: MessageFromWebviewType.EXPORT_PLOT_DATA
     })
   })

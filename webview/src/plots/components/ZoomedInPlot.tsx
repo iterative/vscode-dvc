@@ -4,6 +4,7 @@ import { Config } from 'vega-lite'
 import merge from 'lodash.merge'
 import cloneDeep from 'lodash.clonedeep'
 import { reverseOfLegendSuppressionUpdate } from 'dvc/src/plots/vega/util'
+import { PlotExportType } from 'dvc/src/webview/contract'
 import styles from './styles.module.scss'
 import { getThemeValue, ThemeProperty } from '../../util/styles'
 import { exportPlotData } from '../util/messages'
@@ -11,6 +12,20 @@ import { exportPlotData } from '../util/messages'
 type ZoomedInPlotProps = {
   id: string
   props: VegaLiteProps
+}
+
+const appendActionToVega = (
+  type: PlotExportType,
+  id: string,
+  vegaActions: HTMLDivElement
+) => {
+  const rawDataAction = document.createElement('a')
+  rawDataAction.textContent = `Save as ${type.toUpperCase()}`
+  rawDataAction.addEventListener('click', () => {
+    exportPlotData(id, type)
+  })
+  rawDataAction.classList.add(styles.vegaCustomAction)
+  vegaActions.append(rawDataAction)
 }
 
 export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
@@ -29,14 +44,13 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   }, [])
 
   const onNewView = () => {
-    const actions = zoomedInPlotRef.current?.querySelector('.vega-actions')
-    const rawDataAction = document.createElement('a')
-    rawDataAction.textContent = 'Save Raw Data'
-    rawDataAction.addEventListener('click', () => {
-      exportPlotData(id)
-    })
-    rawDataAction.classList.add(styles.vegaCustomAction)
-    actions?.append(rawDataAction)
+    const actions: HTMLDivElement | null | undefined =
+      zoomedInPlotRef.current?.querySelector('.vega-actions')
+    if (!actions) {
+      return
+    }
+    appendActionToVega(PlotExportType.JSON, id, actions)
+    appendActionToVega(PlotExportType.CSV, id, actions)
   }
 
   return (

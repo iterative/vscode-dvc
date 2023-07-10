@@ -35,7 +35,10 @@ import {
 } from '../../../plots/webview/contract'
 import { TEMP_PLOTS_DIR } from '../../../cli/dvc/constants'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
-import { MessageFromWebviewType } from '../../../webview/contract'
+import {
+  MessageFromWebviewType,
+  PlotExportType
+} from '../../../webview/contract'
 import { reorderObjectList, uniqueValues } from '../../../util/array'
 import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
@@ -499,7 +502,7 @@ suite('Plots Test Suite', () => {
       )
 
       mockMessageReceived.fire({
-        payload: templatePlot.id,
+        payload: { id: templatePlot.id, type: PlotExportType.JSON },
         type: MessageFromWebviewType.EXPORT_PLOT_DATA
       })
 
@@ -517,7 +520,7 @@ suite('Plots Test Suite', () => {
       )
 
       mockMessageReceived.fire({
-        payload: templatePlot.id,
+        payload: { id: templatePlot.id, type: PlotExportType.JSON },
         type: MessageFromWebviewType.EXPORT_PLOT_DATA
       })
 
@@ -562,7 +565,7 @@ suite('Plots Test Suite', () => {
       const customPlot = customPlotsFixture.plots[0]
 
       mockMessageReceived.fire({
-        payload: customPlot.id,
+        payload: { id: customPlot.id, type: PlotExportType.JSON },
         type: MessageFromWebviewType.EXPORT_PLOT_DATA
       })
 
@@ -612,7 +615,7 @@ suite('Plots Test Suite', () => {
       )
 
       mockMessageReceived.fire({
-        payload: templatePlot.id,
+        payload: { id: templatePlot.id, type: PlotExportType.JSON },
         type: MessageFromWebviewType.EXPORT_PLOT_DATA
       })
 
