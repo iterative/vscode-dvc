@@ -418,6 +418,11 @@
         "category": "DVC"
       },
       {
+        "title": "Show Pipeline DAG",
+        "command": "dvc.showPipelineDAG",
+        "category": "DVC"
+      },
+      {
         "title": "Show Plots",
         "command": "dvc.showPlots",
         "category": "DVC",

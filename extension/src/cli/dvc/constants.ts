@@ -3,6 +3,8 @@ import { join } from 'path'
 export const UNEXPECTED_ERROR_CODE = 255
 export const DOT_DVC = '.dvc'
 
+export const TEMP_DAG_FILE = join(DOT_DVC, 'tmp', 'dag.md')
+
 export const TEMP_PLOTS_DIR = join(DOT_DVC, 'tmp', 'plots')
 
 const TEMP_EXP_DIR = join(DOT_DVC, 'tmp', 'exps')
@@ -22,6 +24,7 @@ export enum Command {
   COMMIT = 'commit',
   CONFIG = 'config',
   DATA = 'data',
+  DAG = 'dag',
   EXPERIMENT = 'exp',
   INITIALIZE = 'init',
   MOVE = 'move',
@@ -59,6 +62,7 @@ export enum Flag {
   JSON = '--json',
   KILL = '--kill',
   LOCAL = '--local',
+  MD = '--md',
   PROJECT = '--project',
   NUM_COMMIT = '-n',
   OUTPUT_PATH = '-o',

@@ -32,6 +32,7 @@ export const isDvcError = <
   !!(Object.keys(dataOrError).length === 1 && (dataOrError as DvcError).error)
 
 export const autoRegisteredCommands = {
+  DAG: 'dag',
   DATA_STATUS: 'dataStatus',
   EXP_SHOW: 'expShow',
   GLOBAL_VERSION: 'globalVersion',
@@ -46,6 +47,10 @@ export class DvcReader extends DvcCli {
     autoRegisteredCommands,
     this
   )
+
+  public dag(cwd: string) {
+    return this.executeDvcProcess(cwd, Command.DAG, Flag.MD)
+  }
 
   public dataStatus(
     cwd: string,
