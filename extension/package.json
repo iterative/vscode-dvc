@@ -418,6 +418,11 @@
         "category": "DVC"
       },
       {
+        "title": "Show Pipeline DAG",
+        "command": "dvc.showPipelineDAG",
+        "category": "DVC"
+      },
+      {
         "title": "Show Plots",
         "command": "dvc.showPlots",
         "category": "DVC",
@@ -603,6 +608,11 @@
         },
         "dvc.doNotRecommendRedHatExtension": {
           "description": "Do not prompt to install the Red Hat YAML extension, which helps with DVC YAML schema validation.",
+          "type": "boolean",
+          "default": null
+        },
+        "dvc.doNotRecommendMermaidSupportExtension": {
+          "description": "Do not prompt to install the Markdown Preview Mermaid Support extension, which helps to visualize DVC pipeline DAGs",
           "type": "boolean",
           "default": null
         },
@@ -875,6 +885,10 @@
         {
           "command": "dvc.showCommands",
           "when": "false"
+        },
+        {
+          "command": "dvc.showPipelineDAG",
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.showExperiments",

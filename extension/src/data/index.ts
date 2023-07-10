@@ -17,7 +17,10 @@ export type ExperimentsOutput = {
 }
 
 export abstract class BaseData<
-  T extends { data: PlotsOutputOrError; revs: string[] } | ExperimentsOutput
+  T extends
+    | { data: PlotsOutputOrError; revs: string[] }
+    | ExperimentsOutput
+    | string
 > extends DeferredDisposable {
   public readonly onDidUpdate: Event<T>
   public readonly onDidChangeDvcYaml: Event<void>
@@ -102,6 +105,4 @@ export abstract class BaseData<
   }
 
   abstract managedUpdate(path?: string): Promise<unknown>
-
-  protected abstract collectFiles(data: T): void
 }

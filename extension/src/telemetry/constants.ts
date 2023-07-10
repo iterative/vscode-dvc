@@ -171,6 +171,8 @@ export interface IEventNamePropertyMapping {
   [EventName.MODIFY_WORKSPACE_PARAMS_RESET_AND_RUN]: undefined
   [EventName.STOP_EXPERIMENTS]: { stopped: boolean; wasRunning: boolean }
 
+  [EventName.PIPELINE_SHOW_DAG]: undefined
+
   [EventName.PLOTS_PATH_TOGGLE]: undefined
   [EventName.PLOTS_SHOW]: undefined
   [EventName.PLOTS_SELECT]: undefined
