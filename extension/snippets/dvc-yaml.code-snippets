@@ -6,7 +6,7 @@
       "# These snippets, all prefixed with dvc-, are designed to give pointers on basic usage.",
       "# Type dvc- in the editor to see the list of available snippets.",
       "# Visit https://dvc.org/doc/user-guide/project-structure/dvcyaml-files for further details on building pipelines.",
-      "# On-hover information and completions will be provided for each of the keys in a dvc.yaml file if the redhat.yaml extension is installed."
+      "# On-hover information and completions will be provided for each of the keys in a dvc.yaml file if the redhat.vscode-yaml extension is installed."
     ],
     "description": "Information on the support provided for building dvc.yaml pipelines"
   },
