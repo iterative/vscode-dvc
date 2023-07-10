@@ -16,14 +16,21 @@ export class Pipeline extends DeferredDisposable {
     this.internalCommands = internalCommands
     this.data = this.dispose.track(new PipelineData(dvcRoot, internalCommands))
 
+    void this.initialize()
+  }
+
+  public forceRerender() {
+    return appendFileSync(join(this.dvcRoot, TEMP_DAG_FILE), '\n')
+  }
+
+  private async initialize() {
     this.dispose.track(
       this.data.onDidUpdate(data =>
         writeFileSync(join(this.dvcRoot, TEMP_DAG_FILE), data)
       )
     )
-  }
 
-  public forceRerender() {
-    return appendFileSync(join(this.dvcRoot, TEMP_DAG_FILE), '\n')
+    await this.data.isReady()
+    return this.deferred.resolve()
   }
 }

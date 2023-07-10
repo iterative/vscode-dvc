@@ -105,6 +105,4 @@ export abstract class BaseData<
   }
 
   abstract managedUpdate(path?: string): Promise<unknown>
-
-  protected abstract collectFiles(data: T): void
 }

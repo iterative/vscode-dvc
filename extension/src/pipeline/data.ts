@@ -24,6 +24,4 @@ export class PipelineData extends BaseData<string> {
     )
     return this.notifyChanged(dag)
   }
-
-  protected collectFiles(): void {}
 }
