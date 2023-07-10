@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.15] - 2023-07-09
+
+### 🚀 New Features and Enhancements
+
+- Add dvc.yaml pipeline snippets [#4233](https://github.com/iterative/vscode-dvc/pull/4233) by [@mattseddon](https://github.com/mattseddon)
+- Add dvc.yaml top level plot snippets [#4234](https://github.com/iterative/vscode-dvc/pull/4234) by [@mattseddon](https://github.com/mattseddon)
+- Add dvc.yaml artifact snippets [#4235](https://github.com/iterative/vscode-dvc/pull/4235) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.14] - 2023-07-06
 
 ### 🚀 New Features and Enhancements
