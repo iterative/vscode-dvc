@@ -42,7 +42,7 @@ beforeEach(() => {
   mockedGetProcessEnv.mockReturnValueOnce(mockedEnv)
 })
 
-describe('CliReader', () => {
+describe('DvcReader', () => {
   mockedDisposable.fn.mockReturnValueOnce({
     track: function <T>(disposable: T): T {
       return disposable
@@ -69,6 +69,52 @@ describe('CliReader', () => {
       } as unknown as EventEmitter<CliStarted>
     }
   )
+
+  describe('dag', () => {
+    it('should match the expected output', async () => {
+      const cwd = __dirname
+      const dag = `\`\`\`mermaid
+      flowchart TD
+              node1["nested1/data/data.xml.dvc"]
+              node2["nested1/dvc.yaml:evaluate"]
+              node3["nested1/dvc.yaml:featurize"]
+              node4["nested1/dvc.yaml:prepare"]
+              node5["nested1/dvc.yaml:train"]
+              node1-->node4
+              node3-->node2
+              node3-->node5
+              node4-->node3
+              node5-->node2
+              node6["nested2/data/data.xml.dvc"]
+      \`\`\``
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(dag))
+
+      const cliOutput = await dvcReader.dag(cwd)
+      expect(cliOutput).toStrictEqual(dag)
+      expect(mockedCreateProcess).toHaveBeenCalledWith({
+        args: ['dag', '--md'],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+
+    it('should return the error if the cli returns any type of error', async () => {
+      const cwd = __dirname
+      const error = new Error('unexpected error - something something')
+      const unexpectedStderr = 'This is very unexpected'
+      ;(error as MaybeConsoleError).exitCode = UNEXPECTED_ERROR_CODE
+      ;(error as MaybeConsoleError).stderr = unexpectedStderr
+      mockedCreateProcess.mockImplementationOnce(() => {
+        throw error
+      })
+
+      const cliOutput = await dvcReader.dag(cwd)
+      expect(cliOutput).toStrictEqual(
+        'Error: unexpected error - something something'
+      )
+    })
+  })
 
   describe('expShow', () => {
     it('should match the expected output', async () => {

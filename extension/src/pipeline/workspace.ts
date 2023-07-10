@@ -24,7 +24,7 @@ export class WorkspacePipeline extends BaseWorkspace<Pipeline> {
           MARKDOWN_MERMAID_EXTENSION_ID
         )
         if (!wasMermaidInstalled && this.isMermaidSupportInstalled) {
-          this.renderDAGAsMermaid()
+          this.renderDagAsMermaid()
         }
       })
     )
@@ -55,7 +55,7 @@ export class WorkspacePipeline extends BaseWorkspace<Pipeline> {
     )
   }
 
-  private renderDAGAsMermaid() {
+  private renderDagAsMermaid() {
     for (const dvcRoot of this.getDvcRoots()) {
       void this.getRepository(dvcRoot).forceRerender()
     }

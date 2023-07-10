@@ -48,8 +48,12 @@ export class DvcReader extends DvcCli {
     this
   )
 
-  public dag(cwd: string) {
-    return this.executeDvcProcess(cwd, Command.DAG, Flag.MD)
+  public async dag(cwd: string) {
+    try {
+      return await this.executeDvcProcess(cwd, Command.DAG, Flag.MD)
+    } catch (error: unknown) {
+      return (error as Error).toString()
+    }
   }
 
   public dataStatus(
