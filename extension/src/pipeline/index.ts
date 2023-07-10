@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { writeFileSync } from 'fs-extra'
+import { appendFileSync, writeFileSync } from 'fs-extra'
 import { PipelineData } from './data'
 import { DeferredDisposable } from '../class/deferred'
 import { InternalCommands } from '../commands/internal'
@@ -21,5 +21,9 @@ export class Pipeline extends DeferredDisposable {
         writeFileSync(join(this.dvcRoot, TEMP_DAG_FILE), data)
       )
     )
+  }
+
+  public forceRerender() {
+    return appendFileSync(join(this.dvcRoot, TEMP_DAG_FILE), '\n')
   }
 }
