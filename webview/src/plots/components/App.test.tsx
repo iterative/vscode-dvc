@@ -2153,10 +2153,12 @@ describe('App', () => {
           ).toHaveValue('0.4')
         )
 
-        expect(mockPostMessage).toHaveBeenCalledWith({
-          payload: { [smoothId]: 0.4 },
-          type: MessageFromWebviewType.SET_SMOOTH_PLOT_VALUES
-        })
+        await waitFor(() =>
+          expect(mockPostMessage).toHaveBeenCalledWith({
+            payload: { [smoothId]: 0.4 },
+            type: MessageFromWebviewType.SET_SMOOTH_PLOT_VALUES
+          })
+        )
       })
 
       it('should set a vega panel slider value when given a default value', async () => {
