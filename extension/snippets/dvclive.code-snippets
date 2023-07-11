@@ -15,7 +15,6 @@
     "body": [
       "from dvclive.fastai import DVCLiveCallback",
       "",
-      "learn = tabular_learner(${1:data_loader}, metrics=${2:accuracy})",
       "learn.fit_one_cycle(",
       "    n_epoch=${3:2},",
       "    cbs=[DVCLiveCallback()])"
