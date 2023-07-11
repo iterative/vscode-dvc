@@ -1,5 +1,5 @@
 import { TemplatePlotGroup } from 'dvc/src/plots/webview/contract'
-import React, { DragEvent, useState, useCallback, useEffect } from 'react'
+import React, { DragEvent, useState, useCallback } from 'react'
 import cx from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
 import { AddedSection } from './AddedSection'
@@ -15,7 +15,7 @@ import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 import { isSameGroup } from '../../../shared/components/dragDrop/DragDropContainer'
 import { changeOrderWithDraggedInfo } from '../../../util/array'
 import { LoadingSection, sectionIsLoading } from '../LoadingSection'
-import { reorderTemplatePlots, setSmoothPlotValues } from '../../util/messages'
+import { reorderTemplatePlots } from '../../util/messages'
 
 export enum NewSectionBlock {
   TOP = 'drop-section-top',
@@ -23,7 +23,7 @@ export enum NewSectionBlock {
 }
 
 export const TemplatePlots: React.FC = () => {
-  const { nbItemsPerRow, sections, hasItems, smoothPlotValues } = useSelector(
+  const { nbItemsPerRow, sections, hasItems } = useSelector(
     (state: PlotsState) => state.template
   )
 
@@ -39,12 +39,6 @@ export const TemplatePlots: React.FC = () => {
 
   const [hoveredSection, setHoveredSection] = useState('')
   const dispatch = useDispatch()
-
-  useEffect(() => {
-    if (Object.keys(smoothPlotValues).length > 0) {
-      setSmoothPlotValues(smoothPlotValues)
-    }
-  }, [smoothPlotValues])
 
   const sendReorderMessage = useCallback((sections: PlotGroup[]) => {
     reorderTemplatePlots(sections)

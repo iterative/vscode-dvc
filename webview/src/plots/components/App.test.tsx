@@ -2183,7 +2183,7 @@ describe('App', () => {
         expect(slider).toHaveValue('0.6')
       })
 
-      it('should not send a message to save the value when a zoomed in plot vega panel slider is interacted with', async () => {
+      it('should send a message to save the value when a zoomed in plot vega panel slider is interacted with', async () => {
         renderAppWithOptionalData({ template: withVegaPanels })
 
         const smoothPlot = within(
@@ -2202,7 +2202,7 @@ describe('App', () => {
 
         fireEvent.change(slider as HTMLInputElement, { target: { value: 0.4 } })
 
-        expect(mockPostMessage).not.toHaveBeenCalledWith({
+        expect(mockPostMessage).toHaveBeenCalledWith({
           payload: { [smoothId]: 0.4 },
           type: MessageFromWebviewType.SET_SMOOTH_PLOT_VALUES
         })

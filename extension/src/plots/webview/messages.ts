@@ -203,6 +203,7 @@ export class WebviewMessages {
 
   private setSmoothPlotValues(values: SmoothPlotValues) {
     this.plots.setSmoothPlotValues(values)
+    this.sendTemplatePlots()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_SET_SMOOTH_PLOT_VALUES,
       undefined,

@@ -4,13 +4,13 @@ import React, { useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { VisualizationSpec } from 'react-vega'
 import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
+import { TemplateVegaLite } from './templatePlots/TemplateVegaLite'
 import { setZoomedInPlot } from './webviewSlice'
 import styles from './styles.module.scss'
 import { config } from './constants'
 import { zoomPlot } from '../util/messages'
 import { useGetPlot } from '../hooks/useGetPlot'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
-import { useSetupSmoothPlot } from '../hooks/useSetupSmoothPlot'
 
 interface ZoomablePlotProps {
   spec?: VisualizationSpec
@@ -28,10 +28,13 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   onViewReady,
   section
 }) => {
-  const { data, content: spec } = useGetPlot(section, id, createdSpec)
+  const {
+    data,
+    content: spec,
+    isCustomPlot
+  } = useGetPlot(section, id, createdSpec)
   const dispatch = useDispatch()
   const currentPlotProps = useRef<VegaLiteProps>()
-  const onPlotViewReady = useSetupSmoothPlot(id)
 
   const plotProps: VegaLiteProps = {
     actions: false,
@@ -45,33 +48,43 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
 
   useEffect(() => {
     dispatch(
-      setZoomedInPlot({ id, plot: currentPlotProps.current, refresh: true })
+      setZoomedInPlot({
+        id,
+        isCustomPlot,
+        plot: currentPlotProps.current,
+        refresh: true
+      })
     )
-  }, [data, spec, dispatch, id])
+  }, [data, spec, dispatch, id, isCustomPlot])
 
   const handleOnClick = () => {
     zoomPlot()
-    return dispatch(setZoomedInPlot({ id, plot: plotProps }))
+    return dispatch(setZoomedInPlot({ id, isCustomPlot, plot: plotProps }))
   }
 
   if (!data && !spec) {
     return null
   }
 
+  const onNewView = () => {
+    if (onViewReady) {
+      onViewReady()
+    }
+  }
+
   return (
     <button className={styles.zoomablePlot} onClick={handleOnClick}>
       <GripIcon className={styles.plotGripIcon} />
-      {currentPlotProps.current && (
-        <VegaLite
-          {...plotProps}
-          onNewView={view => {
-            onPlotViewReady(view)
-            if (onViewReady) {
-              onViewReady()
-            }
-          }}
-        />
-      )}
+      {currentPlotProps.current &&
+        (isCustomPlot ? (
+          <VegaLite {...plotProps} onNewView={onNewView} />
+        ) : (
+          <TemplateVegaLite
+            vegaLiteProps={plotProps}
+            id={id}
+            onNewView={onNewView}
+          />
+        ))}
     </button>
   )
 }

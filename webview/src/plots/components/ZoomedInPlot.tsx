@@ -1,26 +1,26 @@
-import { View } from 'react-vega'
 import React, { useEffect, useRef } from 'react'
 import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
 import { Config } from 'vega-lite'
 import merge from 'lodash.merge'
 import cloneDeep from 'lodash.clonedeep'
 import { reverseOfLegendSuppressionUpdate } from 'dvc/src/plots/vega/util'
+import { TemplateVegaLite } from './templatePlots/TemplateVegaLite'
 import styles from './styles.module.scss'
 import { getThemeValue, ThemeProperty } from '../../util/styles'
 import { exportPlotData } from '../util/messages'
-import { useSetupSmoothPlot } from '../hooks/useSetupSmoothPlot'
 
 type ZoomedInPlotProps = {
   id: string
   props: VegaLiteProps
+  isCustomPlot: boolean
 }
 
 export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   id,
-  props
+  props,
+  isCustomPlot
 }: ZoomedInPlotProps) => {
   const zoomedInPlotRef = useRef<HTMLDivElement>(null)
-  const onViewReady = useSetupSmoothPlot(id, true)
 
   useEffect(() => {
     const modalOpenClass = 'modalOpen'
@@ -31,8 +31,7 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
     }
   }, [])
 
-  const onNewView = (view: View) => {
-    onViewReady(view)
+  const onNewView = () => {
     const actions = zoomedInPlotRef.current?.querySelector('.vega-actions')
     const rawDataAction = document.createElement('a')
     rawDataAction.textContent = 'Save Raw Data'
@@ -43,26 +42,35 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
     actions?.append(rawDataAction)
   }
 
+  const vegaLiteProps = {
+    ...merge({ ...cloneDeep(props) }, reverseOfLegendSuppressionUpdate()),
+    actions: {
+      compiled: false,
+      editor: false,
+      export: true,
+      source: false
+    },
+    config: {
+      ...(props.config as Config),
+      background: getThemeValue(ThemeProperty.MENU_BACKGROUND)
+    }
+  }
+
   return (
     <div
       className={styles.zoomedInPlot}
       data-testid="zoomed-in-plot"
       ref={zoomedInPlotRef}
     >
-      <VegaLite
-        {...merge({ ...cloneDeep(props) }, reverseOfLegendSuppressionUpdate())}
-        config={{
-          ...(props.config as Config),
-          background: getThemeValue(ThemeProperty.MENU_BACKGROUND)
-        }}
-        actions={{
-          compiled: false,
-          editor: false,
-          export: true,
-          source: false
-        }}
-        onNewView={onNewView}
-      />
+      {isCustomPlot ? (
+        <VegaLite {...vegaLiteProps} onNewView={onNewView} />
+      ) : (
+        <TemplateVegaLite
+          id={id}
+          vegaLiteProps={vegaLiteProps}
+          onNewView={onNewView}
+        />
+      )}
     </div>
   )
 }

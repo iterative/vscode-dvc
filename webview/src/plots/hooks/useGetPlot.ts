@@ -47,5 +47,5 @@ export const useGetPlot = (
     setPlotData()
   }, [snapshot, setPlotData])
 
-  return { content, data }
+  return { content, data, isCustomPlot }
 }

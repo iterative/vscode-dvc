@@ -53,13 +53,6 @@ export const templatePlotsSlice = createSlice({
     setCollapsed: (state, action: PayloadAction<boolean>) => {
       state.isCollapsed = action.payload
     },
-    setSmoothPlotValue: (
-      state,
-      action: PayloadAction<{ id: string; value: number }>
-    ) => {
-      const { id, value } = action.payload
-      state.smoothPlotValues[id] = value
-    },
     update: (state, action: PayloadAction<TemplatePlotsData>) => {
       if (!action.payload) {
         return templatePlotsInitialState
@@ -105,8 +98,7 @@ export const {
   setCollapsed,
   changeSize,
   changeDisabledDragIds,
-  updateSections,
-  setSmoothPlotValue
+  updateSections
 } = templatePlotsSlice.actions
 
 export default templatePlotsSlice.reducer
