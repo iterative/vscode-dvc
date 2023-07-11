@@ -1399,6 +1399,10 @@
       {
         "language": "yaml",
         "path": "./snippets/dvc-yaml.code-snippets"
+      },
+      {
+        "language": "python",
+        "path": "./snippets/dvclive.code-snippets"
       }
     ],
     "viewsContainers": {

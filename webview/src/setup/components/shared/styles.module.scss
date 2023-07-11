@@ -1,3 +1,5 @@
+@import '../../../shared/variables';
+
 .codeBlock {
   text-align: left;
   padding: 10px;
@@ -11,4 +13,9 @@
   background-color: transparent !important;
   padding: 0;
   min-width: 0;
+}
+
+.infoIcon {
+  fill: $accent-color;
+  margin-bottom: -3px;
 }
