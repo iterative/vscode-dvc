@@ -2141,7 +2141,11 @@ describe('App', () => {
         )
         expect(slider).toBeInTheDocument()
 
-        fireEvent.change(slider as HTMLInputElement, { target: { value: 0.4 } })
+        fireEvent.change(slider as HTMLInputElement, {
+          target: { value: 0.4 }
+        })
+
+        await new Promise(process.nextTick)
 
         expect(mockPostMessage).toHaveBeenCalledWith({
           payload: { [smoothId]: 0.4 },
