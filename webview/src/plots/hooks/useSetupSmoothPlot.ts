@@ -38,10 +38,11 @@ export const useSetupSmoothPlot = (id: string, isZoomedIn = false) => {
     )
     smoothRange?.addEventListener('change', (event: Event) => {
       if (event.target) {
+        const value = Number((event.target as HTMLInputElement).value)
         dispatch(
           setSmoothPlotValue({
             id,
-            value: Number((event.target as HTMLInputElement).value)
+            value
           })
         )
       }

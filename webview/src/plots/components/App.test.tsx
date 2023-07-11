@@ -2140,12 +2140,11 @@ describe('App', () => {
           '.vega-bindings input[name="smooth"]'
         )
         expect(slider).toBeInTheDocument()
+        mockPostMessage.mockReset()
 
         fireEvent.change(slider as HTMLInputElement, {
           target: { value: 0.4 }
         })
-
-        await new Promise(process.nextTick)
 
         expect(mockPostMessage).toHaveBeenCalledWith({
           payload: { [smoothId]: 0.4 },
