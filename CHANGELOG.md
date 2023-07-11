@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.16] - 2023-07-11
+
+### 🚀 New Features and Enhancements
+
+- Display DAG in Markdown Preview editor [#4244](https://github.com/iterative/vscode-dvc/pull/4244) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Correct extension reference in snippet [#4245](https://github.com/iterative/vscode-dvc/pull/4245) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (3.5.0) [#4251](https://github.com/iterative/vscode-dvc/pull/4251) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.15] - 2023-07-09
 
 ### 🚀 New Features and Enhancements
