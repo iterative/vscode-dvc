@@ -1060,21 +1060,23 @@ suite('Plots Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: {
-          [templatePlot.id]: 0.5
+          id: templatePlot.id,
+          value: 0.5
         },
-        type: MessageFromWebviewType.SET_SMOOTH_PLOT_VALUES
+        type: MessageFromWebviewType.SET_SMOOTH_PLOT_VALUE
       })
 
       expect(mockSendTelemetryEvent).to.be.called
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_PLOTS_SET_SMOOTH_PLOT_VALUES,
+        EventName.VIEWS_PLOTS_SET_SMOOTH_PLOT_VALUE,
         undefined,
         undefined
       )
       expect(mockSetSmoothPlotValues).to.be.called
-      expect(mockSetSmoothPlotValues).to.be.calledWithExactly({
-        [templatePlot.id]: 0.5
-      })
+      expect(mockSetSmoothPlotValues).to.be.calledWithExactly(
+        templatePlot.id,
+        0.5
+      )
     })
 
     it('should handle the CLI throwing an error', async () => {

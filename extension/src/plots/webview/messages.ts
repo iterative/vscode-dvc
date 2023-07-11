@@ -7,8 +7,7 @@ import {
   PlotsData as TPlotsData,
   PlotsSection,
   SectionCollapsed,
-  Revision,
-  SmoothPlotValues
+  Revision
 } from './contract'
 import { Logger } from '../../common/logger'
 import { Experiments } from '../../experiments'
@@ -117,8 +116,11 @@ export class WebviewMessages {
         )
       case MessageFromWebviewType.TOGGLE_EXPERIMENT:
         return this.setExperimentStatus(message.payload)
-      case MessageFromWebviewType.SET_SMOOTH_PLOT_VALUES:
-        return this.setSmoothPlotValues(message.payload)
+      case MessageFromWebviewType.SET_SMOOTH_PLOT_VALUE:
+        return this.setSmoothPlotValues(
+          message.payload.id,
+          message.payload.value
+        )
       case MessageFromWebviewType.ZOOM_PLOT:
         if (message.payload) {
           const imagePath = this.revertCorrectUrl(message.payload)
@@ -201,11 +203,11 @@ export class WebviewMessages {
     )
   }
 
-  private setSmoothPlotValues(values: SmoothPlotValues) {
-    this.plots.setSmoothPlotValues(values)
+  private setSmoothPlotValues(id: string, value: number) {
+    this.plots.setSmoothPlotValues(id, value)
     this.sendTemplatePlots()
     sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_SET_SMOOTH_PLOT_VALUES,
+      EventName.VIEWS_PLOTS_SET_SMOOTH_PLOT_VALUE,
       undefined,
       undefined
     )

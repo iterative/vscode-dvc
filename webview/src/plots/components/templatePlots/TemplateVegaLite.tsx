@@ -41,6 +41,21 @@ export const TemplateVegaLite = ({
     }
   }, [smoothPlotValues, id])
 
+  const addRangeEventListener = () => {
+    const smoothRange = plotWrapperEl.current?.querySelector(
+      'input[name="smooth"]'
+    )
+
+    smoothRange?.addEventListener('change', (event: Event) => {
+      if (event.target) {
+        setSmoothPlotValues(
+          id,
+          Number((event.target as HTMLInputElement).value)
+        )
+      }
+    })
+  }
+
   return (
     <span ref={plotWrapperEl}>
       <VegaLite
@@ -62,17 +77,7 @@ export const TemplateVegaLite = ({
             })
           }
 
-          const smoothRange = plotWrapperEl.current?.querySelector(
-            'input[name="smooth"]'
-          )
-
-          smoothRange?.addEventListener('change', (event: Event) => {
-            if (event.target) {
-              setSmoothPlotValues({
-                [id]: Number((event.target as HTMLInputElement).value)
-              })
-            }
-          })
+          addRangeEventListener()
         }}
       />
     </span>

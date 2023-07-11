@@ -93,10 +93,10 @@ export const togglePlotsSection = (
     type: MessageFromWebviewType.TOGGLE_PLOTS_SECTION
   })
 
-export const setSmoothPlotValues = (values: { [key: string]: number }) => {
+export const setSmoothPlotValues = (id: string, value: number) => {
   sendMessage({
-    payload: values,
-    type: MessageFromWebviewType.SET_SMOOTH_PLOT_VALUES
+    payload: { id, value },
+    type: MessageFromWebviewType.SET_SMOOTH_PLOT_VALUE
   })
 }
 
