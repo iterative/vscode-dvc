@@ -1,0 +1,111 @@
+{
+  "DVCLive Catalyst": {
+    "prefix": "dvclive-catalyst",
+    "body": [
+      "from dvclive.catalyst import DVCLiveCallback",
+      "",
+      "runner.train(",
+      "    model=${1:model}, criterion=${2:criterion}, optimizer=${3:optimizer}, loaders=${4:loaders},",
+      "    callbacks=[DVCLiveCallback()])"
+    ],
+    "description": "DVCLive Catalyst callback"
+  },
+  "DVCLive Fast.ai": {
+    "prefix": "dvclive-fastai",
+    "body": [
+      "from dvclive.fastai import DVCLiveCallback",
+      "",
+      "learn = tabular_learner(${1:data_loader}, metrics=${2:accuracy})",
+      "learn.fit_one_cycle(",
+      "    n_epoch=${3:2},",
+      "    cbs=[DVCLiveCallback()])"
+    ],
+    "description": "DVCLive Fast.ai callback"
+  },
+  "DVCLive Hugging Face": {
+    "prefix": "dvclive-huggingface",
+    "body": [
+      "from dvclive.huggingface import DVCLiveCallback",
+      "",
+      "trainer = Trainer(",
+      "    ${1:model}, ${2:args},",
+      "    train_dataset=${3:train_data},",
+      "    eval_dataset=${4:eval_data},",
+      "    tokenizer=${5:tokenizer},",
+      "    compute_metrics=${6:compute_metrics},",
+      ")",
+      "trainer.add_callback(DVCLiveCallback(save_dvc_exp=True))",
+      "trainer.train()"
+    ],
+    "description": "DVCLive Hugging Face callback"
+  },
+  "DVCLive Keras": {
+    "prefix": "dvclive-keras",
+    "body": [
+      "from dvclive.keras import DVCLiveCallback",
+      "",
+      "model.fit(",
+      "    ${1:train_dataset}, epochs=${2:num_epochs}, validation_data=${3:validation_dataset},",
+      "    callbacks=[DVCLiveCallback(save_dvc_exp=True)])"
+    ],
+    "description": "DVCLive Keras callback"
+  },
+  "DVCLive LightGBM": {
+    "prefix": "dvclive-lightgbm",
+    "body": [
+      "from dvclive.lgbm import DVCLiveCallback",
+      "",
+      "lightgbm.train(",
+      "  ${1:param}, ${2:train_data}, valid_sets=[${3:validation_data}], num_round=${4:5},",
+      "  callbacks=[DVCLiveCallback(save_dvc_exp=True)])"
+    ],
+    "description": "DVCLive LightGBM callback"
+  },
+  "DVCLive Optuna": {
+    "prefix": "dvclive-optuna",
+    "body": [
+      "from dvclive.optuna import DVCLiveCallback",
+      "",
+      "study.optimize(",
+      "    ${1:objective}, n_trials=${2:7}, callbacks=[DVCLiveCallback()])"
+    ],
+    "description": "DVCLive Optuna callback"
+  },
+  "DVCLive Pytorch Lightning": {
+    "prefix": "dvclive-pytorch-lightning",
+    "body": [
+      "import lightning.pytorch as pl",
+      "from dvclive.lightning import DVCLiveLogger",
+      "",
+      "class LitModule(pl.LightningModule):",
+      "    def __init__(self, layer_1_dim=${1:128}, learning_rate=${2:1e-2}):",
+      "        super().__init__()",
+      "        # layer_1_dim and learning_rate will be logged by DVCLive",
+      "        self.save_hyperparameters()",
+      "",
+      "    def training_step(self, batch, batch_idx):",
+      "        metric = ${3:...}",
+      "        # See Output Format bellow",
+      "        self.log(${4:\"train_metric\"}, ${5:metric}, on_step=${6:False}, on_epoch=${7:True})",
+      "",
+      "dvclive_logger = DVCLiveLogger(save_dvc_exp=True)",
+      "",
+      "model = LitModule()",
+      "trainer = pl.Trainer(logger=dvclive_logger)",
+      "trainer.fit(model)"
+    ],
+    "description": "DVCLive Pytorch Lightning example"
+  },
+  "DVCLive XGBoost": {
+    "prefix": "dvclive-xgboost",
+    "body": [
+      "from dvclive.xgb import DVCLiveCallback",
+      "",
+      "xgboost.train(",
+      "    ${1:param}, ${2:dtrain}, num_round=${3:5}, evals=[${4:(dval, \"eval_data\")}]",
+      "    callbacks=[DVCLiveCallback(${5:\"eval_data\"}, save_dvc_exp=True)],",
+      ")"
+    ],
+    "description": "DVCLive XGBoost callback"
+  }
+}
