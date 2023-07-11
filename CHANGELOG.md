@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.17] - 2023-07-11
+
+### 🚀 New Features and Enhancements
+
+- Apply product feedback to dvc.yaml snippets [#4255](https://github.com/iterative/vscode-dvc/pull/4255) by [@mattseddon](https://github.com/mattseddon)
+- Add DVCLive snippets [#4258](https://github.com/iterative/vscode-dvc/pull/4258) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.5.1) [#4257](https://github.com/iterative/vscode-dvc/pull/4257) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.16] - 2023-07-11
 
 ### 🚀 New Features and Enhancements
