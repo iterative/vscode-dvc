@@ -490,6 +490,14 @@ suite('Plots Test Suite', () => {
       const mockOpenFile = stub(FileSystem, 'openFileInEditor')
       const exportFile = Uri.file('raw-data.json')
       const templatePlot = templatePlotsFixture.plots[0].entries[0]
+      const templatePlotValues = (
+        templatePlot.content.data as {
+          values: Array<{ dvc_data_version_info: unknown }>
+        }
+      ).values.map(val => {
+        delete val.dvc_data_version_info
+        return val
+      })
 
       const undefinedFileEvent = new Promise(resolve =>
         mockShowSaveDialog.onFirstCall().callsFake(() => {
@@ -526,7 +534,7 @@ suite('Plots Test Suite', () => {
       expect(mockWriteJson).to.be.calledOnce
       expect(mockWriteJson).to.be.calledWithExactly(
         exportFile.path,
-        (templatePlot.content.data as { values: unknown[] }).values,
+        templatePlotValues,
         true
       )
       expect(mockOpenFile).to.be.calledOnce

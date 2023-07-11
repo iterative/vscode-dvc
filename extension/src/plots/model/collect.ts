@@ -33,6 +33,7 @@ import {
 } from '../multiSource/collect'
 import { StrokeDashEncoding } from '../multiSource/constants'
 import { exists } from '../../fileSystem'
+import { hasKey } from '../../util/object'
 
 export const getCustomPlotId = (metric: string, param: string) =>
   `custom-${metric}-${param}`
@@ -472,7 +473,13 @@ export const collectSelectedTemplatePlotRawData = ({
     multiSourceEncodingUpdate
   )
 
-  return datapoints
+  return datapoints.map(datapoint => {
+    if (hasKey(datapoint, 'dvc_data_version_info')) {
+      delete (datapoint as { dvc_data_version_info: unknown })
+        .dvc_data_version_info
+    }
+    return datapoint
+  })
 }
 
 export const collectOrderedRevisions = (
