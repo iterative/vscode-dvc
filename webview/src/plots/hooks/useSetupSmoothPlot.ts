@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { View } from 'react-vega'
 import { setSmoothPlotValue } from '../components/templatePlots/templatePlotsSlice'
 import { PlotsState } from '../store'
+import { setSmoothPlotValues } from '../util/messages'
 
 interface VegaState {
   signals?: { [name: string]: number | undefined }
@@ -37,13 +38,13 @@ export const useSetupSmoothPlot = (id: string, isZoomedIn = false) => {
       `[id="${id}"] input[name="smooth"]`
     )
     smoothRange?.addEventListener('change', (event: Event) => {
-      if (event.target) {
-        dispatch(
-          setSmoothPlotValue({
-            id,
-            value: Number((event.target as HTMLInputElement).value)
-          })
-        )
+      const target = event.target
+      if (target) {
+        const value = Number((target as HTMLInputElement).value)
+        dispatch(setSmoothPlotValue({ id, value }))
+        setSmoothPlotValues({
+          [id]: value
+        })
       }
     })
   }
