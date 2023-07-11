@@ -2146,6 +2146,13 @@ describe('App', () => {
           target: { value: 0.4 }
         })
 
+        await waitFor(() =>
+          expect(
+            // eslint-disable-next-line testing-library/no-node-access
+            smoothPlot.querySelector('.vega-bindings input[name="smooth"]')
+          ).toHaveValue('0.4')
+        )
+
         expect(mockPostMessage).toHaveBeenCalledWith({
           payload: { [smoothId]: 0.4 },
           type: MessageFromWebviewType.SET_SMOOTH_PLOT_VALUES
