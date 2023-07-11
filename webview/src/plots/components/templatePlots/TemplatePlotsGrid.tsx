@@ -100,7 +100,6 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
           <div
             key={plot}
             id={plot}
-            data-id={plot}
             className={plotClassName}
             data-testid={`plot_${plot}`}
             style={withScale(colSpan)}

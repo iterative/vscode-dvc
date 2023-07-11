@@ -34,7 +34,7 @@ export const useSetupSmoothPlot = (id: string, isZoomedIn = false) => {
     }
 
     const smoothRange = document.querySelector(
-      `[data-id="${id}"] input[name="smooth"]`
+      `[id="${id}"] input[name="smooth"]`
     )
     smoothRange?.addEventListener('change', (event: Event) => {
       if (event.target) {
