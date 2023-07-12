@@ -31,6 +31,7 @@ import {
 } from '../fileSystem'
 import { quickPickManyValues, quickPickOneOrInput } from '../vscode/quickPick'
 import { pickFile } from '../vscode/resourcePicker'
+import { WorkspacePipeline } from '../pipeline/workspace'
 
 export enum scriptCommand {
   JUPYTER = 'jupyter nbconvert --to notebook --inplace --execute',
@@ -201,7 +202,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     if (!cwd) {
       return
     }
-    const shouldContinue = await this.checkOrAddPipeline(cwd)
+    const shouldContinue = await this.checkOrAddPipeline(cwd) // repository.getPipeLineCwd() -> !cwd return
     if (!shouldContinue) {
       return
     }
@@ -306,14 +307,18 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
   }
 
-  public createRepository(dvcRoot: string, resourceLocator: ResourceLocator) {
+  public createRepository(
+    dvcRoot: string,
+    pipeline: WorkspacePipeline,
+    resourceLocator: ResourceLocator
+  ) {
     const experiments = this.dispose.track(
       new Experiments(
         dvcRoot,
         this.internalCommands,
+        pipeline.getRepository(dvcRoot),
         resourceLocator,
         this.workspaceState,
-        () => this.checkOrAddPipeline(dvcRoot),
         (branchesSelected: string[]) => this.selectBranches(branchesSelected)
       )
     )
@@ -451,7 +456,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     if (!cwd) {
       return
     }
-    const shouldContinue = await this.checkOrAddPipeline(cwd)
+    const shouldContinue = await this.checkOrAddPipeline(cwd) // repository.getPipeLineCwd() -> !cwd return
     if (!shouldContinue) {
       return
     }

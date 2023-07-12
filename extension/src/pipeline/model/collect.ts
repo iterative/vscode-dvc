@@ -1,31 +1,33 @@
-import { join } from 'path'
 import { trimAndSplit } from '../../util/stdout'
 
-export const collectStages = (stageList: string): string[] => {
-  const stages: string[] = []
-  for (const stageStr of trimAndSplit(stageList)) {
-    const stage = stageStr.split(/\s+/)?.[0]?.trim()
-    if (!stage || stage.endsWith('.dvc')) {
-      continue
-    }
-    stages.push(stage)
-  }
-  return stages
-}
+export const collectStages = (pipelines: {
+  [pipeline: string]: string | undefined
+}): {
+  invalidPipelines: Set<string>
+  validPipelines: Set<string>
+  validStages: string[]
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+} => {
+  const validStages: string[] = []
+  const validPipelines = new Set<string>()
+  const invalidPipelines = new Set<string>()
 
-export const collectPipelines = (
-  dvcRoot: string,
-  stages: string[]
-): Set<string> => {
-  const dvcYamlIdentifier = '/dvc.yaml:'
-  const pipelines = new Set<string>()
-  for (const stage of stages) {
-    if (!stage.includes(dvcYamlIdentifier)) {
-      pipelines.add(dvcRoot)
+  for (const [pipeline, stageList] of Object.entries(pipelines)) {
+    if (stageList === undefined) {
+      invalidPipelines.add(pipeline)
+    }
+
+    if (!stageList) {
       continue
     }
-    const [pipeline] = stage.split(dvcYamlIdentifier)
-    pipelines.add(join(dvcRoot, ...pipeline.split('/')))
+    for (const stageStr of trimAndSplit(stageList)) {
+      const stage = stageStr.split(/\s+/)?.[0]?.trim()
+      if (!stage || stage.endsWith('.dvc')) {
+        continue
+      }
+      validStages.push(stage)
+      validPipelines.add(pipeline)
+    }
   }
-  return pipelines
+  return { invalidPipelines, validPipelines, validStages }
 }

@@ -20,10 +20,9 @@ export abstract class BaseData<
   T extends
     | { data: PlotsOutputOrError; revs: string[] }
     | ExperimentsOutput
-    | { dag: string; stageList: string }
+    | { dag: string; stages: { [pipeline: string]: string | undefined } }
 > extends DeferredDisposable {
   public readonly onDidUpdate: Event<T>
-  public readonly onDidChangeDvcYaml: Event<void>
 
   protected readonly dvcRoot: string
   protected readonly processManager: ProcessManager
@@ -34,10 +33,6 @@ export abstract class BaseData<
 
   private readonly updated: EventEmitter<T> = this.dispose.track(
     new EventEmitter()
-  )
-
-  private readonly dvcYamlChanged: EventEmitter<void> = this.dispose.track(
-    new EventEmitter<void>()
   )
 
   constructor(
@@ -55,8 +50,6 @@ export abstract class BaseData<
     this.internalCommands = internalCommands
     this.onDidUpdate = this.updated.event
     this.staticFiles = staticFiles
-
-    this.onDidChangeDvcYaml = this.dvcYamlChanged.event
 
     this.watchFiles()
 
@@ -96,13 +89,9 @@ export abstract class BaseData<
         ) {
           void this.managedUpdate(path)
         }
-
-        if (path.endsWith('dvc.yaml')) {
-          this.dvcYamlChanged.fire()
-        }
       }
     )
   }
 
-  abstract managedUpdate(path?: string): Promise<unknown>
+  abstract managedUpdate(path?: string): Promise<void>
 }

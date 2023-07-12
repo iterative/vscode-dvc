@@ -91,6 +91,8 @@ import { DEFAULT_NB_ITEMS_PER_ROW } from '../../../plots/webview/contract'
 import { Toast } from '../../../vscode/toast'
 import { Response } from '../../../vscode/response'
 import { MAX_SELECTED_EXPERIMENTS } from '../../../experiments/model/status'
+import { Pipeline } from '../../../pipeline'
+import { buildPipeline } from '../pipeline/util'
 
 const { openFileInEditor } = FileSystem
 
@@ -175,20 +177,24 @@ suite('Experiments Test Suite', () => {
       expect(windowSpy).not.to.have.been.called
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should set hasValidDvcYaml to false if there is an error getting stages and there is a dvc.yaml file', async () => {
-      stub(DvcReader.prototype, 'stageList').resolves(undefined)
-      stub(FileSystem, 'hasDvcYamlFile').returns(true)
+    it.only(
+      'should set hasValidDvcYaml to false if there is an error getting stages and there is a dvc.yaml file',
+      async () => {
+        stub(FileSystem, 'hasDvcYamlFile').returns(true)
 
-      const { experiments, messageSpy } = buildExperiments({
-        disposer: disposable
-      })
+        const { experiments, messageSpy, dvcReader } = buildExperiments({
+          disposer: disposable
+        })
 
-      await experiments.showWebview()
+        stub(dvcReader, 'stageList').resolves(undefined)
 
-      expect(messageSpy).to.be.calledWithMatch({
-        hasValidDvcYaml: false
-      })
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
+        await experiments.showWebview()
+
+        expect(messageSpy).to.be.calledWithMatch({
+          hasValidDvcYaml: false
+        })
+      }
+    ).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasValidDvcYaml to true if there is an error getting stages and there is no dvc.yaml file', async () => {
       stub(DvcReader.prototype, 'stageList').resolves(undefined)
@@ -236,9 +242,7 @@ suite('Experiments Test Suite', () => {
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should set hasConfig to true if there are stages', async () => {
-      stub(DvcReader.prototype, 'stageList').resolves('train')
-
+    it.only('should set hasConfig to true if there are stages', async () => {
       const { experiments, messageSpy } = buildExperiments({
         disposer: disposable
       })
@@ -1563,14 +1567,19 @@ suite('Experiments Test Suite', () => {
       const resourceLocator = disposable.track(
         new ResourceLocator(extensionUri)
       )
+      const pipeline = buildPipeline({
+        disposer: disposable,
+        dvcRoot: dvcDemoPath,
+        internalCommands
+      })
 
       const experiments = disposable.track(
         new Experiments(
           dvcDemoPath,
           internalCommands,
+          pipeline,
           resourceLocator,
           buildMockMemento(),
-          () => Promise.resolve(true),
           () => Promise.resolve([]),
           buildMockExperimentsData()
         )
@@ -1743,9 +1752,9 @@ suite('Experiments Test Suite', () => {
         new Experiments(
           'test',
           internalCommands,
+          { hasStage: () => true } as Pipeline,
           {} as ResourceLocator,
           mockMemento,
-          () => Promise.resolve(true),
           () => Promise.resolve([]),
           buildMockExperimentsData()
         )
@@ -1904,9 +1913,9 @@ suite('Experiments Test Suite', () => {
         new Experiments(
           'test',
           internalCommands,
+          { hasStage: () => true } as Pipeline,
           {} as ResourceLocator,
           mockMemento,
-          () => Promise.resolve(true),
           () => Promise.resolve([]),
           buildMockExperimentsData()
         )

@@ -1,7 +1,12 @@
+import { dirname } from 'path'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { BaseData } from '../data'
+import { findFiles } from '../fileSystem/workspace'
 
-export class PipelineData extends BaseData<{ dag: string; stageList: string }> {
+export class PipelineData extends BaseData<{
+  dag: string
+  stages: { [pipeline: string]: string | undefined }
+}> {
   constructor(dvcRoot: string, internalCommands: InternalCommands) {
     super(
       dvcRoot,
@@ -18,13 +23,26 @@ export class PipelineData extends BaseData<{ dag: string; stageList: string }> {
   }
 
   public async update(): Promise<void> {
-    const [dag, stageList] = await Promise.all([
+    const [dag, fileList] = await Promise.all([
       this.internalCommands.executeCommand(AvailableCommands.DAG, this.dvcRoot),
-      this.internalCommands.executeCommand(
-        AvailableCommands.STAGE_LIST,
-        this.dvcRoot
-      )
+      findFiles('**/dvc.yaml')
     ])
-    return this.notifyChanged({ dag, stageList })
+
+    const dvcYamlsDirs = new Set<string>()
+    for (const file of fileList) {
+      if (file.startsWith(this.dvcRoot)) {
+        dvcYamlsDirs.add(dirname(file))
+      }
+    }
+
+    const stages: { [dir: string]: string } = {}
+    for (const dir of dvcYamlsDirs) {
+      stages[dir] = await this.internalCommands.executeCommand(
+        AvailableCommands.STAGE_LIST,
+        dir
+      )
+    }
+
+    return this.notifyChanged({ dag, stages })
   }
 }

@@ -19,6 +19,7 @@ import { ColumnsModel } from '../../../experiments/columns/model'
 import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../../cli/dvc/constants'
 import { PersistenceKey } from '../../../persistence/constants'
 import { ExpShowOutput } from '../../../cli/dvc/contract'
+import { buildPipeline } from '../pipeline/util'
 
 export const DEFAULT_EXPERIMENTS_OUTPUT = {
   availableNbCommits: { main: 5 },
@@ -33,7 +34,8 @@ export const buildExperiments = ({
   dvcRoot = dvcDemoPath,
   expShow = expShowFixture,
   gitLog = gitLogFixture,
-  rowOrder = rowOrderFixture
+  rowOrder = rowOrderFixture,
+  stageList = 'train'
 }: {
   availableNbCommits?: { [branch: string]: number }
   disposer: Disposer
@@ -41,6 +43,7 @@ export const buildExperiments = ({
   expShow?: ExpShowOutput
   gitLog?: string
   rowOrder?: { branch: string; sha: string }[]
+  stageList?: string | null
 }) => {
   const {
     dvcExecutor,
@@ -60,7 +63,12 @@ export const buildExperiments = ({
   const mockExperimentsData = buildMockExperimentsData(
     mockUpdateExperimentsData
   )
-  const mockCheckOrAddPipeline = stub()
+
+  stub(dvcReader, 'stageList').resolves(stageList ?? undefined)
+  stub(dvcReader, 'dag').resolves('')
+
+  const pipeline = buildPipeline({ disposer, dvcRoot, internalCommands })
+  const mockCheckOrAddPipeline = stub(pipeline, 'checkOrAddPipeline')
   const mockSelectBranches = stub().resolves(['main', 'other'])
   const mockMemento = buildMockMemento({
     [`${PersistenceKey.EXPERIMENTS_BRANCHES}${dvcRoot}`]: ['main'],
@@ -73,9 +81,9 @@ export const buildExperiments = ({
     new Experiments(
       dvcRoot,
       internalCommands,
+      pipeline,
       resourceLocator,
       mockMemento,
-      mockCheckOrAddPipeline,
       mockSelectBranches,
       mockExperimentsData
     )
@@ -131,8 +139,17 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
       'other/dvc/root': mockExperiments
     })
   )
+
+  const pipeline = buildPipeline({
+    disposer,
+    dvcRoot: dvcDemoPath,
+    internalCommands
+  })
+  stub(pipeline, 'hasStage').returns(true)
+
   const [experiments] = workspaceExperiments.create(
     [dvcDemoPath],
+    { getRepository: () => pipeline },
     resourceLocator
   )
 
@@ -148,8 +165,15 @@ export const buildSingleRepoExperiments = (disposer: SafeWatcherDisposer) => {
   const workspaceExperiments = disposer.track(
     new WorkspaceExperiments(internalCommands, buildMockMemento())
   )
+  const pipeline = buildPipeline({
+    disposer,
+    dvcRoot: dvcDemoPath,
+    internalCommands
+  })
+
   const [experiments] = workspaceExperiments.create(
     [dvcDemoPath],
+    { getRepository: () => pipeline },
     resourceLocator
   )
 

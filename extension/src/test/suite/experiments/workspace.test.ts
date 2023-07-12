@@ -90,7 +90,7 @@ suite('Workspace Experiments Test Suite', () => {
       expect(mockQuickPickOne).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should not prompt to pick a project if there is only one project', async () => {
+    it.only('should not prompt to pick a project if there is only one project', async () => {
       const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
         dvcDemoPath
       )
