@@ -5875,15 +5875,15 @@
   resolved "https://registry.yarnpkg.com/@vscode/codicons/-/codicons-0.0.33.tgz#a56243ab5492801fff04e53c0aab0d18a6521751"
   integrity sha512-VdgpnD75swH9hpXjd34VBgQ2w2quK63WljodlUcOoJDPKiV+rPjHrcUc2sjLCNKxhl6oKqmsZgwOWcDAY2GKKQ==
 
-"@vscode/extension-telemetry@0.8.0":
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/@vscode/extension-telemetry/-/extension-telemetry-0.8.0.tgz#bccfec5d9b8e4aaed3c5d1eedd22ed7716f21d2c"
-  integrity sha512-ZJnMnFUFEP7kdBMYvzghhwnEoK1rMrypiEFqx+5BwHs1/RtZY/6Ta0hrQOj9THv+mG9FPwgqdVKdLvdCLSyWfQ==
+"@vscode/extension-telemetry@0.8.1":
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/@vscode/extension-telemetry/-/extension-telemetry-0.8.1.tgz#94e12092dc8f27249b98bbf843621b7588354b50"
+  integrity sha512-1p2wLUr6hLj5IPHPzGViq72yIHq5T63yo6OytVzU7tFjjYyuX0VSIriOIuESpYJFuqQ+ELEbJeN9ksF/pVE8xw==
   dependencies:
     "@microsoft/1ds-core-js" "^3.2.10"
     "@microsoft/1ds-post-js" "^3.2.10"
     "@microsoft/applicationinsights-web-basic" "^3.0.0"
-    applicationinsights "2.6.0"
+    applicationinsights "^2.7.0"
 
 "@vscode/test-electron@2.3.3":
   version "2.3.3"
@@ -6815,10 +6815,10 @@ append-transform@^2.0.0:
   dependencies:
     default-require-extensions "^3.0.0"
 
-applicationinsights@2.6.0:
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/applicationinsights/-/applicationinsights-2.6.0.tgz#4df8b3ab932e832878eea47075932368338ca74c"
-  integrity sha512-ldeFvbocbRoMxS361lOwmLL3ltWfgNxALrttge6BrpsPMTStGzevoiqaWieIjZ/3qNmljOd+xmwaNPpBoefdmA==
+applicationinsights@^2.7.0:
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/applicationinsights/-/applicationinsights-2.7.0.tgz#b397b750e788c010d564c3ef7f5ce6e62227b425"
+  integrity sha512-/vV5X6M4TlRA5NxNZAdCE0gukzfK24mb3z18D5Kl/CyIfSVIkafsIji3mK+Zi5q+7dn6H1CkFazlcnLf40anHw==
   dependencies:
     "@azure/core-auth" "^1.4.0"
     "@azure/core-rest-pipeline" "1.10.1"
