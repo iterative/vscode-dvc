@@ -2,7 +2,7 @@ import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore, spy, stub } from 'sinon'
-import { commands, Uri, window } from 'vscode'
+import { commands, TextDocument, Uri, window } from 'vscode'
 import isEqual from 'lodash.isequal'
 import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
@@ -478,7 +478,7 @@ suite('Plots Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle an export template plot data message from the webview', async () => {
+    it('should handle an export template plot data as json message from the webview', async () => {
       const { plots } = await buildPlots({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
@@ -542,7 +542,7 @@ suite('Plots Test Suite', () => {
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should handle an export custom plot data message from the webview', async () => {
+    it('should handle an export custom plot data as json message from the webview', async () => {
       const { plots } = await buildPlots({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
@@ -586,6 +586,53 @@ suite('Plots Test Suite', () => {
         undefined
       )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle an export template plot data as csv message from the webview', async () => {
+      const { plots } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
+
+      const webview = await plots.showWebview()
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockShowSaveDialog = stub(window, 'showSaveDialog')
+      const mockWriteCsv = stub(FileSystem, 'writeCsv')
+      const mockOpenFile = stub(FileSystem, 'openFileInEditor')
+      const exportFile = Uri.file('raw-data.csv')
+      const templatePlot = templatePlotsFixture.plots[0].entries[0]
+
+      mockShowSaveDialog.onFirstCall().resolves(exportFile)
+
+      const openFileEvent = new Promise(resolve =>
+        mockOpenFile.onFirstCall().callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined as unknown as TextDocument)
+        })
+      )
+
+      mockMessageReceived.fire({
+        payload: { id: templatePlot.id, type: PlotExportType.CSV },
+        type: MessageFromWebviewType.EXPORT_PLOT_DATA
+      })
+
+      await openFileEvent
+
+      expect(mockWriteCsv).to.be.calledOnce
+      expect(mockWriteCsv).to.be.calledWithExactly(
+        exportFile.path,
+        (templatePlot.content.data as { values: unknown[] }).values
+      )
+      expect(mockOpenFile).to.be.calledOnce
+      expect(mockOpenFile).to.calledWithExactly(exportFile.path)
+      expect(mockSendTelemetryEvent).to.be.called
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA,
+        undefined,
+        undefined
+      )
+    })
 
     it('should handle errors being thrown during file writing when exporting plot data', async () => {
       const { plots } = await buildPlots({

@@ -15,7 +15,8 @@ import {
   isSameOrChild,
   getModifiedTime,
   findOrCreateDvcYamlFile,
-  writeJson
+  writeJson,
+  writeCsv
 } from '.'
 import { dvcDemoPath } from '../test/util'
 import { DOT_DVC } from '../cli/dvc/constants'
@@ -67,6 +68,21 @@ describe('writeJson', () => {
     expect(mockedWriteFileSync).toHaveBeenCalledWith(
       'file-name.json',
       formattedJson
+    )
+  })
+})
+
+describe('writeCsv', () => {
+  it('should write csv into given file', async () => {
+    await writeCsv('file-name.csv', [
+      { nested: { string: 'string1' }, value: 3 },
+      { nested: { string: 'string2' }, value: 4 },
+      { nested: { string: 'string3' }, value: 6 }
+    ])
+
+    expect(mockedWriteFileSync).toHaveBeenCalledWith(
+      'file-name.csv',
+      'nested.string,value\nstring1,3\nstring2,4\nstring3,6'
     )
   })
 })

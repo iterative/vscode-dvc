@@ -1,5 +1,4 @@
 import { Memento } from 'vscode'
-import { writeFileSync } from 'fs-extra'
 import {
   collectData,
   collectSelectedTemplatePlots,
@@ -58,7 +57,7 @@ import {
 } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
 import { ErrorsModel } from '../errors/model'
-import { openFileInEditor, writeJson } from '../../fileSystem'
+import { openFileInEditor, writeCsv, writeJson } from '../../fileSystem'
 import { Toast } from '../../vscode/toast'
 import { PlotExportType } from '../../webview/contract'
 
@@ -229,7 +228,11 @@ export class PlotsModel extends ModelWithPersistence {
     return selectedRevisions
   }
 
-  public savePlotData(plotId: string, filePath: string, type: PlotExportType) {
+  public async savePlotData(
+    plotId: string,
+    filePath: string,
+    type: PlotExportType
+  ) {
     const foundCustomPlot = this.customPlotsOrder.find(
       ({ metric, param }) => getCustomPlotId(metric, param) === plotId
     )
@@ -242,8 +245,10 @@ export class PlotsModel extends ModelWithPersistence {
       if (type === PlotExportType.JSON) {
         writeJson(filePath, rawData as unknown as Record<string, unknown>, true)
       } else {
-        // convert raw data to csv then add here
-        writeFileSync(filePath, 'csv data here')
+        await writeCsv(
+          filePath,
+          rawData as unknown as Array<{ [key: string]: unknown }>
+        )
       }
       void openFileInEditor(filePath)
     } catch {
