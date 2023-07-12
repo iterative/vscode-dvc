@@ -6,7 +6,7 @@ import { VegaProps } from 'react-vega/lib/Vega'
 type ZoomedInPlotState = {
   plot: VegaProps | undefined
   id: string
-  isCustomPlot: boolean
+  isTemplatePlot: boolean
   refresh?: boolean
 }
 export interface WebviewState {
@@ -28,7 +28,7 @@ export const webviewInitialState: WebviewState = {
   selectedRevisions: [],
   zoomedInPlot: {
     id: '',
-    isCustomPlot: false,
+    isTemplatePlot: false,
     plot: undefined
   }
 }

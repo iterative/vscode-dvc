@@ -56,7 +56,7 @@ const PlotsContent = () => {
       }}
     >
       <ZoomedInPlot
-        isCustomPlot={zoomedInPlot.isCustomPlot}
+        isTemplatePlot={zoomedInPlot.isTemplatePlot}
         id={zoomedInPlot.id}
         props={zoomedInPlot.plot}
       />

@@ -12,13 +12,13 @@ import { exportPlotData } from '../util/messages'
 type ZoomedInPlotProps = {
   id: string
   props: VegaLiteProps
-  isCustomPlot: boolean
+  isTemplatePlot: boolean
 }
 
 export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   id,
   props,
-  isCustomPlot
+  isTemplatePlot
 }: ZoomedInPlotProps) => {
   const zoomedInPlotRef = useRef<HTMLDivElement>(null)
 
@@ -62,14 +62,14 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
       data-testid="zoomed-in-plot"
       ref={zoomedInPlotRef}
     >
-      {isCustomPlot ? (
-        <VegaLite {...vegaLiteProps} onNewView={onNewView} />
-      ) : (
+      {isTemplatePlot ? (
         <TemplateVegaLite
           id={id}
           vegaLiteProps={vegaLiteProps}
           onNewView={onNewView}
         />
+      ) : (
+        <VegaLite {...vegaLiteProps} onNewView={onNewView} />
       )}
     </div>
   )

@@ -31,7 +31,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   const {
     data,
     content: spec,
-    isCustomPlot
+    isTemplatePlot
   } = useGetPlot(section, id, createdSpec)
   const dispatch = useDispatch()
   const currentPlotProps = useRef<VegaLiteProps>()
@@ -50,16 +50,16 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
     dispatch(
       setZoomedInPlot({
         id,
-        isCustomPlot,
+        isTemplatePlot,
         plot: currentPlotProps.current,
         refresh: true
       })
     )
-  }, [data, spec, dispatch, id, isCustomPlot])
+  }, [data, spec, dispatch, id, isTemplatePlot])
 
   const handleOnClick = () => {
     zoomPlot()
-    return dispatch(setZoomedInPlot({ id, isCustomPlot, plot: plotProps }))
+    return dispatch(setZoomedInPlot({ id, isTemplatePlot, plot: plotProps }))
   }
 
   if (!data && !spec) {
@@ -76,14 +76,14 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
     <button className={styles.zoomablePlot} onClick={handleOnClick}>
       <GripIcon className={styles.plotGripIcon} />
       {currentPlotProps.current &&
-        (isCustomPlot ? (
-          <VegaLite {...plotProps} onNewView={onNewView} />
-        ) : (
+        (isTemplatePlot ? (
           <TemplateVegaLite
             vegaLiteProps={plotProps}
             id={id}
             onNewView={onNewView}
           />
+        ) : (
+          <VegaLite {...plotProps} onNewView={onNewView} />
         ))}
     </button>
   )
