@@ -2124,6 +2124,15 @@ describe('App', () => {
     })
 
     describe('Smooth Plots', () => {
+      const waitSetValuePostMessage = (value: number) =>
+        waitFor(
+          () =>
+            expect(mockPostMessage).toHaveBeenCalledWith({
+              payload: { id: smoothId, value },
+              type: MessageFromWebviewType.SET_SMOOTH_PLOT_VALUE
+            }),
+          { timeout: 5000 }
+        )
       it('should send a message to save the value when a vega panel slider is interacted with', async () => {
         renderAppWithOptionalData({ template: withVegaPanels })
 
@@ -2138,10 +2147,7 @@ describe('App', () => {
 
         fireEvent.change(slider as HTMLInputElement, { target: { value: 0.4 } })
 
-        expect(mockPostMessage).toHaveBeenCalledWith({
-          payload: { id: smoothId, value: 0.4 },
-          type: MessageFromWebviewType.SET_SMOOTH_PLOT_VALUE
-        })
+        await waitSetValuePostMessage(0.4)
       })
 
       it('should send a message to save the value when a zoomed in plot vega panel slider is interacted with', async () => {
@@ -2163,10 +2169,7 @@ describe('App', () => {
 
         fireEvent.change(slider as HTMLInputElement, { target: { value: 0.4 } })
 
-        expect(mockPostMessage).toHaveBeenCalledWith({
-          payload: { id: smoothId, value: 0.4 },
-          type: MessageFromWebviewType.SET_SMOOTH_PLOT_VALUE
-        })
+        await waitSetValuePostMessage(0.4)
       })
 
       it('should set a vega panel slider value when given a default value', async () => {

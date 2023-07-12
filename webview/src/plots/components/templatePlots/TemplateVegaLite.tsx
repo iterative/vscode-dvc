@@ -24,6 +24,7 @@ export const TemplateVegaLite = ({
   const smoothPlotValues = useSelector(
     (state: PlotsState) => state.template.smoothPlotValues
   )
+  const changeDebounceTimer = useRef(0)
 
   useEffect(() => {
     const newValue = smoothPlotValues[id]
@@ -48,10 +49,13 @@ export const TemplateVegaLite = ({
 
     smoothRange?.addEventListener('change', (event: Event) => {
       if (event.target) {
-        setSmoothPlotValues(
-          id,
-          Number((event.target as HTMLInputElement).value)
-        )
+        window.clearTimeout(changeDebounceTimer.current)
+        changeDebounceTimer.current = window.setTimeout(() => {
+          setSmoothPlotValues(
+            id,
+            Number((event.target as HTMLInputElement).value)
+          )
+        }, 500)
       }
     })
   }
