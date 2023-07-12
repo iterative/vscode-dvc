@@ -20,7 +20,7 @@ export abstract class BaseData<
   T extends
     | { data: PlotsOutputOrError; revs: string[] }
     | ExperimentsOutput
-    | string
+    | { dag: string; stageList: string }
 > extends DeferredDisposable {
   public readonly onDidUpdate: Event<T>
   public readonly onDidChangeDvcYaml: Event<void>

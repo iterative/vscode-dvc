@@ -61,7 +61,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
     })
 
     it('should be able to update the table data by adding and removing a filter', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
 
       const { experiments, messageSpy } = buildExperiments({
         disposer: disposable
@@ -341,7 +341,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
     })
 
     it('should be able to filter to starred experiments', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
       const { experiments, messageSpy } = buildExperiments({
         disposer: disposable
       })

@@ -122,7 +122,7 @@ suite('Experiments Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the experiment webview visible', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
 
       const { experiments, messageSpy } = buildExperiments({
         disposer: disposable
@@ -176,7 +176,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasValidDvcYaml to false if there is an error getting stages and there is a dvc.yaml file', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves(undefined)
+      stub(DvcReader.prototype, 'stageList').resolves(undefined)
       stub(FileSystem, 'hasDvcYamlFile').returns(true)
 
       const { experiments, messageSpy } = buildExperiments({
@@ -191,7 +191,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasValidDvcYaml to true if there is an error getting stages and there is no dvc.yaml file', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves(undefined)
+      stub(DvcReader.prototype, 'stageList').resolves(undefined)
       stub(FileSystem, 'hasDvcYamlFile').returns(false)
 
       const { experiments, messageSpy } = buildExperiments({
@@ -208,7 +208,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasValidDvcYaml to true if there are no errors getting stages', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('')
+      stub(DvcReader.prototype, 'stageList').resolves('')
       stub(FileSystem, 'hasDvcYamlFile').returns(false)
 
       const { experiments, messageSpy } = buildExperiments({
@@ -223,7 +223,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasConfig to false if there are no stages', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('')
+      stub(DvcReader.prototype, 'stageList').resolves('')
 
       const { experiments, messageSpy } = buildExperiments({
         disposer: disposable
@@ -237,7 +237,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasConfig to true if there are stages', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
 
       const { experiments, messageSpy } = buildExperiments({
         disposer: disposable
@@ -753,7 +753,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to modify the workspace params and queue an experiment', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
       const { experiments, dvcExecutor } = buildExperiments({
         disposer: disposable
       })
@@ -789,7 +789,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to modify the workspace params and run a new experiment', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
       const { experiments, dvcRunner } = buildExperiments({
         disposer: disposable
       })
@@ -827,7 +827,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to modify the workspace params, reset and run a new experiment', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
       const { experiments, dvcRunner } = buildExperiments({
         disposer: disposable
       })
@@ -1033,7 +1033,7 @@ suite('Experiments Test Suite', () => {
     })
 
     it('should be able to handle a message to select columns', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
 
       const { columnsModel, experiments, messageSpy } =
         setupExperimentsAndMockCommands()
@@ -1398,7 +1398,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to add a configuration', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('')
+      stub(DvcReader.prototype, 'stageList').resolves('')
 
       const { experiments, mockCheckOrAddPipeline, messageSpy } =
         setupExperimentsAndMockCommands()

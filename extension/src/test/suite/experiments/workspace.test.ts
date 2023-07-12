@@ -111,7 +111,7 @@ suite('Workspace Experiments Test Suite', () => {
         DvcRunner.prototype,
         'runExperiment'
       ).resolves(undefined)
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
 
       const { workspaceExperiments, experiments } =
         buildMultiRepoExperiments(disposable)
@@ -160,7 +160,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.modifyWorkspaceParamsAndQueue', () => {
     it('should be able to queue an experiment using an existing one as a base', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
 
       const { dvcExecutor, experiments } = buildExperiments({
         disposer: disposable
@@ -210,7 +210,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.modifyWorkspaceParamsAndResume', () => {
     it('should be able to resume a checkpoint experiment using an existing one as a base', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
 
       const { experiments } = buildExperiments({ disposer: disposable })
 
@@ -262,7 +262,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.modifyWorkspaceParamsAndRun', () => {
     it('should be able to run an experiment using an existing one as a base', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
 
       const { experiments } = buildExperiments({ disposer: disposable })
 
@@ -314,7 +314,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.queueExperiment', () => {
     it('should be able to queue an experiment', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
 
       const mockExperimentRunQueue = stub(
         DvcExecutor.prototype,
@@ -330,7 +330,7 @@ suite('Workspace Experiments Test Suite', () => {
     })
 
     it('should send a telemetry event containing a duration when an experiment is queued', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
 
       stub(DvcExecutor.prototype, 'expRunQueue').resolves('true')
 
@@ -352,7 +352,7 @@ suite('Workspace Experiments Test Suite', () => {
     })
 
     it('should send a telemetry event containing an error message when an experiment fails to queue', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
 
       const duration = 77777
       mockDuration(duration)
@@ -386,7 +386,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.runExperiment', () => {
     it('should be able to run an experiment', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
       const mockRunExperiment = stub(
         DvcRunner.prototype,
         'runExperiment'
@@ -407,7 +407,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.resumeCheckpointExperiment', () => {
     it('should be able to run an experiment', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
 
       const mockRunExperiment = stub(
         DvcRunner.prototype,
@@ -425,7 +425,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.resetAndRunCheckpointExperiment', () => {
     it('should be able to reset existing checkpoints and restart the experiment', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
       const mockRunExperimentReset = stub(
         DvcRunner.prototype,
         'runExperimentReset'
@@ -504,7 +504,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.startExperimentsQueue', () => {
     it('should be able to start the experiments queue with the selected number of workers', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
 
       const mockQueueStart = stub(DvcExecutor.prototype, 'queueStart').resolves(
         undefined
@@ -531,7 +531,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.stopExperimentsQueue', () => {
     it('should be able to stop the experiments queue', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
 
       const mockQueueStop = stub(DvcExecutor.prototype, 'queueStop').resolves(
         undefined
@@ -649,7 +649,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.branchExperiment', () => {
     it('should be able to create a branch from an experiment', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
 
       const { experiments } = buildExperiments({ disposer: disposable })
       await experiments.isReady()
@@ -898,7 +898,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.removeExperimentQueue', () => {
     it('should remove all queued experiments from the selected repository', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
 
       const { experiments } = buildExperiments({ disposer: disposable })
 

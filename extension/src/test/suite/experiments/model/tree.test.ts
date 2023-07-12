@@ -574,7 +574,7 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to queue an experiment from an existing one with dvc.views.experiments.queueExperiment', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
 
       const { dvcExecutor, experiments, experimentsModel } = buildExperiments({
         disposer: disposable
@@ -635,7 +635,7 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to run a new experiment from an existing one with dvc.views.experiments.runExperiment', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
 
       const { dvcRunner, experiments, experimentsModel } = buildExperiments({
         disposer: disposable
@@ -693,7 +693,7 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to reset and run a new checkpoint experiment from an existing one with dvc.views.experiments.resetAndRunCheckpointExperiment', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+      stub(DvcReader.prototype, 'stageList').resolves('train')
 
       const { dvcRunner, experiments, experimentsModel } = buildExperiments({
         disposer: disposable
