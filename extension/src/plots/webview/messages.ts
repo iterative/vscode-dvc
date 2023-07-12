@@ -360,6 +360,6 @@ export class WebviewMessages {
       undefined
     )
 
-    this.plots.savePlotData(plotId, file.path, type)
+    void this.plots.savePlotData(plotId, file.path, type)
   }
 }
