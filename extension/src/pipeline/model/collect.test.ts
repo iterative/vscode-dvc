@@ -19,8 +19,8 @@ describe('collectStages', () => {
     featurize  Outputs data/features
     train      Outputs model.pkl
     evaluate   Outputs eval/importance.png, eval/live/plots, eval/prc; Reports eval/live/metri…`,
-      [join('dvcDemoPath', 'nested2')]: 'data/data.xml.dvc   Outputs data.xml',
-      [join('dvcDemoPath', 'nested3')]: undefined
+      [join(dvcDemoPath, 'nested2')]: 'data/data.xml.dvc   Outputs data.xml',
+      [join(dvcDemoPath, 'nested3')]: undefined
     })
     expect(stages).toStrictEqual(['prepare', 'featurize', 'train', 'evaluate'])
 

@@ -91,7 +91,7 @@ import { Toast } from '../../../vscode/toast'
 import { Response } from '../../../vscode/response'
 import { MAX_SELECTED_EXPERIMENTS } from '../../../experiments/model/status'
 import { Pipeline } from '../../../pipeline'
-import { buildPipeline } from '../pipeline/util'
+import { buildExperimentsPipeline } from '../pipeline/util'
 
 const { openFileInEditor } = FileSystem
 
@@ -1510,14 +1510,15 @@ suite('Experiments Test Suite', () => {
 
   describe('Sorting', () => {
     it('should be able to sort', async () => {
-      const { internalCommands } = buildInternalCommands(disposable)
+      const { dvcReader, internalCommands } = buildInternalCommands(disposable)
 
       const messageSpy = spy(BaseWebview.prototype, 'show')
 
       const resourceLocator = disposable.track(
         new ResourceLocator(extensionUri)
       )
-      const pipeline = buildPipeline({
+      const pipeline = buildExperimentsPipeline({
+        dvcReader,
         disposer: disposable,
         dvcRoot: dvcDemoPath,
         internalCommands

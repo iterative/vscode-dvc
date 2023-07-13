@@ -7,7 +7,6 @@ import { DeferredDisposable } from '../class/deferred'
 import { InternalCommands } from '../commands/internal'
 import { TEMP_DAG_FILE } from '../cli/dvc/constants'
 import { findOrCreateDvcYamlFile, getFileExtension } from '../fileSystem'
-import { Toast } from '../vscode/toast'
 import { getInput, getValidInput } from '../vscode/inputBox'
 import { Title } from '../vscode/title'
 import { quickPickOne, quickPickOneOrInput } from '../vscode/quickPick'
@@ -63,11 +62,8 @@ export class Pipeline extends DeferredDisposable {
     return this.model.hasPipeline()
   }
 
-  public getCwd() {
-    const hasPipeline = this.checkOrAddPipeline() // need to refactor if we are going to run the original command
-    if (!hasPipeline) {
-      return
-    }
+  public async getCwd() {
+    await this.checkOrAddPipeline()
 
     const pipelines = this.model.getPipelines()
     if (!pipelines?.size) {
@@ -87,12 +83,10 @@ export class Pipeline extends DeferredDisposable {
   }
 
   public checkOrAddPipeline() {
-    const hasStage = this.model.hasStage()
-
-    if (!hasStage) {
-      return this.addPipeline()
+    if (this.model.hasPipeline()) {
+      return
     }
-    return true
+    return this.addPipeline()
   }
 
   public forceRerender() {
@@ -114,6 +108,7 @@ export class Pipeline extends DeferredDisposable {
         }
       })
     )
+    void this.data.managedUpdate()
 
     await this.data.isReady()
     return this.deferred.resolve()
@@ -122,14 +117,25 @@ export class Pipeline extends DeferredDisposable {
   private async addPipeline() {
     const stageName = await this.askForStageName()
     if (!stageName) {
-      return false
+      return
     }
 
     const { trainingScript, command, enteredManually } =
       await this.askForTrainingScript()
     if (!trainingScript) {
-      return false
+      return
     }
+
+    const dataUpdated = new Promise(resolve => {
+      const listener = this.dispose.track(
+        this.data.onDidUpdate(() => {
+          resolve(undefined)
+          this.dispose.untrack(listener)
+          listener.dispose()
+        })
+      )
+    })
+
     void findOrCreateDvcYamlFile(
       this.dvcRoot,
       trainingScript,
@@ -137,7 +143,8 @@ export class Pipeline extends DeferredDisposable {
       command,
       !enteredManually
     )
-    return true
+    void this.data.managedUpdate()
+    return dataUpdated
   }
 
   private async askForStageName() {

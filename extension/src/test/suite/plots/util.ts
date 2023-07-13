@@ -26,7 +26,7 @@ import {
 } from '../../../cli/dvc/contract'
 import { ErrorsModel } from '../../../plots/errors/model'
 import { PersistenceKey } from '../../../persistence/constants'
-import { buildPipeline } from '../pipeline/util'
+import { buildExperimentsPipeline } from '../pipeline/util'
 
 export const buildPlots = async ({
   availableNbCommits = { main: 5 },
@@ -43,16 +43,22 @@ export const buildPlots = async ({
   gitLog?: string
   rowOrder?: { branch: string; sha: string }[]
 }) => {
-  const { internalCommands, mockPlotsDiff, messageSpy, resourceLocator } =
-    buildDependencies(disposer, expShow, plotsDiff)
+  const {
+    dvcReader,
+    internalCommands,
+    mockPlotsDiff,
+    messageSpy,
+    resourceLocator
+  } = buildDependencies(disposer, expShow, plotsDiff)
 
   const mockRemoveDir = stub(FileSystem, 'removeDir').returns(undefined)
   const mockGetModifiedTime = stub(FileSystem, 'getModifiedTime').returns(
     MOCK_IMAGE_MTIME
   )
 
-  const pipeline = buildPipeline({
+  const pipeline = buildExperimentsPipeline({
     disposer,
+    dvcReader,
     dvcRoot: dvcDemoPath,
     internalCommands
   })

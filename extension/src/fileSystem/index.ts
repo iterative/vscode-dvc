@@ -172,8 +172,7 @@ export const findOrCreateDvcYamlFile = (
     ? relative(cwd, trainingScript)
     : format(parse(trainingScript))
 
-  const pipeline = `
-# Type dvc-help in this file and hit enter to get more information on how the extension can help to setup pipelines
+  const pipeline = `# Type dvc-help in this file and hit enter to get more information on how the extension can help to setup pipelines
 stages:
   ${stageName}:
     cmd: ${command} ${scriptPath}

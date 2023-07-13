@@ -19,7 +19,7 @@ import { ColumnsModel } from '../../../experiments/columns/model'
 import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../../cli/dvc/constants'
 import { PersistenceKey } from '../../../persistence/constants'
 import { ExpShowOutput } from '../../../cli/dvc/contract'
-import { buildPipeline } from '../pipeline/util'
+import { buildExperimentsPipeline } from '../pipeline/util'
 
 export const DEFAULT_EXPERIMENTS_OUTPUT = {
   availableNbCommits: { main: 5 },
@@ -64,10 +64,13 @@ export const buildExperiments = ({
     mockUpdateExperimentsData
   )
 
-  stub(dvcReader, 'stageList').resolves(stageList ?? undefined)
-  stub(dvcReader, 'dag').resolves('')
-
-  const pipeline = buildPipeline({ disposer, dvcRoot, internalCommands })
+  const pipeline = buildExperimentsPipeline({
+    disposer,
+    dvcReader,
+    dvcRoot,
+    internalCommands,
+    stageList
+  })
   const mockCheckOrAddPipeline = stub(pipeline, 'checkOrAddPipeline')
   const mockSelectBranches = stub().resolves(['main', 'other'])
   const mockMemento = buildMockMemento({
@@ -123,6 +126,7 @@ export const buildExperiments = ({
 
 export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
   const {
+    dvcReader,
     internalCommands,
     experiments: mockExperiments,
     gitReader,
@@ -141,8 +145,9 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
     })
   )
 
-  const pipeline = buildPipeline({
+  const pipeline = buildExperimentsPipeline({
     disposer,
+    dvcReader,
     dvcRoot: dvcDemoPath,
     internalCommands
   })
@@ -159,15 +164,22 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
 }
 
 export const buildSingleRepoExperiments = (disposer: SafeWatcherDisposer) => {
-  const { config, internalCommands, gitReader, messageSpy, resourceLocator } =
-    buildDependencies(disposer)
+  const {
+    config,
+    dvcReader,
+    internalCommands,
+    gitReader,
+    messageSpy,
+    resourceLocator
+  } = buildDependencies(disposer)
 
   stub(gitReader, 'getGitRepositoryRoot').resolves(dvcDemoPath)
   const workspaceExperiments = disposer.track(
     new WorkspaceExperiments(internalCommands, buildMockMemento())
   )
-  const pipeline = buildPipeline({
+  const pipeline = buildExperimentsPipeline({
     disposer,
+    dvcReader,
     dvcRoot: dvcDemoPath,
     internalCommands
   })

@@ -14,8 +14,6 @@ export class PipelineData extends BaseData<{
       [{ name: 'update', process: () => this.update() }],
       ['dvc.yaml']
     )
-
-    void this.managedUpdate()
   }
 
   public managedUpdate() {
