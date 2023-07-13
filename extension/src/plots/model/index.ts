@@ -243,12 +243,9 @@ export class PlotsModel extends ModelWithPersistence {
 
     try {
       if (type === PlotExportType.JSON) {
-        writeJson(filePath, rawData as unknown as Record<string, unknown>, true)
+        writeJson(filePath, rawData, true)
       } else {
-        await writeCsv(
-          filePath,
-          rawData as unknown as Array<{ [key: string]: unknown }>
-        )
+        await writeCsv(filePath, rawData)
       }
       void openFileInEditor(filePath)
     } catch {

@@ -209,7 +209,9 @@ export const loadJson = <T>(path: string): T | undefined => {
   }
 }
 
-export const writeJson = <T extends Record<string, unknown>>(
+export const writeJson = <
+  T extends Record<string, unknown> | Array<Record<string, unknown>>
+>(
   path: string,
   obj: T,
   format = false
@@ -221,7 +223,7 @@ export const writeJson = <T extends Record<string, unknown>>(
 
 export const writeCsv = async (
   path: string,
-  arr: Array<{ [key: string]: unknown }>
+  arr: Array<Record<string, unknown>>
 ) => {
   ensureFileSync(path)
   const csv = await json2csv(arr)
