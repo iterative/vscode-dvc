@@ -308,12 +308,15 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.queueExperiment', () => {
     it('should be able to queue an experiment', async () => {
+      const { experiments } = buildExperiments({ disposer: disposable })
+      await experiments.isReady()
+
       const mockExperimentRunQueue = stub(
         DvcExecutor.prototype,
         'expRunQueue'
       ).resolves('true')
 
-      stubWorkspaceExperimentsGetters(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       await commands.executeCommand(RegisteredCliCommands.QUEUE_EXPERIMENT)
 
@@ -322,11 +325,14 @@ suite('Workspace Experiments Test Suite', () => {
     })
 
     it('should send a telemetry event containing a duration when an experiment is queued', async () => {
+      const { experiments } = buildExperiments({ disposer: disposable })
+      await experiments.isReady()
+
       stub(DvcExecutor.prototype, 'expRunQueue').resolves('true')
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
-      stubWorkspaceExperimentsGetters(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const queueExperiment = commands.executeCommand(
         RegisteredCliCommands.QUEUE_EXPERIMENT
@@ -342,6 +348,9 @@ suite('Workspace Experiments Test Suite', () => {
     })
 
     it('should send a telemetry event containing an error message when an experiment fails to queue', async () => {
+      const { experiments } = buildExperiments({ disposer: disposable })
+      await experiments.isReady()
+
       const mockErrorMessage =
         'ERROR: unexpected error - [Errno 2] No such file or directory'
 
@@ -355,7 +364,7 @@ suite('Workspace Experiments Test Suite', () => {
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
-      stubWorkspaceExperimentsGetters(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       await commands.executeCommand(RegisteredCliCommands.QUEUE_EXPERIMENT)
 
@@ -370,6 +379,9 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.runExperiment', () => {
     it('should be able to run an experiment', async () => {
+      const { experiments } = buildExperiments({ disposer: disposable })
+      await experiments.isReady()
+
       const mockRunExperiment = stub(
         DvcRunner.prototype,
         'runExperiment'
@@ -379,7 +391,7 @@ suite('Workspace Experiments Test Suite', () => {
         experiments: true
       })
 
-      stubWorkspaceExperimentsGetters(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_RUN)
 
@@ -390,12 +402,15 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.resumeCheckpointExperiment', () => {
     it('should be able to run an experiment', async () => {
+      const { experiments } = buildExperiments({ disposer: disposable })
+      await experiments.isReady()
+
       const mockRunExperiment = stub(
         DvcRunner.prototype,
         'runExperiment'
       ).resolves(undefined)
 
-      stubWorkspaceExperimentsGetters(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_RESUME)
 
@@ -406,6 +421,9 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.resetAndRunCheckpointExperiment', () => {
     it('should be able to reset existing checkpoints and restart the experiment', async () => {
+      const { experiments } = buildExperiments({ disposer: disposable })
+      await experiments.isReady()
+
       const mockRunExperimentReset = stub(
         DvcRunner.prototype,
         'runExperimentReset'
@@ -415,7 +433,7 @@ suite('Workspace Experiments Test Suite', () => {
         experiments: true
       })
 
-      stubWorkspaceExperimentsGetters(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       await commands.executeCommand(
         RegisteredCliCommands.EXPERIMENT_RESET_AND_RUN
@@ -484,6 +502,9 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.startExperimentsQueue', () => {
     it('should be able to start the experiments queue with the selected number of workers', async () => {
+      const { experiments } = buildExperiments({ disposer: disposable })
+      await experiments.isReady()
+
       const mockQueueStart = stub(DvcExecutor.prototype, 'queueStart').resolves(
         undefined
       )
@@ -494,7 +515,7 @@ suite('Workspace Experiments Test Suite', () => {
         dDosNumberOfJobs
       )
 
-      stubWorkspaceExperimentsGetters(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       await commands.executeCommand(RegisteredCliCommands.QUEUE_START)
 
@@ -509,11 +530,14 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.stopExperimentsQueue', () => {
     it('should be able to stop the experiments queue', async () => {
+      const { experiments } = buildExperiments({ disposer: disposable })
+      await experiments.isReady()
+
       const mockQueueStop = stub(DvcExecutor.prototype, 'queueStop').resolves(
         undefined
       )
 
-      stubWorkspaceExperimentsGetters(dvcDemoPath)
+      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       await commands.executeCommand(RegisteredCliCommands.QUEUE_STOP)
 

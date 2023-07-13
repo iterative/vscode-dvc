@@ -64,7 +64,7 @@ export const buildExperiments = ({
     mockUpdateExperimentsData
   )
 
-  stub(dvcReader, 'stageList').resolves(stageList ?? undefined)
+  stub(dvcReader, 'stageList').resolves(stageList ?? undefined) // move these two into buildDependencies
   stub(dvcReader, 'dag').resolves('')
 
   const pipeline = buildExperimentsPipeline({
@@ -256,19 +256,17 @@ export const buildExperimentsData = (
 
 export const stubWorkspaceExperimentsGetters = (
   dvcRoot: string,
-  experiments?: Experiments
+  experiments: Experiments
 ) => {
   const mockGetOnlyOrPickProject = stub(
     WorkspaceExperiments.prototype,
     'getOnlyOrPickProject'
   ).resolves(dvcRoot)
-  let mockGetRepository
-  if (experiments) {
-    mockGetRepository = stub(
-      WorkspaceExperiments.prototype,
-      'getRepository'
-    ).returns(experiments)
-  }
+
+  const mockGetRepository = stub(
+    WorkspaceExperiments.prototype,
+    'getRepository'
+  ).returns(experiments)
 
   return [mockGetOnlyOrPickProject, mockGetRepository]
 }

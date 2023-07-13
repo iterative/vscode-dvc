@@ -44,7 +44,7 @@ export const buildPipeline = ({
   stageList?: string | null
 }) => {
   const { dvcReader, internalCommands } = buildDependencies(disposer)
-  stub(dvcReader, 'stageList').resolves(stageList ?? undefined)
+  stub(dvcReader, 'stageList').resolves(stageList ?? undefined) // move into build dependencies
   stub(dvcReader, 'dag').resolves(dag)
 
   const pipeline = buildExperimentsPipeline({
