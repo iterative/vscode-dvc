@@ -99,6 +99,7 @@ suite('Extension Test Suite', () => {
       stub(DvcConfig.prototype, 'remote').resolves('')
 
       stub(DvcReader.prototype, 'root').resolves('.')
+      stub(DvcReader.prototype, 'dag').resolves('')
 
       const dataStatusCalled = new Promise(resolve => {
         mockDataStatus.callsFake(() => {

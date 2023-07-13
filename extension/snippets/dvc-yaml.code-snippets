@@ -1,0 +1,123 @@
+{
+  "Get Started with DVC pipelines": {
+    "prefix": "dvc-help",
+    "body": [
+      "# The DVC for VS Code extension provides snippets to help with building dvc.yaml pipelines.",
+      "# These snippets, all prefixed with dvc-, are designed to give pointers on basic usage.",
+      "# Type dvc- in the editor to see the list of available snippets.",
+      "# Visit https://dvc.org/doc/user-guide/project-structure/dvcyaml-files for further details on building pipelines.",
+      "# On-hover information and completions will be provided for each of the keys in a dvc.yaml file if the redhat.vscode-yaml extension is installed."
+    ],
+    "description": "Information on the support provided for building dvc.yaml pipelines"
+  },
+  "Pipeline Stage Template": {
+    "prefix": "dvc-pipeline-stage",
+    "body": [
+      "  ${1:train}:",
+      "    cmd: ${2:python train.py}",
+      "    deps:",
+      "      - ${3:train.py}",
+      "    params:",
+      "      - ${4:params.yaml:}",
+      "    outs:",
+      "      - ${5:model.pkl}"
+    ],
+    "description": "Stage template for dvc.yaml pipeline"
+  },
+  "Foreach Pipeline Stage Template": {
+    "prefix": "dvc-pipeline-foreach-stage",
+    "body": [
+      "  ${1:cleanups}:",
+      "    foreach:",
+      "      - ${2:raw1}",
+      "      - ${3:raw2}",
+      "    do:",
+      "      cmd: ${4:python clean.py} \"\\${item}\"",
+      "      outs:",
+      "      - \\${item}.${5:cln}"
+    ],
+    "description": "Foreach stage template for dvc.yaml pipeline"
+  },
+  "Single File Plot Template": {
+    "prefix": "dvc-plot-single",
+    "body": [
+      "  - ${1:probs.json}:",
+      "      template: ${2|linear,simple,scatter,smooth,confusion,confusion_normalized,bar_horizontal,bar_horizontal_sorted|}",
+      "      x: ${3:actual}",
+      "      y: ${4:predicted}",
+      "      title: ${5:Predicted Probabilities}"
+    ],
+    "description": "Single file dvc.yaml top level plot template"
+  },
+  "Multi-file Plot Template": {
+    "prefix": "dvc-plot-multi",
+    "body": [
+      "  - ${1:Accuracy}:",
+      "      template: ${2|linear,simple,scatter,smooth,confusion,confusion_normalized,bar_horizontal,bar_horizontal_sorted|}",
+      "      x: ${3:step}",
+      "      y: ",
+      "        ${4:training/plots/metrics/train/acc.tsv}: ${5:acc}",
+      "        ${6:training/plots/metrics/test/acc.tsv}: ${7:acc}",
+      "      y_label: ${8:accuracy}"
+    ],
+    "description": "Multi-file dvc.yaml top level plot template"
+  },
+  "Bar Horizontal Plot Template": {
+    "prefix": "dvc-plot-bar-horizontal",
+    "body": [
+      "  - ${1:hist.csv}:",
+      "      template: bar_horizontal",
+      "      x: ${2:preds}",
+      "      y: ${3:digit}",
+      "      title: ${4:Histogram of Predictions}"
+    ],
+    "description": "Bar horizontal dvc.yaml top level plot template"
+  },
+  "Confusion Matrix Plot Template": {
+    "prefix": "dvc-plot-confusion",
+    "body": [
+      "  - ${1:Confusion Matrix}:",
+      "      template: confusion",
+      "      x: ${2:actual}",
+      "      y:",
+      "        ${3:training/plots/sklearn/confusion_matrix.json}: ${4:predicted}"
+    ],
+    "description": "Confusion matrix dvc.yaml top level plot template"
+  },
+  "Smooth Plot Template": {
+    "prefix": "dvc-plot-smooth",
+    "body": [
+      "  - ${1:acc.tsv}:",
+      "      x: ${2:step}",
+      "      y: ${3:acc}",
+      "      y_label: ${4:accuracy}"
+    ],
+    "description": "Smooth dvc.yaml top level plot template"
+  },
+  "Artifact": {
+    "prefix": "dvc-artifact",
+    "body": [
+      "  ${1:cv-data}:",
+      "    path: ${2:data/data.xml}",
+      "    type: ${3:data}",
+      "    desc: '${4:Preprocessed data for CV classification}'",
+      "    labels:",
+      "      - ${5:resnet50}"
+    ],
+    "description": "dvc.yaml artifact template"
+  },
+  "Model Artifact": {
+    "prefix": "dvc-artifact-model",
+    "body": [
+      "  ${1:cv-classification}:",
+      "    path: ${2:models/resnet.pt}",
+      "    type: model",
+      "    desc: '${3:CV classification model, ResNet50}'",
+      "    labels:",
+      "      - ${4:resnet50}",
+      "    meta:",
+      "      framework: ${5:pytorch}"
+    ],
+    "description": "dvc.yaml model artifact template"
+  }
+}
