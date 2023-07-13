@@ -18,7 +18,8 @@ export enum MessageFromWebviewType {
   ADD_STARRED_EXPERIMENT_FILTER = 'add-starred-experiment-filter',
   ADD_CUSTOM_PLOT = 'add-custom-plot',
   CREATE_BRANCH_FROM_EXPERIMENT = 'create-branch-from-experiment',
-  EXPORT_PLOT_DATA = 'export-plot-data',
+  EXPORT_PLOT_DATA_AS_JSON = 'export-plot-data-as-json',
+  EXPORT_PLOT_DATA_AS_CSV = 'export-plot-data-as-csv',
   FOCUS_FILTERS_TREE = 'focus-filters-tree',
   FOCUS_SORTS_TREE = 'focus-sorts-tree',
   OPEN_EXPERIMENTS_WEBVIEW = 'open-experiments-webview',
@@ -94,21 +95,17 @@ export type PlotsTemplatesReordered = {
   paths: string[]
 }[]
 
-export enum PlotExportType {
-  JSON = 'json',
-  CSV = 'csv'
-}
-
 export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.ADD_CUSTOM_PLOT
     }
   | {
-      type: MessageFromWebviewType.EXPORT_PLOT_DATA
-      payload: {
-        id: string
-        type: PlotExportType
-      }
+      type: MessageFromWebviewType.EXPORT_PLOT_DATA_AS_JSON
+      payload: string
+    }
+  | {
+      type: MessageFromWebviewType.EXPORT_PLOT_DATA_AS_CSV
+      payload: string
     }
   | {
       type: MessageFromWebviewType.REORDER_COLUMNS

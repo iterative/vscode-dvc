@@ -1,4 +1,4 @@
-import { Uri, commands } from 'vscode'
+import { commands } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import {
   ComparisonPlot,
@@ -16,7 +16,6 @@ import { EventName } from '../../telemetry/constants'
 import {
   MessageFromWebview,
   MessageFromWebviewType,
-  PlotExportType,
   PlotsTemplatesReordered
 } from '../../webview/contract'
 import { PlotsModel } from '../model'
@@ -83,8 +82,10 @@ export class WebviewMessages {
           RegisteredCommands.PLOTS_CUSTOM_ADD,
           this.dvcRoot
         )
-      case MessageFromWebviewType.EXPORT_PLOT_DATA:
-        return this.exportPlotData(message.payload.id, message.payload.type)
+      case MessageFromWebviewType.EXPORT_PLOT_DATA_AS_CSV:
+        return this.exportPlotDataAsCsv(message.payload)
+      case MessageFromWebviewType.EXPORT_PLOT_DATA_AS_JSON:
+        return this.exportPlotDataAsJson(message.payload)
       case MessageFromWebviewType.RESIZE_PLOTS:
         return this.setPlotSize(
           message.payload.section,
@@ -345,21 +346,35 @@ export class WebviewMessages {
     return this.plots.getCustomPlots() || null
   }
 
-  private async exportPlotData(plotId: string, type: PlotExportType) {
-    const file = await showSaveDialog(Uri.file(`data.${type}`), {
-      [type.toUpperCase()]: [type]
-    })
+  private async exportPlotDataAsJson(plotId: string) {
+    const file = await showSaveDialog('data.json', 'json')
 
     if (!file) {
       return
     }
 
     sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA,
+      EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_JSON,
       undefined,
       undefined
     )
 
-    void this.plots.savePlotData(plotId, file.path, type)
+    void this.plots.savePlotDataAsJson(file.path, plotId)
+  }
+
+  private async exportPlotDataAsCsv(plotId: string) {
+    const file = await showSaveDialog('data.csv', 'csv')
+
+    if (!file) {
+      return
+    }
+
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_CSV,
+      undefined,
+      undefined
+    )
+
+    void this.plots.savePlotDataAsCsv(file.path, plotId)
   }
 }

@@ -32,8 +32,7 @@ import {
 } from 'dvc/src/plots/webview/contract'
 import {
   MessageFromWebviewType,
-  MessageToWebviewType,
-  PlotExportType
+  MessageToWebviewType
 } from 'dvc/src/webview/contract'
 import { act } from 'react-dom/test-utils'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
@@ -1463,11 +1462,8 @@ describe('App', () => {
     fireEvent.click(customAction)
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: {
-        id: complexTemplatePlotsFixture.plots[0].entries[0].id,
-        type: PlotExportType.JSON
-      },
-      type: MessageFromWebviewType.EXPORT_PLOT_DATA
+      payload: complexTemplatePlotsFixture.plots[0].entries[0].id,
+      type: MessageFromWebviewType.EXPORT_PLOT_DATA_AS_JSON
     })
   })
 
@@ -1491,11 +1487,8 @@ describe('App', () => {
     fireEvent.click(customAction)
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: {
-        id: complexTemplatePlotsFixture.plots[0].entries[0].id,
-        type: PlotExportType.CSV
-      },
-      type: MessageFromWebviewType.EXPORT_PLOT_DATA
+      payload: complexTemplatePlotsFixture.plots[0].entries[0].id,
+      type: MessageFromWebviewType.EXPORT_PLOT_DATA_AS_CSV
     })
   })
 

@@ -4,10 +4,9 @@ import { Config } from 'vega-lite'
 import merge from 'lodash.merge'
 import cloneDeep from 'lodash.clonedeep'
 import { reverseOfLegendSuppressionUpdate } from 'dvc/src/plots/vega/util'
-import { PlotExportType } from 'dvc/src/webview/contract'
 import styles from './styles.module.scss'
 import { getThemeValue, ThemeProperty } from '../../util/styles'
-import { exportPlotData } from '../util/messages'
+import { exportPlotDataAsCsv, exportPlotDataAsJson } from '../util/messages'
 
 type ZoomedInPlotProps = {
   id: string
@@ -15,14 +14,14 @@ type ZoomedInPlotProps = {
 }
 
 const appendActionToVega = (
-  type: PlotExportType,
-  id: string,
-  vegaActions: HTMLDivElement
+  type: string,
+  vegaActions: HTMLDivElement,
+  onClick: () => void
 ) => {
   const rawDataAction = document.createElement('a')
-  rawDataAction.textContent = `Save as ${type.toUpperCase()}`
+  rawDataAction.textContent = `Save as ${type}`
   rawDataAction.addEventListener('click', () => {
-    exportPlotData(id, type)
+    onClick()
   })
   rawDataAction.classList.add(styles.vegaCustomAction)
   vegaActions.append(rawDataAction)
@@ -49,8 +48,8 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
     if (!actions) {
       return
     }
-    appendActionToVega(PlotExportType.JSON, id, actions)
-    appendActionToVega(PlotExportType.CSV, id, actions)
+    appendActionToVega('JSON', actions, () => exportPlotDataAsJson(id))
+    appendActionToVega('CSV', actions, () => exportPlotDataAsCsv(id))
   }
 
   return (

@@ -1,7 +1,4 @@
-import {
-  MessageFromWebviewType,
-  PlotExportType
-} from 'dvc/src/webview/contract'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { PlotsSection } from 'dvc/src/plots/webview/contract'
 import { sendMessage } from '../../shared/vscode'
 import { PlotGroup } from '../components/templatePlots/templatePlotsSlice'
@@ -92,9 +89,16 @@ export const togglePlotsSection = (
 export const zoomPlot = (imagePath?: string) =>
   sendMessage({ payload: imagePath, type: MessageFromWebviewType.ZOOM_PLOT })
 
-export const exportPlotData = (id: string, type: PlotExportType) => {
+export const exportPlotDataAsCsv = (id: string) => {
   sendMessage({
-    payload: { id, type },
-    type: MessageFromWebviewType.EXPORT_PLOT_DATA
+    payload: id,
+    type: MessageFromWebviewType.EXPORT_PLOT_DATA_AS_CSV
+  })
+}
+
+export const exportPlotDataAsJson = (id: string) => {
+  sendMessage({
+    payload: id,
+    type: MessageFromWebviewType.EXPORT_PLOT_DATA_AS_JSON
   })
 }

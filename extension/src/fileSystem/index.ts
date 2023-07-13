@@ -281,7 +281,8 @@ export const getBinDisplayText = (
     : path
 }
 
-export const showSaveDialog = (
-  defaultUri: Uri,
-  filters?: { [name: string]: string[] }
-) => window.showSaveDialog({ defaultUri, filters })
+export const showSaveDialog = (fileName: string, extname: string) =>
+  window.showSaveDialog({
+    defaultUri: Uri.file(fileName),
+    filters: { [extname.toUpperCase()]: [extname] }
+  })
