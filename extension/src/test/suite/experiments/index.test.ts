@@ -1707,8 +1707,9 @@ suite('Experiments Test Suite', () => {
           internalCommands,
           {
             hasStage: () => true,
-            isReady: () => Promise.resolve()
-          } as Pipeline,
+            isReady: () => Promise.resolve(),
+            onDidUpdate: stub()
+          } as unknown as Pipeline,
           {} as ResourceLocator,
           mockMemento,
           () => Promise.resolve([]),
@@ -1871,8 +1872,9 @@ suite('Experiments Test Suite', () => {
           internalCommands,
           {
             hasStage: () => true,
-            isReady: () => Promise.resolve()
-          } as Pipeline,
+            isReady: () => Promise.resolve(),
+            onDidUpdate: stub()
+          } as unknown as Pipeline,
           {} as ResourceLocator,
           mockMemento,
           () => Promise.resolve([]),
