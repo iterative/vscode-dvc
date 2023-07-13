@@ -56,9 +56,11 @@ export const buildPlots = async ({
     MOCK_IMAGE_MTIME
   )
 
+  stub(dvcReader, 'stageList').resolves('train')
+  stub(dvcReader, 'dag').resolves('')
+
   const pipeline = buildExperimentsPipeline({
     disposer,
-    dvcReader,
     dvcRoot: dvcDemoPath,
     internalCommands
   })

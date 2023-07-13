@@ -5,30 +5,20 @@ import { Disposer } from '../../../extension'
 import { Pipeline } from '../../../pipeline'
 import { PipelineData } from '../../../pipeline/data'
 import { dvcDemoPath } from '../../util'
-import { DvcReader } from '../../../cli/dvc/reader'
 import { buildDependencies } from '../util'
 import { PipelineModel } from '../../../pipeline/model'
 
 export const buildExperimentsPipeline = ({
-  dag = '',
   disposer,
   dvcRoot = dvcDemoPath,
   dvcYamls,
-  dvcReader,
-  internalCommands,
-  stageList = 'train'
+  internalCommands
 }: {
-  dag?: string
   disposer: Disposer
   dvcRoot?: string
   dvcYamls?: string[]
-  dvcReader: DvcReader
   internalCommands: InternalCommands
-  stageList?: string | null
 }): Pipeline => {
-  stub(dvcReader, 'stageList').resolves(stageList ?? undefined)
-  stub(dvcReader, 'dag').resolves(dag)
-
   const data = new PipelineData(dvcRoot, internalCommands)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   stub(data as any, 'findDvcYamls').resolves(
@@ -54,14 +44,14 @@ export const buildPipeline = ({
   stageList?: string | null
 }) => {
   const { dvcReader, internalCommands } = buildDependencies(disposer)
+  stub(dvcReader, 'stageList').resolves(stageList ?? undefined)
+  stub(dvcReader, 'dag').resolves(dag)
+
   const pipeline = buildExperimentsPipeline({
-    dag,
     disposer,
-    dvcReader,
     dvcRoot,
     dvcYamls,
-    internalCommands,
-    stageList
+    internalCommands
   })
   return {
     dvcReader,

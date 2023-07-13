@@ -1517,8 +1517,10 @@ suite('Experiments Test Suite', () => {
       const resourceLocator = disposable.track(
         new ResourceLocator(extensionUri)
       )
+      stub(dvcReader, 'stageList').resolves('train')
+      stub(dvcReader, 'dag').resolves('')
+
       const pipeline = buildExperimentsPipeline({
-        dvcReader,
         disposer: disposable,
         dvcRoot: dvcDemoPath,
         internalCommands

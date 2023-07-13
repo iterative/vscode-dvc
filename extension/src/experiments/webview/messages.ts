@@ -263,7 +263,7 @@ export class WebviewMessages {
   }
 
   private addConfiguration() {
-    this.pipeline.checkOrAddPipeline()
+    return this.pipeline.checkOrAddPipeline()
   }
 
   private async setMaxTableHeadDepth() {

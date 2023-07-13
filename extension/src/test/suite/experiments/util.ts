@@ -64,12 +64,13 @@ export const buildExperiments = ({
     mockUpdateExperimentsData
   )
 
+  stub(dvcReader, 'stageList').resolves(stageList ?? undefined)
+  stub(dvcReader, 'dag').resolves('')
+
   const pipeline = buildExperimentsPipeline({
     disposer,
-    dvcReader,
     dvcRoot,
-    internalCommands,
-    stageList
+    internalCommands
   })
   const mockCheckOrAddPipeline = stub(pipeline, 'checkOrAddPipeline')
   const mockSelectBranches = stub().resolves(['main', 'other'])
@@ -126,10 +127,9 @@ export const buildExperiments = ({
 
 export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
   const {
-    dvcReader,
-    internalCommands,
     experiments: mockExperiments,
     gitReader,
+    internalCommands,
     messageSpy,
     resourceLocator
   } = buildExperiments({
@@ -147,7 +147,6 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
 
   const pipeline = buildExperimentsPipeline({
     disposer,
-    dvcReader,
     dvcRoot: dvcDemoPath,
     internalCommands
   })
@@ -177,9 +176,11 @@ export const buildSingleRepoExperiments = (disposer: SafeWatcherDisposer) => {
   const workspaceExperiments = disposer.track(
     new WorkspaceExperiments(internalCommands, buildMockMemento())
   )
+  stub(dvcReader, 'stageList').resolves('train')
+  stub(dvcReader, 'dag').resolves('')
+
   const pipeline = buildExperimentsPipeline({
     disposer,
-    dvcReader,
     dvcRoot: dvcDemoPath,
     internalCommands
   })
