@@ -111,7 +111,7 @@ export const collectCustomPlots = ({
 export const collectCustomPlotRawData = (
   orderValue: CustomPlotsOrderValue,
   experiments: Experiment[]
-) => {
+): Array<Record<string, unknown>> => {
   const { metric, param } = orderValue
   const metricPath = getFullValuePath(ColumnType.METRICS, metric)
   const paramPath = getFullValuePath(ColumnType.PARAMS, param)
@@ -472,7 +472,7 @@ export const collectSelectedTemplatePlotRawData = ({
     multiSourceEncodingUpdate
   )
 
-  return datapoints
+  return datapoints as unknown as Array<Record<string, unknown>>
 }
 
 export const collectOrderedRevisions = (

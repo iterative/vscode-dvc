@@ -1442,7 +1442,7 @@ describe('App', () => {
     expect(screen.getByTestId('modal')).toBeInTheDocument()
   })
 
-  it('should add a "export raw data" action to zoomed in plot modal', async () => {
+  it('should add a "save as json" action to zoomed in plot modal', async () => {
     renderAppWithOptionalData({
       template: complexTemplatePlotsFixture
     })
@@ -1455,7 +1455,7 @@ describe('App', () => {
 
     const modal = screen.getByTestId('modal')
 
-    const customAction = await within(modal).findByText('Save Raw Data')
+    const customAction = await within(modal).findByText('Save as JSON')
 
     expect(customAction).toBeInTheDocument()
 
@@ -1463,7 +1463,32 @@ describe('App', () => {
 
     expect(mockPostMessage).toHaveBeenCalledWith({
       payload: complexTemplatePlotsFixture.plots[0].entries[0].id,
-      type: MessageFromWebviewType.EXPORT_PLOT_DATA
+      type: MessageFromWebviewType.EXPORT_PLOT_DATA_AS_JSON
+    })
+  })
+
+  it('should add a "save as csv" action to zoomed in plot modal', async () => {
+    renderAppWithOptionalData({
+      template: complexTemplatePlotsFixture
+    })
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
+
+    fireEvent.click(plot)
+
+    const modal = screen.getByTestId('modal')
+
+    const customAction = await within(modal).findByText('Save as CSV')
+
+    expect(customAction).toBeInTheDocument()
+
+    fireEvent.click(customAction)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      payload: complexTemplatePlotsFixture.plots[0].entries[0].id,
+      type: MessageFromWebviewType.EXPORT_PLOT_DATA_AS_CSV
     })
   })
 

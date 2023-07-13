@@ -57,7 +57,7 @@ import {
 } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
 import { ErrorsModel } from '../errors/model'
-import { openFileInEditor, writeJson } from '../../fileSystem'
+import { openFileInEditor, writeCsv, writeJson } from '../../fileSystem'
 import { Toast } from '../../vscode/toast'
 
 export class PlotsModel extends ModelWithPersistence {
@@ -227,21 +227,15 @@ export class PlotsModel extends ModelWithPersistence {
     return selectedRevisions
   }
 
-  public savePlotData(plotId: string, filePath: string) {
-    const foundCustomPlot = this.customPlotsOrder.find(
-      ({ metric, param }) => getCustomPlotId(metric, param) === plotId
-    )
+  public savePlotDataAsJson(filePath: string, plotId: string) {
+    void this.savePlotData(filePath, plotId, data => {
+      writeJson(filePath, data, true)
+      return Promise.resolve()
+    })
+  }
 
-    const rawData = foundCustomPlot
-      ? this.getCustomPlotData(foundCustomPlot)
-      : this.getSelectedTemplatePlotData(plotId)
-
-    try {
-      writeJson(filePath, rawData as unknown as Record<string, unknown>, true)
-      void openFileInEditor(filePath)
-    } catch {
-      void Toast.showError('Cannot write to file')
-    }
+  public savePlotDataAsCsv(filePath: string, plotId: string) {
+    void this.savePlotData(filePath, plotId, data => writeCsv(filePath, data))
   }
 
   public getTemplatePlots(
@@ -478,5 +472,26 @@ export class PlotsModel extends ModelWithPersistence {
       .filter(({ id }) => id !== EXPERIMENT_WORKSPACE_ID)
 
     return collectCustomPlotRawData(orderValue, experiments)
+  }
+
+  private async savePlotData(
+    filePath: string,
+    plotId: string,
+    writeToFile: (rawData: Array<Record<string, unknown>>) => Promise<void>
+  ) {
+    const foundCustomPlot = this.customPlotsOrder.find(
+      ({ metric, param }) => getCustomPlotId(metric, param) === plotId
+    )
+
+    const rawData = foundCustomPlot
+      ? this.getCustomPlotData(foundCustomPlot)
+      : this.getSelectedTemplatePlotData(plotId)
+
+    try {
+      await writeToFile(rawData)
+      void openFileInEditor(filePath)
+    } catch {
+      void Toast.showError('Cannot write to file')
+    }
   }
 }
