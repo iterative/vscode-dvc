@@ -66,7 +66,7 @@ suite('Pipeline Test Suite', () => {
       expect(cwd).to.equal(dvcDemoPath)
     })
 
-    it('should return a the dvcRoot if there are multiple pipelines but one is the root', async () => {
+    it('should return the project root if there are multiple pipelines but one is the root', async () => {
       const { pipeline, pipelineModel } = buildPipeline({
         disposer: disposable,
         dvcRoot: dvcDemoPath,

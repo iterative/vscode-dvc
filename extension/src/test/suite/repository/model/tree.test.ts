@@ -287,8 +287,9 @@ suite('Repositories Tree Test Suite', () => {
     })
 
     it('should pull the correct target(s) when asked to dvc.pullTarget a non-tracked directory', async () => {
-      const { gitReader, internalCommands, mockDataStatus } =
-        buildDependencies(disposable)
+      const { gitReader, internalCommands, mockDataStatus } = buildDependencies(
+        { disposer: disposable }
+      )
 
       mockDataStatus.resetBehavior()
       mockDataStatus.resolves({

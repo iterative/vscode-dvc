@@ -57,15 +57,12 @@ export const buildExperiments = ({
     mockExpShow,
     mockGetCommitMessages,
     resourceLocator
-  } = buildDependencies(disposer, expShow)
+  } = buildDependencies({ disposer, expShow, stageList })
 
   const mockUpdateExperimentsData = stub()
   const mockExperimentsData = buildMockExperimentsData(
     mockUpdateExperimentsData
   )
-
-  stub(dvcReader, 'stageList').resolves(stageList ?? undefined) // move these two into buildDependencies
-  stub(dvcReader, 'dag').resolves('')
 
   const pipeline = buildExperimentsPipeline({
     disposer,
@@ -163,21 +160,13 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
 }
 
 export const buildSingleRepoExperiments = (disposer: SafeWatcherDisposer) => {
-  const {
-    config,
-    dvcReader,
-    internalCommands,
-    gitReader,
-    messageSpy,
-    resourceLocator
-  } = buildDependencies(disposer)
+  const { config, internalCommands, gitReader, messageSpy, resourceLocator } =
+    buildDependencies({ disposer })
 
   stub(gitReader, 'getGitRepositoryRoot').resolves(dvcDemoPath)
   const workspaceExperiments = disposer.track(
     new WorkspaceExperiments(internalCommands, buildMockMemento())
   )
-  stub(dvcReader, 'stageList').resolves('train')
-  stub(dvcReader, 'dag').resolves('')
 
   const pipeline = buildExperimentsPipeline({
     disposer,

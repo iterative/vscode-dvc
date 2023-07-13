@@ -43,21 +43,13 @@ export const buildPlots = async ({
   gitLog?: string
   rowOrder?: { branch: string; sha: string }[]
 }) => {
-  const {
-    dvcReader,
-    internalCommands,
-    mockPlotsDiff,
-    messageSpy,
-    resourceLocator
-  } = buildDependencies(disposer, expShow, plotsDiff)
+  const { internalCommands, mockPlotsDiff, messageSpy, resourceLocator } =
+    buildDependencies({ disposer, expShow, plotsDiff })
 
   const mockRemoveDir = stub(FileSystem, 'removeDir').returns(undefined)
   const mockGetModifiedTime = stub(FileSystem, 'getModifiedTime').returns(
     MOCK_IMAGE_MTIME
   )
-
-  stub(dvcReader, 'stageList').resolves('train')
-  stub(dvcReader, 'dag').resolves('')
 
   const pipeline = buildExperimentsPipeline({
     disposer,
