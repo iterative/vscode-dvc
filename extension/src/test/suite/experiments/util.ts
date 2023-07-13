@@ -116,6 +116,7 @@ export const buildExperiments = ({
     mockGetCommitMessages,
     mockSelectBranches,
     mockUpdateExperimentsData,
+    pipeline,
     resourceLocator
   }
 }
