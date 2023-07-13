@@ -20,4 +20,4 @@ export const buildMockMemento = (
       values[key] = value
       void Promise.resolve()
     }
-  } as unknown as Memento)
+  }) as unknown as Memento

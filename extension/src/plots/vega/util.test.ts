@@ -144,7 +144,7 @@ describe('extendVegaSpec', () => {
         ...layers.slice(1)
       ],
       title
-    } as TopLevelSpec)
+    }) as TopLevelSpec
 
   it('should truncate all titles from the left to 50 characters for large plots', () => {
     const spec = withLongTemplatePlotTitle()

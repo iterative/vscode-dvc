@@ -1,16 +1,16 @@
 import { DetailedHTMLProps, HTMLAttributes } from 'react'
 
 export const withScale = (scale: number) =>
-  ({ '--scale': scale } as DetailedHTMLProps<
+  ({ '--scale': scale }) as DetailedHTMLProps<
     HTMLAttributes<HTMLDivElement>,
     HTMLDivElement
-  >)
+  >
 
 export const withVariant = (variant: number) =>
-  ({ '--variant': variant } as DetailedHTMLProps<
+  ({ '--variant': variant }) as DetailedHTMLProps<
     HTMLAttributes<HTMLDivElement>,
     HTMLDivElement
-  >)
+  >
 
 export enum ThemeProperty {
   BACKGROUND_COLOR = '--vscode-editor-background',
