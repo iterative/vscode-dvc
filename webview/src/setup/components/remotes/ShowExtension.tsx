@@ -16,7 +16,7 @@ export const ShowExtension: React.FC<{
         icon={Extensions}
         width={16}
         height={16}
-        className={styles.infoIcon}
+        className={styles.extensionIcon}
       />{' '}
       The <ExtensionLink extensionId={id}>{name}</ExtensionLink> extension can
       be used to <span>{capabilities}</span>.
