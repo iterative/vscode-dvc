@@ -1,20 +1,18 @@
 import { trimAndSplit } from '../../util/stdout'
 
-export const collectStages = (pipelines: {
+export const collectStages = (data: {
   [pipeline: string]: string | undefined
 }): {
-  invalidPipelines: Set<string>
-  validPipelines: Set<string>
-  validStages: string[]
+  pipelines: Set<string>
+  stages: string[]
   // eslint-disable-next-line sonarjs/cognitive-complexity
 } => {
-  const validStages: string[] = []
-  const validPipelines = new Set<string>()
-  const invalidPipelines = new Set<string>()
+  const stages: string[] = []
+  const pipelines = new Set<string>()
 
-  for (const [pipeline, stageList] of Object.entries(pipelines)) {
+  for (const [pipeline, stageList] of Object.entries(data)) {
     if (stageList === undefined) {
-      invalidPipelines.add(pipeline)
+      pipelines.add(pipeline)
     }
 
     if (!stageList) {
@@ -25,9 +23,9 @@ export const collectStages = (pipelines: {
       if (!stage || stage.endsWith('.dvc')) {
         continue
       }
-      validStages.push(stage)
-      validPipelines.add(pipeline)
+      stages.push(stage)
+      pipelines.add(pipeline)
     }
   }
-  return { invalidPipelines, validPipelines, validStages }
+  return { pipelines, stages }
 }

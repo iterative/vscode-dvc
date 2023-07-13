@@ -251,11 +251,10 @@ export class WebviewMessages {
         this.experiments.getAvailableBranchesToShow().length > 0,
       hasCheckpoints: this.experiments.hasCheckpoints(),
       hasColumns: this.columns.hasNonDefaultColumns(),
-      hasConfig: !!this.pipeline.hasStage(),
+      hasConfig: !!(this.pipeline.hasStage() || this.pipeline.hasPipeline()),
       hasMoreCommits: this.experiments.getHasMoreCommits(),
       hasRunningWorkspaceExperiment:
         this.experiments.hasRunningWorkspaceExperiment(),
-      hasValidDvcYaml: !this.pipeline.hasInvalidRootDvcYaml(),
       isShowingMoreCommits: this.experiments.getIsShowingMoreCommits(),
       rows: this.experiments.getRowData(),
       selectedForPlotsCount: this.experiments.getSelectedRevisions().length,
@@ -263,8 +262,8 @@ export class WebviewMessages {
     }
   }
 
-  private async addConfiguration() {
-    await this.pipeline.checkOrAddPipeline()
+  private addConfiguration() {
+    this.pipeline.checkOrAddPipeline()
   }
 
   private async setMaxTableHeadDepth() {

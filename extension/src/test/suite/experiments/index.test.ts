@@ -139,7 +139,6 @@ suite('Experiments Test Suite', () => {
         hasColumns: true,
         hasConfig: true,
         hasRunningWorkspaceExperiment: true,
-        hasValidDvcYaml: true,
         rows: rowsFixture,
         sorts: []
       }
@@ -174,51 +173,6 @@ suite('Experiments Test Suite', () => {
       expect(windowSpy).not.to.have.been.called
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should set hasValidDvcYaml to false if there is an error getting stages and there is a dvc.yaml file', async () => {
-      const { experiments, messageSpy } = buildExperiments({
-        disposer: disposable,
-        stageList: null
-      })
-
-      await experiments.showWebview()
-
-      expect(messageSpy).to.be.calledWithMatch({
-        hasValidDvcYaml: false
-      })
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
-    it('should set hasValidDvcYaml to true if there is no invalid root dvc.yaml file', async () => {
-      const { experiments, messageSpy, pipeline } = buildExperiments({
-        disposer: disposable,
-        stageList: null
-      })
-
-      stub(pipeline, 'hasInvalidRootDvcYaml').returns(false)
-
-      await experiments.showWebview()
-
-      const expectedTableData = {
-        hasValidDvcYaml: true
-      }
-
-      expect(messageSpy).to.be.calledWithMatch(expectedTableData)
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
-    it('should set hasValidDvcYaml to true if there are no errors getting stages', async () => {
-      stub(FileSystem, 'hasDvcYamlFile').returns(false)
-
-      const { experiments, messageSpy } = buildExperiments({
-        disposer: disposable,
-        stageList: ''
-      })
-
-      await experiments.showWebview()
-
-      expect(messageSpy).to.be.calledWithMatch({
-        hasValidDvcYaml: true
-      })
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
     it('should set hasConfig to false if there are no stages', async () => {
       const { experiments, messageSpy } = buildExperiments({
         disposer: disposable,
@@ -229,6 +183,19 @@ suite('Experiments Test Suite', () => {
 
       expect(messageSpy).to.be.calledWithMatch({
         hasConfig: false
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should set hasConfig to true if there is a broken dvc.yaml', async () => {
+      const { experiments, messageSpy } = buildExperiments({
+        disposer: disposable,
+        stageList: null
+      })
+
+      await experiments.showWebview()
+
+      expect(messageSpy).to.be.calledWithMatch({
+        hasConfig: true
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 

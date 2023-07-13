@@ -25,7 +25,7 @@ export class PipelineData extends BaseData<{
   public async update(): Promise<void> {
     const [dag, fileList] = await Promise.all([
       this.internalCommands.executeCommand(AvailableCommands.DAG, this.dvcRoot),
-      findFiles('**/dvc.yaml')
+      this.findDvcYamls()
     ])
 
     const dvcYamlsDirs = new Set<string>()
@@ -44,5 +44,9 @@ export class PipelineData extends BaseData<{
     }
 
     return this.notifyChanged({ dag, stages })
+  }
+
+  private findDvcYamls() {
+    return findFiles('**/dvc.yaml')
   }
 }

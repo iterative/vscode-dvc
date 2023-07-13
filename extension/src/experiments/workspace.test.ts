@@ -1,6 +1,6 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { Experiments } from '.'
-import { scriptCommand, WorkspaceExperiments } from './workspace'
+import { WorkspaceExperiments } from './workspace'
 import {
   quickPickManyValues,
   quickPickOne,
@@ -23,6 +23,7 @@ import {
 } from '../fileSystem'
 import { Toast } from '../vscode/toast'
 import { pickFile } from '../vscode/resourcePicker'
+import { ScriptCommand } from '../pipeline'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = jest.mocked(Disposable)
@@ -96,11 +97,13 @@ describe('Experiments', () => {
     {
       '/my/dvc/root': {
         getDvcRoot: () => mockedDvcRoot,
+        getPipelineCwd: () => mockedDvcRoot,
         pickCommitOrExperiment: mockedPickCommitOrExperiment,
         showWebview: mockedShowWebview
       } as unknown as Experiments,
       '/my/fun/dvc/root': {
         getDvcRoot: () => mockedOtherDvcRoot,
+        getPipelineCwd: () => mockedOtherDvcRoot,
         pickExperiment: jest.fn(),
         showWebview: jest.fn()
       } as unknown as Experiments
@@ -427,7 +430,7 @@ describe('Experiments', () => {
         mockedDvcRoot,
         trainingScript,
         'train',
-        scriptCommand.PYTHON,
+        ScriptCommand.PYTHON,
         false
       )
     })
@@ -468,7 +471,7 @@ describe('Experiments', () => {
         mockedDvcRoot,
         'path/to/training_script.py',
         'train',
-        scriptCommand.PYTHON,
+        ScriptCommand.PYTHON,
         false
       )
     })
@@ -488,7 +491,7 @@ describe('Experiments', () => {
         mockedDvcRoot,
         'path/to/training_script.ipynb',
         'train',
-        scriptCommand.JUPYTER,
+        ScriptCommand.JUPYTER,
         false
       )
     })

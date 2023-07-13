@@ -160,6 +160,7 @@ suite('Workspace Experiments Test Suite', () => {
       const { dvcExecutor, experiments } = buildExperiments({
         disposer: disposable
       })
+      await experiments.isReady()
 
       const mockExperimentRunQueue = stub(dvcExecutor, 'expRunQueue').resolves(
         'true'
@@ -206,6 +207,7 @@ suite('Workspace Experiments Test Suite', () => {
   describe('dvc.modifyWorkspaceParamsAndResume', () => {
     it('should be able to resume a checkpoint experiment using an existing one as a base', async () => {
       const { experiments } = buildExperiments({ disposer: disposable })
+      await experiments.isReady()
 
       const mockExperimentRun = stub(
         DvcRunner.prototype,
@@ -256,6 +258,7 @@ suite('Workspace Experiments Test Suite', () => {
   describe('dvc.modifyWorkspaceParamsAndRun', () => {
     it('should be able to run an experiment using an existing one as a base', async () => {
       const { experiments } = buildExperiments({ disposer: disposable })
+      await experiments.isReady()
 
       const mockExperimentRun = stub(
         DvcRunner.prototype,

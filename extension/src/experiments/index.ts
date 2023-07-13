@@ -431,7 +431,8 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public async modifyWorkspaceParamsAndRun(
-    commandId: ModifiedExperimentAndRunCommandId
+    commandId: ModifiedExperimentAndRunCommandId,
+    cwd: string
   ) {
     const paramsToModify = await this.pickAndModifyParams()
     if (!paramsToModify) {
@@ -440,13 +441,13 @@ export class Experiments extends BaseRepository<TableData> {
 
     await this.internalCommands.executeCommand<string>(
       commandId,
-      this.dvcRoot,
+      cwd,
       ...paramsToModify
     )
     return this.notifyChanged()
   }
 
-  public async modifyWorkspaceParamsAndQueue() {
+  public async modifyWorkspaceParamsAndQueue(cwd: string) {
     const paramsToModify = await this.pickAndModifyParams()
     if (!paramsToModify) {
       return
@@ -455,7 +456,7 @@ export class Experiments extends BaseRepository<TableData> {
     await Toast.showOutput(
       this.internalCommands.executeCommand<string>(
         AvailableCommands.EXP_QUEUE,
-        this.dvcRoot,
+        cwd,
         ...paramsToModify
       )
     )
@@ -515,6 +516,10 @@ export class Experiments extends BaseRepository<TableData> {
 
   public getRelativeMetricsFiles() {
     return this.columns.getRelativeMetricsFiles()
+  }
+
+  public getPipelineCwd() {
+    return this.pipeline.getCwd()
   }
 
   protected sendInitialWebviewData() {

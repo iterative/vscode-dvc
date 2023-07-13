@@ -5,28 +5,24 @@ import { Disposable } from '../../class/dispose'
 export class PipelineModel extends Disposable {
   private readonly dvcRoot: string
   private stages: string[] | undefined = []
-  private validPipelines: Set<string> | undefined
-  private invalidPipelines: Set<string> | undefined
+  private pipelines: Set<string> | undefined
 
   constructor(dvcRoot: string) {
     super()
     this.dvcRoot = dvcRoot
   }
 
-  public transformAndSet(stages: { [pipeline: string]: string | undefined }) {
-    if (isEqual(stages, {})) {
+  public transformAndSet(data: { [pipeline: string]: string | undefined }) {
+    if (isEqual(data, {})) {
       this.stages = undefined
-      this.validPipelines = undefined
-      this.invalidPipelines = undefined
+      this.pipelines = undefined
       return
     }
 
-    const { validPipelines, invalidPipelines, validStages } =
-      collectStages(stages)
+    const { pipelines, stages } = collectStages(data)
 
-    this.validPipelines = validPipelines
-    this.invalidPipelines = invalidPipelines
-    this.stages = validStages
+    this.pipelines = pipelines
+    this.stages = stages
   }
 
   public hasStage() {
@@ -38,14 +34,10 @@ export class PipelineModel extends Disposable {
   }
 
   public getPipelines() {
-    return this.validPipelines
+    return this.pipelines
   }
 
   public hasPipeline() {
-    return !!(this.validPipelines && this.validPipelines.size > 0)
-  }
-
-  public hasInvalidRootDvcYaml() {
-    return !!this.invalidPipelines?.has(this.dvcRoot)
+    return !!(this.pipelines && this.pipelines.size > 0)
   }
 }

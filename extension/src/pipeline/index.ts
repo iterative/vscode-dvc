@@ -10,10 +10,10 @@ import { findOrCreateDvcYamlFile, getFileExtension } from '../fileSystem'
 import { Toast } from '../vscode/toast'
 import { getInput, getValidInput } from '../vscode/inputBox'
 import { Title } from '../vscode/title'
-import { quickPickOneOrInput } from '../vscode/quickPick'
+import { quickPickOne, quickPickOneOrInput } from '../vscode/quickPick'
 import { pickFile } from '../vscode/resourcePicker'
 
-enum scriptCommand {
+export enum ScriptCommand {
   JUPYTER = 'jupyter nbconvert --to notebook --inplace --execute',
   PYTHON = 'python'
 }
@@ -21,9 +21,9 @@ enum scriptCommand {
 const getScriptCommand = (script: string) => {
   switch (getFileExtension(script)) {
     case '.py':
-      return scriptCommand.PYTHON
+      return ScriptCommand.PYTHON
     case '.ipynb':
-      return scriptCommand.JUPYTER
+      return ScriptCommand.JUPYTER
     default:
       return ''
   }
@@ -38,10 +38,16 @@ export class Pipeline extends DeferredDisposable {
   private readonly data: PipelineData
   private readonly model: PipelineModel
 
-  constructor(dvcRoot: string, internalCommands: InternalCommands) {
+  constructor(
+    dvcRoot: string,
+    internalCommands: InternalCommands,
+    data?: PipelineData
+  ) {
     super()
     this.dvcRoot = dvcRoot
-    this.data = this.dispose.track(new PipelineData(dvcRoot, internalCommands))
+    this.data = this.dispose.track(
+      data || new PipelineData(dvcRoot, internalCommands)
+    )
     this.model = this.dispose.track(new PipelineModel(dvcRoot))
     this.updated = this.dispose.track(new EventEmitter<void>())
     this.onDidUpdate = this.updated.event
@@ -53,18 +59,35 @@ export class Pipeline extends DeferredDisposable {
     return this.model.hasStage()
   }
 
-  public hasInvalidRootDvcYaml() {
-    return this.model.hasInvalidRootDvcYaml()
+  public hasPipeline() {
+    return this.model.hasPipeline()
   }
 
-  public async checkOrAddPipeline() {
-    const hasStage = this.model.hasStage()
-    if (this.hasInvalidRootDvcYaml()) {
-      await Toast.showError(
-        'Cannot perform task. Your dvc.yaml file is invalid.'
-      )
-      return false
+  public getCwd() {
+    const hasPipeline = this.checkOrAddPipeline() // need to refactor if we are going to run the original command
+    if (!hasPipeline) {
+      return
     }
+
+    const pipelines = this.model.getPipelines()
+    if (!pipelines?.size) {
+      return
+    }
+    if (pipelines.has(this.dvcRoot)) {
+      return this.dvcRoot
+    }
+    if (pipelines.size === 1) {
+      return [...pipelines][0]
+    }
+
+    return quickPickOne(
+      [...pipelines],
+      'Select a Pipeline to Run Command Against'
+    )
+  }
+
+  public checkOrAddPipeline() {
+    const hasStage = this.model.hasStage()
 
     if (!hasStage) {
       return this.addPipeline()
@@ -81,11 +104,11 @@ export class Pipeline extends DeferredDisposable {
       this.data.onDidUpdate(({ dag, stages }) => {
         this.writeDag(dag)
         const hasStage = this.model.hasStage()
-        const hasInvalidRootDvcYaml = this.model.hasInvalidRootDvcYaml()
+        const hasPipeline = this.model.hasPipeline()
         this.model.transformAndSet(stages)
         if (
           hasStage !== this.model.hasStage() ||
-          hasInvalidRootDvcYaml !== this.model.hasInvalidRootDvcYaml()
+          hasPipeline !== this.model.hasPipeline()
         ) {
           this.updated.fire()
         }
