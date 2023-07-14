@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.18] - 2023-07-14
+
+### 🚀 New Features and Enhancements
+
+- Add CSV export option to zoomed in plots [#4252](https://github.com/iterative/vscode-dvc/pull/4252) by [@julieg18](https://github.com/julieg18)
+- Save smooth plot values across sessions [#4220](https://github.com/iterative/vscode-dvc/pull/4220) by [@julieg18](https://github.com/julieg18)
+
 ## [1.0.17] - 2023-07-11
 
 ### 🚀 New Features and Enhancements
