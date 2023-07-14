@@ -27,4 +27,20 @@ describe('collectPipelines', () => {
       new Set([join(dvcDemoPath, 'nested1'), join(dvcDemoPath, 'nested3')])
     )
   })
+
+  it('should not collect a pipeline that has no stages', () => {
+    const pipelines = collectPipelines({
+      [dvcDemoPath]: ''
+    })
+
+    expect(pipelines).toStrictEqual(new Set([]))
+  })
+
+  it('should collect a pipeline that failed validation', () => {
+    const pipelines = collectPipelines({
+      [dvcDemoPath]: undefined
+    })
+
+    expect(pipelines).toStrictEqual(new Set([dvcDemoPath]))
+  })
 })
