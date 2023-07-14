@@ -60,14 +60,10 @@ suite('Experiments Filter By Tree Test Suite', () => {
     })
 
     it('should be able to update the table data by adding and removing a filter', async () => {
-      const { experiments, messageSpy } = buildExperiments({
-        disposer: disposable
-      })
-
+      const { experiments, messageSpy } =
+        stubWorkspaceExperimentsGetters(disposable)
       await experiments.isReady()
       await experiments.showWebview()
-
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const accuracyPath = buildMetricOrParamPath(
         ColumnType.METRICS,
@@ -135,14 +131,11 @@ suite('Experiments Filter By Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to remove all filters with dvc.views.experimentsFilterByTree.removeAllFilters', async () => {
-      const mockShowQuickPick = stub(window, 'showQuickPick')
-      const mockShowInputBox = stub(window, 'showInputBox')
-
-      const { experiments } = buildExperiments({ disposer: disposable })
-
+      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
       await experiments.isReady()
 
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
+      const mockShowQuickPick = stub(window, 'showQuickPick')
+      const mockShowInputBox = stub(window, 'showInputBox')
 
       const lossPath = buildMetricOrParamPath(
         ColumnType.METRICS,
@@ -338,14 +331,10 @@ suite('Experiments Filter By Tree Test Suite', () => {
     })
 
     it('should be able to filter to starred experiments', async () => {
-      const { experiments, messageSpy } = buildExperiments({
-        disposer: disposable
-      })
-
+      const { experiments, messageSpy } =
+        stubWorkspaceExperimentsGetters(disposable)
       await experiments.isReady()
       await experiments.showWebview()
-
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       await addFilterViaQuickInput(experiments, starredFilter)
 
@@ -373,13 +362,9 @@ suite('Experiments Filter By Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should provide a shortcut to filter to starred experiments', async () => {
-      const { experiments, experimentsModel } = buildExperiments({
-        disposer: disposable
-      })
-
+      const { experiments, experimentsModel } =
+        stubWorkspaceExperimentsGetters(disposable)
       await experiments.isReady()
-
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const mockAddFilter = stub(experimentsModel, 'addFilter')
 

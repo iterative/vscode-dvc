@@ -533,7 +533,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to apply an experiment', async () => {
-      const { experiments } = buildExperiments({ disposer: disposable })
+      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
       await experiments.isReady()
 
       const webview = await experiments.showWebview()
@@ -544,8 +544,6 @@ suite('Experiments Test Suite', () => {
         DvcExecutor.prototype,
         'expApply'
       ).resolves(undefined)
-
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       mockMessageReceived.fire({
         payload: mockExperimentId,
@@ -560,7 +558,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to create a branch from an experiment', async () => {
-      const { experiments } = buildExperiments({ disposer: disposable })
+      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
       await experiments.isReady()
 
       const mockBranch = 'mock-branch-input'
@@ -570,8 +568,6 @@ suite('Experiments Test Suite', () => {
         DvcExecutor.prototype,
         'expBranch'
       ).resolves('undefined')
-
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -714,9 +710,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to modify the workspace params and queue an experiment', async () => {
-      const { experiments, dvcExecutor } = buildExperiments({
-        disposer: disposable
-      })
+      const { experiments, dvcExecutor } =
+        stubWorkspaceExperimentsGetters(disposable)
 
       const mockModifiedParams = [
         '-S',
@@ -724,8 +719,6 @@ suite('Experiments Test Suite', () => {
         '-S',
         'params.yaml:weight_decay=0'
       ]
-
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
       const mockQueueExperiment = stub(dvcExecutor, 'expRunQueue').resolves(
@@ -749,9 +742,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to modify the workspace params and run a new experiment', async () => {
-      const { experiments, dvcRunner } = buildExperiments({
-        disposer: disposable
-      })
+      const { experiments, dvcRunner } =
+        stubWorkspaceExperimentsGetters(disposable)
 
       const mockModifiedParams = [
         '-S',
@@ -759,8 +751,6 @@ suite('Experiments Test Suite', () => {
         '-S',
         'params.yaml:weight_decay=0'
       ]
-
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
       const mockRunExperiment = stub(dvcRunner, 'runExperiment').resolves(
@@ -786,9 +776,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to modify the workspace params, reset and run a new experiment', async () => {
-      const { experiments, dvcRunner } = buildExperiments({
-        disposer: disposable
-      })
+      const { experiments, dvcRunner } =
+        stubWorkspaceExperimentsGetters(disposable)
 
       const mockModifiedParams = [
         '-S',
@@ -798,8 +787,6 @@ suite('Experiments Test Suite', () => {
       ]
 
       stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
-
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -847,9 +834,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to toggle an experiment's status", async () => {
-      const { experiments, experimentsModel } = buildExperiments({
-        disposer: disposable
-      })
+      const { experiments, experimentsModel } =
+        stubWorkspaceExperimentsGetters(disposable)
 
       await experiments.isReady()
 
@@ -874,8 +860,6 @@ suite('Experiments Test Suite', () => {
         isExperimentSelected(queuedId),
         'queued experiment cannot be selected'
       ).to.be.false
-
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -1192,9 +1176,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to select experiments for plotting', async () => {
-      const { experiments, experimentsModel } = buildExperiments({
-        disposer: disposable
-      })
+      const { experiments, experimentsModel } =
+        stubWorkspaceExperimentsGetters(disposable)
       await experiments.isReady()
 
       const webview = await experiments.showWebview()
@@ -1203,8 +1186,6 @@ suite('Experiments Test Suite', () => {
       const runningInQueueId = 'exp-e7a67'
       const expectedIds = ['main', 'test-branch', runningInQueueId]
       const mockExperimentIds = [...expectedIds, queuedId]
-
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const tableChangePromise = experimentsUpdatedEvent(experiments)
 
@@ -1231,9 +1212,8 @@ suite('Experiments Test Suite', () => {
         dvc: true,
         experiments: true
       })
-      const { experiments, experimentsModel } = buildExperiments({
-        disposer: disposable
-      })
+      const { experiments, experimentsModel } =
+        stubWorkspaceExperimentsGetters(disposable)
       const mockShowPlots = stub(WorkspacePlots.prototype, 'showWebview')
 
       const dataSent = new Promise(resolve =>
@@ -1249,8 +1229,6 @@ suite('Experiments Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       const runningInQueueId = 'exp-e7a67'
       const mockExperimentIds = ['main', 'test-branch', runningInQueueId]
-
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const tableChangePromise = experimentsUpdatedEvent(experiments)
 
@@ -1302,9 +1280,9 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to stop experiments running', async () => {
-      const { experiments, dvcExecutor } = buildExperiments({
-        disposer: disposable
-      })
+      const { experiments, dvcExecutor } =
+        stubWorkspaceExperimentsGetters(disposable)
+
       const mockQueueKill = stub(dvcExecutor, 'queueKill')
       const mockStopProcesses = stub(ProcessExecution, 'stopProcesses')
 
@@ -1328,7 +1306,6 @@ suite('Experiments Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockExperimentIds = ['exp-e7a67', 'exp-83425']
 
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
       const mockPid = 1234
       const mockGetPidFromFile = stub(FileSystem, 'getPidFromFile')
         .onFirstCall()

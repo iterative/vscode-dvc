@@ -244,9 +244,12 @@ export const buildExperimentsData = (
 }
 
 export const stubWorkspaceExperimentsGetters = (
-  dvcRoot: string,
-  experiments: Experiments
+  disposer: Disposer,
+  dvcRoot = dvcDemoPath
 ) => {
+  const { dvcExecutor, dvcRunner, experiments, experimentsModel, messageSpy } =
+    buildExperiments({ disposer })
+
   const mockGetOnlyOrPickProject = stub(
     WorkspaceExperiments.prototype,
     'getOnlyOrPickProject'
@@ -257,5 +260,13 @@ export const stubWorkspaceExperimentsGetters = (
     'getRepository'
   ).returns(experiments)
 
-  return [mockGetOnlyOrPickProject, mockGetRepository]
+  return {
+    dvcExecutor,
+    dvcRunner,
+    experiments,
+    experimentsModel,
+    messageSpy,
+    mockGetOnlyOrPickProject,
+    mockGetRepository
+  }
 }
