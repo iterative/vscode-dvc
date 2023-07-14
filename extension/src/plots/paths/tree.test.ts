@@ -29,7 +29,7 @@ describe('PlotsPathsTree', () => {
   it('should return the correct children for multi source plots (encoding elements)', () => {
     const mockedWorkspacePlots = {
       getRepository: () =>
-        ({ getChildPaths: mockedGetChildPaths } as unknown as Plots),
+        ({ getChildPaths: mockedGetChildPaths }) as unknown as Plots,
       pathsChanged: buildMockedEventEmitter()
     } as unknown as WorkspacePlots
     const mockedInternalCommands = {
