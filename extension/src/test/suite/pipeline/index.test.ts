@@ -1,12 +1,13 @@
 import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
-import { SinonStub, restore, stub } from 'sinon'
+import { SinonStub, restore, spy, stub } from 'sinon'
 import { expect } from 'chai'
 import { QuickPickItem, Uri, window } from 'vscode'
 import { buildPipeline } from './util'
 import {
   bypassProcessManagerDebounce,
   closeAllEditors,
+  getActiveEditorUpdatedEvent,
   getMockNow
 } from '../util'
 import { Disposable } from '../../../extension'
@@ -15,6 +16,7 @@ import * as QuickPick from '../../../vscode/quickPick'
 import { QuickPickOptionsWithTitle } from '../../../vscode/quickPick'
 import * as FileSystem from '../../../fileSystem'
 import { ScriptCommand } from '../../../pipeline'
+import * as VscodeContext from '../../../vscode/context'
 
 suite('Pipeline Test Suite', () => {
   const disposable = Disposable.fn()
@@ -284,5 +286,77 @@ suite('Pipeline Test Suite', () => {
       expect(mockQuickPickOneOrInput).to.be.calledOnce
       expect(mockFindOrCreateDvcYamlFile).not.to.be.called
     })
+  })
+
+  it('should set the appropriate context value when a dvc.yaml is open in the active editor', async () => {
+    const dvcYaml = Uri.file(join(dvcDemoPath, 'dvc.yaml'))
+    await window.showTextDocument(dvcYaml)
+
+    const mockContext: { [key: string]: unknown } = {
+      'dvc.pipeline.file.active': false
+    }
+
+    const mockSetContextValue = stub(VscodeContext, 'setContextValue')
+    mockSetContextValue.callsFake((key: string, value: unknown) => {
+      mockContext[key] = value
+      return Promise.resolve(undefined)
+    })
+
+    const { pipeline } = buildPipeline({ disposer: disposable })
+    await pipeline.isReady()
+
+    expect(
+      mockContext['dvc.pipeline.file.active'],
+      'should set dvc.pipeline.file.active to true when a dvc.yaml is open and the extension starts'
+    ).to.be.true
+
+    mockSetContextValue.resetHistory()
+
+    const startupEditorClosed = getActiveEditorUpdatedEvent(disposable)
+
+    await closeAllEditors()
+    await startupEditorClosed
+
+    expect(
+      mockContext['dvc.pipeline.file.active'],
+      'should set dvc.pipeline.file.active to false when the dvc.yaml in the active editor is closed'
+    ).to.be.false
+
+    mockSetContextValue.resetHistory()
+
+    const activeEditorUpdated = getActiveEditorUpdatedEvent(disposable)
+
+    await window.showTextDocument(dvcYaml)
+    await activeEditorUpdated
+
+    const activeEditorClosed = getActiveEditorUpdatedEvent(disposable)
+
+    expect(
+      mockContext['dvc.pipeline.file.active'],
+      'should set dvc.pipeline.file.active to true when a dvc.yaml file is in the active editor'
+    ).to.be.true
+
+    await closeAllEditors()
+    await activeEditorClosed
+
+    expect(
+      mockContext['dvc.pipeline.file.active'],
+      'should set dvc.pipeline.file.active to false when the dvc.yaml in the active editor is closed again'
+    ).to.be.false
+  })
+
+  it('should set dvc.pipeline.file.active to false when a dvc.yaml is not open and the extension starts', async () => {
+    const nonDvcYaml = Uri.file(join(dvcDemoPath, '.gitignore'))
+    await window.showTextDocument(nonDvcYaml)
+
+    const setContextValueSpy = spy(VscodeContext, 'setContextValue')
+
+    const { pipeline } = buildPipeline({ disposer: disposable })
+    await pipeline.isReady()
+
+    expect(setContextValueSpy).to.be.calledWith(
+      'dvc.pipeline.file.active',
+      false
+    )
   })
 })
