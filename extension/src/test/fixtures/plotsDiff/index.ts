@@ -733,13 +733,15 @@ export const getMinimalWebviewMessage = () => ({
   plots: extendedSpecs(basicVega),
   nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
   height: DEFAULT_PLOT_HEIGHT,
-  revisions: getRevisions()
+  revisions: getRevisions(),
+  smoothPlotValues: {}
 })
 
 export const getTemplateWebviewMessage = (): TemplatePlotsData => ({
   plots: extendedSpecs({ ...basicVega, ...require('./vega').default }),
   nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
-  height: DEFAULT_PLOT_HEIGHT
+  height: DEFAULT_PLOT_HEIGHT,
+  smoothPlotValues: {}
 })
 
 export const getManyTemplatePlotsWebviewMessage = (
@@ -749,7 +751,8 @@ export const getManyTemplatePlotsWebviewMessage = (
     ...multipleVega(length)
   }),
   nbItemsPerRow: DEFAULT_NB_ITEMS_PER_ROW,
-  height: DEFAULT_PLOT_HEIGHT
+  height: DEFAULT_PLOT_HEIGHT,
+  smoothPlotValues: {}
 })
 
 export const MOCK_IMAGE_MTIME = 946684800000

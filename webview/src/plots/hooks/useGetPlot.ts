@@ -14,11 +14,12 @@ export const useGetPlot = (
   id: string,
   spec?: VisualizationSpec
 ) => {
-  const isCustomPlot = section === PlotsSection.CUSTOM_PLOTS
-  const storeSection = isCustomPlot ? 'custom' : 'template'
+  const isTemplatePlot = section === PlotsSection.TEMPLATE_PLOTS
+  const storeSection = isTemplatePlot ? 'template' : 'custom'
   const snapshot = useSelector(
     (state: PlotsState) => state[storeSection].plotsSnapshots
   )
+
   const [data, setData] = useState<PlainObject | undefined>(undefined)
   const [content, setContent] = useState<VisualizationSpec | undefined>(spec)
 
@@ -28,23 +29,23 @@ export const useGetPlot = (
       return
     }
 
-    if (isCustomPlot) {
-      setData({ values: (plot as CustomPlotData).values })
-      setContent(spec)
+    if (isTemplatePlot) {
+      setData(undefined)
+      setContent({
+        ...(plot as TemplatePlotEntry).content,
+        height: 'container',
+        width: 'container'
+      } as VisualizationSpec)
       return
     }
 
-    setData(undefined)
-    setContent({
-      ...(plot as TemplatePlotEntry).content,
-      height: 'container',
-      width: 'container'
-    } as VisualizationSpec)
-  }, [id, isCustomPlot, setData, setContent, section, spec])
+    setData({ values: (plot as CustomPlotData).values })
+    setContent(spec)
+  }, [id, isTemplatePlot, setData, setContent, section, spec])
 
   useEffect(() => {
     setPlotData()
   }, [snapshot, setPlotData])
 
-  return { content, data }
+  return { content, data, isTemplatePlot }
 }

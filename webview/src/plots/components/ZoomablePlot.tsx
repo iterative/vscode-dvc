@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { VisualizationSpec } from 'react-vega'
 import VegaLite, { VegaLiteProps } from 'react-vega/lib/VegaLite'
+import { TemplateVegaLite } from './templatePlots/TemplateVegaLite'
 import { setZoomedInPlot } from './webviewSlice'
 import styles from './styles.module.scss'
 import { config } from './constants'
@@ -27,7 +28,11 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   onViewReady,
   section
 }) => {
-  const { data, content: spec } = useGetPlot(section, id, createdSpec)
+  const {
+    data,
+    content: spec,
+    isTemplatePlot
+  } = useGetPlot(section, id, createdSpec)
   const dispatch = useDispatch()
   const currentPlotProps = useRef<VegaLiteProps>()
 
@@ -43,24 +48,43 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
 
   useEffect(() => {
     dispatch(
-      setZoomedInPlot({ id, plot: currentPlotProps.current, refresh: true })
+      setZoomedInPlot({
+        id,
+        isTemplatePlot,
+        plot: currentPlotProps.current,
+        refresh: true
+      })
     )
-  }, [data, spec, dispatch, id])
+  }, [data, spec, dispatch, id, isTemplatePlot])
 
   const handleOnClick = () => {
     zoomPlot()
-    return dispatch(setZoomedInPlot({ id, plot: plotProps }))
+    return dispatch(setZoomedInPlot({ id, isTemplatePlot, plot: plotProps }))
   }
 
   if (!data && !spec) {
     return null
   }
+
+  const onNewView = () => {
+    if (onViewReady) {
+      onViewReady()
+    }
+  }
+
   return (
     <button className={styles.zoomablePlot} onClick={handleOnClick}>
       <GripIcon className={styles.plotGripIcon} />
-      {currentPlotProps.current && (
-        <VegaLite {...plotProps} onNewView={onViewReady} />
-      )}
+      {currentPlotProps.current &&
+        (isTemplatePlot ? (
+          <TemplateVegaLite
+            vegaLiteProps={plotProps}
+            id={id}
+            onNewView={onNewView}
+          />
+        ) : (
+          <VegaLite {...plotProps} onNewView={onNewView} />
+        ))}
     </button>
   )
 }

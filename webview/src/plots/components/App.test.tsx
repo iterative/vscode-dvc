@@ -2147,5 +2147,123 @@ describe('App', () => {
       fireEvent(panel, clickEvent)
       expect(clickEvent.stopPropagation).toHaveBeenCalledTimes(1)
     })
+
+    describe('Smooth Plots', () => {
+      const waitSetValuePostMessage = (value: number) =>
+        waitFor(
+          () =>
+            expect(mockPostMessage).toHaveBeenCalledWith({
+              payload: { id: smoothId, value },
+              type: MessageFromWebviewType.SET_SMOOTH_PLOT_VALUE
+            }),
+          { timeout: 5000 }
+        )
+      it('should send a message to save the value when a vega panel slider is interacted with', async () => {
+        renderAppWithOptionalData({ template: withVegaPanels })
+
+        const smoothPlot = screen.getByTestId(`plot_${smoothId}`)
+        await waitForVega(smoothPlot)
+
+        // eslint-disable-next-line testing-library/no-node-access
+        const slider = smoothPlot.querySelector(
+          '.vega-bindings input[name="smooth"]'
+        )
+        expect(slider).toBeInTheDocument()
+
+        fireEvent.change(slider as HTMLInputElement, { target: { value: 0.4 } })
+
+        await waitSetValuePostMessage(0.4)
+      })
+
+      it('should send a message to save the value when a zoomed in plot vega panel slider is interacted with', async () => {
+        renderAppWithOptionalData({ template: withVegaPanels })
+
+        const smoothPlot = within(
+          screen.getByTestId(`plot_${smoothId}`)
+        ).getByRole('button')
+        fireEvent.click(smoothPlot)
+
+        const popup = screen.getByTestId('zoomed-in-plot')
+        await waitForVega(popup)
+
+        // eslint-disable-next-line testing-library/no-node-access
+        const slider = popup.querySelector(
+          '.vega-bindings input[name="smooth"]'
+        )
+        expect(slider).toBeInTheDocument()
+
+        fireEvent.change(slider as HTMLInputElement, { target: { value: 0.4 } })
+
+        await waitSetValuePostMessage(0.4)
+      })
+
+      it('should set a vega panel slider value when given a default value', async () => {
+        renderAppWithOptionalData({
+          template: { ...withVegaPanels, smoothPlotValues: { [smoothId]: 0.6 } }
+        })
+
+        const smoothPlot = screen.getByTestId(`plot_${smoothId}`)
+        await waitForVega(smoothPlot)
+
+        // eslint-disable-next-line testing-library/no-node-access
+        const slider = smoothPlot.querySelector(
+          '.vega-bindings input[name="smooth"]'
+        )
+        expect(slider).toBeInTheDocument()
+
+        expect(slider).toHaveValue('0.6')
+      })
+
+      it('should set the zoomed in plot vega panel slider value when given a default value', async () => {
+        renderAppWithOptionalData({
+          template: { ...withVegaPanels, smoothPlotValues: { [smoothId]: 0.6 } }
+        })
+
+        const smoothPlot = within(
+          screen.getByTestId(`plot_${smoothId}`)
+        ).getByRole('button')
+        fireEvent.click(smoothPlot)
+
+        const popup = screen.getByTestId('zoomed-in-plot')
+        await waitForVega(popup)
+
+        // eslint-disable-next-line testing-library/no-node-access
+        const slider = popup.querySelector(
+          '.vega-bindings input[name="smooth"]'
+        )
+        expect(slider).toBeInTheDocument()
+
+        expect(slider).toHaveValue('0.6')
+      })
+
+      it('should update a vega panel slider value when given a new value', async () => {
+        renderAppWithOptionalData({
+          template: { ...withVegaPanels }
+        })
+
+        const smoothPlot = screen.getByTestId(`plot_${smoothId}`)
+
+        await waitForVega(smoothPlot)
+
+        // eslint-disable-next-line testing-library/no-node-access
+        const slider = smoothPlot.querySelector(
+          '.vega-bindings input[name="smooth"]'
+        )
+
+        expect(slider).toBeInTheDocument()
+        expect(slider).toHaveValue('0.2')
+
+        sendSetDataMessage({
+          template: {
+            ...withVegaPanels,
+            smoothPlotValues: { [smoothId]: 0.7 }
+          }
+        })
+
+        await waitFor(() => expect(slider).toHaveValue('0.7'), {
+          timeout: 5000
+        })
+      })
+    })
   })
 })

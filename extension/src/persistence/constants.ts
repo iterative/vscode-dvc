@@ -17,6 +17,7 @@ export enum PersistenceKey {
   PLOTS_CUSTOM_ORDER = 'plotCustomOrder:',
   PLOT_SECTION_COLLAPSED = 'plotSectionCollapsed:',
   PLOT_SELECTED_METRICS = 'plotSelectedMetrics:',
+  PLOTS_SMOOTH_PLOT_VALUES = 'plotSmoothPlotValues:',
   PLOT_TEMPLATE_ORDER = 'plotTemplateOrder:'
 }
 

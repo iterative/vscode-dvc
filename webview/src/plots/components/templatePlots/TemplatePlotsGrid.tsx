@@ -48,8 +48,9 @@ export const TemplatePlotsGrid: React.FC<TemplatePlotsGridProps> = ({
 
   const addDisabled = useCallback(
     (e: Event) => {
-      const disabledId = (e.currentTarget as HTMLFormElement).parentElement
-        ?.parentElement?.parentElement?.id
+      const disabledId = (e.currentTarget as HTMLFormElement).closest(
+        `.${styles.plot as string}`
+      )?.id
       dispatch(changeDisabledDragIds(disabledId ? [disabledId] : []))
     },
     [dispatch]
