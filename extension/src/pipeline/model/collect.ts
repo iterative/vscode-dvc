@@ -1,31 +1,36 @@
 import { trimAndSplit } from '../../util/stdout'
 
-export const collectStages = (data: {
+const failedValidation = (stageList: string | undefined): boolean =>
+  stageList === undefined
+
+const hasStages = (stageList: string | undefined): stageList is string =>
+  !!stageList
+
+const hasValidStage = (stageList: string | undefined): boolean => {
+  if (!hasStages(stageList)) {
+    return false
+  }
+
+  for (const stageStr of trimAndSplit(stageList)) {
+    const stage = stageStr.split(/\s+/)?.[0]?.trim()
+    if (!stage || stage.endsWith('.dvc')) {
+      continue
+    }
+
+    return true
+  }
+  return false
+}
+
+export const collectPipelines = (data: {
   [pipeline: string]: string | undefined
-}): {
-  pipelines: Set<string>
-  stages: string[]
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-} => {
-  const stages: string[] = []
+}): Set<string> => {
   const pipelines = new Set<string>()
 
   for (const [pipeline, stageList] of Object.entries(data)) {
-    if (stageList === undefined) {
-      pipelines.add(pipeline)
-    }
-
-    if (!stageList) {
-      continue
-    }
-    for (const stageStr of trimAndSplit(stageList)) {
-      const stage = stageStr.split(/\s+/)?.[0]?.trim()
-      if (!stage || stage.endsWith('.dvc')) {
-        continue
-      }
-      stages.push(stage)
+    if (failedValidation(stageList) || hasValidStage(stageList)) {
       pipelines.add(pipeline)
     }
   }
-  return { pipelines, stages }
+  return pipelines
 }

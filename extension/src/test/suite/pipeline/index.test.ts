@@ -41,41 +41,38 @@ suite('Pipeline Test Suite', () => {
     })
 
     it('should return a cwd if there is an invalid pipeline (let command fail)', async () => {
-      const { pipeline, pipelineModel } = buildPipeline({
+      const { pipeline } = buildPipeline({
         disposer: disposable,
         dvcRoot: dvcDemoPath,
         stageList: null
       })
       await pipeline.isReady()
-      expect(pipelineModel.hasStage()).to.be.false
-      expect(pipelineModel.hasPipeline()).to.be.true
+      expect(pipeline.hasPipeline()).to.be.true
       const cwd = await pipeline.getCwd()
       expect(cwd).to.equal(dvcDemoPath)
     })
 
     it('should return a cwd if there is a single valid pipeline', async () => {
-      const { pipeline, pipelineModel } = buildPipeline({
+      const { pipeline } = buildPipeline({
         disposer: disposable,
         dvcRoot: dvcDemoPath,
         stageList: 'train'
       })
       await pipeline.isReady()
-      expect(pipelineModel.hasStage()).to.be.true
-      expect(pipelineModel.hasPipeline()).to.be.true
+      expect(pipeline.hasPipeline()).to.be.true
       const cwd = await pipeline.getCwd()
       expect(cwd).to.equal(dvcDemoPath)
     })
 
     it('should return the project root if there are multiple pipelines but one is the root', async () => {
-      const { pipeline, pipelineModel } = buildPipeline({
+      const { pipeline } = buildPipeline({
         disposer: disposable,
         dvcRoot: dvcDemoPath,
         dvcYamls: [dvcDemoPath, join(dvcDemoPath, 'subdir')],
         stageList: 'train'
       })
       await pipeline.isReady()
-      expect(pipelineModel.hasStage()).to.be.true
-      expect(pipelineModel.hasPipeline()).to.be.true
+      expect(pipeline.hasPipeline()).to.be.true
       const cwd = await pipeline.getCwd()
       expect(cwd).to.equal(dvcDemoPath)
     })
@@ -87,15 +84,14 @@ suite('Pipeline Test Suite', () => {
         Thenable<string | undefined>
       >
       mockShowQuickPick.resolves(pickedPipeline)
-      const { pipeline, pipelineModel } = buildPipeline({
+      const { pipeline } = buildPipeline({
         disposer: disposable,
         dvcRoot: dvcDemoPath,
         dvcYamls: [pickedPipeline, join(dvcDemoPath, 'nested2', 'dvc.yaml')],
         stageList: 'train'
       })
       await pipeline.isReady()
-      expect(pipelineModel.hasStage()).to.be.true
-      expect(pipelineModel.hasPipeline()).to.be.true
+      expect(pipeline.hasPipeline()).to.be.true
       const cwd = await pipeline.getCwd()
       expect(cwd).to.equal(pickedPipeline)
       expect(mockShowQuickPick).to.be.calledOnce

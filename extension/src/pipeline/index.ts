@@ -47,15 +47,11 @@ export class Pipeline extends DeferredDisposable {
     this.data = this.dispose.track(
       data || new PipelineData(dvcRoot, internalCommands)
     )
-    this.model = this.dispose.track(new PipelineModel(dvcRoot))
+    this.model = this.dispose.track(new PipelineModel())
     this.updated = this.dispose.track(new EventEmitter<void>())
     this.onDidUpdate = this.updated.event
 
     void this.initialize()
-  }
-
-  public hasStage() {
-    return this.model.hasStage()
   }
 
   public hasPipeline() {
@@ -97,13 +93,9 @@ export class Pipeline extends DeferredDisposable {
     this.dispose.track(
       this.data.onDidUpdate(({ dag, stages }) => {
         this.writeDag(dag)
-        const hasStage = this.model.hasStage()
         const hasPipeline = this.model.hasPipeline()
         this.model.transformAndSet(stages)
-        if (
-          hasStage !== this.model.hasStage() ||
-          hasPipeline !== this.model.hasPipeline()
-        ) {
+        if (hasPipeline !== this.model.hasPipeline()) {
           this.updated.fire()
         }
       })

@@ -6,7 +6,6 @@ import { Pipeline } from '../../../pipeline'
 import { PipelineData } from '../../../pipeline/data'
 import { dvcDemoPath } from '../../util'
 import { buildDependencies } from '../util'
-import { PipelineModel } from '../../../pipeline/model'
 
 export const buildExperimentsPipeline = ({
   disposer,
@@ -60,8 +59,6 @@ export const buildPipeline = ({
     internalCommands,
     pipeline,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    pipelineData: (pipeline as any).data as PipelineData,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    pipelineModel: (pipeline as any).model as PipelineModel
+    pipelineData: (pipeline as any).data as PipelineData
   }
 }

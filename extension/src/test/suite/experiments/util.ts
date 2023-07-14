@@ -147,7 +147,7 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
     dvcRoot: dvcDemoPath,
     internalCommands
   })
-  stub(pipeline, 'hasStage').returns(true)
+  stub(pipeline, 'hasPipeline').returns(true)
 
   const [experiments] = workspaceExperiments.create(
     [dvcDemoPath],

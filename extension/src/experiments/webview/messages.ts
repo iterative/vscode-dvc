@@ -251,7 +251,7 @@ export class WebviewMessages {
         this.experiments.getAvailableBranchesToShow().length > 0,
       hasCheckpoints: this.experiments.hasCheckpoints(),
       hasColumns: this.columns.hasNonDefaultColumns(),
-      hasConfig: !!(this.pipeline.hasStage() || this.pipeline.hasPipeline()),
+      hasConfig: this.pipeline.hasPipeline(),
       hasMoreCommits: this.experiments.getHasMoreCommits(),
       hasRunningWorkspaceExperiment:
         this.experiments.hasRunningWorkspaceExperiment(),
