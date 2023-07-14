@@ -161,7 +161,7 @@ suite('Pipeline Test Suite', () => {
       )
     })
 
-    it('should ask to enter a custom command if the file is not a python file or Jupyter notebook', async () => {
+    it('should ask to enter a custom command if the file is not a Python file or Jupyter notebook', async () => {
       const mockNow = getMockNow()
       const { pipeline } = buildPipeline({
         disposer: disposable,

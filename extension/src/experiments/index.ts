@@ -431,9 +431,13 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public async modifyWorkspaceParamsAndRun(
-    commandId: ModifiedExperimentAndRunCommandId,
-    cwd: string
+    commandId: ModifiedExperimentAndRunCommandId
   ) {
+    const cwd = await this.getPipelineCwd()
+    if (!cwd) {
+      return
+    }
+
     const paramsToModify = await this.pickAndModifyParams()
     if (!paramsToModify) {
       return
@@ -447,7 +451,12 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
-  public async modifyWorkspaceParamsAndQueue(cwd: string) {
+  public async modifyWorkspaceParamsAndQueue() {
+    const cwd = await this.getPipelineCwd()
+    if (!cwd) {
+      return
+    }
+
     const paramsToModify = await this.pickAndModifyParams()
     if (!paramsToModify) {
       return

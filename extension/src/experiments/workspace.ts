@@ -153,21 +153,29 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     commandId: ModifiedExperimentAndRunCommandId,
     overrideRoot?: string
   ) {
-    const { cwd, repository } = await this.getRepositoryAndCwd(overrideRoot)
-    if (!(cwd && repository)) {
+    const project = await this.getDvcRoot(overrideRoot)
+    if (!project) {
+      return
+    }
+    const repository = this.getRepository(project)
+    if (!repository) {
       return
     }
 
-    return await repository.modifyWorkspaceParamsAndRun(commandId, cwd)
+    return await repository.modifyWorkspaceParamsAndRun(commandId)
   }
 
   public async modifyWorkspaceParamsAndQueue(overrideRoot?: string) {
-    const { cwd, repository } = await this.getRepositoryAndCwd(overrideRoot)
-    if (!(cwd && repository)) {
+    const project = await this.getDvcRoot(overrideRoot)
+    if (!project) {
+      return
+    }
+    const repository = this.getRepository(project)
+    if (!repository) {
       return
     }
 
-    return await repository.modifyWorkspaceParamsAndQueue(cwd)
+    return await repository.modifyWorkspaceParamsAndQueue()
   }
 
   public async getCwdThenRun(commandId: CommandId) {
@@ -407,19 +415,13 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.getRepository(dvcRoot)[method]()
   }
 
-  private async getRepositoryAndCwd(overrideRoot?: string) {
+  private async getCwd(overrideRoot?: string) {
     const project = await this.getDvcRoot(overrideRoot)
     if (!project) {
-      return { cwd: undefined, repository: undefined }
+      return
     }
     const repository = this.getRepository(project)
-    const cwd = await repository.getPipelineCwd()
-    return { cwd, repository }
-  }
-
-  private async getCwd(overrideRoot?: string) {
-    const { cwd } = await this.getRepositoryAndCwd(overrideRoot)
-    return cwd
+    return await repository.getPipelineCwd()
   }
 
   private async pickExpThenRun(
