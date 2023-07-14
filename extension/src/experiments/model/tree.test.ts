@@ -533,20 +533,19 @@ describe('ExperimentsTree', () => {
 
     it('should return a tree item for the workspace', () => {
       let mockedItem = {}
-      mockedTreeItem.mockImplementationOnce(function (
-        resourceUri,
-        collapsibleState
-      ) {
-        expect(collapsibleState).toStrictEqual(0)
-        expect(resourceUri).toStrictEqual(
-          getDecoratableUri(
-            EXPERIMENT_WORKSPACE_ID,
-            DecoratableTreeItemScheme.EXPERIMENTS
+      mockedTreeItem.mockImplementationOnce(
+        function (resourceUri, collapsibleState) {
+          expect(collapsibleState).toStrictEqual(0)
+          expect(resourceUri).toStrictEqual(
+            getDecoratableUri(
+              EXPERIMENT_WORKSPACE_ID,
+              DecoratableTreeItemScheme.EXPERIMENTS
+            )
           )
-        )
-        mockedItem = { collapsibleState, resourceUri }
-        return mockedItem
-      })
+          mockedItem = { collapsibleState, resourceUri }
+          return mockedItem
+        }
+      )
       mockedThemeIcon.mockImplementationOnce(function (id) {
         return { id }
       })

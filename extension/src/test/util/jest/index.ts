@@ -8,14 +8,14 @@ export const getMockedProcess = (stdout: string): Process =>
     all: { on: jest.fn() },
     on: jest.fn(),
     stdout: new Promise(resolve => resolve(stdout))
-  } as unknown as Process)
+  }) as unknown as Process
 
 export const getFailingMockedProcess = (stderr: string): Process =>
   ({
     on: jest.fn(),
     // eslint-disable-next-line promise/param-names
     stdout: new Promise((_, reject) => reject(new Error(stderr)))
-  } as unknown as Process)
+  }) as unknown as Process
 
 export const buildMockedEventEmitter = <T = void>() => {
   const mockedEmitter = jest.mocked(new EventEmitter<T>())
@@ -55,7 +55,7 @@ export const buildMockedExperiments = () => {
         getSorts: mockedGetSorts,
         getSummaryColumnOrder: mockedGetSummaryColumnOrder,
         getWorkspaceAndCommits: mockedGetWorkspaceAndCommits
-      } as unknown as Experiments),
+      }) as unknown as Experiments,
     isReady: () => true
   } as unknown as WorkspaceExperiments
 

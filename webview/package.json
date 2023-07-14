@@ -35,7 +35,7 @@
     "react-redux": "8.1.1",
     "react-vega": "7.6.0",
     "react-virtualized": "9.22.5",
-    "vega-lite": "5.12.0",
+    "vega-lite": "5.13.0",
     "vega-util": "1.17.2"
   },
   "devDependencies": {
@@ -69,9 +69,9 @@
     "file-loader": "6.2.0",
     "fork-ts-checker-webpack-plugin": "8.0.0",
     "identity-obj-proxy": "3.0.0",
-    "jest": "29.6.0",
+    "jest": "29.6.1",
     "jest-canvas-mock": "2.5.2",
-    "jest-environment-jsdom": "29.6.0",
+    "jest-environment-jsdom": "29.6.1",
     "lint-staged": "13.2.3",
     "raw-loader": "4.0.2",
     "sass": "1.63.6",

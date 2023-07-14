@@ -488,11 +488,12 @@ const extendedSpecs = (plotsOutput: TemplatePlots): TemplatePlotSection[] => {
             ...originalPlot.content,
             data: {
               values:
-                REVISIONS.flatMap(revision =>
-                  originalPlot.datapoints?.[revision].map(values => ({
-                    ...values,
-                    rev: revision
-                  }))
+                REVISIONS.flatMap(
+                  revision =>
+                    originalPlot.datapoints?.[revision].map(values => ({
+                      ...values,
+                      rev: revision
+                    }))
                 ) || []
             }
           } as TopLevelSpec,

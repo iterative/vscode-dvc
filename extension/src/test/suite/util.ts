@@ -188,7 +188,7 @@ export const buildMockExperimentsData = (update = stub()) =>
     onDidUpdate: stub(),
     setBranches: stub(),
     update
-  } as unknown as ExperimentsData)
+  }) as unknown as ExperimentsData
 
 const buildResourceLocator = (disposer: Disposer): ResourceLocator =>
   disposer.track(new ResourceLocator(extensionUri))
