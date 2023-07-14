@@ -1970,7 +1970,9 @@ suite('Experiments Test Suite', () => {
       const { experiments } = buildExperiments({ disposer: disposable })
       await experiments.isReady()
 
-      expect(setContextValueSpy).not.to.be.called
+      expect(setContextValueSpy).not.to.be.calledWith(
+        VscodeContext.ContextKey.EXPERIMENTS_FILE_ACTIVE
+      )
     })
   })
 

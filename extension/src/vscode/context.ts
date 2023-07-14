@@ -11,6 +11,7 @@ export enum ContextKey {
   EXPERIMENTS_SORTED = 'dvc.experiments.sorted',
   EXPERIMENTS_WEBVIEW_ACTIVE = 'dvc.experiments.webview.active',
   MULTIPLE_PROJECTS = 'dvc.multiple.projects',
+  PIPELINE_FILE_ACTIVE = 'dvc.pipeline.file.active',
   PLOTS_WEBVIEW_ACTIVE = 'dvc.plots.webview.active',
   PROJECT_AVAILABLE = 'dvc.project.available',
   PROJECT_HAS_DATA = 'dvc.project.hasData',
