@@ -280,15 +280,20 @@ class Extension extends Disposable {
     await Promise.all([
       this.repositories.create(this.getRoots()),
       this.repositoriesTree.initialize(this.getRoots()),
-      this.experiments.create(this.getRoots(), this.resourceLocator),
       this.pipelines.create(this.getRoots())
     ])
+    this.experiments.create(
+      this.getRoots(),
+      this.pipelines,
+      this.resourceLocator
+    )
     this.plots.create(this.getRoots(), this.resourceLocator, this.experiments)
 
     return Promise.all([
-      this.repositories.isReady(),
       this.experiments.isReady(),
-      this.plots.isReady()
+      this.pipelines.isReady(),
+      this.plots.isReady(),
+      this.repositories.isReady()
     ])
   }
 
@@ -296,6 +301,7 @@ class Extension extends Disposable {
     this.repositories.reset()
     this.repositoriesTree.initialize([])
     this.experiments.reset()
+    this.pipelines.reset()
     this.plots.reset()
   }
 

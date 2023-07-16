@@ -34,7 +34,9 @@ suite('Plots Data Test Suite', () => {
   })
 
   const buildPlotsData = (selectedRevisions: string[] = []) => {
-    const { internalCommands, mockPlotsDiff } = buildDependencies(disposable)
+    const { internalCommands, mockPlotsDiff } = buildDependencies({
+      disposer: disposable
+    })
 
     const mockGetSelectedOrderedIds = stub().returns(selectedRevisions)
 

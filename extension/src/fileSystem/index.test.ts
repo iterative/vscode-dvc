@@ -20,7 +20,7 @@ import {
 } from '.'
 import { dvcDemoPath } from '../test/util'
 import { DOT_DVC } from '../cli/dvc/constants'
-import { scriptCommand } from '../experiments/workspace'
+import { ScriptCommand } from '../pipeline'
 
 jest.mock('../cli/dvc/reader')
 jest.mock('fs-extra', () => {
@@ -235,7 +235,7 @@ describe('findOrCreateDvcYamlFile', () => {
       cwd,
       '/my/training/script.py',
       'train',
-      scriptCommand.PYTHON,
+      ScriptCommand.PYTHON,
       true
     )
 
@@ -249,7 +249,7 @@ describe('findOrCreateDvcYamlFile', () => {
       cwd,
       '/script.py',
       uniqueStageName,
-      scriptCommand.PYTHON,
+      ScriptCommand.PYTHON,
       true
     )
 
@@ -265,7 +265,7 @@ describe('findOrCreateDvcYamlFile', () => {
       cwd,
       '/my/training/script.py',
       'train',
-      scriptCommand.PYTHON,
+      ScriptCommand.PYTHON,
       true
     )
 
@@ -281,7 +281,7 @@ describe('findOrCreateDvcYamlFile', () => {
       cwd,
       '/my/training/script.py',
       'train',
-      scriptCommand.PYTHON,
+      ScriptCommand.PYTHON,
       true
     )
 
@@ -298,7 +298,7 @@ describe('findOrCreateDvcYamlFile', () => {
       '/dir/my_project/',
       '/dir/my_project/src/training/train.py',
       'train',
-      scriptCommand.PYTHON,
+      ScriptCommand.PYTHON,
       true
     )
 
@@ -311,7 +311,7 @@ describe('findOrCreateDvcYamlFile', () => {
       '/dir/my_project/',
       '/dir/my_other_project/train.py',
       'train',
-      scriptCommand.PYTHON,
+      ScriptCommand.PYTHON,
       true
     )
 
@@ -328,7 +328,7 @@ describe('findOrCreateDvcYamlFile', () => {
       '/dir/my_project/',
       join('dir', 'my_project', 'src', 'training', 'train.py'),
       'train',
-      scriptCommand.PYTHON,
+      ScriptCommand.PYTHON,
       false
     )
 
@@ -345,17 +345,17 @@ describe('findOrCreateDvcYamlFile', () => {
       '/',
       '/train.ipynb',
       'train',
-      scriptCommand.JUPYTER,
+      ScriptCommand.JUPYTER,
       true
     )
 
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
       expect.anything(),
-      expect.stringContaining(scriptCommand.JUPYTER)
+      expect.stringContaining(ScriptCommand.JUPYTER)
     )
     expect(mockedAppendFileSync).not.toHaveBeenCalledWith(
       expect.anything(),
-      expect.stringContaining(scriptCommand.PYTHON)
+      expect.stringContaining(ScriptCommand.PYTHON)
     )
   })
 
@@ -364,17 +364,17 @@ describe('findOrCreateDvcYamlFile', () => {
       '/',
       '/train.py',
       'train',
-      scriptCommand.PYTHON,
+      ScriptCommand.PYTHON,
       true
     )
 
     expect(mockedAppendFileSync).not.toHaveBeenCalledWith(
       expect.anything(),
-      expect.stringContaining(scriptCommand.JUPYTER)
+      expect.stringContaining(ScriptCommand.JUPYTER)
     )
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
       expect.anything(),
-      expect.stringContaining(scriptCommand.PYTHON)
+      expect.stringContaining(ScriptCommand.PYTHON)
     )
   })
 
@@ -395,7 +395,7 @@ describe('findOrCreateDvcYamlFile', () => {
       '/',
       '/train.py',
       'train',
-      scriptCommand.PYTHON,
+      ScriptCommand.PYTHON,
       true
     )
 

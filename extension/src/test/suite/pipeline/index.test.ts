@@ -1,0 +1,288 @@
+import { join } from 'path'
+import { afterEach, beforeEach, describe, it, suite } from 'mocha'
+import { SinonStub, restore, stub } from 'sinon'
+import { expect } from 'chai'
+import { QuickPickItem, Uri, window } from 'vscode'
+import { buildPipeline } from './util'
+import {
+  bypassProcessManagerDebounce,
+  closeAllEditors,
+  getMockNow
+} from '../util'
+import { Disposable } from '../../../extension'
+import { dvcDemoPath } from '../../util'
+import * as QuickPick from '../../../vscode/quickPick'
+import { QuickPickOptionsWithTitle } from '../../../vscode/quickPick'
+import * as FileSystem from '../../../fileSystem'
+import { ScriptCommand } from '../../../pipeline'
+
+suite('Pipeline Test Suite', () => {
+  const disposable = Disposable.fn()
+  beforeEach(() => {
+    restore()
+  })
+
+  afterEach(() => {
+    return closeAllEditors()
+  })
+
+  describe('Pipeline', () => {
+    it('should ask to create a stage and not return a cwd if there is no pipeline', async () => {
+      const mockInputBox = stub(window, 'showInputBox').resolves(undefined)
+      const { pipeline } = buildPipeline({
+        disposer: disposable,
+        dvcYamls: []
+      })
+      await pipeline.isReady()
+      const cwd = await pipeline.getCwd()
+      expect(mockInputBox, 'the user should be prompted to add a pipeline').to
+        .have.been.calledOnce
+      expect(cwd, 'no cwd is returned').to.be.undefined
+    })
+
+    it('should return a cwd if there is an invalid pipeline (let command fail)', async () => {
+      const { pipeline } = buildPipeline({
+        disposer: disposable,
+        dvcRoot: dvcDemoPath,
+        stageList: null
+      })
+      await pipeline.isReady()
+      expect(pipeline.hasPipeline()).to.be.true
+      const cwd = await pipeline.getCwd()
+      expect(cwd).to.equal(dvcDemoPath)
+    })
+
+    it('should return a cwd if there is a single valid pipeline', async () => {
+      const { pipeline } = buildPipeline({
+        disposer: disposable,
+        dvcRoot: dvcDemoPath,
+        stageList: 'train'
+      })
+      await pipeline.isReady()
+      expect(pipeline.hasPipeline()).to.be.true
+      const cwd = await pipeline.getCwd()
+      expect(cwd).to.equal(dvcDemoPath)
+    })
+
+    it('should return the project root if there are multiple pipelines but one is the root', async () => {
+      const { pipeline } = buildPipeline({
+        disposer: disposable,
+        dvcRoot: dvcDemoPath,
+        dvcYamls: [dvcDemoPath, join(dvcDemoPath, 'subdir')],
+        stageList: 'train'
+      })
+      await pipeline.isReady()
+      expect(pipeline.hasPipeline()).to.be.true
+      const cwd = await pipeline.getCwd()
+      expect(cwd).to.equal(dvcDemoPath)
+    })
+
+    it('should prompt the user to pick a pipeline if there are multiple pipelines and none are the root', async () => {
+      const pickedPipeline = join(dvcDemoPath, 'nested1', 'dvc.yaml')
+      const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
+        [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
+        Thenable<string | undefined>
+      >
+      mockShowQuickPick.resolves(pickedPipeline)
+      const { pipeline } = buildPipeline({
+        disposer: disposable,
+        dvcRoot: dvcDemoPath,
+        dvcYamls: [pickedPipeline, join(dvcDemoPath, 'nested2', 'dvc.yaml')],
+        stageList: 'train'
+      })
+      await pipeline.isReady()
+      expect(pipeline.hasPipeline()).to.be.true
+      const cwd = await pipeline.getCwd()
+      expect(cwd).to.equal(pickedPipeline)
+      expect(mockShowQuickPick).to.be.calledOnce
+    })
+
+    it('should create a new stage given all of the required information from the user', async () => {
+      const mockNow = getMockNow()
+      const { pipeline } = buildPipeline({
+        disposer: disposable,
+        dvcRoot: dvcDemoPath,
+        dvcYamls: []
+      })
+      bypassProcessManagerDebounce(mockNow)
+
+      const mockInputBox = stub(window, 'showInputBox').resolves('train')
+      const mockQuickPickOneOrInput = stub(
+        QuickPick,
+        'quickPickOneOrInput'
+      ).resolves('train.py')
+      const mockFindOrCreateDvcYamlFile = stub(
+        FileSystem,
+        'findOrCreateDvcYamlFile'
+      ).resolves(undefined)
+
+      await pipeline.checkOrAddPipeline()
+      expect(mockInputBox).to.be.calledOnce
+      expect(mockQuickPickOneOrInput).to.be.calledOnce
+      expect(mockFindOrCreateDvcYamlFile).to.be.calledWithExactly(
+        dvcDemoPath,
+        'train.py',
+        'train',
+        'python',
+        false
+      )
+    })
+
+    it('should add jupyter nbconvert as a command to the dvc.yaml file if the file has the .ipynb extension', async () => {
+      const mockNow = getMockNow()
+      const { pipeline } = buildPipeline({
+        disposer: disposable,
+        dvcRoot: dvcDemoPath,
+        dvcYamls: []
+      })
+      bypassProcessManagerDebounce(mockNow)
+      const scriptPath = join('path', 'to', 'training_script.ipynb')
+      const stageName = 'notebook_train'
+
+      const mockInputBox = stub(window, 'showInputBox').resolves(stageName)
+      const mockQuickPickOneOrInput = stub(
+        QuickPick,
+        'quickPickOneOrInput'
+      ).resolves(scriptPath)
+      const mockFindOrCreateDvcYamlFile = stub(
+        FileSystem,
+        'findOrCreateDvcYamlFile'
+      ).resolves(undefined)
+
+      await pipeline.checkOrAddPipeline()
+      expect(mockInputBox).to.be.calledOnce
+      expect(mockQuickPickOneOrInput).to.be.calledOnce
+      expect(mockFindOrCreateDvcYamlFile).to.be.calledWithExactly(
+        dvcDemoPath,
+        scriptPath,
+        stageName,
+        ScriptCommand.JUPYTER,
+        false
+      )
+    })
+
+    it('should ask to enter a custom command if the file is not a Python file or Jupyter notebook', async () => {
+      const mockNow = getMockNow()
+      const { pipeline } = buildPipeline({
+        disposer: disposable,
+        dvcRoot: dvcDemoPath,
+        dvcYamls: []
+      })
+      bypassProcessManagerDebounce(mockNow)
+      const scriptCommand = 'go run'
+      const scriptPath = join('path', 'to', 'go-go-run.go')
+      const stageName = 'go-train'
+
+      const mockInputBox = stub(window, 'showInputBox')
+        .onFirstCall()
+        .resolves(stageName)
+        .onSecondCall()
+        .resolves(scriptCommand)
+      const mockQuickPickOneOrInput = stub(
+        QuickPick,
+        'quickPickOneOrInput'
+      ).resolves(scriptPath)
+      const mockFindOrCreateDvcYamlFile = stub(
+        FileSystem,
+        'findOrCreateDvcYamlFile'
+      ).resolves(undefined)
+
+      await pipeline.checkOrAddPipeline()
+      expect(mockInputBox).to.be.calledTwice
+      expect(mockQuickPickOneOrInput).to.be.calledOnce
+      expect(mockFindOrCreateDvcYamlFile).to.be.calledWithExactly(
+        dvcDemoPath,
+        scriptPath,
+        stageName,
+        scriptCommand,
+        false
+      )
+    })
+
+    it('should ask to convert the script path to a relative path if the path was provided via the file picker', async () => {
+      const mockNow = getMockNow()
+      const { pipeline } = buildPipeline({
+        disposer: disposable,
+        dvcRoot: dvcDemoPath,
+        dvcYamls: []
+      })
+      bypassProcessManagerDebounce(mockNow)
+      const scriptCommand = 'node'
+      const scriptPath = join(dvcDemoPath, 'path', 'to', 'training_script.js')
+      const stageName = 'whoTrainsInJavascript'
+
+      const mockInputBox = stub(window, 'showInputBox')
+        .onFirstCall()
+        .resolves(stageName)
+        .onSecondCall()
+        .resolves(scriptCommand)
+      const mockQuickPickOneOrInput = stub(
+        QuickPick,
+        'quickPickOneOrInput'
+      ).resolves('select')
+      const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves([
+        Uri.file(scriptPath)
+      ])
+
+      const mockFindOrCreateDvcYamlFile = stub(
+        FileSystem,
+        'findOrCreateDvcYamlFile'
+      ).resolves(undefined)
+
+      await pipeline.checkOrAddPipeline()
+      expect(mockInputBox).to.be.calledTwice
+      expect(mockQuickPickOneOrInput).to.be.calledOnce
+      expect(mockShowOpenDialog).to.be.calledOnce
+      expect(mockFindOrCreateDvcYamlFile).to.be.calledWithExactly(
+        dvcDemoPath,
+        scriptPath,
+        stageName,
+        scriptCommand,
+        true
+      )
+    })
+
+    it('should not add a stage if a name was not given', async () => {
+      const { pipeline } = buildPipeline({
+        disposer: disposable,
+        dvcRoot: dvcDemoPath,
+        dvcYamls: []
+      })
+
+      const mockInputBox = stub(window, 'showInputBox').resolves(undefined)
+      const mockQuickPickOneOrInput = stub(QuickPick, 'quickPickOneOrInput')
+      const mockFindOrCreateDvcYamlFile = stub(
+        FileSystem,
+        'findOrCreateDvcYamlFile'
+      )
+
+      await pipeline.checkOrAddPipeline()
+      expect(mockInputBox).to.be.calledOnce
+      expect(mockQuickPickOneOrInput).not.to.be.called
+      expect(mockFindOrCreateDvcYamlFile).not.to.be.called
+    })
+
+    it('should not add a stage if a training script was not given', async () => {
+      const { pipeline } = buildPipeline({
+        disposer: disposable,
+        dvcRoot: dvcDemoPath,
+        dvcYamls: []
+      })
+
+      const mockInputBox = stub(window, 'showInputBox').resolves('mega_train')
+      const mockQuickPickOneOrInput = stub(
+        QuickPick,
+        'quickPickOneOrInput'
+      ).resolves(undefined)
+      const mockFindOrCreateDvcYamlFile = stub(
+        FileSystem,
+        'findOrCreateDvcYamlFile'
+      )
+
+      await pipeline.checkOrAddPipeline()
+      expect(mockInputBox).to.be.calledOnce
+      expect(mockQuickPickOneOrInput).to.be.calledOnce
+      expect(mockFindOrCreateDvcYamlFile).not.to.be.called
+    })
+  })
+})

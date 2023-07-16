@@ -20,7 +20,6 @@ import {
   updateHasConfig,
   updateHasMoreCommits,
   updateHasRunningWorkspaceExperiment,
-  updateHasValidDvcYaml,
   updateIsShowingMoreCommits,
   updateRows,
   updateSelectedForPlotsCount,
@@ -79,9 +78,6 @@ export const App: React.FC<Record<string, unknown>> = () => {
                     data.data.hasRunningWorkspaceExperiment
                   )
                 )
-                continue
-              case 'hasValidDvcYaml':
-                dispatch(updateHasValidDvcYaml(data.data.hasValidDvcYaml))
                 continue
               case 'isShowingMoreCommits':
                 dispatch(

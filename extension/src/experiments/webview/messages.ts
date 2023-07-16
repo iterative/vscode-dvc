@@ -20,25 +20,20 @@ import { SortDefinition } from '../model/sortBy'
 import { getPositiveIntegerInput } from '../../vscode/inputBox'
 import { Title } from '../../vscode/title'
 import { ConfigKey, setConfigValue } from '../../vscode/config'
-import { hasDvcYamlFile } from '../../fileSystem'
 import { NUM_OF_COMMITS_TO_INCREASE } from '../../cli/dvc/constants'
+import { Pipeline } from '../../pipeline'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
 
   private readonly experiments: ExperimentsModel
   private readonly columns: ColumnsModel
+  private readonly pipeline: Pipeline
 
   private readonly getWebview: () => BaseWebview<TableData> | undefined
   private readonly notifyChanged: () => void
   private readonly selectColumns: () => Promise<void>
 
-  private readonly hasStages: () => Promise<string | undefined>
-
-  private hasConfig = false
-  private hasValidDvcYaml = true
-
-  private readonly addStage: () => Promise<boolean>
   private readonly selectBranches: (
     branchesSelected: string[]
   ) => Promise<string[] | undefined>
@@ -49,11 +44,10 @@ export class WebviewMessages {
     dvcRoot: string,
     experiments: ExperimentsModel,
     columns: ColumnsModel,
+    pipeline: Pipeline,
     getWebview: () => BaseWebview<TableData> | undefined,
     notifyChanged: () => void,
     selectColumns: () => Promise<void>,
-    hasStages: () => Promise<string>,
-    addStage: () => Promise<boolean>,
     selectBranches: (
       branchesSelected: string[]
     ) => Promise<string[] | undefined>,
@@ -62,22 +56,12 @@ export class WebviewMessages {
     this.dvcRoot = dvcRoot
     this.experiments = experiments
     this.columns = columns
+    this.pipeline = pipeline
     this.getWebview = getWebview
     this.notifyChanged = notifyChanged
     this.selectColumns = selectColumns
-    this.hasStages = hasStages
-    this.addStage = addStage
     this.selectBranches = selectBranches
     this.update = update
-
-    void this.changeHasConfig()
-  }
-
-  public async changeHasConfig(update?: boolean) {
-    const stages = await this.hasStages()
-    this.hasValidDvcYaml = !hasDvcYamlFile(this.dvcRoot) || stages !== undefined
-    this.hasConfig = !!stages
-    update && this.sendWebviewMessage()
   }
 
   public sendWebviewMessage() {
@@ -267,11 +251,10 @@ export class WebviewMessages {
         this.experiments.getAvailableBranchesToShow().length > 0,
       hasCheckpoints: this.experiments.hasCheckpoints(),
       hasColumns: this.columns.hasNonDefaultColumns(),
-      hasConfig: this.hasConfig,
+      hasConfig: this.pipeline.hasPipeline(),
       hasMoreCommits: this.experiments.getHasMoreCommits(),
       hasRunningWorkspaceExperiment:
         this.experiments.hasRunningWorkspaceExperiment(),
-      hasValidDvcYaml: this.hasValidDvcYaml,
       isShowingMoreCommits: this.experiments.getIsShowingMoreCommits(),
       rows: this.experiments.getRowData(),
       selectedForPlotsCount: this.experiments.getSelectedRevisions().length,
@@ -279,8 +262,8 @@ export class WebviewMessages {
     }
   }
 
-  private async addConfiguration() {
-    await this.addStage()
+  private addConfiguration() {
+    return this.pipeline.checkOrAddPipeline()
   }
 
   private async setMaxTableHeadDepth() {
