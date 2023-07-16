@@ -1038,6 +1038,39 @@ suite('Plots Test Suite', () => {
       )
     })
 
+    it('should handle an update smooth plot values message from the webview', async () => {
+      const { plots, plotsModel } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
+      const templatePlot = templatePlotsFixture.plots[0].entries[0]
+
+      const webview = await plots.showWebview()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockSetSmoothPlotValues = stub(plotsModel, 'setSmoothPlotValues')
+
+      mockMessageReceived.fire({
+        payload: {
+          id: templatePlot.id,
+          value: 0.5
+        },
+        type: MessageFromWebviewType.SET_SMOOTH_PLOT_VALUE
+      })
+
+      expect(mockSendTelemetryEvent).to.be.called
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_SET_SMOOTH_PLOT_VALUE,
+        undefined,
+        undefined
+      )
+      expect(mockSetSmoothPlotValues).to.be.called
+      expect(mockSetSmoothPlotValues).to.be.calledWithExactly(
+        templatePlot.id,
+        0.5
+      )
+    })
+
     it('should handle the CLI throwing an error', async () => {
       const { data, errorsModel, mockPlotsDiff, plots, plotsModel } =
         await buildPlots({ disposer: disposable, plotsDiff: plotsDiffFixture })

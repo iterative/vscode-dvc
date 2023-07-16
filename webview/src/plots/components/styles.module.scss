@@ -193,7 +193,8 @@ $gap: 20px;
   background-color: $bg-color;
   color: $fg-color;
   padding: 10px;
-  display: none;
+  display: block;
+  opacity: 0;
 
   label {
     display: flex;
@@ -217,7 +218,7 @@ $gap: 20px;
 
   &:hover {
     :global(.vega-bindings) {
-      display: block;
+      opacity: 1;
     }
   }
 

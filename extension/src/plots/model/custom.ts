@@ -118,4 +118,4 @@ export const createSpec = (title: string, metric: string, param: string) =>
       }
     ],
     width: 'container'
-  } as VisualizationSpec)
+  }) as VisualizationSpec

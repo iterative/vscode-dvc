@@ -27,8 +27,9 @@ suite('CLI Suite', () => {
       const options = getOptions('child')
       const child = createProcess(options)
 
-      const stdout = await new Promise<string>(resolve =>
-        child.all?.on('data', chunk => resolve(chunk.toString().trim()))
+      const stdout = await new Promise<string>(
+        resolve =>
+          child.all?.on('data', chunk => resolve(chunk.toString().trim()))
       )
 
       const childPid = createValidInteger(child.pid) as number

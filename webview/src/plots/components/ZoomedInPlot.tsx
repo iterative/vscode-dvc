@@ -4,6 +4,7 @@ import { Config } from 'vega-lite'
 import merge from 'lodash.merge'
 import cloneDeep from 'lodash.clonedeep'
 import { reverseOfLegendSuppressionUpdate } from 'dvc/src/plots/vega/util'
+import { TemplateVegaLite } from './templatePlots/TemplateVegaLite'
 import styles from './styles.module.scss'
 import { getThemeValue, ThemeProperty } from '../../util/styles'
 import { exportPlotDataAsCsv, exportPlotDataAsJson } from '../util/messages'
@@ -11,6 +12,7 @@ import { exportPlotDataAsCsv, exportPlotDataAsJson } from '../util/messages'
 type ZoomedInPlotProps = {
   id: string
   props: VegaLiteProps
+  isTemplatePlot: boolean
 }
 
 const appendActionToVega = (
@@ -29,7 +31,8 @@ const appendActionToVega = (
 
 export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   id,
-  props
+  props,
+  isTemplatePlot
 }: ZoomedInPlotProps) => {
   const zoomedInPlotRef = useRef<HTMLDivElement>(null)
 
@@ -52,26 +55,35 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
     appendActionToVega('CSV', actions, () => exportPlotDataAsCsv(id))
   }
 
+  const vegaLiteProps = {
+    ...merge({ ...cloneDeep(props) }, reverseOfLegendSuppressionUpdate()),
+    actions: {
+      compiled: false,
+      editor: false,
+      export: true,
+      source: false
+    },
+    config: {
+      ...(props.config as Config),
+      background: getThemeValue(ThemeProperty.MENU_BACKGROUND)
+    }
+  }
+
   return (
     <div
       className={styles.zoomedInPlot}
       data-testid="zoomed-in-plot"
       ref={zoomedInPlotRef}
     >
-      <VegaLite
-        {...merge({ ...cloneDeep(props) }, reverseOfLegendSuppressionUpdate())}
-        config={{
-          ...(props.config as Config),
-          background: getThemeValue(ThemeProperty.MENU_BACKGROUND)
-        }}
-        actions={{
-          compiled: false,
-          editor: false,
-          export: true,
-          source: false
-        }}
-        onNewView={onNewView}
-      />
+      {isTemplatePlot ? (
+        <TemplateVegaLite
+          id={id}
+          vegaLiteProps={vegaLiteProps}
+          onNewView={onNewView}
+        />
+      ) : (
+        <VegaLite {...vegaLiteProps} onNewView={onNewView} />
+      )}
     </div>
   )
 }

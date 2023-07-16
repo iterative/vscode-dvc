@@ -55,7 +55,11 @@ const PlotsContent = () => {
         dispatch(setZoomedInPlot(undefined))
       }}
     >
-      <ZoomedInPlot id={zoomedInPlot.id} props={zoomedInPlot.plot} />
+      <ZoomedInPlot
+        isTemplatePlot={zoomedInPlot.isTemplatePlot}
+        id={zoomedInPlot.id}
+        props={zoomedInPlot.plot}
+      />
     </Modal>
   )
 

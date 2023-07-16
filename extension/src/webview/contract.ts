@@ -40,6 +40,7 @@ export enum MessageFromWebviewType {
   RESIZE_COLUMN = 'resize-column',
   RESIZE_PLOTS = 'resize-plots',
   SAVE_STUDIO_TOKEN = 'save-studio-token',
+  SET_SMOOTH_PLOT_VALUE = 'update-smooth-plot-value',
   SHOW_EXPERIMENT_LOGS = 'show-experiment-logs',
   SHOW_WALKTHROUGH = 'show-walkthrough',
   STOP_EXPERIMENTS = 'stop-experiments',
@@ -232,6 +233,10 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.SHOW_WALKTHROUGH }
   | { type: MessageFromWebviewType.SHOW_SCM_PANEL }
   | { type: MessageFromWebviewType.INSTALL_DVC }
+  | {
+      type: MessageFromWebviewType.SET_SMOOTH_PLOT_VALUE
+      payload: { id: string; value: number }
+    }
   | { type: MessageFromWebviewType.UPGRADE_DVC }
   | { type: MessageFromWebviewType.SETUP_WORKSPACE }
   | { type: MessageFromWebviewType.OPEN_STUDIO }

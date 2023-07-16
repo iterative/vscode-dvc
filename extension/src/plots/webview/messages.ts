@@ -118,6 +118,11 @@ export class WebviewMessages {
         )
       case MessageFromWebviewType.TOGGLE_EXPERIMENT:
         return this.setExperimentStatus(message.payload)
+      case MessageFromWebviewType.SET_SMOOTH_PLOT_VALUE:
+        return this.setSmoothPlotValues(
+          message.payload.id,
+          message.payload.value
+        )
       case MessageFromWebviewType.ZOOM_PLOT:
         if (message.payload) {
           const imagePath = this.revertCorrectUrl(message.payload)
@@ -195,6 +200,16 @@ export class WebviewMessages {
     this.sendTemplatePlots()
     sendTelemetryEvent(
       EventName.VIEWS_REORDER_PLOTS_TEMPLATES,
+      undefined,
+      undefined
+    )
+  }
+
+  private setSmoothPlotValues(id: string, value: number) {
+    this.plots.setSmoothPlotValues(id, value)
+    this.sendTemplatePlots()
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_SET_SMOOTH_PLOT_VALUE,
       undefined,
       undefined
     )
@@ -287,7 +302,8 @@ export class WebviewMessages {
       nbItemsPerRow: this.plots.getNbItemsPerRowOrWidth(
         PlotsSection.TEMPLATE_PLOTS
       ),
-      plots
+      plots,
+      smoothPlotValues: this.plots.getSmoothPlotValues()
     }
   }
 
