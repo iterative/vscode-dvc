@@ -157,10 +157,14 @@ const collectDatapoints = (
 ) => {
   for (const value of values) {
     const dvc_data_version_info = getDvcDataVersionInfo(value)
-    const data: { rev: string } = {
+    const data: { rev: string; dvc_data_version_info?: unknown } = {
       ...value,
       ...dvc_data_version_info,
       rev
+    }
+
+    if (hasKey(data, 'dvc_data_version_info')) {
+      delete data.dvc_data_version_info
     }
 
     ;(acc[rev][path] as unknown[]).push(data)
@@ -473,13 +477,7 @@ export const collectSelectedTemplatePlotRawData = ({
     multiSourceEncodingUpdate
   )
 
-  return datapoints.map(datapoint => {
-    if (hasKey(datapoint, 'dvc_data_version_info')) {
-      delete (datapoint as { dvc_data_version_info: unknown })
-        .dvc_data_version_info
-    }
-    return datapoint
-  })
+  return datapoints
 }
 
 export const collectOrderedRevisions = (
