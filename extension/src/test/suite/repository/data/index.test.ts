@@ -50,10 +50,14 @@ suite('Repository Data Test Suite', () => {
       }
 
       const data = disposable.track(
-        new RepositoryData(dvcDemoPath, {
-          dispose: stub(),
-          executeCommand: mockExecuteCommand
-        } as unknown as InternalCommands)
+        new RepositoryData(
+          dvcDemoPath,
+          {
+            dispose: stub(),
+            executeCommand: mockExecuteCommand
+          } as unknown as InternalCommands,
+          []
+        )
       )
       await data.isReady()
 

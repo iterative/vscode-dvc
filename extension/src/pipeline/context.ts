@@ -38,7 +38,7 @@ export const setContextForEditorTitleIcons = (
 
   const activePath = window.activeTextEditor?.document?.fileName
   if (isPathInProject(activePath, dvcRoot, subProjects)) {
-    setActiveEditorContext(activePath)
+    setActiveEditorContext(activePath as string)
   }
 
   disposer.track(

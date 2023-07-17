@@ -37,8 +37,10 @@ export class PipelineData extends BaseData<{
     ])
 
     const dvcYamlsDirs = new Set<string>()
+    this.collectedFiles = []
     for (const file of fileList) {
       if (isPathInProject(file, this.dvcRoot, this.subProjects)) {
+        this.collectedFiles.push(file)
         dvcYamlsDirs.add(dirname(file))
       }
     }

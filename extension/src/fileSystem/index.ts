@@ -135,7 +135,7 @@ export const isPathInProject = (
   path: string | undefined,
   dvcRoot: string,
   subProjects: string[]
-): path is string =>
+): boolean =>
   !!path?.startsWith(dvcRoot) &&
   path !== dvcRoot &&
   !isPathInSubProject(path, subProjects)

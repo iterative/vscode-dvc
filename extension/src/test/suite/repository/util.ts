@@ -57,7 +57,9 @@ export const buildRepositoryData = async (disposer: SafeWatcherDisposer) => {
   mockGetAllUntracked.resolves(new Set())
   mockNow.returns(FIRST_TRUTHY_TIME)
 
-  const data = disposer.track(new RepositoryData(dvcDemoPath, internalCommands))
+  const data = disposer.track(
+    new RepositoryData(dvcDemoPath, internalCommands, [])
+  )
   await data.isReady()
 
   mockDataStatus.resetHistory()
@@ -77,7 +79,7 @@ export const buildRepository = async (
   dvcRoot = dvcDemoPath
 ) => {
   const repository = disposer.track(
-    new Repository(dvcRoot, internalCommands, treeDataChanged)
+    new Repository(dvcRoot, internalCommands, treeDataChanged, [])
   )
 
   const setErrorDecorationStateSpy = spyOnPrivateMemberMethod(

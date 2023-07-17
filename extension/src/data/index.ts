@@ -83,20 +83,22 @@ export abstract class BaseData<
     return createFileSystemWatcher(
       disposable => this.dispose.track(disposable),
       getRelativePattern(this.dvcRoot, '**'),
-      path => {
-        const relPath = relative(this.dvcRoot, path)
-        if (
-          this.getWatchedFiles().some(
-            watchedRelPath =>
-              path.endsWith(watchedRelPath) ||
-              isSameOrChild(relPath, watchedRelPath)
-          ) &&
-          !isPathInSubProject(relPath, this.relSubProjects)
-        ) {
-          void this.managedUpdate(path)
-        }
-      }
+      path => this.listener(path)
     )
+  }
+
+  private listener(path: string) {
+    const relPath = relative(this.dvcRoot, path)
+    if (
+      this.getWatchedFiles().some(
+        watchedRelPath =>
+          path.endsWith(watchedRelPath) ||
+          isSameOrChild(relPath, watchedRelPath)
+      ) &&
+      !isPathInSubProject(relPath, this.relSubProjects)
+    ) {
+      void this.managedUpdate(path)
+    }
   }
 
   abstract managedUpdate(path?: string): Promise<void>
