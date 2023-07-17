@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "1.0.17",
+  "version": "1.0.19",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -420,7 +420,8 @@
       {
         "title": "Show Pipeline DAG",
         "command": "dvc.showPipelineDAG",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(symbol-class)"
       },
       {
         "title": "Show Plots",
@@ -1095,6 +1096,11 @@
           "when": "dvc.experiments.webview.active && dvc.experiment.running && dvc.commands.available"
         },
         {
+          "command": "dvc.showPipelineDAG",
+          "group": "navigation@0",
+          "when": "dvc.pipeline.file.active && dvc.commands.available && dvc.project.available"
+        },
+        {
           "command": "dvc.runExperiment",
           "group": "navigation@1",
           "when": "dvc.experiments.file.active && !dvc.experiment.running.workspace && dvc.commands.available && !dvc.experiment.checkpoints"
@@ -1708,10 +1714,10 @@
     "@types/vscode": "1.64.0",
     "@vscode/test-electron": "2.3.3",
     "@vscode/vsce": "2.19.0",
-    "@wdio/cli": "8.11.2",
-    "@wdio/local-runner": "8.11.2",
-    "@wdio/mocha-framework": "8.11.0",
-    "@wdio/spec-reporter": "8.11.2",
+    "@wdio/cli": "8.12.1",
+    "@wdio/local-runner": "8.12.1",
+    "@wdio/mocha-framework": "8.12.1",
+    "@wdio/spec-reporter": "8.12.1",
     "chai": "4.3.7",
     "chai-as-promised": "7.1.1",
     "clean-webpack-plugin": "4.0.0",
@@ -1727,8 +1733,8 @@
     "sinon-chai": "3.7.0",
     "ts-loader": "9.4.4",
     "vscode-uri": "3.0.7",
-    "wdio-vscode-service": "5.1.0",
-    "webdriverio": "8.11.2",
+    "wdio-vscode-service": "5.2.0",
+    "webdriverio": "8.12.1",
     "webpack": "5.88.1",
     "webpack-cli": "5.1.4"
   },

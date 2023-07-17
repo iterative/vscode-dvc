@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.19] - 2023-07-17
+
+### 🚀 New Features and Enhancements
+
+- Handle non-standard experiment pipeline configurations [#4264](https://github.com/iterative/vscode-dvc/pull/4264) by [@mattseddon](https://github.com/mattseddon)
+- Focus pipeline when dvc.yaml file is open in the active editor [#4273](https://github.com/iterative/vscode-dvc/pull/4273) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Refactor stubWorkspaceExperimentsGetters [#4272](https://github.com/iterative/vscode-dvc/pull/4272) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.0.18] - 2023-07-14
+
+### 🚀 New Features and Enhancements
+
+- Add CSV export option to zoomed in plots [#4252](https://github.com/iterative/vscode-dvc/pull/4252) by [@julieg18](https://github.com/julieg18)
+- Save smooth plot values across sessions [#4220](https://github.com/iterative/vscode-dvc/pull/4220) by [@julieg18](https://github.com/julieg18)
+
 ## [1.0.17] - 2023-07-11
 
 ### 🚀 New Features and Enhancements

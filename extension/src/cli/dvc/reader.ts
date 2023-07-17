@@ -38,7 +38,7 @@ export const autoRegisteredCommands = {
   GLOBAL_VERSION: 'globalVersion',
   PLOTS_DIFF: 'plotsDiff',
   ROOT: 'root',
-  STAGE_LIST: 'listStages',
+  STAGE_LIST: 'stageList',
   VERSION: 'version'
 } as const
 
@@ -144,7 +144,7 @@ export class DvcReader extends DvcCli {
     return this.executeProcess(options)
   }
 
-  public async listStages(cwd: string): Promise<string | undefined> {
+  public async stageList(cwd: string): Promise<string | undefined> {
     try {
       return await this.executeDvcProcess(cwd, Command.STAGE, SubCommand.LIST)
     } catch {}

@@ -164,7 +164,10 @@ suite('Experiments Sort By Tree Test Suite', () => {
           )
 
       stub(WorkspaceExperiments.prototype, 'getDvcRoots').returns([dvcDemoPath])
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
+      stub(WorkspaceExperiments.prototype, 'getOnlyOrPickProject').resolves(
+        dvcDemoPath
+      )
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
       mockSortQuickPicks(testParamPath, false)
       const tableChangedPromise = experimentsUpdatedEvent(experiments)
@@ -284,13 +287,9 @@ suite('Experiments Sort By Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should provide a shortcut to sort by starred experiments', async () => {
-      const { experiments, experimentsModel } = buildExperiments({
-        disposer: disposable
-      })
-
+      const { experiments, experimentsModel } =
+        stubWorkspaceExperimentsGetters(disposable)
       await experiments.isReady()
-
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const mockAddSort = stub(experimentsModel, 'addSort')
 

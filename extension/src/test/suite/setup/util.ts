@@ -47,7 +47,7 @@ export const buildSetup = ({
     dvcReader,
     gitExecutor,
     gitReader
-  } = buildDependencies(disposer)
+  } = buildDependencies({ disposer })
 
   if (gitVersion === undefined) {
     gitVersion = 'git version 2.41.0'

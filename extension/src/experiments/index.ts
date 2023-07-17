@@ -44,6 +44,7 @@ import { ConfigKey, getConfigValue, setUserConfigValue } from '../vscode/config'
 import { checkSignalFile, pollSignalFileForProcess } from '../fileSystem'
 import { DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
 import { Response } from '../vscode/response'
+import { Pipeline } from '../pipeline'
 
 export const ExperimentsScale = {
   ...omit(ColumnType, 'TIMESTAMP'),
@@ -64,8 +65,9 @@ export class Experiments extends BaseRepository<TableData> {
 
   public readonly viewKey = ViewKey.EXPERIMENTS
 
-  private readonly data: ExperimentsData
+  private readonly pipeline: Pipeline
 
+  private readonly data: ExperimentsData
   private readonly experiments: ExperimentsModel
   private readonly columns: ColumnsModel
 
@@ -96,7 +98,6 @@ export class Experiments extends BaseRepository<TableData> {
   private dvcLiveOnlyCleanupInitialized = false
   private dvcLiveOnlySignalFile: string
 
-  private readonly addStage: () => Promise<boolean>
   private readonly selectBranches: (
     branchesSelected: string[]
   ) => Promise<string[] | undefined>
@@ -104,9 +105,9 @@ export class Experiments extends BaseRepository<TableData> {
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
+    pipeline: Pipeline,
     resourceLocator: ResourceLocator,
     workspaceState: Memento,
-    addStage: () => Promise<boolean>,
     selectBranches: (
       branchesSelected: string[]
     ) => Promise<string[] | undefined>,
@@ -120,7 +121,7 @@ export class Experiments extends BaseRepository<TableData> {
     )
 
     this.internalCommands = internalCommands
-    this.addStage = addStage
+    this.pipeline = pipeline
     this.selectBranches = selectBranches
 
     this.onDidChangeIsExperimentsFileFocused = this.experimentsFileFocused.event
@@ -146,11 +147,6 @@ export class Experiments extends BaseRepository<TableData> {
     )
 
     this.dispose.track(this.data.onDidUpdate(data => this.setState(data)))
-    this.dispose.track(
-      this.data.onDidChangeDvcYaml(() =>
-        this.webviewMessages.changeHasConfig(true)
-      )
-    )
 
     this.dispose.track(
       workspace.onDidChangeConfiguration((event: ConfigurationChangeEvent) => {
@@ -437,6 +433,11 @@ export class Experiments extends BaseRepository<TableData> {
   public async modifyWorkspaceParamsAndRun(
     commandId: ModifiedExperimentAndRunCommandId
   ) {
+    const cwd = await this.getPipelineCwd()
+    if (!cwd) {
+      return
+    }
+
     const paramsToModify = await this.pickAndModifyParams()
     if (!paramsToModify) {
       return
@@ -444,13 +445,18 @@ export class Experiments extends BaseRepository<TableData> {
 
     await this.internalCommands.executeCommand<string>(
       commandId,
-      this.dvcRoot,
+      cwd,
       ...paramsToModify
     )
     return this.notifyChanged()
   }
 
   public async modifyWorkspaceParamsAndQueue() {
+    const cwd = await this.getPipelineCwd()
+    if (!cwd) {
+      return
+    }
+
     const paramsToModify = await this.pickAndModifyParams()
     if (!paramsToModify) {
       return
@@ -459,7 +465,7 @@ export class Experiments extends BaseRepository<TableData> {
     await Toast.showOutput(
       this.internalCommands.executeCommand<string>(
         AvailableCommands.EXP_QUEUE,
-        this.dvcRoot,
+        cwd,
         ...paramsToModify
       )
     )
@@ -521,16 +527,26 @@ export class Experiments extends BaseRepository<TableData> {
     return this.columns.getRelativeMetricsFiles()
   }
 
+  public getPipelineCwd() {
+    return this.pipeline.getCwd()
+  }
+
   protected sendInitialWebviewData() {
     return this.webviewMessages.sendWebviewMessage()
   }
 
   private setupInitialData() {
     const waitForInitialData = this.dispose.track(
-      this.onDidChangeExperiments(() => {
+      this.onDidChangeExperiments(async () => {
+        await this.pipeline.isReady()
         this.deferred.resolve()
         this.dispose.untrack(waitForInitialData)
         waitForInitialData.dispose()
+        this.dispose.track(
+          this.pipeline.onDidUpdate(() =>
+            this.webviewMessages.sendWebviewMessage()
+          )
+        )
       })
     )
   }
@@ -555,15 +571,10 @@ export class Experiments extends BaseRepository<TableData> {
       this.dvcRoot,
       this.experiments,
       this.columns,
+      this.pipeline,
       () => this.getWebview(),
       () => this.notifyChanged(),
       () => this.selectColumns(),
-      () =>
-        this.internalCommands.executeCommand(
-          AvailableCommands.STAGE_LIST,
-          this.dvcRoot
-        ),
-      () => this.addStage(),
       (branchesSelected: string[]) => this.selectBranches(branchesSelected),
       () => this.data.update()
     )
