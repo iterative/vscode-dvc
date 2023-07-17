@@ -4,6 +4,7 @@ import {
   SetupSection
 } from './webview/contract'
 import { trimAndSplit } from '../util/stdout'
+import { isSameOrChild } from '../fileSystem'
 
 export const collectSectionCollapsed = (
   focusedSection?: SetupSection
@@ -47,4 +48,31 @@ export const collectRemoteList = async (
   }
 
   return acc
+}
+
+const collectRootSubProjects = (
+  dvcRoot: string,
+  dvcRoots: string[]
+): string[] => {
+  const dvcRootSubProjects = []
+  for (const potentialSubProject of dvcRoots) {
+    if (
+      dvcRoot === potentialSubProject ||
+      !isSameOrChild(dvcRoot, potentialSubProject)
+    ) {
+      continue
+    }
+    dvcRootSubProjects.push(potentialSubProject)
+  }
+  return dvcRootSubProjects
+}
+
+export const collectSubProjects = (
+  dvcRoots: string[]
+): { [dvcRoot: string]: string[] } => {
+  const subProjects: { [dvcRoot: string]: string[] } = {}
+  for (const dvcRoot of dvcRoots) {
+    subProjects[dvcRoot] = collectRootSubProjects(dvcRoot, dvcRoots)
+  }
+  return subProjects
 }

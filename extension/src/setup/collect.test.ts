@@ -1,4 +1,4 @@
-import { collectRemoteList } from './collect'
+import { collectRemoteList, collectSubProjects } from './collect'
 import { dvcDemoPath } from '../test/util'
 import { join } from '../test/util/path'
 
@@ -25,6 +25,35 @@ describe('collectRemoteList', () => {
       },
       mockedOtherRoot: undefined,
       [mockedRoot]: undefined
+    })
+  })
+})
+
+describe('collectSubProjects', () => {
+  it('should return no sub-projects for a single root', () => {
+    const subProjects = collectSubProjects([dvcDemoPath])
+    expect(subProjects).toStrictEqual({ [dvcDemoPath]: [] })
+  })
+
+  it('should return no sub-projects for a sibling projects', () => {
+    const projectA = join(dvcDemoPath, 'A')
+    const projectB = join(dvcDemoPath, 'B')
+    const subProjects = collectSubProjects([projectA, projectB])
+    expect(subProjects).toStrictEqual({ [projectA]: [], [projectB]: [] })
+  })
+
+  it('should return sub-projects for a project with sub-projects', () => {
+    const nestedProjectA = join(dvcDemoPath, 'A')
+    const nestedProjectB = join(dvcDemoPath, 'B')
+    const subProjects = collectSubProjects([
+      dvcDemoPath,
+      nestedProjectA,
+      nestedProjectB
+    ])
+    expect(subProjects).toStrictEqual({
+      [dvcDemoPath]: [nestedProjectA, nestedProjectB],
+      [nestedProjectA]: [],
+      [nestedProjectB]: []
     })
   })
 })

@@ -1512,6 +1512,7 @@ suite('Experiments Test Suite', () => {
           resourceLocator,
           buildMockMemento(),
           () => Promise.resolve([]),
+          [],
           buildMockExperimentsData()
         )
       )
@@ -1691,6 +1692,7 @@ suite('Experiments Test Suite', () => {
           {} as ResourceLocator,
           mockMemento,
           () => Promise.resolve([]),
+          [],
           buildMockExperimentsData()
         )
       )
@@ -1856,6 +1858,7 @@ suite('Experiments Test Suite', () => {
           {} as ResourceLocator,
           mockMemento,
           () => Promise.resolve([]),
+          [],
           buildMockExperimentsData()
         )
       )

@@ -273,6 +273,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
 
   public createRepository(
     dvcRoot: string,
+    subProjects: string[],
     pipeline: WorkspacePipeline,
     resourceLocator: ResourceLocator
   ) {
@@ -283,7 +284,8 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
         pipeline.getRepository(dvcRoot),
         resourceLocator,
         this.workspaceState,
-        (branchesSelected: string[]) => this.selectBranches(branchesSelected)
+        (branchesSelected: string[]) => this.selectBranches(branchesSelected),
+        subProjects
       )
     )
 

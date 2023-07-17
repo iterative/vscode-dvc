@@ -4,7 +4,7 @@ import { isExcluded } from '.'
 describe('isExcluded', () => {
   it('should exclude empty paths', () => {
     const mockedDvcRoot = resolve('some', 'dvc', 'root')
-    const excluded = isExcluded(mockedDvcRoot, '')
+    const excluded = isExcluded(mockedDvcRoot, '', [])
 
     expect(excluded).toBe(true)
   })
@@ -13,7 +13,7 @@ describe('isExcluded', () => {
     const mockedDvcRoot = __dirname
     const path = join(mockedDvcRoot, '.git', 'refs', 'exps', '0F')
 
-    const excluded = isExcluded(mockedDvcRoot, path)
+    const excluded = isExcluded(mockedDvcRoot, path, [])
 
     expect(excluded).toBe(true)
   })
@@ -22,15 +22,25 @@ describe('isExcluded', () => {
     const mockedDvcRoot = resolve('some', 'dvc', 'repo')
     const path = join(mockedDvcRoot, 'data', 'placeholder.dvc')
 
-    const excluded = isExcluded(mockedDvcRoot, path)
+    const excluded = isExcluded(mockedDvcRoot, path, [])
 
     expect(excluded).toBe(false)
+  })
+
+  it('should exclude paths from inside the sub-projects', () => {
+    const mockedDvcRoot = resolve('some', 'dvc', 'repo')
+    const subProject = join(mockedDvcRoot, 'data')
+    const path = join(subProject, 'placeholder.dvc')
+
+    const excluded = isExcluded(mockedDvcRoot, path, [subProject])
+
+    expect(excluded).toBe(true)
   })
 
   it('should not exclude .git/index (that is above the dvc root)', () => {
     const path = resolve(__dirname, '..', '..', '.git', 'index')
 
-    const excluded = isExcluded(__dirname, path)
+    const excluded = isExcluded(__dirname, path, [])
 
     expect(excluded).toBe(false)
   })
@@ -38,7 +48,7 @@ describe('isExcluded', () => {
   it('should not exclude .git/ORIG_HEAD (that is above the dvc root)', () => {
     const path = resolve(__dirname, '..', '..', '.git', 'ORIG_HEAD')
 
-    const excluded = isExcluded(__dirname, path)
+    const excluded = isExcluded(__dirname, path, [])
 
     expect(excluded).toBe(false)
   })
@@ -56,7 +66,7 @@ describe('isExcluded', () => {
       'ref'
     )
 
-    const excluded = isExcluded(__dirname, path)
+    const excluded = isExcluded(__dirname, path, [])
 
     expect(excluded).toBe(true)
   })
@@ -64,7 +74,7 @@ describe('isExcluded', () => {
   it('should exclude paths that are above the dvc root and not in the .git folder', () => {
     const path = resolve(__dirname, '..', '..', 'other', 'refs')
 
-    const excluded = isExcluded(__dirname, path)
+    const excluded = isExcluded(__dirname, path, [])
 
     expect(excluded).toBe(true)
   })

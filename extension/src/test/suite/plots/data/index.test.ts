@@ -45,7 +45,7 @@ suite('Plots Data Test Suite', () => {
     } as unknown as PlotsModel
 
     const data = disposable.track(
-      new PlotsData(dvcDemoPath, internalCommands, mockPlotsModel)
+      new PlotsData(dvcDemoPath, internalCommands, mockPlotsModel, [])
     )
 
     return {
@@ -114,7 +114,8 @@ suite('Plots Data Test Suite', () => {
           } as unknown as InternalCommands,
           {
             getSelectedOrderedIds: () => []
-          } as unknown as PlotsModel
+          } as unknown as PlotsModel,
+          []
         )
       )
 
