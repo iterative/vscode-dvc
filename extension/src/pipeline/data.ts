@@ -2,7 +2,7 @@ import { dirname } from 'path'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { BaseData } from '../data'
 import { findFiles } from '../fileSystem/workspace'
-import { isFileInSubProject } from '../fileSystem'
+import { isPathInProject } from '../fileSystem'
 
 export class PipelineData extends BaseData<{
   dag: string
@@ -38,10 +38,7 @@ export class PipelineData extends BaseData<{
 
     const dvcYamlsDirs = new Set<string>()
     for (const file of fileList) {
-      if (
-        file.startsWith(this.dvcRoot) &&
-        !isFileInSubProject(file, this.subProjects)
-      ) {
+      if (isPathInProject(file, this.dvcRoot, this.subProjects)) {
         dvcYamlsDirs.add(dirname(file))
       }
     }

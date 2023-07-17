@@ -3,7 +3,7 @@ import { EventEmitter, window } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { ContextKey, setContextValue } from '../vscode/context'
 import { standardizePossiblePath } from '../fileSystem/path'
-import { isFileInSubProject } from '../fileSystem'
+import { isPathInProject } from '../fileSystem'
 
 const setContextOnDidChangeActiveEditor = (
   setActiveEditorContext: (path: string) => void,
@@ -17,7 +17,7 @@ const setContextOnDidChangeActiveEditor = (
       return
     }
 
-    if (!path.includes(dvcRoot) || isFileInSubProject(path, subProjects)) {
+    if (!isPathInProject(path, dvcRoot, subProjects)) {
       return
     }
 
@@ -37,10 +37,7 @@ export const setContextForEditorTitleIcons = (
   }
 
   const activePath = window.activeTextEditor?.document?.fileName
-  if (
-    activePath?.startsWith(dvcRoot) &&
-    !isFileInSubProject(activePath, subProjects)
-  ) {
+  if (isPathInProject(activePath, dvcRoot, subProjects)) {
     setActiveEditorContext(activePath)
   }
 

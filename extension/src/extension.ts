@@ -277,8 +277,8 @@ class Extension extends Disposable {
   public async initialize() {
     this.resetMembers()
 
-    const subProjects = this.getSubProjects()
     const dvcRoots = this.getRoots()
+    const subProjects = this.getSubProjects()
 
     await Promise.all([
       this.repositories.create(dvcRoots, subProjects),

@@ -2,7 +2,7 @@ import { Event, EventEmitter, window } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { ContextKey, setContextValue } from '../vscode/context'
 import { standardizePossiblePath } from '../fileSystem/path'
-import { isFileInSubProject } from '../fileSystem'
+import { isPathInProject, isPathInSubProject } from '../fileSystem'
 
 const setContextOnDidChangeParamsFiles = (
   setActiveEditorContext: (paramsFileActive: boolean) => void,
@@ -20,7 +20,7 @@ const setContextOnDidChangeParamsFiles = (
 
     if (
       (!getParamsFiles().has(path) && !path.endsWith('dvc.yaml')) ||
-      isFileInSubProject(path, subProjects)
+      isPathInSubProject(path, subProjects)
     ) {
       return
     }
@@ -40,7 +40,7 @@ const setContextOnDidChangeActiveEditor = (
       return
     }
 
-    if (!path.includes(dvcRoot) || isFileInSubProject(path, subProjects)) {
+    if (!isPathInProject(path, dvcRoot, subProjects)) {
       return
     }
 

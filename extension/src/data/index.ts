@@ -7,7 +7,7 @@ import { InternalCommands } from '../commands/internal'
 import { ExpShowOutput, PlotsOutputOrError } from '../cli/dvc/contract'
 import { uniqueValues } from '../util/array'
 import { DeferredDisposable } from '../class/deferred'
-import { isSameOrChild } from '../fileSystem'
+import { isPathInSubProject, isSameOrChild } from '../fileSystem'
 
 export type ExperimentsOutput = {
   availableNbCommits: { [branch: string]: number }
@@ -86,14 +86,12 @@ export abstract class BaseData<
       path => {
         const relPath = relative(this.dvcRoot, path)
         if (
-          !this.relSubProjects.some(subProject =>
-            relPath.startsWith(subProject)
-          ) &&
           this.getWatchedFiles().some(
             watchedRelPath =>
               path.endsWith(watchedRelPath) ||
               isSameOrChild(relPath, watchedRelPath)
-          )
+          ) &&
+          !isPathInSubProject(relPath, this.relSubProjects)
         ) {
           void this.managedUpdate(path)
         }

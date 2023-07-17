@@ -126,10 +126,19 @@ export const isSameOrChild = (root: string, path: string) => {
   return !rel.startsWith('..')
 }
 
-export const isFileInSubProject = (
-  file: string,
+export const isPathInSubProject = (
+  path: string,
   subProjects: string[]
-): boolean => subProjects.some(dvcRoot => file.startsWith(dvcRoot))
+): boolean => subProjects.some(dvcRoot => path.startsWith(dvcRoot))
+
+export const isPathInProject = (
+  path: string | undefined,
+  dvcRoot: string,
+  subProjects: string[]
+): path is string =>
+  !!path?.startsWith(dvcRoot) &&
+  path !== dvcRoot &&
+  !isPathInSubProject(path, subProjects)
 
 export type Out =
   | string
