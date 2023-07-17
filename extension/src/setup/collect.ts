@@ -15,7 +15,7 @@ export const collectSectionCollapsed = (
 
   const acc = { ...DEFAULT_SECTION_COLLAPSED }
   for (const section of Object.keys(acc)) {
-    if (section !== focusedSection) {
+    if ((section as SetupSection) !== focusedSection) {
       acc[section as SetupSection] = true
     }
   }

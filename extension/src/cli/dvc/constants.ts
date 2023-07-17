@@ -53,7 +53,7 @@ export enum SubCommand {
 
 export enum Flag {
   ALL_COMMITS = '-A',
-  FOLLOW = '-f',
+  FOLLOW = '--follow',
   DEFAULT = '-d',
   FORCE = '-f',
   GLOBAL = '--global',

@@ -17,7 +17,9 @@ import { Cell, CellValue } from '../components/table/content/Cell'
 import { TimestampHeader } from '../components/table/content/TimestampHeader'
 import { DateCellContents } from '../components/table/content/DateCellContent'
 
-export type ColumnWithGroup = ColumnDef<Experiment, unknown> & { group: string }
+export type ColumnWithGroup = ColumnDef<Experiment, unknown> & {
+  group: ColumnType
+}
 
 export const columnHelper = createColumnHelper<Column>()
 
