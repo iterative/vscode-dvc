@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "resolveJsonModule": true,
-    "moduleResolution": "node16",
     "module": "commonjs",
     "target": "es6",
     "outDir": "dist",
