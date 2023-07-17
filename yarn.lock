@@ -5937,10 +5937,10 @@
     "@microsoft/fast-foundation" "^2.38.0"
     "@microsoft/fast-react-wrapper" "^0.1.18"
 
-"@wdio/cli@8.12.1":
-  version "8.12.1"
-  resolved "https://registry.yarnpkg.com/@wdio/cli/-/cli-8.12.1.tgz#2b6c83ca20de4bf1f0ab6715e1c248c42b411de7"
-  integrity sha512-BR2pbtugcI4g0FvQ7xOdZw9mzCRBUJS2pmZ6BWF3b/T1rN2E6ViJO0mPIjaSBnxH3Ceg+49ZyC5qvoj9l6uvUA==
+"@wdio/cli@8.12.2":
+  version "8.12.2"
+  resolved "https://registry.yarnpkg.com/@wdio/cli/-/cli-8.12.2.tgz#d8e702f0592dd1fa77986d779e495f6e514e9332"
+  integrity sha512-sBvDHxVrUQXW1ya4RS6qT23QO1W19rQ3QIXAI5iHYeHCbeBL61QDpXPstLDwlIVAjSIofU3ZzbfZzpepdBzQNA==
   dependencies:
     "@types/node" "^20.1.1"
     "@wdio/config" "8.12.1"
@@ -6068,17 +6068,17 @@
   dependencies:
     "@types/node" "^20.1.0"
 
-"@wdio/reporter@8.12.1":
-  version "8.12.1"
-  resolved "https://registry.yarnpkg.com/@wdio/reporter/-/reporter-8.12.1.tgz#dd5f70fa77143ba0fa09bcf545b1faa5332790a1"
-  integrity sha512-8oJAHTgtLxbCs/Mv5tZo6TYC/ADFE9SjCABjaFCdePATE4jb/7+VRl7lYLdQg6l+ooha86BbOJHYqgwzEbWruQ==
+"@wdio/reporter@8.12.2":
+  version "8.12.2"
+  resolved "https://registry.yarnpkg.com/@wdio/reporter/-/reporter-8.12.2.tgz#c494985a3f2936179c3bf57ba41f486e20cc081c"
+  integrity sha512-xCbppY74dm9jZIgC3Oo5eSMM6pnCXIytol4lFZV1l6LkqWl9WdhBj38cU3Y65XX6gwW+rGnFo36yitxvAXnTaA==
   dependencies:
     "@types/node" "^20.1.0"
     "@wdio/logger" "8.11.0"
     "@wdio/types" "8.10.4"
     diff "^5.0.0"
     object-inspect "^1.12.0"
-    supports-color "9.3.1"
+    supports-color "9.4.0"
 
 "@wdio/runner@8.12.1":
   version "8.12.1"
@@ -6097,12 +6097,12 @@
     webdriver "8.12.1"
     webdriverio "8.12.1"
 
-"@wdio/spec-reporter@8.12.1":
-  version "8.12.1"
-  resolved "https://registry.yarnpkg.com/@wdio/spec-reporter/-/spec-reporter-8.12.1.tgz#778b89a480cb5ac21047c2fa7979d75127bd236e"
-  integrity sha512-ejHGQGAwpC0B9hPAveLNXh+E5yiQOa5YQ09xMBaAgrMjxWeaw56BfY4gLRPILGe+GUeTFZlATaiCbQiwCd4X5g==
+"@wdio/spec-reporter@8.12.2":
+  version "8.12.2"
+  resolved "https://registry.yarnpkg.com/@wdio/spec-reporter/-/spec-reporter-8.12.2.tgz#471d20d85a0389ec50ad82adbcc04466d4d5e59e"
+  integrity sha512-0rAXiclTnaHU9tg3cFimA5vErT3z+ytnhFMTKjH/OxS0gWUliX6LcLz111uoiv8ux39iQ+SDmMgZBEx3Sn3mkQ==
   dependencies:
-    "@wdio/reporter" "8.12.1"
+    "@wdio/reporter" "8.12.2"
     "@wdio/types" "8.10.4"
     chalk "^5.1.2"
     easy-table "^1.2.0"
@@ -19043,10 +19043,10 @@ supports-color@8.1.1, supports-color@^8.0.0:
   dependencies:
     has-flag "^4.0.0"
 
-supports-color@9.3.1:
-  version "9.3.1"
-  resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-9.3.1.tgz#34e4ad3c71c9a39dae3254ecc46c9b74e89e15a6"
-  integrity sha512-knBY82pjmnIzK3NifMo3RxEIRD9E0kIzV4BKcyTZ9+9kWgLMxd4PrsTSMoFQUabgRBbF8KOLRDCyKgNV+iK44Q==
+supports-color@9.4.0:
+  version "9.4.0"
+  resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-9.4.0.tgz#17bfcf686288f531db3dea3215510621ccb55954"
+  integrity sha512-VL+lNrEoIXww1coLPOmiEmK/0sGigko5COxI09KzHc2VJXJsQ37UaQ+8quuxjDeA7+KnLGTWRyOXSLLR2Wb4jw==
 
 supports-color@^2.0.0:
   version "2.0.0"
