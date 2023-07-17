@@ -127,7 +127,7 @@ export const TemplatePlots: React.FC = () => {
       group
     }
 
-    if (e.currentTarget.id === NewSectionBlock.TOP) {
+    if ((e.currentTarget.id as NewSectionBlock) === NewSectionBlock.TOP) {
       if (firstSection.group !== group) {
         setTimeout(() => setSections([newSection, ...updatedSections]), 1)
       }

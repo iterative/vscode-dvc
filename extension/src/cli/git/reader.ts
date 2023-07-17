@@ -55,7 +55,7 @@ export class GitReader extends GitCli {
         Command.LOG,
         revision,
         Flag.PRETTY_FORMAT_COMMIT_MESSAGE,
-        Flag.SEPARATE_WITH_NULL,
+        Flag.RAW_WITH_NUL,
         Flag.NUMBER,
         revisions
       ],

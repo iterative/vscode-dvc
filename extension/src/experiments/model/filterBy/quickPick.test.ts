@@ -79,7 +79,10 @@ describe('pickFilterToAdd', () => {
     expect(mockedQuickPickValue).toHaveBeenCalledWith(
       OPERATORS.filter(
         ({ types }) =>
-          !(types.length === 1 && types[0] === ColumnType.TIMESTAMP)
+          !(
+            types.length === 1 &&
+            (types[0] as ColumnType) === ColumnType.TIMESTAMP
+          )
       ),
       {
         title: Title.SELECT_OPERATOR

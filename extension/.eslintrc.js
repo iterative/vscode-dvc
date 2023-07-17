@@ -35,6 +35,10 @@ module.exports = {
         'jest/valid-expect': 'off',
         'no-unused-expressions': 'off'
       }
+    },
+    {
+      files: ['src/test/e2e/**/*'],
+      rules: { '@typescript-eslint/no-unsafe-declaration-merging': 'off' }
     }
   ]
 }

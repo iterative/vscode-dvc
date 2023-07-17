@@ -13,15 +13,11 @@ import { Title } from './title'
 jest.mock('vscode')
 
 const mockedShowQuickPick = jest.mocked<
-  (
-    items: QuickPickItemWithValue[],
+  <T>(
+    items: QuickPickItemWithValue<T>[],
     options: QuickPickOptionsWithTitle
   ) => Thenable<
-    | QuickPickItemWithValue[]
-    | QuickPickItemWithValue
-    | string
-    | undefined
-    | unknown
+    QuickPickItemWithValue<T>[] | QuickPickItemWithValue<T> | string | undefined
   >
 >(window.showQuickPick)
 
@@ -31,7 +27,9 @@ beforeEach(() => {
 
 describe('quickPickValue', () => {
   it('should call window.showQuickPick with the correct arguments', async () => {
-    mockedShowQuickPick.mockResolvedValueOnce({ value: 'c' } as unknown)
+    mockedShowQuickPick.mockResolvedValueOnce({
+      value: 'c'
+    } as QuickPickItemWithValue)
     const placeHolder = 'these letters are very important'
     const title = 'Choose a letter, any letter...' as Title
     const items = [
@@ -69,7 +67,7 @@ describe('quickPickManyValues', () => {
     mockedShowQuickPick.mockResolvedValueOnce([
       { value: 'b' },
       { value: 'c' }
-    ] as unknown[])
+    ] as QuickPickItemWithValue[])
     const placeHolder = 'these letters are very important'
     const title = 'Choose a letter, any letter...' as Title
     const items = [
@@ -126,7 +124,7 @@ describe('quickPickYesOrNo', () => {
       description: yesDescription,
       label: Response.YES,
       value: true
-    }
+    } as QuickPickItemWithValue<boolean>
     const noDescription = 'me'
     mockedShowQuickPick.mockResolvedValueOnce(yesItem)
 
