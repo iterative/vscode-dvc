@@ -16,7 +16,8 @@ import {
   getModifiedTime,
   findOrCreateDvcYamlFile,
   writeJson,
-  writeCsv
+  writeCsv,
+  writeTsv
 } from '.'
 import { dvcDemoPath } from '../test/util'
 import { DOT_DVC } from '../cli/dvc/constants'
@@ -83,6 +84,21 @@ describe('writeCsv', () => {
     expect(mockedWriteFileSync).toHaveBeenCalledWith(
       'file-name.csv',
       'nested.string,value\nstring1,3\nstring2,4\nstring3,6'
+    )
+  })
+})
+
+describe('writeTsv', () => {
+  it('should write tsv into given file', async () => {
+    await writeTsv('file-name.tsv', [
+      { nested: { string: 'string1' }, value: 3 },
+      { nested: { string: 'string2' }, value: 4 },
+      { nested: { string: 'string3' }, value: 6 }
+    ])
+
+    expect(mockedWriteFileSync).toHaveBeenCalledWith(
+      'file-name.tsv',
+      'nested.string\tvalue\nstring1\t3\nstring2\t4\nstring3\t6'
     )
   })
 })
