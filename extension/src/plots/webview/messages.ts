@@ -84,6 +84,8 @@ export class WebviewMessages {
         )
       case MessageFromWebviewType.EXPORT_PLOT_DATA_AS_CSV:
         return this.exportPlotDataAsCsv(message.payload)
+      case MessageFromWebviewType.EXPORT_PLOT_DATA_AS_TSV:
+        return this.exportPlotDataAsTsv(message.payload)
       case MessageFromWebviewType.EXPORT_PLOT_DATA_AS_JSON:
         return this.exportPlotDataAsJson(message.payload)
       case MessageFromWebviewType.RESIZE_PLOTS:
@@ -362,35 +364,53 @@ export class WebviewMessages {
     return this.plots.getCustomPlots() || null
   }
 
-  private async exportPlotDataAsJson(plotId: string) {
-    const file = await showSaveDialog('data.json', 'json')
+  private async exportPlotData(
+    extName: string,
+    plotId: string,
+    event:
+      | typeof EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_CSV
+      | typeof EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_JSON
+      | typeof EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_TSV,
+    writeFile: (filePath: string, plotId: string) => void
+  ) {
+    const file = await showSaveDialog(`data.${extName}`, extName)
 
     if (!file) {
       return
     }
 
-    sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_JSON,
-      undefined,
-      undefined
-    )
+    sendTelemetryEvent(event, undefined, undefined)
 
-    void this.plots.savePlotDataAsJson(file.path, plotId)
+    writeFile(file.path, plotId)
   }
 
-  private async exportPlotDataAsCsv(plotId: string) {
-    const file = await showSaveDialog('data.csv', 'csv')
-
-    if (!file) {
-      return
-    }
-
-    sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_CSV,
-      undefined,
-      undefined
+  private exportPlotDataAsJson(plotId: string) {
+    void this.exportPlotData(
+      'json',
+      plotId,
+      EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_JSON,
+      (filePath: string, plotId: string) =>
+        this.plots.savePlotDataAsJson(filePath, plotId)
     )
+  }
 
-    void this.plots.savePlotDataAsCsv(file.path, plotId)
+  private exportPlotDataAsCsv(plotId: string) {
+    void this.exportPlotData(
+      'csv',
+      plotId,
+      EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_CSV,
+      (filePath: string, plotId: string) =>
+        this.plots.savePlotDataAsCsv(filePath, plotId)
+    )
+  }
+
+  private exportPlotDataAsTsv(plotId: string) {
+    void this.exportPlotData(
+      'tsv',
+      plotId,
+      EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_TSV,
+      (filePath: string, plotId: string) =>
+        this.plots.savePlotDataAsTsv(filePath, plotId)
+    )
   }
 }

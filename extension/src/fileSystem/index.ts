@@ -230,6 +230,15 @@ export const writeCsv = async (
   return writeFileSync(path, csv)
 }
 
+export const writeTsv = async (
+  path: string,
+  arr: Array<Record<string, unknown>>
+) => {
+  ensureFileSync(path)
+  const csv = await json2csv(arr, { delimiter: { field: '\t' } })
+  return writeFileSync(path, csv)
+}
+
 export const getPidFromFile = async (
   path: string
 ): Promise<number | undefined> => {
