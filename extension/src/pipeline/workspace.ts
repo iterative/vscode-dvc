@@ -13,6 +13,8 @@ import { getOnDidChangeExtensions, isInstalled } from '../vscode/extensions'
 export class WorkspacePipeline extends BaseWorkspace<Pipeline> {
   private isMermaidSupportInstalled = isInstalled(MARKDOWN_MERMAID_EXTENSION_ID)
 
+  private focusedProject: string | undefined
+
   constructor(internalCommands: InternalCommands) {
     super(internalCommands)
 
@@ -37,11 +39,17 @@ export class WorkspacePipeline extends BaseWorkspace<Pipeline> {
 
     this.setRepository(dvcRoot, pipeline)
 
+    this.dispose.track(
+      pipeline.onDidFocusProject(project => {
+        this.focusedProject = project
+      })
+    )
+
     return pipeline
   }
 
   public async showDag() {
-    const cwd = await this.getOnlyOrPickProject()
+    const cwd = this.focusedProject || (await this.getOnlyOrPickProject())
 
     if (!cwd) {
       return

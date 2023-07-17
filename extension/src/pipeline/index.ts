@@ -1,6 +1,7 @@
 import { join } from 'path'
 import { Event, EventEmitter } from 'vscode'
 import { appendFileSync, writeFileSync } from 'fs-extra'
+import { setContextForEditorTitleIcons } from './context'
 import { PipelineData } from './data'
 import { PipelineModel } from './model'
 import { DeferredDisposable } from '../class/deferred'
@@ -30,8 +31,20 @@ const getScriptCommand = (script: string) => {
 
 export class Pipeline extends DeferredDisposable {
   public onDidUpdate: Event<void>
+  public readonly onDidFocusProject: Event<string | undefined>
 
   private updated: EventEmitter<void>
+
+  private focusedPipeline: string | undefined
+  private readonly pipelineFileFocused: EventEmitter<string | undefined> =
+    this.dispose.track(new EventEmitter())
+
+  private readonly onDidFocusPipelineFile: Event<string | undefined> =
+    this.pipelineFileFocused.event
+
+  private projectFocused: EventEmitter<string | undefined> = this.dispose.track(
+    new EventEmitter()
+  )
 
   private readonly dvcRoot: string
   private readonly data: PipelineData
@@ -51,7 +64,10 @@ export class Pipeline extends DeferredDisposable {
     this.updated = this.dispose.track(new EventEmitter<void>())
     this.onDidUpdate = this.updated.event
 
+    this.onDidFocusProject = this.projectFocused.event
+
     void this.initialize()
+    this.watchActiveEditor()
   }
 
   public hasPipeline() {
@@ -59,6 +75,11 @@ export class Pipeline extends DeferredDisposable {
   }
 
   public async getCwd() {
+    const focusedPipeline = this.getFocusedPipeline()
+    if (focusedPipeline) {
+      return focusedPipeline
+    }
+
     await this.checkOrAddPipeline()
 
     const pipelines = this.model.getPipelines()
@@ -191,5 +212,24 @@ export class Pipeline extends DeferredDisposable {
 
   private writeDag(dag: string) {
     writeFileSync(join(this.dvcRoot, TEMP_DAG_FILE), dag)
+  }
+
+  private getFocusedPipeline() {
+    return this.focusedPipeline
+  }
+
+  private watchActiveEditor() {
+    setContextForEditorTitleIcons(
+      this.dvcRoot,
+      this.dispose,
+      this.pipelineFileFocused
+    )
+
+    this.dispose.track(
+      this.onDidFocusPipelineFile(cwd => {
+        this.focusedPipeline = cwd
+        this.projectFocused.fire(cwd && this.dvcRoot)
+      })
+    )
   }
 }

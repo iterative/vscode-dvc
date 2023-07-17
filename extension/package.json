@@ -420,7 +420,8 @@
       {
         "title": "Show Pipeline DAG",
         "command": "dvc.showPipelineDAG",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(symbol-class)"
       },
       {
         "title": "Show Plots",
@@ -1093,6 +1094,11 @@
           "command": "dvc.stopAllRunningExperiments",
           "group": "navigation@0",
           "when": "dvc.experiments.webview.active && dvc.experiment.running && dvc.commands.available"
+        },
+        {
+          "command": "dvc.showPipelineDAG",
+          "group": "navigation@0",
+          "when": "dvc.pipeline.file.active && dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.runExperiment",

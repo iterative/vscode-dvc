@@ -47,6 +47,7 @@ import {
   configurationChangeEvent,
   experimentsUpdatedEvent,
   extensionUri,
+  getActiveEditorUpdatedEvent,
   getInputBoxEvent,
   getMessageReceivedEmitter
 } from '../util'
@@ -1893,17 +1894,6 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('editor/title icons', () => {
-    const getActiveEditorUpdatedEvent = () =>
-      new Promise(resolve => {
-        const listener = disposable.track(
-          window.onDidChangeActiveTextEditor(() => {
-            resolve(undefined)
-            disposable.untrack(listener)
-            listener.dispose()
-          })
-        )
-      })
-
     it('should set the appropriate context value when a params file is open in the active editor/closed', async () => {
       const paramsFile = Uri.file(join(dvcDemoPath, 'params.yaml'))
       await window.showTextDocument(paramsFile)
@@ -1928,7 +1918,7 @@ suite('Experiments Test Suite', () => {
 
       mockSetContextValue.resetHistory()
 
-      const startupEditorClosed = getActiveEditorUpdatedEvent()
+      const startupEditorClosed = getActiveEditorUpdatedEvent(disposable)
 
       await closeAllEditors()
       await startupEditorClosed
@@ -1940,12 +1930,12 @@ suite('Experiments Test Suite', () => {
 
       mockSetContextValue.resetHistory()
 
-      const activeEditorUpdated = getActiveEditorUpdatedEvent()
+      const activeEditorUpdated = getActiveEditorUpdatedEvent(disposable)
 
       await window.showTextDocument(paramsFile)
       await activeEditorUpdated
 
-      const activeEditorClosed = getActiveEditorUpdatedEvent()
+      const activeEditorClosed = getActiveEditorUpdatedEvent(disposable)
 
       expect(
         mockContext['dvc.experiments.file.active'],
@@ -1970,7 +1960,9 @@ suite('Experiments Test Suite', () => {
       const { experiments } = buildExperiments({ disposer: disposable })
       await experiments.isReady()
 
-      expect(setContextValueSpy).not.to.be.called
+      expect(setContextValueSpy).not.to.be.calledWith(
+        'dvc.experiments.file.active'
+      )
     })
   })
 

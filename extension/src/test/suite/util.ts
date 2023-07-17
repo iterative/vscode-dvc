@@ -327,3 +327,14 @@ export const waitForEditorText = async (): Promise<unknown> => {
   }
   return waitForEditorText()
 }
+
+export const getActiveEditorUpdatedEvent = (disposer: Disposer) =>
+  new Promise(resolve => {
+    const listener = disposer.track(
+      window.onDidChangeActiveTextEditor(() => {
+        resolve(undefined)
+        disposer.untrack(listener)
+        listener.dispose()
+      })
+    )
+  })
