@@ -111,6 +111,7 @@ export class Experiments extends BaseRepository<TableData> {
     selectBranches: (
       branchesSelected: string[]
     ) => Promise<string[] | undefined>,
+    subProjects: string[],
     data?: ExperimentsData
   ) {
     super(dvcRoot, resourceLocator.beaker)
@@ -143,7 +144,13 @@ export class Experiments extends BaseRepository<TableData> {
     )
 
     this.data = this.dispose.track(
-      data || new ExperimentsData(dvcRoot, internalCommands, this.experiments)
+      data ||
+        new ExperimentsData(
+          dvcRoot,
+          internalCommands,
+          this.experiments,
+          subProjects
+        )
     )
 
     this.dispose.track(this.data.onDidUpdate(data => this.setState(data)))
@@ -158,7 +165,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.webviewMessages = this.createWebviewMessageHandler()
     this.setupInitialData()
-    this.watchActiveEditor()
+    this.watchActiveEditor(subProjects)
   }
 
   public update() {
@@ -600,13 +607,14 @@ export class Experiments extends BaseRepository<TableData> {
     )
   }
 
-  private watchActiveEditor() {
+  private watchActiveEditor(subProjects: string[]) {
     setContextForEditorTitleIcons(
       this.dvcRoot,
       this.dispose,
       () => this.columns.getParamsFiles(),
       this.experimentsFileFocused,
-      this.onDidChangeColumns
+      this.onDidChangeColumns,
+      subProjects
     )
   }
 

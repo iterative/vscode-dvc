@@ -26,7 +26,8 @@ export class PlotsData extends BaseData<{
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
-    model: PlotsModel
+    model: PlotsModel,
+    subProjects: string[]
   ) {
     super(
       dvcRoot,
@@ -37,6 +38,7 @@ export class PlotsData extends BaseData<{
           process: () => this.update()
         }
       ],
+      subProjects,
       ['dvc.yaml', 'dvc.lock']
     )
     this.model = model

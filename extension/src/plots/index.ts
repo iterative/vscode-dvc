@@ -43,7 +43,8 @@ export class Plots extends BaseRepository<TPlotsData> {
     internalCommands: InternalCommands,
     experiments: Experiments,
     webviewIcon: Resource,
-    workspaceState: Memento
+    workspaceState: Memento,
+    subProjects: string[]
   ) {
     super(dvcRoot, webviewIcon)
 
@@ -65,7 +66,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     )
 
     this.data = this.dispose.track(
-      new PlotsData(dvcRoot, internalCommands, this.plots)
+      new PlotsData(dvcRoot, internalCommands, this.plots, subProjects)
     )
 
     this.decorationProvider = new ErrorDecorationProvider(

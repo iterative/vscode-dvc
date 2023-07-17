@@ -53,12 +53,13 @@ export class Pipeline extends DeferredDisposable {
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
+    subProjects: string[],
     data?: PipelineData
   ) {
     super()
     this.dvcRoot = dvcRoot
     this.data = this.dispose.track(
-      data || new PipelineData(dvcRoot, internalCommands)
+      data || new PipelineData(dvcRoot, internalCommands, subProjects)
     )
     this.model = this.dispose.track(new PipelineModel())
     this.updated = this.dispose.track(new EventEmitter<void>())
@@ -67,7 +68,7 @@ export class Pipeline extends DeferredDisposable {
     this.onDidFocusProject = this.projectFocused.event
 
     void this.initialize()
-    this.watchActiveEditor()
+    this.watchActiveEditor(subProjects)
   }
 
   public hasPipeline() {
@@ -218,11 +219,12 @@ export class Pipeline extends DeferredDisposable {
     return this.focusedPipeline
   }
 
-  private watchActiveEditor() {
+  private watchActiveEditor(subProjects: string[]) {
     setContextForEditorTitleIcons(
       this.dvcRoot,
       this.dispose,
-      this.pipelineFileFocused
+      this.pipelineFileFocused,
+      subProjects
     )
 
     this.dispose.track(

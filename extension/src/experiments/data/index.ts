@@ -20,12 +20,14 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
-    experiments: ExperimentsModel
+    experiments: ExperimentsModel,
+    subProjects: string[]
   ) {
     super(
       dvcRoot,
       internalCommands,
       [{ name: 'update', process: () => this.update() }],
+      subProjects,
       ['dvc.lock', 'dvc.yaml', 'params.yaml', DOT_DVC]
     )
 

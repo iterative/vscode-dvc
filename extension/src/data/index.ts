@@ -29,6 +29,7 @@ export abstract class BaseData<
   protected readonly internalCommands: InternalCommands
   protected collectedFiles: string[] = []
 
+  private readonly relSubProjects: string[]
   private readonly staticFiles: string[]
 
   private readonly updated: EventEmitter<T> = this.dispose.track(
@@ -39,6 +40,7 @@ export abstract class BaseData<
     dvcRoot: string,
     internalCommands: InternalCommands,
     updateProcesses: { name: string; process: () => Promise<unknown> }[],
+    subProjects: string[],
     staticFiles: string[] = []
   ) {
     super()
@@ -49,6 +51,9 @@ export abstract class BaseData<
     )
     this.internalCommands = internalCommands
     this.onDidUpdate = this.updated.event
+    this.relSubProjects = subProjects.map(subProject =>
+      relative(this.dvcRoot, subProject)
+    )
     this.staticFiles = staticFiles
 
     this.watchFiles()
@@ -81,6 +86,9 @@ export abstract class BaseData<
       path => {
         const relPath = relative(this.dvcRoot, path)
         if (
+          !this.relSubProjects.some(subProject =>
+            relPath.startsWith(subProject)
+          ) &&
           this.getWatchedFiles().some(
             watchedRelPath =>
               path.endsWith(watchedRelPath) ||

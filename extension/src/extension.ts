@@ -277,17 +277,26 @@ class Extension extends Disposable {
   public async initialize() {
     this.resetMembers()
 
+    const subProjects = this.getSubProjects()
+    const dvcRoots = this.getRoots()
+
     await Promise.all([
-      this.repositories.create(this.getRoots()),
-      this.repositoriesTree.initialize(this.getRoots()),
-      this.pipelines.create(this.getRoots())
+      this.repositories.create(dvcRoots, subProjects),
+      this.repositoriesTree.initialize(dvcRoots),
+      this.pipelines.create(dvcRoots, subProjects)
     ])
     this.experiments.create(
-      this.getRoots(),
+      dvcRoots,
+      subProjects,
       this.pipelines,
       this.resourceLocator
     )
-    this.plots.create(this.getRoots(), this.resourceLocator, this.experiments)
+    this.plots.create(
+      dvcRoots,
+      subProjects,
+      this.resourceLocator,
+      this.experiments
+    )
 
     return Promise.all([
       this.experiments.isReady(),
@@ -307,6 +316,10 @@ class Extension extends Disposable {
 
   private getRoots() {
     return this.setup.getRoots()
+  }
+
+  private getSubProjects() {
+    return this.setup.getSubProjects()
   }
 }
 

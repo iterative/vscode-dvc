@@ -7,7 +7,11 @@ import {
   SetupSection,
   SetupData as TSetupData
 } from './webview/contract'
-import { collectRemoteList, collectSectionCollapsed } from './collect'
+import {
+  collectRemoteList,
+  collectSectionCollapsed,
+  collectSubProjects
+} from './collect'
 import { WebviewMessages } from './webview/messages'
 import { validateTokenInput } from './inputBox'
 import { findPythonBinForInstall } from './autoInstall'
@@ -76,6 +80,7 @@ export class Setup
   public readonly resetMembers: () => void
 
   private dvcRoots: string[] = []
+  private subProjects: { [dvcRoot: string]: string[] } = {}
 
   private readonly config: Config
   private readonly status: Status
@@ -164,6 +169,10 @@ export class Setup
     return this.dvcRoots
   }
 
+  public getSubProjects() {
+    return this.subProjects
+  }
+
   public async getCliVersion(cwd: string, tryGlobalCli?: true) {
     await this.config.isReady()
     try {
@@ -210,6 +219,7 @@ export class Setup
     const nestedRoots = await this.findWorkspaceDvcRoots()
     this.dvcRoots = this.config.getFocusedProjects() || nestedRoots.flat()
     this.dvcRoots.sort()
+    this.subProjects = collectSubProjects(this.dvcRoots)
 
     void this.sendDataToWebview()
     return this.setProjectAvailability()

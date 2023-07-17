@@ -126,6 +126,11 @@ export const isSameOrChild = (root: string, path: string) => {
   return !rel.startsWith('..')
 }
 
+export const isFileInSubProject = (
+  file: string,
+  subProjects: string[]
+): boolean => subProjects.some(dvcRoot => file.startsWith(dvcRoot))
+
 export type Out =
   | string
   | Record<string, { checkpoint?: boolean; cache?: boolean }>
