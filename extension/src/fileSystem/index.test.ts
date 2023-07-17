@@ -417,6 +417,7 @@ describe('isPathInProject', () => {
     const subProjects: string[] = []
     expect(isPathInProject(path, dvcRoot, subProjects)).toBe(true)
   })
+
   it('should return false if the path is not in the project', () => {
     const path = resolve(dvcDemoPath, '..', 'dvc.yaml')
     const dvcRoot = dvcDemoPath
