@@ -59,17 +59,11 @@ suite('Pipeline Data Test Suite', () => {
       ])
 
       listener(dvcYaml)
-      expect(
-        mockMangedUpdate,
-        'should call managedUpdate for a dvc.yaml inside of the project'
-      ).to.be.calledOnce
+      expect(mockMangedUpdate).to.be.calledOnce
       mockMangedUpdate.resetHistory()
 
       listener(nestedDvcYaml)
-      expect(
-        mockMangedUpdate,
-        'should call managedUpdate for a nested dvc.yaml'
-      ).to.be.calledOnce
+      expect(mockMangedUpdate).to.be.calledOnce
     })
   })
 
@@ -84,14 +78,10 @@ suite('Pipeline Data Test Suite', () => {
     )
 
     listener(dvcYaml)
-    expect(
-      mockMangedUpdate,
-      'should call managedUpdate for a dvc.yaml inside of the project'
-    ).to.be.calledOnce
+    expect(mockMangedUpdate).to.be.calledOnce
     mockMangedUpdate.resetHistory()
 
     listener(nestedDvcYaml)
-    expect(mockMangedUpdate, 'should call managedUpdate for a nested dvc.yaml')
-      .not.to.be.calledOnce
+    expect(mockMangedUpdate).not.to.be.calledOnce
   })
 })
