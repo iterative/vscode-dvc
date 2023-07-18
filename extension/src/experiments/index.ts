@@ -45,6 +45,7 @@ import { checkSignalFile, pollSignalFileForProcess } from '../fileSystem'
 import { DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
 import { Response } from '../vscode/response'
 import { Pipeline } from '../pipeline'
+import { definedAndNonEmpty } from '../util/array'
 
 export const ExperimentsScale = {
   ...omit(ColumnType, 'TIMESTAMP'),
@@ -356,12 +357,27 @@ export class Experiments extends BaseRepository<TableData> {
   public async selectColumns() {
     const columns = this.columns.getTerminalNodes()
 
-    const selected = await pickPaths('columns', columns)
+    const selected = await pickPaths(columns, Title.SELECT_COLUMNS)
     if (!selected) {
       return
     }
 
     this.columns.setSelected(selected)
+    return this.notifyChanged()
+  }
+
+  public async selectFirstColumns() {
+    const columns = this.columns.getTerminalNodes()
+
+    const selected = await pickPaths(
+      columns.map(column => ({ ...column, selected: false })),
+      Title.SELECT_FIRST_COLUMNS
+    )
+    if (!definedAndNonEmpty(selected)) {
+      return
+    }
+
+    this.columns.selectFirst(selected.map(({ path }) => path))
     return this.notifyChanged()
   }
 

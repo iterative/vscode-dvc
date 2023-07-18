@@ -572,6 +572,12 @@
         "icon": "$(list-filter)"
       },
       {
+        "title": "Select Columns to Display First in the Experiments Table",
+        "command": "dvc.views.experimentsColumnsTree.selectFirstColumns",
+        "category": "DVC",
+        "icon": "$(arrow-left)"
+      },
+      {
         "title": "Select Plots to Display",
         "command": "dvc.views.plotsPathsTree.selectPlots",
         "category": "DVC",
@@ -917,6 +923,10 @@
         },
         {
           "command": "dvc.views.experimentsColumnsTree.selectColumns",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.views.experimentsColumnsTree.selectFirstColumns",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
@@ -1283,6 +1293,11 @@
           "command": "dvc.views.experimentsColumnsTree.selectColumns",
           "when": "view == dvc.views.experimentsColumnsTree",
           "group": "navigation@2"
+        },
+        {
+          "command": "dvc.views.experimentsColumnsTree.selectFirstColumns",
+          "when": "view == dvc.views.experimentsColumnsTree",
+          "group": "navigation@3"
         },
         {
           "command": "dvc.stopAllRunningExperiments",

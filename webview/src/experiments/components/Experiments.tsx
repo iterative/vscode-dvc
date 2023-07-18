@@ -122,7 +122,7 @@ const defaultColumn: Partial<ColumnDef<Commit>> = {
 export const ExperimentsTable: React.FC = () => {
   const {
     columns: columnsData,
-    columnOrder: initialColumnOrder,
+    columnOrder: columnOrderData,
     columnWidths,
     hasColumns,
     hasConfig,
@@ -134,7 +134,7 @@ export const ExperimentsTable: React.FC = () => {
   const [columns, setColumns] = useState(getColumns(columnsData))
   const [columnSizing, setColumnSizing] =
     useState<ColumnSizingState>(columnWidths)
-  const [columnOrder, setColumnOrder] = useState(initialColumnOrder)
+  const [columnOrder, setColumnOrder] = useState(columnOrderData)
   const resizeTimeout = useRef(0)
 
   useEffect(() => {
@@ -144,6 +144,10 @@ export const ExperimentsTable: React.FC = () => {
   useEffect(() => {
     setColumns(getColumns(columnsData))
   }, [columnsData])
+
+  useEffect(() => {
+    setColumnOrder(columnOrderData)
+  }, [columnOrderData])
 
   const getRowId = useCallback(
     (experiment: Commit, relativeIndex: number, parent?: TableRow<Commit>) =>
