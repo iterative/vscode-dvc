@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.22] - 2023-07-18
+
+### 🚀 New Features and Enhancements
+
+- Update copy in add stage component [#4292](https://github.com/iterative/vscode-dvc/pull/4292) by [@mattseddon](https://github.com/mattseddon)
+- Add "Save as TSV" option to plot modal [#4285](https://github.com/iterative/vscode-dvc/pull/4285) by [@julieg18](https://github.com/julieg18)
+- Add columns indicator (select columns) to table indicators [#4293](https://github.com/iterative/vscode-dvc/pull/4293) by [@mattseddon](https://github.com/mattseddon)
+- Add select first experiment table columns quick pick [#4294](https://github.com/iterative/vscode-dvc/pull/4294) by [@mattseddon](https://github.com/mattseddon)
+- Add select column options to table header cell context menu [#4295](https://github.com/iterative/vscode-dvc/pull/4295) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Remove `dvc_data_version_info` from plot values [#4262](https://github.com/iterative/vscode-dvc/pull/4262) by [@julieg18](https://github.com/julieg18)
+
 ## [1.0.21] - 2023-07-18
 
 ### 🚀 New Features and Enhancements
