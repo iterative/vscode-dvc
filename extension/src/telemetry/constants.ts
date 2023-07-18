@@ -57,6 +57,9 @@ export const EventName = Object.assign(
       'views.experimentsTable.selectColumns',
     VIEWS_EXPERIMENTS_TABLE_SELECT_EXPERIMENTS_FOR_PLOTS:
       'views.experimentsTable.selectExperimentsForPlots',
+    VIEWS_EXPERIMENTS_TABLE_SELECT_FIRST_COLUMNS:
+      'views.experimentsTable.selectFirstColumns',
+
     VIEWS_EXPERIMENTS_TABLE_SET_MAX_HEADER_HEIGHT:
       'views.experimentsTable.updateHeaderMaxHeight',
     VIEWS_EXPERIMENTS_TABLE_SHOW_LESS_COMMITS:
@@ -250,6 +253,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_EXPERIMENTS_FOR_PLOTS]: {
     experimentCount: number
   }
+  [EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_FIRST_COLUMNS]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_SHOW_MORE_COMMITS]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_SHOW_LESS_COMMITS]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_OPEN_PARAMS_FILE]: {

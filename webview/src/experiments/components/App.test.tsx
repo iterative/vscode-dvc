@@ -737,10 +737,10 @@ describe('App', () => {
       advanceTimersByTime(100)
 
       const menuitems = screen.getAllByRole('menuitem')
-      expect(menuitems).toHaveLength(6)
+      expect(menuitems).toHaveLength(8)
       expect(
         menuitems.filter(item => !item.className.includes('disabled'))
-      ).toHaveLength(3)
+      ).toHaveLength(5)
 
       fireEvent.keyDown(paramsFileHeader, { bubbles: true, key: 'Escape' })
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
@@ -761,7 +761,7 @@ describe('App', () => {
       expect(disabledMenuItem).toBeDefined()
 
       disabledMenuItem && fireEvent.click(disabledMenuItem, { bubbles: true })
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(6)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(8)
     })
 
     it('should have the same enabled options in the empty placeholders', () => {
@@ -783,6 +783,8 @@ describe('App', () => {
         expect(menuitems).toStrictEqual([
           'Hide Column',
           'Set Max Header Height',
+          'Select Columns',
+          'Select First Columns',
           'Sort Ascending',
           'Sort Descending'
         ])
@@ -807,10 +809,52 @@ describe('App', () => {
           .filter(item => !item.className.includes('disabled'))
           .map(item => item.textContent)
 
-        expect(menuitems).toStrictEqual(['Set Max Header Height'])
+        expect(menuitems).toStrictEqual([
+          'Set Max Header Height',
+          'Select Columns',
+          'Select First Columns'
+        ])
 
         fireEvent.keyDown(segment, { bubbles: true, key: 'Escape' })
       }
+    })
+
+    it('should send the correct message when Select Columns is clicked', () => {
+      renderTableWithPlaceholder()
+      const placeholders = screen.getAllByTestId(/header-Created/)
+      const placeholder = placeholders[0]
+      fireEvent.contextMenu(placeholder, { bubbles: true })
+      advanceTimersByTime(100)
+
+      const selectOption = screen.getByText('Select Columns')
+
+      mockPostMessage.mockClear()
+
+      fireEvent.click(selectOption)
+
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SELECT_COLUMNS
+      })
+    })
+
+    it('should send the correct message when Select First Columns is clicked', () => {
+      renderTableWithPlaceholder()
+      const placeholders = screen.getAllByTestId(/header-Created/)
+      const placeholder = placeholders[0]
+      fireEvent.contextMenu(placeholder, { bubbles: true })
+      advanceTimersByTime(100)
+
+      const selectOption = screen.getByText('Select First Columns')
+
+      mockPostMessage.mockClear()
+
+      fireEvent.click(selectOption)
+
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SELECT_FIRST_COLUMNS
+      })
     })
 
     describe('Hiding a column from its empty placeholder', () => {

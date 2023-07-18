@@ -598,6 +598,7 @@ export class Experiments extends BaseRepository<TableData> {
       () => this.getWebview(),
       () => this.notifyChanged(),
       () => this.selectColumns(),
+      () => this.selectFirstColumns(),
       (branchesSelected: string[]) => this.selectBranches(branchesSelected),
       () => this.data.update()
     )

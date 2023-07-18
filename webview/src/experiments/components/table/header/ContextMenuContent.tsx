@@ -114,10 +114,25 @@ export const getMenuOptions = (
       }
     },
     {
+      divider: true,
       id: 'update-header-depth',
       label: 'Set Max Header Height',
       message: {
         type: MessageFromWebviewType.SET_EXPERIMENTS_HEADER_HEIGHT
+      }
+    },
+    {
+      id: 'select-columns',
+      label: 'Select Columns',
+      message: {
+        type: MessageFromWebviewType.SELECT_COLUMNS
+      }
+    },
+    {
+      id: 'select-first-columns',
+      label: 'Select First Columns',
+      message: {
+        type: MessageFromWebviewType.SELECT_FIRST_COLUMNS
       }
     }
   ]
