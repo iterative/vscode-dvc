@@ -51,6 +51,7 @@ export enum MessageFromWebviewType {
   HIDE_EXPERIMENTS_TABLE_COLUMN = 'hide-experiments-table-column',
   SELECT_EXPERIMENTS = 'select-experiments',
   SELECT_COLUMNS = 'select-columns',
+  SELECT_FIRST_COLUMNS = 'select-first-columns',
   SELECT_PLOTS = 'select-plots',
   SET_EXPERIMENTS_FOR_PLOTS = 'set-experiments-for-plots',
   SET_EXPERIMENTS_AND_OPEN_PLOTS = 'set-experiments-and-open-plots',
@@ -216,6 +217,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.REFRESH_EXP_DATA }
   | { type: MessageFromWebviewType.REFRESH_REVISIONS }
   | { type: MessageFromWebviewType.SELECT_COLUMNS }
+  | { type: MessageFromWebviewType.SELECT_FIRST_COLUMNS }
   | { type: MessageFromWebviewType.FOCUS_FILTERS_TREE }
   | { type: MessageFromWebviewType.FOCUS_SORTS_TREE }
   | { type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW }
