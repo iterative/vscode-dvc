@@ -369,8 +369,16 @@ export class Experiments extends BaseRepository<TableData> {
   public async selectFirstColumns() {
     const columns = this.columns.getTerminalNodes()
 
+    const selectedColumns = []
+    for (const column of columns) {
+      if (!column.selected) {
+        continue
+      }
+      selectedColumns.push({ ...column, selected: false })
+    }
+
     const selected = await pickPaths(
-      columns.map(column => ({ ...column, selected: false })),
+      selectedColumns,
       Title.SELECT_FIRST_COLUMNS
     )
     if (!definedAndNonEmpty(selected)) {
