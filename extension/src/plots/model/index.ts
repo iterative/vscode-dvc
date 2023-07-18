@@ -58,7 +58,12 @@ import {
 } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
 import { ErrorsModel } from '../errors/model'
-import { openFileInEditor, writeCsv, writeJson } from '../../fileSystem'
+import {
+  openFileInEditor,
+  writeCsv,
+  writeJson,
+  writeTsv
+} from '../../fileSystem'
 import { Toast } from '../../vscode/toast'
 
 export class PlotsModel extends ModelWithPersistence {
@@ -242,6 +247,10 @@ export class PlotsModel extends ModelWithPersistence {
 
   public savePlotDataAsCsv(filePath: string, plotId: string) {
     void this.savePlotData(filePath, plotId, data => writeCsv(filePath, data))
+  }
+
+  public savePlotDataAsTsv(filePath: string, plotId: string) {
+    void this.savePlotData(filePath, plotId, data => writeTsv(filePath, data))
   }
 
   public getTemplatePlots(

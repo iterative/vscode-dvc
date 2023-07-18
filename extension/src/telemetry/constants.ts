@@ -73,6 +73,7 @@ export const EventName = Object.assign(
     VIEWS_PLOTS_EXPERIMENT_TOGGLE: 'views.plots.toggleExperimentStatus',
     VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_CSV: 'views.plots.exportPlotDataAsCsv',
     VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_JSON: 'views.plots.exportPlotDataAsJson',
+    VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_TSV: 'views.plots.exportPlotDataAsTsv',
     VIEWS_PLOTS_FOCUS_CHANGED: 'views.plots.focusChanged',
     VIEWS_PLOTS_REVISIONS_REORDERED: 'views.plots.revisionsReordered',
     VIEWS_PLOTS_SECTION_RESIZED: 'views.plots.sectionResized',
@@ -272,6 +273,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_EXPERIMENT_TOGGLE]: undefined
   [EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_CSV]: undefined
   [EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_JSON]: undefined
+  [EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_TSV]: undefined
 
   [EventName.VIEWS_PLOTS_ZOOM_PLOT]: { isImage: boolean }
   [EventName.VIEWS_REORDER_PLOTS_CUSTOM]: undefined

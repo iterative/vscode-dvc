@@ -20,6 +20,7 @@ export enum MessageFromWebviewType {
   CREATE_BRANCH_FROM_EXPERIMENT = 'create-branch-from-experiment',
   EXPORT_PLOT_DATA_AS_JSON = 'export-plot-data-as-json',
   EXPORT_PLOT_DATA_AS_CSV = 'export-plot-data-as-csv',
+  EXPORT_PLOT_DATA_AS_TSV = 'export-plot-data-as-tsv',
   FOCUS_FILTERS_TREE = 'focus-filters-tree',
   FOCUS_SORTS_TREE = 'focus-sorts-tree',
   OPEN_EXPERIMENTS_WEBVIEW = 'open-experiments-webview',
@@ -106,6 +107,10 @@ export type MessageFromWebview =
     }
   | {
       type: MessageFromWebviewType.EXPORT_PLOT_DATA_AS_CSV
+      payload: string
+    }
+  | {
+      type: MessageFromWebviewType.EXPORT_PLOT_DATA_AS_TSV
       payload: string
     }
   | {

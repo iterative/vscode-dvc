@@ -15,6 +15,13 @@ export const exportPlotDataAsCsv = (id: string) => {
   })
 }
 
+export const exportPlotDataAsTsv = (id: string) => {
+  sendMessage({
+    payload: id,
+    type: MessageFromWebviewType.EXPORT_PLOT_DATA_AS_TSV
+  })
+}
+
 export const exportPlotDataAsJson = (id: string) => {
   sendMessage({
     payload: id,
