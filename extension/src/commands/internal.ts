@@ -16,7 +16,7 @@ import { Toast } from '../vscode/toast'
 import { Response } from '../vscode/response'
 import { Disposable } from '../class/dispose'
 
-type Command = (...args: Args) => unknown | Promise<unknown>
+type Command = (...args: Args) => unknown
 
 export const AvailableCommands = Object.assign(
   {},

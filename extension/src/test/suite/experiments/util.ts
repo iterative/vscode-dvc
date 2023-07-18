@@ -86,6 +86,7 @@ export const buildExperiments = ({
       resourceLocator,
       mockMemento,
       mockSelectBranches,
+      [],
       mockExperimentsData
     )
   )
@@ -151,6 +152,7 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
 
   const [experiments] = workspaceExperiments.create(
     [dvcDemoPath],
+    { [dvcDemoPath]: [] },
     { getRepository: () => pipeline },
     resourceLocator
   )
@@ -176,6 +178,7 @@ export const buildSingleRepoExperiments = (disposer: SafeWatcherDisposer) => {
 
   const [experiments] = workspaceExperiments.create(
     [dvcDemoPath],
+    { [dvcDemoPath]: [] },
     { getRepository: () => pipeline },
     resourceLocator
   )
@@ -227,11 +230,16 @@ export const buildExperimentsData = (
   const mockGetBranchesToShow = stub().returns(['main'])
   const mockSetBranches = stub()
   const data = disposer.track(
-    new ExperimentsData(dvcDemoPath, internalCommands, {
-      getBranchesToShow: mockGetBranchesToShow,
-      getNbOfCommitsToShow: () => DEFAULT_NUM_OF_COMMITS_TO_SHOW,
-      setBranches: mockSetBranches
-    } as unknown as ExperimentsModel)
+    new ExperimentsData(
+      dvcDemoPath,
+      internalCommands,
+      {
+        getBranchesToShow: mockGetBranchesToShow,
+        getNbOfCommitsToShow: () => DEFAULT_NUM_OF_COMMITS_TO_SHOW,
+        setBranches: mockSetBranches
+      } as unknown as ExperimentsModel,
+      []
+    )
   )
 
   return {

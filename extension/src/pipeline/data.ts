@@ -2,18 +2,28 @@ import { dirname } from 'path'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { BaseData } from '../data'
 import { findFiles } from '../fileSystem/workspace'
+import { isPathInProject } from '../fileSystem'
 
 export class PipelineData extends BaseData<{
   dag: string
   stages: { [pipeline: string]: string | undefined }
 }> {
-  constructor(dvcRoot: string, internalCommands: InternalCommands) {
+  private readonly subProjects: string[]
+
+  constructor(
+    dvcRoot: string,
+    internalCommands: InternalCommands,
+    subProjects: string[]
+  ) {
     super(
       dvcRoot,
       internalCommands,
       [{ name: 'update', process: () => this.update() }],
+      subProjects,
       ['dvc.yaml']
     )
+
+    this.subProjects = subProjects
   }
 
   public managedUpdate() {
@@ -27,8 +37,10 @@ export class PipelineData extends BaseData<{
     ])
 
     const dvcYamlsDirs = new Set<string>()
+    this.collectedFiles = []
     for (const file of fileList) {
-      if (file.startsWith(this.dvcRoot)) {
+      if (isPathInProject(file, this.dvcRoot, this.subProjects)) {
+        this.collectedFiles.push(file)
         dvcYamlsDirs.add(dirname(file))
       }
     }

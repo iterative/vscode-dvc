@@ -312,7 +312,8 @@ suite('Repositories Tree Test Suite', () => {
         new Repository(
           dvcDemoPath,
           internalCommands,
-          disposable.track(new EventEmitter<void>())
+          disposable.track(new EventEmitter<void>()),
+          []
         )
       )
 

@@ -106,7 +106,8 @@ suite('Experiments Data Test Suite', () => {
               main: DEFAULT_NUM_OF_COMMITS_TO_SHOW
             }),
             setBranches: stub()
-          } as unknown as ExperimentsModel
+          } as unknown as ExperimentsModel,
+          []
         )
       )
 
@@ -167,7 +168,8 @@ suite('Experiments Data Test Suite', () => {
               main: DEFAULT_NUM_OF_COMMITS_TO_SHOW
             }),
             setBranches: stub()
-          } as unknown as ExperimentsModel
+          } as unknown as ExperimentsModel,
+          []
         )
       )
 

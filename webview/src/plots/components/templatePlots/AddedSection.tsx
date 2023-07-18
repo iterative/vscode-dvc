@@ -1,6 +1,7 @@
 import React, { DragEvent } from 'react'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
+import { TemplatePlotGroup } from 'dvc/src/plots/webview/contract'
 import { PlotGroup } from './templatePlotsSlice'
 import styles from '../styles.module.scss'
 import { PlotsState } from '../../store'
@@ -39,7 +40,7 @@ export const AddedSection: React.FC<AddedSectionProps> = ({
     const draggedGroup = getIDWithoutIndex(draggedRef?.group) || ''
     if (
       acceptedGroups.includes(draggedGroup) &&
-      draggedGroup !== closestSection.group
+      (draggedGroup as TemplatePlotGroup) !== closestSection.group
     ) {
       setHoveredSection(id)
       immediateDragEnter()

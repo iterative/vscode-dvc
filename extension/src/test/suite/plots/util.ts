@@ -70,6 +70,7 @@ export const buildPlots = async ({
         }
       }),
       () => Promise.resolve([]),
+      [],
       buildMockExperimentsData()
     )
   )
@@ -79,7 +80,8 @@ export const buildPlots = async ({
       internalCommands,
       experiments,
       resourceLocator.scatterGraph,
-      buildMockMemento()
+      buildMockMemento(),
+      []
     )
   )
 

@@ -17,7 +17,8 @@ import {
   findOrCreateDvcYamlFile,
   writeJson,
   writeCsv,
-  writeTsv
+  writeTsv,
+  isPathInProject
 } from '.'
 import { dvcDemoPath } from '../test/util'
 import { DOT_DVC } from '../cli/dvc/constants'
@@ -422,5 +423,54 @@ describe('findOrCreateDvcYamlFile', () => {
         scheme: 'file'
       })
     )
+  })
+})
+
+describe('isPathInProject', () => {
+  it('should return true if the path is in the project', () => {
+    const path = join(dvcDemoPath, 'dvc.yaml')
+    const dvcRoot = dvcDemoPath
+    const subProjects: string[] = []
+    expect(isPathInProject(path, dvcRoot, subProjects)).toBe(true)
+  })
+
+  it('should return false if the path is not in the project', () => {
+    const path = resolve(dvcDemoPath, '..', 'dvc.yaml')
+    const dvcRoot = dvcDemoPath
+    const subProjects: string[] = []
+    expect(isPathInProject(path, dvcRoot, subProjects)).toBe(false)
+  })
+
+  it('should return false if the path is the project', () => {
+    const path = dvcDemoPath
+    const dvcRoot = dvcDemoPath
+    const subProjects: string[] = []
+    expect(isPathInProject(path, dvcRoot, subProjects)).toBe(false)
+  })
+
+  it('should return false if the path is in the project but also in a sub-project', () => {
+    const path = join(dvcDemoPath, 'nested1', 'dvc.yaml')
+    const dvcRoot = dvcDemoPath
+    const subProjects: string[] = [join(dvcDemoPath, 'nested1')]
+    expect(isPathInProject(path, dvcRoot, subProjects)).toBe(false)
+  })
+
+  it('should return false if the path is in the project but also in one of many sub-projects', () => {
+    const path = join(dvcDemoPath, 'nested2', 'dvc.yaml')
+    const dvcRoot = dvcDemoPath
+    const subProjects: string[] = [
+      join(dvcDemoPath, 'nested1'),
+      join(dvcDemoPath, 'nested2'),
+      join(dvcDemoPath, 'nested3'),
+      join(dvcDemoPath, 'nested4')
+    ]
+    expect(isPathInProject(path, dvcRoot, subProjects)).toBe(false)
+  })
+
+  it('should return true if the path is in the project but not in a sub-project', () => {
+    const path = join(dvcDemoPath, 'nested1', 'dvc.yaml')
+    const dvcRoot = dvcDemoPath
+    const subProjects: string[] = [join(dvcDemoPath, 'nested2')]
+    expect(isPathInProject(path, dvcRoot, subProjects)).toBe(true)
   })
 })

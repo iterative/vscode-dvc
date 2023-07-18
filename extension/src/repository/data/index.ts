@@ -13,7 +13,7 @@ import {
 import { DeferredDisposable } from '../../class/deferred'
 import { gitPath } from '../../cli/git/constants'
 import { DataStatusOutput, DvcError } from '../../cli/dvc/contract'
-import { getGitPath } from '../../fileSystem'
+import { getGitPath, isPathInProject } from '../../fileSystem'
 
 export type Data = {
   dataStatus: DataStatusOutput | DvcError
@@ -21,10 +21,14 @@ export type Data = {
   untracked: Set<string>
 }
 
-export const isExcluded = (dvcRoot: string, path: string) =>
+export const isExcluded = (
+  dvcRoot: string,
+  path: string,
+  subProjects: string[]
+) =>
   !path ||
   !(
-    path.includes(dvcRoot) ||
+    isPathInProject(path, dvcRoot, subProjects) ||
     (path.includes('.git') && (path.includes('HEAD') || path.includes('index')))
   ) ||
   path.includes(EXPERIMENTS_GIT_REFS) ||
@@ -35,6 +39,7 @@ export class RepositoryData extends DeferredDisposable {
   public readonly onDidUpdate: Event<Data>
 
   private readonly dvcRoot: string
+  private readonly subProjects: string[]
 
   private readonly processManager: ProcessManager
   private readonly internalCommands: InternalCommands
@@ -43,10 +48,15 @@ export class RepositoryData extends DeferredDisposable {
     new EventEmitter()
   )
 
-  constructor(dvcRoot: string, internalCommands: InternalCommands) {
+  constructor(
+    dvcRoot: string,
+    internalCommands: InternalCommands,
+    subProjects: string[]
+  ) {
     super()
 
     this.dvcRoot = dvcRoot
+    this.subProjects = subProjects
     this.processManager = this.dispose.track(
       new ProcessManager({
         name: 'update',
@@ -114,7 +124,7 @@ export class RepositoryData extends DeferredDisposable {
       disposable => this.dispose.track(disposable),
       getRelativePattern(this.dvcRoot, '**'),
       (path: string) => {
-        if (isExcluded(this.dvcRoot, path)) {
+        if (isExcluded(this.dvcRoot, path, this.subProjects)) {
           return
         }
         return this.managedUpdate()

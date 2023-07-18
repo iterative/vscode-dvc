@@ -41,7 +41,6 @@ export enum Flag {
   OTHERS = '--others',
   QUIET = '-q',
   RAW_WITH_NUL = '-z',
-  SEPARATE_WITH_NULL = '-z',
   SHOW_TOPLEVEL = '--show-toplevel'
 }
 
@@ -53,4 +52,4 @@ export const DEFAULT_REMOTE = 'origin'
 
 export const COMMITS_SEPARATOR = '\u0000'
 
-export type Args = (Command | Flag | Commit | typeof DEFAULT_REMOTE | string)[]
+export type Args = (Command | Flag | Commit | string)[]

@@ -18,12 +18,14 @@ export const buildExperimentsPipeline = ({
   dvcYamls?: string[]
   internalCommands: InternalCommands
 }): Pipeline => {
-  const data = new PipelineData(dvcRoot, internalCommands)
+  const data = new PipelineData(dvcRoot, internalCommands, [])
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   stub(data as any, 'findDvcYamls').resolves(
     dvcYamls || [join(dvcRoot, 'dvc.yaml')]
   )
-  const pipeline = disposer.track(new Pipeline(dvcRoot, internalCommands, data))
+  const pipeline = disposer.track(
+    new Pipeline(dvcRoot, internalCommands, [], data)
+  )
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   stub(pipeline as any, 'writeDag').resolves()
   return pipeline

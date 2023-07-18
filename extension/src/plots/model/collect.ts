@@ -33,6 +33,7 @@ import {
 } from '../multiSource/collect'
 import { StrokeDashEncoding } from '../multiSource/constants'
 import { exists } from '../../fileSystem'
+import { hasKey } from '../../util/object'
 
 export const getCustomPlotId = (metric: string, param: string) =>
   `custom-${metric}-${param}`
@@ -156,10 +157,14 @@ const collectDatapoints = (
 ) => {
   for (const value of values) {
     const dvc_data_version_info = getDvcDataVersionInfo(value)
-    const data: { rev: string } = {
+    const data: { rev: string; dvc_data_version_info?: unknown } = {
       ...value,
       ...dvc_data_version_info,
       rev
+    }
+
+    if (hasKey(data, 'dvc_data_version_info')) {
+      delete data.dvc_data_version_info
     }
 
     ;(acc[rev][path] as unknown[]).push(data)

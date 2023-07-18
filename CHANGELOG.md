@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.20] - 2023-07-17
+
+### 🐛 Bug Fixes
+
+- Exclude sub-project files from file and editor watchers [#4283](https://github.com/iterative/vscode-dvc/pull/4283) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Remove moduleResolution from tsconfig [#4282](https://github.com/iterative/vscode-dvc/pull/4282) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.19] - 2023-07-17
 
 ### 🚀 New Features and Enhancements

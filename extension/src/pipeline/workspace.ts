@@ -32,9 +32,9 @@ export class WorkspacePipeline extends BaseWorkspace<Pipeline> {
     )
   }
 
-  public createRepository(dvcRoot: string) {
+  public createRepository(dvcRoot: string, subProjects: string[]) {
     const pipeline = this.dispose.track(
-      new Pipeline(dvcRoot, this.internalCommands)
+      new Pipeline(dvcRoot, this.internalCommands, subProjects)
     )
 
     this.setRepository(dvcRoot, pipeline)

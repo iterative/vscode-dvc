@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "1.0.19",
+  "version": "1.0.20",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -1696,7 +1696,7 @@
     "@types/chai-as-promised": "7.1.5",
     "@types/copy-webpack-plugin": "10.1.0",
     "@types/fs-extra": "11.0.1",
-    "@types/jest": "29.5.2",
+    "@types/jest": "29.5.3",
     "@types/js-yaml": "4.0.5",
     "@types/lodash.clonedeep": "4.5.7",
     "@types/lodash.get": "4.4.7",
@@ -1714,10 +1714,10 @@
     "@types/vscode": "1.64.0",
     "@vscode/test-electron": "2.3.3",
     "@vscode/vsce": "2.19.0",
-    "@wdio/cli": "8.12.1",
+    "@wdio/cli": "8.12.2",
     "@wdio/local-runner": "8.12.1",
     "@wdio/mocha-framework": "8.12.1",
-    "@wdio/spec-reporter": "8.12.1",
+    "@wdio/spec-reporter": "8.12.2",
     "chai": "4.3.7",
     "chai-as-promised": "7.1.1",
     "clean-webpack-plugin": "4.0.0",
