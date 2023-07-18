@@ -1018,6 +1018,38 @@ suite('Experiments Test Suite', () => {
       expect(messageSpy).to.be.calledWithMatch(allColumnsUnselected)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should be able to handle a message to select the first columns', async () => {
+      const { experiments, messageSpy } = setupExperimentsAndMockCommands()
+
+      const webview = await experiments.showWebview()
+      messageSpy.resetHistory()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const movedColumn = 'metrics:summary.json:val_accuracy'
+
+      const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
+        [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
+        Thenable<QuickPickItemWithValue<{ path: string }>[] | undefined>
+      >
+      mockShowQuickPick.resolves([
+        {
+          value: { path: movedColumn },
+          label: movedColumn
+        }
+      ])
+
+      const tableChangePromise = experimentsUpdatedEvent(experiments)
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.SELECT_FIRST_COLUMNS
+      })
+      await tableChangePromise
+
+      const [id, firstColumn] = messageSpy.lastCall.args[0].columnOrder
+
+      expect(id).to.equal('id')
+      expect(firstColumn).to.equal(movedColumn)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should be able to handle a message to focus the sorts tree', async () => {
       const { experiments } = buildExperiments({ disposer: disposable })
 

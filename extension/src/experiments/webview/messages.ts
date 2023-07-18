@@ -33,6 +33,7 @@ export class WebviewMessages {
   private readonly getWebview: () => BaseWebview<TableData> | undefined
   private readonly notifyChanged: () => void
   private readonly selectColumns: () => Promise<void>
+  private readonly selectFirstColumns: () => Promise<void>
 
   private readonly selectBranches: (
     branchesSelected: string[]
@@ -48,6 +49,7 @@ export class WebviewMessages {
     getWebview: () => BaseWebview<TableData> | undefined,
     notifyChanged: () => void,
     selectColumns: () => Promise<void>,
+    selectFirstColumns: () => Promise<void>,
     selectBranches: (
       branchesSelected: string[]
     ) => Promise<string[] | undefined>,
@@ -60,6 +62,7 @@ export class WebviewMessages {
     this.getWebview = getWebview
     this.notifyChanged = notifyChanged
     this.selectColumns = selectColumns
+    this.selectFirstColumns = selectFirstColumns
     this.selectBranches = selectBranches
     this.update = update
   }
@@ -131,6 +134,8 @@ export class WebviewMessages {
 
       case MessageFromWebviewType.SELECT_COLUMNS:
         return this.setColumnsStatus()
+      case MessageFromWebviewType.SELECT_FIRST_COLUMNS:
+        return this.setFirstColumns()
 
       case MessageFromWebviewType.FOCUS_FILTERS_TREE:
         return this.focusFiltersTree()
@@ -315,6 +320,15 @@ export class WebviewMessages {
 
   private setColumnsStatus() {
     void this.selectColumns()
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_COLUMNS,
+      undefined,
+      undefined
+    )
+  }
+
+  private setFirstColumns() {
+    void this.selectFirstColumns()
     sendTelemetryEvent(
       EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_COLUMNS,
       undefined,
