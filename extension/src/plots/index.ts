@@ -96,7 +96,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   public async selectPlots() {
     const paths = this.paths.getTerminalNodes()
 
-    const selected = await pickPaths('plots', paths)
+    const selected = await pickPaths(paths, Title.SELECT_PLOTS)
     if (!selected) {
       return
     }

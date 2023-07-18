@@ -94,6 +94,17 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     this.statusChanged?.fire()
   }
 
+  public selectFirst(firstColumns: string[]) {
+    const columnOrder = [
+      'id',
+      ...firstColumns,
+      ...this.getColumnOrder().filter(
+        column => !['id', ...firstColumns].includes(column)
+      )
+    ]
+    this.setColumnOrder(columnOrder)
+  }
+
   public setColumnWidth(id: string, width: number) {
     this.columnWidthsState[id] = width
     this.persist(

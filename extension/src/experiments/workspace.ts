@@ -101,6 +101,10 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.getRepositoryThenUpdate('selectColumns', overrideRoot)
   }
 
+  public selectFirstColumns(overrideRoot?: string) {
+    return this.getRepositoryThenUpdate('selectFirstColumns', overrideRoot)
+  }
+
   public async selectExperimentsToStop() {
     const cwd = await this.getFocusedOrOnlyOrPickProject()
     if (!cwd) {
@@ -407,7 +411,8 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       | 'addStarredSort'
       | 'removeSorts'
       | 'selectExperimentsToPlot'
-      | 'selectColumns',
+      | 'selectColumns'
+      | 'selectFirstColumns',
     overrideRoot?: string
   ) {
     const dvcRoot = await this.getDvcRoot(overrideRoot)

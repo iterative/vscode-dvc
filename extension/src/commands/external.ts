@@ -51,6 +51,7 @@ export enum RegisteredCliCommands {
 
 export enum RegisteredCommands {
   EXPERIMENT_COLUMNS_SELECT = 'dvc.views.experimentsColumnsTree.selectColumns',
+  EXPERIMENT_COLUMNS_SELECT_FIRST = 'dvc.views.experimentsColumnsTree.selectFirstColumns',
   EXPERIMENT_FILTER_ADD = 'dvc.addExperimentsTableFilter',
   EXPERIMENT_FILTER_ADD_STARRED = 'dvc.addStarredExperimentsTableFilter',
   EXPERIMENT_FILTER_REMOVE = 'dvc.views.experimentsFilterByTree.removeFilter',
