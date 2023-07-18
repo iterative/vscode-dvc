@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "1.0.15",
+  "version": "1.0.20",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -418,6 +418,12 @@
         "category": "DVC"
       },
       {
+        "title": "Show Pipeline DAG",
+        "command": "dvc.showPipelineDAG",
+        "category": "DVC",
+        "icon": "$(symbol-class)"
+      },
+      {
         "title": "Show Plots",
         "command": "dvc.showPlots",
         "category": "DVC",
@@ -603,6 +609,11 @@
         },
         "dvc.doNotRecommendRedHatExtension": {
           "description": "Do not prompt to install the Red Hat YAML extension, which helps with DVC YAML schema validation.",
+          "type": "boolean",
+          "default": null
+        },
+        "dvc.doNotRecommendMermaidSupportExtension": {
+          "description": "Do not prompt to install the Markdown Preview Mermaid Support extension, which helps to visualize DVC pipeline DAGs",
           "type": "boolean",
           "default": null
         },
@@ -877,6 +888,10 @@
           "when": "false"
         },
         {
+          "command": "dvc.showPipelineDAG",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
           "command": "dvc.showExperiments",
           "when": "dvc.commands.available && dvc.project.available"
         },
@@ -1079,6 +1094,11 @@
           "command": "dvc.stopAllRunningExperiments",
           "group": "navigation@0",
           "when": "dvc.experiments.webview.active && dvc.experiment.running && dvc.commands.available"
+        },
+        {
+          "command": "dvc.showPipelineDAG",
+          "group": "navigation@0",
+          "when": "dvc.pipeline.file.active && dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.runExperiment",
@@ -1385,6 +1405,10 @@
       {
         "language": "yaml",
         "path": "./snippets/dvc-yaml.code-snippets"
+      },
+      {
+        "language": "python",
+        "path": "./snippets/dvclive.code-snippets"
       }
     ],
     "viewsContainers": {
@@ -1646,11 +1670,12 @@
   },
   "dependencies": {
     "@hediet/std": "0.6.0",
-    "@vscode/extension-telemetry": "0.8.0",
+    "@vscode/extension-telemetry": "0.8.1",
     "appdirs": "1.1.0",
     "execa": "5.1.1",
     "fs-extra": "11.1.1",
     "js-yaml": "4.1.0",
+    "json-2-csv": "4.0.0",
     "json5": "2.2.3",
     "lodash.clonedeep": "4.5.0",
     "lodash.get": "4.4.2",
@@ -1665,13 +1690,13 @@
     "vscode-languageclient": "8.1.0"
   },
   "devDependencies": {
-    "@swc/core": "1.3.67",
+    "@swc/core": "1.3.68",
     "@swc/jest": "0.2.26",
     "@types/chai": "4.3.5",
     "@types/chai-as-promised": "7.1.5",
     "@types/copy-webpack-plugin": "10.1.0",
     "@types/fs-extra": "11.0.1",
-    "@types/jest": "29.5.2",
+    "@types/jest": "29.5.3",
     "@types/js-yaml": "4.0.5",
     "@types/lodash.clonedeep": "4.5.7",
     "@types/lodash.get": "4.4.7",
@@ -1689,17 +1714,17 @@
     "@types/vscode": "1.64.0",
     "@vscode/test-electron": "2.3.3",
     "@vscode/vsce": "2.19.0",
-    "@wdio/cli": "8.11.2",
-    "@wdio/local-runner": "8.11.2",
-    "@wdio/mocha-framework": "8.11.0",
-    "@wdio/spec-reporter": "8.11.2",
+    "@wdio/cli": "8.12.2",
+    "@wdio/local-runner": "8.12.1",
+    "@wdio/mocha-framework": "8.12.1",
+    "@wdio/spec-reporter": "8.12.2",
     "chai": "4.3.7",
     "chai-as-promised": "7.1.1",
     "clean-webpack-plugin": "4.0.0",
     "copy-webpack-plugin": "11.0.0",
     "fork-ts-checker-webpack-plugin": "8.0.0",
-    "jest": "29.5.0",
-    "jest-environment-node": "29.5.0",
+    "jest": "29.6.1",
+    "jest-environment-node": "29.6.1",
     "lint-staged": "13.2.3",
     "mocha": "10.2.0",
     "mock-require": "3.0.3",
@@ -1708,8 +1733,8 @@
     "sinon-chai": "3.7.0",
     "ts-loader": "9.4.4",
     "vscode-uri": "3.0.7",
-    "wdio-vscode-service": "5.1.0",
-    "webdriverio": "8.11.2",
+    "wdio-vscode-service": "5.2.0",
+    "webdriverio": "8.12.1",
     "webpack": "5.88.1",
     "webpack-cli": "5.1.4"
   },

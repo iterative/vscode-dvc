@@ -16,7 +16,7 @@ window.acquireVsCodeApi = () =>
   ({
     postMessage: action('postMessage'),
     setState: action('setState')
-  } as unknown as InternalVsCodeApi)
+  }) as unknown as InternalVsCodeApi
 
 export const preview: Preview = {
   parameters: {

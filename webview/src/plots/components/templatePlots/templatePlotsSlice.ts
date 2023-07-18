@@ -29,7 +29,8 @@ export const templatePlotsInitialState: TemplatePlotsState = {
   nbItemsPerRow:
     DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH[PlotsSection.TEMPLATE_PLOTS],
   plotsSnapshots: {},
-  sections: []
+  sections: [],
+  smoothPlotValues: {}
 }
 
 export const templatePlotsSlice = createSlice({
@@ -79,7 +80,8 @@ export const templatePlotsSlice = createSlice({
         sections:
           JSON.stringify(plotSections) === JSON.stringify(state.sections)
             ? state.sections
-            : plotSections
+            : plotSections,
+        smoothPlotValues: action.payload.smoothPlotValues
       }
     },
     updateSections: (state, action: PayloadAction<PlotGroup[]>) => {

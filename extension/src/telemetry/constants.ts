@@ -71,13 +71,15 @@ export const EventName = Object.assign(
       'views.plots.comparisonRowsReordered',
     VIEWS_PLOTS_CREATED: 'views.plots.created',
     VIEWS_PLOTS_EXPERIMENT_TOGGLE: 'views.plots.toggleExperimentStatus',
-    VIEWS_PLOTS_EXPORT_PLOT_DATA: 'views.plots.exportPlotData',
+    VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_CSV: 'views.plots.exportPlotDataAsCsv',
+    VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_JSON: 'views.plots.exportPlotDataAsJson',
     VIEWS_PLOTS_FOCUS_CHANGED: 'views.plots.focusChanged',
     VIEWS_PLOTS_REVISIONS_REORDERED: 'views.plots.revisionsReordered',
     VIEWS_PLOTS_SECTION_RESIZED: 'views.plots.sectionResized',
     VIEWS_PLOTS_SECTION_TOGGLE: 'views.plots.toggleSection',
     VIEWS_PLOTS_SELECT_EXPERIMENTS: 'view.plots.selectExperiments',
     VIEWS_PLOTS_SELECT_PLOTS: 'view.plots.selectPlots',
+    VIEWS_PLOTS_SET_SMOOTH_PLOT_VALUE: 'view.plots.setSmoothPlotValues',
     VIEWS_PLOTS_ZOOM_PLOT: 'views.plots.zoomPlot',
     VIEWS_REORDER_PLOTS_CUSTOM: 'views.plots.customReordered',
     VIEWS_REORDER_PLOTS_TEMPLATES: 'views.plots.templatesReordered',
@@ -170,6 +172,8 @@ export interface IEventNamePropertyMapping {
   [EventName.MODIFY_WORKSPACE_PARAMS_AND_RUN]: undefined
   [EventName.MODIFY_WORKSPACE_PARAMS_RESET_AND_RUN]: undefined
   [EventName.STOP_EXPERIMENTS]: { stopped: boolean; wasRunning: boolean }
+
+  [EventName.PIPELINE_SHOW_DAG]: undefined
 
   [EventName.PLOTS_PATH_TOGGLE]: undefined
   [EventName.PLOTS_SHOW]: undefined
@@ -265,11 +269,13 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_SELECT_EXPERIMENTS]: undefined
   [EventName.VIEWS_PLOTS_SELECT_PLOTS]: undefined
   [EventName.VIEWS_PLOTS_EXPERIMENT_TOGGLE]: undefined
-  [EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA]: undefined
+  [EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_CSV]: undefined
+  [EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_JSON]: undefined
 
   [EventName.VIEWS_PLOTS_ZOOM_PLOT]: { isImage: boolean }
   [EventName.VIEWS_REORDER_PLOTS_CUSTOM]: undefined
   [EventName.VIEWS_REORDER_PLOTS_TEMPLATES]: undefined
+  [EventName.VIEWS_PLOTS_SET_SMOOTH_PLOT_VALUE]: undefined
 
   [EventName.VIEWS_PLOTS_PATH_TREE_OPENED]: DvcRootCount
 

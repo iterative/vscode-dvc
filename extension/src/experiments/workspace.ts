@@ -16,37 +16,12 @@ import {
 import { ResourceLocator } from '../resourceLocator'
 import { Setup } from '../setup'
 import { Toast } from '../vscode/toast'
-import {
-  getInput,
-  getPositiveIntegerInput,
-  getValidInput
-} from '../vscode/inputBox'
+import { getInput, getPositiveIntegerInput } from '../vscode/inputBox'
 import { BaseWorkspaceWebviews } from '../webview/workspace'
 import { Title } from '../vscode/title'
 import { ContextKey, setContextValue } from '../vscode/context'
-import {
-  findOrCreateDvcYamlFile,
-  getFileExtension,
-  hasDvcYamlFile
-} from '../fileSystem'
-import { quickPickManyValues, quickPickOneOrInput } from '../vscode/quickPick'
-import { pickFile } from '../vscode/resourcePicker'
-
-export enum scriptCommand {
-  JUPYTER = 'jupyter nbconvert --to notebook --inplace --execute',
-  PYTHON = 'python'
-}
-
-const getScriptCommand = (script: string) => {
-  switch (getFileExtension(script)) {
-    case '.py':
-      return scriptCommand.PYTHON
-    case '.ipynb':
-      return scriptCommand.JUPYTER
-    default:
-      return ''
-  }
-}
+import { quickPickManyValues } from '../vscode/quickPick'
+import { WorkspacePipeline } from '../pipeline/workspace'
 
 export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   Experiments,
@@ -178,18 +153,12 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     commandId: ModifiedExperimentAndRunCommandId,
     overrideRoot?: string
   ) {
-    const cwd = await this.getDvcRoot(overrideRoot)
-    if (!cwd) {
+    const project = await this.getDvcRoot(overrideRoot)
+    if (!project) {
       return
     }
-
-    const repository = this.getRepository(cwd)
+    const repository = this.getRepository(project)
     if (!repository) {
-      return
-    }
-
-    const shouldContinue = await this.checkOrAddPipeline(cwd)
-    if (!shouldContinue) {
       return
     }
 
@@ -197,15 +166,11 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   }
 
   public async modifyWorkspaceParamsAndQueue(overrideRoot?: string) {
-    const cwd = await this.getDvcRoot(overrideRoot)
-    if (!cwd) {
+    const project = await this.getDvcRoot(overrideRoot)
+    if (!project) {
       return
     }
-    const shouldContinue = await this.checkOrAddPipeline(cwd)
-    if (!shouldContinue) {
-      return
-    }
-    const repository = this.getRepository(cwd)
+    const repository = this.getRepository(project)
     if (!repository) {
       return
     }
@@ -214,7 +179,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   }
 
   public async getCwdThenRun(commandId: CommandId) {
-    const cwd = await this.shouldRun()
+    const cwd = await this.getCwd()
 
     if (!cwd) {
       return 'Could not run task'
@@ -237,7 +202,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     commandId: CommandId,
     quickPick: () => Thenable<string[] | undefined>
   ) {
-    const cwd = await this.shouldRun()
+    const cwd = await this.getCwd()
     if (!cwd) {
       return
     }
@@ -249,7 +214,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   }
 
   public async createExperimentBranch() {
-    const cwd = await this.shouldRun()
+    const cwd = await this.getCwd()
     if (!cwd) {
       return
     }
@@ -286,7 +251,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     title: Title,
     options: { prompt: string; value: string }
   ) {
-    const cwd = await this.shouldRun()
+    const cwd = await this.getCwd()
     if (!cwd) {
       return
     }
@@ -306,15 +271,21 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     )
   }
 
-  public createRepository(dvcRoot: string, resourceLocator: ResourceLocator) {
+  public createRepository(
+    dvcRoot: string,
+    subProjects: string[],
+    pipeline: WorkspacePipeline,
+    resourceLocator: ResourceLocator
+  ) {
     const experiments = this.dispose.track(
       new Experiments(
         dvcRoot,
         this.internalCommands,
+        pipeline.getRepository(dvcRoot),
         resourceLocator,
         this.workspaceState,
-        () => this.checkOrAddPipeline(dvcRoot),
-        (branchesSelected: string[]) => this.selectBranches(branchesSelected)
+        (branchesSelected: string[]) => this.selectBranches(branchesSelected),
+        subProjects
       )
     )
 
@@ -446,106 +417,13 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.getRepository(dvcRoot)[method]()
   }
 
-  private async shouldRun() {
-    const cwd = await this.getFocusedOrOnlyOrPickProject()
-    if (!cwd) {
+  private async getCwd(overrideRoot?: string) {
+    const project = await this.getDvcRoot(overrideRoot)
+    if (!project) {
       return
     }
-    const shouldContinue = await this.checkOrAddPipeline(cwd)
-    if (!shouldContinue) {
-      return
-    }
-    return cwd
-  }
-
-  private async checkOrAddPipeline(cwd: string) {
-    const stages = await this.internalCommands.executeCommand(
-      AvailableCommands.STAGE_LIST,
-      cwd
-    )
-
-    if (hasDvcYamlFile(cwd) && stages === undefined) {
-      await Toast.showError(
-        'Cannot perform task. Your dvc.yaml file is invalid.'
-      )
-      return false
-    }
-
-    if (!stages) {
-      return this.addPipeline(cwd)
-    }
-    return true
-  }
-
-  private async addPipeline(cwd: string) {
-    const stageName = await this.askForStageName()
-    if (!stageName) {
-      return false
-    }
-
-    const { trainingScript, command, enteredManually } =
-      await this.askForTrainingScript()
-    if (!trainingScript) {
-      return false
-    }
-    void findOrCreateDvcYamlFile(
-      cwd,
-      trainingScript,
-      stageName,
-      command,
-      !enteredManually
-    )
-    return true
-  }
-
-  private async askForStageName() {
-    return await getValidInput(
-      Title.ENTER_STAGE_NAME,
-      (stageName?: string) => {
-        if (!stageName) {
-          return 'Stage name must not be empty'
-        }
-        if (!/^[a-z]/i.test(stageName)) {
-          return 'Stage name should start with a letter'
-        }
-        return /^\w+$/.test(stageName)
-          ? null
-          : 'Stage name should only include letters and numbers'
-      },
-      { value: 'train' }
-    )
-  }
-
-  private async askForTrainingScript() {
-    const selectValue = 'select'
-    const pathOrSelect = await quickPickOneOrInput(
-      [{ label: 'Select from file explorer', value: selectValue }],
-      {
-        defaultValue: '',
-        placeholder: 'Path to script',
-        title: Title.ENTER_PATH_OR_CHOOSE_FILE
-      }
-    )
-
-    const trainingScript =
-      pathOrSelect === selectValue
-        ? await pickFile(Title.SELECT_TRAINING_SCRIPT)
-        : pathOrSelect
-
-    if (!trainingScript) {
-      return {
-        command: undefined,
-        enteredManually: false,
-        trainingScript: undefined
-      }
-    }
-
-    const command =
-      getScriptCommand(trainingScript) ||
-      (await getInput(Title.ENTER_COMMAND_TO_RUN)) ||
-      ''
-    const enteredManually = pathOrSelect !== selectValue
-    return { command, enteredManually, trainingScript }
+    const repository = this.getRepository(project)
+    return await repository.getPipelineCwd()
   }
 
   private async pickExpThenRun(

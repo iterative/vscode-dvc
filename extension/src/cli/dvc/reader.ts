@@ -32,12 +32,13 @@ export const isDvcError = <
   !!(Object.keys(dataOrError).length === 1 && (dataOrError as DvcError).error)
 
 export const autoRegisteredCommands = {
+  DAG: 'dag',
   DATA_STATUS: 'dataStatus',
   EXP_SHOW: 'expShow',
   GLOBAL_VERSION: 'globalVersion',
   PLOTS_DIFF: 'plotsDiff',
   ROOT: 'root',
-  STAGE_LIST: 'listStages',
+  STAGE_LIST: 'stageList',
   VERSION: 'version'
 } as const
 
@@ -46,6 +47,14 @@ export class DvcReader extends DvcCli {
     autoRegisteredCommands,
     this
   )
+
+  public async dag(cwd: string) {
+    try {
+      return await this.executeDvcProcess(cwd, Command.DAG, Flag.MD)
+    } catch (error: unknown) {
+      return (error as Error).toString()
+    }
+  }
 
   public dataStatus(
     cwd: string,
@@ -135,7 +144,7 @@ export class DvcReader extends DvcCli {
     return this.executeProcess(options)
   }
 
-  public async listStages(cwd: string): Promise<string | undefined> {
+  public async stageList(cwd: string): Promise<string | undefined> {
     try {
       return await this.executeDvcProcess(cwd, Command.STAGE, SubCommand.LIST)
     } catch {}

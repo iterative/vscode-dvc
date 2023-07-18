@@ -47,6 +47,7 @@ import {
   configurationChangeEvent,
   experimentsUpdatedEvent,
   extensionUri,
+  getActiveEditorUpdatedEvent,
   getInputBoxEvent,
   getMessageReceivedEmitter
 } from '../util'
@@ -85,12 +86,13 @@ import { AvailableCommands } from '../../../commands/internal'
 import { Setup } from '../../../setup'
 import * as FileSystem from '../../../fileSystem'
 import * as ProcessExecution from '../../../process/execution'
-import { DvcReader } from '../../../cli/dvc/reader'
 import { DvcViewer } from '../../../cli/dvc/viewer'
 import { DEFAULT_NB_ITEMS_PER_ROW } from '../../../plots/webview/contract'
 import { Toast } from '../../../vscode/toast'
 import { Response } from '../../../vscode/response'
 import { MAX_SELECTED_EXPERIMENTS } from '../../../experiments/model/status'
+import { Pipeline } from '../../../pipeline'
+import { buildExperimentsPipeline } from '../pipeline/util'
 
 const { openFileInEditor } = FileSystem
 
@@ -122,8 +124,6 @@ suite('Experiments Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the experiment webview visible', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
-
       const { experiments, messageSpy } = buildExperiments({
         disposer: disposable
       })
@@ -140,7 +140,6 @@ suite('Experiments Test Suite', () => {
         hasColumns: true,
         hasConfig: true,
         hasRunningWorkspaceExperiment: true,
-        hasValidDvcYaml: true,
         rows: rowsFixture,
         sorts: []
       }
@@ -175,58 +174,10 @@ suite('Experiments Test Suite', () => {
       expect(windowSpy).not.to.have.been.called
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should set hasValidDvcYaml to false if there is an error getting stages and there is a dvc.yaml file', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves(undefined)
-      stub(FileSystem, 'hasDvcYamlFile').returns(true)
-
-      const { experiments, messageSpy } = buildExperiments({
-        disposer: disposable
-      })
-
-      await experiments.showWebview()
-
-      expect(messageSpy).to.be.calledWithMatch({
-        hasValidDvcYaml: false
-      })
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
-    it('should set hasValidDvcYaml to true if there is an error getting stages and there is no dvc.yaml file', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves(undefined)
-      stub(FileSystem, 'hasDvcYamlFile').returns(false)
-
-      const { experiments, messageSpy } = buildExperiments({
-        disposer: disposable
-      })
-
-      await experiments.showWebview()
-
-      const expectedTableData = {
-        hasValidDvcYaml: true
-      }
-
-      expect(messageSpy).to.be.calledWithMatch(expectedTableData)
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
-    it('should set hasValidDvcYaml to true if there are no errors getting stages', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('')
-      stub(FileSystem, 'hasDvcYamlFile').returns(false)
-
-      const { experiments, messageSpy } = buildExperiments({
-        disposer: disposable
-      })
-
-      await experiments.showWebview()
-
-      expect(messageSpy).to.be.calledWithMatch({
-        hasValidDvcYaml: true
-      })
-    }).timeout(WEBVIEW_TEST_TIMEOUT)
-
     it('should set hasConfig to false if there are no stages', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('')
-
       const { experiments, messageSpy } = buildExperiments({
-        disposer: disposable
+        disposer: disposable,
+        stageList: ''
       })
 
       await experiments.showWebview()
@@ -236,9 +187,20 @@ suite('Experiments Test Suite', () => {
       })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
-    it('should set hasConfig to true if there are stages', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
+    it('should set hasConfig to true if there is a broken dvc.yaml', async () => {
+      const { experiments, messageSpy } = buildExperiments({
+        disposer: disposable,
+        stageList: null
+      })
 
+      await experiments.showWebview()
+
+      expect(messageSpy).to.be.calledWithMatch({
+        hasConfig: true
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should set hasConfig to true if there are stages', async () => {
       const { experiments, messageSpy } = buildExperiments({
         disposer: disposable
       })
@@ -572,7 +534,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to apply an experiment', async () => {
-      const { experiments } = buildExperiments({ disposer: disposable })
+      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
       await experiments.isReady()
 
       const webview = await experiments.showWebview()
@@ -583,8 +545,6 @@ suite('Experiments Test Suite', () => {
         DvcExecutor.prototype,
         'expApply'
       ).resolves(undefined)
-
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       mockMessageReceived.fire({
         payload: mockExperimentId,
@@ -599,7 +559,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to create a branch from an experiment', async () => {
-      const { experiments } = buildExperiments({ disposer: disposable })
+      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
       await experiments.isReady()
 
       const mockBranch = 'mock-branch-input'
@@ -609,8 +569,6 @@ suite('Experiments Test Suite', () => {
         DvcExecutor.prototype,
         'expBranch'
       ).resolves('undefined')
-
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -753,10 +711,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to modify the workspace params and queue an experiment', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
-      const { experiments, dvcExecutor } = buildExperiments({
-        disposer: disposable
-      })
+      const { experiments, dvcExecutor } =
+        stubWorkspaceExperimentsGetters(disposable)
 
       const mockModifiedParams = [
         '-S',
@@ -764,8 +720,6 @@ suite('Experiments Test Suite', () => {
         '-S',
         'params.yaml:weight_decay=0'
       ]
-
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
       const mockQueueExperiment = stub(dvcExecutor, 'expRunQueue').resolves(
@@ -789,10 +743,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to modify the workspace params and run a new experiment', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
-      const { experiments, dvcRunner } = buildExperiments({
-        disposer: disposable
-      })
+      const { experiments, dvcRunner } =
+        stubWorkspaceExperimentsGetters(disposable)
 
       const mockModifiedParams = [
         '-S',
@@ -800,8 +752,6 @@ suite('Experiments Test Suite', () => {
         '-S',
         'params.yaml:weight_decay=0'
       ]
-
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
       const mockRunExperiment = stub(dvcRunner, 'runExperiment').resolves(
@@ -827,10 +777,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to modify the workspace params, reset and run a new experiment', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
-      const { experiments, dvcRunner } = buildExperiments({
-        disposer: disposable
-      })
+      const { experiments, dvcRunner } =
+        stubWorkspaceExperimentsGetters(disposable)
 
       const mockModifiedParams = [
         '-S',
@@ -840,8 +788,6 @@ suite('Experiments Test Suite', () => {
       ]
 
       stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
-
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -889,9 +835,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to toggle an experiment's status", async () => {
-      const { experiments, experimentsModel } = buildExperiments({
-        disposer: disposable
-      })
+      const { experiments, experimentsModel } =
+        stubWorkspaceExperimentsGetters(disposable)
 
       await experiments.isReady()
 
@@ -916,8 +861,6 @@ suite('Experiments Test Suite', () => {
         isExperimentSelected(queuedId),
         'queued experiment cannot be selected'
       ).to.be.false
-
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -1033,8 +976,6 @@ suite('Experiments Test Suite', () => {
     })
 
     it('should be able to handle a message to select columns', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
-
       const { columnsModel, experiments, messageSpy } =
         setupExperimentsAndMockCommands()
 
@@ -1236,9 +1177,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to select experiments for plotting', async () => {
-      const { experiments, experimentsModel } = buildExperiments({
-        disposer: disposable
-      })
+      const { experiments, experimentsModel } =
+        stubWorkspaceExperimentsGetters(disposable)
       await experiments.isReady()
 
       const webview = await experiments.showWebview()
@@ -1247,8 +1187,6 @@ suite('Experiments Test Suite', () => {
       const runningInQueueId = 'exp-e7a67'
       const expectedIds = ['main', 'test-branch', runningInQueueId]
       const mockExperimentIds = [...expectedIds, queuedId]
-
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const tableChangePromise = experimentsUpdatedEvent(experiments)
 
@@ -1275,9 +1213,8 @@ suite('Experiments Test Suite', () => {
         dvc: true,
         experiments: true
       })
-      const { experiments, experimentsModel } = buildExperiments({
-        disposer: disposable
-      })
+      const { experiments, experimentsModel } =
+        stubWorkspaceExperimentsGetters(disposable)
       const mockShowPlots = stub(WorkspacePlots.prototype, 'showWebview')
 
       const dataSent = new Promise(resolve =>
@@ -1293,8 +1230,6 @@ suite('Experiments Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       const runningInQueueId = 'exp-e7a67'
       const mockExperimentIds = ['main', 'test-branch', runningInQueueId]
-
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
 
       const tableChangePromise = experimentsUpdatedEvent(experiments)
 
@@ -1346,9 +1281,9 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to stop experiments running', async () => {
-      const { experiments, dvcExecutor } = buildExperiments({
-        disposer: disposable
-      })
+      const { experiments, dvcExecutor } =
+        stubWorkspaceExperimentsGetters(disposable)
+
       const mockQueueKill = stub(dvcExecutor, 'queueKill')
       const mockStopProcesses = stub(ProcessExecution, 'stopProcesses')
 
@@ -1372,7 +1307,6 @@ suite('Experiments Test Suite', () => {
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockExperimentIds = ['exp-e7a67', 'exp-83425']
 
-      stubWorkspaceExperimentsGetters(dvcDemoPath, experiments)
       const mockPid = 1234
       const mockGetPidFromFile = stub(FileSystem, 'getPidFromFile')
         .onFirstCall()
@@ -1398,8 +1332,6 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to add a configuration', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('')
-
       const { experiments, mockCheckOrAddPipeline, messageSpy } =
         setupExperimentsAndMockCommands()
 
@@ -1556,22 +1488,31 @@ suite('Experiments Test Suite', () => {
 
   describe('Sorting', () => {
     it('should be able to sort', async () => {
-      const { internalCommands } = buildInternalCommands(disposable)
+      const { dvcReader, internalCommands } = buildInternalCommands(disposable)
 
       const messageSpy = spy(BaseWebview.prototype, 'show')
 
       const resourceLocator = disposable.track(
         new ResourceLocator(extensionUri)
       )
+      stub(dvcReader, 'stageList').resolves('train')
+      stub(dvcReader, 'dag').resolves('')
+
+      const pipeline = buildExperimentsPipeline({
+        disposer: disposable,
+        dvcRoot: dvcDemoPath,
+        internalCommands
+      })
 
       const experiments = disposable.track(
         new Experiments(
           dvcDemoPath,
           internalCommands,
+          pipeline,
           resourceLocator,
           buildMockMemento(),
-          () => Promise.resolve(true),
           () => Promise.resolve([]),
+          [],
           buildMockExperimentsData()
         )
       )
@@ -1743,10 +1684,15 @@ suite('Experiments Test Suite', () => {
         new Experiments(
           'test',
           internalCommands,
+          {
+            hasStage: () => true,
+            isReady: () => Promise.resolve(),
+            onDidUpdate: stub()
+          } as unknown as Pipeline,
           {} as ResourceLocator,
           mockMemento,
-          () => Promise.resolve(true),
           () => Promise.resolve([]),
+          [],
           buildMockExperimentsData()
         )
       )
@@ -1904,10 +1850,15 @@ suite('Experiments Test Suite', () => {
         new Experiments(
           'test',
           internalCommands,
+          {
+            hasStage: () => true,
+            isReady: () => Promise.resolve(),
+            onDidUpdate: stub()
+          } as unknown as Pipeline,
           {} as ResourceLocator,
           mockMemento,
-          () => Promise.resolve(true),
           () => Promise.resolve([]),
+          [],
           buildMockExperimentsData()
         )
       )
@@ -1946,17 +1897,6 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('editor/title icons', () => {
-    const getActiveEditorUpdatedEvent = () =>
-      new Promise(resolve => {
-        const listener = disposable.track(
-          window.onDidChangeActiveTextEditor(() => {
-            resolve(undefined)
-            disposable.untrack(listener)
-            listener.dispose()
-          })
-        )
-      })
-
     it('should set the appropriate context value when a params file is open in the active editor/closed', async () => {
       const paramsFile = Uri.file(join(dvcDemoPath, 'params.yaml'))
       await window.showTextDocument(paramsFile)
@@ -1981,7 +1921,7 @@ suite('Experiments Test Suite', () => {
 
       mockSetContextValue.resetHistory()
 
-      const startupEditorClosed = getActiveEditorUpdatedEvent()
+      const startupEditorClosed = getActiveEditorUpdatedEvent(disposable)
 
       await closeAllEditors()
       await startupEditorClosed
@@ -1993,12 +1933,12 @@ suite('Experiments Test Suite', () => {
 
       mockSetContextValue.resetHistory()
 
-      const activeEditorUpdated = getActiveEditorUpdatedEvent()
+      const activeEditorUpdated = getActiveEditorUpdatedEvent(disposable)
 
       await window.showTextDocument(paramsFile)
       await activeEditorUpdated
 
-      const activeEditorClosed = getActiveEditorUpdatedEvent()
+      const activeEditorClosed = getActiveEditorUpdatedEvent(disposable)
 
       expect(
         mockContext['dvc.experiments.file.active'],
@@ -2023,7 +1963,9 @@ suite('Experiments Test Suite', () => {
       const { experiments } = buildExperiments({ disposer: disposable })
       await experiments.isReady()
 
-      expect(setContextValueSpy).not.to.be.called
+      expect(setContextValueSpy).not.to.be.calledWith(
+        'dvc.experiments.file.active'
+      )
     })
   })
 

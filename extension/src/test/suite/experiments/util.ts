@@ -19,6 +19,7 @@ import { ColumnsModel } from '../../../experiments/columns/model'
 import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../../cli/dvc/constants'
 import { PersistenceKey } from '../../../persistence/constants'
 import { ExpShowOutput } from '../../../cli/dvc/contract'
+import { buildExperimentsPipeline } from '../pipeline/util'
 
 export const DEFAULT_EXPERIMENTS_OUTPUT = {
   availableNbCommits: { main: 5 },
@@ -33,7 +34,8 @@ export const buildExperiments = ({
   dvcRoot = dvcDemoPath,
   expShow = expShowFixture,
   gitLog = gitLogFixture,
-  rowOrder = rowOrderFixture
+  rowOrder = rowOrderFixture,
+  stageList = 'train'
 }: {
   availableNbCommits?: { [branch: string]: number }
   disposer: Disposer
@@ -41,6 +43,7 @@ export const buildExperiments = ({
   expShow?: ExpShowOutput
   gitLog?: string
   rowOrder?: { branch: string; sha: string }[]
+  stageList?: string | null
 }) => {
   const {
     dvcExecutor,
@@ -54,13 +57,19 @@ export const buildExperiments = ({
     mockExpShow,
     mockGetCommitMessages,
     resourceLocator
-  } = buildDependencies(disposer, expShow)
+  } = buildDependencies({ disposer, expShow, stageList })
 
   const mockUpdateExperimentsData = stub()
   const mockExperimentsData = buildMockExperimentsData(
     mockUpdateExperimentsData
   )
-  const mockCheckOrAddPipeline = stub()
+
+  const pipeline = buildExperimentsPipeline({
+    disposer,
+    dvcRoot,
+    internalCommands
+  })
+  const mockCheckOrAddPipeline = stub(pipeline, 'checkOrAddPipeline')
   const mockSelectBranches = stub().resolves(['main', 'other'])
   const mockMemento = buildMockMemento({
     [`${PersistenceKey.EXPERIMENTS_BRANCHES}${dvcRoot}`]: ['main'],
@@ -73,10 +82,11 @@ export const buildExperiments = ({
     new Experiments(
       dvcRoot,
       internalCommands,
+      pipeline,
       resourceLocator,
       mockMemento,
-      mockCheckOrAddPipeline,
       mockSelectBranches,
+      [],
       mockExperimentsData
     )
   )
@@ -108,15 +118,16 @@ export const buildExperiments = ({
     mockGetCommitMessages,
     mockSelectBranches,
     mockUpdateExperimentsData,
+    pipeline,
     resourceLocator
   }
 }
 
 export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
   const {
-    internalCommands,
     experiments: mockExperiments,
     gitReader,
+    internalCommands,
     messageSpy,
     resourceLocator
   } = buildExperiments({
@@ -131,8 +142,18 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
       'other/dvc/root': mockExperiments
     })
   )
+
+  const pipeline = buildExperimentsPipeline({
+    disposer,
+    dvcRoot: dvcDemoPath,
+    internalCommands
+  })
+  stub(pipeline, 'hasPipeline').returns(true)
+
   const [experiments] = workspaceExperiments.create(
     [dvcDemoPath],
+    { [dvcDemoPath]: [] },
+    { getRepository: () => pipeline },
     resourceLocator
   )
 
@@ -142,14 +163,23 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
 
 export const buildSingleRepoExperiments = (disposer: SafeWatcherDisposer) => {
   const { config, internalCommands, gitReader, messageSpy, resourceLocator } =
-    buildDependencies(disposer)
+    buildDependencies({ disposer })
 
   stub(gitReader, 'getGitRepositoryRoot').resolves(dvcDemoPath)
   const workspaceExperiments = disposer.track(
     new WorkspaceExperiments(internalCommands, buildMockMemento())
   )
+
+  const pipeline = buildExperimentsPipeline({
+    disposer,
+    dvcRoot: dvcDemoPath,
+    internalCommands
+  })
+
   const [experiments] = workspaceExperiments.create(
     [dvcDemoPath],
+    { [dvcDemoPath]: [] },
+    { getRepository: () => pipeline },
     resourceLocator
   )
 
@@ -200,11 +230,16 @@ export const buildExperimentsData = (
   const mockGetBranchesToShow = stub().returns(['main'])
   const mockSetBranches = stub()
   const data = disposer.track(
-    new ExperimentsData(dvcDemoPath, internalCommands, {
-      getBranchesToShow: mockGetBranchesToShow,
-      getNbOfCommitsToShow: () => DEFAULT_NUM_OF_COMMITS_TO_SHOW,
-      setBranches: mockSetBranches
-    } as unknown as ExperimentsModel)
+    new ExperimentsData(
+      dvcDemoPath,
+      internalCommands,
+      {
+        getBranchesToShow: mockGetBranchesToShow,
+        getNbOfCommitsToShow: () => DEFAULT_NUM_OF_COMMITS_TO_SHOW,
+        setBranches: mockSetBranches
+      } as unknown as ExperimentsModel,
+      []
+    )
   )
 
   return {
@@ -217,20 +252,29 @@ export const buildExperimentsData = (
 }
 
 export const stubWorkspaceExperimentsGetters = (
-  dvcRoot: string,
-  experiments?: Experiments
+  disposer: Disposer,
+  dvcRoot = dvcDemoPath
 ) => {
+  const { dvcExecutor, dvcRunner, experiments, experimentsModel, messageSpy } =
+    buildExperiments({ disposer })
+
   const mockGetOnlyOrPickProject = stub(
     WorkspaceExperiments.prototype,
     'getOnlyOrPickProject'
   ).resolves(dvcRoot)
-  let mockGetRepository
-  if (experiments) {
-    mockGetRepository = stub(
-      WorkspaceExperiments.prototype,
-      'getRepository'
-    ).returns(experiments)
-  }
 
-  return [mockGetOnlyOrPickProject, mockGetRepository]
+  const mockGetRepository = stub(
+    WorkspaceExperiments.prototype,
+    'getRepository'
+  ).returns(experiments)
+
+  return {
+    dvcExecutor,
+    dvcRunner,
+    experiments,
+    experimentsModel,
+    messageSpy,
+    mockGetOnlyOrPickProject,
+    mockGetRepository
+  }
 }

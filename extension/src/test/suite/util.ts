@@ -37,6 +37,7 @@ import { DvcViewer } from '../../cli/dvc/viewer'
 import { Toast } from '../../vscode/toast'
 import { GitExecutor } from '../../cli/git/executor'
 import { DvcConfig } from '../../cli/dvc/config'
+import { ExpShowOutput, PlotsOutput } from '../../cli/dvc/contract'
 
 export const mockDisposable = {
   dispose: stub()
@@ -188,16 +189,24 @@ export const buildMockExperimentsData = (update = stub()) =>
     onDidUpdate: stub(),
     setBranches: stub(),
     update
-  } as unknown as ExperimentsData)
+  }) as unknown as ExperimentsData
 
 const buildResourceLocator = (disposer: Disposer): ResourceLocator =>
   disposer.track(new ResourceLocator(extensionUri))
 
-export const buildDependencies = (
-  disposer: Disposer,
+export const buildDependencies = ({
+  dag = '',
+  disposer,
   expShow = expShowFixture,
-  plotsDiff = plotsDiffFixture
-) => {
+  plotsDiff = plotsDiffFixture,
+  stageList = 'train'
+}: {
+  dag?: string | undefined
+  disposer: Disposer
+  expShow?: ExpShowOutput
+  stageList?: string | null
+  plotsDiff?: PlotsOutput
+}) => {
   const {
     config,
     dvcConfig,
@@ -229,6 +238,11 @@ export const buildDependencies = (
     ''
   )
 
+  const mockStageList = stub(dvcReader, 'stageList').resolves(
+    stageList ?? undefined
+  )
+  const mockDag = stub(dvcReader, 'dag').resolves(dag)
+
   const resourceLocator = buildResourceLocator(disposer)
 
   const messageSpy = spy(BaseWebview.prototype, 'show')
@@ -246,10 +260,12 @@ export const buildDependencies = (
     messageSpy,
     mockCheckSignalFile,
     mockCreateFileSystemWatcher,
+    mockDag,
     mockDataStatus,
     mockExpShow,
     mockGetCommitMessages,
     mockPlotsDiff,
+    mockStageList,
     resourceLocator
   }
 }
@@ -311,3 +327,14 @@ export const waitForEditorText = async (): Promise<unknown> => {
   }
   return waitForEditorText()
 }
+
+export const getActiveEditorUpdatedEvent = (disposer: Disposer) =>
+  new Promise(resolve => {
+    const listener = disposer.track(
+      window.onDidChangeActiveTextEditor(() => {
+        resolve(undefined)
+        disposer.untrack(listener)
+        listener.dispose()
+      })
+    )
+  })

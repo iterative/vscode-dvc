@@ -1053,8 +1053,8 @@ describe('App', () => {
         .map(item => item.textContent)
       expect(itemLabels).toContain('Remove Selected')
 
-      const removeOption = menuitems.find(item =>
-        item.textContent?.includes('Remove Selected')
+      const removeOption = menuitems.find(
+        item => item.textContent?.includes('Remove Selected')
       )
 
       expect(removeOption).toBeDefined()
@@ -1100,8 +1100,8 @@ describe('App', () => {
         .map(item => item.textContent)
       expect(itemLabels).toContain('Push Selected')
 
-      const pushOption = menuitems.find(item =>
-        item.textContent?.includes('Push Selected')
+      const pushOption = menuitems.find(
+        item => item.textContent?.includes('Push Selected')
       )
 
       expect(pushOption).toBeDefined()
@@ -1146,8 +1146,8 @@ describe('App', () => {
         .map(item => item.textContent)
       expect(itemLabels).toContain('Stop')
 
-      const stopOption = menuitems.find(item =>
-        item.textContent?.includes('Stop')
+      const stopOption = menuitems.find(
+        item => item.textContent?.includes('Stop')
       )
 
       expect(stopOption).toBeDefined()
@@ -1176,8 +1176,8 @@ describe('App', () => {
         .map(item => item.textContent)
       expect(itemLabels).toContain('Stop')
 
-      const stopOption = menuitems.find(item =>
-        item.textContent?.includes('Stop')
+      const stopOption = menuitems.find(
+        item => item.textContent?.includes('Stop')
       )
 
       expect(stopOption).toBeDefined()
@@ -1220,8 +1220,8 @@ describe('App', () => {
         .map(item => item.textContent)
       expect(itemLabels).toContain('Stop')
 
-      const stopOption = menuitems.find(item =>
-        item.textContent?.includes('Stop')
+      const stopOption = menuitems.find(
+        item => item.textContent?.includes('Stop')
       )
 
       expect(stopOption).toBeDefined()
@@ -1247,8 +1247,8 @@ describe('App', () => {
         .map(item => item.textContent)
       expect(itemLabels).toContain('Push')
 
-      const shareOption = menuitems.find(item =>
-        item.textContent?.includes('Push')
+      const shareOption = menuitems.find(
+        item => item.textContent?.includes('Push')
       )
 
       expect(shareOption).toBeDefined()
@@ -1306,8 +1306,8 @@ describe('App', () => {
       expect(itemLabels).toContain('Plot and Show')
       expect(itemLabels).toContain('Plot')
 
-      const plotOption = menuitems.find(item =>
-        item.textContent?.includes('Plot and Show')
+      const plotOption = menuitems.find(
+        item => item.textContent?.includes('Plot and Show')
       )
 
       expect(plotOption).toBeDefined()
@@ -1363,8 +1363,8 @@ describe('App', () => {
 
       const menuitems = screen.getAllByRole('menuitem')
 
-      const clearOption = menuitems.find(item =>
-        item.textContent?.includes('Clear')
+      const clearOption = menuitems.find(
+        item => item.textContent?.includes('Clear')
       )
       clearOption && fireEvent.click(clearOption)
 
@@ -1740,44 +1740,24 @@ describe('App', () => {
       renderTable()
       setTableData({ ...tableDataFixture, hasConfig: false })
 
-      expect(screen.getByText('Add Stage')).toBeInTheDocument()
+      expect(screen.getByText('Add dvc.yaml')).toBeInTheDocument()
     })
 
     it('should not show a add config button if the project has pipeline stages', () => {
       renderTable()
 
-      expect(screen.queryByText('Add Stage')).not.toBeInTheDocument()
+      expect(screen.queryByText('Add dvc.yaml')).not.toBeInTheDocument()
     })
 
     it('should send a message to the extension to add a pipeline stage when clicking on the add config button', () => {
       renderTable()
       setTableData({ ...tableDataFixture, hasConfig: false })
 
-      fireEvent.click(screen.getByText('Add Stage'))
+      fireEvent.click(screen.getByText('Add dvc.yaml'))
 
       expect(mockPostMessage).toHaveBeenCalledWith({
         type: MessageFromWebviewType.ADD_CONFIGURATION
       })
-    })
-
-    it('should disable the button and add an error message if the dvc.yaml file contains invalid yaml', async () => {
-      renderTable()
-      setTableData({
-        ...tableDataFixture,
-        hasConfig: false,
-        hasValidDvcYaml: false
-      })
-      const addPipelineButton = await screen.findByText('Add Stage')
-
-      fireEvent.click(addPipelineButton)
-
-      expect(mockPostMessage).not.toHaveBeenCalledWith({
-        type: MessageFromWebviewType.ADD_CONFIGURATION
-      })
-
-      expect(
-        screen.getByText('A stage cannot be added to an invalid dvc.yaml file.')
-      ).toBeInTheDocument()
     })
   })
 

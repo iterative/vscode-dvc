@@ -20,6 +20,7 @@ import {
 } from 'fs-extra'
 import { load } from 'js-yaml'
 import { Uri, workspace, window, commands, ViewColumn } from 'vscode'
+import { json2csv } from 'json-2-csv'
 import { standardizePath } from './path'
 import { definedAndNonEmpty, sortCollectedArray } from '../util/array'
 import { Logger } from '../common/logger'
@@ -125,6 +126,20 @@ export const isSameOrChild = (root: string, path: string) => {
   return !rel.startsWith('..')
 }
 
+export const isPathInSubProject = (
+  path: string,
+  subProjects: string[]
+): boolean => subProjects.some(dvcRoot => path.startsWith(dvcRoot))
+
+export const isPathInProject = (
+  path: string | undefined,
+  dvcRoot: string,
+  subProjects: string[]
+): boolean =>
+  !!path?.startsWith(dvcRoot) &&
+  path !== dvcRoot &&
+  !isPathInSubProject(path, subProjects)
+
 export type Out =
   | string
   | Record<string, { checkpoint?: boolean; cache?: boolean }>
@@ -172,8 +187,7 @@ export const findOrCreateDvcYamlFile = (
     ? relative(cwd, trainingScript)
     : format(parse(trainingScript))
 
-  const pipeline = `
-# Type dvc-help in this file and hit enter to get more information on how the extension can help to setup pipelines
+  const pipeline = `# Type dvc-help in this file and hit enter to get more information on how the extension can help to setup pipelines
 stages:
   ${stageName}:
     cmd: ${command} ${scriptPath}
@@ -208,7 +222,9 @@ export const loadJson = <T>(path: string): T | undefined => {
   }
 }
 
-export const writeJson = <T extends Record<string, unknown>>(
+export const writeJson = <
+  T extends Record<string, unknown> | Array<Record<string, unknown>>
+>(
   path: string,
   obj: T,
   format = false
@@ -216,6 +232,15 @@ export const writeJson = <T extends Record<string, unknown>>(
   ensureFileSync(path)
   const json = format ? JSON.stringify(obj, null, 4) : JSON.stringify(obj)
   return writeFileSync(path, json)
+}
+
+export const writeCsv = async (
+  path: string,
+  arr: Array<Record<string, unknown>>
+) => {
+  ensureFileSync(path)
+  const csv = await json2csv(arr)
+  return writeFileSync(path, csv)
 }
 
 export const getPidFromFile = async (
@@ -269,7 +294,8 @@ export const getBinDisplayText = (
     : path
 }
 
-export const showSaveDialog = (
-  defaultUri: Uri,
-  filters?: { [name: string]: string[] }
-) => window.showSaveDialog({ defaultUri, filters })
+export const showSaveDialog = (fileName: string, extname: string) =>
+  window.showSaveDialog({
+    defaultUri: Uri.file(fileName),
+    filters: { [extname.toUpperCase()]: [extname] }
+  })

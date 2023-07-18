@@ -473,7 +473,7 @@ export const collectRunningInWorkspace = (
     if (!ids.has(id)) {
       continue
     }
-    if (executor === EXPERIMENT_WORKSPACE_ID) {
+    if (executor === (EXPERIMENT_WORKSPACE_ID as Executor)) {
       return id
     }
   }

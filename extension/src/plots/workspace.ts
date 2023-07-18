@@ -10,6 +10,7 @@ export class WorkspacePlots extends BaseWorkspaceWebviews<Plots, PlotsData> {
 
   public createRepository(
     dvcRoot: string,
+    subProjects: string[],
     resourceLocator: ResourceLocator,
     experiments: WorkspaceExperiments
   ) {
@@ -19,7 +20,8 @@ export class WorkspacePlots extends BaseWorkspaceWebviews<Plots, PlotsData> {
         this.internalCommands,
         experiments.getRepository(dvcRoot),
         resourceLocator.scatterGraph,
-        this.workspaceState
+        this.workspaceState,
+        subProjects
       )
     )
 

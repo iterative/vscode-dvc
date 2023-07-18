@@ -16,9 +16,13 @@ export abstract class BaseWorkspace<
     this.internalCommands = internalCommands
   }
 
-  public create(dvcRoots: string[], ...args: U[]): T[] {
+  public create(
+    dvcRoots: string[],
+    subProjects: { [dvcRoot: string]: string[] },
+    ...args: U[]
+  ): T[] {
     const repositories = dvcRoots.map(dvcRoot =>
-      this.createRepository(dvcRoot, ...args)
+      this.createRepository(dvcRoot, subProjects[dvcRoot], ...args)
     )
 
     void Promise.all(repositories.map(repository => repository.isReady())).then(
@@ -52,5 +56,9 @@ export abstract class BaseWorkspace<
     this.repositories[dvcRoot] = repository
   }
 
-  abstract createRepository(dvcRoot: string, ...args: U[]): T
+  abstract createRepository(
+    dvcRoot: string,
+    subProjects: string[],
+    ...args: U[]
+  ): T
 }

@@ -2,6 +2,56 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.20] - 2023-07-17
+
+### 🐛 Bug Fixes
+
+- Exclude sub-project files from file and editor watchers [#4283](https://github.com/iterative/vscode-dvc/pull/4283) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Remove moduleResolution from tsconfig [#4282](https://github.com/iterative/vscode-dvc/pull/4282) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.0.19] - 2023-07-17
+
+### 🚀 New Features and Enhancements
+
+- Handle non-standard experiment pipeline configurations [#4264](https://github.com/iterative/vscode-dvc/pull/4264) by [@mattseddon](https://github.com/mattseddon)
+- Focus pipeline when dvc.yaml file is open in the active editor [#4273](https://github.com/iterative/vscode-dvc/pull/4273) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Refactor stubWorkspaceExperimentsGetters [#4272](https://github.com/iterative/vscode-dvc/pull/4272) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.0.18] - 2023-07-14
+
+### 🚀 New Features and Enhancements
+
+- Add CSV export option to zoomed in plots [#4252](https://github.com/iterative/vscode-dvc/pull/4252) by [@julieg18](https://github.com/julieg18)
+- Save smooth plot values across sessions [#4220](https://github.com/iterative/vscode-dvc/pull/4220) by [@julieg18](https://github.com/julieg18)
+
+## [1.0.17] - 2023-07-11
+
+### 🚀 New Features and Enhancements
+
+- Apply product feedback to dvc.yaml snippets [#4255](https://github.com/iterative/vscode-dvc/pull/4255) by [@mattseddon](https://github.com/mattseddon)
+- Add DVCLive snippets [#4258](https://github.com/iterative/vscode-dvc/pull/4258) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.5.1) [#4257](https://github.com/iterative/vscode-dvc/pull/4257) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.0.16] - 2023-07-11
+
+### 🚀 New Features and Enhancements
+
+- Display DAG in Markdown Preview editor [#4244](https://github.com/iterative/vscode-dvc/pull/4244) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Correct extension reference in snippet [#4245](https://github.com/iterative/vscode-dvc/pull/4245) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (3.5.0) [#4251](https://github.com/iterative/vscode-dvc/pull/4251) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.15] - 2023-07-09
 
 ### 🚀 New Features and Enhancements

@@ -1,4 +1,4 @@
-import { Uri, commands } from 'vscode'
+import { commands } from 'vscode'
 import isEmpty from 'lodash.isempty'
 import {
   ComparisonPlot,
@@ -82,8 +82,10 @@ export class WebviewMessages {
           RegisteredCommands.PLOTS_CUSTOM_ADD,
           this.dvcRoot
         )
-      case MessageFromWebviewType.EXPORT_PLOT_DATA:
-        return this.exportPlotData(message.payload)
+      case MessageFromWebviewType.EXPORT_PLOT_DATA_AS_CSV:
+        return this.exportPlotDataAsCsv(message.payload)
+      case MessageFromWebviewType.EXPORT_PLOT_DATA_AS_JSON:
+        return this.exportPlotDataAsJson(message.payload)
       case MessageFromWebviewType.RESIZE_PLOTS:
         return this.setPlotSize(
           message.payload.section,
@@ -116,6 +118,11 @@ export class WebviewMessages {
         )
       case MessageFromWebviewType.TOGGLE_EXPERIMENT:
         return this.setExperimentStatus(message.payload)
+      case MessageFromWebviewType.SET_SMOOTH_PLOT_VALUE:
+        return this.setSmoothPlotValues(
+          message.payload.id,
+          message.payload.value
+        )
       case MessageFromWebviewType.ZOOM_PLOT:
         if (message.payload) {
           const imagePath = this.revertCorrectUrl(message.payload)
@@ -193,6 +200,16 @@ export class WebviewMessages {
     this.sendTemplatePlots()
     sendTelemetryEvent(
       EventName.VIEWS_REORDER_PLOTS_TEMPLATES,
+      undefined,
+      undefined
+    )
+  }
+
+  private setSmoothPlotValues(id: string, value: number) {
+    this.plots.setSmoothPlotValues(id, value)
+    this.sendTemplatePlots()
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_SET_SMOOTH_PLOT_VALUE,
       undefined,
       undefined
     )
@@ -285,7 +302,8 @@ export class WebviewMessages {
       nbItemsPerRow: this.plots.getNbItemsPerRowOrWidth(
         PlotsSection.TEMPLATE_PLOTS
       ),
-      plots
+      plots,
+      smoothPlotValues: this.plots.getSmoothPlotValues()
     }
   }
 
@@ -344,19 +362,35 @@ export class WebviewMessages {
     return this.plots.getCustomPlots() || null
   }
 
-  private async exportPlotData(plotId: string) {
-    const file = await showSaveDialog(Uri.file('data.json'), { JSON: ['json'] })
+  private async exportPlotDataAsJson(plotId: string) {
+    const file = await showSaveDialog('data.json', 'json')
 
     if (!file) {
       return
     }
 
     sendTelemetryEvent(
-      EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA,
+      EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_JSON,
       undefined,
       undefined
     )
 
-    this.plots.savePlotData(plotId, file.path)
+    void this.plots.savePlotDataAsJson(file.path, plotId)
+  }
+
+  private async exportPlotDataAsCsv(plotId: string) {
+    const file = await showSaveDialog('data.csv', 'csv')
+
+    if (!file) {
+      return
+    }
+
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_CSV,
+      undefined,
+      undefined
+    )
+
+    void this.plots.savePlotDataAsCsv(file.path, plotId)
   }
 }

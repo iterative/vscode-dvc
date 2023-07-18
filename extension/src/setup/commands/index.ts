@@ -173,10 +173,10 @@ const modifyRemote = async (
   dvcRoot: string,
   remote: RemoteWithConfig
 ): Promise<void> => {
-  const option = await quickPickOne(
+  const option = (await quickPickOne(
     Object.values(ModifyOptions),
     'Select an Option to Modify'
-  )
+  )) as ModifyOptions | undefined
 
   if (!option) {
     return

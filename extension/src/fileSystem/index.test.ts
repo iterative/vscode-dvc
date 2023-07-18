@@ -15,11 +15,13 @@ import {
   isSameOrChild,
   getModifiedTime,
   findOrCreateDvcYamlFile,
-  writeJson
+  writeJson,
+  writeCsv,
+  isPathInProject
 } from '.'
 import { dvcDemoPath } from '../test/util'
 import { DOT_DVC } from '../cli/dvc/constants'
-import { scriptCommand } from '../experiments/workspace'
+import { ScriptCommand } from '../pipeline'
 
 jest.mock('../cli/dvc/reader')
 jest.mock('fs-extra', () => {
@@ -67,6 +69,21 @@ describe('writeJson', () => {
     expect(mockedWriteFileSync).toHaveBeenCalledWith(
       'file-name.json',
       formattedJson
+    )
+  })
+})
+
+describe('writeCsv', () => {
+  it('should write csv into given file', async () => {
+    await writeCsv('file-name.csv', [
+      { nested: { string: 'string1' }, value: 3 },
+      { nested: { string: 'string2' }, value: 4 },
+      { nested: { string: 'string3' }, value: 6 }
+    ])
+
+    expect(mockedWriteFileSync).toHaveBeenCalledWith(
+      'file-name.csv',
+      'nested.string,value\nstring1,3\nstring2,4\nstring3,6'
     )
   })
 })
@@ -219,7 +236,7 @@ describe('findOrCreateDvcYamlFile', () => {
       cwd,
       '/my/training/script.py',
       'train',
-      scriptCommand.PYTHON,
+      ScriptCommand.PYTHON,
       true
     )
 
@@ -233,7 +250,7 @@ describe('findOrCreateDvcYamlFile', () => {
       cwd,
       '/script.py',
       uniqueStageName,
-      scriptCommand.PYTHON,
+      ScriptCommand.PYTHON,
       true
     )
 
@@ -249,7 +266,7 @@ describe('findOrCreateDvcYamlFile', () => {
       cwd,
       '/my/training/script.py',
       'train',
-      scriptCommand.PYTHON,
+      ScriptCommand.PYTHON,
       true
     )
 
@@ -265,7 +282,7 @@ describe('findOrCreateDvcYamlFile', () => {
       cwd,
       '/my/training/script.py',
       'train',
-      scriptCommand.PYTHON,
+      ScriptCommand.PYTHON,
       true
     )
 
@@ -282,7 +299,7 @@ describe('findOrCreateDvcYamlFile', () => {
       '/dir/my_project/',
       '/dir/my_project/src/training/train.py',
       'train',
-      scriptCommand.PYTHON,
+      ScriptCommand.PYTHON,
       true
     )
 
@@ -295,7 +312,7 @@ describe('findOrCreateDvcYamlFile', () => {
       '/dir/my_project/',
       '/dir/my_other_project/train.py',
       'train',
-      scriptCommand.PYTHON,
+      ScriptCommand.PYTHON,
       true
     )
 
@@ -312,7 +329,7 @@ describe('findOrCreateDvcYamlFile', () => {
       '/dir/my_project/',
       join('dir', 'my_project', 'src', 'training', 'train.py'),
       'train',
-      scriptCommand.PYTHON,
+      ScriptCommand.PYTHON,
       false
     )
 
@@ -329,17 +346,17 @@ describe('findOrCreateDvcYamlFile', () => {
       '/',
       '/train.ipynb',
       'train',
-      scriptCommand.JUPYTER,
+      ScriptCommand.JUPYTER,
       true
     )
 
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
       expect.anything(),
-      expect.stringContaining(scriptCommand.JUPYTER)
+      expect.stringContaining(ScriptCommand.JUPYTER)
     )
     expect(mockedAppendFileSync).not.toHaveBeenCalledWith(
       expect.anything(),
-      expect.stringContaining(scriptCommand.PYTHON)
+      expect.stringContaining(ScriptCommand.PYTHON)
     )
   })
 
@@ -348,17 +365,17 @@ describe('findOrCreateDvcYamlFile', () => {
       '/',
       '/train.py',
       'train',
-      scriptCommand.PYTHON,
+      ScriptCommand.PYTHON,
       true
     )
 
     expect(mockedAppendFileSync).not.toHaveBeenCalledWith(
       expect.anything(),
-      expect.stringContaining(scriptCommand.JUPYTER)
+      expect.stringContaining(ScriptCommand.JUPYTER)
     )
     expect(mockedAppendFileSync).toHaveBeenCalledWith(
       expect.anything(),
-      expect.stringContaining(scriptCommand.PYTHON)
+      expect.stringContaining(ScriptCommand.PYTHON)
     )
   })
 
@@ -379,7 +396,7 @@ describe('findOrCreateDvcYamlFile', () => {
       '/',
       '/train.py',
       'train',
-      scriptCommand.PYTHON,
+      ScriptCommand.PYTHON,
       true
     )
 
@@ -390,5 +407,54 @@ describe('findOrCreateDvcYamlFile', () => {
         scheme: 'file'
       })
     )
+  })
+})
+
+describe('isPathInProject', () => {
+  it('should return true if the path is in the project', () => {
+    const path = join(dvcDemoPath, 'dvc.yaml')
+    const dvcRoot = dvcDemoPath
+    const subProjects: string[] = []
+    expect(isPathInProject(path, dvcRoot, subProjects)).toBe(true)
+  })
+
+  it('should return false if the path is not in the project', () => {
+    const path = resolve(dvcDemoPath, '..', 'dvc.yaml')
+    const dvcRoot = dvcDemoPath
+    const subProjects: string[] = []
+    expect(isPathInProject(path, dvcRoot, subProjects)).toBe(false)
+  })
+
+  it('should return false if the path is the project', () => {
+    const path = dvcDemoPath
+    const dvcRoot = dvcDemoPath
+    const subProjects: string[] = []
+    expect(isPathInProject(path, dvcRoot, subProjects)).toBe(false)
+  })
+
+  it('should return false if the path is in the project but also in a sub-project', () => {
+    const path = join(dvcDemoPath, 'nested1', 'dvc.yaml')
+    const dvcRoot = dvcDemoPath
+    const subProjects: string[] = [join(dvcDemoPath, 'nested1')]
+    expect(isPathInProject(path, dvcRoot, subProjects)).toBe(false)
+  })
+
+  it('should return false if the path is in the project but also in one of many sub-projects', () => {
+    const path = join(dvcDemoPath, 'nested2', 'dvc.yaml')
+    const dvcRoot = dvcDemoPath
+    const subProjects: string[] = [
+      join(dvcDemoPath, 'nested1'),
+      join(dvcDemoPath, 'nested2'),
+      join(dvcDemoPath, 'nested3'),
+      join(dvcDemoPath, 'nested4')
+    ]
+    expect(isPathInProject(path, dvcRoot, subProjects)).toBe(false)
+  })
+
+  it('should return true if the path is in the project but not in a sub-project', () => {
+    const path = join(dvcDemoPath, 'nested1', 'dvc.yaml')
+    const dvcRoot = dvcDemoPath
+    const subProjects: string[] = [join(dvcDemoPath, 'nested2')]
+    expect(isPathInProject(path, dvcRoot, subProjects)).toBe(true)
   })
 })

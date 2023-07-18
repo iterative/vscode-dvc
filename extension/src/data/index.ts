@@ -7,7 +7,7 @@ import { InternalCommands } from '../commands/internal'
 import { ExpShowOutput, PlotsOutputOrError } from '../cli/dvc/contract'
 import { uniqueValues } from '../util/array'
 import { DeferredDisposable } from '../class/deferred'
-import { isSameOrChild } from '../fileSystem'
+import { isPathInSubProject, isSameOrChild } from '../fileSystem'
 
 export type ExperimentsOutput = {
   availableNbCommits: { [branch: string]: number }
@@ -17,30 +17,30 @@ export type ExperimentsOutput = {
 }
 
 export abstract class BaseData<
-  T extends { data: PlotsOutputOrError; revs: string[] } | ExperimentsOutput
+  T extends
+    | { data: PlotsOutputOrError; revs: string[] }
+    | ExperimentsOutput
+    | { dag: string; stages: { [pipeline: string]: string | undefined } }
 > extends DeferredDisposable {
   public readonly onDidUpdate: Event<T>
-  public readonly onDidChangeDvcYaml: Event<void>
 
   protected readonly dvcRoot: string
   protected readonly processManager: ProcessManager
   protected readonly internalCommands: InternalCommands
   protected collectedFiles: string[] = []
 
+  private readonly relSubProjects: string[]
   private readonly staticFiles: string[]
 
   private readonly updated: EventEmitter<T> = this.dispose.track(
     new EventEmitter()
   )
 
-  private readonly dvcYamlChanged: EventEmitter<void> = this.dispose.track(
-    new EventEmitter<void>()
-  )
-
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
     updateProcesses: { name: string; process: () => Promise<unknown> }[],
+    subProjects: string[],
     staticFiles: string[] = []
   ) {
     super()
@@ -51,9 +51,10 @@ export abstract class BaseData<
     )
     this.internalCommands = internalCommands
     this.onDidUpdate = this.updated.event
+    this.relSubProjects = subProjects.map(subProject =>
+      relative(this.dvcRoot, subProject)
+    )
     this.staticFiles = staticFiles
-
-    this.onDidChangeDvcYaml = this.dvcYamlChanged.event
 
     this.watchFiles()
 
@@ -82,26 +83,23 @@ export abstract class BaseData<
     return createFileSystemWatcher(
       disposable => this.dispose.track(disposable),
       getRelativePattern(this.dvcRoot, '**'),
-      path => {
-        const relPath = relative(this.dvcRoot, path)
-        if (
-          this.getWatchedFiles().some(
-            watchedRelPath =>
-              path.endsWith(watchedRelPath) ||
-              isSameOrChild(relPath, watchedRelPath)
-          )
-        ) {
-          void this.managedUpdate(path)
-        }
-
-        if (path.endsWith('dvc.yaml')) {
-          this.dvcYamlChanged.fire()
-        }
-      }
+      path => this.listener(path)
     )
   }
 
-  abstract managedUpdate(path?: string): Promise<unknown>
+  private listener(path: string) {
+    const relPath = relative(this.dvcRoot, path)
+    if (
+      this.getWatchedFiles().some(
+        watchedRelPath =>
+          path.endsWith(watchedRelPath) ||
+          isSameOrChild(relPath, watchedRelPath)
+      ) &&
+      !isPathInSubProject(relPath, this.relSubProjects)
+    ) {
+      void this.managedUpdate(path)
+    }
+  }
 
-  protected abstract collectFiles(data: T): void
+  abstract managedUpdate(path?: string): Promise<void>
 }

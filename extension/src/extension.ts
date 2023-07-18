@@ -50,6 +50,8 @@ import { registerSetupCommands } from './setup/commands/register'
 import { Status } from './status'
 import { registerPersistenceCommands } from './persistence/register'
 import { showSetupOrExecuteCommand } from './commands/util'
+import { WorkspacePipeline } from './pipeline/workspace'
+import { registerPipelineCommands } from './pipeline/register'
 
 class Extension extends Disposable {
   protected readonly internalCommands: InternalCommands
@@ -57,6 +59,7 @@ class Extension extends Disposable {
   private readonly resourceLocator: ResourceLocator
   private readonly repositories: WorkspaceRepositories
   private readonly experiments: WorkspaceExperiments
+  private readonly pipelines: WorkspacePipeline
   private readonly plots: WorkspacePlots
   private readonly setup: Setup
   private readonly repositoriesTree: RepositoriesTree
@@ -115,6 +118,10 @@ class Extension extends Disposable {
 
     this.experiments = this.dispose.track(
       new WorkspaceExperiments(this.internalCommands, context.workspaceState)
+    )
+
+    this.pipelines = this.dispose.track(
+      new WorkspacePipeline(this.internalCommands)
     )
 
     this.plots = this.dispose.track(
@@ -184,6 +191,7 @@ class Extension extends Disposable {
       this.internalCommands,
       this.setup
     )
+    registerPipelineCommands(this.pipelines, this.internalCommands)
     registerPlotsCommands(this.plots, this.internalCommands, this.setup)
     registerSetupCommands(this.setup, this.internalCommands)
     this.internalCommands.registerExternalCommand(
@@ -269,17 +277,32 @@ class Extension extends Disposable {
   public async initialize() {
     this.resetMembers()
 
+    const dvcRoots = this.getRoots()
+    const subProjects = this.getSubProjects()
+
     await Promise.all([
-      this.repositories.create(this.getRoots()),
-      this.repositoriesTree.initialize(this.getRoots()),
-      this.experiments.create(this.getRoots(), this.resourceLocator)
+      this.repositories.create(dvcRoots, subProjects),
+      this.repositoriesTree.initialize(dvcRoots),
+      this.pipelines.create(dvcRoots, subProjects)
     ])
-    this.plots.create(this.getRoots(), this.resourceLocator, this.experiments)
+    this.experiments.create(
+      dvcRoots,
+      subProjects,
+      this.pipelines,
+      this.resourceLocator
+    )
+    this.plots.create(
+      dvcRoots,
+      subProjects,
+      this.resourceLocator,
+      this.experiments
+    )
 
     return Promise.all([
-      this.repositories.isReady(),
       this.experiments.isReady(),
-      this.plots.isReady()
+      this.pipelines.isReady(),
+      this.plots.isReady(),
+      this.repositories.isReady()
     ])
   }
 
@@ -287,11 +310,16 @@ class Extension extends Disposable {
     this.repositories.reset()
     this.repositoriesTree.initialize([])
     this.experiments.reset()
+    this.pipelines.reset()
     this.plots.reset()
   }
 
   private getRoots() {
     return this.setup.getRoots()
+  }
+
+  private getSubProjects() {
+    return this.setup.getSubProjects()
   }
 }
 

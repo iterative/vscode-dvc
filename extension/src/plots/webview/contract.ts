@@ -141,10 +141,13 @@ export type TemplatePlotSection = {
   entries: TemplatePlotEntry[]
 }
 
+export type SmoothPlotValues = { [id: string]: number }
+
 export interface TemplatePlotsData {
   plots: TemplatePlotSection[]
   nbItemsPerRow: number
   height: PlotHeight
+  smoothPlotValues: SmoothPlotValues
 }
 
 export type ComparisonPlot = {

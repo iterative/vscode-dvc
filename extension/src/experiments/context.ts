@@ -2,11 +2,13 @@ import { Event, EventEmitter, window } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { ContextKey, setContextValue } from '../vscode/context'
 import { standardizePossiblePath } from '../fileSystem/path'
+import { isPathInProject, isPathInSubProject } from '../fileSystem'
 
 const setContextOnDidChangeParamsFiles = (
   setActiveEditorContext: (paramsFileActive: boolean) => void,
   onDidChangeColumns: Event<void>,
-  getParamsFiles: () => Set<string>
+  getParamsFiles: () => Set<string>,
+  subProjects: string[]
 ): Disposable =>
   onDidChangeColumns(() => {
     const path = standardizePossiblePath(
@@ -16,7 +18,10 @@ const setContextOnDidChangeParamsFiles = (
       return
     }
 
-    if (!getParamsFiles().has(path) && !path.endsWith('dvc.yaml')) {
+    if (
+      (!getParamsFiles().has(path) && !path.endsWith('dvc.yaml')) ||
+      isPathInSubProject(path, subProjects)
+    ) {
       return
     }
     setActiveEditorContext(true)
@@ -25,7 +30,8 @@ const setContextOnDidChangeParamsFiles = (
 const setContextOnDidChangeActiveEditor = (
   setActiveEditorContext: (paramsFileActive: boolean) => void,
   dvcRoot: string,
-  getParamsFiles: () => Set<string>
+  getParamsFiles: () => Set<string>,
+  subProjects: string[]
 ): Disposable =>
   window.onDidChangeActiveTextEditor(event => {
     const path = standardizePossiblePath(event?.document.fileName)
@@ -34,7 +40,7 @@ const setContextOnDidChangeActiveEditor = (
       return
     }
 
-    if (!path.includes(dvcRoot)) {
+    if (!isPathInProject(path, dvcRoot, subProjects)) {
       return
     }
 
@@ -49,7 +55,8 @@ export const setContextForEditorTitleIcons = (
   disposer: (() => void) & Disposer,
   getParamsFiles: () => Set<string>,
   experimentsFileFocused: EventEmitter<string | undefined>,
-  onDidChangeColumns: Event<void>
+  onDidChangeColumns: Event<void>,
+  subProjects: string[]
 ): void => {
   const setActiveEditorContext = (experimentsFileActive: boolean) => {
     void setContextValue(
@@ -64,7 +71,8 @@ export const setContextForEditorTitleIcons = (
     setContextOnDidChangeParamsFiles(
       setActiveEditorContext,
       onDidChangeColumns,
-      getParamsFiles
+      getParamsFiles,
+      subProjects
     )
   )
 
@@ -72,7 +80,8 @@ export const setContextForEditorTitleIcons = (
     setContextOnDidChangeActiveEditor(
       setActiveEditorContext,
       dvcRoot,
-      getParamsFiles
+      getParamsFiles,
+      subProjects
     )
   )
 }

@@ -36,7 +36,6 @@ import { DvcExecutor } from '../../../../cli/dvc/executor'
 import { Param } from '../../../../experiments/model/modify/collect'
 import { WorkspaceExperiments } from '../../../../experiments/workspace'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
-import { DvcReader } from '../../../../cli/dvc/reader'
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
 import { Revision } from '../../../../plots/webview/contract'
 import { BaseWebview } from '../../../../webview'
@@ -574,21 +573,17 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to queue an experiment from an existing one with dvc.views.experiments.queueExperiment', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
-
-      const { dvcExecutor, experiments, experimentsModel } = buildExperiments({
-        disposer: disposable
-      })
+      const {
+        dvcExecutor,
+        experiments,
+        experimentsModel,
+        mockGetOnlyOrPickProject
+      } = stubWorkspaceExperimentsGetters(disposable)
 
       await experiments.isReady()
 
       const mockExperimentRunQueue = stub(dvcExecutor, 'expRunQueue').resolves(
         'true'
-      )
-
-      const [mockGetOnlyOrPickProject] = stubWorkspaceExperimentsGetters(
-        '',
-        experiments
       )
 
       const getParamsSpy = spy(experimentsModel, 'getWorkspaceParams')
@@ -635,21 +630,17 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to run a new experiment from an existing one with dvc.views.experiments.runExperiment', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
-
-      const { dvcRunner, experiments, experimentsModel } = buildExperiments({
-        disposer: disposable
-      })
+      const {
+        dvcRunner,
+        experiments,
+        experimentsModel,
+        mockGetOnlyOrPickProject
+      } = stubWorkspaceExperimentsGetters(disposable)
 
       await experiments.isReady()
 
       const mockRunExperiment = stub(dvcRunner, 'runExperiment').resolves(
         undefined
-      )
-
-      const [mockGetOnlyOrPickProject] = stubWorkspaceExperimentsGetters(
-        '',
-        experiments
       )
 
       const getParamsSpy = spy(experimentsModel, 'getWorkspaceParams')
@@ -693,23 +684,18 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to reset and run a new checkpoint experiment from an existing one with dvc.views.experiments.resetAndRunCheckpointExperiment', async () => {
-      stub(DvcReader.prototype, 'listStages').resolves('train')
-
-      const { dvcRunner, experiments, experimentsModel } = buildExperiments({
-        disposer: disposable
-      })
-
+      const {
+        dvcRunner,
+        experiments,
+        experimentsModel,
+        mockGetOnlyOrPickProject
+      } = stubWorkspaceExperimentsGetters(disposable)
       await experiments.isReady()
 
       const mockRunExperimentReset = stub(
         dvcRunner,
         'runExperimentReset'
       ).resolves(undefined)
-
-      const [mockGetOnlyOrPickProject] = stubWorkspaceExperimentsGetters(
-        '',
-        experiments
-      )
 
       const getParamsSpy = spy(experimentsModel, 'getWorkspaceParams')
 

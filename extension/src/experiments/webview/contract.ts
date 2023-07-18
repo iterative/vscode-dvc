@@ -104,7 +104,6 @@ export type TableData = {
   hasConfig: boolean
   hasMoreCommits: Record<string, boolean>
   hasRunningWorkspaceExperiment: boolean
-  hasValidDvcYaml: boolean
   isShowingMoreCommits: Record<string, boolean>
   rows: Commit[]
   selectedForPlotsCount: number

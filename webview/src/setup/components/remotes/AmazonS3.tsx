@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from './styles.module.scss'
-import { InfoText } from './InfoText'
 import { ShowExtension } from './ShowExtension'
+import { InfoText } from '../shared/InfoText'
 
 export const AmazonS3 = () => (
   <div className={styles.storageDetails}>

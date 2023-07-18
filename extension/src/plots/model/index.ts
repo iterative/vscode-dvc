@@ -32,7 +32,8 @@ import {
   CustomPlotsData,
   DEFAULT_HEIGHT,
   DEFAULT_NB_ITEMS_PER_ROW,
-  PlotHeight
+  PlotHeight,
+  SmoothPlotValues
 } from '../webview/contract'
 import {
   EXPERIMENT_WORKSPACE_ID,
@@ -57,7 +58,7 @@ import {
 } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
 import { ErrorsModel } from '../errors/model'
-import { openFileInEditor, writeJson } from '../../fileSystem'
+import { openFileInEditor, writeCsv, writeJson } from '../../fileSystem'
 import { Toast } from '../../vscode/toast'
 
 export class PlotsModel extends ModelWithPersistence {
@@ -74,6 +75,7 @@ export class PlotsModel extends ModelWithPersistence {
 
   private comparisonData: ComparisonData = {}
   private comparisonOrder: string[]
+  private smoothPlotValues: SmoothPlotValues = {}
 
   private revisionData: RevisionData = {}
   private templates: TemplateAccumulator = {}
@@ -102,6 +104,10 @@ export class PlotsModel extends ModelWithPersistence {
     )
     this.comparisonOrder = this.revive(PersistenceKey.PLOT_COMPARISON_ORDER, [])
     this.customPlotsOrder = this.revive(PersistenceKey.PLOTS_CUSTOM_ORDER, [])
+    this.smoothPlotValues = this.revive(
+      PersistenceKey.PLOTS_SMOOTH_PLOT_VALUES,
+      {}
+    )
 
     this.cleanupOutdatedCustomPlotsState()
     this.cleanupOutdatedTrendsState()
@@ -227,21 +233,15 @@ export class PlotsModel extends ModelWithPersistence {
     return selectedRevisions
   }
 
-  public savePlotData(plotId: string, filePath: string) {
-    const foundCustomPlot = this.customPlotsOrder.find(
-      ({ metric, param }) => getCustomPlotId(metric, param) === plotId
-    )
+  public savePlotDataAsJson(filePath: string, plotId: string) {
+    void this.savePlotData(filePath, plotId, data => {
+      writeJson(filePath, data, true)
+      return Promise.resolve()
+    })
+  }
 
-    const rawData = foundCustomPlot
-      ? this.getCustomPlotData(foundCustomPlot)
-      : this.getSelectedTemplatePlotData(plotId)
-
-    try {
-      writeJson(filePath, rawData as unknown as Record<string, unknown>, true)
-      void openFileInEditor(filePath)
-    } catch {
-      void Toast.showError('Cannot write to file')
-    }
+  public savePlotDataAsCsv(filePath: string, plotId: string) {
+    void this.savePlotData(filePath, plotId, data => writeCsv(filePath, data))
   }
 
   public getTemplatePlots(
@@ -316,6 +316,15 @@ export class PlotsModel extends ModelWithPersistence {
       PersistenceKey.PLOT_NB_ITEMS_PER_ROW_OR_WIDTH,
       this.nbItemsPerRowOrWidth
     )
+  }
+
+  public setSmoothPlotValues(id: string, value: number) {
+    this.smoothPlotValues[id] = value
+    this.persist(PersistenceKey.PLOTS_SMOOTH_PLOT_VALUES, this.smoothPlotValues)
+  }
+
+  public getSmoothPlotValues() {
+    return this.smoothPlotValues
   }
 
   public getNbItemsPerRowOrWidth(section: PlotsSection) {
@@ -478,5 +487,26 @@ export class PlotsModel extends ModelWithPersistence {
       .filter(({ id }) => id !== EXPERIMENT_WORKSPACE_ID)
 
     return collectCustomPlotRawData(orderValue, experiments)
+  }
+
+  private async savePlotData(
+    filePath: string,
+    plotId: string,
+    writeToFile: (rawData: Array<Record<string, unknown>>) => Promise<void>
+  ) {
+    const foundCustomPlot = this.customPlotsOrder.find(
+      ({ metric, param }) => getCustomPlotId(metric, param) === plotId
+    )
+
+    const rawData = foundCustomPlot
+      ? this.getCustomPlotData(foundCustomPlot)
+      : this.getSelectedTemplatePlotData(plotId)
+
+    try {
+      await writeToFile(rawData)
+      void openFileInEditor(filePath)
+    } catch {
+      void Toast.showError('Cannot write to file')
+    }
   }
 }
