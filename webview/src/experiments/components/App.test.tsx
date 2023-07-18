@@ -1584,136 +1584,178 @@ describe('App', () => {
       expect(sortIndicator).toHaveTextContent('2')
       jest.useRealTimers()
     })
-  })
 
-  it('should show an indicator with the amount of applied filters', () => {
-    renderTable({
-      ...tableDataFixture,
-      filters: []
+    it('should show an indicator with the amount of applied filters', () => {
+      renderTable({
+        ...tableDataFixture,
+        filters: []
+      })
+      jest.useFakeTimers()
+      const filterIndicator = screen.getByLabelText('filters')
+      expect(filterIndicator).toHaveTextContent('')
+
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+      fireEvent.mouseEnter(filterIndicator)
+      advanceTimersByTime(1000)
+
+      const tooltip = screen.getByRole('tooltip')
+
+      expect(tooltip).toHaveTextContent('Show Filters')
+
+      const { columns } = tableDataFixture
+      const firstFilterPath = columns[columns.length - 1].path
+      const secondFilterPath = columns[columns.length - 2].path
+      setTableData({
+        ...tableDataFixture,
+        filters: [firstFilterPath]
+      })
+      expect(filterIndicator).toHaveTextContent('1')
+
+      setTableData({
+        ...tableDataFixture,
+        filters: [firstFilterPath, secondFilterPath]
+      })
+      expect(filterIndicator).toHaveTextContent('2')
+
+      setTableData({
+        ...tableDataFixture,
+        filters: [firstFilterPath, secondFilterPath]
+      })
+      expect(filterIndicator).toHaveTextContent('2')
+
+      setTableData({
+        ...tableDataFixture,
+        filters: []
+      })
+      expect(filterIndicator).toHaveTextContent('')
+      expect(tooltip).not.toHaveTextContent('Experiment')
+      jest.useRealTimers()
     })
-    jest.useFakeTimers()
-    const filterIndicator = screen.getByLabelText('filters')
-    expect(filterIndicator).toHaveTextContent('')
 
-    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+    it('should show a tooltip for the branches indicator', () => {
+      renderTable({
+        ...tableDataFixture
+      })
+      jest.useFakeTimers()
+      const branchesIndicator = screen.getByLabelText('branches')
+      expect(branchesIndicator).toHaveTextContent('')
 
-    fireEvent.mouseEnter(filterIndicator)
-    advanceTimersByTime(1000)
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
-    const tooltip = screen.getByRole('tooltip')
+      fireEvent.mouseEnter(branchesIndicator)
+      advanceTimersByTime(1000)
 
-    expect(tooltip).toHaveTextContent('Show Filters')
+      const tooltip = screen.getByRole('tooltip')
 
-    const { columns } = tableDataFixture
-    const firstFilterPath = columns[columns.length - 1].path
-    const secondFilterPath = columns[columns.length - 2].path
-    setTableData({
-      ...tableDataFixture,
-      filters: [firstFilterPath]
+      expect(tooltip).toHaveTextContent('Select Branches')
+      jest.useRealTimers()
     })
-    expect(filterIndicator).toHaveTextContent('1')
 
-    setTableData({
-      ...tableDataFixture,
-      filters: [firstFilterPath, secondFilterPath]
-    })
-    expect(filterIndicator).toHaveTextContent('2')
+    it('should show an indicator for the number of branches selected', () => {
+      const branches = ['main', 'other', 'third']
 
-    setTableData({
-      ...tableDataFixture,
-      filters: [firstFilterPath, secondFilterPath]
-    })
-    expect(filterIndicator).toHaveTextContent('2')
-
-    setTableData({
-      ...tableDataFixture,
-      filters: []
-    })
-    expect(filterIndicator).toHaveTextContent('')
-    expect(tooltip).not.toHaveTextContent('Experiment')
-    jest.useRealTimers()
-  })
-
-  it('should show a tooltip for the branches indicator', () => {
-    renderTable({
-      ...tableDataFixture
-    })
-    jest.useFakeTimers()
-    const branchesIndicator = screen.getByLabelText('branches')
-    expect(branchesIndicator).toHaveTextContent('')
-
-    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
-
-    fireEvent.mouseEnter(branchesIndicator)
-    advanceTimersByTime(1000)
-
-    const tooltip = screen.getByRole('tooltip')
-
-    expect(tooltip).toHaveTextContent('Select Branches')
-    jest.useRealTimers()
-  })
-
-  it('should show an indicator for the number of branches selected', () => {
-    const branches = ['main', 'other', 'third']
-
-    let workspace
-    const rowsWithoutWorkspace = []
-    for (const row of tableDataFixture.rows) {
-      if (row.id !== EXPERIMENT_WORKSPACE_ID) {
-        rowsWithoutWorkspace.push(row)
-        continue
+      let workspace
+      const rowsWithoutWorkspace = []
+      for (const row of tableDataFixture.rows) {
+        if (row.id !== EXPERIMENT_WORKSPACE_ID) {
+          rowsWithoutWorkspace.push(row)
+          continue
+        }
+        workspace = row
       }
-      workspace = row
-    }
 
-    const multipleBranches = {
-      ...tableDataFixture,
-      branches,
-      hasData: true,
-      rows: [
-        workspace as Commit,
-        ...rowsWithoutWorkspace.map(row => ({
-          ...row,
-          branch: branches[0],
-          subRows: undefined
-        })),
-        ...rowsWithoutWorkspace.map(row => ({
-          ...row,
-          branch: branches[1],
-          subRows: undefined
-        })),
-        ...rowsWithoutWorkspace.map(row => ({
-          ...row,
-          branch: branches[2],
-          subRows: undefined
-        }))
-      ]
-    }
+      const multipleBranches = {
+        ...tableDataFixture,
+        branches,
+        hasData: true,
+        rows: [
+          workspace as Commit,
+          ...rowsWithoutWorkspace.map(row => ({
+            ...row,
+            branch: branches[0],
+            subRows: undefined
+          })),
+          ...rowsWithoutWorkspace.map(row => ({
+            ...row,
+            branch: branches[1],
+            subRows: undefined
+          })),
+          ...rowsWithoutWorkspace.map(row => ({
+            ...row,
+            branch: branches[2],
+            subRows: undefined
+          }))
+        ]
+      }
 
-    renderTable(multipleBranches)
+      renderTable(multipleBranches)
 
-    const [indicator] = screen.getAllByLabelText('branches')
+      const [indicator] = screen.getAllByLabelText('branches')
 
-    expect(indicator).toHaveTextContent(`${branches.length - 1}`)
-  })
-
-  it('should send a message to focus the relevant tree when clicked', () => {
-    renderTable()
-    mockPostMessage.mockClear()
-    fireEvent.click(screen.getByLabelText('sorts'))
-    expect(mockPostMessage).toHaveBeenCalledWith({
-      type: MessageFromWebviewType.FOCUS_SORTS_TREE
-    })
-    mockPostMessage.mockClear()
-    fireEvent.click(screen.getByLabelText('filters'))
-    expect(mockPostMessage).toHaveBeenCalledWith({
-      type: MessageFromWebviewType.FOCUS_FILTERS_TREE
+      expect(indicator).toHaveTextContent(`${branches.length - 1}`)
     })
 
-    mockPostMessage.mockClear()
-    fireEvent.click(screen.getByLabelText('selected for plots'))
-    expect(mockPostMessage).toHaveBeenCalledWith({
-      type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW
+    it('should send a message to focus the relevant tree when clicked', () => {
+      renderTable()
+      mockPostMessage.mockClear()
+      fireEvent.click(screen.getByLabelText('sorts'))
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.FOCUS_SORTS_TREE
+      })
+      mockPostMessage.mockClear()
+      fireEvent.click(screen.getByLabelText('filters'))
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.FOCUS_FILTERS_TREE
+      })
+
+      mockPostMessage.mockClear()
+      fireEvent.click(screen.getByLabelText('selected for plots'))
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW
+      })
+    })
+
+    it('should show an indicator with the amount of displayed columns', () => {
+      renderTable({
+        ...tableDataFixture
+      })
+      jest.useFakeTimers()
+      const columnsIndicator = screen.getByLabelText('columns')
+      expect(columnsIndicator).toHaveTextContent('22')
+
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+      fireEvent.mouseEnter(columnsIndicator)
+      advanceTimersByTime(1000)
+      const tooltip = screen.getByRole('tooltip')
+
+      expect(tooltip).toHaveTextContent('Select Columns')
+
+      setTableData({
+        ...tableDataFixture,
+        columns: tableDataFixture.columns.slice(1)
+      })
+
+      expect(columnsIndicator).toHaveTextContent('21')
+
+      setTableData({
+        ...tableDataFixture,
+        columns: []
+      })
+
+      expect(columnsIndicator).toHaveTextContent('')
+
+      jest.useRealTimers()
+    })
+
+    it('should send a message to select columns when the select columns icon is clicked', () => {
+      renderTable()
+      mockPostMessage.mockClear()
+      fireEvent.click(screen.getByLabelText('columns'))
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SELECT_COLUMNS
+      })
     })
   })
 

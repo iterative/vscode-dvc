@@ -6,13 +6,15 @@ import {
   focusFiltersTree,
   focusSortsTree,
   openPlotsWebview,
-  selectBranches
+  selectBranches,
+  selectColumns
 } from '../../util/messages'
 import { Icon } from '../../../shared/components/Icon'
 import {
   Filter,
   GitMerge,
   GraphScatter,
+  ListFilter,
   SortPrecedence
 } from '../../../shared/components/icons'
 import { ExperimentsState } from '../../store'
@@ -72,21 +74,30 @@ export const Indicators = () => {
   const filters = useSelector(
     (state: ExperimentsState) => state.tableData.filters
   )
+  const filtersCount = filters?.length
+
   const sorts = useSelector((state: ExperimentsState) => state.tableData.sorts)
+  const sortsCount = sorts?.length
+
   const selectedForPlotsCount = useSelector(
     (state: ExperimentsState) => state.tableData.selectedForPlotsCount
   )
+
   const branchesSelected = useSelector(
     (state: ExperimentsState) =>
       Math.max(state.tableData.branches.filter(Boolean).length - 1, 0) // We always have one branch by default (the current one which is not selected) and undefined for the workspace
   )
-
   const { hasBranchesToSelect } = useSelector(
     (state: ExperimentsState) => state.tableData
   )
 
-  const sortsCount = sorts?.length
-  const filtersCount = filters?.length
+  const columnsSelected = useSelector(
+    (state: ExperimentsState) =>
+      state.tableData.columns.filter(({ hasChildren }) => !hasChildren).length
+  )
+  const hasColumns = useSelector(
+    (state: ExperimentsState) => state.tableData.hasColumns
+  )
 
   return (
     <div className={styles.tableIndicators}>
@@ -122,6 +133,15 @@ export const Indicators = () => {
         disabled={!hasBranchesToSelect}
       >
         <Icon width={16} height={16} icon={GitMerge} />
+      </Indicator>
+      <Indicator
+        count={columnsSelected}
+        aria-label="columns"
+        onClick={selectColumns}
+        tooltipContent="Select Columns"
+        disabled={!hasColumns}
+      >
+        <Icon width={16} height={16} icon={ListFilter} />
       </Indicator>
     </div>
   )
