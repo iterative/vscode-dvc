@@ -85,12 +85,12 @@ describe('ExperimentsFilterByTree', () => {
     const filters = await experimentsFilterByTree.getChildren()
     expect(filters).toStrictEqual([
       {
-        description: '== 90000',
+        description: '= 90000',
         dvcRoot: 'demo',
         id: buildMetricOrParamPath(
           ColumnType.PARAMS,
           'params.yaml',
-          'param==90000'
+          'param=90000'
         ),
         label: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'param')
       }
@@ -119,7 +119,7 @@ describe('ExperimentsFilterByTree', () => {
   it("should return the dvcRoot's filters if one is provided", async () => {
     const mockedFilters = [
       {
-        operator: '==',
+        operator: '=',
         path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yml', 'param'),
         value: 90000
       },
@@ -146,12 +146,12 @@ describe('ExperimentsFilterByTree', () => {
 
     expect(filters).toStrictEqual([
       {
-        description: '== 90000',
+        description: '= 90000',
         dvcRoot: 'demo',
         id: buildMetricOrParamPath(
           ColumnType.PARAMS,
           'params.yml',
-          'param==90000'
+          'param=90000'
         ),
         label: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yml', 'param')
       },

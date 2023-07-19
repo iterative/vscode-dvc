@@ -43,7 +43,9 @@ export const EventName = Object.assign(
       'views.experimentsTable.focusFiltersTree',
     VIEWS_EXPERIMENTS_TABLE_FOCUS_SORTS_TREE:
       'views.experimentsTable.focusSortsTree',
-    VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN: 'views.experimentsTable.columnHidden',
+    VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN_PATH:
+      'views.experimentsTable.hideColumnPath',
+    VIEWS_EXPERIMENTS_TABLE_MOVE_TO_START: 'views.experimentsTable.moveToStart',
     VIEWS_EXPERIMENTS_TABLE_OPEN_PARAMS_FILE:
       'views.experimentsTable.paramsFileOpened',
     VIEWS_EXPERIMENTS_TABLE_REFRESH: 'views.experimentsTable.refresh',
@@ -246,9 +248,10 @@ export interface IEventNamePropertyMapping {
   }
   [EventName.VIEWS_EXPERIMENTS_TABLE_CREATED]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED]: WebviewFocusChangedProperties
-  [EventName.VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN]: {
+  [EventName.VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN_PATH]: {
     path: string
   }
+  [EventName.VIEWS_EXPERIMENTS_TABLE_MOVE_TO_START]: { path: string }
   [EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_BRANCHES]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_COLUMNS]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_EXPERIMENTS_FOR_PLOTS]: {

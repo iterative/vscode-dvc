@@ -48,7 +48,8 @@ export enum MessageFromWebviewType {
   SORT_COLUMN = 'sort-column',
   TOGGLE_EXPERIMENT = 'toggle-experiment',
   TOGGLE_EXPERIMENT_STAR = 'toggle-experiment-star',
-  HIDE_EXPERIMENTS_TABLE_COLUMN = 'hide-experiments-table-column',
+  EXPERIMENTS_TABLE_HIDE_COLUMN_PATH = 'experiments-table-hide-column-path',
+  EXPERIMENTS_TABLE_MOVE_TO_START = 'experiments-table-move-to-start',
   SELECT_EXPERIMENTS = 'select-experiments',
   SELECT_COLUMNS = 'select-columns',
   SELECT_FIRST_COLUMNS = 'select-first-columns',
@@ -131,7 +132,11 @@ export type MessageFromWebview =
       payload: string[]
     }
   | {
-      type: MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN
+      type: MessageFromWebviewType.EXPERIMENTS_TABLE_HIDE_COLUMN_PATH
+      payload: string
+    }
+  | {
+      type: MessageFromWebviewType.EXPERIMENTS_TABLE_MOVE_TO_START
       payload: string
     }
   | {
