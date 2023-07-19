@@ -1000,7 +1000,12 @@ suite('Experiments Test Suite', () => {
           picked: column.selected,
           value: column
         })),
-        { canPickMany: true, title: Title.SELECT_COLUMNS }
+        {
+          canPickMany: true,
+          matchOnDescription: true,
+          matchOnDetail: true,
+          title: Title.SELECT_COLUMNS
+        }
       )
 
       await tableChangePromise
