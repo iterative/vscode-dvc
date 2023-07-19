@@ -1723,7 +1723,7 @@ suite('Experiments Test Suite', () => {
     const firstFilterId = buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
-      'test==1'
+      'test=1'
     )
     const firstFilterDefinition = {
       operator: Operator.EQUAL,
