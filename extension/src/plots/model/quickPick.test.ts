@@ -231,18 +231,15 @@ describe('pickMetricAndParam', () => {
       1,
       [
         {
-          description: 'metrics:summary.json:loss',
-          label: 'loss',
+          label: 'metrics:summary.json:loss',
           value: { label: 'loss', path: 'metrics:summary.json:loss' }
         },
         {
-          description: 'metrics:summary.json:accuracy',
-          label: 'accuracy',
+          label: 'metrics:summary.json:accuracy',
           value: { label: 'accuracy', path: 'metrics:summary.json:accuracy' }
         },
         {
-          description: 'metrics:summary.json:val_loss',
-          label: 'val_loss',
+          label: 'metrics:summary.json:val_loss',
           value: { label: 'val_loss', path: 'metrics:summary.json:val_loss' }
         }
       ],
@@ -254,8 +251,7 @@ describe('pickMetricAndParam', () => {
       2,
       [
         {
-          description: 'params:params.yaml:epochs',
-          label: 'epochs',
+          label: 'params:params.yaml:epochs',
           value: { label: 'epochs', path: 'params:params.yaml:epochs' }
         }
       ],

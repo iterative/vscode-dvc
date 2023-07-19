@@ -13,12 +13,22 @@ export const pickFromColumnLikes = (
   if (!definedAndNonEmpty(columnLikes)) {
     return Toast.showError('There are no columns to select from.')
   }
-  return quickPickValue<ColumnLike>(
-    columnLikes.map(columnLike => ({
-      description: columnLike.path,
-      label: columnLike.label,
+
+  const items = []
+  for (const columnLike of columnLikes) {
+    if (columnLike.path === 'starred') {
+      items.push({
+        description: columnLike.path,
+        label: columnLike.label,
+        value: columnLike
+      })
+      continue
+    }
+    items.push({
+      label: columnLike.path,
       value: columnLike
-    })),
-    quickPickOptions
-  )
+    })
+  }
+
+  return quickPickValue<ColumnLike>(items, quickPickOptions)
 }
