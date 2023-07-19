@@ -193,7 +193,12 @@ suite('Experiments Filter By Tree Test Suite', () => {
             })
           }
         ],
-        { canPickMany: true, title: Title.SELECT_FILTERS_TO_REMOVE }
+        {
+          canPickMany: true,
+          matchOnDescription: true,
+          matchOnDetail: true,
+          title: Title.SELECT_FILTERS_TO_REMOVE
+        }
       )
 
       mockShowInputBox.resetHistory()

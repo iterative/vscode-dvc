@@ -2,6 +2,8 @@ import { QuickPickOptions, QuickPickItem, window, QuickPick } from 'vscode'
 import { Response } from './response'
 import { Title } from './title'
 
+const DEFAULT_OPTIONS = { matchOnDescription: true, matchOnDetail: true }
+
 export interface QuickPickItemWithValue<T = string> extends QuickPickItem {
   value: T
 }
@@ -16,6 +18,7 @@ export const quickPickValue: <T = string>(
 ) => Thenable<T | undefined> = async (items, options) => {
   const result = await window.showQuickPick(items, {
     canPickMany: false,
+    ...DEFAULT_OPTIONS,
     ...options
   })
   return result?.value
@@ -26,6 +29,7 @@ export const quickPickManyValues: <T = string>(
   options: Omit<QuickPickOptionsWithTitle, 'canPickMany'>
 ) => Thenable<T[] | undefined> = async (items, options = {}) => {
   const result = await window.showQuickPick(items, {
+    ...DEFAULT_OPTIONS,
     ...options,
     canPickMany: true
   })
@@ -38,6 +42,7 @@ export const quickPickOne = (
   title: string
 ): Thenable<string | undefined> =>
   window.showQuickPick(items, {
+    ...DEFAULT_OPTIONS,
     canPickMany: false,
     title
   })
@@ -49,8 +54,8 @@ const createQuickPick = <T>(
     canSelectMany: boolean
     placeholder?: string
     title: Title
-    matchOnDescription?: boolean
-    matchOnDetail?: boolean
+    matchOnDescription: boolean
+    matchOnDetail: boolean
   }
 ): QuickPick<QuickPickItemWithValue<T>> => {
   const quickPick = window.createQuickPick<QuickPickItemWithValue<T>>()
@@ -58,8 +63,8 @@ const createQuickPick = <T>(
   quickPick.canSelectMany = options.canSelectMany
   quickPick.placeholder = options.placeholder
   quickPick.title = options.title
-  quickPick.matchOnDescription = options.matchOnDescription || false
-  quickPick.matchOnDetail = options.matchOnDetail || false
+  quickPick.matchOnDescription = options.matchOnDescription
+  quickPick.matchOnDetail = options.matchOnDetail
 
   quickPick.items = items
   if (selectedItems) {
@@ -75,6 +80,7 @@ export const quickPickOneOrInput = (
   new Promise(resolve => {
     const quickPick = createQuickPick<string>(items, undefined, {
       canSelectMany: false,
+      ...DEFAULT_OPTIONS,
       ...options
     })
 
@@ -189,13 +195,12 @@ export const quickPickLimitedValues = <T>(
   items: QuickPickItemWithValue<T>[],
   selectedItems: readonly QuickPickItemWithValue<T>[],
   maxSelectedItems: number,
-  title: Title,
-  options?: { matchOnDescription?: boolean; matchOnDetail?: boolean }
+  options: QuickPickOptions & { title: Title }
 ): Promise<Exclude<T, undefined>[] | undefined> =>
   new Promise(resolve => {
     const quickPick = createQuickPick(items, selectedItems, {
+      ...DEFAULT_OPTIONS,
       canSelectMany: true,
-      title,
       ...options
     })
 

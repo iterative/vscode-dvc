@@ -55,6 +55,8 @@ describe('quickPickValue', () => {
     const probablyC = await quickPickValue(items, { placeHolder, title })
     expect(mockedShowQuickPick).toHaveBeenCalledWith(items, {
       canPickMany: false,
+      matchOnDescription: true,
+      matchOnDetail: true,
       placeHolder,
       title
     })
@@ -93,6 +95,8 @@ describe('quickPickManyValues', () => {
     const result = await quickPickManyValues(items, { placeHolder, title })
     expect(mockedShowQuickPick).toHaveBeenCalledWith(items, {
       canPickMany: true,
+      matchOnDescription: true,
+      matchOnDetail: true,
       placeHolder,
       title
     })
@@ -109,6 +113,8 @@ describe('quickPickOne', () => {
 
     expect(mockedShowQuickPick).toHaveBeenCalledWith(['a', 'b', 'c'], {
       canPickMany: false,
+      matchOnDescription: true,
+      matchOnDetail: true,
       title
     })
     expect(noResponse).toStrictEqual(undefined)
@@ -140,6 +146,8 @@ describe('quickPickYesOrNo', () => {
       ],
       {
         canPickMany: false,
+        matchOnDescription: true,
+        matchOnDetail: true,
         placeHolder,
         title
       }

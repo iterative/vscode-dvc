@@ -89,7 +89,7 @@ suite('Quick Pick Test Suite', () => {
         items,
         items.slice(0, maxSelectedItems),
         maxSelectedItems,
-        'select up to 3 values' as Title
+        { title: 'select up to 3 values' as Title }
       )
 
       expect(
@@ -130,7 +130,7 @@ suite('Quick Pick Test Suite', () => {
         items,
         items.slice(0, maxSelectedItems - 1),
         maxSelectedItems,
-        'select up to 5 values' as Title
+        { title: 'select up to 5 values' as Title }
       )
 
       expect(

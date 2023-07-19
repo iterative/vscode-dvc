@@ -84,8 +84,7 @@ export const pickExperimentsToPlot = (
     items,
     selectedItems,
     MAX_SELECTED_EXPERIMENTS,
-    Title.SELECT_EXPERIMENTS_TO_PLOT,
-    { matchOnDescription: true, matchOnDetail: true }
+    { title: Title.SELECT_EXPERIMENTS_TO_PLOT }
   )
 }
 
