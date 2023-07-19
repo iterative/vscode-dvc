@@ -5,15 +5,17 @@ import { definedAndNonEmpty } from '../../../util/array'
 import { splitColumnPath } from '../../columns/paths'
 
 export enum Operator {
-  EQUAL = '==',
+  EQUAL = '=',
   GREATER_THAN = '>',
   GREATER_THAN_OR_EQUAL = '>=',
   LESS_THAN = '<',
   LESS_THAN_OR_EQUAL = '<=',
-  NOT_EQUAL = '!=',
+  NOT_EQUAL = '≠',
+
+  NOT_MISSING = '≠Ø',
 
   CONTAINS = '∈',
-  NOT_CONTAINS = '!∈',
+  NOT_CONTAINS = '∉',
 
   IS_TRUE = '⊤',
   IS_FALSE = '⊥',
@@ -56,9 +58,11 @@ const evaluate = <T extends string | number | boolean>(
   filterValue: T
 ): boolean => {
   if (valueToEvaluate === undefined) {
-    return true
+    return operator !== Operator.NOT_MISSING
   }
   switch (operator) {
+    case Operator.NOT_MISSING:
+      return true
     case Operator.GREATER_THAN:
       return valueToEvaluate > filterValue
     case Operator.LESS_THAN:
