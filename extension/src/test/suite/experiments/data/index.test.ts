@@ -20,7 +20,7 @@ import {
 } from '../../../../commands/internal'
 import { buildExperimentsData } from '../util'
 import {
-  DEFAULT_NUM_OF_COMMITS_TO_SHOW,
+  DEFAULT_CURRENT_BRANCH_COMMITS_TO_SHOW,
   ExperimentFlag
 } from '../../../../cli/dvc/constants'
 import { EXPERIMENTS_GIT_LOGS_REFS } from '../../../../experiments/data/constants'
@@ -103,7 +103,7 @@ suite('Experiments Data Test Suite', () => {
           {
             getBranchesToShow: () => ['main'],
             getNbOfCommitsToShow: () => ({
-              main: DEFAULT_NUM_OF_COMMITS_TO_SHOW
+              main: DEFAULT_CURRENT_BRANCH_COMMITS_TO_SHOW
             }),
             setBranches: stub()
           } as unknown as ExperimentsModel,
@@ -165,7 +165,7 @@ suite('Experiments Data Test Suite', () => {
           {
             getBranchesToShow: () => ['main'],
             getNbOfCommitsToShow: () => ({
-              main: DEFAULT_NUM_OF_COMMITS_TO_SHOW
+              main: DEFAULT_CURRENT_BRANCH_COMMITS_TO_SHOW
             }),
             setBranches: stub()
           } as unknown as ExperimentsModel,

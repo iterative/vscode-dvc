@@ -35,7 +35,10 @@ import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
 import { PersistenceKey } from '../../persistence/constants'
 import { sum } from '../../util/math'
-import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../cli/dvc/constants'
+import {
+  DEFAULT_CURRENT_BRANCH_COMMITS_TO_SHOW,
+  DEFAULT_OTHER_BRANCH_COMMITS_TO_SHOW
+} from '../../cli/dvc/constants'
 
 type StarredExperiments = Record<string, boolean | undefined>
 
@@ -456,7 +459,12 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getNbOfCommitsToShow(branch: string) {
-    return this.numberOfCommitsToShow[branch] || DEFAULT_NUM_OF_COMMITS_TO_SHOW
+    return (
+      this.numberOfCommitsToShow[branch] ||
+      (branch === this.currentBranch
+        ? DEFAULT_CURRENT_BRANCH_COMMITS_TO_SHOW
+        : DEFAULT_OTHER_BRANCH_COMMITS_TO_SHOW)
+    )
   }
 
   public getAllNbOfCommitsToShow() {

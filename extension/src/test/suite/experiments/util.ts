@@ -16,7 +16,7 @@ import { ExperimentsData } from '../../../experiments/data'
 import * as Watcher from '../../../fileSystem/watcher'
 import { ExperimentsModel } from '../../../experiments/model'
 import { ColumnsModel } from '../../../experiments/columns/model'
-import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../../cli/dvc/constants'
+import { DEFAULT_CURRENT_BRANCH_COMMITS_TO_SHOW } from '../../../cli/dvc/constants'
 import { PersistenceKey } from '../../../persistence/constants'
 import { ExpShowOutput } from '../../../cli/dvc/contract'
 import { buildExperimentsPipeline } from '../pipeline/util'
@@ -235,7 +235,7 @@ export const buildExperimentsData = (
       internalCommands,
       {
         getBranchesToShow: mockGetBranchesToShow,
-        getNbOfCommitsToShow: () => DEFAULT_NUM_OF_COMMITS_TO_SHOW,
+        getNbOfCommitsToShow: () => DEFAULT_CURRENT_BRANCH_COMMITS_TO_SHOW,
         setBranches: mockSetBranches
       } as unknown as ExperimentsModel,
       []
