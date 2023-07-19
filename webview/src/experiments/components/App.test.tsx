@@ -737,10 +737,10 @@ describe('App', () => {
       advanceTimersByTime(100)
 
       const menuitems = screen.getAllByRole('menuitem')
-      expect(menuitems).toHaveLength(8)
+      expect(menuitems).toHaveLength(9)
       expect(
         menuitems.filter(item => !item.className.includes('disabled'))
-      ).toHaveLength(5)
+      ).toHaveLength(6)
 
       fireEvent.keyDown(paramsFileHeader, { bubbles: true, key: 'Escape' })
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
@@ -761,7 +761,7 @@ describe('App', () => {
       expect(disabledMenuItem).toBeDefined()
 
       disabledMenuItem && fireEvent.click(disabledMenuItem, { bubbles: true })
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(8)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(9)
     })
 
     it('should have the same enabled options in the empty placeholders', () => {
@@ -782,6 +782,7 @@ describe('App', () => {
 
         expect(menuitems).toStrictEqual([
           'Hide Column',
+          'Move to Start',
           'Set Max Header Height',
           'Select Columns',
           'Select First Columns',
@@ -817,6 +818,26 @@ describe('App', () => {
 
         fireEvent.keyDown(segment, { bubbles: true, key: 'Escape' })
       }
+    })
+
+    it('should send the correct message when Move to Start is clicked', () => {
+      renderTableWithPlaceholder()
+      const placeholders = screen.getAllByTestId(/header-Created/)
+      const placeholder = placeholders[0]
+      fireEvent.contextMenu(placeholder, { bubbles: true })
+      advanceTimersByTime(100)
+
+      const moveOption = screen.getByText('Move to Start')
+
+      mockPostMessage.mockClear()
+
+      fireEvent.click(moveOption)
+
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: 'Created',
+        type: MessageFromWebviewType.EXPERIMENTS_TABLE_MOVE_TO_START
+      })
     })
 
     it('should send the correct message when Select Columns is clicked', () => {

@@ -267,6 +267,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
   })
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('handleMessageFromWebview', () => {
     after(() =>
       workspace
@@ -1048,6 +1049,49 @@ suite('Experiments Test Suite', () => {
 
       expect(id).to.equal('id')
       expect(firstColumn).to.equal(movedColumn)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should be able to handle a message to move a column group to the start of the table', async () => {
+      const { experiments, messageSpy } = setupExperimentsAndMockCommands()
+
+      const webview = await experiments.showWebview()
+      messageSpy.resetHistory()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      const movedGroup = 'params:params.yaml'
+
+      const tableChangePromise = experimentsUpdatedEvent(experiments)
+      mockMessageReceived.fire({
+        payload: movedGroup,
+        type: MessageFromWebviewType.EXPERIMENTS_TABLE_MOVE_TO_START
+      })
+      await tableChangePromise
+
+      const paramsYamlColumns = columnsOrderFixture.filter(column =>
+        column.startsWith('params:params.yaml')
+      ).length
+
+      expect(paramsYamlColumns).to.be.greaterThan(6)
+
+      const [id, ...columns] = messageSpy.lastCall.args[0].columnOrder
+      expect(id).to.equal('id')
+
+      let params = 0
+      let other = 0
+      for (const column of columns) {
+        if (column.startsWith('params:params.yaml')) {
+          params = params + 1
+        } else {
+          other = other + 1
+        }
+        if (params < paramsYamlColumns) {
+          expect(
+            other,
+            'all params:params.yaml entries are at the start of the order'
+          ).to.equal(0)
+        }
+      }
+      expect(params).to.equal(paramsYamlColumns)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to focus the sorts tree', async () => {
