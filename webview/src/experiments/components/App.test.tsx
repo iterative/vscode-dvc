@@ -781,7 +781,7 @@ describe('App', () => {
           .map(item => item.textContent)
 
         expect(menuitems).toStrictEqual([
-          'Hide Column',
+          'Hide',
           'Move to Start',
           'Set Max Header Height',
           'Select Columns',
@@ -888,7 +888,7 @@ describe('App', () => {
         fireEvent.contextMenu(placeholder, { bubbles: true })
         advanceTimersByTime(100)
 
-        const hideOption = screen.getByText('Hide Column')
+        const hideOption = screen.getByText('Hide')
 
         mockPostMessage.mockClear()
 
@@ -897,7 +897,7 @@ describe('App', () => {
         expect(mockPostMessage).toHaveBeenCalledTimes(1)
         expect(mockPostMessage).toHaveBeenCalledWith({
           payload: 'Created',
-          type: MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN
+          type: MessageFromWebviewType.EXPERIMENTS_TABLE_HIDE_COLUMN_PATH
         })
       })
     })

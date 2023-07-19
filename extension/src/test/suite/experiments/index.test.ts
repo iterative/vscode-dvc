@@ -477,14 +477,14 @@ suite('Experiments Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: mockColumnId,
-        type: MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN
+        type: MessageFromWebviewType.EXPERIMENTS_TABLE_HIDE_COLUMN_PATH
       })
 
       expect(mockUnselect).to.be.calledOnce
       expect(mockUnselect).to.be.calledWithExactly(mockColumnId)
 
       expect(mockSendTelemetryEvent).to.be.calledWithExactly(
-        EventName.VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN,
+        EventName.VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN_PATH,
         { path: mockColumnId },
         undefined
       )
