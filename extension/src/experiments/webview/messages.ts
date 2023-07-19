@@ -88,6 +88,8 @@ export class WebviewMessages {
         return this.setExperimentStars(message.payload)
       case MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN:
         return this.hideTableColumn(message.payload)
+      case MessageFromWebviewType.EXPERIMENTS_TABLE_MOVE_TO_START:
+        return this.movePathToStart(message.payload)
       case MessageFromWebviewType.OPEN_PARAMS_FILE_TO_THE_SIDE:
         return this.openParamsFileToTheSide(message.payload)
       case MessageFromWebviewType.SORT_COLUMN:
@@ -387,6 +389,27 @@ export class WebviewMessages {
 
     sendTelemetryEvent(
       EventName.VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN,
+      { path },
+      undefined
+    )
+  }
+
+  private movePathToStart(path: string) {
+    const toMove = []
+    const terminalNodes = this.columns.getColumnOrder()
+    for (const terminalNode of terminalNodes) {
+      if (!terminalNode.startsWith(path)) {
+        continue
+      }
+      toMove.push(terminalNode)
+    }
+
+    this.columns.selectFirst(toMove)
+
+    this.notifyChanged()
+
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_MOVE_TO_START,
       { path },
       undefined
     )

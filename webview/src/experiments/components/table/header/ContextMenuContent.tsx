@@ -103,6 +103,15 @@ export const getMenuOptions = (
       }
     },
     {
+      disabled: isFromExperimentColumn(header),
+      id: 'move-to-start',
+      label: 'Move to Start',
+      message: {
+        payload: leafColumn.id,
+        type: MessageFromWebviewType.EXPERIMENTS_TABLE_MOVE_TO_START
+      }
+    },
+    {
       disabled:
         (header.column.columnDef as ColumnWithGroup).group !==
         ColumnType.PARAMS,
