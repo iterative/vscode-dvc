@@ -86,8 +86,8 @@ export class WebviewMessages {
         })
       case MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR:
         return this.setExperimentStars(message.payload)
-      case MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN:
-        return this.hideTableColumn(message.payload)
+      case MessageFromWebviewType.EXPERIMENTS_TABLE_HIDE_COLUMN_PATH:
+        return this.hideColumnPath(message.payload)
       case MessageFromWebviewType.EXPERIMENTS_TABLE_MOVE_TO_START:
         return this.movePathToStart(message.payload)
       case MessageFromWebviewType.OPEN_PARAMS_FILE_TO_THE_SIDE:
@@ -382,13 +382,13 @@ export class WebviewMessages {
     return commandPromise
   }
 
-  private hideTableColumn(path: string) {
+  private hideColumnPath(path: string) {
     this.columns.unselect(path)
 
     this.notifyChanged()
 
     sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN,
+      EventName.VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN_PATH,
       { path },
       undefined
     )

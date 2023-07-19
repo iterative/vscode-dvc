@@ -95,11 +95,11 @@ export const getMenuOptions = (
   const menuOptions: MessagesMenuOptionProps[] = [
     {
       disabled: isFromExperimentColumn(header),
-      id: 'hide-column',
-      label: 'Hide Column',
+      id: 'hide',
+      label: 'Hide',
       message: {
         payload: leafColumn.id,
-        type: MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN
+        type: MessageFromWebviewType.EXPERIMENTS_TABLE_HIDE_COLUMN_PATH
       }
     },
     {
