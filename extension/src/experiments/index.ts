@@ -27,7 +27,7 @@ import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ColumnsModel } from './columns/model'
 import { ExperimentsData } from './data'
 import { stopWorkspaceExperiment } from './processExecution'
-import { Experiment, ColumnType, TableData } from './webview/contract'
+import { Experiment, ColumnType, TableData, Column } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { DecorationProvider } from './model/decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
@@ -369,9 +369,15 @@ export class Experiments extends BaseRepository<TableData> {
   public async selectFirstColumns() {
     const columns = this.columns.getTerminalNodes()
 
-    const selected = await pickPaths(
-      columns.map(column => ({ ...column, selected: false })),
-      Title.SELECT_FIRST_COLUMNS
+    const selected = await pickPaths<Column>(
+      columns,
+      Title.SELECT_FIRST_COLUMNS,
+      element => ({
+        description: element.selected ? '$(eye)' : '$(eye-closed)',
+        label: element.path,
+        picked: false,
+        value: element
+      })
     )
     if (!definedAndNonEmpty(selected)) {
       return
