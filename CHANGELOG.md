@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.23] - 2023-07-20
+
+### 🚀 New Features and Enhancements
+
+- Set default number of displayed commits to 1 for non-current branches in the experiments table [#4305](https://github.com/iterative/vscode-dvc/pull/4305) by [@mattseddon](https://github.com/mattseddon)
+- Add move to start option to experiment table header cell context menu [#4303](https://github.com/iterative/vscode-dvc/pull/4303) by [@mattseddon](https://github.com/mattseddon)
+- Add not missing filter for experiments table [#4308](https://github.com/iterative/vscode-dvc/pull/4308) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Add matchOnDetail and matchOnDescription to all quick picks [#4306](https://github.com/iterative/vscode-dvc/pull/4306) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Clean up hide column terminology [#4304](https://github.com/iterative/vscode-dvc/pull/4304) by [@mattseddon](https://github.com/mattseddon)
+- Standardise column like quick pick [#4307](https://github.com/iterative/vscode-dvc/pull/4307) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.22] - 2023-07-18
 
 ### 🚀 New Features and Enhancements
