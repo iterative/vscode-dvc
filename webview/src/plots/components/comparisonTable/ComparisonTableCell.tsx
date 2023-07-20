@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
 import cx from 'classnames'
 import {
-  ComparisonPlotImg,
-  ComparisonPlotMulti,
-  ComparisonPlotSingle
+  ComparisonPlot,
+  ComparisonPlotImg
 } from 'dvc/src/plots/webview/contract'
 import styles from './styles.module.scss'
 import { RefreshButton } from '../../../shared/components/button/RefreshButton'
@@ -29,10 +28,11 @@ const MissingPlotTableCell: React.FC<{ plot: ComparisonPlotImg }> = ({
 
 export const ComparisonTableCellSingle: React.FC<{
   path: string
-  plot: ComparisonPlotSingle
+  plot: ComparisonPlot
 }> = ({ path, plot }) => {
-  const loading = plot.loading
-  const missing = !loading && !plot.url
+  const plotImg = plot.imgOrImgs[0]
+  const loading = plotImg.loading
+  const missing = !loading && !plotImg.url
 
   if (loading) {
     return (
@@ -43,19 +43,19 @@ export const ComparisonTableCellSingle: React.FC<{
   }
 
   if (missing) {
-    return <MissingPlotTableCell plot={plot} />
+    return <MissingPlotTableCell plot={plotImg} />
   }
 
   return (
     <button
       className={styles.imageWrapper}
-      onClick={() => zoomPlot(plot.url)}
+      onClick={() => zoomPlot(plotImg.url)}
       data-testid="image-plot-button"
     >
       <img
         className={styles.image}
         draggable={false}
-        src={plot.url}
+        src={plotImg.url}
         alt={`Plot of ${path} (${plot.id})`}
       />
     </button>
@@ -64,10 +64,10 @@ export const ComparisonTableCellSingle: React.FC<{
 
 export const ComparisonTableCellMulti: React.FC<{
   path: string
-  plot: ComparisonPlotMulti
+  plot: ComparisonPlot
 }> = ({ path, plot }) => {
   const [currentStep, setCurrentStep] = useState(0)
-  const { loading, url, id } = plot.imgs[currentStep]
+  const { loading, url, id } = plot.imgOrImgs[currentStep]
   const missing = !loading && !url
 
   if (loading) {
@@ -79,7 +79,7 @@ export const ComparisonTableCellMulti: React.FC<{
   }
 
   if (missing) {
-    return <MissingPlotTableCell plot={plot.imgs[currentStep]} />
+    return <MissingPlotTableCell plot={plot.imgOrImgs[currentStep]} />
   }
 
   return (
@@ -99,7 +99,7 @@ export const ComparisonTableCellMulti: React.FC<{
         <input
           name={`${id}-step`}
           min="0"
-          max={plot.imgs.length - 1}
+          max={plot.imgOrImgs.length - 1}
           value={currentStep}
           type="range"
           onChange={event => {

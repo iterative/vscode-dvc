@@ -15,9 +15,7 @@ import {
   PlotsComparisonData,
   DEFAULT_PLOT_HEIGHT,
   DEFAULT_NB_ITEMS_PER_ROW,
-  DEFAULT_PLOT_WIDTH,
-  ComparisonPlotType,
-  ComparisonPlotMulti
+  DEFAULT_PLOT_WIDTH
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
@@ -813,34 +811,20 @@ export const getComparisonWebviewMessage = (
       }
     }
 
-    // plotAcc[pathName].revisions = revisionsAcc
-
     for (const { url, revisions } of plots) {
       const id = revisions?.[0]
       if (!id) {
         continue
       }
 
-      if (!isMulti) {
-        plotAcc[pathName].revisions[id] = {
-          url: `${url}?${MOCK_IMAGE_MTIME}`,
-          id,
-          errors: undefined,
-          loading: false,
-          type: ComparisonPlotType.SINGLE
-        }
-
-        continue
-      }
-
       if (!plotAcc[pathName].revisions[id]) {
         plotAcc[pathName].revisions[id] = {
           id,
-          imgs: [],
-          type: ComparisonPlotType.MULTI
+          imgOrImgs: [],
+          isMulti
         }
       }
-      ;(plotAcc[pathName].revisions[id] as ComparisonPlotMulti).imgs.push({
+      plotAcc[pathName].revisions[id].imgOrImgs.push({
         url: `${url}?${MOCK_IMAGE_MTIME}`,
         id,
         errors: undefined,

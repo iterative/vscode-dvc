@@ -1,4 +1,4 @@
-import { ComparisonPlot, isSingleImgPlot } from 'dvc/src/plots/webview/contract'
+import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
 import React, { useState } from 'react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
@@ -67,8 +67,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
       <tr>
         {plots.map(plot => {
           const isPinned = pinnedColumn === plot.id
-          const isSingle = isSingleImgPlot(plot)
-          const { url } = isSingle ? plot : plot.imgs[0]
+          const { url } = plot.imgOrImgs[0]
           return (
             <td
               key={path + plot.id}
@@ -82,10 +81,10 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
                 data-testid="row-images"
                 className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
               >
-                {isSingle ? (
-                  <ComparisonTableCellSingle plot={plot} path={path} />
-                ) : (
+                {plot.isMulti ? (
                   <ComparisonTableCellMulti plot={plot} path={path} />
+                ) : (
+                  <ComparisonTableCellSingle plot={plot} path={path} />
                 )}
               </div>
             </td>

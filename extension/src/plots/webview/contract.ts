@@ -149,15 +149,6 @@ export interface TemplatePlotsData {
   smoothPlotValues: SmoothPlotValues
 }
 
-export enum ComparisonPlotType {
-  SINGLE = 'single',
-  MULTI = 'multi'
-}
-
-// TBD OVER COMPLICATED
-// this can be simplify to both
-// types having a very similiar structure
-
 export type ComparisonPlotImg = {
   url: string | undefined
   errors: string[] | undefined
@@ -165,21 +156,11 @@ export type ComparisonPlotImg = {
   id: string
 }
 
-export const isSingleImgPlot = (
-  plot: ComparisonPlot
-): plot is ComparisonPlotSingle => plot.type === ComparisonPlotType.SINGLE
-
-export type ComparisonPlotMulti = {
+export type ComparisonPlot = {
   id: string
-  imgs: ComparisonPlotImg[]
-  type: ComparisonPlotType.MULTI
+  imgOrImgs: ComparisonPlotImg[]
+  isMulti: boolean
 }
-
-export type ComparisonPlotSingle = ComparisonPlotImg & {
-  type: ComparisonPlotType.SINGLE
-}
-
-export type ComparisonPlot = ComparisonPlotSingle | ComparisonPlotMulti
 
 export enum PlotsDataKeys {
   COMPARISON = 'comparison',
