@@ -95,6 +95,23 @@ $gap: 4px;
   border: 0;
 }
 
+.multiImageWrapper {
+  .image {
+    height: 380px;
+    object-fit: contain;
+  }
+}
+
+.multiImageSlider {
+  display: flex;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  color: $fg-color;
+  background-color: $bg-color;
+  box-shadow: inset 40px 40px $fg-transparency-1;
+}
+
 .noImage {
   background-color: $bg-color;
   border-style: solid;
@@ -170,7 +187,7 @@ $gap: 4px;
   max-height: 0;
 }
 
-.cell img {
+.image {
   width: 100%;
   height: auto;
   vertical-align: middle;

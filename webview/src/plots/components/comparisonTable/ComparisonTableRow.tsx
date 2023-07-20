@@ -1,9 +1,12 @@
-import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
+import { ComparisonPlot, isSingleImgPlot } from 'dvc/src/plots/webview/contract'
 import React, { useState } from 'react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
 import styles from './styles.module.scss'
-import { ComparisonTableCell } from './ComparisonTableCell'
+import {
+  ComparisonTableCellMulti,
+  ComparisonTableCellSingle
+} from './ComparisonTableCell'
 import { Icon } from '../../../shared/components/Icon'
 import { ChevronDown, ChevronRight } from '../../../shared/components/icons'
 import { PlotsState } from '../../store'
@@ -64,12 +67,14 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
       <tr>
         {plots.map(plot => {
           const isPinned = pinnedColumn === plot.id
+          const isSingle = isSingleImgPlot(plot)
+          const { url } = isSingle ? plot : plot.imgs[0]
           return (
             <td
               key={path + plot.id}
               className={cx({
                 [styles.pinnedColumnCell]: isPinned,
-                [styles.noImage]: isShown && !plot?.url,
+                [styles.noImage]: isShown && !url,
                 [styles.draggedColumn]: draggedId === plot.id
               })}
             >
@@ -77,7 +82,11 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
                 data-testid="row-images"
                 className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
               >
-                <ComparisonTableCell path={path} plot={plot} />
+                {isSingle ? (
+                  <ComparisonTableCellSingle plot={plot} path={path} />
+                ) : (
+                  <ComparisonTableCellMulti plot={plot} path={path} />
+                )}
               </div>
             </td>
           )

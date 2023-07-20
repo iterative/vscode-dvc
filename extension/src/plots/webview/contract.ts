@@ -119,7 +119,6 @@ export type ImagePlot = {
   revisions?: string[]
   type: PlotsType
   url: string
-  multiView?: boolean
 }
 
 export const isImagePlot = (plot: Plot): plot is ImagePlot =>
@@ -150,12 +149,37 @@ export interface TemplatePlotsData {
   smoothPlotValues: SmoothPlotValues
 }
 
-export type ComparisonPlot = {
+export enum ComparisonPlotType {
+  SINGLE = 'single',
+  MULTI = 'multi'
+}
+
+// TBD OVER COMPLICATED
+// this can be simplify to both
+// types having a very similiar structure
+
+export type ComparisonPlotImg = {
   url: string | undefined
-  id: string
   errors: string[] | undefined
   loading: boolean
+  id: string
 }
+
+export const isSingleImgPlot = (
+  plot: ComparisonPlot
+): plot is ComparisonPlotSingle => plot.type === ComparisonPlotType.SINGLE
+
+export type ComparisonPlotMulti = {
+  id: string
+  imgs: ComparisonPlotImg[]
+  type: ComparisonPlotType.MULTI
+}
+
+export type ComparisonPlotSingle = ComparisonPlotImg & {
+  type: ComparisonPlotType.SINGLE
+}
+
+export type ComparisonPlot = ComparisonPlotSingle | ComparisonPlotMulti
 
 export enum PlotsDataKeys {
   COMPARISON = 'comparison',

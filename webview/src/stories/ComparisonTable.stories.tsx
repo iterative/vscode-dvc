@@ -5,6 +5,7 @@ import { userEvent, within } from '@storybook/testing-library'
 import React from 'react'
 import { Provider, useDispatch } from 'react-redux'
 import {
+  ComparisonPlotType,
   ComparisonRevisionData,
   DEFAULT_NB_ITEMS_PER_ROW,
   DEFAULT_PLOT_HEIGHT,
@@ -40,6 +41,7 @@ const Template: StoryFn = ({ plots, revisions }) => {
   const store = configureStore({
     reducer: plotsReducers
   })
+
   return (
     <Provider store={store}>
       <MockedState
@@ -69,7 +71,6 @@ WithPinnedColumn.play = async ({ canvasElement }) => {
 
   return userEvent.click(pin)
 }
-
 const removeImages = (
   path: string,
   revisionsData: ComparisonRevisionData
@@ -87,6 +88,7 @@ const removeImages = (
           id === 'main' ? [`FileNotFoundError: ${path} not found.`] : undefined,
         id,
         loading: false,
+        type: ComparisonPlotType.SINGLE,
         url: undefined
       }
       continue

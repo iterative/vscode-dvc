@@ -15,11 +15,13 @@ import {
   PlotsComparisonData,
   DEFAULT_PLOT_HEIGHT,
   DEFAULT_NB_ITEMS_PER_ROW,
-  DEFAULT_PLOT_WIDTH
+  DEFAULT_PLOT_WIDTH,
+  ComparisonPlotType,
+  ComparisonPlotMulti
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
-import { ColumnType, Commit } from '../../../experiments/webview/contract'
+import { ColumnType } from '../../../experiments/webview/contract'
 
 const basicVega = {
   [join('logs', 'loss.tsv')]: [
@@ -364,6 +366,33 @@ const multipleVega = (length: number) => {
   return plots
 }
 
+const getMultiImageData = (
+  baseUrl: string,
+  joinFunc: (...segments: string[]) => string,
+  revisions: string[]
+) => {
+  const data: {
+    [path: string]: {
+      type: PlotsType
+      revisions: string[]
+      url: string
+    }[]
+  } = {}
+  for (let i = 0; i < 15; i++) {
+    const key = join('plots', 'image', `${i}.jpg`)
+    const values = []
+    for (const revision of revisions) {
+      values.push({
+        type: PlotsType.IMAGE,
+        revisions: [revision],
+        url: joinFunc(baseUrl, 'image', `${i}.jpg`)
+      })
+    }
+    data[key] = values
+  }
+  return data
+}
+
 const getImageData = (baseUrl: string, joinFunc = join) => ({
   [join('plots', 'acc.png')]: [
     {
@@ -445,7 +474,14 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
       revisions: ['exp-83425'],
       url: joinFunc(baseUrl, '1ba7bcd_plots_loss.png')
     }
-  ]
+  ],
+  ...getMultiImageData(baseUrl, joinFunc, [
+    EXPERIMENT_WORKSPACE_ID,
+    'main',
+    'exp-e7a67',
+    'test-branch',
+    'exp-83425'
+  ])
 })
 
 export const getOutput = (baseUrl: string): PlotsOutput => ({
@@ -759,31 +795,63 @@ export const MOCK_IMAGE_MTIME = 946684800000
 
 export const getComparisonWebviewMessage = (
   baseUrl: string,
-  joinFunc?: (...args: string[]) => string
+  joinFunc: (...args: string[]) => string = join
 ): PlotsComparisonData => {
-  const plotAcc = [] as ComparisonPlots
+  const plotAcc: {
+    [path: string]: { path: string; revisions: ComparisonRevisionData }
+  } = {}
 
   for (const [path, plots] of Object.entries(getImageData(baseUrl, joinFunc))) {
-    const revisionsAcc: ComparisonRevisionData = {}
+    const multiImagePath = joinFunc('plots', 'image')
+    const isMulti = path.includes(multiImagePath)
+    const pathName = isMulti ? multiImagePath : path
+
+    if (!plotAcc[pathName]) {
+      plotAcc[pathName] = {
+        path: pathName,
+        revisions: {}
+      }
+    }
+
+    // plotAcc[pathName].revisions = revisionsAcc
+
     for (const { url, revisions } of plots) {
       const id = revisions?.[0]
       if (!id) {
         continue
       }
-      revisionsAcc[id] = {
+
+      if (!isMulti) {
+        plotAcc[pathName].revisions[id] = {
+          url: `${url}?${MOCK_IMAGE_MTIME}`,
+          id,
+          errors: undefined,
+          loading: false,
+          type: ComparisonPlotType.SINGLE
+        }
+
+        continue
+      }
+
+      if (!plotAcc[pathName].revisions[id]) {
+        plotAcc[pathName].revisions[id] = {
+          id,
+          imgs: [],
+          type: ComparisonPlotType.MULTI
+        }
+      }
+      ;(plotAcc[pathName].revisions[id] as ComparisonPlotMulti).imgs.push({
         url: `${url}?${MOCK_IMAGE_MTIME}`,
         id,
         errors: undefined,
         loading: false
-      }
+      })
     }
-
-    plotAcc.push({ path, revisions: revisionsAcc })
   }
 
   return {
     revisions: getRevisions(),
-    plots: plotAcc,
+    plots: Object.values(plotAcc),
     width: DEFAULT_PLOT_WIDTH,
     height: DEFAULT_PLOT_HEIGHT
   }
