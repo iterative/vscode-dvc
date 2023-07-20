@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.24] - 2023-07-20
+
+### 🚀 New Features and Enhancements
+
+- Update Studio settings section [#4312](https://github.com/iterative/vscode-dvc/pull/4312) by [@mattseddon](https://github.com/mattseddon)
+- Add shown/hidden indicator to select first column quick pick [#4314](https://github.com/iterative/vscode-dvc/pull/4314) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.6.0) [#4311](https://github.com/iterative/vscode-dvc/pull/4311) by [@mattseddon](https://github.com/mattseddon)
+- Rename select columns commands and events [#4315](https://github.com/iterative/vscode-dvc/pull/4315) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.23] - 2023-07-20
 
 ### 🚀 New Features and Enhancements
