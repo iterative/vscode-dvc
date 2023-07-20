@@ -355,7 +355,7 @@ suite('Experiments Columns Tree Test Suite', () => {
       ).to.equal(Status.UNSELECTED)
     })
 
-    it('should be able to display selected columns first with dvc.views.experimentsColumnsTree.selectFirstColumns', async () => {
+    it('should be able to display selected columns first with dvc.views.experiments.selectFirstColumns', async () => {
       const { experiments, columnsModel } =
         stubWorkspaceExperimentsGetters(disposable)
       await experiments.isReady()
