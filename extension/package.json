@@ -567,13 +567,13 @@
       },
       {
         "title": "Select Columns to Display in the Experiments Table",
-        "command": "dvc.views.experimentsColumnsTree.selectColumns",
+        "command": "dvc.views.experiments.selectColumns",
         "category": "DVC",
         "icon": "$(list-filter)"
       },
       {
         "title": "Select Columns to Display First in the Experiments Table",
-        "command": "dvc.views.experimentsColumnsTree.selectFirstColumns",
+        "command": "dvc.views.experiments.selectFirstColumns",
         "category": "DVC",
         "icon": "$(arrow-left)"
       },
@@ -922,11 +922,11 @@
           "when": "dvc.commands.available && dvc.project.available && dvc.experiment.running"
         },
         {
-          "command": "dvc.views.experimentsColumnsTree.selectColumns",
+          "command": "dvc.views.experiments.selectColumns",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
-          "command": "dvc.views.experimentsColumnsTree.selectFirstColumns",
+          "command": "dvc.views.experiments.selectFirstColumns",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
@@ -1290,12 +1290,12 @@
           "group": "navigation@2"
         },
         {
-          "command": "dvc.views.experimentsColumnsTree.selectColumns",
+          "command": "dvc.views.experiments.selectColumns",
           "when": "view == dvc.views.experimentsColumnsTree",
           "group": "navigation@2"
         },
         {
-          "command": "dvc.views.experimentsColumnsTree.selectFirstColumns",
+          "command": "dvc.views.experiments.selectFirstColumns",
           "when": "view == dvc.views.experimentsColumnsTree",
           "group": "navigation@3"
         },
