@@ -17,6 +17,7 @@ import {
   QuickPickItemWithValue,
   QuickPickOptionsWithTitle
 } from '../../../../vscode/quickPick'
+import { Title } from '../../../../vscode/title'
 
 suite('Experiments Columns Tree Test Suite', () => {
   const paramsFile = 'params.yaml'
@@ -379,7 +380,7 @@ suite('Experiments Columns Tree Test Suite', () => {
         otherColumns.push(column)
       }
 
-      ;(
+      const mockShowQuickPick = (
         stub(window, 'showQuickPick') as SinonStub<
           [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
           Thenable<QuickPickItemWithValue<{ path: string }>[] | undefined>
@@ -414,6 +415,21 @@ suite('Experiments Columns Tree Test Suite', () => {
         ...firstColumns,
         ...otherColumns
       ])
+
+      expect(mockShowQuickPick).to.be.calledWithExactly(
+        columnsModel.getTerminalNodes().map(column => ({
+          description: '$(eye)',
+          label: column.path,
+          picked: false,
+          value: column
+        })),
+        {
+          canPickMany: true,
+          matchOnDescription: true,
+          matchOnDetail: true,
+          title: Title.SELECT_FIRST_COLUMNS
+        }
+      )
     })
   })
 })
