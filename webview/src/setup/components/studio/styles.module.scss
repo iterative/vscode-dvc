@@ -1,3 +1,18 @@
-.smallFont {
-  font-size: 0.6rem;
+.studioSettings {
+  display: 'flex';
+  margin-top: -20px;
+}
+
+.checkboxWrapper {
+  text-align: left;
+  margin: '0 auto';
+}
+
+.checkbox {
+  font-size: inherit;
+}
+
+.checkboxDescription {
+  font-size: 0.8rem;
+  margin-top: -10px;
 }
