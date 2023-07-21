@@ -41,6 +41,7 @@ export type Experiment = {
   metrics?: MetricOrParamColumns
   outs?: MetricOrParamColumns
   params?: MetricOrParamColumns
+  pushed?: boolean
   selected?: boolean
   sha?: string
   starred?: boolean

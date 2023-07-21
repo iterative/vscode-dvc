@@ -134,7 +134,11 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       return
     }
 
-    const pushCommand = getPushExperimentCommand(this.internalCommands, setup)
+    const pushCommand = getPushExperimentCommand(
+      this,
+      this.internalCommands,
+      setup
+    )
 
     return pushCommand({ dvcRoot, ids })
   }

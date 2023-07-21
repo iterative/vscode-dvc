@@ -18,6 +18,9 @@ export const addStarredFilter = () =>
 export const addConfiguration = () =>
   sendMessage({ type: MessageFromWebviewType.ADD_CONFIGURATION })
 
+export const pushExperiment = (id: string) =>
+  sendMessage({ type: MessageFromWebviewType.PUSH_EXPERIMENT, payload: [id] })
+
 export const reorderColumns = (newOrder: string[]) =>
   sendMessage({
     payload: newOrder,

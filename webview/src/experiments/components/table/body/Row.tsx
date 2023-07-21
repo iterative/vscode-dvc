@@ -23,7 +23,7 @@ export const RowContent: React.FC<
   const changes = useSelector(
     (state: ExperimentsState) => state.tableData.changes
   )
-  const { getVisibleCells, original, getIsExpanded, subRows } = row
+  const { depth, getVisibleCells, original, getIsExpanded, subRows } = row
   const { branch, displayColor, error, starred, id } = original
   const [firstCell, ...cells] = getVisibleCells()
   const isWorkspace = id === EXPERIMENT_WORKSPACE_ID
@@ -83,6 +83,7 @@ export const RowContent: React.FC<
         data-testid={isWorkspace && 'workspace-row'}
       >
         <FirstCell
+          depth={depth}
           cell={firstCell}
           changesIfWorkspace={!!changesIfWorkspace?.length}
           plotColor={displayColor}

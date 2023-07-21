@@ -43,7 +43,11 @@ const convertUrlTextToLink = (stdout: string) => {
 }
 
 export const getPushExperimentCommand =
-  (internalCommands: InternalCommands, setup: Setup) =>
+  (
+    experiments: WorkspaceExperiments,
+    internalCommands: InternalCommands,
+    setup: Setup
+  ) =>
   ({ dvcRoot, ids }: { dvcRoot: string; ids: string[] }) => {
     const studioAccessToken = setup.getStudioAccessToken()
     if (
@@ -67,6 +71,8 @@ export const getPushExperimentCommand =
         dvcRoot,
         ...ids
       )
+
+      void experiments.getRepository(dvcRoot).update()
 
       progress.report({
         increment: remainingProgress,

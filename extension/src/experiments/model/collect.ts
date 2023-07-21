@@ -249,7 +249,8 @@ const collectRunningExperiment = (
 const collectExpRange = (
   acc: ExperimentsAccumulator,
   baseline: Experiment,
-  expRange: ExpRange
+  expRange: ExpRange,
+  remoteExpShas: Set<string>
 ): void => {
   const { revs, executor } = expRange
   if (!revs?.length) {
@@ -290,6 +291,13 @@ const collectExpRange = (
 
   collectExecutorInfo(experiment, executor)
   collectRunningExperiment(acc, experiment)
+
+  if (
+    experiment.sha &&
+    [undefined, ExperimentStatus.SUCCESS].includes(experiment.status)
+  ) {
+    experiment.pushed = remoteExpShas.has(experiment.sha)
+  }
 
   addToMapArray(acc.experimentsByCommit, baselineId, experiment)
 }
@@ -340,10 +348,20 @@ const collectCliError = (
   }
 }
 
+const collectRemoteExpShas = (remoteExpRefs: string): Set<string> => {
+  const remoteExpShas = new Set<string>()
+  for (const ref of remoteExpRefs.split('\n').filter(Boolean)) {
+    const [sha] = ref.split(/\s/)
+    remoteExpShas.add(sha)
+  }
+  return remoteExpShas
+}
+
 export const collectExperiments = (
   expShow: ExpShowOutput,
   gitLog: string,
-  dvcLiveOnly: boolean
+  dvcLiveOnly: boolean,
+  remoteExpRefs = ''
 ): ExperimentsAccumulator => {
   const acc: ExperimentsAccumulator = {
     cliError: undefined,
@@ -358,6 +376,7 @@ export const collectExperiments = (
   }
 
   const commitData = collectCommitsData(gitLog)
+  const remoteExpShas = collectRemoteExpShas(remoteExpRefs)
 
   for (const expState of expShow) {
     const baseline = collectExpState(acc, expState, commitData)
@@ -368,7 +387,7 @@ export const collectExperiments = (
     }
 
     for (const expRange of experiments) {
-      collectExpRange(acc, baseline, expRange)
+      collectExpRange(acc, baseline, expRange, remoteExpShas)
     }
   }
 

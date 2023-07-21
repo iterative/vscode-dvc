@@ -648,12 +648,29 @@ $badge-size: 0.85rem;
   padding: 2px;
 }
 
+.cloudBox {
+  background-color: $checkbox-background;
+  border-radius: $checkbox-border-radius;
+  border: $checkbox-border-width solid $checkbox-border;
+  cursor: pointer;
+  display: flex;
+  height: $checkbox-size;
+  width: $checkbox-size;
+  padding: 1px;
+}
+
 .running {
   display: inline-flex;
   height: 12px;
   width: 12px;
   margin-right: 8px;
   margin-left: -20px;
+}
+
+.upload {
+  display: inline-flex;
+  margin-right: -18px;
+  transform: translateX(-24px);
 }
 
 .queued {

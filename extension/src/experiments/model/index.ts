@@ -125,7 +125,8 @@ export class ExperimentsModel extends ModelWithPersistence {
     gitLog: string,
     dvcLiveOnly: boolean,
     rowOrder: { branch: string; sha: string }[],
-    availableNbCommits: { [branch: string]: number }
+    availableNbCommits: { [branch: string]: number },
+    remoteExpRefs = ''
   ) {
     const {
       cliError,
@@ -134,7 +135,7 @@ export class ExperimentsModel extends ModelWithPersistence {
       hasCheckpoints,
       runningExperiments,
       workspace
-    } = collectExperiments(expShow, gitLog, dvcLiveOnly)
+    } = collectExperiments(expShow, gitLog, dvcLiveOnly, remoteExpRefs)
 
     const { hasMoreCommits, isShowingMoreCommits } =
       collectAddRemoveCommitsDetails(availableNbCommits, (branch: string) =>

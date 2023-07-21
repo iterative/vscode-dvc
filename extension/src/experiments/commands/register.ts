@@ -277,7 +277,7 @@ export const registerExperimentCommands = (
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_PUSH,
-    getPushExperimentCommand(internalCommands, setup)
+    getPushExperimentCommand(experiments, internalCommands, setup)
   )
 
   internalCommands.registerExternalCliCommand(

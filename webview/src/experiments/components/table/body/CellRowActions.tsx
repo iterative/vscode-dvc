@@ -1,4 +1,4 @@
-import React, { MouseEventHandler, ReactElement } from 'react'
+import React, { MouseEventHandler, ReactElement, ReactNode } from 'react'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
 import {
   ExperimentStatus,
@@ -18,6 +18,7 @@ import {
 import { Icon } from '../../../../shared/components/Icon'
 
 export type CellRowActionsProps = {
+  depth: number
   isRowSelected: boolean
   plotColor?: string
   showSubRowStates: boolean
@@ -68,7 +69,7 @@ const getTooltipContent = (determiner: boolean, action: string): string =>
 
 type ClickableTooltipContentProps = {
   clickableText: string
-  helperText: string
+  helperText: string | ReactNode
   onClick: MouseEventHandler
 }
 
@@ -87,6 +88,7 @@ const ClickableTooltipContent: React.FC<ClickableTooltipContentProps> = ({
 )
 
 export const CellRowActions: React.FC<CellRowActionsProps> = ({
+  depth,
   plotColor,
   status,
   toggleExperiment,

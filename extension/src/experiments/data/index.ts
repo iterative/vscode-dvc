@@ -42,6 +42,23 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   }
 
   public async update(): Promise<void> {
+    const [{ availableNbCommits, expShow, gitLog, rowOrder }, remoteExpRefs] =
+      await Promise.all([this.updateExpShow(), this.updateRemoteExpRefs()])
+
+    return this.notifyChanged({
+      availableNbCommits,
+      expShow,
+      gitLog,
+      remoteExpRefs,
+      rowOrder
+    })
+  }
+
+  protected collectFiles({ expShow }: { expShow: ExpShowOutput }) {
+    this.collectedFiles = collectFiles(expShow, this.collectedFiles)
+  }
+
+  private async updateExpShow() {
     await this.updateBranches()
     const branches = this.experiments.getBranchesToShow()
     let gitLog = ''
@@ -66,12 +83,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     )
 
     this.collectFiles({ expShow })
-
-    return this.notifyChanged({ availableNbCommits, expShow, gitLog, rowOrder })
-  }
-
-  protected collectFiles({ expShow }: { expShow: ExpShowOutput }) {
-    this.collectedFiles = collectFiles(expShow, this.collectedFiles)
+    return { availableNbCommits, expShow, gitLog, rowOrder }
   }
 
   private async collectGitLogAndOrder(
@@ -147,6 +159,13 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
           return this.managedUpdate()
         }
       }
+    )
+  }
+
+  private updateRemoteExpRefs() {
+    return this.internalCommands.executeCommand(
+      AvailableCommands.GIT_GET_REMOTE_EXPERIMENT_REFS,
+      this.dvcRoot
     )
   }
 }
