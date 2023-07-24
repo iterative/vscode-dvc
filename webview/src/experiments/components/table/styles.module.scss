@@ -93,6 +93,16 @@ $badge-size: 0.85rem;
   user-select: none;
 }
 
+%iconBox {
+  background-color: $checkbox-background;
+  border-radius: $checkbox-border-radius;
+  border: $checkbox-border-width solid $checkbox-border;
+  cursor: pointer;
+  display: flex;
+  height: $checkbox-size;
+  width: $checkbox-size;
+}
+
 // Concrete selectors
 
 @keyframes spin {
@@ -638,14 +648,15 @@ $badge-size: 0.85rem;
 }
 
 .plotBox {
-  background-color: $checkbox-background;
-  border-radius: $checkbox-border-radius;
-  border: $checkbox-border-width solid $checkbox-border;
-  cursor: pointer;
-  display: flex;
-  height: $checkbox-size;
-  width: $checkbox-size;
+  @extend %iconBox;
+
   padding: 2px;
+}
+
+.cloudBox {
+  @extend %iconBox;
+
+  padding: 1px;
 }
 
 .running {
@@ -654,6 +665,12 @@ $badge-size: 0.85rem;
   width: 12px;
   margin-right: 8px;
   margin-left: -20px;
+}
+
+.upload {
+  display: inline-flex;
+  margin-right: -18px;
+  transform: translateX(-24px);
 }
 
 .queued {

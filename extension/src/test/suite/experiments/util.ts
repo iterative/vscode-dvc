@@ -5,6 +5,7 @@ import { Disposer } from '../../../extension'
 import expShowFixture from '../../fixtures/expShow/base/output'
 import gitLogFixture from '../../fixtures/expShow/base/gitLog'
 import rowOrderFixture from '../../fixtures/expShow/base/rowOrder'
+import remoteExpRefsFixture from '../../fixtures/expShow/base/remoteExpRefs'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import {
   buildDependencies,
@@ -25,6 +26,7 @@ export const DEFAULT_EXPERIMENTS_OUTPUT = {
   availableNbCommits: { main: 5 },
   expShow: expShowFixture,
   gitLog: gitLogFixture,
+  remoteExpRefs: '',
   rowOrder: rowOrderFixture
 }
 
@@ -34,6 +36,7 @@ export const buildExperiments = ({
   dvcRoot = dvcDemoPath,
   expShow = expShowFixture,
   gitLog = gitLogFixture,
+  remoteExpRefs = remoteExpRefsFixture,
   rowOrder = rowOrderFixture,
   stageList = 'train'
 }: {
@@ -42,6 +45,7 @@ export const buildExperiments = ({
   dvcRoot?: string
   expShow?: ExpShowOutput
   gitLog?: string
+  remoteExpRefs?: string
   rowOrder?: { branch: string; sha: string }[]
   stageList?: string | null
 }) => {
@@ -95,6 +99,7 @@ export const buildExperiments = ({
     availableNbCommits,
     expShow,
     gitLog,
+    remoteExpRefs,
     rowOrder
   })
 
@@ -226,6 +231,7 @@ export const buildExperimentsData = (
   stub(gitReader, 'getBranches').resolves([currentBranch, 'one'])
   stub(gitReader, 'getCommitMessages').resolves(commitOutput)
   stub(gitReader, 'getNumCommits').resolves(404)
+  stub(gitReader, 'getRemoteExperimentRefs').resolves('')
 
   const mockGetBranchesToShow = stub().returns(['main'])
   const mockSetBranches = stub()

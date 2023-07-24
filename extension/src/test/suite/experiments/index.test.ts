@@ -623,7 +623,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to push an experiment', async () => {
-      const { experiments } = buildExperiments({ disposer: disposable })
+      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
       await experiments.isReady()
 
       const mockExpId = 'exp-e7a67'
@@ -633,6 +633,7 @@ suite('Experiments Test Suite', () => {
 
       const executeCommandSpy = spy(commands, 'executeCommand')
       const mockExpPush = stub(DvcExecutor.prototype, 'expPush')
+      stub(experiments, 'update').resolves(undefined)
 
       const mockGetStudioAccessToken = stub(
         Setup.prototype,
@@ -1638,6 +1639,7 @@ suite('Experiments Test Suite', () => {
         availableNbCommits: { main: 20 },
         gitLog: '',
         expShow: data,
+        remoteExpRefs: '',
         rowOrder: [
           { sha: '2d879497587b80b2d9e61f072d9dbe9c07a65357', branch: 'main' }
         ]
@@ -2117,6 +2119,7 @@ suite('Experiments Test Suite', () => {
         availableNbCommits: { main: 20 },
         gitLog: '',
         expShow: defaultExperimentsData,
+        remoteExpRefs: '',
         rowOrder: []
       })
       await dataUpdated

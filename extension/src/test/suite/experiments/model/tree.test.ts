@@ -349,6 +349,11 @@ suite('Experiments Tree Test Suite', () => {
 
     it('should be able to push an experiment with dvc.views.experimentsTree.pushExperiment', async () => {
       bypassProgressCloseDelay()
+      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
+      await experiments.isReady()
+
+      const mockUpdate = stub(experiments, 'update').resolves(undefined)
+
       const mockExperimentId = 'exp-to-push'
       const mockExperiment = {
         dvcRoot: dvcDemoPath,
@@ -369,11 +374,17 @@ suite('Experiments Tree Test Suite', () => {
       )
 
       expect(mockExpPush).to.be.calledWithExactly(dvcDemoPath, mockExperimentId)
+      expect(mockUpdate).to.be.calledOnce
     })
 
     it('should be able to push the provided experiment with dvc.views.experimentsTree.pushExperiment (if no experiments are selected)', async () => {
       bypassProgressCloseDelay()
       const mockExperiment = 'exp-to-push'
+
+      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
+      await experiments.isReady()
+
+      const mockUpdate = stub(experiments, 'update').resolves(undefined)
 
       const mockExpPush = stub(DvcExecutor.prototype, 'expPush').resolves('')
 
@@ -392,6 +403,7 @@ suite('Experiments Tree Test Suite', () => {
       )
 
       expect(mockExpPush).to.be.calledWithExactly(dvcDemoPath, mockExperiment)
+      expect(mockUpdate).to.be.calledOnce
     })
 
     it('should be able to push multiple experiments with dvc.views.experimentsTree.pushExperiment', async () => {
@@ -399,6 +411,11 @@ suite('Experiments Tree Test Suite', () => {
       const mockFirstExperimentId = 'first-exp-pushed'
       const mockSecondExperimentId = 'second-exp-pushed'
       const mockQueuedExperimentLabel = 'queued-excluded'
+
+      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
+      await experiments.isReady()
+
+      const mockUpdate = stub(experiments, 'update').resolves(undefined)
 
       const mockExpPush = stub(DvcExecutor.prototype, 'expPush').resolves('')
 
@@ -438,6 +455,7 @@ suite('Experiments Tree Test Suite', () => {
         mockFirstExperimentId,
         mockSecondExperimentId
       )
+      expect(mockUpdate).to.be.calledOnce
     })
 
     it('should be able to stop multiple running experiments with dvc.views.experimentsTree.stopExperiment', async () => {

@@ -177,7 +177,8 @@ export class Experiments extends BaseRepository<TableData> {
     availableNbCommits,
     expShow,
     gitLog,
-    rowOrder
+    rowOrder,
+    remoteExpRefs
   }: ExperimentsOutput) {
     const hadCheckpoints = this.hasCheckpoints()
     const dvcLiveOnly = await this.checkSignalFile()
@@ -188,7 +189,8 @@ export class Experiments extends BaseRepository<TableData> {
         gitLog,
         dvcLiveOnly,
         rowOrder,
-        availableNbCommits
+        availableNbCommits,
+        remoteExpRefs
       )
     ])
 
@@ -197,6 +199,16 @@ export class Experiments extends BaseRepository<TableData> {
     }
 
     return this.notifyChanged()
+  }
+
+  public setPushing(ids: string[]) {
+    this.experiments.setPushing(ids)
+    return this.notifyChanged()
+  }
+
+  public unsetPushing(ids: string[]) {
+    this.experiments.unsetPushing(ids)
+    return this.update()
   }
 
   public hasCheckpoints() {

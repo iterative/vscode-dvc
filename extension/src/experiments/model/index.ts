@@ -23,6 +23,7 @@ import {
   Experiment,
   isQueued,
   isRunning,
+  GitRemoteStatus,
   RunningExperiment
 } from '../webview/contract'
 import { definedAndNonEmpty, reorderListSubset } from '../../util/array'
@@ -73,6 +74,8 @@ export class ExperimentsModel extends ModelWithPersistence {
   private isShowingMoreCommits: { [branch: string]: boolean } = {}
 
   private filters: Map<string, FilterDefinition> = new Map()
+
+  private pushing = new Set<string>()
 
   private currentSorts: SortDefinition[]
   private running: RunningExperiment[] = []
@@ -125,7 +128,8 @@ export class ExperimentsModel extends ModelWithPersistence {
     gitLog: string,
     dvcLiveOnly: boolean,
     rowOrder: { branch: string; sha: string }[],
-    availableNbCommits: { [branch: string]: number }
+    availableNbCommits: { [branch: string]: number },
+    remoteExpRefs: string
   ) {
     const {
       cliError,
@@ -134,7 +138,7 @@ export class ExperimentsModel extends ModelWithPersistence {
       hasCheckpoints,
       runningExperiments,
       workspace
-    } = collectExperiments(expShow, gitLog, dvcLiveOnly)
+    } = collectExperiments(expShow, gitLog, dvcLiveOnly, remoteExpRefs)
 
     const { hasMoreCommits, isShowingMoreCommits } =
       collectAddRemoveCommitsDetails(availableNbCommits, (branch: string) =>
@@ -294,6 +298,16 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.setColors(coloredStatus, availableColors)
 
     this.persistStatus()
+  }
+
+  public setPushing(ids: string[]) {
+    this.pushing = new Set(ids)
+  }
+
+  public unsetPushing(ids: string[]) {
+    for (const id of ids) {
+      this.pushing.delete(id)
+    }
   }
 
   public getLabels() {
@@ -517,10 +531,20 @@ export class ExperimentsModel extends ModelWithPersistence {
   private getExperimentsByCommit(commit: Experiment) {
     const experiments = this.experimentsByCommit
       .get(commit.id)
-      ?.map(experiment => ({
-        ...this.addDetails(experiment),
-        branch: commit.branch
-      }))
+      ?.map(originalExperiment => {
+        const experiment = {
+          ...this.addDetails(originalExperiment),
+          branch: commit.branch
+        }
+
+        if (experiment.gitRemoteStatus !== undefined) {
+          experiment.gitRemoteStatus = this.pushing.has(originalExperiment.id)
+            ? GitRemoteStatus.PUSHING
+            : originalExperiment.gitRemoteStatus
+        }
+
+        return experiment
+      })
     if (!experiments) {
       return
     }

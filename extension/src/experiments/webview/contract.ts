@@ -28,6 +28,12 @@ export type CommitData = {
   date: string
 }
 
+export enum GitRemoteStatus {
+  NOT_ON_REMOTE = 'not-on-remote',
+  PUSHING = 'pushing',
+  ON_REMOTE = 'on-remote'
+}
+
 export type Experiment = {
   commit?: CommitData
   Created?: string
@@ -41,6 +47,7 @@ export type Experiment = {
   metrics?: MetricOrParamColumns
   outs?: MetricOrParamColumns
   params?: MetricOrParamColumns
+  gitRemoteStatus?: GitRemoteStatus
   selected?: boolean
   sha?: string
   starred?: boolean

@@ -7,6 +7,7 @@ import gitLogFixture from '../../test/fixtures/expShow/base/gitLog'
 import rowOrderFixture from '../../test/fixtures/expShow/base/rowOrder'
 import outputFixture from '../../test/fixtures/expShow/base/output'
 import rowsFixture from '../../test/fixtures/expShow/base/rows'
+import remoteExpRefsFixture from '../../test/fixtures/expShow/base/remoteExpRefs'
 import deeplyNestedRowsFixture from '../../test/fixtures/expShow/deeplyNested/rows'
 import deeplyNestedOutputFixture from '../../test/fixtures/expShow/deeplyNested/output'
 import uncommittedDepsFixture from '../../test/fixtures/expShow/uncommittedDeps/output'
@@ -40,8 +41,9 @@ const DEFAULT_DATA: [
   string,
   boolean,
   { branch: string; sha: string }[],
-  { [branch: string]: number }
-] = ['', false, [], { main: 2000 }]
+  { [branch: string]: number },
+  string
+] = ['', false, [], { main: 2000 }, '']
 
 type TransformAndSetInputs = [ExpShowOutput, ...typeof DEFAULT_DATA]
 
@@ -53,7 +55,8 @@ describe('ExperimentsModel', () => {
       gitLogFixture,
       false,
       rowOrderFixture,
-      { main: 6 }
+      { main: 6 },
+      remoteExpRefsFixture
     )
     expect(model.getRowData()).toStrictEqual(rowsFixture)
   })
@@ -69,7 +72,8 @@ describe('ExperimentsModel', () => {
         { branch: 'main', sha: 'a49e03966a1f9f1299ec222ebc4bed8625d2c54d' },
         { branch: 'main', sha: '4f7b50c3d171a11b6cfcd04416a16fc80b61018d' }
       ],
-      { main: 700 }
+      { main: 700 },
+      ''
     )
     expect(model.getRowData()).toStrictEqual(
       expect.objectContaining(survivalRowsFixture)
@@ -105,7 +109,7 @@ describe('ExperimentsModel', () => {
       }
     )
 
-    model.transformAndSet(dvcLiveOnly, '', true, [], { main: 2000 })
+    model.transformAndSet(dvcLiveOnly, '', true, [], { main: 2000 }, '')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const runningWorkspace = (model as any).workspace
     expect(runningWorkspace?.executor).toStrictEqual(EXPERIMENT_WORKSPACE_ID)
@@ -201,7 +205,8 @@ describe('ExperimentsModel', () => {
       '',
       false,
       [{ branch: 'main', sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77' }],
-      { main: 10 }
+      { main: 10 },
+      ''
     )
     expect(model.getRowData()).toStrictEqual(
       expect.objectContaining(deeplyNestedRowsFixture)
@@ -215,7 +220,8 @@ describe('ExperimentsModel', () => {
       '',
       false,
       [{ branch: 'main', sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77' }],
-      { main: 10 }
+      { main: 10 },
+      ''
     )
     expect(model.getRowData()).toStrictEqual(
       expect.objectContaining(dataTypesRowsFixture)
@@ -449,7 +455,8 @@ describe('ExperimentsModel', () => {
       [],
       {
         main: 2000
-      }
+      },
+      remoteExpRefsFixture
     ]
 
     const transientErrorData: TransformAndSetInputs = [
@@ -470,7 +477,8 @@ describe('ExperimentsModel', () => {
       [],
       {
         main: 2000
-      }
+      },
+      remoteExpRefsFixture
     ]
 
     model.transformAndSet(...runningExperimentData)
@@ -548,9 +556,16 @@ describe('ExperimentsModel', () => {
         error: { msg: errorMsg, type: 'caught error' }
       }
     ]
-    model.transformAndSet(data, gitLogFixture, false, [], {
-      main: 6
-    })
+    model.transformAndSet(
+      data,
+      gitLogFixture,
+      false,
+      [],
+      {
+        main: 6
+      },
+      remoteExpRefsFixture
+    )
 
     expect(model.getCliError()).toStrictEqual(errorMsg)
 
@@ -559,7 +574,8 @@ describe('ExperimentsModel', () => {
       gitLogFixture,
       false,
       rowOrderFixture,
-      { main: 6 }
+      { main: 6 },
+      remoteExpRefsFixture
     )
 
     expect(model.getCliError()).toBe(undefined)

@@ -34,6 +34,7 @@ export const buildPlots = async ({
   plotsDiff = undefined,
   expShow = expShowFixtureWithoutErrors,
   gitLog = gitLogFixture,
+  remoteExpRefs = '',
   rowOrder = rowOrderFixture
 }: {
   availableNbCommits?: { [branch: string]: number }
@@ -41,6 +42,7 @@ export const buildPlots = async ({
   plotsDiff?: PlotsOutput | undefined
   expShow?: ExpShowOutput
   gitLog?: string
+  remoteExpRefs?: string
   rowOrder?: { branch: string; sha: string }[]
 }) => {
   const { internalCommands, mockPlotsDiff, messageSpy, resourceLocator } =
@@ -100,6 +102,7 @@ export const buildPlots = async ({
     availableNbCommits,
     expShow,
     gitLog,
+    remoteExpRefs,
     rowOrder
   })
 

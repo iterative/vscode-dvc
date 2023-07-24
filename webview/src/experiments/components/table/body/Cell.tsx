@@ -1,9 +1,8 @@
 import { flexRender } from '@tanstack/react-table'
 import React, { ReactNode } from 'react'
-import { VSCodeProgressRing } from '@vscode/webview-ui-toolkit/react'
 import cx from 'classnames'
-import { isRunning } from 'dvc/src/experiments/webview/contract'
 import { CellRowActionsProps, CellRowActions } from './CellRowActions'
+import { ExperimentStatusIndicator } from './ExperimentStatusIndicator'
 import styles from '../styles.module.scss'
 import { CellValue, isValueWithChanges } from '../content/Cell'
 import { CellProp, RowProp } from '../../../util/interfaces'
@@ -39,7 +38,7 @@ const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
     <span className={styles.rowArrowContainer} />
   )
 
-export const FirstCell: React.FC<
+export const StubCell: React.FC<
   CellProp & CellRowActionsProps & { changesIfWorkspace: boolean }
 > = ({ cell, changesIfWorkspace, ...rowActionsProps }) => {
   const {
@@ -52,7 +51,7 @@ export const FirstCell: React.FC<
     }
   } = cell
   const {
-    original: { error, status, label, id, description = '' }
+    original: { error, status, gitRemoteStatus, label, id, description = '' }
   } = row
   const { toggleExperiment } = rowActionsProps
 
@@ -61,11 +60,11 @@ export const FirstCell: React.FC<
       <div className={styles.innerCell} style={{ width: getSize() }}>
         <CellRowActions status={status} {...rowActionsProps} />
         <RowExpansionButton row={row} />
-        {isRunning(status) && (
-          <VSCodeProgressRing
-            className={cx(styles.running, 'chromatic-ignore')}
-          />
-        )}
+        <ExperimentStatusIndicator
+          id={id}
+          status={status}
+          gitRemoteStatus={gitRemoteStatus}
+        />
 
         {getIsPlaceholder() ? null : (
           <ErrorTooltip error={error}>

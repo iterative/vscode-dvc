@@ -7,6 +7,8 @@ export const codicons = [
   'chevron-down',
   'chevron-right',
   'close',
+  'cloud-upload',
+  'cloud',
   'copy',
   'ellipsis',
   'error',
