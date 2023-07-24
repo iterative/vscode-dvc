@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.25] - 2023-07-24
+
+### 🚀 New Features and Enhancements
+
+- Show Experiment Remote Status [#4324](https://github.com/iterative/vscode-dvc/pull/4324) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.7.0) [#4328](https://github.com/iterative/vscode-dvc/pull/4328) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.24] - 2023-07-20
 
 ### 🚀 New Features and Enhancements
