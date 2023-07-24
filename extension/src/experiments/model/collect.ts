@@ -30,6 +30,7 @@ import { RegisteredCommands } from '../../commands/external'
 import { Resource } from '../../resourceLocator'
 import { shortenForLabel } from '../../util/string'
 import { COMMITS_SEPARATOR } from '../../cli/git/constants'
+import { trimAndSplit } from '../../util/stdout'
 
 export type ExperimentItem = {
   command?: {
@@ -360,7 +361,7 @@ const collectCliError = (
 
 const collectRemoteExpShas = (remoteExpRefs: string): Set<string> => {
   const remoteExpShas = new Set<string>()
-  for (const ref of remoteExpRefs.split('\n').filter(Boolean)) {
+  for (const ref of trimAndSplit(remoteExpRefs)) {
     const [sha] = ref.split(/\s/)
     remoteExpShas.add(sha)
   }
