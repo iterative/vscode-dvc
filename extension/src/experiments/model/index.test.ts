@@ -7,6 +7,7 @@ import gitLogFixture from '../../test/fixtures/expShow/base/gitLog'
 import rowOrderFixture from '../../test/fixtures/expShow/base/rowOrder'
 import outputFixture from '../../test/fixtures/expShow/base/output'
 import rowsFixture from '../../test/fixtures/expShow/base/rows'
+import remoteExpRefsFixture from '../../test/fixtures/expShow/base/remoteExpRefs'
 import deeplyNestedRowsFixture from '../../test/fixtures/expShow/deeplyNested/rows'
 import deeplyNestedOutputFixture from '../../test/fixtures/expShow/deeplyNested/output'
 import uncommittedDepsFixture from '../../test/fixtures/expShow/uncommittedDeps/output'
@@ -55,7 +56,7 @@ describe('ExperimentsModel', () => {
       false,
       rowOrderFixture,
       { main: 6 },
-      ''
+      remoteExpRefsFixture
     )
     expect(model.getRowData()).toStrictEqual(rowsFixture)
   })

@@ -5,6 +5,7 @@ import { Disposer } from '../../../extension'
 import expShowFixture from '../../fixtures/expShow/base/output'
 import gitLogFixture from '../../fixtures/expShow/base/gitLog'
 import rowOrderFixture from '../../fixtures/expShow/base/rowOrder'
+import remoteExpRefsFixture from '../../fixtures/expShow/base/remoteExpRefs'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import {
   buildDependencies,
@@ -35,7 +36,7 @@ export const buildExperiments = ({
   dvcRoot = dvcDemoPath,
   expShow = expShowFixture,
   gitLog = gitLogFixture,
-  remoteExpRefs = '',
+  remoteExpRefs = remoteExpRefsFixture,
   rowOrder = rowOrderFixture,
   stageList = 'train'
 }: {

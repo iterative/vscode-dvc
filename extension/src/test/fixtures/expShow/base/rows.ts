@@ -248,7 +248,7 @@ const rowsFixture: Commit[] = [
             test: true
           }
         },
-        pushed: PushedStatus.NOT_ON_REMOTE,
+        pushed: PushedStatus.ON_REMOTE,
         selected: false,
         sha: '42b8736b08170529903cd203a1f40382a4b4a8cd',
         starred: false,
