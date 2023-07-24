@@ -1,18 +1,13 @@
 import { flexRender } from '@tanstack/react-table'
 import React, { ReactNode } from 'react'
-import { VSCodeProgressRing } from '@vscode/webview-ui-toolkit/react'
 import cx from 'classnames'
-import { PushedStatus, isRunning } from 'dvc/src/experiments/webview/contract'
 import { CellRowActionsProps, CellRowActions } from './CellRowActions'
-import { CellHintTooltip } from './CellHintTooltip'
+import { ExperimentStatusIndicator } from './ExperimentStatusIndicator'
 import styles from '../styles.module.scss'
 import { CellValue, isValueWithChanges } from '../content/Cell'
 import { CellProp, RowProp } from '../../../util/interfaces'
 import { clickAndEnterProps } from '../../../../util/props'
 import { ErrorTooltip } from '../../../../shared/components/tooltip/ErrorTooltip'
-import { Icon } from '../../../../shared/components/Icon'
-import { Cloud, CloudUpload } from '../../../../shared/components/icons'
-import { pushExperiment } from '../../../util/messages'
 
 const cellHasChanges = (cellValue: CellValue) =>
   isValueWithChanges(cellValue) ? cellValue.changes : false
@@ -56,7 +51,7 @@ export const StubCell: React.FC<
     }
   } = cell
   const {
-    original: { error, status, pushed, label, id, description = '' }
+    original: { error, status, gitRemoteStatus, label, id, description = '' }
   } = row
   const { toggleExperiment } = rowActionsProps
 
@@ -65,31 +60,11 @@ export const StubCell: React.FC<
       <div className={styles.innerCell} style={{ width: getSize() }}>
         <CellRowActions status={status} {...rowActionsProps} />
         <RowExpansionButton row={row} />
-        {(isRunning(status) || pushed === PushedStatus.PUSHING) && (
-          <VSCodeProgressRing
-            className={cx(styles.running, 'chromatic-ignore')}
-          />
-        )}
-        {pushed === PushedStatus.NOT_ON_REMOTE && (
-          <CellHintTooltip
-            tooltipContent={'Experiment not found on remote\nClick to push'}
-          >
-            <div
-              className={styles.upload}
-              data-testid="fun"
-              {...clickAndEnterProps(() => pushExperiment(id))}
-            >
-              <Icon className={styles.cloudBox} icon={CloudUpload} />
-            </div>
-          </CellHintTooltip>
-        )}
-        {pushed === PushedStatus.ON_REMOTE && (
-          <CellHintTooltip tooltipContent="Experiment on remote">
-            <div className={styles.upload} data-testid="fun1">
-              <Icon icon={Cloud} />
-            </div>
-          </CellHintTooltip>
-        )}
+        <ExperimentStatusIndicator
+          id={id}
+          status={status}
+          gitRemoteStatus={gitRemoteStatus}
+        />
 
         {getIsPlaceholder() ? null : (
           <ErrorTooltip error={error}>

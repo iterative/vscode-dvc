@@ -63,8 +63,7 @@ export const getPushExperimentCommand =
       const repository = experiments.getRepository(dvcRoot)
 
       const updateOnCompletion = () => {
-        repository.unsetPushing(ids)
-        return repository.update()
+        return repository.unsetPushing(ids)
       }
 
       progress.report({ increment: 0 })

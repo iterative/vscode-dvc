@@ -23,7 +23,7 @@ import {
   Experiment,
   isQueued,
   isRunning,
-  PushedStatus,
+  GitRemoteStatus,
   RunningExperiment
 } from '../webview/contract'
 import { definedAndNonEmpty, reorderListSubset } from '../../util/array'
@@ -537,10 +537,10 @@ export class ExperimentsModel extends ModelWithPersistence {
           branch: commit.branch
         }
 
-        if (experiment.pushed !== undefined) {
-          experiment.pushed = this.pushing.has(originalExperiment.id)
-            ? PushedStatus.PUSHING
-            : originalExperiment.pushed
+        if (experiment.gitRemoteStatus !== undefined) {
+          experiment.gitRemoteStatus = this.pushing.has(originalExperiment.id)
+            ? GitRemoteStatus.PUSHING
+            : originalExperiment.gitRemoteStatus
         }
 
         return experiment

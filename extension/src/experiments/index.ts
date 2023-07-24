@@ -208,6 +208,7 @@ export class Experiments extends BaseRepository<TableData> {
 
   public unsetPushing(ids: string[]) {
     this.experiments.unsetPushing(ids)
+    return this.update()
   }
 
   public hasCheckpoints() {

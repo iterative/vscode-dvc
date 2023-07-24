@@ -140,7 +140,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       setup
     )
 
-    return pushCommand({ dvcRoot, ids }) // need to catch and show error
+    return pushCommand({ dvcRoot, ids })
   }
 
   public async selectExperimentsToRemove() {

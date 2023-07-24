@@ -9,7 +9,7 @@ import { extractColumns } from '../columns/extract'
 import {
   CommitData,
   Experiment,
-  PushedStatus,
+  GitRemoteStatus,
   RunningExperiment,
   isQueued,
   isRunning
@@ -245,9 +245,9 @@ const collectRemoteStatus = (
   ) {
     return
   }
-  experiment.pushed = remoteExpShas.has(experiment.sha)
-    ? PushedStatus.ON_REMOTE
-    : PushedStatus.NOT_ON_REMOTE
+  experiment.gitRemoteStatus = remoteExpShas.has(experiment.sha)
+    ? GitRemoteStatus.ON_REMOTE
+    : GitRemoteStatus.NOT_ON_REMOTE
 }
 
 const collectRunningExperiment = (
@@ -372,7 +372,7 @@ export const collectExperiments = (
   expShow: ExpShowOutput,
   gitLog: string,
   dvcLiveOnly: boolean,
-  remoteExpRefs = ''
+  remoteExpRefs: string
 ): ExperimentsAccumulator => {
   const acc: ExperimentsAccumulator = {
     cliError: undefined,

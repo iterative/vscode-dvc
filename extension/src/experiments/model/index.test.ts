@@ -456,7 +456,7 @@ describe('ExperimentsModel', () => {
       {
         main: 2000
       },
-      ''
+      remoteExpRefsFixture
     ]
 
     const transientErrorData: TransformAndSetInputs = [
@@ -478,7 +478,7 @@ describe('ExperimentsModel', () => {
       {
         main: 2000
       },
-      ''
+      remoteExpRefsFixture
     ]
 
     model.transformAndSet(...runningExperimentData)
@@ -564,7 +564,7 @@ describe('ExperimentsModel', () => {
       {
         main: 6
       },
-      ''
+      remoteExpRefsFixture
     )
 
     expect(model.getCliError()).toStrictEqual(errorMsg)
@@ -575,7 +575,7 @@ describe('ExperimentsModel', () => {
       false,
       rowOrderFixture,
       { main: 6 },
-      ''
+      remoteExpRefsFixture
     )
 
     expect(model.getCliError()).toBe(undefined)
