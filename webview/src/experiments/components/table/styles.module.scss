@@ -93,6 +93,16 @@ $badge-size: 0.85rem;
   user-select: none;
 }
 
+%iconBox {
+  background-color: $checkbox-background;
+  border-radius: $checkbox-border-radius;
+  border: $checkbox-border-width solid $checkbox-border;
+  cursor: pointer;
+  display: flex;
+  height: $checkbox-size;
+  width: $checkbox-size;
+}
+
 // Concrete selectors
 
 @keyframes spin {
@@ -635,16 +645,6 @@ $badge-size: 0.85rem;
 
 .starSwitch .cellHintTooltip {
   font-size: 0.65rem;
-}
-
-%iconBox {
-  background-color: $checkbox-background;
-  border-radius: $checkbox-border-radius;
-  border: $checkbox-border-width solid $checkbox-border;
-  cursor: pointer;
-  display: flex;
-  height: $checkbox-size;
-  width: $checkbox-size;
 }
 
 .plotBox {

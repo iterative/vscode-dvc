@@ -47,7 +47,7 @@ export const ExperimentStatusIndicator: React.FC<
     return (
       <CellHintTooltip tooltipContent="Experiment on remote">
         <div className={styles.upload}>
-          <Icon icon={Cloud} />
+          <Icon icon={Cloud} height={16} width={16} />
         </div>
       </CellHintTooltip>
     )
