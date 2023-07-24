@@ -623,7 +623,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to push an experiment', async () => {
-      const { experiments } = buildExperiments({ disposer: disposable })
+      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
       await experiments.isReady()
 
       const mockExpId = 'exp-e7a67'
@@ -633,6 +633,7 @@ suite('Experiments Test Suite', () => {
 
       const executeCommandSpy = spy(commands, 'executeCommand')
       const mockExpPush = stub(DvcExecutor.prototype, 'expPush')
+      stub(experiments, 'update').resolves(undefined)
 
       const mockGetStudioAccessToken = stub(
         Setup.prototype,

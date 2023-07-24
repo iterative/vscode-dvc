@@ -230,6 +230,7 @@ export const buildExperimentsData = (
   stub(gitReader, 'getBranches').resolves([currentBranch, 'one'])
   stub(gitReader, 'getCommitMessages').resolves(commitOutput)
   stub(gitReader, 'getNumCommits').resolves(404)
+  stub(gitReader, 'getRemoteExperimentRefs').resolves('')
 
   const mockGetBranchesToShow = stub().returns(['main'])
   const mockSetBranches = stub()

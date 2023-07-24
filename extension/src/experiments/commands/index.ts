@@ -64,7 +64,7 @@ export const getPushExperimentCommand =
 
       const updateOnCompletion = () => {
         repository.unsetPushing(ids)
-        void repository.update()
+        return repository.update()
       }
 
       progress.report({ increment: 0 })
@@ -82,7 +82,7 @@ export const getPushExperimentCommand =
           ...ids
         )
 
-        updateOnCompletion()
+        void updateOnCompletion()
 
         progress.report({
           increment: remainingProgress,
@@ -91,7 +91,7 @@ export const getPushExperimentCommand =
 
         return Toast.delayProgressClosing(15000)
       } catch (error: unknown) {
-        updateOnCompletion()
+        void updateOnCompletion()
         throw error
       }
     })
