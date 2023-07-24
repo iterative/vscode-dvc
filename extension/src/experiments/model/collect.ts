@@ -113,9 +113,7 @@ const collectCommitData = (
   acc: { [sha: string]: CommitData },
   commit: string
 ) => {
-  const [sha, author, date, refNamesWithKey] = commit
-    .split('\n')
-    .filter(Boolean)
+  const [sha, author, date, refNamesWithKey] = trimAndSplit(commit)
 
   if (!sha) {
     return
@@ -151,7 +149,7 @@ const formatCommitMessage = (commit: string | undefined) => {
   if (!commit) {
     return undefined
   }
-  const lines = commit.split('\n').filter(Boolean)
+  const lines = trimAndSplit(commit)
   return `${lines[0]}${lines.length > 1 ? ' ...' : ''}`
 }
 
