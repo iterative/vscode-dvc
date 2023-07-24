@@ -60,25 +60,39 @@ export const getPushExperimentCommand =
     }
 
     return Toast.showProgress('exp push', async progress => {
+      const repository = experiments.getRepository(dvcRoot)
+
+      const updateOnCompletion = () => {
+        repository.unsetPushing(ids)
+        void repository.update()
+      }
+
       progress.report({ increment: 0 })
 
       progress.report({ increment: 25, message: `Pushing ${ids.join(' ')}...` })
 
       const remainingProgress = 75
 
-      const stdout = await internalCommands.executeCommand(
-        AvailableCommands.EXP_PUSH,
-        dvcRoot,
-        ...ids
-      )
+      repository.setPushing(ids)
 
-      void experiments.getRepository(dvcRoot).update()
+      try {
+        const stdout = await internalCommands.executeCommand(
+          AvailableCommands.EXP_PUSH,
+          dvcRoot,
+          ...ids
+        )
 
-      progress.report({
-        increment: remainingProgress,
-        message: convertUrlTextToLink(stdout)
-      })
+        updateOnCompletion()
 
-      return Toast.delayProgressClosing(15000)
+        progress.report({
+          increment: remainingProgress,
+          message: convertUrlTextToLink(stdout)
+        })
+
+        return Toast.delayProgressClosing(15000)
+      } catch (error: unknown) {
+        updateOnCompletion()
+        throw error
+      }
     })
   }

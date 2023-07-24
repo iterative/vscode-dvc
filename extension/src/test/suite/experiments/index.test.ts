@@ -1638,6 +1638,7 @@ suite('Experiments Test Suite', () => {
         availableNbCommits: { main: 20 },
         gitLog: '',
         expShow: data,
+        remoteExpRefs: '',
         rowOrder: [
           { sha: '2d879497587b80b2d9e61f072d9dbe9c07a65357', branch: 'main' }
         ]
@@ -2117,6 +2118,7 @@ suite('Experiments Test Suite', () => {
         availableNbCommits: { main: 20 },
         gitLog: '',
         expShow: defaultExperimentsData,
+        remoteExpRefs: '',
         rowOrder: []
       })
       await dataUpdated

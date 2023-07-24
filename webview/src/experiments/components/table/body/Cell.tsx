@@ -2,7 +2,7 @@ import { flexRender } from '@tanstack/react-table'
 import React, { ReactNode } from 'react'
 import { VSCodeProgressRing } from '@vscode/webview-ui-toolkit/react'
 import cx from 'classnames'
-import { isQueued, isRunning } from 'dvc/src/experiments/webview/contract'
+import { PushedStatus, isRunning } from 'dvc/src/experiments/webview/contract'
 import { CellRowActionsProps, CellRowActions } from './CellRowActions'
 import { CellHintTooltip } from './CellHintTooltip'
 import styles from '../styles.module.scss'
@@ -43,7 +43,7 @@ const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
     <span className={styles.rowArrowContainer} />
   )
 
-export const FirstCell: React.FC<
+export const StubCell: React.FC<
   CellProp & CellRowActionsProps & { changesIfWorkspace: boolean }
 > = ({ cell, changesIfWorkspace, ...rowActionsProps }) => {
   const {
@@ -56,7 +56,6 @@ export const FirstCell: React.FC<
     }
   } = cell
   const {
-    depth,
     original: { error, status, pushed, label, id, description = '' }
   } = row
   const { toggleExperiment } = rowActionsProps
@@ -66,12 +65,12 @@ export const FirstCell: React.FC<
       <div className={styles.innerCell} style={{ width: getSize() }}>
         <CellRowActions status={status} {...rowActionsProps} />
         <RowExpansionButton row={row} />
-        {isRunning(status) && (
+        {(isRunning(status) || pushed === PushedStatus.PUSHING) && (
           <VSCodeProgressRing
             className={cx(styles.running, 'chromatic-ignore')}
           />
         )}
-        {pushed === false && (
+        {pushed === PushedStatus.NOT_ON_REMOTE && (
           <CellHintTooltip
             tooltipContent={'Experiment not found on remote\nClick to push'}
           >
@@ -84,7 +83,7 @@ export const FirstCell: React.FC<
             </div>
           </CellHintTooltip>
         )}
-        {pushed === true && (
+        {pushed === PushedStatus.ON_REMOTE && (
           <CellHintTooltip tooltipContent="Experiment on remote">
             <div className={styles.upload} data-testid="fun1">
               <Icon icon={Cloud} />

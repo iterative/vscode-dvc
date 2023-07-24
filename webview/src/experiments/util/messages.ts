@@ -19,7 +19,7 @@ export const addConfiguration = () =>
   sendMessage({ type: MessageFromWebviewType.ADD_CONFIGURATION })
 
 export const pushExperiment = (id: string) =>
-  sendMessage({ type: MessageFromWebviewType.PUSH_EXPERIMENT, payload: [id] })
+  sendMessage({ payload: [id], type: MessageFromWebviewType.PUSH_EXPERIMENT })
 
 export const reorderColumns = (newOrder: string[]) =>
   sendMessage({

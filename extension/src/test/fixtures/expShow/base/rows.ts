@@ -1,5 +1,5 @@
 import { join } from '../../../util/path'
-import { Commit } from '../../../../experiments/webview/contract'
+import { Commit, PushedStatus } from '../../../../experiments/webview/contract'
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
 import { shortenForLabel } from '../../../../util/string'
 import {
@@ -248,6 +248,7 @@ const rowsFixture: Commit[] = [
             test: true
           }
         },
+        pushed: PushedStatus.NOT_ON_REMOTE,
         selected: false,
         sha: '42b8736b08170529903cd203a1f40382a4b4a8cd',
         starred: false,
@@ -370,6 +371,7 @@ const rowsFixture: Commit[] = [
             test: true
           }
         },
+        pushed: PushedStatus.NOT_ON_REMOTE,
         selected: false,
         sha: 'f0f918662b4f8c47819ca154a23029bf9b47d4f3',
         starred: false,

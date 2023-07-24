@@ -13,7 +13,7 @@ export type ExperimentsOutput = {
   availableNbCommits: { [branch: string]: number }
   expShow: ExpShowOutput
   gitLog: string
-  remoteExpRefs?: string
+  remoteExpRefs: string
   rowOrder: { branch: string; sha: string }[]
 }
 

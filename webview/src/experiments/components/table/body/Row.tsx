@@ -2,7 +2,7 @@ import cx from 'classnames'
 import React, { useCallback, useContext, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
-import { FirstCell, CellWrapper } from './Cell'
+import { StubCell, CellWrapper } from './Cell'
 import { RowContextMenu } from './RowContextMenu'
 import styles from '../styles.module.scss'
 import { RowProp } from '../../../util/interfaces'
@@ -23,9 +23,9 @@ export const RowContent: React.FC<
   const changes = useSelector(
     (state: ExperimentsState) => state.tableData.changes
   )
-  const { depth, getVisibleCells, original, getIsExpanded, subRows } = row
+  const { getVisibleCells, original, getIsExpanded, subRows } = row
   const { branch, displayColor, error, starred, id } = original
-  const [firstCell, ...cells] = getVisibleCells()
+  const [stubCell, ...cells] = getVisibleCells()
   const isWorkspace = id === EXPERIMENT_WORKSPACE_ID
   const changesIfWorkspace = isWorkspace ? changes : undefined
 
@@ -82,9 +82,8 @@ export const RowContent: React.FC<
         aria-selected={isRowSelected}
         data-testid={isWorkspace && 'workspace-row'}
       >
-        <FirstCell
-          depth={depth}
-          cell={firstCell}
+        <StubCell
+          cell={stubCell}
           changesIfWorkspace={!!changesIfWorkspace?.length}
           plotColor={displayColor}
           starred={starred}

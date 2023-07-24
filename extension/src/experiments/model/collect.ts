@@ -9,6 +9,7 @@ import { extractColumns } from '../columns/extract'
 import {
   CommitData,
   Experiment,
+  PushedStatus,
   RunningExperiment,
   isQueued,
   isRunning
@@ -233,6 +234,21 @@ const collectExecutorInfo = (
   }
 }
 
+const collectRemoteStatus = (
+  experiment: Experiment,
+  remoteExpShas: Set<string>
+): void => {
+  if (
+    !experiment.sha ||
+    ![undefined, ExperimentStatus.SUCCESS].includes(experiment.status)
+  ) {
+    return
+  }
+  experiment.pushed = remoteExpShas.has(experiment.sha)
+    ? PushedStatus.ON_REMOTE
+    : PushedStatus.NOT_ON_REMOTE
+}
+
 const collectRunningExperiment = (
   acc: ExperimentsAccumulator,
   experiment: Experiment
@@ -290,14 +306,8 @@ const collectExpRange = (
   }
 
   collectExecutorInfo(experiment, executor)
+  collectRemoteStatus(experiment, remoteExpShas)
   collectRunningExperiment(acc, experiment)
-
-  if (
-    experiment.sha &&
-    [undefined, ExperimentStatus.SUCCESS].includes(experiment.status)
-  ) {
-    experiment.pushed = remoteExpShas.has(experiment.sha)
-  }
 
   addToMapArray(acc.experimentsByCommit, baselineId, experiment)
 }

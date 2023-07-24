@@ -201,6 +201,15 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
+  public setPushing(ids: string[]) {
+    this.experiments.setPushing(ids)
+    return this.notifyChanged()
+  }
+
+  public unsetPushing(ids: string[]) {
+    this.experiments.unsetPushing(ids)
+  }
+
   public hasCheckpoints() {
     return this.experiments.hasCheckpoints()
   }

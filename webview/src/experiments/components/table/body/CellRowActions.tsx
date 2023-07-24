@@ -18,7 +18,6 @@ import {
 import { Icon } from '../../../../shared/components/Icon'
 
 export type CellRowActionsProps = {
-  depth: number
   isRowSelected: boolean
   plotColor?: string
   showSubRowStates: boolean
@@ -88,7 +87,6 @@ const ClickableTooltipContent: React.FC<ClickableTooltipContentProps> = ({
 )
 
 export const CellRowActions: React.FC<CellRowActionsProps> = ({
-  depth,
   plotColor,
   status,
   toggleExperiment,

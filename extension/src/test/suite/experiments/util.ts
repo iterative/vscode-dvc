@@ -25,6 +25,7 @@ export const DEFAULT_EXPERIMENTS_OUTPUT = {
   availableNbCommits: { main: 5 },
   expShow: expShowFixture,
   gitLog: gitLogFixture,
+  remoteExpRefs: '',
   rowOrder: rowOrderFixture
 }
 
@@ -34,6 +35,7 @@ export const buildExperiments = ({
   dvcRoot = dvcDemoPath,
   expShow = expShowFixture,
   gitLog = gitLogFixture,
+  remoteExpRefs = '',
   rowOrder = rowOrderFixture,
   stageList = 'train'
 }: {
@@ -42,6 +44,7 @@ export const buildExperiments = ({
   dvcRoot?: string
   expShow?: ExpShowOutput
   gitLog?: string
+  remoteExpRefs?: string
   rowOrder?: { branch: string; sha: string }[]
   stageList?: string | null
 }) => {
@@ -95,6 +98,7 @@ export const buildExperiments = ({
     availableNbCommits,
     expShow,
     gitLog,
+    remoteExpRefs,
     rowOrder
   })
 
