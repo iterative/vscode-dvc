@@ -1,4 +1,4 @@
-import React, { MouseEventHandler, ReactElement, ReactNode } from 'react'
+import React, { MouseEventHandler, ReactElement } from 'react'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
 import {
   ExperimentStatus,
@@ -68,7 +68,7 @@ const getTooltipContent = (determiner: boolean, action: string): string =>
 
 type ClickableTooltipContentProps = {
   clickableText: string
-  helperText: string | ReactNode
+  helperText: string
   onClick: MouseEventHandler
 }
 

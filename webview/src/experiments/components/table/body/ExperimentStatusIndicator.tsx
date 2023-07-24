@@ -35,7 +35,6 @@ export const ExperimentStatusIndicator: React.FC<
       >
         <div
           className={styles.upload}
-          data-testid="fun"
           {...clickAndEnterProps(() => pushExperiment(id))}
         >
           <Icon className={styles.cloudBox} icon={CloudUpload} />
@@ -47,7 +46,7 @@ export const ExperimentStatusIndicator: React.FC<
   if (gitRemoteStatus === GitRemoteStatus.ON_REMOTE) {
     return (
       <CellHintTooltip tooltipContent="Experiment on remote">
-        <div className={styles.upload} data-testid="fun1">
+        <div className={styles.upload}>
           <Icon icon={Cloud} />
         </div>
       </CellHintTooltip>

@@ -637,7 +637,7 @@ $badge-size: 0.85rem;
   font-size: 0.65rem;
 }
 
-.plotBox {
+%iconBox {
   background-color: $checkbox-background;
   border-radius: $checkbox-border-radius;
   border: $checkbox-border-width solid $checkbox-border;
@@ -645,17 +645,17 @@ $badge-size: 0.85rem;
   display: flex;
   height: $checkbox-size;
   width: $checkbox-size;
+}
+
+.plotBox {
+  @extend %iconBox;
+
   padding: 2px;
 }
 
 .cloudBox {
-  background-color: $checkbox-background;
-  border-radius: $checkbox-border-radius;
-  border: $checkbox-border-width solid $checkbox-border;
-  cursor: pointer;
-  display: flex;
-  height: $checkbox-size;
-  width: $checkbox-size;
+  @extend %iconBox;
+
   padding: 1px;
 }
 

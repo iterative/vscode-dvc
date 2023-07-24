@@ -54,10 +54,6 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     })
   }
 
-  protected collectFiles({ expShow }: { expShow: ExpShowOutput }) {
-    this.collectedFiles = collectFiles(expShow, this.collectedFiles)
-  }
-
   private async updateExpShow() {
     await this.updateBranches()
     const branches = this.experiments.getBranchesToShow()
@@ -129,6 +125,10 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     )
 
     this.experiments.setBranches(allBranches)
+  }
+
+  private collectFiles({ expShow }: { expShow: ExpShowOutput }) {
+    this.collectedFiles = collectFiles(expShow, this.collectedFiles)
   }
 
   private async watchExpGitRefs(): Promise<void> {
