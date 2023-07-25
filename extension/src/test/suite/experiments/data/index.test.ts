@@ -23,12 +23,12 @@ import {
   DEFAULT_CURRENT_BRANCH_COMMITS_TO_SHOW,
   ExperimentFlag
 } from '../../../../cli/dvc/constants'
-import { EXPERIMENTS_GIT_LOGS_REFS } from '../../../../experiments/data/constants'
 import { gitPath } from '../../../../cli/git/constants'
 import * as FileSystem from '../../../../fileSystem'
 import { ExperimentsModel } from '../../../../experiments/model'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 import expShowFixture from '../../../fixtures/expShow/base/output'
+import { isRemoteExperimentsOutput } from '../../../../data'
 
 const MOCK_WORKSPACE_GIT_FOLDER = join(dvcDemoPath, '.mock-git')
 
@@ -48,6 +48,17 @@ suite('Experiments Data Test Suite', () => {
     afterEach(() => {
       removeSync(MOCK_WORKSPACE_GIT_FOLDER)
     })
+
+    const getDataUpdatedEvent = (data: ExperimentsData) =>
+      new Promise(resolve =>
+        data.onDidUpdate(data => {
+          if (isRemoteExperimentsOutput(data)) {
+            return
+          }
+
+          resolve(undefined)
+        })
+      )
 
     it('should debounce all calls to update that are made within 200ms', async () => {
       const { data, mockExpShow } = buildExperimentsData(disposable)
@@ -98,6 +109,11 @@ suite('Experiments Data Test Suite', () => {
               if (command === AvailableCommands.EXP_SHOW) {
                 return Promise.resolve([{ rev: EXPERIMENT_WORKSPACE_ID }])
               }
+              if (
+                command === AvailableCommands.GIT_GET_REMOTE_EXPERIMENT_REFS
+              ) {
+                return Promise.resolve('')
+              }
             }
           } as unknown as InternalCommands,
           {
@@ -115,9 +131,7 @@ suite('Experiments Data Test Suite', () => {
       bypassProcessManagerDebounce(mockNow)
 
       const managedUpdateSpy = spy(data, 'managedUpdate')
-      const dataUpdatedEvent = new Promise(resolve =>
-        data.onDidUpdate(() => resolve(undefined))
-      )
+      const dataUpdatedEvent = getDataUpdatedEvent(data)
 
       await Watcher.fireWatcher(
         FileSystem.getGitPath(gitRoot, gitPath.DOT_GIT_HEAD)
@@ -134,14 +148,7 @@ suite('Experiments Data Test Suite', () => {
         MOCK_WORKSPACE_GIT_FOLDER,
         gitPath.DOT_GIT_HEAD
       )
-      const mockDotGitNestedFilePath = join(
-        MOCK_WORKSPACE_GIT_FOLDER,
-        EXPERIMENTS_GIT_LOGS_REFS,
-        'index'
-      )
-
       ensureFileSync(mockDotGitFilePath)
-      ensureFileSync(mockDotGitNestedFilePath)
 
       stub(FileSystem, 'getGitPath').returns(MOCK_WORKSPACE_GIT_FOLDER)
 
@@ -160,6 +167,11 @@ suite('Experiments Data Test Suite', () => {
               if (command === AvailableCommands.EXP_SHOW) {
                 return Promise.resolve([{ rev: EXPERIMENT_WORKSPACE_ID }])
               }
+              if (
+                command === AvailableCommands.GIT_GET_REMOTE_EXPERIMENT_REFS
+              ) {
+                return Promise.resolve('')
+              }
             }
           } as unknown as InternalCommands,
           {
@@ -177,16 +189,10 @@ suite('Experiments Data Test Suite', () => {
       bypassProcessManagerDebounce(mockNow)
 
       const managedUpdateSpy = spy(data, 'managedUpdate')
-      const dataUpdatedEvent = new Promise(resolve =>
-        data.onDidUpdate(() => resolve(undefined))
-      )
+
+      const dataUpdatedEvent = getDataUpdatedEvent(data)
 
       await Watcher.fireWatcher(mockDotGitFilePath)
-      await dataUpdatedEvent
-
-      expect(managedUpdateSpy).to.be.called
-
-      await Watcher.fireWatcher(mockDotGitNestedFilePath)
       await dataUpdatedEvent
 
       expect(managedUpdateSpy).to.be.called

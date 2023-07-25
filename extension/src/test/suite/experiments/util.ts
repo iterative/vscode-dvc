@@ -26,7 +26,6 @@ export const DEFAULT_EXPERIMENTS_OUTPUT = {
   availableNbCommits: { main: 5 },
   expShow: expShowFixture,
   gitLog: gitLogFixture,
-  remoteExpRefs: '',
   rowOrder: rowOrderFixture
 }
 
@@ -95,13 +94,15 @@ export const buildExperiments = ({
     )
   )
 
-  void experiments.setState({
-    availableNbCommits,
-    expShow,
-    gitLog,
-    remoteExpRefs,
-    rowOrder
-  })
+  void Promise.all([
+    experiments.setState({
+      availableNbCommits,
+      expShow,
+      gitLog,
+      rowOrder
+    }),
+    experiments.setState({ remoteExpRefs })
+  ])
 
   return {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any,

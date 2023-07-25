@@ -43,6 +43,7 @@ export class PlotsData extends BaseData<{
     )
     this.model = model
     this.onDidTrigger = this.triggered.event
+    this.waitForInitialData()
   }
 
   public async update(): Promise<void> {
