@@ -230,10 +230,16 @@ describe('App', () => {
             path: 'training/plots/images/misclassified.jpg',
             revisions: {
               ad2b5ec: {
-                errors: undefined,
                 id: 'ad2b5ec',
-                loading: true,
-                url: undefined
+                imgOrImgs: [
+                  {
+                    errors: undefined,
+                    id: 'ad2b5ec',
+                    loading: true,
+                    url: undefined
+                  }
+                ],
+                isMulti: false
               }
             }
           }
@@ -1375,7 +1381,8 @@ describe('App', () => {
     fireEvent.click(plot)
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: comparisonTableFixture.plots[0].revisions.workspace.url,
+      payload:
+        comparisonTableFixture.plots[0].revisions.workspace.imgOrImgs[0].url,
       type: MessageFromWebviewType.ZOOM_PLOT
     })
   })

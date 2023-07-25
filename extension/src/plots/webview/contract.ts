@@ -155,7 +155,7 @@ export type ComparisonPlotImg = {
   loading: boolean
   id: string
 }
-
+// TBD I don't think we need the id
 export type ComparisonPlot = {
   id: string
   imgOrImgs: ComparisonPlotImg[]

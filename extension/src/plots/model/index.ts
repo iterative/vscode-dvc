@@ -60,6 +60,11 @@ import { isDvcError } from '../../cli/dvc/reader'
 import { ErrorsModel } from '../errors/model'
 import { openFileInEditor, writeCsv, writeJson } from '../../fileSystem'
 import { Toast } from '../../vscode/toast'
+import { getParent, getPathArray } from '../../fileSystem/util'
+
+type ComparisonPlotsAcc = {
+  [pathLabel: string]: { path: string; revisions: ComparisonRevisionData }
+}
 
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
@@ -420,21 +425,31 @@ export class PlotsModel extends ModelWithPersistence {
     paths: string[],
     selectedRevisionIds: string[]
   ) {
-    const acc: ComparisonPlots = []
+    const acc: ComparisonPlotsAcc = {}
+
     for (const path of paths) {
       this.collectSelectedPathComparisonPlots(acc, path, selectedRevisionIds)
     }
-    return acc
+    // TBD need to sort images by path
+    return Object.values(acc)
   }
 
   private collectSelectedPathComparisonPlots(
-    acc: ComparisonPlots,
+    acc: ComparisonPlotsAcc,
     path: string,
     selectedRevisionIds: string[]
   ) {
-    const pathRevisions = {
-      path,
-      revisions: {} as ComparisonRevisionData
+    const MULTI_IMAGE_PATH_REG = /image[/\\|]\d+\.[a-z]+$/i
+    const isMulti = MULTI_IMAGE_PATH_REG.test(path)
+    const pathLabel = isMulti
+      ? (getParent(getPathArray(path), 0) as string)
+      : path
+
+    if (!acc[pathLabel]) {
+      acc[pathLabel] = {
+        path: pathLabel,
+        revisions: {}
+      }
     }
 
     for (const id of selectedRevisionIds) {
@@ -443,14 +458,22 @@ export class PlotsModel extends ModelWithPersistence {
       const fetched = this.fetchedRevs.has(id)
       const url = collectImageUrl(image, fetched)
       const loading = !fetched && !url
-      pathRevisions.revisions[id] = {
+
+      if (!acc[pathLabel].revisions[id]) {
+        acc[pathLabel].revisions[id] = {
+          id,
+          imgOrImgs: [],
+          isMulti
+        }
+      }
+
+      acc[pathLabel].revisions[id].imgOrImgs.push({
         errors,
         id,
         loading,
         url
-      }
+      })
     }
-    acc.push(pathRevisions)
   }
 
   private getSelectedTemplatePlots(

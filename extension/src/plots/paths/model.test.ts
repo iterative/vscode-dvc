@@ -6,7 +6,7 @@ import { buildMockMemento } from '../../test/util'
 import { PlotsType, TemplatePlotGroup } from '../webview/contract'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { ErrorsModel } from '../errors/model'
-import { REVISIONS } from '../../test/fixtures/plotsDiff'
+import { REVISIONS, getMultiImagePaths } from '../../test/fixtures/plotsDiff'
 
 describe('PathsModel', () => {
   const mockDvcRoot = 'test'
@@ -340,13 +340,15 @@ describe('PathsModel', () => {
     expect(model.getComparisonPaths()).toStrictEqual([
       join('plots', 'acc.png'),
       join('plots', 'heatmap.png'),
-      join('plots', 'loss.png')
+      join('plots', 'loss.png'),
+      ...getMultiImagePaths()
     ])
 
     const newOrder = [
       join('plots', 'heatmap.png'),
       join('plots', 'acc.png'),
-      join('plots', 'loss.png')
+      join('plots', 'loss.png'),
+      ...getMultiImagePaths()
     ]
 
     model.setComparisonPathsOrder(newOrder)

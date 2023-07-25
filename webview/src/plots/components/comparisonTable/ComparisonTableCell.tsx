@@ -1,13 +1,16 @@
-import React, { useState } from 'react'
+import React from 'react'
 import cx from 'classnames'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   ComparisonPlot,
   ComparisonPlotImg
 } from 'dvc/src/plots/webview/contract'
+import { setMultiPlotValue } from './comparisonTableSlice'
 import styles from './styles.module.scss'
 import { RefreshButton } from '../../../shared/components/button/RefreshButton'
 import { refreshRevisions, zoomPlot } from '../../util/messages'
 import { ErrorIcon } from '../../../shared/components/errorIcon/ErrorIcon'
+import { PlotsState } from '../../store'
 
 const MissingPlotTableCell: React.FC<{ plot: ComparisonPlotImg }> = ({
   plot
@@ -66,7 +69,11 @@ export const ComparisonTableCellMulti: React.FC<{
   path: string
   plot: ComparisonPlot
 }> = ({ path, plot }) => {
-  const [currentStep, setCurrentStep] = useState(0)
+  const multiValues = useSelector(
+    (state: PlotsState) => state.comparison.multiPlotValues
+  )
+  const dispatch = useDispatch()
+  const currentStep = multiValues[path] || 0
   const { loading, url, id } = plot.imgOrImgs[currentStep]
   const missing = !loading && !url
 
@@ -103,7 +110,9 @@ export const ComparisonTableCellMulti: React.FC<{
           value={currentStep}
           type="range"
           onChange={event => {
-            setCurrentStep(Number(event.target.value))
+            dispatch(
+              setMultiPlotValue({ path, value: Number(event.target.value) })
+            )
           }}
         />
         <p>{currentStep}</p>

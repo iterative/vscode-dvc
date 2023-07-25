@@ -5,7 +5,6 @@ import { userEvent, within } from '@storybook/testing-library'
 import React from 'react'
 import { Provider, useDispatch } from 'react-redux'
 import {
-  ComparisonPlotType,
   ComparisonRevisionData,
   DEFAULT_NB_ITEMS_PER_ROW,
   DEFAULT_PLOT_HEIGHT,

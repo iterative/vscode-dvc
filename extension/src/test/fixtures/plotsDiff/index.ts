@@ -482,6 +482,14 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
   ])
 })
 
+export const getMultiImagePaths = () => {
+  const paths = []
+  for (let i = 0; i < 15; i++) {
+    paths.push(join('plots', 'image', `${i}.jpg`))
+  }
+  return paths
+}
+
 export const getOutput = (baseUrl: string): PlotsOutput => ({
   data: {
     ...getImageData(baseUrl),
