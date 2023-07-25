@@ -17,15 +17,12 @@ const paramsYaml = 'params.yaml'
 const paramsYamlPath = buildMetricOrParamPath(ColumnType.PARAMS, paramsYaml)
 const epochsParamPath = appendColumnToPath(paramsYamlPath, 'epochs')
 const epochsParam = {
+  firstValueType: 'number',
   hasChildren: false,
   label: 'epochs',
-  maxNumber: 5,
-  maxStringLength: 1,
-  minNumber: 2,
   parentPath: paramsYamlPath,
   path: epochsParamPath,
-  type: ColumnType.PARAMS,
-  types: ['number']
+  type: ColumnType.PARAMS
 }
 
 const paramsYamlParam = {

@@ -4,7 +4,7 @@ import {
   ColumnAccumulator,
   limitAncestorDepth,
   mergeAncestors,
-  mergeValueColumn
+  collectColumn
 } from './util'
 import { ColumnType } from '../../webview/contract'
 import {
@@ -44,7 +44,7 @@ const collectMetricOrParam = (
     (...pathArray: string[]) => buildMetricOrParamPath(type, ...pathArray)
   )
 
-  mergeValueColumn(
+  collectColumn(
     acc,
     buildMetricOrParamPath(
       type,

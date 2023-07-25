@@ -74,12 +74,6 @@ export interface Commit extends Experiment {
   subRows?: Experiment[]
 }
 
-export interface ColumnAggregateData {
-  maxStringLength?: number
-  maxNumber?: number
-  minNumber?: number
-}
-
 export enum ColumnType {
   METRICS = 'metrics',
   PARAMS = 'params',
@@ -87,14 +81,14 @@ export enum ColumnType {
   TIMESTAMP = 'timestamp'
 }
 
-export interface Column extends ColumnAggregateData {
+export type Column = {
   hasChildren: boolean
   label: string
   parentPath?: string
   path: string
   pathArray?: string[]
   type: ColumnType
-  types?: string[]
+  firstValueType?: string
   width?: number
 }
 

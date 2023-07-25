@@ -22,37 +22,28 @@ const paramsYamlPath = buildMetricOrParamPath(ColumnType.PARAMS, paramsYaml)
 const epochsParamPath = appendColumnToPath(paramsYamlPath, 'epoch')
 
 const epochsParam = {
+  firstValueType: 'number',
   hasChildren: false,
   label: 'epochs',
-  maxNumber: 5,
-  maxStringLength: 1,
-  minNumber: 2,
   parentPath: paramsYamlPath,
   path: epochsParamPath,
-  type: ColumnType.PARAMS,
-  types: ['number']
+  type: ColumnType.PARAMS
 }
 const boolParam = {
+  firstValueType: 'boolean',
   hasChildren: false,
   label: 'bool',
-  maxNumber: 1,
-  maxStringLength: 1,
-  minNumber: 0,
   parentPath: paramsYamlPath,
   path: appendColumnToPath(paramsYamlPath, 'bool'),
-  type: ColumnType.PARAMS,
-  types: ['boolean']
+  type: ColumnType.PARAMS
 }
 const mixedParam = {
+  firstValueType: 'number',
   hasChildren: false,
   label: 'mixed',
-  maxNumber: 5,
-  maxStringLength: 44,
-  minNumber: 2,
   parentPath: paramsYamlPath,
   path: appendColumnToPath(paramsYamlPath, 'mixed'),
-  type: ColumnType.PARAMS,
-  types: ['number', 'string', 'boolean']
+  type: ColumnType.PARAMS
 }
 
 describe('pickFilterToAdd', () => {
@@ -77,13 +68,7 @@ describe('pickFilterToAdd', () => {
     mockedQuickPickValue.mockResolvedValueOnce(undefined)
     await pickFilterToAdd(params)
     expect(mockedQuickPickValue).toHaveBeenCalledWith(
-      OPERATORS.filter(
-        ({ types }) =>
-          !(
-            types.length === 1 &&
-            (types[0] as ColumnType) === ColumnType.TIMESTAMP
-          )
-      ),
+      OPERATORS.filter(({ types }) => types.includes('number')),
       {
         title: Title.SELECT_OPERATOR
       }

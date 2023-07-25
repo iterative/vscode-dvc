@@ -21,7 +21,6 @@ const data: Column[] = [
   {
     hasChildren: false,
     label: 'fit_time',
-    maxStringLength: 18,
     parentPath: buildMetricOrParamPath(
       ColumnType.METRICS,
       join('results', 'metrics.json')
@@ -37,14 +36,11 @@ const data: Column[] = [
       'fit_time'
     ],
     type: ColumnType.METRICS,
-    types: ['number'],
-    maxNumber: 0.6337410688400269,
-    minNumber: 0.6337410688400269
+    firstValueType: 'number'
   },
   {
     hasChildren: false,
     label: 'score_time',
-    maxStringLength: 19,
     parentPath: buildMetricOrParamPath(
       ColumnType.METRICS,
       join('results', 'metrics.json')
@@ -60,14 +56,11 @@ const data: Column[] = [
       'score_time'
     ],
     type: ColumnType.METRICS,
-    types: ['number'],
-    maxNumber: 0.07778854370117187,
-    minNumber: 0.07778854370117187
+    firstValueType: 'number'
   },
   {
     hasChildren: false,
     label: 'accuracy',
-    maxStringLength: 18,
     parentPath: buildMetricOrParamPath(
       ColumnType.METRICS,
       join('results', 'metrics.json')
@@ -83,14 +76,11 @@ const data: Column[] = [
       'accuracy'
     ],
     type: ColumnType.METRICS,
-    types: ['number'],
-    maxNumber: 0.8293632958801498,
-    minNumber: 0.8293632958801498
+    firstValueType: 'number'
   },
   {
     hasChildren: false,
     label: 'balanced_accuracy',
-    maxStringLength: 18,
     parentPath: buildMetricOrParamPath(
       ColumnType.METRICS,
       join('results', 'metrics.json')
@@ -106,14 +96,11 @@ const data: Column[] = [
       'balanced_accuracy'
     ],
     type: ColumnType.METRICS,
-    types: ['number'],
-    maxNumber: 0.8040020654726536,
-    minNumber: 0.8040020654726536
+    firstValueType: 'number'
   },
   {
     hasChildren: false,
     label: 'f1',
-    maxStringLength: 18,
     parentPath: buildMetricOrParamPath(
       ColumnType.METRICS,
       join('results', 'metrics.json')
@@ -125,14 +112,11 @@ const data: Column[] = [
     ),
     pathArray: [ColumnType.METRICS, join('results', 'metrics.json'), 'f1'],
     type: ColumnType.METRICS,
-    types: ['number'],
-    maxNumber: 0.7572265847252886,
-    minNumber: 0.7572265847252886
+    firstValueType: 'number'
   },
   {
     hasChildren: false,
     label: 'gmpr',
-    maxStringLength: 18,
     parentPath: buildMetricOrParamPath(
       ColumnType.METRICS,
       join('results', 'metrics.json')
@@ -144,14 +128,11 @@ const data: Column[] = [
     ),
     pathArray: [ColumnType.METRICS, join('results', 'metrics.json'), 'gmpr'],
     type: ColumnType.METRICS,
-    types: ['number'],
-    maxNumber: 0.7615174102573903,
-    minNumber: 0.7615174102573903
+    firstValueType: 'number'
   },
   {
     hasChildren: false,
     label: 'jaccard',
-    maxStringLength: 18,
     parentPath: buildMetricOrParamPath(
       ColumnType.METRICS,
       join('results', 'metrics.json')
@@ -163,14 +144,11 @@ const data: Column[] = [
     ),
     pathArray: [ColumnType.METRICS, join('results', 'metrics.json'), 'jaccard'],
     type: ColumnType.METRICS,
-    types: ['number'],
-    maxNumber: 0.6113136909663465,
-    minNumber: 0.6113136909663465
+    firstValueType: 'number'
   },
   {
     hasChildren: false,
     label: 'precision',
-    maxStringLength: 18,
     parentPath: buildMetricOrParamPath(
       ColumnType.METRICS,
       join('results', 'metrics.json')
@@ -186,14 +164,11 @@ const data: Column[] = [
       'precision'
     ],
     type: ColumnType.METRICS,
-    types: ['number'],
-    maxNumber: 0.8361572183378356,
-    minNumber: 0.8361572183378356
+    firstValueType: 'number'
   },
   {
     hasChildren: false,
     label: 'recall',
-    maxStringLength: 17,
     parentPath: buildMetricOrParamPath(
       ColumnType.METRICS,
       join('results', 'metrics.json')
@@ -205,14 +180,11 @@ const data: Column[] = [
     ),
     pathArray: [ColumnType.METRICS, join('results', 'metrics.json'), 'recall'],
     type: ColumnType.METRICS,
-    types: ['number'],
-    maxNumber: 0.695546218487395,
-    minNumber: 0.695546218487395
+    firstValueType: 'number'
   },
   {
     hasChildren: false,
     label: 'roc_auc',
-    maxStringLength: 18,
     parentPath: buildMetricOrParamPath(
       ColumnType.METRICS,
       join('results', 'metrics.json')
@@ -224,9 +196,7 @@ const data: Column[] = [
     ),
     pathArray: [ColumnType.METRICS, join('results', 'metrics.json'), 'roc_auc'],
     type: ColumnType.METRICS,
-    types: ['number'],
-    maxNumber: 0.8703211951447246,
-    minNumber: 0.8703211951447246
+    firstValueType: 'number'
   },
   {
     hasChildren: true,
@@ -238,7 +208,6 @@ const data: Column[] = [
   {
     hasChildren: false,
     label: 'classifier',
-    maxStringLength: 13,
     parentPath: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
     path: buildMetricOrParamPath(
       ColumnType.PARAMS,
@@ -247,17 +216,16 @@ const data: Column[] = [
     ),
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'classifier'],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'drop_cols',
-    maxStringLength: 17,
     parentPath: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
     path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'drop_cols'),
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'drop_cols'],
     type: ColumnType.PARAMS,
-    types: ['array']
+    firstValueType: 'array'
   },
   {
     hasChildren: true,
@@ -269,7 +237,6 @@ const data: Column[] = [
   {
     hasChildren: false,
     label: 'Age',
-    maxStringLength: 5,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -283,12 +250,11 @@ const data: Column[] = [
     ),
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'dtypes', 'Age'],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'Embarked',
-    maxStringLength: 8,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -302,12 +268,11 @@ const data: Column[] = [
     ),
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'dtypes', 'Embarked'],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'Fare',
-    maxStringLength: 5,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -321,12 +286,11 @@ const data: Column[] = [
     ),
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'dtypes', 'Fare'],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'Parch',
-    maxStringLength: 3,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -340,12 +304,11 @@ const data: Column[] = [
     ),
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'dtypes', 'Parch'],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'Pclass',
-    maxStringLength: 8,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -359,12 +322,11 @@ const data: Column[] = [
     ),
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'dtypes', 'Pclass'],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'Sex',
-    maxStringLength: 8,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -378,12 +340,11 @@ const data: Column[] = [
     ),
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'dtypes', 'Sex'],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'SibSp',
-    maxStringLength: 3,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -397,12 +358,11 @@ const data: Column[] = [
     ),
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'dtypes', 'SibSp'],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'Survived',
-    maxStringLength: 8,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -416,7 +376,7 @@ const data: Column[] = [
     ),
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'dtypes', 'Survived'],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: true,
@@ -432,7 +392,6 @@ const data: Column[] = [
   {
     hasChildren: false,
     label: 'featurize',
-    maxStringLength: 4,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -446,7 +405,7 @@ const data: Column[] = [
     ),
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'feature_eng', 'featurize'],
     type: ColumnType.PARAMS,
-    types: ['boolean']
+    firstValueType: 'boolean'
   },
   {
     hasChildren: true,
@@ -462,7 +421,6 @@ const data: Column[] = [
   {
     hasChildren: false,
     label: 'Age',
-    maxStringLength: 7,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -476,14 +434,11 @@ const data: Column[] = [
     ),
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'imputation', 'Age'],
     type: ColumnType.PARAMS,
-    types: ['number'],
-    maxNumber: 29.6991,
-    minNumber: 29.6991
+    firstValueType: 'number'
   },
   {
     hasChildren: false,
     label: 'Fare',
-    maxStringLength: 7,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -497,14 +452,11 @@ const data: Column[] = [
     ),
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'imputation', 'Fare'],
     type: ColumnType.PARAMS,
-    types: ['number'],
-    maxNumber: 32.2042,
-    minNumber: 32.2042
+    firstValueType: 'number'
   },
   {
     hasChildren: false,
     label: 'method',
-    maxStringLength: 4,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -518,7 +470,7 @@ const data: Column[] = [
     ),
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'imputation', 'method'],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: true,
@@ -534,7 +486,6 @@ const data: Column[] = [
   {
     hasChildren: false,
     label: 'logistic_regression',
-    maxStringLength: 4,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -553,12 +504,11 @@ const data: Column[] = [
       'logistic_regression'
     ],
     type: ColumnType.PARAMS,
-    types: ['null']
+    firstValueType: 'null'
   },
   {
     hasChildren: false,
     label: 'naive_bayes',
-    maxStringLength: 4,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -577,12 +527,11 @@ const data: Column[] = [
       'naive_bayes'
     ],
     type: ColumnType.PARAMS,
-    types: ['null']
+    firstValueType: 'null'
   },
   {
     hasChildren: false,
     label: 'neural_network',
-    maxStringLength: 4,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -601,7 +550,7 @@ const data: Column[] = [
       'neural_network'
     ],
     type: ColumnType.PARAMS,
-    types: ['null']
+    firstValueType: 'null'
   },
   {
     hasChildren: true,
@@ -622,7 +571,6 @@ const data: Column[] = [
   {
     hasChildren: false,
     label: 'criterion',
-    maxStringLength: 4,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -644,12 +592,11 @@ const data: Column[] = [
       'criterion'
     ],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'max_depth',
-    maxStringLength: 2,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -671,14 +618,11 @@ const data: Column[] = [
       'max_depth'
     ],
     type: ColumnType.PARAMS,
-    types: ['number'],
-    maxNumber: 15,
-    minNumber: 15
+    firstValueType: 'number'
   },
   {
     hasChildren: false,
     label: 'max_features',
-    maxStringLength: 4,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -700,12 +644,11 @@ const data: Column[] = [
       'max_features'
     ],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'min_samples_leaf',
-    maxStringLength: 1,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -727,14 +670,11 @@ const data: Column[] = [
       'min_samples_leaf'
     ],
     type: ColumnType.PARAMS,
-    types: ['number'],
-    maxNumber: 6,
-    minNumber: 6
+    firstValueType: 'number'
   },
   {
     hasChildren: false,
     label: 'min_samples_split',
-    maxStringLength: 1,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -756,14 +696,11 @@ const data: Column[] = [
       'min_samples_split'
     ],
     type: ColumnType.PARAMS,
-    types: ['number'],
-    maxNumber: 9,
-    minNumber: 9
+    firstValueType: 'number'
   },
   {
     hasChildren: false,
     label: 'n_estimators',
-    maxStringLength: 3,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -785,14 +722,11 @@ const data: Column[] = [
       'n_estimators'
     ],
     type: ColumnType.PARAMS,
-    types: ['number'],
-    maxNumber: 460,
-    minNumber: 460
+    firstValueType: 'number'
   },
   {
     hasChildren: false,
     label: 'support_vector_machine',
-    maxStringLength: 4,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -811,12 +745,11 @@ const data: Column[] = [
       'support_vector_machine'
     ],
     type: ColumnType.PARAMS,
-    types: ['null']
+    firstValueType: 'null'
   },
   {
     hasChildren: false,
     label: 'xgboost',
-    maxStringLength: 4,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -830,17 +763,16 @@ const data: Column[] = [
     ),
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'model_params', 'xgboost'],
     type: ColumnType.PARAMS,
-    types: ['null']
+    firstValueType: 'null'
   },
   {
     hasChildren: false,
     label: 'normalize',
-    maxStringLength: 4,
     parentPath: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
     path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'normalize'),
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'normalize'],
     type: ColumnType.PARAMS,
-    types: ['null']
+    firstValueType: 'null'
   },
   {
     hasChildren: true,
@@ -856,7 +788,6 @@ const data: Column[] = [
   {
     hasChildren: false,
     label: 'logistic_regression',
-    maxStringLength: 4,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -875,12 +806,11 @@ const data: Column[] = [
       'logistic_regression'
     ],
     type: ColumnType.PARAMS,
-    types: ['null']
+    firstValueType: 'null'
   },
   {
     hasChildren: false,
     label: 'naive_bayes',
-    maxStringLength: 4,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -899,12 +829,11 @@ const data: Column[] = [
       'naive_bayes'
     ],
     type: ColumnType.PARAMS,
-    types: ['null']
+    firstValueType: 'null'
   },
   {
     hasChildren: false,
     label: 'neural_network',
-    maxStringLength: 4,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -923,12 +852,11 @@ const data: Column[] = [
       'neural_network'
     ],
     type: ColumnType.PARAMS,
-    types: ['null']
+    firstValueType: 'null'
   },
   {
     hasChildren: false,
     label: 'num_eval',
-    maxStringLength: 3,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -942,9 +870,7 @@ const data: Column[] = [
     ),
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'param_tuning', 'num_eval'],
     type: ColumnType.PARAMS,
-    types: ['number'],
-    maxNumber: 100,
-    minNumber: 100
+    firstValueType: 'number'
   },
   {
     hasChildren: true,
@@ -965,7 +891,6 @@ const data: Column[] = [
   {
     hasChildren: false,
     label: 'criterion',
-    maxStringLength: 4,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -987,12 +912,11 @@ const data: Column[] = [
       'criterion'
     ],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'max_depth',
-    maxStringLength: 2,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -1014,14 +938,11 @@ const data: Column[] = [
       'max_depth'
     ],
     type: ColumnType.PARAMS,
-    types: ['number'],
-    maxNumber: 15,
-    minNumber: 15
+    firstValueType: 'number'
   },
   {
     hasChildren: false,
     label: 'max_features',
-    maxStringLength: 4,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -1043,12 +964,11 @@ const data: Column[] = [
       'max_features'
     ],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'min_samples_leaf',
-    maxStringLength: 1,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -1070,14 +990,11 @@ const data: Column[] = [
       'min_samples_leaf'
     ],
     type: ColumnType.PARAMS,
-    types: ['number'],
-    maxNumber: 6,
-    minNumber: 6
+    firstValueType: 'number'
   },
   {
     hasChildren: false,
     label: 'min_samples_split',
-    maxStringLength: 1,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -1099,14 +1016,11 @@ const data: Column[] = [
       'min_samples_split'
     ],
     type: ColumnType.PARAMS,
-    types: ['number'],
-    maxNumber: 9,
-    minNumber: 9
+    firstValueType: 'number'
   },
   {
     hasChildren: false,
     label: 'n_estimators',
-    maxStringLength: 3,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -1128,14 +1042,11 @@ const data: Column[] = [
       'n_estimators'
     ],
     type: ColumnType.PARAMS,
-    types: ['number'],
-    maxNumber: 460,
-    minNumber: 460
+    firstValueType: 'number'
   },
   {
     hasChildren: false,
     label: 'scoring',
-    maxStringLength: 8,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -1149,12 +1060,11 @@ const data: Column[] = [
     ),
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'param_tuning', 'scoring'],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'support_vector_machine',
-    maxStringLength: 4,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -1173,7 +1083,7 @@ const data: Column[] = [
       'support_vector_machine'
     ],
     type: ColumnType.PARAMS,
-    types: ['null']
+    firstValueType: 'null'
   },
   {
     hasChildren: true,
@@ -1185,7 +1095,6 @@ const data: Column[] = [
   {
     hasChildren: false,
     label: 'js_estimator',
-    maxStringLength: 4,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -1199,12 +1108,11 @@ const data: Column[] = [
     ),
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'predict', 'js_estimator'],
     type: ColumnType.PARAMS,
-    types: ['boolean']
+    firstValueType: 'boolean'
   },
   {
     hasChildren: false,
     label: 'random_seed',
-    maxStringLength: 5,
     parentPath: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
     path: buildMetricOrParamPath(
       ColumnType.PARAMS,
@@ -1213,9 +1121,7 @@ const data: Column[] = [
     ),
     pathArray: [ColumnType.PARAMS, 'params.yaml', 'random_seed'],
     type: ColumnType.PARAMS,
-    types: ['number'],
-    maxNumber: 12345,
-    minNumber: 12345
+    firstValueType: 'number'
   },
   {
     hasChildren: true,
@@ -1231,7 +1137,6 @@ const data: Column[] = [
   {
     hasChildren: false,
     label: 'n_split',
-    maxStringLength: 2,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -1250,14 +1155,11 @@ const data: Column[] = [
       'n_split'
     ],
     type: ColumnType.PARAMS,
-    types: ['number'],
-    maxNumber: 10,
-    minNumber: 10
+    firstValueType: 'number'
   },
   {
     hasChildren: false,
     label: 'shuffle',
-    maxStringLength: 4,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -1276,12 +1178,11 @@ const data: Column[] = [
       'shuffle'
     ],
     type: ColumnType.PARAMS,
-    types: ['boolean']
+    firstValueType: 'boolean'
   },
   {
     hasChildren: false,
     label: 'target_class',
-    maxStringLength: 8,
     parentPath: buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -1300,7 +1201,7 @@ const data: Column[] = [
       'target_class'
     ],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: true,
@@ -1319,12 +1220,11 @@ const data: Column[] = [
   {
     hasChildren: false,
     label: 'make_dataset.py',
-    maxStringLength: 7,
     parentPath: buildDepPath('src', 'data'),
     path: buildDepPath('src', 'data', 'make_dataset.py'),
     pathArray: [ColumnType.DEPS, join('src', 'data', 'make_dataset.py')],
     type: ColumnType.DEPS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: true,
@@ -1343,32 +1243,29 @@ const data: Column[] = [
   {
     hasChildren: false,
     label: 'test.csv',
-    maxStringLength: 7,
     parentPath: buildDepPath('data', 'raw'),
     path: buildDepPath('data', 'raw', 'test.csv'),
     pathArray: [ColumnType.DEPS, join('data', 'raw', 'test.csv')],
     type: ColumnType.DEPS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'train.csv',
-    maxStringLength: 7,
     parentPath: buildDepPath('data', 'raw'),
     path: buildDepPath('data', 'raw', 'train.csv'),
     pathArray: [ColumnType.DEPS, join('data', 'raw', 'train.csv')],
     type: ColumnType.DEPS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'encode_labels.py',
-    maxStringLength: 7,
     parentPath: buildDepPath('src', 'data'),
     path: buildDepPath('src', 'data', 'encode_labels.py'),
     pathArray: [ColumnType.DEPS, join('src', 'data', 'encode_labels.py')],
     type: ColumnType.DEPS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: true,
@@ -1380,7 +1277,6 @@ const data: Column[] = [
   {
     hasChildren: false,
     label: 'test_categorized.csv',
-    maxStringLength: 7,
     parentPath: buildDepPath('data', 'interim'),
     path: buildDepPath('data', 'interim', 'test_categorized.csv'),
     pathArray: [
@@ -1388,12 +1284,11 @@ const data: Column[] = [
       join('data', 'interim', 'test_categorized.csv')
     ],
     type: ColumnType.DEPS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'train_categorized.csv',
-    maxStringLength: 7,
     parentPath: buildDepPath('data', 'interim'),
     path: buildDepPath('data', 'interim', 'train_categorized.csv'),
     pathArray: [
@@ -1401,22 +1296,20 @@ const data: Column[] = [
       join('data', 'interim', 'train_categorized.csv')
     ],
     type: ColumnType.DEPS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'replace_nan.py',
-    maxStringLength: 7,
     parentPath: buildDepPath('src', 'data'),
     path: buildDepPath('src', 'data', 'replace_nan.py'),
     pathArray: [ColumnType.DEPS, join('src', 'data', 'replace_nan.py')],
     type: ColumnType.DEPS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'test_nan_imputed.csv',
-    maxStringLength: 7,
     parentPath: buildDepPath('data', 'interim'),
     path: buildDepPath('data', 'interim', 'test_nan_imputed.csv'),
     pathArray: [
@@ -1424,12 +1317,11 @@ const data: Column[] = [
       join('data', 'interim', 'test_nan_imputed.csv')
     ],
     type: ColumnType.DEPS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'train_nan_imputed.csv',
-    maxStringLength: 7,
     parentPath: buildDepPath('data', 'interim'),
     path: buildDepPath('data', 'interim', 'train_nan_imputed.csv'),
     pathArray: [
@@ -1437,7 +1329,7 @@ const data: Column[] = [
       join('data', 'interim', 'train_nan_imputed.csv')
     ],
     type: ColumnType.DEPS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: true,
@@ -1449,17 +1341,15 @@ const data: Column[] = [
   {
     hasChildren: false,
     label: 'build_features.py',
-    maxStringLength: 7,
     parentPath: buildDepPath('src', 'features'),
     path: buildDepPath('src', 'features', 'build_features.py'),
     pathArray: [ColumnType.DEPS, join('src', 'features', 'build_features.py')],
     type: ColumnType.DEPS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'test_featurized.csv',
-    maxStringLength: 7,
     parentPath: buildDepPath('data', 'interim'),
     path: buildDepPath('data', 'interim', 'test_featurized.csv'),
     pathArray: [
@@ -1467,12 +1357,11 @@ const data: Column[] = [
       join('data', 'interim', 'test_featurized.csv')
     ],
     type: ColumnType.DEPS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'train_featurized.csv',
-    maxStringLength: 7,
     parentPath: buildDepPath('data', 'interim'),
     path: buildDepPath('data', 'interim', 'train_featurized.csv'),
     pathArray: [
@@ -1480,17 +1369,16 @@ const data: Column[] = [
       join('data', 'interim', 'train_featurized.csv')
     ],
     type: ColumnType.DEPS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'normalize.py',
-    maxStringLength: 7,
     parentPath: buildDepPath('src', 'features'),
     path: buildDepPath('src', 'features', 'normalize.py'),
     pathArray: [ColumnType.DEPS, join('src', 'features', 'normalize.py')],
     type: ColumnType.DEPS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: true,
@@ -1502,7 +1390,6 @@ const data: Column[] = [
   {
     hasChildren: false,
     label: 'train_processed.csv',
-    maxStringLength: 7,
     parentPath: buildDepPath('data', 'processed'),
     path: buildDepPath('data', 'processed', 'train_processed.csv'),
     pathArray: [
@@ -1510,22 +1397,20 @@ const data: Column[] = [
       join('data', 'processed', 'train_processed.csv')
     ],
     type: ColumnType.DEPS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'split_train_dev.py',
-    maxStringLength: 7,
     parentPath: buildDepPath('src', 'data'),
     path: buildDepPath('src', 'data', 'split_train_dev.py'),
     pathArray: [ColumnType.DEPS, join('src', 'data', 'split_train_dev.py')],
     type: ColumnType.DEPS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'split_train_dev.csv',
-    maxStringLength: 7,
     parentPath: buildDepPath('data', 'processed'),
     path: buildDepPath('data', 'processed', 'split_train_dev.csv'),
     pathArray: [
@@ -1533,7 +1418,7 @@ const data: Column[] = [
       join('data', 'processed', 'split_train_dev.csv')
     ],
     type: ColumnType.DEPS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: true,
@@ -1545,17 +1430,15 @@ const data: Column[] = [
   {
     hasChildren: false,
     label: 'train_model.py',
-    maxStringLength: 7,
     parentPath: buildDepPath('src', 'models'),
     path: buildDepPath('src', 'models', 'train_model.py'),
     pathArray: [ColumnType.DEPS, join('src', 'models', 'train_model.py')],
     type: ColumnType.DEPS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'test_processed.csv',
-    maxStringLength: 7,
     parentPath: buildDepPath('data', 'processed'),
     path: buildDepPath('data', 'processed', 'test_processed.csv'),
     pathArray: [
@@ -1563,7 +1446,7 @@ const data: Column[] = [
       join('data', 'processed', 'test_processed.csv')
     ],
     type: ColumnType.DEPS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: true,
@@ -1575,32 +1458,29 @@ const data: Column[] = [
   {
     hasChildren: false,
     label: 'estimator.pkl',
-    maxStringLength: 7,
     parentPath: buildDepPath('models'),
     path: buildDepPath('models', 'estimator.pkl'),
     pathArray: [ColumnType.DEPS, join('models', 'estimator.pkl')],
     type: ColumnType.DEPS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'metrics.py',
-    maxStringLength: 7,
     parentPath: buildDepPath('src', 'models'),
     path: buildDepPath('src', 'models', 'metrics.py'),
     pathArray: [ColumnType.DEPS, join('src', 'models', 'metrics.py')],
     type: ColumnType.DEPS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'predict.py',
-    maxStringLength: 7,
     parentPath: buildDepPath('src', 'models'),
     path: buildDepPath('src', 'models', 'predict.py'),
     pathArray: [ColumnType.DEPS, join('src', 'models', 'predict.py')],
     type: ColumnType.DEPS,
-    types: ['string']
+    firstValueType: 'string'
   }
 ]
 

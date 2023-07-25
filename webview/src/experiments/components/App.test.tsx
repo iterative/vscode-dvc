@@ -472,9 +472,6 @@ describe('App', () => {
         {
           hasChildren: false,
           label: 'loss',
-          maxNumber: testMetricNumberValue,
-          maxStringLength: 18,
-          minNumber: testMetricNumberValue,
           parentPath: buildMetricOrParamPath(
             ColumnType.METRICS,
             'summary.json'
@@ -498,7 +495,6 @@ describe('App', () => {
         {
           hasChildren: false,
           label: testParamName,
-          maxStringLength: 10,
           parentPath: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
           path: testParamPath,
           pathArray: [ColumnType.PARAMS, 'params.yaml', testParamName],

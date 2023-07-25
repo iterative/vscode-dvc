@@ -203,14 +203,13 @@ describe('ColumnsModel', () => {
           type: ColumnType.PARAMS
         },
         {
+          firstValueType: 'boolean',
           hasChildren: false,
           label: 'testParam',
-          maxStringLength: 4,
           parentPath: paramsDotYamlPath,
           path: testParamPath,
           pathArray: [ColumnType.PARAMS, 'params.yaml', 'testParam'],
-          type: ColumnType.PARAMS,
-          types: ['boolean']
+          type: ColumnType.PARAMS
         }
       ])
     })
