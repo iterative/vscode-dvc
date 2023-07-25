@@ -6,6 +6,7 @@ import {
   collectBranches,
   collectExperiments,
   collectOrderedCommitsAndExperiments,
+  collectRemoteExpShas,
   collectRunningInQueue,
   collectRunningInWorkspace
 } from './collect'
@@ -75,6 +76,7 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   private filters: Map<string, FilterDefinition> = new Map()
 
+  private remoteExpShas?: Set<string>
   private pushing = new Set<string>()
 
   private currentSorts: SortDefinition[]
@@ -123,13 +125,12 @@ export class ExperimentsModel extends ModelWithPersistence {
     )
   }
 
-  public transformAndSet(
+  public transformAndSetLocal(
     expShow: ExpShowOutput,
     gitLog: string,
     dvcLiveOnly: boolean,
     rowOrder: { branch: string; sha: string }[],
-    availableNbCommits: { [branch: string]: number },
-    remoteExpRefs: string
+    availableNbCommits: { [branch: string]: number }
   ) {
     const {
       cliError,
@@ -138,7 +139,7 @@ export class ExperimentsModel extends ModelWithPersistence {
       hasCheckpoints,
       runningExperiments,
       workspace
-    } = collectExperiments(expShow, gitLog, dvcLiveOnly, remoteExpRefs)
+    } = collectExperiments(expShow, gitLog, dvcLiveOnly)
 
     const { hasMoreCommits, isShowingMoreCommits } =
       collectAddRemoveCommitsDetails(availableNbCommits, (branch: string) =>
@@ -162,6 +163,11 @@ export class ExperimentsModel extends ModelWithPersistence {
       return
     }
     this.setColoredStatus(runningExperiments)
+  }
+
+  public transformAndSetRemote(remoteExpRefs: string) {
+    const remoteExpShas = collectRemoteExpShas(remoteExpRefs)
+    this.remoteExpShas = remoteExpShas
   }
 
   public toggleStars(ids: string[]) {
@@ -537,11 +543,7 @@ export class ExperimentsModel extends ModelWithPersistence {
           branch: commit.branch
         }
 
-        if (experiment.gitRemoteStatus !== undefined) {
-          experiment.gitRemoteStatus = this.pushing.has(originalExperiment.id)
-            ? GitRemoteStatus.PUSHING
-            : originalExperiment.gitRemoteStatus
-        }
+        this.addRemoteStatus(experiment)
 
         return experiment
       })
@@ -549,6 +551,24 @@ export class ExperimentsModel extends ModelWithPersistence {
       return
     }
     return sortExperiments(this.getSorts(), experiments)
+  }
+
+  private addRemoteStatus(experiment: Experiment) {
+    if (
+      this.remoteExpShas === undefined ||
+      !experiment.sha ||
+      ![undefined, ExperimentStatus.SUCCESS].includes(experiment.status)
+    ) {
+      return
+    }
+    if (this.pushing.has(experiment.id)) {
+      experiment.gitRemoteStatus = GitRemoteStatus.PUSHING
+      return
+    }
+
+    experiment.gitRemoteStatus = this.remoteExpShas.has(experiment.sha)
+      ? GitRemoteStatus.ON_REMOTE
+      : GitRemoteStatus.NOT_ON_REMOTE
   }
 
   private setColoredStatus(runningExperiments: RunningExperiment[]) {

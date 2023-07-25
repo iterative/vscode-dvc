@@ -141,7 +141,6 @@ suite('Plots Test Suite', () => {
         availableNbCommits: { main: 6 },
         expShow: updatedExpShowFixture as ExpShowOutput,
         gitLog: newCommit + COMMITS_SEPARATOR + gitLogFixture,
-        remoteExpRefs: '',
         rowOrder: [{ branch: 'main', sha: newCommit }, ...rowOrderFixture]
       })
 

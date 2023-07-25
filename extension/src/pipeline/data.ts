@@ -24,6 +24,7 @@ export class PipelineData extends BaseData<{
     )
 
     this.subProjects = subProjects
+    this.waitForInitialData()
   }
 
   public managedUpdate() {
