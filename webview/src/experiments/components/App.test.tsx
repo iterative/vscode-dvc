@@ -1956,4 +1956,28 @@ describe('App', () => {
       })
     })
   })
+
+  describe('Experiment git remote status indicator', () => {
+    it('should not allow pushing an experiment when an experiment is running in the workspace', () => {
+      renderTable()
+
+      fireEvent.click(screen.getByTestId('exp-f13bca-push-experiment'))
+
+      expect(mockPostMessage).not.toHaveBeenCalledWith({
+        payload: ['exp-f13bca'],
+        type: MessageFromWebviewType.PUSH_EXPERIMENT
+      })
+    })
+
+    it('should allow pushing an experiment when an experiment is not running in the workspace', () => {
+      renderTableWithoutRunningExperiments()
+
+      fireEvent.click(screen.getByTestId('exp-f13bca-push-experiment'))
+
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: ['exp-f13bca'],
+        type: MessageFromWebviewType.PUSH_EXPERIMENT
+      })
+    })
+  })
 })
