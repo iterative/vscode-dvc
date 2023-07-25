@@ -41,29 +41,28 @@ const DEFAULT_DATA: [
   string,
   boolean,
   { branch: string; sha: string }[],
-  { [branch: string]: number },
-  string
-] = ['', false, [], { main: 2000 }, '']
+  { [branch: string]: number }
+] = ['', false, [], { main: 2000 }]
 
 type TransformAndSetInputs = [ExpShowOutput, ...typeof DEFAULT_DATA]
 
 describe('ExperimentsModel', () => {
   it('should return the expected rows when given the base fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(
+    model.transformAndSetLocal(
       outputFixture,
       gitLogFixture,
       false,
       rowOrderFixture,
-      { main: 6 },
-      remoteExpRefsFixture
+      { main: 6 }
     )
+    model.transformAndSetRemote(remoteExpRefsFixture)
     expect(model.getRowData()).toStrictEqual(rowsFixture)
   })
 
   it('should return the expected rows when given the survival fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(
+    model.transformAndSetLocal(
       survivalOutputFixture,
       '',
       false,
@@ -72,8 +71,7 @@ describe('ExperimentsModel', () => {
         { branch: 'main', sha: 'a49e03966a1f9f1299ec222ebc4bed8625d2c54d' },
         { branch: 'main', sha: '4f7b50c3d171a11b6cfcd04416a16fc80b61018d' }
       ],
-      { main: 700 },
-      ''
+      { main: 700 }
     )
     expect(model.getRowData()).toStrictEqual(
       expect.objectContaining(survivalRowsFixture)
@@ -109,13 +107,13 @@ describe('ExperimentsModel', () => {
       }
     )
 
-    model.transformAndSet(dvcLiveOnly, '', true, [], { main: 2000 }, '')
+    model.transformAndSetLocal(dvcLiveOnly, '', true, [], { main: 2000 })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const runningWorkspace = (model as any).workspace
     expect(runningWorkspace?.executor).toStrictEqual(EXPERIMENT_WORKSPACE_ID)
     expect(runningWorkspace?.status).toStrictEqual(ExperimentStatus.RUNNING)
 
-    model.transformAndSet(dvcLiveOnly, ...DEFAULT_DATA)
+    model.transformAndSetLocal(dvcLiveOnly, ...DEFAULT_DATA)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const stoppedWorkspace = (model as any).workspace
     expect(stoppedWorkspace?.executor).toBeFalsy()
@@ -174,7 +172,7 @@ describe('ExperimentsModel', () => {
       }
     )
 
-    model.transformAndSet(data, ...DEFAULT_DATA)
+    model.transformAndSetLocal(data, ...DEFAULT_DATA)
 
     const experiments = model.getCombinedList()
 
@@ -193,20 +191,19 @@ describe('ExperimentsModel', () => {
 
   it('should handle deps have all null properties (never been committed)', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(uncommittedDepsFixture, ...DEFAULT_DATA)
+    model.transformAndSetLocal(uncommittedDepsFixture, ...DEFAULT_DATA)
     const [workspace] = model.getWorkspaceAndCommits()
     expect(workspace.deps).toStrictEqual({})
   })
 
   it('should return the expected rows when given the deeply nested output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(
+    model.transformAndSetLocal(
       deeplyNestedOutputFixture,
       '',
       false,
       [{ branch: 'main', sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77' }],
-      { main: 10 },
-      ''
+      { main: 10 }
     )
     expect(model.getRowData()).toStrictEqual(
       expect.objectContaining(deeplyNestedRowsFixture)
@@ -215,13 +212,12 @@ describe('ExperimentsModel', () => {
 
   it('should return the expected rows when given the data types output fixture', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(
+    model.transformAndSetLocal(
       dataTypesOutputFixture,
       '',
       false,
       [{ branch: 'main', sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77' }],
-      { main: 10 },
-      ''
+      { main: 10 }
     )
     expect(model.getRowData()).toStrictEqual(
       expect.objectContaining(dataTypesRowsFixture)
@@ -257,7 +253,7 @@ describe('ExperimentsModel', () => {
       ]
     })
 
-    experimentsModel.transformAndSet(data, ...DEFAULT_DATA)
+    experimentsModel.transformAndSetLocal(data, ...DEFAULT_DATA)
 
     experimentsModel.setSelected([
       { id: 'exp-1' },
@@ -320,7 +316,7 @@ describe('ExperimentsModel', () => {
     )
 
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(data, ...DEFAULT_DATA)
+    model.transformAndSetLocal(data, ...DEFAULT_DATA)
 
     expect(model.getSelectedRevisions().map(({ id }) => id)).toStrictEqual([
       runningExpName
@@ -343,7 +339,7 @@ describe('ExperimentsModel', () => {
 
   it('should fetch workspace params', () => {
     const model = new ExperimentsModel('', buildMockMemento())
-    model.transformAndSet(outputFixture, ...DEFAULT_DATA)
+    model.transformAndSetLocal(outputFixture, ...DEFAULT_DATA)
 
     const workspaceParams = model.getWorkspaceParams()
     expect(definedAndNonEmpty(workspaceParams)).toBe(true)
@@ -455,8 +451,7 @@ describe('ExperimentsModel', () => {
       [],
       {
         main: 2000
-      },
-      remoteExpRefsFixture
+      }
     ]
 
     const transientErrorData: TransformAndSetInputs = [
@@ -477,11 +472,10 @@ describe('ExperimentsModel', () => {
       [],
       {
         main: 2000
-      },
-      remoteExpRefsFixture
+      }
     ]
 
-    model.transformAndSet(...runningExperimentData)
+    model.transformAndSetLocal(...runningExperimentData)
 
     model.toggleStatus('exp-e7a67')
     model.toggleStatus(EXPERIMENT_WORKSPACE_ID)
@@ -489,14 +483,14 @@ describe('ExperimentsModel', () => {
     expect(getSelectedRevisions(model)).toStrictEqual(expectedSelection)
     expect(model.hasRunningExperiment()).toBe(true)
 
-    model.transformAndSet(...transientErrorData)
+    model.transformAndSetLocal(...transientErrorData)
 
     expect(getSelectedRevisions(model)).toStrictEqual(
       expectedSelection.slice(2)
     )
     expect(model.hasRunningExperiment()).toBe(true)
 
-    model.transformAndSet(...runningExperimentData)
+    model.transformAndSetLocal(...runningExperimentData)
 
     expect(getSelectedRevisions(model)).toStrictEqual(expectedSelection)
     expect(model.hasRunningExperiment()).toBe(true)
@@ -525,7 +519,7 @@ describe('ExperimentsModel', () => {
       ...DEFAULT_DATA
     ]
 
-    model.transformAndSet(...noRunningExperimentData)
+    model.transformAndSetLocal(...noRunningExperimentData)
 
     model.toggleStatus('main')
 
@@ -534,12 +528,12 @@ describe('ExperimentsModel', () => {
     ])
     expect(model.hasRunningExperiment()).toBe(false)
 
-    model.transformAndSet(...unexpectedErrorData)
+    model.transformAndSetLocal(...unexpectedErrorData)
 
     expect(getSelectedRevisions(model)).toStrictEqual([])
     expect(model.hasRunningExperiment()).toBe(false)
 
-    model.transformAndSet(...noRunningExperimentData)
+    model.transformAndSetLocal(...noRunningExperimentData)
 
     expect(getSelectedRevisions(model)).toStrictEqual([])
     expect(model.hasRunningExperiment()).toBe(false)
@@ -556,26 +550,18 @@ describe('ExperimentsModel', () => {
         error: { msg: errorMsg, type: 'caught error' }
       }
     ]
-    model.transformAndSet(
-      data,
-      gitLogFixture,
-      false,
-      [],
-      {
-        main: 6
-      },
-      remoteExpRefsFixture
-    )
+    model.transformAndSetLocal(data, gitLogFixture, false, [], {
+      main: 6
+    })
 
     expect(model.getCliError()).toStrictEqual(errorMsg)
 
-    model.transformAndSet(
+    model.transformAndSetLocal(
       outputFixture,
       gitLogFixture,
       false,
       rowOrderFixture,
-      { main: 6 },
-      remoteExpRefsFixture
+      { main: 6 }
     )
 
     expect(model.getCliError()).toBe(undefined)

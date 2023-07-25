@@ -33,7 +33,7 @@ import { DecorationProvider } from './model/decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
 import { ResourceLocator } from '../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { ExperimentsOutput } from '../data'
+import { ExperimentsOutput, isRemoteExperimentsOutput } from '../data'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Title } from '../vscode/title'
@@ -173,24 +173,25 @@ export class Experiments extends BaseRepository<TableData> {
     return this.data.managedUpdate()
   }
 
-  public async setState({
-    availableNbCommits,
-    expShow,
-    gitLog,
-    rowOrder,
-    remoteExpRefs
-  }: ExperimentsOutput) {
+  public async setState(data: ExperimentsOutput) {
+    if (isRemoteExperimentsOutput(data)) {
+      const { remoteExpRefs } = data
+      this.experiments.transformAndSetRemote(remoteExpRefs)
+      return this.webviewMessages.sendWebviewMessage()
+    }
+
+    const { expShow, gitLog, rowOrder, availableNbCommits } = data
+
     const hadCheckpoints = this.hasCheckpoints()
     const dvcLiveOnly = await this.checkSignalFile()
     await Promise.all([
       this.columns.transformAndSet(expShow),
-      this.experiments.transformAndSet(
+      this.experiments.transformAndSetLocal(
         expShow,
         gitLog,
         dvcLiveOnly,
         rowOrder,
-        availableNbCommits,
-        remoteExpRefs
+        availableNbCommits
       )
     ])
 
@@ -206,9 +207,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
-  public unsetPushing(ids: string[]) {
+  public async unsetPushing(ids: string[]) {
+    await this.update()
     this.experiments.unsetPushing(ids)
-    return this.update()
+    return this.notifyChanged()
   }
 
   public hasCheckpoints() {
@@ -579,7 +581,7 @@ export class Experiments extends BaseRepository<TableData> {
   private setupInitialData() {
     const waitForInitialData = this.dispose.track(
       this.onDidChangeExperiments(async () => {
-        await this.pipeline.isReady()
+        await Promise.all([this.data.isReady(), this.pipeline.isReady()])
         this.deferred.resolve()
         this.dispose.untrack(waitForInitialData)
         waitForInitialData.dispose()

@@ -8,7 +8,11 @@ import { getRelativePattern } from '../../fileSystem/relativePattern'
 import { createFileSystemWatcher } from '../../fileSystem/watcher'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { ExpShowOutput } from '../../cli/dvc/contract'
-import { BaseData, ExperimentsOutput } from '../../data'
+import {
+  BaseData,
+  ExperimentsOutput,
+  isRemoteExperimentsOutput
+} from '../../data'
 import { Args, DOT_DVC, ExperimentFlag } from '../../cli/dvc/constants'
 import { COMMITS_SEPARATOR, gitPath } from '../../cli/git/constants'
 import { getGitPath } from '../../fileSystem'
@@ -35,6 +39,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
 
     void this.watchExpGitRefs()
     void this.managedUpdate()
+    this.waitForInitialLocalData()
   }
 
   public managedUpdate() {
@@ -42,16 +47,10 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   }
 
   public async update(): Promise<void> {
-    const [{ availableNbCommits, expShow, gitLog, rowOrder }, remoteExpRefs] =
-      await Promise.all([this.updateExpShow(), this.updateRemoteExpRefs()])
-
-    return this.notifyChanged({
-      availableNbCommits,
-      expShow,
-      gitLog,
-      remoteExpRefs,
-      rowOrder
-    })
+    await Promise.all([
+      this.notifyChanged(await this.updateExpShow()),
+      this.notifyChanged(await this.updateRemoteExpRefs())
+    ])
   }
 
   private async updateExpShow() {
@@ -162,10 +161,27 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     )
   }
 
-  private updateRemoteExpRefs() {
-    return this.internalCommands.executeCommand(
-      AvailableCommands.GIT_GET_REMOTE_EXPERIMENT_REFS,
-      this.dvcRoot
+  private async updateRemoteExpRefs() {
+    const [remoteExpRefs] = await Promise.all([
+      this.internalCommands.executeCommand(
+        AvailableCommands.GIT_GET_REMOTE_EXPERIMENT_REFS,
+        this.dvcRoot
+      ),
+      this.isReady()
+    ])
+    return { remoteExpRefs }
+  }
+
+  private waitForInitialLocalData() {
+    const waitForInitialData = this.dispose.track(
+      this.onDidUpdate(data => {
+        if (isRemoteExperimentsOutput(data)) {
+          return
+        }
+        this.dispose.untrack(waitForInitialData)
+        waitForInitialData.dispose()
+        this.deferred.resolve()
+      })
     )
   }
 }
