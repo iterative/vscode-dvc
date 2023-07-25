@@ -1,11 +1,14 @@
-import React from 'react'
+import React, { useCallback, MouseEvent, KeyboardEvent } from 'react'
 import cx from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   ComparisonPlot,
   ComparisonPlotImg
 } from 'dvc/src/plots/webview/contract'
-import { setMultiPlotValue } from './comparisonTableSlice'
+import {
+  changeDisabledDragIds,
+  setMultiPlotValue
+} from './comparisonTableSlice'
 import styles from './styles.module.scss'
 import { RefreshButton } from '../../../shared/components/button/RefreshButton'
 import { refreshRevisions, zoomPlot } from '../../util/messages'
@@ -77,6 +80,18 @@ export const ComparisonTableCellMulti: React.FC<{
   const { loading, url, id } = plot.imgOrImgs[currentStep]
   const missing = !loading && !url
 
+  const addDisabled = useCallback(() => {
+    dispatch(changeDisabledDragIds([path]))
+  }, [dispatch, path])
+
+  const removeDisabled = useCallback(() => {
+    dispatch(changeDisabledDragIds([]))
+  }, [dispatch])
+
+  const disableClick = useCallback((e: MouseEvent | KeyboardEvent) => {
+    e.stopPropagation()
+  }, [])
+
   if (loading) {
     return (
       <div className={styles.noImageContent}>
@@ -99,9 +114,17 @@ export const ComparisonTableCellMulti: React.FC<{
         className={styles.image}
         draggable={false}
         src={url}
-        alt={`I am indeed number ${currentStep} Plot of ${path} (${id})`}
+        alt={`${currentStep} of ${path} (${id})`}
       />
-      <div className={styles.multiImageSlider}>
+      {/* The div element have children that allow keyboard interaction */}
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+      <div
+        className={styles.multiImageSlider}
+        onMouseEnter={addDisabled}
+        onMouseLeave={removeDisabled}
+        onClick={disableClick}
+        onKeyDown={disableClick}
+      >
         <label htmlFor={`${id}-step`}>Step</label>
         <input
           name={`${id}-step`}

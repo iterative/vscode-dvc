@@ -128,6 +128,8 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
   public getComparisonPaths() {
     return performSimpleOrderedUpdate(
       this.comparisonPathsOrder,
+      // TBD doesn't work correct since we no longer list
+      // all paths which is breaking dnd
       this.getPathsByType(PathType.COMPARISON)
     )
   }
