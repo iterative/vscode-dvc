@@ -35,7 +35,7 @@ const RowExpansionButton: React.FC<RowProp> = ({ row }) =>
       />
     </button>
   ) : (
-    <span className={styles.rowArrowContainer} />
+    <span className={styles.emptyRowArrowContainer} />
   )
 
 export const StubCell: React.FC<

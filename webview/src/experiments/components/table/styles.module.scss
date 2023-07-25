@@ -30,6 +30,18 @@ $badge-size: 0.85rem;
   margin: 12px 6px;
 }
 
+%rowArrowContainer {
+  width: 20px;
+  height: 32px;
+  padding: 0;
+  flex: 0 0 20px;
+  right: 6px;
+  display: inline-block;
+  position: relative;
+  border: none;
+  background: none;
+}
+
 %truncateLeftParent {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -657,6 +669,11 @@ $badge-size: 0.85rem;
   @extend %iconBox;
 
   padding: 1px;
+
+  &[aria-disabled='true'] {
+    cursor: default;
+    opacity: 0.4;
+  }
 }
 
 .cloudIndicator {
@@ -690,16 +707,15 @@ $badge-size: 0.85rem;
 }
 
 .rowArrowContainer {
-  width: 20px;
-  height: 32px;
-  padding: 0;
-  flex: 0 0 20px;
-  right: 6px;
-  display: inline-block;
-  position: relative;
-  border: none;
-  background: none;
+  @extend %rowArrowContainer;
+
   cursor: pointer;
+}
+
+.emptyRowArrowContainer {
+  @extend %rowArrowContainer;
+
+  cursor: default;
 }
 
 .expandedRowArrow {
