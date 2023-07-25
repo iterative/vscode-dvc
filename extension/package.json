@@ -1750,7 +1750,7 @@
     "vscode-uri": "3.0.7",
     "wdio-vscode-service": "5.2.0",
     "webdriverio": "8.13.3",
-    "webpack": "5.88.1",
+    "webpack": "5.88.2",
     "webpack-cli": "5.1.4"
   },
   "peerDependencies": {
