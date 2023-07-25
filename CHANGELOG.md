@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.25] - 2023-07-25
+
+### 🚀 New Features and Enhancements
+
+- Show Experiment Remote Status [#4324](https://github.com/iterative/vscode-dvc/pull/4324) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix cloud icon alignment in experiments table [#4340](https://github.com/iterative/vscode-dvc/pull/4340) by [@mattseddon](https://github.com/mattseddon)
+- Disable exp push when experiment is running in the workspace [#4343](https://github.com/iterative/vscode-dvc/pull/4343) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.7.0) [#4328](https://github.com/iterative/vscode-dvc/pull/4328) by [@mattseddon](https://github.com/mattseddon)
+- Run remote experiments data update in the background [#4342](https://github.com/iterative/vscode-dvc/pull/4342) by [@mattseddon](https://github.com/mattseddon)
+- Use trim and split util [#4339](https://github.com/iterative/vscode-dvc/pull/4339) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (3.8.1) [#4351](https://github.com/iterative/vscode-dvc/pull/4351) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.24] - 2023-07-20
 
 ### 🚀 New Features and Enhancements
