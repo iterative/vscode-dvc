@@ -654,6 +654,7 @@ suite('Workspace Experiments Test Suite', () => {
       bypassProgressCloseDelay()
       const { experiments } = stubWorkspaceExperimentsGetters(disposable)
       await experiments.isReady()
+      stub(experiments, 'update').resolves(undefined)
 
       const mockExperimentId = 'exp-e7a67'
       const secondMockExperimentId = 'exp-83425'

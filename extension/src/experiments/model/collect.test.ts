@@ -2,7 +2,7 @@ import { collectExperiments } from './collect'
 import { generateTestExpShowOutput } from '../../test/util/experiments'
 import { ExpShowOutput } from '../../cli/dvc/contract'
 
-const DEFAULT_DATA: [string, boolean, string] = ['', false, '']
+const DEFAULT_DATA: [string, boolean] = ['', false]
 
 describe('collectExperiments', () => {
   it('should return an empty array if no commits are present', () => {
@@ -13,7 +13,7 @@ describe('collectExperiments', () => {
     expect(commits).toStrictEqual([])
   })
 
-  const expShowWithTwoCommits: [ExpShowOutput, string, boolean, string] = [
+  const expShowWithTwoCommits: [ExpShowOutput, string, boolean] = [
     generateTestExpShowOutput(
       {},
       {
