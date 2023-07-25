@@ -579,10 +579,10 @@ export class Experiments extends BaseRepository<TableData> {
   private setupInitialData() {
     const waitForInitialData = this.dispose.track(
       this.onDidChangeExperiments(async () => {
-        await this.pipeline.isReady()
         this.deferred.resolve()
         this.dispose.untrack(waitForInitialData)
         waitForInitialData.dispose()
+        await this.pipeline.isReady()
         this.dispose.track(
           this.pipeline.onDidUpdate(() =>
             this.webviewMessages.sendWebviewMessage()
