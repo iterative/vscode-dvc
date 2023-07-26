@@ -27,6 +27,12 @@ export const reorderColumns = (newOrder: string[]) =>
     type: MessageFromWebviewType.REORDER_COLUMNS
   })
 
+export const resetCommits = (branch: string) =>
+  sendMessage({
+    payload: branch,
+    type: MessageFromWebviewType.RESET_COMMITS
+  })
+
 export const resizeColumn = (id: string, width: number) =>
   sendMessage({
     payload: { id, width },

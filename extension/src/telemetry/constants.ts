@@ -51,6 +51,8 @@ export const EventName = Object.assign(
     VIEWS_EXPERIMENTS_TABLE_REFRESH: 'views.experimentsTable.refresh',
     VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_SORT:
       'views.experimentsTable.columnSortRemoved',
+    VIEWS_EXPERIMENTS_TABLE_RESET_COMMITS:
+      'views.experimentsTable.resetCommits',
     VIEWS_EXPERIMENTS_TABLE_RESIZE_COLUMN:
       'views.experimentsTable.columnResized',
     VIEWS_EXPERIMENTS_TABLE_SELECT_BRANCHES:
@@ -246,6 +248,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_SORT]: {
     path: string
   }
+  [EventName.VIEWS_EXPERIMENTS_TABLE_RESET_COMMITS]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_CREATED]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED]: WebviewFocusChangedProperties
   [EventName.VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN_PATH]: {
