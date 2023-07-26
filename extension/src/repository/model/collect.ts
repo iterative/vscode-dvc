@@ -335,9 +335,15 @@ export const collectTrackedPaths = async (
     return acc
   }
   const children = await getChildren(resourceUri.fsPath)
+  const promises = []
   for (const child of children) {
-    acc.push(...(await collectTrackedPaths(child, getChildren)))
+    promises.push(collectTrackedPaths(child, getChildren))
   }
+  const results = await Promise.all(promises)
+  for (const result of results) {
+    acc.push(...result)
+  }
+
   return acc
 }
 
