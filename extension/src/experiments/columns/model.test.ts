@@ -133,6 +133,7 @@ describe('ColumnsModel', () => {
     )
     await model.transformAndSet(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
+
     expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithHeightOf1)
   })
 

@@ -352,20 +352,21 @@ export const deeplyNestedColumnsWithHeightOf2: Column[] = [
 export const deeplyNestedColumnsWithHeightOf1: Column[] = [
   timestampColumn,
   {
+    firstValueType: 'string',
     hasChildren: false,
     label: 'params.yaml:nested1.doubled',
     parentPath: 'params',
-    path: 'params:doubled',
+    path: 'params:params.yaml:nested1.doubled',
     pathArray: ['params', 'params.yaml', 'nested1', 'doubled'],
-    type: ColumnType.PARAMS,
-    firstValueType: 'string'
+    type: ColumnType.PARAMS
   },
   {
+    firstValueType: 'string',
     hasChildren: false,
     label:
       'params.yaml:nested1.nested2.nested3.nested4.nested5.nested6.nested7',
     parentPath: 'params',
-    path: 'params:nested7',
+    path: 'params:params.yaml:nested1.nested2.nested3.nested4.nested5.nested6.nested7',
     pathArray: [
       'params',
       'params.yaml',
@@ -377,14 +378,14 @@ export const deeplyNestedColumnsWithHeightOf1: Column[] = [
       'nested6',
       'nested7'
     ],
-    type: ColumnType.PARAMS,
-    firstValueType: 'string'
+    type: ColumnType.PARAMS
   },
   {
+    firstValueType: 'string',
     hasChildren: false,
     label: 'params.yaml:nested1.nested2.nested3.nested4.nested5b.nested6',
     parentPath: 'params',
-    path: 'params:nested6',
+    path: 'params:params.yaml:nested1.nested2.nested3.nested4.nested5b.nested6',
     pathArray: [
       'params',
       'params.yaml',
@@ -395,16 +396,33 @@ export const deeplyNestedColumnsWithHeightOf1: Column[] = [
       'nested5b',
       'nested6'
     ],
-    type: ColumnType.PARAMS,
-    firstValueType: 'string'
+    type: ColumnType.PARAMS
   },
   {
+    firstValueType: 'string',
+    hasChildren: false,
+    label: 'params.yaml:nested1.nested2.nested3.nested4.nested5b.doubled',
+    parentPath: 'params',
+    path: 'params:params.yaml:nested1.nested2.nested3.nested4.nested5b.doubled',
+    pathArray: [
+      'params',
+      'params.yaml',
+      'nested1',
+      'nested2',
+      'nested3',
+      'nested4',
+      'nested5b',
+      'doubled'
+    ],
+    type: ColumnType.PARAMS
+  },
+  {
+    firstValueType: 'number',
     hasChildren: false,
     label: 'params.yaml:outlier',
     parentPath: 'params',
-    path: 'params:outlier',
+    path: 'params:params.yaml:outlier',
     pathArray: ['params', 'params.yaml', 'outlier'],
-    type: ColumnType.PARAMS,
-    firstValueType: 'number'
+    type: ColumnType.PARAMS
   }
 ]
