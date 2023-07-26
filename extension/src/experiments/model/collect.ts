@@ -108,13 +108,18 @@ const transformExpState = (
   return experiment
 }
 
+const skipCommit = (
+  acc: { [sha: string]: CommitData },
+  sha: string | undefined
+): boolean => !sha || !!acc[sha]
+
 const collectCommitData = (
   acc: { [sha: string]: CommitData },
   commit: string
 ) => {
   const [sha, author, date, refNamesWithKey] = trimAndSplit(commit)
 
-  if (!sha) {
+  if (skipCommit(acc, sha)) {
     return
   }
 
