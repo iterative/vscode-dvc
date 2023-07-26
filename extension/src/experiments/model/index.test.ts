@@ -20,7 +20,7 @@ import dataTypesOutputFixture from '../../test/fixtures/expShow/dataTypes/output
 import survivalOutputFixture from '../../test/fixtures/expShow/survival/output'
 import survivalRowsFixture from '../../test/fixtures/expShow/survival/rows'
 import {
-  ExperimentStatus,
+  ExecutorStatus,
   EXPERIMENT_WORKSPACE_ID,
   Executor,
   ExpWithError,
@@ -111,7 +111,9 @@ describe('ExperimentsModel', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const runningWorkspace = (model as any).workspace
     expect(runningWorkspace?.executor).toStrictEqual(EXPERIMENT_WORKSPACE_ID)
-    expect(runningWorkspace?.status).toStrictEqual(ExperimentStatus.RUNNING)
+    expect(runningWorkspace?.executorStatus).toStrictEqual(
+      ExecutorStatus.RUNNING
+    )
 
     model.transformAndSetLocal(dvcLiveOnly, ...DEFAULT_DATA)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -292,7 +294,7 @@ describe('ExperimentsModel', () => {
             executor: {
               local: null,
               name: Executor.WORKSPACE,
-              state: ExperimentStatus.RUNNING
+              state: ExecutorStatus.RUNNING
             },
             name: runningExpName,
             rev: EXPERIMENT_WORKSPACE_ID
@@ -305,7 +307,7 @@ describe('ExperimentsModel', () => {
             executor: {
               local: null,
               name: Executor.DVC_TASK,
-              state: ExperimentStatus.RUNNING
+              state: ExecutorStatus.RUNNING
             },
             name: runningTaskName,
             rev: EXPERIMENT_WORKSPACE_ID

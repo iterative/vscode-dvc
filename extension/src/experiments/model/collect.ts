@@ -15,7 +15,7 @@ import {
 } from '../webview/contract'
 import {
   EXPERIMENT_WORKSPACE_ID,
-  ExperimentStatus,
+  ExecutorStatus,
   ExpShowOutput,
   ExpState,
   Executor,
@@ -229,11 +229,11 @@ const collectExecutorInfo = (
 
   const { name, state } = executor
 
-  if (name && state === ExperimentStatus.RUNNING) {
+  if (name && state === ExecutorStatus.RUNNING) {
     experiment.executor = name
   }
-  if (state && state !== ExperimentStatus.SUCCESS) {
-    experiment.status = state
+  if (state && state !== ExecutorStatus.SUCCESS) {
+    experiment.executorStatus = state
   }
 }
 
@@ -241,7 +241,7 @@ const collectRunningExperiment = (
   acc: ExperimentsAccumulator,
   experiment: Experiment
 ): void => {
-  if (!isRunning(experiment.status)) {
+  if (!isRunning(experiment.executorStatus)) {
     return
   }
   acc.runningExperiments.push({
@@ -310,7 +310,7 @@ const setWorkspaceAsRunning = (
     )
   ) {
     acc.workspace.executor = Executor.WORKSPACE
-    acc.workspace.status = ExperimentStatus.RUNNING
+    acc.workspace.executorStatus = ExecutorStatus.RUNNING
   }
 
   if (dvcLiveOnly) {
@@ -435,7 +435,7 @@ const collectExperimentsAndCommit = (
 ): void => {
   acc.push(commit)
   for (const experiment of experiments) {
-    if (isQueued(experiment.status)) {
+    if (isQueued(experiment.executorStatus)) {
       continue
     }
     acc.push(experiment)

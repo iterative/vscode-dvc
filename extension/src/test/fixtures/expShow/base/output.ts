@@ -2,7 +2,7 @@ import { join } from '../../../util/path'
 import {
   EXPERIMENT_WORKSPACE_ID,
   Executor,
-  ExperimentStatus,
+  ExecutorStatus,
   ExpShowOutput
 } from '../../../../cli/dvc/contract'
 
@@ -345,7 +345,7 @@ const data: ExpShowOutput = [
         ],
         executor: {
           name: Executor.DVC_TASK,
-          state: ExperimentStatus.RUNNING,
+          state: ExecutorStatus.RUNNING,
           local: null
         }
       },
@@ -580,7 +580,7 @@ const data: ExpShowOutput = [
         executor: {
           name: Executor.WORKSPACE,
           local: { pid: 1234, root: null, log: null, returncode: null },
-          state: ExperimentStatus.RUNNING
+          state: ExecutorStatus.RUNNING
         }
       },
       {
@@ -593,7 +593,7 @@ const data: ExpShowOutput = [
             }
           }
         ],
-        executor: { state: ExperimentStatus.FAILED, local: null, name: null }
+        executor: { state: ExecutorStatus.FAILED, local: null, name: null }
       },
       {
         name: 'exp-f13bca',
@@ -811,7 +811,7 @@ const data: ExpShowOutput = [
           }
         ],
         executor: {
-          state: ExperimentStatus.QUEUED,
+          state: ExecutorStatus.QUEUED,
           name: Executor.DVC_TASK,
           local: {
             root: null,
@@ -902,7 +902,7 @@ const data: ExpShowOutput = [
             }
           }
         ],
-        executor: { state: ExperimentStatus.FAILED, local: null, name: null }
+        executor: { state: ExecutorStatus.FAILED, local: null, name: null }
       }
     ]
   },

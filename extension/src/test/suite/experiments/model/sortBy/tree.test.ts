@@ -20,7 +20,7 @@ import { RegisteredCommands } from '../../../../../commands/external'
 import {
   EXPERIMENT_WORKSPACE_ID,
   Executor,
-  ExperimentStatus
+  ExecutorStatus
 } from '../../../../../cli/dvc/contract'
 import { WEBVIEW_TEST_TIMEOUT } from '../../../timeouts'
 import { starredSort } from '../../../../../experiments/model/sortBy/constants'
@@ -44,7 +44,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
           executor: {
             local: null,
             name: Executor.WORKSPACE,
-            state: ExperimentStatus.RUNNING
+            state: ExecutorStatus.RUNNING
           },
           name: 'exp-1',
           rev: EXPERIMENT_WORKSPACE_ID

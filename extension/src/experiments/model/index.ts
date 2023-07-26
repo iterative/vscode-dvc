@@ -30,11 +30,7 @@ import {
   WORKSPACE_BRANCH
 } from '../webview/contract'
 import { reorderListSubset } from '../../util/array'
-import {
-  Executor,
-  ExpShowOutput,
-  ExperimentStatus
-} from '../../cli/dvc/contract'
+import { Executor, ExpShowOutput, ExecutorStatus } from '../../cli/dvc/contract'
 import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
 import { PersistenceKey } from '../../persistence/constants'
@@ -184,7 +180,7 @@ export class ExperimentsModel extends ModelWithPersistence {
       ({ id: expId }) => expId === id
     )
 
-    if (isQueued(experiment?.status)) {
+    if (isQueued(experiment?.executorStatus)) {
       return UNSELECTED
     }
 
@@ -378,8 +374,8 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getExperiments() {
-    return this.getExperimentsAndQueued().filter(({ status }) => {
-      return !isQueued(status)
+    return this.getExperimentsAndQueued().filter(({ executorStatus }) => {
+      return !isQueued(executorStatus)
     })
   }
 
@@ -397,7 +393,7 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public getRunningExperiments() {
     return this.getExperimentsAndQueued().filter(experiment =>
-      isRunning(experiment.status)
+      isRunning(experiment.executorStatus)
     )
   }
 
@@ -471,7 +467,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.getExperimentsByCommit(commit)?.map(experiment => ({
       ...experiment,
       hasChildren: false,
-      type: this.getExperimentType(experiment.status)
+      type: this.getExperimentType(experiment.executorStatus)
     }))
   }
 
@@ -569,7 +565,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     if (
       this.remoteExpShas === undefined ||
       !experiment.sha ||
-      ![undefined, ExperimentStatus.SUCCESS].includes(experiment.status)
+      ![undefined, ExecutorStatus.SUCCESS].includes(experiment.executorStatus)
     ) {
       return
     }
@@ -670,11 +666,11 @@ export class ExperimentsModel extends ModelWithPersistence {
     }
   }
 
-  private getExperimentType(status?: ExperimentStatus) {
-    if (isQueued(status)) {
+  private getExperimentType(executorStatus?: ExecutorStatus) {
+    if (isQueued(executorStatus)) {
       return ExperimentType.QUEUED
     }
-    if (isRunning(status)) {
+    if (isRunning(executorStatus)) {
       return ExperimentType.RUNNING
     }
 
