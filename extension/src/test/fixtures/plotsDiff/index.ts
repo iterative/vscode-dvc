@@ -835,6 +835,7 @@ export const getComparisonWebviewMessage = (
       plotAcc[pathName].revisions[id].imgOrImgs.push({
         url: `${url}?${MOCK_IMAGE_MTIME}`,
         id,
+        path,
         errors: undefined,
         loading: false
       })

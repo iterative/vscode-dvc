@@ -15,6 +15,12 @@ import { refreshRevisions, zoomPlot } from '../../util/messages'
 import { ErrorIcon } from '../../../shared/components/errorIcon/ErrorIcon'
 import { PlotsState } from '../../store'
 
+const LoadingPlotTableCell: React.FC = () => (
+  <div className={styles.noImageContent}>
+    <p>Loading...</p>
+  </div>
+)
+
 const MissingPlotTableCell: React.FC<{ plot: ComparisonPlotImg }> = ({
   plot
 }) => (
@@ -41,11 +47,7 @@ export const ComparisonTableCellSingle: React.FC<{
   const missing = !loading && !plotImg.url
 
   if (loading) {
-    return (
-      <div className={styles.noImageContent}>
-        <p>Loading...</p>
-      </div>
-    )
+    return <LoadingPlotTableCell />
   }
 
   if (missing) {
@@ -77,6 +79,7 @@ export const ComparisonTableCellMulti: React.FC<{
   )
   const dispatch = useDispatch()
   const currentStep = multiValues[path] || 0
+
   const { loading, url, id } = plot.imgOrImgs[currentStep]
   const missing = !loading && !url
 
@@ -92,22 +95,55 @@ export const ComparisonTableCellMulti: React.FC<{
     e.stopPropagation()
   }, [])
 
+  const slider = (
+    // The div element has children that allow keyboard interaction
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+    <div
+      className={styles.multiImageSlider}
+      onMouseEnter={addDisabled}
+      onMouseLeave={removeDisabled}
+      onClick={disableClick}
+      onKeyDown={disableClick}
+    >
+      <label htmlFor={`${id}-step`}>Step</label>
+      <input
+        name={`${id}-step`}
+        min="0"
+        max={plot.imgOrImgs.length - 1}
+        value={currentStep}
+        type="range"
+        onChange={event => {
+          dispatch(
+            setMultiPlotValue({ path, value: Number(event.target.value) })
+          )
+        }}
+      />
+      <p>{currentStep}</p>
+    </div>
+  )
+
   if (loading) {
     return (
-      <div className={styles.noImageContent}>
-        <p>Loading...</p>
+      <div className={styles.multiImageWrapper}>
+        <LoadingPlotTableCell />
+        {slider}
       </div>
     )
   }
 
   if (missing) {
-    return <MissingPlotTableCell plot={plot.imgOrImgs[currentStep]} />
+    return (
+      <div className={styles.multiImageWrapper}>
+        <MissingPlotTableCell plot={plot.imgOrImgs[currentStep]} />
+        {slider}
+      </div>
+    )
   }
 
   return (
     <button
       className={cx(styles.imageWrapper, styles.multiImageWrapper)}
-      onClick={() => zoomPlot(url)}
+      onClick={() => url && zoomPlot(url)}
       data-testid="image-plot-button"
     >
       <img
@@ -116,30 +152,7 @@ export const ComparisonTableCellMulti: React.FC<{
         src={url}
         alt={`${currentStep} of ${path} (${id})`}
       />
-      {/* The div element have children that allow keyboard interaction */}
-      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
-      <div
-        className={styles.multiImageSlider}
-        onMouseEnter={addDisabled}
-        onMouseLeave={removeDisabled}
-        onClick={disableClick}
-        onKeyDown={disableClick}
-      >
-        <label htmlFor={`${id}-step`}>Step</label>
-        <input
-          name={`${id}-step`}
-          min="0"
-          max={plot.imgOrImgs.length - 1}
-          value={currentStep}
-          type="range"
-          onChange={event => {
-            dispatch(
-              setMultiPlotValue({ path, value: Number(event.target.value) })
-            )
-          }}
-        />
-        <p>{currentStep}</p>
-      </div>
+      {slider}
     </button>
   )
 }

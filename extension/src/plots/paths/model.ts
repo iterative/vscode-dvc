@@ -126,10 +126,10 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
   }
 
   public getComparisonPaths() {
+    // TBD how do we want to go about this?
+    // group our paths array ?
     return performSimpleOrderedUpdate(
       this.comparisonPathsOrder,
-      // TBD doesn't work correct since we no longer list
-      // all paths which is breaking dnd
       this.getPathsByType(PathType.COMPARISON)
     )
   }

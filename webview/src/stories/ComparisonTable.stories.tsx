@@ -93,6 +93,7 @@ const removeImages = (
                 : undefined,
             id,
             loading: false,
+            path: '',
             url: undefined
           }
         ],

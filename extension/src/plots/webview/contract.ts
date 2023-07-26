@@ -153,9 +153,10 @@ export type ComparisonPlotImg = {
   url: string | undefined
   errors: string[] | undefined
   loading: boolean
-  id: string
+  path: string
+  id: string // TBD i dont think id is needed here
 }
-// TBD I don't think we need the id
+
 export type ComparisonPlot = {
   id: string
   imgOrImgs: ComparisonPlotImg[]

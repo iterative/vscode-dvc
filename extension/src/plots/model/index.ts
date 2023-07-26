@@ -430,7 +430,15 @@ export class PlotsModel extends ModelWithPersistence {
     for (const path of paths) {
       this.collectSelectedPathComparisonPlots(acc, path, selectedRevisionIds)
     }
-    // TBD need to sort images by path
+    // TBD there is probably a better way to do this
+    for (const [pathLabel, { revisions }] of Object.entries(acc)) {
+      for (const revision of Object.keys(revisions)) {
+        acc[pathLabel].revisions[revision].imgOrImgs.sort((img1, img2) =>
+          img1.path.localeCompare(img2.path, undefined, { numeric: true })
+        )
+      }
+    }
+
     return Object.values(acc)
   }
 
@@ -471,6 +479,7 @@ export class PlotsModel extends ModelWithPersistence {
         errors,
         id,
         loading,
+        path,
         url
       })
     }

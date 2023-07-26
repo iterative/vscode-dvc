@@ -67,13 +67,11 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
       <tr>
         {plots.map(plot => {
           const isPinned = pinnedColumn === plot.id
-          const { url } = plot.imgOrImgs[0]
           return (
             <td
               key={path + plot.id}
               className={cx({
                 [styles.pinnedColumnCell]: isPinned,
-                [styles.noImage]: isShown && !url,
                 [styles.draggedColumn]: draggedId === plot.id
               })}
             >
