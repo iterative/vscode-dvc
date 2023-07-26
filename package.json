@@ -64,10 +64,10 @@
     "postcss": "8.4.26",
     "prettier": "3.0.0",
     "prettier-config-standard": "5.0.0",
-    "stylelint": "15.10.1",
+    "stylelint": "15.10.2",
     "stylelint-config-standard-scss": "10.0.0",
     "ts-node": "10.9.1",
-    "turbo": "1.10.8",
+    "turbo": "1.10.9",
     "typescript": "5.1.6"
   },
   "resolutions": {

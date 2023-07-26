@@ -190,9 +190,11 @@ export class WebviewMessages {
 
       case MessageFromWebviewType.SHOW_MORE_COMMITS:
         return this.changeCommitsToShow(1, message.payload)
-
       case MessageFromWebviewType.SHOW_LESS_COMMITS:
         return this.changeCommitsToShow(-1, message.payload)
+      case MessageFromWebviewType.RESET_COMMITS:
+        return this.resetCommitsToShow(message.payload)
+
       case MessageFromWebviewType.SELECT_BRANCHES:
         return this.addAndRemoveBranches()
 
@@ -221,6 +223,12 @@ export class WebviewMessages {
   }
 
   private async changeCommitsToShow(change: 1 | -1, branch: string) {
+    this.experiments.setNbfCommitsToShow(
+      this.experiments.getNbOfCommitsToShow(branch) +
+        NUM_OF_COMMITS_TO_INCREASE * change,
+      branch
+    )
+    await this.update()
     sendTelemetryEvent(
       change === 1
         ? EventName.VIEWS_EXPERIMENTS_TABLE_SHOW_MORE_COMMITS
@@ -228,12 +236,16 @@ export class WebviewMessages {
       undefined,
       undefined
     )
-    this.experiments.setNbfCommitsToShow(
-      this.experiments.getNbOfCommitsToShow(branch) +
-        NUM_OF_COMMITS_TO_INCREASE * change,
-      branch
-    )
+  }
+
+  private async resetCommitsToShow(branch: string) {
+    this.experiments.resetNbfCommitsToShow(branch)
     await this.update()
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_RESET_COMMITS,
+      undefined,
+      undefined
+    )
   }
 
   private refreshData() {

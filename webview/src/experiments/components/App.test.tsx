@@ -1864,7 +1864,7 @@ describe('App', () => {
     })
   })
 
-  describe('Show more commits', () => {
+  describe('Change number of commits', () => {
     it('should display a show more commits button', () => {
       renderTable({ ...tableDataFixture, hasMoreCommits: { main: true } })
 
@@ -1927,6 +1927,25 @@ describe('App', () => {
       expect(mockPostMessage).not.toHaveBeenCalledWith({
         payload: 'main',
         type: MessageFromWebviewType.SHOW_LESS_COMMITS
+      })
+    })
+
+    it('should display a reset commits button', () => {
+      renderTable({ ...tableDataFixture, hasMoreCommits: { main: true } })
+
+      expect(
+        screen.getByLabelText('Reset Commits to Default')
+      ).toBeInTheDocument()
+    })
+
+    it('should send a message to reset commits when the reset commits button is clicked', () => {
+      renderTable()
+
+      fireEvent.click(screen.getByLabelText('Reset Commits to Default'))
+
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: 'main',
+        type: MessageFromWebviewType.RESET_COMMITS
       })
     })
   })

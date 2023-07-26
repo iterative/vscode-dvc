@@ -38,6 +38,7 @@ export enum MessageFromWebviewType {
   REORDER_PLOTS_TEMPLATES = 'reorder-plots-templates',
   REFRESH_EXP_DATA = 'refresh-exp-data',
   REFRESH_REVISIONS = 'refresh-revisions',
+  RESET_COMMITS = 'reset-commits',
   RESIZE_COLUMN = 'resize-column',
   RESIZE_PLOTS = 'resize-plots',
   SAVE_STUDIO_TOKEN = 'save-studio-token',
@@ -118,6 +119,10 @@ export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.REORDER_COLUMNS
       payload: string[]
+    }
+  | {
+      type: MessageFromWebviewType.RESET_COMMITS
+      payload: string
     }
   | {
       type: MessageFromWebviewType.RESIZE_COLUMN

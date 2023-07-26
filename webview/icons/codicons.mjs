@@ -10,6 +10,7 @@ export const codicons = [
   'cloud-upload',
   'cloud',
   'copy',
+  'discard',
   'ellipsis',
   'error',
   'extensions',
