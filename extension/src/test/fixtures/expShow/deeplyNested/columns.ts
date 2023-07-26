@@ -19,13 +19,12 @@ const data: Column[] = [
   },
   {
     hasChildren: false,
-    maxStringLength: 15,
     label: 'doubled',
     parentPath: 'params:params.yaml:nested1',
     path: 'params:params.yaml:nested1.doubled',
     pathArray: ['params', 'params.yaml', 'nested1', 'doubled'],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: true,
@@ -51,7 +50,6 @@ const data: Column[] = [
   },
   {
     hasChildren: false,
-    maxStringLength: 6,
     label: 'nested7',
     parentPath:
       'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4.nested5.nested6',
@@ -68,7 +66,7 @@ const data: Column[] = [
       'nested7'
     ],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: true,
@@ -93,7 +91,6 @@ const data: Column[] = [
   },
   {
     hasChildren: false,
-    maxStringLength: 23,
     label: 'nested6',
     parentPath:
       'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b',
@@ -109,11 +106,10 @@ const data: Column[] = [
       'nested6'
     ],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
-    maxStringLength: 16,
     label: 'doubled',
     parentPath:
       'params:params.yaml:nested1%2Enested2%2Enested3.nested4.nested5b',
@@ -129,19 +125,16 @@ const data: Column[] = [
       'doubled'
     ],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
-    maxStringLength: 1,
     label: 'outlier',
     parentPath: 'params:params.yaml',
     path: 'params:params.yaml:outlier',
     pathArray: ['params', 'params.yaml', 'outlier'],
     type: ColumnType.PARAMS,
-    types: ['number'],
-    maxNumber: 1,
-    minNumber: 1
+    firstValueType: 'number'
   }
 ]
 

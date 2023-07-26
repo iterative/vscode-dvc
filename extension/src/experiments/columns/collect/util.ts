@@ -99,22 +99,6 @@ const getValueType = (value: Value) => {
   return typeof value
 }
 
-const setStringLength = (column: Column, stringLength: number) => {
-  if (!column.maxStringLength || column.maxStringLength < stringLength) {
-    column.maxStringLength = stringLength
-  }
-}
-
-const mergeNumberIntoColumn = (column: Column, value: number) => {
-  const { maxNumber, minNumber } = column
-  if (maxNumber === undefined || maxNumber < value) {
-    column.maxNumber = value
-  }
-  if (minNumber === undefined || minNumber > value) {
-    column.minNumber = value
-  }
-}
-
 export const mergeAncestors = (
   acc: ColumnAccumulator,
   type: ColumnType,
@@ -136,21 +120,6 @@ export const mergeAncestors = (
   }
 }
 
-const mergeValueIntoColumn = (column: Column, value: Value) => {
-  const valueType = getValueType(value)
-  if (!column.types) {
-    column.types = [valueType]
-  } else if (!column.types.includes(valueType)) {
-    column.types.push(valueType)
-  }
-
-  setStringLength(column, String(value).length)
-
-  if (valueType === 'number') {
-    mergeNumberIntoColumn(column, value as number)
-  }
-}
-
 const buildValueColumn = (
   path: string,
   parentPath: string,
@@ -158,28 +127,18 @@ const buildValueColumn = (
   label: string,
   value: Value
 ) => {
-  const valueType = getValueType(value)
-
-  const newColumn: Column = {
+  return {
+    firstValueType: getValueType(value),
     hasChildren: false,
     label,
-    maxStringLength: String(value).length,
     parentPath,
     path,
     pathArray,
-    type: pathArray[0] as ColumnType,
-    types: [valueType]
+    type: pathArray[0] as ColumnType
   }
-
-  if (valueType === 'number') {
-    newColumn.maxNumber = value as number
-    newColumn.minNumber = value as number
-  }
-
-  return newColumn
 }
 
-export const mergeValueColumn = (
+export const collectColumn = (
   acc: ColumnAccumulator,
   path: string,
   parentPath: string,
@@ -187,9 +146,8 @@ export const mergeValueColumn = (
   label: string,
   value: Value
 ) => {
-  if (!acc[path]) {
-    acc[path] = buildValueColumn(path, parentPath, pathArray, label, value)
+  if (acc[path]) {
     return
   }
-  mergeValueIntoColumn(acc[path], value)
+  acc[path] = buildValueColumn(path, parentPath, pathArray, label, value)
 }

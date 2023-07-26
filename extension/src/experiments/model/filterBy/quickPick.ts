@@ -125,8 +125,9 @@ export const pickFilterToAdd = async (
     return
   }
 
-  const typedOperators = OPERATORS.filter(operator =>
-    operator.types.some(type => picked.types?.includes(type))
+  const typedOperators = OPERATORS.filter(
+    operator =>
+      picked.firstValueType && operator.types.includes(picked.firstValueType)
   )
 
   const operator = await quickPickValue<Operator>(typedOperators, {

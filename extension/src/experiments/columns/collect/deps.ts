@@ -4,7 +4,7 @@ import {
   ColumnAccumulator,
   limitAncestorDepth,
   mergeAncestors,
-  mergeValueColumn
+  collectColumn
 } from './util'
 import { buildDepPath } from '../paths'
 import { ColumnType } from '../../webview/contract'
@@ -37,7 +37,7 @@ export const collectDeps = (acc: ColumnAccumulator, data: ExpData) => {
       (...pathArray: string[]) => buildDepPath(...pathArray)
     )
 
-    mergeValueColumn(
+    collectColumn(
       acc,
       path,
       buildDepPath(...limitedDepthAncestors),

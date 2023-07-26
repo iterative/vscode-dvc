@@ -1,11 +1,15 @@
 import { Column } from '../webview/contract'
 
-export type ColumnLike = { label: string; path: string; types?: string[] }
+export type ColumnLike = {
+  firstValueType?: string
+  label: string
+  path: string
+}
 
 const starredColumnLike: ColumnLike = {
+  firstValueType: 'boolean',
   label: '$(star-full)',
-  path: 'starred',
-  types: ['boolean']
+  path: 'starred'
 }
 
 export const addStarredToColumns = (
@@ -16,7 +20,11 @@ export const addStarredToColumns = (
   }
 
   return [
-    ...columns.map(({ label, path, types }) => ({ label, path, types })),
+    ...columns.map(({ label, path, firstValueType }) => ({
+      firstValueType,
+      label,
+      path
+    })),
     starredColumnLike
   ]
 }
