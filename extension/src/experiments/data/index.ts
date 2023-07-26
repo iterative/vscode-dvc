@@ -56,20 +56,15 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   private async updateExpShow() {
     await this.updateBranches()
     const branches = this.experiments.getBranchesToShow()
-    let gitLog = ''
-    const rowOrder: { branch: string; sha: string }[] = []
     const availableNbCommits: { [branch: string]: number } = {}
-    const args: Args = []
 
+    const promises = []
     for (const branch of branches) {
-      gitLog = await this.collectGitLogAndOrder(
-        gitLog,
-        branch,
-        rowOrder,
-        availableNbCommits,
-        args
-      )
+      promises.push(this.collectGitLogByBranch(branch, availableNbCommits))
     }
+
+    const branchLogs = await Promise.all(promises)
+    const { args, gitLog, rowOrder } = this.collectGitLogAndOrder(branchLogs)
 
     const expShow = await this.internalCommands.executeCommand<ExpShowOutput>(
       AvailableCommands.EXP_SHOW,
@@ -81,16 +76,13 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     return { availableNbCommits, expShow, gitLog, rowOrder }
   }
 
-  private async collectGitLogAndOrder(
-    gitLog: string,
+  private async collectGitLogByBranch(
     branch: string,
-    rowOrder: { branch: string; sha: string }[],
-    availableNbCommits: { [branch: string]: number },
-    args: Args
+    availableNbCommits: { [branch: string]: number }
   ) {
     const nbOfCommitsToShow = this.experiments.getNbOfCommitsToShow(branch)
 
-    const [branchGitLog, totalCommits] = await Promise.all([
+    const [branchLog, totalCommits] = await Promise.all([
       this.internalCommands.executeCommand(
         AvailableCommands.GIT_GET_COMMIT_MESSAGES,
         this.dvcRoot,
@@ -103,18 +95,31 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
         branch
       )
     ])
-    gitLog = [gitLog, branchGitLog].join(COMMITS_SEPARATOR)
+
     availableNbCommits[branch] = totalCommits
 
-    for (const commit of branchGitLog.split(COMMITS_SEPARATOR)) {
-      const [sha] = commit.split('\n')
-      rowOrder.push({ branch, sha })
-      if (args.includes(sha)) {
-        continue
+    return { branch, branchLog }
+  }
+
+  private collectGitLogAndOrder(
+    branchLogs: { branch: string; branchLog: string }[]
+  ) {
+    const rowOrder: { branch: string; sha: string }[] = []
+    const args: Args = []
+    const gitLog: string[] = []
+
+    for (const { branch, branchLog } of branchLogs) {
+      gitLog.push(branchLog)
+      for (const commit of branchLog.split(COMMITS_SEPARATOR)) {
+        const [sha] = commit.split('\n')
+        rowOrder.push({ branch, sha })
+        if (args.includes(sha)) {
+          continue
+        }
+        args.push(ExperimentFlag.REV, sha)
       }
-      args.push(ExperimentFlag.REV, sha)
     }
-    return gitLog
+    return { args, gitLog: gitLog.join(COMMITS_SEPARATOR), rowOrder }
   }
 
   private async updateBranches() {
