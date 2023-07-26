@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.26] - 2023-07-26
+
+### 🚀 New Features and Enhancements
+
+- Add reset number of commits to show for a branch button to experiments table [#4355](https://github.com/iterative/vscode-dvc/pull/4355) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Avoid reprocessing duplicate git log commits [#4356](https://github.com/iterative/vscode-dvc/pull/4356) by [@mattseddon](https://github.com/mattseddon)
+- Remove column merge logic [#4346](https://github.com/iterative/vscode-dvc/pull/4346) by [@mattseddon](https://github.com/mattseddon)
+- Improve performance of experiment column collection [#4353](https://github.com/iterative/vscode-dvc/pull/4353) by [@mattseddon](https://github.com/mattseddon)
+- Remove await from inside of loops [#4354](https://github.com/iterative/vscode-dvc/pull/4354) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.25] - 2023-07-25
 
 ### 🚀 New Features and Enhancements
