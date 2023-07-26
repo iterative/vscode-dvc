@@ -478,6 +478,11 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.persistNbOfCommitsToShow()
   }
 
+  public resetNbfCommitsToShow(branch: string) {
+    delete this.numberOfCommitsToShow[branch]
+    this.persistNbOfCommitsToShow()
+  }
+
   public getNbOfCommitsToShow(branch: string) {
     return (
       this.numberOfCommitsToShow[branch] ||

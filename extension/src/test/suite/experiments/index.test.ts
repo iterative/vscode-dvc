@@ -1480,6 +1480,39 @@ suite('Experiments Test Suite', () => {
       expect(setNbfCommitsToShowSpy).to.be.calledWith(3, 'main')
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should handle a message to reset the number of commits shown for a branch', async () => {
+      const {
+        experiments,
+        experimentsModel,
+        messageSpy,
+        mockUpdateExperimentsData
+      } = setupExperimentsAndMockCommands()
+
+      experimentsModel.setNbfCommitsToShow(100, 'main')
+      const getNumberOfCommitsToShowForMain = () =>
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (experimentsModel as any).numberOfCommitsToShow.main
+      expect(getNumberOfCommitsToShowForMain()).to.equal(100)
+
+      const resetNbfCommitsToShowSpy = spy(
+        experimentsModel,
+        'resetNbfCommitsToShow'
+      )
+
+      const webview = await experiments.showWebview()
+      messageSpy.resetHistory()
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+      mockMessageReceived.fire({
+        payload: 'main',
+        type: MessageFromWebviewType.RESET_COMMITS
+      })
+
+      expect(mockUpdateExperimentsData).to.be.calledOnce
+      expect(resetNbfCommitsToShowSpy).to.be.calledWithExactly('main')
+      expect(getNumberOfCommitsToShowForMain()).to.be.undefined
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should handle a message to select branches', async () => {
       const {
         experiments,

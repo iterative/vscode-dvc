@@ -3,26 +3,25 @@ import styles from './styles.module.scss'
 import { Icon, IconValue } from '../../../../../shared/components/Icon'
 import Tooltip from '../../../../../shared/components/tooltip/Tooltip'
 export interface CommitsButtonProps {
-  icon: IconValue
-  moreOrLess: 'More' | 'Less'
   action: () => void
   disabled: boolean
+  icon: IconValue
+  tooltipContent: string
 }
 
 export const CommitsButton: React.FC<CommitsButtonProps> = ({
-  icon,
-  moreOrLess,
   action,
-  disabled
+  disabled,
+  icon,
+  tooltipContent
 }) => {
-  const text = `Show ${moreOrLess} Commits`
   return (
-    <Tooltip content={<>{text}</>}>
+    <Tooltip content={tooltipContent}>
       <button
         className={styles.commitsButton}
         onClick={action}
         disabled={disabled}
-        aria-label={text}
+        aria-label={tooltipContent}
       >
         <Icon icon={icon} className={styles.commitsIcon} />
       </button>
