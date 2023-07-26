@@ -2,7 +2,10 @@ import { Column, ColumnType } from '../../webview/contract'
 import { Value } from '../../../cli/dvc/contract'
 import { ConfigKey, getConfigValue } from '../../../vscode/config'
 
-export type ColumnAccumulator = Record<string, Column>
+export type ColumnAccumulator = {
+  columns: Record<string, Column>
+  collected: Set<string>
+}
 
 const joinPathArray = (
   pathSegments: string[],
@@ -76,10 +79,10 @@ const mergeParentColumnByPath = (
   parentPath: string,
   label: string
 ) => {
-  if (acc[path]) {
-    acc[path].hasChildren = true
+  if (acc.columns[path]) {
+    acc.columns[path].hasChildren = true
   } else {
-    acc[path] = {
+    acc.columns[path] = {
       hasChildren: true,
       label,
       parentPath,
@@ -106,17 +109,15 @@ export const mergeAncestors = (
   limitedDepthAncestors: string[],
   join: (...pathArray: string[]) => string
 ) => {
-  if (!acc[path]) {
-    for (let i = 1; i <= limitedDepthAncestors.length; i++) {
-      const pathArray = limitedDepthAncestors.slice(0, i)
-      mergeParentColumnByPath(
-        acc,
-        type,
-        join(...pathArray),
-        join(...pathArray.slice(0, -1)),
-        pathArray[pathArray.length - 1]
-      )
-    }
+  for (let i = 1; i <= limitedDepthAncestors.length; i++) {
+    const pathArray = limitedDepthAncestors.slice(0, i)
+    mergeParentColumnByPath(
+      acc,
+      type,
+      join(...pathArray),
+      join(...pathArray.slice(0, -1)),
+      pathArray[pathArray.length - 1]
+    )
   }
 }
 
@@ -146,8 +147,11 @@ export const collectColumn = (
   label: string,
   value: Value
 ) => {
-  if (acc[path]) {
-    return
-  }
-  acc[path] = buildValueColumn(path, parentPath, pathArray, label, value)
+  acc.columns[path] = buildValueColumn(
+    path,
+    parentPath,
+    pathArray,
+    label,
+    value
+  )
 }

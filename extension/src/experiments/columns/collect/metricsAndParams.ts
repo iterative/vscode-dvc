@@ -29,28 +29,35 @@ const collectMetricOrParam = (
   label: string,
   value: Value
 ) => {
+  const path = buildMetricOrParamPath(type, ...pathArray, label)
+  if (acc.collected.has(path)) {
+    return
+  }
+  acc.collected.add(path)
+
   const { limitedDepthAncestors, limitedDepthLabel } = limitAncestorDepth(
     pathArray,
     METRIC_PARAM_SEPARATOR,
     FILE_SEPARATOR,
     label
   )
-  const path = buildMetricOrParamPath(type, ...limitedDepthAncestors, label)
+  const limitedPath = buildMetricOrParamPath(
+    type,
+    ...limitedDepthAncestors,
+    limitedDepthLabel
+  )
+
   mergeAncestors(
     acc,
     type,
-    path,
+    limitedPath,
     limitedDepthAncestors,
     (...pathArray: string[]) => buildMetricOrParamPath(type, ...pathArray)
   )
 
   collectColumn(
     acc,
-    buildMetricOrParamPath(
-      type,
-      ...(limitedDepthAncestors || pathArray),
-      label
-    ),
+    limitedPath,
     buildMetricOrParamPath(type, ...limitedDepthAncestors),
     [type, ...pathArray, label],
     limitedDepthLabel,
@@ -89,17 +96,28 @@ const walkMetricsOrParamsFile = (
   }
 }
 
+const collectMetricsOrParams = (
+  acc: ColumnAccumulator,
+  type: ColumnType,
+  metricsOrParams: MetricsOrParams | null
+): void => {
+  if (!metricsOrParams) {
+    return
+  }
+  walkMetricsOrParamsFile(acc, type, metricsOrParams)
+}
+
 export const collectMetricsAndParams = (
   acc: ColumnAccumulator,
   data: ExpData
 ) => {
   const { metrics, params } = data
-  if (metrics) {
-    walkMetricsOrParamsFile(acc, ColumnType.METRICS, metrics)
-  }
-  if (params) {
-    walkMetricsOrParamsFile(acc, ColumnType.PARAMS, params)
-  }
+  return Promise.all([
+    // eslint-disable-next-line sonarjs/no-use-of-empty-return-value
+    collectMetricsOrParams(acc, ColumnType.METRICS, metrics),
+    // eslint-disable-next-line sonarjs/no-use-of-empty-return-value
+    collectMetricsOrParams(acc, ColumnType.PARAMS, params)
+  ])
 }
 
 const collectChange = (

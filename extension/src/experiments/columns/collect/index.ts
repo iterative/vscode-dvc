@@ -28,38 +28,50 @@ const collectFromExperiment = (
 
   const { data } = experiment
   if (data) {
-    collectMetricsAndParams(acc, data)
-    collectDeps(acc, data)
+    return Promise.all([
+      collectMetricsAndParams(acc, data),
+      collectDeps(acc, data)
+    ])
   }
 }
 
-const collectFromExperiments = (
+const collectFromExperiments = async (
   acc: ColumnAccumulator,
   experiments?: ExpRange[] | null
 ) => {
   if (!experiments) {
     return
   }
+
+  const promises = []
   for (const { revs } of experiments) {
-    collectFromExperiment(acc, revs[0])
+    promises.push(collectFromExperiment(acc, revs[0]))
   }
+
+  await Promise.all(promises)
 }
 
-export const collectColumns = (output: ExpShowOutput): Column[] => {
-  const acc: ColumnAccumulator = {}
+export const collectColumns = async (
+  output: ExpShowOutput
+): Promise<Column[]> => {
+  const acc: ColumnAccumulator = { collected: new Set(), columns: {} }
 
-  acc.timestamp = timestampColumn
+  acc.columns.timestamp = timestampColumn
 
+  const promises = []
   for (const expState of output) {
     if (experimentHasError(expState)) {
       continue
     }
 
-    collectFromExperiment(acc, expState)
-    collectFromExperiments(acc, expState.experiments)
+    promises.push(
+      collectFromExperiment(acc, expState),
+      collectFromExperiments(acc, expState.experiments)
+    )
   }
+  await Promise.all(promises)
 
-  const columns = Object.values(acc)
+  const columns = Object.values(acc.columns)
   const hasNoData = isEqual(columns, [timestampColumn])
 
   return hasNoData ? [] : columns

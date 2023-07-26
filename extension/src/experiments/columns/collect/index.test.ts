@@ -22,13 +22,13 @@ const mockedGetConfigValue = jest.mocked(getConfigValue)
 mockedGetConfigValue.mockImplementation(() => 5)
 
 describe('collectColumns', () => {
-  it('should return a value equal to the columns fixture when given the output fixture', () => {
-    const columns = collectColumns(outputFixture)
+  it('should return a value equal to the columns fixture when given the output fixture', async () => {
+    const columns = await collectColumns(outputFixture)
     expect(columns).toStrictEqual(columnsFixture)
   })
 
-  it('should output both params and metrics when both are present', () => {
-    const columns = collectColumns(
+  it('should output both params and metrics when both are present', async () => {
+    const columns = await collectColumns(
       generateTestExpShowOutput({
         metrics: {
           1: {
@@ -50,8 +50,8 @@ describe('collectColumns', () => {
     expect(metrics).toBeDefined()
   })
 
-  it('should omit params when none exist in the source data', () => {
-    const columns = collectColumns(
+  it('should omit params when none exist in the source data', async () => {
+    const columns = await collectColumns(
       generateTestExpShowOutput({
         metrics: {
           1: {
@@ -66,13 +66,13 @@ describe('collectColumns', () => {
     expect(metrics).toBeDefined()
   })
 
-  it('should return an empty array if no params and metrics are provided', () => {
-    const columns = collectColumns(generateTestExpShowOutput({}))
+  it('should return an empty array if no params and metrics are provided', async () => {
+    const columns = await collectColumns(generateTestExpShowOutput({}))
     expect(columns).toStrictEqual([])
   })
 
-  it('should aggregate multiple different field names', () => {
-    const columns = collectColumns(
+  it('should aggregate multiple different field names', async () => {
+    const columns = await collectColumns(
       generateTestExpShowOutput(
         {
           params: {
@@ -127,8 +127,8 @@ describe('collectColumns', () => {
     ])
   })
 
-  it('should create concatenated columns for nesting deeper than 5', () => {
-    const columns = collectColumns(
+  it('should create concatenated columns for nesting deeper than 5', async () => {
+    const columns = await collectColumns(
       generateTestExpShowOutput({
         params: {
           'params.yaml': {

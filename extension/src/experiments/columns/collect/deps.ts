@@ -18,6 +18,12 @@ export const collectDeps = (acc: ColumnAccumulator, data: ExpData) => {
     return
   }
   for (const [file, { hash }] of Object.entries(deps)) {
+    const path = buildDepPath(file)
+    if (acc.collected.has(path)) {
+      return
+    }
+    acc.collected.add(path)
+
     const pathArray = getPathArray(file)
     const label = pathArray.pop() as string
 
@@ -27,7 +33,6 @@ export const collectDeps = (acc: ColumnAccumulator, data: ExpData) => {
       '/',
       label
     )
-    const path = buildDepPath(file)
 
     mergeAncestors(
       acc,
