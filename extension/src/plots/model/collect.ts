@@ -12,7 +12,9 @@ import {
   TemplatePlotSection,
   PlotsType,
   CustomPlotData,
-  CustomPlotValues
+  CustomPlotValues,
+  ComparisonRevisionData,
+  ComparisonPlotImg
 } from '../webview/contract'
 import { PlotsOutput } from '../../cli/dvc/contract'
 import { splitColumnPath } from '../../experiments/columns/paths'
@@ -34,6 +36,8 @@ import {
 import { StrokeDashEncoding } from '../multiSource/constants'
 import { exists } from '../../fileSystem'
 import { hasKey } from '../../util/object'
+import { getParent, getPathArray } from '../../fileSystem/util'
+import { MULTI_IMAGE_PATH_REG } from '../../cli/dvc/constants'
 
 export const getCustomPlotId = (metric: string, param: string) =>
   `custom-${metric}-${param}`
@@ -214,6 +218,96 @@ export const collectData = (output: PlotsOutput): DataAccumulator => {
   }
 
   return acc
+}
+
+type ComparisonPlotsAcc = {
+  [pathLabel: string]: { path: string; revisions: ComparisonRevisionData }
+}
+
+const collectSelectedComparisonPlot = ({
+  acc,
+  id,
+  isMulti,
+  path,
+  pathLabel,
+  getComparisonPlotImg
+}: {
+  acc: ComparisonPlotsAcc
+  id: string
+  isMulti: boolean
+  path: string
+  pathLabel: string
+  getComparisonPlotImg: (id: string, path: string) => ComparisonPlotImg
+}) => {
+  const doesPlotExist = acc[pathLabel].revisions[id]
+  if (!doesPlotExist) {
+    acc[pathLabel].revisions[id] = {
+      id,
+      imgOrImgs: [],
+      isMulti
+    }
+  }
+
+  acc[pathLabel].revisions[id].imgOrImgs.push(getComparisonPlotImg(id, path))
+}
+
+const collectSelectedPathComparisonPlots = ({
+  acc,
+  path,
+  selectedRevisionIds,
+  getComparisonPlotImg
+}: {
+  acc: ComparisonPlotsAcc
+  path: string
+  selectedRevisionIds: string[]
+  getComparisonPlotImg: (id: string, path: string) => ComparisonPlotImg
+}) => {
+  const isMulti = MULTI_IMAGE_PATH_REG.test(path)
+  const pathLabel = isMulti
+    ? (getParent(getPathArray(path), 0) as string)
+    : path
+  const doesPathExist = acc[pathLabel]
+
+  if (!doesPathExist) {
+    acc[pathLabel] = {
+      path: pathLabel,
+      revisions: {}
+    }
+  }
+
+  for (const id of selectedRevisionIds) {
+    collectSelectedComparisonPlot({
+      acc,
+      getComparisonPlotImg,
+      id,
+      isMulti,
+      path,
+      pathLabel
+    })
+  }
+}
+
+export const collectSelectedComparisonPlots = ({
+  paths,
+  selectedRevisionIds,
+  getComparisonPlotImg
+}: {
+  paths: string[]
+  selectedRevisionIds: string[]
+  getComparisonPlotImg: (id: string, path: string) => ComparisonPlotImg
+}) => {
+  const acc: ComparisonPlotsAcc = {}
+
+  for (const path of paths) {
+    collectSelectedPathComparisonPlots({
+      acc,
+      getComparisonPlotImg,
+      path,
+      selectedRevisionIds
+    })
+  }
+
+  return Object.values(acc)
 }
 
 export type TemplateAccumulator = { [path: string]: string }

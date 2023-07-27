@@ -12,7 +12,8 @@ import {
   collectImageUrl,
   collectIdShas,
   collectSelectedTemplatePlotRawData,
-  collectCustomPlotRawData
+  collectCustomPlotRawData,
+  collectSelectedComparisonPlots
 } from './collect'
 import { getRevisionSummaryColumns } from './util'
 import {
@@ -22,7 +23,6 @@ import {
 } from './custom'
 import {
   Revision,
-  ComparisonRevisionData,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH,
   PlotsSection,
@@ -59,12 +59,6 @@ import { isDvcError } from '../../cli/dvc/reader'
 import { ErrorsModel } from '../errors/model'
 import { openFileInEditor, writeCsv, writeJson } from '../../fileSystem'
 import { Toast } from '../../vscode/toast'
-import { getParent, getPathArray } from '../../fileSystem/util'
-import { MULTI_IMAGE_PATH_REG } from '../../cli/dvc/constants'
-
-type ComparisonPlotsAcc = {
-  [pathLabel: string]: { path: string; revisions: ComparisonRevisionData }
-}
 
 export class PlotsModel extends ModelWithPersistence {
   private readonly experiments: Experiments
@@ -420,59 +414,28 @@ export class PlotsModel extends ModelWithPersistence {
     delete this.revisionData[id]
     delete this.comparisonData[id]
   }
-  // TBD we should move this collection code into its own utils
 
   private getSelectedComparisonPlots(
     paths: string[],
     selectedRevisionIds: string[]
   ) {
-    const acc: ComparisonPlotsAcc = {}
+    return collectSelectedComparisonPlots({
+      getComparisonPlotImg: (id: string, path: string) => {
+        const image = this.comparisonData?.[id]?.[path]
+        const errors = this.errors.getImageErrors(path, id)
+        const fetched = this.fetchedRevs.has(id)
+        const url = collectImageUrl(image, fetched)
+        const loading = !fetched && !url
 
-    for (const path of paths) {
-      this.collectSelectedPathComparisonPlots(acc, path, selectedRevisionIds)
-    }
-
-    return Object.values(acc)
-  }
-
-  private collectSelectedPathComparisonPlots(
-    acc: ComparisonPlotsAcc,
-    path: string,
-    selectedRevisionIds: string[]
-  ) {
-    const isMulti = MULTI_IMAGE_PATH_REG.test(path)
-    const pathLabel = isMulti
-      ? (getParent(getPathArray(path), 0) as string)
-      : path
-
-    if (!acc[pathLabel]) {
-      acc[pathLabel] = {
-        path: pathLabel,
-        revisions: {}
-      }
-    }
-
-    for (const id of selectedRevisionIds) {
-      const image = this.comparisonData?.[id]?.[path]
-      const errors = this.errors.getImageErrors(path, id)
-      const fetched = this.fetchedRevs.has(id)
-      const url = collectImageUrl(image, fetched)
-      const loading = !fetched && !url
-
-      if (!acc[pathLabel].revisions[id]) {
-        acc[pathLabel].revisions[id] = {
-          id,
-          imgOrImgs: [],
-          isMulti
+        return {
+          errors,
+          loading,
+          url
         }
-      }
-
-      acc[pathLabel].revisions[id].imgOrImgs.push({
-        errors,
-        loading,
-        url
-      })
-    }
+      },
+      paths,
+      selectedRevisionIds
+    })
   }
 
   private getSelectedTemplatePlots(
