@@ -1,76 +1,18 @@
 import React, { useCallback, MouseEvent, KeyboardEvent } from 'react'
 import cx from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  ComparisonPlot,
-  ComparisonPlotImg
-} from 'dvc/src/plots/webview/contract'
+import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
 import {
   changeDisabledDragIds,
   setMultiPlotValue
-} from './comparisonTableSlice'
-import styles from './styles.module.scss'
-import { RefreshButton } from '../../../shared/components/button/RefreshButton'
-import { refreshRevisions, zoomPlot } from '../../util/messages'
-import { ErrorIcon } from '../../../shared/components/errorIcon/ErrorIcon'
-import { PlotsState } from '../../store'
+} from '../comparisonTableSlice'
+import { PlotsState } from '../../../store'
+import styles from '../styles.module.scss'
+import { ComparisonTableLoadingCell } from './ComparisonTableLoadingCell'
+import { ComparisonTableMissingCell } from './ComparisonTableMissingCell'
+import { zoomPlot } from '../../../util/messages'
 
-const LoadingPlotTableCell: React.FC = () => (
-  <div className={styles.noImageContent}>
-    <p>Loading...</p>
-  </div>
-)
-
-const MissingPlotTableCell: React.FC<{ plot: ComparisonPlotImg }> = ({
-  plot
-}) => (
-  <div className={styles.noImageContent}>
-    {plot.errors?.length ? (
-      <>
-        <div className={styles.errorIcon}>
-          <ErrorIcon error={plot.errors.join('\n')} size={48} />
-        </div>
-        <RefreshButton onClick={refreshRevisions} />
-      </>
-    ) : (
-      <p className={styles.emptyIcon}>-</p>
-    )}
-  </div>
-)
-
-export const ComparisonTableCellSingle: React.FC<{
-  path: string
-  plot: ComparisonPlot
-}> = ({ path, plot }) => {
-  const plotImg = plot.imgOrImgs[0]
-  const loading = plotImg.loading
-  const missing = !loading && !plotImg.url
-
-  if (loading) {
-    return <LoadingPlotTableCell />
-  }
-
-  if (missing) {
-    return <MissingPlotTableCell plot={plotImg} />
-  }
-
-  return (
-    <button
-      className={styles.imageWrapper}
-      onClick={() => zoomPlot(plotImg.url)}
-      data-testid="image-plot-button"
-    >
-      <img
-        className={styles.image}
-        draggable={false}
-        src={plotImg.url}
-        alt={`Plot of ${path} (${plot.id})`}
-      />
-    </button>
-  )
-}
-// TBD split ComparisonTableCell.tsx into its own folder
-export const ComparisonTableCellMulti: React.FC<{
+export const ComparisonTableMultiCell: React.FC<{
   path: string
   plot: ComparisonPlot
 }> = ({ path, plot }) => {
@@ -125,7 +67,7 @@ export const ComparisonTableCellMulti: React.FC<{
   if (loading) {
     return (
       <div className={styles.multiImageWrapper}>
-        <LoadingPlotTableCell />
+        <ComparisonTableLoadingCell />
         {slider}
       </div>
     )
@@ -134,7 +76,7 @@ export const ComparisonTableCellMulti: React.FC<{
   if (missing) {
     return (
       <div className={styles.multiImageWrapper}>
-        <MissingPlotTableCell plot={plot.imgOrImgs[currentStep]} />
+        <ComparisonTableMissingCell plot={plot.imgOrImgs[currentStep]} />
         {slider}
       </div>
     )

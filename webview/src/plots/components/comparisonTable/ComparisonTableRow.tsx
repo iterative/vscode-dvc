@@ -3,10 +3,8 @@ import React, { useState } from 'react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
 import styles from './styles.module.scss'
-import {
-  ComparisonTableCellMulti,
-  ComparisonTableCellSingle
-} from './ComparisonTableCell'
+import { ComparisonTableCell } from './cell/ComparisonTableCell'
+import { ComparisonTableMultiCell } from './cell/ComparisonTableMultiCell'
 import { Icon } from '../../../shared/components/Icon'
 import { ChevronDown, ChevronRight } from '../../../shared/components/icons'
 import { PlotsState } from '../../store'
@@ -80,9 +78,9 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
                 className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
               >
                 {plot.isMulti ? (
-                  <ComparisonTableCellMulti plot={plot} path={path} />
+                  <ComparisonTableMultiCell plot={plot} path={path} />
                 ) : (
-                  <ComparisonTableCellSingle plot={plot} path={path} />
+                  <ComparisonTableCell plot={plot} path={path} />
                 )}
               </div>
             </td>
