@@ -1,10 +1,13 @@
 import { join } from '../../../util/path'
-import { Commit } from '../../../../experiments/webview/contract'
+import {
+  Commit,
+  WORKSPACE_BRANCH
+} from '../../../../experiments/webview/contract'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 
 const data: Commit[] = [
   {
-    branch: undefined,
+    branch: WORKSPACE_BRANCH,
     id: EXPERIMENT_WORKSPACE_ID,
     label: EXPERIMENT_WORKSPACE_ID,
     metrics: {

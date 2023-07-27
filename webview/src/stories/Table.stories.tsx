@@ -32,7 +32,6 @@ import {
 } from '../test/tableDataFixture'
 
 const tableData: TableDataState = {
-  branches: [undefined, 'main'],
   changes: workspaceChangesFixture,
   cliError: null,
   columnOrder: [],
@@ -50,6 +49,7 @@ const tableData: TableDataState = {
   hasRunningWorkspaceExperiment: true,
   isShowingMoreCommits: { main: true },
   rows: rowsFixture,
+  selectedBranches: [],
   selectedForPlotsCount: 2,
   sorts: [
     { descending: true, path: 'params:params.yaml:epochs' },
@@ -59,7 +59,6 @@ const tableData: TableDataState = {
 
 const noRunningExperiments = {
   ...tableData,
-  branches: [undefined, 'main'],
   hasRunningWorkspaceExperiment: false,
   rows: rowsFixture.map(row => ({
     ...row,
@@ -198,7 +197,6 @@ export const WithSurvivalData = Template.bind({})
 WithSurvivalData.args = {
   tableData: {
     ...survivalTableData,
-    branches: [undefined, 'main'],
     hasData: true
   }
 }
@@ -212,8 +210,7 @@ WithMiddleStates.args = {
   tableData: {
     ...setExperimentsAsStarred(tableDataWithSomeSelectedExperiments, [
       '1ba7bcd'
-    ]),
-    branches: [undefined, 'main']
+    ])
   }
 }
 WithMiddleStates.play = async ({ canvasElement }) => {
@@ -270,7 +267,6 @@ export const WithAllDataTypes = Template.bind({})
 WithAllDataTypes.args = {
   tableData: {
     ...dataTypesTableFixture,
-    branches: [undefined, 'main'],
     hasData: true
   }
 }
@@ -286,7 +282,6 @@ export const WithDeeplyNestedHeaders = Template.bind({})
 WithDeeplyNestedHeaders.args = {
   tableData: {
     ...deeplyNestedTableData,
-    branches: [undefined, 'main'],
     hasData: true,
     rows: deeplyNestedTableData.rows
   }
@@ -371,7 +366,6 @@ const branches = ['main', 'other-branch', 'branch-14786']
 WithMultipleBranches.args = {
   tableData: {
     ...survivalTableData,
-    branches,
     hasData: true,
     rows: [
       ...survivalTableData.rows.map(row => ({
@@ -398,6 +392,7 @@ WithMultipleBranches.args = {
           branch: branches[2]
         }))
       }))
-    ]
+    ],
+    selectedBranches: branches.slice(1)
   }
 }

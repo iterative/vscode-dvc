@@ -1,7 +1,8 @@
 import { join } from '../../../util/path'
 import {
   Commit,
-  GitRemoteStatus
+  GitRemoteStatus,
+  WORKSPACE_BRANCH
 } from '../../../../experiments/webview/contract'
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
 import { shortenForLabel } from '../../../../util/string'
@@ -20,7 +21,7 @@ const colorsList = copyOriginalColors()
 
 const rowsFixture: Commit[] = [
   {
-    branch: undefined,
+    branch: WORKSPACE_BRANCH,
     commit: undefined,
     description: undefined,
     deps: {
