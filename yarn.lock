@@ -20618,10 +20618,10 @@ vega-label@~1.2.1:
     vega-scenegraph "^4.9.2"
     vega-util "^1.15.2"
 
-vega-lite@5.14.0:
-  version "5.14.0"
-  resolved "https://registry.yarnpkg.com/vega-lite/-/vega-lite-5.14.0.tgz#20f719e3ba7c15505dfa0e9389ffc488a33e9e16"
-  integrity sha512-BlGSp+nZNmBO0ukRAA86so/6KfUEIN0Mqmo2xo2Tv6UTxLlfh3oGvsKh6g6283meJickwntR+K4qUOIVnGUoyg==
+vega-lite@5.14.1:
+  version "5.14.1"
+  resolved "https://registry.yarnpkg.com/vega-lite/-/vega-lite-5.14.1.tgz#02177cb04af85c7011ab302a441d17e0bb6ac810"
+  integrity sha512-VFvi0QtUoLQqwfAXTGjo0Acw/OTjiK3zOrcO/HyksGnnNDBHWM1GTcFryiWZYoAi99ehvv7tI/q94O46+fGRSQ==
   dependencies:
     "@types/clone" "~2.1.1"
     clone "~2.1.2"
