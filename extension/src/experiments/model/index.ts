@@ -1,6 +1,7 @@
 import { Memento } from 'vscode'
 import { SortDefinition, sortExperiments } from './sortBy'
-import { FilterDefinition, filterExperiment, getFilterId } from './filterBy'
+import { FilterDefinition, getFilterId } from './filterBy'
+import { collectFiltered, collectUnfiltered } from './filterBy/collect'
 import {
   collectAddRemoveCommitsDetails,
   collectBranches,
@@ -27,7 +28,7 @@ import {
   GitRemoteStatus,
   RunningExperiment
 } from '../webview/contract'
-import { definedAndNonEmpty, reorderListSubset } from '../../util/array'
+import { reorderListSubset } from '../../util/array'
 import {
   Executor,
   ExpShowOutput,
@@ -409,31 +410,27 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getRowData() {
-    const commitsBySha: { [sha: string]: Commit } = {}
-    for (const commit of this.commits) {
-      commitsBySha[commit.sha as string] = commit
+    const commitsBySha = this.applyFiltersToCommits()
+
+    const rows: Commit[] = [
+      { branch: undefined, ...this.addDetails(this.workspace) }
+    ]
+    for (const { branch, sha } of this.rowOrder) {
+      const commit = commitsBySha[sha]
+      if (!commit) {
+        continue
+      }
+      if (commit.subRows) {
+        commit.subRows = commit.subRows.map(experiment => ({
+          ...experiment,
+          branch
+        }))
+      }
+
+      rows.push({ ...commit, branch })
     }
 
-    return [
-      { branch: undefined, ...this.addDetails(this.workspace) },
-      ...this.rowOrder.map(({ branch, sha }) => {
-        const commit = { ...commitsBySha[sha], branch }
-        const experiments = this.getExperimentsByCommit(commit)
-        const commitWithSelectedAndStarred = this.addDetails(commit)
-
-        if (!definedAndNonEmpty(experiments)) {
-          return commitWithSelectedAndStarred
-        }
-
-        return {
-          ...commitWithSelectedAndStarred,
-          subRows: experiments.filter(
-            (experiment: Experiment) =>
-              !!filterExperiment(this.getFilters(), experiment)
-          )
-        }
-      })
-    ]
+    return rows
   }
 
   public getHasMoreCommits() {
@@ -459,6 +456,10 @@ export class ExperimentsModel extends ModelWithPersistence {
   public getFilteredCount() {
     const filtered = this.getFilteredExperiments()
     return filtered.length
+  }
+
+  public getRecordCount() {
+    return this.getCombinedList().length
   }
 
   public getCombinedList() {
@@ -530,10 +531,14 @@ export class ExperimentsModel extends ModelWithPersistence {
   private getFilteredExperiments() {
     const acc: Experiment[] = []
 
-    for (const experiment of this.getExperiments()) {
-      if (!filterExperiment(this.getFilters(), experiment)) {
-        acc.push(experiment)
-      }
+    for (const commit of this.commits) {
+      const experiments = this.getExperimentsByCommit(commit)
+      collectFiltered(
+        acc,
+        this.addDetails(commit),
+        experiments,
+        this.getFilters()
+      )
     }
 
     return acc
@@ -543,10 +548,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     const experiments = this.experimentsByCommit
       .get(commit.id)
       ?.map(originalExperiment => {
-        const experiment = {
-          ...this.addDetails(originalExperiment),
-          branch: commit.branch
-        }
+        const experiment = this.addDetails(originalExperiment)
 
         this.addRemoteStatus(experiment)
 
@@ -696,5 +698,26 @@ export class ExperimentsModel extends ModelWithPersistence {
       uniqueStatus[id] = UNSELECTED
     }
     return uniqueStatus
+  }
+
+  private applyFiltersToCommits() {
+    const commitsBySha: { [sha: string]: Commit } = {}
+    for (const commit of this.commits) {
+      const commitWithSelectedAndStarred = this.addDetails(commit)
+      const experiments = this.getExperimentsByCommit(
+        commitWithSelectedAndStarred
+      )
+      const unfilteredCommit = collectUnfiltered(
+        commitWithSelectedAndStarred,
+        experiments,
+        this.getFilters()
+      )
+      if (!unfilteredCommit) {
+        continue
+      }
+
+      commitsBySha[commit.sha as string] = unfilteredCommit
+    }
+    return commitsBySha
   }
 }
