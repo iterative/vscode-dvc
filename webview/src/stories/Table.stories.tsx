@@ -297,7 +297,7 @@ LoadingData.args = { tableData: undefined }
 
 export const WithNoExperiments = Template.bind({})
 WithNoExperiments.args = {
-  tableData: { ...tableData, rows: [rowsFixture[0]] }
+  tableData: { ...tableData, rows: [] }
 }
 
 export const WithNoColumns = Template.bind({})
