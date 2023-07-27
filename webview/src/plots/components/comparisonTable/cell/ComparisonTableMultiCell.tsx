@@ -2,14 +2,14 @@ import React, { useCallback, MouseEvent, KeyboardEvent } from 'react'
 import cx from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
 import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
+import { ComparisonTableLoadingCell } from './ComparisonTableLoadingCell'
+import { ComparisonTableMissingCell } from './ComparisonTableMissingCell'
+import styles from '../styles.module.scss'
 import {
   changeDisabledDragIds,
   setMultiPlotValue
 } from '../comparisonTableSlice'
 import { PlotsState } from '../../../store'
-import styles from '../styles.module.scss'
-import { ComparisonTableLoadingCell } from './ComparisonTableLoadingCell'
-import { ComparisonTableMissingCell } from './ComparisonTableMissingCell'
 import { zoomPlot } from '../../../util/messages'
 
 export const ComparisonTableMultiCell: React.FC<{

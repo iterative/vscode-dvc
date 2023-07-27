@@ -22,7 +22,7 @@ import {
   TemplatePlot
 } from '../webview/contract'
 import { exists } from '../../fileSystem'
-import { REVISIONS, getMultiImagePaths } from '../../test/fixtures/plotsDiff'
+import { REVISIONS } from '../../test/fixtures/plotsDiff'
 
 const mockedExists = jest.mocked(exists)
 
@@ -106,8 +106,7 @@ describe('collectTemplates', () => {
     expect(Object.keys(templates)).toStrictEqual([
       logsLossPath,
       join('logs', 'acc.tsv'),
-      'predictions.json',
-      ...getMultiImagePaths()
+      'predictions.json'
     ])
 
     expect(JSON.parse(templates[logsLossPath])).toStrictEqual(content)
