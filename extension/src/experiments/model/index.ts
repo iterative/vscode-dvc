@@ -1,6 +1,7 @@
 import { Memento } from 'vscode'
 import { SortDefinition, sortExperiments } from './sortBy'
-import { FilterDefinition, filterExperiment, getFilterId } from './filterBy'
+import { FilterDefinition, getFilterId } from './filterBy'
+import { collectFiltered, collectUnfiltered } from './filterBy/collect'
 import {
   collectAddRemoveCommitsDetails,
   collectBranches,
@@ -27,7 +28,7 @@ import {
   GitRemoteStatus,
   RunningExperiment
 } from '../webview/contract'
-import { definedAndNonEmpty, reorderListSubset } from '../../util/array'
+import { reorderListSubset } from '../../util/array'
 import {
   Executor,
   ExpShowOutput,
@@ -408,44 +409,12 @@ export class ExperimentsModel extends ModelWithPersistence {
     }
   }
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   public getRowData() {
-    const commitsBySha: { [sha: string]: Commit } = {}
-    for (const commit of this.commits) {
-      const commitWithSelectedAndStarred = this.addDetails(commit)
-      const experiments = this.getExperimentsByCommit(
-        commitWithSelectedAndStarred
-      )
-
-      const unfilteredExperiments = experiments?.filter(
-        (experiment: Experiment) =>
-          !!filterExperiment(this.getFilters(), experiment)
-      )
-
-      const hasUnfilteredExperiments = definedAndNonEmpty(unfilteredExperiments)
-      const filtered =
-        !hasUnfilteredExperiments &&
-        !filterExperiment(this.getFilters(), commitWithSelectedAndStarred)
-
-      if (filtered) {
-        continue
-      }
-
-      if (!hasUnfilteredExperiments) {
-        commitsBySha[commit.sha as string] = commitWithSelectedAndStarred
-        continue
-      }
-
-      commitsBySha[commit.sha as string] = {
-        ...commitWithSelectedAndStarred,
-        subRows: unfilteredExperiments
-      }
-    }
+    const commitsBySha = this.applyFiltersToCommits()
 
     const rows: Commit[] = [
       { branch: undefined, ...this.addDetails(this.workspace) }
     ]
-
     for (const { branch, sha } of this.rowOrder) {
       const commit = commitsBySha[sha]
       if (!commit) {
@@ -559,26 +528,17 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.currentSorts.findIndex(({ path }) => path === pathToRemove)
   }
 
-  // eslint-disable-next-line sonarjs/cognitive-complexity
   private getFilteredExperiments() {
     const acc: Experiment[] = []
 
     for (const commit of this.commits) {
       const experiments = this.getExperimentsByCommit(commit)
-      let hasUnfilteredExperiment = false
-      for (const experiment of experiments || []) {
-        if (!filterExperiment(this.getFilters(), experiment)) {
-          acc.push(experiment)
-          continue
-        }
-        hasUnfilteredExperiment = true
-      }
-      if (
-        !hasUnfilteredExperiment &&
-        !filterExperiment(this.getFilters(), this.addDetails(commit))
-      ) {
-        acc.push(commit)
-      }
+      collectFiltered(
+        acc,
+        this.addDetails(commit),
+        experiments,
+        this.getFilters()
+      )
     }
 
     return acc
@@ -738,5 +698,26 @@ export class ExperimentsModel extends ModelWithPersistence {
       uniqueStatus[id] = UNSELECTED
     }
     return uniqueStatus
+  }
+
+  private applyFiltersToCommits() {
+    const commitsBySha: { [sha: string]: Commit } = {}
+    for (const commit of this.commits) {
+      const commitWithSelectedAndStarred = this.addDetails(commit)
+      const experiments = this.getExperimentsByCommit(
+        commitWithSelectedAndStarred
+      )
+      const unfilteredCommit = collectUnfiltered(
+        commitWithSelectedAndStarred,
+        experiments,
+        this.getFilters()
+      )
+      if (!unfilteredCommit) {
+        continue
+      }
+
+      commitsBySha[commit.sha as string] = unfilteredCommit
+    }
+    return commitsBySha
   }
 }
