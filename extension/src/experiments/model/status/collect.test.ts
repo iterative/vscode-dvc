@@ -3,7 +3,7 @@ import { collectColoredStatus } from './collect'
 import { copyOriginalColors } from './colors'
 import { Experiment } from '../../webview/contract'
 import {
-  ExperimentStatus,
+  ExecutorStatus,
   EXPERIMENT_WORKSPACE_ID
 } from '../../../cli/dvc/contract'
 
@@ -39,7 +39,7 @@ describe('collectColoredStatus', () => {
   it('should not push queued experiments into the returned object', () => {
     const experiments = [
       { id: 'exp1' },
-      { id: 'exp2', status: ExperimentStatus.QUEUED }
+      { executorStatus: ExecutorStatus.QUEUED, id: 'exp2' }
     ] as Experiment[]
     const colors = copyOriginalColors()
 
@@ -214,8 +214,8 @@ describe('collectColoredStatus', () => {
       [
         {
           executor: null,
-          id: 'exp-1',
-          status: ExperimentStatus.SUCCESS
+          executorStatus: ExecutorStatus.SUCCESS,
+          id: 'exp-1'
         },
         {
           id: EXPERIMENT_WORKSPACE_ID

@@ -1,8 +1,9 @@
 import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
+import { WORKSPACE_BRANCH } from '../../../../experiments/webview/contract'
 
 export const data = [
   {
-    branch: undefined,
+    branch: WORKSPACE_BRANCH,
     id: EXPERIMENT_WORKSPACE_ID,
     label: EXPERIMENT_WORKSPACE_ID,
     params: {

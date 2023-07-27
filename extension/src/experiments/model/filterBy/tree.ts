@@ -12,11 +12,7 @@ import { RegisteredCommands } from '../../../commands/external'
 import { InternalCommands } from '../../../commands/internal'
 import { sendViewOpenedTelemetryEvent } from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
-import {
-  definedAndNonEmpty,
-  joinTruthyItems,
-  sortCollectedArray
-} from '../../../util/array'
+import { definedAndNonEmpty, sortCollectedArray } from '../../../util/array'
 import { createTreeView, getRootItem, isRoot } from '../../../tree'
 import { Disposable } from '../../../class/dispose'
 import { sum } from '../../../util/math'
@@ -171,11 +167,12 @@ export class ExperimentsFilterByTree
         this.experiments.getRepository(dvcRoot).getFilteredCount()
       )
     )
+    const total = sum(
+      dvcRoots.flatMap(dvcRoot =>
+        this.experiments.getRepository(dvcRoot).getRecordCount()
+      )
+    )
 
-    return joinTruthyItems([
-      `${filteredCount || 'No'}`,
-      'Experiment' + (filteredCount === 1 ? '' : 's'),
-      'Filtered'
-    ])
+    return [filteredCount, 'of', total, 'Filtered'].join(' ')
   }
 }

@@ -47,7 +47,7 @@ import {
   renderTableWithoutRunningExperiments,
   renderTableWithPlaceholder,
   renderTableWithSortingData,
-  renderTableWithWorkspaceRowOnly,
+  renderTableWithNoRows,
   selectedRows,
   setTableData
 } from '../../test/experimentsTable'
@@ -109,8 +109,8 @@ describe('App', () => {
     expect(noColumnsState).not.toBeInTheDocument()
   })
 
-  it('should show the no experiments empty state when only the workspace is provided', () => {
-    renderTableWithWorkspaceRowOnly()
+  it('should show the no experiments empty state when no rows are provided', () => {
+    renderTableWithNoRows()
 
     const noExperimentsState = screen.queryByText('No Experiments to Display.')
     expect(noExperimentsState).toBeInTheDocument()
@@ -1728,7 +1728,6 @@ describe('App', () => {
 
       const multipleBranches = {
         ...tableDataFixture,
-        branches,
         hasData: true,
         rows: [
           workspace as Commit,
@@ -1747,7 +1746,8 @@ describe('App', () => {
             branch: branches[2],
             subRows: undefined
           }))
-        ]
+        ],
+        selectedBranches: branches.slice(1)
       }
 
       renderTable(multipleBranches)

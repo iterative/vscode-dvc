@@ -3,7 +3,7 @@ import {
   ExecutorState,
   ExpData,
   EXPERIMENT_WORKSPACE_ID,
-  ExperimentStatus,
+  ExecutorStatus,
   ExpRange,
   ExpShowOutput,
   ExpState
@@ -44,7 +44,7 @@ const getExecutorState = (executor: Partial<ExecutorState>): ExecutorState => {
   return {
     local: null,
     name: Executor.WORKSPACE,
-    state: ExperimentStatus.RUNNING,
+    state: ExecutorStatus.RUNNING,
     ...executor
   }
 }

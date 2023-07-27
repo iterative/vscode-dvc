@@ -182,9 +182,9 @@ export const ExperimentsTable: React.FC = () => {
   }, [toggleAllRowsExpanded])
 
   const hasOnlyDefaultColumns = columns.length <= 1
-  const hasOnlyWorkspace = data.length <= 1
-  if (hasOnlyDefaultColumns || hasOnlyWorkspace) {
-    return <GetStarted showWelcome={!hasColumns || hasOnlyWorkspace} />
+  const hasNoRows = data.length === 0
+  if (hasOnlyDefaultColumns || hasNoRows) {
+    return <GetStarted showWelcome={!hasColumns || hasNoRows} />
   }
   return (
     <RowSelectionProvider>

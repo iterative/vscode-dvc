@@ -276,6 +276,7 @@ export class WebviewMessages {
         this.experiments.hasRunningWorkspaceExperiment(),
       isShowingMoreCommits: this.experiments.getIsShowingMoreCommits(),
       rows: this.experiments.getRowData(),
+      selectedBranches: this.experiments.getSelectedBranches(),
       selectedForPlotsCount: this.experiments.getSelectedRevisions().length,
       sorts: this.experiments.getSorts()
     }

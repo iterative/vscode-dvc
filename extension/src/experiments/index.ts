@@ -341,6 +341,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getFilteredCount()
   }
 
+  public getRecordCount() {
+    return this.experiments.getRecordCount()
+  }
+
   public getExperimentCount() {
     if (!this.columns.hasNonDefaultColumns()) {
       return 0

@@ -28,7 +28,7 @@ const CounterBadge: React.FC<CounterBadgeProps> = ({ count }) => {
     <span
       className={styles.indicatorCount}
       role="marquee"
-      aria-label={`${count}`}
+      aria-label={String(count)}
     >
       {count}
     </span>
@@ -83,9 +83,8 @@ export const Indicators = () => {
     (state: ExperimentsState) => state.tableData.selectedForPlotsCount
   )
 
-  const branchesSelected = useSelector(
-    (state: ExperimentsState) =>
-      Math.max(state.tableData.branches.filter(Boolean).length - 1, 0) // We always have one branch by default (the current one which is not selected) and undefined for the workspace
+  const branchesSelected = useSelector((state: ExperimentsState) =>
+    Math.max(state.tableData.selectedBranches.length, 0)
   )
   const { hasBranchesToSelect } = useSelector(
     (state: ExperimentsState) => state.tableData

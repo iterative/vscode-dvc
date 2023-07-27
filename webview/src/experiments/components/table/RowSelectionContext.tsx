@@ -61,7 +61,6 @@ export const RowSelectionProvider: React.FC<{ children: React.ReactNode }> = ({
           row: {
             original: { id, branch }
           }
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         }) => getCompositeId(id, branch)
       ),
       ...selectionHistory

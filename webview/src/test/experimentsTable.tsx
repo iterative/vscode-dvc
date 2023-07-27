@@ -12,7 +12,7 @@ import { Provider } from 'react-redux'
 import deeplyNestedTableDataFixture from 'dvc/src/test/fixtures/expShow/deeplyNested/tableData'
 import tableDataFixture from 'dvc/src/test/fixtures/expShow/base/tableData'
 import { MessageToWebviewType } from 'dvc/src/webview/contract'
-import { ExperimentStatus } from 'dvc/src/cli/dvc/contract'
+import { ExecutorStatus } from 'dvc/src/cli/dvc/contract'
 import { tableData as sortingTableDataFixture } from './sort'
 import { customQueries, getRow } from './queries'
 import { App } from '../experiments/components/App'
@@ -52,8 +52,8 @@ export const renderTableWithNoColumns = () => {
   renderTable({ ...tableDataFixture, columns: [] })
 }
 
-export const renderTableWithWorkspaceRowOnly = () => {
-  renderTable({ ...tableDataFixture, rows: [tableDataFixture.rows[0]] })
+export const renderTableWithNoRows = () => {
+  renderTable({ ...tableDataFixture, rows: [] })
 }
 
 export const renderTableWithSortingData = () => {
@@ -69,10 +69,10 @@ export const renderTableWithoutRunningExperiments = (
     hasRunningWorkspaceExperiment: false,
     rows: tableDataFixture.rows.map(row => ({
       ...row,
-      status: ExperimentStatus.SUCCESS,
+      executorStatus: ExecutorStatus.SUCCESS,
       subRows: row.subRows?.map(subRow => ({
         ...subRow,
-        status: ExperimentStatus.SUCCESS
+        executorStatus: ExecutorStatus.SUCCESS
       }))
     }))
   })

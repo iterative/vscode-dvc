@@ -51,18 +51,25 @@ export const StubCell: React.FC<
     }
   } = cell
   const {
-    original: { error, status, gitRemoteStatus, label, id, description = '' }
+    original: {
+      error,
+      executorStatus,
+      gitRemoteStatus,
+      label,
+      id,
+      description = ''
+    }
   } = row
   const { toggleExperiment } = rowActionsProps
 
   return (
     <td className={cx(styles.experimentsTd, styles.experimentCell)}>
       <div className={styles.innerCell} style={{ width: getSize() }}>
-        <CellRowActions status={status} {...rowActionsProps} />
+        <CellRowActions executorStatus={executorStatus} {...rowActionsProps} />
         <RowExpansionButton row={row} />
         <ExperimentStatusIndicator
           id={id}
-          status={status}
+          executorStatus={executorStatus}
           gitRemoteStatus={gitRemoteStatus}
         />
 

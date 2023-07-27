@@ -10,10 +10,7 @@ import dataTypesTableFixture from 'dvc/src/test/fixtures/expShow/dataTypes/table
 import survivalTableData from 'dvc/src/test/fixtures/expShow/survival/tableData'
 import { timestampColumn } from 'dvc/src/experiments/columns/constants'
 import { delay } from 'dvc/src/util/time'
-import {
-  ExperimentStatus,
-  isRunning
-} from 'dvc/src/experiments/webview/contract'
+import { ExecutorStatus, isRunning } from 'dvc/src/experiments/webview/contract'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import {
   within,
@@ -32,7 +29,6 @@ import {
 } from '../test/tableDataFixture'
 
 const tableData: TableDataState = {
-  branches: [undefined, 'main'],
   changes: workspaceChangesFixture,
   cliError: null,
   columnOrder: [],
@@ -50,6 +46,7 @@ const tableData: TableDataState = {
   hasRunningWorkspaceExperiment: true,
   isShowingMoreCommits: { main: true },
   rows: rowsFixture,
+  selectedBranches: [],
   selectedForPlotsCount: 2,
   sorts: [
     { descending: true, path: 'params:params.yaml:epochs' },
@@ -59,16 +56,15 @@ const tableData: TableDataState = {
 
 const noRunningExperiments = {
   ...tableData,
-  branches: [undefined, 'main'],
   hasRunningWorkspaceExperiment: false,
   rows: rowsFixture.map(row => ({
     ...row,
-    status: ExperimentStatus.SUCCESS,
+    executorStatus: ExecutorStatus.SUCCESS,
     subRows: row.subRows?.map(experiment => ({
       ...experiment,
-      status: isRunning(experiment.status)
-        ? ExperimentStatus.SUCCESS
-        : experiment.status
+      executorStatus: isRunning(experiment.executorStatus)
+        ? ExecutorStatus.SUCCESS
+        : experiment.executorStatus
     }))
   }))
 }
@@ -78,12 +74,12 @@ const noRunningExperimentsNoCheckpoints = {
   hasCheckpoints: false,
   rows: rowsFixture.map(row => ({
     ...row,
-    status: ExperimentStatus.SUCCESS,
+    executorStatus: ExecutorStatus.SUCCESS,
     subRows: row.subRows?.map(experiment => ({
       ...experiment,
-      status: isRunning(experiment.status)
-        ? ExperimentStatus.SUCCESS
-        : experiment.status,
+      executorStatus: isRunning(experiment.executorStatus)
+        ? ExecutorStatus.SUCCESS
+        : experiment.executorStatus,
       subRows: []
     }))
   }))
@@ -198,7 +194,6 @@ export const WithSurvivalData = Template.bind({})
 WithSurvivalData.args = {
   tableData: {
     ...survivalTableData,
-    branches: [undefined, 'main'],
     hasData: true
   }
 }
@@ -212,8 +207,7 @@ WithMiddleStates.args = {
   tableData: {
     ...setExperimentsAsStarred(tableDataWithSomeSelectedExperiments, [
       '1ba7bcd'
-    ]),
-    branches: [undefined, 'main']
+    ])
   }
 }
 WithMiddleStates.play = async ({ canvasElement }) => {
@@ -270,7 +264,6 @@ export const WithAllDataTypes = Template.bind({})
 WithAllDataTypes.args = {
   tableData: {
     ...dataTypesTableFixture,
-    branches: [undefined, 'main'],
     hasData: true
   }
 }
@@ -286,7 +279,6 @@ export const WithDeeplyNestedHeaders = Template.bind({})
 WithDeeplyNestedHeaders.args = {
   tableData: {
     ...deeplyNestedTableData,
-    branches: [undefined, 'main'],
     hasData: true,
     rows: deeplyNestedTableData.rows
   }
@@ -297,7 +289,7 @@ LoadingData.args = { tableData: undefined }
 
 export const WithNoExperiments = Template.bind({})
 WithNoExperiments.args = {
-  tableData: { ...tableData, rows: [rowsFixture[0]] }
+  tableData: { ...tableData, rows: [] }
 }
 
 export const WithNoColumns = Template.bind({})
@@ -371,7 +363,6 @@ const branches = ['main', 'other-branch', 'branch-14786']
 WithMultipleBranches.args = {
   tableData: {
     ...survivalTableData,
-    branches,
     hasData: true,
     rows: [
       ...survivalTableData.rows.map(row => ({
@@ -398,6 +389,7 @@ WithMultipleBranches.args = {
           branch: branches[2]
         }))
       }))
-    ]
+    ],
+    selectedBranches: branches.slice(1)
   }
 }
