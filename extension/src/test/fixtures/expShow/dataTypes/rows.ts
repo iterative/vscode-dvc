@@ -1,9 +1,12 @@
 import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
-import { Commit } from '../../../../experiments/webview/contract'
+import {
+  Commit,
+  WORKSPACE_BRANCH
+} from '../../../../experiments/webview/contract'
 
 const data: Commit[] = [
   {
-    branch: undefined,
+    branch: WORKSPACE_BRANCH,
     displayColor: undefined,
     id: EXPERIMENT_WORKSPACE_ID,
     label: EXPERIMENT_WORKSPACE_ID,

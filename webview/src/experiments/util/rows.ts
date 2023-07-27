@@ -1,1 +1,4 @@
-export const getCompositeId = (id: string, branch = '') => `${id}-${branch}`
+export const getCompositeId = (
+  id: string,
+  branch: string | undefined | null = ''
+) => `${id}-${branch}`

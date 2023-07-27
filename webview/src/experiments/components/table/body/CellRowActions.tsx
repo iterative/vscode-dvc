@@ -1,9 +1,6 @@
 import React, { MouseEventHandler, ReactElement } from 'react'
 import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react'
-import {
-  ExperimentStatus,
-  isQueued
-} from 'dvc/src/experiments/webview/contract'
+import { ExecutorStatus, isQueued } from 'dvc/src/experiments/webview/contract'
 import { CellHintTooltip } from './CellHintTooltip'
 import { Indicator } from '../Indicators'
 import { addStarredFilter, openPlotsWebview } from '../../../util/messages'
@@ -22,7 +19,7 @@ export type CellRowActionsProps = {
   plotColor?: string
   showSubRowStates: boolean
   starred?: boolean
-  status?: ExperimentStatus
+  executorStatus?: ExecutorStatus
   subRowStates: {
     plotSelections: number
     selections: number
@@ -88,7 +85,7 @@ const ClickableTooltipContent: React.FC<ClickableTooltipContentProps> = ({
 
 export const CellRowActions: React.FC<CellRowActionsProps> = ({
   plotColor,
-  status,
+  executorStatus: status,
   toggleExperiment,
   isRowSelected,
   showSubRowStates,

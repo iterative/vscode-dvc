@@ -1,7 +1,6 @@
-import { Executor, ExperimentStatus, ValueTree } from '../../cli/dvc/contract'
+import { Executor, ExecutorStatus, ValueTree } from '../../cli/dvc/contract'
 import { SortDefinition } from '../model/sortBy'
-
-export { ExperimentStatus } from '../../cli/dvc/contract'
+export { ExecutorStatus } from '../../cli/dvc/contract'
 
 export interface MetricOrParamColumns {
   [filename: string]: ValueTree
@@ -51,24 +50,25 @@ export type Experiment = {
   selected?: boolean
   sha?: string
   starred?: boolean
-  status?: ExperimentStatus
+  executorStatus?: ExecutorStatus
   timestamp?: string | null
-  branch?: string | undefined
+  branch?: string | typeof WORKSPACE_BRANCH
 }
 
-export const isRunning = (status: ExperimentStatus | undefined): boolean =>
-  status === ExperimentStatus.RUNNING
+export const isRunning = (
+  executorStatus: ExecutorStatus | undefined
+): boolean => executorStatus === ExecutorStatus.RUNNING
 
-export const isQueued = (status: ExperimentStatus | undefined): boolean =>
-  status === ExperimentStatus.QUEUED
+export const isQueued = (executorStatus: ExecutorStatus | undefined): boolean =>
+  executorStatus === ExecutorStatus.QUEUED
 
 export const isRunningInQueue = ({
-  status,
+  executorStatus,
   executor
 }: {
-  status?: ExperimentStatus
+  executorStatus?: ExecutorStatus
   executor?: string | null
-}): boolean => isRunning(status) && executor === Executor.DVC_TASK
+}): boolean => isRunning(executorStatus) && executor === Executor.DVC_TASK
 
 export interface Commit extends Experiment {
   subRows?: Experiment[]
@@ -92,6 +92,8 @@ export type Column = {
   width?: number
 }
 
+export const WORKSPACE_BRANCH = null
+
 export type TableData = {
   changes: string[]
   cliError: string | null
@@ -107,6 +109,7 @@ export type TableData = {
   hasRunningWorkspaceExperiment: boolean
   isShowingMoreCommits: Record<string, boolean>
   rows: Commit[]
+  selectedBranches: string[]
   selectedForPlotsCount: number
   sorts: SortDefinition[]
 }

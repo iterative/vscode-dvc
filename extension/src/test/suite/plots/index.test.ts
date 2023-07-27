@@ -519,7 +519,7 @@ suite('Plots Test Suite', () => {
         undefined,
         undefined
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle an export plot data as csv message from the webview', async () => {
       const { plots } = await buildPlots({
@@ -564,7 +564,7 @@ suite('Plots Test Suite', () => {
         undefined,
         undefined
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle an export plot data as tsv message from the webview', async () => {
       const { plots } = await buildPlots({
@@ -609,7 +609,7 @@ suite('Plots Test Suite', () => {
         undefined,
         undefined
       )
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle export data messages from the webview when the file is cancelled or errors are thrown during file writing', async () => {
       const { plots } = await buildPlots({
@@ -663,7 +663,7 @@ suite('Plots Test Suite', () => {
 
       expect(mockOpenFile).not.to.be.called
       expect(mockShowInformationMessage).to.be.called
-    })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a custom plots reordered message from the webview', async () => {
       const { plots, plotsModel, messageSpy } = await buildPlots({

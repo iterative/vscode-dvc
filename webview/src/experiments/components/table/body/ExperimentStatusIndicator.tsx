@@ -3,7 +3,7 @@ import { VSCodeProgressRing } from '@vscode/webview-ui-toolkit/react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
 import {
-  ExperimentStatus,
+  ExecutorStatus,
   GitRemoteStatus,
   isRunning
 } from 'dvc/src/experiments/webview/contract'
@@ -16,14 +16,14 @@ import { Icon } from '../../../../shared/components/Icon'
 import { ExperimentsState } from '../../../store'
 
 type ExperimentStatusIndicatorProps = {
-  status: ExperimentStatus | undefined
+  executorStatus: ExecutorStatus | undefined
   gitRemoteStatus: GitRemoteStatus | undefined
   id: string
 }
 
 export const ExperimentStatusIndicator: React.FC<
   ExperimentStatusIndicatorProps
-> = ({ id, status, gitRemoteStatus }) => {
+> = ({ id, executorStatus: status, gitRemoteStatus }) => {
   const { hasRunningWorkspaceExperiment } = useSelector(
     (state: ExperimentsState) => state.tableData
   )
