@@ -26,7 +26,8 @@ import {
   isQueued,
   isRunning,
   GitRemoteStatus,
-  RunningExperiment
+  RunningExperiment,
+  WORKSPACE_BRANCH
 } from '../webview/contract'
 import { reorderListSubset } from '../../util/array'
 import {
@@ -413,7 +414,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     const commitsBySha = this.applyFiltersToCommits()
 
     const rows: Commit[] = [
-      { branch: undefined, ...this.addDetails(this.workspace) }
+      { branch: WORKSPACE_BRANCH, ...this.addDetails(this.workspace) }
     ]
     for (const { branch, sha } of this.rowOrder) {
       const commit = commitsBySha[sha]
@@ -518,6 +519,10 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public getBranchesToShow() {
     return [this.currentBranch as string, ...this.selectedBranches]
+  }
+
+  public getSelectedBranches() {
+    return this.selectedBranches
   }
 
   public getAvailableBranchesToShow() {

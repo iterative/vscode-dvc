@@ -8,6 +8,7 @@ import { TableData } from 'dvc/src/experiments/webview/contract'
 import Experiments from './Experiments'
 import {
   update,
+  updateSelectedBranches,
   updateChanges,
   updateCliError,
   updateColumnOrder,
@@ -86,6 +87,9 @@ export const App: React.FC<Record<string, unknown>> = () => {
                 continue
               case 'rows':
                 dispatch(updateRows(data.data.rows))
+                continue
+              case 'selectedBranches':
+                dispatch(updateSelectedBranches(data.data.selectedBranches))
                 continue
               case 'selectedForPlotsCount':
                 dispatch(

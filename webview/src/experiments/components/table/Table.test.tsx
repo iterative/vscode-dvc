@@ -261,7 +261,6 @@ describe('Table', () => {
 
       const tableDataWithColumnSetting: TableDataState = {
         ...sortingTableDataFixture,
-        branches: ['main'],
         columnWidths
       }
       render(
@@ -302,7 +301,6 @@ describe('Table', () => {
 
       const tableDataWithColumnSetting: TableDataState = {
         ...sortingTableDataFixture,
-        branches: ['main'],
         columnWidths
       }
       render(

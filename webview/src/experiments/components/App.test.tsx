@@ -1728,7 +1728,6 @@ describe('App', () => {
 
       const multipleBranches = {
         ...tableDataFixture,
-        branches,
         hasData: true,
         rows: [
           workspace as Commit,
@@ -1747,7 +1746,8 @@ describe('App', () => {
             branch: branches[2],
             subRows: undefined
           }))
-        ]
+        ],
+        selectedBranches: branches.slice(1)
       }
 
       renderTable(multipleBranches)

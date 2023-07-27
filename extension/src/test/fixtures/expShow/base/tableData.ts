@@ -3,6 +3,7 @@ import rowsFixture from './rows'
 import columnsFixture from './columns'
 
 const tableDataFixture: TableData = {
+  selectedBranches: [],
   cliError: null,
   changes: [],
   columnOrder: [],

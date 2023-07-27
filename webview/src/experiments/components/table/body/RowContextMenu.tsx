@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import {
   ExperimentStatus,
+  WORKSPACE_BRANCH,
   isQueued,
   isRunning,
   isRunningInQueue
@@ -292,7 +293,7 @@ const getSingleSelectMenuOptions = (
 
 const getContextMenuOptions = (
   id: string,
-  branch: string | undefined,
+  branch: string | undefined | typeof WORKSPACE_BRANCH,
   isWorkspace: boolean,
   projectHasCheckpoints: boolean,
   hasRunningWorkspaceExperiment: boolean,

@@ -53,7 +53,7 @@ export type Experiment = {
   starred?: boolean
   status?: ExperimentStatus
   timestamp?: string | null
-  branch?: string | undefined
+  branch?: string | typeof WORKSPACE_BRANCH
 }
 
 export const isRunning = (status: ExperimentStatus | undefined): boolean =>
@@ -92,6 +92,8 @@ export type Column = {
   width?: number
 }
 
+export const WORKSPACE_BRANCH = null
+
 export type TableData = {
   changes: string[]
   cliError: string | null
@@ -107,6 +109,7 @@ export type TableData = {
   hasRunningWorkspaceExperiment: boolean
   isShowingMoreCommits: Record<string, boolean>
   rows: Commit[]
+  selectedBranches: string[]
   selectedForPlotsCount: number
   sorts: SortDefinition[]
 }

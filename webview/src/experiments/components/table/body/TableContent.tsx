@@ -1,10 +1,8 @@
 import React, { Fragment, RefObject, useCallback, useContext } from 'react'
-import { useSelector } from 'react-redux'
-import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { TableBody } from './TableBody'
+import { collectBranchWithRows } from './util'
 import { BranchDivider } from './branchDivider/BranchDivider'
 import { RowSelectionContext } from '../RowSelectionContext'
-import { ExperimentsState } from '../../../store'
 import { InstanceProp, RowProp } from '../../../util/interfaces'
 
 interface TableContentProps extends InstanceProp {
@@ -19,7 +17,6 @@ export const TableContent: React.FC<TableContentProps> = ({
 }) => {
   const { rows, flatRows } = instance.getRowModel()
   const { batchSelection, lastSelectedRow } = useContext(RowSelectionContext)
-  const { branches } = useSelector((state: ExperimentsState) => state.tableData)
 
   const batchRowSelection = useCallback(
     ({ row: { id } }: RowProp) => {
@@ -52,11 +49,9 @@ export const TableContent: React.FC<TableContentProps> = ({
 
   return (
     <>
-      {branches.map(branch => {
-        const branchRows = rows.filter(row => row.original.branch === branch)
-
+      {collectBranchWithRows(rows).map(([branch, branchRows]) => {
         return (
-          <Fragment key={`${branch || EXPERIMENT_WORKSPACE_ID}`}>
+          <Fragment key={branch}>
             {branchRows.map((row, i) => {
               const isFirstBranchRow = branch && i === 0
               return (
