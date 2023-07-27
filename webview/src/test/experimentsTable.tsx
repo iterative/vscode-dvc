@@ -52,8 +52,8 @@ export const renderTableWithNoColumns = () => {
   renderTable({ ...tableDataFixture, columns: [] })
 }
 
-export const renderTableWithWorkspaceRowOnly = () => {
-  renderTable({ ...tableDataFixture, rows: [tableDataFixture.rows[0]] })
+export const renderTableWithNoRows = () => {
+  renderTable({ ...tableDataFixture, rows: [] })
 }
 
 export const renderTableWithSortingData = () => {

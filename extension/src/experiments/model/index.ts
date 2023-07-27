@@ -408,32 +408,60 @@ export class ExperimentsModel extends ModelWithPersistence {
     }
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   public getRowData() {
     const commitsBySha: { [sha: string]: Commit } = {}
     for (const commit of this.commits) {
-      commitsBySha[commit.sha as string] = commit
+      const commitWithSelectedAndStarred = this.addDetails(commit)
+      const experiments = this.getExperimentsByCommit(
+        commitWithSelectedAndStarred
+      )
+
+      const unfilteredExperiments = experiments?.filter(
+        (experiment: Experiment) =>
+          !!filterExperiment(this.getFilters(), experiment)
+      )
+
+      const hasUnfilteredExperiments = definedAndNonEmpty(unfilteredExperiments)
+      const filtered =
+        !hasUnfilteredExperiments &&
+        !filterExperiment(this.getFilters(), commitWithSelectedAndStarred)
+
+      if (filtered) {
+        continue
+      }
+
+      if (!hasUnfilteredExperiments) {
+        commitsBySha[commit.sha as string] = commitWithSelectedAndStarred
+        continue
+      }
+
+      commitsBySha[commit.sha as string] = {
+        ...commitWithSelectedAndStarred,
+        subRows: unfilteredExperiments
+      }
     }
 
-    return [
-      { branch: undefined, ...this.addDetails(this.workspace) },
-      ...this.rowOrder.map(({ branch, sha }) => {
-        const commit = { ...commitsBySha[sha], branch }
-        const experiments = this.getExperimentsByCommit(commit)
-        const commitWithSelectedAndStarred = this.addDetails(commit)
-
-        if (!definedAndNonEmpty(experiments)) {
-          return commitWithSelectedAndStarred
-        }
-
-        return {
-          ...commitWithSelectedAndStarred,
-          subRows: experiments.filter(
-            (experiment: Experiment) =>
-              !!filterExperiment(this.getFilters(), experiment)
-          )
-        }
-      })
+    const rows: Commit[] = [
+      { branch: undefined, ...this.addDetails(this.workspace) }
     ]
+
+    for (const { branch, sha } of this.rowOrder) {
+      const commit = commitsBySha[sha]
+      if (!commit) {
+        continue
+      }
+      if (commit.subRows) {
+        commit.subRows = commit.subRows.map(experiment => ({
+          ...experiment,
+          branch
+        }))
+      }
+
+      rows.push({ ...commit, branch })
+    }
+
+    return rows
   }
 
   public getHasMoreCommits() {
@@ -459,6 +487,10 @@ export class ExperimentsModel extends ModelWithPersistence {
   public getFilteredCount() {
     const filtered = this.getFilteredExperiments()
     return filtered.length
+  }
+
+  public getRecordCount() {
+    return this.getCombinedList().length
   }
 
   public getCombinedList() {
@@ -527,12 +559,25 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.currentSorts.findIndex(({ path }) => path === pathToRemove)
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   private getFilteredExperiments() {
     const acc: Experiment[] = []
 
-    for (const experiment of this.getExperiments()) {
-      if (!filterExperiment(this.getFilters(), experiment)) {
-        acc.push(experiment)
+    for (const commit of this.commits) {
+      const experiments = this.getExperimentsByCommit(commit)
+      let hasUnfilteredExperiment = false
+      for (const experiment of experiments || []) {
+        if (!filterExperiment(this.getFilters(), experiment)) {
+          acc.push(experiment)
+          continue
+        }
+        hasUnfilteredExperiment = true
+      }
+      if (
+        !hasUnfilteredExperiment &&
+        !filterExperiment(this.getFilters(), this.addDetails(commit))
+      ) {
+        acc.push(commit)
       }
     }
 
@@ -543,10 +588,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     const experiments = this.experimentsByCommit
       .get(commit.id)
       ?.map(originalExperiment => {
-        const experiment = {
-          ...this.addDetails(originalExperiment),
-          branch: commit.branch
-        }
+        const experiment = this.addDetails(originalExperiment)
 
         this.addRemoteStatus(experiment)
 
