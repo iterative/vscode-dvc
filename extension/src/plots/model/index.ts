@@ -21,7 +21,6 @@ import {
   CustomPlotsOrderValue
 } from './custom'
 import {
-  ComparisonPlots,
   Revision,
   ComparisonRevisionData,
   DEFAULT_SECTION_COLLAPSED,
@@ -61,6 +60,7 @@ import { ErrorsModel } from '../errors/model'
 import { openFileInEditor, writeCsv, writeJson } from '../../fileSystem'
 import { Toast } from '../../vscode/toast'
 import { getParent, getPathArray } from '../../fileSystem/util'
+import { MULTI_IMAGE_PATH_REG } from '../../cli/dvc/constants'
 
 type ComparisonPlotsAcc = {
   [pathLabel: string]: { path: string; revisions: ComparisonRevisionData }
@@ -430,14 +430,6 @@ export class PlotsModel extends ModelWithPersistence {
     for (const path of paths) {
       this.collectSelectedPathComparisonPlots(acc, path, selectedRevisionIds)
     }
-    // TBD there is probably a better way to do this
-    for (const [pathLabel, { revisions }] of Object.entries(acc)) {
-      for (const revision of Object.keys(revisions)) {
-        acc[pathLabel].revisions[revision].imgOrImgs.sort((img1, img2) =>
-          img1.path.localeCompare(img2.path, undefined, { numeric: true })
-        )
-      }
-    }
 
     return Object.values(acc)
   }
@@ -447,7 +439,6 @@ export class PlotsModel extends ModelWithPersistence {
     path: string,
     selectedRevisionIds: string[]
   ) {
-    const MULTI_IMAGE_PATH_REG = /image[/\\|]\d+\.[a-z]+$/i
     const isMulti = MULTI_IMAGE_PATH_REG.test(path)
     const pathLabel = isMulti
       ? (getParent(getPathArray(path), 0) as string)

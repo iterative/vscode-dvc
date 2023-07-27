@@ -18,6 +18,8 @@ export const EXP_RWLOCK_FILE = join(TEMP_EXP_DIR, 'rwlock.lock')
 export const DEFAULT_NUM_OF_COMMITS_TO_SHOW = 3
 export const NUM_OF_COMMITS_TO_INCREASE = 2
 
+export const MULTI_IMAGE_PATH_REG = /image[/\\|]\d+\.[a-z]+$/i
+
 export enum Command {
   ADD = 'add',
   CHECKOUT = 'checkout',
