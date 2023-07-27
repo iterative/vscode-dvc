@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.27] - 2023-07-27
+
+### 🚀 New Features and Enhancements
+
+- Apply experiment table filters to commits [#4363](https://github.com/iterative/vscode-dvc/pull/4363) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Refactor experiment table branch data [#4364](https://github.com/iterative/vscode-dvc/pull/4364) by [@mattseddon](https://github.com/mattseddon)
+- Rename experiment status to executor status [#4359](https://github.com/iterative/vscode-dvc/pull/4359) by [@mattseddon](https://github.com/mattseddon)
+- Increase timeouts of webview tests [#4368](https://github.com/iterative/vscode-dvc/pull/4368) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (3.9.0) [#4369](https://github.com/iterative/vscode-dvc/pull/4369) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.26] - 2023-07-26
 
 ### 🚀 New Features and Enhancements
