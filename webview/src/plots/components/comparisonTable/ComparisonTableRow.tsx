@@ -4,7 +4,6 @@ import cx from 'classnames'
 import { useSelector } from 'react-redux'
 import styles from './styles.module.scss'
 import { ComparisonTableCell } from './cell/ComparisonTableCell'
-import { ComparisonTableMultiCell } from './cell/ComparisonTableMultiCell'
 import { Icon } from '../../../shared/components/Icon'
 import { ChevronDown, ChevronRight } from '../../../shared/components/icons'
 import { PlotsState } from '../../store'
@@ -77,11 +76,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
                 data-testid="row-images"
                 className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
               >
-                {plot.isMulti ? (
-                  <ComparisonTableMultiCell plot={plot} path={path} />
-                ) : (
-                  <ComparisonTableCell plot={plot} path={path} />
-                )}
+                <ComparisonTableCell plot={plot} path={path} />
               </div>
             </td>
           )
