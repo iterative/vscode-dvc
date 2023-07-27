@@ -2,8 +2,8 @@ import React, { useContext, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import {
-  ExperimentStatus,
   WORKSPACE_BRANCH,
+  ExecutorStatus,
   isQueued,
   isRunning,
   isRunningInQueue
@@ -44,10 +44,11 @@ const collectIdByStarred = (
 ) => (starred ? starredExperimentIds.push(id) : unstarredExperimentIds.push(id))
 
 const isRunningOrNotExperiment = (
-  status: ExperimentStatus | undefined,
+  executorStatus: ExecutorStatus | undefined,
   depth: number,
   hasRunningWorkspaceExperiment: boolean
-): boolean => isRunning(status) || depth !== 1 || hasRunningWorkspaceExperiment
+): boolean =>
+  isRunning(executorStatus) || depth !== 1 || hasRunningWorkspaceExperiment
 
 const collectDisabledOptions = (
   selectedRowsList: RowProp[],
@@ -61,7 +62,7 @@ const collectDisabledOptions = (
 
   for (const { row } of selectedRowsList) {
     const { original, depth } = row
-    const { starred, status, id } = original
+    const { starred, executorStatus, id } = original
 
     selectedIds.push(id)
 
@@ -73,12 +74,16 @@ const collectDisabledOptions = (
     )
 
     if (
-      isRunningOrNotExperiment(status, depth, hasRunningWorkspaceExperiment)
+      isRunningOrNotExperiment(
+        executorStatus,
+        depth,
+        hasRunningWorkspaceExperiment
+      )
     ) {
       disableExperimentOnlyOption = true
     }
 
-    if (!isRunning(status)) {
+    if (!isRunning(executorStatus)) {
       disableStopOption = true
     }
   }
@@ -209,11 +214,11 @@ const getSingleSelectMenuOptions = (
   projectHasCheckpoints: boolean,
   hasRunningWorkspaceExperiment: boolean,
   depth: number,
-  status?: ExperimentStatus,
+  executorStatus?: ExecutorStatus,
   starred?: boolean,
   executor?: string | null
 ) => {
-  const isNotExperiment = isQueued(status) || isWorkspace || depth <= 0
+  const isNotExperiment = isQueued(executorStatus) || isWorkspace || depth <= 0
 
   const disableIfRunning = (
     label: string,
@@ -225,7 +230,7 @@ const getSingleSelectMenuOptions = (
       id,
       label,
       type,
-      disabled || hasRunningWorkspaceExperiment || isRunning(status),
+      disabled || hasRunningWorkspaceExperiment || isRunning(executorStatus),
       divider
     )
 
@@ -246,7 +251,7 @@ const getSingleSelectMenuOptions = (
       id,
       'Show Logs',
       MessageFromWebviewType.SHOW_EXPERIMENT_LOGS,
-      !isRunningInQueue({ executor, status })
+      !isRunningInQueue({ executor, executorStatus })
     ),
     disableIfRunningOrWorkspace(
       'Apply to Workspace',
@@ -260,7 +265,9 @@ const getSingleSelectMenuOptions = (
       [id],
       'Push',
       MessageFromWebviewType.PUSH_EXPERIMENT,
-      isNotExperiment || hasRunningWorkspaceExperiment || isRunning(status),
+      isNotExperiment ||
+        hasRunningWorkspaceExperiment ||
+        isRunning(executorStatus),
       true
     ),
     ...getRunResumeOptions(
@@ -279,7 +286,7 @@ const getSingleSelectMenuOptions = (
       [id],
       'Stop',
       MessageFromWebviewType.STOP_EXPERIMENTS,
-      !isRunning(status),
+      !isRunning(executorStatus),
       id !== EXPERIMENT_WORKSPACE_ID
     ),
     disableIfRunning(
@@ -299,7 +306,7 @@ const getContextMenuOptions = (
   hasRunningWorkspaceExperiment: boolean,
   depth: number,
   selectedRows: Record<string, RowProp | undefined>,
-  status?: ExperimentStatus,
+  executorStatus?: ExecutorStatus,
   starred?: boolean,
   executor?: string | null
 ) => {
@@ -322,7 +329,7 @@ const getContextMenuOptions = (
         projectHasCheckpoints,
         hasRunningWorkspaceExperiment,
         depth,
-        status,
+        executorStatus,
         starred,
         executor
       )
@@ -331,7 +338,7 @@ const getContextMenuOptions = (
 
 export const RowContextMenu: React.FC<RowProp> = ({
   row: {
-    original: { branch, status, starred, id, executor },
+    original: { branch, executorStatus, starred, id, executor },
     depth
   }
 }) => {
@@ -352,14 +359,14 @@ export const RowContextMenu: React.FC<RowProp> = ({
       hasRunningWorkspaceExperiment,
       depth,
       selectedRows,
-      status,
+      executorStatus,
       starred,
       executor
     )
   }, [
     branch,
     executor,
-    status,
+    executorStatus,
     starred,
     isWorkspace,
     depth,

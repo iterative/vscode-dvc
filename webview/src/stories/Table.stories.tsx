@@ -10,10 +10,7 @@ import dataTypesTableFixture from 'dvc/src/test/fixtures/expShow/dataTypes/table
 import survivalTableData from 'dvc/src/test/fixtures/expShow/survival/tableData'
 import { timestampColumn } from 'dvc/src/experiments/columns/constants'
 import { delay } from 'dvc/src/util/time'
-import {
-  ExperimentStatus,
-  isRunning
-} from 'dvc/src/experiments/webview/contract'
+import { ExecutorStatus, isRunning } from 'dvc/src/experiments/webview/contract'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import {
   within,
@@ -62,12 +59,12 @@ const noRunningExperiments = {
   hasRunningWorkspaceExperiment: false,
   rows: rowsFixture.map(row => ({
     ...row,
-    status: ExperimentStatus.SUCCESS,
+    executorStatus: ExecutorStatus.SUCCESS,
     subRows: row.subRows?.map(experiment => ({
       ...experiment,
-      status: isRunning(experiment.status)
-        ? ExperimentStatus.SUCCESS
-        : experiment.status
+      executorStatus: isRunning(experiment.executorStatus)
+        ? ExecutorStatus.SUCCESS
+        : experiment.executorStatus
     }))
   }))
 }
@@ -77,12 +74,12 @@ const noRunningExperimentsNoCheckpoints = {
   hasCheckpoints: false,
   rows: rowsFixture.map(row => ({
     ...row,
-    status: ExperimentStatus.SUCCESS,
+    executorStatus: ExecutorStatus.SUCCESS,
     subRows: row.subRows?.map(experiment => ({
       ...experiment,
-      status: isRunning(experiment.status)
-        ? ExperimentStatus.SUCCESS
-        : experiment.status,
+      executorStatus: isRunning(experiment.executorStatus)
+        ? ExecutorStatus.SUCCESS
+        : experiment.executorStatus,
       subRows: []
     }))
   }))

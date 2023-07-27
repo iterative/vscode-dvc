@@ -38,7 +38,7 @@ export const isValueTree = (
 ): value is NonNullable<ValueTree> =>
   !!(value && !Array.isArray(value) && typeof value === 'object')
 
-export enum ExperimentStatus {
+export enum ExecutorStatus {
   FAILED = 'failed',
   QUEUED = 'queued',
   RUNNING = 'running',
@@ -81,7 +81,7 @@ export enum Executor {
 }
 
 export type ExecutorState = {
-  state: ExperimentStatus
+  state: ExecutorStatus
   name: Executor | null
   local: {
     root: string | null

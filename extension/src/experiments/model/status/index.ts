@@ -25,9 +25,9 @@ const compareTimestamps = (a: Experiment, b: Experiment) =>
 export const limitToMaxSelected = (experiments: Experiment[]) =>
   [...experiments]
     .sort((a, b) => {
-      if (a.status === b.status) {
+      if (a.executorStatus === b.executorStatus) {
         return compareTimestamps(a, b)
       }
-      return isRunning(a.status) ? -1 : 1
+      return isRunning(a.executorStatus) ? -1 : 1
     })
     .slice(0, MAX_SELECTED_EXPERIMENTS)
