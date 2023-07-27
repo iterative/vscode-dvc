@@ -9,9 +9,7 @@ export const ComparisonTableCell: React.FC<{
   path: string
   plot: ComparisonPlot
 }> = ({ path, plot }) => {
-  const plotImg = plot.imgOrImgs
-    ? plot.imgOrImgs[0]
-    : { errors: undefined, loading: false, url: undefined }
+  const plotImg = plot.imgOrImgs[0]
   const loading = plotImg.loading
   const missing = !loading && !plotImg.url
 

@@ -363,7 +363,8 @@ const multipleVega = (length: number) => {
   }
   return plots
 }
-
+// TBD I don't think we need to add muliImageData to the main fixture used in tests across the project
+// we should put multi image data into its own fixture and use in desired frontend/backend tests
 const getMultiImageData = (
   baseUrl: string,
   joinFunc: (...segments: string[]) => string,
@@ -472,11 +473,7 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
       revisions: ['exp-83425'],
       url: joinFunc(baseUrl, '1ba7bcd_plots_loss.png')
     }
-  ]
-})
-
-const getImageDataWithMultiImgs = (baseUrl: string, joinFunc = join) => ({
-  ...getImageData(baseUrl, joinFunc),
+  ],
   ...getMultiImageData(baseUrl, joinFunc, [
     EXPERIMENT_WORKSPACE_ID,
     'main',
@@ -485,6 +482,14 @@ const getImageDataWithMultiImgs = (baseUrl: string, joinFunc = join) => ({
     'exp-83425'
   ])
 })
+
+export const getMultiImagePaths = () => {
+  const paths = []
+  for (let i = 0; i < 15; i++) {
+    paths.push(join('plots', 'image', `${i}.jpg`))
+  }
+  return paths
+}
 
 export const getOutput = (baseUrl: string): PlotsOutput => ({
   data: {
@@ -797,25 +802,20 @@ export const MOCK_IMAGE_MTIME = 946684800000
 
 export const getComparisonWebviewMessage = (
   baseUrl: string,
-  joinFunc: (...args: string[]) => string = join,
-  addMulti?: boolean
+  joinFunc: (...args: string[]) => string = join
 ): PlotsComparisonData => {
   const plotAcc: {
     [path: string]: { path: string; revisions: ComparisonRevisionData }
   } = {}
 
-  for (const [path, plots] of Object.entries(
-    addMulti
-      ? getImageDataWithMultiImgs(baseUrl, joinFunc)
-      : getImageData(baseUrl, joinFunc)
-  )) {
+  for (const [path, plots] of Object.entries(getImageData(baseUrl, joinFunc))) {
     const multiImagePath = joinFunc('plots', 'image')
     const isMulti = path.includes(multiImagePath)
-    const pathLabel = path
+    const pathName = isMulti ? multiImagePath : path
 
-    if (!plotAcc[pathLabel]) {
-      plotAcc[pathLabel] = {
-        path: pathLabel,
+    if (!plotAcc[pathName]) {
+      plotAcc[pathName] = {
+        path: pathName,
         revisions: {}
       }
     }
@@ -826,15 +826,14 @@ export const getComparisonWebviewMessage = (
         continue
       }
 
-      if (!plotAcc[pathLabel].revisions[id]) {
-        plotAcc[pathLabel].revisions[id] = {
+      if (!plotAcc[pathName].revisions[id]) {
+        plotAcc[pathName].revisions[id] = {
           id,
           imgOrImgs: [],
           isMulti
         }
       }
-
-      plotAcc[pathLabel].revisions[id].imgOrImgs.push({
+      plotAcc[pathName].revisions[id].imgOrImgs.push({
         url: `${url}?${MOCK_IMAGE_MTIME}`,
         errors: undefined,
         loading: false

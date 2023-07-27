@@ -11,7 +11,6 @@ import {
   PlotsComparisonData
 } from 'dvc/src/plots/webview/contract'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
-import comparisonTableMultiFixture from 'dvc/src/test/fixtures/plotsDiff/comparison/multi'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { DISABLE_CHROMATIC_SNAPSHOTS } from './util'
 import { ComparisonTable } from '../plots/components/comparisonTable/ComparisonTable'
@@ -102,11 +101,6 @@ const removeImages = (
     filteredRevisionData[id] = data
   }
   return filteredRevisionData
-}
-
-export const WithMultiImages = Template.bind({})
-WithMultiImages.args = {
-  plots: comparisonTableMultiFixture.plots
 }
 
 export const WithMissingData = Template.bind({})

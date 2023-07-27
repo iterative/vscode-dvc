@@ -36,6 +36,7 @@ import {
 import { StrokeDashEncoding } from '../multiSource/constants'
 import { exists } from '../../fileSystem'
 import { hasKey } from '../../util/object'
+import { getParent, getPathArray } from '../../fileSystem/util'
 import { MULTI_IMAGE_PATH_REG } from '../../cli/dvc/constants'
 
 export const getCustomPlotId = (metric: string, param: string) =>
@@ -262,7 +263,9 @@ const collectSelectedPathComparisonPlots = ({
   getComparisonPlotImg: (id: string, path: string) => ComparisonPlotImg
 }) => {
   const isMulti = MULTI_IMAGE_PATH_REG.test(path)
-  const pathLabel = path
+  const pathLabel = isMulti
+    ? (getParent(getPathArray(path), 0) as string)
+    : path
   const doesPathExist = acc[pathLabel]
 
   if (!doesPathExist) {

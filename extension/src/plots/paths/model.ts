@@ -18,6 +18,7 @@ import { isDvcError } from '../../cli/dvc/reader'
 import { PlotsOutputOrError } from '../../cli/dvc/contract'
 import { getErrorTooltip } from '../../tree'
 import { ErrorsModel } from '../errors/model'
+import { MULTI_IMAGE_PATH_REG } from '../../cli/dvc/constants'
 
 export class PathsModel extends PathSelectionModel<PlotPath> {
   private readonly errors: ErrorsModel
@@ -126,9 +127,17 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
   }
 
   public getComparisonPaths() {
-    return performSimpleOrderedUpdate(
-      this.comparisonPathsOrder,
+    // TBD do we need to do sorting everytime we need plots
+    // should we save sorted/grouped data into its own variables to use?
+    const { multiImagePaths, paths } = this.sortComparisonPaths(
       this.getPathsByType(PathType.COMPARISON)
+    )
+
+    return performSimpleOrderedUpdate(
+      this.comparisonPathsOrder.flatMap(path =>
+        path.endsWith('image') ? multiImagePaths : path
+      ),
+      paths
     )
   }
 
@@ -160,6 +169,32 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     return this.data
       .filter(plotPath => filter(type, plotPath))
       .map(({ path }) => path)
+  }
+
+  private sortComparisonPaths(originalPaths: string[]) {
+    const multiImagePaths: string[] = []
+    const paths: string[] = []
+    let multiImageInd
+
+    for (const [ind, path] of originalPaths.entries()) {
+      const isMulti = MULTI_IMAGE_PATH_REG.test(path)
+      if (!isMulti) {
+        paths.push(path)
+        continue
+      }
+      if (!multiImageInd) {
+        multiImageInd = ind
+      }
+      multiImagePaths.push(path)
+    }
+
+    multiImagePaths.sort((path1, path2) =>
+      path1.localeCompare(path2, undefined, { numeric: true })
+    )
+
+    paths.splice(multiImageInd || 0, 0, ...multiImagePaths)
+
+    return { multiImagePaths, paths }
   }
 
   private filterChildren(path: string | undefined): PlotPath[] {
