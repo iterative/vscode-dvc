@@ -28,7 +28,7 @@ const CounterBadge: React.FC<CounterBadgeProps> = ({ count }) => {
     <span
       className={styles.indicatorCount}
       role="marquee"
-      aria-label={`${count}`}
+      aria-label={String(count)}
     >
       {count}
     </span>
