@@ -69,7 +69,7 @@ export const ComparisonTableCellSingle: React.FC<{
     </button>
   )
 }
-
+// TBD split ComparisonTableCell.tsx into its own folder
 export const ComparisonTableCellMulti: React.FC<{
   path: string
   plot: ComparisonPlot
@@ -80,7 +80,7 @@ export const ComparisonTableCellMulti: React.FC<{
   const dispatch = useDispatch()
   const currentStep = multiValues[path] || 0
 
-  const { loading, url, id } = plot.imgOrImgs[currentStep]
+  const { loading, url } = plot.imgOrImgs[currentStep]
   const missing = !loading && !url
 
   const addDisabled = useCallback(() => {
@@ -105,9 +105,9 @@ export const ComparisonTableCellMulti: React.FC<{
       onClick={disableClick}
       onKeyDown={disableClick}
     >
-      <label htmlFor={`${id}-step`}>Step</label>
+      <label htmlFor={`${plot.id}-step`}>Step</label>
       <input
-        name={`${id}-step`}
+        name={`${plot.id}-step`}
         min="0"
         max={plot.imgOrImgs.length - 1}
         value={currentStep}
@@ -150,7 +150,7 @@ export const ComparisonTableCellMulti: React.FC<{
         className={styles.image}
         draggable={false}
         src={url}
-        alt={`${currentStep} of ${path} (${id})`}
+        alt={`${currentStep} of ${path} (${plot.id})`}
       />
       {slider}
     </button>

@@ -420,6 +420,7 @@ export class PlotsModel extends ModelWithPersistence {
     delete this.revisionData[id]
     delete this.comparisonData[id]
   }
+  // TBD we should move this collection code into its own utils
 
   private getSelectedComparisonPlots(
     paths: string[],
@@ -468,9 +469,7 @@ export class PlotsModel extends ModelWithPersistence {
 
       acc[pathLabel].revisions[id].imgOrImgs.push({
         errors,
-        id,
         loading,
-        path,
         url
       })
     }

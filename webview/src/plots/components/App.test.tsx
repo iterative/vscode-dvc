@@ -234,9 +234,7 @@ describe('App', () => {
                 imgOrImgs: [
                   {
                     errors: undefined,
-                    id: 'ad2b5ec',
                     loading: true,
-                    path: '',
                     url: undefined
                   }
                 ],

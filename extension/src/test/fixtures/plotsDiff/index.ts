@@ -363,7 +363,8 @@ const multipleVega = (length: number) => {
   }
   return plots
 }
-
+// TBD I don't think we need to add muliImageData to the main fixture used in tests across the project
+// we should put multi image data into its own fixture and use in desired frontend/backend tests
 const getMultiImageData = (
   baseUrl: string,
   joinFunc: (...segments: string[]) => string,
@@ -834,8 +835,6 @@ export const getComparisonWebviewMessage = (
       }
       plotAcc[pathName].revisions[id].imgOrImgs.push({
         url: `${url}?${MOCK_IMAGE_MTIME}`,
-        id,
-        path,
         errors: undefined,
         loading: false
       })

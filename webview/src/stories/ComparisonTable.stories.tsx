@@ -82,7 +82,6 @@ const removeImages = (
         ['main', '4fb124a'].includes(id)) ||
       id === EXPERIMENT_WORKSPACE_ID
     ) {
-      // TBD need to review this
       filteredRevisionData[id] = {
         id,
         imgOrImgs: [
@@ -91,9 +90,7 @@ const removeImages = (
               id === 'main'
                 ? [`FileNotFoundError: ${path} not found.`]
                 : undefined,
-            id,
             loading: false,
-            path: '',
             url: undefined
           }
         ],
