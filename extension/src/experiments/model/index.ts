@@ -1,6 +1,6 @@
 import { Memento } from 'vscode'
 import { SortDefinition, sortExperiments } from './sortBy'
-import { FilterDefinition, getFilterId } from './filterBy'
+import { FilterDefinition, filterExperiment, getFilterId } from './filterBy'
 import { collectFiltered, collectUnfiltered } from './filterBy/collect'
 import {
   collectAddRemoveCommitsDetails,
@@ -409,9 +409,13 @@ export class ExperimentsModel extends ModelWithPersistence {
   public getRowData() {
     const commitsBySha = this.applyFiltersToCommits()
 
-    const rows: Commit[] = [
-      { branch: WORKSPACE_BRANCH, ...this.addDetails(this.workspace) }
-    ]
+    const workspace = this.addDetails(this.workspace)
+
+    const rows: Commit[] = []
+    if (filterExperiment(this.getFilters(), workspace)) {
+      rows.push({ branch: WORKSPACE_BRANCH, ...workspace })
+    }
+
     for (const { branch, sha } of this.rowOrder) {
       const commit = commitsBySha[sha]
       if (!commit) {
@@ -531,6 +535,12 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   private getFilteredExperiments() {
     const acc: Experiment[] = []
+
+    const workspace = this.addDetails(this.workspace)
+
+    if (!filterExperiment(this.getFilters(), workspace)) {
+      acc.push(workspace)
+    }
 
     for (const commit of this.commits) {
       const experiments = this.getExperimentsByCommit(commit)
