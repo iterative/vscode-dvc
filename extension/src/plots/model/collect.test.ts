@@ -90,11 +90,11 @@ describe('collectData', () => {
     const testBranchHeatmap = comparisonData['test-branch'][heatmapPlot]
 
     expect(testBranchHeatmap).toBeDefined()
-    expect(testBranchHeatmap).toStrictEqual([
+    expect(testBranchHeatmap).toStrictEqual(
       plotsDiffFixture.data[heatmapPlot].find(({ revisions }) =>
         sameContents(revisions as string[], ['test-branch'])
       )
-    ])
+    )
   })
 })
 

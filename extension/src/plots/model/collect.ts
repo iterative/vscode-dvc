@@ -130,7 +130,7 @@ export type RevisionData = {
 
 export type ComparisonData = {
   [label: string]: {
-    [path: string]: ImagePlot[]
+    [path: string]: ImagePlot
   }
 }
 
@@ -139,7 +139,6 @@ const collectImageData = (
   path: string,
   plot: ImagePlot
 ) => {
-  const pathLabel = path // TBD will be a possible directory
   const id = plot.revisions?.[0]
   if (!id) {
     return
@@ -149,11 +148,7 @@ const collectImageData = (
     acc[id] = {}
   }
 
-  if (!acc[id][pathLabel]) {
-    acc[id][pathLabel] = []
-  }
-
-  acc[id][pathLabel].push(plot)
+  acc[id][path] = plot
 }
 
 const collectDatapoints = (
@@ -223,70 +218,87 @@ export const collectData = (output: PlotsOutput): DataAccumulator => {
   return acc
 }
 
-type ComparisonPlotsAcc = { path: string; revisions: ComparisonRevisionData }[]
+type ComparisonPlotsAcc = {
+  [pathLabel: string]: { path: string; revisions: ComparisonRevisionData }
+}
+
+const collectSelectedComparisonPlot = ({
+  acc,
+  id,
+  path,
+  pathLabel,
+  getComparisonPlotImg
+}: {
+  acc: ComparisonPlotsAcc
+  id: string
+  path: string
+  pathLabel: string
+  getComparisonPlotImg: (id: string, path: string) => ComparisonPlotImg
+}) => {
+  const doesPlotExist = acc[pathLabel].revisions[id]
+  if (!doesPlotExist) {
+    acc[pathLabel].revisions[id] = {
+      id,
+      imgs: []
+    }
+  }
+
+  acc[pathLabel].revisions[id].imgs.push(getComparisonPlotImg(id, path))
+}
 
 const collectSelectedPathComparisonPlots = ({
   acc,
-  comparisonData,
   path,
   selectedRevisionIds,
   getComparisonPlotImg
 }: {
   acc: ComparisonPlotsAcc
-  comparisonData: ComparisonData
   path: string
   selectedRevisionIds: string[]
-  getComparisonPlotImg: (
-    img: ImagePlot,
-    id: string,
-    path: string
-  ) => ComparisonPlotImg
+  getComparisonPlotImg: (id: string, path: string) => ComparisonPlotImg
 }) => {
-  const pathRevisions = {
-    path,
-    revisions: {} as ComparisonRevisionData
+  const pathLabel = path
+  const doesPathExist = acc[pathLabel]
+
+  if (!doesPathExist) {
+    acc[pathLabel] = {
+      path: pathLabel,
+      revisions: {}
+    }
   }
 
   for (const id of selectedRevisionIds) {
-    const imgs = comparisonData[id][path]
-    pathRevisions.revisions[id] = {
+    collectSelectedComparisonPlot({
+      acc,
+      getComparisonPlotImg,
       id,
-      imgs: imgs
-        ? imgs.map(img => getComparisonPlotImg(img, id, path))
-        : [{ errors: undefined, loading: false, url: undefined }]
-    }
+      path,
+      pathLabel
+    })
   }
-  acc.push(pathRevisions)
 }
 
 export const collectSelectedComparisonPlots = ({
-  comparisonData,
   paths,
   selectedRevisionIds,
   getComparisonPlotImg
 }: {
-  comparisonData: ComparisonData
   paths: string[]
   selectedRevisionIds: string[]
-  getComparisonPlotImg: (
-    img: ImagePlot,
-    id: string,
-    path: string
-  ) => ComparisonPlotImg
+  getComparisonPlotImg: (id: string, path: string) => ComparisonPlotImg
 }) => {
-  const acc: ComparisonPlotsAcc = []
+  const acc: ComparisonPlotsAcc = {}
 
   for (const path of paths) {
     collectSelectedPathComparisonPlots({
       acc,
-      comparisonData,
       getComparisonPlotImg,
       path,
       selectedRevisionIds
     })
   }
 
-  return acc
+  return Object.values(acc)
 }
 
 export type TemplateAccumulator = { [path: string]: string }
