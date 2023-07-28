@@ -111,6 +111,7 @@ export const buildSetup = ({
         columnsChanged: mockEmitter,
         getCliError: () => cliError,
         getHasData: () => hasData,
+        isReady: () => Promise.resolve(),
         showWebview: mockShowWebview
       } as unknown as WorkspaceExperiments,
       { setAvailability: stub() } as unknown as Status,
