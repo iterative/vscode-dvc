@@ -1104,6 +1104,7 @@ suite('Experiments Test Suite', () => {
       const { experiments } = buildExperiments({ disposer: disposable })
 
       const webview = await experiments.showWebview()
+      await experiments.isReady()
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -1131,6 +1132,30 @@ suite('Experiments Test Suite', () => {
         undefined,
         undefined
       )
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should be able to handle a message to remove filters', async () => {
+      const { experiments } = buildExperiments({ disposer: disposable })
+
+      const webview = await experiments.showWebview()
+      await experiments.isReady()
+
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const executeCommandStub = stub(commands, 'executeCommand')
+
+      const messageReceived = new Promise(resolve =>
+        disposable.track(mockMessageReceived.event(() => resolve(undefined)))
+      )
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.REMOVE_FILTERS
+      })
+
+      expect(executeCommandStub).to.be.calledWith(
+        'dvc.removeExperimentsTableFilters'
+      )
+
+      await messageReceived
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to focus the filters tree', async () => {

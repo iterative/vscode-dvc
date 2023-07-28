@@ -141,6 +141,11 @@ export class WebviewMessages {
 
       case MessageFromWebviewType.FOCUS_FILTERS_TREE:
         return this.focusFiltersTree()
+      case MessageFromWebviewType.REMOVE_FILTERS:
+        return commands.executeCommand(
+          RegisteredCommands.EXPERIMENT_FILTERS_REMOVE,
+          { dvcRoot: this.dvcRoot }
+        )
       case MessageFromWebviewType.FOCUS_SORTS_TREE:
         return this.focusSortsTree()
 

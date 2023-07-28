@@ -77,8 +77,8 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.getRepositoryThenUpdate('addStarredFilter', overrideRoot)
   }
 
-  public removeFilters() {
-    return this.getRepositoryThenUpdate('removeFilters')
+  public removeFilters(overrideRoot?: string) {
+    return this.getRepositoryThenUpdate('removeFilters', overrideRoot)
   }
 
   public addSort(overrideRoot?: string) {

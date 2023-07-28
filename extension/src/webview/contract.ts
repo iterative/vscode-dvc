@@ -30,6 +30,7 @@ export enum MessageFromWebviewType {
   OPEN_STUDIO_PROFILE = 'open-studio-profile',
   PUSH_EXPERIMENT = 'push-experiment',
   REMOVE_COLUMN_SORT = 'remove-column-sort',
+  REMOVE_FILTERS = 'remove-filters',
   REMOVE_EXPERIMENT = 'remove-experiment',
   REORDER_COLUMNS = 'reorder-columns',
   REORDER_PLOTS_COMPARISON = 'reorder-plots-comparison',
@@ -189,6 +190,7 @@ export type MessageFromWebview =
       type: MessageFromWebviewType.REMOVE_COLUMN_SORT
       payload: string
     }
+  | { type: MessageFromWebviewType.REMOVE_FILTERS }
   | { type: MessageFromWebviewType.REMOTE_ADD }
   | { type: MessageFromWebviewType.REMOTE_MODIFY }
   | { type: MessageFromWebviewType.REMOTE_REMOVE }

@@ -159,7 +159,8 @@ const registerExperimentQuickPickCommands = (
 
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_FILTERS_REMOVE,
-    () => experiments.removeFilters()
+    (context: Context) =>
+      experiments.removeFilters(getDvcRootFromContext(context))
   )
 
   internalCommands.registerExternalCommand(

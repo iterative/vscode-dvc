@@ -21,6 +21,9 @@ export const addConfiguration = () =>
 export const pushExperiment = (id: string) =>
   sendMessage({ payload: [id], type: MessageFromWebviewType.PUSH_EXPERIMENT })
 
+export const removeFilters = () =>
+  sendMessage({ type: MessageFromWebviewType.REMOVE_FILTERS })
+
 export const reorderColumns = (newOrder: string[]) =>
   sendMessage({
     payload: newOrder,

@@ -126,6 +126,7 @@ export const ExperimentsTable: React.FC = () => {
     columnWidths,
     hasColumns,
     hasConfig,
+    filters,
     rows: data
   } = useSelector((state: ExperimentsState) => state.tableData)
 
@@ -182,9 +183,16 @@ export const ExperimentsTable: React.FC = () => {
   }, [toggleAllRowsExpanded])
 
   const hasOnlyDefaultColumns = columns.length <= 1
-  const hasNoRows = data.length === 0
-  if (hasOnlyDefaultColumns || hasNoRows) {
-    return <GetStarted showWelcome={!hasColumns || hasNoRows} />
+  const hasRows = data.length > 0
+  if (hasOnlyDefaultColumns || !hasRows) {
+    return (
+      <GetStarted
+        hasOnlyDefaultColumns={hasOnlyDefaultColumns}
+        hasColumns={hasColumns}
+        hasRows={hasRows}
+        hasFilters={filters.length > 0}
+      />
+    )
   }
   return (
     <RowSelectionProvider>

@@ -49,7 +49,8 @@ import {
   renderTableWithSortingData,
   renderTableWithNoRows,
   selectedRows,
-  setTableData
+  setTableData,
+  renderTableWithAllRowsFiltered
 } from '../../test/experimentsTable'
 import { clearSelection, createWindowTextSelection } from '../../test/selection'
 import { sendMessage } from '../../shared/vscode'
@@ -95,6 +96,32 @@ describe('App', () => {
 
     const noColumnsState = screen.queryByText('No Columns Selected.')
     expect(noColumnsState).toBeInTheDocument()
+
+    const addColumnsButton = screen.queryByText('Add Columns')
+    addColumnsButton && fireEvent.click(addColumnsButton)
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.SELECT_COLUMNS
+    })
+  })
+
+  it('should show the no rows unfiltered empty state when there are no rows provided', () => {
+    renderTableWithAllRowsFiltered()
+    mockPostMessage.mockReset()
+
+    const allRowsFiltered = screen.queryByText('No Experiments to Display.')
+    expect(allRowsFiltered).toBeInTheDocument()
+
+    const focusFiltersTreeButton = screen.queryByText('Show Filters')
+    focusFiltersTreeButton && fireEvent.click(focusFiltersTreeButton)
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.FOCUS_FILTERS_TREE
+    })
+
+    const removeFiltersButton = screen.queryByText('Remove Filters')
+    removeFiltersButton && fireEvent.click(removeFiltersButton)
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.REMOVE_FILTERS
+    })
   })
 
   it('should not show the no columns selected empty state when only the timestamp column is provided', () => {

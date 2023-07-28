@@ -52,6 +52,10 @@ export const renderTableWithNoColumns = () => {
   renderTable({ ...tableDataFixture, columns: [] })
 }
 
+export const renderTableWithAllRowsFiltered = () => {
+  renderTable({ ...tableDataFixture, filters: ['starred'], rows: [] })
+}
+
 export const renderTableWithNoRows = () => {
   renderTable({ ...tableDataFixture, rows: [] })
 }
