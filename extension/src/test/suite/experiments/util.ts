@@ -1,4 +1,4 @@
-import { stub } from 'sinon'
+import { spy, stub } from 'sinon'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
@@ -11,6 +11,7 @@ import {
   buildDependencies,
   buildInternalCommands,
   buildMockExperimentsData,
+  getMessageReceivedEmitter,
   SafeWatcherDisposer
 } from '../util'
 import { ExperimentsData } from '../../../experiments/data'
@@ -126,6 +127,35 @@ export const buildExperiments = ({
     mockUpdateExperimentsData,
     pipeline,
     resourceLocator
+  }
+}
+
+export const buildExperimentsWebview = async (inputs: {
+  availableNbCommits?: { [branch: string]: number }
+  disposer: Disposer
+  dvcRoot?: string
+  expShow?: ExpShowOutput
+  gitLog?: string
+  remoteExpRefs?: string
+  rowOrder?: { branch: string; sha: string }[]
+  stageList?: string | null
+}) => {
+  const all = buildExperiments(inputs)
+  const { experiments, messageSpy } = all
+  await experiments.isReady()
+  const webview = await experiments.showWebview()
+  messageSpy.restore()
+  const instanceMessageSpy: typeof messageSpy = spy(webview, 'show')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ;(experiments as any).webviewMessages.sendWebviewMessage()
+
+  const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+  return {
+    ...all,
+    messageSpy: instanceMessageSpy,
+    mockMessageReceived,
+    webview
   }
 }
 

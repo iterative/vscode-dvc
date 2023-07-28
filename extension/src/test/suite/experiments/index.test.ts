@@ -18,6 +18,7 @@ import {
 import {
   DEFAULT_EXPERIMENTS_OUTPUT,
   buildExperiments,
+  buildExperimentsWebview,
   stubWorkspaceExperimentsGetters
 } from './util'
 import { Disposable } from '../../../extension'
@@ -82,7 +83,6 @@ import {
 import { ConfigKey } from '../../../vscode/config'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
 import * as Time from '../../../util/time'
-import { AvailableCommands } from '../../../commands/internal'
 import { Setup } from '../../../setup'
 import * as FileSystem from '../../../fileSystem'
 import * as ProcessExecution from '../../../process/execution'
@@ -124,11 +124,9 @@ suite('Experiments Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the experiment webview visible', async () => {
-      const { experiments, messageSpy } = buildExperiments({
+      const { messageSpy, webview } = await buildExperimentsWebview({
         disposer: disposable
       })
-
-      const webview = await experiments.showWebview()
 
       const expectedTableData: Partial<TableData> = {
         changes: workspaceChangesFixture,
@@ -175,12 +173,10 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasConfig to false if there are no stages', async () => {
-      const { experiments, messageSpy } = buildExperiments({
+      const { messageSpy } = await buildExperimentsWebview({
         disposer: disposable,
         stageList: ''
       })
-
-      await experiments.showWebview()
 
       expect(messageSpy).to.be.calledWithMatch({
         hasConfig: false
@@ -188,12 +184,10 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasConfig to true if there is a broken dvc.yaml', async () => {
-      const { experiments, messageSpy } = buildExperiments({
+      const { messageSpy } = await buildExperimentsWebview({
         disposer: disposable,
         stageList: null
       })
-
-      await experiments.showWebview()
 
       expect(messageSpy).to.be.calledWithMatch({
         hasConfig: true
@@ -201,11 +195,9 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasConfig to true if there are stages', async () => {
-      const { experiments, messageSpy } = buildExperiments({
+      const { messageSpy } = await buildExperimentsWebview({
         disposer: disposable
       })
-
-      await experiments.showWebview()
 
       expect(messageSpy).to.be.calledWithMatch({
         hasConfig: true
@@ -213,12 +205,10 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasMoreCommits to true if there are more commits to show', async () => {
-      const { experiments, messageSpy } = buildExperiments({
+      const { messageSpy } = await buildExperimentsWebview({
         availableNbCommits: { main: 404 },
         disposer: disposable
       })
-
-      await experiments.showWebview()
 
       expect(messageSpy).to.be.calledWithMatch({
         hasMoreCommits: { main: true }
@@ -226,12 +216,10 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasMoreCommits to false if there are more commits to show', async () => {
-      const { experiments, messageSpy } = buildExperiments({
+      const { messageSpy } = await buildExperimentsWebview({
         availableNbCommits: { main: 1 },
         disposer: disposable
       })
-
-      await experiments.showWebview()
 
       expect(messageSpy).to.be.calledWithMatch({
         hasMoreCommits: { main: false }
@@ -239,12 +227,10 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set isShowingMoreCommits to true if it is showing more than the current commit', async () => {
-      const { experiments, messageSpy } = buildExperiments({
+      const { messageSpy } = await buildExperimentsWebview({
         availableNbCommits: { main: 40000 },
         disposer: disposable
       })
-
-      await experiments.showWebview()
 
       expect(messageSpy).to.be.calledWithMatch({
         isShowingMoreCommits: { main: true }
@@ -275,56 +261,12 @@ suite('Experiments Test Suite', () => {
         .update(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT, undefined, false)
     )
 
-    const setupExperimentsAndMockCommands = () => {
-      const {
-        columnsModel,
-        experiments,
-        experimentsModel,
-        internalCommands,
-        dvcExecutor,
-        mockCheckOrAddPipeline,
-        messageSpy,
-        mockUpdateExperimentsData,
-        mockSelectBranches
-      } = buildExperiments({ disposer: disposable, expShow: expShowFixture })
-      const mockExecuteCommand = stub(
-        internalCommands,
-        'executeCommand'
-      ).callsFake(commandId => {
-        switch (commandId) {
-          case AvailableCommands.GIT_GET_COMMIT_MESSAGES:
-            return Promise.resolve('')
-          case AvailableCommands.GIT_GET_BRANCHES:
-            return Promise.resolve([
-              'main',
-              'other',
-              'one-more',
-              'important-fix'
-            ])
-          default:
-            return Promise.resolve(undefined)
-        }
-      })
-      return {
-        columnsModel,
-        dvcExecutor,
-        experiments,
-        experimentsModel,
-        messageSpy,
-        mockCheckOrAddPipeline,
-        mockExecuteCommand,
-        mockSelectBranches,
-        mockUpdateExperimentsData
-      }
-    }
-
     it('should handle a column reordered message from the webview', async () => {
-      const { experiments } = buildExperiments({ disposer: disposable })
-
-      const webview = await experiments.showWebview()
+      const { mockMessageReceived } = await buildExperimentsWebview({
+        disposer: disposable
+      })
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockColumnOrder = [
         'id',
@@ -361,12 +303,11 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a column resized message from the webview', async () => {
-      const { experiments } = buildExperiments({ disposer: disposable })
-
-      const webview = await experiments.showWebview()
+      const { mockMessageReceived } = await buildExperimentsWebview({
+        disposer: disposable
+      })
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockSetColumnWidth = stub(
         ColumnsModel.prototype,
@@ -395,12 +336,11 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a column sorted message from the webview', async () => {
-      const { experiments } = buildExperiments({ disposer: disposable })
-
-      const webview = await experiments.showWebview()
+      const { mockMessageReceived } = await buildExperimentsWebview({
+        disposer: disposable
+      })
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockAddSort = stub(ExperimentsModel.prototype, 'addSort').returns(
         undefined
@@ -430,12 +370,11 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a column sort removed from the webview', async () => {
-      const { experiments } = buildExperiments({ disposer: disposable })
-
-      const webview = await experiments.showWebview()
+      const { mockMessageReceived } = await buildExperimentsWebview({
+        disposer: disposable
+      })
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockRemoveSort = stub(
         ExperimentsModel.prototype,
@@ -465,14 +404,13 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to hide a table column', async () => {
-      const { experiments, columnsModel } = buildExperiments({
-        disposer: disposable
-      })
+      const { columnsModel, mockMessageReceived } =
+        await buildExperimentsWebview({
+          disposer: disposable
+        })
 
       const mockUnselect = stub(columnsModel, 'unselect')
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const webview = await experiments.showWebview()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockColumnId = 'mock-column-id'
 
       mockMessageReceived.fire({
@@ -491,11 +429,11 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to open the source params file from a column path', async () => {
-      const { experiments } = setupExperimentsAndMockCommands()
+      const { mockMessageReceived } = await buildExperimentsWebview({
+        disposer: disposable
+      })
 
       const mockShowTextDocument = stub(window, 'showTextDocument')
-      const webview = await experiments.showWebview()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockColumnId = 'params:params.yaml_5'
 
       mockMessageReceived.fire({
@@ -513,11 +451,11 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to open different params files than the default one', async () => {
-      const { experiments } = setupExperimentsAndMockCommands()
+      const { mockMessageReceived } = await buildExperimentsWebview({
+        disposer: disposable
+      })
 
       const mockShowTextDocument = stub(window, 'showTextDocument')
-      const webview = await experiments.showWebview()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockColumnId = 'params:params_alt.json_5:nested1.nested2'
 
       mockMessageReceived.fire({
@@ -813,9 +751,9 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to remove an experiment', async () => {
-      const { experiments } = buildExperiments({ disposer: disposable })
-
-      const webview = await experiments.showWebview()
+      const { webview } = await buildExperimentsWebview({
+        disposer: disposable
+      })
       const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockExperimentId = 'mock-experiment-id'
 
@@ -979,7 +917,7 @@ suite('Experiments Test Suite', () => {
 
     it('should be able to handle a message to select columns', async () => {
       const { columnsModel, experiments, messageSpy } =
-        setupExperimentsAndMockCommands()
+        await buildExperimentsWebview({ disposer: disposable })
 
       const webview = await experiments.showWebview()
       messageSpy.resetHistory()
@@ -1026,11 +964,12 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to select the first columns', async () => {
-      const { experiments, messageSpy } = setupExperimentsAndMockCommands()
+      const { experiments, mockMessageReceived, messageSpy } =
+        await buildExperimentsWebview({
+          disposer: disposable
+        })
 
-      const webview = await experiments.showWebview()
       messageSpy.resetHistory()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const movedColumn = 'metrics:summary.json:val_accuracy'
 
@@ -1058,11 +997,12 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to move a column group to the start of the table', async () => {
-      const { experiments, messageSpy } = setupExperimentsAndMockCommands()
+      const { experiments, mockMessageReceived, messageSpy } =
+        await buildExperimentsWebview({
+          disposer: disposable
+        })
 
-      const webview = await experiments.showWebview()
       messageSpy.resetHistory()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const movedGroup = 'params:params.yaml'
 
@@ -1101,9 +1041,9 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to focus the sorts tree', async () => {
-      const { experiments } = buildExperiments({ disposer: disposable })
-
-      const webview = await experiments.showWebview()
+      const { webview } = await buildExperimentsWebview({
+        disposer: disposable
+      })
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -1134,9 +1074,9 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to focus the filters tree', async () => {
-      const { experiments } = buildExperiments({ disposer: disposable })
-
-      const webview = await experiments.showWebview()
+      const { webview } = await buildExperimentsWebview({
+        disposer: disposable
+      })
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -1167,14 +1107,14 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to update the table depth', async () => {
-      const { experiments } = buildExperiments({ disposer: disposable })
+      const { webview } = await buildExperimentsWebview({
+        disposer: disposable
+      })
       const inputEvent = getInputBoxEvent('0')
       const tableMaxDepthChanged = configurationChangeEvent(
         ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT,
         disposable
       )
-
-      const webview = await experiments.showWebview()
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -1200,8 +1140,10 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it("should be able to handle a message to toggle an experiment's star status", async () => {
-      const { experiments, experimentsModel } =
-        setupExperimentsAndMockCommands()
+      const { experimentsModel, mockMessageReceived } =
+        await buildExperimentsWebview({
+          disposer: disposable
+        })
 
       const experimentsToToggle = ['exp-e7a67']
 
@@ -1217,8 +1159,6 @@ suite('Experiments Test Suite', () => {
         'experiments are starred'
       ).to.be.false
 
-      const webview = await experiments.showWebview()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
       const toggleSpy = spy(experimentsModel, 'toggleStars')
 
       mockMessageReceived.fire({
@@ -1236,12 +1176,12 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to filter to starred experiments', async () => {
-      const { experiments } = setupExperimentsAndMockCommands()
+      const { mockMessageReceived } = await buildExperimentsWebview({
+        disposer: disposable
+      })
 
       const mockExecuteCommand = stub(commands, 'executeCommand')
 
-      const webview = await experiments.showWebview()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
       const messageReceived = new Promise(resolve =>
         disposable.track(mockMessageReceived.event(() => resolve(undefined)))
       )
@@ -1336,7 +1276,7 @@ suite('Experiments Test Suite', () => {
         dvc: true,
         experiments: true
       })
-      const { experiments } = buildExperiments({
+      const { mockMessageReceived } = await buildExperimentsWebview({
         disposer: disposable
       })
       const mockShowPlots = stub(WorkspacePlots.prototype, 'showWebview')
@@ -1346,11 +1286,6 @@ suite('Experiments Test Suite', () => {
           return Promise.resolve(undefined)
         })
       )
-
-      await experiments.isReady()
-
-      const webview = await experiments.showWebview()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
         type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW
@@ -1414,12 +1349,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to add a configuration', async () => {
-      const { experiments, mockCheckOrAddPipeline, messageSpy } =
-        setupExperimentsAndMockCommands()
-
-      const webview = await experiments.showWebview()
-      messageSpy.resetHistory()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const { mockMessageReceived, mockCheckOrAddPipeline } =
+        await buildExperimentsWebview({ disposer: disposable })
 
       mockMessageReceived.fire({
         type: MessageFromWebviewType.ADD_CONFIGURATION
@@ -1430,20 +1361,15 @@ suite('Experiments Test Suite', () => {
 
     it('should handle a message to show more commits', async () => {
       const {
-        experiments,
         experimentsModel,
-        messageSpy,
+        mockMessageReceived,
         mockUpdateExperimentsData
-      } = setupExperimentsAndMockCommands()
+      } = await buildExperimentsWebview({ disposer: disposable })
 
       const setNbfCommitsToShowSpy = spy(
         experimentsModel,
         'setNbfCommitsToShow'
       )
-
-      const webview = await experiments.showWebview()
-      messageSpy.resetHistory()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
         payload: 'main',
@@ -1456,20 +1382,15 @@ suite('Experiments Test Suite', () => {
 
     it('should handle a message to show less commits', async () => {
       const {
-        experiments,
+        mockMessageReceived,
         experimentsModel,
-        messageSpy,
         mockUpdateExperimentsData
-      } = setupExperimentsAndMockCommands()
+      } = await buildExperimentsWebview({ disposer: disposable })
 
       const setNbfCommitsToShowSpy = spy(
         experimentsModel,
         'setNbfCommitsToShow'
       )
-
-      const webview = await experiments.showWebview()
-      messageSpy.resetHistory()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
         payload: 'main',
@@ -1482,11 +1403,10 @@ suite('Experiments Test Suite', () => {
 
     it('should handle a message to reset the number of commits shown for a branch', async () => {
       const {
-        experiments,
+        mockMessageReceived,
         experimentsModel,
-        messageSpy,
         mockUpdateExperimentsData
-      } = setupExperimentsAndMockCommands()
+      } = await buildExperimentsWebview({ disposer: disposable })
 
       experimentsModel.setNbfCommitsToShow(100, 'main')
       const getNumberOfCommitsToShowForMain = () =>
@@ -1498,10 +1418,6 @@ suite('Experiments Test Suite', () => {
         experimentsModel,
         'resetNbfCommitsToShow'
       )
-
-      const webview = await experiments.showWebview()
-      messageSpy.resetHistory()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
         payload: 'main',
@@ -1515,12 +1431,12 @@ suite('Experiments Test Suite', () => {
 
     it('should handle a message to select branches', async () => {
       const {
-        experiments,
         experimentsModel,
-        messageSpy,
-        mockUpdateExperimentsData,
-        mockSelectBranches
-      } = setupExperimentsAndMockCommands()
+        mockMessageReceived,
+        mockSelectBranches,
+        mockUpdateExperimentsData
+      } = await buildExperimentsWebview({ disposer: disposable })
+
       const mockSetSelectedBranches = stub(
         experimentsModel,
         'setSelectedBranches'
@@ -1529,10 +1445,6 @@ suite('Experiments Test Suite', () => {
       const waitForBranchesToBeSelected = new Promise(resolve =>
         mockSetSelectedBranches.callsFake(() => resolve(undefined))
       )
-
-      const webview = await experiments.showWebview()
-      messageSpy.resetHistory()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
         type: MessageFromWebviewType.SELECT_BRANCHES
@@ -1548,13 +1460,11 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to refresh the exp show data', async () => {
-      const { experiments, mockUpdateExperimentsData } = buildExperiments({
-        disposer: disposable,
-        expShow: expShowFixture
-      })
-
-      const webview = await experiments.showWebview()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const { mockMessageReceived, mockUpdateExperimentsData } =
+        await buildExperimentsWebview({
+          disposer: disposable,
+          expShow: expShowFixture
+        })
 
       const expShowCalled = new Promise(resolve =>
         mockUpdateExperimentsData.callsFake(() => {
@@ -1573,18 +1483,13 @@ suite('Experiments Test Suite', () => {
 
     it('should not update the selected branches when the user closes the select branches quick pick', async () => {
       const {
-        experiments,
         experimentsModel,
-        messageSpy,
+        mockMessageReceived,
         mockUpdateExperimentsData,
         mockSelectBranches
-      } = setupExperimentsAndMockCommands()
+      } = await buildExperimentsWebview({ disposer: disposable })
       const mockSetBranches = stub(experimentsModel, 'setBranches')
       mockSelectBranches.resolves(undefined)
-
-      const webview = await experiments.showWebview()
-      messageSpy.resetHistory()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
         type: MessageFromWebviewType.SELECT_BRANCHES
