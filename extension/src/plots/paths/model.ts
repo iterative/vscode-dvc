@@ -127,22 +127,21 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
   }
 
   public getComparisonPaths() {
-    // TBD do we need to do sorting everytime we need plots
-    // should we save sorted/grouped data into its own variables to use?
-    const { multiImagePaths, paths } = this.sortComparisonPaths(
+    const { paths } = this.sortComparisonPaths(
       this.getPathsByType(PathType.COMPARISON)
     )
 
-    return performSimpleOrderedUpdate(
-      this.comparisonPathsOrder.flatMap(path =>
-        path.endsWith('image') ? multiImagePaths : path
-      ),
-      paths
-    )
+    return performSimpleOrderedUpdate(this.comparisonPathsOrder, paths)
   }
 
   public setComparisonPathsOrder(order: string[]) {
-    this.comparisonPathsOrder = order
+    const { multiImagePaths } = this.sortComparisonPaths(
+      this.getPathsByType(PathType.COMPARISON)
+    )
+
+    this.comparisonPathsOrder = order.flatMap(path =>
+      path.endsWith('image') ? multiImagePaths : path
+    )
     this.persist(
       PersistenceKey.PLOT_COMPARISON_PATHS_ORDER,
       this.comparisonPathsOrder
