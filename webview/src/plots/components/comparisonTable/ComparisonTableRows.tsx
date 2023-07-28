@@ -49,7 +49,10 @@ export const ComparisionTableRows: React.FC<ComparisonTableRowsProps> = ({
           path={path}
           plots={columns.map(column => ({
             ...revs[column.id],
-            id: column.id
+            id: column.id,
+            imgs: revs[column.id]?.imgs || [
+              { errors: undefined, loading: false, url: undefined }
+            ]
           }))}
           nbColumns={columns.length}
           pinnedColumn={pinnedColumn}

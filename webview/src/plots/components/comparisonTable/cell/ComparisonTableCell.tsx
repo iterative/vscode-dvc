@@ -9,10 +9,8 @@ export const ComparisonTableCell: React.FC<{
   path: string
   plot: ComparisonPlot
 }> = ({ path, plot }) => {
-  const plotImg = plot.imgs
-    ? plot.imgs[0]
-    : // TBD according to testing, imgs could be undefined. Need to review how.
-      { errors: undefined, loading: false, url: undefined }
+  const plotImg = plot.imgs[0]
+
   const loading = plotImg.loading
   const missing = !loading && !plotImg.url
 
