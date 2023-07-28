@@ -277,14 +277,13 @@ describe('ComparisonTable', () => {
           ...revisions,
           [revisionWithNoData]: {
             id: revisionWithNoData,
-            imgOrImgs: [
+            imgs: [
               {
                 errors: undefined,
                 loading: false,
                 url: undefined
               }
-            ],
-            isMulti: false
+            ]
           }
         }
       })),
@@ -315,14 +314,13 @@ describe('ComparisonTable', () => {
           ...revisions,
           [revisionWithNoData]: {
             id: revisionWithNoData,
-            imgOrImgs: [
+            imgs: [
               {
                 errors: ['this is an error'],
                 loading: false,
                 url: undefined
               }
-            ],
-            isMulti: false
+            ]
           }
         }
       })),

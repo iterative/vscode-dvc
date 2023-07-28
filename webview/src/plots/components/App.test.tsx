@@ -231,14 +231,13 @@ describe('App', () => {
             revisions: {
               ad2b5ec: {
                 id: 'ad2b5ec',
-                imgOrImgs: [
+                imgs: [
                   {
                     errors: undefined,
                     loading: true,
                     url: undefined
                   }
-                ],
-                isMulti: false
+                ]
               }
             }
           }
@@ -1380,8 +1379,7 @@ describe('App', () => {
     fireEvent.click(plot)
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload:
-        comparisonTableFixture.plots[0].revisions.workspace.imgOrImgs[0].url,
+      payload: comparisonTableFixture.plots[0].revisions.workspace.imgs[0].url,
       type: MessageFromWebviewType.ZOOM_PLOT
     })
   })

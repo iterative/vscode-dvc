@@ -829,12 +829,11 @@ export const getComparisonWebviewMessage = (
       if (!plotAcc[pathLabel].revisions[id]) {
         plotAcc[pathLabel].revisions[id] = {
           id,
-          imgOrImgs: [],
-          isMulti
+          imgs: []
         }
       }
 
-      plotAcc[pathLabel].revisions[id].imgOrImgs.push({
+      plotAcc[pathLabel].revisions[id].imgs.push({
         url: `${url}?${MOCK_IMAGE_MTIME}`,
         errors: undefined,
         loading: false

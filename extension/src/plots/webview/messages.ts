@@ -340,7 +340,7 @@ export class WebviewMessages {
   private addCorrectUrl(plot: ComparisonPlot) {
     const webview = this.getWebview()
     if (webview) {
-      plot.imgOrImgs = plot.imgOrImgs.map(image => ({
+      plot.imgs = plot.imgs.map(image => ({
         ...image,
         url: image.url
           ? `${webview.getWebviewUri(image.url)}?${getModifiedTime(image.url)}`
