@@ -303,7 +303,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       void experiments.addFilter()
       await tableFilterAdded
 
-      expect(mockTreeView.description).to.equal('5 of 11 Filtered')
+      expect(mockTreeView.description).to.equal('6 of 11 Filtered')
 
       stubPrivateMethod(experimentsModel, 'getFilteredExperiments')
         .onFirstCall()
@@ -359,7 +359,10 @@ suite('Experiments Filter By Tree Test Suite', () => {
         rows: filteredRows
       }
 
-      expect(messageSpy).to.be.calledWithMatch(filteredTableData)
+      expect(messageSpy).to.be.calledWithMatch(
+        filteredTableData,
+        'workspace is unfiltered by stars (starred set to undefined) as it is currently not possible to star the workspace'
+      )
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should provide a shortcut to filter to starred experiments', async () => {

@@ -30,7 +30,12 @@ import {
   WORKSPACE_BRANCH
 } from '../webview/contract'
 import { reorderListSubset } from '../../util/array'
-import { Executor, ExpShowOutput, ExecutorStatus } from '../../cli/dvc/contract'
+import {
+  Executor,
+  ExpShowOutput,
+  ExecutorStatus,
+  EXPERIMENT_WORKSPACE_ID
+} from '../../cli/dvc/contract'
 import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
 import { PersistenceKey } from '../../persistence/constants'
@@ -412,7 +417,9 @@ export class ExperimentsModel extends ModelWithPersistence {
     const workspace = this.addDetails(this.workspace)
 
     const rows: Commit[] = []
-    if (filterExperiment(this.getFilters(), workspace)) {
+    if (
+      filterExperiment(this.getFilters(), { ...workspace, starred: undefined })
+    ) {
       rows.push({ branch: WORKSPACE_BRANCH, ...workspace })
     }
 
@@ -447,6 +454,9 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public isStarred(id: string) {
+    if (id === EXPERIMENT_WORKSPACE_ID) {
+      return
+    }
     return !!this.starredExperiments[id]
   }
 
@@ -672,7 +682,7 @@ export class ExperimentsModel extends ModelWithPersistence {
       ...experiment,
       displayColor: this.getDisplayColor(id),
       selected: this.isSelected(id),
-      starred: !!this.isStarred(id)
+      starred: this.isStarred(id)
     }
   }
 

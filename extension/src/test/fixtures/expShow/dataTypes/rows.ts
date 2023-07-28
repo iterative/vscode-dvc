@@ -23,7 +23,7 @@ const data: Commit[] = [
       }
     },
     selected: false,
-    starred: false
+    starred: undefined
   },
   {
     branch: 'main',

@@ -76,7 +76,7 @@ const rowsFixture: Commit[] = [
     },
     executorStatus: ExecutorStatus.RUNNING,
     selected: false,
-    starred: false
+    starred: undefined
   },
   {
     branch: 'main',

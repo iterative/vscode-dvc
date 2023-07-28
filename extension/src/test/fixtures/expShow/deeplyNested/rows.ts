@@ -27,7 +27,7 @@ export const data = [
     },
     displayColor: undefined,
     selected: false,
-    starred: false
+    starred: undefined
   },
   {
     branch: 'main',

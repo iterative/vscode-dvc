@@ -160,7 +160,7 @@ const data: Commit[] = [
     },
     displayColor: undefined,
     selected: false,
-    starred: false
+    starred: undefined
   },
   {
     branch: 'main',

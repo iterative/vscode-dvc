@@ -41,7 +41,7 @@ import { truncateFromLeft } from '../../util/string'
 type ExperimentAugmented = Experiment & {
   hasChildren: boolean
   selected?: boolean
-  starred: boolean
+  starred?: boolean
   type: ExperimentType
 }
 
