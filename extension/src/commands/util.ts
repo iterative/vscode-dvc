@@ -5,7 +5,8 @@ import { Context } from '../vscode/context'
 
 export const showSetupOrExecuteCommand =
   <T>(setup: Setup, callback: (context: Context) => Promise<T | undefined>) =>
-  (context: Context) => {
+  async (context: Context) => {
+    await setup.isReady()
     const { dvc, experiments } = setup.shouldBeShown()
     if (!dvc) {
       return commands.executeCommand(RegisteredCommands.SETUP_SHOW_DVC)
