@@ -84,7 +84,7 @@ const removeImages = (
     ) {
       filteredRevisionData[id] = {
         id,
-        imgOrImgs: [
+        imgs: [
           {
             errors:
               id === 'main'
@@ -93,8 +93,7 @@ const removeImages = (
             loading: false,
             url: undefined
           }
-        ],
-        isMulti: false
+        ]
       }
       continue
     }

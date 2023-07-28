@@ -157,8 +157,7 @@ export type ComparisonPlotImg = {
 
 export type ComparisonPlot = {
   id: string
-  imgOrImgs: ComparisonPlotImg[]
-  isMulti: boolean
+  imgs: ComparisonPlotImg[]
 }
 
 export enum PlotsDataKeys {

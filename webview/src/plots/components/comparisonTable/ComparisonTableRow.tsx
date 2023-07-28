@@ -77,7 +77,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
                 data-testid="row-images"
                 className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
               >
-                {plot.isMulti ? (
+                {plot.imgs.length > 1 ? (
                   <ComparisonTableMultiCell plot={plot} path={path} />
                 ) : (
                   <ComparisonTableCell plot={plot} path={path} />

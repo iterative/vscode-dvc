@@ -227,14 +227,12 @@ type ComparisonPlotsAcc = {
 const collectSelectedComparisonPlot = ({
   acc,
   id,
-  isMulti,
   path,
   pathLabel,
   getComparisonPlotImg
 }: {
   acc: ComparisonPlotsAcc
   id: string
-  isMulti: boolean
   path: string
   pathLabel: string
   getComparisonPlotImg: (id: string, path: string) => ComparisonPlotImg
@@ -243,12 +241,11 @@ const collectSelectedComparisonPlot = ({
   if (!doesPlotExist) {
     acc[pathLabel].revisions[id] = {
       id,
-      imgOrImgs: [],
-      isMulti
+      imgs: []
     }
   }
 
-  acc[pathLabel].revisions[id].imgOrImgs.push(getComparisonPlotImg(id, path))
+  acc[pathLabel].revisions[id].imgs.push(getComparisonPlotImg(id, path))
 }
 
 const collectSelectedPathComparisonPlots = ({
@@ -280,7 +277,6 @@ const collectSelectedPathComparisonPlots = ({
       acc,
       getComparisonPlotImg,
       id,
-      isMulti,
       path,
       pathLabel
     })

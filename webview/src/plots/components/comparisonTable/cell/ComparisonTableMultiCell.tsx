@@ -22,7 +22,7 @@ export const ComparisonTableMultiCell: React.FC<{
   const dispatch = useDispatch()
   const currentStep = multiValues[path] || 0
 
-  const { loading, url } = plot.imgOrImgs[currentStep]
+  const { loading, url } = plot.imgs[currentStep]
   const missing = !loading && !url
 
   const addDisabled = useCallback(() => {
@@ -51,7 +51,7 @@ export const ComparisonTableMultiCell: React.FC<{
       <input
         name={`${plot.id}-step`}
         min="0"
-        max={plot.imgOrImgs.length - 1}
+        max={plot.imgs.length - 1}
         value={currentStep}
         type="range"
         onChange={event => {
@@ -76,7 +76,7 @@ export const ComparisonTableMultiCell: React.FC<{
   if (missing) {
     return (
       <div className={styles.multiImageWrapper}>
-        <ComparisonTableMissingCell plot={plot.imgOrImgs[currentStep]} />
+        <ComparisonTableMissingCell plot={plot.imgs[currentStep]} />
         {slider}
       </div>
     )

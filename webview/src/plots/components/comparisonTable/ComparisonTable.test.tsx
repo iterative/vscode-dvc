@@ -277,7 +277,7 @@ describe('ComparisonTable', () => {
           ...revisions,
           [revisionWithNoData]: {
             id: revisionWithNoData,
-            imgOrImgs: [
+            imgs: [
               {
                 errors: undefined,
                 id: revisionWithNoData,
@@ -285,8 +285,7 @@ describe('ComparisonTable', () => {
                 path: '',
                 url: undefined
               }
-            ],
-            isMulti: false
+            ]
           }
         }
       })),
@@ -317,7 +316,7 @@ describe('ComparisonTable', () => {
           ...revisions,
           [revisionWithNoData]: {
             id: revisionWithNoData,
-            imgOrImgs: [
+            imgs: [
               {
                 errors: ['this is an error'],
                 id: revisionWithNoData,
@@ -325,8 +324,7 @@ describe('ComparisonTable', () => {
                 path: '',
                 url: undefined
               }
-            ],
-            isMulti: false
+            ]
           }
         }
       })),
