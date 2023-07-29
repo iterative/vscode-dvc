@@ -44,7 +44,12 @@ export const ComparisionTableRows: React.FC<ComparisonTableRowsProps> = ({
     }
     const revs = plot.revisions
     return (
-      <tbody key={path} id={path} ref={i === 0 ? firstRowRef : undefined}>
+      <tbody
+        data-testid="comparison-table-body"
+        key={path}
+        id={path}
+        ref={i === 0 ? firstRowRef : undefined}
+      >
         <ComparisonTableRow
           path={path}
           plots={columns.map(column => ({

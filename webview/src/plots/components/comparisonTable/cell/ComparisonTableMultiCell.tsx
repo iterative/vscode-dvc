@@ -1,4 +1,4 @@
-import React, { useCallback, MouseEvent, KeyboardEvent } from 'react'
+import React, { useCallback } from 'react'
 import cx from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
 import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
@@ -33,14 +33,10 @@ export const ComparisonTableMultiCell: React.FC<{
     dispatch(changeDisabledDragIds([]))
   }, [dispatch])
 
-  const disableClick = useCallback((e: MouseEvent | KeyboardEvent) => {
-    e.stopPropagation()
-  }, [])
-
   let imageContent = (
     <button
       className={cx(styles.imageWrapper, styles.multiImageWrapper)}
-      onClick={() => url && zoomPlot(url)}
+      onClick={() => zoomPlot(url)}
       data-testid="image-plot-button"
     >
       <img
@@ -61,16 +57,12 @@ export const ComparisonTableMultiCell: React.FC<{
   }
 
   return (
-    <div className={styles.multiImageWrapper}>
+    <div data-testid="multi-image-cell" className={styles.multiImageWrapper}>
       {imageContent}
-      {/* The div element has children that allow keyboard interaction */}
-      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
       <div
         className={styles.multiImageSlider}
         onMouseEnter={addDisabled}
         onMouseLeave={removeDisabled}
-        onClick={disableClick}
-        onKeyDown={disableClick}
       >
         <label htmlFor={`${plot.id}-step`}>Step</label>
         <input

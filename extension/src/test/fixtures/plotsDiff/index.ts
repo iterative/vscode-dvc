@@ -810,8 +810,7 @@ export const getComparisonWebviewMessage = (
       : getImageData(baseUrl, joinFunc)
   )) {
     const multiImagePath = joinFunc('plots', 'image')
-    const isMulti = path.includes(multiImagePath)
-    const pathLabel = path
+    const pathLabel = path.includes(multiImagePath) ? multiImagePath : path
 
     if (!plotAcc[pathLabel]) {
       plotAcc[pathLabel] = {
