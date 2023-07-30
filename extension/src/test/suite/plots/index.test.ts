@@ -982,8 +982,7 @@ suite('Plots Test Suite', () => {
       expect(mockPlotsDiff).to.be.called
 
       const { comparison: comparisonData } = getFirstArgOfLastCall(messageSpy)
-      // we need to grab our fixture from vscode
-      // and edit the images from there
+
       expect(comparisonData).to.deep.equal(comparisonPlotsMultiImgFixture)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 

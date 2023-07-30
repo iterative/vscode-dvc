@@ -280,9 +280,7 @@ describe('ComparisonTable', () => {
             imgs: [
               {
                 errors: undefined,
-                id: revisionWithNoData,
                 loading: false,
-                path: '',
                 url: undefined
               }
             ]
@@ -319,9 +317,7 @@ describe('ComparisonTable', () => {
             imgs: [
               {
                 errors: ['this is an error'],
-                id: revisionWithNoData,
                 loading: false,
-                path: '',
                 url: undefined
               }
             ]
