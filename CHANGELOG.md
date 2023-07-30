@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.28] - 2023-07-30
+
+### 🐛 Bug Fixes
+
+- Fix show setup/experiments on extension initialization [#4376](https://github.com/iterative/vscode-dvc/pull/4376) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Use instance spies to test experiments webview messages [#4375](https://github.com/iterative/vscode-dvc/pull/4375) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.27] - 2023-07-27
 
 ### 🚀 New Features and Enhancements
