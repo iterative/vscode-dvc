@@ -32,7 +32,8 @@ import {
   DEFAULT_HEIGHT,
   DEFAULT_NB_ITEMS_PER_ROW,
   PlotHeight,
-  SmoothPlotValues
+  SmoothPlotValues,
+  ImagePlot
 } from '../webview/contract'
 import {
   EXPERIMENT_WORKSPACE_ID,
@@ -420,8 +421,8 @@ export class PlotsModel extends ModelWithPersistence {
     selectedRevisionIds: string[]
   ) {
     return collectSelectedComparisonPlots({
-      getComparisonPlotImg: (id: string, path: string) => {
-        const image = this.comparisonData?.[id]?.[path]
+      comparisonData: this.comparisonData,
+      getComparisonPlotImg: (image: ImagePlot, id: string, path: string) => {
         const errors = this.errors.getImageErrors(path, id)
         const fetched = this.fetchedRevs.has(id)
         const url = collectImageUrl(image, fetched)
