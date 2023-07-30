@@ -385,7 +385,7 @@ const getMultiImageData = (
     }[]
   } = {}
   for (let i = 0; i < 15; i++) {
-    const key = join('plots', 'image', `${i}.jpg`)
+    const key = joinFunc('plots', 'image', `${i}.jpg`)
     const values = []
     for (const revision of revisions) {
       values.push({

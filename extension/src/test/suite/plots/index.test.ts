@@ -11,9 +11,11 @@ import gitLogFixture from '../../fixtures/expShow/base/gitLog'
 import rowOrderFixture from '../../fixtures/expShow/base/rowOrder'
 import customPlotsFixture from '../../fixtures/expShow/base/customPlots'
 import plotsDiffFixture from '../../fixtures/plotsDiff/output'
+import multiImagePlotsDiffFixture from '../../fixtures/plotsDiff/output/multiImage'
 import multiSourcePlotsDiffFixture from '../../fixtures/plotsDiff/multiSource'
 import templatePlotsFixture from '../../fixtures/plotsDiff/template'
 import comparisonPlotsFixture from '../../fixtures/plotsDiff/comparison/vscode'
+import comparisonPlotsMultiImgFixture from '../../fixtures/plotsDiff/comparison/multiVscode'
 import plotsRevisionsFixture from '../../fixtures/plotsDiff/revisions'
 import {
   bypassProcessManagerDebounce,
@@ -966,6 +968,23 @@ suite('Plots Test Suite', () => {
       for (const entry of confusionMatrixDatapoints) {
         expect(expectedRevisions).to.include(entry.rev)
       }
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should send the correct data to the webview for multi image plots', async () => {
+      const { plots, messageSpy, mockPlotsDiff } = await buildPlots({
+        disposer: disposable,
+        plotsDiff: multiImagePlotsDiffFixture
+      })
+
+      const webview = await plots.showWebview()
+      await webview.isReady()
+
+      expect(mockPlotsDiff).to.be.called
+
+      const { comparison: comparisonData } = getFirstArgOfLastCall(messageSpy)
+      // we need to grab our fixture from vscode
+      // and edit the images from there
+      expect(comparisonData).to.deep.equal(comparisonPlotsMultiImgFixture)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a toggle experiment message from the webview', async () => {
