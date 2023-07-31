@@ -5,9 +5,9 @@ import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import plotsDiffMultiImgFixture from '../../test/fixtures/plotsDiff/output/multiImage'
 import { buildMockMemento } from '../../test/util'
 import { PlotsType, TemplatePlotGroup } from '../webview/contract'
-import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../cli/dvc/contract'
+import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { ErrorsModel } from '../errors/model'
-import { REVISIONS, getMultiImgPaths } from '../../test/fixtures/plotsDiff'
+import { REVISIONS } from '../../test/fixtures/plotsDiff'
 
 describe('PathsModel', () => {
   const mockDvcRoot = 'test'
@@ -355,36 +355,27 @@ describe('PathsModel', () => {
     expect(model.getComparisonPaths()).toStrictEqual(newOrder)
   })
 
-  it('should sort the order of the comparison paths when there are "by step" images', () => {
+  it('should group multi comparison plot path directories', () => {
     const model = new PathsModel(
       mockDvcRoot,
       buildMockErrorsModel(),
       buildMockMemento()
     )
-
-    const singleImgPaths = [
+    const currentOrder = [
       join('plots', 'acc.png'),
       join('plots', 'heatmap.png'),
-      join('plots', 'loss.png')
+      join('plots', 'loss.png'),
+      join('plots', 'image')
     ]
 
-    const currentOrder = [...singleImgPaths, ...getMultiImgPaths()]
-
-    const mixedMultiImgFixture: PlotsOutput = {
-      data: {
-        ...plotsDiffMultiImgFixture.data,
-        [join('plots', 'image', '3.jpg')]:
-          plotsDiffMultiImgFixture.data[join('plots', 'image', '3.jpg')]
-      }
-    }
-    model.transformAndSet(mixedMultiImgFixture, REVISIONS)
+    model.transformAndSet(plotsDiffMultiImgFixture, REVISIONS)
     model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
 
     expect(model.getComparisonPaths()).toStrictEqual(currentOrder)
 
-    model.setComparisonPathsOrder([join('plots', 'image'), ...singleImgPaths])
+    const newOrder = [join('plots', 'image'), ...currentOrder.slice(0, 3)]
 
-    const newOrder = [...getMultiImgPaths(), ...singleImgPaths]
+    model.setComparisonPathsOrder(newOrder)
 
     expect(model.getComparisonPaths()).toStrictEqual(newOrder)
   })

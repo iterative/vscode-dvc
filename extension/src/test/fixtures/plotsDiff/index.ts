@@ -364,14 +364,6 @@ const multipleVega = (length: number) => {
   return plots
 }
 
-export const getMultiImgPaths = (joinFunc = join) => {
-  const paths = []
-  for (let i = 0; i < 15; i++) {
-    paths.push(joinFunc('plots', 'image', `${i}.jpg`))
-  }
-  return paths
-}
-
 const getMultiImageData = (
   baseUrl: string,
   joinFunc: (...segments: string[]) => string,

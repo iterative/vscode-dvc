@@ -18,7 +18,6 @@ import { isDvcError } from '../../cli/dvc/reader'
 import { PlotsOutputOrError } from '../../cli/dvc/contract'
 import { getErrorTooltip } from '../../tree'
 import { ErrorsModel } from '../errors/model'
-import { MULTI_IMAGE_PATH_REG } from '../../cli/dvc/constants'
 
 export class PathsModel extends PathSelectionModel<PlotPath> {
   private readonly errors: ErrorsModel
@@ -127,21 +126,14 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
   }
 
   public getComparisonPaths() {
-    const { paths } = this.sortComparisonPaths(
+    return performSimpleOrderedUpdate(
+      this.comparisonPathsOrder,
       this.getPathsByType(PathType.COMPARISON)
     )
-
-    return performSimpleOrderedUpdate(this.comparisonPathsOrder, paths)
   }
 
   public setComparisonPathsOrder(order: string[]) {
-    const { multiImagePaths } = this.sortComparisonPaths(
-      this.getPathsByType(PathType.COMPARISON)
-    )
-
-    this.comparisonPathsOrder = order.flatMap(path =>
-      path.endsWith('image') ? multiImagePaths : path
-    )
+    this.comparisonPathsOrder = order
     this.persist(
       PersistenceKey.PLOT_COMPARISON_PATHS_ORDER,
       this.comparisonPathsOrder
@@ -168,32 +160,6 @@ export class PathsModel extends PathSelectionModel<PlotPath> {
     return this.data
       .filter(plotPath => filter(type, plotPath))
       .map(({ path }) => path)
-  }
-
-  private sortComparisonPaths(originalPaths: string[]) {
-    const multiImagePaths: string[] = []
-    const paths: string[] = []
-    let multiImageInd
-
-    for (const [ind, path] of originalPaths.entries()) {
-      const isMulti = MULTI_IMAGE_PATH_REG.test(path)
-      if (!isMulti) {
-        paths.push(path)
-        continue
-      }
-      if (!multiImageInd) {
-        multiImageInd = ind
-      }
-      multiImagePaths.push(path)
-    }
-
-    multiImagePaths.sort((path1, path2) =>
-      path1.localeCompare(path2, undefined, { numeric: true })
-    )
-
-    paths.splice(multiImageInd || 0, 0, ...multiImagePaths)
-
-    return { multiImagePaths, paths }
   }
 
   private filterChildren(path: string | undefined): PlotPath[] {

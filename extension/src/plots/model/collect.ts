@@ -36,8 +36,8 @@ import {
 import { StrokeDashEncoding } from '../multiSource/constants'
 import { exists } from '../../fileSystem'
 import { hasKey } from '../../util/object'
-import { getParent, getPathArray } from '../../fileSystem/util'
 import { MULTI_IMAGE_PATH_REG } from '../../cli/dvc/constants'
+import { getParent, getPathArray } from '../../fileSystem/util'
 
 export const getCustomPlotId = (metric: string, param: string) =>
   `custom-${metric}-${param}`
@@ -132,7 +132,7 @@ export type RevisionData = {
 
 export type ComparisonData = {
   [label: string]: {
-    [path: string]: ImagePlot[]
+    [path: string]: (ImagePlot & { path: string })[]
   }
 }
 
@@ -141,7 +141,9 @@ const collectImageData = (
   path: string,
   plot: ImagePlot
 ) => {
-  const pathLabel = path
+  const pathLabel = MULTI_IMAGE_PATH_REG.test(path)
+    ? (getParent(getPathArray(path), 0) as string)
+    : path
   const id = plot.revisions?.[0]
   if (!id) {
     return
@@ -155,7 +157,7 @@ const collectImageData = (
     acc[id][pathLabel] = []
   }
 
-  acc[id][pathLabel].push(plot)
+  acc[id][pathLabel].push({ ...plot, path })
 }
 
 const collectDatapoints = (
@@ -211,6 +213,16 @@ const collectPathData = (acc: DataAccumulator, path: string, plots: Plot[]) => {
   }
 }
 
+const sortComparisonImgPaths = (acc: DataAccumulator) => {
+  for (const [label, paths] of Object.entries(acc.comparisonData)) {
+    for (const path of Object.keys(paths)) {
+      acc.comparisonData[label][path].sort((img1, img2) =>
+        img1.path.localeCompare(img2.path, undefined, { numeric: true })
+      )
+    }
+  }
+}
+
 export const collectData = (output: PlotsOutput): DataAccumulator => {
   const { data } = output
   const acc = {
@@ -221,6 +233,8 @@ export const collectData = (output: PlotsOutput): DataAccumulator => {
   for (const [path, plots] of Object.entries(data)) {
     collectPathData(acc, path, plots)
   }
+
+  sortComparisonImgPaths(acc)
 
   return acc
 }

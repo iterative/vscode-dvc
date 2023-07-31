@@ -1663,6 +1663,7 @@ describe('App', () => {
 
       expect(slider).toBeInTheDocument()
     })
+
     it('should update the cell images when the slider changes', () => {
       renderAppWithOptionalData({
         comparison: comparisonTableMultiImgFixture
@@ -1685,6 +1686,46 @@ describe('App', () => {
 
       expect(workspaceImgEl).toHaveAttribute('src', workspaceImgs[3].url)
       expect(mainImgEl).toHaveAttribute('src', mainImgs[3].url)
+    })
+
+    it('should set the slider on max step if the slider state value is too big', () => {
+      renderAppWithOptionalData({
+        comparison: {
+          ...comparisonTableMultiImgFixture,
+          plots: comparisonTableMultiImgFixture.plots.map(plot =>
+            plot.path.includes('image')
+              ? {
+                  ...plot,
+                  revisions: {
+                    ...plot.revisions,
+                    main: {
+                      ...plot.revisions.main,
+                      imgs: plot.revisions.main.imgs.slice(0, 10)
+                    }
+                  }
+                }
+              : plot
+          )
+        }
+      })
+
+      const workspaceImgs =
+        comparisonTableMultiImgFixture.plots[3].revisions.workspace.imgs
+      const mainImgs =
+        comparisonTableMultiImgFixture.plots[3].revisions.main.imgs
+
+      const multiImgPlots = screen.getAllByTestId('multi-image-cell')
+      const slider = within(multiImgPlots[0]).getByRole('slider')
+      const workspaceImgEl = within(multiImgPlots[0]).getByRole('img')
+      const mainImgEl = within(multiImgPlots[1]).getByRole('img')
+
+      expect(workspaceImgEl).toHaveAttribute('src', workspaceImgs[0].url)
+      expect(mainImgEl).toHaveAttribute('src', mainImgs[0].url)
+
+      fireEvent.change(slider, { target: { value: 14 } })
+
+      expect(workspaceImgEl).toHaveAttribute('src', workspaceImgs[14].url)
+      expect(mainImgEl).toHaveAttribute('src', mainImgs[9].url)
     })
 
     it('should disable the multi img row from drag and drop when hovering over a img slider', () => {

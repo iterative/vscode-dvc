@@ -12,6 +12,13 @@ import {
 import { PlotsState } from '../../../store'
 import { zoomPlot } from '../../../util/messages'
 
+const getCurrentStep = (stateStep: number | undefined, imgsLength: number) => {
+  if (!stateStep) {
+    return 0
+  }
+  return stateStep > imgsLength - 1 ? imgsLength - 1 : stateStep
+}
+
 export const ComparisonTableMultiCell: React.FC<{
   path: string
   plot: ComparisonPlot
@@ -20,7 +27,7 @@ export const ComparisonTableMultiCell: React.FC<{
     (state: PlotsState) => state.comparison.multiPlotValues
   )
   const dispatch = useDispatch()
-  const currentStep = multiValues[path] || 0
+  const currentStep = getCurrentStep(multiValues[path], plot.imgs.length)
 
   const { loading, url } = plot.imgs[currentStep]
   const missing = !loading && !url
