@@ -218,7 +218,11 @@ export class ExperimentsTree
     return []
   }
 
-  private formatExperiment(experiment: ExperimentAugmented, dvcRoot: string) {
+  private formatExperiment(
+    experiment: ExperimentAugmented,
+    dvcRoot: string,
+    summaryColumns: string[]
+  ) {
     return {
       collapsibleState: experiment.hasChildren
         ? TreeItemCollapsibleState.Expanded
@@ -233,11 +237,7 @@ export class ExperimentsTree
       iconPath: this.getExperimentIcon(experiment),
       id: experiment.id,
       label: experiment.label,
-      tooltip: this.getTooltip(
-        experiment.error,
-        experiment,
-        this.experiments.getRepository(dvcRoot).getSummaryColumnOrder()
-      ),
+      tooltip: this.getTooltip(experiment.error, experiment, summaryColumns),
       type: experiment.type
     }
   }
@@ -252,21 +252,29 @@ export class ExperimentsTree
       return [{ error: cliError }]
     }
 
+    const summaryColumns = repository.getSummaryColumnOrder()
     return repository
       .getWorkspaceAndCommits()
-      .map(experiment => this.formatExperiment(experiment, dvcRoot))
+      .map(experiment =>
+        this.formatExperiment(experiment, dvcRoot, summaryColumns)
+      )
   }
 
   private getExperimentsByCommit(
     dvcRoot: string,
     commit: Experiment
   ): ExperimentItem[] {
+    const repository = this.experiments.getRepository(dvcRoot)
+    const summaryColumns = repository.getSummaryColumnOrder()
     return (
-      this.experiments
-        .getRepository(dvcRoot)
+      repository
         .getCommitExperiments(commit)
         ?.map(experiment =>
-          this.formatExperiment(experiment as ExperimentAugmented, dvcRoot)
+          this.formatExperiment(
+            experiment as ExperimentAugmented,
+            dvcRoot,
+            summaryColumns
+          )
         ) || []
     )
   }

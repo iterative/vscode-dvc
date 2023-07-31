@@ -214,6 +214,7 @@ export class PlotsModel extends ModelWithPersistence {
 
   public getSelectedRevisionDetails() {
     const selectedRevisions: Revision[] = []
+    const summaryColumns = this.experiments.getSummaryColumnOrder()
     for (const experiment of this.experiments.getSelectedRevisions()) {
       const { commit, description, label, displayColor, id } = experiment
       const revision: Revision = {
@@ -223,10 +224,7 @@ export class PlotsModel extends ModelWithPersistence {
         fetched: this.fetchedRevs.has(id),
         id,
         label,
-        summaryColumns: getRevisionSummaryColumns(
-          this.experiments.getSummaryColumnOrder(),
-          experiment
-        )
+        summaryColumns: getRevisionSummaryColumns(summaryColumns, experiment)
       }
 
       if (commit) {
