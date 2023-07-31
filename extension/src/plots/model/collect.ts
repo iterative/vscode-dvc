@@ -264,7 +264,7 @@ const collectSelectedPathComparisonPlots = ({
   }
 
   for (const id of selectedRevisionIds) {
-    const imgs = comparisonData[id][path]
+    const imgs = comparisonData[id]?.[path]
     pathRevisions.revisions[id] = {
       id,
       imgs: imgs
