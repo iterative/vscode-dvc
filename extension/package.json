@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "1.0.28",
+  "version": "1.0.29",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -1705,7 +1705,7 @@
     "vscode-languageclient": "8.1.0"
   },
   "devDependencies": {
-    "@swc/core": "1.3.70",
+    "@swc/core": "1.3.71",
     "@swc/jest": "0.2.27",
     "@types/chai": "4.3.5",
     "@types/chai-as-promised": "7.1.5",

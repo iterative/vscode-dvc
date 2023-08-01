@@ -144,6 +144,7 @@ export const buildExperimentsWebview = async (inputs: {
   const { experiments, messageSpy } = all
   await experiments.isReady()
   const webview = await experiments.showWebview()
+  await webview.isReady()
   messageSpy.restore()
   const instanceMessageSpy: typeof messageSpy = spy(webview, 'show')
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
