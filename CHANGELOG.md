@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.30] - 2023-08-01
+
+### 🐛 Bug Fixes
+
+- Ensure experiment summary info (columns) is always available in the experiment table data [#4396](https://github.com/iterative/vscode-dvc/pull/4396) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Use instance spies to test plots webview messages [#4394](https://github.com/iterative/vscode-dvc/pull/4394) by [@mattseddon](https://github.com/mattseddon)
+- Improve collection of summary columns efficiency [#4391](https://github.com/iterative/vscode-dvc/pull/4391) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.29] - 2023-08-01
 
 ### 🔨 Maintenance
