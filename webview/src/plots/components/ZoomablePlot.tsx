@@ -11,6 +11,7 @@ import { config } from './constants'
 import { zoomPlot } from '../util/messages'
 import { useGetPlot } from '../hooks/useGetPlot'
 import { GripIcon } from '../../shared/components/dragDrop/GripIcon'
+import { Ellipsis } from '../../shared/components/icons'
 
 interface ZoomablePlotProps {
   spec?: VisualizationSpec
@@ -57,9 +58,12 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
     )
   }, [data, spec, dispatch, id, isTemplatePlot])
 
-  const handleOnClick = () => {
+  const handleOnClick = (openActionsMenu?: boolean) => {
     zoomPlot()
-    return dispatch(setZoomedInPlot({ id, isTemplatePlot, plot: plotProps }))
+
+    return dispatch(
+      setZoomedInPlot({ id, isTemplatePlot, openActionsMenu, plot: plotProps })
+    )
   }
 
   if (!data && !spec) {
@@ -73,8 +77,29 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
   }
 
   return (
-    <button className={styles.zoomablePlot} onClick={handleOnClick}>
+    <button
+      data-testid="zoomable-plot"
+      className={styles.zoomablePlot}
+      onClick={() => handleOnClick()}
+    >
       <GripIcon className={styles.plotGripIcon} />
+      <span
+        data-testid="zoomable-plot-actions"
+        className={styles.plotActions}
+        onClick={event => {
+          event.stopPropagation()
+          handleOnClick(true)
+        }}
+        onKeyDown={event => {
+          if (event.key === 'Enter') {
+            handleOnClick(true)
+          }
+        }}
+        role="button"
+        tabIndex={0}
+      >
+        <Ellipsis />
+      </span>
       {currentPlotProps.current &&
         (isTemplatePlot ? (
           <TemplateVegaLite

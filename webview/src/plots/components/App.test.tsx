@@ -1342,7 +1342,9 @@ describe('App', () => {
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByTestId(
+      'zoomable-plot'
+    )
 
     fireEvent.click(plot)
 
@@ -1356,7 +1358,9 @@ describe('App', () => {
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByTestId(
+      'zoomable-plot'
+    )
 
     fireEvent.click(plot)
 
@@ -1387,7 +1391,9 @@ describe('App', () => {
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    const plot = within(screen.getAllByTestId(/^plot-/)[0]).getByRole('button')
+    const plot = within(screen.getAllByTestId(/^plot-/)[0]).getByTestId(
+      'zoomable-plot'
+    )
 
     fireEvent.click(plot)
 
@@ -1416,7 +1422,9 @@ describe('App', () => {
       template: complexTemplatePlotsFixture
     })
 
-    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByTestId(
+      'zoomable-plot'
+    )
 
     fireEvent.click(plot)
     fireEvent.click(screen.getByTestId('modal'))
@@ -1434,7 +1442,9 @@ describe('App', () => {
       template: complexTemplatePlotsFixture
     })
 
-    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByTestId(
+      'zoomable-plot'
+    )
 
     fireEvent.click(plot)
     fireEvent.click(screen.getByTestId('modal-content'))
@@ -1449,7 +1459,9 @@ describe('App', () => {
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByTestId(
+      'zoomable-plot'
+    )
 
     fireEvent.click(plot)
 
@@ -1474,7 +1486,9 @@ describe('App', () => {
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByTestId(
+      'zoomable-plot'
+    )
 
     fireEvent.click(plot)
 
@@ -1499,7 +1513,9 @@ describe('App', () => {
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByTestId(
+      'zoomable-plot'
+    )
 
     fireEvent.click(plot)
 
@@ -2205,7 +2221,8 @@ describe('App', () => {
 
         const smoothPlot = within(
           screen.getByTestId(`plot_${smoothId}`)
-        ).getByRole('button')
+        ).getByTestId('zoomable-plot')
+
         fireEvent.click(smoothPlot)
 
         const popup = screen.getByTestId('zoomed-in-plot')
@@ -2246,7 +2263,8 @@ describe('App', () => {
 
         const smoothPlot = within(
           screen.getByTestId(`plot_${smoothId}`)
-        ).getByRole('button')
+        ).getByTestId('zoomable-plot')
+
         fireEvent.click(smoothPlot)
 
         const popup = screen.getByTestId('zoomed-in-plot')

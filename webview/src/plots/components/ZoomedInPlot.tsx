@@ -17,6 +17,7 @@ type ZoomedInPlotProps = {
   id: string
   props: VegaLiteProps
   isTemplatePlot: boolean
+  openActionsMenu?: boolean
 }
 
 const appendActionToVega = (
@@ -36,7 +37,8 @@ const appendActionToVega = (
 export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   id,
   props,
-  isTemplatePlot
+  isTemplatePlot,
+  openActionsMenu
 }: ZoomedInPlotProps) => {
   const zoomedInPlotRef = useRef<HTMLDivElement>(null)
 
@@ -55,9 +57,19 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
     if (!actions) {
       return
     }
+
     appendActionToVega('JSON', actions, () => exportPlotDataAsJson(id))
     appendActionToVega('CSV', actions, () => exportPlotDataAsCsv(id))
     appendActionToVega('TSV', actions, () => exportPlotDataAsTsv(id))
+
+    if (openActionsMenu) {
+      setTimeout(() => {
+        const actionsDetails = actions.parentElement as HTMLDetailsElement
+        if (actionsDetails) {
+          actionsDetails.open = true
+        }
+      }, 500)
+    }
   }
 
   const vegaLiteProps = {
@@ -75,10 +87,20 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   }
 
   return (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div
       className={styles.zoomedInPlot}
       data-testid="zoomed-in-plot"
       ref={zoomedInPlotRef}
+      onClick={() => {
+        const actions: HTMLDivElement | null | undefined =
+          zoomedInPlotRef.current?.querySelector('.vega-actions')
+
+        const actionsDetails = actions?.parentElement as HTMLDetailsElement
+        if (actionsDetails.open) {
+          actionsDetails.open = false
+        }
+      }}
     >
       {isTemplatePlot ? (
         <TemplateVegaLite
