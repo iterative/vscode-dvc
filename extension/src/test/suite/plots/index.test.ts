@@ -4,7 +4,7 @@ import { expect } from 'chai'
 import { restore, spy, stub } from 'sinon'
 import { commands, TextDocument, Uri, window } from 'vscode'
 import isEqual from 'lodash.isequal'
-import { buildPlots } from '../plots/util'
+import { buildPlots, buildPlotsWebview } from '../plots/util'
 import { Disposable } from '../../../extension'
 import expShowFixtureWithoutErrors from '../../fixtures/expShow/base/noErrors'
 import gitLogFixture from '../../fixtures/expShow/base/gitLog'
@@ -19,8 +19,8 @@ import {
   bypassProcessManagerDebounce,
   closeAllEditors,
   getFirstArgOfLastCall,
-  getMockNow,
-  getMessageReceivedEmitter
+  getMessageReceivedEmitter,
+  getMockNow
 } from '../util'
 import { dvcDemoPath } from '../../util'
 import {
@@ -169,12 +169,11 @@ suite('Plots Test Suite', () => {
     })
 
     it('should handle a section resized message from the webview', async () => {
-      const { plots, plotsModel } = await buildPlots({ disposer: disposable })
-
-      const webview = await plots.showWebview()
+      const { mockMessageReceived, plotsModel } = await buildPlotsWebview({
+        disposer: disposable
+      })
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockSetPlotSize = stub(
         plotsModel,
@@ -208,14 +207,12 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a section collapsed message from the webview', async () => {
-      const { plots, plotsModel, messageSpy } = await buildPlots({
-        disposer: disposable
-      })
-
-      const webview = await plots.showWebview()
+      const { mockMessageReceived, plotsModel, messageSpy } =
+        await buildPlotsWebview({
+          disposer: disposable
+        })
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockSetSectionCollapsed = spy(plotsModel, 'setSectionCollapsed')
       const mockSectionCollapsed = { [PlotsSection.CUSTOM_PLOTS]: true }
@@ -249,15 +246,13 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a comparison revisions reordered message from the webview', async () => {
-      const { plots, plotsModel, messageSpy } = await buildPlots({
-        disposer: disposable,
-        plotsDiff: plotsDiffFixture
-      })
-
-      const webview = await plots.showWebview()
+      const { messageSpy, mockMessageReceived, plotsModel } =
+        await buildPlotsWebview({
+          disposer: disposable,
+          plotsDiff: plotsDiffFixture
+        })
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockSetComparisonOrder = spy(plotsModel, 'setComparisonOrder')
       const mockComparisonOrder = [
@@ -301,15 +296,13 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a comparison rows reordered message from the webview', async () => {
-      const { plots, pathsModel, messageSpy } = await buildPlots({
-        disposer: disposable,
-        plotsDiff: plotsDiffFixture
-      })
-
-      const webview = await plots.showWebview()
+      const { messageSpy, mockMessageReceived, pathsModel } =
+        await buildPlotsWebview({
+          disposer: disposable,
+          plotsDiff: plotsDiffFixture
+        })
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockSetComparisonPathsOrder = spy(
         pathsModel,
@@ -354,15 +347,13 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a template plots reordered message from the webview', async () => {
-      const { pathsModel, plots, messageSpy } = await buildPlots({
-        disposer: disposable,
-        plotsDiff: plotsDiffFixture
-      })
-
-      const webview = await plots.showWebview()
+      const { pathsModel, messageSpy, mockMessageReceived } =
+        await buildPlotsWebview({
+          disposer: disposable,
+          plotsDiff: plotsDiffFixture
+        })
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockSetTemplateOrder = spy(pathsModel, 'setTemplateOrder')
       const mockTemplateOrder = [
@@ -404,15 +395,12 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a plot zoomed message from the webview', async () => {
-      const { plots } = await buildPlots({
+      const { mockMessageReceived } = await buildPlotsWebview({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
       })
 
-      const webview = await plots.showWebview()
-
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
         type: MessageFromWebviewType.ZOOM_PLOT
@@ -427,16 +415,13 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a plot zoomed message from the webview for an image', async () => {
-      const { plots } = await buildPlots({
+      const { mockMessageReceived, webview } = await buildPlotsWebview({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
       })
       stub(FileSystem, 'openImageFileInEditor').resolves(true)
 
-      const webview = await plots.showWebview()
-
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
         payload: webview.getWebviewUri('a/path.jpg'),
@@ -452,17 +437,15 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should open an image when receiving a plot zoomed message from the webview with a payload', async () => {
-      const { plots } = await buildPlots({
+      const { webview, mockMessageReceived } = await buildPlotsWebview({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
       })
 
-      const webview = await plots.showWebview()
       const imagePath = 'some/path/image.jpg'
 
       stub(Telemetry, 'sendTelemetryEvent')
       const mockExecuteCommands = stub(commands, 'executeCommand')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
         payload: webview.getWebviewUri(imagePath),
@@ -476,14 +459,12 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle an export plot data as json message from the webview', async () => {
-      const { plots } = await buildPlots({
+      const { mockMessageReceived } = await buildPlotsWebview({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
       })
 
-      const webview = await plots.showWebview()
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
       const customPlot = customPlotsFixture.plots[0]
       const mockShowSaveDialog = stub(window, 'showSaveDialog')
       const mockWriteJson = stub(FileSystem, 'writeJson')
@@ -522,14 +503,12 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle an export plot data as csv message from the webview', async () => {
-      const { plots } = await buildPlots({
+      const { mockMessageReceived } = await buildPlotsWebview({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
       })
 
-      const webview = await plots.showWebview()
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockShowSaveDialog = stub(window, 'showSaveDialog')
       const mockWriteCsv = stub(FileSystem, 'writeCsv')
       const mockOpenFile = stub(FileSystem, 'openFileInEditor')
@@ -567,14 +546,12 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle an export plot data as tsv message from the webview', async () => {
-      const { plots } = await buildPlots({
+      const { mockMessageReceived } = await buildPlotsWebview({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
       })
 
-      const webview = await plots.showWebview()
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockShowSaveDialog = stub(window, 'showSaveDialog')
       const mockWriteTsv = stub(FileSystem, 'writeTsv')
       const mockOpenFile = stub(FileSystem, 'openFileInEditor')
@@ -612,14 +589,12 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle export data messages from the webview when the file is cancelled or errors are thrown during file writing', async () => {
-      const { plots } = await buildPlots({
+      const { mockMessageReceived } = await buildPlotsWebview({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
       })
 
-      const webview = await plots.showWebview()
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockShowSaveDialog = stub(window, 'showSaveDialog')
       const mockWriteCsv = stub(FileSystem, 'writeCsv')
       const mockOpenFile = stub(FileSystem, 'openFileInEditor')
@@ -666,12 +641,11 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a custom plots reordered message from the webview', async () => {
-      const { plots, plotsModel, messageSpy } = await buildPlots({
-        disposer: disposable,
-        plotsDiff: plotsDiffFixture
-      })
-
-      const webview = await plots.showWebview()
+      const { plotsModel, messageSpy, mockMessageReceived } =
+        await buildPlotsWebview({
+          disposer: disposable,
+          plotsDiff: plotsDiffFixture
+        })
 
       const mockNewCustomPlotsOrder = [
         'custom-summary.json:accuracy-params.yaml:epochs',
@@ -683,7 +657,6 @@ suite('Plots Test Suite', () => {
         .returns(customPlotsFixture)
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockSetCustomPlotsOrder = stub(plotsModel, 'setCustomPlotsOrder')
       mockSetCustomPlotsOrder.returns(undefined)
 
@@ -715,7 +688,7 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a select experiments message from the webview', async () => {
-      const { plots, experiments } = await buildPlots({
+      const { experiments, mockMessageReceived } = await buildPlotsWebview({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
       })
@@ -725,10 +698,7 @@ suite('Plots Test Suite', () => {
         'selectExperimentsToPlot'
       ).resolves(undefined)
 
-      const webview = await plots.showWebview()
-
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
         type: MessageFromWebviewType.SELECT_EXPERIMENTS
@@ -744,7 +714,7 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a select plots message from the webview', async () => {
-      const { plots } = await buildPlots({
+      const { mockMessageReceived, plots } = await buildPlotsWebview({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
       })
@@ -753,10 +723,7 @@ suite('Plots Test Suite', () => {
         undefined
       )
 
-      const webview = await plots.showWebview()
-
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
         type: MessageFromWebviewType.SELECT_PLOTS
@@ -818,13 +785,10 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to make the plots webview visible', async () => {
-      const { plots, messageSpy, mockPlotsDiff } = await buildPlots({
+      const { messageSpy, mockPlotsDiff, webview } = await buildPlotsWebview({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
       })
-
-      const webview = await plots.showWebview()
-      await webview.isReady()
 
       expect(mockPlotsDiff).to.be.called
 
@@ -1019,7 +983,7 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a toggle experiment message from the webview', async () => {
-      const { plots, experiments } = await buildPlots({
+      const { experiments, mockMessageReceived } = await buildPlotsWebview({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
       })
@@ -1029,10 +993,7 @@ suite('Plots Test Suite', () => {
         'toggleExperimentStatus'
       ).resolves(undefined)
 
-      const webview = await plots.showWebview()
-
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       mockMessageReceived.fire({
         payload: 'main',
@@ -1049,13 +1010,11 @@ suite('Plots Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle an add custom plot message from the webview', async () => {
-      const { plots } = await buildPlots({
+      const { mockMessageReceived } = await buildPlotsWebview({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
       })
 
-      const webview = await plots.showWebview()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
       const executeCommandSpy = spy(commands, 'executeCommand')
 
       mockMessageReceived.fire({
@@ -1069,13 +1028,11 @@ suite('Plots Test Suite', () => {
     })
 
     it('should handle a remove custom plot message from the webview', async () => {
-      const { plots } = await buildPlots({
+      const { mockMessageReceived } = await buildPlotsWebview({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
       })
 
-      const webview = await plots.showWebview()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
       const executeCommandSpy = spy(commands, 'executeCommand')
 
       mockMessageReceived.fire({
@@ -1089,14 +1046,12 @@ suite('Plots Test Suite', () => {
     })
 
     it('should handle an update smooth plot values message from the webview', async () => {
-      const { plots, plotsModel } = await buildPlots({
+      const { mockMessageReceived, plotsModel } = await buildPlotsWebview({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
       })
       const templatePlot = templatePlotsFixture.plots[0].entries[0]
 
-      const webview = await plots.showWebview()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const mockSetSmoothPlotValues = stub(plotsModel, 'setSmoothPlotValues')
 

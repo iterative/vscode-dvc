@@ -1,5 +1,5 @@
 import { Disposer } from '@hediet/std/disposable'
-import { stub } from 'sinon'
+import { spy, stub } from 'sinon'
 import * as FileSystem from '../../../fileSystem'
 import expShowFixtureWithoutErrors from '../../fixtures/expShow/base/noErrors'
 import gitLogFixture from '../../fixtures/expShow/base/gitLog'
@@ -12,7 +12,11 @@ import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { PlotsModel } from '../../../plots/model'
 import { PlotsData } from '../../../plots/data'
 import { Experiments } from '../../../experiments'
-import { buildDependencies, buildMockExperimentsData } from '../util'
+import {
+  buildDependencies,
+  buildMockExperimentsData,
+  getMessageReceivedEmitter
+} from '../util'
 import { MOCK_IMAGE_MTIME } from '../../fixtures/plotsDiff'
 import { PathsModel } from '../../../plots/paths/model'
 import { BaseWorkspaceWebviews } from '../../../webview/workspace'
@@ -138,5 +142,59 @@ export const buildPlots = async ({
     plots,
     plotsModel,
     webviewMessages
+  }
+}
+
+export const buildPlotsWebview = async ({
+  availableNbCommits = { main: 5 },
+  disposer,
+  expShow = expShowFixtureWithoutErrors,
+  gitLog = gitLogFixture,
+  plotsDiff = undefined,
+  rowOrder
+}: {
+  availableNbCommits?: { [branch: string]: number }
+  disposer: Disposer
+  expShow?: ExpShowOutput
+  gitLog?: string
+  plotsDiff?: PlotsOutput | undefined
+  rowOrder?: { branch: string; sha: string }[]
+}) => {
+  const {
+    data,
+    experiments,
+    pathsModel,
+    plots,
+    plotsModel,
+    messageSpy,
+    mockPlotsDiff
+  } = await buildPlots({
+    availableNbCommits,
+    disposer,
+    expShow,
+    gitLog,
+    plotsDiff,
+    rowOrder
+  })
+
+  const webview = await plots.showWebview()
+  await webview.isReady()
+  messageSpy.restore()
+  const instanceMessageSpy: typeof messageSpy = spy(webview, 'show')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (plots as any).webviewMessages.sendWebviewMessage()
+
+  const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+  return {
+    data,
+    experiments,
+    messageSpy: instanceMessageSpy,
+    mockMessageReceived,
+    mockPlotsDiff,
+    pathsModel,
+    plots,
+    plotsModel,
+    webview
   }
 }
