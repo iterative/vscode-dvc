@@ -225,6 +225,12 @@ export const collectData = (output: PlotsOutput): DataAccumulator => {
 
 type ComparisonPlotsAcc = { path: string; revisions: ComparisonRevisionData }[]
 
+type GetComparisonPlotImg = (
+  img: ImagePlot,
+  id: string,
+  path: string
+) => ComparisonPlotImg
+
 const collectSelectedPathComparisonPlots = ({
   acc,
   comparisonData,
@@ -236,11 +242,7 @@ const collectSelectedPathComparisonPlots = ({
   comparisonData: ComparisonData
   path: string
   selectedRevisionIds: string[]
-  getComparisonPlotImg: (
-    img: ImagePlot,
-    id: string,
-    path: string
-  ) => ComparisonPlotImg
+  getComparisonPlotImg: GetComparisonPlotImg
 }) => {
   const pathRevisions = {
     path,
@@ -268,11 +270,7 @@ export const collectSelectedComparisonPlots = ({
   comparisonData: ComparisonData
   paths: string[]
   selectedRevisionIds: string[]
-  getComparisonPlotImg: (
-    img: ImagePlot,
-    id: string,
-    path: string
-  ) => ComparisonPlotImg
+  getComparisonPlotImg: GetComparisonPlotImg
 }) => {
   const acc: ComparisonPlotsAcc = []
 
