@@ -8,7 +8,8 @@ import { zoomPlot } from '../../../util/messages'
 export const ComparisonTableCell: React.FC<{
   path: string
   plot: ComparisonPlot
-}> = ({ path, plot }) => {
+  imgAlt?: string
+}> = ({ path, plot, imgAlt }) => {
   const plotImg = plot.imgs[0]
 
   const loading = plotImg.loading
@@ -32,7 +33,7 @@ export const ComparisonTableCell: React.FC<{
         className={styles.image}
         draggable={false}
         src={plotImg.url}
-        alt={`Plot of ${path} (${plot.id})`}
+        alt={imgAlt || `Plot of ${path} (${plot.id})`}
       />
     </button>
   )

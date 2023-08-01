@@ -92,12 +92,9 @@ describe('collectData', () => {
 
     expect(testBranchHeatmap).toBeDefined()
     expect(testBranchHeatmap).toStrictEqual([
-      {
-        ...plotsDiffFixture.data[heatmapPlot].find(({ revisions }) =>
-          sameContents(revisions as string[], ['test-branch'])
-        ),
-        path: heatmapPlot
-      }
+      plotsDiffFixture.data[heatmapPlot].find(({ revisions }) =>
+        sameContents(revisions as string[], ['test-branch'])
+      )
     ])
   })
 
@@ -117,12 +114,9 @@ describe('collectData', () => {
 
     expect(testBranchHeatmap).toBeDefined()
     expect(testBranchHeatmap).toStrictEqual([
-      {
-        ...plotsDiffFixture.data[heatmapPlot].find(({ revisions }) =>
-          sameContents(revisions as string[], ['test-branch'])
-        ),
-        path: heatmapPlot
-      }
+      plotsDiffFixture.data[heatmapPlot].find(({ revisions }) =>
+        sameContents(revisions as string[], ['test-branch'])
+      )
     ])
   })
 })

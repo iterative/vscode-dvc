@@ -1,16 +1,13 @@
 import React, { useCallback } from 'react'
-import cx from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
 import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
-import { ComparisonTableLoadingCell } from './ComparisonTableLoadingCell'
-import { ComparisonTableMissingCell } from './ComparisonTableMissingCell'
+import { ComparisonTableCell } from './ComparisonTableCell'
 import styles from '../styles.module.scss'
 import {
   changeDisabledDragIds,
   setMultiPlotValue
 } from '../comparisonTableSlice'
 import { PlotsState } from '../../../store'
-import { zoomPlot } from '../../../util/messages'
 
 const getCurrentStep = (stateStep: number | undefined, imgsLength: number) => {
   if (!stateStep) {
@@ -29,9 +26,6 @@ export const ComparisonTableMultiCell: React.FC<{
   const dispatch = useDispatch()
   const currentStep = getCurrentStep(multiValues[path], plot.imgs.length)
 
-  const { loading, url } = plot.imgs[currentStep]
-  const missing = !loading && !url
-
   const addDisabled = useCallback(() => {
     dispatch(changeDisabledDragIds([path]))
   }, [dispatch, path])
@@ -40,32 +34,13 @@ export const ComparisonTableMultiCell: React.FC<{
     dispatch(changeDisabledDragIds([]))
   }, [dispatch])
 
-  let imageContent = (
-    <button
-      className={cx(styles.imageWrapper, styles.multiImageWrapper)}
-      onClick={() => zoomPlot(url)}
-      data-testid="image-plot-button"
-    >
-      <img
-        className={styles.image}
-        draggable={false}
-        src={url}
-        alt={`${currentStep} of ${path} (${plot.id})`}
-      />
-    </button>
-  )
-
-  if (loading) {
-    imageContent = <ComparisonTableLoadingCell />
-  }
-
-  if (missing) {
-    imageContent = <ComparisonTableMissingCell plot={plot.imgs[currentStep]} />
-  }
-
   return (
     <div data-testid="multi-image-cell" className={styles.multiImageWrapper}>
-      {imageContent}
+      <ComparisonTableCell
+        path={path}
+        plot={{ id: plot.id, imgs: [plot.imgs[currentStep]] }}
+        imgAlt={`${currentStep} of ${path} (${plot.id})`}
+      />
       <div
         className={styles.multiImageSlider}
         onMouseEnter={addDisabled}
