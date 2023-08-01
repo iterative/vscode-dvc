@@ -359,6 +359,14 @@ suite('Experiments Filter By Tree Test Suite', () => {
         rows: filteredRows
       }
 
+      expect(
+        messageSpy.lastCall.args[0].columns,
+        'fixture match'
+      ).to.deep.equal(columnsFixture)
+      expect(messageSpy.lastCall.args[0].columnOrder, 'order').to.deep.equal(
+        columnsOrderFixture
+      )
+
       expect(messageSpy).to.be.calledWithMatch(filteredTableData)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
