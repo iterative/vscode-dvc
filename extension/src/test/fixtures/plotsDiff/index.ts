@@ -472,11 +472,7 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
       revisions: ['exp-83425'],
       url: joinFunc(baseUrl, '1ba7bcd_plots_loss.png')
     }
-  ]
-})
-
-const getImageDataWithMultiImgs = (baseUrl: string, joinFunc = join) => ({
-  ...getImageData(baseUrl, joinFunc),
+  ],
   ...getMultiImageData(baseUrl, joinFunc, [
     EXPERIMENT_WORKSPACE_ID,
     'main',
@@ -495,10 +491,6 @@ export const getOutput = (baseUrl: string): PlotsOutput => ({
 })
 
 export const getMinimalOutput = (): PlotsOutput => ({ data: { ...basicVega } })
-
-export const getMultiImgOutput = (baseUrl: string): PlotsOutput => ({
-  data: { ...getImageDataWithMultiImgs(baseUrl) }
-})
 
 export const getMultiSourceOutput = (): PlotsOutput => ({
   ...require('./multiSource').default
@@ -801,18 +793,13 @@ export const MOCK_IMAGE_MTIME = 946684800000
 
 export const getComparisonWebviewMessage = (
   baseUrl: string,
-  joinFunc: (...args: string[]) => string = join,
-  addMulti?: boolean
+  joinFunc: (...args: string[]) => string = join
 ): PlotsComparisonData => {
   const plotAcc: {
     [path: string]: { path: string; revisions: ComparisonRevisionData }
   } = {}
 
-  for (const [path, plots] of Object.entries(
-    addMulti
-      ? getImageDataWithMultiImgs(baseUrl, joinFunc)
-      : getImageData(baseUrl, joinFunc)
-  )) {
+  for (const [path, plots] of Object.entries(getImageData(baseUrl, joinFunc))) {
     const pathLabel = path.includes('image') ? join('plots', 'image') : path
 
     if (!plotAcc[pathLabel]) {

@@ -8,7 +8,6 @@ import {
   collectImageUrl
 } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
-import multiImagePlotsDiffFixture from '../../test/fixtures/plotsDiff/output/multiImage'
 import customPlotsFixture, {
   customPlotsOrderFixture,
   experimentsWithCommits
@@ -79,27 +78,6 @@ describe('collectData', () => {
       join('logs', 'acc.tsv'),
       'predictions.json'
     ])
-
-    const heatmapPlot = join('plots', 'heatmap.png')
-
-    expect(Object.keys(comparisonData.main)).toStrictEqual([
-      join('plots', 'acc.png'),
-      heatmapPlot,
-      join('plots', 'loss.png')
-    ])
-
-    const testBranchHeatmap = comparisonData['test-branch'][heatmapPlot]
-
-    expect(testBranchHeatmap).toBeDefined()
-    expect(testBranchHeatmap).toStrictEqual([
-      plotsDiffFixture.data[heatmapPlot].find(({ revisions }) =>
-        sameContents(revisions as string[], ['test-branch'])
-      )
-    ])
-  })
-
-  it('should return the expected output from the comparison multi image test fixture', () => {
-    const { comparisonData } = collectData(multiImagePlotsDiffFixture)
 
     const heatmapPlot = join('plots', 'heatmap.png')
 

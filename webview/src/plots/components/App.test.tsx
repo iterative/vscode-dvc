@@ -13,7 +13,6 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
-import comparisonTableMultiImgFixture from 'dvc/src/test/fixtures/plotsDiff/comparison/multi'
 import customPlotsFixture from 'dvc/src/test/fixtures/expShow/base/customPlots'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'
 import templatePlotsFixture from 'dvc/src/test/fixtures/plotsDiff/template/webview'
@@ -1451,7 +1450,7 @@ describe('App', () => {
 
   it('should send a message with the plot path when a comparison table multi img plot is zoomed', () => {
     renderAppWithOptionalData({
-      comparison: comparisonTableMultiImgFixture
+      comparison: comparisonTableFixture
     })
 
     const plotWrapper = screen.getAllByTestId('multi-image-cell')[0]
@@ -1460,8 +1459,7 @@ describe('App', () => {
     fireEvent.click(plot)
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload:
-        comparisonTableMultiImgFixture.plots[3].revisions.workspace.imgs[0].url,
+      payload: comparisonTableFixture.plots[3].revisions.workspace.imgs[0].url,
       type: MessageFromWebviewType.ZOOM_PLOT
     })
   })
@@ -1655,7 +1653,7 @@ describe('App', () => {
   describe('Comparison Multi Image Plots', () => {
     it('should render cells with sliders', () => {
       renderAppWithOptionalData({
-        comparison: comparisonTableMultiImgFixture
+        comparison: comparisonTableFixture
       })
 
       const multiImgPlot = screen.getAllByTestId('multi-image-cell')[0]
@@ -1666,11 +1664,11 @@ describe('App', () => {
 
     it('should update the cell image when the slider changes', () => {
       renderAppWithOptionalData({
-        comparison: comparisonTableMultiImgFixture
+        comparison: comparisonTableFixture
       })
 
       const workspaceImgs =
-        comparisonTableMultiImgFixture.plots[3].revisions.workspace.imgs
+        comparisonTableFixture.plots[3].revisions.workspace.imgs
 
       const multiImgPlots = screen.getAllByTestId('multi-image-cell')
       const slider = within(multiImgPlots[0]).getByRole('slider')
@@ -1685,7 +1683,7 @@ describe('App', () => {
 
     it('should disable the multi img row from drag and drop when hovering over a img slider', () => {
       renderAppWithOptionalData({
-        comparison: comparisonTableMultiImgFixture
+        comparison: comparisonTableFixture
       })
 
       const multiImgRow = screen.getAllByTestId('comparison-table-body')[3]

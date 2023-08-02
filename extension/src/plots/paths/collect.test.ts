@@ -11,7 +11,6 @@ import {
 } from './collect'
 import { TemplatePlotGroup, PlotsType } from '../webview/contract'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
-import multiImagePlotsDiffFixture from '../../test/fixtures/plotsDiff/output/multiImage'
 import { Shape, StrokeDash } from '../multiSource/constants'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import { REVISIONS } from '../../test/fixtures/plotsDiff'
@@ -48,6 +47,13 @@ describe('collectPaths', () => {
       },
       {
         hasChildren: false,
+        parentPath: 'plots',
+        path: join('plots', 'image'),
+        revisions: new Set(REVISIONS),
+        type: new Set(['comparison'])
+      },
+      {
+        hasChildren: false,
         parentPath: 'logs',
         path: join('logs', 'loss.tsv'),
         revisions: new Set(REVISIONS),
@@ -72,47 +78,6 @@ describe('collectPaths', () => {
         path: 'predictions.json',
         revisions: new Set(REVISIONS),
         type: new Set(['template-multi'])
-      }
-    ])
-  })
-
-  it('should return the expected data from the comparison multi image test fixture', () => {
-    expect(
-      collectPaths([], multiImagePlotsDiffFixture, REVISIONS)
-    ).toStrictEqual([
-      {
-        hasChildren: false,
-        parentPath: 'plots',
-        path: join('plots', 'acc.png'),
-        revisions: new Set(REVISIONS),
-        type: new Set(['comparison'])
-      },
-      {
-        hasChildren: true,
-        parentPath: undefined,
-        path: 'plots',
-        revisions: new Set(REVISIONS)
-      },
-      {
-        hasChildren: false,
-        parentPath: 'plots',
-        path: join('plots', 'heatmap.png'),
-        revisions: new Set(REVISIONS),
-        type: new Set(['comparison'])
-      },
-      {
-        hasChildren: false,
-        parentPath: 'plots',
-        path: join('plots', 'loss.png'),
-        revisions: new Set(REVISIONS),
-        type: new Set(['comparison'])
-      },
-      {
-        hasChildren: false,
-        parentPath: 'plots',
-        path: join('plots', 'image'),
-        revisions: new Set(REVISIONS),
-        type: new Set(['comparison'])
       }
     ])
   })

@@ -2,7 +2,6 @@ import { join } from 'path'
 import { PathsModel } from './model'
 import { PathType } from './collect'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
-import plotsDiffMultiImgFixture from '../../test/fixtures/plotsDiff/output/multiImage'
 import { buildMockMemento } from '../../test/util'
 import { PlotsType, TemplatePlotGroup } from '../webview/contract'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
@@ -56,6 +55,14 @@ describe('PathsModel', () => {
         hasChildren: false,
         parentPath: 'plots',
         path: join('plots', 'loss.png'),
+        revisions: new Set(REVISIONS),
+        selected: true,
+        type: comparisonType
+      },
+      {
+        hasChildren: false,
+        parentPath: 'plots',
+        path: join('plots', 'image'),
         revisions: new Set(REVISIONS),
         selected: true,
         type: comparisonType
@@ -341,39 +348,16 @@ describe('PathsModel', () => {
     expect(model.getComparisonPaths()).toStrictEqual([
       join('plots', 'acc.png'),
       join('plots', 'heatmap.png'),
-      join('plots', 'loss.png')
+      join('plots', 'loss.png'),
+      join('plots', 'image')
     ])
 
     const newOrder = [
       join('plots', 'heatmap.png'),
       join('plots', 'acc.png'),
-      join('plots', 'loss.png')
-    ]
-
-    model.setComparisonPathsOrder(newOrder)
-
-    expect(model.getComparisonPaths()).toStrictEqual(newOrder)
-  })
-
-  it('should group multi comparison plot path directories', () => {
-    const model = new PathsModel(
-      mockDvcRoot,
-      buildMockErrorsModel(),
-      buildMockMemento()
-    )
-    const currentOrder = [
-      join('plots', 'acc.png'),
-      join('plots', 'heatmap.png'),
       join('plots', 'loss.png'),
       join('plots', 'image')
     ]
-
-    model.transformAndSet(plotsDiffMultiImgFixture, REVISIONS)
-    model.setSelectedRevisions([EXPERIMENT_WORKSPACE_ID])
-
-    expect(model.getComparisonPaths()).toStrictEqual(currentOrder)
-
-    const newOrder = [join('plots', 'image'), ...currentOrder.slice(0, 3)]
 
     model.setComparisonPathsOrder(newOrder)
 
@@ -406,7 +390,7 @@ describe('PathsModel', () => {
         tooltip: undefined
       },
       {
-        descendantStatuses: [2, 2, 2],
+        descendantStatuses: [2, 2, 2, 2],
         hasChildren: true,
         parentPath: undefined,
         path: 'plots',
