@@ -53,7 +53,6 @@ export const ComparisionTableRows: React.FC<ComparisonTableRowsProps> = ({
         <ComparisonTableRow
           path={path}
           plots={columns.map(column => ({
-            ...revs[column.id],
             id: column.id,
             imgs: revs[column.id]?.imgs || [
               { errors: undefined, loading: false, url: undefined }
