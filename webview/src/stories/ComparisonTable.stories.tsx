@@ -5,6 +5,7 @@ import { userEvent, within } from '@storybook/testing-library'
 import React from 'react'
 import { Provider, useDispatch } from 'react-redux'
 import {
+  ComparisonPlotImg,
   ComparisonRevisionData,
   DEFAULT_NB_ITEMS_PER_ROW,
   DEFAULT_PLOT_HEIGHT,
@@ -82,18 +83,25 @@ const removeImages = (
         ['main', '4fb124a'].includes(id)) ||
       id === EXPERIMENT_WORKSPACE_ID
     ) {
+      const isMulti = revisionsData[id].imgs.length > 1
       filteredRevisionData[id] = {
         id,
-        imgs: [
-          {
-            errors:
-              id === 'main'
-                ? [`FileNotFoundError: ${path} not found.`]
-                : undefined,
-            loading: false,
-            url: undefined
-          }
-        ]
+        imgs: isMulti
+          ? (Array.from({ length: revisionsData[id].imgs.length }).fill({
+              errors: undefined,
+              loading: false,
+              url: undefined
+            }) as ComparisonPlotImg[])
+          : [
+              {
+                errors:
+                  id === 'main'
+                    ? [`FileNotFoundError: ${path} not found.`]
+                    : undefined,
+                loading: false,
+                url: undefined
+              }
+            ]
       }
       continue
     }

@@ -70,7 +70,7 @@ describe('Comparison Multi Image Regex', () => {
     ).toBe(true)
   })
 
-  it('should match directorys with spaces or special characters', () => {
+  it('should match directories with spaces or special characters', () => {
     expect(MULTI_IMAGE_PATH_REG.test(join('mis classified', '5.png'))).toBe(
       true
     )
@@ -89,7 +89,7 @@ describe('Comparison Multi Image Regex', () => {
     }
   })
 
-  it('should not match files that include none digits or do not have an extension', () => {
+  it('should not match files that include none digits or do not have a file extension', () => {
     expect(MULTI_IMAGE_PATH_REG.test(join('misclassified', 'five.png'))).toBe(
       false
     )
