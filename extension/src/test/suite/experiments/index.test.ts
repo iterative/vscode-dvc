@@ -1297,6 +1297,28 @@ suite('Experiments Test Suite', () => {
       expect(mockShowPlots).to.be.calledWith(dvcDemoPath)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it.only(
+      'should be able to handle a message to toggle only changed columns',
+      async () => {
+        const { columnsModel, messageSpy, mockMessageReceived } =
+          await buildExperimentsWebview({
+            disposer: disposable
+          })
+
+        expect(columnsModel.getShowOnlyChanged()).to.be.false
+        messageSpy.resetHistory()
+
+        mockMessageReceived.fire({
+          type: MessageFromWebviewType.TOGGLE_SHOW_ONLY_CHANGED
+        })
+
+        expect(columnsModel.getShowOnlyChanged()).to.be.true
+        expect(messageSpy).to.be.calledWithMatch({
+          showOnlyChanged: true
+        })
+      }
+    ).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should handle a message to stop experiments running', async () => {
       const { experiments, dvcExecutor } =
         stubWorkspaceExperimentsGetters(disposable)
