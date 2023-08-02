@@ -1,30 +1,16 @@
-import React, { useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useCallback, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
 import { ComparisonTableCell } from './ComparisonTableCell'
 import styles from '../styles.module.scss'
-import {
-  changeDisabledDragIds,
-  setMultiPlotValue
-} from '../comparisonTableSlice'
-import { PlotsState } from '../../../store'
-
-const getCurrentStep = (stateStep: number | undefined, imgsLength: number) => {
-  if (!stateStep) {
-    return 0
-  }
-  return stateStep > imgsLength - 1 ? imgsLength - 1 : stateStep
-}
+import { changeDisabledDragIds } from '../comparisonTableSlice'
 
 export const ComparisonTableMultiCell: React.FC<{
   path: string
   plot: ComparisonPlot
 }> = ({ path, plot }) => {
-  const multiValues = useSelector(
-    (state: PlotsState) => state.comparison.multiPlotValues
-  )
+  const [currentStep, setCurrentStep] = useState<number>(0)
   const dispatch = useDispatch()
-  const currentStep = getCurrentStep(multiValues[path], plot.imgs.length)
 
   const addDisabled = useCallback(() => {
     dispatch(changeDisabledDragIds([path]))
@@ -54,9 +40,7 @@ export const ComparisonTableMultiCell: React.FC<{
           value={currentStep}
           type="range"
           onChange={event => {
-            dispatch(
-              setMultiPlotValue({ path, value: Number(event.target.value) })
-            )
+            setCurrentStep(Number(event.target.value))
           }}
         />
         <p>{currentStep}</p>
