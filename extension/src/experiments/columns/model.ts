@@ -127,6 +127,7 @@ export class ColumnsModel extends PathSelectionModel<Column> {
 
   public toggleShowOnlyChanged() {
     this.showOnlyChanged = !this.showOnlyChanged
+    this.persist(PersistenceKey.SHOW_ONLY_CHANGED, this.showOnlyChanged)
   }
 
   public getChildren(path: string | undefined) {
