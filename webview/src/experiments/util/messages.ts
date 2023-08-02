@@ -65,6 +65,11 @@ export const toggleExperiment = (id: string) =>
     type: MessageFromWebviewType.TOGGLE_EXPERIMENT
   })
 
+export const toggleShowOnlyChanged = () =>
+  sendMessage({
+    type: MessageFromWebviewType.TOGGLE_SHOW_ONLY_CHANGED
+  })
+
 export const toggleStarred = (id: string) =>
   sendMessage({
     payload: [id],

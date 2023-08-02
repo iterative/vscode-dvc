@@ -246,10 +246,6 @@ export class ExperimentsModel extends ModelWithPersistence {
     return [...this.filters.values()]
   }
 
-  public getFilterPaths() {
-    return this.getFilters().map(({ path }) => path)
-  }
-
   public addFilter(filter: FilterDefinition) {
     this.filters.set(getFilterId(filter), filter)
     this.applyAndPersistFilters()

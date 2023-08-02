@@ -48,6 +48,7 @@ const tableData: TableDataState = {
   rows: rowsFixture,
   selectedBranches: [],
   selectedForPlotsCount: 2,
+  showOnlyChanged: false,
   sorts: [
     { descending: true, path: 'params:params.yaml:epochs' },
     { descending: false, path: 'params:params.yaml:log_file' }

@@ -1,5 +1,6 @@
 import React, { MouseEventHandler, ReactElement } from 'react'
 import { useSelector } from 'react-redux'
+import cx from 'classnames'
 import styles from './styles.module.scss'
 import { CellHintTooltip } from './body/CellHintTooltip'
 import {
@@ -7,7 +8,8 @@ import {
   focusSortsTree,
   openPlotsWebview,
   selectBranches,
-  selectColumns
+  selectColumns,
+  toggleShowOnlyChanged
 } from '../../util/messages'
 import { Icon } from '../../../shared/components/Icon'
 import {
@@ -15,7 +17,8 @@ import {
   GitMerge,
   GraphScatter,
   ListFilter,
-  SortPrecedence
+  SortPrecedence,
+  Table
 } from '../../../shared/components/icons'
 import { ExperimentsState } from '../../store'
 
@@ -98,8 +101,27 @@ export const Indicators = () => {
     (state: ExperimentsState) => state.tableData.hasColumns
   )
 
+  const showOnlyChanged = useSelector(
+    (state: ExperimentsState) => state.tableData.showOnlyChanged
+  )
+
   return (
     <div className={styles.tableIndicators}>
+      <CellHintTooltip
+        tooltipContent="Toggle Show Only Changed Columns"
+        delay={[1000, 0]}
+      >
+        <button
+          className={cx(
+            styles.indicatorIcon,
+            showOnlyChanged && styles.onlyChanged
+          )}
+          aria-label="show only changed columns"
+          onClick={toggleShowOnlyChanged}
+        >
+          <Icon width={16} height={16} icon={Table} />
+        </button>
+      </CellHintTooltip>
       <Indicator
         count={selectedForPlotsCount}
         aria-label="selected for plots"

@@ -30,6 +30,7 @@ export const tableDataInitialState: TableDataState = {
   rows: [],
   selectedBranches: [],
   selectedForPlotsCount: 0,
+  showOnlyChanged: false,
   sorts: []
 }
 
@@ -118,6 +119,9 @@ export const tableDataSlice = createSlice({
     updateSelectedForPlotsCount: (state, action: PayloadAction<number>) => {
       state.selectedForPlotsCount = action.payload
     },
+    updateShowOnlyChanged: (state, action: PayloadAction<boolean>) => {
+      state.showOnlyChanged = action.payload
+    },
     updateSorts: (state, action: PayloadAction<SortDefinition[]>) => {
       state.sorts = keepEqualOldReferencesInArray(
         state.sorts,
@@ -145,6 +149,7 @@ export const {
   updateRows,
   updateSelectedBranches,
   updateSelectedForPlotsCount,
+  updateShowOnlyChanged,
   updateSorts
 } = tableDataSlice.actions
 

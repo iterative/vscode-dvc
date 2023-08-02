@@ -1,4 +1,5 @@
 import { join } from 'path'
+import get from 'lodash.get'
 import isEqual from 'lodash.isequal'
 import { ColumnAccumulator } from './util'
 import { collectDepChanges, collectDeps } from './deps'
@@ -6,17 +7,19 @@ import {
   collectMetricAndParamChanges,
   collectMetricsAndParams
 } from './metricsAndParams'
-import { Column } from '../../webview/contract'
+import { Column, Commit, Experiment } from '../../webview/contract'
 import {
   ExpRange,
   ExpShowOutput,
   ExpState,
   ExpData,
-  experimentHasError
+  experimentHasError,
+  Value
 } from '../../../cli/dvc/contract'
 import { standardizePath } from '../../../fileSystem/path'
 import { timestampColumn } from '../constants'
 import { sortCollectedArray, uniqueValues } from '../../../util/array'
+import { FilterDefinition, filterExperiment } from '../../model/filterBy'
 
 const collectFromExperiment = (
   acc: ColumnAccumulator,
@@ -135,4 +138,64 @@ export const collectRelativeMetricsFiles = (
     .sort()
 
   return uniqueValues(files)
+}
+
+const checkColumn = (
+  path: string,
+  pathArray: string[],
+  columns: string[],
+  records: (Commit | Experiment)[]
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+) => {
+  let initialValue
+  for (const experiment of records) {
+    if (initialValue === undefined) {
+      initialValue = get(experiment, pathArray) as Value
+      continue
+    }
+    const value = get(experiment, pathArray) as Value
+    if (value === undefined) {
+      continue
+    }
+    if (!isEqual(value, initialValue)) {
+      columns.push(path)
+      return
+    }
+  }
+}
+
+const getChangedPaths = (
+  columns: Column[],
+  records: (Commit | Experiment)[]
+) => {
+  const changedPaths: string[] = []
+  for (const { pathArray, path, hasChildren } of columns) {
+    if (!pathArray || hasChildren) {
+      continue
+    }
+    checkColumn(path, pathArray, changedPaths, records)
+  }
+  return changedPaths
+}
+
+export const collectColumnsWithChangedValues = (
+  selectedColumns: Column[],
+  rows: Commit[],
+  filters: FilterDefinition[]
+): Column[] => {
+  const records = []
+  for (const commit of rows) {
+    if (filterExperiment(filters, commit as Experiment)) {
+      records.push(commit)
+    }
+    if (commit.subRows) {
+      records.push(...commit.subRows)
+    }
+  }
+
+  const paths = getChangedPaths(selectedColumns, records)
+
+  return selectedColumns.filter(({ path }) =>
+    paths.find(changedPath => changedPath.startsWith(path))
+  )
 }

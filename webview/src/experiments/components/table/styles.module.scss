@@ -210,6 +210,14 @@ $badge-size: 0.85rem;
   }
 }
 
+.onlyChanged {
+  background-color: $indicator-badge-background;
+
+  svg {
+    fill: $indicator-badge-foreground;
+  }
+}
+
 .indicatorCount {
   position: absolute;
   bottom: 3px;

@@ -59,6 +59,7 @@ export enum MessageFromWebviewType {
   SET_EXPERIMENTS_AND_OPEN_PLOTS = 'set-experiments-and-open-plots',
   SET_STUDIO_SHARE_EXPERIMENTS_LIVE = 'set-studio-share-experiments-live',
   TOGGLE_PLOTS_SECTION = 'toggle-plots-section',
+  TOGGLE_SHOW_ONLY_CHANGED = 'toggle-show-only-changed',
   REMOTE_ADD = 'remote-add',
   REMOTE_MODIFY = 'remote-modify',
   REMOTE_REMOVE = 'remote-remove',
@@ -228,6 +229,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.REFRESH_REVISIONS }
   | { type: MessageFromWebviewType.SELECT_COLUMNS }
   | { type: MessageFromWebviewType.SELECT_FIRST_COLUMNS }
+  | { type: MessageFromWebviewType.TOGGLE_SHOW_ONLY_CHANGED }
   | { type: MessageFromWebviewType.FOCUS_FILTERS_TREE }
   | { type: MessageFromWebviewType.FOCUS_SORTS_TREE }
   | { type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW }
