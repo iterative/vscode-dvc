@@ -22,6 +22,7 @@ import { Title } from '../../vscode/title'
 import { ConfigKey, setConfigValue } from '../../vscode/config'
 import { NUM_OF_COMMITS_TO_INCREASE } from '../../cli/dvc/constants'
 import { Pipeline } from '../../pipeline'
+import { collectColumnsWithChangedValues } from '../columns/collect'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
@@ -201,6 +202,9 @@ export class WebviewMessages {
       case MessageFromWebviewType.REFRESH_EXP_DATA:
         return this.refreshData()
 
+      case MessageFromWebviewType.TOGGLE_SHOW_ONLY_CHANGED:
+        return this.toggleShowOnlyChanged()
+
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
@@ -258,14 +262,34 @@ export class WebviewMessages {
     return this.update()
   }
 
+  private toggleShowOnlyChanged() {
+    this.columns.toggleShowOnlyChanged()
+    this.sendWebviewMessage()
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_REFRESH,
+      undefined,
+      undefined
+    )
+  }
+
   private getWebviewData(): TableData {
+    const filters = this.experiments.getFilters()
+    const rows = this.experiments.getRowData()
+    const selectedColumns = this.columns.getSelected()
+
+    const showOnlyChanged = this.columns.getShowOnlyChanged()
+
+    const columns = showOnlyChanged
+      ? collectColumnsWithChangedValues(selectedColumns, rows, filters)
+      : selectedColumns
+
     return {
       changes: this.columns.getChanges(),
       cliError: this.experiments.getCliError() || null,
       columnOrder: this.columns.getColumnOrder(),
       columnWidths: this.columns.getColumnWidths(),
-      columns: this.columns.getSelected(),
-      filters: this.experiments.getFilterPaths(),
+      columns,
+      filters: filters.map(({ path }) => path),
       hasBranchesToSelect:
         this.experiments.getAvailableBranchesToShow().length > 0,
       hasCheckpoints: this.experiments.hasCheckpoints(),
@@ -275,9 +299,10 @@ export class WebviewMessages {
       hasRunningWorkspaceExperiment:
         this.experiments.hasRunningWorkspaceExperiment(),
       isShowingMoreCommits: this.experiments.getIsShowingMoreCommits(),
-      rows: this.experiments.getRowData(),
+      rows,
       selectedBranches: this.experiments.getSelectedBranches(),
       selectedForPlotsCount: this.experiments.getSelectedRevisions().length,
+      showOnlyChanged,
       sorts: this.experiments.getSorts()
     }
   }

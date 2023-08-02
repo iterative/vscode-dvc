@@ -24,7 +24,8 @@ import {
   updateIsShowingMoreCommits,
   updateRows,
   updateSelectedForPlotsCount,
-  updateSorts
+  updateSorts,
+  updateShowOnlyChanged
 } from '../state/tableDataSlice'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 
@@ -95,6 +96,9 @@ export const App: React.FC<Record<string, unknown>> = () => {
                 dispatch(
                   updateSelectedForPlotsCount(data.data.selectedForPlotsCount)
                 )
+                continue
+              case 'showOnlyChanged':
+                dispatch(updateShowOnlyChanged(data.data.showOnlyChanged))
                 continue
               case 'sorts':
                 dispatch(updateSorts(data.data.sorts))

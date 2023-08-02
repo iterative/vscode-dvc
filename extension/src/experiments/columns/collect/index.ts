@@ -1,4 +1,5 @@
 import { join } from 'path'
+import get from 'lodash.get'
 import isEqual from 'lodash.isequal'
 import { ColumnAccumulator } from './util'
 import { collectDepChanges, collectDeps } from './deps'
@@ -6,17 +7,20 @@ import {
   collectMetricAndParamChanges,
   collectMetricsAndParams
 } from './metricsAndParams'
-import { Column } from '../../webview/contract'
+import { Column, Commit, Experiment } from '../../webview/contract'
 import {
   ExpRange,
   ExpShowOutput,
   ExpState,
   ExpData,
-  experimentHasError
+  experimentHasError,
+  Value,
+  EXPERIMENT_WORKSPACE_ID
 } from '../../../cli/dvc/contract'
 import { standardizePath } from '../../../fileSystem/path'
 import { timestampColumn } from '../constants'
 import { sortCollectedArray, uniqueValues } from '../../../util/array'
+import { FilterDefinition, filterExperiment } from '../../model/filterBy'
 
 const collectFromExperiment = (
   acc: ColumnAccumulator,
@@ -135,4 +139,70 @@ export const collectRelativeMetricsFiles = (
     .sort()
 
   return uniqueValues(files)
+}
+
+const getValue = (
+  experiment: Commit | Experiment,
+  pathArray: string[]
+): Value => get(experiment, pathArray) as Value
+
+const collectChangedPath = (
+  acc: string[],
+  path: string,
+  pathArray: string[],
+  records: (Commit | Experiment)[]
+) => {
+  let initialValue
+  for (const experiment of records) {
+    if (initialValue === undefined) {
+      initialValue = getValue(experiment, pathArray)
+      continue
+    }
+    const value = getValue(experiment, pathArray)
+    if (value === undefined || isEqual(value, initialValue)) {
+      continue
+    }
+
+    acc.push(path)
+    return
+  }
+}
+
+const collectChangedPaths = (
+  columns: Column[],
+  records: (Commit | Experiment)[]
+) => {
+  const acc: string[] = []
+  for (const { pathArray, path, hasChildren } of columns) {
+    if (!pathArray || hasChildren) {
+      continue
+    }
+    collectChangedPath(acc, path, pathArray, records)
+  }
+  return acc
+}
+
+export const collectColumnsWithChangedValues = (
+  selectedColumns: Column[],
+  rows: Commit[],
+  filters: FilterDefinition[]
+): Column[] => {
+  const records = []
+  for (const commit of rows) {
+    if (
+      commit.id === EXPERIMENT_WORKSPACE_ID ||
+      filterExperiment(filters, commit as Experiment)
+    ) {
+      records.push(commit)
+    }
+    if (commit.subRows) {
+      records.push(...commit.subRows)
+    }
+  }
+
+  const changedPaths = collectChangedPaths(selectedColumns, records)
+
+  return selectedColumns.filter(({ path }) =>
+    changedPaths.find(changedPath => changedPath.startsWith(path))
+  )
 }

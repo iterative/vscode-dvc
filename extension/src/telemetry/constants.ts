@@ -72,6 +72,8 @@ export const EventName = Object.assign(
       'views.experimentsTable.showMoreCommits',
     VIEWS_EXPERIMENTS_TABLE_SORT_COLUMN:
       'views.experimentsTable.columnSortAdded',
+    VIEWS_EXPERIMENTS_TABLE_TOGGLE_SHOW_ONLY_CHANGED:
+      'views.experimentsTable.toggleShowOnlyChanged',
 
     VIEWS_PLOTS_CLOSED: 'views.plots.closed',
     VIEWS_PLOTS_COMPARISON_ROWS_REORDERED:
@@ -266,6 +268,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_EXPERIMENTS_TABLE_OPEN_PARAMS_FILE]: {
     path: string
   }
+  [EventName.VIEWS_EXPERIMENTS_TABLE_TOGGLE_SHOW_ONLY_CHANGED]: undefined
 
   [EventName.VIEWS_PLOTS_CLOSED]: undefined
   [EventName.VIEWS_PLOTS_CREATED]: undefined

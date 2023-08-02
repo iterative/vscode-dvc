@@ -23,6 +23,7 @@ export class ColumnsModel extends PathSelectionModel<Column> {
   private columnsChanges: string[] = []
   private paramsFiles = new Set<string>()
   private relativeMetricsFiles: string[] = []
+  private showOnlyChanged: boolean
 
   constructor(
     dvcRoot: string,
@@ -44,6 +45,7 @@ export class ColumnsModel extends PathSelectionModel<Column> {
       PersistenceKey.METRICS_AND_PARAMS_COLUMN_WIDTHS,
       {}
     )
+    this.showOnlyChanged = this.revive(PersistenceKey.SHOW_ONLY_CHANGED, false)
   }
 
   public getColumnOrder(): string[] {
@@ -117,6 +119,15 @@ export class ColumnsModel extends PathSelectionModel<Column> {
       PersistenceKey.METRICS_AND_PARAMS_COLUMN_WIDTHS,
       this.columnWidthsState
     )
+  }
+
+  public getShowOnlyChanged() {
+    return this.showOnlyChanged
+  }
+
+  public toggleShowOnlyChanged() {
+    this.showOnlyChanged = !this.showOnlyChanged
+    this.persist(PersistenceKey.SHOW_ONLY_CHANGED, this.showOnlyChanged)
   }
 
   public getChildren(path: string | undefined) {

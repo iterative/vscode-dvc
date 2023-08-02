@@ -1543,6 +1543,23 @@ describe('App', () => {
   })
 
   describe('Header Indicators', () => {
+    it('should show a show only changed columns indicator', () => {
+      renderTable()
+      jest.useFakeTimers()
+
+      const showOnlyChangedIndicator = screen.getByLabelText(
+        'show only changed columns'
+      )
+
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+      fireEvent.mouseEnter(showOnlyChangedIndicator)
+      advanceTimersByTime(1000)
+      const tooltip = screen.getByRole('tooltip')
+
+      expect(tooltip).toHaveTextContent('Toggle Show Only Changed Columns')
+    })
+
     it('should show an indicator with the amount of experiments selected for plotting', () => {
       renderTable({
         ...tableDataFixture
@@ -1757,7 +1774,16 @@ describe('App', () => {
       expect(indicator).toHaveTextContent(`${branches.length - 1}`)
     })
 
-    it('should send a message to focus the relevant tree when clicked', () => {
+    it('should send a message to toggle show only changed columns when the show only changed columns indicator is clicked', () => {
+      renderTable()
+      mockPostMessage.mockClear()
+      fireEvent.click(screen.getByLabelText('show only changed columns'))
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.TOGGLE_SHOW_ONLY_CHANGED
+      })
+    })
+
+    it('should send a message to focus the relevant tree/view when clicked', () => {
       renderTable()
       mockPostMessage.mockClear()
       fireEvent.click(screen.getByLabelText('sorts'))

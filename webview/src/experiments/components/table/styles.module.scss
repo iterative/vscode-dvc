@@ -210,6 +210,19 @@ $badge-size: 0.85rem;
   }
 }
 
+.onlyChanged {
+  background-color: $indicator-badge-background;
+
+  svg {
+    fill: $indicator-badge-foreground;
+  }
+
+  &:hover {
+    background-color: $indicator-badge-background !important;
+    opacity: 0.8;
+  }
+}
+
 .indicatorCount {
   position: absolute;
   bottom: 3px;
