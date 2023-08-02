@@ -154,7 +154,8 @@ const collectOrderedPath = (
     revisions
   }
 
-  const isMultiImgPlot = isMultiImgDir && idx === pathArray.length
+  const isPathLeaf = idx === pathArray.length
+  const isMultiImgPlot = isMultiImgDir && isPathLeaf
 
   const type = getType(data, hasChildren, path, isMultiImgPlot)
   if (type) {
