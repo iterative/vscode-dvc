@@ -141,42 +141,45 @@ export const collectRelativeMetricsFiles = (
   return uniqueValues(files)
 }
 
-const checkColumn = (
+const getValue = (
+  experiment: Commit | Experiment,
+  pathArray: string[]
+): Value => get(experiment, pathArray) as Value
+
+const collectChangedPath = (
+  acc: string[],
   path: string,
   pathArray: string[],
-  columns: string[],
   records: (Commit | Experiment)[]
-  // eslint-disable-next-line sonarjs/cognitive-complexity
 ) => {
   let initialValue
   for (const experiment of records) {
     if (initialValue === undefined) {
-      initialValue = get(experiment, pathArray) as Value
+      initialValue = getValue(experiment, pathArray)
       continue
     }
-    const value = get(experiment, pathArray) as Value
-    if (value === undefined) {
+    const value = getValue(experiment, pathArray)
+    if (value === undefined || isEqual(value, initialValue)) {
       continue
     }
-    if (!isEqual(value, initialValue)) {
-      columns.push(path)
-      return
-    }
+
+    acc.push(path)
+    return
   }
 }
 
-const getChangedPaths = (
+const collectChangedPaths = (
   columns: Column[],
   records: (Commit | Experiment)[]
 ) => {
-  const changedPaths: string[] = []
+  const acc: string[] = []
   for (const { pathArray, path, hasChildren } of columns) {
     if (!pathArray || hasChildren) {
       continue
     }
-    checkColumn(path, pathArray, changedPaths, records)
+    collectChangedPath(acc, path, pathArray, records)
   }
-  return changedPaths
+  return acc
 }
 
 export const collectColumnsWithChangedValues = (
@@ -197,9 +200,9 @@ export const collectColumnsWithChangedValues = (
     }
   }
 
-  const paths = getChangedPaths(selectedColumns, records)
+  const changedPaths = collectChangedPaths(selectedColumns, records)
 
   return selectedColumns.filter(({ path }) =>
-    paths.find(changedPath => changedPath.startsWith(path))
+    changedPaths.find(changedPath => changedPath.startsWith(path))
   )
 }
