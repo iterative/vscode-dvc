@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.31] - 2023-08-02
+
+### 🚀 New Features and Enhancements
+
+- Add toggle to show only changed columns in experiments table [#4402](https://github.com/iterative/vscode-dvc/pull/4402) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update config tests [#4400](https://github.com/iterative/vscode-dvc/pull/4400) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.30] - 2023-08-01
 
 ### 🐛 Bug Fixes
