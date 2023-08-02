@@ -1,7 +1,8 @@
+import { join } from 'path'
 import { EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { DvcCli } from '.'
-import { Command } from './constants'
+import { Command, MULTI_IMAGE_PATH_REG } from './constants'
 import { CliResult, CliStarted, typeCheckCommands } from '..'
 import { getProcessEnv } from '../../env'
 import { createProcess } from '../../process/execution'
@@ -49,6 +50,53 @@ describe('typeCheckCommands', () => {
   it('should return the list of commands that are on the class', () => {
     const commandsToAutoRegister = typeCheckCommands({ FUNC: 'func' }, cli)
     expect(commandsToAutoRegister).toStrictEqual(['func'])
+  })
+})
+
+describe('Comparison Multi Image Regex', () => {
+  it('should match a nested image group directory', () => {
+    expect(
+      MULTI_IMAGE_PATH_REG.test(
+        join(
+          'extremely',
+          'super',
+          'super',
+          'super',
+          'nested',
+          'image',
+          '768.svg'
+        )
+      )
+    ).toBe(true)
+  })
+
+  it('should match directorys with spaces or special characters', () => {
+    expect(MULTI_IMAGE_PATH_REG.test(join('mis classified', '5.png'))).toBe(
+      true
+    )
+
+    expect(MULTI_IMAGE_PATH_REG.test(join('misclassified#^', '5.png'))).toBe(
+      true
+    )
+  })
+
+  it('should match different types of images', () => {
+    const imageFormats = ['svg', 'png', 'jpg', 'jpeg']
+    for (const format of imageFormats) {
+      expect(
+        MULTI_IMAGE_PATH_REG.test(join('misclassified', `5.${format}`))
+      ).toBe(true)
+    }
+  })
+
+  it('should not match files that include none digits or do not have an extension', () => {
+    expect(MULTI_IMAGE_PATH_REG.test(join('misclassified', 'five.png'))).toBe(
+      false
+    )
+    expect(MULTI_IMAGE_PATH_REG.test(join('misclassified', '5 4.png'))).toBe(
+      false
+    )
+    expect(MULTI_IMAGE_PATH_REG.test(join('misclassified', '5'))).toBe(false)
   })
 })
 
