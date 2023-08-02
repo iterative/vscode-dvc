@@ -14,7 +14,8 @@ import {
   ExpState,
   ExpData,
   experimentHasError,
-  Value
+  Value,
+  EXPERIMENT_WORKSPACE_ID
 } from '../../../cli/dvc/contract'
 import { standardizePath } from '../../../fileSystem/path'
 import { timestampColumn } from '../constants'
@@ -185,7 +186,10 @@ export const collectColumnsWithChangedValues = (
 ): Column[] => {
   const records = []
   for (const commit of rows) {
-    if (filterExperiment(filters, commit as Experiment)) {
+    if (
+      commit.id === EXPERIMENT_WORKSPACE_ID ||
+      filterExperiment(filters, commit as Experiment)
+    ) {
       records.push(commit)
     }
     if (commit.subRows) {
