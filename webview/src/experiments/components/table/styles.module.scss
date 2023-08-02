@@ -216,6 +216,11 @@ $badge-size: 0.85rem;
   svg {
     fill: $indicator-badge-foreground;
   }
+
+  &:hover {
+    background-color: $indicator-badge-background !important;
+    opacity: 0.8;
+  }
 }
 
 .indicatorCount {

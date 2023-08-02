@@ -20,7 +20,7 @@ export const AddColumns: React.FC = () => {
           appearance="secondary"
           isNested={true}
           onClick={toggleShowOnlyChanged}
-          text="Show Only Changed"
+          text="Disable Only Changed"
         />
       )}
     </div>
