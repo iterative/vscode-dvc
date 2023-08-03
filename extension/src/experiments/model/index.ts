@@ -42,7 +42,7 @@ import {
 
 type StarredExperiments = Record<string, boolean | undefined>
 
-export type SelectedExperimentWithColor = Experiment & {
+type SelectedExperimentWithColor = Experiment & {
   displayColor: Color
   selected: true
 }
