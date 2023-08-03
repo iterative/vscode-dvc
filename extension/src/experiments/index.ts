@@ -224,7 +224,7 @@ export class Experiments extends BaseRepository<TableData> {
   public toggleColumnStatus(path: string) {
     const status = this.columns.toggleStatus(path)
 
-    this.notifyColumnsChanged()
+    void this.notifyColumnsChanged()
 
     return status
   }
@@ -605,7 +605,7 @@ export class Experiments extends BaseRepository<TableData> {
       this.experiments.getErrors()
     )
     this.experimentsChanged.fire()
-    this.notifyColumnsChanged()
+    void this.notifyColumnsChanged()
   }
 
   private notifyColumnsChanged() {
