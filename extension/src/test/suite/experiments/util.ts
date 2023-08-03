@@ -148,7 +148,7 @@ export const buildExperimentsWebview = async (inputs: {
   messageSpy.restore()
   const instanceMessageSpy: typeof messageSpy = spy(webview, 'show')
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ;(experiments as any).webviewMessages.sendWebviewMessage()
+  await (experiments as any).webviewMessages.sendWebviewMessage()
 
   const mockMessageReceived = getMessageReceivedEmitter(webview)
 

@@ -19,8 +19,8 @@ import {
   bypassProcessManagerDebounce,
   closeAllEditors,
   getFirstArgOfLastCall,
-  getMessageReceivedEmitter,
-  getMockNow
+  getMockNow,
+  waitForSpyCall
 } from '../util'
 import { dvcDemoPath } from '../../util'
 import {
@@ -39,7 +39,6 @@ import { MessageFromWebviewType } from '../../../webview/contract'
 import { reorderObjectList, uniqueValues } from '../../../util/array'
 import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
-import { SelectedExperimentWithColor } from '../../../experiments/model'
 import { ErrorItem } from '../../../path/selection/tree'
 import { isErrorItem } from '../../../tree'
 import { RegisteredCommands } from '../../../commands/external'
@@ -82,8 +81,11 @@ suite('Plots Test Suite', () => {
       )
       mockPlotsDiff.resetHistory()
 
+      const messageSent = waitForSpyCall(messageSpy, messageSpy.callCount)
+
       const webview = await plots.showWebview()
-      await webview.isReady()
+
+      await Promise.all([webview.isReady(), messageSent])
 
       expect(mockPlotsDiff).not.to.be.called
       expect(managedUpdateSpy).not.to.be.called
@@ -740,24 +742,16 @@ suite('Plots Test Suite', () => {
 
     it('should handle a message to manually refresh plot revisions from the webview', async () => {
       const mockNow = getMockNow()
-      const { data, plots, mockPlotsDiff, messageSpy } = await buildPlots({
-        disposer: disposable,
-        plotsDiff: plotsDiffFixture
-      })
-
-      messageSpy.restore()
-
-      const webview = await plots.showWebview()
-      mockPlotsDiff.resetHistory()
-      const instanceMessageSpy = spy(webview, 'show')
-      await webview.isReady()
+      const { messageSpy, mockMessageReceived, mockPlotsDiff } =
+        await buildPlotsWebview({
+          disposer: disposable,
+          plotsDiff: plotsDiffFixture
+        })
+      messageSpy.resetHistory()
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
-      const dataUpdateEvent = new Promise(resolve =>
-        data.onDidUpdate(() => resolve(undefined))
-      )
+      const messageSent = waitForSpyCall(messageSpy, messageSpy.callCount)
 
       bypassProcessManagerDebounce(mockNow)
 
@@ -765,7 +759,7 @@ suite('Plots Test Suite', () => {
         type: MessageFromWebviewType.REFRESH_REVISIONS
       })
 
-      await dataUpdateEvent
+      await messageSent
 
       expect(mockSendTelemetryEvent).to.be.calledOnce
       expect(mockSendTelemetryEvent).to.be.calledWith(EventName.PLOTS_REFRESH)
@@ -779,7 +773,7 @@ suite('Plots Test Suite', () => {
         REVISIONS[1]
       )
       expect(
-        instanceMessageSpy,
+        messageSpy,
         'should call the plots webview with cached data before refreshing with data from the CLI'
       ).to.be.calledTwice
     }).timeout(WEBVIEW_TEST_TIMEOUT)
@@ -891,19 +885,11 @@ suite('Plots Test Suite', () => {
     })
 
     it('should send the correct data to the webview for flexible plots', async () => {
-      const { experiments, plots, messageSpy, mockPlotsDiff } =
-        await buildPlots({
-          disposer: disposable,
-          plotsDiff: multiSourcePlotsDiffFixture
-        })
-
-      stub(experiments, 'getSelectedRevisions').returns([
-        { id: REVISIONS[0] },
-        { id: REVISIONS[1] }
-      ] as SelectedExperimentWithColor[])
-
-      const webview = await plots.showWebview()
-      await webview.isReady()
+      const { messageSpy, mockPlotsDiff } = await buildPlotsWebview({
+        disposer: disposable,
+        plotsDiff: multiSourcePlotsDiffFixture,
+        selectedExperiments: [REVISIONS[0], REVISIONS[1]]
+      })
 
       expect(mockPlotsDiff).to.be.called
 

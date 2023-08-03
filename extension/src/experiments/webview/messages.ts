@@ -68,9 +68,13 @@ export class WebviewMessages {
     this.update = update
   }
 
-  public sendWebviewMessage() {
+  public async sendWebviewMessage() {
     const webview = this.getWebview()
-    void webview?.show(this.getWebviewData())
+    if (!webview) {
+      return
+    }
+    const data = await this.getWebviewData()
+    return webview.show(data)
   }
 
   public handleMessageFromWebview(message: MessageFromWebview) {
@@ -264,46 +268,80 @@ export class WebviewMessages {
 
   private toggleShowOnlyChanged() {
     this.columns.toggleShowOnlyChanged()
-    this.sendWebviewMessage()
-    sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_REFRESH,
-      undefined,
-      undefined
-    )
+    return Promise.all([
+      this.sendWebviewMessage(),
+      sendTelemetryEvent(
+        EventName.VIEWS_EXPERIMENTS_TABLE_REFRESH,
+        undefined,
+        undefined
+      )
+    ])
   }
 
-  private getWebviewData(): TableData {
-    const filters = this.experiments.getFilters()
-    const rows = this.experiments.getRowData()
-    const selectedColumns = this.columns.getSelected()
-
-    const showOnlyChanged = this.columns.getShowOnlyChanged()
+  private async getWebviewData(): Promise<TableData> {
+    const [
+      changes,
+      cliError,
+      columnOrder,
+      columnWidths,
+      selectedColumns,
+      filters,
+      hasBranchesToSelect,
+      hasCheckpoints,
+      hasColumns,
+      hasConfig,
+      hasMoreCommits,
+      hasRunningWorkspaceExperiment,
+      isShowingMoreCommits,
+      rows,
+      selectedBranches,
+      selectedForPlotsCount,
+      showOnlyChanged,
+      sorts
+    ] = await Promise.all([
+      this.columns.getChanges(),
+      this.experiments.getCliError() || null,
+      this.columns.getColumnOrder(),
+      this.columns.getColumnWidths(),
+      this.columns.getSelected(),
+      this.experiments.getFilters(),
+      this.experiments.getAvailableBranchesToShow().length > 0,
+      this.experiments.hasCheckpoints(),
+      this.columns.hasNonDefaultColumns(),
+      this.pipeline.hasPipeline(),
+      this.experiments.getHasMoreCommits(),
+      this.experiments.hasRunningWorkspaceExperiment(),
+      this.experiments.getIsShowingMoreCommits(),
+      this.experiments.getRowData(),
+      this.experiments.getSelectedBranches(),
+      this.experiments.getSelectedRevisions().length,
+      this.columns.getShowOnlyChanged(),
+      this.experiments.getSorts()
+    ])
 
     const columns = showOnlyChanged
       ? collectColumnsWithChangedValues(selectedColumns, rows, filters)
       : selectedColumns
 
     return {
-      changes: this.columns.getChanges(),
-      cliError: this.experiments.getCliError() || null,
-      columnOrder: this.columns.getColumnOrder(),
-      columnWidths: this.columns.getColumnWidths(),
+      changes,
+      cliError,
+      columnOrder,
+      columnWidths,
       columns,
       filters: filters.map(({ path }) => path),
-      hasBranchesToSelect:
-        this.experiments.getAvailableBranchesToShow().length > 0,
-      hasCheckpoints: this.experiments.hasCheckpoints(),
-      hasColumns: this.columns.hasNonDefaultColumns(),
-      hasConfig: this.pipeline.hasPipeline(),
-      hasMoreCommits: this.experiments.getHasMoreCommits(),
-      hasRunningWorkspaceExperiment:
-        this.experiments.hasRunningWorkspaceExperiment(),
-      isShowingMoreCommits: this.experiments.getIsShowingMoreCommits(),
+      hasBranchesToSelect,
+      hasCheckpoints,
+      hasColumns,
+      hasConfig,
+      hasMoreCommits,
+      hasRunningWorkspaceExperiment,
+      isShowingMoreCommits,
       rows,
-      selectedBranches: this.experiments.getSelectedBranches(),
-      selectedForPlotsCount: this.experiments.getSelectedRevisions().length,
+      selectedBranches,
+      selectedForPlotsCount,
       showOnlyChanged,
-      sorts: this.experiments.getSorts()
+      sorts
     }
   }
 
