@@ -2,8 +2,8 @@ import React, { useEffect } from 'react'
 import cx from 'classnames'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import { flexRender, Header } from '@tanstack/react-table'
-import { SortOrder } from './ContextMenuContent'
 import { ColumnResizer, ResizerHeight } from './ColumnResizer'
+import { SortOrder } from './util'
 import styles from '../styles.module.scss'
 import {
   Draggable,
