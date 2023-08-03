@@ -51,19 +51,10 @@ const collectType = (plots: Plot[]) => {
       ? type.add(PathType.TEMPLATE_MULTI)
       : type.add(PathType.TEMPLATE_SINGLE)
   }
-
   return type
 }
 
-const getType = (
-  data: PlotsData,
-  hasChildren: boolean,
-  path: string
-): Set<PathType> | undefined => {
-  if (hasChildren) {
-    return
-  }
-
+const getType = (data: PlotsData, path: string): Set<PathType> | undefined => {
   const plots = data[path]
   if (!definedAndNonEmpty(plots)) {
     return
@@ -118,6 +109,46 @@ const collectPathRevisions = (data: PlotsData, path: string): Set<string> => {
   return revisions
 }
 
+const collectPlotPathType = (
+  plotPath: PlotPath,
+  data: PlotsData,
+  hasChildren: boolean,
+  path: string
+) => {
+  if (hasChildren) {
+    return
+  }
+
+  const type = getType(data, path)
+
+  if (type) {
+    plotPath.type = type
+  }
+}
+
+const updateExistingPlotPath = (
+  acc: PlotPath[],
+  data: PlotsData,
+  hasChildren: boolean,
+  revisions: Set<string>,
+  path: string
+) =>
+  acc.map(existing => {
+    const plotPath = { ...existing }
+
+    if (existing.path !== path) {
+      return plotPath
+    }
+
+    plotPath.revisions = new Set([...existing.revisions, ...revisions])
+
+    if (!plotPath.type) {
+      collectPlotPathType(plotPath, data, hasChildren, path)
+    }
+
+    return plotPath
+  })
+
 const collectOrderedPath = (
   acc: PlotPath[],
   data: PlotsData,
@@ -126,19 +157,11 @@ const collectOrderedPath = (
   idx: number
 ): PlotPath[] => {
   const path = getPath(pathArray, idx)
+  const hasChildren = idx !== pathArray.length
 
   if (acc.some(({ path: existingPath }) => existingPath === path)) {
-    return acc.map(existing =>
-      existing.path === path
-        ? {
-            ...existing,
-            revisions: new Set([...existing.revisions, ...revisions])
-          }
-        : existing
-    )
+    return updateExistingPlotPath(acc, data, hasChildren, revisions, path)
   }
-
-  const hasChildren = idx !== pathArray.length
 
   const plotPath: PlotPath = {
     hasChildren,
@@ -147,10 +170,7 @@ const collectOrderedPath = (
     revisions
   }
 
-  const type = getType(data, hasChildren, path)
-  if (type) {
-    plotPath.type = type
-  }
+  collectPlotPathType(plotPath, data, hasChildren, path)
 
   acc.push(plotPath)
   return acc
@@ -228,7 +248,6 @@ export const collectPaths = (
   if (errors?.length) {
     acc = collectErrorPaths(acc, data, errors)
   }
-
   return acc
 }
 
