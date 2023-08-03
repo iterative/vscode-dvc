@@ -47,10 +47,10 @@ import {
   closeAllEditors,
   configurationChangeEvent,
   experimentsUpdatedEvent,
-  extensionUri,
   getActiveEditorUpdatedEvent,
   getInputBoxEvent,
-  getMessageReceivedEmitter
+  getMessageReceivedEmitter,
+  waitForSpyCall
 } from '../util'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import { generateTestExpShowOutput } from '../../util/experiments'
@@ -63,7 +63,6 @@ import {
 import * as FilterQuickPicks from '../../../experiments/model/filterBy/quickPick'
 import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
 import { buildMetricOrParamPath } from '../../../experiments/columns/paths'
-import { BaseWebview } from '../../../webview'
 import { ColumnsModel } from '../../../experiments/columns/model'
 import { MessageFromWebviewType } from '../../../webview/contract'
 import { ExperimentsModel } from '../../../experiments/model'
@@ -92,7 +91,6 @@ import { Toast } from '../../../vscode/toast'
 import { Response } from '../../../vscode/response'
 import { MAX_SELECTED_EXPERIMENTS } from '../../../experiments/model/status'
 import { Pipeline } from '../../../pipeline'
-import { buildExperimentsPipeline } from '../pipeline/util'
 
 const { openFileInEditor } = FileSystem
 
@@ -238,14 +236,11 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set isShowingMoreCommits to false it is showing only the current commit', async () => {
-      const { experiments, experimentsModel, messageSpy } = buildExperiments({
+      const { messageSpy } = await buildExperimentsWebview({
+        availableNbCommits: { main: 1 },
         expShow: expShowFixture.slice(0, 2),
         disposer: disposable
       })
-
-      stub(experimentsModel, 'getNbOfCommitsToShow').returns(1)
-
-      await experiments.showWebview()
 
       expect(messageSpy).to.be.calledWithMatch({
         isShowingMoreCommits: { main: false }
@@ -916,12 +911,8 @@ suite('Experiments Test Suite', () => {
     })
 
     it('should be able to handle a message to select columns', async () => {
-      const { columnsModel, experiments, messageSpy } =
+      const { columnsModel, messageSpy, mockMessageReceived } =
         await buildExperimentsWebview({ disposer: disposable })
-
-      const webview = await experiments.showWebview()
-      messageSpy.resetHistory()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
         [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
@@ -929,7 +920,7 @@ suite('Experiments Test Suite', () => {
       >
       mockShowQuickPick.resolves([])
 
-      const tableChangePromise = experimentsUpdatedEvent(experiments)
+      const messageSent = waitForSpyCall(messageSpy, messageSpy.callCount)
       mockMessageReceived.fire({
         type: MessageFromWebviewType.SELECT_COLUMNS
       })
@@ -948,7 +939,7 @@ suite('Experiments Test Suite', () => {
         }
       )
 
-      await tableChangePromise
+      await messageSent
 
       const allColumnsUnselected: Partial<TableData> = {
         changes: workspaceChangesFixture,
@@ -964,10 +955,11 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to select the first columns', async () => {
-      const { experiments, mockMessageReceived, messageSpy } =
-        await buildExperimentsWebview({
+      const { mockMessageReceived, messageSpy } = await buildExperimentsWebview(
+        {
           disposer: disposable
-        })
+        }
+      )
 
       messageSpy.resetHistory()
 
@@ -984,11 +976,11 @@ suite('Experiments Test Suite', () => {
         }
       ])
 
-      const tableChangePromise = experimentsUpdatedEvent(experiments)
+      const messageSent = waitForSpyCall(messageSpy, messageSpy.callCount)
       mockMessageReceived.fire({
         type: MessageFromWebviewType.SELECT_FIRST_COLUMNS
       })
-      await tableChangePromise
+      await messageSent
 
       const [id, firstColumn] = messageSpy.lastCall.args[0].columnOrder
 
@@ -997,21 +989,22 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to move a column group to the start of the table', async () => {
-      const { experiments, mockMessageReceived, messageSpy } =
-        await buildExperimentsWebview({
+      const { mockMessageReceived, messageSpy } = await buildExperimentsWebview(
+        {
           disposer: disposable
-        })
+        }
+      )
 
       messageSpy.resetHistory()
 
       const movedGroup = 'params:params.yaml'
 
-      const tableChangePromise = experimentsUpdatedEvent(experiments)
+      const messageSent = waitForSpyCall(messageSpy, messageSpy.callCount)
       mockMessageReceived.fire({
         payload: movedGroup,
         type: MessageFromWebviewType.EXPERIMENTS_TABLE_MOVE_TO_START
       })
-      await tableChangePromise
+      await messageSent
 
       const paramsYamlColumns = columnsOrderFixture.filter(column =>
         column.startsWith('params:params.yaml')
@@ -1306,9 +1299,11 @@ suite('Experiments Test Suite', () => {
       expect(columnsModel.getShowOnlyChanged()).to.be.false
       messageSpy.resetHistory()
 
+      const messageSent = waitForSpyCall(messageSpy, messageSpy.callCount)
       mockMessageReceived.fire({
         type: MessageFromWebviewType.TOGGLE_SHOW_ONLY_CHANGED
       })
+      await messageSent
 
       expect(columnsModel.getShowOnlyChanged()).to.be.true
       expect(messageSpy).to.be.calledWithMatch({
@@ -1527,84 +1522,48 @@ suite('Experiments Test Suite', () => {
 
   describe('Sorting', () => {
     it('should be able to sort', async () => {
-      const { dvcReader, internalCommands } = buildInternalCommands(disposable)
-
-      const messageSpy = spy(BaseWebview.prototype, 'show')
-
-      const resourceLocator = disposable.track(
-        new ResourceLocator(extensionUri)
-      )
-      stub(dvcReader, 'stageList').resolves('train')
-      stub(dvcReader, 'dag').resolves('')
-
-      const pipeline = buildExperimentsPipeline({
+      const { experiments, messageSpy } = await buildExperimentsWebview({
         disposer: disposable,
-        dvcRoot: dvcDemoPath,
-        internalCommands
-      })
-
-      const experiments = disposable.track(
-        new Experiments(
-          dvcDemoPath,
-          internalCommands,
-          pipeline,
-          resourceLocator,
-          buildMockMemento(),
-          () => Promise.resolve([]),
-          [],
-          buildMockExperimentsData()
-        )
-      )
-
-      const data = generateTestExpShowOutput(
-        {},
-        {
-          rev: '2d879497587b80b2d9e61f072d9dbe9c07a65357',
-          experiments: [
-            {
-              params: {
-                'params.yaml': {
-                  data: {
-                    test: 2
-                  }
-                }
-              }
-            },
-            {
-              params: {
-                'params.yaml': {
-                  data: {
-                    test: 1
-                  }
-                }
-              }
-            },
-            {
-              params: {
-                'params.yaml': {
-                  data: {
-                    test: 3
-                  }
-                }
-              }
-            }
-          ]
-        }
-      )
-
-      void experiments.setState({
         availableNbCommits: { main: 20 },
-        gitLog: '',
-        expShow: data,
+        expShow: generateTestExpShowOutput(
+          {},
+          {
+            rev: '2d879497587b80b2d9e61f072d9dbe9c07a65357',
+            experiments: [
+              {
+                params: {
+                  'params.yaml': {
+                    data: {
+                      test: 2
+                    }
+                  }
+                }
+              },
+              {
+                params: {
+                  'params.yaml': {
+                    data: {
+                      test: 1
+                    }
+                  }
+                }
+              },
+              {
+                params: {
+                  'params.yaml': {
+                    data: {
+                      test: 3
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ),
         rowOrder: [
           { sha: '2d879497587b80b2d9e61f072d9dbe9c07a65357', branch: 'main' }
         ]
       })
-
-      messageSpy.resetHistory()
-
-      await experiments.isReady()
-      await experiments.showWebview()
 
       const getIds = (rows: Commit[]) =>
         rows.map(({ id, subRows }) => {
@@ -1647,13 +1606,11 @@ suite('Experiments Test Suite', () => {
         value: false
       } as QuickPickItemWithValue<boolean>)
 
-      const tableChangePromise = experimentsUpdatedEvent(experiments)
-
       messageSpy.resetHistory()
+      const messageSent = waitForSpyCall(messageSpy, messageSpy.callCount)
 
-      const pickPromise = experiments.addSort()
-      await pickPromise
-      await tableChangePromise
+      await experiments.addSort()
+      await messageSent
 
       const { rows: sortedRows, sorts } = messageSpy.lastCall.args[0]
 

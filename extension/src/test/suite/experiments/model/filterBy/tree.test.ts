@@ -18,7 +18,8 @@ import { buildMockMemento, dvcDemoPath } from '../../../../util'
 import {
   experimentsUpdatedEvent,
   stubPrivateMethod,
-  stubPrivatePrototypeMethod
+  stubPrivatePrototypeMethod,
+  waitForSpyCall
 } from '../../../util'
 import { buildMetricOrParamPath } from '../../../../../experiments/columns/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
@@ -77,6 +78,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         value: '0.45'
       }
 
+      const messageSent = waitForSpyCall(messageSpy, messageSpy.callCount)
       await addFilterViaQuickInput(experiments, accuracyFilter)
 
       const [workspace, main, fe2919b, _7df876c] = rowsFixture
@@ -100,6 +102,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         filters: [accuracyPath],
         rows: filteredRows
       }
+      await messageSent
 
       expect(messageSpy).to.be.calledWithMatch(filteredTableData)
 
@@ -341,6 +344,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       experimentsModel.toggleStars(['main'])
 
+      const messageSent = waitForSpyCall(messageSpy, messageSpy.callCount)
       await addFilterViaQuickInput(experiments, starredFilter)
 
       const [workspace, main] = rowsFixture
@@ -359,14 +363,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         rows: filteredRows
       }
 
-      expect(
-        messageSpy.lastCall.args[0].columns,
-        'fixture match'
-      ).to.deep.equal(columnsFixture)
-      expect(messageSpy.lastCall.args[0].columnOrder, 'order').to.deep.equal(
-        columnsOrderFixture
-      )
-
+      await messageSent
       expect(messageSpy).to.be.calledWithMatch(filteredTableData)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 

@@ -43,7 +43,7 @@ export const mockDisposable = {
   dispose: stub()
 } as Disposable
 
-export const extensionUri = Uri.file(resolve(__dirname, '..', '..', '..'))
+const extensionUri = Uri.file(resolve(__dirname, '..', '..', '..'))
 
 export const configurationChangeEvent = (
   option: string,
@@ -327,6 +327,17 @@ export const waitForEditorText = async (): Promise<unknown> => {
     return
   }
   return waitForEditorText()
+}
+
+export const waitForSpyCall = async (
+  messageSpy: SinonSpy,
+  originalCallCount: number
+): Promise<unknown> => {
+  await Time.delay(500)
+  if (messageSpy.callCount > originalCallCount) {
+    return
+  }
+  return waitForSpyCall(messageSpy, originalCallCount)
 }
 
 export const getActiveEditorUpdatedEvent = (disposer: Disposer) =>

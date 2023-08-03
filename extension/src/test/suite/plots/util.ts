@@ -151,6 +151,7 @@ export const buildPlotsWebview = async ({
   expShow = expShowFixtureWithoutErrors,
   gitLog = gitLogFixture,
   plotsDiff = undefined,
+  selectedExperiments,
   rowOrder
 }: {
   availableNbCommits?: { [branch: string]: number }
@@ -158,11 +159,13 @@ export const buildPlotsWebview = async ({
   expShow?: ExpShowOutput
   gitLog?: string
   plotsDiff?: PlotsOutput | undefined
+  selectedExperiments?: string[]
   rowOrder?: { branch: string; sha: string }[]
 }) => {
   const {
     data,
     experiments,
+    experimentsModel,
     pathsModel,
     plots,
     plotsModel,
@@ -176,6 +179,11 @@ export const buildPlotsWebview = async ({
     plotsDiff,
     rowOrder
   })
+  if (selectedExperiments) {
+    experimentsModel.setSelected(
+      selectedExperiments.map(id => ({ id }) as Experiment)
+    )
+  }
 
   const webview = await plots.showWebview()
   await webview.isReady()
@@ -189,6 +197,7 @@ export const buildPlotsWebview = async ({
   return {
     data,
     experiments,
+    experimentsModel,
     messageSpy: instanceMessageSpy,
     mockMessageReceived,
     mockPlotsDiff,
