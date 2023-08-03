@@ -5,7 +5,8 @@ import { Header } from '@tanstack/react-table'
 import cx from 'classnames'
 import { useInView } from 'react-intersection-observer'
 import { TableHeaderCellContents } from './TableHeaderCellContents'
-import { ContextMenuContent, getMenuOptions } from './ContextMenuContent'
+import { ContextMenuContent } from './ContextMenuContent'
+import { getSortDetails } from './util'
 import styles from '../styles.module.scss'
 import { isExperimentColumn, isFirstLevelHeader } from '../../../util/columns'
 import { ExperimentsState } from '../../../store'
@@ -80,7 +81,6 @@ const WithExpColumnNeedsShadowUpdates: React.FC<{
 
 export const TableHeaderCell: React.FC<{
   header: Header<Experiment, unknown>
-  hasFilter: boolean
   onDragEnter: DragFunction
   onDragEnd: DragFunction
   onDragStart: DragFunction
@@ -91,7 +91,6 @@ export const TableHeaderCell: React.FC<{
   onlyOneLine?: boolean
 }> = ({
   header,
-  hasFilter,
   onDragEnter,
   onDragEnd,
   onDragStart,
@@ -111,12 +110,16 @@ export const TableHeaderCell: React.FC<{
   const headerDropTargetId = useSelector(
     (state: ExperimentsState) => state.headerDropTarget
   )
-  const { sorts } = useSelector((state: ExperimentsState) => state.tableData)
+  const { filters, sorts } = useSelector(
+    (state: ExperimentsState) => state.tableData
+  )
 
   const { isSortable, sortOrder } = useMemo(() => {
-    return getMenuOptions(header, sorts)
+    return getSortDetails(header, sorts)
   }, [header, sorts])
   const isDraggable = !isPlaceholder && !isExperimentColumn(id)
+
+  const hasFilter = !!(header.id && filters.includes(header.id))
 
   const canResize = getCanResize() && !isPlaceholder
   const resizerHeight = calcResizerHeight(header)
