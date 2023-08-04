@@ -91,6 +91,7 @@ import { Toast } from '../../../vscode/toast'
 import { Response } from '../../../vscode/response'
 import { MAX_SELECTED_EXPERIMENTS } from '../../../experiments/model/status'
 import { Pipeline } from '../../../pipeline'
+import { ColumnLike } from '../../../experiments/columns/like'
 
 const { openFileInEditor } = FileSystem
 
@@ -1473,6 +1474,76 @@ suite('Experiments Test Suite', () => {
       expect(mockUpdateExperimentsData).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should handle a message to add a filter', async () => {
+      const { experiments, mockMessageReceived } =
+        await buildExperimentsWebview({
+          disposer: disposable
+        })
+
+      const path = buildMetricOrParamPath(
+        ColumnType.PARAMS,
+        'params.yaml',
+        'learning_rate'
+      )
+
+      const mockPickFilter = stub(FilterQuickPicks, 'pickFilterToAdd').resolves(
+        {
+          operator: Operator.EQUAL,
+          path,
+          value: 1
+        }
+      )
+
+      const filterUpdated = experimentsUpdatedEvent(experiments)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.FILTER_COLUMN,
+        payload: path
+      })
+
+      await filterUpdated
+
+      expect(mockPickFilter).to.be.calledOnce
+      expect(mockPickFilter).to.be.calledWithMatch({
+        path,
+        firstValueType: 'number'
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a message to remove all filters for a path', async () => {
+      const { experiments, experimentsModel, mockMessageReceived } =
+        await buildExperimentsWebview({
+          disposer: disposable
+        })
+
+      const path = buildMetricOrParamPath(
+        ColumnType.PARAMS,
+        'params.yaml',
+        'learning_rate'
+      )
+
+      experimentsModel.addFilter({
+        path,
+        operator: Operator.GREATER_THAN,
+        value: 0.1
+      })
+
+      experimentsModel.addFilter({
+        path,
+        operator: Operator.LESS_THAN,
+        value: 100
+      })
+
+      expect(experiments.getFilters()).to.have.lengthOf(2)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.REMOVE_COLUMN_FILTERS,
+        payload: path
+      })
+
+      expect(experiments.getFilters()).to.have.lengthOf(0)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should handle a message to refresh the exp show data', async () => {
       const { mockMessageReceived, mockUpdateExperimentsData } =
         await buildExperimentsWebview({
@@ -1640,6 +1711,16 @@ suite('Experiments Test Suite', () => {
       secondSortDefinition
     ]
 
+    const firstFilterPath = buildMetricOrParamPath(
+      ColumnType.PARAMS,
+      'params.yaml',
+      'test'
+    )
+    const firstFilterColumn: ColumnLike = {
+      firstValueType: 'number',
+      label: 'test',
+      path: firstFilterPath
+    }
     const firstFilterId = buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -1647,7 +1728,7 @@ suite('Experiments Test Suite', () => {
     )
     const firstFilterDefinition = {
       operator: Operator.EQUAL,
-      path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'test'),
+      path: firstFilterPath,
       value: 1
     }
     const secondFilterId = buildMetricOrParamPath(
@@ -1655,9 +1736,21 @@ suite('Experiments Test Suite', () => {
       'params.yaml',
       'other∈testcontains'
     )
+
+    const secondFilterPath = buildMetricOrParamPath(
+      ColumnType.PARAMS,
+      'params.yaml',
+      'other'
+    )
+    const secondFilterColumn: ColumnLike = {
+      firstValueType: 'string',
+      label: 'test',
+      path: secondFilterPath
+    }
+
     const secondFilterDefinition = {
       operator: Operator.CONTAINS,
-      path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'other'),
+      path: secondFilterPath,
       value: 'testcontains'
     }
     const firstFilterMapEntry: [string, FilterDefinition] = [
@@ -1751,8 +1844,10 @@ suite('Experiments Test Suite', () => {
         'second sort is added to the memento'
       ).to.deep.equal(sortDefinitions)
 
+      const mockPickColumn = stub(FilterQuickPicks, 'pickColumnToFilter')
       const mockPickFilter = stub(FilterQuickPicks, 'pickFilterToAdd')
 
+      mockPickColumn.onFirstCall().resolves(firstFilterColumn)
       mockPickFilter.onFirstCall().resolves(firstFilterDefinition)
       await testRepository.addFilter()
       expect(
@@ -1760,6 +1855,7 @@ suite('Experiments Test Suite', () => {
         'first filter should be added to memento after addFilter'
       ).to.deep.equal([firstFilterMapEntry])
 
+      mockPickColumn.onSecondCall().resolves(secondFilterColumn)
       mockPickFilter.onSecondCall().resolves(secondFilterDefinition)
       await testRepository.addFilter()
       expect(
@@ -1788,6 +1884,8 @@ suite('Experiments Test Suite', () => {
         'all sorts should be removed from memento after removeSorts'
       ).to.deep.equal([])
 
+      mockPickColumn.reset()
+      mockPickColumn.onFirstCall().resolves(firstFilterColumn)
       mockPickFilter.reset()
       mockPickFilter.onFirstCall().resolves(firstFilterDefinition)
       await testRepository.addFilter()

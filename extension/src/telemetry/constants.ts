@@ -37,6 +37,7 @@ export const EventName = Object.assign(
       'views.experimentTable.toggleStars',
     VIEWS_EXPERIMENTS_TABLE_EXPERIMENT_TOGGLE:
       'views.experimentTable.toggleStatus',
+    VIEWS_EXPERIMENTS_TABLE_FILTER_COLUMN: 'views.experimentTable.filterColumn',
     VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED:
       'views.experimentsTable.focusChanged',
     VIEWS_EXPERIMENTS_TABLE_FOCUS_FILTERS_TREE:
@@ -49,6 +50,8 @@ export const EventName = Object.assign(
     VIEWS_EXPERIMENTS_TABLE_OPEN_PARAMS_FILE:
       'views.experimentsTable.paramsFileOpened',
     VIEWS_EXPERIMENTS_TABLE_REFRESH: 'views.experimentsTable.refresh',
+    VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_FILTER:
+      'views.experimentsTable.removeColumnFilter',
     VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_SORT:
       'views.experimentsTable.columnSortRemoved',
     VIEWS_EXPERIMENTS_TABLE_RESET_COMMITS:
@@ -252,6 +255,8 @@ export interface IEventNamePropertyMapping {
   }
   [EventName.VIEWS_EXPERIMENTS_TABLE_RESET_COMMITS]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_CREATED]: undefined
+  [EventName.VIEWS_EXPERIMENTS_TABLE_FILTER_COLUMN]: undefined
+  [EventName.VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_FILTER]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED]: WebviewFocusChangedProperties
   [EventName.VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN_PATH]: {
     path: string

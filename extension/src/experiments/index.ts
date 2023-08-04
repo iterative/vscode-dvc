@@ -7,7 +7,7 @@ import {
   workspace
 } from 'vscode'
 import omit from 'lodash.omit'
-import { addStarredToColumns } from './columns/like'
+import { ColumnLike, addStarredToColumns } from './columns/like'
 import { setContextForEditorTitleIcons } from './context'
 import { ExperimentsModel } from './model'
 import {
@@ -17,6 +17,7 @@ import {
 } from './model/quickPick'
 import { pickAndModifyParams } from './model/modify/quickPick'
 import {
+  pickColumnToFilter,
   pickFilterToAdd,
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
@@ -302,11 +303,13 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getFilters()
   }
 
-  public async addFilter() {
-    const columns = this.columns.getTerminalNodes()
-    const columnLikes = addStarredToColumns(columns)
+  public async addFilter(overrideColumn?: ColumnLike) {
+    const column = await this.pickColumnToFilter(overrideColumn)
+    if (!column) {
+      return
+    }
 
-    const filterToAdd = await pickFilterToAdd(columnLikes)
+    const filterToAdd = await pickFilterToAdd(column)
     if (!filterToAdd) {
       return
     }
@@ -624,6 +627,7 @@ export class Experiments extends BaseRepository<TableData> {
       () => this.selectColumns(),
       () => this.selectFirstColumns(),
       (branchesSelected: string[]) => this.selectBranches(branchesSelected),
+      (column: ColumnLike) => this.addFilter(column),
       () => this.data.update()
     )
 
@@ -686,5 +690,14 @@ export class Experiments extends BaseRepository<TableData> {
     if (response === Response.NEVER) {
       return setUserConfigValue(ConfigKey.DO_NOT_INFORM_MAX_PLOTTED, true)
     }
+  }
+
+  private pickColumnToFilter(overrideColumn?: ColumnLike) {
+    if (overrideColumn) {
+      return overrideColumn
+    }
+    const columns = this.columns.getTerminalNodes()
+    const columnLikes = addStarredToColumns(columns)
+    return pickColumnToFilter(columnLikes)
   }
 }

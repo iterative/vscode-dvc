@@ -50,12 +50,28 @@ interface HeaderMenuProps {
   header: Header<Experiment, unknown>
 }
 
+const getFilterDetails = (
+  header: Header<Experiment, unknown>,
+  filters: string[]
+) => {
+  const id = header.column.id
+
+  const canFilter =
+    !isFromExperimentColumn(header) &&
+    header.column.columns.length <= 1 &&
+    !id.startsWith(ColumnType.DEPS)
+
+  return { canFilter, isFiltered: filters.includes(id) }
+}
+
 const getMenuOptions = (
   header: Header<Experiment, unknown>,
+  filters: string[],
   sorts: SortDefinition[]
 ): MessagesMenuOptionProps[] => {
   const leafColumn = header.column
   const { id, isSortable, sortOrder } = getSortDetails(header, sorts)
+  const { canFilter, isFiltered } = getFilterDetails(header, filters)
 
   return [
     {
@@ -109,6 +125,25 @@ const getMenuOptions = (
         type: MessageFromWebviewType.SELECT_FIRST_COLUMNS
       }
     },
+    {
+      disabled: !canFilter,
+      divider: true,
+      id: 'add-column-filter',
+      label: 'Filter By',
+      message: {
+        payload: leafColumn.id,
+        type: MessageFromWebviewType.FILTER_COLUMN
+      }
+    },
+    {
+      disabled: !(canFilter && isFiltered),
+      id: 'remove-column-filter',
+      label: 'Remove Filter(s)',
+      message: {
+        payload: leafColumn.id,
+        type: MessageFromWebviewType.REMOVE_COLUMN_FILTERS
+      }
+    },
     sortOption(SortOrder.ASCENDING, sortOrder, id, isSortable, true),
     sortOption(SortOrder.DESCENDING, sortOrder, id, isSortable),
     sortOption(SortOrder.NONE, sortOrder, id, isSortable)
@@ -116,11 +151,13 @@ const getMenuOptions = (
 }
 
 export const ContextMenuContent: React.FC<HeaderMenuProps> = ({ header }) => {
-  const { sorts } = useSelector((state: ExperimentsState) => state.tableData)
+  const { filters, sorts } = useSelector(
+    (state: ExperimentsState) => state.tableData
+  )
 
   const menuOptions = useMemo(() => {
-    return getMenuOptions(header, sorts)
-  }, [header, sorts])
+    return getMenuOptions(header, filters, sorts)
+  }, [header, filters, sorts])
 
   return <MessagesMenu options={menuOptions} />
 }
