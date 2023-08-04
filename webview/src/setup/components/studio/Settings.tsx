@@ -18,29 +18,29 @@ export const Settings: React.FC<{
     <EmptyState isFullScreen={false}>
       <div>
         <h1>Studio Settings</h1>
-        <p>
-          Experiment metrics and plots logged with DVCLive <br />
-          can be{' '}
-          <a href="https://dvc.org/doc/studio/user-guide/projects-and-experiments/live-metrics-and-plots#send-and-view-live-metrics-and-plots">
-            automatically shared to Studio
-          </a>
-          .
-        </p>
-        <p>
-          <VSCodeCheckbox
-            onClick={() => setShareLiveToStudio(!shareLiveToStudio)}
-            checked={shareLiveToStudio}
-          >
-            Share New Experiments Live*
-          </VSCodeCheckbox>
-        </p>
-        <p className={styles.smallFont}>
-          *The checkbox reflects the{' '}
-          <a href="https://dvc.org/doc/user-guide/project-structure/configuration#studio">
-            studio.offline
-          </a>{' '}
-          config option.
-        </p>
+        <div className={styles.studioSettings}>
+          <div className={styles.checkboxWrapper}>
+            <VSCodeCheckbox
+              onClick={() => setShareLiveToStudio(!shareLiveToStudio)}
+              checked={shareLiveToStudio}
+              className={styles.checkbox}
+            >
+              <p>Share Experiments</p>
+            </VSCodeCheckbox>
+            <p className={styles.checkboxDescription}>
+              Toggling the checkbox updates the{' '}
+              <a href="https://dvc.org/doc/user-guide/project-structure/configuration#studio">
+                studio.offline
+              </a>{' '}
+              config option. Experiment metrics and plots logged with DVCLive
+              are{' '}
+              <a href="https://dvc.org/doc/studio/user-guide/projects-and-experiments/live-metrics-and-plots#send-and-view-live-metrics-and-plots">
+                automatically shared to Studio
+              </a>{' '}
+              unless studio.offline is set.
+            </p>
+          </div>
+        </div>
         <Button
           appearance="primary"
           isNested={false}

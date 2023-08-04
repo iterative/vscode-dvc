@@ -15,7 +15,8 @@ export const DVCLIVE_ONLY_RUNNING_SIGNAL_FILE = join(
 )
 export const EXP_RWLOCK_FILE = join(TEMP_EXP_DIR, 'rwlock.lock')
 
-export const DEFAULT_NUM_OF_COMMITS_TO_SHOW = 3
+export const DEFAULT_CURRENT_BRANCH_COMMITS_TO_SHOW = 3
+export const DEFAULT_OTHER_BRANCH_COMMITS_TO_SHOW = 1
 export const NUM_OF_COMMITS_TO_INCREASE = 2
 
 export const MULTI_IMAGE_PATH_REG = /[^/]+[/\\]\d+\.[a-z]+$/i

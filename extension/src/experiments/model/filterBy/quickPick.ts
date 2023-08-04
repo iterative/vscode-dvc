@@ -22,6 +22,12 @@ export const OPERATORS = [
     value: Operator.NOT_EQUAL
   },
   {
+    description: 'Not Missing',
+    label: Operator.NOT_MISSING,
+    types: ['string', 'boolean', 'number'],
+    value: Operator.NOT_MISSING
+  },
+  {
     description: 'Is true',
     label: Operator.IS_TRUE,
     types: ['boolean'],
@@ -119,8 +125,9 @@ export const pickFilterToAdd = async (
     return
   }
 
-  const typedOperators = OPERATORS.filter(operator =>
-    operator.types.some(type => picked.types?.includes(type))
+  const typedOperators = OPERATORS.filter(
+    operator =>
+      picked.firstValueType && operator.types.includes(picked.firstValueType)
   )
 
   const operator = await quickPickValue<Operator>(typedOperators, {
@@ -130,7 +137,11 @@ export const pickFilterToAdd = async (
     return
   }
 
-  if ([Operator.IS_TRUE, Operator.IS_FALSE].includes(operator)) {
+  if (
+    [Operator.IS_TRUE, Operator.IS_FALSE, Operator.NOT_MISSING].includes(
+      operator
+    )
+  ) {
     return {
       operator,
       path: picked.path,

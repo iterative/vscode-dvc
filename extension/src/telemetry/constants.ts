@@ -43,12 +43,16 @@ export const EventName = Object.assign(
       'views.experimentsTable.focusFiltersTree',
     VIEWS_EXPERIMENTS_TABLE_FOCUS_SORTS_TREE:
       'views.experimentsTable.focusSortsTree',
-    VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN: 'views.experimentsTable.columnHidden',
+    VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN_PATH:
+      'views.experimentsTable.hideColumnPath',
+    VIEWS_EXPERIMENTS_TABLE_MOVE_TO_START: 'views.experimentsTable.moveToStart',
     VIEWS_EXPERIMENTS_TABLE_OPEN_PARAMS_FILE:
       'views.experimentsTable.paramsFileOpened',
     VIEWS_EXPERIMENTS_TABLE_REFRESH: 'views.experimentsTable.refresh',
     VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_SORT:
       'views.experimentsTable.columnSortRemoved',
+    VIEWS_EXPERIMENTS_TABLE_RESET_COMMITS:
+      'views.experimentsTable.resetCommits',
     VIEWS_EXPERIMENTS_TABLE_RESIZE_COLUMN:
       'views.experimentsTable.columnResized',
     VIEWS_EXPERIMENTS_TABLE_SELECT_BRANCHES:
@@ -57,6 +61,9 @@ export const EventName = Object.assign(
       'views.experimentsTable.selectColumns',
     VIEWS_EXPERIMENTS_TABLE_SELECT_EXPERIMENTS_FOR_PLOTS:
       'views.experimentsTable.selectExperimentsForPlots',
+    VIEWS_EXPERIMENTS_TABLE_SELECT_FIRST_COLUMNS:
+      'views.experimentsTable.selectFirstColumns',
+
     VIEWS_EXPERIMENTS_TABLE_SET_MAX_HEADER_HEIGHT:
       'views.experimentsTable.updateHeaderMaxHeight',
     VIEWS_EXPERIMENTS_TABLE_SHOW_LESS_COMMITS:
@@ -65,6 +72,8 @@ export const EventName = Object.assign(
       'views.experimentsTable.showMoreCommits',
     VIEWS_EXPERIMENTS_TABLE_SORT_COLUMN:
       'views.experimentsTable.columnSortAdded',
+    VIEWS_EXPERIMENTS_TABLE_TOGGLE_SHOW_ONLY_CHANGED:
+      'views.experimentsTable.toggleShowOnlyChanged',
 
     VIEWS_PLOTS_CLOSED: 'views.plots.closed',
     VIEWS_PLOTS_COMPARISON_ROWS_REORDERED:
@@ -73,6 +82,7 @@ export const EventName = Object.assign(
     VIEWS_PLOTS_EXPERIMENT_TOGGLE: 'views.plots.toggleExperimentStatus',
     VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_CSV: 'views.plots.exportPlotDataAsCsv',
     VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_JSON: 'views.plots.exportPlotDataAsJson',
+    VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_TSV: 'views.plots.exportPlotDataAsTsv',
     VIEWS_PLOTS_FOCUS_CHANGED: 'views.plots.focusChanged',
     VIEWS_PLOTS_REVISIONS_REORDERED: 'views.plots.revisionsReordered',
     VIEWS_PLOTS_SECTION_RESIZED: 'views.plots.sectionResized',
@@ -130,6 +140,7 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_APPLY]: undefined
   [EventName.EXPERIMENT_BRANCH]: undefined
   [EventName.EXPERIMENT_COLUMNS_SELECT]: undefined
+  [EventName.EXPERIMENT_COLUMNS_SELECT_FIRST]: undefined
   [EventName.EXPERIMENT_FILTER_ADD]: undefined
   [EventName.EXPERIMENT_FILTER_ADD_STARRED]: undefined
   [EventName.EXPERIMENT_FILTER_REMOVE]: undefined
@@ -239,21 +250,25 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_SORT]: {
     path: string
   }
+  [EventName.VIEWS_EXPERIMENTS_TABLE_RESET_COMMITS]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_CREATED]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED]: WebviewFocusChangedProperties
-  [EventName.VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN]: {
+  [EventName.VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN_PATH]: {
     path: string
   }
+  [EventName.VIEWS_EXPERIMENTS_TABLE_MOVE_TO_START]: { path: string }
   [EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_BRANCHES]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_COLUMNS]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_EXPERIMENTS_FOR_PLOTS]: {
     experimentCount: number
   }
+  [EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_FIRST_COLUMNS]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_SHOW_MORE_COMMITS]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_SHOW_LESS_COMMITS]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_OPEN_PARAMS_FILE]: {
     path: string
   }
+  [EventName.VIEWS_EXPERIMENTS_TABLE_TOGGLE_SHOW_ONLY_CHANGED]: undefined
 
   [EventName.VIEWS_PLOTS_CLOSED]: undefined
   [EventName.VIEWS_PLOTS_CREATED]: undefined
@@ -271,6 +286,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_EXPERIMENT_TOGGLE]: undefined
   [EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_CSV]: undefined
   [EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_JSON]: undefined
+  [EventName.VIEWS_PLOTS_EXPORT_PLOT_DATA_AS_TSV]: undefined
 
   [EventName.VIEWS_PLOTS_ZOOM_PLOT]: { isImage: boolean }
   [EventName.VIEWS_REORDER_PLOTS_CUSTOM]: undefined

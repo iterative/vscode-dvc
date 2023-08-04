@@ -1,7 +1,8 @@
+import { join } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { ColumnsModel } from './model'
 import { appendColumnToPath, buildMetricOrParamPath } from './paths'
-import { timestampColumn } from './constants'
+import { EXPERIMENT_COLUMN_ID, timestampColumn } from './constants'
 import { buildMockMemento } from '../../test/util'
 import { generateTestExpShowOutput } from '../../test/util/experiments'
 import { Status } from '../../path/selection/model'
@@ -133,6 +134,7 @@ describe('ColumnsModel', () => {
     )
     await model.transformAndSet(deeplyNestedOutputFixture)
     expect(mockedGetConfigValue).toHaveBeenCalled()
+
     expect(model.getSelected()).toStrictEqual(deeplyNestedColumnsWithHeightOf1)
   })
 
@@ -203,14 +205,13 @@ describe('ColumnsModel', () => {
           type: ColumnType.PARAMS
         },
         {
+          firstValueType: 'boolean',
           hasChildren: false,
           label: 'testParam',
-          maxStringLength: 4,
           parentPath: paramsDotYamlPath,
           path: testParamPath,
           pathArray: [ColumnType.PARAMS, 'params.yaml', 'testParam'],
-          type: ColumnType.PARAMS,
-          types: ['boolean']
+          type: ColumnType.PARAMS
         }
       ])
     })
@@ -258,7 +259,7 @@ describe('ColumnsModel', () => {
       expect(model.getColumnOrder()).toStrictEqual(persistedState)
     })
 
-    it('should return the first three visible columns for both metrics and params from the persisted state', async () => {
+    it('should return the first three visible columns for both metrics and params from the persisted state (first)', async () => {
       const persistedState = [
         'id',
         'Created',
@@ -287,7 +288,8 @@ describe('ColumnsModel', () => {
         'params:params.yaml:process.threshold',
         'params:params.yaml:process.test_arg',
         'metrics:summary.json:loss',
-        'metrics:summary.json:accuracy'
+        'metrics:summary.json:accuracy',
+        'metrics:summary.json:val_accuracy'
       ])
 
       model.toggleStatus('params:params.yaml:dvc_logs_dir')
@@ -297,8 +299,63 @@ describe('ColumnsModel', () => {
         'params:params.yaml:process.test_arg',
         'params:params.yaml:dropout',
         'metrics:summary.json:loss',
-        'metrics:summary.json:accuracy'
+        'metrics:summary.json:accuracy',
+        'metrics:summary.json:val_accuracy'
       ])
+    })
+
+    it('should not add a param that is no longer present to the summary column order', async () => {
+      const persistedState = [
+        'id',
+        'Created',
+        'params:params.yaml:an-old-params'
+      ]
+
+      const model = new ColumnsModel(
+        exampleDvcRoot,
+        buildMockMemento({
+          [PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER + exampleDvcRoot]:
+            persistedState
+        }),
+        mockedColumnsOrderOrStatusChanged
+      )
+      model.toggleStatus('params:params.yaml:an-old-params')
+      await model.transformAndSet(outputFixture)
+
+      expect(model.getSummaryColumnOrder()).toStrictEqual([
+        join('params:nested', 'params.yaml:test'),
+        'params:params.yaml:code_names',
+        'params:params.yaml:dropout',
+        'metrics:summary.json:accuracy',
+        'metrics:summary.json:loss',
+        'metrics:summary.json:val_accuracy'
+      ])
+    })
+
+    it('should add to the persisted state when there are columns that were not found', async () => {
+      const persistedState = ['params:params.yaml:dvc_logs_dir']
+
+      const model = new ColumnsModel(
+        exampleDvcRoot,
+        buildMockMemento({
+          [PersistenceKey.METRICS_AND_PARAMS_COLUMN_ORDER + exampleDvcRoot]:
+            persistedState
+        }),
+        mockedColumnsOrderOrStatusChanged
+      )
+      await model.transformAndSet(outputFixture)
+
+      expect(model.getSummaryColumnOrder()).toStrictEqual([
+        'params:params.yaml:dvc_logs_dir',
+        join('params:nested', 'params.yaml:test'),
+        'params:params.yaml:code_names',
+        'metrics:summary.json:accuracy',
+        'metrics:summary.json:loss',
+        'metrics:summary.json:val_accuracy'
+      ])
+
+      const [id] = model.getColumnOrder()
+      expect(id).toStrictEqual(EXPERIMENT_COLUMN_ID)
     })
 
     it('should return the first three metric and param columns (none hidden) collected from data if state is empty', async () => {
@@ -310,23 +367,23 @@ describe('ColumnsModel', () => {
       await model.transformAndSet(outputFixture)
 
       expect(model.getSummaryColumnOrder()).toStrictEqual([
+        join('params:nested', 'params.yaml:test'),
         'params:params.yaml:code_names',
-        'params:params.yaml:epochs',
-        'params:params.yaml:learning_rate',
-        'metrics:summary.json:loss',
+        'params:params.yaml:dropout',
         'metrics:summary.json:accuracy',
-        'metrics:summary.json:val_loss'
+        'metrics:summary.json:loss',
+        'metrics:summary.json:val_accuracy'
       ])
 
       model.toggleStatus('params:params.yaml:code_names')
 
       expect(model.getSummaryColumnOrder()).toStrictEqual([
-        'params:params.yaml:epochs',
-        'params:params.yaml:learning_rate',
+        join('params:nested', 'params.yaml:test'),
+        'params:params.yaml:dropout',
         'params:params.yaml:dvc_logs_dir',
-        'metrics:summary.json:loss',
         'metrics:summary.json:accuracy',
-        'metrics:summary.json:val_loss'
+        'metrics:summary.json:loss',
+        'metrics:summary.json:val_accuracy'
       ])
     })
 

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore } from 'sinon'
-import { commands } from 'vscode'
+import { stub, restore, SinonStub } from 'sinon'
+import { QuickPickItem, commands, window } from 'vscode'
 import { Disposable } from '../../../../extension'
 import { WorkspaceExperiments } from '../../../../experiments/workspace'
 import { dvcDemoPath } from '../../../util'
@@ -10,9 +10,14 @@ import {
   appendColumnToPath,
   buildMetricOrParamPath
 } from '../../../../experiments/columns/paths'
-import { buildExperiments } from '../util'
+import { buildExperiments, stubWorkspaceExperimentsGetters } from '../util'
 import { Status } from '../../../../path/selection/model'
 import { ColumnType } from '../../../../experiments/webview/contract'
+import {
+  QuickPickItemWithValue,
+  QuickPickOptionsWithTitle
+} from '../../../../vscode/quickPick'
+import { Title } from '../../../../vscode/title'
 
 suite('Experiments Columns Tree Test Suite', () => {
   const paramsFile = 'params.yaml'
@@ -348,6 +353,83 @@ suite('Experiments Columns Tree Test Suite', () => {
         unselectedGrandParent?.status,
         'the grandparent is now unselected'
       ).to.equal(Status.UNSELECTED)
+    })
+
+    it('should be able to display selected columns first with dvc.views.experiments.selectFirstColumns', async () => {
+      const { experiments, columnsModel } =
+        stubWorkspaceExperimentsGetters(disposable)
+      await experiments.isReady()
+
+      const columnsOrder = columnsModel.getColumnOrder()
+
+      const firstColumns = []
+      const otherColumns = []
+      for (const column of columnsOrder) {
+        if (column === 'id') {
+          continue
+        }
+        if (
+          [
+            'params:params.yaml:learning_rate',
+            'params:params.yaml:dvc_logs_dir'
+          ].includes(column)
+        ) {
+          firstColumns.push(column)
+          continue
+        }
+        otherColumns.push(column)
+      }
+
+      const mockShowQuickPick = (
+        stub(window, 'showQuickPick') as SinonStub<
+          [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
+          Thenable<QuickPickItemWithValue<{ path: string }>[] | undefined>
+        >
+      ).resolves(
+        firstColumns.map(
+          path =>
+            ({
+              label: path,
+              value: { path }
+            }) as QuickPickItemWithValue<{ path: string }>
+        )
+      )
+
+      const orderUpdated = new Promise(resolve =>
+        disposable.track(
+          experiments.onDidChangeColumnOrderOrStatus(() => {
+            resolve(undefined)
+          })
+        )
+      )
+
+      await Promise.all([
+        commands.executeCommand(
+          RegisteredCommands.EXPERIMENT_COLUMNS_SELECT_FIRST
+        ),
+        orderUpdated
+      ])
+
+      expect(columnsModel.getColumnOrder()).to.deep.equal([
+        'id',
+        ...firstColumns,
+        ...otherColumns
+      ])
+
+      expect(mockShowQuickPick).to.be.calledWithExactly(
+        columnsModel.getTerminalNodes().map(column => ({
+          description: '$(eye)',
+          label: column.path,
+          picked: false,
+          value: column
+        })),
+        {
+          canPickMany: true,
+          matchOnDescription: true,
+          matchOnDetail: true,
+          title: Title.SELECT_FIRST_COLUMNS
+        }
+      )
     })
   })
 })

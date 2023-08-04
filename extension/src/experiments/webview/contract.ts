@@ -1,7 +1,6 @@
-import { Executor, ExperimentStatus, ValueTree } from '../../cli/dvc/contract'
+import { Executor, ExecutorStatus, ValueTree } from '../../cli/dvc/contract'
 import { SortDefinition } from '../model/sortBy'
-
-export { ExperimentStatus } from '../../cli/dvc/contract'
+export { ExecutorStatus } from '../../cli/dvc/contract'
 
 export interface MetricOrParamColumns {
   [filename: string]: ValueTree
@@ -28,6 +27,12 @@ export type CommitData = {
   date: string
 }
 
+export enum GitRemoteStatus {
+  NOT_ON_REMOTE = 'not-on-remote',
+  PUSHING = 'pushing',
+  ON_REMOTE = 'on-remote'
+}
+
 export type Experiment = {
   commit?: CommitData
   Created?: string
@@ -41,36 +46,32 @@ export type Experiment = {
   metrics?: MetricOrParamColumns
   outs?: MetricOrParamColumns
   params?: MetricOrParamColumns
+  gitRemoteStatus?: GitRemoteStatus
   selected?: boolean
   sha?: string
   starred?: boolean
-  status?: ExperimentStatus
+  executorStatus?: ExecutorStatus
   timestamp?: string | null
-  branch?: string | undefined
+  branch?: string | typeof WORKSPACE_BRANCH
 }
 
-export const isRunning = (status: ExperimentStatus | undefined): boolean =>
-  status === ExperimentStatus.RUNNING
+export const isRunning = (
+  executorStatus: ExecutorStatus | undefined
+): boolean => executorStatus === ExecutorStatus.RUNNING
 
-export const isQueued = (status: ExperimentStatus | undefined): boolean =>
-  status === ExperimentStatus.QUEUED
+export const isQueued = (executorStatus: ExecutorStatus | undefined): boolean =>
+  executorStatus === ExecutorStatus.QUEUED
 
 export const isRunningInQueue = ({
-  status,
+  executorStatus,
   executor
 }: {
-  status?: ExperimentStatus
+  executorStatus?: ExecutorStatus
   executor?: string | null
-}): boolean => isRunning(status) && executor === Executor.DVC_TASK
+}): boolean => isRunning(executorStatus) && executor === Executor.DVC_TASK
 
 export interface Commit extends Experiment {
   subRows?: Experiment[]
-}
-
-export interface ColumnAggregateData {
-  maxStringLength?: number
-  maxNumber?: number
-  minNumber?: number
 }
 
 export enum ColumnType {
@@ -80,16 +81,18 @@ export enum ColumnType {
   TIMESTAMP = 'timestamp'
 }
 
-export interface Column extends ColumnAggregateData {
+export type Column = {
   hasChildren: boolean
   label: string
   parentPath?: string
   path: string
   pathArray?: string[]
   type: ColumnType
-  types?: string[]
+  firstValueType?: string
   width?: number
 }
+
+export const WORKSPACE_BRANCH = null
 
 export type TableData = {
   changes: string[]
@@ -106,6 +109,8 @@ export type TableData = {
   hasRunningWorkspaceExperiment: boolean
   isShowingMoreCommits: Record<string, boolean>
   rows: Commit[]
+  showOnlyChanged: boolean
+  selectedBranches: string[]
   selectedForPlotsCount: number
   sorts: SortDefinition[]
 }

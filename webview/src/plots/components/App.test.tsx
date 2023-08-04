@@ -1576,6 +1576,31 @@ describe('App', () => {
     })
   })
 
+  it('should add a "save as tsv" action to zoomed in plot modal', async () => {
+    renderAppWithOptionalData({
+      template: complexTemplatePlotsFixture
+    })
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
+
+    fireEvent.click(plot)
+
+    const modal = screen.getByTestId('modal')
+
+    const customAction = await within(modal).findByText('Save as TSV')
+
+    expect(customAction).toBeInTheDocument()
+
+    fireEvent.click(customAction)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      payload: complexTemplatePlotsFixture.plots[0].entries[0].id,
+      type: MessageFromWebviewType.EXPORT_PLOT_DATA_AS_TSV
+    })
+  })
+
   it('should show a tooltip with the meaning of each plot section', () => {
     renderAppWithOptionalData({
       comparison: comparisonTableFixture,

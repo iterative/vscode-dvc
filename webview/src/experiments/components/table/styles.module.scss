@@ -30,6 +30,18 @@ $badge-size: 0.85rem;
   margin: 12px 6px;
 }
 
+%rowArrowContainer {
+  width: 20px;
+  height: 32px;
+  padding: 0;
+  flex: 0 0 20px;
+  right: 6px;
+  display: inline-block;
+  position: relative;
+  border: none;
+  background: none;
+}
+
 %truncateLeftParent {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -91,6 +103,16 @@ $badge-size: 0.85rem;
 
 %noSelect {
   user-select: none;
+}
+
+%iconBox {
+  background-color: $checkbox-background;
+  border-radius: $checkbox-border-radius;
+  border: $checkbox-border-width solid $checkbox-border;
+  cursor: pointer;
+  display: flex;
+  height: $checkbox-size;
+  width: $checkbox-size;
 }
 
 // Concrete selectors
@@ -185,6 +207,19 @@ $badge-size: 0.85rem;
 
   &:hover {
     background-color: $hover-background-color;
+  }
+}
+
+.onlyChanged {
+  background-color: $indicator-badge-background;
+
+  svg {
+    fill: $indicator-badge-foreground;
+  }
+
+  &:hover {
+    background-color: $indicator-badge-background !important;
+    opacity: 0.8;
   }
 }
 
@@ -638,14 +673,26 @@ $badge-size: 0.85rem;
 }
 
 .plotBox {
-  background-color: $checkbox-background;
-  border-radius: $checkbox-border-radius;
-  border: $checkbox-border-width solid $checkbox-border;
-  cursor: pointer;
-  display: flex;
-  height: $checkbox-size;
-  width: $checkbox-size;
+  @extend %iconBox;
+
   padding: 2px;
+}
+
+.cloudBox {
+  @extend %iconBox;
+
+  padding: 1px;
+
+  &[aria-disabled='true'] {
+    cursor: default;
+    opacity: 0.4;
+  }
+}
+
+.cloudIndicator {
+  height: 16px;
+  width: 16px;
+  margin-left: 2px;
 }
 
 .running {
@@ -654,6 +701,12 @@ $badge-size: 0.85rem;
   width: 12px;
   margin-right: 8px;
   margin-left: -20px;
+}
+
+.upload {
+  display: inline-flex;
+  margin-right: -18px;
+  transform: translateX(-24px);
 }
 
 .queued {
@@ -667,16 +720,15 @@ $badge-size: 0.85rem;
 }
 
 .rowArrowContainer {
-  width: 20px;
-  height: 32px;
-  padding: 0;
-  flex: 0 0 20px;
-  right: 6px;
-  display: inline-block;
-  position: relative;
-  border: none;
-  background: none;
+  @extend %rowArrowContainer;
+
   cursor: pointer;
+}
+
+.emptyRowArrowContainer {
+  @extend %rowArrowContainer;
+
+  cursor: default;
 }
 
 .expandedRowArrow {

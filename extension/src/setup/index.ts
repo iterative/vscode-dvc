@@ -91,6 +91,12 @@ export class Setup
   private readonly getExpShowError: () => string | undefined
   private readonly collectWorkspaceScale: () => Promise<WorkspaceScale>
 
+  private readonly setupRun: EventEmitter<void> = this.dispose.track(
+    new EventEmitter<void>()
+  )
+
+  private readonly onDidRunSetup: Event<void> = this.setupRun.event
+
   private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
     new EventEmitter()
   )
@@ -131,8 +137,17 @@ export class Setup
 
     this.status = status
 
-    this.initialize = initialize
-    this.resetMembers = resetMembers
+    this.initialize = async () => {
+      const result = initialize()
+      await experiments.isReady()
+      this.setupRun.fire()
+      return result
+    }
+    this.resetMembers = () => {
+      const result = resetMembers()
+      this.setupRun.fire()
+      return result
+    }
 
     this.collectWorkspaceScale = collectWorkspaceScale
 
@@ -148,15 +163,9 @@ export class Setup
     this.getHasData = () => experiments.getHasData()
     this.getExpShowError = () => experiments.getCliError()
     const onDidChangeHasData = experiments.columnsChanged.event
-    this.dispose.track(
-      onDidChangeHasData(() =>
-        Promise.all([
-          this.sendDataToWebview(),
-          setContextValue(ContextKey.PROJECT_HAS_DATA, this.getHasData())
-        ])
-      )
-    )
+    this.dispose.track(onDidChangeHasData(() => this.updateProjectHasData()))
 
+    this.watchSetupRun()
     this.dispose.track(this.onDidChangeWorkspace(() => run(this)))
     this.watchForVenvChanges()
     this.watchConfigurationDetailsForChanges()
@@ -727,6 +736,23 @@ export class Setup
     for (const workspaceFolder of getWorkspaceFolders()) {
       createWatcher(workspaceFolder)
     }
+  }
+
+  private watchSetupRun() {
+    const onDidRunSetup = this.setupRun.event
+    this.dispose.track(
+      onDidRunSetup(() => {
+        this.deferred.resolve()
+        return this.updateProjectHasData()
+      })
+    )
+  }
+
+  private updateProjectHasData() {
+    return Promise.all([
+      this.sendDataToWebview(),
+      setContextValue(ContextKey.PROJECT_HAS_DATA, this.getHasData())
+    ])
   }
 
   private async setStudioValues() {

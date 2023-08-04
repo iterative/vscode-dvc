@@ -27,13 +27,13 @@ import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ColumnsModel } from './columns/model'
 import { ExperimentsData } from './data'
 import { stopWorkspaceExperiment } from './processExecution'
-import { Experiment, ColumnType, TableData } from './webview/contract'
+import { Experiment, ColumnType, TableData, Column } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { DecorationProvider } from './model/decorationProvider'
 import { starredFilter } from './model/filterBy/constants'
 import { ResourceLocator } from '../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { ExperimentsOutput } from '../data'
+import { ExperimentsOutput, isRemoteExperimentsOutput } from '../data'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Title } from '../vscode/title'
@@ -45,6 +45,7 @@ import { checkSignalFile, pollSignalFileForProcess } from '../fileSystem'
 import { DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
 import { Response } from '../vscode/response'
 import { Pipeline } from '../pipeline'
+import { definedAndNonEmpty } from '../util/array'
 
 export const ExperimentsScale = {
   ...omit(ColumnType, 'TIMESTAMP'),
@@ -172,17 +173,20 @@ export class Experiments extends BaseRepository<TableData> {
     return this.data.managedUpdate()
   }
 
-  public async setState({
-    availableNbCommits,
-    expShow,
-    gitLog,
-    rowOrder
-  }: ExperimentsOutput) {
+  public async setState(data: ExperimentsOutput) {
+    if (isRemoteExperimentsOutput(data)) {
+      const { remoteExpRefs } = data
+      this.experiments.transformAndSetRemote(remoteExpRefs)
+      return this.webviewMessages.sendWebviewMessage()
+    }
+
+    const { expShow, gitLog, rowOrder, availableNbCommits } = data
+
     const hadCheckpoints = this.hasCheckpoints()
     const dvcLiveOnly = await this.checkSignalFile()
     await Promise.all([
       this.columns.transformAndSet(expShow),
-      this.experiments.transformAndSet(
+      this.experiments.transformAndSetLocal(
         expShow,
         gitLog,
         dvcLiveOnly,
@@ -198,6 +202,17 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
+  public setPushing(ids: string[]) {
+    this.experiments.setPushing(ids)
+    return this.notifyChanged()
+  }
+
+  public async unsetPushing(ids: string[]) {
+    await this.update()
+    this.experiments.unsetPushing(ids)
+    return this.notifyChanged()
+  }
+
   public hasCheckpoints() {
     return this.experiments.hasCheckpoints()
   }
@@ -209,7 +224,7 @@ export class Experiments extends BaseRepository<TableData> {
   public toggleColumnStatus(path: string) {
     const status = this.columns.toggleStatus(path)
 
-    this.notifyColumnsChanged()
+    void this.notifyColumnsChanged()
 
     return status
   }
@@ -326,6 +341,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getFilteredCount()
   }
 
+  public getRecordCount() {
+    return this.experiments.getRecordCount()
+  }
+
   public getExperimentCount() {
     if (!this.columns.hasNonDefaultColumns()) {
       return 0
@@ -356,12 +375,33 @@ export class Experiments extends BaseRepository<TableData> {
   public async selectColumns() {
     const columns = this.columns.getTerminalNodes()
 
-    const selected = await pickPaths('columns', columns)
+    const selected = await pickPaths(columns, Title.SELECT_COLUMNS)
     if (!selected) {
       return
     }
 
     this.columns.setSelected(selected)
+    return this.notifyChanged()
+  }
+
+  public async selectFirstColumns() {
+    const columns = this.columns.getTerminalNodes()
+
+    const selected = await pickPaths<Column>(
+      columns,
+      Title.SELECT_FIRST_COLUMNS,
+      element => ({
+        description: element.selected ? '$(eye)' : '$(eye-closed)',
+        label: element.path,
+        picked: false,
+        value: element
+      })
+    )
+    if (!definedAndNonEmpty(selected)) {
+      return
+    }
+
+    this.columns.selectFirst(selected.map(({ path }) => path))
     return this.notifyChanged()
   }
 
@@ -545,7 +585,7 @@ export class Experiments extends BaseRepository<TableData> {
   private setupInitialData() {
     const waitForInitialData = this.dispose.track(
       this.onDidChangeExperiments(async () => {
-        await this.pipeline.isReady()
+        await Promise.all([this.data.isReady(), this.pipeline.isReady()])
         this.deferred.resolve()
         this.dispose.untrack(waitForInitialData)
         waitForInitialData.dispose()
@@ -565,7 +605,7 @@ export class Experiments extends BaseRepository<TableData> {
       this.experiments.getErrors()
     )
     this.experimentsChanged.fire()
-    this.notifyColumnsChanged()
+    void this.notifyColumnsChanged()
   }
 
   private notifyColumnsChanged() {
@@ -582,6 +622,7 @@ export class Experiments extends BaseRepository<TableData> {
       () => this.getWebview(),
       () => this.notifyChanged(),
       () => this.selectColumns(),
+      () => this.selectFirstColumns(),
       (branchesSelected: string[]) => this.selectBranches(branchesSelected),
       () => this.data.update()
     )

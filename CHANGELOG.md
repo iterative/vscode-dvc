@@ -2,6 +2,149 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.32] - 2023-08-03
+
+### 🐛 Bug Fixes
+
+- Fix plots not showing on first experiment run [#4412](https://github.com/iterative/vscode-dvc/pull/4412) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Update filter icon in experiment table column header cells [#4406](https://github.com/iterative/vscode-dvc/pull/4406) by [@mattseddon](https://github.com/mattseddon)
+- Refactor experiment table header context menu [#4407](https://github.com/iterative/vscode-dvc/pull/4407) by [@mattseddon](https://github.com/mattseddon)
+- Collect webview messages async [#4405](https://github.com/iterative/vscode-dvc/pull/4405) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (3.11.0) [#4413](https://github.com/iterative/vscode-dvc/pull/4413) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.0.31] - 2023-08-02
+
+### 🚀 New Features and Enhancements
+
+- Add toggle to show only changed columns in experiments table [#4402](https://github.com/iterative/vscode-dvc/pull/4402) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update config tests [#4400](https://github.com/iterative/vscode-dvc/pull/4400) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.0.30] - 2023-08-01
+
+### 🐛 Bug Fixes
+
+- Ensure experiment summary info (columns) is always available in the experiment table data [#4396](https://github.com/iterative/vscode-dvc/pull/4396) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Use instance spies to test plots webview messages [#4394](https://github.com/iterative/vscode-dvc/pull/4394) by [@mattseddon](https://github.com/mattseddon)
+- Improve collection of summary columns efficiency [#4391](https://github.com/iterative/vscode-dvc/pull/4391) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.0.29] - 2023-08-01
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.10.1) [#4382](https://github.com/iterative/vscode-dvc/pull/4382) by [@mattseddon](https://github.com/mattseddon)
+- Watch a small directory for testing purposes [#4385](https://github.com/iterative/vscode-dvc/pull/4385) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.0.28] - 2023-07-30
+
+### 🐛 Bug Fixes
+
+- Fix show setup/experiments on extension initialization [#4376](https://github.com/iterative/vscode-dvc/pull/4376) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Use instance spies to test experiments webview messages [#4375](https://github.com/iterative/vscode-dvc/pull/4375) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.0.27] - 2023-07-27
+
+### 🚀 New Features and Enhancements
+
+- Apply experiment table filters to commits [#4363](https://github.com/iterative/vscode-dvc/pull/4363) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Refactor experiment table branch data [#4364](https://github.com/iterative/vscode-dvc/pull/4364) by [@mattseddon](https://github.com/mattseddon)
+- Rename experiment status to executor status [#4359](https://github.com/iterative/vscode-dvc/pull/4359) by [@mattseddon](https://github.com/mattseddon)
+- Increase timeouts of webview tests [#4368](https://github.com/iterative/vscode-dvc/pull/4368) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (3.9.0) [#4369](https://github.com/iterative/vscode-dvc/pull/4369) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.0.26] - 2023-07-26
+
+### 🚀 New Features and Enhancements
+
+- Add reset number of commits to show for a branch button to experiments table [#4355](https://github.com/iterative/vscode-dvc/pull/4355) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Avoid reprocessing duplicate git log commits [#4356](https://github.com/iterative/vscode-dvc/pull/4356) by [@mattseddon](https://github.com/mattseddon)
+- Remove column merge logic [#4346](https://github.com/iterative/vscode-dvc/pull/4346) by [@mattseddon](https://github.com/mattseddon)
+- Improve performance of experiment column collection [#4353](https://github.com/iterative/vscode-dvc/pull/4353) by [@mattseddon](https://github.com/mattseddon)
+- Remove await from inside of loops [#4354](https://github.com/iterative/vscode-dvc/pull/4354) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.0.25] - 2023-07-25
+
+### 🚀 New Features and Enhancements
+
+- Show Experiment Remote Status [#4324](https://github.com/iterative/vscode-dvc/pull/4324) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Fix cloud icon alignment in experiments table [#4340](https://github.com/iterative/vscode-dvc/pull/4340) by [@mattseddon](https://github.com/mattseddon)
+- Disable exp push when experiment is running in the workspace [#4343](https://github.com/iterative/vscode-dvc/pull/4343) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.7.0) [#4328](https://github.com/iterative/vscode-dvc/pull/4328) by [@mattseddon](https://github.com/mattseddon)
+- Run remote experiments data update in the background [#4342](https://github.com/iterative/vscode-dvc/pull/4342) by [@mattseddon](https://github.com/mattseddon)
+- Use trim and split util [#4339](https://github.com/iterative/vscode-dvc/pull/4339) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (3.8.1) [#4351](https://github.com/iterative/vscode-dvc/pull/4351) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.0.24] - 2023-07-20
+
+### 🚀 New Features and Enhancements
+
+- Update Studio settings section [#4312](https://github.com/iterative/vscode-dvc/pull/4312) by [@mattseddon](https://github.com/mattseddon)
+- Add shown/hidden indicator to select first column quick pick [#4314](https://github.com/iterative/vscode-dvc/pull/4314) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.6.0) [#4311](https://github.com/iterative/vscode-dvc/pull/4311) by [@mattseddon](https://github.com/mattseddon)
+- Rename select columns commands and events [#4315](https://github.com/iterative/vscode-dvc/pull/4315) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.0.23] - 2023-07-20
+
+### 🚀 New Features and Enhancements
+
+- Set default number of displayed commits to 1 for non-current branches in the experiments table [#4305](https://github.com/iterative/vscode-dvc/pull/4305) by [@mattseddon](https://github.com/mattseddon)
+- Add move to start option to experiment table header cell context menu [#4303](https://github.com/iterative/vscode-dvc/pull/4303) by [@mattseddon](https://github.com/mattseddon)
+- Add not missing filter for experiments table [#4308](https://github.com/iterative/vscode-dvc/pull/4308) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Add matchOnDetail and matchOnDescription to all quick picks [#4306](https://github.com/iterative/vscode-dvc/pull/4306) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Clean up hide column terminology [#4304](https://github.com/iterative/vscode-dvc/pull/4304) by [@mattseddon](https://github.com/mattseddon)
+- Standardise column like quick pick [#4307](https://github.com/iterative/vscode-dvc/pull/4307) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.0.22] - 2023-07-18
+
+### 🚀 New Features and Enhancements
+
+- Add columns indicator (select columns) to table indicators [#4293](https://github.com/iterative/vscode-dvc/pull/4293) by [@mattseddon](https://github.com/mattseddon)
+- Add select first experiment table columns quick pick [#4294](https://github.com/iterative/vscode-dvc/pull/4294) by [@mattseddon](https://github.com/mattseddon)
+- Add select column options to table header cell context menu [#4295](https://github.com/iterative/vscode-dvc/pull/4295) by [@mattseddon](https://github.com/mattseddon)
+
+## [1.0.21] - 2023-07-18
+
+### 🚀 New Features and Enhancements
+
+- Update copy in add stage component [#4292](https://github.com/iterative/vscode-dvc/pull/4292) by [@mattseddon](https://github.com/mattseddon)
+- Add "Save as TSV" option to plot modal [#4285](https://github.com/iterative/vscode-dvc/pull/4285) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Remove `dvc_data_version_info` from plot values [#4262](https://github.com/iterative/vscode-dvc/pull/4262) by [@julieg18](https://github.com/julieg18)
+
 ## [1.0.20] - 2023-07-17
 
 ### 🐛 Bug Fixes

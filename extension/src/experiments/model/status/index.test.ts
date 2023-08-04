@@ -1,7 +1,7 @@
 import { canSelect, limitToMaxSelected } from '.'
 import { copyOriginalColors } from './colors'
 import { Experiment } from '../../webview/contract'
-import { ExperimentStatus } from '../../../cli/dvc/contract'
+import { ExecutorStatus } from '../../../cli/dvc/contract'
 
 describe('canSelect', () => {
   const colors = copyOriginalColors()
@@ -51,9 +51,9 @@ describe('limitToMaxSelected', () => {
         ...mockedExperiments,
         {
           branch: 'main',
+          executorStatus: ExecutorStatus.RUNNING,
           id: '1',
-          label: 'R',
-          status: ExperimentStatus.RUNNING
+          label: 'R'
         }
       ])
         .map(({ label }) => label)

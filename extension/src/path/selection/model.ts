@@ -67,9 +67,21 @@ export abstract class PathSelectionModel<
   }
 
   protected setNewStatuses(data: { path: string }[]) {
+    const paths = new Set<string>()
     for (const { path } of data) {
       if (this.status[path] === undefined) {
         this.status[path] = Status.SELECTED
+      }
+      paths.add(path)
+    }
+
+    this.removeMissingSelected(paths)
+  }
+
+  private removeMissingSelected(paths: Set<string>) {
+    for (const [path, status] of Object.entries(this.status)) {
+      if (!paths.has(path) && status === Status.SELECTED) {
+        delete this.status[path]
       }
     }
   }

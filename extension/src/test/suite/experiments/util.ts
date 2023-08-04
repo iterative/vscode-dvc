@@ -1,22 +1,24 @@
-import { stub } from 'sinon'
+import { spy, stub } from 'sinon'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
 import expShowFixture from '../../fixtures/expShow/base/output'
 import gitLogFixture from '../../fixtures/expShow/base/gitLog'
 import rowOrderFixture from '../../fixtures/expShow/base/rowOrder'
+import remoteExpRefsFixture from '../../fixtures/expShow/base/remoteExpRefs'
 import { buildMockMemento, dvcDemoPath } from '../../util'
 import {
   buildDependencies,
   buildInternalCommands,
   buildMockExperimentsData,
+  getMessageReceivedEmitter,
   SafeWatcherDisposer
 } from '../util'
 import { ExperimentsData } from '../../../experiments/data'
 import * as Watcher from '../../../fileSystem/watcher'
 import { ExperimentsModel } from '../../../experiments/model'
 import { ColumnsModel } from '../../../experiments/columns/model'
-import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../../cli/dvc/constants'
+import { DEFAULT_CURRENT_BRANCH_COMMITS_TO_SHOW } from '../../../cli/dvc/constants'
 import { PersistenceKey } from '../../../persistence/constants'
 import { ExpShowOutput } from '../../../cli/dvc/contract'
 import { buildExperimentsPipeline } from '../pipeline/util'
@@ -34,6 +36,7 @@ export const buildExperiments = ({
   dvcRoot = dvcDemoPath,
   expShow = expShowFixture,
   gitLog = gitLogFixture,
+  remoteExpRefs = remoteExpRefsFixture,
   rowOrder = rowOrderFixture,
   stageList = 'train'
 }: {
@@ -42,6 +45,7 @@ export const buildExperiments = ({
   dvcRoot?: string
   expShow?: ExpShowOutput
   gitLog?: string
+  remoteExpRefs?: string
   rowOrder?: { branch: string; sha: string }[]
   stageList?: string | null
 }) => {
@@ -91,12 +95,15 @@ export const buildExperiments = ({
     )
   )
 
-  void experiments.setState({
-    availableNbCommits,
-    expShow,
-    gitLog,
-    rowOrder
-  })
+  void Promise.all([
+    experiments.setState({
+      availableNbCommits,
+      expShow,
+      gitLog,
+      rowOrder
+    }),
+    experiments.setState({ remoteExpRefs })
+  ])
 
   return {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any,
@@ -120,6 +127,36 @@ export const buildExperiments = ({
     mockUpdateExperimentsData,
     pipeline,
     resourceLocator
+  }
+}
+
+export const buildExperimentsWebview = async (inputs: {
+  availableNbCommits?: { [branch: string]: number }
+  disposer: Disposer
+  dvcRoot?: string
+  expShow?: ExpShowOutput
+  gitLog?: string
+  remoteExpRefs?: string
+  rowOrder?: { branch: string; sha: string }[]
+  stageList?: string | null
+}) => {
+  const all = buildExperiments(inputs)
+  const { experiments, messageSpy } = all
+  await experiments.isReady()
+  const webview = await experiments.showWebview()
+  await webview.isReady()
+  messageSpy.restore()
+  const instanceMessageSpy: typeof messageSpy = spy(webview, 'show')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (experiments as any).webviewMessages.sendWebviewMessage()
+
+  const mockMessageReceived = getMessageReceivedEmitter(webview)
+
+  return {
+    ...all,
+    messageSpy: instanceMessageSpy,
+    mockMessageReceived,
+    webview
   }
 }
 
@@ -226,6 +263,7 @@ export const buildExperimentsData = (
   stub(gitReader, 'getBranches').resolves([currentBranch, 'one'])
   stub(gitReader, 'getCommitMessages').resolves(commitOutput)
   stub(gitReader, 'getNumCommits').resolves(404)
+  stub(gitReader, 'getRemoteExperimentRefs').resolves('')
 
   const mockGetBranchesToShow = stub().returns(['main'])
   const mockSetBranches = stub()
@@ -235,7 +273,7 @@ export const buildExperimentsData = (
       internalCommands,
       {
         getBranchesToShow: mockGetBranchesToShow,
-        getNbOfCommitsToShow: () => DEFAULT_NUM_OF_COMMITS_TO_SHOW,
+        getNbOfCommitsToShow: () => DEFAULT_CURRENT_BRANCH_COMMITS_TO_SHOW,
         setBranches: mockSetBranches
       } as unknown as ExperimentsModel,
       []
@@ -255,8 +293,14 @@ export const stubWorkspaceExperimentsGetters = (
   disposer: Disposer,
   dvcRoot = dvcDemoPath
 ) => {
-  const { dvcExecutor, dvcRunner, experiments, experimentsModel, messageSpy } =
-    buildExperiments({ disposer })
+  const {
+    columnsModel,
+    dvcExecutor,
+    dvcRunner,
+    experiments,
+    experimentsModel,
+    messageSpy
+  } = buildExperiments({ disposer })
 
   const mockGetOnlyOrPickProject = stub(
     WorkspaceExperiments.prototype,
@@ -269,6 +313,7 @@ export const stubWorkspaceExperimentsGetters = (
   ).returns(experiments)
 
   return {
+    columnsModel,
     dvcExecutor,
     dvcRunner,
     experiments,

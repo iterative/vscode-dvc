@@ -18,7 +18,7 @@ const canAssign = (
 ): boolean => canSelect(coloredStatus) && definedAndNonEmpty(unassignedColors)
 
 const collectStatus = (acc: ColoredStatus, experiment: Experiment): void => {
-  const { id, status } = experiment
+  const { id, executorStatus: status } = experiment
   if (!id || isQueued(status) || hasKey(acc, id)) {
     return
   }
@@ -164,8 +164,10 @@ const assignSelected = (
   return { availableColors, coloredStatus }
 }
 
-const cannotSelect = (ids: Set<string>, { id, status }: Experiment): boolean =>
-  isQueued(status) || ids.has(id)
+const cannotSelect = (
+  ids: Set<string>,
+  { id, executorStatus: status }: Experiment
+): boolean => isQueued(status) || ids.has(id)
 
 export const collectSelectable = (
   selectedExperiments: Experiment[]

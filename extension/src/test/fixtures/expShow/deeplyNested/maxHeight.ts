@@ -20,12 +20,11 @@ export const deeplyNestedColumnsWithHeightOf10: Column[] = [
   {
     hasChildren: false,
     label: 'doubled',
-    maxStringLength: 15,
     parentPath: 'params:params.yaml:nested1',
     path: 'params:params.yaml:nested1.doubled',
     pathArray: ['params', 'params.yaml', 'nested1', 'doubled'],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: true,
@@ -65,7 +64,6 @@ export const deeplyNestedColumnsWithHeightOf10: Column[] = [
   {
     hasChildren: false,
     label: 'nested7',
-    maxStringLength: 6,
     parentPath:
       'params:params.yaml:nested1.nested2.nested3.nested4.nested5.nested6',
     path: 'params:params.yaml:nested1.nested2.nested3.nested4.nested5.nested6.nested7',
@@ -81,7 +79,7 @@ export const deeplyNestedColumnsWithHeightOf10: Column[] = [
       'nested7'
     ],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: true,
@@ -93,7 +91,6 @@ export const deeplyNestedColumnsWithHeightOf10: Column[] = [
   {
     hasChildren: false,
     label: 'nested6',
-    maxStringLength: 23,
     parentPath: 'params:params.yaml:nested1.nested2.nested3.nested4.nested5b',
     path: 'params:params.yaml:nested1.nested2.nested3.nested4.nested5b.nested6',
     pathArray: [
@@ -107,12 +104,11 @@ export const deeplyNestedColumnsWithHeightOf10: Column[] = [
       'nested6'
     ],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'doubled',
-    maxStringLength: 16,
     parentPath: 'params:params.yaml:nested1.nested2.nested3.nested4.nested5b',
     path: 'params:params.yaml:nested1.nested2.nested3.nested4.nested5b.doubled',
     pathArray: [
@@ -126,19 +122,16 @@ export const deeplyNestedColumnsWithHeightOf10: Column[] = [
       'doubled'
     ],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'outlier',
-    maxStringLength: 1,
     parentPath: 'params:params.yaml',
     path: 'params:params.yaml:outlier',
     pathArray: ['params', 'params.yaml', 'outlier'],
     type: ColumnType.PARAMS,
-    types: ['number'],
-    maxNumber: 1,
-    minNumber: 1
+    firstValueType: 'number'
   }
 ]
 
@@ -161,12 +154,11 @@ export const deeplyNestedColumnsWithHeightOf3: Column[] = [
   {
     hasChildren: false,
     label: 'doubled',
-    maxStringLength: 15,
     parentPath: 'params:params.yaml:nested1',
     path: 'params:params.yaml:nested1.doubled',
     pathArray: ['params', 'params.yaml', 'nested1', 'doubled'],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: true,
@@ -178,7 +170,6 @@ export const deeplyNestedColumnsWithHeightOf3: Column[] = [
   {
     hasChildren: false,
     label: 'nested7',
-    maxStringLength: 6,
     parentPath:
       'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4%2Enested5%2Enested6',
     path: 'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4%2Enested5%2Enested6.nested7',
@@ -194,7 +185,7 @@ export const deeplyNestedColumnsWithHeightOf3: Column[] = [
       'nested7'
     ],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: true,
@@ -206,7 +197,6 @@ export const deeplyNestedColumnsWithHeightOf3: Column[] = [
   {
     hasChildren: false,
     label: 'nested6',
-    maxStringLength: 23,
     parentPath:
       'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4%2Enested5b',
     path: 'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4%2Enested5b.nested6',
@@ -221,12 +211,11 @@ export const deeplyNestedColumnsWithHeightOf3: Column[] = [
       'nested6'
     ],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'doubled',
-    maxStringLength: 16,
     parentPath:
       'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4%2Enested5b',
     path: 'params:params.yaml:nested1%2Enested2%2Enested3%2Enested4%2Enested5b.doubled',
@@ -241,19 +230,16 @@ export const deeplyNestedColumnsWithHeightOf3: Column[] = [
       'doubled'
     ],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'outlier',
-    maxStringLength: 1,
     parentPath: 'params:params.yaml',
     path: 'params:params.yaml:outlier',
     pathArray: ['params', 'params.yaml', 'outlier'],
     type: ColumnType.PARAMS,
-    types: ['number'],
-    maxNumber: 1,
-    minNumber: 1
+    firstValueType: 'number'
   }
 ]
 
@@ -269,12 +255,11 @@ export const deeplyNestedColumnsWithHeightOf2: Column[] = [
   {
     hasChildren: false,
     label: 'doubled',
-    maxStringLength: 15,
     parentPath: 'params:params.yaml:nested1',
     path: 'params:params.yaml:nested1:doubled',
     pathArray: ['params', 'params.yaml', 'nested1', 'doubled'],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: true,
@@ -286,7 +271,6 @@ export const deeplyNestedColumnsWithHeightOf2: Column[] = [
   {
     hasChildren: false,
     label: 'nested7',
-    maxStringLength: 6,
     parentPath:
       'params:params.yaml:nested1.nested2.nested3.nested4.nested5.nested6',
     path: 'params:params.yaml:nested1.nested2.nested3.nested4.nested5.nested6:nested7',
@@ -302,7 +286,7 @@ export const deeplyNestedColumnsWithHeightOf2: Column[] = [
       'nested7'
     ],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: true,
@@ -314,7 +298,6 @@ export const deeplyNestedColumnsWithHeightOf2: Column[] = [
   {
     hasChildren: false,
     label: 'nested6',
-    maxStringLength: 23,
     parentPath: 'params:params.yaml:nested1.nested2.nested3.nested4.nested5b',
     path: 'params:params.yaml:nested1.nested2.nested3.nested4.nested5b:nested6',
     pathArray: [
@@ -328,12 +311,11 @@ export const deeplyNestedColumnsWithHeightOf2: Column[] = [
       'nested6'
     ],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: false,
     label: 'doubled',
-    maxStringLength: 16,
     parentPath: 'params:params.yaml:nested1.nested2.nested3.nested4.nested5b',
     path: 'params:params.yaml:nested1.nested2.nested3.nested4.nested5b:doubled',
     pathArray: [
@@ -347,7 +329,7 @@ export const deeplyNestedColumnsWithHeightOf2: Column[] = [
       'doubled'
     ],
     type: ColumnType.PARAMS,
-    types: ['string']
+    firstValueType: 'string'
   },
   {
     hasChildren: true,
@@ -359,36 +341,32 @@ export const deeplyNestedColumnsWithHeightOf2: Column[] = [
   {
     hasChildren: false,
     label: 'outlier',
-    maxStringLength: 1,
     parentPath: 'params:params.yaml',
     path: 'params:params.yaml:outlier',
     pathArray: ['params', 'params.yaml', 'outlier'],
     type: ColumnType.PARAMS,
-    types: ['number'],
-    maxNumber: 1,
-    minNumber: 1
+    firstValueType: 'number'
   }
 ]
 
 export const deeplyNestedColumnsWithHeightOf1: Column[] = [
   timestampColumn,
   {
+    firstValueType: 'string',
     hasChildren: false,
     label: 'params.yaml:nested1.doubled',
-    maxStringLength: 16,
     parentPath: 'params',
-    path: 'params:doubled',
+    path: 'params:params.yaml:nested1.doubled',
     pathArray: ['params', 'params.yaml', 'nested1', 'doubled'],
-    type: ColumnType.PARAMS,
-    types: ['string']
+    type: ColumnType.PARAMS
   },
   {
+    firstValueType: 'string',
     hasChildren: false,
     label:
       'params.yaml:nested1.nested2.nested3.nested4.nested5.nested6.nested7',
-    maxStringLength: 6,
     parentPath: 'params',
-    path: 'params:nested7',
+    path: 'params:params.yaml:nested1.nested2.nested3.nested4.nested5.nested6.nested7',
     pathArray: [
       'params',
       'params.yaml',
@@ -400,15 +378,14 @@ export const deeplyNestedColumnsWithHeightOf1: Column[] = [
       'nested6',
       'nested7'
     ],
-    type: ColumnType.PARAMS,
-    types: ['string']
+    type: ColumnType.PARAMS
   },
   {
+    firstValueType: 'string',
     hasChildren: false,
     label: 'params.yaml:nested1.nested2.nested3.nested4.nested5b.nested6',
-    maxStringLength: 23,
     parentPath: 'params',
-    path: 'params:nested6',
+    path: 'params:params.yaml:nested1.nested2.nested3.nested4.nested5b.nested6',
     pathArray: [
       'params',
       'params.yaml',
@@ -419,19 +396,33 @@ export const deeplyNestedColumnsWithHeightOf1: Column[] = [
       'nested5b',
       'nested6'
     ],
-    type: ColumnType.PARAMS,
-    types: ['string']
+    type: ColumnType.PARAMS
   },
   {
+    firstValueType: 'string',
+    hasChildren: false,
+    label: 'params.yaml:nested1.nested2.nested3.nested4.nested5b.doubled',
+    parentPath: 'params',
+    path: 'params:params.yaml:nested1.nested2.nested3.nested4.nested5b.doubled',
+    pathArray: [
+      'params',
+      'params.yaml',
+      'nested1',
+      'nested2',
+      'nested3',
+      'nested4',
+      'nested5b',
+      'doubled'
+    ],
+    type: ColumnType.PARAMS
+  },
+  {
+    firstValueType: 'number',
     hasChildren: false,
     label: 'params.yaml:outlier',
-    maxStringLength: 1,
     parentPath: 'params',
-    path: 'params:outlier',
+    path: 'params:params.yaml:outlier',
     pathArray: ['params', 'params.yaml', 'outlier'],
-    type: ColumnType.PARAMS,
-    types: ['number'],
-    maxNumber: 1,
-    minNumber: 1
+    type: ColumnType.PARAMS
   }
 ]

@@ -83,8 +83,7 @@ describe('pickExperimentsToPlot', () => {
         }
       ],
       MAX_SELECTED_EXPERIMENTS,
-      Title.SELECT_EXPERIMENTS_TO_PLOT,
-      { matchOnDescription: true, matchOnDetail: true }
+      { title: Title.SELECT_EXPERIMENTS_TO_PLOT }
     )
   })
 
@@ -192,8 +191,7 @@ describe('pickExperimentsToPlot', () => {
       ],
       [],
       MAX_SELECTED_EXPERIMENTS,
-      Title.SELECT_EXPERIMENTS_TO_PLOT,
-      { matchOnDescription: true, matchOnDetail: true }
+      { title: Title.SELECT_EXPERIMENTS_TO_PLOT }
     )
   })
 })

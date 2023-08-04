@@ -1,6 +1,6 @@
 import { resolve } from 'path'
 import { GitCli } from '.'
-import { Command, Flag } from './constants'
+import { Command, DEFAULT_REMOTE, Flag } from './constants'
 import { getOptions } from './options'
 import { typeCheckCommands } from '..'
 import { trimAndSplit } from '../../util/stdout'
@@ -10,6 +10,7 @@ export const autoRegisteredCommands = {
   GIT_GET_BRANCHES: 'getBranches',
   GIT_GET_COMMIT_MESSAGES: 'getCommitMessages',
   GIT_GET_NUM_COMMITS: 'getNumCommits',
+  GIT_GET_REMOTE_EXPERIMENT_REFS: 'getRemoteExperimentRefs',
   GIT_GET_REMOTE_URL: 'getRemoteUrl',
   GIT_GET_REPOSITORY_ROOT: 'getGitRepositoryRoot',
   GIT_HAS_CHANGES: 'hasChanges',
@@ -59,6 +60,18 @@ export class GitReader extends GitCli {
         Flag.NUMBER,
         revisions
       ],
+      cwd
+    })
+    try {
+      return await this.executeProcess(options)
+    } catch {
+      return ''
+    }
+  }
+
+  public async getRemoteExperimentRefs(cwd: string): Promise<string> {
+    const options = getOptions({
+      args: [Command.LS_REMOTE, DEFAULT_REMOTE, 'refs/exps/*'],
       cwd
     })
     try {

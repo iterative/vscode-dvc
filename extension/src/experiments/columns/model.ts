@@ -5,8 +5,13 @@ import {
   collectRelativeMetricsFiles,
   collectParamsFiles
 } from './collect'
-import { EXPERIMENT_COLUMN_ID, timestampColumn } from './constants'
-import { SummaryAcc, collectFromColumnOrder } from './util'
+import {
+  MAX_SUMMARY_ORDER_LENGTH,
+  SummaryAcc,
+  collectFromColumnOrder as collectSummaryColumnOrder,
+  limitSummaryOrder
+} from './util'
+import { collectColumnOrder } from './collect/order'
 import { Column, ColumnType } from '../webview/contract'
 import { ExpShowOutput } from '../../cli/dvc/contract'
 import { PersistenceKey } from '../../persistence/constants'
@@ -18,6 +23,7 @@ export class ColumnsModel extends PathSelectionModel<Column> {
   private columnsChanges: string[] = []
   private paramsFiles = new Set<string>()
   private relativeMetricsFiles: string[] = []
+  private showOnlyChanged: boolean
 
   constructor(
     dvcRoot: string,
@@ -39,6 +45,7 @@ export class ColumnsModel extends PathSelectionModel<Column> {
       PersistenceKey.METRICS_AND_PARAMS_COLUMN_WIDTHS,
       {}
     )
+    this.showOnlyChanged = this.revive(PersistenceKey.SHOW_ONLY_CHANGED, false)
   }
 
   public getColumnOrder(): string[] {
@@ -49,17 +56,18 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     const acc: SummaryAcc = { metrics: [], params: [] }
     for (const path of this.columnOrderState) {
       const reachedMaxSummaryOrderLength =
-        acc.metrics.length >= 3 && acc.params.length >= 3
-      if (
-        this.status[path] !== Status.SELECTED ||
-        reachedMaxSummaryOrderLength
-      ) {
+        acc.metrics.length >= MAX_SUMMARY_ORDER_LENGTH &&
+        acc.params.length >= MAX_SUMMARY_ORDER_LENGTH
+      if (reachedMaxSummaryOrderLength) {
+        return limitSummaryOrder(acc)
+      }
+      if (this.status[path] !== Status.SELECTED) {
         continue
       }
-      collectFromColumnOrder(path, acc)
+      collectSummaryColumnOrder(path, acc)
     }
 
-    return [...acc.params.slice(0, 3), ...acc.metrics.slice(0, 3)]
+    return limitSummaryOrder(acc)
   }
 
   public getColumnWidths(): Record<string, number> {
@@ -94,12 +102,32 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     this.statusChanged?.fire()
   }
 
+  public selectFirst(firstColumns: string[]) {
+    const columnOrder = [
+      'id',
+      ...firstColumns,
+      ...this.getColumnOrder().filter(
+        column => !['id', ...firstColumns].includes(column)
+      )
+    ]
+    this.setColumnOrder(columnOrder)
+  }
+
   public setColumnWidth(id: string, width: number) {
     this.columnWidthsState[id] = width
     this.persist(
       PersistenceKey.METRICS_AND_PARAMS_COLUMN_WIDTHS,
       this.columnWidthsState
     )
+  }
+
+  public getShowOnlyChanged() {
+    return this.showOnlyChanged
+  }
+
+  public toggleShowOnlyChanged() {
+    this.showOnlyChanged = !this.showOnlyChanged
+    this.persist(PersistenceKey.SHOW_ONLY_CHANGED, this.showOnlyChanged)
   }
 
   public getChildren(path: string | undefined) {
@@ -141,38 +169,13 @@ export class ColumnsModel extends PathSelectionModel<Column> {
     )
   }
 
-  private findChildrenColumns(
-    parent: string,
-    columns: Column[],
-    childrenColumns: string[]
-  ) {
-    const filteredColumns = columns.filter(
-      ({ parentPath }) => parentPath === parent
+  private async setColumnOrderFromData(terminalNodes: Column[]) {
+    const extendedColumnOrder = await collectColumnOrder(
+      this.columnOrderState,
+      terminalNodes
     )
-    for (const column of filteredColumns) {
-      if (column.hasChildren) {
-        this.findChildrenColumns(column.path, columns, childrenColumns)
-      } else {
-        childrenColumns.push(column.path)
-      }
-    }
-  }
 
-  private getColumnsFromType(type: string): string[] {
-    const childrenColumns: string[] = []
-    const dataWithType = this.data.filter(({ path }) => path.startsWith(type))
-    this.findChildrenColumns(type, dataWithType, childrenColumns)
-    return childrenColumns
-  }
-
-  private getColumnOrderFromData() {
-    return [
-      EXPERIMENT_COLUMN_ID,
-      timestampColumn.path,
-      ...this.getColumnsFromType(ColumnType.METRICS),
-      ...this.getColumnsFromType(ColumnType.PARAMS),
-      ...this.getColumnsFromType(ColumnType.DEPS)
-    ]
+    this.setColumnOrder(extendedColumnOrder)
   }
 
   private async transformAndSetColumns(data: ExpShowOutput) {
@@ -186,12 +189,18 @@ export class ColumnsModel extends PathSelectionModel<Column> {
 
     this.data = columns
 
-    if (this.columnOrderState.length === 0) {
-      this.setColumnOrder(this.getColumnOrderFromData())
-    }
-
     this.paramsFiles = paramsFiles
     this.relativeMetricsFiles = relativeMetricsFiles
+
+    const selectedColumns = this.getTerminalNodes().filter(
+      ({ selected }) => selected
+    )
+
+    for (const { path } of selectedColumns) {
+      if (!this.columnOrderState.includes(path)) {
+        return this.setColumnOrderFromData(selectedColumns)
+      }
+    }
   }
 
   private transformAndSetChanges(data: ExpShowOutput) {

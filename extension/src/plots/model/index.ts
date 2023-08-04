@@ -58,7 +58,12 @@ import {
 } from '../multiSource/collect'
 import { isDvcError } from '../../cli/dvc/reader'
 import { ErrorsModel } from '../errors/model'
-import { openFileInEditor, writeCsv, writeJson } from '../../fileSystem'
+import {
+  openFileInEditor,
+  writeCsv,
+  writeJson,
+  writeTsv
+} from '../../fileSystem'
 import { Toast } from '../../vscode/toast'
 
 export class PlotsModel extends ModelWithPersistence {
@@ -209,6 +214,7 @@ export class PlotsModel extends ModelWithPersistence {
 
   public getSelectedRevisionDetails() {
     const selectedRevisions: Revision[] = []
+    const summaryColumns = this.experiments.getSummaryColumnOrder()
     for (const experiment of this.experiments.getSelectedRevisions()) {
       const { commit, description, label, displayColor, id } = experiment
       const revision: Revision = {
@@ -218,10 +224,7 @@ export class PlotsModel extends ModelWithPersistence {
         fetched: this.fetchedRevs.has(id),
         id,
         label,
-        summaryColumns: getRevisionSummaryColumns(
-          this.experiments.getSummaryColumnOrder(),
-          experiment
-        )
+        summaryColumns: getRevisionSummaryColumns(summaryColumns, experiment)
       }
 
       if (commit) {
@@ -242,6 +245,10 @@ export class PlotsModel extends ModelWithPersistence {
 
   public savePlotDataAsCsv(filePath: string, plotId: string) {
     void this.savePlotData(filePath, plotId, data => writeCsv(filePath, data))
+  }
+
+  public savePlotDataAsTsv(filePath: string, plotId: string) {
+    void this.savePlotData(filePath, plotId, data => writeTsv(filePath, data))
   }
 
   public getTemplatePlots(

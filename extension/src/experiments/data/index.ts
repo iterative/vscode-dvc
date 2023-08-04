@@ -8,7 +8,11 @@ import { getRelativePattern } from '../../fileSystem/relativePattern'
 import { createFileSystemWatcher } from '../../fileSystem/watcher'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { ExpShowOutput } from '../../cli/dvc/contract'
-import { BaseData, ExperimentsOutput } from '../../data'
+import {
+  BaseData,
+  ExperimentsOutput,
+  isRemoteExperimentsOutput
+} from '../../data'
 import { Args, DOT_DVC, ExperimentFlag } from '../../cli/dvc/constants'
 import { COMMITS_SEPARATOR, gitPath } from '../../cli/git/constants'
 import { getGitPath } from '../../fileSystem'
@@ -35,6 +39,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
 
     void this.watchExpGitRefs()
     void this.managedUpdate()
+    this.waitForInitialLocalData()
   }
 
   public managedUpdate() {
@@ -42,22 +47,24 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   }
 
   public async update(): Promise<void> {
+    await Promise.all([
+      this.notifyChanged(await this.updateExpShow()),
+      this.notifyChanged(await this.updateRemoteExpRefs())
+    ])
+  }
+
+  private async updateExpShow() {
     await this.updateBranches()
     const branches = this.experiments.getBranchesToShow()
-    let gitLog = ''
-    const rowOrder: { branch: string; sha: string }[] = []
     const availableNbCommits: { [branch: string]: number } = {}
-    const args: Args = []
 
+    const promises = []
     for (const branch of branches) {
-      gitLog = await this.collectGitLogAndOrder(
-        gitLog,
-        branch,
-        rowOrder,
-        availableNbCommits,
-        args
-      )
+      promises.push(this.collectGitLogByBranch(branch, availableNbCommits))
     }
+
+    const branchLogs = await Promise.all(promises)
+    const { args, gitLog, rowOrder } = this.collectGitLogAndOrder(branchLogs)
 
     const expShow = await this.internalCommands.executeCommand<ExpShowOutput>(
       AvailableCommands.EXP_SHOW,
@@ -66,24 +73,16 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     )
 
     this.collectFiles({ expShow })
-
-    return this.notifyChanged({ availableNbCommits, expShow, gitLog, rowOrder })
+    return { availableNbCommits, expShow, gitLog, rowOrder }
   }
 
-  protected collectFiles({ expShow }: { expShow: ExpShowOutput }) {
-    this.collectedFiles = collectFiles(expShow, this.collectedFiles)
-  }
-
-  private async collectGitLogAndOrder(
-    gitLog: string,
+  private async collectGitLogByBranch(
     branch: string,
-    rowOrder: { branch: string; sha: string }[],
-    availableNbCommits: { [branch: string]: number },
-    args: Args
+    availableNbCommits: { [branch: string]: number }
   ) {
     const nbOfCommitsToShow = this.experiments.getNbOfCommitsToShow(branch)
 
-    const [branchGitLog, totalCommits] = await Promise.all([
+    const [branchLog, totalCommits] = await Promise.all([
       this.internalCommands.executeCommand(
         AvailableCommands.GIT_GET_COMMIT_MESSAGES,
         this.dvcRoot,
@@ -96,18 +95,31 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
         branch
       )
     ])
-    gitLog = [gitLog, branchGitLog].join(COMMITS_SEPARATOR)
+
     availableNbCommits[branch] = totalCommits
 
-    for (const commit of branchGitLog.split(COMMITS_SEPARATOR)) {
-      const [sha] = commit.split('\n')
-      rowOrder.push({ branch, sha })
-      if (args.includes(sha)) {
-        continue
+    return { branch, branchLog }
+  }
+
+  private collectGitLogAndOrder(
+    branchLogs: { branch: string; branchLog: string }[]
+  ) {
+    const rowOrder: { branch: string; sha: string }[] = []
+    const args: Args = []
+    const gitLog: string[] = []
+
+    for (const { branch, branchLog } of branchLogs) {
+      gitLog.push(branchLog)
+      for (const commit of branchLog.split(COMMITS_SEPARATOR)) {
+        const [sha] = commit.split('\n')
+        rowOrder.push({ branch, sha })
+        if (args.includes(sha)) {
+          continue
+        }
+        args.push(ExperimentFlag.REV, sha)
       }
-      args.push(ExperimentFlag.REV, sha)
     }
-    return gitLog
+    return { args, gitLog: gitLog.join(COMMITS_SEPARATOR), rowOrder }
   }
 
   private async updateBranches() {
@@ -117,6 +129,10 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     )
 
     this.experiments.setBranches(allBranches)
+  }
+
+  private collectFiles({ expShow }: { expShow: ExpShowOutput }) {
+    this.collectedFiles = collectFiles(expShow, this.collectedFiles)
   }
 
   private async watchExpGitRefs(): Promise<void> {
@@ -147,6 +163,30 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
           return this.managedUpdate()
         }
       }
+    )
+  }
+
+  private async updateRemoteExpRefs() {
+    const [remoteExpRefs] = await Promise.all([
+      this.internalCommands.executeCommand(
+        AvailableCommands.GIT_GET_REMOTE_EXPERIMENT_REFS,
+        this.dvcRoot
+      ),
+      this.isReady()
+    ])
+    return { remoteExpRefs }
+  }
+
+  private waitForInitialLocalData() {
+    const waitForInitialData = this.dispose.track(
+      this.onDidUpdate(data => {
+        if (isRemoteExperimentsOutput(data)) {
+          return
+        }
+        this.dispose.untrack(waitForInitialData)
+        waitForInitialData.dispose()
+        this.deferred.resolve()
+      })
     )
   }
 }

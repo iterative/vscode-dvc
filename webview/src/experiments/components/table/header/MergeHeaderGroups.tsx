@@ -2,7 +2,7 @@ import React from 'react'
 import cx from 'classnames'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import { HeaderGroup, Header } from '@tanstack/react-table'
-import { TableHeader } from './TableHeader'
+import { TableHeaderCell } from './TableHeaderCell'
 import styles from '../styles.module.scss'
 import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
 
@@ -30,7 +30,7 @@ export const MergedHeaderGroups: React.FC<{
   return (
     <tr className={cx(styles.experimentsTr, styles.headRow)}>
       {headerGroup.headers.map((header: Header<Experiment, unknown>) => (
-        <TableHeader
+        <TableHeaderCell
           setExpColumnNeedsShadow={setExpColumnNeedsShadow}
           key={header.id}
           header={header}

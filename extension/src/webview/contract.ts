@@ -20,6 +20,7 @@ export enum MessageFromWebviewType {
   CREATE_BRANCH_FROM_EXPERIMENT = 'create-branch-from-experiment',
   EXPORT_PLOT_DATA_AS_JSON = 'export-plot-data-as-json',
   EXPORT_PLOT_DATA_AS_CSV = 'export-plot-data-as-csv',
+  EXPORT_PLOT_DATA_AS_TSV = 'export-plot-data-as-tsv',
   FOCUS_FILTERS_TREE = 'focus-filters-tree',
   FOCUS_SORTS_TREE = 'focus-sorts-tree',
   OPEN_EXPERIMENTS_WEBVIEW = 'open-experiments-webview',
@@ -37,6 +38,7 @@ export enum MessageFromWebviewType {
   REORDER_PLOTS_TEMPLATES = 'reorder-plots-templates',
   REFRESH_EXP_DATA = 'refresh-exp-data',
   REFRESH_REVISIONS = 'refresh-revisions',
+  RESET_COMMITS = 'reset-commits',
   RESIZE_COLUMN = 'resize-column',
   RESIZE_PLOTS = 'resize-plots',
   SAVE_STUDIO_TOKEN = 'save-studio-token',
@@ -47,14 +49,17 @@ export enum MessageFromWebviewType {
   SORT_COLUMN = 'sort-column',
   TOGGLE_EXPERIMENT = 'toggle-experiment',
   TOGGLE_EXPERIMENT_STAR = 'toggle-experiment-star',
-  HIDE_EXPERIMENTS_TABLE_COLUMN = 'hide-experiments-table-column',
+  EXPERIMENTS_TABLE_HIDE_COLUMN_PATH = 'experiments-table-hide-column-path',
+  EXPERIMENTS_TABLE_MOVE_TO_START = 'experiments-table-move-to-start',
   SELECT_EXPERIMENTS = 'select-experiments',
   SELECT_COLUMNS = 'select-columns',
+  SELECT_FIRST_COLUMNS = 'select-first-columns',
   SELECT_PLOTS = 'select-plots',
   SET_EXPERIMENTS_FOR_PLOTS = 'set-experiments-for-plots',
   SET_EXPERIMENTS_AND_OPEN_PLOTS = 'set-experiments-and-open-plots',
   SET_STUDIO_SHARE_EXPERIMENTS_LIVE = 'set-studio-share-experiments-live',
   TOGGLE_PLOTS_SECTION = 'toggle-plots-section',
+  TOGGLE_SHOW_ONLY_CHANGED = 'toggle-show-only-changed',
   REMOTE_ADD = 'remote-add',
   REMOTE_MODIFY = 'remote-modify',
   REMOTE_REMOVE = 'remote-remove',
@@ -109,8 +114,16 @@ export type MessageFromWebview =
       payload: string
     }
   | {
+      type: MessageFromWebviewType.EXPORT_PLOT_DATA_AS_TSV
+      payload: string
+    }
+  | {
       type: MessageFromWebviewType.REORDER_COLUMNS
       payload: string[]
+    }
+  | {
+      type: MessageFromWebviewType.RESET_COMMITS
+      payload: string
     }
   | {
       type: MessageFromWebviewType.RESIZE_COLUMN
@@ -125,7 +138,11 @@ export type MessageFromWebview =
       payload: string[]
     }
   | {
-      type: MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN
+      type: MessageFromWebviewType.EXPERIMENTS_TABLE_HIDE_COLUMN_PATH
+      payload: string
+    }
+  | {
+      type: MessageFromWebviewType.EXPERIMENTS_TABLE_MOVE_TO_START
       payload: string
     }
   | {
@@ -211,6 +228,8 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.REFRESH_EXP_DATA }
   | { type: MessageFromWebviewType.REFRESH_REVISIONS }
   | { type: MessageFromWebviewType.SELECT_COLUMNS }
+  | { type: MessageFromWebviewType.SELECT_FIRST_COLUMNS }
+  | { type: MessageFromWebviewType.TOGGLE_SHOW_ONLY_CHANGED }
   | { type: MessageFromWebviewType.FOCUS_FILTERS_TREE }
   | { type: MessageFromWebviewType.FOCUS_SORTS_TREE }
   | { type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW }

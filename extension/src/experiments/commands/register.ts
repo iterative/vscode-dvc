@@ -191,6 +191,12 @@ const registerExperimentQuickPickCommands = (
   )
 
   internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENT_COLUMNS_SELECT_FIRST,
+    (context: Context) =>
+      experiments.selectFirstColumns(getDvcRootFromContext(context))
+  )
+
+  internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_STOP,
     () => experiments.selectExperimentsToStop()
   )
@@ -271,7 +277,7 @@ export const registerExperimentCommands = (
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_VIEW_PUSH,
-    getPushExperimentCommand(internalCommands, setup)
+    getPushExperimentCommand(experiments, internalCommands, setup)
   )
 
   internalCommands.registerExternalCliCommand(

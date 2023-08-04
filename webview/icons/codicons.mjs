@@ -7,7 +7,10 @@ export const codicons = [
   'chevron-down',
   'chevron-right',
   'close',
+  'cloud-upload',
+  'cloud',
   'copy',
+  'discard',
   'ellipsis',
   'error',
   'extensions',
@@ -26,6 +29,7 @@ export const codicons = [
   'sort-precedence',
   'star-empty',
   'star-full',
+  'table',
   'trash',
   'warning'
 ]

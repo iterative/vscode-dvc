@@ -8,6 +8,7 @@ import { TableData } from 'dvc/src/experiments/webview/contract'
 import Experiments from './Experiments'
 import {
   update,
+  updateSelectedBranches,
   updateChanges,
   updateCliError,
   updateColumnOrder,
@@ -23,7 +24,8 @@ import {
   updateIsShowingMoreCommits,
   updateRows,
   updateSelectedForPlotsCount,
-  updateSorts
+  updateSorts,
+  updateShowOnlyChanged
 } from '../state/tableDataSlice'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 
@@ -87,10 +89,16 @@ export const App: React.FC<Record<string, unknown>> = () => {
               case 'rows':
                 dispatch(updateRows(data.data.rows))
                 continue
+              case 'selectedBranches':
+                dispatch(updateSelectedBranches(data.data.selectedBranches))
+                continue
               case 'selectedForPlotsCount':
                 dispatch(
                   updateSelectedForPlotsCount(data.data.selectedForPlotsCount)
                 )
+                continue
+              case 'showOnlyChanged':
+                dispatch(updateShowOnlyChanged(data.data.showOnlyChanged))
                 continue
               case 'sorts':
                 dispatch(updateSorts(data.data.sorts))

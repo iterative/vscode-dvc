@@ -1,4 +1,5 @@
 import { join } from 'path'
+import get from 'lodash.get'
 import isEqual from 'lodash.isequal'
 import { ColumnAccumulator } from './util'
 import { collectDepChanges, collectDeps } from './deps'
@@ -6,17 +7,20 @@ import {
   collectMetricAndParamChanges,
   collectMetricsAndParams
 } from './metricsAndParams'
-import { Column } from '../../webview/contract'
+import { Column, Commit, Experiment } from '../../webview/contract'
 import {
   ExpRange,
   ExpShowOutput,
   ExpState,
   ExpData,
-  experimentHasError
+  experimentHasError,
+  Value,
+  EXPERIMENT_WORKSPACE_ID
 } from '../../../cli/dvc/contract'
 import { standardizePath } from '../../../fileSystem/path'
 import { timestampColumn } from '../constants'
 import { sortCollectedArray, uniqueValues } from '../../../util/array'
+import { FilterDefinition, filterExperiment } from '../../model/filterBy'
 
 const collectFromExperiment = (
   acc: ColumnAccumulator,
@@ -28,38 +32,50 @@ const collectFromExperiment = (
 
   const { data } = experiment
   if (data) {
-    collectMetricsAndParams(acc, data)
-    collectDeps(acc, data)
+    return Promise.all([
+      collectMetricsAndParams(acc, data),
+      collectDeps(acc, data)
+    ])
   }
 }
 
-const collectFromExperiments = (
+const collectFromExperiments = async (
   acc: ColumnAccumulator,
   experiments?: ExpRange[] | null
 ) => {
   if (!experiments) {
     return
   }
+
+  const promises = []
   for (const { revs } of experiments) {
-    collectFromExperiment(acc, revs[0])
+    promises.push(collectFromExperiment(acc, revs[0]))
   }
+
+  await Promise.all(promises)
 }
 
-export const collectColumns = (output: ExpShowOutput): Column[] => {
-  const acc: ColumnAccumulator = {}
+export const collectColumns = async (
+  output: ExpShowOutput
+): Promise<Column[]> => {
+  const acc: ColumnAccumulator = { collected: new Set(), columns: {} }
 
-  acc.timestamp = timestampColumn
+  acc.columns.timestamp = timestampColumn
 
+  const promises = []
   for (const expState of output) {
     if (experimentHasError(expState)) {
       continue
     }
 
-    collectFromExperiment(acc, expState)
-    collectFromExperiments(acc, expState.experiments)
+    promises.push(
+      collectFromExperiment(acc, expState),
+      collectFromExperiments(acc, expState.experiments)
+    )
   }
+  await Promise.all(promises)
 
-  const columns = Object.values(acc)
+  const columns = Object.values(acc.columns)
   const hasNoData = isEqual(columns, [timestampColumn])
 
   return hasNoData ? [] : columns
@@ -123,4 +139,70 @@ export const collectRelativeMetricsFiles = (
     .sort()
 
   return uniqueValues(files)
+}
+
+const getValue = (
+  experiment: Commit | Experiment,
+  pathArray: string[]
+): Value => get(experiment, pathArray) as Value
+
+const collectChangedPath = (
+  acc: string[],
+  path: string,
+  pathArray: string[],
+  records: (Commit | Experiment)[]
+) => {
+  let initialValue
+  for (const experiment of records) {
+    if (initialValue === undefined) {
+      initialValue = getValue(experiment, pathArray)
+      continue
+    }
+    const value = getValue(experiment, pathArray)
+    if (value === undefined || isEqual(value, initialValue)) {
+      continue
+    }
+
+    acc.push(path)
+    return
+  }
+}
+
+const collectChangedPaths = (
+  columns: Column[],
+  records: (Commit | Experiment)[]
+) => {
+  const acc: string[] = []
+  for (const { pathArray, path, hasChildren } of columns) {
+    if (!pathArray || hasChildren) {
+      continue
+    }
+    collectChangedPath(acc, path, pathArray, records)
+  }
+  return acc
+}
+
+export const collectColumnsWithChangedValues = (
+  selectedColumns: Column[],
+  rows: Commit[],
+  filters: FilterDefinition[]
+): Column[] => {
+  const records = []
+  for (const commit of rows) {
+    if (
+      commit.id === EXPERIMENT_WORKSPACE_ID ||
+      filterExperiment(filters, commit as Experiment)
+    ) {
+      records.push(commit)
+    }
+    if (commit.subRows) {
+      records.push(...commit.subRows)
+    }
+  }
+
+  const changedPaths = collectChangedPaths(selectedColumns, records)
+
+  return selectedColumns.filter(({ path }) =>
+    changedPaths.find(changedPath => changedPath.startsWith(path))
+  )
 }

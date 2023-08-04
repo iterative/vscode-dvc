@@ -1,19 +1,24 @@
 import React, { MouseEventHandler, ReactElement } from 'react'
 import { useSelector } from 'react-redux'
+import cx from 'classnames'
 import styles from './styles.module.scss'
 import { CellHintTooltip } from './body/CellHintTooltip'
 import {
   focusFiltersTree,
   focusSortsTree,
   openPlotsWebview,
-  selectBranches
+  selectBranches,
+  selectColumns,
+  toggleShowOnlyChanged
 } from '../../util/messages'
 import { Icon } from '../../../shared/components/Icon'
 import {
   Filter,
   GitMerge,
   GraphScatter,
-  SortPrecedence
+  ListFilter,
+  SortPrecedence,
+  Table
 } from '../../../shared/components/icons'
 import { ExperimentsState } from '../../store'
 
@@ -26,7 +31,7 @@ const CounterBadge: React.FC<CounterBadgeProps> = ({ count }) => {
     <span
       className={styles.indicatorCount}
       role="marquee"
-      aria-label={`${count}`}
+      aria-label={String(count)}
     >
       {count}
     </span>
@@ -72,24 +77,51 @@ export const Indicators = () => {
   const filters = useSelector(
     (state: ExperimentsState) => state.tableData.filters
   )
+  const filtersCount = filters?.length
+
   const sorts = useSelector((state: ExperimentsState) => state.tableData.sorts)
+  const sortsCount = sorts?.length
+
   const selectedForPlotsCount = useSelector(
     (state: ExperimentsState) => state.tableData.selectedForPlotsCount
   )
-  const branchesSelected = useSelector(
-    (state: ExperimentsState) =>
-      Math.max(state.tableData.branches.filter(Boolean).length - 1, 0) // We always have one branch by default (the current one which is not selected) and undefined for the workspace
-  )
 
+  const branchesSelected = useSelector((state: ExperimentsState) =>
+    Math.max(state.tableData.selectedBranches.length, 0)
+  )
   const { hasBranchesToSelect } = useSelector(
     (state: ExperimentsState) => state.tableData
   )
 
-  const sortsCount = sorts?.length
-  const filtersCount = filters?.length
+  const columnsSelected = useSelector(
+    (state: ExperimentsState) =>
+      state.tableData.columns.filter(({ hasChildren }) => !hasChildren).length
+  )
+  const hasColumns = useSelector(
+    (state: ExperimentsState) => state.tableData.hasColumns
+  )
+
+  const showOnlyChanged = useSelector(
+    (state: ExperimentsState) => state.tableData.showOnlyChanged
+  )
 
   return (
     <div className={styles.tableIndicators}>
+      <CellHintTooltip
+        tooltipContent="Toggle Show Only Changed Columns"
+        delay={[1000, 0]}
+      >
+        <button
+          className={cx(
+            styles.indicatorIcon,
+            showOnlyChanged && styles.onlyChanged
+          )}
+          aria-label="show only changed columns"
+          onClick={toggleShowOnlyChanged}
+        >
+          <Icon width={16} height={16} icon={Table} />
+        </button>
+      </CellHintTooltip>
       <Indicator
         count={selectedForPlotsCount}
         aria-label="selected for plots"
@@ -122,6 +154,15 @@ export const Indicators = () => {
         disabled={!hasBranchesToSelect}
       >
         <Icon width={16} height={16} icon={GitMerge} />
+      </Indicator>
+      <Indicator
+        count={columnsSelected}
+        aria-label="columns"
+        onClick={selectColumns}
+        tooltipContent="Select Columns"
+        disabled={!hasColumns}
+      >
+        <Icon width={16} height={16} icon={ListFilter} />
       </Indicator>
     </div>
   )

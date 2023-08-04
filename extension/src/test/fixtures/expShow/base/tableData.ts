@@ -3,8 +3,8 @@ import rowsFixture from './rows'
 import columnsFixture from './columns'
 
 const tableDataFixture: TableData = {
-  cliError: null,
   changes: [],
+  cliError: null,
   columnOrder: [],
   columns: columnsFixture,
   columnWidths: {},
@@ -17,7 +17,9 @@ const tableDataFixture: TableData = {
   hasRunningWorkspaceExperiment: true,
   isShowingMoreCommits: { main: true },
   rows: rowsFixture,
+  selectedBranches: [],
   selectedForPlotsCount: 2,
+  showOnlyChanged: false,
   sorts: []
 }
 

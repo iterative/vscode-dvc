@@ -10,11 +10,9 @@ import { keepReferenceIfEqual } from '../../util/objects'
 
 export interface TableDataState extends TableData {
   hasData?: boolean
-  branches: (string | undefined)[]
 }
 
 export const tableDataInitialState: TableDataState = {
-  branches: ['current'],
   changes: [],
   cliError: null,
   columnOrder: [],
@@ -30,7 +28,9 @@ export const tableDataInitialState: TableDataState = {
   hasRunningWorkspaceExperiment: false,
   isShowingMoreCommits: {},
   rows: [],
+  selectedBranches: [],
   selectedForPlotsCount: 0,
+  showOnlyChanged: false,
   sorts: []
 }
 
@@ -112,18 +112,15 @@ export const tableDataSlice = createSlice({
         state.rows,
         action.payload
       ) as Experiment[]
-
-      const branches: (string | undefined)[] = []
-      for (const { branch } of state.rows) {
-        if (!branches.includes(branch)) {
-          branches.push(branch)
-        }
-      }
-
-      state.branches = branches
+    },
+    updateSelectedBranches: (state, action: PayloadAction<string[]>) => {
+      state.selectedBranches = action.payload
     },
     updateSelectedForPlotsCount: (state, action: PayloadAction<number>) => {
       state.selectedForPlotsCount = action.payload
+    },
+    updateShowOnlyChanged: (state, action: PayloadAction<boolean>) => {
+      state.showOnlyChanged = action.payload
     },
     updateSorts: (state, action: PayloadAction<SortDefinition[]>) => {
       state.sorts = keepEqualOldReferencesInArray(
@@ -139,8 +136,8 @@ export const {
   updateChanges,
   updateCliError,
   updateColumnOrder,
-  updateColumnWidths,
   updateColumns,
+  updateColumnWidths,
   updateFilters,
   updateHasBranchesToSelect,
   updateHasCheckpoints,
@@ -150,7 +147,9 @@ export const {
   updateHasRunningWorkspaceExperiment,
   updateIsShowingMoreCommits,
   updateRows,
+  updateSelectedBranches,
   updateSelectedForPlotsCount,
+  updateShowOnlyChanged,
   updateSorts
 } = tableDataSlice.actions
 

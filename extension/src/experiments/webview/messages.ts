@@ -22,6 +22,7 @@ import { Title } from '../../vscode/title'
 import { ConfigKey, setConfigValue } from '../../vscode/config'
 import { NUM_OF_COMMITS_TO_INCREASE } from '../../cli/dvc/constants'
 import { Pipeline } from '../../pipeline'
+import { collectColumnsWithChangedValues } from '../columns/collect'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
@@ -33,6 +34,7 @@ export class WebviewMessages {
   private readonly getWebview: () => BaseWebview<TableData> | undefined
   private readonly notifyChanged: () => void
   private readonly selectColumns: () => Promise<void>
+  private readonly selectFirstColumns: () => Promise<void>
 
   private readonly selectBranches: (
     branchesSelected: string[]
@@ -48,6 +50,7 @@ export class WebviewMessages {
     getWebview: () => BaseWebview<TableData> | undefined,
     notifyChanged: () => void,
     selectColumns: () => Promise<void>,
+    selectFirstColumns: () => Promise<void>,
     selectBranches: (
       branchesSelected: string[]
     ) => Promise<string[] | undefined>,
@@ -60,13 +63,18 @@ export class WebviewMessages {
     this.getWebview = getWebview
     this.notifyChanged = notifyChanged
     this.selectColumns = selectColumns
+    this.selectFirstColumns = selectFirstColumns
     this.selectBranches = selectBranches
     this.update = update
   }
 
-  public sendWebviewMessage() {
+  public async sendWebviewMessage() {
     const webview = this.getWebview()
-    void webview?.show(this.getWebviewData())
+    if (!webview) {
+      return
+    }
+    const data = await this.getWebviewData()
+    return webview.show(data)
   }
 
   public handleMessageFromWebview(message: MessageFromWebview) {
@@ -83,8 +91,10 @@ export class WebviewMessages {
         })
       case MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR:
         return this.setExperimentStars(message.payload)
-      case MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN:
-        return this.hideTableColumn(message.payload)
+      case MessageFromWebviewType.EXPERIMENTS_TABLE_HIDE_COLUMN_PATH:
+        return this.hideColumnPath(message.payload)
+      case MessageFromWebviewType.EXPERIMENTS_TABLE_MOVE_TO_START:
+        return this.movePathToStart(message.payload)
       case MessageFromWebviewType.OPEN_PARAMS_FILE_TO_THE_SIDE:
         return this.openParamsFileToTheSide(message.payload)
       case MessageFromWebviewType.SORT_COLUMN:
@@ -131,6 +141,8 @@ export class WebviewMessages {
 
       case MessageFromWebviewType.SELECT_COLUMNS:
         return this.setColumnsStatus()
+      case MessageFromWebviewType.SELECT_FIRST_COLUMNS:
+        return this.setFirstColumns()
 
       case MessageFromWebviewType.FOCUS_FILTERS_TREE:
         return this.focusFiltersTree()
@@ -183,14 +195,19 @@ export class WebviewMessages {
 
       case MessageFromWebviewType.SHOW_MORE_COMMITS:
         return this.changeCommitsToShow(1, message.payload)
-
       case MessageFromWebviewType.SHOW_LESS_COMMITS:
         return this.changeCommitsToShow(-1, message.payload)
+      case MessageFromWebviewType.RESET_COMMITS:
+        return this.resetCommitsToShow(message.payload)
+
       case MessageFromWebviewType.SELECT_BRANCHES:
         return this.addAndRemoveBranches()
 
       case MessageFromWebviewType.REFRESH_EXP_DATA:
         return this.refreshData()
+
+      case MessageFromWebviewType.TOGGLE_SHOW_ONLY_CHANGED:
+        return this.toggleShowOnlyChanged()
 
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
@@ -214,6 +231,12 @@ export class WebviewMessages {
   }
 
   private async changeCommitsToShow(change: 1 | -1, branch: string) {
+    this.experiments.setNbfCommitsToShow(
+      this.experiments.getNbOfCommitsToShow(branch) +
+        NUM_OF_COMMITS_TO_INCREASE * change,
+      branch
+    )
+    await this.update()
     sendTelemetryEvent(
       change === 1
         ? EventName.VIEWS_EXPERIMENTS_TABLE_SHOW_MORE_COMMITS
@@ -221,12 +244,16 @@ export class WebviewMessages {
       undefined,
       undefined
     )
-    this.experiments.setNbfCommitsToShow(
-      this.experiments.getNbOfCommitsToShow(branch) +
-        NUM_OF_COMMITS_TO_INCREASE * change,
-      branch
-    )
+  }
+
+  private async resetCommitsToShow(branch: string) {
+    this.experiments.resetNbfCommitsToShow(branch)
     await this.update()
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_RESET_COMMITS,
+      undefined,
+      undefined
+    )
   }
 
   private refreshData() {
@@ -239,26 +266,82 @@ export class WebviewMessages {
     return this.update()
   }
 
-  private getWebviewData(): TableData {
+  private toggleShowOnlyChanged() {
+    this.columns.toggleShowOnlyChanged()
+    return Promise.all([
+      this.sendWebviewMessage(),
+      sendTelemetryEvent(
+        EventName.VIEWS_EXPERIMENTS_TABLE_REFRESH,
+        undefined,
+        undefined
+      )
+    ])
+  }
+
+  private async getWebviewData(): Promise<TableData> {
+    const [
+      changes,
+      cliError,
+      columnOrder,
+      columnWidths,
+      selectedColumns,
+      filters,
+      hasBranchesToSelect,
+      hasCheckpoints,
+      hasColumns,
+      hasConfig,
+      hasMoreCommits,
+      hasRunningWorkspaceExperiment,
+      isShowingMoreCommits,
+      rows,
+      selectedBranches,
+      selectedForPlotsCount,
+      showOnlyChanged,
+      sorts
+    ] = await Promise.all([
+      this.columns.getChanges(),
+      this.experiments.getCliError() || null,
+      this.columns.getColumnOrder(),
+      this.columns.getColumnWidths(),
+      this.columns.getSelected(),
+      this.experiments.getFilters(),
+      this.experiments.getAvailableBranchesToShow().length > 0,
+      this.experiments.hasCheckpoints(),
+      this.columns.hasNonDefaultColumns(),
+      this.pipeline.hasPipeline(),
+      this.experiments.getHasMoreCommits(),
+      this.experiments.hasRunningWorkspaceExperiment(),
+      this.experiments.getIsShowingMoreCommits(),
+      this.experiments.getRowData(),
+      this.experiments.getSelectedBranches(),
+      this.experiments.getSelectedRevisions().length,
+      this.columns.getShowOnlyChanged(),
+      this.experiments.getSorts()
+    ])
+
+    const columns = showOnlyChanged
+      ? collectColumnsWithChangedValues(selectedColumns, rows, filters)
+      : selectedColumns
+
     return {
-      changes: this.columns.getChanges(),
-      cliError: this.experiments.getCliError() || null,
-      columnOrder: this.columns.getColumnOrder(),
-      columnWidths: this.columns.getColumnWidths(),
-      columns: this.columns.getSelected(),
-      filters: this.experiments.getFilterPaths(),
-      hasBranchesToSelect:
-        this.experiments.getAvailableBranchesToShow().length > 0,
-      hasCheckpoints: this.experiments.hasCheckpoints(),
-      hasColumns: this.columns.hasNonDefaultColumns(),
-      hasConfig: this.pipeline.hasPipeline(),
-      hasMoreCommits: this.experiments.getHasMoreCommits(),
-      hasRunningWorkspaceExperiment:
-        this.experiments.hasRunningWorkspaceExperiment(),
-      isShowingMoreCommits: this.experiments.getIsShowingMoreCommits(),
-      rows: this.experiments.getRowData(),
-      selectedForPlotsCount: this.experiments.getSelectedRevisions().length,
-      sorts: this.experiments.getSorts()
+      changes,
+      cliError,
+      columnOrder,
+      columnWidths,
+      columns,
+      filters: filters.map(({ path }) => path),
+      hasBranchesToSelect,
+      hasCheckpoints,
+      hasColumns,
+      hasConfig,
+      hasMoreCommits,
+      hasRunningWorkspaceExperiment,
+      isShowingMoreCommits,
+      rows,
+      selectedBranches,
+      selectedForPlotsCount,
+      showOnlyChanged,
+      sorts
     }
   }
 
@@ -322,6 +405,15 @@ export class WebviewMessages {
     )
   }
 
+  private setFirstColumns() {
+    void this.selectFirstColumns()
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_SELECT_COLUMNS,
+      undefined,
+      undefined
+    )
+  }
+
   private addColumnSort(sort: SortDefinition) {
     this.experiments.addSort(sort)
     sendTelemetryEvent(
@@ -366,13 +458,34 @@ export class WebviewMessages {
     return commandPromise
   }
 
-  private hideTableColumn(path: string) {
+  private hideColumnPath(path: string) {
     this.columns.unselect(path)
 
     this.notifyChanged()
 
     sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN,
+      EventName.VIEWS_EXPERIMENTS_TABLE_HIDE_COLUMN_PATH,
+      { path },
+      undefined
+    )
+  }
+
+  private movePathToStart(path: string) {
+    const toMove = []
+    const terminalNodes = this.columns.getColumnOrder()
+    for (const terminalNode of terminalNodes) {
+      if (!terminalNode.startsWith(path)) {
+        continue
+      }
+      toMove.push(terminalNode)
+    }
+
+    this.columns.selectFirst(toMove)
+
+    this.notifyChanged()
+
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_MOVE_TO_START,
       { path },
       undefined
     )

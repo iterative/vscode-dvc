@@ -111,6 +111,7 @@ export const buildSetup = ({
         columnsChanged: mockEmitter,
         getCliError: () => cliError,
         getHasData: () => hasData,
+        isReady: () => Promise.resolve(),
         showWebview: mockShowWebview
       } as unknown as WorkspaceExperiments,
       { setAvailability: stub() } as unknown as Status,
@@ -161,6 +162,7 @@ export const buildSetupWithWatchers = async (disposer: Disposer) => {
   ensureDirSync(TEMP_DIR)
 
   stub(WorkspaceFolders, 'getFirstWorkspaceFolder').returns(TEMP_DIR)
+  stub(WorkspaceFolders, 'getWorkspaceFolders').returns([TEMP_DIR])
 
   const setup = disposer.track(
     new Setup(

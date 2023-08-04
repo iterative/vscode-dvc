@@ -9,12 +9,21 @@ import { uniqueValues } from '../util/array'
 import { DeferredDisposable } from '../class/deferred'
 import { isPathInSubProject, isSameOrChild } from '../fileSystem'
 
-export type ExperimentsOutput = {
+type LocalExperimentsOutput = {
   availableNbCommits: { [branch: string]: number }
   expShow: ExpShowOutput
   gitLog: string
   rowOrder: { branch: string; sha: string }[]
 }
+
+type RemoteExperimentsOutput = { remoteExpRefs: string }
+
+export type ExperimentsOutput = LocalExperimentsOutput | RemoteExperimentsOutput
+
+export const isRemoteExperimentsOutput = (
+  data: ExperimentsOutput
+): data is RemoteExperimentsOutput =>
+  (data as RemoteExperimentsOutput).remoteExpRefs !== undefined
 
 export abstract class BaseData<
   T extends
@@ -57,15 +66,13 @@ export abstract class BaseData<
     this.staticFiles = staticFiles
 
     this.watchFiles()
-
-    this.waitForInitialData()
   }
 
   protected notifyChanged(data: T) {
     this.updated.fire(data)
   }
 
-  private waitForInitialData() {
+  protected waitForInitialData() {
     const waitForInitialData = this.dispose.track(
       this.onDidUpdate(() => {
         this.dispose.untrack(waitForInitialData)

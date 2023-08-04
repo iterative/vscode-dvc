@@ -43,7 +43,11 @@ const convertUrlTextToLink = (stdout: string) => {
 }
 
 export const getPushExperimentCommand =
-  (internalCommands: InternalCommands, setup: Setup) =>
+  (
+    experiments: WorkspaceExperiments,
+    internalCommands: InternalCommands,
+    setup: Setup
+  ) =>
   ({ dvcRoot, ids }: { dvcRoot: string; ids: string[] }) => {
     const studioAccessToken = setup.getStudioAccessToken()
     if (
@@ -56,23 +60,38 @@ export const getPushExperimentCommand =
     }
 
     return Toast.showProgress('exp push', async progress => {
+      const repository = experiments.getRepository(dvcRoot)
+
+      const updateOnCompletion = () => {
+        return repository.unsetPushing(ids)
+      }
+
       progress.report({ increment: 0 })
 
       progress.report({ increment: 25, message: `Pushing ${ids.join(' ')}...` })
 
       const remainingProgress = 75
 
-      const stdout = await internalCommands.executeCommand(
-        AvailableCommands.EXP_PUSH,
-        dvcRoot,
-        ...ids
-      )
+      repository.setPushing(ids)
 
-      progress.report({
-        increment: remainingProgress,
-        message: convertUrlTextToLink(stdout)
-      })
+      try {
+        const stdout = await internalCommands.executeCommand(
+          AvailableCommands.EXP_PUSH,
+          dvcRoot,
+          ...ids
+        )
 
-      return Toast.delayProgressClosing(15000)
+        void updateOnCompletion()
+
+        progress.report({
+          increment: remainingProgress,
+          message: convertUrlTextToLink(stdout)
+        })
+
+        return Toast.delayProgressClosing(15000)
+      } catch (error: unknown) {
+        void updateOnCompletion()
+        throw error
+      }
     })
   }

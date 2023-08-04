@@ -1,8 +1,13 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
-import { collectChanges, collectColumns, collectRelativeMetricsFiles } from '.'
+import {
+  collectChanges,
+  collectColumns,
+  collectColumnsWithChangedValues,
+  collectRelativeMetricsFiles
+} from '.'
 import { timestampColumn } from '../constants'
 import { buildMetricOrParamPath } from '../paths'
-import { Column, ColumnType } from '../../webview/contract'
+import { ColumnType } from '../../webview/contract'
 import outputFixture from '../../../test/fixtures/expShow/base/output'
 import columnsFixture from '../../../test/fixtures/expShow/base/columns'
 import workspaceChangesFixture from '../../../test/fixtures/expShow/base/workspaceChanges'
@@ -15,6 +20,8 @@ import {
 } from '../../../cli/dvc/contract'
 import { getConfigValue } from '../../../vscode/config'
 import { generateTestExpShowOutput } from '../../../test/util/experiments'
+import rowsFixture from '../../../test/fixtures/expShow/base/rows'
+import { Operator, filterExperiment } from '../../model/filterBy'
 
 jest.mock('../../../vscode/config')
 
@@ -22,13 +29,13 @@ const mockedGetConfigValue = jest.mocked(getConfigValue)
 mockedGetConfigValue.mockImplementation(() => 5)
 
 describe('collectColumns', () => {
-  it('should return a value equal to the columns fixture when given the output fixture', () => {
-    const columns = collectColumns(outputFixture)
+  it('should return a value equal to the columns fixture when given the output fixture', async () => {
+    const columns = await collectColumns(outputFixture)
     expect(columns).toStrictEqual(columnsFixture)
   })
 
-  it('should output both params and metrics when both are present', () => {
-    const columns = collectColumns(
+  it('should output both params and metrics when both are present', async () => {
+    const columns = await collectColumns(
       generateTestExpShowOutput({
         metrics: {
           1: {
@@ -50,8 +57,8 @@ describe('collectColumns', () => {
     expect(metrics).toBeDefined()
   })
 
-  it('should omit params when none exist in the source data', () => {
-    const columns = collectColumns(
+  it('should omit params when none exist in the source data', async () => {
+    const columns = await collectColumns(
       generateTestExpShowOutput({
         metrics: {
           1: {
@@ -66,187 +73,13 @@ describe('collectColumns', () => {
     expect(metrics).toBeDefined()
   })
 
-  it('should return an empty array if no params and metrics are provided', () => {
-    const columns = collectColumns(generateTestExpShowOutput({}))
+  it('should return an empty array if no params and metrics are provided', async () => {
+    const columns = await collectColumns(generateTestExpShowOutput({}))
     expect(columns).toStrictEqual([])
   })
 
-  const exampleBigNumber = 3000000000
-
-  const data: ExpShowOutput = generateTestExpShowOutput(
-    {
-      params: {
-        'params.yaml': {
-          data: { mixedParam: exampleBigNumber }
-        }
-      }
-    },
-    {
-      rev: 'branchA',
-      data: {
-        params: {
-          'params.yaml': {
-            data: { mixedParam: 'string' }
-          }
-        }
-      },
-      experiments: [
-        {
-          params: {
-            'params.yaml': {
-              data: { mixedParam: true }
-            }
-          }
-        }
-      ]
-    },
-    {
-      rev: 'branchB',
-      data: {
-        params: {
-          'params.yaml': {
-            data: { mixedParam: null }
-          }
-        }
-      }
-    }
-  )
-
-  const columns = collectColumns(data)
-
-  const exampleMixedParam = columns.find(
-    column =>
-      column.parentPath ===
-      buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml')
-  ) as Column
-
-  it('should correctly identify mixed type params', () => {
-    expect(exampleMixedParam.types).toStrictEqual([
-      'number',
-      'string',
-      'boolean',
-      'null'
-    ])
-  })
-
-  it('should correctly identify a number as the highest string length of a mixed param', () => {
-    expect(exampleMixedParam.maxStringLength).toStrictEqual(10)
-  })
-
-  it('should add the highest and lowest number from the one present', () => {
-    expect(exampleMixedParam.maxNumber).toStrictEqual(exampleBigNumber)
-    expect(exampleMixedParam.minNumber).toStrictEqual(exampleBigNumber)
-  })
-
-  it('should find a different minNumber and maxNumber on a mixed param', () => {
-    const columns = collectColumns(
-      generateTestExpShowOutput(
-        {},
-        {
-          rev: 'branchA',
-          data: {
-            params: {
-              'params.yaml': {
-                data: { mixedNumber: null }
-              }
-            }
-          },
-          experiments: [
-            {
-              params: {
-                'params.yaml': {
-                  data: { mixedNumber: 0 }
-                }
-              }
-            },
-            {
-              params: {
-                'params.yaml': {
-                  data: { mixedNumber: -1 }
-                }
-              }
-            },
-            {
-              params: {
-                'params.yaml': {
-                  data: { mixedNumber: 1 }
-                }
-              }
-            }
-          ]
-        }
-      )
-    )
-
-    const mixedParam = columns.find(
-      column =>
-        column.path ===
-        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'mixedNumber')
-    ) as Column
-
-    expect(mixedParam.minNumber).toStrictEqual(-1)
-    expect(mixedParam.maxNumber).toStrictEqual(1)
-  })
-
-  const numericColumns = collectColumns(
-    generateTestExpShowOutput(
-      {},
-      {
-        rev: 'branch1',
-        data: {
-          params: {
-            'params.yaml': {
-              data: { withNumbers: -1, withoutNumbers: 'a' }
-            }
-          }
-        },
-        experiments: [
-          {
-            params: {
-              'params.yaml': {
-                data: { withNumbers: 2, withoutNumbers: 'b' }
-              }
-            }
-          },
-          {
-            params: {
-              'params.yaml': {
-                data: { withNumbers: 'c', withoutNumbers: 'b' }
-              }
-            }
-          }
-        ]
-      }
-    )
-  )
-
-  const param = numericColumns.filter(
-    column => column.type === ColumnType.PARAMS
-  )
-  const paramWithNumbers = param.find(p => p.label === 'withNumbers') as Column
-  const paramWithoutNumbers = param.find(
-    p => p.label === 'withoutNumbers'
-  ) as Column
-
-  it('should not add a maxNumber or minNumber on a param with no numbers', () => {
-    expect(paramWithoutNumbers.minNumber).toBeUndefined()
-    expect(paramWithoutNumbers.maxNumber).toBeUndefined()
-  })
-
-  it('should find the min number of -1', () => {
-    expect(paramWithNumbers.minNumber).toStrictEqual(-1)
-  })
-
-  it('should find the max number of 2', () => {
-    expect(paramWithNumbers.maxNumber).toStrictEqual(2)
-  })
-
-  it('should find a max string length of two from -1', () => {
-    expect(paramWithNumbers.maxStringLength).toStrictEqual(2)
-  })
-
-  it('should aggregate multiple different field names', () => {
-    const columns = collectColumns(
+  it('should aggregate multiple different field names', async () => {
+    const columns = await collectColumns(
       generateTestExpShowOutput(
         {
           params: {
@@ -301,8 +134,8 @@ describe('collectColumns', () => {
     ])
   })
 
-  it('should create concatenated columns for nesting deeper than 5', () => {
-    const columns = collectColumns(
+  it('should create concatenated columns for nesting deeper than 5', async () => {
+    const columns = await collectColumns(
       generateTestExpShowOutput({
         params: {
           'params.yaml': {
@@ -348,53 +181,6 @@ describe('collectColumns', () => {
         'seven'
       )
     ])
-  })
-
-  it('should not report types for params and metrics without primitives or children for params and metrics without objects', () => {
-    const columns = collectColumns(
-      generateTestExpShowOutput({
-        params: {
-          'params.yaml': {
-            data: {
-              onlyHasChild: {
-                onlyHasPrimitive: 1
-              }
-            }
-          }
-        }
-      })
-    )
-
-    const objectParam = columns.find(
-      column =>
-        column.parentPath ===
-        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml')
-    ) as Column
-
-    expect(objectParam.label).toStrictEqual('onlyHasChild')
-    expect(objectParam.types).toBeUndefined()
-
-    const primitiveParam = columns.find(
-      column =>
-        column.parentPath ===
-        buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'onlyHasChild')
-    ) as Column
-
-    expect(primitiveParam.label).toStrictEqual('onlyHasPrimitive')
-    expect(primitiveParam.types).toBeDefined()
-
-    const onlyHasPrimitiveChild = columns.find(
-      column =>
-        column.parentPath ===
-        buildMetricOrParamPath(
-          ColumnType.PARAMS,
-          'params.yaml',
-          'onlyHasChild',
-          'onlyHasPrimitive'
-        )
-    ) as Column
-
-    expect(onlyHasPrimitiveChild).toBeUndefined()
   })
 })
 
@@ -744,5 +530,56 @@ describe('collectRelativeMetricsFiles', () => {
     const existingFiles: string[] = []
 
     expect(collectRelativeMetricsFiles([])).toStrictEqual(existingFiles)
+  })
+})
+
+describe('collectColumnsWithChangedValues', () => {
+  it('should return the expected columns from the test fixture', () => {
+    const changedColumns = collectColumnsWithChangedValues(
+      columnsFixture,
+      rowsFixture,
+      []
+    )
+    expect(changedColumns).toStrictEqual(
+      columnsFixture.filter(({ path }) =>
+        [
+          'metrics:summary.json',
+          'metrics:summary.json:loss',
+          'metrics:summary.json:accuracy',
+          'metrics:summary.json:val_loss',
+          'metrics:summary.json:val_accuracy',
+          'params:params.yaml',
+          'params:params.yaml:code_names',
+          'params:params.yaml:epochs',
+          'params:params.yaml:learning_rate',
+          'params:params.yaml:dropout',
+          'params:params.yaml:process',
+          'params:params.yaml:process.threshold',
+          'params:params.yaml:process.test_arg'
+        ].includes(path)
+      )
+    )
+  })
+
+  it('should return the expected columns when applying filters (calculate changed after filters)', () => {
+    const uniformColumn = 'params:params.yaml:dropout'
+    const filters = [
+      {
+        path: uniformColumn,
+        operator: Operator.EQUAL,
+        value: 0.124
+      }
+    ]
+    const filteredRows = [...rowsFixture]
+    for (const row of filteredRows) {
+      row.subRows = row.subRows?.filter(exp => filterExperiment(filters, exp))
+    }
+
+    const changedColumns = collectColumnsWithChangedValues(
+      columnsFixture,
+      filteredRows,
+      filters
+    )
+    expect(changedColumns.map(({ path }) => path)).not.toContain(uniformColumn)
   })
 })

@@ -49,13 +49,11 @@ describe('pickFromColumnLikes', () => {
     expect(mockedQuickPickValue).toHaveBeenCalledWith(
       [
         {
-          description: epochsParamPath,
-          label: 'epochs',
+          label: epochsParamPath,
           value: epochsParam
         },
         {
-          description: paramsYamlPath,
-          label: paramsYaml,
+          label: paramsYamlPath,
           value: paramsYamlParam
         }
       ],

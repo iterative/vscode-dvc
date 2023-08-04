@@ -2,7 +2,10 @@ import { Column, ColumnType } from '../../webview/contract'
 import { Value } from '../../../cli/dvc/contract'
 import { ConfigKey, getConfigValue } from '../../../vscode/config'
 
-export type ColumnAccumulator = Record<string, Column>
+export type ColumnAccumulator = {
+  columns: Record<string, Column>
+  collected: Set<string>
+}
 
 const joinPathArray = (
   pathSegments: string[],
@@ -76,10 +79,10 @@ const mergeParentColumnByPath = (
   parentPath: string,
   label: string
 ) => {
-  if (acc[path]) {
-    acc[path].hasChildren = true
+  if (acc.columns[path]) {
+    acc.columns[path].hasChildren = true
   } else {
-    acc[path] = {
+    acc.columns[path] = {
       hasChildren: true,
       label,
       parentPath,
@@ -99,22 +102,6 @@ const getValueType = (value: Value) => {
   return typeof value
 }
 
-const setStringLength = (column: Column, stringLength: number) => {
-  if (!column.maxStringLength || column.maxStringLength < stringLength) {
-    column.maxStringLength = stringLength
-  }
-}
-
-const mergeNumberIntoColumn = (column: Column, value: number) => {
-  const { maxNumber, minNumber } = column
-  if (maxNumber === undefined || maxNumber < value) {
-    column.maxNumber = value
-  }
-  if (minNumber === undefined || minNumber > value) {
-    column.minNumber = value
-  }
-}
-
 export const mergeAncestors = (
   acc: ColumnAccumulator,
   type: ColumnType,
@@ -122,32 +109,15 @@ export const mergeAncestors = (
   limitedDepthAncestors: string[],
   join: (...pathArray: string[]) => string
 ) => {
-  if (!acc[path]) {
-    for (let i = 1; i <= limitedDepthAncestors.length; i++) {
-      const pathArray = limitedDepthAncestors.slice(0, i)
-      mergeParentColumnByPath(
-        acc,
-        type,
-        join(...pathArray),
-        join(...pathArray.slice(0, -1)),
-        pathArray[pathArray.length - 1]
-      )
-    }
-  }
-}
-
-const mergeValueIntoColumn = (column: Column, value: Value) => {
-  const valueType = getValueType(value)
-  if (!column.types) {
-    column.types = [valueType]
-  } else if (!column.types.includes(valueType)) {
-    column.types.push(valueType)
-  }
-
-  setStringLength(column, String(value).length)
-
-  if (valueType === 'number') {
-    mergeNumberIntoColumn(column, value as number)
+  for (let i = 1; i <= limitedDepthAncestors.length; i++) {
+    const pathArray = limitedDepthAncestors.slice(0, i)
+    mergeParentColumnByPath(
+      acc,
+      type,
+      join(...pathArray),
+      join(...pathArray.slice(0, -1)),
+      pathArray[pathArray.length - 1]
+    )
   }
 }
 
@@ -158,28 +128,18 @@ const buildValueColumn = (
   label: string,
   value: Value
 ) => {
-  const valueType = getValueType(value)
-
-  const newColumn: Column = {
+  return {
+    firstValueType: getValueType(value),
     hasChildren: false,
     label,
-    maxStringLength: String(value).length,
     parentPath,
     path,
     pathArray,
-    type: pathArray[0] as ColumnType,
-    types: [valueType]
+    type: pathArray[0] as ColumnType
   }
-
-  if (valueType === 'number') {
-    newColumn.maxNumber = value as number
-    newColumn.minNumber = value as number
-  }
-
-  return newColumn
 }
 
-export const mergeValueColumn = (
+export const collectColumn = (
   acc: ColumnAccumulator,
   path: string,
   parentPath: string,
@@ -187,9 +147,11 @@ export const mergeValueColumn = (
   label: string,
   value: Value
 ) => {
-  if (!acc[path]) {
-    acc[path] = buildValueColumn(path, parentPath, pathArray, label, value)
-    return
-  }
-  mergeValueIntoColumn(acc[path], value)
+  acc.columns[path] = buildValueColumn(
+    path,
+    parentPath,
+    pathArray,
+    label,
+    value
+  )
 }

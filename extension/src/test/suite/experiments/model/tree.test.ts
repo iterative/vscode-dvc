@@ -16,14 +16,15 @@ import {
   getFirstArgOfLastCall,
   getMockNow,
   getTimeSafeDisposer,
-  stubPrivatePrototypeMethod
+  stubPrivatePrototypeMethod,
+  waitForSpyCall
 } from '../../util'
 import { dvcDemoPath } from '../../../util'
 import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../../../commands/external'
-import { buildPlots } from '../../plots/util'
+import { buildPlots, buildPlotsWebview } from '../../plots/util'
 import { ExperimentsTree } from '../../../../experiments/model/tree'
 import { buildExperiments, stubWorkspaceExperimentsGetters } from '../util'
 import { WEBVIEW_TEST_TIMEOUT } from '../../timeouts'
@@ -38,8 +39,6 @@ import { WorkspaceExperiments } from '../../../../experiments/workspace'
 import { EXPERIMENT_WORKSPACE_ID } from '../../../../cli/dvc/contract'
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
 import { Revision } from '../../../../plots/webview/contract'
-import { BaseWebview } from '../../../../webview'
-import { Experiment } from '../../../../experiments/webview/contract'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = getTimeSafeDisposer()
@@ -63,17 +62,15 @@ suite('Experiments Tree Test Suite', () => {
     it('should be able to toggle whether an experiment is shown in the plots webview with dvc.views.experiments.toggleStatus', async () => {
       const mockNow = getMockNow()
 
-      const { plots, messageSpy, plotsModel, experimentsModel } =
-        await buildPlots({ disposer: disposable })
-      messageSpy.restore()
-      const mockShow = stub(BaseWebview.prototype, 'show')
-
-      experimentsModel.setSelected([
-        { id: EXPERIMENT_WORKSPACE_ID },
-        { id: 'main' },
-        { id: 'test-branch' },
-        { id: 'exp-f13bca' }
-      ] as Experiment[])
+      const { messageSpy, plotsModel } = await buildPlotsWebview({
+        disposer: disposable,
+        selectedExperiments: [
+          EXPERIMENT_WORKSPACE_ID,
+          'main',
+          'test-branch',
+          'exp-f13bca'
+        ]
+      })
 
       const expectedRevisions: { displayColor: string; id: string }[] = []
 
@@ -86,13 +83,9 @@ suite('Experiments Tree Test Suite', () => {
         expectedRevisions.push({ displayColor, id })
       }
 
-      const webview = await plots.showWebview()
-
-      await webview.isReady()
-
       let updateCall = 1
       while (expectedRevisions.length > 0) {
-        const { selectedRevisions } = mockShow.lastCall.firstArg
+        const { selectedRevisions } = messageSpy.lastCall.firstArg
 
         expect(
           (selectedRevisions as Revision[]).map(({ displayColor, id }) => ({
@@ -101,17 +94,11 @@ suite('Experiments Tree Test Suite', () => {
           })),
           'a message is sent with colors for the currently selected experiments'
         ).to.deep.equal(expectedRevisions)
-        mockShow.resetHistory()
-        mockShow.resetBehavior()
+        messageSpy.resetHistory()
 
         const { id } = expectedRevisions.pop() as { id: string }
 
-        const messageSent = new Promise(resolve =>
-          mockShow.callsFake(() => {
-            resolve(undefined)
-            return Promise.resolve(true)
-          })
-        )
+        const messageSent = waitForSpyCall(messageSpy, messageSpy.callCount)
 
         bypassProcessManagerDebounce(mockNow, updateCall)
         const unSelected = await commands.executeCommand(
@@ -128,19 +115,14 @@ suite('Experiments Tree Test Suite', () => {
       }
 
       expect(
-        mockShow,
+        messageSpy,
         "when there are no experiments selected we don't send any template plots"
       ).to.be.calledWithMatch({
         template: null
       })
-      mockShow.resetHistory()
+      messageSpy.resetHistory()
 
-      const messageSent = new Promise(resolve =>
-        mockShow.callsFake(() => {
-          resolve(undefined)
-          return Promise.resolve(true)
-        })
-      )
+      const messageSent = waitForSpyCall(messageSpy, messageSpy.callCount)
 
       bypassProcessManagerDebounce(mockNow, updateCall)
       const selected = await commands.executeCommand(
@@ -191,7 +173,7 @@ suite('Experiments Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to select / de-select experiments using dvc.views.experimentsTree.selectExperiments', async () => {
-      const { plots, plotsModel, messageSpy } = await buildPlots({
+      const { plotsModel, messageSpy } = await buildPlotsWebview({
         disposer: disposable
       })
 
@@ -202,8 +184,6 @@ suite('Experiments Tree Test Suite', () => {
         label: '',
         value: { id: label }
       }
-
-      await plots.showWebview()
 
       const inputAccepted = disposable.track(new EventEmitter<void>())
       const mockEvent = disposable.track(new EventEmitter()).event
@@ -226,6 +206,8 @@ suite('Experiments Tree Test Suite', () => {
         })
       )
 
+      const messageSent = waitForSpyCall(messageSpy, messageSpy.callCount)
+
       const selectExperiments = commands.executeCommand(
         RegisteredCommands.EXPERIMENT_SELECT
       )
@@ -233,7 +215,7 @@ suite('Experiments Tree Test Suite', () => {
       await quickPickCreated
       mockQuickPick.selectedItems = [selectedItem]
       inputAccepted.fire()
-      await selectExperiments
+      await Promise.all([selectExperiments, messageSent])
 
       expect(mockCreateQuickPick).to.be.calledOnce
 
@@ -349,6 +331,11 @@ suite('Experiments Tree Test Suite', () => {
 
     it('should be able to push an experiment with dvc.views.experimentsTree.pushExperiment', async () => {
       bypassProgressCloseDelay()
+      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
+      await experiments.isReady()
+
+      const mockUpdate = stub(experiments, 'update').resolves(undefined)
+
       const mockExperimentId = 'exp-to-push'
       const mockExperiment = {
         dvcRoot: dvcDemoPath,
@@ -369,11 +356,17 @@ suite('Experiments Tree Test Suite', () => {
       )
 
       expect(mockExpPush).to.be.calledWithExactly(dvcDemoPath, mockExperimentId)
+      expect(mockUpdate).to.be.calledOnce
     })
 
     it('should be able to push the provided experiment with dvc.views.experimentsTree.pushExperiment (if no experiments are selected)', async () => {
       bypassProgressCloseDelay()
       const mockExperiment = 'exp-to-push'
+
+      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
+      await experiments.isReady()
+
+      const mockUpdate = stub(experiments, 'update').resolves(undefined)
 
       const mockExpPush = stub(DvcExecutor.prototype, 'expPush').resolves('')
 
@@ -392,6 +385,7 @@ suite('Experiments Tree Test Suite', () => {
       )
 
       expect(mockExpPush).to.be.calledWithExactly(dvcDemoPath, mockExperiment)
+      expect(mockUpdate).to.be.calledOnce
     })
 
     it('should be able to push multiple experiments with dvc.views.experimentsTree.pushExperiment', async () => {
@@ -399,6 +393,11 @@ suite('Experiments Tree Test Suite', () => {
       const mockFirstExperimentId = 'first-exp-pushed'
       const mockSecondExperimentId = 'second-exp-pushed'
       const mockQueuedExperimentLabel = 'queued-excluded'
+
+      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
+      await experiments.isReady()
+
+      const mockUpdate = stub(experiments, 'update').resolves(undefined)
 
       const mockExpPush = stub(DvcExecutor.prototype, 'expPush').resolves('')
 
@@ -438,6 +437,7 @@ suite('Experiments Tree Test Suite', () => {
         mockFirstExperimentId,
         mockSecondExperimentId
       )
+      expect(mockUpdate).to.be.calledOnce
     })
 
     it('should be able to stop multiple running experiments with dvc.views.experimentsTree.stopExperiment', async () => {

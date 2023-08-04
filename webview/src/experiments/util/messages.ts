@@ -18,10 +18,19 @@ export const addStarredFilter = () =>
 export const addConfiguration = () =>
   sendMessage({ type: MessageFromWebviewType.ADD_CONFIGURATION })
 
+export const pushExperiment = (id: string) =>
+  sendMessage({ payload: [id], type: MessageFromWebviewType.PUSH_EXPERIMENT })
+
 export const reorderColumns = (newOrder: string[]) =>
   sendMessage({
     payload: newOrder,
     type: MessageFromWebviewType.REORDER_COLUMNS
+  })
+
+export const resetCommits = (branch: string) =>
+  sendMessage({
+    payload: branch,
+    type: MessageFromWebviewType.RESET_COMMITS
   })
 
 export const resizeColumn = (id: string, width: number) =>
@@ -54,6 +63,11 @@ export const toggleExperiment = (id: string) =>
   sendMessage({
     payload: id,
     type: MessageFromWebviewType.TOGGLE_EXPERIMENT
+  })
+
+export const toggleShowOnlyChanged = () =>
+  sendMessage({
+    type: MessageFromWebviewType.TOGGLE_SHOW_ONLY_CHANGED
   })
 
 export const toggleStarred = (id: string) =>

@@ -14,35 +14,46 @@ type PathWithSelected<T extends PathType> = T & {
   selected: boolean
 }
 
-const getItem = <T extends PathType>(element: PathWithSelected<T>) => ({
+const collectDefaultItem = <T extends PathType>(
+  element: PathWithSelected<T>
+): QuickPickItemWithValue<PathWithSelected<T>> => ({
   label: element.path,
   picked: element.selected,
   value: element
 })
 
 const collectItems = <T extends PathType>(
-  paths: PathWithSelected<T>[]
+  paths: PathWithSelected<T>[],
+  collectItem: (
+    element: PathWithSelected<T>
+  ) => QuickPickItemWithValue<PathWithSelected<T>>
 ): QuickPickItemWithValue<PathWithSelected<T>>[] => {
   const acc: QuickPickItemWithValue<PathWithSelected<T>>[] = []
 
   for (const path of paths) {
-    acc.push(getItem(path))
+    acc.push(collectItem(path))
   }
 
   return acc
 }
 
 export const pickPaths = <T extends PathType>(
-  type: 'plots' | 'columns',
-  paths?: PathWithSelected<T>[]
+  paths: PathWithSelected<T>[] | undefined,
+  title:
+    | typeof Title.SELECT_PLOTS
+    | typeof Title.SELECT_COLUMNS
+    | typeof Title.SELECT_FIRST_COLUMNS,
+  collectItem: (
+    element: PathWithSelected<T>
+  ) => QuickPickItemWithValue<PathWithSelected<T>> = collectDefaultItem
 ): Thenable<PathWithSelected<T>[] | undefined> => {
-  const title = type === 'plots' ? Title.SELECT_PLOTS : Title.SELECT_COLUMNS
+  const type = Title.SELECT_PLOTS === title ? 'plots' : 'columns'
 
   if (!definedAndNonEmpty(paths)) {
     return Toast.showError(`There are no ${type} to select.`)
   }
 
-  const items = collectItems(paths)
+  const items = collectItems(paths, collectItem)
 
   return quickPickManyValues<PathWithSelected<T>>(items, {
     title

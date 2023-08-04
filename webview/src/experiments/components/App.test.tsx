@@ -47,7 +47,7 @@ import {
   renderTableWithoutRunningExperiments,
   renderTableWithPlaceholder,
   renderTableWithSortingData,
-  renderTableWithWorkspaceRowOnly,
+  renderTableWithNoRows,
   selectedRows,
   setTableData
 } from '../../test/experimentsTable'
@@ -109,8 +109,8 @@ describe('App', () => {
     expect(noColumnsState).not.toBeInTheDocument()
   })
 
-  it('should show the no experiments empty state when only the workspace is provided', () => {
-    renderTableWithWorkspaceRowOnly()
+  it('should show the no experiments empty state when no rows are provided', () => {
+    renderTableWithNoRows()
 
     const noExperimentsState = screen.queryByText('No Experiments to Display.')
     expect(noExperimentsState).toBeInTheDocument()
@@ -472,9 +472,6 @@ describe('App', () => {
         {
           hasChildren: false,
           label: 'loss',
-          maxNumber: testMetricNumberValue,
-          maxStringLength: 18,
-          minNumber: testMetricNumberValue,
           parentPath: buildMetricOrParamPath(
             ColumnType.METRICS,
             'summary.json'
@@ -498,7 +495,6 @@ describe('App', () => {
         {
           hasChildren: false,
           label: testParamName,
-          maxStringLength: 10,
           parentPath: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml'),
           path: testParamPath,
           pathArray: [ColumnType.PARAMS, 'params.yaml', testParamName],
@@ -737,10 +733,10 @@ describe('App', () => {
       advanceTimersByTime(100)
 
       const menuitems = screen.getAllByRole('menuitem')
-      expect(menuitems).toHaveLength(6)
+      expect(menuitems).toHaveLength(9)
       expect(
         menuitems.filter(item => !item.className.includes('disabled'))
-      ).toHaveLength(3)
+      ).toHaveLength(6)
 
       fireEvent.keyDown(paramsFileHeader, { bubbles: true, key: 'Escape' })
       expect(screen.queryAllByRole('menuitem')).toHaveLength(0)
@@ -761,7 +757,7 @@ describe('App', () => {
       expect(disabledMenuItem).toBeDefined()
 
       disabledMenuItem && fireEvent.click(disabledMenuItem, { bubbles: true })
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(6)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(9)
     })
 
     it('should have the same enabled options in the empty placeholders', () => {
@@ -781,8 +777,11 @@ describe('App', () => {
           .map(item => item.textContent)
 
         expect(menuitems).toStrictEqual([
-          'Hide Column',
+          'Hide',
+          'Move to Start',
           'Set Max Header Height',
+          'Select Columns',
+          'Select First Columns',
           'Sort Ascending',
           'Sort Descending'
         ])
@@ -807,10 +806,72 @@ describe('App', () => {
           .filter(item => !item.className.includes('disabled'))
           .map(item => item.textContent)
 
-        expect(menuitems).toStrictEqual(['Set Max Header Height'])
+        expect(menuitems).toStrictEqual([
+          'Set Max Header Height',
+          'Select Columns',
+          'Select First Columns'
+        ])
 
         fireEvent.keyDown(segment, { bubbles: true, key: 'Escape' })
       }
+    })
+
+    it('should send the correct message when Move to Start is clicked', () => {
+      renderTableWithPlaceholder()
+      const placeholders = screen.getAllByTestId(/header-Created/)
+      const placeholder = placeholders[0]
+      fireEvent.contextMenu(placeholder, { bubbles: true })
+      advanceTimersByTime(100)
+
+      const moveOption = screen.getByText('Move to Start')
+
+      mockPostMessage.mockClear()
+
+      fireEvent.click(moveOption)
+
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: 'Created',
+        type: MessageFromWebviewType.EXPERIMENTS_TABLE_MOVE_TO_START
+      })
+    })
+
+    it('should send the correct message when Select Columns is clicked', () => {
+      renderTableWithPlaceholder()
+      const placeholders = screen.getAllByTestId(/header-Created/)
+      const placeholder = placeholders[0]
+      fireEvent.contextMenu(placeholder, { bubbles: true })
+      advanceTimersByTime(100)
+
+      const selectOption = screen.getByText('Select Columns')
+
+      mockPostMessage.mockClear()
+
+      fireEvent.click(selectOption)
+
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SELECT_COLUMNS
+      })
+    })
+
+    it('should send the correct message when Select First Columns is clicked', () => {
+      renderTableWithPlaceholder()
+      const placeholders = screen.getAllByTestId(/header-Created/)
+      const placeholder = placeholders[0]
+      fireEvent.contextMenu(placeholder, { bubbles: true })
+      advanceTimersByTime(100)
+
+      const selectOption = screen.getByText('Select First Columns')
+
+      mockPostMessage.mockClear()
+
+      fireEvent.click(selectOption)
+
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SELECT_FIRST_COLUMNS
+      })
     })
 
     describe('Hiding a column from its empty placeholder', () => {
@@ -823,7 +884,7 @@ describe('App', () => {
         fireEvent.contextMenu(placeholder, { bubbles: true })
         advanceTimersByTime(100)
 
-        const hideOption = screen.getByText('Hide Column')
+        const hideOption = screen.getByText('Hide')
 
         mockPostMessage.mockClear()
 
@@ -832,7 +893,7 @@ describe('App', () => {
         expect(mockPostMessage).toHaveBeenCalledTimes(1)
         expect(mockPostMessage).toHaveBeenCalledWith({
           payload: 'Created',
-          type: MessageFromWebviewType.HIDE_EXPERIMENTS_TABLE_COLUMN
+          type: MessageFromWebviewType.EXPERIMENTS_TABLE_HIDE_COLUMN_PATH
         })
       })
     })
@@ -1482,6 +1543,23 @@ describe('App', () => {
   })
 
   describe('Header Indicators', () => {
+    it('should show a show only changed columns indicator', () => {
+      renderTable()
+      jest.useFakeTimers()
+
+      const showOnlyChangedIndicator = screen.getByLabelText(
+        'show only changed columns'
+      )
+
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+      fireEvent.mouseEnter(showOnlyChangedIndicator)
+      advanceTimersByTime(1000)
+      const tooltip = screen.getByRole('tooltip')
+
+      expect(tooltip).toHaveTextContent('Toggle Show Only Changed Columns')
+    })
+
     it('should show an indicator with the amount of experiments selected for plotting', () => {
       renderTable({
         ...tableDataFixture
@@ -1584,136 +1662,187 @@ describe('App', () => {
       expect(sortIndicator).toHaveTextContent('2')
       jest.useRealTimers()
     })
-  })
 
-  it('should show an indicator with the amount of applied filters', () => {
-    renderTable({
-      ...tableDataFixture,
-      filters: []
+    it('should show an indicator with the amount of applied filters', () => {
+      renderTable({
+        ...tableDataFixture,
+        filters: []
+      })
+      jest.useFakeTimers()
+      const filterIndicator = screen.getByLabelText('filters')
+      expect(filterIndicator).toHaveTextContent('')
+
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+      fireEvent.mouseEnter(filterIndicator)
+      advanceTimersByTime(1000)
+
+      const tooltip = screen.getByRole('tooltip')
+
+      expect(tooltip).toHaveTextContent('Show Filters')
+
+      const { columns } = tableDataFixture
+      const firstFilterPath = columns[columns.length - 1].path
+      const secondFilterPath = columns[columns.length - 2].path
+      setTableData({
+        ...tableDataFixture,
+        filters: [firstFilterPath]
+      })
+      expect(filterIndicator).toHaveTextContent('1')
+
+      setTableData({
+        ...tableDataFixture,
+        filters: [firstFilterPath, secondFilterPath]
+      })
+      expect(filterIndicator).toHaveTextContent('2')
+
+      setTableData({
+        ...tableDataFixture,
+        filters: [firstFilterPath, secondFilterPath]
+      })
+      expect(filterIndicator).toHaveTextContent('2')
+
+      setTableData({
+        ...tableDataFixture,
+        filters: []
+      })
+      expect(filterIndicator).toHaveTextContent('')
+      expect(tooltip).not.toHaveTextContent('Experiment')
+      jest.useRealTimers()
     })
-    jest.useFakeTimers()
-    const filterIndicator = screen.getByLabelText('filters')
-    expect(filterIndicator).toHaveTextContent('')
 
-    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+    it('should show a tooltip for the branches indicator', () => {
+      renderTable({
+        ...tableDataFixture
+      })
+      jest.useFakeTimers()
+      const branchesIndicator = screen.getByLabelText('branches')
+      expect(branchesIndicator).toHaveTextContent('')
 
-    fireEvent.mouseEnter(filterIndicator)
-    advanceTimersByTime(1000)
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 
-    const tooltip = screen.getByRole('tooltip')
+      fireEvent.mouseEnter(branchesIndicator)
+      advanceTimersByTime(1000)
 
-    expect(tooltip).toHaveTextContent('Show Filters')
+      const tooltip = screen.getByRole('tooltip')
 
-    const { columns } = tableDataFixture
-    const firstFilterPath = columns[columns.length - 1].path
-    const secondFilterPath = columns[columns.length - 2].path
-    setTableData({
-      ...tableDataFixture,
-      filters: [firstFilterPath]
+      expect(tooltip).toHaveTextContent('Select Branches')
+      jest.useRealTimers()
     })
-    expect(filterIndicator).toHaveTextContent('1')
 
-    setTableData({
-      ...tableDataFixture,
-      filters: [firstFilterPath, secondFilterPath]
-    })
-    expect(filterIndicator).toHaveTextContent('2')
+    it('should show an indicator for the number of branches selected', () => {
+      const branches = ['main', 'other', 'third']
 
-    setTableData({
-      ...tableDataFixture,
-      filters: [firstFilterPath, secondFilterPath]
-    })
-    expect(filterIndicator).toHaveTextContent('2')
-
-    setTableData({
-      ...tableDataFixture,
-      filters: []
-    })
-    expect(filterIndicator).toHaveTextContent('')
-    expect(tooltip).not.toHaveTextContent('Experiment')
-    jest.useRealTimers()
-  })
-
-  it('should show a tooltip for the branches indicator', () => {
-    renderTable({
-      ...tableDataFixture
-    })
-    jest.useFakeTimers()
-    const branchesIndicator = screen.getByLabelText('branches')
-    expect(branchesIndicator).toHaveTextContent('')
-
-    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
-
-    fireEvent.mouseEnter(branchesIndicator)
-    advanceTimersByTime(1000)
-
-    const tooltip = screen.getByRole('tooltip')
-
-    expect(tooltip).toHaveTextContent('Select Branches')
-    jest.useRealTimers()
-  })
-
-  it('should show an indicator for the number of branches selected', () => {
-    const branches = ['main', 'other', 'third']
-
-    let workspace
-    const rowsWithoutWorkspace = []
-    for (const row of tableDataFixture.rows) {
-      if (row.id !== EXPERIMENT_WORKSPACE_ID) {
-        rowsWithoutWorkspace.push(row)
-        continue
+      let workspace
+      const rowsWithoutWorkspace = []
+      for (const row of tableDataFixture.rows) {
+        if (row.id !== EXPERIMENT_WORKSPACE_ID) {
+          rowsWithoutWorkspace.push(row)
+          continue
+        }
+        workspace = row
       }
-      workspace = row
-    }
 
-    const multipleBranches = {
-      ...tableDataFixture,
-      branches,
-      hasData: true,
-      rows: [
-        workspace as Commit,
-        ...rowsWithoutWorkspace.map(row => ({
-          ...row,
-          branch: branches[0],
-          subRows: undefined
-        })),
-        ...rowsWithoutWorkspace.map(row => ({
-          ...row,
-          branch: branches[1],
-          subRows: undefined
-        })),
-        ...rowsWithoutWorkspace.map(row => ({
-          ...row,
-          branch: branches[2],
-          subRows: undefined
-        }))
-      ]
-    }
+      const multipleBranches = {
+        ...tableDataFixture,
+        hasData: true,
+        rows: [
+          workspace as Commit,
+          ...rowsWithoutWorkspace.map(row => ({
+            ...row,
+            branch: branches[0],
+            subRows: undefined
+          })),
+          ...rowsWithoutWorkspace.map(row => ({
+            ...row,
+            branch: branches[1],
+            subRows: undefined
+          })),
+          ...rowsWithoutWorkspace.map(row => ({
+            ...row,
+            branch: branches[2],
+            subRows: undefined
+          }))
+        ],
+        selectedBranches: branches.slice(1)
+      }
 
-    renderTable(multipleBranches)
+      renderTable(multipleBranches)
 
-    const [indicator] = screen.getAllByLabelText('branches')
+      const [indicator] = screen.getAllByLabelText('branches')
 
-    expect(indicator).toHaveTextContent(`${branches.length - 1}`)
-  })
-
-  it('should send a message to focus the relevant tree when clicked', () => {
-    renderTable()
-    mockPostMessage.mockClear()
-    fireEvent.click(screen.getByLabelText('sorts'))
-    expect(mockPostMessage).toHaveBeenCalledWith({
-      type: MessageFromWebviewType.FOCUS_SORTS_TREE
-    })
-    mockPostMessage.mockClear()
-    fireEvent.click(screen.getByLabelText('filters'))
-    expect(mockPostMessage).toHaveBeenCalledWith({
-      type: MessageFromWebviewType.FOCUS_FILTERS_TREE
+      expect(indicator).toHaveTextContent(`${branches.length - 1}`)
     })
 
-    mockPostMessage.mockClear()
-    fireEvent.click(screen.getByLabelText('selected for plots'))
-    expect(mockPostMessage).toHaveBeenCalledWith({
-      type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW
+    it('should send a message to toggle show only changed columns when the show only changed columns indicator is clicked', () => {
+      renderTable()
+      mockPostMessage.mockClear()
+      fireEvent.click(screen.getByLabelText('show only changed columns'))
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.TOGGLE_SHOW_ONLY_CHANGED
+      })
+    })
+
+    it('should send a message to focus the relevant tree/view when clicked', () => {
+      renderTable()
+      mockPostMessage.mockClear()
+      fireEvent.click(screen.getByLabelText('sorts'))
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.FOCUS_SORTS_TREE
+      })
+      mockPostMessage.mockClear()
+      fireEvent.click(screen.getByLabelText('filters'))
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.FOCUS_FILTERS_TREE
+      })
+
+      mockPostMessage.mockClear()
+      fireEvent.click(screen.getByLabelText('selected for plots'))
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW
+      })
+    })
+
+    it('should show an indicator with the amount of displayed columns', () => {
+      renderTable({
+        ...tableDataFixture
+      })
+      jest.useFakeTimers()
+      const columnsIndicator = screen.getByLabelText('columns')
+      expect(columnsIndicator).toHaveTextContent('22')
+
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+
+      fireEvent.mouseEnter(columnsIndicator)
+      advanceTimersByTime(1000)
+      const tooltip = screen.getByRole('tooltip')
+
+      expect(tooltip).toHaveTextContent('Select Columns')
+
+      setTableData({
+        ...tableDataFixture,
+        columns: tableDataFixture.columns.slice(1)
+      })
+
+      expect(columnsIndicator).toHaveTextContent('21')
+
+      setTableData({
+        ...tableDataFixture,
+        columns: []
+      })
+
+      expect(columnsIndicator).toHaveTextContent('')
+
+      jest.useRealTimers()
+    })
+
+    it('should send a message to select columns when the select columns icon is clicked', () => {
+      renderTable()
+      mockPostMessage.mockClear()
+      fireEvent.click(screen.getByLabelText('columns'))
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        type: MessageFromWebviewType.SELECT_COLUMNS
+      })
     })
   })
 
@@ -1761,7 +1890,7 @@ describe('App', () => {
     })
   })
 
-  describe('Show more commits', () => {
+  describe('Change number of commits', () => {
     it('should display a show more commits button', () => {
       renderTable({ ...tableDataFixture, hasMoreCommits: { main: true } })
 
@@ -1826,6 +1955,25 @@ describe('App', () => {
         type: MessageFromWebviewType.SHOW_LESS_COMMITS
       })
     })
+
+    it('should display a reset commits button', () => {
+      renderTable({ ...tableDataFixture, hasMoreCommits: { main: true } })
+
+      expect(
+        screen.getByLabelText('Reset Commits to Default')
+      ).toBeInTheDocument()
+    })
+
+    it('should send a message to reset commits when the reset commits button is clicked', () => {
+      renderTable()
+
+      fireEvent.click(screen.getByLabelText('Reset Commits to Default'))
+
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: 'main',
+        type: MessageFromWebviewType.RESET_COMMITS
+      })
+    })
   })
 
   describe('Add / Remove branches', () => {
@@ -1846,6 +1994,30 @@ describe('App', () => {
 
       expect(mockPostMessage).not.toHaveBeenCalledWith({
         type: MessageFromWebviewType.SELECT_BRANCHES
+      })
+    })
+  })
+
+  describe('Experiment git remote status indicator', () => {
+    it('should not allow pushing an experiment when an experiment is running in the workspace', () => {
+      renderTable()
+
+      fireEvent.click(screen.getByTestId('exp-f13bca-push-experiment'))
+
+      expect(mockPostMessage).not.toHaveBeenCalledWith({
+        payload: ['exp-f13bca'],
+        type: MessageFromWebviewType.PUSH_EXPERIMENT
+      })
+    })
+
+    it('should allow pushing an experiment when an experiment is not running in the workspace', () => {
+      renderTableWithoutRunningExperiments()
+
+      fireEvent.click(screen.getByTestId('exp-f13bca-push-experiment'))
+
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: ['exp-f13bca'],
+        type: MessageFromWebviewType.PUSH_EXPERIMENT
       })
     })
   })

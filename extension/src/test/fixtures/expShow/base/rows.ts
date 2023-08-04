@@ -1,9 +1,13 @@
 import { join } from '../../../util/path'
-import { Commit } from '../../../../experiments/webview/contract'
+import {
+  Commit,
+  GitRemoteStatus,
+  WORKSPACE_BRANCH
+} from '../../../../experiments/webview/contract'
 import { copyOriginalColors } from '../../../../experiments/model/status/colors'
 import { shortenForLabel } from '../../../../util/string'
 import {
-  ExperimentStatus,
+  ExecutorStatus,
   EXPERIMENT_WORKSPACE_ID,
   Executor
 } from '../../../../cli/dvc/contract'
@@ -17,7 +21,7 @@ const colorsList = copyOriginalColors()
 
 const rowsFixture: Commit[] = [
   {
-    branch: undefined,
+    branch: WORKSPACE_BRANCH,
     commit: undefined,
     description: undefined,
     deps: {
@@ -70,7 +74,7 @@ const rowsFixture: Commit[] = [
         test: true
       }
     },
-    status: ExperimentStatus.RUNNING,
+    executorStatus: ExecutorStatus.RUNNING,
     selected: false,
     starred: false
   },
@@ -190,7 +194,7 @@ const rowsFixture: Commit[] = [
             test: true
           }
         },
-        status: ExperimentStatus.RUNNING,
+        executorStatus: ExecutorStatus.RUNNING,
         selected: false,
         sha: '4fb124aebddb2adf1545030907687fa9a4c80e70',
         starred: false,
@@ -248,6 +252,7 @@ const rowsFixture: Commit[] = [
             test: true
           }
         },
+        gitRemoteStatus: GitRemoteStatus.ON_REMOTE,
         selected: false,
         sha: '42b8736b08170529903cd203a1f40382a4b4a8cd',
         starred: false,
@@ -308,7 +313,7 @@ const rowsFixture: Commit[] = [
         },
         selected: true,
         starred: false,
-        status: ExperimentStatus.RUNNING,
+        executorStatus: ExecutorStatus.RUNNING,
         Created: '2020-12-29T15:27:02'
       },
       {
@@ -321,7 +326,7 @@ const rowsFixture: Commit[] = [
           "unable to read: 'params.yaml', YAML file structure is corrupted",
         selected: false,
         starred: false,
-        status: ExperimentStatus.FAILED
+        executorStatus: ExecutorStatus.FAILED
       },
       {
         branch: 'main',
@@ -370,6 +375,7 @@ const rowsFixture: Commit[] = [
             test: true
           }
         },
+        gitRemoteStatus: GitRemoteStatus.NOT_ON_REMOTE,
         selected: false,
         sha: 'f0f918662b4f8c47819ca154a23029bf9b47d4f3',
         starred: false,
@@ -419,7 +425,7 @@ const rowsFixture: Commit[] = [
           }
         },
         selected: false,
-        status: ExperimentStatus.QUEUED,
+        executorStatus: ExecutorStatus.QUEUED,
         sha: '90aea7f2482117a55dfcadcdb901aaa6610fbbc9',
         starred: false,
         Created: '2020-12-29T15:25:27'
@@ -470,7 +476,7 @@ const rowsFixture: Commit[] = [
           }
         },
         selected: false,
-        status: ExperimentStatus.FAILED,
+        executorStatus: ExecutorStatus.FAILED,
         sha: '55d492c9c633912685351b32df91bfe1f9ecefb9',
         starred: false,
         Created: '2020-12-29T15:25:27'

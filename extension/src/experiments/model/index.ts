@@ -1,11 +1,13 @@
 import { Memento } from 'vscode'
 import { SortDefinition, sortExperiments } from './sortBy'
-import { FilterDefinition, filterExperiment, getFilterId } from './filterBy'
+import { FilterDefinition, getFilterId } from './filterBy'
+import { collectFiltered, collectUnfiltered } from './filterBy/collect'
 import {
   collectAddRemoveCommitsDetails,
   collectBranches,
   collectExperiments,
   collectOrderedCommitsAndExperiments,
+  collectRemoteExpShas,
   collectRunningInQueue,
   collectRunningInWorkspace
 } from './collect'
@@ -23,23 +25,24 @@ import {
   Experiment,
   isQueued,
   isRunning,
-  RunningExperiment
+  GitRemoteStatus,
+  RunningExperiment,
+  WORKSPACE_BRANCH
 } from '../webview/contract'
-import { definedAndNonEmpty, reorderListSubset } from '../../util/array'
-import {
-  Executor,
-  ExpShowOutput,
-  ExperimentStatus
-} from '../../cli/dvc/contract'
+import { reorderListSubset } from '../../util/array'
+import { Executor, ExpShowOutput, ExecutorStatus } from '../../cli/dvc/contract'
 import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
 import { PersistenceKey } from '../../persistence/constants'
 import { sum } from '../../util/math'
-import { DEFAULT_NUM_OF_COMMITS_TO_SHOW } from '../../cli/dvc/constants'
+import {
+  DEFAULT_CURRENT_BRANCH_COMMITS_TO_SHOW,
+  DEFAULT_OTHER_BRANCH_COMMITS_TO_SHOW
+} from '../../cli/dvc/constants'
 
 type StarredExperiments = Record<string, boolean | undefined>
 
-export type SelectedExperimentWithColor = Experiment & {
+type SelectedExperimentWithColor = Experiment & {
   displayColor: Color
   selected: true
 }
@@ -70,6 +73,9 @@ export class ExperimentsModel extends ModelWithPersistence {
   private isShowingMoreCommits: { [branch: string]: boolean } = {}
 
   private filters: Map<string, FilterDefinition> = new Map()
+
+  private remoteExpShas?: Set<string>
+  private pushing = new Set<string>()
 
   private currentSorts: SortDefinition[]
   private running: RunningExperiment[] = []
@@ -117,7 +123,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     )
   }
 
-  public transformAndSet(
+  public transformAndSetLocal(
     expShow: ExpShowOutput,
     gitLog: string,
     dvcLiveOnly: boolean,
@@ -157,6 +163,11 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.setColoredStatus(runningExperiments)
   }
 
+  public transformAndSetRemote(remoteExpRefs: string) {
+    const remoteExpShas = collectRemoteExpShas(remoteExpRefs)
+    this.remoteExpShas = remoteExpShas
+  }
+
   public toggleStars(ids: string[]) {
     for (const id of ids) {
       this.starredExperiments[id] = !this.starredExperiments[id]
@@ -169,7 +180,7 @@ export class ExperimentsModel extends ModelWithPersistence {
       ({ id: expId }) => expId === id
     )
 
-    if (isQueued(experiment?.status)) {
+    if (isQueued(experiment?.executorStatus)) {
       return UNSELECTED
     }
 
@@ -235,10 +246,6 @@ export class ExperimentsModel extends ModelWithPersistence {
     return [...this.filters.values()]
   }
 
-  public getFilterPaths() {
-    return this.getFilters().map(({ path }) => path)
-  }
-
   public addFilter(filter: FilterDefinition) {
     this.filters.set(getFilterId(filter), filter)
     this.applyAndPersistFilters()
@@ -291,6 +298,16 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.setColors(coloredStatus, availableColors)
 
     this.persistStatus()
+  }
+
+  public setPushing(ids: string[]) {
+    this.pushing = new Set(ids)
+  }
+
+  public unsetPushing(ids: string[]) {
+    for (const id of ids) {
+      this.pushing.delete(id)
+    }
   }
 
   public getLabels() {
@@ -353,8 +370,8 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getExperiments() {
-    return this.getExperimentsAndQueued().filter(({ status }) => {
-      return !isQueued(status)
+    return this.getExperimentsAndQueued().filter(({ executorStatus }) => {
+      return !isQueued(executorStatus)
     })
   }
 
@@ -372,7 +389,7 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public getRunningExperiments() {
     return this.getExperimentsAndQueued().filter(experiment =>
-      isRunning(experiment.status)
+      isRunning(experiment.executorStatus)
     )
   }
 
@@ -386,31 +403,27 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getRowData() {
-    const commitsBySha: { [sha: string]: Commit } = {}
-    for (const commit of this.commits) {
-      commitsBySha[commit.sha as string] = commit
+    const commitsBySha = this.applyFiltersToCommits()
+
+    const rows: Commit[] = [
+      { branch: WORKSPACE_BRANCH, ...this.addDetails(this.workspace) }
+    ]
+    for (const { branch, sha } of this.rowOrder) {
+      const commit = commitsBySha[sha]
+      if (!commit) {
+        continue
+      }
+      if (commit.subRows) {
+        commit.subRows = commit.subRows.map(experiment => ({
+          ...experiment,
+          branch
+        }))
+      }
+
+      rows.push({ ...commit, branch })
     }
 
-    return [
-      { branch: undefined, ...this.addDetails(this.workspace) },
-      ...this.rowOrder.map(({ branch, sha }) => {
-        const commit = { ...commitsBySha[sha], branch }
-        const experiments = this.getExperimentsByCommit(commit)
-        const commitWithSelectedAndStarred = this.addDetails(commit)
-
-        if (!definedAndNonEmpty(experiments)) {
-          return commitWithSelectedAndStarred
-        }
-
-        return {
-          ...commitWithSelectedAndStarred,
-          subRows: experiments.filter(
-            (experiment: Experiment) =>
-              !!filterExperiment(this.getFilters(), experiment)
-          )
-        }
-      })
-    ]
+    return rows
   }
 
   public getHasMoreCommits() {
@@ -438,6 +451,10 @@ export class ExperimentsModel extends ModelWithPersistence {
     return filtered.length
   }
 
+  public getRecordCount() {
+    return this.getCombinedList().length
+  }
+
   public getCombinedList() {
     return [this.workspace, ...this.commits, ...this.getExperimentsAndQueued()]
   }
@@ -446,7 +463,7 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.getExperimentsByCommit(commit)?.map(experiment => ({
       ...experiment,
       hasChildren: false,
-      type: this.getExperimentType(experiment.status)
+      type: this.getExperimentType(experiment.executorStatus)
     }))
   }
 
@@ -455,8 +472,18 @@ export class ExperimentsModel extends ModelWithPersistence {
     this.persistNbOfCommitsToShow()
   }
 
+  public resetNbfCommitsToShow(branch: string) {
+    delete this.numberOfCommitsToShow[branch]
+    this.persistNbOfCommitsToShow()
+  }
+
   public getNbOfCommitsToShow(branch: string) {
-    return this.numberOfCommitsToShow[branch] || DEFAULT_NUM_OF_COMMITS_TO_SHOW
+    return (
+      this.numberOfCommitsToShow[branch] ||
+      (branch === this.currentBranch
+        ? DEFAULT_CURRENT_BRANCH_COMMITS_TO_SHOW
+        : DEFAULT_OTHER_BRANCH_COMMITS_TO_SHOW)
+    )
   }
 
   public getAllNbOfCommitsToShow() {
@@ -486,6 +513,10 @@ export class ExperimentsModel extends ModelWithPersistence {
     return [this.currentBranch as string, ...this.selectedBranches]
   }
 
+  public getSelectedBranches() {
+    return this.selectedBranches
+  }
+
   public getAvailableBranchesToShow() {
     return this.availableBranchesToShow
   }
@@ -497,10 +528,14 @@ export class ExperimentsModel extends ModelWithPersistence {
   private getFilteredExperiments() {
     const acc: Experiment[] = []
 
-    for (const experiment of this.getExperiments()) {
-      if (!filterExperiment(this.getFilters(), experiment)) {
-        acc.push(experiment)
-      }
+    for (const commit of this.commits) {
+      const experiments = this.getExperimentsByCommit(commit)
+      collectFiltered(
+        acc,
+        this.addDetails(commit),
+        experiments,
+        this.getFilters()
+      )
     }
 
     return acc
@@ -509,14 +544,35 @@ export class ExperimentsModel extends ModelWithPersistence {
   private getExperimentsByCommit(commit: Experiment) {
     const experiments = this.experimentsByCommit
       .get(commit.id)
-      ?.map(experiment => ({
-        ...this.addDetails(experiment),
-        branch: commit.branch
-      }))
+      ?.map(originalExperiment => {
+        const experiment = this.addDetails(originalExperiment)
+
+        this.addRemoteStatus(experiment)
+
+        return experiment
+      })
     if (!experiments) {
       return
     }
     return sortExperiments(this.getSorts(), experiments)
+  }
+
+  private addRemoteStatus(experiment: Experiment) {
+    if (
+      this.remoteExpShas === undefined ||
+      !experiment.sha ||
+      ![undefined, ExecutorStatus.SUCCESS].includes(experiment.executorStatus)
+    ) {
+      return
+    }
+    if (this.pushing.has(experiment.id)) {
+      experiment.gitRemoteStatus = GitRemoteStatus.PUSHING
+      return
+    }
+
+    experiment.gitRemoteStatus = this.remoteExpShas.has(experiment.sha)
+      ? GitRemoteStatus.ON_REMOTE
+      : GitRemoteStatus.NOT_ON_REMOTE
   }
 
   private setColoredStatus(runningExperiments: RunningExperiment[]) {
@@ -606,11 +662,11 @@ export class ExperimentsModel extends ModelWithPersistence {
     }
   }
 
-  private getExperimentType(status?: ExperimentStatus) {
-    if (isQueued(status)) {
+  private getExperimentType(executorStatus?: ExecutorStatus) {
+    if (isQueued(executorStatus)) {
       return ExperimentType.QUEUED
     }
-    if (isRunning(status)) {
+    if (isRunning(executorStatus)) {
       return ExperimentType.RUNNING
     }
 
@@ -639,5 +695,26 @@ export class ExperimentsModel extends ModelWithPersistence {
       uniqueStatus[id] = UNSELECTED
     }
     return uniqueStatus
+  }
+
+  private applyFiltersToCommits() {
+    const commitsBySha: { [sha: string]: Commit } = {}
+    for (const commit of this.commits) {
+      const commitWithSelectedAndStarred = this.addDetails(commit)
+      const experiments = this.getExperimentsByCommit(
+        commitWithSelectedAndStarred
+      )
+      const unfilteredCommit = collectUnfiltered(
+        commitWithSelectedAndStarred,
+        experiments,
+        this.getFilters()
+      )
+      if (!unfilteredCommit) {
+        continue
+      }
+
+      commitsBySha[commit.sha as string] = unfilteredCommit
+    }
+    return commitsBySha
   }
 }

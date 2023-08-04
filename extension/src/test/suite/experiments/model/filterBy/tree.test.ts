@@ -18,7 +18,8 @@ import { buildMockMemento, dvcDemoPath } from '../../../../util'
 import {
   experimentsUpdatedEvent,
   stubPrivateMethod,
-  stubPrivatePrototypeMethod
+  stubPrivatePrototypeMethod,
+  waitForSpyCall
 } from '../../../util'
 import { buildMetricOrParamPath } from '../../../../../experiments/columns/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
@@ -77,6 +78,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         value: '0.45'
       }
 
+      const messageSent = waitForSpyCall(messageSpy, messageSpy.callCount)
       await addFilterViaQuickInput(experiments, accuracyFilter)
 
       const [workspace, main, fe2919b, _7df876c] = rowsFixture
@@ -92,9 +94,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
             const accuracy = experiment.metrics?.['summary.json']?.accuracy
             return !!(accuracy === undefined || gte45(accuracy))
           })
-        },
-        fe2919b,
-        _7df876c
+        }
       ]
 
       const filteredTableData: Partial<TableData> = {
@@ -102,6 +102,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         filters: [accuracyPath],
         rows: filteredRows
       }
+      await messageSent
 
       expect(messageSpy).to.be.calledWithMatch(filteredTableData)
 
@@ -193,7 +194,12 @@ suite('Experiments Filter By Tree Test Suite', () => {
             })
           }
         ],
-        { canPickMany: true, title: Title.SELECT_FILTERS_TO_REMOVE }
+        {
+          canPickMany: true,
+          matchOnDescription: true,
+          matchOnDetail: true,
+          title: Title.SELECT_FILTERS_TO_REMOVE
+        }
       )
 
       mockShowInputBox.resetHistory()
@@ -300,7 +306,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       void experiments.addFilter()
       await tableFilterAdded
 
-      expect(mockTreeView.description).to.equal('3 Experiments Filtered')
+      expect(mockTreeView.description).to.equal('5 of 11 Filtered')
 
       stubPrivateMethod(experimentsModel, 'getFilteredExperiments')
         .onFirstCall()
@@ -314,13 +320,13 @@ suite('Experiments Filter By Tree Test Suite', () => {
       workspaceExperiments.experimentsChanged.fire()
       await allButOneExperimentFilteredEvent
 
-      expect(mockTreeView.description).to.equal('1 Experiment Filtered')
+      expect(mockTreeView.description).to.equal('1 of 11 Filtered')
 
       const threeExperimentsFilteredEvent = getUpdateEvent()
       workspaceExperiments.experimentsChanged.fire()
       await threeExperimentsFilteredEvent
 
-      expect(mockTreeView.description).to.equal('3 Experiments Filtered')
+      expect(mockTreeView.description).to.equal('3 of 11 Filtered')
 
       const tableFilterRemoved = getUpdateEvent()
       experiments.removeFilter(getFilterId(filter))
@@ -331,24 +337,23 @@ suite('Experiments Filter By Tree Test Suite', () => {
     })
 
     it('should be able to filter to starred experiments', async () => {
-      const { experiments, messageSpy } =
+      const { experiments, experimentsModel, messageSpy } =
         stubWorkspaceExperimentsGetters(disposable)
       await experiments.isReady()
       await experiments.showWebview()
 
+      experimentsModel.toggleStars(['main'])
+
+      const messageSent = waitForSpyCall(messageSpy, messageSpy.callCount)
       await addFilterViaQuickInput(experiments, starredFilter)
 
-      const [workspace, main, fe2919b, _7df876c] = rowsFixture
+      const [workspace, main] = rowsFixture
 
-      const filteredRows = [
-        workspace,
-        {
-          ...main,
-          subRows: []
-        },
-        fe2919b,
-        _7df876c
-      ]
+      const mainNoSubRows = { ...main }
+      delete mainNoSubRows.subRows
+      mainNoSubRows.starred = true
+
+      const filteredRows = [workspace, mainNoSubRows]
 
       const filteredTableData: Partial<TableData> = {
         changes: workspaceChangesFixture,
@@ -358,6 +363,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         rows: filteredRows
       }
 
+      await messageSent
       expect(messageSpy).to.be.calledWithMatch(filteredTableData)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 

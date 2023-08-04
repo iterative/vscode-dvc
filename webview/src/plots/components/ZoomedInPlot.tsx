@@ -7,7 +7,11 @@ import { reverseOfLegendSuppressionUpdate } from 'dvc/src/plots/vega/util'
 import { TemplateVegaLite } from './templatePlots/TemplateVegaLite'
 import styles from './styles.module.scss'
 import { getThemeValue, ThemeProperty } from '../../util/styles'
-import { exportPlotDataAsCsv, exportPlotDataAsJson } from '../util/messages'
+import {
+  exportPlotDataAsCsv,
+  exportPlotDataAsJson,
+  exportPlotDataAsTsv
+} from '../util/messages'
 
 type ZoomedInPlotProps = {
   id: string
@@ -53,6 +57,7 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
     }
     appendActionToVega('JSON', actions, () => exportPlotDataAsJson(id))
     appendActionToVega('CSV', actions, () => exportPlotDataAsCsv(id))
+    appendActionToVega('TSV', actions, () => exportPlotDataAsTsv(id))
   }
 
   const vegaLiteProps = {
