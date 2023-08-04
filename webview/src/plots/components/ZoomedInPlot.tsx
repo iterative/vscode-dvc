@@ -92,15 +92,6 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
       className={styles.zoomedInPlot}
       data-testid="zoomed-in-plot"
       ref={zoomedInPlotRef}
-      onClick={() => {
-        const actions: HTMLDivElement | null | undefined =
-          zoomedInPlotRef.current?.querySelector('.vega-actions')
-
-        const actionsDetails = actions?.parentElement as HTMLDetailsElement
-        if (actionsDetails.open) {
-          actionsDetails.open = false
-        }
-      }}
     >
       {isTemplatePlot ? (
         <TemplateVegaLite

@@ -60,8 +60,8 @@ $gap: 20px;
 
 .plotActions {
   z-index: 500;
-  width: 21px;
-  height: 21px;
+  width: 25px;
+  height: 25px;
   border-radius: 50%;
   background-color: $fg-color;
   position: absolute;
@@ -76,6 +76,8 @@ $gap: 20px;
 
   svg {
     fill: var(--vscode-editor-background);
+    width: 18px;
+    height: 18px;
   }
 
   &:hover {
@@ -181,8 +183,6 @@ $gap: 20px;
 .zoomedInPlot {
   width: 80vw;
   height: calc(80vh - 100px);
-  padding: 2rem;
-  box-sizing: content-box;
 
   svg {
     background-color: transparent !important;
