@@ -3,7 +3,8 @@ import React, { useState } from 'react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
 import styles from './styles.module.scss'
-import { ComparisonTableCell } from './ComparisonTableCell'
+import { ComparisonTableCell } from './cell/ComparisonTableCell'
+import { ComparisonTableMultiCell } from './cell/ComparisonTableMultiCell'
 import { Icon } from '../../../shared/components/Icon'
 import { ChevronDown, ChevronRight } from '../../../shared/components/icons'
 import { PlotsState } from '../../store'
@@ -69,7 +70,6 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
               key={path + plot.id}
               className={cx({
                 [styles.pinnedColumnCell]: isPinned,
-                [styles.noImage]: isShown && !plot?.url,
                 [styles.draggedColumn]: draggedId === plot.id
               })}
             >
@@ -77,7 +77,11 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
                 data-testid="row-images"
                 className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
               >
-                <ComparisonTableCell path={path} plot={plot} />
+                {plot.imgs.length > 1 ? (
+                  <ComparisonTableMultiCell plot={plot} path={path} />
+                ) : (
+                  <ComparisonTableCell plot={plot} path={path} />
+                )}
               </div>
             </td>
           )
