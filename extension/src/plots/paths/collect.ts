@@ -115,7 +115,7 @@ const collectPlotPathType = (
   data: PlotsData,
   hasChildren: boolean,
   path: string,
-  isMultiImgPlot?: boolean
+  isMultiImgPlot: boolean
 ) => {
   if (hasChildren) {
     return
@@ -136,7 +136,7 @@ const updateExistingPlotPath = (
   hasChildren: boolean,
   revisions: Set<string>,
   path: string,
-  isMultiImgPlot?: boolean
+  isMultiImgPlot: boolean
 ) =>
   acc.map(existing => {
     const plotPath = { ...existing }
