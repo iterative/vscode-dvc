@@ -21,6 +21,7 @@ export enum MessageFromWebviewType {
   EXPORT_PLOT_DATA_AS_JSON = 'export-plot-data-as-json',
   EXPORT_PLOT_DATA_AS_CSV = 'export-plot-data-as-csv',
   EXPORT_PLOT_DATA_AS_TSV = 'export-plot-data-as-tsv',
+  FILTER_COLUMN = 'filter-column',
   FOCUS_FILTERS_TREE = 'focus-filters-tree',
   FOCUS_SORTS_TREE = 'focus-sorts-tree',
   OPEN_EXPERIMENTS_WEBVIEW = 'open-experiments-webview',
@@ -29,6 +30,7 @@ export enum MessageFromWebviewType {
   OPEN_STUDIO = 'open-studio',
   OPEN_STUDIO_PROFILE = 'open-studio-profile',
   PUSH_EXPERIMENT = 'push-experiment',
+  REMOVE_COLUMN_FILTERS = 'remove-column-filters',
   REMOVE_COLUMN_SORT = 'remove-column-sort',
   REMOVE_EXPERIMENT = 'remove-experiment',
   REORDER_COLUMNS = 'reorder-columns',
@@ -187,6 +189,10 @@ export type MessageFromWebview =
       payload: string[]
     }
   | {
+      type: MessageFromWebviewType.REMOVE_COLUMN_FILTERS
+      payload: string
+    }
+  | {
       type: MessageFromWebviewType.REMOVE_COLUMN_SORT
       payload: string
     }
@@ -230,6 +236,7 @@ export type MessageFromWebview =
   | { type: MessageFromWebviewType.SELECT_COLUMNS }
   | { type: MessageFromWebviewType.SELECT_FIRST_COLUMNS }
   | { type: MessageFromWebviewType.TOGGLE_SHOW_ONLY_CHANGED }
+  | { type: MessageFromWebviewType.FILTER_COLUMN; payload: string }
   | { type: MessageFromWebviewType.FOCUS_FILTERS_TREE }
   | { type: MessageFromWebviewType.FOCUS_SORTS_TREE }
   | { type: MessageFromWebviewType.OPEN_PLOTS_WEBVIEW }

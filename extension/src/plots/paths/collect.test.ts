@@ -47,6 +47,13 @@ describe('collectPaths', () => {
       },
       {
         hasChildren: false,
+        parentPath: 'plots',
+        path: join('plots', 'image'),
+        revisions: new Set(REVISIONS),
+        type: new Set(['comparison'])
+      },
+      {
+        hasChildren: false,
         parentPath: 'logs',
         path: join('logs', 'loss.tsv'),
         revisions: new Set(REVISIONS),

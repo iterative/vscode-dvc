@@ -23,6 +23,7 @@ import {
 } from '../multiSource/constants'
 import { MultiSourceEncoding } from '../multiSource/collect'
 import { truncate } from '../../util/string'
+import { MULTI_IMAGE_PATH_REG } from '../../cli/dvc/constants'
 
 export enum PathType {
   COMPARISON = 'comparison',
@@ -113,13 +114,16 @@ const collectPlotPathType = (
   plotPath: PlotPath,
   data: PlotsData,
   hasChildren: boolean,
-  path: string
+  path: string,
+  isMultiImgPlot: boolean
 ) => {
   if (hasChildren) {
     return
   }
 
-  const type = getType(data, path)
+  const type = isMultiImgPlot
+    ? new Set<PathType>([PathType.COMPARISON])
+    : getType(data, path)
 
   if (type) {
     plotPath.type = type
@@ -131,7 +135,8 @@ const updateExistingPlotPath = (
   data: PlotsData,
   hasChildren: boolean,
   revisions: Set<string>,
-  path: string
+  path: string,
+  isMultiImgPlot: boolean
 ) =>
   acc.map(existing => {
     const plotPath = { ...existing }
@@ -143,7 +148,7 @@ const updateExistingPlotPath = (
     plotPath.revisions = new Set([...existing.revisions, ...revisions])
 
     if (!plotPath.type) {
-      collectPlotPathType(plotPath, data, hasChildren, path)
+      collectPlotPathType(plotPath, data, hasChildren, path, isMultiImgPlot)
     }
 
     return plotPath
@@ -154,13 +159,23 @@ const collectOrderedPath = (
   data: PlotsData,
   revisions: Set<string>,
   pathArray: string[],
-  idx: number
+  idx: number,
+  isMultiImgDir: boolean
 ): PlotPath[] => {
   const path = getPath(pathArray, idx)
   const hasChildren = idx !== pathArray.length
+  const isPathLeaf = idx === pathArray.length
+  const isMultiImgPlot = isMultiImgDir && isPathLeaf
 
   if (acc.some(({ path: existingPath }) => existingPath === path)) {
-    return updateExistingPlotPath(acc, data, hasChildren, revisions, path)
+    return updateExistingPlotPath(
+      acc,
+      data,
+      hasChildren,
+      revisions,
+      path,
+      isMultiImgPlot
+    )
   }
 
   const plotPath: PlotPath = {
@@ -170,7 +185,7 @@ const collectOrderedPath = (
     revisions
   }
 
-  collectPlotPathType(plotPath, data, hasChildren, path)
+  collectPlotPathType(plotPath, data, hasChildren, path, isMultiImgPlot)
 
   acc.push(plotPath)
   return acc
@@ -187,9 +202,23 @@ const addRevisionsToPath = (
   }
 
   const pathArray = getPathArray(path)
+  const isMultiImg =
+    MULTI_IMAGE_PATH_REG.test(path) &&
+    !!getType(data, path)?.has(PathType.COMPARISON)
+
+  if (isMultiImg) {
+    pathArray.pop()
+  }
 
   for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
-    acc = collectOrderedPath(acc, data, revisions, pathArray, reverseIdx)
+    acc = collectOrderedPath(
+      acc,
+      data,
+      revisions,
+      pathArray,
+      reverseIdx,
+      isMultiImg
+    )
   }
   return acc
 }

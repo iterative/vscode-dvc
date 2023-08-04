@@ -23,6 +23,8 @@ import { ConfigKey, setConfigValue } from '../../vscode/config'
 import { NUM_OF_COMMITS_TO_INCREASE } from '../../cli/dvc/constants'
 import { Pipeline } from '../../pipeline'
 import { collectColumnsWithChangedValues } from '../columns/collect'
+import { ColumnLike } from '../columns/like'
+import { getFilterId } from '../model/filterBy'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
@@ -35,7 +37,7 @@ export class WebviewMessages {
   private readonly notifyChanged: () => void
   private readonly selectColumns: () => Promise<void>
   private readonly selectFirstColumns: () => Promise<void>
-
+  private readonly addFilter: (column: ColumnLike) => Promise<void>
   private readonly selectBranches: (
     branchesSelected: string[]
   ) => Promise<string[] | undefined>
@@ -54,6 +56,7 @@ export class WebviewMessages {
     selectBranches: (
       branchesSelected: string[]
     ) => Promise<string[] | undefined>,
+    addFilter: (column: ColumnLike) => Promise<void>,
     update: () => Promise<void>
   ) {
     this.dvcRoot = dvcRoot
@@ -65,6 +68,7 @@ export class WebviewMessages {
     this.selectColumns = selectColumns
     this.selectFirstColumns = selectFirstColumns
     this.selectBranches = selectBranches
+    this.addFilter = addFilter
     this.update = update
   }
 
@@ -101,6 +105,11 @@ export class WebviewMessages {
         return this.addColumnSort(message.payload)
       case MessageFromWebviewType.REMOVE_COLUMN_SORT:
         return this.removeColumnSort(message.payload)
+      case MessageFromWebviewType.FILTER_COLUMN:
+        return this.addColumnFilter(message.payload)
+      case MessageFromWebviewType.REMOVE_COLUMN_FILTERS:
+        return this.removeColumnFilter(message.payload)
+
       case MessageFromWebviewType.APPLY_EXPERIMENT_TO_WORKSPACE:
         return commands.executeCommand(
           RegisteredCliCommands.EXPERIMENT_VIEW_APPLY,
@@ -432,6 +441,40 @@ export class WebviewMessages {
       undefined
     )
     return this.notifyChanged()
+  }
+
+  private addColumnFilter(selectedPath: string) {
+    const column = this.columns
+      .getTerminalNodes()
+      .find(({ path }) => path === selectedPath)
+
+    if (!column) {
+      return
+    }
+
+    void this.addFilter(column)
+
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_FILTER_COLUMN,
+      undefined,
+      undefined
+    )
+  }
+
+  private removeColumnFilter(selectedPath: string) {
+    for (const filter of this.experiments.getFilters()) {
+      if (filter.path === selectedPath) {
+        const id = getFilterId(filter)
+        this.experiments.removeFilter(id)
+      }
+    }
+    this.notifyChanged()
+
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_FILTER,
+      undefined,
+      undefined
+    )
   }
 
   private focusSortsTree() {

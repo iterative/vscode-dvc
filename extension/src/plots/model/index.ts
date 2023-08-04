@@ -12,7 +12,8 @@ import {
   collectImageUrl,
   collectIdShas,
   collectSelectedTemplatePlotRawData,
-  collectCustomPlotRawData
+  collectCustomPlotRawData,
+  collectSelectedComparisonPlots
 } from './collect'
 import { getRevisionSummaryColumns } from './util'
 import {
@@ -21,9 +22,7 @@ import {
   CustomPlotsOrderValue
 } from './custom'
 import {
-  ComparisonPlots,
   Revision,
-  ComparisonRevisionData,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH,
   PlotsSection,
@@ -33,7 +32,8 @@ import {
   DEFAULT_HEIGHT,
   DEFAULT_NB_ITEMS_PER_ROW,
   PlotHeight,
-  SmoothPlotValues
+  SmoothPlotValues,
+  ImagePlot
 } from '../webview/contract'
 import {
   EXPERIMENT_WORKSPACE_ID,
@@ -427,37 +427,23 @@ export class PlotsModel extends ModelWithPersistence {
     paths: string[],
     selectedRevisionIds: string[]
   ) {
-    const acc: ComparisonPlots = []
-    for (const path of paths) {
-      this.collectSelectedPathComparisonPlots(acc, path, selectedRevisionIds)
-    }
-    return acc
-  }
+    return collectSelectedComparisonPlots({
+      comparisonData: this.comparisonData,
+      getComparisonPlotImg: (image: ImagePlot, id: string, path: string) => {
+        const errors = this.errors.getImageErrors(path, id)
+        const fetched = this.fetchedRevs.has(id)
+        const url = collectImageUrl(image, fetched)
+        const loading = !fetched && !url
 
-  private collectSelectedPathComparisonPlots(
-    acc: ComparisonPlots,
-    path: string,
-    selectedRevisionIds: string[]
-  ) {
-    const pathRevisions = {
-      path,
-      revisions: {} as ComparisonRevisionData
-    }
-
-    for (const id of selectedRevisionIds) {
-      const image = this.comparisonData?.[id]?.[path]
-      const errors = this.errors.getImageErrors(path, id)
-      const fetched = this.fetchedRevs.has(id)
-      const url = collectImageUrl(image, fetched)
-      const loading = !fetched && !url
-      pathRevisions.revisions[id] = {
-        errors,
-        id,
-        loading,
-        url
-      }
-    }
-    acc.push(pathRevisions)
+        return {
+          errors,
+          loading,
+          url
+        }
+      },
+      paths,
+      selectedRevisionIds
+    })
   }
 
   private getSelectedTemplatePlots(
