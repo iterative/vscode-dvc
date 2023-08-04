@@ -68,6 +68,31 @@ describe('GitReader', () => {
       const cliOutput = await gitReader.getBranches(cwd)
       expect(cliOutput).toStrictEqual([])
     })
+
+    it('should replace a "detached HEAD" branch with the latest commit', async () => {
+      const cwd = __dirname
+      const branches = ['* (no branch)']
+      mockedCreateProcess.mockReturnValueOnce(
+        getMockedProcess(branches.join('\n'))
+      )
+      mockedCreateProcess.mockReturnValueOnce(
+        getMockedProcess('lengthy0sha0tag0name')
+      )
+
+      const cliOutput = await gitReader.getBranches(cwd)
+      expect(cliOutput).toStrictEqual(['* lengthy'])
+      expect(mockedCreateProcess).toHaveBeenNthCalledWith(1, {
+        args: ['branch'],
+        cwd,
+        env: { LANG: 'en_US.UTF-8' },
+        executable: 'git'
+      })
+      expect(mockedCreateProcess).toHaveBeenNthCalledWith(2, {
+        args: ['rev-parse', 'HEAD'],
+        cwd,
+        executable: 'git'
+      })
+    })
   })
 
   describe('version', () => {
