@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [1.0.33] - 2023-08-04
 
-### 🔨 Maintenance
+### 🚀 New Features and Enhancements
 
 - Add "image by step" plots to comparison section [#4319](https://github.com/iterative/vscode-dvc/pull/4319) by [@julieg18](https://github.com/julieg18)
 
