@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.32] - 2023-08-03
+
+### 🐛 Bug Fixes
+
+- Fix plots not showing on first experiment run [#4412](https://github.com/iterative/vscode-dvc/pull/4412) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Update filter icon in experiment table column header cells [#4406](https://github.com/iterative/vscode-dvc/pull/4406) by [@mattseddon](https://github.com/mattseddon)
+- Refactor experiment table header context menu [#4407](https://github.com/iterative/vscode-dvc/pull/4407) by [@mattseddon](https://github.com/mattseddon)
+- Collect webview messages async [#4405](https://github.com/iterative/vscode-dvc/pull/4405) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (3.11.0) [#4413](https://github.com/iterative/vscode-dvc/pull/4413) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.31] - 2023-08-02
 
 ### 🚀 New Features and Enhancements
