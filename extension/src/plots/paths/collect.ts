@@ -23,6 +23,7 @@ import {
 } from '../multiSource/constants'
 import { MultiSourceEncoding } from '../multiSource/collect'
 import { truncate } from '../../util/string'
+import { MULTI_IMAGE_PATH_REG } from '../../cli/dvc/constants'
 
 export enum PathType {
   COMPARISON = 'comparison',
@@ -58,8 +59,13 @@ const collectType = (plots: Plot[]) => {
 const getType = (
   data: PlotsData,
   hasChildren: boolean,
-  path: string
+  path: string,
+  isMultiImgPlot?: boolean
 ): Set<PathType> | undefined => {
+  if (isMultiImgPlot) {
+    return new Set<PathType>([PathType.COMPARISON])
+  }
+
   if (hasChildren) {
     return
   }
@@ -123,7 +129,8 @@ const collectOrderedPath = (
   data: PlotsData,
   revisions: Set<string>,
   pathArray: string[],
-  idx: number
+  idx: number,
+  isMultiImgDir: boolean
 ): PlotPath[] => {
   const path = getPath(pathArray, idx)
 
@@ -147,7 +154,10 @@ const collectOrderedPath = (
     revisions
   }
 
-  const type = getType(data, hasChildren, path)
+  const isPathLeaf = idx === pathArray.length
+  const isMultiImgPlot = isMultiImgDir && isPathLeaf
+
+  const type = getType(data, hasChildren, path, isMultiImgPlot)
   if (type) {
     plotPath.type = type
   }
@@ -167,9 +177,23 @@ const addRevisionsToPath = (
   }
 
   const pathArray = getPathArray(path)
+  const isMultiImg =
+    MULTI_IMAGE_PATH_REG.test(path) &&
+    !!getType(data, false, path)?.has(PathType.COMPARISON)
+
+  if (isMultiImg) {
+    pathArray.pop()
+  }
 
   for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
-    acc = collectOrderedPath(acc, data, revisions, pathArray, reverseIdx)
+    acc = collectOrderedPath(
+      acc,
+      data,
+      revisions,
+      pathArray,
+      reverseIdx,
+      isMultiImg
+    )
   }
   return acc
 }

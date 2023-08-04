@@ -377,7 +377,7 @@ const getMultiImageData = (
     }[]
   } = {}
   for (let i = 0; i < 15; i++) {
-    const key = join('plots', 'image', `${i}.jpg`)
+    const key = joinFunc('plots', 'image', `${i}.jpg`)
     const values = []
     for (const revision of revisions) {
       values.push({
@@ -472,11 +472,7 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
       revisions: ['exp-83425'],
       url: joinFunc(baseUrl, '1ba7bcd_plots_loss.png')
     }
-  ]
-})
-
-const getImageDataWithMultiImgs = (baseUrl: string, joinFunc = join) => ({
-  ...getImageData(baseUrl, joinFunc),
+  ],
   ...getMultiImageData(baseUrl, joinFunc, [
     EXPERIMENT_WORKSPACE_ID,
     'main',
@@ -797,21 +793,14 @@ export const MOCK_IMAGE_MTIME = 946684800000
 
 export const getComparisonWebviewMessage = (
   baseUrl: string,
-  joinFunc: (...args: string[]) => string = join,
-  addMulti?: boolean
+  joinFunc: (...args: string[]) => string = join
 ): PlotsComparisonData => {
   const plotAcc: {
     [path: string]: { path: string; revisions: ComparisonRevisionData }
   } = {}
 
-  for (const [path, plots] of Object.entries(
-    addMulti
-      ? getImageDataWithMultiImgs(baseUrl, joinFunc)
-      : getImageData(baseUrl, joinFunc)
-  )) {
-    const multiImagePath = joinFunc('plots', 'image')
-    const isMulti = path.includes(multiImagePath)
-    const pathLabel = path
+  for (const [path, plots] of Object.entries(getImageData(baseUrl, joinFunc))) {
+    const pathLabel = path.includes('image') ? join('plots', 'image') : path
 
     if (!plotAcc[pathLabel]) {
       plotAcc[pathLabel] = {

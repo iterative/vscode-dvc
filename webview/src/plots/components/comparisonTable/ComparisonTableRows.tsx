@@ -1,12 +1,13 @@
 import { ComparisonPlots } from 'dvc/src/plots/webview/contract'
 import React, { createRef, useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { ComparisonTableColumn } from './ComparisonTableHead'
 import { ComparisonTableRow } from './ComparisonTableRow'
 import { changeRowHeight, DEFAULT_ROW_HEIGHT } from './comparisonTableSlice'
 import { RowDropTarget } from './RowDropTarget'
 import { DragDropContainer } from '../../../shared/components/dragDrop/DragDropContainer'
 import { reorderComparisonRows } from '../../util/messages'
+import { PlotsState } from '../../store'
 
 interface ComparisonTableRowsProps {
   plots: ComparisonPlots
@@ -22,6 +23,9 @@ export const ComparisionTableRows: React.FC<ComparisonTableRowsProps> = ({
   const [rowsOrder, setRowsOrder] = useState<string[]>([])
   const dispatch = useDispatch()
   const firstRowRef = createRef<HTMLTableSectionElement>()
+  const disabledDragPlotIds = useSelector(
+    (state: PlotsState) => state.comparison.disabledDragPlotIds
+  )
 
   useEffect(() => {
     setRowsOrder(plots.map(({ path }) => path))
@@ -40,12 +44,19 @@ export const ComparisionTableRows: React.FC<ComparisonTableRowsProps> = ({
     }
     const revs = plot.revisions
     return (
-      <tbody key={path} id={path} ref={i === 0 ? firstRowRef : undefined}>
+      <tbody
+        data-testid="comparison-table-body"
+        key={path}
+        id={path}
+        ref={i === 0 ? firstRowRef : undefined}
+      >
         <ComparisonTableRow
           path={path}
           plots={columns.map(column => ({
-            ...revs[column.id],
-            id: column.id
+            id: column.id,
+            imgs: revs[column.id]?.imgs || [
+              { errors: undefined, loading: false, url: undefined }
+            ]
           }))}
           nbColumns={columns.length}
           pinnedColumn={pinnedColumn}
@@ -67,6 +78,7 @@ export const ComparisionTableRows: React.FC<ComparisonTableRowsProps> = ({
       group="comparison-table"
       dropTarget={<RowDropTarget colSpan={columns.length} />}
       onLayoutChange={onLayoutChange}
+      disabledDropIds={disabledDragPlotIds}
       vertical
     />
   )

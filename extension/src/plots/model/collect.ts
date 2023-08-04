@@ -36,6 +36,12 @@ import {
 import { StrokeDashEncoding } from '../multiSource/constants'
 import { exists } from '../../fileSystem'
 import { hasKey } from '../../util/object'
+import { MULTI_IMAGE_PATH_REG } from '../../cli/dvc/constants'
+import {
+  getFileNameWithoutExt,
+  getParent,
+  getPathArray
+} from '../../fileSystem/util'
 
 export const getCustomPlotId = (metric: string, param: string) =>
   `custom-${metric}-${param}`
@@ -128,10 +134,20 @@ export type RevisionData = {
   [label: string]: RevisionPathData
 }
 
+type ComparisonDataImgPlot = ImagePlot & { ind?: number }
+
 export type ComparisonData = {
   [label: string]: {
-    [path: string]: ImagePlot[]
+    [path: string]: ComparisonDataImgPlot[]
   }
+}
+
+const getMultiImagePath = (path: string) =>
+  getParent(getPathArray(path), 0) as string
+
+const getMultiImageInd = (path: string) => {
+  const fileName = getFileNameWithoutExt(path)
+  return Number(fileName)
 }
 
 const collectImageData = (
@@ -139,8 +155,10 @@ const collectImageData = (
   path: string,
   plot: ImagePlot
 ) => {
-  const pathLabel = path
+  const isMultiImgPlot = MULTI_IMAGE_PATH_REG.test(path)
+  const pathLabel = isMultiImgPlot ? getMultiImagePath(path) : path
   const id = plot.revisions?.[0]
+
   if (!id) {
     return
   }
@@ -153,7 +171,13 @@ const collectImageData = (
     acc[id][pathLabel] = []
   }
 
-  acc[id][pathLabel].push(plot)
+  const imgPlot: ComparisonDataImgPlot = { ...plot }
+
+  if (isMultiImgPlot) {
+    imgPlot.ind = getMultiImageInd(path)
+  }
+
+  acc[id][pathLabel].push(imgPlot)
 }
 
 const collectDatapoints = (
@@ -209,6 +233,16 @@ const collectPathData = (acc: DataAccumulator, path: string, plots: Plot[]) => {
   }
 }
 
+const sortComparisonImgPaths = (acc: DataAccumulator) => {
+  for (const [label, paths] of Object.entries(acc.comparisonData)) {
+    for (const path of Object.keys(paths)) {
+      acc.comparisonData[label][path].sort(
+        (img1, img2) => (img1.ind || 0) - (img2.ind || 0)
+      )
+    }
+  }
+}
+
 export const collectData = (output: PlotsOutput): DataAccumulator => {
   const { data } = output
   const acc = {
@@ -219,6 +253,8 @@ export const collectData = (output: PlotsOutput): DataAccumulator => {
   for (const [path, plots] of Object.entries(data)) {
     collectPathData(acc, path, plots)
   }
+
+  sortComparisonImgPaths(acc)
 
   return acc
 }
@@ -250,7 +286,7 @@ const collectSelectedPathComparisonPlots = ({
   }
 
   for (const id of selectedRevisionIds) {
-    const imgs = comparisonData[id][path]
+    const imgs = comparisonData[id]?.[path]
     pathRevisions.revisions[id] = {
       id,
       imgs: imgs

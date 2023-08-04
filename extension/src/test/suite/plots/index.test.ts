@@ -318,7 +318,8 @@ suite('Plots Test Suite', () => {
       const mockComparisonPathsOrder = [
         join('plots', 'acc.png'),
         join('plots', 'heatmap.png'),
-        join('plots', 'loss.png')
+        join('plots', 'loss.png'),
+        join('plots', 'image')
       ]
 
       messageSpy.resetHistory()

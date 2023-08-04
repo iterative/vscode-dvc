@@ -84,7 +84,8 @@ describe('collectData', () => {
     expect(Object.keys(comparisonData.main)).toStrictEqual([
       join('plots', 'acc.png'),
       heatmapPlot,
-      join('plots', 'loss.png')
+      join('plots', 'loss.png'),
+      join('plots', 'image')
     ])
 
     const testBranchHeatmap = comparisonData['test-branch'][heatmapPlot]
