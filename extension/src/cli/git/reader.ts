@@ -181,11 +181,7 @@ export class GitReader extends GitCli {
       args: [Command.REV_PARSE, Commit.HEAD],
       cwd
     })
-    try {
-      const sha = await this.executeProcess(options)
-      return sha.slice(0, 7)
-    } catch {
-      return ''
-    }
+    const sha = await this.executeProcess(options)
+    return sha.slice(0, 7)
   }
 }
