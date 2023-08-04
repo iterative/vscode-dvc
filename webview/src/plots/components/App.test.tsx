@@ -1400,6 +1400,54 @@ describe('App', () => {
     expect(screen.getByTestId('modal')).toBeInTheDocument()
   })
 
+  it('should open a modal with the plot zoomed in and actions menu open when clicking on a plot actions button', async () => {
+    renderAppWithOptionalData({
+      custom: customPlotsFixture
+    })
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+
+    const plotActionsButton = within(
+      screen.getAllByTestId(/^plot-/)[0]
+    ).getByTestId('zoomable-plot-actions')
+
+    fireEvent.click(plotActionsButton)
+
+    expect(screen.getByTestId('modal')).toBeInTheDocument()
+    await waitFor(
+      () => {
+        expect(screen.getByTitle('Click to view actions')).toHaveAttribute(
+          'open'
+        )
+      },
+      { timeout: 1000 }
+    )
+  })
+
+  it('should open a modal with the plot zoomed in and actions menu open when key pressing on a plot actions button', async () => {
+    renderAppWithOptionalData({
+      custom: customPlotsFixture
+    })
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+
+    const plotActionsButton = within(
+      screen.getAllByTestId(/^plot-/)[0]
+    ).getByTestId('zoomable-plot-actions')
+
+    fireEvent.keyDown(plotActionsButton, { key: 'Enter' })
+
+    expect(screen.getByTestId('modal')).toBeInTheDocument()
+    await waitFor(
+      () => {
+        expect(screen.getByTitle('Click to view actions')).toHaveAttribute(
+          'open'
+        )
+      },
+      { timeout: 1000 }
+    )
+  })
+
   it('should not open a modal with the plot zoomed in when clicking a comparison table plot', () => {
     renderAppWithOptionalData({
       comparison: comparisonTableFixture,

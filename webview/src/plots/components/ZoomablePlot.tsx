@@ -97,6 +97,7 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
         }}
         role="button"
         tabIndex={0}
+        aria-label="See Plot Export Options"
       >
         <Ellipsis />
       </span>
