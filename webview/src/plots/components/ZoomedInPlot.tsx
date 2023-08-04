@@ -87,7 +87,6 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   }
 
   return (
-    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div
       className={styles.zoomedInPlot}
       data-testid="zoomed-in-plot"
