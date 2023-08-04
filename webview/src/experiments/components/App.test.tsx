@@ -49,7 +49,8 @@ import {
   renderTableWithSortingData,
   renderTableWithNoRows,
   selectedRows,
-  setTableData
+  setTableData,
+  renderTableWithFilters
 } from '../../test/experimentsTable'
 import { clearSelection, createWindowTextSelection } from '../../test/selection'
 import { sendMessage } from '../../shared/vscode'
@@ -704,6 +705,7 @@ describe('App', () => {
     })
   })
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('Header Context Menu', () => {
     beforeAll(() => {
       jest.useFakeTimers()
@@ -733,7 +735,7 @@ describe('App', () => {
       advanceTimersByTime(100)
 
       const menuitems = screen.getAllByRole('menuitem')
-      expect(menuitems).toHaveLength(9)
+      expect(menuitems).toHaveLength(11)
       expect(
         menuitems.filter(item => !item.className.includes('disabled'))
       ).toHaveLength(6)
@@ -757,7 +759,7 @@ describe('App', () => {
       expect(disabledMenuItem).toBeDefined()
 
       disabledMenuItem && fireEvent.click(disabledMenuItem, { bubbles: true })
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(9)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(11)
     })
 
     it('should have the same enabled options in the empty placeholders', () => {
@@ -782,6 +784,7 @@ describe('App', () => {
           'Set Max Header Height',
           'Select Columns',
           'Select First Columns',
+          'Filter By',
           'Sort Ascending',
           'Sort Descending'
         ])
@@ -833,6 +836,80 @@ describe('App', () => {
       expect(mockPostMessage).toHaveBeenCalledWith({
         payload: 'Created',
         type: MessageFromWebviewType.EXPERIMENTS_TABLE_MOVE_TO_START
+      })
+    })
+
+    it('should disable Filter By for deps, placeholders and the stub column', () => {
+      renderTable()
+
+      mockPostMessage.mockClear()
+
+      for (const headerText of ['data.xml', 'params.yaml', 'Experiment']) {
+        const column = screen.getByText(headerText)
+        fireEvent.contextMenu(column, { bubbles: true })
+        advanceTimersByTime(100)
+
+        const filterOption = screen.getByText('Filter By')
+
+        fireEvent.click(filterOption)
+        fireEvent.keyDown(filterOption, { bubbles: true, key: 'Escape' })
+
+        expect(mockPostMessage).not.toHaveBeenCalled()
+      }
+    })
+
+    it('should disable Remove Filter(s) when there are no filters applied', () => {
+      renderTable()
+
+      mockPostMessage.mockClear()
+
+      const column = screen.getByText('learning_rate')
+      fireEvent.contextMenu(column, { bubbles: true })
+      advanceTimersByTime(100)
+
+      const filterOption = screen.getByText('Remove Filter(s)')
+
+      fireEvent.click(filterOption)
+
+      expect(mockPostMessage).not.toHaveBeenCalled()
+    })
+
+    it('should send the correct message when Filter By is clicked', () => {
+      renderTable()
+      const column = screen.getByText('learning_rate')
+      fireEvent.contextMenu(column, { bubbles: true })
+      advanceTimersByTime(100)
+
+      const filterOption = screen.getByText('Filter By')
+
+      mockPostMessage.mockClear()
+
+      fireEvent.click(filterOption)
+
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: 'params:params.yaml:learning_rate',
+        type: MessageFromWebviewType.FILTER_COLUMN
+      })
+    })
+
+    it('should send the correct message when Remove Filter(s) is clicked', () => {
+      renderTableWithFilters()
+
+      const column = screen.getByText('learning_rate')
+      fireEvent.contextMenu(column, { bubbles: true })
+      advanceTimersByTime(100)
+
+      const filterOption = screen.getByText('Remove Filter(s)')
+
+      mockPostMessage.mockClear()
+
+      fireEvent.click(filterOption)
+
+      expect(mockPostMessage).toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: 'params:params.yaml:learning_rate',
+        type: MessageFromWebviewType.REMOVE_COLUMN_FILTERS
       })
     })
 

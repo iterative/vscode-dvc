@@ -19,6 +19,8 @@ export const DEFAULT_CURRENT_BRANCH_COMMITS_TO_SHOW = 3
 export const DEFAULT_OTHER_BRANCH_COMMITS_TO_SHOW = 1
 export const NUM_OF_COMMITS_TO_INCREASE = 2
 
+export const MULTI_IMAGE_PATH_REG = /[^/]+[/\\]\d+\.[a-z]+$/i
+
 export enum Command {
   ADD = 'add',
   CHECKOUT = 'checkout',

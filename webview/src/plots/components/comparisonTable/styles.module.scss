@@ -88,25 +88,6 @@ $gap: 4px;
   transform: rotate(0deg);
 }
 
-.imageWrapper {
-  width: 100%;
-  display: block;
-  padding: 0;
-  border: 0;
-}
-
-.noImage {
-  background-color: $bg-color;
-  border-style: solid;
-  border-width: thin;
-  border-color: $bg-color;
-}
-
-.noImageContent {
-  padding-top: 25%;
-  padding-bottom: 25%;
-}
-
 .rowToggler {
   border: none;
   background: none;
@@ -170,10 +151,44 @@ $gap: 4px;
   max-height: 0;
 }
 
-.cell img {
+.image {
   width: 100%;
   height: auto;
   vertical-align: middle;
+}
+
+.imageWrapper {
+  width: 100%;
+  display: block;
+  padding: 0;
+  border: 0;
+}
+
+.noImageContent {
+  padding-top: 25%;
+  padding-bottom: 25%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.multiImageWrapper {
+  .image,
+  .noImageContent {
+    height: 380px;
+    object-fit: contain;
+  }
+}
+
+.multiImageSlider {
+  display: flex;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  color: $fg-color;
+  background-color: $bg-color;
+  box-shadow: inset 40px 40px $fg-transparency-1;
 }
 
 .experimentName {

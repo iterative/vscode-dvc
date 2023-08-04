@@ -60,6 +60,13 @@ export const renderTableWithSortingData = () => {
   return renderTable(sortingTableDataFixture)
 }
 
+export const renderTableWithFilters = () => {
+  return renderTable({
+    ...tableDataFixture,
+    filters: ['params:params.yaml:learning_rate']
+  })
+}
+
 export const renderTableWithoutRunningExperiments = (
   hasCheckpoints?: boolean
 ) => {
