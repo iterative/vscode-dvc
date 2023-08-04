@@ -230,10 +230,78 @@ describe('App', () => {
             path: 'training/plots/images/misclassified.jpg',
             revisions: {
               ad2b5ec: {
-                errors: undefined,
                 id: 'ad2b5ec',
-                loading: true,
-                url: undefined
+                imgs: [
+                  {
+                    errors: undefined,
+                    loading: true,
+                    url: undefined
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        revisions: [
+          {
+            description: '[exp-a270a]',
+            displayColor: '#945dd6',
+            fetched: false,
+            id: 'ad2b5ec',
+            label: 'ad2b5ec',
+            summaryColumns: []
+          }
+        ],
+        width: DEFAULT_NB_ITEMS_PER_ROW
+      },
+      custom: null,
+      hasPlots: true,
+      hasUnselectedPlots: false,
+      sectionCollapsed: DEFAULT_SECTION_COLLAPSED,
+      selectedRevisions: [
+        {
+          description: '[exp-a270a]',
+          displayColor: '#945dd6',
+          fetched: false,
+          id: 'ad2b5ec',
+          label: 'ad2b5ec',
+          summaryColumns: []
+        }
+      ],
+      template: null
+    })
+    const loading = await screen.findAllByText('Loading...')
+
+    expect(loading).toHaveLength(3)
+  })
+
+  it('should render loading section states with multi image plots when given a single revision which has not been fetched', async () => {
+    renderAppWithOptionalData({
+      comparison: {
+        height: DEFAULT_PLOT_HEIGHT,
+        plots: [
+          {
+            path: 'training/plots/images/image',
+            revisions: {
+              ad2b5ec: {
+                id: 'ad2b5ec',
+                imgs: [
+                  {
+                    errors: undefined,
+                    loading: true,
+                    url: undefined
+                  },
+                  {
+                    errors: undefined,
+                    loading: true,
+                    url: undefined
+                  },
+                  {
+                    errors: undefined,
+                    loading: true,
+                    url: undefined
+                  }
+                ]
               }
             }
           }
@@ -1375,7 +1443,23 @@ describe('App', () => {
     fireEvent.click(plot)
 
     expect(mockPostMessage).toHaveBeenCalledWith({
-      payload: comparisonTableFixture.plots[0].revisions.workspace.url,
+      payload: comparisonTableFixture.plots[0].revisions.workspace.imgs[0].url,
+      type: MessageFromWebviewType.ZOOM_PLOT
+    })
+  })
+
+  it('should send a message with the plot path when a comparison table multi img plot is zoomed', () => {
+    renderAppWithOptionalData({
+      comparison: comparisonTableFixture
+    })
+
+    const plotWrapper = screen.getAllByTestId('multi-image-cell')[0]
+    const plot = within(plotWrapper).getByTestId('image-plot-button')
+
+    fireEvent.click(plot)
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      payload: comparisonTableFixture.plots[3].revisions.workspace.imgs[0].url,
       type: MessageFromWebviewType.ZOOM_PLOT
     })
   })
@@ -1589,6 +1673,58 @@ describe('App', () => {
     })
 
     expect(multiViewPlot).toHaveStyle('--scale: 2')
+  })
+
+  describe('Comparison Multi Image Plots', () => {
+    it('should render cells with sliders', () => {
+      renderAppWithOptionalData({
+        comparison: comparisonTableFixture
+      })
+
+      const multiImgPlot = screen.getAllByTestId('multi-image-cell')[0]
+      const slider = within(multiImgPlot).getByRole('slider')
+
+      expect(slider).toBeInTheDocument()
+    })
+
+    it('should update the cell image when the slider changes', () => {
+      renderAppWithOptionalData({
+        comparison: comparisonTableFixture
+      })
+
+      const workspaceImgs =
+        comparisonTableFixture.plots[3].revisions.workspace.imgs
+
+      const multiImgPlots = screen.getAllByTestId('multi-image-cell')
+      const slider = within(multiImgPlots[0]).getByRole('slider')
+      const workspaceImgEl = within(multiImgPlots[0]).getByRole('img')
+
+      expect(workspaceImgEl).toHaveAttribute('src', workspaceImgs[0].url)
+
+      fireEvent.change(slider, { target: { value: 3 } })
+
+      expect(workspaceImgEl).toHaveAttribute('src', workspaceImgs[3].url)
+    })
+
+    it('should disable the multi img row from drag and drop when hovering over a img slider', () => {
+      renderAppWithOptionalData({
+        comparison: comparisonTableFixture
+      })
+
+      const multiImgRow = screen.getAllByTestId('comparison-table-body')[3]
+      const multiImgPlots = screen.getAllByTestId('multi-image-cell')
+      const slider = within(multiImgPlots[0]).getByRole('slider')
+
+      expect(multiImgRow.draggable).toBe(true)
+
+      fireEvent.mouseEnter(slider)
+
+      expect(multiImgRow.draggable).toBe(false)
+
+      fireEvent.mouseLeave(slider)
+
+      expect(multiImgRow.draggable).toBe(true)
+    })
   })
 
   describe('Virtualization', () => {

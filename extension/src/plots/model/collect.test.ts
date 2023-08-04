@@ -84,17 +84,18 @@ describe('collectData', () => {
     expect(Object.keys(comparisonData.main)).toStrictEqual([
       join('plots', 'acc.png'),
       heatmapPlot,
-      join('plots', 'loss.png')
+      join('plots', 'loss.png'),
+      join('plots', 'image')
     ])
 
     const testBranchHeatmap = comparisonData['test-branch'][heatmapPlot]
 
     expect(testBranchHeatmap).toBeDefined()
-    expect(testBranchHeatmap).toStrictEqual(
+    expect(testBranchHeatmap).toStrictEqual([
       plotsDiffFixture.data[heatmapPlot].find(({ revisions }) =>
         sameContents(revisions as string[], ['test-branch'])
       )
-    )
+    ])
   })
 })
 

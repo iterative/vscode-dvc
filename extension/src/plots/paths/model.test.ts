@@ -61,6 +61,14 @@ describe('PathsModel', () => {
       },
       {
         hasChildren: false,
+        parentPath: 'plots',
+        path: join('plots', 'image'),
+        revisions: new Set(REVISIONS),
+        selected: true,
+        type: comparisonType
+      },
+      {
+        hasChildren: false,
         parentPath: 'logs',
         path: logsLoss,
         revisions: new Set(REVISIONS),
@@ -340,13 +348,15 @@ describe('PathsModel', () => {
     expect(model.getComparisonPaths()).toStrictEqual([
       join('plots', 'acc.png'),
       join('plots', 'heatmap.png'),
-      join('plots', 'loss.png')
+      join('plots', 'loss.png'),
+      join('plots', 'image')
     ])
 
     const newOrder = [
       join('plots', 'heatmap.png'),
       join('plots', 'acc.png'),
-      join('plots', 'loss.png')
+      join('plots', 'loss.png'),
+      join('plots', 'image')
     ]
 
     model.setComparisonPathsOrder(newOrder)
@@ -380,7 +390,7 @@ describe('PathsModel', () => {
         tooltip: undefined
       },
       {
-        descendantStatuses: [2, 2, 2],
+        descendantStatuses: [2, 2, 2, 2],
         hasChildren: true,
         parentPath: undefined,
         path: 'plots',
