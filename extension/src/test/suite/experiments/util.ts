@@ -56,7 +56,6 @@ export const buildExperiments = ({
     dvcViewer,
     gitReader,
     internalCommands,
-    messageSpy,
     mockCheckSignalFile,
     mockExpShow,
     mockGetCommitMessages,
@@ -117,7 +116,6 @@ export const buildExperiments = ({
     experimentsModel: (experiments as any).experiments as ExperimentsModel,
     gitReader,
     internalCommands,
-    messageSpy,
     mockCheckOrAddPipeline,
     mockCheckSignalFile,
     mockExpShow,
@@ -141,12 +139,11 @@ export const buildExperimentsWebview = async (inputs: {
   stageList?: string | null
 }) => {
   const all = buildExperiments(inputs)
-  const { experiments, messageSpy } = all
+  const { experiments } = all
   await experiments.isReady()
   const webview = await experiments.showWebview()
   await webview.isReady()
-  messageSpy.restore()
-  const instanceMessageSpy: typeof messageSpy = spy(webview, 'show')
+  const messageSpy = spy(webview, 'show')
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (experiments as any).webviewMessages.sendWebviewMessage()
 
@@ -154,7 +151,7 @@ export const buildExperimentsWebview = async (inputs: {
 
   return {
     ...all,
-    messageSpy: instanceMessageSpy,
+    messageSpy,
     mockMessageReceived,
     webview
   }
@@ -165,7 +162,6 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
     experiments: mockExperiments,
     gitReader,
     internalCommands,
-    messageSpy,
     resourceLocator
   } = buildExperiments({
     disposer,
@@ -195,11 +191,11 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
   )
 
   void experiments.setState(DEFAULT_EXPERIMENTS_OUTPUT)
-  return { experiments, internalCommands, messageSpy, workspaceExperiments }
+  return { experiments, internalCommands, workspaceExperiments }
 }
 
 export const buildSingleRepoExperiments = (disposer: SafeWatcherDisposer) => {
-  const { config, internalCommands, gitReader, messageSpy, resourceLocator } =
+  const { config, internalCommands, gitReader, resourceLocator } =
     buildDependencies({ disposer })
 
   stub(gitReader, 'getGitRepositoryRoot').resolves(dvcDemoPath)
@@ -225,7 +221,6 @@ export const buildSingleRepoExperiments = (disposer: SafeWatcherDisposer) => {
   return {
     config,
     internalCommands,
-    messageSpy,
     resourceLocator,
     workspaceExperiments
   }
@@ -289,7 +284,7 @@ export const buildExperimentsData = (
   }
 }
 
-export const stubWorkspaceExperimentsGetters = (
+export const stubWorkspaceExperimentsGetters = async (
   disposer: Disposer,
   dvcRoot = dvcDemoPath
 ) => {
@@ -299,8 +294,9 @@ export const stubWorkspaceExperimentsGetters = (
     dvcRunner,
     experiments,
     experimentsModel,
-    messageSpy
-  } = buildExperiments({ disposer })
+    messageSpy,
+    mockMessageReceived
+  } = await buildExperimentsWebview({ disposer })
 
   const mockGetOnlyOrPickProject = stub(
     WorkspaceExperiments.prototype,
@@ -320,6 +316,7 @@ export const stubWorkspaceExperimentsGetters = (
     experimentsModel,
     messageSpy,
     mockGetOnlyOrPickProject,
-    mockGetRepository
+    mockGetRepository,
+    mockMessageReceived
   }
 }

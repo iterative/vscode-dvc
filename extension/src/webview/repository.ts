@@ -38,7 +38,7 @@ export abstract class BaseRepository<
     this.onDidReceivedWebviewMessage = this.receivedWebviewMessage.event
   }
 
-  public async showWebview(viewColumn?: ViewColumn) {
+  public async showWebview(viewColumn?: ViewColumn): Promise<BaseWebview<T>> {
     if (this.webview) {
       return this.webview.reveal(viewColumn)
     }

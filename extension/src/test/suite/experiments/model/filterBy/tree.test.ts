@@ -61,10 +61,9 @@ suite('Experiments Filter By Tree Test Suite', () => {
     })
 
     it('should be able to update the table data by adding and removing a filter', async () => {
-      const { experiments, messageSpy } =
-        stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
-      await experiments.showWebview()
+      const { experiments, messageSpy } = await stubWorkspaceExperimentsGetters(
+        disposable
+      )
 
       const accuracyPath = buildMetricOrParamPath(
         ColumnType.METRICS,
@@ -132,8 +131,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to remove all filters with dvc.views.experimentsFilterByTree.removeAllFilters', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      const { experiments } = await stubWorkspaceExperimentsGetters(disposable)
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockShowInputBox = stub(window, 'showInputBox')
@@ -338,9 +336,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
     it('should be able to filter to starred experiments', async () => {
       const { experiments, experimentsModel, messageSpy } =
-        stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
-      await experiments.showWebview()
+        await stubWorkspaceExperimentsGetters(disposable)
 
       experimentsModel.toggleStars(['main'])
 
@@ -368,9 +364,9 @@ suite('Experiments Filter By Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should provide a shortcut to filter to starred experiments', async () => {
-      const { experiments, experimentsModel } =
-        stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      const { experimentsModel } = await stubWorkspaceExperimentsGetters(
+        disposable
+      )
 
       const mockAddFilter = stub(experimentsModel, 'addFilter')
 

@@ -246,8 +246,6 @@ export const buildDependencies = ({
 
   const resourceLocator = buildResourceLocator(disposer)
 
-  const messageSpy = spy(BaseWebview.prototype, 'show')
-
   return {
     config,
     dvcConfig,
@@ -258,7 +256,6 @@ export const buildDependencies = ({
     gitExecutor,
     gitReader,
     internalCommands,
-    messageSpy,
     mockCheckSignalFile,
     mockCreateFileSystemWatcher,
     mockDag,
