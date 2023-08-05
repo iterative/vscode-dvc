@@ -1,3 +1,4 @@
+import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore, SinonStub, stub } from 'sinon'
@@ -9,7 +10,7 @@ import comparisonPlotsFixture from '../../../fixtures/plotsDiff/comparison/vscod
 import templatePlotsFixture from '../../../fixtures/plotsDiff/template'
 import { RegisteredCommands } from '../../../../commands/external'
 import { dvcDemoPath } from '../../../util'
-import { buildPlots } from '../util'
+import { buildPlots, buildPlotsWebview } from '../util'
 import { WEBVIEW_TEST_TIMEOUT } from '../../timeouts'
 import {
   QuickPickItemWithValue,
@@ -39,12 +40,10 @@ suite('Plots Paths Tree Test Suite', () => {
 
     it('should be able to toggle whether a plot is selected with dvc.views.plotsPathsTree.toggleStatus', async () => {
       const [path] = Object.keys(plotsDiffFixture.data)
-      const { plots, messageSpy } = await buildPlots({
+      const { messageSpy } = await buildPlotsWebview({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
       })
-
-      await plots.showWebview()
 
       const isUnselected = await commands.executeCommand(
         RegisteredCommands.PLOTS_PATH_TOGGLE,
@@ -81,18 +80,27 @@ suite('Plots Paths Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to select / de-select plots using dvc.views.plotsPathsTree.selectPlots', async () => {
-      const { plots, messageSpy } = await buildPlots({
+      const { messageSpy } = await buildPlotsWebview({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
       })
 
-      await plots.showWebview()
       messageSpy.resetHistory()
 
       const noneSelected: QuickPickItemWithValue<PlotPath>[] = []
-      const allSelected: QuickPickItemWithValue<PlotPath>[] = Object.keys(
-        plotsDiffFixture.data
-      ).map(path => ({ label: path, value: { path } as PlotPath }))
+      const multiImagePath = join('plots', 'image')
+      const allSelected: QuickPickItemWithValue<PlotPath>[] = [
+        {
+          label: multiImagePath,
+          value: { path: multiImagePath } as PlotPath
+        }
+      ]
+      for (const path of Object.keys(plotsDiffFixture.data)) {
+        if (path.includes(multiImagePath)) {
+          continue
+        }
+        allSelected.push({ label: path, value: { path } as PlotPath })
+      }
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
         [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],

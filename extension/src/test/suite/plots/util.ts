@@ -47,7 +47,7 @@ export const buildPlots = async ({
   gitLog?: string
   rowOrder?: { branch: string; sha: string }[]
 }) => {
-  const { internalCommands, mockPlotsDiff, messageSpy, resourceLocator } =
+  const { internalCommands, mockPlotsDiff, resourceLocator } =
     buildDependencies({ disposer, expShow, plotsDiff })
 
   const mockRemoveDir = stub(FileSystem, 'removeDir').returns(undefined)
@@ -134,7 +134,6 @@ export const buildPlots = async ({
     errorsModel,
     experiments,
     experimentsModel,
-    messageSpy,
     mockGetModifiedTime,
     mockPlotsDiff,
     mockRemoveDir,
@@ -169,7 +168,6 @@ export const buildPlotsWebview = async ({
     pathsModel,
     plots,
     plotsModel,
-    messageSpy,
     mockPlotsDiff
   } = await buildPlots({
     availableNbCommits,
@@ -187,8 +185,8 @@ export const buildPlotsWebview = async ({
 
   const webview = await plots.showWebview()
   await webview.isReady()
-  messageSpy.restore()
-  const instanceMessageSpy: typeof messageSpy = spy(webview, 'show')
+
+  const messageSpy = spy(webview, 'show')
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (plots as any).webviewMessages.sendWebviewMessage()
 
@@ -198,7 +196,7 @@ export const buildPlotsWebview = async ({
     data,
     experiments,
     experimentsModel,
-    messageSpy: instanceMessageSpy,
+    messageSpy,
     mockMessageReceived,
     mockPlotsDiff,
     pathsModel,

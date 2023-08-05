@@ -156,9 +156,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.modifyWorkspaceParamsAndQueue', () => {
     it('should be able to queue an experiment using an existing one as a base', async () => {
-      const { dvcExecutor, experiments } =
-        stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      const { dvcExecutor } = await stubWorkspaceExperimentsGetters(disposable)
 
       const mockExperimentRunQueue = stub(dvcExecutor, 'expRunQueue').resolves(
         'true'
@@ -202,8 +200,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.modifyWorkspaceParamsAndResume', () => {
     it('should be able to resume a checkpoint experiment using an existing one as a base', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceExperimentsGetters(disposable)
 
       const mockExperimentRun = stub(
         DvcRunner.prototype,
@@ -251,8 +248,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.modifyWorkspaceParamsAndRun', () => {
     it('should be able to run an experiment using an existing one as a base', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceExperimentsGetters(disposable)
 
       const mockExperimentRun = stub(
         DvcRunner.prototype,
@@ -300,8 +296,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.queueExperiment', () => {
     it('should be able to queue an experiment', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceExperimentsGetters(disposable)
 
       const mockExperimentRunQueue = stub(
         DvcExecutor.prototype,
@@ -315,8 +310,7 @@ suite('Workspace Experiments Test Suite', () => {
     })
 
     it('should send a telemetry event containing a duration when an experiment is queued', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceExperimentsGetters(disposable)
 
       stub(DvcExecutor.prototype, 'expRunQueue').resolves('true')
 
@@ -336,8 +330,7 @@ suite('Workspace Experiments Test Suite', () => {
     })
 
     it('should send a telemetry event containing an error message when an experiment fails to queue', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceExperimentsGetters(disposable)
 
       const mockErrorMessage =
         'ERROR: unexpected error - [Errno 2] No such file or directory'
@@ -365,8 +358,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.runExperiment', () => {
     it('should be able to run an experiment', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceExperimentsGetters(disposable)
 
       const mockRunExperiment = stub(
         DvcRunner.prototype,
@@ -386,8 +378,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.resumeCheckpointExperiment', () => {
     it('should be able to run an experiment', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceExperimentsGetters(disposable)
 
       const mockRunExperiment = stub(
         DvcRunner.prototype,
@@ -403,8 +394,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.resetAndRunCheckpointExperiment', () => {
     it('should be able to reset existing checkpoints and restart the experiment', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceExperimentsGetters(disposable)
 
       const mockRunExperimentReset = stub(
         DvcRunner.prototype,
@@ -426,8 +416,8 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.stopExperiments', () => {
     it('should be able to stop any running experiment', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceExperimentsGetters(disposable)
+
       const mockQueueKill = stub(DvcExecutor.prototype, 'queueKill').resolves(
         undefined
       )
@@ -478,8 +468,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.startExperimentsQueue', () => {
     it('should be able to start the experiments queue with the selected number of workers', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceExperimentsGetters(disposable)
 
       const mockQueueStart = stub(DvcExecutor.prototype, 'queueStart').resolves(
         undefined
@@ -504,8 +493,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.stopExperimentsQueue', () => {
     it('should be able to stop the experiments queue', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceExperimentsGetters(disposable)
 
       const mockQueueStop = stub(DvcExecutor.prototype, 'queueStop').resolves(
         undefined
@@ -522,8 +510,7 @@ suite('Workspace Experiments Test Suite', () => {
     it('should ask the user to pick a commit or experiment and then apply it to the workspace', async () => {
       const selectedExperiment = 'test-branch'
 
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceExperimentsGetters(disposable)
 
       const mockShowQuickPick = stub(window, 'showQuickPick').resolves({
         value: selectedExperiment
@@ -618,8 +605,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.branchExperiment', () => {
     it('should be able to create a branch from an experiment', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceExperimentsGetters(disposable)
 
       const testExperiment = 'exp-83425'
       const mockBranch = 'brunch'
@@ -652,8 +638,8 @@ suite('Workspace Experiments Test Suite', () => {
   describe('dvc.pushExperiments', () => {
     it('should ask the user to pick experiment(s) and then push selected ones to the remote', async () => {
       bypassProgressCloseDelay()
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      const { experiments } = await stubWorkspaceExperimentsGetters(disposable)
+
       stub(experiments, 'update').resolves(undefined)
 
       const mockExperimentId = 'exp-e7a67'
@@ -751,8 +737,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.removeExperiments', () => {
     it('should ask the user to pick experiment(s) and then remove selected ones from the workspace', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceExperimentsGetters(disposable)
 
       const mockExperimentId = 'exp-e7a67'
       const secondMockExperimentId = 'exp-83425'
@@ -858,8 +843,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.removeExperimentQueue', () => {
     it('should remove all queued experiments from the selected repository', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceExperimentsGetters(disposable)
 
       const mockExperimentRemove = stub(DvcExecutor.prototype, 'expRemove')
 
