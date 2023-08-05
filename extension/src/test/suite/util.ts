@@ -321,7 +321,7 @@ export const bypassProgressCloseDelay = () =>
   stub(Toast, 'delayProgressClosing').resolves(undefined)
 
 export const waitForEditorText = async (): Promise<unknown> => {
-  await Time.delay(500)
+  await Time.delay(100)
   const text = window.activeTextEditor?.document.getText()
   if (text) {
     return
@@ -333,7 +333,7 @@ export const waitForSpyCall = async (
   messageSpy: SinonSpy,
   originalCallCount: number
 ): Promise<unknown> => {
-  await Time.delay(500)
+  await Time.delay(100)
   if (messageSpy.callCount > originalCallCount) {
     return
   }
