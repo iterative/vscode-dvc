@@ -10843,14 +10843,13 @@ eslint-module-utils@^2.8.0:
   dependencies:
     debug "^3.2.7"
 
-eslint-plugin-check-file@2.5.0:
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-check-file/-/eslint-plugin-check-file-2.5.0.tgz#916ef77420166f56512d67e3e0a42ef2e8e53474"
-  integrity sha512-FP5FZbJPy2jb9dzVjg/GMNK3l24ZSWuaOwKIEzYjIxUmC8OTKMmC93Mm2s0XKulNi9xoqlX5VyCB0NZfz7MX3g==
+eslint-plugin-check-file@2.6.1:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-check-file/-/eslint-plugin-check-file-2.6.1.tgz#f3614d3f746e22e5d3118aec40ae2fdb2498ede0"
+  integrity sha512-2I7cAboj6sC2CG0oHan1bMKZlk/nLz78TLc+YIiIFTCwlp/rGm0WtrGTcZ+65WWeDU3JY5OsKgEWG7TcL1H4iQ==
   dependencies:
     is-glob "^4.0.3"
     micromatch "^4.0.5"
-    requireindex "^1.2.0"
 
 eslint-plugin-es-x@^7.1.0:
   version "7.1.0"
@@ -18181,7 +18180,7 @@ require-main-filename@^2.0.0:
   resolved "https://registry.yarnpkg.com/require-main-filename/-/require-main-filename-2.0.0.tgz#d0b329ecc7cc0f61649f62215be69af54aa8989b"
   integrity sha512-NKN5kMDylKuldxYLSUfrbo5Tuzh4hd+2E8NPPX02mZtn1VuREQToYe/ZdlJy+J3uCpfaiGF05e7B8W0iXbQHmg==
 
-requireindex@^1.2.0, requireindex@~1.2.0:
+requireindex@~1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/requireindex/-/requireindex-1.2.0.tgz#3463cdb22ee151902635aa6c9535d4de9c2ef1ef"
   integrity sha512-L9jEkOi3ASd9PYit2cwRfyppc9NoABujTP8/5gFcbERmo5jUoAKovIC3fsF17pkTnGsrByysqX+Kxd2OTNI1ww==
