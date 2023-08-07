@@ -7,7 +7,7 @@ import {
   collectMetricAndParamChanges,
   collectMetricsAndParams
 } from './metricsAndParams'
-import { Column, Commit, Experiment } from '../../webview/contract'
+import { Column, ColumnType, Commit, Experiment } from '../../webview/contract'
 import {
   ExpRange,
   ExpShowOutput,
@@ -173,7 +173,12 @@ const collectChangedPaths = (
   records: (Commit | Experiment)[]
 ) => {
   const acc: string[] = []
-  for (const { pathArray, path, hasChildren } of columns) {
+  for (const { type, pathArray, path, hasChildren } of columns) {
+    if (type === ColumnType.TIMESTAMP) {
+      collectChangedPath(acc, path, [path], records)
+      continue
+    }
+
     if (!pathArray || hasChildren) {
       continue
     }
