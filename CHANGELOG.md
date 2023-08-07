@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.34] - 2023-08-07
+
+### 🚀 New Features and Enhancements
+
+- Add filter options to experiment table header context menu [#4415](https://github.com/iterative/vscode-dvc/pull/4415) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Reorder experiment table indicator icons [#4416](https://github.com/iterative/vscode-dvc/pull/4416) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (3.12.0) [#4419](https://github.com/iterative/vscode-dvc/pull/4419) by [@julieg18](https://github.com/julieg18)
+- Move integration test webview message spies towards instance spies [#4417](https://github.com/iterative/vscode-dvc/pull/4417) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.33] - 2023-08-04
 
 ### 🚀 New Features and Enhancements
