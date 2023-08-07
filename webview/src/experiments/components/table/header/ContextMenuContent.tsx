@@ -57,9 +57,7 @@ const getFilterDetails = (
   const id = header.column.id
 
   const canFilter =
-    !isFromExperimentColumn(header) &&
-    header.column.columns.length <= 1 &&
-    !id.startsWith(ColumnType.DEPS)
+    !isFromExperimentColumn(header) && header.column.columns.length <= 1
 
   return { canFilter, isFiltered: filters.includes(id) }
 }

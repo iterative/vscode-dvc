@@ -119,7 +119,7 @@ export const pickColumnToFilter = (
   columns: ColumnLike[] | undefined
 ): Thenable<ColumnLike | undefined> =>
   pickFromColumnLikes(columns, {
-    title: Title.SELECT_PARAM_OR_METRIC_FILTER
+    title: Title.SELECT_COLUMN_FILTER
   })
 
 export const pickFilterToAdd = async ({
