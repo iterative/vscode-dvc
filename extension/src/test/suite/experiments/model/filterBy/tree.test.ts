@@ -23,7 +23,11 @@ import {
 } from '../../../util'
 import { buildMetricOrParamPath } from '../../../../../experiments/columns/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
-import { buildExperiments, stubWorkspaceExperimentsGetters } from '../../util'
+import {
+  buildExperiments,
+  stubWorkspaceGetters,
+  stubWorkspaceGettersWebview
+} from '../../util'
 import {
   ColumnType,
   TableData
@@ -61,7 +65,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
     })
 
     it('should be able to update the table data by adding and removing a filter', async () => {
-      const { experiments, messageSpy } = await stubWorkspaceExperimentsGetters(
+      const { experiments, messageSpy } = await stubWorkspaceGettersWebview(
         disposable
       )
 
@@ -131,7 +135,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to remove all filters with dvc.views.experimentsFilterByTree.removeAllFilters', async () => {
-      const { experiments } = await stubWorkspaceExperimentsGetters(disposable)
+      const { experiments } = await stubWorkspaceGetters(disposable)
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockShowInputBox = stub(window, 'showInputBox')
@@ -336,7 +340,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
     it('should be able to filter to starred experiments', async () => {
       const { experiments, experimentsModel, messageSpy } =
-        await stubWorkspaceExperimentsGetters(disposable)
+        await stubWorkspaceGettersWebview(disposable)
 
       experimentsModel.toggleStars(['main'])
 
@@ -364,9 +368,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should provide a shortcut to filter to starred experiments', async () => {
-      const { experimentsModel } = await stubWorkspaceExperimentsGetters(
-        disposable
-      )
+      const { experimentsModel } = await stubWorkspaceGetters(disposable)
 
       const mockAddFilter = stub(experimentsModel, 'addFilter')
 
