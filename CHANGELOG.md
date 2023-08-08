@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.35] - 2023-08-08
+
+### 🔨 Maintenance
+
+- Add GIT_OPTIONAL_LOCKS=0 to all Git calls [#4440](https://github.com/iterative/vscode-dvc/pull/4440) by [@mattseddon](https://github.com/mattseddon)
+- Reduce calls to Git (Setup webview) [#4441](https://github.com/iterative/vscode-dvc/pull/4441) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.34] - 2023-08-07
 
 ### 🚀 New Features and Enhancements
