@@ -153,7 +153,6 @@ suite('Extension Test Suite', () => {
         'isReady'
       )
 
-      stub(GitReader.prototype, 'hasChanges').resolves(false)
       stub(GitReader.prototype, 'listUntracked').resolves(new Set())
 
       const workspaceExperimentsAreReady = new Promise(resolve =>

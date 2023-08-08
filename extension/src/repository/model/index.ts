@@ -22,14 +22,16 @@ import { isDvcError } from '../../cli/dvc/reader'
 import { Disposable } from '../../class/dispose'
 import { sameContents } from '../../util/array'
 import { Data } from '../data'
-import { isDirectory } from '../../fileSystem'
+import { isDirectory, isSameOrChild } from '../../fileSystem'
 import { DOT_DVC } from '../../cli/dvc/constants'
 import { getCliErrorLabel } from '../../tree'
+import { RepositoryState as GitRepositoryState } from '../../extensions/git'
 
 export class RepositoryModel extends Disposable {
   private readonly dvcRoot: string
 
-  private hasChanges = false
+  private hasGitChanges = false
+  private hasDvcChanges = false
 
   private tracked = new Set<string>()
 
@@ -49,7 +51,26 @@ export class RepositoryModel extends Disposable {
     return this.tree.get(path) || []
   }
 
-  public transformAndSet({ dataStatus, hasGitChanges, untracked }: Data) {
+  public async transformAndSetGit(state: GitRepositoryState) {
+    const [workingTreeChanges, indexChanges, mergeChanges] = await Promise.all([
+      state.workingTreeChanges.filter(({ uri }) =>
+        isSameOrChild(this.dvcRoot, uri.fsPath)
+      ),
+      state.indexChanges.filter(({ uri }) =>
+        isSameOrChild(this.dvcRoot, uri.fsPath)
+      ),
+      state.mergeChanges.filter(({ uri }) =>
+        isSameOrChild(this.dvcRoot, uri.fsPath)
+      )
+    ])
+
+    this.hasGitChanges =
+      workingTreeChanges.length > 0 ||
+      indexChanges.length > 0 ||
+      mergeChanges.length > 0
+  }
+
+  public transformAndSetCli({ dataStatus, untracked }: Data) {
     if (isDvcError(dataStatus)) {
       return this.handleCliError(dataStatus)
     }
@@ -59,7 +80,7 @@ export class RepositoryModel extends Disposable {
       untracked: [...untracked].map(path => relative(this.dvcRoot, path))
     })
     this.collectTree(data.tracked)
-    this.collectHasChanges(data, hasGitChanges)
+    this.collectHasDvcChanges(data)
 
     return {
       scmDecorationState: this.getScmDecorationState(data),
@@ -68,12 +89,12 @@ export class RepositoryModel extends Disposable {
   }
 
   public getHasChanges(): boolean {
-    return this.hasChanges
+    return this.hasGitChanges || this.hasDvcChanges
   }
 
   private handleCliError({ error: { msg } }: DvcError) {
     const emptyState = createDataStatusAccumulator()
-    this.hasChanges = true
+    this.hasDvcChanges = true
 
     this.tracked = new Set()
     this.tree = createTreeFromError(this.dvcRoot, msg)
@@ -97,12 +118,8 @@ export class RepositoryModel extends Disposable {
     }
   }
 
-  private collectHasChanges(
-    data: DataStatusAccumulator,
-    hasGitChanges: boolean
-  ) {
-    this.hasChanges = !!(
-      hasGitChanges ||
+  private collectHasDvcChanges(data: DataStatusAccumulator) {
+    this.hasDvcChanges = !!(
       data.committedAdded.size > 0 ||
       data.committedDeleted.size > 0 ||
       data.committedModified.size > 0 ||
