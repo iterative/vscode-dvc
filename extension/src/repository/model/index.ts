@@ -161,7 +161,9 @@ export class RepositoryModel extends Disposable {
       ),
       untracked: [...untracked]
         .filter(
-          path => extname(path) !== DOT_DVC && basename(path) !== '.gitignore'
+          path =>
+            extname(path) !== DOT_DVC &&
+            !['.gitignore', 'dvc.yaml', 'dvc.lock'].includes(basename(path))
         )
         .map(path => ({
           contextValue: SourceControlDataStatus.UNTRACKED,
