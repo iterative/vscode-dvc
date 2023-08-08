@@ -139,7 +139,7 @@ describe('collectPaths', () => {
     }
   })
 
-  it('should update the existing path types when the paths are recollected', () => {
+  it('should collect path types after an error is returned for a new path', () => {
     const errorFixture: PlotsOutput = { data: {}, errors: [] }
     const plotPathNames = [
       join('plots', 'acc.png'),

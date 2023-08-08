@@ -171,7 +171,7 @@ const collectOrderedPath = (
   const isMultiImgPlot = isMultiImgDir && isPathLeaf
 
   const existingPathInd = acc.findIndex(existing => existing.path === path)
-  if (existingPathInd >= 0) {
+  if (existingPathInd !== -1) {
     return updateExistingPlotPath({
       acc,
       data,
