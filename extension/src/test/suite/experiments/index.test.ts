@@ -91,6 +91,7 @@ import { Toast } from '../../../vscode/toast'
 import { Response } from '../../../vscode/response'
 import { MAX_SELECTED_EXPERIMENTS } from '../../../experiments/model/status'
 import { Pipeline } from '../../../pipeline'
+import { ColumnLike } from '../../../experiments/columns/like'
 
 const { openFileInEditor } = FileSystem
 
@@ -468,11 +469,10 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to apply an experiment', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      const { mockMessageReceived } = await stubWorkspaceExperimentsGetters(
+        disposable
+      )
 
-      const webview = await experiments.showWebview()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockExperimentId = 'exp-e7a67'
 
       const mockExperimentApply = stub(
@@ -493,8 +493,9 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to create a branch from an experiment', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      const { mockMessageReceived } = await stubWorkspaceExperimentsGetters(
+        disposable
+      )
 
       const mockBranch = 'mock-branch-input'
       const inputEvent = getInputBoxEvent(mockBranch)
@@ -504,8 +505,6 @@ suite('Experiments Test Suite', () => {
         'expBranch'
       ).resolves('undefined')
 
-      const webview = await experiments.showWebview()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockExperimentId = 'exp-e7a67'
 
       mockMessageReceived.fire({
@@ -556,13 +555,10 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to push an experiment', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      const { experiments, mockMessageReceived } =
+        await stubWorkspaceExperimentsGetters(disposable)
 
       const mockExpId = 'exp-e7a67'
-
-      const webview = await experiments.showWebview()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const executeCommandSpy = spy(commands, 'executeCommand')
       const mockExpPush = stub(DvcExecutor.prototype, 'expPush')
@@ -646,8 +642,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to modify the workspace params and queue an experiment', async () => {
-      const { experiments, dvcExecutor } =
-        stubWorkspaceExperimentsGetters(disposable)
+      const { experiments, dvcExecutor, mockMessageReceived } =
+        await stubWorkspaceExperimentsGetters(disposable)
 
       const mockModifiedParams = [
         '-S',
@@ -660,9 +656,6 @@ suite('Experiments Test Suite', () => {
       const mockQueueExperiment = stub(dvcExecutor, 'expRunQueue').resolves(
         undefined
       )
-
-      const webview = await experiments.showWebview()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
       const tableChangePromise = experimentsUpdatedEvent(experiments)
 
       mockMessageReceived.fire({
@@ -678,8 +671,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to modify the workspace params and run a new experiment', async () => {
-      const { experiments, dvcRunner } =
-        stubWorkspaceExperimentsGetters(disposable)
+      const { experiments, dvcRunner, mockMessageReceived } =
+        await stubWorkspaceExperimentsGetters(disposable)
 
       const mockModifiedParams = [
         '-S',
@@ -692,10 +685,6 @@ suite('Experiments Test Suite', () => {
       const mockRunExperiment = stub(dvcRunner, 'runExperiment').resolves(
         undefined
       )
-
-      const webview = await experiments.showWebview()
-
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
 
       const tableChangePromise = experimentsUpdatedEvent(experiments)
 
@@ -712,8 +701,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to modify the workspace params, reset and run a new experiment', async () => {
-      const { experiments, dvcRunner } =
-        stubWorkspaceExperimentsGetters(disposable)
+      const { experiments, dvcRunner, mockMessageReceived } =
+        await stubWorkspaceExperimentsGetters(disposable)
 
       const mockModifiedParams = [
         '-S',
@@ -724,8 +713,6 @@ suite('Experiments Test Suite', () => {
 
       stub(experiments, 'pickAndModifyParams').resolves(mockModifiedParams)
 
-      const webview = await experiments.showWebview()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockRunExperiment = stub(dvcRunner, 'runExperiment').resolves(
         undefined
       )
@@ -771,9 +758,7 @@ suite('Experiments Test Suite', () => {
 
     it("should be able to handle a message to toggle an experiment's status", async () => {
       const { experiments, experimentsModel } =
-        stubWorkspaceExperimentsGetters(disposable)
-
-      await experiments.isReady()
+        await stubWorkspaceExperimentsGetters(disposable)
 
       const idToToggle = 'test-branch'
       const runningInQueueId = 'exp-e7a67'
@@ -1192,12 +1177,9 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to select experiments for plotting', async () => {
-      const { experiments, experimentsModel } =
-        stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      const { experiments, experimentsModel, mockMessageReceived } =
+        await stubWorkspaceExperimentsGetters(disposable)
 
-      const webview = await experiments.showWebview()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
       const queuedId = '90aea7f'
       const runningInQueueId = 'exp-e7a67'
       const expectedIds = ['main', 'test-branch', runningInQueueId]
@@ -1229,7 +1211,7 @@ suite('Experiments Test Suite', () => {
         experiments: true
       })
       const { experiments, experimentsModel } =
-        stubWorkspaceExperimentsGetters(disposable)
+        await stubWorkspaceExperimentsGetters(disposable)
       const mockShowPlots = stub(WorkspacePlots.prototype, 'showWebview')
 
       const dataSent = new Promise(resolve =>
@@ -1238,8 +1220,6 @@ suite('Experiments Test Suite', () => {
           return Promise.resolve(undefined)
         })
       )
-
-      await experiments.isReady()
 
       const webview = await experiments.showWebview()
       const mockMessageReceived = getMessageReceivedEmitter(webview)
@@ -1312,8 +1292,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should handle a message to stop experiments running', async () => {
-      const { experiments, dvcExecutor } =
-        stubWorkspaceExperimentsGetters(disposable)
+      const { dvcExecutor, mockMessageReceived } =
+        await stubWorkspaceExperimentsGetters(disposable)
 
       const mockQueueKill = stub(dvcExecutor, 'queueKill')
       const mockStopProcesses = stub(ProcessExecution, 'stopProcesses')
@@ -1332,10 +1312,6 @@ suite('Experiments Test Suite', () => {
         })
       )
 
-      await experiments.isReady()
-
-      const webview = await experiments.showWebview()
-      const mockMessageReceived = getMessageReceivedEmitter(webview)
       const mockExperimentIds = ['exp-e7a67', 'exp-83425']
 
       const mockPid = 1234
@@ -1473,6 +1449,76 @@ suite('Experiments Test Suite', () => {
       expect(mockUpdateExperimentsData).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should handle a message to add a filter', async () => {
+      const { experiments, mockMessageReceived } =
+        await buildExperimentsWebview({
+          disposer: disposable
+        })
+
+      const path = buildMetricOrParamPath(
+        ColumnType.PARAMS,
+        'params.yaml',
+        'learning_rate'
+      )
+
+      const mockPickFilter = stub(FilterQuickPicks, 'pickFilterToAdd').resolves(
+        {
+          operator: Operator.EQUAL,
+          path,
+          value: 1
+        }
+      )
+
+      const filterUpdated = experimentsUpdatedEvent(experiments)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.FILTER_COLUMN,
+        payload: path
+      })
+
+      await filterUpdated
+
+      expect(mockPickFilter).to.be.calledOnce
+      expect(mockPickFilter).to.be.calledWithMatch({
+        path,
+        firstValueType: 'number'
+      })
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should handle a message to remove all filters for a path', async () => {
+      const { experiments, experimentsModel, mockMessageReceived } =
+        await buildExperimentsWebview({
+          disposer: disposable
+        })
+
+      const path = buildMetricOrParamPath(
+        ColumnType.PARAMS,
+        'params.yaml',
+        'learning_rate'
+      )
+
+      experimentsModel.addFilter({
+        path,
+        operator: Operator.GREATER_THAN,
+        value: 0.1
+      })
+
+      experimentsModel.addFilter({
+        path,
+        operator: Operator.LESS_THAN,
+        value: 100
+      })
+
+      expect(experiments.getFilters()).to.have.lengthOf(2)
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.REMOVE_COLUMN_FILTERS,
+        payload: path
+      })
+
+      expect(experiments.getFilters()).to.have.lengthOf(0)
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
     it('should handle a message to refresh the exp show data', async () => {
       const { mockMessageReceived, mockUpdateExperimentsData } =
         await buildExperimentsWebview({
@@ -1577,7 +1623,7 @@ suite('Experiments Test Suite', () => {
 
       const { rows, sorts: noSorts } = messageSpy.lastCall.args[0]
 
-      expect(getIds(rows as Commit[])).to.deep.equal([
+      expect(getIds(rows)).to.deep.equal([
         { id: EXPERIMENT_WORKSPACE_ID },
         {
           id: '2d879497587b80b2d9e61f072d9dbe9c07a65357',
@@ -1614,7 +1660,7 @@ suite('Experiments Test Suite', () => {
 
       const { rows: sortedRows, sorts } = messageSpy.lastCall.args[0]
 
-      expect(getIds(sortedRows as Commit[])).to.deep.equal([
+      expect(getIds(sortedRows)).to.deep.equal([
         { id: EXPERIMENT_WORKSPACE_ID },
         {
           id: '2d879497587b80b2d9e61f072d9dbe9c07a65357',
@@ -1640,6 +1686,16 @@ suite('Experiments Test Suite', () => {
       secondSortDefinition
     ]
 
+    const firstFilterPath = buildMetricOrParamPath(
+      ColumnType.PARAMS,
+      'params.yaml',
+      'test'
+    )
+    const firstFilterColumn: ColumnLike = {
+      firstValueType: 'number',
+      label: 'test',
+      path: firstFilterPath
+    }
     const firstFilterId = buildMetricOrParamPath(
       ColumnType.PARAMS,
       'params.yaml',
@@ -1647,7 +1703,7 @@ suite('Experiments Test Suite', () => {
     )
     const firstFilterDefinition = {
       operator: Operator.EQUAL,
-      path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'test'),
+      path: firstFilterPath,
       value: 1
     }
     const secondFilterId = buildMetricOrParamPath(
@@ -1655,9 +1711,21 @@ suite('Experiments Test Suite', () => {
       'params.yaml',
       'other∈testcontains'
     )
+
+    const secondFilterPath = buildMetricOrParamPath(
+      ColumnType.PARAMS,
+      'params.yaml',
+      'other'
+    )
+    const secondFilterColumn: ColumnLike = {
+      firstValueType: 'string',
+      label: 'test',
+      path: secondFilterPath
+    }
+
     const secondFilterDefinition = {
       operator: Operator.CONTAINS,
-      path: buildMetricOrParamPath(ColumnType.PARAMS, 'params.yaml', 'other'),
+      path: secondFilterPath,
       value: 'testcontains'
     }
     const firstFilterMapEntry: [string, FilterDefinition] = [
@@ -1751,8 +1819,10 @@ suite('Experiments Test Suite', () => {
         'second sort is added to the memento'
       ).to.deep.equal(sortDefinitions)
 
+      const mockPickColumn = stub(FilterQuickPicks, 'pickColumnToFilter')
       const mockPickFilter = stub(FilterQuickPicks, 'pickFilterToAdd')
 
+      mockPickColumn.onFirstCall().resolves(firstFilterColumn)
       mockPickFilter.onFirstCall().resolves(firstFilterDefinition)
       await testRepository.addFilter()
       expect(
@@ -1760,6 +1830,7 @@ suite('Experiments Test Suite', () => {
         'first filter should be added to memento after addFilter'
       ).to.deep.equal([firstFilterMapEntry])
 
+      mockPickColumn.onSecondCall().resolves(secondFilterColumn)
       mockPickFilter.onSecondCall().resolves(secondFilterDefinition)
       await testRepository.addFilter()
       expect(
@@ -1788,6 +1859,8 @@ suite('Experiments Test Suite', () => {
         'all sorts should be removed from memento after removeSorts'
       ).to.deep.equal([])
 
+      mockPickColumn.reset()
+      mockPickColumn.onFirstCall().resolves(firstFilterColumn)
       mockPickFilter.reset()
       mockPickFilter.onFirstCall().resolves(firstFilterDefinition)
       await testRepository.addFilter()

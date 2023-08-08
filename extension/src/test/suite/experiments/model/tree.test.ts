@@ -331,8 +331,7 @@ suite('Experiments Tree Test Suite', () => {
 
     it('should be able to push an experiment with dvc.views.experimentsTree.pushExperiment', async () => {
       bypassProgressCloseDelay()
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      const { experiments } = await stubWorkspaceExperimentsGetters(disposable)
 
       const mockUpdate = stub(experiments, 'update').resolves(undefined)
 
@@ -363,8 +362,7 @@ suite('Experiments Tree Test Suite', () => {
       bypassProgressCloseDelay()
       const mockExperiment = 'exp-to-push'
 
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      const { experiments } = await stubWorkspaceExperimentsGetters(disposable)
 
       const mockUpdate = stub(experiments, 'update').resolves(undefined)
 
@@ -394,8 +392,7 @@ suite('Experiments Tree Test Suite', () => {
       const mockSecondExperimentId = 'second-exp-pushed'
       const mockQueuedExperimentLabel = 'queued-excluded'
 
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      const { experiments } = await stubWorkspaceExperimentsGetters(disposable)
 
       const mockUpdate = stub(experiments, 'update').resolves(undefined)
 
@@ -573,14 +570,8 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to queue an experiment from an existing one with dvc.views.experiments.queueExperiment', async () => {
-      const {
-        dvcExecutor,
-        experiments,
-        experimentsModel,
-        mockGetOnlyOrPickProject
-      } = stubWorkspaceExperimentsGetters(disposable)
-
-      await experiments.isReady()
+      const { dvcExecutor, experimentsModel, mockGetOnlyOrPickProject } =
+        await stubWorkspaceExperimentsGetters(disposable)
 
       const mockExperimentRunQueue = stub(dvcExecutor, 'expRunQueue').resolves(
         'true'
@@ -630,14 +621,8 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to run a new experiment from an existing one with dvc.views.experiments.runExperiment', async () => {
-      const {
-        dvcRunner,
-        experiments,
-        experimentsModel,
-        mockGetOnlyOrPickProject
-      } = stubWorkspaceExperimentsGetters(disposable)
-
-      await experiments.isReady()
+      const { dvcRunner, experimentsModel, mockGetOnlyOrPickProject } =
+        await stubWorkspaceExperimentsGetters(disposable)
 
       const mockRunExperiment = stub(dvcRunner, 'runExperiment').resolves(
         undefined
@@ -684,13 +669,8 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to reset and run a new checkpoint experiment from an existing one with dvc.views.experiments.resetAndRunCheckpointExperiment', async () => {
-      const {
-        dvcRunner,
-        experiments,
-        experimentsModel,
-        mockGetOnlyOrPickProject
-      } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      const { dvcRunner, experimentsModel, mockGetOnlyOrPickProject } =
+        await stubWorkspaceExperimentsGetters(disposable)
 
       const mockRunExperimentReset = stub(
         dvcRunner,

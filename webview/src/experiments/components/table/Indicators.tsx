@@ -123,28 +123,13 @@ export const Indicators = () => {
         </button>
       </CellHintTooltip>
       <Indicator
-        count={selectedForPlotsCount}
-        aria-label="selected for plots"
-        onClick={openPlotsWebview}
-        tooltipContent="Show Plots"
+        count={columnsSelected}
+        aria-label="columns"
+        onClick={selectColumns}
+        tooltipContent="Select Columns"
+        disabled={!hasColumns}
       >
-        <Icon width={16} height={16} icon={GraphScatter} />
-      </Indicator>
-      <Indicator
-        count={sortsCount}
-        aria-label="sorts"
-        onClick={focusSortsTree}
-        tooltipContent="Show Sorts"
-      >
-        <Icon width={16} height={16} icon={SortPrecedence} />
-      </Indicator>
-      <Indicator
-        count={filtersCount}
-        aria-label="filters"
-        onClick={focusFiltersTree}
-        tooltipContent="Show Filters"
-      >
-        <Icon width={16} height={16} icon={Filter} />
+        <Icon width={16} height={16} icon={ListFilter} />
       </Indicator>
       <Indicator
         count={branchesSelected}
@@ -156,13 +141,28 @@ export const Indicators = () => {
         <Icon width={16} height={16} icon={GitMerge} />
       </Indicator>
       <Indicator
-        count={columnsSelected}
-        aria-label="columns"
-        onClick={selectColumns}
-        tooltipContent="Select Columns"
-        disabled={!hasColumns}
+        count={filtersCount}
+        aria-label="filters"
+        onClick={focusFiltersTree}
+        tooltipContent="Show Filters"
       >
-        <Icon width={16} height={16} icon={ListFilter} />
+        <Icon width={16} height={16} icon={Filter} />
+      </Indicator>
+      <Indicator
+        count={sortsCount}
+        aria-label="sorts"
+        onClick={focusSortsTree}
+        tooltipContent="Show Sorts"
+      >
+        <Icon width={16} height={16} icon={SortPrecedence} />
+      </Indicator>
+      <Indicator
+        count={selectedForPlotsCount}
+        aria-label="selected for plots"
+        onClick={openPlotsWebview}
+        tooltipContent="Show Plots"
+      >
+        <Icon width={16} height={16} icon={GraphScatter} />
       </Indicator>
     </div>
   )
