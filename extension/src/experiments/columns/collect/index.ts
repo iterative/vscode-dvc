@@ -1,5 +1,4 @@
 import { join } from 'path'
-import get from 'lodash.get'
 import isEqual from 'lodash.isequal'
 import { ColumnAccumulator } from './util'
 import { collectDepChanges, collectDeps } from './deps'
@@ -8,13 +7,13 @@ import {
   collectMetricsAndParams
 } from './metricsAndParams'
 import { Column, Commit, Experiment } from '../../webview/contract'
+import { getValue } from '../util'
 import {
   ExpRange,
   ExpShowOutput,
   ExpState,
   ExpData,
   experimentHasError,
-  Value,
   EXPERIMENT_WORKSPACE_ID
 } from '../../../cli/dvc/contract'
 import { standardizePath } from '../../../fileSystem/path'
@@ -140,11 +139,6 @@ export const collectRelativeMetricsFiles = (
 
   return uniqueValues(files)
 }
-
-const getValue = (
-  experiment: Commit | Experiment,
-  pathArray: string[]
-): Value => get(experiment, pathArray) as Value
 
 const collectChangedPath = (
   acc: string[],

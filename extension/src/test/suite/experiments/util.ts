@@ -22,6 +22,7 @@ import { DEFAULT_CURRENT_BRANCH_COMMITS_TO_SHOW } from '../../../cli/dvc/constan
 import { PersistenceKey } from '../../../persistence/constants'
 import { ExpShowOutput } from '../../../cli/dvc/contract'
 import { buildExperimentsPipeline } from '../pipeline/util'
+import { Setup } from '../../../setup'
 
 export const DEFAULT_EXPERIMENTS_OUTPUT = {
   availableNbCommits: { main: 5 },
@@ -284,7 +285,53 @@ export const buildExperimentsData = (
   }
 }
 
-export const stubWorkspaceExperimentsGetters = async (
+const stubWorkspaceExperiments = (
+  dvcRoot: string,
+  experiments: Experiments
+) => {
+  const mockGetOnlyOrPickProject = stub(
+    WorkspaceExperiments.prototype,
+    'getOnlyOrPickProject'
+  ).resolves(dvcRoot)
+
+  const mockGetRepository = stub(
+    WorkspaceExperiments.prototype,
+    'getRepository'
+  ).returns(experiments)
+
+  return { mockGetOnlyOrPickProject, mockGetRepository }
+}
+
+export const stubWorkspaceGetters = async (
+  disposer: Disposer,
+  dvcRoot = dvcDemoPath
+) => {
+  const {
+    columnsModel,
+    dvcExecutor,
+    dvcRunner,
+    experiments,
+    experimentsModel
+  } = buildExperiments({ disposer })
+
+  await experiments.isReady()
+
+  stub(Setup.prototype, 'shouldBeShown').returns({
+    dvc: true,
+    experiments: true
+  })
+
+  return {
+    columnsModel,
+    dvcExecutor,
+    dvcRunner,
+    experiments,
+    experimentsModel,
+    ...stubWorkspaceExperiments(dvcRoot, experiments)
+  }
+}
+
+export const stubWorkspaceGettersWebview = async (
   disposer: Disposer,
   dvcRoot = dvcDemoPath
 ) => {
@@ -298,16 +345,6 @@ export const stubWorkspaceExperimentsGetters = async (
     mockMessageReceived
   } = await buildExperimentsWebview({ disposer })
 
-  const mockGetOnlyOrPickProject = stub(
-    WorkspaceExperiments.prototype,
-    'getOnlyOrPickProject'
-  ).resolves(dvcRoot)
-
-  const mockGetRepository = stub(
-    WorkspaceExperiments.prototype,
-    'getRepository'
-  ).returns(experiments)
-
   return {
     columnsModel,
     dvcExecutor,
@@ -315,8 +352,7 @@ export const stubWorkspaceExperimentsGetters = async (
     experiments,
     experimentsModel,
     messageSpy,
-    mockGetOnlyOrPickProject,
-    mockGetRepository,
+    ...stubWorkspaceExperiments(dvcRoot, experiments),
     mockMessageReceived
   }
 }
