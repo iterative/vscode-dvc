@@ -306,7 +306,6 @@ suite('Repositories Tree Test Suite', () => {
         ]
       })
       stub(gitReader, 'listUntracked').resolves(new Set())
-      stub(gitReader, 'hasChanges').resolves(false)
 
       const repository = disposable.track(
         new Repository(
