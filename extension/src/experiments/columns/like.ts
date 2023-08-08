@@ -20,11 +20,11 @@ export const addStarredToColumns = (
   }
 
   return [
+    starredColumnLike,
     ...columns.map(({ label, path, firstValueType }) => ({
       firstValueType,
       label,
       path
-    })),
-    starredColumnLike
+    }))
   ]
 }

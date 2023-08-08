@@ -10,7 +10,7 @@ import {
   appendColumnToPath,
   buildMetricOrParamPath
 } from '../../../../experiments/columns/paths'
-import { buildExperiments, stubWorkspaceExperimentsGetters } from '../util'
+import { buildExperiments, stubWorkspaceGetters } from '../util'
 import { Status } from '../../../../path/selection/model'
 import { ColumnType } from '../../../../experiments/webview/contract'
 import {
@@ -356,8 +356,9 @@ suite('Experiments Columns Tree Test Suite', () => {
     })
 
     it('should be able to display selected columns first with dvc.views.experiments.selectFirstColumns', async () => {
-      const { columnsModel, experiments } =
-        await stubWorkspaceExperimentsGetters(disposable)
+      const { columnsModel, experiments } = await stubWorkspaceGetters(
+        disposable
+      )
 
       const columnsOrder = columnsModel.getColumnOrder()
 

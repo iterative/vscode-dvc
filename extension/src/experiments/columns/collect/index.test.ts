@@ -543,6 +543,7 @@ describe('collectColumnsWithChangedValues', () => {
     expect(changedColumns).toStrictEqual(
       columnsFixture.filter(({ path }) =>
         [
+          'Created',
           'metrics:summary.json',
           'metrics:summary.json:loss',
           'metrics:summary.json:accuracy',
