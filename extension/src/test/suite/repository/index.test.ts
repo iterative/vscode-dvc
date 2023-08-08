@@ -12,6 +12,7 @@ import {
 } from '../util'
 import { SourceControlDataStatus } from '../../../repository/sourceControlManagement'
 import { makeAbsPathSet } from '../../util/path'
+import { standardizePath } from '../../../fileSystem/path'
 
 suite('Repository Test Suite', () => {
   const disposable = getTimeSafeDisposer()
@@ -40,7 +41,6 @@ suite('Repository Test Suite', () => {
         internalCommands,
         mockDataStatus,
         mockGetAllUntracked,
-        mockGetHasChanges,
         treeDataChanged
       } = buildDependencies(disposable)
 
@@ -50,10 +50,8 @@ suite('Repository Test Suite', () => {
         }
       })
 
-      const untracked = resolve(dvcDemoPath, 'python.py')
-      mockGetAllUntracked.resolves(new Set([untracked]))
-
-      mockGetHasChanges.resolves(true)
+      const untrackedFile = resolve(dvcDemoPath, 'python.py')
+      mockGetAllUntracked.resolves(new Set([untrackedFile]))
 
       const { setScmDecorationStateSpy, setScmStateSpy } =
         await buildRepository(disposable, internalCommands, treeDataChanged)
@@ -86,63 +84,51 @@ suite('Repository Test Suite', () => {
         uncommittedUnknown: emptySet
       })
 
-      expect(setScmStateSpy.lastCall.firstArg).to.deep.equal({
+      const { committed, notInCache, uncommitted, untracked } =
+        setScmStateSpy.lastCall.firstArg
+
+      expect(Object.keys(setScmStateSpy.lastCall.firstArg)).to.deep.equal([
+        'committed',
+        'notInCache',
+        'uncommitted',
+        'untracked'
+      ])
+
+      expect({ committed, notInCache }).to.deep.equal({
         committed: [],
-        notInCache: [],
-        uncommitted: [
-          {
-            contextValue: SourceControlDataStatus.UNCOMMITTED_MODIFIED,
-            dvcRoot: dvcDemoPath,
-            isDirectory: false,
-            isTracked: true,
-            resourceUri: Uri.file(join(dvcDemoPath, model))
-          },
-          {
-            contextValue: SourceControlDataStatus.UNCOMMITTED_MODIFIED,
-            dvcRoot: dvcDemoPath,
-            isDirectory: true,
-            isTracked: true,
-            resourceUri: Uri.file(join(dvcDemoPath, logDir))
-          },
-          {
-            contextValue: SourceControlDataStatus.UNCOMMITTED_MODIFIED,
-            dvcRoot: dvcDemoPath,
-            isDirectory: false,
-            isTracked: true,
-            resourceUri: Uri.file(join(dvcDemoPath, logAcc))
-          },
-          {
-            contextValue: SourceControlDataStatus.UNCOMMITTED_MODIFIED,
-            dvcRoot: dvcDemoPath,
-            isDirectory: false,
-            isTracked: true,
-            resourceUri: Uri.file(join(dvcDemoPath, logLoss))
-          },
-          {
-            contextValue: SourceControlDataStatus.UNCOMMITTED_MODIFIED,
-            dvcRoot: dvcDemoPath,
-            isDirectory: true,
-            isTracked: true,
-            resourceUri: Uri.file(join(dvcDemoPath, dataDir))
-          },
-          {
-            contextValue: SourceControlDataStatus.UNCOMMITTED_MODIFIED,
-            dvcRoot: dvcDemoPath,
-            isDirectory: false,
-            isTracked: true,
-            resourceUri: Uri.file(join(dvcDemoPath, dataset))
-          }
-        ],
-        untracked: [
-          {
-            contextValue: SourceControlDataStatus.UNTRACKED,
-            dvcRoot: dvcDemoPath,
-            isDirectory: false,
-            isTracked: false,
-            resourceUri: Uri.file(untracked)
-          }
-        ]
+        notInCache: []
       })
+
+      const getExpectedScmItem = (value: {
+        contextValue: typeof SourceControlDataStatus
+        dvcRoot: string
+        isDirectory: boolean
+        isTracked: boolean
+        resourceUri: Uri
+      }) => ({ ...value, resourceUri: value.resourceUri.fsPath })
+
+      expect(uncommitted.map(getExpectedScmItem)).to.deep.equal(
+        [...modified].map(path => ({
+          contextValue: SourceControlDataStatus.UNCOMMITTED_MODIFIED,
+          dvcRoot: dvcDemoPath,
+          isDirectory: [
+            join(dvcDemoPath, logDir),
+            join(dvcDemoPath, dataDir)
+          ].includes(path),
+          isTracked: true,
+          resourceUri: standardizePath(path)
+        }))
+      )
+
+      expect(untracked.map(getExpectedScmItem)).to.deep.equal([
+        {
+          contextValue: SourceControlDataStatus.UNTRACKED,
+          dvcRoot: dvcDemoPath,
+          isDirectory: false,
+          isTracked: false,
+          resourceUri: standardizePath(untrackedFile)
+        }
+      ])
     })
   })
 
@@ -163,7 +149,6 @@ suite('Repository Test Suite', () => {
         internalCommands,
         mockDataStatus,
         mockGetAllUntracked,
-        mockGetHasChanges,
         mockNow,
         onDidChangeTreeData,
         treeDataChanged
@@ -201,7 +186,7 @@ suite('Repository Test Suite', () => {
           unchanged: [dataDir, logAcc, logDir, logLoss],
           uncommitted: { deleted: [model], modified: [features] }
         })
-      mockGetHasChanges.resolves(false)
+
       mockGetAllUntracked
         .onFirstCall()
         .resolves(new Set())
@@ -245,13 +230,10 @@ suite('Repository Test Suite', () => {
         untracked: []
       })
 
-      expect(repository.hasChanges()).to.be.false
-
       await repository.update()
       await dataUpdateEvent
 
       expect(mockDataStatus).to.be.calledTwice
-      expect(mockGetHasChanges).to.be.calledTwice
 
       expect(setScmDecorationStateSpy.lastCall.firstArg).to.deep.equal({
         committedAdded: emptySet,
@@ -308,7 +290,6 @@ suite('Repository Test Suite', () => {
         internalCommands,
         mockDataStatus,
         mockGetAllUntracked,
-        mockGetHasChanges,
         mockNow,
         onDidChangeTreeData,
         treeDataChanged
@@ -332,7 +313,6 @@ suite('Repository Test Suite', () => {
         .resolves({})
         .onSecondCall()
         .resolves({ error: { msg, type: 'Caught error' } })
-      mockGetHasChanges.resolves(false)
       mockGetAllUntracked
         .onFirstCall()
         .resolves(emptySet)
@@ -356,7 +336,6 @@ suite('Repository Test Suite', () => {
       await dataUpdateEvent
 
       expect(mockDataStatus).to.be.calledTwice
-      expect(mockGetHasChanges).to.be.calledTwice
 
       expect(setErrorDecorationStateSpy.lastCall.firstArg).to.deep.equal(
         new Set([label])

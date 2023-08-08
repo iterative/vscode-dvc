@@ -58,9 +58,8 @@ describe('RepositoryModel', () => {
 
       const model = new RepositoryModel(dvcDemoPath)
       const { scmDecorationState, sourceControlManagementState } =
-        model.transformAndSet({
+        model.transformAndSetCli({
           dataStatus,
-          hasGitChanges: true,
           untracked: new Set()
         })
 
@@ -154,9 +153,8 @@ describe('RepositoryModel', () => {
 
       const model = new RepositoryModel(dvcDemoPath)
       const { scmDecorationState, sourceControlManagementState } =
-        model.transformAndSet({
+        model.transformAndSetCli({
           dataStatus,
-          hasGitChanges: false,
           untracked: new Set()
         })
 
@@ -203,9 +201,8 @@ describe('RepositoryModel', () => {
 
       const model = new RepositoryModel(dvcDemoPath)
       const { scmDecorationState, sourceControlManagementState } =
-        model.transformAndSet({
+        model.transformAndSetCli({
           dataStatus,
-          hasGitChanges: true,
           untracked: new Set()
         })
 
@@ -249,13 +246,13 @@ describe('RepositoryModel', () => {
       const emptyRepoError = { ...emptyRepoData, dataStatus: { error } }
       const model = new RepositoryModel(dvcDemoPath)
 
-      model.transformAndSet(emptyRepoData)
+      model.transformAndSetCli(emptyRepoData)
       expect(model.getChildren(dvcDemoPath)).toStrictEqual([])
 
-      model.transformAndSet(emptyRepoError)
+      model.transformAndSetCli(emptyRepoError)
       expect(model.getChildren(dvcDemoPath)).toStrictEqual([{ error: msg }])
 
-      model.transformAndSet(emptyRepoData)
+      model.transformAndSetCli(emptyRepoData)
       expect(model.getChildren(dvcDemoPath)).toStrictEqual([])
     })
   })

@@ -17,7 +17,6 @@ import { getGitPath, isPathInProject } from '../../fileSystem'
 
 export type Data = {
   dataStatus: DataStatusOutput | DvcError
-  hasGitChanges: boolean
   untracked: Set<string>
 }
 
@@ -88,13 +87,9 @@ export class RepositoryData extends DeferredDisposable {
   }
 
   private async update() {
-    const [dataStatus, hasGitChanges, untracked] = await Promise.all([
+    const [dataStatus, untracked] = await Promise.all([
       this.internalCommands.executeCommand<DataStatusOutput | DvcError>(
         AvailableCommands.DATA_STATUS,
-        this.dvcRoot
-      ),
-      this.internalCommands.executeCommand<boolean>(
-        AvailableCommands.GIT_HAS_CHANGES,
         this.dvcRoot
       ),
       this.internalCommands.executeCommand<Set<string>>(
@@ -105,7 +100,6 @@ export class RepositoryData extends DeferredDisposable {
 
     return this.notifyChanged({
       dataStatus,
-      hasGitChanges,
       untracked
     })
   }
