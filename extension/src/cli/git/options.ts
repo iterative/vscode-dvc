@@ -17,7 +17,7 @@ export const getOptions = ({
   }
 
   if (env) {
-    options.env = env
+    options.env = { ...env, GIT_OPTIONAL_LOCKS: '0' }
   }
 
   return options
