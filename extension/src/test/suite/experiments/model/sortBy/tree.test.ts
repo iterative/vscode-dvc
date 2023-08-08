@@ -11,10 +11,7 @@ import {
   ColumnType
 } from '../../../../../experiments/webview/contract'
 import { QuickPickItemWithValue } from '../../../../../vscode/quickPick'
-import {
-  buildExperimentsWebview,
-  stubWorkspaceExperimentsGetters
-} from '../../util'
+import { buildExperimentsWebview, stubWorkspaceGetters } from '../../util'
 import { experimentsUpdatedEvent } from '../../../util'
 import { dvcDemoPath } from '../../../../util'
 import { generateTestExpShowOutput } from '../../../../util/experiments'
@@ -287,9 +284,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should provide a shortcut to sort by starred experiments', async () => {
-      const { experimentsModel } = await stubWorkspaceExperimentsGetters(
-        disposable
-      )
+      const { experimentsModel } = await stubWorkspaceGetters(disposable)
 
       const mockAddSort = stub(experimentsModel, 'addSort')
 

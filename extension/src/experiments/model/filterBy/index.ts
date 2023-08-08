@@ -1,8 +1,8 @@
-import get from 'lodash.get'
 import { compareDateStrings } from './date'
 import { Experiment } from '../../webview/contract'
 import { definedAndNonEmpty } from '../../../util/array'
 import { splitColumnPath } from '../../columns/paths'
+import { getValue } from '../../columns/util'
 
 export enum Operator {
   EQUAL = '=',
@@ -112,7 +112,7 @@ const buildFilter =
   experiment => {
     const firstFailure = filterDefinitions.find(filter => {
       const pathArray = splitColumnPath(filter.path)
-      const value = get(experiment, pathArray) as string | number | boolean
+      const value = getValue(experiment, pathArray)
 
       return !evaluate<typeof value>(
         value,
