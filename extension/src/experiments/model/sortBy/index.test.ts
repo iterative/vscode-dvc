@@ -1,6 +1,6 @@
 import get from 'lodash.get'
 import { sortExperiments } from '.'
-import { buildMetricOrParamPath } from '../../columns/paths'
+import { buildDepPath, buildMetricOrParamPath } from '../../columns/paths'
 import { Experiment, ColumnType } from '../../webview/contract'
 
 describe('sortExperiments', () => {
@@ -252,5 +252,45 @@ describe('sortExperiments', () => {
         1, 2, 2
       ])
     })
+  })
+
+  it('should reorder experiments when provided a dep', () => {
+    const testData = [
+      {
+        ...irrelevantExperimentData,
+        deps: {
+          'train.py': {
+            changes: true,
+            value: 'e804f48'
+          }
+        }
+      },
+      {
+        ...irrelevantExperimentData,
+        deps: {
+          'train.py': {
+            changes: true,
+            value: 'e804f41'
+          }
+        }
+      },
+      {
+        ...irrelevantExperimentData,
+        deps: {
+          'train.py': {
+            changes: true,
+            value: 'fd5998e'
+          }
+        }
+      }
+    ]
+
+    const result = sortExperiments(
+      [{ descending: true, path: buildDepPath('train.py') }],
+      testData
+    )
+    expect(
+      result.map(experiment => get(experiment, ['deps', 'train.py', 'value']))
+    ).toStrictEqual(['fd5998e', 'e804f48', 'e804f41'])
   })
 })

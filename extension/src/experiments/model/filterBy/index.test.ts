@@ -1,5 +1,7 @@
+import { join } from 'path'
 import { FilterDefinition, filterExperiment, Operator } from '.'
-import { buildMetricOrParamPath } from '../../columns/paths'
+import rowsFixture from '../../../test/fixtures/expShow/base/rows'
+import { buildDepPath, buildMetricOrParamPath } from '../../columns/paths'
 import { Experiment, ColumnType } from '../../webview/contract'
 
 describe('filterExperiment', () => {
@@ -267,5 +269,27 @@ describe('filterExperiment', () => {
     ])
 
     expect(unfiltered.map(experiment => experiment.id)).toStrictEqual([])
+  })
+
+  it('should correctly filter using a dep', () => {
+    const path = join('data', 'data.xml')
+    const depPath = buildDepPath(path)
+
+    const experiment = rowsFixture[0]
+    const value = experiment.deps?.[join('data', 'data.xml')]?.value
+    expect(value).toBeDefined()
+
+    const unfiltered = filterExperiment(
+      [{ operator: Operator.EQUAL, path: depPath, value }],
+      experiment
+    )
+    expect(unfiltered).toStrictEqual(experiment)
+
+    expect(
+      filterExperiment(
+        [{ operator: Operator.NOT_EQUAL, path: depPath, value }],
+        experiment
+      )
+    ).toBeUndefined()
   })
 })

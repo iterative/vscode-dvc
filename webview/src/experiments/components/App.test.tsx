@@ -839,12 +839,12 @@ describe('App', () => {
       })
     })
 
-    it('should disable Filter By for deps, placeholders and the stub column', () => {
+    it('should disable Filter By for placeholders and the stub column', () => {
       renderTable()
 
       mockPostMessage.mockClear()
 
-      for (const headerText of ['data.xml', 'params.yaml', 'Experiment']) {
+      for (const headerText of ['params.yaml', 'Experiment']) {
         const column = screen.getByText(headerText)
         fireEvent.contextMenu(column, { bubbles: true })
         advanceTimersByTime(100)

@@ -8,7 +8,7 @@ import { pickFromColumnLikes } from '../../columns/quickPick'
 
 export const pickSortToAdd = async (columns: ColumnLike[] | undefined) => {
   const picked = await pickFromColumnLikes(columns, {
-    title: Title.SELECT_PARAM_OR_METRIC_SORT
+    title: Title.SELECT_COLUMN_SORT
   })
   if (picked === undefined) {
     return
