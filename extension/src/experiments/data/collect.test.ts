@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { collectFiles } from './collect'
+import { collectBranches, collectFiles } from './collect'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import expShowFixture from '../../test/fixtures/expShow/base/output'
 import { generateTestExpShowOutput } from '../../test/util/experiments'
@@ -84,5 +84,30 @@ describe('collectFiles', () => {
       'params.yaml',
       'dvclive.json'
     ])
+  })
+})
+
+describe('collectBranches', () => {
+  it('should correctly parse the git branch output', () => {
+    const { branches, currentBranch } = collectBranches([
+      '* main',
+      'exp-12',
+      'fix-bug-11',
+      'other'
+    ])
+
+    expect(branches).toStrictEqual(['main', 'exp-12', 'fix-bug-11', 'other'])
+    expect(currentBranch).toStrictEqual('main')
+  })
+
+  it('should correct parse a detached head branch', () => {
+    const { branches, currentBranch } = collectBranches([
+      '* (HEAD detached at 201a9a5)',
+      'exp-12',
+      'fix-bug-11',
+      'other'
+    ])
+    expect(branches).toStrictEqual(['201a9a5', 'exp-12', 'fix-bug-11', 'other'])
+    expect(currentBranch).toStrictEqual('201a9a5')
   })
 })

@@ -261,6 +261,7 @@ export const buildExperimentsData = (
   } = buildExperimentsDataDependencies(disposer)
 
   stub(gitReader, 'getBranches').resolves([currentBranch, 'one'])
+  stub(gitReader, 'revParseHead').resolves('3e518d2')
   stub(gitReader, 'getCommitMessages').resolves(commitOutput)
   stub(gitReader, 'getNumCommits').resolves(404)
   stub(gitReader, 'getRemoteExperimentRefs').resolves('')

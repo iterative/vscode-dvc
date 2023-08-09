@@ -26,7 +26,6 @@ const mockedGetAvailableBranchesToSelect = jest.fn()
 const mockedRun = jest.fn()
 const mockedExpFunc = jest.fn()
 const mockedListStages = jest.fn()
-const mockedGetBranches = jest.fn()
 const mockedExpBranch = jest.fn()
 
 jest.mock('vscode')
@@ -61,11 +60,6 @@ describe('Experiments', () => {
 
   mockedInternalCommands.registerCommand(AvailableCommands.STAGE_LIST, () =>
     mockedListStages()
-  )
-
-  mockedInternalCommands.registerCommand(
-    AvailableCommands.GIT_GET_BRANCHES,
-    () => mockedGetBranches()
   )
 
   mockedInternalCommands.registerCommand(
@@ -357,11 +351,11 @@ describe('Experiments', () => {
 
     it('should return early if no dvcRoot is selected', async () => {
       mockedQuickPickOne.mockResolvedValue(undefined)
-      mockedGetBranches.mockResolvedValueOnce([])
+      mockedGetAvailableBranchesToSelect.mockRejectedValueOnce([])
 
       await workspaceExperiments.selectBranches([])
 
-      expect(mockedGetBranches).not.toHaveBeenCalled()
+      expect(mockedGetAvailableBranchesToSelect).not.toHaveBeenCalled()
       expect(mockedQuickPickManyValues).not.toHaveBeenCalled()
     })
   })

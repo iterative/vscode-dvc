@@ -100,6 +100,9 @@ suite('Experiments Data Test Suite', () => {
           {
             dispose: stub(),
             executeCommand: (command: CommandId) => {
+              if (command === AvailableCommands.GIT_GET_BRANCHES) {
+                return Promise.resolve(['main'])
+              }
               if (command === AvailableCommands.GIT_GET_REPOSITORY_ROOT) {
                 return Promise.resolve(gitRoot)
               }
@@ -158,6 +161,9 @@ suite('Experiments Data Test Suite', () => {
           {
             dispose: stub(),
             executeCommand: (command: CommandId) => {
+              if (command === AvailableCommands.GIT_GET_BRANCHES) {
+                return Promise.resolve(['main'])
+              }
               if (command === AvailableCommands.GIT_GET_REPOSITORY_ROOT) {
                 return Promise.resolve(gitRoot)
               }
@@ -213,6 +219,31 @@ suite('Experiments Data Test Suite', () => {
       await data.update()
 
       expect(mockSetBranches).to.be.calledOnce
+    })
+
+    it('should set experiments branches and current branch', async () => {
+      const { data, mockSetBranches } = buildExperimentsData(disposable)
+
+      await data.isReady()
+
+      expect(mockSetBranches).to.be.calledOnceWithExactly(
+        ['main', 'one'],
+        'main'
+      )
+    })
+
+    it('should set experiments branches and current branch if user is in a detached head (no branch)', async () => {
+      const { data, mockSetBranches } = buildExperimentsData(
+        disposable,
+        '* (no branch)'
+      )
+
+      await data.isReady()
+
+      expect(mockSetBranches).to.be.calledOnceWithExactly(
+        ['3e518d2', 'one'],
+        '3e518d2'
+      )
     })
 
     it('should get the required commits from the git log output', async () => {
