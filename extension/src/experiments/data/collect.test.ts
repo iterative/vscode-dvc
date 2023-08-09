@@ -107,7 +107,28 @@ describe('collectBranches', () => {
       'fix-bug-11',
       'other'
     ])
-    expect(branches).toStrictEqual(['201a9a5', 'exp-12', 'fix-bug-11', 'other'])
-    expect(currentBranch).toStrictEqual('201a9a5')
+    expect(branches).toStrictEqual([
+      '(HEAD detached at 201a9a5)',
+      'exp-12',
+      'fix-bug-11',
+      'other'
+    ])
+    expect(currentBranch).toStrictEqual('(HEAD detached at 201a9a5)')
+  })
+
+  it('should correct parse a "no-branch" output', () => {
+    const { branches, currentBranch } = collectBranches([
+      'exp-12',
+      '* (no-branch)',
+      'fix-bug-11',
+      'other'
+    ])
+    expect(branches).toStrictEqual([
+      'exp-12',
+      '(no-branch)',
+      'fix-bug-11',
+      'other'
+    ])
+    expect(currentBranch).toStrictEqual('(no-branch)')
   })
 })

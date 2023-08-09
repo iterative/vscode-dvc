@@ -1,5 +1,4 @@
 import { ExpShowOutput } from '../../cli/dvc/contract'
-import { gitPath } from '../../cli/git/constants'
 import { uniqueValues } from '../../util/array'
 import { getExpData } from '../columns/collect'
 
@@ -35,10 +34,7 @@ export const collectBranches = (
   for (const branch of allBranches) {
     const isCurrent = isCurrentBranch(branch)
 
-    const cleanBranch = branch
-      .replace('* ', '')
-      .replace(new RegExp(`\\(${gitPath.DOT_GIT_HEAD}\\s\\w+\\s\\w+\\s`), '')
-      .replace(')', '')
+    const cleanBranch = branch.replace('* ', '')
 
     if (!currentBranch && isCurrent) {
       currentBranch = cleanBranch

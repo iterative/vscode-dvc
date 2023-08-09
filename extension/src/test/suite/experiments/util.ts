@@ -261,10 +261,11 @@ export const buildExperimentsData = (
   } = buildExperimentsDataDependencies(disposer)
 
   stub(gitReader, 'getBranches').resolves([currentBranch, 'one'])
-  stub(gitReader, 'revParseHead').resolves('3e518d2')
-  stub(gitReader, 'getCommitMessages').resolves(commitOutput)
-  stub(gitReader, 'getNumCommits').resolves(404)
   stub(gitReader, 'getRemoteExperimentRefs').resolves('')
+  const mockGetCommitMessages = stub(gitReader, 'getCommitMessages').resolves(
+    commitOutput
+  )
+  const mockGetNumCommits = stub(gitReader, 'getNumCommits').resolves(404)
 
   const mockGetBranchesToShow = stub().returns(['main'])
   const mockSetBranches = stub()
@@ -286,6 +287,8 @@ export const buildExperimentsData = (
     mockCreateFileSystemWatcher,
     mockExpShow,
     mockGetBranchesToShow,
+    mockGetCommitMessages,
+    mockGetNumCommits,
     mockSetBranches
   }
 }

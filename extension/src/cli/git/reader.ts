@@ -1,11 +1,10 @@
 import { resolve } from 'path'
 import { GitCli } from '.'
-import { Command, Commit, DEFAULT_REMOTE, Flag } from './constants'
+import { Command, DEFAULT_REMOTE, Flag } from './constants'
 import { getOptions } from './options'
 import { typeCheckCommands } from '..'
 import { trimAndSplit } from '../../util/stdout'
 import { isDirectory } from '../../fileSystem'
-import { shortenForLabel } from '../../util/string'
 
 export const autoRegisteredCommands = {
   GIT_GET_BRANCHES: 'getBranches',
@@ -17,7 +16,6 @@ export const autoRegisteredCommands = {
   GIT_HAS_CHANGES: 'hasChanges',
   GIT_HAS_NO_COMMITS: 'hasNoCommits',
   GIT_LIST_UNTRACKED: 'listUntracked',
-  GIT_REV_PARSE_HEAD: 'revParseHead',
   GIT_VERSION: 'gitVersion'
 } as const
 
@@ -116,8 +114,7 @@ export class GitReader extends GitCli {
   public async getBranches(cwd: string): Promise<string[]> {
     const options = getOptions({
       args: [Command.BRANCH],
-      cwd,
-      env: { LANG: 'en_US.UTF-8' }
+      cwd
     })
     try {
       const branches = await this.executeProcess(options)
@@ -125,15 +122,6 @@ export class GitReader extends GitCli {
     } catch {
       return []
     }
-  }
-
-  public async revParseHead(cwd: string) {
-    const options = getOptions({
-      args: [Command.REV_PARSE, Commit.HEAD],
-      cwd
-    })
-    const sha = await this.executeProcess(options)
-    return shortenForLabel(sha)
   }
 
   public async gitVersion(cwd: string) {

@@ -14,11 +14,7 @@ import {
   isRemoteExperimentsOutput
 } from '../../data'
 import { Args, DOT_DVC, ExperimentFlag } from '../../cli/dvc/constants'
-import {
-  COMMITS_SEPARATOR,
-  NO_BRANCH_TEXT,
-  gitPath
-} from '../../cli/git/constants'
+import { COMMITS_SEPARATOR, gitPath } from '../../cli/git/constants'
 import { getGitPath } from '../../fileSystem'
 import { ExperimentsModel } from '../model'
 
@@ -59,10 +55,15 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
 
   private async updateExpShow() {
     await this.updateBranches()
-    const branches = this.experiments.getBranchesToShow()
+    const [currentBranch, ...branches] = this.experiments.getBranchesToShow()
     const availableNbCommits: { [branch: string]: number } = {}
 
     const promises = []
+
+    promises.push(
+      this.collectGitLogByBranch(currentBranch, availableNbCommits, true)
+    )
+
     for (const branch of branches) {
       promises.push(this.collectGitLogByBranch(branch, availableNbCommits))
     }
@@ -82,21 +83,23 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
 
   private async collectGitLogByBranch(
     branch: string,
-    availableNbCommits: { [branch: string]: number }
+    availableNbCommits: { [branch: string]: number },
+    isCurrent?: boolean
   ) {
     const nbOfCommitsToShow = this.experiments.getNbOfCommitsToShow(branch)
+    const branchName = isCurrent ? gitPath.DOT_GIT_HEAD : branch
 
     const [branchLog, totalCommits] = await Promise.all([
       this.internalCommands.executeCommand(
         AvailableCommands.GIT_GET_COMMIT_MESSAGES,
         this.dvcRoot,
-        branch,
+        branchName,
         String(nbOfCommitsToShow)
       ),
       this.internalCommands.executeCommand<number>(
         AvailableCommands.GIT_GET_NUM_COMMITS,
         this.dvcRoot,
-        branch
+        branchName
       )
     ])
 
@@ -132,22 +135,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
       this.dvcRoot
     )
 
-    const parsedBranches = []
-    const noBranchText = NO_BRANCH_TEXT
-
-    for (const branch of allBranches) {
-      if (branch.includes(noBranchText)) {
-        const sha = await this.internalCommands.executeCommand<string>(
-          AvailableCommands.GIT_REV_PARSE_HEAD,
-          this.dvcRoot
-        )
-        parsedBranches.push(branch.replace(noBranchText, sha))
-        continue
-      }
-      parsedBranches.push(branch)
-    }
-
-    const { currentBranch, branches } = collectBranches(parsedBranches)
+    const { currentBranch, branches } = collectBranches(allBranches)
 
     this.experiments.setBranches(branches, currentBranch)
   }

@@ -53,5 +53,3 @@ export const DEFAULT_REMOTE = 'origin'
 export const COMMITS_SEPARATOR = '\u0000'
 
 export type Args = (Command | Flag | Commit | string)[]
-
-export const NO_BRANCH_TEXT = '(no branch)'

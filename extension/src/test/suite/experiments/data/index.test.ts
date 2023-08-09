@@ -241,8 +241,8 @@ suite('Experiments Data Test Suite', () => {
       await data.isReady()
 
       expect(mockSetBranches).to.be.calledOnceWithExactly(
-        ['3e518d2', 'one'],
-        '3e518d2'
+        ['(no branch)', 'one'],
+        '(no branch)'
       )
     })
 
@@ -263,6 +263,41 @@ suite('Experiments Data Test Suite', () => {
         expShowFixture[2].rev,
         ExperimentFlag.REV,
         expShowFixture[3].rev
+      )
+    })
+
+    it('should get the required commits from the git log output when the user is in a detached head', async () => {
+      stub(ExperimentsData.prototype, 'managedUpdate').resolves()
+      const {
+        data,
+        mockGetBranchesToShow,
+        mockGetCommitMessages,
+        mockGetNumCommits
+      } = buildExperimentsData(disposable, '(HEAD detached at 201a9a5)')
+
+      mockGetBranchesToShow.returns([
+        '(HEAD detached at 201a9a5)',
+        'other-branch'
+      ])
+
+      await data.update()
+
+      expect(mockGetCommitMessages).to.have.been.calledTwice
+      expect(mockGetNumCommits).to.have.been.calledTwice
+      expect(mockGetCommitMessages).to.have.been.calledWithExactly(
+        dvcDemoPath,
+        'HEAD',
+        '3'
+      )
+      expect(mockGetCommitMessages).to.have.been.calledWithExactly(
+        dvcDemoPath,
+        'other-branch',
+        '3'
+      )
+      expect(mockGetNumCommits).to.have.calledWithExactly(dvcDemoPath, 'HEAD')
+      expect(mockGetNumCommits).to.have.calledWithExactly(
+        dvcDemoPath,
+        'other-branch'
       )
     })
   })

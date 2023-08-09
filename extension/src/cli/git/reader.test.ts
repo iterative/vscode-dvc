@@ -54,7 +54,6 @@ describe('GitReader', () => {
       expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['branch'],
         cwd,
-        env: { LANG: 'en_US.UTF-8' },
         executable: 'git'
       })
     })
@@ -67,23 +66,6 @@ describe('GitReader', () => {
 
       const cliOutput = await gitReader.getBranches(cwd)
       expect(cliOutput).toStrictEqual([])
-    })
-  })
-
-  describe('revParseHead', () => {
-    it('should return the expected output', async () => {
-      const cwd = __dirname
-      mockedCreateProcess.mockReturnValueOnce(
-        getMockedProcess('lengthy0sha0tag0name')
-      )
-
-      const cliOutput = await gitReader.revParseHead(cwd)
-      expect(cliOutput).toStrictEqual('lengthy')
-      expect(mockedCreateProcess).toHaveBeenCalledWith({
-        args: ['rev-parse', 'HEAD'],
-        cwd,
-        executable: 'git'
-      })
     })
   })
 
