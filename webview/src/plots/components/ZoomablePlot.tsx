@@ -78,13 +78,12 @@ export const ZoomablePlot: React.FC<ZoomablePlotProps> = ({
 
   return (
     <button
-      data-testid="zoomable-plot"
       className={styles.zoomablePlot}
       onClick={() => handleOnClick()}
+      aria-label="Open Plot in Popup"
     >
       <GripIcon className={styles.plotGripIcon} />
       <span
-        data-testid="zoomable-plot-actions"
         className={styles.plotActions}
         onClick={event => {
           event.stopPropagation()

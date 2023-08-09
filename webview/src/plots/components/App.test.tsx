@@ -1341,9 +1341,8 @@ describe('App', () => {
     })
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
-
-    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByTestId(
-      'zoomable-plot'
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByLabelText(
+      'Open Plot in Popup'
     )
 
     fireEvent.click(plot)
@@ -1358,8 +1357,8 @@ describe('App', () => {
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByTestId(
-      'zoomable-plot'
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByLabelText(
+      'Open Plot in Popup'
     )
 
     fireEvent.click(plot)
@@ -1391,8 +1390,8 @@ describe('App', () => {
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    const plot = within(screen.getAllByTestId(/^plot-/)[0]).getByTestId(
-      'zoomable-plot'
+    const plot = within(screen.getAllByTestId(/^plot-/)[0]).getByLabelText(
+      'Open Plot in Popup'
     )
 
     fireEvent.click(plot)
@@ -1409,7 +1408,7 @@ describe('App', () => {
 
     const plotActionsButton = within(
       screen.getAllByTestId(/^plot-/)[0]
-    ).getByTestId('zoomable-plot-actions')
+    ).getByLabelText('See Plot Export Options')
 
     fireEvent.click(plotActionsButton)
 
@@ -1433,7 +1432,7 @@ describe('App', () => {
 
     const plotActionsButton = within(
       screen.getAllByTestId(/^plot-/)[0]
-    ).getByTestId('zoomable-plot-actions')
+    ).getByLabelText('See Plot Export Options')
 
     fireEvent.keyDown(plotActionsButton, { key: 'Enter' })
 
@@ -1470,8 +1469,8 @@ describe('App', () => {
       template: complexTemplatePlotsFixture
     })
 
-    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByTestId(
-      'zoomable-plot'
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByLabelText(
+      'Open Plot in Popup'
     )
 
     fireEvent.click(plot)
@@ -1490,8 +1489,8 @@ describe('App', () => {
       template: complexTemplatePlotsFixture
     })
 
-    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByTestId(
-      'zoomable-plot'
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByLabelText(
+      'Open Plot in Popup'
     )
 
     fireEvent.click(plot)
@@ -1507,8 +1506,8 @@ describe('App', () => {
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByTestId(
-      'zoomable-plot'
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByLabelText(
+      'Open Plot in Popup'
     )
 
     fireEvent.click(plot)
@@ -1534,8 +1533,8 @@ describe('App', () => {
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByTestId(
-      'zoomable-plot'
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByLabelText(
+      'Open Plot in Popup'
     )
 
     fireEvent.click(plot)
@@ -1561,8 +1560,8 @@ describe('App', () => {
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByTestId(
-      'zoomable-plot'
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByLabelText(
+      'Open Plot in Popup'
     )
 
     fireEvent.click(plot)
@@ -2269,7 +2268,7 @@ describe('App', () => {
 
         const smoothPlot = within(
           screen.getByTestId(`plot_${smoothId}`)
-        ).getByTestId('zoomable-plot')
+        ).getByLabelText('Open Plot in Popup')
 
         fireEvent.click(smoothPlot)
 
@@ -2311,7 +2310,7 @@ describe('App', () => {
 
         const smoothPlot = within(
           screen.getByTestId(`plot_${smoothId}`)
-        ).getByTestId('zoomable-plot')
+        ).getByLabelText('Open Plot in Popup')
 
         fireEvent.click(smoothPlot)
 
