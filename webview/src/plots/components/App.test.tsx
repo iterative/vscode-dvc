@@ -847,7 +847,7 @@ describe('App', () => {
     })
   })
 
-  it('should send update the multi image height when changing the width of plots', async () => {
+  it('should update the multi image height when changing the width of plots', async () => {
     const store = renderAppWithOptionalData({
       comparison: comparisonTableFixture
     })
