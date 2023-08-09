@@ -58,6 +58,33 @@ $gap: 20px;
   }
 }
 
+.plotActions {
+  z-index: 500;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background-color: $fg-color;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity ease-in-out 0.2s;
+
+  svg {
+    fill: var(--vscode-editor-background);
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
 .ratioSmaller .plot {
   aspect-ratio: 2 / 1;
 }

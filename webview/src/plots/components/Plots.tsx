@@ -59,6 +59,7 @@ const PlotsContent = () => {
         isTemplatePlot={zoomedInPlot.isTemplatePlot}
         id={zoomedInPlot.id}
         props={zoomedInPlot.plot}
+        openActionsMenu={zoomedInPlot.openActionsMenu}
       />
     </Modal>
   )
