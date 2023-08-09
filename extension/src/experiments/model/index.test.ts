@@ -380,7 +380,7 @@ describe('ExperimentsModel', () => {
   it('should return all selectable branches', () => {
     const model = new ExperimentsModel('', buildMockMemento())
 
-    model.setBranches(['A', 'B', 'C', 'four', 'five'], 'main')
+    model.setBranches(['main', 'A', 'B', 'C', 'four', 'five'], 'main')
 
     expect(model.getAvailableBranchesToSelect()).toStrictEqual([
       'A',
