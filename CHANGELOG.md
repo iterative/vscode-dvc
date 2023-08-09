@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.37] - 2023-08-09
+
+### 🚀 New Features and Enhancements
+
+- Add action menu button to zoomable plots [#4398](https://github.com/iterative/vscode-dvc/pull/4398) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Fix broken table when no branches available (detached HEAD on checkout) [#4426](https://github.com/iterative/vscode-dvc/pull/4426) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Move stylelint into webview package [#4453](https://github.com/iterative/vscode-dvc/pull/4453) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.36] - 2023-08-08
 
 ### 🐛 Bug Fixes
