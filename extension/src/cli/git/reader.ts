@@ -103,8 +103,7 @@ export class GitReader extends GitCli {
   public async getBranches(cwd: string): Promise<string[]> {
     const options = getOptions({
       args: [Command.BRANCH],
-      cwd,
-      env: { LANG: 'en_US.UTF-8' }
+      cwd
     })
     try {
       const branches = await this.executeProcess(options)

@@ -54,7 +54,6 @@ describe('GitReader', () => {
       expect(mockedCreateProcess).toHaveBeenCalledWith({
         args: ['branch'],
         cwd,
-        env: { GIT_OPTIONAL_LOCKS: '0', LANG: 'en_US.UTF-8' },
         executable: 'git'
       })
     })

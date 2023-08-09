@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { collectFiles } from './collect'
+import { collectBranches, collectFiles } from './collect'
 import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
 import expShowFixture from '../../test/fixtures/expShow/base/output'
 import { generateTestExpShowOutput } from '../../test/util/experiments'
@@ -84,5 +84,56 @@ describe('collectFiles', () => {
       'params.yaml',
       'dvclive.json'
     ])
+  })
+})
+
+describe('collectBranches', () => {
+  it('should correctly parse the git branch output', () => {
+    const { branches, branchesToSelect, currentBranch } = collectBranches([
+      '* main',
+      'exp-12',
+      'fix-bug-11',
+      'other'
+    ])
+
+    expect(branches).toStrictEqual(['main', 'exp-12', 'fix-bug-11', 'other'])
+    expect(branchesToSelect).toStrictEqual(['exp-12', 'fix-bug-11', 'other'])
+    expect(currentBranch).toStrictEqual('main')
+  })
+
+  it('should correct parse a detached head branch', () => {
+    const { branches, branchesToSelect, currentBranch } = collectBranches([
+      '* (HEAD detached at 201a9a5)',
+      'exp-12',
+      'fix-bug-11',
+      'other'
+    ])
+
+    expect(branchesToSelect).toStrictEqual(['exp-12', 'fix-bug-11', 'other'])
+    expect(branches).toStrictEqual([
+      '(HEAD detached at 201a9a5)',
+      'exp-12',
+      'fix-bug-11',
+      'other'
+    ])
+    expect(currentBranch).toStrictEqual('(HEAD detached at 201a9a5)')
+  })
+
+  it('should correct parse a "no-branch" output', () => {
+    const { branches, currentBranch, branchesToSelect } = collectBranches([
+      'exp-12',
+      '* (no-branch)',
+      'fix-bug-11',
+      'other'
+    ])
+
+    expect(branches).toStrictEqual([
+      'exp-12',
+      '(no-branch)',
+      'fix-bug-11',
+      'other'
+    ])
+    expect(currentBranch).toStrictEqual('(no-branch)')
+    expect(branchesToSelect).toStrictEqual(['exp-12', 'fix-bug-11', 'other'])
   })
 })
