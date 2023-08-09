@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { CSSProperties, useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
 import { ComparisonTableCell } from './ComparisonTableCell'
@@ -8,7 +8,8 @@ import { changeDisabledDragIds } from '../comparisonTableSlice'
 export const ComparisonTableMultiCell: React.FC<{
   path: string
   plot: ComparisonPlot
-}> = ({ path, plot }) => {
+  imgHeight: number
+}> = ({ path, plot, imgHeight }) => {
   const [currentStep, setCurrentStep] = useState<number>(0)
   const dispatch = useDispatch()
 
@@ -21,7 +22,11 @@ export const ComparisonTableMultiCell: React.FC<{
   }, [dispatch])
 
   return (
-    <div data-testid="multi-image-cell" className={styles.multiImageWrapper}>
+    <div
+      data-testid="multi-image-cell"
+      style={{ '--img-height': `${imgHeight}px` } as CSSProperties}
+      className={styles.multiImageWrapper}
+    >
       <ComparisonTableCell
         path={path}
         plot={{ id: plot.id, imgs: [plot.imgs[currentStep]] }}

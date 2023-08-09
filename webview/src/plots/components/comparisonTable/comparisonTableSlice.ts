@@ -12,6 +12,7 @@ export interface ComparisonTableState extends PlotsComparisonData {
   hasData: boolean
   rowHeight: number
   disabledDragPlotIds: string[]
+  multiImageHeight: { [path: string]: number }
 }
 
 export const DEFAULT_ROW_HEIGHT = 200
@@ -21,6 +22,7 @@ export const comparisonTableInitialState: ComparisonTableState = {
   hasData: false,
   height: DEFAULT_HEIGHT[PlotsSection.COMPARISON_TABLE],
   isCollapsed: DEFAULT_SECTION_COLLAPSED[PlotsSection.COMPARISON_TABLE],
+  multiImageHeight: {},
   plots: [],
   revisions: [],
   rowHeight: DEFAULT_ROW_HEIGHT,
@@ -34,6 +36,12 @@ export const comparisonTableSlice = createSlice({
   reducers: {
     changeDisabledDragIds: (state, action: PayloadAction<string[]>) => {
       state.disabledDragPlotIds = action.payload
+    },
+    changeMultiImageHeight: (
+      state,
+      action: PayloadAction<{ path: string; height: number }>
+    ) => {
+      state.multiImageHeight[action.payload.path] = action.payload.height
     },
     changeRowHeight: (state, action: PayloadAction<number>) => {
       state.rowHeight = action.payload
@@ -64,6 +72,7 @@ export const {
   update,
   setCollapsed,
   changeSize,
+  changeMultiImageHeight,
   changeDisabledDragIds,
   changeRowHeight
 } = comparisonTableSlice.actions

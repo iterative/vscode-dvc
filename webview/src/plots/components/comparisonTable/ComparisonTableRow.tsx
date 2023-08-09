@@ -1,5 +1,5 @@
 import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
 import styles from './styles.module.scss'
@@ -27,10 +27,15 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   nbColumns,
   pinnedColumn
 }) => {
+  const plotsRowRef = useRef<HTMLTableRowElement>(null)
   const draggedId = useSelector(
     (state: PlotsState) => state.dragAndDrop.draggedRef?.itemId
   )
+  const comparisonWidth = useSelector(
+    (state: PlotsState) => state.comparison.width
+  )
   const [isShown, setIsShown] = useState(true)
+  const [multiImgHeight, setMultiImgHeight] = useState(380)
 
   const toggleIsShownState = () => {
     if (isSelecting([path])) {
@@ -38,6 +43,31 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
     }
     setIsShown(!isShown)
   }
+
+  const updateMultiImgHeight = (img: HTMLImageElement) => {
+    const aspectRatio = img.naturalWidth / img.naturalHeight
+    const width = img.clientWidth
+    const calculatedHeight = Number.parseFloat((width / aspectRatio).toFixed(2))
+    setMultiImgHeight(calculatedHeight)
+  }
+
+  useEffect(() => {
+    const img: HTMLImageElement | null | undefined =
+      plotsRowRef.current?.querySelector(`.${styles.multiImageWrapper} img`)
+    if (img) {
+      if (img.complete) {
+        updateMultiImgHeight(img)
+        return
+      }
+      img.addEventListener(
+        'load',
+        () => {
+          updateMultiImgHeight(img)
+        },
+        { once: true }
+      )
+    }
+  }, [comparisonWidth])
 
   return (
     <>
@@ -62,7 +92,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
         </td>
         {nbColumns > 1 && pinnedColumn && <td colSpan={nbColumns - 1}></td>}
       </tr>
-      <tr>
+      <tr ref={plotsRowRef}>
         {plots.map(plot => {
           const isPinned = pinnedColumn === plot.id
           return (
@@ -78,7 +108,11 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
                 className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
               >
                 {plot.imgs.length > 1 ? (
-                  <ComparisonTableMultiCell plot={plot} path={path} />
+                  <ComparisonTableMultiCell
+                    imgHeight={multiImgHeight}
+                    plot={plot}
+                    path={path}
+                  />
                 ) : (
                   <ComparisonTableCell plot={plot} path={path} />
                 )}
