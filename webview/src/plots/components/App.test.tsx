@@ -847,6 +847,32 @@ describe('App', () => {
     })
   })
 
+  it('should send update the multi image height when changing the width of plots', async () => {
+    const store = renderAppWithOptionalData({
+      comparison: comparisonTableFixture
+    })
+    setWrapperSize(store)
+
+    const plotResizer = within(screen.getByTestId('size-sliders')).getAllByRole(
+      'slider'
+    )[0]
+
+    const multiImage = within(
+      screen.getAllByTestId('multi-image-cell')[0]
+    ).getByRole('img')
+
+    const originalHeight = multiImage.clientHeight
+
+    fireEvent.change(plotResizer, { target: { value: -4 } })
+
+    await waitFor(
+      () => {
+        expect(multiImage.clientHeight).not.toBe(String(originalHeight))
+      },
+      { interval: 1000 }
+    )
+  })
+
   it('should send a message to the extension with the selected size when changing the height of plots', () => {
     const store = renderAppWithOptionalData({
       custom: customPlotsFixture
