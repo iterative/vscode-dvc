@@ -1,6 +1,6 @@
-import get from 'lodash.get'
 import { splitColumnPath } from '../../columns/paths'
 import { Experiment } from '../../webview/contract'
+import { getValue } from '../../columns/util'
 
 export interface SortDefinition {
   descending: boolean
@@ -10,12 +10,12 @@ export interface SortDefinition {
 type SortFunction = (a: Experiment, b: Experiment) => number
 
 const compareExperimentsByPath = (
-  path: string[],
+  pathArray: string[],
   a: Experiment,
   b: Experiment
 ): number => {
-  const valueA = get(a, path) as string | number
-  const valueB = get(b, path) as string | number
+  const valueA = getValue(a, pathArray) as string | number
+  const valueB = getValue(b, pathArray) as string | number
   if (valueA === valueB) {
     return 0
   }

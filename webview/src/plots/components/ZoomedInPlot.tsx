@@ -17,6 +17,7 @@ type ZoomedInPlotProps = {
   id: string
   props: VegaLiteProps
   isTemplatePlot: boolean
+  openActionsMenu?: boolean
 }
 
 const appendActionToVega = (
@@ -36,7 +37,8 @@ const appendActionToVega = (
 export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
   id,
   props,
-  isTemplatePlot
+  isTemplatePlot,
+  openActionsMenu
 }: ZoomedInPlotProps) => {
   const zoomedInPlotRef = useRef<HTMLDivElement>(null)
 
@@ -55,9 +57,19 @@ export const ZoomedInPlot: React.FC<ZoomedInPlotProps> = ({
     if (!actions) {
       return
     }
+
     appendActionToVega('JSON', actions, () => exportPlotDataAsJson(id))
     appendActionToVega('CSV', actions, () => exportPlotDataAsCsv(id))
     appendActionToVega('TSV', actions, () => exportPlotDataAsTsv(id))
+
+    if (openActionsMenu) {
+      setTimeout(() => {
+        const actionsDetails = actions.parentElement as HTMLDetailsElement
+        if (actionsDetails) {
+          actionsDetails.open = true
+        }
+      }, 500)
+    }
   }
 
   const vegaLiteProps = {

@@ -246,8 +246,6 @@ export const buildDependencies = ({
 
   const resourceLocator = buildResourceLocator(disposer)
 
-  const messageSpy = spy(BaseWebview.prototype, 'show')
-
   return {
     config,
     dvcConfig,
@@ -258,7 +256,6 @@ export const buildDependencies = ({
     gitExecutor,
     gitReader,
     internalCommands,
-    messageSpy,
     mockCheckSignalFile,
     mockCreateFileSystemWatcher,
     mockDag,
@@ -321,7 +318,7 @@ export const bypassProgressCloseDelay = () =>
   stub(Toast, 'delayProgressClosing').resolves(undefined)
 
 export const waitForEditorText = async (): Promise<unknown> => {
-  await Time.delay(500)
+  await Time.delay(100)
   const text = window.activeTextEditor?.document.getText()
   if (text) {
     return
@@ -333,7 +330,7 @@ export const waitForSpyCall = async (
   messageSpy: SinonSpy,
   originalCallCount: number
 ): Promise<unknown> => {
-  await Time.delay(500)
+  await Time.delay(100)
   if (messageSpy.callCount > originalCallCount) {
     return
   }

@@ -25,7 +25,6 @@ export const buildDependencies = (disposer: Disposer) => {
 
   const mockDataStatus = stub(dvcReader, 'dataStatus')
   const mockGetAllUntracked = stub(gitReader, 'listUntracked')
-  const mockGetHasChanges = stub(gitReader, 'hasChanges')
 
   const mockNow = stub(Time, 'getCurrentEpoch')
 
@@ -37,7 +36,6 @@ export const buildDependencies = (disposer: Disposer) => {
     mockCreateFileSystemWatcher,
     mockDataStatus,
     mockGetAllUntracked,
-    mockGetHasChanges,
     mockNow,
     onDidChangeTreeData,
     treeDataChanged

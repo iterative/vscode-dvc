@@ -1,5 +1,4 @@
 import { join } from 'path'
-import get from 'lodash.get'
 import isEqual from 'lodash.isequal'
 import { ColumnAccumulator } from './util'
 import { collectDepChanges, collectDeps } from './deps'
@@ -7,14 +6,14 @@ import {
   collectMetricAndParamChanges,
   collectMetricsAndParams
 } from './metricsAndParams'
-import { Column, Commit, Experiment } from '../../webview/contract'
+import { Column, ColumnType, Commit, Experiment } from '../../webview/contract'
+import { getValue } from '../util'
 import {
   ExpRange,
   ExpShowOutput,
   ExpState,
   ExpData,
   experimentHasError,
-  Value,
   EXPERIMENT_WORKSPACE_ID
 } from '../../../cli/dvc/contract'
 import { standardizePath } from '../../../fileSystem/path'
@@ -141,11 +140,6 @@ export const collectRelativeMetricsFiles = (
   return uniqueValues(files)
 }
 
-const getValue = (
-  experiment: Commit | Experiment,
-  pathArray: string[]
-): Value => get(experiment, pathArray) as Value
-
 const collectChangedPath = (
   acc: string[],
   path: string,
@@ -173,7 +167,12 @@ const collectChangedPaths = (
   records: (Commit | Experiment)[]
 ) => {
   const acc: string[] = []
-  for (const { pathArray, path, hasChildren } of columns) {
+  for (const { type, pathArray, path, hasChildren } of columns) {
+    if (type === ColumnType.TIMESTAMP) {
+      collectChangedPath(acc, path, [path], records)
+      continue
+    }
+
     if (!pathArray || hasChildren) {
       continue
     }

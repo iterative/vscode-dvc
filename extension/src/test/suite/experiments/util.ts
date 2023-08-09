@@ -22,6 +22,7 @@ import { DEFAULT_CURRENT_BRANCH_COMMITS_TO_SHOW } from '../../../cli/dvc/constan
 import { PersistenceKey } from '../../../persistence/constants'
 import { ExpShowOutput } from '../../../cli/dvc/contract'
 import { buildExperimentsPipeline } from '../pipeline/util'
+import { Setup } from '../../../setup'
 
 export const DEFAULT_EXPERIMENTS_OUTPUT = {
   availableNbCommits: { main: 5 },
@@ -56,7 +57,6 @@ export const buildExperiments = ({
     dvcViewer,
     gitReader,
     internalCommands,
-    messageSpy,
     mockCheckSignalFile,
     mockExpShow,
     mockGetCommitMessages,
@@ -117,7 +117,6 @@ export const buildExperiments = ({
     experimentsModel: (experiments as any).experiments as ExperimentsModel,
     gitReader,
     internalCommands,
-    messageSpy,
     mockCheckOrAddPipeline,
     mockCheckSignalFile,
     mockExpShow,
@@ -141,12 +140,11 @@ export const buildExperimentsWebview = async (inputs: {
   stageList?: string | null
 }) => {
   const all = buildExperiments(inputs)
-  const { experiments, messageSpy } = all
+  const { experiments } = all
   await experiments.isReady()
   const webview = await experiments.showWebview()
   await webview.isReady()
-  messageSpy.restore()
-  const instanceMessageSpy: typeof messageSpy = spy(webview, 'show')
+  const messageSpy = spy(webview, 'show')
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await (experiments as any).webviewMessages.sendWebviewMessage()
 
@@ -154,7 +152,7 @@ export const buildExperimentsWebview = async (inputs: {
 
   return {
     ...all,
-    messageSpy: instanceMessageSpy,
+    messageSpy,
     mockMessageReceived,
     webview
   }
@@ -165,7 +163,6 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
     experiments: mockExperiments,
     gitReader,
     internalCommands,
-    messageSpy,
     resourceLocator
   } = buildExperiments({
     disposer,
@@ -195,11 +192,11 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
   )
 
   void experiments.setState(DEFAULT_EXPERIMENTS_OUTPUT)
-  return { experiments, internalCommands, messageSpy, workspaceExperiments }
+  return { experiments, internalCommands, workspaceExperiments }
 }
 
 export const buildSingleRepoExperiments = (disposer: SafeWatcherDisposer) => {
-  const { config, internalCommands, gitReader, messageSpy, resourceLocator } =
+  const { config, internalCommands, gitReader, resourceLocator } =
     buildDependencies({ disposer })
 
   stub(gitReader, 'getGitRepositoryRoot').resolves(dvcDemoPath)
@@ -225,7 +222,6 @@ export const buildSingleRepoExperiments = (disposer: SafeWatcherDisposer) => {
   return {
     config,
     internalCommands,
-    messageSpy,
     resourceLocator,
     workspaceExperiments
   }
@@ -293,19 +289,10 @@ export const buildExperimentsData = (
   }
 }
 
-export const stubWorkspaceExperimentsGetters = (
-  disposer: Disposer,
-  dvcRoot = dvcDemoPath
+const stubWorkspaceExperiments = (
+  dvcRoot: string,
+  experiments: Experiments
 ) => {
-  const {
-    columnsModel,
-    dvcExecutor,
-    dvcRunner,
-    experiments,
-    experimentsModel,
-    messageSpy
-  } = buildExperiments({ disposer })
-
   const mockGetOnlyOrPickProject = stub(
     WorkspaceExperiments.prototype,
     'getOnlyOrPickProject'
@@ -316,6 +303,52 @@ export const stubWorkspaceExperimentsGetters = (
     'getRepository'
   ).returns(experiments)
 
+  return { mockGetOnlyOrPickProject, mockGetRepository }
+}
+
+export const stubWorkspaceGetters = async (
+  disposer: Disposer,
+  dvcRoot = dvcDemoPath
+) => {
+  const {
+    columnsModel,
+    dvcExecutor,
+    dvcRunner,
+    experiments,
+    experimentsModel
+  } = buildExperiments({ disposer })
+
+  await experiments.isReady()
+
+  stub(Setup.prototype, 'shouldBeShown').returns({
+    dvc: true,
+    experiments: true
+  })
+
+  return {
+    columnsModel,
+    dvcExecutor,
+    dvcRunner,
+    experiments,
+    experimentsModel,
+    ...stubWorkspaceExperiments(dvcRoot, experiments)
+  }
+}
+
+export const stubWorkspaceGettersWebview = async (
+  disposer: Disposer,
+  dvcRoot = dvcDemoPath
+) => {
+  const {
+    columnsModel,
+    dvcExecutor,
+    dvcRunner,
+    experiments,
+    experimentsModel,
+    messageSpy,
+    mockMessageReceived
+  } = await buildExperimentsWebview({ disposer })
+
   return {
     columnsModel,
     dvcExecutor,
@@ -323,7 +356,7 @@ export const stubWorkspaceExperimentsGetters = (
     experiments,
     experimentsModel,
     messageSpy,
-    mockGetOnlyOrPickProject,
-    mockGetRepository
+    ...stubWorkspaceExperiments(dvcRoot, experiments),
+    mockMessageReceived
   }
 }

@@ -1409,8 +1409,9 @@ describe('App', () => {
     })
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
-
-    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByLabelText(
+      'Open Plot in Popup'
+    )
 
     fireEvent.click(plot)
 
@@ -1424,7 +1425,9 @@ describe('App', () => {
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByLabelText(
+      'Open Plot in Popup'
+    )
 
     fireEvent.click(plot)
 
@@ -1471,11 +1474,61 @@ describe('App', () => {
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    const plot = within(screen.getAllByTestId(/^plot-/)[0]).getByRole('button')
+    const plot = within(screen.getAllByTestId(/^plot-/)[0]).getByLabelText(
+      'Open Plot in Popup'
+    )
 
     fireEvent.click(plot)
 
     expect(screen.getByTestId('modal')).toBeInTheDocument()
+  })
+
+  it('should open a modal with the plot zoomed in and actions menu open when clicking on a plot actions button', async () => {
+    renderAppWithOptionalData({
+      custom: customPlotsFixture
+    })
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+
+    const plotActionsButton = within(
+      screen.getAllByTestId(/^plot-/)[0]
+    ).getByLabelText('See Plot Export Options')
+
+    fireEvent.click(plotActionsButton)
+
+    expect(screen.getByTestId('modal')).toBeInTheDocument()
+    await waitFor(
+      () => {
+        expect(screen.getByTitle('Click to view actions')).toHaveAttribute(
+          'open'
+        )
+      },
+      { timeout: 1000 }
+    )
+  })
+
+  it('should open a modal with the plot zoomed in and actions menu open when key pressing on a plot actions button', async () => {
+    renderAppWithOptionalData({
+      custom: customPlotsFixture
+    })
+
+    expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
+
+    const plotActionsButton = within(
+      screen.getAllByTestId(/^plot-/)[0]
+    ).getByLabelText('See Plot Export Options')
+
+    fireEvent.keyDown(plotActionsButton, { key: 'Enter' })
+
+    expect(screen.getByTestId('modal')).toBeInTheDocument()
+    await waitFor(
+      () => {
+        expect(screen.getByTitle('Click to view actions')).toHaveAttribute(
+          'open'
+        )
+      },
+      { timeout: 1000 }
+    )
   })
 
   it('should not open a modal with the plot zoomed in when clicking a comparison table plot', () => {
@@ -1500,7 +1553,9 @@ describe('App', () => {
       template: complexTemplatePlotsFixture
     })
 
-    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByLabelText(
+      'Open Plot in Popup'
+    )
 
     fireEvent.click(plot)
     fireEvent.click(screen.getByTestId('modal'))
@@ -1518,7 +1573,9 @@ describe('App', () => {
       template: complexTemplatePlotsFixture
     })
 
-    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByLabelText(
+      'Open Plot in Popup'
+    )
 
     fireEvent.click(plot)
     fireEvent.click(screen.getByTestId('modal-content'))
@@ -1533,7 +1590,9 @@ describe('App', () => {
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByLabelText(
+      'Open Plot in Popup'
+    )
 
     fireEvent.click(plot)
 
@@ -1558,7 +1617,9 @@ describe('App', () => {
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByLabelText(
+      'Open Plot in Popup'
+    )
 
     fireEvent.click(plot)
 
@@ -1583,7 +1644,9 @@ describe('App', () => {
 
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
-    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByRole('button')
+    const plot = within(screen.getAllByTestId(/^plot_/)[0]).getByLabelText(
+      'Open Plot in Popup'
+    )
 
     fireEvent.click(plot)
 
@@ -2341,7 +2404,8 @@ describe('App', () => {
 
         const smoothPlot = within(
           screen.getByTestId(`plot_${smoothId}`)
-        ).getByRole('button')
+        ).getByLabelText('Open Plot in Popup')
+
         fireEvent.click(smoothPlot)
 
         const popup = screen.getByTestId('zoomed-in-plot')
@@ -2382,7 +2446,8 @@ describe('App', () => {
 
         const smoothPlot = within(
           screen.getByTestId(`plot_${smoothId}`)
-        ).getByRole('button')
+        ).getByLabelText('Open Plot in Popup')
+
         fireEvent.click(smoothPlot)
 
         const popup = screen.getByTestId('zoomed-in-plot')

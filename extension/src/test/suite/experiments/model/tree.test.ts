@@ -26,7 +26,11 @@ import {
 } from '../../../../commands/external'
 import { buildPlots, buildPlotsWebview } from '../../plots/util'
 import { ExperimentsTree } from '../../../../experiments/model/tree'
-import { buildExperiments, stubWorkspaceExperimentsGetters } from '../util'
+import {
+  buildExperiments,
+  stubWorkspaceGetters,
+  stubWorkspaceGettersWebview
+} from '../util'
 import { WEBVIEW_TEST_TIMEOUT } from '../../timeouts'
 import {
   QuickPickItemWithValue,
@@ -331,8 +335,7 @@ suite('Experiments Tree Test Suite', () => {
 
     it('should be able to push an experiment with dvc.views.experimentsTree.pushExperiment', async () => {
       bypassProgressCloseDelay()
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      const { experiments } = await stubWorkspaceGettersWebview(disposable)
 
       const mockUpdate = stub(experiments, 'update').resolves(undefined)
 
@@ -361,10 +364,9 @@ suite('Experiments Tree Test Suite', () => {
 
     it('should be able to push the provided experiment with dvc.views.experimentsTree.pushExperiment (if no experiments are selected)', async () => {
       bypassProgressCloseDelay()
-      const mockExperiment = 'exp-to-push'
+      const { experiments } = await stubWorkspaceGetters(disposable)
 
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      const mockExperiment = 'exp-to-push'
 
       const mockUpdate = stub(experiments, 'update').resolves(undefined)
 
@@ -390,12 +392,11 @@ suite('Experiments Tree Test Suite', () => {
 
     it('should be able to push multiple experiments with dvc.views.experimentsTree.pushExperiment', async () => {
       bypassProgressCloseDelay()
+      const { experiments } = await stubWorkspaceGetters(disposable)
+
       const mockFirstExperimentId = 'first-exp-pushed'
       const mockSecondExperimentId = 'second-exp-pushed'
       const mockQueuedExperimentLabel = 'queued-excluded'
-
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
 
       const mockUpdate = stub(experiments, 'update').resolves(undefined)
 
@@ -573,14 +574,8 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to queue an experiment from an existing one with dvc.views.experiments.queueExperiment', async () => {
-      const {
-        dvcExecutor,
-        experiments,
-        experimentsModel,
-        mockGetOnlyOrPickProject
-      } = stubWorkspaceExperimentsGetters(disposable)
-
-      await experiments.isReady()
+      const { dvcExecutor, experimentsModel, mockGetOnlyOrPickProject } =
+        await stubWorkspaceGetters(disposable)
 
       const mockExperimentRunQueue = stub(dvcExecutor, 'expRunQueue').resolves(
         'true'
@@ -630,14 +625,8 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to run a new experiment from an existing one with dvc.views.experiments.runExperiment', async () => {
-      const {
-        dvcRunner,
-        experiments,
-        experimentsModel,
-        mockGetOnlyOrPickProject
-      } = stubWorkspaceExperimentsGetters(disposable)
-
-      await experiments.isReady()
+      const { dvcRunner, experimentsModel, mockGetOnlyOrPickProject } =
+        await stubWorkspaceGetters(disposable)
 
       const mockRunExperiment = stub(dvcRunner, 'runExperiment').resolves(
         undefined
@@ -684,13 +673,8 @@ suite('Experiments Tree Test Suite', () => {
     })
 
     it('should be able to reset and run a new checkpoint experiment from an existing one with dvc.views.experiments.resetAndRunCheckpointExperiment', async () => {
-      const {
-        dvcRunner,
-        experiments,
-        experimentsModel,
-        mockGetOnlyOrPickProject
-      } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      const { dvcRunner, experimentsModel, mockGetOnlyOrPickProject } =
+        await stubWorkspaceGetters(disposable)
 
       const mockRunExperimentReset = stub(
         dvcRunner,

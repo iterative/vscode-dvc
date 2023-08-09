@@ -7,6 +7,7 @@ type ZoomedInPlotState = {
   plot: VegaProps | undefined
   id: string
   isTemplatePlot: boolean
+  openActionsMenu?: boolean
   refresh?: boolean
 }
 export interface WebviewState {

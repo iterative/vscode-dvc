@@ -130,29 +130,32 @@ const collectPlotPathType = (
   }
 }
 
-const updateExistingPlotPath = (
-  acc: PlotPath[],
-  data: PlotsData,
-  hasChildren: boolean,
-  revisions: Set<string>,
-  path: string,
+const updateExistingPlotPath = ({
+  acc,
+  data,
+  hasChildren,
+  revisions,
+  path,
+  pathInd,
+  isMultiImgPlot
+}: {
+  acc: PlotPath[]
+  data: PlotsData
+  hasChildren: boolean
+  revisions: Set<string>
+  path: string
+  pathInd: number
   isMultiImgPlot: boolean
-) =>
-  acc.map(existing => {
-    const plotPath = { ...existing }
+}) => {
+  const plotPath = { ...acc[pathInd] }
 
-    if (existing.path !== path) {
-      return plotPath
-    }
+  plotPath.revisions = new Set([...plotPath.revisions, ...revisions])
 
-    plotPath.revisions = new Set([...existing.revisions, ...revisions])
+  collectPlotPathType(plotPath, data, hasChildren, path, isMultiImgPlot)
+  acc[pathInd] = plotPath
 
-    if (!plotPath.type) {
-      collectPlotPathType(plotPath, data, hasChildren, path, isMultiImgPlot)
-    }
-
-    return plotPath
-  })
+  return acc
+}
 
 const collectOrderedPath = (
   acc: PlotPath[],
@@ -167,15 +170,17 @@ const collectOrderedPath = (
   const isPathLeaf = idx === pathArray.length
   const isMultiImgPlot = isMultiImgDir && isPathLeaf
 
-  if (acc.some(({ path: existingPath }) => existingPath === path)) {
-    return updateExistingPlotPath(
+  const existingPathInd = acc.findIndex(existing => existing.path === path)
+  if (existingPathInd !== -1) {
+    return updateExistingPlotPath({
       acc,
       data,
       hasChildren,
-      revisions,
+      isMultiImgPlot,
       path,
-      isMultiImgPlot
-    )
+      pathInd: existingPathInd,
+      revisions
+    })
   }
 
   const plotPath: PlotPath = {
@@ -269,7 +274,6 @@ export const collectPaths = (
   fetchedRevs: string[]
 ): PlotPath[] => {
   let acc: PlotPath[] = filterRevisionIfFetched(existingPaths, fetchedRevs)
-
   const { data, errors } = output
 
   acc = collectDataPaths(acc, data)
