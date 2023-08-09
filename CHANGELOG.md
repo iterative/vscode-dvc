@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.36] - 2023-08-08
+
+### 🐛 Bug Fixes
+
+- Fix sorts and filters for dep columns [#4432](https://github.com/iterative/vscode-dvc/pull/4432) by [@mattseddon](https://github.com/mattseddon)
+- Exclude untracked dvc.yaml and dvc.lock files from the DVC SCM tree [#4446](https://github.com/iterative/vscode-dvc/pull/4446) by [@mattseddon](https://github.com/mattseddon)
+- Fix Created column presence in show only changed [#4435](https://github.com/iterative/vscode-dvc/pull/4435) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.13.2) [#4439](https://github.com/iterative/vscode-dvc/pull/4439) by [@mattseddon](https://github.com/mattseddon)
+- Followup on fixing broken plots on first exp run [#4425](https://github.com/iterative/vscode-dvc/pull/4425) by [@julieg18](https://github.com/julieg18)
+- Reduce wait time in test utils [#4427](https://github.com/iterative/vscode-dvc/pull/4427) by [@mattseddon](https://github.com/mattseddon)
+- Only open experiments webview in integration tests when necessary [#4434](https://github.com/iterative/vscode-dvc/pull/4434) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (3.13.3) [#4450](https://github.com/iterative/vscode-dvc/pull/4450) by [@julieg18](https://github.com/julieg18)
+- Replace git diff call with git extension state [#4444](https://github.com/iterative/vscode-dvc/pull/4444) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.35] - 2023-08-08
 
 ### 🔨 Maintenance

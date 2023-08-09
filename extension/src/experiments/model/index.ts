@@ -4,7 +4,6 @@ import { FilterDefinition, getFilterId } from './filterBy'
 import { collectFiltered, collectUnfiltered } from './filterBy/collect'
 import {
   collectAddRemoveCommitsDetails,
-  collectBranches,
   collectExperiments,
   collectOrderedCommitsAndExperiments,
   collectRemoteExpShas,
@@ -69,6 +68,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   private currentBranch: string | undefined
   private selectedBranches: string[] = []
   private availableBranchesToShow: string[] = []
+  private availableBranchesToSelect: string[] = []
   private hasMoreCommits: { [branch: string]: boolean } = {}
   private isShowingMoreCommits: { [branch: string]: boolean } = {}
 
@@ -490,10 +490,13 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.numberOfCommitsToShow
   }
 
-  public setBranches(allBranches: string[]) {
-    const { currentBranch, branches } = collectBranches(allBranches)
-
+  public setBranches(
+    branches: string[],
+    branchesToSelect: string[],
+    currentBranch: string
+  ) {
     this.availableBranchesToShow = branches
+    this.availableBranchesToSelect = branchesToSelect
     this.currentBranch = currentBranch
 
     this.selectedBranches = this.selectedBranches.filter(
@@ -519,6 +522,10 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public getAvailableBranchesToShow() {
     return this.availableBranchesToShow
+  }
+
+  public getAvailableBranchesToSelect() {
+    return this.availableBranchesToSelect
   }
 
   private findIndexByPath(pathToRemove: string) {

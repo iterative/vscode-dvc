@@ -1,4 +1,4 @@
-import { collectFiles } from './collect'
+import { collectBranches, collectFiles } from './collect'
 import {
   EXPERIMENTS_GIT_LOGS_REFS,
   EXPERIMENTS_GIT_REFS,
@@ -55,10 +55,15 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
 
   private async updateExpShow() {
     await this.updateBranches()
-    const branches = this.experiments.getBranchesToShow()
+    const [currentBranch, ...branches] = this.experiments.getBranchesToShow()
     const availableNbCommits: { [branch: string]: number } = {}
 
     const promises = []
+
+    promises.push(
+      this.collectGitLogByBranch(currentBranch, availableNbCommits, true)
+    )
+
     for (const branch of branches) {
       promises.push(this.collectGitLogByBranch(branch, availableNbCommits))
     }
@@ -78,21 +83,23 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
 
   private async collectGitLogByBranch(
     branch: string,
-    availableNbCommits: { [branch: string]: number }
+    availableNbCommits: { [branch: string]: number },
+    isCurrent?: boolean
   ) {
     const nbOfCommitsToShow = this.experiments.getNbOfCommitsToShow(branch)
+    const branchName = isCurrent ? gitPath.DOT_GIT_HEAD : branch
 
     const [branchLog, totalCommits] = await Promise.all([
       this.internalCommands.executeCommand(
         AvailableCommands.GIT_GET_COMMIT_MESSAGES,
         this.dvcRoot,
-        branch,
+        branchName,
         String(nbOfCommitsToShow)
       ),
       this.internalCommands.executeCommand<number>(
         AvailableCommands.GIT_GET_NUM_COMMITS,
         this.dvcRoot,
-        branch
+        branchName
       )
     ])
 
@@ -128,7 +135,10 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
       this.dvcRoot
     )
 
-    this.experiments.setBranches(allBranches)
+    const { currentBranch, branches, branchesToSelect } =
+      collectBranches(allBranches)
+
+    this.experiments.setBranches(branches, branchesToSelect, currentBranch)
   }
 
   private collectFiles({ expShow }: { expShow: ExpShowOutput }) {
