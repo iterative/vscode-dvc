@@ -1,4 +1,4 @@
-import { collectFiles } from './collect'
+import { collectBranches, collectFiles } from './collect'
 import {
   EXPERIMENTS_GIT_LOGS_REFS,
   EXPERIMENTS_GIT_REFS,
@@ -14,7 +14,11 @@ import {
   isRemoteExperimentsOutput
 } from '../../data'
 import { Args, DOT_DVC, ExperimentFlag } from '../../cli/dvc/constants'
-import { COMMITS_SEPARATOR, gitPath } from '../../cli/git/constants'
+import {
+  COMMITS_SEPARATOR,
+  NO_BRANCH_TEXT,
+  gitPath
+} from '../../cli/git/constants'
 import { getGitPath } from '../../fileSystem'
 import { ExperimentsModel } from '../model'
 
@@ -128,7 +132,24 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
       this.dvcRoot
     )
 
-    this.experiments.setBranches(allBranches)
+    const parsedBranches = []
+    const noBranchText = NO_BRANCH_TEXT
+
+    for (const branch of allBranches) {
+      if (branch.includes(noBranchText)) {
+        const sha = await this.internalCommands.executeCommand<string>(
+          AvailableCommands.GIT_REV_PARSE_HEAD,
+          this.dvcRoot
+        )
+        parsedBranches.push(branch.replace(noBranchText, sha))
+        continue
+      }
+      parsedBranches.push(branch)
+    }
+
+    const { currentBranch, branches } = collectBranches(parsedBranches)
+
+    this.experiments.setBranches(branches, currentBranch)
   }
 
   private collectFiles({ expShow }: { expShow: ExpShowOutput }) {

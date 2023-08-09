@@ -581,6 +581,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.pipeline.getCwd()
   }
 
+  public getAvailableBranchesToSelect() {
+    return this.experiments.getAvailableBranchesToSelect()
+  }
+
   protected sendInitialWebviewData() {
     return this.webviewMessages.sendWebviewMessage()
   }

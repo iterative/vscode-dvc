@@ -5,6 +5,7 @@ import { getOptions } from './options'
 import { typeCheckCommands } from '..'
 import { trimAndSplit } from '../../util/stdout'
 import { isDirectory } from '../../fileSystem'
+import { shortenForLabel } from '../../util/string'
 
 export const autoRegisteredCommands = {
   GIT_GET_BRANCHES: 'getBranches',
@@ -16,6 +17,7 @@ export const autoRegisteredCommands = {
   GIT_HAS_CHANGES: 'hasChanges',
   GIT_HAS_NO_COMMITS: 'hasNoCommits',
   GIT_LIST_UNTRACKED: 'listUntracked',
+  GIT_REV_PARSE_HEAD: 'revParseHead',
   GIT_VERSION: 'gitVersion'
 } as const
 
@@ -118,23 +120,20 @@ export class GitReader extends GitCli {
       env: { LANG: 'en_US.UTF-8' }
     })
     try {
-      const branchesOutput = await this.executeProcess(options)
-      const branches = trimAndSplit(branchesOutput)
-      const parsedBranches = []
-      const noBranchText = '(no branch)'
-
-      for (const branch of branches) {
-        if (branch.includes(noBranchText)) {
-          const sha = await this.revParseHead(cwd)
-          parsedBranches.push(branch.replace(noBranchText, sha))
-          continue
-        }
-        parsedBranches.push(branch)
-      }
-      return parsedBranches
+      const branches = await this.executeProcess(options)
+      return trimAndSplit(branches)
     } catch {
       return []
     }
+  }
+
+  public async revParseHead(cwd: string) {
+    const options = getOptions({
+      args: [Command.REV_PARSE, Commit.HEAD],
+      cwd
+    })
+    const sha = await this.executeProcess(options)
+    return shortenForLabel(sha)
   }
 
   public async gitVersion(cwd: string) {
@@ -174,14 +173,5 @@ export class GitReader extends GitCli {
 
   private getUris(repositoryRoot: string, relativePaths: string[]) {
     return relativePaths.map(path => resolve(repositoryRoot, path))
-  }
-
-  private async revParseHead(cwd: string) {
-    const options = getOptions({
-      args: [Command.REV_PARSE, Commit.HEAD],
-      cwd
-    })
-    const sha = await this.executeProcess(options)
-    return sha.slice(0, 7)
   }
 }

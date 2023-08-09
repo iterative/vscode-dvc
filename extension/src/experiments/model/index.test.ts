@@ -372,16 +372,30 @@ describe('ExperimentsModel', () => {
     const model = new ExperimentsModel('', buildMockMemento())
 
     model.setSelectedBranches(['A', 'old', 'B', 'C', 'older'])
-    model.setBranches(['A', 'B', 'C', 'four', 'five', '* six'])
+    model.setBranches(['A', 'B', 'C', 'four', 'five'], 'six')
 
     expect(model.getBranchesToShow()).toStrictEqual(['six', 'A', 'B', 'C'])
+  })
+
+  it('should return all selectable branches', () => {
+    const model = new ExperimentsModel('', buildMockMemento())
+
+    model.setBranches(['A', 'B', 'C', 'four', 'five'], 'main')
+
+    expect(model.getAvailableBranchesToSelect()).toStrictEqual([
+      'A',
+      'B',
+      'C',
+      'four',
+      'five'
+    ])
   })
 
   it('should remove outdated selected branches when calling setBranches', () => {
     const model = new ExperimentsModel('', buildMockMemento())
 
     model.setSelectedBranches(['A', 'old', 'B', 'C', 'older'])
-    model.setBranches(['* main', 'A', 'B', 'C', 'four', 'five', 'six'])
+    model.setBranches(['A', 'B', 'C', 'four', 'five', 'six'], 'main')
 
     expect(model.getBranchesToShow()).toStrictEqual(['main', 'A', 'B', 'C'])
   })
@@ -391,7 +405,7 @@ describe('ExperimentsModel', () => {
     const model = new ExperimentsModel('', memento)
 
     model.setSelectedBranches(['A', 'old', 'B', 'C', 'older'])
-    model.setBranches(['A', 'B', 'C', '* four', 'five', 'six'])
+    model.setBranches(['A', 'B', 'C', 'five', 'six'], 'four')
 
     expect(memento.get(PersistenceKey.EXPERIMENTS_BRANCHES)).toStrictEqual([
       'A',
@@ -420,7 +434,7 @@ describe('ExperimentsModel', () => {
     const model = new ExperimentsModel('', memento)
 
     model.setSelectedBranches(['A', 'old', 'B', 'C', 'older'])
-    model.setBranches(['* A', 'B', 'C', 'four', 'five', 'six'])
+    model.setBranches(['B', 'C', 'four', 'five', 'six'], 'A')
 
     expect(model.getBranchesToShow()).toStrictEqual(['A', 'B', 'C'])
     expect(memento.get(PersistenceKey.EXPERIMENTS_BRANCHES)).toStrictEqual([
@@ -567,28 +581,5 @@ describe('ExperimentsModel', () => {
     )
 
     expect(model.getCliError()).toBe(undefined)
-  })
-
-  it('should correctly parse the git branch output', () => {
-    const model = new ExperimentsModel('', buildMockMemento())
-    const allBranches = ['* main', 'exp-12', 'fix-bug-11', 'other']
-    const selectedBranches = allBranches.slice(1, 2)
-    model.setBranches(allBranches)
-    model.setSelectedBranches(selectedBranches)
-    expect(model.getBranchesToShow()).toStrictEqual([
-      'main',
-      ...selectedBranches
-    ])
-
-    model.setBranches(
-      allBranches.map(branch =>
-        branch.replace('main', '(HEAD detached at 029da11)')
-      )
-    )
-
-    expect(model.getBranchesToShow()).toStrictEqual([
-      '029da11',
-      ...selectedBranches
-    ])
   })
 })
