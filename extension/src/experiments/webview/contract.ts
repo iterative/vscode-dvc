@@ -109,6 +109,7 @@ export type TableData = {
   hasRunningWorkspaceExperiment: boolean
   isShowingMoreCommits: Record<string, boolean>
   rows: Commit[]
+  showOnlyChanged: boolean
   selectedBranches: string[]
   selectedForPlotsCount: number
   sorts: SortDefinition[]

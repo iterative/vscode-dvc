@@ -18,7 +18,8 @@ export enum PersistenceKey {
   PLOT_SECTION_COLLAPSED = 'plotSectionCollapsed:',
   PLOT_SELECTED_METRICS = 'plotSelectedMetrics:',
   PLOTS_SMOOTH_PLOT_VALUES = 'plotSmoothPlotValues:',
-  PLOT_TEMPLATE_ORDER = 'plotTemplateOrder:'
+  PLOT_TEMPLATE_ORDER = 'plotTemplateOrder:',
+  SHOW_ONLY_CHANGED = 'columnsShowOnlyChanged:'
 }
 
 export enum GlobalPersistenceKey {

@@ -1,5 +1,6 @@
 import React, { MouseEventHandler, ReactElement } from 'react'
 import { useSelector } from 'react-redux'
+import cx from 'classnames'
 import styles from './styles.module.scss'
 import { CellHintTooltip } from './body/CellHintTooltip'
 import {
@@ -7,7 +8,8 @@ import {
   focusSortsTree,
   openPlotsWebview,
   selectBranches,
-  selectColumns
+  selectColumns,
+  toggleShowOnlyChanged
 } from '../../util/messages'
 import { Icon } from '../../../shared/components/Icon'
 import {
@@ -15,7 +17,8 @@ import {
   GitMerge,
   GraphScatter,
   ListFilter,
-  SortPrecedence
+  SortPrecedence,
+  Table
 } from '../../../shared/components/icons'
 import { ExperimentsState } from '../../store'
 
@@ -98,31 +101,35 @@ export const Indicators = () => {
     (state: ExperimentsState) => state.tableData.hasColumns
   )
 
+  const showOnlyChanged = useSelector(
+    (state: ExperimentsState) => state.tableData.showOnlyChanged
+  )
+
   return (
     <div className={styles.tableIndicators}>
-      <Indicator
-        count={selectedForPlotsCount}
-        aria-label="selected for plots"
-        onClick={openPlotsWebview}
-        tooltipContent="Show Plots"
+      <CellHintTooltip
+        tooltipContent="Toggle Show Only Changed Columns"
+        delay={[1000, 0]}
       >
-        <Icon width={16} height={16} icon={GraphScatter} />
-      </Indicator>
+        <button
+          className={cx(
+            styles.indicatorIcon,
+            showOnlyChanged && styles.onlyChanged
+          )}
+          aria-label="show only changed columns"
+          onClick={toggleShowOnlyChanged}
+        >
+          <Icon width={16} height={16} icon={Table} />
+        </button>
+      </CellHintTooltip>
       <Indicator
-        count={sortsCount}
-        aria-label="sorts"
-        onClick={focusSortsTree}
-        tooltipContent="Show Sorts"
+        count={columnsSelected}
+        aria-label="columns"
+        onClick={selectColumns}
+        tooltipContent="Select Columns"
+        disabled={!hasColumns}
       >
-        <Icon width={16} height={16} icon={SortPrecedence} />
-      </Indicator>
-      <Indicator
-        count={filtersCount}
-        aria-label="filters"
-        onClick={focusFiltersTree}
-        tooltipContent="Show Filters"
-      >
-        <Icon width={16} height={16} icon={Filter} />
+        <Icon width={16} height={16} icon={ListFilter} />
       </Indicator>
       <Indicator
         count={branchesSelected}
@@ -134,13 +141,28 @@ export const Indicators = () => {
         <Icon width={16} height={16} icon={GitMerge} />
       </Indicator>
       <Indicator
-        count={columnsSelected}
-        aria-label="columns"
-        onClick={selectColumns}
-        tooltipContent="Select Columns"
-        disabled={!hasColumns}
+        count={filtersCount}
+        aria-label="filters"
+        onClick={focusFiltersTree}
+        tooltipContent="Show Filters"
       >
-        <Icon width={16} height={16} icon={ListFilter} />
+        <Icon width={16} height={16} icon={Filter} />
+      </Indicator>
+      <Indicator
+        count={sortsCount}
+        aria-label="sorts"
+        onClick={focusSortsTree}
+        tooltipContent="Show Sorts"
+      >
+        <Icon width={16} height={16} icon={SortPrecedence} />
+      </Indicator>
+      <Indicator
+        count={selectedForPlotsCount}
+        aria-label="selected for plots"
+        onClick={openPlotsWebview}
+        tooltipContent="Show Plots"
+      >
+        <Icon width={16} height={16} icon={GraphScatter} />
       </Indicator>
     </div>
   )

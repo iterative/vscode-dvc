@@ -276,10 +276,14 @@ describe('ComparisonTable', () => {
         revisions: {
           ...revisions,
           [revisionWithNoData]: {
-            errors: undefined,
             id: revisionWithNoData,
-            loading: false,
-            url: undefined
+            imgs: [
+              {
+                errors: undefined,
+                loading: false,
+                url: undefined
+              }
+            ]
           }
         }
       })),
@@ -289,8 +293,8 @@ describe('ComparisonTable', () => {
           description: undefined,
           displayColor: '#f56565',
           fetched: true,
-          id: 'noData',
-          label: revisionWithNoData,
+          id: revisionWithNoData,
+          label: 'noData',
           summaryColumns: []
         }
       ]
@@ -309,10 +313,14 @@ describe('ComparisonTable', () => {
         revisions: {
           ...revisions,
           [revisionWithNoData]: {
-            errors: ['this is an error'],
             id: revisionWithNoData,
-            loading: false,
-            url: undefined
+            imgs: [
+              {
+                errors: ['this is an error'],
+                loading: false,
+                url: undefined
+              }
+            ]
           }
         }
       })),

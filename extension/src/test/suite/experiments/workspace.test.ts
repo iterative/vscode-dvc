@@ -5,7 +5,8 @@ import { window, commands, QuickPickItem, Uri } from 'vscode'
 import {
   buildMultiRepoExperiments,
   buildSingleRepoExperiments,
-  stubWorkspaceExperimentsGetters
+  stubWorkspaceGetters,
+  stubWorkspaceGettersWebview
 } from './util'
 import { Disposable } from '../../../extension'
 import { Experiments } from '../../../experiments'
@@ -156,9 +157,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.modifyWorkspaceParamsAndQueue', () => {
     it('should be able to queue an experiment using an existing one as a base', async () => {
-      const { dvcExecutor, experiments } =
-        stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      const { dvcExecutor } = await stubWorkspaceGettersWebview(disposable)
 
       const mockExperimentRunQueue = stub(dvcExecutor, 'expRunQueue').resolves(
         'true'
@@ -202,13 +201,11 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.modifyWorkspaceParamsAndResume', () => {
     it('should be able to resume a checkpoint experiment using an existing one as a base', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      const { dvcRunner } = await stubWorkspaceGetters(disposable)
 
-      const mockExperimentRun = stub(
-        DvcRunner.prototype,
-        'runExperiment'
-      ).resolves(undefined)
+      const mockExperimentRun = stub(dvcRunner, 'runExperiment').resolves(
+        undefined
+      )
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
         [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
@@ -251,13 +248,11 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.modifyWorkspaceParamsAndRun', () => {
     it('should be able to run an experiment using an existing one as a base', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      const { dvcRunner } = await stubWorkspaceGetters(disposable)
 
-      const mockExperimentRun = stub(
-        DvcRunner.prototype,
-        'runExperiment'
-      ).resolves(undefined)
+      const mockExperimentRun = stub(dvcRunner, 'runExperiment').resolves(
+        undefined
+      )
 
       const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
         [items: readonly QuickPickItem[], options: QuickPickOptionsWithTitle],
@@ -300,8 +295,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.queueExperiment', () => {
     it('should be able to queue an experiment', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceGetters(disposable)
 
       const mockExperimentRunQueue = stub(
         DvcExecutor.prototype,
@@ -315,18 +309,13 @@ suite('Workspace Experiments Test Suite', () => {
     })
 
     it('should send a telemetry event containing a duration when an experiment is queued', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceGetters(disposable)
 
       stub(DvcExecutor.prototype, 'expRunQueue').resolves('true')
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
-      const queueExperiment = commands.executeCommand(
-        RegisteredCliCommands.QUEUE_EXPERIMENT
-      )
-
-      await queueExperiment
+      await commands.executeCommand(RegisteredCliCommands.QUEUE_EXPERIMENT)
 
       expect(mockSendTelemetryEvent).to.be.calledWith(
         RegisteredCliCommands.QUEUE_EXPERIMENT,
@@ -336,8 +325,7 @@ suite('Workspace Experiments Test Suite', () => {
     })
 
     it('should send a telemetry event containing an error message when an experiment fails to queue', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceGetters(disposable)
 
       const mockErrorMessage =
         'ERROR: unexpected error - [Errno 2] No such file or directory'
@@ -365,17 +353,12 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.runExperiment', () => {
     it('should be able to run an experiment', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceGetters(disposable)
 
       const mockRunExperiment = stub(
         DvcRunner.prototype,
         'runExperiment'
       ).resolves(undefined)
-      stub(Setup.prototype, 'shouldBeShown').returns({
-        dvc: true,
-        experiments: true
-      })
 
       await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_RUN)
 
@@ -386,8 +369,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.resumeCheckpointExperiment', () => {
     it('should be able to run an experiment', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceGetters(disposable)
 
       const mockRunExperiment = stub(
         DvcRunner.prototype,
@@ -403,17 +385,12 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.resetAndRunCheckpointExperiment', () => {
     it('should be able to reset existing checkpoints and restart the experiment', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceGetters(disposable)
 
       const mockRunExperimentReset = stub(
         DvcRunner.prototype,
         'runExperimentReset'
       ).resolves(undefined)
-      stub(Setup.prototype, 'shouldBeShown').returns({
-        dvc: true,
-        experiments: true
-      })
 
       await commands.executeCommand(
         RegisteredCliCommands.EXPERIMENT_RESET_AND_RUN
@@ -426,8 +403,8 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.stopExperiments', () => {
     it('should be able to stop any running experiment', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceGetters(disposable)
+
       const mockQueueKill = stub(DvcExecutor.prototype, 'queueKill').resolves(
         undefined
       )
@@ -452,15 +429,15 @@ suite('Workspace Experiments Test Suite', () => {
           {
             description: '[exp-e7a67]',
             detail:
-              'code_names:[0,1], epochs:2, learning_rate:2e-12, loss:2.0205045, accuracy:0.37241668, val_loss:1.9979371',
+              'test:true, code_names:[0,1], dropout:0.15, accuracy:0.37241668, loss:2.0205045, val_accuracy:0.42780000',
             label: '4fb124a',
             value: queueTaskId
           },
           {
             description: '[exp-83425]',
             detail:
-              'code_names:[0,1], epochs:5, learning_rate:2.1e-7, loss:1.7750162, accuracy:0.59265000, val_loss:1.7233840',
-            label: 'workspace',
+              'test:true, code_names:[0,1], dropout:0.124, accuracy:0.59265000, loss:1.7750162, val_accuracy:0.67040002',
+            label: EXPERIMENT_WORKSPACE_ID,
             value: 'exp-83425'
           }
         ],
@@ -478,8 +455,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.startExperimentsQueue', () => {
     it('should be able to start the experiments queue with the selected number of workers', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceGetters(disposable)
 
       const mockQueueStart = stub(DvcExecutor.prototype, 'queueStart').resolves(
         undefined
@@ -504,8 +480,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.stopExperimentsQueue', () => {
     it('should be able to stop the experiments queue', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceGetters(disposable)
 
       const mockQueueStop = stub(DvcExecutor.prototype, 'queueStop').resolves(
         undefined
@@ -520,11 +495,9 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.applyExperiment', () => {
     it('should ask the user to pick a commit or experiment and then apply it to the workspace', async () => {
+      await stubWorkspaceGetters(disposable)
+
       const selectedExperiment = 'test-branch'
-
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
-
       const mockShowQuickPick = stub(window, 'showQuickPick').resolves({
         value: selectedExperiment
       } as QuickPickItemWithValue<string>)
@@ -543,49 +516,49 @@ suite('Workspace Experiments Test Suite', () => {
             description:
               '$(git-commit)Update version and CHANGELOG for release (#4022) ...',
             detail:
-              'code_names:[0,1], epochs:5, learning_rate:2.1e-7, loss:2.0488560, accuracy:0.34848332, val_loss:1.9979370',
+              'test:true, code_names:[0,1], dropout:0.122, accuracy:0.34848332, loss:2.0488560, val_accuracy:0.42780000',
             label: 'main',
             value: 'main'
           },
           {
             description: '[exp-e7a67]',
             detail:
-              'code_names:[0,1], epochs:2, learning_rate:2e-12, loss:2.0205045, accuracy:0.37241668, val_loss:1.9979371',
+              'test:true, code_names:[0,1], dropout:0.15, accuracy:0.37241668, loss:2.0205045, val_accuracy:0.42780000',
             label: '4fb124a',
             value: 'exp-e7a67'
           },
           {
             description: '[test-branch]',
             detail:
-              'code_names:[0,1], epochs:2, learning_rate:2.2e-7, loss:1.9293040, accuracy:0.46680000, val_loss:1.8770883',
+              'test:true, code_names:[0,1], dropout:0.122, accuracy:0.46680000, loss:1.9293040, val_accuracy:0.56080002',
             label: '42b8736',
             value: 'test-branch'
           },
           {
             description: '[exp-83425]',
             detail:
-              'code_names:[0,1], epochs:5, learning_rate:2.1e-7, loss:1.7750162, accuracy:0.59265000, val_loss:1.7233840',
+              'test:true, code_names:[0,1], dropout:0.124, accuracy:0.59265000, loss:1.7750162, val_accuracy:0.67040002',
             label: 'workspace',
             value: 'exp-83425'
           },
           {
             description: undefined,
             detail:
-              'code_names:-, epochs:-, learning_rate:-, loss:-, accuracy:-, val_loss:-',
+              'test:-, code_names:-, dropout:-, accuracy:-, loss:-, val_accuracy:-',
             label: '489fd8b',
             value: '489fd8b'
           },
           {
             description: '[exp-f13bca]',
             detail:
-              'code_names:[0,1], epochs:5, learning_rate:2.1e-7, loss:-, accuracy:-, val_loss:-',
+              'test:true, code_names:[0,1], dropout:0.124, accuracy:-, loss:-, val_accuracy:-',
             label: 'f0f9186',
             value: 'exp-f13bca'
           },
           {
             description: undefined,
             detail:
-              'code_names:[0,2], epochs:5, learning_rate:2.1e-7, loss:-, accuracy:-, val_loss:-',
+              'test:true, code_names:[0,2], dropout:0.125, accuracy:-, loss:-, val_accuracy:-',
             label: '55d492c',
             value: '55d492c'
           },
@@ -593,7 +566,7 @@ suite('Workspace Experiments Test Suite', () => {
             description:
               '$(git-commit)Improve "Get Started" walkthrough (#4020) ...',
             detail:
-              'code_names:[0,1], epochs:5, learning_rate:2.1e-7, loss:2.0488560, accuracy:0.34848332, val_loss:1.9979370',
+              'test:true, code_names:[0,1], dropout:0.122, accuracy:0.34848332, loss:2.0488560, val_accuracy:0.42780000',
             label: 'fe2919b',
             value: 'fe2919b'
           },
@@ -601,7 +574,7 @@ suite('Workspace Experiments Test Suite', () => {
             description:
               '$(git-commit)Add capabilities to text mentioning storage provider extensions (#4015)',
             detail:
-              'code_names:[0,1], epochs:5, learning_rate:2.1e-7, loss:2.0488560, accuracy:0.34848332, val_loss:1.9979370',
+              'test:true, code_names:[0,1], dropout:0.122, accuracy:0.34848332, loss:2.0488560, val_accuracy:0.42780000',
             label: '7df876c',
             value: '7df876c'
           }
@@ -618,8 +591,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.branchExperiment', () => {
     it('should be able to create a branch from an experiment', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceGetters(disposable)
 
       const testExperiment = 'exp-83425'
       const mockBranch = 'brunch'
@@ -652,8 +624,8 @@ suite('Workspace Experiments Test Suite', () => {
   describe('dvc.pushExperiments', () => {
     it('should ask the user to pick experiment(s) and then push selected ones to the remote', async () => {
       bypassProgressCloseDelay()
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      const { experiments } = await stubWorkspaceGetters(disposable)
+
       stub(experiments, 'update').resolves(undefined)
 
       const mockExperimentId = 'exp-e7a67'
@@ -690,42 +662,42 @@ suite('Workspace Experiments Test Suite', () => {
           {
             description: '[exp-e7a67]',
             detail:
-              'code_names:[0,1], epochs:2, learning_rate:2e-12, loss:2.0205045, accuracy:0.37241668, val_loss:1.9979371',
+              'test:true, code_names:[0,1], dropout:0.15, accuracy:0.37241668, loss:2.0205045, val_accuracy:0.42780000',
             label: '4fb124a',
             value: 'exp-e7a67'
           },
           {
             description: '[test-branch]',
             detail:
-              'code_names:[0,1], epochs:2, learning_rate:2.2e-7, loss:1.9293040, accuracy:0.46680000, val_loss:1.8770883',
+              'test:true, code_names:[0,1], dropout:0.122, accuracy:0.46680000, loss:1.9293040, val_accuracy:0.56080002',
             label: '42b8736',
             value: 'test-branch'
           },
           {
             description: '[exp-83425]',
             detail:
-              'code_names:[0,1], epochs:5, learning_rate:2.1e-7, loss:1.7750162, accuracy:0.59265000, val_loss:1.7233840',
+              'test:true, code_names:[0,1], dropout:0.124, accuracy:0.59265000, loss:1.7750162, val_accuracy:0.67040002',
             label: EXPERIMENT_WORKSPACE_ID,
             value: 'exp-83425'
           },
           {
             description: undefined,
             detail:
-              'code_names:-, epochs:-, learning_rate:-, loss:-, accuracy:-, val_loss:-',
+              'test:-, code_names:-, dropout:-, accuracy:-, loss:-, val_accuracy:-',
             label: '489fd8b',
             value: '489fd8b'
           },
           {
             description: '[exp-f13bca]',
             detail:
-              'code_names:[0,1], epochs:5, learning_rate:2.1e-7, loss:-, accuracy:-, val_loss:-',
+              'test:true, code_names:[0,1], dropout:0.124, accuracy:-, loss:-, val_accuracy:-',
             label: 'f0f9186',
             value: 'exp-f13bca'
           },
           {
             description: undefined,
             detail:
-              'code_names:[0,2], epochs:5, learning_rate:2.1e-7, loss:-, accuracy:-, val_loss:-',
+              'test:true, code_names:[0,2], dropout:0.125, accuracy:-, loss:-, val_accuracy:-',
             label: '55d492c',
             value: '55d492c'
           }
@@ -751,8 +723,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.removeExperiments', () => {
     it('should ask the user to pick experiment(s) and then remove selected ones from the workspace', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceGetters(disposable)
 
       const mockExperimentId = 'exp-e7a67'
       const secondMockExperimentId = 'exp-83425'
@@ -787,49 +758,49 @@ suite('Workspace Experiments Test Suite', () => {
           {
             description: '[exp-e7a67]',
             detail:
-              'code_names:[0,1], epochs:2, learning_rate:2e-12, loss:2.0205045, accuracy:0.37241668, val_loss:1.9979371',
+              'test:true, code_names:[0,1], dropout:0.15, accuracy:0.37241668, loss:2.0205045, val_accuracy:0.42780000',
             label: '4fb124a',
             value: 'exp-e7a67'
           },
           {
             description: '[test-branch]',
             detail:
-              'code_names:[0,1], epochs:2, learning_rate:2.2e-7, loss:1.9293040, accuracy:0.46680000, val_loss:1.8770883',
+              'test:true, code_names:[0,1], dropout:0.122, accuracy:0.46680000, loss:1.9293040, val_accuracy:0.56080002',
             label: '42b8736',
             value: 'test-branch'
           },
           {
             description: '[exp-83425]',
             detail:
-              'code_names:[0,1], epochs:5, learning_rate:2.1e-7, loss:1.7750162, accuracy:0.59265000, val_loss:1.7233840',
+              'test:true, code_names:[0,1], dropout:0.124, accuracy:0.59265000, loss:1.7750162, val_accuracy:0.67040002',
             label: EXPERIMENT_WORKSPACE_ID,
             value: 'exp-83425'
           },
           {
             description: undefined,
             detail:
-              'code_names:-, epochs:-, learning_rate:-, loss:-, accuracy:-, val_loss:-',
+              'test:-, code_names:-, dropout:-, accuracy:-, loss:-, val_accuracy:-',
             label: '489fd8b',
             value: '489fd8b'
           },
           {
             description: '[exp-f13bca]',
             detail:
-              'code_names:[0,1], epochs:5, learning_rate:2.1e-7, loss:-, accuracy:-, val_loss:-',
+              'test:true, code_names:[0,1], dropout:0.124, accuracy:-, loss:-, val_accuracy:-',
             label: 'f0f9186',
             value: 'exp-f13bca'
           },
           {
             description: undefined,
             detail:
-              'code_names:[0,1], epochs:5, learning_rate:2.1e-7, loss:-, accuracy:-, val_loss:-',
+              'test:true, code_names:[0,1], dropout:0.124, accuracy:-, loss:-, val_accuracy:-',
             label: '90aea7f',
             value: '90aea7f'
           },
           {
             description: undefined,
             detail:
-              'code_names:[0,2], epochs:5, learning_rate:2.1e-7, loss:-, accuracy:-, val_loss:-',
+              'test:true, code_names:[0,2], dropout:0.125, accuracy:-, loss:-, val_accuracy:-',
             label: '55d492c',
             value: '55d492c'
           }
@@ -858,8 +829,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('dvc.removeExperimentQueue', () => {
     it('should remove all queued experiments from the selected repository', async () => {
-      const { experiments } = stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      await stubWorkspaceGetters(disposable)
 
       const mockExperimentRemove = stub(DvcExecutor.prototype, 'expRemove')
 

@@ -23,6 +23,7 @@ import {
 } from '../multiSource/constants'
 import { MultiSourceEncoding } from '../multiSource/collect'
 import { truncate } from '../../util/string'
+import { MULTI_IMAGE_PATH_REG } from '../../cli/dvc/constants'
 
 export enum PathType {
   COMPARISON = 'comparison',
@@ -51,19 +52,10 @@ const collectType = (plots: Plot[]) => {
       ? type.add(PathType.TEMPLATE_MULTI)
       : type.add(PathType.TEMPLATE_SINGLE)
   }
-
   return type
 }
 
-const getType = (
-  data: PlotsData,
-  hasChildren: boolean,
-  path: string
-): Set<PathType> | undefined => {
-  if (hasChildren) {
-    return
-  }
-
+const getType = (data: PlotsData, path: string): Set<PathType> | undefined => {
   const plots = data[path]
   if (!definedAndNonEmpty(plots)) {
     return
@@ -118,27 +110,78 @@ const collectPathRevisions = (data: PlotsData, path: string): Set<string> => {
   return revisions
 }
 
+const collectPlotPathType = (
+  plotPath: PlotPath,
+  data: PlotsData,
+  hasChildren: boolean,
+  path: string,
+  isMultiImgPlot: boolean
+) => {
+  if (hasChildren) {
+    return
+  }
+
+  const type = isMultiImgPlot
+    ? new Set<PathType>([PathType.COMPARISON])
+    : getType(data, path)
+
+  if (type) {
+    plotPath.type = type
+  }
+}
+
+const updateExistingPlotPath = ({
+  acc,
+  data,
+  hasChildren,
+  revisions,
+  path,
+  pathInd,
+  isMultiImgPlot
+}: {
+  acc: PlotPath[]
+  data: PlotsData
+  hasChildren: boolean
+  revisions: Set<string>
+  path: string
+  pathInd: number
+  isMultiImgPlot: boolean
+}) => {
+  const plotPath = { ...acc[pathInd] }
+
+  plotPath.revisions = new Set([...plotPath.revisions, ...revisions])
+
+  collectPlotPathType(plotPath, data, hasChildren, path, isMultiImgPlot)
+  acc[pathInd] = plotPath
+
+  return acc
+}
+
 const collectOrderedPath = (
   acc: PlotPath[],
   data: PlotsData,
   revisions: Set<string>,
   pathArray: string[],
-  idx: number
+  idx: number,
+  isMultiImgDir: boolean
 ): PlotPath[] => {
   const path = getPath(pathArray, idx)
-
-  if (acc.some(({ path: existingPath }) => existingPath === path)) {
-    return acc.map(existing =>
-      existing.path === path
-        ? {
-            ...existing,
-            revisions: new Set([...existing.revisions, ...revisions])
-          }
-        : existing
-    )
-  }
-
   const hasChildren = idx !== pathArray.length
+  const isPathLeaf = idx === pathArray.length
+  const isMultiImgPlot = isMultiImgDir && isPathLeaf
+
+  const existingPathInd = acc.findIndex(existing => existing.path === path)
+  if (existingPathInd !== -1) {
+    return updateExistingPlotPath({
+      acc,
+      data,
+      hasChildren,
+      isMultiImgPlot,
+      path,
+      pathInd: existingPathInd,
+      revisions
+    })
+  }
 
   const plotPath: PlotPath = {
     hasChildren,
@@ -147,10 +190,7 @@ const collectOrderedPath = (
     revisions
   }
 
-  const type = getType(data, hasChildren, path)
-  if (type) {
-    plotPath.type = type
-  }
+  collectPlotPathType(plotPath, data, hasChildren, path, isMultiImgPlot)
 
   acc.push(plotPath)
   return acc
@@ -167,9 +207,23 @@ const addRevisionsToPath = (
   }
 
   const pathArray = getPathArray(path)
+  const isMultiImg =
+    MULTI_IMAGE_PATH_REG.test(path) &&
+    !!getType(data, path)?.has(PathType.COMPARISON)
+
+  if (isMultiImg) {
+    pathArray.pop()
+  }
 
   for (let reverseIdx = pathArray.length; reverseIdx > 0; reverseIdx--) {
-    acc = collectOrderedPath(acc, data, revisions, pathArray, reverseIdx)
+    acc = collectOrderedPath(
+      acc,
+      data,
+      revisions,
+      pathArray,
+      reverseIdx,
+      isMultiImg
+    )
   }
   return acc
 }
@@ -220,7 +274,6 @@ export const collectPaths = (
   fetchedRevs: string[]
 ): PlotPath[] => {
   let acc: PlotPath[] = filterRevisionIfFetched(existingPaths, fetchedRevs)
-
   const { data, errors } = output
 
   acc = collectDataPaths(acc, data)
@@ -228,7 +281,6 @@ export const collectPaths = (
   if (errors?.length) {
     acc = collectErrorPaths(acc, data, errors)
   }
-
   return acc
 }
 

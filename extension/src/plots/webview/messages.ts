@@ -61,18 +61,12 @@ export class WebviewMessages {
   }
 
   public async sendWebviewMessage() {
-    const selectedRevisions = this.plots.getSelectedRevisionDetails()
-
-    await this.getWebview()?.show({
-      cliError: this.errors.getCliError()?.error || null,
-      comparison: this.getComparisonPlots(),
-      custom: this.getCustomPlots(),
-      hasPlots: !!this.paths.hasPaths(),
-      hasUnselectedPlots: this.paths.getHasUnselectedPlots(),
-      sectionCollapsed: this.plots.getSectionCollapsed(),
-      selectedRevisions,
-      template: this.getTemplatePlots(selectedRevisions)
-    })
+    const webview = this.getWebview()
+    if (!webview) {
+      return
+    }
+    const data = await this.getWebviewData()
+    return webview.show(data)
   }
 
   public handleMessageFromWebview(message: MessageFromWebview) {
@@ -137,6 +131,39 @@ export class WebviewMessages {
         )
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
+    }
+  }
+
+  private async getWebviewData(): Promise<TPlotsData> {
+    const selectedRevisions = this.plots.getSelectedRevisionDetails()
+
+    const [
+      cliError,
+      comparison,
+      custom,
+      hasPlots,
+      hasUnselectedPlots,
+      sectionCollapsed,
+      template
+    ] = await Promise.all([
+      this.errors.getCliError()?.error || null,
+      this.getComparisonPlots(),
+      this.getCustomPlots(),
+      !!this.paths.hasPaths(),
+      this.paths.getHasUnselectedPlots(),
+      this.plots.getSectionCollapsed(),
+      this.getTemplatePlots(selectedRevisions)
+    ])
+
+    return {
+      cliError,
+      comparison,
+      custom,
+      hasPlots,
+      hasUnselectedPlots,
+      sectionCollapsed,
+      selectedRevisions,
+      template
     }
   }
 
@@ -342,12 +369,13 @@ export class WebviewMessages {
   private addCorrectUrl(plot: ComparisonPlot) {
     const webview = this.getWebview()
     if (webview) {
-      return {
-        ...plot,
-        url: plot.url
-          ? `${webview.getWebviewUri(plot.url)}?${getModifiedTime(plot.url)}`
+      plot.imgs = plot.imgs.map(image => ({
+        ...image,
+        url: image.url
+          ? `${webview.getWebviewUri(image.url)}?${getModifiedTime(image.url)}`
           : undefined
-      }
+      }))
+      return plot
     }
   }
 

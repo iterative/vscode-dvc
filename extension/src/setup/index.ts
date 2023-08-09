@@ -156,9 +156,7 @@ export class Setup
 
     this.webviewMessages = this.createWebviewMessageHandler()
 
-    if (this.webview) {
-      void this.sendDataToWebview()
-    }
+    void this.sendDataToWebview()
 
     this.getHasData = () => experiments.getHasData()
     this.getExpShowError = () => experiments.getCliError()
@@ -213,9 +211,7 @@ export class Setup
 
   public async showSetup(focusSection?: SetupSection) {
     this.focusedSection = focusSection
-    if (this.webview) {
-      void this.sendDataToWebview()
-    }
+    void this.sendDataToWebview()
 
     return await this.showWebview()
   }
@@ -258,7 +254,7 @@ export class Setup
   }
 
   public isFocused() {
-    return !!this.webview?.isActive
+    return !!this.getWebview()?.isActive
   }
 
   public shouldBeShown(): { dvc: boolean; experiments: boolean } {
@@ -401,6 +397,10 @@ export class Setup
   }
 
   private async sendDataToWebview() {
+    if (!this.getWebview()) {
+      return
+    }
+
     const projectInitialized = this.hasRoots()
     const hasData = this.getHasData()
 

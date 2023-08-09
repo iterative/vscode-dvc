@@ -115,19 +115,19 @@ const addFilterValue = async (path: string, operator: Operator) => {
   }
 }
 
-export const pickFilterToAdd = async (
+export const pickColumnToFilter = (
   columns: ColumnLike[] | undefined
-): Promise<FilterDefinition | undefined> => {
-  const picked = await pickFromColumnLikes(columns, {
-    title: Title.SELECT_PARAM_OR_METRIC_FILTER
+): Thenable<ColumnLike | undefined> =>
+  pickFromColumnLikes(columns, {
+    title: Title.SELECT_COLUMN_FILTER
   })
-  if (!picked) {
-    return
-  }
 
+export const pickFilterToAdd = async ({
+  firstValueType,
+  path
+}: ColumnLike): Promise<FilterDefinition | undefined> => {
   const typedOperators = OPERATORS.filter(
-    operator =>
-      picked.firstValueType && operator.types.includes(picked.firstValueType)
+    operator => firstValueType && operator.types.includes(firstValueType)
   )
 
   const operator = await quickPickValue<Operator>(typedOperators, {
@@ -144,12 +144,12 @@ export const pickFilterToAdd = async (
   ) {
     return {
       operator,
-      path: picked.path,
+      path,
       value: undefined
     }
   }
 
-  return addFilterValue(picked.path, operator)
+  return addFilterValue(path, operator)
 }
 
 export const pickFiltersToRemove = (

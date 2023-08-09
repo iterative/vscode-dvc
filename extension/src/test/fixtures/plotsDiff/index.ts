@@ -1,6 +1,5 @@
 import { TopLevelSpec } from 'vega-lite'
 import { VisualizationSpec } from 'react-vega'
-import rowsFixture from '../expShow/base/rows'
 import { extendVegaSpec, isMultiViewPlot } from '../../../plots/vega/util'
 import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../../cli/dvc/contract'
 import {
@@ -19,7 +18,7 @@ import {
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
-import { ColumnType, Commit } from '../../../experiments/webview/contract'
+import { ColumnType } from '../../../experiments/webview/contract'
 
 const basicVega = {
   [join('logs', 'loss.tsv')]: [
@@ -364,6 +363,33 @@ const multipleVega = (length: number) => {
   return plots
 }
 
+const getMultiImageData = (
+  baseUrl: string,
+  joinFunc: (...segments: string[]) => string,
+  revisions: string[]
+) => {
+  const data: {
+    [path: string]: {
+      type: PlotsType
+      revisions: string[]
+      url: string
+    }[]
+  } = {}
+  for (let i = 0; i < 15; i++) {
+    const key = joinFunc('plots', 'image', `${i}.jpg`)
+    const values = []
+    for (const revision of revisions) {
+      values.push({
+        type: PlotsType.IMAGE,
+        revisions: [revision],
+        url: joinFunc(baseUrl, 'image', `${i}.jpg`)
+      })
+    }
+    data[key] = values
+  }
+  return data
+}
+
 const getImageData = (baseUrl: string, joinFunc = join) => ({
   [join('plots', 'acc.png')]: [
     {
@@ -445,7 +471,14 @@ const getImageData = (baseUrl: string, joinFunc = join) => ({
       revisions: ['exp-83425'],
       url: joinFunc(baseUrl, '1ba7bcd_plots_loss.png')
     }
-  ]
+  ],
+  ...getMultiImageData(baseUrl, joinFunc, [
+    EXPERIMENT_WORKSPACE_ID,
+    'main',
+    'exp-e7a67',
+    'test-branch',
+    'exp-83425'
+  ])
 })
 
 export const getOutput = (baseUrl: string): PlotsOutput => ({
@@ -534,34 +567,30 @@ export const getRevisions = (): Revision[] => {
       fetched: true,
       summaryColumns: [
         {
+          path: join('nested', 'params.yaml:test'),
+          type: ColumnType.PARAMS,
+          value: 'true'
+        },
+        {
           path: 'params.yaml:code_names',
           type: ColumnType.PARAMS,
           value: '[0,1]'
         },
+        { path: 'params.yaml:dropout', type: ColumnType.PARAMS, value: 0.124 },
         {
-          path: 'params.yaml:epochs',
-          type: ColumnType.PARAMS,
-          value: 5
-        },
-        {
-          path: 'params.yaml:learning_rate',
-          type: ColumnType.PARAMS,
-          value: 2.1e-7
-        },
-        {
-          type: ColumnType.METRICS,
-          path: 'summary.json:loss',
-          value: 1.775016188621521
-        },
-        {
-          type: ColumnType.METRICS,
           path: 'summary.json:accuracy',
+          type: ColumnType.METRICS,
           value: 0.5926499962806702
         },
         {
+          path: 'summary.json:loss',
           type: ColumnType.METRICS,
-          path: 'summary.json:val_loss',
-          value: 1.7233840227127075
+          value: 1.775016188621521
+        },
+        {
+          path: 'summary.json:val_accuracy',
+          type: ColumnType.METRICS,
+          value: 0.6704000234603882
         }
       ]
     },
@@ -571,19 +600,20 @@ export const getRevisions = (): Revision[] => {
       fetched: true,
       summaryColumns: [
         {
+          path: join('nested', 'params.yaml:test'),
+          type: ColumnType.PARAMS,
+          value: 'true'
+        },
+        {
           path: 'params.yaml:code_names',
           type: ColumnType.PARAMS,
           value: '[0,1]'
         },
+        { path: 'params.yaml:dropout', type: ColumnType.PARAMS, value: 0.122 },
         {
-          path: 'params.yaml:epochs',
-          type: ColumnType.PARAMS,
-          value: 5
-        },
-        {
-          path: 'params.yaml:learning_rate',
-          type: ColumnType.PARAMS,
-          value: 2.1e-7
+          path: 'summary.json:accuracy',
+          type: ColumnType.METRICS,
+          value: 0.3484833240509033
         },
         {
           path: 'summary.json:loss',
@@ -591,14 +621,9 @@ export const getRevisions = (): Revision[] => {
           value: 2.048856019973755
         },
         {
-          path: 'summary.json:accuracy',
+          path: 'summary.json:val_accuracy',
           type: ColumnType.METRICS,
-          value: 0.3484833240509033
-        },
-        {
-          type: ColumnType.METRICS,
-          path: 'summary.json:val_loss',
-          value: 1.9979369640350342
+          value: 0.4277999997138977
         }
       ],
       id: 'main',
@@ -611,34 +636,30 @@ export const getRevisions = (): Revision[] => {
       fetched: true,
       summaryColumns: [
         {
+          path: join('nested', 'params.yaml:test'),
+          type: ColumnType.PARAMS,
+          value: 'true'
+        },
+        {
           path: 'params.yaml:code_names',
           type: ColumnType.PARAMS,
           value: '[0,1]'
         },
+        { path: 'params.yaml:dropout', type: ColumnType.PARAMS, value: 0.15 },
         {
-          path: 'params.yaml:epochs',
-          type: ColumnType.PARAMS,
-          value: 2
-        },
-        {
-          path: 'params.yaml:learning_rate',
-          type: ColumnType.PARAMS,
-          value: 2e-12
-        },
-        {
-          type: ColumnType.METRICS,
-          path: 'summary.json:loss',
-          value: 2.0205044746398926
-        },
-        {
-          type: ColumnType.METRICS,
           path: 'summary.json:accuracy',
+          type: ColumnType.METRICS,
           value: 0.3724166750907898
         },
         {
+          path: 'summary.json:loss',
           type: ColumnType.METRICS,
-          path: 'summary.json:val_loss',
-          value: 1.9979370832443237
+          value: 2.0205044746398926
+        },
+        {
+          path: 'summary.json:val_accuracy',
+          type: ColumnType.METRICS,
+          value: 0.4277999997138977
         }
       ],
       id: 'exp-e7a67',
@@ -651,34 +672,30 @@ export const getRevisions = (): Revision[] => {
       fetched: true,
       summaryColumns: [
         {
+          path: join('nested', 'params.yaml:test'),
+          type: ColumnType.PARAMS,
+          value: 'true'
+        },
+        {
           path: 'params.yaml:code_names',
           type: ColumnType.PARAMS,
           value: '[0,1]'
         },
+        { path: 'params.yaml:dropout', type: ColumnType.PARAMS, value: 0.122 },
         {
-          path: 'params.yaml:epochs',
-          type: ColumnType.PARAMS,
-          value: 2
-        },
-        {
-          path: 'params.yaml:learning_rate',
-          type: ColumnType.PARAMS,
-          value: 2.2e-7
-        },
-        {
-          type: ColumnType.METRICS,
-          path: 'summary.json:loss',
-          value: 1.9293040037155151
-        },
-        {
-          type: ColumnType.METRICS,
           path: 'summary.json:accuracy',
+          type: ColumnType.METRICS,
           value: 0.4668000042438507
         },
         {
+          path: 'summary.json:loss',
           type: ColumnType.METRICS,
-          path: 'summary.json:val_loss',
-          value: 1.8770883083343506
+          value: 1.9293040037155151
+        },
+        {
+          path: 'summary.json:val_accuracy',
+          type: ColumnType.METRICS,
+          value: 0.5608000159263611
         }
       ],
       id: 'test-branch',
@@ -691,34 +708,30 @@ export const getRevisions = (): Revision[] => {
       fetched: true,
       summaryColumns: [
         {
+          path: join('nested', 'params.yaml:test'),
+          type: ColumnType.PARAMS,
+          value: 'true'
+        },
+        {
           path: 'params.yaml:code_names',
           type: ColumnType.PARAMS,
           value: '[0,1]'
         },
+        { path: 'params.yaml:dropout', type: ColumnType.PARAMS, value: 0.124 },
         {
-          path: 'params.yaml:epochs',
-          type: ColumnType.PARAMS,
-          value: 5
-        },
-        {
-          path: 'params.yaml:learning_rate',
-          type: ColumnType.PARAMS,
-          value: 2.1e-7
-        },
-        {
-          type: ColumnType.METRICS,
-          path: 'summary.json:loss',
-          value: 1.775016188621521
-        },
-        {
-          type: ColumnType.METRICS,
           path: 'summary.json:accuracy',
+          type: ColumnType.METRICS,
           value: 0.5926499962806702
         },
         {
+          path: 'summary.json:loss',
           type: ColumnType.METRICS,
-          path: 'summary.json:val_loss',
-          value: 1.7233840227127075
+          value: 1.775016188621521
+        },
+        {
+          path: 'summary.json:val_accuracy',
+          type: ColumnType.METRICS,
+          value: 0.6704000234603882
         }
       ],
       id: 'exp-83425',
@@ -759,31 +772,46 @@ export const MOCK_IMAGE_MTIME = 946684800000
 
 export const getComparisonWebviewMessage = (
   baseUrl: string,
-  joinFunc?: (...args: string[]) => string
+  joinFunc: (...args: string[]) => string = join
 ): PlotsComparisonData => {
-  const plotAcc = [] as ComparisonPlots
+  const plotAcc: {
+    [path: string]: { path: string; revisions: ComparisonRevisionData }
+  } = {}
 
   for (const [path, plots] of Object.entries(getImageData(baseUrl, joinFunc))) {
-    const revisionsAcc: ComparisonRevisionData = {}
+    const pathLabel = path.includes('image') ? join('plots', 'image') : path
+
+    if (!plotAcc[pathLabel]) {
+      plotAcc[pathLabel] = {
+        path: pathLabel,
+        revisions: {}
+      }
+    }
+
     for (const { url, revisions } of plots) {
       const id = revisions?.[0]
       if (!id) {
         continue
       }
-      revisionsAcc[id] = {
+
+      if (!plotAcc[pathLabel].revisions[id]) {
+        plotAcc[pathLabel].revisions[id] = {
+          id,
+          imgs: []
+        }
+      }
+
+      plotAcc[pathLabel].revisions[id].imgs.push({
         url: `${url}?${MOCK_IMAGE_MTIME}`,
-        id,
         errors: undefined,
         loading: false
-      }
+      })
     }
-
-    plotAcc.push({ path, revisions: revisionsAcc })
   }
 
   return {
     revisions: getRevisions(),
-    plots: plotAcc,
+    plots: Object.values(plotAcc),
     width: DEFAULT_PLOT_WIDTH,
     height: DEFAULT_PLOT_HEIGHT
   }

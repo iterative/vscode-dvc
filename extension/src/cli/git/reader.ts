@@ -13,7 +13,6 @@ export const autoRegisteredCommands = {
   GIT_GET_REMOTE_EXPERIMENT_REFS: 'getRemoteExperimentRefs',
   GIT_GET_REMOTE_URL: 'getRemoteUrl',
   GIT_GET_REPOSITORY_ROOT: 'getGitRepositoryRoot',
-  GIT_HAS_CHANGES: 'hasChanges',
   GIT_HAS_NO_COMMITS: 'hasNoCommits',
   GIT_LIST_UNTRACKED: 'listUntracked',
   GIT_VERSION: 'gitVersion'
@@ -24,16 +23,6 @@ export class GitReader extends GitCli {
     autoRegisteredCommands,
     this
   )
-
-  public async hasChanges(cwd: string) {
-    const options = getOptions({
-      args: [Command.DIFF, Flag.NAME_ONLY, Flag.RAW_WITH_NUL],
-      cwd
-    })
-    const output = await this.executeProcess(options)
-
-    return !!output
-  }
 
   public async hasNoCommits(cwd: string) {
     const options = getOptions({

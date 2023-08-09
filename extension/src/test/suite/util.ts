@@ -43,7 +43,7 @@ export const mockDisposable = {
   dispose: stub()
 } as Disposable
 
-export const extensionUri = Uri.file(resolve(__dirname, '..', '..', '..'))
+const extensionUri = Uri.file(resolve(__dirname, '..', '..', '..'))
 
 export const configurationChangeEvent = (
   option: string,
@@ -246,8 +246,6 @@ export const buildDependencies = ({
 
   const resourceLocator = buildResourceLocator(disposer)
 
-  const messageSpy = spy(BaseWebview.prototype, 'show')
-
   return {
     config,
     dvcConfig,
@@ -258,7 +256,6 @@ export const buildDependencies = ({
     gitExecutor,
     gitReader,
     internalCommands,
-    messageSpy,
     mockCheckSignalFile,
     mockCreateFileSystemWatcher,
     mockDag,
@@ -321,12 +318,23 @@ export const bypassProgressCloseDelay = () =>
   stub(Toast, 'delayProgressClosing').resolves(undefined)
 
 export const waitForEditorText = async (): Promise<unknown> => {
-  await Time.delay(500)
+  await Time.delay(100)
   const text = window.activeTextEditor?.document.getText()
   if (text) {
     return
   }
   return waitForEditorText()
+}
+
+export const waitForSpyCall = async (
+  messageSpy: SinonSpy,
+  originalCallCount: number
+): Promise<unknown> => {
+  await Time.delay(100)
+  if (messageSpy.callCount > originalCallCount) {
+    return
+  }
+  return waitForSpyCall(messageSpy, originalCallCount)
 }
 
 export const getActiveEditorUpdatedEvent = (disposer: Disposer) =>

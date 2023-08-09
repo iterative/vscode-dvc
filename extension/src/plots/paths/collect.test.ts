@@ -7,72 +7,84 @@ import {
   collectPaths,
   collectTemplateOrder,
   EncodingType,
-  PathType
+  PathType,
+  PlotPath
 } from './collect'
 import { TemplatePlotGroup, PlotsType } from '../webview/contract'
 import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import { Shape, StrokeDash } from '../multiSource/constants'
-import { EXPERIMENT_WORKSPACE_ID } from '../../cli/dvc/contract'
+import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../cli/dvc/contract'
 import { REVISIONS } from '../../test/fixtures/plotsDiff'
+
+const plotsDiffFixturePaths: PlotPath[] = [
+  {
+    hasChildren: false,
+    parentPath: 'plots',
+    path: join('plots', 'acc.png'),
+    revisions: new Set(REVISIONS),
+    type: new Set<PathType>([PathType.COMPARISON])
+  },
+  {
+    hasChildren: true,
+    parentPath: undefined,
+    path: 'plots',
+    revisions: new Set(REVISIONS)
+  },
+  {
+    hasChildren: false,
+    parentPath: 'plots',
+    path: join('plots', 'heatmap.png'),
+    revisions: new Set(REVISIONS),
+    type: new Set<PathType>([PathType.COMPARISON])
+  },
+  {
+    hasChildren: false,
+    parentPath: 'plots',
+    path: join('plots', 'loss.png'),
+    revisions: new Set(REVISIONS),
+    type: new Set<PathType>([PathType.COMPARISON])
+  },
+  {
+    hasChildren: false,
+    parentPath: 'plots',
+    path: join('plots', 'image'),
+    revisions: new Set(REVISIONS),
+    type: new Set<PathType>([PathType.COMPARISON])
+  },
+  {
+    hasChildren: false,
+    parentPath: 'logs',
+    path: join('logs', 'loss.tsv'),
+    revisions: new Set(REVISIONS),
+    type: new Set<PathType>([PathType.TEMPLATE_SINGLE])
+  },
+  {
+    hasChildren: true,
+    parentPath: undefined,
+    path: 'logs',
+    revisions: new Set(REVISIONS)
+  },
+  {
+    hasChildren: false,
+    parentPath: 'logs',
+    path: join('logs', 'acc.tsv'),
+    revisions: new Set(REVISIONS),
+    type: new Set<PathType>([PathType.TEMPLATE_SINGLE])
+  },
+  {
+    hasChildren: false,
+    parentPath: undefined,
+    path: 'predictions.json',
+    revisions: new Set(REVISIONS),
+    type: new Set<PathType>([PathType.TEMPLATE_MULTI])
+  }
+]
 
 describe('collectPaths', () => {
   it('should return the expected data from the test fixture', () => {
-    expect(collectPaths([], plotsDiffFixture, REVISIONS)).toStrictEqual([
-      {
-        hasChildren: false,
-        parentPath: 'plots',
-        path: join('plots', 'acc.png'),
-        revisions: new Set(REVISIONS),
-        type: new Set(['comparison'])
-      },
-      {
-        hasChildren: true,
-        parentPath: undefined,
-        path: 'plots',
-        revisions: new Set(REVISIONS)
-      },
-      {
-        hasChildren: false,
-        parentPath: 'plots',
-        path: join('plots', 'heatmap.png'),
-        revisions: new Set(REVISIONS),
-        type: new Set(['comparison'])
-      },
-      {
-        hasChildren: false,
-        parentPath: 'plots',
-        path: join('plots', 'loss.png'),
-        revisions: new Set(REVISIONS),
-        type: new Set(['comparison'])
-      },
-      {
-        hasChildren: false,
-        parentPath: 'logs',
-        path: join('logs', 'loss.tsv'),
-        revisions: new Set(REVISIONS),
-        type: new Set(['template-single'])
-      },
-      {
-        hasChildren: true,
-        parentPath: undefined,
-        path: 'logs',
-        revisions: new Set(REVISIONS)
-      },
-      {
-        hasChildren: false,
-        parentPath: 'logs',
-        path: join('logs', 'acc.tsv'),
-        revisions: new Set(REVISIONS),
-        type: new Set(['template-single'])
-      },
-      {
-        hasChildren: false,
-        parentPath: undefined,
-        path: 'predictions.json',
-        revisions: new Set(REVISIONS),
-        type: new Set(['template-multi'])
-      }
-    ])
+    expect(collectPaths([], plotsDiffFixture, REVISIONS)).toStrictEqual(
+      plotsDiffFixturePaths
+    )
   })
 
   it('should update the revision details when any revision is recollected', () => {
@@ -125,6 +137,46 @@ describe('collectPaths', () => {
         remainingPath.split(sep).length
       )
     }
+  })
+
+  it('should collect path types after an error is returned for a new path', () => {
+    const errorFixture: PlotsOutput = { data: {}, errors: [] }
+    const plotPathNames = [
+      join('plots', 'acc.png'),
+      join('plots', 'heatmap.png'),
+      join('plots', 'loss.png'),
+      join('plots', 'image'),
+      join('logs', 'loss.tsv'),
+      join('logs', 'acc.tsv'),
+      'predictions.json'
+    ]
+    for (const path of plotPathNames) {
+      errorFixture.data[path] = []
+
+      errorFixture.errors?.push({
+        msg: 'No such file or directory',
+        name: path,
+        rev: 'workspace',
+        type: 'FileNotFoundError'
+      })
+    }
+
+    const pathsWithNoTypes: PlotPath[] = plotsDiffFixturePaths.map(
+      plotPath => ({
+        hasChildren: plotPath.hasChildren,
+        parentPath: plotPath.parentPath,
+        path: plotPath.path,
+        revisions: new Set(['workspace'])
+      })
+    )
+
+    expect(collectPaths([], errorFixture, ['workspace'])).toStrictEqual(
+      pathsWithNoTypes
+    )
+
+    expect(
+      collectPaths(pathsWithNoTypes, plotsDiffFixture, REVISIONS)
+    ).toStrictEqual(plotsDiffFixturePaths)
   })
 
   it('should not drop already collected paths', () => {

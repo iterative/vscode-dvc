@@ -42,7 +42,7 @@ import {
 
 type StarredExperiments = Record<string, boolean | undefined>
 
-export type SelectedExperimentWithColor = Experiment & {
+type SelectedExperimentWithColor = Experiment & {
   displayColor: Color
   selected: true
 }
@@ -244,10 +244,6 @@ export class ExperimentsModel extends ModelWithPersistence {
 
   public getFilters() {
     return [...this.filters.values()]
-  }
-
-  public getFilterPaths() {
-    return this.getFilters().map(({ path }) => path)
   }
 
   public addFilter(filter: FilterDefinition) {

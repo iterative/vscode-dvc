@@ -1,5 +1,10 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
-import { collectChanges, collectColumns, collectRelativeMetricsFiles } from '.'
+import {
+  collectChanges,
+  collectColumns,
+  collectColumnsWithChangedValues,
+  collectRelativeMetricsFiles
+} from '.'
 import { timestampColumn } from '../constants'
 import { buildMetricOrParamPath } from '../paths'
 import { ColumnType } from '../../webview/contract'
@@ -15,6 +20,8 @@ import {
 } from '../../../cli/dvc/contract'
 import { getConfigValue } from '../../../vscode/config'
 import { generateTestExpShowOutput } from '../../../test/util/experiments'
+import rowsFixture from '../../../test/fixtures/expShow/base/rows'
+import { Operator, filterExperiment } from '../../model/filterBy'
 
 jest.mock('../../../vscode/config')
 
@@ -523,5 +530,57 @@ describe('collectRelativeMetricsFiles', () => {
     const existingFiles: string[] = []
 
     expect(collectRelativeMetricsFiles([])).toStrictEqual(existingFiles)
+  })
+})
+
+describe('collectColumnsWithChangedValues', () => {
+  it('should return the expected columns from the test fixture', () => {
+    const changedColumns = collectColumnsWithChangedValues(
+      columnsFixture,
+      rowsFixture,
+      []
+    )
+    expect(changedColumns).toStrictEqual(
+      columnsFixture.filter(({ path }) =>
+        [
+          'Created',
+          'metrics:summary.json',
+          'metrics:summary.json:loss',
+          'metrics:summary.json:accuracy',
+          'metrics:summary.json:val_loss',
+          'metrics:summary.json:val_accuracy',
+          'params:params.yaml',
+          'params:params.yaml:code_names',
+          'params:params.yaml:epochs',
+          'params:params.yaml:learning_rate',
+          'params:params.yaml:dropout',
+          'params:params.yaml:process',
+          'params:params.yaml:process.threshold',
+          'params:params.yaml:process.test_arg'
+        ].includes(path)
+      )
+    )
+  })
+
+  it('should return the expected columns when applying filters (calculate changed after filters)', () => {
+    const uniformColumn = 'params:params.yaml:dropout'
+    const filters = [
+      {
+        path: uniformColumn,
+        operator: Operator.EQUAL,
+        value: 0.124
+      }
+    ]
+    const filteredRows = [...rowsFixture]
+    for (const row of filteredRows) {
+      row.subRows = row.subRows?.filter(exp => filterExperiment(filters, exp))
+    }
+
+    const changedColumns = collectColumnsWithChangedValues(
+      columnsFixture,
+      filteredRows,
+      filters
+    )
+    expect(changedColumns.map(({ path }) => path)).not.toContain(uniformColumn)
   })
 })

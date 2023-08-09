@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { EventEmitter, commands, env } from 'vscode'
 import { Disposer } from '@hediet/std/disposable'
-import { fake, stub } from 'sinon'
+import { fake, spy, stub } from 'sinon'
 import { ensureDirSync } from 'fs-extra'
 import * as FileSystem from '../../../fileSystem'
 import { Setup } from '../../../setup'
@@ -18,6 +18,7 @@ import { Config } from '../../../config'
 import { Resource } from '../../../resourceLocator'
 import { MIN_CLI_VERSION } from '../../../cli/dvc/contract'
 import { Status } from '../../../status'
+import { BaseWebview } from '../../../webview'
 
 export const TEMP_DIR = join(dvcDemoPath, 'temp-empty-watcher-dir')
 
@@ -40,7 +41,6 @@ export const buildSetup = ({
 }) => {
   const {
     config,
-    messageSpy,
     resourceLocator,
     internalCommands,
     dvcConfig,
@@ -48,6 +48,8 @@ export const buildSetup = ({
     gitExecutor,
     gitReader
   } = buildDependencies({ disposer })
+
+  const messageSpy = spy(BaseWebview.prototype, 'show')
 
   if (gitVersion === undefined) {
     gitVersion = 'git version 2.41.0'

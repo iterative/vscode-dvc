@@ -11,7 +11,7 @@ import {
   ColumnType
 } from '../../../../../experiments/webview/contract'
 import { QuickPickItemWithValue } from '../../../../../vscode/quickPick'
-import { buildExperiments, stubWorkspaceExperimentsGetters } from '../../util'
+import { buildExperimentsWebview, stubWorkspaceGetters } from '../../util'
 import { experimentsUpdatedEvent } from '../../../util'
 import { dvcDemoPath } from '../../../../util'
 import { generateTestExpShowOutput } from '../../../../util/experiments'
@@ -104,7 +104,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
     it('should be able to properly add and remove sorts with a variety of commands', async () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
 
-      const { experiments, messageSpy } = buildExperiments({
+      const { experiments, messageSpy } = await buildExperimentsWebview({
         disposer: disposable,
         dvcRoot: dvcDemoPath,
         expShow: data,
@@ -113,9 +113,6 @@ suite('Experiments Sort By Tree Test Suite', () => {
           { branch: 'main', sha: '2d879497587b80b2d9e61f072d9dbe9c07a65357' }
         ]
       })
-
-      await experiments.isReady()
-      await experiments.showWebview()
 
       const mockSortQuickPicks = (paramPath: string, descending: boolean) => {
         mockShowQuickPick.onFirstCall().resolves({
@@ -287,9 +284,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should provide a shortcut to sort by starred experiments', async () => {
-      const { experiments, experimentsModel } =
-        stubWorkspaceExperimentsGetters(disposable)
-      await experiments.isReady()
+      const { experimentsModel } = await stubWorkspaceGetters(disposable)
 
       const mockAddSort = stub(experimentsModel, 'addSort')
 

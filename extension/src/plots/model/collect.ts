@@ -12,7 +12,9 @@ import {
   TemplatePlotSection,
   PlotsType,
   CustomPlotData,
-  CustomPlotValues
+  CustomPlotValues,
+  ComparisonRevisionData,
+  ComparisonPlotImg
 } from '../webview/contract'
 import { PlotsOutput } from '../../cli/dvc/contract'
 import { splitColumnPath } from '../../experiments/columns/paths'
@@ -34,6 +36,12 @@ import {
 import { StrokeDashEncoding } from '../multiSource/constants'
 import { exists } from '../../fileSystem'
 import { hasKey } from '../../util/object'
+import { MULTI_IMAGE_PATH_REG } from '../../cli/dvc/constants'
+import {
+  getFileNameWithoutExt,
+  getParent,
+  getPathArray
+} from '../../fileSystem/util'
 
 export const getCustomPlotId = (metric: string, param: string) =>
   `custom-${metric}-${param}`
@@ -126,10 +134,20 @@ export type RevisionData = {
   [label: string]: RevisionPathData
 }
 
+type ComparisonDataImgPlot = ImagePlot & { ind?: number }
+
 export type ComparisonData = {
   [label: string]: {
-    [path: string]: ImagePlot
+    [path: string]: ComparisonDataImgPlot[]
   }
+}
+
+const getMultiImagePath = (path: string) =>
+  getParent(getPathArray(path), 0) as string
+
+const getMultiImageInd = (path: string) => {
+  const fileName = getFileNameWithoutExt(path)
+  return Number(fileName)
 }
 
 const collectImageData = (
@@ -137,7 +155,10 @@ const collectImageData = (
   path: string,
   plot: ImagePlot
 ) => {
+  const isMultiImgPlot = MULTI_IMAGE_PATH_REG.test(path)
+  const pathLabel = isMultiImgPlot ? getMultiImagePath(path) : path
   const id = plot.revisions?.[0]
+
   if (!id) {
     return
   }
@@ -146,7 +167,17 @@ const collectImageData = (
     acc[id] = {}
   }
 
-  acc[id][path] = plot
+  if (!acc[id][pathLabel]) {
+    acc[id][pathLabel] = []
+  }
+
+  const imgPlot: ComparisonDataImgPlot = { ...plot }
+
+  if (isMultiImgPlot) {
+    imgPlot.ind = getMultiImageInd(path)
+  }
+
+  acc[id][pathLabel].push(imgPlot)
 }
 
 const collectDatapoints = (
@@ -202,6 +233,16 @@ const collectPathData = (acc: DataAccumulator, path: string, plots: Plot[]) => {
   }
 }
 
+const sortComparisonImgPaths = (acc: DataAccumulator) => {
+  for (const [label, paths] of Object.entries(acc.comparisonData)) {
+    for (const path of Object.keys(paths)) {
+      acc.comparisonData[label][path].sort(
+        (img1, img2) => (img1.ind || 0) - (img2.ind || 0)
+      )
+    }
+  }
+}
+
 export const collectData = (output: PlotsOutput): DataAccumulator => {
   const { data } = output
   const acc = {
@@ -211,6 +252,72 @@ export const collectData = (output: PlotsOutput): DataAccumulator => {
 
   for (const [path, plots] of Object.entries(data)) {
     collectPathData(acc, path, plots)
+  }
+
+  sortComparisonImgPaths(acc)
+
+  return acc
+}
+
+type ComparisonPlotsAcc = { path: string; revisions: ComparisonRevisionData }[]
+
+type GetComparisonPlotImg = (
+  img: ImagePlot,
+  id: string,
+  path: string
+) => ComparisonPlotImg
+
+const collectSelectedPathComparisonPlots = ({
+  acc,
+  comparisonData,
+  path,
+  selectedRevisionIds,
+  getComparisonPlotImg
+}: {
+  acc: ComparisonPlotsAcc
+  comparisonData: ComparisonData
+  path: string
+  selectedRevisionIds: string[]
+  getComparisonPlotImg: GetComparisonPlotImg
+}) => {
+  const pathRevisions = {
+    path,
+    revisions: {} as ComparisonRevisionData
+  }
+
+  for (const id of selectedRevisionIds) {
+    const imgs = comparisonData[id]?.[path]
+    pathRevisions.revisions[id] = {
+      id,
+      imgs: imgs
+        ? imgs.map(img => getComparisonPlotImg(img, id, path))
+        : [{ errors: undefined, loading: false, url: undefined }]
+    }
+  }
+  acc.push(pathRevisions)
+}
+
+export const collectSelectedComparisonPlots = ({
+  comparisonData,
+  paths,
+  selectedRevisionIds,
+  getComparisonPlotImg
+}: {
+  comparisonData: ComparisonData
+  paths: string[]
+  selectedRevisionIds: string[]
+  getComparisonPlotImg: GetComparisonPlotImg
+}) => {
+  const acc: ComparisonPlotsAcc = []
+
+  for (const path of paths) {
+    collectSelectedPathComparisonPlots({
+      acc,
+      comparisonData,
+      getComparisonPlotImg,
+      path,
+      selectedRevisionIds
+    })
   }
 
   return acc
