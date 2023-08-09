@@ -34,18 +34,18 @@ jobs:
       - run: yarn install
       - run: yarn build
 
-      - name: Upload VSIX
-        uses: actions/upload-artifact@v3
-        with:
-          name: dvc.vsix
-          path: ./extension/dvc.vsix
+      # - name: Upload VSIX
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: dvc.vsix
+      #     path: ./extension/dvc.vsix
 
-      - name: Publish to Visual Studio Marketplace
-        uses: HaaLeo/publish-vscode-extension@v1
-        with:
-          extensionFile: './extension/dvc.vsix'
-          pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
-          registryUrl: https://marketplace.visualstudio.com
+      # - name: Publish to Visual Studio Marketplace
+      #   uses: HaaLeo/publish-vscode-extension@v1
+      #   with:
+      #     extensionFile: './extension/dvc.vsix'
+      #     pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
+      #     registryUrl: https://marketplace.visualstudio.com
 
       - name: Publish to Open VSX Registry
         uses: HaaLeo/publish-vscode-extension@v1
