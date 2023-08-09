@@ -228,6 +228,7 @@ suite('Experiments Data Test Suite', () => {
 
       expect(mockSetBranches).to.be.calledOnceWithExactly(
         ['main', 'one'],
+        ['one'],
         'main'
       )
     })
@@ -242,6 +243,7 @@ suite('Experiments Data Test Suite', () => {
 
       expect(mockSetBranches).to.be.calledOnceWithExactly(
         ['(no branch)', 'one'],
+        ['one'],
         '(no branch)'
       )
     })
