@@ -135,9 +135,10 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
       this.dvcRoot
     )
 
-    const { currentBranch, branches } = collectBranches(allBranches)
+    const { currentBranch, branches, branchesToSelect } =
+      collectBranches(allBranches)
 
-    this.experiments.setBranches(branches, currentBranch)
+    this.experiments.setBranches(branches, branchesToSelect, currentBranch)
   }
 
   private collectFiles({ expShow }: { expShow: ExpShowOutput }) {

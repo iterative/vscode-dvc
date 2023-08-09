@@ -372,7 +372,11 @@ describe('ExperimentsModel', () => {
     const model = new ExperimentsModel('', buildMockMemento())
 
     model.setSelectedBranches(['A', 'old', 'B', 'C', 'older'])
-    model.setBranches(['A', 'B', 'C', 'four', 'five'], 'six')
+    model.setBranches(
+      ['A', 'B', 'C', 'four', 'five', 'six'],
+      ['A', 'B', 'C', 'four', 'five'],
+      'six'
+    )
 
     expect(model.getBranchesToShow()).toStrictEqual(['six', 'A', 'B', 'C'])
   })
@@ -380,7 +384,11 @@ describe('ExperimentsModel', () => {
   it('should return all selectable branches', () => {
     const model = new ExperimentsModel('', buildMockMemento())
 
-    model.setBranches(['main', 'A', 'B', 'C', 'four', 'five'], 'main')
+    model.setBranches(
+      ['main', 'A', 'B', 'C', 'four', 'five'],
+      ['A', 'B', 'C', 'four', 'five'],
+      'main'
+    )
 
     expect(model.getAvailableBranchesToSelect()).toStrictEqual([
       'A',
@@ -395,7 +403,11 @@ describe('ExperimentsModel', () => {
     const model = new ExperimentsModel('', buildMockMemento())
 
     model.setSelectedBranches(['A', 'old', 'B', 'C', 'older'])
-    model.setBranches(['A', 'B', 'C', 'four', 'five', 'six'], 'main')
+    model.setBranches(
+      ['main', 'A', 'B', 'C', 'four', 'five', 'six'],
+      ['A', 'B', 'C', 'four', 'five', 'six'],
+      'main'
+    )
 
     expect(model.getBranchesToShow()).toStrictEqual(['main', 'A', 'B', 'C'])
   })
@@ -405,7 +417,11 @@ describe('ExperimentsModel', () => {
     const model = new ExperimentsModel('', memento)
 
     model.setSelectedBranches(['A', 'old', 'B', 'C', 'older'])
-    model.setBranches(['A', 'B', 'C', 'five', 'six'], 'four')
+    model.setBranches(
+      ['A', 'B', 'C', 'five', 'four', 'six'],
+      ['A', 'B', 'C', 'five', 'six'],
+      'four'
+    )
 
     expect(memento.get(PersistenceKey.EXPERIMENTS_BRANCHES)).toStrictEqual([
       'A',
@@ -434,7 +450,11 @@ describe('ExperimentsModel', () => {
     const model = new ExperimentsModel('', memento)
 
     model.setSelectedBranches(['A', 'old', 'B', 'C', 'older'])
-    model.setBranches(['B', 'C', 'four', 'five', 'six'], 'A')
+    model.setBranches(
+      ['B', 'A', 'C', 'four', 'five', 'six'],
+      ['B', 'C', 'four', 'five', 'six'],
+      'A'
+    )
 
     expect(model.getBranchesToShow()).toStrictEqual(['A', 'B', 'C'])
     expect(memento.get(PersistenceKey.EXPERIMENTS_BRANCHES)).toStrictEqual([

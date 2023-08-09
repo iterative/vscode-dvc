@@ -68,6 +68,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   private currentBranch: string | undefined
   private selectedBranches: string[] = []
   private availableBranchesToShow: string[] = []
+  private availableBranchesToSelect: string[] = []
   private hasMoreCommits: { [branch: string]: boolean } = {}
   private isShowingMoreCommits: { [branch: string]: boolean } = {}
 
@@ -489,8 +490,13 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.numberOfCommitsToShow
   }
 
-  public setBranches(branches: string[], currentBranch: string) {
+  public setBranches(
+    branches: string[],
+    branchesToSelect: string[],
+    currentBranch: string
+  ) {
     this.availableBranchesToShow = branches
+    this.availableBranchesToSelect = branchesToSelect
     this.currentBranch = currentBranch
 
     this.selectedBranches = this.selectedBranches.filter(
@@ -519,9 +525,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   }
 
   public getAvailableBranchesToSelect() {
-    return this.availableBranchesToShow.filter(
-      branch => branch !== this.currentBranch
-    )
+    return this.availableBranchesToSelect
   }
 
   private findIndexByPath(pathToRemove: string) {
