@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
+  ComparisonMultiPlotValues,
   DEFAULT_HEIGHT,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH,
@@ -21,6 +22,7 @@ export const comparisonTableInitialState: ComparisonTableState = {
   hasData: false,
   height: DEFAULT_HEIGHT[PlotsSection.COMPARISON_TABLE],
   isCollapsed: DEFAULT_SECTION_COLLAPSED[PlotsSection.COMPARISON_TABLE],
+  multiPlotValues: {},
   plots: [],
   revisions: [],
   rowHeight: DEFAULT_ROW_HEIGHT,
@@ -47,6 +49,12 @@ export const comparisonTableSlice = createSlice({
     setCollapsed: (state, action: PayloadAction<boolean>) => {
       state.isCollapsed = action.payload
     },
+    setMultiPlotValues: (
+      state,
+      action: PayloadAction<ComparisonMultiPlotValues>
+    ) => {
+      state.multiPlotValues = action.payload
+    }, // TBD is this needed?
     update: (state, action: PayloadAction<PlotsComparisonData>) => {
       if (!action.payload) {
         return comparisonTableInitialState

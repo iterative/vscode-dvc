@@ -96,6 +96,17 @@ export const selectRevisions = () =>
     type: MessageFromWebviewType.SELECT_EXPERIMENTS
   })
 
+export const setComparisonMultiPlotValue = (
+  path: string,
+  revision: string,
+  value: number
+) => {
+  sendMessage({
+    type: MessageFromWebviewType.SET_COMPARISON_MULTI_PLOT_VALUE,
+    payload: { path, revision, value }
+  })
+}
+
 export const togglePlotsSection = (
   sectionKey: PlotsSection,
   sectionCollapsed: boolean

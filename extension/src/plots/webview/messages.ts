@@ -102,6 +102,12 @@ export class WebviewMessages {
         return this.selectPlotsFromWebview()
       case MessageFromWebviewType.SELECT_EXPERIMENTS:
         return this.selectExperimentsFromWebview()
+      case MessageFromWebviewType.SET_COMPARISON_MULTI_PLOT_VALUE:
+        return this.setComparisonMultiPlotValue(
+          message.payload.path,
+          message.payload.revision,
+          message.payload.value
+        )
       case MessageFromWebviewType.REMOVE_CUSTOM_PLOTS:
         return commands.executeCommand(
           RegisteredCommands.PLOTS_CUSTOM_REMOVE,
@@ -219,6 +225,20 @@ export class WebviewMessages {
     this.sendComparisonPlots()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_COMPARISON_ROWS_REORDERED,
+      undefined,
+      undefined
+    )
+  }
+
+  private setComparisonMultiPlotValue(
+    path: string,
+    revision: string,
+    value: number
+  ) {
+    this.plots.setComparisonMultiPlotValue(path, revision, value)
+    this.sendComparisonPlots()
+    sendTelemetryEvent(
+      EventName.VIEWS_PLOTS_SET_COMPARISON_MULTI_PLOT_VALUE,
       undefined,
       undefined
     )
@@ -345,6 +365,7 @@ export class WebviewMessages {
 
     return {
       height: this.plots.getHeight(PlotsSection.COMPARISON_TABLE),
+      multiPlotValues: this.plots.getComparisonMultiPlotValues(),
       plots: comparison.map(({ path, revisions }) => {
         return { path, revisions: this.getRevisionsWithCorrectUrls(revisions) }
       }),

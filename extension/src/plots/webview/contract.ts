@@ -66,11 +66,16 @@ export type Revision = {
   label: string
 }
 
+export type ComparisonMultiPlotValues = {
+  [path: string]: { [revision: string]: number }
+}
+
 export interface PlotsComparisonData {
   plots: ComparisonPlots
   width: number
   height: PlotHeight
   revisions: Revision[]
+  multiPlotValues: ComparisonMultiPlotValues
 }
 
 export type CustomPlotValues = {
