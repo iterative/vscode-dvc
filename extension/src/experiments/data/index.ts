@@ -47,10 +47,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
   }
 
   public async update(): Promise<void> {
-    await Promise.all([
-      this.notifyChanged(await this.updateExpShow()),
-      this.notifyChanged(await this.updateRemoteExpRefs())
-    ])
+    await Promise.all([this.updateExpShow(), this.updateRemoteExpRefs()])
   }
 
   private async updateExpShow() {
@@ -77,8 +74,9 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
       ...args
     )
 
+    this.notifyChanged({ availableNbCommits, expShow, gitLog, rowOrder })
+
     this.collectFiles({ expShow })
-    return { availableNbCommits, expShow, gitLog, rowOrder }
   }
 
   private async collectGitLogByBranch(
@@ -184,7 +182,8 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
       ),
       this.isReady()
     ])
-    return { remoteExpRefs }
+
+    this.notifyChanged({ remoteExpRefs })
   }
 
   private waitForInitialLocalData() {
