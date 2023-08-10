@@ -32,6 +32,7 @@ const DEFAULT_DATA = {
   hasData: false,
   isAboveLatestTestedVersion: false,
   isPythonEnvironmentGlobal: false,
+  isPythonExtensionInstalled: false,
   isPythonExtensionUsed: false,
   isStudioConnected: false,
   needsGitCommit: false,
