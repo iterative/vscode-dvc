@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.38] - 2023-08-10
+
+### 🐛 Bug Fixes
+
+- Fix plot actions button showing on sticky ribbon [#4461](https://github.com/iterative/vscode-dvc/pull/4461) by [@julieg18](https://github.com/julieg18)
+- Fix Comparison Plot "Image By Step" height [#4458](https://github.com/iterative/vscode-dvc/pull/4458) by [@julieg18](https://github.com/julieg18)
+- Use is Python extension installed for setup [#4467](https://github.com/iterative/vscode-dvc/pull/4467) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.14.0) [#4468](https://github.com/iterative/vscode-dvc/pull/4468) by [@mattseddon](https://github.com/mattseddon)
+- Do not wait to collect files to send exp data [#4463](https://github.com/iterative/vscode-dvc/pull/4463) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.37] - 2023-08-09
 
 ### 🚀 New Features and Enhancements
