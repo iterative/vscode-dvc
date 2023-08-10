@@ -6628,10 +6628,10 @@
     "@microsoft/fast-foundation" "^2.38.0"
     "@microsoft/fast-react-wrapper" "^0.1.18"
 
-"@wdio/cli@8.14.3":
-  version "8.14.3"
-  resolved "https://registry.yarnpkg.com/@wdio/cli/-/cli-8.14.3.tgz#4c6e0584b5f324a93b2d6f450a362d3574b9c630"
-  integrity sha512-KtIA35hcbwJy70jXwSan+WH21kDAQN4J4+iQU/fCa+Adv7lwV6qSxTyJRoAixKUlvUtCSp4DCBy3IvgamOonFA==
+"@wdio/cli@8.14.4":
+  version "8.14.4"
+  resolved "https://registry.yarnpkg.com/@wdio/cli/-/cli-8.14.4.tgz#3eba90787fcf697251004e97a6f70ca82000c47a"
+  integrity sha512-67a/DhDr2jm/mnH+Asvn0vvY9eT9vK4lLecBv20X0hMkLAS2qKLEbJz1+JfewP2ScArlSluG4R7Zq/qU0F+i3g==
   dependencies:
     "@types/node" "^20.1.1"
     "@wdio/config" "8.14.0"
