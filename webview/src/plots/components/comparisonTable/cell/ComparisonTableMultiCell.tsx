@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
 import { ComparisonTableCell } from './ComparisonTableCell'
@@ -19,13 +19,6 @@ export const ComparisonTableMultiCell: React.FC<{
   const removeDisabled = useCallback(() => {
     dispatch(changeDisabledDragIds([]))
   }, [dispatch])
-
-  useEffect(() => {
-    const maxStep = plot.imgs.length - 1
-    if (currentStep > maxStep) {
-      setCurrentStep(maxStep)
-    }
-  }, [plot.imgs.length, currentStep])
 
   return (
     <div data-testid="multi-image-cell" className={styles.multiImageWrapper}>
