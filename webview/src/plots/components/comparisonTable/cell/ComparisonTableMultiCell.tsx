@@ -9,8 +9,7 @@ export const ComparisonTableMultiCell: React.FC<{
   path: string
   plot: ComparisonPlot
 }> = ({ path, plot }) => {
-  const [step, setStep] = useState<number>(0)
-  const currentStep = step
+  const [currentStep, setCurrentStep] = useState<number>(0)
   const dispatch = useDispatch()
 
   const addDisabled = useCallback(() => {
@@ -23,10 +22,10 @@ export const ComparisonTableMultiCell: React.FC<{
 
   useEffect(() => {
     const maxStep = plot.imgs.length - 1
-    if (step > maxStep) {
-      setStep(maxStep)
+    if (currentStep > maxStep) {
+      setCurrentStep(maxStep)
     }
-  }, [plot.imgs.length, step])
+  }, [plot.imgs.length, currentStep])
 
   return (
     <div data-testid="multi-image-cell" className={styles.multiImageWrapper}>
@@ -57,7 +56,7 @@ export const ComparisonTableMultiCell: React.FC<{
           value={currentStep}
           type="range"
           onChange={event => {
-            setStep(Number(event.target.value))
+            setCurrentStep(Number(event.target.value))
           }}
         />
         <p>{currentStep}</p>
