@@ -14,8 +14,6 @@ import {
 } from 'dvc/src/experiments/webview/contract'
 import { Header } from '../components/table/content/Header'
 import { Cell, CellValue } from '../components/table/content/Cell'
-import { TimestampHeader } from '../components/table/content/TimestampHeader'
-import { DateCellContents } from '../components/table/content/DateCellContent'
 
 export type ColumnWithGroup = ColumnDef<Experiment, unknown> & {
   group: ColumnType
@@ -45,18 +43,6 @@ const getMainColumnProperties = (
   }
   const sizeProperty = size ? { size } : {}
 
-  if (type === ColumnType.TIMESTAMP) {
-    return {
-      ...basicProperties,
-      ...sizeProperty,
-      cell: DateCellContents as unknown as React.FC<
-        CellContext<Column, CellValue>
-      >,
-      header: () => <TimestampHeader />,
-      id: 'Created'
-    }
-  }
-
   return {
     ...basicProperties,
     ...sizeProperty,
@@ -67,11 +53,10 @@ const getMainColumnProperties = (
 }
 
 export const buildColumns = (
-  properties: Column[],
+  properties: { [parentPath: string]: Column[] },
   parentPath: string
 ): TableColumn<Experiment>[] => {
-  return properties
-    .filter(column => column.parentPath === parentPath)
+  return (properties[parentPath] || [])
     .map(data => {
       const { path, width, pathArray, label, type } = data
 
@@ -83,7 +68,7 @@ export const buildColumns = (
         width
       )
 
-      if (childColumns.length > 0) {
+      if (childColumns?.length > 0) {
         return columnHelper.group({
           ...mainColumnProperties,
           cell: undefined,

@@ -26,6 +26,8 @@ import styles from './table/styles.module.scss'
 import { ErrorState } from './emptyState/ErrorState'
 import { GetStarted } from './emptyState/GetStarted'
 import { RowSelectionProvider } from './table/RowSelectionContext'
+import { DateCellContents } from './table/content/DateCellContent'
+import { TimestampHeader } from './table/content/TimestampHeader'
 import { CellValue } from './table/content/Cell'
 import { AddStage } from './AddStage'
 import { ExperimentCell } from './table/content/ExperimentCell'
@@ -67,34 +69,55 @@ const getDefaultColumn = () =>
     size: 240
   })
 
+const collectColumnObj = (
+  columns: Column[]
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+): { [parentPath: string]: Column[] } => {
+  const columnObj: { [parentPath: string]: Column[] } = {}
+
+  for (const column of columns) {
+    if (column.parentPath) {
+      if (!columnObj[column.parentPath]) {
+        columnObj[column.parentPath] = []
+      }
+      columnObj[column.parentPath].push(column)
+    } else {
+      if (!columnObj[column.type]) {
+        columnObj[column.type] = []
+      }
+      columnObj[column.type].push(column)
+    }
+  }
+  return columnObj
+}
+
 const getColumns = (columns: Column[]) => {
   const includeTimestamp = columns.some(
     ({ type }) => type === ColumnType.TIMESTAMP
   )
 
-  const timestampColumn =
-    (includeTimestamp &&
-      buildColumns(
-        [
-          {
-            hasChildren: false,
-            label: 'Created',
-            parentPath: ColumnType.TIMESTAMP,
-            path: 'Created',
-            type: ColumnType.TIMESTAMP,
-            width: 100
-          }
-        ],
-        ColumnType.TIMESTAMP
-      )) ||
-    []
+  const columnObj = collectColumnObj(columns)
+
+  const timestampColumn = includeTimestamp
+    ? [
+        {
+          cell: DateCellContents as unknown as React.FC<
+            CellContext<Column, CellValue>
+          >,
+          group: ColumnType.TIMESTAMP,
+          header: () => <TimestampHeader />,
+          id: 'Created',
+          size: 100
+        }
+      ]
+    : []
 
   return [
     getDefaultColumn(),
     ...timestampColumn,
-    ...buildColumns(columns, ColumnType.METRICS),
-    ...buildColumns(columns, ColumnType.PARAMS),
-    ...buildColumns(columns, ColumnType.DEPS)
+    ...buildColumns(columnObj, ColumnType.METRICS),
+    ...buildColumns(columnObj, ColumnType.PARAMS),
+    ...buildColumns(columnObj, ColumnType.DEPS)
   ]
 }
 
