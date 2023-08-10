@@ -16,6 +16,7 @@ export const dvcInitialState: DvcState = {
   dvcCliDetails: undefined,
   isAboveLatestTestedVersion: undefined,
   isPythonEnvironmentGlobal: undefined,
+  isPythonExtensionInstalled: false,
   isPythonExtensionUsed: false,
   needsGitInitialized: false,
   projectInitialized: false,
@@ -54,6 +55,12 @@ export const dvcSlice = createSlice({
     ) => {
       state.isPythonEnvironmentGlobal = action.payload
     },
+    updateIsPythonExtensionInstalled: (
+      state,
+      action: PayloadAction<boolean>
+    ) => {
+      state.isPythonExtensionInstalled = action.payload
+    },
     updateIsPythonExtensionUsed: (state, action: PayloadAction<boolean>) => {
       state.isPythonExtensionUsed = action.payload
     },
@@ -78,6 +85,7 @@ export const {
   updateDvcCliDetails,
   updateIsAboveLatestTestedVersion,
   updateIsPythonEnvironmentGlobal,
+  updateIsPythonExtensionInstalled,
   updateIsPythonExtensionUsed,
   updateNeedsGitInitialized,
   updateProjectInitialized,

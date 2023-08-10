@@ -13,8 +13,11 @@ import { Warning } from '../../../shared/components/icons'
 import { ShowExtension } from '../remotes/ShowExtension'
 
 export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
-  const { pythonBinPath, isPythonExtensionUsed, isPythonEnvironmentGlobal } =
-    useSelector((state: SetupState) => state.dvc)
+  const {
+    pythonBinPath,
+    isPythonExtensionInstalled,
+    isPythonEnvironmentGlobal
+  } = useSelector((state: SetupState) => state.dvc)
   const canInstall = !!pythonBinPath
   const installationSentence = (
     <>
@@ -58,13 +61,13 @@ export const CliUnavailable: React.FC<PropsWithChildren> = ({ children }) => {
           text="Install (pip)"
         />
         <Button
-          disabled={!isPythonExtensionUsed}
+          disabled={!isPythonExtensionInstalled}
           onClick={updatePythonEnvironment}
           text="Set Env"
         />
         <Button onClick={setupWorkspace} text="Locate DVC" />
       </div>
-      {isPythonExtensionUsed || (
+      {isPythonExtensionInstalled || (
         <ShowExtension
           className={styles.pythonExtInfo}
           id="ms-python.python"
