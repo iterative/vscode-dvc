@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
 import { ComparisonTableCell } from './ComparisonTableCell'
@@ -9,7 +9,8 @@ export const ComparisonTableMultiCell: React.FC<{
   path: string
   plot: ComparisonPlot
 }> = ({ path, plot }) => {
-  const [currentStep, setCurrentStep] = useState<number>(0)
+  const [step, setStep] = useState<number>(0)
+  const currentStep = step
   const dispatch = useDispatch()
 
   const addDisabled = useCallback(() => {
@@ -20,11 +21,27 @@ export const ComparisonTableMultiCell: React.FC<{
     dispatch(changeDisabledDragIds([]))
   }, [dispatch])
 
+  useEffect(() => {
+    const maxStep = plot.imgs.length - 1
+    if (step > maxStep) {
+      setStep(maxStep)
+    }
+  }, [plot.imgs.length, step])
+
   return (
     <div data-testid="multi-image-cell" className={styles.multiImageWrapper}>
       <ComparisonTableCell
         path={path}
-        plot={{ id: plot.id, imgs: [plot.imgs[currentStep]] }}
+        plot={{
+          id: plot.id,
+          imgs: [
+            plot.imgs[currentStep] || {
+              errors: undefined,
+              loading: false,
+              url: undefined
+            }
+          ]
+        }}
         imgAlt={`${currentStep} of ${path} (${plot.id})`}
       />
       <div
@@ -40,7 +57,7 @@ export const ComparisonTableMultiCell: React.FC<{
           value={currentStep}
           type="range"
           onChange={event => {
-            setCurrentStep(Number(event.target.value))
+            setStep(Number(event.target.value))
           }}
         />
         <p>{currentStep}</p>
