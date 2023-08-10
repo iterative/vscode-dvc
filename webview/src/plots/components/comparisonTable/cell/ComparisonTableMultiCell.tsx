@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
 import { ComparisonTableCell } from './ComparisonTableCell'
@@ -14,8 +14,11 @@ export const ComparisonTableMultiCell: React.FC<{
   const values = useSelector(
     (state: PlotsState) => state.comparison.multiPlotValues
   )
-  const currentStep = values?.[path]?.[plot.id] || 0
   const dispatch = useDispatch()
+  const [step, setStep] = useState(values?.[path]?.[plot.id] || 0)
+  const maxStep = plot.imgs.length - 1
+  const currentStep = step > maxStep ? maxStep : step
+  const changeDebounceTimer = useRef(0)
 
   const addDisabled = useCallback(() => {
     dispatch(changeDisabledDragIds([path]))
@@ -25,10 +28,12 @@ export const ComparisonTableMultiCell: React.FC<{
     dispatch(changeDisabledDragIds([]))
   }, [dispatch])
 
-  const handleSliderChange = (event: ChangeEvent<HTMLInputElement>) => {
-    // I think we need to lower the amount of calls being made
-    setComparisonMultiPlotValue(path, plot.id, Number(event.target.value))
-  }
+  useEffect(() => {
+    window.clearTimeout(changeDebounceTimer.current)
+    changeDebounceTimer.current = window.setTimeout(() => {
+      setComparisonMultiPlotValue(path, plot.id, step)
+    }, 500)
+  }, [path, plot.id, step])
 
   return (
     <div data-testid="multi-image-cell" className={styles.multiImageWrapper}>
@@ -46,10 +51,12 @@ export const ComparisonTableMultiCell: React.FC<{
         <input
           name={`${plot.id}-step`}
           min="0"
-          max={plot.imgs.length - 1}
+          max={maxStep}
           value={currentStep}
           type="range"
-          onChange={handleSliderChange}
+          onChange={event => {
+            setStep(Number(event.target.value))
+          }}
         />
         <p>{currentStep}</p>
       </div>

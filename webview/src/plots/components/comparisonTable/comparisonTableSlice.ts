@@ -49,12 +49,6 @@ export const comparisonTableSlice = createSlice({
     setCollapsed: (state, action: PayloadAction<boolean>) => {
       state.isCollapsed = action.payload
     },
-    setMultiPlotValues: (
-      state,
-      action: PayloadAction<ComparisonMultiPlotValues>
-    ) => {
-      state.multiPlotValues = action.payload
-    }, // TBD is this needed?
     update: (state, action: PayloadAction<PlotsComparisonData>) => {
       if (!action.payload) {
         return comparisonTableInitialState
