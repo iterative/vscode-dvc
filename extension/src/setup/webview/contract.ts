@@ -13,6 +13,7 @@ export type SetupData = {
   dvcCliDetails: DvcCliDetails | undefined
   hasData: boolean | undefined
   isPythonEnvironmentGlobal: boolean | undefined
+  isPythonExtensionInstalled: boolean
   isPythonExtensionUsed: boolean
   isStudioConnected: boolean
   needsGitCommit: boolean

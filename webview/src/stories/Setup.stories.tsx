@@ -18,6 +18,7 @@ const DEFAULT_DATA: SetupData = {
   hasData: false,
   isAboveLatestTestedVersion: false,
   isPythonEnvironmentGlobal: false,
+  isPythonExtensionInstalled: true,
   isPythonExtensionUsed: true,
   isStudioConnected: true,
   needsGitCommit: false,
@@ -105,7 +106,7 @@ CLIPythonNotFound.args = getUpdatedArgs({
     command: 'dvc',
     version: undefined
   },
-  isPythonExtensionUsed: false,
+  isPythonExtensionInstalled: false,
   pythonBinPath: undefined
 })
 
