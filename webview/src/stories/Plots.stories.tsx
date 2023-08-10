@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import React from 'react'
 import { Provider, useDispatch } from 'react-redux'
 import type { StoryFn, Meta } from '@storybook/react'
-import { userEvent, within } from '@storybook/testing-library'
+import { userEvent, within, fireEvent } from '@storybook/testing-library'
 import {
   PlotsData,
   DEFAULT_SECTION_COLLAPSED,
@@ -226,6 +226,35 @@ AllSmall.args = {
   }
 }
 AllSmall.parameters = CHROMATIC_VIEWPORTS_WITH_DELAY
+
+export const WithMixedMultiImgHeight = Template.bind({})
+WithMixedMultiImgHeight.args = {
+  data: {
+    comparison: {
+      ...comparisonPlotsFixture,
+      plots: comparisonPlotsFixture.plots.filter(({ path }) =>
+        path.includes('image')
+      )
+    }
+  }
+}
+WithMixedMultiImgHeight.play = async ({ canvasElement }) => {
+  const plotSizeSliders = await within(canvasElement).findByTestId(
+    'size-sliders'
+  )
+
+  const sizeSlider = within(plotSizeSliders).getByRole('slider')
+
+  fireEvent.change(sizeSlider, { target: { value: -5 } })
+
+  const multiImgCells = await within(canvasElement).findAllByTestId(
+    'multi-image-cell'
+  )
+
+  const multiImgSlider = within(multiImgCells[1]).getByRole('slider')
+  fireEvent.change(multiImgSlider, { target: { value: 7 } })
+}
+WithMixedMultiImgHeight.parameters = { chromatic: { delay: 2000 } }
 
 export const VirtualizedPlots = Template.bind({})
 VirtualizedPlots.args = {

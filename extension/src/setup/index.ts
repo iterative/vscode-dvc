@@ -430,6 +430,7 @@ export class Setup
       hasData,
       isAboveLatestTestedVersion: isAboveLatestTestedVersion(this.cliVersion),
       isPythonEnvironmentGlobal,
+      isPythonExtensionInstalled: this.config.isPythonExtensionInstalled(),
       isPythonExtensionUsed,
       isStudioConnected: this.studioIsConnected,
       needsGitCommit,

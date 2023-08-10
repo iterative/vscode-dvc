@@ -176,8 +176,8 @@ $gap: 4px;
 .multiImageWrapper {
   .image,
   .noImageContent {
-    height: 380px;
     object-fit: contain;
+    height: var(--img-height);
   }
 }
 
