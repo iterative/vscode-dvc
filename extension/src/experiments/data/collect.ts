@@ -22,3 +22,36 @@ export const collectFiles = (
     ...existingFiles
   ])
 }
+
+const isCurrentBranch = (branch: string) => branch.indexOf('*') === 0
+
+export const collectBranches = (
+  allBranches: string[]
+): {
+  currentBranch: string
+  branches: string[]
+  branchesToSelect: string[]
+} => {
+  let currentBranch = ''
+  const branches: string[] = []
+  const branchesToSelect: string[] = []
+
+  for (const branch of allBranches) {
+    const isCurrent = isCurrentBranch(branch)
+
+    const cleanBranch = branch.replace('* ', '')
+
+    branches.push(cleanBranch)
+
+    if (isCurrent) {
+      if (!currentBranch) {
+        currentBranch = cleanBranch
+      }
+      continue
+    }
+
+    branchesToSelect.push(cleanBranch)
+  }
+
+  return { branches, branchesToSelect, currentBranch }
+}

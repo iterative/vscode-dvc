@@ -5,7 +5,6 @@ import {
   getBranchExperimentCommand,
   getPushExperimentCommand
 } from './commands'
-import { isCurrentBranch } from './model/collect'
 import { TableData } from './webview/contract'
 import { Args } from '../cli/dvc/constants'
 import {
@@ -382,24 +381,22 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   }
 
   public async selectBranches(branchesSelected: string[]) {
-    const cwd = await this.getDvcRoot()
-    if (!cwd) {
+    const dvcRoot = await this.getDvcRoot()
+    if (!dvcRoot) {
       return
     }
-    const allBranches = await this.internalCommands.executeCommand<string[]>(
-      AvailableCommands.GIT_GET_BRANCHES,
-      cwd
-    )
+    const repository = this.getRepository(dvcRoot)
+
+    const allBranches = repository.getAvailableBranchesToSelect()
+
     return await quickPickManyValues(
-      allBranches
-        .filter(branch => !isCurrentBranch(branch))
-        .map(branch => {
-          return {
-            label: branch,
-            picked: branchesSelected.includes(branch),
-            value: branch
-          }
-        }),
+      allBranches.map(branch => {
+        return {
+          label: branch,
+          picked: branchesSelected.includes(branch),
+          value: branch
+        }
+      }),
       {
         title: Title.SELECT_BRANCHES
       }
