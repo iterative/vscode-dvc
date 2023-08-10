@@ -35,7 +35,6 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
     (state: PlotsState) => state.comparison.width
   )
   const [isShown, setIsShown] = useState(true)
-  const [multiImgHeight, setMultiImgHeight] = useState(380)
 
   const toggleIsShownState = () => {
     if (isSelecting([path])) {
@@ -44,29 +43,35 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
     setIsShown(!isShown)
   }
 
-  const updateMultiImgHeight = (img: HTMLImageElement) => {
-    const aspectRatio = img.naturalWidth / img.naturalHeight
-    const width = img.clientWidth
+  const updateMultiImgHeight = (image: HTMLImageElement) => {
+    const aspectRatio = image.naturalWidth / image.naturalHeight
+    const width = image.clientWidth
     const calculatedHeight = Number.parseFloat((width / aspectRatio).toFixed(2))
-    setMultiImgHeight(calculatedHeight)
+
+    plotsRowRef.current?.style.setProperty(
+      '--img-height',
+      `${calculatedHeight}px`
+    )
   }
 
   useEffect(() => {
     const img: HTMLImageElement | null | undefined =
       plotsRowRef.current?.querySelector(`.${styles.multiImageWrapper} img`)
-    if (img) {
-      if (img.complete) {
-        updateMultiImgHeight(img)
-        return
-      }
-      img.addEventListener(
-        'load',
-        () => {
-          updateMultiImgHeight(img)
-        },
-        { once: true }
-      )
+    if (!img) {
+      return
     }
+
+    if (img.complete) {
+      updateMultiImgHeight(img)
+      return
+    }
+    img.addEventListener(
+      'load',
+      () => {
+        updateMultiImgHeight(img)
+      },
+      { once: true }
+    )
   }, [comparisonWidth])
 
   return (
@@ -108,11 +113,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
                 className={cx(styles.cell, { [styles.cellHidden]: !isShown })}
               >
                 {plot.imgs.length > 1 ? (
-                  <ComparisonTableMultiCell
-                    imgHeight={multiImgHeight}
-                    plot={plot}
-                    path={path}
-                  />
+                  <ComparisonTableMultiCell plot={plot} path={path} />
                 ) : (
                   <ComparisonTableCell plot={plot} path={path} />
                 )}
