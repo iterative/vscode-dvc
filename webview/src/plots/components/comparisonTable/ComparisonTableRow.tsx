@@ -1,5 +1,5 @@
 import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
 import styles from './styles.module.scss'
@@ -27,8 +27,12 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
   nbColumns,
   pinnedColumn
 }) => {
+  const plotsRowRef = useRef<HTMLTableRowElement>(null)
   const draggedId = useSelector(
     (state: PlotsState) => state.dragAndDrop.draggedRef?.itemId
+  )
+  const comparisonWidth = useSelector(
+    (state: PlotsState) => state.comparison.width
   )
   const [isShown, setIsShown] = useState(true)
 
@@ -38,6 +42,37 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
     }
     setIsShown(!isShown)
   }
+
+  const updateMultiImgHeight = (image: HTMLImageElement) => {
+    const aspectRatio = image.naturalWidth / image.naturalHeight
+    const width = image.clientWidth
+    const calculatedHeight = Number.parseFloat((width / aspectRatio).toFixed(2))
+
+    plotsRowRef.current?.style.setProperty(
+      '--img-height',
+      `${calculatedHeight}px`
+    )
+  }
+
+  useEffect(() => {
+    const img: HTMLImageElement | null | undefined =
+      plotsRowRef.current?.querySelector(`.${styles.multiImageWrapper} img`)
+    if (!img) {
+      return
+    }
+
+    if (img.complete) {
+      updateMultiImgHeight(img)
+      return
+    }
+    img.addEventListener(
+      'load',
+      () => {
+        updateMultiImgHeight(img)
+      },
+      { once: true }
+    )
+  }, [comparisonWidth])
 
   return (
     <>
@@ -62,7 +97,7 @@ export const ComparisonTableRow: React.FC<ComparisonTableRowProps> = ({
         </td>
         {nbColumns > 1 && pinnedColumn && <td colSpan={nbColumns - 1}></td>}
       </tr>
-      <tr>
+      <tr ref={plotsRowRef}>
         {plots.map(plot => {
           const isPinned = pinnedColumn === plot.id
           return (
