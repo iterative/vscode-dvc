@@ -41,7 +41,16 @@ export const ComparisonTableMultiCell: React.FC<{
     <div data-testid="multi-image-cell" className={styles.multiImageWrapper}>
       <ComparisonTableCell
         path={path}
-        plot={{ id: plot.id, imgs: [plot.imgs[imageStep]] }}
+        plot={{
+          id: plot.id,
+          imgs: [
+            plot.imgs[imageStep] || {
+              errors: undefined,
+              loading: false,
+              url: undefined
+            }
+          ]
+        }}
         imgAlt={`${imageStep} of ${path} (${plot.id})`}
       />
       <div

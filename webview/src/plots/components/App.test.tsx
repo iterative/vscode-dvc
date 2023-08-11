@@ -225,6 +225,7 @@ describe('App', () => {
     renderAppWithOptionalData({
       comparison: {
         height: DEFAULT_PLOT_HEIGHT,
+        multiPlotValues: {},
         plots: [
           {
             path: 'training/plots/images/misclassified.jpg',
@@ -279,6 +280,7 @@ describe('App', () => {
     renderAppWithOptionalData({
       comparison: {
         height: DEFAULT_PLOT_HEIGHT,
+        multiPlotValues: {},
         plots: [
           {
             path: 'training/plots/images/image',

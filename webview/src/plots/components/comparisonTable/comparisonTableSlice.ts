@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {
-  ComparisonMultiPlotValues,
   DEFAULT_HEIGHT,
   DEFAULT_SECTION_COLLAPSED,
   DEFAULT_SECTION_NB_ITEMS_PER_ROW_OR_WIDTH,

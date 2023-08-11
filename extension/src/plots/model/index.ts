@@ -420,10 +420,7 @@ export class PlotsModel extends ModelWithPersistence {
       ...this.comparisonData,
       ...comparisonData
     }
-    console.log('processOutput', comparisonData, {
-      ...this.comparisonData,
-      ...comparisonData
-    })
+
     this.revisionData = {
       ...this.revisionData,
       ...revisionData

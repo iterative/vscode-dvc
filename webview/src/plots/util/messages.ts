@@ -102,8 +102,8 @@ export const setComparisonMultiPlotValue = (
   value: number
 ) => {
   sendMessage({
-    type: MessageFromWebviewType.SET_COMPARISON_MULTI_PLOT_VALUE,
-    payload: { path, revision, value }
+    payload: { path, revision, value },
+    type: MessageFromWebviewType.SET_COMPARISON_MULTI_PLOT_VALUE
   })
 }
 
