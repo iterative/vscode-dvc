@@ -1065,7 +1065,7 @@ suite('Plots Test Suite', () => {
       )
     })
 
-    it('should handle an update comparison multi plot values message from the webview', async () => {
+    it('should handle an update comparison multi plot value message from the webview', async () => {
       const { mockMessageReceived, plotsModel } = await buildPlotsWebview({
         disposer: disposable,
         plotsDiff: plotsDiffFixture
@@ -1097,7 +1097,7 @@ suite('Plots Test Suite', () => {
       expect(mockSetComparisonMultiPlotValue).to.be.calledWithExactly(
         'main',
         multiImg.path,
-        0.5
+        5
       )
     })
 
