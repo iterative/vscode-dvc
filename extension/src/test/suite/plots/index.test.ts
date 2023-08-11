@@ -1065,6 +1065,42 @@ suite('Plots Test Suite', () => {
       )
     })
 
+    it('should handle an update comparison multi plot values message from the webview', async () => {
+      const { mockMessageReceived, plotsModel } = await buildPlotsWebview({
+        disposer: disposable,
+        plotsDiff: plotsDiffFixture
+      })
+      const multiImg = comparisonPlotsFixture.plots[3]
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const mockSetComparisonMultiPlotValue = stub(
+        plotsModel,
+        'setComparisonMultiPlotValue'
+      )
+
+      mockMessageReceived.fire({
+        payload: {
+          path: multiImg.path,
+          revision: 'main',
+          value: 5
+        },
+        type: MessageFromWebviewType.SET_COMPARISON_MULTI_PLOT_VALUE
+      })
+
+      expect(mockSendTelemetryEvent).to.be.called
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_PLOTS_SET_COMPARISON_MULTI_PLOT_VALUE,
+        undefined,
+        undefined
+      )
+      expect(mockSetComparisonMultiPlotValue).to.be.called
+      expect(mockSetComparisonMultiPlotValue).to.be.calledWithExactly(
+        'main',
+        multiImg.path,
+        0.5
+      )
+    })
+
     it('should handle the CLI throwing an error', async () => {
       const { data, errorsModel, mockPlotsDiff, plots, plotsModel } =
         await buildPlots({ disposer: disposable, plotsDiff: plotsDiffFixture })
