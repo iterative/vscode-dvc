@@ -1752,13 +1752,14 @@ describe('App', () => {
       expect(slider).toBeInTheDocument()
     })
 
-    it('should update the cell image when the slider changes', () => {
+    it('should send a message when the slider changes', async () => {
       renderAppWithOptionalData({
         comparison: comparisonTableFixture
       })
 
-      const workspaceImgs =
-        comparisonTableFixture.plots[3].revisions.workspace.imgs
+      const multiImg = comparisonTableFixture.plots[3]
+      const workspacePlot = multiImg.revisions.workspace
+      const workspaceImgs = workspacePlot.imgs
 
       const multiImgPlots = screen.getAllByTestId('multi-image-cell')
       const slider = within(multiImgPlots[0]).getByRole('slider')
@@ -1767,6 +1768,41 @@ describe('App', () => {
       expect(workspaceImgEl).toHaveAttribute('src', workspaceImgs[0].url)
 
       fireEvent.change(slider, { target: { value: 3 } })
+
+      await waitFor(
+        () => {
+          expect(mockPostMessage).toHaveBeenCalledWith({
+            payload: {
+              path: multiImg.path,
+              revision: workspacePlot.id,
+              value: 3
+            },
+            type: MessageFromWebviewType.SET_COMPARISON_MULTI_PLOT_VALUE
+          })
+        },
+        { timeout: 1000 }
+      )
+    })
+
+    it('should update the cell image when the value changes', () => {
+      renderAppWithOptionalData({
+        comparison: comparisonTableFixture
+      })
+
+      const multiImg = comparisonTableFixture.plots[3]
+      const workspaceImgs = multiImg.revisions.workspace.imgs
+
+      const multiImgPlots = screen.getAllByTestId('multi-image-cell')
+      const workspaceImgEl = within(multiImgPlots[0]).getByRole('img')
+
+      expect(workspaceImgEl).toHaveAttribute('src', workspaceImgs[0].url)
+
+      sendSetDataMessage({
+        comparison: {
+          ...comparisonTableFixture,
+          multiPlotValues: { [multiImg.path]: { workspace: 3 } }
+        }
+      })
 
       expect(workspaceImgEl).toHaveAttribute('src', workspaceImgs[3].url)
     })
