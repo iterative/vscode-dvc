@@ -67,7 +67,7 @@ export type Revision = {
 }
 
 export type ComparisonMultiPlotValues = {
-  [path: string]: { [revision: string]: number }
+  [revision: string]: { [path: string]: number }
 }
 
 export interface PlotsComparisonData {

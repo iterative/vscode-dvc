@@ -314,15 +314,15 @@ export class PlotsModel extends ModelWithPersistence {
   }
 
   public setComparisonMultiPlotValue(
-    path: string,
     revision: string,
+    path: string,
     value: number
   ) {
-    if (!this.comparisonMultiPlotValues[path]) {
-      this.comparisonMultiPlotValues[path] = {}
+    if (!this.comparisonMultiPlotValues[revision]) {
+      this.comparisonMultiPlotValues[revision] = {}
     }
 
-    this.comparisonMultiPlotValues[path][revision] = value
+    this.comparisonMultiPlotValues[revision][path] = value
     this.persist(
       PersistenceKey.PLOTS_COMPARISON_MULTI_PLOT_VALUES,
       this.comparisonMultiPlotValues

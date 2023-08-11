@@ -1800,7 +1800,7 @@ describe('App', () => {
       sendSetDataMessage({
         comparison: {
           ...comparisonTableFixture,
-          multiPlotValues: { [multiImg.path]: { workspace: 3 } }
+          multiPlotValues: { workspace: { [multiImg.path]: 3 } }
         }
       })
 

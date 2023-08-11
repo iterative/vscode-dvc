@@ -104,8 +104,8 @@ export class WebviewMessages {
         return this.selectExperimentsFromWebview()
       case MessageFromWebviewType.SET_COMPARISON_MULTI_PLOT_VALUE:
         return this.setComparisonMultiPlotValue(
-          message.payload.path,
           message.payload.revision,
+          message.payload.path,
           message.payload.value
         )
       case MessageFromWebviewType.REMOVE_CUSTOM_PLOTS:
@@ -231,11 +231,11 @@ export class WebviewMessages {
   }
 
   private setComparisonMultiPlotValue(
-    path: string,
     revision: string,
+    path: string,
     value: number
   ) {
-    this.plots.setComparisonMultiPlotValue(path, revision, value)
+    this.plots.setComparisonMultiPlotValue(revision, path, value)
     this.sendComparisonPlots()
     sendTelemetryEvent(
       EventName.VIEWS_PLOTS_SET_COMPARISON_MULTI_PLOT_VALUE,

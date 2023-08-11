@@ -14,7 +14,7 @@ export const ComparisonTableMultiCell: React.FC<{
   const values = useSelector(
     (state: PlotsState) => state.comparison.multiPlotValues
   )
-  const imageStep = values?.[path]?.[plot.id] || 0
+  const imageStep = values?.[plot.id]?.[path] || 0
   const dispatch = useDispatch()
   const maxStep = plot.imgs.length - 1
   const changeDebounceTimer = useRef(0)
