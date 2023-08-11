@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { ChangeEvent, useCallback, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
 import { ComparisonTableCell } from './ComparisonTableCell'
@@ -14,10 +14,9 @@ export const ComparisonTableMultiCell: React.FC<{
   const values = useSelector(
     (state: PlotsState) => state.comparison.multiPlotValues
   )
+  const imageStep = values?.[path]?.[plot.id] || 0
   const dispatch = useDispatch()
-  const [step, setStep] = useState(values?.[path]?.[plot.id] || 0)
   const maxStep = plot.imgs.length - 1
-  const currentStep = step > maxStep ? maxStep : step
   const changeDebounceTimer = useRef(0)
 
   const addDisabled = useCallback(() => {
@@ -28,19 +27,22 @@ export const ComparisonTableMultiCell: React.FC<{
     dispatch(changeDisabledDragIds([]))
   }, [dispatch])
 
-  useEffect(() => {
+  const handleSliderChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (!event.target) {
+      return
+    }
     window.clearTimeout(changeDebounceTimer.current)
     changeDebounceTimer.current = window.setTimeout(() => {
-      setComparisonMultiPlotValue(path, plot.id, step)
+      setComparisonMultiPlotValue(path, plot.id, Number(event.target.value))
     }, 500)
-  }, [path, plot.id, step])
+  }
 
   return (
     <div data-testid="multi-image-cell" className={styles.multiImageWrapper}>
       <ComparisonTableCell
         path={path}
-        plot={{ id: plot.id, imgs: [plot.imgs[currentStep]] }}
-        imgAlt={`${currentStep} of ${path} (${plot.id})`}
+        plot={{ id: plot.id, imgs: [plot.imgs[imageStep]] }}
+        imgAlt={`${imageStep} of ${path} (${plot.id})`}
       />
       <div
         className={styles.multiImageSlider}
@@ -52,13 +54,10 @@ export const ComparisonTableMultiCell: React.FC<{
           name={`${plot.id}-step`}
           min="0"
           max={maxStep}
-          value={currentStep}
           type="range"
-          onChange={event => {
-            setStep(Number(event.target.value))
-          }}
+          onChange={handleSliderChange}
         />
-        <p>{currentStep}</p>
+        <p>{imageStep}</p>
       </div>
     </div>
   )
