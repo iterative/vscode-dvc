@@ -1,5 +1,4 @@
 import React, { useRef, useState, CSSProperties, useContext } from 'react'
-import { ColumnOrderState } from '@tanstack/react-table'
 import cx from 'classnames'
 import styles from './styles.module.scss'
 import { TableHead } from './header/TableHead'
@@ -7,14 +6,7 @@ import { RowSelectionContext } from './RowSelectionContext'
 import { TableContent } from './body/TableContent'
 import { InstanceProp } from '../../util/interfaces'
 
-interface TableProps extends InstanceProp {
-  onColumnOrderChange: (order: ColumnOrderState) => void
-}
-
-export const Table: React.FC<TableProps> = ({
-  instance,
-  onColumnOrderChange
-}) => {
+export const Table: React.FC<InstanceProp> = ({ instance }) => {
   const { clearSelectedRows } = useContext(RowSelectionContext)
   const [expColumnNeedsShadow, setExpColumnNeedsShadow] = useState(false)
   const [tableHeadHeight, setTableHeadHeight] = useState(55)
@@ -44,7 +36,6 @@ export const Table: React.FC<TableProps> = ({
           root={tableRef.current}
           setExpColumnNeedsShadow={setExpColumnNeedsShadow}
           setTableHeadHeight={setTableHeadHeight}
-          onOrderChange={onColumnOrderChange}
         />
         <TableContent
           instance={instance}

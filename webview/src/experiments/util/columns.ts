@@ -3,44 +3,78 @@ import { Header } from '@tanstack/react-table'
 
 export const isFirstLevelHeader = (id: string) => id.split(':').length - 1 === 1
 
-export const reorderColumnIds = (
-  columnIds: string[],
-  displacer: string[],
+type OrderAccumulator = { newOrder: string[]; firstDroppedFound: boolean }
+
+const addDroppedAndDisplaced = (
+  acc: OrderAccumulator,
+  dropped: string[],
   displaced: string[]
 ) => {
-  if (columnIds.length === 0 || displacer[0] === displaced[0]) {
+  const droppedStartedLeftOfDisplaced = acc.firstDroppedFound
+  const order = droppedStartedLeftOfDisplaced
+    ? [...displaced, ...dropped]
+    : [...dropped, ...displaced]
+  acc.newOrder.push(...order)
+}
+
+const collectId = (
+  acc: OrderAccumulator,
+  columnId: string,
+  dropped: string[],
+  displaced: string[]
+) => {
+  if (columnId === displaced[0]) {
+    addDroppedAndDisplaced(acc, dropped, displaced)
+    return
+  }
+  if (displaced.includes(columnId)) {
+    return
+  }
+  if (dropped.includes(columnId)) {
+    acc.firstDroppedFound = true
+    return
+  }
+
+  acc.newOrder.push(columnId)
+}
+
+const collectNewOrder = (
+  columnIds: string[],
+  dropped: string[],
+  displaced: string[]
+): string[] => {
+  const acc: OrderAccumulator = {
+    firstDroppedFound: false,
+    newOrder: []
+  }
+  for (const columnId of columnIds) {
+    collectId(acc, columnId, dropped, displaced)
+  }
+  return acc.newOrder
+}
+
+export const reorderColumnIds = (
+  columnIds: string[],
+  dropped: string[],
+  displaced: string[]
+) => {
+  if (columnIds.length === 0 || dropped[0] === displaced[0]) {
     return columnIds
   }
-
-  const displacerIndex = columnIds.indexOf(displacer[0])
-  const displacedIndex = columnIds.indexOf(displaced[0])
-
-  if (displacerIndex < displacedIndex) {
-    return [
-      ...columnIds.slice(0, displacerIndex),
-      ...columnIds.slice(displacerIndex + displacer.length, displacedIndex),
-      ...displaced,
-      ...displacer,
-      ...columnIds.slice(displacedIndex + displaced.length)
-    ]
-  }
-
-  return [
-    ...columnIds.slice(0, displacedIndex),
-    ...displacer,
-    ...displaced,
-    ...columnIds.slice(displacedIndex + displaced.length, displacerIndex),
-    ...columnIds.slice(displacerIndex + displacer.length)
-  ]
+  return collectNewOrder(columnIds, dropped, displaced)
 }
 
 export const leafColumnIds = (
   header: Header<Experiment, unknown>
 ): string[] => {
-  return header
-    .getLeafHeaders()
-    .filter(h => h.subHeaders.length === 0)
-    .map(h => h.column.id)
+  const leafColumnIds: string[] = []
+  for (const headers of header.getLeafHeaders()) {
+    if (headers.subHeaders.length > 0) {
+      continue
+    }
+    leafColumnIds.push(headers.column.id)
+  }
+  return leafColumnIds
 }
 
 export const EXPERIMENT_COLUMN_ID = 'id'

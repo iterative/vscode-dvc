@@ -145,10 +145,6 @@ export const ExperimentsTable: React.FC = () => {
     setColumns(getColumns(columnsData))
   }, [columnsData])
 
-  useEffect(() => {
-    setColumnOrder(columnOrderData)
-  }, [columnOrderData])
-
   const getRowId = useCallback(
     (experiment: Commit, relativeIndex: number, parent?: TableRow<Commit>) =>
       parent ? [parent.id, experiment.id].join('.') : String(relativeIndex),
@@ -166,6 +162,7 @@ export const ExperimentsTable: React.FC = () => {
     getExpandedRowModel: getExpandedRowModel(),
     getRowId,
     getSubRows: row => row.subRows,
+    onColumnOrderChange: setColumnOrder,
     onColumnSizingChange: setColumnSizing,
     onExpandedChange: setExpanded,
     state: {
@@ -188,7 +185,7 @@ export const ExperimentsTable: React.FC = () => {
   }
   return (
     <RowSelectionProvider>
-      <Table instance={instance} onColumnOrderChange={setColumnOrder} />
+      <Table instance={instance} />
       {!hasConfig && <AddStage />}
     </RowSelectionProvider>
   )
