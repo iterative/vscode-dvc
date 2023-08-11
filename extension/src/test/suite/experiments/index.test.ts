@@ -1537,6 +1537,39 @@ suite('Experiments Test Suite', () => {
       expect(mockUpdateExperimentsData).to.be.calledOnce
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
+    it('should handle a message to redirect to setup', async () => {
+      const { mockMessageReceived, webview } = await buildExperimentsWebview({
+        disposer: disposable,
+        expShow: expShowFixture
+      })
+
+      const webviewDisposeStub = stub(webview, 'dispose')
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const executeCommandSpy = spy(commands, 'executeCommand')
+
+      const webviewDisposeEvent = new Promise(resolve => {
+        webviewDisposeStub.onFirstCall().callsFake(() => {
+          resolve(undefined)
+        })
+      })
+
+      mockMessageReceived.fire({
+        type: MessageFromWebviewType.REDIRECT_TO_SETUP
+      })
+
+      await webviewDisposeEvent
+
+      expect(mockSendTelemetryEvent).to.be.calledWithExactly(
+        EventName.VIEWS_EXPERIMENTS_TABLE_REDIRECT_TO_SETUP,
+        undefined,
+        undefined
+      )
+      expect(executeCommandSpy).to.be.calledWith(
+        RegisteredCommands.SETUP_SHOW_EXPERIMENTS
+      )
+      expect(webviewDisposeStub).to.be.called
+    })
+
     it('should not update the selected branches when the user closes the select branches quick pick', async () => {
       const {
         experimentsModel,

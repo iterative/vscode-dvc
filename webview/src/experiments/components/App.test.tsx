@@ -110,11 +110,17 @@ describe('App', () => {
     expect(noColumnsState).not.toBeInTheDocument()
   })
 
-  it('should show the no experiments empty state when no rows are provided', () => {
+  it('should redirect to setup when no rows are provided', () => {
     renderTableWithNoRows()
 
-    const noExperimentsState = screen.queryByText('No Experiments to Display.')
+    const noExperimentsState = screen.queryByText(
+      'No experiments to display. Redirecting to setup...'
+    )
     expect(noExperimentsState).toBeInTheDocument()
+
+    expect(mockPostMessage).toHaveBeenCalledWith({
+      type: MessageFromWebviewType.REDIRECT_TO_SETUP
+    })
   })
 
   it('should show a refresh button if there is a CLI error', () => {

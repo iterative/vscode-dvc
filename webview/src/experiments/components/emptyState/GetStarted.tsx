@@ -15,7 +15,7 @@ export const GetStarted: React.FC<{ noExpsToDisplay: boolean }> = ({
   return (
     <EmptyState>
       {noExpsToDisplay ? (
-        'No experiments to display. Redirecting to setup...'
+        <span>No experiments to display. Redirecting to setup...</span>
       ) : (
         <AddColumns />
       )}

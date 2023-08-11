@@ -274,13 +274,10 @@ export class WebviewMessages {
       undefined
     )
 
-    await commands.executeCommand(RegisteredCommands.SETUP_SHOW_EXPERIMENTS, {
-      dvcRoot: this.dvcRoot
-    })
+    await commands.executeCommand(RegisteredCommands.SETUP_SHOW_EXPERIMENTS)
 
     const webview = this.getWebview()
-
-    return webview?.dispose()
+    webview?.dispose()
   }
 
   private refreshData() {
