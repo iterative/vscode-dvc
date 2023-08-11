@@ -1826,6 +1826,56 @@ describe('App', () => {
 
       expect(multiImgRow.draggable).toBe(true)
     })
+
+    it('should handle when a revision contains less images than before', () => {
+      renderAppWithOptionalData({
+        comparison: comparisonTableFixture
+      })
+
+      const multiImg = comparisonTableFixture.plots[3]
+      const mainImgs = multiImg.revisions.main.imgs
+
+      const multiImgPlots = screen.getAllByTestId('multi-image-cell')
+
+      sendSetDataMessage({
+        comparison: {
+          ...comparisonTableFixture,
+          multiPlotValues: { main: { [multiImg.path]: 14 } }
+        }
+      })
+
+      expect(within(multiImgPlots[1]).getByRole('img')).toHaveAttribute(
+        'src',
+        mainImgs[14].url
+      )
+
+      const dataWithLessMainImages = {
+        comparison: {
+          ...comparisonTableFixture,
+          multiPlotValues: { main: { [multiImg.path]: 14 } },
+          plots: comparisonTableFixture.plots.map(plot =>
+            plot.path.includes('image')
+              ? {
+                  ...plot,
+                  revisions: {
+                    ...plot.revisions,
+                    main: {
+                      ...plot.revisions.main,
+                      imgs: plot.revisions.main.imgs.slice(0, 7)
+                    }
+                  }
+                }
+              : plot
+          )
+        }
+      }
+
+      sendSetDataMessage(dataWithLessMainImages)
+
+      expect(
+        within(multiImgPlots[1]).queryByRole('img')
+      ).not.toBeInTheDocument()
+    })
   })
 
   describe('Virtualization', () => {
