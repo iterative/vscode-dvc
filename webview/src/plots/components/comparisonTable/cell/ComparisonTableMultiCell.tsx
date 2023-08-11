@@ -30,9 +30,12 @@ export const ComparisonTableMultiCell: React.FC<{
   useEffect(() => {
     window.clearTimeout(changeDebounceTimer.current)
     changeDebounceTimer.current = window.setTimeout(() => {
+      if (currentStep === values?.[plot.id]?.[path]) {
+        return
+      }
       setComparisonMultiPlotValue(path, plot.id, currentStep)
     }, 500)
-  }, [path, plot.id, currentStep])
+  }, [values, path, plot.id, currentStep])
 
   return (
     <div data-testid="multi-image-cell" className={styles.multiImageWrapper}>
