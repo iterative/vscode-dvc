@@ -1752,6 +1752,24 @@ describe('App', () => {
       expect(slider).toBeInTheDocument()
     })
 
+    it('should update the cell image when the slider changes', () => {
+      renderAppWithOptionalData({
+        comparison: comparisonTableFixture
+      })
+
+      const workspaceImgs =
+        comparisonTableFixture.plots[3].revisions.workspace.imgs
+      const multiImgPlots = screen.getAllByTestId('multi-image-cell')
+      const slider = within(multiImgPlots[0]).getByRole('slider')
+      const workspaceImgEl = within(multiImgPlots[0]).getByRole('img')
+
+      expect(workspaceImgEl).toHaveAttribute('src', workspaceImgs[0].url)
+
+      fireEvent.change(slider, { target: { value: 3 } })
+
+      expect(workspaceImgEl).toHaveAttribute('src', workspaceImgs[3].url)
+    })
+
     it('should send a message when the slider changes', async () => {
       renderAppWithOptionalData({
         comparison: comparisonTableFixture
@@ -1784,25 +1802,18 @@ describe('App', () => {
       )
     })
 
-    it('should update the cell image when the value changes', () => {
-      renderAppWithOptionalData({
-        comparison: comparisonTableFixture
-      })
-
+    it('should set default slider value if given a saved value', () => {
       const multiImg = comparisonTableFixture.plots[3]
-      const workspaceImgs = multiImg.revisions.workspace.imgs
-
-      const multiImgPlots = screen.getAllByTestId('multi-image-cell')
-      const workspaceImgEl = within(multiImgPlots[0]).getByRole('img')
-
-      expect(workspaceImgEl).toHaveAttribute('src', workspaceImgs[0].url)
-
-      sendSetDataMessage({
+      renderAppWithOptionalData({
         comparison: {
           ...comparisonTableFixture,
           multiPlotValues: { workspace: { [multiImg.path]: 3 } }
         }
       })
+
+      const workspaceImgs = multiImg.revisions.workspace.imgs
+      const multiImgPlots = screen.getAllByTestId('multi-image-cell')
+      const workspaceImgEl = within(multiImgPlots[0]).getByRole('img')
 
       expect(workspaceImgEl).toHaveAttribute('src', workspaceImgs[3].url)
     })
@@ -1832,17 +1843,11 @@ describe('App', () => {
         comparison: comparisonTableFixture
       })
 
-      const multiImg = comparisonTableFixture.plots[3]
-      const mainImgs = multiImg.revisions.main.imgs
-
+      const mainImgs = comparisonTableFixture.plots[3].revisions.main.imgs
       const multiImgPlots = screen.getAllByTestId('multi-image-cell')
+      const slider = within(multiImgPlots[1]).getByRole('slider')
 
-      sendSetDataMessage({
-        comparison: {
-          ...comparisonTableFixture,
-          multiPlotValues: { main: { [multiImg.path]: 14 } }
-        }
-      })
+      fireEvent.change(slider, { target: { value: 14 } })
 
       expect(within(multiImgPlots[1]).getByRole('img')).toHaveAttribute(
         'src',
@@ -1852,7 +1857,6 @@ describe('App', () => {
       const dataWithLessMainImages = {
         comparison: {
           ...comparisonTableFixture,
-          multiPlotValues: { main: { [multiImg.path]: 14 } },
           plots: comparisonTableFixture.plots.map(plot =>
             plot.path.includes('image')
               ? {
