@@ -1,8 +1,24 @@
-import React from 'react'
-import { Welcome } from './Welcome'
+import React, { useEffect } from 'react'
 import { AddColumns } from './AddColumns'
 import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
+import { redirectToSetup } from '../../util/messages'
 
-export const GetStarted: React.FC<{ showWelcome: boolean }> = ({
-  showWelcome
-}) => <EmptyState>{showWelcome ? <Welcome /> : <AddColumns />}</EmptyState>
+export const GetStarted: React.FC<{ noExpsToDisplay: boolean }> = ({
+  noExpsToDisplay
+}) => {
+  useEffect(() => {
+    if (noExpsToDisplay) {
+      redirectToSetup()
+    }
+  }, [noExpsToDisplay])
+
+  return (
+    <EmptyState>
+      {noExpsToDisplay ? (
+        'No experiments to display. Redirecting to setup...'
+      ) : (
+        <AddColumns />
+      )}
+    </EmptyState>
+  )
+}

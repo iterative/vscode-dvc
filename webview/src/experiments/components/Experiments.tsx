@@ -184,7 +184,7 @@ export const ExperimentsTable: React.FC = () => {
   const hasOnlyDefaultColumns = columns.length <= 1
   const hasNoRows = data.length === 0
   if (hasOnlyDefaultColumns || hasNoRows) {
-    return <GetStarted showWelcome={!hasColumns || hasNoRows} />
+    return <GetStarted noExpsToDisplay={!hasColumns || hasNoRows} />
   }
   return (
     <RowSelectionProvider>

@@ -147,6 +147,8 @@ export class WebviewMessages {
           RegisteredCommands.EXPERIMENT_FILTER_ADD_STARRED,
           this.dvcRoot
         )
+      case MessageFromWebviewType.REDIRECT_TO_SETUP:
+        return this.redirectToSetup()
 
       case MessageFromWebviewType.SELECT_COLUMNS:
         return this.setColumnsStatus()
@@ -263,6 +265,22 @@ export class WebviewMessages {
       undefined,
       undefined
     )
+  }
+
+  private async redirectToSetup() {
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_REDIRECT_TO_SETUP,
+      undefined,
+      undefined
+    )
+
+    await commands.executeCommand(RegisteredCommands.SETUP_SHOW_EXPERIMENTS, {
+      dvcRoot: this.dvcRoot
+    })
+
+    const webview = this.getWebview()
+
+    return webview?.dispose()
   }
 
   private refreshData() {

@@ -30,6 +30,7 @@ export enum MessageFromWebviewType {
   OPEN_STUDIO = 'open-studio',
   OPEN_STUDIO_PROFILE = 'open-studio-profile',
   PUSH_EXPERIMENT = 'push-experiment',
+  REDIRECT_TO_SETUP = 'redirect-to-setup',
   REMOVE_COLUMN_FILTERS = 'remove-column-filters',
   REMOVE_COLUMN_SORT = 'remove-column-sort',
   REMOVE_EXPERIMENT = 'remove-experiment',
@@ -118,6 +119,9 @@ export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.EXPORT_PLOT_DATA_AS_TSV
       payload: string
+    }
+  | {
+      type: MessageFromWebviewType.REDIRECT_TO_SETUP
     }
   | {
       type: MessageFromWebviewType.REORDER_COLUMNS
