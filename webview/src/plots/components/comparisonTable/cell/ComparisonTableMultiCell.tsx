@@ -61,6 +61,7 @@ export const ComparisonTableMultiCell: React.FC<{
           min="0"
           max={maxStep}
           type="range"
+          value={currentStep}
           onChange={event => {
             if (!event.target) {
               return
