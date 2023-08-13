@@ -1,13 +1,15 @@
-import React, { useRef, useState, CSSProperties, useContext } from 'react'
+import React, { useRef, useState, CSSProperties } from 'react'
 import cx from 'classnames'
+import { useDispatch } from 'react-redux'
 import styles from './styles.module.scss'
 import { TableHead } from './header/TableHead'
-import { RowSelectionContext } from './RowSelectionContext'
 import { TableContent } from './body/TableContent'
 import { InstanceProp } from '../../util/interfaces'
+import { clearSelectedRows } from '../../state/rowSelectionSlice'
 
 export const Table: React.FC<InstanceProp> = ({ instance }) => {
-  const { clearSelectedRows } = useContext(RowSelectionContext)
+  const dispatch = useDispatch()
+
   const [expColumnNeedsShadow, setExpColumnNeedsShadow] = useState(false)
   const [tableHeadHeight, setTableHeadHeight] = useState(55)
 
@@ -27,7 +29,7 @@ export const Table: React.FC<InstanceProp> = ({ instance }) => {
         ref={tableRef}
         onKeyUp={e => {
           if (e.key === 'Escape') {
-            clearSelectedRows?.()
+            dispatch(clearSelectedRows())
           }
         }}
       >
