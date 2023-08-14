@@ -25,7 +25,6 @@ import { Table } from './table/Table'
 import styles from './table/styles.module.scss'
 import { ErrorState } from './emptyState/ErrorState'
 import { GetStarted } from './emptyState/GetStarted'
-import { RowSelectionProvider } from './table/RowSelectionContext'
 import { CellValue } from './table/content/Cell'
 import { AddStage } from './AddStage'
 import { ExperimentCell } from './table/content/ExperimentCell'
@@ -184,10 +183,10 @@ export const ExperimentsTable: React.FC = () => {
     return <GetStarted showWelcome={!hasColumns || hasNoRows} />
   }
   return (
-    <RowSelectionProvider>
+    <>
       <Table instance={instance} />
       {!hasConfig && <AddStage />}
-    </RowSelectionProvider>
+    </>
   )
 }
 
