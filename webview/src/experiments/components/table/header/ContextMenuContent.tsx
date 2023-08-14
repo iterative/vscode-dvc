@@ -8,7 +8,7 @@ import { SortOrder, getSortDetails, isFromExperimentColumn } from './util'
 import { MessagesMenu } from '../../../../shared/components/messagesMenu/MessagesMenu'
 import { MessagesMenuOptionProps } from '../../../../shared/components/messagesMenu/MessagesMenuOption'
 import { ExperimentsState } from '../../../store'
-import { ColumnWithGroup } from '../../../util/buildColumns'
+import { ColumnWithGroup } from '../body/columns/Columns'
 
 const sortOption = (
   label: SortOrder,

@@ -1,5 +1,6 @@
 import { copyOriginalColors } from 'dvc/src/experiments/model/status/colors'
-import { Commit, TableData } from 'dvc/src/experiments/webview/contract'
+import { Commit } from 'dvc/src/experiments/webview/contract'
+import { TableDataState } from '../experiments/state/tableDataSlice'
 
 const matchAndTransform = (
   rows: Commit[],
@@ -21,10 +22,10 @@ const matchAndTransform = (
 }
 
 const transformRows = (
-  fixture: TableData,
+  fixture: TableDataState,
   labelOrIds: string[],
   transform: (source: Commit) => Commit
-) => {
+): TableDataState => {
   const [workspace, main] = fixture.rows
 
   const starredRows = [
@@ -38,12 +39,12 @@ const transformRows = (
   return {
     ...fixture,
     rows: starredRows
-  } as TableData
+  }
 }
 
 const setRowProperty =
   (prop: keyof Commit, value: unknown) =>
-  (fixture: TableData, labelOrIds: string[]) => {
+  (fixture: TableDataState, labelOrIds: string[]) => {
     return transformRows(fixture, labelOrIds, row => ({
       ...row,
       [prop]: value
@@ -53,9 +54,9 @@ const setRowProperty =
 export const setExperimentsAsStarred = setRowProperty('starred', true)
 
 export const setExperimentsAsSelected = (
-  fixture: TableData,
+  fixture: TableDataState,
   labelOrIds: string[]
-) => {
+): TableDataState => {
   let colors = [...copyOriginalColors()].reverse()
   const nextColor = () => {
     if (colors.length === 0) {
