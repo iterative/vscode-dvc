@@ -21,7 +21,6 @@ export const tableDataInitialState: TableDataState = {
   filters: [],
   hasBranchesToSelect: true,
   hasCheckpoints: false,
-  hasColumns: false,
   hasConfig: false,
   hasData: false,
   hasMoreCommits: {},
@@ -76,9 +75,6 @@ export const tableDataSlice = createSlice({
     },
     updateHasCheckpoints: (state, action: PayloadAction<boolean>) => {
       state.hasCheckpoints = action.payload
-    },
-    updateHasColumns: (state, action: PayloadAction<boolean>) => {
-      state.hasColumns = action.payload
     },
     updateHasConfig: (state, action: PayloadAction<boolean>) => {
       state.hasConfig = action.payload
@@ -141,7 +137,6 @@ export const {
   updateFilters,
   updateHasBranchesToSelect,
   updateHasCheckpoints,
-  updateHasColumns,
   updateHasConfig,
   updateHasMoreCommits,
   updateHasRunningWorkspaceExperiment,

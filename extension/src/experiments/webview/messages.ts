@@ -80,7 +80,7 @@ export class WebviewMessages {
     const data = await this.getWebviewData()
 
     const hasNoRows = data.rows.length === 0
-    const hasNoData = !data.hasColumns || hasNoRows
+    const hasNoData = !this.columns.hasNonDefaultColumns() || hasNoRows
 
     if (hasNoData && !data.cliError) {
       await commands.executeCommand(RegisteredCommands.SETUP_SHOW_EXPERIMENTS)
@@ -306,7 +306,6 @@ export class WebviewMessages {
       filters,
       hasBranchesToSelect,
       hasCheckpoints,
-      hasColumns,
       hasConfig,
       hasMoreCommits,
       hasRunningWorkspaceExperiment,
@@ -325,7 +324,6 @@ export class WebviewMessages {
       this.experiments.getFilters(),
       this.experiments.getAvailableBranchesToShow().length > 0,
       this.experiments.hasCheckpoints(),
-      this.columns.hasNonDefaultColumns(),
       this.pipeline.hasPipeline(),
       this.experiments.getHasMoreCommits(),
       this.experiments.hasRunningWorkspaceExperiment(),
@@ -350,7 +348,6 @@ export class WebviewMessages {
       filters: filters.map(({ path }) => path),
       hasBranchesToSelect,
       hasCheckpoints,
-      hasColumns,
       hasConfig,
       hasMoreCommits,
       hasRunningWorkspaceExperiment,

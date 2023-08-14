@@ -39,7 +39,6 @@ const tableData: TableDataState = {
   filters: ['params:params.yaml:lr'],
   hasBranchesToSelect: true,
   hasCheckpoints: true,
-  hasColumns: true,
   hasConfig: true,
   hasData: true,
   hasMoreCommits: { main: true },

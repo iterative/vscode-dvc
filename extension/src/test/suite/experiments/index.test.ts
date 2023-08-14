@@ -134,7 +134,6 @@ suite('Experiments Test Suite', () => {
         columns: columnsFixture,
         filters: [],
         hasCheckpoints: true,
-        hasColumns: true,
         hasConfig: true,
         hasRunningWorkspaceExperiment: true,
         rows: rowsFixture,
