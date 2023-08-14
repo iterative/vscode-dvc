@@ -258,7 +258,20 @@ describe('ComparisonTable', () => {
     ] as Revision[]
 
     renderTable(
-      { ...comparisonTableFixture, revisions: newRevisions },
+      {
+        ...comparisonTableFixture,
+        plots: comparisonTableFixture.plots.map(plot => ({
+          ...plot,
+          revisions: {
+            ...plot.revisions,
+            [newRevName]: {
+              id: newRevName,
+              imgs: [{ errors: undefined, loading: false, url: undefined }]
+            }
+          }
+        })),
+        revisions: newRevisions
+      },
       rerender
     )
     const headers = getHeaders().map(header => header.textContent)
