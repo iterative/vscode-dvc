@@ -24,11 +24,11 @@ import {
 import { Table } from './table/Table'
 import styles from './table/styles.module.scss'
 import { ErrorState } from './emptyState/ErrorState'
-import { GetStarted } from './emptyState/GetStarted'
 import { RowSelectionProvider } from './table/RowSelectionContext'
 import { CellValue } from './table/content/Cell'
 import { AddStage } from './AddStage'
 import { ExperimentCell } from './table/content/ExperimentCell'
+import { AddColumns } from './emptyState/AddColumns'
 import { buildColumns, columnHelper } from '../util/buildColumns'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
@@ -124,7 +124,6 @@ export const ExperimentsTable: React.FC = () => {
     columns: columnsData,
     columnOrder: columnOrderData,
     columnWidths,
-    hasColumns,
     hasConfig,
     rows: data
   } = useSelector((state: ExperimentsState) => state.tableData)
@@ -182,10 +181,10 @@ export const ExperimentsTable: React.FC = () => {
   }, [toggleAllRowsExpanded])
 
   const hasOnlyDefaultColumns = columns.length <= 1
-  const hasNoRows = data.length === 0
-  if (hasOnlyDefaultColumns || hasNoRows) {
-    return <GetStarted noExpsToDisplay={!hasColumns || hasNoRows} />
+  if (hasOnlyDefaultColumns) {
+    return <AddColumns />
   }
+
   return (
     <RowSelectionProvider>
       <Table instance={instance} onColumnOrderChange={setColumnOrder} />

@@ -78,6 +78,15 @@ export class WebviewMessages {
       return
     }
     const data = await this.getWebviewData()
+
+    const hasNoRows = data.rows.length === 0
+    const hasNoData = !data.hasColumns || hasNoRows
+
+    if (hasNoData && !data.cliError) {
+      await commands.executeCommand(RegisteredCommands.SETUP_SHOW_EXPERIMENTS)
+      return webview.dispose()
+    }
+
     return webview.show(data)
   }
 
@@ -147,8 +156,6 @@ export class WebviewMessages {
           RegisteredCommands.EXPERIMENT_FILTER_ADD_STARRED,
           this.dvcRoot
         )
-      case MessageFromWebviewType.REDIRECT_TO_SETUP:
-        return this.redirectToSetup()
 
       case MessageFromWebviewType.SELECT_COLUMNS:
         return this.setColumnsStatus()
@@ -265,19 +272,6 @@ export class WebviewMessages {
       undefined,
       undefined
     )
-  }
-
-  private async redirectToSetup() {
-    sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_REDIRECT_TO_SETUP,
-      undefined,
-      undefined
-    )
-
-    await commands.executeCommand(RegisteredCommands.SETUP_SHOW_EXPERIMENTS)
-
-    const webview = this.getWebview()
-    webview?.dispose()
   }
 
   private refreshData() {

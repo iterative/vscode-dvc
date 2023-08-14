@@ -76,8 +76,5 @@ export const toggleStarred = (id: string) =>
     type: MessageFromWebviewType.TOGGLE_EXPERIMENT_STAR
   })
 
-export const redirectToSetup = () =>
-  sendMessage({ type: MessageFromWebviewType.REDIRECT_TO_SETUP })
-
 export const refreshData = () =>
   sendMessage({ type: MessageFromWebviewType.REFRESH_EXP_DATA })

@@ -49,8 +49,6 @@ export const EventName = Object.assign(
     VIEWS_EXPERIMENTS_TABLE_MOVE_TO_START: 'views.experimentsTable.moveToStart',
     VIEWS_EXPERIMENTS_TABLE_OPEN_PARAMS_FILE:
       'views.experimentsTable.paramsFileOpened',
-    VIEWS_EXPERIMENTS_TABLE_REDIRECT_TO_SETUP:
-      'views.experimentsTable.redirectToSetup',
     VIEWS_EXPERIMENTS_TABLE_REFRESH: 'views.experimentsTable.refresh',
     VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_FILTER:
       'views.experimentsTable.removeColumnFilter',
@@ -251,7 +249,6 @@ export interface IEventNamePropertyMapping {
   }
   [EventName.VIEWS_EXPERIMENTS_TABLE_SET_MAX_HEADER_HEIGHT]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_SORT_COLUMN]: SortDefinition
-  [EventName.VIEWS_EXPERIMENTS_TABLE_REDIRECT_TO_SETUP]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_REFRESH]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_REMOVE_COLUMN_SORT]: {
     path: string

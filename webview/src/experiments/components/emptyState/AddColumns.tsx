@@ -5,24 +5,27 @@ import { ExperimentsState } from '../../store'
 import { StartButton } from '../../../shared/components/button/StartButton'
 import { IconButton } from '../../../shared/components/button/IconButton'
 import { Close } from '../../../shared/components/icons'
+import { EmptyState } from '../../../shared/components/emptyState/EmptyState'
 
 export const AddColumns: React.FC = () => {
   const showOnlyChanged = useSelector(
     (state: ExperimentsState) => state.tableData.showOnlyChanged
   )
   return (
-    <div>
-      <p>No Columns Selected.</p>
-      <StartButton onClick={selectColumns} text="Add Columns" />
-      {showOnlyChanged && (
-        <IconButton
-          icon={Close}
-          appearance="secondary"
-          isNested={true}
-          onClick={toggleShowOnlyChanged}
-          text="Disable Only Changed"
-        />
-      )}
-    </div>
+    <EmptyState>
+      <div>
+        <p>No Columns Selected.</p>
+        <StartButton onClick={selectColumns} text="Add Columns" />
+        {showOnlyChanged && (
+          <IconButton
+            icon={Close}
+            appearance="secondary"
+            isNested={true}
+            onClick={toggleShowOnlyChanged}
+            text="Disable Only Changed"
+          />
+        )}
+      </div>
+    </EmptyState>
   )
 }
