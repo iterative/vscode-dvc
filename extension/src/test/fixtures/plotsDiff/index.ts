@@ -811,6 +811,7 @@ export const getComparisonWebviewMessage = (
 
   return {
     revisions: getRevisions(),
+    multiPlotValues: {},
     plots: Object.values(plotAcc),
     width: DEFAULT_PLOT_WIDTH,
     height: DEFAULT_PLOT_HEIGHT

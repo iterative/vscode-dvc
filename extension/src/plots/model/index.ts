@@ -33,7 +33,8 @@ import {
   DEFAULT_NB_ITEMS_PER_ROW,
   PlotHeight,
   SmoothPlotValues,
-  ImagePlot
+  ImagePlot,
+  ComparisonMultiPlotValues
 } from '../webview/contract'
 import {
   EXPERIMENT_WORKSPACE_ID,
@@ -80,6 +81,7 @@ export class PlotsModel extends ModelWithPersistence {
 
   private comparisonData: ComparisonData = {}
   private comparisonOrder: string[]
+  private comparisonMultiPlotValues: ComparisonMultiPlotValues = {}
   private smoothPlotValues: SmoothPlotValues = {}
 
   private revisionData: RevisionData = {}
@@ -111,6 +113,10 @@ export class PlotsModel extends ModelWithPersistence {
     this.customPlotsOrder = this.revive(PersistenceKey.PLOTS_CUSTOM_ORDER, [])
     this.smoothPlotValues = this.revive(
       PersistenceKey.PLOTS_SMOOTH_PLOT_VALUES,
+      {}
+    )
+    this.comparisonMultiPlotValues = this.revive(
+      PersistenceKey.PLOTS_COMPARISON_MULTI_PLOT_VALUES,
       {}
     )
 
@@ -307,6 +313,26 @@ export class PlotsModel extends ModelWithPersistence {
     this.persist(PersistenceKey.PLOT_COMPARISON_ORDER, this.comparisonOrder)
   }
 
+  public setComparisonMultiPlotValue(
+    revision: string,
+    path: string,
+    value: number
+  ) {
+    if (!this.comparisonMultiPlotValues[revision]) {
+      this.comparisonMultiPlotValues[revision] = {}
+    }
+
+    this.comparisonMultiPlotValues[revision][path] = value
+    this.persist(
+      PersistenceKey.PLOTS_COMPARISON_MULTI_PLOT_VALUES,
+      this.comparisonMultiPlotValues
+    )
+  }
+
+  public getComparisonMultiPlotValues() {
+    return this.comparisonMultiPlotValues
+  }
+
   public getSelectedRevisionIds() {
     return this.experiments.getSelectedRevisions().map(({ id }) => id)
   }
@@ -394,6 +420,7 @@ export class PlotsModel extends ModelWithPersistence {
       ...this.comparisonData,
       ...comparisonData
     }
+
     this.revisionData = {
       ...this.revisionData,
       ...revisionData

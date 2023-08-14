@@ -44,6 +44,7 @@ export enum MessageFromWebviewType {
   RESIZE_COLUMN = 'resize-column',
   RESIZE_PLOTS = 'resize-plots',
   SAVE_STUDIO_TOKEN = 'save-studio-token',
+  SET_COMPARISON_MULTI_PLOT_VALUE = 'update-comparison-multi-plot-value',
   SET_SMOOTH_PLOT_VALUE = 'update-smooth-plot-value',
   SHOW_EXPERIMENT_LOGS = 'show-experiment-logs',
   SHOW_WALKTHROUGH = 'show-walkthrough',
@@ -210,6 +211,10 @@ export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.REORDER_PLOTS_COMPARISON_ROWS
       payload: string[]
+    }
+  | {
+      type: MessageFromWebviewType.SET_COMPARISON_MULTI_PLOT_VALUE
+      payload: { path: string; revision: string; value: number }
     }
   | {
       type: MessageFromWebviewType.REORDER_PLOTS_CUSTOM
