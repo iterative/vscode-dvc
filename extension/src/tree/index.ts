@@ -55,6 +55,8 @@ export const getCliErrorTreeItem = (
 
   treeItem.iconPath = new ThemeIcon('blank')
 
+  treeItem.contextValue = 'cliError'
+
   treeItem.command = {
     command: RegisteredCommands.EXTENSION_SHOW_OUTPUT,
     title: 'Show DVC Output'

@@ -450,6 +450,12 @@
         "category": "DVC"
       },
       {
+        "title": "Refresh Experiments",
+        "command": "dvc.views.experiments.refresh",
+        "category": "DVC",
+        "icon": "$(refresh)"
+      },
+      {
         "title": "Stop",
         "command": "dvc.views.experimentsTree.stopExperiment",
         "category": "DVC",
@@ -1246,6 +1252,11 @@
           "command": "dvc.views.experiments.branchExperiment",
           "group": "inline@2",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem =~ /^(experiment|commit)$/ && !dvc.experiment.running.workspace"
+        },
+        {
+          "command": "dvc.views.experiments.refresh",
+          "group": "inline",
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == cliError"
         },
         {
           "command": "dvc.views.experimentsTree.removeExperiment",

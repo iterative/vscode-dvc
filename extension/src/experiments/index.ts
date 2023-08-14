@@ -585,6 +585,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getAvailableBranchesToSelect()
   }
 
+  public refresh() {
+    return this.data.update()
+  }
+
   protected sendInitialWebviewData() {
     return this.webviewMessages.sendWebviewMessage()
   }
@@ -632,7 +636,7 @@ export class Experiments extends BaseRepository<TableData> {
       () => this.selectFirstColumns(),
       (branchesSelected: string[]) => this.selectBranches(branchesSelected),
       (column: ColumnLike) => this.addFilter(column),
-      () => this.data.update()
+      () => this.refresh()
     )
 
     this.dispose.track(
