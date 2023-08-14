@@ -1,11 +1,11 @@
 import { screen } from '@testing-library/react'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
-import {
-  Column,
-  ColumnType,
-  TableData
-} from 'dvc/src/experiments/webview/contract'
+import { Column, ColumnType } from 'dvc/src/experiments/webview/contract'
 import defaultTableData from 'dvc/src/test/fixtures/expShow/base/tableData'
+import {
+  TableDataState,
+  collectColumnData
+} from '../experiments/state/tableDataSlice'
 
 const defaultColumn = ['Experiment', 'Created']
 
@@ -40,8 +40,9 @@ const columns = [
   }
 ]
 
-export const tableData: TableData = {
+export const tableData: TableDataState = {
   ...defaultTableData,
+  columnData: collectColumnData(columns as Column[]),
   columns: columns as Column[],
   hasRunningWorkspaceExperiment: false,
   rows: [

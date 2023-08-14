@@ -8,6 +8,12 @@ import { configureStore } from '@reduxjs/toolkit'
 import tableData from 'dvc/src/test/fixtures/expShow/base/tableData'
 import { TableContent } from './TableContent'
 import { experimentsReducers } from '../../../store'
+import { collectColumnData } from '../../../state/tableDataSlice'
+
+const tableStateData = {
+  ...tableData,
+  columnData: collectColumnData(tableData.columns)
+}
 
 jest.mock('../../../../shared/api')
 jest.mock('./ExperimentGroup')
@@ -813,7 +819,7 @@ describe('TableContent', () => {
       <Provider
         store={configureStore({
           preloadedState: {
-            tableData
+            tableData: tableStateData
           },
           reducer: experimentsReducers
         })}
