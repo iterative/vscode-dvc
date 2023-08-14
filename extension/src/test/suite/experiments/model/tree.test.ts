@@ -573,7 +573,7 @@ suite('Experiments Tree Test Suite', () => {
       )
     })
 
-    it('should be able to refresh experiments when there is a cli eror with dvc.views.experiments.refresh', async () => {
+    it('should be able to refresh experiments when there is a cli error with dvc.views.experiments.refresh', async () => {
       const { experiments, mockUpdateExperimentsData } = buildExperiments({
         disposer: disposable
       })
