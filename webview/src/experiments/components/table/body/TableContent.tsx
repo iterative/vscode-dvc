@@ -1,10 +1,12 @@
 import React, { Fragment, RefObject, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
+import { useVirtual } from '@tanstack/react-virtual'
 import { TableBody } from './TableBody'
 import { collectBranchWithRows } from './util'
 import { BranchDivider } from './branchDivider/BranchDivider'
 import { InstanceProp } from '../../../util/interfaces'
 import { updateRowOrder } from '../../../state/rowSelectionSlice'
+import { OVERSCAN_ROW_COUNT } from '../../../../shared/components/virtualizedGrid/VirtualizedGrid'
 
 interface TableContentProps extends InstanceProp {
   tableRef: RefObject<HTMLTableElement>
@@ -18,6 +20,13 @@ export const TableContent: React.FC<TableContentProps> = ({
 }) => {
   const { rows, flatRows } = instance.getRowModel()
   const dispatch = useDispatch()
+
+  const rowVirtualizer = useVirtual({
+    overscan: OVERSCAN_ROW_COUNT,
+    parentRef: tableRef,
+    size: rows.length
+  })
+  const { virtualItems: virtualRows } = rowVirtualizer
 
   useEffect(() => {
     dispatch(
@@ -37,7 +46,7 @@ export const TableContent: React.FC<TableContentProps> = ({
 
   return (
     <>
-      {collectBranchWithRows(rows).map(([branch, branchRows]) => {
+      {collectBranchWithRows(virtualRows, rows).map(([branch, branchRows]) => {
         return (
           <Fragment key={branch}>
             {branchRows.map((row, i) => {

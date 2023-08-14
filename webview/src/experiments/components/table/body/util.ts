@@ -1,10 +1,22 @@
 import { Row } from '@tanstack/react-table'
+import { VirtualItem } from '@tanstack/react-virtual'
 import {
   Experiment,
   WORKSPACE_BRANCH
 } from 'dvc/src/experiments/webview/contract'
 
+const isLastVirtualRow = (
+  virtualIndex: number,
+  virtualRowsLength: number
+): boolean => virtualIndex === virtualRowsLength - 1
+
+const isLastRowForBranch = (
+  next: Row<Experiment>,
+  branch: string | null
+): boolean => !next || next.original.branch !== branch
+
 export const collectBranchWithRows = (
+  virtualRows: VirtualItem[],
   rows: Row<Experiment>[]
 ): [string | typeof WORKSPACE_BRANCH, Row<Experiment>[]][] => {
   const branchesWithRows: [
@@ -14,7 +26,12 @@ export const collectBranchWithRows = (
 
   let branchRows = []
 
-  for (let i = 0; i < rows.length; i++) {
+  for (
+    let virtualIndex = 0;
+    virtualIndex < virtualRows.length;
+    virtualIndex++
+  ) {
+    const i = virtualRows[virtualIndex].index
     const row = rows[i]
     const branch = row.original.branch
     if (branch === undefined) {
@@ -22,7 +39,10 @@ export const collectBranchWithRows = (
     }
     const next = rows[i + 1]
     branchRows.push(row)
-    if (!next || next.original.branch !== branch) {
+    if (
+      isLastRowForBranch(next, branch) ||
+      isLastVirtualRow(virtualIndex, virtualRows.length)
+    ) {
       branchesWithRows.push([branch, branchRows])
       branchRows = []
     }
