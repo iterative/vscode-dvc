@@ -21,6 +21,7 @@ export const comparisonTableInitialState: ComparisonTableState = {
   hasData: false,
   height: DEFAULT_HEIGHT[PlotsSection.COMPARISON_TABLE],
   isCollapsed: DEFAULT_SECTION_COLLAPSED[PlotsSection.COMPARISON_TABLE],
+  multiPlotValues: {},
   plots: [],
   revisions: [],
   rowHeight: DEFAULT_ROW_HEIGHT,

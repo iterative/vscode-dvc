@@ -47,6 +47,7 @@ const Template: StoryFn = ({ plots, revisions }) => {
       <MockedState
         data={{
           height: DEFAULT_PLOT_HEIGHT,
+          multiPlotValues: {},
           plots,
           revisions,
           width: DEFAULT_NB_ITEMS_PER_ROW

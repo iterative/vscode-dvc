@@ -92,6 +92,8 @@ export const EventName = Object.assign(
     VIEWS_PLOTS_SECTION_TOGGLE: 'views.plots.toggleSection',
     VIEWS_PLOTS_SELECT_EXPERIMENTS: 'view.plots.selectExperiments',
     VIEWS_PLOTS_SELECT_PLOTS: 'view.plots.selectPlots',
+    VIEWS_PLOTS_SET_COMPARISON_MULTI_PLOT_VALUE:
+      'view.plots.setComparisonMultiPlotValue',
     VIEWS_PLOTS_SET_SMOOTH_PLOT_VALUE: 'view.plots.setSmoothPlotValues',
     VIEWS_PLOTS_ZOOM_PLOT: 'views.plots.zoomPlot',
     VIEWS_REORDER_PLOTS_CUSTOM: 'views.plots.customReordered',
@@ -296,6 +298,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_PLOTS_ZOOM_PLOT]: { isImage: boolean }
   [EventName.VIEWS_REORDER_PLOTS_CUSTOM]: undefined
   [EventName.VIEWS_REORDER_PLOTS_TEMPLATES]: undefined
+  [EventName.VIEWS_PLOTS_SET_COMPARISON_MULTI_PLOT_VALUE]: undefined
   [EventName.VIEWS_PLOTS_SET_SMOOTH_PLOT_VALUE]: undefined
 
   [EventName.VIEWS_PLOTS_PATH_TREE_OPENED]: DvcRootCount

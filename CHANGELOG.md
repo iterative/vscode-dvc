@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.39] - 2023-08-14
+
+### 🚀 New Features and Enhancements
+
+- Save comparison multi plot image values across sessions [#4476](https://github.com/iterative/vscode-dvc/pull/4476) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Fix image by step plots breaking on nonexistent steps [#4478](https://github.com/iterative/vscode-dvc/pull/4478) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Fix comparison table test [#4481](https://github.com/iterative/vscode-dvc/pull/4481) by [@julieg18](https://github.com/julieg18)
+- Refactor setting of experiment table column order via drag and drop [#4479](https://github.com/iterative/vscode-dvc/pull/4479) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.38] - 2023-08-10
 
 ### 🐛 Bug Fixes

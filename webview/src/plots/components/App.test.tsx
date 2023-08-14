@@ -225,6 +225,7 @@ describe('App', () => {
     renderAppWithOptionalData({
       comparison: {
         height: DEFAULT_PLOT_HEIGHT,
+        multiPlotValues: {},
         plots: [
           {
             path: 'training/plots/images/misclassified.jpg',
@@ -279,6 +280,7 @@ describe('App', () => {
     renderAppWithOptionalData({
       comparison: {
         height: DEFAULT_PLOT_HEIGHT,
+        multiPlotValues: {},
         plots: [
           {
             path: 'training/plots/images/image',
@@ -1757,6 +1759,25 @@ describe('App', () => {
 
       const workspaceImgs =
         comparisonTableFixture.plots[3].revisions.workspace.imgs
+      const multiImgPlots = screen.getAllByTestId('multi-image-cell')
+      const slider = within(multiImgPlots[0]).getByRole('slider')
+      const workspaceImgEl = within(multiImgPlots[0]).getByRole('img')
+
+      expect(workspaceImgEl).toHaveAttribute('src', workspaceImgs[0].url)
+
+      fireEvent.change(slider, { target: { value: 3 } })
+
+      expect(workspaceImgEl).toHaveAttribute('src', workspaceImgs[3].url)
+    })
+
+    it('should send a message when the slider changes', async () => {
+      renderAppWithOptionalData({
+        comparison: comparisonTableFixture
+      })
+
+      const multiImg = comparisonTableFixture.plots[3]
+      const workspacePlot = multiImg.revisions.workspace
+      const workspaceImgs = workspacePlot.imgs
 
       const multiImgPlots = screen.getAllByTestId('multi-image-cell')
       const slider = within(multiImgPlots[0]).getByRole('slider')
@@ -1765,6 +1786,34 @@ describe('App', () => {
       expect(workspaceImgEl).toHaveAttribute('src', workspaceImgs[0].url)
 
       fireEvent.change(slider, { target: { value: 3 } })
+
+      await waitFor(
+        () => {
+          expect(mockPostMessage).toHaveBeenCalledWith({
+            payload: {
+              path: multiImg.path,
+              revision: workspacePlot.id,
+              value: 3
+            },
+            type: MessageFromWebviewType.SET_COMPARISON_MULTI_PLOT_VALUE
+          })
+        },
+        { timeout: 1000 }
+      )
+    })
+
+    it('should set default slider value if given a saved value', () => {
+      const multiImg = comparisonTableFixture.plots[3]
+      renderAppWithOptionalData({
+        comparison: {
+          ...comparisonTableFixture,
+          multiPlotValues: { workspace: { [multiImg.path]: 3 } }
+        }
+      })
+
+      const workspaceImgs = multiImg.revisions.workspace.imgs
+      const multiImgPlots = screen.getAllByTestId('multi-image-cell')
+      const workspaceImgEl = within(multiImgPlots[0]).getByRole('img')
 
       expect(workspaceImgEl).toHaveAttribute('src', workspaceImgs[3].url)
     })
@@ -1795,7 +1844,6 @@ describe('App', () => {
       })
 
       const mainImgs = comparisonTableFixture.plots[3].revisions.main.imgs
-
       const multiImgPlots = screen.getAllByTestId('multi-image-cell')
       const slider = within(multiImgPlots[1]).getByRole('slider')
 
