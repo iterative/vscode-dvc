@@ -27,7 +27,7 @@ import { dragAndDrop, dragEnter, dragLeave } from '../../../test/dragDrop'
 import { DragEnterDirection } from '../../../shared/components/dragDrop/util'
 import { experimentsReducers } from '../../store'
 import { customQueries } from '../../../test/queries'
-import { TableDataState } from '../../state/tableDataSlice'
+import { collectColumnData } from '../../state/tableDataSlice'
 
 jest.mock('../../../shared/api')
 
@@ -43,6 +43,7 @@ describe('Table', () => {
       ...partialTableData,
       branches: ['main']
     }
+    tableData.columnData = collectColumnData(tableData.columns)
     return render(
       <Provider
         store={configureStore({
@@ -259,7 +260,7 @@ describe('Table', () => {
         id: 333
       }
 
-      const tableDataWithColumnSetting: TableDataState = {
+      const tableDataWithColumnSetting = {
         ...sortingTableDataFixture,
         columnWidths
       }
@@ -299,7 +300,7 @@ describe('Table', () => {
         id: 333
       }
 
-      const tableDataWithColumnSetting: TableDataState = {
+      const tableDataWithColumnSetting = {
         ...sortingTableDataFixture,
         columnWidths
       }

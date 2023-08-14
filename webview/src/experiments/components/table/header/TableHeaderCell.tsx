@@ -12,7 +12,7 @@ import { isExperimentColumn, isFirstLevelHeader } from '../../../util/columns'
 import { ExperimentsState } from '../../../store'
 import { ContextMenu } from '../../../../shared/components/contextMenu/ContextMenu'
 import { DragFunction } from '../../../../shared/components/dragDrop/Draggable'
-import { ColumnWithGroup } from '../../../util/buildColumns'
+import { ColumnWithGroup } from '../body/columns/Columns'
 import { Indicators } from '../Indicators'
 
 const getPercentResizer = (depth: number) => `${100 + depth * 105}%`
