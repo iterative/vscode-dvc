@@ -573,6 +573,23 @@ suite('Experiments Tree Test Suite', () => {
       )
     })
 
+    it('should be able to refresh experiments when there is a cli eror with dvc.views.experiments.refresh', async () => {
+      const { experiments, mockUpdateExperimentsData } = buildExperiments({
+        disposer: disposable
+      })
+
+      await experiments.isReady()
+
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENTS_REFRESH, {
+        dvcRoot: dvcDemoPath,
+        error: 'dvc cli error'
+      })
+
+      expect(mockUpdateExperimentsData).to.be.called
+    })
+
     it('should be able to queue an experiment from an existing one with dvc.views.experiments.queueExperiment', async () => {
       const { dvcExecutor, experimentsModel, mockGetOnlyOrPickProject } =
         await stubWorkspaceGetters(disposable)
