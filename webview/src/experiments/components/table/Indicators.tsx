@@ -97,9 +97,6 @@ export const Indicators = () => {
     (state: ExperimentsState) =>
       state.tableData.columns.filter(({ hasChildren }) => !hasChildren).length
   )
-  const hasColumns = useSelector(
-    (state: ExperimentsState) => state.tableData.hasColumns
-  )
 
   const showOnlyChanged = useSelector(
     (state: ExperimentsState) => state.tableData.showOnlyChanged
@@ -127,7 +124,6 @@ export const Indicators = () => {
         aria-label="columns"
         onClick={selectColumns}
         tooltipContent="Select Columns"
-        disabled={!hasColumns}
       >
         <Icon width={16} height={16} icon={ListFilter} />
       </Indicator>

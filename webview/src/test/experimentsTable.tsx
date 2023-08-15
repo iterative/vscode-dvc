@@ -52,10 +52,6 @@ export const renderTableWithNoColumns = () => {
   renderTable({ ...tableDataFixture, columns: [] })
 }
 
-export const renderTableWithNoRows = () => {
-  renderTable({ ...tableDataFixture, rows: [] })
-}
-
 export const renderTableWithSortingData = () => {
   return renderTable(sortingTableDataFixture)
 }
