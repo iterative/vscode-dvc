@@ -24,7 +24,6 @@ import {
   getDecoratableTreeItem,
   getErrorTooltip,
   getRootItem,
-  isErrorItem,
   isRoot
 } from '../../tree'
 import { IconName, Resource, ResourceLocator } from '../../resourceLocator'
@@ -37,6 +36,7 @@ import { Disposable } from '../../class/dispose'
 import { Commit, Experiment } from '../webview/contract'
 import { getMarkdownString } from '../../vscode/markdownString'
 import { truncateFromLeft } from '../../util/string'
+import { hasKey } from '../../util/object'
 
 type ExperimentAugmented = Experiment & {
   hasChildren: boolean
@@ -45,16 +45,23 @@ type ExperimentAugmented = Experiment & {
   type: ExperimentType
 }
 
+type ExperimentErrorItem = ErrorItem & { dvcRoot: string }
+
+const isExperimentErrorItem = (
+  maybeExperimentErrorItem: unknown
+): maybeExperimentErrorItem is ExperimentErrorItem =>
+  hasKey(maybeExperimentErrorItem, 'error')
+
 export class ExperimentsTree
   extends Disposable
-  implements TreeDataProvider<string | ExperimentItem | ErrorItem>
+  implements TreeDataProvider<string | ExperimentItem | ExperimentErrorItem>
 {
   public readonly onDidChangeTreeData: Event<string | void>
 
   private readonly experiments: WorkspaceExperiments
   private readonly resourceLocator: ResourceLocator
 
-  private readonly view: TreeView<string | ExperimentItem | ErrorItem>
+  private readonly view: TreeView<string | ExperimentItem | ExperimentErrorItem>
   private viewed = false
 
   constructor(
@@ -66,7 +73,7 @@ export class ExperimentsTree
     this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.view = this.dispose.track(
-      createTreeView<ExperimentItem | ErrorItem>(
+      createTreeView<ExperimentItem | ExperimentErrorItem>(
         'dvc.views.experimentsTree',
         this,
         true
@@ -86,7 +93,7 @@ export class ExperimentsTree
       return getRootItem(element)
     }
 
-    if (isErrorItem(element)) {
+    if (isExperimentErrorItem(element)) {
       const { error } = element
       return getCliErrorTreeItem(
         error,
@@ -125,7 +132,7 @@ export class ExperimentsTree
 
   public getChildren(
     element?: string | ExperimentItem
-  ): Promise<string[] | ExperimentItem[] | ErrorItem[]> {
+  ): Promise<string[] | ExperimentItem[] | ExperimentErrorItem[]> {
     if (!element) {
       return this.getRootElements()
     }
@@ -244,12 +251,12 @@ export class ExperimentsTree
 
   private getWorkspaceAndCommits(
     dvcRoot: string
-  ): ExperimentItem[] | ErrorItem[] {
+  ): ExperimentItem[] | ExperimentErrorItem[] {
     const repository = this.experiments.getRepository(dvcRoot)
 
     const cliError = repository.getCliError()
     if (cliError) {
-      return [{ error: cliError }]
+      return [{ dvcRoot, error: cliError }]
     }
 
     const summaryColumns = repository.getSummaryColumnOrder()

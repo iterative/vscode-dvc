@@ -47,7 +47,6 @@ import {
   renderTableWithoutRunningExperiments,
   renderTableWithPlaceholder,
   renderTableWithSortingData,
-  renderTableWithNoRows,
   selectedRows,
   setTableData,
   renderTableWithFilters
@@ -114,13 +113,6 @@ describe('App', () => {
 
     const noColumnsState = screen.queryByText('No Columns Selected.')
     expect(noColumnsState).not.toBeInTheDocument()
-  })
-
-  it('should show the no experiments empty state when no rows are provided', () => {
-    renderTableWithNoRows()
-
-    const noExperimentsState = screen.queryByText('No Experiments to Display.')
-    expect(noExperimentsState).toBeInTheDocument()
   })
 
   it('should show a refresh button if there is a CLI error', () => {
