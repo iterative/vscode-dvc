@@ -28,13 +28,19 @@ suite('data status --granular --unchanged --show-json', () => {
         'hist.csv',
         'model.pt',
         join('training', 'plots') + sep,
-        join('training', 'plots', 'images', 'misclassified.jpg'),
         join('training', 'plots', 'metrics', 'test', 'acc.tsv'),
         join('training', 'plots', 'metrics', 'test', 'loss.tsv'),
         join('training', 'plots', 'metrics', 'train', 'acc.tsv'),
         join('training', 'plots', 'metrics', 'train', 'loss.tsv'),
         join('training', 'plots', 'sklearn', 'confusion_matrix.json')
-      ].sort()
+      ]
+
+      for (let i = 0; i < 15; i++) {
+        demoRepoTrackedData.push(
+          join('training', 'plots', 'images', 'misclassified', `${i}.jpg`)
+        )
+      }
+      demoRepoTrackedData.sort()
 
       const collectedPaths = [
         ...(output.committed?.modified || []),
