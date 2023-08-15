@@ -225,6 +225,7 @@ suite('Experiments Tree Test Suite', () => {
 
       const firstArg = getFirstArgOfLastCall(messageSpy)
 
+      // eslint-disable-next-line no-console
       console.log('selectedRevisions', firstArg)
 
       expect(
