@@ -18,7 +18,11 @@ import {
 } from '../../../../vscode/quickPick'
 import { PlotPath } from '../../../../plots/paths/collect'
 import { REVISIONS } from '../../../fixtures/plotsDiff'
-import { bypassProcessManagerDebounce, getMockNow } from '../../util'
+import {
+  bypassProcessManagerDebounce,
+  closeAllEditors,
+  getMockNow
+} from '../../util'
 
 suite('Plots Paths Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -29,6 +33,7 @@ suite('Plots Paths Tree Test Suite', () => {
 
   afterEach(() => {
     disposable.dispose()
+    return closeAllEditors()
   })
 
   describe('PlotsPathsTree', () => {

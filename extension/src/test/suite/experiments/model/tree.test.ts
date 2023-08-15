@@ -13,6 +13,7 @@ import { UNSELECTED } from '../../../../experiments/model/status'
 import {
   bypassProcessManagerDebounce,
   bypassProgressCloseDelay,
+  closeAllEditors,
   getFirstArgOfLastCall,
   getMockNow,
   getTimeSafeDisposer,
@@ -52,7 +53,7 @@ suite('Experiments Tree Test Suite', () => {
   })
 
   afterEach(() => {
-    return disposable.disposeAndFlush()
+    return Promise.all([closeAllEditors(), disposable.disposeAndFlush()])
   })
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -210,8 +211,6 @@ suite('Experiments Tree Test Suite', () => {
         })
       )
 
-      const messageSent = waitForSpyCall(messageSpy, messageSpy.callCount)
-
       const selectExperiments = commands.executeCommand(
         RegisteredCommands.EXPERIMENT_SELECT
       )
@@ -219,7 +218,10 @@ suite('Experiments Tree Test Suite', () => {
       await quickPickCreated
       mockQuickPick.selectedItems = [selectedItem]
       inputAccepted.fire()
-      await Promise.all([selectExperiments, messageSent])
+      const messageSent = waitForSpyCall(messageSpy, messageSpy.callCount)
+      await selectExperiments
+
+      await messageSent
 
       expect(mockCreateQuickPick).to.be.calledOnce
 
