@@ -289,11 +289,6 @@ WithDeeplyNestedHeaders.args = {
 export const LoadingData = Template.bind({})
 LoadingData.args = { tableData: undefined }
 
-export const WithNoExperiments = Template.bind({})
-WithNoExperiments.args = {
-  tableData: { ...tableData, rows: [] }
-}
-
 export const WithNoColumns = Template.bind({})
 WithNoColumns.args = {
   tableData: { ...tableData, columns: [] }
