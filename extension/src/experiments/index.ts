@@ -160,7 +160,7 @@ export class Experiments extends BaseRepository<TableData> {
     this.dispose.track(
       workspace.onDidChangeConfiguration((event: ConfigurationChangeEvent) => {
         if (event.affectsConfiguration(ConfigKey.EXP_TABLE_HEAD_MAX_HEIGHT)) {
-          void this.data.update()
+          void this.refresh()
         }
       })
     )
@@ -585,6 +585,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getAvailableBranchesToSelect()
   }
 
+  public refresh() {
+    return this.data.update()
+  }
+
   protected sendInitialWebviewData() {
     return this.webviewMessages.sendWebviewMessage()
   }
@@ -632,7 +636,7 @@ export class Experiments extends BaseRepository<TableData> {
       () => this.selectFirstColumns(),
       (branchesSelected: string[]) => this.selectBranches(branchesSelected),
       (column: ColumnLike) => this.addFilter(column),
-      () => this.data.update()
+      () => this.refresh()
     )
 
     this.dispose.track(
@@ -675,7 +679,7 @@ export class Experiments extends BaseRepository<TableData> {
       void pollSignalFileForProcess(this.dvcLiveOnlySignalFile, () => {
         this.dvcLiveOnlyCleanupInitialized = false
         if (this.hasRunningWorkspaceExperiment()) {
-          void this.data.update()
+          void this.refresh()
         }
       })
     }
