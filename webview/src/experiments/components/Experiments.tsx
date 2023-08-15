@@ -18,7 +18,7 @@ import {
 import { Table } from './table/Table'
 import styles from './table/styles.module.scss'
 import { ErrorState } from './emptyState/ErrorState'
-import { GetStarted } from './emptyState/GetStarted'
+import { AddColumns } from './emptyState/AddColumns'
 import { AddStage } from './AddStage'
 import { buildColumns } from './table/body/columns/Columns'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
@@ -55,7 +55,6 @@ export const ExperimentsTable: React.FC = () => {
     columnData,
     columnOrder: columnOrderData,
     columnWidths,
-    hasColumns,
     hasConfig,
     rows: data
   } = useSelector((state: ExperimentsState) => state.tableData)
@@ -110,10 +109,10 @@ export const ExperimentsTable: React.FC = () => {
   }, [toggleAllRowsExpanded])
 
   const hasOnlyDefaultColumns = columns.length <= 1
-  const hasNoRows = data.length === 0
-  if (hasOnlyDefaultColumns || hasNoRows) {
-    return <GetStarted showWelcome={!hasColumns || hasNoRows} />
+  if (hasOnlyDefaultColumns) {
+    return <AddColumns />
   }
+
   return (
     <>
       <Table instance={instance} />

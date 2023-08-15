@@ -478,7 +478,7 @@ describe('ExperimentsTree', () => {
 
       const children = await experimentsTree.getChildren()
 
-      expect(children).toStrictEqual([{ error: errorMsg }])
+      expect(children).toStrictEqual([{ dvcRoot: 'repo', error: errorMsg }])
     })
   })
 

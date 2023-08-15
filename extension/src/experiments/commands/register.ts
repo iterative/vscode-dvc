@@ -270,6 +270,12 @@ export const registerExperimentCommands = (
   registerExperimentRunCommands(experiments, internalCommands, setup)
 
   internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENTS_REFRESH,
+    ({ dvcRoot }: { dvcRoot: string }) =>
+      experiments.getRepository(dvcRoot).refresh()
+  )
+
+  internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_TOGGLE,
     ({ dvcRoot, id }: ExperimentDetails) =>
       experiments.getRepository(dvcRoot).toggleExperimentStatus(id)
