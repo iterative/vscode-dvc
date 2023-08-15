@@ -17,7 +17,6 @@ import {
   updateFilters,
   updateHasBranchesToSelect,
   updateHasCheckpoints,
-  updateHasColumns,
   updateHasConfig,
   updateHasMoreCommits,
   updateHasRunningWorkspaceExperiment,
@@ -64,9 +63,6 @@ export const App: React.FC<Record<string, unknown>> = () => {
                 continue
               case 'hasCheckpoints':
                 dispatch(updateHasCheckpoints(data.data.hasCheckpoints))
-                continue
-              case 'hasColumns':
-                dispatch(updateHasColumns(data.data.hasColumns))
                 continue
               case 'hasConfig':
                 dispatch(updateHasConfig(data.data.hasConfig))

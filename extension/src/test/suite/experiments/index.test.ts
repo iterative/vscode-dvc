@@ -134,7 +134,6 @@ suite('Experiments Test Suite', () => {
         columns: columnsFixture,
         filters: [],
         hasCheckpoints: true,
-        hasColumns: true,
         hasConfig: true,
         hasRunningWorkspaceExperiment: true,
         rows: rowsFixture,
@@ -169,6 +168,45 @@ suite('Experiments Test Suite', () => {
       expect(webview === sameWebview).to.be.true
 
       expect(windowSpy).not.to.have.been.called
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should open setup and close experiments webview if there is no data and no cli error', async () => {
+      const { webview, experiments } = await buildExperimentsWebview({
+        disposer: disposable,
+        expShow: [
+          {
+            error: { type: 'ErrorType', msg: 'error message' },
+            rev: 'workspace'
+          }
+        ]
+      })
+
+      await experiments.isReady()
+
+      const webviewDisposeStub = stub(webview, 'dispose')
+      const executeCommandSpy = spy(commands, 'executeCommand')
+
+      const data = generateTestExpShowOutput({}, { rev: 'main' })
+
+      void experiments.setState({
+        availableNbCommits: { main: 1 },
+        gitLog: '',
+        expShow: data,
+        rowOrder: []
+      })
+
+      const webviewDisposeEvent = new Promise(resolve => {
+        webviewDisposeStub.onFirstCall().callsFake(() => {
+          resolve(undefined)
+        })
+      })
+
+      await webviewDisposeEvent
+
+      expect(executeCommandSpy).to.be.calledWith(
+        RegisteredCommands.SETUP_SHOW_EXPERIMENTS
+      )
+      expect(webviewDisposeStub).to.be.called
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should set hasConfig to false if there are no stages', async () => {

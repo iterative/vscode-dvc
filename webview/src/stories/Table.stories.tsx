@@ -52,7 +52,6 @@ const tableData = getTableState({
   filters: ['params:params.yaml:lr'],
   hasBranchesToSelect: true,
   hasCheckpoints: true,
-  hasColumns: true,
   hasConfig: true,
   hasMoreCommits: { main: true },
   hasRunningWorkspaceExperiment: true,
@@ -289,11 +288,6 @@ WithDeeplyNestedHeaders.args = {
 
 export const LoadingData = Template.bind({})
 LoadingData.args = { tableData: undefined }
-
-export const WithNoExperiments = Template.bind({})
-WithNoExperiments.args = {
-  tableData: { ...tableData, rows: [] }
-}
 
 export const WithNoColumns = Template.bind({})
 WithNoColumns.args = {

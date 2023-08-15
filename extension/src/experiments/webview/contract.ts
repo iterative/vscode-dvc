@@ -103,7 +103,6 @@ export type TableData = {
   filters: string[]
   hasBranchesToSelect: boolean
   hasCheckpoints: boolean
-  hasColumns: boolean
   hasConfig: boolean
   hasMoreCommits: Record<string, boolean>
   hasRunningWorkspaceExperiment: boolean
