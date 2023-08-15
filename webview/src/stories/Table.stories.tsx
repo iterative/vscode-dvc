@@ -11,6 +11,7 @@ import survivalTableData from 'dvc/src/test/fixtures/expShow/survival/tableData'
 import { timestampColumn } from 'dvc/src/experiments/columns/constants'
 import { delay } from 'dvc/src/util/time'
 import {
+  ColumnType,
   ExecutorStatus,
   TableData,
   isRunning
@@ -37,7 +38,7 @@ import {
 
 const getTableState = (data: TableData): TableDataState => ({
   ...data,
-  columnData: collectColumnData(survivalTableData.columns),
+  columnData: collectColumnData(data.columns),
   hasData: true
 })
 
@@ -291,12 +292,16 @@ LoadingData.args = { tableData: undefined }
 
 export const WithNoColumns = Template.bind({})
 WithNoColumns.args = {
-  tableData: { ...tableData, columns: [] }
+  tableData: { ...tableData, columnData: {}, columns: [] }
 }
 
 export const WithOnlyTimestamp = Template.bind({})
 WithOnlyTimestamp.args = {
-  tableData: { ...tableData, columns: [timestampColumn] }
+  tableData: {
+    ...tableData,
+    columnData: { [ColumnType.TIMESTAMP]: [timestampColumn] },
+    columns: [timestampColumn]
+  }
 }
 
 export const WithNoSortsOrFilters = Template.bind({})
