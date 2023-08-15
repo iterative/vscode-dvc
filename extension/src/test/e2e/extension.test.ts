@@ -201,13 +201,18 @@ describe('Source Control View', function () {
       `sklearn, ${join('training', 'plots')}`,
       `test, ${join('training', 'plots', 'metrics')}`,
       `train, ${join('training', 'plots', 'metrics')}`,
-      `misclassified.jpg, ${join('training', 'plots', 'images')}`,
       `acc.tsv, ${join('training', 'plots', 'metrics', 'test')}`,
       `loss.tsv, ${join('training', 'plots', 'metrics', 'test')}`,
       `acc.tsv, ${join('training', 'plots', 'metrics', 'train')}`,
       `loss.tsv, ${join('training', 'plots', 'metrics', 'train')}`,
       `confusion_matrix.json, ${join('training', 'plots', 'sklearn')}`
     ]
+    for (let i = 0; i < 15; i++) {
+      expectedScmItemLabels.push(
+        `${i}.jpg, ${join('training', 'plots', 'images', 'misclassified')}`
+      )
+    }
+
     const expectedScmSet = new Set(expectedScmItemLabels)
     let dvcTreeItemLabels: string[] = []
 

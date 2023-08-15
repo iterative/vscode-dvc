@@ -2,12 +2,12 @@ import React from 'react'
 import cx from 'classnames'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { ExperimentGroup } from './ExperimentGroup'
-import { BatchSelectionProp, RowContent } from './Row'
+import { RowContent } from './Row'
 import { WorkspaceRowGroup } from './WorkspaceRowGroup'
 import styles from '../styles.module.scss'
 import { InstanceProp, RowProp } from '../../../util/interfaces'
 
-interface TableBodyProps extends RowProp, InstanceProp, BatchSelectionProp {
+interface TableBodyProps extends RowProp, InstanceProp {
   root: HTMLElement | null
   tableHeaderHeight: number
   isLast?: boolean
@@ -16,13 +16,11 @@ interface TableBodyProps extends RowProp, InstanceProp, BatchSelectionProp {
 export const TableBody: React.FC<TableBodyProps> = ({
   row,
   instance,
-  batchRowSelection,
   root,
   tableHeaderHeight,
   isLast
 }) => {
   const contentProps = {
-    batchRowSelection,
     key: row.id,
     row
   }
