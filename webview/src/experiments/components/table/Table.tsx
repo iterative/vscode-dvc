@@ -1,11 +1,14 @@
-import React, { useRef, useState, CSSProperties } from 'react'
+import React, { useRef, useState, CSSProperties, useEffect } from 'react'
 import cx from 'classnames'
 import { useDispatch } from 'react-redux'
 import styles from './styles.module.scss'
 import { TableHead } from './header/TableHead'
 import { TableContent } from './body/TableContent'
 import { InstanceProp } from '../../util/interfaces'
-import { clearSelectedRows } from '../../state/rowSelectionSlice'
+import {
+  clearSelectedRows,
+  updateRowOrder
+} from '../../state/rowSelectionSlice'
 
 export const Table: React.FC<InstanceProp> = ({ instance }) => {
   const dispatch = useDispatch()
@@ -14,6 +17,27 @@ export const Table: React.FC<InstanceProp> = ({ instance }) => {
   const [tableHeadHeight, setTableHeadHeight] = useState(55)
 
   const tableRef = useRef<HTMLTableElement>(null)
+
+  const { setColumnOrder, getHeaderGroups, getAllLeafColumns, getRowModel } =
+    instance
+
+  const { rows, flatRows } = getRowModel()
+
+  useEffect(() => {
+    dispatch(
+      updateRowOrder(
+        flatRows.map(
+          ({ depth, original: { branch, id, executorStatus, starred } }) => ({
+            branch,
+            depth,
+            executorStatus,
+            id,
+            starred
+          })
+        )
+      )
+    )
+  }, [dispatch, flatRows])
 
   return (
     <div
@@ -34,15 +58,17 @@ export const Table: React.FC<InstanceProp> = ({ instance }) => {
         }}
       >
         <TableHead
-          instance={instance}
+          columnOrder={getAllLeafColumns().map(({ id }) => id)}
+          headerGroups={getHeaderGroups()}
+          setColumnOrder={setColumnOrder}
           root={tableRef.current}
           setExpColumnNeedsShadow={setExpColumnNeedsShadow}
           setTableHeadHeight={setTableHeadHeight}
         />
         <TableContent
-          instance={instance}
-          tableRef={tableRef}
+          rows={rows}
           tableHeadHeight={tableHeadHeight}
+          tableRef={tableRef}
         />
       </table>
     </div>

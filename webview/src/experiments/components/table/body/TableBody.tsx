@@ -1,13 +1,13 @@
 import React from 'react'
 import cx from 'classnames'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
-import { ExperimentGroup } from './ExperimentGroup'
-import { RowContent } from './Row'
+import { NestedRow } from './NestedRow'
+import { TableRow } from './Row'
 import { WorkspaceRowGroup } from './WorkspaceRowGroup'
 import styles from '../styles.module.scss'
-import { InstanceProp, RowProp } from '../../../util/interfaces'
+import { RowProp } from '../../../util/interfaces'
 
-interface TableBodyProps extends RowProp, InstanceProp {
+interface TableBodyProps extends RowProp {
   root: HTMLElement | null
   tableHeaderHeight: number
   isLast?: boolean
@@ -15,28 +15,24 @@ interface TableBodyProps extends RowProp, InstanceProp {
 
 export const TableBody: React.FC<TableBodyProps> = ({
   row,
-  instance,
   root,
   tableHeaderHeight,
   isLast
 }) => {
   const contentProps = {
+    isExpanded: row.getIsExpanded(),
     key: row.id,
     row
   }
   const content =
     row.depth > 0 ? (
-      <ExperimentGroup {...contentProps} />
+      <NestedRow {...contentProps} />
     ) : (
-      <RowContent {...contentProps} />
+      <TableRow {...contentProps} />
     )
 
   return row.original.id === EXPERIMENT_WORKSPACE_ID ? (
-    <WorkspaceRowGroup
-      tableHeaderHeight={tableHeaderHeight}
-      root={root}
-      instance={instance}
-    >
+    <WorkspaceRowGroup tableHeaderHeight={tableHeaderHeight} root={root}>
       {content}
     </WorkspaceRowGroup>
   ) : (
