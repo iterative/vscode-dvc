@@ -1,11 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import tableDataReducer from './state/tableDataSlice'
-import headersReducer from './state/headersSlice'
+import rowSelectionReducer from './state/rowSelectionSlice'
 import headerDropTargetReducer from './state/headerDropTargetSlice'
 
 export const experimentsReducers = {
   headerDropTarget: headerDropTargetReducer,
-  headers: headersReducer,
+  rowSelection: rowSelectionReducer,
   tableData: tableDataReducer
 }
 

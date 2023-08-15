@@ -1,20 +1,36 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
+import isEqual from 'lodash/isEqual'
 import {
-  Column,
+  Column as ExtensionColumn,
+  ColumnType,
   Experiment,
   TableData
 } from 'dvc/src/experiments/webview/contract'
 import { keepEqualOldReferencesInArray } from '../../util/array'
 import { keepReferenceIfEqual } from '../../util/objects'
 
+export type Column = {
+  label: string
+  path: string
+  type: ColumnType
+  pathArray?: string[]
+  width?: number
+}
+
+export type Columns = {
+  [parentPath: string]: Column[]
+}
+
 export interface TableDataState extends TableData {
   hasData?: boolean
+  columnData: Columns
 }
 
 export const tableDataInitialState: TableDataState = {
   changes: [],
   cliError: null,
+  columnData: {},
   columnOrder: [],
   columnWidths: {},
   columns: [],
@@ -31,6 +47,57 @@ export const tableDataInitialState: TableDataState = {
   selectedForPlotsCount: 0,
   showOnlyChanged: false,
   sorts: []
+}
+
+const getColumn = ({
+  path,
+  pathArray,
+  type,
+  width,
+  label
+}: {
+  path: string
+  pathArray?: string[]
+  type: ColumnType
+  width?: number
+  label: string
+}): Column => {
+  const column: Column = {
+    label,
+    path,
+    type
+  }
+  if (pathArray) {
+    column.pathArray = pathArray
+  }
+  if (width) {
+    column.width = width
+  }
+  return column
+}
+
+export const collectColumnData = (columns: ExtensionColumn[]): Columns => {
+  const acc: Columns = {}
+
+  for (const { path, parentPath, pathArray, type, width, label } of columns) {
+    const column: Column = getColumn({
+      label,
+      path,
+      pathArray,
+      type,
+      width
+    })
+
+    const key = parentPath || type
+
+    if (!acc[key]) {
+      acc[key] = []
+    }
+
+    acc[key].push(column)
+  }
+
+  return acc
 }
 
 export const tableDataSlice = createSlice({
@@ -61,11 +128,19 @@ export const tableDataSlice = createSlice({
         action.payload
       ) as Record<string, number>
     },
-    updateColumns: (state, action: PayloadAction<Column[]>) => {
-      state.columns = keepEqualOldReferencesInArray(
-        state.columns,
-        action.payload
-      ) as Column[]
+    updateColumns: (state, action: PayloadAction<ExtensionColumn[]>) => {
+      if (isEqual(state.columns, action.payload)) {
+        return
+      }
+
+      state.columns = action.payload
+
+      const columnData = collectColumnData(action.payload)
+
+      if (isEqual(state.columnData, columnData)) {
+        return
+      }
+      state.columnData = columnData
     },
     updateFilters: (state, action: PayloadAction<string[]>) => {
       state.filters = action.payload

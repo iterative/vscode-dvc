@@ -1,7 +1,7 @@
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import React, { DragEvent, useRef, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Table, Header, ColumnOrderState } from '@tanstack/react-table'
+import { Table, Header } from '@tanstack/react-table'
 import { MergedHeaderGroups } from './MergeHeaderGroups'
 import { setDropTarget } from '../../../state/headerDropTargetSlice'
 import { ExperimentsState } from '../../../store'
@@ -17,7 +17,6 @@ import { reorderColumns } from '../../../util/messages'
 interface TableHeadProps {
   instance: Table<Experiment>
   root: HTMLElement | null
-  onOrderChange: (order: ColumnOrderState) => void
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   setTableHeadHeight: (height: number) => void
 }
@@ -25,7 +24,6 @@ interface TableHeadProps {
 export const TableHead = ({
   instance,
   root,
-  onOrderChange,
   setExpColumnNeedsShadow,
   setTableHeadHeight
 }: TableHeadProps) => {
@@ -110,7 +108,6 @@ export const TableHead = ({
       setColumnOrder(newOrder)
       reorderColumns(newOrder)
       onDragEnd()
-      onOrderChange(newOrder)
     }
   }
 

@@ -6,15 +6,9 @@ import React, {
   useState
 } from 'react'
 import { useSelector } from 'react-redux'
-import {
-  Column,
-  Commit,
-  ColumnType,
-  Experiment
-} from 'dvc/src/experiments/webview/contract'
+import { Commit } from 'dvc/src/experiments/webview/contract'
 import {
   ColumnDef,
-  CellContext,
   useReactTable,
   Row as TableRow,
   getCoreRowModel,
@@ -24,79 +18,16 @@ import {
 import { Table } from './table/Table'
 import styles from './table/styles.module.scss'
 import { ErrorState } from './emptyState/ErrorState'
-import { RowSelectionProvider } from './table/RowSelectionContext'
-import { CellValue } from './table/content/Cell'
-import { AddStage } from './AddStage'
-import { ExperimentCell } from './table/content/ExperimentCell'
 import { AddColumns } from './emptyState/AddColumns'
-import { buildColumns, columnHelper } from '../util/buildColumns'
+import { AddStage } from './AddStage'
+import { buildColumns } from './table/body/columns/Columns'
 import { WebviewWrapper } from '../../shared/components/webviewWrapper/WebviewWrapper'
 import { EmptyState } from '../../shared/components/emptyState/EmptyState'
 import { ExperimentsState } from '../store'
-import { EXPERIMENT_COLUMN_ID } from '../util/columns'
 import { resizeColumn } from '../util/messages'
 
 const DEFAULT_COLUMN_WIDTH = 90
 const MINIMUM_COLUMN_WIDTH = 90
-
-const ExperimentHeader = () => (
-  <div className={styles.experimentHeader}>Experiment</div>
-)
-
-const getDefaultColumn = () =>
-  columnHelper.accessor(() => EXPERIMENT_COLUMN_ID, {
-    cell: (cell: CellContext<Column, CellValue>) => {
-      const {
-        row: {
-          original: { label, description, commit, sha, error }
-        }
-      } = cell as unknown as CellContext<Experiment, CellValue>
-      return (
-        <ExperimentCell
-          commit={commit}
-          description={description}
-          error={error}
-          label={label}
-          sha={sha}
-        />
-      )
-    },
-    header: ExperimentHeader,
-    id: EXPERIMENT_COLUMN_ID,
-    minSize: 230,
-    size: 240
-  })
-
-const getColumns = (columns: Column[]) => {
-  const includeTimestamp = columns.some(
-    ({ type }) => type === ColumnType.TIMESTAMP
-  )
-
-  const timestampColumn =
-    (includeTimestamp &&
-      buildColumns(
-        [
-          {
-            hasChildren: false,
-            label: 'Created',
-            parentPath: ColumnType.TIMESTAMP,
-            path: 'Created',
-            type: ColumnType.TIMESTAMP,
-            width: 100
-          }
-        ],
-        ColumnType.TIMESTAMP
-      )) ||
-    []
-
-  return [
-    getDefaultColumn(),
-    ...timestampColumn,
-    ...buildColumns(columns, ColumnType.METRICS),
-    ...buildColumns(columns, ColumnType.PARAMS),
-    ...buildColumns(columns, ColumnType.DEPS)
-  ]
-}
 
 const reportResizedColumn = (
   state: ColumnSizingState,
@@ -121,7 +52,7 @@ const defaultColumn: Partial<ColumnDef<Commit>> = {
 
 export const ExperimentsTable: React.FC = () => {
   const {
-    columns: columnsData,
+    columnData,
     columnOrder: columnOrderData,
     columnWidths,
     hasConfig,
@@ -130,7 +61,7 @@ export const ExperimentsTable: React.FC = () => {
 
   const [expanded, setExpanded] = useState({})
 
-  const [columns, setColumns] = useState(getColumns(columnsData))
+  const [columns, setColumns] = useState(buildColumns(columnData))
   const [columnSizing, setColumnSizing] =
     useState<ColumnSizingState>(columnWidths)
   const [columnOrder, setColumnOrder] = useState(columnOrderData)
@@ -141,12 +72,8 @@ export const ExperimentsTable: React.FC = () => {
   }, [columnSizing, columnWidths])
 
   useEffect(() => {
-    setColumns(getColumns(columnsData))
-  }, [columnsData])
-
-  useEffect(() => {
-    setColumnOrder(columnOrderData)
-  }, [columnOrderData])
+    setColumns(buildColumns(columnData))
+  }, [columnData])
 
   const getRowId = useCallback(
     (experiment: Commit, relativeIndex: number, parent?: TableRow<Commit>) =>
@@ -165,6 +92,7 @@ export const ExperimentsTable: React.FC = () => {
     getExpandedRowModel: getExpandedRowModel(),
     getRowId,
     getSubRows: row => row.subRows,
+    onColumnOrderChange: setColumnOrder,
     onColumnSizingChange: setColumnSizing,
     onExpandedChange: setExpanded,
     state: {
@@ -186,10 +114,10 @@ export const ExperimentsTable: React.FC = () => {
   }
 
   return (
-    <RowSelectionProvider>
-      <Table instance={instance} onColumnOrderChange={setColumnOrder} />
+    <>
+      <Table instance={instance} />
       {!hasConfig && <AddStage />}
-    </RowSelectionProvider>
+    </>
   )
 }
 

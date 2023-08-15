@@ -54,6 +54,12 @@ import {
 import { clearSelection, createWindowTextSelection } from '../../test/selection'
 import { sendMessage } from '../../shared/vscode'
 import { setExperimentsAsStarred } from '../../test/tableDataFixture'
+import { collectColumnData } from '../state/tableDataSlice'
+
+const tableStateFixture = {
+  ...tableDataFixture,
+  columnData: collectColumnData(tableDataFixture.columns)
+}
 
 jest.mock('../../shared/api')
 jest.mock('../../util/styles')
@@ -99,8 +105,8 @@ describe('App', () => {
 
   it('should not show the no columns selected empty state when only the timestamp column is provided', () => {
     renderTable({
-      ...tableDataFixture,
-      columns: tableDataFixture.columns.filter(
+      ...tableStateFixture,
+      columns: tableStateFixture.columns.filter(
         ({ label }) => label === 'Created'
       )
     })
@@ -111,7 +117,7 @@ describe('App', () => {
 
   it('should show a refresh button if there is a CLI error', () => {
     renderTable({
-      ...tableDataFixture,
+      ...tableStateFixture,
       cliError: 'Error'
     })
 
@@ -171,13 +177,13 @@ describe('App', () => {
       expect(screen.getByText(experimentLabel)).toBeInTheDocument()
 
       setTableData({
-        ...tableDataFixture,
+        ...tableStateFixture,
         rows: [
-          tableDataFixture.rows[0],
+          tableStateFixture.rows[0],
           {
-            ...tableDataFixture.rows[1],
+            ...tableStateFixture.rows[1],
             subRows: [
-              ...(tableDataFixture.rows[1].subRows as Experiment[])
+              ...(tableStateFixture.rows[1].subRows as Experiment[])
             ].reverse()
           }
         ]
@@ -189,7 +195,7 @@ describe('App', () => {
 
       expect(screen.queryByText(experimentLabel)).not.toBeInTheDocument()
 
-      setTableData(tableDataFixture)
+      setTableData(tableStateFixture)
 
       expect(screen.queryByText(experimentLabel)).not.toBeInTheDocument()
     })
@@ -206,7 +212,7 @@ describe('App', () => {
 
       const changedCommitName = 'changed-branch'
 
-      const changedRows = [...tableDataFixture.rows]
+      const changedRows = [...tableStateFixture.rows]
       changedRows[1] = {
         ...changedRows[1],
         id: changedCommitName,
@@ -215,7 +221,7 @@ describe('App', () => {
       }
 
       setTableData({
-        ...tableDataFixture,
+        ...tableStateFixture,
         rows: changedRows
       })
 
@@ -260,7 +266,7 @@ describe('App', () => {
     }
 
     const starSomeSubRows = () => {
-      const starredFixture = setExperimentsAsStarred(tableDataFixture, [
+      const starredFixture = setExperimentsAsStarred(tableStateFixture, [
         '489fd8b',
         '4fb124a'
       ])
@@ -453,7 +459,7 @@ describe('App', () => {
     const testMetricNumberValue = 1.9293040037155151
 
     const testData = {
-      ...tableDataFixture,
+      ...tableStateFixture,
       columns: [
         {
           hasChildren: true,
@@ -1631,7 +1637,7 @@ describe('App', () => {
 
     it('should show an indicator with the amount of experiments selected for plotting', () => {
       renderTable({
-        ...tableDataFixture
+        ...tableStateFixture
       })
       jest.useFakeTimers()
       const selectedForPlotsIndicator =
@@ -1647,10 +1653,10 @@ describe('App', () => {
       expect(tooltip).toHaveTextContent('Show Plots')
 
       setTableData({
-        ...tableDataFixture,
+        ...tableStateFixture,
         rows: [
-          { ...tableDataFixture.rows[0], selected: false },
-          { ...tableDataFixture.rows[1], selected: false, subRows: [] }
+          { ...tableStateFixture.rows[0], selected: false },
+          { ...tableStateFixture.rows[1], selected: false, subRows: [] }
         ],
         selectedForPlotsCount: 0
       })
@@ -1658,15 +1664,15 @@ describe('App', () => {
       expect(selectedForPlotsIndicator).toHaveTextContent('')
 
       setTableData({
-        ...tableDataFixture,
+        ...tableStateFixture,
         rows: [
-          { ...tableDataFixture.rows[0], selected: false },
+          { ...tableStateFixture.rows[0], selected: false },
           {
-            ...tableDataFixture.rows[1],
+            ...tableStateFixture.rows[1],
             selected: false,
             subRows: [
               {
-                ...(tableDataFixture.rows[1]?.subRows?.[0] as Commit),
+                ...(tableStateFixture.rows[1]?.subRows?.[0] as Commit),
                 selected: true
               }
             ]
@@ -1683,7 +1689,7 @@ describe('App', () => {
       const plottedExperiment = '4fb124a'
 
       renderTable({
-        ...tableDataFixture
+        ...tableStateFixture
       })
 
       expect(screen.getByText(plottedExperiment)).toBeInTheDocument()
@@ -1697,7 +1703,7 @@ describe('App', () => {
 
     it('should show an indicator with the amount of applied sorts', () => {
       renderTable({
-        ...tableDataFixture,
+        ...tableStateFixture,
         sorts: []
       })
       jest.useFakeTimers()
@@ -1713,16 +1719,16 @@ describe('App', () => {
 
       expect(tooltip).toHaveTextContent('Show Sorts')
 
-      const { columns } = tableDataFixture
+      const { columns } = tableStateFixture
       const firstSortPath = columns[columns.length - 1].path
       const secondSortPath = columns[columns.length - 2].path
       setTableData({
-        ...tableDataFixture,
+        ...tableStateFixture,
         sorts: [{ descending: true, path: firstSortPath }]
       })
       expect(sortIndicator).toHaveTextContent('1')
       setTableData({
-        ...tableDataFixture,
+        ...tableStateFixture,
         sorts: [
           { descending: true, path: firstSortPath },
           { descending: false, path: secondSortPath }
@@ -1734,7 +1740,7 @@ describe('App', () => {
 
     it('should show an indicator with the amount of applied filters', () => {
       renderTable({
-        ...tableDataFixture,
+        ...tableStateFixture,
         filters: []
       })
       jest.useFakeTimers()
@@ -1750,29 +1756,29 @@ describe('App', () => {
 
       expect(tooltip).toHaveTextContent('Show Filters')
 
-      const { columns } = tableDataFixture
+      const { columns } = tableStateFixture
       const firstFilterPath = columns[columns.length - 1].path
       const secondFilterPath = columns[columns.length - 2].path
       setTableData({
-        ...tableDataFixture,
+        ...tableStateFixture,
         filters: [firstFilterPath]
       })
       expect(filterIndicator).toHaveTextContent('1')
 
       setTableData({
-        ...tableDataFixture,
+        ...tableStateFixture,
         filters: [firstFilterPath, secondFilterPath]
       })
       expect(filterIndicator).toHaveTextContent('2')
 
       setTableData({
-        ...tableDataFixture,
+        ...tableStateFixture,
         filters: [firstFilterPath, secondFilterPath]
       })
       expect(filterIndicator).toHaveTextContent('2')
 
       setTableData({
-        ...tableDataFixture,
+        ...tableStateFixture,
         filters: []
       })
       expect(filterIndicator).toHaveTextContent('')
@@ -1782,7 +1788,7 @@ describe('App', () => {
 
     it('should show a tooltip for the branches indicator', () => {
       renderTable({
-        ...tableDataFixture
+        ...tableStateFixture
       })
       jest.useFakeTimers()
       const branchesIndicator = screen.getByLabelText('branches')
@@ -1804,7 +1810,7 @@ describe('App', () => {
 
       let workspace
       const rowsWithoutWorkspace = []
-      for (const row of tableDataFixture.rows) {
+      for (const row of tableStateFixture.rows) {
         if (row.id !== EXPERIMENT_WORKSPACE_ID) {
           rowsWithoutWorkspace.push(row)
           continue
@@ -1813,7 +1819,7 @@ describe('App', () => {
       }
 
       const multipleBranches = {
-        ...tableDataFixture,
+        ...tableStateFixture,
         hasData: true,
         rows: [
           workspace as Commit,
@@ -1874,7 +1880,7 @@ describe('App', () => {
 
     it('should show an indicator with the amount of displayed columns', () => {
       renderTable({
-        ...tableDataFixture
+        ...tableStateFixture
       })
       jest.useFakeTimers()
       const columnsIndicator = screen.getByLabelText('columns')
@@ -1889,14 +1895,14 @@ describe('App', () => {
       expect(tooltip).toHaveTextContent('Select Columns')
 
       setTableData({
-        ...tableDataFixture,
-        columns: tableDataFixture.columns.slice(1)
+        ...tableStateFixture,
+        columns: tableStateFixture.columns.slice(1)
       })
 
       expect(columnsIndicator).toHaveTextContent('21')
 
       setTableData({
-        ...tableDataFixture,
+        ...tableStateFixture,
         columns: []
       })
 
@@ -1936,7 +1942,7 @@ describe('App', () => {
   describe('Add configuration button', () => {
     it('should show a add config button if the project has no pipeline stages', () => {
       renderTable()
-      setTableData({ ...tableDataFixture, hasConfig: false })
+      setTableData({ ...tableStateFixture, hasConfig: false })
 
       expect(screen.getByText('Add dvc.yaml')).toBeInTheDocument()
     })
@@ -1949,7 +1955,7 @@ describe('App', () => {
 
     it('should send a message to the extension to add a pipeline stage when clicking on the add config button', () => {
       renderTable()
-      setTableData({ ...tableDataFixture, hasConfig: false })
+      setTableData({ ...tableStateFixture, hasConfig: false })
 
       fireEvent.click(screen.getByText('Add dvc.yaml'))
 
@@ -1961,13 +1967,13 @@ describe('App', () => {
 
   describe('Change number of commits', () => {
     it('should display a show more commits button', () => {
-      renderTable({ ...tableDataFixture, hasMoreCommits: { main: true } })
+      renderTable({ ...tableStateFixture, hasMoreCommits: { main: true } })
 
       expect(screen.getByLabelText('Show More Commits')).toBeInTheDocument()
     })
 
     it('should send a message to show more commits when the show more commits button is clicked', () => {
-      renderTable({ ...tableDataFixture, hasMoreCommits: { main: true } })
+      renderTable({ ...tableStateFixture, hasMoreCommits: { main: true } })
 
       fireEvent.click(screen.getByLabelText('Show More Commits'))
 
@@ -1978,7 +1984,7 @@ describe('App', () => {
     })
 
     it('should disable the show more commits button if the table data hasMoreCommits is set to false', () => {
-      renderTable({ ...tableDataFixture, hasMoreCommits: { main: false } })
+      renderTable({ ...tableStateFixture, hasMoreCommits: { main: false } })
 
       fireEvent.click(screen.getByLabelText('Show More Commits'))
 
@@ -1990,7 +1996,7 @@ describe('App', () => {
 
     it('should display a show less commits button', () => {
       renderTable({
-        ...tableDataFixture,
+        ...tableStateFixture,
         isShowingMoreCommits: { main: true }
       })
 
@@ -1999,7 +2005,7 @@ describe('App', () => {
 
     it('should send a message to show less commits when the show less commits button is clicked', () => {
       renderTable({
-        ...tableDataFixture,
+        ...tableStateFixture,
         isShowingMoreCommits: { main: true }
       })
 
@@ -2013,7 +2019,7 @@ describe('App', () => {
 
     it('should disable the show less commits button if the table data isShowingMoreCommits is set to false', () => {
       renderTable({
-        ...tableDataFixture,
+        ...tableStateFixture,
         isShowingMoreCommits: { main: false }
       })
 
@@ -2026,7 +2032,7 @@ describe('App', () => {
     })
 
     it('should display a reset commits button', () => {
-      renderTable({ ...tableDataFixture, hasMoreCommits: { main: true } })
+      renderTable({ ...tableStateFixture, hasMoreCommits: { main: true } })
 
       expect(
         screen.getByLabelText('Reset Commits to Default')
@@ -2057,7 +2063,7 @@ describe('App', () => {
     })
 
     it('should disable the select branches button if there are no branches to select', () => {
-      renderTable({ ...tableDataFixture, hasBranchesToSelect: false })
+      renderTable({ ...tableStateFixture, hasBranchesToSelect: false })
 
       fireEvent.click(screen.getByLabelText('branches'))
 

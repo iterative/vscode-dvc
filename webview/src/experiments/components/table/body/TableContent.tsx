@@ -1,9 +1,10 @@
-import React, { Fragment, RefObject, useCallback, useContext } from 'react'
+import React, { Fragment, RefObject, useEffect } from 'react'
+import { useDispatch } from 'react-redux'
 import { TableBody } from './TableBody'
 import { collectBranchWithRows } from './util'
 import { BranchDivider } from './branchDivider/BranchDivider'
-import { RowSelectionContext } from '../RowSelectionContext'
-import { InstanceProp, RowProp } from '../../../util/interfaces'
+import { InstanceProp } from '../../../util/interfaces'
+import { updateRowOrder } from '../../../state/rowSelectionSlice'
 
 interface TableContentProps extends InstanceProp {
   tableRef: RefObject<HTMLTableElement>
@@ -16,36 +17,23 @@ export const TableContent: React.FC<TableContentProps> = ({
   tableHeadHeight
 }) => {
   const { rows, flatRows } = instance.getRowModel()
-  const { batchSelection, lastSelectedRow } = useContext(RowSelectionContext)
+  const dispatch = useDispatch()
 
-  const batchRowSelection = useCallback(
-    ({ row: { id } }: RowProp) => {
-      const lastSelectedRowId = lastSelectedRow?.row.id ?? ''
-      const lastIndex =
-        flatRows.findIndex(flatRow => flatRow.id === lastSelectedRowId) || 1
-      const selectedIndex =
-        flatRows.findIndex(flatRow => flatRow.id === id) || 1
-      const rangeStart = Math.min(lastIndex, selectedIndex)
-      const rangeEnd = Math.max(lastIndex, selectedIndex)
-
-      const collapsedIds = flatRows
-        .filter(flatRow => !flatRow.getIsExpanded())
-        .map(flatRow => flatRow.id)
-
-      const batch = flatRows
-        .slice(rangeStart, rangeEnd + 1)
-        .filter(
-          flatRow =>
-            !collapsedIds.some(collapsedId =>
-              flatRow.id.startsWith(`${collapsedId}.`)
-            )
+  useEffect(() => {
+    dispatch(
+      updateRowOrder(
+        flatRows.map(
+          ({ depth, original: { branch, id, executorStatus, starred } }) => ({
+            branch,
+            depth,
+            executorStatus,
+            id,
+            starred
+          })
         )
-        .map(row => ({ row }))
-
-      batchSelection?.(batch)
-    },
-    [flatRows, batchSelection, lastSelectedRow]
-  )
+      )
+    )
+  }, [dispatch, flatRows])
 
   return (
     <>
@@ -64,7 +52,6 @@ export const TableContent: React.FC<TableContentProps> = ({
                     root={tableRef.current}
                     row={row}
                     instance={instance}
-                    batchRowSelection={batchRowSelection}
                     isLast={i === branchRows.length - 1}
                   />
                 </Fragment>

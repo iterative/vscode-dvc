@@ -1,27 +1,31 @@
 import cx from 'classnames'
-import React, { useCallback, useContext, useMemo } from 'react'
-import { useSelector } from 'react-redux'
+import React, { useCallback, useMemo } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { StubCell, CellWrapper } from './Cell'
 import { RowContextMenu } from './RowContextMenu'
 import styles from '../styles.module.scss'
 import { RowProp } from '../../../util/interfaces'
-import { RowSelectionContext } from '../RowSelectionContext'
 import { ContextMenu } from '../../../../shared/components/contextMenu/ContextMenu'
 import { HandlerFunc } from '../../../../util/props'
 import { ExperimentsState } from '../../../store'
 import { toggleExperiment, toggleStarred } from '../../../util/messages'
 import { getCompositeId } from '../../../util/rows'
+import {
+  selectRowRange,
+  toggleRowSelected
+} from '../../../state/rowSelectionSlice'
 
-export type BatchSelectionProp = {
-  batchRowSelection: (prop: RowProp) => void
-}
-
-export const RowContent: React.FC<
-  RowProp & { className?: string } & BatchSelectionProp
-> = ({ row, className, batchRowSelection }): JSX.Element => {
+export const RowContent: React.FC<RowProp & { className?: string }> = ({
+  row,
+  className
+}): JSX.Element => {
   const changes = useSelector(
     (state: ExperimentsState) => state.tableData.changes
+  )
+  const dispatch = useDispatch()
+  const { selectedRows } = useSelector(
+    (state: ExperimentsState) => state.rowSelection
   )
   const { getVisibleCells, original, getIsExpanded, subRows } = row
   const { branch, displayColor, error, starred, id } = original
@@ -29,21 +33,24 @@ export const RowContent: React.FC<
   const isWorkspace = id === EXPERIMENT_WORKSPACE_ID
   const changesIfWorkspace = isWorkspace ? changes : undefined
 
-  const { toggleRowSelected, selectedRows } = useContext(RowSelectionContext)
-
   const isRowSelected = !!selectedRows[getCompositeId(id, branch)]
 
   const toggleRowSelection = useCallback<HandlerFunc<HTMLElement>>(
     args => {
       if (!isWorkspace) {
+        const { original, depth } = row
+        const { starred, executorStatus, id, branch } = original
+
+        const selectedRow = { branch, depth, executorStatus, id, starred }
+
         if (args?.mouse?.shiftKey) {
-          batchRowSelection({ row })
+          dispatch(selectRowRange(selectedRow))
         } else {
-          toggleRowSelected?.({ row })
+          dispatch(toggleRowSelected(selectedRow))
         }
       }
     },
-    [row, toggleRowSelected, isWorkspace, batchRowSelection]
+    [dispatch, row, isWorkspace]
   )
 
   const subRowStates = useMemo(() => {

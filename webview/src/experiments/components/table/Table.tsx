@@ -1,21 +1,15 @@
-import React, { useRef, useState, CSSProperties, useContext } from 'react'
-import { ColumnOrderState } from '@tanstack/react-table'
+import React, { useRef, useState, CSSProperties } from 'react'
 import cx from 'classnames'
+import { useDispatch } from 'react-redux'
 import styles from './styles.module.scss'
 import { TableHead } from './header/TableHead'
-import { RowSelectionContext } from './RowSelectionContext'
 import { TableContent } from './body/TableContent'
 import { InstanceProp } from '../../util/interfaces'
+import { clearSelectedRows } from '../../state/rowSelectionSlice'
 
-interface TableProps extends InstanceProp {
-  onColumnOrderChange: (order: ColumnOrderState) => void
-}
+export const Table: React.FC<InstanceProp> = ({ instance }) => {
+  const dispatch = useDispatch()
 
-export const Table: React.FC<TableProps> = ({
-  instance,
-  onColumnOrderChange
-}) => {
-  const { clearSelectedRows } = useContext(RowSelectionContext)
   const [expColumnNeedsShadow, setExpColumnNeedsShadow] = useState(false)
   const [tableHeadHeight, setTableHeadHeight] = useState(55)
 
@@ -35,7 +29,7 @@ export const Table: React.FC<TableProps> = ({
         ref={tableRef}
         onKeyUp={e => {
           if (e.key === 'Escape') {
-            clearSelectedRows?.()
+            dispatch(clearSelectedRows())
           }
         }}
       >
@@ -44,7 +38,6 @@ export const Table: React.FC<TableProps> = ({
           root={tableRef.current}
           setExpColumnNeedsShadow={setExpColumnNeedsShadow}
           setTableHeadHeight={setTableHeadHeight}
-          onOrderChange={onColumnOrderChange}
         />
         <TableContent
           instance={instance}

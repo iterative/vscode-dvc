@@ -1,5 +1,5 @@
-import React, { useContext, useMemo } from 'react'
-import { useSelector } from 'react-redux'
+import React, { useMemo } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import {
   WORKSPACE_BRANCH,
@@ -10,12 +10,15 @@ import {
 } from 'dvc/src/experiments/webview/contract'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { RowProp } from '../../../util/interfaces'
-import { RowSelectionContext } from '../RowSelectionContext'
 import { MessagesMenu } from '../../../../shared/components/messagesMenu/MessagesMenu'
 import { MessagesMenuOptionProps } from '../../../../shared/components/messagesMenu/MessagesMenuOption'
 import { cond } from '../../../../util/helpers'
 import { ExperimentsState } from '../../../store'
 import { getCompositeId } from '../../../util/rows'
+import {
+  SelectedRow,
+  clearSelectedRows
+} from '../../../state/rowSelectionSlice'
 
 const experimentMenuOption = (
   payload: string | string[] | { id: string; executor?: string | null }[],
@@ -51,7 +54,7 @@ const isRunningOrNotExperiment = (
   isRunning(executorStatus) || depth !== 1 || hasRunningWorkspaceExperiment
 
 const collectDisabledOptions = (
-  selectedRowsList: RowProp[],
+  selectedRowsList: SelectedRow[],
   hasRunningWorkspaceExperiment: boolean
 ) => {
   const selectedIds: string[] = []
@@ -60,9 +63,8 @@ const collectDisabledOptions = (
   let disableExperimentOnlyOption = false
   let disableStopOption = false
 
-  for (const { row } of selectedRowsList) {
-    const { original, depth } = row
-    const { starred, executorStatus, id } = original
+  for (const row of selectedRowsList) {
+    const { starred, executorStatus, id, depth } = row
 
     selectedIds.push(id)
 
@@ -98,7 +100,7 @@ const collectDisabledOptions = (
 }
 
 const getMultiSelectMenuOptions = (
-  selectedRowsList: RowProp[],
+  selectedRowsList: SelectedRow[],
   hasRunningWorkspaceExperiment: boolean
 ) => {
   const {
@@ -305,7 +307,7 @@ const getContextMenuOptions = (
   projectHasCheckpoints: boolean,
   hasRunningWorkspaceExperiment: boolean,
   depth: number,
-  selectedRows: Record<string, RowProp | undefined>,
+  selectedRows: Record<string, SelectedRow | undefined>,
   executorStatus?: ExecutorStatus,
   starred?: boolean,
   executor?: string | null
@@ -313,7 +315,7 @@ const getContextMenuOptions = (
   const isFromSelection = !!selectedRows[getCompositeId(id, branch)]
   const selectedRowsList = Object.values(selectedRows).filter(
     value => value !== undefined
-  ) as RowProp[]
+  ) as SelectedRow[]
 
   return cond(
     isFromSelection && selectedRowsList.length > 1,
@@ -342,11 +344,14 @@ export const RowContextMenu: React.FC<RowProp> = ({
     depth
   }
 }) => {
-  const { selectedRows, clearSelectedRows } = useContext(RowSelectionContext)
+  const { selectedRows } = useSelector(
+    (state: ExperimentsState) => state.rowSelection
+  )
   const {
     hasRunningWorkspaceExperiment,
     hasCheckpoints: projectHasCheckpoints
   } = useSelector((state: ExperimentsState) => state.tableData)
+  const dispatch = useDispatch()
 
   const isWorkspace = id === EXPERIMENT_WORKSPACE_ID
 
@@ -380,7 +385,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
     (contextMenuOptions.length > 0 && (
       <MessagesMenu
         options={contextMenuOptions}
-        onOptionSelected={() => clearSelectedRows?.()}
+        onOptionSelected={() => dispatch(clearSelectedRows())}
       />
     )) ||
     null

@@ -10,7 +10,11 @@ import dataTypesTableFixture from 'dvc/src/test/fixtures/expShow/dataTypes/table
 import survivalTableData from 'dvc/src/test/fixtures/expShow/survival/tableData'
 import { timestampColumn } from 'dvc/src/experiments/columns/constants'
 import { delay } from 'dvc/src/util/time'
-import { ExecutorStatus, isRunning } from 'dvc/src/experiments/webview/contract'
+import {
+  ExecutorStatus,
+  TableData,
+  isRunning
+} from 'dvc/src/experiments/webview/contract'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import {
   within,
@@ -21,14 +25,23 @@ import {
 } from '@storybook/testing-library'
 import Experiments from '../experiments/components/Experiments'
 import { experimentsReducers } from '../experiments/store'
-import { TableDataState } from '../experiments/state/tableDataSlice'
+import {
+  TableDataState,
+  collectColumnData
+} from '../experiments/state/tableDataSlice'
 import { NORMAL_TOOLTIP_DELAY } from '../shared/components/tooltip/Tooltip'
 import {
   setExperimentsAsSelected,
   setExperimentsAsStarred
 } from '../test/tableDataFixture'
 
-const tableData: TableDataState = {
+const getTableState = (data: TableData): TableDataState => ({
+  ...data,
+  columnData: collectColumnData(survivalTableData.columns),
+  hasData: true
+})
+
+const tableData = getTableState({
   changes: workspaceChangesFixture,
   cliError: null,
   columnOrder: [],
@@ -40,7 +53,6 @@ const tableData: TableDataState = {
   hasBranchesToSelect: true,
   hasCheckpoints: true,
   hasConfig: true,
-  hasData: true,
   hasMoreCommits: { main: true },
   hasRunningWorkspaceExperiment: true,
   isShowingMoreCommits: { main: true },
@@ -52,7 +64,7 @@ const tableData: TableDataState = {
     { descending: true, path: 'params:params.yaml:epochs' },
     { descending: false, path: 'params:params.yaml:log_file' }
   ]
-}
+})
 
 const noRunningExperiments = {
   ...tableData,
@@ -192,10 +204,7 @@ options:
 
 export const WithSurvivalData = Template.bind({})
 WithSurvivalData.args = {
-  tableData: {
-    ...survivalTableData,
-    hasData: true
-  }
+  tableData: getTableState(survivalTableData)
 }
 
 export const WithMiddleStates = Template.bind({})
@@ -262,10 +271,7 @@ WithContextMenuNoCheckpoints.play = contextMenuPlay
 
 export const WithAllDataTypes = Template.bind({})
 WithAllDataTypes.args = {
-  tableData: {
-    ...dataTypesTableFixture,
-    hasData: true
-  }
+  tableData: getTableState(dataTypesTableFixture)
 }
 WithAllDataTypes.play = async ({ canvasElement }) => {
   const falseCell = await within(canvasElement).findByText('false')
@@ -277,11 +283,7 @@ WithAllDataTypes.parameters = {
 
 export const WithDeeplyNestedHeaders = Template.bind({})
 WithDeeplyNestedHeaders.args = {
-  tableData: {
-    ...deeplyNestedTableData,
-    hasData: true,
-    rows: deeplyNestedTableData.rows
-  }
+  tableData: getTableState(deeplyNestedTableData)
 }
 
 export const LoadingData = Template.bind({})
@@ -361,9 +363,8 @@ const rowsWithoutWorkspace = survivalTableData.rows.filter(
 const branches = ['main', 'other-branch', 'branch-14786']
 
 WithMultipleBranches.args = {
-  tableData: {
+  tableData: getTableState({
     ...survivalTableData,
-    hasData: true,
     rows: [
       ...survivalTableData.rows.map(row => ({
         ...row,
@@ -391,5 +392,5 @@ WithMultipleBranches.args = {
       }))
     ],
     selectedBranches: branches.slice(1)
-  }
+  })
 }
