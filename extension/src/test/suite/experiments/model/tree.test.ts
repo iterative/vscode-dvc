@@ -223,13 +223,17 @@ suite('Experiments Tree Test Suite', () => {
 
       expect(mockCreateQuickPick).to.be.calledOnce
 
-      const { selectedRevisions } = getFirstArgOfLastCall(messageSpy)
+      const firstArg = getFirstArgOfLastCall(messageSpy)
+
+      console.log('selectedRevisions', firstArg)
 
       expect(
-        (selectedRevisions as Revision[]).map(({ displayColor, label }) => ({
-          displayColor,
-          label
-        })),
+        (firstArg.selectedRevisions as Revision[]).map(
+          ({ displayColor, label }) => ({
+            displayColor,
+            label
+          })
+        ),
         'a message is sent with colors for the currently selected experiments'
       ).to.deep.equal([{ displayColor, label }])
     }).timeout(WEBVIEW_TEST_TIMEOUT)
