@@ -58,6 +58,23 @@ const buildAccessor: (valuePath: string[]) => AccessorFn<Column> =
     return `[${value.join(', ')}]`
   }
 
+const getTimestampColumn = (columns: Columns) => {
+  const includeTimestamp = columns[ColumnType.TIMESTAMP]?.length > 0
+
+  return includeTimestamp
+    ? [
+        columnHelper.accessor(buildAccessor(['Created']), {
+          cell: DateCellContents as unknown as React.FC<
+            CellContext<Column, CellValue>
+          >,
+          header: () => <TimestampHeader />,
+          id: 'Created',
+          size: 100
+        })
+      ]
+    : []
+}
+
 const getMainColumnProperties = (
   type: ColumnType,
   label: string,
@@ -110,25 +127,9 @@ const buildColumnsType = (
 }
 
 export const buildColumns = (columns: Columns): ColumnDef<Column, string>[] => {
-  const includeTimestamp = columns[ColumnType.TIMESTAMP]?.length > 0
-
-  const timestampColumn = includeTimestamp
-    ? [
-        {
-          cell: DateCellContents as unknown as React.FC<
-            CellContext<Column, CellValue>
-          >,
-          group: ColumnType.TIMESTAMP,
-          header: () => <TimestampHeader />,
-          id: 'Created',
-          size: 100
-        }
-      ]
-    : []
-
   return [
     getDefaultColumn(),
-    ...timestampColumn,
+    ...getTimestampColumn(columns),
     ...buildColumnsType(columns, ColumnType.METRICS),
     ...buildColumnsType(columns, ColumnType.PARAMS),
     ...buildColumnsType(columns, ColumnType.DEPS)
