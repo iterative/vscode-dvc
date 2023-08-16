@@ -1880,6 +1880,37 @@ describe('App', () => {
         within(multiImgPlots[1]).queryByRole('img')
       ).not.toBeInTheDocument()
     })
+
+    it('should handle a plot with steps that do not increment by one', () => {
+      renderAppWithOptionalData({
+        comparison: comparisonTableFixture
+      })
+
+      const unusualRev = 'exp-83425'
+      const imgs = comparisonTableFixture.plots[3].revisions[unusualRev].imgs
+      const multiImgPlot = screen.getAllByTestId('multi-image-cell')[4]
+
+      const slider = within(multiImgPlot).getByRole('slider')
+      const imgEl = within(multiImgPlot).getByRole('img')
+
+      expect(slider).toHaveAttribute('max', '6')
+
+      expect(imgEl).toHaveAttribute('src', imgs[0].url)
+      expect(imgEl).toHaveAttribute(
+        'alt',
+        `1 of ${join('plots', 'image')} (exp-83425)`
+      )
+      expect(within(multiImgPlot).getByText('1')).toBeInTheDocument()
+
+      fireEvent.change(slider, { target: { value: 3 } })
+
+      expect(imgEl).toHaveAttribute('src', imgs[3].url)
+      expect(imgEl).toHaveAttribute(
+        'alt',
+        `7 of ${join('plots', 'image')} (exp-83425)`
+      )
+      expect(within(multiImgPlot).getByText('7')).toBeInTheDocument()
+    })
   })
 
   describe('Virtualization', () => {
