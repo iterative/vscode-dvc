@@ -16,6 +16,7 @@ import {
 } from '../../../../../experiments/model/filterBy'
 import { buildMockMemento, dvcDemoPath } from '../../../../util'
 import {
+  closeAllEditors,
   experimentsUpdatedEvent,
   stubPrivateMethod,
   stubPrivatePrototypeMethod,
@@ -54,6 +55,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
   afterEach(() => {
     disposable.dispose()
+    return closeAllEditors()
   })
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
