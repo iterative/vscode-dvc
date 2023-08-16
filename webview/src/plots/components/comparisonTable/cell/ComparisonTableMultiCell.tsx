@@ -30,7 +30,10 @@ export const ComparisonTableMultiCell: React.FC<{
   useEffect(() => {
     window.clearTimeout(changeDebounceTimer.current)
     changeDebounceTimer.current = window.setTimeout(() => {
-      if (currentStep === values?.[plot.id]?.[path]) {
+      const isOnMount =
+        values?.[plot.id]?.[path] === undefined && currentStep === 0
+      const stepMatchesState = currentStep === values?.[plot.id]?.[path]
+      if (isOnMount || stepMatchesState) {
         return
       }
       setComparisonMultiPlotValue(path, plot.id, currentStep)
