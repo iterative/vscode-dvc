@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.41] - 2023-08-16
+
+### 🐛 Bug Fixes
+
+- Fix show only changed behaviour [#4512](https://github.com/iterative/vscode-dvc/pull/4512) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.40] - 2023-08-16
 
 ### 🚀 New Features and Enhancements
