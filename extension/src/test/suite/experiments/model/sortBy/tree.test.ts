@@ -12,7 +12,7 @@ import {
 } from '../../../../../experiments/webview/contract'
 import { QuickPickItemWithValue } from '../../../../../vscode/quickPick'
 import { buildExperimentsWebview, stubWorkspaceGetters } from '../../util'
-import { experimentsUpdatedEvent } from '../../../util'
+import { closeAllEditors, experimentsUpdatedEvent } from '../../../util'
 import { dvcDemoPath } from '../../../../util'
 import { generateTestExpShowOutput } from '../../../../util/experiments'
 import { buildMetricOrParamPath } from '../../../../../experiments/columns/paths'
@@ -92,6 +92,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
 
   afterEach(() => {
     disposable.dispose()
+    return closeAllEditors()
   })
 
   describe('ExperimentsSortByTree', () => {
