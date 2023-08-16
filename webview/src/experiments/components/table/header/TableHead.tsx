@@ -1,5 +1,5 @@
 import { Experiment } from 'dvc/src/experiments/webview/contract'
-import React, { DragEvent, useRef, useEffect, memo } from 'react'
+import React, { DragEvent, useRef, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   Header,
@@ -28,7 +28,7 @@ interface TableHeadProps {
   setTableHeadHeight: (height: number) => void
 }
 
-const THead = ({
+export const TableHead = ({
   columnOrder,
   headerGroups,
   setColumnOrder,
@@ -135,5 +135,3 @@ const THead = ({
     </thead>
   )
 }
-
-export const TableHead = memo(THead)
