@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import React, { useCallback, useMemo } from 'react'
+import React, { memo, useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { StubCell, CellWrapper } from './Cell'
@@ -16,8 +16,9 @@ import {
   toggleRowSelected
 } from '../../../state/rowSelectionSlice'
 
-export const RowContent: React.FC<RowProp & { className?: string }> = ({
+const Row: React.FC<RowProp & { className?: string; isExpanded: boolean }> = ({
   row,
+  isExpanded,
   className
 }): JSX.Element => {
   const changes = useSelector(
@@ -27,10 +28,11 @@ export const RowContent: React.FC<RowProp & { className?: string }> = ({
   const { selectedRows } = useSelector(
     (state: ExperimentsState) => state.rowSelection
   )
-  const { getVisibleCells, original, getIsExpanded, subRows } = row
+  const { getVisibleCells, original, subRows } = row
   const { branch, displayColor, error, starred, id } = original
   const [stubCell, ...cells] = getVisibleCells()
   const isWorkspace = id === EXPERIMENT_WORKSPACE_ID
+
   const changesIfWorkspace = isWorkspace ? changes : undefined
 
   const isRowSelected = !!selectedRows[getCompositeId(id, branch)]
@@ -95,7 +97,7 @@ export const RowContent: React.FC<RowProp & { className?: string }> = ({
           plotColor={displayColor}
           starred={starred}
           isRowSelected={isRowSelected}
-          showSubRowStates={!getIsExpanded() && !isWorkspace}
+          showSubRowStates={!isExpanded && !isWorkspace}
           subRowStates={subRowStates}
           toggleExperiment={() => toggleExperiment(id)}
           toggleRowSelection={toggleRowSelection}
@@ -117,3 +119,5 @@ export const RowContent: React.FC<RowProp & { className?: string }> = ({
     </ContextMenu>
   )
 }
+
+export const TableRow = memo(Row)

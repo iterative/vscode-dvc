@@ -1,7 +1,12 @@
 import { Experiment } from 'dvc/src/experiments/webview/contract'
-import React, { DragEvent, useRef, useEffect } from 'react'
+import React, { DragEvent, useRef, useEffect, memo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Table, Header } from '@tanstack/react-table'
+import {
+  Header,
+  HeaderGroup,
+  Updater,
+  ColumnOrderState
+} from '@tanstack/react-table'
 import { MergedHeaderGroups } from './MergeHeaderGroups'
 import { setDropTarget } from '../../../state/headerDropTargetSlice'
 import { ExperimentsState } from '../../../store'
@@ -15,22 +20,22 @@ import styles from '../styles.module.scss'
 import { reorderColumns } from '../../../util/messages'
 
 interface TableHeadProps {
-  instance: Table<Experiment>
+  headerGroups: HeaderGroup<Experiment>[]
+  columnOrder: string[]
+  setColumnOrder: (updater: Updater<ColumnOrderState>) => void
   root: HTMLElement | null
   setExpColumnNeedsShadow: (needsShadow: boolean) => void
   setTableHeadHeight: (height: number) => void
 }
 
-export const TableHead = ({
-  instance,
+const THead = ({
+  columnOrder,
+  headerGroups,
+  setColumnOrder,
   root,
   setExpColumnNeedsShadow,
   setTableHeadHeight
 }: TableHeadProps) => {
-  const { setColumnOrder, getHeaderGroups, getAllLeafColumns } = instance
-  const headerGroups = getHeaderGroups()
-  const allColumns = getAllLeafColumns()
-
   const headerDropTargetId = useSelector(
     (state: ExperimentsState) => state.headerDropTarget
   )
@@ -58,7 +63,7 @@ export const TableHead = ({
     )
     if (displacerHeader) {
       draggingIds.current = leafColumnIds(displacerHeader)
-      fullColumnOrder.current = allColumns.map(({ id }) => id)
+      fullColumnOrder.current = columnOrder
     }
   }
 
@@ -130,3 +135,5 @@ export const TableHead = ({
     </thead>
   )
 }
+
+export const TableHead = memo(THead)
