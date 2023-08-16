@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.42] - 2023-08-16
+
+### 🚀 New Features and Enhancements
+
+- Add Scikit-learn and YOLO to other frameworks supported by DVCLive [#4510](https://github.com/iterative/vscode-dvc/pull/4510) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Make redux utils generic [#4511](https://github.com/iterative/vscode-dvc/pull/4511) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.41] - 2023-08-16
 
 ### 🐛 Bug Fixes
