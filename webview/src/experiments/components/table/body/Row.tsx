@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import React, { memo, useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { EXPERIMENT_WORKSPACE_ID } from 'dvc/src/cli/dvc/contract'
 import { StubCell, CellWrapper } from './Cell'
@@ -16,11 +16,9 @@ import {
   toggleRowSelected
 } from '../../../state/rowSelectionSlice'
 
-const Row: React.FC<RowProp & { className?: string; isExpanded: boolean }> = ({
-  row,
-  isExpanded,
-  className
-}): JSX.Element => {
+export const TableRow: React.FC<
+  RowProp & { className?: string; isExpanded: boolean }
+> = ({ row, isExpanded, className }): JSX.Element => {
   const changes = useSelector(
     (state: ExperimentsState) => state.tableData.changes
   )
@@ -119,5 +117,3 @@ const Row: React.FC<RowProp & { className?: string; isExpanded: boolean }> = ({
     </ContextMenu>
   )
 }
-
-export const TableRow = memo(Row)
