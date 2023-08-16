@@ -14,7 +14,6 @@ import {
   bypassProcessManagerDebounce,
   bypassProgressCloseDelay,
   closeAllEditors,
-  getFirstArgOfLastCall,
   getMockNow,
   getTimeSafeDisposer,
   stubPrivatePrototypeMethod,
@@ -178,9 +177,11 @@ suite('Experiments Tree Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to select / de-select experiments using dvc.views.experimentsTree.selectExperiments', async () => {
-      const { plotsModel, messageSpy } = await buildPlotsWebview({
+      const { experiments, plotsModel, messageSpy } = await buildPlotsWebview({
         disposer: disposable
       })
+
+      stub(experiments, 'getSummaryColumnOrder').returns([])
 
       const [{ label, displayColor }] = plotsModel.getSelectedRevisionDetails()
 
@@ -225,15 +226,22 @@ suite('Experiments Tree Test Suite', () => {
 
       expect(mockCreateQuickPick).to.be.calledOnce
 
-      const { selectedRevisions } = getFirstArgOfLastCall(messageSpy)
-
       expect(
-        (selectedRevisions as Revision[]).map(({ displayColor, label }) => ({
-          displayColor,
-          label
-        })),
+        messageSpy,
         'a message is sent with colors for the currently selected experiments'
-      ).to.deep.equal([{ displayColor, label }])
+      ).to.be.calledWithMatch({
+        selectedRevisions: [
+          {
+            description: undefined,
+            displayColor,
+            errors: undefined,
+            fetched: true,
+            id: label,
+            label,
+            summaryColumns: []
+          }
+        ]
+      })
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to remove an experiment with dvc.views.experimentsTree.removeExperiment', async () => {
