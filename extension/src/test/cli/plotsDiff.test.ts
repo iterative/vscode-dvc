@@ -28,8 +28,8 @@ suite('plots diff -o <TEMP_DIR> --split --show-json', () => {
       expect(isDvcError(output), 'should not be an error object').to.be.false
       const data = (output as PlotsOutput)?.data
 
-      expect(Object.keys(data), 'should have six plot paths').to.have.lengthOf(
-        6
+      expect(Object.keys(data), 'should have 20 plot paths').to.have.lengthOf(
+        20
       )
 
       // each set of plots under a path

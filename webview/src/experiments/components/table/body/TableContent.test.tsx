@@ -16,7 +16,7 @@ const tableStateData = {
 }
 
 jest.mock('../../../../shared/api')
-jest.mock('./ExperimentGroup')
+jest.mock('./NestedRow')
 jest.mock('./Row')
 
 describe('TableContent', () => {
@@ -815,10 +815,28 @@ describe('TableContent', () => {
   } as unknown as Table<Experiment>
 
   const renderTableContent = (rowsInstance = instance) => {
+    const { rows, flatRows } = rowsInstance.getRowModel()
+
     return render(
       <Provider
         store={configureStore({
           preloadedState: {
+            rowSelection: {
+              lastSelectedRowId: undefined,
+              rowOrder: flatRows.map(
+                ({
+                  depth,
+                  original: { branch, id, executorStatus, starred }
+                }) => ({
+                  branch,
+                  depth,
+                  executorStatus,
+                  id,
+                  starred
+                })
+              ),
+              selectedRows: {}
+            },
             tableData: tableStateData
           },
           reducer: experimentsReducers
@@ -826,7 +844,7 @@ describe('TableContent', () => {
       >
         <table>
           <TableContent
-            instance={rowsInstance}
+            rows={rows}
             tableHeadHeight={50}
             tableRef={createRef()}
           />

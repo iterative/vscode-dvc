@@ -1,8 +1,13 @@
 import React from 'react'
-import { RowContent } from './Row'
+import { TableRow } from './Row'
 import styles from '../styles.module.scss'
 import { RowProp } from '../../../util/interfaces'
 
-export const NestedRow: React.FC<RowProp> = ({ row }) => {
-  return <RowContent row={row} className={styles.nestedRow} />
+export const NestedRow: React.FC<RowProp & { isExpanded: boolean }> = ({
+  row,
+  isExpanded
+}) => {
+  return (
+    <TableRow row={row} isExpanded={isExpanded} className={styles.nestedRow} />
+  )
 }
