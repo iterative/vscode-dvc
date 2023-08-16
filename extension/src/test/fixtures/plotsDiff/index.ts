@@ -14,7 +14,8 @@ import {
   PlotsComparisonData,
   DEFAULT_PLOT_HEIGHT,
   DEFAULT_NB_ITEMS_PER_ROW,
-  DEFAULT_PLOT_WIDTH
+  DEFAULT_PLOT_WIDTH,
+  ComparisonPlotImg
 } from '../../../plots/webview/contract'
 import { join } from '../../util/path'
 import { copyOriginalColors } from '../../../experiments/model/status/colors'
@@ -375,10 +376,14 @@ const getMultiImageData = (
       url: string
     }[]
   } = {}
+
   for (let i = 0; i < 15; i++) {
     const key = joinFunc('plots', 'image', `${i}.jpg`)
     const values = []
     for (const revision of revisions) {
+      if (revision === 'exp-83425' && i % 2 === 0) {
+        continue
+      }
       values.push({
         type: PlotsType.IMAGE,
         revisions: [revision],
@@ -779,7 +784,8 @@ export const getComparisonWebviewMessage = (
   } = {}
 
   for (const [path, plots] of Object.entries(getImageData(baseUrl, joinFunc))) {
-    const pathLabel = path.includes('image') ? join('plots', 'image') : path
+    const isMulti = path.includes('image')
+    const pathLabel = isMulti ? join('plots', 'image') : path
 
     if (!plotAcc[pathLabel]) {
       plotAcc[pathLabel] = {
@@ -801,11 +807,18 @@ export const getComparisonWebviewMessage = (
         }
       }
 
-      plotAcc[pathLabel].revisions[id].imgs.push({
+      const img: ComparisonPlotImg = {
         url: `${url}?${MOCK_IMAGE_MTIME}`,
         errors: undefined,
         loading: false
-      })
+      }
+
+      if (isMulti) {
+        const pathIndMatches = path.match(/(\d+)\.jpg$/)
+        img.ind = Number((pathIndMatches as string[])[1])
+      }
+
+      plotAcc[pathLabel].revisions[id].imgs.push(img)
     }
   }
 

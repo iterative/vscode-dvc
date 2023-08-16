@@ -1,6 +1,9 @@
 import React, { useEffect, useCallback, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { ComparisonPlot } from 'dvc/src/plots/webview/contract'
+import {
+  ComparisonPlot,
+  ComparisonPlotImg
+} from 'dvc/src/plots/webview/contract'
 import { ComparisonTableCell } from './ComparisonTableCell'
 import styles from '../styles.module.scss'
 import { changeDisabledDragIds } from '../comparisonTableSlice'
@@ -18,6 +21,12 @@ export const ComparisonTableMultiCell: React.FC<{
   const dispatch = useDispatch()
   const maxStep = plot.imgs.length - 1
   const changeDebounceTimer = useRef(0)
+  const selectedImg: ComparisonPlotImg = plot.imgs[currentStep] || {
+    errors: undefined,
+    ind: currentStep,
+    loading: false,
+    url: undefined
+  }
 
   const addDisabled = useCallback(() => {
     dispatch(changeDisabledDragIds([path]))
@@ -46,15 +55,9 @@ export const ComparisonTableMultiCell: React.FC<{
         path={path}
         plot={{
           id: plot.id,
-          imgs: [
-            plot.imgs[currentStep] || {
-              errors: undefined,
-              loading: false,
-              url: undefined
-            }
-          ]
+          imgs: [selectedImg]
         }}
-        imgAlt={`${currentStep} of ${path} (${plot.id})`}
+        imgAlt={`${selectedImg.ind} of ${path} (${plot.id})`}
       />
       <div
         className={styles.multiImageSlider}
@@ -76,7 +79,7 @@ export const ComparisonTableMultiCell: React.FC<{
             setCurrentStep(Number(event.target.value))
           }}
         />
-        <p>{currentStep}</p>
+        <p>{selectedImg?.ind}</p>
       </div>
     </div>
   )

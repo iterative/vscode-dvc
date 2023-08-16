@@ -124,6 +124,7 @@ export type ImagePlot = {
   revisions?: string[]
   type: PlotsType
   url: string
+  ind?: number
 }
 
 export const isImagePlot = (plot: Plot): plot is ImagePlot =>
@@ -158,6 +159,7 @@ export type ComparisonPlotImg = {
   url: string | undefined
   errors: string[] | undefined
   loading: boolean
+  ind?: number
 }
 
 export type ComparisonPlot = {
