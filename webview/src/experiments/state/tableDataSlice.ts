@@ -126,7 +126,7 @@ export const tableDataSlice = createSlice({
       state.columnWidths = keepReferenceIfEqual(
         state.columnWidths,
         action.payload
-      ) as Record<string, number>
+      )
     },
     updateColumns: (state, action: PayloadAction<ExtensionColumn[]>) => {
       if (isEqual(state.columns, action.payload)) {
@@ -161,7 +161,7 @@ export const tableDataSlice = createSlice({
       state.hasMoreCommits = keepReferenceIfEqual(
         state.hasMoreCommits,
         action.payload
-      ) as Record<string, boolean>
+      )
     },
     updateHasRunningWorkspaceExperiment: (
       state,
@@ -176,13 +176,10 @@ export const tableDataSlice = createSlice({
       state.isShowingMoreCommits = keepReferenceIfEqual(
         state.isShowingMoreCommits,
         action.payload
-      ) as Record<string, boolean>
+      )
     },
     updateRows: (state, action: PayloadAction<Experiment[]>) => {
-      state.rows = keepEqualOldReferencesInArray(
-        state.rows,
-        action.payload
-      ) as Experiment[]
+      state.rows = keepEqualOldReferencesInArray(state.rows, action.payload)
     },
     updateSelectedBranches: (state, action: PayloadAction<string[]>) => {
       state.selectedBranches = action.payload
@@ -194,10 +191,7 @@ export const tableDataSlice = createSlice({
       state.showOnlyChanged = action.payload
     },
     updateSorts: (state, action: PayloadAction<SortDefinition[]>) => {
-      state.sorts = keepEqualOldReferencesInArray(
-        state.sorts,
-        action.payload
-      ) as SortDefinition[]
+      state.sorts = keepEqualOldReferencesInArray(state.sorts, action.payload)
     }
   }
 })

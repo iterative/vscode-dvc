@@ -5,10 +5,10 @@ import { DraggedInfo } from '../shared/components/dragDrop/dragDropSlice'
 export const pushIf = <T>(array: T[], condition: boolean, elements: T[]) =>
   condition && array.push(...elements)
 
-export const keepEqualOldReferencesInArray = (
-  oldArray: BaseType[],
-  newArray: BaseType[]
-) =>
+export const keepEqualOldReferencesInArray = <T extends BaseType>(
+  oldArray: T[],
+  newArray: T[]
+): T[] =>
   newArray.map(item => oldArray.find(oldItem => isEqual(oldItem, item)) || item)
 
 export const changeOrderWithDraggedInfo = (

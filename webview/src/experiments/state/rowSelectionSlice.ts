@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { ExecutorStatus } from 'dvc/src/cli/dvc/contract'
 import { getCompositeId } from '../util/rows'
-import { keepEqualOldReferencesInArray } from '../../util/array'
+import { keepReferenceIfEqual } from '../../util/objects'
 
 export type SelectedRow = {
   depth: number
@@ -80,10 +80,7 @@ export const rowSelectionSlice = createSlice({
     },
     updateRowOrder(state, action: PayloadAction<SelectedRow[]>) {
       const newOrder = action.payload
-      state.rowOrder = keepEqualOldReferencesInArray(
-        state.rowOrder,
-        newOrder
-      ) as SelectedRow[]
+      state.rowOrder = keepReferenceIfEqual(state.rowOrder, newOrder)
     }
   }
 })
