@@ -79,7 +79,7 @@ export const ComparisonTableMultiCell: React.FC<{
             setCurrentStep(Number(event.target.value))
           }}
         />
-        <p>{selectedImg?.ind}</p>
+        <p>{selectedImg.ind}</p>
       </div>
     </div>
   )
