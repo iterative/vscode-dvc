@@ -99,7 +99,7 @@ export class ExperimentsTree
         error,
         error,
         DecoratableTreeItemScheme.EXPERIMENTS,
-        true
+        false
       )
     }
 
