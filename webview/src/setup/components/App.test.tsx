@@ -689,7 +689,7 @@ describe('App', () => {
       ).toBeInTheDocument()
     })
 
-    it('should show an info icon if dvc is compatible but studio is not connected', () => {
+    it('should show an error icon if dvc is compatible but studio is not connected', () => {
       renderApp()
 
       const iconWrapper = within(
@@ -697,7 +697,7 @@ describe('App', () => {
       ).getByTestId('info-tooltip-toggle')
 
       expect(
-        within(iconWrapper).getByTestId(TooltipIconType.INFO)
+        within(iconWrapper).getByTestId(TooltipIconType.ERROR)
       ).toBeInTheDocument()
     })
   })

@@ -50,13 +50,8 @@ const getDvcStatusIcon = (
     : TooltipIconType.PASSED
 }
 
-const getStudioStatusIcon = (cliCompatible: boolean, isConnected: boolean) => {
-  if (!cliCompatible) {
-    return TooltipIconType.ERROR
-  }
-
-  return isConnected ? TooltipIconType.PASSED : TooltipIconType.INFO
-}
+const getStudioStatusIcon = (cliCompatible: boolean, isConnected: boolean) =>
+  cliCompatible && isConnected ? TooltipIconType.PASSED : TooltipIconType.ERROR
 
 export const feedStore = (
   data: MessageToWebview<SetupData>,
