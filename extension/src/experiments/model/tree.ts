@@ -98,7 +98,8 @@ export class ExperimentsTree
       return getCliErrorTreeItem(
         error,
         error,
-        DecoratableTreeItemScheme.EXPERIMENTS
+        DecoratableTreeItemScheme.EXPERIMENTS,
+        true
       )
     }
 

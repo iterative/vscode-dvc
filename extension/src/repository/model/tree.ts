@@ -106,7 +106,8 @@ export class RepositoriesTree
       return getCliErrorTreeItem(
         getCliErrorLabel(error),
         error,
-        DecoratableTreeItemScheme.TRACKED
+        DecoratableTreeItemScheme.TRACKED,
+        true
       )
     }
     const { resourceUri, isDirectory } = item
