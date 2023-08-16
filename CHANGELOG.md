@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.40] - 2023-08-16
+
+### 🚀 New Features and Enhancements
+
+- Add refresh button to experiments tree cli errors [#4500](https://github.com/iterative/vscode-dvc/pull/4500) by [@julieg18](https://github.com/julieg18)
+
+### 🐛 Bug Fixes
+
+- Have experiment webview redirect to setup when there is no data [#4483](https://github.com/iterative/vscode-dvc/pull/4483) by [@julieg18](https://github.com/julieg18)
+- Fix experiment table created column [#4501](https://github.com/iterative/vscode-dvc/pull/4501) by [@mattseddon](https://github.com/mattseddon)
+- Fix scheduled CLI output test (extra image plots) [#4502](https://github.com/iterative/vscode-dvc/pull/4502) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Replace experiments table react context with redux state [#4486](https://github.com/iterative/vscode-dvc/pull/4486) by [@mattseddon](https://github.com/mattseddon)
+- Update experiments table column data [#4495](https://github.com/iterative/vscode-dvc/pull/4495) by [@mattseddon](https://github.com/mattseddon)
+- Update demo project and latest tested CLI version (3.15.2) [#4477](https://github.com/iterative/vscode-dvc/pull/4477) by [@mattseddon](https://github.com/mattseddon)
+- Remove unused redux slice from experiments table [#4484](https://github.com/iterative/vscode-dvc/pull/4484) by [@mattseddon](https://github.com/mattseddon)
+- Fix tests [#4508](https://github.com/iterative/vscode-dvc/pull/4508) by [@mattseddon](https://github.com/mattseddon)
+- Avoid more unnecessary experiments table re-renders [#4503](https://github.com/iterative/vscode-dvc/pull/4503) by [@mattseddon](https://github.com/mattseddon)
+- Reduce Comparison "Image By Step" calls to backend [#4506](https://github.com/iterative/vscode-dvc/pull/4506) by [@julieg18](https://github.com/julieg18)
+
 ## [1.0.39] - 2023-08-14
 
 ### 🚀 New Features and Enhancements
