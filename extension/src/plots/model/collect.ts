@@ -134,11 +134,9 @@ export type RevisionData = {
   [label: string]: RevisionPathData
 }
 
-type ComparisonDataImgPlot = ImagePlot & { ind?: number }
-
 export type ComparisonData = {
   [label: string]: {
-    [path: string]: ComparisonDataImgPlot[]
+    [path: string]: ImagePlot[]
   }
 }
 
@@ -171,7 +169,7 @@ const collectImageData = (
     acc[id][pathLabel] = []
   }
 
-  const imgPlot: ComparisonDataImgPlot = { ...plot }
+  const imgPlot: ImagePlot = { ...plot }
 
   if (isMultiImgPlot) {
     imgPlot.ind = getMultiImageInd(path)
