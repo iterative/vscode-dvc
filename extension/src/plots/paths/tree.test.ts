@@ -1,4 +1,4 @@
-import { Uri } from 'vscode'
+import { MarkdownString, TreeItem, Uri } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { EncodingType } from './collect'
 import { PlotsPathsTree } from './tree'
@@ -9,11 +9,26 @@ import { Plots } from '..'
 import { buildMockedEventEmitter } from '../../test/util/jest'
 import { Shape, StrokeDash } from '../multiSource/constants'
 import { join } from '../../test/util/path'
+import { DecoratableTreeItemScheme, getDecoratableUri } from '../../tree'
+import { RegisteredCommands } from '../../commands/external'
+import { getMarkdownString } from '../../vscode/markdownString'
 
 const mockedDisposable = jest.mocked(Disposable)
 const mockedGetChildPaths = jest.fn()
+const mockedWorkspacePlots = {
+  getRepository: () =>
+    ({ getChildPaths: mockedGetChildPaths }) as unknown as Plots,
+  pathsChanged: buildMockedEventEmitter()
+} as unknown as WorkspacePlots
+const mockedInternalCommands = {
+  registerExternalCommand: jest.fn()
+} as unknown as InternalCommands
+const resourceLocator = new ResourceLocator(Uri.file(__filename))
+const mockedTreeItem = jest.mocked(TreeItem)
+const mockedGetMarkdownString = jest.mocked(getMarkdownString)
 
 jest.mock('vscode')
+jest.mock('../../vscode/markdownString')
 jest.mock('@hediet/std/disposable')
 
 beforeEach(() => {
@@ -27,16 +42,6 @@ beforeEach(() => {
 
 describe('PlotsPathsTree', () => {
   it('should return the correct children for multi source plots (encoding elements)', () => {
-    const mockedWorkspacePlots = {
-      getRepository: () =>
-        ({ getChildPaths: mockedGetChildPaths }) as unknown as Plots,
-      pathsChanged: buildMockedEventEmitter()
-    } as unknown as WorkspacePlots
-    const mockedInternalCommands = {
-      registerExternalCommand: jest.fn()
-    } as unknown as InternalCommands
-    const resourceLocator = new ResourceLocator(Uri.file(__filename))
-
     const plotsPathTree = new PlotsPathsTree(
       mockedWorkspacePlots,
       mockedInternalCommands,
@@ -85,5 +90,44 @@ describe('PlotsPathsTree', () => {
         tooltip: undefined
       }
     ])
+  })
+
+  it('should return the correct tree item for a cli error', () => {
+    const errorMsg = 'dvc cli error message'
+    const path = join('plots', 'plot.png')
+    const expectedUri = getDecoratableUri(path, DecoratableTreeItemScheme.PLOTS)
+    const expectedCollapsibleState = 0
+
+    mockedGetMarkdownString.mockImplementationOnce(
+      str => str as unknown as MarkdownString
+    )
+    mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
+      expect(collapsibleState).toStrictEqual(expectedCollapsibleState)
+      expect(uri).toStrictEqual(expectedUri)
+      return { collapsibleState, uri }
+    })
+
+    const plotsPathTree = new PlotsPathsTree(
+      mockedWorkspacePlots,
+      mockedInternalCommands,
+      resourceLocator
+    )
+
+    const treeItem = plotsPathTree.getTreeItem({
+      error: errorMsg,
+      path
+    })
+
+    expect(treeItem).toStrictEqual({
+      collapsibleState: expectedCollapsibleState,
+      command: {
+        command: RegisteredCommands.EXTENSION_SHOW_OUTPUT,
+        title: 'Show DVC Output'
+      },
+      contextValue: 'cliError',
+      iconPath: expect.anything(),
+      tooltip: `$(error) ${errorMsg}`,
+      uri: expectedUri
+    })
   })
 })

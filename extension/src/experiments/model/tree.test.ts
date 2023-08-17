@@ -637,5 +637,46 @@ describe('ExperimentsTree', () => {
         iconPath: { id: 'circle-filled' }
       })
     })
+
+    it('should return a tree item for a cli error', () => {
+      const errorMsg = 'dvc cli error message'
+      const expectedUri = getDecoratableUri(
+        errorMsg,
+        DecoratableTreeItemScheme.EXPERIMENTS
+      )
+      const expectedCollapsibleState = 0
+
+      mockedGetMarkdownString.mockImplementationOnce(
+        str => str as unknown as MarkdownString
+      )
+      mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
+        expect(collapsibleState).toStrictEqual(expectedCollapsibleState)
+        expect(uri).toStrictEqual(expectedUri)
+        return { collapsibleState, uri }
+      })
+
+      const experimentsTree = new ExperimentsTree(
+        mockedExperiments,
+        mockedResourceLocator
+      )
+
+      const treeItem = experimentsTree.getTreeItem({
+        dvcRoot: 'repo',
+        error: errorMsg
+      })
+
+      expect(treeItem).toStrictEqual({
+        collapsibleState: expectedCollapsibleState,
+        command: {
+          command: RegisteredCommands.EXTENSION_SHOW_OUTPUT,
+          title: 'Show DVC Output'
+        },
+        contextValue: 'cliError',
+        iconPath: expect.anything(),
+        label: errorMsg,
+        tooltip: `$(error) ${errorMsg}`,
+        uri: expectedUri
+      })
+    })
   })
 })

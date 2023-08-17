@@ -88,7 +88,9 @@ export class ExperimentsTree
     this.updateDescriptionOnChange()
   }
 
-  public getTreeItem(element: string | ExperimentItem): TreeItem {
+  public getTreeItem(
+    element: string | ExperimentItem | ExperimentErrorItem
+  ): TreeItem {
     if (isRoot(element)) {
       return getRootItem(element)
     }

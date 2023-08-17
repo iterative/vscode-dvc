@@ -377,7 +377,6 @@ describe('RepositoriesTree', () => {
     })
 
     it('should return the correct tree item for an error', () => {
-      let mockedItem = {}
       const label =
         'ERROR: unable to read: params.yaml, YAML file structure is corrupted: mapping values are not allowed in this context'
 
@@ -386,13 +385,15 @@ describe('RepositoriesTree', () => {
       mockedGetMarkdownString.mockImplementationOnce(
         str => str as unknown as MarkdownString
       )
+      const expectedUri = getDecoratableUri(
+        label,
+        DecoratableTreeItemScheme.TRACKED
+      )
+      const expectedCollapsibleState = 0
       mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
-        expect(collapsibleState).toStrictEqual(0)
-        expect(uri).toStrictEqual(
-          getDecoratableUri(label, DecoratableTreeItemScheme.TRACKED)
-        )
-        mockedItem = { collapsibleState, uri }
-        return mockedItem
+        expect(collapsibleState).toStrictEqual(expectedCollapsibleState)
+        expect(uri).toStrictEqual(expectedUri)
+        return { collapsibleState, uri }
       })
 
       const trackedTreeView = new RepositoriesTree(
@@ -406,12 +407,16 @@ describe('RepositoriesTree', () => {
 
       expect(mockedTreeItem).toHaveBeenCalledTimes(1)
       expect(treeItem).toStrictEqual({
-        ...mockedItem,
+        collapsibleState: expectedCollapsibleState,
         command: {
           command: RegisteredCommands.EXTENSION_SHOW_OUTPUT,
           title: 'Show DVC Output'
         },
-        tooltip: `$(error) ${msg}`
+        contextValue: 'cliError',
+        iconPath: expect.anything(),
+        label,
+        tooltip: `$(error) ${msg}`,
+        uri: expectedUri
       })
     })
   })
