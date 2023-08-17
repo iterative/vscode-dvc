@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.43] - 2023-08-17
+
+### 🐛 Bug Fixes
+
+- Fix "Image By Step" step number inaccuracy [#4516](https://github.com/iterative/vscode-dvc/pull/4516) by [@julieg18](https://github.com/julieg18)
+
+### 🔨 Maintenance
+
+- Update setup studio status icon [#4515](https://github.com/iterative/vscode-dvc/pull/4515) by [@julieg18](https://github.com/julieg18)
+- Update demo project and latest tested CLI version (3.15.3) [#4514](https://github.com/iterative/vscode-dvc/pull/4514) by [@julieg18](https://github.com/julieg18)
+
 ## [1.0.42] - 2023-08-16
 
 ### 🚀 New Features and Enhancements
