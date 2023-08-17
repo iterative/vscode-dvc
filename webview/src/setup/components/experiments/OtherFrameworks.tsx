@@ -28,8 +28,18 @@ export const OtherFrameworks = () => (
         <a href="https://dvc.org/doc/dvclive/ml-frameworks/pytorch">PyTorch</a>
       </li>
       <li>
+        <a href="https://dvc.org/doc/dvclive/ml-frameworks/scikit-learn">
+          Scikit-learn
+        </a>
+      </li>
+      <li>
         <a href="https://dvc.org/doc/dvclive/ml-frameworks/tensorflow">
           TensorFlow
+        </a>
+      </li>
+      <li>
+        <a href="https://dvc.org/doc/dvclive/ml-frameworks/yolo">
+          Ultralytics YOLO v8
         </a>
       </li>
       <li>

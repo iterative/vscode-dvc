@@ -55,7 +55,7 @@ const getStudioStatusIcon = (cliCompatible: boolean, isConnected: boolean) => {
     return TooltipIconType.ERROR
   }
 
-  return isConnected ? TooltipIconType.PASSED : TooltipIconType.INFO
+  return isConnected ? TooltipIconType.PASSED : TooltipIconType.WARNING
 }
 
 export const feedStore = (
