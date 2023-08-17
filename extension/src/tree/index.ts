@@ -47,8 +47,7 @@ export const getCliErrorLabel = (msg: string): string =>
 export const getCliErrorTreeItem = (
   label: string,
   msg: string,
-  decoratableTreeItemScheme: DecoratableTreeItemScheme,
-  isLabelPath = true
+  decoratableTreeItemScheme: DecoratableTreeItemScheme
 ) => {
   const treeItem = getDecoratableTreeItem(label, decoratableTreeItemScheme)
 
@@ -63,9 +62,17 @@ export const getCliErrorTreeItem = (
     title: 'Show DVC Output'
   }
 
-  if (!isLabelPath) {
-    treeItem.label = label
-  }
+  return treeItem
+}
+
+export const getCliErrorMessageTreeItem = (
+  label: string,
+  msg: string,
+  decoratableTreeItemScheme: DecoratableTreeItemScheme
+) => {
+  const treeItem = getCliErrorTreeItem(label, msg, decoratableTreeItemScheme)
+
+  treeItem.label = label
 
   return treeItem
 }
