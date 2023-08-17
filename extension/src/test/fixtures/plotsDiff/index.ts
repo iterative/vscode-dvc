@@ -775,6 +775,11 @@ export const getManyTemplatePlotsWebviewMessage = (
 
 export const MOCK_IMAGE_MTIME = 946684800000
 
+const getIndFromComparisonMultiImgPath = (path: string) => {
+  const pathIndMatches = path.match(/(\d+)\.jpg$/)
+  return Number((pathIndMatches as string[])[1])
+}
+
 export const getComparisonWebviewMessage = (
   baseUrl: string,
   joinFunc: (...args: string[]) => string = join
@@ -814,8 +819,7 @@ export const getComparisonWebviewMessage = (
       }
 
       if (isMulti) {
-        const pathIndMatches = path.match(/(\d+)\.jpg$/)
-        img.ind = Number((pathIndMatches as string[])[1])
+        img.ind = getIndFromComparisonMultiImgPath(path)
       }
 
       plotAcc[pathLabel].revisions[id].imgs.push(img)
