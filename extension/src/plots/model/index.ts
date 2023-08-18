@@ -34,7 +34,8 @@ import {
   PlotHeight,
   SmoothPlotValues,
   ImagePlot,
-  ComparisonMultiPlotValues
+  ComparisonMultiPlotValues,
+  ComparisonPlotImg
 } from '../webview/contract'
 import {
   EXPERIMENT_WORKSPACE_ID,
@@ -462,11 +463,17 @@ export class PlotsModel extends ModelWithPersistence {
         const url = collectImageUrl(image, fetched)
         const loading = !fetched && !url
 
-        return {
+        const plot: ComparisonPlotImg = {
           errors,
           loading,
           url
         }
+
+        if (typeof image.ind === 'number') {
+          plot.ind = image.ind
+        }
+
+        return plot
       },
       paths,
       selectedRevisionIds

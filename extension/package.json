@@ -9,7 +9,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "1.0.41",
+  "version": "1.0.43",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -957,6 +957,10 @@
         },
         {
           "command": "dvc.views.experimentsTree.removeExperiment",
+          "when": "false"
+        },
+        {
+          "command": "dvc.views.experiments.refresh",
           "when": "false"
         },
         {
