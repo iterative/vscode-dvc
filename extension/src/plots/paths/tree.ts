@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { join, sep } from 'path'
 import { TreeItem, TreeItemCollapsibleState } from 'vscode'
 import { EncodingType, isEncodingElement } from './collect'
 import {
@@ -57,10 +57,13 @@ export class PlotsPathsTree extends BasePathSelectionTree<WorkspacePlots> {
     const { collapsibleState, dvcRoot, path } = element
 
     const resourceUri = getDecoratableUri(
-      join(dvcRoot, path),
+      join(dvcRoot, path.replace('dvc.yaml::', `dvc.yaml${sep}`)),
       DecoratableTreeItemScheme.PLOTS
     )
     const treeItem = new TreeItem(resourceUri, collapsibleState)
+    if (resourceUri.fsPath.endsWith('dvc.yaml')) {
+      treeItem.label = path
+    }
 
     return this.addTreeItemDetails(element, treeItem)
   }

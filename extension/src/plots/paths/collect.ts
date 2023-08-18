@@ -1,3 +1,4 @@
+import { sep } from 'path'
 import {
   ImagePlot,
   isImagePlot,
@@ -165,7 +166,7 @@ const collectOrderedPath = (
   idx: number,
   isMultiImgDir: boolean
 ): PlotPath[] => {
-  const path = getPath(pathArray, idx)
+  const path = getPath(pathArray, idx).replace(`dvc.yaml${sep}`, 'dvc.yaml::')
   const hasChildren = idx !== pathArray.length
   const isPathLeaf = idx === pathArray.length
   const isMultiImgPlot = isMultiImgDir && isPathLeaf
@@ -196,6 +197,15 @@ const collectOrderedPath = (
   return acc
 }
 
+const fun = (path: string): string[] => {
+  if (!path.includes('::')) {
+    return getPathArray(path)
+  }
+
+  const [dvcYamlPath, plotPath] = path.split('::')
+  return [dvcYamlPath, ...getPathArray(plotPath)]
+}
+
 const addRevisionsToPath = (
   acc: PlotPath[],
   data: PlotsData,
@@ -206,7 +216,7 @@ const addRevisionsToPath = (
     return acc
   }
 
-  const pathArray = getPathArray(path)
+  const pathArray = fun(path)
   const isMultiImg =
     MULTI_IMAGE_PATH_REG.test(path) &&
     !!getType(data, path)?.has(PathType.COMPARISON)
