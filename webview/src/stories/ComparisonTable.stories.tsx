@@ -88,11 +88,15 @@ const removeImages = (
       filteredRevisionData[id] = {
         id,
         imgs: isMulti
-          ? (Array.from({ length: revisionsData[id].imgs.length }).fill({
-              errors: undefined,
-              loading: false,
-              url: undefined
-            }) as ComparisonPlotImg[])
+          ? Array.from({ length: revisionsData[id].imgs.length }).map(
+              (_, ind) =>
+                ({
+                  errors: undefined,
+                  ind,
+                  loading: false,
+                  url: undefined
+                }) as ComparisonPlotImg
+            )
           : [
               {
                 errors:
