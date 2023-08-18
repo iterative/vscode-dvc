@@ -960,6 +960,10 @@
           "when": "false"
         },
         {
+          "command": "dvc.views.experiments.refresh",
+          "when": "false"
+        },
+        {
           "command": "dvc.views.experiments.removeExperiment",
           "when": "false"
         },
