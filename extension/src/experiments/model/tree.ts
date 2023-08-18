@@ -20,7 +20,7 @@ import {
   createTreeView,
   DecoratableTreeItemScheme,
   ErrorItem,
-  getCliErrorTreeItem,
+  getCliErrorMessageTreeItem,
   getDecoratableTreeItem,
   getErrorTooltip,
   getRootItem,
@@ -88,14 +88,16 @@ export class ExperimentsTree
     this.updateDescriptionOnChange()
   }
 
-  public getTreeItem(element: string | ExperimentItem): TreeItem {
+  public getTreeItem(
+    element: string | ExperimentItem | ExperimentErrorItem
+  ): TreeItem {
     if (isRoot(element)) {
       return getRootItem(element)
     }
 
     if (isExperimentErrorItem(element)) {
       const { error } = element
-      return getCliErrorTreeItem(
+      return getCliErrorMessageTreeItem(
         error,
         error,
         DecoratableTreeItemScheme.EXPERIMENTS

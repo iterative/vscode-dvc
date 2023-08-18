@@ -42,7 +42,7 @@ import {
   createTreeView,
   DecoratableTreeItemScheme,
   getCliErrorLabel,
-  getCliErrorTreeItem,
+  getCliErrorMessageTreeItem,
   isErrorItem
 } from '../../tree'
 import { getWorkspaceFolders } from '../../vscode/workspaceFolders'
@@ -103,7 +103,7 @@ export class RepositoriesTree
     if (isErrorItem(item)) {
       const { error } = item
 
-      return getCliErrorTreeItem(
+      return getCliErrorMessageTreeItem(
         getCliErrorLabel(error),
         error,
         DecoratableTreeItemScheme.TRACKED

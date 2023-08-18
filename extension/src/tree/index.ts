@@ -61,6 +61,19 @@ export const getCliErrorTreeItem = (
     command: RegisteredCommands.EXTENSION_SHOW_OUTPUT,
     title: 'Show DVC Output'
   }
+
+  return treeItem
+}
+
+export const getCliErrorMessageTreeItem = (
+  label: string,
+  msg: string,
+  decoratableTreeItemScheme: DecoratableTreeItemScheme
+) => {
+  const treeItem = getCliErrorTreeItem(label, msg, decoratableTreeItemScheme)
+
+  treeItem.label = label
+
   return treeItem
 }
 
