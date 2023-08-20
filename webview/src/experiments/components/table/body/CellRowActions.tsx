@@ -129,6 +129,7 @@ export const CellRowActions: React.FC<CellRowActionsProps> = ({
         >
           <Icon
             className={styles.plotBox}
+            data-testid="plot-icon"
             style={
               plotColor
                 ? {

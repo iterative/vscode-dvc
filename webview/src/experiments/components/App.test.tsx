@@ -329,10 +329,12 @@ describe('App', () => {
   })
 
   describe('Toggle experiment status', () => {
-    it('should send a message to the extension to toggle an experiment when the row is clicked', () => {
+    it('should send a message to the extension to toggle an experiment when a plot icon is clicked', () => {
       renderTable()
 
-      const testClick = (element: HTMLElement, id: string) => {
+      const testClick = (elementId: string, id: string) => {
+        const element = within(getRow(elementId)).getByTestId('plot-icon')
+
         mockPostMessage.mockReset()
 
         fireEvent.click(element)
@@ -344,56 +346,10 @@ describe('App', () => {
         })
       }
 
-      const [workspace, experimentRunningInWorkspace] = screen.getAllByText(
-        EXPERIMENT_WORKSPACE_ID
-      )
-
-      testClick(workspace, EXPERIMENT_WORKSPACE_ID)
-      testClick(experimentRunningInWorkspace, 'exp-83425')
-      testClick(screen.getAllByText('main')[1], 'main')
-      testClick(screen.getByText('[exp-e7a67]'), 'exp-e7a67')
-    })
-
-    it('should send a message to the extension to toggle an experiment when Enter or Space is pressed on the row', () => {
-      renderTable()
-
-      mockPostMessage.mockClear()
-
-      const testRowLabel = screen.getAllByText('main')[1]
-
-      testRowLabel.focus()
-
-      fireEvent.keyDown(testRowLabel, {
-        bubbles: true,
-        code: 'Enter',
-        key: 'Enter',
-        keyCode: 13
-      })
-      expect(mockPostMessage).toHaveBeenCalledWith({
-        payload: 'main',
-        type: MessageFromWebviewType.TOGGLE_EXPERIMENT
-      })
-      mockPostMessage.mockClear()
-
-      fireEvent.keyDown(testRowLabel, {
-        bubbles: true,
-        charCode: 32,
-        code: 'Space',
-        key: ' ',
-        keyCode: 32
-      })
-      expect(mockPostMessage).toHaveBeenCalledWith({
-        payload: 'main',
-        type: MessageFromWebviewType.TOGGLE_EXPERIMENT
-      })
-      mockPostMessage.mockClear()
-
-      fireEvent.keyDown(testRowLabel, {
-        bubbles: true,
-        code: 'keyA',
-        key: 'a'
-      })
-      expect(mockPostMessage).not.toHaveBeenCalled()
+      testClick(EXPERIMENT_WORKSPACE_ID, EXPERIMENT_WORKSPACE_ID)
+      testClick('[exp-83425]', 'exp-83425')
+      testClick('main', 'main')
+      testClick('[exp-e7a67]', 'exp-e7a67')
     })
 
     it('should not send a message if row label was selected', () => {
@@ -417,13 +373,14 @@ describe('App', () => {
       clearSelection()
       fireEvent.click(getWorkspace())
 
-      expect(mockPostMessage).toHaveBeenCalledTimes(1)
-      expect(mockPostMessage).toHaveBeenCalledWith({
+      expect(mockPostMessage).not.toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).not.toHaveBeenCalledWith({
         payload: testRowId,
         type: MessageFromWebviewType.TOGGLE_EXPERIMENT
       })
     })
-    it('should send a message if some other label is selected', () => {
+
+    it('should not send a message if some other label is selected', () => {
       renderTable()
       mockPostMessage.mockClear()
 
@@ -433,8 +390,8 @@ describe('App', () => {
       createWindowTextSelection(selectedTestRowId, 5)
       fireEvent.click(screen.getAllByText(testRowId)[1])
 
-      expect(mockPostMessage).toHaveBeenCalledTimes(1)
-      expect(mockPostMessage).toHaveBeenCalledWith({
+      expect(mockPostMessage).not.toHaveBeenCalledTimes(1)
+      expect(mockPostMessage).not.toHaveBeenCalledWith({
         payload: testRowId,
         type: MessageFromWebviewType.TOGGLE_EXPERIMENT
       })
