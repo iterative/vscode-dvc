@@ -1,12 +1,8 @@
 import React from 'react'
-import { render, cleanup, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { WebviewWrapper } from './WebviewWrapper'
 
 describe('Wrapper', () => {
-  afterEach(() => {
-    cleanup()
-  })
-
   it('should add some css variables to the markup', () => {
     render(<WebviewWrapper>Test</WebviewWrapper>)
 

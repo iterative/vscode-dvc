@@ -1,6 +1,6 @@
 import React from 'react'
-import { render, cleanup, screen, fireEvent } from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
+import { render, screen, fireEvent } from '@testing-library/react'
+import '@testing-library/jest-dom'
 import { SelectMenuOption, SelectMenuOptionProps } from './SelectMenuOption'
 
 const option: SelectMenuOptionProps = {
@@ -20,7 +20,6 @@ const renderOption = (optionToRender = option, addedProps = otherProps) =>
 
 afterEach(() => {
   jest.clearAllMocks()
-  cleanup()
 })
 
 describe('SelectMenuOption', () => {

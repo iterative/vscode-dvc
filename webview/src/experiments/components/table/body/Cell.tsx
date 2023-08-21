@@ -6,7 +6,6 @@ import { ExperimentStatusIndicator } from './ExperimentStatusIndicator'
 import styles from '../styles.module.scss'
 import { CellValue, isValueWithChanges } from '../content/Cell'
 import { CellProp, RowProp } from '../../../util/interfaces'
-import { clickAndEnterProps } from '../../../../util/props'
 import { ErrorTooltip } from '../../../../shared/components/tooltip/ErrorTooltip'
 
 const cellHasChanges = (cellValue: CellValue) =>
@@ -51,16 +50,8 @@ export const StubCell: React.FC<
     }
   } = cell
   const {
-    original: {
-      error,
-      executorStatus,
-      gitRemoteStatus,
-      label,
-      id,
-      description = ''
-    }
+    original: { error, executorStatus, gitRemoteStatus, id }
   } = row
-  const { toggleExperiment } = rowActionsProps
 
   return (
     <td className={cx(styles.experimentsTd, styles.experimentCell)}>
@@ -80,11 +71,6 @@ export const StubCell: React.FC<
                 [styles.workspaceChangeText]: changesIfWorkspace,
                 [styles.errorText]: error
               })}
-              {...clickAndEnterProps(
-                toggleExperiment,
-                [label, description],
-                true
-              )}
               data-testid={`id___${id}`}
             >
               {flexRender(columnCell, getContext())}
