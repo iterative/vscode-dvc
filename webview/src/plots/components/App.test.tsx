@@ -10,7 +10,7 @@ import {
   waitFor,
   within
 } from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
+import '@testing-library/jest-dom'
 import comparisonTableFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import customPlotsFixture from 'dvc/src/test/fixtures/expShow/base/customPlots'
 import plotsRevisionsFixture from 'dvc/src/test/fixtures/plotsDiff/revisions'

@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import { join } from 'dvc/src/test/util/path'
 import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
+import '@testing-library/jest-dom'
 import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import { Provider } from 'react-redux'
 import {

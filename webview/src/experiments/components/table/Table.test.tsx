@@ -1,5 +1,5 @@
 /* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectHeaders"] }] */
-import '@testing-library/jest-dom/extend-expect'
+import '@testing-library/jest-dom'
 import { configureStore } from '@reduxjs/toolkit'
 import { fireEvent, queries, render, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
