@@ -1,7 +1,6 @@
 /* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectHeaders"] }] */
 import {
   act,
-  cleanup,
   createEvent,
   fireEvent,
   screen,
@@ -73,10 +72,6 @@ const mockPostMessage = jest.mocked(postMessage)
 
 beforeEach(() => {
   jest.clearAllMocks()
-})
-
-afterEach(() => {
-  cleanup()
 })
 
 describe('App', () => {

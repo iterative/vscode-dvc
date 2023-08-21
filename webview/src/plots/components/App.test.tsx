@@ -3,7 +3,6 @@ import { configureStore } from '@reduxjs/toolkit'
 import React from 'react'
 import { Provider } from 'react-redux'
 import {
-  cleanup,
   createEvent,
   fireEvent,
   render,
@@ -182,10 +181,6 @@ describe('App', () => {
       .mockImplementation(() => heightToSuppressVegaError)
     plotDataStore[PlotsSection.CUSTOM_PLOTS] = {} as CustomPlotsById
     plotDataStore[PlotsSection.TEMPLATE_PLOTS] = {} as TemplatePlotsById
-  })
-
-  afterEach(() => {
-    cleanup()
   })
 
   afterAll(() => {
@@ -2025,17 +2020,14 @@ describe('App', () => {
 
       describe('Sizing', () => {
         const custom = createCustomPlots(25)
-        let store: typeof plotsStore
 
-        beforeEach(async () => {
-          store = await renderAppAndChangeSize(
+        it('should render the plots correctly when the screen is larger than 2000px', async () => {
+          const store = await renderAppAndChangeSize(
             { comparison: comparisonTableFixture, custom },
             1,
             PlotsSection.CUSTOM_PLOTS
           )
-        })
 
-        it('should render the plots correctly when the screen is larger than 2000px', () => {
           let plots = screen.getAllByTestId(/^plot-/)
 
           expect(plots[4].id).toBe('plot-4')
@@ -2049,7 +2041,13 @@ describe('App', () => {
           expect(plots.length).toBe(OVERSCAN_ROW_COUNT + 1)
         })
 
-        it('should render the plots correctly when the screen is larger than 1600px (but less than 2000px)', () => {
+        it('should render the plots correctly when the screen is larger than 1600px (but less than 2000px)', async () => {
+          const store = await renderAppAndChangeSize(
+            { comparison: comparisonTableFixture, custom },
+            1,
+            PlotsSection.CUSTOM_PLOTS
+          )
+
           resizeScreen(1849, store)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -2058,7 +2056,13 @@ describe('App', () => {
           expect(plots.length).toBe(OVERSCAN_ROW_COUNT + 1)
         })
 
-        it('should render the plots correctly when the screen is larger than 800px (but less than 1600px)', () => {
+        it('should render the plots correctly when the screen is larger than 800px (but less than 1600px)', async () => {
+          const store = await renderAppAndChangeSize(
+            { comparison: comparisonTableFixture, custom },
+            1,
+            PlotsSection.CUSTOM_PLOTS
+          )
+
           resizeScreen(936, store)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -2067,7 +2071,13 @@ describe('App', () => {
           expect(plots.length).toBe(1 + OVERSCAN_ROW_COUNT) // Only the first and the next lines defined by the overscan row count will be rendered
         })
 
-        it('should render the plots correctly when the screen is smaller than 800px', () => {
+        it('should render the plots correctly when the screen is smaller than 800px', async () => {
+          const store = await renderAppAndChangeSize(
+            { comparison: comparisonTableFixture, custom },
+            1,
+            PlotsSection.CUSTOM_PLOTS
+          )
+
           resizeScreen(563, store)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -2120,17 +2130,14 @@ describe('App', () => {
 
       describe('Sizing', () => {
         const custom = createCustomPlots(25)
-        let store: typeof plotsStore
 
-        beforeEach(async () => {
-          store = await renderAppAndChangeSize(
+        it('should render the plots correctly when the screen is larger than 2000px', async () => {
+          const store = await renderAppAndChangeSize(
             { comparison: comparisonTableFixture, custom },
             DEFAULT_NB_ITEMS_PER_ROW,
             PlotsSection.CUSTOM_PLOTS
           )
-        })
 
-        it('should render the plots correctly when the screen is larger than 2000px', () => {
           resizeScreen(3200, store)
 
           let plots = screen.getAllByTestId(/^plot-/)
@@ -2146,7 +2153,13 @@ describe('App', () => {
           expect(plots.length).toBe(custom.plots.length)
         })
 
-        it('should render the plots correctly when the screen is larger than 1600px (but less than 2000px)', () => {
+        it('should render the plots correctly when the screen is larger than 1600px (but less than 2000px)', async () => {
+          const store = await renderAppAndChangeSize(
+            { comparison: comparisonTableFixture, custom },
+            DEFAULT_NB_ITEMS_PER_ROW,
+            PlotsSection.CUSTOM_PLOTS
+          )
+
           resizeScreen(1889, store)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -2155,7 +2168,13 @@ describe('App', () => {
           expect(plots.length).toBe(custom.plots.length)
         })
 
-        it('should render the plots correctly when the screen is larger than 800px (but less than 1600px)', () => {
+        it('should render the plots correctly when the screen is larger than 800px (but less than 1600px)', async () => {
+          const store = await renderAppAndChangeSize(
+            { comparison: comparisonTableFixture, custom },
+            DEFAULT_NB_ITEMS_PER_ROW,
+            PlotsSection.CUSTOM_PLOTS
+          )
+
           resizeScreen(938, store)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -2164,7 +2183,13 @@ describe('App', () => {
           expect(plots.length).toBe(custom.plots.length)
         })
 
-        it('should render the plots correctly when the screen is smaller than 800px', () => {
+        it('should render the plots correctly when the screen is smaller than 800px', async () => {
+          const store = await renderAppAndChangeSize(
+            { comparison: comparisonTableFixture, custom },
+            DEFAULT_NB_ITEMS_PER_ROW,
+            PlotsSection.CUSTOM_PLOTS
+          )
+
           resizeScreen(562, store)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -2217,17 +2242,14 @@ describe('App', () => {
 
       describe('Sizing', () => {
         const custom = createCustomPlots(25)
-        let store: typeof plotsStore
 
-        beforeEach(async () => {
-          store = await renderAppAndChangeSize(
+        it('should render the plots correctly when the screen is larger than 2000px', async () => {
+          const store = await renderAppAndChangeSize(
             { comparison: comparisonTableFixture, custom },
             4,
             PlotsSection.CUSTOM_PLOTS
           )
-        })
 
-        it('should render the plots correctly when the screen is larger than 2000px', () => {
           resizeScreen(3004, store)
 
           let plots = screen.getAllByTestId(/^plot-/)
@@ -2243,7 +2265,13 @@ describe('App', () => {
           expect(plots.length).toBe(custom.plots.length)
         })
 
-        it('should render the plots correctly when the screen is larger than 1600px (but less than 2000px)', () => {
+        it('should render the plots correctly when the screen is larger than 1600px (but less than 2000px)', async () => {
+          const store = await renderAppAndChangeSize(
+            { comparison: comparisonTableFixture, custom },
+            4,
+            PlotsSection.CUSTOM_PLOTS
+          )
+
           resizeScreen(1839, store)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -2252,7 +2280,13 @@ describe('App', () => {
           expect(plots.length).toBe(custom.plots.length)
         })
 
-        it('should render the plots correctly when the screen is larger than 800px (but less than 1600px)', () => {
+        it('should render the plots correctly when the screen is larger than 800px (but less than 1600px)', async () => {
+          const store = await renderAppAndChangeSize(
+            { comparison: comparisonTableFixture, custom },
+            4,
+            PlotsSection.CUSTOM_PLOTS
+          )
+
           resizeScreen(956, store)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -2261,7 +2295,13 @@ describe('App', () => {
           expect(plots.length).toBe(custom.plots.length)
         })
 
-        it('should render the plots correctly when the screen is smaller than 800px but larger than 600px', () => {
+        it('should render the plots correctly when the screen is smaller than 800px but larger than 600px', async () => {
+          const store = await renderAppAndChangeSize(
+            { comparison: comparisonTableFixture, custom },
+            4,
+            PlotsSection.CUSTOM_PLOTS
+          )
+
           resizeScreen(663, store)
 
           const plots = screen.getAllByTestId(/^plot-/)
@@ -2270,7 +2310,13 @@ describe('App', () => {
           expect(plots.length).toBe(custom.plots.length)
         })
 
-        it('should render the plots correctly when the screen is smaller than 600px', () => {
+        it('should render the plots correctly when the screen is smaller than 600px', async () => {
+          const store = await renderAppAndChangeSize(
+            { comparison: comparisonTableFixture, custom },
+            4,
+            PlotsSection.CUSTOM_PLOTS
+          )
+
           resizeScreen(569, store)
 
           const plots = screen.getAllByTestId(/^plot-/)

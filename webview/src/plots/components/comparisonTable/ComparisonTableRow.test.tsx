@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { join } from 'dvc/src/test/util/path'
 import React from 'react'
-import { render, cleanup, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import comparisonPlotsFixture from 'dvc/src/test/fixtures/plotsDiff/comparison'
 import { Provider } from 'react-redux'
@@ -19,10 +19,6 @@ import {
 jest.mock('../../../shared/api')
 
 describe('ComparisonTableRow', () => {
-  afterEach(() => {
-    cleanup()
-  })
-
   const basicProps: ComparisonTableRowProps = {
     nbColumns: 3,
     path: 'path/to/the-file/image.png',

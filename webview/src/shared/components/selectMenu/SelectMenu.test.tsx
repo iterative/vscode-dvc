@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, cleanup, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { SelectMenu } from './SelectMenu'
 
 const options = [
@@ -27,10 +27,6 @@ const basicProps = {
 }
 
 const renderMenu = (props = basicProps) => render(<SelectMenu {...props} />)
-
-afterEach(() => {
-  cleanup()
-})
 
 describe('SelectMenu', () => {
   it('should display as many options as there are options from the props', () => {
