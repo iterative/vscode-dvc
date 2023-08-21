@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.44] - 2023-08-21
+
+### 🚀 New Features and Enhancements
+
+- Add copy sha and name to experiment table row context menu [#4544](https://github.com/iterative/vscode-dvc/pull/4544) by [@mattseddon](https://github.com/mattseddon)
+
+### 🐛 Bug Fixes
+
+- Hide refresh experiments from the command palette [#4529](https://github.com/iterative/vscode-dvc/pull/4529) by [@mattseddon](https://github.com/mattseddon)
+- Fix possibly cuttoff cli errors in tree views [#4522](https://github.com/iterative/vscode-dvc/pull/4522) by [@julieg18](https://github.com/julieg18)
+- Remove click listener from experiment name and sha [#4543](https://github.com/iterative/vscode-dvc/pull/4543) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.43] - 2023-08-17
 
 ### 🐛 Bug Fixes
