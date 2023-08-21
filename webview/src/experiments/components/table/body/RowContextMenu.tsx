@@ -1,6 +1,9 @@
 import React, { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { MessageFromWebviewType } from 'dvc/src/webview/contract'
+import {
+  MessageFromWebview,
+  MessageFromWebviewType
+} from 'dvc/src/webview/contract'
 import {
   WORKSPACE_BRANCH,
   ExecutorStatus,
@@ -35,8 +38,8 @@ const experimentMenuOption = (
     message: {
       payload,
       type
-    }
-  } as MessagesMenuOptionProps
+    } as MessageFromWebview
+  }
 }
 
 const collectIdByStarred = (
@@ -212,6 +215,7 @@ const getRunResumeOptions = (
 
 const getSingleSelectMenuOptions = (
   id: string,
+  sha: string,
   isWorkspace: boolean,
   projectHasCheckpoints: boolean,
   hasRunningWorkspaceExperiment: boolean,
@@ -263,6 +267,24 @@ const getSingleSelectMenuOptions = (
       'Create new Branch',
       MessageFromWebviewType.CREATE_BRANCH_FROM_EXPERIMENT
     ),
+    {
+      disabled: isWorkspace,
+      id: MessageFromWebviewType.COPY_TO_CLIPBOARD,
+      label: 'Copy Sha',
+      message: {
+        payload: sha,
+        type: MessageFromWebviewType.COPY_TO_CLIPBOARD
+      } as MessageFromWebview
+    },
+    {
+      disabled: isWorkspace || depth <= 0,
+      id: MessageFromWebviewType.COPY_TO_CLIPBOARD,
+      label: 'Copy Experiment Name',
+      message: {
+        payload: id,
+        type: MessageFromWebviewType.COPY_TO_CLIPBOARD
+      } as MessageFromWebview
+    },
     experimentMenuOption(
       [id],
       'Push',
@@ -302,6 +324,7 @@ const getSingleSelectMenuOptions = (
 
 const getContextMenuOptions = (
   id: string,
+  sha: string,
   branch: string | undefined | typeof WORKSPACE_BRANCH,
   isWorkspace: boolean,
   projectHasCheckpoints: boolean,
@@ -327,6 +350,7 @@ const getContextMenuOptions = (
     () =>
       getSingleSelectMenuOptions(
         id,
+        sha,
         isWorkspace,
         projectHasCheckpoints,
         hasRunningWorkspaceExperiment,
@@ -340,7 +364,7 @@ const getContextMenuOptions = (
 
 export const RowContextMenu: React.FC<RowProp> = ({
   row: {
-    original: { branch, executorStatus, starred, id, executor },
+    original: { branch, executorStatus, starred, id, executor, label },
     depth
   }
 }) => {
@@ -358,6 +382,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
   const contextMenuOptions = useMemo(() => {
     return getContextMenuOptions(
       id,
+      label,
       branch,
       isWorkspace,
       projectHasCheckpoints,
@@ -376,6 +401,7 @@ export const RowContextMenu: React.FC<RowProp> = ({
     isWorkspace,
     depth,
     id,
+    label,
     projectHasCheckpoints,
     selectedRows,
     hasRunningWorkspaceExperiment

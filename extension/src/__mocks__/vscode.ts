@@ -2,6 +2,9 @@ import { join } from 'path'
 import { URI, Utils } from 'vscode-uri'
 
 export const commands = jest.fn()
+export const env = {
+  clipboard: jest.fn()
+}
 export const EventEmitter = jest.fn()
 export const Extension = jest.fn()
 export const extensions = jest.fn()
