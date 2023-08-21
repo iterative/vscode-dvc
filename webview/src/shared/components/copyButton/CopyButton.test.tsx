@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-identical-functions */
 import React from 'react'
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import { CopyButton } from './CopyButton'
 
@@ -16,7 +16,6 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  cleanup()
   jest.useRealTimers()
 })
 

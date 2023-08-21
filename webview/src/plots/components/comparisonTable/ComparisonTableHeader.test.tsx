@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, cleanup, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import {
   ComparisonTableHeader,
@@ -9,10 +9,6 @@ import {
 describe('ComparisonTableHeader', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-  })
-
-  afterEach(() => {
-    cleanup()
   })
 
   const basicProps: ComparisonTableHeaderProps = {

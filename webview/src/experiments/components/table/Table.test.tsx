@@ -1,13 +1,7 @@
 /* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectHeaders"] }] */
 import '@testing-library/jest-dom/extend-expect'
 import { configureStore } from '@reduxjs/toolkit'
-import {
-  cleanup,
-  fireEvent,
-  queries,
-  render,
-  screen
-} from '@testing-library/react'
+import { fireEvent, queries, render, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { TableData } from 'dvc/src/experiments/webview/contract'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
@@ -61,10 +55,6 @@ describe('Table', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-  })
-
-  afterEach(() => {
-    cleanup()
   })
 
   describe('Sorting through the UI', () => {
