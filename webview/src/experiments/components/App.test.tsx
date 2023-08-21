@@ -6,7 +6,7 @@ import {
   screen,
   within
 } from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
+import '@testing-library/jest-dom'
 import tableDataFixture from 'dvc/src/test/fixtures/expShow/base/tableData'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import {

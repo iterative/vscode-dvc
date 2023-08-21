@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit'
-import '@testing-library/jest-dom/extend-expect'
+import '@testing-library/jest-dom'
 import {
   fireEvent,
   render,

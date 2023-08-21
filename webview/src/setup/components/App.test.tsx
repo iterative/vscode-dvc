@@ -9,7 +9,7 @@ import {
   LATEST_TESTED_CLI_VERSION,
   MIN_CLI_VERSION
 } from 'dvc/src/cli/dvc/contract'
-import '@testing-library/jest-dom/extend-expect'
+import '@testing-library/jest-dom'
 import React from 'react'
 import { SetupSection, SetupData } from 'dvc/src/setup/webview/contract'
 import { App } from './App'
