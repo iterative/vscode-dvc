@@ -1,7 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
-import '@testing-library/jest-dom/extend-expect'
+import '@testing-library/jest-dom'
 import {
-  cleanup,
   fireEvent,
   render,
   RenderResult,
@@ -51,7 +50,6 @@ const getPin = (element: HTMLElement) =>
 
 describe('ComparisonTable', () => {
   afterEach(() => {
-    cleanup()
     jest.clearAllMocks()
   })
 

@@ -1,13 +1,12 @@
 /* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "expectHeaders"] }] */
 import {
   act,
-  cleanup,
   createEvent,
   fireEvent,
   screen,
   within
 } from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
+import '@testing-library/jest-dom'
 import tableDataFixture from 'dvc/src/test/fixtures/expShow/base/tableData'
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import {
@@ -73,10 +72,6 @@ const mockPostMessage = jest.mocked(postMessage)
 
 beforeEach(() => {
   jest.clearAllMocks()
-})
-
-afterEach(() => {
-  cleanup()
 })
 
 describe('App', () => {
