@@ -18,6 +18,7 @@ export enum MessageFromWebviewType {
   ADD_STARRED_EXPERIMENT_FILTER = 'add-starred-experiment-filter',
   ADD_CUSTOM_PLOT = 'add-custom-plot',
   CREATE_BRANCH_FROM_EXPERIMENT = 'create-branch-from-experiment',
+  COPY_TO_CLIPBOARD = 'copy-to-clipboard',
   EXPORT_PLOT_DATA_AS_JSON = 'export-plot-data-as-json',
   EXPORT_PLOT_DATA_AS_CSV = 'export-plot-data-as-csv',
   EXPORT_PLOT_DATA_AS_TSV = 'export-plot-data-as-tsv',
@@ -107,6 +108,10 @@ export type PlotsTemplatesReordered = {
 export type MessageFromWebview =
   | {
       type: MessageFromWebviewType.ADD_CUSTOM_PLOT
+    }
+  | {
+      type: MessageFromWebviewType.COPY_TO_CLIPBOARD
+      payload: string
     }
   | {
       type: MessageFromWebviewType.EXPORT_PLOT_DATA_AS_JSON

@@ -92,6 +92,7 @@ import { Response } from '../../../vscode/response'
 import { MAX_SELECTED_EXPERIMENTS } from '../../../experiments/model/status'
 import { Pipeline } from '../../../pipeline'
 import { ColumnLike } from '../../../experiments/columns/like'
+import * as Clipboard from '../../../vscode/clipboard'
 
 const { openFileInEditor } = FileSystem
 
@@ -1573,6 +1574,32 @@ suite('Experiments Test Suite', () => {
 
       await expShowCalled
       expect(mockUpdateExperimentsData).to.be.calledOnce
+    }).timeout(WEBVIEW_TEST_TIMEOUT)
+
+    it('should be able to handle a message to copy an experiment name', async () => {
+      const { webview } = await buildExperimentsWebview({
+        disposer: disposable
+      })
+      const mockMessageReceived = getMessageReceivedEmitter(webview)
+      const mockExperimentId = 'mock-experiment-id'
+
+      const mockCopyToClipboard = stub(Clipboard, 'writeToClipboard')
+      const copyCalled = new Promise(resolve =>
+        mockCopyToClipboard.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve()
+        })
+      )
+
+      mockMessageReceived.fire({
+        payload: mockExperimentId,
+        type: MessageFromWebviewType.COPY_TO_CLIPBOARD
+      })
+
+      await copyCalled
+
+      expect(mockCopyToClipboard).to.be.calledOnce
+      expect(mockCopyToClipboard).to.be.calledWithExactly(mockExperimentId)
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should not update the selected branches when the user closes the select branches quick pick', async () => {

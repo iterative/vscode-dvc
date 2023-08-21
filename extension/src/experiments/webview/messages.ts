@@ -25,6 +25,7 @@ import { Pipeline } from '../../pipeline'
 import { collectColumnsWithChangedValues } from '../columns/collect'
 import { ColumnLike } from '../columns/like'
 import { getFilterId } from '../model/filterBy'
+import { writeToClipboard } from '../../vscode/clipboard'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
@@ -226,6 +227,9 @@ export class WebviewMessages {
 
       case MessageFromWebviewType.TOGGLE_SHOW_ONLY_CHANGED:
         return this.toggleShowOnlyChanged()
+
+      case MessageFromWebviewType.COPY_TO_CLIPBOARD:
+        return this.copyToClipboard(message.payload)
 
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
@@ -570,5 +574,14 @@ export class WebviewMessages {
 
   private showPlots() {
     return commands.executeCommand(RegisteredCommands.PLOTS_SHOW, this.dvcRoot)
+  }
+
+  private async copyToClipboard(text: string) {
+    await writeToClipboard(text)
+    void sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_COPY_TO_CLIPBOARD,
+      undefined,
+      undefined
+    )
   }
 }

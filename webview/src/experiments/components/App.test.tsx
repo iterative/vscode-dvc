@@ -1036,6 +1036,7 @@ describe('App', () => {
       expect(getEnabledOptions()).toStrictEqual([
         'Apply to Workspace',
         'Create new Branch',
+        'Copy Sha',
         'Star'
       ])
     })
@@ -1049,6 +1050,7 @@ describe('App', () => {
       expect(getEnabledOptions()).toStrictEqual([
         'Apply to Workspace',
         'Create new Branch',
+        'Copy Sha',
         'Star'
       ])
     })
@@ -1062,6 +1064,8 @@ describe('App', () => {
       expect(getEnabledOptions()).toStrictEqual([
         'Apply to Workspace',
         'Create new Branch',
+        'Copy Sha',
+        'Copy Experiment Name',
         'Push',
         'Star',
         'Remove'
@@ -1080,7 +1084,13 @@ describe('App', () => {
       const target = screen.getByText('[exp-e7a67]')
       fireEvent.contextMenu(target, { bubbles: true })
 
-      expect(getEnabledOptions()).toStrictEqual(['Show Logs', 'Star', 'Stop'])
+      expect(getEnabledOptions()).toStrictEqual([
+        'Show Logs',
+        'Copy Sha',
+        'Copy Experiment Name',
+        'Star',
+        'Stop'
+      ])
 
       fireEvent.click(screen.getAllByRole('menuitem')[0], {
         bubbles: true,
@@ -1108,7 +1118,7 @@ describe('App', () => {
       expect(disabledMenuItem).toBeDefined()
 
       disabledMenuItem && fireEvent.click(disabledMenuItem, { bubbles: true })
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(10)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(12)
     })
 
     it('should be removed with a left click', () => {
@@ -1118,7 +1128,7 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(10)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(12)
 
       fireEvent.click(row, {
         bubbles: true
@@ -1135,7 +1145,7 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.getAllByRole('menuitem')).toHaveLength(10)
+      expect(screen.getAllByRole('menuitem')).toHaveLength(12)
 
       const commit = getRow('main')
       fireEvent.click(commit, { bubbles: true })
@@ -1150,13 +1160,13 @@ describe('App', () => {
       fireEvent.contextMenu(row, { bubbles: true })
 
       advanceTimersByTime(100)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(10)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(12)
 
       fireEvent.contextMenu(within(row).getByText('[exp-e7a67]'), {
         bubbles: true
       })
       advanceTimersByTime(200)
-      expect(screen.queryAllByRole('menuitem')).toHaveLength(10)
+      expect(screen.queryAllByRole('menuitem')).toHaveLength(12)
     })
 
     it('should enable the remove option for an experiment', () => {
