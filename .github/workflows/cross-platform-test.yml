@@ -28,6 +28,7 @@ jobs:
         with:
           node-version: '16'
           cache: yarn
+          cache-dependency-path: 'yarn.lock'
 
       - name: Turbo cache
         if: ${{ github.ref_name != 'main' }}
