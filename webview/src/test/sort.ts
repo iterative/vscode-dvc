@@ -61,9 +61,8 @@ export const tableData: TableDataState = {
 }
 
 export const getHeaders = async () => {
-  const renderedHeadersAndPlaceholders = await screen.findAllByTestId(
-    'rendered-header'
-  )
+  const renderedHeadersAndPlaceholders =
+    await screen.findAllByTestId('rendered-header')
   return renderedHeadersAndPlaceholders
     .map(header => header.textContent?.trim())
     .filter(Boolean)
