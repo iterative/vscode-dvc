@@ -54,13 +54,14 @@ export class PlotsPathsTree extends BasePathSelectionTree<WorkspacePlots> {
       return getCliErrorTreeItem(path, error, DecoratableTreeItemScheme.PLOTS)
     }
 
-    const { collapsibleState, dvcRoot, path } = element
+    const { collapsibleState, dvcRoot, path, label } = element
 
     const resourceUri = getDecoratableUri(
       join(dvcRoot, path),
       DecoratableTreeItemScheme.PLOTS
     )
     const treeItem = new TreeItem(resourceUri, collapsibleState)
+    treeItem.label = label
 
     return this.addTreeItemDetails(element, treeItem)
   }

@@ -39,7 +39,7 @@ export class ExperimentsColumnsTree extends BasePathSelectionTree<WorkspaceExper
 
     const { label, collapsibleState } = element
 
-    const treeItem = new TreeItem(label as string, collapsibleState)
+    const treeItem = new TreeItem(label, collapsibleState)
 
     return this.addTreeItemDetails(element, treeItem)
   }

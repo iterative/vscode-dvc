@@ -11,8 +11,7 @@ import {
 import { isImagePlot, Plot, TemplatePlot } from '../webview/contract'
 import { PlotsOutput } from '../../cli/dvc/contract'
 import { sortCollectedArray } from '../../util/array'
-
-const FIELD_SEPARATOR = '::'
+import { FIELD_SEPARATOR } from '../../cli/dvc/constants'
 
 type Values = { filename?: Set<string>; field?: Set<string> }
 

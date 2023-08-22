@@ -25,7 +25,7 @@ export type PathSelectionItem = {
   description: string | undefined
   dvcRoot: string
   iconPath: Resource | Uri
-  label: string | undefined
+  label: string
   path: string
   tooltip: MarkdownString | undefined
 }
@@ -111,7 +111,7 @@ export abstract class BasePathSelectionTree<
     hasChildren: boolean
     path: string
     status: Status
-    label?: string
+    label: string
     tooltip?: MarkdownString
   }) {
     const {

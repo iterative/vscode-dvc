@@ -33,7 +33,7 @@ import {
   TemplatePlot,
   ImagePlot
 } from '../../../plots/webview/contract'
-import { TEMP_PLOTS_DIR } from '../../../cli/dvc/constants'
+import { FIELD_SEPARATOR, TEMP_PLOTS_DIR } from '../../../cli/dvc/constants'
 import { WEBVIEW_TEST_TIMEOUT } from '../timeouts'
 import { MessageFromWebviewType } from '../../../webview/contract'
 import { reorderObjectList, uniqueValues } from '../../../util/array'
@@ -915,7 +915,7 @@ suite('Plots Test Suite', () => {
         )?.values || []
       expect(rocDatapoints.length).to.be.greaterThan(0)
       for (const entry of rocDatapoints) {
-        expect(entry.rev).not.to.contain('::')
+        expect(entry.rev).not.to.contain(FIELD_SEPARATOR)
         expect(entry.filename).not.to.be.undefined
       }
 

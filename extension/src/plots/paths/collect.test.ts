@@ -15,10 +15,12 @@ import plotsDiffFixture from '../../test/fixtures/plotsDiff/output'
 import { Shape, StrokeDash } from '../multiSource/constants'
 import { EXPERIMENT_WORKSPACE_ID, PlotsOutput } from '../../cli/dvc/contract'
 import { REVISIONS } from '../../test/fixtures/plotsDiff'
+import { FIELD_SEPARATOR } from '../../cli/dvc/constants'
 
 const plotsDiffFixturePaths: PlotPath[] = [
   {
     hasChildren: false,
+    label: 'acc.png',
     parentPath: 'plots',
     path: join('plots', 'acc.png'),
     revisions: new Set(REVISIONS),
@@ -26,12 +28,14 @@ const plotsDiffFixturePaths: PlotPath[] = [
   },
   {
     hasChildren: true,
+    label: 'plots',
     parentPath: undefined,
     path: 'plots',
     revisions: new Set(REVISIONS)
   },
   {
     hasChildren: false,
+    label: 'heatmap.png',
     parentPath: 'plots',
     path: join('plots', 'heatmap.png'),
     revisions: new Set(REVISIONS),
@@ -39,6 +43,7 @@ const plotsDiffFixturePaths: PlotPath[] = [
   },
   {
     hasChildren: false,
+    label: 'loss.png',
     parentPath: 'plots',
     path: join('plots', 'loss.png'),
     revisions: new Set(REVISIONS),
@@ -46,6 +51,7 @@ const plotsDiffFixturePaths: PlotPath[] = [
   },
   {
     hasChildren: false,
+    label: 'image',
     parentPath: 'plots',
     path: join('plots', 'image'),
     revisions: new Set(REVISIONS),
@@ -53,6 +59,7 @@ const plotsDiffFixturePaths: PlotPath[] = [
   },
   {
     hasChildren: false,
+    label: 'loss.tsv',
     parentPath: 'logs',
     path: join('logs', 'loss.tsv'),
     revisions: new Set(REVISIONS),
@@ -60,12 +67,14 @@ const plotsDiffFixturePaths: PlotPath[] = [
   },
   {
     hasChildren: true,
+    label: 'logs',
     parentPath: undefined,
     path: 'logs',
     revisions: new Set(REVISIONS)
   },
   {
     hasChildren: false,
+    label: 'acc.tsv',
     parentPath: 'logs',
     path: join('logs', 'acc.tsv'),
     revisions: new Set(REVISIONS),
@@ -73,6 +82,7 @@ const plotsDiffFixturePaths: PlotPath[] = [
   },
   {
     hasChildren: false,
+    label: 'predictions.json',
     parentPath: undefined,
     path: 'predictions.json',
     revisions: new Set(REVISIONS),
@@ -164,6 +174,7 @@ describe('collectPaths', () => {
     const pathsWithNoTypes: PlotPath[] = plotsDiffFixturePaths.map(
       plotPath => ({
         hasChildren: plotPath.hasChildren,
+        label: plotPath.label,
         parentPath: plotPath.parentPath,
         path: plotPath.path,
         revisions: new Set(['workspace'])
@@ -183,6 +194,7 @@ describe('collectPaths', () => {
     const mockPath = 'completely:madeup:path'
     const mockPlotPath = {
       hasChildren: false,
+      label: mockPath,
       parentPath: undefined,
       path: mockPath,
       revisions: new Set(['bfc7f64']),
@@ -230,6 +242,27 @@ describe('collectPaths', () => {
             revisions,
             type: PlotsType.VEGA
           }
+        ],
+        [join(`dvc.yaml${FIELD_SEPARATOR}logs`, 'acc.tsv')]: [
+          {
+            content: {},
+            datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
+            revisions,
+            type: PlotsType.VEGA
+          }
+        ],
+        [join(
+          'nested',
+          'dvclive',
+          `dvc.yaml${FIELD_SEPARATOR}logs`,
+          'acc.tsv'
+        )]: [
+          {
+            content: {},
+            datapoints: { [EXPERIMENT_WORKSPACE_ID]: [{}] },
+            revisions,
+            type: PlotsType.VEGA
+          }
         ]
       }
     }
@@ -237,6 +270,7 @@ describe('collectPaths', () => {
     expect(collectPaths([], mockPlotsDiff, revisions)).toStrictEqual([
       {
         hasChildren: false,
+        label: 'acc.tsv',
         parentPath: join('logs', 'scalars'),
         path: join('logs', 'scalars', 'acc.tsv'),
         revisions: new Set(revisions),
@@ -244,18 +278,21 @@ describe('collectPaths', () => {
       },
       {
         hasChildren: true,
+        label: 'scalars',
         parentPath: 'logs',
         path: join('logs', 'scalars'),
         revisions: new Set(revisions)
       },
       {
         hasChildren: true,
+        label: 'logs',
         parentPath: undefined,
         path: 'logs',
         revisions: new Set(revisions)
       },
       {
         hasChildren: false,
+        label: 'loss.tsv',
         parentPath: join('logs', 'scalars'),
         path: join('logs', 'scalars', 'loss.tsv'),
         revisions: new Set(revisions),
@@ -263,6 +300,7 @@ describe('collectPaths', () => {
       },
       {
         hasChildren: false,
+        label: 'heatmap.png',
         parentPath: 'plots',
         path: join('plots', 'heatmap.png'),
         revisions: new Set(revisions),
@@ -270,16 +308,67 @@ describe('collectPaths', () => {
       },
       {
         hasChildren: true,
+        label: 'plots',
         parentPath: undefined,
         path: 'plots',
         revisions: new Set(revisions)
       },
       {
         hasChildren: false,
+        label: 'predictions.json',
         parentPath: undefined,
         path: 'predictions.json',
         revisions: new Set(revisions),
         type: new Set(['template-multi'])
+      },
+      {
+        hasChildren: false,
+        label: 'acc.tsv',
+        parentPath: join(`dvc.yaml${FIELD_SEPARATOR}logs`),
+        path: join(`dvc.yaml${FIELD_SEPARATOR}logs`, 'acc.tsv'),
+        revisions: new Set(revisions),
+        type: new Set(['template-single'])
+      },
+      {
+        hasChildren: true,
+        label: 'logs',
+        parentPath: join('dvc.yaml'),
+        path: join(`dvc.yaml${FIELD_SEPARATOR}logs`),
+        revisions: new Set(revisions)
+      },
+      {
+        hasChildren: true,
+        label: 'dvc.yaml',
+        parentPath: undefined,
+        path: 'dvc.yaml',
+        revisions: new Set(revisions)
+      },
+      {
+        hasChildren: false,
+        label: 'acc.tsv',
+        parentPath: join('nested', 'dvclive', `dvc.yaml${FIELD_SEPARATOR}logs`),
+        path: join(
+          'nested',
+          'dvclive',
+          `dvc.yaml${FIELD_SEPARATOR}logs`,
+          'acc.tsv'
+        ),
+        revisions: new Set(revisions),
+        type: new Set(['template-single'])
+      },
+      {
+        hasChildren: true,
+        label: 'logs',
+        parentPath: join('nested', 'dvclive', 'dvc.yaml'),
+        path: join('nested', 'dvclive', `dvc.yaml${FIELD_SEPARATOR}logs`),
+        revisions: new Set(revisions)
+      },
+      {
+        hasChildren: true,
+        label: join('nested', 'dvclive', 'dvc.yaml'),
+        parentPath: undefined,
+        path: join('nested', 'dvclive', 'dvc.yaml'),
+        revisions: new Set(revisions)
       }
     ])
   })
@@ -308,24 +397,28 @@ describe('collectPaths', () => {
     expect(paths).toStrictEqual([
       {
         hasChildren: false,
+        label: 'mip.jpg',
         parentPath: join('training', 'plots', 'images'),
         path: misspeltJpg,
         revisions
       },
       {
         hasChildren: true,
+        label: 'images',
         parentPath: join('training', 'plots'),
         path: join('training', 'plots', 'images'),
         revisions
       },
       {
         hasChildren: true,
+        label: 'plots',
         parentPath: 'training',
         path: join('training', 'plots'),
         revisions
       },
       {
         hasChildren: true,
+        label: 'training',
         parentPath: undefined,
         path: 'training',
         revisions
