@@ -1888,9 +1888,8 @@ describe('App', () => {
 
     expect(document.body).not.toHaveClass(styles.isColumnResizing)
 
-    const [experimentColumnResizeHandle] = await screen.findAllByRole(
-      'separator'
-    )
+    const [experimentColumnResizeHandle] =
+      await screen.findAllByRole('separator')
 
     fireEvent.mouseDown(experimentColumnResizeHandle)
 
