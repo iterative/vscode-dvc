@@ -37,6 +37,7 @@ describe('PathsModel', () => {
     expect(model.getTerminalNodes()).toStrictEqual([
       {
         hasChildren: false,
+        label: 'acc.png',
         parentPath: 'plots',
         path: plotsAcc,
         revisions: new Set(REVISIONS),
@@ -45,6 +46,7 @@ describe('PathsModel', () => {
       },
       {
         hasChildren: false,
+        label: 'heatmap.png',
         parentPath: 'plots',
         path: join('plots', 'heatmap.png'),
         revisions: new Set(REVISIONS),
@@ -53,6 +55,7 @@ describe('PathsModel', () => {
       },
       {
         hasChildren: false,
+        label: 'loss.png',
         parentPath: 'plots',
         path: join('plots', 'loss.png'),
         revisions: new Set(REVISIONS),
@@ -61,6 +64,7 @@ describe('PathsModel', () => {
       },
       {
         hasChildren: false,
+        label: 'image',
         parentPath: 'plots',
         path: join('plots', 'image'),
         revisions: new Set(REVISIONS),
@@ -69,6 +73,7 @@ describe('PathsModel', () => {
       },
       {
         hasChildren: false,
+        label: 'loss.tsv',
         parentPath: 'logs',
         path: logsLoss,
         revisions: new Set(REVISIONS),
@@ -77,6 +82,7 @@ describe('PathsModel', () => {
       },
       {
         hasChildren: false,
+        label: 'acc.tsv',
         parentPath: 'logs',
         path: logsAcc,
         revisions: new Set(REVISIONS),
@@ -85,6 +91,7 @@ describe('PathsModel', () => {
       },
       {
         hasChildren: false,
+        label: 'predictions.json',
         parentPath: undefined,
         path: 'predictions.json',
         revisions: new Set(REVISIONS),
@@ -383,6 +390,7 @@ describe('PathsModel', () => {
       {
         descendantStatuses: [2, 2],
         hasChildren: true,
+        label: 'logs',
         parentPath: undefined,
         path: 'logs',
         revisions: new Set(REVISIONS),
@@ -392,6 +400,7 @@ describe('PathsModel', () => {
       {
         descendantStatuses: [2, 2, 2, 2],
         hasChildren: true,
+        label: 'plots',
         parentPath: undefined,
         path: 'plots',
         revisions: new Set(REVISIONS),
@@ -401,6 +410,7 @@ describe('PathsModel', () => {
       {
         descendantStatuses: [],
         hasChildren: false,
+        label: 'predictions.json',
         parentPath: undefined,
         path: 'predictions.json',
         revisions: new Set(REVISIONS),
@@ -415,6 +425,7 @@ describe('PathsModel', () => {
       {
         descendantStatuses: [],
         hasChildren: false,
+        label: 'acc.tsv',
         parentPath: 'logs',
         path: logsAcc,
         revisions: new Set(REVISIONS),
@@ -425,6 +436,7 @@ describe('PathsModel', () => {
       {
         descendantStatuses: [],
         hasChildren: false,
+        label: 'loss.tsv',
         parentPath: 'logs',
         path: logsLoss,
         revisions: new Set(REVISIONS),
@@ -446,6 +458,7 @@ describe('PathsModel', () => {
       {
         descendantStatuses: [],
         hasChildren: true,
+        label: 'acc.tsv',
         parentPath: 'logs',
         path: logsAcc,
         revisions: new Set(REVISIONS),
@@ -456,6 +469,7 @@ describe('PathsModel', () => {
       {
         descendantStatuses: [],
         hasChildren: true,
+        label: 'loss.tsv',
         parentPath: 'logs',
         path: logsLoss,
         revisions: new Set(REVISIONS),

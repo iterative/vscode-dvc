@@ -24,7 +24,7 @@ import {
 } from '../multiSource/constants'
 import { MultiSourceEncoding } from '../multiSource/collect'
 import { truncate } from '../../util/string'
-import { MULTI_IMAGE_PATH_REG } from '../../cli/dvc/constants'
+import { FIELD_SEPARATOR, MULTI_IMAGE_PATH_REG } from '../../cli/dvc/constants'
 
 export enum PathType {
   COMPARISON = 'comparison',
@@ -33,11 +33,12 @@ export enum PathType {
 }
 
 export type PlotPath = {
-  path: string
-  type?: Set<PathType>
-  parentPath: string | undefined
   hasChildren: boolean
+  label: string
+  parentPath: string | undefined
+  path: string
   revisions: Set<string>
+  type?: Set<PathType>
 }
 
 const collectType = (plots: Plot[]) => {
@@ -158,6 +159,46 @@ const updateExistingPlotPath = ({
   return acc
 }
 
+const separateDvcYamlPath = (path: string): string[] => {
+  if (!path.includes(FIELD_SEPARATOR)) {
+    return getPathArray(path)
+  }
+
+  const [dvcYamlPath, plotPath] = path.split(FIELD_SEPARATOR)
+  return [dvcYamlPath, ...getPathArray(plotPath)]
+}
+
+const joinDvcYamlPath = (pathArray: string[], idx: number): string => {
+  if (!pathArray[0].endsWith('dvc.yaml')) {
+    return getPath(pathArray, idx)
+  }
+
+  const dvcYamlPath = pathArray[0]
+  const plotPath = pathArray.slice(1, idx).join(sep)
+
+  if (!plotPath) {
+    return dvcYamlPath
+  }
+
+  return [dvcYamlPath, plotPath].join(FIELD_SEPARATOR)
+}
+
+const joinDvcYamlParentPath = (
+  pathArray: string[],
+  idx: number
+): string | undefined => {
+  if (!pathArray[0].endsWith('dvc.yaml')) {
+    return getParent(pathArray, idx)
+  }
+
+  const noParent = idx - 1 <= 0
+  if (noParent) {
+    return undefined
+  }
+
+  return joinDvcYamlPath(pathArray, idx - 1)
+}
+
 const collectOrderedPath = (
   acc: PlotPath[],
   data: PlotsData,
@@ -166,7 +207,7 @@ const collectOrderedPath = (
   idx: number,
   isMultiImgDir: boolean
 ): PlotPath[] => {
-  const path = getPath(pathArray, idx).replace(`dvc.yaml${sep}`, 'dvc.yaml::')
+  const path = joinDvcYamlPath(pathArray, idx)
   const hasChildren = idx !== pathArray.length
   const isPathLeaf = idx === pathArray.length
   const isMultiImgPlot = isMultiImgDir && isPathLeaf
@@ -186,7 +227,8 @@ const collectOrderedPath = (
 
   const plotPath: PlotPath = {
     hasChildren,
-    parentPath: getParent(pathArray, idx),
+    label: pathArray[idx - 1],
+    parentPath: joinDvcYamlParentPath(pathArray, idx),
     path,
     revisions
   }
@@ -195,15 +237,6 @@ const collectOrderedPath = (
 
   acc.push(plotPath)
   return acc
-}
-
-const fun = (path: string): string[] => {
-  if (!path.includes('::')) {
-    return getPathArray(path)
-  }
-
-  const [dvcYamlPath, plotPath] = path.split('::')
-  return [dvcYamlPath, ...getPathArray(plotPath)]
 }
 
 const addRevisionsToPath = (
@@ -216,7 +249,7 @@ const addRevisionsToPath = (
     return acc
   }
 
-  const pathArray = fun(path)
+  const pathArray = separateDvcYamlPath(path)
   const isMultiImg =
     MULTI_IMAGE_PATH_REG.test(path) &&
     !!getType(data, path)?.has(PathType.COMPARISON)
