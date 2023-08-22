@@ -239,17 +239,15 @@ WithMixedMultiImgHeight.args = {
   }
 }
 WithMixedMultiImgHeight.play = async ({ canvasElement }) => {
-  const plotSizeSliders = await within(canvasElement).findByTestId(
-    'size-sliders'
-  )
+  const plotSizeSliders =
+    await within(canvasElement).findByTestId('size-sliders')
 
   const sizeSlider = within(plotSizeSliders).getByRole('slider')
 
   fireEvent.change(sizeSlider, { target: { value: -5 } })
 
-  const multiImgCells = await within(canvasElement).findAllByTestId(
-    'multi-image-cell'
-  )
+  const multiImgCells =
+    await within(canvasElement).findAllByTestId('multi-image-cell')
 
   const multiImgSlider = within(multiImgCells[1]).getByRole('slider')
   fireEvent.change(multiImgSlider, { target: { value: 7 } })

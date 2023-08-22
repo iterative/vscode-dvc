@@ -67,9 +67,8 @@ suite('Experiments Filter By Tree Test Suite', () => {
     })
 
     it('should be able to update the table data by adding and removing a filter', async () => {
-      const { experiments, messageSpy } = await stubWorkspaceGettersWebview(
-        disposable
-      )
+      const { experiments, messageSpy } =
+        await stubWorkspaceGettersWebview(disposable)
 
       const accuracyPath = buildMetricOrParamPath(
         ColumnType.METRICS,

@@ -356,9 +356,8 @@ suite('Experiments Columns Tree Test Suite', () => {
     })
 
     it('should be able to display selected columns first with dvc.views.experiments.selectFirstColumns', async () => {
-      const { columnsModel, experiments } = await stubWorkspaceGetters(
-        disposable
-      )
+      const { columnsModel, experiments } =
+        await stubWorkspaceGetters(disposable)
 
       const columnsOrder = columnsModel.getColumnOrder()
 

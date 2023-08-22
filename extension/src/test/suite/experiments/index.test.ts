@@ -508,9 +508,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to apply an experiment', async () => {
-      const { mockMessageReceived } = await stubWorkspaceGettersWebview(
-        disposable
-      )
+      const { mockMessageReceived } =
+        await stubWorkspaceGettersWebview(disposable)
 
       const mockExperimentId = 'exp-e7a67'
 
@@ -532,9 +531,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(WEBVIEW_TEST_TIMEOUT)
 
     it('should be able to handle a message to create a branch from an experiment', async () => {
-      const { mockMessageReceived } = await stubWorkspaceGettersWebview(
-        disposable
-      )
+      const { mockMessageReceived } =
+        await stubWorkspaceGettersWebview(disposable)
 
       const mockBranch = 'mock-branch-input'
       const inputEvent = getInputBoxEvent(mockBranch)

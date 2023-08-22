@@ -264,9 +264,8 @@ describe('Table', () => {
           <ExperimentsTable />
         </Provider>
       )
-      const [experimentColumnResizeHandle] = await screen.findAllByRole(
-        'separator'
-      )
+      const [experimentColumnResizeHandle] =
+        await screen.findAllByRole('separator')
 
       fireEvent.mouseDown(experimentColumnResizeHandle, {
         bubbles: true
@@ -304,9 +303,8 @@ describe('Table', () => {
           <ExperimentsTable />
         </Provider>
       )
-      const [experimentColumnResizeHandle] = await screen.findAllByRole(
-        'separator'
-      )
+      const [experimentColumnResizeHandle] =
+        await screen.findAllByRole('separator')
 
       fireEvent.mouseDown(experimentColumnResizeHandle, {
         bubbles: true
