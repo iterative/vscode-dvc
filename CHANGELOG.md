@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.45] - 2023-08-23
+
+### 🐛 Bug Fixes
+
+- Restructure plots path tree for nested dvc.yaml paths [#4527](https://github.com/iterative/vscode-dvc/pull/4527) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.44] - 2023-08-21
 
 ### 🚀 New Features and Enhancements
