@@ -766,13 +766,12 @@ export class Setup
     const cwd = this.getCwd()
 
     const previousStudioAccessToken = this.studioAccessToken
-    const previousShareLiveToStudio = this.shareLiveToStudio
 
     if (!cwd) {
       this.studioAccessToken = undefined
       this.shareLiveToStudio = undefined
 
-      if (previousStudioAccessToken || previousShareLiveToStudio) {
+      if (previousStudioAccessToken) {
         this.studioConnectionChanged.fire()
       }
       return
@@ -786,10 +785,7 @@ export class Setup
     this.studioAccessToken = studioAccessToken
     this.shareLiveToStudio = shareLiveToStudio
 
-    if (
-      previousStudioAccessToken !== this.studioAccessToken ||
-      previousShareLiveToStudio !== this.shareLiveToStudio
-    ) {
+    if (previousStudioAccessToken !== this.studioAccessToken) {
       this.studioConnectionChanged.fire()
     }
   }
