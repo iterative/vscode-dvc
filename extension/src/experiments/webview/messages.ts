@@ -26,6 +26,7 @@ import { collectColumnsWithChangedValues } from '../columns/collect'
 import { ColumnLike } from '../columns/like'
 import { getFilterId } from '../model/filterBy'
 import { writeToClipboard } from '../../vscode/clipboard'
+import { Studio } from '../studio'
 
 export class WebviewMessages {
   private readonly dvcRoot: string
@@ -33,6 +34,7 @@ export class WebviewMessages {
   private readonly experiments: ExperimentsModel
   private readonly columns: ColumnsModel
   private readonly pipeline: Pipeline
+  private readonly studio: Studio
 
   private readonly getWebview: () => BaseWebview<TableData> | undefined
   private readonly notifyChanged: () => void
@@ -50,6 +52,7 @@ export class WebviewMessages {
     experiments: ExperimentsModel,
     columns: ColumnsModel,
     pipeline: Pipeline,
+    studio: Studio,
     getWebview: () => BaseWebview<TableData> | undefined,
     notifyChanged: () => void,
     selectColumns: () => Promise<void>,
@@ -64,6 +67,7 @@ export class WebviewMessages {
     this.experiments = experiments
     this.columns = columns
     this.pipeline = pipeline
+    this.studio = studio
     this.getWebview = getWebview
     this.notifyChanged = notifyChanged
     this.selectColumns = selectColumns
@@ -231,6 +235,9 @@ export class WebviewMessages {
       case MessageFromWebviewType.COPY_TO_CLIPBOARD:
         return this.copyToClipboard(message.payload)
 
+      case MessageFromWebviewType.COPY_STUDIO_LINK:
+        return this.copyStudioLink(message.payload)
+
       default:
         Logger.error(`Unexpected message: ${JSON.stringify(message)}`)
     }
@@ -314,6 +321,7 @@ export class WebviewMessages {
       hasMoreCommits,
       hasRunningWorkspaceExperiment,
       isShowingMoreCommits,
+      isStudioConnected,
       rows,
       selectedBranches,
       selectedForPlotsCount,
@@ -332,6 +340,7 @@ export class WebviewMessages {
       this.experiments.getHasMoreCommits(),
       this.experiments.hasRunningWorkspaceExperiment(),
       this.experiments.getIsShowingMoreCommits(),
+      this.studio.isConnected(),
       this.experiments.getRowData(),
       this.experiments.getSelectedBranches(),
       this.experiments.getSelectedRevisions().length,
@@ -356,6 +365,7 @@ export class WebviewMessages {
       hasMoreCommits,
       hasRunningWorkspaceExperiment,
       isShowingMoreCommits,
+      isStudioConnected,
       rows,
       selectedBranches,
       selectedForPlotsCount,
@@ -583,5 +593,20 @@ export class WebviewMessages {
       undefined,
       undefined
     )
+  }
+
+  private async copyStudioLink(id: string) {
+    const sha = this.experiments.getExperiments().find(exp => exp.id === id)
+      ?.sha
+
+    if (!sha) {
+      return
+    }
+
+    const link = this.studio.getLink(sha)
+
+    await writeToClipboard(link, 'Studio link')
+
+    // needs event
   }
 }

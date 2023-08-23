@@ -1,6 +1,12 @@
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { sendMessage } from '../../shared/vscode'
 
+export const copyStudioLink = (id: string) =>
+  sendMessage({
+    payload: id,
+    type: MessageFromWebviewType.COPY_STUDIO_LINK
+  })
+
 export const focusFiltersTree = () =>
   sendMessage({ type: MessageFromWebviewType.FOCUS_FILTERS_TREE })
 

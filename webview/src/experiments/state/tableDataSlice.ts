@@ -42,6 +42,7 @@ export const tableDataInitialState: TableDataState = {
   hasMoreCommits: {},
   hasRunningWorkspaceExperiment: false,
   isShowingMoreCommits: {},
+  isStudioConnected: false,
   rows: [],
   selectedBranches: [],
   selectedForPlotsCount: 0,
@@ -178,6 +179,12 @@ export const tableDataSlice = createSlice({
         action.payload
       )
     },
+    updateIsStudioConnected: (state, action: PayloadAction<boolean>) => {
+      state.isStudioConnected = keepReferenceIfEqual(
+        state.isStudioConnected,
+        action.payload
+      )
+    },
     updateRows: (state, action: PayloadAction<Experiment[]>) => {
       state.rows = keepEqualOldReferencesInArray(state.rows, action.payload)
     },
@@ -210,6 +217,7 @@ export const {
   updateHasMoreCommits,
   updateHasRunningWorkspaceExperiment,
   updateIsShowingMoreCommits,
+  updateIsStudioConnected,
   updateRows,
   updateSelectedBranches,
   updateSelectedForPlotsCount,

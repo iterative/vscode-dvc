@@ -10,8 +10,8 @@ import {
 import { CellHintTooltip } from './CellHintTooltip'
 import styles from '../styles.module.scss'
 import { clickAndEnterProps } from '../../../../util/props'
-import { pushExperiment } from '../../../util/messages'
-import { Cloud, CloudUpload } from '../../../../shared/components/icons'
+import { copyStudioLink, pushExperiment } from '../../../util/messages'
+import { Cloud, CloudUpload, Link } from '../../../../shared/components/icons'
 import { Icon } from '../../../../shared/components/Icon'
 import { ExperimentsState } from '../../../store'
 
@@ -21,10 +21,37 @@ type ExperimentStatusIndicatorProps = {
   id: string
 }
 
+const OnRemote: React.FC<{ id: string; isStudioConnected: boolean }> = ({
+  id,
+  isStudioConnected
+}) => {
+  if (isStudioConnected) {
+    return (
+      <CellHintTooltip
+        tooltipContent={'Experiment on remote\nClick to copy Studio link'}
+      >
+        <div
+          className={styles.upload}
+          {...clickAndEnterProps(() => copyStudioLink(id))}
+        >
+          <Icon className={styles.cloudBox} icon={Link} />
+        </div>
+      </CellHintTooltip>
+    )
+  }
+  return (
+    <CellHintTooltip tooltipContent="Experiment on remote">
+      <div className={styles.upload}>
+        <Icon className={styles.cloudIndicator} icon={Cloud} />
+      </div>
+    </CellHintTooltip>
+  )
+}
+
 export const ExperimentStatusIndicator: React.FC<
   ExperimentStatusIndicatorProps
 > = ({ id, executorStatus: status, gitRemoteStatus }) => {
-  const { hasRunningWorkspaceExperiment } = useSelector(
+  const { hasRunningWorkspaceExperiment, isStudioConnected } = useSelector(
     (state: ExperimentsState) => state.tableData
   )
 
@@ -59,12 +86,6 @@ export const ExperimentStatusIndicator: React.FC<
   }
 
   if (gitRemoteStatus === GitRemoteStatus.ON_REMOTE) {
-    return (
-      <CellHintTooltip tooltipContent="Experiment on remote">
-        <div className={styles.upload}>
-          <Icon className={styles.cloudIndicator} icon={Cloud} />
-        </div>
-      </CellHintTooltip>
-    )
+    return <OnRemote id={id} isStudioConnected={isStudioConnected} />
   }
 }
