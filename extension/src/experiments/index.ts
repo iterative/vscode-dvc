@@ -106,8 +106,6 @@ export class Experiments extends BaseRepository<TableData> {
     branchesSelected: string[]
   ) => Promise<string[] | undefined>
 
-  private baseStudioUrl: string | undefined
-
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,

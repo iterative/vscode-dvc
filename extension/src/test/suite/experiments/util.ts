@@ -198,7 +198,6 @@ export const buildMultiRepoExperiments = (disposer: SafeWatcherDisposer) => {
     { [dvcDemoPath]: [] },
     { getRepository: () => pipeline },
     buildMockSetup(disposer),
-
     resourceLocator
   )
 

@@ -605,8 +605,12 @@ export class WebviewMessages {
 
     const link = this.studio.getLink(sha)
 
-    await writeToClipboard(link, 'Studio link')
+    await writeToClipboard(link, `[Studio link](${link})`)
 
-    // needs event
+    void sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_COPY_STUDIO_LINK,
+      undefined,
+      undefined
+    )
   }
 }
