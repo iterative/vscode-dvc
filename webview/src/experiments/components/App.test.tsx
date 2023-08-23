@@ -2039,7 +2039,7 @@ describe('App', () => {
       renderTable()
 
       const pushButton = within(getRow('f0f9186')).getByLabelText(
-        'push-experiment'
+        'Push Experiment'
       )
       fireEvent.click(pushButton)
 
@@ -2053,7 +2053,7 @@ describe('App', () => {
       renderTableWithoutRunningExperiments()
 
       const pushButton = within(getRow('f0f9186')).getByLabelText(
-        'push-experiment'
+        'Push Experiment'
       )
       fireEvent.click(pushButton)
 
@@ -2067,7 +2067,7 @@ describe('App', () => {
       renderTable({ ...tableStateFixture, isStudioConnected: true })
 
       const copyLinkButton = within(getRow('42b8736')).getByLabelText(
-        'copy-experiment-link'
+        'Copy Experiment Link'
       )
       fireEvent.click(copyLinkButton)
 
@@ -2081,7 +2081,7 @@ describe('App', () => {
       renderTable({ ...tableStateFixture, isStudioConnected: false })
 
       expect(
-        within(getRow('42b8736')).queryByLabelText('copy-experiment-link')
+        within(getRow('42b8736')).queryByLabelText('Copy Experiment Link')
       ).not.toBeInTheDocument()
     })
 
@@ -2089,7 +2089,7 @@ describe('App', () => {
       renderTable({ ...tableStateFixture, isStudioConnected: true })
 
       expect(
-        within(getRow('f0f9186')).queryByLabelText('copy-experiment-link')
+        within(getRow('f0f9186')).queryByLabelText('Copy Experiment Link')
       ).not.toBeInTheDocument()
     })
   })

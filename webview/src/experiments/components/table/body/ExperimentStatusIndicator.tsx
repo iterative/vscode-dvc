@@ -35,7 +35,7 @@ const OnRemote: React.FC<{ id: string; isStudioConnected: boolean }> = ({
           {...clickAndEnterProps(() => copyStudioLink(id))}
         >
           <Icon
-            aria-label="copy-experiment-link"
+            aria-label="Copy Experiment Link"
             className={styles.remoteStatusBox}
             icon={Link}
           />
@@ -79,7 +79,7 @@ export const ExperimentStatusIndicator: React.FC<
           )}
         >
           <Icon
-            aria-label="push-experiment"
+            aria-label="Push Experiment"
             aria-disabled={false}
             className={styles.remoteStatusBox}
             icon={CloudUpload}
