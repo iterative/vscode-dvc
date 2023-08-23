@@ -34,7 +34,11 @@ const OnRemote: React.FC<{ id: string; isStudioConnected: boolean }> = ({
           className={styles.upload}
           {...clickAndEnterProps(() => copyStudioLink(id))}
         >
-          <Icon className={styles.remoteStatusBox} icon={Link} />
+          <Icon
+            aria-label="copy-experiment-link"
+            className={styles.remoteStatusBox}
+            icon={Link}
+          />
         </div>
       </CellHintTooltip>
     )
@@ -75,7 +79,7 @@ export const ExperimentStatusIndicator: React.FC<
           )}
         >
           <Icon
-            data-testid={`${id}-push-experiment`}
+            aria-label="push-experiment"
             aria-disabled={false}
             className={styles.remoteStatusBox}
             icon={CloudUpload}

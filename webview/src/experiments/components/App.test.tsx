@@ -2038,7 +2038,10 @@ describe('App', () => {
     it('should not allow pushing an experiment when an experiment is running in the workspace', () => {
       renderTable()
 
-      fireEvent.click(screen.getByTestId('exp-f13bca-push-experiment'))
+      const pushButton = within(getRow('f0f9186')).getByLabelText(
+        'push-experiment'
+      )
+      fireEvent.click(pushButton)
 
       expect(mockPostMessage).not.toHaveBeenCalledWith({
         payload: ['exp-f13bca'],
@@ -2049,12 +2052,45 @@ describe('App', () => {
     it('should allow pushing an experiment when an experiment is not running in the workspace', () => {
       renderTableWithoutRunningExperiments()
 
-      fireEvent.click(screen.getByTestId('exp-f13bca-push-experiment'))
+      const pushButton = within(getRow('f0f9186')).getByLabelText(
+        'push-experiment'
+      )
+      fireEvent.click(pushButton)
 
       expect(mockPostMessage).toHaveBeenCalledWith({
         payload: ['exp-f13bca'],
         type: MessageFromWebviewType.PUSH_EXPERIMENT
       })
+    })
+
+    it('should allow copying a Studio link when an experiment exists on the remote and Studio is connected', () => {
+      renderTable({ ...tableStateFixture, isStudioConnected: true })
+
+      const copyLinkButton = within(getRow('42b8736')).getByLabelText(
+        'copy-experiment-link'
+      )
+      fireEvent.click(copyLinkButton)
+
+      expect(mockPostMessage).toHaveBeenCalledWith({
+        payload: 'test-branch',
+        type: MessageFromWebviewType.COPY_STUDIO_LINK
+      })
+    })
+
+    it('should not allow copying a Studio link when an experiment exists on the remote and Studio is not connected', () => {
+      renderTable({ ...tableStateFixture, isStudioConnected: false })
+
+      expect(
+        within(getRow('42b8736')).queryByLabelText('copy-experiment-link')
+      ).not.toBeInTheDocument()
+    })
+
+    it('should not allow copying a Studio link when an experiment does not exist on the remote and Studio is connected', () => {
+      renderTable({ ...tableStateFixture, isStudioConnected: true })
+
+      expect(
+        within(getRow('f0f9186')).queryByLabelText('copy-experiment-link')
+      ).not.toBeInTheDocument()
     })
   })
 })
