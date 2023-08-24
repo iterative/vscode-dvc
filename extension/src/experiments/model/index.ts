@@ -29,7 +29,12 @@ import {
   WORKSPACE_BRANCH
 } from '../webview/contract'
 import { reorderListSubset } from '../../util/array'
-import { Executor, ExpShowOutput, ExecutorStatus } from '../../cli/dvc/contract'
+import {
+  Executor,
+  ExpShowOutput,
+  ExecutorStatus,
+  EXPERIMENT_WORKSPACE_ID
+} from '../../cli/dvc/contract'
 import { flattenMapValues } from '../../util/map'
 import { ModelWithPersistence } from '../../persistence/model'
 import { PersistenceKey } from '../../persistence/constants'
@@ -81,6 +86,8 @@ export class ExperimentsModel extends ModelWithPersistence {
   private running: RunningExperiment[] = []
   private startedRunning: Set<string> = new Set()
 
+  private dvcLiveOnlyExpName: string | undefined
+
   constructor(dvcRoot: string, workspaceState: Memento) {
     super(dvcRoot, workspaceState)
 
@@ -126,7 +133,7 @@ export class ExperimentsModel extends ModelWithPersistence {
   public transformAndSetLocal(
     expShow: ExpShowOutput,
     gitLog: string,
-    dvcLiveOnly: boolean,
+    dvcLiveOnly: { running: boolean; expName?: string },
     rowOrder: { branch: string; sha: string }[],
     availableNbCommits: { [branch: string]: number }
   ) {
@@ -137,7 +144,11 @@ export class ExperimentsModel extends ModelWithPersistence {
       hasCheckpoints,
       runningExperiments,
       workspace
-    } = collectExperiments(expShow, gitLog, dvcLiveOnly)
+    } = collectExperiments(expShow, gitLog, dvcLiveOnly.running)
+
+    if (dvcLiveOnly.expName) {
+      this.dvcLiveOnlyExpName = dvcLiveOnly.expName
+    }
 
     const { hasMoreCommits, isShowingMoreCommits } =
       collectAddRemoveCommitsDetails(availableNbCommits, (branch: string) =>
@@ -528,6 +539,22 @@ export class ExperimentsModel extends ModelWithPersistence {
     return this.availableBranchesToSelect
   }
 
+  public checkDvcLiveOnly(fetched: string[]) {
+    if (!this.dvcLiveOnlyExpName) {
+      return false
+    }
+    if (
+      fetched.includes(this.dvcLiveOnlyExpName) &&
+      this.coloredStatus[EXPERIMENT_WORKSPACE_ID] ===
+        this.coloredStatus[this.dvcLiveOnlyExpName]
+    ) {
+      this.coloredStatus[EXPERIMENT_WORKSPACE_ID] = UNSELECTED
+      this.dvcLiveOnlyExpName = undefined
+      this.persistStatus()
+      return true
+    }
+  }
+
   private findIndexByPath(pathToRemove: string) {
     return this.currentSorts.findIndex(({ path }) => path === pathToRemove)
   }
@@ -590,7 +617,8 @@ export class ExperimentsModel extends ModelWithPersistence {
       this.experimentsByCommit,
       this.coloredStatus,
       this.availableColors,
-      this.startedRunning
+      this.startedRunning,
+      this.dvcLiveOnlyExpName
     )
     this.startedRunning = new Set()
 

@@ -10,16 +10,25 @@ import { hasKey } from '../../../util/object'
 import { Experiment, isQueued, RunningExperiment } from '../../webview/contract'
 import { definedAndNonEmpty, reorderListSubset } from '../../../util/array'
 import { flattenMapValues } from '../../../util/map'
-import { Executor } from '../../../cli/dvc/contract'
+import { Executor, EXPERIMENT_WORKSPACE_ID } from '../../../cli/dvc/contract'
 
 const canAssign = (
   coloredStatus: ColoredStatus,
   unassignedColors: Color[]
 ): boolean => canSelect(coloredStatus) && definedAndNonEmpty(unassignedColors)
 
-const collectStatus = (acc: ColoredStatus, experiment: Experiment): void => {
+const collectStatus = (
+  acc: ColoredStatus,
+  experiment: Experiment,
+  dvcLiveOnlyExpName: string | undefined
+): void => {
   const { id, executorStatus: status } = experiment
   if (!id || isQueued(status) || hasKey(acc, id)) {
+    return
+  }
+
+  if (acc[EXPERIMENT_WORKSPACE_ID] && id === dvcLiveOnlyExpName) {
+    acc[id] = acc[EXPERIMENT_WORKSPACE_ID]
     return
   }
 
@@ -89,7 +98,8 @@ export const collectColoredStatus = (
   experimentsByCommit: Map<string, Experiment[]>,
   previousStatus: ColoredStatus,
   unassignedColors: Color[],
-  startedRunning: Set<string>
+  startedRunning: Set<string>,
+  dvcLiveOnlyExpName: string | undefined
 ): { coloredStatus: ColoredStatus; availableColors: Color[] } => {
   const flatExperimentsByCommit = flattenMapValues(experimentsByCommit)
   let availableColors = unassignColors(
@@ -115,7 +125,7 @@ export const collectColoredStatus = (
     ...workspaceAndCommits,
     ...flatExperimentsByCommit
   ]) {
-    collectStatus(coloredStatus, experiment)
+    collectStatus(coloredStatus, experiment, dvcLiveOnlyExpName)
   }
 
   return {

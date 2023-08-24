@@ -279,6 +279,21 @@ export const getPidFromFile = async (
   return pid
 }
 
+export const getDetailFromFile = (
+  path: string,
+  key: string
+): string | undefined => {
+  if (!exists(path)) {
+    return
+  }
+
+  const contents = readFileSync(path).toString()
+
+  try {
+    return (JSON.parse(contents) as { [key: string]: string })[key]
+  } catch {}
+}
+
 export const checkSignalFile = async (path: string): Promise<boolean> => {
   return !!(await getPidFromFile(path))
 }

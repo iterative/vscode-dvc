@@ -43,7 +43,11 @@ import { createTypedAccumulator } from '../util/object'
 import { pickPaths } from '../path/selection/quickPick'
 import { Toast } from '../vscode/toast'
 import { ConfigKey, getConfigValue, setUserConfigValue } from '../vscode/config'
-import { checkSignalFile, pollSignalFileForProcess } from '../fileSystem'
+import {
+  checkSignalFile,
+  getDetailFromFile,
+  pollSignalFileForProcess
+} from '../fileSystem'
 import { DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
 import { Response } from '../vscode/response'
 import { Pipeline } from '../pipeline'
@@ -599,6 +603,15 @@ export class Experiments extends BaseRepository<TableData> {
     return this.webviewMessages.sendWebviewMessage()
   }
 
+  public checkDvcLiveOnly(fetched: string[]) {
+    const updated = this.experiments.checkDvcLiveOnly(fetched)
+    if (!updated) {
+      return
+    }
+
+    this.notifyChanged()
+  }
+
   protected sendInitialWebviewData() {
     return this.webviewMessages.sendWebviewMessage()
   }
@@ -683,9 +696,13 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   private async checkSignalFile() {
-    const dvcLiveOnly = await checkSignalFile(this.dvcLiveOnlySignalFile)
+    const running = await checkSignalFile(this.dvcLiveOnlySignalFile)
 
-    if (dvcLiveOnly && !this.dvcLiveOnlyCleanupInitialized) {
+    if (!running) {
+      return { running }
+    }
+
+    if (!this.dvcLiveOnlyCleanupInitialized) {
       this.dvcLiveOnlyCleanupInitialized = true
       void pollSignalFileForProcess(this.dvcLiveOnlySignalFile, () => {
         this.dvcLiveOnlyCleanupInitialized = false
@@ -694,7 +711,9 @@ export class Experiments extends BaseRepository<TableData> {
         }
       })
     }
-    return dvcLiveOnly
+    const expName = getDetailFromFile(this.dvcLiveOnlySignalFile, 'exp_name')
+
+    return { expName, running }
   }
 
   private async informMaxSelected() {

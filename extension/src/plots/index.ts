@@ -189,7 +189,17 @@ export class Plots extends BaseRepository<TPlotsData> {
   private async sendPlots() {
     await this.isReady()
 
-    return this.webviewMessages.sendWebviewMessage()
+    await this.webviewMessages.sendWebviewMessage()
+
+    const fetchedRevs = []
+    for (const { id, fetched } of this.plots.getSelectedRevisionDetails()) {
+      if (!fetched) {
+        continue
+      }
+      fetchedRevs.push(id)
+    }
+
+    return this.experiments.checkDvcLiveOnly(fetchedRevs)
   }
 
   private createWebviewMessageHandler(
