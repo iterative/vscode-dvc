@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { VSCodeProgressRing } from '@vscode/webview-ui-toolkit/react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
@@ -21,27 +21,60 @@ type ExperimentStatusIndicatorProps = {
   id: string
 }
 
+const Progress: React.FC = () => (
+  <VSCodeProgressRing className={cx(styles.running, 'chromatic-ignore')} />
+)
+
+const CopyStudioLink: React.FC<{ id: string }> = ({ id }) => {
+  const [copying, setCopying] = useState<boolean>()
+  const timer = useRef<number>()
+
+  useEffect(
+    () => () => {
+      if (timer.current) {
+        window.clearTimeout(timer.current)
+      }
+    },
+    []
+  )
+
+  if (copying) {
+    return <Progress />
+  }
+
+  return (
+    <CellHintTooltip
+      tooltipContent={'Experiment on remote\nClick to copy Studio link'}
+    >
+      <div
+        className={styles.upload}
+        {...clickAndEnterProps(() => {
+          setCopying(true)
+          if (timer.current) {
+            window.clearTimeout(timer.current)
+          }
+          timer.current = window.setTimeout(() => {
+            setCopying(false)
+          }, 1000)
+          return copyStudioLink(id)
+        })}
+      >
+        <Icon
+          aria-label="Copy Experiment Link"
+          className={styles.remoteStatusBox}
+          icon={Link}
+        />
+      </div>
+    </CellHintTooltip>
+  )
+}
+
 const OnRemote: React.FC<{ id: string; isStudioConnected: boolean }> = ({
   id,
   isStudioConnected
 }) => {
   if (isStudioConnected) {
-    return (
-      <CellHintTooltip
-        tooltipContent={'Experiment on remote\nClick to copy Studio link'}
-      >
-        <div
-          className={styles.upload}
-          {...clickAndEnterProps(() => copyStudioLink(id))}
-        >
-          <Icon
-            aria-label="Copy Experiment Link"
-            className={styles.remoteStatusBox}
-            icon={Link}
-          />
-        </div>
-      </CellHintTooltip>
-    )
+    return <CopyStudioLink id={id} />
   }
   return (
     <CellHintTooltip tooltipContent="Experiment on remote">
@@ -60,9 +93,7 @@ export const ExperimentStatusIndicator: React.FC<
   )
 
   if (isRunning(status) || gitRemoteStatus === GitRemoteStatus.PUSHING) {
-    return (
-      <VSCodeProgressRing className={cx(styles.running, 'chromatic-ignore')} />
-    )
+    return <Progress />
   }
 
   if (gitRemoteStatus === GitRemoteStatus.NOT_ON_REMOTE) {
