@@ -4,6 +4,7 @@ import {
   ensureDirSync,
   ensureFileSync,
   remove,
+  readFileSync,
   writeFileSync
 } from 'fs-extra'
 import { TextDocument, window, workspace } from 'vscode'
@@ -18,13 +19,16 @@ import {
   writeJson,
   writeCsv,
   writeTsv,
-  isPathInProject
+  isPathInProject,
+  getPidFromFile
 } from '.'
 import { dvcDemoPath } from '../test/util'
 import { DOT_DVC } from '../cli/dvc/constants'
 import { ScriptCommand } from '../pipeline'
+import { processExists } from '../process/execution'
 
 jest.mock('../cli/dvc/reader')
+jest.mock('../process/execution')
 jest.mock('fs-extra', () => {
   const actualModule = jest.requireActual('fs-extra')
   return {
@@ -32,13 +36,17 @@ jest.mock('fs-extra', () => {
     ...actualModule,
     appendFileSync: jest.fn(),
     ensureFileSync: jest.fn(),
+    readFileSync: jest.fn(),
     writeFileSync: jest.fn()
   }
 })
 
+const mockedProcessExists = jest.mocked(processExists)
+
 const mockedAppendFileSync = jest.mocked(appendFileSync)
 const mockedEnsureFileSync = jest.mocked(ensureFileSync)
 const mockedWriteFileSync = jest.mocked(writeFileSync)
+const mockedReadFileSync = jest.mocked(readFileSync)
 const mockedWorkspace = jest.mocked(workspace)
 const mockedWindow = jest.mocked(window)
 const mockedOpenTextDocument = jest.fn()
@@ -472,5 +480,41 @@ describe('isPathInProject', () => {
     const dvcRoot = dvcDemoPath
     const subProjects: string[] = [join(dvcDemoPath, 'nested2')]
     expect(isPathInProject(path, dvcRoot, subProjects)).toBe(true)
+  })
+})
+
+describe('getPidFromFile', () => {
+  it('should handle a file containing a number', async () => {
+    mockedReadFileSync.mockReturnValueOnce(Buffer.from('3675'))
+    mockedProcessExists.mockResolvedValueOnce(true)
+    const pid = await getPidFromFile(__filename)
+
+    expect(mockedReadFileSync).toHaveBeenCalledTimes(1)
+    expect(mockedProcessExists).toHaveBeenCalledTimes(1)
+    expect(pid).toBe(3675)
+  })
+
+  it('should handle a file containing a JSON object with a numeric pid', async () => {
+    mockedReadFileSync.mockReturnValueOnce(
+      Buffer.from(JSON.stringify({ pid: 3676 }))
+    )
+    mockedProcessExists.mockResolvedValueOnce(true)
+    const pid = await getPidFromFile(__filename)
+
+    expect(mockedReadFileSync).toHaveBeenCalledTimes(1)
+    expect(mockedProcessExists).toHaveBeenCalledTimes(1)
+    expect(pid).toBe(3676)
+  })
+
+  it('should handle a file containing a JSON object with a string pid', async () => {
+    mockedReadFileSync.mockReturnValueOnce(
+      Buffer.from(JSON.stringify({ pid: '3676' }))
+    )
+    mockedProcessExists.mockResolvedValueOnce(true)
+    const pid = await getPidFromFile(__filename)
+
+    expect(mockedReadFileSync).toHaveBeenCalledTimes(1)
+    expect(mockedProcessExists).toHaveBeenCalledTimes(1)
+    expect(pid).toBe(3676)
   })
 })

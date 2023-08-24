@@ -252,6 +252,16 @@ export const writeTsv = async (
   return writeFileSync(path, csv)
 }
 
+const getPid = (contents: string): number | undefined => {
+  try {
+    const { pid } = JSON.parse(contents) as { pid?: string }
+    if (pid) {
+      return createValidInteger(pid)
+    }
+  } catch {}
+  return createValidInteger(contents)
+}
+
 export const getPidFromFile = async (
   path: string
 ): Promise<number | undefined> => {
@@ -260,7 +270,7 @@ export const getPidFromFile = async (
   }
 
   const contents = readFileSync(path).toString()
-  const pid = createValidInteger(contents)
+  const pid = getPid(contents)
 
   if (!pid || !(await processExists(pid))) {
     removeSync(path)
