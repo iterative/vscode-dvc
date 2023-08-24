@@ -6,9 +6,13 @@ import { generateTestExpShowOutput } from '../../test/util/experiments'
 
 describe('collectFiles', () => {
   it('should collect all of the available files from the test fixture', () => {
-    expect(collectFiles(expShowFixture, [])).toStrictEqual([
-      'params.yaml',
+    const files = collectFiles(expShowFixture, [])
+    files.sort()
+
+    expect(files).toStrictEqual([
+      'metrics.json',
       join('nested', 'params.yaml'),
+      'params.yaml',
       'summary.json'
     ])
   })
@@ -80,9 +84,12 @@ describe('collectFiles', () => {
       }
     })
 
+    const files = collectFiles(workspaceOnly, ['dvclive.json'])
+    files.sort()
+
     expect(collectFiles(workspaceOnly, ['dvclive.json'])).toStrictEqual([
-      'params.yaml',
-      'dvclive.json'
+      'dvclive.json',
+      'params.yaml'
     ])
   })
 })

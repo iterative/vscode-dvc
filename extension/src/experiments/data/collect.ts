@@ -1,6 +1,28 @@
-import { ExpShowOutput } from '../../cli/dvc/contract'
-import { uniqueValues } from '../../util/array'
+import { ExpData, ExpShowOutput, MetricsOrParams } from '../../cli/dvc/contract'
 import { getExpData } from '../columns/collect'
+
+const collectFilesFromKeys = (
+  acc: Set<string>,
+  metricsOrParams: MetricsOrParams | null | undefined
+): void => {
+  for (const file of Object.keys(metricsOrParams || {})) {
+    if (!file) {
+      continue
+    }
+    acc.add(file)
+  }
+}
+
+const collectFilesFromExperiment = (
+  acc: Set<string>,
+  data: ExpData | undefined
+) => {
+  if (!data) {
+    return
+  }
+  collectFilesFromKeys(acc, data.params)
+  collectFilesFromKeys(acc, data.metrics)
+}
 
 export const collectFiles = (
   output: ExpShowOutput,
@@ -10,17 +32,25 @@ export const collectFiles = (
     return existingFiles
   }
 
-  const [workspace] = output
+  const acc = new Set(existingFiles)
 
-  const data = getExpData(workspace)
+  for (const commit of output) {
+    const data = getExpData(commit)
+    collectFilesFromExperiment(acc, data)
 
-  return uniqueValues([
-    ...Object.keys({
-      ...data?.params,
-      ...data?.metrics
-    }).filter(Boolean),
-    ...existingFiles
-  ])
+    const { experiments } = commit
+
+    if (!experiments?.length) {
+      continue
+    }
+
+    for (const { revs } of experiments) {
+      const [experiment] = revs
+      collectFilesFromExperiment(acc, getExpData(experiment))
+    }
+  }
+
+  return [...acc]
 }
 
 const isCurrentBranch = (branch: string) => branch.indexOf('*') === 0
