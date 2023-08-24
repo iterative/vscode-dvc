@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.46] - 2023-08-24
+
+### 🐛 Bug Fixes
+
+- Update collection of files which trigger exp show updates [#4564](https://github.com/iterative/vscode-dvc/pull/4564) by [@mattseddon](https://github.com/mattseddon)
+
+### 🔨 Maintenance
+
+- Update demo project and latest tested CLI version (3.16.0) [#4559](https://github.com/iterative/vscode-dvc/pull/4559) by [@mattseddon](https://github.com/mattseddon)
+- Accomodate new DVCLive signal file format [#4565](https://github.com/iterative/vscode-dvc/pull/4565) by [@mattseddon](https://github.com/mattseddon)
+
 ## [1.0.45] - 2023-08-23
 
 ### 🐛 Bug Fixes
