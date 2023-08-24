@@ -82,19 +82,7 @@ export abstract class BaseData<
     )
   }
 
-  private getWatchedFiles() {
-    return uniqueValues([...this.staticFiles, ...this.collectedFiles])
-  }
-
-  private watchFiles() {
-    return createFileSystemWatcher(
-      disposable => this.dispose.track(disposable),
-      getRelativePattern(this.dvcRoot, '**'),
-      path => this.listener(path)
-    )
-  }
-
-  private listener(path: string) {
+  protected listener(path: string) {
     const relPath = relative(this.dvcRoot, path)
     if (
       this.getWatchedFiles().some(
@@ -106,6 +94,18 @@ export abstract class BaseData<
     ) {
       void this.managedUpdate(path)
     }
+  }
+
+  private getWatchedFiles() {
+    return uniqueValues([...this.staticFiles, ...this.collectedFiles])
+  }
+
+  private watchFiles() {
+    return createFileSystemWatcher(
+      disposable => this.dispose.track(disposable),
+      getRelativePattern(this.dvcRoot, '**'),
+      path => this.listener(path)
+    )
   }
 
   abstract managedUpdate(path?: string): Promise<void>
