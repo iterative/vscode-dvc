@@ -9,7 +9,7 @@ export const TEMP_PLOTS_DIR = join(DOT_DVC, 'tmp', 'plots')
 
 export const FIELD_SEPARATOR = '::'
 
-const TEMP_EXP_DIR = join(DOT_DVC, 'tmp', 'exps')
+export const TEMP_EXP_DIR = join(DOT_DVC, 'tmp', 'exps')
 export const DVCLIVE_ONLY_RUNNING_SIGNAL_FILE = join(
   TEMP_EXP_DIR,
   'run',

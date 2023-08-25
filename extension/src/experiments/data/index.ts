@@ -1,3 +1,4 @@
+import { join } from 'path'
 import { collectBranches, collectFiles } from './collect'
 import {
   EXPERIMENTS_GIT_LOGS_REFS,
@@ -13,7 +14,12 @@ import {
   ExperimentsOutput,
   isRemoteExperimentsOutput
 } from '../../data'
-import { Args, DOT_DVC, ExperimentFlag } from '../../cli/dvc/constants'
+import {
+  Args,
+  DOT_DVC,
+  ExperimentFlag,
+  TEMP_EXP_DIR
+} from '../../cli/dvc/constants'
 import { COMMITS_SEPARATOR, gitPath } from '../../cli/git/constants'
 import { getGitPath } from '../../fileSystem'
 import { ExperimentsModel } from '../model'
@@ -38,6 +44,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
     this.experiments = experiments
 
     void this.watchExpGitRefs()
+    void this.watchQueueDirectories()
     void this.managedUpdate()
     this.waitForInitialLocalData()
   }
@@ -171,6 +178,15 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
           return this.managedUpdate()
         }
       }
+    )
+  }
+
+  private watchQueueDirectories() {
+    const tempQueueDirectory = join(this.dvcRoot, TEMP_EXP_DIR)
+    return createFileSystemWatcher(
+      disposable => this.dispose.track(disposable),
+      getRelativePattern(tempQueueDirectory, '**'),
+      (path: string) => this.listener(path)
     )
   }
 
