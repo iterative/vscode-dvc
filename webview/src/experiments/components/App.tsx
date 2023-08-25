@@ -24,7 +24,8 @@ import {
   updateRows,
   updateSelectedForPlotsCount,
   updateSorts,
-  updateShowOnlyChanged
+  updateShowOnlyChanged,
+  updateIsStudioConnected
 } from '../state/tableDataSlice'
 import { useVsCodeMessaging } from '../../shared/hooks/useVsCodeMessaging'
 
@@ -81,6 +82,9 @@ export const App: React.FC<Record<string, unknown>> = () => {
                 dispatch(
                   updateIsShowingMoreCommits(data.data.isShowingMoreCommits)
                 )
+                continue
+              case 'isStudioConnected':
+                dispatch(updateIsStudioConnected(data.data.isStudioConnected))
                 continue
               case 'rows':
                 dispatch(updateRows(data.data.rows))

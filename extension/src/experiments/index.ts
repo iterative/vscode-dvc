@@ -28,6 +28,7 @@ import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ColumnsModel } from './columns/model'
 import { ExperimentsData } from './data'
 import { stopWorkspaceExperiment } from './processExecution'
+import { Studio } from './studio'
 import { Experiment, ColumnType, TableData, Column } from './webview/contract'
 import { WebviewMessages } from './webview/messages'
 import { DecorationProvider } from './model/decorationProvider'
@@ -42,7 +43,11 @@ import { createTypedAccumulator } from '../util/object'
 import { pickPaths } from '../path/selection/quickPick'
 import { Toast } from '../vscode/toast'
 import { ConfigKey, getConfigValue, setUserConfigValue } from '../vscode/config'
-import { checkSignalFile, pollSignalFileForProcess } from '../fileSystem'
+import {
+  checkSignalFile,
+  getEntryFromJsonFile,
+  pollSignalFileForProcess
+} from '../fileSystem'
 import { DVCLIVE_ONLY_RUNNING_SIGNAL_FILE } from '../cli/dvc/constants'
 import { Response } from '../vscode/response'
 import { Pipeline } from '../pipeline'
@@ -72,6 +77,7 @@ export class Experiments extends BaseRepository<TableData> {
   private readonly data: ExperimentsData
   private readonly experiments: ExperimentsModel
   private readonly columns: ColumnsModel
+  private readonly studio: Studio
 
   private readonly experimentsFileFocused = this.dispose.track(
     new EventEmitter<string | undefined>()
@@ -144,6 +150,8 @@ export class Experiments extends BaseRepository<TableData> {
         this.columnsOrderOrStatusChanged
       )
     )
+
+    this.studio = this.dispose.track(new Studio(this.dvcRoot, internalCommands))
 
     this.data = this.dispose.track(
       data ||
@@ -589,6 +597,25 @@ export class Experiments extends BaseRepository<TableData> {
     return this.data.update()
   }
 
+  public async setStudioBaseUrl(studioToken: string | undefined) {
+    await this.isReady()
+    await this.studio.setBaseUrl(studioToken)
+    return this.webviewMessages.sendWebviewMessage()
+  }
+
+  public hasDvcLiveOnlyRunning() {
+    return this.experiments.hasDvcLiveOnlyRunning()
+  }
+
+  public checkWorkspaceDuplicated(fetched: string[]) {
+    const updated = this.experiments.checkWorkspaceDuplicated(fetched)
+    if (!updated) {
+      return
+    }
+
+    this.notifyChanged()
+  }
+
   protected sendInitialWebviewData() {
     return this.webviewMessages.sendWebviewMessage()
   }
@@ -630,6 +657,7 @@ export class Experiments extends BaseRepository<TableData> {
       this.experiments,
       this.columns,
       this.pipeline,
+      this.studio,
       () => this.getWebview(),
       () => this.notifyChanged(),
       () => this.selectColumns(),
@@ -672,9 +700,13 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   private async checkSignalFile() {
-    const dvcLiveOnly = await checkSignalFile(this.dvcLiveOnlySignalFile)
+    const running = await checkSignalFile(this.dvcLiveOnlySignalFile)
 
-    if (dvcLiveOnly && !this.dvcLiveOnlyCleanupInitialized) {
+    if (!running) {
+      return { running }
+    }
+
+    if (!this.dvcLiveOnlyCleanupInitialized) {
       this.dvcLiveOnlyCleanupInitialized = true
       void pollSignalFileForProcess(this.dvcLiveOnlySignalFile, () => {
         this.dvcLiveOnlyCleanupInitialized = false
@@ -683,7 +715,9 @@ export class Experiments extends BaseRepository<TableData> {
         }
       })
     }
-    return dvcLiveOnly
+    const expName = getEntryFromJsonFile(this.dvcLiveOnlySignalFile, 'exp_name')
+
+    return { expName, running }
   }
 
   private async informMaxSelected() {

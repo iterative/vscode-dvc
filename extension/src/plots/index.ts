@@ -189,7 +189,24 @@ export class Plots extends BaseRepository<TPlotsData> {
   private async sendPlots() {
     await this.isReady()
 
-    return this.webviewMessages.sendWebviewMessage()
+    await this.webviewMessages.sendWebviewMessage()
+    return this.checkDvcLiveOnlyDuplicate()
+  }
+
+  private checkDvcLiveOnlyDuplicate() {
+    if (!this.experiments.hasDvcLiveOnlyRunning()) {
+      return
+    }
+
+    const fetchedRevs = []
+    for (const { id, fetched } of this.plots.getSelectedRevisionDetails()) {
+      if (!fetched) {
+        continue
+      }
+      fetchedRevs.push(id)
+    }
+
+    return this.experiments.checkWorkspaceDuplicated(fetchedRevs)
   }
 
   private createWebviewMessageHandler(

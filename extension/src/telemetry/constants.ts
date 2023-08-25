@@ -32,6 +32,8 @@ export const EventName = Object.assign(
     VIEWS_EXPERIMENTS_TABLE_CLOSED: 'views.experimentsTable.closed',
     VIEWS_EXPERIMENTS_TABLE_COLUMNS_REORDERED:
       'views.experimentsTable.columnsReordered',
+    VIEWS_EXPERIMENTS_TABLE_COPY_STUDIO_LINK:
+      'views.experimentsTable.copyStudioLink',
     VIEWS_EXPERIMENTS_TABLE_COPY_TO_CLIPBOARD:
       'views.experimentsTable.copyToClipboard',
     VIEWS_EXPERIMENTS_TABLE_CREATED: 'views.experimentsTable.created',
@@ -259,6 +261,7 @@ export interface IEventNamePropertyMapping {
     path: string
   }
   [EventName.VIEWS_EXPERIMENTS_TABLE_RESET_COMMITS]: undefined
+  [EventName.VIEWS_EXPERIMENTS_TABLE_COPY_STUDIO_LINK]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_COPY_TO_CLIPBOARD]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_CREATED]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_FILTER_COLUMN]: undefined

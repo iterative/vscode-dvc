@@ -22,6 +22,7 @@ export const codicons = [
   'gripper',
   'info',
   'list-filter',
+  'link',
   'pass-filled',
   'pinned',
   'refresh',

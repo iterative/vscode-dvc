@@ -39,10 +39,10 @@ beforeEach(() => {
 
 const DEFAULT_DATA: [
   string,
-  boolean,
+  { running: boolean; expName?: string },
   { branch: string; sha: string }[],
   { [branch: string]: number }
-] = ['', false, [], { main: 2000 }]
+] = ['', { running: false }, [], { main: 2000 }]
 
 type TransformAndSetInputs = [ExpShowOutput, ...typeof DEFAULT_DATA]
 
@@ -52,7 +52,7 @@ describe('ExperimentsModel', () => {
     model.transformAndSetLocal(
       outputFixture,
       gitLogFixture,
-      false,
+      { running: false },
       rowOrderFixture,
       { main: 6 }
     )
@@ -65,7 +65,7 @@ describe('ExperimentsModel', () => {
     model.transformAndSetLocal(
       survivalOutputFixture,
       '',
-      false,
+      { running: false },
       [
         { branch: 'main', sha: '3d5adcb974bb2c85917a5d61a489b933adaa2b7f' },
         { branch: 'main', sha: 'a49e03966a1f9f1299ec222ebc4bed8625d2c54d' },
@@ -107,7 +107,9 @@ describe('ExperimentsModel', () => {
       }
     )
 
-    model.transformAndSetLocal(dvcLiveOnly, '', true, [], { main: 2000 })
+    model.transformAndSetLocal(dvcLiveOnly, '', { running: true }, [], {
+      main: 2000
+    })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const runningWorkspace = (model as any).workspace
     expect(runningWorkspace?.executor).toStrictEqual(EXPERIMENT_WORKSPACE_ID)
@@ -203,7 +205,7 @@ describe('ExperimentsModel', () => {
     model.transformAndSetLocal(
       deeplyNestedOutputFixture,
       '',
-      false,
+      { running: false },
       [{ branch: 'main', sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77' }],
       { main: 10 }
     )
@@ -217,7 +219,7 @@ describe('ExperimentsModel', () => {
     model.transformAndSetLocal(
       dataTypesOutputFixture,
       '',
-      false,
+      { running: false },
       [{ branch: 'main', sha: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77' }],
       { main: 10 }
     )
@@ -483,7 +485,7 @@ describe('ExperimentsModel', () => {
     const runningExperimentData: TransformAndSetInputs = [
       outputFixture,
       gitLogFixture,
-      false,
+      { running: false },
       [],
       {
         main: 2000
@@ -504,7 +506,7 @@ describe('ExperimentsModel', () => {
         } as ExpWithError
       ],
       gitLogFixture,
-      false,
+      { running: false },
       [],
       {
         main: 2000
@@ -586,7 +588,7 @@ describe('ExperimentsModel', () => {
         error: { msg: errorMsg, type: 'caught error' }
       }
     ]
-    model.transformAndSetLocal(data, gitLogFixture, false, [], {
+    model.transformAndSetLocal(data, gitLogFixture, { running: false }, [], {
       main: 6
     })
 
@@ -595,7 +597,7 @@ describe('ExperimentsModel', () => {
     model.transformAndSetLocal(
       outputFixture,
       gitLogFixture,
-      false,
+      { running: false },
       rowOrderFixture,
       { main: 6 }
     )
