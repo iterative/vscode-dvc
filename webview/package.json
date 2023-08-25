@@ -79,7 +79,7 @@
     "storybook": "7.3.2",
     "storybook-addon-themes": "6.1.0",
     "style-loader": "3.3.3",
-    "stylelint": "15.10.2",
+    "stylelint": "15.10.3",
     "stylelint-config-standard-scss": "10.0.0",
     "ts-loader": "9.4.4",
     "webpack": "5.88.2",
