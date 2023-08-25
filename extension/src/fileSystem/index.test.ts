@@ -537,7 +537,7 @@ describe('getEntryFromJsonFile', () => {
     expect(undef).toBeUndefined()
   })
 
-  it('should return undefined it the file does not contain the key', () => {
+  it('should return undefined if the file does not contain the key', () => {
     mockedReadFileSync.mockReturnValueOnce(
       JSON.stringify({ 'other-key': '3676' })
     )
