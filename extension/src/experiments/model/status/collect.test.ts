@@ -27,7 +27,8 @@ describe('collectColoredStatus', () => {
       new Map(),
       {},
       copyOriginalColors(),
-      new Set()
+      new Set(),
+      undefined
     )
 
     expect(availableColors).toStrictEqual(colors)
@@ -48,7 +49,8 @@ describe('collectColoredStatus', () => {
       new Map(),
       {},
       copyOriginalColors(),
-      new Set()
+      new Set(),
+      undefined
     )
 
     expect(availableColors).toStrictEqual(colors)
@@ -74,7 +76,8 @@ describe('collectColoredStatus', () => {
         exp7: colors[6]
       },
       [],
-      new Set(['exp8'])
+      new Set(['exp8']),
+      undefined
     )
 
     expect(availableColors).toStrictEqual([])
@@ -107,7 +110,8 @@ describe('collectColoredStatus', () => {
         exp8: UNSELECTED
       },
       copyOriginalColors().slice(3),
-      new Set(['exp1'])
+      new Set(['exp1']),
+      undefined
     )
 
     expect(coloredStatus).toStrictEqual({ exp1: colors[0] })
@@ -129,7 +133,8 @@ describe('collectColoredStatus', () => {
         exp9: colors[1]
       },
       unassignedColors,
-      new Set()
+      new Set(),
+      undefined
     )
 
     expect(coloredStatus).toStrictEqual({
@@ -157,7 +162,8 @@ describe('collectColoredStatus', () => {
       new Map(),
       { exp9: colors[0] },
       unassignColors,
-      new Set()
+      new Set(),
+      undefined
     )
 
     expect(availableColors).toStrictEqual(unassignColors)
@@ -190,7 +196,8 @@ describe('collectColoredStatus', () => {
         exp9: colors[5]
       },
       copyOriginalColors().slice(6),
-      new Set(['exp1', 'exp2', 'exp3'])
+      new Set(['exp1', 'exp2', 'exp3']),
+      undefined
     )
 
     expect(availableColors).toStrictEqual([])
@@ -228,12 +235,54 @@ describe('collectColoredStatus', () => {
         workspace: UNSELECTED
       },
       colors,
-      new Set()
+      new Set(),
+      undefined
     )
     expect(coloredStatus).toStrictEqual({
       'exp-1': selectedColor,
       main: UNSELECTED,
       workspace: UNSELECTED
+    })
+
+    expect(availableColors).toStrictEqual(
+      colors.filter(color => color !== selectedColor)
+    )
+  })
+
+  it("should duplicate the workspace's color when a new experiment is provided that has the same name as found in the DVCLive only signal file", () => {
+    const colors = copyOriginalColors()
+    const selectedColor = colors[2]
+    const { availableColors, coloredStatus } = collectColoredStatus(
+      [
+        {
+          executor: null,
+          executorStatus: ExecutorStatus.SUCCESS,
+          id: 'exp-1'
+        },
+        {
+          id: EXPERIMENT_WORKSPACE_ID
+        },
+        { id: 'main' },
+        {
+          executor: null,
+          executorStatus: ExecutorStatus.SUCCESS,
+          id: 'exp-2'
+        }
+      ] as Experiment[],
+      new Map(),
+      {
+        'exp-1': UNSELECTED,
+        workspace: selectedColor
+      },
+      colors,
+      new Set(),
+      'exp-2'
+    )
+    expect(coloredStatus).toStrictEqual({
+      [EXPERIMENT_WORKSPACE_ID]: selectedColor,
+      'exp-1': UNSELECTED,
+      'exp-2': selectedColor,
+      main: UNSELECTED
     })
 
     expect(availableColors).toStrictEqual(

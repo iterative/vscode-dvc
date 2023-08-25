@@ -279,6 +279,20 @@ export const getPidFromFile = async (
   return pid
 }
 
+export const getEntryFromJsonFile = (
+  path: string,
+  key: string
+): string | undefined => {
+  const json = loadJson(path)
+  if (!json) {
+    return
+  }
+
+  try {
+    return (json as { [key: string]: string })[key]
+  } catch {}
+}
+
 export const checkSignalFile = async (path: string): Promise<boolean> => {
   return !!(await getPidFromFile(path))
 }

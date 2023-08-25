@@ -20,13 +20,15 @@ import {
   writeCsv,
   writeTsv,
   isPathInProject,
-  getPidFromFile
+  getPidFromFile,
+  getEntryFromJsonFile
 } from '.'
 import { dvcDemoPath } from '../test/util'
 import { DOT_DVC } from '../cli/dvc/constants'
 import { ScriptCommand } from '../pipeline'
 import { processExists } from '../process/execution'
 
+jest.mock('../common/logger')
 jest.mock('../cli/dvc/reader')
 jest.mock('../process/execution')
 jest.mock('fs-extra', () => {
@@ -516,5 +518,42 @@ describe('getPidFromFile', () => {
     expect(mockedReadFileSync).toHaveBeenCalledTimes(1)
     expect(mockedProcessExists).toHaveBeenCalledTimes(1)
     expect(pid).toBe(3676)
+  })
+})
+
+describe('getEntryFromJsonFile', () => {
+  it('should return undefined if the file does not exist', () => {
+    const undef = getEntryFromJsonFile('no-file', 'no-keys')
+
+    expect(mockedReadFileSync).toHaveBeenCalledTimes(1)
+    expect(undef).toBeUndefined()
+  })
+
+  it('should return undefined for a file containing a string', () => {
+    mockedReadFileSync.mockReturnValueOnce(Buffer.from('string'))
+    const undef = getEntryFromJsonFile(__filename, 'no-keys')
+
+    expect(mockedReadFileSync).toHaveBeenCalledTimes(1)
+    expect(undef).toBeUndefined()
+  })
+
+  it('should return undefined if the file does not contain the key', () => {
+    mockedReadFileSync.mockReturnValueOnce(
+      JSON.stringify({ 'other-key': '3676' })
+    )
+    mockedProcessExists.mockResolvedValueOnce(true)
+    const undef = getEntryFromJsonFile(__filename, 'key')
+
+    expect(mockedReadFileSync).toHaveBeenCalledTimes(1)
+    expect(undef).toBeUndefined()
+  })
+
+  it('should return the value if the file contains the key', () => {
+    mockedReadFileSync.mockReturnValueOnce(JSON.stringify({ key: 'value' }))
+    mockedProcessExists.mockResolvedValueOnce(true)
+    const value = getEntryFromJsonFile(__filename, 'key')
+
+    expect(mockedReadFileSync).toHaveBeenCalledTimes(1)
+    expect(value).toStrictEqual('value')
   })
 })
