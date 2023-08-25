@@ -45,7 +45,7 @@ export class Studio extends Disposable {
       const response = await fetch(`${STUDIO_URL}/webhook/dvc`, {
         body: JSON.stringify({
           client: 'vscode',
-          refs: ['ref'], // to be removed after https://github.com/iterative/studio/pull/7196 is shipped (before merge)
+          refs: [null],
           repo_url: gitRemoteUrl
         }),
         headers: {
