@@ -38,6 +38,19 @@
     ],
     "description": "Foreach stage template for dvc.yaml pipeline"
   },
+  "Matrix Pipeline Stage Template": {
+    "prefix": "dvc-pipeline-matrix-stage",
+    "body": [
+      "  ${1:train}:",
+      "    matrix:",
+      "      model: [${2:cnn}, ${3:xgb}]",
+      "      feature: [${4:feature1}, ${5:feature2}, ${6:feature3}]",
+      "    cmd: ${7:./train.py} --feature \\${item.feature}} \\${item.model}",
+      "    outs:",
+      "      - \\${item.model}.pkl"
+    ],
+    "description": "Matrix stage template for dvc.yaml pipeline"
+  },
   "Single File Plot Template": {
     "prefix": "dvc-plot-single",
     "body": [
